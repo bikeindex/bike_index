@@ -1,4 +1,4 @@
-![BIKE INDEX](https://github.com/bikeindex/webapp/tree/master/app/assets/images/logo.svg)
+![BIKE INDEX](https://github.com/bikeindex/webapp/tree/master/bike_index.png)
 # Welcome. This is the Bike Index.
 
 ## Dependencies
