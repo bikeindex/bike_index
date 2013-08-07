@@ -80,7 +80,7 @@ describe OwnershipCreator do
   end
 
   describe :add_errors_to_bike do 
-    it "should add the errors to the bike" do 
+    xit "should add the errors to the bike" do 
       ownership = Ownership.new 
       bike = Bike.new 
       ownership.errors.add(:problem, "BALLZ")
