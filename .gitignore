@@ -1,10 +1,8 @@
 # Ignore bundler config
 /.bundle
 
-# Ignore the database
-config/database.yml
 
-# Ignore the deploy and certs
+# Ignore the deploy location and certs
 config/certs
 config/deploy
 

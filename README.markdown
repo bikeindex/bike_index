@@ -1,6 +1,6 @@
-![BIKE INDEX](https://github.com/bikeindex/webapp/blob/master/bike_index.png?raw=true) [![Build Status](https://secure.travis-ci.org/bikeindex/webapp.png)](http://travis-ci.org/bikeindex/webapp)
+# ![BIKE INDEX](https://github.com/bikeindex/webapp/blob/master/bike_index.png?raw=true) This is the [Bike Index](https://www.bikeindex.org) [![Build Status](https://secure.travis-ci.org/bikeindex/webapp.png)](http://travis-ci.org/bikeindex/webapp)
 
-# Welcome. This is the [Bike Index.](https://www.bikeindex.org) 
+
 
 ## Dependencies
 
@@ -16,8 +16,6 @@
 
 
 ## Run it
-
-- Copy `config/database-sample.yml` to `config/database.yml`.
 
 - Create and seed your database (`rake db:setup`)
 
@@ -56,6 +54,6 @@ Keep track of development and community news.
 
 Please submit all pull requests as *-wip branches. If your pull request contains Ruby patches or features, you must include relevant rspec tests.
 
----
+
 
 and go hard

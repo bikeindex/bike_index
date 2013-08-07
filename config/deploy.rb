@@ -38,12 +38,6 @@ after "deploy:setup", "deploy:dbyml_upload"
 before "deploy:assets:precompile","deploy:dbyml_symlink"
 
 namespace :deploy do
-  task :dbyml_upload do
-    run "mkdir -p #{shared_path}/config"
-    data = File.open('./config/database-sample.yml', 'rb').read
-    put data, "#{shared_path}/config/database.yml"
-  end
-
   task :dbyml_symlink do
     run "ln -nfs #{shared_path}/config/database.yml #{release_path}/config/database.yml"
   end
