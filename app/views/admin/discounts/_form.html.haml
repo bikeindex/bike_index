@@ -1,0 +1,46 @@
+.form.form-horizontal
+  = form_for [:admin, @discount] do |f|
+    - if @discount.errors.any?
+      #alert-block
+        .alert.alert-error
+          %h4
+            Please fix the following 
+            = pluralize(@discount.errors.count, "error")
+          %ul
+            - @discount.errors.full_messages.each do |msg|
+              %li
+                = msg
+    
+    .control-group.padded
+      .control-label
+        = f.label :name
+      .controls
+        = f.text_field :name
+
+    .control-group
+      .control-label
+        = f.label :default
+      .controls
+        = f.select :default, [["No", false], ["Yes", true]]
+
+    .control-group
+      .control-label
+        = f.label :free_bike_tokens, 'Number of free bike tickets'
+      .controls
+        = f.text_field :free_bike_tokens
+
+    .control-group
+      .control-label
+        = f.label :notes, 'Discount notes'
+      .controls
+        = f.text_area :notes
+    
+    .control-group
+      .control-label
+        = f.label :code, 'Code'
+      .controls
+        = f.text_field :code
+    
+
+    .padded
+      = f.submit "Submit", class: 'button-green'

@@ -1,0 +1,23 @@
+%h1
+  Showing membership
+
+.row
+  .span6.well.padded
+    %p
+      = link_to 'Edit', edit_admin_membership_url(@membership), class: 'button-blue pull-right'
+    %p
+      %strong
+        Email address:
+      = @user.email
+      
+    %p
+      %strong
+        Role: 
+      = @membership.role
+        
+    %p
+      %strong
+        Organization Name:
+      = @organization.name
+    %p
+      = link_to 'Delete Membership!', admin_membership_path(@membership), method: :delete, confirm: 'Are you sure you want to delete this membership?', class: 'button-red'

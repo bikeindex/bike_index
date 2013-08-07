@@ -1,0 +1,76 @@
+//________________________
+//
+// Spoke card
+//
+//________________________
+@import "includes/bootstrap/_mixins.scss";
+@import "includes/bootstrap/_reset.scss";
+
+$headerFont: 'Raleway', sans-serif;
+
+.spokecard-wrap {
+  @include clearfix;
+  font-family: $headerFont;
+  position: relative;
+  margin: 100px auto;
+  width: 600px;
+  height: 380px;
+  padding: 20px;
+  &>span {
+    border: 1px solid black;
+    height: 20px; width: 20px;
+    position: absolute;
+    display: block;
+  }
+  .tleft {
+    top: 0; left: 0;
+    border-top: 0;
+    border-left: 0;
+  }
+  .bleft {
+    bottom: 0; left: 0;
+    border-bottom: 0;
+    border-left: 0;
+  }
+  .tright {
+    top: 0; right: 0;
+    border-right: 0;
+    border-top: 0;
+  }
+  .bright {
+    bottom: 0; right: 0;
+    border-right: 0;
+    border-bottom: 0;
+  }
+}
+
+.qr-code {
+  float: left;
+  display: block;
+  width: 170px;
+  margin: 160px 20px 0 0;
+}
+
+.mace-man, .steed {
+  margin: 20px 0 0;
+  float: left;
+  display: block;
+  height: 300px;
+  width: auto;
+}
+
+h1 {
+  margin: 0;
+  text-align: center;
+  font-size: 30px;
+}
+
+h2 {
+  color: #ccc;
+  margin: 0;
+  font-size: 20px;
+  position: absolute;
+  bottom: 22px;
+  right: 30px;
+  text-transform: uppercase;
+}

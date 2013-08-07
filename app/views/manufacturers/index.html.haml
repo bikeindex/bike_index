@@ -1,0 +1,37 @@
+%h1
+  Manufacturers known to Bike Index
+
+%section.full-screen-table
+  %table#manufacturers-list.table.table-striped.table-bordered
+    %thead
+      %th
+        Name
+      %th
+        Frames
+      %th.large-screens
+        Website
+    %tbody
+      - @manufacturers.each do |manufacturer|
+        %tr
+          %td
+            = link_to manufacturer.name, manufacturer_url(manufacturer)
+          %td
+            = "&#x2713;".html_safe if manufacturer.frame_maker
+          %td.large-screens
+            - if manufacturer.website
+              = link_to "Company website", manufacturer.website
+
+%h2.padded
+  OH NO! We're missing a manufacturer?
+%p
+  That's not actually surprising, there are a bunch.
+%p
+  Give us a heads up in a comment below.
+
+%article.padded
+  .alert.alert-info
+    %p
+      Even better, #{link_to "this list is stored on GitHub", "https://github.com/bikeindex/resources/blob/master/manufacturers.csv"}. It's downloadable in csv format and is open source. If you'd like to make a correction or an addition, be awesome and #{link_to "submit a pull request", "https://help.github.com/articles/using-pull-requests"}.
+
+%article.content-comments
+  = render "/shared/disqus"

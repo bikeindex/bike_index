@@ -1,0 +1,118 @@
+- if @lock.errors.any?
+  #alert-block
+    .alert.alert-error
+      %a.close{"data-dismiss" => "alert"} ×
+      %h4
+        Please fix the following 
+        = pluralize(@lock.errors.count, "error")
+      %ul
+        - @lock.errors.full_messages.each do |msg|
+          %li 
+            = msg
+
+            
+- ulock_type = LockType.find_by_slug('u-lock')
+- chain_type = LockType.find_by_slug('chain-with-lock')
+- cable_type = LockType.find_by_slug('cable')
+- skewer_type = LockType.find_by_slug('locking-skewers')
+- other_type = LockType.find_by_slug('other-style')
+
+.lock-types-select
+  .lock-type-title
+    %label
+      Lock type
+  .lock-type
+    %div
+      %input{ id: "locky_#{ulock_type.id}", type: "radio", name: "lock_types_select", :data => {value: ulock_type.id}}
+    %label{ for: "locky_#{ulock_type.id}" }
+      %span
+        U-lock
+      = image_tag "/assets/locks/u-lock.jpg"
+  .lock-type
+    %div
+      %input{ id: "locky_#{chain_type.id}", type: "radio", name: "lock_types_select", :data => {value: chain_type.id}}
+    %label{ for: "locky_#{chain_type.id}" }
+      %span
+        Chain
+      = image_tag "/assets/locks/chain-with-lock.jpg"
+  .lock-type
+    %div
+      %input{ id: "locky_#{cable_type.id}", type: "radio", name: "lock_types_select", :data => {value: cable_type.id}}
+    %label{ for: "locky_#{cable_type.id}" }
+      %span
+        Cable lock
+      = image_tag "/assets/locks/cable.jpg"
+  .lock-type
+    %div
+      
+      %input{ id: "locky_#{skewer_type.id}", type: "radio", name: "lock_types_select", :data => {value: skewer_type.id}}
+    %label{ for: "locky_#{skewer_type.id}" }
+      %span
+        Locking skewers
+      = image_tag "/assets/locks/locking-skewer.jpg"
+  .lock-type
+    %div
+      %input{ id: "locky_#{other_type.id}", type: "radio", name: "lock_types_select", :data => {value: other_type.id}}
+    %label{ for: "locky_#{other_type.id}" }
+      %span
+        Other lock style
+      = image_tag "/assets/locks/other-style.jpg"
+  
+  = f.hidden_field :lock_type_id
+
+.input-field#chosen-container
+  .manufacturer-select.control-group.chosen-select
+    = f.label :manufacturer_id, class: "control-label"
+    .controls
+      = collection_select( :lock, :manufacturer_id, Manufacturer.all, :id, :name, :required =>true, prompt: "Choose manufacturer")
+  %p.other-value
+    = Manufacturer.find_by_slug("other").id
+  .hidden-other.control-group
+    = f.label :manufacturer_other, "Other lock manufacturer", class: "control-label"
+    .controls
+      = f.text_field :manufacturer_other
+
+.release-types.control-group.checkboxes
+  .release-type
+    .control-label
+      = f.label :has_key
+    .controls
+      = f.check_box :has_key     
+  .release-type
+    .control-label
+      = f.label :has_combination
+    .controls
+      = f.check_box :has_combination
+
+
+#serial.control-group.initially-hidden
+
+  .control-label
+    = f.label :key_serial
+  .controls
+    = f.text_field :key_serial
+
+  .lock-pictures
+    %h2
+      Examples of serial numbers found on different types of bike lock keys
+    %section
+      %a.lock-picture{ :data => { target: "https://www.bikeindex.org/assets/locks/krypto_small_key.jpg"} }
+        = image_tag("/assets/locks/krypto_small_key.jpg", alt: "Small kryptonite key")
+      %p
+        Small Kryptonite key
+    %section
+      %a.lock-picture{ :data => { target: "https://www.bikeindex.org/assets/locks/krypto_large_key.jpg"} }
+        = image_tag("/assets/locks/krypto_large_key.jpg", alt: "Large kryptonite key")
+      %p
+        Large Kryptonite key
+    %section
+      %a.lock-picture{ :data => { target: "https://www.bikeindex.org/assets/locks/pinhead_key.jpg"} }
+        = image_tag("/assets/locks/pinhead_key.jpg", alt: "Pinhead key")
+      %p
+        Pinhead locking skewer key
+
+#combination.control-group.initially-hidden
+  .control-label
+    = f.label :combination
+  .controls
+    = f.text_field :combination

@@ -1,0 +1,17 @@
+= form_for :session, url: session_path do |f|
+  .field
+    = f.email_field :email, placeholder: "Email address"
+  .field
+    = f.password_field :password, placeholder: "Password"
+  = f.submit "Log in", class: 'button-blue'
+
+%p
+  = link_to 'Forgot your password?', '/users/request_password_reset', class: 'forgotten-pass form-link'
+
+%a.facebook-login{href: "/auth/facebook" }
+  Log in with
+  = image_tag "/assets/facebook-login.png"
+
+%p.switch-login-signup
+  Don't have an account? 
+  = link_to 'Sign up instead', new_user_url

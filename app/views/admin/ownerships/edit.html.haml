@@ -1,0 +1,63 @@
+#admin-bikes-edit
+  %header.with-subtitle
+    %h1
+      Edit ownership
+    %p
+      = link_to "Back to editing bike", edit_admin_bike_path(@bike)
+
+  %ul.bike-boxes
+    = render partial: "/bikes/bike", :locals => {bike: @bike, target: "show" }
+  .dl-holder
+    %dl.dl-horizontal
+      = @bike.dl_list_item(@bike.created_at.strftime("%m-%d-%Y"), "Created")
+      = @bike.dl_from_attribute("owner_email")
+      = @bike.dl_list_item(@bike.owner.email, "Current Owner")
+      = @bike.dl_from_attribute("cached_data")
+  %hr
+
+  %h2
+    %span.table-error
+      BE CAREFUL. 
+    YOU CAN BREAK STUFF HERE
+  = form_for [:admin, @ownership], :html => { class: "form form-horizontal" } do |f|
+    - if @ownership.errors.any?
+      #alert-block
+        .alert.alert-error
+          %h4
+            Please fix the following 
+            = pluralize(@ownership.errors.count, "error")
+          %ul
+            - @ownership.errors.full_messages.each do |msg|
+              %li
+                = msg
+
+    
+    .control-group
+      = f.label :current, class: "control-label"
+      .controls
+        = f.check_box :current
+
+    .control-group
+      = f.label :claimed, class: "control-label"
+      .controls
+        = f.check_box :claimed
+
+    .control-group.chosen-select
+      = f.label :creator_id, class: "control-label"
+      .controls
+        = collection_select( :ownership, :creator_id, User.all, :id, :email, :required =>true, prompt: "Choose creator")
+
+    .control-group.chosen-select
+      = f.label :user_id, class: "control-label"
+      .controls
+        = collection_select( :ownership, :user_id, User.all, :id, :email, include_blank: "Choose Owner")
+
+    .control-group
+      = f.label :owner_email, class: "control-label"
+      .controls
+        = f.text_field :owner_email, :required =>true
+
+    .actions
+      .control-group
+        = submit_tag "Update the ownership", class: "button-green"
+        

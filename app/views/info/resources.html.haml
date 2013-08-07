@@ -1,0 +1,37 @@
+%h1
+  Bike Index Resources
+
+%p
+  We've got some stuff, right here.
+
+%article
+  %ul
+    %li
+      %p
+        We're open source, view it on #{link_to "GitHub", "https://github.com/bikeindex", target: "_blank"}.
+    %li
+      %p
+        Did you know every bike has a unique, identifying number? #{link_to "Read more", serials_url}.
+    %li
+      %p
+        View the list of all
+        = link_to "the manufacturers", manufacturers_url
+        the Bike Index knows about.
+    %li
+      %p
+        Read
+        = link_to "our recommendations ", stolen_bikes_url
+        for what to do if your bike is stolen, or some general information #{link_to "about bike theft", stolen_url}.
+    %li
+      %p
+        Make a sweet 
+        = link_to "Bike Index spoke card", spokecard_url
+        with a QR code linking to your bike's page on the index.
+
+%p
+  There's more, look around.
+%p
+  Pandabike.
+
+%article.padded
+  = image_tag "/assets/pandabike.jpg", alt: "Awesome bike made of panda"

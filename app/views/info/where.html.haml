@@ -1,0 +1,42 @@
+%h1#where-bike-index
+  Shops using the Bike Index
+
+
+%article
+  .map-of-shops
+    = render "/shared/shops_map"
+
+
+%ul.where-shops-list#list_of_partners
+  - @shops.each do |shop|
+    - shop.locations.each do |location|
+      %li{id: "shop#{shop.id}_#{location.id}" }
+        %h3
+          %a.where-shop-location{href: "#", :data => { lat: location.latitude, long: location.longitude }}
+            = shop.name
+        %p
+          #{location.street}, #{location.city}, #{location.state} #{location.zipcode}
+        - if location.phone
+          %p
+            %a{ href: "tel:#{ location.phone }" }
+              = number_to_phone(location.phone)
+            - if shop.website.present?
+              = link_to "(#{shop.name} website)", shop.website, target: "_blank", class: "shop-site"
+        .map-window
+          .window-content
+            %h3
+              = shop.name
+            %p
+              = location.street
+              %br
+              #{location.city}, #{location.state} #{location.zipcode}
+            .map-telephone
+              %a{ href: "tel:#{ location.phone }" }
+                = number_to_phone(location.phone)
+
+
+
+%hr.where-add-shops
+
+%p
+  If you're a bike shop and would like to join us, check out our #{link_to "signup page", vendor_signup_url}.

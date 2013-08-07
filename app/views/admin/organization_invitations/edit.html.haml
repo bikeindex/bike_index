@@ -1,0 +1,8 @@
+%header.with-subtitle
+  %h1
+    Editing #{@organization_invitation.organization.name}'s invitation
+  %p
+    = link_to "Back to managing organization invitations", admin_organization_invitations_url
+
+.well.span6.padded
+  = render partial: "/admin/organization_invitations/form"

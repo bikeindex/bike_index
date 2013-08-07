@@ -1,0 +1,8 @@
+%h1
+  edit #{@ctype.name} component type
+
+.row-fluid
+  .span6.padded.well
+    = render partial: "form"
+
+= link_to "Delete component type", admin_ctype_url(@ctype), method: :delete, confirm: "Are you sure?", class: "button-red"

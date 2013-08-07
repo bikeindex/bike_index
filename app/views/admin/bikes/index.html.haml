@@ -1,0 +1,22 @@
+
+%header.with-subtitle
+  %h1
+    Manage Bikes
+  = link_to "Manage component types", admin_ctypes_url, class: "sharing-links"
+
+%p
+  There are currently #{PublicImage.count} bike images
+  %em
+    (#{PublicImage.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
+
+%h4
+  = @bikes.count 
+  indexed,
+  %em
+    (#{Bike.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today) 
+  = Ownership.where(current: true).where(claimed: true).count
+  claimed
+
+%section.full-screen-table
+  %table#admin-bikes-table.table.table-striped.table-bordered
+    = render partial: "/admin/bikes/admin_bikes_table"

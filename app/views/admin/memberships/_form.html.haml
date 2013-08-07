@@ -1,0 +1,40 @@
+.form.form-horizontal#chosen-container
+  = form_for [:admin, @membership] do |f|
+    - if @membership.errors.any?
+      #alert-block
+        .alert.alert-error
+          %h4
+            Please fix the following 
+            = pluralize(@membership.errors.count, "error")
+          %ul
+            - @membership.errors.full_messages.each do |msg|
+              %li
+                = msg
+    %h3
+      User membership
+    .control-group.padded
+      %label.control-label
+        Organization
+      .controls
+        = collection_select( :membership, :organization_id, @organizations, :id, :name, :required =>true )
+        
+        
+    .control-group.chosen-select
+      %label.control-label
+        User ID
+      .controls
+        = collection_select( :membership, :user_id, @users, :id, :email, :required =>true, prompt: "Choose a user")
+    
+    .control-group
+      = f.label :role, class: "control-label"
+      .controls.radio-controls
+        %label.radio
+          = f.radio_button :role, "admin"
+          Admin of organization
+        %label.radio
+          = f.radio_button :role, "member"
+          Member of organization
+        
+
+    .control-group.actions
+      = f.submit 'Save', class: 'button-green'

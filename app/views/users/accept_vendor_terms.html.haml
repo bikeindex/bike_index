@@ -1,0 +1,21 @@
+%section.content
+  .receptacle
+    .inner-recep.legal-content
+      = render partial: "/info/vendor_terms_text"
+
+.accept-vendor-terms
+
+  = form_for @user do |f|
+    
+    .form-horizontal
+      .control-group
+        %label
+          .control-label
+            = f.check_box :vendor_terms_of_service
+          .controls
+            I agree to the Bike Index 
+            %strong
+              Terms of Service for Vendors.
+    .agree-action
+      .control-group
+        = f.submit "Submit", class: 'button-blue'

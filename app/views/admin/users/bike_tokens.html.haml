@@ -1,0 +1,12 @@
+%h1
+  = @user.name
+
+= form_tag admin_user_add_bike_tokens_url(@user.id), method: :post do
+  %label How many tokens do you want to grant?
+  = text_field_tag :count
+
+  %label Associated with which organization?
+  = collection_select(nil, :organization_id, Organization.all, :id, :name, prompt: true)
+
+  %div.actions
+    = submit_tag 'Add Tickets', class: "button-green"

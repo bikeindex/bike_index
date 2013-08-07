@@ -1,0 +1,80 @@
+<% if @new_user %>
+** Welcome to the Bike Index **
+
+Good thinking! We’re glad you’ve joined, you smarty pants.
+<% end %>
+
+<% if @bike.stolen %>
+Bike thieves are jerks.
+We're sorry your bike was stolen.
+<% else %>
+Congrats on adding your bike to the index!
+<% end %>
+
+<% if @bike.stolen %>
+You added a stolen bike to the Bike Index:
+<% elsif @bike.created_with_token %>
+Yeah! Work those free bikes!
+<% else %>
+
+<% if @ownership.creator.name %>
+<%= @ownership.creator.name %>
+<% else %>
+<%= @ownership.creator.email %>
+<% end %>
+<% if @org_name %>
+from <%= @org_name %>
+<% end %>
+<% if @new_bike %>
+sent you a 
+<% else %>
+added a 
+<% end %>
+<%= @biketype %>
+on the Bike Index 
+<% if @new_bike %> for you <% end %>
+
+<% end %>
+
+Make: <%= @bike.manufacturer.name  %></p>
+Serial: <%= @bike.serial_number.upcase %>
+Color: <%= @bike.primary_frame_color.name %>
+
+<% if @bike.stolen %>
+Hopefully you find the <%= @biketype %> soon. Give us a heads up when you do!
+<% elsif @bike.created_with_token %>
+  
+<% else %>
+
+Sign up or sign in to claim your <%= @biketype %> and edit it, upload photos and make sure you never lose track of your trusty steed!
+<% end %>
+
+
+
+
+
+
+Hi <%= @ownership.owner_email %>,
+
+<% if @new_user == true %>
+  Welcome to the Bike Index
+
+  Good thinking! We’re glad you’ve joined, you smarty pants.
+
+  <%= @org_text %> has indicated that you now have a bicycle on The Bike Index.
+
+  Go to www.bikeindex.org and sign up to claim your bike and keep it safe from thieves.
+
+<% else %>
+
+  <%= @org_text %> has indicated that you now have a bicycle on The Bike Index.
+
+  Go to the www.bikeindex.org to claim your bike and keep it safe from thieves.
+
+<% end %>
+
+
+Thanks,
+Bike Index Management
+
+

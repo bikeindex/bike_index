@@ -1,0 +1,25 @@
+%li{ class: bike.stolen && "stolen-background" }
+  = bike.list_image(target)
+  .primary-group
+    .dl-holder
+      %dl.dl-horizontal
+        = link_to(bike.dl_list_item(bike.title, bike.type), bike.list_link_url(target))
+      %dl.dl-horizontal
+        %dt Serial
+        %dd.serial-text
+          = bike.serial_number
+        
+  .info-group
+    .dl-holder
+      %dl.dl-horizontal
+        = bike.dl_list_item(bike.ass_name("primary_frame_color"), "Primary color")
+        = bike.dl_list_item(bike.ass_name("frame_material"), "Material")
+        - if bike.stolen and bike.stolen_records.any?
+          = bike.dl_list_item(bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), "Date stolen")
+
+      %dl.dl-horizontal
+        = bike.dl_list_item(bike.ass_name("rear_wheel_size"), "Wheel size")
+        = bike.dl_from_attribute_othered("handlebar_type")
+        - if bike.stolen and bike.stolen_records.any?
+          = bike.dl_list_item(bike.current_stolen_record.city, "Location")
+

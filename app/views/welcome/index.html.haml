@@ -1,0 +1,55 @@
+#home-title
+  %h1
+    Do right by your bike
+
+
+#treating-right
+  .treating-right-image
+    = image_tag "/assets/home/breakfast_in_bed.svg", alt: "Show your bike some love", title: "Show your bike some love"
+  .receptacle.overfloating
+    .inner-recep
+      .treating-right-text
+        = link_to "Register it!", choose_registration_path, class: "button-green"
+        %h2
+          Show your trusty steed some love
+  .home-sharing
+    = render "/shared/home_share"    
+
+
+#fight-theft-profit
+  .receptacle.overfloating
+    .inner-recep
+      .fight-theft-image
+        = image_tag "/assets/home/bike-thief-fat.svg", alt: "Fight bike theft", title: "A brigand stealing a trusty steed"
+      .theft-profit-block
+        %h3
+          Fight bike theft
+        %h4
+          Stolen bikes are sold quickly and easily
+        %h4
+          There hasn't been an organized nationwide system to publish stolen bike information.
+        %h4
+          Now there is. Join us.
+
+#support-the-community
+  .receptacle.overfloating
+    .inner-recep
+      %article
+        %h3
+          We created the service we wanted to use to protect our bikes.
+        %h4
+          We built the best registry
+          %em
+            we
+          could imagine. We're open sourcing it so it can be the best service imaginable, for everyone.
+      .sample-list
+        = link_to (image_tag "/assets/home/bikes_list1.jpg", alt: "Sample Bike Index return"), "https://www.bikeindex.org/bikes/71", class: "top-image"
+        = link_to (image_tag "/assets/home/bikes_list2.jpg", alt: "Sample Bike Index return"), "https://www.bikeindex.org/bikes/2", class: "middle-image"
+        = link_to (image_tag "/assets/home/bikes_list3.jpg", alt: "Sample Bike Index return"), "https://www.bikeindex.org/bikes/12"
+            
+
+
+.faq-block
+  .receptacle.overfloating
+    .inner-recep.faq-holder
+      = render "/shared/faq"     

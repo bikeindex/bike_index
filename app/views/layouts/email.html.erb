@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title><%= content_for?(:title) ? yield(:title) : "Bike Index" %></title>
+  <style type="text/css">
+    #outlook a{padding:0;} /* Force Outlook to provide a "view in browser" button. */
+    body{width:100% !important;} /* Force Hotmail to display emails at full width */
+    body{-webkit-text-size-adjust:none;} /* Prevent Webkit platforms from changing default text sizes. */
+  </style>
+  
+</head>
+
+<body style="margin: 0;padding: 0;font-family: Verdana, Geneva, sans-serif;color: #111;font-size: 100%; background: #fff">
+
+<div class="wrapper" style="width: 100%;position: relative;max-width: 700px;margin: 20px auto;background: #2980b9;-webkit-border-radius: 1px;-moz-border-radius: 1px;border-radius: 1px;">
+  <div class="header-content" style="padding: 20px 0 0;height: 180px;">
+    <img src="https://s3.amazonaws.com/bikeindex/bikeindex-white-tilt.png" style="display: block;float: right;">
+  </div>
+
+  <div class="body-content" style="margin: 0;background: #fff;border-top: 1px solid #c0c0c0;border-bottom: 1px solid #c0c0c0;padding: 20px 20px 30px;margin-bottom: 10px;">
+
+    <%= yield %>
+
+  </div>
+  <div class="footer-content" style="padding: 20px;font-size: 1.2em; color: #fff;">
+    <p>Thanks,<br>
+    Bike Index Management</p>
+  </div>
+</div>
+</body>
+</html>

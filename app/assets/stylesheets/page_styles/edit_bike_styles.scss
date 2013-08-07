@@ -1,0 +1,791 @@
+//________________________
+//
+// Wrapper
+//
+//________________________
+
+.edit-bike-container {
+  margin: 0px 0 0px;
+  border-left: none;
+  border-right: none;
+  padding: 0 0 100px;
+  background: rgba(#efefef, .2);
+  border-top: 1px solid #cecece;
+  border-bottom: 1px solid #cecece;
+  form { padding: 0; position: static; }
+  .receptacle { overflow: visible; }
+  .bikeform-tip { right: 5px; }
+  .weird-edit-wrap { position: static; }
+  // .form-save { display: none; }
+}
+
+#edit-bike-form {
+  position: relative;
+  padding: 0;
+}
+
+@media (min-width: 580px) {
+  #edit-bike-form {
+    padding: 0 5px;
+  }
+  .edit-bike-fields {
+    @include border-radius(2px);
+    // @include box-shadow(1px 2px 6px rgba(black,.2));
+  } 
+}
+
+#edit-menu {
+  position: relative;
+  height: auto;
+  margin-top: 25px;
+}
+
+.edit-selection-select {
+  height: auto;
+  @include border-radius(3px);
+  @include box-shadow(1px 2px 6px rgba(black,.2));  
+  position: relative;
+  width: 100%;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  li {
+    display: block;
+    position: relative;
+    width: 100%;
+    border-bottom: 1px solid $grayLightish;
+    background: $bodyBackground;
+    &:first-of-type {
+      border-top: 1px solid $grayLightish;
+      @include border-radius(3px 3px 0 0);
+      a { @include border-radius(3px 3px 0 0); }
+    }
+  }
+  a {
+    display: block;
+    position: relative;
+    border-left: 1px solid $grayLightish;
+    border-right: 1px solid $grayLightish;
+    width: 100%;
+    padding: 14px 25px 14px 10px;
+    &:hover {
+      text-decoration: none;
+      background: darken(white, 5%);
+    }
+    i {
+      position: absolute; 
+      right: 10px;
+      top: 50%;
+      margin-top: -.5em;
+    }
+  }
+  li.active a, a:active {
+    background: $blueDarker;
+    color: white;
+    border-left: 1px solid $blueDarker;
+    border-right: 1px solid $blueDarker;
+    .icon-chevron-right {
+      background-image: $iconWhiteSpritePath;
+      // background-position: -456px -72px;
+    }
+  }
+  .save {
+    padding: 10px;
+    border: 1px solid $grayLightish;
+    border-top: 0;
+    @include border-radius(0 0 3px 3px);
+    input {
+      display: block;
+      margin: 0 auto;
+    }
+  }
+
+}
+
+#clearing_span { display: none; }
+
+@media (max-width: 767px) {
+  #edit-bike-form {
+    #clearing_span {
+      display: block;
+      width: 100%;
+    }
+    #edit-menu {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 0 20px;
+    }
+  }
+  .bike-edit-head .overflow-text {
+    display: block;
+    width: 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  #edit-bike-form {
+    position: relative;
+    @include clearfix;
+    max-width: 1200px;
+    margin: 0 auto;
+    .edit_photos { margin-top: 0; }
+  }
+  .edit-bike-fields {
+    width: $nineColumn;
+    float: right;
+    .inform-save { display: none; }
+  }
+  #edit-menu {
+    margin-top: 25px;
+    position: absolute;
+    width: $threeColumn;
+    max-width: 272px;
+    &.affix {
+      position: fixed;
+      top: 0;
+    }
+  }
+}
+
+.edit-bike-actions {
+  text-align: center;
+  padding-top: 30px;
+}
+
+
+//________________________
+//
+// Base fields
+//
+//________________________
+
+.bike-edit-head {
+  h1 {
+    color: $blueDarker;
+    font-weight: 400;
+    strong {
+      font-weight: 400;
+      color: $textColor;
+    }
+  }
+  width: 100%;
+  padding: 0 20px;
+  max-width: 1200px;
+  margin: 0 auto 20px;
+}
+
+.edit-bike-fields {
+  position: relative;
+  border: 1px solid $grayLightish;
+  border-bottom: 0;
+  background: $bodyBackground;
+  padding: 0;
+  margin-top: 25px;
+  header {
+    @include clearfix;
+    padding: 20px 20px 0;
+    border-bottom: 1px solid $grayLightish;
+  }
+  .input-group {
+    position: relative;
+    padding: 1.2em 2em 1em 1em;
+    border-bottom: 1px solid $grayLightish;
+  }
+  .input-group.add-additional {
+    .add-component-fields {
+      padding-bottom: 30px;
+    }
+    .hidden-other.unhidden {
+      padding: .5em 0 0;
+    }
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 60px;
+    .button-blue {
+      position: absolute;
+      bottom: 15px;
+      right: 20px;
+    }
+  }
+  .form-foot {
+    @include clearfix;
+  }
+  .control-group {
+    margin-bottom: 0;
+    select { margin-top: .1em; }
+  }
+  .with-optional-blocks {
+    @include clearfix;
+    .hidden-other.unhidden {
+      clear: both;
+      padding-bottom: 0;
+      width: 100%;
+      .field {
+        float: left;
+        display: block;
+      }
+      .optional-form-block {
+        margin: 0 0 0 1.25em;
+      }
+    }
+    .wheel-diameter {
+      clear: both;
+    }
+  }
+  .collapse.in {
+    @include clearfix;
+    padding-top: 20px;
+  }
+  .optional-form-block {
+    cursor: pointer;
+    display: block;
+    float: right;
+    margin-top: 1em;
+    text-align: right;
+  }
+
+  .has-no-serial {
+    float: left;
+    position: relative;
+    margin: .5em 0 0;
+    input { margin: 0 .5em 0 0;}
+    label {
+      width: 100%;
+      margin: 0 15px 0 0;
+      width: 105px;
+    } 
+  }
+  .cm-or-in-select {
+    float: left;
+    margin: .5em 0 0;
+    label {
+      margin: 0 15px 0 0;
+      width: 30px;
+    }
+  }
+  .form-save {
+    display: block;
+    text-align: center;
+    input {
+      text-align: center;
+      float: none;
+      width: 60%;
+    }
+  }
+}
+
+.hidden-other, .edit-bike-fields .hidden-other,
+.currently-hidden, .edit-bike-fields .currently-hidden,
+.hidden-other, .new-bike-fields .optional-form-block.hidden-other,
+.currently-hidden, .new-bike-fields .optional-form-block.currently-hidden {
+  display: none;
+  padding: 1em 0;
+}
+
+.form-save {
+  @include clearfix;
+  .button-green {
+    float: right;
+    font-size: 1.2em;
+  }
+}
+
+.inform-save {
+  @include clearfix;
+  .button-green { float: right; }
+}
+
+.extra-field {
+  margin-top: .75em;
+}
+
+#police-report-check {
+  margin-top: .25em;
+  label { 
+    width: 200px;
+    display: block;
+    text-align: left;
+    font-size: $standardFontSize;
+  }
+  input {
+    margin: 0 .5em 0 0;
+  }
+}
+
+
+.chosen-select .controls {
+  input, .chzn-container {
+    font-size: $standardFontSize;
+  }
+}
+.chzn-container-active .chzn-single {
+  @include box-shadow(0 0 6px rgba($blue,.6));
+  border: 1px solid rgba($blue,.6);
+}
+
+.other-value {
+  display: none;
+}
+
+.large-text {
+  width: 100%;
+  position: relative;
+  .control-label {
+  }
+  .controls {
+    width: 100%;
+    margin-left: 0;
+  }
+  textarea, input { width: 100%; }
+}
+
+#edit-bike-form .initially-hidden.has-front-or-rear-boxes {
+  padding: 0;
+}
+
+.has-front-or-rear-boxes {
+  .controls {
+    float: left;
+  }
+  .front-or-rear-part {
+    float: left;
+    color: $grayDark;
+    .checkbox {
+      float: left;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+  }
+}
+
+#twin_part_types { display: none; }
+
+@media (min-width: 960px) {
+  .split-fields {
+    @include clearfix;
+    .control-group {
+      width: 370px;
+      float: left;
+    }
+    .short-label {
+      width: 300px;
+      .control-label { width: 80px; }
+      .controls { margin-left: 90px; }
+    }
+  }
+}
+
+.remove-part {
+  cursor: pointer;
+  input {
+    display: none;
+  }
+  label { 
+    display: block;
+    text-align: right;
+    width: auto;
+    position: absolute;
+    bottom: 0;
+    right: 10px;
+    color: $grayDark;
+    &:hover, &:active {
+      text-decoration: underline;
+      color: $linkColor;
+    }
+  }
+}
+
+
+
+@media (max-width: 600px) {
+  .edit-bike-fields .with-optional-blocks {
+    @include clearfix;
+    .hidden-other.unhidden {
+      .optional-form-block {
+        margin: 0;
+      }
+    }
+    .field {
+      margin-top: 10px;
+    }
+    .optional-form-block {
+      margin: 0;
+      width: 100%;
+    }
+  }
+}
+
+
+@media (min-width: 479px) {
+  .has-front-or-rear-boxes {
+    .controls {
+      margin-left: 20px;
+    }
+  }
+  .large-text {
+    .control-label {
+      width: 140px;
+      position: absolute;
+      left: 0;
+    }
+    .controls {
+      padding-left: 160px;
+    }
+  }
+
+}
+
+@media (min-width: 925px) {
+  .edit-bike-fields {
+
+    .control-label.unclickable { padding-top: 0; }
+
+    .has-no-serial {
+      margin-top: 0;
+    }
+    .input-group {
+      @include clearfix;
+      padding-right: 1em;
+    }
+    .optional-form-block {
+      margin-top: 0;
+      width: 28%;
+      margin-left: 2%;
+      text-align: left;
+      float: right;
+    }
+    .wheel-diameter {
+      clear: both;
+      width: 100%;
+      color: $grayDark;
+      margin-top: 10px;
+      .control-label {
+        width: 21%;
+      }
+      .radio-controls {
+        width: 76%;
+        margin-left: 23.1%;
+        position: relative;
+        .radio {
+          width: 110px;
+          float: left;
+          padding-left: 20px;
+          margin: 0;
+          &.wide-tire {
+            margin-top: 5px;
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+//________________________
+//
+// Stolen!
+//
+//________________________
+
+
+#edit_stolen {
+  border: 1px solid $stolenColor;
+}
+
+.stolen-phone-groups {
+  .phone-group {
+    float: left;
+    label {
+      margin: 4px 0 0 15px;
+    }
+    input { margin: 0 3px 0 0; }
+  }
+}
+
+@media (max-width: 500px) {
+  .stolen-phone-groups {
+    margin-top: 10px;
+    .control-label {
+      float: none;
+    }
+  }
+}
+
+
+
+//________________________
+//
+// Upload photos!
+//
+//________________________
+
+#edit_photos { border-bottom: 1px solid #cecece; }
+
+.multifilefield-button {
+  @extend .button-yellow;
+  cursor: pointer;
+  display: block;
+  position: relative;
+  width: 150px;
+  overflow: hidden;
+  input {
+    cursor: pointer;
+    position: absolute;
+    height: 100%;
+    top: 0; left: 0;
+    opacity:0;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
+  }
+}
+
+@media (max-width: 580px) {
+  .new-bike-photo { width: 96%;}
+}
+
+@media (min-width: 925px) {
+  .new-bike-photo {
+    width: $fiveColumn;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+  }
+}
+
+.public_image {
+  @include border-radius(2px);
+  background: $searchBackground;
+  // user-select prevents the contents of your
+  // list items from being selectable by the cursor
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: move;
+  border: 1px solid $searchBorder;
+  padding: 5px;
+  float: left;
+  position: relative;
+  // Determining how many images there are per line. Also, update the sortable placeholder height.
+  width: 11.5%;
+  min-width: 105px;
+  margin: 20px 1% 20px 0;
+  margin-right: 1%;
+  // &:nth-of-type(8n) { margin-right: 0; }
+  // Done determining
+  img {
+    width: 100%;
+    // height: 83px;
+  }
+  .name {
+    display: none;
+    padding-top: 5px;
+    text-align: center;
+    font-size: $smallText;
+  }
+  .actions {
+    font-size: $smallText;
+    text-align: center;
+    color: #777;
+    a {
+      padding: 5px 5px 0;
+      float: left;
+      text-decoration: none;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+    .photo-remove {
+      float: right;
+    }
+  }
+}
+// This class is unique to html5sortable for
+// the placeholder that's shown while in motion
+.sortable-placeholder {
+  @extend .public_image;
+  border: 3px dashed #CCC;
+  height: 125px;
+}
+
+.photo-upload-container {
+  @include clearfix;
+  padding: 0 0 30px;
+}
+
+.upload {
+  @include border-radius(2px);
+  border: 1px solid $grayLighter;
+  background: $searchBackground;
+  width: 80%;
+  margin: 10px 10% 0;
+  float: left;
+  padding: 10px;
+  .bar, .alert-success { margin-bottom: 0;}
+  p { @include text-overflow(); }
+}
+
+#new_public_image {
+  @include clearfix;
+  // padding: 20px;
+  margin: 0;
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  .upload {
+    width: 50%;
+    float: left;
+    margin: 10px 2.5%;
+  }
+}
+
+#public_images {
+  @include clearfix;
+  clear: both;
+  list-style-type: none;
+  // margin: $baseLineHeight 0 0 0;
+  margin: 0;
+  padding: 0 20px;
+  // margin-bottom: 15px;
+}
+
+.add-bike-photos {
+  .smaller-text {
+    float: left;
+    text-align: center;
+    padding-top: 5px;
+  }
+}
+
+
+.photo-upload-fields {
+  @include clearfix;
+  position: relative;
+  border-top: 2px dashed $grayLighter;
+  padding: 20px;
+  // margin: 20px 0 0;
+  width: 100%;
+  .extra-info {
+    color: $grayDark;
+    margin-top: 1em;
+  }
+
+}
+
+@media (min-width: 700px) {
+  .photo-upload-fields {
+    p { margin: 0; }
+    .upload-buttons {
+      position: relative;
+      width: $fiveColumn;
+      margin-left: $gutterW;
+      // padding-left: 10%;
+      float: right;
+      .multifilefield-button {
+        display: block;
+        margin: 0 auto;
+        float: none;
+      }
+      .smaller-text { float: none; clear: both; }
+    }
+    .extra-info {
+      width: $sevenColumn;
+      text-align: center;
+      position: absolute;
+      left: 0;
+      padding: 0 $gutterW*2;
+      top: 50%;
+      margin-top: -.5em;
+      color: $grayDark;
+    }
+  }
+}
+
+
+
+
+
+//________________________
+//
+// Bike tips!
+//
+//________________________
+
+
+.bikeform-tip {
+  @extend .button-blue;
+  display: block;  
+  position: absolute;
+  top: 3%;
+  height: 94%;
+  width: 1em;
+  padding:  0;
+  line-height: 1em;
+  font-size: 20px;
+  font-family: Courier;
+  span {
+    position: relative;
+    display: block;
+    top: 50%;
+    margin-top: -.5em;
+  }
+}
+
+.handlebar-tip {
+  .alert {
+    clear: both;
+    margin-top: 20px;
+  }
+  p {
+    clear: both;
+    span {
+      display: block;
+      width: 75px;
+      height: 75px;
+      margin: 0 5px 10px 0;
+      float: left;
+      position: relative;
+      border: 1px solid $grayMed;
+      background: purple;
+      background: url('/assets/icons/bar_sprites.jpg') no-repeat;
+      background-size: 450px 75px;
+    }
+  }
+  .flat-bars {
+    background-position: 0 0;
+  }
+  .bmx-bars {
+    background-position: -75px 0;
+  }
+  .drop-bars {
+    background-position: -150px 0;
+  }
+  .forward-bars {
+    background-position: -225px 0;
+  }
+  .rear-bars {
+    background-position: -300px 0;
+  }
+  .other-bars {
+    background-position: -375px 0;
+  }
+}
+
+@media  only screen and (-moz-min-device-pixel-ratio: 1.5), 
+  only screen and (-o-min-device-pixel-ratio: 3/2), 
+  only screen and (-webkit-min-device-pixel-ratio: 1.5), 
+  only screen and (min-devicepixel-ratio: 1.5), 
+  only screen and (min-resolution: 1.5dppx) 
+{
+  .handlebar-tip p span {
+    background: url('/assets/icons/bar_sprites_retina.jpg') no-repeat;
+  }
+}
+
+

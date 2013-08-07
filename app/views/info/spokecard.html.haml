@@ -1,0 +1,80 @@
+%h1
+  So you want a wicked spokecard, eh?
+
+%p
+  Every fully registered bicycle on the Bike Index has a spoke card with a QR code that directs to the bike's page on the index.
+
+%h3
+  Steps:
+%ul.fancy-bullets
+  %li
+    %span.blue-bullet
+    %p
+      Print out the code
+  %li
+    %span.blue-bullet
+    %p
+      Cut out the print out (that's why we give cutting guides)
+  %li
+    %span.blue-bullet
+    %p
+      Laminate the card
+  %li
+    %span.blue-bullet
+    %p
+      Put it in your bike
+  %li
+    %span.blue-bullet
+    %p
+      Be awesome
+
+
+%article
+  .well.spokecard-bikes
+    %p.url-spokecard
+      You can see a spokecard page by adding 
+      %em
+        \/spokecard
+      to the end of a bike's URL on the Bike Index.
+
+    - if current_user.present? 
+      - if @bikes.any?
+        %ul
+          - @bikes.each do |bike|
+            %li
+              %p
+                Spokecard for your
+                %a{ href: "#{bike_url(bike)}/spokecard" }
+                  #{bike.primary_frame_color.name} #{bike.manufacturer_name}
+      - else
+        %p 
+          %em
+            If you had any bikes on the index, we would put links to their spokecard pages here.
+    - else
+      %p
+        %em 
+          (If you logged in we would put links to all the spokecard pages here)
+
+
+%h3.padded
+  Tips:
+%ul.fancy-bullets
+  %li
+    %span.bullet-point
+    %p
+      If you're using lamination pouches, run it through the lamination machine at least twice.
+  %li
+    %span.bullet-point
+    %p
+      Leave a little bit of space around the edges of the cuttout so the card stays watertight.
+  %li
+    %span.bullet-point
+    %p
+      If you'd like to have a double sided spoke card, you'll have to print out double sided. Putting two pages together doesn't work, it peels apart.
+
+%p
+  We're working on designing a cooler spoke card, check back later. We'll have better instructions too...
+
+
+%article.content-comments
+  = render "/shared/disqus"

@@ -1,0 +1,48 @@
+.form.form-horizontal#chosen-container
+  = form_for [:admin, @blog] do |f|
+    - if @blog.errors.any?
+      #alert-block
+        .alert.alert-error
+          %h4
+            Please fix the following 
+            = pluralize(@blog.errors.count, "error")
+          %ul
+            - @blog.errors.full_messages.each do |msg|
+              %li
+                = msg
+
+    .control-group.chosen-select
+      %label.control-label
+        Author
+      .controls
+        = collection_select( :blog, :user_id, @users, :id, :email, :required =>true, prompt: "Choose a user")
+        / #= f.collection_select( :user_id, @users, :id, :email, :required =>true)
+
+    .control-group.datepicker-container
+      = label :post_date, "Post date", class: "control-label"
+      .controls
+        #post-date-field
+          = f.text_field :post_on, value: @blog.post_date.strftime("%m-%d-%Y"), required: true, data: { :'date-format' => "mm-dd-yyyy" }
+
+    .blog-field
+      = f.text_field :title, placeholder: "Blog title"
+
+    .blog-field
+      = f.text_area :body, placeholder: "Blog post (in markdown)"
+
+    .control-group.tags
+      = f.label :tags, "Tags, should include a main category: Tech, Design, or Update", class: "control-label"
+      .controls
+        = f.text_area :tags, placeholder: "Separate tags with commas"
+
+    .control-group
+      = f.label :published, "Published", class: "control-label"
+      .controls
+        = f.check_box :published
+
+
+    
+    .padded
+      = f.submit 'Save', class: 'button-green pull-right'
+
+  

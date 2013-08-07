@@ -1,0 +1,30 @@
+%section.full-screen-table
+  %header.with-subtitle
+    %h1
+      Component Types
+    = link_to "New Component type", new_admin_ctype_url, class: "button-green sharing-links"
+  %p 
+    There are #{pluralize(@ctypes.count, "component type")}.
+
+  %table.table.table-striped.table-bordered.padded
+    %thead
+      %th
+        Name
+      %th
+        Slug
+      %th
+        Component group
+      %th.large-screens
+        Has image?
+    %tbody
+      - @ctypes.each do |ctype|
+        %tr
+          %td
+            = link_to ctype.name, edit_admin_ctype_url(ctype)
+          %td
+            = ctype.slug
+          %td
+            = ctype.cgroup.name.titleize
+          %td.large-screens
+            = "&#x2713;".html_safe if ctype.image?
+          

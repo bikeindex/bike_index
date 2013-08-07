@@ -1,0 +1,24 @@
+%h3#never-block
+  Never lose track of your trusty steed
+.span8.photo-animation
+  #photos-flip 
+    - @photos.each_with_index do |photo, i|
+      .bike-photo{id: "photo#{i}"}
+        .flipper
+          .front
+          %a.front-behind{ href: bike_url(photo.imageable) }
+            %p
+              = photo.imageable.primary_frame_color.name
+            %p
+              = photo.imageable.manufacturer_name
+            %p
+              / %span
+              
+          .back
+            %p.img-location
+              = photo.image_url(:small)
+.span4.signinup-form
+  .well
+    %h3
+      Log in!
+    = render :partial => "sessions/form"

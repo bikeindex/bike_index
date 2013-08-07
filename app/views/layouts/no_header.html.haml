@@ -1,0 +1,15 @@
+= render 'shared/header'
+%header.global-header.collapsible-head.invisibled#header
+  = render 'shared/header_nav'
+%a#nav-header-collapse.expandable
+  %span.e +
+  %span.c -
+
+%header.replace-header
+  .inner-recep
+    %h2.new-title
+      = FlavorText.first(:offset => rand(FlavorText.count)).message
+
+= yield
+
+= render 'shared/footer'

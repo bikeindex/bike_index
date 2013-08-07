@@ -1,0 +1,14 @@
+%header.with-subtitle
+  %h1
+    Our blogs
+  = link_to 'New Blog', new_admin_blog_url, class: "button-green sharing-links"
+
+%hr
+
+- @blogs.each do |blog|
+  %h2
+    = link_to blog.title, edit_admin_blog_url(blog)
+  %p
+    = blog.body_abbr.html_safe
+
+  %hr

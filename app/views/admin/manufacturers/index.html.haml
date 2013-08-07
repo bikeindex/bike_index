@@ -1,0 +1,38 @@
+%header.with-subtitle
+  %h1 Manage Manufacturers
+  = link_to 'New Manufacturer', new_admin_manufacturer_url, class: "button-green sharing-links"
+
+%h4
+  = @manufacturers.count
+  have been added so far!
+
+%ul 
+%section.full-screen-table
+  %table#admin-manufacturers-list.table.table-striped.table-bordered
+    %thead
+      %th
+        Name
+      %th
+        Frames
+      %th.large-screens
+        Website
+    %tbody
+      - @manufacturers.each do |manufacturer|
+        %tr
+          %td
+            = link_to manufacturer.name, admin_manufacturer_url(manufacturer)
+          %td
+            = "&#x2713;".html_safe if manufacturer.frame_maker
+          %td.large-screens
+            - if manufacturer.website
+              = link_to "Company website", manufacturer.website
+
+.form
+  = form_tag import_admin_manufacturers_path, multipart: true do
+    .control-group.padded
+      .control-label
+        %label
+          Upload CSV of Manufacturers list
+      .controls
+        = file_field_tag :file
+    = submit_tag "Import CSV of Manufacturers", class: "button-yellow"

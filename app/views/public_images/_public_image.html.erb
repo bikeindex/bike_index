@@ -1,0 +1,9 @@
+<li class="public_image" id="<%= public_image.id %>">
+  <%#= link_to image_tag(public_image.image_url(:thumb)), edit_public_image_path(public_image) if public_image.image? %>
+  <%= image_tag(public_image.image_url(:small)) if public_image.image? %>
+  <div class="name"><%= public_image.name.truncate(18) %></div>
+  <div class="actions">
+    <%= link_to "Edit", edit_public_image_path(public_image), class: "photo-edit" %>
+    <%= link_to "Remove", public_image_url(public_image, :return_url => edit_bike_url(@bike)), :method => :delete, class: "photo-remove" %>
+  </div>
+</li>

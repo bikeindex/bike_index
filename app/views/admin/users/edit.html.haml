@@ -1,0 +1,59 @@
+%h1
+  Editing #{@user.email}
+
+.row-fluid
+  .span6.padded
+    = render partial: "form"
+
+%h3.padded
+  %span
+    #{@user.email}
+  ownerships
+- if @user.ownerships.any?
+  %section.full-screen-table
+    %table.table.table-striped.table-bordered
+      %thead
+        %th
+          ID
+        %th
+          Date Created
+        %th
+          Creator
+        %th
+          Owner email
+        %th
+          Current?
+      %tbody
+        - @user.ownerships.each do |ownership|
+          %tr
+            %td
+              = link_to ownership.id, edit_admin_ownership_url(ownership.id)
+            %td
+              - if ownership.created_at.today?
+                %span.hidden
+                  = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
+                Today at #{ownership.created_at.strftime("%-I %p")}
+              - elsif Date.yesterday().beginning_of_day() <= ownership.created_at
+                %span.hidden
+                  = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
+                Yesterday at #{ownership.created_at.strftime("%-I %p")}
+              - else
+                %span.hidden
+                  = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
+                = ownership.created_at.strftime("%-m/%-d/%Y at %-I %p")
+            %td
+              - u = ownership.creator
+              - if u.name.present?
+                = u.name
+              - else
+                = u.email
+            %td
+              = ownership.owner_email
+            %td.table-cell-check
+              = "&#x2713;".html_safe if ownership.current
+- else
+  %p
+    #{@user.email} has no Bikes
+
+.actions.padded
+  = link_to "Delete #{@user.email}!", admin_user_url(@user), method: :delete, confirm: "Are you sure?", class: "button-red"

@@ -1,0 +1,63 @@
+.top-header#total-top-header{:data => {domain: Rails.env}}
+  %span.background-extend
+  .receptacle
+    .inner-recep
+      %a.follow-link.logo{ href: root_url(:subdomain => false) }
+        = image_tag "/assets/logo_colored.svg", class: "standard-logo"
+        = image_tag "/assets/logo_cover.svg", class: "transparent-logo"
+        %span.transparent-logo-bg
+        %span.transparent-logo-bg
+
+        %span.logo-background
+        %h2
+          Bike Index
+      %nav#header-tabs.collapse.in
+        %ul.global-tabs
+
+          %li.expand_t.settings.yes_user.hidden
+            %a{href: "#you"}
+              = image_tag '/assets/settings.svg', id: "settingsimage"
+          %li.account.yes_user.hidden
+            = link_to 'Your Index', user_home_url(:subdomain => false), class: "follow-link"
+          %li.super_user.hidden
+            = link_to 'Superuser home', admin_root_path, class: "follow-link"
+        
+          %li.expand_t.no_user.hidden
+            %a{href: "#signup"}
+              Log in
+          %li.no_user.hidden
+            = link_to "Sign up", new_user_url, class: "follow-link"
+
+        .tab-content
+          #you.tab-pane.yes_user.hidden
+            %ul
+              %li
+                %a{ title: "Your preferences", href: "/my_account"}
+                  Preferences
+              %li
+                = link_to 'Log out', session_path(:subdomain => false), :method => :delete
+          
+          #signup.tab-pane.login-header.no_user.hidden
+            = render 'sessions/form'
+
+
+
+      %span.search-background
+      = form_tag bikes_path, method: :get, id: "head-search-bikes" do 
+        .search-fields
+          = text_field_tag :query, params[:query], placeholder: "Find bikes!", :data => { provide: "typeahead", items: "3", source: @search_ahead.to_json }
+          .search-button
+            = submit_tag "Search", name: "search", class: "button-blue"
+            = hidden_field :search_stolen, params[:stolen]
+          .dropdown
+            %a.dropdown-toggle#dLabel{ href: "/", role: "button", :data => { toggle: "dropdown", target:"#"} }
+              %b.caret
+            %ul.dropdown-menu{ role: "menu", :aria =>{ labelledby: "dLabel" } }
+              %li
+                %a#search-stolen{ href: "#" }
+                  Only stolen
+              %li
+                %a#search-nonstolen{ href: "#" }
+                  Only non-stolen
+              %li
+                = link_to "Show the most recent bikes", bikes_path( query: "" )

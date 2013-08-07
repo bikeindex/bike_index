@@ -1,0 +1,32 @@
+%fieldset
+  .control-group
+    = f.label :name, "Name", class: "control-label"
+    .controls
+      = f.text_field :name
+
+  .control-group
+    = f.label :phone, "Phone number", class: "control-label"
+    .controls
+      = f.text_field :phone
+
+  / .control-group
+  /   = f.label :email, "Shop's email (only if you want)", class: "control-label"
+  /   .controls
+  /     = f.text_field :email
+  
+  .control-group
+    = f.label :street, "Address", class: "control-label"
+    .controls
+      = f.text_field :street, placeholder: "Street"
+    .controls.extra-field
+      = f.text_field :city, placeholder: "City"
+    .controls.extra-field
+      = f.collection_select(:state, UsStates.all, :abbr, :name, :required =>true, prompt: "State" )
+    .controls.extra-field
+      = f.text_field :zipcode, placeholder: "Zipcode"
+
+  .remove-control
+    = f.check_box :_destroy
+    = f.label :_destroy, "Remove", class: "remove_fields"
+  
+  %hr

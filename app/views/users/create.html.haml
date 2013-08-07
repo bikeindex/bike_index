@@ -1,0 +1,19 @@
+.signup-response
+  %h1
+    Thanks for signing up!
+  %h2
+    Verify your email so we can connect you to your bikes
+  %h3.padded
+    We sent an email to 
+    %strong.stolen-color
+      = @user.email
+    with a confirmation link in it.
+    %br
+    Click the link in the email to finish signing up.
+  .signup-image
+    = image_tag "girl-with-bike.png", alt: "All signed up now, y'hear?"
+  .signup-text
+    %p
+      We know email verification is lame and all, but email is how we connect you to the bikes you own.
+    %p
+      We don't want the mean jerk at the end of the street pretending to be you, faking your email, and stealing all your indexed bikes.

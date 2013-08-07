@@ -1,0 +1,24 @@
+# Ignore bundler config
+/.bundle
+
+# Ignore the database
+config/database.yml
+
+# Ignore the deploy and certs
+config/certs
+config/deploy
+
+# Ignore all logfiles and tempfiles.
+/log/*.log
+/tmp
+.DS_Store
+coverage/*
+public/uploads/Pu
+public/caches
+.vagrant
+
+
+# Ignore rvm stuff
+.rvmrc
+.ruby-gemset
+.ruby-version

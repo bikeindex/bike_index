@@ -1,0 +1,323 @@
+//________________________
+//
+// Helper classes
+//
+//________________________
+
+.receptacle {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 $singlePad;
+}
+.inner-recep {
+  @include clearfix;
+  position: relative;
+  width: 100% ;
+}
+.overfloating { overflow: visible; }
+
+label { cursor: pointer; }
+.chosen-select label { cursor: default;}
+
+.pull-left {
+  float: left;
+}
+
+.pull-right {
+  float: right;
+}
+
+.footnote-ref {
+  color: $blueLight;
+  font-size: .9em;
+}
+.footnotes {
+  padding: 40px 0 60px;
+  li {
+    line-height: 1.3em;
+    margin: 1em 0;
+  }
+}
+
+.padded {
+  margin-top: 30px;
+}
+
+.bottom-padded {
+  padding-bottom: 200px;
+}
+
+.placeholder { color: #aaa; }
+
+.subheading-text {
+  display: block;
+  width: 100%;
+  font-size: 16px;
+  line-height: 1.2em;
+  color: $grayDark;
+}
+
+// Visibility
+.invisible {
+  visibility: hidden;
+}
+
+// For Affix plugin
+.affix {
+  position: fixed;
+}
+
+.clickable, .no-tab { cursor: pointer; }
+
+.unclickable { cursor: default; }
+
+.overflow-text { @include text-overflow();}
+
+.initially-hidden, .hidden, .hide {
+  display: none;
+}
+
+hr {
+  display: block;
+  border: none;
+  border-bottom: 1px solid #c4c4c5;
+  margin: 1em 0;
+}
+
+.horizontal-list {
+  @include clearfix;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  li {
+    float: left;
+  }
+}
+
+.delineated-horizontal-list {
+  @extend .horizontal-list;
+  li {
+    margin: 0;
+  }
+  a {
+    display: inline-block;
+    line-height: 1em;
+    padding: 0 .4em;
+    text-decoration: none;
+    color: $textColor;
+    border-right: 1px solid $grayDarker;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  & li:last-of-type a {
+    border-right: 0;
+  }
+}
+
+.short-transition {
+  -webkit-transition: all .1s linear;
+  -moz-transition: all .1s linear;
+  -o-transition: all .1s linear;
+  transition: all .1s linear;
+}
+
+.hide-text {
+  display: block;
+  width: 100%;
+  height: 100%;
+  text-indent: 200%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-decoration: none;
+}
+
+
+
+.logo {
+  display: block;
+  h1 {
+    display: none;
+  }
+}
+
+//________________________
+//
+// Horizontal dls, how we display things
+//
+//________________________
+
+
+
+.dl-horizontal {
+ dd {
+   font-weight: 400;
+  }
+  dt {
+    font-weight: 400;
+    text-align: left;
+    margin-bottom: 6px;
+    color: #999;
+  }
+   dd {
+    font-weight: 400;
+    max-width: 460px;
+    margin-bottom: 6px;
+    textarea {width: 100%;}
+    .highlight {
+      display: inline-block;
+      padding: .5em .5em .25em;
+      background: $grayLighter;
+    }
+  }
+}
+
+@media (min-width: 768px) {
+  .dl-holder {
+    @include clearfix;
+    position: relative;
+    .dl-horizontal {
+      width: $sixColumn;
+      float: left;
+      margin-left: $gutterW;
+    }
+    dl:first-of-type {
+      margin-left: 0;
+    }
+    dd {
+      width: 70%;
+      margin: 0 0 6px 0;
+    }
+    dt {
+      width: 30%;
+      padding-right: 5%;
+      margin: 0 0 .3em 0;
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .dl-holder {
+    @include clearfix;
+    position: relative;
+    .dl-horizontal {
+      width: 100%;
+      float: none;
+      margin-left: 0;
+    }
+    dd {
+      width: 70%;
+      margin: 0 0 .3em 0;
+      float: left;
+    }
+    dt {
+      width: 29%;
+      padding-right: 2%;
+      margin: 0 0 .3em 0;
+      float: left;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .dl-holder {
+    dt {
+      width: 35%;
+      // margin-bottom: 0;
+    }
+    dd {
+      width: 65%;
+      // margin-bottom: .5em;
+    }
+  }
+}
+//     dt, dd {
+//       width: 100%;
+//       padding: 0;
+//       margin: 0;
+//       clear: both;
+//     }
+//     dd {
+//       margin: 0 0 6px $oneColumn + $gutterW;
+//     }
+//   }
+// }
+
+header.with-subtitle {
+  padding-bottom: 0;
+  @include clearfix;
+  h1, h2, h3 {
+    float: left;
+    font-size: $standardFontSize * 2.5;
+  }
+  p {
+    display: inline-block;
+    margin: 1.85em 0 0 1em;
+  }
+  .sharing-links {
+    display: block;
+    float: right;
+    margin: 1.85em 0 0 1em;
+  }
+  .sharing-section {
+    float: right;
+    width: 250px;
+  }
+  .subtitle-form {
+    @include clearfix;
+    float: right;
+    width: 257px;
+    margin-top: 22px;
+    form { margin: 0; }
+    input { margin: 0;}
+  }
+}
+
+@media (max-width: 1000px) {
+  header.with-subtitle {
+    h1 {
+      float: none;
+      clear: both;
+    }
+    p {
+      margin: 0 0 10px;
+    }
+    .sharing-links {
+      float: right;
+      margin: 0 0 10px 1em;
+    }
+  }
+}
+
+
+.well-yellow {
+  @include border-radius(2px);
+  background: $bi-stripes;
+  border: 1px solid $biYellow;
+  padding: 10px;
+  width: 100%;
+}
+
+.well-blue {
+  @include border-radius(2px);
+  background: $blueLight;
+  border: 1px solid $blue;
+  color: white;
+  padding: 10px;
+  width: 100%;
+}
+
+.stolen-background {
+  background: $stolenBackground;
+}
+
+.stolen-color {
+  color: $stolenColor;
+}
+
+.smaller-text {
+  font-size: .8em;
+}

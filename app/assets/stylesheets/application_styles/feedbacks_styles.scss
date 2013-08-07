@@ -1,0 +1,117 @@
+.feedbacks {
+  width: $fourColumn;
+  min-width: 260px;
+  margin: 30px auto 40px;
+  .contact-info {
+    position: relative;
+    // float: left;
+    width: 100%;
+    input {
+      width: 100%;
+
+    }
+  }
+  .contact-text {
+    position: relative;
+    // float: left;
+    width: 100%;
+    textarea {
+      width: 100%;
+    }
+  }
+  .feedback-actions {
+    @include clearfix;
+    margin: 0;
+    input { float: right;}
+    width: 100%;
+  }
+}
+
+
+
+//________________________
+//
+// Vendor signup form styles
+//
+//________________________
+
+
+.vendor-signup {
+  @include clearfix;
+  h1 {
+    color: $blueDarker;
+  }
+  h2 {
+    margin-bottom: 1em;
+    color: $grayDark;
+  }
+  .bike-shop-image {
+    width: 100%;
+    position: relative;
+    padding-bottom: 30px;
+    img { 
+      display: block;
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+  }
+}
+
+.vendor-signup-form {
+  @extend .feedbacks;
+  // padding-top: 1em;
+}
+
+.vendor-questions {
+  margin: 0 0 40px;
+  h2 {
+    margin: 0 0 12px;
+    font-size: 24px;
+    line-height: 1em;
+  }
+
+  h3 {
+    margin: 0 0 .25em;
+    font-size: 20px;
+    line-height: 1em;
+    font-family: $baseFont;
+  }
+
+  p {
+    color: $grayDarker;
+  }
+}
+
+@media (min-width: 767px) {
+  .vendor-signup {
+    header {
+      @include clearfix;
+    }
+     .header-text {
+      float: left;
+      width: $fiveColumn;
+      margin: 80px 0 0 $gutterW;
+    }
+    .bike-shop-image {
+      width: $sevenColumn;
+      float: left;
+    }
+   }
+  // .vendor-questions {
+  //   margin: 0 0 0 $gutterW;
+  //   padding-left: 1em;
+  //   width: $sevenColumn;
+  //   float: right;
+  // }
+  // .vendor-signup-form {
+  //   width: $fiveColumn;
+  //   margin: 0;
+  //   float: left;
+  // }
+}
+
+// @media (min-width: 899px) {
+//   .vendor-questions {
+//     width: 100%;
+//     clear: both;

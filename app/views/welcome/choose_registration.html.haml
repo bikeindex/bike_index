@@ -1,0 +1,27 @@
+#choose-registration-type
+  .choose-links
+    %ul
+      - if current_user.memberships.any?
+        - current_user.memberships.each do |membership|
+          %li
+            %a.organization-choice.choose-type{:data => {target: new_bike_url(creation_organization_id: membership.organization.id)}}
+              Register through
+              = membership.organization.name
+      - if current_user.bike_tokens.available.any?
+        %li
+          %a.free-tix-choice.choose-type{:data => {target: new_bike_url(bike_token_id: current_user.bike_tokens.available.last.id)}}
+            Register with a free ticket
+            %em
+            (You have #{current_user.bike_tokens.available.count})
+      %li
+        %a.purchase-choice.choose-type{:data => {target: new_bike_url}}
+          Register a bike
+          %em
+          ($6.99)
+      %li
+        %a.choose-type{:data => {target: new_bike_url(stolen: true)}}
+          Register a stolen bike
+
+
+    %a#add-bike.button-green{href: new_bike_url}
+      Add the bike!

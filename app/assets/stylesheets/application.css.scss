@@ -1,0 +1,44 @@
+// Import Base styles
+@import "application_styles/_colors.scss";
+@import "application_styles/_vars.scss";
+@import "includes/bootstrap.scss";
+@import "includes/bootstrap-responsive.scss";
+@import "application_styles/global_styles.scss";
+
+// Import App styles
+@import "application_styles/_mixins.scss";
+@import "application_styles/utility_classes.scss";
+@import "application_styles/_buttons.scss";
+@import "application_styles/_nav_tabs.scss";
+@import "application_styles/application_styles.scss";
+@import "application_styles/image_bike_styles.scss";
+@import "application_styles/pagination_styles.scss";
+@import "application_styles/admin_styles.scss";
+@import "application_styles/about_styles.scss";
+@import "application_styles/feedbacks_styles.scss";
+@import "application_styles/notifications.scss";
+
+// Import includes
+@import "includes/chosen.scss";
+@import "includes/datepicker.scss";
+@import "application_styles/sharing_styles.scss";
+@import "includes/datatables_bootstrap.scss";
+
+// Import Page styles
+@import "page_styles/error_styles.scss";
+@import "page_styles/legal_styles.scss";
+@import "page_styles/content_styles.scss";
+@import "page_styles/home_styles.scss";
+@import "page_styles/faq_styles.scss";
+@import "page_styles/login_styles.scss";
+@import "page_styles/header_styles.scss";
+@import "page_styles/footer_styles.scss";
+@import "page_styles/edit_bike_styles.scss";
+@import "page_styles/new_bike_styles.scss";
+@import "page_styles/show_bike_styles.scss";
+@import "page_styles/stolen_bike_styles.scss";
+@import "page_styles/lock_styles.scss";
+@import "page_styles/user_styles.scss";
+@import "page_styles/organization_styles.scss";
+@import "page_styles/choose_registration_styles.scss";
+@import "page_styles/pay_registration_styles.scss";

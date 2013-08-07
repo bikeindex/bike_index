@@ -1,0 +1,43 @@
+.pay-for-registration {
+  @include border-radius(3px);
+  
+  background: $blueDarker;
+  border: 1px solid black;
+  padding: 10px 20px;
+  width: 100%;
+  margin: 0 auto;
+  h2 {
+    color: $yellowPale;
+    text-align: center;
+  }
+  button {
+    display: block; 
+    margin: 0 auto;
+    &:hover {
+      @include translate(-1px,-1px);
+      text-decoration: none;
+    }
+    &:active {
+      @include translate(1px,1px);
+    }
+
+    &.stripe-button-el span {
+      font-size: 20px;
+      height: auto;
+      padding-bottom: 3px;
+    }
+  }
+  dl {
+    @include border-radius(3px);
+    margin: 10px 0 auto 0;
+    background: $searchBackground;
+    border: $searchBorder;
+    padding: 5px 10px;
+  }
+}
+
+@media (min-width: 768px) {
+  .pay-for-registration {
+    max-width: $sixColumn;
+  }
+}

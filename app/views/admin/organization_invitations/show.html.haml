@@ -1,0 +1,64 @@
+%header.with-subtitle
+  %h1 
+    Manage
+    %strong
+      #{@organization.name}'s
+    Invitations
+  %p
+    = link_to "Back to organization", admin_organization_url(@organization)
+
+.invitations
+  %hr
+  %h2
+    Invitations
+  %h3.organization-description-list
+    #{@organization.name} has sent #{pluralize(@organization.sent_invitation_count, "invitation")},
+    %br
+    and has 
+    = @organization.available_invitation_count
+    remaining #{"invitation".pluralize(current_organization.available_invitation_count)}.
+  %hr
+
+- if @organization.organization_invitations.any?
+  %section.full-screen-table
+    %table.table.table-striped
+      %thead
+        %th
+          Id&nbsp;
+        %th.large-screens
+          Date sent
+        %th.medium-screens
+          Name
+        %th
+          Email
+        %th.medium-screens
+          Role
+        %th
+          Organization
+        %th
+          %span.medium-screens
+            Redeemed
+
+      %tbody
+        - @organization_invitations.each do |org_invite|
+          %tr
+            %td
+              = link_to org_invite.id, admin_organization_invitation_url(org_invite.id)
+            %td.large-screens
+              = org_invite.created_at.strftime("%-I %p on %-m/%-d/%Y ")
+            %td.medium-screens
+              - if org_invite.invitee_name
+                = org_invite.invitee_name
+            %td
+              = org_invite.invitee_email
+            %td.medium-screens
+              = org_invite.membership_role
+            %td
+              = link_to org_invite.organization.name, admin_organization_url(org_invite.organization.name)
+            %td.table-cell-check
+              = "&#x2713;".html_safe if org_invite.redeemed
+
+
+- if @organization.available_invitation_count > 0
+  .well.span6.padded
+    = render partial: "/admin/organization_invitations/form"

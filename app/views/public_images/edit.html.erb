@@ -1,0 +1,28 @@
+<section class="bibox-top">
+    
+  <%= link_to edit_bike_url(@public_image.imageable), class: "back" do %>
+    <span>Back Arrow</span>Back to <em>Editing Bike</em>
+  <% end %>
+
+  <h2>
+    <% if current_user.email == @public_image.imageable.owner_email %>
+      <% end %>
+  </h2>
+  
+  <div class="headline-content-edit">
+    <h1>
+      Editing Image
+    </h1>
+  </div>
+</section>
+
+<div class="edit-image">
+
+  <%= link_to image_tag(@public_image.image_url(:medium)), @public_image.image_url, target: "_blank" %>
+
+  <hr />
+  
+  <%= render 'form' %>
+
+</div>
+

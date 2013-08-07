@@ -1,0 +1,59 @@
+%h1
+  Manage Organizations
+%h4
+  = @organizations.count
+  organizations have been deleted!
+
+
+%section.full-screen-table
+  %table#admin-orgs-table.table.table-striped.table-bordered
+    %thead
+      %th.medium-screens
+        Created
+      %th.medium-screens
+        Deleted
+      %th
+        Name
+      %th.medium-screens
+        Memberships
+      %th
+        Management links
+    %tbody
+      - @organizations.each do |organization|
+        %tr
+          %td.medium-screens
+            - if organization.created_at.today?
+              %span.hidden
+                = organization.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Today at #{organization.created_at.strftime("%-I %p")}
+            - elsif Date.yesterday().beginning_of_day() <= organization.created_at
+              %span.hidden
+                = organization.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Yesterday at #{organization.created_at.strftime("%-I %p")}
+            - else
+              %span.hidden
+                = organization.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              = organization.created_at.strftime("%-m/%-d/%Y at %-I %p")
+          %td.medium-screens
+            - if organization.deleted_at.today?
+              %span.hidden
+                = organization.deleted_at.strftime("%-m.%-d.%Y %-H.%M")
+              Today at #{organization.deleted_at.strftime("%-I %p")}
+            - elsif Date.yesterday().beginning_of_day() <= organization.deleted_at
+              %span.hidden
+                = organization.deleted_at.strftime("%-m.%-d.%Y %-H.%M")
+              Yesterday at #{organization.deleted_at.strftime("%-I %p")}
+            - else
+              %span.hidden
+                = organization.deleted_at.strftime("%-m.%-d.%Y %-H.%M")
+              = organization.deleted_at.strftime("%-m/%-d/%Y at %-I %p")
+          %td
+            = organization.name
+          %td.medium-screens
+            = organization.memberships.count
+          %td
+            = button_to "Restore", :remote => true, :action => "recover", :id => organization.id, :form_class => "btn btn-small btn-warning"
+            
+
+%hr
+  = link_to "Back to undeleted organizations", admin_organizations_url

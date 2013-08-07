@@ -1,0 +1,39 @@
+%h2.red-text
+  There is no charge until we reach a 1000 bikes!
+%h3.blue-text
+  (So there really isn't a reason to view this page right now)
+
+%h1.padded
+  #{@organization.name} Invoices
+
+%section.full-screen-table
+  %table.table.table-striped.table-bordered
+    %thead
+      %th
+        Go to invoice
+      %th.medium-screens
+        Billing period starts
+      %th
+        Billing period ends
+      %th
+        Invoice amount
+      %th
+        Invoice paid?
+
+    %tbody
+      - @invoices.each do |invoice|
+        %tr
+          %td
+            = link_to "View", invoice_url(invoice, :subdomain => current_organization.slug)
+          %td.medium-screens
+            = invoice.billing_period_start.strftime("%-m/%-d/%Y")
+          %td
+            = invoice.billing_period_end.strftime("%-m/%-d/%Y")
+          %td
+            = number_to_currency(invoice.amount_in_dollars)
+          %td
+            - if invoice.paid_at.present?
+              Paid
+            - else
+              %span.stolen-color
+                Unpaid

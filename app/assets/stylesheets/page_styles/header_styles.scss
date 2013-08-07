@@ -1,0 +1,673 @@
+//________________________
+//
+// General styles
+//
+//________________________
+
+.global-header {
+  padding: $singlePad 0 40px;
+  position: relative;
+  .top-receptacle, .logo-receptacle, .nav-receptacle {
+    @extend .receptacle;
+  }
+  &.invisibled {
+    height: 0;
+    padding: 0;
+    overflow: visible;
+    .logo { margin-top: 20px; }
+  }
+}
+
+
+//________________________
+//
+// Search field
+//
+//________________________
+
+.top-header {
+  width: 100%;
+  position: relative;
+  // margin-top: $singlePad;
+  .receptacle { overflow: visible; }
+  form {
+    position: relative;
+    margin-bottom: 0;
+  }
+  .search-background {
+    @include border-radius(2px 0 0 2px);
+    display: block;
+    position: absolute;
+    right: 0;
+    height: 4em;
+    width: $eightColumn;
+    background: $searchBackground;
+    border: 1px solid $searchBorder;
+    border-right: none;
+    z-index: 0;
+  }
+  .search-fields {
+    @include clearfix;
+    position: absolute;
+    right: 0;
+    width: 100%;
+    z-index: 0;
+    padding: 1em 0;
+    z-index: 100;
+    input[type="text"] {
+      // @include border-radius(0);
+      float: right;
+      width: $sevenColumn - $gutterW;
+      margin: 0;
+      margin-right: $gutterW + $oneColumn;
+      // width: 14.5%; 12.45
+      // width: 85.86%;
+    }
+    .search-button {
+
+      width: $oneColumn;
+      position: absolute;
+      right: 0; top: 0;
+      margin-top: 1em;
+      padding-right: 15px;
+    }
+  .button-blue {
+      font-size: $standardFontSize;
+      width: 100%;
+      padding: .25em 0;
+      height: 32px;
+    }
+  }
+  .dropdown {
+    position: absolute;
+    right: 0; top: 0;
+    margin-top: 1em;
+    width: 16px;
+  }
+  .dropdown-toggle {
+    @extend .button;
+    font-size: $standardFontSize;
+    height: 32px;
+    position: absolute;
+    left: 0; top: 0;
+    padding: .25em 0;
+    text-decoration: none; 
+    text-align: center;
+    display: block;
+    width: 100%;
+    background: $btnAction;
+    border: 1px solid $btnActionBorder;
+    // border-left: 0;
+  }
+  .dropdown-menu {
+    top: 32px;
+  }
+  .background-extend {
+    display: block;
+    position: absolute;
+    right: 0;
+    width: 40%;
+    height: 4em;
+    z-index: 0;
+    background: $searchBackground;
+    border: 1px solid $searchBorder;
+    border-right: none;
+    border-left: none;
+  }
+}
+
+@media (max-width: 20000px) {
+  .top-header {
+    .search-fields {
+      .search-button {
+        width: $twoColumn;
+        padding-right: 25px;
+      }
+      .dropdown { width: 26px; }
+      input[type="text"] {
+        width: $sixColumn - $gutterW;
+        margin: 0;
+        margin-right: $gutterW + $twoColumn;
+      }
+    }
+  }
+}
+
+// @media (min-width: 768px) {
+  .top-header {
+    .search-fields, .background-extend, .search-background { 
+      bottom: 0;
+      margin-top: 0;
+    }
+  }
+// }
+
+@media (max-width: 600px) {
+  .top-header {
+    // overflow: hidden;
+    .search-background {
+      width: 100%;
+      right: 10%;
+
+    }
+    .search-fields {
+      .search-button { width: $fourColumn; }
+      input[type="text"] {
+        margin-right: $gutterW + $fourColumn;
+        width: $eightColumn;
+      }
+    }
+  }
+}
+
+// @media (max-width: 767px) {
+//   .top-header {
+//     .search-fields, .background-extend, .search-background { 
+//       bottom: 0;
+//     }
+//     .search-background {
+//       width: $tenColumn;
+//     }
+//     .search-fields {
+//       position: relative;
+//       margin-top: $singlePad;
+//       float: right;
+//       .button {
+//         width: $threeColumn; 
+//       }
+//       input[type="text"] {
+//         width: $sevenColumn - $gutterW;
+//         margin: 0;
+//         margin-right: $threeColumn+ $gutterW;
+//       }
+//     }
+//   }
+// }
+
+// .logo-nav {
+//   position: relative;
+//   width: $twoColumn;
+//     // height: 3.8em;
+//     z-index: 100;
+//     float: left;
+.top-header {
+  .logo {
+    .standard-logo { display: block; }
+    .transparent-logo-bg-first, .transparent-logo-bg-second, .transparent-logo { display: none; }
+    width: $twoColumn;
+    max-height: 8em;
+    display: block;
+    position: absolute;
+    left: 0;
+    z-index: 101;
+    // padding: 0 31% 5px 0;
+    margin: 0;
+    font-size: 1em;
+    // height: 3.8em;
+    border: none;
+    // width: 100%; height: auto;
+    overflow: visible;
+    &:hover {
+      border: none;
+      background: none;
+    }
+    h2 {
+      display: none;
+    }
+    img {
+      display: block;
+      height: auto;
+      width: 100%;
+      margin: 0;
+    }
+  }
+}
+
+@media (min-width: 601px) {
+  .top-header {
+    .logo {
+      width: $threeColumn;
+      top: 0; 
+    }
+  }
+}
+
+@media (min-width: 600px) and (max-width: 900px) {
+  .top-header {
+    .logo img { 
+      width: 67%;
+      margin: 0 auto;
+    }
+  }
+}
+
+@media (min-width: 900px) {
+  .top-header {
+    .logo { width: $twoColumn; }
+  }
+}
+
+@media (max-width: 600px) {
+  .top-header {
+    .logo {
+      top: -11px;
+      left: 0px;
+      height: 4em;
+      width: auto;
+      img {
+        height: 100%;
+        width: auto;
+      }
+    }
+  }
+}
+
+//________________________
+//
+// Nav tabs
+//
+//________________________
+
+#header-tabs {
+  margin-bottom: 4em;
+  padding-bottom: 1em;
+}
+
+.global-tabs {
+  @include clearfix;
+  @extend .nav;
+  @extend .nav-tabs;
+  min-height: 2em;
+  width: 100%;
+  position: relative;
+  list-style-type: none;
+  margin: 0;
+  z-index: 10;
+  // padding-right: 30px;
+  li {
+    @include text-overflow();
+    float: right;
+    position: relative;
+    width: $twoColumn;
+    margin-right: $gutterW;
+    &.no_user.expand_t, &:first-of-type {
+      margin-right: 0;
+    }
+    a {
+      @include text-overflow();
+      // @extend .short-transition;
+      display: block;
+      width: 100%;
+      // height: 4em;
+      padding: .5em 0;
+      text-align: center;
+    }
+  }
+  .settings {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 30px;
+    border: 1px solid transparent;
+    margin-right: 0;
+    img { 
+      width: 20px;
+      height: auto;
+    }
+    &:hover, &.hover {
+      background: $searchBackground;
+      border: 1px solid $searchBorder;
+    }
+  }
+}
+
+.collapse.visibled .tab-content { overflow: visible; }
+
+.tab-content .tab-pane.active#you { margin-right: 1px; }
+
+@media (min-width: 760px) {
+  .tab-content .tab-pane.active#you {
+    overflow: visible;
+    margin-left: 77.3%;
+    &:before { 
+      content: " ";
+      position: absolute;
+      left: 0;
+      top: -1px;
+      display: block;
+      width: 77.3%;
+      height: 2px; 
+      background: white;
+    }
+  }
+}
+
+
+
+@media (min-width: 1200px) {
+  #header-tabs {
+    padding-bottom: 2em;
+  }
+}
+
+@media (min-width: 601px) {
+  #header-tabs {
+    width: $eightColumn;
+    margin-left: $fourColumn + $gutterW;
+  }
+  .global-tabs {
+    li {
+      width: 22.72%;
+      margin-right: 3.03%;
+    }
+  }
+}
+
+
+@media (max-width: 900px) {
+  // .top-header {
+  //   .global-tabs {
+  //     .account {
+  //       width: 30%;
+  //       padding-right: 7.28%;
+  //     }
+  //     .settings { width: 30px; }
+  //   }
+  // } 
+}
+
+@media (max-width: 700px) {
+  .top-header {
+    .global-tabs {
+      // width: 100%;
+      // clear: both;
+      // margin-right: $gutterW;
+
+      .account {
+        // width: 150px;
+        // padding-right: 30px;
+        // padding-right: $gutterW;
+      }
+      // .logo-nav {
+      //   width: $twoColumn + $gutterW;
+      //   padding-right: $gutterW;
+      //   margin-left: 0;
+      //   a {
+      //     padding-right: 12%;
+      //   }
+      // }
+
+    }
+  } 
+}
+
+
+@media (max-width: 600px) {
+  #header-tabs {
+    padding-bottom: 2em;
+   .tab-content { z-index: 120; } 
+  }
+  .top-header {
+    .global-tabs {
+      width: 80%;
+      margin: 0 0 0 auto;
+      .settings { width: 30px; }
+      li { 
+        width: $fourColumn;
+      }
+      // li:nth-of-type(2n) {
+      //   margin-left: $fourColumn + $gutterW;
+      // }
+      // li:nth-of-type(3n+1) {
+      //   margin-right: 0;
+      // }
+    }
+  }
+}
+
+// @media (max-width: 920px) {
+//   .global-tabs li:first-of-type {
+//     width: 35.25%;
+//   }
+// }
+
+
+//  TODO Somehow make this not take up the whole screen when the screen is larger
+// @media (min-width: 650px) {
+//   .top-header #header-tabs .tab-content {
+//     width: $eightColumn;
+//     border-top: 1px solid $searchBorder;
+//     float: right;
+//     margin-top: -1px;
+//   }
+// }
+
+.top-header {
+  .tab-pane.active { padding: 5px 0; }
+  .visibled { 
+    .tab-content {  height: auto; }
+    .nav-tabs { border-bottom: 1px solid $searchBorder; }
+    #header-tabs { height: auto;}
+  }
+  .tab-content {
+    // @extend .short-transition;
+    width: 100%;
+    margin: 0;
+    position: relative;
+    // float: right;
+    height: 0;
+    z-index: 10;
+  
+    ul {
+      list-style-type: none;
+      margin: 0;
+    }
+    li {
+      width: 100%;
+      position: relative;
+      &:last-of-type {
+        margin-bottom: 0;
+      }
+      a {
+        display: block;
+        width: 100%;
+        padding: .4em $singlePad;
+        &:hover {
+          text-decoration: none;
+          background: rgba($grayMed,.4);
+        }
+      }
+    }
+    .login-header.active {
+      padding: $singlePad;
+      .field {
+        @include clearfix;
+        width: 100%;
+        position: relative;
+      }
+      input {
+        width: 100%;
+      }
+      .button-blue {
+        float: right;
+        width: auto;
+        font-size: $standardFontSize;
+      }
+      p { margin-bottom: 0; }
+      p:first-of-type {
+        margin: .45em 0 1em;
+      }
+    }
+  }
+}
+
+
+
+
+
+//________________________
+//
+// Collapse header
+//
+//________________________
+
+.collapsible-head {
+  .search-background, .background-extend, .search-fields, .global-tabs { display: none; }
+  .show.search-background, .show.background-extend, .show.search-fields, .show.global-tabs { display: block; }
+}
+
+
+#nav-header-collapse {
+  @include box-shadow(0px 1px 2px rgba(black, .3));
+  display: block;
+  width: 100%;
+  background: $btnAction;
+  position: relative;
+  height: 4px;
+  overflow: visible;
+  color: white;
+  font-size: 40px;
+  border-bottom: 1px solid $btnActionBorder;
+  cursor: pointer; 
+  z-index: 99;
+  &:hover, &:hover span {
+    background: darken($btnAction, 5%);
+  }
+  span {
+    @include box-shadow(0px 1px 2px rgba(black, .3));
+    @include border-radius(0 0 2px 2px);
+    display: none;
+    position: absolute;
+    right: 5%;
+    top: 3px;
+    padding: .1em .25em .15em .25em;
+    background: $btnAction;
+    border: 1px solid $btnActionBorder;
+    border-top: none;
+  }
+  .c { display: block; }
+  .e { display: none; }
+  
+  &.expandable {
+    .e { display: block; }
+    .c { display: none; }
+  }
+}
+
+.replace-header {
+  @extend .receptacle;
+  position: relative;
+  overflow: visible;
+  margin-top: 30px;
+  .new-title {
+    display: block;
+    float: left;
+    padding-left: $threeColumn + $gutterW;
+    font-weight: 600;
+    margin: 0;
+    font-size: 30px;
+    line-height: 1.1em;
+    a { 
+      line-height: 1em;
+      color: $blueLight;
+      &:hover, &.active {
+        color: $linkColor;
+        text-decoration: none;
+      }
+    }
+  }
+  ul {
+    clear: both;
+    @extend .horizontal-list;
+    padding-left: $threeColumn + $gutterW;
+    padding-top: 20px;
+    min-height: 34px;
+    li {
+      margin-right: 1.5em;
+      &:last-of-type { margin-right: 0;}
+    }
+    a {
+      color: $blueLight;
+      font-weight: 800;
+      font-size: 1.3em;
+      &:hover, &.active {
+        color: $linkColor;
+        text-decoration: none;
+      }
+    }
+  }
+  .org-add-bike {
+    position: relative;
+    margin-top: 30px;
+    font-size: 20px;
+  }
+  .button-green {
+    float: right;
+    padding: .5em 1em;
+  }
+}
+
+@media (max-width: 600px) {
+  .replace-header {
+    .org-add-bike {
+      width: 100%;
+      .button-green { float: none; width: 100%;}
+    }
+    ul {
+      padding-top: 40px;
+      padding-left: 0;
+    }
+  }
+}
+
+
+
+@media (min-width: 601px) {
+  .replace-header {
+    .new-title {
+      font-size: 40px;
+    }
+  }
+}
+
+@media (min-width: 768px) {
+  .replace-header {
+    .new-title {
+      font-size: 60px;
+    }
+    ul { padding-right: 0; }
+    ul.org-links { padding-right: $fourColumn + $gutterW; }
+    .org-add-bike {
+      position: absolute;
+      top: 60px;
+      right: 0;
+      margin-top: 18px;
+      width: $fourColumn;
+    }
+    .button-green {
+      float: none;
+      display: block;
+    }
+  }
+}
+
+@media (min-width: 900px) {
+  .replace-header {
+    margin-top: 17px;
+    min-height: 160px;
+    ul {
+      padding-left: $twoColumn + $gutterW;
+      padding-top: 20px;
+    }
+    .new-title {
+      font-size: 70px;
+      padding-left: $twoColumn + $gutterW;
+    }
+    .org-add-bike {
+      position: absolute;
+      top: 62px;
+    }
+  }
+}
+
+

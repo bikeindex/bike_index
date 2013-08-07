@@ -1,0 +1,61 @@
+%h1
+  #{@organization.name} bikes
+
+%section.full-screen-table
+  %table#org-bikes-table.table.table-striped.table-bordered
+    %thead
+      / %th
+      /   Link&nbsp;&nbsp;
+      %th
+        Date indexed
+      %th.medium-screens
+        Sent to
+      %th.medium-screens
+        Created by
+      %th
+        Manufacturer
+      %th.large-screens
+        Color&nbsp;&nbsp;
+      %th.large-screens
+        Rear Wheel size
+
+    %tbody
+      - @bikes.each do |bike|
+        %tr
+          / %td
+          / # = link_to "&rarr;".html_safe, bike_url(bike)
+          %td
+            - if bike.created_at.today?
+              %span.hidden
+                = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Today at #{bike.created_at.strftime("%-I %p")}
+            - elsif Date.yesterday().beginning_of_day() <= bike.created_at
+              %span.hidden
+                = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Yesterday at #{bike.created_at.strftime("%-I %p")}
+            - else
+              %span.hidden
+                = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              = bike.created_at.strftime("%-m/%-d/%Y at %-I %p")
+          %td.medium-screens
+            - if bike.created_with_token
+              %span.less-strong
+                Free bike token
+            - else
+              = bike.owner_email
+          %td.medium-screens
+            - if bike.creator_id.present?
+              - u = User.find(bike.creator_id)
+              - if u.name.present?
+                = u.name
+              - else
+                = u.email
+            - else
+              Sorry, we're not sure who created this
+          %td
+            = bike.manufacturer_name
+          %td.large-screens
+            = bike.primary_frame_color.name
+          %td.large-screens
+            = bike.rear_wheel_size.name
+

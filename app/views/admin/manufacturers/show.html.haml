@@ -1,0 +1,24 @@
+%h1
+  Manage
+  = @manufacturer.name
+
+%hr
+
+%article
+  %h2 
+    = @manufacturer.slug
+  - if @manufacturer.logo_location.present?
+    = image_tag @manufacturer.logo_location
+  - if @manufacturer.frame_maker
+    %h4
+      #{@manufacturer.name} makes Frames
+  %dl.dl-horizontal
+    = @manufacturer.dl_from_attribute("open_year")
+    = @manufacturer.dl_from_attribute("close_year")
+    = @manufacturer.dl_list_item(link_to(@manufacturer.website, @manufacturer.website), "Website")
+    = @manufacturer.dl_from_attribute("description")
+
+  
+.actions
+  = link_to "Edit", edit_admin_manufacturer_url(@manufacturer), class: "button-green"
+  = link_to "Delete", admin_manufacturer_url(@manufacturer), method: :delete, confirm: "Are you sure?", class: "button-red"

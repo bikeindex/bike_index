@@ -1,0 +1,16 @@
+.blog-header
+  %h4
+    / %span
+    /   #{@blog.user.name} on
+    #{l @blog.post_date, format: :standard_display}
+
+  %hr
+
+%h1
+  = @blog.title
+
+:markdown
+  #{@blog.body}
+
+%article.content-comments
+  = render "/shared/disqus"

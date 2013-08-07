@@ -1,0 +1,43 @@
+.form.form-horizontal
+  = form_for [:admin, @user] do |f|
+    - if @user.errors.any?
+      #alert-block
+        .alert.alert-error
+          %h4
+            Please fix the following 
+            = pluralize(@user.errors.count, "error")
+          %ul
+            - @user.errors.full_messages.each do |msg|
+              %li
+                = msg
+    %h3
+      User attributes  
+    .control-group.padded
+      = f.label :name, class: "control-label"
+      .controls
+        = f.text_field :name
+    .control-group
+      = f.label :email, class: "control-label"
+      .controls
+        = f.text_field :email
+    .control-group
+      = f.label :confirmed, class: "control-label"
+      .controls
+        = f.check_box :confirmed
+    .control-group
+      = f.label :superuser, class: "control-label"
+      .controls
+        = f.check_box :superuser
+    .control-group
+      = f.label :can_invite, class: "control-label"
+      .controls
+        = f.check_box :can_invite
+    .control-group
+      = f.label :banned, class: "control-label"
+      .controls
+        = f.check_box :banned
+
+    .padded
+      = f.submit 'Save', class: 'button-green pull-right'
+
+  

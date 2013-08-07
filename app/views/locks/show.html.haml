@@ -1,0 +1,23 @@
+%header.with-subtitle
+  %h1
+    Your
+    = @lock.mnfg_name
+    lock
+  %p
+    = link_to "Edit it", edit_lock_url(@lock)
+
+.image-holder
+  %a{href: "/locks/#{@lock.id}"}
+    %img{ src: "/assets/locks/#{@lock.lock_type.slug}.jpg", alt: @lock.lock_type.name}
+
+.dl-holder
+  %dl.dl-horizontal
+    = @lock.dl_list_item(@lock.mnfg_name, "Manufacturer")
+    = @lock.dl_list_item(@lock.lock_type_name, "Lock Type")
+    = @lock.dl_from_attribute("key_serial")
+    = @lock.dl_from_attribute("combination")
+    = @lock.dl_from_attribute("lock_model")
+    = @lock.dl_from_attribute("notes","A few more words")
+
+%p
+  = link_to "Delete this lock", lock_url(@lock), method: :delete, confirm: "Are you sure?"

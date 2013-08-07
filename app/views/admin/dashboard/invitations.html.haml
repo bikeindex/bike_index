@@ -1,0 +1,12 @@
+.row-fluid
+  .span6
+    %h2
+      = link_to "Send Bike tickets", admin_bike_token_invitations_url
+    .well
+      = render partial: "/admin/bike_token_invitations/form"
+
+  .span6
+    %h2
+      = link_to "Organization invitations", admin_organization_invitations_url
+    .well
+      = render partial: "/admin/organization_invitations/form"

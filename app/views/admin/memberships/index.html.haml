@@ -1,0 +1,44 @@
+%header.with-subtitle
+  %h1 Manage Memberships
+  = link_to 'New Membership', new_admin_membership_url, class: "button-green sharing-links"
+
+%section.full-screen-table
+  %h2
+    = @memberships.count
+    Current memberships
+  %table#admin-users-table.table.table-striped.table-bordered
+    %thead
+      %th
+        Id&nbsp;
+      %th.medium-screens
+        Created
+      %th
+        Email
+      %th
+        Organization
+      %th.large-screens
+        Management links
+    %tbody
+      - @memberships.each do |membership|
+        %tr
+          %td
+            = link_to membership.id, admin_membership_url(membership)
+          %td.medium-screens
+            - if membership.created_at.today?
+              %span.hidden
+                = membership.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Today at #{membership.created_at.strftime("%-I %p")}
+            - elsif Date.yesterday().beginning_of_day() <= membership.created_at
+              %span.hidden
+                = membership.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Yesterday at #{membership.created_at.strftime("%-I %p")}
+            - else
+              %span.hidden
+                = membership.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              = membership.created_at.strftime("%-m/%-d/%Y at %-I %p")
+          %td
+            = membership.user.email
+          %td
+            = membership.organization.name
+          %td.large-screens
+            #{link_to 'Edit', edit_admin_membership_url(membership)}

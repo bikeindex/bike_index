@@ -1,0 +1,49 @@
+.form.form-horizontal
+  = form_for @bike_token_invitation, :html => { class: "form-horizontal" } do |f|
+    - if @bike_token_invitation.errors.any?
+      #alert-block
+        .alert.alert-error
+          %h4
+            Please fix the following 
+            = pluralize(@bike_token_invitation.errors.count, "error")
+          %ul
+            - @bike_token_invitation.errors.full_messages.each do |msg|
+              %li
+                = msg
+    %h3
+      Send free bike tickets through #{current_user.memberships.first.organization.name}
+    %p
+      Bro/Homey/Lover doesn't need a Bike Index account to receive the ticket
+
+    = f.hidden_field :organization_id, value: current_user.memberships.first.organization.id
+
+          
+    .control-group.padded
+      = f.label :invitee_email, "Email you're inviting", class: "control-label"
+      .controls
+        = f.email_field :invitee_email, :required => true
+
+    .control-group
+      = f.label :invitee_name, "Name", class: "control-label"
+      .controls
+        = f.text_field :invitee_name
+
+    .control-group
+      = f.label :bike_token_count, "How many bikes?", class: "control-label"
+      .controls
+        = f.number_field :bike_token_count, :required => true
+
+    .control-group
+      = f.label :subject, "Email subject", class: "control-label"
+      .controls
+        = f.text_field :subject, :required => true
+
+    .control-group.invitation-message
+      = f.label :message, "Email body", class: "control-label"
+      .controls
+        = f.text_area :message, :required => true, rows: 10
+
+        
+
+    .control-group.actions.padded
+      = f.submit 'Send invitation', class: 'button-green'

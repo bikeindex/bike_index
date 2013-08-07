@@ -1,0 +1,56 @@
+%header.with-subtitle
+  %h1
+    Manage Organizations
+  = link_to 'New Organization', new_admin_organization_url, class: "button-green sharing-links"
+
+%h4.padded
+  = @organizations.count
+  organizations are in the system so far!
+
+
+%section.full-screen-table
+  %table#admin-orgs-table.table.table-striped.table-bordered
+    %thead
+      %th
+        Name
+      %th.medium-screens
+        Created
+      %th
+        Bikes
+      %th
+        Money owed
+      %th.medium-screens
+        Memberships
+      %th.large-screens
+        Management links
+    %tbody
+      - @organizations.each do |organization|
+        %tr
+          %td
+            = link_to organization.name, admin_organization_url(organization)
+          %td.medium-screens
+            - if organization.created_at.today?
+              %span.hidden
+                = organization.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Today at #{organization.created_at.strftime("%-I %p")}
+            - elsif Date.yesterday().beginning_of_day() <= organization.created_at
+              %span.hidden
+                = organization.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Yesterday at #{organization.created_at.strftime("%-I %p")}
+            - else
+              %span.hidden
+                = organization.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              = organization.created_at.strftime("%-m/%-d/%Y at %-I %p")
+          %td
+            = @bikes.where(organization_id: organization.id).count
+          %td
+            = number_to_currency(@bikes.where(organization_id: organization.id).non_token.where(["created_at >= ?", organization.last_billing_date]).count * 4)
+          %td.medium-screens
+            = organization.memberships.count
+          %td.large-screens
+            = link_to 'Edit', edit_admin_organization_url(organization)
+
+
+
+%hr
+  = link_to "View deleted organizations", admin_show_deleted_organizations_url

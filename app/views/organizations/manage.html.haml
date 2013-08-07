@@ -1,0 +1,81 @@
+%h1
+  Manage #{@organization.name}'s users
+
+
+%h3
+  You currently have #{pluralize(@organization.users.count, "member")},
+
+%section.full-screen-table
+  %table#org-users-table.table.table-striped.table-bordered
+    %thead
+      %th
+        View&nbsp;
+      %th.medium-screens
+        Name
+      %th
+        Email
+      %th.medium-screens
+        Total indexed
+      %th.medium-screens
+        Indexed since #{@organization.last_billing_date.strftime("%m-%d")}
+    %tbody
+      - @organization.users.each do |user|
+        %tr
+          %td
+            = link_to "&rarr;".html_safe, user_url(user)
+          %td.medium-screens
+            = user.name
+          %td
+            = user.email
+          %td.medium-screens
+            = @bikes.where(creator_id: user.id).count
+          %td.medium-screens
+            = @bikes.where(creator_id: user.id).where(["created_at >= ?", @organization.last_billing_date]).count
+.invitations
+  %hr
+  %h2
+    Invitations
+  %h3.organization-description-list
+    You have sent #{pluralize(@organization.sent_invitation_count, "invitation")},
+    %br
+    and have 
+    = @organization.available_invitation_count
+    remaining #{"invitation".pluralize(current_organization.available_invitation_count)}.
+    - if @organization.available_invitation_count > 0
+      = link_to "Send an invitation to an employee", new_organization_invitation_url, class: "button-yellow"
+      
+    
+      
+
+  - if @organization.organization_invitations.unclaimed.count > 0
+    %h3.invitations-sent
+      #{ pluralize(@organization.organization_invitations.unclaimed.count, "invitations") } you sent haven't been claimed yet
+
+    %table.table.table-striped
+      %thead
+        %th.medium-screens
+          Name
+        %th
+          Email
+        %th
+          Role
+        %th
+          Date sent
+      %tbody
+        - @organization.organization_invitations.unclaimed.each do |org_invite| 
+          %tr
+            %td.medium-screens
+              - if org_invite.invitee_name
+                = org_invite.invitee_name
+            %td
+              = org_invite.invitee_email
+            %td
+              = org_invite.membership_role
+            %td
+              = org_invite.created_at.strftime("%-I %p on %-m/%-d/%Y ")
+
+    .alert-info.invitations-wait-till
+      %p
+        You have to wait until invitations are claimed before you can edit the users. And before they can add bikes.
+
+

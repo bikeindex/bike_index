@@ -1,0 +1,65 @@
+- if @organization.errors.any?
+  #alert-block
+    .alert.alert-error
+      %h4
+        Please fix the following
+        = pluralize(@organization.errors.count, "error")
+      %ul
+        - @organization.errors.full_messages.each do |msg|
+          %li
+            = msg
+
+.control-group.padded
+  .control-label
+    = f.label :name
+  .controls
+    = f.text_field :name
+
+.control-group.padded
+  .control-label
+    = f.label :available_invitation_count, "Available invitations"
+  .controls
+    = f.number_field :available_invitation_count
+  .controls.extra-field
+    %p
+      = "Invitations sent: #{@organization.sent_invitation_count}"
+
+.control-group.padded
+  .control-label
+    = f.label :default_bike_token_count
+  .controls
+    = f.number_field :default_bike_token_count
+
+.control-group.padded
+  .control-label
+    %label
+      Short Name
+      %br
+      (15 characters or less)
+  .controls
+    = f.text_field :short_name
+
+/ .control-group.padded
+/   .control-label
+/     = f.label :paid
+/   .controls
+/     = f.check_box :paid
+
+.control-group.padded
+  .control-label
+    = f.label :is_a_bike_shop
+  .controls
+    = f.check_box :is_a_bike_shop
+
+.control-group.padded
+  .control-label
+    = f.label :is_suspended
+  .controls
+    = f.check_box :is_suspended
+
+.control-group.padded
+  .control-label
+    = f.label :website
+  .controls
+    = f.text_field :website
+

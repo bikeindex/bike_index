@@ -1,0 +1,13 @@
+
+%header.with-subtitle
+  %h1
+    Possible duplicate bikes
+  = link_to "Manage component types", admin_ctypes_url, class: "sharing-links"
+
+%section.full-screen-table
+  - @bike_groups.each do |bikes|
+    - @bikes = bikes
+    %h3
+      = @bikes.first.serial_number    
+    %table.table.table-striped.table-bordered
+      = render partial: "/admin/bikes/admin_bikes_table"

@@ -1,0 +1,88 @@
+.edit-bike-fields#edit_stolen
+  %header
+    %h2
+      The theft
+  .input-group
+    %a.bikeform-tip{role: "button", title: "Why do we want your phone number?", :data => {toggle: "modal", target: "#phoneTip"} }
+      %span
+        ?
+    .control-group
+      = f.label :phone, class: "control-label"
+      .controls
+        = f.text_field :phone, required: "true"
+    .control-group.stolen-phone-groups
+      %label.control-label
+        Show phone number to:
+      .phone-group
+        = f.label :phone_for_everyone do
+          = f.check_box :phone_for_everyone
+          Everyone
+      .phone-group
+        = f.label :phone_for_users do
+          = f.check_box :phone_for_users
+          Bike Index users
+      .phone-group
+        = f.label :phone_for_shops do
+          = f.check_box :phone_for_shops
+          Bike Shops
+      .phone-group
+        = f.label :phone_for_police do
+          = f.check_box :phone_for_police
+          Law enforcement
+
+  .input-group
+    .control-group.datepicker-container
+      = bike.label :date_stolen_input, "When was the bike stolen?", class: "control-label"
+      .controls
+        #stolen_date
+          = bike.text_field :date_stolen_input, value: @bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), required: true, data: { :'date-format' => "mm-dd-yyyy" }
+    / .span6.input-tip
+    /   .tip-title
+    /     %h2 When was this bike stolen
+    /   %section
+    /     = render 'content/bike_tips/when_stolen'
+
+  .input-group
+    .control-group
+      = f.label :street, "Where was the bike?", class: "control-label"
+      .controls
+        = f.text_field :street, placeholder: "Intersection or address"
+      .controls.extra-field
+        = f.text_field :city, placeholder: "City"
+      .controls.extra-field
+        = f.collection_select(:state, UsStates.all, :abbr, :name, prompt: "State" )
+      .controls.extra-field
+        = f.text_field :zipcode, placeholder: "Zipcode"
+    / .span6.input-tip
+    /   .tip-title
+    /     %h2 Where was the bike stolen?
+    /   %section
+    /     = render 'content/bike_tips/where_stolen'
+
+  .input-group
+    .control-group.large-text
+      = f.label :theft_description, "Description of the theft", class: "control-label"
+      .controls
+        = f.text_area :theft_description, rows: 3
+  / .span6.input-tip
+  /   .tip-title
+  /     %h2 Police report information
+  /   %section
+  /     = render 'content/bike_tips/description_stolen'
+
+
+  .input-group
+    .control-group
+      = f.label :police_report_filed, "Police report filed?", class: "control-label"
+        
+      .controls#police-report-check
+        %label
+          = f.check_box :police_report_filed
+          A police report was filed
+      / .controls#police-report-field
+      / #= f.text_area :police_report_information, :toolbar => 'Basic', class: 'ckeditor'
+    / .span6.input-tip
+    /   .tip-title
+    /     %h2 Police report filed?
+    /   %section
+    /     = render 'content/bike_tips/police_report_filed'

@@ -1,0 +1,22 @@
+%section.content
+  .receptacle
+    .inner-recep.legal-content
+      :markdown
+        #{render partial: "/info/terms_text"}
+
+.accept-vendor-terms
+
+  = form_for @user, :html => { class: "form" } do |f|
+    
+    .form-horizontal
+      .control-group
+        %label{ for: 'user_terms_of_service' }
+          .control-label
+            = f.check_box :terms_of_service
+          .controls
+            I agree to the Bike Index 
+            %strong
+              Terms of Service
+    .agree-action
+      .control-group
+        = f.submit "Submit", class: 'button-blue'

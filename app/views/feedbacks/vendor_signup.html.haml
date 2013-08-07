@@ -1,0 +1,74 @@
+.vendor-signup
+  %header
+    .header-text
+      %h1
+        Are you a bike shop?
+      %h2
+        Want to register bikes? 
+    .bike-shop-image
+      = image_tag "bike-shop.png", alt: "Bike shop"
+
+  .vendor-questions
+    %h2
+      A few questions and answers
+    %ul.fancy-bullets
+      %li
+        %span.blue-bullet
+        %h3
+          How much does it cost to get started?
+        %p
+          There is no set up fee. You only pay for bikes that you register.
+
+
+      %li
+        %span.blue-bullet
+        %h3
+          Do I sign a long term contract?
+        %p
+          Nope. There aren't any long term commitments. You can cancel anytime.
+      
+      %li
+        %span.blue-bullet
+        %h3
+          Do you have fliers?
+        %p
+          Yes! You can print out 
+          %a{href: "https://s3.amazonaws.com/bikeindex/Add+bike+form+v2.pdf"}
+            this pdf
+          and cut it into four sections so customers can write down their information.
+
+      %li
+        %span.blue-bullet
+        %h3
+          This sounds awesome! How do I sign up?
+        %p
+          Just submit the form below!
+          / %br
+          / If you'd like you can read through the #{link_to "vendor terms of service", vendor_terms_path}.
+
+
+  = form_for @feedback do |f|
+
+    - if @feedback.errors.any?
+      #flash.alert.alert-error
+        %button.close{ :data => {dismiss: "alert" }}
+          x
+        %h4
+          Please fix the following #{pluralize(@feedback.errors.count, "error")}:
+        %ul
+          - @feedback.errors.full_messages.each do |msg|
+            %li
+              = msg 
+    
+    
+    
+    .vendor-signup-form
+      .contact-info
+        = f.text_field :email, placeholder: "Enter your email address"
+        = f.text_field :title, placeholder: "Your phone number"
+        = f.text_field :name, placeholder: "Enter your shop's name"
+      .contact-text
+        = f.text_area :body, placeholder: "Where is your shop located?", rows: 7
+      .feedback-actions.control-group
+        = f.submit 'Submit request', class: 'button-green pull-right'
+    

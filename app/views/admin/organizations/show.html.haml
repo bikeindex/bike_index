@@ -1,0 +1,160 @@
+%header.with-subtitle.padded
+  %h1
+    Viewing
+    = @organization.name
+  %p
+    = link_to "Manage organization invitations", admin_organization_invitation_url(@organization.id)
+%hr
+.row-fluid
+  .span6
+    %h3
+      Overview:
+
+    - if @organization.is_suspended
+      %p.red-text
+        Organization is suspended
+    %p
+      Domain: #{@organization.slug}.bikeindex.org
+    %p
+      users: #{@organization.users.count}
+    %p
+      = "Remaining invitations: #{@organization.available_invitation_count }"
+    %p
+      = "Invitations sent: #{@organization.sent_invitation_count}"
+
+    - if @organization.website
+      %p
+        website:
+        %a{href: "#{@organization.website}"}
+          = @organization.website
+  .span6
+    %h3
+      Billing:
+    %p
+      = pluralize(@bikes.count, "Bike")
+      total bikes registered
+    %p
+      = pluralize(@bikes.non_token.count, "Customer bike")
+      registered (non ticket)
+    %p
+      = pluralize(@bikes.non_token.where(["created_at >= ?", @organization.last_billing_date]).count, "Bike")
+      registered this billing period
+      (#{number_to_currency(@bikes.non_token.where(["created_at >= ?", @organization.last_billing_date]).count * 4)} will be due)
+
+%section.full-screen-table
+  %h2
+    = pluralize(@bikes.count, "Bike")
+
+  %table#org-bikes-table.table.table-striped.table-bordered
+    %thead
+      / %th
+      /   Link&nbsp;&nbsp;
+      %th
+        Date indexed
+      %th
+        Sent to
+      %th
+        Manufacturer
+      %th
+        Color&nbsp;&nbsp;
+      %th
+        Rear Wheel size
+
+    %tbody
+      - @bikes.each do |bike|
+        %tr
+          / %td
+          / # = link_to "&rarr;".html_safe, bike_url(bike)
+          %td
+            - if bike.created_at.today?
+              %span.hidden
+                = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Today at #{bike.created_at.strftime("%-I %p")}
+            - elsif Date.yesterday().beginning_of_day() <= bike.created_at
+              %span.hidden
+                = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Yesterday at #{bike.created_at.strftime("%-I %p")}
+            - else
+              %span.hidden
+                = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              = bike.created_at.strftime("%-m/%-d/%Y at %-I %p")
+          %td
+            - if bike.created_with_token
+              %span.less-strong
+                Free bike ticket
+            - else
+              = bike.owner_email
+          %td
+            = bike.manufacturer_name
+          %td
+            = bike.primary_frame_color.name
+          %td
+            = bike.rear_wheel_size.name
+
+
+%section.full-screen-table
+
+  %h2
+    = pluralize(@organization.users.count, "User")
+
+  %table#org-users-table.table.table-striped.table-bordered
+    %thead
+      %th
+        Edit&nbsp;
+      %th
+        Name
+      %th
+        Email
+      %th
+        Total indexed
+      %th
+        Indexed since #{@organization.last_billing_date.strftime("%m-%d")}
+    %tbody
+      - @organization.users.each do |user|
+        %tr
+          %td
+            = link_to "&rarr;".html_safe, edit_admin_user_url(user)
+          %td
+            = user.name
+          %td
+            = user.email
+          %td
+            = @bikes.where(creator_id: user.id).count
+          %td
+            = @bikes.where(creator_id: user.id).where(["created_at >= ?", @organization.last_billing_date]).count
+
+
+%ul
+  - @organization.users.each do |user|
+    %li
+      %p
+        = user.name
+        = user.email
+%hr
+- if @organization.locations.any?
+  - if @organization.locations.count > 1
+    %h3.padded
+      = pluralize(@organization.locations.count, "Location")
+  .row-fluid.locations-list
+    - @organization.locations.each do |location|
+      .span4
+        .alert.alert-info
+          - if location.name
+            %p
+              Name:
+              = location.name
+
+          - if location.phone
+            %p
+              Phone:
+              = number_to_phone(location.phone)
+
+          - if location.street
+            %p
+              Street address:
+              = location.street
+
+.actions.padded
+  = link_to "Manage organization invitations", admin_organization_invitation_url(@organization.id), class: "button-yellow"
+  = link_to "Edit", edit_admin_organization_url(@organization), class: "button-green"
+  = link_to "Delete #{@organization.name}!", admin_organization_url(@organization), method: :delete, confirm: "Are you sure?", class: "button-red"

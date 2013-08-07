@@ -1,0 +1,107 @@
+.input-group.with-optional-blocks.form-head
+  %a.bikeform-tip{role: "button", title: "Help with bicycle serial numbers", :data => {toggle: "modal", keyboard: "true", target: "#serialTip"} }
+    %span
+      ?
+  .control-group
+    = f.label :serial_number, class: "control-label"
+    .controls
+      = f.text_field :serial_number, :required =>true
+  .has-no-serial.optional-block
+    %label
+      = f.check_box :has_no_serial, tabindex: -1 
+      - if @bike.stolen?
+        Unknown
+      - else
+        Has no serial
+
+.input-group.with-additional-block
+  %a.bikeform-tip{role: "button", title: "Help with choosing a frame manufacturer", :data => {toggle: "modal", target: "#frameManufacturerTip"} }
+    %span
+      ?
+  .control-group.chosen-select
+    = f.label :manufacturer_id, class: "control-label"
+    .controls
+      = collection_select( :bike, :manufacturer_id, Manufacturer.frames, :id, :name, :required =>true, prompt: "Choose manufacturer")
+  %p.other-value
+    = Manufacturer.find_by_slug("other").id
+  .hidden-other.control-group
+    = f.label :manufacturer_other, "Enter manufacturer", class: "control-label"
+    .controls
+      = f.text_field :manufacturer_other
+      
+.input-group.with-optional-blocks
+  %a.bikeform-tip{role: "button", title: "An amazing explanation of wheel sizing.", :data => {toggle: "modal", target: "#rearWheelTip"} }
+    %span
+      ?
+  .control-group
+    %label.control-label{for: "standard-diams"}
+      Rear wheel
+    .controls
+      %select#standard-diams
+        %option{value: 0}
+          Choose Diameter
+        %option{value: 3}
+          700c (includes 29ers)
+        %option{value: 8}
+          650b
+        %option{value: 2}
+          27in
+        %option{value: 10}
+          26in
+        %option{value: 20}
+          20in
+        %option{value: 23}
+          18in
+        %option{value: 28}
+          16in
+        %option{value: 29}
+          12in
+  %a#show-wheel-diams.optional-form-block{:data => {target: "#wheel-diams", toggle: "#hide-wheel-diams"}}
+    Show more sizes
+  %a#hide-wheel-diams.optional-form-block.rm-block.currently-hidden{:data => {target: "#wheel-diams", toggle: "#show-wheel-diams"}}
+    Hide extra sizes
+  #wheel-diams.hidden-other
+    .control-group
+      %label.control-label
+        Detailed wheel list
+      .controls
+        = collection_select( :bike, :rear_wheel_size_id, WheelSize.all , :id, :description, :html => { :required =>true }, prompt: "Choose diameter")
+  .control-group.wheel-diameter
+    %label.control-label
+      Rear tire
+    .controls.radio-controls
+      %label.radio
+        = f.radio_button :rear_tire_narrow, "true"
+        Narrow Tire
+      %label.radio.wide-tire
+        = f.radio_button :rear_tire_narrow, "false"
+        Wide tire
+
+.input-group.with-optional-blocks
+  %a.bikeform-tip{role: "button", title: "Why do we do colors like this?", :data => {toggle: "modal", target: "#colorTip"} }
+    %span
+      ?
+  .control-group
+    = f.label :primary_frame_color_id, class: "control-label"
+    .controls
+      = collection_select( :bike, :primary_frame_color_id, Color.all, :id, :name, required: true, prompt: "Choose color" )
+  %a#add-secondary.optional-form-block{:data => {target: "#secondary-color", toggle: "#rm-secondary"}}
+    Add a color
+  %a#rm-secondary.optional-form-block.rm-block.currently-hidden{:data => {target: "#secondary-color", toggle: "#add-secondary"}}
+    Remove color
+  #secondary-color.hidden-other
+    .control-group
+      %label.control-label
+        Secondary color
+      .controls
+        = collection_select( :bike, :secondary_frame_color_id, Color.all, :id, :name, prompt: "Choose color" )
+    %a#add-tertiary.optional-form-block{:data => {target: "#tertiary-color", toggle: "#rm-tertiary"}}
+      Add a color
+    %a#rm-tertiary.optional-form-block.rm-block.currently-hidden{:data => {target: "#tertiary-color", toggle: "#add-tertiary"}}
+      Remove color
+  #tertiary-color.hidden-other
+    .control-group
+      %label.control-label
+        Third color
+      .controls
+        = collection_select( :bike, :tertiary_frame_color_id, Color.all, :id, :name, prompt: "Choose color" )

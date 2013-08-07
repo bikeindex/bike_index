@@ -1,0 +1,88 @@
+.receptacle.overfloating
+  .inner-recep
+    %h1.user-home-title
+      Hello
+      - if current_user.name.present?
+        #{current_user.name},
+      - else
+        #{current_user.email},
+    .notifications-holder
+      .notification
+
+        / %button.close{ :data => { dismiss: "alert" }}
+        /   x
+        - if @bikes.count > 0
+          - if @bikes.last.stolen
+            %h4
+              Suffering succotash!
+              %span.subtitle We're sorry your #{@bikes.last.type} was stolen, but hopefully, with everyone able to search for it, you'll get it back.
+          - else
+            %h4
+              Awesome!
+              %span.subtitle
+                We're pumped that you added a #{@bikes.last.type} to the Index.
+          %ul
+            - if @bikes.last.stolen
+              %li
+                %p
+                  Add more information about the 
+                  %span.stolen-color
+                    villainous theft
+                  of the #{link_to @bikes.first.type, edit_bike_url(@bikes.first)} and add some details to the #{@bikes.last.type} as well.
+            - else
+              %li
+                #{ link_to "Add a bit more information", edit_bike_url(@bikes.first)} about your #{@bikes.first.type}. What's it made of? What size is it? How many gears does it have? Upload some pictures of it.
+            %li
+              Tell us more about #{link_to "yourself", my_account_url}.
+            
+        - else
+          %h4
+            Welcome
+            %span.subtitle
+              to the Bike Index. Thanks for signing up!
+          
+
+          %p Curious about what to do now?
+
+          %ul
+            %li
+              Update
+              = link_to "your profile.", my_account_url
+            %li
+              Visit 
+              = link_to "where to register", where_url
+              to find the closest shop to register your bikes.
+      = render "/shared/bike_token_list"  
+
+
+.user-homepage.receptacle
+  .inner-recep
+    - if @bikes.any?
+      %header.with-subtitle
+        %h3
+          Your Bikes
+        - if current_user.show_bikes
+          %p
+            = link_to "Your public page", "/users/#{current_user.username}"
+      %ul.bike-boxes
+        = render partial: "/bikes/bike", collection: @bikes, :locals => {target: "edit" }
+          
+    - else
+      %h3
+        You don't have any bikes on the Index yet.
+
+  .locks-well
+    .well
+      = render "locks/lock_home"
+
+
+  - if current_user.can_invite
+    - if current_user.memberships.any?
+      .user-token-invitations
+        = render "/bike_token_invitations/form"
+    - else
+      .user-token-invitations
+        %h2
+          Whoops, you need to be part of an organization to send free bike tokens
+        %p
+          Please contact someone with administrator privileges to fix this!

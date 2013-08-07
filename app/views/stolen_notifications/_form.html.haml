@@ -1,0 +1,10 @@
+= form_for @stolen_notification do |f|
+  = f.hidden_field :bike_id, value: @bike.id
+
+  .control-group
+    = f.label :message, "Send a message to the owner", class: "control-label"
+    .controls
+      = f.text_area :message, :required => true, rows: 2
+  .control-group
+    = f.submit "Send", class: 'button-blue'
+

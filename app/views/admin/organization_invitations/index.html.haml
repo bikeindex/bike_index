@@ -1,0 +1,45 @@
+%header.with-subtitle
+  %h1 Manage Organization Invitations
+  = link_to 'Send an invitation', new_admin_organization_invitation_url, class: "button-green sharing-links"
+
+
+  
+%h3.invitations-sent
+  #{ pluralize(OrganizationInvitation.unclaimed.count, "invitation") } haven't been claimed yet
+
+%section.full-screen-table
+  %table.table.table-striped
+    %thead
+      %th
+        Id&nbsp;
+      %th.large-screens
+        Date sent
+      %th.medium-screens
+        Name
+      %th
+        Email
+      %th.medium-screens
+        Role
+      %th
+        Organization
+      %th
+        %span.medium-screens
+          Redeemed
+    %tbody
+      - @organization_invitations.each do |org_invite|
+        %tr
+          %td
+            = link_to org_invite.id, edit_admin_organization_invitation_url(org_invite.id)
+          %td.large-screens
+            = org_invite.created_at.strftime("%-I %p on %-m/%-d/%Y ")
+          %td.medium-screens
+            - if org_invite.invitee_name
+              = org_invite.invitee_name
+          %td
+            = org_invite.invitee_email
+          %td.medium-screens
+            = org_invite.membership_role
+          %td
+            = link_to org_invite.organization.name, admin_organization_url(org_invite.organization.name)
+          %td.table-cell-check
+            = "&#x2713;".html_safe if org_invite.redeemed

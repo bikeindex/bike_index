@@ -1,0 +1,56 @@
+%fieldset.input-group.with-additional-block.add-component-fields
+  %article
+    .control-group.chosen-select.has-front-or-rear-boxes{:data => {other: Ctype.find_by_slug("other").id, hidden: ".hidden-ctype" }}
+      = f.label :ctype_id, "Part type", class: "control-label"
+      .controls.part-type-select
+        = f.collection_select(:ctype_id, Ctype.all, :id, :name, :required =>true, prompt: "What type of part?" )
+      .front-or-rear-part{class: ("initially-hidden" unless f.object.ctype && f.object.ctype.has_twin_part)}
+        %label.checkbox
+          = f.check_box :front
+          Font
+        %label.checkbox.rear-part
+          = f.check_box :rear
+          Rear
+    
+    .hidden-other.control-group.hidden-ctype
+      = f.label :ctype_other, "Other part type", class: "control-label"
+      .controls
+        = f.text_field :ctype_other
+
+    .control-group.large-text.extra-field
+      = f.label :description, "Part Description", class: "control-label"
+      .controls
+        = f.text_area :description, rows: 2
+
+    .split-fields
+      .control-group.chosen-select.extra-field{:data => {other: Manufacturer.find_by_slug("other").id, hidden: ".hidden-mnfg" }}
+        = f.label :manufacturer_id, class: "control-label"
+        .controls.component-mnfg-select
+          = f.collection_select( :manufacturer_id, Manufacturer.all, :id, :name, :required =>true, prompt: "Manufacturer")
+      
+      .control-group.extra-field.component_model.short-label
+        = f.label :model_name, "Model", class: "control-label"
+        .controls
+          = f.text_field :model_name
+
+    .hidden-other.control-group.hidden-mnfg
+      = f.label :manufacturer_other, "Other manufacturer", class: "control-label"
+      .controls
+        = f.text_field :manufacturer_other
+
+    .split-fields.extra-model-fields{class: ("hidden-other" unless f.object.model_name.present?)}
+      .control-group.extra-field
+        = f.label :year, "Model Year", class: "control-label"
+        .controls
+          = f.text_field :year
+
+      .control-group.extra-field.short-label
+        = f.label :serial_number, "Part Serial", class: "control-label"
+        .controls
+          = f.text_field :serial_number
+
+    .remove-part
+      = f.check_box :_destroy
+      = f.label :_destroy, "Remove part", class: "remove_fields"
+    
+    

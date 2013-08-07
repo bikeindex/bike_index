@@ -1,0 +1,31 @@
+.user-page
+  %header.with-subtitle
+    %h1
+      - if @user.title
+        = @user.title
+      - else
+        This user's bikes
+    %p.sharing-links
+      = @user.show_twitter_and_website(@user)
+  .description-avatar
+    - if @user.avatar
+      - unless @user.avatar.url(:medium) == "https://s3.amazonaws.com/bikeindex/blank.png"
+        .avatar
+          = image_tag @user.avatar.url(:medium)
+    - if @user.description
+      .description
+        = @user.description.html_safe
+  .sharing-section
+    .sharing-buttons
+      = render "/shared/share_this"
+
+  - if @bikes.any?
+    %ul.bike-boxes
+      = render partial: "/bikes/bike", collection: @bikes, :locals => {target: "show" }
+
+    .comments-container
+      = render "/shared/disqus"
+        
+  - else
+    %h2
+      This user has no bikes yet!

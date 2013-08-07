@@ -1,0 +1,92 @@
+.edit-bike-fields#edit_frame
+  %header
+    %h2
+      Frame and Fork
+  .input-group
+    .control-group
+      %label.control-label.unclickable
+        Serial number
+      .controls
+        = @bike.serial_number.upcase
+    .control-group
+      %label.control-label.unclickable
+        Manufacturer
+      .controls
+        = @bike.manufacturer_name
+
+  .input-group
+    .control-group
+      = f.label :frame_model, class: "control-label"
+      .controls
+        = f.text_field :frame_model
+
+  .input-group
+    .control-group
+      = f.label :frame_manufacture_year, class: "control-label"
+      .controls
+        = f.text_field :frame_manufacture_year
+
+  .input-group.with-optional-blocks
+    %a.bikeform-tip{role: "button", title: "Seat tube measuring", :data => {toggle: "modal", target: "#seatTubeLengthTip"} }
+      %span
+        ?
+    .control-group
+      = f.label :seat_tube_length, class: "control-label"
+      .controls
+        = f.text_field :seat_tube_length
+    .cm-or-in-select.optional-form-block
+      %label.radio
+        = f.radio_button :seat_tube_length_in_cm, "true"
+        cm
+      %label.radio
+        = f.radio_button :seat_tube_length_in_cm, "false"
+        in
+
+
+  .input-group.with-additional-block
+    %a.bikeform-tip{role: "button", title: "What's the frame made of?", :data => {toggle: "modal", target: "#frameMaterialTip"} }
+      %span
+        ?
+    .control-group
+      = f.label :frame_material_id, class: "control-label"
+      .controls
+        = collection_select( :bike, :frame_material_id, FrameMaterial.all, :id, :name, :input_html => { :class => "has-hidden-other" }, prompt: "Choose material" )
+    %p.other-value
+      5
+    .hidden-other.control-group
+      = f.label :frame_material_other, "Other frame material", class: "control-label"
+      .controls
+        = f.text_field :frame_material_other
+
+  .input-group.with-optional-blocks
+    %a.bikeform-tip{role: "button", title: "Why do we do colors like this?", :data => {toggle: "modal", target: "#colorTip"} }
+      %span
+        ?
+    .control-group
+      = f.label :primary_frame_color_id, class: "control-label"
+      .controls
+        = collection_select( :bike, :primary_frame_color_id, Color.all, :id, :name, required: true, prompt: "Choose color" )
+    %a#add-secondary.optional-form-block{:data => {target: "#secondary-color", toggle: "#rm-secondary"}}
+      Add a color
+    %a#rm-secondary.optional-form-block.rm-block.currently-hidden{:data => {target: "#secondary-color", toggle: "#add-secondary"}}
+      Remove color
+    #secondary-color.hidden-other
+      .control-group
+        %label.control-label
+          Secondary color
+        .controls
+          = collection_select( :bike, :secondary_frame_color_id, Color.all, :id, :name, include_blank: 'Choose color' )
+      %a#add-tertiary.optional-form-block{:data => {target: "#tertiary-color", toggle: "#rm-tertiary"}}
+        Add a color
+      %a#rm-tertiary.optional-form-block.rm-block.currently-hidden{:data => {target: "#tertiary-color", toggle: "#add-tertiary"}}
+        Remove color
+    #tertiary-color.hidden-other
+      .control-group
+        %label.control-label
+          Third color
+        .controls
+          = collection_select( :bike, :tertiary_frame_color_id, Color.all, :id, :name, include_blank: 'Choose color' )
+
+  .input-group.inform-save
+    .controls
+      = submit_tag "Save", class: "button-green"

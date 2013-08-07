@@ -1,0 +1,61 @@
+%h1
+  Manage users
+%h4
+  = @users.count
+  users have signed up so far!
+
+
+%section.full-screen-table
+  %table#admin-users-table.table.table-striped.table-bordered
+    %thead
+      %th
+        Id&nbsp;
+      %th.medium-screens
+        Created
+      %th.large-screens
+        Name  
+      %th
+        Email
+      %th
+        Bikes
+      %th.medium-screens
+        Memberships
+      %th.large-screens
+        Tickets
+      %th.large-screens
+        Management
+    %tbody
+      - @users.each do |user|
+        %tr
+          %td
+            = link_to user.id, edit_admin_user_url(user)
+          %td.medium-screens
+            - if user.created_at.today?
+              %span.hidden
+                = user.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Today at #{user.created_at.strftime("%-I %p")}
+            - elsif Date.yesterday().beginning_of_day() <= user.created_at
+              %span.hidden
+                = user.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Yesterday at #{user.created_at.strftime("%-I %p")}
+            - else
+              %span.hidden
+                = user.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              = user.created_at.strftime("%-m/%-d/%Y at %-I %p")
+          %td.large-screens
+            - if user.name?
+              = user.name
+          %td
+            = user.email
+          %td
+            = user.ownerships.count
+          %td.medium-screens
+            - if user.memberships.present?
+              - user.memberships.each do |membership|
+                = link_to "#{membership.organization.name} ", admin_membership_url(membership)
+          %td.large-screens
+            - if user.bike_tokens.count > 0
+              = user.bike_tokens.count
+          %td.large-screens
+            #{link_to 'Edit', edit_admin_user_url(user)} 
+            / #{link_to 'Grant Bike Tokens', admin_user_bike_tokens_url(user.id)}

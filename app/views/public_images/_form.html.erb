@@ -1,0 +1,37 @@
+<%= form_for @public_image do |f| %>
+  <% if @public_image.errors.any? %>
+    <div id="alert-block">
+      <div class="alert-error">
+        <a class="close" data-dismiss="alert" herf="#">x</a>
+        <h4><%= pluralize(@public_image.errors.count, "Error") %> prevented Photo from saving</h4>
+        <ul>
+          <% @public_image.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <section>
+    <ul class="horizontal-form-list">
+      <li>
+        <label>Image name</label>
+        <div class="controls">
+          <%= f.text_field :name %>
+        </div>
+      </li>
+      <li>
+        <label>Choose a new image</label>
+        <div class="controls">
+          <%= f.file_field :image %>
+        </div>
+      </li>
+    </ul>
+  <section>
+    <div class="bibox-btn">
+      <%= f.submit "Update image", class: "button-green" %>
+      <%= link_to 'Cancel Update', edit_bike_url(@public_image.imageable), class: "button-red" %>
+    </div>
+  </section>
+<% end %>

@@ -1,0 +1,43 @@
+.input-group.with-optional-blocks
+  %a.bikeform-tip{role: "button", title: "Seat tube measuring", :data => {toggle: "modal", target: "#seatTubeLengthTip"} }
+    %span
+      ?
+  .control-group
+    = f.label :seat_tube_length, class: "control-label"
+    .controls
+      = f.text_field :seat_tube_length
+  .cm-or-in-select.optional-form-block
+    %label.radio
+      = f.radio_button :seat_tube_length_in_cm, "true"
+      cm
+    %label.radio
+      = f.radio_button :seat_tube_length_in_cm, "false"
+      in
+.input-group
+  .control-group
+    = f.label :frame_model, class: "control-label"
+    .controls
+      = f.text_field :frame_model
+
+.input-group
+  .control-group
+    = f.label :frame_manufacture_year, class: "control-label"
+    .controls
+      = f.text_field :frame_manufacture_year
+
+.input-group.with-additional-block
+  %a.bikeform-tip{role: "button", title: "What's the frame made of?", :data => {toggle: "modal", target: "#frameMaterialTip"} }
+    %span
+      ?
+  .control-group
+    = f.label :frame_material_id, class: "control-label"
+    .controls
+      = collection_select( :bike, :frame_material_id, FrameMaterial.all, :id, :name, :input_html => { :class => "has-hidden-other" }, prompt: "Choose material" )
+  %p.other-value
+    5
+  .hidden-other.control-group
+    = f.label :frame_material_other, "Other frame material", class: "control-label"
+    .controls
+      = f.text_field :frame_material_other
+  
+

@@ -1,0 +1,136 @@
+//________________________
+//
+// Lock styles
+//
+//________________________
+
+.lock-boxes {
+  @extend .bike-boxes;
+}
+
+
+#lock-form {
+  padding: 50px 0 100px;
+  // max-width: 600px;
+  // margin: 0 auto;
+
+  .control-group {
+    margin-bottom: 0;
+    padding: 1em;
+  }
+  .release-types {
+    @include clearfix;
+    width: 100%;
+    
+    .controls {
+      margin-left: 120px;
+    }
+    .control-label {
+      width: 100px;
+    }
+  }
+  .release-type {
+    width: 200px;
+    float: left;
+  }
+  .submit-button {
+    margin-top: 20px;
+    max-width: 780px;
+    .btn {
+      float: right;
+    }
+  }
+  .lock-notes {
+    max-width: 780px;
+  }
+}
+
+
+@media (min-width: 450px) {
+  #lock-form .release-types {
+    padding-left: 1.4em;
+  }
+}
+
+
+.lock-types-select {
+  @include clearfix;
+  position: relative;
+  padding: 0 0 40px;
+}
+.lock-type-title { display: none; }
+.lock-type {
+  position: relative;
+  width: 20%;
+  max-width: 120px;
+  float: left;
+  padding-right: 15px;
+  span {
+    display: block;
+    width: 100%;
+    clear: both;
+    text-align: left;
+    padding-left: 20px;
+  }
+  div {
+    width: 100%;
+    padding-right: 15px;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+}
+
+@media (min-width: 840px) {
+  .lock-type-title {
+    float: left;
+    width: 160px;
+    height: 100%;
+    padding: 0 22px 40px 0;
+    margin-left: 1em;
+    display: block;
+    label { text-align: right; cursor: default;}
+  }
+}
+
+@media (max-width: 600px) {
+  .lock-type {
+    span { padding: 1.5em 0 0; text-align: center; }
+    div { input { display: block; margin: 0 auto;}}
+  }
+}
+
+
+.lock-pictures {
+  @extend .alert;
+  @include clearfix;
+  width: 100%;
+  max-width: 700px;
+  position: relative;
+  margin: 20px auto;
+  h2 {
+    width: 100%;
+    font-size: 24px;
+  }
+  section {
+    float: left;
+    position: relative;
+    width: 32%;
+    margin-right: 2%;
+    a {
+      display: block;
+      cursor: pointer;
+    }
+  }
+  img {
+    width: 100%;
+    height: auto;
+    margin-bottom: .5em;
+  }
+  p {
+    clear: both;
+  }
+  section:nth-of-type(3) {
+    margin-right: 0;
+  }
+}

@@ -1,0 +1,100 @@
+//________________________
+//
+// popup and down!
+//
+//________________________
+.btn-pop {
+  @extend .clickable;
+  display: inline-block;
+  text-decoration: none;
+  padding: .25em .5em;
+  &:hover {
+    @include translate(-1px,-1px);
+    text-decoration: none;
+  }
+  &:active {
+    @include translate(1px,1px);
+  }
+}
+
+.btn-pop-shadowed {
+  @extend .btn-pop;
+  &:hover {
+    @include box-shadow(1px 1px 2px rgba(black,.2));  
+  }
+  &:active {
+    @include box-shadow(none);  
+  }
+}
+
+//________________________
+//
+// Buttons
+//
+//________________________
+
+.button {
+  @include border-radius(3px);
+  @extend .btn-pop;
+  background: $grayDark;
+  text-transform: capitalize; 
+  text-align: center;
+  color: white;
+  border: 1px solid darken($grayDark, 5%);
+  @include box-shadow(0 0 2px rgba(black,.4));
+  &:hover {
+    @include box-shadow(1px 1px 2px rgba(black,.4));
+    color: white;
+  } 
+  &:active {
+    @include box-shadow(0 0 1px rgba(black,.4));
+  }
+}
+
+.button-blue {
+  @extend .button;
+  background: $btnAction;
+  border-color: $btnActionBorder;
+}
+
+.button-green {
+  @extend .button;
+  background: $btnSuccess;
+  border-color: $btnSuccessBorder;
+  font-weight: bold;
+  padding: .5em 1em;
+  text-transform: none;
+}
+
+.button-red {
+  @extend .button-green;
+  background: $btnDanger;
+  border-color: $btnDangerBorder;
+}
+
+.button-yellow {
+  @extend .button-green;
+  background: $btnWarning;
+  border-color: $btnWarningBorder;
+}
+
+.btn-secondary {
+  @extend .btn;
+}
+
+
+
+//________________________
+//
+// a Clickable image is a anchor tag wrapping an img
+//
+//________________________
+
+.clickable-image {
+  @extend .btn-pop-shadowed;
+  img {
+    @include border-radius(1px);
+    padding: 2px;
+  }
+}
+

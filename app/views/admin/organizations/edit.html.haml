@@ -1,0 +1,27 @@
+%h1.padded
+  Edit Organization
+
+.form.form-horizontal
+  = form_for [:admin, @organization] do |f|
+    = render :partial => 'form', :locals => { :f => f }
+    
+    .control-group
+      = f.label :slug, "Slug", class: "control-label"
+      .controls
+        %p
+          = @organization.slug
+    
+    .nested-form
+      %p
+        %strong
+          Locations
+      %fieldset
+        #admin-locations-fields.horizontal-form-list
+          = f.fields_for :locations do |builder|
+            = render '/admin/organizations/location_fields', f: builder
+          = link_to_add_fields "Add a location", f, :locations
+
+    
+    .control-group.actions.padded
+      = f.submit "Update", class: 'button-green'
+

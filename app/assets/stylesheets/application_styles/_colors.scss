@@ -1,0 +1,111 @@
+//________________________
+//
+// Colors
+//
+//________________________
+
+$blueLight: #85a4b0;
+$blue: rgb(52,152,219);
+$blueDark: rgb(41,128,185);
+$blueDarker: rgb(53,73,94);
+$blueDarkerer: rgb(44,62,80);
+$turquoise: rgb(26,188,56);
+$turquoiseDark: rgb(22,160,133);
+$green: rgb(46,204,113);
+$greenDark: rgb(39,174,96);
+$purple: rgb(155,89,182);
+$purpleDark: rgb(142,168,173);
+$yellow: rgb(241,196,15);
+$YellowDark: rgb(243,156,18);
+$orange: rgb(230,126,34);
+$orangeDark: rgb(211,84,0);
+$red: rgb(231,76,60);
+$redDark: rgb(192,57,43);
+$yellowPale: rgb(231,220,188);
+$concrete: #95A5A7;
+
+$linkColor: $blue;
+$linkColorHover: darken($blueDark, 10%);
+
+$contentBorder: #e3e3e3;
+$contentTextColor: #4d4d4d;
+
+// Old
+
+$stolenColor: $redDark;
+$textColor: #111;
+$biWhite: #fff;
+$offWhite: #fcfcfc;
+
+$grayLighterer: lighten(#eee, 4%);
+$grayLighter: #cacaca;
+$grayLightish: darken(#eee, 7%);
+$grayLight: #a7a7a7;
+$grayMed: #bebebe;
+$grayDark: #636466;
+$grayDarker: #555555;
+
+$biYellow: rgb(255,181,34);
+$bi-stripes: rgb(255, 232, 188);
+
+$biGreen: #2e9f67;
+
+$imageBorder: $grayMed;
+
+$tableBackgroundAccent:             #f5f5f5 !default; // for striping
+
+//________________________
+//
+// Helper classes
+//
+//________________________
+
+.red-text { color: $redDark; }
+.blue-text { color: $purpleDark; }
+.table-error { color: $redDark; }
+
+
+
+//________________________
+//
+// Buttons
+//
+//________________________
+
+$btnBackground:                     white !default;
+$btnBackgroundHighlight:            darken(white, 10%) !default;
+$btnBorder:                         $grayDark; // #bbb !default
+
+$btnAction: $blue;
+$btnActionBorder: darken($blue, 10%);
+
+$btnSuccess: $greenDark;
+$btnSuccessBorder: darken($greenDark, 5%);
+
+$btnWarning: $yellow;
+$btnWarningBorder: darken($yellow, 5%);
+
+$btnDanger: $red;
+$btnDangerBorder: darken($red, 10%);
+
+
+
+
+
+
+//________________________
+//
+// Backgrounds
+//
+//________________________
+
+$topsearchBackground: url("/assets/background-granite.png") repeat repeat;
+$searchBackground: url("/assets/background-granite.png") repeat repeat;
+$searchBorder: darken(rgb(234,234,234), 5%);
+// $footerBackground: url("/assets/background-diagonal.png") repeat repeat;
+$footerBackground: rgb(249,249,249);
+$bodyBackground: url("/assets/paper_bg.jpg") repeat repeat;
+$stolenBackground: url("/assets/background-stolen.jpg") repeat repeat;;
+
+
+// Tint on about who page: #f0f5fa

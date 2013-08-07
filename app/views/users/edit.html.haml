@@ -1,0 +1,128 @@
+= form_for @user, :html => { class: "form-horizontal form user-settings", id: "edit-user-form" } do |f|
+
+  %fieldset
+    %legend
+      Edit Personal Information for 
+      = @user.email
+    .input-group
+      %p 
+        Any use of your personal information is governed by the terms of our #{link_to "Privacy policy", privacy_url}. We do not sell, trade, or rent your personal information to third parties.
+
+      .control-group
+        %label.control-label{ for: "user_user_name" }
+          Name
+        .controls
+          = f.text_field :name
+
+      .control-group
+        %label.control-label{ for: "user_Password" }
+          Password
+        .controls
+          = f.password_field :password, placeholder: "Password"
+      .control-group
+        %label.control-label{ for: "user_password_confirmation" }
+          Password Confirmation
+        .controls
+          = f.password_field :password_confirmation, placeholder: "Password confirmation"
+      .control-group
+        %label.label-with-tip.control-label{ for: "user_zipcode" }
+          %p
+            Zipcode
+          %span.formtip
+            ?
+            %a.tooltip{ rel: "tooltip", :"data-placement" => "bottom", title: "If entered, closer bikes will appear first in search results." }
+              ?
+        .controls
+          = f.text_field :zipcode, placeholder: "Default search location"
+
+    .control-group.actions
+      = f.submit "Update information", class: 'button-green'
+
+  %fieldset
+    %legend
+      Sharing settings
+  
+    .control-group.sharing-collapser{ :data => {target: "#personal-page" } }
+      %p
+        The Bike Index can create a page listing all your bikes that includes all the information you want to share. It's your personal page.
+        = link_to "(preview page)", user_url(@user), target: "_blank"
+      %p
+        Would you like us to create this page for you?
+      .controls
+        %label.radio
+          = f.radio_button :show_bikes, "true"
+          Create page
+        %label.radio
+          = f.radio_button :show_bikes, "false"
+          No, please don't create me a page
+
+    #personal-page.collapse
+      .control-group
+        %label.control-label{ for: "title" }
+          Title for personal page
+        .controls
+          = f.text_field :title, placeholder: "This user's bikes"
+
+      .control-group.avatar-upload
+        %label.control-label
+          Profile avatar
+        .controls
+          .avatar-img
+            - if @user.avatar? 
+              = image_tag(@user.avatar_url(:thumb))
+            - else
+              %p
+                No picture!
+          = f.file_field :avatar
+          = f.hidden_field :avatar_cache
+
+      .description
+        %label.control-label{ for: 'description' }
+          Enter some information about yourself if you'd like
+        .description-input
+          .controls
+            = f.text_area :description, :toolbar => 'Basic', class: 'ckeditor'
+
+    .control-group.sharing-collapser{ :data => {target: "#twitter-field" } }
+      %label.control-label
+        Show Twitter
+      .controls.radio-controls
+        %label.radio
+          = f.radio_button :show_twitter, "true"
+          Show Twitter
+        %label.radio
+          = f.radio_button :show_twitter, "false"
+          No Twitter
+    
+    #twitter-field.collapse
+      .control-group.controls-appended
+        %label.control-label{ for: "user_twitter" }
+          Twitter Url
+        .controls.input-prepend
+          %span.add-on
+            http&#58;&#47;&#47;
+          = f.text_field :twitter, placeholder: "Twitter url"
+
+    .control-group.sharing-collapser{ :data => {target: "#personal-field" } }
+      %label.control-label
+        Show Person Site
+      .controls.radio-controls
+        %label.radio
+          = f.radio_button :show_website, "true"
+          Show personal site
+        %label.radio
+          = f.radio_button :show_website, "false"
+          No personal site
+
+    #personal-field.collapse
+      .control-group.controls-appended
+        %label.control-label{ for: "user_website" }
+          Personal Site url
+        .controls.input-prepend
+          %span.add-on
+            http&#58;&#47;&#47;
+          = f.text_field :website, placeholder: "Enter site url"
+
+
+    .control-group.actions
+      = f.submit "Update sharing", class: 'button-green'

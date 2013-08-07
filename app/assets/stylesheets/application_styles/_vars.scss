@@ -1,0 +1,68 @@
+//________________________
+//
+// Fonts
+//
+//________________________
+
+// Standard font:
+// We could load we are loading 200, 300, 400 (normal), 600, 800, 400 italic
+// <link href='http://fonts.googleapis.com/css?family=Titillium+Web:400,400italic,900,700,600,300,200' rel='stylesheet' type='text/css'>
+// $baseFont: 'Titillium Web', helvetica, sans-serif;
+// $baseFont: 'EB Garamond', serif;
+// <link href='http://fonts.googleapis.com/css?family=EB+Garamond' rel='stylesheet' type='text/css'>
+// I'm feeling Rambla and raleway now. we got 400, 400 italic and 700
+$baseFont: 'Rambla', sans-serif;
+
+// Header:
+// Currently only loading normal weight
+// <link href='http://fonts.googleapis.com/css?family=Autour+One' rel='stylesheet' type='text/css'>
+// $headerFont: 'Autour One', helvetica, sans-serif;
+// Now loading a whole bunch of weights. Remove them when you figure out which you want.
+$headerFont: 'Raleway', sans-serif;
+
+@font-face{
+  font-family:'Ribbon';
+  src:url("/assets/Ribbon_V2_2011.otf");
+}
+
+$ribbonFont: 'Ribbon', sans-serif;
+
+//________________________
+//
+// standard settings
+//
+//________________________
+
+$standTopPadding: 1.5em;
+$standardPadding: 20px;
+$singlePad: 20px;
+$footerHeight: 250px;
+
+$standardFontSize: 17px;
+$smallText: 14px;
+
+
+
+//________________________
+//
+// Fluid Grid
+//
+//________________________
+
+$gridColumns:             12 !default;
+$columnW:                  6.5%;
+$gutterW:                  2%;
+
+
+$oneColumn:                     (1 * $columnW) + (0 * $gutterW);
+$twoColumn:                     (2 * $columnW) + (1 * $gutterW);
+$threeColumn:                   (3 * $columnW) + (2 * $gutterW);
+$fourColumn:                    (4 * $columnW) + (3 * $gutterW);
+$fiveColumn:                    (5 * $columnW) + (4 * $gutterW);
+$sixColumn:                     (6 * $columnW) + (5 * $gutterW);
+$sevenColumn:                   (7 * $columnW) + (6 * $gutterW);
+$eightColumn:                   (8 * $columnW) + (7 * $gutterW);
+$nineColumn:                    (9 * $columnW) + (8 * $gutterW);
+$tenColumn:                     (10 * $columnW) + (9 * $gutterW);
+$elevenColumn:                  (11 * $columnW) + (10 * $gutterW);
+$twelveColumn:                  100%;

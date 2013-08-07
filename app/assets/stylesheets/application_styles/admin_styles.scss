@@ -1,0 +1,87 @@
+//________________________
+//
+// Admin global styles
+//
+//________________________
+
+
+//________________________
+//
+// Admin organizations and lists
+//
+//________________________
+
+
+.bikes-organization-list, .bikes-admin-list {
+  margin: 0 0 30px;
+  li {
+    @extend .well-yellow;
+    list-style-type: none;
+    margin: 0 0 10px 0;
+    padding: 10px;
+  }
+  
+  .dl-holder .dl-horizontal {
+    width: 100%;
+    margin: 0;
+    position: relative;
+    dd { float: left;}
+    a {
+      display: block;
+      width: 100%;
+      @include clearfix;
+    }
+  }
+}
+
+//________________________
+//
+// Organizations
+//
+//________________________
+
+
+
+.locations-list {
+  .span4:nth-of-type(4n) {
+    clear: both;
+    margin-left: 0;
+  }
+  .alert {
+    padding-top: 10px;
+    color: $textColor;
+  }
+}
+
+
+
+
+//________________________
+//
+// Free Bike Tickets
+//
+//________________________
+
+.invitation-message {
+  width: 100%;
+  textarea { width: 100%;}
+}
+
+
+//________________________
+//
+// Admin blog
+//
+//________________________
+
+.blog-field {
+  width: 100%;
+  position: relative;
+  margin: 20px 0;
+  input, textarea {
+    width: 100%;
+  }
+}
+.control-group.tags textarea {
+  height: 6em;
+}

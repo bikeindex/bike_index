@@ -1,0 +1,54 @@
+//________________________
+//
+// Mixins!
+//
+//________________________
+
+
+@mixin triangle($borderColor) {
+// has four values, for the four sides.
+// set transparent for all of them but one.
+// Meant to be included in a psuedo element
+  content: "";
+  display: block;
+  border-color: $borderColor;
+  border-style: solid;
+  height:0;
+  width:0;
+  position: absolute;
+}
+
+
+//________________________
+//
+// Gradients
+//
+//________________________
+
+// For IE9 support
+// Don't forget to add a 'gradient' class to everything that has gradients.
+// Or add the item to the rule in the header
+
+// These are Mixins, so that they override extends.
+
+@mixin grad-gray-highlight() {
+  background: #959595; /* Old browsers */
+  /* IE9 SVG, needs conditional override of 'filter' to 'none' */
+  background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzk1OTU5NSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjUwJSIgc3RvcC1jb2xvcj0iI2Y0ZjRmNCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM5NTk1OTUiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+  background: -moz-linear-gradient(top,  #959595 0%, #f4f4f4 50%, #959595 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#959595), color-stop(50%,#f4f4f4), color-stop(100%,#959595)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top,  #959595 0%,#f4f4f4 50%,#959595 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top,  #959595 0%,#f4f4f4 50%,#959595 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top,  #959595 0%,#f4f4f4 50%,#959595 100%); /* IE10+ */
+  background: linear-gradient(to bottom,  #959595 0%,#f4f4f4 50%,#959595 100%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#959595', endColorstr='#959595',GradientType=0 ); /* IE6-8 */
+}
+
+
+@mixin transform($transformation) {
+  -webkit-transform: $transformation;
+     -moz-transform: $transformation;
+      -ms-transform: $transformation;
+       -o-transform: $transformation;
+          transform: $transformation;
+}

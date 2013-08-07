@@ -1,0 +1,57 @@
+.form.form-horizontal
+  = form_for [:admin, @manufacturer] do |f|
+    - if @manufacturer.errors.any?
+      #alert-block
+        .alert.alert-error
+          %h4
+            Please fix the following 
+            = pluralize(@manufacturer.errors.count, "error")
+          %ul
+            - @manufacturer.errors.full_messages.each do |msg|
+              %li
+                = msg
+
+    .control-group.padded
+      .control-label
+        = f.label :name
+      .controls
+        = f.text_field :name
+
+    .control-group.padded
+      .control-label
+        = f.label :website
+      .controls
+        = f.text_field :website
+
+    .control-group.padded
+      .control-label
+        = f.label :logo_location
+      .controls
+        = f.text_field :logo_location
+
+    .control-group.padded
+      .control-label
+        = f.label :open_year
+      .controls
+        = f.text_field :open_year
+
+    .control-group.padded
+      .control-label
+        = f.label :close_year
+      .controls
+        = f.text_field :close_year
+
+    .control-group.padded
+      .control-label
+        = f.label :frame_maker
+      .controls
+        = f.check_box :frame_maker
+
+    .control-group.padded
+      .control-label
+        = f.label :description
+      .controls
+        = f.text_area :description
+
+    = f.submit "Submit", class: 'button-green'
+

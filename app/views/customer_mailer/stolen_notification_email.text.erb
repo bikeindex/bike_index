@@ -1,0 +1,9 @@
+** <%= @stolen_notification.sender.email %> sent a message about your stolen <%= @stolen_notification.bike.type %>! **
+
+
+<%= @stolen_notification.message %>
+
+
+View your <%= @stolen_notification.bike.type %> on the Bike Index:
+
+<%= bike_url(@stolen_notification.bike) %>

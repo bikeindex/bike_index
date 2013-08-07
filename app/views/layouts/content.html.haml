@@ -1,0 +1,52 @@
+= render 'shared/header'
+
+#content-wrap.header-closed
+  %header.global-header.collapsible-head.invisibled#header
+    = render 'shared/header_nav'
+
+  %a#nav-header-collapse.expandable
+    %span.e +
+    %span.c -
+
+
+  %header.content-sidebar#content-menu
+    .header-content
+      .logo
+        %a.follow-link.logo{ href: root_url(:subdomain => false) }
+          = image_tag "/assets/logo_colored.svg"
+          %h2
+            Bike Index
+    %nav.content-nav
+      %ul.content-sections
+        %li{ class: content_nav_class("about") }
+          = nav_link "About<span> the Bike Index</span>", about_url
+          %ul
+            %li
+              = nav_link "Bike Index blog", blogs_url
+            %li
+              = nav_link "Bike Index partner organizations", where_url
+
+        %li{ class: content_nav_class("resources") }
+          = nav_link "Resources", resources_url
+          %ul
+            %li
+              = nav_link "What to do if your bike is stolen", stolen_bikes_url
+            %li
+              = nav_link "About stolen bikes", stolen_url
+            %li
+              = nav_link "Information about bicycle serial numbers", serials_url
+            %li
+              = nav_link "List of manufacturers", manufacturers_url
+            %li
+              = nav_link "Making a Bike Index spokecard", spokecard_url
+        %li.contact-nav-btns{ class: content_nav_class("contact") }
+          = nav_link "Contact", contact_us_url
+          %ul
+            %li
+              = nav_link "Sign up a shop", vendor_signup_url
+
+
+  %section.page-content
+    = yield
+    
+  = render 'shared/footer'

@@ -1,0 +1,8 @@
+= render 'shared/header'    
+%header.global-header#header
+  = render 'shared/header_nav'
+
+%section.content
+  = yield
+
+= render 'shared/footer'

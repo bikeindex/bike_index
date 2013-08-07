@@ -1,0 +1,128 @@
+#admin-bikes-edit#chosen-container
+  %h1
+    Manage bike
+
+  %ul.bike-boxes
+    = render partial: "/bikes/bike", :locals => {bike: @bike, target: "show" }
+  .dl-holder
+    %dl.dl-horizontal
+      = @bike.dl_list_item(@bike.created_at.strftime("%m-%d-%Y"), "Created")
+      = @bike.dl_from_attribute("owner_email")
+      = @bike.dl_list_item(@bike.owner.email, "Current Owner")
+      = @bike.dl_from_attribute("cached_data")
+  %hr
+
+  = form_for [:admin, @bike], :html => { class: "form form-horizontal" } do |f|
+    - if @bike.errors.any?
+      #alert-block
+        .alert.alert-error
+          %h4
+            Please fix the following 
+            = pluralize(@bike.errors.count, "error")
+          %ul
+            - @bike.errors.full_messages.each do |msg|
+              %li
+                = msg
+    .control-group
+      = f.label :cycle_type_id, "Cycle type", class: "control-label"
+      .controls
+        = collection_select( :bike, :cycle_type_id, CycleType.all, :id, :name, :required =>true )
+
+    .control-group
+      = f.label :serial_number, class: "control-label"
+      .controls
+        = f.text_field :serial_number, :required =>true
+    
+    .control-group
+      = f.label :has_no_serial, class: "control-label"
+      .controls
+        = f.check_box :has_no_serial
+
+    .control-group.chosen-select
+      = f.label :creation_organization_id, class: "control-label"
+      .controls
+        = collection_select( :bike, :creation_organization_id, Organization.all, :id, :name)
+
+    .control-group.chosen-select
+      = f.label :location_id, class: "control-label"
+      .controls
+        = f.text_field :location_id
+
+    .control-group.chosen-select
+      = f.label :manufacturer_id, class: "control-label"
+      .controls
+        = collection_select( :bike, :manufacturer_id, Manufacturer.frames, :id, :name, :required =>true, prompt: "Choose manufacturer")
+
+    .control-group
+      = f.label :manufacturer_other, "Other frame manufacturer", class: "control-label"
+      .controls
+        = f.text_field :manufacturer_other
+
+    .control-group.chosen-select
+      = f.label :creator_id, class: "control-label"
+      .controls
+        = collection_select( :bike, :creator_id, User.all, :id, :email, :required =>true, prompt: "Choose creator")
+
+    .control-group
+      = f.label :created_with_token, class: "control-label"
+      .controls
+        = f.check_box :created_with_token
+
+    .control-group
+      = f.label :owner_email, class: "control-label"
+      .controls
+        = f.text_field :owner_email, :required =>true
+
+    .actions
+      .control-group
+        = submit_tag "Update the bike", class: "button-green"
+        = link_to "Delete bike", admin_bike_url(@bike), method: :delete, confirm: "Are you sure?", class: "button-red"
+
+
+
+%section.full-screen-table
+  %table.table.table-striped.table-bordered
+    %thead
+      %th
+        ID
+      %th
+        Date Created
+      %th
+        Creator
+      %th
+        Owner email
+      %th
+        Current?
+      %th
+        Claimed?
+    %tbody
+      - @bike.ownerships.each do |ownership|
+        %tr
+          %td
+            = link_to ownership.id, edit_admin_ownership_url(ownership.id)
+          %td
+            - if ownership.created_at.today?
+              %span.hidden
+                = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Today at #{ownership.created_at.strftime("%-I %p")}
+            - elsif Date.yesterday().beginning_of_day() <= ownership.created_at
+              %span.hidden
+                = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Yesterday at #{ownership.created_at.strftime("%-I %p")}
+            - else
+              %span.hidden
+                = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              = ownership.created_at.strftime("%-m/%-d/%Y at %-I %p")
+          %td
+            - u = ownership.creator
+            - if u.name.present?
+              = u.name
+            - else
+              = u.email
+          %td
+            = ownership.owner_email
+          %td.table-cell-check
+            = "&#x2713;".html_safe if ownership.current
+          %td.table-cell-check
+            = "&#x2713;".html_safe if ownership.claimed
+

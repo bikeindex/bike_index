@@ -1,0 +1,54 @@
+%h2.stolen-color
+  There is no charge until we reach a 1000 bikes!
+
+%h1.padded
+  Invoice for
+  %em
+    = @invoice.billing_period_start.strftime("%-m/%-d/%Y")
+  to
+  %em
+    = @invoice.billing_period_end.strftime("%-m/%-d/%Y")
+
+%section.full-screen-table
+  %table.table.table-striped.table-bordered
+    %thead
+      %th.medium-screens
+        Billing period starts
+      %th
+        Billing period ends
+      %th
+        Customer bikes added
+      %th
+        Amount due
+      
+    %tbody
+      %tr
+        %td.medium-screens
+          = @invoice.billing_period_start.strftime("%-m/%-d/%Y")
+        %td
+          = @invoice.billing_period_end.strftime("%-m/%-d/%Y")
+        %td
+          = @invoice.bike_count
+        %td
+          = number_to_currency(@invoice.amount_in_dollars)
+
+
+- if @invoice.paid_at.present?
+  %h2
+    Invoice was paid
+    = @invoice.paid_at.strftime("%-m/%-d/%Y")
+    (Or you didn't owe anything this pay period)
+
+- else
+ 
+  .pay-box
+    .pay-current
+      %h2
+        = number_to_currency(@invoice.amount_in_dollars)
+        due
+        = (@invoice.billing_period_end + 7.days).strftime("%-m/%-d/%Y")
+    .actions.padded
+      = form_tag charges_path do
+        / %a.button-green{href: "#"}
+        /   Make a payment
+        = render "/shared/charge"

@@ -1,0 +1,56 @@
+.paginate-container {
+  @include clearfix;
+  width: 100%;
+  clear: both;
+  margin-bottom: 30px;
+}
+
+.pagination {
+  @include clearfix;
+  float: right;
+  // background: white;
+  cursor: default;
+  margin: 13px 0 0 0;
+  // height: 22px;
+  a, span, em {
+    padding: 0.1em 0.5em;
+    line-height: 38px;
+    display: block;
+    float: left;
+    margin-right: 1px;
+  }
+  .disabled {
+    display: none;
+    color: #999999;
+    border: 1px solid #dddddd;
+  }
+  .current {
+    font-style: normal;
+    font-weight: bold;
+    background: $linkColor;
+    color: white;
+    border: 1px solid darken($linkColor, 5%);
+  }
+  a {
+    text-decoration: none;
+    color: $linkColor;
+    border: 1px solid $linkColor;
+    &:hover, &:focus {
+      color: #000033;
+      // border-color: #000033;
+    }
+  }
+  .page_info {
+    background: #2e6ab1;
+    color: white;
+    padding: 0.4em 0.6em;
+    width: 22em;
+    margin-bottom: 0.3em;
+    text-align: center;
+    b {
+      color: #000033;
+      background: #2e6ab1 + 60;
+      padding: 0.1em 0.25em;
+    }
+  }
+}

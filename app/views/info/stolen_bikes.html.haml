@@ -1,0 +1,23 @@
+
+%h1
+  Bike thieves are jerks.
+
+%p
+  If you've recently had a bike stolen, and are trying to figure out what to do, the first thing we recommend is that you file a police report. It is much easier for someone to return a found bike if the bike is listed as stolen property.
+%p
+  If you 
+  %em
+    have
+  already added the bike to the Index, edit its entry and mark the bike as Stolen.
+%p
+  If you 
+  %em
+    haven't
+  yet registered the bike, you should 
+  = link_to "add the stolen bike", new_bike_url(stolen: true)
+  to the Index.
+%p
+  Finally, we recommend telling everyone you know that your bike is stolen. Word of mouth always helps. 
+
+%p
+  When adding a stolen bike, we require a phone number. After adding the bike you get to choose who is able to see your phone number, the default setting is for Bike Index users to be able to see it.

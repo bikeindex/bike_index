@@ -1,0 +1,66 @@
+//________________________
+//
+// System Wide and user Notifications
+//
+//________________________
+
+.notifications-holder {
+  @include clearfix;
+  margin: -40px 0 0;
+  width: 100%;
+  padding: 0 20px 20px;
+  position: relative;
+}
+
+.notification {
+  @extend .alert;
+  height: 100%;
+  
+  // color: $textColor;
+  // color: darken(#c09853, 15%);
+  h4 {
+    // color: darken(#c09853, 10%);
+    // color: $textColor;
+    // color: darken(adjust-hue(#c09853, -10), 3%);
+    font-size: 1.4em;
+    margin-bottom: .5em;
+  }
+  .subtitle { font-size: .8em; }
+  p { margin-bottom: .25em; }
+  ul {
+    margin-top: 1em;
+  }
+  li {
+    margin-top: .25em;
+  }
+}
+
+@media (min-width: 901px) { 
+  .notifications-holder {
+    height: 220px;
+    margin-bottom: 30px;
+  }
+  .notification {
+    h4 { padding-top: 23px;}
+    display: block;
+    position: relative;
+    width: 49%;
+    float: left;
+    margin: 20px 2% 0 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .notifications-holder { margin-top: 0; }
+  .notifications {
+    position: relative;
+    width: 100%;
+    margin: 0 auto 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .notifications-holder {
+    padding: 0 0 20px;
+  }
+}

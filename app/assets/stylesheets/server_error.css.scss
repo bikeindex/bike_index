@@ -1,0 +1,52 @@
+// This is compiled and put inline in 500 error html docs. This is arround in case we want to change it.
+
+body {
+  font-size: 100%;
+  background: url('https://s3.amazonaws.com/bikeindex/background-diagonal.png');
+  font-family: "Helvetica", arial, sans-serif;
+}
+
+a {
+  cursor: pointer;
+  text-decoration: none;
+  color: #08c;
+  &:hover {
+    text-decoration: underline;
+    color: darken(#08c, 10%);
+  }
+}
+
+.error-explanation {
+  max-width: 800px;
+  margin: 40px auto 60px;
+}
+
+.ascii {
+  padding: 0 2em 0 0;
+  font-family: Courier;
+  font-size: 35px;
+  font-weight: bold;
+  width: 6em;
+  margin: 100px auto 0;
+}
+
+p {
+  margin: 0 0 .5em;
+  width: 100%;
+  text-align: center;
+}
+h4 {
+  font-size: 1.2em;
+  margin: .5em 0 1em;
+  text-align: center;
+}
+
+@media (min-width: 550px) {
+  .ascii {
+    font-size: 45px;
+  }
+  h4 {
+    font-size: 1.8em;
+    margin-bottom: .2em;
+  }
+}

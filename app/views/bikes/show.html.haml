@@ -1,0 +1,181 @@
+- if current_user.present? and @bike.can_be_claimed_by(current_user)
+  #claim-ownership-modal.modal.fade.hide
+    .modal-header
+      %button.close{ type: "button", :"data-dismiss" => "modal", :"aria-hidden" => "true" }
+        &times;
+      %h3
+        Bike ownership
+  
+    .modal-body
+      %p
+        We're honored to have your #{@bike.type} on the Index.  
+      %p
+        Claim it so you can edit and upload pictures of it!
+        
+    .modal-footer
+      %a.button-green{ href: "/ownerships/#{@bike.current_ownership.id}" }
+        Claim #{@bike.type}
+
+- if @bike.owner == current_user
+  .show-bike-edit
+    %p
+      - if @bike.current_owner_exists
+        - if @bike.stolen
+          We're really bummed that your #{@bike.type} was stolen.       
+        - else
+          Whoah, this awesome #{@bike.type} is yours!
+
+        - if @bike.public_images.any?
+          Add some more information about it.
+        - else
+          You should add a picture of it, so everyone can admire its beauty.
+        = link_to  "Edit", edit_bike_path, class: "button-blue"
+      - else
+        You sent this bike to
+        %em
+          = @bike.current_ownership.owner_email
+        but it hasn't been claimed yet, so you can update it.
+        = link_to  "Edit", edit_bike_path, class: "button-blue"
+
+
+.receptacle#bike-show
+  %header.inner-recep.single-bike
+    %h1
+      - if @bike.stolen
+        %strong.stolen-color
+          Stolen
+      = @bike.title
+
+    %p.other-bikes
+      = @bike.show_other_bikes
+        
+
+    %p.sharing-links
+      = @bike.bike_show_twitter_and_website
+
+- if @bike.public_images.any?
+  .single-bike-photos{ class: current_page?(root_path) && "stolen-background" }
+    .receptacle
+      .inner-recep
+        = render 'bikes/photo'
+
+.receptacle.overfloating
+  .inner-recep.single-bike-info
+    %header.with-subtitle
+      .sharing-section
+        .sharing-buttons
+          = render "/shared/share_this"
+      %h3
+        A little bit of information about
+        - if @bike.name && @bike.name.length > 1
+          the bike named
+          %strong
+            = @bike.name
+        - else
+          this
+          = @bike.title
+          / = bike.dl_list_item(bike.type, title)
+
+    .dl-holder
+      %dl.dl-horizontal
+        - unless @bike.type == "bike"
+          = @bike.dl_from_attribute("type", "Cycle Type")
+        %dt Serial
+        %dd.serial-text
+          = @bike.serial_number
+        = @bike.dl_list_item(@bike.mnfg_name, "Manufacturer")
+        = @bike.dl_from_attribute("frame_model", "Model")
+        = @bike.dl_from_attribute("frame_manufacture_year", "Year")
+        = @bike.dl_list_item(@bike.seat_tube_display, "Seat tube length")
+        - if @bike.front_wheel_size.present? and @bike.front_wheel_size != @bike.rear_wheel_size
+          = @bike.dl_list_item(@bike.ass_name("front_wheel_size"), "Front Wheel")
+          = @bike.dl_list_item(@bike.ass_name("rear_wheel_size"), "Rear Wheel")
+        - else
+          = @bike.dl_list_item(@bike.ass_name("rear_wheel_size"), "Wheel size")
+        - if @bike.front_wheel_size.present? and @bike.tire_width("rear") != @bike.tire_width("front")
+          = @bike.dl_list_item(@bike.tire_width("front"), "Front Tire")
+          = @bike.dl_list_item(@bike.tire_width("rear"), "Rear Tire")
+        - else
+          = @bike.dl_list_item(@bike.tire_width("rear").titleize, "Tire Width")
+      %dl.dl-horizontal
+        = @bike.dl_from_attribute_othered("handlebar_type")
+        = @bike.dl_list_item(@bike.ass_name("primary_frame_color"), "Primary color")
+        = @bike.dl_list_item(@bike.ass_name("secondary_frame_color"), "Secondary color")
+        = @bike.dl_list_item(@bike.ass_name("tertiary_frame_color"), "Third color")
+        = @bike.dl_list_item(@bike.ass_name("frame_material"), "Frame Material")
+        = @bike.dl_list_item(@bike.ass_name("rear_gear_type"), "Rear gears")
+        = @bike.dl_list_item(@bike.ass_name("front_gear_type"), "Front gears")
+        = @bike.dl_from_attribute("description", "A few more words")
+
+    - if @components.any?
+      %h3
+        Components on
+        - if @bike.name && @bike.name.length > 1
+          the bike named
+          %strong
+            = @bike.name
+        - else
+          this
+          = @bike.title
+
+      
+      - @components.each do |component|
+        .dl-holder
+          %dl.dl-horizontal
+            %p
+              = component.component_type
+            - if component.manufacturer.present?
+              = component.dl_list_item(component.mnfg_name, "Manufacturer")
+            = component.dl_from_attribute("year")
+            = component.dl_from_attribute("model_name", "Model")
+            = component.dl_from_attribute("serial_number")
+            = component.dl_from_attribute("description")
+
+
+    - if @bike.stolen and @bike.current_stolen_record.present?
+      .stolen-information
+        %h3
+          Information about
+          %span.stolen-color
+            the theft
+          of this 
+          = @bike.type
+        .dl-holder
+          - if @bike.current_stolen_record.latitude.present? and @bike.current_stolen_record.longitude.present?
+            = render "bikes/stolen_map"
+          .dl-horizontal
+            - if @bike.phoneable_by(current_user)
+              .phone-shown
+                %dt
+                  Phone number
+                %dd
+                  %a{ href: "tell:#{@bike.current_stolen_record.phone}" }
+                    = @bike.current_stolen_record.phone
+            - if @bike.current_stolen_record.police_report_filed
+              = @bike.dl_list_item("Report was filed", "Police Report")
+            = @bike.dl_list_item(@bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), "Date stolen")
+            = @bike.dl_list_item(@bike.current_stolen_record.address, "Location")
+            = @bike.dl_list_item(@bike.current_stolen_record.theft_description, "Description")
+
+      - if current_user.present?
+        .alert.stolen-contact.no-user
+          %h3
+            Contact the owner of this bike
+          - if @bike.phoneable_by(current_user)
+            %p
+              %strong
+                Phone number
+              
+              %a{ href: "tell:#{@bike.current_stolen_record.phone}" }
+                = @bike.current_stolen_record.phone
+          = render 'stolen_notifications/form'
+
+      - else
+        .alert.stolen-contact
+          %h3
+            Sign in to contact the owner!
+          .login-form
+            = render 'sessions/form'
+
+    .comments-container
+      = render "/shared/disqus"

@@ -1,0 +1,102 @@
+//________________________
+//
+// Global styles
+//
+//________________________
+
+* {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+  background: $bodyBackground;
+  color: $textColor;
+  font-size: $standardFontSize;
+  font-family: $baseFont;
+}
+
+h1, h2, h3, h4 {
+  font-family: $headerFont;
+  font-weight: 500;
+  line-height: 1.2em;
+  strong {
+    font-weight: 600;
+  }
+}
+
+html {
+  width: 100%;
+  max-width: 100%;
+  background: $footerBackground;
+}
+
+@media (max-width: 767px) {
+  body {
+    padding: 0;
+  }
+}
+
+// Reset bootstrap padding on buttons so it's responsive to text size
+.btn {
+  padding: .25em 1em;
+}
+
+// Since everything is border-box, inputs need to be padded differently
+
+select,
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="color"],
+.uneditable-input {
+  @include border-radius(2px);
+  height: auto;
+  font-size: 1em;
+  margin-top: -.25em;
+}
+
+
+
+
+#grid-overlay {
+  // Add = render '/layouts/grid' to header.html to enable
+  display: none;
+  position: fixed;
+  height: 100%; width: 100%;
+  z-index: 99999;
+  .grid-receptacle {
+    @extend .receptacle;
+    height: 100%;
+  } 
+  .inner-recep { height: 100%;}
+  .column {
+    float: left;
+    width: $oneColumn;
+    height: 100%;
+    margin-left: $gutterW;
+    border: 1px solid #b2dec1;
+    border-top: none;
+    border-bottom: none;
+  }
+  .inner-recep .column:first-of-type {
+    margin-left: 0;
+  }
+}
+

@@ -1,0 +1,75 @@
+<% if @new_user %>
+  <h2 style="font-size: 30px;font-weight: 400;">Welcome to the Bike Index</h2>
+
+  <p>Good thinking! We’re glad you’ve joined, you smarty pants.</p>
+<% end %>
+
+<% if @bike.stolen %>
+  <h1>Bike thieves are jerks.</h1>
+  <h2>We're sorry your bike was stolen.</h2>
+<% else %>
+  <h1>Congrats on adding your bike to the index!</h1>
+<% end %>
+
+<% if @bike.stolen %>
+  <p>You added a stolen bike to the Bike Index:</p>
+<% elsif @bike.created_with_token && @bike.ownerships.count < 2 %>
+  <p>Yeah! <em>Work those free bikes!</em></p>
+<% else %>
+  <p>
+    <strong>
+      <% if @ownership.creator.name %>
+        <%= @ownership.creator.name %>
+      <% else %>
+        <%= @ownership.creator.email %>
+      <% end %>
+    </strong>
+    <% if @org_name %>
+      from <em><%= @org_name %> </em>
+    <% end %>
+    <% if @new_bike %>
+      sent you a 
+    <% else %>
+      added a 
+    <% end %>
+    <%= @biketype %>
+    on the Bike Index 
+    <% if @new_bike %> for you <% end %>
+  </p>
+<% end %>
+
+<% if @bike.thumb_path %>    
+  <% bike_image = @bike.thumb_path %>
+<% else  %>
+  <% bike_image = "https://www.bikeindex.org/assets/bike_photo_placeholder.png" %>
+<% end %>
+
+<% if @bike.stolen %>
+  <div class="bike-display" style="position: relative;width: 96%;height: 150px;padding: 10px 2%;background: #bf2f2f;border: 1px solid #ddd;max-width: 450px;margin: 30px auto 0;">
+<% else %>
+  <div class="bike-display" style="position: relative;width: 96%;height: 150px;padding: 10px 2%;background: #ebebeb;border: 1px solid #ddd;max-width: 450px;margin: 30px auto 0;">
+<% end %>
+
+  <div class="image-holder" style="width: 33%;float: left;position: relative;">
+    <a href="<%= ownership_url(@ownership) %>">
+     <img src="<%= bike_image %>" style="width: auto;max-width: 100%;max-height: 150px;border: 1px solid #ddd;">
+  </div>
+  <div class="bike-info" style="position: relative;width: 63%;margin-left: 3%;float: left;padding-top: 30px; <%= 'color: white;' if @bike.stolen %>">
+    <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Make</span> <%= @bike.manufacturer.name  %></p>
+    <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Serial</span> <%= @bike.serial_number %></p>
+    <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Color</span> <%= @bike.primary_frame_color.name %></p>
+  </div>
+</div>
+
+<% if @bike.stolen %>
+  <p>Hopefully you find the <%= @biketype %> soon. Give us a heads up when you do!</p>
+<% elsif @bike.created_with_token %>
+  
+<% else %>
+  <a href="<%= ownership_url(@ownership) %>" class="button" style="text-decoration: none;-webkit-border-radius: 3px;-moz-border-radius: 3px;border-radius: 3px;-webkit-box-shadow: 1px 1px 2px rgba(0,0,0,0.4);-moz-box-shadow: 1px 1px 2px rgba(0,0,0,0.4);box-shadow: 1px 1px 2px rgba(0,0,0,0.4);display: block;padding: .5em 1em;margin: 1.5em auto;width: 250px;max-width: 100%;font-size: 2em;background: #27ae60;border: 1px solid #229955;color: white;text-align: center;">
+    Claim the <%= @biketype %>
+  </a>
+
+  <p class="explanation" style="text-align: center;color: #555;">Sign up or sign in to BikeIndex.org to claim your <%= @biketype %> and edit it, upload photos and make sure you never lose track of your trusty steed!</p>
+<% end %>
+

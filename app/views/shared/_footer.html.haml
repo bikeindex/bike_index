@@ -1,0 +1,44 @@
+%footer.global-footer#page-foot
+  .receptacle
+    %ul.footer-links
+      %li{ class: content_nav_class("about") }
+        = link_to "Register a bike", choose_registration_url
+        %ul
+          %li
+            = link_to "Bike Index partner organizations", where_url         
+          %li
+            = link_to "Bike Index resources", resources_url
+          
+            
+      %li{ class: content_nav_class("resources") }
+        = link_to "About the Bike Index", about_url  
+        %ul       
+          %li
+            = link_to "Bike Index blog", blogs_url
+          %li
+            = link_to "List of manufacturers", manufacturers_url         
+         
+          
+      %li.contact-nav-btns{ class: content_nav_class("contact") }
+        = link_to "Contact", contact_us_url
+        %ul
+          %li
+            = link_to "Sign up a shop", vendor_signup_url
+
+    %p
+      2013 © Bike Index.
+      - if current_user.present? && current_user.has_membership?
+        #{link_to "Privacy policy", privacy_url}, #{link_to "vendor terms", vendor_terms_url}
+      - else
+        #{link_to "Privacy policy", privacy_url}
+      and #{link_to "terms and conditions", terms_url}.
+      
+:plain
+  <div id="fb-root"></div>
+  <script async>(function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=223376277803071";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));</script>

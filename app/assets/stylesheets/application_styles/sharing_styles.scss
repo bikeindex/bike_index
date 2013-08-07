@@ -1,0 +1,148 @@
+//________________________
+//
+// Social stuff
+//
+//________________________
+
+
+.sharing-section {
+  @include clearfix;
+  // padding-bottom: 10px;
+  .sharing-buttons {
+    float: right;
+  }
+  .twitter-share-button {
+    display: block;
+    float: right;
+    margin-right: 10px;
+    margin-top: 33px;
+  }
+  .fb-like {
+    display: block;
+    float: right;
+    overflow: visible;
+  }
+}
+
+.home-sharing {
+  @include border-radius(0 0 0 4px);
+  position: absolute;
+  right: 0px;
+  bottom: -34px;
+  height: 34px;
+  overflow: visible;
+  z-index: 10;
+  // top: -38px; right: 20px;
+  background: $blueDarker;
+  padding: 2px 20px 10px 15px;
+  border-left: 1px solid rgb(176,176,179);
+  border-bottom: 1px solid rgb(176,176,179);
+  // @include clearfix;
+  // padding: 30px 10px;
+  // max-width: 465px;
+  // position: relative;
+  // margin: 0 auto;
+  .follow-us-buttons {
+    @include clearfix;
+    float: right;
+  }
+  .twitter-follow-button {
+    display: block;
+    float: left;
+    margin-right: 5px;
+    // margin-top: -20px;
+  }
+  .fb-like {
+    margin-top: -41px;
+    display: block;
+    float: left;
+  }
+}
+@media (min-width: 1200px) {
+  .home-sharing {
+    padding-right: 30px;
+  }
+}
+
+@media (max-width: 600px) {
+  .home-sharing {
+    padding-top: 35px;
+    bottom: -60px;
+    height: 60px;
+    .fb-like {
+      margin-top: -70px;
+    }
+    .twitter-follow-button {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+    }
+    
+  }
+}
+
+.mc_embed_signup {
+  float: right;
+  width: 280px;
+  max-width: 100%;
+  position: relative;
+  margin: 7px 30px 0 0;
+  label {
+    font-size: 16px;
+    width: 100%;
+    color: $grayDark;
+  }
+  input[type="email"] {
+    display: block;
+    width: 70%;
+    float: left;
+    margin: 0 2% 0 0;
+  }
+  input[type="submit"] {
+    width: 28%;
+    float: left;
+  }
+}
+
+@media (max-width: 600px) {
+  .home-sharing-section {
+    .follow-us-buttons {
+      margin: 0 auto 10px;
+      float: none;
+      width: 130px;
+    }
+    .mc_embed_signup {
+      @include clearfix;
+      clear: both;
+     margin: 0 auto;
+     float: none;
+    }
+    .button { padding-left: 0; padding-right: 0; }
+  }
+}
+
+
+
+
+//________________________
+//
+// disqus comments
+//
+//________________________
+
+
+.comments-container {
+  max-width: 700px;
+  margin: 100px auto 50px;
+}
+
+.content-comments {
+  // Styling for this is in the media queries in the contents styles...
+  margin-top: 100px;
+  margin-bottom: 50px;
+}
+
+.blog-comments {
+  padding-top: 150px;
+  margin-bottom: 50px;
+}

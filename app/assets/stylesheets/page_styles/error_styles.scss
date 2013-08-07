@@ -1,0 +1,28 @@
+// @font-face {
+//   font-family: 'INDO_Handwriting';
+//   src: url('https://s3.amazonaws.com/bikeindex/INDO_Handwriting.ttf'); // Handmade font by Linsey 
+// }
+// .error-text {
+//   font-family: 'INDO_Handwriting', arial, sans-serif;
+// }
+
+.error-text {
+  line-height: 1.5em;
+  font-size: 300px;
+  text-align: center;
+}
+.error-explanation {
+  text-align: center;
+}
+
+@media (max-width: 550px) {
+  .error-text {
+    font-size: 200px;
+  }
+}
+
+.go-back {
+  cursor: pointer;
+  text-align: center;
+  margin-bottom: 100px;
+}

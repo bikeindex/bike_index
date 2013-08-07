@@ -1,0 +1,18 @@
+%header.with-subtitle
+  %h1{ title: @manufacturer.slug }
+    = @manufacturer.name
+  %p.sharing-lings
+    = link_to "Back to all manufacturers", manufacturers_url
+
+
+%article
+  - if @manufacturer.logo_location.present?
+    = image_tag @manufacturer.logo_location
+  - if @manufacturer.frame_maker
+    %h4
+      #{@manufacturer.name} makes Frames
+  %dl.dl-horizontal
+    = @manufacturer.dl_from_attribute("open_year")
+    = @manufacturer.dl_from_attribute("close_year")
+    = @manufacturer.dl_list_item(link_to(@manufacturer.website, @manufacturer.website), "Website")
+    = @manufacturer.dl_from_attribute("description")

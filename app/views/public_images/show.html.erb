@@ -1,0 +1,15 @@
+<h1>
+  <% if @public_image.name.present? %>
+    <%= @public_image.name %>
+  <% else %>
+    Bike Image
+  <% end %>
+</h1>
+
+<%= image_tag @public_image.image_url(:large) %>
+
+<p>
+  <%= link_to "Edit", edit_public_image_path(@public_image) %> |
+  <%= link_to "Destroy", @public_image, :confirm => 'Are you sure?', :method => :delete %> |
+  <%= link_to "Back to public_images", public_images_path %>
+</p>

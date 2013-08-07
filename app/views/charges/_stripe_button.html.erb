@@ -1,0 +1,7 @@
+<script src="https://checkout.stripe.com/v2/checkout.js" class="stripe-button"
+  data-key="<%= ENV['STRIPE_PUBLISHABLE_KEY'] %>"
+  data-description="Purchase a bike registration"
+  data-name="Bike Index"
+  data-label="Pay for registration"
+  data-amount="<%= @amount %>">
+</script>

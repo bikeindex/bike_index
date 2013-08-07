@@ -1,0 +1,40 @@
+%h1
+  Send invitation
+
+= form_for @organization_invitation, :html => { class: "form-horizontal padded" } do |f|
+  - if @organization_invitation.errors.any?
+    #alert-block
+      .alert.alert-error
+        %h4
+          Please fix the following 
+          = pluralize(@organization_invitation.errors.count, "error")
+        %ul
+          - @organization_invitation.errors.full_messages.each do |msg|
+            %li
+              = msg
+    
+
+  .control-group
+    = f.label :invitee_email, "Email you're inviting", class: "control-label"
+    .controls
+      = f.email_field :invitee_email, :required =>true
+
+  .control-group
+    = f.label :invitee_name, "Name", class: "control-label"
+    .controls
+      = f.text_field :invitee_name, :required =>true
+
+  .control-group
+    = f.label :membership_role, class: "control-label"
+    .controls.radio-controls
+      %label.radio
+        = f.radio_button :membership_role, "admin"
+        Admin of organization
+      %label.radio
+        = f.radio_button :membership_role, "member"
+        Member of organization
+
+  
+  .control-group.actions.padded
+    = f.submit "Send invitation", class: 'button-green'
+
