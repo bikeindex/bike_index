@@ -1,4 +1,6 @@
-# ![BIKE INDEX](https://github.com/bikeindex/webapp/blob/master/bike_index.png?raw=true) This is the Bike Index.
+![BIKE INDEX](https://github.com/bikeindex/webapp/blob/master/bike_index.png?raw=true) [![Build Status](https://secure.travis-ci.org/bikeindex/webapp.png)](http://travis-ci.org/bikeindex/webapp)
+
+# Welcome. This is the [Bike Index.](https://www.bikeindex.org) 
 
 ## Dependencies
 

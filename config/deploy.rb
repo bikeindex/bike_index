@@ -11,7 +11,7 @@ set :scm, :git
 set :branch, :master
 
 set :application, "bikeindex"
-set :repository,  "git@github.com:sethherr/bikeindex.git"
+set :repository,  "git@github.com:bikeindex/webapp.git"
 
 set :rails_env, 'production'
 
