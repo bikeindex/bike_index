@@ -27,16 +27,18 @@
 .home-sharing {
   @include border-radius(0 0 0 4px);
   position: absolute;
-  right: 0px;
-  bottom: -34px;
-  height: 34px;
+  right: 0px; 
+  bottom: 0;
+  // bottom: -34px;
+  // height: 34px;
   overflow: visible;
-  z-index: 10;
+  width: $fourColumn;
+  // z-index: 10;
   // top: -38px; right: 20px;
-  background: $blueDarker;
+  // background: $blueDarker;
   padding: 2px 20px 10px 15px;
-  border-left: 1px solid rgb(176,176,179);
-  border-bottom: 1px solid rgb(176,176,179);
+  // border-left: 1px solid rgb(176,176,179);
+  // border-bottom: 1px solid rgb(176,176,179);
   // @include clearfix;
   // padding: 30px 10px;
   // max-width: 465px;
@@ -44,7 +46,10 @@
   // margin: 0 auto;
   .follow-us-buttons {
     @include clearfix;
-    float: right;
+    margin: 0 auto;
+    // float: right;
+    width: 152px;
+    // width: $fourColumn;
   }
   .twitter-follow-button {
     display: block;
@@ -53,7 +58,7 @@
     // margin-top: -20px;
   }
   .fb-like {
-    margin-top: -41px;
+    // margin-top: -41px;
     display: block;
     float: left;
   }
@@ -67,15 +72,15 @@
 @media (max-width: 600px) {
   .home-sharing {
     padding-top: 35px;
-    bottom: -60px;
-    height: 60px;
+    // bottom: -60px;
+    // height: 60px;
     .fb-like {
-      margin-top: -70px;
+      margin-top: -45px;
     }
     .twitter-follow-button {
       position: absolute;
-      bottom: 2px;
-      right: 2px;
+      bottom: 3px;
+      left: 7px;
     }
     
   }

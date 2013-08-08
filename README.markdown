@@ -52,7 +52,7 @@ Keep track of development and community news.
 
 ## Contributing
 
-Please submit all pull requests as *-wip branches. If your pull request contains Ruby patches or features, you must include relevant rspec tests.
+Please submit all pull requests as *_wip branches. If your pull request contains Ruby patches or features, you must include relevant rspec tests.
 
 
 

@@ -12,14 +12,19 @@
         = link_to "Register it!", choose_registration_path, class: "button-green"
         %h2
           Show your trusty steed some love
-   
+    .home-sharing
+      = render "/shared/home_share"    
+
 
 
 #fight-theft-profit
   .receptacle.overfloating
     .inner-recep
       .fight-theft-image
-        = image_tag "/assets/home/bike-thief-fat.svg", alt: "Fight bike theft", title: "A brigand stealing a trusty steed"
+        = image_tag "/assets/home/bike-locked.png", alt: "Fight bike theft", title: "A bike, maybe just like yours."  
+        #moving-block
+          = image_tag "/assets/home/hacksaw-man.svg", alt: "Make thieves go away", title: "A brigand"
+          
       .theft-profit-block
         %h3
           Fight bike theft
