@@ -15,19 +15,6 @@
   margin: 0 auto 30px;
   width: 100%;
   text-align: center;
-  a.button-green {
-    width: 350px;
-    margin: 0 auto;
-    // margin-right: 20px;
-    font-weight: 400;
-    font-size: 40px;
-  }
-}
-
-@media (min-width: 768px) {
-  .choose-links {
-    max-width: $sixColumn;
-  }
 }
 
 .choose-links ul {
@@ -37,7 +24,6 @@
   list-style-type: none;
   li {
     width: 100%;
-    
     margin-bottom: .5em;
   }
   a {
@@ -45,11 +31,20 @@
     @include border-radius(3px);
     cursor: pointer;
     // border: 1px solid transparent;
+    margin: 0 auto;
     height: 100%;
     width: 100%;
+    max-width: 486px;
+    // max-width: $fiveColumn;
     padding: 10px 20px;
     display: block;
+    text-align: left;
     font-size: 20px;
+    span {
+      color: rgba($linkColor, .6);
+      margin-left: 20px;
+      float: right;
+    }
     &:hover {
       @include box-shadow(0px 1px 4px rgba($blueDarker, .7));
       color: $linkColor;
@@ -69,3 +64,36 @@
   }
 }
 
+.add-bike-button {
+  width: 100%;
+  position: relative;
+  a.button-green {
+    width: 350px;
+    margin: 0 auto;
+    // margin-right: 20px;
+    font-weight: 400;
+    font-size: 40px;
+  }
+}
+
+@media (min-width: 870px) {
+  .choose-links {
+    @include clearfix;
+    max-width: 880px;
+    margin: 0 auto;
+    ul {
+      width: $sevenColumn;
+      float: left;
+      text-align: left;
+      margin: 0 $gutterW 0 0;
+      li a {
+        margin: 0 0 0 auto;
+      }
+    }
+    .add-bike-button {
+      width: $fiveColumn;
+      float: left;
+      margin-top: 10px;
+    }
+  }
+}

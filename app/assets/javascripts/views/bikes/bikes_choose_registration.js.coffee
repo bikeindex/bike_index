@@ -7,7 +7,10 @@ class BikeIndex.Views.BikesChooseRegistration extends Backbone.View
     @SetInitialRegistrationType()
 
   updateBikeLink: (e) ->
-    @chooseBikeLink($(e.target))
+    t = $(e.target)
+    unless t.hasClass('choose-type')
+      t = $(t.parents('.choose-type'))
+    @chooseBikeLink(t)
 
   chooseBikeLink: (target) ->
     $('.choose-type').removeClass('current-choice')
