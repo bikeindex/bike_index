@@ -28,13 +28,16 @@
       .theft-profit-block
         %h3
           Fight bike theft
-        %ul
+        %ul.fancy-bullets
           %li
-            Join our public national database
+            %span.blue-bullet
+            Join our national database
           %li
+            %span.blue-bullet
             Create a permanent record of your bike
           %li
-            Alert the community if your bike is stolen
+            %span.blue-bullet
+            Alert everyone if your bike is ever stolen
 
 #best-ever
   .receptacle.overfloating
@@ -43,10 +46,9 @@
         %h3
           We created the service we wanted to use to protect our bikes.
         %h4
-          We built the best registry
-          %em
-            we
-          could imagine. We open sourced it so it can be the best service imaginable, for everyone.
+          We built the best registry we could imagine.
+        %h4
+          We open sourced it so it can be everyone's dream registry.
       .sample-list
         = link_to (image_tag "/assets/home/bikes_list1.jpg", alt: "Sample Bike Index return"), "https://www.bikeindex.org/bikes/71", class: "top-image"
         = link_to (image_tag "/assets/home/bikes_list2.jpg", alt: "Sample Bike Index return"), "https://www.bikeindex.org/bikes/2", class: "middle-image"

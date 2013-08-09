@@ -81,8 +81,14 @@ body.welcome-page {
 
 @media (max-width: 600px) {
   #home-title h1 {
-    // margin-bottom: 40px;
     font-size: 42px;
+  }
+}
+
+
+@media (max-width: 600px) {
+  #home-title h1 {
+    padding: 20px 0 20px;
   }
 }
 
@@ -181,7 +187,7 @@ body.welcome-page {
     padding-top: 65px;
     h2 {
       position: absolute;
-      top: 20px;
+      top: 0px;
       left: -222.5%;
       width: 333%;
     }
@@ -254,7 +260,10 @@ body.welcome-page {
     color: $textColor;
     margin-top: 40px;
   }
-  li { margin-bottom: 10px; }
+  li {
+    margin-bottom: 1em;
+    span { margin-top: 0; }
+  }
 }
 
 @media (max-width: 700px) {
