@@ -7,7 +7,6 @@ Bikeindex::Application.routes.draw do
     match '/manage' => 'organizations#manage'
     match '/organization_bikes' => 'organizations#bikes'
     match '/settings' => 'organizations#settings'
-    resources :invoices, only: [:index, :show]  
   end
   
   resources :organizations, only: [:update, :destroy]

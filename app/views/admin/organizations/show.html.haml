@@ -27,19 +27,6 @@
         website:
         %a{href: "#{@organization.website}"}
           = @organization.website
-  .span6
-    %h3
-      Billing:
-    %p
-      = pluralize(@bikes.count, "Bike")
-      total bikes registered
-    %p
-      = pluralize(@bikes.non_token.count, "Customer bike")
-      registered (non ticket)
-    %p
-      = pluralize(@bikes.non_token.where(["created_at >= ?", @organization.last_billing_date]).count, "Bike")
-      registered this billing period
-      (#{number_to_currency(@bikes.non_token.where(["created_at >= ?", @organization.last_billing_date]).count * 4)} will be due)
 
 %section.full-screen-table
   %h2
@@ -107,8 +94,6 @@
         Email
       %th
         Total indexed
-      %th
-        Indexed since #{@organization.last_billing_date.strftime("%m-%d")}
     %tbody
       - @organization.users.each do |user|
         %tr
@@ -120,8 +105,6 @@
             = user.email
           %td
             = @bikes.where(creator_id: user.id).count
-          %td
-            = @bikes.where(creator_id: user.id).where(["created_at >= ?", @organization.last_billing_date]).count
 
 
 %ul

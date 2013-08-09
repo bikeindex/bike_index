@@ -15,8 +15,6 @@
           = nav_link "Users", manage_url(:subdomain => current_organization.slug)
         %li
           = nav_link "Settings", settings_url(:subdomain => current_organization.slug)
-        / %li
-        /   = nav_link "Billing", invoices_url(:subdomain => current_organization.slug)
     
     .org-add-bike
       = link_to "Add a bike to the Index", new_bike_url(creation_organization_id: current_organization.id), class: "button-green"

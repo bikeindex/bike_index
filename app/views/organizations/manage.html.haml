@@ -17,7 +17,7 @@
       %th.medium-screens
         Total indexed
       %th.medium-screens
-        Indexed since #{@organization.last_billing_date.strftime("%m-%d")}
+        Indexed since #{Date.today.beginning_of_month.strftime("%m-%d")}
     %tbody
       - @organization.users.each do |user|
         %tr
@@ -30,7 +30,7 @@
           %td.medium-screens
             = @bikes.where(creator_id: user.id).count
           %td.medium-screens
-            = @bikes.where(creator_id: user.id).where(["created_at >= ?", @organization.last_billing_date]).count
+            = @bikes.where(creator_id: user.id).where(["created_at >= ?", Date.today.beginning_of_month]).count
 .invitations
   %hr
   %h2
