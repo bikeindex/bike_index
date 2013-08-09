@@ -99,13 +99,12 @@ $btnDangerBorder: darken($red, 10%);
 //
 //________________________
 
-$topsearchBackground: url("/assets/background-granite.png") repeat repeat;
 $searchBackground: url("/assets/background-granite.png") repeat repeat;
+$searchBackgroundLight: url("/assets/background-granite-light.jpg") repeat repeat;
 $searchBorder: darken(rgb(234,234,234), 5%);
+$searchBorderLight: #ebebeb;
 // $footerBackground: url("/assets/background-diagonal.png") repeat repeat;
 $footerBackground: rgb(249,249,249);
-$bodyBackground: url("/assets/paper_bg.jpg") repeat repeat;
+$bodyBackground: url("/assets/background-paper.jpg") repeat repeat;
 $stolenBackground: url("/assets/background-stolen.jpg") repeat repeat;;
-
-
 // Tint on about who page: #f0f5fa

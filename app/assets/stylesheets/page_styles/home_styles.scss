@@ -4,7 +4,6 @@ body.welcome-page {
   background: $blueDarker;
   .follow-link.logo {
     background: $searchBackground;
-
     overflow: hidden;
     .standard-logo { display: none; }
     .transparent-logo {
@@ -12,7 +11,7 @@ body.welcome-page {
       display: block;
     }
   }
-  .content { padding-bottom: 0; }
+  .content { padding: 0; }
 }
 
 @media (min-width: 601px) and (max-width: 900px) {
@@ -74,10 +73,9 @@ body.welcome-page {
   h1 {
     margin: 0;
     color: white;
-    // color: $yellowPale;
+    font-family: $baseFont;
     font-size: 60px;
     text-transform: capitalize;
-    font-weight: normal;
   }
 }
 
@@ -91,6 +89,7 @@ body.welcome-page {
 @media (min-width: 900px) {
   #home-title h1 {
     // margin: 40px 0 150px;
+    margin-top: 20px;
     font-size: 80px;
   }
 }
@@ -98,7 +97,8 @@ body.welcome-page {
 @media (min-width: 1100px) {
   #home-title h1 {
     // margin: 40px 0 150px;
-    font-size: 95px;
+    margin-top: 30px;
+    font-size: 110px;
   }
 }
 
@@ -146,7 +146,8 @@ body.welcome-page {
   h2 {
     font-size: 22px;
     text-align: center;
-    color: white;
+    color: lighten($grayLighter, 7%);
+    // font-family: $baseFont;
     // color: $yellowPale;
     // a:hover { color: $linkColor; }
   }
@@ -203,7 +204,8 @@ body.welcome-page {
 //________________________
 
 #support-the-community {
-  color: $yellowPale;
+  background: $bodyBackground;
+  color: $grayDark;
   position: relative;
   width: 100%;
   // background: $yellowPale;
@@ -221,7 +223,7 @@ body.welcome-page {
 #moving-block {
   display: block;
   width: 100%;
-  height: 80%;
+  height: 75%;
   // background: $purple;
   position: absolute;
   left: 0;
@@ -233,22 +235,13 @@ body.welcome-page {
 }
 
 #fight-theft-profit {
-  @include box-shadow(0px -1px 2px rgba(black,.2));
+  @include box-shadow(0px -1px 1px rgba($grayDark,.2));
   position: relative;
   overflow: hidden;
   z-index: 10;
-  background: $yellowPale;
-  border-top: 1px solid lighten($yellowPale, 3%);
-  border-bottom: 1px solid lighten($yellowPale, 4%);
-  // border-top: 1px solid rgb(176,176,179);
-}
-
-.theft-profit-block {
-  // color: $grayLighter;
-  h3 {
-    // color: $yellowPale;
-    margin-top: 40px;
-  }
+  background: $searchBackgroundLight;
+  border-top: white;
+  border-bottom: 1px solid $searchBorderLight;
 }
 
 .fight-theft-image {
@@ -256,9 +249,7 @@ body.welcome-page {
   position: relative;
   &>img {
     position: relative;
-    // z-index: 100;
     display: block;
-    // z-index: 10;
     width: auto;
     max-height: 500px;
     padding-bottom: 20px;
@@ -266,8 +257,17 @@ body.welcome-page {
     // max-width: 400px;
     // max-width: 350px;
     margin: 0 auto;
-
   }
+}
+
+.theft-profit-block {
+  color: $grayDark;
+  h3 {
+    font-size: 40px;
+    color: $textColor;
+    margin-top: 40px;
+  }
+  li { margin-bottom: 10px; }
 }
 
 @media (max-width: 700px) {
@@ -286,27 +286,33 @@ body.welcome-page {
 }
 
 @media (min-width: 850px) {
-  .theft-profit-block {
-    width: 46%;
-    margin-left: $gutterW;
-    float: right;
-    h3 { margin-top: 80px; }
-  }
   .fight-theft-image {
     width: 52%;
     float: right;
     max-width: 500px;
     // margin-left: $gutterW;
   }
-}
-
-
-
-@media (min-width: 1100px) {
   .theft-profit-block {
-    h3 { margin-top: 180px; }
+    width: 46%;
+    margin-left: $gutterW;
+    float: right;
+    h3 { margin-top: 80px; }
+    ul {
+      margin-top: 40px;
+      font-size: 22px;
+      line-height: 1em;
+
+    }
   }
 }
+
+
+
+// @media (min-width: 1100px) {
+//   .theft-profit-block {
+//     h3 { margin-top: 180px; }
+//   }
+// }
 
 //________________________
 //
@@ -316,6 +322,7 @@ body.welcome-page {
 
 #support-the-community {
   padding: 2px 0;
+  h3 { color: $textColor; }
   article {
     width: $sixColumn;
     float: right;

@@ -1,7 +1,7 @@
 %footer.global-footer#page-foot
   .receptacle
     %ul.footer-links
-      %li{ class: content_nav_class("about") }
+      %li
         = link_to "Register a bike", choose_registration_url
         %ul
           %li
@@ -10,7 +10,7 @@
             = link_to "Bike Index resources", resources_url
           
             
-      %li{ class: content_nav_class("resources") }
+      %li
         = link_to "About the Bike Index", about_url  
         %ul       
           %li
@@ -19,11 +19,17 @@
             = link_to "List of manufacturers", manufacturers_url         
          
           
-      %li.contact-nav-btns{ class: content_nav_class("contact") }
+      %li.contact-nav-btns
         = link_to "Contact", contact_us_url
         %ul
           %li
             = link_to "Sign up a shop", vendor_signup_url
+      %li.social
+        %ul
+          %li
+            = link_to image_tag("/assets/twitter.svg", alt: "Bike Index Twitter"), "https://twitter.com/BikeIndex"
+          %li
+            = link_to image_tag("/assets/facebook.svg", alt: "Bike Index Facebook"), "https://facebook.com/bikeindex"
 
     %p
       2013 © Bike Index.

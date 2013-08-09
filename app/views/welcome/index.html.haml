@@ -9,7 +9,7 @@
   .receptacle.overfloating
     .inner-recep
       .treating-right-text
-        = link_to "Register it!", choose_registration_path, class: "button-green"
+        = link_to "Register it", choose_registration_path, class: "button-green"
         %h2
           Show your trusty steed some love
     .home-sharing
@@ -21,7 +21,7 @@
   .receptacle.overfloating
     .inner-recep
       .fight-theft-image
-        = image_tag "/assets/home/bike-locked.png", alt: "Fight bike theft", title: "A bike, maybe just like yours."  
+        = image_tag "/assets/home/bike-locked.svg", alt: "Fight bike theft", title: "A bike, maybe just like yours."  
         #moving-block
           = image_tag "/assets/home/hacksaw-man.svg", alt: "Make thieves go away", title: "A brigand"
           
@@ -46,7 +46,7 @@
           We built the best registry
           %em
             we
-          could imagine. We're open sourcing it so it can be the best service imaginable, for everyone.
+          could imagine. We open sourced it so it can be the best service imaginable, for everyone.
       .sample-list
         = link_to (image_tag "/assets/home/bikes_list1.jpg", alt: "Sample Bike Index return"), "https://www.bikeindex.org/bikes/71", class: "top-image"
         = link_to (image_tag "/assets/home/bikes_list2.jpg", alt: "Sample Bike Index return"), "https://www.bikeindex.org/bikes/2", class: "middle-image"
