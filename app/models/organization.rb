@@ -5,7 +5,6 @@ class Organization < ActiveRecord::Base
     :short_name,
     :slug,
     :website,
-    :paid,
     :default_bike_token_count,
     :is_a_bike_shop,
     :is_suspended,
@@ -14,7 +13,6 @@ class Organization < ActiveRecord::Base
   acts_as_paranoid
 
   has_many :memberships, dependent: :destroy
-  has_many :invoices, dependent: :destroy
   has_many :users, through: :memberships
   has_many :organization_invitations, dependent: :destroy
 
@@ -53,11 +51,6 @@ class Organization < ActiveRecord::Base
   before_save :truncate_short_name
   def truncate_short_name
     self.short_name = self.short_name.truncate(15)
-  end
-
-  def last_billing_date
-    return self.created_at unless self.invoices.any?
-    return self.invoices.last.billing_period_end
   end
 
 end

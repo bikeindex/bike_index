@@ -16,7 +16,6 @@ describe Bike do
     it { should belong_to :propulsion_type }
     it { should belong_to :cycle_type }
     it { should belong_to :creator }
-    it { should belong_to :invoice }
     it { should belong_to :creation_organization }
     it { should belong_to :location }
     it { should have_many :b_params }

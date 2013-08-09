@@ -17,8 +17,6 @@
         Created
       %th
         Bikes
-      %th
-        Money owed
       %th.medium-screens
         Memberships
       %th.large-screens
@@ -43,8 +41,6 @@
               = organization.created_at.strftime("%-m/%-d/%Y at %-I %p")
           %td
             = @bikes.where(organization_id: organization.id).count
-          %td
-            = number_to_currency(@bikes.where(organization_id: organization.id).non_token.where(["created_at >= ?", organization.last_billing_date]).count * 4)
           %td.medium-screens
             = organization.memberships.count
           %td.large-screens

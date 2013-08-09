@@ -1,7 +1,7 @@
 class OrganizationsController < ApplicationController
   before_filter :authenticate_user!
   before_filter :require_member!
-  before_filter :require_admin!, only: [:edit, :update, :manage, :settings, :billing, :destroy]
+  before_filter :require_admin!, only: [:edit, :update, :manage, :settings, :destroy]
   before_filter :find_organization
   
   layout "organization"
