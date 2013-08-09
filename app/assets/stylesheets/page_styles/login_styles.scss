@@ -82,11 +82,19 @@
   float: right;
   position: relative;
   padding-right: 35px;
-  img {
+  span {
+    @include border-radius(2px);
+    display: block;
     position: absolute;
     top: 5%;
     right: 3px;
-    height: 90%;
+    height: 26px;
+    width: 26px;
+    background: $blueDarker;
+  }
+  img {
+    height: 26px;
+    width: 26px;
   }
 }
 
