@@ -5,6 +5,8 @@
 //________________________
 .btn-pop {
   @extend .clickable;
+  font-family: $headerFont;
+  font-weight: normal;
   display: inline-block;
   text-decoration: none;
   padding: .25em .5em;
@@ -61,7 +63,7 @@
   @extend .button;
   background: $btnSuccess;
   border-color: $btnSuccessBorder;
-  font-weight: bold;
+  // font-weight: bold;
   padding: .5em 1em;
   text-transform: none;
 }

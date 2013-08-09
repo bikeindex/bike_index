@@ -54,9 +54,9 @@
       span { padding: 10px;}
     }
     .tix-title {
-      font-family: $headerFont;
+      font-family: $baseFont;
       font-size: 20px;
-      font-weight: 800;
+      font-weight: bold;
       text-transform: uppercase;
       position: relative;
       border-bottom: 1px solid rgba(139,87,51,.2);
@@ -72,17 +72,17 @@
     }
     .use {
       float: left;
-      font-family: $headerFont;
+      font-family: $baseFont;
       text-transform: uppercase;
       text-align: right;
-      font-weight: 800;
+      font-weight: bold;
       width: 82%;
       border-left: 1px solid rgba(139,87,51,.2);
       text-shadow: 0px 1px 0px rgba(white,.5);
     }
     .tix-num {
       float: left;
-      font-weight: 800;
+      font-weight: bold;
       width: 18%;
       color: rgba($red,.6);
 

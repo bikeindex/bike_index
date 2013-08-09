@@ -83,11 +83,10 @@
     position: relative;
     // font-size: 20px;
     font-family: $headerFont;
-    font-weight: 400;
-    // color: $textColor;
+    font-size: 18px;
+    font-weight: normal;
     width: 100%;
     padding: .5em 10px;
-
     span {
       @include rotate(90deg);
       color: $linkColor;

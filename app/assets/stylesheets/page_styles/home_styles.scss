@@ -73,11 +73,11 @@ body.welcome-page {
   margin: 0 auto;
   h1 {
     margin: 0;
-    font-family: $ribbonFont;
-    color: $yellowPale;
+    color: white;
+    // color: $yellowPale;
     font-size: 60px;
     text-transform: capitalize;
-    font-weight: 400;
+    font-weight: normal;
   }
 }
 
@@ -146,7 +146,8 @@ body.welcome-page {
   h2 {
     font-size: 22px;
     text-align: center;
-    color: $yellowPale;
+    color: white;
+    // color: $yellowPale;
     // a:hover { color: $linkColor; }
   }
 }
@@ -319,7 +320,7 @@ body.welcome-page {
     width: $sixColumn;
     float: right;
     padding-top: 60px;
-    font-weight: 300;
+    font-weight: normal;
     margin-left: $gutterW;
   }
   .sample-list {

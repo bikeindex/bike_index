@@ -48,7 +48,7 @@
   }
   h3 {
     position: relative;
-    font-weight: 800;
+    font-weight: bold;
     text-align: center;
     margin: 0;
     font-size: 28px;
@@ -109,7 +109,7 @@
   line-height: 1.25em;
   h1 {
     margin: 1em 0;
-    font-weight: 400;
+    font-weight: normal;
   }
   p {
     margin-bottom: 1em;
@@ -167,7 +167,7 @@
    
     line-height: 1.5em;
     a {
-       font-weight: 300;
+       font-weight: normal;
       margin: 0;
       // float: left;
       // width: $fourColumn;
@@ -175,7 +175,7 @@
       color: $textColor;
     
     strong {
-      font-weight: 400;
+      font-weight: bold;
     }
   }
   }

@@ -23,10 +23,10 @@ body {
 
 h1, h2, h3, h4 {
   font-family: $headerFont;
-  font-weight: 500;
+  font-weight: normal;
   line-height: 1.2em;
   strong {
-    font-weight: 600;
+    font-weight: bold;
   }
 }
 

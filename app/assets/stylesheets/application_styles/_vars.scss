@@ -5,27 +5,30 @@
 //________________________
 
 // Standard font:
-// We could load we are loading 200, 300, 400 (normal), 600, 800, 400 italic
-// <link href='http://fonts.googleapis.com/css?family=Titillium+Web:400,400italic,900,700,600,300,200' rel='stylesheet' type='text/css'>
-// $baseFont: 'Titillium Web', helvetica, sans-serif;
-// $baseFont: 'EB Garamond', serif;
-// <link href='http://fonts.googleapis.com/css?family=EB+Garamond' rel='stylesheet' type='text/css'>
-// I'm feeling Rambla and raleway now. we got 400, 400 italic and 700
-$baseFont: 'Rambla', sans-serif;
-
-// Header:
-// Currently only loading normal weight
-// <link href='http://fonts.googleapis.com/css?family=Autour+One' rel='stylesheet' type='text/css'>
-// $headerFont: 'Autour One', helvetica, sans-serif;
-// Now loading a whole bunch of weights. Remove them when you figure out which you want.
-$headerFont: 'Raleway', sans-serif;
+$headerFont: 'Rambla', sans-serif;
 
 @font-face{
-  font-family:'Ribbon';
-  src:url("/assets/Ribbon_V2_2011.otf");
+  font-family:'Klinic';
+  src:url("/assets/KlinicSlabBook.otf");
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face{
+  font-family:'Klinic';
+  src:url("/assets/KlinicSlabBookIt.otf");
+  font-weight: normal;
+  font-style: italic;
+}
+@font-face{
+  font-family:'Klinic';
+  src:url("/assets/KlinicSlabMedium.otf");
+  font-weight: bold;
+  font-style: normal;
 }
 
-$ribbonFont: 'Ribbon', sans-serif;
+$baseFont: 'Klinic', sans-serif;
+
+
 
 //________________________
 //

@@ -563,7 +563,7 @@
     display: block;
     float: left;
     padding-left: $threeColumn + $gutterW;
-    font-weight: 600;
+    font-weight: normal;
     margin: 0;
     font-size: 30px;
     line-height: 1.1em;
@@ -588,7 +588,7 @@
     }
     a {
       color: $blueLight;
-      font-weight: 800;
+      font-weight: bold;
       font-size: 1.3em;
       &:hover, &.active {
         color: $linkColor;
