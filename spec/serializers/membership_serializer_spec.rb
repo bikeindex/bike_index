@@ -8,6 +8,7 @@ describe MembershipSerializer do
   
   it { subject.organization_name.should == organization.name }
   it { subject.short_name.should == organization.short_name }
+  it { subject.organization_id.should == organization.id }
   it { subject.slug.should == organization.slug }
   it { subject.is_admin.should be_false }
   it { subject.locations.should == [{ name: organization.name, id: nil}] }

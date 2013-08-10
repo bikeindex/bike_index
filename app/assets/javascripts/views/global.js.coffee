@@ -36,8 +36,8 @@ class BikeIndex.Views.Global extends Backbone.View
                 <div class="tab-pane" id="#{membership["slug"]}">
                   <ul>
                     <li>
-                      <a href="/bikes/new?creation_organization_id=#{membership["id"]}">
-                        <strong>Add a bike</strong> as #{membership["organization_name"]}
+                      <a href="/bikes/new?creation_organization_id=#{membership["organization_id"]}">
+                        <strong>Add a bike</strong> through #{membership["organization_name"]}
                       </a>
                     </li>
                     <li>

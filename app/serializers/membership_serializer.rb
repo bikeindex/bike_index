@@ -1,10 +1,10 @@
 class MembershipSerializer < ActiveModel::Serializer
   attributes :organization_name,
+    :organization_id,
     :short_name,
     :slug,
     :is_admin,
     :base_url,
-    :id,
     :locations
 
   def organization_name
@@ -13,6 +13,10 @@ class MembershipSerializer < ActiveModel::Serializer
 
   def short_name
     object.organization.short_name
+  end
+
+  def organization_id
+    object.organization.id
   end
 
   def slug 
