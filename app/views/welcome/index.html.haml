@@ -5,7 +5,10 @@
 
 #treating-right
   .treating-right-image
-    = image_tag "/assets/home/breakfast_in_bed.svg", alt: "Show your bike some love", title: "Show your bike some love"
+    / = image_tag "/assets/home/breakfast_in_bed.svg", alt: "Show your bike some love", title: "Show your bike some love"
+    = image_tag "/assets/home/binb/bed.svg", alt: "Show your bike some love", title: "Show your bike some love"
+    = image_tag "/assets/home/binb/wheel.svg", alt: "Show your bike some love", title: "Show your bike some love", class: "wheel-layer", id: "wheel-spin"
+    = image_tag "/assets/home/binb/fork.svg", alt: "Show your bike some love", title: "Show your bike some love", class: "fork-layer"
   .receptacle.overfloating
     .inner-recep
       .treating-right-text
@@ -37,7 +40,7 @@
             Create a permanent record of your bike
           %li
             %span.blue-bullet
-            Alert everyone if your bike is ever stolen
+            Alert everyone if your bike is stolen
 
 #best-ever
   .receptacle.overfloating

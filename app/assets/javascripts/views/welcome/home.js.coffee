@@ -23,3 +23,9 @@ class BikeIndex.Views.Home extends Backbone.View
           # -webkit-transform: rotate(-90deg);
           # -moz-transform: rotate(-90deg);
           # -o-transform: rotate(-90deg);
+      if scroll < aStart
+        unless scroll >= aEnd
+          p = ((scroll)/tScroll)
+          $('#wheel-spin').css('-webkit-transform', "rotate(-#{(p*30)}deg)")
+          $('#wheel-spin').css('-moz-transform', "rotate(-#{(p*30)}deg)")
+          $('#wheel-spin').css('-o-transform', "rotate(-#{(p*30)}deg)")

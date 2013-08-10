@@ -40,9 +40,9 @@
       li {
         width: 28%;
         margin-right: 8%;
-        float: right;
+        float: left;
         padding: 0;
-        &:first-of-type { margin-right: 0; } 
+        &:last-of-type { margin-right: 0; } 
       }
       a {
         @include border-radius(4px);

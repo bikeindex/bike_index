@@ -135,6 +135,18 @@ body.welcome-page {
     height: auto;
     display: block;
   }
+  .fork-layer {
+    position: absolute;
+    left: 0; top: 0;
+  }
+  
+  .wheel-layer {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: auto;
+  }
 }
 
 

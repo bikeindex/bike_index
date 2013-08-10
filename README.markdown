@@ -44,10 +44,8 @@ Have a bug or a feature request? [Open a new issue](https://github.com/bikeindex
 
 Keep track of development and community news.
 
-- Follow [@bikeindex on Twitter](http://twitter.com/bikeindex).
+- Follow [@bikeindex](http://twitter.com/bikeindex) on Twitter.
 - Read the [Bike Index Blog](https://bikeindex.org/blog).
-- Have a question that's not a feature request or bug report? [Ask on the mailing list.](http://groups.google.com/group/bike-index)
-
 
 
 ## Contributing
