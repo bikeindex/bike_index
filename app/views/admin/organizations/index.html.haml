@@ -40,7 +40,7 @@
                 = organization.created_at.strftime("%-m.%-d.%Y %-H.%M")
               = organization.created_at.strftime("%-m/%-d/%Y at %-I %p")
           %td
-            = @bikes.where(organization_id: organization.id).count
+            = @bikes.where(creation_organization_id: organization.id).count
           %td.medium-screens
             = organization.memberships.count
           %td.large-screens

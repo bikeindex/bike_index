@@ -86,7 +86,7 @@ class UsersController < ApplicationController
     if current_organization.present?
       if current_user.is_admin_of?(current_organization)
         @membership = user.memberships.where(organization_id:  current_organization.id).last
-        bikes = Bike.where(organization_id: current_organization.id).order("created_at asc")
+        bikes = Bike.where(creation_organization_id: current_organization.id).order("created_at asc")
         @bikes = BikeDecorator.decorate_collection(bikes)
         render action: :organization_show, layout: "organization"
       elsif current_user.is_member_of?(current_organization)

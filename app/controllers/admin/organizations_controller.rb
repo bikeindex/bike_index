@@ -9,7 +9,7 @@ class Admin::OrganizationsController < Admin::BaseController
   def show
     @organizations = Organization.all
 
-    @bikes = Bike.where(organization_id: @organization.id)
+    @bikes = Bike.where(creation_organization_id: @organization.id)
   end
 
   def show_deleted
