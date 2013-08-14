@@ -332,71 +332,79 @@ body.welcome-page {
   color: $grayDark;
   position: relative;
   width: 100%;
-  // background: $yellowPale;
-  // border-top: 1px solid rgb(176,176,179);
-  // border-bottom: 1px solid rgb(176,176,179);
-  min-height: 200px;
   overflow: hidden;
-}
-
-#best-ever {
-  padding: 2px 0;
-  h3 { color: $textColor; }
-  article {
-    width: $sixColumn;
-    float: right;
-    padding-top: 60px;
-    font-weight: normal;
-    margin-left: $gutterW;
+  a { color: $blueLight; }
+  h3 {
+    text-align: center;
+    color: $textColor;
   }
-  .sample-list {
+  article {
     position: relative;
-    float: right;
-    width: 46%;
-    padding-right: 10px;
-    a {
-      max-width: 300px;
-      display: block;
-      padding: 0;
-      margin: 10px auto 0;
-      &:first-of-type {margin-top: 0;}
-    }
+    float: left;
+    padding-top: 40px;
+    margin-right: $gutterW;
+  }
+  .icographix {
+    @include border-radius(6px);
+    @include box-shadow(#{inset 1px 1px 6px rgba(black,.2)});
+    position: relative;
+    width: 50%;
+    max-width: 220px;
+    padding: 10px;
+    background: $blueDarker;
+    margin: 0 auto 20px;
     img {
       width: 100%;
-      height: auto;
+      display: block;
     }
   }
 }
 
-@media (max-width: 650px) {
+@media (max-width: 767px) {
   #best-ever {
+    padding: 60px 0;
     article {
-      padding-top: 1em;
-      width: 100%;
-      float: none;
-      margin-left: 0;
+      width: $sixColumn;
+      &:nth-of-type(2n) {
+        margin-right: 0;
+      }
     } 
-    .sample-list {
-      float: none;
-      margin: 30px auto 0;
-      width: 300px;
-      max-width: 100%;
-      // a, a img { width: 300px;}
-      .top-image, .middle-image { display: none; }
-    }
   }
 }
 
-@media (min-width: 1100px) {
+@media (max-width: 550px) {
   #best-ever {
     article {
-      padding-top: 120px;
-      float: right;
-      
-    }
-    .sample-list {
+      width: $twelveColumn;
+      margin-right: 0;
+    } 
+  }
+}
 
+@media (min-width: 768px) {
+  #best-ever {
+    padding: 120px 0;
+    article {
+      padding-top: 60px;
+      width: $fourColumn;
+      &:nth-of-type(3n) {
+        margin-right: 0;
+      }
+      &:nth-of-type(3n+1) {
+        clear: left;
+      }
     }
   }
 }
+
+// @media (min-width: 1100px) {
+//   #best-ever {
+//     article {
+//       padding-top: 120px;
+//       float: right;
+      
+//     }
+    
+//   }
+// }
 
