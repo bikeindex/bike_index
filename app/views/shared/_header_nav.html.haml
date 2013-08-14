@@ -1,4 +1,4 @@
-.top-header#total-top-header{:data => {domain: Rails.env}}
+.top-header.search-expanded#total-top-header{:data => {domain: Rails.env}}
   %span.background-extend
   .receptacle
     .inner-recep
@@ -46,6 +46,9 @@
       = form_tag bikes_path, method: :get, id: "head-search-bikes" do 
         .search-fields
           = text_field_tag :query, params[:query], placeholder: "Find bikes!", :data => { provide: "typeahead", items: "3", source: @search_ahead.to_json }
+          .optional-fields
+            = collection_select(:color, :color_id, Color.all, :id, :name, prompt: "Color (optional)")
+            = select("bikes", :stoleness, options_for_select([["All Bikes", "all"],["Only stolen", "stolen"], ["Only non-stolen", "non-stolen"]]))
           .search-button
             = submit_tag "Search", name: "search", class: "button-blue"
             = hidden_field :search_stolen, params[:stolen]
