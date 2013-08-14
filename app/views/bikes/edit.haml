@@ -85,7 +85,7 @@
             %a{ href: "#edit_additionals" }
               Additional parts
               %i.icon-chevron-right
-          - if @bike.creation_organization_id
+          - if @bike.verified?
             %li
               %a{ href: "#edit_ownership" }
                 Ownership
@@ -113,42 +113,41 @@
       = render :partial => 'bikes/bike_fields/additional_parts', :locals => { :f => f }
 
 
-      - if @bike.creation_organization_id
+      - if @bike.verified?
         .edit-bike-fields#edit_ownership
           %header
             %h2
               Change #{@bike.type.titleize} ownership
           - if @bike.current_owner_exists
-            - if @bike.creation_organization_id.present?
-              .input-group
+            .input-group
 
-                %a.collapsed{ href: "#change_ownership", :data => { toggle: "collapse" } }
-                  Change ownership or mark #{@bike.type} stolen
-              #change_ownership.collapse
-                - unless @creator
-                  .input-group
-                    This #{@bike.type} is no longer mine, I am selling or giving it to someone:
-                    .control-group.padded
-                      %label.control-label{ for: 'bike_owner_email' }
-                        New owner's email
-                      .controls
-                        = f.text_field :owner_email
-                    .edit-bike-actions
-                      = submit_tag "Send #{@bike.type}", class: "button-yellow", confirm: "Are you sure? Once the new owner has claimed this #{@bike.type}, you will no longer be able to edit it."
+              %a.collapsed{ href: "#change_ownership", :data => { toggle: "collapse" } }
+                Change ownership or mark #{@bike.type} stolen
+            #change_ownership.collapse
+              - unless @creator
                 .input-group
-                  #bike-stolen-check.hidden
-                    = f.check_box :stolen
-                  - if @bike.stolen
-                    .control-group
-                      .edit-bike-actions
-                      = submit_tag "I found my #{@bike.type}! It's no longer stolen", class: "button-yellow", id: "mark-unstolen"
-                  - else
-                    %p
-                      Oh no! This #{@bike.type} was stolen.
-                    
-                    .control-group
-                      .edit-bike-actions
-                        = submit_tag "Mark #{@bike.type} stolen", class: "button-red", id: "mark-stolen", confirm: "Are you sure you want to mark this #{@bike.type} stolen?", class: "button-red"
+                  This #{@bike.type} is no longer mine, I am selling or giving it to someone:
+                  .control-group.padded
+                    %label.control-label{ for: 'bike_owner_email' }
+                      New owner's email
+                    .controls
+                      = f.text_field :owner_email
+                  .edit-bike-actions
+                    = submit_tag "Send #{@bike.type}", class: "button-yellow", confirm: "Are you sure? Once the new owner has claimed this #{@bike.type}, you will no longer be able to edit it."
+              .input-group
+                #bike-stolen-check.hidden
+                  = f.check_box :stolen
+                - if @bike.stolen
+                  .control-group
+                    .edit-bike-actions
+                    = submit_tag "I found my #{@bike.type}! It's no longer stolen", class: "button-yellow", id: "mark-unstolen"
+                - else
+                  %p
+                    Oh no! This #{@bike.type} was stolen.
+                  
+                  .control-group
+                    .edit-bike-actions
+                      = submit_tag "Mark #{@bike.type} stolen", class: "button-red", id: "mark-stolen", confirm: "Are you sure you want to mark this #{@bike.type} stolen?", class: "button-red"
           - else
             .input-group
               .control-group.form-foot

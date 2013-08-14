@@ -20,6 +20,7 @@ task :seed_test_users => :environment do
   org.save
   membership = Membership.create(organization_id: org.id, user_id: User.find_by_email("member@example.com").id, role: "admin")
   membership.save
+  puts "\nSuccess"
 end
 
 desc "Create test bikes for user@example on first organization"
@@ -39,7 +40,8 @@ task :seed_test_bikes => :environment do
       primary_frame_color_id: (rand(Color.count) + 1),
       handlebar_type_id: (rand(HandlebarType.count) + 1),
       creator: @user,
-      owner_email: @user.email
+      owner_email: @user.email,
+      verified: true
     )
     bike.serial_number = (0...10).map{(65+rand(26)).chr}.join
     bike.creation_organization_id = @org.id
