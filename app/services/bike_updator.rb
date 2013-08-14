@@ -49,10 +49,9 @@ class BikeUpdator
     @bike_params[:bike][:creation_organization_id] = @bike.creation_organization_id
     @bike_params[:bike][:creator] = @bike.creator
     @bike_params[:bike][:verified] = @bike.verified
-    unless @bike.verified?
-      # If the bike isn't verified, it can't be marked un-stolen :(
-      @bike_params[:bike][:stolen] = @bike.stolen
-    end
+
+    # If the bike isn't verified, it can't be marked un-stolen :(
+    @bike_params[:bike][:stolen] = @bike.stolen unless @bike.verified?
   end
 
   def update_available_attributes
