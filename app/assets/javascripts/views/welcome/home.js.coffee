@@ -12,10 +12,22 @@ class BikeIndex.Views.Home extends Backbone.View
       aEnd = $('#best-ever').offset().top
       tScroll = baseBlock.height() + parseInt(baseBlock.css('padding-top')) + parseInt(baseBlock.css('padding-bottom'))
       scroll = $(window).scrollTop()
-      
+      # if scroll >= aStart
+      #   unless scroll >= aEnd
+      #     p = ((scroll - aStart)/tScroll)
+      #     width = 100 - (p*20)
+      #     aBlock.css('width', "#{width}%")
+          # aBlock.css('left', "#{p*150}%")
+          # aBlock.css('bottom', "#{40-(p*220)}px")
+          # aBlock.css('-webkit-transform', "rotate(#{(p*7)}deg)")
+          # aBlock.css('-moz-transform', "rotate(#{(p*7)}deg)")
+          # aBlock.css('-o-transform', "rotate(#{(p*7)}deg)")
+          # -webkit-transform: rotate(-90deg);
+          # -moz-transform: rotate(-90deg);
+          # -o-transform: rotate(-90deg);
       if scroll < aStart
         unless scroll >= aEnd
           p = ((scroll)/tScroll)
-          $('#wheel-spin').css('-webkit-transform', "rotate(-#{(p*30)}deg)")
-          $('#wheel-spin').css('-moz-transform', "rotate(-#{(p*30)}deg)")
-          $('#wheel-spin').css('-o-transform', "rotate(-#{(p*30)}deg)")
+          $('#wheel-spin').css('-webkit-transform', "rotate(-#{(p*50)}deg)")
+          $('#wheel-spin').css('-moz-transform', "rotate(-#{(p*50)}deg)")
+          $('#wheel-spin').css('-o-transform', "rotate(-#{(p*50)}deg)")
