@@ -4,14 +4,17 @@ body.welcome-page {
   background: $blueDarker;
   .follow-link.logo {
     background: $searchBackground;
-    overflow: hidden;
+    // overflow: hidden;
     .standard-logo { display: none; }
     .transparent-logo {
       width: 100;
       display: block;
     }
   }
-  .content { padding: 0; }
+  .content {
+    padding: 0;
+    overflow: hidden;
+  }
 }
 
 @media (min-width: 601px) and (max-width: 900px) {
@@ -32,6 +35,7 @@ body.welcome-page {
 }
 @media (min-width: 910px) {
   body.welcome-page .follow-link.logo {
+    overflow: hidden;
     img {
       width: 100.5%;
       max-width: 100.5%;
@@ -120,7 +124,6 @@ body.welcome-page {
   margin-top: 60px;
   position: relative;
   width: 100%;
-  overflow: visible;
   // .receptacle.overfloating { height: 1px; }
 }
 
@@ -326,7 +329,6 @@ body.welcome-page {
   color: $grayDark;
   position: relative;
   width: 100%;
-  overflow: hidden;
   a { color: $blueLight; }
   h3 {
     text-align: center;
@@ -406,7 +408,6 @@ body.welcome-page {
   background: $searchBackgroundLight;
   border-top: 1px solid white;
   border-bottom: 1px solid $searchBorderLight;
-  .receptacle { overflow: visible; }
   p {
     color: $grayDark;
     font-family: $baseFont;

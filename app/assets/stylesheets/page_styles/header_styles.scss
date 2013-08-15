@@ -64,14 +64,14 @@
       // width: 85.86%;
     }
     .search-button {
-
       width: $oneColumn;
       position: absolute;
       right: 0; top: 0;
       margin-top: 1em;
       padding-right: 15px;
     }
-  .button-blue {
+    .button-blue {
+      text-shadow: none;
       font-size: $standardFontSize;
       width: 100%;
       padding: .25em 0;
