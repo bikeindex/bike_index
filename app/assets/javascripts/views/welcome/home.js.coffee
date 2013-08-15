@@ -12,12 +12,10 @@ class BikeIndex.Views.Home extends Backbone.View
       unless scroll >= aEnd
         p = ((scroll)/aEnd)
         spin = p * 50
-        if ww < 900 # When the screen is smaller, spin more, move less 
-          spin = spin * 2
-          p = p * .5
-
+        spin = spin * 2 if ww < 900 # When the screen is smaller, spin more, move less 
         $('#wheel-spin').css('-webkit-transform', "rotate(-#{spin}deg)")
         $('#wheel-spin').css('-moz-transform', "rotate(-#{spin}deg)")
         $('#wheel-spin').css('-o-transform', "rotate(-#{spin}deg)")
-        register.css('top', "#{p*25}px") # Small parallax on the button
+        
+        # register.css('top', "#{p*25}px") # Small parallax on the button
      

@@ -18,32 +18,52 @@
     .home-sharing
       = render "/shared/home_share"    
 
+#our-database
+  .receptacle
+    .inner-recep
+      %article
+        %h3
+          The Bike Index is a bike registry
+        %ul.fancy-bullets
+          %li
+            %span.blue-bullet
+            %p
+              Show off your trusty steed.
+          %li
+            %span.blue-bullet
+            %p
+              Report stolen bicycles.
+          %li
+            %span.blue-bullet
+            %p
+              Contact the owner of a stolen bike if you find one.
+          %li
+            %span.blue-bullet
+            %p
+              Verify any bike you buy or sell.
+      .sample-list
+        = link_to (image_tag "/assets/home/bikes_list1.jpg", alt: "Sample Bike Index return"), "https://www.bikeindex.org/bikes/71", class: "top-image"
+        = link_to (image_tag "/assets/home/bikes_list2.jpg", alt: "Sample Bike Index return"), "https://www.bikeindex.org/bikes/2", class: "middle-image"
+        = link_to (image_tag "/assets/home/bikes_list3.jpg", alt: "Sample Bike Index return"), "https://www.bikeindex.org/bikes/12"
+
 
 
 #fight-theft-profit
   .receptacle.overfloating
     .inner-recep
       .fight-theft-image
-        = image_tag "/assets/home/hacksaw-man-with-bike.png", alt: "Fight bike theft", title: "A bike, maybe just like yours."  
-          
+        = image_tag "/assets/home/hacksaw-man-with-bike.png", alt: "Fight bike theft", title: "A bike, maybe just like yours."
       .theft-profit-block
         %h3
-          Fight bike theft
-        %ul.fancy-bullets
-          %li
-            %span.blue-bullet
-            Join our national database
-          %li
-            %span.blue-bullet
-            Create a permanent record of your bike
-          %li
-            %span.blue-bullet
-            Alert everyone if your bike is stolen
+          Add your bike, fight bike theft
+        %p
+          Bikes are stolen because they can be sold quickly and easily.
+        %p
+          Add your bike to the Index to make it easier to recover if it's ever stolen.
 
 #best-ever
   .receptacle.overfloating
     .inner-recep
-
       %article
         .icographix
           = image_tag "/assets/home/community_retina.png", alt: "Community", title: "We love the bike community"
