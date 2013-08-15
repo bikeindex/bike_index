@@ -4,30 +4,18 @@ class BikeIndex.Views.Home extends Backbone.View
     @moveBike()
 
   moveBike: ->
-    baseBlock = $('#fight-theft-profit')
-    aBlock = $('#moving-block')
-    $(window).scroll ->      
-      sh = $(window).height()
-      aStart = baseBlock.offset().top - sh + (baseBlock.height()*.92)
-      aEnd = $('#best-ever').offset().top
-      tScroll = baseBlock.height() + parseInt(baseBlock.css('padding-top')) + parseInt(baseBlock.css('padding-bottom'))
+    register = $('#treating-right .treating-right-text')
+    $(window).scroll -> 
+      ww = $(window).width()
+      aEnd = $('#fight-theft-profit').offset().top
       scroll = $(window).scrollTop()
-      # if scroll >= aStart
-      #   unless scroll >= aEnd
-      #     p = ((scroll - aStart)/tScroll)
-      #     width = 100 - (p*20)
-      #     aBlock.css('width', "#{width}%")
-          # aBlock.css('left', "#{p*150}%")
-          # aBlock.css('bottom', "#{40-(p*220)}px")
-          # aBlock.css('-webkit-transform', "rotate(#{(p*7)}deg)")
-          # aBlock.css('-moz-transform', "rotate(#{(p*7)}deg)")
-          # aBlock.css('-o-transform', "rotate(#{(p*7)}deg)")
-          # -webkit-transform: rotate(-90deg);
-          # -moz-transform: rotate(-90deg);
-          # -o-transform: rotate(-90deg);
-      if scroll < aStart
-        unless scroll >= aEnd
-          p = ((scroll)/tScroll)
-          $('#wheel-spin').css('-webkit-transform', "rotate(-#{(p*50)}deg)")
-          $('#wheel-spin').css('-moz-transform', "rotate(-#{(p*50)}deg)")
-          $('#wheel-spin').css('-o-transform', "rotate(-#{(p*50)}deg)")
+      unless scroll >= aEnd
+        p = ((scroll)/aEnd)
+        spin = p * 50
+        spin = spin * 2 if ww < 900 # When the screen is smaller, spin more, move less 
+        $('#wheel-spin').css('-webkit-transform', "rotate(-#{spin}deg)")
+        $('#wheel-spin').css('-moz-transform', "rotate(-#{spin}deg)")
+        $('#wheel-spin').css('-o-transform', "rotate(-#{spin}deg)")
+        
+        # register.css('top', "#{p*25}px") # Small parallax on the button
+     

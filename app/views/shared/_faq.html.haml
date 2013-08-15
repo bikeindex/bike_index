@@ -5,45 +5,63 @@
   / #= image_tag "/assets/home_shield/shield-logo.png"
   = image_tag "/assets/logo.svg"
 %dl
+  / %dt.collapse-faq
+  /   %a#ref-basic-attributes.collapsed{ href: "#why-bike-index", :data => { toggle: "collapse"} }
+  /     %span
+  /       &#x25B6;
+  /     Other bike registries exist, why use the Bike Index?
+  
+  / %dd#why-bike-index.collapse
+  /   %p
+  /     Bike registration is a great idea&mdash;but to be useful, a majority of bikes need to be registered.
+  /   %p
+  /     We created the Bike Index to fix the problem. This is how:
+  /   %ol
+  /     %li 
+  /       %p
+  /         %strong
+  /           Registration that's convenient
+  /         %br
+  /         Bike shops add bikes to the Index from their shops&mdash;so your bike gets registered before it leaves the shop. It's free for them and free for you.
+  /       %p
+  /         You will be able to register your own bike for a small fee soon.
+  /     %li
+  /       %p
+  /         %strong
+  /           The same registry, everywhere
+  /         %br
+  /         Stolen, not stolen, wherever in the US you are&mdash;we provide the same service. By having the same registry everywhere, we offer a centralized place to look up any bike, preventing bike thieves from selling your bike in a different place.
+  /     %li
+  /       %p
+  /         %strong
+  /           Verify used bike sales
+  /         %br
+  /         Selling a bike? Show the buyer that you own it. When you sell it, send the bike to the new owner's email easily and free of charge.
+    
   %dt.collapse-faq
-    %a#ref-basic-attributes.collapsed{ href: "#why-bike-index", :data => { toggle: "collapse"} }
+    %a#ref-basic-attributes.collapsed{ href: "#how-vendor", :data => { toggle: "collapse"} }
       %span
         &#x25B6;
-      Other bike registries exist, why use the Bike Index?
-  
-  %dd#why-bike-index.collapse
+      Can my local bike shop partner with the Bike Index?
+  %dd#how-vendor.collapse
     %p
-      Bike registration is a great idea&mdash;but to be useful, a majority of bikes need to be registered.
+      Absolutely!
     %p
-      We created the Bike Index to fix the problem. This is how:
-    %ol
-      %li 
-        %p
-          %strong
-            Registration that's convenient
-          %br
-          Bike shops add bikes to the Index from their shops&mdash;so your bike gets registered before it leaves the shop. It's free for them and free for you.
-        %p
-          You will be able to register your own bike for a small fee soon.
-      %li
-        %p
-          %strong
-            The same registry, everywhere
-          %br
-          Stolen, not stolen, wherever in the US you are&mdash;we provide the same service. By having the same registry everywhere, we offer a centralized place to look up any bike, preventing bike thieves from selling your bike in a different place.
-      %li
-        %p
-          %strong
-            Verify used bike sales
-          %br
-          Selling a bike? Show the buyer that you own it. When you sell it, send the bike to the new owner's email easily and free of charge.
-      %li
-        %p
-          %strong
-            Built with the community
-          %br
-          We are open source. Want to improve the Bike Index? Visit us #{ link_to "on github", "https://github.com/bikeindex/webapp"}!
+      Have them visit the #{link_to "organization signup page", vendor_signup_url}, we'll set them up with a organization account so they can register bikes for free.
     
+  %dt.collapse-faq
+    %a#ref-basic-attributes.collapsed{ href: "#already-stolen", :data => { toggle: "collapse"} }
+      %span
+        &#x25B6;
+      My bike was already stolen. What should I do?
+    %dd#already-stolen.collapse
+      %p
+        %strong
+          Adding already stolen bikes to the Bike Index is free.
+      %p
+        Bike Index is a comprehensive public database. If your bike was stolen, we think everyone should know about it.
+      %p
+        Visit the #{link_to "stolen bikes page", stolen_bikes_url} to for more information, or #{link_to "add a stolen bike here", new_bike_url(stolen: true)}.  
 
   %dt.collapse-faq
     %a#ref-basic-attributes.collapsed{ href: "#what-about-privacy", :data => { toggle: "collapse"} }
@@ -60,26 +78,15 @@
       = link_to "our blog post", "https://www.bikeindex.org/blogs/privacy-on-the-bike-index"
       about privacy.
 
-  %dt.collapse-faq
-    %a#ref-basic-attributes.collapsed{ href: "#how-vendor", :data => { toggle: "collapse"} }
-      %span
-        &#x25B6;
-      Can my local bike shop partner with the Bike Index?
-  %dd#how-vendor.collapse
-    %p
-      Yes! Have them visit the #{link_to "organization signup page", vendor_signup_url}.
-
 %dl
   %dt.collapse-faq
     %a#ref-basic-attributes.collapsed{ href: "#what-if-i-sell", :data => { toggle: "collapse"} }
       %span
         &#x25B6;
-      What if I sell my bike?
+      What should I do if I sell my bike?
   %dd#what-if-i-sell.collapse
     %p
-      Send the bike to the new owner!
-    %p
-      It's free to transfer bikes, the record is permanent.
+      Bike registration is permanent, it's free to transfer bikes.
     %p.steps
       Go to the edit page for the bike and click on the link at the bottom
     = image_tag "/assets/home/transfer_shot1.png", alt: "Click to reveal the transfer fields", class: "demo-screen"
@@ -108,20 +115,6 @@
     / %p
     /   We are starting the our battle battle against bike thieves and selling stolen bikes, but are by no means finished.
     / Bike Index won't make bike theft go away over night, but with the biking communities support we will have a place to start.
-
-  %dt.collapse-faq
-    %a#ref-basic-attributes.collapsed{ href: "#already-stolen", :data => { toggle: "collapse"} }
-      %span
-        &#x25B6;
-      My bike was already stolen. What should I do?
-    %dd#already-stolen.collapse
-      %p
-        %strong
-          Adding already stolen bikes to the Bike Index is free.
-      %p
-        Bike Index is a comprehensive public database. If your bike was stolen, we think everyone should know about it.
-      %p
-        Visit the #{link_to "stolen bikes page", stolen_bikes_url} to for more information, or #{link_to "add a stolen bike here", new_bike_url(stolen: true)}.
 
   %dt.collapse-faq
     %a#ref-basic-attributes.collapsed{ href: "#kit-bro", :data => { toggle: "collapse"} }
