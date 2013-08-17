@@ -72,6 +72,10 @@ class BikeIndex.Views.Global extends Backbone.View
       allow_single_deselect: true
       no_results_text: 'No Manufacturers matched'
       width: '100%'
+    $('#header-search .bike_attributes select').chosen
+      allow_single_deselect: true
+      no_results_text: 'No Colors matched'
+      width: '100%'
 
   openNewWindow: (e) ->
     e.preventDefault()

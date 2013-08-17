@@ -94,14 +94,14 @@
 .optional-fields {
   display: none;
   position: absolute;
-  right: 0; top: 3.5em;
-  width: $sevenColumn - $gutterW;
-  margin-right: $gutterW + $oneColumn;
-  .manufacturers, .colors {
+  right: 0; top: 3.4em;
+  width: $eightColumn - $gutterW;
+  .manufacturers, .bike_attributes {
     width: 48.5%;
     float: left;
+    select { width: 100%; }
   }
-  .colors { margin-left: 5%; }
+  .bike_attributes { margin-left: 3%; }
 }
 
 // .top-header {
@@ -156,10 +156,6 @@
       .search-text-field {
         margin-right: $gutterW + $fourColumn;
         width: $eightColumn;
-      }
-      .optional-fields {
-        width: 100%;
-        margin-right: 0;
       }
     }
   }
