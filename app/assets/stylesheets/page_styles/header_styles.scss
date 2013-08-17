@@ -97,13 +97,20 @@
   right: 0; top: 3.4em;
   width: $eightColumn - $gutterW;
   .manufacturers, .bike_attributes {
-    width: 48.5%;
     float: left;
     select { width: 100%; }
   }
-  .bike_attributes { margin-left: 3%; }
+  .stoleness { float: left; }
+  .bike_attributes { margin-left: 2%; }
 }
 
+@media (min-width: 900px) {
+  .optional-fields {
+    .manufacturers, .bike-attributes {
+      width: 40%;
+    }
+  }
+}
 // .top-header {
 //   .search-background, .background-extend {
 //     @include transition(all 1s ease-out);

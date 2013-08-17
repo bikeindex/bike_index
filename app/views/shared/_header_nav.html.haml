@@ -45,7 +45,7 @@
       %span.search-background
       = form_tag bikes_path, method: :get, id: "head-search-bikes" do 
         .search-fields#header-search
-          = text_field_tag :query, params[:query], placeholder: "Find bikes!", class: "search-text-field", :data => { provide: "typeahead", items: "3", source: @search_ahead.to_json }
+          = text_field_tag :query, params[:query], placeholder: "Find bikes!", class: "search-text-field"
           .optional-fields
             .manufacturers
               = collection_select :manufacturer_ids, params[:manufacturer_ids],
