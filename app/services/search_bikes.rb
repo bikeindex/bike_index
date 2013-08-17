@@ -1,8 +1,10 @@
 class SearchBikes
-  def initialize(params = nil)
-    if params.present?
-      @query = params[:query] ? params[:query] : nil
-      @stolen = params[:search_stolen] ? params[:search_stolen][0] : nil
+  def initialize(creation_params = {})
+    if creation_params.present?
+      @query = creation_params[:query]
+      @manufacturer_id = creation_params[:manufacturer_id]
+      @color_id = creation_params[:color_id]
+      @stolen = creation_params[:search_stolen]
     else
       @query, @stolen = nil
     end
@@ -27,13 +29,20 @@ class SearchBikes
     # TODO: Is it okay to default scope this?
     # How do I limit the results for most recent?
     bikes = Bike.scoped
-
     unless @stolen == nil
       if @stolen == "true"
         bikes = bikes.stolen
       elsif @stolen == "false"
         bikes = bikes.non_stolen
       end
+    end
+
+    if @color_id
+      bikes = bikes.where(primary_frame_color_id: @color_id)
+    end
+
+    if @manufacturer_id
+      bikes = bikes.where(manufacturer_id: @manufacturer_id)
     end
 
     if @query.present?

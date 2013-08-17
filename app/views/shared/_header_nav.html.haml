@@ -44,23 +44,19 @@
 
       %span.search-background
       = form_tag bikes_path, method: :get, id: "head-search-bikes" do 
-        .search-fields
-          = text_field_tag :query, params[:query], placeholder: "Find bikes!", :data => { provide: "typeahead", items: "3", source: @search_ahead.to_json }
+        .search-fields#header-search
+          = text_field_tag :query, params[:query], placeholder: "Find bikes!", class: "search-text-field", :data => { provide: "typeahead", items: "3", source: @search_ahead.to_json }
           .optional-fields
-            = collection_select(:color, :color_id, Color.all, :id, :name, prompt: "Color (optional)")
-            = select("bikes", :stoleness, options_for_select([["All Bikes", "all"],["Only stolen", "stolen"], ["Only non-stolen", "non-stolen"]]))
+            .manufacturers
+              = collection_select :manufacturer_ids, params[:manufacturer_ids],
+                @frame_makers, :id, :name,
+                {include_blank: true},
+                { multiple: true, :data => {placeholder: "Choose manufacturers"} }
+              
+              
+            / = collection_select(:manufacturer_id, params[:query], @frame_makers, :id, :name, prompt: "Bike manufacturer", class: "manufacturers-chosen-search" )
+            / = collection_select(:color_id, params[:query], Color.all, :id, :name, prompt: "Color")
+
+
           .search-button
             = submit_tag "Search", name: "search", class: "button-blue"
-            = hidden_field :search_stolen, params[:stolen]
-          .dropdown
-            %a.dropdown-toggle#dLabel{ href: "/", role: "button", :data => { toggle: "dropdown", target:"#"} }
-              %b.caret
-            %ul.dropdown-menu{ role: "menu", :aria =>{ labelledby: "dLabel" } }
-              %li
-                %a#search-stolen{ href: "#" }
-                  Only stolen
-              %li
-                %a#search-nonstolen{ href: "#" }
-                  Only non-stolen
-              %li
-                = link_to "Show the most recent bikes", bikes_path( query: "" )
