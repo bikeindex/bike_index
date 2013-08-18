@@ -1,13 +1,14 @@
 class BikeIndex.Views.Global extends Backbone.View
   events:
-    'click #nav-header-collapse':                'toggleCollapsibleHeader'
-    'click #header-tabs .expand_t a':            'expandHeaderTab'
-    'click .footnote-ref':                       'scrollToFootnote'
-    'click .footnote-back-link':                 'scrollToFootnote'
-    'click .scroll-to-ref':                      'scrollToFootnote'
-    'click .no-tab':                             'openNewWindow'
-    'focus #header-search':                      'expandSearch'
-    'blur #header-search':                       'collapseSearch'
+    'click #nav-header-collapse':           'toggleCollapsibleHeader'
+    'click #header-tabs .expand_t a':       'expandHeaderTab'
+    'click .footnote-ref':                  'scrollToFootnote'
+    'click .footnote-back-link':            'scrollToFootnote'
+    'click .scroll-to-ref':                 'scrollToFootnote'
+    'click .no-tab':                        'openNewWindow'
+    'focus #header-search':                 'expandSearch'
+    'blur #header-search':                  'collapseSearch'
+    'click #header-search .stolenness a':   'toggleStolenness'
     
   initialize: ->
     BikeIndex.hideFlash()
@@ -72,7 +73,7 @@ class BikeIndex.Views.Global extends Backbone.View
       allow_single_deselect: true
       no_results_text: 'No Manufacturers matched'
       width: '100%'
-    $('#header-search .bike_attributes select').chosen
+    $('#header-search .bike-attributes select').chosen
       allow_single_deselect: true
       no_results_text: 'No Colors matched'
       width: '100%'
@@ -141,6 +142,11 @@ class BikeIndex.Views.Global extends Backbone.View
       $("<style>#content-menu.affix{top:#{b_offset}px};</style>").appendTo('head')
       $('#content-menu').attr('data-spy', 'affix').attr('data-offset-top', (b_offset))
 
+
+  toggleStolenness: (event) ->
+    event.preventDefault()
+    target = $(event.target)
+    target.toggleClass('activated')
 
   expandSearch: ->
     $('#total-top-header').addClass('search-expanded')

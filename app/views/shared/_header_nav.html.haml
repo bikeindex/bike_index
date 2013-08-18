@@ -52,11 +52,18 @@
                 @frame_makers, :id, :name,
                 {include_blank: true},
                 { multiple: true, :data => {placeholder: "Choose manufacturers"} }
-            .bike_attributes
+            .bike-attributes
               = collection_select :bike_attribute_ids, params[:bike_attribute_ids],
                 @attributes, :id, :name,
                 {include_blank: true},
                 { multiple: true, :data => {placeholder: "Choose color"} }
+            .stolenness 
+              %span
+                include
+              %a.activated{ href: "#"}
+                stolen
+              %a.activated{ href: "#"}
+                non-stolen
               
               
             / = collection_select(:manufacturer_id, params[:query], @frame_makers, :id, :name, prompt: "Bike manufacturer", class: "manufacturers-chosen-search" )
