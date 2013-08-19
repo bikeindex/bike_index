@@ -50,9 +50,11 @@ class Bike < ActiveRecord::Base
     :bike_image,
     :components_attributes,
     :bike_token_id,
-    :b_param_id
+    :b_param_id,
+    :cached_attributes
 
   belongs_to :manufacturer
+  serialize :params
   belongs_to :primary_frame_color, class_name: "Color"
   belongs_to :secondary_frame_color, class_name: "Color"
   belongs_to :tertiary_frame_color, class_name: "Color"
@@ -118,6 +120,11 @@ class Bike < ActiveRecord::Base
     end
   end
 
+  pg_search_scope :find_attributes, against: [:cached_attributes]
+  def self.attributes_search(query)
+    find_attributes(query)
+  end
+
   def current_ownership
     ownerships.last
   end
@@ -169,9 +176,18 @@ class Bike < ActiveRecord::Base
     string
   end
 
+  def cache_attributes
+    c = "frame_color#{primary_frame_color_id}"
+    c += " frame_color#{secondary_frame_color_id}" if secondary_frame_color_id
+    c += " frame_color#{tertiary_frame_color_id}" if tertiary_frame_color_id
+
+    self.cached_attributes = c
+  end
+
   before_save :cache_bike
   def cache_bike
     cache_photo
+    cache_attributes
     c = ""
     c += "#{propulsion_type.name} " unless propulsion_type.name == "Foot pedal"
     c += "#{frame_manufacture_year} " if frame_manufacture_year

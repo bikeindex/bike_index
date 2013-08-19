@@ -1,15 +1,10 @@
 #bikes-search
 
 - if @bikes.present?
-  
-  - if @search_type[:most_recent]
-    %h2
-      The most recent #{@search_type[:phrase]} added to the Index
 
-  -else
-    %h2
-      = pluralize(@bikes.count, @search_type[:phrase])
-      matched your search
+  %h2
+    = pluralize(@bikes.count, "bike")
+    matched found
 
   %ul.bike-boxes
     = render partial: "/bikes/bike", collection: @bikes, :locals => {target: "show" }
@@ -22,4 +17,4 @@
     %h3
       Oh no!
     %h4
-      We're sorry, no #{@search_type[:phrase]} matched your search!
+      We're sorry, no bikes matched your search!

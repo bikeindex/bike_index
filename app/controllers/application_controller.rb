@@ -5,7 +5,6 @@ class ApplicationController < ActionController::Base
 
 
   def load_search_typeahead
-    @search_ahead = Manufacturer.all.map(&:name)
     @frame_makers = Manufacturer.frames
     @attributes = Color.order(:name)
     # TODO: if we cache this, every request thinks it's cached.

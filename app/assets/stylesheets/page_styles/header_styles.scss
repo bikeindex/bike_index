@@ -90,6 +90,7 @@
     border-left: none;
   }
 }
+
 .top-header.search-expanded {
   padding-bottom: 4em;
   .search-background, .background-extend { height: 8em; }
@@ -118,18 +119,14 @@
 @media (max-width: 600px) {
   .optional-fields {
     width: 100%;
-    .manufacturers, .bike-attributes {
-      width: 66%;
-    }
+    .manufacturers, .bike-attributes { width: 66%; }
     .stolenness { width: 32%; }
   }
 }
 
 @media (min-width: 601px) and (max-width: 1000px) {
   .optional-fields {
-    .manufacturers, .bike-attributes {
-      width: 73.3%;
-    }
+    .manufacturers, .bike-attributes { width: 73.3%; }
   }
 }
 

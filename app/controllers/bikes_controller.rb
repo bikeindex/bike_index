@@ -20,9 +20,8 @@ class BikesController < ApplicationController
 
   def index
     @title = "Bikes"
-    @search_type = SearchBikes.new(params).search_type
-    bikes = SearchBikes.new(params).bikes
-    bikes = bikes.page(params[:page]).per_page(24)
+    search = BikeSearcher.new(params)
+    bikes = search.find_bikes.page(params[:page]).per_page(24)
     @bikes = bikes.decorate
     render :layout => 'application'
   end
