@@ -25,6 +25,18 @@ window.BikeIndex =
     
     $('#total-top-header .global-tabs').append(tab)
     $('#total-top-header .tab-content').append(links)
+
+  initializeHeaderSearch: ->
+    $('#header-search .manufacturers select').chosen
+      allow_single_deselect: true
+      no_results_text: 'No Manufacturers matched'
+      width: '100%'
+    $('#header-search .bike-attributes select').chosen
+      allow_single_deselect: true
+      no_results_text: 'No Colors matched'
+      width: '100%'
+    $('#header-search .chosen-container input[type="text"]').css("width","100%")
+    $('#header-search .stolenness input').prop('checked', true)
     
 
 $(document).ready ->

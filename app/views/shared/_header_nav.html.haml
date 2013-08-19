@@ -1,4 +1,4 @@
-.top-header.search-expanded#total-top-header{:data => {domain: Rails.env}}
+.top-header#total-top-header{:data => {domain: Rails.env}}
   %span.background-extend
   .receptacle
     .inner-recep
@@ -65,13 +65,5 @@
               %label{ for: "non_stolen_included" }
                 = check_box_tag :non_stolen_included, params[:non_stolen_included]
                 non-stolen
-              
-              
-              
-              
-            / = collection_select(:manufacturer_id, params[:query], @frame_makers, :id, :name, prompt: "Bike manufacturer", class: "manufacturers-chosen-search" )
-            / = collection_select(:color_id, params[:query], Color.all, :id, :name, prompt: "Color")
-
-
           .search-button
             = submit_tag "Search", name: "search", class: "button-blue"

@@ -7,12 +7,11 @@ class BikeIndex.Views.Global extends Backbone.View
     'click .scroll-to-ref':                 'scrollToFootnote'
     'click .no-tab':                        'openNewWindow'
     'focus #header-search':                 'expandSearch'
-    'blur #header-search':                  'collapseSearch'
+    # 'blur #header-search':                  'collapseSearch'
     
   initialize: ->
     BikeIndex.hideFlash()
     @setElement($('#body'))
-    @initializeHeaderSearch()
     @loadChosen() if $('#chosen-container').length > 0
     @loadUserHeader()
 
@@ -131,28 +130,17 @@ class BikeIndex.Views.Global extends Backbone.View
       $("<style>#content-menu.affix{top:#{b_offset}px};</style>").appendTo('head')
       $('#content-menu').attr('data-spy', 'affix').attr('data-offset-top', (b_offset))
 
-
-  initializeHeaderSearch: ->
-    $('#header-search .manufacturers select').chosen
-      allow_single_deselect: true
-      no_results_text: 'No Manufacturers matched'
-      width: '100%'
-    $('#header-search .bike-attributes select').chosen
-      allow_single_deselect: true
-      no_results_text: 'No Colors matched'
-      width: '100%'
-    $('#header-search .stolenness input').prop('checked', true)
-
   expandSearch: ->
-    unless ('#bikes-search').length > 0
+    unless $('#total-top-header').hasClass('search-expanded')
+      BikeIndex.initializeHeaderSearch()
+      $('#header-search .optional-fields').hide()
       $('#total-top-header').addClass('search-expanded')
-      $('#header-search .optional-fields').fadeIn('slow')
+      $('#header-search .optional-fields').fadeIn()
 
-  collapseSearch: ->
-    c = true
-    c = false unless $('#header-search select').first().val() == 0
-    c = false unless $('#header-search select').last().val() == 0
-    if c == true
-      $('#total-top-header').removeClass('search-expanded')
-      $('#header-search .optional-fields').fadeOut('slow')
-
+  # collapseSearch: ->
+    # having issues with the collapse
+    # unless $('#bikes-search').length > 0
+    #   if $('#header-search #query').val() == ""
+    #     unless $('#header-search select').first().val()?
+    #       unless $('#header-search select').last().val()?
+    #         $('#total-top-header').removeClass('search-expanded')
