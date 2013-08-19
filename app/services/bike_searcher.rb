@@ -12,35 +12,38 @@ class BikeSearcher
     @bikes
   end
 
-  def parsed_attributes
-    input = @params[:bike_attribute_ids].to_s
-    input = input.gsub(/[^0-9\,]+/,'')
-    attribute_ids = input.split(',').reject(&:empty?)
-    attributes = ""
-    attribute_ids.each do |attribute|
-      attributes += "frame_color#{attribute.to_i} "
+  def parsed_attribute_ids
+    if @params[:find_bike_attributes]
+      attr_ids = @params[:find_bike_attributes][:ids].reject(&:empty?)
+      if attr_ids.any?
+        attr_ids.collect! {|m| m.to_i}
+        return attr_ids 
+      end
+      nil
     end
-    attributes
   end
 
   def parsed_manufacturer_ids
-    input = @params[:manufacturer_ids].to_s
-    input = input.gsub(/[^0-9\,]+/,'')
-    mnfg_ids = input.split(',').reject(&:empty?)
-    mnfg_ids.collect! {|m| m.to_i}
-    mnfg_ids
+    if @params[:find_manufacturers]
+      mnfg_ids = @params[:find_manufacturers][:ids].reject(&:empty?)
+      if mnfg_ids.any?
+        mnfg_ids.collect! {|m| m.to_i}
+        return mnfg_ids 
+      end
+      nil
+    end
   end
 
   def matching_manufacturers(bikes)
-    if @params[:manufacturer_ids]
+    if parsed_manufacturer_ids
       @bikes = bikes.where(manufacturer_id: parsed_manufacturer_ids)
     end
     @bikes
   end
 
   def matching_attributes(bikes)
-    if @params[:bike_attribute_ids]
-      @bikes = bikes.attributes_search(parsed_attributes)
+    if parsed_attribute_ids
+      @bikes = bikes.where(primary_frame_color_id: parsed_attribute_ids)
     end
     @bikes
   end
@@ -53,10 +56,15 @@ class BikeSearcher
   end
 
   def find_bikes
+    # puts "\n\n\n\n\n\nBIKE COUNT: #{@bikes.count} \n\n\n"
     matching_stolenness(@bikes)
+    # puts "\n\n\n\n\n\nBIKE COUNT: #{@bikes.count} \n\n\n"
     matching_manufacturers(@bikes)
+    # puts "\n\n\n\n\n\nBIKE COUNT: #{@bikes.count} \n\n\n"
     matching_attributes(@bikes)
+    # puts "\n\n\n\n\n\nBIKE COUNT: #{@bikes.count} \n\n\n"
     matching_query(@bikes)
+    # puts "\n\n\n\n\n\nBIKE COUNT: #{@bikes.count} \n\n\n"
     @bikes
   end
 

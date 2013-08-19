@@ -1,13 +1,14 @@
 #bikes-search
+  %span#manufacturer_select_values
+    = @manufacturer_select_values
+  %span#attribute_select_values
+    = @attribute_select_values
 
 - if @bikes.present?
 
-  %h2
-    = pluralize(@bikes.count, "bike")
-    matched found
-
   %ul.bike-boxes
     = render partial: "/bikes/bike", collection: @bikes, :locals => {target: "show" }
+
 
   .paginate-container
     / = will_paginate @bikes 

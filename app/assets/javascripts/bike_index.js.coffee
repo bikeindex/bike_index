@@ -35,7 +35,6 @@ window.BikeIndex =
       allow_single_deselect: true
       no_results_text: 'No Colors matched'
       width: '100%'
-    $('#header-search .chosen-container input[type="text"]').css("width","100%")
     $('#header-search .stolenness input').prop('checked', true)
     
 

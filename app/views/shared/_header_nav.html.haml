@@ -48,12 +48,12 @@
           = text_field_tag :query, params[:query], placeholder: "Find bikes!", class: "search-text-field"
           .optional-fields
             .manufacturers
-              = collection_select :manufacturer_ids, params[:manufacturer_ids],
+              = collection_select :find_manufacturers, :ids,
                 @frame_makers, :id, :name,
                 {include_blank: true},
                 { multiple: true, :data => {placeholder: "Choose manufacturers"} }
             .bike-attributes
-              = collection_select :bike_attribute_ids, params[:bike_attribute_ids],
+              = collection_select :find_bike_attributes, :ids,
                 @attributes, :id, :name,
                 {include_blank: true},
                 { multiple: true, :data => {placeholder: "Choose color"} }

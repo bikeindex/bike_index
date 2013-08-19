@@ -109,20 +109,6 @@ describe Bike do
     end
   end
 
-  describe :attributes_search do
-    # @bike = FactoryGirl.create(:bike, serial_number: "4444444sssss")
-    # @bikes = Bike.text_search("4444444sssss")
-    # @bikes.should include(@bike)
-    it "should find bikes where the colors match" do
-      bike1 = FactoryGirl.create(:bike)
-      bike2 = FactoryGirl.create(:bike)
-      color_id = bike1.primary_frame_color_id
-      bike3 = FactoryGirl.create(:bike, secondary_frame_color_id: color_id)
-      Bike.find_attributes("frame_color#{color_id}").should eq([bike3,bike1])
-      # Bike.find_attributes("frame_color#{color_id} frame_color#{bike2.primary_frame_color_id}").should eq([bike3,bike2,bike1])
-    end
-  end
-
   describe :video_embed_src do 
     it "should return false if there is no video_embed" do 
       @bike = Bike.new 
@@ -190,16 +176,6 @@ describe Bike do
     end
   end
 
-  describe :cache_attributes do 
-    it "should cache the photo" do 
-      bike = Bike.new
-      bike.stub(:primary_frame_color_id).and_return(3)
-      bike.stub(:secondary_frame_color_id).and_return(6)
-      bike.cache_attributes
-      bike.cached_attributes.should eq("frame_color3 frame_color6")
-    end
-  end
-
   describe :components_cache_string do 
     it "should cache the components" do 
       bike = FactoryGirl.create(:bike)
@@ -212,7 +188,6 @@ describe Bike do
     it "should call cache photo and cache component" do 
       bike = FactoryGirl.create(:bike)
       bike.should_receive(:cache_photo)
-      bike.should_receive(:cache_attributes)
       bike.should_receive(:components_cache_string)
       bike.cache_bike
     end

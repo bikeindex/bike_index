@@ -40,14 +40,14 @@ describe BikeSearcher do
       @bike2 = FactoryGirl.create(:bike)
     end
     it "should select bikes matching the manufacturer" do 
-      search = BikeSearcher.new({manufacturer_ids: "present"})
+      search = BikeSearcher.new()
       search.stub(:parsed_manufacturer_ids).and_return(@bike1.manufacturer_id)
       result = search.matching_manufacturers(Bike.scoped)
       result.should eq([@bike1])
     end
     it "should select bikes matching multiple manufacturers" do
       FactoryGirl.create(:bike)
-      search = BikeSearcher.new({manufacturer_ids: "present"})
+      search = BikeSearcher.new()
       mnfgs = [@bike1.manufacturer_id, @bike2.manufacturer_id]
       search.stub(:parsed_manufacturer_ids).and_return(mnfgs)
       result = search.matching_manufacturers(Bike.scoped)
@@ -59,42 +59,42 @@ describe BikeSearcher do
     end
   end
 
-  describe :parsed_attributes do 
-    it "should grab the numbers that it needs to grab" do 
-      # This is the same as parsed_manufacturer_ids for now, but will in the future change
-      search = BikeSearcher.new({bike_attribute_ids: {"{\"\\\"\\\", \\\"8\\\", \\\"16\\\"\"=>"=>{"\"\", \"4\""=>{"}"=>[""]}}}})
-      result = search.parsed_attributes
-      result.should eq("frame_color8 frame_color16 frame_color4 ")
-    end
-  end
-
   describe :parsed_manufacturer_ids do 
     it "should grab the numbers that it needs to grab" do 
-      search = BikeSearcher.new({manufacturer_ids: {"{\"\\\"\\\", \\\"9\\\", \\\"16\\\"\"=>"=>{"\"\", \"3\""=>{"}"=>[""]}}}})
+      search = BikeSearcher.new({:find_manufacturers => { :ids => ["", "9", "16", "3"] } })
       result = search.parsed_manufacturer_ids
       result.should eq([9,16,3])      
     end
   end
 
-  describe :matching_attributes do 
-     before :each do 
-       @bike1 = FactoryGirl.create(:bike)
-       @bike2 = FactoryGirl.create(:bike)
-       @bike3 = FactoryGirl.create(:bike, primary_frame_color_id: @bike1.primary_frame_color_id, secondary_frame_color_id: @bike2.primary_frame_color_id)
-     end
-     it "should select bikes matching the attribute" do 
-       search = BikeSearcher.new({bike_attribute_ids: "present"})
-       search.stub(:parsed_attributes).and_return("frame_color#{@bike1.primary_frame_color_id}")
-       result = search.matching_attributes(Bike.scoped)
-       result.first.should eq(@bike3)
-       result.last.should eq(@bike1)
-       result.count.should eq(2)
-     end
-     it "should return all bikes" do 
-       search = BikeSearcher.new.matching_attributes(Bike.scoped)
-       search.should eq(Bike.scoped)
-     end
-   end
+  # describe :parsed_attributes do 
+  #   it "should grab the numbers that it needs to grab" do 
+  #     # This is the same as parsed_manufacturer_ids for now, but will in the future change
+  #     search = BikeSearcher.new({bike_attribute_ids: {"{\"\\\"\\\", \\\"8\\\", \\\"16\\\"\"=>"=>{"\"\", \"4\""=>{"}"=>[""]}}}})
+  #     result = search.parsed_attributes
+  #     result.should eq("frame_color8 frame_color16 frame_color4 ")
+  #   end
+  # end
+
+  # describe :matching_attributes do 
+  #    before :each do 
+  #      @bike1 = FactoryGirl.create(:bike)
+  #      @bike2 = FactoryGirl.create(:bike)
+  #      @bike3 = FactoryGirl.create(:bike, primary_frame_color_id: @bike1.primary_frame_color_id, secondary_frame_color_id: @bike2.primary_frame_color_id)
+  #    end
+  #    it "should select bikes matching the attribute" do 
+  #      search = BikeSearcher.new({bike_attribute_ids: "present"})
+  #      search.stub(:parsed_attributes).and_return("frame_color#{@bike1.primary_frame_color_id}")
+  #      result = search.matching_attributes(Bike.scoped)
+  #      result.first.should eq(@bike3)
+  #      result.last.should eq(@bike1)
+  #      result.count.should eq(2)
+  #    end
+  #    it "should return all bikes" do 
+  #      search = BikeSearcher.new.matching_attributes(Bike.scoped)
+  #      search.should eq(Bike.scoped)
+  #    end
+  #  end
 
   describe :matching_query do 
      it "should select bikes matching the attribute" do 
