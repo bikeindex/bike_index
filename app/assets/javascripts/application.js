@@ -23,8 +23,8 @@
 //= require external_scripts/bootstrap-scrollspy.js
 //= require external_scripts/bootstrap-affix.js
 //= require external_scripts/jquery.sortable.js
-//= require external_scripts/jquery.chosen.js
 //= require external_scripts/jquery.ui.widget.js
+//= require chosen-jquery
 //= require external_scripts/jquery.iframe-transport.js
 //= require external_scripts/jquery.fileupload.js
 //= require dataTables/jquery.dataTables

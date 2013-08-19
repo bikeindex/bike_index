@@ -1,16 +1,17 @@
 class BikeIndex.Views.Global extends Backbone.View
   events:
-    'click #nav-header-collapse': 'toggleCollapsibleHeader'
-    'click #header-tabs .expand_t a': 'expandHeaderTab'
-    'click .footnote-ref': 'scrollToFootnote'
-    'click .footnote-back-link': 'scrollToFootnote'
-    'click .scroll-to-ref': 'scrollToFootnote'
-    'click .no-tab': 'openNewWindow'
+    'click #nav-header-collapse':           'toggleCollapsibleHeader'
+    'click #header-tabs .expand_t a':       'expandHeaderTab'
+    'click .footnote-ref':                  'scrollToFootnote'
+    'click .footnote-back-link':            'scrollToFootnote'
+    'click .scroll-to-ref':                 'scrollToFootnote'
+    'click .no-tab':                        'openNewWindow'
+    'focus #header-search':                 'expandSearch'
+    # 'blur #header-search':                  'collapseSearch'
     
   initialize: ->
     BikeIndex.hideFlash()
     @setElement($('#body'))
-    @initializeHeaderSearch()
     @loadChosen() if $('#chosen-container').length > 0
     @loadUserHeader()
 
@@ -64,18 +65,6 @@ class BikeIndex.Views.Global extends Backbone.View
       error: (data, textStatus, jqXHR) ->
         BikeIndex.alertMessage("error", "User load error", "We're sorry, we failed to load your user information. Try reloading maybe?")
       })
-
-  initializeHeaderSearch: ->
-    # Turn off autocomplete because it breaks things
-    $("#head-search-bikes #query").attr("autocomplete","off");
-    $('#search-nonstolen').click (e) ->
-      e.preventDefault
-      $('#search_stolen_').val('false')
-      $('#head-search-bikes').submit()
-    $('#search-stolen').click (e) ->
-      e.preventDefault
-      $('#search_stolen_').val('true')
-      $('#head-search-bikes').submit()
 
   openNewWindow: (e) ->
     e.preventDefault()
@@ -135,20 +124,24 @@ class BikeIndex.Views.Global extends Backbone.View
       menu = $('#content-menu')
       tp = menu.css('padding-top')
       bp = menu.css('padding-bottom')
-      menu_height = menu.height() # + parseInt(tp, 10)
+      menu_height = menu.height()
       b_offset = footer_offset - ( menu_height + 120 ) 
       
       $("<style>#content-menu.affix{top:#{b_offset}px};</style>").appendTo('head')
-      # console.log($('#content-menu.affix').css('top'))
-      # scroll_height = $(window).height() * .4
-      # $('#body').attr('data-spy', "scroll").attr('data-target', '#edit-menu')
-      # $('#body').scrollspy(offset: - scroll_height)
-      # $('#clearing_span').css('height', $('#edit-menu').height() + 25)
-      # $('#content-menu').affix(offset: {
-      #   y: 100
-      #   })
       $('#content-menu').attr('data-spy', 'affix').attr('data-offset-top', (b_offset))
 
-      # $('#content-menu').attr('data-spy', 'affix').attr('data-offset-bottom', (700))
+  expandSearch: ->
+    unless $('#total-top-header').hasClass('search-expanded')
+      BikeIndex.initializeHeaderSearch()
+      $('#header-search .chosen-container input[type="text"]').css("width","100%")
+      $('#header-search .optional-fields').hide()
+      $('#total-top-header').addClass('search-expanded')
+      $('#header-search .optional-fields').fadeIn()
 
-      # $('#content-menu').attr('data-spy', 'affix').attr('data-offset-top', (footer_height))
+  # collapseSearch: ->
+    # having issues with the collapse
+    # unless $('#bikes-search').length > 0
+    #   if $('#header-search #query').val() == ""
+    #     unless $('#header-search select').first().val()?
+    #       unless $('#header-search select').last().val()?
+    #         $('#total-top-header').removeClass('search-expanded')

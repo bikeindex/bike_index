@@ -50,9 +50,11 @@ class Bike < ActiveRecord::Base
     :bike_image,
     :components_attributes,
     :bike_token_id,
-    :b_param_id
+    :b_param_id,
+    :cached_attributes
 
   belongs_to :manufacturer
+  serialize :params
   belongs_to :primary_frame_color, class_name: "Color"
   belongs_to :secondary_frame_color, class_name: "Color"
   belongs_to :tertiary_frame_color, class_name: "Color"

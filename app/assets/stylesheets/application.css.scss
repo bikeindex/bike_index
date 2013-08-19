@@ -1,3 +1,5 @@
+//= require chosen
+
 // Import Base styles
 @import "application_styles/_colors.scss";
 @import "application_styles/_vars.scss";
@@ -18,7 +20,6 @@
 @import "application_styles/notifications.scss";
 
 // Import includes
-@import "includes/chosen.scss";
 @import "includes/datepicker.scss";
 @import "application_styles/sharing_styles.scss";
 @import "includes/datatables_bootstrap.scss";
