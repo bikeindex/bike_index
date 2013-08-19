@@ -57,13 +57,16 @@
                 @attributes, :id, :name,
                 {include_blank: true},
                 { multiple: true, :data => {placeholder: "Choose color"} }
-            .stolenness 
-              %span
-                include
-              %a.activated{ href: "#"}
+            .stolenness
+              %label{ for: "stolen_included" }
+                = check_box_tag :stolen_included, params[:stolen_included]
                 stolen
-              %a.activated{ href: "#"}
+              
+              %label{ for: "non_stolen_included" }
+                = check_box_tag :non_stolen_included, params[:non_stolen_included]
                 non-stolen
+              
+              
               
               
             / = collection_select(:manufacturer_id, params[:query], @frame_makers, :id, :name, prompt: "Bike manufacturer", class: "manufacturers-chosen-search" )

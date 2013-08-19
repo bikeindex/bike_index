@@ -28,7 +28,6 @@
 .top-header {
   width: 100%;
   position: relative;
-  // margin-top: $singlePad;
   .receptacle { overflow: visible; }
   form {
     position: relative;
@@ -46,6 +45,10 @@
     border-right: none;
     z-index: 0;
   }
+  .search-fields, .background-extend, .search-background { 
+    bottom: 0;
+    margin-top: 0;
+  }
   .search-fields {
     @include clearfix;
     position: absolute;
@@ -55,26 +58,23 @@
     padding: 1em 0;
     z-index: 100;
     .search-text-field {
-      // @include border-radius(0);
       float: right;
       width: $sevenColumn - $gutterW;
       margin: 0;
       margin-right: $gutterW + $oneColumn;
-      // width: 14.5%; 12.45
-      // width: 85.86%;
     }
     .search-button {
       width: $oneColumn;
       position: absolute;
       right: 0; top: 0;
       margin-top: 1em;
-      // padding-right: 15px;
     }
     .button-blue {
       font-size: $standardFontSize;
       width: 100%;
       padding: .25em 0;
       height: 32px;
+      margin-top: 1px;
     }
   }
   .background-extend {
@@ -90,83 +90,77 @@
     border-left: none;
   }
 }
+.top-header.search-expanded {
+  padding-bottom: 4em;
+  .search-background, .background-extend { height: 8em; }
+  .search-background { bottom: -4em; }
+  .optional-fields { display: block; }
+}
 
 .optional-fields {
   display: none;
   position: absolute;
   right: 0; top: 3.4em;
   width: $eightColumn - $gutterW;
-  .manufacturers, .bike-attributes {
-    float: left;
-    select { width: 100%; }
+  .manufacturers select, .bike-attributes select {
+    width: 100%;
   }
+  .bike-attributes { margin-top: 10px; }
   .stolenness {
-    // position: absolute;
-    // right: 0; top: 0;
-    font-size: 14px;
-    span { 
-      display:block;
-      width: 100%;
-      text-align: center;
-    }
-    a { 
-      @include border-radius(4px);
-      display: block;
-      padding: 2px 5px;
-      text-align: center;
-      &:hover {
-        text-decoration: none;
-      }
-    }
+    position: absolute;
+    right: 0; top: 0;
+    width: 23.4%;
+    input { margin: 2px 5px 0 0; }
+    label { margin: 0; }
   }
-  .activated, .stolenness a:active {
-    @include box-shadow(inset 0 0 3px rgba(black,.2));
-    background: rgba(gray, .2);
-    border: 1px solid rgba(white,.4);
-    // color: white;
-    text-decoration: none;
-  }
-
-  .bike-attributes { margin-left: 2%; }
 }
 
-@media (min-width: 900px) {
+@media (max-width: 600px) {
+  .optional-fields {
+    width: 100%;
+    .manufacturers, .bike-attributes {
+      width: 66%;
+    }
+    .stolenness { width: 32%; }
+  }
+}
+
+@media (min-width: 601px) and (max-width: 1000px) {
   .optional-fields {
     .manufacturers, .bike-attributes {
-      width: 35.7%;
-    }
-    .stolenness {
-      width: 23.5%;
-      float: right;
-      a {
-        width: 48%;
-        float: left;
-      }
-      a:last-of-type { margin-left: 4%; }
+      width: 73.3%;
     }
   }
 }
-// .top-header {
-//   .search-background, .background-extend {
-//     @include transition(all 1s ease-out);
-//   }
-// }
 
-.top-header.search-expanded {
-  padding-bottom: 2em;
-  .search-background, .background-extend {
-    height: 6em;
+@media (min-width: 1001px) {
+  .top-header.search-expanded { padding-bottom: 2em;
+    .search-background, .background-extend { height: 6em; }
+    .search-background { bottom: -2em; }
   }
-  .search-background { bottom: -2em; }
-  .optional-fields { display: block; }
+  .optional-fields {
+    .manufacturers, .bike-attributes {
+      width: 34.7%;
+      float: left;
+    }
+    .bike-attributes { margin: 0 0 0 4%; }
+    .stolenness {
+      input { margin-right: 2px; }
+      label {
+        display: inline-block;
+        margin: .3em 0 0 0;
+        &:last-of-type { margin-left: 10px; }
+      }
+    }
+  }
 }
+
 
 @media (max-width: 20000px) {
   .top-header {
     .search-fields {
       .search-button {
         width: $twoColumn;
-        // padding-right: 25px;
       }
       .search-text-field {
         width: $sixColumn - $gutterW;
@@ -177,18 +171,8 @@
   }
 }
 
-// @media (min-width: 768px) {
-  .top-header {
-    .search-fields, .background-extend, .search-background { 
-      bottom: 0;
-      margin-top: 0;
-    }
-  }
-// }
-
 @media (max-width: 600px) {
   .top-header {
-    // overflow: hidden;
     .search-background {
       width: 100%;
       right: 10%;
@@ -213,12 +197,9 @@
     position: absolute;
     left: 0;
     z-index: 101;
-    // padding: 0 31% 5px 0;
     margin: 0;
     font-size: 1em;
-    // height: 3.8em;
     border: none;
-    // width: 100%; height: auto;
     overflow: visible;
     &:hover {
       border: none;
@@ -236,17 +217,13 @@
   }
 }
 
-@media (min-width: 601px) {
+
+@media (min-width: 601px) and (max-width: 900px) {
   .top-header {
     .logo {
       width: $threeColumn;
       top: 0; 
     }
-  }
-}
-
-@media (min-width: 600px) and (max-width: 900px) {
-  .top-header {
     .logo img { 
       width: 67%;
       margin: 0 auto;
@@ -256,7 +233,10 @@
 
 @media (min-width: 900px) {
   .top-header {
-    .logo { width: $twoColumn; }
+    .logo {
+      width: $twoColumn;
+      top: 0; 
+    }
   }
 }
 
@@ -296,7 +276,6 @@
   list-style-type: none;
   margin: 0;
   z-index: 10;
-  // padding-right: 30px;
   li {
     @include text-overflow();
     float: right;
@@ -308,10 +287,8 @@
     }
     a {
       @include text-overflow();
-      // @extend .short-transition;
       display: block;
       width: 100%;
-      // height: 4em;
       padding: .5em 0;
       text-align: center;
     }
@@ -377,44 +354,6 @@
 }
 
 
-@media (max-width: 900px) {
-  // .top-header {
-  //   .global-tabs {
-  //     .account {
-  //       width: 30%;
-  //       padding-right: 7.28%;
-  //     }
-  //     .settings { width: 30px; }
-  //   }
-  // } 
-}
-
-@media (max-width: 700px) {
-  .top-header {
-    .global-tabs {
-      // width: 100%;
-      // clear: both;
-      // margin-right: $gutterW;
-
-      .account {
-        // width: 150px;
-        // padding-right: 30px;
-        // padding-right: $gutterW;
-      }
-      // .logo-nav {
-      //   width: $twoColumn + $gutterW;
-      //   padding-right: $gutterW;
-      //   margin-left: 0;
-      //   a {
-      //     padding-right: 12%;
-      //   }
-      // }
-
-    }
-  } 
-}
-
-
 @media (max-width: 600px) {
   #header-tabs {
     padding-bottom: 2em;
@@ -428,32 +367,10 @@
       li { 
         width: $fourColumn;
       }
-      // li:nth-of-type(2n) {
-      //   margin-left: $fourColumn + $gutterW;
-      // }
-      // li:nth-of-type(3n+1) {
-      //   margin-right: 0;
-      // }
     }
   }
 }
 
-// @media (max-width: 920px) {
-//   .global-tabs li:first-of-type {
-//     width: 35.25%;
-//   }
-// }
-
-
-//  TODO Somehow make this not take up the whole screen when the screen is larger
-// @media (min-width: 650px) {
-//   .top-header #header-tabs .tab-content {
-//     width: $eightColumn;
-//     border-top: 1px solid $searchBorder;
-//     float: right;
-//     margin-top: -1px;
-//   }
-// }
 
 .top-header {
   .tab-pane.active { padding: 5px 0; }

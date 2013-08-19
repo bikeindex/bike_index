@@ -42,6 +42,9 @@ $(document).ready ->
   else if $('#choose-registration-type').length > 0
     view = new BikeIndex.Views.BikesChooseRegistration
 
+  else if $('#bikes-search').length > 0
+    view = new BikeIndex.Views.BikesSearch
+
   else if $('#bike-show').length > 0
     view = new BikeIndex.Views.BikesShow
 
