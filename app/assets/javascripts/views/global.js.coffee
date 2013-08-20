@@ -16,6 +16,7 @@ class BikeIndex.Views.Global extends Backbone.View
     @loadUserHeader()
 
   loadUserHeader: ->
+    $('#header-tabs').prepend("<div id='tab-cover'></div>")
     $.ajax({
       type: "GET"
       url: '/api/v1/users/current'
@@ -60,8 +61,11 @@ class BikeIndex.Views.Global extends Backbone.View
               
               $('#total-top-header .global-tabs').append(tab)
               $('#total-top-header .tab-content').append(links)
+          $('#tab-cover').fadeOut()
+
         else
-            $('#total-top-header .no_user').removeClass('hidden')
+          $('#total-top-header .no_user').removeClass('hidden')
+          $('#tab-cover').fadeOut()
       error: (data, textStatus, jqXHR) ->
         BikeIndex.alertMessage("error", "User load error", "We're sorry, we failed to load your user information. Try reloading maybe?")
       })

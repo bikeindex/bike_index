@@ -256,6 +256,16 @@
   padding-bottom: 1em;
 }
 
+#tab-cover {
+  position: absolute;
+  top: 0; left: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: $bodyBackground;
+  z-index: 20;
+}
+
 .global-tabs {
   @include clearfix;
   @extend .nav;
