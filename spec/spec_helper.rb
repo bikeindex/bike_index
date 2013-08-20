@@ -1,14 +1,14 @@
 # Uncomment get the coverage. Leave commented most of the time,
 # it slows down the test suite
 
-# require 'simplecov'
-# SimpleCov.start 'rails' do
-#   add_group "Services", "app/services"
-#   add_group "Serializers", "app/serializers"
-#   add_group "Decorators", "app/decorators"
-#   add_group "Uploaders", "app/uploaders"
-#   minimum_coverage 80
-# end
+require 'simplecov'
+SimpleCov.start 'rails' do
+  add_group "Services", "app/services"
+  add_group "Serializers", "app/serializers"
+  add_group "Decorators", "app/decorators"
+  add_group "Uploaders", "app/uploaders"
+  minimum_coverage 80
+end
 
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 ENV["RAILS_ENV"] ||= 'test'
