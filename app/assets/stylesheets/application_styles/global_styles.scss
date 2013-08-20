@@ -70,10 +70,25 @@ input[type="color"],
   height: auto;
   font-size: 1em;
   margin-top: -.25em;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  line-height: 1.3em;
+  font-family: $headerFont;
 }
 
+.chosen-choices {
+  @include border-radius(2px);
+  font-size: 16px;
+  min-height: 29px;
+}
+.chosen-container-multi { font-size: 16px; }
 
+.chosen-container .chosen-results li.group-result { font-size: 1.2em; }
+
+.chosen-container-multi .chosen-choices li.search-field input[type="text"] {
+  height: auto;
+}
+.chosen-container-multi, .chosen-container-multi input, .chosen-choices {
+  font-family: $headerFont;
+}
 
 
 #grid-overlay {

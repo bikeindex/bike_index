@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130809155956) do
+ActiveRecord::Schema.define(:version => 20130820150839) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -91,6 +91,7 @@ ActiveRecord::Schema.define(:version => 20130809155956) do
     t.integer  "front_gear_type_other"
     t.boolean  "verified"
     t.boolean  "paid_for"
+    t.text     "cached_attributes"
   end
 
   add_index "bikes", ["creation_organization_id"], :name => "index_bikes_on_organization_id"
@@ -120,6 +121,7 @@ ActiveRecord::Schema.define(:version => 20130809155956) do
     t.string   "name"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+    t.integer  "priority"
   end
 
   create_table "components", :force => true do |t|
@@ -411,6 +413,7 @@ ActiveRecord::Schema.define(:version => 20130809155956) do
     t.integer  "iso_bsd"
     t.datetime "created_at",     :null => false
     t.datetime "updated_at",     :null => false
+    t.integer  "priority"
   end
 
 end

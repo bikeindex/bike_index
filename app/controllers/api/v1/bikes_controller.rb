@@ -3,7 +3,7 @@ module Api
     class BikesController < ApiV1Controller
 
       def index
-        respond_with SearchBikes.new(params).bikes
+        respond_with BikeSearcher.new(params).find_bikes
       end
 
       def show

@@ -44,20 +44,7 @@
 
       %span.search-background
       = form_tag bikes_path, method: :get, id: "head-search-bikes" do 
-        .search-fields
-          = text_field_tag :query, params[:query], placeholder: "Find bikes!", :data => { provide: "typeahead", items: "3", source: @search_ahead.to_json }
+        .search-fields#header-search
+          = render "/shared/header_search"
           .search-button
             = submit_tag "Search", name: "search", class: "button-blue"
-            = hidden_field :search_stolen, params[:stolen]
-          .dropdown
-            %a.dropdown-toggle#dLabel{ href: "/", role: "button", :data => { toggle: "dropdown", target:"#"} }
-              %b.caret
-            %ul.dropdown-menu{ role: "menu", :aria =>{ labelledby: "dLabel" } }
-              %li
-                %a#search-stolen{ href: "#" }
-                  Only stolen
-              %li
-                %a#search-nonstolen{ href: "#" }
-                  Only non-stolen
-              %li
-                = link_to "Show the most recent bikes", bikes_path( query: "" )

@@ -15,9 +15,23 @@ lock_types.each do |type_name|
 end
 
 # Seed the colors
-colors = ['Black', 'White', 'Silver or gray', 'Red', 'Green', 'Blue', 'Purple', 'Pink', 'Orange', 'Brown', 'Raw metal', 'Yellow', 'Stickers, tape or other cover-up']
-colors.each do |color_name|
-  color = Color.create(name: color_name)
+colors = [
+  { name: 'Black', priority: 1 },
+  { name: 'White', priority: 1 },
+  { name: 'Silver or gray', priority: 1 },
+  { name: 'Red', priority: 1 },
+  { name: 'Green', priority: 1 },
+  { name: 'Blue', priority: 1 },
+  { name: 'Purple', priority: 1 },
+  { name: 'Pink', priority: 1 },
+  { name: 'Orange', priority: 1 },
+  { name: 'Brown', priority: 1 },
+  { name: 'Raw metal', priority: 2 },
+  { name: 'Yellow', priority: 1 },
+  { name: 'Stickers, tape or other cover-up', priority: 3 }
+]
+colors.each do |c|
+  color = Color.create(name: c[:name], priority: c[:priority])
   color.save
 end
 

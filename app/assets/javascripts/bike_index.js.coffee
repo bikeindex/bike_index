@@ -25,6 +25,14 @@ window.BikeIndex =
     
     $('#total-top-header .global-tabs').append(tab)
     $('#total-top-header .tab-content').append(links)
+
+  initializeHeaderSearch: ->
+    $('#find_bike_attributes_ids').chosen
+      allow_single_deselect: true
+      no_results_text: 'No Attributes matched'
+      width: '100%'
+    $('#header-search .stolenness input').prop('checked', true)
+    $("#head-search-bikes #query").attr("autocomplete","off");
     
 
 $(document).ready ->
@@ -41,6 +49,9 @@ $(document).ready ->
 
   else if $('#choose-registration-type').length > 0
     view = new BikeIndex.Views.BikesChooseRegistration
+
+  else if $('#bikes-search').length > 0
+    view = new BikeIndex.Views.BikesSearch
 
   else if $('#bike-show').length > 0
     view = new BikeIndex.Views.BikesShow
