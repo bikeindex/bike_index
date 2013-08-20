@@ -65,7 +65,7 @@ FactoryGirl.define do
   factory :wheel_size do 
     name { FactoryGirl.generate(:unique_name) }
     iso_bsd { FactoryGirl.generate(:unique_iso) }
-    wheel_size_set 'Standard wheel size'
+    priority 1
     description { FactoryGirl.generate(:unique_name) }
   end
 

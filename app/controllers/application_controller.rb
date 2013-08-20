@@ -1,16 +1,6 @@
 class ApplicationController < ActionController::Base
   include UrlHelper
   protect_from_forgery
-  before_filter :load_search_typeahead
-
-
-  def load_search_typeahead
-    @search_ahead = Manufacturer.frames.map(&:name)
-    @colors = Color.order(:name)
-    # TODO: if we cache this, every request thinks it's cached.
-    # But it would be nice to cache it
-  end
-
 
 protected
   def current_user

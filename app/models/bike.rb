@@ -171,6 +171,12 @@ class Bike < ActiveRecord::Base
     string
   end
 
+  def cache_attributes
+    # "c#{attribute}" colors
+    # "h#{attribute}" handlebar_type
+    # "w#{attribute}" wheel size 
+  end
+
   before_save :cache_bike
   def cache_bike
     cache_photo
