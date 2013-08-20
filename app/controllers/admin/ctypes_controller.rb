@@ -47,5 +47,6 @@ class Admin::CtypesController < Admin::BaseController
 
   def find_ctypes
     @ctype = Ctype.find_by_slug(params[:id])
+    raise ActionController::RoutingError.new('Not Found') unless @ctype.present?
   end
 end

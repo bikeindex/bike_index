@@ -9,6 +9,13 @@ xml.urlset(xmlns: "http://www.sitemaps.org/schemas/sitemap/0.9") do
     xml.url do
       xml.loc "#{root_url}bikes/#{bike.id}"
       xml.lastmod bike.updated_at.strftime("%F")
+      xml.changefreq("weekly")
+    end
+  end
+  @manufacturers.each do |manufacturer|
+    xml.url do
+      xml.loc "#{root_url}manufacturers/#{manufacturer.slug}"
+      xml.lastmod manufacturer.updated_at.strftime("%F")
       xml.changefreq("monthly")
     end
   end

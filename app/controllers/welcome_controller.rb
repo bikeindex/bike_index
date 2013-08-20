@@ -1,7 +1,6 @@
 class WelcomeController < ApplicationController
   caches_page :index
   before_filter :authenticate_user!, only: :user_home
-  # before_filter :bust_cache!, only: :user_home
   
   def index
     render action: 'index', layout: 'no_container'

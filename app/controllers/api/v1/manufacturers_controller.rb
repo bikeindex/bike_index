@@ -7,7 +7,9 @@ module Api
       end
 
       def show
-        respond_with Manufacturer.find_by_slug(params[:id])
+        manufacturer = Manufacturer.find_by_slug(params[:id])
+        raise ActionController::RoutingError.new('Not Found') unless manufacturer.present?
+        respond_with manufacturer
       end
     
     end
