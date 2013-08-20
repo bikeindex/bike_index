@@ -19,6 +19,7 @@ class ManufacturersController < ApplicationController
 
   def show
     manufacturer = Manufacturer.find_by_slug(params[:id])
+    raise ActionController::RoutingError.new('Not Found') unless manufacturer.present?
     @manufacturer = manufacturer.decorate
     @title = manufacturer.name
   end

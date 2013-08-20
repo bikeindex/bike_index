@@ -4,9 +4,9 @@
   %span#attribute_values_searched
     = @attribute_select_values
   %span#stolen_searched
-    = @stolen_searched
+    = 1 if @stolen_searched
   %span#non_stolen_searched
-    = @non_stolen_searched
+    = 1 if @non_stolen_searched
 
 
 - if @bikes.present?
