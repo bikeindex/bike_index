@@ -3,7 +3,7 @@
   .primary-group
     .dl-holder
       %dl.dl-horizontal
-        = link_to(bike.dl_list_item(bike.title, bike.type), bike.list_link_url(target))
+        = link_to(bike.dl_list_item(bike.title, bike.type.titleize), bike.list_link_url(target))
       %dl.dl-horizontal
         %dt Serial
         %dd.serial-text
