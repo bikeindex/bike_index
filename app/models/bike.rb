@@ -54,7 +54,7 @@ class Bike < ActiveRecord::Base
     :cached_attributes
 
   belongs_to :manufacturer
-  serialize :params
+  serialize :cached_attributes
   belongs_to :primary_frame_color, class_name: "Color"
   belongs_to :secondary_frame_color, class_name: "Color"
   belongs_to :tertiary_frame_color, class_name: "Color"
@@ -172,6 +172,7 @@ class Bike < ActiveRecord::Base
   end
 
   def cache_attributes
+
     # "c#{attribute}" colors
     # "h#{attribute}" handlebar_type
     # "w#{attribute}" wheel size 
@@ -180,6 +181,7 @@ class Bike < ActiveRecord::Base
   before_save :cache_bike
   def cache_bike
     cache_photo
+    cache_attributes
     c = ""
     c += "#{propulsion_type.name} " unless propulsion_type.name == "Foot pedal"
     c += "#{frame_manufacture_year} " if frame_manufacture_year

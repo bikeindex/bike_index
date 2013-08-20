@@ -33,6 +33,7 @@ describe Bike do
     it { should validate_presence_of :manufacturer_id }
     it { should validate_presence_of :rear_wheel_size_id }
     it { should validate_presence_of :primary_frame_color_id }
+    it { should serialize :cached_attributes }
   end
 
 
@@ -184,10 +185,25 @@ describe Bike do
     end
   end
 
+  describe :cache_attributes do 
+    it "should cache the colors handlebar_type and wheel_size" do 
+      color = FactoryGirl.create(:color)
+      handlebar = FactoryGirl.create(:handlebar_type)
+      bike = FactoryGirl.create(:bike, secondary_frame_color: color, handlebar_type: handlebar)
+      bike.cached_attributes[0].should eq("c#{bike.primary_frame_color_id}")
+      bike.cached_attributes[1].should eq("c#{color.id}")
+      bike.cached_attributes[2].should eq("c#{handlebar.id}")
+      bike.cached_attributes[3].should eq("c#{bike.rear_wheel_size_id}")
+      bike.cached_attributes[4].should eq("c#{bike.rear_wheel_size}")
+    end
+  end
+
+
   describe :cache_bike do 
     it "should call cache photo and cache component" do 
       bike = FactoryGirl.create(:bike)
       bike.should_receive(:cache_photo)
+      bike.should_receive(:cache_attributes)
       bike.should_receive(:components_cache_string)
       bike.cache_bike
     end

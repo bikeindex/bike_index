@@ -75,6 +75,7 @@ FactoryGirl.define do
 
   factory :color do 
     name { FactoryGirl.generate(:unique_name) }
+    priority 1
   end
 
   factory :b_param do 
