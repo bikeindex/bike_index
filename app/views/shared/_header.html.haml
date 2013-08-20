@@ -30,5 +30,4 @@
 
 - body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
 %body#body{ class: body_class }
-  = render '/layouts/grid'
   = render 'layouts/messages'
