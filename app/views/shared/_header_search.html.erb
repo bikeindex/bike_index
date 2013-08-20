@@ -1,14 +1,14 @@
-<% cache do %>
+<%# cache do %>
   <%= text_field_tag :query,
     params[:query],
     placeholder: "Find bikes!",
-    :data => { provide: "typeahead", items: "3", source: Manufacturer.all.to_json },
+    :data => { provide: "typeahead", items: "3", source: Manufacturer.all.map(&:name).to_json },
     class: "search-text-field"
   %>
+  
   <div class="optional-fields">
     <div class="bike-attributes">
-      <select id="find_bike_attributes_ids" name="find_bike_attributes[ids]" multiple data-placeholder="Enter attributes">
-        <option></option>
+      <input name="find_bike_attributes[ids][]" type="hidden" value="" /><select data-placeholder="Choose color" id="find_bike_attributes_ids" multiple="multiple" name="find_bike_attributes[ids][]"><option value=""></option>
         <optgroup label="Frame colors">
           <% Color.commonness.each do |attribute| %>
             <option value="c<%= attribute.id %>"><%= attribute.name %></option>
@@ -26,17 +26,16 @@
         </optgroup>
       </select>
     </div>
+
     <div class="stolenness">
       <label for: "stolen_included">
         <%= check_box_tag :stolen_included, params[:stolen_included] %>
         stolen
       </label>
-      
       <label for="non_stolen_included">
         <%= check_box_tag :non_stolen_included, params[:non_stolen_included] %>
         non-stolen
       </label>
-
     </div>
   </div>
-<% end %>
+<%# end %>

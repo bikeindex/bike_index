@@ -12,17 +12,6 @@ class BikeSearcher
     @bikes
   end
 
-  def parsed_attribute_ids
-    if @params[:find_bike_attributes]
-      attr_ids = @params[:find_bike_attributes][:ids].reject(&:empty?)
-      if attr_ids.any?
-        attr_ids.collect! {|m| m.to_i}
-        return attr_ids 
-      end
-      nil
-    end
-  end
-
   def parsed_manufacturer_ids
     if @params[:find_manufacturers]
       mnfg_ids = @params[:find_manufacturers][:ids].reject(&:empty?)
@@ -41,9 +30,17 @@ class BikeSearcher
     @bikes
   end
 
-  def matching_attributes(bikes)
-    if parsed_attribute_ids
-      @bikes = bikes.where(primary_frame_color_id: parsed_attribute_ids)
+  def parsed_attributes
+    if @params[:find_bike_attributes]
+      attr_ids = @params[:find_bike_attributes][:ids].reject(&:empty?)
+      return attr_ids  if attr_ids.any?
+      nil
+    end
+  end
+
+  def matching_attr_cache(bikes)
+    if parsed_attributes
+      @bikes = bikes.attr_cache_search(parsed_attributes)
     end
     @bikes
   end
@@ -55,16 +52,11 @@ class BikeSearcher
     @bikes
   end
 
-  def find_bikes
-    # puts "\n\n\n\n\n\nBIKE COUNT: #{@bikes.count} \n\n\n"
+  def find_bikes    
     matching_stolenness(@bikes)
-    # puts "\n\n\n\n\n\nBIKE COUNT: #{@bikes.count} \n\n\n"
     matching_manufacturers(@bikes)
-    # puts "\n\n\n\n\n\nBIKE COUNT: #{@bikes.count} \n\n\n"
-    matching_attributes(@bikes)
-    # puts "\n\n\n\n\n\nBIKE COUNT: #{@bikes.count} \n\n\n"
+    matching_attr_cache(@bikes)
     matching_query(@bikes)
-    # puts "\n\n\n\n\n\nBIKE COUNT: #{@bikes.count} \n\n\n"
     @bikes
   end
 

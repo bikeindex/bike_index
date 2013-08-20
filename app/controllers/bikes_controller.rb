@@ -23,8 +23,7 @@ class BikesController < ApplicationController
     search = BikeSearcher.new(params)
     bikes = search.find_bikes.page(params[:page]).per_page(24)
     @bikes = bikes.decorate
-    @manufacturer_select_values = search.parsed_manufacturer_ids
-    @attribute_select_values = search.parsed_attribute_ids
+    @attribute_select_values = search.parsed_attributes
     render :layout => 'application'
   end
 

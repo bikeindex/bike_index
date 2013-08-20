@@ -52,6 +52,17 @@ describe Bike do
     end
   end
 
+  describe :attr_cache_search do
+    it "should find bikes by email address when the case doesn't match" do
+      bike = FactoryGirl.create(:bike)
+      query = ["c#{bike.primary_frame_color_id}"]
+      result = Bike.attr_cache_search(query)
+      result.first.should eq(bike)
+      result.class.should eq(ActiveRecord::Relation)
+    end
+  end
+
+
   describe :owner do
     it "should receive owner from the last ownership" do
       first_ownership = Ownership.new 
@@ -189,12 +200,13 @@ describe Bike do
     it "should cache the colors handlebar_type and wheel_size" do 
       color = FactoryGirl.create(:color)
       handlebar = FactoryGirl.create(:handlebar_type)
-      bike = FactoryGirl.create(:bike, secondary_frame_color: color, handlebar_type: handlebar)
+      wheel = FactoryGirl.create(:wheel_size)
+      bike = FactoryGirl.create(:bike, secondary_frame_color: color, handlebar_type: handlebar, front_wheel_size: wheel)
       bike.cached_attributes[0].should eq("c#{bike.primary_frame_color_id}")
       bike.cached_attributes[1].should eq("c#{color.id}")
-      bike.cached_attributes[2].should eq("c#{handlebar.id}")
-      bike.cached_attributes[3].should eq("c#{bike.rear_wheel_size_id}")
-      bike.cached_attributes[4].should eq("c#{bike.rear_wheel_size}")
+      bike.cached_attributes[2].should eq("h#{handlebar.id}")
+      bike.cached_attributes[3].should eq("w#{bike.rear_wheel_size_id}")
+      bike.cached_attributes[4].should eq("w#{wheel.id}")
     end
   end
 

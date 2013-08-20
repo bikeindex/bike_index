@@ -54,7 +54,7 @@ class Bike < ActiveRecord::Base
     :cached_attributes
 
   belongs_to :manufacturer
-  serialize :cached_attributes
+  serialize(:cached_attributes, Array)
   belongs_to :primary_frame_color, class_name: "Color"
   belongs_to :secondary_frame_color, class_name: "Color"
   belongs_to :tertiary_frame_color, class_name: "Color"
@@ -120,6 +120,15 @@ class Bike < ActiveRecord::Base
     end
   end
 
+  def self.attr_cache_search(query)
+    return scoped unless query.present? and query.is_a? Array
+    a = []
+    self.find_each do |b|
+      a << b.id if (query - b.cached_attributes).empty?
+    end
+    self.where(id: a)
+  end
+
   def current_ownership
     ownerships.last
   end
@@ -172,10 +181,14 @@ class Bike < ActiveRecord::Base
   end
 
   def cache_attributes
-
-    # "c#{attribute}" colors
-    # "h#{attribute}" handlebar_type
-    # "w#{attribute}" wheel size 
+    ca = []
+    ca << "c#{primary_frame_color_id}" if primary_frame_color_id
+    ca << "c#{secondary_frame_color_id}" if secondary_frame_color_id
+    ca << "c#{tertiary_frame_color_id}" if tertiary_frame_color_id
+    ca << "h#{handlebar_type_id}" if handlebar_type
+    ca << "w#{rear_wheel_size_id}" if rear_wheel_size_id
+    ca << "w#{front_wheel_size_id}" if front_wheel_size_id
+    self.cached_attributes = ca 
   end
 
   before_save :cache_bike
