@@ -19,8 +19,8 @@ class ManufacturersController < ApplicationController
 
   def show
     manufacturer = Manufacturer.find_by_slug(params[:id])
-    @title = manufacturer.name
     @manufacturer = manufacturer.decorate
+    @title = manufacturer.name
   end
 
   def set_manufacturers_active_section

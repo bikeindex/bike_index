@@ -24,6 +24,9 @@ class BikesController < ApplicationController
     bikes = search.find_bikes.page(params[:page]).per_page(24)
     @bikes = bikes.decorate
     @attribute_select_values = search.parsed_attributes
+    @query = params[:query]
+    @stolen_searched = params[:stolen_included]
+    @non_stolen_searched = params[:non_stolen_included]
     render :layout => 'application'
   end
 

@@ -31,7 +31,6 @@ window.BikeIndex =
       allow_single_deselect: true
       no_results_text: 'No Attributes matched'
       width: '100%'
-    $('#header-search .stolenness input').prop('checked', true)
     $("#head-search-bikes #query").attr("autocomplete","off");
     
 

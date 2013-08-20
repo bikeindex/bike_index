@@ -1,8 +1,13 @@
 #bikes-search
-  %span#manufacturer_select_values
-    = @manufacturer_select_values
-  %span#attribute_select_values
+  %span#query_searched
+    = @query
+  %span#attribute_values_searched
     = @attribute_select_values
+  %span#stolen_searched
+    = @stolen_searched
+  %span#non_stolen_searched
+    = @non_stolen_searched
+
 
 - if @bikes.present?
 
