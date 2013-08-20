@@ -45,18 +45,13 @@
       %span.search-background
       = form_tag bikes_path, method: :get, id: "head-search-bikes" do 
         .search-fields#header-search
-          = text_field_tag :query, params[:query], placeholder: "Find bikes!", class: "search-text-field"
+          = text_field_tag :query, params[:query],
+            placeholder: "Find bikes!",
+            :data => { provide: "typeahead", items: "3", source: @search_ahead.to_json },
+            class: "search-text-field"
           .optional-fields
-            .manufacturers
-              = collection_select :find_manufacturers, :ids,
-                @frame_makers, :id, :name,
-                {include_blank: true},
-                { multiple: true, :data => {placeholder: "Choose manufacturers"} }
             .bike-attributes
-              = collection_select :find_bike_attributes, :ids,
-                @attributes, :id, :name,
-                {include_blank: true},
-                { multiple: true, :data => {placeholder: "Choose color"} }
+              = render "/shared/select_bike_attributes"
             .stolenness
               %label{ for: "stolen_included" }
                 = check_box_tag :stolen_included, params[:stolen_included]

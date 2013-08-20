@@ -1,0 +1,14 @@
+%select#find_bike_attributes_ids{ name: "find_bike_attributes[ids]", multiple: true, :data => {placeholder: "Select attributes"}}
+  %optgroup{label: "Frame colors"}
+    - @colors.all.each do |attribute|
+      %option{ value: "color#{attribute.id}" }
+        = attribute.name
+  %optgroup{label: "Handlebar types"}
+    - HandlebarType.all.each do |attribute|
+      %option{ value: "handlebar#{attribute.id}" }
+        = attribute.name
+        handlebars
+  %optgroup{label: "Wheel Sizes"}
+    - WheelSize.all.each do |attribute|
+      %option{ value: "wheel#{attribute.id}" }
+        = attribute.name

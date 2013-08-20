@@ -79,9 +79,9 @@ input[type="color"],
   font-size: 16px;
   min-height: 29px;
 }
-.chosen-container-multi {
-  font-size: 16px;
-}
+.chosen-container-multi { font-size: 16px; }
+
+.chosen-container .chosen-results li.group-result { font-size: 1.2em; }
 
 .chosen-container-multi .chosen-choices li.search-field input[type="text"] {
   height: auto;
