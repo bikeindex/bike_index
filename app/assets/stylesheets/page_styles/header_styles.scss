@@ -283,7 +283,7 @@
     width: $twoColumn;
     margin-right: $gutterW;
     &.no_user.expand_t, &:first-of-type {
-      margin-right: 0;
+      margin-right: 0px;
     }
     a {
       @include text-overflow();
@@ -291,29 +291,12 @@
       width: 100%;
       padding: .5em 0;
       text-align: center;
-    }
-  }
-  .settings {
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 30px;
-    border: 1px solid transparent;
-    margin-right: 0;
-    img { 
-      width: 20px;
-      height: auto;
-    }
-    &:hover, &.hover {
-      background: $searchBackground;
-      border: 1px solid $searchBorder;
+      &:hover, &.hover { border-bottom: 1px solid transparent; }
     }
   }
 }
 
 .collapse.visibled .tab-content { overflow: visible; }
-
-.tab-content .tab-pane.active#you { margin-right: 1px; }
 
 @media (min-width: 760px) {
   .tab-content .tab-pane.active#you {
@@ -360,10 +343,21 @@
    .tab-content { z-index: 120; } 
   }
   .top-header {
+    .visibled {
+      z-index: 102;
+      #global-tabs-cover {
+        // content: " ";
+        display: block;
+        position: absolute;
+        bottom: -1px;
+        width: 25%; left: -25%;
+        height: 1px;
+        background: #dddddd;
+      }
+    }
     .global-tabs {
       width: 80%;
       margin: 0 0 0 auto;
-      .settings { width: 30px; }
       li { 
         width: $fourColumn;
       }

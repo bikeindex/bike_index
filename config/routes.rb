@@ -3,7 +3,7 @@ Bikeindex::Application.routes.draw do
   get "dashboard/show"
 
   constraints(Subdomain) do
-    match '/' => 'organizations#show'
+    match '/overview' => 'organizations#show'
     match '/manage' => 'organizations#manage'
     match '/organization_bikes' => 'organizations#bikes'
     match '/settings' => 'organizations#settings'

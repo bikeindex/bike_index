@@ -27,7 +27,6 @@ class BikeIndex.Views.Global extends Backbone.View
             $('#total-top-header .super_user').removeClass('hidden')
           if _.isArray(data["memberships"])
             for membership in data["memberships"]
-              
               tab = """
                 <li class="expand_t">
                   <a href="##{membership["slug"]}">#{membership["short_name"]}</a>
@@ -48,6 +47,7 @@ class BikeIndex.Views.Global extends Backbone.View
                       </a>
                     </li>
               """
+
               if membership["is_admin"]
                 links = links + """
                   <li>
@@ -56,11 +56,12 @@ class BikeIndex.Views.Global extends Backbone.View
                     </a>
                   </li>
                 """
-
               links = links + "</ul></div>"
               
               $('#total-top-header .global-tabs').append(tab)
               $('#total-top-header .tab-content').append(links)
+          
+          $('#your_settings_n_stuff').text(data["email"]) if data["email"]
           $('#tab-cover').fadeOut()
 
         else

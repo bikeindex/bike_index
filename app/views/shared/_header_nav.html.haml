@@ -13,12 +13,11 @@
           Bike Index
       %nav#header-tabs.collapse.in
         %ul.global-tabs
+          %span#global-tabs-cover
 
-          %li.expand_t.settings.yes_user.hidden
-            %a{href: "#you"}
-              = image_tag '/assets/settings.svg', id: "settingsimage"
-          %li.account.yes_user.hidden
-            = link_to 'Your Index', user_home_url(:subdomain => false), class: "follow-link"
+          %li.expand_t.yes_user.hidden
+            %a#your_settings_n_stuff{href: "#you"}
+              You
           %li.super_user.hidden
             = link_to 'Superuser home', admin_root_path, class: "follow-link"
         
@@ -31,6 +30,8 @@
         .tab-content
           #you.tab-pane.yes_user.hidden
             %ul
+              %li
+                = link_to 'Your Index', user_home_url(:subdomain => false), class: "follow-link"
               %li
                 %a{ title: "Your preferences", href: "/my_account"}
                   Preferences

@@ -56,9 +56,9 @@
 
   .input-group
     .control-group
-      = f.label :locking_description, "bike locking description", class: "control-label"
+      = f.label :locking_description, "Bike locking description", class: "control-label"
       .controls
-        = f.select(:locking_description, StolenRecord.locking_description_select, prompt: "")
+        = f.select(:locking_description, StolenRecord.locking_description_select, prompt: "Choose lock")
 
   .input-group
     .control-group.large-text

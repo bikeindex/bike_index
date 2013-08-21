@@ -5,7 +5,7 @@
 //________________________
 
 .stolen-information {
-  margin-top: 40px;
+  padding: 40px 0;
 
     h4 {
       font-size: 1.25em;
@@ -75,7 +75,7 @@
 
 .stolen-contact {
   max-width: 800px;
-  margin: 40px auto 0;
+  margin: 80px auto 0;
   textarea { width: 100%; }
   h3 {
     color: $stolenColor;

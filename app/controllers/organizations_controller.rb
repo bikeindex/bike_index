@@ -39,7 +39,7 @@ class OrganizationsController < ApplicationController
 
   def destroy
     @organization.destroy
-    redirect_to root_url
+    redirect_to root_url(:subdomain => @organization.slug)
   end
 
   protected

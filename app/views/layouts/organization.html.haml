@@ -8,7 +8,7 @@
 %header.replace-header
   .inner-recep
     %h2.new-title
-      = nav_link current_organization.name, root_url
+      = nav_link current_organization.name, overview_url(:subdomain => current_organization.slug)
     %ul.org-links
       - if current_user.is_admin_of?(current_organization)
         %li
