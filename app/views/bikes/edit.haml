@@ -66,10 +66,6 @@
                 Stolen information
                 %i.icon-chevron-right
           %li
-            %a{ href: "#edit_overview" }
-              Overview
-              %i.icon-chevron-right
-          %li
             %a{ href: "#edit_frame" }
               Frame and Fork
               %i.icon-chevron-right
@@ -79,11 +75,12 @@
               %i.icon-chevron-right
           %li
             %a{ href: "#edit_drivetrain" }
-              Drivetrain and brakes
+              Drivetrain 
+              / and brakes
               %i.icon-chevron-right
           %li
             %a{ href: "#edit_additionals" }
-              Additional parts
+              Additional information
               %i.icon-chevron-right
           - if @bike.verified?
             %li
@@ -102,9 +99,6 @@
             = render :partial => 'bikes/bike_fields/stolen_record', :locals => { :f => builder, :bike => f }
           - else
             / For some weird reason, if you don't have an else here it prints out all of the form elements.
-
-            
-      = render :partial => 'bikes/bike_fields/overview', :locals => { :f => f }
 
       = render :partial => 'bikes/bike_fields/frame_and_fork', :locals => { :f => f }
       = render :partial => 'bikes/bike_fields/wheels', :locals => { :f => f }

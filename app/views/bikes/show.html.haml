@@ -28,7 +28,10 @@
         - if @bike.public_images.any?
           Add some more information about it.
         - else
-          You should add a picture of it, so everyone can admire its beauty.
+          - if @bike.stolen
+            Add a picture so people know what to look for.
+          - else
+            You should add a picture of it, so everyone can admire its beauty.
         = link_to  "Edit", edit_bike_path, class: "button-blue"
       - else
         You sent this bike to
@@ -61,12 +64,34 @@
 
 .receptacle.overfloating
   .inner-recep.single-bike-info
+    - if @bike.stolen and @bike.current_stolen_record.present?
+      .stolen-information
+        .dl-holder
+          - if @bike.current_stolen_record.latitude.present? and @bike.current_stolen_record.longitude.present?
+            = render "bikes/stolen_map"
+          .dl-horizontal
+            - if @bike.phoneable_by(current_user)
+              .phone-shown
+                %dt
+                  Phone number
+                %dd
+                  %a{ href: "tell:#{@bike.current_stolen_record.phone}" }
+                    = @bike.current_stolen_record.phone
+            = @bike.dl_list_item(@bike.current_stolen_record.locking_description, "Locking description")
+            = @bike.dl_list_item(@bike.current_stolen_record.lock_defeat_description, "Locking circumvented")
+            = @bike.dl_list_item(@bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), "Date stolen")
+            = @bike.dl_list_item(@bike.current_stolen_record.address, "Location")
+            = @bike.dl_list_item(@bike.current_stolen_record.theft_description, "Description")
+            = @bike.dl_list_item(@bike.current_stolen_record.police_report_number, "Police report number")
+
     %header.with-subtitle
       .sharing-section
         .sharing-buttons
           = render "/shared/share_this"
       %h3
-        A little bit of information about
+        - if @bike.stolen
+          More
+        Information about
         - if @bike.name && @bike.name.length > 1
           the bike named
           %strong
@@ -131,32 +156,7 @@
             = component.dl_from_attribute("serial_number")
             = component.dl_from_attribute("description")
 
-
     - if @bike.stolen and @bike.current_stolen_record.present?
-      .stolen-information
-        %h3
-          Information about
-          %span.stolen-color
-            the theft
-          of this 
-          = @bike.type
-        .dl-holder
-          - if @bike.current_stolen_record.latitude.present? and @bike.current_stolen_record.longitude.present?
-            = render "bikes/stolen_map"
-          .dl-horizontal
-            - if @bike.phoneable_by(current_user)
-              .phone-shown
-                %dt
-                  Phone number
-                %dd
-                  %a{ href: "tell:#{@bike.current_stolen_record.phone}" }
-                    = @bike.current_stolen_record.phone
-            - if @bike.current_stolen_record.police_report_filed
-              = @bike.dl_list_item("Report was filed", "Police Report")
-            = @bike.dl_list_item(@bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), "Date stolen")
-            = @bike.dl_list_item(@bike.current_stolen_record.address, "Location")
-            = @bike.dl_list_item(@bike.current_stolen_record.theft_description, "Description")
-
       - if current_user.present?
         .alert.stolen-contact.no-user
           %h3

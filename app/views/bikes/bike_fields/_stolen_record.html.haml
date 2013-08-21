@@ -53,36 +53,35 @@
         = f.collection_select(:state, UsStates.all, :abbr, :name, prompt: "State" )
       .controls.extra-field
         = f.text_field :zipcode, placeholder: "Zipcode"
-    / .span6.input-tip
-    /   .tip-title
-    /     %h2 Where was the bike stolen?
-    /   %section
-    /     = render 'content/bike_tips/where_stolen'
 
+  .input-group
+    .control-group
+      = f.label :locking_description, "bike locking description", class: "control-label"
+      .controls
+        = f.select(:locking_description, StolenRecord.locking_description_select, prompt: "")
+
+  .input-group
+    .control-group.large-text
+      = f.label :lock_defeat_description, "lock defeated", class: "control-label"
+      .controls
+        = f.select(:lock_defeat_description, StolenRecord.lock_defeat_description_select, prompt: "How was the lock defeated?")
+
+    
   .input-group
     .control-group.large-text
       = f.label :theft_description, "Description of the theft", class: "control-label"
       .controls
         = f.text_area :theft_description, rows: 3
-  / .span6.input-tip
-  /   .tip-title
-  /     %h2 Police report information
-  /   %section
-  /     = render 'content/bike_tips/description_stolen'
-
-
+  
   .input-group
     .control-group
-      = f.label :police_report_filed, "Police report filed?", class: "control-label"
-        
+      = f.label :police_report_number, "Police report number", class: "control-label"
       .controls#police-report-check
-        %label
-          = f.check_box :police_report_filed
-          A police report was filed
-      / .controls#police-report-field
-      / #= f.text_area :police_report_information, :toolbar => 'Basic', class: 'ckeditor'
-    / .span6.input-tip
-    /   .tip-title
-    /     %h2 Police report filed?
-    /   %section
-    /     = render 'content/bike_tips/police_report_filed'
+        = f.text_field :police_report_number
+      .controls.form-suggestion
+        It is 
+        %strong
+          strongly recommended
+        that you file a police report, and fill in the report number here.
+          
+      

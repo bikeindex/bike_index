@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130820173657) do
+ActiveRecord::Schema.define(:version => 20130821135549) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -348,28 +348,27 @@ ActiveRecord::Schema.define(:version => 20130820173657) do
   end
 
   create_table "stolen_records", :force => true do |t|
-    t.boolean  "police_report_filed"
-    t.text     "police_report_information"
     t.integer  "zipcode"
     t.string   "city"
     t.string   "state"
-    t.integer  "location_id"
-    t.string   "locking_description_id"
     t.text     "theft_description"
     t.text     "time"
-    t.datetime "created_at",                                  :null => false
-    t.datetime "updated_at",                                  :null => false
+    t.datetime "created_at",                                :null => false
+    t.datetime "updated_at",                                :null => false
     t.integer  "bike_id"
-    t.boolean  "current",                   :default => true
+    t.boolean  "current",                 :default => true
     t.string   "street"
     t.float    "latitude"
     t.float    "longitude"
     t.datetime "date_stolen"
     t.string   "phone"
     t.boolean  "phone_for_everyone"
-    t.boolean  "phone_for_users",           :default => true
-    t.boolean  "phone_for_shops",           :default => true
-    t.boolean  "phone_for_police",          :default => true
+    t.boolean  "phone_for_users",         :default => true
+    t.boolean  "phone_for_shops",         :default => true
+    t.boolean  "phone_for_police",        :default => true
+    t.string   "police_report_number"
+    t.string   "locking_description"
+    t.string   "lock_defeat_description"
   end
 
   create_table "users", :force => true do |t|

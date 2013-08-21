@@ -2,7 +2,19 @@
 .edit-bike-fields#edit_additionals
   %header
     %h2
-      Components
+      Additional information
+  .input-group
+    .control-group
+      = f.label :name, "Bike name", class: "control-label"
+      .controls
+        = f.text_field :name
+
+  .input-group
+    .control-group.large-text
+      = f.label :description, "General description", class: "control-label"
+      .controls
+        = f.text_area :description, rows: 3, placeholder: "Say something more about your bike!"
+
   .input-group.with-additional-block
     %a.bikeform-tip{role: "button", title: "Curious about handlebar types? Click here!!!", :data => {toggle: "modal", target: "#handlebarTip"} }
       %span
@@ -18,6 +30,12 @@
       .controls
         = f.text_field :handlebar_type_other
 
+  %fieldset.input-group.add-additional
+    = f.fields_for :components do |builder|
+      = render '/bikes/bike_fields/component_fields', f: builder
+    = link_to_add_components "Add a component", f, :components, "Frame and fork"
+
+    
   .input-group.inform-save
     .controls
       = submit_tag "Save", class: "button-green"

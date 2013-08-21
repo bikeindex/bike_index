@@ -1,3 +1,3 @@
 class StolenRecordSerializer < ActiveModel::Serializer
-  attributes :date_stolen, :latitude, :longitude, :police_report_filed, :theft_description
+  attributes :date_stolen, :latitude, :longitude, :theft_description, :locking_description, :lock_defeat_description, :police_report_number
 end
