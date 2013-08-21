@@ -8,9 +8,6 @@
         #{current_user.email},
     .notifications-holder
       .notification
-
-        / %button.close{ :data => { dismiss: "alert" }}
-        /   x
         - if @bikes.count > 0
           - if @bikes.last.stolen
             %h4

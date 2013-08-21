@@ -21,10 +21,11 @@
         = f.text_field :frame_model
 
   .input-group
-    .control-group
+    .control-group.chosen-select
       = f.label :frame_manufacture_year, class: "control-label"
       .controls
-        = f.text_field :frame_manufacture_year
+        - years = (1900..Time.now.year+1).to_a.reverse.map {|i| [i,i] }
+        = f.select :frame_manufacture_year, years, prompt: "Choose year"
 
   .input-group.with-optional-blocks
     %a.bikeform-tip{role: "button", title: "Seat tube measuring", :data => {toggle: "modal", target: "#seatTubeLengthTip"} }

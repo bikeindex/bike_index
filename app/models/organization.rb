@@ -6,7 +6,7 @@ class Organization < ActiveRecord::Base
     :slug,
     :website,
     :default_bike_token_count,
-    :is_a_bike_shop,
+    :show_on_map,
     :is_suspended,
     :locations_attributes
 
@@ -23,16 +23,13 @@ class Organization < ActiveRecord::Base
 
   validates_uniqueness_of :slug, message: "Needs a unique slug"
 
-  scope :bike_shops, where(is_a_bike_shop: true)
+  scope :shown_on_map, where(show_on_map: true)
 
   before_save :set_slug
   def set_slug
-    # if self.short_name
-    # self.slug = self.short_name.gsub(/\s/, '_').gsub(/([^A-Za-z0-9_\-]+)/,'').downcase
-    # else
-      self.slug = Slugifyer.slugify(self.short_name)
-    # end
+    self.slug = Slugifyer.slugify(self.short_name)
   end
+
   # def set_slug
   #   self.slug = Slugifyer.slugify(self.name)
   # end

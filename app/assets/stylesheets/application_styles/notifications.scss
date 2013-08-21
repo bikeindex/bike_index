@@ -13,15 +13,9 @@
 }
 
 .notification {
-  @extend .alert;
+  // @extend .alert;
   height: 100%;
-  
-  // color: $textColor;
-  // color: darken(#c09853, 15%);
   h4 {
-    // color: darken(#c09853, 10%);
-    // color: $textColor;
-    // color: darken(adjust-hue(#c09853, -10), 3%);
     font-size: 1.4em;
     margin-bottom: .5em;
   }

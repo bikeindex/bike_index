@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130821135549) do
+ActiveRecord::Schema.define(:version => 20130821230157) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -292,7 +292,7 @@ ActiveRecord::Schema.define(:version => 20130821135549) do
     t.string   "website"
     t.string   "short_name"
     t.integer  "default_bike_token_count",   :default => 5,     :null => false
-    t.boolean  "is_a_bike_shop"
+    t.boolean  "show_on_map"
     t.integer  "sent_invitation_count",      :default => 0
     t.datetime "deleted_at"
     t.boolean  "is_suspended",               :default => false, :null => false

@@ -13,7 +13,7 @@ class InfoController < ApplicationController
   
   def where
     @active_section = "about"
-    @shops = Organization.bike_shops.order("created_at asc")
+    @shops = Organization.shown_on_map.order("created_at asc")
   end
 
   def roadmap
