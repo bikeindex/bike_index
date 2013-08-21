@@ -1,21 +1,18 @@
 class UsersController < ApplicationController
   before_filter :authenticate_user!, only: [:edit]
-  caches_page :new
   
   def new
     @title = "Signup"
-    if current_user.present?
-      redirect_to user_home_url, notice: "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
-    end
-    @photos = PublicImage.limit(24).order("created_at desc")
     @user = User.new
-    expires_in 24.hours, public: true
+    if current_user.present?
+      flash[:notice] = "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
+      redirect_to user_home_url and return
+    end
   end
 
   def create
     @title = "Signup"
     @user = User.new(params[:user])
-    @photos = PublicImage.limit(24).order("created_at desc")
     if @user.save
       CreateUserJobs.new(user: @user).do_jobs  
     else

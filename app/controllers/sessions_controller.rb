@@ -1,6 +1,5 @@
 class SessionsController < ApplicationController
   def new
-    @photos = PublicImage.limit(18).order("created_at desc")
     if current_user.present?
       redirect_to user_home_url, notice: "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
     end

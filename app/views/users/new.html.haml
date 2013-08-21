@@ -2,7 +2,8 @@
   Never lose track of your trusty steed
 .span8.photo-animation
   #photos-flip 
-    - @photos.each_with_index do |photo, i|
+    / cache('new_users_pictures')
+    - PublicImage.unscoped.order("created_at desc").limit(24).each_with_index do |photo, i|
       .bike-photo{id: "photo#{i}"}
         .flipper
           .front

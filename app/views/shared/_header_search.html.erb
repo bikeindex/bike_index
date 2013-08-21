@@ -10,8 +10,8 @@
     <div class="bike-attributes">
       <input name="find_bike_attributes[ids][]" type="hidden" value="" /><select data-placeholder="Enter attributes" id="find_bike_attributes_ids" multiple="multiple" name="find_bike_attributes[ids][]"><option value=""></option>
         <optgroup label="Frame colors">
-          <% Color.commonness.each do |attribute| %>
-            <option value="c<%= attribute.id %>"><%= attribute.name %></option>
+          <% Color.unscoped.commonness.each do |attribute| %>
+            <option value="<%= attribute.priority %>c<%= attribute.id %>"><%= attribute.name %></option>
           <% end %>
         </optgroup>
         <optgroup label="Handlebar types">
@@ -20,8 +20,8 @@
           <% end %>
         </optgroup>
         <optgroup label="Wheel Sizes">
-          <% WheelSize.commonness.each do |attribute| %>
-            <option value: "w<%= attribute.id %>"><%= attribute.name %></option>
+          <% WheelSize.unscoped.commonness.each do |attribute| %>
+            <option value: "<%= attribute.priority %>w<%= attribute.id %>"><%= attribute.name %></option>
           <% end %>
         </optgroup>
       </select>

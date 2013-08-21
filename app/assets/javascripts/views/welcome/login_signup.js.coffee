@@ -7,7 +7,7 @@ class BikeIndex.Views.LoginSignup extends Backbone.View
     $("#never-block").fadeTo(900, 1)
     if $('body').width() > 768
       size = ($('#photos-flip').width() - 1)/6
-      $('.bike-photo, .front, .back, .front-behind')
+      $('#photos-flip .bike-photo, #photos-flip .front, #photos-flip .back, #photos-flip .front-behind')
         .css('width', size)
         .css('height', size)
       # Set the delay so that the images wait till after the header fades in
@@ -22,6 +22,7 @@ class BikeIndex.Views.LoginSignup extends Backbone.View
   photoFlip: (photo_number, delay) ->
     if $("#photo#{photo_number}").length > 0
       img_src = $("#photo#{photo_number} .back .img-location").text()
+      # console.log(img_src)
       $("#photo#{photo_number} .back").html("<img src='#{img_src}'>")
       setTimeout ( ->
         $("#photo#{photo_number}").fadeTo(200, 1)

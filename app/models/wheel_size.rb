@@ -5,5 +5,5 @@ class WheelSize < ActiveRecord::Base
   has_many :bikes
 
   default_scope order(:iso_bsd)
-  scope :commonness, order(:priority)
+  scope :commonness, order("priority ASC")
 end

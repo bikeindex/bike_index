@@ -55,7 +55,7 @@ describe Bike do
   describe :attr_cache_search do
     it "should find bikes by email address when the case doesn't match" do
       bike = FactoryGirl.create(:bike)
-      query = ["c#{bike.primary_frame_color_id}"]
+      query = ["1c#{bike.primary_frame_color_id}"]
       result = Bike.attr_cache_search(query)
       result.first.should eq(bike)
       result.class.should eq(ActiveRecord::Relation)
@@ -202,11 +202,11 @@ describe Bike do
       handlebar = FactoryGirl.create(:handlebar_type)
       wheel = FactoryGirl.create(:wheel_size)
       bike = FactoryGirl.create(:bike, secondary_frame_color: color, handlebar_type: handlebar, front_wheel_size: wheel)
-      bike.cached_attributes[0].should eq("c#{bike.primary_frame_color_id}")
-      bike.cached_attributes[1].should eq("c#{color.id}")
+      bike.cached_attributes[0].should eq("1c#{bike.primary_frame_color_id}")
+      bike.cached_attributes[1].should eq("1c#{color.id}")
       bike.cached_attributes[2].should eq("h#{handlebar.id}")
-      bike.cached_attributes[3].should eq("w#{bike.rear_wheel_size_id}")
-      bike.cached_attributes[4].should eq("w#{wheel.id}")
+      bike.cached_attributes[3].should eq("1w#{bike.rear_wheel_size_id}")
+      bike.cached_attributes[4].should eq("1w#{wheel.id}")
     end
   end
 

@@ -5,5 +5,5 @@ class Color < ActiveRecord::Base
   has_many :bikes
 
   default_scope order(:name)
-  scope :commonness, order(:priority)
+  scope :commonness, order("priority ASC")
 end

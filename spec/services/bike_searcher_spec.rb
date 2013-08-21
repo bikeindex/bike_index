@@ -75,7 +75,7 @@ describe BikeSearcher do
      end
      it "should select bikes matching the attribute" do 
        search = BikeSearcher.new({bike_attribute_ids: "present"})
-       search.stub(:parsed_attributes).and_return(["c#{@bike1.primary_frame_color_id}"])
+       search.stub(:parsed_attributes).and_return(["1c#{@bike1.primary_frame_color_id}"])
        result = search.matching_attr_cache(Bike.scoped)
        result.first.should eq(@bike3)
        result.last.should eq(@bike1)

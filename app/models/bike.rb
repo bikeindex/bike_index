@@ -182,12 +182,12 @@ class Bike < ActiveRecord::Base
 
   def cache_attributes
     ca = []
-    ca << "c#{primary_frame_color_id}" if primary_frame_color_id
-    ca << "c#{secondary_frame_color_id}" if secondary_frame_color_id
-    ca << "c#{tertiary_frame_color_id}" if tertiary_frame_color_id
+    ca << "#{primary_frame_color.priority}c#{primary_frame_color_id}" if primary_frame_color_id
+    ca << "#{secondary_frame_color.priority}c#{secondary_frame_color_id}" if secondary_frame_color_id
+    ca << "#{tertiary_frame_color.priority}c#{tertiary_frame_color_id}" if tertiary_frame_color_id
     ca << "h#{handlebar_type_id}" if handlebar_type
-    ca << "w#{rear_wheel_size_id}" if rear_wheel_size_id
-    ca << "w#{front_wheel_size_id}" if front_wheel_size_id
+    ca << "#{rear_wheel_size.priority}w#{rear_wheel_size_id}" if rear_wheel_size_id
+    ca << "#{front_wheel_size.priority}w#{front_wheel_size_id}" if front_wheel_size_id
     self.cached_attributes = ca 
   end
 

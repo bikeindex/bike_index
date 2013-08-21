@@ -7,7 +7,6 @@ class BikeIndex.Views.Global extends Backbone.View
     'click .scroll-to-ref':                 'scrollToFootnote'
     'click .no-tab':                        'openNewWindow'
     'focus #header-search':                 'expandSearch'
-    # 'blur #header-search':                  'collapseSearch'
     
   initialize: ->
     BikeIndex.hideFlash()
@@ -113,7 +112,6 @@ class BikeIndex.Views.Global extends Backbone.View
       # Added this because sometimes the settings image makes things break.
       if target.parents('li').hasClass('settings')
         target.parents('li').find('a').tab('show')
-
 
   scrollToFootnote: (event) ->
     event.preventDefault()
