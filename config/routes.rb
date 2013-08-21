@@ -16,6 +16,7 @@ Bikeindex::Application.routes.draw do
   match 'user_home', to: 'welcome#user_home'
   match 'choose_registration', to: 'welcome#choose_registration'
   match 'goodbye', to: 'welcome#goodbye'
+  match 'bust_z_cache', to: 'welcome#bust_z_cache'
 
   resource :session, only: [:new, :create, :destroy]
   match 'logout', to: 'sessions#destroy'

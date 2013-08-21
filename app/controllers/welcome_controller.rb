@@ -10,6 +10,11 @@ class WelcomeController < ApplicationController
     @title = "goodbye"
   end
 
+  def bust_z_cache
+    Rails.cache.clear
+    redirect_to root_url
+  end
+
   def user_home
     @title = "Home"
     if current_user.present?
