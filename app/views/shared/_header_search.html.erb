@@ -21,7 +21,7 @@
         </optgroup>
         <optgroup label="Wheel Sizes">
           <% WheelSize.unscoped.commonness.each do |attribute| %>
-            <option value: "<%= attribute.priority %>w<%= attribute.id %>"><%= attribute.name %></option>
+            <option value="<%= attribute.priority %>w<%= attribute.id %>"><%= attribute.name %></option>
           <% end %>
         </optgroup>
       </select>
