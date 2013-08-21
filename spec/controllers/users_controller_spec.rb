@@ -17,6 +17,7 @@ describe UsersController do
         get :new
       end
       it { should respond_with(:success) }
+      it { should_not redirect_to(:new_session) }
       it { should render_template(:new) }
     end
   end
