@@ -3,6 +3,7 @@
 body.welcome-page {
   background: $blueDarker;
   #tab-cover { background: $blueDarker; }
+  .global-tabs a { color: #97c0db; }
   .follow-link.logo {
     background: $searchBackground;
     // overflow: hidden;

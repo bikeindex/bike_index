@@ -1,7 +1,6 @@
 class BikeIndex.Views.Home extends Backbone.View
   initialize: ->
     @setElement($('#body'))
-    @setTop()
     @moveBike()
 
   moveBike: ->
@@ -11,7 +10,6 @@ class BikeIndex.Views.Home extends Backbone.View
       aEnd = $('#fight-theft-profit').offset().top
       scroll = $(window).scrollTop()
       unless scroll >= aEnd
-        scroll = scroll - $('#home-title').offset().top
         p = ((scroll)/aEnd)
         spin = p * 50
         spin = spin * 1.5 if ww < 1200
@@ -21,6 +19,3 @@ class BikeIndex.Views.Home extends Backbone.View
         $('#wheel-spin').css('-o-transform', "rotate(-#{spin}deg)")
         
         # register.css('top', "#{p*25}px") # Small parallax on the button
-  
-  setTop: ->
-    window.scrollTo(0,$('#home-title').offset().top)
