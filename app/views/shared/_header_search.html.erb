@@ -1,7 +1,7 @@
 <% cache('header_search_awesomeness') do %>
   <%= text_field_tag :query,
     params[:query],
-    placeholder: "Find bikes!",
+    placeholder: "Search for bikes",
     :data => { provide: "typeahead", items: "3", source: Manufacturer.all.map(&:name).to_json },
     class: "search-text-field"
   %>

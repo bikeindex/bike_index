@@ -328,7 +328,13 @@
 }
 
 .blue-bullet {
-  @extend .bullet-point;
+  @include border-radius(1px);
+  @include box-shadow(1px 1px 1px rgba(black,.2));
+  display: block;
+  position: absolute;
+  left: 0; top: 0;
+  width: .4em; height: .4em;
+  margin: .5em .3em 0 0;
   background: $blueDark;
   border: 1px solid darken($blueDark, 10%); 
 }

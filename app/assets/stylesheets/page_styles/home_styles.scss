@@ -75,9 +75,9 @@ body.welcome-page {
   min-height: 40px;
   max-width: 1200px;
   margin: 0 auto;
+  color: white;
   h1 {
     margin: 0;
-    color: white;
     font-family: $baseFont;
     font-size: 60px;
     text-transform: capitalize;
@@ -100,7 +100,7 @@ body.welcome-page {
 @media (min-width: 900px) {
   #home-title h1 {
     // margin: 40px 0 150px;
-    margin-top: 20px;
+    padding-top: 20px;
     font-size: 80px;
   }
 }
@@ -108,7 +108,7 @@ body.welcome-page {
 @media (min-width: 1100px) {
   #home-title h1 {
     // margin: 40px 0 150px;
-    margin-top: 30px;
+    padding-top: 30px;
     font-size: 110px;
   }
 }
@@ -365,7 +365,10 @@ body.welcome-page {
       &:nth-of-type(2n) {
         margin-right: 0;
       }
-    } 
+    }
+    .icographix {
+      max-width: 30%;
+    }
   }
 }
 
