@@ -93,9 +93,10 @@ body.welcome-page {
 
 
 @media (max-width: 600px) {
-  #home-title h1 {
-    padding: 20px 0 20px;
-  }
+  #home-title h1 { padding: 20px 0 20px; }
+}
+@media (max-width: 900px) {
+  #home-title h3 { font-size: 20px; }
 }
 
 @media (min-width: 900px) {
@@ -167,6 +168,8 @@ body.welcome-page {
     display: block;
     width: 100%;
     margin: 0 auto 30px;
+    padding: .5em;
+    text-transform: uppercase;
     &:hover {
       @include box-shadow(#{inset 0 0 0 white, 1px 1px 2px rgba(black,.2)});
     } 
@@ -181,19 +184,25 @@ body.welcome-page {
   }
 }
 
+@media (max-width: 1000px) {
+  .treating-right-text .button-green { font-size: 30px; }
+}
+
 @media (max-width: 900px) {
   .treating-right-text {
-    .button-green { font-size: 30px; }
     h2 { font-size: 18px; }
   }
+}
+@media (max-width: 800px) {
+  .treating-right-text .button-green { font-size: 18px; }
 }
 
 @media (max-width: 700px) {
   .treating-right-text {
     margin-top: -60px;
     h2 { font-size: 16px; }
+
     .button-green {
-      font-size: 18px;
       padding: .5em;
       margin-bottom: 10px;
     }
