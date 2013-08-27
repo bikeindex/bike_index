@@ -1,0 +1,45 @@
+%section.full-screen-table
+  %table#user-bikes-table.table.table-striped.table-bordered
+    %thead
+      %th
+        Date indexed
+      %th
+        Manufacturer
+      %th.medium-screens
+        Model
+      %th.large-screens
+        Color&nbsp;&nbsp;
+      %th.large-screens
+        Created by
+
+    %tbody
+      - @bikes.each do |bike|
+        %tr
+          %td
+            - if bike.created_at.today?
+              %span.hidden
+                = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Today at #{bike.created_at.strftime("%-I %p")}
+            - elsif Date.yesterday().beginning_of_day() <= bike.created_at
+              %span.hidden
+                = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Yesterday at #{bike.created_at.strftime("%-I %p")}
+            - else
+              %span.hidden
+                = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              = bike.created_at.strftime("%-m/%-d/%Y")
+          %td
+            = link_to bike.manufacturer_name, bike.list_link_url(target)
+          %td.large-screens
+            = bike.frame_model if bike.frame_model.present?
+          %td.large-screens
+            = bike.primary_frame_color.name
+          %td.large-screens
+            - if bike.creator_id.present?
+              - u = User.find(bike.creator_id)
+              - if u.name.present?
+                = u.name
+              - else
+                = u.email
+            - else
+              Sorry, we're not sure who created this

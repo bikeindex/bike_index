@@ -4,8 +4,6 @@ class BikeIndex.Views.AdminOrganizationsEdit extends Backbone.View
     @setElement($('#body'))
     @adminLocations()
     
-      
-
   adminLocations: ->
     $('form').on 'click', '.remove_fields', (event) ->
       # We don't need to do anything except slide the input up, because the label is on it.

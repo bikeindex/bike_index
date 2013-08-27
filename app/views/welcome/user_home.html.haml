@@ -61,12 +61,17 @@
         - if current_user.show_bikes
           %p
             = link_to "Your public page", "/users/#{current_user.username}"
-      %ul.bike-boxes
-        = render partial: "/bikes/bike", collection: @bikes, :locals => {target: "edit" }
+      - if @bikes.count > 5
+        = render partial: "/bikes/bike_table", :locals => {target: "edit"}
+      - else
+        %ul.bike-boxes
+          = render partial: "/bikes/bike", collection: @bikes, :locals => {target: "edit" }
           
     - else
       %h3
         You don't have any bikes on the Index yet.
+      .padded
+        = link_to "Register one now!", choose_registration_path, class: "button-green"
 
   .locks-well
     .well
