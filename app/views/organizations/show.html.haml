@@ -4,26 +4,22 @@
 %section.full-screen-table
   %table#org-bikes-table.table.table-striped.table-bordered
     %thead
-      / %th
-      /   Link&nbsp;&nbsp;
       %th
         Date indexed
-      %th.medium-screens
-        Sent to
-      %th.medium-screens
-        Created by
       %th
         Manufacturer
-      %th.large-screens
+      %th.medium-screens
         Color&nbsp;&nbsp;
+      %th.medium-screens
+        Sent to
+      %th.large-screens
+        Created by
       %th.large-screens
         Rear Wheel size
 
     %tbody
       - @bikes.each do |bike|
         %tr
-          / %td
-          / # = link_to "&rarr;".html_safe, bike_url(bike)
           %td
             - if bike.created_at.today?
               %span.hidden
@@ -37,13 +33,17 @@
               %span.hidden
                 = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
               = bike.created_at.strftime("%-m/%-d/%Y at %-I %p")
+          %td
+            = link_to bike.manufacturer_name, bike_url(bike)
+          %td.medium-screens
+            = bike.primary_frame_color.name
           %td.medium-screens
             - if bike.created_with_token
               %span.less-strong
                 Free bike token
             - else
               = bike.owner_email
-          %td.medium-screens
+          %td.large-screens
             - if bike.creator_id.present?
               - u = User.find(bike.creator_id)
               - if u.name.present?
@@ -52,10 +52,6 @@
                 = u.email
             - else
               Sorry, we're not sure who created this
-          %td
-            = bike.manufacturer_name
-          %td.large-screens
-            = bike.primary_frame_color.name
           %td.large-screens
             = bike.rear_wheel_size.name
 
