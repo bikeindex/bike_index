@@ -1,0 +1,86 @@
+%h1
+  - if @user.name.present?
+    = @user.name
+  - else 
+    = @user.email
+
+%p
+  Joined the bike index #{@user.created_at.strftime("%-m/%-d/%Y")}
+
+%section.full-screen-table.padded
+  %p 
+    Bikes indexed for
+    %strong
+      = @membership.organization.name
+    by
+    - if @user.name.present?
+      = @user.name
+    - else 
+      = @user.email
+  %table#org-bikes-table.table.table-striped.table-bordered
+    %thead
+      / %th
+      /   Link&nbsp;&nbsp;
+      %th
+        Date indexed
+      %th.medium-screens
+        Sent to
+      %th
+        Manufacturer
+      %th.large-screens
+        Color&nbsp;&nbsp;
+      %th.large-screens
+        Rear Wheel size
+
+    %tbody
+      - @bikes.each do |bike|
+        %tr
+          %td
+            - if bike.created_at.today?
+              %span.hidden
+                = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Today at #{bike.created_at.strftime("%-I %p")}
+            - elsif Date.yesterday().beginning_of_day() <= bike.created_at
+              %span.hidden
+                = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Yesterday at #{bike.created_at.strftime("%-I %p")}
+            - else
+              %span.hidden
+                = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              = bike.created_at.strftime("%-m/%-d/%Y at %-I %p")
+          %td.medium-screens
+            - if bike.created_with_token
+              %span.less-strong
+                Free bike ticket
+            - else
+              = bike.owner_email
+          %td
+            = bike.manufacturer_name
+          %td.large-screens
+            = bike.primary_frame_color.name
+          %td.large-screens
+            = bike.rear_wheel_size.name
+
+%hr
+%section
+
+  %h4
+    Edit #{@user.email}
+
+  .form.form-horizontal
+    = form_for @membership do |f|
+     
+      .control-group
+        = f.label :role, class: "control-label"
+        .controls.radio-controls
+          %label.radio
+            = f.radio_button :role, "admin"
+            Admin of organization
+          %label.radio
+            = f.radio_button :role, "member"
+            Member of organization
+
+      .membership-actions
+        = f.submit 'Update role', class: 'button-green'
+        = link_to "Delete member", membership_url(@membership), method: :delete, confirm: "Are you sure you want to remove #{@user.email} from your organization?", class: "button-red"
+    

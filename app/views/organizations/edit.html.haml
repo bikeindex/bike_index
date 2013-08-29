@@ -12,8 +12,6 @@
     %table#org-users-table.table.table-striped.table-bordered
       %thead
         %th
-          View&nbsp;
-        %th.medium-screens
           Name
         %th
           Email
@@ -22,18 +20,16 @@
         %th.medium-screens
           Indexed since #{Date.today.beginning_of_month.strftime("%m-%d")}
       %tbody
-        - @organization.users.each do |user|
+        - @organization.memberships.each do |membership|
           %tr
             %td
-              = link_to "&rarr;".html_safe, user_url(user)
-            %td.medium-screens
-              = user.name
+              = link_to membership.user.name, "/organizations/#{@organization.slug}/memberships/#{membership.id}/edit"
             %td
-              = user.email
+              = membership.user.email
             %td.medium-screens
-              = @bikes.where(creator_id: user.id).count
+              = @bikes.where(creator_id: membership.user.id).count
             %td.medium-screens
-              = @bikes.where(creator_id: user.id).where(["created_at >= ?", Date.today.beginning_of_month]).count
+              = @bikes.where(creator_id: membership.user.id).where(["created_at >= ?", Date.today.beginning_of_month]).count
   .invitations
     %hr
     %h2

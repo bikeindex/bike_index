@@ -2,7 +2,10 @@ Bikeindex::Application.routes.draw do
 
   get "dashboard/show"
   
-  resources :organizations, only: [:show, :edit, :update, :destroy]
+  resources :organizations, only: [:show, :edit, :update, :destroy] do 
+    resources :memberships, only: [:edit, :update, :destroy]
+  end
+
 
   root to: 'welcome#index'
 
