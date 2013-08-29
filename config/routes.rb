@@ -1,15 +1,8 @@
 Bikeindex::Application.routes.draw do
 
   get "dashboard/show"
-
-  constraints(Subdomain) do
-    match '/overview' => 'organizations#show'
-    match '/manage' => 'organizations#manage'
-    match '/organization_bikes' => 'organizations#bikes'
-    match '/settings' => 'organizations#settings'
-  end
   
-  resources :organizations, only: [:update, :destroy]
+  resources :organizations, only: [:show, :edit, :update, :destroy]
 
   root to: 'welcome#index'
 

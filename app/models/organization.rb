@@ -25,6 +25,10 @@ class Organization < ActiveRecord::Base
 
   scope :shown_on_map, where(show_on_map: true)
 
+  def to_param
+    slug
+  end
+
   before_save :set_slug
   def set_slug
     self.slug = Slugifyer.slugify(self.short_name)

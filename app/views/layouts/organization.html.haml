@@ -8,13 +8,11 @@
 %header.replace-header
   .inner-recep
     %h2.new-title
-      = nav_link current_organization.name, overview_url(:subdomain => current_organization.slug)
+      = nav_link current_organization.name, organization_path(@organization)
     %ul.org-links
       - if current_user.is_admin_of?(current_organization)
         %li
-          = nav_link "Users", manage_url(:subdomain => current_organization.slug)
-        %li
-          = nav_link "Settings", settings_url(:subdomain => current_organization.slug)
+          = nav_link "Manage", edit_organization_url(@organization)
     
     .org-add-bike
       = link_to "Add a bike to the Index", new_bike_url(creation_organization_id: current_organization.id), class: "button-green"

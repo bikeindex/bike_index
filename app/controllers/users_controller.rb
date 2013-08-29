@@ -130,14 +130,14 @@ class UsersController < ApplicationController
           else
             flash[:notice] = "Thanks for accepting the terms of service!"
           end
-          redirect_to user_home_url(:subdomain => false)
+          redirect_to user_home_url
           # TODO: Redirect to the correct page, somehow this breaks things right now though.
-          # redirect_to root_url(:subdomain => "#{@user.memberships.first.organization.slug}")
+          # redirect_to organization_home
         else
           redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index as #{@user.memberships.first.organization.name}"
         end
       else
-        redirect_to root_url(subdomain: false), notice: 'Your information was successfully updated.'
+        redirect_to root_url, notice: 'Your information was successfully updated.'
       end
     else
       flash[:error] = "Sorry, there was a problem updating your information"

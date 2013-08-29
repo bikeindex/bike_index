@@ -28,7 +28,8 @@ class MembershipSerializer < ActiveModel::Serializer
   end
 
   def base_url
-    overview_url(:subdomain => object.organization.slug)
+    # overview_url(:subdomain => object.organization.slug)
+    "blank"
   end
   
   def locations
