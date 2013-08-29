@@ -13,6 +13,7 @@ Bikeindex::Application.routes.draw do
 
   root to: 'welcome#index'
 
+  match 'update_browser', to: 'welcome#update_browser'
   match 'user_home', to: 'welcome#user_home'
   match 'choose_registration', to: 'welcome#choose_registration'
   match 'goodbye', to: 'welcome#goodbye'

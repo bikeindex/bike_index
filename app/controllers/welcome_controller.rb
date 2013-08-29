@@ -6,6 +6,10 @@ class WelcomeController < ApplicationController
     render action: 'index', layout: 'no_container'
   end
 
+  def update_browser
+    render action: 'update_browser', layout: false
+  end
+
   def goodbye
     @title = "goodbye"
   end
