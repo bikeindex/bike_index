@@ -8,7 +8,8 @@ class OrganizationsController < ApplicationController
   
   def show
     @title = @organization.name
-    @bikes = Bike.where(creation_organization_id: @organization.id).order("created_at asc")
+    bikes = Bike.where(creation_organization_id: @organization.id).order("created_at asc")
+    @bikes = bikes.decorate
   end
 
   def manage
