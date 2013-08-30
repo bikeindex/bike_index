@@ -41,7 +41,7 @@ class BikeIndex.Views.Global extends Backbone.View
                       </a>
                     </li>
                     <li>
-                      <a href="#{membership["base_url"]}">
+                      <a href="#{membership["base_url"]}overview">
                         #{membership["organization_name"]} Account
                       </a>
                     </li>
