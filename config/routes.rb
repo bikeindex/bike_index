@@ -89,6 +89,7 @@ Bikeindex::Application.routes.draw do
   namespace :api, defaults: {format: 'json'} do
     namespace :v1 do
       resources :bikes, only: [:index, :show]
+      resources :cycle_types, only: [:index]
       resources :manufacturers, only: [:index, :show]
       resources :users do 
         collection { get 'current' }

@@ -18,7 +18,7 @@ end
 colors = [
   { name: 'Black', priority: 1 },
   { name: 'White', priority: 1 },
-  { name: 'Silver or gray', priority: 1 },
+  { name: 'Gray or Silver', priority: 1 },
   { name: 'Red', priority: 1 },
   { name: 'Green', priority: 1 },
   { name: 'Blue', priority: 1 },
@@ -27,7 +27,7 @@ colors = [
   { name: 'Orange', priority: 1 },
   { name: 'Brown', priority: 1 },
   { name: 'Raw metal', priority: 2 },
-  { name: 'Yellow', priority: 1 },
+  { name: 'Yellow or Gold', priority: 1 },
   { name: 'Stickers, tape or other cover-up', priority: 3 }
 ]
 colors.each do |c|
