@@ -93,6 +93,7 @@ Bikeindex::Application.routes.draw do
       resources :wheel_sizes, only: [:index]
       resources :colors, only: [:index]
       resources :handlebar_types, only: [:index]
+      resources :frame_materials, only: [:index]
       resources :manufacturers, only: [:index, :show]
       resources :users do 
         collection { get 'current' }
