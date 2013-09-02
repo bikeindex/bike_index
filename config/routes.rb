@@ -90,6 +90,9 @@ Bikeindex::Application.routes.draw do
     namespace :v1 do
       resources :bikes, only: [:index, :show]
       resources :cycle_types, only: [:index]
+      resources :wheel_sizes, only: [:index]
+      resources :colors, only: [:index]
+      resources :handlebar_types, only: [:index]
       resources :manufacturers, only: [:index, :show]
       resources :users do 
         collection { get 'current' }
