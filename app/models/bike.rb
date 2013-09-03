@@ -37,7 +37,6 @@ class Bike < ActiveRecord::Base
     :rear_gear_type_other,
     :front_gear_type_id,
     :front_gear_type_other,
-    :gender,
     :description,
     :owner_email,
     :stolen_records_attributes,
