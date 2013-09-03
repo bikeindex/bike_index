@@ -32,6 +32,7 @@ class Component < ActiveRecord::Base
   end
 
   def manufacturer_name
+    return nil unless self.manufacturer
     if self.manufacturer.name == "Other" && self.manufacturer_other.present?
       return self.manufacturer_other
     else

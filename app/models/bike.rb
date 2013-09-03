@@ -46,7 +46,6 @@ class Bike < ActiveRecord::Base
     :creator,
     :creator_id,
     :created_with_token,
-    :invoice_id,
     :bike_image,
     :components_attributes,
     :bike_token_id,
