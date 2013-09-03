@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130821230157) do
+ActiveRecord::Schema.define(:version => 20130903142657) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -66,7 +66,6 @@ ActiveRecord::Schema.define(:version => 20130821230157) do
     t.string   "manufacturer_other"
     t.string   "zipcode"
     t.text     "cached_data"
-    t.string   "gender"
     t.text     "description"
     t.text     "owner_email"
     t.string   "thumb_path"
