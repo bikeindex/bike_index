@@ -1,33 +1,44 @@
 class MembershipsController < ApplicationController
   before_filter :authenticate_user!
   before_filter :find_membership
-  before_filter :require_admin_of_membership!
+  before_filter :require_admin
+
+  def edit
+    @user = @membership.user
+    bikes = Bike.where(creator_id: @user.id).where(creation_organization_id: @organization.id).order("created_at asc")
+    @bikes = BikeDecorator.decorate_collection(bikes)
+  end
 
   def update
-    @user = @membership.user
     if @membership.update_attributes(role: params[:membership][:role])
-      redirect_to user_url(@user), notice: "Updated user's settings."
+      redirect_to edit_organization_path(id: @organization.slug), notice: "Updated user's settings."
     else
-      redirect_to user_url(@user), notice: "Oops, update failed."
+      redirect_to edit_organization_path(id: @organization.slug), notice: "Oops, update failed."
     end
   end
 
   def destroy
-    @membership = current_organization.memberships.find(params[:id])
     @membership.destroy
     flash[:notice] = "Membership Destroyed. User booted from organization."
-    redirect_to root_url
+    redirect_to organization_path(@organization)
   end
 
   def find_membership
     @membership = Membership.find(params[:id])
   end
 
-  def require_admin_of_membership!
-    require_admin!
-    unless @membership.organization_id = current_organization.id 
+
+protected
+
+  def find_membership
+    @organization = Organization.find_by_slug(params[:organization_id])
+    @membership = Membership.find(params[:id])
+  end
+
+  def require_admin
+    unless current_user.is_admin_of?(@organization)
       flash[:error] = "You gotta be an organization administrator to do that!"
-      redirect_to root_url
+      redirect_to user_home_url and return
     end
   end
 

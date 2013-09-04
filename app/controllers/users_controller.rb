@@ -80,29 +80,15 @@ class UsersController < ApplicationController
     end
     @owner = user
     @user = user.decorate
-    if current_organization.present?
-      if current_user.is_admin_of?(current_organization)
-        @membership = user.memberships.where(organization_id:  current_organization.id).last
-        bikes = Bike.where(creation_organization_id: current_organization.id).order("created_at asc")
-        @bikes = BikeDecorator.decorate_collection(bikes)
-        render action: :organization_show, layout: "organization"
-      elsif current_user.is_member_of?(current_organization)
-        require_admin!
-      else
-        flash[:error] = "Sorry, that user isn't part of #{current_organization.name}"
-        redirect_to '/manage'
-      end
+    if user == current_user
+      # Render the site
     else
-      if user == current_user
-        # Render the site
-      else
-        unless @user.show_bikes
-          redirect_to user_home_url, notice: "Sorry, that user isn't sharing their bikes" and return
-        end
+      unless @user.show_bikes
+        redirect_to user_home_url, notice: "Sorry, that user isn't sharing their bikes" and return
       end
-      bikes = Bike.find(user.bikes)
-      @bikes = BikeDecorator.decorate_collection(bikes)
     end
+    bikes = Bike.find(user.bikes)
+    @bikes = BikeDecorator.decorate_collection(bikes)
   end
 
   def edit
@@ -130,14 +116,14 @@ class UsersController < ApplicationController
           else
             flash[:notice] = "Thanks for accepting the terms of service!"
           end
-          redirect_to user_home_url(:subdomain => false)
+          redirect_to user_home_url
           # TODO: Redirect to the correct page, somehow this breaks things right now though.
-          # redirect_to root_url(:subdomain => "#{@user.memberships.first.organization.slug}")
+          # redirect_to organization_home
         else
           redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index as #{@user.memberships.first.organization.name}"
         end
       else
-        redirect_to root_url(subdomain: false), notice: 'Your information was successfully updated.'
+        redirect_to root_url, notice: 'Your information was successfully updated.'
       end
     else
       flash[:error] = "Sorry, there was a problem updating your information"

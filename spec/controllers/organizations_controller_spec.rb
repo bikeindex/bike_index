@@ -23,4 +23,41 @@ describe OrganizationsController do
 
   end
 
+  describe :show do 
+    describe "user not member" do 
+      before do 
+        organization = FactoryGirl.create(:organization)
+        user = FactoryGirl.create(:user)
+        session[:user_id] = user.id
+        get :show, id: organization.slug
+      end
+      it { should respond_with(:redirect) }
+      it { should redirect_to(user_home_url) }
+      it { should set_the_flash }
+    end
+    
+    describe "when user is present" do 
+      it "should render" do 
+        organization = FactoryGirl.create(:organization)
+        user = FactoryGirl.create(:user)
+        membership = FactoryGirl.create(:membership, user: user, organization: organization)
+        session[:user_id] = user.id
+        get :show, id: organization.slug
+        response.code.should eq("200")
+      end
+    end
+  end
+
+  describe :edit do 
+    it "should render when user is admin" do 
+      organization = FactoryGirl.create(:organization)
+      user = FactoryGirl.create(:user)
+      membership = FactoryGirl.create(:membership, user: user, organization: organization, role: "admin")
+      session[:user_id] = user.id
+      get :edit, id: organization.slug
+      response.code.should eq("200")
+    end
+  end
+
+
 end
