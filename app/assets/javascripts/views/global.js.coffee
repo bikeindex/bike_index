@@ -41,7 +41,7 @@ class BikeIndex.Views.Global extends Backbone.View
                       </a>
                     </li>
                     <li>
-                      <a href="#{membership["base_url"]}overview">
+                      <a href="#{membership["base_url"]}">
                         #{membership["organization_name"]} Account
                       </a>
                     </li>
@@ -50,7 +50,7 @@ class BikeIndex.Views.Global extends Backbone.View
               if membership["is_admin"]
                 links = links + """
                   <li>
-                    <a href="#{membership["base_url"]}manage">
+                    <a href="#{membership["base_url"]}/edit">
                       Manage organization
                     </a>
                   </li>

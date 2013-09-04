@@ -1,24 +1,20 @@
 class OrganizationsController < ApplicationController
   before_filter :authenticate_user!
-  before_filter :require_member!
-  before_filter :require_admin!, only: [:edit, :update, :manage, :settings, :destroy]
   before_filter :find_organization
-  
+  before_filter :require_membership
+  before_filter :require_admin, only: [:edit, :update, :destroy]
   layout "organization"
   
-  def show
-    @title = @organization.name
-    bikes = Bike.where(creation_organization_id: @organization.id).order("created_at asc")
-    @bikes = bikes.decorate
-  end
-
-  def manage
+  def edit
     @title = "Manage #{@organization.name}"
     @bikes = Bike.where(creation_organization_id: @organization.id).non_token.order("created_at asc")
+    # @bikes = bikes.decorate
   end
 
-  def settings
-    @title = "Settings for #{@organization.name}"
+  def show
+    @title = "#{@organization.name}"
+    bikes = Bike.where(creation_organization_id: @organization.id).non_token.order("created_at asc")
+    @bikes = bikes.decorate
   end
 
   def update
@@ -27,7 +23,7 @@ class OrganizationsController < ApplicationController
       @organization.website = websitey
       if @organization.save
         # raise "organization saved"
-        redirect_to settings_url(:subdomain => @organization.slug), notice: "Organization updated"
+        redirect_to edit_organization_url(@organization), notice: "Organization updated"
       else
         raise "organization not saved"
         render action: :settings
@@ -40,13 +36,29 @@ class OrganizationsController < ApplicationController
 
   def destroy
     @organization.destroy
-    redirect_to root_url(:subdomain => @organization.slug)
+    redirect_to root_url
   end
 
   protected
 
   def find_organization 
-    @organization = current_organization
+    @organization = Organization.find_by_slug(params[:id])
+  end
+
+  def require_membership
+    if current_user.is_member_of?(@organization)
+      true
+    else
+      flash[:error] = "You're not a member of that organization!"
+      redirect_to user_home_url and return
+    end
+  end
+
+  def require_admin
+    unless current_user.is_admin_of?(@organization)
+      flash[:error] = "You gotta be an organization administrator to do that!"
+      redirect_to user_home_url and return
+    end
   end
 
 end
