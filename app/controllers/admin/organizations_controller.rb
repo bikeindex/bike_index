@@ -8,7 +8,6 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def show
     @organizations = Organization.all
-
     @bikes = Bike.where(creation_organization_id: @organization.id)
   end
 
@@ -55,6 +54,6 @@ class Admin::OrganizationsController < Admin::BaseController
   protected
 
   def find_organization
-    @organization = Organization.find(params[:id])
+    @organization = Organization.find_by_slug(params[:id])
   end
 end

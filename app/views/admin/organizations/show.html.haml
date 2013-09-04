@@ -14,7 +14,8 @@
       %p.red-text
         Organization is suspended
     %p
-      Domain: #{@organization.slug}.bikeindex.org
+      URL: 
+      =organization_url(@organization)
     %p
       users: #{@organization.users.count}
     %p
