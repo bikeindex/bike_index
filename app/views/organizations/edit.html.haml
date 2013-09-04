@@ -17,8 +17,6 @@
           Email
         %th.medium-screens
           Total indexed
-        %th.medium-screens
-          Indexed since #{Date.today.beginning_of_month.strftime("%m-%d")}
       %tbody
         - @organization.memberships.each do |membership|
           %tr
@@ -28,8 +26,6 @@
               = membership.user.email
             %td.medium-screens
               = @bikes.where(creator_id: membership.user.id).count
-            %td.medium-screens
-              = @bikes.where(creator_id: membership.user.id).where(["created_at >= ?", Date.today.beginning_of_month]).count
   .invitations
     %hr
     %h2
@@ -41,7 +37,7 @@
       = @organization.available_invitation_count
       remaining #{"invitation".pluralize(current_organization.available_invitation_count)}.
       - if @organization.available_invitation_count > 0
-        = link_to "Send an invitation to an employee", new_organization_invitation_url, class: "button-yellow"
+        = link_to "Send an invitation to an employee", "/organizations/#{@organization.slug}/organization_invitations/new", class: "button-yellow"
         
       
         
@@ -80,7 +76,7 @@
 
 
 
-%hr
+%hr.padded
 - if @organization.locations.any?
   - if @organization.locations.count > 1
     %h3.padded
@@ -103,30 +99,7 @@
         Street address: 
         = location.street
 
-
-.form.form-horizontal
-  = form_for @organization do |f|
-    - if @organization.errors.any?
-      #alert-block
-        .alert.alert-error
-          %h4
-            Please fix the following 
-            = pluralize(@organization.errors.count, "error")
-          %ul
-            - @organization.errors.full_messages.each do |msg|
-              %li
-                = msg
-
-    .control-group.padded.controls-appended
-      .control-label
-        = f.label :website
-      .controls.input-prepend
-        %span.add-on
-          http&#58;&#47;&#47;
-        = f.text_field :website
-    .control-group.actions
-      = f.submit 'Update organization', class: 'button-green'
-    
+   
 .delete-organization
   %p
     %a.collapsed{:data => {toggle: "collapse", target: "#delete-organization"}}

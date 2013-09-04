@@ -80,29 +80,15 @@ class UsersController < ApplicationController
     end
     @owner = user
     @user = user.decorate
-    if current_organization.present?
-      if current_user.is_admin_of?(current_organization)
-        @membership = user.memberships.where(organization_id:  current_organization.id).last
-        bikes = Bike.where(creation_organization_id: current_organization.id).order("created_at asc")
-        @bikes = BikeDecorator.decorate_collection(bikes)
-        render action: :organization_show, layout: "organization"
-      elsif current_user.is_member_of?(current_organization)
-        require_admin!
-      else
-        flash[:error] = "Sorry, that user isn't part of #{current_organization.name}"
-        redirect_to '/manage'
-      end
+    if user == current_user
+      # Render the site
     else
-      if user == current_user
-        # Render the site
-      else
-        unless @user.show_bikes
-          redirect_to user_home_url, notice: "Sorry, that user isn't sharing their bikes" and return
-        end
+      unless @user.show_bikes
+        redirect_to user_home_url, notice: "Sorry, that user isn't sharing their bikes" and return
       end
-      bikes = Bike.find(user.bikes)
-      @bikes = BikeDecorator.decorate_collection(bikes)
     end
+    bikes = Bike.find(user.bikes)
+    @bikes = BikeDecorator.decorate_collection(bikes)
   end
 
   def edit

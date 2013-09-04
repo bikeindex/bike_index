@@ -4,6 +4,7 @@ Bikeindex::Application.routes.draw do
   
   resources :organizations, only: [:show, :edit, :update, :destroy] do 
     resources :memberships, only: [:edit, :update, :destroy]
+    resources :organization_invitations, only: [:new, :create]
   end
 
 
@@ -21,7 +22,6 @@ Bikeindex::Application.routes.draw do
   resource :charges, only: [:new, :create]
 
   resources :ownerships, only: [:show]
-  resources :organization_invitations, only: [:new, :create]
   resources :memberships, only: [:update, :destroy]
 
   resources :stolen_notifications, only: [:create, :new]

@@ -1,6 +1,5 @@
 class Membership < ActiveRecord::Base
   attr_accessible :organization_id, :role, :user_id
-
   acts_as_paranoid
   
   belongs_to :organization

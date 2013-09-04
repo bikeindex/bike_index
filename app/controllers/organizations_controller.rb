@@ -7,8 +7,8 @@ class OrganizationsController < ApplicationController
   
   def edit
     @title = "Manage #{@organization.name}"
-    bikes = Bike.where(creation_organization_id: @organization.id).non_token.order("created_at asc")
-    @bikes = bikes.decorate
+    @bikes = Bike.where(creation_organization_id: @organization.id).non_token.order("created_at asc")
+    # @bikes = bikes.decorate
   end
 
   def show
@@ -23,7 +23,7 @@ class OrganizationsController < ApplicationController
       @organization.website = websitey
       if @organization.save
         # raise "organization saved"
-        redirect_to edit_organizations_url, notice: "Organization updated"
+        redirect_to edit_organization_url(@organization), notice: "Organization updated"
       else
         raise "organization not saved"
         render action: :settings

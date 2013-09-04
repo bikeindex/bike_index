@@ -20,7 +20,7 @@ class MembershipsController < ApplicationController
   def destroy
     @membership.destroy
     flash[:notice] = "Membership Destroyed. User booted from organization."
-    redirect_to root_url
+    redirect_to organization_path(@organization)
   end
 
   def find_membership
