@@ -13,6 +13,7 @@ class Organization < ActiveRecord::Base
   acts_as_paranoid
 
   has_many :memberships, dependent: :destroy
+  has_many :organization_deals, dependent: :destroy
   has_many :users, through: :memberships
   has_many :organization_invitations, dependent: :destroy
 

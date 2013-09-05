@@ -100,7 +100,7 @@ Bikeindex::Application.routes.draw do
   resources :manufacturers, only: [:show, :index]
   match 'manufacturers_mock_csv', to: 'manufacturers#mock_csv'
 
-
+  resources :organization_deals, only: [:create, :new]
   resource :integrations, only: [:create]
   match '/auth/:provider/callback', :to => "integrations#create"
 
