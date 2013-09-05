@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130903142657) do
+ActiveRecord::Schema.define(:version => 20130905215302) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -268,6 +268,15 @@ ActiveRecord::Schema.define(:version => 20130903142657) do
 
   add_index "memberships", ["organization_id"], :name => "index_memberships_on_organization_id"
   add_index "memberships", ["user_id"], :name => "index_memberships_on_user_id"
+
+  create_table "organization_deals", :force => true do |t|
+    t.integer  "organization_id"
+    t.string   "deal_name"
+    t.string   "email"
+    t.string   "user_id"
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
+  end
 
   create_table "organization_invitations", :force => true do |t|
     t.string   "invitee_email"

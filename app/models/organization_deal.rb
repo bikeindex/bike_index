@@ -5,5 +5,7 @@ class OrganizationDeal < ActiveRecord::Base
   belongs_to :user 
 
   validates_presence_of :organization_id, :deal_name, :email
+  
+
 
 end

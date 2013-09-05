@@ -1,0 +1,23 @@
+%h1
+  Claim your free registration!
+= form_for [@organization_deal], :html => { class: "form-horizontal padded" } do |f|
+  - if @organization_deal.errors.any?
+    #alert-block
+      .alert.alert-error
+        %h4
+          Please fix the following 
+          = pluralize(@organization_deal.errors.count, "error")
+        %ul
+          - @organization_deal.errors.full_messages.each do |msg|
+            %li
+              = msg
+  = f.hidden_field :organization_id, value: @organization_id
+  = f.hidden_field :deal_name, value: @name
+
+  .control-group
+    = f.label :email, "Email", class: "control-label"
+    .controls
+      = f.email_field :email, :required =>true
+  
+  .control-group.actions.padded
+    = f.submit "Claim registration", class: 'button-green'
