@@ -1,5 +1,5 @@
 %h1
-  Claim your free registration!
+  Claim your free registration from #{@organization.name}!
 = form_for [@organization_deal], :html => { class: "form-horizontal padded" } do |f|
   - if @organization_deal.errors.any?
     #alert-block
@@ -11,7 +11,7 @@
           - @organization_deal.errors.full_messages.each do |msg|
             %li
               = msg
-  = f.hidden_field :organization_id, value: @organization_id
+  = f.hidden_field :organization_id, value: @organization.id
   = f.hidden_field :deal_name, value: @name
 
   .control-group

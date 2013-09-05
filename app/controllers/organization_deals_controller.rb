@@ -2,7 +2,7 @@ class OrganizationDealsController < ApplicationController
 
   def new
     @organization_deal = OrganizationDeal.new
-    @organization_id = Organization.find(params[:organization_id])
+    @organization = Organization.find(params[:organization_id])
     @name = params[:deal_name]
   end
 
