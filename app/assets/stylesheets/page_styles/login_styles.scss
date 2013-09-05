@@ -234,6 +234,13 @@
   display: none;
 }
 
+#photo-page {
+  @include clearfix;
+  display: block;
+  position: relative;
+  width: 100%;
+}
+
 @media (min-width: 768px) {
   .photo-animation {
     width: $eightColumn;

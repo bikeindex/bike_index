@@ -47,7 +47,7 @@ Bikeindex::Application.routes.draw do
   resources :blogs, only: [:show, :index]
   match 'blog', to: "blogs#index"
 
-  resources :public_images, only: [:create, :show, :edit, :update, :destroy] do 
+  resources :public_images, only: [:create, :show, :edit, :update, :index, :destroy] do 
     collection do
       post :order
     end
