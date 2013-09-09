@@ -7,7 +7,7 @@ class Admin::OrganizationsController < Admin::BaseController
   end
 
   def show
-    @organizations = Organization.all
+    # @organizations = Organization.all
     @bikes = Bike.where(creation_organization_id: @organization.id)
   end
 
@@ -55,5 +55,9 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def find_organization
     @organization = Organization.find_by_slug(params[:id])
+    unless @organization
+      flash[:error] = "Sorry! That organization doesn't exist"
+      redirect_to admin_organizations_url and return
+    end
   end
 end
