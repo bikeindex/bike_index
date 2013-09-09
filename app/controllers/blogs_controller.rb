@@ -9,7 +9,7 @@ class BlogsController < ApplicationController
 
   def index
     @title = "Blog"
-    @blogs = Blog.where(published: true).order("post_date desc")
+    @blogs = Blog.where(published: true)
   end
 
   def set_blogs_active_section

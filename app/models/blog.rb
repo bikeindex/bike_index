@@ -15,7 +15,7 @@ class Blog < ActiveRecord::Base
   validates_uniqueness_of :title, message: "has already been taken. If you believe that this message is an error, contact us!"
   validates_uniqueness_of :title_slug, message: "somehow that overlaps with another title! Sorrys."
 
-  default_scope order(:post_date)
+  default_scope order("post_date desc")
 
   before_save :set_post_date
   def set_post_date
