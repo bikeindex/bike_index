@@ -62,7 +62,6 @@ describe Bike do
     end
     it "should find bikes by wheel size" do
       bike = FactoryGirl.create(:bike)
-      pp bike.rear_wheel_size
       query = ["1w#{bike.rear_wheel_size_id}"]
       result = Bike.attr_cache_search(query)
       result.first.should eq(bike)

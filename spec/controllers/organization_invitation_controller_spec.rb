@@ -2,42 +2,27 @@ require "spec_helper"
 
 describe OrganizationInvitationsController do
   describe :new do 
-    before do 
-      ApplicationController.any_instance.should_receive(:require_admin!).and_return(true)
-      post :new
+    it "should render the page" do 
+      user = FactoryGirl.create(:user, email: "MEMBERSTHING@ggg.com")
+      organization = FactoryGirl.create(:organization, available_invitation_count: 1)
+      membership = FactoryGirl.create(:membership, organization: organization, user: user, role: "admin")
+      session[:user_id] = user.id
+      { put: "/organizations/#{organization.slug}/organization_invitations/new" }
+      response.code.should eq("200")
     end
-    it { should respond_with(:success) }
-    it { should render_template(:new) }
-    it { should_not set_the_flash }
   end
 
   describe :create do
     before :each do
       @user = FactoryGirl.create(:user)
       @organization = FactoryGirl.create(:organization, available_invitation_count: 1)
+      @membership = FactoryGirl.create(:membership, organization: @organization, user: @user, role: "admin")
+      session[:user_id] = @user.id
     end
     
-    it "should create a new organization_invitation" do
-      controller.should_receive(:require_admin!).and_return(true)
-      controller.should_receive(:current_organization).and_return(@organization)
-      @organization_invitation = FactoryGirl.create(:organization_invitation, {inviter_id: @user.id, organization_id: @organization.id, invitee_email: "bike_email@bike_shop.com"})
-      session[:user_id] = @user.id
+    it "should create a new organization_invitation and reduce the organization invitation tokens by one" do
       lambda {
-        post :create, organization_invitation: { 
-          inviter_id: @user.id,
-          membership_role: "member",
-          invitee_email: "bike_email@bike_shop.com"
-        }
-      }.should change(OrganizationInvitation, :count).by(1)
-    end
-
-    it "should reduce the number of invitation tokens for the organization by one and increase the invitations sent by one" do
-      controller.should_receive(:require_admin!).and_return(true)
-      controller.should_receive(:current_organization).and_return(@organization)
-      @organization_invitation = FactoryGirl.create(:organization_invitation, {inviter_id: @user.id, organization_id: @organization.id, invitee_email: "bike_email@bike_shop.com"})
-      session[:user_id] = @user.id
-      lambda {
-        post :create, organization_invitation: { 
+        put :create, organization_id: @organization.slug, organization_invitation: { 
           inviter_id: @user.id,
           membership_role: "member",
           invitee_email: "bike_email@bike_shop.com"
@@ -48,12 +33,9 @@ describe OrganizationInvitationsController do
     end
 
     it "should not create a new organization_invitation if there are no available invitations" do
-      controller.should_receive(:require_admin!).and_return(true)
-      controller.should_receive(:current_organization).and_return(@organization)
-      @organization.available_invitation_count = 0
-      @organization_invitation = FactoryGirl.create(:organization_invitation, {inviter_id: @user.id, organization_id: @organization.id, invitee_email: "bike_email@bike_shop.com"})
+      @organization.update_attributes(available_invitation_count: 0)
       lambda {
-        post :create, organization_invitation: { 
+        put :create, organization_id: @organization.slug, organization_invitation: { 
           inviter_id: @user.id,
           membership_role: "member",
           invitee_email: "bike_email@bike_shop.com"

@@ -139,33 +139,6 @@ describe UsersController do
       get :show, id: @user.username
       response.should render_template :show 
     end
-
-    describe "org user view" do 
-      before do
-        member = FactoryGirl.create(:user) 
-        admin = FactoryGirl.create(:user)
-        org =  FactoryGirl.create(:organization)
-        FactoryGirl.create(:membership, organization: org, user: member, role: "member")
-        FactoryGirl.create(:membership, organization: org, user: admin, role: "admin")
-        session[:user_id] = admin.id
-        controller.should_receive(:current_organization).at_least(1).times.and_return(org)
-        get :show, id: member.username
-      end
-      it { should respond_with(:success) }
-      it { should render_template(:organization_show) }
-    end
-
-    it "should error for a member to view" do 
-      member = FactoryGirl.create(:user) 
-      admin = FactoryGirl.create(:user)
-      org =  FactoryGirl.create(:organization)
-      FactoryGirl.create(:membership, organization: org, user: member, role: "member")
-      FactoryGirl.create(:membership, organization: org, user: admin, role: "admin")
-      session[:user_id] = member.id
-      controller.should_receive(:current_organization).at_least(1).times.and_return(org)
-      get :show, id: admin.username
-      response.should redirect_to(user_home_url)
-    end
   end
 
   describe :accept_vendor_terms do 

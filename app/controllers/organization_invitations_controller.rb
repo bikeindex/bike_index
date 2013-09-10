@@ -35,6 +35,5 @@ class OrganizationInvitationsController < ApplicationController
       redirect_to user_home_url and return
     end
   end
- 
 
 end
