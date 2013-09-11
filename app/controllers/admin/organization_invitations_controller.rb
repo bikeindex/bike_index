@@ -37,7 +37,7 @@ class Admin::OrganizationInvitationsController < Admin::BaseController
     @organization = @organization_invitation.organization
     if @organization.available_invitation_count > 0
       if @organization_invitation.save
-        redirect_to admin_organization_url(@organization_invitation.organization.id), notice: "#{@organization_invitation.invitee_email} was invited to #{@organization.name}!"
+        redirect_to admin_organization_url(@organization_invitation.organization.slug), notice: "#{@organization_invitation.invitee_email} was invited to #{@organization.name}!"
       else
         flash[:error] = "Oh no! Error problem things! The invitation was not saved. Maybe we're missing some information?"
         redirect_to edit_admin_organization_invitation_url(@organization_invitation.organization.id)

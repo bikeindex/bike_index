@@ -17,10 +17,7 @@
       %label.control-label
         Organization select
       .controls
-        - if @organization.present?
-          = collection_select( :organization_invitation, :organization_id, @organizations, :id, :name, :required =>true, prompt: "Choose an organization", value: @organization.id)
-        - else
-          = collection_select( :organization_invitation, :organization_id, @organizations, :id, :name, :required =>true, prompt: "Choose an organization")
+        = collection_select( :organization_invitation, :organization_id, @organizations, :id, :name, :required =>true, prompt: "Choose an organization")
           
     .control-group.padded
       = f.label :invitee_email, "Email you're inviting", class: "control-label"

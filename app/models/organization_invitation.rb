@@ -6,7 +6,10 @@ class OrganizationInvitation < ActiveRecord::Base
     :organization_id,
     :inviter,
     :inviter_id,
-    :membership_role
+    :membership_role,
+    :admin_org_id
+
+  attr_accessor :admin_org_id
 
   # We are making people fill in names. That way, everyone who is at an
   # organization has a name in the email they send when creating bikes
