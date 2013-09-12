@@ -31,8 +31,8 @@ class MembershipsController < ApplicationController
 protected
 
   def find_membership
-    @organization = Organization.find_by_slug(params[:organization_id])
     @membership = Membership.find(params[:id])
+    @organization = @membership.organization
   end
 
   def require_admin
