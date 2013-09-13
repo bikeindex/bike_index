@@ -4,7 +4,6 @@
   %h3
     The Bike Index works with you and bike shops to register and protect your bicycle
 
-
 #treating-right
   .treating-right-image
     / = image_tag "/assets/home/breakfast_in_bed.svg", alt: "Show your bike some love", title: "Show your bike some love"
@@ -19,6 +18,15 @@
           Show your trusty steed some love
     .home-sharing
       = render "/shared/home_share"    
+
+#kickstarter
+  .receptacle.overfloating
+    .inner-recep
+      %h2
+        = link_to "Check out our Kickstarter!", "http://kck.st/181KohZ"
+      .kickstarter-iframe
+        :plain
+          <iframe frameborder="0" height="380" src="http://www.kickstarter.com/projects/1073266317/the-bike-index-lets-stop-bike-theft-together/widget/card.html" width="220"></iframe>
 
 #our-database
   .receptacle
