@@ -340,6 +340,7 @@ body.welcome-page {
   background: url("/assets/kickstarter_background.jpg") center center;
   position: relative;
   z-index: 10;
+  overflow: hidden;
   border-bottom: 1px solid $searchBorderLight;
   width: 100%;
   height: 420px;
@@ -365,6 +366,19 @@ body.welcome-page {
     right: 0;
   }
 }
+
+@media (max-width: 600px) {
+  #kickstarter {
+    h2 { display: none; }
+    .kickstarter-iframe {
+      margin: 20px auto;
+      position: relative;
+      width: 212px;
+    }
+  }
+}
+
+
 
 
 
