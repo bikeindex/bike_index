@@ -71,9 +71,7 @@
             %label.control-label{ for: 'bike_owner_email' }
               Owner email address
             .controls
-              - o_email = current_user.email if @bike.stolen
-              - o_email = current_user.email if @bike.created_with_token
-              - o_email = current_user.email if @bike.payment_required
+              - o_email = current_user.email unless @bike.creation_organization
               = f.email_field :owner_email, value: o_email
         
         .input-group.form-foot

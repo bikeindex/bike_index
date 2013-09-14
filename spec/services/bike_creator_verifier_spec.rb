@@ -2,12 +2,13 @@ require 'spec_helper'
 
 describe BikeCreatorVerifier do
 
-  describe :set_payment_required do 
+  describe :set_no_payment_required do 
     it "should set payment required on the bike" do
       bike = Bike.new
       b_param = BParam.new 
-      creator = BikeCreatorVerifier.new(b_param, bike).set_payment_required
-      bike.payment_required.should be_true
+      creator = BikeCreatorVerifier.new(b_param, bike).set_no_payment_required
+      bike.payment_required.should be_false
+      bike.verified.should be_true
     end
   end
 
@@ -70,7 +71,7 @@ describe BikeCreatorVerifier do
       bike = Bike.new
       b_param = BParam.new(params: {stolen: true})
       creator = BikeCreatorVerifier.new(b_param, bike)
-      creator.should_receive(:set_payment_required).and_return(true)
+      creator.should_receive(:set_no_payment_required).and_return(true)
       creator.should_receive(:check_token).and_return(true) 
       creator.should_receive(:check_stolen).and_return(true)
       creator.verify.should eq(bike)

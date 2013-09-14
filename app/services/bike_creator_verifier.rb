@@ -4,9 +4,9 @@ class BikeCreatorVerifier
     @bike = bike 
   end
 
-  def set_payment_required
-    @bike.payment_required = true
-    @bike.verified = false
+  def set_no_payment_required
+    @bike.payment_required = false
+    @bike.verified = true
   end
 
   def check_token
@@ -31,7 +31,7 @@ class BikeCreatorVerifier
   end
 
   def verify
-    set_payment_required
+    set_no_payment_required
     check_token
     check_organization
     check_stolen

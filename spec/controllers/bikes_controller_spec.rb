@@ -111,7 +111,8 @@ describe BikesController do
       response.should render_template("new")
     end
 
-    it "should redirect to charges if payment is required" do
+    xit "should redirect to charges if payment is required" do
+      # DISABLE FOR NOW, we're not accepting any payments.
       post :create, { bike: @bike }
       response.should redirect_to(new_charges_url(b_param_id: @b_param.id))
     end
