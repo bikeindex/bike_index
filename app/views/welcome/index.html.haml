@@ -20,17 +20,19 @@
       = render "/shared/home_share"    
 
 #kickstarter
-  %span.kickstarter-background
+  .kickstarter-background
     = image_tag "/assets/home/kickstarter-background.svg"
   .receptacle.overfloating
     .inner-recep
+      %h2
+        Join us, let's stop bike theft
       .kickstarter-main
-        / %h2
-        /   = link_to "Check out our Kickstarter!", "http://kck.st/181KohZ"
         .kvid
-      .kickstarter-iframe
-        :plain
-          <iframe frameborder="0" height="380" src="http://www.kickstarter.com/projects/1073266317/the-bike-index-lets-stop-bike-theft-together/widget/card.html" width="220"></iframe>
+          :plain
+            <iframe width="480" height="360" src="https://www.kickstarter.com/projects/1073266317/the-bike-index-lets-stop-bike-theft-together/widget/video.html" frameborder="0"> </iframe>
+        .kickstarter-iframe
+          :plain
+            <iframe frameborder="0" height="380" src="https://www.kickstarter.com/projects/1073266317/the-bike-index-lets-stop-bike-theft-together/widget/card.html" width="220"></iframe>
 
 #our-database
   .receptacle

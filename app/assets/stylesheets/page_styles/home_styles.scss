@@ -343,15 +343,16 @@ body.welcome-page {
   width: 100%;
   .kickstarter-background {
     display: block;
-    width: 100%;
+    width: 110%;
     height: 100%;
     position: absolute;
     left: 0; top: 0;
     z-index: 0;
     img {
+      width: 100%;
       min-height: 100%;
-      min-width: 100%;
-      max-width: 300%;
+      // min-width: 100%;
+      max-width: 500%;
     }
     &:before {
       content: " ";
@@ -366,54 +367,59 @@ body.welcome-page {
   }
   .receptacle { z-index: 1; }
   h2 {
-    font-weight: bold;
-    font-family: $baseFont;
+    // font-weight: bold;
+    // font-family: $baseFont;
     text-align: center;
-    font-size: 30px;
-    a {
-      color: $blueDarker;
-      text-shadow: 1px 1px 2px rgba(black,.2);
-    }
+    font-size: 40px;
+    margin: 20px 0 30px;
+    color: $blueDarker;
+    // text-shadow: 1px 1px 2px rgba(black,.2);
   }
   .kickstarter-main {
     position: relative;
-    display: none;
     width: 100%;
-    padding-right: 240px;
     .kvid {
+      display: none;
       width: 480px;
     }
   }
   .kickstarter-iframe {
-    margin: 20px 0 20px auto;
+    margin: 0;
     position: absolute;
-    right: 0; top: 0;
-  }
-}
-@media (min-width: 760px) {
-  #kickstarter {
-    .kickstarter-main {
-      display: block;
-      .kvid { margin: 30px auto; }
-    }
+    right: 0;
+    top: -10px;
+    overflow: visible;
   }
 }
 
 @media (min-width: 960px) {
   #kickstarter {
+    h2 { font-size: 60px; }
     .kickstarter-main .kvid {
       margin: 20px auto;
       width: 640px;
     }
     .kickstarter-iframe {
+      // top: 0px;
       top: 50px;
+    }
+  }
+}
+
+@media (min-width: 760px) {
+  #kickstarter {
+    .kickstarter-main {
+      padding-right: 240px;
+      .kvid {
+        display: block;
+        margin: 15px auto;
+      }
     }
   }
 }
 
 @media (max-width: 760px) {
   #kickstarter {
-    height: 420px;
     .kickstarter-iframe {
       margin: 20px auto;
       position: relative;
