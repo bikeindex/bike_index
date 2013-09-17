@@ -6,16 +6,12 @@
 @import "includes/bootstrap/_mixins.scss";
 @import "includes/bootstrap/_reset.scss";
 
-$headerFont: 'Rambla', sans-serif;
-
 .spokecard-wrap {
-  @include clearfix;
-  font-family: $headerFont;
   position: relative;
   margin: 100px auto;
   width: 600px;
   height: 380px;
-  padding: 20px;
+  padding: 0;
   &>span {
     border: 1px solid black;
     height: 20px; width: 20px;
@@ -23,54 +19,46 @@ $headerFont: 'Rambla', sans-serif;
     display: block;
   }
   .tleft {
-    top: 0; left: 0;
+    top: -20px; left: -20px;
     border-top: 0;
     border-left: 0;
   }
   .bleft {
-    bottom: 0; left: 0;
+    bottom: -20px; left: -20px;
     border-bottom: 0;
     border-left: 0;
   }
   .tright {
-    top: 0; right: 0;
+    top: -20px; right: -20px;
     border-right: 0;
     border-top: 0;
   }
   .bright {
-    bottom: 0; right: 0;
+    bottom: -20px; right: -20px;
     border-right: 0;
     border-bottom: 0;
   }
 }
 
-.qr-code {
-  float: left;
+.spokecard-background {
   display: block;
-  width: 170px;
-  margin: 160px 20px 0 0;
-}
-
-.mace-man, .steed {
-  margin: 20px 0 0;
-  float: left;
-  display: block;
-  height: 300px;
-  width: auto;
-}
-
-h1 {
-  margin: 0;
-  text-align: center;
-  font-size: 30px;
-}
-
-h2 {
-  color: #ccc;
-  margin: 0;
-  font-size: 20px;
   position: absolute;
-  bottom: 22px;
-  right: 30px;
-  text-transform: uppercase;
+  left: 0; top: 0;
+  width: 100%;
+  z-index: 1;
+}
+
+.qr-code-f, .qr-code-b {
+  display: block;
+  position: absolute;
+  z-index: 2;
+  left: 50%; top: 50%;
+  background: white;
+  padding: 4px 10px;
+  margin: -87px 0 0 -70px;
+  img { height: 148px; }
+}
+
+.qr-code-b {
+  margin: -87px 0 0 -103px;
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 15.0.2, SVG Export Plug-In  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" [
+	<!ENTITY ns_flows "http://ns.adobe.com/Flows/1.0/">
+]>
+<svg version="1.1"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/"
+	 x="0px" y="0px" width="360px" height="216px" viewBox="0 0 360 216" overflow="visible" enable-background="new 0 0 360 216"
+	 xml:space="preserve">
+<defs>
+</defs>
+<rect x="2.362" y="14.106" fill="#FFFFFF" width="327.4" height="189.297"/>
+<rect fill="#FFFFFF" width="360" height="216"/>
+<rect x="2.362" y="14.106" fill="#3B97D3" width="327.4" height="36.635"/>
+<rect x="2.362" y="64.994" fill="#2980BA" width="327.4" height="36.635"/>
+<rect x="2.362" y="115.882" fill="#35495E" width="327.4" height="36.635"/>
+<rect x="2.362" y="166.769" fill="#2C3E50" width="327.4" height="36.635"/>
+<polygon fill="#2980BA" points="328.763,107.328 351.429,83.311 328.763,59.294 "/>
+<polygon fill="#3B97D3" points="328.763,56.44 351.429,32.423 328.763,8.407 "/>
+<polygon fill="#35495E" points="328.763,158.216 351.429,134.199 328.763,110.182 "/>
+<polygon fill="#2C3E50" points="328.763,209.104 351.429,185.087 328.763,161.069 "/>
+<text transform="matrix(1 0 0 1 24.4492 49.3066)" fill="#FFFFFF" font-family="'Ribbon'" font-size="42.8029" letter-spacing="2">REGISTERED</text>
+<text transform="matrix(1 0 0 1 24.4492 201.1523)" fill="#FFFFFF" font-family="'Ribbon'" font-size="41.862">bikeindex.org</text>
+</svg>

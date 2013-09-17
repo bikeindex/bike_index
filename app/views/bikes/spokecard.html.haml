@@ -13,7 +13,6 @@
     <!--[if lt IE 9]>
     <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <link href='https://fonts.googleapis.com/css?family=Raleway:300,400,500,600,700' rel='stylesheet' type='text/css'>
 
 %body
   .spokecard-wrap
@@ -22,11 +21,18 @@
     %span.tright
     %span.bright
 
-    = image_tag "/assets/mace-man.png", alt: "Lunatic brigand with a mace attacking a lovely steed", title: "Lunatic brigand with a mace attacking a lovely steed", class: "mace-man"
+    = image_tag "/assets/spokecard_front.svg", alt: "Spokecard front", title: "GO FAST", class: "spokecard-background"
     
-    %img.qr-code{ src: "#{bike_url(@bike)}.gif", alt: "This bike's qrcode" }
+    .qr-code-f
+      %img{ src: "#{bike_url(@bike)}.gif", alt: "This bike's qrcode" }
 
-    = image_tag "/assets/lovely-steed.png", alt: "The lovely steed the lunatic with a mace is attacking (duh)", title: "The lovely Steed", class: "steed"
+  .spokecard-wrap
+    %span.tleft
+    %span.bleft
+    %span.tright
+    %span.bright
 
-    %h2
-      BikeIndex.org
+    = image_tag "/assets/spokecard_back.svg", alt: "Spokecard back", title: "GO FAST", class: "spokecard-background"
+
+    .qr-code-b
+      %img{ src: "#{bike_url(@bike)}.gif", alt: "This bike's qrcode" }
