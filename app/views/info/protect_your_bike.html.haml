@@ -1,0 +1,67 @@
+%h1
+  Protect your bike 
+
+%p#fnref-bike-theft-estimate
+  Each year
+  %strong
+    over a million bikes are stolen
+  in the United States.
+  %sup
+    %a.footnote-ref{ href: "#fn-bike-theft-estimate" }
+      1
+
+%h2.padded
+  Make sure your bike isn't one of by following these guidelines.
+
+%article.padded
+  %ul
+    %li
+      %p
+        %strong
+          Cable locks should never be used as a primary means of locking a bike in a city.
+    %li
+      %p
+        Aim to have the hardest bike to steal on the bike rack. We consider two U-locks, or one U-lock and one heavy duty cable to be the minimum required in large cities to keep a bike secure.
+    %li
+      %p
+        Don't rely on foot traffic to keep your bike safe; years of reports have taught us that many thefts, particularly those involving cutting cable locks, occur under the cover of crowd activity or in front of bustling cafés or restaurants.
+    %li
+      %p
+        Don't rely on the presence of cameras to keep your bike secure. Security footage is rarely of much use once a bike is gone, and thieves know this.
+    %li
+      %p
+        Cheaper and older U-locks can often be defeated with common hand tools, or no tools at all.
+    %li
+      %p
+        Signposts can be removed from the ground by unbolting them. Some are already unattached. Do not lock to signposts without first checking to make sure they can't be easily removed.
+    %li
+      %p
+        Many bicycles are stolen from garages and store rooms. Lock your bike securely to an immovable object even if in a "secure" place.
+
+%article#locking-demonstration
+  .locked
+    = image_tag "/assets/Locking.svg", alt: "Correctly locking a bike", title: "Pink Power U-Locks are a registered trademark of Bike Index, Inc"
+  %p
+    %em
+      %strong
+        A correctly locked bike. 
+      The frame is locked to the bike rack and both wheels are secured.
+
+
+.footnotes
+  %ol
+    %li#fn-bike-theft-estimate
+      According to FBI statistics,
+      %a{ href: "http://www.fbi.gov/about-us/cjis/ucr/crime-in-the-u.s/2010/crime-in-the-u.s.-2010/tables/10tbl07.xls" }
+        206,053 bikes were reported stolen
+      in 2010, the most recent available year with data. An estimated
+      %a{ href: "http://www.transalt.org/files/resources/blueprint/chapter11/" }
+        9 in 10 incidents of bike theft
+      go unreported. That's a lot of bikes! What’s more: reporting bike theft is sometimes actively
+      %a{ href: "http://www.outsideonline.com/outdoor-adventure/biking/Who-Pinched-My-Ride.html?page=all" }
+        discouraged by the police.
+      If you would like to read more about bike theft in the US, check out Priceonomics'
+      %a{ href: "http://blog.priceonomics.com/post/30393216796/what-happens-to-stolen-bicycles" }
+        exploration 
+      of the topic. #{link_to "↩", "#fnref-bike-theft-estimate", title: "Jump back to footnote 1 in the text", class: "footnote-back-link"}.
+

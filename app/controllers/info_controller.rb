@@ -1,13 +1,9 @@
 class InfoController < ApplicationController
   layout 'content'
-  # caches_page :about, :stolen, :where, :roadmap, :security, :serials, :stolen_bikes, :privacy, :terms, :vendor_terms, :downloads, :resources, :spokecard
+  # caches_page :about, :where, :roadmap, :security, :serials, :stolen_bikes, :privacy, :terms, :vendor_terms, :downloads, :resources, :spokecard
   before_filter :set_title
 
   def about
-    @active_section = "about"
-  end
-  
-  def stolen
     @active_section = "about"
   end
   
@@ -26,6 +22,10 @@ class InfoController < ApplicationController
 
   def serials
     @active_section = "resources"
+  end
+
+  def protect_your_bike
+    @active_section = "about"
   end
 
   def stolen_bikes
