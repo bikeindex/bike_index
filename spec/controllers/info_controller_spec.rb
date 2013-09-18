@@ -10,20 +10,12 @@ describe InfoController do
     it { should render_template(:about) }
   end
 
-  describe :about do 
+  describe :protect_your_bike do 
     before do 
-      get :about
+      get :protect_your_bike
     end
     it { should respond_with(:success) }
-    it { should render_template(:about)}
-  end
-
-  describe :stolen do 
-    before do 
-      get :stolen
-    end
-    it { should respond_with(:success) }
-    it { should render_template(:stolen)}
+    it { should render_template(:protect_your_bike) }
   end
 
   describe :where do 
