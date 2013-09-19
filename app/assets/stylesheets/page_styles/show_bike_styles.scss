@@ -61,6 +61,10 @@ header.single-bike {
 //
 //________________________
 
+@media (max-width: 768px) {
+  .receptacle.bike-search-page { padding: 0; }
+}
+
 .bike-boxes {
   list-style-type: none;
   position: relative;
@@ -76,13 +80,6 @@ header.single-bike {
 }
 
 .bike-boxes li:nth-child(odd) { background-color: $tableBackgroundAccent; }
-
-@media (max-width: 600px) {
-  .bike-boxes {
-    li { padding: 10px 5px 5px; }
-  }
-}
-
 
 .blist-image-holder {
   width: $twoColumn;
@@ -127,6 +124,10 @@ header.single-bike {
   }
 }
 
+@media (max-width: 550px) {
+  .bike-boxes .blist-info-group { display: none; }
+}
+
 @media (min-width: 768px) {
   .bike-boxes .dl-holder dd { width: 100%; }
 }
@@ -153,6 +154,14 @@ header.single-bike {
     width: 100%;
     float: none;
     clear: left;
+  }
+}
+
+
+@media (max-width: 550px) {
+  .bike-boxes li.blist-stolen .blist-stolen-info .dl-horizontal {
+    width: 100%;
+    float: none;
   }
 }
 
