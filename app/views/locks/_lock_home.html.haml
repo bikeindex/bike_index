@@ -9,15 +9,15 @@
   %ul.lock-boxes
     - @locks.each do |lock|
       %li
-        .image-holder
+        .blist-image-holder
           %a{href: "/locks/#{lock.id}"}
             %img{ src: "/assets/locks/#{lock.lock_type.slug}.jpg", alt: lock.lock_type.name} 
-        .primary-group
+        .blist-primary-group
           .dl-holder
             %dl.dl-horizontal
               = link_to (lock.dl_list_item("Lock Type", lock.lock_type_name)), lock_url(lock)
               = link_to (lock.dl_list_item("Manufacturer", lock.mnfg_name)), lock_url(lock)
-        .info-group
+        .blist-info-group
           .dl-holder
             %dl.dl-horizontal
               = lock.dl_from_attribute("key_serial")

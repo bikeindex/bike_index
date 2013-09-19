@@ -1,25 +1,28 @@
-%li{ class: bike.stolen && "stolen-background" }
+%li{ class: bike.stolen && "blist-stolen" }
   = bike.list_image(target)
-  .primary-group
+  .blist-primary-group
     .dl-holder
-      %dl.dl-horizontal
-        = link_to(bike.dl_list_item(bike.title, bike.type.titleize), bike.list_link_url(target))
-      %dl.dl-horizontal
-        %dt Serial
-        %dd.serial-text
-          = bike.serial_number
+      %a.blist-link{ href: bike.list_link_url(target) }
+        %dl.dl-horizontal
+          %dt Serial
+          %dd.serial-text
+            = bike.serial_number
+        %dl.dl-horizontal
+          = bike.dl_list_item(bike.title, bike.type.titleize)
         
-  .info-group
+  .blist-info-group
     .dl-holder
       %dl.dl-horizontal
-        = bike.dl_list_item(bike.ass_name("primary_frame_color"), "Primary color")
-        = bike.dl_list_item(bike.ass_name("frame_material"), "Material")
-        - if bike.stolen and bike.stolen_records.any?
-          = bike.dl_list_item(bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), "Date stolen")
-
+        = bike.dl_list_item(bike.ass_name("primary_frame_color"), "Color")
+        = bike.dl_from_attribute("frame_manufacture_year", "Year")
       %dl.dl-horizontal
+        = bike.dl_list_item(bike.ass_name("frame_material"), "Material")        
         = bike.dl_list_item(bike.ass_name("rear_wheel_size"), "Wheel size")
-        = bike.dl_from_attribute_othered("handlebar_type")
-        - if bike.stolen and bike.stolen_records.any?
-          = bike.dl_list_item(bike.current_stolen_record.city, "Location")
 
+  - if bike.stolen and bike.stolen_records.any?
+    .blist-stolen-info
+      .dl-holder
+        %dl.dl-horizontal
+          = bike.dl_list_item(bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), "Stolen on")
+        %dl.dl-horizontal
+          = bike.dl_list_item("#{bike.current_stolen_record.city}, #{bike.current_stolen_record.state}", "From")

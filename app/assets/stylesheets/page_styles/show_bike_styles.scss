@@ -6,6 +6,35 @@
   font-size: 1.1em;
 }
 
+//________________________
+//
+// Single bike view
+//
+//________________________
+
+header.single-bike {
+  @extend header.with-subtitle;
+}
+
+.single-bike-info {
+  .receptacle { overflow: visible; }
+
+  .with-subtitle {
+    margin: 30px 0;
+    h3 {
+      font-size: 24px;
+      line-height: 1.2em;
+    }
+    .sharing-links { margin-top: 0;}
+  }
+  .dl-horizontal .description {
+    margin: 0;
+    padding: 0;
+    clear: both;
+    width: 100%;
+  }
+}
+
 .show-bike-edit {
   @include box-shadow(1px 0 2px rgba(black,.3));
   position: relative;
@@ -36,286 +65,238 @@
   list-style-type: none;
   position: relative;
   padding: 0;
-  margin: $singlePad 0 0 0;
+  margin: 0;
   li {
     @include clearfix;
-    @include border-radius(1px);
     position: relative;
     width: 100%;
-    margin-bottom: $singlePad;
-    border: 1px solid $searchBorder;
-    background: $searchBackground;
-    padding: 10px 0;
-    &.stolen-background {
-      background: $stolenBackground;
-      dd {
-        color: $white;
-      }
-      a dd { text-decoration: underline; }
-    }
-  }
-  .image-holder {
-    width: $oneColumn;
-    margin-left: $gutterW;
-    float: left;
-    position: relative;
-    a {
-      width: 100%;
-      display: block;
-      color: transparent;
-    }
-    img {
-      @include box-shadow(0 0 1px rgba(black,.2));
-      border: 1px solid $imageBorder;
-      display: block;
-    }
-    a:hover img {
-      @include box-shadow(0px 0px 2px rgba(black,.2));
-    }
-    &:visited {
-      border: none;
-    }
-    span {
-      position: absolute;
-      top: 0;
-      left: 0;
-      color: #999;
-      width: 100%;
-      text-align: center;
-      font-weight: bold;
-    }
-  }
-  .primary-group {
-    position: relative;
-    float: left;
-    padding-left: $gutterW;
-    .dl-horizontal {
-      margin: 0;
-      a dt {
-        color: #999;
-      }
-      a {
-       @include clearfix;
-      }
-    }
-  }
-  .info-group {
-    position: relative;
-    float: left;
-    margin-left: $gutterW;
-    .dl-holder
-    .dl-horizontal {
-      margin: 0;
-    }
-  }
-  a dt, a dd {
-    text-decoration: none;
-    color: $linkColor;
-  }
-  a:hover {
-    dt, dd {
-      text-decoration: underline;
-      // color: $linkColor;
-    }
+    padding: 20px 10px 10px;
+    margin: 5px 0 0;
   }
 }
 
-.claim-bike-cover {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 100;
-  // background: rgba(black,.6);
-  background: url("/assets/background_cross.png");
+.bike-boxes li:nth-child(odd) { background-color: $tableBackgroundAccent; }
 
+@media (max-width: 600px) {
+  .bike-boxes {
+    li { padding: 10px 5px 5px; }
+  }
+}
+
+
+.blist-image-holder {
+  width: $twoColumn;
+  float: left;
+  position: relative;
+  margin: 0 $gutterW .5em 0;
+  background: white;
+  a {
+    width: 100%;
+    display: block;
+  }
+  img {
+    @include box-shadow(0 0 1px rgba(black,.2));
+    border: 1px solid $imageBorder;
+    display: block;
+  }
+  &:visited { border: none; }
   span {
-    font-size: 24px;
     position: absolute;
-    top: 50%; left: 10%;
-    width: 80%;
-    margin-top: -1em;
-    margin-left: auto;
-    margin-right: auto;
+    top: 0; left: 0;
+    color: #999;
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+  }
+}
+
+.blist-link {
+  display: block;
+  color: $textColor;
+  .serial-text {
+    color: $linkColor;
+  }
+}
+
+.blist-primary-group, .blist-info-group, .blist-stolen-info {
+  float: left;
+  width: $tenColumn;
+  .dl-horizontal {
+    @include clearfix;
+    margin: 0;
   }
 }
 
 @media (min-width: 768px) {
-  .claim-bike-cover span { width: 50%; left: 25%;}
-  .bike-boxes {
-    .image-holder {
-      width: $oneColumn;
-      margin-left: $oneColumn + $gutterW;
-    }
-    .info-group {
-      width: 85%;
-      margin-left: 0;
-      padding-left: 2%;
-    }
-    .dl-holder {
-      dt {
-        width: 35%;
-        // margin-bottom: 0;
-      }
-      dd {
-        width: 65%;
-        float: left;
-        // margin-bottom: .5em;
-      }
-    }
-    .primary-group {
-      width: $tenColumn;
-      .dl-horizontal {
-        width: 50%;
-        float: left;
-      }
-    }
-  }
+  .bike-boxes .dl-holder dd { width: 100%; }
 }
 
-@media (max-width: 767px) {
-  .bike-boxes {
-    .dl-holder dt {
-      padding-right: 2%;
+.bike-boxes li.blist-stolen {
+  background: #E3A6A0;
+  border: 1px solid $stolenColor;
+  dl dt { color: #666; }
+  .blist-stolen-info {
+    margin-top: 10px;
+    dl dt {
+      color: $stolenColor;
+      text-shadow: 0 0 100px rgba(black,.2);
     }
-    .image-holder {
-      width: $twoColumn;
-    }
-  }
-  .primary-group {
-    width: $nineColumn;
     .dl-horizontal {
-      width: 100%;
+      width: 50%;
       float: left;
     }
   }
 }
 
-@media (max-width: 600px) {
-  .bike-boxes {
-    li {
-      // background: none;
-      border-left: none;
-      border-right: none;
-      // border-bottom: none;
-      margin-left: -6%;
-      width: 112%;
-      padding: 20px;
-    }
-    .image-holder {
-      width: $threeColumn;
-      margin-bottom: .5em;
-      margin-left: 0;
-    }
-    .info-group {
-      margin-left: 0;
-      padding-left: 2%;
-    }
-    .dl-holder {
-      dt {
-        width: 40%;
-      }
-      dd {
-        width: 60%;
-      }
-    }
-  }
-}
-
-@media (max-width: 500px) {
-  .bike-boxes li .info-group {
-    padding-left: 0;
-  }
-}
-
-//________________________
-//
-// Bike thumbnail browse
-//
-//________________________
-
-ul.thumbnails.bike-thumbnails {
-  .clickable {
-    // @include border-radius(4px);
-    background: darken($white, 20%);
-    overflow: hidden;
-    &:hover {  
-      @include box-shadow(0 2px 5px rgba(0,0,0,.2));
-      .lock { background: $blue; }
-      img {
-        
-        margin: -1px;
-      }
-      aside {
-        @include transition(ease .3s);
-        bottom: 0;
-      }
-    }
-    display: block;
-    position: relative;
-    height: 210px;
-    border: 1px solid $grayLight;
-    aside {
-      // @include border-radius(0 0 4px 4px);
-      position: absolute;
-      bottom: -100%; left: 0;
-      width: 100%;
-      padding: .5em 2em;
-      background: rgba($black,.5);
-      p, a:hover, a:active, a:visited, a {color: $white; text-decoration: none;}
-    }
-  }
-  .span3:nth-of-type(4n+1) {
-    margin-left: 0;
-  }
-  img {
-    display: block;
-    position: absolute;
-    top: 0px; left: 0;
+@media (max-width: 767px) {
+  .bike-boxes li.blist-stolen .blist-stolen-info {
     width: 100%;
-    height: auto;
-  } 
-}
-
-
-
-
-//________________________
-//
-// Single bike view
-//
-//________________________
-
-header.single-bike {
-  @extend header.with-subtitle;
-}
-
-.single-bike-info {
-  .receptacle { overflow: visible; }
-
-  .with-subtitle {
-    margin: 30px 0;
-    h3 {
-      font-size: 24px;
-      line-height: 1.2em;
-    }
-    .sharing-links { margin-top: 0;}
-  }
-  .dl-horizontal .description {
-    margin: 0;
-    padding: 0;
-    clear: both;
-    width: 100%;
+    float: none;
+    clear: left;
   }
 }
-// @media (min-width: 1000px) {
-//   .single-bike-info {
-//     .with-subtitle {
-//       .sharing-links {
-//         margin-top: 0;
+
+
+// .bike-boxes {
+//   list-style-type: none;
+//   position: relative;
+//   padding: 0;
+//   margin: $singlePad 0 0 0;
+//   li {
+//     @include clearfix;
+//     @include border-radius(1px);
+//     position: relative;
+//     width: 100%;
+//     margin-bottom: $singlePad;
+//     border: 1px solid $searchBorder;
+//     background: $searchBackground;
+//     padding: 10px 0;
+//     &.stolen-background {
+//       background: $stolenBackground;
+//       dd {
+//         color: $white;
+//       }
+//       a dd { text-decoration: underline; }
+//     }
+//   }
+//   .image-holder {
+//     width: $oneColumn;
+//     margin-left: $gutterW;
+//     float: left;
+//     position: relative;
+//     a {
+//       width: 100%;
+//       display: block;
+//       color: transparent;
+//     }
+//     img {
+//       @include box-shadow(0 0 1px rgba(black,.2));
+//       border: 1px solid $imageBorder;
+//       display: block;
+//     }
+//     a:hover img {
+//       @include box-shadow(0px 0px 2px rgba(black,.2));
+//     }
+//     &:visited {
+//       border: none;
+//     }
+//     span {
+//       position: absolute;
+//       top: 0;
+//       left: 0;
+//       color: #999;
+//       width: 100%;
+//       text-align: center;
+//       font-weight: bold;
+//     }
+//   }
+//   .primary-group {
+//     position: relative;
+//     float: left;
+//     padding-left: $gutterW;
+//     .dl-horizontal {
+//       margin: 0;
+//       a dt {
+//         color: #999;
+//       }
+//       a {
+//        @include clearfix;
+//       }
+//     }
+//   }
+//   .info-group {
+//     position: relative;
+//     float: left;
+//     margin-left: $gutterW;
+//     .dl-holder
+//     .dl-horizontal {
+//       margin: 0;
+//     }
+//   }
+//   a dt, a dd {
+//     text-decoration: none;
+//     color: $linkColor;
+//   }
+//   a:hover {
+//     dt, dd {
+//       text-decoration: underline;
+//       // color: $linkColor;
+//     }
+//   }
+// }
+
+// @media (max-width: 767px) {
+//   .bike-boxes {
+//     .dl-holder dt {
+//       padding-right: 2%;
+//     }
+//     .image-holder {
+//       width: $twoColumn;
+//     }
+//   }
+//   .primary-group {
+//     width: $nineColumn;
+//     .dl-horizontal {
+//       width: 100%;
+//       float: left;
+//     }
+//   }
+// }
+
+// @media (max-width: 600px) {
+//   .bike-boxes {
+//     li {
+//       // background: none;
+//       border-left: none;
+//       border-right: none;
+//       // border-bottom: none;
+//       margin-left: -6%;
+//       width: 112%;
+//       padding: 20px;
+//     }
+//     .image-holder {
+//       width: $threeColumn;
+//       margin-bottom: .5em;
+//       margin-left: 0;
+//     }
+//     .info-group {
+//       margin-left: 0;
+//       padding-left: 2%;
+//     }
+//     .dl-holder {
+//       dt {
+//         width: 40%;
+//       }
+//       dd {
+//         width: 60%;
 //       }
 //     }
 //   }
 // }
 
-
+// @media (max-width: 500px) {
+//   .bike-boxes li .info-group {
+//     padding-left: 0;
+//     clear: left;
+//   }
+// }
