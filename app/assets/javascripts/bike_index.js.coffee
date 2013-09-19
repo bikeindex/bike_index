@@ -27,9 +27,9 @@ window.BikeIndex =
     $('#total-top-header .tab-content').append(links)
 
   initializeHeaderSearch: ->
-    $('#find_bike_attributes_ids').chosen
+    $('#find_bike_attributes_ids').select2
       allow_single_deselect: true
-      no_results_text: 'No Attributes matched'
+      allowClear: true
       width: '100%'
     $("#head-search-bikes #query").attr("autocomplete","off");
     

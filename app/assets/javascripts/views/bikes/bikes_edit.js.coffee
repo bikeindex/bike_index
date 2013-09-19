@@ -220,7 +220,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     time = new Date().getTime()
     regexp = new RegExp(target.attr('data-id'), 'g')
     target.before(target.data('fields').replace(regexp, time))
-    $('.chosen-select select').chosen()
+    $('.chosen-select select').select2()
     # $('.input-group.add-additional .with-additional-block select').on 'change', @expandAdditionalBlock
 
 

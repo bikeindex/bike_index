@@ -80,7 +80,7 @@ class BikeIndex.Views.Global extends Backbone.View
       window.open(local, '_blank')
 
   loadChosen: ->
-    $('.chosen-select select').chosen()
+    $('.chosen-select select').select2()
   
   toggleCollapsibleHeader: ->
     # $('#header-tabs').css('min-height', '50px')

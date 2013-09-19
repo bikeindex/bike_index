@@ -49,7 +49,8 @@ group :assets do
   gem 'coffee-rails', '~> 3.2.1'
   gem 'therubyracer', :platforms => :ruby
   gem 'uglifier', '>= 1.0.3'
-  gem 'chosen-rails'
+  # gem 'chosen-rails'
+  gem "select2-rails"
 end
 
 group :develop do
@@ -59,6 +60,7 @@ group :develop do
   gem 'guard-rspec'
   gem 'guard-livereload'
   gem 'bullet'
+  gem 'database_rewinder'
 end
 
 group :develop, :test do
@@ -73,5 +75,4 @@ group :test do
   gem 'resque_spec'
   gem 'shoulda-matchers'
   gem 'pry'
-  gem 'database_cleaner'
 end
