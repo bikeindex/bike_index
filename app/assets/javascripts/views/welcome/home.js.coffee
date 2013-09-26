@@ -21,6 +21,7 @@ class BikeIndex.Views.Home extends Backbone.View
         
         # register.css('top', "#{p*25}px") # Small parallax on the button
 
+
   manufacturerCall: ->
     $.ajax({
       type: "GET"

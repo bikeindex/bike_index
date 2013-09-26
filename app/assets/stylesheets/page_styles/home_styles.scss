@@ -393,10 +393,12 @@ body.welcome-page {
 @media (min-width: 960px) {
   #kickstarter {
     h2 { font-size: 60px; }
-    .kickstarter-main .kvid {
-      margin: 20px auto;
-      width: 640px;
-      min-height: 640px;
+    .kickstarter-main {
+      min-height: 480px;
+      .kvid {
+        margin: 20px auto;
+        width: 640px;
+      }
     }
     .kickstarter-iframe {
       // top: 0px;
