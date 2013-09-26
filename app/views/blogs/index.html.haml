@@ -6,7 +6,7 @@
 - @blogs.each do |blog|
   %h2
     = link_to blog.title, blog_url(blog)
-  %p
+  %p.blog-index
     = blog.body_abbr.html_safe
 
   %hr
