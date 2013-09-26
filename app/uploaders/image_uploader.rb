@@ -38,24 +38,32 @@ class ImageUploader < CarrierWave::Uploader::Base
     %w(jpg jpeg gif png)
   end
 
-  def auto_orient
+  def strip
+    manipulate! do |img|
+      img.strip!
+      img = yield(img) if block_given?
+      img
+    end
+  end
+
+  def fix_exif_rotation
     manipulate! do |img|
       img = img.auto_orient
     end
   end
 
+  process :fix_exif_rotation
+  process :strip
+
   version :large do
-    process :auto_orient
     process resize_to_fit: [1200, 900]
   end
 
   version :medium, :from_version => :large do
-    process :auto_orient
     process resize_to_fit: [700,525]
   end
 
-  version :small do
-    process :auto_orient
+  version :small, :from_version => :medium do
     process resize_to_fill: [300,300]
   end
 
