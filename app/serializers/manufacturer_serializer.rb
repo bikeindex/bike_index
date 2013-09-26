@@ -1,10 +1,10 @@
 class ManufacturerSerializer < ActiveModel::Serializer
-  attributes :id,
+  attributes :slug,
     :name,
-    :slug,
-    :website,
-    :frame_maker,
-    :logo_location,
-    :description
+    :api_url
+
+  def api_url
+    api_v1_manufacturer_url(object)
+  end
 
 end

@@ -3,7 +3,7 @@ class BikeIndex.Views.Home extends Backbone.View
     @setElement($('#body'))
     @moveBike()
     @resizeVideo()
-    @manufacturerCall()
+    # @manufacturerCall()
 
   moveBike: ->
     register = $('#treating-right .treating-right-text')
