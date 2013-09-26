@@ -19,6 +19,23 @@
     .home-sharing
       = render "/shared/home_share"    
 
+#kickstarter
+  .kickstarter-background
+    = image_tag "/assets/home/kickstarter-background.svg"
+  .receptacle.overfloating
+    .inner-recep
+      %h2
+        Contribute to our Kickstarter!
+      .kickstarter-main
+        - unless Rails.env.development?
+          .kvid
+            :plain
+              <iframe width="480" height="360" src="https://www.kickstarter.com/projects/1073266317/the-bike-index-lets-stop-bike-theft-together/widget/video.html" frameborder="0"> </iframe>
+          .kickstarter-iframe
+            :plain
+              <iframe frameborder="0" height="380" src="https://www.kickstarter.com/projects/1073266317/the-bike-index-lets-stop-bike-theft-together/widget/card.html" width="220"></iframe>
+
+
 #our-database
   .receptacle
     .inner-recep
@@ -48,7 +65,6 @@
         = link_to (image_tag "/assets/home/bikes_list3.jpg", alt: "Sample Bike Index return"), "https://www.bikeindex.org/bikes/12"
 
 
-
 #fight-theft-profit
   .receptacle.overfloating
     .inner-recep
@@ -62,21 +78,6 @@
         %p
           Add your bike to the Index to make it easier to recover if it's ever stolen.
 
-#kickstarter
-  .kickstarter-background
-    = image_tag "/assets/home/kickstarter-background.svg"
-  .receptacle.overfloating
-    .inner-recep
-      %h2
-        Contribute to our Kickstarter!
-      .kickstarter-main
-        - unless Rails.env.development?
-          .kvid
-            :plain
-              <iframe width="480" height="360" src="https://www.kickstarter.com/projects/1073266317/the-bike-index-lets-stop-bike-theft-together/widget/video.html" frameborder="0"> </iframe>
-          .kickstarter-iframe
-            :plain
-              <iframe frameborder="0" height="380" src="https://www.kickstarter.com/projects/1073266317/the-bike-index-lets-stop-bike-theft-together/widget/card.html" width="220"></iframe>
 
 #best-ever
   .receptacle.overfloating
