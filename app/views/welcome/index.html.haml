@@ -27,13 +27,14 @@
       %h2
         Contribute to our Kickstarter!
       .kickstarter-main
-        - unless Rails.env.development?
-          .kvid
-            :plain
-              <iframe width="480" height="360" src="https://www.kickstarter.com/projects/1073266317/the-bike-index-lets-stop-bike-theft-together/widget/video.html" frameborder="0"> </iframe>
-          .kickstarter-iframe
-            :plain
-              <iframe frameborder="0" height="380" src="https://www.kickstarter.com/projects/1073266317/the-bike-index-lets-stop-bike-theft-together/widget/card.html" width="220"></iframe>
+        
+        .kvid
+          :plain
+            <iframe width="480" height="360" src="https://www.kickstarter.com/projects/1073266317/the-bike-index-lets-stop-bike-theft-together/widget/video.html" frameborder="0"> </iframe>
+        .kickstarter-iframe
+          :plain
+            <iframe frameborder="0" height="380" src="https://www.kickstarter.com/projects/1073266317/the-bike-index-lets-stop-bike-theft-together/widget/card.html" width="220"></iframe>
+          <script type="text/javascript">jQuery(function(){var vheight,vwidth;if($(window).width()>960){vwidth=640;vheight=480;$("#kickstarter .kvid iframe").attr("width",vwidth).attr("height",vheight)}});</script>
 
 
 #our-database

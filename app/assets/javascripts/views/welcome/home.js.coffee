@@ -2,7 +2,7 @@ class BikeIndex.Views.Home extends Backbone.View
   initialize: ->
     @setElement($('#body'))
     @moveBike()
-    @resizeVideo()
+    # @resizeVideo()
     # @manufacturerCall()
 
   moveBike: ->
