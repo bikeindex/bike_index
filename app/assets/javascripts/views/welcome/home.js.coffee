@@ -2,7 +2,6 @@ class BikeIndex.Views.Home extends Backbone.View
   initialize: ->
     @setElement($('#body'))
     @moveBike()
-    # @resizeVideo()
     # @manufacturerCall()
 
   moveBike: ->
@@ -21,13 +20,6 @@ class BikeIndex.Views.Home extends Backbone.View
         $('#wheel-spin').css('-o-transform', "rotate(-#{spin}deg)")
         
         # register.css('top', "#{p*25}px") # Small parallax on the button
-
-  resizeVideo: ->
-    if $(window).width() > 960  
-      vwidth = 640
-      vheight = 480
-      $('#kickstarter .kvid iframe').attr("width", vwidth).attr("height", vheight)
-
 
   manufacturerCall: ->
     $.ajax({
