@@ -1,9 +1,9 @@
 module Api
   module V1
     class ManufacturersController < ApiV1Controller
-
       def index
-        respond_with Manufacturer.all
+        manufacturers = Manufacturer.all
+        render json: manufacturers, each_serializer: ManufacturerIndexSerializer
       end
 
       def show

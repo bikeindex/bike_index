@@ -3,6 +3,7 @@ class BikeIndex.Views.Home extends Backbone.View
     @setElement($('#body'))
     @moveBike()
     @resizeVideo()
+    @manufacturerCall()
 
   moveBike: ->
     register = $('#treating-right .treating-right-text')
@@ -26,3 +27,15 @@ class BikeIndex.Views.Home extends Backbone.View
       vwidth = 640
       vheight = 480
       $('#kickstarter .kvid iframe').attr("width", vwidth).attr("height", vheight)
+
+
+  manufacturerCall: ->
+    $.ajax({
+      type: "GET"
+      url: 'https://www.bikeindex.org/api/v1/manufacturers'
+      dataType: "jsonp",
+      success: (data, textStatus, jqXHR) ->
+        console.log(data)
+      error: (data, textStatus, jqXHR) ->
+        console.log(data)
+      })
