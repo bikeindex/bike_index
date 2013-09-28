@@ -11,6 +11,16 @@
   <h1>Congrats on adding your bike to the index!</h1>
 <% end %>
 
+<hr style="margin: 40px 0 30px;">
+
+<h2>
+  Help us register more bikes!
+  <br>
+  <a href="http://www.kickstarter.com/projects/1073266317/the-bike-index-lets-stop-bike-theft-together">Contribute to our Kickstarter!</a>
+</h2>
+
+<hr style="margin: 40px 0 30px;">
+
 <% if @bike.stolen %>
   <p>You added a stolen bike to the Bike Index:</p>
 <% elsif @bike.created_with_token && @bike.ownerships.count < 2 %>
@@ -94,12 +104,12 @@ Secure both wheels - either with two U-locks, or one U-lock and one heavy duty c
 </li>
 <li>
 <p>
-Do not lock to anything without first checking to make sure it can't be easily removed.Signposts can be removed from the ground by unbolting them. Some are already unattached.
+Do not lock to anything without first checking to make sure it can't be easily removed.
 </p>
 </li>
 <li>
 <p>
-<a href="https://www.bikeindex.org/protect_your_bike">Read more about locking guidelines here</a>
+<a href="https://www.bikeindex.org/protect_your_bike">Read more about protecting your bike here</a>
 </p>
 </li>
 </ul>
