@@ -4,6 +4,9 @@ class BlogsController < ApplicationController
 
   def show
     @blog = Blog.find_by_title_slug(params[:id])
+    unless @blog
+      raise ActionController::RoutingError.new('Not Found')
+    end
     @title = @blog.title
   end
 

@@ -1,15 +1,6 @@
 #choose-registration-type {
-//   @include box-shadow(1px 1px rgba(black,.2));
-//   @include border-radius(3px);
-//   padding: 30px 10px;
-//   background: $blueDarker;
-//   border: 1px solid $blueDarkerer;
-  // h1 {
-  //   color: $yellowPale;
-  //   text-align: center;
-  //   font-size: 60px;
-  // }
 }
+
 
 .choose-links {
   margin: 0 auto 30px;
@@ -30,7 +21,7 @@
     @include transition(background .05s linear);
     @include border-radius(3px);
     cursor: pointer;
-    // border: 1px solid transparent;
+    border: 1px solid transparent;
     margin: 0 auto;
     height: 100%;
     width: 100%;
@@ -40,27 +31,25 @@
     display: block;
     text-align: left;
     font-size: 20px;
-    span {
-      color: rgba($linkColor, .6);
-      margin-left: 20px;
-      float: right;
-    }
+    color: $textColor;
     &:hover {
-      @include box-shadow(0px 1px 4px rgba($blueDarker, .7));
       color: $linkColor;
       text-decoration: none;
     }
-    &:active {
-      @include translate(1px,1px);
-      @include box-shadow(none);
-    }
   }
+  .add-selected { display: none; }
   .current-choice {
-    @include transition(background .15s linear);
-    @include translate(1px,1px);
-    background: $blueDarker;
-    border-color: black;
-    &:hover { @include box-shadow(none); }
+    @include transition(border .15s linear);
+    border: 1px dashed $grayDark;
+    padding-left: 20px;
+    &:hover { color: $textColor; }
+    .add-selected {
+      font-family: courier;
+      float: right;
+      display: block;
+      font-size: .8em;
+      color: $grayDark;
+    }
   }
 }
 
