@@ -708,6 +708,10 @@
 //
 //________________________
 
+.help-block {
+  font-size: .8em;
+  color: $gray;
+}
 
 .bikeform-tip {
   @extend .button-blue;

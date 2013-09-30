@@ -22,12 +22,14 @@
     = f.label :manufacturer_id, class: "control-label"
     .controls
       = collection_select( :bike, :manufacturer_id, Manufacturer.frames, :id, :name, :required =>true, prompt: "Choose manufacturer")
+      %span.help-block
+        Select 'Other' if manufacturer isn't listed
   %p.other-value
     = Manufacturer.find_by_slug("other").id
   .hidden-other.control-group
-    = f.label :manufacturer_other, "Enter manufacturer", class: "control-label"
+    = f.label :manufacturer_other, "Other manufacturer", class: "control-label"
     .controls
-      = f.text_field :manufacturer_other
+      = f.text_field :manufacturer_other, placeholder: "Manufacturer name"
       
 .input-group.with-optional-blocks
   %a.bikeform-tip{role: "button", title: "An amazing explanation of wheel sizing.", :data => {toggle: "modal", target: "#rearWheelTip"} }
