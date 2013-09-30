@@ -1,5 +1,5 @@
 # Seed the cycle types
-cycle_types = ['Bike', 'Tandem', 'Unicycle', 'Tricycle', 'Recumbent', 'Pedi Cab', 'Cargo Bike (front storage)', 'Cargo Bike (rear storage)', 'Cargo Tricycle (front storage)', 'Cargo Tricycle (rear storage)', 'Bike Trailer', 'Tall Bike', 'Penny Farthing', 'Wheelchair', 'Stroller', 'Tag Along Bike Attachment', 'Other']
+cycle_types = ['Bike', 'Tandem', 'Unicycle', 'Tricycle', 'Recumbent', 'Pedi Cab', 'Cargo Bike (front storage)', 'Cargo Bike (rear storage)', 'Cargo Tricycle (front storage)', 'Cargo Tricycle (rear storage)', 'Bike Trailer', 'Tall Bike', 'Penny Farthing', 'Wheelchair', 'Stroller', 'Other']
 cycle_types.each do |type_name|
   cycle_type = CycleType.create(name: type_name)
   cycle_type.save
