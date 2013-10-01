@@ -8,6 +8,7 @@ class Ownership < ActiveRecord::Base
 
   validates_presence_of :owner_email
   validates_presence_of :creator_id
+  validates_presence_of :bike_id
 
   belongs_to :bike
   belongs_to :user

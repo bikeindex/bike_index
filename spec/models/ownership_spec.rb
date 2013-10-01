@@ -7,6 +7,7 @@ describe Ownership do
     it { should belong_to :user }
     it { should belong_to :creator }
     it { should validate_presence_of :creator_id }
+    it { should validate_presence_of :bike_id }
     it { should validate_presence_of :owner_email }
   end
 
