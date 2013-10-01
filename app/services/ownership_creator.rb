@@ -24,6 +24,7 @@ class OwnershipCreator
   end
 
   def send_notification_email(ownership)
+    puts "\n\n\n\n\n SendOwnership #{ownership} \n\n\n"
     Resque.enqueue(OwnershipInvitationEmailJob, ownership.id)
   end
 
