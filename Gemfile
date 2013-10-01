@@ -44,6 +44,9 @@ gem 'draper'
 # gem 'rack-mini-profiler' # I'm not actually doing anything useful with this and it's annoying.
 gem 'dotenv-rails', "~> 0.8", git: "https://github.com/bkeepers/dotenv"
 
+# handle pdf page request generation
+gem 'prawn'
+
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'
   gem 'coffee-rails', '~> 3.2.1'
@@ -74,5 +77,8 @@ group :test do
   gem 'simplecov', require: false
   gem 'resque_spec'
   gem 'shoulda-matchers'
+end
+
+group :development, :develop, :test do
   gem 'pry'
 end
