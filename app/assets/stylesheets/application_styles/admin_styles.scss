@@ -82,6 +82,25 @@
     width: 100%;
   }
 }
+
 .control-group.tags textarea {
   height: 6em;
+}
+
+.blog-entry-fields {
+  .well {
+    @include clearfix;
+    width: 100%;
+    margin: 40px auto 0;
+  }
+
+  .button-red {
+    display: block;
+    width: 200px;
+    margin: 100px auto 20px;
+  }
+}
+
+@media (min-width: 1000px) {
+  .blog-entry-fields .well { width: $eightColumn; }
 }

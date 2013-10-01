@@ -16,7 +16,6 @@
         Author
       .controls
         = collection_select( :blog, :user_id, @users, :id, :email, :required =>true, prompt: "Choose a user")
-        / #= f.collection_select( :user_id, @users, :id, :email, :required =>true)
 
     .control-group.datepicker-container
       = label :post_date, "Post date", class: "control-label"
@@ -40,9 +39,9 @@
       .controls
         = f.check_box :published
 
-
-    
     .padded
+      %a.button-blue.pull-left{target: "_blank", href: blog_url(@blog)}
+        preview post
       = f.submit 'Save', class: 'button-green pull-right'
 
   

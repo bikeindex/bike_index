@@ -3,4 +3,21 @@
 
 .row-fluid
   .span6.padded.well
-    = render partial: "form"
+    .form.form-horizontal#chosen-container
+      = form_for [:admin, @blog] do |f|
+        - if @blog.errors.any?
+          #alert-block
+            .alert.alert-error
+              %h4
+                Please fix the following 
+                = pluralize(@blog.errors.count, "error")
+              %ul
+                - @blog.errors.full_messages.each do |msg|
+                  %li
+                    = msg
+        .blog-field
+          = f.text_field :title, placeholder: "Blog title"
+       
+  
+        .padded
+          = f.submit 'Create Blog!', class: 'button-green pull-right'

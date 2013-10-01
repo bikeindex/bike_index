@@ -24,13 +24,18 @@ class Admin::BlogsController < Admin::BaseController
   end
 
   def create
-    @blog = Blog.create(params[:blog])
+    @blog = Blog.create({
+      title: params[:blog][:title],
+      user_id: current_user.id,
+      body: "No content yet, write some now!",
+      post_date: Time.now
+    })
     if @blog.save
       flash[:notice] = "Blog created!"
-      redirect_to admin_blogs_url
+      redirect_to edit_admin_blog_url(@blog)
     else
-      flash[:error] = "Blog Error!"
-      redirect_to admin_blogs_url
+      flash[:error] = "Blog error!"
+      redirect_to new_admin_blog_url
     end
   end
 

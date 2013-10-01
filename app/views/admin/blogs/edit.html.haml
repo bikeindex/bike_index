@@ -4,8 +4,9 @@
   %p
     = link_to "Back to blogs", admin_blogs_url
 
-.row-fluid
-  .span6.padded.well
+
+.blog-entry-fields
+  .well
     = render partial: "form"
 
-= link_to "Delete blog", admin_blog_url(@blog), method: :delete, confirm: "Are you sure?", class: "button-red"
+  = link_to "Delete blog", admin_blog_url(@blog), method: :delete, confirm: "Are you sure?", class: "button-red"

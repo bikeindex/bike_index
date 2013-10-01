@@ -57,6 +57,6 @@ class AvatarUploader < CarrierWave::Uploader::Base
 
   version :medium do
     process :auto_orient
-    process resize_to_fit: [300,300]
+    process resize_to_fill: [300,300]
   end  
 end

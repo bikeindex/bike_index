@@ -11,7 +11,7 @@ config/deploy
 /tmp
 .DS_Store
 coverage/*
-public/uploads/Pu
+public/uploads/*
 public/caches
 .vagrant
 

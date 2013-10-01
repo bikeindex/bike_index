@@ -123,7 +123,7 @@ class UsersController < ApplicationController
           redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index as #{@user.memberships.first.organization.name}"
         end
       else
-        redirect_to root_url, notice: 'Your information was successfully updated.'
+        redirect_to user_home_url, notice: 'Your information was successfully updated.'
       end
     else
       flash[:error] = "Sorry, there was a problem updating your information"

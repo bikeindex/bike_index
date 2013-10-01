@@ -1,0 +1,97 @@
+//________________________
+//
+// Blog styles
+//
+//________________________
+
+.blog-header {
+  h4 {
+    
+  }
+  hr { margin-bottom: 30px; }
+}
+.blogger-info {
+  @include clearfix;
+  position: relative;
+  h4, h4 a {
+    color: $grayMed;
+    margin: .5em 0 0;
+    strong { color: $gray; font-weight: normal; }
+  }
+}
+
+
+@media (min-width: 780px) {
+  .blog-header {
+    hr {
+      margin-bottom: 50px;
+    }
+  }
+}
+
+
+@media (min-width: 1000px) {
+  .blog-header {
+    hr {
+      margin-bottom: 80px;
+    }
+  }
+}
+
+#locking-demonstration {
+  @include border-radius(3px);
+  @include box-shadow(0 0 2px rgba(black,.2));
+  background: $grayLighter;
+  padding: 10px;
+  max-width: 500px;
+  margin-bottom: 60px;
+  .locked { 
+    @include border-radius(2px);
+    width: 100%;
+    background: #FFF;
+  }
+  img {
+    width: 100%;
+  }
+  p {
+    color: white;
+    width: 100%;
+    margin: 0;
+    padding: 10px 10px 0;
+  }
+}
+
+
+
+
+
+
+//________________________
+//
+// Individual blog styles
+//
+//________________________
+
+
+.terms-evaluation {
+  padding-top: 40px;
+  padding-bottom: 40px;
+  p {
+    font-size: .8em;
+    margin-bottom: 8px;
+  }
+
+  .badge {
+    i { background-image: url("/assets/glyphicons-halflings-white.png"); }
+    margin-right: .25em;
+    padding: 1px 2px 2px;
+  }
+  .badge-warning {
+    background: #D66F2C;
+  }
+  .badge-success {
+    background: #79B752;
+  }
+}
+
+.blog-index .post-image { display: none; }
