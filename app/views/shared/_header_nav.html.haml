@@ -2,7 +2,7 @@
   %span.background-extend
   .receptacle
     .inner-recep
-      %a.follow-link.logo{ href: root_url(:subdomain => false) }
+      %a.follow-link.logo{ href: root_url }
         = image_tag "/assets/logo.svg", class: "standard-logo"
         = image_tag "/assets/logo_cover.svg", class: "transparent-logo"
         %span.transparent-logo-bg
@@ -31,12 +31,12 @@
           #you.tab-pane.yes_user.hidden
             %ul
               %li
-                = link_to 'Your bikes', user_home_url(:subdomain => false), class: "follow-link"
+                = link_to 'Your bikes', user_home_url, class: "follow-link"
               %li
                 %a{ title: "Your preferences", href: "/my_account"}
                   Preferences
               %li
-                = link_to 'Log out', session_path(:subdomain => false), :method => :delete
+                = link_to 'Log out', session_path, :method => :delete
           
           #signup.tab-pane.login-header.no_user.hidden
             = render 'sessions/form'

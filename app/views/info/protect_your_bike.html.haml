@@ -1,51 +1,55 @@
 %h1
-  Protect your bike 
-
-%p#fnref-bike-theft-estimate
-  Each year
-  %strong
-    over a million bikes are stolen
-  in the United States.
+  Protect your bike!
+%h2#fnref-bike-theft-estimate
+  Over a million bikes are stolen every year in the US
   %sup
     %a.footnote-ref{ href: "#fn-bike-theft-estimate" }
       1
 
-%h2.padded
-  Make sure your bike isn't one of by following these guidelines.
+
+  %br
+  %strong
+    Make sure your bike isn't one of them
 
 %article.padded
-  %ul
+  %ol
     %li
       %p
         %strong
           Cable locks should never be used as a primary means of locking a bike in a city.
+        Cheaper and older U-locks can often be broken without any tools.
+        %strong
+          Use a u-lock that costs at least $40.
     %li
       %p
-        Aim to have the hardest bike to steal on the bike rack. We consider two U-locks, or one U-lock and one heavy duty cable to be the minimum required in large cities to keep a bike secure.
+        Aim to have the hardest bike to steal on the rack. We consider two U-locks, or a U-lock and one heavy duty cable, to be the minimum required in large cities to keep a bike secure.
     %li
       %p
-        Don't rely on foot traffic to keep your bike safe; years of reports have taught us that many thefts, particularly those involving cutting cable locks, occur under the cover of crowd activity or in front of bustling cafés or restaurants.
+        Don't rely on foot traffic to keep your bike safe; years of reports have taught us that many thefts, particularly those involving cutting cable locks, occur under the cover of crowd activity or in front of bustling cafés or restaurants. 
     %li
       %p
         Don't rely on the presence of cameras to keep your bike secure. Security footage is rarely of much use once a bike is gone, and thieves know this.
     %li
       %p
-        Cheaper and older U-locks can often be defeated with common hand tools, or no tools at all.
-    %li
-      %p
-        Signposts can be removed from the ground by unbolting them and some are already unattached. Tug on whatever you're about to lock to make sure it can't be easily removed.
+        Tug on whatever you're about to lock to make sure it can't be easily removed. Signposts in particular can be easily removed by unbolting them and some are already unattached. 
     %li
       %p
         Many bicycles are stolen from garages and store rooms. Lock your bike securely to an immovable object even if in a "secure" place.
 
-%article#locking-demonstration
-  .locked
-    = image_tag "/assets/Locking.svg", alt: "Correctly locking a bike", title: "Pink Power U-Locks are a registered trademark of Bike Index, Inc"
-  %p
-    %em
+
+%article
+  #locking-demonstration
+    .locked
+      = image_tag "/assets/Locking.svg", alt: "Correctly locking a bike", title: "Pink Power U-Locks are a registered trademark of Bike Index, Inc"
+    %p
       %strong
-        A correctly locked bike. 
-      The frame is locked to the bike rack and both wheels are secured.
+        A correctly locked bicycle
+      %br
+      The frame is locked to an immovable object. Both wheels are secured.
+
+%p
+  %em.less-strong
+    Thanks to #{ link_to "Chicago.StolenBike.org", "http://chicago.stolenbike.org" } for suggestions and the research behind these guidelines. Thanks to #{ link_to "JJJJJXXXX", "" } for their excellent article on choosing a lock.
 
 
 .footnotes

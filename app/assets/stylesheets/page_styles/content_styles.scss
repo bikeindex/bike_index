@@ -493,17 +493,21 @@
   @include box-shadow(0 0 2px rgba(black,.2));
   background: $grayLighter;
   padding: 10px;
-  max-width: 500px;
-  margin-bottom: 60px;
+  margin: 0 0 60px;
   .locked { 
     @include border-radius(2px);
     width: 100%;
     background: #FFF;
   }
   img {
-    width: 100%;
+    display: block;
+    max-width: 100%;
+    margin: 0 auto;
+    max-height: 450px;
   }
   p {
+    text-align: center;
+    font-style: italic;
     color: white;
     width: 100%;
     margin: 0;

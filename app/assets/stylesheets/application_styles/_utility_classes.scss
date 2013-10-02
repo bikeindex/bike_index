@@ -60,18 +60,16 @@ label { cursor: pointer; }
 }
 
 // Visibility
-.invisible {
-  visibility: hidden;
-}
+.invisible { visibility: hidden; }
 
 // For Affix plugin
-.affix {
-  position: fixed;
-}
+.affix { position: fixed; }
 
 .clickable, .no-tab { cursor: pointer; }
 
 .unclickable { cursor: default; }
+
+.less-strong { color: darken($grayMed, 5%); }
 
 .overflow-text { @include text-overflow();}
 

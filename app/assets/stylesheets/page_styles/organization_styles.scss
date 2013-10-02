@@ -175,16 +175,6 @@
 // }
 
 
-.full-screen-table {
-  padding: 20px 0;
-  table.table {
-    margin: 10px 0 25px;
-  }
-  .less-strong {
-    color: darken($grayMed, 5%);
-  }
-}
-
 .manage-org-link {
   @include clearfix;
   font-size: 20px;
