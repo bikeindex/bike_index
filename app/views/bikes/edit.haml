@@ -39,7 +39,7 @@
       .add-bike-photos
         %ul#public_images{ :"data-order-url" => order_public_images_url }
           - if @bike.public_images
-            = render partial: "/public_images/public_image", collection: @bike.public_images
+            = render partial: "/public_images/public_image", collection: @bike.public_images, as: :public_image
             
         - if @bike.public_images.length < 49
           %section

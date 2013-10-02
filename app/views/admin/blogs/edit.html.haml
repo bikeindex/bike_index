@@ -9,4 +9,13 @@
   .well
     = render partial: "form"
 
+    .add-blog-photos
+      %ul#public_images{ :"data-order-url" => order_public_images_url }
+        - if @blog.public_images
+          = render partial: "/public_images/public_image", collection: @blog.public_images, as: :public_image
+      %section
+        = render "public_images/new_blog_form"
+
   = link_to "Delete blog", admin_blog_url(@blog), method: :delete, confirm: "Are you sure?", class: "button-red"
+
+  

@@ -11,9 +11,11 @@ class Blog < ActiveRecord::Base
   attr_accessor :post_on
 
   validates_presence_of :title, :body, :user_id
-  belongs_to :user
   validates_uniqueness_of :title, message: "has already been taken. If you believe that this message is an error, contact us!"
   validates_uniqueness_of :title_slug, message: "somehow that overlaps with another title! Sorrys."
+  
+  belongs_to :user
+  has_many :public_images, as: :imageable, dependent: :destroy
 
   default_scope order("post_date desc")
 

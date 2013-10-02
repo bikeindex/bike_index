@@ -3,7 +3,15 @@
   <%= image_tag(public_image.image_url(:small)) if public_image.image? %>
   <div class="name"><%= public_image.name.truncate(18) %></div>
   <div class="actions">
-    <%= link_to "Edit", edit_public_image_path(public_image), class: "photo-edit" %>
-    <%= link_to "Remove", public_image_url(public_image, :return_url => edit_bike_url(@bike)), :method => :delete, class: "photo-remove" %>
+    <% if public_image.imageable_type == "Bike" %>
+      <%= link_to "Edit", edit_public_image_path(public_image), class: "photo-edit" %>
+      <%= link_to "Remove", public_image_url(public_image, :return_url => edit_bike_url(@bike)), :method => :delete, class: "photo-remove" %>
+    <% else %>
+      <textarea class="code-to-enter">&lt;img class="post-image" src="<%= public_image.image_url(:large) %>" alt="ENTER YOUR TEXT HERE"&gt;</textarea>
+      <p>
+        <span>Copy the above text and paste it where you'd like it to appear in the post.</span>
+        <%= link_to "Delete image", public_image_url(public_image, :return_url => edit_admin_blog_url(@blog)), :method => :delete, class: "photo-remove" %>
+      </p>
+    <% end %>
   </div>
 </li>

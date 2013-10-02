@@ -104,3 +104,42 @@
 @media (min-width: 1000px) {
   .blog-entry-fields .well { width: $eightColumn; }
 }
+
+.add-blog-photos {
+  clear: both;
+  padding: 40px 0 0;
+  li {
+    cursor: default;
+    float: none;
+    width: 100%;
+    margin: 0 0 10px;
+    img {
+      width: 75px;
+      position: absolute;
+      left: 5; top: 5;
+      margin-right: 10px;
+    }
+    .actions {
+      width: 100%;
+      padding-left: 85px;
+    }
+    textarea {
+      display: block;
+      width: 100%;
+      margin: 0 0 10px;
+    }
+    p { margin: 0; }
+    a {
+      color: lighten($linkColor, 20%);
+      &:hover { color: $linkColorHover; }
+    }
+  }
+}
+
+@media (max-width: 710px) {
+  .add-blog-photos {
+    p span { display: none; }
+    li { @include clearfix; }
+    // p a { display: none; }
+  }
+}

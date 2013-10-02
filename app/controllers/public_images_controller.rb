@@ -10,6 +10,7 @@ class PublicImagesController < ApplicationController
   end
 
   def create
+
     @public_image = PublicImage.new(params[:public_image])
     if params[:bike_id].present?
       @bike = Bike.find(params[:bike_id])
@@ -17,10 +18,16 @@ class PublicImagesController < ApplicationController
         @public_image.imageable = @bike
         @public_image.save
       end
+      @imageable = @bike
+    elsif params[:blog_id].present?
+      @blog = Blog.find(params[:blog_id])
+      @public_image.imageable = @blog
+      @public_image.save
+      @imageable = @blog 
     end
     unless @public_image.imageable.present?
       flash[:error] = "Whoops! We can't let you create that image."
-      redirect_to @bike
+      redirect_to @imageable
     end
   end
 
@@ -36,17 +43,19 @@ class PublicImagesController < ApplicationController
   end
 
   def destroy
-    @bike = @public_image.imageable
+    @imageable = @public_image.imageable if @public_image.imageable_type == "Bike"
     @public_image.destroy
     flash[:notice] = "Image was successfully deleted"
     if params[:return_url].present?
       redirect_to params[:return_url]
     else
-      redirect_to edit_bike_url(@bike)
+      redirect_to edit_bike_url(@imageable) and return if @imageable.cycle_type_id
+      redirect_to edit_admin_blog(@imageable)
     end
   end
 
   def order
+
     if params[:list_of_photos]
       params[:list_of_photos].each_with_index do |id, index|
         PublicImage.update_all({listing_order: index+1}, {id: id})
@@ -63,9 +72,16 @@ class PublicImagesController < ApplicationController
 
   def find_image_if_owned
     @public_image = PublicImage.find(params[:id])
-    unless @public_image.imageable.owner == current_user
-      flash[:error] = "Sorry! You don't have permission to edit that image."
-      redirect_to @public_image.imageable
+    if @public_image.imageable_type == "Bike"
+      unless @public_image.imageable.owner == current_user
+        flash[:error] = "Sorry! You don't have permission to edit that image."
+        redirect_to @public_image.imageable and return
+      end
+    elsif @public_image.imageable_type == "Blog"
+      unless current_user.superuser? 
+        flash[:error] = "Sorry! You don't have permission to edit that image."
+        redirect_to @public_image.imageable and return
+      end
     end
   end
     

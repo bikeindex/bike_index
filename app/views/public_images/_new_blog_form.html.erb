@@ -1,0 +1,13 @@
+<%= form_for PublicImage.new do |f| %>
+  <div class="photo-upload-fields">    
+    <%= hidden_field_tag :blog_id, @blog.id %>
+    <div class="upload-buttons">
+      <div class="multifilefield-button">
+        Upload photos
+        <%= f.file_field :image, multiple: true, name: "public_image[image]" %>
+      </div>
+      <!-- <p class="smaller-text">Use the shift key to select multiple photos</p> -->
+    </div>
+    <p class="extra-info">Drag and drop files here to or use the <em>Upload Photos</em> button.</p>
+  </div>
+<% end %>
