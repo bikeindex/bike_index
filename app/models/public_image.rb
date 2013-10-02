@@ -10,7 +10,7 @@ class PublicImage < ActiveRecord::Base
   default_scope order(:listing_order)
 
   after_create :set_order
-  
+  scope :bikes, where(imageable_type: "Bike")
 
   def set_order
     self.listing_order = self.imageable.public_images.length

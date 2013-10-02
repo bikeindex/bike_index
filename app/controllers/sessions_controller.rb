@@ -6,7 +6,7 @@ class SessionsController < ApplicationController
   end
 
   def create
-    @photos = PublicImage.limit(18).order("created_at desc")
+    # @photos = PublicImage.limit(18).order("created_at desc")
     user = User.fuzzy_email_find(params[:session][:email])
 
     if user.present?

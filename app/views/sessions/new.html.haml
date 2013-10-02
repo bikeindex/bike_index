@@ -3,7 +3,7 @@
 .span8.photo-animation
   #photos-flip 
     - cache('new_session_pictures') do
-      - PublicImage.order("created_at desc").limit(18).each_with_index do |photo, i|
+      - PublicImage.bikes.order("created_at desc").limit(18).each_with_index do |photo, i|
         .bike-photo{id: "photo#{i}"}
           .flipper
             .front
