@@ -24,9 +24,12 @@ module PdfCreate
     cleanup
     render_stolen_banner( pdf )
     render_title( pdf )
+    render_site_information( pdf )
     render_media( pdf )
     render_stolen_record( pdf )
     render_bike_info( pdf )
+    render_bike_components( pdf )
+    render_footer( pdf )
     pdf.render_file "#{base_name}#{file_name}"
     file_name
   end
@@ -58,7 +61,7 @@ module PdfCreate
       pdf.stroke_horizontal_rule
       pdf.pad_top(10) do
         pdf.fill_color important_color
-        pdf.text "<b>Stolen Bike Information:</b>", :inline_format => true
+        pdf.text "<b>Theft Information:</b>", :inline_format => true
       end
       render_stolen_details pdf
     end
@@ -83,7 +86,7 @@ module PdfCreate
     end
     pdf.table(data) do
       cells.borders = []
-      cells.size = 11
+      cells.size = 10
       cells.padding = [0, 30, 2, 10]
     end
   end
@@ -91,8 +94,13 @@ module PdfCreate
   def render_media pdf
     unless bike.thumb_path.nil?
       render_row_margin( pdf )
-      pdf.image "#{Prawn::DATADIR}#{bike.thumb_path.gsub(%r{/small},'/large')}", :height => 120, :position => :center
+      pdf.image "#{Prawn::DATADIR}#{bike.thumb_path.gsub(%r{/small},'/large')}", :width => 210, :position => :left
     end
+  end
+  
+  def render_site_information pdf
+    pdf.formatted_text_box [{text: "Listed on"}, 
+                            {text: " BikeIndex.com\r\r", color: link_color, link: "http://bikeindex.com/bikes/#{bike.id}"}], :at => [250, 630]
   end
   
   def render_bike_info pdf
@@ -138,7 +146,7 @@ module PdfCreate
     end
     pdf.table(data) do
       cells.borders = []
-      cells.size = 11
+      cells.size = 10
       cells.each_with_index do |cell, i|
         if i.even?
           cell.text_color = '999999'
@@ -151,8 +159,42 @@ module PdfCreate
     end
   end
   
-  def render_bike_components
-    
+  def render_bike_components pdf
+    render_row_margin( pdf )
+    pdf.stroke_color border_color
+    pdf.stroke_horizontal_rule
+    pdf.pad_top(10) do
+      pdf.fill_color text_color
+      pdf.text "<b>Addition Component Information</b>", :inline_format => true
+    end
+    render_bike_component_details( pdf )
+  end
+  
+  def render_bike_component_details pdf
+    data = [["Manufacturer", "Name", "Serial Number"]]
+    bike.components.each do |component|
+      manufacturer = Manufacturer.find(component.manufacturer_id)
+      data << [ "#{component.model_name}", "#{manufacturer.name}", "#{component.serial_number}" ]
+    end
+    pdf.column_box([0, pdf.cursor], columns: 1, width: pdf.bounds.width) do
+      pdf.table(data.slice(0,8)) do
+        cells.borders = []
+        cells.size = 10
+        cells.each_with_index do |cell, i|
+          if i < 3
+            cell.text_color = '999999'
+            cell.padding = [6,10,6,10]
+          else
+            cell.padding = [0,10,2,10]            
+          end
+        end
+      end
+    end
+  end
+  
+  def render_footer pdf
+    pdf.formatted_text_box [{text: "Questions about the Bike Index? Email us at ", color: text_color, size: 10},
+                              {text: "contact@bikeindex.org", color: link_color, link: "contact@bikeindex.org", size: 10}], at: [0, 10], width: 540, align: :center
   end
   
   def cleanup file=nil
@@ -175,7 +217,7 @@ private
   def filter_hash_clean_array item
     item.map.with_index do |x,j|
       if j == 0
-        x = x.to_s.sub(%r{\_}," ").capitalize
+        x = x.to_s.sub(%r{\_}," ").capitalize+":"
       end
       x
     end
@@ -219,4 +261,8 @@ private
   def border_color
     "DDDDDD"
   end  
+  
+  def link_color
+    "0000FF"
+  end
 end
