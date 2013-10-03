@@ -5,7 +5,7 @@ module PdfCreate
   
   def pdf_format bike
     @bike = bike
-    # return file_name unless is_new?
+    return file_name unless is_new?
     pdf = Prawn::Document.new
     render_pdf_document pdf
   end
@@ -21,7 +21,6 @@ module PdfCreate
   end
   
   def render_pdf_document pdf
-    cleanup
     render_stolen_banner( pdf )
     render_title( pdf )
     render_site_information( pdf )
