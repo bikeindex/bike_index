@@ -41,7 +41,7 @@
     .control-group.chosen-select
       = f.label :creation_organization_id, class: "control-label"
       .controls
-        = collection_select( :bike, :creation_organization_id, Organization.all, :id, :name)
+        = collection_select( :bike, :creation_organization_id, Organization.all, :id, :name, prompt: "Choose organization")
 
     .control-group.chosen-select
       = f.label :location_id, class: "control-label"
