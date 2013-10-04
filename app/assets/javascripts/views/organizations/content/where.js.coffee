@@ -10,7 +10,8 @@ class BikeIndex.Views.ContentWhere extends Backbone.View
 
   
   initializeMap: ->
-    createMap(41.869561,-87.495117,6);
+    # createMap(41.869561,-87.495117,4);
+    createMap(40.111689,-96.81839,4);
 
   updateMapLocation: (event) ->
     # event.preventDefault()
@@ -19,7 +20,7 @@ class BikeIndex.Views.ContentWhere extends Backbone.View
       scrollTop: ($('#where-bike-index').offset().top - 20), 'fast' 
     )
     latLng = new google.maps.LatLng(target.attr('data-lat'), target.attr('data-long'))
-    window.map.setZoom(13)
+    window.map.setZoom(8)
     window.map.panTo(latLng)
     
     
