@@ -17,6 +17,7 @@ class BikesController < ApplicationController
   before_filter :ensure_user_for_edit, only: [:edit, :update]
   before_filter :ensure_user_for_new, only: [:new, :create]
   layout 'no_container'
+  include PdfCreate 
 
   def index
     @title = "Bikes"
@@ -38,10 +39,13 @@ class BikesController < ApplicationController
     @stolen_notification = StolenNotification.new if @bike.stolen
     respond_to do |format|
       format.html
+      format.pdf do
+        redirect_to pdf_format(bike), content_type: Mime::PDF
+      end
       format.gif  { render :qrcode => bike_url(@bike), :level => :h, :unit => 50 }
     end
   end
-
+  
   def spokecard
     @title = "Bike spokecard"
     @bike = Bike.find(params[:id])

@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'date'
 
 describe BikesController do
 
@@ -11,7 +12,7 @@ describe BikesController do
     it { should_not set_the_flash }
   end
 
-  describe :show do 
+  describe :show do
     describe "showing" do 
       before do 
         ownership = FactoryGirl.create(:ownership)
@@ -21,8 +22,18 @@ describe BikesController do
       it { should render_template(:show) }
       it { should_not set_the_flash }
       it { assigns(:bike).should be_decorated }
+    end    
+    describe :pdf_redirect do
+      it "should redirect to the asset pdf path" do
+        bike = FactoryGirl.create :bike, name: "Test Bike#{rand(1000)}"
+        get :show, id: bike.id, format: "pdf"
+        name = bike.name.sub(%r{\s},"-")
+        today = Date.today
+        response.should redirect_to("http://test.host/uploads/pdf/#{name}_#{bike.id}D#{today}.pdf")
+      end
     end
   end
+  
 
   describe :spokecard do
     it "shouldn't render the page if the bike isn't verified" do 

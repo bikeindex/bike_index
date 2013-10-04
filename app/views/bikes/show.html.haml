@@ -21,7 +21,7 @@
     %p
       - if @bike.current_owner_exists
         - if @bike.stolen
-          We're really bummed that your #{@bike.type} was stolen.       
+          We're really bummed that your #{@bike.type} was stolen. 
         - else
           Whoah, this awesome #{@bike.type} is yours!
 
@@ -48,7 +48,8 @@
         %strong.stolen-color
           Stolen
       = @bike.title
-
+      %span.download_report_btn
+        = link_to "View Report", bike_path+".pdf", class: "btn btn-small btn-warning"
     %p.other-bikes
       = @bike.show_other_bikes
         
