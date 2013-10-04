@@ -71,13 +71,13 @@ module PdfCreate
     data=[]
     last_record = bike.stolen_records.last
     list_data = {
-      phone_number:           last_record.phone,
-      locking_description:    last_record.locking_description,
-      locking_circumvented:   last_record.lock_defeat_description,
-      date_stolen:            last_record.date_stolen.to_s.split(%r{\s}).first,
-      location:               last_record.street,
-      description:            last_record.theft_description,
-      police_report_number:   last_record.police_report_number
+      phone_number:           last_record.phone || "",
+      locking_description:    last_record.locking_description || "",
+      locking_circumvented:   last_record.lock_defeat_description || "",
+      date_stolen:            last_record.date_stolen.to_s.split(%r{\s}).first || "",
+      location:               last_record.street || "",
+      description:            last_record.theft_description || "",
+      police_report_number:   last_record.police_report_number || ""
     }
     list_data.each_with_index do |item, i|
       arr = filter_hash_clean_array(item)
@@ -118,21 +118,21 @@ module PdfCreate
     j=0
     data = []
     bike_info = {
-      cycle_type:         bike.type,
-      serial:             bike.serial_number,
-      manufacture:        bike.manufacturer.name,
-      model:              bike.frame_model,
-      year:               bike.frame_manufacture_year,
-      seat_tube_length:   bike.seat_tube_length,
-      front_wheel:        bike.front_wheel_size.name,
-      rear_wheel:         bike.rear_wheel_size.name,
-      handlebar_type:     bike.handlebar_type.name,
-      primary_color:      bike.primary_frame_color.name,
-      secondary_color:    bike.secondary_frame_color.name,
-      frame_material:     bike.frame_material.name,
-      rear_gears:         bike.rear_gear_type.name,
-      front_gears:        bike.front_gear_type.name
-    }    
+      cycle_type:         bike.type || "",
+      serial:             bike.serial_number || "",
+      manufacture:        bike.manufacturer.name || "",
+      frame_type:         bike.frame_model || "",
+      year:               bike.frame_manufacture_year || "",
+      seat_tube_length:   bike.seat_tube_length || "" }    
+    bike_info[:front_wheel] =     !bike.front_wheel_size.nil? ? bike.front_wheel_size.name : ""
+    bike_info[:rear_wheel] =      !bike.rear_wheel_size.nil? ? bike.rear_wheel_size.name : ""
+    bike_info[:handlebar_type] =  !bike.handlebar_type.nil? ? bike.handlebar_type.name : ""
+    bike_info[:primary_color] =   !bike.primary_frame_color.nil? ? bike.primary_frame_color.name : ""
+    bike_info[:secondary_color] = !bike.secondary_frame_color.nil? ? bike.secondary_frame_color.name : ""
+    bike_info[:frame_material] =  !bike.frame_material.nil? ? bike.frame_material.name : ""
+    bike_info[:rear_gears] =      !bike.rear_gear_type.nil? ? bike.rear_gear_type.name : ""
+    bike_info[:front_gears] =     !bike.front_gear_type.nil? ? bike.front_gear_type.name : ""
+
     bike_info.each_with_index do |item, i|
       if i < bike_info.size/2
         data << filter_hash_clean_array(item)
@@ -173,7 +173,7 @@ module PdfCreate
     data = [["Manufacturer", "Name", "Serial Number"]]
     bike.components.each do |component|
       manufacturer = Manufacturer.find(component.manufacturer_id)
-      data << [ "#{component.model_name}", "#{manufacturer.name}", "#{component.serial_number}" ]
+      data << [ "#{component.model_name || ""}", "#{manufacturer.name || ""}", "#{component.serial_number || ""}" ]
     end
     pdf.column_box([0, pdf.cursor], columns: 1, width: pdf.bounds.width) do
       pdf.table(data.slice(0,8)) do

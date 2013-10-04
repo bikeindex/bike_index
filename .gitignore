@@ -20,3 +20,6 @@ public/caches
 .rvmrc
 .ruby-gemset
 .ruby-version
+
+# Ignore public pdf test files
+/public/uploads/pdf/*.pdf
