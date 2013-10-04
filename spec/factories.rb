@@ -184,6 +184,6 @@ FactoryGirl.define do
   factory :stolen_record do 
     association :bike 
     date_stolen Time.now 
-  end
+  end  
 
 end

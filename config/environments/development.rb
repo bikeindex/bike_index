@@ -8,6 +8,9 @@ Bikeindex::Application.configure do
 
   # Log error messages when you accidentally call methods on nil.
   config.whiny_nils = true
+  
+  # temparary allow static assets to test pdf creation
+  config.serve_static_assets = true
 
   # Show full error reports and disable caching
   config.consider_all_requests_local       = true
