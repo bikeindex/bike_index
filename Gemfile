@@ -70,6 +70,7 @@ group :develop, :test do
   gem 'rb-fsevent', '~> 0.9.1'
   gem 'rspec-rails'
   gem 'foreman'
+  gem 'database_cleaner'
 end
 
 group :test do
