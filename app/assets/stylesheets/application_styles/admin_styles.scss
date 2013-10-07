@@ -88,6 +88,10 @@
 }
 
 .blog-entry-fields {
+  .this-will-break-links {
+    font-size: 14px;
+    color: $stolenColor;
+  }
   .well {
     @include clearfix;
     width: 100%;
