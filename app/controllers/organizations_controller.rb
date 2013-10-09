@@ -23,10 +23,6 @@ class OrganizationsController < ApplicationController
     render layout: 'embed_layout'
   end
 
-  def embed_success
-    render layout: 'embed_layout'
-  end
-
   def update
     websitey = params[:organization][:website]
     if Urlifyer.urlify(websitey)

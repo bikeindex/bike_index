@@ -421,6 +421,10 @@ body.welcome-page {
 
 @media (max-width: 760px) {
   #kickstarter {
+    .kickstarter-background {
+      width: 140%;
+      height: 110%;
+    }
     .kickstarter-iframe {
       margin: 20px auto;
       position: relative;
