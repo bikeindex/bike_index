@@ -65,26 +65,43 @@ class BikesController < ApplicationController
 
 
   def create
-    users_b_params = BParam.where(creator_id: current_user.id)
-    begin
-      @b_param = users_b_params.find(params[:bike][:b_param_id])
-    rescue
+    if params[:bike][:embeded]
+      @b_param = BParam.find(params[:bike][:b_param_id])
       @bike = Bike.new
-      flash[:error] = "Oops, that isn't your bike"
-      redirect_to action: :new, layout: 'no_header' and return
-    end
-    if @b_param.created_bike.present?
-      redirect_to edit_bike_url(@b_param.created_bike) and return
-    end
-    @b_param.update_attributes(params: params)
-    @bike = BikeCreator.new(@b_param).create_bike
-    if @bike.errors.any?
-      render action: :new, layout: 'no_header' and return
-    end
-    if @bike.payment_required
-      redirect_to new_charges_url(b_param_id: @b_param.id) and return
+      if @b_param.created_bike.present?
+        redirect_to embed_organization_url(@bike.creation_organization) and return
+      end
+      @b_param.update_attributes(params: params)
+      @bike = BikeCreator.new(@b_param).create_bike
+      if @bike.errors.any?
+        flash[:error] = "Whoops! There was a problem with your entry!"
+        redirect_to embed_organization_url(@bike.creation_organization) and return  
+      else
+        flash[:notice] = "Bike added successfully!"
+        redirect_to embed_organization_url(@bike.creation_organization) and return  
+      end
     else
-      redirect_to edit_bike_url(@bike), notice: "Bike successfully added to the index!"      
+      users_b_params = BParam.where(creator_id: current_user.id)
+      begin
+        @b_param = users_b_params.find(params[:bike][:b_param_id])
+      rescue
+        @bike = Bike.new
+        flash[:error] = "Oops, that isn't your bike"
+        redirect_to action: :new, layout: 'no_header' and return
+      end
+      if @b_param.created_bike.present?
+        redirect_to edit_bike_url(@b_param.created_bike) and return
+      end
+      @b_param.update_attributes(params: params)
+      @bike = BikeCreator.new(@b_param).create_bike
+      if @bike.errors.any?
+        render action: :new, layout: 'no_header' and return
+      end
+      if @bike.payment_required
+        redirect_to new_charges_url(b_param_id: @b_param.id) and return
+      else
+        redirect_to edit_bike_url(@bike), notice: "Bike successfully added to the index!"      
+      end
     end
   end
 

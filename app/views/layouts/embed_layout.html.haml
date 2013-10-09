@@ -10,4 +10,11 @@
     = csrf_meta_tags
     
   %body#bi_embed
+    #alert-block
+      - flash.each do |name, msg|
+        %div{:class => "alert-#{name == :notice ? "success" : "error"}"}
+          %a.close{"data-dismiss" => "alert"} ×
+          = content_tag :div, msg, :id => "flash_#{name}" if msg.is_a?(String)
+
+          
     = yield

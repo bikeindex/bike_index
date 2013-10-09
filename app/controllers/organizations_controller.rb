@@ -1,5 +1,5 @@
 class OrganizationsController < ApplicationController
-  before_filter :authenticate_user!
+  before_filter :authenticate_user!, only: [:show, :edit, :update, :destroy]
   before_filter :find_organization
   before_filter :require_membership, only: [:show, :edit, :update, :destroy]
   before_filter :require_admin, only: [:edit, :update, :destroy]
@@ -18,9 +18,13 @@ class OrganizationsController < ApplicationController
   end
 
   def embed
-    render layout: 'embed_layout'
-    b_param = BParam.create(creator_id: @organization.embedable_user.id, params: params)
+    b_param = BParam.create(creator_id: @organization.embedable_user.id, params: {creation_organization_id: @organization.id, embeded: true})
     @bike = BikeCreator.new(b_param).new_bike
+    render layout: 'embed_layout'
+  end
+
+  def embed_success
+    render layout: 'embed_layout'
   end
 
   def update
