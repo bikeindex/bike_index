@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130905215302) do
+ActiveRecord::Schema.define(:version => 20131009140156) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -304,6 +304,7 @@ ActiveRecord::Schema.define(:version => 20130905215302) do
     t.integer  "sent_invitation_count",      :default => 0
     t.datetime "deleted_at"
     t.boolean  "is_suspended",               :default => false, :null => false
+    t.integer  "embedable_user_id"
   end
 
   add_index "organizations", ["slug"], :name => "index_organizations_on_slug", :unique => true

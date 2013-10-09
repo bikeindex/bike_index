@@ -1,7 +1,7 @@
 class OrganizationsController < ApplicationController
   before_filter :authenticate_user!
   before_filter :find_organization
-  before_filter :require_membership
+  before_filter :require_membership, only: [:show, :edit, :update, :destroy]
   before_filter :require_admin, only: [:edit, :update, :destroy]
   layout "organization"
   
@@ -15,6 +15,12 @@ class OrganizationsController < ApplicationController
     @title = "#{@organization.name}"
     bikes = Bike.where(creation_organization_id: @organization.id).non_token.order("created_at asc")
     @bikes = bikes.decorate
+  end
+
+  def embed
+    render layout: 'embed_layout'
+    b_param = BParam.create(creator_id: @organization.embedable_user.id, params: params)
+    @bike = BikeCreator.new(b_param).new_bike
   end
 
   def update

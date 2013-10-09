@@ -17,7 +17,24 @@ describe Organization do
       @user = FactoryGirl.create(:organization, website: "http://somewhere.com" )
       @user.website.should eq('somewhere.com')
     end
+  end
 
+  describe :set_embedable_user do 
+    it "should set the embedable user" do 
+      organization = FactoryGirl.create(:organization)
+      user = FactoryGirl.create(:user, email: "embed@org.com")
+      membership = FactoryGirl.create(:membership, organization: organization, user: user)
+      organization.embedable_user_email = "embed@org.com"
+      organization.save
+      organization.reload.embedable_user_id.should eq(user.id)
+    end
+    it "should not set the embedable user if user is not a member" do 
+      organization = FactoryGirl.create(:organization)
+      user = FactoryGirl.create(:user, email: "no_embed@org.com")
+      organization.embedable_user_email = "no_embed@org.com"
+      organization.save
+      organization.reload.embedable_user_id.should be_nil
+    end
   end
 
 end

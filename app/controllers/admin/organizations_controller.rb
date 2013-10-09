@@ -25,6 +25,7 @@ class Admin::OrganizationsController < Admin::BaseController
   end
 
   def edit
+    @embedable_email = @organization.embedable_user.email if @organization.embedable_user
   end
 
   def update
