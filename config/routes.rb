@@ -3,6 +3,10 @@ Bikeindex::Application.routes.draw do
   get "dashboard/show"
   
   resources :organizations, only: [:show, :edit, :update, :destroy] do 
+    member do
+      get :embed
+      get :embed_success
+    end
     resources :memberships, only: [:edit, :update, :destroy]
     resources :organization_invitations, only: [:new, :create]
   end

@@ -1,0 +1,234 @@
+//= require select2
+@import "application_styles/_colors.scss";
+@import "includes/bootstrap/_mixins.scss";
+@import "includes/embed_form_styles.scss";
+
+
+#bi_embed {
+  font-family: $sansFontFamily;
+  max-width: 800px;
+  margin: 40px auto;
+  * {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    text-rendering: optimizeLegibility;
+  }
+
+  select,
+  textarea,
+  input[type="text"],
+  input[type="password"],
+  input[type="datetime"],
+  input[type="datetime-local"],
+  input[type="date"],
+  input[type="month"],
+  input[type="time"],
+  input[type="week"],
+  input[type="number"],
+  input[type="email"],
+  input[type="url"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="color"],
+  .uneditable-input {
+    @include border-radius(2px);
+    height: auto;
+    font-size: 1em;
+    margin-top: -.25em;
+    line-height: 1.3em;
+  }
+  .select2-choices {
+    @include border-radius(2px);
+    font-size: 16px;
+    min-height: 29px;
+  }
+}
+
+.input-group .absent-serial {
+  background: darken(white, 10%);
+  color: $grayLight;
+  cursor: default;
+  &:active, &:focus {
+    border: 1px solid #ccc;
+    @include box-shadow(none);
+  }
+}
+a {
+  color: $linkColor;
+}
+
+
+.input-group {
+  @include clearfix;
+  position: relative;
+  padding: 1.2em 2em 1em 1em;
+  border-bottom: 1px solid $grayLightish;
+}
+.input-group.add-additional {
+  .add-component-fields {
+    padding-bottom: 30px;
+  }
+  .hidden-other.unhidden {
+    padding: .5em 0 0;
+  }
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 60px;
+  .button-blue {
+    position: absolute;
+    bottom: 15px;
+    right: 20px;
+  }
+}
+.form-foot {
+  @include clearfix;
+}
+.control-group {
+  float: left;
+  max-width: 300px;
+  margin-bottom: 0;
+  select { margin-top: .1em; }
+}
+.with-optional-blocks {
+  @include clearfix;
+  .hidden-other.unhidden {
+    clear: both;
+    padding-bottom: 0;
+    width: 100%;
+    .field {
+      float: left;
+      display: block;
+    }
+    .optional-form-block {
+      margin: 0 0 0 1.25em;
+    }
+  }
+  .wheel-diameter {
+    clear: both;
+  }
+}
+
+.optional-form-block {
+  cursor: pointer;
+  display: block;
+  float: right;
+  margin-top: 1em;
+  text-align: right;
+}
+.has-no-serial {
+  margin: 24px 0 0 10px;
+  float: left;
+  position: relative;
+  input { margin: 0 .5em 0 0;}
+  label {
+    width: 100%;
+    margin: 0 15px 0 0;
+    // width: 105px;
+  } 
+}
+.form-save {
+  display: block;
+  text-align: center;
+  input {
+    text-align: center;
+    float: none;
+    width: 60%;
+  }
+}
+
+.hidden-other, .edit-bike-fields .hidden-other,
+.currently-hidden, .edit-bike-fields .currently-hidden,
+.hidden-other, .new-bike-fields .optional-form-block.hidden-other,
+.currently-hidden, .new-bike-fields .optional-form-block.currently-hidden {
+  display: none;
+  padding: 1em 0;
+}
+
+.form-save {
+  @include clearfix;
+  .button-green {
+    float: right;
+    font-size: 1.2em;
+  }
+}
+.chosen-select .controls .select2-container { width: 210px;}
+
+.other-value {
+  display: none;
+}
+
+
+#alert-block {
+  z-index: 100;
+  position: fixed;
+  top: 100px; left: 0;
+  // margin: 10px;
+  width: 100%;
+  // @include clearfix;
+  margin: 0 auto;
+  .alert {
+    @include box-shadow(-2px 2px 4px rgba(black,.2));
+    // For IE 8 
+    -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=2, Direction=135, Color='#000000')";
+    z-index: 100;
+    position: absolute;
+    left: 10%;
+    width: 80%;
+    top: 20px;
+    opacity: .95;
+  }
+}
+
+
+.alert {
+  @include border-radius(1px);
+  padding: 15px 35px 20px 14px;
+  margin-bottom: $baseLineHeight;
+  text-shadow: 0 1px 0 rgba(255,255,255,.5);
+  // background-color: $warningBackground;
+  // border: 1px solid $warningBorder;
+  // color: $warningText;
+  background-color: darken($warningBackground, 2%);
+  border: 1px solid darken($warningBorder, 7%);
+  color: darken($warningText, 20%);
+}
+.alert h4 {
+  margin: 0 0 .5em;
+}
+
+// Adjust close link position
+.alert .close {
+  position: relative;
+  top: -2px;
+  right: -21px;
+  float: right;
+  line-height: $baseLineHeight;
+  font-size: 40px;
+  cursor: pointer;
+  color: $grayLight;
+  &:hover {
+    text-shadow: 0 0 2px rgba(black,.2);
+    color: $grayMed;
+  }
+}
+
+.alert-success {
+  @extend .alert;
+  background-color: $successBackground;
+  border-color: $successBorder;
+  color: $successText;
+}
+.alert-danger,
+.alert-error {
+  @extend .alert;
+  background-color: $errorBackground;
+  border-color: $errorBorder;
+  color: $errorText;
+}
+.alert-info {
+  @extend .alert;
+  background-color: $infoBackground;
+  border-color: $infoBorder;
+  color: $infoText;
+}
