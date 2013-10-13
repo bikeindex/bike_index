@@ -3,8 +3,8 @@ module PdfCreate
   require 'date'
   require 'time'
   
-  def pdf_format
-    bike = @bike
+  def pdf_format bike
+    @bike = bike
     return file_name unless is_new?
     pdf = Prawn::Document.new
     render_pdf_document pdf
