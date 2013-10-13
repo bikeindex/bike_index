@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131009140156) do
+ActiveRecord::Schema.define(:version => 20131013171704) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -137,6 +137,13 @@ ActiveRecord::Schema.define(:version => 20131009140156) do
     t.boolean  "rear"
     t.string   "manufacturer_other"
     t.string   "serial_number"
+  end
+
+  create_table "countries", :force => true do |t|
+    t.string   "name"
+    t.string   "iso"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "ctypes", :force => true do |t|
