@@ -20,6 +20,8 @@
   .show-bike-edit
     %p
       - if @bike.current_owner_exists
+        %a{href: bike_path+".pdf", target: "_blank"}
+          Download printable registration
         - if @bike.stolen
           We're really bummed that your #{@bike.type} was stolen. 
         - else
@@ -48,8 +50,6 @@
         %strong.stolen-color
           Stolen
       = @bike.title
-      %span.download_report_btn
-        = link_to "View Report", bike_path+".pdf", class: "btn btn-small btn-warning"
     %p.other-bikes
       = @bike.show_other_bikes
         
@@ -77,7 +77,7 @@
                   Phone number
                 %dd
                   %a{ href: "tell:#{@bike.current_stolen_record.phone}" }
-                    = @bike.current_stolen_record.phone
+                    = @bike.current_stolen_record.display_phone
             = @bike.dl_list_item(@bike.current_stolen_record.locking_description, "Locking description")
             = @bike.dl_list_item(@bike.current_stolen_record.lock_defeat_description, "Locking circumvented")
             = @bike.dl_list_item(@bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), "Date stolen")

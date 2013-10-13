@@ -3,8 +3,8 @@ module PdfCreate
   require 'date'
   require 'time'
   
-  def pdf_format bike
-    @bike = bike
+  def pdf_format
+    bike = @bike
     return file_name unless is_new?
     pdf = Prawn::Document.new
     render_pdf_document pdf
@@ -16,14 +16,12 @@ module PdfCreate
   
   def file_name
     date = Date.today
-    name = bike.name.sub(%r{\s},"-")
-    "/uploads/pdf/#{name}_#{bike.id}D#{date}.pdf"
+    "/uploads/pdf/#{bike.id}D#{date}.pdf"
   end
   
   def render_pdf_document pdf
     render_stolen_banner( pdf )
     render_title( pdf )
-    render_site_information( pdf )
     render_media( pdf )
     render_stolen_record( pdf )
     render_bike_info( pdf )
@@ -34,13 +32,13 @@ module PdfCreate
   end
   
   def render_stolen_banner pdf
-    if is_stolen?
+    pdf.image "#{Prawn::DATADIR}/logo.png", :width => 60, :at => [505, 25]
+    if bike.stolen
       reported_date = bike.stolen_records.last.created_at.to_s.split(%r{\s}).first
       pdf.bounding_box([0, pdf.cursor], width: 540, height: 22) do
         pdf.stroke_color important_color
-        pdf.stroke_horizontal_rule
         pdf.pad_bottom(10) do
-          pdf.text("<color rgb='#{important_color}'>Your #{bike.type} was reported stolen on #{reported_date}.</color>", :align => :center, :valign => :center, :inline_format => true)
+          pdf.text("<color rgb='#{important_color}'>This #{bike.type} was stolen on #{reported_date}</color>", :align => :center, :valign => :center, :inline_format => true)
         end
       end
       pdf.stroke_horizontal_rule
@@ -50,11 +48,11 @@ module PdfCreate
   def render_title pdf
     render_row_margin_if_stolen( pdf )
     pdf.fill_color text_color
-    pdf.text "#{bike.frame_manufacture_year} #{bike.frame_model} by <b>#{bike.manufacturer.name}</b>", :size => 36, :inline_format => true, :align => :center
+    pdf.text bike.decorate.title_nhtml, :size => 24, :inline_format => true, :align => :center
   end
   
   def render_stolen_record pdf
-    if is_stolen?
+    if bike.stolen
       render_row_margin_if_stolen(pdf)
       pdf.stroke_color important_color
       pdf.stroke_horizontal_rule
@@ -71,7 +69,7 @@ module PdfCreate
     data=[]
     last_record = bike.stolen_records.last
     list_data = {
-      phone_number:           last_record.phone || "",
+      phone_number:           last_record.display_phone || "",
       locking_description:    last_record.locking_description || "",
       locking_circumvented:   last_record.lock_defeat_description || "",
       date_stolen:            last_record.date_stolen.to_s.split(%r{\s}).first || "",
@@ -91,15 +89,10 @@ module PdfCreate
   end
   
   def render_media pdf
-    unless bike.thumb_path.nil?
+    if bike.public_images.any?
       render_row_margin( pdf )
-      pdf.image "#{Prawn::DATADIR}#{bike.thumb_path.gsub(%r{/small},'/large')}", :width => 210, :position => :left
+      pdf.image "#{Prawn::DATADIR}#{bike.public_images.first.image_url(:large)}", :width => 210, :position => :center
     end
-  end
-  
-  def render_site_information pdf
-    pdf.formatted_text_box [{text: "Listed on"}, 
-                            {text: " BikeIndex.com\r\r", color: link_color, link: "http://bikeindex.com/bikes/#{bike.id}"}], :at => [250, 630]
   end
   
   def render_bike_info pdf
@@ -108,7 +101,7 @@ module PdfCreate
     pdf.stroke_horizontal_rule
     pdf.pad_top(10) do
       pdf.fill_color text_color
-      pdf.text "<b>Bike Information</b>", :inline_format => true
+      pdf.text "<b>#{bike.type.titleize} Information</b>", :inline_format => true
     end
     render_bike_details( pdf )
   end
@@ -120,7 +113,7 @@ module PdfCreate
     bike_info = {
       cycle_type:         bike.type || "",
       serial:             bike.serial_number || "",
-      manufacture:        bike.manufacturer.name || "",
+      manufacture:        bike.decorate.mnfg_name || "",
       frame_type:         bike.frame_model || "",
       year:               bike.frame_manufacture_year || "",
       seat_tube_length:   bike.seat_tube_length || "" }    
@@ -164,16 +157,16 @@ module PdfCreate
     pdf.stroke_horizontal_rule
     pdf.pad_top(10) do
       pdf.fill_color text_color
-      pdf.text "<b>Addition Component Information</b>", :inline_format => true
+      pdf.text "<b>Additional Components</b>", :inline_format => true
     end
     render_bike_component_details( pdf )
   end
   
   def render_bike_component_details pdf
-    data = [["Manufacturer", "Name", "Serial Number"]]
+    data = [["Manufacturer", "Model"]]
     bike.components.each do |component|
-      manufacturer = Manufacturer.find(component.manufacturer_id)
-      data << [ "#{component.model_name || ""}", "#{manufacturer.name || ""}", "#{component.serial_number || ""}" ]
+      mnfg_name = component.decorate.mnfg_name
+      data << [ "#{mnfg_name || ""}", "#{component.model_name || ""}" ]
     end
     pdf.column_box([0, pdf.cursor], columns: 1, width: pdf.bounds.width) do
       pdf.table(data.slice(0,8)) do
@@ -192,27 +185,18 @@ module PdfCreate
   end
   
   def render_footer pdf
-    pdf.formatted_text_box [{text: "Questions about the Bike Index? Email us at ", color: text_color, size: 10},
-                              {text: "contact@bikeindex.org", color: link_color, link: "contact@bikeindex.org", size: 10}], at: [0, 10], width: 540, align: :center
+    pdf.formatted_text_box [{text: "View this #{bike.type} online at ", color: text_color, size: 10},
+                              {text: bike_url(bike), color: link_color, link: bike_url(bike), size: 10}], at: [0, 10], width: 540, align: :center
   end
-  
-  def cleanup file=nil
-    path = file || base_name+file_name
-    destroy_pdf( path ) if File.exist?(path)
-  end
-  
+   
   def render_row_margin pdf, size=20
     pdf.move_down size
   end
   
   def render_row_margin_if_stolen pdf
-    if is_stolen?
-      pdf.move_down 20
-    end
+    pdf.move_down 20 if bike.stolen
   end
-    
-private
-  
+
   def filter_hash_clean_array item
     item.map.with_index do |x,j|
       if j == 0
@@ -221,17 +205,12 @@ private
       x
     end
   end
-  
-  def filter_name name
-    name = name.sub(%r{\s},"-") # replace white space
-    name = name.sub(%r{\H}, "") # remove non alpha numerics
-    name
+
+  def cleanup file=nil
+    path = file || base_name+file_name
+    destroy_pdf( path ) if File.exist?(path)
   end
-  
-  def is_stolen?
-    bike.stolen ? true : false
-  end
-    
+      
   def is_new?
     # returns true if file was created more than 15mins ago or file doesn't exists
     path = "#{base_name+file_name}"

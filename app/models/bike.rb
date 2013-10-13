@@ -50,7 +50,8 @@ class Bike < ActiveRecord::Base
     :bike_token_id,
     :b_param_id,
     :cached_attributes,
-    :embeded
+    :embeded,
+    :print_registration
 
   belongs_to :manufacturer
   serialize(:cached_attributes, Array)
@@ -93,6 +94,8 @@ class Bike < ActiveRecord::Base
   validates_presence_of :primary_frame_color_id
   validates_presence_of :rear_wheel_size_id
   validates_inclusion_of :rear_tire_narrow, :in => [true, false]
+
+  mount_uploader :print_registration, PrintRegistrationUploader
 
   attr_accessor :date_stolen_input, :phone, :bike_image, :bike_token_id, :b_param_id, :payment_required, :embeded
 

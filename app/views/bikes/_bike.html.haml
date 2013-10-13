@@ -26,7 +26,3 @@
           = bike.dl_list_item(bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), "Stolen on")
         %dl.dl-horizontal
           = bike.dl_list_item("#{bike.current_stolen_record.city}, #{bike.current_stolen_record.state}", "From")
-      .dl-holder
-        %dl.dl-horizontal.pull-right
-          %span.download_sheet
-            = link_to "View Report", "/bikes/#{bike.id}.pdf", class: "btn btn-small btn-warning"

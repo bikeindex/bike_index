@@ -27,7 +27,8 @@ class StolenRecord < ActiveRecord::Base
   default_scope where(current: true)
 
   def address
-    [street, city, state, zipcode, country.name].compact.join(', ')
+    cntry = country.name if country.present?
+    [street, city, state, zipcode, cntry].compact.join(', ')
   end
 
   unless Rails.env.test?
@@ -66,5 +67,8 @@ class StolenRecord < ActiveRecord::Base
     self.phone = Phonifyer.phonify(self.phone) if self.phone 
   end
 
+  def display_phone
+    self.phone.scan(/.{3}|.+/).join(".") if self.phone
+  end
 
 end
