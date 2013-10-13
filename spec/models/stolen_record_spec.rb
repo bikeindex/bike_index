@@ -16,8 +16,9 @@ describe StolenRecord do
 
   describe :address do 
     it "should create an address" do 
-      stolen_record = FactoryGirl.create(:stolen_record, street: "2200 N Milwaukee Ave", city: "Chicago", state: "IL", zipcode: "60647" )
-      stolen_record.address.should eq("2200 N Milwaukee Ave, Chicago, IL, 60647, United States")
+      c = Country.create(name: "Neverland", iso: "XXX")
+      stolen_record = FactoryGirl.create(:stolen_record, street: "2200 N Milwaukee Ave", city: "Chicago", state: "IL", zipcode: "60647", country_id: c.id)
+      stolen_record.address.should eq("2200 N Milwaukee Ave, Chicago, IL, 60647, Neverland")
     end
   end
 
