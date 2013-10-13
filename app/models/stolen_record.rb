@@ -4,6 +4,7 @@ class StolenRecord < ActiveRecord::Base
     :lock_defeat_description,
     :date_stolen,
     :bike,
+    :country_id,
     :street,
     :zipcode,
     :city,
@@ -19,13 +20,14 @@ class StolenRecord < ActiveRecord::Base
     :phone_for_police
 
   belongs_to :bike
+  belongs_to :country
 
   validates_presence_of :bike, :date_stolen
 
   default_scope where(current: true)
 
   def address
-    [street, city, state, zipcode, "United States"].compact.join(', ')
+    [street, city, state, zipcode, country.name].compact.join(', ')
   end
 
   unless Rails.env.test?

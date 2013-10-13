@@ -16,6 +16,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     @setElement($('#body'))
     menu_height = $('#edit-menu').offset().top 
     scroll_height = $(window).height() * .4
+    @setDefaultCountry()
     
     $('#body').attr('data-spy', "scroll").attr('data-target', '#edit-menu')
     $('#body').scrollspy(offset: - scroll_height)
@@ -207,6 +208,18 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
 
   markStolen: ->
     $('#bike_stolen').prop('checked', 'true')
+
+  setDefaultCountry: ->
+    c_select = $('#country_select_container select')
+    if c_select.length > 0
+      us_val = parseInt($('#country_select_container .other-value').text(), 10)
+      c_select.val(us_val).select2() unless c_select.val()
+      c_select.change ->
+        if c_select.val() == us_val
+          $('#state-select').slideDown()
+        else 
+          $('#state-select').slideUp()
+
 
   removeComponent: (event) ->
     # We don't need to do anything except slide the input up, because the label is on it.

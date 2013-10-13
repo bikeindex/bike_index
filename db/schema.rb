@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131013171704) do
+ActiveRecord::Schema.define(:version => 20131013172625) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -385,6 +385,7 @@ ActiveRecord::Schema.define(:version => 20131013171704) do
     t.string   "police_report_number"
     t.string   "locking_description"
     t.string   "lock_defeat_description"
+    t.integer  "country_id"
   end
 
   create_table "users", :force => true do |t|

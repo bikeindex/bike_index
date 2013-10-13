@@ -314,7 +314,8 @@
   }
 }
 
-.chosen-select .controls .select2-container { width: 210px;}
+.chosen-select .controls .select2-container,
+#stolen-bike-location .select2-container  { width: 210px;}
 
 .other-value {
   display: none;
