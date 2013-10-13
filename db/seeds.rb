@@ -5,6 +5,7 @@ require File.expand_path('db/seeds/seed_manufacturers', Rails.root)
 require File.expand_path('db/seeds/seed_wheel_sizes', Rails.root)
 require File.expand_path('db/seeds/seed_bike_associations', Rails.root)
 require File.expand_path('db/seeds/seed_components', Rails.root)
+require File.expand_path('db/seeds/seed_countries', Rails.root)
 
 # We have a silly random string at the top of a few pages.
 # They will break unless there is a value there... So here one is

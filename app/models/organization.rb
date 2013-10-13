@@ -8,14 +8,18 @@ class Organization < ActiveRecord::Base
     :default_bike_token_count,
     :show_on_map,
     :is_suspended,
-    :locations_attributes
+    :locations_attributes,
+    :embedable_user_email,
+    :embedable_user_id
 
+  attr_accessor :embedable_user_email
   acts_as_paranoid
 
   has_many :memberships, dependent: :destroy
   has_many :organization_deals, dependent: :destroy
   has_many :users, through: :memberships
   has_many :organization_invitations, dependent: :destroy
+  belongs_to :embedable_user, class_name: "User"
 
   has_many :locations, dependent: :destroy
   accepts_nested_attributes_for :locations, allow_destroy: true
@@ -35,16 +39,14 @@ class Organization < ActiveRecord::Base
     self.slug = Slugifyer.slugify(self.short_name)
   end
 
-  # def set_slug
-  #   self.slug = Slugifyer.slugify(self.name)
-  # end
 
-  # before_save :set_url
-  # def set_url
-  #   if self.website
-  #     self.website = Urlifyer.urlify(self.website)
-  #   end
-  # end
+  before_save :set_embedable_user
+  def set_embedable_user
+    if self.embedable_user_email.present?
+      u = User.fuzzy_email_find(embedable_user_email)
+      self.embedable_user_id = u.id if u.is_member_of?(self)
+    end
+  end
 
   def suspended?
     is_suspended?

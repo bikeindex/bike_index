@@ -49,7 +49,8 @@ class Bike < ActiveRecord::Base
     :components_attributes,
     :bike_token_id,
     :b_param_id,
-    :cached_attributes
+    :cached_attributes,
+    :embeded
 
   belongs_to :manufacturer
   serialize(:cached_attributes, Array)
@@ -93,7 +94,7 @@ class Bike < ActiveRecord::Base
   validates_presence_of :rear_wheel_size_id
   validates_inclusion_of :rear_tire_narrow, :in => [true, false]
 
-  attr_accessor :date_stolen_input, :phone, :bike_image, :bike_token_id, :b_param_id, :payment_required
+  attr_accessor :date_stolen_input, :phone, :bike_image, :bike_token_id, :b_param_id, :payment_required, :embeded
 
   default_scope order("created_at desc")
   scope :non_token, where(created_with_token: nil)

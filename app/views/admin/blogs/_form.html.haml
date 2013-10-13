@@ -39,6 +39,13 @@
       .controls
         = f.check_box :published
 
+    .control-group
+      = f.label :update_title, "Update URL", class: "control-label"
+      .controls
+        = f.check_box :update_title
+        %span.this-will-break-links
+          This will break existing links!
+
     .padded
       %a.button-blue.pull-left{target: "_blank", href: blog_url(@blog)}
         preview post

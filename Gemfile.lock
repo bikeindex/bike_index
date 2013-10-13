@@ -111,7 +111,6 @@ GEM
     coffee-script-source (1.6.2)
     dalli (2.6.4)
     database_cleaner (1.0.1)
-    database_rewinder (0.0.1)
     diff-lcs (1.2.4)
     draper (1.2.1)
       actionpack (>= 3.0)
@@ -425,7 +424,6 @@ DEPENDENCIES
   coffee-rails (~> 3.2.1)
   dalli
   database_cleaner
-  database_rewinder
   dotenv-rails (~> 0.8)!
   draper
   dumper

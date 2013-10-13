@@ -6,9 +6,10 @@ class Blog < ActiveRecord::Base
     :post_date,
     :post_on,
     :tags,
-    :published
+    :published,
+    :update_title
   
-  attr_accessor :post_on
+  attr_accessor :post_on, :update_title
 
   validates_presence_of :title, :body, :user_id
   validates_uniqueness_of :title, message: "has already been taken. If you believe that this message is an error, contact us!"
@@ -26,16 +27,23 @@ class Blog < ActiveRecord::Base
     end
   end
 
+  before_save :update_title_save
+  def update_title_save
+    set_title_slug if update_title.present? && update_title == "1"
+  end
+
   before_create :set_title_slug
   def set_title_slug
     # We want to only set this once, and not change it, so that links don't break
     self.title_slug = truncate(Slugifyer.slugify(self.title), length: 50, :omission => '')
   end
 
+
+
   before_save :create_abbreviation
   def create_abbreviation
     # Remove newlines, remove square brackets, remove parentheses (generally link targets) and then remove extra spaces
-    b_abbr = self.body.gsub(/\n/,' ').gsub(/[\[\]]/, '').gsub(/\![^)]*\)/, '').gsub(/\([^)]*\)/, '')
+    b_abbr = self.body.gsub(/\n/,' ').gsub(/[\[\]]/, '').gsub(/\![^)]*\)/, '').gsub(/\([^)]*\)/, '').gsub(/\<[^)]*\>/, '')
     # then remove extra spaces
     b_abbr = b_abbr.gsub(/\s+/, ' ').strip
     self.body_abbr = truncate(b_abbr, length: 200)
