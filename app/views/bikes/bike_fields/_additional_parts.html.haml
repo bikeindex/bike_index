@@ -14,6 +14,12 @@
       = f.label :description, "General description", class: "control-label"
       .controls
         = f.text_area :description, rows: 3, placeholder: "Say something more about your bike!"
+  .input-group
+    .control-group.large-text
+      %label.control-label.unclickable
+        = f.label :additional_registration, "Additional registration", class: "control-label"
+      .controls
+        = f.text_field :additional_registration, placeholder: "Enter a  registration number, if it exists"
 
   .input-group.with-additional-block
     %a.bikeform-tip{role: "button", title: "Curious about handlebar types? Click here!!!", :data => {toggle: "modal", target: "#handlebarTip"} }

@@ -8,12 +8,13 @@ class Bike < ActiveRecord::Base
     :manufacturer_other,
     :serial_number,
     :has_no_serial,
+    :additional_registration,
     :creation_organization_id,
     :location_id,
     :manufacturer,
     :frame_manufacture_year,
     :thumb_path,
-    :name, 
+    :name,
     :stolen,
     :frame_material_id, 
     :frame_material_other,
@@ -203,6 +204,7 @@ class Bike < ActiveRecord::Base
     c += "#{frame_material.name} " if frame_material
     c += "#{frame_model} " if frame_model
     c += "#{manufacturer_name} "
+    c += "#{additional_registration} "
     c += "#{type} " unless self.type == "bike"
     c += components_cache_string if components_cache_string
 

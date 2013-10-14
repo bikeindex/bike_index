@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131013172625) do
+ActiveRecord::Schema.define(:version => 20131013233351) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -91,6 +91,8 @@ ActiveRecord::Schema.define(:version => 20131013172625) do
     t.boolean  "verified"
     t.boolean  "paid_for"
     t.text     "cached_attributes"
+    t.string   "print_registration"
+    t.string   "additional_registration"
   end
 
   add_index "bikes", ["creation_organization_id"], :name => "index_bikes_on_organization_id"
