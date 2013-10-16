@@ -27,12 +27,13 @@ class StolenRecord < ActiveRecord::Base
   default_scope where(current: true)
 
   def address
+    return nil unless self.country
     [street, city, state, zipcode, country.name].compact.join(', ')
   end
 
   unless Rails.env.test?
     geocoded_by :address
-    after_validation :geocode, :if => lambda { self.city.present? && self.zipcode.present? && self.city.present? }
+    after_validation :geocode, :if => lambda { self.city.present? && self.zipcode.present? && self.country.present? }
   end
 
   def self.locking_description_select
