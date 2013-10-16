@@ -50,8 +50,7 @@ class Bike < ActiveRecord::Base
     :bike_token_id,
     :b_param_id,
     :cached_attributes,
-    :embeded,
-    :print_registration
+    :embeded
 
   belongs_to :manufacturer
   serialize(:cached_attributes, Array)

@@ -39,9 +39,9 @@ class BikesController < ApplicationController
     @stolen_notification = StolenNotification.new if @bike.stolen
     respond_to do |format|
       format.html
-      # format.pdf do
-      #   redirect_to pdf_format, content_type: Mime::PDF
-      # end
+      format.pdf do
+        redirect_to pdf_format(@bike), content_type: Mime::PDF
+      end
       format.gif  { render :qrcode => bike_url(@bike), :level => :h, :unit => 50 }
     end
   end
