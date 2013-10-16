@@ -1,3 +1,7 @@
+# A button should make this pdf be created.
+# And then it should save to carrierwave
+# and then it should delete the pdf that was created
+
 module PdfCreate
   attr_accessor :bike
   require 'date'
