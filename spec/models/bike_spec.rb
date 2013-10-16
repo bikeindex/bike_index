@@ -240,7 +240,7 @@ describe Bike do
       b.handlebar_type_id = handlebar.id
       b.save
       b.cache_bike
-      b.cached_data.should eq("Hand pedaled 1999 #{b.primary_frame_color.name} #{b.secondary_frame_color.name} #{b.tertiary_frame_color.name} #{material.name} #{b.frame_model} #{b.manufacturer_name} unicycle ")
+      b.cached_data.should eq("Hand pedaled 1999 #{b.primary_frame_color.name} #{b.secondary_frame_color.name} #{b.tertiary_frame_color.name} #{material.name} #{b.frame_model} #{b.manufacturer_name}  unicycle ")
     end
   end
 
