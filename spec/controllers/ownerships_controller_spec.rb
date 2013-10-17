@@ -34,8 +34,8 @@ describe OwnershipsController do
         @ownership.reload.claimed.should be_false
       end
   
-      it "should redirect and mark current" do
-        @ownership.update_attributes(owner_email: @user.email)
+      it "should redirect and mark current based on fuzzy find" do
+        @ownership.update_attributes(owner_email: @user.email.upcase)
         put :show, id: @ownership.id
         response.code.should eq('302')
         flash.should be_present 

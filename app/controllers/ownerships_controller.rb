@@ -4,7 +4,7 @@ class OwnershipsController < ApplicationController
   def show
     ownership = Ownership.find(params[:id])
     bike = ownership.bike 
-    if current_user.email == ownership.owner_email
+    if current_user == User.fuzzy_email_find(ownership.owner_email)
       if ownership.current
         ownership.mark_claimed
         flash[:notice] = "Looks like this is your #{bike.type}! Good work, you just claimed it."
