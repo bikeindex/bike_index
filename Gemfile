@@ -19,13 +19,13 @@ gem "journey", "~> 1.0.3"
 gem 'rdiscount'
 gem 'will_paginate', '~> 3.0'
 gem 'pg_search'
-gem 'nokogiri'
+gem 'nokogiri', '~> 1.6.0'
 gem 'carrierwave'
 gem 'rmagick'
 gem "mini_magick" # a smaller implementation of rmagick, required for rqrcode
 gem 'rqrcode-rails3'
 gem 'strong_parameters'
-gem 'libv8', '~> 3.11.8'
+gem 'libv8', '~> 3.16.14'
 gem 'rb-readline', '~> 0.4.2'
 gem 'airbrake'
 gem 'backbone-on-rails', "=0.9.10.0"
@@ -35,7 +35,7 @@ gem "acts_as_paranoid", "~>0.4.0"
 gem "high_voltage"
 gem 'omniauth-facebook'
 gem 'omniauth'
-gem "capistrano"
+gem "capistrano", "~> 2.15.5"
 gem "capistrano-resque", "~> 0.1.0"
 gem "fog"
 gem 'dalli'
