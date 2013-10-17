@@ -46,6 +46,7 @@ Keep track of development and community news.
 
 - Follow [@bikeindex](http://twitter.com/bikeindex) on Twitter.
 - Read the [Bike Index Blog](https://bikeindex.org/blog).
+- Have a question that's not a feature request or bug report? Ask on the [mailing list](https://groups.google.com/group/bike-index).
 
 
 ## Contributing
