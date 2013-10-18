@@ -13,7 +13,7 @@ class ErrorsController < ApplicationController
   end
 
   def server_error
-    render :status => 500, :formats => [:html], layout: false
+    render :status => 500, :formats => [:html]
   end
 
 end
