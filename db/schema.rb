@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131013233351) do
+ActiveRecord::Schema.define(:version => 20131018221510) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -74,7 +74,7 @@ ActiveRecord::Schema.define(:version => 20131013233351) do
     t.integer  "frame_manufacture_year"
     t.boolean  "has_no_serial",            :default => false, :null => false
     t.integer  "creator_id"
-    t.boolean  "created_with_token"
+    t.boolean  "created_with_token",       :default => false, :null => false
     t.integer  "location_id"
     t.boolean  "front_tire_narrow"
     t.integer  "primary_frame_color_id"

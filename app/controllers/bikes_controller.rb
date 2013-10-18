@@ -15,7 +15,7 @@ end
 
 class BikesController < ApplicationController
   before_filter :ensure_user_for_edit, only: [:edit, :update]
-  before_filter :ensure_user_for_new, only: [:new, :create]
+  before_filter :ensure_user_for_new, only: [:new]
   layout 'no_container'
 
   def index
@@ -63,7 +63,6 @@ class BikesController < ApplicationController
     render layout: 'no_header'
   end
 
-
   def create
     if params[:bike][:embeded]
       @b_param = BParam.find(params[:bike][:b_param_id])
@@ -81,6 +80,7 @@ class BikesController < ApplicationController
         redirect_to embed_organization_url(@bike.creation_organization) and return  
       end
     else
+      ensure_user_for_new
       users_b_params = BParam.where(creator_id: current_user.id)
       begin
         @b_param = users_b_params.find(params[:bike][:b_param_id])
