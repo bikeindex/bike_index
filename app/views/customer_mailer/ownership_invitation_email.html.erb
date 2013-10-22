@@ -13,14 +13,6 @@
 
 <hr style="margin: 40px 0 30px;">
 
-<h2>
-  Help us register more bikes!
-  <br>
-  <a href="http://www.kickstarter.com/projects/1073266317/the-bike-index-lets-stop-bike-theft-together">Contribute to our Kickstarter!</a>
-</h2>
-
-<hr style="margin: 40px 0 30px;">
-
 <% if @bike.stolen %>
   <p>You added a stolen bike to the Bike Index:</p>
 <% elsif @bike.created_with_token && @bike.ownerships.count < 2 %>
