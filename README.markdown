@@ -37,7 +37,7 @@
 
 ## Bug tracker
 
-Have a bug or a feature request? [Open a new issue](https://github.com/bikeindex/webapp/issues).
+Have a bug or a feature request? [Open a new issue](https://github.com/bikeindex/bike_index/issues).
 
 
 ## Community
