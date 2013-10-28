@@ -67,7 +67,7 @@
                 %i.icon-chevron-right
           %li
             %a{ href: "#edit_frame" }
-              Frame and Fork
+              Frame
               %i.icon-chevron-right
           %li
             %a{ href: "#edit_wheels" }
@@ -100,7 +100,7 @@
           - else
             / For some weird reason, if you don't have an else here it prints out all of the form elements.
 
-      = render :partial => 'bikes/bike_fields/frame_and_fork', :locals => { :f => f }
+      = render :partial => 'bikes/bike_fields/frame', :locals => { :f => f }
       = render :partial => 'bikes/bike_fields/wheels', :locals => { :f => f }
 
       = render :partial => 'bikes/bike_fields/drivetrain_and_brakes', :locals => { :f => f }

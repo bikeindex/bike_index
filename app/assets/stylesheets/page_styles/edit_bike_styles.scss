@@ -206,7 +206,9 @@
     .button-blue {
       position: absolute;
       bottom: 15px;
-      right: 20px;
+      right: 50%;
+      margin-right: -100px;
+      width: 200px;
     }
   }
   .form-foot {
@@ -441,8 +443,8 @@
       @include clearfix;
       padding-right: 1em;
     }
-    .optional-form-block {
-      margin-top: 0;
+    .optional-form-block, .with-optional-blocks .hidden-other.unhidden .optional-form-block {
+      margin-top: -1.2em;
       width: 28%;
       margin-left: 2%;
       text-align: left;

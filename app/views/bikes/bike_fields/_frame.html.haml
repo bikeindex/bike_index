@@ -1,7 +1,7 @@
 .edit-bike-fields#edit_frame
   %header
     %h2
-      Frame and Fork
+      Frame
   .input-group
     .control-group
       %label.control-label.unclickable
@@ -32,7 +32,7 @@
       %span
         ?
     .control-group
-      = f.label :seat_tube_length, class: "control-label"
+      = f.label :seat_tube_length, "Size (seat tube length)", class: "control-label"
       .controls
         = f.text_field :seat_tube_length
     .cm-or-in-select.optional-form-block
