@@ -274,19 +274,36 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
         hidden_other.removeClass('unhidden').slideUp()
 
   toggleDrivetrainChecks: (event) ->
-    [f_type, r_type] = ['standard', 'standard']
-    $('#edit_drivetrain .select-display').removeClass('fake-disabled')
+    [f_type, r_type] = [false, false]
+    target = $(event.target).attr('id')
+
+    if target == 'fixed_gear_check'
+      [f_type, r_type] = @setFixedGear()
+    else if target == 'front_internal_check'
+      f_type = 'standard'
+    else if target == 'rear_internal_check'
+      r_type = 'standard'
+    
     f_type = 'internal' if $('#front_internal_check').prop('checked') == true
     r_type = 'internal' if $('#rear_internal_check').prop('checked') == true
-    [f_type, r_type] = ['fixed', 'fixed'] if $('#fixed_gear_check').prop('checked') == true
-    if r_type == 'fixed'
+    @setDrivetrainDisplay(f_type, r_type)
+    
+
+  setFixedGear: ->
+    if $('#fixed_gear_check').prop('checked') == true
       $('#rear_internal_check, #front_internal_check').prop('checked', '')
       $('#edit_drivetrain .select-display').addClass('fake-disabled')
-    @setDrivetrainDisplay(f_type, r_type)
+      ['fixed', 'fixed']
+    else
+      $('#edit_drivetrain .select-display').removeClass('fake-disabled')
+      ['standard', 'standard']
+    
 
   setDrivetrainDisplay: (f_type, r_type) ->
-    $('#front-gear-select .select-display').html($("#front-#{f_type}").html())    
-    $('#rear-gear-select .select-display').html($("#rear-#{r_type}").html())
+    unless f_type == false
+      $('#front-gear-select .select-display').html($("#front-#{f_type}").html()) 
+    unless r_type == false
+      $('#rear-gear-select .select-display').html($("#rear-#{r_type}").html())
     @setDrivetrainValue()
   
   setDrivetrainValue: ->
@@ -303,4 +320,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       $('#rear-gear-select .select-display').html($("#rear-standard").html())
     else
       $('#rear-gear-select .select-display').val($('#bike_rear_gear_type_id').val())
+    if $('#fixed_gear_check').prop('checked') == true
+      $('#rear_internal_check, #front_internal_check').prop('checked', '')
+      $('#edit_drivetrain .select-display').addClass('fake-disabled')
     

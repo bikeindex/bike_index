@@ -48,7 +48,7 @@
               = fgt.name
         %select#front-internal
           %option{ disabled: true, selected: true }
-            Select internal Gear count
+            Select Gear count
           - FrontGearType.internal.each do |fgt|
             %option{ value: fgt.id }
               = fgt.name
@@ -81,7 +81,7 @@
               = rgt.name
         %select#rear-internal
           %option{ disabled: true, selected: true }
-            Select internal gear count
+            Select gear count
           - RearGearType.internal.each do |rgt|
             %option{ value: rgt.id }
               = rgt.name
