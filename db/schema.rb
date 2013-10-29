@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131018221510) do
+ActiveRecord::Schema.define(:version => 20131029144536) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -93,6 +93,8 @@ ActiveRecord::Schema.define(:version => 20131018221510) do
     t.text     "cached_attributes"
     t.string   "print_registration"
     t.string   "additional_registration"
+    t.boolean  "belt_drive",               :default => false
+    t.boolean  "coaster_brake",            :default => false
   end
 
   add_index "bikes", ["creation_organization_id"], :name => "index_bikes_on_organization_id"
@@ -193,6 +195,7 @@ ActiveRecord::Schema.define(:version => 20131018221510) do
     t.boolean  "internal",   :default => false, :null => false
     t.datetime "created_at",                    :null => false
     t.datetime "updated_at",                    :null => false
+    t.boolean  "standard"
   end
 
   create_table "handlebar_types", :force => true do |t|
@@ -353,6 +356,7 @@ ActiveRecord::Schema.define(:version => 20131018221510) do
     t.boolean  "internal",   :default => false, :null => false
     t.datetime "created_at",                    :null => false
     t.datetime "updated_at",                    :null => false
+    t.boolean  "standard"
   end
 
   create_table "stolen_notifications", :force => true do |t|

@@ -109,7 +109,7 @@
   }
 }
 
-.input-group .absent-serial {
+.input-group .absent-serial, .input-group .fake-disabled {
   background: darken(white, 10%);
   color: $grayLight;
   cursor: default;

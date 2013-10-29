@@ -5,15 +5,86 @@
       / and brakes
   .input-group
     .control-group
-      = f.label :rear_gear_type_id, "How many rear gears", class: "control-label"
+      %label.control-label
+        Drivetrain
+      #drivetrain_checks.controls
+        - fixed = @bike.front_gear_type == FrontGearType.fixed.first
+        %label.checkbox
+          %input#fixed_gear_check{ type: "checkbox", checked: fixed }
+          Fixed gear
+        %label.checkbox
+          = f.check_box :coaster_brake
+          Coaster brake (backpedal to brake)
+        %label.checkbox
+          = f.check_box :belt_drive
+          Belt drive
+      
+  .input-group
+    #front-gear-select.control-group
+      %label.control-label{ for: 'front-select-display'}
+        How many front gears
       .controls
-        = collection_select( :bike, :rear_gear_type_id, RearGearType.all, :id, :name, prompt: "Choose cogs" )
+        %select.select-display
+          - FrontGearType.all.each do |fgt|
+            %option{ value: fgt.id }
+              = fgt.name
+      
+      .optional-form-block
+        - f_internal = @bike.front_gear_type.internal
+        %label.checkbox
+          %input#front_internal_check{ type: "checkbox", checked: f_internal }
+          Internal front gears
+
+      .gear-info-fields
+        = f.hidden_field :front_gear_type_id
+        %select#front-fixed
+          %option{ value: FrontGearType.fixed.first.id }
+            Fixed
+        %select#front-standard
+          %option{ disabled: true, selected: true }
+            Select chainring count
+          - FrontGearType.standard.each do |fgt|
+            %option{ value: fgt.id }
+              = fgt.name
+        %select#front-internal
+          %option{ disabled: true, selected: true }
+            Select internal Gear count
+          - FrontGearType.internal.each do |fgt|
+            %option{ value: fgt.id }
+              = fgt.name
 
   .input-group
-    .control-group
-      = f.label :front_gear_type_id, "How many front gears", class: "control-label"
+    #rear-gear-select.control-group
+      %label.control-label{ for: 'rear-select-display' }
+        How many rear gears
       .controls
-        = collection_select( :bike, :front_gear_type_id, FrontGearType.all, :id, :name, prompt: "Choose chainrings" )
+        %select.select-display#rear-select-display
+          - RearGearType.all.each do |rgt|
+            %option{ value: rgt.id }
+              = rgt.name
+      .optional-form-block
+        - r_internal = @bike.rear_gear_type.internal
+        %label.checkbox
+          %input#rear_internal_check{ type: "checkbox", checked: r_internal }
+          Internal rear gears
+
+      .gear-info-fields
+        = f.hidden_field :rear_gear_type_id
+        %select#rear-fixed
+          %option{ value: RearGearType.fixed.first.id }
+            Fixed
+        %select#rear-standard
+          %option{ disabled: true, selected: true }
+            Select cog count
+          - RearGearType.standard.each do |rgt|
+            %option{ value: rgt.id }
+              = rgt.name
+        %select#rear-internal
+          %option{ disabled: true, selected: true }
+            Select internal gear count
+          - RearGearType.internal.each do |rgt|
+            %option{ value: rgt.id }
+              = rgt.name
 
   .input-group.inform-save
     .controls

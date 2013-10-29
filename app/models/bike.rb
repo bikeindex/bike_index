@@ -34,6 +34,8 @@ class Bike < ActiveRecord::Base
     :propulsion_type_id,
     :propulsion_type_other,
     :zipcode,
+    :belt_drive,
+    :coaster_brake,
     :rear_gear_type_id,
     :rear_gear_type_other,
     :front_gear_type_id,

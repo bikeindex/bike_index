@@ -63,7 +63,7 @@ f_gear_types = [
   {name: '2', count: 2, internal: false},
   {name: '3', count: 3, internal: false},
   {name: 'Internal', count: 1, internal: true},
-  {name: 'Other style, internal: false'}
+  {name: 'Fixed', count: 1, internal: false}
 ]
 f_gear_types.each do |gear|
   f_gear_type = FrontGearType.create(name: gear[:name], count: gear[:count], internal: gear[:internal])
@@ -82,9 +82,21 @@ r_gear_types = [
   {name: '10', count: 10, internal: false},
   {name: '11', count: 11, internal: false},
   {name: '12', count: 12, internal: false},
+  {name: '1 internal', count: 1, internal: true},
+  {name: '2 internal', count: 2, internal: true},
+  {name: '3 internal', count: 3, internal: true},
+  {name: '4 internal', count: 4, internal: true},
+  {name: '5 internal', count: 5, internal: true},
+  {name: '6 internal', count: 6, internal: true},
+  {name: '7 internal', count: 7, internal: true},
+  {name: '8 internal', count: 8, internal: true},
+  {name: '9 internal', count: 9, internal: true},
+  {name: '10 internal', count: 10, internal: true},
+  {name: '11 internal', count: 11, internal: true},
+  {name: '12 internal', count: 12, internal: true},
   {name: 'Fixed', count: 1, internal: false},
-  {name: 'Coaster Brake', count: 1, internal: false},
-  {name: 'Other style', internal: false}
+  {name: 'Coaster Brake 1 speed', count: 1, internal: false},
+  {name: 'Coaster Brake 2 speed kickback', count: 2, internal: false},
 ]
 r_gear_types.each do |gear|
   r_gear_type = RearGearType.create(name: gear[:name], count: gear[:count], internal: gear[:internal])

@@ -11,6 +11,10 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     'click .add_fields': 'addComponent'
     'change .part-type-select select': 'updatePartType'
     'change .component_model input': 'toggleExtraModelField'
+    'change #fixed_gear_check': 'toggleDrivetrainChecks'
+    'change #rear_internal_check': 'toggleDrivetrainChecks'
+    'change #front_internal_check': 'toggleDrivetrainChecks'
+    'change #edit_drivetrain select': 'setDrivetrainValue'
     
   initialize: ->
     @setElement($('#body'))
@@ -101,6 +105,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     @expandAdditionalBlockFromSelector('#bike_frame_material_id')
     @expandAdditionalBlockFromSelector('.component-mnfg-select select')
     @expandAdditionalBlockFromSelector('.part-type-select select')
+    @setInitialGears()
 
 
   expandAdditionalBlock: (event) ->
@@ -268,5 +273,34 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
         hidden_other.find('input').val('')
         hidden_other.removeClass('unhidden').slideUp()
 
+  toggleDrivetrainChecks: (event) ->
+    [f_type, r_type] = ['standard', 'standard']
+    $('#edit_drivetrain .select-display').removeClass('fake-disabled')
+    f_type = 'internal' if $('#front_internal_check').prop('checked') == true
+    r_type = 'internal' if $('#rear_internal_check').prop('checked') == true
+    [f_type, r_type] = ['fixed', 'fixed'] if $('#fixed_gear_check').prop('checked') == true
+    if r_type == 'fixed'
+      $('#rear_internal_check, #front_internal_check').prop('checked', '')
+      $('#edit_drivetrain .select-display').addClass('fake-disabled')
+    @setDrivetrainDisplay(f_type, r_type)
 
+  setDrivetrainDisplay: (f_type, r_type) ->
+    $('#front-gear-select .select-display').html($("#front-#{f_type}").html())    
+    $('#rear-gear-select .select-display').html($("#rear-#{r_type}").html())
+    @setDrivetrainValue()
+  
+  setDrivetrainValue: ->
+    $('#bike_front_gear_type_id').val($('#front-gear-select .select-display').val())
+    $('#bike_rear_gear_type_id').val($('#rear-gear-select .select-display').val())
 
+  setInitialGears: ->
+    if $('#bike_front_gear_type_id').val().length < 1
+      $('#front-gear-select .select-display').html($("#front-standard").html())
+    else
+      $('#front-gear-select .select-display').val($('#bike_front_gear_type_id').val())
+
+    if $('#bike_rear_gear_type_id').val().length < 1
+      $('#rear-gear-select .select-display').html($("#rear-standard").html())
+    else
+      $('#rear-gear-select .select-display').val($('#bike_rear_gear_type_id').val())
+    
