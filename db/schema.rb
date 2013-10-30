@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131030132116) do
+ActiveRecord::Schema.define(:version => 20131030161105) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -85,9 +85,7 @@ ActiveRecord::Schema.define(:version => 20131030132116) do
     t.integer  "front_wheel_size_id"
     t.integer  "rear_wheel_size_id"
     t.integer  "rear_gear_type_id"
-    t.integer  "rear_gear_type_other"
     t.integer  "front_gear_type_id"
-    t.integer  "front_gear_type_other"
     t.boolean  "verified"
     t.boolean  "paid_for"
     t.text     "cached_attributes"

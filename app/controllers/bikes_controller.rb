@@ -38,8 +38,13 @@ class BikesController < ApplicationController
     @stolen_notification = StolenNotification.new if @bike.stolen
     respond_to do |format|
       format.html
-      format.gif  { render :qrcode => bike_url(@bike), :level => :h, :unit => 50 }
+      format.gif  { render :qrcode => scanned_bike_url(@bike), :level => :h, :unit => 50 }
     end
+  end
+
+  def scanned
+    # Gives us an easy way of knowing if bike is accessed via QR code
+    redirect_to bike_url(Bike.find(params[:id]))
   end
 
   def spokecard

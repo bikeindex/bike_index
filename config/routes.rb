@@ -59,6 +59,7 @@ Bikeindex::Application.routes.draw do
   resources :bikes do
     member do
      get 'spokecard'
+     get 'scanned'
    end
   end
   resources :locks
