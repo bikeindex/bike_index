@@ -30,7 +30,7 @@
               = fgt.name
       
       .optional-form-block
-        - f_internal = @bike.front_gear_type.internal
+        - f_internal = (@bike.front_gear_type ? @bike.front_gear_type.internal : false)
         %label.checkbox
           %input#front_internal_check{ type: "checkbox", checked: f_internal }
           Internal front gears
@@ -63,7 +63,7 @@
             %option{ value: rgt.id }
               = rgt.name
       .optional-form-block
-        - r_internal = @bike.rear_gear_type.internal
+        - r_internal = (@bike.rear_gear_type ? @bike.rear_gear_type.internal : false)
         %label.checkbox
           %input#rear_internal_check{ type: "checkbox", checked: r_internal }
           Internal rear gears

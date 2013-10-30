@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131029144536) do
+ActiveRecord::Schema.define(:version => 20131030132116) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -93,8 +93,8 @@ ActiveRecord::Schema.define(:version => 20131029144536) do
     t.text     "cached_attributes"
     t.string   "print_registration"
     t.string   "additional_registration"
-    t.boolean  "belt_drive",               :default => false
-    t.boolean  "coaster_brake",            :default => false
+    t.boolean  "belt_drive",               :default => false, :null => false
+    t.boolean  "coaster_brake",            :default => false, :null => false
   end
 
   add_index "bikes", ["creation_organization_id"], :name => "index_bikes_on_organization_id"
