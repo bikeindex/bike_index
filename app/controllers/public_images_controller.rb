@@ -10,7 +10,6 @@ class PublicImagesController < ApplicationController
   end
 
   def create
-
     @public_image = PublicImage.new(params[:public_image])
     if params[:bike_id].present?
       @bike = Bike.find(params[:bike_id])

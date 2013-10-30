@@ -47,9 +47,6 @@ describe Bike do
     it "non_stolen scopes to only non_stolen bikes" do 
       Bike.non_stolen.to_sql.should == Bike.where(stolen: false).to_sql
     end
-    it "non_token scopes to only non_token bikes" do 
-      Bike.non_token.to_sql.should == Bike.where(created_with_token: nil).to_sql
-    end
   end
 
   describe :attr_cache_search do

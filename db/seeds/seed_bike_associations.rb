@@ -59,10 +59,11 @@ end
 # Seed the gear types
 
 f_gear_types = [
-  {name: '1', count: 1, internal: false},
-  {name: '2', count: 2, internal: false},
-  {name: '3', count: 3, internal: false},
-  {name: 'Internal', count: 1, internal: true},
+  {name: '1', count: 1, internal: false, standard: true },
+  {name: '2', count: 2, internal: false, standard: true },
+  {name: '3', count: 3, internal: false, standard: true },
+  {name: 'Internal 2', count: 2, internal: true},
+  {name: 'Internal 3', count: 3, internal: true},
   {name: 'Fixed', count: 1, internal: false}
 ]
 f_gear_types.each do |gear|
@@ -70,35 +71,33 @@ f_gear_types.each do |gear|
   f_gear_type.save
 end
 r_gear_types = [
-  {name: '1', count: 1, internal: false},
-  {name: '2', count: 2, internal: false},
-  {name: '3', count: 3, internal: false},
-  {name: '4', count: 4, internal: false},
-  {name: '5', count: 5, internal: false},
-  {name: '6', count: 6, internal: false},
-  {name: '7', count: 7, internal: false},
-  {name: '8', count: 8, internal: false},
-  {name: '9', count: 9, internal: false},
-  {name: '10', count: 10, internal: false},
-  {name: '11', count: 11, internal: false},
-  {name: '12', count: 12, internal: false},
-  {name: '1 internal', count: 1, internal: true},
-  {name: '2 internal', count: 2, internal: true},
-  {name: '3 internal', count: 3, internal: true},
-  {name: '4 internal', count: 4, internal: true},
-  {name: '5 internal', count: 5, internal: true},
-  {name: '6 internal', count: 6, internal: true},
-  {name: '7 internal', count: 7, internal: true},
-  {name: '8 internal', count: 8, internal: true},
-  {name: '9 internal', count: 9, internal: true},
-  {name: '10 internal', count: 10, internal: true},
-  {name: '11 internal', count: 11, internal: true},
-  {name: '12 internal', count: 12, internal: true},
+  {name: '1', count: 1, internal: false, standard: true},
+  {name: '2', count: 2, internal: false, standard: true},
+  {name: '3', count: 3, internal: false, standard: true},
+  {name: '4', count: 4, internal: false, standard: true},
+  {name: '5', count: 5, internal: false, standard: true},
+  {name: '6', count: 6, internal: false, standard: true},
+  {name: '7', count: 7, internal: false, standard: true},
+  {name: '8', count: 8, internal: false, standard: true},
+  {name: '9', count: 9, internal: false, standard: true},
+  {name: '10', count: 10, internal: false, standard: true},
+  {name: '11', count: 11, internal: false, standard: true},
+  {name: '12', count: 12, internal: false, standard: true},
+  {name: '1 internal', count: 1, internal: true, standard: false},
+  {name: '2 internal', count: 2, internal: true, standard: false},
+  {name: '3 internal', count: 3, internal: true, standard: false},
+  {name: '4 internal', count: 4, internal: true, standard: false},
+  {name: '5 internal', count: 5, internal: true, standard: false},
+  {name: '6 internal', count: 6, internal: true, standard: false},
+  {name: '7 internal', count: 7, internal: true, standard: false},
+  {name: '8 internal', count: 8, internal: true, standard: false},
+  {name: '9 internal', count: 9, internal: true, standard: false},
+  {name: '10 internal', count: 10, internal: true, standard: false},
+  {name: '11 internal', count: 11, internal: true, standard: false},
+  {name: '12 internal', count: 12, internal: true, standard: false},
   {name: 'Fixed', count: 1, internal: false},
-  {name: 'Coaster Brake 1 speed', count: 1, internal: false},
-  {name: 'Coaster Brake 2 speed kickback', count: 2, internal: false},
 ]
-r_gear_types.each do |gear|
-  r_gear_type = RearGearType.create(name: gear[:name], count: gear[:count], internal: gear[:internal])
-  r_gear_type.save
-end
+  r_gear_types.each do |gear|
+    r_gear_type = RearGearType.create(name: gear[:name], count: gear[:count], internal: gear[:internal])
+    r_gear_type.save
+  end

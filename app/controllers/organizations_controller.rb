@@ -7,13 +7,13 @@ class OrganizationsController < ApplicationController
   
   def edit
     @title = "Manage #{@organization.name}"
-    @bikes = Bike.where(creation_organization_id: @organization.id).non_token.order("created_at asc")
+    @bikes = Bike.where(creation_organization_id: @organization.id).order("created_at asc")
     # @bikes = bikes.decorate
   end
 
   def show
     @title = "#{@organization.name}"
-    bikes = Bike.where(creation_organization_id: @organization.id).non_token.order("created_at asc")
+    bikes = Bike.where(creation_organization_id: @organization.id).order("created_at asc")
     @bikes = bikes.decorate
   end
 
