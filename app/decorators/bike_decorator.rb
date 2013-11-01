@@ -48,7 +48,11 @@ class BikeDecorator < ApplicationDecorator
 
   def seat_tube_display
     return nil unless object.frame_size
-    "#{object.frame_size} #{object.frame_size_unit}"
+    if object.frame_size_unit == "ordinal"
+      "#{object.frame_size.upcase}"
+    else
+      "#{object.frame_size} #{object.frame_size_unit}"
+    end
   end
 
   def list_link_url(target = nil)

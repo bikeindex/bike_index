@@ -28,7 +28,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     $('#clearing_span').css('height', $('#edit-menu').height() + 25)
     $('#edit-menu').attr('data-spy', 'affix').attr('data-offset-top', (menu_height-25))
     # $('#edit-menu').attr('data-spy', 'affix').attr('data-offset-top', 10)
-    # $('#edit-menu').affix()    
+    # $('#edit-menu').affix()
     @setInitialValues()
 
     if $('#new_public_image').length > 0
@@ -331,6 +331,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     unit = $('#bike_frame_size_unit').val()
     if unit != 'ordinal' and unit.length > 0
       $('#frame-sizer .hidden-other').slideDown().addClass('unhidden')
+      $('#frame-sizer .groupedbtn-group').addClass('ex-size')
 
   updateFrameSize: ->
     size = $(event.target).attr('data-size')
@@ -338,11 +339,13 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     if size == 'cm' or size == 'in'
       $('#bike_frame_size_unit').val(size)
       unless hidden_other.hasClass('unhidden')
-        hidden_other.slideDown().addClass('unhidden')
+        hidden_other.slideDown('fast').addClass('unhidden')
         $('#bike_frame_size').val('')
+        $('#frame-sizer .groupedbtn-group').addClass('ex-size')
     else
       $('#bike_frame_size_unit').val('ordinal')
       $('#bike_frame_size').val(size)
       if hidden_other.hasClass('unhidden')
         hidden_other.removeClass('unhidden').slideUp('fast')
+        $('#frame-sizer .groupedbtn-group').removeClass('ex-size')
       

@@ -357,10 +357,21 @@
 
 #twin_part_types { display: none; }
 
-#frame-sizer .groupedbtn-group .btn-group { display: inline-block; }
+#frame-sizer .groupedbtn-group .btn-group { @include transition(2s ease-in-out left); display: inline-block; }
+
+#frame-sizer .groupedbtn-group.ex-size {
+  position: relative;
+  .btn-group:last-of-type {
+    display: block;
+    position: absolute;
+    left: 70px;
+    top: 50px;
+  }
+}
+#bike_frame_size { width: 60px; }
 
 @media (min-width: 925px) {
-  #frame-sizer .groupedbtn-group { margin-top: -.3em; }
+  #frame-sizer .groupedbtn-group { margin-top: -.4em; }
 }
 
 @media (min-width: 480px ) and (max-width: 550px){

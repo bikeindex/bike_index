@@ -53,7 +53,7 @@
             %button.btn{ type: "button", :'data-size' => 'in', :class => if @bike.frame_size_unit == 'in' then 'active' end }
               IN
     .hidden-other.control-group
-      = f.label :frame_size, "Seat tube Length", class: "control-label"
+      = f.label :frame_size, "Seat tube length", class: "control-label"
       .controls
         = f.hidden_field :frame_size_unit
         = f.text_field :frame_size
