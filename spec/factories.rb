@@ -94,7 +94,6 @@ FactoryGirl.define do
     association :propulsion_type
     association :primary_frame_color, factory: :color
     rear_tire_narrow true
-    # seat_tube_length "56"
     sequence(:owner_email) {|n| "bike_owner#{n}@example.com"}
   end
 

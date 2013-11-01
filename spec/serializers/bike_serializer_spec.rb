@@ -12,8 +12,6 @@ describe BikeSerializer do
   it { subject.name.should == bike.name }
   it { subject.frame_manufacture_year.should == bike.frame_manufacture_year }
   it { subject.frame_model.should == bike.frame_model }
-  it { subject.seat_tube_length.should == bike.seat_tube_length }
-  it { subject.seat_tube_length_in_cm.should == bike.seat_tube_length_in_cm }
   it { subject.description.should == bike.description }
   it { subject.rear_tire_narrow.should == bike.rear_tire_narrow }
   it { subject.front_tire_narrow.should == bike.front_tire_narrow }

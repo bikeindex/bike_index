@@ -329,7 +329,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
 
   setFrameSize: ->
     unit = $('#bike_frame_size_unit').val()
-    if unit != 'ordinal' and unit > 0
+    if unit != 'ordinal' and unit.length > 0
       $('#frame-sizer .hidden-other').slideDown().addClass('unhidden')
 
   updateFrameSize: ->

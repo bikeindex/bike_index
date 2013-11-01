@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131031222251) do
+ActiveRecord::Schema.define(:version => 20131101002019) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -55,7 +55,6 @@ ActiveRecord::Schema.define(:version => 20131031222251) do
     t.boolean  "rear_tire_narrow",         :default => true
     t.integer  "frame_material_id"
     t.integer  "number_of_seats"
-    t.string   "seat_tube_length"
     t.integer  "propulsion_type_id"
     t.integer  "creation_organization_id"
     t.datetime "created_at",                                  :null => false
@@ -69,7 +68,6 @@ ActiveRecord::Schema.define(:version => 20131031222251) do
     t.text     "description"
     t.text     "owner_email"
     t.string   "thumb_path"
-    t.boolean  "seat_tube_length_in_cm",   :default => true
     t.text     "video_embed"
     t.integer  "frame_manufacture_year"
     t.boolean  "has_no_serial",            :default => false, :null => false

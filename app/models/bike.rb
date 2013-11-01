@@ -23,8 +23,6 @@ class Bike < ActiveRecord::Base
     :handlebar_type_other,
     :frame_size,
     :frame_size_unit,
-    :seat_tube_length,
-    :seat_tube_length_in_cm,
     :rear_tire_narrow,
     :front_wheel_size_id,
     :rear_wheel_size_id,
@@ -203,6 +201,7 @@ class Bike < ActiveRecord::Base
     c += "#{secondary_frame_color.name} " if secondary_frame_color
     c += "#{tertiary_frame_color.name} " if tertiary_frame_color
     c += "#{frame_material.name} " if frame_material
+    c += "#{frame_size} #{frame_size_unit} " if frame_size
     c += "#{frame_model} " if frame_model
     c += "#{manufacturer_name} "
     c += "#{additional_registration} "

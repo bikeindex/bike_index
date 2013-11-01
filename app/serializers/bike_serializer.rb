@@ -8,8 +8,6 @@ class BikeSerializer < ActiveModel::Serializer
     :name,
     :frame_manufacture_year,
     :frame_model,
-    :seat_tube_length,
-    :seat_tube_length_in_cm,
     :description,
     :rear_tire_narrow,
     :front_tire_narrow

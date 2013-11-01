@@ -47,12 +47,8 @@ class BikeDecorator < ApplicationDecorator
   end
 
   def seat_tube_display
-    return nil unless object.seat_tube_length
-    if object.seat_tube_length_in_cm
-      "#{object.seat_tube_length} cm"
-    else
-      "#{object.seat_tube_length} in"
-    end
+    return nil unless object.frame_size
+    "#{object.frame_size} #{object.frame_size_unit}"
   end
 
   def list_link_url(target = nil)

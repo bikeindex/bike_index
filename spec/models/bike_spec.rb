@@ -233,11 +233,13 @@ describe Bike do
       b.frame_material_id = material.id
       b.secondary_frame_color_id = b.primary_frame_color_id
       b.tertiary_frame_color_id = b.primary_frame_color_id
+      b.frame_size = "SO MANY"
+      b.frame_size_unit = "ballsacks"
       b.frame_model = "Some model"
       b.handlebar_type_id = handlebar.id
       b.save
       b.cache_bike
-      b.cached_data.should eq("Hand pedaled 1999 #{b.primary_frame_color.name} #{b.secondary_frame_color.name} #{b.tertiary_frame_color.name} #{material.name} #{b.frame_model} #{b.manufacturer_name}  unicycle ")
+      b.cached_data.should eq("Hand pedaled 1999 #{b.primary_frame_color.name} #{b.secondary_frame_color.name} #{b.tertiary_frame_color.name} #{material.name} SO MANY ballsacks #{b.frame_model} #{b.manufacturer_name}  unicycle ")
     end
   end
 
