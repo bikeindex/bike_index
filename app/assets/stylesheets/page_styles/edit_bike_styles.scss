@@ -357,18 +357,18 @@
 
 #twin_part_types { display: none; }
 
-#frame-sizer .groupedbtn-group .btn-group { @include transition(2s ease-in-out left); display: inline-block; }
+#frame-sizer .groupedbtn-group .btn-group { display: inline-block; }
 
 #frame-sizer .groupedbtn-group.ex-size {
   position: relative;
   .btn-group:last-of-type {
     display: block;
     position: absolute;
-    left: 70px;
+    left: 110px;
     top: 50px;
   }
 }
-#bike_frame_size { width: 60px; }
+#bike_frame_size { width: 100px; }
 
 @media (min-width: 925px) {
   #frame-sizer .groupedbtn-group { margin-top: -.4em; }
@@ -501,6 +501,11 @@
     }
   }
 }
+
+// #standard-r-diams, #standard-f-diams {
+//   position: absolute;
+//   top: 0;
+// }
 
 
 

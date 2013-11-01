@@ -87,7 +87,6 @@ ActiveRecord::Schema.define(:version => 20131101002019) do
     t.boolean  "verified"
     t.boolean  "paid_for"
     t.text     "cached_attributes"
-    t.string   "print_registration"
     t.string   "additional_registration"
     t.boolean  "belt_drive",               :default => false, :null => false
     t.boolean  "coaster_brake",            :default => false, :null => false

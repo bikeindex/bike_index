@@ -67,7 +67,7 @@ f_gear_types = [
   {name: 'Fixed', count: 1, internal: false}
 ]
 f_gear_types.each do |gear|
-  f_gear_type = FrontGearType.create(name: gear[:name], count: gear[:count], internal: gear[:internal])
+  f_gear_type = FrontGearType.create(name: gear[:name], count: gear[:count], internal: gear[:internal], standard: gear[:standard])
   f_gear_type.save
 end
 r_gear_types = [
@@ -99,6 +99,6 @@ r_gear_types = [
   {name: 'Fixed', count: 1, internal: false},
 ]
   r_gear_types.each do |gear|
-    r_gear_type = RearGearType.create(name: gear[:name], count: gear[:count], internal: gear[:internal])
+    r_gear_type = RearGearType.create(name: gear[:name], count: gear[:count], internal: gear[:internal], standard: gear[:standard])
     r_gear_type.save
   end

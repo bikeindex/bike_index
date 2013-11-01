@@ -11,9 +11,7 @@ class BikeIndex.Views.BikesNew extends Backbone.View
     @setElement($('#body'))
     if $('#bike_has_no_serial').prop('checked') == true
       $('#bike_serial_number').val('absent').addClass('absent-serial')
-    
-    if $('#bike_rear_wheel_size_id').val()
-      @setWheelDiam()
+    @setWheelDiam()
 
     @updateCycleType()
 
@@ -22,7 +20,6 @@ class BikeIndex.Views.BikesNew extends Backbone.View
   updateSerial: (event) ->
     if $(event.target).prop('checked') == true
       $('#bike_serial_number').val('absent').addClass('absent-serial')
-
     else
       $('#bike_serial_number').val('').removeClass('absent-serial')
 
@@ -32,39 +29,47 @@ class BikeIndex.Views.BikesNew extends Backbone.View
     clickTarget = $(target.attr('data-target'))
     $(target.attr('data-toggle')).show().removeClass('currently-hidden')
     target.addClass('currently-hidden').hide()
-
-    if target.hasClass('rm-block')
-      if clickTarget.find('select').attr('name') != 'bike[rear_wheel_size_id]'
-        clickTarget.find('select').val('')
-        clickTarget.slideUp().removeClass('unhidden')
-      else
-        wheelDiam = $('#bike_rear_wheel_size_id').val()
-        if $("#standard-diams option[value=#{wheelDiam}]").length
-          $('#standard-diams').val(wheelDiam)
-        else
-          $('#bike_rear_wheel_size_id').val('')
-        clickTarget.slideUp().removeClass('unhidden').addClass('currently-hidden')
-        
+    if target.hasClass('wh_sw')
+      @updateWheels(target, clickTarget)
     else
-      clickTarget.slideDown().addClass('unhidden').removeClass('currently-hidden')
-      if clickTarget.find('select').attr('name') == 'bike[rear_wheel_size_id]'
-        $('#standard-diams').val('')
+      if target.hasClass('rm-block')
+        clickTarget.slideUp().removeClass('unhidden').addClass('currently-hidden')
+      else
+        clickTarget.slideDown().addClass('unhidden').removeClass('currently-hidden')
 
+
+  updateWheels: (target, clickTarget) ->
+    clickTarget.parents('.controls').find('select').val('')
+    standard = clickTarget.parents('.controls').find('.standard-diams')
+    if target.hasClass('show-all')
+      standard.fadeOut('fast', ->
+        clickTarget.fadeIn()
+      )
+    else
+      clickTarget.fadeOut('fast', ->
+        standard.fadeIn()
+      )
   
   setWheelDiam: ->
-    # If the rear wheel diam has a value, set the standard-diams, unless it isn't standard.
     wheelDiam = $('#bike_rear_wheel_size_id').val()
-    if $("#standard-diams option[value=#{wheelDiam}]").length
-      $('#standard-diams').val(wheelDiam)
+    if $("#r_standard option[value=#{wheelDiam}]").length
+      $('#r_standard').val(wheelDiam)
+      $('#bike_rear_wheel_size_id').hide()
     else
-      $('#wheel-diams').show().addClass('unhidden')
-      $('#show-wheel-diams').hide().addClass('currently-hidden')
-      $('#hide-wheel-diams').show().removeClass('currently-hidden')
+      $('#r_standard').hide()
+      
+    # If the rear wheel diam has a value, set the standard-diams, unless it isn't standard.
+    # wheelDiam = $('#bike_rear_wheel_size_id').val()
+    # if $("#standard-diams option[value=#{wheelDiam}]").length
+    #   $('#standard-diams').val(wheelDiam)
+    # else
+    #   $('#wheel-diams').show().addClass('unhidden')
+    #   $('#show-wheel-diams').hide().addClass('currently-hidden')
+    #   $('#hide-wheel-diams').show().removeClass('currently-hidden')
   
   updateWheelDiam: (event) ->
-    current_value = $(event.target).val()
-    $('#bike_rear_wheel_size_id').val(current_value)
-
+    cv = $(event.target).val()
+    $('#bike_rear_wheel_size_id').val(cv) if cv.length > 0
 
 
   updateCycleType: ->
@@ -80,11 +85,11 @@ class BikeIndex.Views.BikesNew extends Backbone.View
     #     hidden_other.find('input').val('')
     #     hidden_other.removeClass('unhidden').slideUp()
     # Rewrite the name
-    current = $("#cycletype#{current_value}")
+    current_value = $("#cycletype#{$("#bike_cycle_type_id").val()}")
     $('#cycletype-text').removeClass('long-title')
-    if current.hasClass('long-title')
+    if current_value.hasClass('long-title')
       $('#cycletype-text').addClass('long-title')  
-    $('#cycletype-text').text(current.text())
+    $('#cycletype-text').text(current_value.text())
 
 
   changeCycleType: (event) ->
