@@ -15,7 +15,6 @@ task :seed_test_users => :environment do
   user.confirmed = true 
   user.save
 
-
   org = Organization.create(name: "Ikes Bike's", website: "", short_name: "Ikes", default_bike_token_count: 5, show_on_map: true)
   org.save
   membership = Membership.create(organization_id: org.id, user_id: User.find_by_email("member@example.com").id, role: "admin")

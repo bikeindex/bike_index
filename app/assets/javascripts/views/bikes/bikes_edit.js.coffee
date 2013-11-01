@@ -15,6 +15,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     'change #rear_internal_check': 'toggleDrivetrainChecks'
     'change #front_internal_check': 'toggleDrivetrainChecks'
     'change #edit_drivetrain select': 'setDrivetrainValue'
+    'click #frame-sizer button': 'updateFrameSize'
     
   initialize: ->
     @setElement($('#body'))
@@ -106,6 +107,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     @expandAdditionalBlockFromSelector('.component-mnfg-select select')
     @expandAdditionalBlockFromSelector('.part-type-select select')
     @setInitialGears()
+    @setFrameSize()
 
 
   expandAdditionalBlock: (event) ->
@@ -324,3 +326,23 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       $('#rear_internal_check, #front_internal_check').prop('checked', '')
       $('#edit_drivetrain .select-display').addClass('fake-disabled')
     
+
+  setFrameSize: ->
+    unit = $('#bike_frame_size_unit').val()
+    if unit != 'ordinal' and unit > 0
+      $('#frame-sizer .hidden-other').slideDown().addClass('unhidden')
+
+  updateFrameSize: ->
+    size = $(event.target).attr('data-size')
+    hidden_other = $('#frame-sizer .hidden-other')
+    if size == 'cm' or size == 'in'
+      $('#bike_frame_size_unit').val(size)
+      unless hidden_other.hasClass('unhidden')
+        hidden_other.slideDown().addClass('unhidden')
+        $('#bike_frame_size').val('')
+    else
+      $('#bike_frame_size_unit').val('ordinal')
+      $('#bike_frame_size').val(size)
+      if hidden_other.hasClass('unhidden')
+        hidden_other.removeClass('unhidden').slideUp('fast')
+      

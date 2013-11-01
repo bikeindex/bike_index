@@ -357,6 +357,20 @@
 
 #twin_part_types { display: none; }
 
+#frame-sizer .groupedbtn-group .btn-group { display: inline-block; }
+
+@media (min-width: 925px) {
+  #frame-sizer .groupedbtn-group { margin-top: -.3em; }
+}
+
+@media (min-width: 480px ) and (max-width: 550px){
+  #frame-sizer .groupedbtn-group .btn-group:last-of-type {
+    margin: 5px 0 0 0;
+  }
+}
+
+
+
 @media (min-width: 960px) {
   .split-fields {
     @include clearfix;

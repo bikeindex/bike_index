@@ -27,21 +27,37 @@
         - years = (1900..Time.now.year+1).to_a.reverse.map {|i| [i,i] }
         = f.select :frame_manufacture_year, years, prompt: "Choose year"
 
-  .input-group.with-optional-blocks
+  .input-group.with-additional-block#frame-sizer
     %a.bikeform-tip{role: "button", title: "Seat tube measuring", :data => {toggle: "modal", target: "#seatTubeLengthTip"} }
       %span
         ?
     .control-group
-      = f.label :seat_tube_length, "Size (seat tube length)", class: "control-label"
+      %label.control-label.unclickable
+        Frame size
       .controls
-        = f.text_field :seat_tube_length
-    .cm-or-in-select.optional-form-block
-      %label.radio
-        = f.radio_button :seat_tube_length_in_cm, "true"
-        cm
-      %label.radio
-        = f.radio_button :seat_tube_length_in_cm, "false"
-        in
+        .groupedbtn-group{ :data =>  { toggle: "buttons-radio" }}
+          .btn-group
+            %button.btn{ type: "button", :'data-size' => 'xs', :class => if @bike.frame_size == 'xs' then 'active' end}
+              XS
+            %button.btn{ type: "button", :'data-size' => 's', :class => if @bike.frame_size == 's' then 'active' end }
+              S
+            %button.btn{ type: "button", :'data-size' => 'm', :class => if @bike.frame_size == 'm' then 'active' end }
+              M
+            %button.btn{ type: "button", :'data-size' => 'l', :class => if @bike.frame_size == 'l' then 'active' end }
+              L
+            %button.btn{ type: "button", :'data-size' => 'xl', :class => if @bike.frame_size == 'xl' then 'active' end }
+              XL
+          .btn-group
+            %button.btn{ type: "button", :'data-size' => 'cm', :class => if @bike.frame_size_unit == 'cm' then 'active' end }
+              CM
+            %button.btn{ type: "button", :'data-size' => 'in', :class => if @bike.frame_size_unit == 'in' then 'active' end }
+              IN
+    .hidden-other.control-group
+      = f.label :frame_size, "Seat tube Length", class: "control-label"
+      .controls
+        = f.hidden_field :frame_size_unit
+        = f.text_field :frame_size
+
 
 
   .input-group.with-additional-block
