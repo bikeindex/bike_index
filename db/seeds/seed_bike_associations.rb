@@ -95,6 +95,7 @@ r_gear_types = [
   {name: '10 internal', count: 10, internal: true, standard: false},
   {name: '11 internal', count: 11, internal: true, standard: false},
   {name: '12 internal', count: 12, internal: true, standard: false},
+  {name: 'Continuously variable', count: 0, internal: true, standard: false},
   {name: 'Fixed', count: 1, internal: false},
 ]
   r_gear_types.each do |gear|
