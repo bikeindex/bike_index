@@ -10,10 +10,8 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     'click .add_fields': 'addComponent'
     'change .part-type-select select': 'updatePartType'
     'change .component_model input': 'toggleExtraModelField'
-    'change #fixed_gear_check': 'toggleDrivetrainChecks'
-    'change #rear_internal_check': 'toggleDrivetrainChecks'
-    'change #front_internal_check': 'toggleDrivetrainChecks'
-    'change #edit_drivetrain select': 'setDrivetrainValue'
+    'change .drive-check': 'toggleDrivetrainChecks'
+    'change #edit_drivetrain select': 'updateDrivetrainValue'
     'click #frame-sizer button': 'updateFrameSize'
     
   initialize: ->
@@ -21,7 +19,6 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     menu_height = $('#edit-menu').offset().top 
     scroll_height = $(window).height() * .4
     @setDefaultCountry()
-    
     $('#body').attr('data-spy', "scroll").attr('data-target', '#edit-menu')
     $('#body').scrollspy(offset: - scroll_height)
     $('#clearing_span').css('height', $('#edit-menu').height() + 25)
@@ -162,8 +159,6 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
         clickTarget.slideDown().addClass('unhidden').removeClass('currently-hidden')
 
 
-
-
   updateWheels: (target, clickTarget) ->
     standard = clickTarget.parents('.controls').find('.standard-diams')
     if target.hasClass('show-all')
@@ -275,58 +270,6 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
         hidden_other.find('input').val('')
         hidden_other.removeClass('unhidden').slideUp()
 
-  toggleDrivetrainChecks: (event) ->
-    [f_type, r_type] = [false, false]
-    target = $(event.target).attr('id')
-
-    if target == 'fixed_gear_check'
-      [f_type, r_type] = @setFixedGear()
-    else if target == 'front_internal_check'
-      f_type = 'standard'
-    else if target == 'rear_internal_check'
-      r_type = 'standard'
-    
-    f_type = 'internal' if $('#front_internal_check').prop('checked') == true
-    r_type = 'internal' if $('#rear_internal_check').prop('checked') == true
-    @setDrivetrainDisplay(f_type, r_type)
-    
-
-  setFixedGear: ->
-    if $('#fixed_gear_check').prop('checked') == true
-      $('#rear_internal_check, #front_internal_check').prop('checked', '')
-      $('#edit_drivetrain .select-display').addClass('fake-disabled')
-      ['fixed', 'fixed']
-    else
-      $('#edit_drivetrain .select-display').removeClass('fake-disabled')
-      ['standard', 'standard']
-    
-
-  setDrivetrainDisplay: (f_type, r_type) ->
-    unless f_type == false
-      $('#front-gear-select .select-display').html($("#front-#{f_type}").html()) 
-    unless r_type == false
-      $('#rear-gear-select .select-display').html($("#rear-#{r_type}").html())
-    @setDrivetrainValue()
-  
-  setDrivetrainValue: ->
-    $('#bike_front_gear_type_id').val($('#front-gear-select .select-display').val())
-    $('#bike_rear_gear_type_id').val($('#rear-gear-select .select-display').val())
-
-  setInitialGears: ->
-    if $('#bike_front_gear_type_id').val().length < 1
-      $('#front-gear-select .select-display').html($("#front-standard").html())
-    else
-      $('#front-gear-select .select-display').val($('#bike_front_gear_type_id').val())
-
-    if $('#bike_rear_gear_type_id').val().length < 1
-      $('#rear-gear-select .select-display').html($("#rear-standard").html())
-    else
-      $('#rear-gear-select .select-display').val($('#bike_rear_gear_type_id').val())
-    if $('#fixed_gear_check').prop('checked') == true
-      $('#rear_internal_check, #front_internal_check').prop('checked', '')
-      $('#edit_drivetrain .select-display').addClass('fake-disabled')
-    
-
   setFrameSize: ->
     unit = $('#bike_frame_size_unit').val()
     if unit != 'ordinal' and unit.length > 0
@@ -349,3 +292,59 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
         hidden_other.removeClass('unhidden').slideUp('fast')
         $('#frame-sizer .groupedbtn-group').removeClass('ex-size')
       
+  toggleDrivetrainChecks: (event) ->
+    target = $(event.target)
+    id = target.attr('id')
+    if id == 'fixed_gear_check'
+      if target.prop('checked') == true
+        @setFixed()
+      else
+        $('.not-fixed').slideDown()
+        @setDrivetrainDisplay(['front','rear'], 'standard')
+
+    else
+      if id == 'front_internal_check'
+        if target.prop('checked') == true
+          @setDrivetrainDisplay(['front'],'internal')
+        else 
+          @setDrivetrainDisplay(['front'],'standard')
+      if id == 'rear_internal_check'
+        if target.prop('checked') == true
+          @setDrivetrainDisplay(['rear'],'internal')
+        else 
+          @setDrivetrainDisplay(['rear'],'standard')
+      
+      if id == 'bike_coaster_brake'
+        if target.prop('checked') == true
+          $('#rear_internal_check').prop('checked', true)
+          @setDrivetrainDisplay(['rear'],'internal')
+        else 
+          @setDrivetrainDisplay(['rear'],'standard')
+
+  setFixed: ->
+    $('.not-fixed').slideUp('medium')
+    $('#rear_internal_check, #front_internal_check').prop('checked', '')  
+    @setDrivetrainDisplay(['front','rear'], 'fixed')
+
+  setDrivetrainDisplay: (positions, type) ->
+    for position in positions
+      $("##{position}-gear-select .select-display").html($("##{position}-#{type}").html())
+    @updateDrivetrainValue()
+  
+  updateDrivetrainValue:  ->
+    $('#bike_front_gear_type_id').val($('#front-gear-select .select-display').val())
+    $('#bike_rear_gear_type_id').val($('#rear-gear-select .select-display').val())
+
+  setInitialGears: ->
+    if $('#fixed_gear_check').prop('checked') == true
+      @setFixed()
+    else
+      front = $('#bike_front_gear_type_id').val()
+      rear = $('#bike_rear_gear_type_id').val()
+      @setDrivetrainDisplay(['front','rear'],'standard')
+      if $('#front_internal_check').prop('checked') == true
+        @setDrivetrainDisplay(['front'],'internal')
+      if $('#rear_internal_check').prop('checked') == true
+        @setDrivetrainDisplay(['rear'],'internal')
+      $('#rear-gear-select .select-display').val(rear)
+      $('#front-gear-select .select-display').val(front)

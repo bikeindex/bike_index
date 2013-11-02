@@ -365,21 +365,32 @@
     display: block;
     position: absolute;
     left: 110px;
-    top: 50px;
+    top: 47px;
   }
 }
+
 #bike_frame_size { width: 100px; }
 
 @media (min-width: 925px) {
   #frame-sizer .groupedbtn-group { margin-top: -.4em; }
+  #frame-sizer .groupedbtn-group.ex-size .btn-group:last-of-type {
+    top: 50px;
+  }
 }
 
 @media (min-width: 480px ) and (max-width: 550px){
   #frame-sizer .groupedbtn-group .btn-group:last-of-type {
     margin: 5px 0 0 0;
   }
+  #frame-sizer .groupedbtn-group.ex-size .btn-group:last-of-type {
+    top: 42px;
+  }
 }
-
+@media (max-width: 479px){
+  #frame-sizer .groupedbtn-group.ex-size .btn-group:last-of-type {
+    top: 72px;
+  }
+}
 
 
 @media (min-width: 960px) {

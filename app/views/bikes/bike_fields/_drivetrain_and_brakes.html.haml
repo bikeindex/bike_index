@@ -10,16 +10,16 @@
       #drivetrain_checks.controls
         - fixed = @bike.front_gear_type == FrontGearType.fixed.first
         %label.checkbox
-          %input#fixed_gear_check{ type: "checkbox", checked: fixed }
+          %input#fixed_gear_check.checkbox.drive-check{ type: "checkbox", checked: fixed }
           Fixed gear
-        %label.checkbox
-          = f.check_box :coaster_brake
+        %label.checkbox.not-fixed
+          = f.check_box :coaster_brake, class: 'drive-check'
           Coaster brake (backpedal to brake)
-        %label.checkbox
+        %label.checkbox.not-fixed
           = f.check_box :belt_drive
           Belt drive
       
-  .input-group
+  .input-group.not-fixed
     #front-gear-select.control-group
       %label.control-label{ for: 'front-select-display'}
         How many front gears
@@ -32,7 +32,7 @@
       .optional-form-block
         - f_internal = (@bike.front_gear_type ? @bike.front_gear_type.internal : false)
         %label.checkbox
-          %input#front_internal_check{ type: "checkbox", checked: f_internal }
+          %input#front_internal_check.drive-check{ type: "checkbox", checked: f_internal }
           Internal front gears
 
       .gear-info-fields
@@ -53,7 +53,7 @@
             %option{ value: fgt.id }
               = fgt.name
 
-  .input-group
+  .input-group.not-fixed
     #rear-gear-select.control-group
       %label.control-label{ for: 'rear-select-display' }
         How many rear gears
@@ -65,7 +65,7 @@
       .optional-form-block
         - r_internal = (@bike.rear_gear_type ? @bike.rear_gear_type.internal : false)
         %label.checkbox
-          %input#rear_internal_check{ type: "checkbox", checked: r_internal }
+          %input#rear_internal_check.drive-check{ type: "checkbox", checked: r_internal }
           Internal rear gears
 
       .gear-info-fields

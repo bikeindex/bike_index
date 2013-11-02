@@ -36,6 +36,7 @@ task :seed_test_bikes => :environment do
       manufacturer_id: (rand(Manufacturer.frames.count) + 1),
       rear_tire_narrow: true,
       rear_wheel_size_id: (rand(WheelSize.count) + 1),
+      front_wheel_size_id: (rand(WheelSize.count) + 1),
       primary_frame_color_id: (rand(Color.count) + 1),
       handlebar_type_id: (rand(HandlebarType.count) + 1),
       creator: @user,
