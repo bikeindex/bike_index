@@ -36,10 +36,10 @@
     %span
       ?
   .control-group
-    %label.control-label{for: "r_standard"}
+    %label.control-label{for: "rear_standard"}
       Rear wheel
     .controls
-      %select#r_standard.standard-diams
+      %select#rear_standard.standard-diams
         %option{value: ''}
           Choose diameter
         %option{value: 3}
@@ -59,9 +59,9 @@
         %option{value: 29}
           12in
       = collection_select( :bike, :rear_wheel_size_id, WheelSize.all , :id, :description, :html => { :required =>true }, prompt: "All diameters")
-  %a#show-wheel-diams.wh_sw.show-all.optional-form-block{:data => {target: "#bike_rear_wheel_size_id", toggle: "#hide-wheel-diams"}}
+  %a#show-rear-wheel-diams.wh_sw.show-all.optional-form-block{:data => {target: "#bike_rear_wheel_size_id", toggle: "#hide-rear-wheel-diams"}}
     Show more sizes
-  %a#hide-wheel-diams.wh_sw.optional-form-block.currently-hidden{:data => {target: "#bike_rear_wheel_size_id", toggle: "#show-wheel-diams"}}
+  %a#hide-rear-wheel-diams.wh_sw.optional-form-block.currently-hidden{:data => {target: "#bike_rear_wheel_size_id", toggle: "#show-rear-wheel-diams"}}
     Hide extra sizes
   .control-group.wheel-diameter
     %label.control-label

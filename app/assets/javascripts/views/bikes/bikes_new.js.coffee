@@ -3,7 +3,7 @@ class BikeIndex.Views.BikesNew extends Backbone.View
     'change #bike_has_no_serial': 'updateSerial'
     'click a.optional-form-block': 'optionalFormUpdate'
     'change #bike_manufacturer_id': 'expandAdditionalBlock'
-    'change #standard-diams': 'updateWheelDiam'
+    'change #rear_standard': 'updateWheelDiam'
     'click #select-cycletype a': 'changeCycleType'
     
   
@@ -11,8 +11,8 @@ class BikeIndex.Views.BikesNew extends Backbone.View
     @setElement($('#body'))
     if $('#bike_has_no_serial').prop('checked') == true
       $('#bike_serial_number').val('absent').addClass('absent-serial')
-    @setWheelDiam()
-
+    
+    @setWheelDiam('rear')
     @updateCycleType()
 
   
@@ -37,9 +37,9 @@ class BikeIndex.Views.BikesNew extends Backbone.View
       else
         clickTarget.slideDown().addClass('unhidden').removeClass('currently-hidden')
 
-
+  # Right Now: Need to make the edit page work. New page should work
+  # But I just tried to make the new page universal, and I can't guarantee anything.
   updateWheels: (target, clickTarget) ->
-    clickTarget.parents('.controls').find('select').val('')
     standard = clickTarget.parents('.controls').find('.standard-diams')
     if target.hasClass('show-all')
       standard.fadeOut('fast', ->
@@ -47,44 +47,30 @@ class BikeIndex.Views.BikesNew extends Backbone.View
       )
     else
       clickTarget.fadeOut('fast', ->
+        clickTarget.val('')
+        standard.val('')
         standard.fadeIn()
       )
   
-  setWheelDiam: ->
-    wheelDiam = $('#bike_rear_wheel_size_id').val()
-    if $("#r_standard option[value=#{wheelDiam}]").length
-      $('#r_standard').val(wheelDiam)
-      $('#bike_rear_wheel_size_id').hide()
+  setWheelDiam: (position) ->
+    wheelDiam = $("#bike_#{position}_wheel_size_id").val()
+    if $("##{position}_standard option[value=#{wheelDiam}]").length
+      $("##{position}_standard").val(wheelDiam)
+      $("#bike_#{position}_wheel_size_id").hide()
     else
-      $('#r_standard').hide()
+      $("##{position}_standard").hide()
+      $("#show-#{position}-wheel-diams").addClass('currently-hidden').hide()
+      $("#hide-#{position}-wheel-diams").removeClass('currently-hidden').show()
       
-    # If the rear wheel diam has a value, set the standard-diams, unless it isn't standard.
-    # wheelDiam = $('#bike_rear_wheel_size_id').val()
-    # if $("#standard-diams option[value=#{wheelDiam}]").length
-    #   $('#standard-diams').val(wheelDiam)
-    # else
-    #   $('#wheel-diams').show().addClass('unhidden')
-    #   $('#show-wheel-diams').hide().addClass('currently-hidden')
-    #   $('#hide-wheel-diams').show().removeClass('currently-hidden')
-  
+
   updateWheelDiam: (event) ->
-    cv = $(event.target).val()
-    $('#bike_rear_wheel_size_id').val(cv) if cv.length > 0
+    target = $(event.target)
+    cv = target.val()
+    position = 'rear'
+    $("#bike_#{position}_wheel_size_id").val(cv) if cv.length > 0
 
 
   updateCycleType: ->
-    # Slide down the other field if needed
-    # But there is no other field for now...
-    # current_value = $("#bike_cycle_type_id").val()
-    # expand_value = $("#hidden-cycletype-other").find('.other-value').text()
-    # hidden_other = $("#hidden-cycletype-other").find('.hidden-other')
-    # if parseInt(current_value, 10) == parseInt(expand_value, 10)
-    #   hidden_other.slideDown().addClass('unhidden')
-    # else 
-    #   if hidden_other.hasClass('unhidden')
-    #     hidden_other.find('input').val('')
-    #     hidden_other.removeClass('unhidden').slideUp()
-    # Rewrite the name
     current_value = $("#cycletype#{$("#bike_cycle_type_id").val()}")
     $('#cycletype-text').removeClass('long-title')
     if current_value.hasClass('long-title')

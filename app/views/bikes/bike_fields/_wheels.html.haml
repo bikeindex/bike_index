@@ -7,56 +7,12 @@
       %span
         ?
     .control-group
-      %label.control-label{for: "standard-diams"}
-        Rear wheel
-      .controls
-        %select#standard-diams
-          %option{value: 3}
-            700c (includes 29ers)
-          %option{value: 8}
-            650b
-          %option{value: 2}
-            27in
-          %option{value: 10}
-            26in
-          %option{value: 20}
-            20in
-          %option{value: 23}
-            18in
-          %option{value: 28}
-            16in
-          %option{value: 29}
-            12in
-    %a#show-wheel-diams.optional-form-block{:data => {target: "#wheel-diams", toggle: "#hide-wheel-diams"}}
-      Show more sizes
-    %a#hide-wheel-diams.optional-form-block.rm-block.currently-hidden{:data => {target: "#wheel-diams", toggle: "#show-wheel-diams"}}
-      Hide extra sizes
-    #wheel-diams.hidden-other
-      .control-group
-        %label.control-label
-          Detailed wheel list
-        .controls
-          = collection_select( :bike, :rear_wheel_size_id, WheelSize.all , :id, :description, :html => { :required =>true })
-    .control-group.wheel-diameter
-      %label.control-label
-        Rear tire
-      .controls.radio-controls
-        %label.radio
-          = f.radio_button :rear_tire_narrow, "true"
-          Narrow Tire
-        %label.radio.wide-tire
-          = f.radio_button :rear_tire_narrow, "false"
-          Wide tire
-
-  .input-group.with-optional-blocks
-    %a.bikeform-tip{role: "button", title: "An amazing explanation of wheel sizing.", :data => {toggle: "modal", target: "#rearWheelTip"} }
-      %span
-        ?
-    .control-group
-      %label.control-label{for: "standard-diams"}
+      %label.control-label{for: "front_standard"}
         Front wheel
       .controls
-        %select#front-standard-diams
+        %select#front_standard.standard-diams
+          %option{value: ''}
+            Choose diameter
           %option{value: 3}
             700c (includes 29ers)
           %option{value: 8}
@@ -73,16 +29,11 @@
             16in
           %option{value: 29}
             12in
-    %a#show-front-wheel-diams.optional-form-block{:data => {target: "#front-wheel-diams", toggle: "#hide-front-wheel-diams"}}
+        = collection_select( :bike, :front_wheel_size_id, WheelSize.all , :id, :description, :html => { :required =>true }, prompt: "All diameters")
+    %a#show-front-wheel-diams.wh_sw.show-all.optional-form-block{:data => {target: "#bike_front_wheel_size_id", toggle: "#hide-front-wheel-diams"}}
       Show more sizes
-    %a#hide-front-wheel-diams.optional-form-block.rm-block.currently-hidden{:data => {target: "#front-wheel-diams", toggle: "#show-front-wheel-diams"}}
+    %a#hide-front-wheel-diams.wh_sw.optional-form-block.currently-hidden{:data => {target: "#bike_front_wheel_size_id", toggle: "#show-front-wheel-diams"}}
       Hide extra sizes
-    #front-wheel-diams.hidden-other
-      .control-group
-        %label.control-label
-          Detailed wheel list
-        .controls
-          = collection_select( :bike, :front_wheel_size_id, WheelSize.all , :id, :description)
     .control-group.wheel-diameter
       %label.control-label
         Rear tire
@@ -92,6 +43,48 @@
           Narrow Tire
         %label.radio.wide-tire
           = f.radio_button :front_tire_narrow, "false"
+          Wide tire
+  .input-group.with-optional-blocks
+    %a.bikeform-tip{role: "button", title: "An amazing explanation of wheel sizing.", :data => {toggle: "modal", target: "#rearWheelTip"} }
+      %span
+        ?
+    .control-group
+      %label.control-label{for: "rear_standard"}
+        Rear wheel
+      .controls
+        %select#rear_standard.standard-diams
+          %option{value: ''}
+            Choose diameter
+          %option{value: 3}
+            700c (includes 29ers)
+          %option{value: 8}
+            650b
+          %option{value: 2}
+            27in
+          %option{value: 10}
+            26in
+          %option{value: 20}
+            20in
+          %option{value: 23}
+            18in
+          %option{value: 28}
+            16in
+          %option{value: 29}
+            12in
+        = collection_select( :bike, :rear_wheel_size_id, WheelSize.all , :id, :description, :html => { :required =>true }, prompt: "All diameters")
+    %a#show-rear-wheel-diams.wh_sw.show-all.optional-form-block{:data => {target: "#bike_rear_wheel_size_id", toggle: "#hide-rear-wheel-diams"}}
+      Show more sizes
+    %a#hide-rear-wheel-diams.wh_sw.optional-form-block.currently-hidden{:data => {target: "#bike_rear_wheel_size_id", toggle: "#show-rear-wheel-diams"}}
+      Hide extra sizes
+    .control-group.wheel-diameter
+      %label.control-label
+        Rear tire
+      .controls.radio-controls
+        %label.radio
+          = f.radio_button :rear_tire_narrow, "true"
+          Narrow Tire
+        %label.radio.wide-tire
+          = f.radio_button :rear_tire_narrow, "false"
           Wide tire
 
   .input-group.inform-save

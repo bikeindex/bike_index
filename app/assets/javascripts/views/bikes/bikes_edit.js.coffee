@@ -2,8 +2,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
   events:
     'change .with-additional-block select': 'expandAdditionalBlock'
     'click a.optional-form-block': 'optionalFormUpdate'
-    'change #standard-diams': 'updateWheelDiam'
-    'change #front-standard-diams': 'updateFrontWheelDiam'
+    'change .standard-diams': 'updateWheelDiam'
     'click #mark-stolen': 'markStolen'
     'click #mark-unstolen': 'markUnstolen'
     'click #edit-menu a': 'scrollToMenuTarget'
@@ -99,7 +98,8 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
   setInitialValues: ->
     if $('#stolen_date').length > 0
       $('#stolen_date input').datepicker('format: mm-dd-yyy')
-    @setWheelDiam()
+    @setWheelDiam('front')
+    @setWheelDiam('rear')
     @showColors()
     @expandAdditionalBlockFromSelector('#bike_handlebar_type_id')
     @expandAdditionalBlockFromSelector('#bike_frame_material_id')
@@ -153,27 +153,53 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     clickTarget = $(target.attr('data-target'))
     $(target.attr('data-toggle')).show().removeClass('currently-hidden')
     target.addClass('currently-hidden').hide()
-
-    if target.hasClass('rm-block')
-      if clickTarget.find('select').attr('name') != 'bike[rear_wheel_size_id]'
-        clickTarget.find('select').val('')
-        clickTarget.slideUp().removeClass('unhidden')
-      else
-        wheelDiam = $('#bike_rear_wheel_size_id').val()
-        if $("#standard-diams option[value=#{wheelDiam}]").length
-          $('#standard-diams').val(wheelDiam)
-        else
-          $('#bike_rear_wheel_size_id').val('')
-        clickTarget.slideUp().removeClass('unhidden').addClass('currently-hidden')
-        
+    if target.hasClass('wh_sw')
+      @updateWheels(target, clickTarget)
     else
-      clickTarget.slideDown().addClass('unhidden').removeClass('currently-hidden')
-      if clickTarget.find('select').attr('name') == 'bike[rear_wheel_size_id]'
-        $('#standard-diams').val('')
-      if clickTarget.find('select').attr('name') == 'bike[front_wheel_size_id]'
-        $('#front-standard-diams').val('')
+      if target.hasClass('rm-block')
+        clickTarget.slideUp().removeClass('unhidden').addClass('currently-hidden')
+      else
+        clickTarget.slideDown().addClass('unhidden').removeClass('currently-hidden')
 
+
+
+
+  updateWheels: (target, clickTarget) ->
+    standard = clickTarget.parents('.controls').find('.standard-diams')
+    if target.hasClass('show-all')
+      standard.fadeOut('fast', ->
+        clickTarget.fadeIn()
+      )
+    else
+      clickTarget.fadeOut('fast', ->
+        clickTarget.val('')
+        standard.val('')
+        standard.fadeIn()
+      )
   
+  setWheelDiam: (position) ->
+    wheelDiam = $("#bike_#{position}_wheel_size_id").val()
+    if $("##{position}_standard option[value=#{wheelDiam}]").length
+      $("##{position}_standard").val(wheelDiam)
+      $("#bike_#{position}_wheel_size_id").hide()
+    else
+      $("##{position}_standard").hide()
+      $("#show-#{position}-wheel-diams").addClass('currently-hidden').hide()
+      $("#hide-#{position}-wheel-diams").removeClass('currently-hidden').show()
+      
+  updateWheelDiam: (event) ->
+    target = $(event.target)
+    cv = target.val()
+    position = 'rear'
+    $("#bike_#{position}_wheel_size_id").val(cv) if cv.length > 0
+
+  updateCycleType: ->
+    current_value = $("#cycletype#{$("#bike_cycle_type_id").val()}")
+    $('#cycletype-text').removeClass('long-title')
+    if current_value.hasClass('long-title')
+      $('#cycletype-text').addClass('long-title')  
+    $('#cycletype-text').text(current_value.text())
+
   showColors: ->
     if $('#bike_secondary_color_id').val()
       $($('#add-secondary').attr('data-toggle')).show().removeClass('currently-hidden')
@@ -183,32 +209,6 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       $($('#add-tertiary').attr('data-toggle')).show().removeClass('currently-hidden')
       $('#add-tertiary').addClass('currently-hidden').hide()
       $($('#add-tertiary').attr('data-target')).show().addClass('unhidden')
-
-  setWheelDiam: ->
-    # If the rear wheel diam has a value, set the standard-diams, unless it isn't standard.
-    wheelDiam = $('#bike_rear_wheel_size_id').val()
-    frontDiam = $('#bike_front_wheel_size_id').val()
-    if $("#standard-diams option[value=#{wheelDiam}]").length
-      $('#standard-diams').val(wheelDiam)
-    else
-      $('#wheel-diams').show().addClass('unhidden')
-      $('#show-wheel-diams').hide().addClass('currently-hidden')
-      $('#hide-wheel-diams').show().removeClass('currently-hidden')
-    if $("#front-standard-diams option[value=#{frontDiam}]").length
-      $('#front-standard-diams').val(wheelDiam)
-    else
-      $('#front-wheel-diams').show().addClass('unhidden')
-      $('#show-front-wheel-diams').hide().addClass('currently-hidden')
-      $('#hide-front-wheel-diams').show().removeClass('currently-hidden')
-
-  
-  updateWheelDiam: (event) ->
-    current_value = $(event.target).val()
-    $('#bike_rear_wheel_size_id').val(current_value)
-
-  updateFrontWheelDiam: (event) ->
-    current_value = $(event.target).val()
-    $('#bike_front_wheel_size_id').val(current_value)
 
   markUnstolen: ->
     $('#bike_stolen').prop('checked', '')
