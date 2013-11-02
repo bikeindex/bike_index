@@ -167,8 +167,11 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       )
     else
       clickTarget.fadeOut('fast', ->
-        clickTarget.val('')
-        standard.val('')
+        if $(standard).find("option[value=#{clickTarget.val()}]").length
+          $(standard).val(clickTarget.val())
+        else
+          clickTarget.val('')
+          standard.val('')
         standard.fadeIn()
       )
   
@@ -186,7 +189,9 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     target = $(event.target)
     cv = target.val()
     position = 'rear'
-    $("#bike_#{position}_wheel_size_id").val(cv) if cv.length > 0
+    position = 'front' if target.attr('id') == 'front_standard'
+    $("#bike_#{position}_wheel_size_id").val(cv) if cv.length
+    # $("#bike_#{position}_wheel_size_id").val(cv) if cv.length > 0
 
   updateCycleType: ->
     current_value = $("#cycletype#{$("#bike_cycle_type_id").val()}")
