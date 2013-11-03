@@ -20,71 +20,58 @@
           Belt drive
       
   .input-group.not-fixed
-    #front-gear-select.control-group
-      %label.control-label{ for: 'front-select-display'}
+    .control-group
+      %label.control-label{ for: 'front_gear_select'}
         How many front gears
       .controls
-        %select.select-display
-          - FrontGearType.all.each do |fgt|
-            %option{ value: fgt.id }
-              = fgt.name
+        %select#front_gear_select
+          %option.placeholder{ value: ''}
+            Select chainring count
+          - FrontGearType.standard.each do |gt|
+            %option{ value: gt.count }
+              = gt.name
       
       .optional-form-block
         - f_internal = (@bike.front_gear_type ? @bike.front_gear_type.internal : false)
-        %label.checkbox
-          %input#front_internal_check.drive-check{ type: "checkbox", checked: f_internal }
+        %label.checkbox{ for: "front_gear_select_internal" }
+          %input#front_gear_select_internal.drive-check{ type: "checkbox", checked: f_internal }
           Internal front gears
 
-      .gear-info-fields
-        = f.hidden_field :front_gear_type_id
-        %select#front-fixed
-          %option{ value: FrontGearType.fixed.first.id }
-            Fixed
-        %select#front-standard
-          %option{ disabled: true, selected: true }
-            Select chainring count
-          - FrontGearType.standard.each do |fgt|
-            %option{ value: fgt.id }
-              = fgt.name
-        %select#front-internal
-          %option{ disabled: true, selected: true }
-            Select Gear count
-          - FrontGearType.internal.each do |fgt|
-            %option{ value: fgt.id }
-              = fgt.name
+      .gear-info-fields#front_gear_select_value
+        .initial_value
+          = @bike.front_gear_type.count if @bike.front_gear_type
+        .fixed_value
+          = FrontGearType.fixed.first.id
+        = f.radio_button 'front_gear_type_id', nil, class: "no-gear-selected"
+        - FrontGearType.all.each do |gt|
+          = f.radio_button 'front_gear_type_id', gt.id, class: "count_#{gt.count} internal_#{gt.internal}", :data => {count: gt.count }
+
 
   .input-group.not-fixed
-    #rear-gear-select.control-group
-      %label.control-label{ for: 'rear-select-display' }
+    .control-group
+      %label.control-label{ for: 'rear_gear_select' }
         How many rear gears
       .controls
-        %select.select-display#rear-select-display
-          - RearGearType.all.each do |rgt|
-            %option{ value: rgt.id }
-              = rgt.name
+        %select#rear_gear_select
+          %option.placeholder{ value: '' }
+            Select cog count
+          - RearGearType.standard.each do |gt|
+            %option{ value: gt.count }
+              = gt.name
       .optional-form-block
         - r_internal = (@bike.rear_gear_type ? @bike.rear_gear_type.internal : false)
-        %label.checkbox
-          %input#rear_internal_check.drive-check{ type: "checkbox", checked: r_internal }
+        %label.checkbox{ for: "rear_gear_select_internal" }
+          %input#rear_gear_select_internal.drive-check{ type: "checkbox", checked: r_internal }
           Internal rear gears
 
-      .gear-info-fields
-        = f.hidden_field :rear_gear_type_id
-        %select#rear-fixed
-          %option{ value: RearGearType.fixed.first.id }
-            Fixed
-        %select#rear-standard
-          %option{ disabled: true, selected: true }
-            Select cog count
-          - RearGearType.standard.each do |rgt|
-            %option{ value: rgt.id }
-              = rgt.name
-        %select#rear-internal
-          %option{ disabled: true, selected: true }
-            Select gear count
-          - RearGearType.internal.each do |rgt|
-            %option{ value: rgt.id }
-              = rgt.name
+      .gear-info-fields#rear_gear_select_value
+        .initial_value
+          = @bike.rear_gear_type.count if @bike.rear_gear_type
+        .fixed_value
+          = RearGearType.fixed.first.id
+        = f.radio_button 'rear_gear_type_id', nil, class: "no-gear-selected"
+        - RearGearType.all.each do |gt|
+          = f.radio_button 'rear_gear_type_id', gt.id, class: "count_#{gt.count} internal_#{gt.internal}", :data => {count: gt.count }
 
   .input-group.inform-save
     .controls

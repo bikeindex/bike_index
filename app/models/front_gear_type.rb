@@ -6,5 +6,5 @@ class FrontGearType < ActiveRecord::Base
 
   scope :standard, where(standard: true)
   scope :internal, where(internal: true)
-  scope :fixed, where(name: "Fixed")
+  scope :fixed, where(count: 1)
 end

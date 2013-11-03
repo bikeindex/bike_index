@@ -304,52 +304,54 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       if target.prop('checked') == true
         @setFixed()
       else
+        $('#front_gear_select, #rear_gear_select').val('')
+        $('#front_gear_select_value .no-gear-selected').prop('checked', true)
+        $('#front_gear_select_value .no-gear-selected, #rear_gear_select_value .no-gear-selected').prop('checked', true)
         $('.not-fixed').slideDown()
-        @setDrivetrainDisplay(['front','rear'], 'standard')
-
     else
-      if id == 'front_internal_check'
-        if target.prop('checked') == true
-          @setDrivetrainDisplay(['front'],'internal')
-        else 
-          @setDrivetrainDisplay(['front'],'standard')
-      if id == 'rear_internal_check'
-        if target.prop('checked') == true
-          @setDrivetrainDisplay(['rear'],'internal')
-        else 
-          @setDrivetrainDisplay(['rear'],'standard')
-      
-      if id == 'bike_coaster_brake'
-        if target.prop('checked') == true
-          $('#rear_internal_check').prop('checked', true)
-          @setDrivetrainDisplay(['rear'],'internal')
-        else 
-          @setDrivetrainDisplay(['rear'],'standard')
-
+      if id == 'front_gear_select_internal'
+        @setDrivetrainValue('front_gear_select')
+      if id == 'rear_gear_select_internal'
+        @setDrivetrainValue('rear_gear_select')
+        
   setFixed: ->
-    $('.not-fixed').slideUp('medium')
-    $('#rear_internal_check, #front_internal_check').prop('checked', '')  
-    @setDrivetrainDisplay(['front','rear'], 'fixed')
+    ffixed = parseInt($('#front_gear_select_value .fixed_value').text(), 10)
+    rfixed = parseInt($('#rear_gear_select_value .fixed_value').text(), 10)
+    $('#edit_drivetrain .not-fixed').slideUp 'medium', ->
+      $('#rear_gear_select_internal, #front_gear_select_internal').prop('checked', '')  
+      $('#front_gear_select, #rear_gear_select').val('')
+      $("#front_gear_select_value #bike_front_gear_type_id_#{ffixed}").prop('checked', true)
+      $("#rear_gear_select_value #bike_rear_gear_type_id_#{rfixed}").prop('checked', true)
 
-  setDrivetrainDisplay: (positions, type) ->
-    for position in positions
-      $("##{position}-gear-select .select-display").html($("##{position}-#{type}").html())
-    @updateDrivetrainValue()
-  
+
+  setDrivetrainValue: (position) ->
+    v = parseInt($("##{position}").val(), 10)
+    i = $("##{position}_internal").prop('checked')
+    if isNaN(v)
+      $("##{position}_value .placeholder").prop('selected', 'selected')
+    else
+      $("##{position}_value .count_#{v}.internal_#{i}").prop('checked', true)
+      if v == 0
+        $('#rear_gear_select_internal').prop('checked', true)
+
   updateDrivetrainValue:  ->
-    $('#bike_front_gear_type_id').val($('#front-gear-select .select-display').val())
-    $('#bike_rear_gear_type_id').val($('#rear-gear-select .select-display').val())
+    position = $(event.target).attr('id')
+    @setDrivetrainValue(position)
+    
 
   setInitialGears: ->
     if $('#fixed_gear_check').prop('checked') == true
       @setFixed()
     else
-      front = $('#bike_front_gear_type_id').val()
-      rear = $('#bike_rear_gear_type_id').val()
-      @setDrivetrainDisplay(['front','rear'],'standard')
-      if $('#front_internal_check').prop('checked') == true
-        @setDrivetrainDisplay(['front'],'internal')
-      if $('#rear_internal_check').prop('checked') == true
-        @setDrivetrainDisplay(['rear'],'internal')
-      $('#rear-gear-select .select-display').val(rear)
-      $('#front-gear-select .select-display').val(front)
+      fcount = parseInt($('#front_gear_select_value .initial_value').text(), 10)
+      rcount = parseInt($('#rear_gear_select_value .initial_value').text(), 10)
+      if isNaN(fcount)
+        $('#front_gear_select .placeholder').prop('selected', 'selected')
+      else
+        $('#front_gear_select').val(fcount)
+
+      if isNaN(rcount)
+        $('#rear_gear_select .placeholder').prop('selected', 'selected')
+      else
+        $('#rear_gear_select').val(rcount)
+      

@@ -38,7 +38,7 @@
             Free bike token
         - else
           = bike.owner_email
-      %td
+      %td.medium-screens
         = bike.creation_organization.name if bike.creation_organization.present?
         - if bike.paid_for
           %span.less-strong
