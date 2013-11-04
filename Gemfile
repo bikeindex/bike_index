@@ -43,6 +43,8 @@ gem 'dumper'
 gem 'draper'
 # gem 'rack-mini-profiler' # I'm not actually doing anything useful with this and it's annoying.
 gem 'dotenv-rails', "~> 0.8", git: "https://github.com/bkeepers/dotenv"
+gem 'wkhtmltopdf-binary'
+gem 'wicked_pdf'
 
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'

@@ -1,0 +1,111 @@
+@import "application_styles/_colors.scss";
+@import "includes/bootstrap/_mixins.scss";
+@import "includes/bootstrap/_variables.scss";
+@import "includes/bootstrap/_tables.scss";
+@import "application_styles/_vars.scss";
+
+$baseFont: Helvetica;
+
+// src: url(data:application/x-font-tff;base64, <base64_font_data> );
+
+
+* {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  width: 100%;
+  margin: 0;
+  max-width: 100%;
+  position: relative;
+  background: white;
+  color: $textColor;
+  font-size: 12px;
+  font-family: $baseFont;
+  // max-width: 1200px;
+  // margin: 60px auto 200px;
+}
+
+header {
+  @include border-radius(4px);
+  width: 100%;
+  position: relative;
+  padding: 0;
+  min-height: 250px;
+  .mnfg-logo {
+    z-index: 10;
+    // height: 25%;
+    height: 150px;
+    position: fixed;
+    top: 20px; left: 20px;
+    img {
+      max-height: 100%;
+      width: auto;
+      display: block;
+    }
+  }
+  .bike-photo {
+    @include border-radius(4px);
+    @include box-shadow(0 0 4px rgba(black, .2));
+    width: 100%;
+    border: 1px solid $grayMed;
+    height: auto;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+h1 { font-size: 36px; }
+h1, h2, h3, h4, h5 { font-weight: 400; }
+
+.index-block {
+  @include clearfix;
+  .logo-block {
+    width: 25%;
+    position: relative;
+    float: left;
+  }
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .index-text {
+    width: 73%;
+    margin-left: 2%;
+    float: left;
+    text-align: center;
+  }
+  h2 {
+    margin: .5em 0 0;
+    font-size: 35px;
+  }
+  h3 {
+    margin: 0;
+    font-size: 25px;
+  }
+  p {
+    margin: .75em 0 0;
+    font-family: $headerFont;
+    span { color: $linkColor; }
+  }
+}
+
+.details-container {
+  margin-top: 40px;
+  @include clearfix;
+}
+
+.bike-details {
+  width: 47.5%;
+  position: relative;
+  float: left;
+  &:last-of-type {
+    margin-left: 5%;
+  }
+}
+
+

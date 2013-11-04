@@ -42,6 +42,11 @@ class BikesController < ApplicationController
     end
   end
 
+  def pdf
+    @bike = Bike.find(params[:id]).decorate
+    render :pdf => 'registration_pdf'
+  end
+
   def scanned
     # Gives us an easy way of knowing if bike is accessed via QR code
     redirect_to bike_url(Bike.find(params[:id]))

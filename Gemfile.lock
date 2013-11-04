@@ -395,7 +395,10 @@ GEM
     whenever (0.8.4)
       activesupport (>= 2.3.4)
       chronic (>= 0.6.3)
+    wicked_pdf (0.9.7)
+      rails
     will_paginate (3.0.5)
+    wkhtmltopdf-binary (0.9.9.1)
 
 PLATFORMS
   ruby
@@ -460,4 +463,6 @@ DEPENDENCIES
   therubyracer
   uglifier (>= 1.0.3)
   whenever
+  wicked_pdf
   will_paginate (~> 3.0)
+  wkhtmltopdf-binary

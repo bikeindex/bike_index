@@ -60,6 +60,7 @@ Bikeindex::Application.routes.draw do
     member do
      get 'spokecard'
      get 'scanned'
+     get 'pdf'
    end
   end
   resources :locks

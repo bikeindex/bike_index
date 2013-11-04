@@ -8,4 +8,3 @@ class RearGearType < ActiveRecord::Base
   scope :internal, where(internal: true)
   scope :fixed, where(name: "Fixed")
 end
-
