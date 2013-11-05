@@ -34,42 +34,76 @@
     .bike-details
       %table.table.table-striped
         %tbody
-          %tr
-            %td
-              Frame
-            %td
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-              tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-              quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-          %tr
-            %td
-              Front wheel
-            %td
-              = @bike.front_wheel_size.name
-          %tr
-            %td
-              Rear wheel
-            %td
-              = @bike.rear_wheel_size.name
+          - if @bike.frame_size
+            %tr
+              %td.td-title
+                Frame size
+              %td
+                = @bike.seat_tube_display
+          - if @bike.frame_paint_description
+            %tr
+              %td.td-title
+                Paint job
+              %td
+                = @bike.frame_paint_description
+          - if @bike.front_gear_type_id
+            %tr
+              %td.td-title
+                Chainring
+              %td
+                = @bike.front_gear_type.name
+          - if @bike.rear_gear_type_id
+            %tr
+              %td.td-title
+                Rear gears
+              %td
+                = @bike.rear_gear_type.name
+                = "with coaster brake" if @bike.coaster_brake
+                - if @bike.components.where(ctype_id: Ctype.find_by_name('Hub').id)
+                  - hubs = @bike.components.where(ctype_id: Ctype.find_by_name('Hub').id)
+                  - if hubs.where(rear: true)
+                    - r_hub = hubs.where(rear: true).first
+
+                    (#{r_hub.model_name} by #{r_hub.manufacturer_name})
         
 
     .bike-details
       %table.table.table-striped
         %tbody
           %tr
+            %td.td-title
+              Front wheel
             %td
-              Frame
-            %td
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-              tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-              quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+              = @bike.front_wheel_size.name
+              with 
+              - if @bike.front_tire_narrow
+                narrow tires
+              - else
+                wide tires
           %tr
+            %td.td-title
+              Rear wheel
             %td
-              Frame
-            %td
-              consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-              cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-              proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+              = @bike.rear_wheel_size.name              
+              with
+              - if @bike.rear_tire_narrow
+                narrow tires
+              - else
+                wide tires
+          - if @bike.components.where(ctype_id: Ctype.find_by_name('Seat').id)
+            %tr
+              %td.td-title
+                Saddle
+              %td
+                - seat = @bike.components.where(ctype_id: Ctype.find_by_name('Seat').id).first
+                = seat.model_name
+                by
+                = seat.manufacturer.name
+                = seat.description
+
+
+
+
         
 
 
@@ -84,5 +118,5 @@
             printout
           %p 
             online @ 
-            %span
+            %a{href: bike_url(@bike) }
               bikeindex.org#{bike_path(@bike)}

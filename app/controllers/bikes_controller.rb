@@ -44,6 +44,7 @@ class BikesController < ApplicationController
 
   def pdf
     @bike = Bike.find(params[:id]).decorate
+    # render :pdf => 'registration_pdf', :show_as_html => true, :disposition => 'attachment'
     render :pdf => 'registration_pdf'
   end
 

@@ -103,6 +103,11 @@
           Third color
         .controls
           = collection_select( :bike, :tertiary_frame_color_id, Color.all, :id, :name, include_blank: 'Choose color' )
+  .input-group
+    .control-group
+      = f.label :frame_paint_description, "Paint description", class: "control-label"
+      .controls
+        = f.text_field :frame_paint_description
 
   .input-group.inform-save
     .controls
