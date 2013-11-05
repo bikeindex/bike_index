@@ -12,9 +12,10 @@ class BikeIndex.Views.Global extends Backbone.View
     BikeIndex.hideFlash()
     @setElement($('#body'))
     @loadChosen() if $('#chosen-container').length > 0
-    # @loadUserHeader()
+    
 
   loadUserHeader: ->
+    # This is now minified and inlined in the header, to make it load more quickly.
     $('#header-tabs').prepend("<div id='tab-cover'></div>")
     $.ajax({
       type: "GET"
