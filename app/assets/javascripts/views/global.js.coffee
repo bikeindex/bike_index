@@ -12,7 +12,7 @@ class BikeIndex.Views.Global extends Backbone.View
     BikeIndex.hideFlash()
     @setElement($('#body'))
     @loadChosen() if $('#chosen-container').length > 0
-    @loadUserHeader()
+    # @loadUserHeader()
 
   loadUserHeader: ->
     $('#header-tabs').prepend("<div id='tab-cover'></div>")
@@ -31,7 +31,6 @@ class BikeIndex.Views.Global extends Backbone.View
                   <a href="##{membership["slug"]}">#{membership["short_name"]}</a>
                 </li>
               """
-
               links = """
                 <div class="tab-pane" id="#{membership["slug"]}">
                   <ul>
@@ -46,7 +45,6 @@ class BikeIndex.Views.Global extends Backbone.View
                       </a>
                     </li>
               """
-
               if membership["is_admin"]
                 links = links + """
                   <li>
@@ -56,10 +54,8 @@ class BikeIndex.Views.Global extends Backbone.View
                   </li>
                 """
               links = links + "</ul></div>"
-              
               $('#total-top-header .global-tabs').append(tab)
               $('#total-top-header .tab-content').append(links)
-          
           $('#your_settings_n_stuff').text(data["email"]) if data["email"]
           $('#tab-cover').fadeOut()
 
@@ -67,6 +63,8 @@ class BikeIndex.Views.Global extends Backbone.View
           $('#total-top-header .no_user').removeClass('hidden')
           $('#tab-cover').fadeOut()
       error: (data, textStatus, jqXHR) ->
+        $('#total-top-header .no_user').removeClass('hidden')
+        $('#tab-cover').fadeOut()
         BikeIndex.alertMessage("error", "User load error", "We're sorry, we failed to load your user information. Try reloading maybe?")
       })
 
