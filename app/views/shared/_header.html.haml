@@ -70,7 +70,6 @@
     error: function(data, textStatus, jqXHR) {
       $('#total-top-header .no_user').removeClass('hidden');
       $('#tab-cover').fadeOut();
-      return BikeIndex.alertMessage("error", "User load error", "We're sorry, we failed to load your user information. Try reloading maybe?");
     }
   });
 
