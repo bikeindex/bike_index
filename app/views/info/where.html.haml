@@ -10,9 +10,10 @@
 %ul.where-shops-list#list_of_partners
   - @shops.each do |shop|
     - shop.locations.each do |location|
+      
       %li{id: "shop#{shop.id}_#{location.id}" }
         %h3
-          %a.where-shop-location{href: "#", :data => { lat: location.latitude, long: location.longitude }}
+          %a.where-shop-location{:data => { lat: location.latitude, long: location.longitude } }
             = shop.name
         %p
           #{location.street}, #{location.city}, #{location.state} #{location.zipcode}

@@ -11,6 +11,7 @@ class Location < ActiveRecord::Base
     :latitude,
     :longitude
 
+
   acts_as_paranoid
   belongs_to :organization
   validates_presence_of :name, :organization_id, :zipcode, :city, :state, :street
@@ -30,6 +31,10 @@ class Location < ActiveRecord::Base
     if self.phone 
       self.phone = Phonifyer.phonify(self.phone)
     end
+  end
+
+  def org_location_id
+    "#{self.organization_id}_#{self.id}"
   end
 
 end
