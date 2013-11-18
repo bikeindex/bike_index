@@ -9,13 +9,16 @@ class Location < ActiveRecord::Base
     :phone,
     :email,
     :latitude,
-    :longitude
+    :longitude,
+    :shown
 
 
   acts_as_paranoid
   belongs_to :organization
   validates_presence_of :name, :organization_id, :zipcode, :city, :state, :street
   has_many :bikes
+
+  scope :by_state, order(:state)
 
   def address
     [street, city, state, zipcode, "United States"].compact.join(', ')
@@ -33,8 +36,21 @@ class Location < ActiveRecord::Base
     end
   end
 
+  before_save :set_shown
+  def set_shown
+    self.shown = true if organization.show_on_map
+  end
+
   def org_location_id
     "#{self.organization_id}_#{self.id}"
+  end
+
+  def display_name
+    if name == organization.name 
+      name 
+    else
+      "#{organization.name} - #{name}"
+    end
   end
 
 end

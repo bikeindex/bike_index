@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131101002019) do
+ActiveRecord::Schema.define(:version => 20131117232341) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -92,6 +92,7 @@ ActiveRecord::Schema.define(:version => 20131101002019) do
     t.boolean  "coaster_brake",            :default => false, :null => false
     t.string   "frame_size"
     t.string   "frame_size_unit"
+    t.string   "frame_paint_description"
   end
 
   add_index "bikes", ["creation_organization_id"], :name => "index_bikes_on_organization_id"
@@ -221,9 +222,10 @@ ActiveRecord::Schema.define(:version => 20131101002019) do
     t.string   "name"
     t.float    "latitude"
     t.float    "longitude"
-    t.datetime "created_at",      :null => false
-    t.datetime "updated_at",      :null => false
+    t.datetime "created_at",                         :null => false
+    t.datetime "updated_at",                         :null => false
     t.datetime "deleted_at"
+    t.boolean  "shown",           :default => false
   end
 
   create_table "lock_types", :force => true do |t|

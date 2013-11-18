@@ -89,7 +89,7 @@
     margin-top: 30px;
     border-top: 1px solid $contentBorder;
   }
-  ul { margin-bottom: 30px; }
+  dl, ul { margin-bottom: 30px; }
 }
    
 @media (max-width: 779px) {
@@ -232,7 +232,7 @@
     margin-left: 26%;
     // border-top: 1px solid $contentBorder;
     border-left: 1px solid $contentBorder;
-    h1, h2, ol, ul, &>h3, &>h4, &>h5, &>p, &>img, article {
+    h1, h2, ol, ul, dl, &>h3, &>h4, &>h5, &>p, &>img, article {
       margin-left: 50px; 
       padding-right: 50px;
     }
@@ -248,7 +248,7 @@
 
 @media (min-width: 1000px) {
   .page-content {
-    h1, h2, ol, ul, &>h3, &>h4, &>h5, &>p, &>img, article {
+    h1, h2, ol, ul, dl, &>h3, &>h4, &>h5, &>p, &>img, article {
      max-width: 700px;
     }
     p {
@@ -372,35 +372,32 @@
 
 
 .where-shops-list {
-  list-style-type: none;
   width: 100%;
   position: relative;
   margin: 0;
-  padding-top: 30px;
-  li {
-    @include clearfix;
-    width: 100%;
-    padding: 5px 0 0 0;
-    // border-top: 1px solid $grayDark;
-    margin-top: 10px;
-    &:first-of-type {
-      // border-top: none;
-      margin-top: 0;
+  dt a {
+    font-weight: normal;
+    color: $textColor;
+    span { color: $textColor; }
+    em {
+      color: $grayMed;
+      font-size: .9em;
+      font-style: normal;
     }
   }
-  h3 {
-    margin: 0;
-    font-size: 20px;
+
+  dd { margin-left: 27px; }
+  
+  .where-shop-location {
+    color: $linkColorHover;
   }
+
   h4 {
     font-size: $standardFontSize;
     margin: 0;
     font-weight: 400;
   }
   p { margin: .25em 0 0; }
-  .shop-site {
-    margin-left: 1em;
-  }
   .map-window { display: none; }
 }
 

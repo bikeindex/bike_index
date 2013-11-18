@@ -6,27 +6,36 @@
   .map-of-shops
     = render "/shared/shops_map"
 
+%h3.padded
+  Partner shops
 
-%ul.where-shops-list#list_of_partners
-  - @shops.each do |shop|
-    - shop.locations.each do |location|
-      
-      %li{id: "shop#{shop.id}_#{location.id}" }
-        %h3
-          %a.where-shop-location{:data => { lat: location.latitude, long: location.longitude } }
-            = shop.name
+%dl.where-shops-list#list_of_partners
+  - @locations.each do |location|
+    - if location.shown
+  
+      %dt.collapse-faq
+        %a.collapsed{ href: "#shop#{location.org_location_id}", :data => { toggle: "collapse"} }
+          %span
+            &#x25B6;
+          = location.display_name
+          %em
+            &nbsp;&nbsp;#{location.city}, #{location.state}
+      %dd.collapse{ id: "shop#{location.org_location_id}" }
+        %a.where-shop-location{:data => { lat: location.latitude, long: location.longitude } }
+          Locate #{location.display_name} on map
         %p
           #{location.street}, #{location.city}, #{location.state} #{location.zipcode}
         - if location.phone
           %p
             %a{ href: "tel:#{ location.phone }" }
               = number_to_phone(location.phone)
-            - if shop.website.present?
-              = link_to "(#{shop.name} website)", shop.website, target: "_blank", class: "shop-site"
+        - if location.organization.website.present?
+          %p
+            = link_to location.organization.website, location.organization.website, target: "_blank", class: "shop-site"
         .map-window
           .window-content
             %h3
-              = shop.name
+              = location.display_name
             %p
               = location.street
               %br
