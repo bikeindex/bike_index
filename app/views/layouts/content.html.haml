@@ -17,7 +17,7 @@
           %h2
             Bike Index
     %nav.content-nav
-      %ul.content-sections
+      %ul.content-sections{ class: "#{@active_section}_menu"}
         %li{ class: content_nav_class("about") }
           = nav_link "About<span> the Bike Index</span>", about_url
           %ul
