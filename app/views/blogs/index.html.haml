@@ -1,12 +1,12 @@
-%h1
-  What we've been thinking about
-
 %hr
 
 - @blogs.each do |blog|
   %h2
     = link_to blog.title, blog_url(blog)
   %p.blog-index
+    - if blog.subtitle
+      %strong
+        #{blog.subtitle}.
     = blog.body_abbr.html_safe
 
   %hr

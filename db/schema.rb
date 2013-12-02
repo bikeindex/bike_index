@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131117232341) do
+ActiveRecord::Schema.define(:version => 20131202181502) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -108,6 +108,7 @@ ActiveRecord::Schema.define(:version => 20131117232341) do
     t.datetime "post_date"
     t.string   "tags"
     t.boolean  "published"
+    t.text     "subtitle"
   end
 
   create_table "cgroups", :force => true do |t|
@@ -226,6 +227,7 @@ ActiveRecord::Schema.define(:version => 20131117232341) do
     t.datetime "updated_at",                         :null => false
     t.datetime "deleted_at"
     t.boolean  "shown",           :default => false
+    t.integer  "us_state_id"
   end
 
   create_table "lock_types", :force => true do |t|
@@ -391,6 +393,13 @@ ActiveRecord::Schema.define(:version => 20131117232341) do
     t.string   "locking_description"
     t.string   "lock_defeat_description"
     t.integer  "country_id"
+  end
+
+  create_table "us_states", :force => true do |t|
+    t.string   "name"
+    t.string   "abbreviation"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
   end
 
   create_table "users", :force => true do |t|
