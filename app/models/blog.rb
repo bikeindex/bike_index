@@ -7,9 +7,8 @@ class Blog < ActiveRecord::Base
     :post_on,
     :tags,
     :published,
-    :update_title,
-    :subtitle
-  
+    :update_title
+      
   attr_accessor :post_on, :update_title
 
   validates_presence_of :title, :body, :user_id
