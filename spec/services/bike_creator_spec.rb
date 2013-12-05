@@ -28,6 +28,16 @@ describe BikeCreator do
     end
   end
 
+  describe :set_normalized_serial do 
+    it "should call creator_associator" do 
+      bike = FactoryGirl.create(:bike, serial_number: "bobs-ill-catz")
+      b_param = BParam.new
+      b_param.stub(:created_bike_id).and_return(bike.id)
+      BikeCreator.new(b_param).set_normalized_serial
+      bike.reload.serial_normalized.should eq("8085-111-CAT2")
+    end
+  end
+
   describe :clear_bike do
     it "should remove the existing bike and transfer the errors to a new active record object" do 
       b_param = BParam.new
@@ -68,6 +78,7 @@ describe BikeCreator do
       bike.stub(:id).and_return(69)
       bike.stub(:errors).and_return(nil)
       b_param.should_receive(:update_attributes).with(created_bike_id: 69)
+      SerialNormalizer.any_instance.should_receive(:set_normalized).and_return(true)
       BikeCreator.new(b_param).validate_record(bike)
     end
   end

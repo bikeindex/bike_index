@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131202181502) do
+ActiveRecord::Schema.define(:version => 20131205145316) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -93,6 +93,7 @@ ActiveRecord::Schema.define(:version => 20131202181502) do
     t.string   "frame_size"
     t.string   "frame_size_unit"
     t.string   "frame_paint_description"
+    t.string   "serial_normalized"
   end
 
   add_index "bikes", ["creation_organization_id"], :name => "index_bikes_on_organization_id"
@@ -108,7 +109,6 @@ ActiveRecord::Schema.define(:version => 20131202181502) do
     t.datetime "post_date"
     t.string   "tags"
     t.boolean  "published"
-    t.text     "subtitle"
   end
 
   create_table "cgroups", :force => true do |t|

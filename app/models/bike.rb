@@ -7,6 +7,7 @@ class Bike < ActiveRecord::Base
     :manufacturer_id, 
     :manufacturer_other,
     :serial_number,
+    :serial_normalized,
     :has_no_serial,
     :additional_registration,
     :creation_organization_id,
