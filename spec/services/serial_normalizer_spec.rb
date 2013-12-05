@@ -3,21 +3,10 @@ require 'spec_helper'
 describe SerialNormalizer do
 
   describe :normalize do 
-    it "should upcase" do 
-      serial = "happY"
+    it "should normalize i o 5 2 z and b" do 
+      serial = "bobs-catzio"
       result = SerialNormalizer.new({serial: serial}).normalized
-      result.should eq("HAPPY")
-    end
-    it "should normalize o and i" do 
-      serial = "Ii0O0OiOOlli"
-      result = SerialNormalizer.new({serial: serial}).normalized
-      result.should eq("110000100111")
-    end
-
-    it "should normalize 5 2 z and b" do 
-      serial = "bobs-catz"
-      result = SerialNormalizer.new({serial: serial}).normalized
-      result.should eq("8085-CAT2")
+      result.should eq("8085-CAT210")
     end
   end
 

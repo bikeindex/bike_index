@@ -19,10 +19,17 @@ class SerialNormalizer
   end
 
   def normalized
-    i = @serial.upcase
-    i = i.gsub(/[O]/,'0').gsub(/[IL]/,'1')
-    i = i.gsub(/[S]/,'5').gsub(/[S]/,'5').gsub(/[Z]/,'2').gsub(/[B]/,'8')
-    return i
+    normalized = @serial.upcase
+    key_hash = {'O' => '0',
+      'IL' => '1',
+      'S' => '5',
+      'Z' => '2',
+      'B' => '8'
+    }
+    key_hash.keys.each do |k|
+      normalized.gsub!(/[#{k}]/, key_hash[k])
+    end
+    return normalized
   end
 
   def set_normalized
