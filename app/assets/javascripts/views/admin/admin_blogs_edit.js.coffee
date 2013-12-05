@@ -4,6 +4,7 @@ class BikeIndex.Views.AdminBlogsEdit extends Backbone.View
     $('#post-date-field input').datepicker('format: mm-dd-yyy')
     $('#public_image_image').attr('name', "public_image[image]")
     @publicImageFileUpload()
+    $('.edit_blog').areYouSure()
     
   publicImageFileUpload: ->
     # runSortableImages = @sortableImages($('#public_images'))
