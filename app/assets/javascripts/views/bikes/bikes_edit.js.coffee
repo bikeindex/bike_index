@@ -26,6 +26,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     # $('#edit-menu').attr('data-spy', 'affix').attr('data-offset-top', 10)
     # $('#edit-menu').affix()
     @setInitialValues()
+    $('.form-horizontal').areYouSure()
 
     if $('#new_public_image').length > 0
       # we need to rename the damn field or it breaks
