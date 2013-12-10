@@ -19,9 +19,19 @@
             <option value="h<%= attribute.id %>"><%= attribute.name %> bars</option>
           <% end %>
         </optgroup>
+        <optgroup label="Frame Materials">
+          <% FrameMaterial.all.each do |attribute| %>
+            <option value="h<%= attribute.id %>"><%= attribute.name %> bars</option>
+          <% end %>
+        </optgroup>
         <optgroup label="Wheel Sizes">
           <% WheelSize.unscoped.commonness.each do |attribute| %>
             <option value="<%= attribute.priority %>w<%= attribute.id %>"><%= attribute.name %></option>
+          <% end %>
+        </optgroup>
+        <optgroup label="Manufacturers">
+          <% Manufacturer.all.each do |attribute| %>
+            <option value="m_<%= attribute.slug %>"><%= attribute.name %></option>
           <% end %>
         </optgroup>
       </select>
