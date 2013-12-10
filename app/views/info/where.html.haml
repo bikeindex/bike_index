@@ -31,7 +31,7 @@
               = number_to_phone(location.phone)
         - if location.organization.website.present?
           %p
-            = link_to location.organization.website, location.organization.website, target: "_blank", class: "shop-site"
+            = link_to "#{location.organization.name} website", location.organization.website, target: "_blank", class: "shop-site"
         .map-window
           .window-content
             %h3
