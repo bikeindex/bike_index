@@ -79,13 +79,20 @@
   
   .input-group
     .control-group
-      = f.label :police_report_number, "Police report number", class: "control-label"
-      .controls#police-report-check
-        = f.text_field :police_report_number
-      .controls.form-suggestion
-        It is 
+      %p
+        Filing a 
         %strong
-          strongly recommended
-        that you file a police report, and fill in the report number here.
+          police report
+        is 
+        %em.stolen-color
+          extremely important
+        for stolen bike recovery.
+      = f.label :police_report_number, "Police report number", class: "control-label"
+      .controls.police-report-check
+        = f.text_field :police_report_number
+      = f.label :police_report_department, "Department & city", class: "control-label"
+      .controls.police-report-check
+        = f.text_field :police_report_department
+
           
       

@@ -1,5 +1,6 @@
 class StolenRecord < ActiveRecord::Base
   attr_accessible :police_report_number,
+    :police_report_department,
     :locking_description,
     :lock_defeat_description,
     :date_stolen,
