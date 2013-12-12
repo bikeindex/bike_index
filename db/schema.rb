@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131211163130) do
+ActiveRecord::Schema.define(:version => 20131212161639) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -228,6 +228,7 @@ ActiveRecord::Schema.define(:version => 20131211163130) do
     t.datetime "deleted_at"
     t.boolean  "shown",           :default => false
     t.integer  "us_state_id"
+    t.integer  "country_id"
   end
 
   create_table "lock_types", :force => true do |t|

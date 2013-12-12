@@ -45,7 +45,7 @@
   .input-group
     #stolen-bike-location.control-group
       = f.label :street, "Where was the bike?", class: "control-label"
-      .controls#country_select_container
+      #country_select_container.controls.chosen-select
         = f.collection_select(:country_id, Country.all, :id, :name, prompt: "Choose country" )
         %p.other-value
           = Country.find_by_iso("US").id
@@ -56,7 +56,7 @@
       .controls.extra-field
         = f.text_field :zipcode, placeholder: "Zipcode"
       #state-select.controls.extra-field.chosen-select
-        = f.collection_select(:state, UsStates.all, :abbr, :name, prompt: "State" )
+        = f.collection_select(:state, UsStates.all, :abbr, :name, include_blank: true, prompt: "State" )
 
   .input-group
     .control-group

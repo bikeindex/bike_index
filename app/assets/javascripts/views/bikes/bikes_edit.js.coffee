@@ -13,12 +13,13 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     'change .drive-check': 'toggleDrivetrainChecks'
     'change #edit_drivetrain select': 'updateDrivetrainValue'
     'click #frame-sizer button': 'updateFrameSize'
+    'change #country_select_container select': 'updateCountry'
     
   initialize: ->
     @setElement($('#body'))
     menu_height = $('#edit-menu').offset().top 
     scroll_height = $(window).height() * .4
-    @setDefaultCountry()
+    @setDefaultCountryAndState()
     $('#body').attr('data-spy', "scroll").attr('data-target', '#edit-menu')
     $('#body').scrollspy(offset: - scroll_height)
     $('#clearing_span').css('height', $('#edit-menu').height() + 25)
@@ -217,16 +218,23 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
   markStolen: ->
     $('#bike_stolen').prop('checked', 'true')
 
-  setDefaultCountry: ->
+  setDefaultCountryAndState: ->
     c_select = $('#country_select_container select')
     if c_select.length > 0
-      us_val = parseInt($('#country_select_container .other-value').text(), 10)
-      c_select.val(us_val).select2() unless c_select.val()
-      c_select.change ->
-        if c_select.val() == us_val
-          $('#state-select').slideDown()
-        else 
-          $('#state-select').slideUp()
+      if c_select.val().length > 0
+        @updateCountry()
+      else
+        us_val = parseInt($('#country_select_container .other-value').text(), 10)
+        c_select.val(us_val).change()
+
+  updateCountry: ->
+    c_select = $('#country_select_container select')
+    us_val = parseInt($('#country_select_container .other-value').text(), 10)
+    if parseInt(c_select.val(), 10) == us_val
+      $('#state-select').slideDown()
+    else
+      $('#state-select').slideUp()
+      $('#state-select select').val('').change()
 
 
   removeComponent: (event) ->

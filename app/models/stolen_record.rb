@@ -34,7 +34,7 @@ class StolenRecord < ActiveRecord::Base
 
   unless Rails.env.test?
     geocoded_by :address
-    after_validation :geocode, :if => lambda { self.city.present? && self.zipcode.present? && self.country.present? }
+    after_validation :geocode, :if => lambda { self.street.present? && self.city.present? && self.country.present? }
   end
 
   def self.locking_description_select
