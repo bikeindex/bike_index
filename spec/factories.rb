@@ -129,10 +129,16 @@ FactoryGirl.define do
   factory :location do 
     name 
     association :organization
+    association :country
     zipcode '60647'
     city 'Chicago'
     state 'IL'
     street 'foo address'
+  end
+
+  factory :country do 
+    name 
+    iso 'asdffda'
   end
 
   factory :lock_type do 
