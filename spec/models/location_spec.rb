@@ -16,4 +16,11 @@ describe Location do
     end
   end
 
+  describe :org_location_id do 
+    it "should create a unique id that references the organization" do 
+      location = FactoryGirl.create(:location)
+      location.org_location_id.should eq("#{location.organization_id}_#{location.id}")
+    end
+  end
+
 end

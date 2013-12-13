@@ -15,7 +15,7 @@
       <% @shops.all.each do |shop| %>
         <% shop.locations.each_with_index do |location, index| %>
           [
-            "#shop<%= shop.id %>_<%= location.id %>",
+            "#shop<%= location.org_location_id %>",
             <%= location.latitude %>,
             <%= location.longitude %>
           ],
@@ -43,6 +43,7 @@
       google.maps.event.addListener(marker, 'click', (function(marker, i) {
         return function() {
           infowindow.setContent($(marker.shopTarget).find('.map-window').html());
+          console.log(marker)
           infowindow.open(map, marker);
         }
       })(marker, i));

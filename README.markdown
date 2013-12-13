@@ -1,8 +1,12 @@
-# ![BIKE INDEX](https://github.com/bikeindex/webapp/blob/master/bike_index.png?raw=true) This is the [Bike Index](https://www.bikeindex.org) [![Build Status](https://secure.travis-ci.org/bikeindex/webapp.png)](http://travis-ci.org/bikeindex/webapp)
+# ![BIKE INDEX](https://github.com/bikeindex/webapp/blob/master/bike_index.png?raw=true) This is the [Bike Index](https://www.bikeindex.org) [![Build Status](https://secure.travis-ci.org/bikeindex/bike_index.png)](http://travis-ci.org/bikeindex/bike_index)
 
+The Bike Index is a national bike registry that fights theft by working with shops and advocacy organizations to register bikes for free quickly and easily.
 
+Registering a bike only takes a few minutes and gives cyclists a permanent record linked to their identity that proves ownership in the case of a theft.
 
-## Dependencies
+We're an open source project. Take a gander through our code, report bugs, or download it and run it locally.
+
+### Dependencies
 
 - [Ruby 1.9.3](http://www.ruby-lang.org/en/) (we use [RVM](https://rvm.io/))
 
@@ -15,7 +19,7 @@
 - *If you turn on caching locally:* [Dalli](https://github.com/mperham/dalli) ([railscast](http://railscasts.com/episodes/380-memcached-dalli?view=asciicast))
 
 
-## Run it
+## Running the Bike Index locally
 
 - Create and seed your database (`rake db:setup`)
 

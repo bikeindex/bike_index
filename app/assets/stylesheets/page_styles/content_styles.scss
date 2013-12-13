@@ -61,7 +61,6 @@
   a.active {
     color: $textColor;
     text-decoration: underline;
-    cursor: default;
   }
 }
 
@@ -89,15 +88,17 @@
     margin-top: 30px;
     border-top: 1px solid $contentBorder;
   }
-  ul { margin-bottom: 30px; }
+  dl, ul { margin-bottom: 30px; }
 }
    
 @media (max-width: 779px) {
   .content-nav {
     .content-sections {
       @include clearfix;
-      padding: 30px 0 130px 0px;
       position: relative;
+      padding: 30px 0 50px 0px;
+      &.resources_menu { padding-bottom: 160px; }
+      &.contact_menu { padding-bottom: 30px; }
       &>li {
         float: left;
         width: 31.333%;
@@ -122,10 +123,10 @@
         border: 1px solid darken($grayLighterer, 5%);
         background: $grayLighterer;
         position: absolute;
-        left: 2%;
+        left: 2.4%;
         width: 96%;
         margin: 10px 0 0 0;
-        padding: 0;
+        padding: .5em .25em;
         top: 3.8em; 
         li {
           float: left;
@@ -232,10 +233,11 @@
     margin-left: 26%;
     // border-top: 1px solid $contentBorder;
     border-left: 1px solid $contentBorder;
-    h1, h2, ol, ul, &>h3, &>h4, &>h5, &>p, &>img, article {
+    h1, h2, ol, ul, dl, &>h3, &>h4, &>h5, &>p, &>img, article {
       margin-left: 50px; 
       padding-right: 50px;
     }
+    &>ul, &>ol { margin-left: 75px; }
     .full-screen-table {
       padding: 20px 50px 0;
     }
@@ -248,7 +250,7 @@
 
 @media (min-width: 1000px) {
   .page-content {
-    h1, h2, ol, ul, &>h3, &>h4, &>h5, &>p, &>img, article {
+    h1, h2, ol, ul, dl, &>h3, &>h4, &>h5, &>p, &>img, article {
      max-width: 700px;
     }
     p {
@@ -372,35 +374,33 @@
 
 
 .where-shops-list {
-  list-style-type: none;
   width: 100%;
   position: relative;
   margin: 0;
-  padding-top: 30px;
-  li {
-    @include clearfix;
-    width: 100%;
-    padding: 5px 0 0 0;
-    // border-top: 1px solid $grayDark;
-    margin-top: 10px;
-    &:first-of-type {
-      // border-top: none;
-      margin-top: 0;
+  dt a {
+    font-weight: normal;
+    color: $textColor;
+    span { color: $textColor; }
+    em {
+      color: $grayMed;
+      font-size: .9em;
+      font-style: normal;
     }
   }
-  h3 {
-    margin: 0;
-    font-size: 20px;
+
+  dd { margin-left: 27px; }
+  dd.collapse.in { padding-bottom: .6em; }
+  
+  .where-shop-location {
+    color: $linkColorHover;
   }
+
   h4 {
     font-size: $standardFontSize;
     margin: 0;
     font-weight: 400;
   }
   p { margin: .25em 0 0; }
-  .shop-site {
-    margin-left: 1em;
-  }
   .map-window { display: none; }
 }
 

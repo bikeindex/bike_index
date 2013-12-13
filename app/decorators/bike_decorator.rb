@@ -68,8 +68,7 @@ class BikeDecorator < ApplicationDecorator
       h.image_tag(object.thumb_path, alt: title)
     else
       h.image_tag("/assets/bike_photo_placeholder.png", alt: title) + h.content_tag(:span, "no image")          
-    end
-    
+    end    
   end
 
   def list_image(target = nil)
@@ -80,6 +79,11 @@ class BikeDecorator < ApplicationDecorator
     end
   end
 
-
+  def frame_colors
+    c = [object.primary_frame_color.name]
+    c << object.secondary_frame_color.name if object.secondary_frame_color
+    c << object.tertiary_frame_color.name if object.tertiary_frame_color
+    c
+  end
 
 end

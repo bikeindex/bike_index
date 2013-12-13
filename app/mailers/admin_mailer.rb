@@ -11,7 +11,7 @@ class AdminMailer < ActionMailer::Base
 
       from: 'administerer@bikeindex.org', subject: feedback.title) do |format|
         format.text
-        format.html { render layout: 'email' }
+        format.html { render layout: 'email_no_border' }
       end
   end
 
@@ -22,7 +22,7 @@ class AdminMailer < ActionMailer::Base
 
       to: 'admin@bikeindex.org', subject: "#{@organization.name} doesn't have any admins!") do |format|
         format.text
-        format.html { render layout: 'email' }
+        format.html { render layout: 'email_no_border' }
       end
   end
 
@@ -33,7 +33,7 @@ class AdminMailer < ActionMailer::Base
 
       to: 'admin@bikeindex.org', subject: "error with #{@organization.name} invoice") do |format|
         format.text
-        format.html { render layout: 'email' }
+        format.html { render layout: 'email_no_border' }
       end
   end
 

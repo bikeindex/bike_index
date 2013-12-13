@@ -25,4 +25,4 @@
         %dl.dl-horizontal
           = bike.dl_list_item(bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), "Stolen on")
         %dl.dl-horizontal
-          = bike.dl_list_item("#{bike.current_stolen_record.city}, #{bike.current_stolen_record.state}", "From")
+          = bike.dl_list_item(bike.short_address(bike.current_stolen_record), "From")

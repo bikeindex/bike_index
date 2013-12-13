@@ -179,4 +179,19 @@ describe BikeDecorator do
     end
   end
 
+  describe :frame_colors do 
+    it "should return an array of the frame colors" do 
+      bike = Bike.new 
+      decorator = BikeDecorator.new(bike)
+      color = Color.new
+      color2 = Color.new
+      color.stub(:name).and_return('Blue')
+      color2.stub(:name).and_return('Black')
+      bike.stub(:primary_frame_color).and_return(color)
+      bike.stub(:secondary_frame_color).and_return(color2)
+      bike.stub(:tertiary_frame_color).and_return(color)
+      decorator.frame_colors.should eq(['Blue', 'Black', 'Blue'])
+    end
+  end
+
 end

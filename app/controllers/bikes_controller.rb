@@ -87,8 +87,7 @@ class BikesController < ApplicationController
         flash[:error] = "Whoops! There was a problem with your entry!"
         redirect_to embed_organization_url(@bike.creation_organization) and return  
       else
-        flash[:notice] = "Bike added successfully!"
-        redirect_to embed_organization_url(@bike.creation_organization) and return  
+        redirect_to controller: :organizations, action: :embed_create_success, id: @bike.creation_organization.slug, bike_id: @bike.id and return  
       end
     else
       ensure_user_for_new

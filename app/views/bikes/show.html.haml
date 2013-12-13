@@ -29,7 +29,7 @@
           Add some more information about it.
         - else
           - if @bike.stolen
-            Add a picture so people know what to look for.
+            Add a picture so people know what to look for!
           - else
             You should add a picture of it, so everyone can admire its beauty.
         = link_to  "Edit", edit_bike_path, class: "button-blue"
@@ -76,13 +76,16 @@
                   Phone number
                 %dd
                   %a{ href: "tell:#{@bike.current_stolen_record.phone}" }
-                    = @bike.current_stolen_record.phone
+                    = number_to_phone(@bike.current_stolen_record.phone)
             = @bike.dl_list_item(@bike.current_stolen_record.locking_description, "Locking description")
             = @bike.dl_list_item(@bike.current_stolen_record.lock_defeat_description, "Locking circumvented")
             = @bike.dl_list_item(@bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), "Date stolen")
             = @bike.dl_list_item(@bike.current_stolen_record.address, "Location")
             = @bike.dl_list_item(@bike.current_stolen_record.theft_description, "Description")
-            = @bike.dl_list_item(@bike.current_stolen_record.police_report_number, "Police report number")
+            = @bike.dl_list_item(@bike.current_stolen_record.police_report_number, "Police report #")
+            = @bike.dl_list_item(@bike.current_stolen_record.police_report_department, "Department & city")
+            
+
 
     %header.with-subtitle
       .sharing-section

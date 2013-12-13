@@ -62,8 +62,8 @@ f_gear_types = [
   {name: '1', count: 1, internal: false, standard: true },
   {name: '2', count: 2, internal: false, standard: true },
   {name: '3', count: 3, internal: false, standard: true },
-  {name: 'Internal 2', count: 2, internal: true},
-  {name: 'Internal 3', count: 3, internal: true}
+  {name: '2 internal', count: 2, internal: true},
+  {name: '3 internal', count: 3, internal: true}
 ]
 f_gear_types.each do |gear|
   f_gear_type = FrontGearType.create(name: gear[:name], count: gear[:count], internal: gear[:internal], standard: gear[:standard])

@@ -28,6 +28,8 @@ class Organization < ActiveRecord::Base
 
   validates_uniqueness_of :slug, message: "Needs a unique slug"
 
+  default_scope order(:name)
+
   scope :shown_on_map, where(show_on_map: true)
 
   def to_param

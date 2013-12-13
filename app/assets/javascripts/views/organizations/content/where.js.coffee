@@ -14,7 +14,6 @@ class BikeIndex.Views.ContentWhere extends Backbone.View
     createMap(40.111689,-96.81839,4);
 
   updateMapLocation: (event) ->
-    event.preventDefault()
     target = $(event.target)
     $('body').animate( 
       scrollTop: ($('#where-bike-index').offset().top - 20), 'fast' 

@@ -3,6 +3,7 @@
 @import "includes/bootstrap/_variables.scss";
 @import "includes/bootstrap/_tables.scss";
 @import "application_styles/_vars.scss";
+@import "application_styles/_utility_classes.scss";
 
 @font-face {
   font-family: 'klinic_slabbook';
@@ -102,6 +103,9 @@ h1, h2, h3, h4, h5 { font-weight: 400; }
   margin-top: 40px;
   @include clearfix;
 }
+.stolen-container {
+  @include clearfix;
+}
 
 .bike-details {
   width: 47.5%;
@@ -115,5 +119,4 @@ h1, h2, h3, h4, h5 { font-weight: 400; }
   .td-title { width: 90px; }
 }
 
-
-
+.phone-number-link { text-decoration: none; }
