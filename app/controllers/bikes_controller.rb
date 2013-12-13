@@ -14,7 +14,7 @@ class BikeTyperError < StandardError
 end
 
 class BikesController < ApplicationController
-  before_filter :ensure_user_for_edit, only: [:edit, :update]
+  before_filter :ensure_user_for_edit, only: [:edit, :update, :pdf]
   before_filter :ensure_user_for_new, only: [:new]
   layout 'no_container'
 
@@ -43,6 +43,8 @@ class BikesController < ApplicationController
   end
 
   def pdf
+    # s3 = bike_id + date_last_modified
+    # VCR
     @bike = Bike.find(params[:id]).decorate
     # render :pdf => 'registration_pdf', :show_as_html => true, :disposition => 'attachment'
     render :pdf => 'registration_pdf'
@@ -57,7 +59,7 @@ class BikesController < ApplicationController
     @title = "Bike spokecard"
     @bike = Bike.find(params[:id])
     if @bike.verified?
-      render layout: false
+      render layout: false  
     else
       flash[:error] = "Whoops, we can't make a spoke card for that bike. Perhaps it wasn't registered at a bike shop?"
       redirect_to user_home_url

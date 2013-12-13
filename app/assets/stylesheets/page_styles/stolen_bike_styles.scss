@@ -27,11 +27,9 @@
       margin-bottom: .5em;
     }
   }
-  .phone-shown {
-    dd, dt {
-      color: $stolenColor;
-      font-weight: normal;
-    }
+  dt.stolen-color {
+    color: $stolenColor;
+    font-weight: normal;
   }
 }
 
@@ -74,7 +72,6 @@
 
 
 .stolen-contact {
-  max-width: 800px;
   margin: 80px auto 0;
   textarea { width: 100%; }
   h3 {

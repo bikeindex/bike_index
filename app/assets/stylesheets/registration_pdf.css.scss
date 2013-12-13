@@ -55,10 +55,12 @@ header {
   .bike-photo {
     @include border-radius(4px);
     @include box-shadow(0 0 4px rgba(black, .2));
-    width: 100%;
+    display: block;
+    max-width: 100%;
     border: 1px solid $grayMed;
     height: auto;
-    margin: 0;
+    max-height: 530px;
+    margin: 0 auto;
     padding: 0;
   }
 }
@@ -68,7 +70,8 @@ h1, h2, h3, h4, h5 { font-weight: 400; }
 
 .index-block {
   @include clearfix;
-  margin-top: 70px;
+  margin-top: 40px;
+  &.stolen { margin-top: 30px;}
   .logo-block {
     width: 30%;
     position: relative;
@@ -100,23 +103,26 @@ h1, h2, h3, h4, h5 { font-weight: 400; }
 }
 
 .details-container {
-  margin-top: 40px;
+  margin-top: 20px;
   @include clearfix;
 }
 .stolen-container {
   @include clearfix;
+  margin-top: -20px;
+  td.td-title { color: $stolenColor; }
+  table.table { margin-bottom: 5px;}
 }
 
 .bike-details {
   width: 47.5%;
   position: relative;
   float: left;
-  
-  td {
-    border: 0;
-  }
+  td { border: 0; }
   &:last-of-type { margin-left: 5%; }
-  .td-title { width: 90px; }
+  .td-title {
+    width: 90px;
+    color: $grayDark;
+  }
 }
 
 .phone-number-link { text-decoration: none; }

@@ -31,37 +31,35 @@
           Stolen
       = @bike.title
 
-  .description
-    %p
-      = @bike.description
   - if @bike.stolen and @bike.current_stolen_record.present?
     .stolen-container
-      %h2
-        This #{@bike.type} was stolen
-        = @bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y")
+      - if @bike.current_stolen_record.theft_description.present?
+        %p
+          %em
+            Description of theft
+          = @bike.current_stolen_record.theft_description.truncate(300)
       .bike-details
         %table.table.table-striped
           %tbody
             %tr
               %td.td-title
+                Date Stolen
+              %td
+                = @bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y")
+            %tr
+              %td.td-title
                 Location
               %td
                 = @bike.current_stolen_record.address
-            - if @bike.current_stolen_record.theft_description.present?
-              %tr
-                %td.td-title
-                  Theft description
-                %td
-                  = @bike.current_stolen_record.theft_description
 
       .bike-details
         %table.table.table-striped
           %tbody
             %tr
               %td.td-title
-                Phone
+                Owner phone
               %td
-                %a{ href: "tell:#{@bike.current_stolen_record.phone}" }
+                %a.phone-number-link{ href: "tell:#{@bike.current_stolen_record.phone}" }
                   = number_to_phone(@bike.current_stolen_record.phone)
             - if @bike.current_stolen_record.police_report_number.present?
               %tr
@@ -72,10 +70,17 @@
             - if @bike.current_stolen_record.police_report_department.present?
               %tr
                 %td.td-title
-                  Department & city
+                  Department
                 %td
                   = @bike.current_stolen_record.police_report_department
-              
+  .description
+    %p
+      %em
+        Bike description:
+      - if @bike.stolen
+        = @bike.description.truncate(500)
+      - else
+        = @bike.description
   .details-container
     .bike-details
       %table.table.table-striped
@@ -86,12 +91,24 @@
                 Bike Serial
               %td
                 = @bike.serial_number
-          - if @bike.frame_size.present?
+          %tr
+            %td.td-title
+              Manufacturer
+            %td
+              = @bike.mnfg_name
+          - if @bike.frame_model.present?
             %tr
               %td.td-title
-                Frame size
+                Model
               %td
-                = @bike.seat_tube_display
+                = @bike.frame_model
+          - unless @bike.stolen and @bike.current_stolen_record.present?
+            - if @bike.frame_size.present?
+              %tr
+                %td.td-title
+                  Frame size
+                %td
+                  = @bike.seat_tube_display
           - if @bike.frame_paint_description.present?
             %tr
               %td.td-title
@@ -104,63 +121,65 @@
                 = 'Color'.pluralize(@bike.frame_colors.count)
               %td
                 = @bike.frame_colors.to_sentence
-          - if @bike.front_gear_type.present?
-            %tr
-              %td.td-title
-                Front gears
-              %td
-                = @bike.front_gear_type.name
-          - if @bike.rear_gear_type_id.present?
-            %tr
-              %td.td-title
-                Rear gears
-              %td
-                = @bike.rear_gear_type.name
-                = "with coaster brake" if @bike.coaster_brake
-                - if @bike.components.where(ctype_id: Ctype.find_by_name('Hub').id).present?
-                  - hubs = @bike.components.where(ctype_id: Ctype.find_by_name('Hub').id)
-                  - if hubs.where(rear: true)
-                    - r_hub = hubs.where(rear: true).first
+          - unless @bike.stolen and @bike.current_stolen_record.present?
+            - if @bike.front_gear_type.present?
+              %tr
+                %td.td-title
+                  Front gears
+                %td
+                  = @bike.front_gear_type.name
+            - if @bike.rear_gear_type_id.present?
+              %tr
+                %td.td-title
+                  Rear gears
+                %td
+                  = @bike.rear_gear_type.name
+                  = "with coaster brake" if @bike.coaster_brake
+                  - if @bike.components.where(ctype_id: Ctype.find_by_name('Hub').id).present?
+                    - hubs = @bike.components.where(ctype_id: Ctype.find_by_name('Hub').id)
+                    - if hubs.where(rear: true)
+                      - r_hub = hubs.where(rear: true).first
 
-                    (#{r_hub.model_name} by #{r_hub.manufacturer_name})
+                      (#{r_hub.model_name} by #{r_hub.manufacturer_name})
         
 
     .bike-details
-      %table.table.table-striped
-        %tbody
-          %tr
-            %td.td-title
-              Front wheel
-            %td
-              = @bike.front_wheel_size.name
-              with 
-              - if @bike.front_tire_narrow
-                narrow tires
-              - else
-                wide tires
-          %tr
-            %td.td-title
-              Rear wheel
-            %td
-              = @bike.rear_wheel_size.name              
-              with
-              - if @bike.rear_tire_narrow
-                narrow tires
-              - else
-                wide tires
-          - if @bike.components.where(ctype_id: Ctype.find_by_name('Seat').id).present?
+      - unless @bike.stolen and @bike.current_stolen_record.present?
+        %table.table.table-striped
+          %tbody
             %tr
               %td.td-title
-                Saddle
+                Front wheel
               %td
-                - seat = @bike.components.where(ctype_id: Ctype.find_by_name('Seat').id).first
-                = seat.model_name
-                by
-                = seat.manufacturer.name
-                = seat.description
+                = @bike.front_wheel_size.name
+                with 
+                - if @bike.front_tire_narrow
+                  narrow tires
+                - else
+                  wide tires
+            %tr
+              %td.td-title
+                Rear wheel
+              %td
+                = @bike.rear_wheel_size.name              
+                with
+                - if @bike.rear_tire_narrow
+                  narrow tires
+                - else
+                  wide tires
+            - if @bike.components.where(ctype_id: Ctype.find_by_name('Seat').id).present?
+              %tr
+                %td.td-title
+                  Saddle
+                %td
+                  - seat = @bike.components.where(ctype_id: Ctype.find_by_name('Seat').id).first
+                  = seat.model_name
+                  by
+                  = seat.manufacturer.name
+                  = seat.description
 
 
-      .index-block
+      .index-block{ class: ('stolen' if @bike.stolen) }
         .logo-block
           %img{ src: "https://s3.amazonaws.com/bikeindex/logo.png" }
         .index-text

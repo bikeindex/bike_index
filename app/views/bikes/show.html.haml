@@ -71,16 +71,15 @@
             = render "bikes/stolen_map"
           .dl-horizontal
             - if @bike.phoneable_by(current_user)
-              .phone-shown
-                %dt
-                  Phone number
-                %dd
-                  %a{ href: "tell:#{@bike.current_stolen_record.phone}" }
-                    = number_to_phone(@bike.current_stolen_record.phone)
+              %dt.stolen-color
+                Phone number
+              %dd
+                %a{ href: "tell:#{@bike.current_stolen_record.phone}" }
+                  = number_to_phone(@bike.current_stolen_record.phone)
+            = @bike.dl_list_item(@bike.current_stolen_record.address, "Location")
             = @bike.dl_list_item(@bike.current_stolen_record.locking_description, "Locking description")
             = @bike.dl_list_item(@bike.current_stolen_record.lock_defeat_description, "Locking circumvented")
             = @bike.dl_list_item(@bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), "Date stolen")
-            = @bike.dl_list_item(@bike.current_stolen_record.address, "Location")
             = @bike.dl_list_item(@bike.current_stolen_record.theft_description, "Description")
             = @bike.dl_list_item(@bike.current_stolen_record.police_report_number, "Police report #")
             = @bike.dl_list_item(@bike.current_stolen_record.police_report_department, "Department & city")
