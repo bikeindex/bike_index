@@ -52,8 +52,10 @@ class Bike < ActiveRecord::Base
     :bike_token_id,
     :b_param_id,
     :cached_attributes,
-    :embeded
+    :embeded,
+    :pdf 
 
+  mount_uploader :pdf, PdfUploader
   belongs_to :manufacturer
   serialize(:cached_attributes, Array)
   belongs_to :primary_frame_color, class_name: "Color"
