@@ -15,10 +15,6 @@ class PdfUploader < CarrierWave::Uploader::Base
   else
     storage :fog
   end
-
-  def identifier!
-    self.file.identifier
-  end
   
   after :remove, :delete_empty_upstream_dirs  
   def delete_empty_upstream_dirs
