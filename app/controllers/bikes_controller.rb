@@ -46,7 +46,7 @@ class BikesController < ApplicationController
     @bike = Bike.find(params[:id]).decorate
     # render :pdf => 'registration_pdf', :show_as_html => true
     filename = "Registration_" + @bike.updated_at.strftime("%m%d_%H%M")[0..-1]
-    unless @bike.pdf.file.identifier == "#{filename}.pdf"
+    unless @bike.pdf.present? && @bike.pdf.file.identifier == "#{filename}.pdf"
       pdf = render_to_string pdf: filename, template: 'bikes/pdf.html.haml'
       save_path = "#{Rails.root}/tmp/uploads/#{filename}.pdf"
       File.open(save_path, 'wb') do |file| 
