@@ -44,7 +44,7 @@ class BikesController < ApplicationController
 
   def pdf
     @bike = Bike.find(params[:id]).decorate
-    render :pdf => 'registration_pdf', :show_as_html => true
+    render :pdf => 'registration_pdf'
     # filename = "Registration_" + @bike.updated_at.strftime("%m%d_%H%M")[0..-1]
     # unless @bike.pdf.present? && @bike.pdf.file.identifier == "#{filename}.pdf"
     #   pdf = render_to_string pdf: filename, template: 'bikes/pdf.html.haml'
