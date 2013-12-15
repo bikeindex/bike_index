@@ -151,7 +151,7 @@
               %td.td-title
                 Front wheel
               %td
-                = @bike.front_wheel_size.name
+                = @bike.front_wheel_size.name if @bike.front_wheel_size.present?
                 with 
                 - if @bike.front_tire_narrow
                   narrow tires
