@@ -59,19 +59,18 @@ class BikesController < ApplicationController
   end
 
   def scanned
-    # Gives us an easy way of knowing if bike is accessed via QR code
-    redirect_to bike_url(Bike.find(params[:id]))
+    if params[:id]
+      b = Bike.find(params[:id])
+    else
+      b = Bike.find_by_card_id(params[:card_id])
+    end
+    redirect_to bike_url(b)
   end
 
   def spokecard
     @title = "Bike spokecard"
-    @bike = Bike.find(params[:id])
-    if @bike.verified?
-      render layout: false  
-    else
-      flash[:error] = "Whoops, we can't make a spoke card for that bike. Perhaps it wasn't registered at a bike shop?"
-      redirect_to user_home_url
-    end
+    @qrcode = "#{bike_url(Bike.find(params[:id]))}.gif"
+    render layout: false
   end
 
   def new

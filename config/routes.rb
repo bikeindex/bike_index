@@ -58,6 +58,7 @@ Bikeindex::Application.routes.draw do
   end
   
   resources :bikes do
+    collection { get :scanned }
     member do
      get 'spokecard'
      get 'scanned'

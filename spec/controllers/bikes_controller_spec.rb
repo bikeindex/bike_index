@@ -25,15 +25,23 @@ describe BikesController do
   end
 
   describe :spokecard do
-    it "shouldn't render the page if the bike isn't verified" do 
+    it "should render the page from bike id" do 
       bike = FactoryGirl.create(:bike)
       get :spokecard, id: bike.id
-      response.code.should eq('302')
-    end
-    it "should render the page" do 
-      bike = FactoryGirl.create(:bike, verified: true)
-      get :spokecard, id: bike.id
       response.code.should eq('200')
+    end
+  end
+
+  describe :scanned do 
+    it "should render the page from bike id" do 
+      bike = FactoryGirl.create(:bike)
+      get :scanned, id: bike.id
+      response.should redirect_to bike_url(bike)
+    end
+    it "should redirect to the proper page" do 
+      bike = FactoryGirl.create(:bike, card_id: 2)
+      get :scanned, card_id: bike.card_id
+      response.should redirect_to bike_url(bike)
     end
   end
 

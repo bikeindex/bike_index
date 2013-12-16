@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131213185845) do
+ActiveRecord::Schema.define(:version => 20131216154423) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -95,6 +95,7 @@ ActiveRecord::Schema.define(:version => 20131213185845) do
     t.string   "frame_paint_description"
     t.string   "serial_normalized"
     t.string   "pdf"
+    t.integer  "card_id"
   end
 
   add_index "bikes", ["creation_organization_id"], :name => "index_bikes_on_organization_id"

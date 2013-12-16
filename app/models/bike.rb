@@ -53,6 +53,7 @@ class Bike < ActiveRecord::Base
     :b_param_id,
     :cached_attributes,
     :embeded,
+    :card_id,
     :pdf 
 
   mount_uploader :pdf, PdfUploader
@@ -93,7 +94,7 @@ class Bike < ActiveRecord::Base
   validates_presence_of :creator
   validates_presence_of :manufacturer_id
   
-  # Comment below validations out when you first push to server
+  validates_uniqueness_of :card_id, allow_nil: true
   validates_presence_of :primary_frame_color_id
   validates_presence_of :rear_wheel_size_id
   validates_inclusion_of :rear_tire_narrow, :in => [true, false]
