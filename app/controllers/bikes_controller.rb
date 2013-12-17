@@ -57,7 +57,8 @@ class BikesController < ApplicationController
       @bike.pdf = File.open(save_path)
       @bike.save
     # end
-    send_file @bike.pdf.url, :type=>"application/pdf", :x_sendfile=>true
+    render :pdf => @bike.pdf.url
+    # send_file @bike.pdf.path, :type=>"application/pdf", :x_sendfile=>true
   end
 
   def scanned
