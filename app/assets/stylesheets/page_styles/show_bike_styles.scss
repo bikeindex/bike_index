@@ -169,6 +169,16 @@ header.single-bike {
   }
 }
 
+.printable-registration {
+  display: block;
+  margin-top: 40px;
+}
+
+@media (min-width: 900px) {
+  .printable-registration {
+    margin-top: 80px;
+  }
+}
 
 // .bike-boxes {
 //   list-style-type: none;
