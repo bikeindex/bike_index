@@ -23,8 +23,10 @@
       .mnfg-logo
         %img{ src: @bike.manufacturer.logo_location }
     - if @bike.public_images.present?
-      %img.bike-photo{ src: root_url + @bike.public_images.first.image_url }
-    
+      - if Rails.env.development?
+        %img.bike-photo{ src: root_url + @bike.public_images.first.image_url }
+      - else
+        %img.bike-photo{ src: root_url + @bike.public_images.first.image_url }
     %h1
       - if @bike.stolen
         %span.stolen-color
