@@ -43,11 +43,14 @@ class BikesController < ApplicationController
   end
 
   def pdf
-    @bike = Bike.find(params[:id]).decorate
-    # render :pdf => 'registration_pdf'
+    bike = Bike.find(params[:id])
+    unless bike.owner == current_user
+      flash[:error] = "Sorry, that's not your bike!"
+      redirect_to bike_path(bike) and return 
+    end
+    @bike = bike.decorate
     filename = "Registration_" + @bike.updated_at.strftime("%m%d_%H%M")[0..-1]
-
-    # unless @bike.pdf.present? && @bike.pdf.file.identifier == "#{filename}.pdf"
+    unless @bike.pdf.present? && @bike.pdf.file.identifier == "#{filename}.pdf"
       pdf = render_to_string pdf: filename, template: 'bikes/pdf.html.haml'
       save_path = "#{Rails.root}/tmp/#{filename}.pdf"
       File.open(save_path, 'wb') do |file| 
@@ -56,9 +59,8 @@ class BikesController < ApplicationController
       # @bike.pdf = File.open(pdf, 'wb') { |file| file << pdf }
       @bike.pdf = File.open(save_path)
       @bike.save
-    # end
-    render :pdf => @bike.pdf.url
-    # send_file @bike.pdf.path, :type=>"application/pdf", :x_sendfile=>true
+    end
+    redirect_to @bike.pdf.url
   end
 
   def scanned
