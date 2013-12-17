@@ -46,25 +46,17 @@ class BikesController < ApplicationController
     @bike = Bike.find(params[:id]).decorate
     # render :pdf => 'registration_pdf'
     filename = "Registration_" + @bike.updated_at.strftime("%m%d_%H%M")[0..-1]
-    # unless @bike.pdf.present? && @bike.pdf.file.identifier == "#{filename}.pdf"
-      # pdf = render_to_string pdf: filename, template: 'bikes/pdf.html.haml'
-      # save_path = "#{Rails.root}/tmp/uploads/#{filename}.pdf"
-      # File.open(save_path, 'wb') do |file| 
-      #   file << pdf
-      # end
-      # @bike.pdf = File.open(pdf, 'wb') { |file| file << pdf }
-      # @bike.save
-    # end
 
-    unless @bike.pdf.present? && @bike.pdf.file.identifier == "#{filename}.pdf"
+    # unless @bike.pdf.present? && @bike.pdf.file.identifier == "#{filename}.pdf"
       pdf = render_to_string pdf: filename, template: 'bikes/pdf.html.haml'
       save_path = "#{Rails.root}/tmp/#{filename}.pdf"
       File.open(save_path, 'wb') do |file| 
         file << pdf
       end
+      # @bike.pdf = File.open(pdf, 'wb') { |file| file << pdf }
       @bike.pdf = File.open(save_path)
       @bike.save
-    end
+    # end
     send_file @bike.pdf.path, :type=>"application/pdf", :x_sendfile=>true
   end
 
