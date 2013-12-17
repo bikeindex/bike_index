@@ -20,7 +20,7 @@ gem 'rdiscount'
 gem 'will_paginate', '~> 3.0'
 gem 'pg_search'
 gem 'nokogiri', '~> 1.6.0'
-gem 'carrierwave'
+gem 'carrierwave', '~> 0.9.0'
 gem 'rmagick'
 gem "mini_magick" # a smaller implementation of rmagick, required for rqrcode
 gem 'rqrcode-rails3'

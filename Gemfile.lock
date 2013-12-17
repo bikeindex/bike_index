@@ -414,7 +414,7 @@ DEPENDENCIES
   bullet
   capistrano (~> 2.15.5)
   capistrano-resque (~> 0.1.0)
-  carrierwave
+  carrierwave (~> 0.9.0)
   coffee-rails (~> 3.2.1)
   dalli
   database_cleaner
