@@ -75,14 +75,15 @@
                   Department
                 %td
                   = @bike.current_stolen_record.police_report_department
-  .description
-    %p
-      %em
-        Bike description:
-      - if @bike.stolen
-        = @bike.description.truncate(500)
-      - else
-        = @bike.description
+  - if @bike.description.present?
+    .description
+      %p
+        %em
+          Bike description:
+        - if @bike.stolen
+          = @bike.description.truncate(500)
+        - else
+          = @bike.description
   .details-container
     .bike-details
       %table.table.table-striped
