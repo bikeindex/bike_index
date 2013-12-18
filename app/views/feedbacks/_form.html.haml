@@ -1,0 +1,23 @@
+= form_for @feedback do |f|
+  - if @feedback.errors.any?
+    #alert-block
+      .alert.alert-error
+        %a.close{"data-dismiss" => "alert"} ×
+        %h4
+          Please fix the following 
+          = pluralize(@feedback.errors.count, "error")
+        %ul
+          - @feedback.errors.full_messages.each do |msg|
+            %li 
+              = msg  
+
+  .feedbacks
+    .contact-info
+      = f.text_field :name, placeholder: "Enter your name", value: current_user ? current_user.name : ""
+      = f.email_field :email, placeholder: "Enter your email address", value: current_user ? current_user.email : ""
+      = f.text_field :title, placeholder: "Your subject title"
+    .contact-text
+      = f.text_area :body, placeholder: "Enter your message", rows: 7   
+    .feedback-actions.control-group
+      = f.submit 'Submit!', class: 'button-green pull-right'
+  

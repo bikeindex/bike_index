@@ -43,6 +43,10 @@ describe BikesController do
       get :scanned, card_id: bike.card_id
       response.should redirect_to bike_url(bike)
     end
+    it "should render a page if there isn't a connection" do 
+      get :scanned, card_id: 12
+      response.code.should eq('200')
+    end
   end
 
   describe :new do 

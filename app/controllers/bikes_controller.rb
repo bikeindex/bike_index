@@ -69,7 +69,9 @@ class BikesController < ApplicationController
     else
       b = Bike.find_by_card_id(params[:card_id])
     end
-    redirect_to bike_url(b)
+    redirect_to bike_url(b) if b.present?
+    @feedback = Feedback.new
+    @card_id = params[:card_id]
   end
 
   def spokecard

@@ -1,0 +1,34 @@
+.receptacle.overfloating
+  .inner-recep
+    %h1
+      Oh no! That spokecard isn't linked to a bike
+
+    %h3.padded
+      Tell us what bike it should connected to!
+    
+    = form_for @feedback do |f|
+      - if @feedback.errors.any?
+        #alert-block
+          .alert.alert-error
+            %a.close{"data-dismiss" => "alert"} ×
+            %h4
+              Please fix the following 
+              = pluralize(@feedback.errors.count, "error")
+            %ul
+              - @feedback.errors.full_messages.each do |msg|
+                %li 
+                  = msg  
+
+      .feedbacks.padded
+        .contact-info
+          = f.text_field :name, placeholder: "Enter your name", value: current_user ? current_user.name : ""
+          = f.email_field :email, placeholder: "Enter your email address", value: current_user ? current_user.email : ""
+          = f.hidden_field :title, value: @card_id
+        .contact-text
+          - if current_user.present? && current_user.bikes.any?
+            - bike_urls = "I would like to connect this bike https://bikeindex.org/bikes/#{current_user.bikes.first}"
+
+          = f.text_area :body, placeholder: "Bike url it should be associated with (and anything else you want to say)", rows: 7, value: bike_urls ? bike_urls : ""
+        .feedback-actions.control-group
+          = f.submit 'Submit!', class: 'button-green pull-right'
+        
