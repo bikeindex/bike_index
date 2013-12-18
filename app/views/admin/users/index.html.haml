@@ -9,13 +9,11 @@
   %table#admin-users-table.table.table-striped.table-bordered
     %thead
       %th
-        Id&nbsp;
+        Email
       %th.medium-screens
         Created
       %th.large-screens
         Name  
-      %th
-        Email
       %th
         Bikes
       %th.medium-screens
@@ -28,7 +26,7 @@
       - @users.each do |user|
         %tr
           %td
-            = link_to user.id, edit_admin_user_url(user)
+            = link_to user.email, edit_admin_user_url(user)
           %td.medium-screens
             - if user.created_at.today?
               %span.hidden
@@ -45,8 +43,6 @@
           %td.large-screens
             - if user.name?
               = user.name
-          %td
-            = user.email
           %td
             = user.ownerships.count
           %td.medium-screens

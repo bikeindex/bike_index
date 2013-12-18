@@ -5,6 +5,17 @@
   .span6.padded
     = render partial: "form"
 
+- if @bikes.any?
+  %h3.padded
+    %span
+      #{@user.email}
+    Bikes
+  %ul
+    - @bikes.each do |bike|
+      %li
+        = link_to bike.title, edit_admin_bike_url(bike)
+
+
 %h3.padded
   %span
     #{@user.email}

@@ -30,6 +30,7 @@ class Admin::BikesController < Admin::BaseController
 
   def update
     BikeUpdator.new(user: current_user, b_params: params).update_ownership
+    @bike = @bike.decorate
     if @bike.update_attributes(params[:bike])
       redirect_to edit_admin_bike_url(@bike), notice: 'Bike was successfully updated.'
     else
