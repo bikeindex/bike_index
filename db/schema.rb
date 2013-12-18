@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131216154423) do
+ActiveRecord::Schema.define(:version => 20131218201839) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -321,6 +321,7 @@ ActiveRecord::Schema.define(:version => 20131216154423) do
     t.datetime "deleted_at"
     t.boolean  "is_suspended",               :default => false, :null => false
     t.integer  "embedable_user_id"
+    t.boolean  "is_police"
   end
 
   add_index "organizations", ["slug"], :name => "index_organizations_on_slug", :unique => true

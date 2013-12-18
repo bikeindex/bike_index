@@ -50,7 +50,7 @@ class BikesController < ApplicationController
     end
     @bike = bike.decorate
     filename = "Registration_" + @bike.updated_at.strftime("%m%d_%H%M")[0..-1]
-    unless @bike.pdf.present? && @bike.pdf.file.identifier == "#{filename}.pdf"
+    unless @bike.pdf.present? && @bike.pdf.file.filename == "#{filename}.pdf"
       pdf = render_to_string pdf: filename, template: 'bikes/pdf.html.haml'
       save_path = "#{Rails.root}/tmp/#{filename}.pdf"
       File.open(save_path, 'wb') do |file| 

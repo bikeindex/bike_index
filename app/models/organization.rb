@@ -8,6 +8,7 @@ class Organization < ActiveRecord::Base
     :default_bike_token_count,
     :show_on_map,
     :is_suspended,
+    :is_police,
     :locations_attributes,
     :embedable_user_email,
     :embedable_user_id

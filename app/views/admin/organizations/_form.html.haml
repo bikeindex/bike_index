@@ -53,6 +53,12 @@
 
 .control-group.padded
   .control-label
+    = f.label :is_police, "Police department"
+  .controls
+    = f.check_box :is_police
+
+.control-group.padded
+  .control-label
     = f.label :website
   .controls
     = f.text_field :website
