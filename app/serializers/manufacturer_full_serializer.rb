@@ -4,7 +4,6 @@ class ManufacturerFullSerializer < ActiveModel::Serializer
     :slug,
     :website,
     :frame_maker,
-    :logo_location,
     :description
 
 end

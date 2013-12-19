@@ -17,7 +17,6 @@ describe Manufacturer do
       @manufacturer.frame_maker.should be_true
       @manufacturer.open_year.should eq(1900)
       @manufacturer.close_year.should eq(3000)
-      @manufacturer.logo_location.should eq('http://example.com')
       @manufacturer2 = Manufacturer.find_by_slug("wethepeople")
       @manufacturer2.website.should eq('http://wethepeople.com')
     end
@@ -28,8 +27,6 @@ describe Manufacturer do
       second_import_file = File.open(Rails.root.to_s + "/spec/manufacturer-test-import-second.csv")
       Manufacturer.import(second_import_file)
       @manufacturer = Manufacturer.find_by_slug("surly-bikes")
-      @manufacturer.logo_location.should eq('http://NEWTHING.com')
-
     end
 
   end

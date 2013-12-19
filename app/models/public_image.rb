@@ -4,6 +4,7 @@ class PublicImage < ActiveRecord::Base
   mount_uploader :image, ImageUploader
 
   belongs_to :imageable, polymorphic: true
+  has_many :manufacturers
 
   before_create :default_name
 

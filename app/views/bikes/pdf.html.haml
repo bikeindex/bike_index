@@ -19,9 +19,9 @@
 
 %body
   %header
-    - if @bike.manufacturer.logo_location
+    - if @bike.manufacturer.logo && @bike.manufacturer.logo.url != "https://s3.amazonaws.com/bikeindex/blank.png"
       .mnfg-logo
-        %img{ src: @bike.manufacturer.logo_location }
+        %img{ src: @bike.manufacturer.logo }
     - if @bike.public_images.present?
       - if Rails.env.development?
         %img.bike-photo{ src: root_url + @bike.public_images.first.image_url }

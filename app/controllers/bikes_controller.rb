@@ -60,6 +60,7 @@ class BikesController < ApplicationController
       @bike.pdf = File.open(save_path)
       @bike.save
     end
+    # render :pdf => 'registration_pdf', :show_as_html => true
     redirect_to @bike.pdf.url
   end
 

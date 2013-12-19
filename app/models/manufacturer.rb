@@ -5,12 +5,15 @@ class Manufacturer < ActiveRecord::Base
     :frame_maker,    
     :open_year,
     :close_year,
-    :logo_location,
+    :logo,
+    :logo_cache,
     :description
 
   validates_presence_of :name
   validates_uniqueness_of :name
   validates_uniqueness_of :slug
+
+  mount_uploader :logo, AvatarUploader
 
   def to_param
     slug

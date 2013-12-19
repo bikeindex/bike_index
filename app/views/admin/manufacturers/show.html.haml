@@ -7,8 +7,6 @@
 %article
   %h2 
     = @manufacturer.slug
-  - if @manufacturer.logo_location.present?
-    = image_tag @manufacturer.logo_location
   - if @manufacturer.frame_maker
     %h4
       #{@manufacturer.name} makes Frames
@@ -17,8 +15,10 @@
     = @manufacturer.dl_from_attribute("close_year")
     = @manufacturer.dl_list_item(link_to(@manufacturer.website, @manufacturer.website), "Website")
     = @manufacturer.dl_from_attribute("description")
+  - if @manufacturer.logo.present?
+    = image_tag @manufacturer.logo.url(:thumb)
 
   
-.actions
+.actions.padded
   = link_to "Edit", edit_admin_manufacturer_url(@manufacturer), class: "button-green"
   = link_to "Delete", admin_manufacturer_url(@manufacturer), method: :delete, confirm: "Are you sure?", class: "button-red"
