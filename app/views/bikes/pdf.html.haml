@@ -131,7 +131,7 @@
                   Front gears
                 %td
                   = @bike.front_gear_type.name
-            - if @bike.rear_gear_type_id.present?
+            - if @bike.rear_gear_type.present?
               %tr
                 %td.td-title
                   Rear gears
