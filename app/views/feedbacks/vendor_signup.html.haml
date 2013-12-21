@@ -33,9 +33,9 @@
           Do you have fliers?
         %p
           Yes! You can print out 
-          %a{href: "https://s3.amazonaws.com/bikeindex/Add+bike+form+v2.pdf"}
+          %a{href: "https://s3.amazonaws.com/bikeindex/Bike+Index+display.pdf"}
             this pdf
-          and cut it into four sections so customers can write down their information.
+          to show that you register bikes.
 
       %li
         %span.blue-bullet
@@ -43,32 +43,32 @@
           This sounds awesome! How do I sign up?
         %p
           Just submit the form below!
-          / %br
-          / If you'd like you can read through the #{link_to "vendor terms of service", vendor_terms_path}.
 
 
   = form_for @feedback do |f|
 
     - if @feedback.errors.any?
-      #flash.alert.alert-error
-        %button.close{ :data => {dismiss: "alert" }}
-          x
-        %h4
-          Please fix the following #{pluralize(@feedback.errors.count, "error")}:
-        %ul
-          - @feedback.errors.full_messages.each do |msg|
-            %li
-              = msg 
+      #alert-block
+        .alert.alert-error
+          %a.close{"data-dismiss" => "alert"} ×
+          %h4
+            Please fix the following 
+            = pluralize(@feedback.errors.count, "error")
+          %ul
+            - @feedback.errors.full_messages.each do |msg|
+              %li 
+                = msg  
     
     
     
     .vendor-signup-form
       .contact-info
-        = f.text_field :email, placeholder: "Enter your email address"
-        = f.text_field :title, placeholder: "Your phone number"
-        = f.text_field :name, placeholder: "Enter your shop's name"
+        = f.email_field :email, required: true, placeholder: "Enter your email address", value: current_user ? current_user.email : ""
+        = f.hidden_field :feedback_type, value: 'shop_submission'
+        = f.text_field :title, required: true, placeholder: "Your phone number"
+        = f.text_field :name, required: true, placeholder: "Enter your shop's name"
       .contact-text
-        = f.text_area :body, placeholder: "Where is your shop located?", rows: 7
+        = f.text_area :body, required: true, placeholder: "Where is your shop located?", rows: 7
       .feedback-actions.control-group
         = f.submit 'Submit request', class: 'button-green pull-right'
     

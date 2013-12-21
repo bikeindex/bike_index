@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131219182417) do
+ActiveRecord::Schema.define(:version => 20131221193910) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -174,8 +174,9 @@ ActiveRecord::Schema.define(:version => 20131219182417) do
     t.string   "email"
     t.string   "title"
     t.text     "body"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+    t.string   "feedback_type"
   end
 
   create_table "flavor_texts", :force => true do |t|
