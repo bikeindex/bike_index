@@ -12,6 +12,8 @@ class BikeIndex.Views.Global extends Backbone.View
     BikeIndex.hideFlash()
     @setElement($('#body'))
     @loadChosen() if $('#chosen-container').length > 0
+    if $('#what-spokecards-are').length > 0
+      $('.spokecard-extension').addClass('on-spokecard-page')
     
 
   loadUserHeader: ->

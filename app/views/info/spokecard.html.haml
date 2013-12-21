@@ -1,8 +1,34 @@
-%h1
-  So you want a wicked spokecard, eh?
+%h1#what-spokecards-are
+  Spokecards
 
 %p
-  Every fully registered bicycle on the Bike Index has a spoke card with a QR code that directs to the bike's page on the index.
+  = link_to "Spokecards", "https://en.wikipedia.org/wiki/Spokecard", target: '_blank'
+  are cards placed in the spokes of a bicycle wheel. They are held in place by overlapping spokes.
+
+  = image_tag '/assets/spokecard-demo.jpg', alt: 'Bike Index spokecard, showin off', class: 'spokecard-demo'
+
+
+
+%h2#index-specifics
+  Bike Index spokecards
+%p
+  Bike Index spokecards have a
+  = link_to "QR code", "https://en.wikipedia.org/wiki/QR_code", target: '_blank'
+  that links to a specific bike registration on the Index. You can read the QR code with a free app on your 
+  = link_to "iOS", "https://itunes.apple.com/us/app/qr-reader-for-iphone/id368494609"
+  or 
+  = link_to "Andriod", "https://play.google.com/store/apps/details?id=uk.tapmedia.qrreader"
+  device. When you scan the qr code it will go to your bike's page on the Bike Index!
+
+%p
+  If you were sent a spokecard by the Bike Index, it may not be linked to your bike. When you scan the card you will get sent to a page that asks for your email.
+
+
+%h2#making-one
+  Making your own
+
+%p
+  So you wanna have your own wicked cool spokecard?
 
 %h3
   Steps:
@@ -11,10 +37,6 @@
     %span.blue-bullet
     %p
       Print out the code
-  %li
-    %span.blue-bullet
-    %p
-      Cut out the print out (that's why we give cutting guides)
   %li
     %span.blue-bullet
     %p
@@ -70,11 +92,4 @@
   %li
     %span.bullet-point
     %p
-      If you'd like to have a double sided spoke card, you'll have to print out double sided. Putting two pages together doesn't work, it peels apart.
-
-%p
-  We're working on designing a cooler spoke card, check back later. We'll have better instructions too...
-
-
-%article.content-comments
-  = render "/shared/disqus"
+      If you'd like to have a double sided spoke card, you'll have to print out double sided. Putting two pages together doesn't work terribly well, it peels apart.

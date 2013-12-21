@@ -64,9 +64,6 @@
   }
 }
 
-
-
-
 .page-content {
   position: relative;
   padding: 40px 20px;
@@ -295,6 +292,33 @@
     margin: 0 0 30px;
   }
 }
+
+.page-content .spokecard-demo, .page-content .spokecard-error {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  display: block;
+  padding-right: 0;
+}
+.spokecard-error {
+  border: 1px solid $grayLighter;
+}
+
+@media (min-width: 540px) {
+  .spokecard-demo { max-width: 500px; }
+}
+
+.content-sections .active-menu ul.spokecard-extension { display: none; }
+
+@media (min-width: 780px) {
+  .content-sections .active-menu ul.spokecard-extension.on-spokecard-page {
+    display: block;
+    li {
+      margin-top: .1em;
+      a { font-size: .9em; }
+    }
+  }
+}
+
 
 
 

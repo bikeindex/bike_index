@@ -38,7 +38,16 @@
             %li
               = nav_link "List of manufacturers", manufacturers_url
             %li
-              = nav_link "Making a Bike Index spokecard", spokecard_url
+              = nav_link "Bike Index spokecards", spokecard_url
+              %ul.spokecard-extension
+                %li
+                  = link_to "Spokecards?", spokecard_url(anchor: 'what-spokecards-are')
+                %li
+                  = link_to "About Bike Index spokecards", spokecard_url(anchor: 'index-specifics')
+                  
+                %li
+                  = link_to "Making your own", spokecard_url(anchor: 'making-one')
+                  
         %li.contact-nav-btns{ class: content_nav_class("contact") }
           = nav_link "Contact", contact_us_url
           %ul
