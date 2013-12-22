@@ -2,6 +2,23 @@
 # See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
 
 en:
+  meta_title:
+    bikes_index: "Bike Index search"
+    new_bike_stolen_true: "Register a stolen bike"
+    new_bike_stolen_false: "Register a bike"
+    feedbacks_vendor_signup: "Bike shop sign up"
+    feedbacks_new: "Contact us"
+    blogs_index: "Bike Index blog"
+  meta_descriptions:
+    base_description: "Bike registration that works: online, powerful, free."
+    info_about: "About the Bike Index"
+    info_resources: "Bike Index resources"
+    bikes_index: "Search for bikes that have been registered on the Bike Index"
+    new_bike_stolen_true: "Register a stolen bike on the Bike Index"
+    new_bike_stolen_false: "Register a bike on the Bike Index"
+    feedbacks_vendor_signup: "Sign up with the Bike Index to register your customers' bikes quickly, easily and for free."
+    feedbacks_new: "Contact the Bike Index. Your words are our muse, please whisper them in our ear."
+    blogs_index: "Read about what the Bike Index has been up to recently. Also, periodically, learn magic spells."
   time:
     formats:
       standard_display: "%A, %B %d"

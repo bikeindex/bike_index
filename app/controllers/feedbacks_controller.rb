@@ -8,7 +8,7 @@ class FeedbacksController < ApplicationController
   end
 
   def vendor_signup
-    @title = "Shop signup"
+    @title = ""
     @feedback = Feedback.new
   end
 

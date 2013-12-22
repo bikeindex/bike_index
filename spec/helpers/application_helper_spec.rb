@@ -1,13 +1,6 @@
 require 'spec_helper'
 
-describe ApplicationHelper do
-  describe :titleation do 
-    it "should return title format from things" do 
-      @title = "About"
-      helper.titleation.should eq("About - Bike Index")
-    end
-  end
-  
+describe ApplicationHelper do 
   describe :nav_link do 
     it "should return the link active if it ought to be" do 
       view.stub(:current_page?).and_return(true)

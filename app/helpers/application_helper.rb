@@ -1,11 +1,4 @@
-module ApplicationHelper
-
-  def titleation
-    title = "Bike Index"
-    title = "#{@title} - #{title}" if @title.present?
-    return title
-  end
-  
+module ApplicationHelper 
   def nav_link(link_text, link_path)
     class_name = current_page?(link_path) ? 'active' : ''
     class_name = "active" if controller_name == "blogs" && link_path == blogs_url

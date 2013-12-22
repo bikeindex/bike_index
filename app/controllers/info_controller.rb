@@ -1,8 +1,6 @@
 class InfoController < ApplicationController
   layout 'content'
   # caches_page :about, :where, :roadmap, :security, :serials, :stolen_bikes, :privacy, :terms, :vendor_terms, :downloads, :resources, :spokecard
-  before_filter :set_title
-
   def about
     @active_section = "about"
   end
@@ -56,9 +54,4 @@ class InfoController < ApplicationController
       @bikes = Bike.find(current_user.bikes)
     end
   end
-
-  def set_title
-    @title = action_name.titleize
-  end
-
 end

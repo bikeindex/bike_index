@@ -98,12 +98,4 @@ describe InfoController do
     it { should render_template(:spokecard)}
   end
 
-  describe :set_title do
-    it "should set the title based on the current action" do 
-      controller.should_receive(:action_name).and_return("about bikey things")
-      controller.set_title.should eq("About Bikey Things")
-    end
-  end
-  
-
 end

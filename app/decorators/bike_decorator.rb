@@ -31,6 +31,13 @@ class BikeDecorator < ApplicationDecorator
     h.content_tag(:span, t) + h.content_tag(:strong, mnfg_name)
   end
 
+  def title_string
+    t = ""
+    t += "#{object.frame_manufacture_year} " if object.frame_manufacture_year.present?
+    t += "#{object.frame_model} " if object.frame_model.present?
+    t += mnfg_name
+  end
+
   def phoneable_by(user = nil)
     return nil unless object.current_stolen_record.present?
     return true if object.current_stolen_record.phone_for_everyone
