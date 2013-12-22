@@ -34,8 +34,22 @@ class BikeDecorator < ApplicationDecorator
   def title_string
     t = ""
     t += "#{object.frame_manufacture_year} " if object.frame_manufacture_year.present?
+    t += "#{mnfg_name} "
     t += "#{object.frame_model} " if object.frame_model.present?
-    t += mnfg_name
+    if object.type == "bike"
+      t += "bicycle"
+    else
+      t += "#{object.type}" 
+    end
+    t
+  end
+
+  def stolen_string
+    return nil unless object.stolen and object.current_stolen_record.present?
+    s = "Stolen "
+    s += "#{object.current_stolen_record.date_stolen.strftime("%m-%d-%Y")}. " if object.current_stolen_record.date_stolen.present?
+    s += "from #{object.current_stolen_record.address}. " if object.current_stolen_record.address.present?
+    s
   end
 
   def phoneable_by(user = nil)

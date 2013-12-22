@@ -121,6 +121,7 @@ describe HeaderTagHelper do
       @bike = Bike.new
       @bike.stub(:title_string).and_return("Something special 1969")
       @bike.stub(:stolen).and_return("true")
+      @bike.stub(:stolen_string).and_return("")
       @bike.stub(:frame_colors).and_return(["blue"])
       view.stub(:action_name).and_return("show")
       hash = helper.bikes_header_tags

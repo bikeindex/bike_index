@@ -91,7 +91,7 @@ protected
     end
     if action_name == 'show'
       hash[:title_tag][:title] = "#{'Stolen ' if @bike.stolen }#{@bike.title_string}"
-      hash[:meta_tags][:description] = "#{'Stolen ' if @bike.stolen }#{@bike.frame_colors.to_sentence} #{@bike.title_string}, serial: #{@bike.serial_number}"
+      hash[:meta_tags][:description] =  "#{@bike.frame_colors.to_sentence} #{@bike.title_string}, serial: #{@bike.serial_number}. #{@bike.stolen_string}#{@bike.description}"
     end
     if action_name == 'edit'
       hash[:title_tag][:title] = "Edit #{@bike.title_string}"
