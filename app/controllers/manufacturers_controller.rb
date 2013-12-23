@@ -3,7 +3,6 @@ class ManufacturersController < ApplicationController
   before_filter :set_manufacturers_active_section
 
   def index
-    @title = "Manufacturers"
     @manufacturers = Manufacturer.all
     respond_to do |format|
       format.html
@@ -12,7 +11,6 @@ class ManufacturersController < ApplicationController
   end
 
   def mock_csv
-    @title = "Manufacturers csv"
     @manufacturers = Manufacturer.all
     render layout: false
   end
@@ -21,7 +19,6 @@ class ManufacturersController < ApplicationController
     manufacturer = Manufacturer.find_by_slug(params[:id])
     raise ActionController::RoutingError.new('Not Found') unless manufacturer.present?
     @manufacturer = manufacturer.decorate
-    @title = manufacturer.name
   end
 
   def set_manufacturers_active_section

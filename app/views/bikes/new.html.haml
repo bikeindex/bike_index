@@ -1,95 +1,103 @@
-- if @bike.errors.any?
-  #alert-block
-    .alert.alert-error
-      %a.close{"data-dismiss" => "alert"} ×
-      %h4
-        Please fix the following 
-        = pluralize(@bike.errors.count, "error")
-      %ul
-        - @bike.errors.full_messages.each do |msg|
-          %li
-            = msg
+- if current_user.present?
+  - if @bike.errors.any?
+    #alert-block
+      .alert.alert-error
+        %a.close{"data-dismiss" => "alert"} ×
+        %h4
+          Please fix the following 
+          = pluralize(@bike.errors.count, "error")
+        %ul
+          - @bike.errors.full_messages.each do |msg|
+            %li
+              = msg
 
-#chosen-container.new-bike-container{ class: "#{"stolen-add" if @bike.stolen}" }
-  = form_for @bike, :html => { class: "receptacle form-horizontal" }, :multipart => true do |f|
-    = f.hidden_field :cycle_type_id
-    = f.hidden_field :b_param_id
-    - if @bike.location_id.present?
-      = f.hidden_field :location_id, value: @location.id
-    - if @bike.creation_organization_id.present?
-      = f.hidden_field :creation_organization_id
-    - if @bike.created_with_token.present?
-      = hidden_field_tag :bike_token_id, @bike.bike_token_id
+  #chosen-container.new-bike-container{ class: "#{"stolen-add" if @bike.stolen}" }
+    = form_for @bike, :html => { class: "receptacle form-horizontal" }, :multipart => true do |f|
+      = f.hidden_field :cycle_type_id
+      = f.hidden_field :b_param_id
+      - if @bike.location_id.present?
+        = f.hidden_field :location_id, value: @location.id
+      - if @bike.creation_organization_id.present?
+        = f.hidden_field :creation_organization_id
+      - if @bike.created_with_token.present?
+        = hidden_field_tag :bike_token_id, @bike.bike_token_id
 
-    .inner-recep
-      .adding-bike       
-        %h1
-          Add a
-          - if @bike.stolen
-            %span.stolen-color
-              stolen
-        .dropdown
-          %a.dropdown-toggle#cycletypeBtn{ href: "/", role: "button", :data => { toggle: "dropdown", target:"#"} }
-            %span.craft-button
-              %strong#cycletype-text
-                Bike
-              %span
-                not adding a standard bike?
-                %b.caret
-            %ul.dropdown-menu#select-cycletype{ role: "menu", :aria =>{ labelledby: "cycletypeBtn" } }
-              - CycleType.all.each do |type|
-                %li
-                  %a.clickable{ id: "cycletype#{type.id}", :data => {id: type.id}, class: ("long-title" if type.name.length > 8) }
-                    = type.name
-              
-        %h2
-          to the Index
+      .inner-recep
+        .adding-bike       
+          %h1
+            Add a
+            - if @bike.stolen
+              %span.stolen-color
+                stolen
+          .dropdown
+            %a.dropdown-toggle#cycletypeBtn{ href: "/", role: "button", :data => { toggle: "dropdown", target:"#"} }
+              %span.craft-button
+                %strong#cycletype-text
+                  Bike
+                %span
+                  not adding a standard bike?
+                  %b.caret
+              %ul.dropdown-menu#select-cycletype{ role: "menu", :aria =>{ labelledby: "cycletypeBtn" } }
+                - CycleType.all.each do |type|
+                  %li
+                    %a.clickable{ id: "cycletype#{type.id}", :data => {id: type.id}, class: ("long-title" if type.name.length > 8) }
+                      = type.name
+                
+          %h2
+            to the Index
 
-      .new-bike-fields
+        .new-bike-fields
 
-        = render :partial => 'bikes/bike_fields/new_bike', :locals => { :f => f }
+          = render :partial => 'bikes/bike_fields/new_bike', :locals => { :f => f }
 
 
-        - if @bike.stolen?
-          = f.hidden_field :stolen, value: true
-          = hidden_field_tag :stolen, value: true
+          - if @bike.stolen?
+            = f.hidden_field :stolen, value: true
+            = hidden_field_tag :stolen, value: true
+            .input-group
+              %a.bikeform-tip{role: "button", title: "Why do we want your phone number?", :data => {toggle: "modal", target: "#phoneTip"} }
+                %span
+                  ?
+              .control-group
+                = f.label :phone, class: "control-label"
+                .controls
+
+                  = f.text_field :phone, required: "true", value: current_user.phone
+          
           .input-group
-            %a.bikeform-tip{role: "button", title: "Why do we want your phone number?", :data => {toggle: "modal", target: "#phoneTip"} }
+            %a.bikeform-tip{role: "button", title: "An explanation of the email field.", :data => {toggle: "modal", target: "#emailTip"} }
               %span
                 ?
             .control-group
-              = f.label :phone, class: "control-label"
+              %label.control-label{ for: 'bike_owner_email' }
+                Owner email address
               .controls
+                - o_email = current_user.email unless @bike.creation_organization
+                = f.email_field :owner_email, value: o_email
+          
+          .input-group.form-foot
+            = submit_tag "Register the bike", class: "button-green"
 
-                = f.text_field :phone, required: "true", value: current_user.phone
-        
-        .input-group
-          %a.bikeform-tip{role: "button", title: "An explanation of the email field.", :data => {toggle: "modal", target: "#emailTip"} }
-            %span
-              ?
-          .control-group
-            %label.control-label{ for: 'bike_owner_email' }
-              Owner email address
-            .controls
-              - o_email = current_user.email unless @bike.creation_organization
-              = f.email_field :owner_email, value: o_email
-        
-        .input-group.form-foot
-          = submit_tag "Register the bike", class: "button-green"
+        / .new-bike-photo
+        /   %p
+        /     Upload a photo of the bike now (if you'd like)
 
-      / .new-bike-photo
-      /   %p
-      /     Upload a photo of the bike now (if you'd like)
+        /     .filefield-button
+        /       Choose photo
+        /       = f.file_field :bike_image
+        /     #filepath
 
-      /     .filefield-button
-      /       Choose photo
-      /       = f.file_field :bike_image
-      /     #filepath
+  = render "/bikes/form_help/serial_tip"
+  = render "/bikes/form_help/frame_manufacturer_tip"
+  = render "/bikes/form_help/rear_wheel_tip"
+  = render "/bikes/form_help/color_tip"
+  = render "/bikes/form_help/handlebar_tip"
+  = render "/bikes/form_help/email_tip"      
+  = render "/bikes/form_help/phone_tip"
 
-= render "/bikes/form_help/serial_tip"
-= render "/bikes/form_help/frame_manufacturer_tip"
-= render "/bikes/form_help/rear_wheel_tip"
-= render "/bikes/form_help/color_tip"
-= render "/bikes/form_help/handlebar_tip"
-= render "/bikes/form_help/email_tip"      
-= render "/bikes/form_help/phone_tip"
+
+- else
+  .content
+    .receptacle
+      .inner-recep
+        = render :partial => "users/form"

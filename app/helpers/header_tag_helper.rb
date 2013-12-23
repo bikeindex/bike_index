@@ -38,7 +38,7 @@ protected
   end
 
   def default_hash
-    base_description = t "meta_descriptions.base_description"
+    base_description = t "meta_descriptions.welcome_index"
     tags = {
       :title_tag => { title: "Bike Index" },
       :meta_tags => {
@@ -75,19 +75,23 @@ protected
   end
 
   def welcome_header_tags
-    hash = default_hash
+    hash = current_page_auto_hash
     if action_name == 'user_home' 
       hash[:title_tag][:title] = "Your bikes"
       hash[:title_tag][:title] = current_user.name if current_user.name.present?
+    end
+    if action_name == 'choose_registration'
+      hash[:title_tag][:title] = t "meta_title.bikes_new"
+      hash[:meta_tags][:description] = t "meta_title.bikes_new"
     end
     hash
   end
 
   def bikes_header_tags
     hash = current_page_auto_hash
-    if action_name == 'new'
-      hash[:title_tag][:title] = t "meta_title.new_bike_stolen_#{@bike.stolen}"
-      hash[:meta_tags][:description] = t "meta_descriptions.new_bike_stolen_#{@bike.stolen}"
+    if action_name == 'new' && current_user.present? && @bike.stolen
+      hash[:title_tag][:title] = t "meta_title.bikes_new_stolen"
+      hash[:meta_tags][:description] = t "meta_descriptions.bikes_new_stolen"
     end
     if action_name == 'show'
       hash[:title_tag][:title] = "#{'Stolen ' if @bike.stolen }#{@bike.title_string}"

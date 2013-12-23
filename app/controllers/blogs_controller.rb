@@ -8,11 +8,9 @@ class BlogsController < ApplicationController
       raise ActionController::RoutingError.new('Not Found')
     end
     @blogger = @blog.user
-    @title = @blog.title
   end
 
   def index
-    @title = "Blog"
     @blogs = Blog.where(published: true)
   end
 

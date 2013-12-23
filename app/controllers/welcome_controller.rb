@@ -11,7 +11,6 @@ class WelcomeController < ApplicationController
   end
 
   def goodbye
-    @title = "goodbye"
   end
 
   def bust_z_cache
@@ -20,7 +19,6 @@ class WelcomeController < ApplicationController
   end
 
   def user_home
-    @title = "Home"
     if current_user.present?
       bikes = Bike.find(current_user.bikes)
       @bikes = BikeDecorator.decorate_collection(bikes)
@@ -37,11 +35,7 @@ class WelcomeController < ApplicationController
   end
 
   def choose_registration
-    unless current_user.present?
-      flash[:notice] = "Please create an account first!"
-      redirect_to new_user_path and return
-    end
-    @title = "Add a bike"
+    @user = User.new unless current_user.present?
   end
 
 end

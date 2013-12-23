@@ -15,11 +15,9 @@ end
 
 class BikesController < ApplicationController
   before_filter :ensure_user_for_edit, only: [:edit, :update, :pdf]
-  before_filter :ensure_user_for_new, only: [:new]
   layout 'no_container'
 
   def index
-    @title = "Bikes"
     search = BikeSearcher.new(params)
     bikes = search.find_bikes.page(params[:page]).per_page(24)
     @bikes = bikes.decorate
@@ -32,7 +30,6 @@ class BikesController < ApplicationController
 
   def show
     bike = Bike.find(params[:id])
-    @title = "#{bike.manufacturer.name}"
     @components = bike.components.decorate
     @bike = bike.decorate
     @stolen_notification = StolenNotification.new if @bike.stolen
@@ -76,17 +73,19 @@ class BikesController < ApplicationController
   end
 
   def spokecard
-    @title = "Bike spokecard"
     @qrcode = "#{bike_url(Bike.find(params[:id]))}.gif"
     render layout: false
   end
 
   def new
-    @title = "New bike"
-    b_param = BParam.create(creator_id: current_user.id, params: params)
-    @bike = BikeCreator.new(b_param).new_bike
-    if @bike.errors.any?
-      flash[:notice] = @bike.errors.full_messages
+    if current_user.present?
+      b_param = BParam.create(creator_id: current_user.id, params: params)
+      @bike = BikeCreator.new(b_param).new_bike
+      if @bike.errors.any?
+        flash[:notice] = @bike.errors.full_messages
+      end
+    else
+      @user = User.new 
     end
     render layout: 'no_header'
   end
@@ -135,7 +134,6 @@ class BikesController < ApplicationController
 
   def edit
     bike = Bike.find(params[:id])
-    @title = "Edit #{bike.manufacturer.name}"
     begin
       BikeUpdator.new(user: current_user, b_params: params).ensure_ownership!
       rescue UserNotLoggedInError => e
@@ -164,12 +162,6 @@ class BikesController < ApplicationController
   end
 
 protected
-  def ensure_user_for_new
-    unless current_user.present?
-      flash[:error] = "Whoops! You have to sign up to be able to do that"
-      redirect_to new_user_path and return
-    end
-  end
 
   def ensure_user_for_edit
     unless current_user.present?

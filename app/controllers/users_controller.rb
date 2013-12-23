@@ -2,7 +2,6 @@ class UsersController < ApplicationController
   before_filter :authenticate_user!, only: [:edit]
   
   def new
-    @title = "Signup"
     @user = User.new
     if current_user.present?
       flash[:notice] = "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
@@ -11,7 +10,6 @@ class UsersController < ApplicationController
   end
 
   def create
-    @title = "Signup"
     @user = User.new(params[:user])
     if @user.save
       CreateUserJobs.new(user: @user).do_jobs  
@@ -21,7 +19,6 @@ class UsersController < ApplicationController
   end
 
   def confirm
-    @title = "Confirm your account"
     begin
       @user = User.find(params[:id])
       if @user.confirmed?
@@ -40,16 +37,13 @@ class UsersController < ApplicationController
   end
 
   def request_password_reset
-    @title = "Forgotten password"
   end
 
   def update_password
-    @title = "Update password"
     @user = current_user
   end
 
   def password_reset
-    @title = "Password reset"
     if params[:token].present?
       @user = User.find_by_password_reset_token(params[:token])
       if @user.present?
@@ -92,7 +86,6 @@ class UsersController < ApplicationController
   end
 
   def edit
-    @title = "Edit profile"
     @user = current_user
   end
 
@@ -132,7 +125,6 @@ class UsersController < ApplicationController
   end
 
   def accept_terms
-    @title = "Bike Index terms"
     if current_user.present?
       @user = current_user
     else
@@ -141,7 +133,6 @@ class UsersController < ApplicationController
   end
 
   def accept_vendor_terms
-    @title = "Bike Index vendor terms"
     if current_user.present?
       @user = current_user
     else

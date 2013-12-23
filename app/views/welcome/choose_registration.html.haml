@@ -1,28 +1,31 @@
-#choose-registration-type
-  .choose-links
-    %ul
-      - if current_user.memberships.any?
-        - current_user.memberships.each do |membership|
-          %li
-            %a.organization-choice.choose-type{:data => {target: new_bike_url(creation_organization_id: membership.organization.id)}}
-              %span.add-selected
-                &#10004
-              Add a bike through
-              %em
-                = membership.organization.name
-      
-      %li
-        %a.purchase-choice.choose-type{:data => {target: new_bike_url}}
-          %span.add-selected
-            &#10004
-          Add your own bike
+- if current_user.present?
+  #choose-registration-type
+    .choose-links
+      %ul
+        - if current_user.memberships.any?
+          - current_user.memberships.each do |membership|
+            %li
+              %a.organization-choice.choose-type{:data => {target: new_bike_url(creation_organization_id: membership.organization.id)}}
+                %span.add-selected
+                  &#10004
+                Add a bike through
+                %em
+                  = membership.organization.name
+        
+        %li
+          %a.purchase-choice.choose-type{:data => {target: new_bike_url}}
+            %span.add-selected
+              &#10004
+            Add your own bike
 
-      %li
-        %a.choose-type{:data => {target: new_bike_url(stolen: true)}}
-          %span.add-selected
-            &#10004
-          Add a stolen bike
+        %li
+          %a.choose-type{:data => {target: new_bike_url(stolen: true)}}
+            %span.add-selected
+              &#10004
+            Add a stolen bike
 
-    .add-bike-button
-      %a#add-bike.button-green{href: new_bike_url}
-        Enter bike data
+      .add-bike-button
+        %a#add-bike.button-green{href: new_bike_url}
+          Enter bike data
+- else
+  = render :partial => "users/form"

@@ -1,47 +1,67 @@
-.signup-form
-  = form_for @user, :html => { class: "form-horizontal" } do |f|
-    - if @user.errors.any?
-      #alert-block
-        .alert.alert-error
-          %h4
-            Please fix the following 
-            = pluralize(@user.errors.count, "error")
-          %ul
-            - @user.errors.full_messages.each do |msg|
-              %li
-                = msg
+%h3#never-block
+  Create a Bike Index account
+.span8.photo-animation
+  #photos-flip 
+    - cache('new_users_pictures') do
+      - PublicImage.bikes.order("created_at desc").limit(24).each_with_index do |photo, i|
+        .bike-photo{id: "photo#{i}"}
+          .flipper
+            .front
+            %a.front-behind{ href: bike_url(photo.imageable) }
+              %span.back-colored
+                %span
+                  #{photo.imageable.manufacturer_name},
+                %span
+                  #{photo.imageable.primary_frame_color.name}
+            .back
+              %span.img-location
+                = photo.image_url(:small)
+.span4.signinup-form
+  .well
+    .signup-form
+      = form_for @user, :html => { class: "form-horizontal" } do |f|
+        - if @user.errors.any?
+          #alert-block
+            .alert.alert-error
+              %h4
+                Please fix the following 
+                = pluralize(@user.errors.count, "error")
+              %ul
+                - @user.errors.full_messages.each do |msg|
+                  %li
+                    = msg
 
-    .control-group
-      = f.label :name, "Name", class: "control-label email-control-label"
-      .controls
-        = f.text_field :name, placeholder: "You got a name?"
+        .control-group
+          = f.label :name, "Name", class: "control-label email-control-label"
+          .controls
+            = f.text_field :name, placeholder: "You got a name?"
 
-    .control-group
-      = f.label :email, class: "control-label email-control-label"
-      .controls
-        = f.email_field :email, placeholder: "What's your email?"
-    .control-group
-      = f.label :password, class: "control-label"
-      .controls
-        = f.password_field :password, placeholder: "Password"
-    .control-group
-      = f.label :password_confirmation, class: "control-label"
-      .controls
-        = f.password_field :password_confirmation, placeholder: "Password confirmation"
-    
-    .control-group.tos
-      
-      %label{for: "user_terms_of_service" }
-        = f.check_box :terms_of_service
-        I agree to the Bike Index 
-        %a.no-tab{ :data => {target: "#{terms_url}"} }
-          Terms and conditions
-    
-    = f.submit "Sign up", class: 'button-blue'
+        .control-group
+          = f.label :email, class: "control-label email-control-label"
+          .controls
+            = f.email_field :email, placeholder: "What's your email?"
+        .control-group
+          = f.label :password, class: "control-label"
+          .controls
+            = f.password_field :password, placeholder: "Password"
+        .control-group
+          = f.label :password_confirmation, class: "control-label"
+          .controls
+            = f.password_field :password_confirmation, placeholder: "Password confirmation"
+        
+        .control-group.tos
+          
+          %label{for: "user_terms_of_service" }
+            = f.check_box :terms_of_service
+            I agree to the Bike Index 
+            %a.no-tab{ :data => {target: "#{terms_url}"} }
+              Terms and conditions
+        
+        = f.submit "Sign up", class: 'button-blue'
 
-  %p.switch-login-signup
-    Already have an account? 
-    = link_to 'log in instead', new_session_url
+      %p.switch-login-signup
+        Already have an account? 
+        = link_to 'log in instead', new_session_url
 
-  %p
-    Or #{link_to "Sign up with facebook", "/auth/facebook"}.
+      %p
+        Or #{link_to "Sign up with facebook", "/auth/facebook"}.

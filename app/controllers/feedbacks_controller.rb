@@ -3,12 +3,10 @@ class FeedbacksController < ApplicationController
   before_filter :set_feedback_active_section
 
   def new
-    @title = "Contact us"
     @feedback = Feedback.new
   end
 
   def vendor_signup
-    @title = ""
     @feedback = Feedback.new
   end
 

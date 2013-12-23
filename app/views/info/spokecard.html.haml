@@ -1,5 +1,5 @@
 %h1#what-spokecards-are
-  Spokecards
+  Spoke cards
 
 %p
   = link_to "Spokecards", "https://en.wikipedia.org/wiki/Spokecard", target: '_blank'
@@ -10,9 +10,9 @@
 
 
 %h2#bike-index-specifics
-  Bike Index spokecards
+  Bike Index spoke cards
 %p
-  Bike Index spokecards have a
+  Bike Index spoke cards have a
   = link_to "QR code", "https://en.wikipedia.org/wiki/QR_code", target: '_blank'
   that links to a specific bike registration on the Index. You can read the QR code with a free app on your 
   = link_to "iOS", "https://itunes.apple.com/us/app/qr-reader-for-iphone/id368494609"
@@ -21,14 +21,14 @@
   device. When you scan the qr code it will go to your bike's page on the Bike Index!
 
 %p
-  If you were sent a spokecard by the Bike Index, it may not be linked to your bike. When you scan the card you will get sent to a page that asks for your email.
+  If you were sent a spoke card by the Bike Index, it may not be linked to your bike. When you scan the card you will get sent to a page that asks for your email.
 
 
 %h2#making-one
   Making your own
 
 %p
-  So you wanna have your own wicked cool spokecard?
+  So you wanna have your own wicked cool spoke card?
 
 %h3
   Steps:
@@ -54,7 +54,7 @@
 %article
   .well.spokecard-bikes
     %p.url-spokecard
-      You can see a spokecard page by adding 
+      You can see a spoke card page by adding 
       %em
         \/spokecard
       to the end of a bike's URL on the Bike Index.
@@ -65,17 +65,17 @@
           - @bikes.each do |bike|
             %li
               %p
-                Spokecard for your
+                Spoke card for your
                 %a{ href: "#{bike_url(bike)}/spokecard" }
                   #{bike.primary_frame_color.name} #{bike.manufacturer_name}
       - else
         %p 
           %em
-            If you had any bikes on the index, we would put links to their spokecard pages here.
+            If you had any bikes on the index, we would put links to their spoke card pages here.
     - else
       %p
         %em 
-          (If you logged in we would put links to all the spokecard pages here)
+          (If you logged in we would put links to all the spoke card pages here)
 
 
 %h3.padded
