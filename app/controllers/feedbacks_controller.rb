@@ -20,7 +20,7 @@ class FeedbacksController < ApplicationController
         flash[:notice] = "Thanks! We'll set up the shop and give you a call."
         redirect_to where_path and return
       end
-      redirect_to contact_us_path, notice: "Thanks for your comment!" 
+      redirect_to about_path, notice: "Thanks for your comment!" 
     else
       if @feedback.feedback_type == 'shop_submission'
         render action: :vendor_signup

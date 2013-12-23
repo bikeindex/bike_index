@@ -106,7 +106,6 @@ class BikesController < ApplicationController
         redirect_to controller: :organizations, action: :embed_create_success, id: @bike.creation_organization.slug, bike_id: @bike.id and return  
       end
     else
-      ensure_user_for_new
       users_b_params = BParam.where(creator_id: current_user.id)
       begin
         @b_param = users_b_params.find(params[:bike][:b_param_id])
