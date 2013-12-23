@@ -88,5 +88,18 @@ describe BikeUpdator do
       update_bike.update_available_attributes
       bike.reload.stolen.should_not be_false
     end
+
+    it "should update the bike" do 
+      bike = FactoryGirl.create(:bike)
+      ownership = FactoryGirl.create(:ownership, bike: bike)
+      user = ownership.creator
+      new_creator = FactoryGirl.create(:user)
+      bike_params = {coaster_brake: true, :components_attributes =>{"1387762503379"=>{"ctype_id"=>"", "front"=>"0", "rear"=>"0", "ctype_other"=>"", "description"=>"", "manufacturer_id"=>"", "model_name"=>"", "manufacturer_other"=>"", "year"=>"", "serial_number"=>"", "_destroy"=>"0"}},}
+      update_bike = BikeUpdator.new(user: user, :b_params => {id: bike.id, bike: bike_params})
+      update_bike.should_receive(:update_ownership).and_return(true)
+      update_bike.update_available_attributes
+      bike.reload.coaster_brake.should be_true
+      bike.components.count.should eq(0)
+    end
   end
 end

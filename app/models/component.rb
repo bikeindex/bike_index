@@ -14,7 +14,6 @@ class Component < ActiveRecord::Base
     :serial_number
     
 
-  validates_presence_of :ctype_id
   belongs_to :manufacturer
   belongs_to :ctype
   belongs_to :bike

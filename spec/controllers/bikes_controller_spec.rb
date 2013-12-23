@@ -50,9 +50,9 @@ describe BikesController do
   end
 
   describe :new do 
-    it "should redirect to new user if a user isn't present" do 
+    it "shouldn't redirect to new user if a user isn't present" do 
       get :new, stolen: true
-      response.should redirect_to new_user_url
+      response.code.should eq('200')
     end
 
     it "should render a new stolen bike" do 

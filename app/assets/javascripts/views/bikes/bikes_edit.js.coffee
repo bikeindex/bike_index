@@ -243,7 +243,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     target.prev('input[type=hidden]').val('1')
     target.closest('fieldset').slideUp()
 
-  addComponent: ->
+  addComponent: (event) ->
     event.preventDefault()
     target = $('.add_fields')
     time = new Date().getTime()

@@ -6,7 +6,6 @@ describe Component do
     it { should belong_to :bike }
     it { should belong_to :manufacturer }
     it { should belong_to :ctype }
-    it { should validate_presence_of :ctype_id }
   end
 
   describe :component_type do 

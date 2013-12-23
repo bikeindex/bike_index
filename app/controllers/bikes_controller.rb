@@ -156,8 +156,13 @@ class BikesController < ApplicationController
     end
     @twined_ctypes = Ctype.where(has_twin_part: true).map(&:id).join(",")
     @bike = bike.decorate 
-    flash[:notice] = "Bike successfully updated!" unless bike.errors.any?
-    redirect_to bike_url(@bike), layout: 'no_header'
+    if bike.errors.any?
+      flash[:error] = bike.errors.full_messages
+      render action: :edit
+    else
+      flash[:notice] = "Bike successfully updated!" 
+      redirect_to bike_url(@bike), layout: 'no_header' and return
+    end
   end
 
 protected

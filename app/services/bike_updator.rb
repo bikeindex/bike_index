@@ -54,14 +54,19 @@ class BikeUpdator
     @bike_params[:bike][:stolen] = @bike.stolen unless @bike.verified?
   end
 
+  def remove_blank_components
+    return false unless @bike.components.any?
+    @bike.components.each do |c|
+      c.destroy unless c.ctype.present? or c.description.present?
+    end
+  end
+
   def update_available_attributes
     ensure_ownership!
     set_protected_attributes
     update_ownership
-    if @bike.update_attributes(@bike_params[:bike])
-      update_stolen_record
-    end
-
+    update_stolen_record if @bike.update_attributes(@bike_params[:bike])
+    remove_blank_components
     @bike
   end
 
