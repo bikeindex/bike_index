@@ -290,7 +290,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       $('#frame-sizer .hidden-other').slideDown().addClass('unhidden')
       $('#frame-sizer .groupedbtn-group').addClass('ex-size')
 
-  updateFrameSize: ->
+  updateFrameSize: (event) ->
     size = $(event.target).attr('data-size')
     hidden_other = $('#frame-sizer .hidden-other')
     if size == 'cm' or size == 'in'
