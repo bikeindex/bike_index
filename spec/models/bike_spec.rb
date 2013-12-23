@@ -196,6 +196,7 @@ describe Bike do
     it "should cache the components" do 
       bike = FactoryGirl.create(:bike)
       c = FactoryGirl.create(:component, bike: bike)
+      bike.save
       bike.components_cache_string.should eq("#{c.ctype.name} ")
     end
   end
@@ -243,4 +244,19 @@ describe Bike do
     end
   end
 
+  # tests that belong in the controller
+  describe "retrieving pdf" do
+    it "should return a pdf from s3 if it exists already" do
+      #instantiate a model
+      #upload a dummy pdf
+      #request that model view's pdf
+      #confirm model object returned by controller is instantiated model
+    end
+    it "should call the service object for generating the pdf if it doesn't" do
+      #instantiate a model
+      #request that model view's pdf
+      #ensure that PdfServiceObject.new is called
+    end
+  end
+  
 end

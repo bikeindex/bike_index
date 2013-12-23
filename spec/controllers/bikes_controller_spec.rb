@@ -213,12 +213,23 @@ describe BikesController do
       it { should redirect_to(bike_url) }
       it { should set_the_flash }
     end
+
+    it "should redirect to edit if the bike has changed to be stolen" do 
+      ownership = FactoryGirl.create(:ownership)
+      session[:user_id] = ownership.creator.id
+      ownership.bike.update_attributes(verified: true)
+      put :update, {id: ownership.bike.id, :bike => {stolen: "1"}}
+      ownership.bike.stolen.should eq(true)
+      response.should redirect_to edit_bike_url(ownership.bike)
+    end
+    
     it "should update the bike when a user is present who is allowed to edit the bike" do 
       ownership = FactoryGirl.create(:ownership)
       user = ownership.creator
       session[:user_id] = user.id
       put :update, {id: ownership.bike.id, :bike => {description: "69"}}
       ownership.bike.reload.description.should eq("69")
+      response.should redirect_to bike_url(ownership.bike)
       assigns(:bike).should be_decorated
     end
 
