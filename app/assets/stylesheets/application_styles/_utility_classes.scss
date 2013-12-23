@@ -289,6 +289,19 @@ header.with-subtitle {
   }
 }
 
+@media (max-width: 800px) {
+  header.with-subtitle {
+    h1, h2, h3 { font-size: $standardFontSize * 2; }
+  }
+}
+
+
+@media (max-width: 650px) {
+  header.with-subtitle {
+    h1, h2, h3 { font-size: $standardFontSize * 1.5; }
+  }
+}
+
 
 .well-yellow {
   @include border-radius(2px);

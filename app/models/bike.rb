@@ -174,11 +174,14 @@ class Bike < ActiveRecord::Base
   end
 
   def components_cache_string
+    return nil unless components.any?
     string = ""
     components.all.each do |c|
-      string += "#{c.year} " if c.manufacturer
-      string += "#{c.manufacturer.name} " if c.manufacturer
-      string += "#{c.component_type} "
+      if c.name.present?
+        string += "#{c.year} " if c.manufacturer
+        string += "#{c.manufacturer.name} " if c.manufacturer
+        string += "#{c.component_type} "
+      end
     end
     string
   end

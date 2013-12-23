@@ -19,7 +19,7 @@ class Component < ActiveRecord::Base
   belongs_to :bike
 
   def component_type
-    if ctype.name == "Other" && ctype_other.present?
+    if ctype.name && ctype.name == "Other" && ctype_other.present?
       ctype_other
     else
       ctype.name

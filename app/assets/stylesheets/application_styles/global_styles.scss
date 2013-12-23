@@ -208,6 +208,14 @@ input[type="color"],
   padding-bottom: 60px;
 }
 
+@media (max-width: 800px) {
+  .content { padding-top: 30px; }
+}
+
+@media (max-width: 650px) {
+  .content { padding-top: 0; }
+}
+
 //________________________
 //
 // footer
