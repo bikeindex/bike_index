@@ -67,6 +67,8 @@ Bikeindex::Application.routes.draw do
    end
   end
   resources :locks
+  
+  resources :graphs, only: [:index, :show]
 
   namespace :admin do
     root :to => 'dashboard#show'
@@ -74,6 +76,7 @@ Bikeindex::Application.routes.draw do
     resources :discounts, :memberships, :bikes, :organizations, :bike_token_invitations, :organization_invitations
     match 'duplicate_bikes', to: 'bikes#duplicates'
     resources :flavor_texts, only: [:destroy, :create]
+    resources :graphs, only: [:index, :show]
     resources :ownerships, only: [:edit, :update]
     match 'recover_organization', to: 'organizations#recover' 
     match 'show_deleted_organizations', to: 'organizations#show_deleted' 

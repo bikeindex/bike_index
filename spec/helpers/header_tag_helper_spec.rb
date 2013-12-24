@@ -68,7 +68,7 @@ describe HeaderTagHelper do
       view.stub(:controller_name).and_return("bikes")
       h = helper.current_page_auto_hash
       h[:meta_tags][:description].should eq("Search for bikes that have been registered on the Bike Index")
-      h[:title_tag][:title].should eq("Search | Bike Index")
+      h[:title_tag][:title].should eq("Search Results")
     end
 
     it "should return the action name humanized and default description" do 

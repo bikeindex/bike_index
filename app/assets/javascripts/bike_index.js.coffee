@@ -82,6 +82,8 @@ $(document).ready ->
       view = new BikeIndex.Views.AdminOrganizationsEdit
     else if $('#post-date-field').length > 0
       view = new BikeIndex.Views.AdminBlogsEdit
+    else if $('#graph-holder').length > 0
+      view = new BikeIndex.Views.AdminChartShow
   
   else if $('#photo-page').length > 0
     view = new BikeIndex.Views.PhotosIndex

@@ -1,0 +1,16 @@
+%section.full-screen-table
+  %h2
+    Bike Index graphs
+
+  %table.table.table-striped.table-bordered
+    %tbody
+      - ["user","emails","bikes","stolen_bikes", "organization_bikes","organizations"].each do |graph_type|
+        %tr
+          %td
+            = graph_type.humanize
+          %td
+            = link_to "Since start", graph_url("#{graph_type}")
+          %td
+            = link_to "Last 6 months", graph_url("#{graph_type}")
+          %td
+            = link_to "Last month", graph_url("#{graph_type}")

@@ -219,7 +219,6 @@ describe BikesController do
       session[:user_id] = ownership.creator.id
       ownership.bike.update_attributes(verified: true)
       put :update, {id: ownership.bike.id, :bike => {stolen: "1"}}
-      ownership.bike.stolen.should eq(true)
       response.should redirect_to edit_bike_url(ownership.bike)
     end
     
