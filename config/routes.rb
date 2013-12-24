@@ -67,8 +67,6 @@ Bikeindex::Application.routes.draw do
    end
   end
   resources :locks
-  
-  resources :graphs, only: [:index, :show]
 
   namespace :admin do
     root :to => 'dashboard#show'

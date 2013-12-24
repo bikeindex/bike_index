@@ -1,4 +1,4 @@
-class GraphsController < ApplicationController
+class Admin::GraphsController < Admin::BaseController
   def index
 
   end
