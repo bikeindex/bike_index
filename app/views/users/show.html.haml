@@ -22,9 +22,6 @@
   - if @bikes.any?
     %ul.bike-boxes
       = render partial: "/bikes/bike", collection: @bikes, :locals => {target: "show" }
-
-    .comments-container
-      = render "/shared/disqus"
         
   - else
     %h2

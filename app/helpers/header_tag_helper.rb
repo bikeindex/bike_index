@@ -3,6 +3,7 @@ module HeaderTagHelper
   def header_tags
     header_tag_hash = set_header_tag_hash
     html = title_tag_html(header_tag_hash)
+    html << author_tag_html
     html << meta_tags_html(header_tag_hash)
     return html.html_safe
   end
@@ -20,6 +21,11 @@ protected
   
   def title_tag_html(hash)
     "<title>#{hash[:title_tag][:title]}</title>\n"
+  end
+
+  def author_tag_html
+    return '' unless controller_name == 'blogs' and action_name == 'show'
+    "<link rel='author' href='#{user_url(@blogger)}'/>"
   end
 
   def meta_tags_html(hash)
@@ -112,6 +118,7 @@ protected
     if action_name == 'show'
       hash[:title_tag][:title] = @user.title if @user.title.present?
       hash[:meta_tags][:description] = "#{@user.title} on the Bike Index" if @user.title.present?
+      hash[:meta_tags][:"og:image"] = @user.avatar.url unless @user.avatar.url(:medium) == "https://s3.amazonaws.com/bikeindex/blank.png"
     end
     if action_name == 'edit'
       hash[:title_tag][:title] = "Edit your account"
