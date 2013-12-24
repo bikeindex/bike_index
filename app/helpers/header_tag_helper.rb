@@ -24,6 +24,8 @@ protected
 
   def meta_tags_html(hash)
     html = ""
+    # hash[:meta_tags][:title] = hash[:title]
+    # hash[:meta_tags][:"og:description"] = hash[:description]
     hash[:meta_tags].each do |k,value_or_array|
       values = value_or_array.is_a?(Array) ? value_or_array : [value_or_array]
       values.each do |v|
@@ -45,7 +47,9 @@ protected
         :charset           => "utf-8",
         :"X-UA-Compatible" => "IE=edge,chrome=1", 
         :viewport          => "width=device-width, initial-scale=1, maximum-scale=1",
-        :description       => base_description
+        :description       => base_description,
+        :"og:url"          => "#{request.url}",
+        :"og:image"        => "#{root_url}assets/logos/bw_transparent.png"
       }
     }
   end
@@ -126,6 +130,7 @@ protected
 
   def blogs_header_tags
     hash = current_page_auto_hash
+    # :"og:type"         => "article",
     if action_name == 'show'
       hash[:title_tag][:title] = "#{@blog.title}"
       hash[:meta_tags][:description] = "#{@blog.body_abbr}"

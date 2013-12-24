@@ -7,10 +7,10 @@ class Admin::GraphsController < Admin::BaseController
     @graph_type = params[:id]
     range = date_range("2013-01-18 21:03:08")
     @xaxis = month_list(range).to_json
-    @values1 = range_values(range, "ownership_value").to_json
-    @values2 = range_values(range, "stolen_bike_value").to_json
-    # @values1 = range_values(range, "user_value").to_json
-    # @values2 = range_values(range, "organization_value").to_json
+    @values1 = range_values(range, "#{params[:id]}_value").to_json
+    if params[:id] == 'bikes'
+      @values2 = range_values(range, "stolen_bike_value").to_json
+    end
     render :layout => 'graphs'
   end
 
@@ -35,7 +35,7 @@ protected
     values
   end
 
-  def ownership_value(date)
+  def bikes_value(date)
     Ownership.where(["created_at < ?", date.end_of_month.end_of_day]).count
   end
 
@@ -43,11 +43,11 @@ protected
     Bike.where(["created_at < ?", date.end_of_month.end_of_day]).stolen.count
   end
 
-  def user_value(date)
+  def users_value(date)
     User.where(["created_at < ?", date.end_of_month.end_of_day]).count
   end
 
-  def organization_value(date)
+  def organizations_value(date)
     Organization.where(["created_at < ?", date.end_of_month.end_of_day]).count
   end
 
