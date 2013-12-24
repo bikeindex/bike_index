@@ -2,7 +2,7 @@
   %h1
     #{@graph_type.titleize} growth
   %p
-    = link_to "Back to all graphs", graphs_url
+    = link_to "Back to all graphs", admin_graphs_url
 
 #graph-holder
-  %canvas#graphy{ width: "900", height: "300", :data => { labels: @xaxis, values1: @values1, values2: @values2 } }
+  %canvas#graphy{ width: "1160", height: "500", :data => { labels: @xaxis, values1: @values1, values2: @values2 } }
