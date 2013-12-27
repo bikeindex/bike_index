@@ -162,11 +162,15 @@ end
 desc "Seed states"
 task :migrate_states => :environment do 
   Location.all.each do |l|
-    l.state_id = State.where(abbreviation: l.old_state).first.id 
-    l.save
+    if l.old_state
+      l.state_id = State.where(abbreviation: l.old_state).first.id 
+      l.save
+    end
   end
   StolenRecord.all.each do |l|
-    l.state_id = State.where(abbreviation: l.old_state).first.id 
-    l.save
+    if l.old_state
+      l.state_id = State.where(abbreviation: l.old_state).first.id 
+      l.save
+    end
   end
 end
