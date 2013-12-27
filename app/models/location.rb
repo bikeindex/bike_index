@@ -4,7 +4,7 @@ class Location < ActiveRecord::Base
     :organization,
     :zipcode,
     :city,
-    :state,
+    :us_state_id,
     :country_id,
     :street,
     :phone,
@@ -17,13 +17,14 @@ class Location < ActiveRecord::Base
   acts_as_paranoid
   belongs_to :organization
   belongs_to :country
+  belongs_to :us_state 
   validates_presence_of :name, :organization_id, :zipcode, :city, :street
   has_many :bikes
 
-  scope :by_state, order(:state)
+  scope :by_state, order(:us_state)
 
   def address
-    [street, city, state, zipcode, country.name].compact.join(', ')
+    [street, city, us_state, zipcode, country.name].compact.join(', ')
   end
 
   unless Rails.env.test?
