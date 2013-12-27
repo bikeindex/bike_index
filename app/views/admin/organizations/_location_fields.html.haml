@@ -21,7 +21,7 @@
     .controls.extra-field
       = f.text_field :city, placeholder: "City"
     .controls.extra-field
-      = f.collection_select(:state, UsStates.all, :abbr, :name, prompt: "State", include_blank: true )
+      = f.collection_select(:state_id, State.all, :id, :name, prompt: "State", include_blank: true )
     .controls.extra-field
       = f.text_field :zipcode, placeholder: "Zipcode"
     .controls.extra-field.chosen-select.country_select_container

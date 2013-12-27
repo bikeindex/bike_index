@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131227133553) do
+ActiveRecord::Schema.define(:version => 20131227135813) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -218,7 +218,7 @@ ActiveRecord::Schema.define(:version => 20131227133553) do
     t.integer  "organization_id"
     t.string   "zipcode"
     t.string   "city"
-    t.string   "state"
+    t.string   "old_state"
     t.string   "street"
     t.string   "phone"
     t.string   "email"
@@ -385,7 +385,7 @@ ActiveRecord::Schema.define(:version => 20131227133553) do
   create_table "stolen_records", :force => true do |t|
     t.integer  "zipcode"
     t.string   "city"
-    t.string   "state"
+    t.string   "old_state"
     t.text     "theft_description"
     t.text     "time"
     t.datetime "created_at",                                 :null => false

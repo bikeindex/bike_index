@@ -14,6 +14,14 @@ describe Location do
       location = FactoryGirl.create(:location)
       location.address.should be_a(String)
     end
+    describe :address do 
+      it "should create an address" do 
+        c = Country.create(name: "Neverland", iso: "XXX")
+        s = State.create(country_id: c.id, name: "BullShit", abbreviation: "XXX")
+        location = FactoryGirl.create(:location, street: "300 Blossom Hill Dr", city: "Lancaster", state_id: s.id, zipcode: "17601", country_id: c.id)
+        location.address.should eq("300 Blossom Hill Dr, Lancaster, XXX, 17601, Neverland")
+      end
+    end
   end
 
   describe :org_location_id do 

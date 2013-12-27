@@ -130,15 +130,21 @@ FactoryGirl.define do
     name 
     association :organization
     association :country
+    association :state
     zipcode '60647'
     city 'Chicago'
-    state 'IL'
     street 'foo address'
   end
 
   factory :country do 
     name 
-    iso 'asdffda'
+    sequence(:iso) {|n| "D#{n}"}
+  end
+
+  factory :state do 
+    name 
+    association :country
+    sequence(:abbreviation) {|n| "Q#{n}"}
   end
 
   factory :lock_type do 

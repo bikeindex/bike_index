@@ -56,7 +56,7 @@
       .controls.extra-field
         = f.text_field :zipcode, placeholder: "Zipcode"
       #state-select.controls.extra-field.chosen-select
-        = f.collection_select(:state, UsStates.all, :abbr, :name, include_blank: true, prompt: "State" )
+        = f.collection_select(:state_id, State.all, :id, :name, include_blank: true, prompt: "State" )
 
   .input-group
     .control-group

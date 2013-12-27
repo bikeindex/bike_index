@@ -6,10 +6,10 @@ class StolenRecord < ActiveRecord::Base
     :date_stolen,
     :bike,
     :country_id,
+    :state_id,
     :street,
     :zipcode,
     :city,
-    :state,
     :latitude,
     :longitude,
     :theft_description,
@@ -22,6 +22,7 @@ class StolenRecord < ActiveRecord::Base
 
   belongs_to :bike
   belongs_to :country
+  belongs_to :state
 
   validates_presence_of :bike, :date_stolen
 
@@ -29,7 +30,9 @@ class StolenRecord < ActiveRecord::Base
 
   def address
     return nil unless self.country
-    [street, city, state, zipcode, country.name].compact.join(', ')
+    a = [street, city]
+    a << state.abbreviation if state.present?
+    (a+[zipcode, country.name]).compact.join(', ')
   end
 
   unless Rails.env.test?

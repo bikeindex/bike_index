@@ -74,7 +74,7 @@ class ApplicationDecorator < Draper::Decorator
   def short_address(item)
     return nil unless item.country
     html = "#{item.city}"
-    html << ", #{item.state}" if item.state.present?
+    html << ", #{item.state.name}" if item.state.present?
     html << ", #{item.country.name}"
     html
   end

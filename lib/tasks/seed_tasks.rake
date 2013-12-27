@@ -156,14 +156,17 @@ task :seed_us_states => :environment do
   states.each do |s|
     state = State.create(country_id: us_id, name: s[:name], abbreviation: s[:abbr])
     state.save
-    puts state.errors.messages
   end
 end
 
 desc "Seed states"
 task :migrate_states => :environment do 
   Location.all.each do |l|
-    l.us_state_id = UsState.where(abbreviation: l.state).first.id 
+    l.state_id = State.where(abbreviation: l.old_state).first.id 
+    l.save
+  end
+  StolenRecord.all.each do |l|
+    l.state_id = State.where(abbreviation: l.old_state).first.id 
     l.save
   end
 end
