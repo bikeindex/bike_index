@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131219182417) do
+ActiveRecord::Schema.define(:version => 20131227133553) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -93,7 +93,6 @@ ActiveRecord::Schema.define(:version => 20131219182417) do
     t.string   "frame_size"
     t.string   "frame_size_unit"
     t.string   "frame_paint_description"
-    t.string   "serial_normalized"
     t.string   "pdf"
     t.integer  "card_id"
   end
@@ -174,8 +173,9 @@ ActiveRecord::Schema.define(:version => 20131219182417) do
     t.string   "email"
     t.string   "title"
     t.text     "body"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+    t.string   "feedback_type"
   end
 
   create_table "flavor_texts", :force => true do |t|
@@ -229,8 +229,8 @@ ActiveRecord::Schema.define(:version => 20131219182417) do
     t.datetime "updated_at",                         :null => false
     t.datetime "deleted_at"
     t.boolean  "shown",           :default => false
-    t.integer  "us_state_id"
     t.integer  "country_id"
+    t.integer  "state_id"
   end
 
   create_table "lock_types", :force => true do |t|
@@ -364,6 +364,14 @@ ActiveRecord::Schema.define(:version => 20131219182417) do
     t.boolean  "standard"
   end
 
+  create_table "states", :force => true do |t|
+    t.string   "name"
+    t.string   "abbreviation"
+    t.integer  "country_id"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+  end
+
   create_table "stolen_notifications", :force => true do |t|
     t.string   "subject"
     t.text     "message"
@@ -398,13 +406,7 @@ ActiveRecord::Schema.define(:version => 20131219182417) do
     t.string   "lock_defeat_description"
     t.integer  "country_id"
     t.string   "police_report_department"
-  end
-
-  create_table "us_states", :force => true do |t|
-    t.string   "name"
-    t.string   "abbreviation"
-    t.datetime "created_at",   :null => false
-    t.datetime "updated_at",   :null => false
+    t.integer  "state_id"
   end
 
   create_table "users", :force => true do |t|
