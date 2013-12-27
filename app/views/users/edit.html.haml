@@ -1,4 +1,14 @@
 = form_for @user, :html => { class: "form-horizontal form user-settings", id: "edit-user-form" } do |f|
+  - if @user.errors.any?
+    #alert-block
+      .alert.alert-error
+        %h4
+          Please fix the following 
+          = pluralize(@user.errors.count, "error")
+        %ul
+          - @user.errors.full_messages.each do |msg|
+            %li
+              = msg
 
   %fieldset
     %legend
@@ -59,9 +69,9 @@
     #personal-page.collapse
       .control-group
         %label.control-label{ for: "title" }
-          Title for personal page
+          Username
         .controls
-          = f.text_field :title, placeholder: "This user's bikes"
+          = f.text_field :username
 
       .control-group.avatar-upload
         %label.control-label
@@ -76,6 +86,10 @@
           = f.file_field :avatar
           = f.hidden_field :avatar_cache
 
+      %label.control-label{ for: "title" }
+        Title for personal page
+      .controls
+        = f.text_field :title, placeholder: "This user's bikes"
       .description
         %label.control-label{ for: 'description' }
           Enter some information about yourself if you'd like

@@ -244,6 +244,12 @@ describe Bike do
     end
   end
 
+  describe :cgroups do
+    it "should grab a list of all the cgroups" do 
+      # Sometime, need to get this to display stuff better.
+    end
+  end
+
   # tests that belong in the controller
   describe "retrieving pdf" do
     it "should return a pdf from s3 if it exists already" do

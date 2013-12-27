@@ -167,6 +167,14 @@ class Bike < ActiveRecord::Base
     self.cycle_type.name.downcase
   end
 
+  def cgroup_array
+    # list of cgroups so that we can arrange them. Future feature.
+    return nil unless self.components.any?
+    a = []
+    components.each 
+    ownerships.each { |i| a << i.cgroup_id }
+  end
+
   def cache_photo
     if self.public_images.any?
       self.thumb_path = self.public_images.first.image_url(:small)

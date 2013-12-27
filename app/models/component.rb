@@ -26,6 +26,11 @@ class Component < ActiveRecord::Base
     end
   end
 
+  def cgroup_id
+    return 0 unless ctype.present?
+    ctype.cgroup.id 
+  end
+
   def component_group
     self.ctype.cgroup.name
   end

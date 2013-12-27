@@ -49,7 +49,7 @@ class User < ActiveRecord::Base
 
   before_create :generate_username_and_confirmation
 
-  validates_uniqueness_of :username
+  validates_uniqueness_of :username, :case_sensitive => false
   def to_param
     username
   end

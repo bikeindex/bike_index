@@ -145,9 +145,12 @@
           this
           = @bike.title
 
-      
-      - @components.each do |component|
-        .dl-holder
+      .dl-holder
+        / TODO: Make it display components in the list of cgroups.
+        / - @bike.cgroup_array.each do |cgroup_id|
+        /   - @components.where(cgroup_id: cgroup_id)
+        /     - if cgroup_id == 0
+        - @components.each do |component|
           %dl.dl-horizontal
             %p
               = component.component_type

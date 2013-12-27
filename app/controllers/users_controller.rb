@@ -97,7 +97,7 @@ class UsersController < ApplicationController
         if params[:user][:terms_of_service] == '1'
           @user.terms_of_service = true
           @user.save
-          redirect_to user_home_url, notice: "Thanks! Now you can use Bike Index"
+          redirect_to user_home_url, notice: "Thanks! Now you can use the Bike Index"
         else
           redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index"
         end
@@ -116,10 +116,9 @@ class UsersController < ApplicationController
           redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index as #{@user.memberships.first.organization.name}"
         end
       else
-        redirect_to user_home_url, notice: 'Your information was successfully updated.'
+        redirect_to my_account_url, notice: 'Your information was successfully updated.'
       end
     else
-      flash[:error] = "Sorry, there was a problem updating your information"
       render action: :edit
     end
   end
