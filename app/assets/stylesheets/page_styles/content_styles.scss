@@ -401,7 +401,7 @@
   width: 100%;
   position: relative;
   margin: 0;
-  dt a {
+  a.shop-title-link {
     font-weight: normal;
     color: $textColor;
     span { color: $textColor; }
@@ -412,8 +412,8 @@
     }
   }
 
-  dd { margin-left: 27px; }
-  dd.collapse.in { padding-bottom: .6em; }
+  .shop-info { margin-left: 27px; }
+  .shop-info.collapse.in { padding-bottom: .6em; }
   
   .where-shop-location {
     color: $linkColorHover;

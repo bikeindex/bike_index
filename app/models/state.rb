@@ -7,4 +7,6 @@ class State < ActiveRecord::Base
   has_many :locations
   has_many :stolen_records
 
+  default_scope order(:name)
+
 end

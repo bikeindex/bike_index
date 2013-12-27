@@ -10,8 +10,14 @@ class BikeIndex.Views.ContentWhere extends Backbone.View
 
   
   initializeMap: ->
-    # createMap(41.869561,-87.495117,4);
-    createMap(40.111689,-96.81839,4);
+    $.ajax
+      type: "GET"
+      url: 'http://freegeoip.net/json/'
+      dataType: "jsonp",
+      success: (location) ->
+        createMap(location.latitude,location.longitude,8)
+      error: (location) ->
+        createMap(40.111689,-96.81839,4)
 
   updateMapLocation: (event) ->
     target = $(event.target)

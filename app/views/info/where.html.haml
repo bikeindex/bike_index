@@ -1,7 +1,6 @@
 %h1#where-bike-index
   Shops using the Bike Index
 
-
 %article
   .map-of-shops
     = render "/shared/shops_map"
@@ -9,40 +8,46 @@
 %h3.padded
   Partner shops
 
-%dl.where-shops-list#list_of_partners
-  - @locations.each do |location|
-    - if location.shown
-  
-      %dt.collapse-faq
-        %a.collapsed{ href: "#shop#{location.org_location_id}", :data => { toggle: "collapse"} }
-          %span
-            &#x25B6;
-          = location.display_name
-          %em
-            &nbsp;&nbsp;#{location.city}, #{location.state.abbreviation}
-      %dd.collapse{ id: "shop#{location.org_location_id}" }
-        %a.where-shop-location{:data => { lat: location.latitude, long: location.longitude } }
-          Show #{location.display_name} on map
-        %p
-          #{location.street}, #{location.city}, #{location.state.abbreviation} #{location.zipcode}
-        - if location.phone
-          %p
-            %a{ href: "tel:#{ location.phone }" }
-              = number_to_phone(location.phone)
-        - if location.organization.website.present?
-          %p
-            = link_to "#{location.organization.name} website", location.organization.website, target: "_blank", class: "shop-site"
-        .map-window
-          .window-content
-            %h3
-              = location.display_name
-            %p
-              = location.street
-              %br
-              #{location.city}, #{location.state.abbreviation} #{location.zipcode}
-            .map-telephone
-              %a{ href: "tel:#{ location.phone }" }
-                = number_to_phone(location.phone)
+%article.where-shops-list#list_of_partners
+  - @states.each do |state|
+    - if state.locations.any?
+      %p.state-name
+        = state.name
+      .state-list
+        - state.locations.each do |location|
+          - if location.shown
+            
+        
+            .collapse-faq
+              %a.shop-title-link.collapsed{ href: "#shop#{location.org_location_id}", :data => { toggle: "collapse"} }
+                %span
+                  &#x25B6;
+                = location.display_name
+                %em
+                  &nbsp;&nbsp;#{location.city}
+            .shop-info.collapse{ id: "shop#{location.org_location_id}" }
+              %a.where-shop-location{:data => { lat: location.latitude, long: location.longitude } }
+                Show #{location.display_name} on map
+              %p
+                #{location.street}, #{location.city}, #{location.state.abbreviation} #{location.zipcode}
+              - if location.phone
+                %p
+                  %a{ href: "tel:#{ location.phone }" }
+                    = number_to_phone(location.phone)
+              - if location.organization.website.present?
+                %p
+                  = link_to "#{location.organization.name} website", location.organization.website, target: "_blank", class: "shop-site"
+              .map-window
+                .window-content
+                  %h3
+                    = location.display_name
+                  %p
+                    = location.street
+                    %br
+                    #{location.city}, #{location.state.abbreviation} #{location.zipcode}
+                  .map-telephone
+                    %a{ href: "tel:#{ location.phone }" }
+                      = number_to_phone(location.phone)
 
 
 

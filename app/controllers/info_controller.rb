@@ -8,6 +8,7 @@ class InfoController < ApplicationController
   def where
     @active_section = "about"
     @shops = Organization.shown_on_map
+    @states = State.all
     @locations = Location.by_state
     # @locations = Locations.shown_on_map.order("created_at asc")
   end
