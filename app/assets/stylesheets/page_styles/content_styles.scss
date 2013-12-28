@@ -424,12 +424,26 @@
     margin: 0;
     font-weight: 400;
   }
-  p { margin: .25em 0 0; }
+  p { margin: .5em 0 0; }
   .map-window { display: none; }
 }
 
-.where-add-shops {
-  margin: 60px 0 40px;
+ul.state-list {
+  @include clearfix;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  position: relative;
+}
+
+.where-add-shops { margin: 60px 0 40px; }
+
+@media (min-width: 780px) {
+  ul.state-list li {
+    width: 50%;
+    float: left;
+  }
 }
 
 
