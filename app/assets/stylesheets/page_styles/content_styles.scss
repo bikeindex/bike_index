@@ -404,14 +404,16 @@
   a.shop-title-link {
     font-weight: normal;
     color: $textColor;
-    span { color: $textColor; }
+    span {
+      color: $textColor;
+      margin-bottom: 2px;
+    }
     em {
       color: $grayMed;
       font-size: .9em;
       font-style: normal;
     }
   }
-
   .shop-info { margin-left: 27px; }
   .shop-info.collapse.in { padding-bottom: .6em; }
   
@@ -440,6 +442,7 @@ ul.state-list {
 .where-add-shops { margin: 60px 0 40px; }
 
 @media (min-width: 780px) {
+  .where-shops-list p { margin-top: 1em; }
   ul.state-list li {
     width: 50%;
     float: left;

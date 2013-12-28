@@ -10,7 +10,7 @@
 
 %article.where-shops-list#list_of_partners
   - @states.each do |state|
-    - if state.locations.any?
+    - if state.locations.where(shown: true).any?
       %p.state-name
         = state.name
       %ul.state-list
