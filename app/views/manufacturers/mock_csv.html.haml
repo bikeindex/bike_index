@@ -1,10 +1,10 @@
-name&#9;website&#9;frame_maker&#9;open_year&#9;close_year&#9;logo_url
+name,website,frame_maker,open_year,close_year,logo_url
 %br
 - @manufacturers.each do |manufacturer|
-  #{manufacturer.name}&#9;
-  #{manufacturer.website}&#9;
-  #{manufacturer.frame_maker}&#9;
-  #{manufacturer.open_year}&#9;
-  #{manufacturer.close_year}&#9;
-  = manufacturer.logo if manufacturer.logo.present?
+  "#{manufacturer.name}",
+  "#{manufacturer.website}",
+  "#{manufacturer.frame_maker}",
+  "#{manufacturer.open_year},
+  "#{manufacturer.close_year}",
+  = "#{manufacturer.logo}" if manufacturer.logo.present?
   %br
