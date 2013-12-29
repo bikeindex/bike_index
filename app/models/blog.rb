@@ -1,4 +1,5 @@
 class Blog < ActiveRecord::Base
+  require 'rdiscount'
   include ActionView::Helpers::TextHelper
   attr_accessible :title,
     :body,
@@ -41,11 +42,14 @@ class Blog < ActiveRecord::Base
 
   before_save :create_abbreviation
   def create_abbreviation
+    markdown = RDiscount.new(self.body)
+    # pp strip_tags(markdown.to_html)
     # Remove newlines, remove square brackets, remove parentheses (generally link targets) and then remove extra spaces
-    b_abbr = self.body.gsub(/\n/,' ').gsub(/[\[\]]/, '').gsub(/\*/, '').gsub(/\([^)]*\)/, '').gsub(/\<[^)]*\>/, '')
+    # b_abbr = self.body.gsub(/\n/,' ').gsub(/[\[\]]/, '').gsub(/\*/, '').gsub(/\([^)]*\)/, '').gsub(/\<[^)]*\>/, '')
     # then remove extra spaces
-    b_abbr = b_abbr.gsub(/\s+/, ' ').strip
-    self.body_abbr = truncate(b_abbr, length: 200)
+    abbr = strip_tags(markdown.to_html)
+    abbr = abbr.gsub(/\n/,' ').gsub(/\s+/, ' ').strip
+    self.body_abbr = truncate(abbr, length: 200)
   end
 
   def to_param

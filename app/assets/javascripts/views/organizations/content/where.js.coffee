@@ -15,7 +15,7 @@ class BikeIndex.Views.ContentWhere extends Backbone.View
       url: 'https://freegeoip.net/json/'
       dataType: "jsonp",
       success: (location) ->
-        createMap(location.latitude,location.longitude,8)
+        createMap(location.latitude,location.longitude,7)
       error: (location) ->
         createMap(40.111689,-96.81839,4)
 

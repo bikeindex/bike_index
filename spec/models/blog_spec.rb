@@ -45,13 +45,9 @@ describe Blog do
       # Also, it would be cool if we could end on a word instead of in the middle of one...
       @user = FactoryGirl.create(:user)
       blog = Blog.new(title: "Blog title", user_id: @user.id, post_date: Time.now )
-      blog.body = """
-      View the link
-      [here](http://something)
-      ![PBR, a bike bag and drawings](http://imgur.com/e4zzEjP.jpg)
-      """
+      blog.body = """View the link\n[here](http://something)\n\n<img class='post-image' src='https://bikeindex.s3.amazonaws.com/uploads/Pu/1003/large_photo__6_.JPG' alt='Bike Index shirt and stickers'>\n![PBR, a bike bag and drawings](http://imgur.com/e4zzEjP.jpg) and also this"""
       blog.save
-      blog.body_abbr.should eq("View the link here")
+      blog.body_abbr.should eq("View the link here and also this")
     end
   end
 end
