@@ -26,10 +26,11 @@
                   %em
                     &nbsp;&nbsp;#{location.city}
               .shop-info.collapse{ id: "shop#{location.org_location_id}" }
-                %a.where-shop-location{:data => { lat: location.latitude, long: location.longitude } }
-                  Show #{location.display_name} on map
-                %p
-                  #{location.street}, #{location.city}, #{location.state.abbreviation} #{location.zipcode}
+                - if location.street.present?
+                  %a.where-shop-location{:data => { lat: location.latitude, long: location.longitude } }
+                    Show #{location.display_name} on map
+                  %p
+                    #{location.street}, #{location.city}, #{location.state.abbreviation} #{location.zipcode}
                 - if location.phone
                   %p
                     %a{ href: "tel:#{ location.phone }" }

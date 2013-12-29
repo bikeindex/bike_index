@@ -441,12 +441,13 @@ ul.state-list {
 
 .where-add-shops { margin: 60px 0 40px; }
 
-@media (min-width: 780px) {
-  .where-shops-list p { margin-top: 1em; }
+@media (min-width: 600px) {
+  // .where-shops-list p { margin-top: 1em; }
   ul.state-list li {
     width: 50%;
     float: left;
   }
+  .state-name { margin-top: 1em; }
 }
 
 

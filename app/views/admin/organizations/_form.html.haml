@@ -24,13 +24,13 @@
     %p
       = "Invitations sent: #{@organization.sent_invitation_count}"
 
-.control-group.padded
+.control-group
   .control-label
     = f.label :default_bike_token_count
   .controls
     = f.number_field :default_bike_token_count
 
-.control-group.padded
+.control-group
   .control-label
     %label
       Short Name
@@ -39,25 +39,13 @@
   .controls
     = f.text_field :short_name
 
-.control-group.padded
-  .control-label
-    = f.label :show_on_map
+.control-group
+  = f.label :slug, "Slug", class: "control-label"
   .controls
-    = f.check_box :show_on_map
+    %p
+      = @organization.slug
 
-.control-group.padded
-  .control-label
-    = f.label :is_suspended
-  .controls
-    = f.check_box :is_suspended
-
-.control-group.padded
-  .control-label
-    = f.label :is_police, "Police department"
-  .controls
-    = f.check_box :is_police
-
-.control-group.padded
+.control-group
   .control-label
     = f.label :website
   .controls
@@ -69,3 +57,30 @@
   .controls
     = f.text_field :embedable_user_email, value: @embedable_email
 
+.control-group.padded
+  .control-label
+    = f.label :show_on_map
+  .controls
+    = f.check_box :show_on_map
+
+/ .control-group.padded
+/   .control-label
+/     = f.label :is_suspended
+/   .controls
+/     = f.check_box :is_suspended
+
+
+.control-group
+  .control-label
+    %label
+      Organization type
+  .controls.radio-controls
+    %label.radio
+      = f.radio_button :org_type, "shop"
+      Bike shop
+    %label.radio
+      = f.radio_button :org_type, "advocacy"
+      Advocacy group
+    %label.radio
+      = f.radio_button :org_type, "police"
+      Police department

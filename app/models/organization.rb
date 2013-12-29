@@ -8,7 +8,7 @@ class Organization < ActiveRecord::Base
     :default_bike_token_count,
     :show_on_map,
     :is_suspended,
-    :is_police,
+    :org_type,
     :locations_attributes,
     :embedable_user_email,
     :embedable_user_id
@@ -32,6 +32,9 @@ class Organization < ActiveRecord::Base
   default_scope order(:name)
 
   scope :shown_on_map, where(show_on_map: true)
+  scope :shop, where(org_type: 'shop')
+  scope :police, where(org_type: 'police')
+  scope :advocacy, where(org_type: 'advocacy')
 
   def to_param
     slug

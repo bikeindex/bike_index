@@ -5,12 +5,6 @@
   = form_for [:admin, @organization] do |f|
     = render :partial => 'form', :locals => { :f => f }
     
-    .control-group
-      = f.label :slug, "Slug", class: "control-label"
-      .controls
-        %p
-          = @organization.slug
-    
     .nested-form
       %p
         %strong

@@ -1,6 +1,17 @@
 require 'spec_helper'
 
 describe Location do 
+  describe :validations do
+    it { should belong_to :organization }
+    it { should belong_to :country }
+    it { should belong_to :state }
+    it { should have_many :bikes }
+    it { should validate_presence_of :name }
+    it { should validate_presence_of :organization_id }
+    it { should validate_presence_of :city }
+    it { should validate_presence_of :country_id }
+  end
+
   
   describe :set_phone do
     it "should strip the non-digit numbers from the phone input" do
@@ -14,13 +25,11 @@ describe Location do
       location = FactoryGirl.create(:location)
       location.address.should be_a(String)
     end
-    describe :address do 
-      it "should create an address" do 
-        c = Country.create(name: "Neverland", iso: "XXX")
-        s = State.create(country_id: c.id, name: "BullShit", abbreviation: "XXX")
-        location = FactoryGirl.create(:location, street: "300 Blossom Hill Dr", city: "Lancaster", state_id: s.id, zipcode: "17601", country_id: c.id)
-        location.address.should eq("300 Blossom Hill Dr, Lancaster, XXX, 17601, Neverland")
-      end
+    it "should create an address" do 
+      c = Country.create(name: "Neverland", iso: "XXX")
+      s = State.create(country_id: c.id, name: "BullShit", abbreviation: "XXX")
+      location = FactoryGirl.create(:location, street: "300 Blossom Hill Dr", city: "Lancaster", state_id: s.id, zipcode: "17601", country_id: c.id)
+      location.address.should eq("300 Blossom Hill Dr, Lancaster, XXX, 17601, Neverland")
     end
   end
 

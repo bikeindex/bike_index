@@ -18,14 +18,16 @@ class Location < ActiveRecord::Base
   belongs_to :organization
   belongs_to :country
   belongs_to :state
-  validates_presence_of :name, :organization_id, :zipcode, :city, :street
+  validates_presence_of :name, :organization_id, :city, :country_id
   has_many :bikes
 
   scope :by_state, order(:state_id)
 
   def address
     return nil unless self.country
-    a = [street, city]
+    a = []
+    a << street
+    a << city
     a << state.abbreviation if state.present?
     (a+[zipcode, country.name]).compact.join(', ')
   end

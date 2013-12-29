@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131227151833) do
+ActiveRecord::Schema.define(:version => 20131229194508) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -308,19 +308,19 @@ ActiveRecord::Schema.define(:version => 20131227151833) do
 
   create_table "organizations", :force => true do |t|
     t.string   "name"
-    t.string   "slug",                                          :null => false
+    t.string   "slug",                                           :null => false
     t.integer  "available_invitation_count", :default => 10
-    t.datetime "created_at",                                    :null => false
-    t.datetime "updated_at",                                    :null => false
+    t.datetime "created_at",                                     :null => false
+    t.datetime "updated_at",                                     :null => false
     t.string   "website"
     t.string   "short_name"
-    t.integer  "default_bike_token_count",   :default => 5,     :null => false
+    t.integer  "default_bike_token_count",   :default => 5,      :null => false
     t.boolean  "show_on_map"
     t.integer  "sent_invitation_count",      :default => 0
     t.datetime "deleted_at"
-    t.boolean  "is_suspended",               :default => false, :null => false
+    t.boolean  "is_suspended",               :default => false,  :null => false
     t.integer  "embedable_user_id"
-    t.boolean  "is_police"
+    t.string   "org_type",                   :default => "shop", :null => false
   end
 
   add_index "organizations", ["slug"], :name => "index_organizations_on_slug", :unique => true
