@@ -6,5 +6,5 @@ name,website,frame_maker,open_year,close_year,logo_url
   #{manufacturer.frame_maker},
   #{manufacturer.open_year},
   #{manufacturer.close_year},
-  = manufacturer.logo unless "https://s3.amazonaws.com/bikeindex/blank.png"
+  = manufacturer.logo if manufacturer.logo.present?
   %br
