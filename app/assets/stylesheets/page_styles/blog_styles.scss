@@ -79,8 +79,7 @@
 
 .post-image-bordered {
   @extend .post-image;
-  @include box-shadow(0 0 2px rgba(black,.4));
-  border: 1px solid $grayDark;
+  @include box-shadow(0 0 1px rgba(black,.4));
 }
 
 .blog-index .post-image { display: none; }
