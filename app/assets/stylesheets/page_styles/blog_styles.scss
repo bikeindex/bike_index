@@ -77,6 +77,12 @@
   margin: 0 auto;
 }
 
+.post-image-bordered {
+  @extend .post-image;
+  @include box-shadow(0 0 2px rgba(black,.4));
+  border: 1px solid $grayDark;
+}
+
 .blog-index .post-image { display: none; }
 
 .blog-subhead {

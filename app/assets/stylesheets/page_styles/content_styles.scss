@@ -489,46 +489,6 @@ ul.state-list {
 
 
 
-//________________________
-//
-// Blog styles
-//
-//________________________
-
-.blog-header {
-  h4 {
-    span { display: none; }
-    color: $grayMed;
-  }
-  hr {
-    margin-bottom: 30px;
-  }
-}
-
-
-@media (min-width: 780px) {
-  .blog-header {
-    h4 {
-      margin-left: 50px; 
-      padding-right: 50px;
-    }
-    hr {
-      margin-bottom: 50px;
-    }
-  }
-}
-
-
-@media (min-width: 1000px) {
-  .blog-header {
-    h4 {
-      max-width: 700px;
-    }
-    hr {
-      margin-bottom: 80px;
-    }
-  }
-}
 
 #locking-demonstration {
   @include border-radius(3px);
@@ -589,5 +549,3 @@ ul.state-list {
     background: #79B752;
   }
 }
-
-.blog-index .post-image { display: none; }
