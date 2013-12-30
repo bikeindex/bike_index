@@ -61,7 +61,7 @@
         - if current_user.show_bikes
           %p
             = link_to "Your public page", "/users/#{current_user.username}"
-      - if @bikes.count > 5
+      - if @bikes.count > 10
         = render partial: "/bikes/bike_table", :locals => {target: "edit"}
       - else
         %ul.bike-boxes
