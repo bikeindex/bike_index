@@ -113,7 +113,7 @@ class UsersController < ApplicationController
           # TODO: Redirect to the correct page, somehow this breaks things right now though.
           # redirect_to organization_home
         else
-          redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index as #{@user.memberships.first.organization.name}"
+          redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index as through the organization"
         end
       else
         redirect_to my_account_url, notice: 'Your information was successfully updated.'
