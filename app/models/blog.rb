@@ -36,7 +36,7 @@ class Blog < ActiveRecord::Base
   before_create :set_title_slug
   def set_title_slug
     # We want to only set this once, and not change it, so that links don't break
-    self.title_slug = truncate(Slugifyer.slugify(self.title), length: 50, :omission => '')
+    self.title_slug = truncate(Slugifyer.slugify(self.title), length: 70, :omission => '')
   end
 
 
