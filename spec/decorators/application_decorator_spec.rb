@@ -90,7 +90,7 @@ describe ApplicationDecorator do
       user.stub(:show_twitter).and_return(true)
       user.stub(:twitter).and_return("twitter")
       decorator = ApplicationDecorator.new(user).twitterable(user)
-      decorator.should eq('<a href="twitter">Twitter</a>')
+      decorator.should eq('<a href="https://twitter.com/twitter">Twitter</a>')
     end
   end
 

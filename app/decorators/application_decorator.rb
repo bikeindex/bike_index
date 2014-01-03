@@ -48,7 +48,7 @@ class ApplicationDecorator < Draper::Decorator
 
   def twitterable(user)
     if user.show_twitter and user.twitter
-     h.link_to 'Twitter', user.twitter
+     h.link_to 'Twitter', "https://twitter.com/#{user.twitter}"
     end
   end
 

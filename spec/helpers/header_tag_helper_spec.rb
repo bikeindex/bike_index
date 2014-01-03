@@ -4,6 +4,7 @@ describe HeaderTagHelper do
   describe :header_tags do 
     it "should return the html for the tags" do
       helper.stub(:set_header_tag_hash).and_return({ tags: true })
+      helper.stub(:set_social_hash).and_return({ tags: true })
       helper.stub(:title_tag_html).and_return("<title>Foo 69 69</title>\n")
       helper.stub(:meta_tags_html).and_return("<meta name=\"charset\" content=\"utf-8\" />\n")
       helper.header_tags.should eq("<title>Foo 69 69</title>\n<meta name=\"charset\" content=\"utf-8\" />\n")
@@ -32,6 +33,16 @@ describe HeaderTagHelper do
     end
   end
 
+  describe :set_social_hash do 
+    it "should have some values" do 
+      d = helper.set_social_hash({ :title_tag => { title: "Loosers" }, :meta_tags => {description: "Something 69"} })
+      d[:meta_tags][:"og:title"].should eq("Loosers")
+      d[:meta_tags][:"twitter:title"].should eq("Loosers")
+      d[:meta_tags][:"og:description"].should eq("Something 69")
+      d[:meta_tags][:"twitter:description"].should eq("Something 69")
+    end
+  end
+
   describe :default_hash do 
     it "should have some values" do 
       d = helper.default_hash
@@ -40,7 +51,6 @@ describe HeaderTagHelper do
       d[:meta_tags][:charset].should_not be_empty
     end
   end
-
   describe :set_header_tag_hash do 
     it "should call the controller name header tags if it's listed" do 
       view.stub(:controller_name).and_return("bikes")

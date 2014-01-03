@@ -163,9 +163,6 @@ class User < ActiveRecord::Base
 
   before_save :set_urls
   def set_urls
-    if self.twitter
-      self.twitter = Urlifyer.urlify(self.twitter)
-    end
     if self.website
       self.website = Urlifyer.urlify(self.website)
     end

@@ -2,6 +2,7 @@ module HeaderTagHelper
 
   def header_tags
     header_tag_hash = set_header_tag_hash
+    header_tag_hash = set_social_hash(header_tag_hash)
     html = title_tag_html(header_tag_hash)
     html << author_tag_html
     html << meta_tags_html(header_tag_hash)
@@ -22,6 +23,15 @@ protected
   def title_tag_html(hash)
     "<title>#{hash[:title_tag][:title]}</title>\n"
   end
+
+  def set_social_hash(hash)
+    t = hash[:title_tag][:title]
+    hash[:meta_tags][:"og:title"], hash[:meta_tags][:"twitter:title"] = t, t
+    d = hash[:meta_tags][:description]
+    hash[:meta_tags][:"og:description"], hash[:meta_tags][:"twitter:description"] = d, d
+    return hash
+  end
+
 
   def author_tag_html
     return '' unless controller_name == 'blogs' and action_name == 'show'
@@ -55,7 +65,10 @@ protected
         :viewport          => "width=device-width, initial-scale=1, maximum-scale=1",
         :description       => base_description,
         :"og:url"          => "#{request.url}",
-        :"og:image"        => "#{root_url}assets/logos/bw_transparent.png"
+        :"og:image"        => "#{root_url}assets/logos/bw_transparent.png",
+        :"og:site_name"    => "Bike Index",
+        :"twitter:card"    => "summary",
+        :"twitter:site"    => "@bikeindex"
       }
     }
   end
@@ -139,9 +152,16 @@ protected
     hash = current_page_auto_hash
     # :"og:type"         => "article",
     if action_name == 'show'
-      hash[:title_tag][:title] = "#{@blog.title}"
-      hash[:meta_tags][:description] = "#{@blog.description}"
-      hash[:meta_tags][:"og:image"] = @blog.public_images.last.image_url if @blog.public_images.any?
+      hash[:meta_tags][:description] = @blog.description
+      hash[:meta_tags][:"og:type"] = "article"
+      hash[:meta_tags][:"og:published_time"] = @blog.post_date.utc
+      hash[:meta_tags][:"og:modified_time"] = @blog.updated_at.utc
+      hash[:meta_tags][:"twitter:creator"] = "@#{@blog.user.twitter}" if @blog.user.twitter
+      
+      if @blog.public_images.any?
+        hash[:meta_tags][:"og:image"] = @blog.public_images.last.image_url 
+        hash[:meta_tags][:"twitter:image:src"] = @blog.public_images.last.image_url 
+      end
     end
     hash
   end

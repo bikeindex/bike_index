@@ -110,7 +110,7 @@ describe User do
   end
 
   describe :set_urls do
-    it "should add http:// to twitter and website if the url doesn't have it so that the link goes somewhere" do
+    xit "should add http:// to twitter and website if the url doesn't have it so that the link goes somewhere" do
       @user = FactoryGirl.create(:user, show_twitter: true, twitter: "http://somewhere.com", show_website: true, website: "somewhere.org" )
       @user.website.should eq('http://somewhere.org')
     end
