@@ -1,6 +1,9 @@
 module Api
   module V1
     class ManufacturersController < ApiV1Controller
+      before_filter :current_user, :cors_preflight_check
+      after_filter :cors_set_access_control_headers
+
       def index
         manufacturers = Manufacturer.all
         if params[:callback]
