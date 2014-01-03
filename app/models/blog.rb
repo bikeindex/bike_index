@@ -8,6 +8,7 @@ class Blog < ActiveRecord::Base
     :post_on,
     :tags,
     :published,
+    :old_title_slug,
     :update_title
       
   attr_accessor :post_on, :update_title
@@ -30,13 +31,18 @@ class Blog < ActiveRecord::Base
 
   before_save :update_title_save
   def update_title_save
-    set_title_slug if update_title.present? && update_title == "1"
+    if update_title.present? && update_title != false
+      self.old_title_slug = self.title_slug
+      set_title_slug
+    end
   end
 
   before_create :set_title_slug
   def set_title_slug
     # We want to only set this once, and not change it, so that links don't break
-    self.title_slug = truncate(Slugifyer.slugify(self.title), length: 70, :omission => '')
+    t_slug = truncate(Slugifyer.slugify(self.title), length: 70, :omission => '')
+    # also - remove last char if a dash
+    self.title_slug = t_slug.gsub(/\-$/, '')
   end
 
 
