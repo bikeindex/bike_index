@@ -173,6 +173,11 @@ class User < ActiveRecord::Base
     self.phone = Phonifyer.phonify(self.phone) if self.phone 
   end
 
+  before_save :slug_username
+  def slug_username
+    self.username = Slugifyer.slugify(self.username) if self.username
+  end
+
   protected
 
   def generate_username_and_confirmation
