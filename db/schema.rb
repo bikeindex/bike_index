@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131229194508) do
+ActiveRecord::Schema.define(:version => 20140103144654) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -105,11 +105,12 @@ ActiveRecord::Schema.define(:version => 20131229194508) do
     t.text     "body"
     t.text     "body_abbr"
     t.integer  "user_id"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
     t.datetime "post_date"
     t.string   "tags"
     t.boolean  "published"
+    t.string   "old_title_slug"
   end
 
   create_table "cgroups", :force => true do |t|
