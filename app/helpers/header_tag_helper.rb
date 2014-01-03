@@ -160,6 +160,7 @@ protected
       hash[:meta_tags][:"twitter:creator"] = "@#{@blog.user.twitter}" if @blog.user.twitter
       
       if @blog.public_images.any?
+        hash[:meta_tags][:"twitter:card"] = "summary_large_image"
         hash[:meta_tags][:"og:image"] = @blog.public_images.last.image_url 
         hash[:meta_tags][:"twitter:image:src"] = @blog.public_images.last.image_url 
       end
