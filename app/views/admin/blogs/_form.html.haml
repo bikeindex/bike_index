@@ -27,6 +27,9 @@
       = f.text_field :title, placeholder: "Blog title"
 
     .blog-field
+      = f.text_field :description_abbr, placeholder: "Blog description (155 Characters)"
+
+    .blog-field
       = f.text_area :body, placeholder: "Blog post (in markdown)"
 
     .control-group.tags

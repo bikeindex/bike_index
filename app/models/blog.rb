@@ -9,6 +9,7 @@ class Blog < ActiveRecord::Base
     :tags,
     :published,
     :old_title_slug,
+    :description_abbr,
     :update_title
       
   attr_accessor :post_on, :update_title
@@ -27,6 +28,11 @@ class Blog < ActiveRecord::Base
     if self.post_on
       self.post_date = DateTime.strptime("#{self.post_on} 06", "%m-%d-%Y %H")
     end
+  end
+
+  def description
+    return description_abbr if description_abbr.present?
+    self.boddy_abbr
   end
 
   before_save :update_title_save
