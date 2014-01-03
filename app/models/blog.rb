@@ -32,7 +32,7 @@ class Blog < ActiveRecord::Base
 
   def description
     return description_abbr if description_abbr.present?
-    self.boddy_abbr
+    self.body_abbr
   end
 
   before_save :update_title_save
