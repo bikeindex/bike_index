@@ -141,8 +141,8 @@ protected
     if action_name == 'show'
       hash[:title_tag][:title] = "#{@blog.title}"
       hash[:meta_tags][:description] = "#{@blog.description}"
+      hash[:meta_tags][:"og:image"] = @blog.public_images.last.image_url if @blog.public_images.any?
     end
-    hash[:meta_tags][:"og:image"] = @blog.public_images.last.image_url if @blog.public_images.any?
     hash
   end
 
