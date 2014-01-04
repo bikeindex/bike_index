@@ -1,0 +1,37 @@
+
+%header.with-subtitle
+  %h1
+    Manage Failed Bikes
+
+%h4
+  = @b_params.count 
+  failed bikes,
+  %em
+    = @b_params.where(BParam.arel_table[:created_at].gt(Date.yesterday)).count
+    today
+
+  
+
+%section.full-screen-table
+  %table.table.table-striped
+    %thead
+      %th
+        Date
+      %th
+        Email
+      %th
+        Errors
+    %tbody
+      - @b_params.each do |b_param|
+        %tr
+          %td
+            = link_to b_param.created_at.strftime("%-I %p on %-m/%-d/%Y "), admin_failed_bike_url(b_param.id)
+          %td
+            = b_param.creator.email
+          %td
+            - if b_param.bike_errors.present?
+              = b_param.bike_errors.each_key { |f| f.to_s.humanize}
+            / - if b_param.params.creation_organization_id && b_param.params.creation_organization_id
+            /   - organization = Organization.find(b_param.params.creation_organization_id)
+            /   = organization.name 
+          

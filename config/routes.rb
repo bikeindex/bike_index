@@ -75,6 +75,7 @@ Bikeindex::Application.routes.draw do
     match 'duplicate_bikes', to: 'bikes#duplicates'
     resources :flavor_texts, only: [:destroy, :create]
     resources :graphs, only: [:index, :show]
+    resources :failed_bikes, only: [:index, :show]
     resources :ownerships, only: [:edit, :update]
     match 'recover_organization', to: 'organizations#recover' 
     match 'show_deleted_organizations', to: 'organizations#show_deleted' 
@@ -93,7 +94,7 @@ Bikeindex::Application.routes.draw do
 
   namespace :api, defaults: {format: 'json'} do
     namespace :v1 do
-      resources :bikes, only: [:index, :show]
+      resources :bikes, only: [:index, :show, :create]
       resources :cycle_types, only: [:index]
       resources :wheel_sizes, only: [:index]
       resources :colors, only: [:index]

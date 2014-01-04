@@ -6,7 +6,6 @@ module Api
         {root: false}
       end
       
-      # For all responses in this controller, return the CORS access control headers.
       def cors_set_access_control_headers
         headers['Access-Control-Allow-Origin'] = '*'
         headers['Access-Control-Allow-Methods'] = 'POST, PUT, GET, OPTIONS'

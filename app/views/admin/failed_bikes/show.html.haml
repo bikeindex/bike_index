@@ -1,0 +1,28 @@
+%p
+  ID: 
+  = @b_param.id
+%p
+  Creator: 
+  = @b_param.creator.email
+%p
+  Created: 
+  = @b_param.created_at.strftime("%-I:%M %p on %-m/%-d/%Y")
+%p
+  Modified: 
+  = @b_param.updated_at.strftime("%-I:%M %p on %-m/%-d/%Y")
+
+
+
+
+%h3.padded
+  Bike
+%pre
+  = @b_param.params.to_yaml
+
+
+  
+%h3.padded
+  Bike Errors
+
+%pre
+  = @b_param.bike_errors.to_yaml

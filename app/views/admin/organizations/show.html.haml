@@ -3,31 +3,36 @@
     Viewing
     = @organization.name
   %p
-    = link_to "Manage organization invitations", admin_organization_invitation_url(@organization.id)
-%hr
-.row-fluid
-  .span6
-    %h3
-      Overview:
+    = link_to "Edit organization", edit_admin_organization_url(@organization)
+
+%section
+  .dl-holder.padded
+    %dl.dl-horizontal
+      %dt Map
+      %dd
+        - if @organization.show_on_map
+          Shown on map
+        - else
+          %strong
+            Not shown
+      
+      = @organization.dl_from_attribute("org_type", "Type")
+      = @organization.dl_from_attribute("slug")
+      = @organization.dl_from_attribute("access_token")
+      
+      
+    %dl.dl-horizontal
+      = @organization.dl_list_item(@organization.users.count, "Users")
+      = @organization.dl_list_item(@organization.sent_invitation_count, "Sent invites")
+      = @organization.dl_list_item(link_to(@organization.available_invitation_count, admin_organization_invitation_url(@organization.id)), link_to("Remaining invites", admin_organization_invitation_url(@organization.id)))
+      = @organization.dl_from_attribute("website")
+   
 
     - if @organization.is_suspended
-      %p.red-text
+      %h2.red-text
         Organization is suspended
-    %p
-      URL: 
-      =organization_url(@organization)
-    %p
-      users: #{@organization.users.count}
-    %p
-      = "Remaining invitations: #{@organization.available_invitation_count }"
-    %p
-      = "Invitations sent: #{@organization.sent_invitation_count}"
 
-    - if @organization.website
-      %p
-        website:
-        %a{href: "#{@organization.website}"}
-          = @organization.website
+
 
 %section.full-screen-table
   %h2

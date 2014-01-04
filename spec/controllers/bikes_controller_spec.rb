@@ -115,11 +115,12 @@ describe BikesController do
       flash[:error].should eq("Oops, that isn't your bike")
     end
 
-    it "should render new if there is an error" do
+    it "should render new if there is an error and update the b_params" do
       bike = Bike.new(@bike)
       bike.errors.add(:errory, "something")
       BikeCreator.any_instance.should_receive(:create_bike).and_return(bike)
       post :create, { bike: @bike }
+      @b_param.reload.bike_errors.should_not be_nil
       response.should render_template("new")
     end
 
@@ -142,6 +143,7 @@ describe BikesController do
         post :create, { stolen: "true", bike: @bike}
       }.should change(StolenRecord, :count).by(1)
       @b_param.reload.created_bike_id.should_not be_nil
+      @b_param.reload.bike_errors.should be_nil
       @user.reload.phone.should eq("3123799513")
     end
 

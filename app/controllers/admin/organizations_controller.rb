@@ -8,6 +8,7 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def show
     # @organizations = Organization.all
+    @organization = @organization.decorate
     @bikes = Bike.where(creation_organization_id: @organization.id)
   end
 

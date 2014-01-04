@@ -11,7 +11,8 @@ class Organization < ActiveRecord::Base
     :org_type,
     :locations_attributes,
     :embedable_user_email,
-    :embedable_user_id
+    :embedable_user_id,
+    :access_token
 
   attr_accessor :embedable_user_email
   acts_as_paranoid
@@ -60,7 +61,17 @@ class Organization < ActiveRecord::Base
 
   before_save :truncate_short_name
   def truncate_short_name
-    self.short_name = self.short_name.truncate(15)
+    self.short_name = self.short_name.truncate(20)
+  end
+
+  before_save :generate_access_token
+  
+private
+  def generate_access_token
+    return true if self.access_token.present?
+    begin
+      self.access_token = SecureRandom.hex
+    end while self.class.exists?(access_token: access_token)
   end
 
 end

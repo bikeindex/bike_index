@@ -4,9 +4,11 @@ class BParam < ActiveRecord::Base
     :creator_id,
     :bike_title,
     :created_bike_id,
-    :bike_token_id
+    :bike_token_id,
+    :bike_errors
 
   serialize :params
+  serialize :bike_errors
 
   belongs_to :created_bike, class_name: "Bike"
   belongs_to :creator, class_name: "User"
