@@ -93,7 +93,6 @@ class BikesController < ApplicationController
   def create
     if params[:bike][:embeded]
       @b_param = BParam.find(params[:bike][:b_param_id])
-      @b_param.update_attributes(bike_errors: '')
       @bike = Bike.new
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@bike)
@@ -101,7 +100,7 @@ class BikesController < ApplicationController
       @b_param.update_attributes(params: params)
       @bike = BikeCreator.new(@b_param).create_bike
       if @bike.errors.any?
-        @b_param.update_attributes(bike_errors: @bike.errors.messages)
+        @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
         flash[:error] = "Whoops! There was a problem with your entry!"
         redirect_to embed_organization_url(@bike.creation_organization) and return  
       else
@@ -122,7 +121,7 @@ class BikesController < ApplicationController
       @b_param.update_attributes(params: params)
       @bike = BikeCreator.new(@b_param).create_bike
       if @bike.errors.any?
-        @b_param.update_attributes(bike_errors: @bike.errors.messages)
+        @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
         render action: :new, layout: 'no_header' and return
       end
       if @bike.payment_required

@@ -34,11 +34,22 @@ class BikeIndex.Views.Home extends Backbone.View
       })
 
   createBike: ->
+    org_slug = 'ikes'
+
+    bike = 
+      serial_number: "69"
+      cycle_type_id: 1
+      manufacturer_id: 1
+      rear_tire_narrow: false
+      rear_wheel_size_id: 10
+      primary_frame_color_id: 2
+      owner_email: "seth@bikeindex.org"
+
     $.ajax
-      # url: "https://bikeindex.org/api/v1/"
+      # url: "https://bikeindex.org/api/v1/bikes"
       url: "http://lvh.me:3000/api/v1/bikes"
       type: "POST"
-      data: { bike: {new_thing: "something", else_thing: "blah"} }
+      data: { bike: bike, organization_slug: org_slug, access_token: token, keys_included: true }
       success: (data, textStatus, jqXHR) ->
         # console.log(data)
         console.log("Response:  " + textStatus)
