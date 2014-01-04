@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140103235111) do
+ActiveRecord::Schema.define(:version => 20140104011352) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -322,7 +322,7 @@ ActiveRecord::Schema.define(:version => 20140103235111) do
     t.integer  "sent_invitation_count",      :default => 0
     t.datetime "deleted_at"
     t.boolean  "is_suspended",               :default => false,  :null => false
-    t.integer  "embedable_user_id"
+    t.integer  "auto_user_id"
     t.string   "org_type",                   :default => "shop", :null => false
     t.string   "access_token"
   end

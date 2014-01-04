@@ -41,7 +41,7 @@ class BikeCreator
       bike.destroy
       @bike = @b_param.created_bike
     else
-      @b_param.update_attributes(created_bike_id: bike.id)
+      @b_param.update_attributes(created_bike_id: bike.id, bike_errors: nil)
     end
     @bike 
   end

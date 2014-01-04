@@ -28,7 +28,7 @@ class User < ActiveRecord::Base
   mount_uploader :avatar, AvatarUploader
 
   has_many :memberships, dependent: :destroy
-  has_many :organization_embeds, class_name: 'Organization', foreign_key: :embedable_user_id
+  has_many :organization_embeds, class_name: 'Organization', foreign_key: :auto_user_id
   has_many :organizations, through: :memberships
   has_many :ownerships, dependent: :destroy
   has_many :current_ownerships, class_name: 'Ownership', foreign_key: :user_id, conditions: {current: true}

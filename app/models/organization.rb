@@ -11,7 +11,7 @@ class Organization < ActiveRecord::Base
     :org_type,
     :locations_attributes,
     :embedable_user_email,
-    :embedable_user_id,
+    :auto_user_id,
     :access_token
 
   attr_accessor :embedable_user_email
@@ -21,7 +21,7 @@ class Organization < ActiveRecord::Base
   has_many :organization_deals, dependent: :destroy
   has_many :users, through: :memberships
   has_many :organization_invitations, dependent: :destroy
-  belongs_to :embedable_user, class_name: "User"
+  belongs_to :auto_user, class_name: "User"
 
   has_many :locations, dependent: :destroy
   accepts_nested_attributes_for :locations, allow_destroy: true
@@ -47,11 +47,14 @@ class Organization < ActiveRecord::Base
   end
 
 
-  before_save :set_embedable_user
-  def set_embedable_user
+  before_save :set_auto_user
+  def set_auto_user
     if self.embedable_user_email.present?
       u = User.fuzzy_email_find(embedable_user_email)
-      self.embedable_user_id = u.id if u.is_member_of?(self)
+      self.auto_user_id = u.id if u.is_member_of?(self)
+    elsif self.auto_user_id.blank?
+      return nil unless self.users.any?
+      self.auto_user_id = self.users.first.id
     end
   end
 

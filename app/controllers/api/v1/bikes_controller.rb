@@ -15,10 +15,16 @@ module Api
       end
 
       def create
-        
-        b_param = BParam.create(creator_id: current_user.id, params: params)
-        @bike = BikeCreator.new(@b_param).create_bike
-        if @bike.errors.any?
+        raise StandardError unless params[:bike].present?
+        params[:bike][:creation_organization_id] = @organization.id
+        @b_param = BParam.create(creator_id: @organization.auto_user.id, params: params)
+        if params[:keys_included]
+          bike = BikeCreator.new(@b_param).create_bike 
+        else
+          # bike = BikeCreator.new(@b_param).create_bike_without_foreign_keys
+          @b_param.update_attributes(bike_errors: {foreign_keys: "not associated"}) 
+        end
+        unless @b_param.errors.blank? && @b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
           email_admin = Feedback.new(email: 'contact@bikeindex.org', name: 'Error mailer', title: 'API Bike Creation error!', body: params)
           email_admin.save
         end
@@ -27,15 +33,20 @@ module Api
     
     private
       def authenticate_organization
-        organization = Organization.find_by_slug(params[:organization])
+        organization = Organization.find_by_slug(params[:organization_slug])
         if organization.access_token == params[:access_token]
           @organization = organization
+        else
+          raise StandardError
+          # At some point we'll want to rescue these errors.
+          # For now, throw an error and so we get an airbrake notification anytime this happens...
+          # Since we probably did something wrong.
+          # Because who the hell is posting to our API without instruction?
+          # No-one. That's who. Since there is no documentation.
         end
-        # At some point we'll want to rescue these errors.
-        # For now, I want to get an airbrake notification anytime this happens...
-        # Because, who the hell is getting here without instruction?
       end
-
     end
+
   end
 end
+# associated
