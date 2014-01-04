@@ -3,7 +3,7 @@ class BikeIndex.Views.Home extends Backbone.View
     @setElement($('#body'))
     @moveBike()
     # @manufacturerCall()
-    # @createBike()
+    @createBike()
 
   moveBike: ->
     register = $('#treating-right .treating-right-text')
@@ -34,7 +34,13 @@ class BikeIndex.Views.Home extends Backbone.View
       })
 
   createBike: ->
-    org_slug = 'ikes'
+    token = 'c86bc0e87b854b8f6c42f86efcbf91f6'
+    org_slug = 'bikeindex'
+    url = "https://bikeindex.org/api/v1/bikes"
+    
+    # url = "http://lvh.me:3000/api/v1/bikes"
+    # token = '05f3fc5564e6dd77a3bde974132f219b'
+    # org_slug = 'ikes'
 
     bike = 
       serial_number: "69"
@@ -46,8 +52,7 @@ class BikeIndex.Views.Home extends Backbone.View
       owner_email: "seth@bikeindex.org"
 
     $.ajax
-      # url: "https://bikeindex.org/api/v1/bikes"
-      url: "http://lvh.me:3000/api/v1/bikes"
+      url: url
       type: "POST"
       data: { bike: bike, organization_slug: org_slug, access_token: token, keys_included: true }
       success: (data, textStatus, jqXHR) ->

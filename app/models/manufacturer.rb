@@ -15,6 +15,15 @@ class Manufacturer < ActiveRecord::Base
 
   mount_uploader :logo, AvatarUploader
 
+  def self.fuzzy_name_find(n)
+    if !n.blank?
+      self.find(:first, :conditions => [ "lower(name) = ?", n.downcase.strip ])
+    else
+      nil
+    end
+  end
+
+
   def to_param
     slug
   end
