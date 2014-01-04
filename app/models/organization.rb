@@ -67,11 +67,13 @@ class Organization < ActiveRecord::Base
     self.short_name = self.short_name.truncate(20)
   end
 
-  before_save :generate_access_token
-  
+  before_save :set_access_token
+  def set_access_token
+    generate_access_token unless self.access_token.present?
+  end
+
 private
-  def generate_access_token
-    return true if self.access_token.present?
+  def generate_access_token    
     begin
       self.access_token = SecureRandom.hex
     end while self.class.exists?(access_token: access_token)
