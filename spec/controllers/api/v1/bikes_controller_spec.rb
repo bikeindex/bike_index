@@ -61,21 +61,21 @@ describe Api::V1::BikesController do
       f_count.should eq(Feedback.count)
     end
 
-    it "should create email us if the record isn't pre_associated" do
-      manufacturer = FactoryGirl.create(:manufacturer)
-      bike = { serial_number: "69",
-        cycle_type_id: FactoryGirl.create(:cycle_type).id,
-        manufacturer_id: manufacturer.id,
-        rear_tire_narrow: "true",
-        rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
-        primary_frame_color_id: FactoryGirl.create(:color).id,
-        owner_email: "fun_times@examples.com"
-      }
-      lambda { 
-        post :create, { bike: bike, organization_slug: @organization.slug, access_token: @organization.access_token }
-        pp bike
-      }.should change(Feedback, :count).by(1)
-    end
+    # it "should create email us if the record isn't pre_associated" do
+    #   manufacturer = FactoryGirl.create(:manufacturer)
+    #   bike = { serial_number: "69",
+    #     cycle_type_id: FactoryGirl.create(:cycle_type).id,
+    #     manufacturer_id: manufacturer.id,
+    #     rear_tire_narrow: "true",
+    #     rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
+    #     primary_frame_color_id: FactoryGirl.create(:color).id,
+    #     owner_email: "fun_times@examples.com"
+    #   }
+    #   lambda { 
+    #     post :create, { bike: bike, organization_slug: @organization.slug, access_token: @organization.access_token }
+    #     pp bike
+    #   }.should change(Feedback, :count).by(1)
+    # end
   end
     
 end
