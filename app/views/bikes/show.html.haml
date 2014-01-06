@@ -20,7 +20,9 @@
   .show-bike-edit
     %p
       - if @bike.current_owner_exists
-        - if @bike.stolen
+        - if @bike.recovered
+          Thank you for recovering this #{@bike.type}!
+        - elsif @bike.stolen
           We're really bummed that your #{@bike.type} was stolen.       
         - else
           Whoah, this awesome #{@bike.type} is yours!
@@ -46,6 +48,8 @@
     %h1
       - if @bike.stolen
         %strong.stolen-color
+          - if @bike.recovered
+            Recovered 
           Stolen
       = @bike.title
 
@@ -70,6 +74,11 @@
           - if @bike.current_stolen_record.latitude.present? and @bike.current_stolen_record.longitude.present?
             = render "bikes/stolen_map"
           .dl-horizontal
+            - if @bike.recovered && @bike.creation_organization.present?
+              %dt.stolen-color
+                Recovered by
+              %dd
+                = @bike.creation_organization.name
             - if @bike.phoneable_by(current_user)
               %dt.stolen-color
                 Phone number
@@ -107,9 +116,10 @@
       %dl.dl-horizontal
         - unless @bike.type == "bike"
           = @bike.dl_from_attribute("type", "Cycle Type")
-        %dt Serial
-        %dd.serial-text
-          = @bike.serial_number
+        - unless @bike.recovered
+          %dt Serial
+          %dd.serial-text
+            = @bike.serial_number
         = @bike.dl_list_item(@bike.mnfg_name, "Manufacturer")
         = @bike.dl_from_attribute("frame_model", "Model")
         = @bike.dl_from_attribute("frame_manufacture_year", "Year")
@@ -173,6 +183,8 @@
               
               %a{ href: "tell:#{@bike.current_stolen_record.phone}" }
                 = @bike.current_stolen_record.phone
+          - if @bike.recovered
+            Is this your bike? Send proof of ownership (such as the bike's serial number or a photo of you with the bike)
           = render 'stolen_notifications/form'
 
       - else

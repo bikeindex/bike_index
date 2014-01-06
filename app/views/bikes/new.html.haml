@@ -23,7 +23,7 @@
         = hidden_field_tag :bike_token_id, @bike.bike_token_id
 
       .inner-recep
-        .adding-bike       
+        .adding-bike{ class: "#{"recovered-color" if @bike.recovered}" }
           %h1
             Add a
             - if @bike.stolen
@@ -42,14 +42,18 @@
                   %li
                     %a.clickable{ id: "cycletype#{type.id}", :data => {id: type.id}, class: ("long-title" if type.name.length > 8) }
                       = type.name
-                
           %h2
+            - if @bike.recovered
+              %span.recovered-color
+                you have recovered
             to the Index
 
         .new-bike-fields
 
           = render :partial => 'bikes/bike_fields/new_bike', :locals => { :f => f }
 
+          - if @bike.recovered
+            = f.hidden_field :recovered, value: true
 
           - if @bike.stolen?
             = f.hidden_field :stolen, value: true

@@ -4,9 +4,10 @@
     .dl-holder
       %a.blist-link{ href: bike.list_link_url(target) }
         %dl.dl-horizontal
-          %dt Serial
-          %dd.serial-text
-            = bike.serial_number
+          - unless bike.recovered
+            %dt Serial
+            %dd.serial-text
+              = bike.serial_number
         %dl.dl-horizontal
           = bike.dl_list_item(bike.title, bike.type.titleize)
         

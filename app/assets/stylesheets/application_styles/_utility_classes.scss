@@ -328,9 +328,9 @@ header.with-subtitle {
   background: $stolenBackground;
 }
 
-.stolen-color {
-  color: $stolenColor;
-}
+.stolen-color { color: $stolenColor; }
+
+.recovered-color { color: $stolenColor; }
 
 .smaller-text {
   font-size: .8em;

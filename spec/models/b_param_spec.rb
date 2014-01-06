@@ -13,6 +13,11 @@ describe BParam do
       b_param.stub(:params).and_return({:bike => {serial_number: "XXX"}})
       b_param.bike[:serial_number].should eq("XXX")
     end
+    it "shouldn't fail if there isn't a bike" do 
+      user = FactoryGirl.create(:user)
+      b_param = BParam.new(creator_id: user.id, params: { stolen: true })
+      b_param.save.should be_true
+    end
   end
 
 

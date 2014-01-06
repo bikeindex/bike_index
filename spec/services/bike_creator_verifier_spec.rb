@@ -12,12 +12,63 @@ describe BikeCreatorVerifier do
     end
   end
 
-  describe :stolenize do 
-    it "should mark the bike stolen and payment required false" do 
+  describe :add_phone do 
+    it "should call add the org phone if one exists" do 
+      bike = Bike.new
+      organization = Organization.new
+      location = Location.new
+      b_param = BParam.new
+      organization.stub(:locations).and_return([location])
+      location.stub(:phone).and_return('6969')
+      bike.stub(:creation_organization).and_return(organization)
+      creator = BikeCreatorVerifier.new(b_param, bike)
+      creator.add_phone
+      bike.phone.should eq('6969')
+    end
+    it "should add the user phone if one exists and creation org has no phone" do 
       bike = Bike.new
       b_param = BParam.new
-      BikeCreatorVerifier.new(b_param, bike).stolenize
+      user = User.new
+      bike.stub(:creation_organization).and_return(nil)
+      user.stub(:phone).and_return('69')
+      bike.stub(:creator).and_return(user)
+      creator = BikeCreatorVerifier.new(b_param, bike)
+      creator.add_phone
+      bike.phone.should eq('69')
+    end
+    it "shouldn't raise an error if it can't find a phone" do 
+      bike = Bike.new
+      b_param = BParam.new
+      user = User.new
+      organization = Organization.new
+      bike.stub(:creation_organization).and_return(organization)
+      bike.stub(:creator).and_return(user)
+      user.stub(:phone).and_return(nil)
+      creator = BikeCreatorVerifier.new(b_param, bike)
+      creator.add_phone.should be_nil
+    end
+  end
+
+  describe :stolenize do 
+    it "should call add_phone, mark the bike stolen and payment required false" do 
+      bike = Bike.new
+      b_param = BParam.new
+      creator = BikeCreatorVerifier.new(b_param, bike)
+      creator.should_receive(:add_phone).and_return(true)
+      creator.stolenize
       bike.stolen.should be_true
+      bike.payment_required.should be_false
+    end
+  end
+
+  describe :recoverize do 
+    it "should mark the bike recovered, stolen and payment required false" do 
+      bike = Bike.new
+      b_param = BParam.new
+      creator = BikeCreatorVerifier.new(b_param, bike)
+      creator.should_receive(:stolenize).and_return(true)
+      creator.recoverize
+      bike.recovered.should be_true
       bike.payment_required.should be_false
     end
   end
@@ -42,11 +93,11 @@ describe BikeCreatorVerifier do
     end
   end
 
-  describe :check_stolen do 
-    it "should return false if the bike isn't stolen" do
+  describe :check_stolen_and_recovered do 
+    it "should return false if the bike isn't stolen or recovered" do
       bike = Bike.new
       b_param = BParam.new(params: {stolen: false})
-      creator = BikeCreatorVerifier.new(b_param, bike).check_stolen
+      creator = BikeCreatorVerifier.new(b_param, bike).check_stolen_and_recovered
       creator.should be_false
     end
     it "should call stolenize if there is a stolen attribute included" do
@@ -55,14 +106,30 @@ describe BikeCreatorVerifier do
       b_param.stub(:params).and_return(:bike => {stolen: true})
       creator = BikeCreatorVerifier.new(b_param, bike)
       creator.should_receive(:stolenize).and_return(true)
-      creator.check_stolen
+      creator.check_stolen_and_recovered
     end
     it "should call stolenize if the stolen parameter is passed" do 
       bike = Bike.new
       b_param = BParam.new(params: {stolen: true})
       creator = BikeCreatorVerifier.new(b_param, bike)
       creator.should_receive(:stolenize).and_return(true)
-      creator.check_stolen
+      creator.check_stolen_and_recovered
+    end
+
+    it "should call recoverize if there is a recovered attribute included" do
+      bike = Bike.new
+      b_param = BParam.new
+      b_param.stub(:params).and_return(:bike => {recovered: true})
+      creator = BikeCreatorVerifier.new(b_param, bike)
+      creator.should_receive(:recoverize).and_return(true)
+      creator.check_stolen_and_recovered
+    end
+    it "should call recoverize if the recovered parameter is passed" do 
+      bike = Bike.new
+      b_param = BParam.new(params: {recovered: true})
+      creator = BikeCreatorVerifier.new(b_param, bike)
+      creator.should_receive(:recoverize).and_return(true)
+      creator.check_stolen_and_recovered
     end
   end
 
@@ -73,7 +140,7 @@ describe BikeCreatorVerifier do
       creator = BikeCreatorVerifier.new(b_param, bike)
       creator.should_receive(:set_no_payment_required).and_return(true)
       creator.should_receive(:check_token).and_return(true) 
-      creator.should_receive(:check_stolen).and_return(true)
+      creator.should_receive(:check_stolen_and_recovered).and_return(true)
       creator.verify.should eq(bike)
     end
   end

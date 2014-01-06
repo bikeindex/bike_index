@@ -62,6 +62,17 @@ describe BikesController do
       session[:user_id] = user.id
       get :new, { stolen: true }
       response.code.should eq('200')
+      assigns(:bike).stolen.should be_true
+    end
+
+    it "should render a new recovered bike" do 
+      user = FactoryGirl.create(:user)
+      FactoryGirl.create(:cycle_type, name: "Bike")
+      FactoryGirl.create(:propulsion_type, name: "Foot pedal")
+      session[:user_id] = user.id
+      get :new, { recovered: true }
+      response.code.should eq('200')
+      assigns(:bike).recovered.should be_true
     end
 
     it "should render a new organization bike" do 

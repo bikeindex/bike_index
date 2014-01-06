@@ -21,10 +21,9 @@ class BParam < ActiveRecord::Base
 
   before_save :set_foreign_keys
   def set_foreign_keys
-    if params[:bike].present?
-      set_manufacturer_keys if params[:bike][:manufacturer_name].present?
-      set_primary_color_key if params[:bike][:primary_frame_color_name].present?
-    end
+    return true unless params.present? && bike.present?
+    set_manufacturer_keys if bike[:manufacturer_name].present?
+    set_primary_color_key if bike[:primary_frame_color_name].present?
   end
 
   def set_manufacturer_keys

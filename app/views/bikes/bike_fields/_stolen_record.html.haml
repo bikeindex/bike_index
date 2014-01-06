@@ -1,7 +1,14 @@
+- if @bike.recovered
+  - stolen_type = "recovered"
+- else 
+  - stolen_type = "stolen"
 .edit-bike-fields#edit_stolen
   %header
     %h2
-      The theft
+      - if @bike.recovered
+        Information about the bike's recovery
+      - else
+        The theft
   .input-group
     %a.bikeform-tip{role: "button", title: "Why do we want your phone number?", :data => {toggle: "modal", target: "#phoneTip"} }
       %span
@@ -32,7 +39,7 @@
 
   .input-group
     .control-group.datepicker-container
-      = bike.label :date_stolen_input, "When was the bike stolen?", class: "control-label"
+      = bike.label :date_stolen_input, "When was it #{stolen_type}?", class: "control-label"
       .controls
         #stolen_date
           = bike.text_field :date_stolen_input, value: @bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), required: true, data: { :'date-format' => "mm-dd-yyyy" }
@@ -44,7 +51,7 @@
 
   .input-group
     #stolen-bike-location.control-group
-      = f.label :street, "Where was the bike?", class: "control-label"
+      = f.label :street, "Where was it #{stolen_type}?", class: "control-label"
       #country_select_container.controls.chosen-select
         = f.collection_select(:country_id, Country.all, :id, :name, prompt: "Choose country" )
         %p.other-value
@@ -58,41 +65,46 @@
       #state-select.controls.extra-field.chosen-select
         = f.collection_select(:state_id, State.all, :id, :name, include_blank: true, prompt: "State" )
 
-  .input-group
-    .control-group
-      = f.label :locking_description, "Bike locking description", class: "control-label"
-      .controls
-        = f.select(:locking_description, StolenRecord.locking_description_select, prompt: "Choose lock")
+  - unless @bike.recovered
+    .input-group
+      .control-group
+        = f.label :locking_description, "Bike locking description", class: "control-label"
+        .controls
+          = f.select(:locking_description, StolenRecord.locking_description_select, prompt: "Choose lock")
 
-  .input-group
-    .control-group.large-text
-      = f.label :lock_defeat_description, "lock defeated", class: "control-label"
-      .controls
-        = f.select(:lock_defeat_description, StolenRecord.lock_defeat_description_select, prompt: "How was the lock defeated?")
+    .input-group
+      .control-group.large-text
+        = f.label :lock_defeat_description, "lock defeated", class: "control-label"
+        .controls
+          = f.select(:lock_defeat_description, StolenRecord.lock_defeat_description_select, prompt: "How was the lock defeated?")
 
     
   .input-group
     .control-group.large-text
-      = f.label :theft_description, "Description of the theft", class: "control-label"
+      - if @bike.recovered?
+        = f.label :theft_description, "How and why you recovered the bike", class: "control-label"
+      - else
+        = f.label :theft_description, "Description of the theft", class: "control-label"
       .controls
         = f.text_area :theft_description, rows: 3
   
-  .input-group
-    .control-group
-      %p
-        Filing a 
-        %strong
-          police report
-        is 
-        %em.stolen-color
-          extremely important
-        for stolen bike recovery.
-      = f.label :police_report_number, "Police report number", class: "control-label"
-      .controls.police-report-check
-        = f.text_field :police_report_number
-      = f.label :police_report_department, "Department & city", class: "control-label"
-      .controls.police-report-check
-        = f.text_field :police_report_department
+  - unless @bike.recovered
+    .input-group
+      .control-group
+        %p
+          Filing a 
+          %strong
+            police report
+          is 
+          %em.stolen-color
+            extremely important
+          for stolen bike recovery.
+        = f.label :police_report_number, "Police report number", class: "control-label"
+        .controls.police-report-check
+          = f.text_field :police_report_number
+        = f.label :police_report_department, "Department & city", class: "control-label"
+        .controls.police-report-check
+          = f.text_field :police_report_department
 
-          
-      
+            
+        
