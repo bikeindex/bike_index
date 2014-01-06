@@ -75,7 +75,7 @@
             = render "bikes/stolen_map"
           .dl-horizontal
             - if @bike.recovered && @bike.creation_organization.present?
-              %dt.stolen-color
+              %dt
                 Recovered by
               %dd
                 = @bike.creation_organization.name
