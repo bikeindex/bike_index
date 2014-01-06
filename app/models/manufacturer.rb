@@ -12,8 +12,17 @@ class Manufacturer < ActiveRecord::Base
   validates_presence_of :name
   validates_uniqueness_of :name
   validates_uniqueness_of :slug
+  has_many :bikes
+  has_many :locks
 
   mount_uploader :logo, AvatarUploader
+  default_scope order(:name)
+
+  scope :frames, where(frame_maker: true)
+
+  def to_param
+    slug
+  end
 
   def self.fuzzy_name_find(n)
     if !n.blank?
@@ -23,17 +32,6 @@ class Manufacturer < ActiveRecord::Base
     end
   end
 
-
-  def to_param
-    slug
-  end
-
-  has_many :bikes
-  has_many :locks
-
-  default_scope order(:name)
-
-  scope :frames, where(frame_maker: true)
 
   def self.import(file)
     CSV.foreach(file.path, headers: true) do |row|

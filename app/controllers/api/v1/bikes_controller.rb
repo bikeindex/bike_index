@@ -18,18 +18,17 @@ module Api
         raise StandardError unless params[:bike].present?
         params[:bike][:creation_organization_id] = @organization.id
         @b_param = BParam.create(creator_id: @organization.auto_user.id, params: params)
-        if params[:keys_included]
-          bike = BikeCreator.new(@b_param).create_bike
+        bike = BikeCreator.new(@b_param).create_bike
+        if @b_param.errors.blank? && @b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
+          render :text => '{"status": "success"}'
         else
-          # bike = BikeCreator.new(@b_param).create_bike_without_foreign_keys
-          @b_param.update_attributes(bike_errors: {foreign_keys: "not associated"}) 
+          e = @b_param.errors.full_messages.to_sentence
+          e += bike.errors.full_messages.to_sentence if bike.present?
+          Feedback.create(email: 'contact@bikeindex.org', name: 'Error mailer', title: 'API Bike Creation error!', body: e)
+          # render json: "errors": e, status: :unprocessable_entity
+          render :text => '{"status": "success"}'
         end
-        unless @b_param.errors.blank? && @b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
-          email_admin = Feedback.new(email: 'contact@bikeindex.org', name: 'Error mailer', title: 'API Bike Creation error!', body: params)
-          email_admin.body = bike.errors.full_messages.to_sentence if bike.present? && bike.errors.any?
-          email_admin.save
-        end
-        render :text => '{"status": "success"}'
+        
       end
     
       def authenticate_organization

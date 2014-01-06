@@ -78,6 +78,10 @@ FactoryGirl.define do
     priority 1
   end
 
+  factory :color_shade do 
+    name { FactoryGirl.generate(:unique_name) }
+  end
+
   factory :b_param do 
     association :creator, factory: :user
   end

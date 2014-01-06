@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140105181220) do
+ActiveRecord::Schema.define(:version => 20140106031356) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -122,6 +122,13 @@ ActiveRecord::Schema.define(:version => 20140105181220) do
     t.string   "description"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
+  end
+
+  create_table "color_shades", :force => true do |t|
+    t.string   "name"
+    t.integer  "color_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "colors", :force => true do |t|

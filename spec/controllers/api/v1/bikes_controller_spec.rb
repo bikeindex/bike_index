@@ -28,9 +28,16 @@ describe Api::V1::BikesController do
       FactoryGirl.create(:propulsion_type, name: "Foot pedal")
     end
 
-    it "should email us work" do 
+    xit "should return correct code if not logged in" do 
+      c = FactoryGirl.create(:color)
+      post :create, { :bike => { serial_number: '69', color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }
+      response.code.should eq("401")
+    end
+
+    it "should email us" do 
+      c = FactoryGirl.create(:color)
       lambda {
-        post :create, { :bike => { serial_number: '69' }, organization_slug: @organization.slug, access_token: @organization.access_token }
+        post :create, { :bike => { serial_number: '69', color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }
       }.should change(Feedback, :count).by(1)
     end
 
@@ -62,11 +69,11 @@ describe Api::V1::BikesController do
         rear_tire_narrow: "true",
         rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
         primary_frame_color_id: FactoryGirl.create(:color).id,
-        handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
         owner_email: "fun_times@examples.com"
       }
       lambda { 
         post :create, { bike: bike, organization_slug: @organization.slug, access_token: @organization.access_token }
+        pp bike
       }.should change(Feedback, :count).by(1)
     end
   end

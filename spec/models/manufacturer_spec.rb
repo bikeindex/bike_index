@@ -1,6 +1,22 @@
 require 'spec_helper'
 
 describe Manufacturer do
+  describe :validations do 
+    it { should validate_presence_of :name }
+    it { should validate_uniqueness_of :name }
+    xit { should validate_uniqueness_of :slug }
+    it { should have_many :bikes }
+    it { should have_many :locks }
+  end
+
+
+  describe :fuzzy_name_find do
+    it "should find users by email address when the case doesn't match" do
+      mnfg = FactoryGirl.create(:manufacturer, name: "Poopy PANTERS")
+      Manufacturer.fuzzy_name_find('poopy panters').should == mnfg
+    end
+  end
+
   describe "import csv" do 
     it "should add manufacturers to the list" do
       import_file = File.open(Rails.root.to_s + "/spec/manufacturer-test-import.csv")

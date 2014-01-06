@@ -20,22 +20,98 @@ describe BParam do
     end
   end
 
-
-  describe :set_foreign_keys do
-    it "should remove association names and replace them with ids" do
-      FactoryGirl.create(:manufacturer, name: "Other")
-      color = FactoryGirl.create(:color)
-      bike = { serial_number: "69",
-        manufacturer_name: "gobble gobble",
-        primary_frame_color_name: color.name
-      }
-      b_param = FactoryGirl.create(:b_param, params: {bike: bike})
+  describe :set_foreign_keys do 
+    it "should call set_foreign_keys" do 
+      m = FactoryGirl.create(:manufacturer)
+      c = FactoryGirl.create(:color)
+      FactoryGirl.create(:cycle_type, name: "Bike")
+      b_param = BParam.new
+      bike = {manufacturer: m.name, color: c.name}
+      b_param.stub(:params).and_return({bike: bike})
+      b_param.should_receive(:set_cycle_type_key).and_return(true)
+      b_param.should_receive(:set_manufacturer_key).and_return(true)
+      b_param.should_receive(:set_color_key).and_return(true)
+      b_param.should_receive(:set_wheel_size_key).and_return(true)
       b_param.set_foreign_keys
-      b_param.reload
-      b_param.reload.params[:bike][:manufacturer_name].should_not be_present
-      b_param.reload.params[:bike][:manufacturer_other].should eq('Gobble Gobble')
-      b_param.reload.params[:bike][:primary_frame_color_name].should_not be_present
-      b_param.reload.params[:bike][:primary_frame_color_id].should eq(color.id)
+    end
+  end
+
+  describe :set_wheel_size_key do
+    it "should set rear_wheel_size_id to the bsd submitted" do
+      ws = FactoryGirl.create(:wheel_size, iso_bsd: "Bike")
+      bike = { rear_wheel_bsd: ws.iso_bsd }
+      b_param = BParam.new
+      b_param.stub(:params).and_return({bike: bike})
+      b_param.set_wheel_size_key
+      b_param.params[:bike][:rear_wheel_size_id].should eq(ws.id)
+    end
+  end
+
+  describe :set_cycle_type_key do
+    it "should set cycle_type_id to the cycle type from slug submitted" do
+      FactoryGirl.create(:cycle_type, name: "Bike")
+      ct = FactoryGirl.create(:cycle_type, name: "Boo Boo")
+      bike = { serial_number: "gobble gobble", cycle_type: ct.slug }
+      b_param = BParam.new
+      b_param.stub(:params).and_return({bike: bike})
+      b_param.set_cycle_type_key
+      b_param.params[:bike][:cycle_type_id].should eq(ct.id)
+    end
+    it "should set cycle_type_id to bike if there isn't input" do
+      ct = FactoryGirl.create(:cycle_type, name: "Bike")
+      bike = { serial_number: "gobble gobble" }
+      b_param = BParam.new
+      b_param.stub(:params).and_return({bike: bike})
+      b_param.set_cycle_type_key
+      b_param.params[:bike][:cycle_type_id].should eq(ct.id)
+    end
+  end
+
+  describe :set_manufacturer_key do
+    it "should add other manufacturer name and set the set the foreign keys" do
+      m = FactoryGirl.create(:manufacturer, name: "Other")
+      bike = { manufacturer: "gobble gobble" }
+      b_param = BParam.new
+      b_param.stub(:params).and_return({bike: bike})
+      b_param.set_manufacturer_key
+      b_param.params[:bike][:manufacturer].should_not be_present
+      b_param.params[:bike][:manufacturer_id].should eq(m.id)
+      b_param.params[:bike][:manufacturer_other].should eq('Gobble Gobble')
+    end
+  end
+
+  describe :set_color_key do
+    it "should set the color if it's a color" do
+      color = FactoryGirl.create(:color)
+      bike = { color: color.name }
+      b_param = BParam.new
+      b_param.stub(:params).and_return({bike: bike})
+      b_param.set_color_key
+      b_param.params[:bike][:color].should_not be_present
+      b_param.params[:bike][:primary_frame_color_id].should eq(color.id)
+    end
+    it "should set the paint color description if it isn't a base color" do 
+      color = FactoryGirl.create(:color)
+      color_shade = FactoryGirl.create(:color_shade, color: color)
+      bike = { color: color_shade.name }
+      b_param = BParam.new
+      b_param.stub(:params).and_return({bike: bike})
+      b_param.set_color_key
+      b_param.params[:bike][:color].should_not be_present
+      b_param.params[:bike][:frame_paint_description].should eq(color_shade.name)
+      b_param.params[:bike][:primary_frame_color_id].should eq(color.id)
+    end
+    it "should create a color shade and set the color to white if we don't know the color" do
+      color = FactoryGirl.create(:color, name: "Black")
+      bike = { color: "69" }
+      b_param = BParam.new
+      b_param.stub(:params).and_return({bike: bike})
+      lambda {
+        b_param.set_color_key
+      }.should change(ColorShade, :count).by(1)
+      b_param.params[:bike][:color].should_not be_present
+      b_param.params[:bike][:frame_paint_description].should eq("69")
+      b_param.params[:bike][:primary_frame_color_id].should eq(color.id)
     end
   end
 

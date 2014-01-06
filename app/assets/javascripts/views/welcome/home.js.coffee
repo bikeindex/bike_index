@@ -44,11 +44,10 @@ class BikeIndex.Views.Home extends Backbone.View
 
     bike = 
       serial_number: "69"
-      cycle_type_id: 1
-      manufacturer_id: 1
+      manufacturer: "Surly"
       rear_tire_narrow: false
-      rear_wheel_size_id: 10
-      primary_frame_color_id: 2
+      rear_wheel_bsd: 559
+      color: "Black"
       owner_email: "seth@bikeindex.org"
 
     $.ajax
