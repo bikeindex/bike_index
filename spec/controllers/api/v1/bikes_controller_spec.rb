@@ -28,20 +28,26 @@ describe Api::V1::BikesController do
       FactoryGirl.create(:propulsion_type, name: "Foot pedal")
     end
 
-    xit "should return correct code if not logged in" do 
+    it "should return correct code if not logged in" do 
       c = FactoryGirl.create(:color)
-      post :create, { :bike => { serial_number: '69', color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }
+      post :create, { :bike => { serial_number: '69', color: c.name } }
       response.code.should eq("401")
     end
 
-    it "should email us" do 
+    it "should return correct code if bike has errors" do 
+      c = FactoryGirl.create(:color)
+      post :create, { :bike => { serial_number: '69', color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }
+      response.code.should eq("422")
+    end
+
+    it "should email us if it can't create a record" do 
       c = FactoryGirl.create(:color)
       lambda {
         post :create, { :bike => { serial_number: '69', color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }
       }.should change(Feedback, :count).by(1)
     end
 
-    it "should create a record" do
+    it "should create a record and not email us" do
       manufacturer = FactoryGirl.create(:manufacturer)
       f_count = Feedback.count
       bike = { serial_number: "69",
@@ -56,8 +62,9 @@ describe Api::V1::BikesController do
       lambda { 
         post :create, { bike: bike, organization_slug: @organization.slug, access_token: @organization.access_token, keys_included: true }
       }.should change(Ownership, :count).by(1)
-      Bike.last.creation_organization_id.should eq(@organization.id)
       response.code.should eq("200")
+      Bike.last.creation_organization_id.should eq(@organization.id)
+      
       f_count.should eq(Feedback.count)
     end
 

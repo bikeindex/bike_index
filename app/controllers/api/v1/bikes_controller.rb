@@ -20,27 +20,26 @@ module Api
         @b_param = BParam.create(creator_id: @organization.auto_user.id, params: params)
         bike = BikeCreator.new(@b_param).create_bike
         if @b_param.errors.blank? && @b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
-          render :text => '{"status": "success"}'
+          render json: {created_bike_url: bike_url(bike)} and return
         else
-          e = @b_param.errors.full_messages.to_sentence
-          e += bike.errors.full_messages.to_sentence if bike.present?
+          if bike.present?
+            e = bike.errors.full_messages.to_sentence 
+          else
+            e = @b_param.errors.full_messages.to_sentence
+          end
           Feedback.create(email: 'contact@bikeindex.org', name: 'Error mailer', title: 'API Bike Creation error!', body: e)
-          # render json: "errors": e, status: :unprocessable_entity
-          render :text => '{"status": "success"}'
+          render json: e, status: :unprocessable_entity and return
         end
         
       end
     
       def authenticate_organization
         organization = Organization.find_by_slug(params[:organization_slug])
-        if organization.access_token == params[:access_token]
+        if organization.present? && organization.access_token == params[:access_token]
           @organization = organization
         else
-          raise StandardError
-          # At some point we'll want to rescue these errors.
-          # For now, throw an error and so we get an airbrake notification anytime this happens...
-          # Since we probably did something wrong.
-          # Because who the hell is posting to our API without instruction?
+          render json: "Not authorized", status: :unauthorized and return
+          # Really? Who the hell is posting to our API?
           # No-one. That's who. Since there is no documentation.
         end
       end

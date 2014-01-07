@@ -34,20 +34,20 @@ class BikeIndex.Views.Home extends Backbone.View
       })
 
   createBike: ->
-    token = 'c86bc0e87b854b8f6c42f86efcbf91f6'
+    
     org_slug = 'bikeindex'
     url = "https://bikeindex.org/api/v1/bikes"
     
-    # url = "http://lvh.me:3000/api/v1/bikes"
-    # token = '05f3fc5564e6dd77a3bde974132f219b'
-    # org_slug = 'ikes'
+    url = "http://lvh.me:3000/api/v1/bikes"
+    org_slug = 'blow-me'
 
     bike = 
       serial_number: "69"
       manufacturer: "Surly"
+      color: "Black"
       rear_tire_narrow: false
       rear_wheel_bsd: 559
-      color: "Black"
+      description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\ntempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
       owner_email: "seth@bikeindex.org"
 
     $.ajax
@@ -55,10 +55,12 @@ class BikeIndex.Views.Home extends Backbone.View
       type: "POST"
       data: { bike: bike, organization_slug: org_slug, access_token: token, keys_included: true }
       success: (data, textStatus, jqXHR) ->
-        # console.log(data)
+        console.log(data)
+        console.log(data.responseText)
         console.log("Response:  " + textStatus)
         # console.log(jqXHR.responseText)
 
       error: (data, textStatus, jqXHR) ->
         console.log(jqXHR.responseText)
+        console.log(data.responseText)
       

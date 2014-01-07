@@ -66,7 +66,7 @@ class OwnershipCreator
       send_notification_email(ownership)
     else
       add_errors_to_bike(ownership)
-      raise OwnershipNotSavedError, "whoops, ownership wasn't saved"
+      raise OwnershipNotSavedError, "Ownership wasn't saved. Are you sure the bike was created?"
     end
   end
 

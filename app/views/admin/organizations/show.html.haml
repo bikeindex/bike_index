@@ -19,6 +19,12 @@
       = @organization.dl_from_attribute("org_type", "Type")
       = @organization.dl_from_attribute("slug")
       = @organization.dl_from_attribute("access_token")
+      %dt Auto user email
+      %dd
+        = @organization.auto_user.email if @organization.auto_user.present?
+          
+
+
       
       
     %dl.dl-horizontal

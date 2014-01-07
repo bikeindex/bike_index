@@ -29,9 +29,8 @@ class BParam < ActiveRecord::Base
   end
 
   def set_cycle_type_key
-    bike[:cycle_type_id] = CycleType.find_by_name("Bike").id
     if bike[:cycle_type].present?
-      ct = CycleType.find_by_slug(bike[:cycle_type])
+      ct = CycleType.find_by_name(bike[:cycle_type])
       bike[:cycle_type_id] = ct.id if ct.present?
       bike.delete(:cycle_type)
     end
@@ -47,6 +46,7 @@ class BParam < ActiveRecord::Base
 
   def set_manufacturer_key
     m_name = params[:bike][:manufacturer] if bike.present?
+    return false unless m_name.present?
     manufacturer = Manufacturer.fuzzy_name_find(m_name)
     unless manufacturer.present?
       manufacturer = Manufacturer.find_by_name("Other")

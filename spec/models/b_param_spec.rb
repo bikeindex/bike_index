@@ -24,7 +24,6 @@ describe BParam do
     it "should call set_foreign_keys" do 
       m = FactoryGirl.create(:manufacturer)
       c = FactoryGirl.create(:color)
-      FactoryGirl.create(:cycle_type, name: "Bike")
       b_param = BParam.new
       bike = {manufacturer: m.name, color: c.name}
       b_param.stub(:params).and_return({bike: bike})
@@ -48,18 +47,11 @@ describe BParam do
   end
 
   describe :set_cycle_type_key do
-    it "should set cycle_type_id to the cycle type from slug submitted" do
+    it "should set cycle_type_id to the cycle type from name submitted" do
+      # Optional, because default type of Bike is set in creator
       FactoryGirl.create(:cycle_type, name: "Bike")
       ct = FactoryGirl.create(:cycle_type, name: "Boo Boo")
-      bike = { serial_number: "gobble gobble", cycle_type: ct.slug }
-      b_param = BParam.new
-      b_param.stub(:params).and_return({bike: bike})
-      b_param.set_cycle_type_key
-      b_param.params[:bike][:cycle_type_id].should eq(ct.id)
-    end
-    it "should set cycle_type_id to bike if there isn't input" do
-      ct = FactoryGirl.create(:cycle_type, name: "Bike")
-      bike = { serial_number: "gobble gobble" }
+      bike = { serial_number: "gobble gobble", cycle_type: ct.name }
       b_param = BParam.new
       b_param.stub(:params).and_return({bike: bike})
       b_param.set_cycle_type_key
