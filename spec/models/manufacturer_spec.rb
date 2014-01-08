@@ -7,6 +7,8 @@ describe Manufacturer do
     xit { should validate_uniqueness_of :slug }
     it { should have_many :bikes }
     it { should have_many :locks }
+    it { should have_many :components }
+    it { should have_many :paints }
   end
 
 

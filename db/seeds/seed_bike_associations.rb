@@ -28,6 +28,7 @@ colors = [
   { name: 'Brown', priority: 1 },
   { name: 'Raw metal', priority: 2 },
   { name: 'Yellow or Gold', priority: 1 },
+  { name: 'Teal', priority: 1 },
   { name: 'Stickers, tape or other cover-up', priority: 3 }
 ]
 colors.each do |c|

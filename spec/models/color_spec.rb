@@ -5,6 +5,7 @@ describe Color do
     it { should validate_presence_of :name }
     it { should validate_presence_of :priority }
     it { should validate_uniqueness_of :name }
+    it { should have_many :paints }
   end
 
   describe :fuzzy_name_find do

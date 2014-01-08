@@ -3,6 +3,7 @@ class Bike < ActiveRecord::Base
   attr_accessible :verified,
     :payment_required,
     :paid_for,
+    :registered_new, # Was this bike registered at point of sale?
     :cycle_type_id,
     :manufacturer_id, 
     :manufacturer_other,
@@ -32,6 +33,7 @@ class Bike < ActiveRecord::Base
     :primary_frame_color_id,
     :secondary_frame_color_id,
     :tertiary_frame_color_id,
+    :paint_id,
     :frame_paint_description,
     :propulsion_type_id,
     :propulsion_type_other,
@@ -71,6 +73,7 @@ class Bike < ActiveRecord::Base
   belongs_to :frame_material
   belongs_to :propulsion_type
   belongs_to :cycle_type
+  belongs_to :paint
   belongs_to :creator, class_name: "User"
   belongs_to :invoice
   belongs_to :creation_organization, class_name: "Organization"

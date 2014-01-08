@@ -57,27 +57,29 @@ class BParam < ActiveRecord::Base
   end
 
   def set_color_key
-    color_name = params[:bike][:color]
-    color = Color.fuzzy_name_find(color_name.strip) if color_name.present?
-    unless color.present?
-      # if the color isn't one of the base colors,
-      # Set the frame_paint_description to the color
-      # look up the name in color shades, create it if it isn't there
-      if color_name.present?
-        bike[:frame_paint_description] = color_name 
-        cshade = ColorShade.find_by_name(color_name)
-        if cshade.present? 
-          color = cshade.color if cshade.color_id.present?
-        else
-          ColorShade.create(name: color_name)
-        end
-      end
+    paint = params[:bike][:color]
+    color = Color.fuzzy_name_find(paint.strip) if paint.present?
+    if color.present?
+      bike[:primary_frame_color_id] = color.id
+    else
+      set_paint_key(paint)
     end
-    color = Color.find_by_name("Black") unless color.present?
-    bike[:primary_frame_color_id] = color.id
     self.bike.delete(:color)
   end
 
-
+  def set_paint_key(paint_entry)
+    return nil unless paint_entry.present?
+    paint = Paint.find_by_name(paint_entry.strip.downcase)
+    if paint.present?
+      bike[:paint_id] = paint.id
+      bike[:primary_frame_color_id] = paint.color.id if paint.color_id.present?
+    else
+      paint = Paint.new(name: paint_entry)
+      paint.manufacturer_id = bike[:manufacturer_id] if bike[:registered_new]
+      paint.save
+      params[:bike][:paint_id] = paint.id
+    end
+    bike[:primary_frame_color_id] = Color.find_by_name("Black").id unless bike[:primary_frame_color_id].present?
+  end
 
 end

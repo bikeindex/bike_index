@@ -14,6 +14,8 @@ class Manufacturer < ActiveRecord::Base
   validates_uniqueness_of :slug
   has_many :bikes
   has_many :locks
+  has_many :paints
+  has_many :components
 
   mount_uploader :logo, AvatarUploader
   default_scope order(:name)

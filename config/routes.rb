@@ -69,8 +69,9 @@ Bikeindex::Application.routes.draw do
   resources :locks
 
   namespace :admin do
-    root :to => 'dashboard#show'
+    root :to => 'dashboard#index'
     match 'invitations', to: 'dashboard#invitations'
+    match 'maintenance', to: 'dashboard#maintenance'
     resources :discounts, :memberships, :bikes, :organizations, :bike_token_invitations, :organization_invitations
     match 'duplicate_bikes', to: 'bikes#duplicates'
     resources :flavor_texts, only: [:destroy, :create]

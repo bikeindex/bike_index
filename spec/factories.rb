@@ -78,7 +78,7 @@ FactoryGirl.define do
     priority 1
   end
 
-  factory :color_shade do 
+  factory :paint do 
     name { FactoryGirl.generate(:unique_name) }
   end
 

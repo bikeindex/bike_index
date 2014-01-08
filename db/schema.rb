@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140106031356) do
+ActiveRecord::Schema.define(:version => 20140108203313) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -97,6 +97,8 @@ ActiveRecord::Schema.define(:version => 20140106031356) do
     t.string   "pdf"
     t.integer  "card_id"
     t.boolean  "recovered",                :default => false, :null => false
+    t.integer  "paint_id"
+    t.boolean  "registered_new"
   end
 
   add_index "bikes", ["creation_organization_id"], :name => "index_bikes_on_organization_id"
@@ -122,13 +124,6 @@ ActiveRecord::Schema.define(:version => 20140106031356) do
     t.string   "description"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
-  end
-
-  create_table "color_shades", :force => true do |t|
-    t.string   "name"
-    t.integer  "color_id"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
   end
 
   create_table "colors", :force => true do |t|
@@ -346,6 +341,14 @@ ActiveRecord::Schema.define(:version => 20140106031356) do
     t.integer  "creator_id"
     t.boolean  "current",     :default => false
     t.boolean  "claimed"
+  end
+
+  create_table "paints", :force => true do |t|
+    t.string   "name"
+    t.integer  "color_id"
+    t.integer  "manufacturer_id"
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
   end
 
   create_table "propulsion_types", :force => true do |t|

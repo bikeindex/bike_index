@@ -14,6 +14,7 @@ describe Bike do
     it { should belong_to :front_gear_type }
     it { should belong_to :frame_material }
     it { should belong_to :propulsion_type }
+    it { should belong_to :paint }
     it { should belong_to :cycle_type }
     it { should belong_to :creator }
     it { should belong_to :creation_organization }

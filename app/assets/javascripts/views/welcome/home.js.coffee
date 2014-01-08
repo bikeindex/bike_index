@@ -2,8 +2,8 @@ class BikeIndex.Views.Home extends Backbone.View
   initialize: ->
     @setElement($('#body'))
     @moveBike()
-    # @manufacturerCall()
-    # @createBike()
+    @manufacturerCall()
+    @createBike()
 
   moveBike: ->
     register = $('#treating-right .treating-right-text')
@@ -35,16 +35,17 @@ class BikeIndex.Views.Home extends Backbone.View
 
   createBike: ->
     
-    org_slug = 'bikeindex'
-    url = "https://bikeindex.org/api/v1/bikes"
+    # org_slug = 'bikeindex'
+    # url = "https://bikeindex.org/api/v1/bikes"
     
     url = "http://lvh.me:3000/api/v1/bikes"
+    token = 'ea663d45d85169801f1dd90afc2178bc'
     org_slug = 'blow-me'
 
     bike = 
       serial_number: "69"
       manufacturer: "Surly"
-      color: "Black"
+      color: "Burgondy"
       rear_tire_narrow: false
       rear_wheel_bsd: 559
       description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\ntempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."

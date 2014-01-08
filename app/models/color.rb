@@ -3,7 +3,7 @@ class Color < ActiveRecord::Base
   validates_presence_of :name, :priority
   validates_uniqueness_of :name
   has_many :bikes
-  has_many :color_shades
+  has_many :paints
 
   default_scope order(:name)
   scope :commonness, order("priority ASC, name ASC")
