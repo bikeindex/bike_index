@@ -13,4 +13,12 @@ describe Paint do
       pd.name.should eq("hazel or something")
     end
   end
+
+
+  describe :fuzzy_name_find do
+    it "should find users by email address when the case doesn't match" do
+      paint = FactoryGirl.create(:paint, name: "Poopy PAiNTERS")
+      Paint.fuzzy_name_find('poopy painters').should == paint
+    end
+  end
 end

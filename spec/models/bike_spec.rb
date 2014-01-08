@@ -184,6 +184,29 @@ describe Bike do
     end
   end
 
+  describe :set_paints do 
+    it "should set return true if paint is a color" do 
+      FactoryGirl.create(:color, name: "Bluety")
+      bike = Bike.new
+      bike.stub(:paint_name).and_return(" blueTy")
+      lambda { bike.set_paints }.should_not change(Paint, :count)
+      bike.paint.should be_nil
+    end
+    it "should set the paint if it exists" do 
+      FactoryGirl.create(:paint, name: "poopy pile")
+      bike = Bike.new
+      bike.stub(:paint_name).and_return("Poopy PILE  ")
+      lambda { bike.set_paints }.should_not change(Paint, :count)
+      bike.paint.name.should eq("poopy pile")
+    end
+    it "should create a new paint and set it otherwise" do 
+      bike = Bike.new
+      bike.stub(:paint_name).and_return("Food Time SOOON")
+      lambda { bike.set_paints }.should change(Paint, :count).by(1)
+      bike.paint.name.should eq("food time sooon")
+    end
+  end
+
   describe :cache_photo do 
     it "should cache the photo" do 
       bike = FactoryGirl.create(:bike)

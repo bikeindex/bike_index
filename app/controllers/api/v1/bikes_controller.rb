@@ -38,13 +38,12 @@ module Api
         if organization.present? && organization.access_token == params[:access_token]
           @organization = organization
         else
-          render json: "Not authorized", status: :unauthorized and return
           # Really? Who the hell is posting to our API?
-          # No-one. That's who. Since there is no documentation.
+          # No-one. That's who. Because, no documentation.
+          render json: "Not authorized", status: :unauthorized and return
         end
       end
     end
 
   end
 end
-# associated

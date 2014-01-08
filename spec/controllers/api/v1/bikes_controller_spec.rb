@@ -64,7 +64,6 @@ describe Api::V1::BikesController do
       }.should change(Ownership, :count).by(1)
       response.code.should eq("200")
       Bike.last.creation_organization_id.should eq(@organization.id)
-      
       f_count.should eq(Feedback.count)
     end
 

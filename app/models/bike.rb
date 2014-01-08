@@ -34,7 +34,8 @@ class Bike < ActiveRecord::Base
     :secondary_frame_color_id,
     :tertiary_frame_color_id,
     :paint_id,
-    :frame_paint_description,
+    :paint_name,
+    # :frame_paint_description,
     :propulsion_type_id,
     :propulsion_type_other,
     :zipcode,
@@ -103,7 +104,7 @@ class Bike < ActiveRecord::Base
   validates_presence_of :rear_wheel_size_id
   validates_inclusion_of :rear_tire_narrow, :in => [true, false]
 
-  attr_accessor :date_stolen_input, :phone, :bike_image, :bike_token_id, :b_param_id, :payment_required, :embeded
+  attr_accessor :date_stolen_input, :phone, :bike_image, :bike_token_id, :b_param_id, :payment_required, :embeded, :paint_name
 
   default_scope order("created_at desc")
   scope :stolen, where(stolen: true)
@@ -164,6 +165,14 @@ class Bike < ActiveRecord::Base
         src[0].value
       end
     end
+  end
+
+  before_save :set_paints
+  def set_paints
+    return true if Color.fuzzy_name_find(paint_name).present?
+    paint = Paint.fuzzy_name_find(paint_name)
+    paint = Paint.create(name: paint_name) unless paint.present?
+    self.paint_id = paint.id
   end
 
   def type

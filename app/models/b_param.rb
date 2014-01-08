@@ -69,7 +69,7 @@ class BParam < ActiveRecord::Base
 
   def set_paint_key(paint_entry)
     return nil unless paint_entry.present?
-    paint = Paint.find_by_name(paint_entry.strip.downcase)
+    paint = Paint.fuzzy_name_find(paint_entry)
     if paint.present?
       bike[:paint_id] = paint.id
       bike[:primary_frame_color_id] = paint.color.id if paint.color_id.present?

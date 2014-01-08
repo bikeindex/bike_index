@@ -112,12 +112,12 @@
                   Frame size
                 %td
                   = @bike.seat_tube_display
-          - if @bike.frame_paint_description.present?
+          - if @bike.paint.present?
             %tr
               %td.td-title
-                Paint job
+                Paint
               %td
-                = @bike.frame_paint_description
+                = @bike.paint.name
           - else
             %tr
               %td.td-title

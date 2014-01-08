@@ -105,9 +105,9 @@
           = collection_select( :bike, :tertiary_frame_color_id, Color.all, :id, :name, include_blank: 'Choose color' )
   .input-group
     .control-group
-      = f.label :frame_paint_description, "Paint description", class: "control-label"
+      = f.label :paint_name, "Paint description", class: "control-label"
       .controls
-        = f.text_field :frame_paint_description
+        = f.text_field :paint_name, value: (@bike.paint.name.titleize if @bike.paint.present?)
 
   .input-group.inform-save
     .controls

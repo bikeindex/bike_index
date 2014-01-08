@@ -9,3 +9,17 @@ namespace :carrierwave do
 
   end
 end
+
+
+task :switch_paints_over => :environment do
+  Bike.where("frame_paint_description IS NOT NULL").each do |bike|
+    paint = Paint.fuzzy_name_find(bike.frame_paint_description)
+    if paint.present?
+      bike.paint_id = paint.id
+    else
+      paint = Paint.create(name: bike.frame_paint_description)
+      bike.paint_id = paint.id
+    end
+    bike.save
+  end
+end

@@ -27,7 +27,7 @@
           %td
             = link_to b_param.created_at.strftime("%-I %p on %-m/%-d/%Y "), admin_failed_bike_url(b_param.id)
           %td
-            = b_param.creator.email
+            = b_param.creator.email if b_param.creator
           %td
             - if b_param.bike_errors.present?
               = b_param.bike_errors.each_key { |f| f.to_s.humanize}
