@@ -3,7 +3,10 @@
   = @b_param.id
 %p
   Creator: 
-  = @b_param.creator.email
+  - if @b_param.creator.present?
+    = @b_param.creator.email
+  - else
+    No creator
 %p
   Created: 
   = @b_param.created_at.strftime("%-I:%M %p on %-m/%-d/%Y")

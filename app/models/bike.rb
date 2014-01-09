@@ -35,7 +35,6 @@ class Bike < ActiveRecord::Base
     :tertiary_frame_color_id,
     :paint_id,
     :paint_name,
-    # :frame_paint_description,
     :propulsion_type_id,
     :propulsion_type_other,
     :zipcode,

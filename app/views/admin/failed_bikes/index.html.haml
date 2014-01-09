@@ -40,6 +40,8 @@
           %td
             - if b_param.bike_errors.present?
               = b_param.bike_errors.each_key { |f| f.to_s.humanize}
+            - if b_param.errors.present?
+              = b_param.errors.each_key { |f| f.to_s.humanize}
             / - if b_param.params.creation_organization_id && b_param.params.creation_organization_id
             /   - organization = Organization.find(b_param.params.creation_organization_id)
             /   = organization.name 
