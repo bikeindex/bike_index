@@ -3,12 +3,14 @@
   
 
   %section.full-screen-table
-    %table.table.table-striped
+    %table.table.table-striped.table-bordered
       %thead
         %th
           Date
         %th
           Component type
+        %th
+          Component id
         %th
           Bike
 
@@ -26,11 +28,13 @@
             %td
               = f.ctype_other
             %td
+              = f.id
+            %td
               = link_to f.bike.id, edit_admin_bike_url(f.bike)
 
 
   %section.full-screen-table
-    %table.table.table-striped
+    %table.table.table-striped.table-bordered
       %thead
         %th
           Date
@@ -56,7 +60,7 @@
 
 
   %section.full-screen-table
-    %table.table.table-striped
+    %table.table.table-striped.table-bordered
       %thead
         %th
           Date
