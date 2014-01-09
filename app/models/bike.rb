@@ -169,6 +169,7 @@ class Bike < ActiveRecord::Base
 
   before_save :set_paints
   def set_paints
+    return true unless paint_name.present?
     return true if Color.fuzzy_name_find(paint_name).present?
     paint = Paint.fuzzy_name_find(paint_name)
     paint = Paint.create(name: paint_name) unless paint.present?
