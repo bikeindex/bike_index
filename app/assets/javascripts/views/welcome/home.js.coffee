@@ -3,7 +3,7 @@ class BikeIndex.Views.Home extends Backbone.View
     @setElement($('#body'))
     @moveBike()
     @manufacturerCall()
-    @createBike()
+    # @createBike()
 
   moveBike: ->
     register = $('#treating-right .treating-right-text')
@@ -34,7 +34,7 @@ class BikeIndex.Views.Home extends Backbone.View
       })
 
   createBike: ->
-    
+    # token = '61417d679e7a35a5c8dad5505d1d1141'
     # org_slug = 'bikeindex'
     # url = "https://bikeindex.org/api/v1/bikes"
     
@@ -43,6 +43,7 @@ class BikeIndex.Views.Home extends Backbone.View
     org_slug = 'blow-me'
 
     bike = 
+      registered_new: true
       serial_number: "69"
       manufacturer: "Surly"
       color: "Burgondy"
