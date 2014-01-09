@@ -7,5 +7,4 @@ class Admin::FailedBikesController < Admin::BaseController
     @b_param = BParam.find(params[:id])
   end
 
-
 end

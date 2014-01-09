@@ -139,6 +139,14 @@ class User < ActiveRecord::Base
     self.memberships.any?
   end
 
+  def has_police_membership?
+    self.organizations.police.any?
+  end
+
+  def has_shop_membership?
+    self.organizations.shop.any?
+  end
+
   def bikes
     ownerships = Ownership.where(user_id: self.id).where(current: true).pluck(:bike_id)
   end

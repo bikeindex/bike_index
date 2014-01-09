@@ -79,6 +79,14 @@
                 Recovered by
               %dd
                 = @bike.creation_organization.name
+              - if @bike.creation_organization.locations.present? && @bike.creation_organization.locations.first.phone.present?
+                %dt
+                  #{@bike.creation_organization.name} phone
+                  
+                %dd
+                  %a{ href: "tell:#{@bike.current_stolen_record.phone}" }
+                    = number_to_phone(@bike.creation_organization.locations.first.phone)
+
             - if @bike.phoneable_by(current_user)
               %dt.stolen-color
                 Phone number
@@ -116,9 +124,12 @@
       %dl.dl-horizontal
         - unless @bike.type == "bike"
           = @bike.dl_from_attribute("type", "Cycle Type")
-        - unless @bike.recovered
-          %dt Serial
-          %dd.serial-text
+      
+        %dt Serial
+        %dd.serial-text
+          - if @bike.recovered
+            Serial hidden
+          - else
             = @bike.serial_number
         = @bike.dl_list_item(@bike.mnfg_name, "Manufacturer")
         = @bike.dl_from_attribute("frame_model", "Model")
