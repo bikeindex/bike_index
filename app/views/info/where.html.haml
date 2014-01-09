@@ -46,9 +46,10 @@
                       = location.street
                       %br
                       #{location.city}, #{location.state.abbreviation} #{location.zipcode}
-                    .map-telephone
-                      %a{ href: "tel:#{ location.phone }" }
-                        = number_to_phone(location.phone)
+                    - if location.phone
+                      .map-telephone
+                        %a{ href: "tel:#{ location.phone }" }
+                          = number_to_phone(location.phone)
 
 
 
