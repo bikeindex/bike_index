@@ -72,7 +72,6 @@ class Organization < ActiveRecord::Base
     generate_access_token unless self.access_token.present?
   end
 
-private
   def generate_access_token    
     begin
       self.access_token = SecureRandom.hex
