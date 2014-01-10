@@ -2,7 +2,7 @@ class BikeIndex.Views.Home extends Backbone.View
   initialize: ->
     @setElement($('#body'))
     @moveBike()
-    @manufacturerCall()
+    # @manufacturerCall()
     # @createBike()
 
   moveBike: ->
@@ -34,14 +34,6 @@ class BikeIndex.Views.Home extends Backbone.View
       })
 
   createBike: ->
-    # token = '61417d679e7a35a5c8dad5505d1d1141'
-    # org_slug = 'bikeindex'
-    # url = "https://bikeindex.org/api/v1/bikes"
-    
-    url = "http://lvh.me:3000/api/v1/bikes"
-    token = 'ea663d45d85169801f1dd90afc2178bc'
-    org_slug = 'blow-me'
-
     bike = 
       registered_new: true
       serial_number: "69"
