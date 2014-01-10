@@ -12,7 +12,12 @@ class UsersController < ApplicationController
   def create
     @user = User.new(params[:user])
     if @user.save
-      CreateUserJobs.new(user: @user).do_jobs  
+      CreateUserJobs.new(user: @user).do_jobs
+      if @user.confirmed
+        session[:user_id] = @user.id
+        session[:last_seen] = Time.now
+        redirect_to user_home_url, :notice => "Logged in!" and return
+      end
     else
       render action: :new
     end

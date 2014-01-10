@@ -3,14 +3,13 @@ require "spec_helper"
 describe OrganizationInvitation do
 
   describe :validations do
-    it "should require an invitee_email, a organization, and an inviter" do
-      o = OrganizationInvitation.new
-      o.valid?.should be_false
-      o.errors.messages[:invitee_email].should be_present
-      o.errors.messages[:inviter].should be_present
-      o.errors.messages[:organization].should be_present
-    end
-  end
+    it { should belong_to :inviter }
+    it { should belong_to :invitee }
+    it { should validate_presence_of :invitee_email }
+    it { should validate_presence_of :organization }
+    it { should validate_presence_of :inviter }
+    it { should validate_presence_of :membership_role }
+  end  
 
   describe :create do
     before :each do
