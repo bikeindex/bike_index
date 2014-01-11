@@ -4,9 +4,11 @@
     .dl-holder
       %a.blist-link{ href: bike.list_link_url(target) }
         %dl.dl-horizontal
-          - unless bike.recovered
-            %dt Serial
-            %dd.serial-text
+          %dt Serial
+          %dd.serial-text
+            - if bike.recovered
+              Serial hidden
+            - else 
               = bike.serial_number
         %dl.dl-horizontal
           = bike.dl_list_item(bike.title, bike.type.titleize)
@@ -24,7 +26,9 @@
     .blist-stolen-info
       .dl-holder
         %dl.dl-horizontal
-          = bike.dl_list_item(bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), "Stolen on")
+          - date_label = "Stolen on"
+          - date_label = "Recovered on" if bike.recovered
+          = bike.dl_list_item(bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), date_label)
         %dl.dl-horizontal
           = bike.dl_list_item(bike.short_address(bike.current_stolen_record), "From")
   - pdf ||= false

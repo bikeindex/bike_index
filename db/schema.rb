@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140111142521) do
+ActiveRecord::Schema.define(:version => 20140111183125) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -115,6 +115,7 @@ ActiveRecord::Schema.define(:version => 20140111142521) do
     t.boolean  "published"
     t.string   "old_title_slug"
     t.text     "description_abbr"
+    t.text     "feed_body"
   end
 
   create_table "cgroups", :force => true do |t|
@@ -419,6 +420,7 @@ ActiveRecord::Schema.define(:version => 20140111142521) do
     t.integer  "country_id"
     t.string   "police_report_department"
     t.integer  "state_id"
+    t.integer  "creation_organization_id"
   end
 
   create_table "users", :force => true do |t|

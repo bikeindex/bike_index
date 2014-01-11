@@ -6,17 +6,8 @@ class StolenRecordUpdator
     @bike = creation_params[:bike]
     @date_stolen = creation_params[:date_stolen_input]
     @user = creation_params[:user]
-  end
-
-  def create_new_record
-    mark_records_not_current
-    stolen_record = StolenRecord.new(bike: @bike, current: true, date_stolen: Time.now)     
-    stolen_record.phone = updated_phone if updated_phone.present?
-    if stolen_record.save
-      return true
-    end
-    raise StolenRecordError, "Damnit! We couldn't mark this bike as stolen. Try again."
-  end
+    @b_param = creation_params[:new_bike_b_param]
+  end 
 
   def updated_phone
     if @bike.phone.present?
@@ -49,7 +40,42 @@ class StolenRecordUpdator
         stolen_record.update_attributes(date_stolen: create_date_from_string(@date_stolen))
       end
     else
+      @bike.update_attributes(recovered: false) if @bike.recovered == true
       mark_records_not_current
     end
   end
+
+  def create_new_record
+    mark_records_not_current
+    stolen_record = StolenRecord.new(bike: @bike, current: true, date_stolen: Time.now)
+    stolen_record.phone = updated_phone if updated_phone.present?
+    stolen_record = update_with_params(stolen_record)
+    if stolen_record.save
+      return true
+    end
+    raise StolenRecordError, "Awww shucks! We failed to mark this bike as stolen. Try again?"
+  end
+
+  def set_creation_organization
+    @bike.reload.current_stolen_record.update_attributes(creation_organization_id: @bike.creation_organization_id)
+  end
+
+
+  def update_with_params(stolen_record)
+    return stolen_record unless @b_param.present? && @b_param.params[:stolen_record].present?
+    sr = @b_param.params[:stolen_record]
+    stolen_record.police_report_number, stolen_record.police_report_department = [
+      sr[:police_report_number], sr[:police_report_department] 
+    ]
+    stolen_record.theft_description, stolen_record.street, stolen_record.city = [
+      sr[:theft_description], sr[:street], sr[:city]
+    ]
+    stolen_record.phone = sr[:phone] if sr[:phone].present?
+    stolen_record.date_stolen = create_date_from_string(sr[:date_stolen]) if sr[:date_stolen].present?
+    stolen_record.country_id = Country.fuzzy_iso_find(sr[:country]).id if sr[:country].present?
+    stolen_record.state_id = State.fuzzy_abbr_find(sr[:state]).id if sr[:state].present?
+
+    stolen_record
+  end
+
 end

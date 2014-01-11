@@ -9,4 +9,12 @@ class State < ActiveRecord::Base
 
   default_scope order(:name)
 
+  def self.fuzzy_abbr_find(n)
+    if !n.blank?
+      self.find(:first, :conditions => [ "lower(abbreviation) = ?", n.downcase.strip ])
+    else
+      nil
+    end
+  end
+
 end

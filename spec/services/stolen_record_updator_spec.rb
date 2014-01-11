@@ -46,7 +46,7 @@ describe StolenRecordUpdator do
     end
   end
 
-  describe :update do
+  describe :update_records do
     it "should set the current stolen record as not current if the bike isn't stolen" do 
       bike = FactoryGirl.create(:bike, stolen: true)
       update_stolen_record = StolenRecordUpdator.new(bike: bike)
@@ -69,6 +69,14 @@ describe StolenRecordUpdator do
       StolenRecordUpdator.new(bike: bike, date_stolen_input: "01-01-1969").update_records
       bike.reload.current_stolen_record.date_stolen.should eq(DateTime.strptime("01-01-1969 06", "%m-%d-%Y %H"))
     end
+
+    it "should mark all stolen records false and mark the bike unrecovered if the bike isn't stolen" do 
+      bike = FactoryGirl.create(:bike, stolen: false, recovered: true)
+      update_stolen_record = StolenRecordUpdator.new(bike: bike)
+      update_stolen_record.should_receive(:mark_records_not_current)
+      update_stolen_record.update_records
+      bike.recovered.should be_false
+    end
   end
 
   describe :mark_records_not_current do 
@@ -83,5 +91,63 @@ describe StolenRecordUpdator do
       stolen_record2.reload.current.should be_false
     end
   end
+
+  describe :set_creation_organization do 
+    it "should set the creation organization from the bike" do 
+      organization = FactoryGirl.create(:organization)
+      bike = FactoryGirl.create(:bike, creation_organization_id: organization.id)
+      stolen_record = FactoryGirl.create(:stolen_record, bike: bike)
+      updated = StolenRecordUpdator.new(bike: bike).set_creation_organization
+      stolen_record.reload.creation_organization.should eq(organization)
+    end
+  end
+
+
+  describe :update_with_params do
+    it "should return the stolen record if no stolen record is associated" do 
+      stolen_record = StolenRecord.new 
+      updator = StolenRecordUpdator.new().update_with_params(stolen_record)
+      updator.should eq(stolen_record)
+    end
+
+    it "should set the data that is submitted" do 
+      sr = { phone: '2123123',
+        date_stolen: Time.now.beginning_of_day.strftime("%m-%d-%Y"),
+        police_report_number: 'XXX',
+        police_report_department: 'highway 69',
+        theft_description: 'blah blah blah',
+        street: 'some address',
+        city: 'Big town'
+      }
+      b_param = BParam.new
+      b_param.stub(:params).and_return({stolen_record: sr})
+      stolen_record = StolenRecord.new 
+      updator = StolenRecordUpdator.new(new_bike_b_param: b_param)
+      stolen_record = updator.update_with_params(stolen_record)
+      stolen_record.phone.should eq(sr[:phone])
+      stolen_record.police_report_number.should eq(sr[:police_report_number])
+      stolen_record.police_report_department.should eq(sr[:police_report_department])
+      stolen_record.theft_description.should eq(sr[:theft_description])
+      stolen_record.street.should eq(sr[:street])
+      stolen_record.city.should eq(sr[:city])
+      stolen_record.date_stolen.today?.should be_true
+    end
+
+    it "should create the associations that it's suppose to" do
+      country = FactoryGirl.create(:country)
+      state = FactoryGirl.create(:state, country: country)
+      sr = { state: state.abbreviation,
+        country: country.iso
+      }
+      b_param = BParam.new
+      b_param.stub(:params).and_return({stolen_record: sr})
+      stolen_record = StolenRecord.new 
+      updator = StolenRecordUpdator.new(new_bike_b_param: b_param)
+      stolen_record = updator.update_with_params(stolen_record)
+      stolen_record.country.should eq(country)
+      stolen_record.state.should eq(state)
+    end
+  end
+
 
 end

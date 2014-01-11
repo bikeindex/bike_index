@@ -8,7 +8,8 @@ class BikeCreatorAssociator
   end
 
   def create_stolen_record(bike)
-    StolenRecordUpdator.new(bike: bike, user: @b_param.creator).create_new_record
+    StolenRecordUpdator.new(bike: bike, user: @b_param.creator, new_bike_b_param: @b_param).create_new_record
+    StolenRecordUpdator.new(bike: bike).set_creation_organization if bike.creation_organization.present?
   end
 
   def update_bike_token(bike)

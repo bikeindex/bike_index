@@ -116,18 +116,22 @@
             .input-group
 
               %a.collapsed{ href: "#change_ownership", :data => { toggle: "collapse" } }
-                Change ownership or mark #{@bike.type} stolen
+                - if @bike.stolen?
+                  Mark your #{@bike.type} not stolen
+                - else
+                  Change ownership or mark #{@bike.type} stolen
             #change_ownership.collapse
-              - unless @creator
-                .input-group
-                  This #{@bike.type} is no longer mine, I am selling or giving it to someone:
-                  .control-group.padded
-                    %label.control-label{ for: 'bike_owner_email' }
-                      New owner's email
-                    .controls
-                      = f.text_field :owner_email
-                  .edit-bike-actions
-                    = submit_tag "Send #{@bike.type}", class: "button-yellow", confirm: "Are you sure? Once the new owner has claimed this #{@bike.type}, you will no longer be able to edit it."
+              - unless @bike.stolen?
+                - unless @creator 
+                  .input-group
+                    This #{@bike.type} is no longer mine, I am selling or giving it to someone:
+                    .control-group.padded
+                      %label.control-label{ for: 'bike_owner_email' }
+                        New owner's email
+                      .controls
+                        = f.text_field :owner_email
+                    .edit-bike-actions
+                      = submit_tag "Send #{@bike.type}", class: "button-yellow", confirm: "Are you sure? Once the new owner has claimed this #{@bike.type}, you will no longer be able to edit it."
               .input-group
                 #bike-stolen-check.hidden
                   = f.check_box :stolen

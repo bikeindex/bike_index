@@ -79,13 +79,14 @@
                 Recovered by
               %dd
                 = @bike.creation_organization.name
-              - if @bike.creation_organization.locations.present? && @bike.creation_organization.locations.first.phone.present?
-                %dt
-                  #{@bike.creation_organization.name} phone
-                  
-                %dd
-                  %a{ href: "tell:#{@bike.current_stolen_record.phone}" }
-                    = number_to_phone(@bike.creation_organization.locations.first.phone)
+              - if @bike.current_stolen_record.creation_organization.present?
+                - if @bike.current_stolen_record.creation_organization.locations.present? && @bike.current_stolen_record.creation_organization.locations.first.phone.present?
+                  %dt
+                    #{@bike.current_stolen_record.creation_organization.name} phone
+                    
+                  %dd
+                    %a{ href: "tell:#{@bike.current_stolen_record.phone}" }
+                      = number_to_phone(@bike.current_stolen_record.creation_organization.locations.first.phone)
 
             - if @bike.phoneable_by(current_user)
               %dt.stolen-color

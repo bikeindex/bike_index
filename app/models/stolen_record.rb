@@ -5,6 +5,7 @@ class StolenRecord < ActiveRecord::Base
     :lock_defeat_description,
     :date_stolen,
     :bike,
+    :creation_organization_id,
     :country_id,
     :state_id,
     :street,
@@ -23,6 +24,7 @@ class StolenRecord < ActiveRecord::Base
   belongs_to :bike
   belongs_to :country
   belongs_to :state
+  belongs_to :creation_organization, class_name: "Organization"
 
   validates_presence_of :bike, :date_stolen
 

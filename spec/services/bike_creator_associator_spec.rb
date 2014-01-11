@@ -12,10 +12,12 @@ describe BikeCreatorAssociator do
   end
 
   describe :create_stolen_record do 
-    it "should call create ownership" do 
+    it "should call create stolen record and set_creation_organization" do 
       b_param = BParam.new
       bike = Bike.new 
+      bike.stub(:creation_organization).and_return(true)
       StolenRecordUpdator.any_instance.should_receive(:create_new_record).and_return(true)
+      StolenRecordUpdator.any_instance.should_receive(:set_creation_organization).and_return(true)
       BikeCreatorAssociator.new(b_param).create_stolen_record(bike)
     end
   end

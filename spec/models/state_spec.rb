@@ -11,4 +11,11 @@ describe State do
     it { should validate_uniqueness_of :name }
     it { should validate_uniqueness_of :abbreviation }
   end
+
+  describe :fuzzy_abbr_find do
+    it "should find users by email address when the case doesn't match" do
+      state = FactoryGirl.create(:state, abbreviation: "LULZ" )
+      State.fuzzy_abbr_find('lulz ').should == state
+    end
+  end
 end

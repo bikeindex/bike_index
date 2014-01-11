@@ -95,6 +95,7 @@ Bikeindex::Application.routes.draw do
 
   namespace :api, defaults: {format: 'json'} do
     namespace :v1 do
+      root :to => 'documentation#index'
       resources :bikes, only: [:index, :show, :create]
       resources :cycle_types, only: [:index]
       resources :wheel_sizes, only: [:index]

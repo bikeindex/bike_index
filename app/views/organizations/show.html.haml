@@ -2,3 +2,25 @@
   #{@organization.name} bikes
 
 = render partial: "/bikes/bike_org_table", :locals => {target: ""}
+
+- if @organization.access_token.present?
+  %hr
+
+  %h3
+    Developer information
+
+  %p.padded
+    %strong
+      API Access token:
+    = @organization.access_token
+  %p
+    %strong
+      User for API:
+    - if @organization.auto_user.present?
+      = @organization.auto_user.email
+    - else
+      %span
+        No user set!
+      Contact us at 
+      = link_to "support@bikeindex.org", "mailto:support@bikeindex.org"
+      to get set up for API access.
