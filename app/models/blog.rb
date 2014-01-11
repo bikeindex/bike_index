@@ -55,12 +55,10 @@ class Blog < ActiveRecord::Base
 
   before_save :create_abbreviation
   def create_abbreviation
+    # Render markdown,
     markdown = RDiscount.new(self.body)
-    # pp strip_tags(markdown.to_html)
-    # Remove newlines, remove square brackets, remove parentheses (generally link targets) and then remove extra spaces
-    # b_abbr = self.body.gsub(/\n/,' ').gsub(/[\[\]]/, '').gsub(/\*/, '').gsub(/\([^)]*\)/, '').gsub(/\<[^)]*\>/, '')
-    # then remove extra spaces
     abbr = strip_tags(markdown.to_html)
+    # strip tags, then remove extra spaces
     abbr = abbr.gsub(/\n/,' ').gsub(/\s+/, ' ').strip
     self.body_abbr = truncate(abbr, length: 200)
   end
