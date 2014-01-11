@@ -2,7 +2,7 @@ module HeaderTagHelper
 
   def header_tags
     header_tag_hash = set_header_tag_hash
-    header_tag_hash = set_social_hash(header_tag_hash)
+    header_tag_hash = set_social_hash(header_tag_hash) if controller_name == "blogs"
     html = title_tag_html(header_tag_hash)
     html << author_tag_html
     html << meta_tags_html(header_tag_hash)
