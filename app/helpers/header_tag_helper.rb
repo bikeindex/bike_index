@@ -155,7 +155,7 @@ protected
       hash[:title_tag][:title] = @blog.title
       hash[:meta_tags][:description] = @blog.description
       hash[:meta_tags][:"og:type"] = "article"
-      hash[:meta_tags][:"og:published_time"] = @blog.post_date.utc
+      hash[:meta_tags][:"og:published_time"] = @blog.published_at.utc
       hash[:meta_tags][:"og:modified_time"] = @blog.updated_at.utc
       hash[:meta_tags][:"twitter:creator"] = "@#{@blog.user.twitter}" if @blog.user.twitter
       

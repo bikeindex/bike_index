@@ -4,15 +4,16 @@ class Blog < ActiveRecord::Base
   attr_accessible :title,
     :body,
     :user_id,
+    :published_at,
     :post_date,
-    :post_on,
+    :post_now,
     :tags,
     :published,
     :old_title_slug,
     :description_abbr,
     :update_title
       
-  attr_accessor :post_on, :update_title
+  attr_accessor :post_date, :post_now, :update_title
 
   validates_presence_of :title, :body, :user_id
   validates_uniqueness_of :title, message: "has already been taken. If you believe that this message is an error, contact us!"
@@ -22,13 +23,14 @@ class Blog < ActiveRecord::Base
   has_many :public_images, as: :imageable, dependent: :destroy
 
   scope :published, where(published: true)
-  default_scope order("post_date desc")
+  default_scope order("published_at desc")
 
-  before_save :set_post_date
-  def set_post_date
-    if self.post_on
-      self.post_date = DateTime.strptime("#{self.post_on} 06", "%m-%d-%Y %H")
+  before_save :set_published_at
+  def set_published_at
+    if self.post_date.present?
+      self.published_at = DateTime.strptime("#{self.post_date} 06", "%m-%d-%Y %H")
     end
+    self.published_at = Time.now if self.post_now == '1'
   end
 
   def description

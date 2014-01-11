@@ -4,7 +4,7 @@
       %a.blog-poster{href: user_path(@blogger)}
         = @blogger.name if @blogger.name
     %h4      
-      #{l @blog.post_date, format: :standard_display}
+      #{l @blog.published_at, format: :standard_display}
 
   %hr
 

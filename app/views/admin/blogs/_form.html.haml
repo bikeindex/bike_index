@@ -17,17 +17,13 @@
       .controls
         = collection_select( :blog, :user_id, @users, :id, :email, :required =>true, prompt: "Choose a user")
 
-    .control-group.datepicker-container
-      = label :post_date, "Post date", class: "control-label"
-      .controls
-        #post-date-field
-          = f.text_field :post_on, value: @blog.post_date.strftime("%m-%d-%Y"), required: true, data: { :'date-format' => "mm-dd-yyyy" }
+
 
     .blog-field
       = f.text_field :title, placeholder: "Blog title"
 
     .blog-field
-      = f.text_field :description_abbr, placeholder: "Blog description (155 Characters)"
+      = f.text_field :description_abbr, placeholder: "Blog description (155 Characters) - Generated automatically, unless you enter something"
 
     .blog-field
       = f.text_area :body, placeholder: "Blog post (in markdown)"
@@ -36,6 +32,25 @@
       = f.label :tags, "Tags, should include a main category: Tech, Design, or Update", class: "control-label"
       .controls
         = f.text_area :tags, placeholder: "Separate tags with commas"
+
+    .control-group
+      %label.control-label
+        Published date 
+      .controls.radio-controls
+        %label.checkbox
+          = f.check_box :post_now
+          Publish now
+      .controls.extra-field
+        = @blog.published_at.strftime("%m-%d-%Y")
+        
+        %a#change_published_date{ href: "#", :data => {date: "#{@blog.published_at.strftime("%m-%d-%Y")}" }}
+          edit
+
+    .control-group#blog-date.datepicker-container.initially-hidden
+      = label :post_date, "Post date", class: "control-label"
+      .controls
+        #post-date-field
+          = f.text_field :post_date
 
     .control-group
       = f.label :published, "Published", class: "control-label"
@@ -49,9 +64,11 @@
         %span.this-will-break-links
           This will break existing links!
 
+
     .padded
       %a.button-blue.pull-left{target: "_blank", href: blog_url(@blog)}
         preview post
       = f.submit 'Save', class: 'button-green pull-right'
+          
 
   
