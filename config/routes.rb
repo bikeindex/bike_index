@@ -50,7 +50,7 @@ Bikeindex::Application.routes.draw do
   resources :bike_token_invitations, only: [:create]
 
   resources :blogs, only: [:show, :index]
-  match 'blog', to: "blogs#index"
+  match 'blog', to: redirect("/blogs")
 
   resources :public_images, only: [:create, :show, :edit, :update, :index, :destroy] do 
     collection do
