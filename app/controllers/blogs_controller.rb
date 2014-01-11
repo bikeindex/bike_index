@@ -12,7 +12,7 @@ class BlogsController < ApplicationController
   end
 
   def index
-    @blogs = Blog.where(published: true)
+    @blogs = Blog.published
   end
 
   def set_blogs_active_section

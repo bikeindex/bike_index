@@ -21,6 +21,7 @@ class Blog < ActiveRecord::Base
   belongs_to :user
   has_many :public_images, as: :imageable, dependent: :destroy
 
+  scope :published, where(published: true)
   default_scope order("post_date desc")
 
   before_save :set_post_date
