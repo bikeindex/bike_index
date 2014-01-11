@@ -1,5 +1,5 @@
 require 'rdiscount'
-atom_feed ({:id => request.url}) do |feed|
+atom_feed ({id: request.url, schema_date: 2013}) do |feed|
   feed.title "Bike Index"
   feed.updated(@blogs[0].published_at) if @blogs.length > 0
   @blogs.each do |blog|
