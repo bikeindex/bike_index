@@ -87,3 +87,5 @@ $(document).ready ->
   
   else if $('#photo-page').length > 0
     view = new BikeIndex.Views.PhotosIndex
+  else if $('#documentation-menu').length > 0
+    view = new BikeIndex.Views.DocumentationIndex
