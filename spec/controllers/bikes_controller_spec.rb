@@ -22,6 +22,16 @@ describe BikesController do
       it { should_not set_the_flash }
       it { assigns(:bike).should be_decorated }
     end
+
+    describe "showing example" do 
+      before do 
+        ownership = FactoryGirl.create(:ownership)
+        ownership.bike.update_attributes(example: true)
+        get :show, id: ownership.bike.id
+      end
+      it { should respond_with(:success) }
+      it { should render_template(:show) }
+    end
   end
 
   describe :spokecard do

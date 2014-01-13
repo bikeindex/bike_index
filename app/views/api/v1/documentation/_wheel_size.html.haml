@@ -1,0 +1,22 @@
+%p
+  Curious about the iso bsd of a wheel? Get the list of wheel sizes that we have.
+
+%h3
+  The full list
+
+%article.code
+  - request_url = api_v1_wheel_sizes_url
+  %p Request
+  %pre
+    :plain
+      $.ajax({
+        type: "GET",
+        url: "#{request_url}",
+        success: function(data, textStatus, jqXHR) {
+          $('#wheel-sizes-index').text(data)
+        }
+      });
+
+  %p Response
+  %pre#wheel-sizes-index{ data: {url: request_url }}
+    :plain

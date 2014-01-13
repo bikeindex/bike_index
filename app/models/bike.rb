@@ -56,8 +56,9 @@ class Bike < ActiveRecord::Base
     :b_param_id,
     :cached_attributes,
     :embeded,
+    :example,
     :card_id,
-    :pdf 
+    :pdf
 
   mount_uploader :pdf, PdfUploader
   belongs_to :manufacturer
@@ -105,7 +106,7 @@ class Bike < ActiveRecord::Base
 
   attr_accessor :date_stolen_input, :phone, :bike_image, :bike_token_id, :b_param_id, :payment_required, :embeded, :paint_name
 
-  default_scope order("created_at desc")
+  default_scope where(example: false).order("created_at desc")
   scope :stolen, where(stolen: true)
   scope :non_stolen, where(stolen: false)
 

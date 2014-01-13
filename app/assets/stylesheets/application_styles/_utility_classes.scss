@@ -172,6 +172,11 @@ hr {
   }
 }
 
+.dl-wider-dt {
+  dt { width: 160px; }
+  dd { margin-left: 170px; }
+}
+
 @media (min-width: 768px) {
   .dl-holder {
     @include clearfix;

@@ -49,6 +49,25 @@ describe BikeCreatorVerifier do
     end
   end
 
+  describe :check_example do 
+    it "should make the bike an example if it was created by example organization" do 
+      org = FactoryGirl.create(:organization, name: "Example organization")
+      bike = Bike.new
+      b_param = BParam.new
+      bike.stub(:creation_organization_id).and_return(org.id)
+      creator = BikeCreatorVerifier.new(b_param, bike)
+      creator.check_example
+      bike.example.should be_true
+    end
+    it "shouldn't make the bike an example" do 
+      bike = Bike.new
+      b_param = BParam.new
+      creator = BikeCreatorVerifier.new(b_param, bike)
+      creator.check_example
+      bike.example.should be_false
+    end
+  end
+
   describe :stolenize do 
     it "should call add_phone, mark the bike stolen and payment required false" do 
       bike = Bike.new
@@ -141,6 +160,7 @@ describe BikeCreatorVerifier do
       creator.should_receive(:set_no_payment_required).and_return(true)
       creator.should_receive(:check_token).and_return(true) 
       creator.should_receive(:check_stolen_and_recovered).and_return(true)
+      creator.should_receive(:check_example).and_return(true)
       creator.verify.should eq(bike)
     end
   end

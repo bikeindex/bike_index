@@ -25,9 +25,15 @@ describe OwnershipCreator do
 
   describe :send_notification_email do 
     it "should send a notification email" do 
-      ownership = Ownership.new
-      ownership.stub(:id).and_return(2)
+      ownership = FactoryGirl.create(:ownership)
       Resque.should_receive(:enqueue)
+      OwnershipCreator.new().send_notification_email(ownership)
+    end
+
+    it "should not send a notification email if the bike is an example" do 
+      ownership = FactoryGirl.create(:ownership)
+      ownership.bike.update_attributes(example: true)
+      Resque.should_not_receive(:enqueue)
       OwnershipCreator.new().send_notification_email(ownership)
     end
   end

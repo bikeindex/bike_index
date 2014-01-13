@@ -29,7 +29,7 @@ class BikesController < ApplicationController
   end
 
   def show
-    bike = Bike.find(params[:id])
+    bike = Bike.unscoped.find(params[:id])
     @components = bike.components.decorate
     @bike = bike.decorate
     @stolen_notification = StolenNotification.new if @bike.stolen

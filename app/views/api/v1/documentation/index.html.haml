@@ -1,6 +1,45 @@
 %h1
-  Bike Index API V1 Documentation.
-
+  Bike Index API V1
+%p
+  This is the documentation for the Bike Index JSON API. 
+%p
+  It's terrible, sparsely populated, and most likely incorrect. We apologize.
 
 %p
-  Soon to come...
+  The Bike Index API supports Cross-Origin Resource Sharing (CORS). The CORS spec allows web applications to make cross domain AJAX calls without using workarounds such as JSONP.
+%p
+  For more information about CORS, read #{link_to "this blog post", "www.nczonline.net/blog/2010/05/25/cross-domain-ajax-with-cross-origin-resource-sharing/"}, or #{link_to "the spec", "www.w3.org/TR/access-control/#simple-cross-origin-request-and-actual-r"}.
+
+%p
+  As always, all code is available on our github page, #{link_to "bikeindex", "https://github.com/bikeindex/bike_index"}. You can also read the code for #{link_to "this documentation page","https://github.com/bikeindex/bike_index/blob/master/app/views/api/v1/documentation/index.html.haml"} there.
+%p
+  If you're having any trouble, please contact us at #{link_to "support@bikeindex.org", "mailto:support@bikeindex.org"}.
+
+%hr
+
+%h2#bikes_ref
+  Bikes
+  %span.github-link
+    #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/bikes_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/bikes_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/spec/serializers/bikes_serializer.rb"} on Github
+
+= render partial: "/api/v1/documentation/bikes"
+
+
+
+%hr
+
+%h2#manufacturers_ref
+  Manufacturers 
+  %span.github-link
+    #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/manufacturers_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/manufacturers_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/spec/serializers/bikes_serializer.rb"} on Github
+
+= render partial: "/api/v1/documentation/manufacturers"
+
+%hr
+
+%h2#wheel_size_ref
+  Wheel Sizes
+  %span.github-link
+    #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/wheel_sizes_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/wheel_sizes_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/spec/serializers/wheel_sizes_serializer.rb"} on Github
+
+= render partial: "/api/v1/documentation/wheel_size"

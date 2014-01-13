@@ -1,0 +1,42 @@
+%p
+  The Bike Index maintains a comprehensive list of biking related brands. If you want to get a list of brands that do biking things, you're in the right place.
+
+%h3
+  Query
+%p
+  Find a specific manufacturer ("Surly")
+
+%article.code
+  - request_url = api_v1_manufacturers_url(query: "Surly")
+  %p Request
+  %pre
+    :plain
+      $.ajax({
+        type: "GET",
+        url: "#{request_url}",
+        success: function(data, textStatus, jqXHR) {
+          $('#manufacturers-query').text(data)
+        }
+      });
+
+  %p Response
+  %pre#manufacturers-query{ data: {url: request_url }}
+
+%h3
+  The full list
+
+%article.code
+  - request_url = api_v1_manufacturers_url
+  %p Request
+  %pre
+    :plain
+      $.ajax({
+        type: "GET",
+        url: "#{request_url}",
+        success: function(data, textStatus, jqXHR) {
+          $('#manufacturers-index').text(data)
+        }
+      });
+
+  %p Response
+  %pre#manufacturers-index{ data: {url: request_url }}

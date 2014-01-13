@@ -11,7 +11,7 @@ module Api
       end
 
       def show
-        respond_with Bike.find(params[:id])
+        respond_with Bike.unscoped.find(params[:id])
       end
 
       def create
@@ -38,8 +38,6 @@ module Api
         if organization.present? && organization.access_token == params[:access_token]
           @organization = organization
         else
-          # Really? Who the hell is posting to our API?
-          # No-one. That's who. Because, no documentation.
           render json: "Not authorized", status: :unauthorized and return
         end
       end

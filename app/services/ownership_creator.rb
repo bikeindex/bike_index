@@ -24,6 +24,7 @@ class OwnershipCreator
   end
 
   def send_notification_email(ownership)
+    return true if Bike.unscoped.find(ownership.bike_id).example
     Resque.enqueue(OwnershipInvitationEmailJob, ownership.id)
   end
 

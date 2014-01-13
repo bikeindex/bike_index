@@ -59,29 +59,37 @@ describe Api::V1::BikesController do
         handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
         owner_email: "fun_times@examples.com"
       }
+      OwnershipCreator.any_instance.should_receive(:send_notification_email)
       lambda { 
-        post :create, { bike: bike, organization_slug: @organization.slug, access_token: @organization.access_token, keys_included: true }
+        post :create, { bike: bike, organization_slug: @organization.slug, access_token: @organization.access_token }
       }.should change(Ownership, :count).by(1)
       response.code.should eq("200")
       Bike.last.creation_organization_id.should eq(@organization.id)
       f_count.should eq(Feedback.count)
     end
 
-    # it "should create email us if the record isn't pre_associated" do
-    #   manufacturer = FactoryGirl.create(:manufacturer)
-    #   bike = { serial_number: "69",
-    #     cycle_type_id: FactoryGirl.create(:cycle_type).id,
-    #     manufacturer_id: manufacturer.id,
-    #     rear_tire_narrow: "true",
-    #     rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
-    #     primary_frame_color_id: FactoryGirl.create(:color).id,
-    #     owner_email: "fun_times@examples.com"
-    #   }
-    #   lambda { 
-    #     post :create, { bike: bike, organization_slug: @organization.slug, access_token: @organization.access_token }
-    #     pp bike
-    #   }.should change(Feedback, :count).by(1)
-    # end
+    it "should create an example bike if the bike is from example" do
+      org = FactoryGirl.create(:organization, name: "Example organization")
+      user = FactoryGirl.create(:user)
+      FactoryGirl.create(:membership, user: user, organization: org)
+      manufacturer = FactoryGirl.create(:manufacturer)
+      org.save
+      bike = { serial_number: "69 example bike",
+        cycle_type_id: FactoryGirl.create(:cycle_type).id,
+        manufacturer_id: manufacturer.id,
+        rear_tire_narrow: "true",
+        rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
+        primary_frame_color_id: FactoryGirl.create(:color).id,
+        handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
+        owner_email: "fun_times@examples.com"
+      }
+      Resque.should_not_receive(:enqueue).with(OwnershipInvitationEmailJob, 1)
+      lambda { 
+        post :create, { bike: bike, organization_slug: org.slug, access_token: org.access_token }
+      }.should change(Ownership, :count).by(1)
+      response.code.should eq("200")
+      Bike.unscoped.where(serial_number: "69 example bike").first.example.should be_true
+    end
   end
     
 end

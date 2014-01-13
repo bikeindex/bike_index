@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140111183125) do
+ActiveRecord::Schema.define(:version => 20140112004042) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -98,6 +98,7 @@ ActiveRecord::Schema.define(:version => 20140111183125) do
     t.boolean  "recovered",                :default => false, :null => false
     t.integer  "paint_id"
     t.boolean  "registered_new"
+    t.boolean  "example",                  :default => false, :null => false
   end
 
   add_index "bikes", ["creation_organization_id"], :name => "index_bikes_on_organization_id"

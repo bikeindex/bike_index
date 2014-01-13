@@ -1,6 +1,5 @@
 class ManufacturerSerializer < ActiveModel::Serializer
-  attributes :slug,
-    :name,
+  attributes :name,
     :api_url
 
   def api_url

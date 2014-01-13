@@ -39,7 +39,10 @@ $(document).ready ->
   
   if $('#home-title').length > 0
     view = new BikeIndex.Views.Home 
-  
+
+  else if $('#documentation-menu').length > 0
+    view = new BikeIndex.Views.DocumentationIndex
+
   else if $('#content-wrap').length > 0
     if $('#where-bike-index').length > 0
       view = new BikeIndex.Views.ContentWhere
@@ -87,5 +90,4 @@ $(document).ready ->
   
   else if $('#photo-page').length > 0
     view = new BikeIndex.Views.PhotosIndex
-  else if $('#documentation-menu').length > 0
-    view = new BikeIndex.Views.DocumentationIndex
+    

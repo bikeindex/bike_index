@@ -1,0 +1,56 @@
+%p
+  We provide a way to add bikes via JSON posts to our API. There are a few rules. Or at least some suggested guidelines.
+
+%p
+  You have to have an organization and an access token to add bikes to the Index. When you're ready to register bikes, hit us up.
+
+%p
+  For testing purposes, you can use the example organization to create test bikes. Creating the bikes will not send an email, and they won't be visible in searches - but otherwise, they're functional bikes.
+
+- org = Organization.find_by_name('Example organization')
+
+
+%dl.dl-horizontal.dl-wider-dt
+  %dt#example_organization{ data: {slug: org.slug, token: org.access_token}}
+    Organization slug
+  %dd
+    = org.slug
+  %dt
+    Access token
+  %dd
+    = org.access_token
+
+%h3
+  Add a bike
+
+%article.code
+  - request_url = api_v1_bikes_url
+  %p Request
+  %pre
+    :plain
+      var bike;
+      bike = {
+        serial_number: "XOXO <3",
+        manufacturer: "Surly",
+        color: "Blue",
+        rear_tire_narrow: false,
+        rear_wheel_bsd: 559,
+        description: "Has an under-seat beer opener and a handlebar flower vase",
+        owner_email: "new_bike_owner@bikeindex.org"
+      };
+
+      $.ajax({
+        type: "POST",
+        url: "#{request_url}",
+        data: {
+          bike: bike,
+          organization_slug: #{org.slug},
+          access_token: #{org.access_token}
+        },
+        success: function(data, textStatus, jqXHR) {
+          $('#bike-standard').text(data)
+        }
+      });
+
+  %p Response
+  %pre#bike-standard{ data: {url: request_url }}

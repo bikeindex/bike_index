@@ -9,7 +9,7 @@
     %span.c -
 
 
-  %header.content-sidebar#content-menu
+  %header.content-sidebar#documentation-menu
     .header-content
       .logo
         %a.follow-link.logo{ href: root_url }
@@ -17,45 +17,20 @@
           %h2
             Bike Index
     %nav.content-nav
-      %ul.content-sections{ class: "#{@active_section}_menu"}
-        %li{ class: content_nav_class("about") }
-          = nav_link "About<span> the Bike Index</span>", about_url
+      %ul.content-sections
+        %li.active-menu
+          = link_to "API documentation", "#header", class: "active documentation-head"
           %ul
             %li
-              = nav_link "Bike Index blog", blogs_url
+              = link_to "Adding bikes", "#bikes_ref"
             %li
-              = nav_link "Bike Index partner organizations", where_url
-
-        %li{ class: content_nav_class("resources") }
-          = nav_link "Resources", resources_url
-          %ul
+              = link_to "Manufacturers", "#manufacturers_ref"
             %li
-              = nav_link "Protect your bike", protect_your_bike_url
-            %li
-              = nav_link "What to do if your bike is stolen", stolen_bikes_url
-            %li
-              = nav_link "Information about bicycle serial numbers", serials_url
-            %li
-              = nav_link "List of manufacturers", manufacturers_url
-            %li
-              = nav_link "Bike Index spoke cards", spokecard_url
-              %ul.spokecard-extension
-                %li
-                  = link_to "Spoke cards?", spokecard_url(anchor: 'what-spokecards-are')
-                %li
-                  = link_to "About Bike Index spoke cards", spokecard_url(anchor: 'bike-index-specifics')
-                  
-                %li
-                  = link_to "Making your own", spokecard_url(anchor: 'making-one')
-                  
-        %li.contact-nav-btns{ class: content_nav_class("contact") }
-          = nav_link "Contact", contact_us_url
-          %ul
-            %li
-              = nav_link "Sign up a shop", vendor_signup_url
+              = link_to "Wheel sizes", "#wheel_size_ref"
+            
 
 
-  %section.page-content
+  %section.page-content#documentation-content
     = yield
     
   = render 'shared/footer'
