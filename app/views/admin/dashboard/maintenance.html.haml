@@ -8,7 +8,7 @@
     %table.table.table-striped.table-bordered
       = render partial: "/admin/bikes/admin_bikes_table"
     %p.pull-right
-      #{Bike.unscoped.where(example: true)} example bikes total
+      #{Bike.unscoped.where(example: true).count} example bikes total
       
   - else
     No example bikes right now!

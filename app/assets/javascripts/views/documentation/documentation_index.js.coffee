@@ -6,9 +6,13 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
 
   initialize: ->
     @setElement($('#body'))
-    @createBikes()
-    # @manufacturerCall()
-    # @wheelSizeCall()
+    production = parseInt($('#documentation_head').attr('data-production'), 10)
+    @manufacturerCall()
+    @wheelSizeCall()
+
+    unless production == 1
+      @createBikes()
+      
     # $('#body').attr('data-spy', "scroll").attr('data-target', '#documentation-menu')
     # $('#body').scrollspy(offset: - scroll_height)
     # $('#body').attr('data-spy', "scroll").attr('data-target', '#edit-menu')

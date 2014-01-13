@@ -118,7 +118,7 @@
       });
 
   %p Response
-  %pre#bike-basic{ data: {url: request_url, production: Rails.env.production? }}
+  %pre#bike-basic{ data: {url: request_url }}
     - if Rails.env.production?
       :plain
         {
