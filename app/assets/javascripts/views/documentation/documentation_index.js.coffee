@@ -6,9 +6,9 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
 
   initialize: ->
     @setElement($('#body'))
-    @manufacturerCall()
-    # @createBike()
-    @wheelSizeCall()
+    @createBike()
+    # @manufacturerCall()
+    # @wheelSizeCall()
     # $('#body').attr('data-spy', "scroll").attr('data-target', '#documentation-menu')
     # $('#body').scrollspy(offset: - scroll_height)
     # $('#body').attr('data-spy', "scroll").attr('data-target', '#edit-menu')
@@ -53,41 +53,29 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
       })
 
 
-  createBike: ->
-    # token = '7fb1c38526e57a98ec57760aa7f84992'
-    # org_slug = 'example-org'
-    # url = "https://bikeindex.org/api/v1/bikes"
-    
-    # bikes_data = $('#bikes').data('bikes')
-
-    # for bike_data in bikes_data
-
-    # url = "http://lvh.me:3000/api/v1/bikes"
-    # token = 'ea663d45d85169801f1dd90afc2178bc'
-    # org_slug = 'blow-me'
-
-      
+  createBike: ->      
     bike = 
-      serial_number: "XOXO <3",
-      manufacturer: "Surly",
-      color: "Blue",
-      rear_tire_narrow: false,
-      rear_wheel_bsd: 559,
-      description: "Has an under-seat beer opener and a handlebar flower vase",
+      serial_number: "XOXO <3"
+      manufacturer: "Surly"
+      color: "Blue"
+      rear_tire_narrow: false
+      rear_wheel_bsd: "559"
+      description: "Has an under-seat beer opener and a handlebar flower vase"
       owner_email: "new_bike_owner@bikeindex.org"
-
+    
     $.ajax
       url: $('#bike-standard').attr('data-url')
       type: "POST"
       data: 
         bike: bike
         organization_slug: $('#example_organization').attr('data-slug')
-        access_token: $('#example_organization').attr('data-toke')
+        access_token: $('#example_organization').attr('data-token')
       success: (data, textStatus, jqXHR) ->
         $('#bike-standard').text(JSON.stringify(data,undefined,2))
         # console.log(jqXHR.responseText)
       error: (data, textStatus, jqXHR) ->
         $('#bike-standard').text(JSON.stringify(data,undefined,2))
+        console.log(data)
 
 
 

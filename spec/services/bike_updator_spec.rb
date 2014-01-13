@@ -60,18 +60,19 @@ describe BikeUpdator do
   describe :update_available_attributes do 
     it "should not let protected attributes be updated" do 
       organization = FactoryGirl.create(:organization)
-      bike = FactoryGirl.create(:bike, creation_organization_id: organization.id, verified: true)
+      bike = FactoryGirl.create(:bike, creation_organization_id: organization.id, verified: true, example: true)
       ownership = FactoryGirl.create(:ownership, bike: bike)
       user = ownership.creator
       new_creator = FactoryGirl.create(:user)
       og_bike = bike
-      bike_params = {description: "something long", serial_number: "69", manufacturer_id: 69, manufacturer_other: "Uggity Buggity", creator: new_creator, creation_organization_id: 69, stolen: true}
+      bike_params = {description: "something long", serial_number: "69", manufacturer_id: 69, manufacturer_other: "Uggity Buggity", creator: new_creator, creation_organization_id: 69, example: false, stolen: true}
       BikeUpdator.new(user: user, :b_params => {id: bike.id, bike: bike_params}).update_available_attributes
       bike.reload.serial_number.should eq(og_bike.serial_number)
       bike.manufacturer_id.should eq(og_bike.manufacturer_id)
       bike.manufacturer_other.should eq(og_bike.manufacturer_other)
       bike.creation_organization_id.should eq(og_bike.creation_organization_id)
       bike.creator.should eq(og_bike.creator)
+      bike.example.should eq(og_bike.example)
       # bike.stolen.should be_true
       bike.verified.should be_true
       bike.description.should eq("something long")

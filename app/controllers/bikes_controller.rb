@@ -134,7 +134,7 @@ class BikesController < ApplicationController
 
 
   def edit
-    bike = Bike.find(params[:id])
+    bike = Bike.unscoped.find(params[:id])
     begin
       BikeUpdator.new(user: current_user, b_params: params).ensure_ownership!
       rescue UserNotLoggedInError => e

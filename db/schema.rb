@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140112004042) do
+ActiveRecord::Schema.define(:version => 20140113181408) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -342,6 +342,7 @@ ActiveRecord::Schema.define(:version => 20140112004042) do
     t.integer  "creator_id"
     t.boolean  "current",     :default => false
     t.boolean  "claimed"
+    t.boolean  "example",     :default => false, :null => false
   end
 
   create_table "paints", :force => true do |t|

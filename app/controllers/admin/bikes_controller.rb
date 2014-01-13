@@ -41,6 +41,6 @@ class Admin::BikesController < Admin::BaseController
   protected
 
   def find_bike
-    @bike = Bike.find(params[:id])
+    @bike = Bike.unscoped.find(params[:id])
   end
 end

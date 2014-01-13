@@ -148,7 +148,8 @@ class User < ActiveRecord::Base
   end
 
   def bikes
-    ownerships = Ownership.where(user_id: self.id).where(current: true).pluck(:bike_id)
+    ownerships = Ownership.where(user_id: self.id)
+      .where(example: false).where(current: true).pluck(:bike_id)
   end
 
   def current_organization

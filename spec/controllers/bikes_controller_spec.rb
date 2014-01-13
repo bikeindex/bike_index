@@ -268,6 +268,16 @@ describe BikesController do
       it { should set_the_flash }
     end
 
+    it "should allow you to edit an example bike" do 
+      ownership = FactoryGirl.create(:ownership)
+      ownership.bike.update_attributes(example: true)
+      user = ownership.creator
+      session[:user_id] = user.id
+      put :update, {id: ownership.bike.id, :bike => {description: "69"}}
+      ownership.bike.reload.description.should eq("69")
+      response.should redirect_to bike_url(ownership.bike)
+    end
+
     it "should redirect to edit if the bike has changed to be stolen" do 
       ownership = FactoryGirl.create(:ownership)
       session[:user_id] = ownership.creator.id

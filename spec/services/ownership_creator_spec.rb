@@ -25,14 +25,16 @@ describe OwnershipCreator do
 
   describe :send_notification_email do 
     it "should send a notification email" do 
-      ownership = FactoryGirl.create(:ownership)
+      ownership = Ownership.new
+      ownership.stub(:id).and_return(2)
       Resque.should_receive(:enqueue)
       OwnershipCreator.new().send_notification_email(ownership)
     end
 
-    it "should not send a notification email if the bike is an example" do 
-      ownership = FactoryGirl.create(:ownership)
-      ownership.bike.update_attributes(example: true)
+    it "should send a notification email" do 
+      ownership = Ownership.new
+      ownership.stub(:id).and_return(2)
+      ownership.stub(:example).and_return(true)
       Resque.should_not_receive(:enqueue)
       OwnershipCreator.new().send_notification_email(ownership)
     end
@@ -43,6 +45,7 @@ describe OwnershipCreator do
       user = User.new
       bike = Bike.new 
       user.stub(:id).and_return(69)
+      bike.stub(:example).and_return(true)
       bike.stub(:id).and_return(1)
       create_ownership = OwnershipCreator.new(creator: user, bike: bike)
       create_ownership.stub(:owner_id).and_return(69)
@@ -50,6 +53,7 @@ describe OwnershipCreator do
       create_ownership.stub(:find_owner_email).and_return("f@f.com")
       new_params = create_ownership.new_ownership_params
       new_params[:bike_id].should eq(1)
+      new_params[:example].should eq(true)
       new_params[:user_id].should eq(69)
       new_params[:owner_email].should eq("f@f.com")
       new_params[:claimed].should be_false

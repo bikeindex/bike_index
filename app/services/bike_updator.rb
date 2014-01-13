@@ -14,7 +14,7 @@ class BikeUpdator
 
   def find_bike
     begin
-    return Bike.find(@bike_params[:id])
+    return Bike.unscoped.find(@bike_params[:id])
     rescue
       raise BikeUpdatorError, "Oh no! We couldn't find that bike"
     end
@@ -49,6 +49,7 @@ class BikeUpdator
     @bike_params[:bike][:creation_organization_id] = @bike.creation_organization_id
     @bike_params[:bike][:creator] = @bike.creator
     @bike_params[:bike][:verified] = @bike.verified
+    @bike_params[:bike][:example] = @bike.example
     # If the bike isn't verified, it can't be marked un-stolen
     # nevermind - nothing's verified and we don't care right now.
     # @bike_params[:bike][:stolen] = @bike.stolen unless @bike.verified?

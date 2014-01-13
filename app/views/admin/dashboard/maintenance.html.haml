@@ -1,5 +1,18 @@
 %header.with-subtitle
-  %h1 Things to fix
+  %h1 Maintaining things
+
+%section.full-screen-table
+  %h2
+    Recent example bikes
+  - if @bikes.any? 
+    %table.table.table-striped.table-bordered
+      = render partial: "/admin/bikes/admin_bikes_table"
+    %p.pull-right
+      #{@bikes.count} example bikes total
+      %em
+        (#{Bike.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
+  - else
+    No example bikes right now!
   
 
   %section.full-screen-table
