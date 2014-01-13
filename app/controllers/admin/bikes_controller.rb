@@ -2,7 +2,7 @@ class BikeNotSavedError < StandardError
 end
 
 class Admin::BikesController < Admin::BaseController
-  before_filter :find_bike, only: [:destroy, :update]
+  before_filter :find_bike, only: [:edit, :destroy, :update]
 
   def index
     @bikes = Bike.order("created_at desc")
@@ -24,8 +24,7 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def edit
-    bike = Bike.find(params[:id])
-    @bike = bike.decorate
+    @bike = @bike.decorate
   end
 
   def update
