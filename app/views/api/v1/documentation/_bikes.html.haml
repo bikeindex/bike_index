@@ -5,10 +5,10 @@
   Organization and access tokens
 
 %p
-  You have to submit an organization and an access token to post bikes to the Index. Contact #{link_to "support@bikeindex.org", "mailto:support@bikeindex.org"} to get set up.
+  You have to submit an organization and an access token to post bikes to the Index.
 
 %p
-  We provide a test organization to add bikes via our API, so you can get started and figure out how to add bikes without having an organization access token (also to provide a way to test out your parameters before registering actual bikes).
+  We provide a test organization to add bikes via our API, so you can get started and figure out how to add bikes without having an organization access token.
 
 - org = Organization.find_by_name('Example organization')
 
@@ -45,11 +45,11 @@
         type: "POST",
         url: "#{request_url}",
         data: {
-          organization_slug: #{org.slug},
-          access_token: #{org.access_token},
+          organization_slug: "#{org.slug}",
+          access_token: "#{org.access_token}",
           bike: bike_hash,
-          stolen_record: stolen_record_hash, // not-required
-          components: components_hash        // not-required
+          stolen_record: stolen_record_hash, // not required
+          components: components_hash        // not required
         },
         success: function(data, textStatus, jqXHR) {
           $('#bike-standard').text(data)
@@ -108,8 +108,8 @@
         type: "POST",
         url: "#{request_url}",
         data: {
-          organization_slug: #{org.slug},
-          access_token: #{org.access_token},
+          organization_slug: "#{org.slug}",
+          access_token: "#{org.access_token}",
           bike: bike_hash
         },
         success: function(data, textStatus, jqXHR) {
