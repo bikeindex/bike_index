@@ -20,7 +20,7 @@ module Api
         @b_param = BParam.create(creator_id: @organization.auto_user.id, params: params)
         bike = BikeCreator.new(@b_param).create_bike
         if @b_param.errors.blank? && @b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
-          render json: {created_bike_url: bike_url(bike)} and return
+          render json: {created: { web_url: bike_url(bike), api_url: api_v1_bike_url(bike)}} and return
         else
           if bike.present?
             e = bike.errors.full_messages.to_sentence 

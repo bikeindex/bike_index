@@ -16,7 +16,7 @@ class Admin::DashboardController < ApplicationController
 
   def maintenance
     # @bikes here because this is the only one we're using the standard admin bikes table
-    @bikes = Bike.unscoped.where(example: true) 
+    @bikes = Bike.unscoped.where(example: true).limit(5)
     mnfg_other = Manufacturer.fuzzy_name_find("other")
     @component_mnfgs = Component.where(manufacturer_id: mnfg_other.id)
     @bike_mnfgs = Bike.where(manufacturer_id: mnfg_other.id)

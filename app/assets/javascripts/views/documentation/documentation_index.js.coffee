@@ -6,7 +6,7 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
 
   initialize: ->
     @setElement($('#body'))
-    @createBike()
+    @createBikes()
     # @manufacturerCall()
     # @wheelSizeCall()
     # $('#body').attr('data-spy', "scroll").attr('data-target', '#documentation-menu')
@@ -53,29 +53,29 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
       })
 
 
-  createBike: ->      
+  createBikes: ->      
     bike = 
       serial_number: "XOXO <3"
       manufacturer: "Surly"
       color: "Blue"
       rear_tire_narrow: false
       rear_wheel_bsd: "559"
-      description: "Has an under-seat beer opener and a handlebar flower vase"
       owner_email: "new_bike_owner@bikeindex.org"
     
-    $.ajax
-      url: $('#bike-standard').attr('data-url')
-      type: "POST"
-      data: 
-        bike: bike
-        organization_slug: $('#example_organization').attr('data-slug')
-        access_token: $('#example_organization').attr('data-token')
-      success: (data, textStatus, jqXHR) ->
-        $('#bike-standard').text(JSON.stringify(data,undefined,2))
-        # console.log(jqXHR.responseText)
-      error: (data, textStatus, jqXHR) ->
-        $('#bike-standard').text(JSON.stringify(data,undefined,2))
-        console.log(data)
+    unless $('#bike-basic').attr('data-production') == true
+      $.ajax
+        url: $('#bike-basic').attr('data-url')
+        type: "POST"
+        data: 
+          bike: bike
+          organization_slug: $('#example_organization').attr('data-slug')
+          access_token: $('#example_organization').attr('data-token')
+        success: (data, textStatus, jqXHR) ->
+          $('#bike-basic').text(JSON.stringify(data,undefined,2))
+          # console.log(jqXHR.responseText)
+        error: (data, textStatus, jqXHR) ->
+          $('#bike-basic').text(JSON.stringify(data,undefined,2))
+          console.log(data)
 
 
 

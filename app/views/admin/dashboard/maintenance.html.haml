@@ -8,9 +8,8 @@
     %table.table.table-striped.table-bordered
       = render partial: "/admin/bikes/admin_bikes_table"
     %p.pull-right
-      #{@bikes.count} example bikes total
-      %em
-        (#{Bike.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
+      #{Bike.unscoped.where(example: true)} example bikes total
+      
   - else
     No example bikes right now!
   
