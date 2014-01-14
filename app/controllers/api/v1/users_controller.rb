@@ -2,6 +2,11 @@ module Api
   module V1
     class UsersController < ApiV1Controller
       before_filter :bust_cache!, only: [:current]
+      def default_serializer_options
+        {
+          root: false
+        }
+      end
       
       def current
         if current_user.present?
