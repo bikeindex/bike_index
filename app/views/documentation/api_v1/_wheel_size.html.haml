@@ -13,6 +13,8 @@
   The full list
 
 %article.code
+  %p.code-label
+    GET all wheel sizes
   - request_url = api_v1_wheel_sizes_url
   %pre
     :plain
@@ -24,6 +26,6 @@
         }
       });
 
-  %p Response
+  %p.code-label Response
   %pre#wheel-sizes-index{ data: {url: request_url }}
     :plain

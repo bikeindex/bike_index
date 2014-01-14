@@ -24,6 +24,10 @@ Bikeindex::Application.routes.draw do
   match 'logout', to: 'sessions#destroy'
 
   resource :charges, only: [:new, :create]
+  resources :documentation, only: [:index] do
+    collection { get :api_v1 }
+  end
+
 
   resources :ownerships, only: [:show]
   resources :memberships, only: [:update, :destroy]
@@ -95,7 +99,6 @@ Bikeindex::Application.routes.draw do
 
   namespace :api, defaults: {format: 'json'} do
     namespace :v1 do
-      root :to => 'documentation#index'
       resources :bikes, only: [:index, :show, :create]
       resources :cycle_types, only: [:index]
       resources :wheel_sizes, only: [:index]

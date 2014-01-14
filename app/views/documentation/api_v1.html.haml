@@ -1,9 +1,7 @@
 %h1#documentation_head{ data: {production: (1 if Rails.env.production?)}}
   Bike Index API V1
 %p
-  This is the documentation for the Bike Index JSON API. 
-%p
-  It's terrible, sparsely populated, and most likely incorrect. We apologize.
+  This is the documentation for the Bike Index JSON API.
 
 %p
   The Bike Index API supports Cross-Origin Resource Sharing (CORS). The CORS spec allows web applications to make cross domain AJAX calls without using workarounds such as JSONP.
@@ -22,7 +20,7 @@
   %span.github-link
     #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/bikes_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/bikes_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/bike_serializer.rb"} on Github
 
-= render partial: "/api/v1/documentation/bikes"
+= render partial: "/documentation/api_v1/bikes"
 
 
 
@@ -33,7 +31,7 @@
   %span.github-link
     #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/manufacturers_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/manufacturers_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/manufacturer_serializer.rb"} on Github
 
-= render partial: "/api/v1/documentation/manufacturers"
+= render partial: "/documentation/api_v1/manufacturers"
 
 %hr
 
@@ -42,4 +40,4 @@
   %span.github-link
     #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/wheel_sizes_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/wheel_sizes_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/wheel_size_serializer.rb"} on Github
 
-= render partial: "/api/v1/documentation/wheel_size"
+= render partial: "/documentation/api_v1/wheel_size"

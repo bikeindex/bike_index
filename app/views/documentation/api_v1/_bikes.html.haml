@@ -1,6 +1,27 @@
 %p
   We provide a way to add bikes via JSON posts to our API.
 
+%p
+  There are a few things that need to be submitted in the POST request.
+
+%article.code
+  %p.code-label
+    POST request and possible parameters
+  - request_url = api_v1_bikes_url
+  %pre
+    :plain
+      $.ajax({
+        type: "POST",
+        url: "#{request_url}",
+        data: {
+          organization_slug: organization_slug,
+          access_token: org_access_token,
+          bike: bike_hash,
+          stolen_record: stolen_record_hash, // optional
+          components: components_hash        // optional
+        },
+      });
+
 %h3
   Organization and access tokens
 
@@ -28,36 +49,14 @@
     Test bikes are like normal bikes on the Index - you can edit them if they are sent to your account. There are a few key differences though:
     %ul.padded
       %li
-        They do not send an email when they are created
+        No email is sent when they are created
       %li
         Are not visible in searches
       %li
-        Are deleted every day or so.
-%p
-  There are a few things that need to be submitted in the POST request. This is the way the request is set up.
-
-
-%article.code
-  - request_url = api_v1_bikes_url
-  %pre
-    :plain
-      $.ajax({
-        type: "POST",
-        url: "#{request_url}",
-        data: {
-          organization_slug: "#{org.slug}",
-          access_token: "#{org.access_token}",
-          bike: bike_hash,
-          stolen_record: stolen_record_hash, // not required
-          components: components_hash        // not required
-        },
-        success: function(data, textStatus, jqXHR) {
-          $('#bike-standard').text(data)
-        }
-      });
+        They Are deleted every day or so.
 
 %h3
-  Creating a bike hash
+  Bike hash
 
 %p
   The following attributes are required to create a bike:
@@ -88,36 +87,35 @@
       owner_email
     string: email that should receive the registration
 
-%p
-  Sample basic request
-
 %article.code
+  %p.code-label
+    Basic post including bike_hash
+
   - request_url = api_v1_bikes_url
   %pre
     :plain
-      bike_hash = {
-        serial_number: "XOXO <3",
-        manufacturer: "Surly",
-        color: "Blue",
-        rear_wheel_bsd: 559,
-        rear_tire_narrow: false,
-        owner_email: "new_bike_owner@bikeindex.org"
-      };
-      
       $.ajax({
         type: "POST",
         url: "#{request_url}",
         data: {
           organization_slug: "#{org.slug}",
           access_token: "#{org.access_token}",
-          bike: bike_hash
+          bike: {
+            serial_number: "XOXO <3",
+            manufacturer: "Surly",
+            color: "Blue",
+            rear_wheel_bsd: 559,
+            rear_tire_narrow: false,
+            owner_email: "new_bike_owner@bikeindex.org"
+          }
         },
         success: function(data, textStatus, jqXHR) {
           $('#bike-standard').text(data)
         }
       });
-
-  %p Response
+%article.code
+  %p.code-label
+    \#bike-standard (response data)
   %pre#bike-basic{ data: {url: request_url }}
     - if Rails.env.production?
       :plain

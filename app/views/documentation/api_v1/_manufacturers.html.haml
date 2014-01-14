@@ -4,10 +4,12 @@
 %h3
   Query
 %p
-  Find a specific manufacturer ("Surly")
+  Get information from a specific manufacturer. Query is case insensitive.
 
 %article.code
-  - request_url = api_v1_manufacturers_url(query: "Surly")
+  .code-label
+    GET manufacturer with the name "surly"
+  - request_url = api_v1_manufacturers_url(query: "surly")
   %pre
     :plain
       $.ajax({
@@ -18,13 +20,18 @@
         }
       });
 
-  %p Response
+  .code-label
+    Response
   %pre#manufacturers-query{ data: {url: request_url }}
 
 %h3
   The full list
+%p
+  You can use this to with an #{link_to "autocomplete plugin", "http://twitter.github.io/typeahead.js/"} or improved select boxes. We use #{ link_to "Select2", "https://github.com/ivaynberg/select2"}.
 
 %article.code
+  .code-label
+    GET all the manufacturers
   - request_url = api_v1_manufacturers_url
   %pre
     :plain
@@ -36,5 +43,5 @@
         }
       });
 
-  %p Response
+  .code-label Response
   %pre#manufacturers-index{ data: {url: request_url }}

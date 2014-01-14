@@ -15,16 +15,44 @@
   }
 }
 
+.code {
+  .code-label {
+    @include border-radius(2px 2px 0 0);
+    width: 100%;
+    background: #E0E0E0;
+    border: 1px solid $grayMed;
+    margin-top: 1em;
+    margin-bottom: 0;
+    padding: 7px 9px 5px;
+    font: Monaco, Menlo, Consolas, 'Courier New', monospace;
+    font-size: 15px;
+    font-weight: bold;
+  }
+  pre {
+    @include border-radius(0 0 2px 2px);
+    box-shadow: inset 0 0 1px rgba(black,.2);
+    border: 1px solid $grayMed;
+    border-top: 0;
+    max-height: 400px;
+    overflow: scroll;
+    // background: #232323;
+    // color: #fff;
+  }
+}
+
+#doc-sections li li.active {
+  text-decoration: underline;
+  color: $linkColor;
+}
+
 
 #documentation-content {
   hr {
     margin-top: 60px;
     margin-bottom: 40px;
   }
-  pre {
-    max-height: 400px;
-    overflow: scroll;
-    box-shadow: inset 0 1px 3px rgba(black,.2);
+  h3 {
+    font-size: 20px;
   }
 }
 
