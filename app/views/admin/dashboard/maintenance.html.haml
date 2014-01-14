@@ -20,7 +20,7 @@
         %th
           Date
         %th
-          Component type
+          Component
         %th
           Component id
         %th
@@ -38,7 +38,25 @@
                 = f.created_at.strftime("%-m/%-d/%Y")
 
             %td
-              = f.ctype_other
+              Type: 
+              %span.stolen-color
+                #{f.ctype_other},
+              - if f.model_name.present?
+                name: #{f.model_name},
+              - if f.year.present?
+                year: #{f.year},
+              - if f.description.present?
+                description: #{f.description},
+              manufacturer:
+              - if f.manufacturer_other.present?
+                %span.stolen-color
+                  #{f.manufacturer_other},
+              - else
+                #{f.manufacturer.name},
+              front: #{f.front},
+              rear: #{f.rear},
+              - if f.serial_number.present?
+                serial_number: #{f.serial_number}
             %td
               = f.id
             %td

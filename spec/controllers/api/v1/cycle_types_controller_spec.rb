@@ -1,9 +1,8 @@
 require 'spec_helper'
 
-describe Api::V1::CycleTypesController do
-  
+describe Api::V1::CycleTypesController do  
   describe :index do
-    it "should load the page" do
+    it "should load the request" do
       FactoryGirl.create(:cycle_type)
       get :index, format: :json
       response.code.should eq('200')

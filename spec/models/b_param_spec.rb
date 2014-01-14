@@ -51,7 +51,7 @@ describe BParam do
       # Optional, because default type of Bike is set in creator
       FactoryGirl.create(:cycle_type, name: "Bike")
       ct = FactoryGirl.create(:cycle_type, name: "Boo Boo")
-      bike = { serial_number: "gobble gobble", cycle_type: ct.name }
+      bike = { serial_number: "gobble gobble", cycle_type: "boo boo" }
       b_param = BParam.new
       b_param.stub(:params).and_return({bike: bike})
       b_param.set_cycle_type_key

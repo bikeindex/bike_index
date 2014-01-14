@@ -2,9 +2,9 @@ module Api
   module V1
     class ApiV1Controller < ApplicationController
       respond_to :json      
-      def default_serializer_options
-        {root: false}
-      end
+      # def default_serializer_options
+      #   {root: false}
+      # end
       
       def cors_set_access_control_headers
         headers['Access-Control-Allow-Origin'] = '*'

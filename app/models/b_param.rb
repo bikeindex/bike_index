@@ -30,7 +30,7 @@ class BParam < ActiveRecord::Base
 
   def set_cycle_type_key
     if bike[:cycle_type].present?
-      ct = CycleType.find_by_name(bike[:cycle_type])
+      ct = CycleType.fuzzy_name_find(bike[:cycle_type])
       bike[:cycle_type_id] = ct.id if ct.present?
       bike.delete(:cycle_type)
     end

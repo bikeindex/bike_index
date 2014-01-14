@@ -16,6 +16,12 @@
 }
 
 .code {
+  table {
+    font: Monaco, Menlo, Consolas, 'Courier New', monospace;
+    font-size: 15px;
+    tr:first-of-type td { border-top: 0; }
+    td { padding: 4px; }
+  }
   .code-label {
     @include border-radius(2px 2px 0 0);
     width: 100%;
@@ -45,14 +51,22 @@
   color: $linkColor;
 }
 
-
 #documentation-content {
   hr {
     margin-top: 60px;
     margin-bottom: 40px;
   }
+  h2 { margin-bottom: 1em; }
   h3 {
     font-size: 20px;
+    margin-top: 1.5em;
+  }
+  code { color: $contentTextColor; }
+
+
+  .key-differences {
+    margin: .5em 0 0 20px;
+    li { margin-bottom: .25em; }
   }
 }
 

@@ -4,7 +4,7 @@
 %h3
   Query
 %p
-  Get information from a specific manufacturer. Query is case insensitive.
+  Find out whether we have information about a specific manufacturer. Query is not case sensitive.
 
 %article.code
   .code-label
@@ -22,26 +22,37 @@
 
   .code-label
     Response
-  %pre#manufacturers-query{ data: {url: request_url }}
+  %pre#manufacturers_query{ data: {url: request_url }}
 
 %h3
-  The full list
+  Frame makers
+
 %p
-  You can use this to with an #{link_to "autocomplete plugin", "http://twitter.github.io/typeahead.js/"} or improved select boxes. We use #{ link_to "Select2", "https://github.com/ivaynberg/select2"}.
+  Get the list of all the manufacturers that make frames (as oppose to brands that are connected with biking but might only make components or apparel).
 
 %article.code
   .code-label
-    GET all the manufacturers
-  - request_url = api_v1_manufacturers_url
+    GET "frame_makers"
+  - request_url = api_v1_manufacturers_url(query: "frame_makers")
   %pre
     :plain
       $.ajax({
         type: "GET",
         url: "#{request_url}",
         success: function(data, textStatus, jqXHR) {
-          $('#manufacturers-index').text(data)
+          $('#manufacturers-frame-makers').text(data)
         }
       });
 
-  .code-label Response
-  %pre#manufacturers-index{ data: {url: request_url }}
+  .code-label
+    Response
+  %pre#manufacturers_frame_makers{ data: {url: request_url }}
+
+%h3
+  All manufacturers
+
+%p
+  If you submit a GET request with no query, you will receive the whole list of manufacturers
+
+%p
+  You can use this, (or just the frame makers) with an #{link_to "autocomplete plugin", "http://twitter.github.io/typeahead.js/"} or improved select boxes, we use #{ link_to "Select2", "https://github.com/ivaynberg/select2"}.

@@ -1,0 +1,26 @@
+%p
+  The Bike Index aims to make cataloging and searching bikes much simpler, by using standardized attributes to search between.
+
+%p
+  We only offer these types of materials, because we believe they cover all the possibilities. Please #{link_to "send us an email", "mailto:support@bikeindex.org"} if you think we're missing something!
+
+%h3
+  The full list
+
+%article.code
+  %p.code-label
+    GET all frame materials
+  - request_url = api_v1_frame_materials_url
+  %pre
+    :plain
+      $.ajax({
+        type: "GET",
+        url: "#{request_url}",
+        success: function(data, textStatus, jqXHR) {
+          $('#frame-materials-index').text(data)
+        }
+      });
+
+  %p.code-label Response
+  %pre#frame_materials_index{ data: {url: request_url }}
+    :plain

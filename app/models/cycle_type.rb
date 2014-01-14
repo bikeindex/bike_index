@@ -12,4 +12,12 @@ class CycleType < ActiveRecord::Base
     self.slug = Slugifyer.slugify(self.name)
   end
 
+  def self.fuzzy_name_find(n)
+    if !n.blank?
+      self.find(:first, :conditions => [ "lower(name) = ?", n.downcase.strip ])
+    else
+      nil
+    end
+  end
+
 end

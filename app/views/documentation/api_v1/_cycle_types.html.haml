@@ -1,0 +1,35 @@
+%p
+  The Bike Index can be used to register more than just standard bicycles.
+%p
+  Standard bikes, for the purposes of this discussion, have 
+  %strong two wheels,
+  are designed for 
+  %strong one rider,
+  have a 
+  %strong diamond shaped frame,
+  and have 
+  %strong pedals.
+
+%p
+  You can also add non-standard cycles through the web menu.
+
+%h3
+  List of all cycle types
+
+%article.code
+  %p.code-label
+    GET all cycle types
+  - request_url = api_v1_cycle_types_url
+  %pre
+    :plain
+      $.ajax({
+        type: "GET",
+        url: "#{request_url}",
+        success: function(data, textStatus, jqXHR) {
+          $('#cycle-types-index').text(data)
+        }
+      });
+
+  %p.code-label Response
+  %pre#cycle_types_index{ data: {url: request_url }}
+    :plain

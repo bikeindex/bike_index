@@ -7,17 +7,15 @@ module Api
       def index
         manufacturers = Manufacturer.all
         if params[:query]
-          manufacturers = Manufacturer.fuzzy_name_find(params[:query].to_s)
+          if params[:query].strip == "frame_makers"
+            Manufacturer.frames
+          else
+            manufacturers = Manufacturer.fuzzy_name_find(params[:query].to_s)
+          end
         end
         respond_with manufacturers
       end
 
-      def show
-        manufacturer = Manufacturer.find_by_slug(params[:id])
-        raise ActionController::RoutingError.new('Not Found') unless manufacturer.present?
-        respond_with manufacturer, each_serializer: ManufacturerFullSerializer
-      end
-         
     end
   end
 end

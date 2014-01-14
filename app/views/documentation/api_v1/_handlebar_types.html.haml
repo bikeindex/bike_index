@@ -1,0 +1,23 @@
+%p
+  Just like the above, we only support a limited number of handlebar types. There are pictures that accompany them if you add a bike through the web interface.
+
+%h3
+  The full list
+
+%article.code
+  %p.code-label
+    GET all handlebar types
+  - request_url = api_v1_handlebar_types_url
+  %pre
+    :plain
+      $.ajax({
+        type: "GET",
+        url: "#{request_url}",
+        success: function(data, textStatus, jqXHR) {
+          $('#handlebar-types-index').text(data)
+        }
+      });
+
+  %p.code-label Response
+  %pre#handlebar_types_index{ data: {url: request_url }}
+    :plain

@@ -8,7 +8,7 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
     @setElement($('#body'))
     production = parseInt($('#documentation_head').attr('data-production'), 10)
     @manufacturerCall()
-    @wheelSizeCall()
+    @attributesCall()
 
     unless production == 1
       @createBikes()
@@ -28,34 +28,34 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
     )
   
   manufacturerCall: ->
-    $.ajax({
+    $.ajax
       type: "GET"
-      url: $('#manufacturers-index').attr('data-url')
+      url: $('#manufacturers_frame_makers').attr('data-url')
       success: (data, textStatus, jqXHR) ->
-        $('#manufacturers-index').text(JSON.stringify(data,undefined,2))
-
+        $('#manufacturers_frame_makers').text(JSON.stringify(data,undefined,2))
       error: (data, textStatus, jqXHR) ->
         console.log(data)
-      })
-    $.ajax({
+      
+    $.ajax
       type: "GET"
-      url: $('#manufacturers-query').attr('data-url')
+      url: $('#manufacturers_query').attr('data-url')
       success: (data, textStatus, jqXHR) ->
-        $('#manufacturers-query').text(JSON.stringify(data,undefined,2))
+        $('#manufacturers_query').text(JSON.stringify(data,undefined,2))
       error: (data, textStatus, jqXHR) ->
         console.log(data)
-      })
+      
 
-  wheelSizeCall: ->
-    $.ajax({
-      type: "GET"
-      url: $('#wheel-sizes-index').attr('data-url')
-      success: (data, textStatus, jqXHR) ->
-        $('#wheel-sizes-index').text(JSON.stringify(data,undefined,2))
-      error: (data, textStatus, jqXHR) ->
-        console.log(data)
-      })
-
+  attributesCall: ->
+    id_blocks = ['#wheel_sizes_index', '#cycle_types_index', '#frame_materials_index', '#handlebar_types_index']
+    for id in id_blocks
+      $.ajax
+        type: "GET"
+        url: $(id).attr('data-url')
+        success: (data, textStatus, jqXHR) ->
+          i = Object.keys(data)[0]
+          $("##{i}_index").text(JSON.stringify(data,undefined,2))
+        error: (data, textStatus, jqXHR) ->
+          console.log(data)
 
   createBikes: ->      
     bike = 
@@ -66,19 +66,19 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
       rear_wheel_bsd: "559"
       owner_email: "new_bike_owner@bikeindex.org"
     
-    unless $('#bike-basic').attr('data-production') == true
+    unless $('#bike_basic').attr('data-production') == true
       $.ajax
-        url: $('#bike-basic').attr('data-url')
+        url: $('#bike_basic').attr('data-url')
         type: "POST"
         data: 
           bike: bike
           organization_slug: $('#example_organization').attr('data-slug')
           access_token: $('#example_organization').attr('data-token')
         success: (data, textStatus, jqXHR) ->
-          $('#bike-basic').text(JSON.stringify(data,undefined,2))
+          $('#bike_basic').text(JSON.stringify(data,undefined,2))
           # console.log(jqXHR.responseText)
         error: (data, textStatus, jqXHR) ->
-          $('#bike-basic').text(JSON.stringify(data,undefined,2))
+          $('#bike_basic').text(JSON.stringify(data,undefined,2))
           console.log(data)
 
 
