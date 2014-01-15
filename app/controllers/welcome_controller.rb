@@ -13,11 +13,6 @@ class WelcomeController < ApplicationController
   def goodbye
   end
 
-  def bust_z_cache
-    Rails.cache.clear
-    redirect_to root_url
-  end
-
   def user_home
     if current_user.present?
       bikes = Bike.find(current_user.bikes)

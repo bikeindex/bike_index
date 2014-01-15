@@ -242,9 +242,12 @@
 
 
 %p
-  To make a bike stolen, you only need to add 
+  To make a bike stolen, you need to add 
   %code
     stolen: true
+  and
+  %code
+    phone: phone number
   to the bike hash.
 
 %p
@@ -254,6 +257,16 @@
   The keys available for stolen bikes
 
 
+  / stolen_record.police_report_number, stolen_record.police_report_department = [
+  /   sr[:police_report_number], sr[:police_report_department] 
+  / ]
+  / stolen_record.theft_description, stolen_record.street, stolen_record.city = [
+  /   sr[:theft_description], sr[:street], sr[:city]
+  / ]
+  / stolen_record.phone = sr[:phone] if sr[:phone].present?
+  / stolen_record.date_stolen = create_date_from_string(sr[:date_stolen]) if sr[:date_stolen].present?
+  / stolen_record.country_id = Country.fuzzy_iso_find(sr[:country]).id if sr[:country].present?
+
 %article.code
   %table.table
 
@@ -261,7 +274,7 @@
       %tr
         %td
           %code
-            serial_number
+            police_report_number
         %td
           string
         %td
@@ -269,7 +282,7 @@
       %tr
         %td
           %code
-            manufacturer
+            police_report_department
         %td
           string
         %td

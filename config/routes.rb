@@ -18,8 +18,7 @@ Bikeindex::Application.routes.draw do
   match 'user_home', to: 'welcome#user_home'
   match 'choose_registration', to: 'welcome#choose_registration'
   match 'goodbye', to: 'welcome#goodbye'
-  match 'bust_z_cache', to: 'welcome#bust_z_cache'
-
+  
   resource :session, only: [:new, :create, :destroy]
   match 'logout', to: 'sessions#destroy'
 
@@ -76,6 +75,7 @@ Bikeindex::Application.routes.draw do
     root :to => 'dashboard#index'
     match 'invitations', to: 'dashboard#invitations'
     match 'maintenance', to: 'dashboard#maintenance'
+    match 'bust_z_cache', to: 'dashboard#bust_z_cache'
     resources :discounts, :memberships, :bikes, :organizations, :bike_token_invitations, :organization_invitations
     match 'duplicate_bikes', to: 'bikes#duplicates'
     resources :flavor_texts, only: [:destroy, :create]

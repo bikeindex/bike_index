@@ -25,4 +25,10 @@ class Admin::DashboardController < ApplicationController
     @paint = Paint.where("color_id IS NULL")
   end
 
+  def bust_z_cache
+    Rails.cache.clear
+    flash[:notice] = "Z cash WAAAAAS busted!"
+    redirect_to admin_root_url
+  end
+
 end

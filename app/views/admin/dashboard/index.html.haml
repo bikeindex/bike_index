@@ -106,11 +106,14 @@
           %td
             = link_to "delete", admin_flavor_text_url(flavor), method: :delete
 
-%p.padded
-  = link_to "Maintenance", admin_maintenance_url
-  &#149;
-  = link_to "Graphs", admin_graphs_url
-  &#149;
-  = link_to "Failed bikes", admin_failed_bikes_url
-  &#149;
-  = link_to "Component types", admin_ctypes_url
+%ul.admin-adv-list
+  %li
+    = link_to "Maintenance", admin_maintenance_url
+  %li
+    = link_to "Graphs", admin_graphs_url
+  %li
+    = link_to "Failed bikes", admin_failed_bikes_url
+  %li
+    = link_to "Component types", admin_ctypes_url
+  %li
+    = link_to "Clear cache", admin_bust_z_cache_url

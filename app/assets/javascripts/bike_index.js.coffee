@@ -62,7 +62,7 @@ $(document).ready ->
     view = new BikeIndex.Views.LoginSignup
 
   else if $('#organization-content').length > 0
-    view = new BikeIndex.Views.DataTables
+    view = new BikeIndex.Views.OrganizationsShow
 
   else if $('#user-bikes-table').length > 0
     view = new BikeIndex.Views.DataTables

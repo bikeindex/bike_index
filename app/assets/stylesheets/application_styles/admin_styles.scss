@@ -4,6 +4,18 @@
 //
 //________________________
 
+.admin-adv-list {
+  @extend .horizontal-list;
+  margin: 40px 0 0;
+  li {
+    width: 20%;
+    min-width: 100px;
+    text-align: center;
+    padding: 10px;
+  //   &:before { content: "&#149;"; }
+  }
+}
+
 
 //________________________
 //

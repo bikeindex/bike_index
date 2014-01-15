@@ -15,6 +15,5 @@ class Color < ActiveRecord::Base
       nil
     end
   end
-
   
 end

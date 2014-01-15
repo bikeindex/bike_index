@@ -32,7 +32,7 @@
               = bike.created_at.strftime("%-m/%-d/%Y")
           %td
             = link_to bike.manufacturer_name, bike.list_link_url(target)
-          %td.large-screens
+          %td.medium-screens
             = bike.frame_model if bike.frame_model.present?
           %td.large-screens
             = bike.primary_frame_color.name

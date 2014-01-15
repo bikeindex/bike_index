@@ -186,6 +186,41 @@
   }
 }
 
+.tutorials {
+  @include clearfix;
+  margin: 20px 0 60px;
+  h3 { margin: 0 0 1em; }
+  a {
+    display: block;
+    position: relative;
+    float: left;
+    width: 50%;
+    &:hover { 
+      img { border-color: $linkColor; }
+    }
+  }
+  img {
+    display: block;
+    margin: 0 auto;
+    border: 1px solid $grayLighter;
+    max-width: 95%;
+  }
+}
+
+@media (max-width: 650px) {
+  .tutorials {
+    a {
+      float: none;
+      width: 100%;
+      margin: 10px 0;
+    }
+  }
+}
+
+
+#developer-info {
+  margin-top: 40px;
+}
 
 //________________________
 //

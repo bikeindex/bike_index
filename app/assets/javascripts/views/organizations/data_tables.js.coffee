@@ -2,11 +2,7 @@ class BikeIndex.Views.DataTables extends Backbone.View
 
   initialize: ->
     # Later we can seperate these, for now though here is good enough
-    if $('#org-bikes-table').length > 0
-      @loadDataTable('#org-bikes-table')
-    else if $('#org-users-table').length > 0
-      @loadDataTable('#org-users-table')
-    else if $('#admin-bikes-table').length > 0
+    if $('#admin-bikes-table').length > 0
       @loadDataTable('#admin-bikes-table')
     else if $('#admin-users-table').length > 0
       @loadDataTable('#admin-users-table')
