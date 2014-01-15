@@ -3,7 +3,7 @@ class OwnershipsController < ApplicationController
 
   def show
     ownership = Ownership.find(params[:id])
-    bike = ownership.bike 
+    bike = Bike.unscoped.find(ownership.bike_id)
     if current_user == User.fuzzy_email_find(ownership.owner_email)
       if ownership.current
         ownership.mark_claimed

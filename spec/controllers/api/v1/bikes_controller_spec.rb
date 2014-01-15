@@ -47,15 +47,16 @@ describe Api::V1::BikesController do
       }.should change(Feedback, :count).by(1)
     end
 
-    it "should create a record and not email us" do
+    it "should create a record and reset example" do
       manufacturer = FactoryGirl.create(:manufacturer)
       FactoryGirl.create(:cycle_type, slug: "bike")
       f_count = Feedback.count
-      bike = { serial_number: "69",
+      bike = { serial_number: "69 non-example",
         manufacturer_id: manufacturer.id,
         rear_tire_narrow: "true",
         rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
-        primary_frame_color_id: FactoryGirl.create(:color).id,
+        color: FactoryGirl.create(:color).name,
+        example: true,
         owner_email: "fun_times@examples.com"
       }
       OwnershipCreator.any_instance.should_receive(:send_notification_email)
@@ -63,8 +64,44 @@ describe Api::V1::BikesController do
         post :create, { bike: bike, organization_slug: @organization.slug, access_token: @organization.access_token }
       }.should change(Ownership, :count).by(1)
       response.code.should eq("200")
-      Bike.last.creation_organization_id.should eq(@organization.id)
+      b = Bike.where(serial_number: "69 non-example").first
+      b.example.should be_false
+      b.creation_organization_id.should eq(@organization.id)
       f_count.should eq(Feedback.count)
+    end
+
+    it "should create a stolen record" do
+      manufacturer = FactoryGirl.create(:manufacturer)
+      FactoryGirl.create(:cycle_type, slug: "bike")
+      FactoryGirl.create(:country, iso: "Candyland")
+      FactoryGirl.create(:state, abbreviation: "Palace")
+      bike = { serial_number: "69 stolen bike",
+        manufacturer_id: manufacturer.id,
+        rear_tire_narrow: "true",
+        rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
+        primary_frame_color_id: FactoryGirl.create(:color).id,
+        owner_email: "fun_times@examples.com",
+        stolen: "true",
+        phone: "9999999"
+      }
+      stolen_record = { date_stolen: "03-01-2013",
+        theft_description: "This bike was stolen and that's no fair.",
+        country: "Candyland",
+        street: "Cortland and Ashland",
+        zipcode: "60622",
+        state: "Palace",
+        police_report_number: "99999999",
+        police_report_department: "Chicago"
+      }
+      OwnershipCreator.any_instance.should_receive(:send_notification_email)
+      lambda { 
+        post :create, { bike: bike, stolen_record: stolen_record, organization_slug: @organization.slug, access_token: @organization.access_token }
+      }.should change(Ownership, :count).by(1)
+      response.code.should eq("200")
+      b = Bike.unscoped.where(serial_number: "69 stolen bike").first
+      b.current_stolen_record.address.should be_present
+      b.current_stolen_record.phone.should eq("9999999")
+      b.current_stolen_record.date_stolen.should eq(DateTime.strptime("03-01-2013 06", "%m-%d-%Y %H"))
     end
 
     it "should create an example bike if the bike is from example, and include all the options" do

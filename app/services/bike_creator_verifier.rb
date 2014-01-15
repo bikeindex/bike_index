@@ -21,6 +21,8 @@ class BikeCreatorVerifier
     example_org = Organization.find_by_name('Example organization')
     if @bike.creation_organization_id.present? && example_org.present?
       @bike.example = true if @bike.creation_organization_id == example_org.id
+    else
+      @bike.example = false
     end
     @bike
   end

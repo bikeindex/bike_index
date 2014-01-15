@@ -101,11 +101,4 @@ class BikeDecorator < ApplicationDecorator
     end
   end
 
-  def frame_colors
-    c = [object.primary_frame_color.name]
-    c << object.secondary_frame_color.name if object.secondary_frame_color
-    c << object.tertiary_frame_color.name if object.tertiary_frame_color
-    c
-  end
-
 end

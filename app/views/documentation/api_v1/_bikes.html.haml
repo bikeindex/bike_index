@@ -106,7 +106,9 @@
   Bike hash
 
 %p
-  The following keys are required for a valid bike_hash
+  The following keys are required for a valid
+  %code
+    bike_hash
 
 %article.code
   %table.table
@@ -160,8 +162,9 @@
         %td
           email that should receive the registration
 
+%article.code
   %p.code-label
-    Basic post including bike_hash
+    Basic post
 
   - request_url = api_v1_bikes_url
   %pre
@@ -192,13 +195,16 @@
     - if Rails.env.production?
       :plain
         {
-          "created": {
+          "bike": {
             "web_url": "#{link_to "https://bikeindex.org/bikes/1520", "https://bikeindex.org/bikes/1520"}",
             "api_url": "#{ link_to "https://bikeindex.org/api/v1/bikes/1520", "https://bikeindex.org/api/v1/bikes/1520"}"
           }
         }
 %p
-  You can add some additional attributes to the bike hash if you want to.
+  The 
+  %code
+    bike_hash
+  accepts some optional additional attributes. Include them if you want!
 %article.code
   %table.table
     %tbody
@@ -240,26 +246,40 @@
 %h3#stolen_bikes
   Adding stolen bikes
 
+%p
+  To create a stolen bike, you have to include two additional keys in the 
+  %code
+    bike_hash
+
+%article.code
+  %table.table
+
+    %tbody
+      %tr
+        %td
+          %code
+            stolen
+        %td
+          boolean
+        %td
+          %code
+            true
+      %tr
+        %td
+          %code
+            phone
+        %td
+          string
+        %td
+          Phone number of the stolen bike owner. Format doesn't matter
 
 %p
-  To make a bike stolen, you need to add 
-  %code
-    stolen: true
-  and
-  %code
-    phone: phone number
-  to the bike hash.
-
-%p
-  However, you can also add extra information about the bike theft to make a more accurate record.
+  You can also add information about the bike theft to create a more accurate record. This information is included in the stolen 
 
 %p
   The keys available for stolen bikes
 
 
-  / stolen_record.police_report_number, stolen_record.police_report_department = [
-  /   sr[:police_report_number], sr[:police_report_department] 
-  / ]
   / stolen_record.theft_description, stolen_record.street, stolen_record.city = [
   /   sr[:theft_description], sr[:street], sr[:city]
   / ]
@@ -274,11 +294,60 @@
       %tr
         %td
           %code
+            date_stolen
+        %td
+          string
+        %td
+          Format mm-dd-yyyy. Defaults to the current date.
+      %tr
+        %td
+          %code
+            theft_description
+        %td
+          text
+        %td
+          Description of the theft
+      %tr
+        %td
+          %code
+            country
+        %td
+          string
+        %td
+          #{link_to "Country code", "https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements"}, required if submitting location information.
+      %tr
+        %td
+          %code
+            street
+        %td
+          string
+        %td
+          Address or intersection where the theft occurred.
+      %tr
+        %td
+          %code
+            zipcode
+        %td
+          string
+        %td
+          Postal zipcode
+      %tr
+        %td
+          %code
+            state
+        %td
+          string
+        %td
+          State postal code, if in the US
+
+      %tr
+        %td
+          %code
             police_report_number
         %td
           string
         %td
-          The bike's serial. Set to "absent" if the bike doesn't have a serial number.
+          Police crime report number for this theft.
       %tr
         %td
           %code
@@ -286,36 +355,68 @@
         %td
           string
         %td
-          The name of the frame manufacturer
-      %tr
-        %td
-          %code
-            color
-        %td
-          string
-        %td
-          The color of the frame
-      %tr
-        %td
-          %code
-            rear_wheel_bsd
-        %td
-          integer
-        %td
-          Rear wheel size, the tire's #{link_to "BSD", "#wheel_sizes_ref", class: "scroll-to-ref"}
-      %tr
-        %td
-          %code
-            rear_tire_narrow
-        %td
-          boolean
-        %td
-          Whether the tire width is less than 32mm
-      %tr
-        %td
-          %code
-            owner_email
-        %td
-          string
-        %td
-          email that should receive the registration
+          Police department where the theft was reported.
+%p
+  Here is an example post with all the possible attributes. Remember: Only the two attributes from the
+  %code
+    bike_hash
+  are required.
+
+%article.code
+  %p.code-label
+    Stolen Bike
+
+  - request_url = api_v1_bikes_url
+  %pre
+    :plain
+      $.ajax({
+        type: "POST",
+        url: "#{request_url}",
+        data: {
+          organization_slug: "#{org.slug}",
+          access_token: "#{org.access_token}",
+          bike: {
+            stolen: true,
+            phone: "(124) 534-6339",
+            serial_number: "XXXX :(",
+            manufacturer: "Jamis",
+            color: "Black",
+            rear_wheel_bsd: 559,
+            rear_tire_narrow: false,
+            owner_email: "stolen_bike_owner@bikeindex.org"
+          },
+          stolen_record: {
+            date_stolen: "03-01-2013",
+            theft_description: "This bike was stolen and that's no fair.",
+            country: "US",
+            street: "Cortland and Ashland",
+            city: "Chicago",
+            zipcode: "60622",
+            state: "IL",
+            police_report_number: "99999999",
+            police_report_department: "Chicago"
+          },
+        },
+        success: function(data, textStatus, jqXHR) {
+          $('#bike_stolen').text(JSON.stringify(data,undefined,2))
+        }
+      });
+%article.code
+  %p.code-label
+    Response
+  %pre#bike_stolen{ data: {url: request_url }}
+    - if Rails.env.production?
+      :plain
+        {
+          "bike": {
+            "web_url": "#{link_to "https://bikeindex.org/bikes/1520", "https://bikeindex.org/bikes/1520"}",
+            "api_url": "#{ link_to "https://bikeindex.org/api/v1/bikes/1520", "https://bikeindex.org/api/v1/bikes/1520"}"
+          }
+        }
+
+
+%h3#bike_components
+  Adding components to bikes
+
+%p
+  In progress. SRYS

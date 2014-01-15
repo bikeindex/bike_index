@@ -117,19 +117,20 @@ describe StolenRecordUpdator do
         police_report_department: 'highway 69',
         theft_description: 'blah blah blah',
         street: 'some address',
-        city: 'Big town'
+        city: 'Big town',
+        zipcode: '60666'
       }
       b_param = BParam.new
       b_param.stub(:params).and_return({stolen_record: sr})
       stolen_record = StolenRecord.new 
       updator = StolenRecordUpdator.new(new_bike_b_param: b_param)
       stolen_record = updator.update_with_params(stolen_record)
-      stolen_record.phone.should eq(sr[:phone])
       stolen_record.police_report_number.should eq(sr[:police_report_number])
       stolen_record.police_report_department.should eq(sr[:police_report_department])
       stolen_record.theft_description.should eq(sr[:theft_description])
       stolen_record.street.should eq(sr[:street])
       stolen_record.city.should eq(sr[:city])
+      stolen_record.zipcode.should eq(60666)
       stolen_record.date_stolen.today?.should be_true
     end
 

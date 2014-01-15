@@ -58,28 +58,65 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
           console.log(data)
 
   createBikes: ->      
-    bike = 
-      serial_number: "XOXO <3"
-      manufacturer: "Surly"
-      color: "Blue"
-      rear_tire_narrow: false
-      rear_wheel_bsd: "559"
-      owner_email: "new_bike_owner@bikeindex.org"
+    # bike = 
+    #   serial_number: "XOXO <3"
+    #   manufacturer: "Surly"
+    #   color: "Blue"
+    #   rear_tire_narrow: false
+    #   rear_wheel_bsd: "559"
+    #   owner_email: "new_bike_owner@bikeindex.org"
     
-    unless $('#bike_basic').attr('data-production') == true
-      $.ajax
-        url: $('#bike_basic').attr('data-url')
-        type: "POST"
-        data: 
-          bike: bike
-          organization_slug: $('#example_organization').attr('data-slug')
-          access_token: $('#example_organization').attr('data-token')
-        success: (data, textStatus, jqXHR) ->
-          $('#bike_basic').text(JSON.stringify(data,undefined,2))
-          # console.log(jqXHR.responseText)
-        error: (data, textStatus, jqXHR) ->
-          $('#bike_basic').text(JSON.stringify(data,undefined,2))
-          console.log(data)
+    
+    # $.ajax
+    #   url: $('#bike_basic').attr('data-url')
+    #   type: "POST"
+    #   data: 
+    #     bike: bike
+    #     organization_slug: $('#example_organization').attr('data-slug')
+    #     access_token: $('#example_organization').attr('data-token')
+    #   success: (data, textStatus, jqXHR) ->
+    #     $('#bike_basic').text(JSON.stringify(data,undefined,2))
+    #     # console.log(jqXHR.responseText)
+    #   error: (data, textStatus, jqXHR) ->
+    #     $('#bike_basic').text(JSON.stringify(data,undefined,2))
+
+    stolen_bike =
+      stolen: true
+      phone: "(124) 534-6339"
+      serial_number: "XXXX :("
+      manufacturer: "Jamis"
+      color: "Black"
+      rear_wheel_bsd: 559
+      rear_tire_narrow: false
+      owner_email: "user@example.com"
+
+    stolen_record =
+      date_stolen: "03-01-2013"
+      theft_description: "This bike was stolen and that's no fair."
+      country: "US"
+      street: "Cortland and Ashland"
+      city: "Chicago"
+      zipcode: "60622"
+      state: "IL"
+      police_report_number: "99999999"
+      police_report_department: "Chicago"
+
+
+
+    $.ajax
+      url: $('#bike_stolen').attr('data-url')
+      type: "POST"
+      data: 
+        bike: stolen_bike
+        stolen_record: stolen_record
+        organization_slug: $('#example_organization').attr('data-slug')
+        access_token: $('#example_organization').attr('data-token')
+      success: (data, textStatus, jqXHR) ->
+        $('#bike_stolen').text(JSON.stringify(data,undefined,2))
+        # console.log(jqXHR.responseText)
+      error: (data, textStatus, jqXHR) ->
+        $('#bike_stolen').text(JSON.stringify(data,undefined,2))
+
 
 
 

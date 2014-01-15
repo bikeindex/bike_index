@@ -67,10 +67,9 @@ class StolenRecordUpdator
     stolen_record.police_report_number, stolen_record.police_report_department = [
       sr[:police_report_number], sr[:police_report_department] 
     ]
-    stolen_record.theft_description, stolen_record.street, stolen_record.city = [
-      sr[:theft_description], sr[:street], sr[:city]
+    stolen_record.theft_description, stolen_record.street, stolen_record.city, stolen_record.zipcode = [
+      sr[:theft_description], sr[:street], sr[:city], sr[:zipcode]
     ]
-    stolen_record.phone = sr[:phone] if sr[:phone].present?
     stolen_record.date_stolen = create_date_from_string(sr[:date_stolen]) if sr[:date_stolen].present?
     stolen_record.country_id = Country.fuzzy_iso_find(sr[:country]).id if sr[:country].present?
     stolen_record.state_id = State.fuzzy_abbr_find(sr[:state]).id if sr[:state].present?

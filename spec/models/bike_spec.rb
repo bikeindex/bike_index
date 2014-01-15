@@ -268,6 +268,21 @@ describe Bike do
     end
   end
 
+
+  describe :frame_colors do 
+    it "should return an array of the frame colors" do 
+      bike = Bike.new 
+      color = Color.new
+      color2 = Color.new
+      color.stub(:name).and_return('Blue')
+      color2.stub(:name).and_return('Black')
+      bike.stub(:primary_frame_color).and_return(color)
+      bike.stub(:secondary_frame_color).and_return(color2)
+      bike.stub(:tertiary_frame_color).and_return(color)
+      bike.frame_colors.should eq(['Blue', 'Black', 'Blue'])
+    end
+  end
+
   describe :cgroups do
     it "should grab a list of all the cgroups" do 
       # Sometime, need to get this to display stuff better.

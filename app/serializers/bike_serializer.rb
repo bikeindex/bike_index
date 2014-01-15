@@ -4,6 +4,8 @@ class BikeSerializer < ActiveModel::Serializer
     :api_url,
     :manufacturer_name,
     :manufacturer_id,
+    :frame_colors,
+    :paint_description,
     :stolen,
     :name,
     :frame_manufacture_year,
@@ -14,9 +16,6 @@ class BikeSerializer < ActiveModel::Serializer
 
   has_one :rear_wheel_size,
     :front_wheel_size,
-    :primary_frame_color,
-    :secondary_frame_color,
-    :tertiary_frame_color,
     :handlebar_type,
     :frame_material,
     :front_gear_type,
@@ -26,7 +25,6 @@ class BikeSerializer < ActiveModel::Serializer
   has_many :components
   has_many :public_images
   
-
   def url
     bike_path(object)
   end

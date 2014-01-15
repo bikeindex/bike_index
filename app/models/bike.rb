@@ -175,6 +175,17 @@ class Bike < ActiveRecord::Base
     self.paint_id = paint.id
   end
 
+  def paint_description
+    paint.name.titleize if self.paint.present?
+  end
+
+  def frame_colors
+    c = [primary_frame_color.name]
+    c << secondary_frame_color.name if secondary_frame_color
+    c << tertiary_frame_color.name if tertiary_frame_color
+    c
+  end
+
   def type
     # Small helper because we call this a lot
     self.cycle_type.name.downcase
