@@ -2,7 +2,7 @@
   We provide a way to add bikes via JSON posts to our API.
 
 %p
-  There are a few things that need to be submitted in the POST request.
+  Here are the things that need to be sent in the request:
 
 / %article.code
 /   %p.code-label
@@ -142,7 +142,7 @@
         %td
           integer
         %td
-          Rear wheel size, the tire's #{link_to "BSD", "#wheel_size_ref", class: "scroll-to-ref"}
+          Rear wheel size, the tire's #{link_to "BSD", "#wheel_sizes_ref", class: "scroll-to-ref"}
       %tr
         %td
           %code
@@ -217,7 +217,7 @@
         %td
           string
         %td
-          Can be any of the names from the list of #{link_to "cycle_types", "#cycle_types_ref"}. Defaults to "bike"
+          Can be any of the names from the list of #{link_to "cycle_types", "#cycle_types_ref", class: "scroll-to-ref"}. Defaults to "bike"
       %tr
         %td
           %code
@@ -225,7 +225,7 @@
         %td
           string
         %td
-          The type of material the frame is made from, chosen from #{link_to "frame_materials","#frame_materials_ref"}.
+          The type of material the frame is made from, chosen from #{link_to "frame_materials","#frame_materials_ref", class: "scroll-to-ref"}
       %tr
         %td
           %code
@@ -233,7 +233,7 @@
         %td
           string
         %td
-          The slug of the handlebar type, chosen from the list of #{link_to "handlebar_types", "#handlebar_types_ref"}
+          The slug of the handlebar type, chosen from the list of #{link_to "handlebar_types", "#handlebar_types_ref", class: "scroll-to-ref"}
 
 / description: "Has an under-seat beer opener and a handlebar flower vase",
 
@@ -289,7 +289,7 @@
         %td
           integer
         %td
-          Rear wheel size, the tire's #{link_to "BSD", "#wheel_size_ref", class: "scroll-to-ref"}
+          Rear wheel size, the tire's #{link_to "BSD", "#wheel_sizes_ref", class: "scroll-to-ref"}
       %tr
         %td
           %code

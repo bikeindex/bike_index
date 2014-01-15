@@ -69,6 +69,7 @@ describe Api::V1::BikesController do
 
     it "should create an example bike if the bike is from example, and include all the options" do
       FactoryGirl.create(:cycle_type, slug: "bike")
+      FactoryGirl.create(:color, name: "Black")
       org = FactoryGirl.create(:organization, name: "Example organization")
       user = FactoryGirl.create(:user)
       FactoryGirl.create(:membership, user: user, organization: org)
@@ -79,7 +80,7 @@ describe Api::V1::BikesController do
         manufacturer_id: manufacturer.id,
         rear_tire_narrow: "true",
         rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
-        color: "something",
+        color: "grazeen",
         handlebar_type_slug: FactoryGirl.create(:handlebar_type, slug: "foo").slug,
         frame_material_slug: FactoryGirl.create(:frame_material, slug: "whatevah").slug,
         description: "something else",

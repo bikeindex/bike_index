@@ -1,4 +1,9 @@
 class ManufacturerSerializer < ActiveModel::Serializer
   attributes :name,
-    :website
+    :company_url
+
+  def company_url
+    return "" unless object.website
+    object.website
+  end
 end
