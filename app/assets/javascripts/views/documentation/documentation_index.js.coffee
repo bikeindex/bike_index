@@ -58,27 +58,27 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
           console.log(data)
 
   createBikes: ->      
-    # bike = 
-    #   serial_number: "XOXO <3"
-    #   manufacturer: "Surly"
-    #   color: "Blue"
-    #   rear_tire_narrow: false
-    #   rear_wheel_bsd: "559"
-    #   owner_email: "new_bike_owner@bikeindex.org"
     
+    bike = 
+      serial_number: "XOXO <3"
+      manufacturer: "Surly"
+      color: "Blue"
+      rear_tire_narrow: false
+      rear_wheel_bsd: "559"
+      owner_email: "new_bike_owner@bikeindex.org"
     
-    # $.ajax
-    #   url: $('#bike_basic').attr('data-url')
-    #   type: "POST"
-    #   data: 
-    #     bike: bike
-    #     organization_slug: $('#example_organization').attr('data-slug')
-    #     access_token: $('#example_organization').attr('data-token')
-    #   success: (data, textStatus, jqXHR) ->
-    #     $('#bike_basic').text(JSON.stringify(data,undefined,2))
-    #     # console.log(jqXHR.responseText)
-    #   error: (data, textStatus, jqXHR) ->
-    #     $('#bike_basic').text(JSON.stringify(data,undefined,2))
+    $.ajax
+      url: $('#bike_basic').attr('data-url')
+      type: "POST"
+      data: 
+        bike: bike
+        organization_slug: $('#example_organization').attr('data-slug')
+        access_token: $('#example_organization').attr('data-token')
+      success: (data, textStatus, jqXHR) ->
+        $('#bike_basic').text(JSON.stringify(data,undefined,2))
+        # console.log(jqXHR.responseText)
+      error: (data, textStatus, jqXHR) ->
+        $('#bike_basic').text(JSON.stringify(data,undefined,2))
 
     stolen_bike =
       stolen: true
@@ -88,7 +88,7 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
       color: "Black"
       rear_wheel_bsd: 559
       rear_tire_narrow: false
-      owner_email: "user@example.com"
+      owner_email: "stolen_bike_owner@bikeindex.org"
 
     stolen_record =
       date_stolen: "03-01-2013"
@@ -101,8 +101,6 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
       police_report_number: "99999999"
       police_report_department: "Chicago"
 
-
-
     $.ajax
       url: $('#bike_stolen').attr('data-url')
       type: "POST"
@@ -113,6 +111,7 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
         access_token: $('#example_organization').attr('data-token')
       success: (data, textStatus, jqXHR) ->
         $('#bike_stolen').text(JSON.stringify(data,undefined,2))
+
         # console.log(jqXHR.responseText)
       error: (data, textStatus, jqXHR) ->
         $('#bike_stolen').text(JSON.stringify(data,undefined,2))

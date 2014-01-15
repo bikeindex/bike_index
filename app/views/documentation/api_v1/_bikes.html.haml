@@ -45,11 +45,11 @@
       %tr
         %td
           %code
-            bike_hash
+            bike
         %td
           hash
         %td
-          A hash of the bike's attributes
+          An object containing key value pairs of the bike's attributes
       %tr
         %td
           %code
@@ -57,7 +57,7 @@
         %td
           hash
         %td
-          Optional. A hash of information about the bike theft.
+          Optional. An object with information about the bike theft.
       %tr
         %td
           %code
@@ -93,7 +93,7 @@
 
 %article
   .alert.alert
-    Test bikes behave like normal bikes on the Index in most ways. You can view them and you can edit them if they are sent to your email address. There are a few key differences though:
+    Test bikes behave like normal bikes on the Index in most ways. You can view them and you can edit them if the owner_email is the email you are logged in with. There are some important differences though:
     %ul.key-differences
       %li
         No email is sent when they are created
@@ -103,12 +103,12 @@
         They're deleted every day or so.
 
 %h3#bike_hash
-  Bike hash
+  Bike object (hash)
 
 %p
   The following keys are required for a valid
   %code
-    bike_hash
+    bike
 
 %article.code
   %table.table
@@ -203,8 +203,8 @@
 %p
   The 
   %code
-    bike_hash
-  accepts some optional additional attributes. Include them if you want!
+    bike
+  object accepts some optional additional attributes. Include them if you want!
 %article.code
   %table.table
     %tbody
@@ -247,9 +247,9 @@
   Adding stolen bikes
 
 %p
-  To create a stolen bike, you have to include two additional keys in the 
+  To create a stolen bike, you have to add two keys pairs to your
   %code
-    bike_hash
+    bike
 
 %article.code
   %table.table
@@ -274,10 +274,15 @@
           Phone number of the stolen bike owner. Format doesn't matter
 
 %p
-  You can also add information about the bike theft to create a more accurate record. This information is included in the stolen 
+  You can also add information about the bike theft to create a more accurate record. You put this information in the
+  %code
+    stolen_record
+  object.
 
 %p
-  The keys available for stolen bikes
+  The keys available for the
+  %code
+    stolen_record
 
 
   / stolen_record.theft_description, stolen_record.street, stolen_record.city = [
@@ -359,8 +364,8 @@
 %p
   Here is an example post with all the possible attributes. Remember: Only the two attributes from the
   %code
-    bike_hash
-  are required.
+    bike
+  object are required to create a stolen bike record, the rest is icing on the cupcake.
 
 %article.code
   %p.code-label
@@ -409,8 +414,8 @@
       :plain
         {
           "bike": {
-            "web_url": "#{link_to "https://bikeindex.org/bikes/1520", "https://bikeindex.org/bikes/1520"}",
-            "api_url": "#{ link_to "https://bikeindex.org/api/v1/bikes/1520", "https://bikeindex.org/api/v1/bikes/1520"}"
+            "web_url": "#{link_to "https://bikeindex.org/bikes/1532", "https://bikeindex.org/bikes/1532"}",
+            "api_url": "#{ link_to "https://bikeindex.org/api/v1/bikes/1532", "https://bikeindex.org/api/v1/bikes/1532"}"
           }
         }
 
@@ -419,4 +424,4 @@
   Adding components to bikes
 
 %p
-  In progress. SRYS
+  \... soon to be

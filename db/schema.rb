@@ -115,7 +115,6 @@ ActiveRecord::Schema.define(:version => 20140115041923) do
     t.boolean  "published"
     t.string   "old_title_slug"
     t.text     "description_abbr"
-    t.text     "feed_body"
   end
 
   create_table "cgroups", :force => true do |t|

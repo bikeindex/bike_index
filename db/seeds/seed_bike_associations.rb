@@ -16,7 +16,7 @@ cycle_types = [
   { name: 'Wheelchair', slug: 'wheelchair' },
   { name: 'Stroller', slug: 'stroller' }]
 cycle_types.each do |ct|
-  cycle_type = CycleType.create(name: ct.name, slug: ct.slug)
+  cycle_type = CycleType.create(name: ct[:name], slug: ct[:slug])
   cycle_type.save
 end
 
@@ -58,9 +58,9 @@ handlebar_types = [
   { name: 'Forward facing', slug: 'forward'},
   { name: 'Rear facing', slug: 'rear'},
   { name: 'BMX Style', slug: 'rise'},
-  { name: 'Not handlebars' slug: 'not-handlebars'}]
-handlebar_types.each do |type_name|
-  handlebar_type = HandlebarType.create(name: h.name, slug: h.slug)
+  { name: 'Not handlebars', slug: 'not-handlebars'}]
+handlebar_types.each do |h|
+  handlebar_type = HandlebarType.create(name: h[:name], slug: h[:slug])
   handlebar_type.save
 end
 
@@ -72,7 +72,7 @@ frame_materials = [
   { name: 'Titanium', slug: 'titanium'},
   { name: 'Wood', slug: 'wood'}]
 frame_materials.each do |m|
-  frame_material = FrameMaterial.create(name: m.name, slug: m.slug)
+  frame_material = FrameMaterial.create(name: m[:name], slug: m[:slug])
   frame_material.save
 end
 
