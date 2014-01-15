@@ -17,7 +17,7 @@
         type: "GET",
         url: "#{request_url}",
         success: function(data, textStatus, jqXHR) {
-          $('#frame-materials-index').text(data)
+          $('#frame_materials_index').text(JSON.stringify(data,undefined,2))
         }
       });
 

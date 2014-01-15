@@ -172,9 +172,11 @@ hr {
   }
 }
 
-.dl-wider-dt {
-  dt { width: 180px; }
-  dd { margin-left: 190px; }
+@media (min-width: 768px) {
+  .dl-wider-dt {
+    dt { width: 180px; }
+    dd { margin-left: 190px; }
+  }
 }
 
 @media (min-width: 768px) {

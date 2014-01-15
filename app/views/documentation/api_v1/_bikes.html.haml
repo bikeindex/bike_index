@@ -92,7 +92,7 @@
     = org.access_token
 
 %article
-  .alert.alert-info
+  .alert.alert
     Test bikes behave like normal bikes on the Index in most ways. You can view them and you can edit them if they are sent to your email address. There are a few key differences though:
     %ul.key-differences
       %li
@@ -182,7 +182,7 @@
           }
         },
         success: function(data, textStatus, jqXHR) {
-          $('#bike_basic').text(data)
+          $('#bike_basic').text(JSON.stringify(data,undefined,2))
         }
       });
 %article.code

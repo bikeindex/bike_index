@@ -14,7 +14,7 @@
         type: "GET",
         url: "#{request_url}",
         success: function(data, textStatus, jqXHR) {
-          $('#handlebar-types-index').text(data)
+          $('#handlebar_types_index').text(JSON.stringify(data,undefined,2))
         }
       });
 

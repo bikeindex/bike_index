@@ -22,7 +22,7 @@
         type: "GET",
         url: "#{request_url}",
         success: function(data, textStatus, jqXHR) {
-          $('#wheel-sizes-index').text(data)
+          $('#wheel-sizes-index').text(JSON.stringify(data,undefined,2))
         }
       });
 

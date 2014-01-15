@@ -26,7 +26,7 @@
         type: "GET",
         url: "#{request_url}",
         success: function(data, textStatus, jqXHR) {
-          $('#cycle-types-index').text(data)
+          $('#cycle_types_index').text(JSON.stringify(data,undefined,2))
         }
       });
 

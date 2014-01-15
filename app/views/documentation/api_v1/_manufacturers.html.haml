@@ -16,7 +16,7 @@
         type: "GET",
         url: "#{request_url}",
         success: function(data, textStatus, jqXHR) {
-          $('#manufacturers_query').text(data)
+          $('#manufacturers_query').text(JSON.stringify(data,undefined,2))
         }
       });
 
@@ -40,7 +40,7 @@
         type: "GET",
         url: "#{request_url}",
         success: function(data, textStatus, jqXHR) {
-          $('#manufacturers_frame_makers').text(data)
+          $('#manufacturers_frame_makers').text(JSON.stringify(data,undefined,2))
         }
       });
 
