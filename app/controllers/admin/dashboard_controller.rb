@@ -22,7 +22,6 @@ class Admin::DashboardController < ApplicationController
     @bike_mnfgs = Bike.where(manufacturer_id: mnfg_other.id)
     @component_types = Component.where(Ctype_id: Ctype.find_by_name("Other").id )
     @handlebar_types = Bike.where(handlebar_type_id: HandlebarType.find_by_name("Other style").id )
-    @frame_material_types = Bike.where(frame_material_id: FrameMaterial.find_by_name("Other style").id)
     @paint = Paint.where("color_id IS NULL")
   end
 

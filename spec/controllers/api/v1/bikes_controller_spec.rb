@@ -49,14 +49,13 @@ describe Api::V1::BikesController do
 
     it "should create a record and not email us" do
       manufacturer = FactoryGirl.create(:manufacturer)
+      FactoryGirl.create(:cycle_type, slug: "bike")
       f_count = Feedback.count
       bike = { serial_number: "69",
-        cycle_type_id: FactoryGirl.create(:cycle_type).id,
         manufacturer_id: manufacturer.id,
         rear_tire_narrow: "true",
         rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
         primary_frame_color_id: FactoryGirl.create(:color).id,
-        handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
         owner_email: "fun_times@examples.com"
       }
       OwnershipCreator.any_instance.should_receive(:send_notification_email)
@@ -68,19 +67,22 @@ describe Api::V1::BikesController do
       f_count.should eq(Feedback.count)
     end
 
-    it "should create an example bike if the bike is from example" do
+    it "should create an example bike if the bike is from example, and include all the options" do
+      FactoryGirl.create(:cycle_type, slug: "bike")
       org = FactoryGirl.create(:organization, name: "Example organization")
       user = FactoryGirl.create(:user)
       FactoryGirl.create(:membership, user: user, organization: org)
       manufacturer = FactoryGirl.create(:manufacturer)
       org.save
       bike = { serial_number: "69 example bike",
-        cycle_type_id: FactoryGirl.create(:cycle_type).id,
+        cycle_type_id: FactoryGirl.create(:cycle_type, slug: 'gluey').id,
         manufacturer_id: manufacturer.id,
         rear_tire_narrow: "true",
         rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
-        primary_frame_color_id: FactoryGirl.create(:color).id,
-        handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
+        color: "something",
+        handlebar_type_slug: FactoryGirl.create(:handlebar_type, slug: "foo").slug,
+        frame_material_slug: FactoryGirl.create(:frame_material, slug: "whatevah").slug,
+        description: "something else",
         owner_email: "fun_times@examples.com"
       }
       Resque.should_not_receive(:enqueue).with(OwnershipInvitationEmailJob, 1)
@@ -88,7 +90,12 @@ describe Api::V1::BikesController do
         post :create, { bike: bike, organization_slug: org.slug, access_token: org.access_token }
       }.should change(Ownership, :count).by(1)
       response.code.should eq("200")
-      Bike.unscoped.where(serial_number: "69 example bike").first.example.should be_true
+      b = Bike.unscoped.where(serial_number: "69 example bike").first
+      b.example.should be_true
+      b.paint.name.should eq("grazeen")
+      b.description.should eq("something else")
+      b.frame_material.slug.should eq("whatevah")
+      b.handlebar_type.slug.should eq("foo")
     end
   end
     

@@ -1,7 +1,22 @@
 # Seed the cycle types
-cycle_types = ['Bike', 'Tandem', 'Unicycle', 'Tricycle', 'Recumbent', 'Pedi Cab', 'Cargo Bike (front storage)', 'Cargo Bike (rear storage)', 'Cargo Tricycle (front storage)', 'Cargo Tricycle (rear storage)', 'Bike Trailer', 'Tall Bike', 'Penny Farthing', 'Wheelchair', 'Stroller', 'Other']
-cycle_types.each do |type_name|
-  cycle_type = CycleType.create(name: type_name)
+cycle_types = [
+  { name: 'Bike', slug: 'bike' },
+  { name: 'Tandem', slug: 'tandem' },
+  { name: 'Unicycle', slug: 'unicycle' },
+  { name: 'Tricycle', slug: 'tricycle' },
+  { name: 'Recumbent', slug: 'recumbent' },
+  { name: 'Pedi Cab', slug: 'pedi-cab' },
+  { name: 'Cargo Bike (front storage)', slug: 'cargo' },
+  { name: 'Cargo Bike (rear storage)', slug: 'cargo-rear' },
+  { name: 'Cargo Tricycle (front storage)', slug: 'cargo-trike' },
+  { name: 'Cargo Tricycle (rear storage)', slug: 'cargo-trike-rear' },
+  { name: 'Bike Trailer', slug: 'trailer' },
+  { name: 'Tall Bike', slug: 'tall-bike' },
+  { name: 'Penny Farthing', slug: 'penny-farthing' },
+  { name: 'Wheelchair', slug: 'wheelchair' },
+  { name: 'Stroller', slug: 'stroller' }]
+cycle_types.each do |ct|
+  cycle_type = CycleType.create(name: ct.name, slug: ct.slug)
   cycle_type.save
 end
 
@@ -37,16 +52,27 @@ colors.each do |c|
 end
 
 # Seed the handlebar types
-handlebar_types = ['Flat', 'Drop', 'Forward facing', 'Rear facing', 'BMX Style', 'Other style']
+handlebar_types = [
+  { name: 'Flat', slug: 'flat'},
+  { name: 'Drop', slug: 'drop'},
+  { name: 'Forward facing', slug: 'forward'},
+  { name: 'Rear facing', slug: 'rear'},
+  { name: 'BMX Style', slug: 'rise'},
+  { name: 'Not handlebars' slug: 'not-handlebars'}]
 handlebar_types.each do |type_name|
-  handlebar_type = HandlebarType.create(name: type_name)
+  handlebar_type = HandlebarType.create(name: h.name, slug: h.slug)
   handlebar_type.save
 end
 
 # Seed the Frame materials
-frame_materials = ['Steel', 'Aluminium', 'Composite', 'Titanium', 'Other style']
-frame_materials.each do |material|
-  frame_material = FrameMaterial.create(name: material)
+frame_materials = [
+  { name: 'Steel', slug: 'steel'},
+  { name: 'Aluminium', slug: 'aluminum'},
+  { name: 'Carbon or composite', slug: 'composite'},
+  { name: 'Titanium', slug: 'titanium'},
+  { name: 'Wood', slug: 'wood'}]
+frame_materials.each do |m|
+  frame_material = FrameMaterial.create(name: m.name, slug: m.slug)
   frame_material.save
 end
 

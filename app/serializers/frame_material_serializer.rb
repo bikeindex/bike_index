@@ -1,3 +1,3 @@
 class FrameMaterialSerializer < ActiveModel::Serializer
-  attributes :id, :name
+  attributes :name, :slug
 end

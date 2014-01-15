@@ -47,6 +47,7 @@ FactoryGirl.define do
 
   factory :cycle_type do 
     name { FactoryGirl.generate(:unique_name) }
+    slug { FactoryGirl.generate(:unique_name) }
   end
 
   factory :manufacturer do
@@ -56,6 +57,7 @@ FactoryGirl.define do
 
   factory :frame_material do 
     name { FactoryGirl.generate(:unique_name) }
+    slug { FactoryGirl.generate(:unique_name) }
   end
 
   factory :propulsion_type do 
@@ -71,6 +73,7 @@ FactoryGirl.define do
 
   factory :handlebar_type do
     name { FactoryGirl.generate(:unique_name) }
+    slug { FactoryGirl.generate(:unique_name) }
   end
 
   factory :color do 

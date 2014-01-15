@@ -22,18 +22,30 @@ class BParam < ActiveRecord::Base
   before_save :set_foreign_keys
   def set_foreign_keys
     return true unless params.present? && bike.present?
-    set_cycle_type_key unless bike[:cycle_type_id].present?
     set_wheel_size_key unless bike[:rear_wheel_size_id].present?
     set_manufacturer_key unless bike[:manufacturer_id].present?
     set_color_key unless bike[:primary_frame_color_id].present?
+    set_cycle_type_key if bike[:cycle_type_slug].present?
+    set_handlebar_type_key if bike[:handlebar_type_slug].present?
+    set_frame_material_key if bike[:frame_material_slug].present?
   end
 
   def set_cycle_type_key
-    if bike[:cycle_type].present?
-      ct = CycleType.fuzzy_name_find(bike[:cycle_type])
-      bike[:cycle_type_id] = ct.id if ct.present?
-      bike.delete(:cycle_type)
-    end
+    ct = CycleType.find(:first, :conditions => [ "slug = ?", bike[:cycle_type_slug].downcase.strip ])
+    bike[:cycle_type_id] = ct.id if ct.present?
+    bike.delete(:cycle_type_slug)
+  end
+
+  def set_frame_material_key
+    fm = FrameMaterial.find(:first, :conditions => [ "slug = ?", bike[:frame_material_slug].downcase.strip ])
+    bike[:frame_material_id] = fm.id if fm.present?
+    bike.delete(:frame_material_slug)
+  end
+
+  def set_handlebar_type_key
+    ht = HandlebarType.find(:first, :conditions => [ "slug = ?", bike[:handlebar_type_slug].downcase.strip ])
+    bike[:handlebar_type_id] = ht.id if ht.present?
+    bike.delete(:handlebar_type_slug)
   end
 
   def set_wheel_size_key

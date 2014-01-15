@@ -87,29 +87,3 @@
               = f.handlebar_type_other
             %td
               = link_to f.id, edit_admin_bike_url(f)
-
-
-  %section.full-screen-table
-    %table.table.table-striped.table-bordered
-      %thead
-        %th
-          Date
-        %th
-          Frame material
-        %th
-          Bike
-      %tbody
-        - @frame_material_types.each do |f|
-          %tr
-            %td
-              - if f.created_at.today?
-                Today at #{f.created_at.strftime("%-I %p")}
-              - elsif Date.yesterday().beginning_of_day() <= f.created_at               
-                Yesterday at #{f.created_at.strftime("%-I %p")}
-              - else
-                = f.created_at.strftime("%-m/%-d/%Y")
-
-            %td
-              = f.frame_material_other
-            %td
-              = link_to f.id, edit_admin_bike_url(f)

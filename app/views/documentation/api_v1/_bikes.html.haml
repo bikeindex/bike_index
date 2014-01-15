@@ -209,47 +209,31 @@
         %td
           text
         %td
-          A description of the bike. This is searched, so it's a good idea add a description of any distinguishing features.
+          A description of the bike. This is searched, so it's a good idea add any distinguishing features.
       %tr
         %td
           %code
-            cycle_type_name
+            cycle_type_slug
         %td
           string
         %td
-          Can be any of the names from the list of #{link_to "cycle_types", "#cycle_type_ref"}. Defaults to "bike"
+          Can be any of the names from the list of #{link_to "cycle_types", "#cycle_types_ref"}. Defaults to "bike"
       %tr
         %td
           %code
-            frame_material_name
+            frame_material_slug
         %td
           string
         %td
-          The type of material the frame is made from
+          The type of material the frame is made from, chosen from #{link_to "frame_materials","#frame_materials_ref"}.
       %tr
         %td
           %code
-            rear_wheel_bsd
-        %td
-          integer
-        %td
-          Rear wheel size, the tire's #{link_to "BSD", "#wheel_size_ref", class: "scroll-to-ref"}
-      %tr
-        %td
-          %code
-            rear_tire_narrow
-        %td
-          boolean
-        %td
-          Whether the tire width is less than 32mm
-      %tr
-        %td
-          %code
-            owner_email
+            handlebar_type_slug
         %td
           string
         %td
-          email that should receive the registration
+          The slug of the handlebar type, chosen from the list of #{link_to "handlebar_types", "#handlebar_types_ref"}
 
 / description: "Has an under-seat beer opener and a handlebar flower vase",
 

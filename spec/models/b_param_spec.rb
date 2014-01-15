@@ -22,15 +22,19 @@ describe BParam do
 
   describe :set_foreign_keys do 
     it "should call set_foreign_keys" do 
-      m = FactoryGirl.create(:manufacturer)
-      c = FactoryGirl.create(:color)
       b_param = BParam.new
-      bike = {manufacturer: m.name, color: c.name}
+      bike = {
+        frame_material_slug: "something",
+        handlebar_type_slug: "else",
+        cycle_type_slug: "entirely"
+      }
       b_param.stub(:params).and_return({bike: bike})
-      b_param.should_receive(:set_cycle_type_key).and_return(true)
       b_param.should_receive(:set_manufacturer_key).and_return(true)
       b_param.should_receive(:set_color_key).and_return(true)
       b_param.should_receive(:set_wheel_size_key).and_return(true)
+      b_param.should_receive(:set_cycle_type_key).and_return(true)
+      b_param.should_receive(:set_handlebar_type_key).and_return(true)
+      b_param.should_receive(:set_frame_material_key).and_return(true)
       b_param.set_foreign_keys
     end
   end
@@ -48,14 +52,37 @@ describe BParam do
 
   describe :set_cycle_type_key do
     it "should set cycle_type_id to the cycle type from name submitted" do
-      # Optional, because default type of Bike is set in creator
-      FactoryGirl.create(:cycle_type, name: "Bike")
-      ct = FactoryGirl.create(:cycle_type, name: "Boo Boo")
-      bike = { serial_number: "gobble gobble", cycle_type: "boo boo" }
+      ct = FactoryGirl.create(:cycle_type, name: "Boo Boo", slug: "boop")
+      bike = { serial_number: "gobble gobble", cycle_type_slug: " booP " }
       b_param = BParam.new
       b_param.stub(:params).and_return({bike: bike})
       b_param.set_cycle_type_key
       b_param.params[:bike][:cycle_type_id].should eq(ct.id)
+      b_param.params[:bike][:cycle_type_slug].present?.should be_false
+    end
+  end
+
+  describe :set_frame_material_key do
+    it "should set cycle_type_id to the cycle type from name submitted" do
+      fm = FactoryGirl.create(:frame_material, name: "poo poo", slug: "poop")
+      bike = { serial_number: "gobble gobble", frame_material_slug: " POOP " }
+      b_param = BParam.new
+      b_param.stub(:params).and_return({bike: bike})
+      b_param.set_frame_material_key
+      b_param.params[:bike][:frame_material_slug].present?.should be_false
+      b_param.params[:bike][:frame_material_id].should eq(fm.id)
+    end
+  end
+
+  describe :set_handlebar_type_key do
+    it "should set cycle_type_id to the cycle type from name submitted" do
+      ht = FactoryGirl.create(:handlebar_type, name: "poo poo", slug: "poopie")
+      bike = { serial_number: "gobble gobble", handlebar_type_slug: " POOPie " }
+      b_param = BParam.new
+      b_param.stub(:params).and_return({bike: bike})
+      b_param.set_handlebar_type_key
+      b_param.params[:bike][:handlebar_type_slug].present?.should be_false
+      b_param.params[:bike][:handlebar_type_id].should eq(ht.id)
     end
   end
 

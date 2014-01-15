@@ -16,7 +16,7 @@
         type: "GET",
         url: "#{request_url}",
         success: function(data, textStatus, jqXHR) {
-          $('#manufacturers-query').text(data)
+          $('#manufacturers_query').text(data)
         }
       });
 
@@ -40,7 +40,7 @@
         type: "GET",
         url: "#{request_url}",
         success: function(data, textStatus, jqXHR) {
-          $('#manufacturers-frame-makers').text(data)
+          $('#manufacturers_frame_makers').text(data)
         }
       });
 
@@ -55,4 +55,4 @@
   If you submit a GET request with no query, you will receive the whole list of manufacturers
 
 %p
-  You can use this, (or just the frame makers) with an #{link_to "autocomplete plugin", "http://twitter.github.io/typeahead.js/"} or improved select boxes, we use #{ link_to "Select2", "https://github.com/ivaynberg/select2"}.
+  You can use this, (or just the frame makers) with an #{link_to "autocomplete plugin", "http://twitter.github.io/typeahead.js/"} or improved select boxes. We're huge fans of #{ link_to "Select2", "https://github.com/ivaynberg/select2"}.

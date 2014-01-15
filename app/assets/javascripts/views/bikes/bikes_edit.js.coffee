@@ -101,8 +101,6 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     @setWheelDiam('rear')
     @showColors()
     @expandAdditionalBlockFromSelector('#bike_handlebar_type_id')
-    @expandAdditionalBlockFromSelector('#bike_frame_material_id')
-    @expandAdditionalBlockFromSelector('#bike_frame_material_id')
     @expandAdditionalBlockFromSelector('.component-mnfg-select select')
     @expandAdditionalBlockFromSelector('.part-type-select select')
     @setInitialGears()

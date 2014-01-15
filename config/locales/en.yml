@@ -21,6 +21,7 @@ en:
     users_password_reset: "Password reset - Bike Index"
     users_accept_terms: "Terms of use - Bike Index"
     users_accept_vendor_terms: "Organization terms - Bike Index"
+    documentation_api_v1: "Bike Index API documentation"
   meta_descriptions:
     welcome_index: "Bicycle registration: online, powerful, free."
     info_about: "About the Bike Index"
@@ -38,6 +39,7 @@ en:
     feedbacks_new: "Contact the Bike Index. Your words are our muse, whisper them in our ear."
     blogs_index: "Read about what the Bike Index has been up to recently. Also, periodically, learn magic spells."
     users_new: "Sign up for the Bike Index"
+    documentation_api_v1: "API Version 1 documentation, and love"
   time:
     formats:
       standard_display: "%A, %B %d"

@@ -16,7 +16,7 @@ describe BikeCreatorBuilder do
 
   describe :add_front_wheel_size do
     it "should set the front wheel equal to the rear wheel if it's present" do 
-      cycle_type = FactoryGirl.create(:cycle_type, name: "Bike")
+      cycle_type = FactoryGirl.create(:cycle_type, name: "Bike", slug: "bike")
       bike = Bike.new
       b_param = BParam.new 
       bike.stub(:cycle_type_id).and_return(cycle_type.id)
@@ -30,7 +30,7 @@ describe BikeCreatorBuilder do
 
   describe :add_required_attributes do 
     it "should call the methods it needs to call" do 
-      cycle_type = FactoryGirl.create(:cycle_type, name: "Bike")
+      cycle_type = FactoryGirl.create(:cycle_type, name: "Bike", slug: "bike")
       propulsion_type = FactoryGirl.create(:propulsion_type, name: "Foot pedal")
       bike = Bike.new
       b_param = BParam.new

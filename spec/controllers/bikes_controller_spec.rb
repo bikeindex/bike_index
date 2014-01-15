@@ -67,7 +67,7 @@ describe BikesController do
 
     it "should render a new stolen bike" do 
       user = FactoryGirl.create(:user)
-      FactoryGirl.create(:cycle_type, name: "Bike")
+      FactoryGirl.create(:cycle_type, name: "Bike", slug: "bike")
       FactoryGirl.create(:propulsion_type, name: "Foot pedal")
       session[:user_id] = user.id
       get :new, { stolen: true }
@@ -77,7 +77,7 @@ describe BikesController do
 
     it "should render a new recovered bike" do 
       user = FactoryGirl.create(:user)
-      FactoryGirl.create(:cycle_type, name: "Bike")
+      FactoryGirl.create(:cycle_type, name: "Bike", slug: "bike")
       FactoryGirl.create(:propulsion_type, name: "Foot pedal")
       session[:user_id] = user.id
       get :new, { recovered: true }
@@ -89,7 +89,7 @@ describe BikesController do
       user = FactoryGirl.create(:user)
       organization = FactoryGirl.create(:organization)
       membership = FactoryGirl.create(:membership, user: user, organization: organization)
-      FactoryGirl.create(:cycle_type, name: "Bike")
+      FactoryGirl.create(:cycle_type, name: "Bike", slug: "bike")
       FactoryGirl.create(:propulsion_type, name: "Foot pedal")
       session[:user_id] = user.id
       get :new
@@ -99,7 +99,7 @@ describe BikesController do
     it "should render a new bike_token bike" do 
       user = FactoryGirl.create(:user)
       bike_token = FactoryGirl.create(:bike_token, user: user)
-      FactoryGirl.create(:cycle_type, name: "Bike")
+      FactoryGirl.create(:cycle_type, name: "Bike", slug: "bike")
       FactoryGirl.create(:propulsion_type, name: "Foot pedal")
       session[:user_id] = user.id
       get :new, { bike_token_id: bike_token.id }
@@ -113,7 +113,7 @@ describe BikesController do
       before :each do
         @user = FactoryGirl.create(:user)
         @b_param = FactoryGirl.create(:b_param, creator: @user)
-        FactoryGirl.create(:cycle_type, name: "Bike")
+        FactoryGirl.create(:cycle_type, name: "Bike", slug: "bike")
         FactoryGirl.create(:propulsion_type, name: "Foot pedal")
         manufacturer = FactoryGirl.create(:manufacturer)
         session[:user_id] = @user.id
@@ -195,7 +195,7 @@ describe BikesController do
         user = FactoryGirl.create(:user)
         FactoryGirl.create(:membership, user: user, organization: organization)
         organization.save
-        FactoryGirl.create(:cycle_type, name: "Bike")
+        FactoryGirl.create(:cycle_type, name: "Bike", slug: "bike")
         FactoryGirl.create(:propulsion_type, name: "Foot pedal")
         manufacturer = FactoryGirl.create(:manufacturer)
         b_param = BParam.create(creator_id: organization.auto_user.id, params: {creation_organization_id: organization.id, embeded: true})
