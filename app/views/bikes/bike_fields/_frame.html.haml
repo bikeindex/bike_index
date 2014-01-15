@@ -65,7 +65,7 @@
       %span
         ?
     .control-group
-      = f.label :frame_material_id, class: "control-label"
+      = f.label :frame_material_id, "Primary frame material", class: "control-label"
       .controls
         = collection_select( :bike, :frame_material_id, FrameMaterial.all, :id, :name, prompt: "Choose material" )
 

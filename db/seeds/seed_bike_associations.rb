@@ -67,7 +67,7 @@ end
 # Seed the Frame materials
 frame_materials = [
   { name: 'Steel', slug: 'steel'},
-  { name: 'Aluminium', slug: 'aluminum'},
+  { name: 'Aluminum', slug: 'aluminum'},
   { name: 'Carbon or composite', slug: 'composite'},
   { name: 'Titanium', slug: 'titanium'},
   { name: 'Wood', slug: 'wood'}]

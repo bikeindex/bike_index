@@ -19,7 +19,6 @@ class Bike < ActiveRecord::Base
     :stolen,
     :recovered,
     :frame_material_id, 
-    :frame_material_other,
     :frame_model, 
     :handlebar_type_id,
     :handlebar_type_other,

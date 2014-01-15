@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140114230221) do
+ActiveRecord::Schema.define(:version => 20140115041923) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -61,7 +61,6 @@ ActiveRecord::Schema.define(:version => 20140114230221) do
     t.datetime "created_at",                                  :null => false
     t.datetime "updated_at",                                  :null => false
     t.boolean  "stolen",                   :default => false, :null => false
-    t.string   "frame_material_other"
     t.string   "propulsion_type_other"
     t.string   "manufacturer_other"
     t.string   "zipcode"
