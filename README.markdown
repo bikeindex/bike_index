@@ -29,7 +29,7 @@ We're an open source project. Take a gander through our code, report bugs, or do
 
 - `bundle exec foreman start` to start the server
 
-- **Access the site through [lvh.me:3000](http://lvh.me:300)**. You can't log in through localhost:3000.
+- **Access the site through [lvh.me:3000](http://lvh.me:3000)**. You can't log in through localhost:3000.
  
   - if you want to use [pow](http://pow.cx/), change the appropriate values in `session_store.rb` and `development.rb`
 
