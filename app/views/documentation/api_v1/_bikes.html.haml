@@ -236,6 +236,145 @@
   %code
     bike 
   object.
+%h3#components_for_bikes
+  Adding components to bikes
+
+%p
+  You can submit an array of component objects along with the bike.
+%p
+  The
+  %code
+    component
+  object has these key value pairs:
+%article.code
+  %table.table
+    %tbody
+      %tr
+        %td
+          %code
+            manufacturer
+        %td
+          string
+        %td
+          Required. The name of the component manufacturer
+      %tr
+        %td
+          %code
+            component_type
+        %td
+          string
+        %td
+          Required. The slug of the #{ link_to "component_type", "#component_types_ref", class: "scroll-to-ref" } this component is.
+      %tr
+        %td
+          %code
+            model_name
+        %td
+          string
+        %td
+          The component's model
+      %tr
+        %td
+          %code
+            year
+        %td
+          integer
+        %td
+          The model year for this component.
+      %tr
+        %td
+          %code
+            front_or_rear
+        %td
+          string
+        %td
+          Can be "front", "rear", or "both". For component_types that
+          %code
+            have_multiple
+      %tr
+        %td
+          %code
+            serial_number
+        %td
+          string
+        %td
+          Part serial number
+      %tr
+        %td
+          %code
+            description
+        %td
+          text
+        %td
+          A description of the component
+
+%article
+  .alert.alert
+    There are only two required attributes for components: 
+    %code
+      manufacturer
+    &
+    %code
+      component_type
+    
+    
+
+%article.code
+  %p.code-label
+    Bike POST with components
+
+  - request_url = api_v1_bikes_url
+  %pre
+    :plain
+      $.ajax({
+        type: "POST",
+        url: "#{request_url}",
+        data: {
+          organization_slug: "#{org.slug}",
+          access_token: "#{org.access_token}",
+          bike: {
+            serial_number: "XOXO :)",
+            manufacturer: "WorkCycles",
+            color: "Red",
+            rear_wheel_bsd: 559,
+            rear_tire_narrow: false,
+            owner_email: "cargo_bike_owner@bikeindex.org",
+            cycle_type_slug: "cargo",
+            frame_material_slug: "steel",
+            handlebar_type_slug: "flat",
+            description: "Amazing cargo bike. Has made me car free!"
+          },
+          components: [
+            {
+              manufacturer: "SRAM",
+              year: "2013",
+              component_type: "crankset",
+              description: "2X10 crankset",
+              model_name: "X0"
+            },
+            {
+              manufacturer: "Chris King",
+              component_type: "hub",
+              model_name: "Bumble Bee"
+              front_or_rear: "both"
+            }
+          ]
+        },
+        success: function(data, textStatus, jqXHR) {
+          $('#bike_components').text(JSON.stringify(data,undefined,2))
+        }
+      });
+  %p.code-label
+    Response
+  %pre#bike_components{ data: {url: request_url }}
+    - if Rails.env.production?
+      :plain
+        {
+          "bike": {
+            "web_url": "#{link_to "https://bikeindex.org/bikes/1532", "https://bikeindex.org/bikes/1532"}",
+            "api_url": "#{ link_to "https://bikeindex.org/api/v1/bikes/1532", "https://bikeindex.org/api/v1/bikes/1532"}"
+          }
+        }
 
 %h3#stolen_bikes
   Adding stolen bikes
@@ -402,146 +541,6 @@
   %p.code-label
     Response
   %pre#bike_stolen{ data: {url: request_url }}
-    - if Rails.env.production?
-      :plain
-        {
-          "bike": {
-            "web_url": "#{link_to "https://bikeindex.org/bikes/1532", "https://bikeindex.org/bikes/1532"}",
-            "api_url": "#{ link_to "https://bikeindex.org/api/v1/bikes/1532", "https://bikeindex.org/api/v1/bikes/1532"}"
-          }
-        }
-
-%h3#components_for_bikes
-  Adding components to bikes
-
-%p
-  You can submit an array of component objects along with the bike.
-%p
-  The
-  %code
-    component
-  object has these key value pairs:
-%article.code
-  %table.table
-    %tbody
-      %tr
-        %td
-          %code
-            manufacturer
-        %td
-          string
-        %td
-          Required. The name of the component manufacturer
-      %tr
-        %td
-          %code
-            component_type
-        %td
-          string
-        %td
-          Required. The slug of the #{ link_to "component_type", "#component_types_ref", class: "scroll-to-ref" } this component is.
-      %tr
-        %td
-          %code
-            model_name
-        %td
-          string
-        %td
-          The component's model
-      %tr
-        %td
-          %code
-            year
-        %td
-          integer
-        %td
-          The model year for this component.
-      %tr
-        %td
-          %code
-            front_or_rear
-        %td
-          string
-        %td
-          Can be "front", "rear", or "both". For component_types that
-          %code
-            have_multiple
-      %tr
-        %td
-          %code
-            serial_number
-        %td
-          string
-        %td
-          Part serial number
-      %tr
-        %td
-          %code
-            description
-        %td
-          text
-        %td
-          A description of the component
-
-%article
-  .alert.alert
-    There are only two required attributes for components: 
-    %code
-      manufacturer
-    &
-    %code
-      component_type
-    
-    
-
-%article.code
-  %p.code-label
-    Bike POST with components
-
-  - request_url = api_v1_bikes_url
-  %pre
-    :plain
-      $.ajax({
-        type: "POST",
-        url: "#{request_url}",
-        data: {
-          organization_slug: "#{org.slug}",
-          access_token: "#{org.access_token}",
-          bike: {
-            serial_number: "XOXO :)",
-            manufacturer: "WorkCycles",
-            color: "Red",
-            rear_wheel_bsd: 559,
-            rear_tire_narrow: false,
-            owner_email: "cargo_bike_owner@bikeindex.org",
-            cycle_type_slug: "cargo",
-            frame_material_slug: "steel",
-            handlebar_type_slug: "flat",
-            description: "Amazing cargo bike. Has made me car free!"
-          },
-          components: [
-            {
-              manufacturer: "SRAM",
-              year: "2013",
-              component_type: "crankset",
-              description: "2X10 crankset",
-              model_name: "X0"
-            },
-            {
-              manufacturer: "Chris King",
-              component_type: "hub",
-              model_name: "Bumble Bee"
-              front_or_rear: "both"
-            }
-          ]
-        },
-        success: function(data, textStatus, jqXHR) {
-          $('#bike_components').text(JSON.stringify(data,undefined,2))
-        }
-      });
-  %p.code-label
-    Response
-  %pre#bike_components{ data: {url: request_url }}
     - if Rails.env.production?
       :plain
         {
