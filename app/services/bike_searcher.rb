@@ -51,8 +51,17 @@ class BikeSearcher
     end
     @bikes
   end
+  
+  def matching_updated_since(bikes)
+    if @params[:updated_since]
+      since_date = DateTime.parse(@params[:updated_since])
+      @bikes = bikes.where("updated_at >= ?", since_date)
+    end
+    @bikes
+  end
 
-  def find_bikes    
+  def find_bikes
+    matching_updated_since(@bikes)
     matching_stolenness(@bikes)
     matching_manufacturers(@bikes)
     matching_attr_cache(@bikes)
