@@ -27,7 +27,6 @@ module Api
           else
             e = @b_param.errors.full_messages.to_sentence
           end
-          pp e
           Feedback.create(email: 'contact@bikeindex.org', name: 'Error mailer', title: 'API Bike Creation error!', body: e)
           render json: e, status: :unprocessable_entity and return
         end

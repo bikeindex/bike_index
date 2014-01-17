@@ -90,9 +90,6 @@
           %li.save
             = submit_tag "Save changes", class: "button-green"
 
-      %p#twin_part_types
-        = @twined_ctypes
-
       - if @bike.stolen and @bike.current_stolen_record
         = f.fields_for :stolen_records do |builder|
           - if builder.object == @bike.current_stolen_record

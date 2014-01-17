@@ -4,25 +4,6 @@
 %p
   Here are the things that need to be sent in the request:
 
-/ %article.code
-/   %p.code-label
-/     POST request and possible parameters
-/   - request_url = api_v1_bikes_url
-/   %pre
-/     :plain
-/       $.ajax({
-/         type: "POST",
-/         url: "#{request_url}",
-/         data: {
-/           organization_slug: organization_slug,
-/           access_token: org_access_token,
-/           bike: bike_hash,
-/           stolen_record: stolen_record_hash, // optional
-/           components: components_hash        // optional
-/         },
-/       });
-
-
 %article.code
   %table.table
     %tbody
@@ -65,7 +46,7 @@
         %td
           array
         %td
-          Optional. An array of hashes with attributes for the bike's components.
+          Optional. An array of objects with attributes for the bike's components.
 
           
       
@@ -76,7 +57,18 @@
   You have to submit an organization and an access token to post bikes to the Index.
 
 %p
-  We provide a test organization to add bikes via our API, so you can get started and figure out how to add bikes without having an organization access token.
+  We provide a test organization to add bikes via our API, so you can get started and try adding bikes without having an organization access token.
+
+%article
+  .alert.alert
+    Test bikes behave like normal bikes on the Index in most ways. You can view them and you can edit them if the owner_email is the email you are logged in with. There are some important differences though:
+    %ul.key-differences
+      %li
+        No email is sent when they are created
+      %li
+        Are not visible in searches
+      %li
+        They're deleted every day or so.
 
 - org = Organization.find_by_name('Example organization')
 
@@ -90,17 +82,6 @@
     Access token
   %dd
     = org.access_token
-
-%article
-  .alert.alert
-    Test bikes behave like normal bikes on the Index in most ways. You can view them and you can edit them if the owner_email is the email you are logged in with. There are some important differences though:
-    %ul.key-differences
-      %li
-        No email is sent when they are created
-      %li
-        Are not visible in searches
-      %li
-        They're deleted every day or so.
 
 %h3#bike_hash
   Bike object (hash)
@@ -128,7 +109,7 @@
         %td
           string
         %td
-          The name of the frame manufacturer
+          The name of the #{ link_to "frame manufacturer", "#manufacturers_ref", class: "scroll-to-ref"}.
       %tr
         %td
           %code
@@ -179,7 +160,7 @@
             serial_number: "XOXO <3",
             manufacturer: "Surly",
             color: "Blue",
-            rear_wheel_bsd: 559,
+            rear_wheel_bsd: 622,
             rear_tire_narrow: false,
             owner_email: "new_bike_owner@bikeindex.org"
           }
@@ -188,7 +169,6 @@
           $('#bike_basic').text(JSON.stringify(data,undefined,2))
         }
       });
-%article.code
   %p.code-label
     Response
   %pre#bike_basic{ data: {url: request_url }}
@@ -215,7 +195,15 @@
         %td
           text
         %td
-          A description of the bike. This is searched, so it's a good idea add any distinguishing features.
+          A description of the bike. This is searched, so it's a good idea add any distinguishing features
+      %tr
+        %td
+          %code
+            year
+        %td
+          integer
+        %td
+          The model year of the bike's frame
       %tr
         %td
           %code
@@ -242,6 +230,12 @@
           The slug of the handlebar type, chosen from the list of #{link_to "handlebar_types", "#handlebar_types_ref", class: "scroll-to-ref"}
 
 / description: "Has an under-seat beer opener and a handlebar flower vase",
+
+%p
+  Check the #{link_to "components post", "#bike_components", class: "scroll-to-ref"} for an example with optional attributes included in the 
+  %code
+    bike 
+  object.
 
 %h3#stolen_bikes
   Adding stolen bikes
@@ -283,14 +277,6 @@
   The keys available for the
   %code
     stolen_record
-
-
-  / stolen_record.theft_description, stolen_record.street, stolen_record.city = [
-  /   sr[:theft_description], sr[:street], sr[:city]
-  / ]
-  / stolen_record.phone = sr[:phone] if sr[:phone].present?
-  / stolen_record.date_stolen = create_date_from_string(sr[:date_stolen]) if sr[:date_stolen].present?
-  / stolen_record.country_id = Country.fuzzy_iso_find(sr[:country]).id if sr[:country].present?
 
 %article.code
   %table.table
@@ -352,7 +338,7 @@
         %td
           string
         %td
-          Police crime report number for this theft.
+          Police crime report number for this theft
       %tr
         %td
           %code
@@ -360,16 +346,22 @@
         %td
           string
         %td
-          Police department where the theft was reported.
+          Police department where the theft was reported
+%article
+  .alert.alert-info
+    %strong
+      Remember:
+    Only the two attributes from the
+    %code
+      bike
+    object are required to create a stolen bike record, the rest is icing on the cupcake.
+
 %p
-  Here is an example post with all the possible attributes. Remember: Only the two attributes from the
-  %code
-    bike
-  object are required to create a stolen bike record, the rest is icing on the cupcake.
+  Here is an example post with all the possible attributes.
 
 %article.code
   %p.code-label
-    Stolen Bike
+    Stolen Bike POST
 
   - request_url = api_v1_bikes_url
   %pre
@@ -386,7 +378,7 @@
             serial_number: "XXXX :(",
             manufacturer: "Jamis",
             color: "Black",
-            rear_wheel_bsd: 559,
+            rear_wheel_bsd: 622,
             rear_tire_narrow: false,
             owner_email: "stolen_bike_owner@bikeindex.org"
           },
@@ -406,7 +398,7 @@
           $('#bike_stolen').text(JSON.stringify(data,undefined,2))
         }
       });
-%article.code
+
   %p.code-label
     Response
   %pre#bike_stolen{ data: {url: request_url }}
@@ -419,9 +411,142 @@
           }
         }
 
-
-%h3#bike_components
+%h3#components_for_bikes
   Adding components to bikes
 
 %p
-  \... soon to be
+  You can submit an array of component objects along with the bike.
+%p
+  The
+  %code
+    component
+  object has these key value pairs:
+%article.code
+  %table.table
+    %tbody
+      %tr
+        %td
+          %code
+            manufacturer
+        %td
+          string
+        %td
+          Required. The name of the component manufacturer
+      %tr
+        %td
+          %code
+            component_type
+        %td
+          string
+        %td
+          Required. The slug of the #{ link_to "component_type", "#component_types_ref", class: "scroll-to-ref" } this component is.
+      %tr
+        %td
+          %code
+            model_name
+        %td
+          string
+        %td
+          The component's model
+      %tr
+        %td
+          %code
+            year
+        %td
+          integer
+        %td
+          The model year for this component.
+      %tr
+        %td
+          %code
+            front_or_rear
+        %td
+          string
+        %td
+          Can be "front", "rear", or "both". For component_types that
+          %code
+            have_multiple
+      %tr
+        %td
+          %code
+            serial_number
+        %td
+          string
+        %td
+          Part serial number
+      %tr
+        %td
+          %code
+            description
+        %td
+          text
+        %td
+          A description of the component
+
+%article
+  .alert.alert
+    There are only two required attributes for components: 
+    %code
+      manufacturer
+    &
+    %code
+      component_type
+    
+    
+
+%article.code
+  %p.code-label
+    Bike POST with components
+
+  - request_url = api_v1_bikes_url
+  %pre
+    :plain
+      $.ajax({
+        type: "POST",
+        url: "#{request_url}",
+        data: {
+          organization_slug: "#{org.slug}",
+          access_token: "#{org.access_token}",
+          bike: {
+            serial_number: "XOXO :)",
+            manufacturer: "WorkCycles",
+            color: "Red",
+            rear_wheel_bsd: 559,
+            rear_tire_narrow: false,
+            owner_email: "cargo_bike_owner@bikeindex.org",
+            cycle_type_slug: "cargo",
+            frame_material_slug: "steel",
+            handlebar_type_slug: "flat",
+            description: "Amazing cargo bike. Has made me car free!"
+          },
+          components: [
+            {
+              manufacturer: "SRAM",
+              year: "2013",
+              component_type: "crankset",
+              description: "2X10 crankset",
+              model_name: "X0"
+            },
+            {
+              manufacturer: "Chris King",
+              component_type: "hub",
+              model_name: "Bumble Bee"
+              front_or_rear: "both"
+            }
+          ]
+        },
+        success: function(data, textStatus, jqXHR) {
+          $('#bike_components').text(JSON.stringify(data,undefined,2))
+        }
+      });
+  %p.code-label
+    Response
+  %pre#bike_components{ data: {url: request_url }}
+    - if Rails.env.production?
+      :plain
+        {
+          "bike": {
+            "web_url": "#{link_to "https://bikeindex.org/bikes/1532", "https://bikeindex.org/bikes/1532"}",
+            "api_url": "#{ link_to "https://bikeindex.org/api/v1/bikes/1532", "https://bikeindex.org/api/v1/bikes/1532"}"
+          }
+        }

@@ -46,7 +46,7 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
       
 
   attributesCall: ->
-    id_blocks = ['#wheel_sizes_index', '#cycle_types_index', '#frame_materials_index', '#handlebar_types_index']
+    id_blocks = ['#wheel_sizes_index', '#cycle_types_index', '#frame_materials_index', '#handlebar_types_index', '#component_types_index']
     for id in id_blocks
       $.ajax
         type: "GET"
@@ -58,7 +58,44 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
           console.log(data)
 
   createBikes: ->      
-    
+    component_bike =
+      serial_number: "XOXO :)"
+      manufacturer: "WorkCycles"
+      color: "Red"
+      rear_wheel_bsd: 559
+      rear_tire_narrow: false
+      owner_email: "cargo_bike_owner@bikeindex.org"
+      cycle_type_slug: "cargo"
+      frame_material_slug: "steel"
+      handlebar_type_slug: "flat"
+      description: "Amazing cargo bike. Has made me car free!"
+    components = [
+      manufacturer: "SRAM"
+      year: "2013"
+      component_type: "crankset"
+      description: "2X10 crankset"
+      model_name: "X0"
+    ,
+      manufacturer: "SRAM"
+      component_type: "bottom-bracket"
+      model_name: "GXP team"
+    ]
+
+    $.ajax
+      url: $('#bike_components').attr('data-url')
+      type: "POST"
+      data: 
+        bike: component_bike
+        components: components
+        organization_slug: $('#example_organization').attr('data-slug')
+        access_token: $('#example_organization').attr('data-token')
+      success: (data, textStatus, jqXHR) ->
+        $('#bike_components').text(JSON.stringify(data,undefined,2))
+
+        # console.log(jqXHR.responseText)
+      error: (data, textStatus, jqXHR) ->
+        $('#bike_components').text(JSON.stringify(data,undefined,2)) 
+        
     bike = 
       serial_number: "XOXO <3"
       manufacturer: "Surly"
@@ -114,9 +151,7 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
 
         # console.log(jqXHR.responseText)
       error: (data, textStatus, jqXHR) ->
-        $('#bike_stolen').text(JSON.stringify(data,undefined,2))
-
-
+        $('#bike_stolen').text(JSON.stringify(data,undefined,2))       
 
 
       

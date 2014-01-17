@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140115041923) do
+ActiveRecord::Schema.define(:version => 20140116222529) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -69,7 +69,7 @@ ActiveRecord::Schema.define(:version => 20140115041923) do
     t.text     "owner_email"
     t.string   "thumb_path"
     t.text     "video_embed"
-    t.integer  "frame_manufacture_year"
+    t.integer  "year"
     t.boolean  "has_no_serial",            :default => false, :null => false
     t.integer  "creator_id"
     t.boolean  "created_with_token",       :default => false, :null => false
@@ -160,9 +160,9 @@ ActiveRecord::Schema.define(:version => 20140115041923) do
     t.string   "slug"
     t.string   "secondary_name"
     t.string   "image"
-    t.datetime "created_at",     :null => false
-    t.datetime "updated_at",     :null => false
-    t.boolean  "has_twin_part"
+    t.datetime "created_at",                        :null => false
+    t.datetime "updated_at",                        :null => false
+    t.boolean  "has_multiple",   :default => false, :null => false
     t.integer  "cgroup_id"
   end
 

@@ -134,7 +134,7 @@
             = @bike.serial_number
         = @bike.dl_list_item(@bike.mnfg_name, "Manufacturer")
         = @bike.dl_from_attribute("frame_model", "Model")
-        = @bike.dl_from_attribute("frame_manufacture_year", "Year")
+        = @bike.dl_from_attribute("year", "Year")
         = @bike.dl_list_item(@bike.seat_tube_display, "Frame size")
         - if @bike.front_wheel_size.present? and @bike.front_wheel_size != @bike.rear_wheel_size
           = @bike.dl_list_item(@bike.ass_name("front_wheel_size"), "Front Wheel")

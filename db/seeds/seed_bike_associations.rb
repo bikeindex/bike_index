@@ -56,9 +56,9 @@ handlebar_types = [
   { name: 'Flat', slug: 'flat'},
   { name: 'Drop', slug: 'drop'},
   { name: 'Forward facing', slug: 'forward'},
-  { name: 'Rear facing', slug: 'rear'},
-  { name: 'BMX Style', slug: 'rise'},
-  { name: 'Not handlebars', slug: 'not-handlebars'}]
+  { name: 'Rear facing', slug: 'rearward'},
+  { name: 'BMX style', slug: 'bmx'},
+  { name: 'Not handlebars', slug: 'other'}]
 handlebar_types.each do |h|
   handlebar_type = HandlebarType.create(name: h[:name], slug: h[:slug])
   handlebar_type.save

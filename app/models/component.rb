@@ -8,11 +8,14 @@ class Component < ActiveRecord::Base
     :manufacturer_id,
     :manufacturer_other,
     :description,
+    :bike_id,
+    :bike,
+    :serial_number,
     :front,
     :rear,
-    :bike,
-    :serial_number
+    :front_or_rear
     
+  attr_accessor :front_or_rear
 
   belongs_to :manufacturer
   belongs_to :ctype
@@ -28,7 +31,7 @@ class Component < ActiveRecord::Base
 
   def cgroup_id
     return 0 unless ctype.present?
-    ctype.cgroup.id 
+    ctype.cgroup.id
   end
 
   def component_group

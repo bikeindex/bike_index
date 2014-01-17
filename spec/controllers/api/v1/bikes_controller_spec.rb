@@ -49,24 +49,51 @@ describe Api::V1::BikesController do
 
     it "should create a record and reset example" do
       manufacturer = FactoryGirl.create(:manufacturer)
+      FactoryGirl.create(:wheel_size, iso_bsd: 559)
       FactoryGirl.create(:cycle_type, slug: "bike")
+      FactoryGirl.create(:ctype, slug: "wheel")
+      FactoryGirl.create(:ctype, slug: "headset")
       f_count = Feedback.count
       bike = { serial_number: "69 non-example",
         manufacturer_id: manufacturer.id,
         rear_tire_narrow: "true",
-        rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
+        rear_wheel_bsd: "559",
         color: FactoryGirl.create(:color).name,
         example: true,
+        year: '1969',
         owner_email: "fun_times@examples.com"
       }
+      components = [
+        {
+          manufacturer: manufacturer.name,
+          year: "1999",
+          component_type: 'Headset',
+          description: "yeah yay!",
+          serial_number: '69',
+          model_name: 'Richie rich'
+        },
+        {
+          manufacturer: "BLUE TEETH",
+          front_or_rear: "Both",
+          component_type: 'wheel'
+        }
+      ]
       OwnershipCreator.any_instance.should_receive(:send_notification_email)
       lambda { 
-        post :create, { bike: bike, organization_slug: @organization.slug, access_token: @organization.access_token }
+        post :create, { bike: bike, organization_slug: @organization.slug, access_token: @organization.access_token, components: components}
       }.should change(Ownership, :count).by(1)
       response.code.should eq("200")
       b = Bike.where(serial_number: "69 non-example").first
       b.example.should be_false
       b.creation_organization_id.should eq(@organization.id)
+      b.year.should eq(1969)
+      b.components.count.should eq(3)
+      b.components.first.serial_number.should eq('69')
+      b.components.first.description.should eq("yeah yay!")
+      b.components.first.ctype.slug.should eq("headset")
+      b.components.first.year.should eq(1999)
+      b.components.first.manufacturer_id.should eq(manufacturer.id)
+      b.components.first.model_name.should eq('Richie rich')
       f_count.should eq(Feedback.count)
     end
 

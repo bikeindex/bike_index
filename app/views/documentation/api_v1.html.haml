@@ -18,16 +18,6 @@
     
     The example requests on this page are all usable. Pop open your browser console and copy the code in to see how it works!
 
-%hr
-
-%h2#bikes_ref
-  Adding bikes
-  %span.github-link
-    #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/bikes_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/bikes_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/bike_serializer.rb"} on Github
-
-= render partial: "/documentation/api_v1/bikes"
-
-
 
 %hr
 
@@ -40,40 +30,58 @@
 
 %hr
 
-%h2#wheel_sizes_ref
+%h2#bikes_ref
+  Adding bikes
+  %span.github-link
+    #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/bikes_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/bikes_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/bike_serializer.rb"} on Github
+
+= render partial: "/documentation/api_v1/bikes"
+
+
+%hr
+
+%h2#bike_attributes_ref
+  Bike Associations
+
+%p
+  The Bike Index makes searching for and finding bikes easier by using standardized attributes to catalog them.
+
+%h3#wheel_sizes_ref
   Wheel Sizes
   %span.github-link
     #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/wheel_sizes_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/wheel_sizes_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/wheel_size_serializer.rb"} on Github
 
 = render partial: "/documentation/api_v1/wheel_sizes"
 
-
-%hr
-
-%h2#cycle_types_ref
+%h3#cycle_types_ref
   Cycle Types
   %span.github-link
     #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/cycle_types_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/cycle_types_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/cycle_type_serializer.rb"} on Github
 
 = render partial: "/documentation/api_v1/cycle_types"
 
-%hr
-
-%h2#frame_materials_ref
+%h3#frame_materials_ref
   Frame materials
   %span.github-link
     #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/frame_materials_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/frame_materials_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/frame_material_serializer.rb"} on Github
 
 = render partial: "/documentation/api_v1/frame_materials"
 
-%hr
-
-%h2#handlebar_types_ref
+%h3#handlebar_types_ref
   Handlebar type
   %span.github-link
     #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/handlebar_types_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/handlebar_types_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/handlebar_type_serializer.rb"} on Github
 
 = render partial: "/documentation/api_v1/handlebar_types"
+
+
+%h3#component_types_ref
+  Component type
+  %span.github-link
+    #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/component_types_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/component_types_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/ctype_serializer.rb"} on Github
+
+= render partial: "/documentation/api_v1/component_types"
+
 
 %hr
 

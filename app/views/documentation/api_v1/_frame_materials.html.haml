@@ -1,11 +1,10 @@
 %p
-  The Bike Index makes searching for and finding bikes easier by using standardized attributes to catalog them.
+  %code
+    frame_material
+  is a bike attribute.
 
 %p
-  We only offer these types of materials, because we believe they cover all the possibilities. Please #{link_to "send us an email", "mailto:support@bikeindex.org"} if you think we're missing something!
-
-%h3
-  The full list
+  We offer these types of materials because we believe they cover all the possibilities. Please #{link_to "send us an email", "mailto:support@bikeindex.org"} if you think we're missing something!
 
 %article.code
   %p.code-label
@@ -20,7 +19,6 @@
           $('#frame_materials_index').text(JSON.stringify(data,undefined,2))
         }
       });
-
   %p.code-label Response
   %pre#frame_materials_index{ data: {url: request_url }}
     :plain

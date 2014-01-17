@@ -55,7 +55,7 @@ describe BikeDecorator do
   describe :title do 
     it "should return the major bike attribs formatted" do 
       bike = Bike.new
-      bike.stub(:frame_manufacture_year).and_return("1999")
+      bike.stub(:year).and_return("1999")
       bike.stub(:frame_model).and_return("model")
       decorator = BikeDecorator.new(bike)
       decorator.stub(:mnfg_name).and_return("foo")

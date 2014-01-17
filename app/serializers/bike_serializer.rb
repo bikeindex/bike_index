@@ -8,7 +8,7 @@ class BikeSerializer < ActiveModel::Serializer
     :paint_description,
     :stolen,
     :name,
-    :frame_manufacture_year,
+    :year,
     :frame_model,
     :description,
     :rear_tire_narrow,

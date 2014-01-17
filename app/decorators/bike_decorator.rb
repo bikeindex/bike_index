@@ -26,14 +26,14 @@ class BikeDecorator < ApplicationDecorator
 
   def title
     t = ""
-    t += "#{object.frame_manufacture_year} " if object.frame_manufacture_year.present?
+    t += "#{object.year} " if object.year.present?
     t += "#{object.frame_model} by " if object.frame_model.present?
     h.content_tag(:span, t) + h.content_tag(:strong, mnfg_name)
   end
 
   def title_string
     t = ""
-    t += "#{object.frame_manufacture_year} " if object.frame_manufacture_year.present?
+    t += "#{object.year} " if object.year.present?
     t += "#{mnfg_name} "
     t += "#{object.frame_model} " if object.frame_model.present?
     if object.type == "bike"

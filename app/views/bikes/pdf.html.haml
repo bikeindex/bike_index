@@ -11,7 +11,7 @@
     
     %title
       - tit = ''
-      - tit += "#{@bike.frame_manufacture_year} " if @bike.frame_manufacture_year.present?
+      - tit += "#{@bike.year} " if @bike.year.present?
       - tit += "#{@bike.frame_model} by " if @bike.frame_model.present?
       = tit + @bike.mnfg_name
 

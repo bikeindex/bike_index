@@ -8,27 +8,27 @@ cgroups.each do |component_group|
   cg.save
 end
 
-# Seed the component groups
+# Seed the component types
 ctypes = [
   {name: "Fork", cgroup: Cgroup.find_by_name('Frame and fork').id},
   {name: "Rear suspension", cgroup: Cgroup.find_by_name('Frame and fork').id},
   {name: "Headset", cgroup: Cgroup.find_by_name('Frame and fork').id},
-  {name: "Rim", cgroup: Cgroup.find_by_name('Wheels').id, has_twin_part: true},
-  {name: "Axle nuts", cgroup: Cgroup.find_by_name('Wheels').id, has_twin_part: true},
-  {name: "Hub", cgroup: Cgroup.find_by_name('Wheels').id, has_twin_part: true},
-  {name: "Spokes", cgroup: Cgroup.find_by_name('Wheels').id, has_twin_part: true},
-  {name: "Tube", cgroup: Cgroup.find_by_name('Wheels').id, has_twin_part: true},
-  {name: "Tire", cgroup: Cgroup.find_by_name('Wheels').id, has_twin_part: true},
-  {name: "Wheel complete", cgroup: Cgroup.find_by_name('Wheels').id, has_twin_part: true},
-  {name: "Brake lever", cgroup: Cgroup.find_by_name('Drivetrain and brakes').id, has_twin_part: true},
-  {name: "Shift and brake lever", cgroup: Cgroup.find_by_name('Drivetrain and brakes').id, has_twin_part: true},
-  {name: "Brake Caliper", cgroup: Cgroup.find_by_name('Drivetrain and brakes').id, has_twin_part: true},
-  {name: "Brake rotor", cgroup: Cgroup.find_by_name('Drivetrain and brakes').id, has_twin_part: true},
+  {name: "Rim", cgroup: Cgroup.find_by_name('Wheels').id, has_multiple: true},
+  {name: "Axle nuts", cgroup: Cgroup.find_by_name('Wheels').id, has_multiple: true},
+  {name: "Hub", cgroup: Cgroup.find_by_name('Wheels').id, has_multiple: true},
+  {name: "Spokes", cgroup: Cgroup.find_by_name('Wheels').id, has_multiple: true},
+  {name: "Tube", cgroup: Cgroup.find_by_name('Wheels').id, has_multiple: true},
+  {name: "Tire", cgroup: Cgroup.find_by_name('Wheels').id, has_multiple: true},
+  {name: "Wheel complete", cgroup: Cgroup.find_by_name('Wheels').id, has_multiple: true},
+  {name: "Brake lever", cgroup: Cgroup.find_by_name('Drivetrain and brakes').id, has_multiple: true},
+  {name: "Shift and brake lever", cgroup: Cgroup.find_by_name('Drivetrain and brakes').id, has_multiple: true},
+  {name: "Brake Caliper", cgroup: Cgroup.find_by_name('Drivetrain and brakes').id, has_multiple: true},
+  {name: "Brake rotor", cgroup: Cgroup.find_by_name('Drivetrain and brakes').id, has_multiple: true},
   {name: "Brake cable", cgroup: Cgroup.find_by_name('Drivetrain and brakes') .id},
   {name: "Shift cable", cgroup: Cgroup.find_by_name('Drivetrain and brakes') .id},
-  {name: "Brake pad", cgroup: Cgroup.find_by_name('Drivetrain and brakes').id, has_twin_part: true},
+  {name: "Brake pad", cgroup: Cgroup.find_by_name('Drivetrain and brakes').id, has_multiple: true},
   {name: "Chain", cgroup: Cgroup.find_by_name('Drivetrain and brakes').id},
-  {name: "Shifter", cgroup: Cgroup.find_by_name('Drivetrain and brakes').id, has_twin_part: true},
+  {name: "Shifter", cgroup: Cgroup.find_by_name('Drivetrain and brakes').id, has_multiple: true},
   {name: "Front derailleur", cgroup: Cgroup.find_by_name('Drivetrain and brakes').id},
   {name: "Rear derailleur", cgroup: Cgroup.find_by_name('Drivetrain and brakes').id},
   {name: "Three piece driver", cgroup: Cgroup.find_by_name('Drivetrain and brakes').id},
@@ -53,8 +53,8 @@ ctypes = [
 ]
 ctypes.each do |component_type|
   ct = Ctype.create(name: component_type[:name], cgroup_id: component_type[:cgroup])
-  if component_type[:has_twin_part]
-    ct.has_twin_part = true
+  if component_type[:has_multiple]
+    ct.has_multiple = true
   end
   ct.save
 end

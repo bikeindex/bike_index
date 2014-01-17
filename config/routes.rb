@@ -102,6 +102,7 @@ Bikeindex::Application.routes.draw do
       resources :bikes, only: [:index, :show, :create]
       resources :cycle_types, only: [:index]
       resources :wheel_sizes, only: [:index]
+      resources :component_types, only: [:index]
       resources :colors, only: [:index]
       resources :handlebar_types, only: [:index]
       resources :frame_materials, only: [:index]

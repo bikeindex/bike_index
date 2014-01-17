@@ -1,0 +1,29 @@
+%p
+  %code
+    component_type
+  is a component attribute.
+
+%p
+  Here are the component types we offer.
+%p
+  %code
+    has multiple
+  refers to whether this component exists in multiple places on a bicycle. For example, wheels - since there are both front and rear wheels.
+
+%article.code
+  %p.code-label
+    GET all component types
+  - request_url = api_v1_component_types_url
+  %pre
+    :plain
+      $.ajax({
+        type: "GET",
+        url: "#{request_url}",
+        success: function(data, textStatus, jqXHR) {
+          $('#component_types_index').text(JSON.stringify(data,undefined,2))
+        }
+      });
+
+  %p.code-label Response
+  %pre#component_types_index{ data: {url: request_url }}
+    :plain
