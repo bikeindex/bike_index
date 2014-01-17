@@ -6,12 +6,13 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
 
   initialize: ->
     @setElement($('#body'))
-    production = parseInt($('#documentation_head').attr('data-production'), 10)
-    @manufacturerCall()
-    @attributesCall()
+    # production = parseInt($('#documentation_head').attr('data-production'), 10)
+    # @manufacturerCall()
+    @bikeSearchCall()
+    # @attributesCall()
 
-    unless production == 1
-      @createBikes()
+    # unless production == 1
+    #   @createBikes()
       
     # $('#body').attr('data-spy', "scroll").attr('data-target', '#documentation-menu')
     # $('#body').scrollspy(offset: - scroll_height)
@@ -43,8 +44,17 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
         $('#manufacturers_query').text(JSON.stringify(data,undefined,2))
       error: (data, textStatus, jqXHR) ->
         console.log(data)
-      
-
+  
+  bikeSearchCall: ->
+    $.ajax
+      type: "GET"
+      url: $("#bikes_search_query").attr('data-url')
+      success: (data, textStatus, jqXHR) ->
+        console.log(textStatus)
+        $("#bikes_search_query").text(JSON.stringify(data,undefined,2))
+      error: (data, textStatus, jqXHR) ->
+        $("#bikes_search_query").text(JSON.stringify(data,undefined,2))
+  
   attributesCall: ->
     id_blocks = ['#wheel_sizes_index', '#cycle_types_index', '#frame_materials_index', '#handlebar_types_index', '#component_types_index']
     for id in id_blocks

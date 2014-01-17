@@ -3,11 +3,7 @@
     = @query
   %span#attribute_values_searched
     = @attribute_select_values
-  %span#stolen_searched
-    = 1 if @stolen_searched
-  %span#non_stolen_searched
-    = 1 if @non_stolen_searched
-
+  %span#stolenness_query{data: {stolen: @stolenness[:stolen], nonstolen: @stolenness[:non_stolen] }}
 
 - if @bikes.present?
 
@@ -16,7 +12,7 @@
 
 
   .paginate-container
-    / = will_paginate @bikes 
+    = will_paginate @bikes 
 
 - else
   %section.bottom-of-page

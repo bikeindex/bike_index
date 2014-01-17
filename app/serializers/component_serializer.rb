@@ -6,6 +6,5 @@ class ComponentSerializer < ActiveModel::Serializer
     :manufacturer_name,
     :manufacturer_id,
     :model_name,
-    :year,
-    :serial_number
+    :year
 end

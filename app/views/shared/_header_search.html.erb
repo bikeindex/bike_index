@@ -28,12 +28,12 @@
     </div>
 
     <div class="stolenness">
-      <label for: "stolen_included">
-        <%= check_box_tag :stolen_included, params[:stolen_included] %>
+      <label for: "stolen">
+        <%= check_box_tag :stolen, params[:stolen], value: 1 %>
         stolen
       </label>
-      <label for="non_stolen_included">
-        <%= check_box_tag :non_stolen_included, params[:non_stolen_included] %>
+      <label for="non_stolen">
+        <%= check_box_tag :non_stolen, params[:non_stolen], value: 1 %>
         non-stolen
       </label>
     </div>

@@ -30,12 +30,21 @@
 
 %hr
 
-%h2#bikes_ref
+%h2#search_bikes_ref
+  Searching bikes
+  %span.github-link
+    #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/bikes_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/bikes_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/bike_serializer.rb"} on Github
+
+= render partial: "/documentation/api_v1/bikes_search"
+
+%hr
+
+%h2#add_bikes_ref
   Adding bikes
   %span.github-link
     #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/bikes_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/bikes_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/bike_serializer.rb"} on Github
 
-= render partial: "/documentation/api_v1/bikes"
+= render partial: "/documentation/api_v1/bikes_add"
 
 
 %hr

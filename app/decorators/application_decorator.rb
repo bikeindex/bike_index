@@ -1,6 +1,10 @@
 class ApplicationDecorator < Draper::Decorator 
   delegate_all
 
+  def self.collection_decorator_class
+    PaginatingDecorator
+  end
+
   def ass_name(association)
     ass = object.send(association, name)
     ass.name if ass.present?

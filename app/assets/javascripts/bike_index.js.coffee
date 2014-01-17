@@ -27,6 +27,7 @@ window.BikeIndex =
     $('#total-top-header .tab-content').append(links)
 
   initializeHeaderSearch: ->
+    # $('#header-search .stolenness input').prop('checked', true)
     $('#find_bike_attributes_ids').select2
       allow_single_deselect: true
       allowClear: true

@@ -39,6 +39,7 @@ class Component < ActiveRecord::Base
   end
         
   def component_type
+    return nil unless ctype.present?
     if ctype.name && ctype.name == "Other" && ctype_other.present?
       ctype_other
     else
@@ -47,11 +48,12 @@ class Component < ActiveRecord::Base
   end
 
   def cgroup_id
-    return 0 unless ctype.present?
+    return Cgroup.find_by_slug('additional-parts').id unless ctype.present?
     ctype.cgroup.id
   end
 
   def component_group
+    return "Additional parts" unless ctype.present?
     self.ctype.cgroup.name
   end
 

@@ -19,12 +19,11 @@ class BikesController < ApplicationController
 
   def index
     search = BikeSearcher.new(params)
-    bikes = search.find_bikes.page(params[:page]).per_page(24)
+    bikes = search.find_bikes.page(params[:page]).per_page(25)
     @bikes = bikes.decorate
     @attribute_select_values = search.parsed_attributes
     @query = params[:query]
-    @stolen_searched = params[:stolen_included]
-    @non_stolen_searched = params[:non_stolen_included]
+    @stolenness = { stolen: params[:stolen], non_stolen: params[:non_stolen] }
     render :layout => 'application'
   end
 

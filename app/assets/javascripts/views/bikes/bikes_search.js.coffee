@@ -4,12 +4,12 @@ class BikeIndex.Views.BikesSearch extends Backbone.View
     @setElement($('#body'))
     @setInitialValues()
     $('.content .receptacle').addClass('bike-search-page')
+
   setInitialValues: ->
     $('#total-top-header').addClass('search-expanded')
     @selectCurrentAttributes()
     BikeIndex.initializeHeaderSearch()
-    $('#header-search #stolen_included').prop('checked', true) if parseInt($('#stolen_searched').text()) == 1
-    $('#header-search #non_stolen_included').prop('checked', true) if parseInt($('#non_stolen_searched').text(), 10) == 1
+    @selectStolenness()
     $('#header-search #query').val($('#query_searched').text())
 
 
@@ -17,3 +17,13 @@ class BikeIndex.Views.BikesSearch extends Backbone.View
     a_values = $("#attribute_values_searched").text()
     if a_values.length > 3
       $('#find_bike_attributes_ids').val(JSON.parse(a_values))
+
+  selectStolenness: ->
+    # We need to leave them on if they are both selected or neither are selected.
+    stolenness = ["stolen", "non_stolen"]
+    stolenness.shift() if $('#stolenness_query').attr('data-stolen')
+    stolenness.pop() if $('#stolenness_query').attr('data-nonstolen')
+    # So we do something if only one is selected
+    if stolenness.length == 1
+      $("##{stolenness[0]}").prop('checked',false)
+    

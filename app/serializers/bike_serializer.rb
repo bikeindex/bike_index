@@ -1,5 +1,7 @@
 class BikeSerializer < ActiveModel::Serializer
-  attributes :id, 
+  attributes :id,
+    :registration_created_at,
+    :registration_updated_at,
     :url,
     :api_url,
     :manufacturer_name,
@@ -12,9 +14,8 @@ class BikeSerializer < ActiveModel::Serializer
     :frame_model,
     :description,
     :rear_tire_narrow,
-    :front_tire_narrow,
-    :registration_created_at,
-    :registration_updated_at
+    :front_tire_narrow
+    
 
   has_one :rear_wheel_size,
     :front_wheel_size,
