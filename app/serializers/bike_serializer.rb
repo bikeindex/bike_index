@@ -12,7 +12,9 @@ class BikeSerializer < ActiveModel::Serializer
     :frame_model,
     :description,
     :rear_tire_narrow,
-    :front_tire_narrow
+    :front_tire_narrow,
+    :registration_created_at,
+    :registration_updated_at
 
   has_one :rear_wheel_size,
     :front_wheel_size,
@@ -26,11 +28,19 @@ class BikeSerializer < ActiveModel::Serializer
   has_many :public_images
   
   def url
-    bike_path(object)
+    bike_url(object)
   end
 
   def api_url
-    api_v1_bike_path(object)
+    api_v1_bike_url(object)
+  end
+  
+  def registration_created_at
+    object.created_at
+  end
+  
+  def registration_updated_at
+    object.updated_at
   end
 
 end
