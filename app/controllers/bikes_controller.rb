@@ -19,7 +19,9 @@ class BikesController < ApplicationController
 
   def index
     search = BikeSearcher.new(params)
-    bikes = search.find_bikes.page(params[:page]).per_page(25)
+    bikes = search.find_bikes
+    (bikes.count <= 1000) ? (total_bikes = bikes.count) : (total_bikes = 1000)
+    bikes = bikes.paginate(page: params[:page], total_entries: total_bikes).per_page(25)
     @bikes = bikes.decorate
     @attribute_select_values = search.parsed_attributes
     @query = params[:query]
