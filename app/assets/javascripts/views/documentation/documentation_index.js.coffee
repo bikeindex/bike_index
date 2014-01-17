@@ -11,8 +11,8 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
     @bikeSearchCall()
     @attributesCall()
 
-    # unless production == 1
-    @createBikes()
+    unless production == 1
+      @createBikes()
       
     # $('#body').attr('data-spy', "scroll").attr('data-target', '#documentation-menu')
     # $('#body').scrollspy(offset: - scroll_height)
