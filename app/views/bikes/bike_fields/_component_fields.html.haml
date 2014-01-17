@@ -1,18 +1,24 @@
 %fieldset.input-group.with-additional-block.add-component-fields
   %article
-    .control-group.chosen-select.has-front-or-rear-boxes{:data => {other: Ctype.find_by_slug("other").id, hidden: ".hidden-ctype" }}
+    .control-group.chosen-select.has-position-select{:data => {other: Ctype.find_by_slug("other").id, hidden: ".hidden-ctype" }}
       = f.label :ctype_id, "Part type", class: "control-label"
       .controls.part-type-select
         = f.collection_select(:ctype_id, Ctype.all, :id, :name, :required =>true, prompt: "What type of part?" )
-      .front-or-rear-part{class: ("initially-hidden" unless f.object.ctype && f.object.ctype.has_twin_part)}
-        %label.checkbox
-          = f.check_box :front
-          Font
-        %label.checkbox.rear-part
-          = f.check_box :rear
-          Rear
-    
-    .hidden-other.control-group.hidden-ctype
+      .controls
+        - position_visibility = "initially-hidden"
+        - position_visibility = "" if f.object.front || f.object.rear
+        .groupedbtn-group{ class: position_visibility, :data =>  { toggle: "buttons-radio" }}
+          .btn-group
+            %button.btn.ctype-position-both{ type: "button", :'data-position' => 'both' }
+              Both
+            %button.btn{ type: "button", :'data-position' => 'front', :class => if f.object.front then 'active' end }
+              Front
+            %button.btn{ type: "button", :'data-position' => 'rear', :class => if f.object.rear then 'active' end }
+              Rear
+          = f.hidden_field :front_or_rear, class: "front-or-rear"
+    - other_show = ""
+    - other_show = "other_present" if f.object.ctype_id == Ctype.find_by_slug("other").id
+    .hidden-other.control-group.hidden-ctype{class: other_show }
       = f.label :ctype_other, "Other part type", class: "control-label"
       .controls
         = f.text_field :ctype_other
@@ -32,8 +38,9 @@
         = f.label :model_name, "Model", class: "control-label"
         .controls
           = f.text_field :model_name
-
-    .hidden-other.control-group.hidden-mnfg
+    - other_show = ""
+    - other_show = "other_present" if f.object.manufacturer_id == Manufacturer.find_by_slug("other").id
+    .hidden-other.control-group.hidden-mnfg{class: other_show}
       = f.label :manufacturer_other, "Other manufacturer", class: "control-label"
       .controls
         = f.text_field :manufacturer_other

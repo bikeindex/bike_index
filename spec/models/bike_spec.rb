@@ -254,7 +254,7 @@ describe Bike do
       material = FactoryGirl.create(:frame_material)
       propulsion = FactoryGirl.create(:propulsion_type, name: "Hand pedaled")
       b = FactoryGirl.create(:bike, cycle_type: type, propulsion_type_id: propulsion.id)
-      b.frame_manufacture_year = 1999
+      b.year = 1999
       b.frame_material_id = material.id
       b.secondary_frame_color_id = b.primary_frame_color_id
       b.tertiary_frame_color_id = b.primary_frame_color_id

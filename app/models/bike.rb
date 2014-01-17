@@ -13,7 +13,7 @@ class Bike < ActiveRecord::Base
     :creation_organization_id,
     :location_id,
     :manufacturer,
-    :frame_manufacture_year,
+    :year,
     :thumb_path,
     :name,
     :stolen,
@@ -234,7 +234,7 @@ class Bike < ActiveRecord::Base
     cache_attributes
     c = ""
     c += "#{propulsion_type.name} " unless propulsion_type.name == "Foot pedal"
-    c += "#{frame_manufacture_year} " if frame_manufacture_year
+    c += "#{year} " if year
     c += "#{primary_frame_color.name} " if primary_frame_color
     c += "#{secondary_frame_color.name} " if secondary_frame_color
     c += "#{tertiary_frame_color.name} " if tertiary_frame_color

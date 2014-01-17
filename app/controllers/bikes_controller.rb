@@ -144,7 +144,6 @@ class BikesController < ApplicationController
         flash[:error] = e.message
         redirect_to bike_path(bike) and return
     end
-    @twined_ctypes = Ctype.where(has_twin_part: true).map(&:id).join(",")
     @bike = bike.decorate
   end
 
@@ -156,7 +155,6 @@ class BikesController < ApplicationController
       flash[:error] = e.message
       redirect_to bike_path(params[:id]) and return
     end
-    @twined_ctypes = Ctype.where(has_twin_part: true).map(&:id).join(",")
     @bike = bike.decorate 
     if bike.errors.any?
       flash[:error] = bike.errors.full_messages

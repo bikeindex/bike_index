@@ -8,16 +8,36 @@ class Component < ActiveRecord::Base
     :manufacturer_id,
     :manufacturer_other,
     :description,
+    :bike_id,
+    :bike,
+    :serial_number,
     :front,
     :rear,
-    :bike,
-    :serial_number
+    :front_or_rear
     
+  attr_accessor :front_or_rear
 
   belongs_to :manufacturer
   belongs_to :ctype
   belongs_to :bike
 
+  before_save :set_front_or_rear
+  def set_front_or_rear
+    return true unless self.front_or_rear.present?
+    position = self.front_or_rear.downcase.strip
+    self.front_or_rear = ''
+    if position == "both"
+      f = self.dup
+      f.front = true
+      f.save 
+      self.rear = true 
+    elsif position == "front"
+      self.front = true
+    elsif position == "rear"
+      self.rear = true
+    end
+  end
+        
   def component_type
     if ctype.name && ctype.name == "Other" && ctype_other.present?
       ctype_other
@@ -28,7 +48,7 @@ class Component < ActiveRecord::Base
 
   def cgroup_id
     return 0 unless ctype.present?
-    ctype.cgroup.id 
+    ctype.cgroup.id
   end
 
   def component_group

@@ -59,7 +59,8 @@
   h2 { margin-bottom: 1em; }
   h3 {
     font-size: 20px;
-    margin-top: 3em;
+    margin-top: 100px;
+    margin-bottom: 30px;
   }
   code { color: $contentTextColor; }
 
@@ -68,6 +69,11 @@
     margin: .5em 0 0 20px;
     li { margin-bottom: .25em; }
   }
+  .alert {
+    margin-top: 40px;
+    margin-bottom: 40px;
+  }
+  .code pre:last-of-type { margin-bottom: 40px; }
 }
 
 @media (min-width: 768px) {
@@ -76,6 +82,9 @@
       margin-top: 300px;
       margin-bottom: 80px;
     }
+    // h3 {
+    //   margin-top: 100px;
+    // }
     // .code { max-width: 100%; }
   }
 }

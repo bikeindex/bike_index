@@ -37,6 +37,7 @@
         = f.text_field :handlebar_type_other
 
   %fieldset.input-group.add-additional
+    #has_multiples_parts{ data: {ids: Ctype.where(has_multiple: true).map(&:id).to_json}}
     = f.fields_for :components do |builder|
       = render '/bikes/bike_fields/component_fields', f: builder
     = link_to_add_components "Add a component", f, :components, "Frame and fork"
