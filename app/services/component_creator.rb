@@ -30,29 +30,9 @@ class ComponentCreator
     component
   end
 
-  def set_duplicate(component)
-    position = component[:front_or_rear]
-    component.delete([:front_or_rear])
-    components = [component]
-    if position.present?
-      position = position.downcase.strip
-      if position == "front"
-        components[0][:front] = true
-      elsif position == "rear"
-        components[0][:rear] = true
-      elsif position == "both"
-        components << component
-        components[0][:front] = true
-        components[1][:rear] = true
-      end
-    end
-    components
-  end
-
   def create_component(component)
-    components = set_duplicate(component)
-    components.each { |c| c[:bike_id] = @bike.id }
-    components.each { |c| Component.create(c) }
+    c = Component.new(bike_id: @bike.id)
+    c.update_attributes(component)
   end
 
   def create_components_from_params

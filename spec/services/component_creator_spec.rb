@@ -30,30 +30,13 @@ describe ComponentCreator do
     end
   end
 
-  describe :set_duplicate do 
-    it "should return an array even if front_or_rear isn't there" do 
-      ctype = FactoryGirl.create(:ctype, name: "Stuff")
-      c = { year: 999 }
-      components = ComponentCreator.new().set_duplicate(c)
-      components[0][:year].should eq(999)
-    end
-    it "should create a second component if front_or_rear is both" do 
-      ctype = FactoryGirl.create(:ctype, name: "Stuff")
-      c = { front_or_rear: "Both" }
-      components = ComponentCreator.new().set_duplicate(c)
-      components[0][:front].should be_true
-      components[1][:rear].should be_true
-    end
-  end
-
   describe :create_component do 
     it "should create the component" do 
       bike = FactoryGirl.create(:bike)
-      components = [{description: "Stuff"}]
+      component = {description: "Stuff"}
       component_creator = ComponentCreator.new(bike: bike)
-      component_creator.should_receive(:set_duplicate).and_return(components)
-      component_creator.create_component("empty")
-      bike.components.count.should eq(1)
+      component_creator.create_component(component)
+      bike.reload.components.count.should eq(1)
     end
   end
 
@@ -74,18 +57,6 @@ describe ComponentCreator do
       component_creator.should_receive(:create_component).at_least(2).times.and_return(true)
       component_creator.create_components_from_params
     end
-    # it "should do everything test" do 
-    #   bike = FactoryGirl.create(:bike)
-    #   ctype = FactoryGirl.create(:ctype)
-    #   b_param = BParam.new 
-    #   components = [
-    #     {component_type: ctype.slug, year: "1999"},
-    #     {component_type: ctype.slug, front_or_rear: "both"}]
-    #   b_param.stub(:params).and_return(components: components)
-    #   component_creator = ComponentCreator.new(b_param: b_param, bike: bike)
-    #   component_creator.create_components_from_params
-    #   bike.components.count.should eq(3)
-    # end
   end
 
 end
