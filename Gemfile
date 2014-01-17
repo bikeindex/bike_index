@@ -27,7 +27,6 @@ gem 'rqrcode-rails3'
 gem 'strong_parameters'
 gem 'libv8', '~> 3.16.14'
 gem 'rb-readline', '~> 0.4.2'
-gem 'airbrake'
 gem 'backbone-on-rails', "=0.9.10.0"
 gem 'stripe', :git => 'https://github.com/stripe/stripe-ruby'
 gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'

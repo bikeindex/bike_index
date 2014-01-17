@@ -21,8 +21,6 @@ We're an open source project. Take a gander through our code, report bugs, or do
 
 ## Running the Bike Index locally
 
-- Copy `config/database-sample` to `config/database.yml`
-
 - Create and seed your database (`rake db:setup`)
 
 - `rake seed_test_users` to add the three test user accounts: admin@example.com, member@example.com, user@example.com (all have password `please12`)
