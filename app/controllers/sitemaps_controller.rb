@@ -1,7 +1,7 @@
 class SitemapsController < ApplicationController
   caches_page :index
   def index
-    @static_paths = ["stolen_bikes", "serials", "about", "manufacturers", "where", "resources", "stolen", "spokecard", "vendor_signup", "contact_us"]
+    @static_paths = ["stolen_bikes", "serials", "about", "manufacturers", "where", "resources", "stolen", "spokecard", "vendor_signup", "contact_us", "documentation/api_v1"]
     @bikes = Bike.scoped
     @blogs = Blog.published
     @manufacturers = Manufacturer.scoped
