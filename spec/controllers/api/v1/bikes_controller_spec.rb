@@ -161,7 +161,30 @@ describe Api::V1::BikesController do
       b.description.should eq("something else")
       b.frame_material.slug.should eq("whatevah")
       b.handlebar_type.slug.should eq("foo")
+    end  
+
+    it "should create a record even if the post is a string" do
+      manufacturer = FactoryGirl.create(:manufacturer)
+      FactoryGirl.create(:wheel_size, iso_bsd: 559)
+      FactoryGirl.create(:cycle_type, slug: "bike")
+      FactoryGirl.create(:ctype, slug: "wheel")
+      FactoryGirl.create(:ctype, slug: "headset")
+      f_count = Feedback.count
+      bike = { serial_number: "69 string",
+        manufacturer_id: manufacturer.id,
+        rear_tire_narrow: "true",
+        rear_wheel_bsd: "559",
+        color: FactoryGirl.create(:color).name,
+        owner_email: "jsoned@examples.com"
+      }
+      options = { bike: bike.to_json, organization_slug: @organization.slug, access_token: @organization.access_token } 
+      lambda { 
+        post :create, options
+      }.should change(Ownership, :count).by(1)
+      response.code.should eq("200")    
     end
   end
+
+
     
 end

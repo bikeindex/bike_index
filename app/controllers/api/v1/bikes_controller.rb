@@ -15,6 +15,7 @@ module Api
       end
 
       def create
+        params = de_string_params
         raise StandardError unless params[:bike].present?
         params[:bike][:creation_organization_id] = @organization.id
         @b_param = BParam.create(creator_id: @organization.auto_user.id, params: params)
@@ -30,7 +31,6 @@ module Api
           Feedback.create(email: 'contact@bikeindex.org', name: 'Error mailer', title: 'API Bike Creation error!', body: e)
           render json: e, status: :unprocessable_entity and return
         end
-        
       end
     
       def authenticate_organization
@@ -40,6 +40,15 @@ module Api
         else
           render json: "Not authorized", status: :unauthorized and return
         end
+      end
+
+      def de_string_params
+        # Google app script doesn't support nested params -
+        # So we're doing this.
+        params[:bike] = JSON.parse params[:bike] if params[:bike].kind_of?(String)
+        params[:stolen_record] = JSON.parse params[:stolen_record] if params[:stolen_record].kind_of?(String)
+        params[:components] = JSON.parse params[:components] if params[:components].kind_of?(String)
+        params
       end
     end
 
