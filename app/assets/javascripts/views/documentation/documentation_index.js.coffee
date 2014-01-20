@@ -50,7 +50,6 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
       type: "GET"
       url: $("#bikes_search_query").attr('data-url')
       success: (data, textStatus, jqXHR) ->
-        console.log(textStatus)
         $("#bikes_search_query").text(JSON.stringify(data,undefined,2))
       error: (data, textStatus, jqXHR) ->
         $("#bikes_search_query").text(JSON.stringify(data,undefined,2))
@@ -101,8 +100,6 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
         access_token: $('#example_organization').attr('data-token')
       success: (data, textStatus, jqXHR) ->
         $('#bike_components').text(JSON.stringify(data,undefined,2))
-
-        # console.log(jqXHR.responseText)
       error: (data, textStatus, jqXHR) ->
         $('#bike_components').text(JSON.stringify(data,undefined,2)) 
         
@@ -158,8 +155,6 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
         access_token: $('#example_organization').attr('data-token')
       success: (data, textStatus, jqXHR) ->
         $('#bike_stolen').text(JSON.stringify(data,undefined,2))
-
-        # console.log(jqXHR.responseText)
       error: (data, textStatus, jqXHR) ->
         $('#bike_stolen').text(JSON.stringify(data,undefined,2))       
 
