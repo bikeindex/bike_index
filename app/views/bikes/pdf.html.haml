@@ -177,7 +177,7 @@
                 %td
                   - seat = @bike.components.where(ctype_id: Ctype.find_by_name('Seat').id).first
                   = seat.model_name if seat.model_name.present?
-                  - if seat.manufacturer.present
+                  - if seat.manufacturer.present?
                     by
                     = seat.manufacturer.name
                   = seat.description
