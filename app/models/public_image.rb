@@ -4,9 +4,6 @@ class PublicImage < ActiveRecord::Base
   mount_uploader :image, ImageUploader
 
   belongs_to :imageable, polymorphic: true
-  has_many :manufacturers
-
-  before_create :default_name
 
   default_scope order(:listing_order)
 
@@ -17,8 +14,14 @@ class PublicImage < ActiveRecord::Base
     self.listing_order = self.imageable.public_images.length
   end
 
+  before_create :default_name
   def default_name
-    self.name ||= File.basename(image.filename, '.*').titleize if image
+    if imageable_type == "Bike"
+      self.name = BikeDecorator.new(imageable).title_string
+      self.name += " #{imageable.frame_colors.to_sentence}"
+    else
+      self.name ||= File.basename(image.filename, '.*').titleize if image
+    end
   end
 
 end
