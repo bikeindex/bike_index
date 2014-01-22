@@ -124,8 +124,8 @@ Bikeindex::Application.routes.draw do
     get page, controller: 'info', action: page
   end
 
-  get 'sitemap.xml' => 'sitemaps#index', as: 'sitemap', defaults: { format: 'xml' }
-  match 'sitemap', to: 'sitemaps#index', defaults: { format: 'xml' }
+  # get 'sitemap.xml' => 'sitemaps#index', as: 'sitemap', defaults: { format: 'xml' }
+  # match 'sitemap', to: 'sitemaps#index', defaults: { format: 'xml' }
 
   match '/400', to: 'errors#bad_request'
   match '/404', to: 'errors#not_found'
