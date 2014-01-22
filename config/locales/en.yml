@@ -11,6 +11,7 @@ en:
     feedbacks_vendor_signup: "Shop sign up - Bike Index"
     feedbacks_new: "Contact the Bike Index"
     blogs_index: "Bike Index Blog"
+    info_about: "Bike Index - Bike registration that works"
     info_spokecard: "Spoke cards - Bike Index"
     info_stolen_bikes: "Responding to theft"
     info_serials: "Bike serial numbers"
@@ -24,8 +25,8 @@ en:
     documentation_api_v1: "Bike Index API documentation"
   meta_descriptions:
     welcome_index: "Bicycle registration: online, powerful, free."
-    info_about: "About the Bike Index"
-    info_resources: "Bike Index resources"
+    info_about: "Why we made the Bike Index and who we are"
+    info_resources: "Bike Index resources and useful tools"
     info_stolen_bikes: "What to do if your bike is stolen - next steps the Bike Index recommends taking."
     info_serials: "What bike serial numbers are - and where to find them."
     info_spokecard: "The Bike Index offers spoke cards that link to each bike on the Index with a QR code. Learn about how they work and how to create your own."
@@ -37,7 +38,7 @@ en:
     bikes_new: "Register a bike on the Bike Index quickly, easily and for free. Create a permanent verified record of your bike to protect it."
     feedbacks_vendor_signup: "Sign up with the Bike Index to register your customers' bikes quickly, easily and for free."
     feedbacks_new: "Contact the Bike Index. Your words are our muse, whisper them in our ear."
-    blogs_index: "Read about what the Bike Index has been up to recently. Also, periodically, learn magic spells."
+    blogs_index: "Read Bike Index news. Also, periodically, learn magic spells."
     users_new: "Sign up for the Bike Index"
     documentation_api_v1: "API Version 1 documentation, and love"
   time:
