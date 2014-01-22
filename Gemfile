@@ -45,6 +45,7 @@ gem 'dotenv-rails', "~> 0.8", git: "https://github.com/bkeepers/dotenv"
 gem 'wkhtmltopdf-binary'
 gem 'wicked_pdf'
 gem 'sitemap_generator'
+gem 'whenever'
 
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'
