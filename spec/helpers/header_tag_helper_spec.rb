@@ -18,7 +18,7 @@ describe HeaderTagHelper do
         :meta_tags => { :charset => "utf-8" }
       }
       title_tag = helper.title_tag_html(header_hash)
-      title_tag.should eq("<title>Foo 69 69</title>\n")
+      title_tag.should eq("<title lang='en'>Foo 69 69</title>\n")
     end
   end
 

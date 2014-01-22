@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140116222529) do
+ActiveRecord::Schema.define(:version => 20140122181308) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -98,6 +98,9 @@ ActiveRecord::Schema.define(:version => 20140116222529) do
     t.integer  "paint_id"
     t.boolean  "registered_new"
     t.boolean  "example",                  :default => false, :null => false
+    t.string   "creation_zipcode"
+    t.integer  "creation_country_id"
+    t.integer  "country_id"
   end
 
   add_index "bikes", ["creation_organization_id"], :name => "index_bikes_on_organization_id"
@@ -399,7 +402,7 @@ ActiveRecord::Schema.define(:version => 20140116222529) do
   end
 
   create_table "stolen_records", :force => true do |t|
-    t.integer  "zipcode"
+    t.string   "zipcode"
     t.string   "city"
     t.text     "theft_description"
     t.text     "time"

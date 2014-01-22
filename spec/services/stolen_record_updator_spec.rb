@@ -130,7 +130,7 @@ describe StolenRecordUpdator do
       stolen_record.theft_description.should eq(sr[:theft_description])
       stolen_record.street.should eq(sr[:street])
       stolen_record.city.should eq(sr[:city])
-      stolen_record.zipcode.should eq(60666)
+      stolen_record.zipcode.should eq('60666')
       stolen_record.date_stolen.today?.should be_true
     end
 

@@ -1,5 +1,6 @@
 class Admin::UsersController < Admin::BaseController
   before_filter :find_user, only: [:show, :edit, :update, :destroy]
+
   def index
     @users = User.order("created_at desc").all
   end
@@ -58,6 +59,7 @@ class Admin::UsersController < Admin::BaseController
 
   def find_user
     @user = User.find_by_username(params[:id])
+    raise ActionController::RoutingError.new('Not Found') unless @user.present?
   end
 
 end

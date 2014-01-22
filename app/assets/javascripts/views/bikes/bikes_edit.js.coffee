@@ -220,13 +220,33 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     $('#bike_stolen').prop('checked', 'true')
 
   setDefaultCountryAndState: ->
+    if $('#normal-bike-location .chosen-select select').val().length > 0
+      @setStolenCountry($('#normal-bike-location .chosen-select select').val())
+    else 
+      @grabCountryFromIP()
+
+  grabCountryFromIP: ->
+    view = @
+    $.ajax
+      type: "GET"
+      url: 'https://freegeoip.net/json/'
+      dataType: "jsonp",
+      success: (location) ->
+        select = $('#normal-bike-location .chosen-select select')
+        country_id = select.find("option").filter(->
+          $(this).text() is location.country_name
+        ).val()
+        select.val(country_id).change()
+        view.setStolenCountry(country_id)
+
+  setStolenCountry: (country_id) ->
     c_select = $('#country_select_container select')
     if c_select.length > 0
       if c_select.val().length > 0
         @updateCountry()
       else
-        us_val = parseInt($('#country_select_container .other-value').text(), 10)
-        c_select.val(us_val).change()
+        c_select.val(country_id).change()
+        
 
   updateCountry: ->
     c_select = $('#country_select_container select')
