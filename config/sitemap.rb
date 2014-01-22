@@ -1,8 +1,11 @@
 # Set the host name for URL creation
 SitemapGenerator::Sitemap.default_host = "https://bikeindex.org"
+SitemapGenerator::Sitemap.sitemaps_host = "https://bikeindex.s3.amazonaws.com"
+SitemapGenerator::Sitemap.public_path = "#{Rails.root}/tmp/uploads"
+SitemapGenerator::Sitemap.sitemaps_path = 'sitemaps/'
+SitemapGenerator::Sitemap.adapter = SitemapGenerator::WaveAdapter.new
 
 SitemapGenerator::Sitemap.create do
-
   group(:filename => :about) do
     paths = ["about"]
     paths.each { |i| add "/#{i}", priority: 0.9 }
