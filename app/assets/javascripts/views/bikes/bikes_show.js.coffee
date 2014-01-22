@@ -1,7 +1,7 @@
 class BikeIndex.Views.BikesShow extends Backbone.View
   events:
     'click .single-bike-photos .clickable-image': 'clickPhoto'
-    # 'keyup': 'logKey'
+    'keyup': 'logKey'
     
   initialize: ->
     @setElement($('#body'))
@@ -10,6 +10,7 @@ class BikeIndex.Views.BikesShow extends Backbone.View
       $('#claim-ownership-modal').modal("show")
 
     @initializePhotoSelector()
+    @prepPhotos()
 
 
   initializePhotoSelector: ->
@@ -38,15 +39,25 @@ class BikeIndex.Views.BikesShow extends Backbone.View
 
   logKey:(event) ->
     if event.keyCode == 39
-      # Go forward
-      c_photo = $('#selected-photo .current-photo img').attr('id')
-      c_photo = c_photo.split('|')
-      c_photo = parseInt(c_photo[1], 10)
-      # console.log(c_photo)
-    if event.keyCode == 37
-      # Go left
-      current_photo = $('#selected-photo .current-photo img').attr('id')
-      current_photo = parseInt(current_photo, 10)
+      if $('#thumbnail-photos').data('length') > 1
+        # Go forward
+        pos = parseInt($('#selected-photo .current-photo').data('pos'), 10)
+        pos = pos + 1
+        pos = 1 if pos > $('#thumbnail-photos').data('length')
+        @shiftToPhoto(pos)
+    else if event.keyCode == 37
+      if $('#thumbnail-photos').data('length') > 1
+        # Go backward
+        pos = parseInt($('#selected-photo .current-photo').data('pos'), 10)
+        pos = pos - 1
+        pos = $('#thumbnail-photos').data('length') if pos <= 0
+        @shiftToPhoto(pos)
+
+  shiftToPhoto: (pos) ->
+    targetPhotoID = $("#selected-photo a[data-pos='#{pos}']").attr("id")
+    targetPhoto = $("#thumbnail-photos a[data-id='#{targetPhotoID}']")
+    @photoFadeOut(targetPhoto, targetPhotoID)
+
       
 
   clickPhoto:(event) ->
@@ -75,14 +86,29 @@ class BikeIndex.Views.BikesShow extends Backbone.View
       )
     return false # Not sure why this is here, so I left it
 
+  injectPhoto: (targetPhotoID, targetPhoto) ->
+    $('#selected-photo').append("""
+      <a href="#{targetPhoto.data('link')}" target="_blank" id="#{targetPhotoID}" style="display: none;">
+        <img alt="#{targetPhoto.attr('alt')}" src="#{targetPhoto.attr('data-img')}" id="#{targetPhoto.find('img').attr('id')}" class="initially-hidden">
+      </a>
+    """)
+
+  prepPhotos: ->
+    $('#thumbnail-photos').data('length',0)
+    return true unless $('#thumbnail-photos li').length > 0
+    $('#thumbnail-photos').data('length',$('#thumbnail-photos li').length)
+    for li, index in $('#thumbnail-photos li')
+      targetPhoto = $(li).find('.clickable-image')
+      targetPhotoID = targetPhoto.attr('data-id')
+      @injectPhoto(targetPhotoID, targetPhoto) unless $("##{targetPhotoID}").length > 0
+      i = index + 1
+      $("##{targetPhotoID}").attr('data-pos', i)
+
 
   photoFadeIn: (targetPhotoID, targetPhoto) ->
     if $("##{targetPhotoID}").length > 0
       $("##{targetPhotoID}").addClass('current-photo')
     else
-      $('#selected-photo').append("""
-        <a href="#{targetPhoto.data('link')}" target="_blank" id="#{targetPhotoID}" class="current-photo">
-          <img alt="#{targetPhoto.attr('alt')}" src="#{targetPhoto.attr('data-img')}" id="#{targetPhoto.find('img').attr('id')}" class="initially-hidden">
-        </a>
-        """)
+      @injectPhoto(targetPhotoID, targetPhoto)
+      $("##{targetPhotoID}").addClass('current-photo')
     $('#selected-photo .current-photo, #selected-photo .current-photo img').fadeIn('fast')
