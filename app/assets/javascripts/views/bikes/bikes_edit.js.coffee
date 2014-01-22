@@ -367,7 +367,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       if v == 0
         $('#rear_gear_select_internal').prop('checked', true)
 
-  updateDrivetrainValue:  ->
+  updateDrivetrainValue: (event) ->
     position = $(event.target).attr('id')
     @setDrivetrainValue(position)
     
