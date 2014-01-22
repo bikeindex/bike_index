@@ -124,6 +124,7 @@ Bikeindex::Application.routes.draw do
     get page, controller: 'info', action: page
   end
 
+  get 'sitemap.xml.gz' => redirect("https://s3.amazonaws.com/bikeindex/sitemaps/sitemap_index.xml.gz")
   # get 'sitemap.xml' => 'sitemaps#index', as: 'sitemap', defaults: { format: 'xml' }
   # match 'sitemap', to: 'sitemaps#index', defaults: { format: 'xml' }
 
