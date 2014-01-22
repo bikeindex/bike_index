@@ -1,1 +1,1 @@
-Sitemap: https://s3.amazonaws.com/bikeindex/sitemaps/sitemap_index.xml.gz
+Sitemap: https://bikeindex.org/sitemap.xml.gz

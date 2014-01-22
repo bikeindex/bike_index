@@ -1,6 +1,6 @@
 # Set the host name for URL creation
 SitemapGenerator::Sitemap.default_host = "https://bikeindex.org"
-SitemapGenerator::Sitemap.sitemaps_host = "https://bikeindex.s3.amazonaws.com"
+SitemapGenerator::Sitemap.sitemaps_host = "https://bikeindex.org"
 SitemapGenerator::Sitemap.public_path = "#{Rails.root}/tmp/uploads"
 SitemapGenerator::Sitemap.sitemaps_path = 'sitemaps/'
 SitemapGenerator::Sitemap.adapter = SitemapGenerator::WaveAdapter.new
@@ -18,7 +18,7 @@ SitemapGenerator::Sitemap.create do
           :publication_name => "Bike Index Blog",
           :publication_language => "en",
           :title => b.title,
-          :publication_date => b.published_at.utc
+          :publication_date => b.published_at.strftime("%Y-%m-%dT%H:%M:%S+00:00")
       })
     end
   end
