@@ -36,16 +36,26 @@ optionalFormUpdate = (e) ->
 
 
 $(document).ready ->
-  $('#bike_has_no_serial').change (e) ->
-    updateSerial(e)
+  if $('#bi-slide-prev').length > 0
+    window.mySwipe = new Swipe(document.getElementById('slider'), 
+      auto: 4000
+    )
+    $('#bi-slide-prev').click (e) ->
+      mySwipe.prev()
+    $('#bi-slide-next').click (e) ->
+      mySwipe.next()
 
-  $('#alert-block .close').click ->
-    $('#alert-block').fadeOut('fast')
+  # $('#bike_has_no_serial').change (e) ->
+  #   updateSerial(e)
 
-  $('a.optional-form-block').click (e) ->
-    optionalFormUpdate(e)
+  # $('#alert-block .close').click ->
+  #   $('#alert-block').fadeOut('fast')
 
-  $('#standard-diams').change (e) ->
-    updateWheelDiam(e)
+  # $('a.optional-form-block').click (e) ->
+  #   optionalFormUpdate(e)
 
-  $('.chosen-select select').select2()
+  # $('#standard-diams').change (e) ->
+  #   updateWheelDiam(e)
+
+  # $('.chosen-select select').select2()
+

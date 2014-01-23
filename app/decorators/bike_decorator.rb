@@ -36,9 +36,7 @@ class BikeDecorator < ApplicationDecorator
     t += "#{object.year} " if object.year.present?
     t += "#{mnfg_name} "
     t += "#{object.frame_model} " if object.frame_model.present?
-    if object.type == "bike"
-      t += "bicycle"
-    else
+    if object.type != "bike"
       t += "#{object.type}" 
     end
     t
@@ -87,7 +85,7 @@ class BikeDecorator < ApplicationDecorator
 
   def thumb_image
     if object.thumb_path
-      h.image_tag(object.thumb_path, alt: title)
+      h.image_tag(object.thumb_path, alt: title_string)
     else
       h.image_tag("/assets/bike_photo_placeholder.png", alt: title) + h.content_tag(:span, "no image")          
     end    

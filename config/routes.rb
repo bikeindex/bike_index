@@ -11,7 +11,6 @@ Bikeindex::Application.routes.draw do
     resources :organization_invitations, only: [:new, :create]
   end
 
-
   root to: 'welcome#index'
 
   match 'update_browser', to: 'welcome#update_browser'
@@ -37,7 +36,7 @@ Bikeindex::Application.routes.draw do
   match 'vendor_signup', to: 'feedbacks#vendor_signup'
   match 'contact', to: 'feedbacks#new'
   match 'contact_us', to: 'feedbacks#new'
-  
+
   resources :users, only: [:new, :create, :show, :edit, :update] do
     collection do
       get 'confirm'
@@ -51,6 +50,7 @@ Bikeindex::Application.routes.draw do
   match 'accept_vendor_terms', to: 'users#accept_vendor_terms'
   match "accept_terms", to: "users#accept_terms"  
   resources :bike_token_invitations, only: [:create]
+  resources :user_embeds, only: [:show]
 
   resources :blogs, only: [:show, :index]
   match 'blog', to: redirect("/blogs")
