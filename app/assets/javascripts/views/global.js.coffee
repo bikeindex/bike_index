@@ -14,6 +14,21 @@ class BikeIndex.Views.Global extends Backbone.View
     @loadChosen() if $('#chosen-container').length > 0
     if $('#what-spokecards-are').length > 0
       $('.spokecard-extension').addClass('on-spokecard-page')
+    @initializeHeaderSearch()
+
+  initializeHeaderSearch: ->
+    v = @
+    $.ajax
+      type: "GET"
+      url: $("#head-search-bikes #query").attr('data-url')
+      success: (data, textStatus, jqXHR) ->
+        v.setSearchfantasy(data.tags)
+
+  setSearchfantasy: (tags) ->
+    $('#head-search-bikes #query').select2
+      tags: tags
+      openOnEnter: false
+      tokenSeparators: [","]
     
 
   loadUserHeader: ->
@@ -136,7 +151,6 @@ class BikeIndex.Views.Global extends Backbone.View
 
   expandSearch: ->
     unless $('#total-top-header').hasClass('search-expanded')
-      BikeIndex.initializeHeaderSearch()
       $('#header-search .chosen-container input[type="text"]').css("width","100%")
       $('#header-search .optional-fields').hide()
       $('#total-top-header').addClass('search-expanded')

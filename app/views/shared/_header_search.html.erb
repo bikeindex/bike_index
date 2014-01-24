@@ -2,7 +2,7 @@
   <%= text_field_tag :query,
     params[:query],
     placeholder: "Search for bikes",
-    :data => { provide: "typeahead", items: "3", source: Manufacturer.all.map(&:name).to_json },
+    :data => { url: search_tags_api_v1_bikes_url },
     class: "search-text-field"
   %>
   

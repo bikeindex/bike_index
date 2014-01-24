@@ -5,6 +5,15 @@ module Api
       before_filter :authenticate_organization, only: [:create]
       after_filter :cors_set_access_control_headers
 
+      def search_tags
+        tags = []
+        Color.unscoped.commonness.each { |i| tags << i.name }
+        HandlebarType.all.each { |i| tags << i.name }
+        FrameMaterial.all.each  { |i| tags << i.name }
+        WheelSize.unscoped.commonness.each { |i| tags << i.name }
+        Manufacturer.all.each { |i| tags << i.name }
+        respond_with tags, root: 'tags'
+      end
 
       def index
         respond_with BikeSearcher.new(params).find_bikes.limit(10)
