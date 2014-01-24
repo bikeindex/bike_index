@@ -66,36 +66,6 @@
     margin-bottom: 0;
     select { margin-top: .1em; }
   }
-  .with-optional-blocks {
-    @include clearfix;
-    .hidden-other.unhidden {
-      clear: both;
-      padding-bottom: 0;
-      width: 100%;
-      .field {
-        float: left;
-        display: block;
-      }
-      .optional-form-block {
-        margin: 0 0 0 1.25em;
-      }
-    }
-    .wheel-diameter {
-      clear: both;
-    }
-  }
-  .collapse.in {
-    @include clearfix;
-    padding-top: 20px;
-  }
-  .optional-form-block {
-    cursor: pointer;
-    display: block;
-    float: right;
-    margin-top: 1em;
-    text-align: right;
-  }
-
   .has-no-serial {
     float: left;
     position: relative;
@@ -109,6 +79,38 @@
   }
 }
 
+.with-optional-blocks {
+  @include clearfix;
+  .hidden-other.unhidden {
+    clear: both;
+    padding-bottom: 0;
+    width: 100%;
+    .field {
+      float: left;
+      display: block;
+    }
+    .optional-form-block {
+      margin: 0 1em 0 1.25em;
+    }
+  }
+  .wheel-diameter {
+    clear: both;
+  }
+}
+
+.optional-form-block {
+  cursor: pointer;
+  display: block;
+  float: right;
+  margin-top: .4em;
+  margin-right: 1em;
+  text-align: right;
+}
+
+@media (min-width: 480px) and (max-width: 930px) {
+  .new-bike-fields .has-no-serial { margin-left: 160px; }
+}
+
 .input-group .absent-serial {
   background: darken(white, 10%);
   color: $grayLight;
@@ -116,24 +118,6 @@
   &:active, &:focus {
     border: 1px solid #ccc;
     @include box-shadow(none);
-  }
-}
-
-@media (max-width: 600px) {
-  .new-bike-fields .with-optional-blocks {
-    @include clearfix;
-    .hidden-other.unhidden {
-      .optional-form-block {
-        margin: 0;
-      }
-    }
-    .field {
-      margin-top: 10px;
-    }
-    .optional-form-block {
-      margin: 0;
-      width: 100%;
-    }
   }
 }
 
@@ -164,37 +148,6 @@
       width: 70%;
       float: left;
       position: relative;
-    }
-    .optional-form-block {
-      margin-top: 0;
-      width: 28%;
-      margin-left: 2%;
-      text-align: left;
-      float: right;
-    }
-    .wheel-diameter {
-      clear: both;
-      width: 100%;
-      color: $grayDark;
-      margin-top: 10px;
-      .control-label {
-        width: 21%;
-
-      }
-      .radio-controls {
-        width: 76%;
-        margin-left: 23.1%;
-        position: relative;
-        .radio {
-          width: 110px;
-          float: left;
-          padding-left: 20px;
-          margin: 0;
-          &.wide-tire {
-            margin-top: 5px;
-          }
-        }
-      }
     }
   }
 }

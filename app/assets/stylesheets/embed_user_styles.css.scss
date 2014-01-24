@@ -16,7 +16,7 @@
     @include border-radius(3px 3px 2px 2px);
     @include box-shadow(0 0 2px rgba(black,.2));
     max-width: 200px;
-    margin: 40px auto 0;
+    margin: 0 auto;
     border: 2px solid $blueDarker;  
     background: $blueDarker;
     position: relative;
