@@ -6,8 +6,9 @@
     %meta{:name => "viewport", :content => "width=device-width, initial-scale=1, maximum-scale=1"}
     %meta{:name => "description", :content => "Bikes on the Index" }
     = stylesheet_link_tag "embed_user_styles", :media => "all"
-    = javascript_include_tag "embed_user"
     = csrf_meta_tags
     
   %body#bi_user_embed
     = yield
+
+    = javascript_include_tag "embed_user"

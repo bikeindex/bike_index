@@ -162,7 +162,7 @@ describe BikeDecorator do
       bike = Bike.new
       bike.stub(:thumb_path).and_return("pathy")
       decorator = BikeDecorator.new(bike)
-      decorator.stub(:title).and_return("Title")
+      decorator.stub(:title_string).and_return("Title")
       decorator.thumb_image.should eq("<img alt=\"Title\" src=\"/assets/pathy\" />")
     end
     it "should return the placeholder url otherwise" do 

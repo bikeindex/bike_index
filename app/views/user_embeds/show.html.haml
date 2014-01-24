@@ -1,24 +1,29 @@
 .bi-embed-box
-  .bikes-registered
-    My
-    = "bike".pluralize(@bikes.count)
+  - unless @text == "none"
+    .bikes-registered
+      - if @text.present?
+        = @text
+      - else
+        My Indexed
+        = "Bike".pluralize(@bikes.count)
   .bi-slide-over
   - if @bikes.count > 1
-    #bi-slide-prev.controleys
+    %a#bi-slide-prev.controleys
       <
-    #bi-slide-next.controleys
+    %a#bi-slide-next.controleys
       >
   #slider.swipe{ style: 'max-width:500px;margin:0 auto' }
 
     .swipe-wrap
       - @bikes.each do |bike|
         .bikey-slide
-          %a{ href: bike_url(bike), target: "_blank" }
+          %a.bi-bike-link{ href: bike_url(bike), target: "_blank" }
           - if bike.thumb_path
-            = image_tag(bike.thumb_path, alt: bike.title_string)
+            = image_tag(bike.thumb_path, alt: bike.title_string, class: "bike-photo")
           - else
-            .no-bike-photo
-            = image_tag("/assets/bike_photo_placeholder.png", alt: bike.title_string)
+            %span.no-bike-photo
+              no photo
+            = image_tag("/assets/bike_photo_placeholder.png", alt: bike.title_string, class: "bike-photo")
           .bi-title
             = bike.title_string
             

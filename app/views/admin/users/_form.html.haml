@@ -21,6 +21,10 @@
       .controls
         = f.text_field :email
     .control-group
+      = f.label :username, class: "control-label"
+      .controls
+        = f.text_field :username
+    .control-group
       = f.label :confirmed, class: "control-label"
       .controls
         = f.check_box :confirmed

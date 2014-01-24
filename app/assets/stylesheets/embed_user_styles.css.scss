@@ -1,7 +1,7 @@
 @import "application_styles/_colors.scss";
 @import "includes/bootstrap/_mixins.scss";
 
-#bi_user_embed {
+#bi_user_embed {  
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 14px;
   font-weight: 200;
@@ -11,126 +11,125 @@
     box-sizing: border-box;
     text-rendering: optimizeLegibility;
   }
-}
 
-.bi-embed-box {
-  @include border-radius(3px 3px 2px 2px);
-  @include box-shadow(0 0 2px rgba(black,.2));
-  max-width: 200px;
-  margin: 40px auto 0;
-  border: 1px solid black;  
-  background: black;
-  position: relative;
-  overflow: hidden;
-  img {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-  .bikey-slide {
-    width: 100%;
+  .bi-embed-box {
+    @include border-radius(3px 3px 2px 2px);
+    @include box-shadow(0 0 2px rgba(black,.2));
+    max-width: 200px;
+    margin: 40px auto 0;
+    border: 2px solid $blueDarker;  
+    background: $blueDarker;
     position: relative;
-    background: $grayLighter;
+    overflow: hidden;
+    .bike-photo {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .no-bike-photo {
+      display: block;
+      position: absolute;
+      left: 0; top: 1em;
+      width: 100%;
+      text-align: center;
+      color: rgba($blueDarker, .4);
+    }
+    .bikey-slide {
+      width: 100%;
+      position: relative;
+      background: $grayLighter;
+    }
+    .bi-bike-link {
+      display: block;
+      position: absolute;
+      z-index: 20;
+      width: 100%;
+      height: 100%;
+    }
+    .bi-title { 
+      width: 100%;
+      position: absolute;
+      bottom: 0; left: 0;
+      padding: 5px 2px;
+      background: rgba(black,.4);
+      color: $grayLight;
+      cursor: pointer;
+      border-top: 1px solid rgba(black,.1);
+      -webkit-transition: all .2s linear;
+      -moz-transition: all .2s linear;
+      -o-transition: all .2s linear;
+      transition: all .2s linear;
+    }
+    &:hover {
+      .bi-title { color: $grayLighter;}
+      .bi-slide-over { display: none; }
+      #bi-slide-prev { left: -1.5em; }
+      #bi-slide-next { right: -1.5em; }
+    }
   }
-  a {
-    display: block;
+
+  .bi-slide-over {
     position: absolute;
-    z-index: 20;
+    top: 0; left: 0;
     width: 100%;
     height: 100%;
+    z-index: 10;
+    -moz-box-shadow:    inset 0 0 2px rgba(black,.3);
+    -webkit-box-shadow: inset 0 0 2px rgba(black,.3);
+    box-shadow:         inset 0 0 2px rgba(black,.3);
   }
-  .bi-title { 
-    width: 100%;
-    position: absolute;
-    bottom: 0; left: 0;
-    padding: 5px 2px;
-    background: rgba(black,.4);
-    color: $grayLight;
+
+  .controleys {
+    @include border-radius(1em);
     cursor: pointer;
-    border-top: 1px solid rgba(black,.1);
-    -webkit-transition: all .2s linear;
-    -moz-transition: all .2s linear;
-    -o-transition: all .2s linear;
-    transition: all .2s linear;
-  }
-  .no-bike-photo {
     position: absolute;
-    top:0;
-    left: 0;
+    top: 50%;
+    background: rgba(white,.5);
+    padding: 1em;
+    margin-top: -1.5em;
+    color: $grayMed;
+    z-index: 50;
+    -webkit-transition: all .15s linear;
+    -moz-transition: all .15s linear;
+    -o-transition: all .15s linear;
+    transition: all .15s linear;
+    &:hover { background: rgba(white,.8); color: $grayDark}
+  }
+  #bi-slide-prev {
+    &:active { @include translate(-1px,2px); }
+    left: -4em;
+    padding-left: 2em;
+  }
+  #bi-slide-next {
+    &:active { @include translate(1px,2px); }
+    right: -4em;
+    padding-right: 2em;
+  }
+
+  .swipe {
+    overflow: hidden;
+    visibility: hidden;
+    position: relative;
+  }
+  .swipe-wrap {
+    overflow: hidden;
+    position: relative;
+  }
+  .swipe-wrap > div {
+    float:left;
+    width:100%;
+    position: relative;
+  }
+
+  .bikes-registered {
+    @include box-shadow(0 0 2px rgba(black,.3));
+    position: relative;
+    z-index: 10;
     width: 100%;
-    z-index: -1;
-    height: 100%;
-    color: purple;
+    padding: 2px 5px;
+    margin: 0;
+    text-align: center;
+    color: $grayLighter;
+    border-bottom: 1px solid rgba(white,.1);
   }
-  &:hover {
-    .bi-title { color: $grayLighter;}
-    .bi-slide-over { display: none; }
-    #bi-slide-prev { left: -1.5em; }
-    #bi-slide-next { right: -1.5em; }
-  }
-}
-
-.bi-slide-over {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 10;
-  -moz-box-shadow:    inset 0 0 2px rgba(black,.3);
-  -webkit-box-shadow: inset 0 0 2px rgba(black,.3);
-  box-shadow:         inset 0 0 2px rgba(black,.3);
-}
-
-.controleys {
-  @include border-radius(1em);
-  cursor: pointer;
-  position: absolute;
-  top: 50%;
-  background: rgba(white,.5);
-  padding: 1em;
-  margin-top: -1.5em;
-  color: $grayMed;
-  z-index: 50;
-  -webkit-transition: all .15s linear;
-  -moz-transition: all .15s linear;
-  -o-transition: all .15s linear;
-  transition: all .15s linear;
-  &:hover { background: rgba(white,.8); color: $grayDark}
-}
-#bi-slide-prev {
-  &:active { @include translate(-1px,2px); }
-  left: -4em;
-  padding-left: 2em;
-}
-#bi-slide-next {
-  &:active { @include translate(1px,2px); }
-  right: -4em;
-  padding-right: 2em;
-}
-
-.swipe {
-  overflow: hidden;
-  visibility: hidden;
-  position: relative;
-}
-.swipe-wrap {
-  overflow: hidden;
-  position: relative;
-}
-.swipe-wrap > div {
-  float:left;
-  width:100%;
-  position: relative;
-}
-
-.bikes-registered {
-  @include box-shadow(0 0 2px rgba(black,.3));
-  position: relative;
-  z-index: 10;
-  width: 100%;
-  padding: 2px 5px;
-  margin: 0;
-  text-align: center;
-  color: $grayLighter;
-  border-bottom: 1px solid rgba(white,.1);
 }
