@@ -68,6 +68,18 @@
     }
   }
 
+  .bikes-registered {
+    @include box-shadow(0 0 2px rgba(black,.4));
+    border-bottom: 1px solid rgba(black,.1);
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    padding: 2px 5px;
+    margin: 0;
+    text-align: center;
+    color: $grayLighter;
+  }
+
   .bi-slide-over {
     position: absolute;
     top: 0; left: 0;
@@ -119,21 +131,10 @@
     overflow: hidden;
     position: relative;
   }
+
   .swipe-wrap .bikey-slide {
     float: left;
     width: 100%;
     position: relative;
-  }
-
-  .bikes-registered {
-    @include box-shadow(0 0 2px rgba(black,.3));
-    position: relative;
-    z-index: 10;
-    width: 100%;
-    padding: 2px 5px;
-    margin: 0;
-    text-align: center;
-    color: $grayLighter;
-    border-bottom: 1px solid rgba(white,.1);
   }
 }
