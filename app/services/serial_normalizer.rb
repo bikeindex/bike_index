@@ -12,7 +12,7 @@ class SerialNormalizer
   def find_bike
     return nil unless @bike_id.present?
     begin
-    return Bike.find(@bike_id)
+    return Bike.unscoped.find(@bike_id)
     rescue
       raise SerialNormalizerError, "Oh no! We couldn't find that bike"
     end
