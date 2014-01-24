@@ -95,6 +95,7 @@
     transition: all .15s linear;
     &:hover { background: rgba(white,.8); color: $grayDark}
   }
+
   #bi-slide-prev {
     &:active { @include translate(-1px,2px); }
     left: -4em;
@@ -107,17 +108,20 @@
   }
 
   .swipe {
+    max-width:500px;
+    margin:0 auto;
     overflow: hidden;
     visibility: hidden;
     position: relative;
   }
+
   .swipe-wrap {
     overflow: hidden;
     position: relative;
   }
-  .swipe-wrap > div {
-    float:left;
-    width:100%;
+  .swipe-wrap .bikey-slide {
+    float: left;
+    width: 100%;
     position: relative;
   }
 

@@ -1,9 +1,11 @@
 prev = document.getElementById('bi-slide-prev')
 next = document.getElementById('bi-slide-next')
 if document.contains(prev)
-  window.mySwipe = new Swipe(document.getElementById('slider'), 
+  slider = document.getElementById('slider')
+  slider.className += " swipe"
+  window.mySwipe = new Swipe(slider, 
     auto: 4000
-  )  
+  )
   if document.body.addEventListener
     prev.addEventListener "click", ->
       mySwipe.prev()
