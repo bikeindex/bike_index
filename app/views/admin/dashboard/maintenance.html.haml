@@ -1,0 +1,89 @@
+%header.with-subtitle
+  %h1 Maintaining things
+
+%section.full-screen-table
+  %h2
+    Recent example bikes
+  - if @bikes.any? 
+    %table.table.table-striped.table-bordered
+      = render partial: "/admin/bikes/admin_bikes_table"
+    %p.pull-right
+      #{Bike.unscoped.where(example: true).count} example bikes total
+      
+  - else
+    No example bikes right now!
+  
+
+  %section.full-screen-table
+    %table.table.table-striped.table-bordered
+      %thead
+        %th
+          Date
+        %th
+          Component
+        %th
+          Component id
+        %th
+          Bike
+
+      %tbody
+        - @component_mnfgs.each do |f|
+          %tr
+            %td
+              - if f.created_at.today?
+                Today at #{f.created_at.strftime("%-I %p")}
+              - elsif Date.yesterday().beginning_of_day() <= f.created_at               
+                Yesterday at #{f.created_at.strftime("%-I %p")}
+              - else
+                = f.created_at.strftime("%-m/%-d/%Y")
+
+            %td
+              Type: 
+              %span.stolen-color
+                #{f.ctype_other},
+              - if f.model_name.present?
+                name: #{f.model_name},
+              - if f.year.present?
+                year: #{f.year},
+              - if f.description.present?
+                description: #{f.description},
+              manufacturer:
+              - if f.manufacturer_other.present?
+                %span.stolen-color
+                  #{f.manufacturer_other},
+              - else
+                #{f.manufacturer.name},
+              front: #{f.front},
+              rear: #{f.rear},
+              - if f.serial_number.present?
+                serial_number: #{f.serial_number}
+            %td
+              = f.id
+            %td
+              = link_to f.bike.id, edit_admin_bike_url(f.bike)
+
+
+  %section.full-screen-table
+    %table.table.table-striped.table-bordered
+      %thead
+        %th
+          Date
+        %th
+          Handlebar type
+        %th
+          Bike
+      %tbody
+        - @handlebar_types.each do |f|
+          %tr
+            %td
+              - if f.created_at.today?
+                Today at #{f.created_at.strftime("%-I %p")}
+              - elsif Date.yesterday().beginning_of_day() <= f.created_at               
+                Yesterday at #{f.created_at.strftime("%-I %p")}
+              - else
+                = f.created_at.strftime("%-m/%-d/%Y")
+
+            %td
+              = f.handlebar_type_other
+            %td
+              = link_to f.id, edit_admin_bike_url(f)

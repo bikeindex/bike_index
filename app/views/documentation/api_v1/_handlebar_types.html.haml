@@ -1,0 +1,25 @@
+%p
+  %code
+    handlebar_type
+  is a bike attribute.
+
+%p
+  We have a short list of handlebar types. There are pictures that accompany them if you add a bike through the web interface.
+
+%article.code
+  %p.code-label
+    GET all handlebar types
+  - request_url = api_v1_handlebar_types_url
+  %pre
+    :plain
+      $.ajax({
+        type: "GET",
+        url: "#{request_url}",
+        success: function(data, textStatus, jqXHR) {
+          $('#handlebar_types_index').text(JSON.stringify(data,undefined,2))
+        }
+      });
+
+  %p.code-label Response
+  %pre#handlebar_types_index{ data: {url: request_url }}
+    :plain

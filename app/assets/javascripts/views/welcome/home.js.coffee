@@ -2,7 +2,7 @@ class BikeIndex.Views.Home extends Backbone.View
   initialize: ->
     @setElement($('#body'))
     @moveBike()
-    # @manufacturerCall()
+    
 
   moveBike: ->
     register = $('#treating-right .treating-right-text')
@@ -21,14 +21,3 @@ class BikeIndex.Views.Home extends Backbone.View
         
         # register.css('top', "#{p*25}px") # Small parallax on the button
 
-
-  manufacturerCall: ->
-    $.ajax({
-      type: "GET"
-      url: 'https://www.bikeindex.org/api/v1/manufacturers'
-      dataType: "jsonp",
-      success: (data, textStatus, jqXHR) ->
-        console.log(data)
-      error: (data, textStatus, jqXHR) ->
-        console.log(data)
-      })

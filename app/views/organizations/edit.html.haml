@@ -37,7 +37,7 @@
       = @organization.available_invitation_count
       remaining #{"invitation".pluralize(current_organization.available_invitation_count)}.
       - if @organization.available_invitation_count > 0
-        = link_to "Send an invitation to an employee", "/organizations/#{@organization.slug}/organization_invitations/new", class: "button-yellow"
+        = link_to "Send an invitation to a member of your organization", "/organizations/#{@organization.slug}/organization_invitations/new", class: "button-yellow"
         
       
         

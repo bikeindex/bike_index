@@ -59,7 +59,7 @@
   <div class="bike-info" style="position: relative;width: 63%;margin-left: 3%;float: left;padding-top: 30px; <%= 'color: white;' if @bike.stolen %>">
     <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Make</span> <%= @bike.manufacturer.name  %></p>
     <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Serial</span> <%= @bike.serial_number %></p>
-    <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Color</span> <%= @bike.primary_frame_color.name %></p>
+    <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Color</span><% if @bike.paint.present? %><%= @bike.paint.name %><% else %><%= @bike.primary_frame_color.name %><% end %></p>
   </div>
 </div>
 

@@ -6,7 +6,10 @@
         %dl.dl-horizontal
           %dt Serial
           %dd.serial-text
-            = bike.serial_number
+            - if bike.recovered
+              Serial hidden
+            - else 
+              = bike.serial_number
         %dl.dl-horizontal
           = bike.dl_list_item(bike.title, bike.type.titleize)
         
@@ -14,7 +17,7 @@
     .dl-holder
       %dl.dl-horizontal
         = bike.dl_list_item(bike.ass_name("primary_frame_color"), "Color")
-        = bike.dl_from_attribute("frame_manufacture_year", "Year")
+        = bike.dl_from_attribute("year", "Year")
       %dl.dl-horizontal
         = bike.dl_list_item(bike.ass_name("frame_material"), "Material")        
         = bike.dl_list_item(bike.ass_name("rear_wheel_size"), "Wheel size")
@@ -23,6 +26,11 @@
     .blist-stolen-info
       .dl-holder
         %dl.dl-horizontal
-          = bike.dl_list_item(bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), "Stolen on")
+          - date_label = "Stolen on"
+          - date_label = "Recovered on" if bike.recovered
+          = bike.dl_list_item(bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), date_label)
         %dl.dl-horizontal
-          = bike.dl_list_item("#{bike.current_stolen_record.city}, #{bike.current_stolen_record.state}", "From")
+          = bike.dl_list_item(bike.short_address(bike.current_stolen_record), "From")
+  - pdf ||= false
+  - if pdf
+    = link_to "Printable registration", pdf_bike_url(bike), class: 'printable-registration'

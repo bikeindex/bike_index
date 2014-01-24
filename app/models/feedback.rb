@@ -1,5 +1,5 @@
 class Feedback < ActiveRecord::Base
-  attr_accessible :body, :email, :name, :title
+  attr_accessible :body, :email, :name, :title, :feedback_type
 
   validates_presence_of :body, :email, :name, :title
 

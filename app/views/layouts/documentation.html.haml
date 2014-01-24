@@ -1,0 +1,57 @@
+= render 'shared/header'
+
+#content-wrap.header-closed
+  %header.global-header.collapsible-head.invisibled#header
+    = render 'shared/header_nav'
+
+  %a#nav-header-collapse.expandable
+    %span.e +
+    %span.c -
+
+
+  %header.content-sidebar#documentation-menu
+    .header-content
+      .logo
+        %a.follow-link.logo{ href: root_url }
+          = image_tag "/assets/logo.svg"
+          %h2
+            Bike Index
+    %nav.content-nav#doc-sections
+      %ul.content-sections
+        %li.active-menu
+          = link_to "API documentation", "#header", class: "documentation-head"
+        %li
+          = link_to "Manufacturers", "#manufacturers_ref"
+        %li
+          = link_to "Searching bikes", "#search_bikes_ref"
+        %li
+          = link_to "Adding bikes", "#add_bikes_ref"
+          %ul
+            %li
+              = link_to "Organizations and access tokens", "#org_access"
+            %li
+              = link_to "Bike object", "#bike_hash"
+            %li
+              = link_to "Components", "#components_for_bikes"
+            %li
+              = link_to "Stolen bikes", "#stolen_bikes"
+        %li
+          = link_to "Bike attributes", "#bike_attributes_ref"
+          %ul
+            %li
+              = link_to "Wheel sizes", "#wheel_sizes_ref"
+            %li
+              = link_to "Cycle types", "#cycle_types_ref"
+            %li
+              = link_to "Frame materials", "#frame_materials_ref"
+            %li
+              = link_to "Handlebar types", "#handlebar_types_ref"
+            %li
+              = link_to "Component types", "#component_types_ref"
+            
+
+
+  %section.page-content#documentation-content
+    = yield
+    
+  = render 'shared/footer'

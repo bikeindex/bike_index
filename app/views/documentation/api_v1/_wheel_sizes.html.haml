@@ -1,0 +1,27 @@
+%p
+  The International Organization for Standardization has a universal tire sizing system that removes the confusion surrounding wheel and tire sizes - read 
+  = link_to "Sheldon Brown's article on tire sizing", "http://sheldonbrown.com/tire-sizing.html#iso"
+  to learn more.
+
+%p
+  We use BSD (Bead Seat Diameter) to identify wheel sizes. This is the second number in the pair of numbers found on tires (e.g. the numbers on a 700 x 23 tire are 23-622 - so the BSD is 622).
+
+%p
+  You can get the list of BSD's we accept by querying our API.
+
+%article.code
+  %p.code-label
+    GET all wheel sizes
+  - request_url = api_v1_wheel_sizes_url
+  %pre
+    :plain
+      $.ajax({
+        type: "GET",
+        url: "#{request_url}",
+        success: function(data, textStatus, jqXHR) {
+          $('#wheel-sizes-index').text(JSON.stringify(data,undefined,2))
+        }
+      });
+
+  %p.code-label Response
+  %pre#wheel_sizes_index{ data: {url: request_url }}

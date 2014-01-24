@@ -11,11 +11,22 @@ describe BikeCreatorAssociator do
     end
   end
 
-  describe :create_stolen_record do 
-    it "should call create ownership" do 
+  describe :create_components do 
+    it "should call create components" do 
       b_param = BParam.new
       bike = Bike.new 
+      ComponentCreator.any_instance.should_receive(:create_components_from_params).and_return(true)
+      BikeCreatorAssociator.new(b_param).create_components(bike)
+    end
+  end
+
+  describe :create_stolen_record do 
+    it "should call create stolen record and set_creation_organization" do 
+      b_param = BParam.new
+      bike = Bike.new 
+      bike.stub(:creation_organization).and_return(true)
       StolenRecordUpdator.any_instance.should_receive(:create_new_record).and_return(true)
+      StolenRecordUpdator.any_instance.should_receive(:set_creation_organization).and_return(true)
       BikeCreatorAssociator.new(b_param).create_stolen_record(bike)
     end
   end
@@ -52,6 +63,7 @@ describe BikeCreatorAssociator do
       creator.should_receive(:create_ownership).and_return(bike)
       creator.should_receive(:create_stolen_record).and_return(bike)
       creator.should_receive(:update_bike_token).and_return(bike)
+      creator.should_receive(:create_components).and_return(bike)
       # creator.should_receive(:add_uploaded_image).and_return(bike)
       creator.associate(bike)
     end

@@ -4,16 +4,16 @@ class BlogsController < ApplicationController
 
   def show
     @blog = Blog.find_by_title_slug(params[:id])
+    @blog = Blog.find_by_old_title_slug(params[:id]) unless @blog
+    @blog = Blog.find(params[:id]) unless @blog
     unless @blog
       raise ActionController::RoutingError.new('Not Found')
     end
     @blogger = @blog.user
-    @title = @blog.title
   end
 
   def index
-    @title = "Blog"
-    @blogs = Blog.where(published: true)
+    @blogs = Blog.published
   end
 
   def set_blogs_active_section

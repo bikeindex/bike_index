@@ -1,0 +1,33 @@
+%p
+  %code
+    cycle_type
+  is a bike attribute.
+%p
+  The Bike Index can be used to register more than just standard bicycles.
+%p
+  Standard bikes, for the purposes of this discussion, have 
+  %strong two wheels,
+  are designed for 
+  %strong one rider,
+  have a 
+  %strong diamond shaped frame,
+  and have 
+  %strong pedals.
+
+%article.code
+  %p.code-label
+    GET all cycle types
+  - request_url = api_v1_cycle_types_url
+  %pre
+    :plain
+      $.ajax({
+        type: "GET",
+        url: "#{request_url}",
+        success: function(data, textStatus, jqXHR) {
+          $('#cycle_types_index').text(JSON.stringify(data,undefined,2))
+        }
+      });
+
+  %p.code-label Response
+  %pre#cycle_types_index{ data: {url: request_url }}
+    :plain

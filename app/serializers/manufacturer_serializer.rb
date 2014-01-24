@@ -1,10 +1,9 @@
 class ManufacturerSerializer < ActiveModel::Serializer
-  attributes :slug,
-    :name,
-    :api_url
+  attributes :name,
+    :company_url
 
-  def api_url
-    api_v1_manufacturer_url(object)
+  def company_url
+    return "" unless object.website
+    object.website
   end
-
 end

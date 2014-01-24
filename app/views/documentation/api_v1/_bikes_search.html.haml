@@ -1,0 +1,64 @@
+%p
+  Query the Bike Index API to find bikes!
+%p
+  We return the first 10 matches for your query.
+%p
+  Here are the things that can be sent in the request:
+
+%article.code
+  %table.table
+    %tbody
+      %tr
+        %td
+          %code
+            query
+        %td
+          string
+        %td
+          The query string. This will full text search all the bikes.
+      %tr
+        %td
+          %code
+            stolen
+        %td
+          boolean
+        %td
+          Whether to include stolen bikes in the response.
+      %tr
+        %td
+          %code
+            non_stolen
+        %td
+          boolean
+        %td
+          Whether to include non-stolen bikes in the response
+
+
+%article
+  .alert.alert-info
+    If you don't include 
+    %code
+      stolen
+    or
+    %code
+      non_stolen
+    then the response will include both stolen and non stolen bikes.
+
+%article.code
+  .code-label
+    GET stolen bikes with the manufacturer "Trek"
+  - request_url = api_v1_bikes_url(query: "Trek", stolen: true)
+  %pre
+    :plain
+      $.ajax({
+        type: "GET",
+        url: "#{request_url}",
+        success: function(data, textStatus, jqXHR) {
+          $('#bikes_search_query').text(JSON.stringify(data,undefined,2))
+        }
+      });
+
+  .code-label
+    Response
+  %pre#bikes_search_query{ data: {url: request_url }}
+

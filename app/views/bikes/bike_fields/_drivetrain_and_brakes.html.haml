@@ -8,7 +8,7 @@
       %label.control-label
         Drivetrain
       #drivetrain_checks.controls
-        - fixed = @bike.front_gear_type == FrontGearType.fixed.first
+        - fixed = @bike.rear_gear_type == RearGearType.fixed.first
         %label.checkbox
           %input#fixed_gear_check.checkbox.drive-check{ type: "checkbox", checked: fixed }
           Fixed gear
@@ -71,7 +71,10 @@
           = RearGearType.fixed.first.id
         = f.radio_button 'rear_gear_type_id', nil, class: "no-gear-selected"
         - RearGearType.all.each do |gt|
-          = f.radio_button 'rear_gear_type_id', gt.id, class: "count_#{gt.count} internal_#{gt.internal}", :data => {count: gt.count }
+          - if gt.name == "Fixed"
+            = f.radio_button 'rear_gear_type_id', gt.id
+          - else
+            = f.radio_button 'rear_gear_type_id', gt.id, class: "count_#{gt.count} internal_#{gt.internal}", :data => {count: gt.count }
 
   .input-group.inform-save
     .controls

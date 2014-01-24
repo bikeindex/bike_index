@@ -20,7 +20,9 @@
   .show-bike-edit
     %p
       - if @bike.current_owner_exists
-        - if @bike.stolen
+        - if @bike.recovered
+          Thank you for recovering this #{@bike.type}!
+        - elsif @bike.stolen
           We're really bummed that your #{@bike.type} was stolen.       
         - else
           Whoah, this awesome #{@bike.type} is yours!
@@ -29,7 +31,7 @@
           Add some more information about it.
         - else
           - if @bike.stolen
-            Add a picture so people know what to look for.
+            Add a picture so people know what to look for!
           - else
             You should add a picture of it, so everyone can admire its beauty.
         = link_to  "Edit", edit_bike_path, class: "button-blue"
@@ -46,6 +48,8 @@
     %h1
       - if @bike.stolen
         %strong.stolen-color
+          - if @bike.recovered
+            Recovered 
           Stolen
       = @bike.title
 
@@ -70,19 +74,35 @@
           - if @bike.current_stolen_record.latitude.present? and @bike.current_stolen_record.longitude.present?
             = render "bikes/stolen_map"
           .dl-horizontal
+            - if @bike.recovered && @bike.creation_organization.present?
+              %dt
+                Recovered by
+              %dd
+                = @bike.creation_organization.name
+              - if @bike.current_stolen_record.creation_organization.present?
+                - if @bike.current_stolen_record.creation_organization.locations.present? && @bike.current_stolen_record.creation_organization.locations.first.phone.present?
+                  %dt
+                    #{@bike.current_stolen_record.creation_organization.name} phone
+                    
+                  %dd
+                    %a{ href: "tell:#{@bike.current_stolen_record.phone}" }
+                      = number_to_phone(@bike.current_stolen_record.creation_organization.locations.first.phone)
+
             - if @bike.phoneable_by(current_user)
-              .phone-shown
-                %dt
-                  Phone number
-                %dd
-                  %a{ href: "tell:#{@bike.current_stolen_record.phone}" }
-                    = @bike.current_stolen_record.phone
+              %dt.stolen-color
+                Phone number
+              %dd
+                %a{ href: "tell:#{@bike.current_stolen_record.phone}" }
+                  = number_to_phone(@bike.current_stolen_record.phone)
+            = @bike.dl_list_item(@bike.current_stolen_record.address, "Location")
             = @bike.dl_list_item(@bike.current_stolen_record.locking_description, "Locking description")
             = @bike.dl_list_item(@bike.current_stolen_record.lock_defeat_description, "Locking circumvented")
             = @bike.dl_list_item(@bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), "Date stolen")
-            = @bike.dl_list_item(@bike.current_stolen_record.address, "Location")
             = @bike.dl_list_item(@bike.current_stolen_record.theft_description, "Description")
-            = @bike.dl_list_item(@bike.current_stolen_record.police_report_number, "Police report number")
+            = @bike.dl_list_item(@bike.current_stolen_record.police_report_number, "Police report #")
+            = @bike.dl_list_item(@bike.current_stolen_record.police_report_department, "Department & city")
+            
+
 
     %header.with-subtitle
       .sharing-section
@@ -105,12 +125,16 @@
       %dl.dl-horizontal
         - unless @bike.type == "bike"
           = @bike.dl_from_attribute("type", "Cycle Type")
+      
         %dt Serial
         %dd.serial-text
-          = @bike.serial_number
+          - if @bike.recovered
+            Serial hidden
+          - else
+            = @bike.serial_number
         = @bike.dl_list_item(@bike.mnfg_name, "Manufacturer")
         = @bike.dl_from_attribute("frame_model", "Model")
-        = @bike.dl_from_attribute("frame_manufacture_year", "Year")
+        = @bike.dl_from_attribute("year", "Year")
         = @bike.dl_list_item(@bike.seat_tube_display, "Frame size")
         - if @bike.front_wheel_size.present? and @bike.front_wheel_size != @bike.rear_wheel_size
           = @bike.dl_list_item(@bike.ass_name("front_wheel_size"), "Front Wheel")
@@ -143,9 +167,12 @@
           this
           = @bike.title
 
-      
-      - @components.each do |component|
-        .dl-holder
+      .dl-holder
+        / TODO: Make it display components in the list of cgroups.
+        / - @bike.cgroup_array.each do |cgroup_id|
+        /   - @components.where(cgroup_id: cgroup_id)
+        /     - if cgroup_id == 0
+        - @components.each do |component|
           %dl.dl-horizontal
             %p
               = component.component_type
@@ -168,6 +195,8 @@
               
               %a{ href: "tell:#{@bike.current_stolen_record.phone}" }
                 = @bike.current_stolen_record.phone
+          - if @bike.recovered
+            Is this your bike? Send proof of ownership (such as the bike's serial number or a photo of you with the bike)
           = render 'stolen_notifications/form'
 
       - else

@@ -3,6 +3,7 @@ class Bike < ActiveRecord::Base
   attr_accessible :verified,
     :payment_required,
     :paid_for,
+    :registered_new, # Was this bike registered at point of sale?
     :cycle_type_id,
     :manufacturer_id, 
     :manufacturer_other,
@@ -13,12 +14,12 @@ class Bike < ActiveRecord::Base
     :creation_organization_id,
     :location_id,
     :manufacturer,
-    :frame_manufacture_year,
+    :year,
     :thumb_path,
     :name,
     :stolen,
+    :recovered,
     :frame_material_id, 
-    :frame_material_other,
     :frame_model, 
     :handlebar_type_id,
     :handlebar_type_other,
@@ -32,9 +33,13 @@ class Bike < ActiveRecord::Base
     :primary_frame_color_id,
     :secondary_frame_color_id,
     :tertiary_frame_color_id,
+    :paint_id,
+    :paint_name,
     :propulsion_type_id,
     :propulsion_type_other,
     :zipcode,
+    :country_id,
+    :creation_zipcode,
     :belt_drive,
     :coaster_brake,
     :rear_gear_type_id,
@@ -52,8 +57,12 @@ class Bike < ActiveRecord::Base
     :bike_token_id,
     :b_param_id,
     :cached_attributes,
-    :embeded
+    :embeded,
+    :example,
+    :card_id,
+    :pdf
 
+  mount_uploader :pdf, PdfUploader
   belongs_to :manufacturer
   serialize(:cached_attributes, Array)
   belongs_to :primary_frame_color, class_name: "Color"
@@ -67,6 +76,7 @@ class Bike < ActiveRecord::Base
   belongs_to :frame_material
   belongs_to :propulsion_type
   belongs_to :cycle_type
+  belongs_to :paint
   belongs_to :creator, class_name: "User"
   belongs_to :invoice
   belongs_to :creation_organization, class_name: "Organization"
@@ -91,14 +101,14 @@ class Bike < ActiveRecord::Base
   validates_presence_of :creator
   validates_presence_of :manufacturer_id
   
-  # Comment below validations out when you first push to server
+  validates_uniqueness_of :card_id, allow_nil: true
   validates_presence_of :primary_frame_color_id
   validates_presence_of :rear_wheel_size_id
   validates_inclusion_of :rear_tire_narrow, :in => [true, false]
 
-  attr_accessor :date_stolen_input, :phone, :bike_image, :bike_token_id, :b_param_id, :payment_required, :embeded
+  attr_accessor :date_stolen_input, :phone, :bike_image, :bike_token_id, :b_param_id, :payment_required, :embeded, :paint_name
 
-  default_scope order("created_at desc")
+  default_scope where(example: false).order("created_at desc")
   scope :stolen, where(stolen: true)
   scope :non_stolen, where(stolen: false)
 
@@ -159,9 +169,37 @@ class Bike < ActiveRecord::Base
     end
   end
 
+  before_save :set_paints
+  def set_paints
+    return true unless paint_name.present?
+    return true if Color.fuzzy_name_find(paint_name).present?
+    paint = Paint.fuzzy_name_find(paint_name)
+    paint = Paint.create(name: paint_name) unless paint.present?
+    self.paint_id = paint.id
+  end
+
+  def paint_description
+    paint.name.titleize if self.paint.present?
+  end
+
+  def frame_colors
+    c = [primary_frame_color.name]
+    c << secondary_frame_color.name if secondary_frame_color
+    c << tertiary_frame_color.name if tertiary_frame_color
+    c
+  end
+
   def type
     # Small helper because we call this a lot
     self.cycle_type.name.downcase
+  end
+
+  def cgroup_array
+    # list of cgroups so that we can arrange them. Future feature.
+    return nil unless self.components.any?
+    a = []
+    components.each 
+    ownerships.each { |i| a << i.cgroup_id }
   end
 
   def cache_photo
@@ -173,9 +211,11 @@ class Bike < ActiveRecord::Base
   def components_cache_string
     string = ""
     components.all.each do |c|
-      string += "#{c.year} " if c.manufacturer
-      string += "#{c.manufacturer.name} " if c.manufacturer
-      string += "#{c.component_type} "
+      if c.ctype.present? && c.ctype.name.present?
+        string += "#{c.year} " if c.manufacturer
+        string += "#{c.manufacturer.name} " if c.manufacturer
+        string += "#{c.component_type} "
+      end
     end
     string
   end
@@ -197,7 +237,7 @@ class Bike < ActiveRecord::Base
     cache_attributes
     c = ""
     c += "#{propulsion_type.name} " unless propulsion_type.name == "Foot pedal"
-    c += "#{frame_manufacture_year} " if frame_manufacture_year
+    c += "#{year} " if year
     c += "#{primary_frame_color.name} " if primary_frame_color
     c += "#{secondary_frame_color.name} " if secondary_frame_color
     c += "#{tertiary_frame_color.name} " if tertiary_frame_color

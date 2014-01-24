@@ -1,0 +1,12 @@
+%section.full-screen-table
+  %h2
+    Bike Index graphs
+
+  %table.table.table-striped.table-bordered
+    %tbody
+      - ["users","bikes","organizations"].each do |graph_type|
+        %tr
+          %td
+            = graph_type.humanize
+          %td
+            = link_to "Since start", admin_graph_url("#{graph_type}")

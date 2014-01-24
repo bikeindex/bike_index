@@ -11,19 +11,21 @@ Bikeindex::Application.routes.draw do
     resources :organization_invitations, only: [:new, :create]
   end
 
-
   root to: 'welcome#index'
 
   match 'update_browser', to: 'welcome#update_browser'
   match 'user_home', to: 'welcome#user_home'
   match 'choose_registration', to: 'welcome#choose_registration'
   match 'goodbye', to: 'welcome#goodbye'
-  match 'bust_z_cache', to: 'welcome#bust_z_cache'
-
+  
   resource :session, only: [:new, :create, :destroy]
   match 'logout', to: 'sessions#destroy'
 
   resource :charges, only: [:new, :create]
+  resources :documentation, only: [:index] do
+    collection { get :api_v1 }
+  end
+
 
   resources :ownerships, only: [:show]
   resources :memberships, only: [:update, :destroy]
@@ -32,8 +34,9 @@ Bikeindex::Application.routes.draw do
 
   resources :feedbacks, only: [:create, :new]
   match 'vendor_signup', to: 'feedbacks#vendor_signup'
+  match 'contact', to: 'feedbacks#new'
   match 'contact_us', to: 'feedbacks#new'
-  
+
   resources :users, only: [:new, :create, :show, :edit, :update] do
     collection do
       get 'confirm'
@@ -47,9 +50,10 @@ Bikeindex::Application.routes.draw do
   match 'accept_vendor_terms', to: 'users#accept_vendor_terms'
   match "accept_terms", to: "users#accept_terms"  
   resources :bike_token_invitations, only: [:create]
+  resources :user_embeds, only: [:show]
 
   resources :blogs, only: [:show, :index]
-  match 'blog', to: "blogs#index"
+  match 'blog', to: redirect("/blogs")
 
   resources :public_images, only: [:create, :show, :edit, :update, :index, :destroy] do 
     collection do
@@ -58,19 +62,25 @@ Bikeindex::Application.routes.draw do
   end
   
   resources :bikes do
+    collection { get :scanned }
     member do
      get 'spokecard'
      get 'scanned'
+     get 'pdf'
    end
   end
   resources :locks
 
   namespace :admin do
-    root :to => 'dashboard#show'
+    root :to => 'dashboard#index'
     match 'invitations', to: 'dashboard#invitations'
+    match 'maintenance', to: 'dashboard#maintenance'
+    match 'bust_z_cache', to: 'dashboard#bust_z_cache'
     resources :discounts, :memberships, :bikes, :organizations, :bike_token_invitations, :organization_invitations
     match 'duplicate_bikes', to: 'bikes#duplicates'
     resources :flavor_texts, only: [:destroy, :create]
+    resources :graphs, only: [:index, :show]
+    resources :failed_bikes, only: [:index, :show]
     resources :ownerships, only: [:edit, :update]
     match 'recover_organization', to: 'organizations#recover' 
     match 'show_deleted_organizations', to: 'organizations#show_deleted' 
@@ -89,13 +99,14 @@ Bikeindex::Application.routes.draw do
 
   namespace :api, defaults: {format: 'json'} do
     namespace :v1 do
-      resources :bikes, only: [:index, :show]
+      resources :bikes, only: [:index, :show, :create]
       resources :cycle_types, only: [:index]
       resources :wheel_sizes, only: [:index]
+      resources :component_types, only: [:index]
       resources :colors, only: [:index]
       resources :handlebar_types, only: [:index]
       resources :frame_materials, only: [:index]
-      resources :manufacturers, only: [:index, :show]
+      resources :manufacturers, only: [:index]
       resources :users do 
         collection { get 'current' }
       end
@@ -113,9 +124,10 @@ Bikeindex::Application.routes.draw do
     get page, controller: 'info', action: page
   end
 
-  get 'sitemap.xml' => 'sitemaps#index', as: 'sitemap', defaults: { format: 'xml' }
-  match 'sitemap', to: 'sitemaps#index', defaults: { format: 'xml' }
-
+  get 'sitemap.xml.gz' => redirect("https://s3.amazonaws.com/bikeindex/sitemaps/sitemap_index.xml.gz")
+  # Somehow the redirect drops the .gz extension, which ruins it so this redirect is handled by Cloudflare
+  # get "sitemaps/(*all)" => redirect("https://s3.amazonaws.com/bikeindex/sitemaps/%{all}")
+  
   match '/400', to: 'errors#bad_request'
   match '/404', to: 'errors#not_found'
   match '/422', to: 'errors#unprocessable_entity'

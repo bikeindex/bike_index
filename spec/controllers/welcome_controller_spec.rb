@@ -17,9 +17,6 @@ describe WelcomeController do
     end
     it { should respond_with(:success) }
     it { should render_template(:goodbye) }
-    it "should set the title" do 
-      assigns(:title).should_not be_nil
-    end
   end
 
   describe :user_home do 

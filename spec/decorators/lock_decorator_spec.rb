@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe LockDecorator do
-
   describe :lock_type_name do 
     it "should return the lock type name other name if present" do 
       lock = Lock.new
@@ -11,5 +10,4 @@ describe LockDecorator do
       LockDecorator.new(lock).lock_type_name.should eq("lockity lock")
     end
   end
-
 end

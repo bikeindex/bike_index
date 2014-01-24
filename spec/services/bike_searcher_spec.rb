@@ -19,12 +19,12 @@ describe BikeSearcher do
       @stolen = FactoryGirl.create(:bike, stolen: true)
     end
     it "should select only stolen bikes if non-stolen isn't selected" do 
-      search = BikeSearcher.new({stolen_included: "on"})
+      search = BikeSearcher.new({stolen: "on"})
       result = search.matching_stolenness(Bike.scoped)
       result.should eq([@stolen])
     end
     it "should select only non-stolen bikes if stolen isn't selected" do 
-      search = BikeSearcher.new({non_stolen_included: "on"})
+      search = BikeSearcher.new({non_stolen: "on"})
       result = search.matching_stolenness(Bike.scoped)
       result.should eq([@non_stolen])
     end

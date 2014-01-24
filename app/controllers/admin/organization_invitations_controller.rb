@@ -14,7 +14,7 @@ class Admin::OrganizationInvitationsController < Admin::BaseController
     @organization = Organization.find(params[:id])
     @organizations = Organization.all
     @organization_invitations = OrganizationInvitation.where(organization_id: @organization.id)
-    @organization_invitation = OrganizationInvitation.new
+    @organization_invitation = OrganizationInvitation.new(organization_id: @organization.id)
   end
 
   def edit

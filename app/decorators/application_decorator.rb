@@ -1,6 +1,10 @@
 class ApplicationDecorator < Draper::Decorator 
   delegate_all
 
+  def self.collection_decorator_class
+    PaginatingDecorator
+  end
+
   def ass_name(association)
     ass = object.send(association, name)
     ass.name if ass.present?
@@ -48,7 +52,7 @@ class ApplicationDecorator < Draper::Decorator
 
   def twitterable(user)
     if user.show_twitter and user.twitter
-     h.link_to 'Twitter', user.twitter
+     h.link_to 'Twitter', "https://twitter.com/#{user.twitter}"
     end
   end
 
@@ -69,6 +73,14 @@ class ApplicationDecorator < Draper::Decorator
       end
       html.html_safe
     end
+  end
+
+  def short_address(item)
+    return nil unless item.country
+    html = "#{item.city}"
+    html << ", #{item.state.name}" if item.state.present?
+    html << ", #{item.country.name}"
+    html
   end
 
 end

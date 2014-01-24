@@ -26,9 +26,28 @@ class BikeDecorator < ApplicationDecorator
 
   def title
     t = ""
-    t += "#{object.frame_manufacture_year} " if object.frame_manufacture_year.present?
+    t += "#{object.year} " if object.year.present?
     t += "#{object.frame_model} by " if object.frame_model.present?
     h.content_tag(:span, t) + h.content_tag(:strong, mnfg_name)
+  end
+
+  def title_string
+    t = ""
+    t += "#{object.year} " if object.year.present?
+    t += "#{mnfg_name} "
+    t += "#{object.frame_model} " if object.frame_model.present?
+    if object.type != "bike"
+      t += "#{object.type}" 
+    end
+    t
+  end
+
+  def stolen_string
+    return nil unless object.stolen and object.current_stolen_record.present?
+    s = "Stolen "
+    s += "#{object.current_stolen_record.date_stolen.strftime("%m-%d-%Y")}. " if object.current_stolen_record.date_stolen.present?
+    s += "from #{object.current_stolen_record.address}. " if object.current_stolen_record.address.present?
+    s
   end
 
   def phoneable_by(user = nil)
@@ -36,7 +55,8 @@ class BikeDecorator < ApplicationDecorator
     return true if object.current_stolen_record.phone_for_everyone
     if user.present?
       return true if user.superuser
-      return true if object.current_stolen_record.phone_for_shops and user.has_membership?
+      return true if object.current_stolen_record.phone_for_shops and user.has_shop_membership?
+      return true if object.current_stolen_record.phone_for_police and user.has_police_membership?
       true if object.current_stolen_record.phone_for_users      
     end
   end
@@ -65,11 +85,10 @@ class BikeDecorator < ApplicationDecorator
 
   def thumb_image
     if object.thumb_path
-      h.image_tag(object.thumb_path, alt: title)
+      h.image_tag(object.thumb_path, alt: title_string)
     else
       h.image_tag("/assets/bike_photo_placeholder.png", alt: title) + h.content_tag(:span, "no image")          
-    end
-    
+    end    
   end
 
   def list_image(target = nil)
@@ -79,7 +98,5 @@ class BikeDecorator < ApplicationDecorator
       end
     end
   end
-
-
 
 end

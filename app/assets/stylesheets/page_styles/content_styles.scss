@@ -64,9 +64,6 @@
   }
 }
 
-
-
-
 .page-content {
   position: relative;
   padding: 40px 20px;
@@ -296,6 +293,33 @@
   }
 }
 
+.page-content .spokecard-demo, .page-content .spokecard-error {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  display: block;
+  padding-right: 0;
+}
+.spokecard-error {
+  border: 1px solid $grayLighter;
+}
+
+@media (min-width: 540px) {
+  .spokecard-demo { max-width: 500px; }
+}
+
+.content-sidebar .content-sections ul.spokecard-extension { display: none; }
+
+@media (min-width: 780px) {
+  .content-sections .active-menu ul.spokecard-extension.on-spokecard-page {
+    display: block;
+    li {
+      margin-top: .1em;
+      a { font-size: .9em; }
+    }
+  }
+}
+
+
 
 
 //________________________
@@ -377,19 +401,21 @@
   width: 100%;
   position: relative;
   margin: 0;
-  dt a {
+  a.shop-title-link {
     font-weight: normal;
     color: $textColor;
-    span { color: $textColor; }
+    span {
+      color: $textColor;
+      margin-bottom: 2px;
+    }
     em {
       color: $grayMed;
       font-size: .9em;
       font-style: normal;
     }
   }
-
-  dd { margin-left: 27px; }
-  dd.collapse.in { padding-bottom: .6em; }
+  .shop-info { margin-left: 27px; }
+  .shop-info.collapse.in { padding-bottom: .6em; }
   
   .where-shop-location {
     color: $linkColorHover;
@@ -400,12 +426,28 @@
     margin: 0;
     font-weight: 400;
   }
-  p { margin: .25em 0 0; }
+  p { margin: .5em 0 0; }
   .map-window { display: none; }
 }
 
-.where-add-shops {
-  margin: 60px 0 40px;
+ul.state-list {
+  @include clearfix;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  position: relative;
+}
+
+.where-add-shops { margin: 60px 0 40px; }
+
+@media (min-width: 600px) {
+  // .where-shops-list p { margin-top: 1em; }
+  ul.state-list li {
+    width: 50%;
+    float: left;
+  }
+  .state-name { margin-top: 1em; }
 }
 
 
@@ -447,46 +489,6 @@
 
 
 
-//________________________
-//
-// Blog styles
-//
-//________________________
-
-.blog-header {
-  h4 {
-    span { display: none; }
-    color: $grayMed;
-  }
-  hr {
-    margin-bottom: 30px;
-  }
-}
-
-
-@media (min-width: 780px) {
-  .blog-header {
-    h4 {
-      margin-left: 50px; 
-      padding-right: 50px;
-    }
-    hr {
-      margin-bottom: 50px;
-    }
-  }
-}
-
-
-@media (min-width: 1000px) {
-  .blog-header {
-    h4 {
-      max-width: 700px;
-    }
-    hr {
-      margin-bottom: 80px;
-    }
-  }
-}
 
 #locking-demonstration {
   @include border-radius(3px);
@@ -547,5 +549,3 @@
     background: #79B752;
   }
 }
-
-.blog-index .post-image { display: none; }

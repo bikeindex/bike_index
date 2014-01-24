@@ -99,8 +99,9 @@ input[type="color"],
 .select2-container-multi .select2-choices .select2-search-choice {
   margin-top: 5px;
 }
-.select2-container-multi, .select2-container-multi input, .select2-choices, .select2-results {
+.select2-container-multi .select2-choices .select2-search-field input, .select2-container-multi, .select2-container-multi input, .select2-choices, .select2-results {
   font-family: $headerFont;
+  font-size: 1em;
 }
 
 
@@ -205,6 +206,14 @@ input[type="color"],
   padding-top: 60px;
   min-height: 400px;
   padding-bottom: 60px;
+}
+
+@media (max-width: 800px) {
+  .content { padding-top: 30px; }
+}
+
+@media (max-width: 650px) {
+  .content { padding-top: 0; }
 }
 
 //________________________

@@ -4,7 +4,8 @@ class Ownership < ActiveRecord::Base
     :creator_id,
     :current,
     :user_id, # is the owner
-    :claimed
+    :claimed,
+    :example
 
   validates_presence_of :owner_email
   validates_presence_of :creator_id
@@ -29,7 +30,7 @@ class Ownership < ActiveRecord::Base
     end
   end
 
-  def owner 
+  def owner
     if self.claimed
       self.user
     else

@@ -60,24 +60,26 @@ describe BikeUpdator do
   describe :update_available_attributes do 
     it "should not let protected attributes be updated" do 
       organization = FactoryGirl.create(:organization)
-      bike = FactoryGirl.create(:bike, creation_organization_id: organization.id, verified: true)
+      bike = FactoryGirl.create(:bike, creation_organization_id: organization.id, verified: true, example: true)
       ownership = FactoryGirl.create(:ownership, bike: bike)
       user = ownership.creator
       new_creator = FactoryGirl.create(:user)
       og_bike = bike
-      bike_params = {description: "something long", serial_number: "69", manufacturer_id: 69, manufacturer_other: "Uggity Buggity", creator: new_creator, creation_organization_id: 69, stolen: true}
+      bike_params = {description: "something long", serial_number: "69", manufacturer_id: 69, manufacturer_other: "Uggity Buggity", creator: new_creator, creation_organization_id: 69, example: false, stolen: true}
       BikeUpdator.new(user: user, :b_params => {id: bike.id, bike: bike_params}).update_available_attributes
       bike.reload.serial_number.should eq(og_bike.serial_number)
       bike.manufacturer_id.should eq(og_bike.manufacturer_id)
       bike.manufacturer_other.should eq(og_bike.manufacturer_other)
       bike.creation_organization_id.should eq(og_bike.creation_organization_id)
       bike.creator.should eq(og_bike.creator)
-      bike.stolen.should be_true
+      bike.example.should eq(og_bike.example)
+      # bike.stolen.should be_true
       bike.verified.should be_true
       bike.description.should eq("something long")
     end
 
-    it "should not let bikes that weren't created by an organization become non-stolen" do 
+    # it "should not let bikes that weren't created by an organization become non-stolen" do 
+    it "Actually, for now, we let anyone mark anything not stolen" do 
       bike = FactoryGirl.create(:bike, stolen: true)
       ownership = FactoryGirl.create(:ownership, bike: bike)
       user = ownership.creator
@@ -86,7 +88,20 @@ describe BikeUpdator do
       update_bike = BikeUpdator.new(user: user, :b_params => {id: bike.id, bike: bike_params})
       update_bike.should_receive(:update_ownership).and_return(true)
       update_bike.update_available_attributes
-      bike.reload.stolen.should_not be_false
+      bike.reload.stolen.should_not be_true
+    end
+
+    it "should update the bike" do 
+      bike = FactoryGirl.create(:bike)
+      ownership = FactoryGirl.create(:ownership, bike: bike)
+      user = ownership.creator
+      new_creator = FactoryGirl.create(:user)
+      bike_params = {coaster_brake: true, :components_attributes =>{"1387762503379"=>{"ctype_id"=>"", "front"=>"0", "rear"=>"0", "ctype_other"=>"", "description"=>"", "manufacturer_id"=>"", "model_name"=>"", "manufacturer_other"=>"", "year"=>"", "serial_number"=>"", "_destroy"=>"0"}},}
+      update_bike = BikeUpdator.new(user: user, :b_params => {id: bike.id, bike: bike_params})
+      update_bike.should_receive(:update_ownership).and_return(true)
+      update_bike.update_available_attributes
+      bike.reload.coaster_brake.should be_true
+      bike.components.count.should eq(0)
     end
   end
 end

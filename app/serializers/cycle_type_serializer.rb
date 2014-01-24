@@ -1,6 +1,3 @@
 class CycleTypeSerializer < ActiveModel::Serializer
-  attributes :id,
-    :name,
-    :slug
-    
+  attributes :name, :slug
 end

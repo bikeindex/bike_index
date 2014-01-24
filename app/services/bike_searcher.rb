@@ -5,9 +5,9 @@ class BikeSearcher
   end
 
   def matching_stolenness(bikes)
-    if @params[:non_stolen_included] or @params[:stolen_included]
-      @bikes = @bikes.non_stolen unless @params[:stolen_included]
-      @bikes = @bikes.stolen unless @params[:non_stolen_included]
+    if @params[:non_stolen] or @params[:stolen]
+      @bikes = @bikes.non_stolen unless @params[:stolen]
+      @bikes = @bikes.stolen unless @params[:non_stolen]
     end
     @bikes
   end
@@ -51,8 +51,17 @@ class BikeSearcher
     end
     @bikes
   end
+  
+  def matching_updated_since(bikes)
+    if @params[:updated_since]
+      since_date = DateTime.parse(@params[:updated_since])
+      @bikes = bikes.where("updated_at >= ?", since_date)
+    end
+    @bikes
+  end
 
-  def find_bikes    
+  def find_bikes
+    matching_updated_since(@bikes)
     matching_stolenness(@bikes)
     matching_manufacturers(@bikes)
     matching_attr_cache(@bikes)

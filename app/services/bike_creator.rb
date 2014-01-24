@@ -24,12 +24,11 @@ class BikeCreator
   end
 
   def clear_bike(bike)
-    problems = bike.errors.messages
-    bike.destroy
     build_bike
-    problems.each do |message|
-      @bike.errors.add(message[0], message[1])
+    bike.errors.messages.each do |message|
+      @bike.errors.add(message[0], message[1][0])
     end
+    bike.destroy
     @bike
   end
 
@@ -45,7 +44,7 @@ class BikeCreator
       bike.destroy
       @bike = @b_param.created_bike
     else
-      @b_param.update_attributes(created_bike_id: bike.id)
+      @b_param.update_attributes(created_bike_id: bike.id, bike_errors: nil)
       set_normalized_serial
     end
     @bike 

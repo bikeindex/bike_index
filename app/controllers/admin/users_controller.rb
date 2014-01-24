@@ -1,10 +1,13 @@
 class Admin::UsersController < Admin::BaseController
   before_filter :find_user, only: [:show, :edit, :update, :destroy]
+
   def index
     @users = User.order("created_at desc").all
   end
 
   def edit
+    bikes = Bike.find(@user.bikes)
+    @bikes = BikeDecorator.decorate_collection(bikes)
   end
 
   def update
@@ -15,6 +18,7 @@ class Admin::UsersController < Admin::BaseController
     @user.superuser = params[:user][:superuser]
     @user.can_invite = params[:user][:can_invite]
     @user.banned = params[:user][:banned]
+    @user.username = params[:user][:username]
     # m = Membership.new
     # .membership = params[:user][:organizations]
 
@@ -24,6 +28,8 @@ class Admin::UsersController < Admin::BaseController
     if @user.save
       redirect_to admin_users_url, notice: 'User Updated'
     else
+      bikes = Bike.find(@user.bikes)
+      @bikes = BikeDecorator.decorate_collection(bikes)
       render action: :edit
     end
   end
@@ -56,6 +62,7 @@ class Admin::UsersController < Admin::BaseController
 
   def find_user
     @user = User.find_by_username(params[:id])
+    raise ActionController::RoutingError.new('Not Found') unless @user.present?
   end
 
 end

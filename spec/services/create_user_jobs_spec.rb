@@ -28,11 +28,12 @@ describe CreateUserJobs do
   end
 
   describe :associate_membership_invites do 
-    it "should assign any organization invitations that match the user email" do 
-      @organization_invitation = FactoryGirl.create(:organization_invitation, invitee_email: "owNER1@a.com")
-      @user = FactoryGirl.create(:user, email: "owner1@A.COM")
-      CreateUserJobs.new(user: @user).associate_membership_invites
-      @user.reload.memberships.count.should eq(1)
+    it "should assign any organization invitations that match the user email, and mark user confirmed if invited" do 
+      organization_invitation = FactoryGirl.create(:organization_invitation, invitee_email: "owNER1@a.com")
+      user = FactoryGirl.create(:user, email: "owner1@A.COM")
+      CreateUserJobs.new(user: user).associate_membership_invites
+      user.reload.memberships.count.should eq(1)
+      user.confirmed.should be_true
     end
   end
 

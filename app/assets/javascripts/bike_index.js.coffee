@@ -27,6 +27,7 @@ window.BikeIndex =
     $('#total-top-header .tab-content').append(links)
 
   initializeHeaderSearch: ->
+    # $('#header-search .stolenness input').prop('checked', true)
     $('#find_bike_attributes_ids').select2
       allow_single_deselect: true
       allowClear: true
@@ -39,7 +40,10 @@ $(document).ready ->
   
   if $('#home-title').length > 0
     view = new BikeIndex.Views.Home 
-  
+
+  else if $('#documentation-menu').length > 0
+    view = new BikeIndex.Views.DocumentationIndex
+
   else if $('#content-wrap').length > 0
     if $('#where-bike-index').length > 0
       view = new BikeIndex.Views.ContentWhere
@@ -59,7 +63,7 @@ $(document).ready ->
     view = new BikeIndex.Views.LoginSignup
 
   else if $('#organization-content').length > 0
-    view = new BikeIndex.Views.DataTables
+    view = new BikeIndex.Views.OrganizationsShow
 
   else if $('#user-bikes-table').length > 0
     view = new BikeIndex.Views.DataTables
@@ -82,6 +86,9 @@ $(document).ready ->
       view = new BikeIndex.Views.AdminOrganizationsEdit
     else if $('#post-date-field').length > 0
       view = new BikeIndex.Views.AdminBlogsEdit
+    else if $('#graph-holder').length > 0
+      view = new BikeIndex.Views.AdminChartShow
   
   else if $('#photo-page').length > 0
     view = new BikeIndex.Views.PhotosIndex
+    

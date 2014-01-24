@@ -1,37 +1,29 @@
 class InfoController < ApplicationController
   layout 'content'
   # caches_page :about, :where, :roadmap, :security, :serials, :stolen_bikes, :privacy, :terms, :vendor_terms, :downloads, :resources, :spokecard
-  before_filter :set_title
+  before_filter :set_active_section
 
   def about
-    @active_section = "about"
   end
   
   def where
-    @active_section = "about"
-    @shops = Organization.shown_on_map
-    @locations = Location.by_state
-    # @locations = Locations.shown_on_map.order("created_at asc")
+    @bike_shops = Organization.shop.shown_on_map
+    @states = State.includes(:locations).all
   end
 
   def roadmap
-    @active_section = "about"
   end
 
   def security
-    @active_section = "about"
   end
 
   def serials
-    @active_section = "resources"
   end
 
   def protect_your_bike
-    @active_section = "about"
   end
 
   def stolen_bikes
-    @active_section = "resources"
   end
 
   def privacy
@@ -47,18 +39,24 @@ class InfoController < ApplicationController
   end
 
   def resources
-    @active_section = "resources"
   end
 
   def spokecard
-    @active_section = "resources"
     if current_user.present?
       @bikes = Bike.find(current_user.bikes)
     end
   end
 
-  def set_title
-    @title = action_name.titleize
+protected
+
+  def set_active_section
+    resources = ['serials', 'stolen_bikes', 'resources', 'spokecard', 'protect_your_bike']
+    if resources.include? action_name
+      @active_section = 'resources'
+    else
+      @active_section = 'about'
+    end
   end
+
 
 end

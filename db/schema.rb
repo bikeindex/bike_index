@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131205145316) do
+ActiveRecord::Schema.define(:version => 20140122181308) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -21,6 +21,7 @@ ActiveRecord::Schema.define(:version => 20131205145316) do
     t.datetime "created_at",      :null => false
     t.datetime "updated_at",      :null => false
     t.integer  "bike_token_id"
+    t.text     "bike_errors"
   end
 
   create_table "bike_token_invitations", :force => true do |t|
@@ -60,7 +61,6 @@ ActiveRecord::Schema.define(:version => 20131205145316) do
     t.datetime "created_at",                                  :null => false
     t.datetime "updated_at",                                  :null => false
     t.boolean  "stolen",                   :default => false, :null => false
-    t.string   "frame_material_other"
     t.string   "propulsion_type_other"
     t.string   "manufacturer_other"
     t.string   "zipcode"
@@ -69,7 +69,7 @@ ActiveRecord::Schema.define(:version => 20131205145316) do
     t.text     "owner_email"
     t.string   "thumb_path"
     t.text     "video_embed"
-    t.integer  "frame_manufacture_year"
+    t.integer  "year"
     t.boolean  "has_no_serial",            :default => false, :null => false
     t.integer  "creator_id"
     t.boolean  "created_with_token",       :default => false, :null => false
@@ -92,7 +92,15 @@ ActiveRecord::Schema.define(:version => 20131205145316) do
     t.boolean  "coaster_brake",            :default => false, :null => false
     t.string   "frame_size"
     t.string   "frame_size_unit"
-    t.string   "frame_paint_description"
+    t.string   "pdf"
+    t.integer  "card_id"
+    t.boolean  "recovered",                :default => false, :null => false
+    t.integer  "paint_id"
+    t.boolean  "registered_new"
+    t.boolean  "example",                  :default => false, :null => false
+    t.string   "creation_zipcode"
+    t.integer  "creation_country_id"
+    t.integer  "country_id"
     t.string   "serial_normalized"
   end
 
@@ -104,11 +112,13 @@ ActiveRecord::Schema.define(:version => 20131205145316) do
     t.text     "body"
     t.text     "body_abbr"
     t.integer  "user_id"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-    t.datetime "post_date"
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
+    t.datetime "published_at"
     t.string   "tags"
     t.boolean  "published"
+    t.string   "old_title_slug"
+    t.text     "description_abbr"
   end
 
   create_table "cgroups", :force => true do |t|
@@ -154,9 +164,9 @@ ActiveRecord::Schema.define(:version => 20131205145316) do
     t.string   "slug"
     t.string   "secondary_name"
     t.string   "image"
-    t.datetime "created_at",     :null => false
-    t.datetime "updated_at",     :null => false
-    t.boolean  "has_twin_part"
+    t.datetime "created_at",                        :null => false
+    t.datetime "updated_at",                        :null => false
+    t.boolean  "has_multiple",   :default => false, :null => false
     t.integer  "cgroup_id"
   end
 
@@ -172,8 +182,9 @@ ActiveRecord::Schema.define(:version => 20131205145316) do
     t.string   "email"
     t.string   "title"
     t.text     "body"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+    t.string   "feedback_type"
   end
 
   create_table "flavor_texts", :force => true do |t|
@@ -186,6 +197,7 @@ ActiveRecord::Schema.define(:version => 20131205145316) do
     t.string   "name"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+    t.string   "slug"
   end
 
   create_table "front_gear_types", :force => true do |t|
@@ -201,6 +213,7 @@ ActiveRecord::Schema.define(:version => 20131205145316) do
     t.string   "name"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+    t.string   "slug"
   end
 
   create_table "integrations", :force => true do |t|
@@ -216,7 +229,6 @@ ActiveRecord::Schema.define(:version => 20131205145316) do
     t.integer  "organization_id"
     t.string   "zipcode"
     t.string   "city"
-    t.string   "state"
     t.string   "street"
     t.string   "phone"
     t.string   "email"
@@ -227,7 +239,8 @@ ActiveRecord::Schema.define(:version => 20131205145316) do
     t.datetime "updated_at",                         :null => false
     t.datetime "deleted_at"
     t.boolean  "shown",           :default => false
-    t.integer  "us_state_id"
+    t.integer  "country_id"
+    t.integer  "state_id"
   end
 
   create_table "lock_types", :force => true do |t|
@@ -265,7 +278,7 @@ ActiveRecord::Schema.define(:version => 20131205145316) do
     t.text     "notes"
     t.integer  "open_year"
     t.integer  "close_year"
-    t.string   "logo_location"
+    t.string   "logo"
     t.text     "description"
   end
 
@@ -306,18 +319,20 @@ ActiveRecord::Schema.define(:version => 20131205145316) do
 
   create_table "organizations", :force => true do |t|
     t.string   "name"
-    t.string   "slug",                                          :null => false
+    t.string   "slug",                                           :null => false
     t.integer  "available_invitation_count", :default => 10
-    t.datetime "created_at",                                    :null => false
-    t.datetime "updated_at",                                    :null => false
+    t.datetime "created_at",                                     :null => false
+    t.datetime "updated_at",                                     :null => false
     t.string   "website"
     t.string   "short_name"
-    t.integer  "default_bike_token_count",   :default => 5,     :null => false
+    t.integer  "default_bike_token_count",   :default => 5,      :null => false
     t.boolean  "show_on_map"
     t.integer  "sent_invitation_count",      :default => 0
     t.datetime "deleted_at"
-    t.boolean  "is_suspended",               :default => false, :null => false
-    t.integer  "embedable_user_id"
+    t.boolean  "is_suspended",               :default => false,  :null => false
+    t.integer  "auto_user_id"
+    t.string   "org_type",                   :default => "shop", :null => false
+    t.string   "access_token"
   end
 
   add_index "organizations", ["slug"], :name => "index_organizations_on_slug", :unique => true
@@ -331,6 +346,15 @@ ActiveRecord::Schema.define(:version => 20131205145316) do
     t.integer  "creator_id"
     t.boolean  "current",     :default => false
     t.boolean  "claimed"
+    t.boolean  "example",     :default => false, :null => false
+  end
+
+  create_table "paints", :force => true do |t|
+    t.string   "name"
+    t.integer  "color_id"
+    t.integer  "manufacturer_id"
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
   end
 
   create_table "propulsion_types", :force => true do |t|
@@ -360,6 +384,14 @@ ActiveRecord::Schema.define(:version => 20131205145316) do
     t.boolean  "standard"
   end
 
+  create_table "states", :force => true do |t|
+    t.string   "name"
+    t.string   "abbreviation"
+    t.integer  "country_id"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+  end
+
   create_table "stolen_notifications", :force => true do |t|
     t.string   "subject"
     t.text     "message"
@@ -371,35 +403,30 @@ ActiveRecord::Schema.define(:version => 20131205145316) do
   end
 
   create_table "stolen_records", :force => true do |t|
-    t.integer  "zipcode"
+    t.string   "zipcode"
     t.string   "city"
-    t.string   "state"
     t.text     "theft_description"
     t.text     "time"
-    t.datetime "created_at",                                :null => false
-    t.datetime "updated_at",                                :null => false
+    t.datetime "created_at",                                 :null => false
+    t.datetime "updated_at",                                 :null => false
     t.integer  "bike_id"
-    t.boolean  "current",                 :default => true
+    t.boolean  "current",                  :default => true
     t.string   "street"
     t.float    "latitude"
     t.float    "longitude"
     t.datetime "date_stolen"
     t.string   "phone"
     t.boolean  "phone_for_everyone"
-    t.boolean  "phone_for_users",         :default => true
-    t.boolean  "phone_for_shops",         :default => true
-    t.boolean  "phone_for_police",        :default => true
+    t.boolean  "phone_for_users",          :default => true
+    t.boolean  "phone_for_shops",          :default => true
+    t.boolean  "phone_for_police",         :default => true
     t.string   "police_report_number"
     t.string   "locking_description"
     t.string   "lock_defeat_description"
     t.integer  "country_id"
-  end
-
-  create_table "us_states", :force => true do |t|
-    t.string   "name"
-    t.string   "abbreviation"
-    t.datetime "created_at",   :null => false
-    t.datetime "updated_at",   :null => false
+    t.string   "police_report_department"
+    t.integer  "state_id"
+    t.integer  "creation_organization_id"
   end
 
   create_table "users", :force => true do |t|

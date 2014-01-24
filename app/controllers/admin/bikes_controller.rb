@@ -2,7 +2,7 @@ class BikeNotSavedError < StandardError
 end
 
 class Admin::BikesController < Admin::BaseController
-  before_filter :find_bike, only: [:destroy, :update]
+  before_filter :find_bike, only: [:edit, :destroy, :update]
 
   def index
     @bikes = Bike.order("created_at desc")
@@ -24,12 +24,12 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def edit
-    bike = Bike.find(params[:id])
-    @bike = bike.decorate
+    @bike = @bike.decorate
   end
 
   def update
     BikeUpdator.new(user: current_user, b_params: params).update_ownership
+    @bike = @bike.decorate
     if @bike.update_attributes(params[:bike])
       SerialNormalizer.new({bike_id: @bike.id}).set_normalized
       redirect_to edit_admin_bike_url(@bike), notice: 'Bike was successfully updated.'
@@ -41,6 +41,6 @@ class Admin::BikesController < Admin::BaseController
   protected
 
   def find_bike
-    @bike = Bike.find(params[:id])
+    @bike = Bike.unscoped.find(params[:id])
   end
 end

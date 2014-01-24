@@ -4,6 +4,10 @@
 //
 //________________________
 
+.blog-index-head {
+  color: $grayMed;
+}
+
 .blog-header {
   h4 {
     
@@ -38,7 +42,7 @@
   }
 }
 
-
+#change_published_date { margin-left: .5em; }
 
 
 
@@ -71,7 +75,15 @@
 }
 
 .post-image {
-  width: 100%;
+  max-width: 100%;
+  max-height: 75%;
+  display: block;
+  margin: 0 auto;
+}
+
+.post-image-bordered {
+  @extend .post-image;
+  @include box-shadow(0 0 1px rgba(black,.4));
 }
 
 .blog-index .post-image { display: none; }
@@ -81,4 +93,10 @@
   font-size: 20px;
   margin-top: -.5em;
   margin-bottom: 1.5em;
+}
+
+.mike-stephen-otl {
+  float:left;
+  max-width: 40%;
+  margin: 0 1em 1em 0;
 }

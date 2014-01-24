@@ -71,14 +71,15 @@ describe BikeCreator do
       Bike.where(id: bike1.id).should be_empty
     end
 
-    it "should associate the b_param with the bike if the bike is created" do 
+    it "should associate the b_param with the bike and clear the bike_errors if the bike is created" do 
       b_param = BParam.new
       bike = Bike.new
       b_param.stub(:id).and_return(42)
       bike.stub(:id).and_return(69)
       bike.stub(:errors).and_return(nil)
-      b_param.should_receive(:update_attributes).with(created_bike_id: 69)
+      # b_param.should_receive(:update_attributes).with(created_bike_id: 69)
       SerialNormalizer.any_instance.should_receive(:set_normalized).and_return(true)
+      b_param.should_receive(:update_attributes).with(created_bike_id: 69, bike_errors: nil)
       BikeCreator.new(b_param).validate_record(bike)
     end
   end

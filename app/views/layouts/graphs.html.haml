@@ -1,0 +1,60 @@
+!!!
+%html
+  %head
+    = header_tags
+    = csrf_meta_tags
+    <link rel="shortcut icon" href="/fav.ico" />
+    = stylesheet_link_tag "application", :media => "all"
+    <link href='https://fonts.googleapis.com/css?family=Rambla:400' rel='stylesheet' type='text/css'>
+    = javascript_include_tag "application"
+    = javascript_include_tag "graphs"
+    <!-- Pulled from https://code.google.com/p/html5shiv/ -->
+    <!--[if lt IE 9]>
+    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lte IE 8]>
+    <meta http-equiv="refresh" content="0;url=https://www.bikeindex.org/update_browser" />
+    <![endif]-->
+
+%header.global-header.collapsible-head.invisibled#header
+  = render 'shared/header_nav'
+  
+%a#nav-header-collapse.expandable
+  %span.e +
+  %span.c -
+
+%header.replace-header
+  .inner-recep
+    %h2.new-title
+      = admin_nav_link "Go hard", admin_root_path
+    %ul
+      %li
+        = admin_nav_link "Organizations", admin_organizations_url
+
+      %li
+        = admin_nav_link "Users", admin_users_url
+
+      %li
+        = admin_nav_link "Memberships", admin_memberships_url
+
+      %li
+        = admin_nav_link "Manufacturers", admin_manufacturers_url
+
+      %li
+        = admin_nav_link "Bikes", admin_bikes_url
+
+      %li
+        = admin_nav_link "Invitations", admin_invitations_url
+
+      %li
+        = admin_nav_link "Blogs", admin_blogs_url
+
+
+
+%section.content#admin-content
+  .receptacle
+    .inner-recep
+
+      = yield
+  
+= render 'shared/footer'

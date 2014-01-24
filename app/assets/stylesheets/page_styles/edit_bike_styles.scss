@@ -303,7 +303,7 @@
   margin-top: .75em;
 }
 
-#police-report-check {
+.police-report-check {
   margin-top: .25em;
   label { 
     width: 100%;
@@ -317,9 +317,10 @@
 }
 
 .chosen-select .controls .select2-container,
-#stolen-bike-location .select2-container  { width: 210px;}
+#stolen-bike-location .select2-container,
+#normal-bike-location .select2-container  { width: 210px;}
 
-.other-value, .input-group .gear-info-fields {
+.other-value, .input-group .gear-info-fields  {
   display: none;
 }
 
@@ -335,27 +336,14 @@
   textarea, input, select { width: 100%; }
 }
 
-#edit-bike-form .initially-hidden.has-front-or-rear-boxes {
-  padding: 0;
+.has-position-select .groupedbtn-group { 
+  margin-top: 1em;
 }
 
-.has-front-or-rear-boxes {
-  .controls {
-    float: left;
-  }
-  .front-or-rear-part {
-    float: left;
-    color: $grayDark;
-    .checkbox {
-      float: left;
-      cursor: pointer;
-      margin-left: 10px;
-    }
-  }
+#has_multiples_parts {
+  display: block;
 }
 
-
-#twin_part_types { display: none; }
 
 #frame-sizer .groupedbtn-group .btn-group { display: inline-block; }
 
@@ -448,13 +436,20 @@
   }
 }
 
+@media (min-width: 640px) and (max-width: 770px) {
+  .has-position-select .controls {
+    float: left;
+    margin-left: 20px;
+    .groupedbtn-group { margin-top: -2px; }}
+}
+@media (min-width: 870px) {
+  .has-position-select .controls {
+    float: left;
+    margin-left: 20px;
+    .groupedbtn-group { margin-top: -2px; } }
+}
 
 @media (min-width: 479px) {
-  .has-front-or-rear-boxes {
-    .controls {
-      margin-left: 20px;
-    }
-  }
   .large-text {
     .control-label {
       width: 140px;

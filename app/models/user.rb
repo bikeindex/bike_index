@@ -28,7 +28,7 @@ class User < ActiveRecord::Base
   mount_uploader :avatar, AvatarUploader
 
   has_many :memberships, dependent: :destroy
-  has_many :organization_embeds, class_name: 'Organization', foreign_key: :embedable_user_id
+  has_many :organization_embeds, class_name: 'Organization', foreign_key: :auto_user_id
   has_many :organizations, through: :memberships
   has_many :ownerships, dependent: :destroy
   has_many :current_ownerships, class_name: 'Ownership', foreign_key: :user_id, conditions: {current: true}
@@ -49,7 +49,7 @@ class User < ActiveRecord::Base
 
   before_create :generate_username_and_confirmation
 
-  validates_uniqueness_of :username
+  validates_uniqueness_of :username, :case_sensitive => false
   def to_param
     username
   end
@@ -139,8 +139,17 @@ class User < ActiveRecord::Base
     self.memberships.any?
   end
 
+  def has_police_membership?
+    self.organizations.police.any?
+  end
+
+  def has_shop_membership?
+    self.organizations.shop.any?
+  end
+
   def bikes
-    ownerships = Ownership.where(user_id: self.id).where(current: true).pluck(:bike_id)
+    ownerships = Ownership.where(user_id: self.id)
+      .where(example: false).where(current: true).pluck(:bike_id)
   end
 
   def current_organization
@@ -163,9 +172,6 @@ class User < ActiveRecord::Base
 
   before_save :set_urls
   def set_urls
-    if self.twitter
-      self.twitter = Urlifyer.urlify(self.twitter)
-    end
     if self.website
       self.website = Urlifyer.urlify(self.website)
     end
@@ -174,6 +180,11 @@ class User < ActiveRecord::Base
   before_save :set_phone
   def set_phone
     self.phone = Phonifyer.phonify(self.phone) if self.phone 
+  end
+
+  before_save :slug_username
+  def slug_username
+    self.username = Slugifyer.slugify(self.username) if self.username
   end
 
   protected

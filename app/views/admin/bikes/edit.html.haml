@@ -73,6 +73,11 @@
       .controls
         = f.text_field :owner_email, :required =>true
 
+    .control-group
+      = f.label :card_id, "Spokecard id", class: "control-label"
+      .controls
+        = f.text_field :card_id
+
     .actions
       .control-group
         = submit_tag "Update the bike", class: "button-green"

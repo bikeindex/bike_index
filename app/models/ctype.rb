@@ -1,12 +1,13 @@
 class Ctype < ActiveRecord::Base
-  # Note: Ctype is short for component_type
+  # Note: Ctype is short for component_type.
+  # The name had to be shortened because of join table key length
   attr_accessible :name,
     :slug,
     :secondary_name,
     :image,
     :image_cache,
     :cgroup_id,
-    :has_twin_part,
+    :has_multiple,
     :cgroup_name
 
   attr_accessor :cgroup_name
@@ -44,7 +45,8 @@ class Ctype < ActiveRecord::Base
   def set_slug
     # We don't care about updating the slug, since this information will rarely
     # if ever change, and the slug can always stay the same.
-    self.slug = Slugifyer.slugify(self.name)
+    self.slug = self.name unless self.slug.present?
+    self.slug = Slugifyer.slugify(self.slug)
   end
 
 end

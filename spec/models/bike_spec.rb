@@ -14,6 +14,7 @@ describe Bike do
     it { should belong_to :front_gear_type }
     it { should belong_to :frame_material }
     it { should belong_to :propulsion_type }
+    it { should belong_to :paint }
     it { should belong_to :cycle_type }
     it { should belong_to :creator }
     it { should belong_to :creation_organization }
@@ -39,7 +40,7 @@ describe Bike do
 
   describe "scopes" do 
     it "default scopes to created_at desc" do 
-      Bike.scoped.to_sql.should == Bike.order("created_at desc").to_sql
+      Bike.scoped.to_sql.should == Bike.where(example: false).order("created_at desc").to_sql
     end
     it "scopes to only stolen bikes" do 
       Bike.stolen.to_sql.should == Bike.where(stolen: true).to_sql
@@ -183,6 +184,29 @@ describe Bike do
     end
   end
 
+  describe :set_paints do 
+    it "should set return true if paint is a color" do 
+      FactoryGirl.create(:color, name: "Bluety")
+      bike = Bike.new
+      bike.stub(:paint_name).and_return(" blueTy")
+      lambda { bike.set_paints }.should_not change(Paint, :count)
+      bike.paint.should be_nil
+    end
+    it "should set the paint if it exists" do 
+      FactoryGirl.create(:paint, name: "poopy pile")
+      bike = Bike.new
+      bike.stub(:paint_name).and_return("Poopy PILE  ")
+      lambda { bike.set_paints }.should_not change(Paint, :count)
+      bike.paint.name.should eq("poopy pile")
+    end
+    it "should create a new paint and set it otherwise" do 
+      bike = Bike.new
+      bike.stub(:paint_name).and_return("Food Time SOOON")
+      lambda { bike.set_paints }.should change(Paint, :count).by(1)
+      bike.paint.name.should eq("food time sooon")
+    end
+  end
+
   describe :cache_photo do 
     it "should cache the photo" do 
       bike = FactoryGirl.create(:bike)
@@ -196,6 +220,7 @@ describe Bike do
     it "should cache the components" do 
       bike = FactoryGirl.create(:bike)
       c = FactoryGirl.create(:component, bike: bike)
+      bike.save
       bike.components_cache_string.should eq("#{c.ctype.name} ")
     end
   end
@@ -229,7 +254,7 @@ describe Bike do
       material = FactoryGirl.create(:frame_material)
       propulsion = FactoryGirl.create(:propulsion_type, name: "Hand pedaled")
       b = FactoryGirl.create(:bike, cycle_type: type, propulsion_type_id: propulsion.id)
-      b.frame_manufacture_year = 1999
+      b.year = 1999
       b.frame_material_id = material.id
       b.secondary_frame_color_id = b.primary_frame_color_id
       b.tertiary_frame_color_id = b.primary_frame_color_id
@@ -243,4 +268,40 @@ describe Bike do
     end
   end
 
+
+  describe :frame_colors do 
+    it "should return an array of the frame colors" do 
+      bike = Bike.new 
+      color = Color.new
+      color2 = Color.new
+      color.stub(:name).and_return('Blue')
+      color2.stub(:name).and_return('Black')
+      bike.stub(:primary_frame_color).and_return(color)
+      bike.stub(:secondary_frame_color).and_return(color2)
+      bike.stub(:tertiary_frame_color).and_return(color)
+      bike.frame_colors.should eq(['Blue', 'Black', 'Blue'])
+    end
+  end
+
+  describe :cgroups do
+    it "should grab a list of all the cgroups" do 
+      # Sometime, need to get this to display stuff better.
+    end
+  end
+
+  # tests that belong in the controller
+  describe "retrieving pdf" do
+    it "should return a pdf from s3 if it exists already" do
+      #instantiate a model
+      #upload a dummy pdf
+      #request that model view's pdf
+      #confirm model object returned by controller is instantiated model
+    end
+    it "should call the service object for generating the pdf if it doesn't" do
+      #instantiate a model
+      #request that model view's pdf
+      #ensure that PdfServiceObject.new is called
+    end
+  end
+  
 end

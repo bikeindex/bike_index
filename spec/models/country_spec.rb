@@ -1,5 +1,19 @@
 require 'spec_helper'
 
 describe Country do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe :validations do 
+    it { should validate_presence_of :name }
+    it { should validate_uniqueness_of :iso }
+    it { should validate_uniqueness_of :iso }
+    it { should have_many :stolen_records }
+    it { should have_many :locations }
+  end
+
+
+  describe :fuzzy_iso_find do
+    it "should find users by email address when the case doesn't match" do
+      country = Country.create(name: "EEEEEEEh", iso: "LULZ" )
+      Country.fuzzy_iso_find('lulz ').should == country
+    end
+  end
 end

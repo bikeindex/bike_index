@@ -20,14 +20,13 @@ gem 'rdiscount'
 gem 'will_paginate', '~> 3.0'
 gem 'pg_search'
 gem 'nokogiri', '~> 1.6.0'
-gem 'carrierwave'
+gem 'carrierwave', '~> 0.9.0'
 gem 'rmagick'
 gem "mini_magick" # a smaller implementation of rmagick, required for rqrcode
 gem 'rqrcode-rails3'
 gem 'strong_parameters'
 gem 'libv8', '~> 3.16.14'
 gem 'rb-readline', '~> 0.4.2'
-gem 'airbrake'
 gem 'backbone-on-rails', "=0.9.10.0"
 gem 'stripe', :git => 'https://github.com/stripe/stripe-ruby'
 gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'
@@ -43,6 +42,10 @@ gem 'dumper'
 gem 'draper'
 # gem 'rack-mini-profiler' # I'm not actually doing anything useful with this and it's annoying.
 gem 'dotenv-rails', "~> 0.8", git: "https://github.com/bkeepers/dotenv"
+gem 'wkhtmltopdf-binary'
+gem 'wicked_pdf'
+gem 'sitemap_generator'
+gem 'whenever'
 
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'

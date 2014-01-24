@@ -5,6 +5,10 @@ describe StolenRecord do
   describe :validations do 
     it { should validate_presence_of :bike }
     it { should validate_presence_of :date_stolen }
+    it { should belong_to :bike }
+    it { should belong_to :country }
+    it { should belong_to :state }
+    it { should belong_to :creation_organization }
   end
 
   it "should mark current true by default" do 
@@ -17,8 +21,9 @@ describe StolenRecord do
   describe :address do 
     it "should create an address" do 
       c = Country.create(name: "Neverland", iso: "XXX")
-      stolen_record = FactoryGirl.create(:stolen_record, street: "2200 N Milwaukee Ave", city: "Chicago", state: "IL", zipcode: "60647", country_id: c.id)
-      stolen_record.address.should eq("2200 N Milwaukee Ave, Chicago, IL, 60647, Neverland")
+      s = State.create(country_id: c.id, name: "BullShit", abbreviation: "XXX")
+      stolen_record = FactoryGirl.create(:stolen_record, street: "2200 N Milwaukee Ave", city: "Chicago", state_id: s.id, zipcode: "60647", country_id: c.id)
+      stolen_record.address.should eq("2200 N Milwaukee Ave, Chicago, XXX, 60647, Neverland")
     end
   end
 

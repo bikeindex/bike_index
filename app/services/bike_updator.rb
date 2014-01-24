@@ -14,7 +14,7 @@ class BikeUpdator
 
   def find_bike
     begin
-    return Bike.find(@bike_params[:id])
+    return Bike.unscoped.find(@bike_params[:id])
     rescue
       raise BikeUpdatorError, "Oh no! We couldn't find that bike"
     end
@@ -49,19 +49,25 @@ class BikeUpdator
     @bike_params[:bike][:creation_organization_id] = @bike.creation_organization_id
     @bike_params[:bike][:creator] = @bike.creator
     @bike_params[:bike][:verified] = @bike.verified
+    @bike_params[:bike][:example] = @bike.example
+    # If the bike isn't verified, it can't be marked un-stolen
+    # nevermind - nothing's verified and we don't care right now.
+    # @bike_params[:bike][:stolen] = @bike.stolen unless @bike.verified?
+  end
 
-    # If the bike isn't verified, it can't be marked un-stolen :(
-    @bike_params[:bike][:stolen] = @bike.stolen unless @bike.verified?
+  def remove_blank_components
+    return false unless @bike.components.any?
+    @bike.components.each do |c|
+      c.destroy unless c.ctype.present? or c.description.present?
+    end
   end
 
   def update_available_attributes
     ensure_ownership!
     set_protected_attributes
     update_ownership
-    if @bike.update_attributes(@bike_params[:bike])
-      update_stolen_record
-    end
-
+    update_stolen_record if @bike.update_attributes(@bike_params[:bike])
+    remove_blank_components
     @bike
   end
 

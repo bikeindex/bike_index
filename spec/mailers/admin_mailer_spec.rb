@@ -9,9 +9,8 @@ describe AdminMailer do
     end
     it "renders email" do 
       @mail.subject.should eq("New Feedback Submitted")
-      @mail.body.encoded.should match("This is a test email.")
-      @mail.to.should eq(["admin@bikeindex.org"])
-      @mail.from.should eq(["administerer@bikeindex.org"])
+      @mail.to.should eq(["contact@bikeindex.org"])
+      @mail.from.should eq([@feedback.email])
     end
   end
 
@@ -22,7 +21,7 @@ describe AdminMailer do
     end
 
     it "renders email" do
-      @mail.to.should eq(['admin@bikeindex.org'])
+      @mail.to.should eq(['contact@bikeindex.org'])
       @mail.subject.should match("doesn't have any admins")
     end
   end

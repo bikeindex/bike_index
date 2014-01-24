@@ -1,3 +1,5 @@
-<p><%= @name %> says,<br><br></p>
+From: <%= @feedback.email %>
 
-<p><%= @body.html_safe %></p>
+<%= @feedback.name %> says,
+
+<%= @feedback.body.html_safe %>

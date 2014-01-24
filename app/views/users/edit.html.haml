@@ -1,4 +1,14 @@
 = form_for @user, :html => { class: "form-horizontal form user-settings", id: "edit-user-form" } do |f|
+  - if @user.errors.any?
+    #alert-block
+      .alert.alert-error
+        %h4
+          Please fix the following 
+          = pluralize(@user.errors.count, "error")
+        %ul
+          - @user.errors.full_messages.each do |msg|
+            %li
+              = msg
 
   %fieldset
     %legend
@@ -28,10 +38,10 @@
         %label.label-with-tip.control-label{ for: "user_zipcode" }
           %p
             Zipcode
-          %span.formtip
-            ?
-            %a.tooltip{ rel: "tooltip", :"data-placement" => "bottom", title: "If entered, closer bikes will appear first in search results." }
-              ?
+          / %span.formtip
+          /   ?
+          /   %a.tooltip{ rel: "tooltip", :"data-placement" => "bottom", title: "If entered, closer bikes will appear first in search results." }
+          /     ?
         .controls
           = f.text_field :zipcode, placeholder: "Default search location"
 
@@ -41,7 +51,6 @@
   %fieldset
     %legend
       Sharing settings
-  
     .control-group.sharing-collapser{ :data => {target: "#personal-page" } }
       %p
         The Bike Index can create a page listing all your bikes that includes all the information you want to share. It's your personal page.
@@ -57,12 +66,6 @@
           No, please don't create me a page
 
     #personal-page.collapse
-      .control-group
-        %label.control-label{ for: "title" }
-          Title for personal page
-        .controls
-          = f.text_field :title, placeholder: "This user's bikes"
-
       .control-group.avatar-upload
         %label.control-label
           Profile avatar
@@ -76,6 +79,10 @@
           = f.file_field :avatar
           = f.hidden_field :avatar_cache
 
+      %label.control-label{ for: "title" }
+        Title for personal page
+      .controls
+        = f.text_field :title, placeholder: "This user's bikes"
       .description
         %label.control-label{ for: 'description' }
           Enter some information about yourself if you'd like
@@ -97,11 +104,11 @@
     #twitter-field.collapse
       .control-group.controls-appended
         %label.control-label{ for: "user_twitter" }
-          Twitter Url
+          Twitter handle
         .controls.input-prepend
           %span.add-on
-            http&#58;&#47;&#47;
-          = f.text_field :twitter, placeholder: "Twitter url"
+            @
+          = f.text_field :twitter, placeholder: "Twitter handle"
 
     .control-group.sharing-collapser{ :data => {target: "#personal-field" } }
       %label.control-label
@@ -122,6 +129,14 @@
           %span.add-on
             http&#58;&#47;&#47;
           = f.text_field :website, placeholder: "Enter site url"
+    .control-group#username_ref
+      %p
+        Your username is the url for your sharing page and the bike embed form. Update it if you care about those things.
+      .padded
+        %label.control-label{ for: "username" }
+          Username
+        .controls
+          = f.text_field :username
 
 
     .control-group.actions

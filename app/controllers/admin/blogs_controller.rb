@@ -6,7 +6,7 @@ class Admin::BlogsController < Admin::BaseController
   end
 
   def new
-    @blog = Blog.new(post_date: Time.now, user_id: current_user.id)
+    @blog = Blog.new(published_at: Time.now, user_id: current_user.id)
     @users = User.all
   end
 
@@ -28,7 +28,7 @@ class Admin::BlogsController < Admin::BaseController
       title: params[:blog][:title],
       user_id: current_user.id,
       body: "No content yet, write some now!",
-      post_date: Time.now
+      published_at: Time.now
     })
     if @blog.save
       flash[:notice] = "Blog created!"

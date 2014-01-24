@@ -1,14 +1,16 @@
 class StolenRecord < ActiveRecord::Base
   attr_accessible :police_report_number,
+    :police_report_department,
     :locking_description,
     :lock_defeat_description,
     :date_stolen,
     :bike,
+    :creation_organization_id,
     :country_id,
+    :state_id,
     :street,
     :zipcode,
     :city,
-    :state,
     :latitude,
     :longitude,
     :theft_description,
@@ -21,6 +23,8 @@ class StolenRecord < ActiveRecord::Base
 
   belongs_to :bike
   belongs_to :country
+  belongs_to :state
+  belongs_to :creation_organization, class_name: "Organization"
 
   validates_presence_of :bike, :date_stolen
 
@@ -28,12 +32,14 @@ class StolenRecord < ActiveRecord::Base
 
   def address
     return nil unless self.country
-    [street, city, state, zipcode, country.name].compact.join(', ')
+    a = [street, city]
+    a << state.abbreviation if state.present?
+    (a+[zipcode, country.name]).compact.join(', ')
   end
 
   unless Rails.env.test?
     geocoded_by :address
-    after_validation :geocode, :if => lambda { self.city.present? && self.zipcode.present? && self.country.present? }
+    after_validation :geocode, :if => lambda { self.street.present? && self.city.present? && self.country.present? }
   end
 
   def self.locking_description_select

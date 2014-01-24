@@ -24,6 +24,7 @@ class OwnershipCreator
   end
 
   def send_notification_email(ownership)
+    return true if ownership.example
     Resque.enqueue(OwnershipInvitationEmailJob, ownership.id)
   end
 
@@ -38,6 +39,7 @@ class OwnershipCreator
       owner_email: find_owner_email,
       creator_id: creator_id,
       claimed: self_made?,
+      example: @bike.example,
       current: true
     }
     ownership
@@ -62,11 +64,12 @@ class OwnershipCreator
   def create_ownership
     mark_other_ownerships_not_current
     ownership = Ownership.new(new_ownership_params)
-    if ownership.save 
+
+    if ownership.save
       send_notification_email(ownership)
     else
       add_errors_to_bike(ownership)
-      raise OwnershipNotSavedError, "whoops, ownership wasn't saved"
+      raise OwnershipNotSavedError, "Ownership wasn't saved. Are you sure the bike was created?"
     end
   end
 

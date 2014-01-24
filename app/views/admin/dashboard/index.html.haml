@@ -1,0 +1,119 @@
+%section.full-screen-table
+  %h2
+    Recent
+    = link_to "Bikes", admin_bikes_url
+  %table.table.table-striped.table-bordered
+    = render partial: "/admin/bikes/admin_bikes_table"
+  %p.pull-right
+    #{Bike.count} bikes total
+    %em
+      (#{Bike.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
+
+%section.full-screen-table
+  %h2
+    Recent
+    = link_to "Users", admin_users_url
+  %table.table.table-striped.table-bordered
+    %thead
+      %th
+        Id&nbsp;
+      %th.medium-screens
+        Created
+      %th
+        Email
+      %th
+        Bikes
+      %th.medium-screens
+        Memberships
+      %th.large-screens
+        Tickets
+      %th.large-screens
+        Management links
+    %tbody
+      - @users.each do |user|
+        %tr
+          %td
+            = link_to user.id, edit_admin_user_url(user)
+          %td.medium-screens
+            - if user.created_at.today?
+              %span.hidden
+                = user.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Today at #{user.created_at.strftime("%-I %p")}
+            - elsif Date.yesterday().beginning_of_day() <= user.created_at
+              %span.hidden
+                = user.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Yesterday at #{user.created_at.strftime("%-I %p")}
+            - else
+              %span.hidden
+                = user.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              = user.created_at.strftime("%-m/%-d/%Y at %-I %p")
+          %td
+            = user.email
+          %td
+            = user.ownerships.count
+          %td.medium-screens
+            - if user.memberships.present?
+              - user.memberships.each do |membership|
+                = link_to "#{membership.organization.name} ", admin_membership_url(membership)
+          %td.large-screens
+            - if user.bike_tokens.count > 0
+              = user.bike_tokens.count
+          %td.large-screens
+            #{link_to 'Grant Bike Tokens', admin_user_bike_tokens_url(user.id)}
+  %p.pull-right
+    #{User.count} users total
+    %em
+      (#{User.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
+
+
+%section.full-screen-table
+  %header.with-subtitle
+    %h2
+      Flavor
+    .subtitle-form
+      = form_for [:admin, @flavor] do |f|
+        = f.text_field :message, placeholder: "FLAVOR!!!!!"
+        = f.submit "Add", class: "button-blue"
+
+  %table.table.table-striped.table-bordered
+    %thead
+      %th
+        Text
+      %th
+        Date Added
+      %th
+        &nbsp;
+
+
+    %tbody
+      - @flavors.each do |flavor|
+        %tr
+          %td
+            = flavor.message
+          %td
+            - if flavor.created_at.today?
+              %span.hidden
+                = flavor.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Today at #{flavor.created_at.strftime("%-I %p")}
+            - elsif Date.yesterday().beginning_of_day() <= flavor.created_at
+              %span.hidden
+                = flavor.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Yesterday at #{flavor.created_at.strftime("%-I %p")}
+            - else
+              %span.hidden
+                = flavor.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              = flavor.created_at.strftime("%-m/%-d/%Y at %-I %p")
+          %td
+            = link_to "delete", admin_flavor_text_url(flavor), method: :delete
+
+%ul.admin-adv-list
+  %li
+    = link_to "Maintenance", admin_maintenance_url
+  %li
+    = link_to "Graphs", admin_graphs_url
+  %li
+    = link_to "Failed bikes", admin_failed_bikes_url
+  %li
+    = link_to "Component types", admin_ctypes_url
+  %li
+    = link_to "Clear cache", admin_bust_z_cache_url

@@ -8,6 +8,7 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def show
     # @organizations = Organization.all
+    @organization = @organization.decorate
     @bikes = Bike.where(creation_organization_id: @organization.id)
   end
 
@@ -25,7 +26,7 @@ class Admin::OrganizationsController < Admin::BaseController
   end
 
   def edit
-    @embedable_email = @organization.embedable_user.email if @organization.embedable_user
+    @embedable_email = @organization.auto_user.email if @organization.auto_user
   end
 
   def update

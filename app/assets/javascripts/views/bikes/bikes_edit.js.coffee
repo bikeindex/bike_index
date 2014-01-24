@@ -8,17 +8,19 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     'click #edit-menu a': 'scrollToMenuTarget'
     'click .remove_fields': 'removeComponent'
     'click .add_fields': 'addComponent'
+    'click .has-position-select .groupedbtn-group': 'updatePartPosition'
     'change .part-type-select select': 'updatePartType'
     'change .component_model input': 'toggleExtraModelField'
     'change .drive-check': 'toggleDrivetrainChecks'
     'change #edit_drivetrain select': 'updateDrivetrainValue'
     'click #frame-sizer button': 'updateFrameSize'
+    'change #country_select_container select': 'updateCountry'
     
   initialize: ->
     @setElement($('#body'))
     menu_height = $('#edit-menu').offset().top 
     scroll_height = $(window).height() * .4
-    @setDefaultCountry()
+    @setDefaultCountryAndState()
     $('#body').attr('data-spy', "scroll").attr('data-target', '#edit-menu')
     $('#body').scrollspy(offset: - scroll_height)
     $('#clearing_span').css('height', $('#edit-menu').height() + 25)
@@ -100,12 +102,12 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     @setWheelDiam('rear')
     @showColors()
     @expandAdditionalBlockFromSelector('#bike_handlebar_type_id')
-    @expandAdditionalBlockFromSelector('#bike_frame_material_id')
-    @expandAdditionalBlockFromSelector('#bike_frame_material_id')
     @expandAdditionalBlockFromSelector('.component-mnfg-select select')
     @expandAdditionalBlockFromSelector('.part-type-select select')
     @setInitialGears()
     @setFrameSize()
+    # Also, this is easier for components - just show it if it's suppose to be
+    $('.add-component-fields .other_present').slideDown().addClass('unhidden')
 
 
   expandAdditionalBlock: (event) ->
@@ -217,16 +219,43 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
   markStolen: ->
     $('#bike_stolen').prop('checked', 'true')
 
-  setDefaultCountry: ->
+  setDefaultCountryAndState: ->
+    if $('#normal-bike-location .chosen-select select').val().length > 0
+      @setStolenCountry($('#normal-bike-location .chosen-select select').val())
+    else 
+      @grabCountryFromIP()
+
+  grabCountryFromIP: ->
+    view = @
+    $.ajax
+      type: "GET"
+      url: 'https://freegeoip.net/json/'
+      dataType: "jsonp",
+      success: (location) ->
+        select = $('#normal-bike-location .chosen-select select')
+        country_id = select.find("option").filter(->
+          $(this).text() is location.country_name
+        ).val()
+        select.val(country_id).change()
+        view.setStolenCountry(country_id)
+
+  setStolenCountry: (country_id) ->
     c_select = $('#country_select_container select')
     if c_select.length > 0
-      us_val = parseInt($('#country_select_container .other-value').text(), 10)
-      c_select.val(us_val).select2() unless c_select.val()
-      c_select.change ->
-        if c_select.val() == us_val
-          $('#state-select').slideDown()
-        else 
-          $('#state-select').slideUp()
+      if c_select.val().length > 0
+        @updateCountry()
+      else
+        c_select.val(country_id).change()
+        
+
+  updateCountry: ->
+    c_select = $('#country_select_container select')
+    us_val = parseInt($('#country_select_container .other-value').text(), 10)
+    if parseInt(c_select.val(), 10) == us_val
+      $('#state-select').slideDown()
+    else
+      $('#state-select').slideUp()
+      $('#state-select select').val('').change()
 
 
   removeComponent: (event) ->
@@ -235,34 +264,37 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     target.prev('input[type=hidden]').val('1')
     target.closest('fieldset').slideUp()
 
-  addComponent: ->
+  addComponent: (event) ->
     event.preventDefault()
     target = $('.add_fields')
     time = new Date().getTime()
     regexp = new RegExp(target.attr('data-id'), 'g')
     target.before(target.data('fields').replace(regexp, time))
-    $('.chosen-select select').select2()
+    $('.add-component-fields .chosen-select select').select2()
     # $('.input-group.add-additional .with-additional-block select').on 'change', @expandAdditionalBlock
 
 
   updatePartType: (event) ->
-    group = $(event.target).parents('.input-group')
-    twin_parts = $('#twin_part_types').text().replace(/^(\s*)|(\s*)$/g, '').split(',')
-    current_value = group.find('select').val()
-    # Check if the part is a twin part
-    is_twined = false
-    for twin_part in twin_parts
-      if twin_part == current_value
-        is_twined = true
-    # Show or hide it and mark values
-    if is_twined
-      # if group.find('.front-or-rear-part').hasClass('currently-hidden')
-      group.find('.front-or-rear-part input').prop('checked', 'true')
-      group.find('.front-or-rear-part').fadeIn('fast')
-      # group.find('.front-or-rear-part').removeClass('currently-hidden')
+    target = $(event.target)
+    value = parseInt(target.val(), 10)
+    ctypes_with_multiples = $('#has_multiples_parts').data('ids')
+    pos = $.inArray(value, ctypes_with_multiples)
+    p_selector = target.parents('.has-position-select').find('.groupedbtn-group')
+    p_selector.find('.active').removeClass('active')
+    if pos == -1
+      unless p_selector.hasClass('initially-hidden')
+        p_selector.fadeOut('fast').addClass('initially-hidden')
     else
-      group.find('.front-or-rear-part input').prop('checked', '')
-      group.find('.front-or-rear-part').fadeOut('fast')
+      p_selector.find('.ctype-position-both').addClass('active')
+      if p_selector.hasClass('initially-hidden')
+        p_selector.fadeIn('fast').removeClass('initially-hidden')
+    p_selector.find('.front-or-rear').val(p_selector.find('.active').attr('data-position'))
+
+
+  updatePartPosition: (event) ->
+    target = $(event.target)
+    component = target.parents('.has-position-select')
+    component.find('.front-or-rear').val(target.attr('data-position'))
 
   toggleExtraModelField: (event) ->
     target = $(event.target)
@@ -282,7 +314,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       $('#frame-sizer .hidden-other').slideDown().addClass('unhidden')
       $('#frame-sizer .groupedbtn-group').addClass('ex-size')
 
-  updateFrameSize: ->
+  updateFrameSize: (event) ->
     size = $(event.target).attr('data-size')
     hidden_other = $('#frame-sizer .hidden-other')
     if size == 'cm' or size == 'in'
@@ -335,7 +367,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       if v == 0
         $('#rear_gear_select_internal').prop('checked', true)
 
-  updateDrivetrainValue:  ->
+  updateDrivetrainValue: (event) ->
     position = $(event.target).attr('id')
     @setDrivetrainValue(position)
     

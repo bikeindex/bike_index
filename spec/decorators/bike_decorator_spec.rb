@@ -55,7 +55,7 @@ describe BikeDecorator do
   describe :title do 
     it "should return the major bike attribs formatted" do 
       bike = Bike.new
-      bike.stub(:frame_manufacture_year).and_return("1999")
+      bike.stub(:year).and_return("1999")
       bike.stub(:frame_model).and_return("model")
       decorator = BikeDecorator.new(bike)
       decorator.stub(:mnfg_name).and_return("foo")
@@ -87,15 +87,28 @@ describe BikeDecorator do
       BikeDecorator.new(bike).phoneable_by(user).should be_true
     end
 
-    it "should return true if shops can see it and user has membership" do 
+    it "should return true if shops can see it and user has shop membership" do 
       user = User.new
       bike = Bike.new 
       stolen_record = StolenRecord.new
-      user.stub(:has_membership?).and_return(true)
+      user.stub(:has_shop_membership?).and_return(true)
       bike.stub(:stolen).and_return(true)
       bike.stub(:current_stolen_record).and_return(stolen_record)
       stolen_record.stub(:phone_for_users).and_return(false)
       stolen_record.stub(:phone_for_shops).and_return(true)
+      BikeDecorator.new(bike).phoneable_by(user).should be_true
+    end
+
+    it "should return true if police can see it and user is police" do 
+      user = User.new
+      bike = Bike.new 
+      stolen_record = StolenRecord.new
+      user.stub(:has_police_membership?).and_return(true)
+      bike.stub(:stolen).and_return(true)
+      bike.stub(:current_stolen_record).and_return(stolen_record)
+      stolen_record.stub(:phone_for_users).and_return(false)
+      stolen_record.stub(:phone_for_shops).and_return(false)
+      stolen_record.stub(:phone_for_police).and_return(true)
       BikeDecorator.new(bike).phoneable_by(user).should be_true
     end
 
@@ -149,7 +162,7 @@ describe BikeDecorator do
       bike = Bike.new
       bike.stub(:thumb_path).and_return("pathy")
       decorator = BikeDecorator.new(bike)
-      decorator.stub(:title).and_return("Title")
+      decorator.stub(:title_string).and_return("Title")
       decorator.thumb_image.should eq("<img alt=\"Title\" src=\"/assets/pathy\" />")
     end
     it "should return the placeholder url otherwise" do 

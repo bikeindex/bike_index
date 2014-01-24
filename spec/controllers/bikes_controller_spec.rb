@@ -22,41 +22,74 @@ describe BikesController do
       it { should_not set_the_flash }
       it { assigns(:bike).should be_decorated }
     end
+
+    describe "showing example" do 
+      before do 
+        ownership = FactoryGirl.create(:ownership)
+        ownership.bike.update_attributes(example: true)
+        get :show, id: ownership.bike.id
+      end
+      it { should respond_with(:success) }
+      it { should render_template(:show) }
+    end
   end
 
   describe :spokecard do
-    it "shouldn't render the page if the bike isn't verified" do 
+    it "should render the page from bike id" do 
       bike = FactoryGirl.create(:bike)
       get :spokecard, id: bike.id
-      response.code.should eq('302')
+      response.code.should eq('200')
     end
-    it "should render the page" do 
-      bike = FactoryGirl.create(:bike, verified: true)
-      get :spokecard, id: bike.id
+  end
+
+  describe :scanned do 
+    it "should render the page from bike id" do 
+      bike = FactoryGirl.create(:bike)
+      get :scanned, id: bike.id
+      response.should redirect_to bike_url(bike)
+    end
+    it "should redirect to the proper page" do 
+      bike = FactoryGirl.create(:bike, card_id: 2)
+      get :scanned, card_id: bike.card_id
+      response.should redirect_to bike_url(bike)
+    end
+    it "should render a page if there isn't a connection" do 
+      get :scanned, card_id: 12
       response.code.should eq('200')
     end
   end
 
   describe :new do 
-    it "should redirect to new user if a user isn't present" do 
+    it "shouldn't redirect to new user if a user isn't present" do 
       get :new, stolen: true
-      response.should redirect_to new_user_url
+      response.code.should eq('200')
     end
 
     it "should render a new stolen bike" do 
       user = FactoryGirl.create(:user)
-      FactoryGirl.create(:cycle_type, name: "Bike")
+      FactoryGirl.create(:cycle_type, name: "Bike", slug: "bike")
       FactoryGirl.create(:propulsion_type, name: "Foot pedal")
       session[:user_id] = user.id
       get :new, { stolen: true }
       response.code.should eq('200')
+      assigns(:bike).stolen.should be_true
+    end
+
+    it "should render a new recovered bike" do 
+      user = FactoryGirl.create(:user)
+      FactoryGirl.create(:cycle_type, name: "Bike", slug: "bike")
+      FactoryGirl.create(:propulsion_type, name: "Foot pedal")
+      session[:user_id] = user.id
+      get :new, { recovered: true }
+      response.code.should eq('200')
+      assigns(:bike).recovered.should be_true
     end
 
     it "should render a new organization bike" do 
       user = FactoryGirl.create(:user)
       organization = FactoryGirl.create(:organization)
       membership = FactoryGirl.create(:membership, user: user, organization: organization)
-      FactoryGirl.create(:cycle_type, name: "Bike")
+      FactoryGirl.create(:cycle_type, name: "Bike", slug: "bike")
       FactoryGirl.create(:propulsion_type, name: "Foot pedal")
       session[:user_id] = user.id
       get :new
@@ -66,7 +99,7 @@ describe BikesController do
     it "should render a new bike_token bike" do 
       user = FactoryGirl.create(:user)
       bike_token = FactoryGirl.create(:bike_token, user: user)
-      FactoryGirl.create(:cycle_type, name: "Bike")
+      FactoryGirl.create(:cycle_type, name: "Bike", slug: "bike")
       FactoryGirl.create(:propulsion_type, name: "Foot pedal")
       session[:user_id] = user.id
       get :new, { bike_token_id: bike_token.id }
@@ -76,80 +109,113 @@ describe BikesController do
   
 
   describe :create do
-    before :each do
-      @user = FactoryGirl.create(:user)
-      @b_param = FactoryGirl.create(:b_param, creator: @user)
-      FactoryGirl.create(:cycle_type, name: "Bike")
-      FactoryGirl.create(:propulsion_type, name: "Foot pedal")
-      manufacturer = FactoryGirl.create(:manufacturer)
-      session[:user_id] = @user.id
-      @bike = { serial_number: "1234567890",
-        b_param_id: @b_param.id,
-        cycle_type_id: FactoryGirl.create(:cycle_type).id,
-        manufacturer_id: manufacturer.id,
-        rear_tire_narrow: "true",
-        rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
-        primary_frame_color_id: FactoryGirl.create(:color).id,
-        handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
-        owner_email: @user.email
-      }
-    end
+    describe "web interface submission" do 
+      before :each do
+        @user = FactoryGirl.create(:user)
+        @b_param = FactoryGirl.create(:b_param, creator: @user)
+        FactoryGirl.create(:cycle_type, name: "Bike", slug: "bike")
+        FactoryGirl.create(:propulsion_type, name: "Foot pedal")
+        manufacturer = FactoryGirl.create(:manufacturer)
+        session[:user_id] = @user.id
+        @bike = { serial_number: "1234567890",
+          b_param_id: @b_param.id,
+          cycle_type_id: FactoryGirl.create(:cycle_type).id,
+          manufacturer_id: manufacturer.id,
+          rear_tire_narrow: "true",
+          rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
+          primary_frame_color_id: FactoryGirl.create(:color).id,
+          handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
+          owner_email: @user.email
+        }
+      end
 
-    it "should render new if b_param isn't owned by user" do
-      user = FactoryGirl.create(:user)
-      session[:user_id] = user.id 
-      post :create, { bike: @bike }
-      # response.should render_template("new.html.haml")
-      flash[:error].should eq("Oops, that isn't your bike")
-    end
+      it "should render new if b_param isn't owned by user" do
+        user = FactoryGirl.create(:user)
+        session[:user_id] = user.id 
+        post :create, { bike: @bike }
+        # response.should render_template("new.html.haml")
+        flash[:error].should eq("Oops, that isn't your bike")
+      end
 
-    it "should render new if there is an error" do
-      bike = Bike.new(@bike)
-      bike.errors.add(:errory, "something")
-      BikeCreator.any_instance.should_receive(:create_bike).and_return(bike)
-      post :create, { bike: @bike }
-      response.should render_template("new")
-    end
+      it "should render new if there is an error and update the b_params" do
+        bike = Bike.new(@bike)
+        bike.errors.add(:errory, "something")
+        BikeCreator.any_instance.should_receive(:create_bike).and_return(bike)
+        post :create, { bike: @bike }
+        @b_param.reload.bike_errors.should_not be_nil
+        response.should render_template("new")
+      end
 
-    xit "should redirect to charges if payment is required" do
-      # DISABLE FOR NOW, we're not accepting any payments.
-      post :create, { bike: @bike }
-      response.should redirect_to(new_charges_url(b_param_id: @b_param.id))
+      xit "should redirect to charges if payment is required" do
+        # DISABLE FOR NOW, we're not accepting any payments.
+        post :create, { bike: @bike }
+        response.should redirect_to(new_charges_url(b_param_id: @b_param.id))
+      end
+      
+      it "should redirect to the created bike if it exists" do
+        bike = FactoryGirl.create(:bike)
+        @b_param.update_attributes(created_bike_id: bike.id)
+        post :create, {:bike => {b_param_id: @b_param.id}}
+        response.should redirect_to(edit_bike_url(bike))
+      end
+
+      it "should create a new stolen bike" do
+        @bike[:phone] = "312.379.9513"
+        lambda {
+          post :create, { stolen: "true", bike: @bike}
+        }.should change(StolenRecord, :count).by(1)
+        @b_param.reload.created_bike_id.should_not be_nil
+        @b_param.reload.bike_errors.should be_nil
+        @user.reload.phone.should eq("3123799513")
+      end
+
+      it "should update the bike token to be used when creating a bike token bike" do
+        bike_tokend = FactoryGirl.create(:bike_token, user: @user)
+        @bike[:bike_token_id] = bike_tokend.id 
+        lambda {
+          post :create, {bike: @bike}
+        }.should change(Ownership, :count).by(1)
+        bike_tokend.reload.used?.should be_true
+      end
+
+      it "should create a new ownership and bike from an organization" do
+        organization = FactoryGirl.create(:organization)
+        membership = FactoryGirl.create(:membership, user: @user, organization: organization)
+        @bike[:creation_organization_id] = organization.id
+        lambda { 
+          post :create, { bike: @bike}
+        }.should change(Ownership, :count).by(1)
+        Bike.last.creation_organization_id.should eq(organization.id)
+      end
     end
     
-    it "should redirect to the created bike if it exists" do
-      bike = FactoryGirl.create(:bike)
-      @b_param.update_attributes(created_bike_id: bike.id)
-      post :create, {:bike => {b_param_id: @b_param.id}}
-      response.should redirect_to(edit_bike_url(bike))
-    end
-
-    it "should create a new stolen bike" do
-      @bike[:phone] = "312.379.9513"
-      lambda {
-        post :create, { stolen: "true", bike: @bike}
-      }.should change(StolenRecord, :count).by(1)
-      @b_param.reload.created_bike_id.should_not be_nil
-      @user.reload.phone.should eq("3123799513")
-    end
-
-    it "should update the bike token to be used when creating a bike token bike" do
-      bike_tokend = FactoryGirl.create(:bike_token, user: @user)
-      @bike[:bike_token_id] = bike_tokend.id 
-      lambda {
-        post :create, {bike: @bike}
-      }.should change(Ownership, :count).by(1)
-      bike_tokend.reload.used?.should be_true
-    end
-
-    it "should create a new ownership and bike from an organization" do
-      organization = FactoryGirl.create(:organization)
-      membership = FactoryGirl.create(:membership, user: @user, organization: organization)
-      @bike[:creation_organization_id] = organization.id
-      lambda { 
-        post :create, { bike: @bike}
-      }.should change(Ownership, :count).by(1)
-      Bike.last.creation_organization_id.should eq(organization.id)
+    describe "embeded submission" do 
+      it "should create a new ownership and bike from an organization" do
+        organization = FactoryGirl.create(:organization)
+        user = FactoryGirl.create(:user)
+        FactoryGirl.create(:membership, user: user, organization: organization)
+        organization.save
+        FactoryGirl.create(:cycle_type, name: "Bike", slug: "bike")
+        FactoryGirl.create(:propulsion_type, name: "Foot pedal")
+        manufacturer = FactoryGirl.create(:manufacturer)
+        b_param = BParam.create(creator_id: organization.auto_user.id, params: {creation_organization_id: organization.id, embeded: true})
+        bike = { serial_number: "69",
+          b_param_id: b_param.id,
+          creation_organization_id: organization.id,
+          embeded: true,
+          cycle_type_id: FactoryGirl.create(:cycle_type).id,
+          manufacturer_id: manufacturer.id,
+          rear_tire_narrow: "true",
+          rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
+          primary_frame_color_id: FactoryGirl.create(:color).id,
+          handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
+          owner_email: "Flow@goodtimes.com"
+        }
+        lambda { 
+          post :create, { bike: bike}
+        }.should change(Ownership, :count).by(1)
+        Bike.last.creation_organization_id.should eq(organization.id)
+      end
     end
   end
 
@@ -201,12 +267,32 @@ describe BikesController do
       it { should redirect_to(bike_url) }
       it { should set_the_flash }
     end
+
+    it "should allow you to edit an example bike" do 
+      ownership = FactoryGirl.create(:ownership)
+      ownership.bike.update_attributes(example: true)
+      user = ownership.creator
+      session[:user_id] = user.id
+      put :update, {id: ownership.bike.id, :bike => {description: "69"}}
+      ownership.bike.reload.description.should eq("69")
+      response.should redirect_to bike_url(ownership.bike)
+    end
+
+    it "should redirect to edit if the bike has changed to be stolen" do 
+      ownership = FactoryGirl.create(:ownership)
+      session[:user_id] = ownership.creator.id
+      ownership.bike.update_attributes(verified: true)
+      put :update, {id: ownership.bike.id, :bike => {stolen: "1"}}
+      response.should redirect_to edit_bike_url(ownership.bike)
+    end
+    
     it "should update the bike when a user is present who is allowed to edit the bike" do 
       ownership = FactoryGirl.create(:ownership)
       user = ownership.creator
       session[:user_id] = user.id
       put :update, {id: ownership.bike.id, :bike => {description: "69"}}
       ownership.bike.reload.description.should eq("69")
+      response.should redirect_to bike_url(ownership.bike)
       assigns(:bike).should be_decorated
     end
 

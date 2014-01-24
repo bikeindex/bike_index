@@ -161,7 +161,7 @@ hr {
   }
    dd {
     font-weight: normal;
-    max-width: 460px;
+    // max-width: 460px;
     margin-bottom: 6px;
     textarea {width: 100%;}
     .highlight {
@@ -173,6 +173,13 @@ hr {
 }
 
 @media (min-width: 768px) {
+  .dl-wider-dt {
+    dt { width: 28%; }
+    dd { margin-left: 30%; }
+  }
+}
+
+@media (min-width: 768px) {
   .dl-holder {
     @include clearfix;
     position: relative;
@@ -180,13 +187,17 @@ hr {
       width: $sixColumn;
       float: left;
       margin-left: $gutterW;
+      &:nth-of-type(2n+1) {
+        margin-left: 0;
+        clear: left;
+      }
     }
     dl:first-of-type {
       margin-left: 0;
     }
     dd {
-      width: 70%;
       margin: 0 0 6px 0;
+      padding-left: 30%;
     }
     dt {
       width: 30%;
@@ -289,6 +300,19 @@ header.with-subtitle {
   }
 }
 
+@media (max-width: 800px) {
+  header.with-subtitle {
+    h1, h2, h3 { font-size: $standardFontSize * 2; }
+  }
+}
+
+
+@media (max-width: 650px) {
+  header.with-subtitle {
+    h1, h2, h3 { font-size: $standardFontSize * 1.5; }
+  }
+}
+
 
 .well-yellow {
   @include border-radius(2px);
@@ -311,9 +335,9 @@ header.with-subtitle {
   background: $stolenBackground;
 }
 
-.stolen-color {
-  color: $stolenColor;
-}
+.stolen-color { color: $stolenColor; }
+
+.recovered-color { color: $stolenColor; }
 
 .smaller-text {
   font-size: .8em;

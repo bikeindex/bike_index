@@ -7,8 +7,13 @@ class BikeCreatorAssociator
     OwnershipCreator.new(bike: bike, creator: @b_param.creator).create_ownership
   end
 
+  def create_components(bike)
+    ComponentCreator.new(bike: bike, b_param: @b_param).create_components_from_params
+  end
+
   def create_stolen_record(bike)
-    StolenRecordUpdator.new(bike: bike, user: @b_param.creator).create_new_record
+    StolenRecordUpdator.new(bike: bike, user: @b_param.creator, new_bike_b_param: @b_param).create_new_record
+    StolenRecordUpdator.new(bike: bike).set_creation_organization if bike.creation_organization.present?
   end
 
   def update_bike_token(bike)
@@ -30,9 +35,9 @@ class BikeCreatorAssociator
   def associate(bike)
     begin 
       create_ownership(bike)
+      create_components(bike)
       create_stolen_record(bike) if bike.stolen
       update_bike_token(bike) if bike.created_with_token
-      # pp bike
     rescue => e
       bike.errors.add(:association_error, e.message)
     end

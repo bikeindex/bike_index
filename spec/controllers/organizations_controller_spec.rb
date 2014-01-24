@@ -20,7 +20,6 @@ describe OrganizationsController do
       # pp assigns(:organization)
       @organization.reload.website.should eq('http://www.drseuss.org')
     end
-
   end
 
   describe :show do 
@@ -57,6 +56,20 @@ describe OrganizationsController do
       get :edit, id: organization.slug
       response.code.should eq("200")
     end
+  end
+
+  describe :embed do 
+    before do 
+      organization = FactoryGirl.create(:organization)
+      user = FactoryGirl.create(:user)
+      membership = FactoryGirl.create(:membership, user: user, organization: organization)
+      organization.save
+      FactoryGirl.create(:cycle_type, name: "Bike")
+      FactoryGirl.create(:propulsion_type, name: "Foot pedal")
+      get :embed, id: organization.slug
+    end
+    it { should respond_with(:success) }
+    it { should render_template(:embed) }
   end
 
 

@@ -2,7 +2,6 @@ class UsersController < ApplicationController
   before_filter :authenticate_user!, only: [:edit]
   
   def new
-    @title = "Signup"
     @user = User.new
     if current_user.present?
       flash[:notice] = "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
@@ -11,17 +10,20 @@ class UsersController < ApplicationController
   end
 
   def create
-    @title = "Signup"
     @user = User.new(params[:user])
     if @user.save
-      CreateUserJobs.new(user: @user).do_jobs  
+      CreateUserJobs.new(user: @user).do_jobs
+      if @user.confirmed
+        session[:user_id] = @user.id
+        session[:last_seen] = Time.now
+        redirect_to user_home_url, :notice => "Logged in!" and return
+      end
     else
       render action: :new
     end
   end
 
   def confirm
-    @title = "Confirm your account"
     begin
       @user = User.find(params[:id])
       if @user.confirmed?
@@ -40,16 +42,13 @@ class UsersController < ApplicationController
   end
 
   def request_password_reset
-    @title = "Forgotten password"
   end
 
   def update_password
-    @title = "Update password"
     @user = current_user
   end
 
   def password_reset
-    @title = "Password reset"
     if params[:token].present?
       @user = User.find_by_password_reset_token(params[:token])
       if @user.present?
@@ -92,7 +91,6 @@ class UsersController < ApplicationController
   end
 
   def edit
-    @title = "Edit profile"
     @user = current_user
   end
 
@@ -104,7 +102,7 @@ class UsersController < ApplicationController
         if params[:user][:terms_of_service] == '1'
           @user.terms_of_service = true
           @user.save
-          redirect_to user_home_url, notice: "Thanks! Now you can use Bike Index"
+          redirect_to user_home_url, notice: "Thanks! Now you can use the Bike Index"
         else
           redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index"
         end
@@ -120,19 +118,17 @@ class UsersController < ApplicationController
           # TODO: Redirect to the correct page, somehow this breaks things right now though.
           # redirect_to organization_home
         else
-          redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index as #{@user.memberships.first.organization.name}"
+          redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index as through the organization"
         end
       else
-        redirect_to user_home_url, notice: 'Your information was successfully updated.'
+        redirect_to my_account_url, notice: 'Your information was successfully updated.'
       end
     else
-      flash[:error] = "Sorry, there was a problem updating your information"
       render action: :edit
     end
   end
 
   def accept_terms
-    @title = "Bike Index terms"
     if current_user.present?
       @user = current_user
     else
@@ -141,7 +137,6 @@ class UsersController < ApplicationController
   end
 
   def accept_vendor_terms
-    @title = "Bike Index vendor terms"
     if current_user.present?
       @user = current_user
     else

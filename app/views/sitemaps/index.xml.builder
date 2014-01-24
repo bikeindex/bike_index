@@ -29,7 +29,7 @@ xml.urlset(xmlns: "http://www.sitemaps.org/schemas/sitemap/0.9") do
   @blogs.each do |blog|
     xml.url do
       xml.loc "#{root_url}blogs/#{blog.title_slug}"
-      xml.lastmod blog.post_date.strftime("%F")
+      xml.lastmod blog.published_at.strftime("%F")
       xml.changefreq("monthly")
     end
   end

@@ -9,10 +9,11 @@
   var markers = new Array();
   var map;
 
+
   function createMap(lat, lng, zoom) {
     
     var locations = [
-      <% @shops.all.each do |shop| %>
+      <% @bike_shops.each do |shop| %>
         <% shop.locations.each_with_index do |location, index| %>
           [
             "#shop<%= location.org_location_id %>",

@@ -2,3 +2,45 @@
   #{@organization.name} bikes
 
 = render partial: "/bikes/bike_org_table", :locals => {target: ""}
+
+.tutorials
+  %h3
+    Tutorials
+  %a{href: "http://youtu.be/o2qqHhTWhLQ"}
+    = image_tag("/assets/org_add_bike_screencast_screenshot.png")
+  %a{href: "http://youtu.be/rCj6Gkndm1k"}
+    = image_tag("/assets/org_manage_screencast_screenshot.png")
+
+%hr
+
+%h3
+  %a#show-developer-info{href: "#"}
+    View developer information
+
+#developer-info.initially-hidden
+  %h3
+    API Access
+  %p
+    Questions? View our #{link_to "API documentation", documentation_index_url}.
+
+
+  %dl.dl-horizontal.dl-wider-dt
+    %dt
+      Organization slug
+    %dd
+      = @organization.slug
+    %dt
+      API Access token
+    %dd
+      = @organization.access_token
+    %dt
+      API registration user
+    %dd
+      - if @organization.auto_user.present?
+        = @organization.auto_user.email
+      - else
+        %span
+          No user set!
+        Contact us at 
+        = link_to "support@bikeindex.org", "mailto:support@bikeindex.org"
+        to get set up for API access.

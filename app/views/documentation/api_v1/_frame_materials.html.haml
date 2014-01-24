@@ -1,0 +1,24 @@
+%p
+  %code
+    frame_material
+  is a bike attribute.
+
+%p
+  We offer these types of materials because we believe they cover all the possibilities. Please #{link_to "send us an email", "mailto:support@bikeindex.org"} if you think we're missing something!
+
+%article.code
+  %p.code-label
+    GET all frame materials
+  - request_url = api_v1_frame_materials_url
+  %pre
+    :plain
+      $.ajax({
+        type: "GET",
+        url: "#{request_url}",
+        success: function(data, textStatus, jqXHR) {
+          $('#frame_materials_index').text(JSON.stringify(data,undefined,2))
+        }
+      });
+  %p.code-label Response
+  %pre#frame_materials_index{ data: {url: request_url }}
+    :plain

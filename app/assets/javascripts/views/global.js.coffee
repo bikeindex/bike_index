@@ -12,6 +12,8 @@ class BikeIndex.Views.Global extends Backbone.View
     BikeIndex.hideFlash()
     @setElement($('#body'))
     @loadChosen() if $('#chosen-container').length > 0
+    if $('#what-spokecards-are').length > 0
+      $('.spokecard-extension').addClass('on-spokecard-page')
     
 
   loadUserHeader: ->
@@ -135,16 +137,7 @@ class BikeIndex.Views.Global extends Backbone.View
   expandSearch: ->
     unless $('#total-top-header').hasClass('search-expanded')
       BikeIndex.initializeHeaderSearch()
-      $('#header-search .stolenness input').prop('checked', true)
       $('#header-search .chosen-container input[type="text"]').css("width","100%")
       $('#header-search .optional-fields').hide()
       $('#total-top-header').addClass('search-expanded')
       $('#header-search .optional-fields').fadeIn()
-
-  # collapseSearch: ->
-    # having issues with the collapse
-    # unless $('#bikes-search').length > 0
-    #   if $('#header-search #query').val() == ""
-    #     unless $('#header-search select').first().val()?
-    #       unless $('#header-search select').last().val()?
-    #         $('#total-top-header').removeClass('search-expanded')

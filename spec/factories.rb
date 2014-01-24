@@ -47,6 +47,7 @@ FactoryGirl.define do
 
   factory :cycle_type do 
     name { FactoryGirl.generate(:unique_name) }
+    slug { FactoryGirl.generate(:unique_name) }
   end
 
   factory :manufacturer do
@@ -56,6 +57,7 @@ FactoryGirl.define do
 
   factory :frame_material do 
     name { FactoryGirl.generate(:unique_name) }
+    slug { FactoryGirl.generate(:unique_name) }
   end
 
   factory :propulsion_type do 
@@ -71,11 +73,16 @@ FactoryGirl.define do
 
   factory :handlebar_type do
     name { FactoryGirl.generate(:unique_name) }
+    slug { FactoryGirl.generate(:unique_name) }
   end
 
   factory :color do 
     name { FactoryGirl.generate(:unique_name) }
     priority 1
+  end
+
+  factory :paint do 
+    name { FactoryGirl.generate(:unique_name) }
   end
 
   factory :b_param do 
@@ -129,10 +136,22 @@ FactoryGirl.define do
   factory :location do 
     name 
     association :organization
+    association :country
+    association :state
     zipcode '60647'
     city 'Chicago'
-    state 'IL'
     street 'foo address'
+  end
+
+  factory :country do 
+    name 
+    sequence(:iso) {|n| "D#{n}"}
+  end
+
+  factory :state do 
+    name 
+    association :country
+    sequence(:abbreviation) {|n| "Q#{n}"}
   end
 
   factory :lock_type do 

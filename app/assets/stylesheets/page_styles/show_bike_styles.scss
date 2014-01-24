@@ -147,7 +147,7 @@ header.single-bike {
       text-shadow: 0 0 100px rgba(black,.2);
     }
     .dl-horizontal {
-      width: 50%;
+      width: 49%;
       float: left;
     }
   }
@@ -169,6 +169,16 @@ header.single-bike {
   }
 }
 
+.printable-registration {
+  display: block;
+  margin-top: 40px;
+}
+
+@media (min-width: 900px) {
+  .printable-registration {
+    margin-top: 80px;
+  }
+}
 
 // .bike-boxes {
 //   list-style-type: none;

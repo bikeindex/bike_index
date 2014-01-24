@@ -3,6 +3,7 @@ class BikeIndex.Views.AdminOrganizationsEdit extends Backbone.View
   initialize: ->
     @setElement($('#body'))
     @adminLocations()
+    $('.chosen-select select').select2()
     
   adminLocations: ->
     $('form').on 'click', '.remove_fields', (event) ->
@@ -14,4 +15,8 @@ class BikeIndex.Views.AdminOrganizationsEdit extends Backbone.View
       regexp = new RegExp($(this).data('id'), 'g')
       $(this).before($(this).data('fields').replace(regexp, time))
       event.preventDefault()
+      us_val = parseInt($('#us-country-code').text(), 10)
+      console.log($(this).closest('fieldset').find('.country_select_container select'))
+      $(this).closest('fieldset').find('.country_select_container select').val(us_val)
       $('.chosen-select select').select2()
+      
