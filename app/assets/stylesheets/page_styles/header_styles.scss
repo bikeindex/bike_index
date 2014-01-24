@@ -103,7 +103,7 @@
   position: absolute;
   right: 0; top: 3.4em;
   width: $eightColumn - $gutterW;
-  .manufacturers select, .bike-attributes select {
+  .manufacturers select, .bike-attributes input {
     width: 100%;
   }
   .stolenness {

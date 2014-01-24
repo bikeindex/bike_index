@@ -8,32 +8,8 @@
   
   <div class="optional-fields">
     <div class="bike-attributes">
-      <input name="find_bike_attributes[ids][]" type="hidden" value="" /><select data-placeholder="Enter attributes" id="find_bike_attributes_ids" multiple="multiple" name="find_bike_attributes[ids][]"><option value=""></option>
-        <optgroup label="Frame colors">
-          <% Color.unscoped.commonness.each do |attribute| %>
-            <option value="<%= attribute.priority %>c<%= attribute.id %>"><%= attribute.name %></option>
-          <% end %>
-        </optgroup>
-        <optgroup label="Handlebar types">
-          <% HandlebarType.all.each do |attribute| %>
-            <option value="h<%= attribute.id %>"><%= attribute.name %> bars</option>
-          <% end %>
-        </optgroup>
-        <optgroup label="Frame Materials">
-          <% FrameMaterial.all.each do |attribute| %>
-            <option value="h<%= attribute.id %>"><%= attribute.name %> bars</option>
-          <% end %>
-        </optgroup>
-        <optgroup label="Wheel Sizes">
-          <% WheelSize.unscoped.commonness.each do |attribute| %>
-            <option value="<%= attribute.priority %>w<%= attribute.id %>"><%= attribute.name %></option>
-          <% end %>
-        </optgroup>
-        <optgroup label="Manufacturers">
-          <% Manufacturer.all.each do |attribute| %>
-            <option value="m_<%= attribute.slug %>"><%= attribute.name %></option>
-          <% end %>
-        </optgroup>
+      <input id="find_bike_attributes_ids" placeholder="Serial number" type="text">
+      <!-- <input name="find_bike_attributes[ids][]" type="hidden" value="" /><select data-placeholder="Enter attributes" id="find_bike_attributes_ids" name="find_bike_attributes[ids][]"><option value=""></option> -->
       </select>
     </div>
 
