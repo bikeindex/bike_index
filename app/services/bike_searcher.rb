@@ -51,6 +51,13 @@ class BikeSearcher
     end
     @bikes
   end
+
+  def matching_serial
+    if @params[:serial].present?
+      @bikes = SerialNormalizer.new(serial: @params[:serial]).search
+    end
+    @bikes
+  end
   
   def matching_updated_since(bikes)
     if @params[:updated_since]
@@ -61,10 +68,11 @@ class BikeSearcher
   end
 
   def find_bikes
-    matching_updated_since(@bikes)
+    matching_serial
+    # matching_updated_since(@bikes)
     matching_stolenness(@bikes)
-    matching_manufacturers(@bikes)
-    matching_attr_cache(@bikes)
+    # matching_manufacturers(@bikes)
+    # matching_attr_cache(@bikes)
     matching_query(@bikes)
     @bikes
   end

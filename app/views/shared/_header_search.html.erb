@@ -5,22 +5,22 @@
     :data => { url: search_tags_api_v1_bikes_url },
     class: "search-text-field"
   %>
+  <div class="search-button">
+    <%= submit_tag "Search", name: "search", class: "button-blue" %>
+  </div>
   
   <div class="optional-fields">
-    <div class="bike-attributes">
-      <input id="find_bike_attributes_ids" placeholder="Serial number" type="text">
+    <div class="additional-fields">
+      <%= text_field_tag :serial, params[:serial], placeholder: 'Serial number' %>
+      <!-- <input id="serial_number" placeholder="Serial number" type="text"> -->
       <!-- <input name="find_bike_attributes[ids][]" type="hidden" value="" /><select data-placeholder="Enter attributes" id="find_bike_attributes_ids" name="find_bike_attributes[ids][]"><option value=""></option> -->
       </select>
     </div>
 
     <div class="stolenness">
       <label for: "stolen">
-        <%= check_box_tag :stolen, params[:stolen], value: 1 %>
-        stolen
-      </label>
-      <label for="non_stolen">
-        <%= check_box_tag :non_stolen, params[:non_stolen], value: 1 %>
-        non-stolen
+        <%= check_box_tag :stolen, params[:stolen] %>
+        Only stolen
       </label>
     </div>
   </div>

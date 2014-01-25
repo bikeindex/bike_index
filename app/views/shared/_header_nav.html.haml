@@ -1,5 +1,5 @@
 .top-header#total-top-header{:data => {domain: Rails.env}}
-  %span.background-extend
+  / %span.background-extend
   .receptacle
     .inner-recep
       %a.follow-link.logo{ href: root_url }
@@ -41,11 +41,8 @@
           #signup.tab-pane.login-header.no_user.hidden
             = render 'sessions/form'
 
-
-
-      %span.search-background
       = form_tag bikes_path, method: :get, id: "head-search-bikes" do 
         .search-fields#header-search
+          %span.search-background
           = render "/shared/header_search"
-          .search-button
-            = submit_tag "Search", name: "search", class: "button-blue"
+          

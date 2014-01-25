@@ -10,7 +10,7 @@ module Api
         Color.unscoped.commonness.each { |i| tags << i.name }
         HandlebarType.all.each { |i| tags << i.name }
         FrameMaterial.all.each  { |i| tags << i.name }
-        WheelSize.unscoped.commonness.each { |i| tags << i.name }
+        WheelSize.unscoped.commonness.each { |i| tags << "#{i.name} wheel" }
         Manufacturer.all.each { |i| tags << i.name }
         respond_with tags, root: 'tags'
       end

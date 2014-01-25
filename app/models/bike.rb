@@ -227,7 +227,7 @@ class Bike < ActiveRecord::Base
     ca << "#{tertiary_frame_color.priority}c#{tertiary_frame_color_id}" if tertiary_frame_color_id
     ca << "h#{handlebar_type_id}" if handlebar_type
     ca << "#{rear_wheel_size.priority}w#{rear_wheel_size_id}" if rear_wheel_size_id
-    ca << "#{front_wheel_size.priority}w#{front_wheel_size_id}" if front_wheel_size_id
+    ca << "#{front_wheel_size.priority}w#{front_wheel_size_id}" if front_wheel_size_id && front_wheel_size != rear_wheel_size
     self.cached_attributes = ca 
   end
 
@@ -236,6 +236,7 @@ class Bike < ActiveRecord::Base
     cache_photo
     cache_attributes
     c = ""
+    c += "#{manufacturer_name} "
     c += "#{propulsion_type.name} " unless propulsion_type.name == "Foot pedal"
     c += "#{year} " if year
     c += "#{primary_frame_color.name} " if primary_frame_color
@@ -244,7 +245,8 @@ class Bike < ActiveRecord::Base
     c += "#{frame_material.name} " if frame_material
     c += "#{frame_size} #{frame_size_unit} " if frame_size
     c += "#{frame_model} " if frame_model
-    c += "#{manufacturer_name} "
+    c += "#{rear_wheel_size.name} wheel "
+    c += "#{front_wheel_size.name} wheel " if front_wheel_size && front_wheel_size != rear_wheel_size
     c += "#{additional_registration} "
     c += "#{type} " unless self.type == "bike"
     c += components_cache_string if components_cache_string
