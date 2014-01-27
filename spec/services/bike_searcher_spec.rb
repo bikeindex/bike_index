@@ -5,11 +5,20 @@ describe BikeSearcher do
   describe :find_bikes do 
     it "should call select manufacturers, attributes, stolen and query" do 
       search = BikeSearcher.new
+      search.should_receive(:matching_serial).and_return(true)
       search.should_receive(:matching_stolenness).and_return(true)
-      search.should_receive(:matching_manufacturers).and_return(true)
-      search.should_receive(:matching_attr_cache).and_return(true)
+      # search.should_receive(:matching_manufacturers).and_return(true)
+      # search.should_receive(:matching_attr_cache).and_return(true)
       search.should_receive(:matching_query).and_return(true)
       search.find_bikes
+    end
+  end
+
+  describe :matching_serial do 
+    it "should call serial_search on serial_normalizer" do 
+      search = BikeSearcher.new(serial: "stuff")
+      SerialNormalizer.any_instance.should_receive(:search)
+      search.matching_serial
     end
   end
 

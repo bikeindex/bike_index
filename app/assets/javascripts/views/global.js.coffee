@@ -14,7 +14,7 @@ class BikeIndex.Views.Global extends Backbone.View
     @loadChosen() if $('#chosen-container').length > 0
     if $('#what-spokecards-are').length > 0
       $('.spokecard-extension').addClass('on-spokecard-page')
-    
+    @initializeHeaderSearch()
 
   loadUserHeader: ->
     # This is now minified and inlined in the header, to make it load more
@@ -82,37 +82,51 @@ class BikeIndex.Views.Global extends Backbone.View
 
   loadChosen: ->
     $('.chosen-select select').select2()
+
+  initializeHeaderSearch: ->
+    v = @
+    $.ajax
+      type: "GET"
+      url: $("#head-search-bikes #query").attr('data-url')
+      success: (data, textStatus, jqXHR) ->
+        v.setSearchfantasy(data.tags)
+
+  setSearchfantasy: (tags) ->
+    $('#head-search-bikes #query').select2
+      tags: tags
+      openOnEnter: false
+      # matcher: (term, text) ->
+      #   text.toUpperCase().indexOf(term.toUpperCase()) >= 0
+      tokenSeparators: [","]
   
   toggleCollapsibleHeader: ->
-    # $('#header-tabs').css('min-height', '50px')
+    # This is for the content pages where the search header is hidden
     $('#total-top-header').find('.search-background').toggleClass('show')
     $('#total-top-header').find('.background-extend').toggleClass('show')
     $('#total-top-header').find('.search-fields').toggleClass('show')
     $('#total-top-header').find('.global-tabs').toggleClass('show')
     $('#header').toggleClass('invisibled')
     $('#nav-header-collapse').toggleClass('expandable')
+    # $('#header-tabs').css('min-height', '50px')
     # $('#header-tabs').collapse('toggle')
     # $('#header-tabs').css('height', 'auto')
-    
     if $('#content-wrap').length > 0
       $('#content-wrap').toggleClass('header-closed')
 
   expandHeaderTab:(event) ->
     event.preventDefault()
     target = $(event.target)
-
     if target.parents('li').hasClass('active')
       $('#header-tabs .global-tabs li').removeClass('active')
       $('#header-tabs').removeClass('visibled')
-    else
+      $('#total-top-header').removeClass('header-tabs-in')
+    else 
+      $('#total-top-header').addClass('header-tabs-in')
       if $('#header-tabs .tab-content').hasClass('visibled') 
         target.tab('show')
       else
         $('#header-tabs').addClass('visibled')
         target.tab('show')
-      # Added this because sometimes the settings image makes things break.
-      if target.parents('li').hasClass('settings')
-        target.parents('li').find('a').tab('show')
 
   scrollToFootnote: (event) ->
     event.preventDefault()
@@ -136,8 +150,7 @@ class BikeIndex.Views.Global extends Backbone.View
 
   expandSearch: ->
     unless $('#total-top-header').hasClass('search-expanded')
-      BikeIndex.initializeHeaderSearch()
-      $('#header-search .chosen-container input[type="text"]').css("width","100%")
-      $('#header-search .optional-fields').hide()
-      $('#total-top-header').addClass('search-expanded')
+      # $('#header-search .chosen-container input[type="text"]').css("width","100%")
+      # $('#header-search .optional-fields').hide()
+      # $('#total-top-header').addClass('search-expanded')
       $('#header-search .optional-fields').fadeIn()

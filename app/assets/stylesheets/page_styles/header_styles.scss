@@ -38,7 +38,6 @@
     display: block;
     position: absolute;
     right: 0;
-    height: 4em;
     width: $eightColumn;
     background: $searchBackground;
     border: 1px solid $searchBorder;
@@ -77,40 +76,25 @@
       margin-top: 1px;
     }
   }
-  .background-extend {
-    display: block;
-    position: absolute;
-    right: 0;
-    width: 40%;
-    height: 4em;
-    z-index: 0;
-    background: $searchBackground;
-    border: 1px solid $searchBorder;
-    border-right: none;
-    border-left: none;
-  }
 }
 
 .top-header.search-expanded {
   padding-bottom: 2em;
   .optional-fields { display: block; }
-  .search-background, .background-extend { height: 6em; }
-  .search-background { bottom: -2em; }
 }
 
 .optional-fields {
   display: none;
-  position: absolute;
-  right: 0; top: 3.4em;
   width: $eightColumn - $gutterW;
-  .manufacturers select, .bike-attributes select {
+  .additional-fields input {
     width: 100%;
+    margin-bottom: 0;
   }
   .stolenness {
     position: absolute;
     right: 0; top: 0;
     width: 23.4%;
-    input { margin: 2px 5px 0 0; }
+    input { margin: -2px 5px 0 0; }
     label { margin: 0; }
   }
 }
@@ -118,28 +102,28 @@
 @media (max-width: 600px) {
   .optional-fields {
     width: 100%;
-    .bike-attributes { width: 66%; }
+    .additional-fields { width: 66%; }
     .stolenness { width: 32%; }
   }
 }
 
 @media (min-width: 601px) and (max-width: 1000px) {
   .optional-fields {
-    .bike-attributes { width: 73.3%; }
+    .additional-fields { width: 73.3%; }
   }
 }
 
 @media (min-width: 1001px) {
   .optional-fields {
-    .bike-attributes {
+    .additional-fields {
       width: 73.4%;
     }
     .stolenness {
-      input { margin-right: 2px; }
+      // input { margin-right: 2px; }
       label {
         display: inline-block;
-        margin: .3em 0 0 0;
-        &:last-of-type { margin-left: 10px; }
+        // margin: .3em 0 0 0;
+        // &:last-of-type { margin-left: 10px; }
       }
     }
   }

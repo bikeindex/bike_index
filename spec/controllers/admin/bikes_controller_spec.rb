@@ -56,6 +56,14 @@ describe Admin::BikesController do
       put :update, id: bike.id
     end
 
+    it "should call serial_normalizer" do
+      SerialNormalizer.any_instance.should_receive(:set_normalized)
+      bike = FactoryGirl.create(:bike)
+      user = FactoryGirl.create(:user, superuser: true)
+      set_current_user(user)
+      put :update, id: bike.id
+    end
+
     describe "failure" do 
       before do 
         bike = FactoryGirl.create(:bike)
