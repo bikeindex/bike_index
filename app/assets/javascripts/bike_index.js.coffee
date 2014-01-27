@@ -56,7 +56,7 @@ $(document).ready ->
   else if $('#organization-content').length > 0
     view = new BikeIndex.Views.OrganizationsShow
 
-  else if $('#user-bikes-table').length > 0
+  else if $('#user-home-page').length > 0
     view = new BikeIndex.Views.DataTables
   
   else if $('#edit-bike-form').length > 0

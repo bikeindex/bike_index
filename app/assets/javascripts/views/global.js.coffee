@@ -150,7 +150,4 @@ class BikeIndex.Views.Global extends Backbone.View
 
   expandSearch: ->
     unless $('#total-top-header').hasClass('search-expanded')
-      # $('#header-search .chosen-container input[type="text"]').css("width","100%")
-      # $('#header-search .optional-fields').hide()
-      # $('#total-top-header').addClass('search-expanded')
       $('#header-search .optional-fields').fadeIn()

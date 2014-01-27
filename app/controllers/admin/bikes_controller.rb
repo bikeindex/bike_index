@@ -5,7 +5,12 @@ class Admin::BikesController < Admin::BaseController
   before_filter :find_bike, only: [:edit, :destroy, :update]
 
   def index
-    @bikes = Bike.order("created_at desc")
+    if params[:email]
+      user = User.fuzzy_email_find(params[:email])
+      @bikes = Bike.find(user.bikes) if user.present?
+    else 
+      @bikes = Bike.limit(100)
+    end
   end
 
   def duplicates
