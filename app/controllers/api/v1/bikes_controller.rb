@@ -4,7 +4,7 @@ module Api
       before_filter :cors_preflight_check
       before_filter :authenticate_organization, only: [:create]
       after_filter :cors_set_access_control_headers
-      caches_page :index
+      caches_action :search_tags
 
       def search_tags
         tags = []
