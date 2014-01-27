@@ -95,8 +95,8 @@ class BikeIndex.Views.Global extends Backbone.View
     $('#head-search-bikes #query').select2
       tags: tags
       openOnEnter: false
-      matcher: (term, text) ->
-        text.toUpperCase().indexOf(term.toUpperCase()) >= 0
+      # matcher: (term, text) ->
+      #   text.toUpperCase().indexOf(term.toUpperCase()) >= 0
       tokenSeparators: [","]
   
   toggleCollapsibleHeader: ->
