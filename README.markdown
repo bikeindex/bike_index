@@ -1,4 +1,4 @@
-# ![BIKE INDEX](https://github.com/bikeindex/webapp/blob/master/bike_index.png?raw=true) This is the [Bike Index](https://www.bikeindex.org) [![Build Status](https://secure.travis-ci.org/bikeindex/bike_index.png)](http://travis-ci.org/bikeindex/bike_index)
+# ![BIKE INDEX](https://github.com/bikeindex/bike_index/blob/master/bike_index.png?raw=true) This is the [Bike Index](https://www.bikeindex.org) [![Build Status](https://secure.travis-ci.org/bikeindex/bike_index.png)](http://travis-ci.org/bikeindex/bike_index)
 
 The Bike Index is a national bike registry that fights theft by working with shops and advocacy organizations to register bikes for free quickly and easily.
 
