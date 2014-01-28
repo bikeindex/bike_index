@@ -17,8 +17,8 @@
     - if controller_name == "blogs"
       = auto_discovery_link_tag(:atom, blogs_url(format: "atom"), {:title => "Bike Index"})
 
-:plain
-  <!--
+  :plain
+    <!--
                                                       
         Stop reading code and go ride your bike!                          ~~O
                                                                         -  /\,
@@ -26,52 +26,52 @@
                                                                       -  (*)
         
                                                                         ^--------                                         
-  -->
-  <script type="text/javascript">$(document).ready(function () {
-  
-  $('#header-tabs').prepend("<div id='tab-cover'></div>");
+    -->
+    <script type="text/javascript">$(document).ready(function () {
+    
+    $('#header-tabs').prepend("<div id='tab-cover'></div>");
 
-  $.ajax({
-    type: "GET",
-    url: '/api/v1/users/current',
-    success: function(data, textStatus, jqXHR) {
-      var links, membership, tab, _i, _len, _ref;
-      if (data["user_present"]) {
-        $('#total-top-header .yes_user').removeClass('hidden');
-        if (data["is_superuser"]) {
-          $('#total-top-header .super_user').removeClass('hidden');
-        }
-        if (_.isArray(data["memberships"])) {
-          _ref = data["memberships"];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            membership = _ref[_i];
-            tab = "<li class=\"expand_t\">\n  <a href=\"#" + membership["slug"] + "\">" + membership["short_name"] + "</a>\n</li>";
-            links = "<div class=\"tab-pane\" id=\"" + membership["slug"] + "\">\n  <ul>\n    <li>\n      <a href=\"/bikes/new?creation_organization_id=" + membership["organization_id"] + "\">\n        <strong>Add a bike</strong> through " + membership["organization_name"] + "\n      </a>\n    </li>\n    <li>\n      <a href=\"" + membership["base_url"] + "\">\n        " + membership["organization_name"] + " Account\n      </a>\n    </li>";
-            if (membership["is_admin"]) {
-              links = links + ("<li>\n  <a href=\"" + membership["base_url"] + "/edit\">\n    Manage organization\n  </a>\n</li>");
-            }
-            links = links + "</ul></div>";
-            $('#total-top-header .global-tabs').append(tab);
-            $('#total-top-header .tab-content').append(links);
+    $.ajax({
+      type: "GET",
+      url: '/api/v1/users/current',
+      success: function(data, textStatus, jqXHR) {
+        var links, membership, tab, _i, _len, _ref;
+        if (data["user_present"]) {
+          $('#total-top-header .yes_user').removeClass('hidden');
+          if (data["is_superuser"]) {
+            $('#total-top-header .super_user').removeClass('hidden');
           }
+          if (_.isArray(data["memberships"])) {
+            _ref = data["memberships"];
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              membership = _ref[_i];
+              tab = "<li class=\"expand_t\">\n  <a href=\"#" + membership["slug"] + "\">" + membership["short_name"] + "</a>\n</li>";
+              links = "<div class=\"tab-pane\" id=\"" + membership["slug"] + "\">\n  <ul>\n    <li>\n      <a href=\"/bikes/new?creation_organization_id=" + membership["organization_id"] + "\">\n        <strong>Add a bike</strong> through " + membership["organization_name"] + "\n      </a>\n    </li>\n    <li>\n      <a href=\"" + membership["base_url"] + "\">\n        " + membership["organization_name"] + " Account\n      </a>\n    </li>";
+              if (membership["is_admin"]) {
+                links = links + ("<li>\n  <a href=\"" + membership["base_url"] + "/edit\">\n    Manage organization\n  </a>\n</li>");
+              }
+              links = links + "</ul></div>";
+              $('#total-top-header .global-tabs').append(tab);
+              $('#total-top-header .tab-content').append(links);
+            }
+          }
+          if (data["email"]) {
+            $('#your_settings_n_stuff').text(data["email"]);
+          }
+          return $('#tab-cover').fadeOut();
+        } else {
+          $('#total-top-header .no_user').removeClass('hidden');
+          return $('#tab-cover').fadeOut();
         }
-        if (data["email"]) {
-          $('#your_settings_n_stuff').text(data["email"]);
-        }
-        return $('#tab-cover').fadeOut();
-      } else {
+      },
+      error: function(data, textStatus, jqXHR) {
         $('#total-top-header .no_user').removeClass('hidden');
-        return $('#tab-cover').fadeOut();
+        $('#tab-cover').fadeOut();
       }
-    },
-    error: function(data, textStatus, jqXHR) {
-      $('#total-top-header .no_user').removeClass('hidden');
-      $('#tab-cover').fadeOut();
-    }
-  });
+    });
 
-  });</script>
+    });</script>
 
-- body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
-%body#body{ class: body_class }
-  = render 'layouts/messages'
+  - body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
+  %body#body{ class: body_class }
+    = render 'layouts/messages'
