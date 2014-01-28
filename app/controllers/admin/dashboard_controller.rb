@@ -31,4 +31,14 @@ class Admin::DashboardController < ApplicationController
     redirect_to admin_root_url
   end
 
+  def destroy_example_bikes
+    org = Organization.find_by_slug("example-org")
+    bikes = Bike.unscoped.where(example: true)
+    # The example bikes for the API docs on production are not created by example-org
+    # This way we don't clear them when we clear the rest of the example bikes
+    bikes.each { |b| b.destroy if b.creation_organization_id == org.id }
+    flash[:notice] = "Example bikes cleared!"
+    redirect_to admin_root_url
+  end
+
 end
