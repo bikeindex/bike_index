@@ -101,6 +101,7 @@ ActiveRecord::Schema.define(:version => 20140122181308) do
     t.string   "creation_zipcode"
     t.integer  "creation_country_id"
     t.integer  "country_id"
+    t.string   "serial_normalized"
   end
 
   add_index "bikes", ["creation_organization_id"], :name => "index_bikes_on_organization_id"

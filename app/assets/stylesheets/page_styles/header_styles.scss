@@ -7,6 +7,7 @@
 .global-header {
   padding: $singlePad 0 40px;
   position: relative;
+  overflow: hidden;
   .top-receptacle, .logo-receptacle, .nav-receptacle {
     @extend .receptacle;
   }
@@ -38,7 +39,6 @@
     display: block;
     position: absolute;
     right: 0;
-    height: 4em;
     width: $eightColumn;
     background: $searchBackground;
     border: 1px solid $searchBorder;
@@ -77,40 +77,25 @@
       margin-top: 1px;
     }
   }
-  .background-extend {
-    display: block;
-    position: absolute;
-    right: 0;
-    width: 40%;
-    height: 4em;
-    z-index: 0;
-    background: $searchBackground;
-    border: 1px solid $searchBorder;
-    border-right: none;
-    border-left: none;
-  }
 }
 
 .top-header.search-expanded {
   padding-bottom: 2em;
   .optional-fields { display: block; }
-  .search-background, .background-extend { height: 6em; }
-  .search-background { bottom: -2em; }
 }
 
 .optional-fields {
   display: none;
-  position: absolute;
-  right: 0; top: 3.4em;
   width: $eightColumn - $gutterW;
-  .manufacturers select, .bike-attributes select {
+  .additional-fields input {
     width: 100%;
+    margin-bottom: 0;
   }
   .stolenness {
     position: absolute;
     right: 0; top: 0;
     width: 23.4%;
-    input { margin: 2px 5px 0 0; }
+    input { margin: -2px 5px 0 0; }
     label { margin: 0; }
   }
 }
@@ -118,28 +103,28 @@
 @media (max-width: 600px) {
   .optional-fields {
     width: 100%;
-    .bike-attributes { width: 66%; }
+    .additional-fields { width: 66%; }
     .stolenness { width: 32%; }
   }
 }
 
 @media (min-width: 601px) and (max-width: 1000px) {
   .optional-fields {
-    .bike-attributes { width: 73.3%; }
+    .additional-fields { width: 73.3%; }
   }
 }
 
 @media (min-width: 1001px) {
   .optional-fields {
-    .bike-attributes {
+    .additional-fields {
       width: 73.4%;
     }
     .stolenness {
-      input { margin-right: 2px; }
+      // input { margin-right: 2px; }
       label {
         display: inline-block;
-        margin: .3em 0 0 0;
-        &:last-of-type { margin-left: 10px; }
+        // margin: .3em 0 0 0;
+        // &:last-of-type { margin-left: 10px; }
       }
     }
   }
@@ -594,4 +579,74 @@
   }
 }
 
+
+
+
+//________________________
+//
+// Overrides for header select2
+//
+//________________________
+
+#head-search-bikes {
+  .select2-container {
+    * {
+      -moz-box-sizing: content-box;
+      -webkit-box-sizing: content-box;
+      box-sizing: content-box;
+    }
+  }
+  .select2-container-multi .select2-choices .select2-search-choice {
+    padding-top: .3em;
+    padding-bottom: .3em;
+    margin-top: .25em;
+    // margin-bottom: .3em;
+  }
+  .select2-search-choice-close { top: 5px; }
+  // .additional-fields input { margin-top: 0; }
+}
+
+
+///////////// Overrides
+
+#header {
+  #header-tabs {
+    margin-bottom: 0;
+  }
+  .search-fields {
+    position: relative;
+  }
+  .search-background {
+    z-index: -1;
+    height: 100%;
+    &:after {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: -1px; right: -50%;
+      width: 100%; height: 100%;
+      background: $searchBackground;
+      border-top: 1px solid $searchBorder;
+      border-bottom: 1px solid $searchBorder;
+      z-index: -2;
+    }
+  }
+
+
+  .optional-fields {
+    position: relative;
+    float: right;
+    margin-top: .5em;
+  }
+}
+
+@media (max-width: 599px) {
+  #total-top-header.header-tabs-in .logo {
+    opacity: .2;
+    -webkit-transition: all .1s linear;
+    -moz-transition: all .1s linear;
+    -o-transition: all .1s linear;
+    transition: all .1s linear;
+  }
+}
 

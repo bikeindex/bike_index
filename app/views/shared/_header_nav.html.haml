@@ -1,5 +1,5 @@
 .top-header#total-top-header{:data => {domain: Rails.env}}
-  %span.background-extend
+  / %span.background-extend
   .receptacle
     .inner-recep
       %a.follow-link.logo{ href: root_url }
@@ -41,11 +41,22 @@
           #signup.tab-pane.login-header.no_user.hidden
             = render 'sessions/form'
 
-
-
-      %span.search-background
       = form_tag bikes_path, method: :get, id: "head-search-bikes" do 
         .search-fields#header-search
-          = render "/shared/header_search"
+          %span.search-background
+          = text_field_tag :query,                          |
+            params[:query],                                 |
+            placeholder: "Search for bikes",                |
+            :data => { url: search_tags_api_v1_bikes_url }, |
+            class: "search-text-field"                      |
           .search-button
             = submit_tag "Search", name: "search", class: "button-blue"
+          .optional-fields
+            .additional-fields
+              = text_field_tag :serial, params[:serial], placeholder: 'Serial number'
+            .stolenness
+
+              %label{ for: "stolen" }
+                = check_box_tag :stolen, 1, params[:stolen]
+                Only stolen
+          

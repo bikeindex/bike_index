@@ -5,7 +5,12 @@ class Admin::BikesController < Admin::BaseController
   before_filter :find_bike, only: [:edit, :destroy, :update]
 
   def index
-    @bikes = Bike.order("created_at desc")
+    if params[:email]
+      user = User.fuzzy_email_find(params[:email])
+      @bikes = Bike.find(user.bikes) if user.present?
+    else 
+      @bikes = Bike.limit(100)
+    end
   end
 
   def duplicates
@@ -31,6 +36,7 @@ class Admin::BikesController < Admin::BaseController
     BikeUpdator.new(user: current_user, b_params: params).update_ownership
     @bike = @bike.decorate
     if @bike.update_attributes(params[:bike])
+      SerialNormalizer.new({bike_id: @bike.id}).set_normalized
       redirect_to edit_admin_bike_url(@bike), notice: 'Bike was successfully updated.'
     else
       render action: "edit"

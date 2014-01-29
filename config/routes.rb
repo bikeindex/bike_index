@@ -76,6 +76,7 @@ Bikeindex::Application.routes.draw do
     match 'invitations', to: 'dashboard#invitations'
     match 'maintenance', to: 'dashboard#maintenance'
     match 'bust_z_cache', to: 'dashboard#bust_z_cache'
+    match 'destroy_example_bikes', to: 'dashboard#destroy_example_bikes'
     resources :discounts, :memberships, :bikes, :organizations, :bike_token_invitations, :organization_invitations
     match 'duplicate_bikes', to: 'bikes#duplicates'
     resources :flavor_texts, only: [:destroy, :create]
@@ -99,7 +100,9 @@ Bikeindex::Application.routes.draw do
 
   namespace :api, defaults: {format: 'json'} do
     namespace :v1 do
-      resources :bikes, only: [:index, :show, :create]
+      resources :bikes, only: [:index, :show, :create] do
+        collection { get 'search_tags' }
+      end
       resources :cycle_types, only: [:index]
       resources :wheel_sizes, only: [:index]
       resources :component_types, only: [:index]

@@ -26,15 +26,6 @@ window.BikeIndex =
     $('#total-top-header .global-tabs').append(tab)
     $('#total-top-header .tab-content').append(links)
 
-  initializeHeaderSearch: ->
-    # $('#header-search .stolenness input').prop('checked', true)
-    $('#find_bike_attributes_ids').select2
-      allow_single_deselect: true
-      allowClear: true
-      width: '100%'
-    $("#head-search-bikes #query").attr("autocomplete","off");
-    
-
 $(document).ready ->
   view = new BikeIndex.Views.Global
   
@@ -65,7 +56,7 @@ $(document).ready ->
   else if $('#organization-content').length > 0
     view = new BikeIndex.Views.OrganizationsShow
 
-  else if $('#user-bikes-table').length > 0
+  else if $('#user-home-page').length > 0
     view = new BikeIndex.Views.DataTables
   
   else if $('#edit-bike-form').length > 0

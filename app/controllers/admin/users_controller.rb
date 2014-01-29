@@ -2,7 +2,14 @@ class Admin::UsersController < Admin::BaseController
   before_filter :find_user, only: [:show, :edit, :update, :destroy]
 
   def index
-    @users = User.order("created_at desc").all
+    if params[:user_query]
+      users = User.where('email LIKE ?', params[:user_query]).all
+      users += User.where('name LIKE ?', params[:user_query]).all
+      @users = users
+    else 
+      @users = User.order("created_at desc").limit(100)
+    end
+
   end
 
   def edit

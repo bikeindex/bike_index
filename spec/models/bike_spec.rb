@@ -254,17 +254,13 @@ describe Bike do
       material = FactoryGirl.create(:frame_material)
       propulsion = FactoryGirl.create(:propulsion_type, name: "Hand pedaled")
       b = FactoryGirl.create(:bike, cycle_type: type, propulsion_type_id: propulsion.id)
-      b.year = 1999
-      b.frame_material_id = material.id
-      b.secondary_frame_color_id = b.primary_frame_color_id
-      b.tertiary_frame_color_id = b.primary_frame_color_id
-      b.frame_size = "SO MANY"
-      b.frame_size_unit = "ballsacks"
-      b.frame_model = "Some model"
-      b.handlebar_type_id = handlebar.id
-      b.save
+      b.update_attributes( year: 1999, frame_material_id: material.id,
+        secondary_frame_color_id: b.primary_frame_color_id,
+        tertiary_frame_color_id: b.primary_frame_color_id,
+        frame_size: "SO MANY", frame_size_unit: "ballsacks",
+        frame_model: "Some model", handlebar_type_id: handlebar.id)
       b.cache_bike
-      b.cached_data.should eq("Hand pedaled 1999 #{b.primary_frame_color.name} #{b.secondary_frame_color.name} #{b.tertiary_frame_color.name} #{material.name} SO MANY ballsacks #{b.frame_model} #{b.manufacturer_name}  unicycle ")
+      b.cached_data.should eq("#{b.manufacturer_name} Hand pedaled 1999 #{b.primary_frame_color.name} #{b.secondary_frame_color.name} #{b.tertiary_frame_color.name} #{material.name} SO MANY ballsacks #{b.frame_model} #{b.rear_wheel_size.name} wheel  unicycle ")
     end
   end
 

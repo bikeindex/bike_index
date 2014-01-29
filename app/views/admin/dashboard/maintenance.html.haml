@@ -1,9 +1,11 @@
 %header.with-subtitle
   %h1 Maintaining things
-
+  
 %section.full-screen-table
-  %h2
-    Recent example bikes
+  %header.with-subtitle
+    %h2
+      Recent example bikes
+    = link_to "Delete example bikes", admin_destroy_example_bikes_url, class: "sharing-links"
   - if @bikes.any? 
     %table.table.table-striped.table-bordered
       = render partial: "/admin/bikes/admin_bikes_table"
@@ -13,7 +15,6 @@
   - else
     No example bikes right now!
   
-
   %section.full-screen-table
     %table.table.table-striped.table-bordered
       %thead
@@ -60,7 +61,7 @@
             %td
               = f.id
             %td
-              = link_to f.bike.id, edit_admin_bike_url(f.bike)
+              = link_to f.bike_id, edit_admin_bike_url(f.bike_id)
 
 
   %section.full-screen-table

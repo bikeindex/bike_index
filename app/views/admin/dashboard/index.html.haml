@@ -15,8 +15,6 @@
     = link_to "Users", admin_users_url
   %table.table.table-striped.table-bordered
     %thead
-      %th
-        Id&nbsp;
       %th.medium-screens
         Created
       %th
@@ -32,8 +30,6 @@
     %tbody
       - @users.each do |user|
         %tr
-          %td
-            = link_to user.id, edit_admin_user_url(user)
           %td.medium-screens
             - if user.created_at.today?
               %span.hidden
@@ -48,7 +44,7 @@
                 = user.created_at.strftime("%-m.%-d.%Y %-H.%M")
               = user.created_at.strftime("%-m/%-d/%Y at %-I %p")
           %td
-            = user.email
+            = link_to user.email, edit_admin_user_url(user)
           %td
             = user.ownerships.count
           %td.medium-screens
@@ -113,6 +109,8 @@
     = link_to "Graphs", admin_graphs_url
   %li
     = link_to "Failed bikes", admin_failed_bikes_url
+  %li
+    = link_to "Possible duplicates", admin_duplicate_bikes_url
   %li
     = link_to "Component types", admin_ctypes_url
   %li
