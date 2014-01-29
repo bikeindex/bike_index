@@ -5,14 +5,24 @@
 //________________________
 
 .admin-adv-list {
-  @extend .horizontal-list;
-  margin: 40px 0 0;
-  li {
-    width: 20%;
-    min-width: 100px;
-    text-align: center;
-    padding: 10px;
-  //   &:before { content: "&#149;"; }
+
+  ul {
+    @extend .horizontal-list;
+    margin: 40px 0 0;
+    li {
+      width: 20%;
+      min-width: 100px;
+      text-align: center;
+      padding: 10px;
+    //   &:before { content: "&#149;"; }
+    }
+  }
+
+  .button-blue {
+    clear: both;
+    display: block;
+    width: 150px;
+    margin: 20px auto 0;
   }
 }
 

@@ -7,7 +7,9 @@
   %p.pull-right
     #{Bike.count} bikes total
     %em
-      (#{Bike.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
+      - today = Bike.where("created_at >= ?", Time.zone.now.beginning_of_day).count
+      - yesterday = (Bike.where("created_at >= ?", Time.zone.now.beginning_of_day - 1.day).count) - today
+      (#{today} today, #{yesterday} yesterday)
 
 %section.full-screen-table
   %h2
@@ -102,16 +104,16 @@
           %td
             = link_to "delete", admin_flavor_text_url(flavor), method: :delete
 
-%ul.admin-adv-list
-  %li
-    = link_to "Maintenance", admin_maintenance_url
-  %li
-    = link_to "Graphs", admin_graphs_url
-  %li
-    = link_to "Failed bikes", admin_failed_bikes_url
-  %li
-    = link_to "Possible duplicates", admin_duplicate_bikes_url
-  %li
-    = link_to "Component types", admin_ctypes_url
-  %li
-    = link_to "Clear cache", admin_bust_z_cache_url
+.admin-adv-list
+  %ul
+    %li
+      = link_to "Maintenance", admin_maintenance_url
+    %li
+      = link_to "Possible dupes", admin_duplicate_bikes_url
+    %li
+      = link_to "Failed bikes", admin_failed_bikes_url
+    %li
+      = link_to "Component types", admin_ctypes_url
+    %li
+      = link_to "Graphs", admin_graphs_url
+  = link_to "Clear cache", admin_bust_z_cache_url, class: "button-blue"
