@@ -169,13 +169,6 @@ class Bike < ActiveRecord::Base
     end
   end
 
-  before_save :set_xyz_code
-  def set_xyz_code
-    if xyz_code.blank?
-      self.xyz_code = LookupCode.next_code
-    end
-  end
-  
   before_save :set_paints
   def set_paints
     return true unless paint_name.present?
