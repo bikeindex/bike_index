@@ -111,5 +111,6 @@
 
 .heritage-table { 
   overflow: scroll;
-  .wide-cell { min-width: 110px; }
+  td { min-width: 110px; }
+  .small-cell { min-width: 40px; }
 }
