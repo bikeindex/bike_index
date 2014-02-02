@@ -40,10 +40,10 @@ class Blog < ActiveRecord::Base
 
   before_save :update_title_save
   def update_title_save
-    if update_title.present? && update_title != false
-      self.old_title_slug = self.title_slug
-      set_title_slug
-    end
+    return true unless update_title.present?
+    return true if update_title == false || update_title.to_i == 0 
+    self.old_title_slug = self.title_slug
+    set_title_slug
   end
 
   before_create :set_title_slug
