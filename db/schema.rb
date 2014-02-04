@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140122181308) do
+ActiveRecord::Schema.define(:version => 20140204162239) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -92,6 +92,7 @@ ActiveRecord::Schema.define(:version => 20140122181308) do
     t.boolean  "coaster_brake",            :default => false, :null => false
     t.string   "frame_size"
     t.string   "frame_size_unit"
+    t.string   "serial_normalized"
     t.string   "pdf"
     t.integer  "card_id"
     t.boolean  "recovered",                :default => false, :null => false
@@ -101,10 +102,11 @@ ActiveRecord::Schema.define(:version => 20140122181308) do
     t.string   "creation_zipcode"
     t.integer  "creation_country_id"
     t.integer  "country_id"
-    t.string   "serial_normalized"
+    t.string   "xyz_code"
   end
 
   add_index "bikes", ["creation_organization_id"], :name => "index_bikes_on_organization_id"
+  add_index "bikes", ["xyz_code"], :name => "index_bikes_on_xyz_code", :unique => true
 
   create_table "blogs", :force => true do |t|
     t.text     "title"
@@ -267,6 +269,14 @@ ActiveRecord::Schema.define(:version => 20140122181308) do
 
   add_index "locks", ["user_id"], :name => "index_locks_on_user_id"
 
+  create_table "lookup_codes", :force => true do |t|
+    t.string   "xyz_code"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  add_index "lookup_codes", ["xyz_code"], :name => "index_lookup_codes_on_xyz_code", :unique => true
+
   create_table "manufacturers", :force => true do |t|
     t.string   "name"
     t.string   "slug"
@@ -333,6 +343,7 @@ ActiveRecord::Schema.define(:version => 20140122181308) do
     t.integer  "auto_user_id"
     t.string   "org_type",                   :default => "shop", :null => false
     t.string   "access_token"
+    t.text     "new_bike_notification"
   end
 
   add_index "organizations", ["slug"], :name => "index_organizations_on_slug", :unique => true

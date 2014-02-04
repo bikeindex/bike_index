@@ -25,7 +25,7 @@ describe Blog do
       blog = Blog.new(title: "A really really really really loooooooooooooooooooooooooooooooooooong title that absolutely rocks so hard", body: "some things", user_id: @user.id, published_at: Time.now)
       blog.save
       blog.title = "New Title"
-      blog.update_title = true
+      blog.update_title = '1'
       blog.save
       blog.title_slug.should eq('new-title')
       blog.old_title_slug.should eq("a-really-really-really-really-loooooooooooooooooooooooooooooooooooong")

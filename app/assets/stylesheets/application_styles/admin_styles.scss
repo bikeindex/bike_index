@@ -76,6 +76,30 @@
 }
 
 
+#bike-notification {
+  textarea { height: 200px; width: 100%; max-width: 540px; }
+  &.in { padding-top: 30px; }
+  .new-notification-container {
+    width: 100%; position: relative;
+    max-width: 700px; margin: 20px 0; 
+    background: #2980b9;
+    -webkit-border-radius: 1px;
+    -moz-border-radius: 1px;
+    border-radius: 1px;
+  }
+  .header-content {
+    padding: 20px 0 0;height: 180px;
+    img { display: block; float: right; }
+  }
+  .new-notification {
+    margin: 0; background: #fff;
+    border-top: 1px solid #c0c0c0;
+    border-bottom: 1px solid #c0c0c0;
+    padding: 20px 20px 50px;
+    
+  }
+}
+
 
 
 //________________________

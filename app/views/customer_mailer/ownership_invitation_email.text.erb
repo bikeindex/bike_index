@@ -1,9 +1,13 @@
+<% if @creation_org.present? && @creation_org.new_bike_notification.present? %>
+<%= @creation_org.new_bike_notification.html_safe %>
+<% else %>
+
 <% if @new_user %>
 ** Welcome to the Bike Index **
 
 Good thinking! We’re glad you’ve joined, you smarty pants.
-<% end %>
 
+<% end %>
 <% if @bike.stolen %>
 Bike thieves are jerks.
 We're sorry your bike was stolen.
@@ -11,87 +15,39 @@ We're sorry your bike was stolen.
 Congrats on adding your bike to the index!
 <% end %>
 
-<% if @bike.stolen %>
-You added a stolen bike to the Bike Index:
-<% elsif @bike.created_with_token %>
-Yeah! Work those free bikes!
-<% else %>
+--------------------------------
 
-<% if @ownership.creator.name %>
-<%= @ownership.creator.name %>
-<% else %>
-<%= @ownership.creator.email %>
-<% end %>
-<% if @org_name %>
-from <%= @org_name %>
-<% end %>
-<% if @new_bike %>
-sent you a 
-<% else %>
-added a 
-<% end %>
-<%= @biketype %>
-on the Bike Index 
-<% if @new_bike %> for you <% end %>
+<% if @bike.stolen %><p>You added a stolen bike to the Bike Index:</p><% else %><% if @ownership.creator.name %><%= @ownership.creator.name %><% else %><%= @ownership.creator.email %><% end %><% if @creation_org.present? %>from <em><%= @creation_org.name %><% end %><% if @new_bike %> added a <% else %> sent you a <% end %><%= @biketype %> on the Bike Index <% if @new_bike %> for you <% end %><% end %>
+<% end # end of the creation_org notification %>
 
-<% end %>
-
+---
 Make: <%= @bike.manufacturer.name  %></p>
-Serial: <%= @bike.serial_number.upcase %>
-Color: <%= @bike.primary_frame_color.name %>
+    
+Serial: <%= @bike.serial_number %></p>
+    
+Color: <% if @bike.paint.present? %><%= @bike.paint.name %><% else %><%= @bike.primary_frame_color.name %><% end %>
+---  
 
 <% if @bike.stolen %>
 Hopefully you find the <%= @biketype %> soon. Give us a heads up when you do!
-<% elsif @bike.created_with_token %>
-  
-<% else %>
-
-Sign up or sign in to claim your <%= @biketype %> and edit it, upload photos and make sure you never lose track of your trusty steed!
 <% end %>
 
 
+* Claim the <%= @biketype %> here: <%= bike_url(@bike) %> *
+
+Sign up or sign in to BikeIndex.org to claim your <%= @biketype %> and edit it, upload photos and make sure you never lose track of your trusty steed!
 
 
 
+--------------------------------
 
-Hi <%= @ownership.owner_email %>,
+* Protect your bike by following these locking guidelines. *
 
-<% if @new_user == true %>
-  Welcome to the Bike Index
+- Use a U-Lock. Cable locks should never be used as a primary means of locking a bike in a city.
 
-  Good thinking! We’re glad you’ve joined, you smarty pants.
+- Secure both wheels - either with two U-locks, or one U-lock and one heavy duty cable.
 
-  <%= @org_text %> has indicated that you now have a bicycle on The Bike Index.
-
-  Go to www.bikeindex.org and sign up to claim your bike and keep it safe from thieves.
-
-<% else %>
-
-  <%= @org_text %> has indicated that you now have a bicycle on The Bike Index.
-
-  Go to the www.bikeindex.org to claim your bike and keep it safe from thieves.
-
-<% end %>
-
-Now that you've got your bike, you should protect it.
-
-- Cable locks should never be used as a primary means of locking a bike in a city.
-
-- Aim to have the hardest bike to steal on the bike rack. We consider two U-locks, or one U-lock and one heavy duty cable to be the minimum required in large cities to keep a bike secure.
-
-- Don't rely on foot traffic to keep your bike safe; years of reports have taught us that many thefts, particularly those involving cutting cable locks, occur under the cover of crowd activity or in front of bustling cafés or restaurants.
-
-- Don't rely on the presence of cameras to keep your bike secure. Security footage is rarely of much use once a bike is gone, and thieves know this.
-
-- Cheaper and older U-locks can often be defeated with common hand tools, or no tools at all.
-
-- Signposts can be removed from the ground by unbolting them and some are already unattached. Tug on whatever you're about to lock to make sure it can't be easily removed.
-
-- Many bicycles are stolen from garages and store rooms. Lock your bike securely to an immovable object even if in a "secure" place.
+- Do not lock to anything without first checking to make sure it can't be easily removed.
 
 
-
-Thanks,
-Bike Index Management
-
-
+Read more about protecting your bike here: https://www.bikeindex.org/protect_your_bike

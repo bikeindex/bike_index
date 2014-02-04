@@ -174,7 +174,7 @@ input[type="color"],
 @media (min-width: 480px) {
   .control-group.actions {
     width: 98%;
-    max-width: 680px;
+    max-width: 650px;
     padding-left: 370px;
     margin-left: 2%;
   }
@@ -188,6 +188,13 @@ input[type="color"],
     }
   }
 }
+
+.control-group.big-action {
+  padding-left: 0;
+  margin-left: 0;
+  a, input { display: block; width: 90%; margin: 0 auto; float: none; }
+}
+
 
 // $btnInfoBackground:     lighten($btnInfoBackgroundHighlight, 10%) !default;
 

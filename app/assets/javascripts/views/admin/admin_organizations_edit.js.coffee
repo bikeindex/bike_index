@@ -3,6 +3,7 @@ class BikeIndex.Views.AdminOrganizationsEdit extends Backbone.View
   initialize: ->
     @setElement($('#body'))
     @adminLocations()
+    @loadNotifications()
     $('.chosen-select select').select2()
     
   adminLocations: ->
@@ -20,3 +21,12 @@ class BikeIndex.Views.AdminOrganizationsEdit extends Backbone.View
       $(this).closest('fieldset').find('.country_select_container select').val(us_val)
       $('.chosen-select select').select2()
       
+  loadNotifications: ->
+    if $('#bike-notification textarea').val().length > 0
+      $('#show_notification a').hide()
+      $('#bike-notification').collapse('show')
+    else
+      $('#show_notification a').click (e) ->
+        e.preventDefault()
+        $('#bike-notification').collapse('show')
+        $('#show_notification a').fadeOut()

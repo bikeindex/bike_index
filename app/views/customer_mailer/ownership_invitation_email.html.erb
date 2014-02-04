@@ -13,37 +13,41 @@
 
 <hr style="margin: 40px 0 30px;">
 
-<% if @bike.stolen %>
-  <p>You added a stolen bike to the Bike Index:</p>
-<% elsif @bike.created_with_token && @bike.ownerships.count < 2 %>
-  <p>Yeah! <em>Work those free bikes!</em></p>
+<% if @creation_org.present? && @creation_org.new_bike_notification.present? %>
+  <%= @creation_org.new_bike_notification.html_safe %>
 <% else %>
-  <p>
-    <strong>
-      <% if @ownership.creator.name %>
-        <%= @ownership.creator.name %>
-      <% else %>
-        <%= @ownership.creator.email %>
+  <% if @bike.stolen %>
+    <p>You added a stolen bike to the Bike Index:</p>
+  <% elsif @bike.created_with_token && @bike.ownerships.count < 2 %>
+    <p>Yeah! <em>Work those free bikes!</em></p>
+  <% else %>
+    <p>
+      <strong>
+        <% if @ownership.creator.name %>
+          <%= @ownership.creator.name %>
+        <% else %>
+          <%= @ownership.creator.email %>
+        <% end %>
+      </strong>
+      <% if @creation_org.present? %>
+        from <em><%= @creation_org.name %> </em>
       <% end %>
-    </strong>
-    <% if @org_name %>
-      from <em><%= @org_name %> </em>
-    <% end %>
-    <% if @new_bike %>
-      added a 
-    <% else %>
-      sent you a 
-    <% end %>
-    <%= @biketype %>
-    on the Bike Index 
-  </p>
+      <% if @new_bike %>
+        added a 
+      <% else %>
+        sent you a 
+      <% end %>
+      <%= @biketype %>
+      on the Bike Index 
+      <% if @new_bike %> for you <% end %>
+    </p>
+  <% end %>
 <% end %>
 
-<% if @bike.thumb_path %>    
-  <% bike_image = @bike.thumb_path %>
-<% else  %>
-  <% bike_image = "https://www.bikeindex.org/assets/bike_photo_placeholder.png" %>
-<% end %>
+<!-- Begin the bike box -->
+
+<% bike_image = "https://www.bikeindex.org/assets/bike_photo_placeholder.png" %>
+<% bike_image = @bike.thumb_path if @bike.thumb_path %>    
 
 <% if @bike.stolen %>
   <div class="bike-display" style="position: relative;width: 96%;height: 150px;padding: 10px 2%;background: #bf2f2f;border: 1px solid #ddd;max-width: 450px;margin: 30px auto 0;">
@@ -57,8 +61,7 @@
   </div>
   <div class="bike-info" style="position: relative;width: 63%;margin-left: 3%;float: left;padding-top: 30px; <%= 'color: white;' if @bike.stolen %>">
     <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Make</span> <%= @bike.manufacturer.name  %></p>
-    <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Serial</span> <%= @bike.serial_number %></p>
-    <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Color</span><% if @bike.paint.present? %><%= @bike.paint.name %><% else %><%= @bike.primary_frame_color.name %><% end %></p>
+    <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Serial</span> <%= @bike.serial_number %></p>Color</span><% if @bike.paint.present? %><%= @bike.paint.name %><% else %><%= @bike.primary_frame_color.name %><% end %></p>
   </div>
 </div>
 
@@ -73,8 +76,6 @@
 
   <p class="explanation" style="text-align: center;color: #555;">Sign up or sign in to BikeIndex.org to claim your <%= @biketype %> and edit it, upload photos and make sure you never lose track of your trusty steed!</p>
 <% end %>
-
-
 
 <hr style="margin: 40px 0 30px;">
 <h2>

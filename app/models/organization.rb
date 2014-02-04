@@ -12,7 +12,8 @@ class Organization < ActiveRecord::Base
     :locations_attributes,
     :embedable_user_email,
     :auto_user_id,
-    :access_token
+    :access_token,
+    :new_bike_notification
 
   attr_accessor :embedable_user_email
   acts_as_paranoid
