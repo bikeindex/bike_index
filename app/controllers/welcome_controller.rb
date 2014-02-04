@@ -32,5 +32,4 @@ class WelcomeController < ApplicationController
   def choose_registration
     @user = User.new unless current_user.present?
   end
-
 end

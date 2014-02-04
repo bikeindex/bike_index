@@ -49,10 +49,13 @@
                   = link_to "Making your own", spokecard_url(anchor: 'making-one')
                   
         %li.contact-nav-btns{ class: content_nav_class("contact") }
-          = nav_link "Contact", contact_us_url
+          = nav_link "Help", help_url
           %ul
             %li
+              = nav_link "Contact", contact_us_url
+            %li
               = nav_link "Sign up a shop", vendor_signup_url
+            
 
 
   %section.page-content

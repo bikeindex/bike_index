@@ -2,6 +2,9 @@ class FeedbacksController < ApplicationController
   layout 'content'
   before_filter :set_feedback_active_section
 
+  def index
+  end
+
   def new
     @feedback = Feedback.new
   end

@@ -8,9 +8,9 @@
 .faq-block {
   // background: $yellowPale;
   // border-top: 1px solid rgb(176,176,179);
-  background: $bodyBackground;
-  padding: 30px 0 50px;
-  margin: 0;
+  // background: $bodyBackground;
+  // padding: 30px 0 50px;
+  // margin: 0;
   // margin: 60px 0 20px 0;
   h3 {
     text-align: left;
@@ -32,48 +32,48 @@
   }
 }
 
-@media (min-width: 767px) { 
-  .faq-block {
-    padding-top: 80px;
-    padding-bottom: 80px;
-    .receptacle .faq-holder dl { margin-top: 60px; }
-  }
-}
+// @media (min-width: 767px) { 
+//   .faq-block {
+//     padding-top: 80px;
+//     padding-bottom: 80px;
+//     .receptacle .faq-holder dl { margin-top: 60px; }
+//   }
+// }
 
-#faqLogo {
-  width: 15%;
-  max-width: 100px;
-  position: absolute;
-  top: 0;
-  right: 0;
-  img {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-}
+// #faqLogo {
+//   width: 15%;
+//   max-width: 100px;
+//   position: absolute;
+//   top: 0;
+//   right: 0;
+//   img {
+//     display: block;
+//     width: 100%;
+//     height: auto;
+//   }
+// }
 
-@media (min-width: 767px) {
-  #faqLogo { top: -10px; }
-  .faq-holder {
-    @include clearfix;
-    width: 90%;
-    margin: 0 auto;
-    h3 {
-      margin-bottom: 20px; 
-      text-align: center;
-      padding-right: 0;
-    }
-    dl {
-      width: $sixColumn;
-      float: left;
-      &:last-of-type {
-        margin-top: 30px;
-        margin-left: $gutterW;
-      }
-    }
-  }
-}
+// @media (min-width: 767px) {
+//   #faqLogo { top: -10px; }
+//   .faq-holder {
+//     @include clearfix;
+//     width: 90%;
+//     margin: 0 auto;
+//     h3 {
+//       margin-bottom: 20px; 
+//       text-align: center;
+//       padding-right: 0;
+//     }
+//     dl {
+//       width: $sixColumn;
+//       float: left;
+//       &:last-of-type {
+//         margin-top: 30px;
+//         margin-left: $gutterW;
+//       }
+//     }
+//   }
+// }
 
 
 .collapse-faq {

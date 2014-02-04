@@ -37,7 +37,7 @@ ctypes = [
   {name: "Crankset", cgroup: Cgroup.find_by_name('Drivetrain and brakes').id},
   {name: "Bottom Bracket", cgroup: Cgroup.find_by_name('Drivetrain and brakes').id},
   {name: "Pedals", cgroup: Cgroup.find_by_name('Drivetrain and brakes').id},
-  {name: "Freewheel", cgroup: Cgroup.find_by_name('Drivetrain and brakes').id},
+  # {name: "Freewheel", cgroup: Cgroup.find_by_name('Drivetrain and brakes').id},
   {name: "Rear rack", cgroup: Cgroup.find_by_name('Additional parts').id},
   {name: "Handlebars", cgroup: Cgroup.find_by_name('Additional parts').id},
   {name: "Seat", cgroup: Cgroup.find_by_name('Additional parts').id},
@@ -58,3 +58,6 @@ ctypes.each do |component_type|
   end
   ct.save
 end
+
+
+Automating bike registration with Google Apps script and the Bike Index API

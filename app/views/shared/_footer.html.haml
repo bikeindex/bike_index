@@ -18,9 +18,10 @@
             = link_to "List of manufacturers", manufacturers_url         
          
       %li.contact-nav-btns
-        = link_to "Contact", contact_us_url
+        = link_to "Help", help_url
         %ul
           %li
+            = link_to "Contact us", contact_us_url
             = link_to "Sign up a shop", vendor_signup_url
             
       %li.social
@@ -31,7 +32,7 @@
             = link_to image_tag("/assets/twitter.svg", alt: "Bike Index Twitter"), "https://twitter.com/BikeIndex"
 
     %p
-      2013 © Bike Index.
+      2014 © Bike Index.
       - if current_user.present? && current_user.has_membership?
         #{link_to "Privacy policy", privacy_url}, #{link_to "vendor terms", vendor_terms_url}
       - else

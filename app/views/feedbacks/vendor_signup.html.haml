@@ -44,7 +44,7 @@
         %p
           Just submit the form below!
 
-
+%article
   = form_for @feedback do |f|
 
     - if @feedback.errors.any?
@@ -63,12 +63,13 @@
     
     .vendor-signup-form
       .contact-info
-        = f.email_field :email, required: true, placeholder: "Enter your email address", value: current_user ? current_user.email : ""
-        = f.hidden_field :feedback_type, value: 'shop_submission'
-        = f.text_field :title, required: true, placeholder: "Your phone number"
+        .contact-first-row
+          = f.email_field :email, required: true, placeholder: "Shop email address"
+          = f.hidden_field :feedback_type, value: 'shop_submission'
+          = f.text_field :title, required: true, placeholder: "Shop phone number"
         = f.text_field :name, required: true, placeholder: "Enter your shop's name"
       .contact-text
         = f.text_area :body, required: true, placeholder: "Where is your shop located?", rows: 7
       .feedback-actions.control-group
-        = f.submit 'Submit request', class: 'button-green pull-right'
+        = f.submit 'Send the request', class: 'button-green pull-right'
     

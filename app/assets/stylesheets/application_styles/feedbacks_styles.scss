@@ -1,23 +1,24 @@
 .feedbacks {
-  width: $fourColumn;
-  min-width: 260px;
   margin: 30px auto 40px;
   .contact-info {
     position: relative;
-    // float: left;
     width: 100%;
-    input {
-      width: 100%;
-
+    input { width: 100%; }
+    .contact-first-row {
+      @include clearfix;
+      input {
+        width: 49%;
+        float: left;
+        &:last-of-type {
+          margin-left: 2%;
+        }
+      }
     }
   }
   .contact-text {
     position: relative;
-    // float: left;
     width: 100%;
-    textarea {
-      width: 100%;
-    }
+    textarea { width: 100%; }
   }
   .feedback-actions {
     @include clearfix;
@@ -60,7 +61,6 @@
 
 .vendor-signup-form {
   @extend .feedbacks;
-  // padding-top: 1em;
 }
 
 .vendor-questions {
@@ -98,20 +98,4 @@
       float: left;
     }
    }
-  // .vendor-questions {
-  //   margin: 0 0 0 $gutterW;
-  //   padding-left: 1em;
-  //   width: $sevenColumn;
-  //   float: right;
-  // }
-  // .vendor-signup-form {
-  //   width: $fiveColumn;
-  //   margin: 0;
-  //   float: left;
-  // }
 }
-
-// @media (min-width: 899px) {
-//   .vendor-questions {
-//     width: 100%;
-//     clear: both;
