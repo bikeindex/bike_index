@@ -31,12 +31,10 @@ class CustomerMailer < ActionMailer::Base
     @ownership = ownership
     @bike = @ownership.bike
     @biketype = CycleType.find(@bike.cycle_type_id).name.downcase
-    @new_bike = true if @bike.ownerships.count == 2
+    @new_bike = @bike.ownerships.count == 1
     @new_user = true unless User.fuzzy_email_find(@ownership.owner_email)
-    @org_name = @ownership.bike.creation_organization.name if @ownership.bike.creation_organization.present?
-    if @bike.created_with_token
-      subject = "Thanks for adding your bike"
-    elsif @bike.stolen
+    @creation_org = @bike.creation_organization.name if @bike.creation_organization.present? && @new_bike
+    if @bike.stolen
       subject = "Your stolen bike"
     else
       subject = "Claim your bike on BikeIndex.org!"
