@@ -3,7 +3,6 @@
   .contact-info {
     position: relative;
     width: 100%;
-    input { width: 100%; }
     .contact-first-row {
       @include clearfix;
       input {
@@ -15,15 +14,18 @@
       }
     }
   }
+  input[type="text"], input[type="email"], textarea {
+    @include border-radius(3px);
+    width: 100%;
+    background: #eee;
+  }
   .contact-text {
     position: relative;
     width: 100%;
-    textarea { width: 100%; }
   }
   .feedback-actions {
     @include clearfix;
     margin: 0;
-    input { float: right;}
     width: 100%;
   }
 }
