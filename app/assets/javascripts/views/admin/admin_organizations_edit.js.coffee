@@ -22,11 +22,7 @@ class BikeIndex.Views.AdminOrganizationsEdit extends Backbone.View
       $('.chosen-select select').select2()
       
   loadNotifications: ->
-    if $('#bike-notification textarea').val().length > 0
-      $('#show_notification a').hide()
+    $('#show_notification a').click (e) ->
+      e.preventDefault()
       $('#bike-notification').collapse('show')
-    else
-      $('#show_notification a').click (e) ->
-        e.preventDefault()
-        $('#bike-notification').collapse('show')
-        $('#show_notification a').fadeOut()
+      $('#show_notification a').fadeOut()

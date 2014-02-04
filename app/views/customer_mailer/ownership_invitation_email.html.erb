@@ -44,14 +44,14 @@
       <% if @new_bike %> for you <% end %>
     </p>
   <% end %>
-<% end # end of the creation_org notifcation %>
+<% end # end of the creation_org notification %>
 
 
 <% bike_image = "https://www.bikeindex.org/assets/bike_photo_placeholder.png" %>
 <% bike_image = @bike.thumb_path if @bike.thumb_path %>    
 
 <% if @bike.stolen %>
-  <div class="bike-display" style="position: relative;width: 96%;height: 150px;padding: 10px 2%;background: #bf2f2f;border: 1px solid #ddd;max-width: 450px;margin: 30px auto 0;">
+  <div class="bike-display" style="position: relative;width: 96%;height: 150px;padding: 10px 2%;background: #bf2f2f;border: 1px solid #ddd;max-width: 450px;margin: 30px auto 0;clear: both;">
 <% else %>
   <div class="bike-display" style="position: relative;width: 96%;height: 150px;padding: 10px 2%;background: #ebebeb;border: 1px solid #ddd;max-width: 450px;margin: 30px auto 0;">
 <% end %>
@@ -62,7 +62,8 @@
   </div>
   <div class="bike-info" style="position: relative;width: 63%;margin-left: 3%;float: left;padding-top: 30px; <%= 'color: white;' if @bike.stolen %>">
     <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Make</span> <%= @bike.manufacturer.name  %></p>
-    <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Serial</span> <%= @bike.serial_number %></p>Color</span><% if @bike.paint.present? %><%= @bike.paint.name %><% else %><%= @bike.primary_frame_color.name %><% end %></p>
+    <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Serial</span> <%= @bike.serial_number %></p>
+    <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Color</span><% if @bike.paint.present? %><%= @bike.paint.name %><% else %><%= @bike.primary_frame_color.name %><% end %></p>
   </div>
 </div>
 
