@@ -1,21 +1,23 @@
-<% if @new_user %>
-  <h2 style="font-size: 30px;font-weight: 400;">Welcome to the Bike Index</h2>
-
-  <p>Good thinking! We’re glad you’ve joined, you smarty pants.</p>
-<% end %>
-
-<% if @bike.stolen %>
-  <h1>Bike thieves are jerks.</h1>
-  <h2>We're sorry your bike was stolen.</h2>
-<% else %>
-  <h1>Congrats on adding your bike to the index!</h1>
-<% end %>
-
-<hr style="margin: 40px 0 30px;">
-
 <% if @creation_org.present? && @creation_org.new_bike_notification.present? %>
   <%= @creation_org.new_bike_notification.html_safe %>
 <% else %>
+
+  <% if @new_user %>
+    <h2 style="font-size: 30px;font-weight: 400;">Welcome to the Bike Index</h2>
+
+    <p>Good thinking! We’re glad you’ve joined, you smarty pants.</p>
+  <% end %>
+
+  <% if @bike.stolen %>
+    <h1>Bike thieves are jerks.</h1>
+    <h2>We're sorry your bike was stolen.</h2>
+  <% else %>
+    <h1>Congrats on adding your bike to the index!</h1>
+  <% end %>
+
+  <hr style="margin: 40px 0 30px;">
+
+
   <% if @bike.stolen %>
     <p>You added a stolen bike to the Bike Index:</p>
   <% elsif @bike.created_with_token && @bike.ownerships.count < 2 %>
@@ -42,9 +44,8 @@
       <% if @new_bike %> for you <% end %>
     </p>
   <% end %>
-<% end %>
+<% end # end of the creation_org notifcation %>
 
-<!-- Begin the bike box -->
 
 <% bike_image = "https://www.bikeindex.org/assets/bike_photo_placeholder.png" %>
 <% bike_image = @bike.thumb_path if @bike.thumb_path %>    

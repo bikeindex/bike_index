@@ -33,7 +33,7 @@ class CustomerMailer < ActionMailer::Base
     @biketype = CycleType.find(@bike.cycle_type_id).name.downcase
     @new_bike = @bike.ownerships.count == 1
     @new_user = true unless User.fuzzy_email_find(@ownership.owner_email)
-    @creation_org = @bike.creation_organization.name if @bike.creation_organization.present? && @new_bike
+    @creation_org = @bike.creation_organization if @bike.creation_organization.present? && @new_bike
     if @bike.stolen
       subject = "Your stolen bike"
     else
