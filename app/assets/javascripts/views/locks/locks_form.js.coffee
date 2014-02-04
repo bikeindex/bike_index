@@ -43,11 +43,12 @@ class BikeIndex.Views.LocksForm extends Backbone.View
     
 
   updateLockFields: ->
+    console.log('lololol')
     if $('input[name="lock[has_key]"]:checked').length > 0
-      $('#serial').addClass('visibled').slideDown('fast')
+      $('#serial-group').addClass('visibled').slideDown('fast')
     else
-      if $('#serial').hasClass('visibled')
-        $('#serial').slideUp('fast').find('input').val('')
+      if $('#serial-group').hasClass('visibled')
+        $('#serial-group').slideUp('fast').find('input').val('')
     if $('input[name="lock[has_combination]"]:checked').length > 0
       $('#combination').addClass('visibled').slideDown()
     else

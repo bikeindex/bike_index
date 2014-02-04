@@ -13,15 +13,11 @@
           %a{href: "/locks/#{lock.id}"}
             %img{ src: "/assets/locks/#{lock.lock_type.slug}.jpg", alt: lock.lock_type.name} 
         .blist-primary-group
-          .dl-holder
-            %dl.dl-horizontal
-              = link_to (lock.dl_list_item("Lock Type", lock.lock_type_name)), lock_url(lock)
-              = link_to (lock.dl_list_item("Manufacturer", lock.mnfg_name)), lock_url(lock)
-        .blist-info-group
-          .dl-holder
-            %dl.dl-horizontal
-              = lock.dl_from_attribute("key_serial")
-              = lock.dl_from_attribute("combination")
+          %dl.dl-horizontal
+            = lock.dl_list_item(link_to(lock.lock_type_name, lock_url(lock)), "Lock Type")
+            = lock.dl_list_item(lock.mnfg_name, "Manufacturer")
+            = lock.dl_from_attribute("key_serial")
+            = lock.dl_from_attribute("combination")
         
 - else
   %h2
