@@ -2,13 +2,12 @@ class BikeIndex.Views.Home extends Backbone.View
   initialize: ->
     @setElement($('#body'))
     @moveBike()
-    
 
   moveBike: ->
     register = $('#treating-right .treating-right-text')
     $(window).scroll -> 
       ww = $(window).width()
-      aEnd = $('#fight-theft-profit').offset().top
+      aEnd = $('#best-ever').offset().top
       scroll = $(window).scrollTop()
       unless scroll >= aEnd
         p = ((scroll)/aEnd)

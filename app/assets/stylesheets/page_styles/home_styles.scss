@@ -445,7 +445,8 @@ body.welcome-page {
 
 
 #best-ever {
-  background: $searchBackgroundLight;
+  background: white;
+  z-index: 1;
   border-top: 1px solid $searchBorderLight;
   border-bottom: 1px solid $searchBorderLight;
   color: $grayDark;
