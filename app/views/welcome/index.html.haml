@@ -2,7 +2,7 @@
   %h1
     Do right by your bike
   %h3
-    The Bike Index works with you and bike shops to register and protect your bicycle
+    Bicycle registration that just works. Online, powerful, free.
 
 #treating-right
   .treating-right-image
@@ -13,7 +13,7 @@
   .receptacle.overfloating
     .inner-recep
       .treating-right-text
-        = link_to "Add your bike", choose_registration_path, class: "button-green"
+        = link_to "Register it", choose_registration_path, class: "button-green"
         %h2
           Show your trusty steed some love
     .home-sharing
@@ -38,97 +38,74 @@
             <iframe frameborder="0" height="380" src="https://www.kickstarter.com/projects/1073266317/the-bike-index-lets-stop-bike-theft-together/widget/card.html" width="220"></iframe>
           <script type="text/javascript">jQuery(function(){var vheight,vwidth;if($(window).width()>960){vwidth=640;vheight=480;$("#kickstarter .kvid iframe").attr("width",vwidth).attr("height",vheight)}});</script>
 
+.bike-background
+  #best-ever
+    .receptacle.overfloating
+      .inner-recep
+        %article
+          .icographix
+            = image_tag "/assets/home/community_retina.png", alt: "Community", title: "We love the bike community"
+          %h3
+            Community partnerships
+          %p
+            Partnered with bike shops and bike advocacy groups to make registration convenient.
 
-#our-database
-  .receptacle
-    .inner-recep
-      %article
-        %h3
-          Convenient bike registration
-        %ul.fancy-bullets
+        %article
+          .icographix
+            = image_tag "/assets/home/find_retina.png", alt: "Searching", title: "Find it, everywhere."
+          %h3
+            Powerful search
+          %p
+            Full text search of all registered bikes, accessible at the top of every page.
+
+        %article
+          .icographix
+            = image_tag "/assets/home/convenient_retina.png", alt: "Convenience", title: "So convenient it's like ice cream"
+          %h3
+            Convenient registration
+          %p
+            Register in seconds: only 5 pieces of information are required.
+
+        %article
+          .icographix
+            = image_tag "/assets/home/mobile_retina.png", alt: "Mobility", title: "Mobile accessible for your adventure planning"
+          %h3
+            Mobile friendly
+          %p
+            Designed from the ground up with mobile devices in mind. Access the Index when and how you please.
+
+        %article
+          .icographix
+            = image_tag "/assets/home/code_retina.png", alt: "Open source", title: "Open source, because we love you"
+          %h3
+            Open source
+          %p
+            We built the service we wanted to use to save our bikes&mdash;we're open source to offer the best service for everyone.
+
+        %article
+          .icographix
+            = image_tag "/assets/home/verification_retina.png", alt: "Verification", title: "Verify everything"
+          %h3
+            Used bike verification
+          %p
+            Use the Bike Index to verify any bike you buy or sell. You can transfer bike registrations for free.
+  #supporters
+    .receptacle.overfloating
+      .inner-recep
+        %h2
+          %span
+            A few of our
+          Supporters
+        %ul.horizontal-list
           %li
-            %span.blue-bullet
-            %p
-              Show off your sweet ride.
+            %a{href: "http://www.peopleforbikes.org/", target: "_blank"}
+              = image_tag "/assets/supporters/people_for_bikes.png", alt: "People for bikes"
           %li
-            %span.blue-bullet
-            %p
-              Report stolen bicycles.
+            %a{href: "http://bikelanechicago.com/", target: "_blank"}
+              = image_tag "/assets/supporters/bike_lane.png", alt: "Bike Lane"
           %li
-            %span.blue-bullet
-            %p
-              Contact the owner of a stolen bike if you find one.
+            %a{href: "http://westtownbikes.org/retail", target: "_blank"}
+              = image_tag "/assets/supporters/ciclo_urbano.png", alt: "Ciclo Urbano"
           %li
-            %span.blue-bullet
-            %p
-              Verify any bike you buy or sell.
-      .sample-list
-        = link_to (image_tag "/assets/home/bikes_list1.jpg", alt: "Sample Bike Index return"), "https://www.bikeindex.org/bikes/71", class: "top-image"
-        = link_to (image_tag "/assets/home/bikes_list2.jpg", alt: "Sample Bike Index return"), "https://www.bikeindex.org/bikes/2", class: "middle-image"
-        = link_to (image_tag "/assets/home/bikes_list3.jpg", alt: "Sample Bike Index return"), "https://www.bikeindex.org/bikes/12"
-
-
-#fight-theft-profit
-  .receptacle.overfloating
-    .inner-recep
-      .fight-theft-image
-        = image_tag "/assets/home/hacksaw-man-with-bike.png", alt: "Fight bike theft", title: "A bike, maybe just like yours."
-      .theft-profit-block
-        %h3
-          Add your bike, fight bike theft
-        %p
-          Bikes are stolen because they can be sold quickly and easily.
-        %p
-          Add your bike to the Index to make it easier to recover if it's ever stolen.
-
-
-#best-ever
-  .receptacle.overfloating
-    .inner-recep
-      %article
-        .icographix
-          = image_tag "/assets/home/community_retina.png", alt: "Community", title: "We love the bike community"
-        %h3
-          Community partnerships
-        %p
-          We connect with local bike shops and advocacy organizations to offer you free bikes registration.
-
-      %article
-        .icographix
-          = image_tag "/assets/home/find_retina.png", alt: "Searching", title: "Find it, everywhere."
-        %h3
-          Powerful search
-        %p
-          Full text search of all registered bikes, accessible at the top of every page.
-
-      %article
-        .icographix
-          = image_tag "/assets/home/convenient_retina.png", alt: "Convenience", title: "So convenient it's like ice cream"
-        %h3
-          Convenient registration
-        %p
-          Register in seconds: only 5 pieces of information are required to positively identify your bike.
-
-      %article
-        .icographix
-          = image_tag "/assets/home/mobile_retina.png", alt: "Mobility", title: "Mobile accessible for your adventure planning"
-        %h3
-          Mobile friendly
-        %p
-          Designed from the ground up with mobile devices in mind. Access the Index when and how you please.
-
-      %article
-        .icographix
-          = image_tag "/assets/home/code_retina.png", alt: "Open source", title: "Open source, because we love you"
-        %h3
-          Open source
-        %p
-          We built the service we wanted to use to save our bikes&mdash;we're open source to offer the best service for everyone.
-
-      %article
-        .icographix
-          = image_tag "/assets/home/verification_retina.png", alt: "Verification", title: "Verify everything"
-        %h3
-          Used bike verification
-        %p
-          Use the Bike Index to verify any bike you buy or sell. You can transfer bike registrations for free.
+            %a{href: "http://www.activetrans.org/", target: "_blank"}
+              = image_tag "/assets/supporters/active_trans.png", alt: "Active Transportation Alliance"
