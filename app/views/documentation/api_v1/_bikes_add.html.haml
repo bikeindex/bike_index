@@ -237,10 +237,12 @@
     bike 
   object.
 %h3#components_for_bikes
-  Adding components to bikes
+  Adding components and photos to bikes
 
 %p
-  You can submit an array of component objects along with the bike.
+  You can submit an array of urls of photos along with the bike if you'd like.
+%p
+  You can also submit an array of component objects along with the bike.
 %p
   The
   %code
@@ -344,6 +346,10 @@
             handlebar_type_slug: "flat",
             description: "Amazing cargo bike. Has made me car free!"
           },
+          photos: [
+            "http://i.imgur.com/lybYl1l.jpg",
+            "http://i.imgur.com/3BGQeJh.jpg"
+          ]
           components: [
             {
               manufacturer: "SRAM",

@@ -1,5 +1,5 @@
 class PublicImage < ActiveRecord::Base
-  attr_accessible :image, :name, :imageable, :listing_order
+  attr_accessible :image, :name, :imageable, :listing_order, :remote_image_url
 
   mount_uploader :image, ImageUploader
 

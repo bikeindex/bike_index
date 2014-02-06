@@ -78,6 +78,10 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
       frame_material_slug: "steel"
       handlebar_type_slug: "flat"
       description: "Amazing cargo bike. Has made me car free!"
+    photos = [
+      "https://bikeindex.s3.amazonaws.com/uploads/Pu/545/large_8465603755_223358d8b4_b.jpg"
+      "https://bikeindex.s3.amazonaws.com/uploads/Pu/544/large_8433449838_8660d50a08_b.jpg"
+    ]
     components = [
       manufacturer: "SRAM"
       year: "2013"

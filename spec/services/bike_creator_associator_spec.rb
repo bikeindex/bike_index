@@ -43,6 +43,20 @@ describe BikeCreatorAssociator do
     end
   end
 
+  describe :attach_photos_from_url do 
+    it "should create public images for the first 5 photos uploaded" do 
+      bike = FactoryGirl.create(:bike)
+      b_param = BParam.new
+      p = {photos: [
+        "http://i.imgur.com/EAZAdSt.jpg",
+        "http://i.imgur.com/EAZAdSt.jpg"
+      ]}
+      b_param.params = p
+      BikeCreatorAssociator.new(b_param).attach_photos(bike)
+      bike.reload.public_images.count.should eq(1)
+    end
+  end
+
   # describe :add_uploaded_image do 
   #   it "should associate the public image" do 
   #     bike = FactoryGirl.create(:bike)

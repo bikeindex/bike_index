@@ -24,6 +24,12 @@ class BikeCreatorAssociator
     end
   end
 
+  def attach_photos(bike)
+    return nil unless @b_param.params[:photos].present?
+    photos = @b_param.params[:photos].uniq.take(7)
+    photos.each { |p| PublicImage.create(imageable: bike, remote_image_url: p) }
+  end
+
   # def add_uploaded_image(bike)
   #   if @b_param.params[:bike][:bike_image]
   #     public_image = PublicImage.new(image: @b_param.params[:bike][:bike_image])
@@ -38,10 +44,11 @@ class BikeCreatorAssociator
       create_components(bike)
       create_stolen_record(bike) if bike.stolen
       update_bike_token(bike) if bike.created_with_token
+      attach_photo_urls(bike)
     rescue => e
       bike.errors.add(:association_error, e.message)
     end
-    # pp bike.errors.messages
+    pp bike.errors.messages
     bike
   end
 
