@@ -44,11 +44,11 @@ class BikeCreatorAssociator
       create_components(bike)
       create_stolen_record(bike) if bike.stolen
       update_bike_token(bike) if bike.created_with_token
-      attach_photo(bike)
+      attach_photos(bike)
     rescue => e
       bike.errors.add(:association_error, e.message)
     end
-    pp bike.errors.messages
+    # pp bike.errors.messages
     bike
   end
 
