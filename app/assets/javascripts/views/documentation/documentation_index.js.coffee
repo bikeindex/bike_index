@@ -1,41 +1,20 @@
 class BikeIndex.Views.DocumentationIndex extends Backbone.View
-
-  events:
-    'click #documentation-menu a': 'scrollToMenuTarget'
-
-
   initialize: ->
-    @setElement($('#body'))
-    production = parseInt($('#documentation_head').attr('data-production'), 10)
-    @manufacturerCall()
+    @indexCall()
+    @manufacturerCalls()
     @bikeSearchCall()
-    @attributesCall()
-
+    production = parseInt($('#documentation_head').attr('data-production'), 10)
     unless production == 1
       @createBikes()
-      
-    # $('#body').attr('data-spy', "scroll").attr('data-target', '#documentation-menu')
-    # $('#body').scrollspy(offset: - scroll_height)
-    # $('#body').attr('data-spy', "scroll").attr('data-target', '#edit-menu')
-    # $('#body').scrollspy(offset: - scroll_height)
-    # $('#clearing_span').css('height', $('#edit-menu').height() + 25)
-    # $('#edit-menu').attr('data-spy', 'affix').attr('data-offset-top', (menu_height-25))
-
-  scrollToMenuTarget: (event) ->
-    event.preventDefault()
-    target = $(event.target).attr('href')
-    $('body').animate( 
-      scrollTop: ($(target).offset().top - 20), 'fast' 
-    )
   
-  manufacturerCall: ->
+  manufacturerCalls: ->
     $.ajax
       type: "GET"
       url: $('#manufacturers_frame_makers').attr('data-url')
       success: (data, textStatus, jqXHR) ->
         $('#manufacturers_frame_makers').text(JSON.stringify(data,undefined,2))
       error: (data, textStatus, jqXHR) ->
-        console.log(data)
+        $('#manufacturers_frame_makers').text(JSON.stringify(data,undefined,2))
       
     $.ajax
       type: "GET"
@@ -54,8 +33,14 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
       error: (data, textStatus, jqXHR) ->
         $("#bikes_search_query").text(JSON.stringify(data,undefined,2))
   
-  attributesCall: ->
-    id_blocks = ['#wheel_sizes_index', '#cycle_types_index', '#frame_materials_index', '#handlebar_types_index', '#component_types_index']
+  indexCall: ->
+    id_blocks = [
+      '#wheel_sizes_index'
+      '#cycle_types_index'
+      '#frame_materials_index'
+      '#handlebar_types_index'
+      '#component_types_index'
+    ]
     for id in id_blocks
       $.ajax
         type: "GET"
@@ -64,7 +49,7 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
           i = Object.keys(data)[0]
           $("##{i}_index").text(JSON.stringify(data,undefined,2))
         error: (data, textStatus, jqXHR) ->
-          console.log(data)
+          $("##{i}_index").text(data)
 
   createBikes: ->      
     component_bike =
@@ -160,21 +145,4 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
       success: (data, textStatus, jqXHR) ->
         $('#bike_stolen').text(JSON.stringify(data,undefined,2))
       error: (data, textStatus, jqXHR) ->
-        $('#bike_stolen').text(JSON.stringify(data,undefined,2))       
-
-
-      
-  syntaxHighlight: (json) ->
-    json = JSON.stringify(json, `undefined`, 2)  unless typeof json is "string"
-    json = json.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-    json.replace /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, (match) ->
-      cls = "number"
-      if /^"/.test(match)
-        if /:$/.test(match)
-          cls = "key"
-        else
-          cls = "string"
-      else if /true|false/.test(match)
-        cls = "boolean"
-      else cls = "null"  if /null/.test(match)
-      "<span class=\"" + cls + "\">" + match + "</span>"
+        $('#bike_stolen').text(JSON.stringify(data,undefined,2))
