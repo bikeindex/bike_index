@@ -1,14 +1,10 @@
 %h3#never-block
   Create a Bike Index account
-.span8.photo-animation
+.span8.photo-animation#new-user-form
   #photos-flip 
     - cache('new_users_pictures') do
-      - i = 0
-      - PublicImage.bikes.order("created_at desc").limit(30).each do |photo|
-        - if Bike.unscoped.find(photo.imageable_id).example
-        - elsif i > 25
-        - else # We need to have some extras, in case of example photos
-          - i += 1
+      - PublicImage.bikes.order("created_at desc").limit(30).each_with_index do |photo, i|
+        - unless Bike.unscoped.find(photo.imageable_id).example # We extras, in case of example photos
           .bike-photo{id: "photo#{i}"}
             .flipper
               .front

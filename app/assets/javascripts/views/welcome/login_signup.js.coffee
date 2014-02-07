@@ -13,7 +13,10 @@ class BikeIndex.Views.LoginSignup extends Backbone.View
       # Set the delay so that the images wait till after the header fades in
       # then run different while statements for each line
       delay = 1000
-      photo_numbers = [0,6,1,8,2,12,7,3,18,4,10,13,9,19,5,14,16,20,11,15,17,22,21,23]
+      photo_numbers = [0..17]
+      
+      if $('#new_user').length > 0
+        Array::push.apply photo_numbers, [18..23]
       for num in photo_numbers
         delay = delay + (200*Math.random())
         @photoFlip(num, delay)
