@@ -3,19 +3,24 @@
 .span8.photo-animation
   #photos-flip 
     - cache('new_session_pictures') do
-      - PublicImage.bikes.order("created_at desc").limit(18).each_with_index do |photo, i|
-        .bike-photo{id: "photo#{i}"}
-          .flipper
-            .front
-            %a.front-behind{ href: bike_url(photo.imageable) }
-              %span.back-colored
-                %span
-                  #{photo.imageable.manufacturer_name},
-                %span
-                  #{photo.imageable.primary_frame_color.name}
-            .back
-              %span.img-location
-                = photo.image_url(:small)
+      - i = 0
+      - PublicImage.bikes.order("created_at desc").limit(25).each_with_index do |photo, i|
+        - if Bike.unscoped.find(photo.imageable_id).example
+        - elsif i > 18
+        - else # We need to have some extras, in case of example photos
+          - i += 1
+          .bike-photo{id: "photo#{i}"}
+            .flipper
+              .front
+              %a.front-behind{ href: bike_url(photo.imageable) }
+                %span.back-colored
+                  %span
+                    #{photo.imageable.manufacturer_name},
+                  %span
+                    #{photo.imageable.primary_frame_color.name}
+              .back
+                %span.img-location
+                  = photo.image_url(:small)
 .span4.signinup-form
   .well
     %h3
