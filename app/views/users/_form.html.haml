@@ -6,7 +6,7 @@
       - i = 0
       - PublicImage.bikes.order("created_at desc").limit(30).each do |photo|
         - if Bike.unscoped.find(photo.imageable_id).example
-        - elsif i > 24
+        - elsif i > 25
         - else # We need to have some extras, in case of example photos
           - i += 1
           .bike-photo{id: "photo#{i}"}
