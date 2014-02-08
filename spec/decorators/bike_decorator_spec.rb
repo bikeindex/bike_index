@@ -36,7 +36,7 @@ describe BikeDecorator do
       user.stub(:username).and_return("i")
       decorator = BikeDecorator.new(bike)
       decorator.stub(:current_owner_exists).and_return(true)
-      decorator.show_other_bikes.should eq("<a href='/users/i'>Check out this biker's other bikes</a>")
+      decorator.show_other_bikes.should eq("<a href='/users/i'>Check out this users other bikes</a>")
     end
   end
 
