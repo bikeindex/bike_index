@@ -5,6 +5,8 @@
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 14px;
   font-weight: 200;
+  margin: 0;
+  padding: 0;
   * {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
@@ -16,7 +18,7 @@
     @include border-radius(3px 3px 2px 2px);
     @include box-shadow(0 0 2px rgba(black,.2));
     max-width: 200px;
-    margin: 0 auto;
+    margin: 0;
     border: 2px solid $blueDarker;  
     background: $blueDarker;
     position: relative;
