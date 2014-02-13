@@ -13,7 +13,11 @@ module Api
             manufacturers = Manufacturer.fuzzy_name_find(params[:query].to_s)
           end
         end
-        respond_with manufacturers
+        if params[:just_names] && manufacturers.count > 1
+          respond_with manufacturers.map(&:name)
+        else
+          respond_with manufacturers
+        end
       end
 
     end
