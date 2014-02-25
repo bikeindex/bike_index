@@ -28,8 +28,8 @@
     }
     img {
       @include border-radius(2px);
-      // @include box-shadow(0 0 1px rgba(black,.2));
-      border: 1px solid rgba(white,.2);
+      @include box-shadow(0 0 3px rgba(white,.3));
+      // border: 1px solid rgba(white,.2);
       display: block;
       margin: 0 auto;
       max-width: 100%;
@@ -61,12 +61,13 @@
   }
   .clickable-image {
     @include border-radius(2px);
+    @include box-shadow(0 0 3px rgba(white,.3));
     // @include box-shadow(0 0 1px rgba(black,.2));
     position: relative;
     padding: 0;
     margin: 0 auto 10px;
     display: block;
-    border: 1px solid rgba(white,.2);
+    // border: 1px solid rgba(white,.2);
   }
   .video-overlay {
     display: block;
@@ -192,6 +193,10 @@
 }
 
 #selected-photo.just1photo { width: 100%; }
+
+@media (min-width: 1200px) {
+  .single-bike-photos .receptacle { max-width: 100%; }
+}
 
 .single-bike-photos #selected-photo.image-holder.empty {
   @extend .image-holder;

@@ -96,7 +96,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
 
 
   setInitialValues: ->
-    if $('#stolen_date').length > 0
+    # if $('#stolen_date').length > 0
       
       # $('#stolen_date input').datepicker('format: mm-dd-yyy')
     @setWheelDiam('front')
