@@ -38,7 +38,7 @@ gem "capistrano", "~> 2.15.5"
 gem "capistrano-resque", "~> 0.1.0"
 gem "fog"
 gem 'dalli'
-gem 'dumper'
+gem "dumper", "~> 1.4.4"
 gem 'draper'
 # gem 'rack-mini-profiler' # I'm not actually doing anything useful with this and it's annoying.
 gem 'dotenv-rails', "~> 0.8", git: "https://github.com/bkeepers/dotenv"
