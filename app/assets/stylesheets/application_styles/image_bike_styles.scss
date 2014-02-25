@@ -1,3 +1,5 @@
+.stock-photo { opacity: .7; margin-top: .5em; font-size: 1.5em; }
+
 .single-bike-photos {
   @include clearfix;
   position: relative;
@@ -9,6 +11,7 @@
   border-left: 0;
   border-right: 0;
   background: $searchBackground;
+  background: #000;
   &.stolen-background { background: $stolenBackground; }
   .placeholder-wrap {
     margin: 0;
@@ -25,8 +28,8 @@
     }
     img {
       @include border-radius(2px);
-      @include box-shadow(0 0 1px rgba(black,.2));
-      border: 1px solid $imageBorder;
+      // @include box-shadow(0 0 1px rgba(black,.2));
+      border: 1px solid rgba(white,.2);
       display: block;
       margin: 0 auto;
       max-width: 100%;
@@ -58,12 +61,12 @@
   }
   .clickable-image {
     @include border-radius(2px);
-    @include box-shadow(0 0 1px rgba(black,.2));
+    // @include box-shadow(0 0 1px rgba(black,.2));
     position: relative;
     padding: 0;
     margin: 0 auto 10px;
     display: block;
-    border: 1px solid $imageBorder;
+    border: 1px solid rgba(white,.2);
   }
   .video-overlay {
     display: block;
@@ -85,6 +88,8 @@
     width: $tenColumn;
     margin-right: $gutterW;
     float: left;
+    padding: 40px 0;
+    .stock-photo { font-size: 80px; margin-top: .25em; }
   }
   .photo-list {
     position: absolute;
@@ -185,6 +190,8 @@
     }
   }
 }
+
+#selected-photo.just1photo { width: 100%; }
 
 .single-bike-photos #selected-photo.image-holder.empty {
   @extend .image-holder;

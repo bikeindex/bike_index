@@ -60,7 +60,7 @@
     %p.sharing-links
       = @bike.bike_show_twitter_and_website
 
-- if @bike.public_images.any?
+- if @bike.public_images.any? or @bike.stock_photo_url.present?
   .single-bike-photos{ class: current_page?(root_path) && "stolen-background" }
     .receptacle
       .inner-recep

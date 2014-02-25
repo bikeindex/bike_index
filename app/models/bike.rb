@@ -60,6 +60,7 @@ class Bike < ActiveRecord::Base
     :embeded,
     :example,
     :card_id,
+    :stock_photo_url,
     :pdf
 
   mount_uploader :pdf, PdfUploader

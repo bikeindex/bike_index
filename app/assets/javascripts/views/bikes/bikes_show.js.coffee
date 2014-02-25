@@ -8,10 +8,12 @@ class BikeIndex.Views.BikesShow extends Backbone.View
     if $('#claim-ownership-modal').length > 0
       $('#alert-block .alert-error').hide()
       $('#claim-ownership-modal').modal("show")
+    @setPhotos()
 
-    @initializePhotoSelector()
-    @prepPhotos()
-
+  setPhotos: ->
+    if $('#thumbnails').length > 0
+      @initializePhotoSelector()
+      @prepPhotos()
 
   initializePhotoSelector: ->
     setTimeout ( ->
@@ -38,15 +40,14 @@ class BikeIndex.Views.BikesShow extends Backbone.View
           $('#thumbnails').width('100%')
 
   logKey:(event) ->
+    return true unless $('#thumbnail-photos').data('length') > 1
     if event.keyCode == 39
-      if $('#thumbnail-photos').data('length') > 1
         # Go forward
         pos = parseInt($('#selected-photo .current-photo').data('pos'), 10)
         pos = pos + 1
         pos = 1 if pos > $('#thumbnail-photos').data('length')
         @shiftToPhoto(pos)
     else if event.keyCode == 37
-      if $('#thumbnail-photos').data('length') > 1
         # Go backward
         pos = parseInt($('#selected-photo .current-photo').data('pos'), 10)
         pos = pos - 1
