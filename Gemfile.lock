@@ -124,9 +124,10 @@ GEM
       activemodel (>= 3.0)
       activesupport (>= 3.0)
       request_store (~> 1.0.3)
-    dumper (0.0.5)
-      multi_json (~> 1.0)
-      posix-spawn (~> 0.3.6)
+    dumper (1.4.5)
+      multi_json (>= 1.0)
+      multipart-post (>= 1.1.5)
+      posix-spawn (>= 0.3.6)
     eco (1.0.0)
       coffee-script
       eco-source
@@ -431,7 +432,7 @@ DEPENDENCIES
   database_cleaner
   dotenv-rails (~> 0.8)!
   draper
-  dumper
+  dumper (~> 1.4.5)
   factory_girl_rails
   fog
   foreman
