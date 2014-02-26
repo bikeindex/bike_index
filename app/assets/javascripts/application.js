@@ -18,6 +18,7 @@
 //= require external_scripts/bootstrap-collapse.js
 //= require external_scripts/bootstrap-tab.js
 //= require external_scripts/bootstrap-datepicker.js
+//= require external_scripts/bootstrap-typeahead.js
 //= require external_scripts/bootstrap-dropdown.js
 //= require external_scripts/bootstrap-button.js
 //= require external_scripts/bootstrap-scrollspy.js

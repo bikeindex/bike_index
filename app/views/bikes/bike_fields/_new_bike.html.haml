@@ -42,8 +42,8 @@
   .control-group
     = f.label :frame_model, class: "control-label"
     .controls
-      = f.text_field :frame_model
-            
+      = f.text_field :frame_model, autocomplete: 'off'
+
 .input-group.with-optional-blocks
   %a.bikeform-tip{role: "button", title: "Why do we do colors like this?", :data => {toggle: "modal", target: "#colorTip"} }
     %span

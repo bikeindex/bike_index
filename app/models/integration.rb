@@ -8,9 +8,11 @@ class Integration < ActiveRecord::Base
     :user,
     :information
 
-  serialize :information, JSON
+  validates_presence_of :access_token
+  validates_presence_of :provider_name
+  validates_presence_of :information
 
-  validates_presence_of :access_token, :provider_name, :information
+  serialize :information, JSON
 
   belongs_to :user
 

@@ -2,14 +2,9 @@ require 'spec_helper'
 
 describe Integration do
   describe :validations do
-    it "should require a user id, refresh_token, provider_name, expires_in, and access_token" do
-      i = Integration.new
-      i.valid?.should be_false
-      e = i.errors.messages
-      e[:information].should be_present
-      e[:access_token].should be_present
-      e[:provider_name].should be_present
-    end
+    it { should validate_presence_of :information }
+    xit { should validate_presence_of :provider_name }
+    xit { should validate_presence_of :access_token }
   end
 
   describe :associate_with_user do

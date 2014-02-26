@@ -2,8 +2,8 @@ class BikeIndex.Views.BikesNew extends Backbone.View
   events:
     'change #bike_has_no_serial': 'updateSerial'
     'click a.optional-form-block': 'optionalFormUpdate'
-    'change #bike_manufacturer_id': 'expandAdditionalBlock'
-    'change #rear_standard': 'updateWheelDiam'
+    'change #bike_manufacturer_id': 'updateManufacturer'
+    'change #bike_year': 'getModelList'
     'click #select-cycletype a': 'changeCycleType'
     
   
@@ -12,7 +12,6 @@ class BikeIndex.Views.BikesNew extends Backbone.View
     if $('#bike_has_no_serial').prop('checked') == true
       $('#bike_serial_number').val('absent').addClass('absent-serial')
     
-    @setWheelDiam('rear')
     @updateCycleType()
 
   
@@ -36,40 +35,6 @@ class BikeIndex.Views.BikesNew extends Backbone.View
         clickTarget.slideUp().removeClass('unhidden').addClass('currently-hidden')
       else
         clickTarget.slideDown().addClass('unhidden').removeClass('currently-hidden')
-
-  # Right Now: Need to make the edit page work. New page should work
-  # But I just tried to make the new page universal, and I can't guarantee anything.
-  updateWheels: (target, clickTarget) ->
-    standard = clickTarget.parents('.controls').find('.standard-diams')
-    if target.hasClass('show-all')
-      standard.fadeOut('fast', ->
-        clickTarget.fadeIn()
-      )
-    else
-      clickTarget.fadeOut('fast', ->
-        clickTarget.val('')
-        standard.val('')
-        standard.fadeIn()
-      )
-  
-  setWheelDiam: (position) ->
-    wheelDiam = $("#bike_#{position}_wheel_size_id").val()
-    if $("##{position}_standard option[value=#{wheelDiam}]").length
-      $("##{position}_standard").val(wheelDiam)
-      $("#bike_#{position}_wheel_size_id").hide()
-    else
-      $("##{position}_standard").hide()
-      $("#show-#{position}-wheel-diams").addClass('currently-hidden').hide()
-      $("#hide-#{position}-wheel-diams").removeClass('currently-hidden').show()
-      
-
-  updateWheelDiam: (event) ->
-    target = $(event.target)
-    cv = target.val()
-    position = 'rear'
-    $("#bike_#{position}_wheel_size_id").val(cv) if cv.length > 0
-
-
   updateCycleType: ->
     current_value = $("#cycletype#{$("#bike_cycle_type_id").val()}")
     $('#cycletype-text').removeClass('long-title')
@@ -83,7 +48,35 @@ class BikeIndex.Views.BikesNew extends Backbone.View
     $('#bike_cycle_type_id').val(target.attr("data-id"))
     @updateCycleType()
 
-  expandAdditionalBlock: ->
+  setModelTypeahead: (data=[]) ->
+    autocomplete = $('#bike_frame_model').typeahead()
+    autocomplete.data('typeahead').source = data 
+    # $('#bike_frame_model').typeahead({source: data})
+
+  getModelList: ->
+    mnfg = $('#bike_manufacturer_id option:selected').text()
+    unless mnfg == "Choose manufacturer"
+      year = parseInt($('#bike_year').val(),10)
+      url = "http://bikebook.io/model_list/?manufacturer=#{mnfg}"
+      url += "&year=#{year}" if year > 1
+      that = @
+      $.ajax
+        type: "GET"
+        url: url
+        success: (data, textStatus, jqXHR) ->
+          that.setModelTypeahead(data)
+        error: ->
+          that.setModelTypeahead()
+
+
+
+  updateManufacturer: ->
+    @otherManufacturerDisplay()
+    @getModelList()
+    
+
+
+  otherManufacturerDisplay: ->
     current_value = $('#bike_manufacturer_id').val()
     expand_value = $('#bike_manufacturer_id').parents('.input-group').find('.other-value').text()
     hidden_other = $('#bike_manufacturer_id').parents('.input-group').find('.hidden-other')
