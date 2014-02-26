@@ -41,7 +41,7 @@ class Ctype < ActiveRecord::Base
     end
   end
 
-  before_create :set_slug
+  before_save :set_slug
   def set_slug
     # We don't care about updating the slug, since this information will rarely
     # if ever change, and the slug can always stay the same.
