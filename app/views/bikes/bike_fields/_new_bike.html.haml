@@ -30,50 +30,20 @@
     = f.label :manufacturer_other, "Other manufacturer", class: "control-label"
     .controls
       = f.text_field :manufacturer_other, placeholder: "Manufacturer name"
-      
-.input-group.with-optional-blocks
-  %a.bikeform-tip{role: "button", title: "An amazing explanation of wheel sizing.", :data => {toggle: "modal", target: "#rearWheelTip"} }
-    %span
-      ?
-  .control-group
-    %label.control-label{for: "rear_standard"}
-      Rear wheel
-    .controls
-      %select#rear_standard.standard-diams
-        %option{value: ''}
-          Choose diameter
-        %option{value: 3}
-          700c (includes 29ers)
-        %option{value: 8}
-          650b
-        %option{value: 2}
-          27in
-        %option{value: 10}
-          26in
-        %option{value: 20}
-          20in
-        %option{value: 23}
-          18in
-        %option{value: 28}
-          16in
-        %option{value: 29}
-          12in
-      = collection_select( :bike, :rear_wheel_size_id, WheelSize.all , :id, :description, :html => { :required =>true }, prompt: "All diameters")
-  %a#show-rear-wheel-diams.wh_sw.show-all.optional-form-block{:data => {target: "#bike_rear_wheel_size_id", toggle: "#hide-rear-wheel-diams"}}
-    Show more sizes
-  %a#hide-rear-wheel-diams.wh_sw.optional-form-block.currently-hidden{:data => {target: "#bike_rear_wheel_size_id", toggle: "#show-rear-wheel-diams"}}
-    Hide extra sizes
-  .control-group.wheel-diameter
-    %label.control-label
-      Rear tire
-    .controls.radio-controls
-      %label.radio
-        = f.radio_button :rear_tire_narrow, "true"
-        Narrow Tire
-      %label.radio.wide-tire
-        = f.radio_button :rear_tire_narrow, "false"
-        Wide tire
 
+.input-group
+  .control-group.chosen-select
+    = f.label :year, "Model year", class: "control-label"
+    .controls
+      - years = (1900..Time.now.year+1).to_a.reverse.map {|i| [i,i] }
+      = f.select :year, years, selected: Time.now.year
+      
+.input-group
+  .control-group
+    = f.label :frame_model, class: "control-label"
+    .controls
+      = f.text_field :frame_model
+            
 .input-group.with-optional-blocks
   %a.bikeform-tip{role: "button", title: "Why do we do colors like this?", :data => {toggle: "modal", target: "#colorTip"} }
     %span

@@ -2,6 +2,35 @@ require 'spec_helper'
 
 describe BikeCreator do
 
+  describe :include_bike_book do 
+    it "should return the bike if stuff isn't present" do 
+      bike = Bike.new
+      creator = BikeCreator.new()
+      creator.add_bike_book_data.should be_nil
+    end
+    it "should add se bike data if it exists" do 
+      manufacturer = FactoryGirl.create(:manufacturer, name: "SE Bikes")
+      color = FactoryGirl.create(:color)
+      bike = {
+        serial_number: "Some serial",
+        description: "Input description",
+        manufacturer_id: manufacturer.id,
+        year: 2014,
+        frame_model: "Draft",
+        primary_frame_color_id: color.id
+      }
+      b_param = FactoryGirl.create(:b_param, :params => {bike: bike})
+      creator = BikeCreator.new(b_param).add_bike_book_data
+
+      b_param.reload
+      # pp b_param.params
+      b_param.params[:components].count.should > 5
+      b_param.bike[:description].should_not eq("Input description")
+      b_param.bike[:serial_number].should eq("Some serial")
+      b_param.bike[:primary_frame_color_id].should eq(1)
+    end
+  end
+
   describe :build_new_bike do 
     it "should call creator_builder" do 
       b_param = BParam.new
@@ -129,6 +158,7 @@ describe BikeCreator do
       b_param = BParam.new
       bike = Bike.new 
       creator = BikeCreator.new(b_param)
+      creator.should_receive(:add_bike_book_data).at_least(1).times.and_return(nil)
       creator.should_receive(:build_bike).at_least(1).times.and_return(bike)
       bike.should_receive(:save).and_return(true)
       creator.create_bike
@@ -160,6 +190,7 @@ describe BikeCreator do
       b_param = BParam.new
       bike = Bike.new 
       creator = BikeCreator.new(b_param)
+      creator.should_receive(:add_bike_book_data).at_least(1).times.and_return(nil)
       creator.should_receive(:build_bike).at_least(1).times.and_return(bike)
       bike.should_receive(:save).and_return(true)
       creator.create_paid_bike

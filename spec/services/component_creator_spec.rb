@@ -21,11 +21,19 @@ describe ComponentCreator do
   end
 
   describe :set_component_type do 
-    it "should set the component_type from a slug" do 
-      ctype = FactoryGirl.create(:ctype, name: "Stuff")
-      c = { component_type: "sTuff " }
+    it "should set the component_type from a string" do 
+      ctype = FactoryGirl.create(:ctype, name: "Stuff blows")
+      c = { component_type: "sTuff Blows " }
       component = ComponentCreator.new().set_component_type(c)
       component[:ctype_id].should eq(ctype.id)
+      component[:component_type].should_not be_present
+    end
+    it "should create a new component type if we don't recognize it" do 
+      ctype = FactoryGirl.create(:ctype, name: "Unknown")
+      c = { component_type: "Hubs" }
+      component = ComponentCreator.new().set_component_type(c)
+      component[:ctype_id].should eq(ctype.id)
+      component[:ctype_other].should eq('Hubs')
       component[:component_type].should_not be_present
     end
   end

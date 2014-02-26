@@ -104,8 +104,8 @@ class Bike < ActiveRecord::Base
   
   validates_uniqueness_of :card_id, allow_nil: true
   validates_presence_of :primary_frame_color_id
-  validates_presence_of :rear_wheel_size_id
-  validates_inclusion_of :rear_tire_narrow, :in => [true, false]
+  # validates_presence_of :rear_wheel_size_id
+  # validates_inclusion_of :rear_tire_narrow, :in => [true, false]
 
   attr_accessor :date_stolen_input, :phone, :bike_image, :bike_token_id, :b_param_id, :payment_required, :embeded, :paint_name
 
@@ -246,7 +246,7 @@ class Bike < ActiveRecord::Base
     c += "#{frame_material.name} " if frame_material
     c += "#{frame_size} #{frame_size_unit} " if frame_size
     c += "#{frame_model} " if frame_model
-    c += "#{rear_wheel_size.name} wheel "
+    c += "#{rear_wheel_size.name} wheel " if rear_wheel_size
     c += "#{front_wheel_size.name} wheel " if front_wheel_size && front_wheel_size != rear_wheel_size
     c += "#{additional_registration} "
     c += "#{type} " unless self.type == "bike"

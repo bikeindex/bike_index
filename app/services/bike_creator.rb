@@ -7,6 +7,26 @@ class BikeCreator
     @bike = nil
   end
 
+  def add_bike_book_data
+    return nil unless @b_param.present? && @b_param.params.present? && @b_param.params[:bike].present?
+    return nil unless @b_param.bike[:manufacturer_id].present?
+    return nil unless @b_param.bike[:frame_model].present?
+    return nil unless @b_param.bike[:year].present?
+    bike = {
+      manufacturer: Manufacturer.find(@b_param.bike[:manufacturer_id]).name,
+      year: @b_param.bike[:year],
+      frame_model: @b_param.bike[:frame_model]
+    }
+    return nil unless bb_data = BikeBookIntegration.new.get_model(bike).with_indifferent_access
+    @b_param.params[:bike][:cycle_type] = bb_data[:bike][:cycle_type] if bb_data[:bike][:cycle_type].present?
+    @b_param.params[:bike][:paint_name] = bb_data[:bike][:paint_description] if bb_data[:bike][:paint_description].present?
+    @b_param.params[:bike][:description] = bb_data[:bike][:description] if bb_data[:bike][:description].present?
+    @b_param.params[:bike][:wheel_size] = bb_data[:bike][:wheel_size] if bb_data[:bike][:wheel_size].present?
+    @b_param.params[:bike][:stock_photo_url] = bb_data[:bike][:stock_photo_url] if bb_data[:bike][:stock_photo_url].present?
+    @b_param.params[:components] = bb_data[:components]
+    @b_param.save
+  end
+
   def build_new_bike
     @bike = BikeCreatorBuilder.new(@b_param).build_new
   end
@@ -63,6 +83,7 @@ class BikeCreator
   end
 
   def create_bike
+    add_bike_book_data
     @bike = build_bike
     return @bike if @bike.errors.present?
     return @bike if @bike.payment_required
@@ -70,6 +91,7 @@ class BikeCreator
   end
 
   def create_paid_bike
+    add_bike_book_data
     @bike = build_bike
     @bike.payment_required = false
     @bike.verified = true
