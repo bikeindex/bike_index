@@ -32,7 +32,7 @@ describe Bike do
     it { should validate_presence_of :creator }
     it { should validate_presence_of :serial_number }
     it { should validate_presence_of :manufacturer_id }
-    it { should validate_presence_of :rear_wheel_size_id }
+    # it { should validate_presence_of :rear_wheel_size_id }
     it { should validate_presence_of :primary_frame_color_id }
     it { should serialize :cached_attributes }
   end

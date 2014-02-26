@@ -48,9 +48,7 @@ class BikeIndex.Views.AdminBlogsEdit extends Backbone.View
       date = target.attr('data-date')
       $('#blog-date').slideDown()
       $('#post-date-field input').val(date).attr("data-date-format","mm-dd-yyyy")
-      
-      # $('#post-date-field input').datepicker('format: mm-dd-yyy')
-
+      $('#post-date-field input').datepicker('format: mm-dd-yyy')
       # , value: @blog.published_at.strftime("%m-%d-%Y"), required: true, data: { :'date-format' => "mm-dd-yyyy" }
 
 
