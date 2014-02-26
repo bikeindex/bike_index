@@ -48,7 +48,8 @@
 
 
 <% bike_image = "https://www.bikeindex.org/assets/bike_photo_placeholder.png" %>
-<% bike_image = @bike.thumb_path if @bike.thumb_path %>    
+<% bike_image = @bike.stock_photo_url if @bike.stock_photo_url.present? %>
+<% bike_image = @bike.thumb_path if @bike.thumb_path %>
 
 <% if @bike.stolen %>
   <div class="bike-display" style="position: relative;width: 96%;height: 150px;padding: 10px 2%;background: #bf2f2f;border: 1px solid #ddd;max-width: 450px;margin: 30px auto 0;clear: both;">
