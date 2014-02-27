@@ -5,7 +5,7 @@ end
 class SerialNormalizer
   def initialize(creation_params = {})
     @bike_id = creation_params[:bike_id]
-    @serial = creation_params[:serial]
+    @serial = creation_params[:serial].strip
     @bike = find_bike
   end
 
@@ -30,6 +30,7 @@ class SerialNormalizer
     key_hash.keys.each do |k|
       normalized.gsub!(/[#{k}]/, key_hash[k])
     end
+    @serial = normalized
     return normalized
   end
 
