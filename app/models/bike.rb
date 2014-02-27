@@ -170,6 +170,11 @@ class Bike < ActiveRecord::Base
     end
   end
 
+  before_save :set_normalized_serial
+  def set_normalized_serial
+    self.serial_normalized = SerialNormalizer.new({serial: serial_number}).normalized
+  end
+
   before_save :set_paints
   def set_paints
     return true unless paint_name.present?
@@ -199,8 +204,8 @@ class Bike < ActiveRecord::Base
     # list of cgroups so that we can arrange them. Future feature.
     return nil unless self.components.any?
     a = []
-    components.each 
-    ownerships.each { |i| a << i.cgroup_id }
+    components.each { |i| a << i.cgroup_id }
+    a.uniq
   end
 
   def cache_photo

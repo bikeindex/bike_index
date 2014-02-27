@@ -30,9 +30,10 @@ class SerialNormalizer
     }
     key_hash.keys.each do |k|
       normalized.gsub!(/[#{k}]/, key_hash[k])
+      normalized.gsub!(/[^\w]|[_]/, ' ') # turn all non letter/numbers into spaces
     end
-    @serial = normalized
-    return normalized
+    @serial = normalized.gsub(/\s+/,' ') # remove multiple spaces
+    return @serial
   end
 
   def find_normalized
@@ -48,12 +49,6 @@ class SerialNormalizer
     @serial = normalized
     bikes = find_normalized
     return bikes
-  end
-
-  def set_normalized
-    @serial = @bike.serial_number
-    @bike.serial_normalized = normalized
-    @bike.save
   end
 
 end

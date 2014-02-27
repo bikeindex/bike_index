@@ -1,8 +1,8 @@
 # Seed the database with test things!
 # Note: you have to seed the users first, or else the bikes don't have anywhere to go.
 
-desc "Seed test users"
-task :seed_test_users => :environment do 
+desc "Seed test users & 50 text bikes for user@example on first organization"
+task :seed_test_users_and_bikes => :environment do 
   user = User.create(name: "admin", email: "admin@example.com", password: "please12", password_confirmation: "please12", terms_of_service: true)
   user.confirmed = true 
   user.superuser = true 
@@ -27,11 +27,7 @@ task :seed_test_users => :environment do
   membership = Membership.create(organization_id: org.id, user_id: User.find_by_email("example_user@bikeindex.org").id, role: "member")
   membership.save
   org.save
-  puts "\nSuccess"
-end
-
-desc "Create test bikes for user@example on first organization"
-task :seed_test_bikes => :environment do
+  puts "Users added successfully\n"
   @user = User.find_by_email('user@example.com')
   @member = User.find_by_email('member@example.com')
   @org = Organization.first

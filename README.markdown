@@ -23,9 +23,7 @@ We're an open source project. Take a gander through our code, report bugs, or do
 
 - Create and seed your database (`rake db:setup`)
 
-- `rake seed_test_users` to add the three test user accounts: admin@example.com, member@example.com, user@example.com (all have password `please12`)
-
-- `rake seed_test_bikes` to give user@example.com 50 bikes
+- `rake seed_test_users_and_bikes` to add the three test user accounts: admin@example.com, member@example.com, user@example.com (all have password `please12`) and give user@example.com 50 bikes
 
 - `bundle exec foreman start` to start the server
 

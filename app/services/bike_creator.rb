@@ -40,10 +40,6 @@ class BikeCreator
     @bike = BikeCreatorAssociator.new(@b_param).associate(bike)
   end
 
-  def set_normalized_serial
-    SerialNormalizer.new({bike_id: @b_param.created_bike_id}).set_normalized
-  end
-
   def clear_bike(bike)
     build_bike
     bike.errors.messages.each do |message|
@@ -66,7 +62,6 @@ class BikeCreator
       @bike = @b_param.created_bike
     else
       @b_param.update_attributes(created_bike_id: bike.id, bike_errors: nil)
-      set_normalized_serial
     end
     @bike 
   end

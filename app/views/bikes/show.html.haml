@@ -158,7 +158,7 @@
 
     - if @components.any?
       %h3
-        Components on
+        Details for
         - if @bike.name && @bike.name.length > 1
           the bike named
           %strong
@@ -167,21 +167,31 @@
           this
           = @bike.title
 
-      .dl-holder
-        / TODO: Make it display components in the list of cgroups.
-        / - @bike.cgroup_array.each do |cgroup_id|
-        /   - @components.where(cgroup_id: cgroup_id)
-        /     - if cgroup_id == 0
-        - @components.each do |component|
-          %dl.dl-horizontal
-            %p
-              = component.component_type
-            - if component.manufacturer.present?
-              = component.dl_list_item(component.mnfg_name, "Manufacturer")
-            = component.dl_from_attribute("year")
-            = component.dl_from_attribute("model_name", "Model")
-            = component.dl_from_attribute("serial_number")
-            = component.dl_from_attribute("description")
+      - if @bike.cgroup_array.any?
+        .dl-holder
+          - @bike.cgroup_array.each do |cgroup_id|
+            %dl.dl-horizontal
+              %p
+                = Cgroup.find(cgroup_id).name
+              - @components.each do |component|
+                - next unless component.cgroup_id == cgroup_id
+                %dt
+                  = "Front" if component.front
+                  = "Rear" if component.rear
+                  - if component.component_type == "unknown"
+                    Other
+                  - else
+                    = component.component_type.titleize
+                %dd
+                  = component.description
+                - if component.year.present? ||  component.model_name.present? || component.manufacturer.present?
+                  %dd
+                    = component.model_name
+                    = component.year if component.year.present?
+                    - if component.manufacturer.present?
+                      (#{component.mnfg_name})
+                
+            
 
     - if @bike.stolen and @bike.current_stolen_record.present?
       - if current_user.present?

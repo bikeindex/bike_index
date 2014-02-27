@@ -150,6 +150,18 @@ describe Bike do
     end
   end
 
+  describe :set_normalized_serial do 
+    it "should set a bikes normalized_serial" do 
+      bike = Bike.new
+      SerialNormalizer.any_instance.should_receive(:normalized).and_return('normal')
+      bike.set_normalized_serial
+      bike.serial_normalized.should eq('normal')
+    end
+    it "should have before_save_callback_method defined as a before_save callback" do
+      Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_normalized_serial).should == true
+    end
+  end
+
 
   describe "pg search" do 
     it "should return a bike which has a serial number from the query" do
@@ -204,6 +216,9 @@ describe Bike do
       bike.stub(:paint_name).and_return("Food Time SOOON")
       lambda { bike.set_paints }.should change(Paint, :count).by(1)
       bike.paint.name.should eq("food time sooon")
+    end
+    it "should have before_save_callback_method defined as a before_save callback" do
+      Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_paints).should == true
     end
   end
 
@@ -262,6 +277,9 @@ describe Bike do
       b.cache_bike
       b.cached_data.should eq("#{b.manufacturer_name} Hand pedaled 1999 #{b.primary_frame_color.name} #{b.secondary_frame_color.name} #{b.tertiary_frame_color.name} #{material.name} SO MANY ballsacks #{b.frame_model} #{b.rear_wheel_size.name} wheel  unicycle ")
     end
+    it "should have before_save_callback_method defined as a before_save callback" do
+      Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:cache_bike).should == true
+    end
   end
 
 
@@ -279,9 +297,17 @@ describe Bike do
     end
   end
 
-  describe :cgroups do
+  describe :cgroup_array do
     it "should grab a list of all the cgroups" do 
-      # Sometime, need to get this to display stuff better.
+      bike = Bike.new
+      component1 = Component.new 
+      component2 = Component.new 
+      component3 = Component.new 
+      bike.stub_chain(:components).and_return([component1, component2, component3])
+      component1.stub(:cgroup_id).and_return(1)
+      component2.stub(:cgroup_id).and_return(2)
+      component3.stub(:cgroup_id).and_return(2)
+      bike.cgroup_array.should eq([1,2])
     end
   end
 
