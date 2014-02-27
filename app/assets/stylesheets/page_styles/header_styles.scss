@@ -85,7 +85,7 @@
 }
 
 .optional-fields {
-  display: none;
+  // display: none;
   width: $eightColumn - $gutterW;
   .additional-fields input {
     width: 100%;
@@ -594,6 +594,7 @@
       -moz-box-sizing: content-box;
       -webkit-box-sizing: content-box;
       box-sizing: content-box;
+      border-color: #ccc;
     }
   }
   .select2-container-multi .select2-choices .select2-search-choice {

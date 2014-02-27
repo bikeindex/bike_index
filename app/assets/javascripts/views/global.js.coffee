@@ -91,8 +91,8 @@ class BikeIndex.Views.Global extends Backbone.View
       $('#content-menu').attr('data-spy', 'affix').attr('data-offset-top', (b_offset))
 
   expandSearch: ->
-    unless $('#total-top-header').hasClass('search-expanded')
-      $('#header-search .optional-fields').fadeIn()
+    # unless $('#total-top-header').hasClass('search-expanded')
+    #   $('#header-search .optional-fields').fadeIn()
 
   # loadUserHeader: ->
     # This is minified and inlined in the header
