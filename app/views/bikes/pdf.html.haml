@@ -160,16 +160,17 @@
                   narrow tires
                 - else
                   wide tires
-            %tr
-              %td.td-title
-                Rear wheel
-              %td
-                = @bike.rear_wheel_size.name              
-                with
-                - if @bike.rear_tire_narrow
-                  narrow tires
-                - else
-                  wide tires
+            - if @bike.rear_wheel_size.present?
+              %tr
+                %td.td-title
+                  Rear wheel
+                %td
+                  = @bike.rear_wheel_size.name
+                  with
+                  - if @bike.rear_tire_narrow
+                    narrow tires
+                  - else
+                    wide tires
             - if @bike.components.where(ctype_id: Ctype.find_by_name('Seat').id).present?
               %tr
                 %td.td-title
