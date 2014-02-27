@@ -18,11 +18,11 @@ class BikeCreator
       frame_model: @b_param.bike[:frame_model]
     }
     return nil unless bb_data = BikeBookIntegration.new.get_model(bike)
-    bb_data = bb_data..with_indifferent_access
+    # bb_data = bb_data.with_indifferent_access
     @b_param.params[:bike][:cycle_type] = bb_data[:bike][:cycle_type] if bb_data[:bike][:cycle_type].present?
     @b_param.params[:bike][:paint_name] = bb_data[:bike][:paint_description] if bb_data[:bike][:paint_description].present?
     @b_param.params[:bike][:description] = bb_data[:bike][:description] if bb_data[:bike][:description].present?
-    @b_param.params[:bike][:wheel_size] = bb_data[:bike][:wheel_size] if bb_data[:bike][:wheel_size].present?
+    @b_param.params[:bike][:rear_wheel_size] = bb_data[:bike][:rear_wheel_size] if bb_data[:bike][:rear_wheel_size].present?
     @b_param.params[:bike][:stock_photo_url] = bb_data[:bike][:stock_photo_url] if bb_data[:bike][:stock_photo_url].present?
     @b_param.params[:components] = bb_data[:components]
     @b_param.save

@@ -5,7 +5,8 @@ end
 class SerialNormalizer
   def initialize(creation_params = {})
     @bike_id = creation_params[:bike_id]
-    @serial = creation_params[:serial].strip
+    @serial = creation_params[:serial]
+    @serial = @serial.strip if @serial.present?
     @bike = find_bike
   end
 
