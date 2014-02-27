@@ -57,7 +57,8 @@ class BikeIndex.Views.BikesNew extends Backbone.View
     mnfg = $('#bike_manufacturer_id option:selected').text()
     unless mnfg == "Choose manufacturer"
       year = parseInt($('#bike_year').val(),10)
-      url = "http://bikebook.io/model_list/?manufacturer=#{mnfg}"
+      # could be bikebook.io - but then we'd have to pay for SSL...
+      url = "https://bikebook.herokuapp.com//model_list/?manufacturer=#{mnfg}"
       url += "&year=#{year}" if year > 1
       that = @
       $.ajax
@@ -67,7 +68,6 @@ class BikeIndex.Views.BikesNew extends Backbone.View
           that.setModelTypeahead(data)
         error: ->
           that.setModelTypeahead()
-
 
 
   updateManufacturer: ->
