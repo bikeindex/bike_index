@@ -1,3 +1,3 @@
-Dumper::Agent.start_if(:app_key => ENV['DUMPER_KEY']) do
-  Rails.env.production? && dumper_enabled_host?
+if Rails.env.production?
+  Dumper::Agent.start(:app_key => ENV['DUMPER_KEY'])
 end
