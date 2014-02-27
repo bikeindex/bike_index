@@ -20,6 +20,10 @@ class BikesController < ApplicationController
   def index
     search = BikeSearcher.new(params)
     bikes = search.find_bikes
+    if params[:serial].present?
+      secondary_bikes = search.fuzzy_find_serial
+      @secondary_bikes = secondary_bikes.decorate
+    end
     (bikes.count <= 100) ? (total_bikes = bikes.count) : (total_bikes = 100)
     bikes = bikes.paginate(page: params[:page], total_entries: total_bikes).per_page(25)
     @bikes = bikes.decorate

@@ -15,10 +15,15 @@ describe BikeSearcher do
   end
 
   describe :matching_serial do 
-    it "should call serial_search on serial_normalizer" do 
+    it "should call serial normalized on any thing with a serial" do 
+      SerialNormalizer.any_instance.should_receive(:normalized)
       search = BikeSearcher.new(serial: "stuff")
-      SerialNormalizer.any_instance.should_receive(:search)
-      search.matching_serial
+    end
+
+    it "should find matching bikes" do 
+      bike = FactoryGirl.create(:bike, serial_number: 'stuffer')
+      search = BikeSearcher.new(serial: "stuffer")
+      search.matching_serial.first.should eq(bike)
     end
   end
 
@@ -42,60 +47,6 @@ describe BikeSearcher do
       search.should eq(Bike.scoped)
     end
   end
-
-  describe :matching_manufacturers do 
-    before :each do 
-      @bike1 = FactoryGirl.create(:bike)
-      @bike2 = FactoryGirl.create(:bike)
-    end
-    it "should select bikes matching the manufacturer" do 
-      search = BikeSearcher.new()
-      search.stub(:parsed_manufacturer_ids).and_return(@bike1.manufacturer_id)
-      result = search.matching_manufacturers(Bike.scoped)
-      result.should eq([@bike1])
-    end
-    it "should select bikes matching multiple manufacturers" do
-      FactoryGirl.create(:bike)
-      search = BikeSearcher.new()
-      mnfgs = [@bike1.manufacturer_id, @bike2.manufacturer_id]
-      search.stub(:parsed_manufacturer_ids).and_return(mnfgs)
-      result = search.matching_manufacturers(Bike.scoped)
-      result.should eq([@bike2, @bike1])
-    end
-    it "should return all bikes" do 
-      search = BikeSearcher.new.matching_manufacturers(Bike.scoped)
-      search.should eq(Bike.scoped)
-    end
-  end
-
-  describe :parsed_manufacturer_ids do 
-    it "should grab the numbers that it needs to grab" do 
-      search = BikeSearcher.new({:find_manufacturers => { :ids => ["", "9", "16", "3"] } })
-      result = search.parsed_manufacturer_ids
-      result.should eq([9,16,3])      
-    end
-  end
-
-  describe :matching_attr_cache do 
-     before :each do 
-       @bike1 = FactoryGirl.create(:bike)
-       @bike2 = FactoryGirl.create(:bike)
-       @bike3 = FactoryGirl.create(:bike, primary_frame_color_id: @bike1.primary_frame_color_id, secondary_frame_color_id: @bike2.primary_frame_color_id)
-     end
-     it "should select bikes matching the attribute" do 
-       search = BikeSearcher.new({bike_attribute_ids: "present"})
-       search.stub(:parsed_attributes).and_return(["1c#{@bike1.primary_frame_color_id}"])
-       result = search.matching_attr_cache(Bike.scoped)
-       result.first.should eq(@bike3)
-       result.last.should eq(@bike1)
-       result.count.should eq(2)
-       result.class.should eq(ActiveRecord::Relation)
-     end
-     it "should return all bikes" do 
-       search = BikeSearcher.new.matching_attr_cache(Bike.scoped)
-       search.should eq(Bike.scoped)
-     end
-   end
 
   describe :matching_query do 
      it "should select bikes matching the attribute" do 

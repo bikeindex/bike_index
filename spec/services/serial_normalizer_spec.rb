@@ -15,13 +15,4 @@ describe SerialNormalizer do
     end
   end
 
-  describe :search do
-    it "should search for normalized serials" do
-      normalizer = SerialNormalizer.new(serial: "Boots")
-      normalizer.should_receive(:normalized).and_return("b00t5")
-      normalizer.should_receive(:find_normalized).and_return(true)
-      normalizer.search 
-    end
-  end
-
 end

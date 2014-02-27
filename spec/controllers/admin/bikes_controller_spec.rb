@@ -57,7 +57,6 @@ describe Admin::BikesController do
     end
 
     it "should call serial_normalizer" do
-      SerialNormalizer.any_instance.should_receive(:set_normalized)
       bike = FactoryGirl.create(:bike)
       user = FactoryGirl.create(:user, superuser: true)
       set_current_user(user)

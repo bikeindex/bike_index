@@ -156,40 +156,29 @@
         = @bike.dl_list_item(@bike.ass_name("front_gear_type"), "Front gears")
         = @bike.dl_from_attribute("description", "A few more words")
 
-    - if @components.any?
-      %h3
-        Details for
-        - if @bike.name && @bike.name.length > 1
-          the bike named
-          %strong
-            = @bike.name
-        - else
-          this
-          = @bike.title
-
-      - if @bike.cgroup_array.any?
-        .dl-holder
-          - @bike.cgroup_array.each do |cgroup_id|
-            %dl.dl-horizontal
-              %p
-                = Cgroup.find(cgroup_id).name
-              - @components.each do |component|
-                - next unless component.cgroup_id == cgroup_id
-                %dt
-                  = "Front" if component.front
-                  = "Rear" if component.rear
-                  - if component.component_type == "unknown"
-                    Other
-                  - else
-                    = component.component_type.titleize
+    - if @bike.cgroup_array.present?
+      .dl-holder
+        - @bike.cgroup_array.each do |cgroup_id|
+          %dl.dl-horizontal
+            %h3
+              = Cgroup.find(cgroup_id).name
+            - @components.each do |component|
+              - next unless component.cgroup_id == cgroup_id
+              %dt
+                = "Front" if component.front
+                = "Rear" if component.rear
+                - if component.component_type == "unknown"
+                  Other
+                - else
+                  = component.component_type.titleize
+              %dd
+                = component.description
+              - if component.year.present? ||  component.model_name.present? || component.manufacturer.present?
                 %dd
-                  = component.description
-                - if component.year.present? ||  component.model_name.present? || component.manufacturer.present?
-                  %dd
-                    = component.model_name
-                    = component.year if component.year.present?
-                    - if component.manufacturer.present?
-                      (#{component.mnfg_name})
+                  = component.model_name
+                  = component.year if component.year.present?
+                  - if component.manufacturer.present?
+                    (#{component.mnfg_name})
                 
             
 

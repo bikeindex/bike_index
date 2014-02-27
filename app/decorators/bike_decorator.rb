@@ -87,7 +87,7 @@ class BikeDecorator < ApplicationDecorator
     if object.thumb_path
       h.image_tag(object.thumb_path, alt: title_string)
     elsif object.stock_photo_url.present?
-      h.image_tag(object.stock_photo_url, alt: title) + h.content_tag(:span, "stock photo", class: 'stock-photo')
+      h.image_tag(object.stock_photo_url, alt: title)
     else
       h.image_tag("/assets/bike_photo_placeholder.png", alt: title) + h.content_tag(:span, "no image")          
     end    

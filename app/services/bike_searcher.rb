@@ -2,32 +2,17 @@ class BikeSearcher
   def initialize(creation_params = {})
     @params = creation_params
     @bikes = Bike.scoped
+    if @params[:serial].present?
+      @normed_ser = SerialNormalizer.new(serial: @params[:serial]).normalized
+    end
   end
 
   def matching_stolenness(bikes)
     if @params[:non_stolen] or @params[:stolen]
-      @bikes = @bikes.non_stolen unless @params[:stolen]
-      @bikes = @bikes.stolen unless @params[:non_stolen]
+      @bikes = bikes.non_stolen unless @params[:stolen]
+      @bikes = bikes.stolen unless @params[:non_stolen]
     end
-    @bikes
-  end
-
-  def parsed_manufacturer_ids
-    if @params[:find_manufacturers]
-      mnfg_ids = @params[:find_manufacturers][:ids].reject(&:empty?)
-      if mnfg_ids.any?
-        mnfg_ids.collect! {|m| m.to_i}
-        return mnfg_ids 
-      end
-      nil
-    end
-  end
-
-  def matching_manufacturers(bikes)
-    if parsed_manufacturer_ids
-      @bikes = bikes.where(manufacturer_id: parsed_manufacturer_ids)
-    end
-    @bikes
+    @bikes 
   end
 
   def parsed_attributes
@@ -36,13 +21,6 @@ class BikeSearcher
       return attr_ids  if attr_ids.any?
       nil
     end
-  end
-
-  def matching_attr_cache(bikes)
-    if parsed_attributes
-      @bikes = bikes.attr_cache_search(parsed_attributes)
-    end
-    @bikes
   end
 
   def matching_query(bikes)
@@ -54,25 +32,20 @@ class BikeSearcher
 
   def matching_serial
     if @params[:serial].present?
-      @bikes = SerialNormalizer.new(serial: @params[:serial]).search
-    end
-    @bikes
-  end
-  
-  def matching_updated_since(bikes)
-    if @params[:updated_since]
-      since_date = DateTime.parse(@params[:updated_since])
-      @bikes = bikes.where("updated_at >= ?", since_date)
+      @bikes = Bike.where(serial_normalized: @normed_ser)
     end
     @bikes
   end
 
+  def fuzzy_find_serial
+    if @normed_ser.present?
+      Bike.where("LEVENSHTEIN(serial_normalized, ?) < 3", @normed_ser)
+    end
+  end    
+  
   def find_bikes
-    matching_serial
-    # matching_updated_since(@bikes)
+    @bikes = matching_serial    
     matching_stolenness(@bikes)
-    # matching_manufacturers(@bikes)
-    # matching_attr_cache(@bikes)
     matching_query(@bikes)
     @bikes
   end

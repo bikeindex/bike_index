@@ -6,8 +6,6 @@
   %span#stolenness_query{data: {stolen: @stolenness[:stolen], nonstolen: @stolenness[:non_stolen] }}
 
 - if @bikes.present?
-  %h1
-    Indexed Bikes
 
   %ul.bike-boxes
     = render partial: "/bikes/bike", collection: @bikes, :locals => {target: "show" }
@@ -22,3 +20,12 @@
       Oh no!
     %h1
       No bikes matched your search!
+
+- if @secondary_bikes.present?
+  %h2.secondary-bikes
+    Some bikes with serial numbers close to 
+    %em
+      #{params[:serial]}
+
+  %ul.bike-boxes
+    = render partial: "/bikes/bike", collection: @secondary_bikes, :locals => {target: "show" }

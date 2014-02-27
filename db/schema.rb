@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140225203114) do
+ActiveRecord::Schema.define(:version => 20140227225103) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"

@@ -14,7 +14,7 @@ describe BikeBookIntegration do
 
     it "should return a hash of the model for Surly" do 
       manufacturer = FactoryGirl.create(:manufacturer, name: "Surly")
-      bike = {manufacturer: manufacturer.name, frame_model: "Pugsley", year: 2014}
+      bike = {manufacturer: manufacturer.name, frame_model: "Pugsley", year: 2013}
       response = BikeBookIntegration.new.get_model(bike)
       response[:bike][:frame_model].should eq('Pugsley')
       response[:components].count.should eq(22)

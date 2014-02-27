@@ -51,9 +51,6 @@ class BikeUpdator
     @bike_params[:bike][:verified] = @bike.verified
     @bike_params[:bike][:example] = @bike.example
 
-
-    # MAKE SURE YOU MAKE SERIAL NORMALIZED UPDATE ON SAVE!!!
-
     # If the bike isn't verified, it can't be marked un-stolen
     # nevermind - nothing's verified and we don't care right now.
     # @bike_params[:bike][:stolen] = @bike.stolen unless @bike.verified?
