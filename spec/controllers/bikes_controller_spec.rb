@@ -205,8 +205,6 @@ describe BikesController do
           embeded: true,
           cycle_type_id: FactoryGirl.create(:cycle_type).id,
           manufacturer_id: manufacturer.id,
-          rear_tire_narrow: "true",
-          rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
           primary_frame_color_id: FactoryGirl.create(:color).id,
           handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
           owner_email: "Flow@goodtimes.com"

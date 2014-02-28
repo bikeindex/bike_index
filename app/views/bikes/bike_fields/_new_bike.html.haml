@@ -49,7 +49,7 @@
     %span
       ?
   .control-group.chosen-select
-    = f.label :primary_frame_color_id, class: "control-label"
+    = f.label :primary_frame_color_id, "Frame color", class: "control-label"
     .controls
       = collection_select( :bike, :primary_frame_color_id, Color.all, :id, :name, required: true, prompt: "Choose color" )
   %a#add-secondary.optional-form-block{:data => {target: "#secondary-color", toggle: "#rm-secondary"}}

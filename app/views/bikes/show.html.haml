@@ -123,15 +123,15 @@
 
     .dl-holder
       %dl.dl-horizontal
-        - unless @bike.type == "bike"
-          = @bike.dl_from_attribute("type", "Cycle Type")
-      
         %dt Serial
         %dd.serial-text
           - if @bike.recovered
             Serial hidden
           - else
             = @bike.serial_number
+        - unless @bike.type == "bike"
+          = @bike.dl_from_attribute("type", "Cycle Type")
+        
         = @bike.dl_list_item(@bike.mnfg_name, "Manufacturer")
         = @bike.dl_from_attribute("frame_model", "Model")
         = @bike.dl_from_attribute("year", "Year")

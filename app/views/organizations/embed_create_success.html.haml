@@ -4,4 +4,4 @@
   #{@organization.name} sent 
   %em
     #{@bike.owner_email}
-  a #{@bike.type}.
+  = link_to "this #{@bike.type}.", bike_url(@bike), target: "_blank"

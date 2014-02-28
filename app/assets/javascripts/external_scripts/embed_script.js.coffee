@@ -1,14 +1,29 @@
+setModelTypeahead = (data=[]) ->
+  autocomplete = $('#bike_frame_model').typeahead()
+  autocomplete.data('typeahead').source = data 
+  # $('#bike_frame_model').typeahead({source: data})
+
+getModelList = ->
+  mnfg = $('#bike_manufacturer_id option:selected').text()
+  unless mnfg == "Choose manufacturer"
+    year = parseInt($('#bike_year').val(),10)
+    # could be bikebook.io - but then we'd have to pay for SSL...
+    url = "https://bikebook.herokuapp.com//model_list/?manufacturer=#{mnfg}"
+    url += "&year=#{year}" if year > 1
+    $.ajax
+      type: "GET"
+      url: url
+      success: (data, textStatus, jqXHR) ->
+        setModelTypeahead(data)
+      error: ->
+        setModelTypeahead()
+
+
 updateSerial = (e) ->
     if $(e.target).prop('checked') == true
       $('#bike_serial_number').val('absent').addClass('absent-serial')
     else
       $('#bike_serial_number').val('').removeClass('absent-serial')    
-
-updateWheelDiam = (e) ->
-  current_value = $(e.target).val()
-  $('#bike_rear_wheel_size_id').val(current_value)
-
-
 
 optionalFormUpdate = (e) ->
   # $(@).find('a').data('target')
@@ -18,24 +33,28 @@ optionalFormUpdate = (e) ->
   target.addClass('currently-hidden').hide()
 
   if target.hasClass('rm-block')
-    if clickTarget.find('select').attr('name') != 'bike[rear_wheel_size_id]'
-      clickTarget.find('select').val('')
-      clickTarget.slideUp().removeClass('unhidden')
-    else
-      wheelDiam = $('#bike_rear_wheel_size_id').val()
-      if $("#standard-diams option[value=#{wheelDiam}]").length
-        $('#standard-diams').val(wheelDiam)
-      else
-        $('#bike_rear_wheel_size_id').val('')
-      clickTarget.slideUp().removeClass('unhidden').addClass('currently-hidden')      
+    clickTarget.find('select').val('')
+    clickTarget.slideUp().removeClass('unhidden')
   else
     clickTarget.slideDown().addClass('unhidden').removeClass('currently-hidden')
-    if clickTarget.find('select').attr('name') == 'bike[rear_wheel_size_id]'
-      $('#standard-diams').val('')
 
+otherManufacturerUpdate = ->
+  current_value = $('#bike_manufacturer_id').val()
+  expand_value = $('#bike_manufacturer_id').parents('.input-group').find('.other-value').text()
+  hidden_other = $('#bike_manufacturer_id').parents('.input-group').find('.hidden-other')
+  if parseInt(current_value, 10) == parseInt(expand_value, 10)
+    # show the bugger!
+    hidden_other.slideDown().addClass('unhidden')
+  else 
+    # if it's visible, clear it and slide up
+    if hidden_other.hasClass('unhidden')
+      hidden_other.find('input').val('')
+      hidden_other.removeClass('unhidden').slideUp()
 
 
 $(document).ready ->
+  otherManufacturerUpdate()
+
   $('#bike_has_no_serial').change (e) ->
     updateSerial(e)
 
@@ -45,7 +64,11 @@ $(document).ready ->
   $('a.optional-form-block').click (e) ->
     optionalFormUpdate(e)
 
-  $('#standard-diams').change (e) ->
-    updateWheelDiam(e)
+  $('#bike_manufacturer_id').change ->
+    otherManufacturerUpdate()
+    getModelList()
+
+  $('#bike_year').change ->
+    getModelList()
 
   $('.chosen-select select').select2()

@@ -51,8 +51,8 @@ describe Api::V1::BikesController do
       manufacturer = FactoryGirl.create(:manufacturer)
       FactoryGirl.create(:wheel_size, iso_bsd: 559)
       FactoryGirl.create(:cycle_type, slug: "bike")
-      FactoryGirl.create(:ctype, slug: "wheel")
-      FactoryGirl.create(:ctype, slug: "headset")
+      FactoryGirl.create(:ctype, name: "wheel")
+      FactoryGirl.create(:ctype, name: "headset")
       f_count = Feedback.count
       bike = { serial_number: "69 non-example",
         manufacturer_id: manufacturer.id,

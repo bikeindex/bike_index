@@ -1,6 +1,10 @@
 //= require select2
+
 @import "application_styles/_colors.scss";
+@import "includes/bootstrap/_variables.scss";
 @import "includes/bootstrap/_mixins.scss";
+@import "includes/bootstrap/component-animations.scss";
+@import "includes/bootstrap/dropdowns.scss";
 @import "includes/embed_form_styles.scss";
 
 
@@ -81,9 +85,6 @@ a {
     right: 20px;
   }
 }
-.form-foot {
-  border-bottom: 0;
-}
 .control-group {
   float: left;
   max-width: 300px;
@@ -145,14 +146,31 @@ a {
   padding: 1em 0;
 }
 
-.form-save {
+.unhidden.manufacturer-other-input {
+  clear: both;
+  padding: 0;
+}
+
+.form-foot {
+  border-bottom: 0;
   @include clearfix;
-  .button-green {
-    float: right;
-    font-size: 1.2em;
+}
+.submit-registration {
+  clear: both;
+  padding-top: 1.25em;
+  input { margin: 0; }
+  .button-submit {
+    float: left;
+    font-size: 1.3em;
+    // padding: .5em 1.75em;
+    margin-top: -1px;
+    margin-right: .5em;
   }
 }
+
 .chosen-select .controls .select2-container { width: 210px;}
+
+.typeahead .dropdown-menu { max-width: 300px; }
 
 .other-value {
   display: none;
