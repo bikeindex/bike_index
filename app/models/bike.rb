@@ -85,6 +85,7 @@ class Bike < ActiveRecord::Base
 
   has_many :stolen_notifications, dependent: :destroy
   has_many :stolen_records
+  has_many :normalized_serial_segments
   has_many :ownerships, dependent: :destroy
   has_many :public_images, as: :imageable, dependent: :destroy
   has_many :components, dependent: :destroy

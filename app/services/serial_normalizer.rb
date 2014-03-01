@@ -7,16 +7,6 @@ class SerialNormalizer
     @bike_id = creation_params[:bike_id]
     @serial = creation_params[:serial]
     @serial = @serial.strip if @serial.present?
-    @bike = find_bike
-  end
-
-  def find_bike
-    return nil unless @bike_id.present?
-    begin
-    return Bike.unscoped.find(@bike_id)
-    rescue
-      raise SerialNormalizerError, "Oh no! We couldn't find that bike"
-    end
   end
 
   def normalized
@@ -33,7 +23,27 @@ class SerialNormalizer
       normalized.gsub!(/[^\w]|[_]/, ' ') # turn all non letter/numbers into spaces
     end
     @serial = normalized.gsub(/\s+/,' ') # remove multiple spaces
-    return @serial
+  end
+
+  def normalized_segments
+    @serial = normalized 
+    return nil if @serial == "absent"
+    
+    segments = @serial.split(' ')
+    segments.reject! { |c| c.empty? }
+    segments.uniq
+  end
+
+  def save_segments(bike_id)
+    existing = NormalizedSerialSegment.where(bike_id: bike_id)
+    existing.map(&:destroy) if existing.present?
+    return false unless Bike.where(id: bike_id).present?
+    
+    segments = normalized_segments
+    return false unless segments.present?
+    segments.each do |seg|
+      NormalizedSerialSegment.create(bike_id: bike_id, segment: seg)
+    end
   end
 
 end

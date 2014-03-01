@@ -3,7 +3,7 @@ class BikeSearcher
     @params = creation_params
     @bikes = Bike.scoped
     if @params[:serial].present?
-      @normed_ser = SerialNormalizer.new(serial: @params[:serial]).normalized
+      @normer = SerialNormalizer.new(serial: @params[:serial])
     end
   end
 
@@ -32,15 +32,19 @@ class BikeSearcher
 
   def matching_serial
     if @params[:serial].present?
-      @bikes = Bike.where(serial_normalized: @normed_ser)
+      @bikes = Bike.where(serial_normalized: @normer.normalized)
     end
     @bikes
   end
 
   def fuzzy_find_serial
-    if @normed_ser.present?
-      Bike.where("LEVENSHTEIN(serial_normalized, ?) < 3", @normed_ser)
+    return nil unless @normer.normalized_segments.present?
+    bike_ids = []
+    @normer.normalized_segments.each do |seg|
+      next unless seg.length > 2
+      bike_ids += NormalizedSerialSegment.where("LEVENSHTEIN(segment, ?) < 3", seg).map(&:bike_id)
     end
+    Bike.where('id in (?)', bike_ids.uniq)
   end    
   
   def find_bikes

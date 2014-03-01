@@ -20,6 +20,15 @@ describe BikeCreatorAssociator do
     end
   end
 
+  describe :create_normalized_serial_segments do 
+    it "should call create components" do 
+      b_param = BParam.new
+      bike = Bike.new 
+      SerialNormalizer.any_instance.should_receive(:save_segments).and_return(true)
+      BikeCreatorAssociator.new(b_param).create_normalized_serial_segments(bike)
+    end
+  end
+
   describe :create_stolen_record do 
     it "should call create stolen record and set_creation_organization" do 
       b_param = BParam.new
@@ -78,6 +87,7 @@ describe BikeCreatorAssociator do
       creator.should_receive(:create_stolen_record).and_return(bike)
       creator.should_receive(:update_bike_token).and_return(bike)
       creator.should_receive(:create_components).and_return(bike)
+      creator.should_receive(:create_normalized_serial_segments).and_return(bike)
       # creator.should_receive(:add_uploaded_image).and_return(bike)
       creator.associate(bike)
     end

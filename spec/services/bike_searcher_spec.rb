@@ -15,14 +15,10 @@ describe BikeSearcher do
   end
 
   describe :matching_serial do 
-    it "should call serial normalized on any thing with a serial" do 
-      SerialNormalizer.any_instance.should_receive(:normalized)
-      search = BikeSearcher.new(serial: "stuff")
-    end
-
     it "should find matching bikes" do 
-      bike = FactoryGirl.create(:bike, serial_number: 'stuffer')
-      search = BikeSearcher.new(serial: "stuffer")
+      bike = FactoryGirl.create(:bike, serial_number: 'st00d-ffer')
+      # SerialNormalizer.any_instance.should_receive(:normalized)
+      search = BikeSearcher.new(serial: 'STood ffer')
       search.matching_serial.first.should eq(bike)
     end
   end

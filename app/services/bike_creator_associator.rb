@@ -16,6 +16,10 @@ class BikeCreatorAssociator
     StolenRecordUpdator.new(bike: bike).set_creation_organization if bike.creation_organization.present?
   end
 
+  def create_normalized_serial_segments(bike)
+    SerialNormalizer.new({serial: bike.serial_number}).save_segments(bike.id)
+  end
+
   def update_bike_token(bike)
     if @b_param.bike_token_id.present?
       bike_token = BikeToken.find(@b_param.bike_token_id)
@@ -42,6 +46,7 @@ class BikeCreatorAssociator
     begin 
       create_ownership(bike)
       create_components(bike)
+      create_normalized_serial_segments(bike)
       create_stolen_record(bike) if bike.stolen
       update_bike_token(bike) if bike.created_with_token
       attach_photos(bike)
