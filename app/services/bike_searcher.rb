@@ -32,7 +32,7 @@ class BikeSearcher
 
   def matching_serial
     if @params[:serial].present?
-      @bikes = Bike.where(serial_normalized: @normer.normalized)
+      @bikes = Bike.where("serial_normalized @@ ?", @normer.normalized)
     end
     @bikes
   end
@@ -41,7 +41,7 @@ class BikeSearcher
     return nil unless @normer.normalized_segments.present?
     bike_ids = []
     @normer.normalized_segments.each do |seg|
-      next unless seg.length > 2
+      next unless seg.length > 3
       bike_ids += NormalizedSerialSegment.where("LEVENSHTEIN(segment, ?) < 3", seg).map(&:bike_id)
     end
     Bike.where('id in (?)', bike_ids.uniq)

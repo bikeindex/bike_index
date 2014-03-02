@@ -118,9 +118,8 @@ class Bike < ActiveRecord::Base
   # TODO: match serial numbers search across common substitutions,
   # i.e. 0 & O
   pg_search_scope :search, against: {
-    :serial_number => 'A',
-    :cached_data => 'B',
-    :description => 'c',
+    :cached_data => 'A',
+    :description => 'B',
     },
     using: {tsearch: {dictionary: "english", :prefix => true}}
 

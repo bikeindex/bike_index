@@ -20,9 +20,14 @@ describe BikeSearcher do
       search = BikeSearcher.new(serial: 'STood ffer')
       search.matching_serial.first.should eq(bike)
     end
-    it "should find matching bikes" do 
+    it "should find bikes with absent serials" do 
       bike = FactoryGirl.create(:bike, serial_number: 'absent')
       search = BikeSearcher.new(serial: 'absent')
+      search.matching_serial.first.should eq(bike)
+    end
+    it "should full text search" do 
+      bike = FactoryGirl.create(:bike, serial_number: 'K10DY00047-bkd')
+      search = BikeSearcher.new(serial: 'bkd-K1oDYooo47')
       search.matching_serial.first.should eq(bike)
     end
   end
