@@ -17,8 +17,12 @@ describe BikeSearcher do
   describe :matching_serial do 
     it "should find matching bikes" do 
       bike = FactoryGirl.create(:bike, serial_number: 'st00d-ffer')
-      # SerialNormalizer.any_instance.should_receive(:normalized)
       search = BikeSearcher.new(serial: 'STood ffer')
+      search.matching_serial.first.should eq(bike)
+    end
+    it "should find matching bikes" do 
+      bike = FactoryGirl.create(:bike, serial_number: 'absent')
+      search = BikeSearcher.new(serial: 'absent')
       search.matching_serial.first.should eq(bike)
     end
   end

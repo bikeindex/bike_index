@@ -13,6 +13,7 @@ module Api
         FrameMaterial.all.each  { |i| tags << i.name }
         WheelSize.unscoped.commonness.each { |i| tags << "#{i.name} wheel" }
         Manufacturer.all.each { |i| tags << i.name }
+        CycleType.all.each { |i| tags << i.name }
         respond_with tags, root: 'tags'
       end
 

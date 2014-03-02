@@ -7,6 +7,9 @@ class BikeIndex.Views.BikesSearch extends Backbone.View
 
   setInitialValues: ->
     $('#header-search .optional-fields').show()
+    if $('#serial').val() == "absent"
+      $('#serial-absent, .absent-serial-blocker').addClass('absents')
+      $('#serial').addClass('absent-serial')
     # $('#total-top-header').addClass('search-expanded')
     # @selectCurrentAttributes()
     # @selectStolenness()

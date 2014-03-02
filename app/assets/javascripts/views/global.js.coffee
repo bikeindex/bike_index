@@ -6,6 +6,7 @@ class BikeIndex.Views.Global extends Backbone.View
     'click .footnote-back-link':            'scrollToRef'
     'click .scroll-to-ref':                 'scrollToRef'
     'click .no-tab':                        'openNewWindow'
+    'click #serial-absent':                 'updateSerialAbsent'
     'focus #header-search':                 'expandSearch'
     
   initialize: ->
@@ -35,6 +36,21 @@ class BikeIndex.Views.Global extends Backbone.View
       url: $("#head-search-bikes #query").attr('data-url')
       success: (data, textStatus, jqXHR) ->
         v.setSearchfantasy(data.tags)
+
+  updateSerialAbsent: (e) ->
+    e.preventDefault()
+    $('#serial-absent, .absent-serial-blocker').toggleClass('absents')
+    if $('#serial-absent').hasClass('absents')
+      $('#serial')
+        .val('absent')
+        .addClass('absent-serial')
+    else
+      $('#serial')
+        .val('')
+        .removeClass('absent-serial')
+
+
+
 
   setSearchfantasy: (tags) ->
     $('#head-search-bikes #query').select2

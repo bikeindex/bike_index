@@ -111,7 +111,7 @@
   .new-bike-fields .has-no-serial { margin-left: 160px; }
 }
 
-.input-group .absent-serial {
+.input-group .absent-serial, .additional-fields .absent-serial {
   background: darken(white, 10%);
   color: $grayLight;
   cursor: default;

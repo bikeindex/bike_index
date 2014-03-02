@@ -49,7 +49,7 @@ label { cursor: pointer; }
   padding-bottom: 200px;
 }
 
-.placeholder { color: #aaa; }
+.placeholder { color: $placeholder; }
 
 .subheading-text {
   display: block;
