@@ -164,24 +164,6 @@ describe Bike do
 
 
   describe "pg search" do 
-    it "should return a bike which has a serial number from the query" do
-      @bike = FactoryGirl.create(:bike, serial_number: "4444444sssss")
-      @bikes = Bike.text_search("4444444sssss")
-      @bikes.should include(@bike)
-    end
-    
-    xit "should return a bike that has a serial number that includes the query" do 
-      @bike = FactoryGirl.create(:bike, serial_number: "4sssss")
-      @bikes = Bike.text_search("4444444sssss")
-      @bikes.should include(@bike)
-    end
-
-    it "should not return a bike which does not have a matching serial number" do 
-      @bike = FactoryGirl.create(:bike, serial_number: "4444444sssss")
-      @bikes = Bike.text_search("5555ssss")
-      @bikes.should_not include(@bike)
-    end
-
     it "should return a bike which has a matching part of its description" do
       @bike = FactoryGirl.create(:bike, description: "Phil wood hub")
       @bikes = Bike.text_search("phil wood hub")
