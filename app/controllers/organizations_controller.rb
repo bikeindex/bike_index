@@ -19,7 +19,11 @@ class OrganizationsController < ApplicationController
     b_param = BParam.create(creator_id: @organization.auto_user.id, params: {creation_organization_id: @organization.id, embeded: true})
     @bike = BikeCreator.new(b_param).new_bike
     @bike.owner_email = params[:email] if params[:email].present?
-    render layout: 'embed_layout'
+    if params[:sf_safe].present?
+      render action: :embed_sf_safe, layout: 'embed_layout'
+    else
+      render layout: 'embed_layout'
+    end
   end
 
   def embed_create_success
