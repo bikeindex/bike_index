@@ -154,15 +154,15 @@
         type: "POST",
         url: "#{request_url}",
         data: {
-          organization_slug: "#{org.slug}",
-          access_token: "#{org.access_token}",
-          bike: {
-            serial_number: "XOXO <3",
-            manufacturer: "Surly",
-            color: "Blue",
-            rear_wheel_bsd: 622,
-            rear_tire_narrow: false,
-            owner_email: "new_bike_owner@bikeindex.org"
+          "organization_slug": "#{org.slug}",
+          "access_token": "#{org.access_token}",
+          "bike": {
+            "serial_number": "XOXO <3",
+            "manufacturer": "Surly",
+            "color": "Blue",
+            "rear_wheel_bsd": 622,
+            "rear_tire_narrow": false,
+            "owner_email": "new_bike_owner@bikeindex.org"
           }
         },
         success: function(data, textStatus, jqXHR) {
@@ -332,37 +332,37 @@
         type: "POST",
         url: "#{request_url}",
         data: {
-          organization_slug: "#{org.slug}",
-          access_token: "#{org.access_token}",
-          bike: {
-            serial_number: "XOXO :)",
-            manufacturer: "WorkCycles",
-            color: "Red",
-            rear_wheel_bsd: 559,
-            rear_tire_narrow: false,
-            owner_email: "cargo_bike_owner@bikeindex.org",
-            cycle_type_slug: "cargo",
-            frame_material_slug: "steel",
-            handlebar_type_slug: "flat",
-            description: "Amazing cargo bike. Has made me car free!"
+          "organization_slug": "#{org.slug}",
+          "access_token": "#{org.access_token}",
+          "bike": {
+            "serial_number": "XOXO :)",
+            "manufacturer": "WorkCycles",
+            "color": "Red",
+            "rear_wheel_bsd": 559,
+            "rear_tire_narrow": false,
+            "owner_email": "cargo_bike_owner@bikeindex.org",
+            "cycle_type_slug": "cargo",
+            "frame_material_slug": "steel",
+            "handlebar_type_slug": "flat",
+            "description": "Amazing cargo bike. Has made me car free!"
           },
-          photos: [
+          "photos": [
             "http://i.imgur.com/lybYl1l.jpg",
             "http://i.imgur.com/3BGQeJh.jpg"
           ],
-          components: [
+          "components": [
             {
-              manufacturer: "SRAM",
-              year: "2013",
-              component_type: "crankset",
-              description: "2X10 crankset",
-              model_name: "X0"
+              "manufacturer": "SRAM",
+              "year": "2013",
+              "component_type": "crankset",
+              "description": "2X10 crankset",
+              "model_name": "X0"
             },
             {
-              manufacturer: "Chris King",
-              component_type: "hub",
-              model_name: "Bumble Bee",
-              front_or_rear: "both"
+              "manufacturer": "Chris King",
+              "component_type": "hub",
+              "model_name": "Bumble Bee",
+              "front_or_rear": "both"
             }
           ]
         },
@@ -514,28 +514,28 @@
         type: "POST",
         url: "#{request_url}",
         data: {
-          organization_slug: "#{org.slug}",
-          access_token: "#{org.access_token}",
-          bike: {
-            stolen: true,
-            phone: "(124) 534-6339",
-            serial_number: "XXXX :(",
-            manufacturer: "Jamis",
-            color: "Black",
-            rear_wheel_bsd: 622,
-            rear_tire_narrow: false,
-            owner_email: "stolen_bike_owner@bikeindex.org"
+          "organization_slug": "#{org.slug}",
+          "access_token": "#{org.access_token}",
+          "bike": {
+            "stolen": true,
+            "phone": "(124) 534-6339",
+            "serial_number": "XXXX :(",
+            "manufacturer": "Jamis",
+            "color": "Black",
+            "rear_wheel_bsd": 622,
+            "rear_tire_narrow": false,
+            "owner_email": "stolen_bike_owner@bikeindex.org"
           },
-          stolen_record: {
-            date_stolen: "03-01-2013",
-            theft_description: "This bike was stolen and that's no fair.",
-            country: "US",
-            street: "Cortland and Ashland",
-            city: "Chicago",
-            zipcode: "60622",
-            state: "IL",
-            police_report_number: "99999999",
-            police_report_department: "Chicago"
+          "stolen_record": {
+            "date_stolen": "03-01-2013",
+            "theft_description": "This bike was stolen and that's no fair.",
+            "country": "US",
+            "street": "Cortland and Ashland",
+            "city": "Chicago",
+            "zipcode": "60622",
+            "state": "IL",
+            "police_report_number": "99999999",
+            "police_report_department": "Chicago"
           },
         },
         success: function(data, textStatus, jqXHR) {
