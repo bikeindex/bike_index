@@ -130,9 +130,14 @@
   }
 }
 
-@media (max-width: 900px) {
-  #serial-absent span { display: none; }
+@media (max-width: 550px) {
+  .optional-fields {
+    .additional-fields input { width: 67%; }
+    #serial-absent { width: 31%; }
+  }
 }
+
+@media (max-width: 900px) { #serial-absent span { display: none; } }
 
 @media (max-width: 600px) {
   .optional-fields {
