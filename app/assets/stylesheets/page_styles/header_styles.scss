@@ -99,14 +99,8 @@
     width: 28%;
     margin: -.25em 0 0 2%;
     padding: .35em .25em;
-    // @include box-shadow(1 1 2px rgba(black,.4));
-    // @include box-shadow(#{inset 0 0 4px rgba(white,.4), inset 0 0 4px rgba(white,.4), inset 0 0 4px rgba(purple,.9)});
     color: $placeholder;
-    // background: $grayDark;
-    // text-transform: capitalize; 
     text-align: center;
-    // color: white;
-    // border: 1px solid darken($grayDark, 5%);
     &:hover {
       @include box-shadow(1px 1px 2px rgba(black,.4));
     } 
@@ -144,9 +138,15 @@
   .optional-fields {
     width: 100%;
     .additional-fields { width: 66%; }
-    #serial-absent { font-size: .8em; padding: .4375em .3em; }
-    .absent-serial-blocker.absents { width: 45%; }
     .stolenness { width: 32%; }
+  }
+}
+
+@media (max-width: 660px) {
+  .optional-fields {
+    #serial-absent { font-size: .8em; padding: .4375em 0em; }
+    .absent-serial-blocker.absents { width: 45%; }
+    
   }
 }
 
