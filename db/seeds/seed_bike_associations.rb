@@ -11,6 +11,7 @@ cycle_types = [
   { name: 'Cargo Tricycle (front storage)', slug: 'cargo-trike' },
   { name: 'Cargo Tricycle (rear storage)', slug: 'cargo-trike-rear' },
   { name: 'Bike Trailer', slug: 'trailer' },
+  { name: 'Trail behind (half bike)', slug: 'trail-behind' },
   { name: 'Tall Bike', slug: 'tall-bike' },
   { name: 'Penny Farthing', slug: 'penny-farthing' },
   { name: 'Wheelchair', slug: 'wheelchair' },

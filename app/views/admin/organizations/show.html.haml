@@ -88,7 +88,7 @@
           %td
             = bike.primary_frame_color.name
           %td
-            = bike.rear_wheel_size.name
+            = bike.rear_wheel_size.name if bike.rear_wheel_size.present?
 
 
 %section.full-screen-table
