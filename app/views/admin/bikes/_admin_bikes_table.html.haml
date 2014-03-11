@@ -1,49 +1,35 @@
 %thead
   %th
-    Id&nbsp;
-  %th
     Date indexed
   %th.medium-screens
     Sent to
-  %th.medium-screens
-    Created by
   %th
     Manufacturer
   %th.large-screens
-    Color&nbsp;&nbsp;
-  %th.large-screens
-    Registrar
+    Info
+  %th
+    Created by
 
 %tbody
   - @bikes.each do |bike|
     %tr
       %td
-        = link_to bike.id, edit_admin_bike_url(bike)
-      %td
-        - if bike.created_at.today?
-          %span.hidden
-            = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
-          Today at #{bike.created_at.strftime("%-I %p")}
-        - elsif Date.yesterday().beginning_of_day() <= bike.created_at
-          %span.hidden
-            = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
-          Yesterday at #{bike.created_at.strftime("%-I %p")}
-        - else
-          %span.hidden
-            = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
-          = bike.created_at.strftime("%-m/%-d/%Y at %-H")
+        %span.less-strong-right
+          = bike.id 
+        %a{href: edit_admin_bike_url(bike) }
+
+          - if bike.created_at.today?
+            Today at #{bike.created_at.strftime("%-I %p")}
+          - elsif Date.yesterday().beginning_of_day() <= bike.created_at          
+            Yesterday at #{bike.created_at.strftime("%-I %p")}
+          - else
+            = bike.created_at.strftime("%-m.%-d.%Y at %-H")
       %td.medium-screens
         - if bike.created_with_token
           %span.less-strong
             Free bike token
         - else
           = bike.owner_email
-      %td.medium-screens
-        = bike.creation_organization.name if bike.creation_organization.present?
-        - if bike.paid_for
-          %span.less-strong
-            Purchased
-
       %td
         - if bike.manufacturer_other.present?
           %span.table-error
@@ -51,9 +37,14 @@
         - else
           = bike.manufacturer.name
       %td.large-screens
-        = bike.primary_frame_color.name
-      %td.large-screens
-        - if bike.creator.name.present?
-          = bike.creator.name
-        - else
-          = bike.creator.email
+        = bike.year
+        = bike.frame_model
+        %span.less-strong-right
+          = "pos" if bike.registered_new
+
+      %td
+        = bike.creation_organization.name if bike.creation_organization.present?
+        - if bike.paid_for
+          %span.less-strong
+            Purchased
+      
