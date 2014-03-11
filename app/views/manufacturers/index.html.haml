@@ -1,25 +1,27 @@
 %h1
-  Manufacturers known to Bike Index
+  Manufacturers we know about
 
 %section.full-screen-table
   %table#manufacturers-list.table.table-striped.table-bordered
     %thead
       %th
         Name
-      %th
-        Frames
+      / %th
+      /   Frame maker
       %th.large-screens
         Website
     %tbody
       - @manufacturers.each do |manufacturer|
         %tr
           %td
-            = link_to manufacturer.name, manufacturer_url(manufacturer)
-          %td
-            = "&#x2713;".html_safe if manufacturer.frame_maker
+            / # = image_tag manufacturer.logo_url(:thumb)
+            = manufacturer.name
+            - if manufacturer.frame_maker
+              %span.less-strong-right
+                frame maker
           %td.large-screens
             - if manufacturer.website
-              = link_to "Company website", manufacturer.website
+              = link_to manufacturer.website, manufacturer.website
 
 %h2.padded
   OH NO! We're missing a manufacturer?
@@ -31,7 +33,7 @@
 %article.padded
   .alert.alert-info
     %p
-      Even better, #{link_to "this list is stored on GitHub", "https://github.com/bikeindex/resources/blob/master/manufacturers.csv"}. It's downloadable in csv format and is open source. If you'd like to make a correction or an addition, be awesome and #{link_to "submit a pull request", "https://help.github.com/articles/using-pull-requests"}.
+      Even better, #{link_to "this list is stored on GitHub", "https://github.com/bikeindex/resources/blob/master/manufacturers.csv"}. It's downloadable in csv format and is open source. If you'd like to make a correction or an addition, you could be awesome and #{link_to "submit a pull request", "https://help.github.com/articles/using-pull-requests"}.
 
 %article.content-comments
   = render "/shared/disqus"

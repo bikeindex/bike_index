@@ -64,8 +64,11 @@ table.dataTable th:active {
   table.table {
     margin: 10px 0 25px;
   }
-  .less-strong {
-    color: darken($grayMed, 5%);
+  .less-strong { color: darken($grayMed, 5%); }
+  .less-strong-right {
+    color: darken($grayMed, 5%); 
+    float: right;
+    font-size: .8em;
   }
 }
 
