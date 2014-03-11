@@ -64,6 +64,7 @@ table.dataTable th:active {
   table.table {
     margin: 10px 0 25px;
   }
+  .not-large-screens { display: none; }
   .less-strong { color: darken($grayMed, 5%); }
   .less-strong-right {
     color: darken($grayMed, 5%); 
@@ -75,6 +76,8 @@ table.dataTable th:active {
 @media (max-width: 950px) {
   .full-screen-table {
     .large-screens { display: none; }
+    .not-large-screens { display: inline-block; }
+    .less-strong-right { display: none; }
   }
 }
 

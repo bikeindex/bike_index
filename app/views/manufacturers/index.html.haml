@@ -6,22 +6,24 @@
     %thead
       %th
         Name
-      / %th
-      /   Frame maker
       %th.large-screens
+        Frame maker
+      %th.med-width
         Website
     %tbody
       - @manufacturers.each do |manufacturer|
         %tr
           %td
-            / # = image_tag manufacturer.logo_url(:thumb)
             = manufacturer.name
-            - if manufacturer.frame_maker
-              %span.less-strong-right
-                frame maker
           %td.large-screens
+            = "&#x2713;".html_safe if manufacturer.frame_maker
+          %td.med-width
             - if manufacturer.website
-              = link_to manufacturer.website, manufacturer.website
+              %a{href: manufacturer.website}
+                %span.large-screens
+                  = manufacturer.website.gsub(/https?:\/\/(www\.)?/,'').truncate(30)
+                %span.not-large-screens
+                  Website
 
 %h2.padded
   OH NO! We're missing a manufacturer?
