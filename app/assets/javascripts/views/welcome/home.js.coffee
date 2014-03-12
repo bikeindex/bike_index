@@ -5,12 +5,12 @@ class BikeIndex.Views.Home extends Backbone.View
   initialize: ->
     @setElement($('#body'))
     @moveBike()
-    if $(window).width() > 768
-      $('#movie-cover .cover-container').css('min-height',$(window).height() )
-      # $('#movie-cover .cover-container').css('min-height',$(window).height()*.5)
-      # else
-      # $('#movie-cover .cover-container').css('min-height',$(window).height() )
-
+    height = $(window).width()*.66
+    if height > $(window).height()
+      height = $(window).height()
+    $('#movie-cover .cover-container').css('min-height', height)
+    $('#movie-cover .cover-container').css('max-height', height)
+    
 
   movieShowtime: (event) ->
     event.preventDefault()

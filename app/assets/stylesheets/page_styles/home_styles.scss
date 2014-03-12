@@ -363,7 +363,6 @@ body.welcome-page {
   border-bottom: 1px solid $searchBorderLight;
   background: $bodyBackground;
   width: 100%; height: 100%;
-  min-height: 400px;
   .cover-background {
     display: block;
     width: 110%;
@@ -399,29 +398,27 @@ body.welcome-page {
   @include clearfix;
   position: relative;
   width: 100%; height: 100%;
+  min-height: 400px;
   
-  .movie-image {
+  img {
     @include border-radius(4px);
     @include box-shadow(1px 1px 2px rgba(black,.3));
     position: absolute;
     top: 10%;
-    width: 80%;
-    left: 10%;
+    width: 96%;
+    left: 2%;
     border-bottom: 1px solid #000;
   }
 }
-
-@media (max-width: 768px) {
-  #movie-cover {
-    .cover-container { 
-      height: 400px;
-    }
+@media (min-width: 1000px) {
+  .cover-container img {
+    width: 80%;
+    left: 10%;
   }
 }
 
 @media (max-width: 760px) {
   #movie-cover {
-    .cover-container { max-height: 400px; }
     .cover-background {
       width: 140%;
       height: 110%;
