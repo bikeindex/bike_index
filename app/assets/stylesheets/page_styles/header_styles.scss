@@ -90,15 +90,17 @@
   .additional-fields input {
     float: left;
     margin-bottom: 0;
-    width: 70%;
+    width: 76%;
   }
   #serial-absent {
     @include border-radius(3px);
     @extend .btn-pop;
+    font-size: .8em; 
     float: left;
-    width: 28%;
+    width: 22%;
     margin: -.25em 0 0 2%;
-    padding: .35em .25em;
+    // padding: .35em .25em;
+    padding: .4375em 0em;
     color: $placeholder;
     text-align: center;
     &:hover {
@@ -149,7 +151,7 @@
 
 @media (max-width: 660px) {
   .optional-fields {
-    #serial-absent { font-size: .8em; padding: .4375em 0em; }
+    // #serial-absent { font-size: .8em; padding: .4375em 0em; }
     .absent-serial-blocker.absents { width: 45%; }
     
   }

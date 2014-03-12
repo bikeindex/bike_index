@@ -61,9 +61,14 @@ header.single-bike {
 //
 //________________________
 
-.secondary-bikes { margin-top: 100px; color: $grayMed;}
+.secondary-bikes {
+  margin-top: 100px;
+  color: $grayMed;
+}
 
 @media (max-width: 768px) {
+  .secondary-bikes { margin-top: 50px; }
+
   .receptacle.bike-search-page { padding: 0; }
 }
 

@@ -32,6 +32,22 @@ describe BikeSearcher do
     end
   end
 
+  describe :fuzzy_find_serial do 
+    # I don't know how to test these... the test db doesn't recognize levenshtein
+    xit "should find matching serial segments" do 
+      bike = FactoryGirl.create(:bike, serial_number: 'st00d-fferd')
+      search = BikeSearcher.new(serial: 'ffer')
+      result = search.fuzzy_find_serial
+      result.first.should eq(bike)
+      result.count.should eq(1)
+    end
+    xit "shouldn't find exact matches" do 
+      bike = FactoryGirl.create(:bike, serial_number: 'K10DY00047-bkd')
+      search = BikeSearcher.new(serial: 'bkd-K1oDYooo47')
+      search.fuzzy_find_serial.should be_nil
+    end
+  end
+
   describe :matching_stolenness do 
     before :each do 
       @non_stolen = FactoryGirl.create(:bike)

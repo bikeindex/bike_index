@@ -16,14 +16,12 @@
 
 - else
   %section.bottom-of-page
-    %h3
-      Oh no!
     %h1
-      No bikes matched your search!
+      Nothing matched your search
 
 - if @secondary_bikes.present?
   %h2.secondary-bikes
-    Some bikes with serial numbers close to 
+    Serial numbers close to 
     %em
       #{params[:serial]}
 

@@ -44,7 +44,9 @@ class BikeSearcher
       next unless seg.length > 3
       bike_ids += NormalizedSerialSegment.where("LEVENSHTEIN(segment, ?) < 3", seg).map(&:bike_id)
     end
-    Bike.where('id in (?)', bike_ids.uniq)
+    # Don't return exact matches
+    bike_ids = bike_ids.uniq - matching_serial.map(&:id)
+    Bike.where('id in (?)', bike_ids)
   end    
   
   def find_bikes
