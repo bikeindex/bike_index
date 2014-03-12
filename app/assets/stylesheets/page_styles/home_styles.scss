@@ -411,10 +411,21 @@ body.welcome-page {
   }
 }
 
+@media (max-width: 768px) {
+  #movie-cover {
+    .cover-container { 
+      height: 400px;
+    }
+  }
+}
+
 @media (max-width: 760px) {
-  #movie-cover .cover-background {
-    width: 140%;
-    height: 110%;
+  #movie-cover {
+    .cover-container { max-height: 400px; }
+    .cover-background {
+      width: 140%;
+      height: 110%;
+    }
   }
 }
 
