@@ -338,21 +338,33 @@ body.welcome-page {
 
 //________________________
 //
-// Kickstarter
+// Movie!
 //
 //________________________
 
+#movie-wrap { 
+  position: relative;
+  background: #000;
+}
 
-#kickstarter {
+#iframe-holder {
+  width: 100%;
+  position: absolute;
+  top: 0; left: 0;
+  z-index: 100;
+  &.showing-movie { height: 100%; }
+}
+
+#movie-cover {
   @include clearfix;
   position: relative;
   z-index: 10;
   overflow: hidden;
   border-bottom: 1px solid $searchBorderLight;
   background: $bodyBackground;
-  // background: #000;
   width: 100%; height: 100%;
-  .kickstarter-background {
+  min-height: 400px;
+  .cover-background {
     display: block;
     width: 110%;
     height: 100%;
@@ -377,18 +389,32 @@ body.welcome-page {
     }
   }
   .receptacle { z-index: 1; }
+  &.showing-movie {
+    @include transition(opacity 1s ease-in);
+    opacity: 0;
+  }
 }
 
-.movie-container {
+.cover-container {
   @include clearfix;
   position: relative;
-  h2 {
+  width: 100%; height: 100%;
+  
+  .movie-image {
+    @include border-radius(4px);
+    @include box-shadow(1px 1px 2px rgba(black,.3));
     position: absolute;
-    bottom: 5%;
-    width: 100%;
-    text-align: center;
-    color: white;
-    text-shadow: 0 0 4px rgba(black,.8);
+    top: 10%;
+    width: 80%;
+    left: 10%;
+    border-bottom: 1px solid #000;
+  }
+}
+
+@media (max-width: 760px) {
+  #movie-cover .cover-background {
+    width: 140%;
+    height: 110%;
   }
 }
 
@@ -420,54 +446,6 @@ body.welcome-page {
     border-color: transparent transparent transparent rgba(255, 255, 255, 1);
   }
 }
-
-#movie-wrap {
-  @include clearfix;
-  position: relative;
-  width: 100%;
-  background: #000;
-}
-
-#kickstarter.movie-showtime {
-  @include transition(opacity 1s ease-in);
-  opacity: 0;
-}
-
-#iframe-holder {
-  width: 100%;
-  position: absolute;
-  top: 0; left: 0;
-  z-index: 100;
-}
-
-.movie-image {
-  @include border-radius(4px);
-  @include box-shadow(1px 1px 2px rgba(black,.3));
-  position: absolute;
-  bottom: -20%;
-  width: 110%;
-  border-bottom: 1px solid #000;
-}
-
-@media (min-width: 960px) {
-  #kickstarter {
-    h2 { font-size: 60px; }
-    
-  }
-}
-
-
-@media (max-width: 760px) {
-  #kickstarter {
-    .kickstarter-background {
-      width: 140%;
-      height: 110%;
-    }
-  }
-}
-
-
-
 
 
 //________________________

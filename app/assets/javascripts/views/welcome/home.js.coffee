@@ -5,12 +5,12 @@ class BikeIndex.Views.Home extends Backbone.View
   initialize: ->
     @setElement($('#body'))
     @moveBike()
-    $('#movie-wrap').css('min-height',$(window).height()*.9 )
+    $('#movie-cover .cover-container').css('min-height',$(window).height() )
 
 
   movieShowtime: (event) ->
     event.preventDefault()
-    $('#kickstarter').addClass('movie-showtime')
+    $('#movie-cover').addClass('showing-movie')
     setTimeout ( ->
       $('#iframe-holder')
         .addClass('showing-movie')
