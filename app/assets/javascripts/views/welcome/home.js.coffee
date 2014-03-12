@@ -6,12 +6,12 @@ class BikeIndex.Views.Home extends Backbone.View
     @setElement($('#body'))
     @moveBike()
     @setMovieSize()
-    that = @
+    resized = @setMovieSize
     $( window ).resize ->
-      that.setMovieSize()
+      resized()
 
   setMovieSize: ->
-    height = $(window).width()*.66
+    height = $(window).width()*.78
     if height > $(window).height()
       height = $(window).height()
     $('#movie-cover .cover-container')
@@ -24,7 +24,7 @@ class BikeIndex.Views.Home extends Backbone.View
     $('#movie-cover').addClass('showing-movie')
     height = "100%"
     height = $(window).height() if $(window).width() < 768
-    video = """<iframe width="100%" height="#{height}" src="//www.youtube.com/embed/wXucyGWF_rE?rel=0&autoplay=1" frameborder="0" allowfullscreen></iframe>"""
+    video = """<iframe width="100%" height="#{height}" src="//www.youtube.com/embed/XIWmKNpooNI?rel=0&autoplay=1" frameborder="0" allowfullscreen></iframe>"""
     setTimeout ( ->
       $('#iframe-holder')
         .addClass('showing-movie')
