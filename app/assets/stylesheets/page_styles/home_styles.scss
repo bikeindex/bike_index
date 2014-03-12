@@ -156,6 +156,12 @@ body.welcome-page {
   }
 }
 
+#wheel-spin {
+  @include transition(1.5s ease-out);
+  @include rotate(-15deg);
+  &.wheelspun { @include rotate(15deg); }
+}
+
 
 .treating-right-text {
   width: $fourColumn;
@@ -163,16 +169,20 @@ body.welcome-page {
   right: 0;
   padding-top: 20px;
   .button-green {
-    @include box-shadow(#{inset 0 0 3px rgba(black,.2), 0 0 2px rgba(black,.2)});
+    @include box-shadow(1px 1px 4px rgba(black,.3));
     font-size: 40px;
     display: block;
     width: 100%;
     margin: 0 auto 30px;
     padding: .5em;
-    text-transform: uppercase;
+    text-transform: uppercase;    
+    border-color: rgba(0,0,0,.15) rgba(0,0,0,.15) rgba(0,0,0,.25);
     &:hover {
-      @include box-shadow(#{inset 0 0 0 white, 1px 1px 2px rgba(black,.2)});
+      @include box-shadow(2px 2px 4px rgba(black,.3));
     } 
+    &:active {
+      @include box-shadow(1px 1px 4px rgba(black,.3));
+    }
   }
   h2 {
     font-size: 22px;
@@ -340,7 +350,8 @@ body.welcome-page {
   overflow: hidden;
   border-bottom: 1px solid $searchBorderLight;
   background: $bodyBackground;
-  width: 100%;
+  // background: #000;
+  width: 100%; height: 100%;
   .kickstarter-background {
     display: block;
     width: 110%;
@@ -366,69 +377,91 @@ body.welcome-page {
     }
   }
   .receptacle { z-index: 1; }
+}
+
+.movie-container {
+  @include clearfix;
+  position: relative;
   h2 {
-    text-align: center;
-    font-size: 40px;
-    margin: 20px 0 30px;
-    color: $blueDarker;
-    // text-shadow: 1px 1px 2px rgba(black,.2);
-  }
-  .kickstarter-main {
-    position: relative;
-    width: 100%;
-    .kvid {
-      display: none;
-      width: 480px;
-    }
-  }
-  .kickstarter-iframe {
-    margin: 0;
     position: absolute;
-    right: 0;
-    top: -10px;
-    overflow: visible;
+    bottom: 5%;
+    width: 100%;
+    text-align: center;
+    color: white;
+    text-shadow: 0 0 4px rgba(black,.8);
   }
+}
+
+.play-button {
+  height: 80px;
+  width: 130px;    
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 10px;
+  position: absolute;
+  top: 50%; left: 50%;
+  margin-top: -40px;
+  margin-left: -65px;
+  cursor: pointer;
+  &:hover {
+    background-color: rgba(0, 173, 239, 0.9);
+  }
+  &:active {
+    @include translate(1px,1px);
+  }
+  &:after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 21px;
+    left: 48px;
+    margin: 0 auto;
+    border-style: solid;
+    border-width: 19px 0 19px 34px;
+    border-color: transparent transparent transparent rgba(255, 255, 255, 1);
+  }
+}
+
+#movie-wrap {
+  @include clearfix;
+  position: relative;
+  width: 100%;
+  background: #000;
+}
+
+#kickstarter.movie-showtime {
+  @include transition(opacity 1s ease-in);
+  opacity: 0;
+}
+
+#iframe-holder {
+  width: 100%;
+  position: absolute;
+  top: 0; left: 0;
+  z-index: 100;
+}
+
+.movie-image {
+  @include border-radius(4px);
+  @include box-shadow(1px 1px 2px rgba(black,.3));
+  position: absolute;
+  bottom: -20%;
+  width: 110%;
+  border-bottom: 1px solid #000;
 }
 
 @media (min-width: 960px) {
   #kickstarter {
     h2 { font-size: 60px; }
-    .kickstarter-main {
-      min-height: 480px;
-      .kvid {
-        margin: 20px auto;
-        width: 640px;
-      }
-    }
-    .kickstarter-iframe {
-      // top: 0px;
-      top: 50px;
-    }
+    
   }
 }
 
-@media (min-width: 760px) {
-  #kickstarter {
-    .kickstarter-main {
-      padding-right: 240px;
-      .kvid {
-        display: block;
-        margin: 15px auto;
-      }
-    }
-  }
-}
 
 @media (max-width: 760px) {
   #kickstarter {
     .kickstarter-background {
       width: 140%;
       height: 110%;
-    }
-    .kickstarter-iframe {
-      margin: 20px auto;
-      position: relative;
-      width: 212px;
     }
   }
 }
@@ -457,6 +490,7 @@ body.welcome-page {
     text-align: center;
     color: $textColor;
   }
+  p { text-align: center; }
   article {
     position: relative;
     float: left;
@@ -466,6 +500,8 @@ body.welcome-page {
   .icographix {
     @include border-radius(6px);
     @include box-shadow(#{inset 1px 1px 6px rgba(black,.2)});
+    @include transition(opacity 1.7s ease-in);
+    opacity: 1;
     position: relative;
     width: 50%;
     max-width: 220px;
@@ -477,7 +513,9 @@ body.welcome-page {
       display: block;
     }
   }
+  &.displayno-icos .icographix { opacity: 0; }
 }
+
 
 @media (max-width: 767px) {
   #best-ever {
@@ -488,24 +526,19 @@ body.welcome-page {
         margin-right: 0;
       }
     }
-    .icographix {
-      max-width: 30%;
-    }
   }
 }
 
 @media (max-width: 550px) {
   #best-ever {
-    article {
-      width: $twelveColumn;
-      margin-right: 0;
-    } 
+    .icongraphix { max-width: 70%; }
+    article p { display: none;  } 
   }
 }
 
 @media (min-width: 768px) {
   #best-ever {
-    padding: 120px 0;
+    // padding: 80px 0;
     article {
       padding-top: 60px;
       width: $fourColumn;
