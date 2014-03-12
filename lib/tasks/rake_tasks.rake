@@ -9,3 +9,11 @@ namespace :carrierwave do
 
   end
 end
+
+desc "find new sold serials and make bikes"
+task :set_book_slugs => :environment do
+  Manufacturer.all.each do |mfg|
+    mfg.book_slug = Slugifyer.book_slug(mfg.name)
+    mfg.save
+  end
+end

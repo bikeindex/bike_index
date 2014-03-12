@@ -97,6 +97,15 @@ describe BParam do
       b_param.params[:bike][:manufacturer_id].should eq(m.id)
       b_param.params[:bike][:manufacturer_other].should eq('Gobble Gobble')
     end
+    it "should look through book slug" do
+      m = FactoryGirl.create(:manufacturer, name: "Something Cycles")
+      bike = { manufacturer: "something" }
+      b_param = BParam.new
+      b_param.stub(:params).and_return({bike: bike})
+      b_param.set_manufacturer_key
+      b_param.params[:bike][:manufacturer].should_not be_present
+      b_param.params[:bike][:manufacturer_id].should eq(m.id)
+    end
   end
 
   describe :set_color_key do

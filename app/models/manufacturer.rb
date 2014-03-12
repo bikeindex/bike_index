@@ -7,7 +7,8 @@ class Manufacturer < ActiveRecord::Base
     :close_year,
     :logo,
     :logo_cache,
-    :description
+    :description,
+    :book_slug
 
   validates_presence_of :name
   validates_uniqueness_of :name
@@ -28,7 +29,7 @@ class Manufacturer < ActiveRecord::Base
 
   def self.fuzzy_name_find(n)
     if !n.blank?
-      self.find(:first, :conditions => [ "lower(name) = ?", n.downcase.strip ])
+      self.find(:first, :conditions => [ "book_slug = ?", Slugifyer.book_slug(n) ])
     else
       nil
     end
@@ -58,6 +59,7 @@ class Manufacturer < ActiveRecord::Base
   before_create :set_slug
   def set_slug
     self.slug = Slugifyer.slugify(self.name)
+    self.book_slug = Slugifyer.book_slug(self.name)
   end
 
 end
