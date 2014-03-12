@@ -5,33 +5,39 @@ class BikeIndex.Views.Home extends Backbone.View
   initialize: ->
     @setElement($('#body'))
     @moveBike()
+    @setMovieSize()
+    that = @
+    $( window ).resize ->
+      that.setMovieSize()
+
+  setMovieSize: ->
     height = $(window).width()*.66
     if height > $(window).height()
       height = $(window).height()
-    $('#movie-cover .cover-container').css('min-height', height)
-    $('#movie-cover .cover-container').css('max-height', height)
+    $('#movie-cover .cover-container')
+      .css('min-height', height)
+      .css('max-height', height)
     
 
   movieShowtime: (event) ->
     event.preventDefault()
     $('#movie-cover').addClass('showing-movie')
+    height = "100%"
+    height = $(window).height() if $(window).width() < 768
+    video = """<iframe width="100%" height="#{height}" src="//www.youtube.com/embed/wXucyGWF_rE?rel=0&autoplay=1" frameborder="0" allowfullscreen></iframe>"""
     setTimeout ( ->
       $('#iframe-holder')
         .addClass('showing-movie')
-        # $('#movie-wrap .movie-container').css('min-height',$(window).height()*.9 )
-        .append('<iframe width="100%" height="100%" src="//www.youtube.com/embed/wXucyGWF_rE?rel=0&autoplay=1" frameborder="0" allowfullscreen></iframe>')
+        .append(video)
     ) , 1000
 
   moveBike: ->
     register = $('#treating-right .treating-right-text')
     wheight = $(window).height()
-
-
     $(window).scroll -> 
       best = $('#best-ever').offset().top
       scroll = $(window).scrollTop()
-      p = (scroll/best)
-      if p < .05
+      if (scroll/best) < .05
         $('#wheel-spin').removeClass('wheelspun')
       else
         unless $('#wheel-spin').hasClass('wheelspun')
