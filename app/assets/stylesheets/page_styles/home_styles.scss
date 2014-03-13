@@ -376,6 +376,17 @@ body.welcome-page {
   }
 }
 
+
+@media (min-width: 1500px) {
+  #movie-cover {
+    background: url("/assets/home/logo-mosaic_huge.jpg") no-repeat center center; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+  }
+}
+
 .play-button {
   height: 80px;
   width: 130px;    
