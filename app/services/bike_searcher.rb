@@ -50,15 +50,15 @@ class BikeSearcher
   end    
 
   def by_proximity
-    bike_ids = StolenRecord.where(current: true).near(@params[:proximity], 1000).pluck(:bike_id)
-    @bikes.where('id in (?)', bike_ids)
+    bike_ids = StolenRecord.where(current: true).near(@params[:proximity]).pluck(:bike_id)
+    @bikes = @bikes.where('id in (?)', bike_ids)
   end
 
   def find_bikes
     @bikes = matching_serial    
     matching_stolenness(@bikes)
     matching_query(@bikes)
-    @bikes = by_proximity if @params[:stolen] && @params[:proximity].present?
+    by_proximity if @params[:stolen] && @params[:proximity].present?
     @bikes
   end
 
