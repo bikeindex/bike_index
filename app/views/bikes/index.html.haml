@@ -3,7 +3,9 @@
     = @query
   %span#attribute_values_searched
     = @attribute_select_values
-  %span#stolenness_query{data: {stolen: @stolenness[:stolen], nonstolen: @stolenness[:non_stolen] }}
+  %span#proximity_searched{data: { proximity: @proximity }}
+    
+  %span#stolenness_query{data: {stolen: @stolenness[:stolen]} }
 
 - if @bikes.present?
 

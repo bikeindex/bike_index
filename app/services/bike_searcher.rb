@@ -40,7 +40,7 @@ class BikeSearcher
   def fuzzy_find_serial
     return nil unless @normer.normalized_segments.present?
     bike_ids = []
-    @normer.normalized_segments.each do |seg|
+    @normer.normalized_segments.find_each do |seg|
       next unless seg.length > 3
       bike_ids += NormalizedSerialSegment.where("LEVENSHTEIN(segment, ?) < 3", seg).map(&:bike_id)
     end
@@ -48,11 +48,17 @@ class BikeSearcher
     bike_ids = bike_ids.uniq - matching_serial.map(&:id)
     Bike.where('id in (?)', bike_ids)
   end    
-  
+
+  def by_proximity
+    bike_ids = StolenRecord.where(current: true).near(@params[:proximity], 1000).pluck(:bike_id)
+    @bikes.where('id in (?)', bike_ids)
+  end
+
   def find_bikes
     @bikes = matching_serial    
     matching_stolenness(@bikes)
     matching_query(@bikes)
+    @bikes = by_proximity if @params[:stolen] && @params[:proximity].present?
     @bikes
   end
 

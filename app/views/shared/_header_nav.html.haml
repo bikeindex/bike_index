@@ -65,4 +65,7 @@
               %label{ for: "stolen" }
                 = check_box_tag :stolen, 1, params[:stolen]
                 Only stolen
-          
+            .proximity#stolen-proximity
+              = text_field_tag :proximity, params[:proximity], placeholder: 'Location to prioritize'
+              %span
+                area thefts first

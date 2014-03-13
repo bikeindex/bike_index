@@ -8,6 +8,7 @@ class BikeIndex.Views.Global extends Backbone.View
     'click .no-tab':                        'openNewWindow'
     'click #serial-absent':                 'updateSerialAbsent'
     'focus #header-search':                 'expandSearch'
+    'change input#stolen':                  'toggleProximitySearch'
     
   initialize: ->
     BikeIndex.hideFlash()
@@ -16,6 +17,7 @@ class BikeIndex.Views.Global extends Backbone.View
     if $('#what-spokecards-are').length > 0
       $('.spokecard-extension').addClass('on-spokecard-page')
     @initializeHeaderSearch()
+    @setProximityLocation()
 
   openNewWindow: (e) ->
     e.preventDefault()
@@ -49,7 +51,26 @@ class BikeIndex.Views.Global extends Backbone.View
         .val('')
         .removeClass('absent-serial')
 
+  toggleProximitySearch: ->
+    if $('#stolen-proximity').hasClass('unhidden')
+      $('#stolen-proximity span').fadeOut 100, ->
+        $('#stolen-proximity')
+          .slideUp "medium"
+          .removeClass('unhidden')
+    else
+      $('#stolen-proximity').slideDown "medium", ->
+        $('#stolen-proximity span').fadeIn 100
+        $('#stolen-proximity').addClass('unhidden')
+        
 
+  setProximityLocation: ->
+    unless $('#stolenness_query').length > 0 && $('#stolenness_query').attr('data-stolen')
+      $.ajax
+        type: "GET"
+        url: 'https://freegeoip.net/json/'
+        dataType: "jsonp",
+        success: (location) ->
+          $('#stolen-proximity #proximity').val("#{location.city}, #{location.zipcode}")
 
 
   setSearchfantasy: (tags) ->

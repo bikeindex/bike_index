@@ -29,7 +29,7 @@ class BikesController < ApplicationController
     @bikes = bikes.decorate
     @attribute_select_values = search.parsed_attributes
     @query = params[:query]
-    @stolenness = { stolen: params[:stolen], non_stolen: params[:non_stolen] }
+    @stolenness = { stolen: params[:stolen] }
     render :layout => 'application'
   end
 

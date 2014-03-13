@@ -85,22 +85,39 @@
 }
 
 .optional-fields {
-  // display: none;
   width: $eightColumn - $gutterW;
   .additional-fields input {
     float: left;
     margin-bottom: 0;
     width: 76%;
   }
+  .proximity {
+    width: 100%;
+    display: none;
+    input {
+      float: none;
+      margin: 1.2em 0 0;
+      width: 100%;
+      padding-right: 100px;
+    }
+    span {
+      display: none;
+      position: absolute;
+      right: 0; bottom: 0;
+      padding: 0 .5em .2em  0;
+      font-size: .8em; 
+      color: $placeholder;
+      text-align: right;
+    }
+  }
   #serial-absent {
     @include border-radius(3px);
     @extend .btn-pop;
-    font-size: .8em; 
     float: left;
     width: 22%;
     margin: -.25em 0 0 2%;
-    // padding: .35em .25em;
     padding: .4375em 0em;
+    font-size: .8em; 
     color: $placeholder;
     text-align: center;
     &:hover {
@@ -130,7 +147,11 @@
     input { margin: -2px 5px 0 0; }
     label { margin: 0; }
   }
+
 }
+
+
+
 
 @media (max-width: 550px) {
   .optional-fields {
@@ -150,32 +171,17 @@
 }
 
 @media (max-width: 660px) {
-  .optional-fields {
-    // #serial-absent { font-size: .8em; padding: .4375em 0em; }
-    .absent-serial-blocker.absents { width: 45%; }
-    
-  }
+  .optional-fields .absent-serial-blocker.absents { width: 45%; }
 }
 
 @media (min-width: 601px) and (max-width: 1000px) {
-  .optional-fields {
-    .additional-fields { width: 73.3%; }
-  }
+  .optional-fields .additional-fields { width: 73.3%; }
 }
 
 @media (min-width: 1001px) {
   .optional-fields {
-    .additional-fields {
-      width: 73.4%;
-    }
-    .stolenness {
-      // input { margin-right: 2px; }
-      label {
-        display: inline-block;
-        // margin: .3em 0 0 0;
-        // &:last-of-type { margin-left: 10px; }
-      }
-    }
+    .additional-fields { width: 73.4%; }
+    .stolenness label { display: inline-block; }
   }
 }
 
