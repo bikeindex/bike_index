@@ -18,6 +18,7 @@ class Bike < ActiveRecord::Base
     :thumb_path,
     :name,
     :stolen,
+    :current_stolen_record_id,
     :recovered,
     :frame_material_id, 
     :frame_model, 

@@ -238,12 +238,13 @@ describe Bike do
 
 
   describe :cache_bike do 
-    it "should call cache photo and cache component" do 
-      bike = FactoryGirl.create(:bike)
+    it "should call cache photo and cache component and erase stolen_rec_id" do 
+      bike = FactoryGirl.create(:bike, current_stolen_record_id: 69)
       bike.should_receive(:cache_photo)
       bike.should_receive(:cache_attributes)
       bike.should_receive(:components_cache_string)
       bike.cache_bike
+      bike.current_stolen_record_id.should be_nil
     end
     it "should cache all the bike parts" do 
       type = FactoryGirl.create(:cycle_type, name: "Unicycle")
@@ -251,6 +252,7 @@ describe Bike do
       material = FactoryGirl.create(:frame_material)
       propulsion = FactoryGirl.create(:propulsion_type, name: "Hand pedaled")
       b = FactoryGirl.create(:bike, cycle_type: type, propulsion_type_id: propulsion.id)
+      s = FactoryGirl.create(:stolen_record, bike: b)
       b.update_attributes( year: 1999, frame_material_id: material.id,
         secondary_frame_color_id: b.primary_frame_color_id,
         tertiary_frame_color_id: b.primary_frame_color_id,
@@ -258,6 +260,7 @@ describe Bike do
         frame_model: "Some model", handlebar_type_id: handlebar.id)
       b.cache_bike
       b.cached_data.should eq("#{b.manufacturer_name} Hand pedaled 1999 #{b.primary_frame_color.name} #{b.secondary_frame_color.name} #{b.tertiary_frame_color.name} #{material.name} SO MANY ballsacks #{b.frame_model} #{b.rear_wheel_size.name} wheel  unicycle ")
+      b.current_stolen_record_id.should eq(s.id)
     end
     it "should have before_save_callback_method defined as a before_save callback" do
       Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:cache_bike).should == true
