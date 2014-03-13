@@ -239,6 +239,11 @@ class Bike < ActiveRecord::Base
 
   before_save :cache_bike
   def cache_bike
+    if current_stolen_record.present?
+      self.current_stolen_record_id = current_stolen_record.id 
+    else
+      self.current_stolen_record_id = nil
+    end
     cache_photo
     cache_attributes
     c = ""

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140312191710) do
+ActiveRecord::Schema.define(:version => 20140313002428) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -103,6 +103,7 @@ ActiveRecord::Schema.define(:version => 20140312191710) do
     t.integer  "creation_country_id"
     t.integer  "country_id"
     t.string   "stock_photo_url"
+    t.integer  "current_stolen_record_id"
   end
 
   add_index "bikes", ["creation_organization_id"], :name => "index_bikes_on_organization_id"
