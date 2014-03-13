@@ -14,7 +14,7 @@ class BikeIndex.Views.Home extends Backbone.View
     height = $(window).width()*.78
     if height > $(window).height()
       height = $(window).height()
-    $('#movie-cover .cover-container')
+    $('#movie-cover')
       .css('min-height', height)
       .css('max-height', height)
     
