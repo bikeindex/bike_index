@@ -25,7 +25,7 @@
       = f.label :year, class: "control-label"
       .controls
         - years = (1900..Time.now.year+1).to_a.reverse.map {|i| [i,i] }
-        = f.select :year, years, prompt: "Choose year"
+        = f.select :year, years, prompt: "Select year"
 
   .input-group.with-additional-block#frame-sizer
     %a.bikeform-tip{role: "button", title: "Seat tube measuring", :data => {toggle: "modal", target: "#seatTubeLengthTip"} }

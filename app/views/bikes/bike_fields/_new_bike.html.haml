@@ -36,7 +36,7 @@
     = f.label :year, "Model year", class: "control-label"
     .controls
       - years = (1900..Time.now.year+1).to_a.reverse.map {|i| [i,i] }
-      = f.select :year, years, selected: Time.now.year
+      = f.select :year, years, prompt: "Choose year"
       
 .input-group
   .control-group
