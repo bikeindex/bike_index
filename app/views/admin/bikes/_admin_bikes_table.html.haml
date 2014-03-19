@@ -14,7 +14,7 @@
   - @bikes.each do |bike|
     %tr
       %td
-        %span.less-strong-right
+        %span.less-strong-right.medium-screens
           = bike.id 
         %a{href: edit_admin_bike_url(bike) }
 
@@ -39,12 +39,13 @@
       %td.large-screens
         = bike.year
         = bike.frame_model
-        %span.less-strong-right
-          = "pos" if bike.registered_new
 
       %td
         = bike.creation_organization.name if bike.creation_organization.present?
         - if bike.paid_for
           %span.less-strong
             Purchased
+        - if bike.registered_new
+          %span.less-strong-right
+            pos
       
