@@ -28,6 +28,10 @@ class Admin::BikesController < Admin::BaseController
     redirect_to admin_bikes_url
   end
 
+  def show
+    redirect_to edit_admin_bike_url
+  end
+
   def edit
     @bike = @bike.decorate
   end
