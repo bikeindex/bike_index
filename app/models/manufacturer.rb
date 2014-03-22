@@ -59,7 +59,7 @@ class Manufacturer < ActiveRecord::Base
   before_create :set_slug
   def set_slug
     self.slug = Slugifyer.slugify(self.name)
-    self.book_slug = Slugifyer.book_slug(self.name)
+    self.book_slug = Slugifyer.manufacturer(self.name)
   end
 
 end
