@@ -7,7 +7,7 @@
     Manufacturer
   %th.large-screens
     Info
-  %th
+  %th.not-tiny-screens
     Created by
 
 %tbody
@@ -40,7 +40,7 @@
         = bike.year
         = bike.frame_model
 
-      %td
+      %td.not-tiny-screens
         = bike.creation_organization.name if bike.creation_organization.present?
         - if bike.paid_for
           %span.less-strong
