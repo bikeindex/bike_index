@@ -19,6 +19,7 @@ class BikeIndex.Views.AdminOrganizationsEdit extends Backbone.View
       us_val = parseInt($('#us-country-code').text(), 10)
       console.log($(this).closest('fieldset').find('.country_select_container select'))
       $(this).closest('fieldset').find('.country_select_container select').val(us_val)
+      $(this).closest('fieldset').find('.location-name-field input').val($('#organization_name').val())
       $('.chosen-select select').select2()
       
   loadNotifications: ->

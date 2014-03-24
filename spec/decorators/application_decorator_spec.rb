@@ -121,4 +121,17 @@ describe ApplicationDecorator do
     end
   end
 
+  describe :display_phone do 
+    it "should display the phone with an area code" do 
+      location = Location.new 
+      location.stub(:phone).and_return("999 999 9999")
+      ApplicationDecorator.new(location).display_phone.should eq("999 999 9999")
+    end
+    it "should display the phone with a country code" do 
+      location = Location.new 
+      location.stub(:phone).and_return("+91 8041505583")
+      ApplicationDecorator.new(location).display_phone.should eq("+91 804 150 5583")
+    end
+  end
+
 end

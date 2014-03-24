@@ -7,8 +7,9 @@ class InfoController < ApplicationController
   end
   
   def where
-    @bike_shops = Organization.shop.shown_on_map
+    @bike_shops = Organization.shop.shown_on_map.decorate
     @states = State.includes(:locations).all
+    @countries = Country.where('iso != ?', 'US').includes(:locations)
   end
 
   def roadmap

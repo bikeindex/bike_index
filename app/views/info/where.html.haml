@@ -6,50 +6,99 @@
     = render "/shared/shops_map"
 
 %h3.padded
-  Partner organizations
+  US Partner organizations
 
 %article.where-shops-list#list_of_partners
   - @states.each do |state|
-    - if state.locations.where(shown: true).any?
-      %p.state-name
-        = state.name
-      %ul.state-list
-        - state.locations.each do |location|
-          - if location.shown
-            
-            %li
-              .collapse-faq
-                %a.shop-title-link.collapsed{ href: "#shop#{location.org_location_id}", :data => { toggle: "collapse"} }
-                  %span
-                    &#x25B6;
+    - next unless state.locations.where(shown: true).any?
+    %p.state-name
+      = state.name
+    %ul.state-list
+      - state.locations.each do |location|
+        - next unless location.shown
+        - location = location.decorate
+        %li
+          .collapse-faq
+            %a.shop-title-link.collapsed{ href: "#shop#{location.org_location_id}", :data => { toggle: "collapse"} }
+              %span
+                &#x25B6;
+              = location.display_name
+              %em
+                &nbsp;&nbsp;#{location.city}
+          .shop-info.collapse{ id: "shop#{location.org_location_id}" }
+            - if location.street.present?
+              %a.where-shop-location{:data => { lat: location.latitude, long: location.longitude } }
+                Show #{location.display_name} on map
+              %p
+                #{location.street}, #{location.city}, #{location.state.abbreviation} #{location.zipcode}
+            - if location.phone
+              %p
+                %a{ href: "tel:#{ location.phone }" }
+                  = location.display_phone
+            - if location.organization.website.present?
+              %p
+                = link_to "#{location.organization.name} website", location.organization.website, target: "_blank", class: "shop-site"
+            .map-window
+              .window-content
+                %h3
                   = location.display_name
-                  %em
-                    &nbsp;&nbsp;#{location.city}
-              .shop-info.collapse{ id: "shop#{location.org_location_id}" }
-                - if location.street.present?
-                  %a.where-shop-location{:data => { lat: location.latitude, long: location.longitude } }
-                    Show #{location.display_name} on map
-                  %p
-                    #{location.street}, #{location.city}, #{location.state.abbreviation} #{location.zipcode}
+                %p
+                  = location.street
+                  %br
+                  #{location.city}, #{location.state.abbreviation} #{location.zipcode}
                 - if location.phone
-                  %p
+                  .map-telephone
                     %a{ href: "tel:#{ location.phone }" }
                       = number_to_phone(location.phone)
-                - if location.organization.website.present?
-                  %p
-                    = link_to "#{location.organization.name} website", location.organization.website, target: "_blank", class: "shop-site"
-                .map-window
-                  .window-content
-                    %h3
-                      = location.display_name
-                    %p
-                      = location.street
-                      %br
-                      #{location.city}, #{location.state.abbreviation} #{location.zipcode}
-                    - if location.phone
-                      .map-telephone
-                        %a{ href: "tel:#{ location.phone }" }
-                          = number_to_phone(location.phone)
+  %h3.padded
+    International Partner organizations
+
+
+
+  - @countries.each do |country|
+    - next unless country.locations.where(shown: true).any?
+    %p.state-name
+      = country.name
+    %ul.state-list
+      - country.locations.each do |location|
+        - next unless location.shown
+        - location = location.decorate
+        %li
+          .collapse-faq
+            %a.shop-title-link.collapsed{ href: "#shop#{location.org_location_id}", :data => { toggle: "collapse"} }
+              %span
+                &#x25B6;
+              = location.display_name
+              %em
+                &nbsp;&nbsp;#{location.city}
+          .shop-info.collapse{ id: "shop#{location.org_location_id}" }
+            - if location.street.present?
+              %a.where-shop-location{:data => { lat: location.latitude, long: location.longitude } }
+                Show #{location.display_name} on map
+              %p
+                #{location.street}, #{location.city}, #{location.zipcode}, #{location.country.name}
+            - if location.phone
+              %p
+                %a{ href: "tel:#{ location.phone }" }
+                  = location.display_phone
+            - if location.organization.website.present?
+              %p
+                = link_to "#{location.organization.name} website", location.organization.website, target: "_blank", class: "shop-site"
+            .map-window
+              .window-content
+                %h3
+                  = location.display_name
+                %p
+                  = location.street
+                  %br
+                  #{location.city}, #{location.zipcode}, #{location.country.name}
+                - if location.phone
+                  .map-telephone
+                    %a{ href: "tel:#{ location.phone }" }
+                      = number_to_phone(location.phone)
+
+
+    
 
 
 

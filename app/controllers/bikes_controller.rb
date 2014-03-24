@@ -36,6 +36,9 @@ class BikesController < ApplicationController
   def show
     bike = Bike.unscoped.find(params[:id])
     @components = bike.components.decorate
+    if bike.stolen and bike.current_stolen_record.present?
+      @stolen_record = bike.current_stolen_record.decorate
+    end
     @bike = bike.decorate
     @stolen_notification = StolenNotification.new if @bike.stolen
     respond_to do |format|
@@ -49,6 +52,9 @@ class BikesController < ApplicationController
     unless bike.owner == current_user
       flash[:error] = "Sorry, that's not your bike!"
       redirect_to bike_path(bike) and return 
+    end
+    if bike.stolen and bike.current_stolen_record.present?
+      @stolen_record = bike.current_stolen_record.decorate
     end
     @bike = bike.decorate
     filename = "Registration_" + @bike.updated_at.strftime("%m%d_%H%M")[0..-1]

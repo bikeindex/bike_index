@@ -1,5 +1,6 @@
 class ApplicationDecorator < Draper::Decorator 
   delegate_all
+  include ActionView::Helpers::NumberHelper
 
   def self.collection_decorator_class
     PaginatingDecorator
@@ -81,6 +82,16 @@ class ApplicationDecorator < Draper::Decorator
     html << ", #{item.state.name}" if item.state.present?
     html << ", #{item.country.name}"
     html
+  end
+
+  def display_phone
+    p = object.phone
+    if p[/\+/]
+      phone = number_to_phone(p.gsub(/\+\d*/,''), country_code: p[/\A.\d*/].gsub('+',''), delimiter: ' ' )
+    else
+      phone = number_to_phone(p, delimiter: ' ')
+    end
+    phone
   end
 
 end

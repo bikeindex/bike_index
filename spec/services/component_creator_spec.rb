@@ -46,6 +46,13 @@ describe ComponentCreator do
       component_creator.create_component(component)
       bike.reload.components.count.should eq(1)
     end
+    it "should create the component and ignore attributes it shouldn't use" do 
+      bike = FactoryGirl.create(:bike)
+      component = {description: "Stuff", cgroup: "Drivetrain and brakes"}
+      component_creator = ComponentCreator.new(bike: bike)
+      component_creator.create_component(component)
+      bike.reload.components.count.should eq(1)
+    end
   end
 
   describe :create_components_from_params do 

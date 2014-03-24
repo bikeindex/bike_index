@@ -56,7 +56,7 @@ class OrganizationsController < ApplicationController
   protected
 
   def find_organization 
-    @organization = Organization.find_by_slug(params[:id])
+    @organization = Organization.find_by_slug(params[:id]).decorate
   end
 
   def require_membership

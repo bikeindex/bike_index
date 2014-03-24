@@ -35,8 +35,26 @@ class ComponentCreator
     component
   end
 
+  def whitelist_attributes(component)
+    comp_attributes = {
+      model_name: component[:model_name],
+      description: component[:description],
+      year: component[:year],
+      serial_number: component[:serial_number],
+      front: component[:front],
+      rear: component[:rear],
+      front_or_rear: component[:front_or_rear],
+      ctype_id: component[:ctype_id],
+      ctype_other: component[:ctype_other],
+      manufacturer_id: component[:manufacturer_id],
+      manufacturer_other: component[:manufacturer_other]
+    }
+    comp_attributes
+  end
+
   def create_component(component)
     c = Component.new(bike_id: @bike.id)
+    component = whitelist_attributes(component)
     c.update_attributes(component)
   end
 

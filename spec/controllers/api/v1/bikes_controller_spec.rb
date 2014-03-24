@@ -68,6 +68,7 @@ describe Api::V1::BikesController do
           manufacturer: manufacturer.name,
           year: "1999",
           component_type: 'Headset',
+          cgroup: "Frame and fork",
           description: "yeah yay!",
           serial_number: '69',
           model_name: 'Richie rich'
@@ -75,6 +76,7 @@ describe Api::V1::BikesController do
         {
           manufacturer: "BLUE TEETH",
           front_or_rear: "Both",
+          cgroup: "Wheels",
           component_type: 'wheel'
         }
       ]

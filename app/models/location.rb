@@ -22,6 +22,8 @@ class Location < ActiveRecord::Base
   has_many :bikes
 
   scope :by_state, order(:state_id)
+  scope :shown, where(shown: true)
+  # scope :international, where("country_id IS NOT #{Country.find_by_iso("US").id}")
 
   def address
     return nil unless self.country
@@ -39,9 +41,7 @@ class Location < ActiveRecord::Base
 
   before_save :set_phone
   def set_phone
-    if self.phone 
-      self.phone = Phonifyer.phonify(self.phone)
-    end
+    self.phone = Phonifyer.phonify(self.phone) if self.phone 
   end
 
   before_save :set_shown

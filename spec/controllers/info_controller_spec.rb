@@ -20,6 +20,7 @@ describe InfoController do
 
   describe :where do 
     before do 
+      FactoryGirl.create(:country, iso: "US")
       get :where
     end
     it { should respond_with(:success) }

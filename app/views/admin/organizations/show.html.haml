@@ -126,12 +126,12 @@
         = user.name
         = user.email
 %hr
-- if @organization.locations.any?
-  - if @organization.locations.count > 1
+- if @locations.any?
+  - if @locations.count > 1
     %h3.padded
-      = pluralize(@organization.locations.count, "Location")
+      = pluralize(@locations.count, "Location")
   .row-fluid.locations-list
-    - @organization.locations.each do |location|
+    - @locations.each do |location|
       .span4
         .alert.alert-info
           - if location.name
@@ -142,7 +142,7 @@
           - if location.phone
             %p
               Phone:
-              = number_to_phone(location.phone)
+              = location.display_phone
 
           - if location.street
             %p

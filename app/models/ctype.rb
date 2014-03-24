@@ -7,6 +7,7 @@ class Ctype < ActiveRecord::Base
     :image,
     :image_cache,
     :cgroup_id,
+    :cgroup,
     :has_multiple,
     :cgroup_name
 

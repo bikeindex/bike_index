@@ -7,9 +7,9 @@ class Admin::OrganizationsController < Admin::BaseController
   end
 
   def show
-    # @organizations = Organization.all
-    @organization = @organization.decorate
+    @locations = @organization.locations.decorate
     @bikes = Bike.where(creation_organization_id: @organization.id)
+    @organization = @organization.decorate
   end
 
   def show_deleted

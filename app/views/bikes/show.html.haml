@@ -68,10 +68,10 @@
 
 .receptacle.overfloating
   .inner-recep.single-bike-info
-    - if @bike.stolen and @bike.current_stolen_record.present?
+    - if @stolen_record.present?
       .stolen-information
         .dl-holder
-          - if @bike.current_stolen_record.latitude.present? and @bike.current_stolen_record.longitude.present?
+          - if @stolen_record.latitude.present? and @stolen_record.longitude.present?
             = render "bikes/stolen_map"
           .dl-horizontal
             - if @bike.recovered && @bike.creation_organization.present?
@@ -79,28 +79,28 @@
                 Recovered by
               %dd
                 = @bike.creation_organization.name
-              - if @bike.current_stolen_record.creation_organization.present?
-                - if @bike.current_stolen_record.creation_organization.locations.present? && @bike.current_stolen_record.creation_organization.locations.first.phone.present?
+              - if @stolen_record.creation_organization.present?
+                - if @stolen_record.creation_organization.locations.present? && @stolen_record.creation_organization.locations.first.phone.present?
                   %dt
-                    #{@bike.current_stolen_record.creation_organization.name} phone
+                    #{@stolen_record.creation_organization.name} phone
                     
                   %dd
-                    %a{ href: "tell:#{@bike.current_stolen_record.phone}" }
-                      = number_to_phone(@bike.current_stolen_record.creation_organization.locations.first.phone)
+                    %a{ href: "tell:#{@stolen_record.phone}" }
+                      = @stolen_record.creation_organization.locations.first.display_phone
 
             - if @bike.phoneable_by(current_user)
               %dt.stolen-color
                 Phone number
               %dd
-                %a{ href: "tell:#{@bike.current_stolen_record.phone}" }
-                  = number_to_phone(@bike.current_stolen_record.phone)
-            = @bike.dl_list_item(@bike.current_stolen_record.address, "Location")
-            = @bike.dl_list_item(@bike.current_stolen_record.locking_description, "Locking description")
-            = @bike.dl_list_item(@bike.current_stolen_record.lock_defeat_description, "Locking circumvented")
-            = @bike.dl_list_item(@bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), "Date stolen")
-            = @bike.dl_list_item(@bike.current_stolen_record.theft_description, "Description")
-            = @bike.dl_list_item(@bike.current_stolen_record.police_report_number, "Police report #")
-            = @bike.dl_list_item(@bike.current_stolen_record.police_report_department, "Department & city")
+                %a{ href: "tell:#{@stolen_record.phone}" }
+                  = @stolen_record.display_phone
+            = @bike.dl_list_item(@stolen_record.address, "Location")
+            = @bike.dl_list_item(@stolen_record.locking_description, "Locking description")
+            = @bike.dl_list_item(@stolen_record.lock_defeat_description, "Locking circumvented")
+            = @bike.dl_list_item(@stolen_record.date_stolen.strftime("%m-%d-%Y"), "Date stolen")
+            = @bike.dl_list_item(@stolen_record.theft_description, "Description")
+            = @bike.dl_list_item(@stolen_record.police_report_number, "Police report #")
+            = @bike.dl_list_item(@stolen_record.police_report_department, "Department & city")
             
 
 
@@ -182,7 +182,7 @@
                 
             
 
-    - if @bike.stolen and @bike.current_stolen_record.present?
+    - if @bike.stolen and @stolen_record.present?
       - if current_user.present?
         .alert.stolen-contact.no-user
           %h3
@@ -192,8 +192,8 @@
               %strong
                 Phone number
               
-              %a{ href: "tell:#{@bike.current_stolen_record.phone}" }
-                = @bike.current_stolen_record.phone
+              %a{ href: "tell:#{@stolen_record.phone}" }
+                = @stolen_record.phone
           - if @bike.recovered
             Is this your bike? Send proof of ownership (such as the bike's serial number or a photo of you with the bike)
           = render 'stolen_notifications/form'
