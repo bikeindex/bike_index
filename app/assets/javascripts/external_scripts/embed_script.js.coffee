@@ -51,6 +51,22 @@ otherManufacturerUpdate = ->
       hidden_other.find('input').val('')
       hidden_other.removeClass('unhidden').slideUp()
 
+toggleUnknownYear = ->
+  if $('#bike_unknown_year').prop('checked')
+    $('#bike_year').val('').trigger('change')
+    $('#bike_year').select2 "enable", false
+  else
+    $('#bike_year').val(new Date().getFullYear()).trigger('change')
+    $('#bike_year').select2 "enable", true
+
+updateYear = ->
+  if $('#bike_year').val().length == 0
+    $('#bike_year').select2 "enable", false
+    $('#bike_unknown_year').prop('checked', true)
+  else
+    $('#bike_unknown_year').prop('checked', false)
+  getModelList()
+
 
 $(document).ready ->
   otherManufacturerUpdate()
@@ -69,6 +85,9 @@ $(document).ready ->
     getModelList()
 
   $('#bike_year').change ->
-    getModelList()
+    updateYear()
+
+  $('#bike_unknown_year').change ->
+    toggleUnknownYear()
 
   $('.chosen-select select').select2()

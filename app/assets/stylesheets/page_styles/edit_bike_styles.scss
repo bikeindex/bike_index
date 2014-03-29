@@ -248,17 +248,6 @@
     text-align: right;
   }
 
-  .has-no-serial {
-    float: left;
-    position: relative;
-    margin: .5em 0 0;
-    input { margin: 0 .5em 0 0;}
-    label {
-      width: 100%;
-      margin: 0 15px 0 0;
-      width: 105px;
-    } 
-  }
   .cm-or-in-select {
     float: left;
     margin: .5em 0 0;
@@ -276,6 +265,33 @@
       width: 60%;
     }
   }
+  .has-no-serial {
+    float: left;
+    position: relative;
+    margin: .5em 0 0;
+    input { margin: 0 .5em 0 0;}
+    label {
+      width: 100%;
+      margin: 0 15px 0 0;
+      width: 105px;
+    } 
+  }
+  .select2-container-disabled .select2-choice { color: $grayMed; }
+  .unknown-year {
+    float: left;
+    position: relative;
+    margin: .5em 0 0;
+    input { margin: -.25em .5em 0 0;}
+    label {
+      width: 100%;
+      margin: 0 15px 0 0;
+      width: 140px;
+    }
+  }
+}
+
+@media (min-width: 480px) and (max-width: 930px) {
+  .new-bike-fields .unknown-year, .new-bike-fields .has-no-serial { margin-left: 160px; }
 }
 
 .hidden-other, .edit-bike-fields .hidden-other,
@@ -468,7 +484,7 @@
 
     .control-label.unclickable { padding-top: 0; }
 
-    .has-no-serial {
+    .has-no-serial, .unknown-year {
       margin-top: 0;
     }
     .input-group {

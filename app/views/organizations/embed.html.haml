@@ -45,7 +45,11 @@
       = f.label :year, "Model year", class: "control-label"
       .controls
         - years = (1900..Time.now.year+1).to_a.reverse.map {|i| [i,i] }
-        = f.select :year, years, selected: Time.now.year
+        = f.select :year, years, selected: Time.now.year, prompt: "Unsure or unknown"
+    .unknown-year.optional-block
+      %label
+        %input#bike_unknown_year{ type: 'checkbox', tabindex: -1 }
+        Unknown year
         
   .input-group
     .control-group
@@ -54,7 +58,7 @@
         = f.text_field :frame_model, autocomplete: 'off'
 
   .input-group.with-optional-blocks
-    .control-group
+    .control-group.chosen-select
       = f.label :primary_frame_color_id, "Frame color", class: "control-label"
       .controls
         = collection_select( :bike, :primary_frame_color_id, Color.all, :id, :name, required: true, prompt: "Choose color" )
@@ -63,7 +67,7 @@
     %a#rm-secondary.optional-form-block.rm-block.currently-hidden{:data => {target: "#secondary-color", toggle: "#add-secondary"}}
       Remove color
     #secondary-color.hidden-other
-      .control-group
+      .control-group.chosen-select
         %label.control-label
           Secondary color
         .controls
@@ -76,7 +80,7 @@
       .control-group
         %label.control-label
           Third color
-        .controls
+        .controls.chosen-select
           = collection_select( :bike, :tertiary_frame_color_id, Color.all, :id, :name, prompt: "Choose color" )
 
   .input-group.form-foot

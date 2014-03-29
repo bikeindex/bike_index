@@ -91,16 +91,19 @@ describe BikeUpdator do
       bike.reload.stolen.should_not be_true
     end
 
-    it "should update the bike" do 
-      bike = FactoryGirl.create(:bike)
+    it "should update the bike and set year to nothing if year == 69" do 
+      # I was having trouble setting year to nil and having it update.
+      # So, now we're setting it to 69 if there is no year
+      bike = FactoryGirl.create(:bike, year: 2014)
       ownership = FactoryGirl.create(:ownership, bike: bike)
       user = ownership.creator
       new_creator = FactoryGirl.create(:user)
-      bike_params = {coaster_brake: true, :components_attributes =>{"1387762503379"=>{"ctype_id"=>"", "front"=>"0", "rear"=>"0", "ctype_other"=>"", "description"=>"", "manufacturer_id"=>"", "model_name"=>"", "manufacturer_other"=>"", "year"=>"", "serial_number"=>"", "_destroy"=>"0"}},}
+      bike_params = {coaster_brake: true, year: 69, :components_attributes =>{"1387762503379"=>{"ctype_id"=>"", "front"=>"0", "rear"=>"0", "ctype_other"=>"", "description"=>"", "manufacturer_id"=>"", "model_name"=>"", "manufacturer_other"=>"", "year"=>"", "serial_number"=>"", "_destroy"=>"0"}}}
       update_bike = BikeUpdator.new(user: user, :b_params => {id: bike.id, bike: bike_params})
       update_bike.should_receive(:update_ownership).and_return(true)
       update_bike.update_available_attributes
       bike.reload.coaster_brake.should be_true
+      bike.reload.year.should be_nil
       bike.components.count.should eq(0)
     end
   end

@@ -31,12 +31,16 @@
     .controls
       = f.text_field :manufacturer_other, placeholder: "Manufacturer name"
 
-.input-group
+.input-group.with-optional-blocks
   .control-group.chosen-select
     = f.label :year, "Model year", class: "control-label"
     .controls
       - years = (1900..Time.now.year+1).to_a.reverse.map {|i| [i,i] }
-      = f.select :year, years, prompt: "Choose year"
+      = f.select :year, years, prompt: "Unsure or unknown", selected: Time.now.year
+  .unknown-year.optional-block
+    %label
+      %input#bike_unknown_year{ type: 'checkbox', tabindex: -1 }
+      Unknown year
       
 .input-group
   .control-group

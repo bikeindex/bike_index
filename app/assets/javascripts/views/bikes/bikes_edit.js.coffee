@@ -15,6 +15,9 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     'change #edit_drivetrain select': 'updateDrivetrainValue'
     'click #frame-sizer button': 'updateFrameSize'
     'change #country_select_container select': 'updateCountry'
+    'change #bike_year':              'updateYear'
+    'change #bike_unknown_year':      'toggleUnknownYear'
+
     
   initialize: ->
     @setElement($('#body'))
@@ -37,6 +40,8 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
 
     if $('#public_images').length > 0
       @sortableImages($('#public_images'))
+
+    @updateYear()
 
 
   scrollToMenuTarget: (event) ->
@@ -387,4 +392,16 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
         $('#rear_gear_select .placeholder').prop('selected', 'selected')
       else
         $('#rear_gear_select').val(rcount)
-      
+  
+  toggleUnknownYear: ->
+    if $('#bike_unknown_year').prop('checked')
+      $('#bike_year').val('').trigger('change')
+    else
+      $('#bike_year').val(new Date().getFullYear()).trigger('change')
+      $('#bike_year').select2 "enable", true
+  
+  updateYear: ->
+    if $('#bike_year').val().length == 0
+      $('#bike_unknown_year').prop('checked', true)
+    else
+      $('#bike_unknown_year').prop('checked', false)

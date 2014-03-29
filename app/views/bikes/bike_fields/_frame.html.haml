@@ -20,12 +20,17 @@
       .controls
         = f.text_field :frame_model
 
-  .input-group
+  .input-group.with-optional-blocks
     .control-group.chosen-select
       = f.label :year, class: "control-label"
       .controls
         - years = (1900..Time.now.year+1).to_a.reverse.map {|i| [i,i] }
-        = f.select :year, years, prompt: "Select year"
+        - years = [['Unsure or unknown','']] + years
+        = f.select :year, years
+      .unknown-year.optional-form-block
+        %label
+          %input#bike_unknown_year{ type: 'checkbox', tabindex: -1 }
+          Unknown year
 
   .input-group.with-additional-block#frame-sizer
     %a.bikeform-tip{role: "button", title: "Seat tube measuring", :data => {toggle: "modal", target: "#seatTubeLengthTip"} }

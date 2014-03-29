@@ -123,6 +123,21 @@ a {
   position: relative;
   input { margin: 0 .5em 0 0;}
   label {
+    cursor: pointer;
+    width: 100%;
+    margin: 0 15px 0 0;
+    // width: 105px;
+  } 
+}
+.select2-container-disabled .select2-choice { color: $grayMed; }
+.unknown-year {
+  
+  margin: 24px 0 0 10px;
+  float: left;
+  position: relative;
+  input { margin: 0 .5em 0 0;}
+  label {
+    cursor: pointer;
     width: 100%;
     margin: 0 15px 0 0;
     // width: 105px;

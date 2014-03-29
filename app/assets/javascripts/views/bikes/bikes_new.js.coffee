@@ -1,19 +1,18 @@
 class BikeIndex.Views.BikesNew extends Backbone.View
   events:
-    'change #bike_has_no_serial': 'updateSerial'
-    'click a.optional-form-block': 'optionalFormUpdate'
-    'change #bike_manufacturer_id': 'updateManufacturer'
-    'change #bike_year': 'getModelList'
-    'click #select-cycletype a': 'changeCycleType'
+    'change #bike_has_no_serial':     'updateSerial'
+    'click a.optional-form-block':    'optionalFormUpdate'
+    'change #bike_manufacturer_id':   'updateManufacturer'
+    'change #bike_year':              'updateYear'
+    'change #bike_unknown_year':      'toggleUnknownYear' 
+    'click #select-cycletype a':      'changeCycleType'
     
   
   initialize: ->
     @setElement($('#body'))
     if $('#bike_has_no_serial').prop('checked') == true
       $('#bike_serial_number').val('absent').addClass('absent-serial')
-    
     @updateCycleType()
-
   
 
   updateSerial: (event) ->
@@ -73,8 +72,22 @@ class BikeIndex.Views.BikesNew extends Backbone.View
   updateManufacturer: ->
     @otherManufacturerDisplay()
     @getModelList()
-    
-
+  
+  toggleUnknownYear: ->
+    if $('#bike_unknown_year').prop('checked')
+      $('#bike_year').val('').trigger('change')
+      $('#bike_year').select2 "enable", false
+    else
+      $('#bike_year').val(new Date().getFullYear()).trigger('change')
+      $('#bike_year').select2 "enable", true
+  
+  updateYear: ->
+    if $('#bike_year').val().length == 0
+      $('#bike_year').select2 "enable", false
+      $('#bike_unknown_year').prop('checked', true)
+    else
+      $('#bike_unknown_year').prop('checked', false)
+    @getModelList()
 
   otherManufacturerDisplay: ->
     current_value = $('#bike_manufacturer_id').val()
