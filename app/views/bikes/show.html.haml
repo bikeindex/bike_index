@@ -170,7 +170,7 @@
                 - if component.component_type == "unknown"
                   Other
                 - else
-                  = component.component_type.titleize
+                  = component.component_type.titleize if component.component_type.present?
               %dd
                 = component.description
               - if component.year.present? ||  component.model_name.present? || component.manufacturer.present?
