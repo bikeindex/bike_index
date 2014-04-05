@@ -82,8 +82,9 @@
     %h3.padded
       = pluralize(@organization.locations.count, "Location")
   - @organization.locations.each do |location|
-    - if @organization.locations.count > 1
-      %hr
+
+    - location = location.decorate
+    
     - if location.name
       %p
         Name: 
@@ -98,6 +99,7 @@
       %p
         Street address: 
         = location.street
+    %hr
 
    
 .delete-organization
