@@ -74,6 +74,7 @@ end
 group :test do
   gem 'factory_girl_rails'
   gem 'simplecov', require: false
+  gem "codeclimate-test-reporter", require: nil
   gem 'resque_spec'
   gem 'shoulda-matchers'
   gem 'pry'

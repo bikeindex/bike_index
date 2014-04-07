@@ -107,6 +107,8 @@ GEM
       celluloid (>= 0.15.0)
       nio4r (>= 0.5.0)
     chronic (0.10.2)
+    codeclimate-test-reporter (0.3.0)
+      simplecov (>= 0.7.1, < 1.0.0)
     coderay (1.1.0)
     coffee-rails (3.2.2)
       coffee-script (>= 2.2.0)
@@ -427,6 +429,7 @@ DEPENDENCIES
   capistrano (~> 2.15.5)
   capistrano-resque (~> 0.1.0)
   carrierwave (~> 0.9.0)
+  codeclimate-test-reporter
   coffee-rails (~> 3.2.1)
   dalli
   database_cleaner
