@@ -65,14 +65,13 @@
   @extend .feedbacks;
 }
 
-.vendor-questions {
-  margin: 0 0 40px;
-  h2 {
-    margin: 0 0 12px;
-    font-size: 24px;
-    line-height: 1em;
-  }
+// .vendor-description {
 
+// }
+
+.vendor-signup .vendor-questions {
+  margin: 40px 0 40px;
+  
   h3 {
     margin: 0 0 .25em;
     font-size: 20px;
@@ -82,6 +81,24 @@
 
   p {
     color: $grayDarker;
+  }
+  .nav-tabs {
+    margin-bottom: 10px;
+    li {
+      list-style-type: none;
+      font-size: 1em;
+      a { padding-bottom: 10px; }
+      &.active a {
+        // background: none;
+        background: #fbfbfb;
+      }
+    }
+  }
+  .tab-pane {
+    // background: none;
+    background: #fbfbfb;
+    padding: .5em;
+    &.active { border-top: 1px solid #dddddd; }
   }
 }
 
@@ -99,5 +116,10 @@
       width: $sevenColumn;
       float: left;
     }
-   }
+    .vendor-questions .tab-pane {
+      padding: 1.5em 0 0 0;
+      border-left: 0;
+      border-right: 0;
+    }
+  }
 }

@@ -11,7 +11,6 @@ gem 'airbrake'
 gem 'resque', :require => 'resque/server'
 gem 'resque-pool'
 gem 'geocoder', "~> 1.1.2"
-gem "whenever", require: false
 gem "money-rails", "~> 0.5.0"
 gem "i18n"
 gem "haml-rails", '~> 0.3.5'

@@ -2,48 +2,94 @@
   %header
     .header-text
       %h1
-        Are you a bike shop?
-      %h2
-        Want to register bikes? 
+        Are you a bike shop? 
+      %h1
+        A biking organization?
     .bike-shop-image
       = image_tag "bike-shop.png", alt: "Bike shop"
+  %article.vendor-description
+    %p
+      The Bike Index gives you the ability to quickly and easily register bikes for your customers or members.
+    %p
+      When you register a bike, your customer will receive an email with the basic information about the bike &mdash; they never need to do anything else, and they will always have a permanent record of their bike.
+    %p
+      If they ever want to, they can sign in to Bike Index and upload photos or add details, and if their bike is stolen, they can mark it stolen on the Index to get the best chance of recovery.
 
-  .vendor-questions
-    %h2
-      A few questions and answers
-    %ul.fancy-bullets
+  .vendor-questions.tabbable
+    / .nav
+    %ul.nav-tabs
+      %li.active
+        %a{ href: '#regular-vendor', data: {toggle: 'tab'} }
+          Standard use
       %li
-        %span.blue-bullet
-        %h3
-          How much does it cost to get started?
-        %p
-          It is free. There is no set up fee and it's free to register bikes.
+        %a{ href: '#lightspeed-automation', data: {toggle: 'tab'} }
+          Use with LightSpeed Cloud
+    
+    .tab-content
+      #regular-vendor.tab-pane.active
+        %article
+          / <a href="http://youtu.be/rCj6Gkndm1k" style="display: block;"><img style="display: block; margin: 20px auto 10px;" src="https://s3.amazonaws.com/bikeindex/org_manage_screencast_screenshot.png"></a>
+          %p
+            Watch our screencast on 
+            %a{ href: "http://youtu.be/rCj6Gkndm1k" }
+              getting started with organizations
+            on the Bike Index
+        %ul.fancy-bullets
+          %li
+            %span.blue-bullet
+            %h3
+              How much does it cost?
+            %p
+              It's completely free! It will always be free for bike shops and bike organizations to register bikes.
+          
+          %li
+            %span.blue-bullet
+            %h3
+              Do you have fliers?
+            %p
+              Yes, you can print
+              %a{href: "https://s3.amazonaws.com/bikeindex/Bike+Index+display.pdf"}
+                this pdf
+              to show your customers that you care about protecting their bikes.
 
+          %li
+            %span.blue-bullet
+            %h3
+              This sounds awesome! How do I sign up?
+            %p
+              Just submit the form below!
 
-      %li
-        %span.blue-bullet
-        %h3
-          Do I sign a long term contract?
-        %p
-          Nope. There aren't any long term commitments. You can cancel anytime.
-      
-      %li
-        %span.blue-bullet
-        %h3
-          Do you have fliers?
-        %p
-          Yes! You can print out 
-          %a{href: "https://s3.amazonaws.com/bikeindex/Bike+Index+display.pdf"}
-            this pdf
-          to show that you register bikes.
-
-      %li
-        %span.blue-bullet
-        %h3
-          This sounds awesome! How do I sign up?
-        %p
-          Just submit the form below!
-
+      #lightspeed-automation.tab-pane
+        %article
+          %p
+            Does your bike shop use LightSpeed Cloud? We offer an integration to make bike registration entirely automatic at your shop.
+          %p
+            Make sure every bike you sell is registered, so that every one of your customers' bikes are protected, regardless of how busy your shop is (#{link_to 'read the announcement', 'https://bikeindex.org/blogs'}).
+        
+        %ul.fancy-bullets
+          %li
+            %span.blue-bullet
+            %h3
+              What if a customer doesn't want to be registered?
+            %p
+              Just put "do not register" in the notes section of the bike when you sell it (or don't take the customer's email).
+          %li
+            %span.blue-bullet
+            %h3
+              What information do you collect?
+            %p
+              We only access your customer's email and the information about the bikes that are sold. No other information is read or saved.
+          %li
+            %span.blue-bullet
+            %h3
+              What do you need to sign up?
+            %p
+              We need your #{link_to 'LightSpeed Cloud API key', 'http://lightspeed.com/api_key'}. We are working on a video tutorial to show how to get exactly what we need, but for now, just
+              %a{ href: 'mailto:contact@bikeindex.org' }
+                contact us
+              and we'll get you set up.
+            %p
+              Also, you should request a Bike Index account using the form below if you haven't already.
 %article
   = form_for @feedback do |f|
 
