@@ -137,5 +137,5 @@ Bikeindex::Application.routes.draw do
   match '/422', to: 'errors#unprocessable_entity'
   match '/500', to: 'errors#server_error'
   
-  mount Resque::Server.new, :at => '/resque'
+  mount Resque::Server.new, :at => '/resque', :constraints => AdminRestriction
 end
