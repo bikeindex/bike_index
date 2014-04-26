@@ -7,7 +7,7 @@ class Admin::UsersController < Admin::BaseController
       users += User.where('name LIKE ?', params[:user_query]).all
       @users = users
     else 
-      @users = User.order("created_at desc").limit(100)
+      @users = User.order("created_at desc")
     end
 
   end

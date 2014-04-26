@@ -9,7 +9,7 @@ class Admin::BikesController < Admin::BaseController
       user = User.fuzzy_email_find(params[:email])
       @bikes = Bike.find(user.bikes) if user.present?
     else 
-      @bikes = Bike.limit(100)
+      @bikes = Bike.all
     end
   end
 
