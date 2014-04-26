@@ -243,97 +243,180 @@ body.welcome-page {
   }
 }
 
+
 //________________________
 //
-// Fight theft
+// Community
 //
 //________________________
 
-#moving-block {
-  display: block;
-  width: 100%;
-  height: 75%;
-  // background: $purple;
-  position: absolute;
-  left: 0;
-  bottom: 40px;
-  img {
-    width: auto;
-    height: 100%;
-  }
-}
 
-#fight-theft-profit {
-  background: $bodyBackground;
-  border-bottom: 1px solid $searchBorderLight;
-}
-
-.fight-theft-image {
-  margin-top: 20px;
-  position: relative;
-  &>img {
-    position: relative;
-    display: block;
-    width: auto;
-    max-height: 500px;
-    padding-bottom: 20px;
-    // width: 100%;
-    // max-width: 400px;
-    // max-width: 350px;
-    margin: 0 auto;
-  }
-}
-
-.theft-profit-block {
+#best-ever {
+  background: white;
+  // background: #27AE60;
+  z-index: 1;
+  border-top: 1px solid $searchBorder;
+  border-bottom: 1px solid $searchBorder;
   color: $grayDark;
+  // color: white;
+  position: relative;
+  width: 100%;
+  a { color: $blueLight; }
   h3 {
+    text-align: center;
     color: $textColor;
-    margin-top: 40px;
   }
-  li {
-    margin-bottom: 1em;
-    span { margin-top: 0; }
-  }
-}
-
-@media (max-width: 699px) {
-  #fight-theft-profit {
+  p { text-align: center; }
+  article {
+    position: relative;
+    float: left;
     padding-top: 40px;
-    .fight-theft-image>img { max-height: 300px; }
+    margin-right: $gutterW;
+  }
+  .icographix {
+    @include border-radius(6px);
+    @include box-shadow(#{inset 1px 1px 6px rgba(black,.2)});
+    @include transition(opacity 1.7s ease-in);
+    opacity: 1;
+    position: relative;
+    width: 50%;
+    max-width: 220px;
+    padding: 10px;
+    background: $blueDarker;
+    margin: 0 auto 20px;
+    img {
+      width: 100%;
+      display: block;
+    }
+  }
+  &.displayno-icos .icographix { opacity: 0; }
+}
+
+
+@media (max-width: 767px) {
+  #best-ever {
+    padding: 60px 0;
+    article {
+      width: $sixColumn;
+      &:nth-of-type(2n) {
+        margin-right: 0;
+      }
+    }
   }
 }
 
-@media (min-width: 701px) {
-  #fight-theft-profit {
-    .inner-recep {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-    padding: 30px 0;
+@media (max-width: 550px) {
+  #best-ever {
+    .icongraphix { max-width: 70%; }
+    article p { display: none;  } 
   }
-  .fight-theft-image {
-    width: 52%;
-    float: right;
-    max-width: 500px;
-  }
-  .theft-profit-block {
-    width: 46%;
-    margin-left: $gutterW;
-    float: right;
-    h3 { margin-top: 100px; }
-    ul {
-      margin-top: 40px;
-      font-size: 22px;
-      line-height: 1em;
+}
+
+@media (min-width: 768px) {
+  #best-ever {
+    padding-bottom: 80px;
+    article {
+      padding-top: 60px;
+      width: $fourColumn;
+      &:nth-of-type(3n) {
+        margin-right: 0;
+      }
+      &:nth-of-type(3n+1) {
+        clear: left;
+      }
     }
   }
 }
 
-@media (min-width: 1100px) {
-  .theft-profit-block {
-    h3 { margin-top: 180px; }
+//________________________
+//
+// Awesomeness
+//
+//________________________
+
+.bike-background {
+  background: url("/assets/supporters/bikes_small.jpg") fixed;
+  width: 100%;
+}
+
+@media (min-width: 1200px) {
+  .bike-background { background: url("/assets/supporters/bikes_large.jpg") fixed; }
+}
+
+#supporters {
+  @include box-shadow(inset 0 0 2px rgba(black,.6));
+  position: relative;
+  min-height: 15em;
+  padding: 40px 0 4em;
+  h2 {
+    font-size: 30px;
+    margin: .75em 0;
+    // margin: 1em 0;
+    text-shadow: 1px 1px 2px rgba(black,.3);
+    color: white;
+    font-family: $baseFont;
+  }
+  .horizontal-list {
+    li {
+      width: 33%;
+      padding: 15px;
+      a { display: block; width: 100%;}
+      img { width: 100%; }
+    }
   }
 }
+
+.and-many-more {
+  position: absolute;
+  background: rgba(white,.7);
+  border: $searchBorder;
+  border-bottom: 0;
+  border-radius: 3px 3px 0 0;
+  bottom: 0;
+  left: 3%;
+  width: 94%;
+  p {
+    text-align: center;
+    margin: 0;
+    padding: .5em 0 .25em;
+  }
+}
+
+@media (min-width: 625px) {
+  #supporters {
+    padding-bottom: 5em;
+    h2 { font-size: 40px; }
+    .horizontal-list li {
+      width: 16.66%;
+      padding: 0;
+    }
+    .and-many-more {
+      left: 5%;
+      width: 90%;
+      p { padding: .75em 0 .5em; }
+    }
+  }
+}
+
+@media (min-width: 1000px) {
+  #supporters {
+    // padding-bottom: 6em;
+    h2 {
+      font-size: 50px;
+      // margin: .75em 0 .75em;
+    }
+    .and-many-more {
+      left: 20%;
+      width: 60%;
+    }
+  }
+}
+
+@media (min-width: 1300px) {
+  #supporters h2 { margin-left: -5%; }
+}
+
+
 
 
 //________________________
@@ -413,156 +496,5 @@ body.welcome-page {
     border-style: solid;
     border-width: 19px 0 19px 34px;
     border-color: transparent transparent transparent rgba(255, 255, 255, 1);
-  }
-}
-
-
-//________________________
-//
-// Community
-//
-//________________________
-
-
-#best-ever {
-  background: white;
-  z-index: 1;
-  border-top: 1px solid $searchBorderLight;
-  border-bottom: 1px solid $searchBorderLight;
-  color: $grayDark;
-  position: relative;
-  width: 100%;
-  a { color: $blueLight; }
-  h3 {
-    text-align: center;
-    color: $textColor;
-  }
-  p { text-align: center; }
-  article {
-    position: relative;
-    float: left;
-    padding-top: 40px;
-    margin-right: $gutterW;
-  }
-  .icographix {
-    @include border-radius(6px);
-    @include box-shadow(#{inset 1px 1px 6px rgba(black,.2)});
-    @include transition(opacity 1.7s ease-in);
-    opacity: 1;
-    position: relative;
-    width: 50%;
-    max-width: 220px;
-    padding: 10px;
-    background: $blueDarker;
-    margin: 0 auto 20px;
-    img {
-      width: 100%;
-      display: block;
-    }
-  }
-  &.displayno-icos .icographix { opacity: 0; }
-}
-
-
-@media (max-width: 767px) {
-  #best-ever {
-    padding: 60px 0;
-    article {
-      width: $sixColumn;
-      &:nth-of-type(2n) {
-        margin-right: 0;
-      }
-    }
-  }
-}
-
-@media (max-width: 550px) {
-  #best-ever {
-    .icongraphix { max-width: 70%; }
-    article p { display: none;  } 
-  }
-}
-
-@media (min-width: 768px) {
-  #best-ever {
-    padding-bottom: 80px;
-    article {
-      padding-top: 60px;
-      width: $fourColumn;
-      &:nth-of-type(3n) {
-        margin-right: 0;
-      }
-      &:nth-of-type(3n+1) {
-        clear: left;
-      }
-    }
-  }
-}
-
-
-//________________________
-//
-// Awesomeness
-//
-//________________________
-
-
-
-//________________________
-//
-// Awesomeness
-//
-//________________________
-
-.bike-background {
-  background: url("/assets/supporters/bikes_small.jpg") fixed;
-  width: 100%;
-}
-
-@media (min-width: 1200px) {
-  .bike-background { background: url("/assets/supporters/bikes_large.jpg") fixed; }
-}
-
-#supporters {
-  @include box-shadow(inset 0 0 2px rgba(black,.6));
-  position: relative;
-  min-height: 15em;
-  padding: 40px 0;
-  h2 {
-    margin: 1em 0;
-    text-shadow: 1px 1px 2px rgba(black,.3);
-    color: white;
-    font-family: $baseFont;
-  }
-  .horizontal-list {
-    li {
-      width: 50%;
-      padding: 15px;
-      a { display: block; width: 100%;}
-      img { width: 100%; }
-    }
-  }
-}
-
-@media (min-width: 550px) {
-  #supporters .horizontal-list {
-    li {
-      width: 25%;
-      padding: 0;
-    }
-  }
-}
-
-@media (min-width: 1000px) {
-  #supporters {
-    h2 {
-      span { font-size: 55px; }
-      font-size: 60px;
-      margin: -1.25em 0 0;
-      position: absolute;
-      left: 0; top: 50%;
-      width: 300px;
-    }
-    .horizontal-list { padding-left: 300px; }
   }
 }

@@ -16,15 +16,9 @@
         %h2
           Show your trusty steed some love
     .home-sharing
-      = render "/shared/home_share"
+      / = render "/shared/home_share"
       %a.hidden{ href: "https://plus.google.com/112992910030626766953", rel: "publisher"}
         Google+
-
-
-#movie-wrap
-  #iframe-holder
-  #movie-cover
-    %a.play-button
 
 
 .bike-background
@@ -78,23 +72,39 @@
             Used bike verification
           %p
             Verify any bike you buy or sell. Transfer bike registrations for free.
+  
   #supporters
     .receptacle.overfloating
       .inner-recep
         %h2
-          %span
-            A few of our
-          Supporters
+          Recommended &amp; supported by:
         %ul.horizontal-list
           %li
             %a{href: "http://www.peopleforbikes.org/", target: "_blank"}
-              = image_tag "/assets/supporters/people_for_bikes.png", alt: "People for bikes"
+              = image_tag "/assets/supporters/people_for_bikes.png", alt: "People for bikes logo", title: "People for bikes"
           %li
-            %a{href: "http://bikelanechicago.com/", target: "_blank"}
-              = image_tag "/assets/supporters/bike_lane.png", alt: "Bike Lane"
+            %a{href: "http://bikepgh.org/", target: "_blank"}
+              = image_tag "/assets/supporters/bike_pgh.png", alt: "Bike Pittsburgh logo", title: "Bike Pittsburgh"
           %li
-            %a{href: "http://westtownbikes.org/retail", target: "_blank"}
-              = image_tag "/assets/supporters/ciclo_urbano.png", alt: "Ciclo Urbano"
+            %a{href: "http://trailnet.org/", target: "_blank"}
+              = image_tag "/assets/supporters/trailnet.png", alt: "Trailnet logo", title: "Trailnet"
+          %li
+            %a{href: "https://www.ebbc.org/", target: "_blank"}
+              = image_tag "/assets/supporters/ebbc.png", alt: "East Bay Bicycle Coalition logo", title: "East Bay Bicycle Coalition"
+          %li
+            %a{href: "http://indycog.org/", target: "_blank"}
+              = image_tag "/assets/supporters/indycog.png", alt: "INDYCOG logo", title: "INDYCOG"
           %li
             %a{href: "http://www.activetrans.org/", target: "_blank"}
-              = image_tag "/assets/supporters/active_trans.png", alt: "Active Transportation Alliance"
+              = image_tag "/assets/supporters/active_trans.png", alt: "Active Transportation Alliance logo", title: "Active Transportation Alliance"
+          / %li
+          /   %a{href: "https://stlouis-mo.gov/", target: "_blank"}
+          /     = image_tag "/assets/supporters/st_louis.png", alt: "City of Saint Louis"
+    .and-many-more
+      %p
+        \... and many more - #{link_to "view our partners", where_path}
+
+#movie-wrap
+  #iframe-holder
+  #movie-cover
+    %a.play-button
