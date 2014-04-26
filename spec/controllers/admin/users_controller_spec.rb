@@ -29,6 +29,7 @@ describe Admin::UsersController do
         confirmed: true,
         superuser: true,
         can_invite: true,
+        can_send_many_stolen_notifications: true,
         banned: true
       }
       @user.reload.name.should eq("New Name")
@@ -36,6 +37,7 @@ describe Admin::UsersController do
       @user.confirmed.should be_true
       @user.superuser.should be_true
       @user.can_invite.should be_true
+      @user.can_send_many_stolen_notifications.should be_true
       @user.banned.should be_true
     end
   end

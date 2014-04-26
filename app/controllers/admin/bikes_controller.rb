@@ -8,7 +8,7 @@ class Admin::BikesController < Admin::BaseController
     if params[:email]
       @bikes = Bike.admin_text_search(params[:email])
     else 
-      @bikes = Bike.limit(100)
+      @bikes = Bike.scoped.limit(100)
     end
   end
 
