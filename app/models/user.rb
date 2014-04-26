@@ -70,6 +70,23 @@ class User < ActiveRecord::Base
   validates_presence_of :email
   validates_uniqueness_of :email, case_sensitive: false
 
+
+  include PgSearch
+
+  pg_search_scope :admin_search, against: {
+    :name => 'A',
+    :email => 'A'
+    },
+    using: {tsearch: {dictionary: "english", :prefix => true}}
+
+  def self.admin_text_search(query)
+    if query.present?
+      admin_search(query)
+    else
+      scoped
+    end
+  end
+
   def superuser?
     self.superuser
   end

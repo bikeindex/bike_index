@@ -6,10 +6,9 @@ class Admin::BikesController < Admin::BaseController
 
   def index
     if params[:email]
-      user = User.fuzzy_email_find(params[:email])
-      @bikes = Bike.find(user.bikes) if user.present?
+      @bikes = Bike.admin_text_search(params[:email])
     else 
-      @bikes = Bike.all
+      @bikes = Bike.limit(100)
     end
   end
 

@@ -116,17 +116,29 @@ class Bike < ActiveRecord::Base
   scope :non_stolen, where(stolen: false)
 
   include PgSearch
-  # TODO: match serial numbers search across common substitutions,
-  # i.e. 0 & O
   pg_search_scope :search, against: {
     :cached_data => 'A',
     :description => 'B',
     },
     using: {tsearch: {dictionary: "english", :prefix => true}}
 
+  pg_search_scope :admin_search, against: {
+    :owner_email => 'A'
+    },
+    associated_against: {ownerships: :owner_email, creator: :email},
+    using: {tsearch: {dictionary: "english", :prefix => true}}
+
   def self.text_search(query)
     if query.present?
       search(query)
+    else
+      scoped
+    end
+  end
+
+  def self.admin_text_search(query)
+    if query.present?
+      admin_search(query)
     else
       scoped
     end

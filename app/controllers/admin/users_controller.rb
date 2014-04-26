@@ -3,11 +3,13 @@ class Admin::UsersController < Admin::BaseController
 
   def index
     if params[:user_query]
-      users = User.where('email LIKE ?', params[:user_query]).all
-      users += User.where('name LIKE ?', params[:user_query]).all
-      @users = users
+      # if params[:email]
+      @users = User.admin_text_search(params[:user_query])
+      # users = User.where('email LIKE ?', params[:user_query]).all
+      # users += User.where('name LIKE ?', params[:user_query]).all
+      # @users = users
     else 
-      @users = User.order("created_at desc")
+      @users = User.order("created_at desc").limit(100)
     end
 
   end
