@@ -21,7 +21,11 @@ class StolenNotification < ActiveRecord::Base
 
   after_create :notify_receiver
   def notify_receiver
-    Resque.enqueue(StolenNotificationEmailJob, self.id)
+    if sender.sent_stolen_notifications.count < 2 or sender.can_send_many_stolen_notifications
+      Resque.enqueue(StolenNotificationEmailJob, self.id)
+    else
+      Resque.enqueue(BlockedStolenNotificationEmailJob, self.id)
+    end
   end
 
 end

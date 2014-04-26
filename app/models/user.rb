@@ -23,7 +23,8 @@ class User < ActiveRecord::Base
     :show_website,
     :show_bikes,
     :show_phone,
-    :has_stolen_bikes
+    :has_stolen_bikes,
+    :can_send_many_stolen_notifications
 
   mount_uploader :avatar, AvatarUploader
 
@@ -41,8 +42,8 @@ class User < ActiveRecord::Base
   has_many :bike_tokens, dependent: :destroy
   has_many :locks, dependent: :destroy
 
-  has_many :comments, class_name: "Comment", foreign_key: :receiver_id
-  has_many :sent_comments, class_name: "Comment", foreign_key: :sender_id
+  has_many :sent_stolen_notifications, class_name: 'StolenNotification', foreign_key: :sender_id
+  has_many :received_stolen_notifications, class_name: 'StolenNotification', foreign_key: :receiver_id
 
   has_many :organization_invitations, class_name: 'OrganizationInvitation', inverse_of: :inviter
   has_many :organization_invitations, class_name: 'OrganizationInvitation', inverse_of: :invitee

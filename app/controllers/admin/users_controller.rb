@@ -28,6 +28,7 @@ class Admin::UsersController < Admin::BaseController
     @user.can_invite = params[:user][:can_invite]
     @user.banned = params[:user][:banned]
     @user.username = params[:user][:username]
+    @user.can_send_multiple_stolen_notifications = params[:user][:can_send_multiple_stolen_notifications]
     # m = Membership.new
     # .membership = params[:user][:organizations]
 

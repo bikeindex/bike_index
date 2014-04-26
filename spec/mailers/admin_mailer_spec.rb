@@ -25,5 +25,17 @@ describe AdminMailer do
       @mail.subject.should match("doesn't have any admins")
     end
   end
+
+  describe :blocked_stolen_notification_email do 
+    before :each do
+      @stolen_notification = FactoryGirl.create(:stolen_notification, message: "Test Message", subject: "Test subject")
+      @mail = AdminMailer.blocked_stolen_notification_email(@stolen_notification)
+    end
+
+    it "should render email" do
+      @mail.subject[/blocked/i].present?.should be_true
+      @mail.body.encoded.should match(@stolen_notification.message)
+    end
+  end
   
 end

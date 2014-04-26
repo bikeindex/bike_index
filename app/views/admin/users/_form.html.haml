@@ -40,6 +40,10 @@
       = f.label :banned, class: "control-label"
       .controls
         = f.check_box :banned
+    .control-group
+      = f.label :can_send_many_stolen_notifications, class: "control-label"
+      .controls
+        = f.check_box :can_send_many_stolen_notifications
 
     .padded
       = f.submit 'Save', class: 'button-green pull-right'

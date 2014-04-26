@@ -11,7 +11,15 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140313002428) do
+ActiveRecord::Schema.define(:version => 20140426211337) do
+
+  create_table "alternate_emails", :force => true do |t|
+    t.string   "email"
+    t.boolean  "confirmed"
+    t.integer  "user_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -445,31 +453,32 @@ ActiveRecord::Schema.define(:version => 20140313002428) do
     t.string   "email"
     t.text     "password"
     t.datetime "last_login"
-    t.boolean  "superuser",                    :default => false, :null => false
+    t.boolean  "superuser",                          :default => false, :null => false
     t.text     "password_reset_token"
-    t.datetime "created_at",                                      :null => false
-    t.datetime "updated_at",                                      :null => false
+    t.datetime "created_at",                                            :null => false
+    t.datetime "updated_at",                                            :null => false
     t.string   "password_digest"
     t.boolean  "banned"
     t.string   "phone"
     t.string   "zipcode"
     t.string   "twitter"
-    t.boolean  "show_twitter",                 :default => false, :null => false
+    t.boolean  "show_twitter",                       :default => false, :null => false
     t.string   "website"
-    t.boolean  "show_website",                 :default => false, :null => false
-    t.boolean  "show_phone",                   :default => true
-    t.boolean  "show_bikes",                   :default => false, :null => false
+    t.boolean  "show_website",                       :default => false, :null => false
+    t.boolean  "show_phone",                         :default => true
+    t.boolean  "show_bikes",                         :default => false, :null => false
     t.string   "username"
     t.boolean  "has_stolen_bikes"
     t.string   "avatar"
     t.text     "description"
     t.text     "title"
-    t.boolean  "terms_of_service",             :default => false, :null => false
+    t.boolean  "terms_of_service",                   :default => false, :null => false
     t.boolean  "vendor_terms_of_service"
     t.datetime "when_vendor_terms_of_service"
     t.boolean  "confirmed"
     t.string   "confirmation_token"
     t.boolean  "can_invite"
+    t.boolean  "can_send_many_stolen_notifications", :default => false, :null => false
   end
 
   add_index "users", ["password_reset_token"], :name => "index_users_on_password_reset_token"

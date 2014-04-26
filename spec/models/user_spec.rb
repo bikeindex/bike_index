@@ -1,7 +1,26 @@
 require 'spec_helper'
 
 describe User do
- 
+  
+  describe :validations do
+    it { should have_many :memberships }
+    it { should have_many :organization_embeds }
+    it { should have_many :organizations }
+    it { should have_many :ownerships }
+    it { should have_many :current_ownerships }
+    it { should have_many :owned_bikes }
+    it { should have_many :currently_owned_bikes }
+    it { should have_many :integrations }
+    it { should have_many :created_ownerships }
+    it { should have_many :bike_tokens }
+    it { should have_many :locks }
+    it { should have_many :organization_invitations }
+
+    it { should have_many :sent_stolen_notifications }
+    it { should have_many :received_stolen_notifications }
+    
+  end
+
   describe :validate do
     describe :create do
       before :each do
