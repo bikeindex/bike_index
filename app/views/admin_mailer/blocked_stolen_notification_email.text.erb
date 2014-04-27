@@ -10,4 +10,4 @@
 
 <h3><%= link_to "Update their account", edit_admin_user_url(@stolen_notification.sender) %> if they should be allowed to send more email.<h3>
 
-<h3>Resend the message afterward</h3>
+<%= link_to "Resend the message afterward", admin_stolen_notification_url(@stolen_notification), method: :put %>
