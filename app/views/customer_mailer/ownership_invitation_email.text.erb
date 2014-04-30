@@ -21,9 +21,9 @@ Congrats on adding your bike to the index!
 <% end # end of the creation_org notification %>
 
 ---
-Make: <%= @bike.manufacturer.name  %></p>
+Make: <%= @bike.manufacturer.name  %>
     
-Serial: <%= @bike.serial_number %></p>
+Serial: <%= @bike.serial_number %>
     
 Color: <% if @bike.paint.present? %><%= @bike.paint.name %><% else %><%= @bike.primary_frame_color.name %><% end %>
 ---  
