@@ -100,6 +100,14 @@ class BikeIndex.Views.Global extends Backbone.View
       $('#header-tabs').removeClass('visibled')
       $('#total-top-header').removeClass('header-tabs-in')
     else 
+      # console.log(target)
+      # $('#session_email').focus() if target.hasClass('.expand-sign-in')
+      # console.log('hihih')
+      window.setTimeout (->
+        $('#session_email').focus()
+      ), 500
+      
+      
       $('#total-top-header').addClass('header-tabs-in')
       if $('#header-tabs .tab-content').hasClass('visibled') 
         target.tab('show')

@@ -6,4 +6,9 @@ class WheelSize < ActiveRecord::Base
 
   default_scope order(:iso_bsd)
   scope :commonness, order("priority ASC, iso_bsd DESC")
+
+  def select_value
+    "[#{iso_bsd}] #{description}"
+  end
+
 end

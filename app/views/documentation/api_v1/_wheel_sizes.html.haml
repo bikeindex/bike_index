@@ -12,7 +12,7 @@
 %article.code
   %p.code-label
     GET all wheel sizes
-  - request_url = api_v1_wheel_sizes_url
+  - request_url = @root + api_v1_wheel_sizes_path
   %pre
     :plain
       $.ajax({
