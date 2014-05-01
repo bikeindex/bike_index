@@ -101,6 +101,8 @@ GEM
       activemodel (>= 3.2.0)
       activesupport (>= 3.2.0)
       json (>= 1.7)
+    carrierwave_backgrounder (0.3.0)
+      carrierwave (~> 0.5)
     celluloid (0.15.2)
       timers (~> 1.1.0)
     celluloid-io (0.15.0)
@@ -429,6 +431,7 @@ DEPENDENCIES
   capistrano (~> 2.15.5)
   capistrano-resque (~> 0.1.0)
   carrierwave (~> 0.9.0)
+  carrierwave_backgrounder
   codeclimate-test-reporter
   coffee-rails (~> 3.2.1)
   dalli

@@ -113,9 +113,18 @@ class BikesController < ApplicationController
       if @bike.errors.any?
         @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
         flash[:error] = "Whoops! There was a problem with your entry!"
-        redirect_to embed_organization_url(@bike.creation_organization) and return  
+        if params[:bike][:embeded_extended]
+          redirect_to embed_extended_organization_url(@bike.creation_organization) and return  
+        else
+          redirect_to embed_organization_url(@bike.creation_organization) and return  
+        end
       else
-        redirect_to controller: :organizations, action: :embed_create_success, id: @bike.creation_organization.slug, bike_id: @bike.id and return  
+        if params[:bike][:embeded_extended]
+          flash[:notice] = "Success! #{@bike.type} was sent to #{@bike.owner_email}."
+          redirect_to embed_extended_organization_url(@bike.creation_organization) and return  
+        else
+          redirect_to controller: :organizations, action: :embed_create_success, id: @bike.creation_organization.slug, bike_id: @bike.id and return  
+        end
       end
     else
       users_b_params = BParam.where(creator_id: current_user.id)
