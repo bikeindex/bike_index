@@ -20,7 +20,7 @@ class Admin::DashboardController < ApplicationController
     mnfg_other = Manufacturer.fuzzy_name_find("Other")
     @component_mnfgs = Component.where(manufacturer_id: mnfg_other.id)
     @bike_mnfgs = Bike.where(manufacturer_id: mnfg_other.id)
-    @component_types = Component.where(Ctype_id: Ctype.find_by_name("Other").id )
+    @component_types = Component.where(ctype_id: Ctype.find_by_name("other").id )
     @handlebar_types = Bike.where(handlebar_type_id: HandlebarType.find_by_slug("other").id )
     @paint = Paint.where("color_id IS NULL")
   end
