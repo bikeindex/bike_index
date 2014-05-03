@@ -8,7 +8,7 @@ class Admin::BikesController < Admin::BaseController
     if params[:email]
       @bikes = Bike.admin_text_search(params[:email])
     else 
-      @bikes = Bike.order("created_at desc").limit(100)
+      @bikes = Bike.unscoped.order("created_at desc").limit(100)
     end
   end
 
