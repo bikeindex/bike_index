@@ -16,17 +16,16 @@
       If they ever want to, they can sign in to Bike Index and upload photos or add details, and if their bike is stolen, they can mark it stolen on the Index to get the best chance of recovery.
 
   .vendor-questions.tabbable
-    / .nav
     %ul.nav-tabs
-      %li.active
+      %li{class: ('active' unless @lightspeed) }
         %a{ href: '#regular-vendor', data: {toggle: 'tab'} }
           Standard use
-      %li
+      %li{class: ('active' if @lightspeed) }
         %a{ href: '#lightspeed-automation', data: {toggle: 'tab'} }
           Use with LightSpeed Cloud
     
     .tab-content
-      #regular-vendor.tab-pane.active
+      #regular-vendor.tab-pane{class: ('active' unless @lightspeed) }
         %article
           / <a href="http://youtu.be/rCj6Gkndm1k" style="display: block;"><img style="display: block; margin: 20px auto 10px;" src="https://s3.amazonaws.com/bikeindex/org_manage_screencast_screenshot.png"></a>
           %p
@@ -59,37 +58,57 @@
             %p
               Just submit the form below!
 
-      #lightspeed-automation.tab-pane
+      #lightspeed-automation.tab-pane{class: ('active' if @lightspeed) }
         %article
           %p
-            Does your bike shop use LightSpeed Cloud? We offer an integration to make bike registration entirely automatic at your shop.
+            Does your bike shop use LightSpeed Cloud? The Bike Index now offers an integration to make bike registration entirely automatic at your shop (#{link_to 'read the announcement', 'https://bikeindex.org/blogs/automated-registration-for-bike-shops'}).
           %p
-            Make sure every bike you sell is registered, so that every one of your customers' bikes are protected, regardless of how busy your shop is (#{link_to 'read the announcement', 'https://bikeindex.org/blogs'}).
-        
+            Make sure you register every bike you sell &mdash; so that every one of your customers is protected, no matter how busy your shop is.
+          %p
+            It works like this:
         %ul.fancy-bullets
           %li
             %span.blue-bullet
-            %h3
+            %p
+              Every few minutes we contact LightSpeed Cloud and ask if any new bikes have been sold.
+          %li
+            %span.blue-bullet
+            %p
+              If any have been, we look up the information about the bikes.
+          %li
+            %span.blue-bullet
+            %p
+              If the bike is suppose to be registered, we ask LightSpeed cloud what the customer's email is.
+          %li
+            %span.blue-bullet
+            %p
+              We register the bike and send it to your customer.
+        %article
+          %p
+            All you need to do to sign up is get us your API key. Here is a video explaining how to do this.
+          :plain
+            <iframe width="700" height="394" src="//www.youtube.com/embed/52QTFWm7gHk" frameborder="0" allowfullscreen></iframe>
+          %p.padded
+            To get automation, you also need to have a Bike Index account. Sign up by submitting the form below if you haven't already (it's free).
+        %dl
+          %dt.collapse-faq
+            %a.collapsed{ href: "#whats-collected", :data => { toggle: "collapse"} }
+              %span
+              What information do you get from LightSpeed?
+          %dd#whats-collected.collapse
+            %p
+              We only access the information we need for registration (serial number, description, manufacturer, year, color, photo) about the bikes that we are registering and the customer's email associated with the bikes we register.
+          %dt.collapse-faq
+            %a.collapsed{ href: "#opting-out", :data => { toggle: "collapse"} }
+              %span
               What if a customer doesn't want to be registered?
+          %dd#opting-out.collapse
             %p
-              Just put "do not register" in the notes section of the bike when you sell it (or don't take the customer's email).
-          %li
-            %span.blue-bullet
-            %h3
-              What information do you collect?
+              Just add "do not register" in the notes section of the bike when you sell it.
             %p
-              We only access your customer's email and the information about the bikes that are sold. No other information is read or saved.
-          %li
-            %span.blue-bullet
-            %h3
-              What do you need to sign up?
+              Bikes marked "do not register" are never processed and the customer's email is never accessed.
             %p
-              We need your #{link_to 'LightSpeed Cloud API key', 'http://lightspeed.com/api_key'}. We are working on a video tutorial to show how to get exactly what we need, but for now, just
-              %a{ href: 'mailto:contact@bikeindex.org' }
-                contact us
-              and we'll get you set up.
-            %p
-              Also, you should request a Bike Index account using the form below if you haven't already.
+              Also, if you don't add your customer's email, we won't register the bike.
 %article
   = form_for @feedback do |f|
 

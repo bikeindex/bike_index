@@ -32,19 +32,27 @@ class OrganizationsController < ApplicationController
   end
 
   def update
-    websitey = params[:organization][:website]
-    if Urlifyer.urlify(websitey)
-      @organization.website = websitey
-      if @organization.save
-        # raise "organization saved"
-        redirect_to edit_organization_url(@organization), notice: "Organization updated"
+    if params[:organization][:lightspeed_cloud_api_key].present?
+      api_key = params[:organization][:lightspeed_cloud_api_key]
+      Resque.enqueue(LightspeedNotificationEmailJob, @organization.id, api_key)
+      flash[:notice] = "Thanks for updating your LightSpeed API Key!"
+      redirect_to organization_url(@organization) and return
+      # @stolen_notification = StolenNotification.new(params[:stolen_notification])
+    else
+      websitey = params[:organization][:website]
+      if Urlifyer.urlify(websitey)
+        @organization.website = websitey
+        if @organization.save
+          # raise "organization saved"
+          redirect_to edit_organization_url(@organization), notice: "Organization updated"
+        else
+          raise "organization not saved"
+          render action: :settings
+        end
       else
-        raise "organization not saved"
+        flash[:error] = "We're sorry, that didn't look like a valid url to us!"
         render action: :settings
       end
-    else
-      flash[:error] = "We're sorry, that didn't look like a valid url to us!"
-      render action: :settings
     end
   end
 

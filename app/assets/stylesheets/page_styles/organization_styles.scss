@@ -218,8 +218,24 @@
 }
 
 
-#developer-info {
+#developer-info, #lightspeed-info {
   margin-top: 40px;
+}
+
+#show-developer-info, #show-lightspeed-info {
+  .hidden-info { display: none; }
+  .shown-info { display: inline; }
+  &.shown {
+    .hidden-info { display: inline; }
+    .shown-info { display: none; }
+  }
+}
+#lightspeed-info {
+  input[type="text"] {
+    width: 100%;
+    margin: 20px 0;
+  } 
+  .button-green { float: right; }
 }
 
 //________________________

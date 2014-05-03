@@ -1,6 +1,7 @@
 class BikeIndex.Views.OrganizationsShow extends Backbone.View
   events:
     'click #show-developer-info':           'showDeveloperInfo'
+    'click #show-lightspeed-info':          'showLightspeedInfo'
 
 
   initialize: ->
@@ -22,6 +23,12 @@ class BikeIndex.Views.OrganizationsShow extends Backbone.View
 
   showDeveloperInfo: (event) ->
     event.preventDefault()
-    if $('#developer-info').hasClass('initially-hidden')
-      $('#developer-info').slideDown().removeClass('initially-hidden')
+    $('#developer-info').slideToggle()
+    $(event.target).toggleClass('shown')
+
+  showLightspeedInfo: (event) ->
+    event.preventDefault()
+    $('#lightspeed-info').slideToggle()
+    $(event.target).toggleClass('shown')
+
 

@@ -13,9 +13,10 @@ class Organization < ActiveRecord::Base
     :embedable_user_email,
     :auto_user_id,
     :access_token,
-    :new_bike_notification
+    :new_bike_notification,
+    :lightspeed_cloud_api_key
 
-  attr_accessor :embedable_user_email
+  attr_accessor :embedable_user_email, :lightspeed_cloud_api_key
   acts_as_paranoid
 
   has_many :memberships, dependent: :destroy
