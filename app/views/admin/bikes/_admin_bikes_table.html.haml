@@ -15,7 +15,11 @@
     %tr
       %td
         %span.less-strong-right.medium-screens
-          = bike.id 
+          - if bike.example
+            %span.table-error
+              = bike.id 
+          - else
+            = bike.id 
         %a{href: edit_admin_bike_url(bike) }
 
           - if bike.created_at.today?
