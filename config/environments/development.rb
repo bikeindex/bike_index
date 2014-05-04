@@ -47,7 +47,5 @@ Bikeindex::Application.configure do
   ActionMailer::Base.delivery_method = :smtp
 
   config.logger = Logger.new(STDOUT)
-  config.logger.level = Logger.const_get(
-    ENV['LOG_LEVEL'] ? ENV['LOG_LEVEL'].upcase : 'DEBUG'
-  )
+  # config.logger.level = Logger.const_get( ENV['LOG_LEVEL'] ? ENV['LOG_LEVEL'].upcase : 'DEBUG' )
 end
