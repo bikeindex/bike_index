@@ -1,5 +1,9 @@
-<h1><%= @stolen_notification.sender.email %> sent a message about your stolen <%= @stolen_notification.bike.type %>!</h1>
+<h1 style="text-align: center; font-size: 18px; font-weight: 400;"><%= @stolen_notification.sender.email %> sent a message about your <a href="<%= bike_url(@stolen_notification.bike) %>">stolen <%= @stolen_notification.bike.type %></a>!</h1>
 
+<hr>
 <p><%= @stolen_notification.message %></p>
-
+<% if @stolen_notification.sender.name.present? %>
+  <p style="color: #ccc; margin: 2em 0 2em 1em;"><%= @stolen_notification.sender.name %></p>
+<% end %>
+<hr>
 <p class="explanation" style="text-align: center;color: #555;"><a href="<%= bike_url(@stolen_notification.bike) %>">View your <%= @stolen_notification.bike.type %> on the Bike Index</a></p>
