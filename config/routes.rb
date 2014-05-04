@@ -84,7 +84,7 @@ Bikeindex::Application.routes.draw do
     resources :graphs, only: [:index, :show]
     resources :failed_bikes, only: [:index, :show]
     resources :ownerships, only: [:edit, :update]
-    resources :stolen_notifications
+    match 'resend_stolen_notification', to: 'stolen_notifications#resend'
     match 'recover_organization', to: 'organizations#recover' 
     match 'show_deleted_organizations', to: 'organizations#show_deleted' 
     resources :blogs, only: [:new, :create, :index, :edit, :update, :destroy]

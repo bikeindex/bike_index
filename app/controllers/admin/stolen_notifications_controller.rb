@@ -1,6 +1,6 @@
 class Admin::StolenNotificationsController < Admin::BaseController
 
-  def update
+  def resend
     stolen_notification = StolenNotification.find(params[:id])
     Resque.enqueue(StolenNotificationEmailJob, stolen_notification.id)
     flash[:notice] = "Notification resent!"
