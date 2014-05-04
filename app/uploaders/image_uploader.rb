@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 class ImageUploader < CarrierWave::Uploader::Base
-  include CarrierWave::RMagick
+  include CarrierWave::MiniMagick
 
   # Include the Sprockets helpers for Rails 3.1+ asset pipeline compatibility:
   include Sprockets::Helpers::RailsHelper
@@ -35,21 +35,7 @@ class ImageUploader < CarrierWave::Uploader::Base
   end
 
   def extension_white_list
-    %w(jpg jpeg gif png)
-  end
-
-  def strip
-    manipulate! do |img|
-      img.strip!
-      img = yield(img) if block_given?
-      img
-    end
-  end
-
-  def fix_exif_rotation
-    manipulate! do |img|
-      img = img.auto_orient
-    end
+    %w(jpg jpeg gif png tiff)
   end
 
   process :fix_exif_rotation

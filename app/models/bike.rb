@@ -66,6 +66,8 @@ class Bike < ActiveRecord::Base
     :pdf
 
   mount_uploader :pdf, PdfUploader
+  process_in_background :pdf
+
   belongs_to :manufacturer
   serialize(:cached_attributes, Array)
   belongs_to :primary_frame_color, class_name: "Color"

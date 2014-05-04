@@ -24,8 +24,8 @@ describe Admin::DashboardController do
 
   describe :maintenance do 
     before do 
-      FactoryGirl.create(:manufacturer, name: "Other")
-      FactoryGirl.create(:ctype, name: "Other")
+      FactoryGirl.create(:manufacturer, name: "other")
+      FactoryGirl.create(:ctype, name: "other")
       FactoryGirl.create(:handlebar_type, slug: "other")
       user = FactoryGirl.create(:user, superuser: true)
       set_current_user(user)

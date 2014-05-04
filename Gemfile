@@ -9,7 +9,8 @@ gem 'active_model_serializers'
 gem 'aws-sdk', '~> 1.3.4'
 gem 'airbrake'
 gem 'resque', :require => 'resque/server'
-gem 'resque-pool'
+gem 'sidekiq'
+gem 'sidekiq-failures'
 gem 'geocoder', "~> 1.1.2"
 gem "money-rails", "~> 0.5.0"
 gem "i18n"
@@ -34,8 +35,6 @@ gem "acts_as_paranoid", "~>0.4.0"
 gem "high_voltage"
 gem 'omniauth-facebook'
 gem 'omniauth'
-gem "capistrano", "~> 2.15.5"
-gem "capistrano-resque", "~> 0.1.0"
 gem "fog"
 gem 'dalli'
 gem 'dumper', "~>1.4.5"
@@ -46,6 +45,8 @@ gem 'wkhtmltopdf-binary'
 gem 'wicked_pdf'
 gem 'sitemap_generator'
 gem 'whenever'
+gem 'unicorn'
+gem 'unicorn-worker-killer'
 
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'
