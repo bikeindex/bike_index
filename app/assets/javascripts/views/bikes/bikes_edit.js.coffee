@@ -69,10 +69,8 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
         if data.context
           progress = parseInt(data.loaded / data.total * 95, 10) # Multiply by 95, so that it doesn't look done, since progress doesn't work.
           data.context.find('.bar').css('width', progress + '%')
-          console.log(data.context)
       done: (e, data) ->
         $('#public_images').sortable()
-        console.log(data.files)
         file = data.files[0]
         $.each(data.files, (index, file) ->
           data.context.addClass('finished_upload').html("""
