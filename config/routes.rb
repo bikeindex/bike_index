@@ -5,6 +5,7 @@ Bikeindex::Application.routes.draw do
   resources :organizations, only: [:show, :edit, :update, :destroy] do 
     member do
       get :embed
+      get :embed_extended
       get :embed_create_success
     end
     resources :memberships, only: [:edit, :update, :destroy]
@@ -84,7 +85,7 @@ Bikeindex::Application.routes.draw do
     resources :graphs, only: [:index, :show]
     resources :failed_bikes, only: [:index, :show]
     resources :ownerships, only: [:edit, :update]
-    resources :stolen_notifications
+    match 'resend_stolen_notification', to: 'stolen_notifications#resend'
     match 'recover_organization', to: 'organizations#recover' 
     match 'show_deleted_organizations', to: 'organizations#show_deleted' 
     resources :blogs, only: [:new, :create, :index, :edit, :update, :destroy]
@@ -137,6 +138,8 @@ Bikeindex::Application.routes.draw do
   match '/404', to: 'errors#not_found'
   match '/422', to: 'errors#unprocessable_entity'
   match '/500', to: 'errors#server_error'
-  
+
+  mount Sidekiq::Web => '/sidekiq', :constraints => AdminRestriction
   mount Resque::Server.new, :at => '/resque', :constraints => AdminRestriction
+  
 end

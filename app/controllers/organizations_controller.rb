@@ -26,25 +26,44 @@ class OrganizationsController < ApplicationController
     end
   end
 
+  def embed_extended
+    b_param = BParam.create(creator_id: @organization.auto_user.id, params: {creation_organization_id: @organization.id, embeded: true})
+    @bike = BikeCreator.new(b_param).new_bike
+    @bike.owner_email = params[:email] if params[:email].present?
+    if params[:sf_safe].present?
+      render action: :embed_sf_safe, layout: 'embed_layout'
+    else
+      render layout: 'embed_layout'
+    end
+  end
+
   def embed_create_success
     @bike = Bike.find(params[:bike_id]).decorate
     render layout: 'embed_layout'
   end
 
   def update
-    websitey = params[:organization][:website]
-    if Urlifyer.urlify(websitey)
-      @organization.website = websitey
-      if @organization.save
-        # raise "organization saved"
-        redirect_to edit_organization_url(@organization), notice: "Organization updated"
+    if params[:organization][:lightspeed_cloud_api_key].present?
+      api_key = params[:organization][:lightspeed_cloud_api_key]
+      Resque.enqueue(LightspeedNotificationEmailJob, @organization.id, api_key)
+      flash[:notice] = "Thanks for updating your LightSpeed API Key!"
+      redirect_to organization_url(@organization) and return
+      # @stolen_notification = StolenNotification.new(params[:stolen_notification])
+    else
+      websitey = params[:organization][:website]
+      if Urlifyer.urlify(websitey)
+        @organization.website = websitey
+        if @organization.save
+          # raise "organization saved"
+          redirect_to edit_organization_url(@organization), notice: "Organization updated"
+        else
+          raise "organization not saved"
+          render action: :settings
+        end
       else
-        raise "organization not saved"
+        flash[:error] = "We're sorry, that didn't look like a valid url to us!"
         render action: :settings
       end
-    else
-      flash[:error] = "We're sorry, that didn't look like a valid url to us!"
-      render action: :settings
     end
   end
 

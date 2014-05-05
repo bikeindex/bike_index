@@ -13,7 +13,7 @@
 %article.code
   .code-label
     GET manufacturer with the name "surly"
-  - request_url = api_v1_manufacturers_url(query: "surly")
+  - request_url = @root + api_v1_manufacturers_path(query: "surly")
   %pre
     :plain
       $.ajax({
@@ -37,7 +37,7 @@
 %article.code
   .code-label
     GET "frame_makers"
-  - request_url = api_v1_manufacturers_url(query: "frame_makers")
+  - request_url = @root + api_v1_manufacturers_path(query: "frame_makers")
   %pre
     :plain
       $.ajax({

@@ -88,7 +88,7 @@
                     %a{ href: "tell:#{@stolen_record.phone}" }
                       = @stolen_record.creation_organization.locations.first.display_phone
 
-            - if @bike.phoneable_by(current_user)
+            - if @bike.phoneable_by(current_user) && @stolen_record.phone.present?
               %dt.stolen-color
                 Phone number
               %dd

@@ -59,12 +59,15 @@ class Bike < ActiveRecord::Base
     :b_param_id,
     :cached_attributes,
     :embeded,
+    :embeded_extended,
     :example,
     :card_id,
     :stock_photo_url,
     :pdf
 
   mount_uploader :pdf, PdfUploader
+  process_in_background :pdf
+
   belongs_to :manufacturer
   serialize(:cached_attributes, Array)
   belongs_to :primary_frame_color, class_name: "Color"
@@ -109,7 +112,7 @@ class Bike < ActiveRecord::Base
   # validates_presence_of :rear_wheel_size_id
   # validates_inclusion_of :rear_tire_narrow, :in => [true, false]
 
-  attr_accessor :date_stolen_input, :phone, :bike_image, :bike_token_id, :b_param_id, :payment_required, :embeded, :paint_name
+  attr_accessor :date_stolen_input, :phone, :bike_image, :bike_token_id, :b_param_id, :payment_required, :embeded, :embeded_extended, :paint_name
 
   default_scope where(example: false).order("created_at desc")
   scope :stolen, where(stolen: true)

@@ -29,7 +29,7 @@
             16in
           %option{value: WheelSize.find_by_iso_bsd(203).id}
             12in
-        = collection_select( :bike, :front_wheel_size_id, WheelSize.all , :id, :description, :html => { :required =>true }, prompt: "All diameters")
+        = collection_select( :bike, :front_wheel_size_id, WheelSize.all , :id, :select_value, :html => { :required =>true }, prompt: "All diameters")
     %a#show-front-wheel-diams.wh_sw.show-all.optional-form-block{:data => {target: "#bike_front_wheel_size_id", toggle: "#hide-front-wheel-diams"}}
       Show more sizes
     %a#hide-front-wheel-diams.wh_sw.optional-form-block.currently-hidden{:data => {target: "#bike_front_wheel_size_id", toggle: "#show-front-wheel-diams"}}
@@ -71,7 +71,7 @@
             16in
           %option{value: WheelSize.find_by_iso_bsd(203).id}
             12in
-        = collection_select( :bike, :rear_wheel_size_id, WheelSize.all , :id, :description, :html => { :required =>true }, prompt: "All diameters")
+        = collection_select( :bike, :rear_wheel_size_id, WheelSize.all , :id, :select_value, :html => { :required =>true }, prompt: "All diameters")
     %a#show-rear-wheel-diams.wh_sw.show-all.optional-form-block{:data => {target: "#bike_rear_wheel_size_id", toggle: "#hide-rear-wheel-diams"}}
       Show more sizes
     %a#hide-rear-wheel-diams.wh_sw.optional-form-block.currently-hidden{:data => {target: "#bike_rear_wheel_size_id", toggle: "#show-rear-wheel-diams"}}

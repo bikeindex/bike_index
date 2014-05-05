@@ -11,6 +11,7 @@ class FeedbacksController < ApplicationController
 
   def vendor_signup
     @feedback = Feedback.new
+    @lightspeed = true if params[:lightspeed_integration]
   end
 
   def create

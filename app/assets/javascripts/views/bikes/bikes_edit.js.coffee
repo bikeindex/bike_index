@@ -52,11 +52,11 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     )
 
   publicImageFileUpload: ->
-    runSortableImages = @sortableImages($('#public_images'))
+    # runSortableImages = @sortableImages($('#public_images'))
     $('#new_public_image').fileupload
       dataType: "script"
       add: (e, data) ->
-        types = /(\.|\/)(gif|jpe?g|png)$/i
+        types = /(\.|\/)(gif|jpe?g|png|tiff?)$/i
         file = data.files[0]
         $('#public_images').sortable('disable')
         if types.test(file.type) || types.test(file.name)
@@ -70,7 +70,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
           progress = parseInt(data.loaded / data.total * 95, 10) # Multiply by 95, so that it doesn't look done, since progress doesn't work.
           data.context.find('.bar').css('width', progress + '%')
       done: (e, data) ->
-        runSortableImages
+        $('#public_images').sortable()
         file = data.files[0]
         $.each(data.files, (index, file) ->
           data.context.addClass('finished_upload').html("""
