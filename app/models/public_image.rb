@@ -2,6 +2,7 @@ class PublicImage < ActiveRecord::Base
   attr_accessible :image, :name, :imageable, :listing_order, :remote_image_url
 
   mount_uploader :image, ImageUploader
+  process_in_background :image
 
   belongs_to :imageable, polymorphic: true
 

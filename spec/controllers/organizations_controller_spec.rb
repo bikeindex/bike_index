@@ -20,6 +20,15 @@ describe OrganizationsController do
       # pp assigns(:organization)
       @organization.reload.website.should eq('http://www.drseuss.org')
     end
+
+    it "should send an admin notification if there is the lightspeed cloud api key" do 
+      user = FactoryGirl.create(:user)
+      organization = FactoryGirl.create(:organization)
+      membership = FactoryGirl.create(:membership, user: user, organization: organization)
+      set_current_user(user)
+      put :update, id: organization.slug, organization: { lightspeed_cloud_api_key: 'Some api key' }
+      LightspeedNotificationEmailJob.should have_queued(organization.id, 'Some api key')
+    end
   end
 
   describe :show do 

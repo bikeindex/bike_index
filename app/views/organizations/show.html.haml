@@ -15,7 +15,12 @@
 
 %h3
   %a#show-developer-info{href: "#"}
-    View developer information
+    %span.shown-info
+      View
+    %span.hidden-info
+      Hide
+    developer information
+
 
 #developer-info.initially-hidden
   %h3
@@ -44,3 +49,22 @@
         Contact us at 
         = link_to "support@bikeindex.org", "mailto:support@bikeindex.org"
         to get set up for API access.
+
+%hr
+
+%h3
+  %a#show-lightspeed-info{href: "#"}
+    %span.shown-info
+      View
+    %span.hidden-info
+      Hide
+    LightSpeed Cloud information
+
+#lightspeed-info.initially-hidden
+  %h3
+    Update your Lightspeed Cloud API key.
+  .well.span6.form.form-horizontal
+    = form_for @organization do |f|
+      .lightspeed-api-key-input
+        = f.text_field :lightspeed_cloud_api_key, placeholder: 'Enter your Lightspeed Cloud API key'
+      = f.submit "Update key", class: 'button-green'

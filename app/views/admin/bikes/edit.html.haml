@@ -1,7 +1,4 @@
 #admin-bikes-edit#chosen-container
-  %h1
-    Manage bike
-
   %ul.bike-boxes
     = render partial: "/bikes/bike", :locals => {bike: @bike, target: "show" }
   .dl-holder
@@ -12,71 +9,82 @@
       = @bike.dl_from_attribute("cached_data")
   %hr
 
-  = form_for [:admin, @bike], :html => { class: "form form-horizontal" } do |f|
-    - if @bike.errors.any?
-      #alert-block
-        .alert.alert-error
-          %h4
-            Please fix the following 
-            = pluralize(@bike.errors.count, "error")
-          %ul
-            - @bike.errors.full_messages.each do |msg|
-              %li
-                = msg
-    .control-group
-      = f.label :cycle_type_id, "Cycle type", class: "control-label"
-      .controls
-        = collection_select( :bike, :cycle_type_id, CycleType.all, :id, :name, :required =>true )
+  = form_for [:admin, @bike], :html => { class: "form form-horizontal admin-bike-edit" } do |f|
+    .clearfix
+      .bike-fields
+        - if @bike.errors.any?
+          #alert-block
+            .alert.alert-error
+              %h4
+                Please fix the following 
+                = pluralize(@bike.errors.count, "error")
+              %ul
+                - @bike.errors.full_messages.each do |msg|
+                  %li
+                    = msg
+        .control-group
+          = f.label :cycle_type_id, "Cycle type", class: "control-label"
+          .controls
+            = collection_select( :bike, :cycle_type_id, CycleType.all, :id, :name, :required =>true )
 
-    .control-group
-      = f.label :serial_number, class: "control-label"
-      .controls
-        = f.text_field :serial_number, :required =>true
-    
-    .control-group
-      = f.label :has_no_serial, class: "control-label"
-      .controls
-        = f.check_box :has_no_serial
+        .control-group
+          = f.label :serial_number, class: "control-label"
+          .controls
+            = f.text_field :serial_number, :required =>true
+        
+        .control-group
+          = f.label :has_no_serial, class: "control-label"
+          .controls
+            = f.check_box :has_no_serial
 
-    .control-group.chosen-select
-      = f.label :creation_organization_id, class: "control-label"
-      .controls
-        = collection_select( :bike, :creation_organization_id, Organization.all, :id, :name, prompt: "Choose organization")
 
-    .control-group.chosen-select
-      = f.label :location_id, class: "control-label"
-      .controls
-        = f.text_field :location_id
+        .control-group.chosen-select
+          = f.label :location_id, class: "control-label"
+          .controls
+            = f.text_field :location_id
 
-    .control-group.chosen-select
-      = f.label :manufacturer_id, class: "control-label"
-      .controls
-        = collection_select( :bike, :manufacturer_id, Manufacturer.frames, :id, :name, :required =>true, prompt: "Choose manufacturer")
+        .control-group.chosen-select
+          = f.label :manufacturer_id, class: "control-label"
+          .controls
+            = collection_select( :bike, :manufacturer_id, Manufacturer.frames, :id, :name, :required =>true, prompt: "Choose manufacturer")
 
-    .control-group
-      = f.label :manufacturer_other, "Other frame manufacturer", class: "control-label"
-      .controls
-        = f.text_field :manufacturer_other
+        .control-group
+          = f.label :manufacturer_other, "Other frame manufacturer", class: "control-label"
+          .controls
+            = f.text_field :manufacturer_other
+        
+        .control-group
+          = f.label :card_id, "Spokecard id", class: "control-label"
+          .controls
+            = f.text_field :card_id
 
-    .control-group.chosen-select
-      = f.label :creator_id, class: "control-label"
-      .controls
-        = collection_select( :bike, :creator_id, User.all, :id, :email, :required =>true, prompt: "Choose creator")
+      .bike-fields
+        .control-group
+          = f.label :frame_model, class: "control-label"
+          .controls
+            = f.text_field :frame_model
+        .control-group
+          = f.label :year, class: "control-label"
+          .controls
+            = f.text_field :year
+        .control-group
+          = f.label :created_with_token, class: "control-label"
+          .controls
+            = f.check_box :created_with_token
+        .control-group.chosen-select
+          = f.label :creator_id, class: "control-label"
+          .controls
+            = collection_select( :bike, :creator_id, User.all, :id, :email, :required =>true, prompt: "Choose creator")
+        .control-group.chosen-select
+          = f.label :creation_organization_id, class: "control-label"
+          .controls
+            = collection_select( :bike, :creation_organization_id, Organization.all, :id, :name, prompt: "Choose organization")
 
-    .control-group
-      = f.label :created_with_token, class: "control-label"
-      .controls
-        = f.check_box :created_with_token
+        .control-group
+          = f.label :owner_email, class: "control-label"
+          .controls
+            = f.text_field :owner_email, :required =>true
 
-    .control-group
-      = f.label :owner_email, class: "control-label"
-      .controls
-        = f.text_field :owner_email, :required =>true
-
-    .control-group
-      = f.label :card_id, "Spokecard id", class: "control-label"
-      .controls
-        = f.text_field :card_id
 
     .actions
       .control-group

@@ -1,0 +1,101 @@
+- if @bike.errors.any?
+  #alert-block
+    .alert.alert-error
+      %a.close{"data-dismiss" => "alert"} ×
+      %h4
+        Please fix the following 
+        = pluralize(@bike.errors.count, "error")
+      %ul
+        - @bike.errors.full_messages.each do |msg|
+          %li
+            = msg
+= form_for @bike, :multipart => true do |f|
+  = f.hidden_field :b_param_id
+  = f.hidden_field :creation_organization_id
+  = f.hidden_field :embeded, value: true
+  = f.hidden_field :embeded_extended, value: true
+  .input-group
+    .control-group
+      = f.label :serial_number, class: "control-label"
+      .controls
+        = f.text_field :serial_number, :required =>true
+    .has-no-serial.optional-block
+      %label
+        = f.check_box :has_no_serial, tabindex: -1 
+        - if @bike.stolen?
+          Unknown
+        - else
+          Has no serial
+
+  .input-group.with-additional-block
+    .control-group.chosen-select
+      = f.label :manufacturer_id, class: "control-label"
+      .controls
+        = collection_select( :bike, :manufacturer_id, Manufacturer.frames, :id, :name, :required =>true, prompt: "Choose manufacturer")
+        %span.help-block
+          Select 'Other' if manufacturer isn't listed
+    %p.other-value
+      = Manufacturer.find_by_slug("other").id
+    .hidden-other.control-group.manufacturer-other-input
+      = f.label :manufacturer_other, "Other manufacturer", class: "control-label"
+      .controls
+        = f.text_field :manufacturer_other, placeholder: "Manufacturer name"
+
+  .input-group
+    .control-group.chosen-select
+      = f.label :year, "Model year", class: "control-label"
+      .controls
+        - years = (1900..Time.now.year+1).to_a.reverse.map {|i| [i,i] }
+        = f.select :year, years, selected: Time.now.year, prompt: "Unsure or unknown"
+    .unknown-year.optional-block
+      %label
+        %input#bike_unknown_year{ type: 'checkbox', tabindex: -1 }
+        Unknown year
+        
+  .input-group
+    .control-group
+      = f.label :frame_model, class: "control-label"
+      .controls
+        = f.text_field :frame_model, autocomplete: 'off'
+
+  .input-group.with-optional-blocks
+    .control-group.chosen-select
+      = f.label :primary_frame_color_id, "Frame color", class: "control-label"
+      .controls
+        = collection_select( :bike, :primary_frame_color_id, Color.all, :id, :name, required: true, prompt: "Choose color" )
+    %a#add-secondary.optional-form-block{:data => {target: "#secondary-color", toggle: "#rm-secondary"}}
+      Add a color
+    %a#rm-secondary.optional-form-block.rm-block.currently-hidden{:data => {target: "#secondary-color", toggle: "#add-secondary"}}
+      Remove color
+    #secondary-color.hidden-other
+      .control-group.chosen-select
+        %label.control-label
+          Secondary color
+        .controls
+          = collection_select( :bike, :secondary_frame_color_id, Color.all, :id, :name, prompt: "Choose color" )
+      %a#add-tertiary.optional-form-block{:data => {target: "#tertiary-color", toggle: "#rm-tertiary"}}
+        Add a color
+      %a#rm-tertiary.optional-form-block.rm-block.currently-hidden{:data => {target: "#tertiary-color", toggle: "#add-tertiary"}}
+        Remove color
+    #tertiary-color.hidden-other
+      .control-group
+        %label.control-label
+          Third color
+        .controls.chosen-select
+          = collection_select( :bike, :tertiary_frame_color_id, Color.all, :id, :name, prompt: "Choose color" )
+
+  .input-group
+    .control-group
+      %label.control-label{ for: 'bike_owner_email' }
+        Your email address
+        = f.email_field :owner_email
+  .input-group
+    .control-group
+      .filefield-button
+        Choose photo
+        = f.file_field :bike_image
+      #filepath
+  .input-group.form-foot
+    .submit-registration
+      = submit_tag "Register this", class: "button-submit"
+      = collection_select( :bike, :cycle_type_id, CycleType.all, :id, :name, required: true)

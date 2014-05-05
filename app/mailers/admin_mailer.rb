@@ -44,4 +44,13 @@ class AdminMailer < ActionMailer::Base
     end
   end
 
+  def lightspeed_notification_email(organization, api_key)
+    @organization = organization
+    @api_key = api_key
+    mail(to: "admin@bikeindex.org", subject: "Api Notification sent!") do |format|
+      format.text
+      format.html { render layout: 'email'}
+    end
+  end
+
 end

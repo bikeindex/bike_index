@@ -147,7 +147,7 @@
   %p.code-label
     Basic post
 
-  - request_url = api_v1_bikes_url
+  - request_url = @root + api_v1_bikes_path
   %pre
     :plain
       $.ajax({
@@ -325,7 +325,7 @@
   %p.code-label
     Bike POST with components
 
-  - request_url = api_v1_bikes_url
+  - request_url = @root + api_v1_bikes_path
   %pre
     :plain
       $.ajax({
@@ -507,7 +507,7 @@
   %p.code-label
     Stolen Bike POST
 
-  - request_url = api_v1_bikes_url
+  - request_url = @root + api_v1_bikes_path
   %pre
     :plain
       $.ajax({
