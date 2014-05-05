@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140426211337) do
+ActiveRecord::Schema.define(:version => 20140504234957) do
 
   create_table "alternate_emails", :force => true do |t|
     t.string   "email"
@@ -30,6 +30,8 @@ ActiveRecord::Schema.define(:version => 20140426211337) do
     t.datetime "updated_at",      :null => false
     t.integer  "bike_token_id"
     t.text     "bike_errors"
+    t.string   "image"
+    t.string   "image_tmp"
   end
 
   create_table "bike_token_invitations", :force => true do |t|

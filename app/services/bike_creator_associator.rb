@@ -34,13 +34,13 @@ class BikeCreatorAssociator
     photos.each { |p| PublicImage.create(imageable: bike, remote_image_url: p) }
   end
 
-  # def add_uploaded_image(bike)
-  #   if @b_param.params[:bike][:bike_image]
-  #     public_image = PublicImage.new(image: @b_param.params[:bike][:bike_image])
-  #     public_image.imageable = bike
-  #     public_image.save
-  #   end
-  # end
+  def add_uploaded_image(bike)
+    if @b_param.params[:bike][:bike_image]
+      public_image = PublicImage.new(image: @b_param.params[:bike][:bike_image])
+      public_image.imageable = bike
+      public_image.save
+    end
+  end
 
   def associate(bike)
     begin 

@@ -5,7 +5,12 @@ class BParam < ActiveRecord::Base
     :bike_title,
     :created_bike_id,
     :bike_token_id,
-    :bike_errors
+    :bike_errors,
+    :image
+
+  mount_uploader :image, ImageUploader
+  store_in_background :image
+
 
   serialize :params
   serialize :bike_errors
