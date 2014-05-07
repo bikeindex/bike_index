@@ -85,6 +85,8 @@ class BParam < ActiveRecord::Base
     if paint.present?
       bike[:paint_id] = paint.id
       bike[:primary_frame_color_id] = paint.color.id if paint.color_id.present?
+      bike[:secondary_frame_color_id] = paint.secondary_color_id if paint.secondary_color_id.present?
+      bike[:tertiary_frame_color_id] = paint.tertiary_color_id if paint.tertiary_color_id.present?
     else
       paint = Paint.new(name: paint_entry)
       paint.manufacturer_id = bike[:manufacturer_id] if bike[:registered_new]

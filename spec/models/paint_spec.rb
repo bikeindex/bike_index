@@ -4,6 +4,8 @@ describe Paint do
   it { should validate_presence_of :name }
   it { should validate_uniqueness_of :name }
   it { should belong_to :color }
+  it { should belong_to :secondary_color }
+  it { should belong_to :tertiary_color }
   it { should belong_to :manufacturer }
   it { should have_many :bikes }
 

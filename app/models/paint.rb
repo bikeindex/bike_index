@@ -1,6 +1,8 @@
 class Paint < ActiveRecord::Base
   attr_accessible :name,
     :color_id,
+    :secondary_color_id,
+    :tertiary_color_id,
     :manufacturer_id
 
   validates_presence_of :name 
@@ -8,6 +10,9 @@ class Paint < ActiveRecord::Base
   belongs_to :color 
   belongs_to :manufacturer
   has_many :bikes
+
+  belongs_to :secondary_color, class_name: 'Color'
+  belongs_to :tertiary_color, class_name: 'Color'
 
   scope :official, where("manufacturer_id IS NOT NULL")
 

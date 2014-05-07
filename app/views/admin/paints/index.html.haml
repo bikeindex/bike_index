@@ -44,6 +44,10 @@
             %td
               - if paint.color_id.present?
                 = paint.color.name
+              - if paint.secondary_color_id.present?
+                = "- #{paint.secondary_color.name}"
+              - if paint.tertiary_color_id.present?
+                = "- #{paint.tertiary_color.name}"
             
 
 - else

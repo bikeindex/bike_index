@@ -24,7 +24,13 @@ class Admin::PaintsController < Admin::BaseController
       flash[:notice] = "Paint updated!"
       if @paint.reload.color_id.present?
         bikes = @paint.bikes.where(primary_frame_color_id: Color.find_by_name('Black').id)
-        bikes.each { |b| b.update_attributes(primary_frame_color_id: @paint.color_id) }
+        bikes.each do |bike|
+          next if bike.secondary_frame_color_id.present?
+          bike.primary_frame_color_id = @paint.color_id
+          bike.secondary_frame_color_id = @paint.secondary_color_id
+          bike.tertiary_frame_color_id = @paint.tertiary_color_id
+          bike.save
+        end
       end
       redirect_to admin_paints_url
     else
