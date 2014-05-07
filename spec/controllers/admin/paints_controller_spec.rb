@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Admin::PaintController do
+describe Admin::PaintsController do
   describe :index do 
     before do 
       user = FactoryGirl.create(:user, superuser: true)

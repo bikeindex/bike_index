@@ -18,11 +18,13 @@
       %thead
         %th
           Date created
-        %th.medium-screens
+        %th.large-screens
+          manufacturer
+        %th
           Bikes
         %th
           Description
-        %th.large-screens
+        %th.medium-screens
           Color
 
       %tbody
@@ -37,11 +39,14 @@
                   Yesterday at #{paint.created_at.strftime("%-I %p")}
                 - else
                   = paint.created_at.strftime("%-m.%-d.%Y at %-H")
+            %td.large-screens
+              - if paint.manufacturer_id.present?
+                = paint.manufacturer.name
             %td
               = paint.bikes.count
             %td
               = paint.name
-            %td
+            %td.medium-screens
               - if paint.color_id.present?
                 = paint.color.name
               - if paint.secondary_color_id.present?
