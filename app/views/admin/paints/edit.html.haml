@@ -1,0 +1,49 @@
+#chosen-container
+  %header.with-subtitle
+    %h1
+      Edit paint
+    %p
+      = link_to "Back to all paints", admin_paints_path
+
+  .paint-form.clearfix.padded
+    = form_for [:admin, @paint], :html => { class: "form form-horizontal span6" } do |f|
+      - if @paint.errors.any?
+        #alert-block
+          .alert.alert-error
+            %h4
+              Please fix the following 
+              = pluralize(@paint.errors.count, "error")
+            %ul
+              - @paint.errors.full_messages.each do |msg|
+                %li
+                  = msg
+
+      .well
+        %p.stolen-color
+          Probably don't edit this.
+        %p
+          %em
+            Otherwise future bikes posted with this paint won't be able to find this paint, and will recreate it.
+        .control-group
+          = f.label :name, 'Description', class: "control-label"
+          .controls
+            = f.text_field :name
+
+      .control-group.chosen-select
+        = f.label :color_id, class: "control-label"
+        .controls
+          = collection_select( :paint, :color_id, Color.all, :id, :name, required: true, prompt: "Choose color" )
+
+      .actions
+        .control-group
+          = submit_tag "Update the color", class: "button-green"
+  %hr      
+
+  - if @bikes.present?
+    %section.full-screen-table
+      %table#truncated-data-table.table.table-striped.table-bordered
+        = render partial: "/admin/bikes/admin_bikes_table"
+
+  - else
+    .actions.padded
+      = link_to "Delete!", admin_paint_url(@paint), method: :delete, class: "button-red"

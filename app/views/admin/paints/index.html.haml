@@ -1,0 +1,51 @@
+
+%header.with-subtitle
+  %h1
+    Manage Paints
+
+%h4
+  = @paints.count
+  indexed,
+  %em
+    (#{Paint.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today) 
+  = @paints.where('color_id IS NULL').count 
+  are unlinked
+    
+
+- if @paints.present?
+  %section.full-screen-table
+    %table#truncated-data-table.table.table-striped.table-bordered
+      %thead
+        %th
+          Date created
+        %th.medium-screens
+          Bikes
+        %th
+          Description
+        %th.large-screens
+          Color
+
+      %tbody
+        - @paints.each do |paint|
+          %tr
+            %td
+              %a{href: edit_admin_paint_url(paint) }
+
+                - if paint.created_at.today?
+                  Today at #{paint.created_at.strftime("%-I %p")}
+                - elsif Date.yesterday().beginning_of_day() <= paint.created_at          
+                  Yesterday at #{paint.created_at.strftime("%-I %p")}
+                - else
+                  = paint.created_at.strftime("%-m.%-d.%Y at %-H")
+            %td
+              = paint.bikes.count
+            %td
+              = paint.name
+            %td
+              - if paint.color_id.present?
+                = paint.color.name
+            
+
+- else
+  %h1.padded
+    No paints found!

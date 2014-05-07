@@ -1,4 +1,4 @@
-#admin-bikes-edit#chosen-container
+#chosen-container
   %ul.bike-boxes
     = render partial: "/bikes/bike", :locals => {bike: @bike, target: "show" }
   .dl-holder
@@ -67,14 +67,24 @@
           = f.label :year, class: "control-label"
           .controls
             = f.text_field :year
-        .control-group
-          = f.label :created_with_token, class: "control-label"
-          .controls
-            = f.check_box :created_with_token
+        / disabled because we don't use it 
+        / .control-group
+        /   = f.label :created_with_token, class: "control-label"
+        /   .controls
+        /     = f.check_box :created_with_token
         .control-group.chosen-select
-          = f.label :creator_id, class: "control-label"
+          = f.label :paint_id, "Paint description", class: "control-label"
           .controls
-            = collection_select( :bike, :creator_id, User.all, :id, :email, :required =>true, prompt: "Choose creator")
+            = collection_select( :bike, :paint_id, Paint.all, :id, :name, required: true, prompt: "Choose paint" )
+        .control-group.chosen-select
+          = f.label :primary_frame_color_id, class: "control-label"
+          .controls
+            = collection_select( :bike, :primary_frame_color_id, Color.all, :id, :name, required: true, prompt: "Choose color" )
+        / Disabled for performance reasons 
+        / .control-group.chosen-select
+        /   = f.label :creator_id, class: "control-label"
+        /   .controls
+        /     = collection_select( :bike, :creator_id, User.all, :id, :email, :required =>true, prompt: "Choose creator")
         .control-group.chosen-select
           = f.label :creation_organization_id, class: "control-label"
           .controls

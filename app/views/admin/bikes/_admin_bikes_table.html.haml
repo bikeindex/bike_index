@@ -43,6 +43,9 @@
       %td.large-screens
         = bike.year
         = bike.frame_model
+        - if bike.paint.present?
+          .large-screens.less-strong
+            #{bike.paint.name} || #{bike.frame_colors.to_sentence}
 
       %td.not-tiny-screens
         = bike.creation_organization.name if bike.creation_organization.present?
