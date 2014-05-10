@@ -81,5 +81,4 @@ describe OrganizationsController do
     it { should render_template(:embed) }
   end
 
-
 end

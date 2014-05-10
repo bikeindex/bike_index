@@ -52,17 +52,17 @@ describe BikeCreatorAssociator do
     end
   end
 
-  describe :attach_photos_from_url do 
-    it "should create public images for the first 5 photos uploaded" do 
+  describe :attach_photo do 
+    it "should create public images for the attached image" do 
       bike = FactoryGirl.create(:bike)
-      b_param = BParam.new
-      p = {photos: [
-        "http://i.imgur.com/EAZAdSt.jpg",
-        "http://i.imgur.com/EAZAdSt.jpg"
-      ]}
+      b_param = FactoryGirl.create(:b_param)
+      test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, 'spec', 'factories', 'bike.jpg')))
+      b_param.image = test_photo
+      b_param.save 
+      b_param.image.should be_present
       b_param.params = p
-      BikeCreatorAssociator.new(b_param).attach_photos(bike)
-      bike.reload.public_images.count.should eq(1)
+      BikeCreatorAssociator.new(b_param).attach_photo(bike)
+      bike.public_images.count.should eq(1)
     end
   end
 
@@ -88,7 +88,7 @@ describe BikeCreatorAssociator do
       creator.should_receive(:update_bike_token).and_return(bike)
       creator.should_receive(:create_components).and_return(bike)
       creator.should_receive(:create_normalized_serial_segments).and_return(bike)
-      # creator.should_receive(:add_uploaded_image).and_return(bike)
+      creator.should_receive(:attach_photo)
       creator.associate(bike)
     end
     it "should rescue from the error and add the message to the bike" do 

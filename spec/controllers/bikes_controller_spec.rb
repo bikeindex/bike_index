@@ -215,6 +215,39 @@ describe BikesController do
         Bike.last.creation_organization_id.should eq(organization.id)
       end
     end
+
+    describe "extended embeded submission" do 
+      it "should register a bike and upload an image" do 
+        organization = FactoryGirl.create(:organization)
+        user = FactoryGirl.create(:user)
+        FactoryGirl.create(:membership, user: user, organization: organization)
+        organization.save
+        FactoryGirl.create(:cycle_type, name: "Bike", slug: "bike")
+        FactoryGirl.create(:propulsion_type, name: "Foot pedal")
+        manufacturer = FactoryGirl.create(:manufacturer)
+        b_param = BParam.create(creator_id: organization.auto_user.id, params: {creation_organization_id: organization.id, embeded: true})
+        test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, 'spec', 'factories', 'bike.jpg')))
+        bike = { serial_number: "69",
+          b_param_id: b_param.id,
+          creation_organization_id: organization.id,
+          embeded: true,
+          embeded_extended: true,
+          cycle_type_id: FactoryGirl.create(:cycle_type).id,
+          manufacturer_id: manufacturer.id,
+          primary_frame_color_id: FactoryGirl.create(:color).id,
+          handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
+          owner_email: "Flow@goodtimes.com",
+          image: test_photo
+        }
+        lambda { 
+          post :create, { bike: bike}
+        }.should change(Ownership, :count).by(1)
+        b_param.reload.image.should be_present
+        bike = Bike.last
+        bike.creation_organization_id.should eq(organization.id)
+      end
+    end
+
   end
 
 

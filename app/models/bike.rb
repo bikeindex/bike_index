@@ -53,8 +53,7 @@ class Bike < ActiveRecord::Base
     :creator,
     :creator_id,
     :created_with_token,
-    :bike_image,
-    :bike_image_cache,
+    :image,
     :components_attributes,
     :bike_token_id,
     :b_param_id,
@@ -113,7 +112,7 @@ class Bike < ActiveRecord::Base
   # validates_presence_of :rear_wheel_size_id
   # validates_inclusion_of :rear_tire_narrow, :in => [true, false]
 
-  attr_accessor :date_stolen_input, :phone, :bike_image, :bike_token_id, :b_param_id, :payment_required, :embeded, :embeded_extended, :paint_name, :bike_image_cache
+  attr_accessor :date_stolen_input, :phone, :image, :bike_token_id, :b_param_id, :payment_required, :embeded, :embeded_extended, :paint_name, :bike_image_cache
 
   default_scope where(example: false).order("created_at desc")
   scope :stolen, where(stolen: true)

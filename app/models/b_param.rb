@@ -9,8 +9,7 @@ class BParam < ActiveRecord::Base
     :image
 
   mount_uploader :image, ImageUploader
-  store_in_background :image
-
+  process_in_background :image
 
   serialize :params
   serialize :bike_errors

@@ -108,9 +108,10 @@ class BikesController < ApplicationController
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@bike)
       end
-      if params[:bike][:bike_image].present?
-        @b_param.update_attributes(image: params[:bike][:bike_image])
-        params[:bike].delete(:bike_image)
+      if params[:bike][:image].present?
+        @b_param.image = params[:bike][:image]
+        @b_param.save
+        params[:bike].delete(:image)
       end
       @b_param.update_attributes(params: params)
       @bike = BikeCreator.new(@b_param).create_bike
