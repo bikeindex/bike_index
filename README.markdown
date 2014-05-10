@@ -8,7 +8,7 @@ We're an open source project. Take a gander through our code, report bugs, or do
 
 ### Dependencies
 
-- [Ruby 1.9.3](http://www.ruby-lang.org/en/) (we use [RVM](https://rvm.io/))
+- [Ruby 2.1](http://www.ruby-lang.org/en/) (we use [RVM](https://rvm.io/))
 
 - [Rails 3.2](http://rubyonrails.org/)
 
