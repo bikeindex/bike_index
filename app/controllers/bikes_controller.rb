@@ -90,11 +90,8 @@ class BikesController < ApplicationController
 
   def new
     if current_user.present?
-      b_param = BParam.create(creator_id: current_user.id, params: params)
-      @bike = BikeCreator.new(b_param).new_bike
-      if @bike.errors.any?
-        flash[:notice] = @bike.errors.full_messages
-      end
+      @b_param = BParam.create(creator_id: current_user.id, params: params)
+      @bike = BikeCreator.new(@b_param).new_bike
     else
       @user = User.new 
     end
@@ -110,6 +107,7 @@ class BikesController < ApplicationController
       end
       if params[:bike][:image].present?
         @b_param.image = params[:bike][:image]
+        @b_param.image_processed = false
         @b_param.save
         ImageAssociatorWorker.perform_in(1.minutes)
         params[:bike].delete(:image)
@@ -118,11 +116,11 @@ class BikesController < ApplicationController
       @bike = BikeCreator.new(@b_param).create_bike
       if @bike.errors.any?
         @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
-        flash[:error] = "Whoops! There was a problem with your entry!"
+        flash[:error] = @b_param.bike_errors.to_sentence
         if params[:bike][:embeded_extended]
-          redirect_to embed_extended_organization_url(@bike.creation_organization) and return  
+          redirect_to embed_extended_organization_url(id: @bike.creation_organization.slug, b_param_id: @b_param.id) and return  
         else
-          redirect_to embed_organization_url(@bike.creation_organization) and return  
+          redirect_to embed_organization_url(id: @bike.creation_organization.slug, b_param_id: @b_param.id) and return  
         end
       else
         if params[:bike][:embeded_extended]

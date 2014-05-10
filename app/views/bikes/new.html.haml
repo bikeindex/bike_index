@@ -1,13 +1,13 @@
 - if current_user.present?
-  - if @bike.errors.any?
+  - if @b_param.bike_errors.present?
     #alert-block
       .alert.alert-error
         %a.close{"data-dismiss" => "alert"} ×
         %h4
           Please fix the following 
-          = pluralize(@bike.errors.count, "error")
+          = pluralize(@b_param.bike_errors.count, "error")
         %ul
-          - @bike.errors.full_messages.each do |msg|
+          - @b_param.bike_errors.each do |msg|
             %li
               = msg
 

@@ -13,6 +13,8 @@
       - if current_user.is_admin_of?(current_organization)
         %li
           = nav_link "Manage", edit_organization_url(@organization)
+      %li
+        = nav_link "Continuos upload form", embed_extended_organization_url(@organization)
     
     .org-add-bike
       = link_to "Add a bike to the Index", new_bike_url(creation_organization_id: current_organization.id), class: "button-green"

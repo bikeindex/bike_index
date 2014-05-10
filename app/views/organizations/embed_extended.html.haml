@@ -1,14 +1,3 @@
-- if @bike.errors.any?
-  #alert-block
-    .alert.alert-error
-      %a.close{"data-dismiss" => "alert"} ×
-      %h4
-        Please fix the following 
-        = pluralize(@bike.errors.count, "error")
-      %ul
-        - @bike.errors.full_messages.each do |msg|
-          %li
-            = msg
 = form_for @bike, :multipart => true do |f|
   = f.hidden_field :b_param_id
   = f.hidden_field :creation_organization_id
@@ -117,7 +106,11 @@
         = f.text_area :description, rows: 3, placeholder: "Any extra words?"
   .input-group.form-foot
     .control-group
-      .filefield-button
-        Choose photo
-        = f.file_field :image
-      #filepath
+      - if @b_param.image.present? or @b_param.image_tmp.present?
+        %strong
+          Image has been uploaded
+      - else
+        .filefield-button
+          Choose photo
+          = f.file_field :image
+        #filepath

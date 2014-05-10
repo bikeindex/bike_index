@@ -39,6 +39,18 @@ describe BParam do
     end
   end
 
+  describe :clean_errors do 
+    it "should remove error messages we don't want to show users" do 
+      errors = ["Manufacturer can't be blank", "Bike can't be blank", "Association error Ownership wasn't saved. Are you sure the bike was created?"]
+      b_param = BParam.new(bike_errors: errors)
+      b_param.clean_errors
+      b_param.bike_errors.length.should eq(1)
+    end
+    it "should have before_save_callback_method defined as a before_save callback" do
+      BParam._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:clean_errors).should == true
+    end
+  end
+
   describe :set_wheel_size_key do
     it "should set rear_wheel_size_id to the bsd submitted" do
       ws = FactoryGirl.create(:wheel_size, iso_bsd: "Bike")

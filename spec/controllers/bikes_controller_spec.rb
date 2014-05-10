@@ -217,7 +217,7 @@ describe BikesController do
     end
 
     describe "extended embeded submission" do 
-      xit "should register a bike and upload an image" do 
+      it "should register a bike and upload an image" do 
         organization = FactoryGirl.create(:organization)
         user = FactoryGirl.create(:user)
         FactoryGirl.create(:membership, user: user, organization: organization)
@@ -239,13 +239,8 @@ describe BikesController do
           owner_email: "Flow@goodtimes.com",
           image: test_photo
         }
-        # expect(ImageAssociatorWorker).to have_enqueued_job
-        lambda { 
-          post :create, { bike: bike}
-        }.should change(Ownership, :count).by(1)
-        b_param.reload.image.should be_present
-        bike = Bike.last
-        bike.creation_organization_id.should eq(organization.id)
+        post :create, { bike: bike}
+        expect(ImageAssociatorWorker).to have_enqueued_job
       end
     end
 

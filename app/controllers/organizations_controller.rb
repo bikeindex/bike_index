@@ -3,6 +3,7 @@ class OrganizationsController < ApplicationController
   before_filter :find_organization
   before_filter :require_membership, only: [:show, :edit, :update, :destroy]
   before_filter :require_admin, only: [:edit, :update, :destroy]
+  before_filter :set_bparam, only: [:embed, :embed_extended]
   layout "organization"
   
   def edit
@@ -16,8 +17,7 @@ class OrganizationsController < ApplicationController
   end
 
   def embed
-    b_param = BParam.create(creator_id: @organization.auto_user.id, params: {creation_organization_id: @organization.id, embeded: true})
-    @bike = BikeCreator.new(b_param).new_bike
+    @bike = BikeCreator.new(@b_param).new_bike
     @bike.owner_email = params[:email] if params[:email].present?
     if params[:sf_safe].present?
       render action: :embed_sf_safe, layout: 'embed_layout'
@@ -27,12 +27,7 @@ class OrganizationsController < ApplicationController
   end
 
   def embed_extended
-    if params[:b_param].present?
-      b_param = BParam.find(params[:b_param_id])
-    else
-      b_param = BParam.create(creator_id: @organization.auto_user.id, params: {creation_organization_id: @organization.id, embeded: true})
-    end
-    @bike = BikeCreator.new(b_param).new_bike
+    @bike = BikeCreator.new(@b_param).new_bike
     @bike.owner_email = params[:email] if params[:email].present?
     if params[:sf_safe].present?
       render action: :embed_sf_safe, layout: 'embed_layout'
@@ -77,6 +72,14 @@ class OrganizationsController < ApplicationController
   end
 
   protected
+
+  def set_bparam
+    if params[:b_param_id].present?
+      @b_param = BParam.find(params[:b_param_id])
+    else
+      @b_param = BParam.create(creator_id: @organization.auto_user.id, params: {creation_organization_id: @organization.id, embeded: true})
+    end
+  end
 
   def find_organization 
     @organization = Organization.find_by_slug(params[:id]).decorate

@@ -24,6 +24,12 @@ class BParam < ActiveRecord::Base
     params[:bike]
   end
 
+  before_save :clean_errors
+  def clean_errors
+    return true unless bike_errors.present?
+    self.bike_errors = bike_errors.delete_if { |a| a[/(bike can.t be blank|are you sure the bike was created)/i] }
+  end
+
   before_save :set_foreign_keys
   def set_foreign_keys
     return true unless params.present? && bike.present?
