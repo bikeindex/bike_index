@@ -83,19 +83,41 @@
           Third color
         .controls.chosen-select
           = collection_select( :bike, :tertiary_frame_color_id, Color.all, :id, :name, prompt: "Choose color" )
-
   .input-group
     .control-group
       %label.control-label{ for: 'bike_owner_email' }
-        Your email address
+        Owner's email address
         = f.email_field :owner_email
   .input-group
-    .control-group
-      .filefield-button
-        Choose photo
-        = f.file_field :bike_image
-      #filepath
-  .input-group.form-foot
     .submit-registration
       = submit_tag "Register this", class: "button-submit"
       = collection_select( :bike, :cycle_type_id, CycleType.all, :id, :name, required: true)
+  .input-group
+    %h3
+      Optional additions
+    .control-group.chosen-select
+      = f.label :frame_material_id, "Primary frame material", class: "control-label"
+      .controls
+        = collection_select( :bike, :frame_material_id, FrameMaterial.all, :id, :name, prompt: "Choose material" )
+  .input-group
+    .control-group.chosen-select
+      = f.label :handlebar_type_id, class: "control-label"
+      .controls
+        = collection_select( :bike, :handlebar_type_id, HandlebarType.all, :id, :name, :label => "Handlebar Style", :required =>true, :input_html => { :class => "has-hidden-other" }, prompt: "Choose handlebar" )
+      %p.other-value
+        = HandlebarType.find_by_slug("other").id
+    .hidden-other.control-group
+      = f.label :handlebar_type_other, "Other handlebar style", class: "control-label"
+      .controls
+        = f.text_field :handlebar_type_other
+  .input-group
+    .control-group
+      = f.label :description, "Other defining features", class: "control-label"
+      .controls
+        = f.text_area :description, rows: 3, placeholder: "Any extra words?"
+  .input-group.form-foot
+    .control-group
+      .filefield-button
+        Choose photo
+        = f.file_field :image
+      #filepath

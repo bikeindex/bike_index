@@ -28,19 +28,13 @@ class BikeCreatorAssociator
     end
   end
 
-  def attach_photos(bike)
-    return nil unless @b_param.params[:photos].present?
-    photos = @b_param.params[:photos].uniq.take(7)
-    photos.each { |p| PublicImage.create(imageable: bike, remote_image_url: p) }
+  def attach_photo(bike)
+    return true unless @b_param.image.present?
+    public_image = PublicImage.new(image: @b_param.image)
+    public_image.imageable = bike
+    public_image.save
+    bike.reload
   end
-
-  # def add_uploaded_image(bike)
-  #   if @b_param.params[:bike][:bike_image]
-  #     public_image = PublicImage.new(image: @b_param.params[:bike][:bike_image])
-  #     public_image.imageable = bike
-  #     public_image.save
-  #   end
-  # end
 
   def associate(bike)
     begin 
@@ -49,7 +43,7 @@ class BikeCreatorAssociator
       create_normalized_serial_segments(bike)
       create_stolen_record(bike) if bike.stolen
       update_bike_token(bike) if bike.created_with_token
-      attach_photos(bike)
+      attach_photo(bike)
     rescue => e
       bike.errors.add(:association_error, e.message)
     end

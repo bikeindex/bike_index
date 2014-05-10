@@ -27,7 +27,11 @@ class OrganizationsController < ApplicationController
   end
 
   def embed_extended
-    b_param = BParam.create(creator_id: @organization.auto_user.id, params: {creation_organization_id: @organization.id, embeded: true})
+    if params[:b_param].present?
+      b_param = BParam.find(params[:b_param_id])
+    else
+      b_param = BParam.create(creator_id: @organization.auto_user.id, params: {creation_organization_id: @organization.id, embeded: true})
+    end
     @bike = BikeCreator.new(b_param).new_bike
     @bike.owner_email = params[:email] if params[:email].present?
     if params[:sf_safe].present?

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140507023948) do
+ActiveRecord::Schema.define(:version => 20140510132245) do
 
   create_table "alternate_emails", :force => true do |t|
     t.string   "email"
@@ -114,6 +114,8 @@ ActiveRecord::Schema.define(:version => 20140507023948) do
     t.integer  "country_id"
     t.string   "stock_photo_url"
     t.integer  "current_stolen_record_id"
+    t.string   "creation_image"
+    t.string   "creation_image_tmp"
   end
 
   add_index "bikes", ["creation_organization_id"], :name => "index_bikes_on_organization_id"
