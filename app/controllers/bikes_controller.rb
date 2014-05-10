@@ -111,6 +111,7 @@ class BikesController < ApplicationController
       if params[:bike][:image].present?
         @b_param.image = params[:bike][:image]
         @b_param.save
+        ImageAssociatorWorker.perform_in(1.minutes)
         params[:bike].delete(:image)
       end
       @b_param.update_attributes(params: params)

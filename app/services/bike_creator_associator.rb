@@ -33,6 +33,7 @@ class BikeCreatorAssociator
     public_image = PublicImage.new(image: @b_param.image)
     public_image.imageable = bike
     public_image.save
+    @b_param.update_attributes(image_processed: true)
     bike.reload
   end
 
