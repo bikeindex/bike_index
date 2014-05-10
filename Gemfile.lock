@@ -326,6 +326,9 @@ GEM
       rspec-core (~> 2.14.0)
       rspec-expectations (~> 2.14.0)
       rspec-mocks (~> 2.14.0)
+    rspec-sidekiq (1.0.0)
+      rspec (>= 2.0.0)
+      sidekiq (>= 2.4.0)
     ruby2ruby (2.0.7)
       ruby_parser (~> 3.1)
       sexp_processor (~> 4.0)
@@ -461,6 +464,7 @@ DEPENDENCIES
   rmagick
   rqrcode-rails3
   rspec-rails
+  rspec-sidekiq
   sass-rails (~> 3.2.3)
   select2-rails
   shoulda-matchers

@@ -16,6 +16,8 @@ We're an open source project. Take a gander through our code, report bugs, or do
 
 - Imagemagick ([railscast](http://railscasts.com/episodes/374-image-manipulation?view=asciicast))
 
+- [Resque](https://github.com/resque/resque) & [Sidekiq](https://github.com/mperham/sidekiq), which require [Redis](http://redis.io/). The [RailsCast on Resque](http://railscasts.com/episodes/271-resque?view=asciicast) is a good resource for getting up and running with Redis.
+
 - *If you turn on caching locally:* [Dalli](https://github.com/mperham/dalli) ([railscast](http://railscasts.com/episodes/380-memcached-dalli?view=asciicast))
 
 
@@ -25,7 +27,7 @@ We're an open source project. Take a gander through our code, report bugs, or do
 
 - `rake seed_test_users_and_bikes` to add the three test user accounts: admin@example.com, member@example.com, user@example.com (all have password `please12`) and give user@example.com 50 bikes
 
-- `bundle exec foreman start` to start the server
+- `rake start` to start the server (this will start Redis locally)
 
 - **Access the site through [lvh.me:3000](http://lvh.me:3000)**. You can't log in through localhost:3000.
  
