@@ -17,7 +17,7 @@ describe BikeSerializer do
     it { subject.rear_tire_narrow.should == bike.rear_tire_narrow }
     it { subject.front_tire_narrow.should == bike.front_tire_narrow }
     it { subject.rear_wheel_size.should == bike.rear_wheel_size }
-    
+    it { subject.serial.should == bike.serial_number }
     it { subject.front_wheel_size.should == bike.front_wheel_size }
     it { subject.handlebar_type.should == bike.handlebar_type }
     it { subject.frame_material.should == bike.frame_material }

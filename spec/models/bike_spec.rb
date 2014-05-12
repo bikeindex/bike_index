@@ -162,6 +162,17 @@ describe Bike do
     end
   end
 
+  describe :serial do 
+    it "should only return the serial if we should show people the serial" do 
+      # We're hiding serial numbers for bikes that are recovered to provide a method of verifying 
+      # ownership
+      bike = Bike.new
+      bike.stub(:serial_number).and_return('something')
+      bike.stub(:recovered).and_return(true)
+      bike.serial.should be_nil      
+    end
+  end
+
 
   describe "pg search" do 
     it "should return a bike which has a matching part of its description" do

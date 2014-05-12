@@ -18,7 +18,7 @@ module Api
       end
 
       def index
-        respond_with BikeSearcher.new(params).find_bikes.limit(10)
+        respond_with BikeSearcher.new(params).find_bikes.limit(20)
       end
 
       def show

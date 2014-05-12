@@ -191,6 +191,10 @@ class Bike < ActiveRecord::Base
     self.serial_normalized = SerialNormalizer.new({serial: serial_number}).normalized
   end
 
+  def serial
+    serial_number unless self.recovered
+  end
+
   before_save :set_paints
   def set_paints
     return true unless paint_name.present?

@@ -1,5 +1,6 @@
 class BikeSerializer < ActiveModel::Serializer
   attributes :id,
+    :serial,
     :registration_created_at,
     :registration_updated_at,
     :url,
