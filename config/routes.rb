@@ -119,6 +119,7 @@ Bikeindex::Application.routes.draw do
       resources :users do 
         collection { get 'current' }
       end
+      match '*a', to: 'api_v1#not_found'
     end
   end
 

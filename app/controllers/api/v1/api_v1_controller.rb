@@ -1,10 +1,12 @@
 module Api
   module V1
     class ApiV1Controller < ApplicationController
-      respond_to :json      
-      # def default_serializer_options
-      #   {root: false}
-      # end
+      respond_to :json
+
+      def not_found
+        message = { :'404' => "Couldn't find that shit" }
+        respond_with message, status: 404
+      end
       
       def cors_set_access_control_headers
         headers['Access-Control-Allow-Origin'] = '*'
