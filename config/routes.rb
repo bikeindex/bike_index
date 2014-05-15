@@ -104,7 +104,10 @@ Bikeindex::Application.routes.draw do
   namespace :api, defaults: {format: 'json'} do
     namespace :v1 do
       resources :bikes, only: [:index, :show, :create] do
-        collection { get 'search_tags' }
+        collection do
+          get 'search_tags'
+          get 'close_serials'
+        end
       end
       resources :cycle_types, only: [:index]
       resources :wheel_sizes, only: [:index]

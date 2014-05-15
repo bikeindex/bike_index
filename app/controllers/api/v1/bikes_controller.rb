@@ -21,6 +21,12 @@ module Api
         respond_with BikeSearcher.new(params).find_bikes.limit(20)
       end
 
+      def close_serials
+        response = {bikes: []}
+        response = BikeSearcher.new(params).fuzzy_find_serial.limit(20) if params[:serial].present?
+        respond_with response
+      end
+
       def show
         respond_with Bike.unscoped.find(params[:id])
       end

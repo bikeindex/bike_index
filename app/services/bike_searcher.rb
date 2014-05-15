@@ -59,7 +59,7 @@ class BikeSearcher
     @bikes = matching_serial    
     matching_stolenness(@bikes)
     matching_query(@bikes)
-    by_proximity if @params[:stolen] && @params[:proximity].present?
+    by_proximity if @params[:stolen] && @params[:proximity].present? && @params[:proximity].strip.length > 1
     @bikes
   end
 
