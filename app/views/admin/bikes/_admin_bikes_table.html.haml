@@ -37,6 +37,8 @@
       %td
         - if bike.manufacturer_other.present?
           %span.table-error
+            %span.hidden
+              0 1
             = bike.manufacturer_other
         - else
           = bike.manufacturer.name
