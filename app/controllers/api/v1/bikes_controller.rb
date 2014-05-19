@@ -5,6 +5,7 @@ module Api
       before_filter :authenticate_organization, only: [:create]
       after_filter :cors_set_access_control_headers
       caches_action :search_tags
+      serialization_scope nil
 
       def search_tags
         tags = []
@@ -28,7 +29,7 @@ module Api
       end
 
       def show
-        respond_with Bike.unscoped.find(params[:id])
+        render json: Bike.unscoped.find(params[:id]), serializer: SingleBikeSerializer
       end
 
       def create

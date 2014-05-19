@@ -15,7 +15,8 @@ class BikeSerializer < ActiveModel::Serializer
     :frame_model,
     :description,
     :rear_tire_narrow,
-    :front_tire_narrow
+    :front_tire_narrow,
+    :photo
     
 
   has_one :rear_wheel_size,
@@ -25,9 +26,6 @@ class BikeSerializer < ActiveModel::Serializer
     :front_gear_type,
     :rear_gear_type,
     :current_stolen_record
-
-  has_many :components
-  has_many :public_images
   
   def url
     bike_url(object)
@@ -43,6 +41,16 @@ class BikeSerializer < ActiveModel::Serializer
   
   def registration_updated_at
     object.updated_at
+  end
+
+  def photo
+    if object.thumb_path
+      object.public_images.first.image_url(:large)
+    elsif object.stock_photo_url.present?
+      object.stock_photo_url
+    else
+      nil
+    end    
   end
 
 end
