@@ -23,6 +23,6 @@ describe BikeSerializer do
     it { subject.frame_material.should == bike.frame_material }
     it { subject.front_gear_type.should == bike.front_gear_type }
     it { subject.rear_gear_type.should == bike.rear_gear_type }
-    it { subject.current_stolen_record.should == bike.current_stolen_record }
+    it { subject.stolen_record.should == bike.current_stolen_record }
   end
 end

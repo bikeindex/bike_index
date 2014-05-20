@@ -1,5 +1,10 @@
 class SingleBikeSerializer < BikeSerializer
+  self.root = 'bikes'
+  attributes :images 
   has_many :components
-  has_many :public_images
+
+  def images
+    object.public_images
+  end
 
 end
