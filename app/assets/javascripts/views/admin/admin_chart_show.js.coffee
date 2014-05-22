@@ -1,9 +1,10 @@
 class BikeIndex.Views.AdminChartShow extends Backbone.View
     
   initialize: ->
-    @initialize_graph()
-
-
+    if $('#graphy').length > 0
+      @initialize_graph()
+    else
+      @initialize_review()
 
   initialize_graph: ->
     data_values1 = $('#graphy').data('values1')
@@ -44,4 +45,8 @@ class BikeIndex.Views.AdminChartShow extends Backbone.View
         ]
     ctx = document.getElementById("graphy").getContext("2d")
     new Chart(ctx).Line data, options
+    
+  initialize_review: ->
+    data_values1 = $('#review-graph').data('values1')
+    data_labels = $('#review-graph').data('labels')
     

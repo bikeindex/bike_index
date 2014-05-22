@@ -14,6 +14,20 @@ class Admin::GraphsController < Admin::BaseController
     render :layout => 'graphs'
   end
 
+  def review
+    start_day = (1.week.ago - 1.day).to_date
+    end_day = (1.day.ago).to_date
+    xaxis = []
+    days_from_this_week = (start_day..end_day).map
+
+    days_from_this_week.each do |day|
+      xaxis << day.strftime("%A")
+
+    end
+    @xaxis = xaxis.to_json
+    render :layout => 'graphs'
+  end
+
 protected
 
   def date_range(start_date)

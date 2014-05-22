@@ -82,7 +82,9 @@ Bikeindex::Application.routes.draw do
     resources :discounts, :memberships, :bikes, :organizations, :bike_token_invitations, :organization_invitations, :paints
     match 'duplicate_bikes', to: 'bikes#duplicates'
     resources :flavor_texts, only: [:destroy, :create]
-    resources :graphs, only: [:index, :show]
+    resources :graphs, only: [:index, :show] do 
+      collection { get :review }
+    end
     resources :failed_bikes, only: [:index, :show]
     resources :ownerships, only: [:edit, :update]
     match 'resend_stolen_notification', to: 'stolen_notifications#resend'
