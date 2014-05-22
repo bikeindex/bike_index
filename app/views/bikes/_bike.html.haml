@@ -1,33 +1,29 @@
 %li{ class: bike.stolen && "blist-stolen" }
-  = bike.list_image(target)
+  .blist-image-holder
+    = bike.thumb_image
+  %h3
+    = link_to bike.title, bike.list_link_url(target)
   .blist-primary-group
     .dl-holder
-      %a.blist-link{ href: bike.list_link_url(target) }
-        %dl.dl-horizontal
-          %dt Serial
-          %dd.serial-text
-            - if bike.recovered
-              Serial hidden
-            - else 
-              = bike.serial_number
-        %dl.dl-horizontal
-          = bike.dl_list_item(bike.title, bike.type.titleize)
+      %dl.dl-horizontal
+        %dt Serial
+        %dd.serial-text
+          - if bike.recovered
+            Serial hidden
+          - else 
+            = bike.serial_number
         
-  .blist-info-group
-    .dl-holder
-      %dl.dl-horizontal
-        = bike.dl_list_item(bike.ass_name("primary_frame_color"), "Color")
-        = bike.dl_from_attribute("year", "Year")
-      %dl.dl-horizontal
-        = bike.dl_list_item(bike.ass_name("frame_material"), "Material")        
-        = bike.dl_list_item(bike.ass_name("rear_wheel_size"), "Wheel size")
+        = bike.dl_list_item(bike.frame_colors.to_sentence, "Colors")
+        
+  
+        
 
   - if bike.stolen and bike.stolen_records.any?
     .blist-stolen-info
       .dl-holder
         %dl.dl-horizontal
-          - date_label = "Stolen on"
-          - date_label = "Recovered on" if bike.recovered
+          - date_label = "Stolen"
+          - date_label = "Recovered" if bike.recovered
           = bike.dl_list_item(bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), date_label)
         %dl.dl-horizontal
           = bike.dl_list_item(bike.short_address(bike.current_stolen_record), "From")

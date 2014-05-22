@@ -16,6 +16,7 @@ body.welcome-page {
   .content {
     padding: 0;
     overflow: hidden;
+    &:before { display: none; }
   }
 }
 

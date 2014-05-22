@@ -56,10 +56,14 @@ class BikeSearcher
   end
 
   def find_bikes
-    @bikes = matching_serial    
-    matching_stolenness(@bikes)
-    matching_query(@bikes)
-    by_proximity if @params[:stolen] && @params[:proximity].present? && @params[:proximity].strip.length > 1
+    if @params[:stolen].present? or @params[:query].present? or @params[:serial].present?
+      @bikes = matching_serial    
+      matching_stolenness(@bikes)
+      matching_query(@bikes)
+      by_proximity if @params[:stolen] && @params[:proximity].present? && @params[:proximity].strip.length > 1
+    else
+      @bikes = Bike.unscoped.order("RANDOM()").limit(100)
+    end
     @bikes
   end
 

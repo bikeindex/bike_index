@@ -54,11 +54,11 @@
           .optional-fields
             .additional-fields
               = text_field_tag :serial, params[:serial], placeholder: 'Serial number lookup'
-              %span.absent-serial-blocker
-              %a#serial-absent{href: "#"}
-                %span
-                  has
-                no serial
+              / %span.absent-serial-blocker
+              / %a#serial-absent{href: "#"}
+              /   %span
+              /     has
+              /   no serial
 
             .stolenness
 
