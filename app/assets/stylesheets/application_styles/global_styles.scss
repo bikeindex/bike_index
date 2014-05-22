@@ -382,3 +382,14 @@ footer {
   }
 }
 
+#old-browser-warning {
+  width: 100%;
+  background: $grayLighterer;
+  border-bottom: 1px solid $grayLighter;
+  z-index: 9999;
+  padding: 10px;
+  position: fixed;
+  top: 0; left: 0;
+  text-align: center;
+  h4 { color: $stolenColor; }
+}
