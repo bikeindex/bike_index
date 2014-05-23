@@ -3,6 +3,7 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
     @indexCall()
     @manufacturerCalls()
     @bikeSearchCall()
+    @closeSerialCall()
     production = parseInt($('#documentation_head').attr('data-production'), 10)
     unless production == 1
       @createBikes()
@@ -32,7 +33,16 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
         $("#bikes_search_query").text(JSON.stringify(data,undefined,2))
       error: (data, textStatus, jqXHR) ->
         $("#bikes_search_query").text(JSON.stringify(data,undefined,2))
-  
+
+  closeSerialCall: ->
+    $.ajax
+      type: "GET"
+      url: $("#bikes_search_close_query").attr('data-url')
+      success: (data, textStatus, jqXHR) ->
+        $("#bikes_search_close_query").text(JSON.stringify(data,undefined,2))
+      error: (data, textStatus, jqXHR) ->
+        $("#bikes_search_close_query").text(JSON.stringify(data,undefined,2))
+
   indexCall: ->
     id_blocks = [
       '#wheel_sizes_index'
