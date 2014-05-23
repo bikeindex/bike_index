@@ -69,6 +69,7 @@ Bikeindex::Application.routes.draw do
      get 'spokecard'
      get 'scanned'
      get 'pdf'
+     post 'update_serial'
    end
   end
   resources :locks

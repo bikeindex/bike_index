@@ -154,6 +154,13 @@
   padding-top: 30px;
 }
 
+.serial-update-link {
+  color: $blueLight;
+  font-size: .9em;
+  &:hover { color: $linkColor; }
+}
+#submit-serial-error { display: none; }
+
 
 //________________________
 //

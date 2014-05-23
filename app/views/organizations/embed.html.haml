@@ -72,7 +72,7 @@
         .controls.chosen-select
           = collection_select( :bike, :tertiary_frame_color_id, Color.all, :id, :name, prompt: "Choose color" )
 
-  .input-group.form-foot
+  .input-group
     .control-group
       %label.control-label{ for: 'bike_owner_email' }
         Your email address
@@ -80,3 +80,13 @@
     .submit-registration
       = submit_tag "Register this", class: "button-submit"
       = collection_select( :bike, :cycle_type_id, CycleType.all, :id, :name, required: true)
+  .input-group.form-foot
+    .control-group
+      - if @b_param.image.present? or @b_param.image_tmp.present?
+        %strong
+          Image has been uploaded
+      - else
+        .filefield-button
+          Optional - upload a photo
+          = f.file_field :image
+        #filepath

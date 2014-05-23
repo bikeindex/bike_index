@@ -70,27 +70,74 @@
             It works like this:
         %ul.fancy-bullets
           %li
-            %span.blue-bullet
+            %span.green-bullet
             %p
               Every few minutes the Bike Index contacts participating LightSpeed Cloud accounts and asks if any new bikes have been sold.
           %li
-            %span.blue-bullet
+            %span.green-bullet
             %p
               If any have been, we look up the information about the bikes.
           %li
-            %span.blue-bullet
+            %span.green-bullet
             %p
               We check to make sure each bike is supposed to be registered. 
           %li
-            %span.blue-bullet
+            %span.green-bullet
             %p
               We ask LightSpeed cloud for the customer's email and register the bike.
         %article
           %p
-            All you need to do to sign up is get us your API key. Here is a video explaining how to do this.
+            It's fast, effortless and secure. We will only send your customers one email, letting them know that you registered their bike (because you're awesome).
+          %p
+            Watch the video for a step-by-step walkthrough of signing up!
+          
           #lightspeed-tutorial-video
+        
           %p.padded
-            To set up automation, you also need a Bike Index account. Sign up by submitting the form below if you haven't already (it's free).
+            Here are the steps written out:
+        %ul.fancy-bullets
+          - unless current_user.present? && current_user.memberships.present?
+            %li
+              %span.blue-bullet
+              %p
+                Get a Bike Index organization account by filling in 
+                %a.scroll-to-ref{href: '#new_feedback'}
+                  the form below
+                (it's free).
+          %li
+            %span.blue-bullet
+            %p
+              Add an API key in Lightspeed cloud (#{ link_to 'LightSpeed reference', 'http://www.lightspeedretail.com/cloud/help/developers/api/getting-api-key/'}) 
+          %li
+            %span.blue-bullet
+            %p
+              Give the API key read access 
+              %code
+                Account.Serialized
+              \,
+              %code
+                Account.Item
+              \,
+              %code
+                Account.Manufacturer
+              and 
+              %code
+                Account.Customer
+          %li
+            %span.blue-bullet
+            %p
+              - if current_user.present? && current_user.memberships.present?
+                - org = current_user.organizations.first
+                Copy the API key, go to
+                %a{ href: "https://bikeindex.org/organizations/#{org.slug}#show-lightspeed-info" }
+                  #{org.name} page on the Index
+                and paste it in the box in 
+                %em
+                  View LightSpeed Cloud information
+
+              - else
+                Copy the API key, go to your organizations page on the Index and fill it in.
+            
         %dl
           %dt.collapse-faq
             %a.collapsed{ href: "#whats-collected", :data => { toggle: "collapse"} }

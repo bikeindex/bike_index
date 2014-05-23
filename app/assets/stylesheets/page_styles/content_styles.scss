@@ -363,6 +363,12 @@
   border: 1px solid darken($blueDark, 10%); 
 }
 
+.green-bullet {
+  @extend .blue-bullet;
+  background: $greenDark;
+  border: 1px solid darken($greenDark, 10%); 
+}
+
 
 
 
@@ -474,6 +480,9 @@ ul.state-list {
       display: block;
       width: 100%;
     }
+  }
+  &.final-list {
+    li { margin-left: 34%; }
   }
 }
 

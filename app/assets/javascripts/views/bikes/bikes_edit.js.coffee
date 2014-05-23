@@ -17,6 +17,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     'change #country_select_container select': 'updateCountry'
     'change #bike_year':              'updateYear'
     'change #bike_unknown_year':      'toggleUnknownYear'
+    'click #submit-serial-update':     'submitSerialUpdate'
 
     
   initialize: ->
@@ -405,3 +406,12 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       $('#bike_unknown_year').prop('checked', true)
     else
       $('#bike_unknown_year').prop('checked', false)
+  
+  submitSerialUpdate: ->
+    if $('#updated_serial').val().length > 0 && $('#serial_update_reason').val().length > 0
+      $('#submitSerialCorrection').modal('hide')  
+      BikeIndex.alertMessage('success', 'Serial correction submitted', "Processing your updated serial now. Thanks!")
+    else
+      $('#submit-serial-error').slideDown('fast')
+    
+    #submitSerialCorrection

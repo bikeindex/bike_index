@@ -1,0 +1,32 @@
+#submitSerialCorrection.modal.hide.fade
+  .modal-header
+    %button{ type: "button", class: "close", :data => { dismiss: "modal" }, :aria => {hidden: "true"} }
+      &times;
+    %h3
+      Incorrect serial number? Submit a correction
+  .modal-body.form.form-horizontal
+      
+    #submit-serial-error.alert.alert-error
+      %a.close{"data-dismiss" => "alert"} ×
+      %h4
+        Not enough information!
+      %p
+        Please fill in both fields
+    = form_tag update_serial_bike_url(@bike) do |t|
+      .input-group
+        .control-group
+          %label.control-label{ for: :updated_serial }
+            Updated serial
+          .controls
+            = text_field_tag :updated_serial
+      .input-group
+        .control-group
+          %label.control-label{ for: :serial_update_reason }
+            Reason for update
+          .controls
+            = text_area_tag :serial_update_reason
+      .input-group
+        .controls.actions.padded
+          %a#submit-serial-update.button-blue
+            Submit update
+          
