@@ -3,14 +3,18 @@ require 'spec_helper'
 describe BikeSearcher do
 
   describe :find_bikes do 
-    it "should call select manufacturers, attributes, stolen and query" do 
-      search = BikeSearcher.new
+    it "should call select manufacturers, attributes, stolen and query if stolen is present" do 
+      search = BikeSearcher.new(stolen: true)
       search.should_receive(:matching_serial).and_return(true)
       search.should_receive(:matching_stolenness).and_return(true)
       # search.should_receive(:matching_manufacturers).and_return(true)
       # search.should_receive(:matching_attr_cache).and_return(true)
       search.should_receive(:matching_query).and_return(true)
       search.find_bikes
+    end
+    it "shouldn't fail if nothing is present" do 
+      search = BikeSearcher.new
+      search.find_bikes.should_not be_present
     end
   end
 

@@ -24,7 +24,7 @@ module Api
 
       def close_serials
         response = {bikes: []}
-        response = BikeSearcher.new(params).fuzzy_find_serial.limit(20) if params[:serial].present?
+        response = BikeSearcher.new(params).close_serials.limit(20) if params[:serial].present?
         respond_with response
       end
 

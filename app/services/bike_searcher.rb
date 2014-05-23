@@ -67,4 +67,12 @@ class BikeSearcher
     @bikes
   end
 
+  def close_serials
+    @bikes = fuzzy_find_serial
+    matching_stolenness(@bikes)
+    matching_query(@bikes)
+    by_proximity if @params[:stolen] && @params[:proximity].present? && @params[:proximity].strip.length > 1
+    @bikes
+  end
+
 end
