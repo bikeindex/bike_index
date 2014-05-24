@@ -23,8 +23,8 @@ window.BikeIndex =
 
     links = links + "</ul></div>"
     
-    $('#total-top-header .global-tabs').append(tab)
-    $('#total-top-header .tab-content').append(links)
+    # $('#total-top-header .global-tabs').append(tab)
+    # $('#total-top-header .tab-content').append(links)
 
 $(document).ready ->
   view = new BikeIndex.Views.Global

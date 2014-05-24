@@ -407,14 +407,15 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     else
       $('#bike_unknown_year').prop('checked', false)
   
-  submitSerialUpdate: ->
+  submitSerialUpdate: (e) ->
+    e.preventDefault()
     serial = $('#serial_update_serial').val()
     reason = $('#serial_update_reason').val()
     bike_id = $('#serial_update_bike_id').val()
     if serial.length > 0 && reason.length > 0 && bike_id.length > 0
       url = $('#submitSerialCorrection').attr('data-url')
       $.ajax
-        type: "GET"
+        type: "POST"
         url: url
         data:
           serial_update_serial: serial
@@ -423,7 +424,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
         success: (data, textStatus, jqXHR) ->
           BikeIndex.alertMessage('success', 'Serial correction submitted', "Processing your updated serial now. Thanks!")
         error: (data, textStatus, jqXHR) ->
-          BikeIndex.alertMessage('warning', 'Request failed', "We're!")
+          BikeIndex.alertMessage('error', 'Request failed', "We're!")
       $('#submitSerialCorrection').modal('hide')  
       
     else
