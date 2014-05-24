@@ -69,7 +69,6 @@ Bikeindex::Application.routes.draw do
      get 'spokecard'
      get 'scanned'
      get 'pdf'
-     post 'update_serial'
    end
   end
   resources :locks
@@ -120,7 +119,10 @@ Bikeindex::Application.routes.draw do
       resources :frame_materials, only: [:index]
       resources :manufacturers, only: [:index]
       resources :users do 
-        collection { get 'current' }
+        collection do
+          get 'current'
+          post 'request_serial_update'
+        end
       end
       match '*a', to: 'api_v1#not_found'
     end

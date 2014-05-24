@@ -1,4 +1,8 @@
-#submitSerialCorrection.modal.hide.fade
+- if Rails.env.production?
+  - request_url = "https://bikeindex.org"
+- else
+  - request_url = "http://lvh.me:3000"
+#submitSerialCorrection.modal.hide.fade{ data: {url: request_url + request_serial_update_api_v1_users_path } }
   .modal-header
     %button{ type: "button", class: "close", :data => { dismiss: "modal" }, :aria => {hidden: "true"} }
       &times;
@@ -12,13 +16,14 @@
         Not enough information!
       %p
         Please fill in both fields
-    = form_tag update_serial_bike_url(@bike) do |t|
+    = form_tag  do |t|
+      = hidden_field_tag :serial_update_bike_id, @bike.id
       .input-group
         .control-group
-          %label.control-label{ for: :updated_serial }
+          %label.control-label{ for: :serial_update_serial }
             Updated serial
           .controls
-            = text_field_tag :updated_serial
+            = text_field_tag :serial_update_serial
       .input-group
         .control-group
           %label.control-label{ for: :serial_update_reason }

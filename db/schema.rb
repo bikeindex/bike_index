@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140510163446) do
+ActiveRecord::Schema.define(:version => 20140523122545) do
 
   create_table "alternate_emails", :force => true do |t|
     t.string   "email"
@@ -200,6 +200,7 @@ ActiveRecord::Schema.define(:version => 20140510163446) do
     t.datetime "created_at",    :null => false
     t.datetime "updated_at",    :null => false
     t.string   "feedback_type"
+    t.text     "feedback_hash"
   end
 
   create_table "flavor_texts", :force => true do |t|

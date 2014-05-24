@@ -47,15 +47,14 @@
         - desc += "#{bike.year} " if bike.year.present?
         - desc += "#{bike.frame_model} " if bike.frame_model.present?
         - desc += "(#{bike.type})" unless bike.type == 'bike'
-        - if bike.stolen
-          %span.table-error
-            = desc
-        - else
-          = desc
+        = desc
         - if bike.paint.present? && bike.paint.color_id.blank?
           .large-screens.less-strong
             = link_to bike.paint.name, edit_admin_paint_url(bike.paint)
             = bike.frame_colors.to_sentence
+        - if bike.stolen
+          %span.less-strong-right
+            stolen
 
       %td.not-tiny-screens
         = bike.creation_organization.name if bike.creation_organization.present?
