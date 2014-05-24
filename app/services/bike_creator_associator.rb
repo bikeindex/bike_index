@@ -5,10 +5,10 @@ class BikeCreatorAssociator
 
   def create_ownership(bike)
     send_email = true
-    i = @b_param.params[:bike][:send_email] 
-    if i == false
+    send = @b_param.params[:bike][:send_email] 
+    if send == false
       send_email = false
-    elsif i.present? && i[/false/i]
+    elsif send.present? && i[/false/i]
       send_email = false
     end
     OwnershipCreator.new(bike: bike, creator: @b_param.creator, send_email: send_email).create_ownership

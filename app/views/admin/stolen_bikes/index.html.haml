@@ -1,0 +1,52 @@
+
+%header.with-subtitle
+  %h1
+    Stolen Bikes
+  
+%h4
+  = Bike.where(stolen: true).count
+  Stolen Bikes indexed,
+  %em
+    (#{Bike.where(stolen: true).where("created_at >= ?", Time.zone.now.beginning_of_day).count} today) 
+
+
+%section.full-screen-table
+  %table#truncated-data-table.table.table-striped.table-bordered
+    %thead
+      %th
+        Date indexed
+      %th.not-tiny-screens
+        Bike info
+      %th.large-screens
+        Theft info
+      %th
+        Approved
+      
+    %tbody
+      - @bikes.each do |bike|
+        %tr
+          %td
+            .less-strong-hold
+              %span.less-strong-right.medium-screens
+                - if bike.example
+                  %span.table-error
+                    = bike.id 
+                - else
+                  = bike.id 
+              %a{href: edit_admin_bike_url(bike) }
+
+                - if bike.created_at.today?
+                  Today at #{bike.created_at.strftime("%-I %p")}
+                - elsif Date.yesterday().beginning_of_day() <= bike.created_at          
+                  Yesterday at #{bike.created_at.strftime("%-I %p")}
+                - else
+                  = bike.created_at.strftime("%-m.%-d.%Y at %-H")
+          %td.not-tiny-screens
+            = bike.title_string
+          %td.large-screens
+            - if bike.current_stolen_record.present?
+              = bike.current_stolen_record.theft_description
+
+          %td
+            = "&#x2713;".html_safe 
+            

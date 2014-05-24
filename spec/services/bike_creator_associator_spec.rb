@@ -8,7 +8,7 @@ describe BikeCreatorAssociator do
       bike = Bike.new
       b_param.stub(:params).and_return({bike: bike})
       b_param.stub(:creator).and_return('creator')
-      OwnershipCreator.any_instance.should_receive(:initialize).with(bike: bike, creator: 'creator', send_email: false)
+      OwnershipCreator.any_instance.should_receive(:initialize).with(bike: bike, creator: 'creator', send_email: true)
       OwnershipCreator.any_instance.should_receive(:create_ownership).and_return(true)
       BikeCreatorAssociator.new(b_param).create_ownership(bike)
     end

@@ -14,12 +14,13 @@
   - @bikes.each do |bike|
     %tr
       %td
-        %span.less-strong-right.medium-screens
-          - if bike.example
-            %span.table-error
+        .less-strong-hold
+          %span.less-strong-right.medium-screens
+            - if bike.example
+              %span.table-error
+                = bike.id 
+            - else
               = bike.id 
-          - else
-            = bike.id 
         %a{href: edit_admin_bike_url(bike) }
 
           - if bike.created_at.today?
@@ -43,25 +44,27 @@
         - else
           = bike.manufacturer.name
       %td.large-screens
-        - desc = ''
-        - desc += "#{bike.year} " if bike.year.present?
-        - desc += "#{bike.frame_model} " if bike.frame_model.present?
-        - desc += "(#{bike.type})" unless bike.type == 'bike'
-        = desc
-        - if bike.paint.present? && bike.paint.color_id.blank?
-          .large-screens.less-strong
-            = link_to bike.paint.name, edit_admin_paint_url(bike.paint)
-            = bike.frame_colors.to_sentence
-        - if bike.stolen
-          %span.less-strong-right
-            stolen
+        .less-strong-hold
+          - desc = ''
+          - desc += "#{bike.year} " if bike.year.present?
+          - desc += "#{bike.frame_model} " if bike.frame_model.present?
+          - desc += "(#{bike.type})" unless bike.type == 'bike'
+          = desc
+          - if bike.paint.present? && bike.paint.color_id.blank?
+            .large-screens.less-strong
+              = link_to bike.paint.name, edit_admin_paint_url(bike.paint)
+              = bike.frame_colors.to_sentence
+          - if bike.stolen
+            %span.less-strong-right
+              stolen
 
       %td.not-tiny-screens
-        = bike.creation_organization.name if bike.creation_organization.present?
-        - if bike.paid_for
-          %span.less-strong
-            Purchased
-        - if bike.registered_new
-          %span.less-strong-right
-            pos
-      
+        .less-strong-hold
+          = bike.creation_organization.name if bike.creation_organization.present?
+          - if bike.paid_for
+            %span.less-strong
+              Purchased
+          - if bike.registered_new
+            %span.less-strong-right
+              pos
+        

@@ -66,9 +66,12 @@ table.dataTable th:active {
   }
   .not-large-screens { display: none; }
   .less-strong { color: darken($grayMed, 5%); }
+  .less-strong-hold { position: relative; }
   .less-strong-right {
     color: darken($grayMed, 5%); 
-    float: right;
+    position: absolute;
+    right: -.3em;
+    bottom: -.8em;
     font-size: .8em;
   }
 }
