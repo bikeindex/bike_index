@@ -1,0 +1,27 @@
+- if feedback.type == "serial_update_request"
+  %h1
+    Serial update request
+  %p
+    From
+    = @feedback.email
+  %p
+    Reason for update:
+    = @feedback.body
+  %p
+    New serial:
+    = @feedback.feedback_hash[:new_serial]
+  %p
+    - bike = Bike.find(@feedback.feedback_hash[:bike_id])
+    = link_to 'View the bike', edit_admin_bike_url(bike)
+    
+- else
+  %p
+    From: 
+    = @feedback.email
+
+  %p
+    = @feedback.name
+    says,
+
+  %p
+    = @feedback.body
