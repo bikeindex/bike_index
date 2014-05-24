@@ -5,7 +5,8 @@ class Ownership < ActiveRecord::Base
     :current,
     :user_id, # is the owner
     :claimed,
-    :example
+    :example,
+    :send_email
 
   validates_presence_of :owner_email
   validates_presence_of :creator_id

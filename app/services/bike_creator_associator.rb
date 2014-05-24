@@ -4,7 +4,12 @@ class BikeCreatorAssociator
   end
 
   def create_ownership(bike)
-    OwnershipCreator.new(bike: bike, creator: @b_param.creator).create_ownership
+    if @b_param.params[:bike][:send_email] == false
+      send_email = false
+    else
+      send_email = true
+    end
+    OwnershipCreator.new(bike: bike, creator: @b_param.creator, send_email: send_email).create_ownership
   end
 
   def create_components(bike)
@@ -48,7 +53,6 @@ class BikeCreatorAssociator
     rescue => e
       bike.errors.add(:association_error, e.message)
     end
-    # pp bike.errors.messages
     bike
   end
 

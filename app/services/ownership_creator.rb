@@ -6,6 +6,7 @@ class OwnershipCreator
     @creator = creation_params[:creator]
     @bike = creation_params[:bike]
     @owner_email = creation_params[:owner_email]
+    @send_email = creation_params[:send_email]
   end
 
   def find_owner_email
@@ -25,6 +26,7 @@ class OwnershipCreator
 
   def send_notification_email(ownership)
     return true if ownership.example
+    return true unless ownership.send_email
     Resque.enqueue(OwnershipInvitationEmailJob, ownership.id)
   end
 
@@ -40,7 +42,8 @@ class OwnershipCreator
       creator_id: creator_id,
       claimed: self_made?,
       example: @bike.example,
-      current: true
+      current: true,
+      send_email: @send_email
     }
     ownership
   end

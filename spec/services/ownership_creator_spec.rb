@@ -31,10 +31,18 @@ describe OwnershipCreator do
       OwnershipCreator.new().send_notification_email(ownership)
     end
 
-    it "should send a notification email" do 
+    it "should not send a notification email for example bikes" do 
       ownership = Ownership.new
       ownership.stub(:id).and_return(2)
       ownership.stub(:example).and_return(true)
+      Resque.should_not_receive(:enqueue)
+      OwnershipCreator.new().send_notification_email(ownership)
+    end
+
+    it "should not send a notification email for ownerships with no_email set" do 
+      ownership = Ownership.new
+      ownership.stub(:id).and_return(2)
+      ownership.stub(:send_email).and_return(false)
       Resque.should_not_receive(:enqueue)
       OwnershipCreator.new().send_notification_email(ownership)
     end

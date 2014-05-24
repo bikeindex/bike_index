@@ -24,7 +24,7 @@ class BikeUpdator
     if @bike_params[:bike] and @bike_params[:bike][:owner_email]
       unless @bike.owner_email == @bike_params[:bike][:owner_email]
         owner_email = @bike_params[:bike][:owner_email]
-        OwnershipCreator.new(bike: @bike, owner_email: owner_email, creator: @user).create_ownership
+        OwnershipCreator.new(bike: @bike, owner_email: owner_email, creator: @user, send_email: true).create_ownership
       end
     end
   end

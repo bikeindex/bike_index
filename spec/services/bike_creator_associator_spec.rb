@@ -5,7 +5,19 @@ describe BikeCreatorAssociator do
   describe :create_ownership do 
     it "should call create ownership" do 
       b_param = BParam.new
-      bike = Bike.new 
+      bike = Bike.new
+      b_param.stub(:params).and_return({bike: bike})
+      b_param.stub(:creator).and_return('creator')
+      OwnershipCreator.any_instance.should_receive(:initialize).with(bike: bike, creator: 'creator', send_email: false)
+      OwnershipCreator.any_instance.should_receive(:create_ownership).and_return(true)
+      BikeCreatorAssociator.new(b_param).create_ownership(bike)
+    end
+    it "should call create ownership with send_email false if b_param has that" do 
+      b_param = BParam.new
+      bike = Bike.new
+      b_param.stub(:params).and_return({bike: {send_email: false}})
+      b_param.stub(:creator).and_return('creator')
+      OwnershipCreator.any_instance.should_receive(:initialize).with(bike: bike, creator: 'creator', send_email: false)
       OwnershipCreator.any_instance.should_receive(:create_ownership).and_return(true)
       BikeCreatorAssociator.new(b_param).create_ownership(bike)
     end

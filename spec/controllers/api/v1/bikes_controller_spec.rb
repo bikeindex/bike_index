@@ -185,6 +185,34 @@ describe Api::V1::BikesController do
       }.should change(Ownership, :count).by(1)
       response.code.should eq("200")    
     end
+
+    it "should not send an ownership email if it has no_email set" do
+      manufacturer = FactoryGirl.create(:manufacturer)
+      FactoryGirl.create(:wheel_size, iso_bsd: 559)
+      FactoryGirl.create(:cycle_type, slug: "bike")
+      FactoryGirl.create(:ctype, slug: "wheel")
+      FactoryGirl.create(:ctype, slug: "headset")
+      f_count = Feedback.count
+      bike = { serial_number: "69 string",
+        manufacturer_id: manufacturer.id,
+        rear_tire_narrow: "true",
+        rear_wheel_bsd: "559",
+        color: FactoryGirl.create(:color).name,
+        owner_email: "jsoned@examples.com",
+        send_email: false
+      }
+      options = { bike: bike.to_json, organization_slug: @organization.slug, access_token: @organization.access_token } 
+      Resque.should_not_receive(:enqueue)
+      lambda { 
+        post :create, options
+      }.should change(Ownership, :count).by(1)
+      pp Ownership.last
+      # b_param = BParam.last
+      # pp b_param
+      # pp b_param.params[:bike][:send_email]
+
+      response.code.should eq("200")    
+    end
   end
 
 

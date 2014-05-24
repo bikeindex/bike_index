@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140523122545) do
+ActiveRecord::Schema.define(:version => 20140524183616) do
 
   create_table "alternate_emails", :force => true do |t|
     t.string   "email"
@@ -372,6 +372,7 @@ ActiveRecord::Schema.define(:version => 20140523122545) do
     t.boolean  "current",     :default => false
     t.boolean  "claimed"
     t.boolean  "example",     :default => false, :null => false
+    t.boolean  "send_email",  :default => true
   end
 
   create_table "paints", :force => true do |t|

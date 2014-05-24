@@ -63,7 +63,8 @@ class Bike < ActiveRecord::Base
     :example,
     :card_id,
     :stock_photo_url,
-    :pdf
+    :pdf,
+    :send_email
 
   mount_uploader :pdf, PdfUploader
   process_in_background :pdf
@@ -112,7 +113,7 @@ class Bike < ActiveRecord::Base
   # validates_presence_of :rear_wheel_size_id
   # validates_inclusion_of :rear_tire_narrow, :in => [true, false]
 
-  attr_accessor :date_stolen_input, :phone, :image, :bike_token_id, :b_param_id, :payment_required, :embeded, :embeded_extended, :paint_name, :bike_image_cache
+  attr_accessor :date_stolen_input, :phone, :image, :bike_token_id, :b_param_id, :payment_required, :embeded, :embeded_extended, :paint_name, :bike_image_cache, :send_email
 
   default_scope where(example: false).order("created_at desc")
   scope :stolen, where(stolen: true)
