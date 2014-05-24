@@ -1,7 +1,7 @@
 %p
   Query the Bike Index API to find bikes!
 %p
-  We return the first 10 matches for your query.
+  We return the first 20 matches for your query.
 %p
   Here are the things that can be sent in the request:
 
@@ -15,7 +15,15 @@
         %td
           string
         %td
-          The query string. This will full text search all the bikes.
+          The query string. This will full text search all the bikes unless serial is set.
+      %tr
+        %td
+          %code
+            serial
+        %td
+          string
+        %td
+          Limits your search to bikes with this serial number. If query is empty, returns all bikes with this serial number.
       %tr
         %td
           %code
@@ -62,3 +70,40 @@
     Response
   %pre#bikes_search_query{ data: {url: request_url }}
 
+%h3#close-serial-searches
+  Close serial number searches
+%p
+  You can search for bikes that have a similar serial number to the one you enter, in case you're worried about a transcription error.
+%p
+  These are the results displayed under "Serial numbers close to ..." in the web search
+%p
+  This accepts all of the parameters of search above with the following difference:
+%article.code
+  %table.table
+    %tbody
+      %tr
+        %td
+          %code
+            serial
+        %td
+          string
+        %td
+          Required: Serial number to be close to
+
+%article.code
+  .code-label
+    GET bikes with serial number close to 'EN14764'
+  - request_url = @root + close_serials_api_v1_bikes_path(serial: "EN14764")
+  %pre
+    :plain
+      $.ajax({
+        type: "GET",
+        url: "#{request_url}",
+        success: function(data, textStatus, jqXHR) {
+          $('#bikes_search_close_query').text(JSON.stringify(data,undefined,2))
+        }
+      });
+
+  .code-label
+    Response
+  %pre#bikes_search_close_query{ data: {url: request_url }}
