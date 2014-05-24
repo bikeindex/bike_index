@@ -199,19 +199,14 @@ describe Api::V1::BikesController do
         rear_wheel_bsd: "559",
         color: FactoryGirl.create(:color).name,
         owner_email: "jsoned@examples.com",
-        send_email: false
+        send_email: 'false'
       }
       options = { bike: bike.to_json, organization_slug: @organization.slug, access_token: @organization.access_token } 
       Resque.should_not_receive(:enqueue)
       lambda { 
         post :create, options
       }.should change(Ownership, :count).by(1)
-      pp Ownership.last
-      # b_param = BParam.last
-      # pp b_param
-      # pp b_param.params[:bike][:send_email]
-
-      response.code.should eq("200")    
+      response.code.should eq("200")
     end
   end
 
