@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140524183616) do
+ActiveRecord::Schema.define(:version => 20140525163552) do
 
   create_table "alternate_emails", :force => true do |t|
     t.string   "email"
@@ -358,6 +358,7 @@ ActiveRecord::Schema.define(:version => 20140524183616) do
     t.string   "org_type",                   :default => "shop", :null => false
     t.string   "access_token"
     t.text     "new_bike_notification"
+    t.boolean  "api_access_approved",        :default => false,  :null => false
   end
 
   add_index "organizations", ["slug"], :name => "index_organizations_on_slug", :unique => true

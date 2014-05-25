@@ -12,6 +12,7 @@ class Organization < ActiveRecord::Base
     :locations_attributes,
     :embedable_user_email,
     :auto_user_id,
+    :api_access_approved,
     :access_token,
     :new_bike_notification,
     :lightspeed_cloud_api_key
