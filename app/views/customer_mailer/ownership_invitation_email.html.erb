@@ -25,15 +25,14 @@
   <% else %>
     <p>
       <strong>
-        <% if @ownership.creator.name %>
+        <% if @creation_org.present? %>
+          <%= @creation_org.name %>
+        <% elsif @ownership.creator.name %>
           <%= @ownership.creator.name %>
         <% else %>
           <%= @ownership.creator.email %>
         <% end %>
       </strong>
-      <% if @creation_org.present? %>
-        from <em><%= @creation_org.name %> </em>
-      <% end %>
       <% if @new_bike %>
         added a 
       <% else %>
