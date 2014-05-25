@@ -41,7 +41,7 @@ describe BikeCreatorAssociator do
     end
   end
 
-  describe :create_stolen_record do 
+  describe :create_stolen_record do
     it "should call create stolen record and set_creation_organization" do 
       b_param = BParam.new
       bike = Bike.new 

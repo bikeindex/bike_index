@@ -1,5 +1,6 @@
 class BikeSearcher
-  def initialize(creation_params = {})
+  def initialize(creation_params = {},approved=nil)
+    @approved = approved
     @params = creation_params
     @bikes = Bike.scoped
     if @params[:serial].present?
@@ -53,7 +54,12 @@ class BikeSearcher
     proximity = 500
     proximity = @params[:proximity_radius] if @params[:proximity_radius].present? && @params[:proximity_radius].strip.length > 0
     stolen_ids = @bikes.pluck(:current_stolen_record_id)
-    bike_ids = StolenRecord.where('id in (?)', stolen_ids).near(@params[:proximity], proximity).pluck(:bike_id)
+    if @approved
+      stole = StolenRecord.where('id in (?)', stolen_ids).where(approved: true)
+    else
+      stole = StolenRecord.where('id in (?)', stolen_ids)
+    end
+    bike_ids = stole.near(@params[:proximity], proximity).pluck(:bike_id)
     @bikes = @bikes.where('id in (?)', bike_ids)
   end
 

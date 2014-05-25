@@ -112,6 +112,7 @@ Bikeindex::Application.routes.draw do
         collection do
           get 'search_tags'
           get 'close_serials'
+          get 'stolen_ids'
         end
       end
       resources :cycle_types, only: [:index]

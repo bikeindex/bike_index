@@ -10,6 +10,29 @@ describe Api::V1::BikesController do
     end
   end
 
+  describe :stolen_ids do
+    it "should return correct code if no org" do 
+      c = FactoryGirl.create(:color)
+      get :stolen_ids, format: :json
+      response.code.should eq("401")
+    end
+
+    it "should return an array of ids" do
+      bike = FactoryGirl.create(:bike)
+      stole1 = FactoryGirl.create(:stolen_record)
+      stole2 = FactoryGirl.create(:stolen_record, approved: true)
+      organization = FactoryGirl.create(:organization)
+      user = FactoryGirl.create(:user)
+      FactoryGirl.create(:membership, user: user, organization: organization)
+      get :stolen_ids, { stolen: true, organization_slug: organization.slug, access_token: organization.access_token}, format: :json
+      response.code.should eq('200')
+      pp response
+      bikes = JSON.parse(response.body)
+      bikes.count.should eq(1)
+      bikes.first.should eq(stole2.bike.id)
+    end
+  end
+
   describe :show do
     it "should load the page" do
       bike = FactoryGirl.create(:bike)
