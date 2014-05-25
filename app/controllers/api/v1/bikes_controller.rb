@@ -24,7 +24,6 @@ module Api
 
       def stolen_ids
         bikes = BikeSearcher.new(params, true).find_bikes
-        pp bikes.pluck(:id)
         if params[:updated_since]
           since_date = DateTime.parse(params[:updated_since])
           bikes = bikes.where("updated_at >= ?", since_date)
