@@ -64,7 +64,7 @@ class BikeSerializer < ActiveModel::Serializer
     elsif object.stock_photo_url.present?
       small = object.stock_photo_url.split('/')
       ext = "/small_" + small.pop
-      h.image_tag(small.join('/') + ext, alt: title)
+      small.join('/') + ext
     else
       nil
     end    
