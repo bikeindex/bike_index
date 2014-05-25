@@ -1,6 +1,8 @@
 #chosen-container
   %ul.bike-boxes
     = render partial: "/bikes/bike", :locals => {bike: @bike, target: "show" }
+  %p
+    = @stolen_record.theft_description if @stolen_record.present?
   %h4
     = link_to "Standard edit page", edit_admin_bike_url(@bike)
   .dl-holder
