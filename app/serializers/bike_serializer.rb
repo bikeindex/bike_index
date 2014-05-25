@@ -48,7 +48,7 @@ class BikeSerializer < ActiveModel::Serializer
   end
 
   def photo
-    if object.thumb_path
+    if object.public_images.present?
       object.public_images.first.image_url(:large)
     elsif object.stock_photo_url.present?
       object.stock_photo_url
