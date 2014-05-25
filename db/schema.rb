@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140525173416) do
+ActiveRecord::Schema.define(:version => 20140525183759) do
 
   create_table "alternate_emails", :force => true do |t|
     t.string   "email"
@@ -362,6 +362,14 @@ ActiveRecord::Schema.define(:version => 20140525173416) do
   end
 
   add_index "organizations", ["slug"], :name => "index_organizations_on_slug", :unique => true
+
+  create_table "other_listings", :force => true do |t|
+    t.integer  "bike_id"
+    t.string   "url"
+    t.string   "listing_type"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+  end
 
   create_table "ownerships", :force => true do |t|
     t.integer  "bike_id"

@@ -52,6 +52,17 @@ describe BikeCreatorAssociator do
     end
   end
 
+  describe :add_other_listings do 
+    it "should call create stolen record and set_creation_organization" do 
+      b_param = BParam.new
+      bike = FactoryGirl.create(:bike)
+      urls = ['http://some_blog.com', 'http://some_thing.com']
+      b_param.stub(:params).and_return({bike: {other_listing_urls: urls}})
+      BikeCreatorAssociator.new(b_param).add_other_listings(bike)
+      bike.other_listings.reload.pluck(:url).should eq(urls)
+    end
+  end
+
   describe :update_bike_token do 
     it "should set the bike_token to the bike" do 
       b_param = BParam.new
@@ -101,6 +112,8 @@ describe BikeCreatorAssociator do
       creator.should_receive(:create_components).and_return(bike)
       creator.should_receive(:create_normalized_serial_segments).and_return(bike)
       creator.should_receive(:attach_photo)
+      creator.should_receive(:attach_photos)
+      creator.should_receive(:add_other_listings)
       creator.associate(bike)
     end
     it "should rescue from the error and add the message to the bike" do 

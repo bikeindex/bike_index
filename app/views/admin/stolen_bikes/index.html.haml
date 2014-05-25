@@ -2,6 +2,11 @@
 %header.with-subtitle
   %h1
     Stolen Bikes
+  - if @verified_only
+    = link_to 'All stolen', admin_stolen_bikes_url, class: "sharing-links"
+  - else
+    = link_to 'Only non-verified', admin_stolen_bikes_url(unapproved: true), class: "sharing-links"
+
   
 %h4
   = Bike.where(stolen: true).count
@@ -11,7 +16,7 @@
 
 
 %section.full-screen-table
-  %table#truncated-data-table.table.table-striped.table-bordered
+  %table.table.table-striped.table-bordered
     %thead
       %th
         Date indexed
@@ -20,7 +25,10 @@
       %th.large-screens
         Theft info
       %th
+        Location
+      %th
         Approved
+
       
     %tbody
       - @bikes.each do |bike|
@@ -33,7 +41,7 @@
                     = bike.id 
                 - else
                   = bike.id 
-              %a{href: edit_admin_bike_url(bike) }
+              %a{href: edit_admin_stolen_bike_url(bike) }
 
                 - if bike.created_at.today?
                   Today at #{bike.created_at.strftime("%-I %p")}
@@ -46,7 +54,10 @@
           %td.large-screens
             - if bike.current_stolen_record.present?
               = bike.current_stolen_record.theft_description
-
           %td
-            = "&#x2713;".html_safe 
-            
+            = "&#x2713;".html_safe if bike.current_stolen_record.address.present?
+          %td
+            = "&#x2713;".html_safe if bike.current_stolen_record.approved
+
+  .paginate-container
+    = will_paginate @bikes 

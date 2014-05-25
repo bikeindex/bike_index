@@ -1,15 +1,29 @@
 #chosen-container
   %ul.bike-boxes
     = render partial: "/bikes/bike", :locals => {bike: @bike, target: "show" }
-  - if @bike.stolen
-    %h4
-      = link_to "Stolen edit page", edit_admin_stolen_bike_url(@bike)
+  %h4
+    = link_to "Standard edit page", edit_admin_bike_url(@bike)
   .dl-holder
     %dl.dl-horizontal
       = @bike.dl_list_item(@bike.created_at.strftime("%m-%d-%Y"), "Created")
       = @bike.dl_from_attribute("owner_email")
       = @bike.dl_list_item(@bike.owner.email, "Current Owner")
-      = @bike.dl_from_attribute("cached_data")
+      - if @stolen_record.approved 
+        %h2
+          Stolen bike approved
+      - else
+        = link_to 'Approve listing', approve_admin_stolen_bike_url(@bike), method: :post, class: 'button-blue padded'
+    %dl.dl-horizontal
+      - if @stolen_record.present?
+        = @bike.dl_list_item(@stolen_record.date_stolen.strftime("%m-%d-%Y"), "Stolen on")
+        = @bike.dl_list_item(@stolen_record.address, "Address")
+        = @bike.dl_list_item(@stolen_record.phone, "Phone")
+        = @bike.dl_list_item(@stolen_record.police_report_department, "Police department")
+        = @bike.dl_list_item(@stolen_record.police_report_number, "Police report")
+      - else
+        %h4
+          Stolen record not created yet.
+
   %hr
 
   = form_for [:admin, @bike], :html => { class: "form form-horizontal admin-bike-edit" } do |f|
@@ -103,52 +117,3 @@
       .control-group
         = submit_tag "Update the bike", class: "button-green"
         = link_to "Delete bike", admin_bike_url(@bike), method: :delete, confirm: "Are you sure?", class: "button-red"
-
-
-
-%section.full-screen-table
-  %table.table.table-striped.table-bordered
-    %thead
-      %th
-        ID
-      %th
-        Date Created
-      %th
-        Creator
-      %th
-        Owner email
-      %th
-        Current?
-      %th
-        Claimed?
-    %tbody
-      - @bike.ownerships.each do |ownership|
-        %tr
-          %td
-            = link_to ownership.id, edit_admin_ownership_url(ownership.id)
-          %td
-            - if ownership.created_at.today?
-              %span.hidden
-                = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              Today at #{ownership.created_at.strftime("%-I %p")}
-            - elsif Date.yesterday().beginning_of_day() <= ownership.created_at
-              %span.hidden
-                = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              Yesterday at #{ownership.created_at.strftime("%-I %p")}
-            - else
-              %span.hidden
-                = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              = ownership.created_at.strftime("%-m/%-d/%Y at %-I %p")
-          %td
-            - u = ownership.creator
-            - if u.name.present?
-              = u.name
-            - else
-              = u.email
-          %td
-            = ownership.owner_email
-          %td.table-cell-check
-            = "&#x2713;".html_safe if ownership.current
-          %td.table-cell-check
-            = "&#x2713;".html_safe if ownership.claimed
-

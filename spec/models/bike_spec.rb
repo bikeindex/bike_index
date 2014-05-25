@@ -25,6 +25,7 @@ describe Bike do
     it { should have_many :ownerships }
     it { should have_many :public_images }
     it { should have_many :components }
+    it { should have_many :other_listings }
     it { should accept_nested_attributes_for :stolen_records }
     it { should accept_nested_attributes_for :components }
     it { should validate_presence_of :cycle_type_id }

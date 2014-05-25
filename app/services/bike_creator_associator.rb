@@ -50,6 +50,12 @@ class BikeCreatorAssociator
     photos.each { |p| PublicImage.create(imageable: bike, remote_image_url: p) }
   end
 
+  def add_other_listings(bike)
+    return nil unless @b_param.params[:bike][:other_listing_urls].present?
+    urls = @b_param.params[:bike][:other_listing_urls]
+    urls.each { |url| OtherListing.create(url: url, bike_id: bike.id) }
+  end
+
   def associate(bike)
     begin 
       create_ownership(bike)
@@ -59,6 +65,7 @@ class BikeCreatorAssociator
       update_bike_token(bike) if bike.created_with_token
       attach_photo(bike)
       attach_photos(bike)
+      add_other_listings(bike)
     rescue => e
       bike.errors.add(:association_error, e.message)
     end

@@ -64,7 +64,8 @@ class Bike < ActiveRecord::Base
     :card_id,
     :stock_photo_url,
     :pdf,
-    :send_email
+    :send_email,
+    :other_listing_urls
 
   mount_uploader :pdf, PdfUploader
   process_in_background :pdf
@@ -90,6 +91,7 @@ class Bike < ActiveRecord::Base
 
   has_many :stolen_notifications, dependent: :destroy
   has_many :stolen_records
+  has_many :other_listings
   has_many :normalized_serial_segments
   has_many :ownerships, dependent: :destroy
   has_many :public_images, as: :imageable, dependent: :destroy
@@ -113,7 +115,7 @@ class Bike < ActiveRecord::Base
   # validates_presence_of :rear_wheel_size_id
   # validates_inclusion_of :rear_tire_narrow, :in => [true, false]
 
-  attr_accessor :date_stolen_input, :phone, :image, :bike_token_id, :b_param_id, :payment_required, :embeded, :embeded_extended, :paint_name, :bike_image_cache, :send_email
+  attr_accessor :other_listing_urls, :date_stolen_input, :phone, :image, :bike_token_id, :b_param_id, :payment_required, :embeded, :embeded_extended, :paint_name, :bike_image_cache, :send_email
 
   default_scope where(example: false).order("created_at desc")
   scope :stolen, where(stolen: true)
