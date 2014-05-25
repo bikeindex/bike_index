@@ -16,7 +16,8 @@ class BikeSerializer < ActiveModel::Serializer
     :description,
     :rear_tire_narrow,
     :front_tire_narrow,
-    :photo
+    :photo,
+    :thumb
 
   has_one :rear_wheel_size,
     :front_wheel_size,
@@ -52,6 +53,18 @@ class BikeSerializer < ActiveModel::Serializer
       object.public_images.first.image_url(:large)
     elsif object.stock_photo_url.present?
       object.stock_photo_url
+    else
+      nil
+    end    
+  end
+
+  def thumb
+    if object.public_images.present?
+      object.public_images.first.image_url(:small)
+    elsif object.stock_photo_url.present?
+      small = object.stock_photo_url.split('/')
+      ext = "/small_" + small.pop
+      h.image_tag(small.join('/') + ext, alt: title)
     else
       nil
     end    
