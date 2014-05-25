@@ -104,7 +104,7 @@ describe Api::V1::BikesController do
       f_count.should eq(Feedback.count)
     end
 
-    xit "should create a photos even inf one fails" do
+    it "should create a photos even inf one fails" do
       manufacturer = FactoryGirl.create(:manufacturer)
       FactoryGirl.create(:wheel_size, iso_bsd: 559)
       FactoryGirl.create(:cycle_type, slug: "bike")
@@ -124,7 +124,7 @@ describe Api::V1::BikesController do
         'http://i.imgur.com/lybYl1l.jpg',
         'http://bikeindex.org/not_actually_a_thing_404_and_shit'
       ]
-      post :create, { bike: bike, organization_slug: @organization.slug, access_token: @organization.access_token, components: components, photos: photos}
+      post :create, { bike: bike, organization_slug: @organization.slug, access_token: @organization.access_token, photos: photos}
       b = Bike.where(serial_number: "69 photo-test").first
       b.public_images.count.should eq(1)
     end

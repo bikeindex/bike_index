@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140525163552) do
+ActiveRecord::Schema.define(:version => 20140525173416) do
 
   create_table "alternate_emails", :force => true do |t|
     t.string   "email"
@@ -436,8 +436,8 @@ ActiveRecord::Schema.define(:version => 20140525163552) do
     t.string   "city"
     t.text     "theft_description"
     t.text     "time"
-    t.datetime "created_at",                                 :null => false
-    t.datetime "updated_at",                                 :null => false
+    t.datetime "created_at",                                  :null => false
+    t.datetime "updated_at",                                  :null => false
     t.integer  "bike_id"
     t.boolean  "current",                  :default => true
     t.string   "street"
@@ -456,6 +456,8 @@ ActiveRecord::Schema.define(:version => 20140525163552) do
     t.string   "police_report_department"
     t.integer  "state_id"
     t.integer  "creation_organization_id"
+    t.string   "secondary_phone"
+    t.boolean  "approved",                 :default => false, :null => false
   end
 
   create_table "users", :force => true do |t|

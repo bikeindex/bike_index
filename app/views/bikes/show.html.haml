@@ -94,6 +94,12 @@
               %dd
                 %a{ href: "tell:#{@stolen_record.phone}" }
                   = @stolen_record.display_phone
+              - if @stolen_record.secondary_phone.present?
+                %dt
+                  Secondary phone
+                %dd
+                  %a{ href: "tell:#{@stolen_record.secondary_phone}" }
+                    = @stolen_record.display_phone(@stolen_record.secondary_phone)
             = @bike.dl_list_item(@stolen_record.address, "Location")
             = @bike.dl_list_item(@stolen_record.locking_description, "Locking description")
             = @bike.dl_list_item(@stolen_record.lock_defeat_description, "Locking circumvented")

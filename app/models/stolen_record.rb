@@ -16,6 +16,7 @@ class StolenRecord < ActiveRecord::Base
     :theft_description,
     :current,
     :phone,
+    :secondary_phone,
     :phone_for_everyone,
     :phone_for_users,
     :phone_for_shops,
@@ -71,6 +72,7 @@ class StolenRecord < ActiveRecord::Base
   before_save :set_phone
   def set_phone
     self.phone = Phonifyer.phonify(self.phone) if self.phone 
+    self.secondary_phone = Phonifyer.phonify(self.secondary_phone) if self.secondary_phone 
   end
 
 

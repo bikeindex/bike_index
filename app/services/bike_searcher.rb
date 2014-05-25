@@ -50,8 +50,10 @@ class BikeSearcher
   end    
 
   def by_proximity
+    proximity = 500
+    proximity = @params[:proximity_radius] if @params[:proximity_radius].present? && @params[:proximity_radius].strip.length > 0
     stolen_ids = @bikes.pluck(:current_stolen_record_id)
-    bike_ids = StolenRecord.where('id in (?)', stolen_ids).near(@params[:proximity], 500).pluck(:bike_id)
+    bike_ids = StolenRecord.where('id in (?)', stolen_ids).near(@params[:proximity], proximity).pluck(:bike_id)
     @bikes = @bikes.where('id in (?)', bike_ids)
   end
 

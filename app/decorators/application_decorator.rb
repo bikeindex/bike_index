@@ -84,8 +84,7 @@ class ApplicationDecorator < Draper::Decorator
     html
   end
 
-  def display_phone
-    p = object.phone
+  def display_phone(p=object.phone)
     if p[/\+/]
       phone = number_to_phone(p.gsub(/\+\d*/,''), country_code: p[/\A.\d*/].gsub('+',''), delimiter: ' ' )
     else

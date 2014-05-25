@@ -32,4 +32,19 @@ describe StolenRecord do
       StolenRecord.scoped.to_sql.should == StolenRecord.where(current: true).to_sql
     end
   end
+
+  describe :stolen_record do 
+    it "it should set_phone" do 
+      stolen_record = FactoryGirl.create(:stolen_record)
+      stolen_record.phone = '000/000/0000'
+      stolen_record.secondary_phone = '000/000/0000'
+      stolen_record.set_phone
+      stolen_record.phone.should eq('0000000000')
+      stolen_record.secondary_phone.should eq('0000000000')
+    end
+    it "should have before_save_callback_method defined as a before_save callback" do
+      StolenRecord._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_phone).should == true
+    end
+  end
+
 end

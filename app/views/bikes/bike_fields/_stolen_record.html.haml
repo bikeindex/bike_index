@@ -17,6 +17,10 @@
       = f.label :phone, class: "control-label"
       .controls
         = f.text_field :phone, required: "true"
+    .control-group.extra-field
+      = f.label :secondary_phone, class: "control-label"
+      .controls
+        = f.text_field :secondary_phone
     .control-group.stolen-phone-groups
       %label.control-label
         Show phone number to:
