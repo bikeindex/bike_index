@@ -33,6 +33,16 @@ describe StolenRecord do
     end
   end
 
+  describe :tsv_row do 
+    it "should return the tsv row" do 
+      stolen_record = FactoryGirl.create(:stolen_record)
+      stolen_record.bike.update_attribute :description, "I like tabs because i'm a jerk\t sometimes\n"
+      row = stolen_record.tsv_row
+      row.gsub("/\t",'').split("\t").count.should eq(9)
+      row.gsub("/\n",'').split("\n").count.should eq(1)
+    end
+  end
+
   describe :stolen_record do 
     it "it should set_phone" do 
       stolen_record = FactoryGirl.create(:stolen_record)

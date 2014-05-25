@@ -1,0 +1,31 @@
+!!!
+%html
+  %head
+    = header_tags
+    = csrf_meta_tags
+    <link rel="shortcut icon" href="/fav.ico" />
+    = stylesheet_link_tag "application", :media => "all"
+    <link href='https://fonts.googleapis.com/css?family=Rambla:400' rel='stylesheet' type='text/css'>
+    = javascript_include_tag "application"
+    <!-- Pulled from https://code.google.com/p/html5shiv/ -->
+    <!--[if lt IE 9]>
+    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lte IE 8]>
+    <script type="text/javascript">$(function() {$('body').prepend("<body class='welcome-page' id='body'><div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, the Bike Index (and the internet in general) is broken and ugly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>");});</script>
+    <![endif]-->
+    
+    - if controller_name == "blogs"
+      = auto_discovery_link_tag(:atom, blogs_url(format: "atom"), {:title => "Bike Index"})
+
+  %body
+  %header.global-header#header
+    = render 'shared/header_nav'
+
+  %section.content
+    .receptacle
+      .inner-recep
+
+        = yield
+    
+  = render 'shared/footer'

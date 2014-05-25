@@ -131,6 +131,10 @@ Bikeindex::Application.routes.draw do
     end
   end
 
+  resources :stolen, only: [:index] do 
+    collection { get 'tsv_download' }
+  end  
+  
   resources :manufacturers, only: [:show, :index]
   match 'manufacturers_mock_csv', to: 'manufacturers#mock_csv'
 

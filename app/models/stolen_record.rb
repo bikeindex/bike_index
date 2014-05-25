@@ -75,5 +75,34 @@ class StolenRecord < ActiveRecord::Base
     self.secondary_phone = Phonifyer.phonify(self.secondary_phone) if self.secondary_phone 
   end
 
+  def tsv_col(i)
+    col = ""
+    col << i.gsub("/\t","\t").gsub("\t","/\t").gsub("/\n","\n").gsub("\n","/\n") if i.present?
+    col
+  end
+
+  def tsv_row
+    b = self.bike 
+    return '' unless b.present?
+    row = ""
+    row << tsv_col(b.manufacturer_name)
+    row << "\t"
+    row << tsv_col(b.frame_model)
+    row << "\t"
+    row << tsv_col(b.frame_colors.to_sentence)
+    row << tsv_col(b.description)
+    row << " #{tsv_col(self.theft_description)}"
+    row << " Stolen from: #{tsv_col(self.address)}"
+    row << "\t"
+    row << "Article\t"
+    row << self.date_stolen.strftime("%Y-%m-%d-")
+    row << "\t"
+    row << tsv_col(self.police_report_number)
+    row << "\t"
+    row << tsv_col(self.police_report_department)
+    row << "\t\t"
+    row << "https://bikeindex.org/bikes/#{b.id}\n"
+    row
+  end
 
 end
