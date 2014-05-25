@@ -17,7 +17,7 @@ Congrats on adding your bike to the index!
 
 --------------------------------
 
-<% if @bike.stolen %><p>You added a stolen bike to the Bike Index:</p><% else %><% if @creation_org.present? %><%= @creation_org.name %><% elsif @ownership.creator.name %><%= @ownership.creator.name %><% else %><%= @ownership.creator.email %><% end %><% if @new_bike %> added a <% else %> sent you a <% end %><%= @biketype %> on the Bike Index <% if @new_bike %> for you <% end %><% end %>.
+<% if @creation_org.present? %><%= @creation_org.name %><% elsif @ownership.creator.name %><%= @ownership.creator.name %><% else %><%= @ownership.creator.email %><% end %><% if @bike.stolen %>added a stolen<% elsif @new_bike %> added a <% else %> sent you a <% end %><%= @biketype %> on the Bike Index <% if @new_bike %> for you <% end %><% end %>.
 <% end # end of the creation_org notification %>
 
 ---

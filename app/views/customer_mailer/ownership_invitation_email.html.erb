@@ -16,13 +16,6 @@
   <% end %>
 
   <hr style="margin: 40px 0 30px;">
-
-
-  <% if @bike.stolen %>
-    <p>You added a stolen bike to the Bike Index:</p>
-  <% elsif @bike.created_with_token && @bike.ownerships.count < 2 %>
-    <p>Yeah! <em>Work those free bikes!</em></p>
-  <% else %>
     <p>
       <strong>
         <% if @creation_org.present? %>
@@ -33,7 +26,9 @@
           <%= @ownership.creator.email %>
         <% end %>
       </strong>
-      <% if @new_bike %>
+      <% if @bike.stolen %>
+        added a stolen
+      <% elsif @new_bike %>
         added a 
       <% else %>
         sent you a 
