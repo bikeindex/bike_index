@@ -80,9 +80,13 @@ describe Api::V1::BikesController do
           component_type: 'wheel'
         }
       ]
+      photos = [
+        'http://i.imgur.com/lybYl1l.jpg',
+        'http://i.imgur.com/3BGQeJh.jpg'
+      ]
       OwnershipCreator.any_instance.should_receive(:send_notification_email)
       lambda { 
-        post :create, { bike: bike, organization_slug: @organization.slug, access_token: @organization.access_token, components: components}
+        post :create, { bike: bike, organization_slug: @organization.slug, access_token: @organization.access_token, components: components, photos: photos}
       }.should change(Ownership, :count).by(1)
       response.code.should eq("200")
       b = Bike.where(serial_number: "69 non-example").first
@@ -96,6 +100,7 @@ describe Api::V1::BikesController do
       b.components.first.year.should eq(1999)
       b.components.first.manufacturer_id.should eq(manufacturer.id)
       b.components.first.model_name.should eq('Richie rich')
+      b.public_images.count.should eq(2)
       f_count.should eq(Feedback.count)
     end
 
