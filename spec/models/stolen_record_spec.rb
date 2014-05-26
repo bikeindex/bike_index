@@ -39,7 +39,7 @@ describe StolenRecord do
       stolen_record.bike.update_attribute :description, "I like tabs because i'm a jerk\t sometimes\n"
       row = stolen_record.tsv_row
       row.gsub("/\t",'').split("\t").count.should eq(9)
-      row.gsub("/\n",'').split("\n").count.should eq(1)
+      row.split("\n").count.should eq(1)
     end
   end
 
