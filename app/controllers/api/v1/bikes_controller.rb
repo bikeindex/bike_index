@@ -23,11 +23,15 @@ module Api
       end
 
       def stolen_ids
-        bikes = BikeSearcher.new(params, true).find_bikes
+        proximity = 500
+        proximity = @params[:proximity_radius] if @params[:proximity_radius].present? && @params[:proximity_radius].strip.length > 0
+        stolen = StolenRecord.where('id in (?)', stolen_ids).where(approved: true)
+        stolen = stolen.near(@params[:proximity], proximity)
         if params[:updated_since]
           since_date = DateTime.parse(params[:updated_since])
-          bikes = bikes.where("updated_at >= ?", since_date)
+          bikes = stolen.where("updated_at >= ?", since_date)
         end
+        bike_ids = stolen.pluck(:bike_id)
         respond_with bikes.pluck(:id)
       end
 

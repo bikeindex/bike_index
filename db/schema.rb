@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140526141810) do
+ActiveRecord::Schema.define(:version => 20140526161223) do
 
   create_table "alternate_emails", :force => true do |t|
     t.string   "email"
@@ -479,6 +479,7 @@ ActiveRecord::Schema.define(:version => 20140526141810) do
     t.integer  "creation_organization_id"
     t.string   "secondary_phone"
     t.boolean  "approved",                 :default => false, :null => false
+    t.boolean  "receive_notifications",    :default => true
   end
 
   create_table "users", :force => true do |t|

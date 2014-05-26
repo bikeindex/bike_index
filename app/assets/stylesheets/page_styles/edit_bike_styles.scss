@@ -553,6 +553,24 @@
   }
 }
 
+.receive-notifications {
+  padding-left: 25px;
+  position: relative;
+  input {
+    position: absolute;
+    left: 0;
+    top: .75em;
+  }
+  label {
+    font-size: 18px;
+  }
+  span {
+    display: block;
+    color: $grayLight;
+    font-size: 16px;
+  }
+}
+
 @media (max-width: 500px) {
   .stolen-phone-groups {
     margin-top: 10px;

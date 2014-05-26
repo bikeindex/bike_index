@@ -1,12 +1,15 @@
 require "spec_helper"
 
-describe AdminStolenEmailJob do
+describe OwnershipInvitationEmailJob do
 
   describe :perform do
+    before :each do
+      @ownership = FactoryGirl.create(:ownership)
+    end
+
     it "should send an email" do
-      customer_contact = FactoryGirl.create(:customer_contact)
       ActionMailer::Base.deliveries = []
-      AdminStolenEmailJob.perform(customer_contact.id)
+      OwnershipInvitationEmailJob.perform(@ownership.id)
       ActionMailer::Base.deliveries.should_not be_empty
     end
   end
