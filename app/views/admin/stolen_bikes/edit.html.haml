@@ -1,3 +1,33 @@
+= form_for [:admin, @customer_contact], :html => { class: "form form-horizontal admin-bike-edit" } do |f|
+  - if @customer_contact.errors.any?
+    #alert-block
+      .alert.alert-error
+        %a.close{"data-dismiss" => "alert"} ×
+        %h4
+          Please fix the following 
+          = pluralize(@customer_contact.errors.count, "error")
+        %ul
+          - @customer_contact.errors.full_messages.each do |msg|
+            %li 
+              = msg  
+  .feedbacks
+    %h4
+      Send bike owner an email
+    .contact-info
+      .contact-first-row
+        = f.email_field :creator_email, value: current_user.email
+        = f.email_field :user_email, value: @bike.owner_email
+      = f.text_field :title, value: "Your stolen #{@bike.title_string}"
+      = f.hidden_field :contact_type, value: 'stolen_contact'
+      = f.hidden_field :creator_id, value: current_user.id
+      = f.hidden_field :bike_id, value: @bike.id
+    .contact-text
+      - stolen_message = "\n\n\nThis is regarding #{link_to @bike.title_string, bike_url(@bike)}"
+      = f.text_area :body, value: stolen_message, rows: 7   
+    .feedback-actions.control-group.padded
+      = f.submit 'Send it!', class: 'button-green pull-right'
+  
+
 #chosen-container
   %ul.bike-boxes
     = render partial: "/bikes/bike", :locals => {bike: @bike, target: "show" }
@@ -14,7 +44,7 @@
         %h2
           Stolen bike approved
       - else
-        = link_to 'Approve listing', approve_admin_stolen_bike_url(@bike), method: :post, class: 'button-blue padded'
+        = link_to 'Approve listing', approve_admin_stolen_bike_url(@bike), method: :post, confirm: "Approving will:\n\n- Send out a tweet\n- The #{@bike.type} will be posted to any pertinent blogs.\n- It can NOT be effectively reversed\n", class: 'button-blue padded'
     %dl.dl-horizontal
       - if @stolen_record.present?
         = @bike.dl_list_item(@stolen_record.date_stolen.strftime("%m-%d-%Y"), "Stolen on")

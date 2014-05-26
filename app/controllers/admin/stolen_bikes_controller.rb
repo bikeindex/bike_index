@@ -33,6 +33,7 @@ class Admin::StolenBikesController < Admin::BaseController
 
   def edit
     @stolen_record = @bike.current_stolen_record
+    @customer_contact = CustomerContact.new
     @bike = @bike.decorate
   end
 

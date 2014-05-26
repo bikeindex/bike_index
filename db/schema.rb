@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140525183759) do
+ActiveRecord::Schema.define(:version => 20140526141810) do
 
   create_table "alternate_emails", :force => true do |t|
     t.string   "email"
@@ -183,6 +183,19 @@ ActiveRecord::Schema.define(:version => 20140525183759) do
     t.datetime "updated_at",                        :null => false
     t.boolean  "has_multiple",   :default => false, :null => false
     t.integer  "cgroup_id"
+  end
+
+  create_table "customer_contacts", :force => true do |t|
+    t.integer  "user_id"
+    t.string   "user_email"
+    t.integer  "creator_id"
+    t.string   "creator_email"
+    t.string   "title"
+    t.string   "contact_type"
+    t.text     "body"
+    t.integer  "bike_id"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
   end
 
   create_table "cycle_types", :force => true do |t|

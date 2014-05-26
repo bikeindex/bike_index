@@ -204,4 +204,14 @@ FactoryGirl.define do
     date_stolen Time.now 
   end
 
+  factory :customer_contact do 
+    association :creator, factory: :user
+    title 'Some title'
+    body 'some message'
+    creator_email 'something@example.com'
+    user_email 'something_else@example.com'
+    send_association '1'
+    contact_type 'stolen_message'
+  end
+
 end
