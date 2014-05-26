@@ -7,7 +7,7 @@ class StolenController < ApplicationController
 
   def tsv_download
     tsv = "Make\tModel\tSerial\tDescription\tArticleOrGun\tDateOfTheft\tCaseNumber\tLEName\tLEContact\tComments\n"
-    StolenRecord.where(current: true).where(approved: false).each { |r| tsv << r.tsv_row }
+    StolenRecord.where(current: true).where(approved: true).each { |r| tsv << r.tsv_row }
     send_data tsv, filename: 'stolen_bikes.tsv'
   end
 
