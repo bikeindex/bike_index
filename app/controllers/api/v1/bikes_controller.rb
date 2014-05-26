@@ -23,16 +23,17 @@ module Api
       end
 
       def stolen_ids
-        proximity = 500
-        proximity = @params[:proximity_radius] if @params[:proximity_radius].present? && @params[:proximity_radius].strip.length > 0
-        stolen = StolenRecord.where('id in (?)', stolen_ids).where(approved: true)
-        stolen = stolen.near(@params[:proximity], proximity)
+        stolen = StolenRecord.where(approved: true)
+        if params[:proximity].present?
+          radius = 500
+          radius = params[:proximity_radius] if params[:proximity_radius].present? && params[:proximity_radius].strip.length > 0
+          stolen = stolen.near(params[:proximity], radius)
+        end
         if params[:updated_since]
           since_date = DateTime.parse(params[:updated_since])
-          bikes = stolen.where("updated_at >= ?", since_date)
+          stolen = stolen.where("updated_at >= ?", since_date)
         end
-        bike_ids = stolen.pluck(:bike_id)
-        respond_with bikes.pluck(:id)
+        respond_with stolen.pluck(:bike_id)
       end
 
       def close_serials
