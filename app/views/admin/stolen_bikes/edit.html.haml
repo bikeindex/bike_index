@@ -22,8 +22,7 @@
       = f.hidden_field :creator_id, value: current_user.id
       = f.hidden_field :bike_id, value: @bike.id
     .contact-text
-      - stolen_message = "\n\n\nThis is regarding #{link_to @bike.title_string, bike_url(@bike)}"
-      = f.text_area :body, value: stolen_message, rows: 7   
+      = f.text_area :body, placeholder: "You can write HTML in here. There will be a link to the #{@bike.type} included automatically.", rows: 7   
     .feedback-actions.control-group.padded
       = f.submit 'Send it!', class: 'button-green pull-right'
   
@@ -33,13 +32,13 @@
     = render partial: "/bikes/bike", :locals => {bike: @bike, target: "show" }
   %p
     = @stolen_record.theft_description if @stolen_record.present?
-  %h4
-    = link_to "Standard edit page", edit_admin_bike_url(@bike)
   .dl-holder
     %dl.dl-horizontal
       = @bike.dl_list_item(@bike.created_at.strftime("%m-%d-%Y"), "Created")
       = @bike.dl_from_attribute("owner_email")
       = @bike.dl_list_item(@bike.owner.email, "Current Owner")
+      - if @bike.creation_organization_id.present?
+        = @bike.dl_list_item(@bike.creation_organization.name, "Creation Organization")
       - if @stolen_record.approved 
         %h2
           Stolen bike approved
@@ -47,105 +46,34 @@
         = link_to 'Approve listing', approve_admin_stolen_bike_url(@bike), method: :post, confirm: "Approving will:\n\n- Send out a tweet\n- The #{@bike.type} will be posted to any pertinent blogs.\n- It can NOT be effectively reversed\n", class: 'button-blue padded'
     %dl.dl-horizontal
       - if @stolen_record.present?
-        = @bike.dl_list_item(@stolen_record.date_stolen.strftime("%m-%d-%Y"), "Stolen on")
-        = @bike.dl_list_item(@stolen_record.address, "Address")
-        = @bike.dl_list_item(@stolen_record.phone, "Phone")
-        = @bike.dl_list_item(@stolen_record.police_report_department, "Police department")
-        = @bike.dl_list_item(@stolen_record.police_report_number, "Police report")
+        %dt
+          Stolen on
+        %dd
+          = @stolen_record.date_stolen.strftime("%m-%d-%Y")
+        %dt
+          Address
+        %dd
+          = @stolen_record.address
+        %dt
+          Phone
+        %dd
+          = @stolen_record.phone
+        = @bike.dl_list_item(@stolen_record.secondary_phone, "Secondary phone")
+
+        %dt
+          Police department
+        %dd
+          = @stolen_record.police_report_department
+        %dt
+          Police Report
+        = @stolen_record.police_report_number
       - else
         %h4
           Stolen record not created yet.
 
   %hr
-
-  = form_for [:admin, @bike], :html => { class: "form form-horizontal admin-bike-edit" } do |f|
-    .clearfix
-      .bike-fields
-        - if @bike.errors.any?
-          #alert-block
-            .alert.alert-error
-              %h4
-                Please fix the following 
-                = pluralize(@bike.errors.count, "error")
-              %ul
-                - @bike.errors.full_messages.each do |msg|
-                  %li
-                    = msg
-        .control-group
-          = f.label :cycle_type_id, "Cycle type", class: "control-label"
-          .controls
-            = collection_select( :bike, :cycle_type_id, CycleType.all, :id, :name, :required =>true )
-
-        .control-group
-          = f.label :serial_number, class: "control-label"
-          .controls
-            = f.text_field :serial_number, :required =>true
-        
-        .control-group
-          = f.label :has_no_serial, class: "control-label"
-          .controls
-            = f.check_box :has_no_serial
-
-
-        .control-group.chosen-select
-          = f.label :location_id, class: "control-label"
-          .controls
-            = f.text_field :location_id
-
-        .control-group.chosen-select
-          = f.label :manufacturer_id, class: "control-label"
-          .controls
-            = collection_select( :bike, :manufacturer_id, Manufacturer.frames, :id, :name, :required =>true, prompt: "Choose manufacturer")
-
-        .control-group
-          = f.label :manufacturer_other, "Other frame manufacturer", class: "control-label"
-          .controls
-            = f.text_field :manufacturer_other
-        
-        .control-group
-          = f.label :card_id, "Spokecard id", class: "control-label"
-          .controls
-            = f.text_field :card_id
-
-      .bike-fields
-        .control-group
-          = f.label :frame_model, class: "control-label"
-          .controls
-            = f.text_field :frame_model
-        .control-group
-          = f.label :year, class: "control-label"
-          .controls
-            = f.text_field :year
-        / disabled because we don't use it 
-        / .control-group
-        /   = f.label :created_with_token, class: "control-label"
-        /   .controls
-        /     = f.check_box :created_with_token
-        .control-group.chosen-select
-          = f.label :paint_id, "Paint description", class: "control-label"
-          .controls
-            = collection_select( :bike, :paint_id, Paint.all, :id, :name, required: true, prompt: "Choose paint" )
-        .control-group.chosen-select
-          = f.label :primary_frame_color_id, class: "control-label"
-          .controls
-            = collection_select( :bike, :primary_frame_color_id, Color.all, :id, :name, required: true, prompt: "Choose color" )
-        / Disabled for performance reasons 
-        / .control-group.chosen-select
-        /   = f.label :creator_id, class: "control-label"
-        /   .controls
-        /     = collection_select( :bike, :creator_id, User.all, :id, :email, :required =>true, prompt: "Choose creator")
-        .control-group.chosen-select
-          = f.label :creation_organization_id, class: "control-label"
-          .controls
-            = collection_select( :bike, :creation_organization_id, Organization.all, :id, :name, prompt: "Choose organization")
-
-        .control-group
-          = f.label :owner_email, class: "control-label"
-          .controls
-            = f.text_field :owner_email, :required =>true
-
-
-    .actions
-      .control-group
-        = submit_tag "Update the bike", class: "button-green"
-        = link_to "Delete bike", admin_bike_url(@bike), method: :delete, confirm: "Are you sure?", class: "button-red"
+  = link_to "Standard edit page", edit_admin_bike_url(@bike)
+  .clearfix
+    - @bike.public_images.each do |img|
+      .pull-left
+        = image_tag img.image_url(:small)

@@ -206,11 +206,11 @@ FactoryGirl.define do
 
   factory :customer_contact do 
     association :creator, factory: :user
+    association :bike
     title 'Some title'
     body 'some message'
     creator_email 'something@example.com'
     user_email 'something_else@example.com'
-    send_association '1'
     contact_type 'stolen_message'
   end
 

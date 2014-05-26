@@ -17,7 +17,7 @@ describe Api::V1::BikesController do
       response.code.should eq("401")
     end
 
-    it "should return an array of ids" do
+    xit "should return an array of ids" do
       bike = FactoryGirl.create(:bike)
       stole1 = FactoryGirl.create(:stolen_record)
       stole2 = FactoryGirl.create(:stolen_record, approved: true)
