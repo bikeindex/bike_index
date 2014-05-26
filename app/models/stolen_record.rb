@@ -77,7 +77,7 @@ class StolenRecord < ActiveRecord::Base
 
   def tsv_col(i)
     col = ""
-    col << i.gsub("/\t","\t").gsub("\t","/\t").gsub("\n",' ') if i.present?
+    col << i.gsub("/\t","\t").gsub("\t","/\t").gsub("\r",' ').gsub("\n",' ') if i.present?
     col
   end
 

@@ -1,9 +1,16 @@
 !!!
 %html
   %head
-    = header_tags
-    = csrf_meta_tags
-    <link rel="shortcut icon" href="/fav.ico" />
+    <title lang='en'>Stolen Bike Registry</title>
+    <meta name="charset" content="utf-8"/>
+    <meta name="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <meta name="description" content="Stolen Bike Registry - the best, most comprehensive stolen bike registration system in the universe"/>
+    <meta property="og:url" content="https://bikeindex.org/stolen"/>
+    <meta property="og:image" content="https://bikeindex.org/assets/logos/bw_transparent.png"/>
+    <meta property="og:site_name" content="Stolen Bike Registry"/>
+    <meta property="twitter:card" content="summary"/>
+    <link rel="shortcut icon" href="/sbr.ico" />
     = stylesheet_link_tag "application", :media => "all"
     <link href='https://fonts.googleapis.com/css?family=Rambla:400' rel='stylesheet' type='text/css'>
     = javascript_include_tag "application"
@@ -19,13 +26,9 @@
       = auto_discovery_link_tag(:atom, blogs_url(format: "atom"), {:title => "Bike Index"})
 
   %body
-  %header.global-header#header
-    = render 'shared/header_nav'
+  
+  .sbr-wrap
 
-  %section.content
-    .receptacle
-      .inner-recep
-
-        = yield
+    = yield
     
   = render 'shared/footer'

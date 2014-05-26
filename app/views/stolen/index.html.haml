@@ -1,2 +1,46 @@
-%h1
-  Stolen Bikes on the Index
+%section
+  .receptacle
+    .inner-recep
+      = link_to 'List a stolen bike', new_bike_url(stolen: true), class: 'pull-right'
+      %h1
+        Stolen Bike Registry
+
+      = form_tag bikes_path, method: :get, id: "head-search-bikes" do 
+        = hidden_field_tag :stolen, true
+        .search-fields#header-search
+          %span.search-background
+          = text_field_tag :query,                          |
+            params[:query],                                 |
+            placeholder: "Search bike traits",              |
+            :data => { url: search_tags_api_v1_bikes_url }, |
+            class: "search-text-field"                      |
+          .search-button
+            = submit_tag "Search", name: "search", class: "button-blue"
+          
+            = text_field_tag :serial, params[:serial], placeholder: 'Serial number lookup'
+            
+          .proximity#stolen-proximity
+            = text_field_tag :proximity, params[:proximity], placeholder: 'Location to prioritize'
+            %span
+              area thefts first
+%section
+  .receptacle
+    .inner-recep
+      %h2
+        Get Involved!
+      .involve-yerself
+        %h3
+          Report CL seller
+      .involve-yerself
+        %h3
+          Report chop shop
+      .involve-yerself
+        %h3
+          Add recent stolen bikes to your page
+        = link_to 'Wordpress plugin', 'https://github.com/purcebr/bike-index-listings'
+
+%section
+  .receptacle
+    .inner-recep
+
+      = render 'stolen/stickers'
