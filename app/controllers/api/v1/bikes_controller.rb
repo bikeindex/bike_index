@@ -66,18 +66,20 @@ module Api
       end
 
       def send_notification_email
-        bike = Bike.find(params[:bike_id])
-        if bike.current_stolen_record.present? && bike.current_stolen_record.approved
-          customer_contact = CustomerContact.new(body: params[:body], title: params[:title], bike_id: bike.id)
-          customer_contact.user_email = bike.email
-          customer_contact.creator_id = @organization.auto_user.id
-          customer_contact.creator_email = @organization.auto_user.email
-          if customer_contact.save
-            Resque.enqueue(AdminStolenEmailJob, @customer_contact.id)
-            render json: { success: true }
+        unless @organization.slug == 'example'
+          bike = Bike.find(params[:bike_id])
+          if bike.current_stolen_record.present? && bike.current_stolen_record.approved
+            customer_contact = CustomerContact.new(body: params[:body], title: params[:title], bike_id: bike.id)
+            customer_contact.user_email = bike.email
+            customer_contact.creator_id = @organization.auto_user.id
+            customer_contact.creator_email = @organization.auto_user.email
+            if customer_contact.save
+              Resque.enqueue(AdminStolenEmailJob, @customer_contact.id)
+              render json: { success: true }
+            end
           end
         end
-        render json: e, status: :unprocessable_entity and return
+        render json: {error: "Unable to send that email, srys"}, status: :unprocessable_entity and return
         
       end
     
