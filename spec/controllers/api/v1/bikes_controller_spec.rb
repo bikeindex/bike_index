@@ -17,14 +17,15 @@ describe Api::V1::BikesController do
       response.code.should eq("401")
     end
 
-    xit "should return an array of ids" do
+    it "should return an array of ids" do
       bike = FactoryGirl.create(:bike)
       stole1 = FactoryGirl.create(:stolen_record)
       stole2 = FactoryGirl.create(:stolen_record, approved: true)
       organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:user)
       FactoryGirl.create(:membership, user: user, organization: organization)
-      get :stolen_ids, { stolen: true, organization_slug: organization.slug, access_token: organization.access_token}, format: :json
+      options = { stolen: true, organization_slug: organization.slug, access_token: organization.access_token}
+      get :stolen_ids, , format: :json
       response.code.should eq('200')
       pp response
       bikes = JSON.parse(response.body)

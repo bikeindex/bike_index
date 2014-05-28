@@ -1,29 +1,34 @@
-%section
+%section.sbr-main-section
   .receptacle
     .inner-recep
-      = link_to 'List a stolen bike', new_bike_url(stolen: true), class: 'pull-right'
+      = link_to 'Register your stolen bike', new_bike_url(stolen: true), class: 'list-stolen-bike sbrbtn sbrbtn-default'
       %h1
         Stolen Bike Registry
 
-      = form_tag bikes_path, method: :get, id: "head-search-bikes" do 
+      = form_tag bikes_path, method: :get, class: 'sbr-search-fields' do 
         = hidden_field_tag :stolen, true
-        .search-fields#header-search
-          %span.search-background
-          = text_field_tag :query,                          |
-            params[:query],                                 |
-            placeholder: "Search bike traits",              |
-            :data => { url: search_tags_api_v1_bikes_url }, |
-            class: "search-text-field"                      |
-          .search-button
-            = submit_tag "Search", name: "search", class: "button-blue"
-          
-            = text_field_tag :serial, params[:serial], placeholder: 'Serial number lookup'
-            
+        .sbr-search-inputs
+          = text_field_tag :query, params[:query], class: 'sbr-bike-search'
+          = submit_tag "Search", name: "search", class: "sbrbtn sbrbtn-success"
+          / # = text_field_tag :serial, params[:serial], placeholder: 'Search serial numbers', class: 'sbr-serial-search'
           .proximity#stolen-proximity
-            = text_field_tag :proximity, params[:proximity], placeholder: 'Location to prioritize'
             %span
-              area thefts first
-%section
+              Stolen near
+            = text_field_tag :proximity, params[:proximity], placeholder: 'anywhere'
+          .sbr-search-type
+            
+            searching
+            .sbrbtn-group
+              .sbrbtn.sbrbtn-default{ type: "button", :'data-searching' => 'serial' }
+                Serials
+              .sbrbtn.sbrbtn-default{ type: "button", :'data-searching' => 'description' }
+                Descriptions
+.sbr-banner
+  We get bikes back -
+  = StolenRecord.unscoped.where(current: false).count
+  and counting
+
+%section.sbr-get-involved
   .receptacle
     .inner-recep
       %h2
@@ -43,4 +48,4 @@
   .receptacle
     .inner-recep
 
-      = render 'stolen/stickers'
+      / # = render 'stolen/stickers'

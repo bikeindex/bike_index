@@ -1,3 +1,230 @@
+$brand-primary:         #428bca !default;
+$brand-success:         rgb(112,182,97) !default;
+$brand-info:            #5bc0de !default;
+$brand-warning:         #f0ad4e !default;
+$brand-danger:          #d9534f !default;
+$sbrbtn-font-weight:                normal !default;
+
+$sbrbtn-default-color:              #333 !default;
+$sbrbtn-default-bg:                 #fff !default;
+$sbrbtn-default-border:             #ccc !default;
+
+$sbrbtn-primary-color:              #fff !default;
+$sbrbtn-primary-bg:                 $brand-primary !default;
+$sbrbtn-primary-border:             darken($sbrbtn-primary-bg, 5%) !default;
+
+$sbrbtn-success-color:              #fff !default;
+$sbrbtn-success-bg:                 $brand-success !default;
+$sbrbtn-success-border:             darken($sbrbtn-success-bg, 5%) !default;
+
+$sbrbtn-info-color:                 #fff !default;
+$sbrbtn-info-bg:                    $brand-info !default;
+$sbrbtn-info-border:                darken($sbrbtn-info-bg, 5%) !default;
+
+$sbrbtn-warning-color:              #fff !default;
+$sbrbtn-warning-bg:                 $brand-warning !default;
+$sbrbtn-warning-border:             darken($sbrbtn-warning-bg, 5%) !default;
+
+$sbrbtn-danger-color:               #fff !default;
+$sbrbtn-danger-bg:                  $brand-danger !default;
+$sbrbtn-danger-border:              darken($sbrbtn-danger-bg, 5%) !default;
+
+$sbrbtn-link-disabled-color:        $grayLight !default;
+
+//
+// Buttons
+// --------------------------------------------------
+
+@mixin button-variant($color, $background, $border) {
+  color: $color;
+  background-color: $background;
+  border-color: $border;
+
+  &:hover,
+  &:focus,
+  &:active,
+  &.active,
+  .open > &.dropdown-toggle {
+    color: $color;
+    background-color: darken($background, 10%);
+        border-color: darken($border, 12%);
+  }
+  &:active,
+  &.active,
+  .open > &.dropdown-toggle {
+    background-image: none;
+  }
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    &,
+    &:hover,
+    &:focus,
+    &:active,
+    &.active {
+      background-color: $background;
+          border-color: $border;
+    }
+  }
+
+  .badge {
+    color: $background;
+    background-color: $color;
+  }
+}
+
+// Button sizes
+@mixin button-size($padding-vertical, $padding-horizontal, $font-size, $line-height, $border-radius) {
+  padding: $padding-vertical $padding-horizontal;
+  font-size: $font-size;
+  line-height: $line-height;
+  border-radius: $border-radius;
+}
+
+
+// Base styles
+// --------------------------------------------------
+
+.sbrbtn {
+  display: inline-block;
+  margin-bottom: 0; // For input.sbrbtn
+  font-weight: $sbrbtn-font-weight;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  background-image: none; // Reset unusual Firefox-on-Android default style; see https://github.com/necolas/normalize.css/issues/214
+  border: 1px solid transparent;
+  white-space: nowrap;
+  @include button-size(16px, 10px, 1em, 1em, 4px);
+  // @include button-size($padding-base-vertical, $padding-base-horizontal, $font-size-base, $line-height-base, $border-radius-base);
+  // @include user-select(none);
+
+  &,
+  &:active,
+  &.active {
+    &:focus {
+      @include tab-focus();
+    }
+  }
+
+  &:hover,
+  &:focus {
+    color: $sbrbtn-default-color;
+    text-decoration: none;
+  }
+
+  &:active,
+  &.active {
+    outline: 0;
+    background-image: none;
+    @include box-shadow(inset 0 3px 5px rgba(0,0,0,.125));
+  }
+
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    cursor: not-allowed;
+    pointer-events: none; // Future-proof disabling of clicks
+    @include opacity(.65);
+    @include box-shadow(none);
+  }
+}
+
+
+// Alternate buttons
+// --------------------------------------------------
+
+.sbrbtn-default {
+  @include button-variant($sbrbtn-default-color, $sbrbtn-default-bg, $sbrbtn-default-border);
+}
+.sbrbtn-primary {
+  @include button-variant($sbrbtn-primary-color, $sbrbtn-primary-bg, $sbrbtn-primary-border);
+}
+// Success appears as green
+.sbrbtn-success {
+  @include button-variant($sbrbtn-success-color, $sbrbtn-success-bg, $sbrbtn-success-border);
+}
+// Info appears as blue-green
+.sbrbtn-info {
+  @include button-variant($sbrbtn-info-color, $sbrbtn-info-bg, $sbrbtn-info-border);
+}
+// Warning appears as orange
+.sbrbtn-warning {
+  @include button-variant($sbrbtn-warning-color, $sbrbtn-warning-bg, $sbrbtn-warning-border);
+}
+// Danger and error appear as red
+.sbrbtn-danger {
+  @include button-variant($sbrbtn-danger-color, $sbrbtn-danger-bg, $sbrbtn-danger-border);
+}
+
+
+// Link buttons
+// -------------------------
+
+// Make a button look and behave like a link
+.sbrbtn-link {
+  color: $linkColor;
+  font-weight: normal;
+  cursor: pointer;
+  border-radius: 0;
+
+  &,
+  &:active,
+  &[disabled],
+  fieldset[disabled] & {
+    background-color: transparent;
+    @include box-shadow(none);
+  }
+  &,
+  &:hover,
+  &:focus,
+  &:active {
+    border-color: transparent;
+  }
+  &:hover,
+  &:focus {
+    color: $linkColorHover;
+    text-decoration: underline;
+    background-color: transparent;
+  }
+  &[disabled],
+  fieldset[disabled] & {
+    &:hover,
+    &:focus {
+      color: $sbrbtn-link-disabled-color;
+      text-decoration: none;
+    }
+  }
+}
+
+
+// Block button
+// --------------------------------------------------
+
+.sbrbtn-block {
+  display: block;
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+// Vertically space out multiple block buttons
+.sbrbtn-block + .sbrbtn-block {
+  margin-top: 5px;
+}
+
+// Specificity overrides
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+  &.sbrbtn-block {
+    width: 100%;
+  }
+}
+
+
+
+
 //________________________
 //
 // Stolen styles
@@ -5,8 +232,89 @@
 //________________________
 
 .sbr-wrap {
+  font-family: "Helvetica Neue";
+  h1, h2, h3, h4, input { font-family: "Helvetica Neue"; }
+  background: #f9f9f9;
+  color: #7a7a7a;
+  .list-stolen-bike {
+    float: right;
+    color: #7a7a7a;
+  }
+  input {
+    box-shadow: none;
+    border: 1px solid #cccdc8;
+    background: #fff;
+    color: darken(#7a7a7a, 20%);
+    margin-bottom: .75em;
+  }
   section {
     border-bottom: 1px solid $grayMed;
     padding: 30px 0;
-  }  
+  }
+}
+
+.sbr-main-section {
+  h1 {
+    text-align: center;
+    color: darken(#7a7a7a, 25%);
+  }
+}
+
+@media (min-width: 1000px) {
+  .sbr-main-section {
+    min-height: 400px;
+    padding: 50px 0 40px;
+    h1 {
+      padding: 100px 0 40px;
+    }
+  }
+}
+
+.sbr-search-fields {
+  @include clearfix;
+  max-width: 700px;
+  margin: 0 auto;
+  .sbr-bike-search, .sbr-serial-search {
+    padding: .4em .7em;
+    width: 79%;
+    float: left;
+  }
+  .sbr-serial-search { width: 100%; }
+  .proximity {
+    clear: both;
+    input {
+      background: none;
+      border: none;
+      box-shadow: none;
+      margin: 0 0 .1em .1em;
+      padding: 0;
+      line-height: 1em;
+      color: #7a7a7a;
+    }
+  }
+  .sbrbtn {
+    float: left;
+    display: block;
+    width: 20%;
+    padding: .52em;
+    margin: -.25em 0 0 1%;
+    // height: 100%;
+  }
+}
+
+// .sbr-search-texts {
+//   input {
+//     width: 100%;
+//   }
+// }
+
+.sbr-get-involved {
+  background: #fff;
+}
+
+.sbr-banner {
+  width: 100%;
+  padding: 1em 0;
+  text-align: center;
+  background: purple;
 }

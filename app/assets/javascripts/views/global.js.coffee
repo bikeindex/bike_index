@@ -71,22 +71,24 @@ class BikeIndex.Views.Global extends Backbone.View
         
 
   setProximityLocation: ->
-    unless $('#stolenness_query').length > 0 && $('#stolenness_query').attr('data-stolen')
-      $.ajax
-        type: "GET"
-        url: 'https://freegeoip.net/json/'
-        dataType: "jsonp",
-        success: (location) ->
-          $('#stolen-proximity #proximity').val("#{location.city}, #{location.zipcode}")
-
+    if $('#stolenness_query').length > 0 && $('#stolenness_query').attr('data-stolen').length > 0
+      return true
+    $.ajax
+      type: "GET"
+      url: 'https://freegeoip.net/json/'
+      dataType: "jsonp",
+      success: (location) ->
+        $('#stolen-proximity #proximity').val("#{location.region_name}")
+  
 
   setSearchfantasy: (tags) ->
-    $('#head-search-bikes #query').select2
-      tags: tags
-      openOnEnter: false
-      # matcher: (term, text) ->
-      #   text.toUpperCase().indexOf(term.toUpperCase()) >= 0
-      tokenSeparators: [","]
+    unless $('#sbr-body').length > 0
+      $('#head-search-bikes #query').select2
+        tags: tags
+        openOnEnter: false
+        # matcher: (term, text) ->
+        #   text.toUpperCase().indexOf(term.toUpperCase()) >= 0
+        tokenSeparators: [","]
   
   toggleCollapsibleHeader: ->
     # This is for the content pages where the search header is hidden

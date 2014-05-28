@@ -10,6 +10,7 @@
     <meta property="og:image" content="https://bikeindex.org/assets/logos/bw_transparent.png"/>
     <meta property="og:site_name" content="Stolen Bike Registry"/>
     <meta property="twitter:card" content="summary"/>
+    <meta property="twitter:site" content="@stolenbikereg"/>
     <link rel="shortcut icon" href="/sbr.ico" />
     = stylesheet_link_tag "application", :media => "all"
     <link href='https://fonts.googleapis.com/css?family=Rambla:400' rel='stylesheet' type='text/css'>
@@ -25,10 +26,10 @@
     - if controller_name == "blogs"
       = auto_discovery_link_tag(:atom, blogs_url(format: "atom"), {:title => "Bike Index"})
 
-  %body
+  %body#sbr-body
   
-  .sbr-wrap
+    .sbr-wrap
 
-    = yield
-    
-  = render 'shared/footer'
+      = yield
+      
+    = render 'shared/footer'
