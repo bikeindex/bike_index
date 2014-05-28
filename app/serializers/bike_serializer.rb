@@ -17,7 +17,8 @@ class BikeSerializer < ActiveModel::Serializer
     :rear_tire_narrow,
     :front_tire_narrow,
     :photo,
-    :thumb
+    :thumb,
+    :title_string
 
   has_one :rear_wheel_size,
     :front_wheel_size,

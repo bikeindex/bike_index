@@ -172,6 +172,17 @@ class Bike < ActiveRecord::Base
     self.stolen_records.last if self.stolen_records.any?
   end
 
+  def title_string
+    t = ""
+    t += "#{self.year} " if self.year.present?
+    t += "#{manufacturer_name} "
+    t += "#{self.frame_model} " if self.frame_model.present?
+    if self.type != "bike"
+      t += "#{self.type}" 
+    end
+    t
+  end
+
   def manufacturer_name
     if self.manufacturer.name == "Other" && self.manufacturer_other.present?
       self.manufacturer_other

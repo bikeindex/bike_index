@@ -31,17 +31,6 @@ class BikeDecorator < ApplicationDecorator
     h.content_tag(:span, t) + h.content_tag(:strong, mnfg_name)
   end
 
-  def title_string
-    t = ""
-    t += "#{object.year} " if object.year.present?
-    t += "#{mnfg_name} "
-    t += "#{object.frame_model} " if object.frame_model.present?
-    if object.type != "bike"
-      t += "#{object.type}" 
-    end
-    t
-  end
-
   def stolen_string
     return nil unless object.stolen and object.current_stolen_record.present?
     s = "Stolen "
