@@ -18,7 +18,7 @@ class BikeSerializer < ActiveModel::Serializer
     :front_tire_narrow,
     :photo,
     :thumb,
-    :title_string
+    :title
 
   has_one :rear_wheel_size,
     :front_wheel_size,
@@ -35,6 +35,10 @@ class BikeSerializer < ActiveModel::Serializer
 
   def api_url
     api_v1_bike_url(object)
+  end
+
+  def title
+    object.title_string + "(#{object.frame_colors.to_sentence.downcase})"
   end
   
   def registration_created_at
