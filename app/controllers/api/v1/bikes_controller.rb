@@ -30,12 +30,7 @@ module Api
           stolen = stolen.near(params[:proximity], radius)
         end
         if params[:updated_since]
-          since_date = params[:updated_since][/\d.*hours?.ago/i]
-          if since_date.present?
-            since_date = since_date.gsub(/\D/,'').to_i.hours.ago
-          else
-            since_date = DateTime.parse(params[:updated_since])
-          end
+          since_date = Time.at(params[:updated_since]).utc.to_datetime
           stolen = stolen.where("updated_at >= ?", since_date)
         end
         respond_with stolen.pluck(:bike_id)
