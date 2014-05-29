@@ -1,3 +1,4 @@
+$border-radius-base:         3px !default;
 $brand-primary:         #428bca !default;
 $brand-success:         rgb(112,182,97) !default;
 $brand-info:            #5bc0de !default;
@@ -222,6 +223,247 @@ input[type="button"] {
   }
 }
 
+//
+// Button groups
+// --------------------------------------------------
+
+// Make the div behave like a button
+.sbrbtn-group,
+.sbrbtn-group-vertical {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle; // match .sbrbtn alignment given font-size hack above
+  > .sbrbtn {
+    position: relative;
+    float: left;
+    // Bring the "active" button to the front
+    &:hover,
+    &:focus,
+    &:active,
+    &.active {
+      z-index: 2;
+    }
+    &:focus {
+      // Remove focus outline when dropdown JS adds it after closing the menu
+      outline: 0;
+    }
+  }
+}
+
+// Prevent double borders when buttons are next to each other
+.sbrbtn-group {
+  .sbrbtn + .sbrbtn,
+  .sbrbtn + .sbrbtn-group,
+  .sbrbtn-group + .sbrbtn,
+  .sbrbtn-group + .sbrbtn-group {
+    margin-left: -1px;
+  }
+}
+
+// Optional: Group multiple button groups together for a toolbar
+.sbrbtn-toolbar {
+  margin-left: -5px; // Offset the first child's margin
+  @include clearfix();
+
+  .sbrbtn-group,
+  .input-group {
+    float: left;
+  }
+  > .sbrbtn,
+  > .sbrbtn-group,
+  > .input-group {
+    margin-left: 5px;
+  }
+}
+
+.sbrbtn-group > .sbrbtn:not(:first-child):not(:last-child):not(.dropdown-toggle) {
+  border-radius: 0;
+}
+
+// Set corners individual because sometimes a single button can be in a .sbrbtn-group and we need :first-child and :last-child to both match
+.sbrbtn-group > .sbrbtn:first-child {
+  margin-left: 0;
+  &:not(:last-child):not(.dropdown-toggle) {
+    @include border-right-radius(0);
+  }
+}
+// Need .dropdown-toggle since :last-child doesn't apply given a .dropdown-menu immediately after it
+.sbrbtn-group > .sbrbtn:last-child:not(:first-child),
+.sbrbtn-group > .dropdown-toggle:not(:first-child) {
+  @include border-left-radius(0);
+}
+
+// Custom edits for including btn-groups within btn-groups (useful for including dropdown buttons within a btn-group)
+.sbrbtn-group > .sbrbtn-group {
+  float: left;
+}
+.sbrbtn-group > .sbrbtn-group:not(:first-child):not(:last-child) > .sbrbtn {
+  border-radius: 0;
+}
+.sbrbtn-group > .sbrbtn-group:first-child {
+  > .sbrbtn:last-child,
+  > .dropdown-toggle {
+    @include border-right-radius(0);
+  }
+}
+.sbrbtn-group > .sbrbtn-group:last-child > .sbrbtn:first-child {
+  @include border-left-radius(0);
+}
+
+// On active and open, don't show outline
+.sbrbtn-group .dropdown-toggle:active,
+.sbrbtn-group.open .dropdown-toggle {
+  outline: 0;
+}
+
+
+// Sizing
+//
+// Remix the default button sizing classes into new ones for easier manipulation.
+
+.sbrbtn-group-xs > .sbrbtn { @extend .sbrbtn-xs; }
+.sbrbtn-group-sm > .sbrbtn { @extend .sbrbtn-sm; }
+.sbrbtn-group-lg > .sbrbtn { @extend .sbrbtn-lg; }
+
+
+// Split button dropdowns
+// ----------------------
+
+// Give the line between buttons some depth
+.sbrbtn-group > .sbrbtn + .dropdown-toggle {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+.sbrbtn-group > .sbrbtn-lg + .dropdown-toggle {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+// The clickable button for toggling the menu
+// Remove the gradient and set the same inset shadow as the :active state
+.sbrbtn-group.open .dropdown-toggle {
+  @include box-shadow(inset 0 3px 5px rgba(0,0,0,.125));
+
+  // Show no shadow for `.sbrbtn-link` since it has no other button styles.
+  &.sbrbtn-link {
+    @include box-shadow(none);
+  }
+}
+
+
+// // Reposition the caret
+// .sbrbtn .caret {
+//   margin-left: 0;
+// }
+// // Carets in other button sizes
+// .sbrbtn-lg .caret {
+//   border-width: $caret-width-large $caret-width-large 0;
+//   border-bottom-width: 0;
+// }
+// // Upside down carets for .dropup
+// .dropup .sbrbtn-lg .caret {
+//   border-width: 0 $caret-width-large $caret-width-large;
+// }
+
+
+// Vertical button groups
+// ----------------------
+
+.sbrbtn-group-vertical {
+  > .sbrbtn,
+  > .sbrbtn-group,
+  > .sbrbtn-group > .sbrbtn {
+    display: block;
+    float: none;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  // Clear floats so dropdown menus can be properly placed
+  > .sbrbtn-group {
+    @include clearfix();
+    > .sbrbtn {
+      float: none;
+    }
+  }
+
+  > .sbrbtn + .sbrbtn,
+  > .sbrbtn + .sbrbtn-group,
+  > .sbrbtn-group + .sbrbtn,
+  > .sbrbtn-group + .sbrbtn-group {
+    margin-top: -1px;
+    margin-left: 0;
+  }
+}
+
+.sbrbtn-group-vertical > .sbrbtn {
+  &:not(:first-child):not(:last-child) {
+    border-radius: 0;
+  }
+  &:first-child:not(:last-child) {
+    border-top-right-radius: $border-radius-base;
+    @include border-bottom-radius(0);
+  }
+  &:last-child:not(:first-child) {
+    border-bottom-left-radius: $border-radius-base;
+    @include border-top-radius(0);
+  }
+}
+.sbrbtn-group-vertical > .sbrbtn-group:not(:first-child):not(:last-child) > .sbrbtn {
+  border-radius: 0;
+}
+.sbrbtn-group-vertical > .sbrbtn-group:first-child:not(:last-child) {
+  > .sbrbtn:last-child,
+  > .dropdown-toggle {
+    @include border-bottom-radius(0);
+  }
+}
+.sbrbtn-group-vertical > .sbrbtn-group:last-child:not(:first-child) > .sbrbtn:first-child {
+  @include border-top-radius(0);
+}
+
+
+
+// Justified button groups
+// ----------------------
+
+.sbrbtn-group-justified {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  > .sbrbtn,
+  > .sbrbtn-group {
+    float: none;
+    display: table-cell;
+    width: 1%;
+  }
+  > .sbrbtn-group .sbrbtn {
+    width: 100%;
+  }
+
+  > .sbrbtn-group .dropdown-menu {
+    left: auto;
+  }
+}
+
+
+// Checkbox and radio options
+//
+// In order to support the browser's form validation feedback, powered by the
+// `required` attribute, we have to "hide" the inputs via `opacity`. We cannot
+// use `display: none;` or `visibility: hidden;` as that also hides the popover.
+// This way, we ensure a DOM element is visible to position the popover from.
+//
+// See https://github.com/twbs/bootstrap/pull/12794 for more.
+
+[data-toggle="buttons"] > .sbrbtn > input[type="radio"],
+[data-toggle="buttons"] > .sbrbtn > input[type="checkbox"] {
+  position: absolute;
+  z-index: -1;
+  @include opacity(0);
+}
+
 
 
 
@@ -272,14 +514,34 @@ input[type="button"] {
 
 .sbr-search-fields {
   @include clearfix;
-  max-width: 700px;
+  max-width: 800px;
   margin: 0 auto;
-  .sbr-bike-search, .sbr-serial-search {
+  .sbr-bike-search {
     padding: .4em .7em;
-    width: 79%;
+    width: 59%;
     float: left;
+    border-radius: 0 3px 3px 0;
+    border-left: none;
   }
-  .sbr-serial-search { width: 100%; }
+  .sbr-desc-btn {
+    border-radius: 0;
+  }
+  .sbrbtn-group {
+    float: left;
+    // width: 40%;
+  }
+  .sbrbtn {
+    // float: left;
+    // display: block;
+    // width: 20%;
+    // padding: .52em;
+    // margin: -.25em 0 0 1%;
+    // height: 100%;
+    font-size: .9em;
+    padding: .64em;
+    margin: -.27em 0 0 0;
+  }
+  // .sbr-serial-search { width: 100%; }
   .proximity {
     clear: both;
     input {
@@ -292,13 +554,17 @@ input[type="button"] {
       color: #7a7a7a;
     }
   }
-  .sbrbtn {
+  .search-link {
+    width: 10%;
     float: left;
-    display: block;
-    width: 20%;
-    padding: .52em;
-    margin: -.25em 0 0 1%;
-    // height: 100%;
+    position: absolute;
+    background: #3B97D3;
+    height: 3em;
+    img {
+      display: block;
+      height: 100%;
+      width: auto;
+    }
   }
 }
 
@@ -308,13 +574,40 @@ input[type="button"] {
 //   }
 // }
 
-.sbr-get-involved {
-  background: #fff;
-}
 
 .sbr-banner {
   width: 100%;
   padding: 1em 0;
   text-align: center;
-  background: purple;
+  background: #955BA5;
+  color: #fff;
+}
+
+.sbr-get-involved {
+  // background: #fff;
+  // background: #955BA5;
+  // color: #fff;
+  .banner {
+    text-align: center;
+    padding: 20px 0 60px;
+    font-weight: 400;
+    font-size: 20px;
+  }
+  @include clearfix;
+  h2 { text-align: center; }
+}
+
+.involve-yerself {
+  
+}
+
+.involve-report {
+  width: 66%;
+  float: left;
+}
+
+.involve-widget {
+  width: 32%;
+  float: left;
+  margin-left: 1%;
 }

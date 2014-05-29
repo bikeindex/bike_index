@@ -7,42 +7,53 @@
 
       = form_tag bikes_path, method: :get, class: 'sbr-search-fields' do 
         = hidden_field_tag :stolen, true
+        %p
+          %span.glyphicon.glyphicon-search
         .sbr-search-inputs
+          .sbrbtn-group
+            %a.sbrbtn.sbrbtn-default.sbr-serial-btn{ :'data-searching' => 'serial' }
+              Serial
+            %a.sbrbtn.sbrbtn-default.sbr-desc-btn.active{ :'data-searching' => 'description' }
+              Description
           = text_field_tag :query, params[:query], class: 'sbr-bike-search'
-          = submit_tag "Search", name: "search", class: "sbrbtn sbrbtn-success"
+          / .search-link
+          / = image_tag '/assets/stolen/search_btn.png'
+          / # = submit_tag "Search", name: "search", class: "sbrbtn sbrbtn-success"
           / # = text_field_tag :serial, params[:serial], placeholder: 'Search serial numbers', class: 'sbr-serial-search'
           .proximity#stolen-proximity
             %span
               Stolen near
             = text_field_tag :proximity, params[:proximity], placeholder: 'anywhere'
-          .sbr-search-type
-            
-            searching
-            .sbrbtn-group
-              .sbrbtn.sbrbtn-default{ type: "button", :'data-searching' => 'serial' }
-                Serials
-              .sbrbtn.sbrbtn-default{ type: "button", :'data-searching' => 'description' }
-                Descriptions
 .sbr-banner
-  We get bikes back -
-  = StolenRecord.unscoped.where(current: false).count
-  and counting
+  / # = StolenRecord.unscoped.where(current: false).count
+  2999
+
+  bikes recovered - and counting
 
 %section.sbr-get-involved
   .receptacle
     .inner-recep
+      / .banner
+      /   / # = StolenRecord.unscoped.where(current: false).count
+      /   2999
+
+      /   bikes recovered - and counting
+
       %h2
-        Get Involved!
+        Get Involved! Help stop bike theft
       .involve-yerself
-        %h3
-          Report CL seller
-      .involve-yerself
-        %h3
-          Report chop shop
-      .involve-yerself
-        %h3
-          Add recent stolen bikes to your page
-        = link_to 'Wordpress plugin', 'https://github.com/purcebr/bike-index-listings'
+        .involve-report
+          %h3
+            Report someone selling stolen bikes on Craigslist, Ebay or anywhere else
+          %h3
+            Report a bicycle chop shop
+        .involve-widget
+          %h3
+            Add a list of recent stolen bikes to your site.
+          %p
+            = link_to 'Wordpress plugin', 'https://github.com/purcebr/bike-index-listings'
+          %p
+            = link_to 'HTML code', 'https://github.com/sethherr/bike-index-listings'
 
 %section
   .receptacle
