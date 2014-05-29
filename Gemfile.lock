@@ -159,6 +159,7 @@ GEM
       thor (>= 0.13.6)
     formatador (0.2.4)
     geocoder (1.1.9)
+    gli (2.10.0)
     growl (1.0.3)
     guard (2.5.1)
       formatador (>= 0.2.4)
@@ -202,6 +203,13 @@ GEM
       celluloid-io (>= 0.15.0)
       rb-fsevent (>= 0.9.3)
       rb-inotify (>= 0.9)
+    localeapp (0.7.2)
+      gli
+      i18n
+      json
+      rack
+      rest-client
+      ya2yaml
     lumberjack (1.0.4)
     mail (2.5.4)
       mime-types (~> 1.16)
@@ -410,6 +418,7 @@ GEM
       rails
     will_paginate (3.0.5)
     wkhtmltopdf-binary (0.9.9.1)
+    ya2yaml (0.31)
 
 PLATFORMS
   ruby
@@ -447,6 +456,7 @@ DEPENDENCIES
   jquery-datatables-rails!
   jquery-rails
   libv8 (~> 3.16.14)
+  localeapp
   mini_magick
   money-rails (~> 0.5.0)
   nokogiri (~> 1.6.0)

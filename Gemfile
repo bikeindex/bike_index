@@ -48,6 +48,7 @@ gem 'sitemap_generator'
 gem 'whenever'
 gem 'unicorn'
 gem 'unicorn-worker-killer'
+gem 'localeapp'
 
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'
