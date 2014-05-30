@@ -81,7 +81,7 @@ header.single-bike {
     @include clearfix;
     position: relative;
     width: 100%;
-    padding: 10px 1% 10px 23%;
+    padding: 10px 23% 10px 1%;
     margin: 0 0 5px;
     &:hover { background-color: $tableBackgroundAccent; }
   }
@@ -97,7 +97,7 @@ header.single-bike {
   // background: white;
   height: 100%;
   position: absolute;
-  left: 1%; top: 0;
+  right: 1%; top: 0;
   padding: 10px 0;
   // a {
   //   width: 100%;
