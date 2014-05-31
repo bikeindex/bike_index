@@ -12,11 +12,11 @@
         = hidden_field_tag :search_type, 'description'
         #search-type-tabs
           %a.search-type-tab.active{ href: '#', data: { stype: 'description' } }
-            %span
+            %span.medium-screens
               Search bike
             descriptions
           %a.search-type-tab{ href: '#', data: { stype: 'serial' } }
-            %span
+            %span.medium-screens
               Search bike
             serials
         .sbr-search-inputs
@@ -31,32 +31,98 @@
   Over 
   / = StolenRecord.unscoped.where(current: false).count
   1999
-  bikes recovered - and counting
+  bikes recovered
+  %span.medium-screens
+    \- and counting
 
 %section.sbr-get-involved
   .receptacle
     .inner-recep
-
       %h2
-        Get Involved! Help stop bike theft
+        Get Involved! Help us stop bike theft
+
       .involve-yerself
+
         .involve-report
           %h3
-            Report someone selling stolen bikes on Craigslist, Ebay or anywhere else
-          %h3
-            Report a bicycle chop shop
+            Report bike theft issues:
+          .involve-report-form
+            = form_for @feedback do |f|
+              - if @feedback.errors.any?
+                #alert-block
+                  .alert.alert-error
+                    %a.close{"data-dismiss" => "alert"} ×
+                    %h4
+                      Please fix the following 
+                      = pluralize(@feedback.errors.count, "error")
+                    %ul
+                      - @feedback.errors.full_messages.each do |msg|
+                        %li 
+                          = msg  
+              .report-type
+                %label
+                  = f.radio_button :title, "Someone is selling a stolen bike"
+                  Report someone selling a stolen bike
+                %label
+                  = f.radio_button :title, "Bike ChopShop report"
+                  Report a bicycle chop shop
+                    
+              .contact-text
+                = f.text_area :body, placeholder: "Where is this happening? URL, address - any information you have", rows: 5
+              .contact-actions.control-group
+                = f.email_field :email, placeholder: "Your email address"
+                = f.submit 'Send alert!', class: 'btn pull-right'
+
         .involve-widget
           %h3
             Add a recent stolen bikes widget to your site.
-          %ul.stolen-recent-widget
+          .stolen-recent-widget
+            %ul
+              - @stolen_bikes.each do |bike|
+                %li
+                  - if bike.thumb_image.present?
+                    = link_to bike.thumb_image, bike_url(bike), class: 'stolen-thumb'
+                  %h4
+                    = link_to bike.title, bike_url(bike)
+                  %p
+                    Stolen from 
+                    = bike.current_stolen_record.city if bike.current_stolen_record.city.present?
+                    = bike.current_stolen_record.state.abbreviation if bike.current_stolen_record.state.present?
+                    on
+                    - if bike.current_stolen_record.date_stolen.today?
+                      Today at #{bike.current_stolen_record.date_stolen.strftime("%-I %p")}
+                    - elsif Date.yesterday().beginning_of_day() <= bike.current_stolen_record.date_stolen
+                      Yesterday at #{bike.current_stolen_record.date_stolen.strftime("%-I %p")}
+                    - else
+                      = bike.current_stolen_record.date_stolen.strftime("%-m/%-d/%Y")
+            .get-widget-code
+              Get the 
+              = link_to 'WordPress plugin', 'https://github.com/purcebr/bike-index-listings'
+              or 
+              = link_to 'HTML code', 'https://github.com/sethherr/bike-index-listings'
             
-          %p
-            = link_to 'Wordpress plugin', 'https://github.com/purcebr/bike-index-listings'
-          %p
-            = link_to 'HTML code', 'https://github.com/sethherr/bike-index-listings'
 
 %section
   .receptacle
     .inner-recep
 
       = render 'stolen/stickers'
+
+%section.donation-section
+  .receptacle
+    .inner-recep
+      %h3
+        You can also make a donation!
+      %p
+        If stickers aren't your thing, a 
+        %strong
+          donation is also always appreciated.
+        Every single penny you donate goes towards recovering more bikes.
+
+      :plain
+        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+        <input type="hidden" name="cmd" value="_s-xclick">
+        <input type="hidden" name="hosted_button_id" value="F4X72WUEF9QXJ">
+        <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+        <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+        </form>

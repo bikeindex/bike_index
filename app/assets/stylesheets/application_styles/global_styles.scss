@@ -21,16 +21,16 @@ body {
   font-family: $baseFont;
 }
 
-section.content:before {
-  content: "";
-  display: block;
-  position: fixed;
-  height: 5px;
-  background: $blueDarker;
-  z-index: 99999;
-  width: 100%;
-  left: 0; top: 0;
-}
+// section.content:before {
+//   content: "";
+//   display: block;
+//   position: fixed;
+//   height: 5px;
+//   background: $blueDarker;
+//   z-index: 99999;
+//   width: 100%;
+//   left: 0; top: 0;
+// }
 
 h1, h2, h3, h4 {
   font-family: $headerFont;

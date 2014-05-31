@@ -4,11 +4,13 @@
 //
 //________________________
 
+$sbrBackground: #f9f9f9;
+
 .sbr-wrap {
   font-family: $headerFont;
   h1, h2, h3, h4, input { font-family: $baseFont; }
   input { font-family: $headerFont; }
-  background: #f9f9f9;
+  background: $sbrBackground;
   color: #7a7a7a;
   .list-stolen-bike {
     margin-top: 3px;
@@ -86,6 +88,7 @@
   }
   .sbr-search-inputs { position: relative; }
   .sbr-bike-search {
+    box-shadow: none;
     padding: .4em .7em;
     width: 100%;
     float: left;
@@ -112,7 +115,7 @@
     }
     &:hover {
       // background: darken(#f9f9f9, 10%);
-      background: #f9f9f9;
+      background: $sbrBackground;
       text-decoration: none;
     }
   }
@@ -145,7 +148,6 @@
 @media (max-width: 600px) {
   .sbr-search-fields {
     .sbrbtn { top: .4em; }
-    .search-type-tab span { display: none; }
   }
 }
 
@@ -166,22 +168,152 @@
     font-size: 20px;
   }
   @include clearfix;
-  h2 { text-align: center; }
+  h2 { 
+    text-align: center;
+    margin: 0 0 1em;
+  }
+}
+
+.involve-report-form {
+  background: #6EB2DF;
+  border: 1px solid #3B97D3;
+  border-radius: 4px;
+  padding: 20px 10px;
+  color: #fff;
+  form { margin: 0; }
+  input { background: #fff; }
+  input[type="email"], textarea {
+    box-shadow: none;
+    border-radius: 2px;
+    border: 1px solid #cccdc8;
+    background: $sbrBackground;
+    color: darken(#7a7a7a, 20%);
+    margin-bottom: .75em;
+    // &:focus, &:active {
+    //   background: #fff;
+    // }
+    // &:focus { box-shadow: none; border-color: #cccdc8; }
+  }
+  .contact-text {
+    padding-top: 1em;
+    width: 100%;
+    position: relative;
+    textarea {
+      display: block;
+      width: 100%;
+      resize: none;
+      padding: .5em;
+    }
+  }
+  .contact-actions {
+    @include clearfix;
+    width: 100%;
+    position: relative;
+    input[type="email"] {
+      display: block;
+      width: 70%;
+      float: left;
+      padding-left: .5em;
+      padding-right: .5em;
+    }
+    .btn {
+      font-size: 19px;
+      border-radius: 3px;
+      display: block;
+      float: left;
+      width: 28%;
+      margin: -.25em 0 0 2%;
+      padding: .3em .5em;
+    }
+  }
 }
 
 .involve-yerself {
-  
+  padding-top: 1em;
 }
 
-.involve-report {
-  width: 66%;
-  float: left;
+.report-type label {
+  font-size: 19px;
+  input { margin: -.25em .5em 0 0; }
 }
 
-.involve-widget {
-  width: 32%;
-  float: left;
-  margin-left: 1%;
+
+
+.stolen-recent-widget {
+  position: relative;
+  border: 1px solid lighten(#223844, 15%);
+  border-radius: 2px;
+  ul {
+    list-style-type: none; 
+    margin: 0;
+    padding: 5px 5px 2.5em;
+    background: #223844;
+    max-height: 350px;
+    overflow: auto;
+  }
+  li {
+    @include clearfix;
+    margin: .5em 0 0;
+    padding: 6px;
+    border: 1px solid #DC7D59;
+    border-radius: 2px;
+    background: #fff;
+    // width: 49%;
+    // float: left;
+    position: relative;
+    p, h4 { width: 73% }
+    h4 { margin: 0; font-size: 19px; }
+    .stolen-thumb {
+      float: right;
+      position: relative;
+      // right: 2%;
+      width: 26%;
+      margin-left: 2%;
+      img {
+        display: block; 
+        width: 100%;
+        height: auto;
+      }
+    }
+  }
+  .get-widget-code {
+    font-family: $baseFont;
+    font-weight: 200;
+    font-size: 17px;
+    text-align: center;
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%;
+    background: rgba(black,.7);
+    color: #fff;
+    padding: .5em 0;
+    a {
+      color: lighten($linkColor, 10%);
+    }
+  }
+}
+
+@media(min-width: 800px) {
+  .involve-yerself {
+    @include clearfix;
+    padding-bottom: 60px;
+    h3 { margin-top: 0; }
+  }
+  .involve-report {
+    width: 60%;
+    float: left;
+    .involve-report-form { height: 350px; }
+  }
+
+  .involve-widget {
+    width: 38%;
+    float: left;
+    margin-left: 2%;
+  }
+  // .stolen-recent-widget {
+  //   max-height: 350px;
+  //   overflow: auto;
+  // }
 }
 
 
@@ -191,12 +323,17 @@
 // Sticker styles
 //
 //________________________
+.contribute-sbr {
+  margin: .5em 0 1em;
+  text-align: center;
+}
 
 .sticker-wells { margin: 30px 0; }
 .sticker-well {
   img { padding-bottom: 1em; }
   select { margin-top: .5em; }
 }
+
 @media (min-width: 800px) {
   .sticker-wells { @include clearfix; }
   .sticker-well {
@@ -210,4 +347,5 @@
     }
   }
 }
-  
+
+.donation-section { background: #fff; }

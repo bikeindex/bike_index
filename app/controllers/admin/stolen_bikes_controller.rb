@@ -17,7 +17,8 @@ class Admin::StolenBikesController < Admin::BaseController
   end
 
   def approve
-    @bike.current_stolen_record.update_attribute :approved, true
+    @bike.current_stolen_record.approved = true
+    @bike.current_stolen_record.save
     redirect_to edit_admin_stolen_bike_url(@bike), notice: 'Bike was approved.'
   end
 

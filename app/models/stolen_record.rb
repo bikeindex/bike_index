@@ -22,7 +22,6 @@ class StolenRecord < ActiveRecord::Base
     :phone_for_shops,
     :phone_for_police,
     :receive_notifications
-
   belongs_to :bike
   belongs_to :country
   belongs_to :state

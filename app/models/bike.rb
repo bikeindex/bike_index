@@ -91,7 +91,7 @@ class Bike < ActiveRecord::Base
   belongs_to :location
 
   has_many :stolen_notifications, dependent: :destroy
-  has_many :stolen_records
+  has_many :stolen_records, dependent: :destroy
   has_many :other_listings
   has_many :normalized_serial_segments
   has_many :ownerships, dependent: :destroy
