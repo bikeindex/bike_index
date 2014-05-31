@@ -9,16 +9,25 @@ class BikeIndex.Views.Global extends Backbone.View
     'click #serial-absent':                 'updateSerialAbsent'
     'focus #header-search':                 'expandSearch'
     'change input#stolen':                  'toggleProximitySearch'
+    # 'click #search-type-tabs':              'toggleSearchType'
     
   initialize: ->
     BikeIndex.hideFlash()
     @setElement($('#body'))
-    @loadChosen() if $('#chosen-container').length > 0
-    if $('#what-spokecards-are').length > 0
-      $('.spokecard-extension').addClass('on-spokecard-page')
-    @initializeHeaderSearch()
+    on_stolen = false
+    if $('#sbr-body').length > 0
+      console.log('something')
+      that = @
+      $('#search-type-tabs').click (e) ->
+        that.toggleSearchType(e)
+    else
+      @initializeHeaderSearch()
+      @loadChosen() if $('#chosen-container').length > 0
+      @setLightspeedMovie() if $('#lightspeed-automation').length > 0
+      if $('#what-spokecards-are').length > 0
+        $('.spokecard-extension').addClass('on-spokecard-page')
     @setProximityLocation()
-    @setLightspeedMovie() if $('#lightspeed-automation').length > 0
+    
 
   setLightspeedMovie: ->
     height = '394'
@@ -58,6 +67,23 @@ class BikeIndex.Views.Global extends Backbone.View
         .val('')
         .removeClass('absent-serial')
 
+  loadStolenWidget: (location) ->
+    $.ajax
+      type: "GET"
+      url: 'https://freegeoip.net/json/'
+      dataType: "jsonp",
+      success: (location) ->
+        $('#stolen-proximity #proximity').val("#{location.region_name}")
+        loadStolenWidget(location) if $('#sbr-body').length > 0
+
+  toggleSearchType: (e) ->
+    e.preventDefault()
+    target = $(e.target)
+    target = target.parents('a') if target.is('span')
+    unless $(target).hasClass('active')
+      $('.search-type-tab').toggleClass('active')
+      $('#search_type').val(target.attr('data-stype'))
+
   toggleProximitySearch: ->
     if $('#stolen-proximity').hasClass('unhidden')
       $('#stolen-proximity span').fadeOut 100, ->
@@ -79,6 +105,7 @@ class BikeIndex.Views.Global extends Backbone.View
       dataType: "jsonp",
       success: (location) ->
         $('#stolen-proximity #proximity').val("#{location.region_name}")
+        # loadStolenWidget(location) if $('#sbr-body').length > 0
   
 
   setSearchfantasy: (tags) ->

@@ -20,16 +20,19 @@ describe Api::V1::UsersController do
   end
 
   describe :request_serial_update do 
-    xit "should create a new serial request mail" do 
+    it "should create a new serial request mail" do 
       o = FactoryGirl.create(:ownership)
       user = o.creator
       bike = o.bike
-      serial_request = { serial_update_bike_id: bike.id,
+      serial_request = { 
+        user_id: user.id,
+        serial_update_bike_id: bike.id,
         serial_update_email: user.email,
         serial_update_serial: 'some new serial',
         serial_update_reason: 'Some reason'
       }
       set_current_user(user)
+      # pp session
       lambda {
         put :request_serial_update, serial_request, format: :json
       }.should change(Feedback, :count).by(1)
@@ -41,11 +44,10 @@ describe Api::V1::UsersController do
       message = { serial_update_bike_id: bike.id, serial_update_serial: 'some update', serial_update_reason: 'Some reason' }
       # pp message
       post :request_serial_update, message, format: :json
-      # pp response.body
       response.code.should eq('403')
     end
 
-    it "shouldn't create a new serial request mailer if a user isn't present" do 
+    it "shouldn't create a new serial request mailer if wrong user user is present" do 
       o = FactoryGirl.create(:ownership)
       bike = o.bike
       user = FactoryGirl.create(:user)

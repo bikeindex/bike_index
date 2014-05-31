@@ -1,43 +1,41 @@
 %section.sbr-main-section
   .receptacle
     .inner-recep
-      = link_to 'Register your stolen bike', new_bike_url(stolen: true), class: 'list-stolen-bike sbrbtn sbrbtn-default'
+      = link_to 'Register your stolen bike', new_bike_url(stolen: true), class: 'list-stolen-bike'
+      .stolen-registry-logo
+        = image_tag '/assets/stolen/stolen-registry.svg'
       %h1
         Stolen Bike Registry
 
       = form_tag bikes_path, method: :get, class: 'sbr-search-fields' do 
         = hidden_field_tag :stolen, true
-        %p
-          %span.glyphicon.glyphicon-search
+        = hidden_field_tag :search_type, 'description'
+        #search-type-tabs
+          %a.search-type-tab.active{ href: '#', data: { stype: 'description' } }
+            %span
+              Search bike
+            descriptions
+          %a.search-type-tab{ href: '#', data: { stype: 'serial' } }
+            %span
+              Search bike
+            serials
         .sbr-search-inputs
-          .sbrbtn-group
-            %a.sbrbtn.sbrbtn-default.sbr-serial-btn{ :'data-searching' => 'serial' }
-              Serial
-            %a.sbrbtn.sbrbtn-default.sbr-desc-btn.active{ :'data-searching' => 'description' }
-              Description
-          = text_field_tag :query, params[:query], class: 'sbr-bike-search'
-          / .search-link
-          / = image_tag '/assets/stolen/search_btn.png'
-          / # = submit_tag "Search", name: "search", class: "sbrbtn sbrbtn-success"
-          / # = text_field_tag :serial, params[:serial], placeholder: 'Search serial numbers', class: 'sbr-serial-search'
+          = text_field_tag :query_typed, params[:query_typed], class: 'sbr-bike-search', autofocus: true
+          = button_tag(type: "submit", class: "sbrbtn") do
+            = image_tag '/assets/stolen/search.svg'
           .proximity#stolen-proximity
             %span
               Stolen near
             = text_field_tag :proximity, params[:proximity], placeholder: 'anywhere'
 .sbr-banner
-  / # = StolenRecord.unscoped.where(current: false).count
-  2999
-
+  Over 
+  = StolenRecord.unscoped.where(current: false).count
+  / 2999
   bikes recovered - and counting
 
 %section.sbr-get-involved
   .receptacle
     .inner-recep
-      / .banner
-      /   / # = StolenRecord.unscoped.where(current: false).count
-      /   2999
-
-      /   bikes recovered - and counting
 
       %h2
         Get Involved! Help stop bike theft
@@ -49,7 +47,9 @@
             Report a bicycle chop shop
         .involve-widget
           %h3
-            Add a list of recent stolen bikes to your site.
+            Add a recent stolen bikes widget to your site.
+          %ul.stolen-recent-widget
+            
           %p
             = link_to 'Wordpress plugin', 'https://github.com/purcebr/bike-index-listings'
           %p
@@ -59,4 +59,4 @@
   .receptacle
     .inner-recep
 
-      / # = render 'stolen/stickers'
+      = render 'stolen/stickers'

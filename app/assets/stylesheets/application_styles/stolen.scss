@@ -1,472 +1,3 @@
-$border-radius-base:         3px !default;
-$brand-primary:         #428bca !default;
-$brand-success:         rgb(112,182,97) !default;
-$brand-info:            #5bc0de !default;
-$brand-warning:         #f0ad4e !default;
-$brand-danger:          #d9534f !default;
-$sbrbtn-font-weight:                normal !default;
-
-$sbrbtn-default-color:              #333 !default;
-$sbrbtn-default-bg:                 #fff !default;
-$sbrbtn-default-border:             #ccc !default;
-
-$sbrbtn-primary-color:              #fff !default;
-$sbrbtn-primary-bg:                 $brand-primary !default;
-$sbrbtn-primary-border:             darken($sbrbtn-primary-bg, 5%) !default;
-
-$sbrbtn-success-color:              #fff !default;
-$sbrbtn-success-bg:                 $brand-success !default;
-$sbrbtn-success-border:             darken($sbrbtn-success-bg, 5%) !default;
-
-$sbrbtn-info-color:                 #fff !default;
-$sbrbtn-info-bg:                    $brand-info !default;
-$sbrbtn-info-border:                darken($sbrbtn-info-bg, 5%) !default;
-
-$sbrbtn-warning-color:              #fff !default;
-$sbrbtn-warning-bg:                 $brand-warning !default;
-$sbrbtn-warning-border:             darken($sbrbtn-warning-bg, 5%) !default;
-
-$sbrbtn-danger-color:               #fff !default;
-$sbrbtn-danger-bg:                  $brand-danger !default;
-$sbrbtn-danger-border:              darken($sbrbtn-danger-bg, 5%) !default;
-
-$sbrbtn-link-disabled-color:        $grayLight !default;
-
-//
-// Buttons
-// --------------------------------------------------
-
-@mixin button-variant($color, $background, $border) {
-  color: $color;
-  background-color: $background;
-  border-color: $border;
-
-  &:hover,
-  &:focus,
-  &:active,
-  &.active,
-  .open > &.dropdown-toggle {
-    color: $color;
-    background-color: darken($background, 10%);
-        border-color: darken($border, 12%);
-  }
-  &:active,
-  &.active,
-  .open > &.dropdown-toggle {
-    background-image: none;
-  }
-  &.disabled,
-  &[disabled],
-  fieldset[disabled] & {
-    &,
-    &:hover,
-    &:focus,
-    &:active,
-    &.active {
-      background-color: $background;
-          border-color: $border;
-    }
-  }
-
-  .badge {
-    color: $background;
-    background-color: $color;
-  }
-}
-
-// Button sizes
-@mixin button-size($padding-vertical, $padding-horizontal, $font-size, $line-height, $border-radius) {
-  padding: $padding-vertical $padding-horizontal;
-  font-size: $font-size;
-  line-height: $line-height;
-  border-radius: $border-radius;
-}
-
-
-// Base styles
-// --------------------------------------------------
-
-.sbrbtn {
-  display: inline-block;
-  margin-bottom: 0; // For input.sbrbtn
-  font-weight: $sbrbtn-font-weight;
-  text-align: center;
-  vertical-align: middle;
-  cursor: pointer;
-  background-image: none; // Reset unusual Firefox-on-Android default style; see https://github.com/necolas/normalize.css/issues/214
-  border: 1px solid transparent;
-  white-space: nowrap;
-  @include button-size(16px, 10px, 1em, 1em, 4px);
-  // @include button-size($padding-base-vertical, $padding-base-horizontal, $font-size-base, $line-height-base, $border-radius-base);
-  // @include user-select(none);
-
-  &,
-  &:active,
-  &.active {
-    &:focus {
-      @include tab-focus();
-    }
-  }
-
-  &:hover,
-  &:focus {
-    color: $sbrbtn-default-color;
-    text-decoration: none;
-  }
-
-  &:active,
-  &.active {
-    outline: 0;
-    background-image: none;
-    @include box-shadow(inset 0 3px 5px rgba(0,0,0,.125));
-  }
-
-  &.disabled,
-  &[disabled],
-  fieldset[disabled] & {
-    cursor: not-allowed;
-    pointer-events: none; // Future-proof disabling of clicks
-    @include opacity(.65);
-    @include box-shadow(none);
-  }
-}
-
-
-// Alternate buttons
-// --------------------------------------------------
-
-.sbrbtn-default {
-  @include button-variant($sbrbtn-default-color, $sbrbtn-default-bg, $sbrbtn-default-border);
-}
-.sbrbtn-primary {
-  @include button-variant($sbrbtn-primary-color, $sbrbtn-primary-bg, $sbrbtn-primary-border);
-}
-// Success appears as green
-.sbrbtn-success {
-  @include button-variant($sbrbtn-success-color, $sbrbtn-success-bg, $sbrbtn-success-border);
-}
-// Info appears as blue-green
-.sbrbtn-info {
-  @include button-variant($sbrbtn-info-color, $sbrbtn-info-bg, $sbrbtn-info-border);
-}
-// Warning appears as orange
-.sbrbtn-warning {
-  @include button-variant($sbrbtn-warning-color, $sbrbtn-warning-bg, $sbrbtn-warning-border);
-}
-// Danger and error appear as red
-.sbrbtn-danger {
-  @include button-variant($sbrbtn-danger-color, $sbrbtn-danger-bg, $sbrbtn-danger-border);
-}
-
-
-// Link buttons
-// -------------------------
-
-// Make a button look and behave like a link
-.sbrbtn-link {
-  color: $linkColor;
-  font-weight: normal;
-  cursor: pointer;
-  border-radius: 0;
-
-  &,
-  &:active,
-  &[disabled],
-  fieldset[disabled] & {
-    background-color: transparent;
-    @include box-shadow(none);
-  }
-  &,
-  &:hover,
-  &:focus,
-  &:active {
-    border-color: transparent;
-  }
-  &:hover,
-  &:focus {
-    color: $linkColorHover;
-    text-decoration: underline;
-    background-color: transparent;
-  }
-  &[disabled],
-  fieldset[disabled] & {
-    &:hover,
-    &:focus {
-      color: $sbrbtn-link-disabled-color;
-      text-decoration: none;
-    }
-  }
-}
-
-
-// Block button
-// --------------------------------------------------
-
-.sbrbtn-block {
-  display: block;
-  width: 100%;
-  padding-left: 0;
-  padding-right: 0;
-}
-
-// Vertically space out multiple block buttons
-.sbrbtn-block + .sbrbtn-block {
-  margin-top: 5px;
-}
-
-// Specificity overrides
-input[type="submit"],
-input[type="reset"],
-input[type="button"] {
-  &.sbrbtn-block {
-    width: 100%;
-  }
-}
-
-//
-// Button groups
-// --------------------------------------------------
-
-// Make the div behave like a button
-.sbrbtn-group,
-.sbrbtn-group-vertical {
-  position: relative;
-  display: inline-block;
-  vertical-align: middle; // match .sbrbtn alignment given font-size hack above
-  > .sbrbtn {
-    position: relative;
-    float: left;
-    // Bring the "active" button to the front
-    &:hover,
-    &:focus,
-    &:active,
-    &.active {
-      z-index: 2;
-    }
-    &:focus {
-      // Remove focus outline when dropdown JS adds it after closing the menu
-      outline: 0;
-    }
-  }
-}
-
-// Prevent double borders when buttons are next to each other
-.sbrbtn-group {
-  .sbrbtn + .sbrbtn,
-  .sbrbtn + .sbrbtn-group,
-  .sbrbtn-group + .sbrbtn,
-  .sbrbtn-group + .sbrbtn-group {
-    margin-left: -1px;
-  }
-}
-
-// Optional: Group multiple button groups together for a toolbar
-.sbrbtn-toolbar {
-  margin-left: -5px; // Offset the first child's margin
-  @include clearfix();
-
-  .sbrbtn-group,
-  .input-group {
-    float: left;
-  }
-  > .sbrbtn,
-  > .sbrbtn-group,
-  > .input-group {
-    margin-left: 5px;
-  }
-}
-
-.sbrbtn-group > .sbrbtn:not(:first-child):not(:last-child):not(.dropdown-toggle) {
-  border-radius: 0;
-}
-
-// Set corners individual because sometimes a single button can be in a .sbrbtn-group and we need :first-child and :last-child to both match
-.sbrbtn-group > .sbrbtn:first-child {
-  margin-left: 0;
-  &:not(:last-child):not(.dropdown-toggle) {
-    @include border-right-radius(0);
-  }
-}
-// Need .dropdown-toggle since :last-child doesn't apply given a .dropdown-menu immediately after it
-.sbrbtn-group > .sbrbtn:last-child:not(:first-child),
-.sbrbtn-group > .dropdown-toggle:not(:first-child) {
-  @include border-left-radius(0);
-}
-
-// Custom edits for including btn-groups within btn-groups (useful for including dropdown buttons within a btn-group)
-.sbrbtn-group > .sbrbtn-group {
-  float: left;
-}
-.sbrbtn-group > .sbrbtn-group:not(:first-child):not(:last-child) > .sbrbtn {
-  border-radius: 0;
-}
-.sbrbtn-group > .sbrbtn-group:first-child {
-  > .sbrbtn:last-child,
-  > .dropdown-toggle {
-    @include border-right-radius(0);
-  }
-}
-.sbrbtn-group > .sbrbtn-group:last-child > .sbrbtn:first-child {
-  @include border-left-radius(0);
-}
-
-// On active and open, don't show outline
-.sbrbtn-group .dropdown-toggle:active,
-.sbrbtn-group.open .dropdown-toggle {
-  outline: 0;
-}
-
-
-// Sizing
-//
-// Remix the default button sizing classes into new ones for easier manipulation.
-
-.sbrbtn-group-xs > .sbrbtn { @extend .sbrbtn-xs; }
-.sbrbtn-group-sm > .sbrbtn { @extend .sbrbtn-sm; }
-.sbrbtn-group-lg > .sbrbtn { @extend .sbrbtn-lg; }
-
-
-// Split button dropdowns
-// ----------------------
-
-// Give the line between buttons some depth
-.sbrbtn-group > .sbrbtn + .dropdown-toggle {
-  padding-left: 8px;
-  padding-right: 8px;
-}
-.sbrbtn-group > .sbrbtn-lg + .dropdown-toggle {
-  padding-left: 12px;
-  padding-right: 12px;
-}
-
-// The clickable button for toggling the menu
-// Remove the gradient and set the same inset shadow as the :active state
-.sbrbtn-group.open .dropdown-toggle {
-  @include box-shadow(inset 0 3px 5px rgba(0,0,0,.125));
-
-  // Show no shadow for `.sbrbtn-link` since it has no other button styles.
-  &.sbrbtn-link {
-    @include box-shadow(none);
-  }
-}
-
-
-// // Reposition the caret
-// .sbrbtn .caret {
-//   margin-left: 0;
-// }
-// // Carets in other button sizes
-// .sbrbtn-lg .caret {
-//   border-width: $caret-width-large $caret-width-large 0;
-//   border-bottom-width: 0;
-// }
-// // Upside down carets for .dropup
-// .dropup .sbrbtn-lg .caret {
-//   border-width: 0 $caret-width-large $caret-width-large;
-// }
-
-
-// Vertical button groups
-// ----------------------
-
-.sbrbtn-group-vertical {
-  > .sbrbtn,
-  > .sbrbtn-group,
-  > .sbrbtn-group > .sbrbtn {
-    display: block;
-    float: none;
-    width: 100%;
-    max-width: 100%;
-  }
-
-  // Clear floats so dropdown menus can be properly placed
-  > .sbrbtn-group {
-    @include clearfix();
-    > .sbrbtn {
-      float: none;
-    }
-  }
-
-  > .sbrbtn + .sbrbtn,
-  > .sbrbtn + .sbrbtn-group,
-  > .sbrbtn-group + .sbrbtn,
-  > .sbrbtn-group + .sbrbtn-group {
-    margin-top: -1px;
-    margin-left: 0;
-  }
-}
-
-.sbrbtn-group-vertical > .sbrbtn {
-  &:not(:first-child):not(:last-child) {
-    border-radius: 0;
-  }
-  &:first-child:not(:last-child) {
-    border-top-right-radius: $border-radius-base;
-    @include border-bottom-radius(0);
-  }
-  &:last-child:not(:first-child) {
-    border-bottom-left-radius: $border-radius-base;
-    @include border-top-radius(0);
-  }
-}
-.sbrbtn-group-vertical > .sbrbtn-group:not(:first-child):not(:last-child) > .sbrbtn {
-  border-radius: 0;
-}
-.sbrbtn-group-vertical > .sbrbtn-group:first-child:not(:last-child) {
-  > .sbrbtn:last-child,
-  > .dropdown-toggle {
-    @include border-bottom-radius(0);
-  }
-}
-.sbrbtn-group-vertical > .sbrbtn-group:last-child:not(:first-child) > .sbrbtn:first-child {
-  @include border-top-radius(0);
-}
-
-
-
-// Justified button groups
-// ----------------------
-
-.sbrbtn-group-justified {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: separate;
-  > .sbrbtn,
-  > .sbrbtn-group {
-    float: none;
-    display: table-cell;
-    width: 1%;
-  }
-  > .sbrbtn-group .sbrbtn {
-    width: 100%;
-  }
-
-  > .sbrbtn-group .dropdown-menu {
-    left: auto;
-  }
-}
-
-
-// Checkbox and radio options
-//
-// In order to support the browser's form validation feedback, powered by the
-// `required` attribute, we have to "hide" the inputs via `opacity`. We cannot
-// use `display: none;` or `visibility: hidden;` as that also hides the popover.
-// This way, we ensure a DOM element is visible to position the popover from.
-//
-// See https://github.com/twbs/bootstrap/pull/12794 for more.
-
-[data-toggle="buttons"] > .sbrbtn > input[type="radio"],
-[data-toggle="buttons"] > .sbrbtn > input[type="checkbox"] {
-  position: absolute;
-  z-index: -1;
-  @include opacity(0);
-}
-
-
-
-
 //________________________
 //
 // Stolen styles
@@ -474,13 +5,16 @@ input[type="button"] {
 //________________________
 
 .sbr-wrap {
-  font-family: "Helvetica Neue";
-  h1, h2, h3, h4, input { font-family: "Helvetica Neue"; }
+  font-family: $headerFont;
+  h1, h2, h3, h4, input { font-family: $baseFont; }
+  input { font-family: $headerFont; }
   background: #f9f9f9;
   color: #7a7a7a;
   .list-stolen-bike {
+    margin-top: 3px;
     float: right;
-    color: #7a7a7a;
+    // color: #7a7a7a;
+    // color: $linkColor;
   }
   input {
     box-shadow: none;
@@ -488,6 +22,7 @@ input[type="button"] {
     background: #fff;
     color: darken(#7a7a7a, 20%);
     margin-bottom: .75em;
+    &:focus { box-shadow: none; border-color: #cccdc8; }
   }
   section {
     border-bottom: 1px solid $grayMed;
@@ -496,18 +31,38 @@ input[type="button"] {
 }
 
 .sbr-main-section {
+  .stolen-registry-logo {
+    width: 200px;
+    margin: 0 auto;
+    padding: 2.5em 0 30px;
+    img { 
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+  }
   h1 {
+    font-size: 30px;
     text-align: center;
     color: darken(#7a7a7a, 25%);
+    padding: 0 0 40px;
+  }
+}
+@media (min-width: 600px) {
+  .sbr-main-section {
+    h1 { font-size: 40px; }
+    .stolen-registry-logo { width: 280px; padding-top: 0; }
   }
 }
 
 @media (min-width: 1000px) {
   .sbr-main-section {
-    min-height: 400px;
     padding: 50px 0 40px;
+    .stolen-registry-logo {
+      margin-top: 50px;}
     h1 {
-      padding: 100px 0 40px;
+      
+      font-size: 50px;
     }
   }
 }
@@ -516,32 +71,7 @@ input[type="button"] {
   @include clearfix;
   max-width: 800px;
   margin: 0 auto;
-  .sbr-bike-search {
-    padding: .4em .7em;
-    width: 59%;
-    float: left;
-    border-radius: 0 3px 3px 0;
-    border-left: none;
-  }
-  .sbr-desc-btn {
-    border-radius: 0;
-  }
-  .sbrbtn-group {
-    float: left;
-    // width: 40%;
-  }
-  .sbrbtn {
-    // float: left;
-    // display: block;
-    // width: 20%;
-    // padding: .52em;
-    // margin: -.25em 0 0 1%;
-    // height: 100%;
-    font-size: .9em;
-    padding: .64em;
-    margin: -.27em 0 0 0;
-  }
-  // .sbr-serial-search { width: 100%; }
+  padding-bottom: 40px;
   .proximity {
     clear: both;
     input {
@@ -554,39 +84,81 @@ input[type="button"] {
       color: #7a7a7a;
     }
   }
-  .search-link {
-    width: 10%;
+  .sbr-search-inputs { position: relative; }
+  .sbr-bike-search {
+    padding: .4em .7em;
+    width: 100%;
     float: left;
+    border-radius: 2px;
+    // border-left: none;
+    margin-top: 5px;
+  }
+  .search-type-tab {
+    background: #E6E6E6;
+    padding: 5px 10px 3px 10px;
+    color: #7a7a7a;
+    margin-left: 5px;
+    border: 1px solid #cccdc8;
+    border-radius: 2px 2px 0 0;
+    border-bottom: none;
+    position: relative;
+    z-index: 10;
+    &:first-of-type { margin-left: 10px; }
+    &.active {
+      background: #fff;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #fff;
+      &:hover { background: #fff; }
+    }
+    &:hover {
+      // background: darken(#f9f9f9, 10%);
+      background: #f9f9f9;
+      text-decoration: none;
+    }
+  }
+  .sbrbtn {
+    height: 1.9em;
     position: absolute;
-    background: #3B97D3;
-    height: 3em;
+    top: .36em; right: .2em;
+    border: none;
+    padding: 3px;
+    background: none;
+    font-size: 19px;
+    border-radius: 2px;
     img {
       display: block;
       height: 100%;
       width: auto;
     }
+    &:hover, &:active, &:focus {
+      background: #DC7D59;
+      box-shadow: none;
+      border: none;
+      outline: none; 
+    }
+    &:active {
+      background: #D25627;
+    }
   }
 }
 
-// .sbr-search-texts {
-//   input {
-//     width: 100%;
-//   }
-// }
-
+@media (max-width: 600px) {
+  .sbr-search-fields {
+    .sbrbtn { top: .4em; }
+    .search-type-tab span { display: none; }
+  }
+}
 
 .sbr-banner {
   width: 100%;
   padding: 1em 0;
   text-align: center;
-  background: #955BA5;
+  background: #3B97D3;
   color: #fff;
 }
 
 .sbr-get-involved {
-  // background: #fff;
-  // background: #955BA5;
-  // color: #fff;
+  background: #fff;
   .banner {
     text-align: center;
     padding: 20px 0 60px;
