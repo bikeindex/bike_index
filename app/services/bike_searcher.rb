@@ -3,6 +3,13 @@ class BikeSearcher
     @approved = approved
     @params = creation_params
     @bikes = Bike.scoped
+    if @params[:search_type].present?
+      if @params[:search_type] == 'serial'
+        @params[:serial] = @params[:query_typed]
+      else
+        @params[:query] = @params[:query_typed]
+      end
+    end
     if @params[:serial].present?
       @normer = SerialNormalizer.new(serial: @params[:serial])
     end

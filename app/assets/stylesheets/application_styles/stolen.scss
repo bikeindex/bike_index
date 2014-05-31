@@ -5,8 +5,181 @@
 //________________________
 
 .sbr-wrap {
+  font-family: $headerFont;
+  h1, h2, h3, h4, input { font-family: $baseFont; }
+  input { font-family: $headerFont; }
+  background: #f9f9f9;
+  color: #7a7a7a;
+  .list-stolen-bike {
+    margin-top: 3px;
+    float: right;
+    // color: #7a7a7a;
+    // color: $linkColor;
+  }
+  input {
+    box-shadow: none;
+    border: 1px solid #cccdc8;
+    background: #fff;
+    color: darken(#7a7a7a, 20%);
+    margin-bottom: .75em;
+    &:focus { box-shadow: none; border-color: #cccdc8; }
+  }
   section {
     border-bottom: 1px solid $grayMed;
     padding: 30px 0;
-  }  
+  }
+}
+
+.sbr-main-section {
+  .stolen-registry-logo {
+    width: 200px;
+    margin: 0 auto;
+    padding: 2.5em 0 30px;
+    img { 
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+  }
+  h1 {
+    font-size: 30px;
+    text-align: center;
+    color: darken(#7a7a7a, 25%);
+    padding: 0 0 40px;
+  }
+}
+@media (min-width: 600px) {
+  .sbr-main-section {
+    h1 { font-size: 40px; }
+    .stolen-registry-logo { width: 280px; padding-top: 0; }
+  }
+}
+
+@media (min-width: 1000px) {
+  .sbr-main-section {
+    padding: 50px 0 40px;
+    .stolen-registry-logo {
+      margin-top: 50px;}
+    h1 {
+      
+      font-size: 50px;
+    }
+  }
+}
+
+.sbr-search-fields {
+  @include clearfix;
+  max-width: 800px;
+  margin: 0 auto;
+  padding-bottom: 40px;
+  .proximity {
+    clear: both;
+    input {
+      background: none;
+      border: none;
+      box-shadow: none;
+      margin: 0 0 .1em .1em;
+      padding: 0;
+      line-height: 1em;
+      color: #7a7a7a;
+    }
+  }
+  .sbr-search-inputs { position: relative; }
+  .sbr-bike-search {
+    padding: .4em .7em;
+    width: 100%;
+    float: left;
+    border-radius: 2px;
+    // border-left: none;
+    margin-top: 5px;
+  }
+  .search-type-tab {
+    background: #E6E6E6;
+    padding: 5px 10px 3px 10px;
+    color: #7a7a7a;
+    margin-left: 5px;
+    border: 1px solid #cccdc8;
+    border-radius: 2px 2px 0 0;
+    border-bottom: none;
+    position: relative;
+    z-index: 10;
+    &:first-of-type { margin-left: 10px; }
+    &.active {
+      background: #fff;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #fff;
+      &:hover { background: #fff; }
+    }
+    &:hover {
+      // background: darken(#f9f9f9, 10%);
+      background: #f9f9f9;
+      text-decoration: none;
+    }
+  }
+  .sbrbtn {
+    height: 1.9em;
+    position: absolute;
+    top: .36em; right: .2em;
+    border: none;
+    padding: 3px;
+    background: none;
+    font-size: 19px;
+    border-radius: 2px;
+    img {
+      display: block;
+      height: 100%;
+      width: auto;
+    }
+    &:hover, &:active, &:focus {
+      background: #DC7D59;
+      box-shadow: none;
+      border: none;
+      outline: none; 
+    }
+    &:active {
+      background: #D25627;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .sbr-search-fields {
+    .sbrbtn { top: .4em; }
+    .search-type-tab span { display: none; }
+  }
+}
+
+.sbr-banner {
+  width: 100%;
+  padding: 1em 0;
+  text-align: center;
+  background: #3B97D3;
+  color: #fff;
+}
+
+.sbr-get-involved {
+  background: #fff;
+  .banner {
+    text-align: center;
+    padding: 20px 0 60px;
+    font-weight: 400;
+    font-size: 20px;
+  }
+  @include clearfix;
+  h2 { text-align: center; }
+}
+
+.involve-yerself {
+  
+}
+
+.involve-report {
+  width: 66%;
+  float: left;
+}
+
+.involve-widget {
+  width: 32%;
+  float: left;
+  margin-left: 1%;
 }
