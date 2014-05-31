@@ -24,3 +24,4 @@ public/caches
 # Ignore localeapp
 .localeapp
 .env
+log/localeapp.yml
