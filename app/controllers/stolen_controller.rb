@@ -1,5 +1,5 @@
 class StolenController < ApplicationController
-  caches_page :index
+  # caches_page :index
   
   def index
     stolen_bikes = StolenRecord.where(current: true).order(:date_stolen).limit(6).pluck(:bike_id)
