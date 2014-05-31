@@ -2,8 +2,8 @@ class StolenController < ApplicationController
   # caches_page :index
   
   def index
-    stolen_bikes = StolenRecord.where(current: true).order(:date_stolen).limit(6).pluck(:bike_id)
-    # stolen_bikes = StolenRecord.where(approved: true).order(:date_stolen).limit(6).pluck(:bike_id)
+    # stolen_bikes = StolenRecord.where(current: true).order(:date_stolen).limit(6).pluck(:bike_id)
+    stolen_bikes = StolenRecord.where(approved: true).order('date_stolen DESC').limit(6).pluck(:bike_id)
     @stolen_bikes = Bike.where('id in (?)', stolen_bikes).includes(:stolen_records).decorate
     @feedback = Feedback.new
     render action: 'index', layout: 'sbr'
