@@ -29,8 +29,8 @@
             = text_field_tag :proximity, params[:proximity], placeholder: 'anywhere'
 .sbr-banner
   Over 
-  = StolenRecord.unscoped.where(current: false).count
-  / 2999
+  / = StolenRecord.unscoped.where(current: false).count
+  1999
   bikes recovered - and counting
 
 %section.sbr-get-involved

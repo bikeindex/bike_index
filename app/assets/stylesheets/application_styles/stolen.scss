@@ -16,14 +16,6 @@
     // color: #7a7a7a;
     // color: $linkColor;
   }
-  input {
-    box-shadow: none;
-    border: 1px solid #cccdc8;
-    background: #fff;
-    color: darken(#7a7a7a, 20%);
-    margin-bottom: .75em;
-    &:focus { box-shadow: none; border-color: #cccdc8; }
-  }
   section {
     border-bottom: 1px solid $grayMed;
     padding: 30px 0;
@@ -72,6 +64,14 @@
   max-width: 800px;
   margin: 0 auto;
   padding-bottom: 40px;
+  input {
+    box-shadow: none;
+    border: 1px solid #cccdc8;
+    background: #fff;
+    color: darken(#7a7a7a, 20%);
+    margin-bottom: .75em;
+    &:focus { box-shadow: none; border-color: #cccdc8; }
+  }
   .proximity {
     clear: both;
     input {
@@ -183,3 +183,31 @@
   float: left;
   margin-left: 1%;
 }
+
+
+
+//________________________
+//
+// Sticker styles
+//
+//________________________
+
+.sticker-wells { margin: 30px 0; }
+.sticker-well {
+  img { padding-bottom: 1em; }
+  select { margin-top: .5em; }
+}
+@media (min-width: 800px) {
+  .sticker-wells { @include clearfix; }
+  .sticker-well {
+    width: 48%;
+    float: left;
+    &:nth-of-type(2) { margin-left: 2%; }
+    &:nth-of-type(3) {
+      clear: both;
+      float: none;
+      margin: 0 auto; 
+    }
+  }
+}
+  
