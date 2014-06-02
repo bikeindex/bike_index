@@ -55,8 +55,10 @@ $sbrBackground: #f9f9f9;
     .stolen-registry-logo {
       margin-top: 50px;}
     h1 {
-      
       font-size: 50px;
+    }
+    .list-stolen-bike {
+      font-size: 1.5em;
     }
   }
 }
@@ -80,10 +82,12 @@ $sbrBackground: #f9f9f9;
       background: none;
       border: none;
       box-shadow: none;
-      margin: 0 0 .1em .1em;
+      margin: 2px 0 .1em .1em;
       padding: 0;
       line-height: 1em;
       color: #7a7a7a;
+      width: 10em;
+      border-bottom: 1px dashed #cccdc8;
     }
   }
   .sbr-search-inputs { position: relative; }
@@ -148,6 +152,7 @@ $sbrBackground: #f9f9f9;
 @media (max-width: 600px) {
   .sbr-search-fields {
     .sbrbtn { top: .4em; }
+    .proximity input { width: 8em; }
   }
 }
 

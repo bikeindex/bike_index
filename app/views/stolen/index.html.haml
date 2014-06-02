@@ -26,7 +26,7 @@
           .proximity#stolen-proximity
             %span
               Stolen near
-            = text_field_tag :proximity, params[:proximity], placeholder: 'anywhere'
+            = text_field_tag :proximity, params[:proximity], placeholder: 'Anywhere'
 .sbr-banner
   Over 
   / = StolenRecord.unscoped.where(current: false).count
