@@ -7,7 +7,7 @@ class ApproveStolenListingWorker
     require 'httparty'
     options = {api_url: api_v1_url(bike_id), key: ENV['STOLEN_TWITTERBOT_KEY']}
     HTTParty.post(ENV['STOLEN_TWITTERBOT_URL'],
-      :body => options.to_json
+      :body => options.to_json,
       :headers => { 'Content-Type' => 'application/json' } )
   end
 
