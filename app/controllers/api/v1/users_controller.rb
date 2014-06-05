@@ -20,7 +20,6 @@ module Api
         new_serial = params[:serial_update_serial]
         bike_id = params[:serial_update_bike_id]
         reason = params[:serial_update_reason]
-        pp current_user
         if current_user.present? && new_serial.present? && bike_id.present? && reason.present?
           bike = Bike.find(bike_id)
           if bike.owner == current_user
