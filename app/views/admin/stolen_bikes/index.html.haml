@@ -59,7 +59,8 @@
             - if bike.current_stolen_record.present?
               = bike.current_stolen_record.theft_description
           %td
-            = "&#x2713;".html_safe if bike.current_stolen_record.address.present?
+            - if bike.current_stolen_record.address.present?
+              = bike.current_stolen_record.city
           %td
             = "&#x2713;".html_safe if bike.current_stolen_record.approved
 
