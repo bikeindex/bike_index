@@ -75,12 +75,11 @@ module Api
             customer_contact.creator_email = @organization.auto_user.email
             if customer_contact.save
               Resque.enqueue(AdminStolenEmailJob, @customer_contact.id)
-              render json: { success: true }
+              render json: { success: true } and return
             end
           end
         end
         render json: {error: "Unable to send that email, srys"}, status: :unprocessable_entity and return
-        
       end
     
       def authenticate_organization
