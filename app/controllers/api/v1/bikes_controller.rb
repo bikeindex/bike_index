@@ -3,6 +3,7 @@ module Api
     class BikesController < ApiV1Controller
       before_filter :cors_preflight_check
       before_filter :authenticate_organization, only: [:create, :stolen_ids, :send_notification_email]
+      skip_before_filter  :verify_authenticity_token
       after_filter :cors_set_access_control_headers
       caches_action :search_tags
       serialization_scope nil
