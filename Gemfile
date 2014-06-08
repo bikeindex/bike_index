@@ -20,16 +20,16 @@ gem "journey", "~> 1.0.3"
 gem 'rdiscount'
 gem 'will_paginate', '~> 3.0'
 gem 'pg_search'
-gem 'nokogiri', '~> 1.6.0'
+gem 'nokogiri'
 gem 'carrierwave', '~> 0.9.0'
 gem 'carrierwave_backgrounder'
 gem 'rmagick'
 gem "mini_magick" # a smaller implementation of rmagick, required for rqrcode
 gem 'rqrcode-rails3'
 gem 'strong_parameters'
-gem 'libv8', '~> 3.16.14'
+gem 'libv8', '~> 3.11.8'
 gem 'rb-readline', '~> 0.4.2'
-gem 'backbone-on-rails', "=0.9.10.0"
+gem 'backbone-on-rails', "~>0.9.10.0"
 gem 'stripe', :git => 'https://github.com/stripe/stripe-ruby'
 gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'
 gem "acts_as_paranoid", "~>0.4.0"
@@ -48,7 +48,7 @@ gem 'sitemap_generator'
 gem 'whenever'
 gem 'unicorn'
 gem 'unicorn-worker-killer'
-gem 'localeapp'
+# gem 'localeapp'
 
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'

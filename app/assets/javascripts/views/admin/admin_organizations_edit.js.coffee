@@ -17,9 +17,14 @@ class BikeIndex.Views.AdminOrganizationsEdit extends Backbone.View
       $(this).before($(this).data('fields').replace(regexp, time))
       event.preventDefault()
       us_val = parseInt($('#us-country-code').text(), 10)
-      console.log($(this).closest('fieldset').find('.country_select_container select'))
-      $(this).closest('fieldset').find('.country_select_container select').val(us_val)
-      $(this).closest('fieldset').find('.location-name-field input').val($('#organization_name').val())
+      for location in $(this).closest('fieldset').find('.country_select_container select')
+        l = $(location)
+        l.val(us_val) unless l.val().length > 0
+      names = $(this).closest('fieldset').find('.location-name-field input')
+      for name in names
+        n = $(name)
+        n.val($('#organization_name').val()) unless n.val().length > 0
+      
       $('.chosen-select select').select2()
       
   loadNotifications: ->

@@ -11,6 +11,7 @@ Bikeindex::Application.routes.draw do
     resources :memberships, only: [:edit, :update, :destroy]
     resources :organization_invitations, only: [:new, :create]
   end
+  
   match '/' => 'stolen#index', :constraints => { subdomain: /stolen/i } 
   root to: 'welcome#index'
 

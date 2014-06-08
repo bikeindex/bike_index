@@ -25,7 +25,7 @@ describe Api::V1::BikesController do
       user = FactoryGirl.create(:user)
       FactoryGirl.create(:membership, user: user, organization: organization)
       options = { stolen: true, organization_slug: organization.slug, access_token: organization.access_token}
-      get :stolen_ids, , format: :json
+      get :stolen_ids, options, format: :json
       response.code.should eq('200')
       pp response
       bikes = JSON.parse(response.body)
