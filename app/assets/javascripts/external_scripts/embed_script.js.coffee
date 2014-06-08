@@ -18,12 +18,24 @@ getModelList = ->
       error: ->
         setModelTypeahead()
 
+toggleRegistrationType = ->
+  $('#registration-type-tabs a').toggleClass('current-type')
+  if $('#registration-type-tabs a.current-type').hasClass('stolen')
+    $('#stolen_fields_container').slideUp 'medium', ->
+      $('#stolen_fields').appendTo('#stolen_fields_store')
+    $('.has-no-serial .stolen').fadeOut 'fast', ->
+  else
+    $('#stolen_fields').appendTo('#stolen_fields_container')
+    # $('#stolen_fields_containter').html($('#stolen_fields').html())
+    $('#stolen_fields_container').slideDown()
+
+
 
 updateSerial = (e) ->
-    if $(e.target).prop('checked') == true
-      $('#bike_serial_number').val('absent').addClass('absent-serial')
-    else
-      $('#bike_serial_number').val('').removeClass('absent-serial')    
+  if $(e.target).prop('checked') == true
+    $('#bike_serial_number').val('absent').addClass('absent-serial')
+  else
+    $('#bike_serial_number').val('').removeClass('absent-serial')    
 
 optionalFormUpdate = (e) ->
   # $(@).find('a').data('target')
@@ -67,13 +79,12 @@ updateYear = ->
     $('#bike_unknown_year').prop('checked', false)
   getModelList()
 
-
 $(document).ready ->
   otherManufacturerUpdate()
 
   $('#bike_has_no_serial').change (e) ->
     updateSerial(e)
-
+  
   $('#alert-block .close').click ->
     $('#alert-block').fadeOut('fast')
 
@@ -91,3 +102,14 @@ $(document).ready ->
     toggleUnknownYear()
 
   $('.chosen-select select').select2()
+
+  $('#registration-type-tabs a').click (e) ->
+    e.preventDefault()
+    if $('#bike_stolen').val() == "true"
+      $('#bike_stolen').val(0)
+    else
+      $('#bike_stolen').val(1)
+    toggleRegistrationType()
+
+  $('#stolen_record_date_stolen_input').datepicker('format: mm-dd-yyy')
+  $('#stolen_fields').appendTo('#stolen_fields_store')

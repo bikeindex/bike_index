@@ -1,8 +1,14 @@
+#stolen_fields_store
 = form_for @bike, :multipart => true do |f|
   = f.hidden_field :b_param_id
   = f.hidden_field :creation_organization_id
   = f.hidden_field :embeded, value: true
   .input-group
+    #registration-type-tabs
+      %a.registration-type-tab{ href: '#', data: { stype: 'description' } }
+        Register a non-stolen bike
+      %a.registration-type-tab.stolen.current-type{ href: '#', data: { stype: 'serial' } }
+        Register a stolen bike
     .control-group
       = f.label :serial_number, class: "control-label"
       .controls
@@ -10,9 +16,9 @@
     .has-no-serial.optional-block
       %label
         = f.check_box :has_no_serial, tabindex: -1 
-        - if @bike.stolen?
+        %span.stolen          
           Unknown
-        - else
+        %span.not-stolen          
           Has no serial
 
   .input-group.with-additional-block
@@ -71,22 +77,104 @@
           Third color
         .controls.chosen-select
           = collection_select( :bike, :tertiary_frame_color_id, Color.all, :id, :name, prompt: "Choose color" )
+  
+  #stolen_fields_container
+    #stolen_fields
+      = f.hidden_field :stolen, value: true
+      = fields_for :stolen_record do |builder|
+        .input-group
+          .control-group
+            = f.label :phone, class: "control-label"
+            .controls
+              = builder.text_field :phone, required: "true"
+          .control-group.stolen-phone-groups
+            %label.control-label
+              Show phone number to:
+            .phone-group
+              = builder.label :phone_for_everyone do
+                = builder.check_box :phone_for_everyone
+                Everyone
+            .phone-group
+              = builder.label :phone_for_users do
+                = builder.check_box :phone_for_users, checked: true
+                Bike Index users
+            .phone-group
+              = builder.label :phone_for_shops do
+                = builder.check_box :phone_for_shops, checked: true
+                Bike Shops
+            .phone-group
+              = builder.label :phone_for_police do
+                = builder.check_box :phone_for_police, checked: true
+                Law enforcement
+        .input-group
+          .control-group.datepicker-container
+            = builder.label :date_stolen_input, "When was it stolen?", class: "control-label"
+            .controls
+              #stolen_date
 
-  .input-group
+                = builder.text_field :date_stolen_input, value: Time.now.strftime("%m-%d-%Y"), required: true, data: { :'date-format' => "mm-dd-yyyy" }
+        #stolen-bike-location.input-group
+          .control-group.chosen-select
+            = builder.label :street, "Where was it stolen?", class: "control-label"
+            #country_select_container.controls.chosen-select
+              = builder.collection_select(:country_id, Country.all, :id, :name, prompt: "Choose country", selected: Country.find_by_iso("US").id )
+          .control-group.extra-group.chosen-select
+            .controls
+              = builder.text_field :street, placeholder: "Intersection or address"
+            .controls.extra-field
+              = builder.text_field :city, placeholder: "City"
+            .controls.extra-field
+              = builder.text_field :zipcode, placeholder: "Zipcode"
+            #state-select.controls.extra-field.chosen-select
+              = builder.collection_select(:state_id, State.all, :id, :name, include_blank: true, prompt: "State" )
+        .input-group
+          .control-group.large-text
+            = builder.label :theft_description, "Description of the theft", class: "control-label"
+            .controls
+              = builder.text_area :theft_description, rows: 3
+        .input-group
+          %p.stolen-suggestion
+            Filing a 
+            %strong
+              police report
+            is 
+            %span.stolen-color
+              extremely important
+            for stolen bike recovery.
+          .control-group
+            = builder.label :police_report_number, "Police report number", class: 'control-label'
+            .controls
+              = builder.text_field :police_report_number
+          .control-group.extra-group
+            = builder.label :police_report_department, "Department & city", class: 'control-label'
+            .controls
+              = builder.text_field :police_report_department
+        .input-group
+          .control-group.receive-group
+            .receive-notifications
+              = builder.label :receive_notifications do
+                = builder.check_box :receive_notifications, checked: true
+                Receive notifications from the Index about this stolen #{@bike.type}
+                %span
+                  eg if we tweet about or someone searches for it's serial number
+
+  .input-group.form-foot
     .control-group
       %label.control-label{ for: 'bike_owner_email' }
         Your email address
+      .controls
         = f.email_field :owner_email
     .submit-registration
       = submit_tag "Register this", class: "button-submit"
       = collection_select( :bike, :cycle_type_id, CycleType.all, :id, :name, required: true)
-  .input-group.form-foot
-    .control-group
-      - if @b_param.image.present? or @b_param.image_tmp.present?
-        %strong
-          Image has been uploaded
-      - else
-        .filefield-button
-          Optional - upload a photo
-          = f.file_field :image
-        #filepath
+  .input-group.optional-group
+  
+    - if @b_param.image.present? or @b_param.image_tmp.present?
+      %strong
+        Image has been uploaded
+    - else
+      .filefield-button
+        = f.file_field :image
+      #filepath
+      %span
+        Optional - upload a photo
