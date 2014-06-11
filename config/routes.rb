@@ -136,8 +136,14 @@ Bikeindex::Application.routes.draw do
   end
 
   resources :stolen, only: [:index] do 
-    collection { get 'tsv_download' }
-  end  
+    collection do 
+      get 'tsv_download'
+      %w[links faq tech identidots philosophy rfid_tags_for_the_win howworks about].each do |page|
+        get page
+      end
+    end
+  end
+  
   
   resources :manufacturers, only: [:show, :index]
   match 'manufacturers_mock_csv', to: 'manufacturers#mock_csv'

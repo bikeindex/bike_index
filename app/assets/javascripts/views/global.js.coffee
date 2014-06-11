@@ -16,7 +16,6 @@ class BikeIndex.Views.Global extends Backbone.View
     @setElement($('#body'))
     on_stolen = false
     if $('#sbr-body').length > 0
-      console.log('something')
       that = @
       $('#search-type-tabs').click (e) ->
         that.toggleSearchType(e)

@@ -1,40 +1,3 @@
-%section.sbr-main-section
-  .receptacle
-    .inner-recep
-      = link_to 'Register your stolen bike', new_bike_url(stolen: true), class: 'list-stolen-bike'
-      .stolen-registry-logo
-        = image_tag '/assets/stolen/stolen-registry.svg'
-      %h1
-        Stolen Bike Registry
-
-      = form_tag bikes_path, method: :get, class: 'sbr-search-fields' do 
-        = hidden_field_tag :stolen, true
-        = hidden_field_tag :search_type, 'description'
-        #search-type-tabs
-          %a.search-type-tab.active{ href: '#', data: { stype: 'description' } }
-            %span.medium-screens
-              Search bike
-            descriptions
-          %a.search-type-tab{ href: '#', data: { stype: 'serial' } }
-            %span.medium-screens
-              Search bike
-            serials
-        .sbr-search-inputs
-          = text_field_tag :query_typed, params[:query_typed], class: 'sbr-bike-search', autofocus: true
-          = button_tag(type: "submit", class: "sbrbtn") do
-            = image_tag '/assets/stolen/search.svg'
-          .proximity#stolen-proximity
-            %span
-              Stolen near
-            = text_field_tag :proximity, params[:proximity], placeholder: 'Anywhere'
-.sbr-banner
-  Over 
-  / = StolenRecord.unscoped.where(current: false).count
-  1999
-  bikes recovered
-  %span.medium-screens
-    \- and counting
-
 %section.sbr-get-involved
   .receptacle
     .inner-recep
@@ -108,7 +71,7 @@
 
       = render 'stolen/stickers'
 
-%section.donation-section
+%section
   .receptacle
     .inner-recep
       %h3
