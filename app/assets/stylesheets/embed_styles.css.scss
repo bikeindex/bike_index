@@ -398,3 +398,10 @@ a {
   // }
 }
 
+@media (max-width: 500px) {
+ #registration-type-tabs {
+   position: relative; 
+   padding-bottom: 10px;
+   margin-top: -10px;
+ }
+}
