@@ -41,4 +41,12 @@ class StolenController < ApplicationController
     @title = ' - how it works'
   end
 
+  def merging
+    @title = ' - Under construction'
+    stolen_bikes = StolenRecord.where(approved: true).order('date_stolen DESC').limit(6).pluck(:bike_id)
+    @stolen_bikes = Bike.where('id in (?)', stolen_bikes).includes(:stolen_records).decorate
+    @feedback = Feedback.new
+    render action: 'index'
+  end
+
 end

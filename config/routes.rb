@@ -138,7 +138,7 @@ Bikeindex::Application.routes.draw do
   resources :stolen, only: [:index] do 
     collection do 
       get 'tsv_download'
-      %w[links faq tech identidots philosophy rfid_tags_for_the_win howworks about].each do |page|
+      %w[links faq tech identidots philosophy rfid_tags_for_the_win howworks about merging].each do |page|
         get page
       end
     end

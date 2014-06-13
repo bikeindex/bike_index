@@ -27,11 +27,20 @@
       = auto_discovery_link_tag(:atom, blogs_url(format: "atom"), {:title => "Bike Index"})
 
   %body#sbr-body
-  
     .sbr-wrap
       %section.sbr-main-section
         .receptacle
           .inner-recep
+            .alert.alert-info
+              %h4
+                StolenBicycleRegistry.com has moved!
+              %p
+                StolenBicycleRegistry.com has merged with Bike Index (#{link_to 'read the announcement', 'https://bikeindex.org/blogs/providing-the-largest-and-most-effective-bicycle-registry---ever'})!
+              %p
+                We're moving all the records over today, so some links will be broken. Don't worry, you can still #{link_to 'register your stolen bike', new_bike_url(stolen: true)}. We apologize for the temporary inconvenience,
+              %p
+                \- Bryan Hance & Bike Index
+
             = link_to 'Register your stolen bike', new_bike_url(stolen: true), class: 'list-stolen-bike'
             .stolen-registry-logo
               = image_tag '/assets/stolen/stolen-registry.svg'
