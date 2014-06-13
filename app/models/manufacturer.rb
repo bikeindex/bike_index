@@ -56,7 +56,7 @@ class Manufacturer < ActiveRecord::Base
   end
 
   
-  before_create :set_slug
+  before_save :set_slug
   def set_slug
     self.slug = Slugifyer.slugify(self.name)
     self.book_slug = Slugifyer.manufacturer(self.name)
