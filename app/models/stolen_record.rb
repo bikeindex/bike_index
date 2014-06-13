@@ -35,7 +35,9 @@ class StolenRecord < ActiveRecord::Base
 
   def address
     return nil unless self.country
-    a = [street, city]
+    a = []
+    a << street if street.present?
+    a << city
     a << state.abbreviation if state.present?
     (a+[zipcode, country.name]).compact.join(', ')
   end
