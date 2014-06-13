@@ -13,14 +13,6 @@
 
 ActiveRecord::Schema.define(:version => 20140526161223) do
 
-  create_table "alternate_emails", :force => true do |t|
-    t.string   "email"
-    t.boolean  "confirmed"
-    t.integer  "user_id"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-  end
-
   create_table "b_params", :force => true do |t|
     t.text     "params"
     t.string   "bike_title"
@@ -115,8 +107,6 @@ ActiveRecord::Schema.define(:version => 20140526161223) do
     t.integer  "country_id"
     t.string   "stock_photo_url"
     t.integer  "current_stolen_record_id"
-    t.string   "creation_image"
-    t.string   "creation_image_tmp"
   end
 
   add_index "bikes", ["creation_organization_id"], :name => "index_bikes_on_organization_id"

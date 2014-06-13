@@ -21,7 +21,9 @@ class StolenRecord < ActiveRecord::Base
     :phone_for_users,
     :phone_for_shops,
     :phone_for_police,
-    :receive_notifications
+    :receive_notifications,
+    :approved
+    
   belongs_to :bike
   belongs_to :country
   belongs_to :state
@@ -40,7 +42,7 @@ class StolenRecord < ActiveRecord::Base
 
   unless Rails.env.test?
     geocoded_by :address
-    after_validation :geocode, :if => lambda { self.street.present? && self.city.present? && self.country.present? }
+    after_validation :geocode, :if => lambda { self.city.present? && self.country.present? }
   end
 
   def self.locking_description_select
