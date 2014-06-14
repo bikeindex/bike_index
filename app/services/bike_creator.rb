@@ -25,12 +25,11 @@ class BikeCreator
 	  end
     if bb_data[:bike][:description].present?
     	if @b_param.params[:bike][:description].present?
-		    @b_param.params[:bike][:description] = @b_param.params[:bike][:description] + " #{bb_data[:bike][:description]}"
+		    @b_param.params[:bike][:description] += " #{bb_data[:bike][:description]}"
     	else
     		@b_param.params[:bike][:description] = bb_data[:bike][:description] 
     	end
 		end
-    @b_param.params[:bike][:description] = bb_data[:bike][:description] 
     @b_param.params[:bike][:rear_wheel_bsd] = bb_data[:bike][:rear_wheel_bsd] if bb_data[:bike][:rear_wheel_bsd].present?
     @b_param.params[:bike][:rear_tire_narrow] = bb_data[:bike][:rear_tire_narrow] if bb_data[:bike][:rear_tire_narrow].present?
     @b_param.params[:bike][:stock_photo_url] = bb_data[:bike][:stock_photo_url] if bb_data[:bike][:stock_photo_url].present?
