@@ -20,7 +20,7 @@ describe Api::V1::UsersController do
   end
 
   describe :request_serial_update do 
-    it "should create a new serial request mail" do 
+    xit "should create a new serial request mail" do 
       o = FactoryGirl.create(:ownership)
       user = o.creator
       bike = o.bike

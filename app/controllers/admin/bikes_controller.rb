@@ -8,6 +8,7 @@ class Admin::BikesController < Admin::BaseController
     if params[:email]
       @bikes = Bike.admin_text_search(params[:email])
     elsif params[:missing_manufacturer]
+      @unknown = true
     	@bikes = Bike.where('manufacturer_other IS NOT NULL').limit 500
     else 
       @bikes = Bike.unscoped.order("created_at desc").limit(400)

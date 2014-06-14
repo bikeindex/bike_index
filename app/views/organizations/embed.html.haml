@@ -82,30 +82,12 @@
     #stolen_fields
       = f.hidden_field :stolen, value: true
       = fields_for :stolen_record do |builder|
+      = builder.hidden_field :phone_no_show, value: true
         .input-group
           .control-group
             = f.label :phone, class: "control-label"
             .controls
               = builder.text_field :phone, required: "true"
-          .control-group.stolen-phone-groups
-            %label.control-label
-              Show phone number to:
-            .phone-group
-              = builder.label :phone_for_everyone do
-                = builder.check_box :phone_for_everyone
-                Everyone
-            .phone-group
-              = builder.label :phone_for_users do
-                = builder.check_box :phone_for_users, checked: true
-                Bike Index users
-            .phone-group
-              = builder.label :phone_for_shops do
-                = builder.check_box :phone_for_shops, checked: true
-                Bike Shops
-            .phone-group
-              = builder.label :phone_for_police do
-                = builder.check_box :phone_for_police, checked: true
-                Law enforcement
         .input-group
           .control-group.datepicker-container
             = builder.label :date_stolen_input, "When was it stolen?", class: "control-label"
