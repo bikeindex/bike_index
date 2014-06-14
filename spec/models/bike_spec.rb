@@ -68,7 +68,6 @@ describe Bike do
     end
   end
 
-
   describe :owner do
     it "should receive owner from the last ownership" do
       first_ownership = Ownership.new 
@@ -308,19 +307,35 @@ describe Bike do
     end
   end
 
-  # tests that belong in the controller
-  describe "retrieving pdf" do
-    it "should return a pdf from s3 if it exists already" do
-      #instantiate a model
-      #upload a dummy pdf
-      #request that model view's pdf
-      #confirm model object returned by controller is instantiated model
+  describe :get_listing_order do 
+    it "should be 1/1000 of the current timestamp" do 
+      bike = Bike.new
+      time = Time.now
+      bike.stub(:updated_at).and_return(time)
+      lo = bike.get_listing_order
+      lo.should eq(time.to_time.to_i/1000)
     end
-    it "should call the service object for generating the pdf if it doesn't" do
-      #instantiate a model
-      #request that model view's pdf
-      #ensure that PdfServiceObject.new is called
+    
+    it "should be the current stolen record date stolen" do 
+      bike = Bike.new
+      bike.stub(:stolen).and_return(true)
+      stolen_record = StolenRecord.new 
+      yesterday = Time.now - 1.days
+      stolen_record.stub(:date_stolen).and_return(yesterday)
+      bike.stub(:current_stolen_record).and_return(stolen_record)
+      lo = bike.get_listing_order
+      lo.should eq(yesterday.to_time.to_i)
     end
+
+    it "should be the updated_at" do 
+      bike = Bike.new
+      last_week = Time.now - 7.days
+      bike.stub(:updated_at).and_return(last_week)
+      bike.stub(:stock_photo_url).and_return('https://some_photo.cum')
+      lo = bike.get_listing_order
+      lo.should eq(last_week.to_time.to_i)
+    end
+
   end
   
 end

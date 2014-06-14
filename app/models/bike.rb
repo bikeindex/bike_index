@@ -66,7 +66,8 @@ class Bike < ActiveRecord::Base
     :stock_photo_url,
     :pdf,
     :send_email,
-    :other_listing_urls
+    :other_listing_urls,
+    :listing_order
 
   mount_uploader :pdf, PdfUploader
   process_in_background :pdf
@@ -160,6 +161,15 @@ class Bike < ActiveRecord::Base
     self.where(id: a)
   end
 
+  def get_listing_order
+    return current_stolen_record.date_stolen.to_time.to_i if stolen    
+    t = updated_at.to_time.to_i
+    unless stock_photo_url.present? or public_images.present?
+      t = t/1000
+    end
+    t
+  end
+
   def current_ownership
     ownerships.last
   end
@@ -187,7 +197,7 @@ class Bike < ActiveRecord::Base
     if self.manufacturer.name == "Other" && self.manufacturer_other.present?
       self.manufacturer_other
     else
-      self.manufacturer.name 
+      self.manufacturer.name
     end
   end
 

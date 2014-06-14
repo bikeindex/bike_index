@@ -6,10 +6,15 @@
       = link_to "Stolen edit page", edit_admin_stolen_bike_url(@bike)
   .dl-holder
     %dl.dl-horizontal
-      = @bike.dl_list_item(@bike.created_at.strftime("%m-%d-%Y"), "Created")
       = @bike.dl_from_attribute("owner_email")
-      = @bike.dl_list_item(@bike.owner.email, "Current Owner")
-      = @bike.dl_from_attribute("cached_data")
+      = @bike.dl_list_item((link_to @bike.owner.email, edit_admin_user_url(@bike.owner)), "Current Owner")
+      - if @bike.current_stolen_record.present?
+        = @bike.dl_list_item(@bike.current_stolen_record.phone, "Phone")
+    %dl.dl-horizontal
+      = @bike.dl_list_item(@bike.created_at.strftime("%m-%d-%Y"), "Created")
+      - if @bike.creation_organization.present?
+        = @bike.dl_list_item(@bike.creation_organization.name, "Creation org")
+        = @bike.dl_from_attribute("cached_data")
   %hr
 
   = form_for [:admin, @bike], :html => { class: "form form-horizontal admin-bike-edit" } do |f|

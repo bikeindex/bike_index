@@ -1,4 +1,35 @@
-.stock-photo { opacity: .7; margin-top: .5em; font-size: 1.5em; }
+.stock-photo {
+  color: $grayMed;
+  opacity: .9;
+  margin: 0 auto;
+  font-size: 1.5em;
+  position: absolute;
+  top: .5em; left: 0;
+  color: #999;
+  width: 100%;
+  font-weight: bold;
+  font-size: 1.75em;
+  font-family: $baseFont;
+  p {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 0;
+  }
+  // span {
+  //   text-align: right;
+  //   display: none;
+  //   font-size: .5em;
+    
+  // }
+  span {
+    font-family: $headerFont;
+    display: block;
+    font-weight: normal;
+    font-size: .85em;
+    margin-top: .45em;
+    opacity: .6;
+  }
+}
 
 .single-bike-photos {
   @include clearfix;
@@ -36,16 +67,16 @@
       height: auto;
       max-height: 90%;
     }
-    span {
-      position: absolute;
-      top: 1em;
-      left: 0;
-      color: #999;
-      width: 100%;
-      text-align: center;
-      font-weight: bold;
-      font-size: 1.75em;
-    }
+    // span {
+    //   position: absolute;
+    //   top: 1em;
+    //   left: 0;
+    //   color: #999;
+    //   width: 100%;
+    //   text-align: center;
+    //   font-weight: bold;
+    //   font-size: 1.75em;
+    // }
   }
 }
 .photo-list {
@@ -90,7 +121,14 @@
     margin-right: $gutterW;
     float: left;
     padding: 40px 0;
-    .stock-photo { font-size: 80px; margin-top: .25em; }
+    .stock-photo {
+      font-size: 80px; 
+      p { font-weight: normal; }
+      span {
+        margin-top: 1.5em;
+        font-size: 30px;
+      }
+    }
   }
   .photo-list {
     position: absolute;

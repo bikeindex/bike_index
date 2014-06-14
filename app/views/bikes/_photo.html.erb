@@ -26,8 +26,16 @@
   <% end %>
 <% elsif @bike.stock_photo_url.present? %>
   <div class="image-holder just1photo" id="selected-photo">
-    <%= link_to image_tag(@bike.stock_photo_url, alt: "Bike photo", id: "i|0"), @bike.stock_photo_url, target: "_blank", class: "current-photo" %>
-    <!-- <span class="stock-photo">manufacturer photo</span> -->
+    <div class="stock-photo">
+      <p>
+        Stock photo
+        <span>(color may not match)</span>
+        
+      </p>
+    </div>
+    <a href="<%= @bike.stock_photo_url %>" class='current-photo' target='blank'>
+      <%= image_tag(@bike.stock_photo_url, alt: "Bike photo", id: "i|0")%>
+    </a>
   </div>
 <% else %>
   <div class="image-holder empty" id="selected-photo">

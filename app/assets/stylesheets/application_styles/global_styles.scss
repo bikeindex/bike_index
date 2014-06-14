@@ -18,7 +18,7 @@ body {
   background: $bodyBackground;
   color: $textColor;
   font-size: $standardFontSize;
-  font-family: $baseFont;
+  font-family: $headerFont;
 }
 
 // section.content:before {
@@ -33,7 +33,7 @@ body {
 // }
 
 h1, h2, h3, h4 {
-  font-family: $headerFont;
+  font-family: $baseFont;
   font-weight: normal;
   line-height: 1.2em;
   strong {
