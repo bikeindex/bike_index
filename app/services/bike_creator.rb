@@ -20,8 +20,17 @@ class BikeCreator
     return nil unless bb_data = BikeBookIntegration.new.get_model(bike)
     # bb_data = bb_data.with_indifferent_access
     @b_param.params[:bike][:cycle_type] = bb_data[:bike][:cycle_type] if bb_data[:bike][:cycle_type].present?
-    @b_param.params[:bike][:paint_name] = bb_data[:bike][:paint_description] if bb_data[:bike][:paint_description].present?
-    @b_param.params[:bike][:description] = bb_data[:bike][:description] if bb_data[:bike][:description].present?
+    if bb_data[:bike][:paint_description].present?
+	    @b_param.params[:bike][:paint_name] = bb_data[:bike][:paint_description] unless @b_param.params[:bike][:paint_name].present?
+	  end
+    if bb_data[:bike][:description].present?
+    	if @b_param.params[:bike][:description].present?
+		    @b_param.params[:bike][:description] = @b_param.params[:bike][:description] + " #{bb_data[:bike][:description]}"
+    	else
+    		@b_param.params[:bike][:description] = bb_data[:bike][:description] 
+    	end
+		end
+    @b_param.params[:bike][:description] = bb_data[:bike][:description] 
     @b_param.params[:bike][:rear_wheel_bsd] = bb_data[:bike][:rear_wheel_bsd] if bb_data[:bike][:rear_wheel_bsd].present?
     @b_param.params[:bike][:rear_tire_narrow] = bb_data[:bike][:rear_tire_narrow] if bb_data[:bike][:rear_tire_narrow].present?
     @b_param.params[:bike][:stock_photo_url] = bb_data[:bike][:stock_photo_url] if bb_data[:bike][:stock_photo_url].present?
