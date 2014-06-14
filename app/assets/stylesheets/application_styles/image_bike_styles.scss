@@ -3,12 +3,13 @@
   opacity: .9;
   margin: 0 auto;
   font-size: 1.5em;
-  position: absolute;
+  // position: absolute;
   top: .5em; left: 0;
   color: #999;
   width: 100%;
   font-weight: bold;
   font-size: 1.75em;
+  line-height: 1em;
   font-family: $baseFont;
   p {
     max-width: 1160px;
@@ -19,14 +20,14 @@
   //   text-align: right;
   //   display: none;
   //   font-size: .5em;
-    
   // }
-  span {
+  .stock-photo-byline {
+    span { display: none; }
     font-family: $headerFont;
-    display: block;
+    // display: block;
     font-weight: normal;
     font-size: .85em;
-    margin-top: .45em;
+    // margin-top: .45em;
     opacity: .6;
   }
 }
@@ -124,7 +125,8 @@
     .stock-photo {
       font-size: 80px; 
       p { font-weight: normal; }
-      span {
+      .stock-photo-byline {
+        span { display: inline; }
         margin-top: 1.5em;
         font-size: 30px;
       }

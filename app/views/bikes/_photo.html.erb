@@ -28,9 +28,7 @@
   <div class="image-holder just1photo" id="selected-photo">
     <div class="stock-photo">
       <p>
-        Stock photo
-        <span>(color may not match)</span>
-        
+        Stock photo <span class="stock-photo-byline"><span>of <%= @bike.year%> <%= @bike.frame_model %></span> (color may not match)</span>
       </p>
     </div>
     <a href="<%= @bike.stock_photo_url %>" class='current-photo' target='blank'>
