@@ -82,7 +82,7 @@
     #stolen_fields
       = f.hidden_field :stolen, value: true
       = fields_for :stolen_record do |builder|
-      = builder.hidden_field :phone_no_show, value: true
+        = builder.hidden_field :phone_no_show, value: true
         .input-group
           .control-group
             = f.label :phone, class: "control-label"
