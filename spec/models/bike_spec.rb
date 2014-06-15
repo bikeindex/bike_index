@@ -314,7 +314,7 @@ describe Bike do
       time = Time.now
       bike.stub(:updated_at).and_return(time)
       bike.set_listing_order
-      bike.listing_order.should eq(time.to_time.to_i/1000)
+      bike.listing_order.should eq(time.to_time.to_i/1000000)
     end
     
     it "should be the current stolen record date stolen * 1000" do 
@@ -325,7 +325,7 @@ describe Bike do
       stolen_record.stub(:date_stolen).and_return(yesterday)
       bike.stub(:current_stolen_record).and_return(stolen_record)
       bike.set_listing_order
-      bike.listing_order.should eq(yesterday.to_time.to_i*10000)
+      bike.listing_order.should eq(yesterday.to_time.to_i)
     end
 
     it "should be the updated_at" do 
@@ -334,7 +334,7 @@ describe Bike do
       bike.stub(:updated_at).and_return(last_week)
       bike.stub(:stock_photo_url).and_return('https://some_photo.cum')
       bike.set_listing_order
-      bike.listing_order.should eq(last_week.to_time.to_i)
+      bike.listing_order.should eq(last_week.to_time.to_i/10000)
     end
 
   end

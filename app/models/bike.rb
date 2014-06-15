@@ -164,14 +164,15 @@ class Bike < ActiveRecord::Base
   before_save :set_listing_order
   def set_listing_order
     if stolen && current_stolen_record.present?
-      t = current_stolen_record.date_stolen.to_time.to_i * 10000
+      t = current_stolen_record.date_stolen.to_time.to_i
     else
       if updated_at.present?
         t = updated_at.to_time.to_i
       else
         t = Time.now.to_time.to_i
       end
-      t = t/1000 unless stock_photo_url.present? or public_images.present?
+      t = t/10000
+      t = t/100 unless stock_photo_url.present? or public_images.present?
     end
     self.listing_order = t
   end
