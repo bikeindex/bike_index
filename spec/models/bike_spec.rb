@@ -219,6 +219,7 @@ describe Bike do
     it "should cache the photo" do 
       bike = FactoryGirl.create(:bike)
       image = FactoryGirl.create(:public_image, imageable: bike)
+      bike.reload
       bike.cache_photo
       bike.thumb_path.should_not be_nil
     end
@@ -307,13 +308,13 @@ describe Bike do
     end
   end
 
-  describe :get_listing_order do 
+  describe :set_listing_order do 
     it "should be 1/1000 of the current timestamp" do 
       bike = Bike.new
       time = Time.now
       bike.stub(:updated_at).and_return(time)
-      lo = bike.get_listing_order
-      lo.should eq(time.to_time.to_i/1000)
+      bike.set_listing_order
+      bike.listing_order.should eq(time.to_time.to_i/1000)
     end
     
     it "should be the current stolen record date stolen" do 
@@ -323,8 +324,8 @@ describe Bike do
       yesterday = Time.now - 1.days
       stolen_record.stub(:date_stolen).and_return(yesterday)
       bike.stub(:current_stolen_record).and_return(stolen_record)
-      lo = bike.get_listing_order
-      lo.should eq(yesterday.to_time.to_i)
+      bike.set_listing_order
+      bike.listing_order.should eq(yesterday.to_time.to_i)
     end
 
     it "should be the updated_at" do 
@@ -332,8 +333,8 @@ describe Bike do
       last_week = Time.now - 7.days
       bike.stub(:updated_at).and_return(last_week)
       bike.stub(:stock_photo_url).and_return('https://some_photo.cum')
-      lo = bike.get_listing_order
-      lo.should eq(last_week.to_time.to_i)
+      bike.set_listing_order
+      bike.listing_order.should eq(last_week.to_time.to_i)
     end
 
   end

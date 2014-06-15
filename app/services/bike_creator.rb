@@ -79,12 +79,12 @@ class BikeCreator
     bike.save
     @bike = create_associations(bike)
     validate_record(@bike)
-    if @bike.present? && @bike.created_at.present?
-    	if @b_param.params[:date_created].present? && @b_param.params[:date_created].length > 4
-	    	@bike.created_at = DateTime.strptime("#{@b_param.params[:date_created]} 06", "%Y-%m-%d %H")
-	    	@bike.save
-	    end
-	  end
+    #  if @bike.present? && @bike.created_at.present?
+    #  	if @b_param.params[:date_created].present? && @b_param.params[:date_created].length > 4
+	  #   	@bike.created_at = DateTime.strptime("#{@b_param.params[:date_created]} 06", "%Y-%m-%d %H")
+	  #   	@bike.save
+	  #   end
+	  # end
     @bike
   end
 
