@@ -1,6 +1,6 @@
 class ImageAssociatorWorker
   include Sidekiq::Worker
-  sidekiq_options queue: 'image_associator'
+  sidekiq_options queue: 'updates'
   sidekiq_options :backtrace => true
     
   def perform

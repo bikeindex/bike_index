@@ -72,7 +72,7 @@ class BikeSearcher
       matching_query(@bikes)
       by_proximity if @params[:stolen] && @params[:proximity].present? && @params[:proximity].strip.length > 1
     else
-      @bikes = Bike.unscoped.order("RANDOM()").limit(100)
+      @bikes = Bike.where(stolen: false).order("RANDOM()").limit(100)
     end
     @bikes
   end

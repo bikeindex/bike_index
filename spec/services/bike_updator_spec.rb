@@ -107,4 +107,18 @@ describe BikeUpdator do
       bike.components.count.should eq(0)
     end
   end
+
+  it "enque listing order working" do
+    Sidekiq::Worker.clear_all
+    bike = FactoryGirl.create(:bike, stolen: true)
+    ownership = FactoryGirl.create(:ownership, bike: bike)
+    user = ownership.creator
+    new_creator = FactoryGirl.create(:user)
+    bike_params = {stolen: false}
+    update_bike = BikeUpdator.new(user: user, :b_params => {id: bike.id, bike: bike_params})
+    update_bike.should_receive(:update_ownership).and_return(true)
+    expect {
+      update_bike.update_available_attributes
+    }.to change(ListingOrderWorker.jobs, :size).by(1)
+  end
 end

@@ -119,6 +119,7 @@ class Bike < ActiveRecord::Base
 
   attr_accessor :other_listing_urls, :date_stolen_input, :receive_notifications, :phone, :image, :bike_token_id, :b_param_id, :payment_required, :embeded, :embeded_extended, :paint_name, :bike_image_cache, :send_email
 
+  # default_scope where(example: false).order("listing_order desc")
   default_scope where(example: false).order("created_at desc")
   scope :stolen, where(stolen: true)
   scope :non_stolen, where(stolen: false)
@@ -161,20 +162,11 @@ class Bike < ActiveRecord::Base
     self.where(id: a)
   end
 
-  before_save :set_listing_order
-  def set_listing_order
-    if stolen && current_stolen_record.present?
-      t = current_stolen_record.date_stolen.to_time.to_i
-    else
-      if updated_at.present?
-        t = updated_at.to_time.to_i
-      else
-        t = Time.now.to_time.to_i
-      end
-      t = t/10000
-      t = t/100 unless stock_photo_url.present? or public_images.present?
-    end
-    self.listing_order = t
+  def get_listing_order
+    return current_stolen_record.date_stolen.to_time.to_i if stolen && current_stolen_record.present?
+    t = updated_at.to_time.to_i/10000
+    t = t/100 unless stock_photo_url.present? or public_images.present?
+    t
   end
 
   def current_ownership

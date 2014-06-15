@@ -114,8 +114,10 @@ describe BikeCreator do
       wheel_size = FactoryGirl.create(:wheel_size)
       b_param = BParam.new
       creator = BikeCreator.new(b_param)
-      creator.should_receive(:create_associations).and_return(true)
-      creator.should_receive(:validate_record).and_return(true)
+      bike = Bike.new
+      bike.stub(:id).and_return(69)
+      creator.should_receive(:create_associations).and_return(bike)
+      creator.should_receive(:validate_record).and_return(bike)
       new_bike = Bike.new(
         creation_organization_id: organization.id,
         propulsion_type_id: propulsion_type.id,
@@ -132,6 +134,19 @@ describe BikeCreator do
         creator.save_bike(new_bike)
       }.should change(Bike, :count).by(1)
     end
+    
+    it "enque listing order working" do
+      Sidekiq::Worker.clear_all
+      b_param = BParam.new
+      creator = BikeCreator.new(b_param)
+      bike = FactoryGirl.create(:bike)
+      creator.should_receive(:create_associations).and_return(bike)
+      creator.should_receive(:validate_record).and_return(bike)
+      expect {
+        creator.save_bike(bike)
+      }.to change(ListingOrderWorker.jobs, :size).by(1)
+    end
+
   end
 
   describe :new_bike do 

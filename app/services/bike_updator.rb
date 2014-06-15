@@ -68,6 +68,7 @@ class BikeUpdator
     set_protected_attributes
     update_ownership
     update_stolen_record if @bike.update_attributes(@bike_params[:bike])
+    ListingOrderWorker.perform_in(1.minutes, @bike.id) if @bike.present?
     remove_blank_components
     @bike
   end

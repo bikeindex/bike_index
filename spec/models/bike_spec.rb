@@ -41,7 +41,7 @@ describe Bike do
 
   describe "scopes" do 
     it "default scopes to created_at desc" do 
-      Bike.scoped.to_sql.should == Bike.where(example: false).order("created_at desc").to_sql
+      Bike.scoped.to_sql.should == Bike.where(example: false).order("listing_order desc").to_sql
     end
     it "scopes to only stolen bikes" do 
       Bike.stolen.to_sql.should == Bike.where(stolen: true).to_sql
@@ -185,7 +185,7 @@ describe Bike do
       bike = FactoryGirl.create(:bike, description: "Phil wood hub")
       bike2 = FactoryGirl.create(:bike)
       bikes = Bike.text_search("")
-      bikes.first.should eq(bike2)
+      bikes.first.should eq(bike)
     end
   end
 
@@ -313,8 +313,8 @@ describe Bike do
       bike = Bike.new
       time = Time.now
       bike.stub(:updated_at).and_return(time)
-      bike.set_listing_order
-      bike.listing_order.should eq(time.to_time.to_i/1000000)
+      lo = bike.get_listing_order
+      lo.should eq(time.to_time.to_i/1000000)
     end
     
     it "should be the current stolen record date stolen * 1000" do 
@@ -324,8 +324,8 @@ describe Bike do
       yesterday = Time.now - 1.days
       stolen_record.stub(:date_stolen).and_return(yesterday)
       bike.stub(:current_stolen_record).and_return(stolen_record)
-      bike.set_listing_order
-      bike.listing_order.should eq(yesterday.to_time.to_i)
+      lo = bike.get_listing_order
+      lo.should eq(yesterday.to_time.to_i)
     end
 
     it "should be the updated_at" do 
@@ -333,8 +333,8 @@ describe Bike do
       last_week = Time.now - 7.days
       bike.stub(:updated_at).and_return(last_week)
       bike.stub(:stock_photo_url).and_return('https://some_photo.cum')
-      bike.set_listing_order
-      bike.listing_order.should eq(last_week.to_time.to_i/10000)
+      lo = bike.get_listing_order
+      lo.should eq(last_week.to_time.to_i/10000)
     end
 
   end
