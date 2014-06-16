@@ -28,7 +28,7 @@
           - elsif Date.yesterday().beginning_of_day() <= bike.created_at          
             Yesterday at #{bike.created_at.strftime("%-I %p")}
           - else
-            = bike.created_at.strftime("%-m.%-d.%Y at %-H")
+            = bike.created_at.strftime("%-m.%-d.%Y")
       %td.medium-screens
         - if bike.created_with_token
           %span.less-strong
