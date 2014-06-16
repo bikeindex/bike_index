@@ -39,6 +39,16 @@
       = @bike.dl_list_item(@bike.owner.email, "Current Owner")
       - if @bike.creation_organization_id.present?
         = @bike.dl_list_item(@bike.creation_organization.name, "Creation Organization")
+      %dt
+        Callable by
+      %dd
+        - if @stolen_record.phone_for_everyone
+          %strong
+            Everyone
+        - else
+          = "Users" if @stolen_record.phone_for_users
+          = " Shops" if @stolen_record.phone_for_shops
+          = " Police" if @stolen_record.phone_for_police
       - if @stolen_record.approved 
         %h2
           Stolen bike approved
