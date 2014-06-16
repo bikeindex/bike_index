@@ -4,14 +4,14 @@ class Admin::UsersController < Admin::BaseController
   def index
     if params[:user_query]
       # if params[:email]
-      @users = User.admin_text_search(params[:user_query])
+      users = User.admin_text_search(params[:user_query])
       # users = User.where('email LIKE ?', params[:user_query]).all
       # users += User.where('name LIKE ?', params[:user_query]).all
       # @users = users
     else 
-      @users = User.order("created_at desc").limit(100)
+      users = User.order("created_at desc").limit(100)
     end
-
+    @users = users.paginate(page: params[:page]).per_page(100)
   end
 
   def edit

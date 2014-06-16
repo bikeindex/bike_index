@@ -25,9 +25,13 @@
     
 
 - if @bikes.present?
+  .paginate-container
+    = will_paginate @bikes 
   %section.full-screen-table
-    %table#truncated-data-table.table.table-striped.table-bordered
+    %table.table.table-striped.table-bordered
       = render partial: "/admin/bikes/admin_bikes_table"
+  .paginate-container
+    = will_paginate @bikes 
 - else
   %h1.padded
     No bikes found!

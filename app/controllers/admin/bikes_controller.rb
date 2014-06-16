@@ -6,13 +6,15 @@ class Admin::BikesController < Admin::BaseController
 
   def index
     if params[:email]
-      @bikes = Bike.admin_text_search(params[:email])
+      bikes = Bike.admin_text_search(params[:email])
     elsif params[:missing_manufacturer]
       @unknown = true
-    	@bikes = Bike.where(manufacturer_id: Manufacturer.find_by_slug('other').id).limit 500
+    	bikes = Bike.where(manufacturer_id: Manufacturer.find_by_slug('other').id).limit 500
     else 
-      @bikes = Bike.unscoped.order("created_at desc").limit(400)
+      bikes = Bike.unscoped.order("created_at desc").limit(400)
     end
+    bikes = bikes.paginate(page: params[:page]).per_page(100)
+    @bikes = bikes.decorate
   end
 
   def duplicates
