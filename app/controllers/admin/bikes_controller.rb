@@ -13,7 +13,7 @@ class Admin::BikesController < Admin::BaseController
     else 
       bikes = Bike.unscoped.order("created_at desc")
     end
-    bikes = bikes.paginate(page: params[:page]).per_page(50)
+    bikes = bikes.paginate(page: params[:page]).per_page(100)
     @bikes = bikes.decorate
   end
 
