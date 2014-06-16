@@ -5,7 +5,7 @@
   - if @verified_only
     = link_to 'All stolen', admin_stolen_bikes_url, class: "sharing-links"
   - else
-    = link_to 'Only non-verified', admin_stolen_bikes_url(unapproved: true), class: "sharing-links"
+    = link_to 'include verified bikes', admin_stolen_bikes_url(unapproved: true), class: "sharing-links"
 
   
 %h4

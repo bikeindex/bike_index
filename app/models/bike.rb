@@ -67,7 +67,8 @@ class Bike < ActiveRecord::Base
     :pdf,
     :send_email,
     :other_listing_urls,
-    :listing_order
+    :listing_order,
+    :approved_stolen
 
   mount_uploader :pdf, PdfUploader
   process_in_background :pdf
@@ -119,8 +120,7 @@ class Bike < ActiveRecord::Base
 
   attr_accessor :other_listing_urls, :date_stolen_input, :receive_notifications, :phone, :image, :bike_token_id, :b_param_id, :payment_required, :embeded, :embeded_extended, :paint_name, :bike_image_cache, :send_email
 
-  # default_scope where(example: false).order("listing_order desc")
-  default_scope where(example: false).order("created_at desc")
+  default_scope where(example: false).order("listing_order desc")
   scope :stolen, where(stolen: true)
   scope :non_stolen, where(stolen: false)
 

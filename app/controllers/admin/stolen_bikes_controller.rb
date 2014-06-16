@@ -6,11 +6,10 @@ class Admin::StolenBikesController < Admin::BaseController
 
   def index
     if params[:unapproved]
-      ids = StolenRecord.where(approved: false).pluck(:bike_id)
-      bikes = Bike.where('id in (?)', ids)
-      @verified_only = true
+      bikes = Bike.stolen.order("created_at desc")
     else
-      bikes = Bike.where(stolen: true).order("created_at desc")
+      bikes = Bike.stolen.where('approved_stolen IS NOT TRUE')
+      @verified_only = true
     end
     bikes = bikes.paginate(page: params[:page]).per_page(50)
     @bikes = bikes.decorate
@@ -18,6 +17,7 @@ class Admin::StolenBikesController < Admin::BaseController
 
   def approve
     @bike.current_stolen_record.update_attribute :approved, true
+    @bike.update_attribute :approved_stolen, true
     ApproveStolenListingWorker.perform_async(@bike.id)
     redirect_to edit_admin_stolen_bike_url(@bike), notice: 'Bike was approved.'
   end
