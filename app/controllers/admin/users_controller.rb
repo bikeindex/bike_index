@@ -9,9 +9,9 @@ class Admin::UsersController < Admin::BaseController
       # users += User.where('name LIKE ?', params[:user_query]).all
       # @users = users
     else 
-      users = User.order("created_at desc").limit(100)
+      users = User.order("created_at desc")
     end
-    @users = users.paginate(page: params[:page]).per_page(100)
+    @users = users.paginate(page: params[:page]).per_page(50)
   end
 
   def edit
