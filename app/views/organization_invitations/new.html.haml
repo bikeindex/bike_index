@@ -1,7 +1,7 @@
 %h1
   Send invitation
 
-= form_for [@organization, @organization_invitation], :html => { class: "form-horizontal padded" } do |f|
+= form_for [@organization, @organization_invitation], html: { class: "form-horizontal padded" } do |f|
   - if @organization_invitation.errors.any?
     #alert-block
       .alert.alert-error

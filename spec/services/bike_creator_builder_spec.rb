@@ -7,7 +7,7 @@ describe BikeCreatorBuilder do
       bike = Bike.new
       b_param = BParam.new 
       b_param.stub(:id).and_return(9)
-      b_param.stub(:params).and_return(:bike => {serial_number: "AAAA"})
+      b_param.stub(:params).and_return(bike: {serial_number: "AAAA"})
       bike = BikeCreatorBuilder.new(b_param).new_bike
       bike.serial_number.should eq("AAAA")
       bike.b_param_id.should eq(9)

@@ -14,8 +14,8 @@ describe HeaderTagHelper do
   describe :title_tag_html do 
     it "should return the title wrapped in title tags" do 
       header_hash = {
-        :title_tag => { title: "Foo 69 69" },
-        :meta_tags => { :charset => "utf-8" }
+        title_tag: { title: "Foo 69 69" },
+        meta_tags: { charset: "utf-8" }
       }
       title_tag = helper.title_tag_html(header_hash)
       title_tag.should eq("<title lang='en'>Foo 69 69</title>\n")
@@ -25,8 +25,8 @@ describe HeaderTagHelper do
   describe :meta_tags_html do 
     it "should return the meta tags in html" do 
       header_hash = {
-        :title_tag => { title: "Foo 69 69" },
-        :meta_tags => { :charset => "utf-8" }
+        title_tag: { title: "Foo 69 69" },
+        meta_tags: { charset: "utf-8" }
       }
       meta_tags = helper.meta_tags_html(header_hash)
       meta_tags.should eq("<meta name=\"charset\" content=\"utf-8\" />\n")
@@ -35,7 +35,7 @@ describe HeaderTagHelper do
 
   describe :set_social_hash do 
     it "should have some values" do 
-      d = helper.set_social_hash({ :title_tag => { title: "Loosers" }, :meta_tags => {description: "Something 69"} })
+      d = helper.set_social_hash({ title_tag: { title: "Loosers" }, meta_tags: {description: "Something 69"} })
       d[:meta_tags][:"og:title"].should eq("Loosers")
       d[:meta_tags][:"twitter:title"].should eq("Loosers")
       d[:meta_tags][:"og:description"].should eq("Something 69")
@@ -68,8 +68,8 @@ describe HeaderTagHelper do
   describe :current_page_auto_hash do 
     before do 
       view.stub(:default_hash).and_return({
-        :title_tag => { title: "Default" },
-        :meta_tags => { :description => "Blank" }
+        title_tag: { title: "Default" },
+        meta_tags: { description: "Blank" }
       })
     end
 
@@ -106,8 +106,8 @@ describe HeaderTagHelper do
   describe :bikes_header_tags do 
     before do 
       helper.stub(:current_page_auto_hash).and_return({
-        :title_tag => { title: "Default" },
-        :meta_tags => { :description => "Blank" }
+        title_tag: { title: "Default" },
+        meta_tags: { description: "Blank" }
       })
     end
 

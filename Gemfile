@@ -9,7 +9,7 @@ gem 'bcrypt-ruby', '~> 3.0.0'
 gem 'active_model_serializers'
 gem 'aws-sdk', '~> 1.3.4'
 gem 'airbrake'
-gem 'resque', :require => 'resque/server'
+gem 'resque', require: 'resque/server'
 gem 'sidekiq'
 gem 'sidekiq-failures'
 gem 'geocoder', "~> 1.1.2"
@@ -30,7 +30,7 @@ gem 'strong_parameters'
 gem 'libv8', '~> 3.11.8'
 gem 'rb-readline', '~> 0.4.2'
 gem 'backbone-on-rails', "~>0.9.10.0"
-gem 'stripe', :git => 'https://github.com/stripe/stripe-ruby'
+gem 'stripe', git: 'https://github.com/stripe/stripe-ruby'
 gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'
 gem "acts_as_paranoid", "~>0.4.0"
 gem "high_voltage"
@@ -53,7 +53,7 @@ gem 'unicorn-worker-killer'
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'
   gem 'coffee-rails', '~> 3.2.1'
-  gem 'therubyracer', :platforms => :ruby
+  gem 'therubyracer', platforms: :ruby
   gem 'uglifier', '>= 1.0.3'
   gem "select2-rails"
 end

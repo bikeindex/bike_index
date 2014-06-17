@@ -1,19 +1,19 @@
 %fieldset.input-group.with-additional-block.add-component-fields
   %article
-    .control-group.chosen-select.has-position-select{:data => {other: Ctype.find_by_slug("other").id, hidden: ".hidden-ctype" }}
+    .control-group.chosen-select.has-position-select{data: {other: Ctype.find_by_slug("other").id, hidden: ".hidden-ctype" }}
       = f.label :ctype_id, "Part type", class: "control-label"
       .controls.part-type-select
         = f.collection_select(:ctype_id, Ctype.all, :id, :name, :required =>true, prompt: "What type of part?" )
       .controls
         - position_visibility = "initially-hidden"
         - position_visibility = "" if f.object.front || f.object.rear
-        .groupedbtn-group{ class: position_visibility, :data =>  { toggle: "buttons-radio" }}
+        .groupedbtn-group{ class: position_visibility, data:  { toggle: "buttons-radio" }}
           .btn-group
             %button.btn.ctype-position-both{ type: "button", :'data-position' => 'both' }
               Both
-            %button.btn{ type: "button", :'data-position' => 'front', :class => if f.object.front then 'active' end }
+            %button.btn{ type: "button", :'data-position' => 'front', class: if f.object.front then 'active' end }
               Front
-            %button.btn{ type: "button", :'data-position' => 'rear', :class => if f.object.rear then 'active' end }
+            %button.btn{ type: "button", :'data-position' => 'rear', class: if f.object.rear then 'active' end }
               Rear
           = f.hidden_field :front_or_rear, class: "front-or-rear"
     - other_show = ""
@@ -29,7 +29,7 @@
         = f.text_area :description, rows: 2
 
     .split-fields
-      .control-group.chosen-select.extra-field{:data => {other: Manufacturer.find_by_slug("other").id, hidden: ".hidden-mnfg" }}
+      .control-group.chosen-select.extra-field{data: {other: Manufacturer.find_by_slug("other").id, hidden: ".hidden-mnfg" }}
         = f.label :manufacturer_id, class: "control-label"
         .controls.component-mnfg-select
           = f.collection_select( :manufacturer_id, Manufacturer.all, :id, :name, :required =>true, prompt: "Manufacturer")

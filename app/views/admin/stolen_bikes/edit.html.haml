@@ -1,4 +1,4 @@
-= form_for [:admin, @customer_contact], :html => { class: "form form-horizontal admin-bike-edit" } do |f|
+= form_for [:admin, @customer_contact], html: { class: "form form-horizontal admin-bike-edit" } do |f|
   - if @customer_contact.errors.any?
     #alert-block
       .alert.alert-error
@@ -29,7 +29,7 @@
 
 #chosen-container
   %ul.bike-boxes
-    = render partial: "/bikes/bike", :locals => {bike: @bike, target: "show" }
+    = render partial: "/bikes/bike", locals: {bike: @bike, target: "show" }
   %p
     = @stolen_record.theft_description if @stolen_record.present?
   .dl-holder

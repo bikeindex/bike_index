@@ -11,7 +11,7 @@ class Admin::GraphsController < Admin::BaseController
     if params[:id] == 'bikes'
       @values2 = range_values(range, "stolen_bike_value").to_json
     end
-    render :layout => 'graphs'
+    render layout: 'graphs'
   end
 
   def review
@@ -25,7 +25,7 @@ class Admin::GraphsController < Admin::BaseController
 
     end
     @xaxis = xaxis.to_json
-    render :layout => 'graphs'
+    render layout: 'graphs'
   end
 
 protected

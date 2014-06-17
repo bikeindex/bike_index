@@ -2,11 +2,11 @@ require 'pg'
 
 master = Rubber.instances.for_role('postgresql_master').first.full_name
 slave = "localhost"
-opts = { :dbname => Rubber.config.db_name,
-         :user => Rubber.config.db_user,
-         :password => Rubber.config.db_pass }
-mconn = PGconn.open(opts.merge({:host => master}))
-sconn = PGconn.open(opts.merge({:host => slave}))
+opts = { dbname: Rubber.config.db_name,
+         user: Rubber.config.db_user,
+         password: Rubber.config.db_pass }
+mconn = PGconn.open(opts.merge({host: master}))
+sconn = PGconn.open(opts.merge({host: slave}))
 
 mval = mconn.exec("select pg_current_xlog_location()")[0]["pg_current_xlog_location"]
 sresult = sconn.exec("select pg_last_xlog_receive_location(), pg_last_xlog_replay_location()")[0]

@@ -116,7 +116,7 @@ class Bike < ActiveRecord::Base
   validates_uniqueness_of :card_id, allow_nil: true
   validates_presence_of :primary_frame_color_id
   # validates_presence_of :rear_wheel_size_id
-  # validates_inclusion_of :rear_tire_narrow, :in => [true, false]
+  # validates_inclusion_of :rear_tire_narrow, in: [true, false]
 
   attr_accessor :other_listing_urls, :date_stolen_input, :receive_notifications, :phone, :image, :bike_token_id, :b_param_id, :payment_required, :embeded, :embeded_extended, :paint_name, :bike_image_cache, :send_email
 
@@ -126,16 +126,16 @@ class Bike < ActiveRecord::Base
 
   include PgSearch
   pg_search_scope :search, against: {
-    :cached_data => 'A',
-    :description => 'B',
+    cached_data: 'A',
+    description: 'B',
     },
-    using: {tsearch: {dictionary: "english", :prefix => true}}
+    using: {tsearch: {dictionary: "english", prefix: true}}
 
   pg_search_scope :admin_search, against: {
-    :owner_email => 'A'
+    owner_email: 'A'
     },
     associated_against: {ownerships: :owner_email, creator: :email},
-    using: {tsearch: {dictionary: "english", :prefix => true}}
+    using: {tsearch: {dictionary: "english", prefix: true}}
 
   def self.text_search(query)
     if query.present?

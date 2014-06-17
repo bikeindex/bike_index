@@ -1,6 +1,6 @@
 require 'redis'
 
-redis = Redis.new(:host => 'localhost', :port => 6379, :timeout => INTERVAL - 1)
+redis = Redis.new(host: 'localhost', port: 6379, timeout: INTERVAL - 1)
 info = redis.info
 
 items = {

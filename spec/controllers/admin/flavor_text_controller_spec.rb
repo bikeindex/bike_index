@@ -17,7 +17,7 @@ describe Admin::FlavorTextsController do
       before do 
         user = FactoryGirl.create(:user, superuser: true)
         set_current_user(user)
-        post :create, {:flavor_text => {message: "lulz"}}
+        post :create, {flavor_text: {message: "lulz"}}
       end
       it { should redirect_to(:admin_root) }
       it { should set_the_flash }

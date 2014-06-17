@@ -1,6 +1,6 @@
 #chosen-container
   %ul.bike-boxes
-    = render partial: "/bikes/bike", :locals => {bike: @bike, target: "show" }
+    = render partial: "/bikes/bike", locals: {bike: @bike, target: "show" }
   - if @bike.stolen
     %h4
       = link_to "Stolen edit page", edit_admin_stolen_bike_url(@bike)
@@ -17,7 +17,7 @@
         = @bike.dl_from_attribute("cached_data")
   %hr
 
-  = form_for [:admin, @bike], :html => { class: "form form-horizontal admin-bike-edit" } do |f|
+  = form_for [:admin, @bike], html: { class: "form form-horizontal admin-bike-edit" } do |f|
     .clearfix
       .bike-fields
         - if @bike.errors.any?

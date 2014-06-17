@@ -6,7 +6,7 @@
       = link_to "Back to all paints", admin_paints_path
 
   .paint-form.clearfix.padded
-    = form_for [:admin, @paint], :html => { class: "form form-horizontal span6" } do |f|
+    = form_for [:admin, @paint], html: { class: "form form-horizontal span6" } do |f|
       - if @paint.errors.any?
         #alert-block
           .alert.alert-error

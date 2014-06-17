@@ -1,4 +1,4 @@
-= form_for @user, :html => { class: "form-horizontal form user-settings", id: "edit-user-form" } do |f|
+= form_for @user, html: { class: "form-horizontal form user-settings", id: "edit-user-form" } do |f|
   - if @user.errors.any?
     #alert-block
       .alert.alert-error
@@ -51,7 +51,7 @@
   %fieldset
     %legend
       Sharing settings
-    .control-group.sharing-collapser{ :data => {target: "#personal-page" } }
+    .control-group.sharing-collapser{ data: {target: "#personal-page" } }
       %p
         The Bike Index can create a page listing all your bikes that includes all the information you want to share. It's your personal page.
         = link_to "(preview page)", user_url(@user), target: "_blank"
@@ -90,7 +90,7 @@
           .controls
             = f.text_area :description
 
-    .control-group.sharing-collapser{ :data => {target: "#twitter-field" } }
+    .control-group.sharing-collapser{ data: {target: "#twitter-field" } }
       %label.control-label
         Show Twitter
       .controls.radio-controls
@@ -110,7 +110,7 @@
             @
           = f.text_field :twitter, placeholder: "Twitter handle"
 
-    .control-group.sharing-collapser{ :data => {target: "#personal-field" } }
+    .control-group.sharing-collapser{ data: {target: "#personal-field" } }
       %label.control-label
         Show Person Site
       .controls.radio-controls

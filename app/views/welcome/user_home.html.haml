@@ -62,10 +62,10 @@
           %p
             = link_to "Your public page", "/users/#{current_user.username}"
       - if @bikes.count > 10
-        = render partial: "/bikes/bike_table", :locals => {target: "edit"}
+        = render partial: "/bikes/bike_table", locals: {target: "edit"}
       - else
         %ul.bike-boxes
-          = render partial: "/bikes/bike", collection: @bikes, :locals => {target: "edit", pdf: true }
+          = render partial: "/bikes/bike", collection: @bikes, locals: {target: "edit", pdf: true }
           
     - else
       %h3

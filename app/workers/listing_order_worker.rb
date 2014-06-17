@@ -1,7 +1,7 @@
 class ListingOrderWorker
   include Sidekiq::Worker
   sidekiq_options queue: 'updates'
-  sidekiq_options :backtrace => true
+  sidekiq_options backtrace: true
     
   def perform(bike_id)
     bike = Bike.find(bike_id)

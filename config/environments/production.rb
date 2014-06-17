@@ -10,7 +10,7 @@ Bikeindex::Application.configure do
   config.action_controller.perform_caching = true
   config.action_controller.page_cache_directory = Rails.public_path + "/page_caches"
   config.cache_store = :dalli_store,
-    { :namespace => Bikeindex, :expires_in => 0, :compress => true }
+    { namespace: Bikeindex, expires_in: 0, compress: true }
   # Disable Rails's static asset server (Apache or nginx will already do this)
   config.serve_static_assets = false
 
@@ -52,13 +52,13 @@ Bikeindex::Application.configure do
 
   # Disable delivery errors, bad email addresses will be ignored
   # config.action_mailer.raise_delivery_errors = false
-  config.action_mailer.default_url_options = { :protocol => 'https', :host => "bikeindex.org" }
+  config.action_mailer.default_url_options = { protocol: 'https', host: "bikeindex.org" }
   ActionMailer::Base.smtp_settings = {
-      :port =>           ENV['MANDRILL_PORT'],
-      :address =>        'smtp.mandrillapp.com',
-      :user_name =>      ENV['MANDRILL_USERNAME'],
-      :password =>       ENV['MANDRILL_PASSWORD'],
-      :authentication => :plain
+      port:           ENV['MANDRILL_PORT'],
+      address:        'smtp.mandrillapp.com',
+      user_name:      ENV['MANDRILL_USERNAME'],
+      password:       ENV['MANDRILL_PASSWORD'],
+      authentication: :plain
   }
   ActionMailer::Base.delivery_method = :smtp
 

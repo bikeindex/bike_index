@@ -25,7 +25,7 @@
     .control-group
       = t.label :invitee_email, "Email you're inviting", class: "control-label"
       .controls
-        = t.email_field :invitee_email, :required => true
+        = t.email_field :invitee_email, required: true
 
     .control-group
       = t.label :invitee_name, "Name", class: "control-label"
@@ -35,17 +35,17 @@
     .control-group
       = t.label :bike_token_count, "How many bikes?", class: "control-label"
       .controls
-        = t.number_field :bike_token_count, :required => true
+        = t.number_field :bike_token_count, required: true
 
     .control-group
       = t.label :subject, "Email subject", class: "control-label"
       .controls
-        = t.text_field :subject, :required => true
+        = t.text_field :subject, required: true
 
     .control-group.invitation-message
       = t.label :message, "Email body", class: "control-label"
       .controls
-        = t.text_area :message, :required => true, rows: 10
+        = t.text_area :message, required: true, rows: 10
 
         
 

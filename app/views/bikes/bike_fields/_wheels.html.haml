@@ -3,7 +3,7 @@
     %h2
       Wheels
   .input-group.with-optional-blocks
-    %a.bikeform-tip{role: "button", title: "An amazing explanation of wheel sizing.", :data => {toggle: "modal", target: "#rearWheelTip"} }
+    %a.bikeform-tip{role: "button", title: "An amazing explanation of wheel sizing.", data: {toggle: "modal", target: "#rearWheelTip"} }
       %span
         ?
     .control-group
@@ -29,10 +29,10 @@
             16in
           %option{value: WheelSize.find_by_iso_bsd(203).id}
             12in
-        = collection_select( :bike, :front_wheel_size_id, WheelSize.all , :id, :select_value, :html => { :required =>true }, prompt: "All diameters")
-    %a#show-front-wheel-diams.wh_sw.show-all.optional-form-block{:data => {target: "#bike_front_wheel_size_id", toggle: "#hide-front-wheel-diams"}}
+        = collection_select( :bike, :front_wheel_size_id, WheelSize.all , :id, :select_value, html: { :required =>true }, prompt: "All diameters")
+    %a#show-front-wheel-diams.wh_sw.show-all.optional-form-block{data: {target: "#bike_front_wheel_size_id", toggle: "#hide-front-wheel-diams"}}
       Show more sizes
-    %a#hide-front-wheel-diams.wh_sw.optional-form-block.currently-hidden{:data => {target: "#bike_front_wheel_size_id", toggle: "#show-front-wheel-diams"}}
+    %a#hide-front-wheel-diams.wh_sw.optional-form-block.currently-hidden{data: {target: "#bike_front_wheel_size_id", toggle: "#show-front-wheel-diams"}}
       Hide extra sizes
     .control-group.wheel-diameter
       %label.control-label
@@ -45,7 +45,7 @@
           = f.radio_button :front_tire_narrow, "false"
           Wide tire
   .input-group.with-optional-blocks
-    %a.bikeform-tip{role: "button", title: "An amazing explanation of wheel sizing.", :data => {toggle: "modal", target: "#rearWheelTip"} }
+    %a.bikeform-tip{role: "button", title: "An amazing explanation of wheel sizing.", data: {toggle: "modal", target: "#rearWheelTip"} }
       %span
         ?
     .control-group
@@ -71,10 +71,10 @@
             16in
           %option{value: WheelSize.find_by_iso_bsd(203).id}
             12in
-        = collection_select( :bike, :rear_wheel_size_id, WheelSize.all , :id, :select_value, :html => { :required =>true }, prompt: "All diameters")
-    %a#show-rear-wheel-diams.wh_sw.show-all.optional-form-block{:data => {target: "#bike_rear_wheel_size_id", toggle: "#hide-rear-wheel-diams"}}
+        = collection_select( :bike, :rear_wheel_size_id, WheelSize.all , :id, :select_value, html: { :required =>true }, prompt: "All diameters")
+    %a#show-rear-wheel-diams.wh_sw.show-all.optional-form-block{data: {target: "#bike_rear_wheel_size_id", toggle: "#hide-rear-wheel-diams"}}
       Show more sizes
-    %a#hide-rear-wheel-diams.wh_sw.optional-form-block.currently-hidden{:data => {target: "#bike_rear_wheel_size_id", toggle: "#show-rear-wheel-diams"}}
+    %a#hide-rear-wheel-diams.wh_sw.optional-form-block.currently-hidden{data: {target: "#bike_rear_wheel_size_id", toggle: "#show-rear-wheel-diams"}}
       Hide extra sizes
     .control-group.wheel-diameter
       %label.control-label

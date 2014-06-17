@@ -29,7 +29,7 @@ class Manufacturer < ActiveRecord::Base
 
   def self.fuzzy_name_find(n)
     if !n.blank?
-      self.find(:first, :conditions => [ "book_slug = ?", Slugifyer.book_slug(n) ])
+      self.find(:first, conditions: [ "book_slug = ?", Slugifyer.book_slug(n) ])
     else
       nil
     end

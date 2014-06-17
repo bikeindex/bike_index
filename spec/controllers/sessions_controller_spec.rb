@@ -55,7 +55,7 @@ describe SessionsController do
     end
 
     it "should not log in the user when the user is not found" do
-      post :create, :session => { :email => "notThere@example.com" }
+      post :create, session: { email: "notThere@example.com" }
       session[:user_id].should be_nil
       response.should render_template(:new)
     end

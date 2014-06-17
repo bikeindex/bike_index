@@ -30,7 +30,7 @@ class BikesController < ApplicationController
     @attribute_select_values = search.parsed_attributes
     @query = params[:query]
     @stolenness = { stolen: params[:stolen] }
-    render :layout => 'application'
+    render layout: 'application'
   end
 
   def show
@@ -43,7 +43,7 @@ class BikesController < ApplicationController
     @stolen_notification = StolenNotification.new if @bike.stolen
     respond_to do |format|
       format.html
-      format.gif  { render :qrcode => scanned_bike_url(@bike), :level => :h, :unit => 50 }
+      format.gif  { render qrcode: scanned_bike_url(@bike), level: :h, unit: 50 }
     end
   end
 
@@ -68,7 +68,7 @@ class BikesController < ApplicationController
       @bike.pdf = File.open(save_path)
       @bike.save
     end
-    # render :pdf => 'registration_pdf', :show_as_html => true
+    # render pdf: 'registration_pdf', show_as_html: true
     redirect_to @bike.pdf.url
   end
 

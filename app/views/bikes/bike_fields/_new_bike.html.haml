@@ -1,5 +1,5 @@
 .input-group.with-optional-blocks.form-head
-  %a.bikeform-tip{role: "button", title: "Help with bicycle serial numbers", :data => {toggle: "modal", keyboard: "true", target: "#serialTip"} }
+  %a.bikeform-tip{role: "button", title: "Help with bicycle serial numbers", data: {toggle: "modal", keyboard: "true", target: "#serialTip"} }
     %span
       ?
   .control-group
@@ -15,7 +15,7 @@
         Has no serial
 
 .input-group.with-additional-block
-  %a.bikeform-tip{role: "button", title: "Help with choosing a frame manufacturer", :data => {toggle: "modal", target: "#frameManufacturerTip"} }
+  %a.bikeform-tip{role: "button", title: "Help with choosing a frame manufacturer", data: {toggle: "modal", target: "#frameManufacturerTip"} }
     %span
       ?
   .control-group.chosen-select
@@ -49,16 +49,16 @@
       = f.text_field :frame_model, autocomplete: 'off'
 
 .input-group.with-optional-blocks
-  %a.bikeform-tip{role: "button", title: "Why do we do colors like this?", :data => {toggle: "modal", target: "#colorTip"} }
+  %a.bikeform-tip{role: "button", title: "Why do we do colors like this?", data: {toggle: "modal", target: "#colorTip"} }
     %span
       ?
   .control-group.chosen-select
     = f.label :primary_frame_color_id, "Frame color", class: "control-label"
     .controls
       = collection_select( :bike, :primary_frame_color_id, Color.all, :id, :name, required: true, prompt: "Choose color" )
-  %a#add-secondary.optional-form-block{:data => {target: "#secondary-color", toggle: "#rm-secondary"}}
+  %a#add-secondary.optional-form-block{data: {target: "#secondary-color", toggle: "#rm-secondary"}}
     Add a color
-  %a#rm-secondary.optional-form-block.rm-block.currently-hidden{:data => {target: "#secondary-color", toggle: "#add-secondary"}}
+  %a#rm-secondary.optional-form-block.rm-block.currently-hidden{data: {target: "#secondary-color", toggle: "#add-secondary"}}
     Remove color
   #secondary-color.hidden-other
     .control-group.chosen-select
@@ -66,9 +66,9 @@
         Secondary color
       .controls
         = collection_select( :bike, :secondary_frame_color_id, Color.all, :id, :name, prompt: "Choose color" )
-    %a#add-tertiary.optional-form-block{:data => {target: "#tertiary-color", toggle: "#rm-tertiary"}}
+    %a#add-tertiary.optional-form-block{data: {target: "#tertiary-color", toggle: "#rm-tertiary"}}
       Add a color
-    %a#rm-tertiary.optional-form-block.rm-block.currently-hidden{:data => {target: "#tertiary-color", toggle: "#add-tertiary"}}
+    %a#rm-tertiary.optional-form-block.rm-block.currently-hidden{data: {target: "#tertiary-color", toggle: "#add-tertiary"}}
       Remove color
   #tertiary-color.hidden-other
     .control-group.chosen-select

@@ -3,7 +3,7 @@
 
 .form.form-horizontal
   = form_for [:admin, @organization] do |f|
-    = render :partial => 'form', :locals => { :f => f }
+    = render partial: 'form', locals: { f: f }
     
     .nested-form
       %p
@@ -37,7 +37,7 @@
 
     .control-group.padded#show_notification
       .controls
-        %a{ href: "#", :data => {target: "#bike-notification" } }
+        %a{ href: "#", data: {target: "#bike-notification" } }
           Show new bike notification
 
     

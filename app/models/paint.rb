@@ -21,7 +21,7 @@ class Paint < ActiveRecord::Base
   
   def self.fuzzy_name_find(n)
     if !n.blank?
-      self.find(:first, :conditions => [ "lower(name) = ?", n.downcase.strip ])
+      self.find(:first, conditions: [ "lower(name) = ?", n.downcase.strip ])
     else
       nil
     end

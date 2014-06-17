@@ -1,4 +1,4 @@
-.top-header#total-top-header{:data => {domain: Rails.env}}
+.top-header#total-top-header{data: {domain: Rails.env}}
   / %span.background-extend
   .receptacle
     .inner-recep
@@ -36,7 +36,7 @@
                 %a{ title: "Your preferences", href: "/my_account"}
                   Preferences
               %li
-                = link_to 'Log out', session_path, :method => :delete
+                = link_to 'Log out', session_path, method: :delete
           
           #signup.tab-pane.login-header.no_user.hidden
             = render 'sessions/form'
@@ -47,7 +47,7 @@
           = text_field_tag :query,                          |
             params[:query],                                 |
             placeholder: "Search bike traits",              |
-            :data => { url: search_tags_api_v1_bikes_url }, |
+            data: { url: search_tags_api_v1_bikes_url }, |
             class: "search-text-field"                      |
           .search-button
             = submit_tag "Search", name: "search", class: "button-blue"

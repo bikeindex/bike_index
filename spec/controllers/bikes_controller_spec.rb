@@ -155,7 +155,7 @@ describe BikesController do
       it "should redirect to the created bike if it exists" do
         bike = FactoryGirl.create(:bike)
         @b_param.update_attributes(created_bike_id: bike.id)
-        post :create, {:bike => {b_param_id: @b_param.id}}
+        post :create, {bike: {b_param_id: @b_param.id}}
         response.should redirect_to(edit_bike_url(bike))
       end
 
@@ -288,7 +288,7 @@ describe BikesController do
         ownership = FactoryGirl.create(:ownership)
         user = FactoryGirl.create(:user)
         session[:user_id] = user.id
-        put :update, {id: ownership.bike.id, :bike => {serial_number: "69"}}
+        put :update, {id: ownership.bike.id, bike: {serial_number: "69"}}
       end
       it { should respond_with(:redirect)}
       it { should redirect_to(bike_url) }
@@ -300,7 +300,7 @@ describe BikesController do
       ownership.bike.update_attributes(example: true)
       user = ownership.creator
       session[:user_id] = user.id
-      put :update, {id: ownership.bike.id, :bike => {description: "69"}}
+      put :update, {id: ownership.bike.id, bike: {description: "69"}}
       ownership.bike.reload.description.should eq("69")
       response.should redirect_to bike_url(ownership.bike)
     end
@@ -309,7 +309,7 @@ describe BikesController do
       ownership = FactoryGirl.create(:ownership)
       session[:user_id] = ownership.creator.id
       ownership.bike.update_attributes(verified: true)
-      put :update, {id: ownership.bike.id, :bike => {stolen: "1"}}
+      put :update, {id: ownership.bike.id, bike: {stolen: "1"}}
       response.should redirect_to edit_bike_url(ownership.bike)
     end
     
@@ -317,7 +317,7 @@ describe BikesController do
       ownership = FactoryGirl.create(:ownership)
       user = ownership.creator
       session[:user_id] = user.id
-      put :update, {id: ownership.bike.id, :bike => {description: "69"}}
+      put :update, {id: ownership.bike.id, bike: {description: "69"}}
       ownership.bike.reload.description.should eq("69")
       response.should redirect_to bike_url(ownership.bike)
       assigns(:bike).should be_decorated
@@ -328,7 +328,7 @@ describe BikesController do
       user = ownership.creator
       session[:user_id] = user.id
       lambda { put :update,
-        {id: ownership.bike.id, :bike => {owner_email: "new@email.com"}}
+        {id: ownership.bike.id, bike: {owner_email: "new@email.com"}}
       }.should change(Ownership, :count).by(1)
     end
   end

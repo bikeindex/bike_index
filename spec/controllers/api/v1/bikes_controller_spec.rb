@@ -54,20 +54,20 @@ describe Api::V1::BikesController do
 
     it "should return correct code if not logged in" do 
       c = FactoryGirl.create(:color)
-      post :create, { :bike => { serial_number: '69', color: c.name } }
+      post :create, { bike: { serial_number: '69', color: c.name } }
       response.code.should eq("401")
     end
 
     it "should return correct code if bike has errors" do 
       c = FactoryGirl.create(:color)
-      post :create, { :bike => { serial_number: '69', color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }
+      post :create, { bike: { serial_number: '69', color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }
       response.code.should eq("422")
     end
 
     it "should email us if it can't create a record" do 
       c = FactoryGirl.create(:color)
       lambda {
-        post :create, { :bike => { serial_number: '69', color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }
+        post :create, { bike: { serial_number: '69', color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }
       }.should change(Feedback, :count).by(1)
     end
 

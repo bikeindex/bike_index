@@ -50,7 +50,7 @@ class User < ActiveRecord::Base
 
   before_create :generate_username_and_confirmation
 
-  validates_uniqueness_of :username, :case_sensitive => false
+  validates_uniqueness_of :username, case_sensitive: false
   def to_param
     username
   end
@@ -75,10 +75,10 @@ class User < ActiveRecord::Base
   include PgSearch
 
   pg_search_scope :admin_search, against: {
-    :name => 'A',
-    :email => 'A'
+    name: 'A',
+    email: 'A'
     },
-    using: {tsearch: {dictionary: "english", :prefix => true}}
+    using: {tsearch: {dictionary: "english", prefix: true}}
 
   def self.admin_text_search(query)
     if query.present?
@@ -128,7 +128,7 @@ class User < ActiveRecord::Base
   
   def self.fuzzy_email_find(email)
     if !email.blank?
-      self.find(:first, :conditions => [ "lower(email) = ?", email.downcase ])
+      self.find(:first, conditions: [ "lower(email) = ?", email.downcase ])
     else
       nil
     end
@@ -210,7 +210,7 @@ class User < ActiveRecord::Base
   def generate_username_and_confirmation
     begin
       username = SecureRandom.urlsafe_base64
-    end while User.where(:username => username).exists?
+    end while User.where(username: username).exists?
     self.username = username
     if !self.confirmed
       self.confirmation_token = (Digest::MD5.hexdigest "#{SecureRandom.hex(10)}-#{DateTime.now.to_s}")

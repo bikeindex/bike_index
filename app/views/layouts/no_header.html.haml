@@ -8,7 +8,7 @@
 %header.replace-header
   .inner-recep
     %h2.new-title
-      = FlavorText.first(:offset => rand(FlavorText.count)).message
+      = FlavorText.first(offset: rand(FlavorText.count)).message
 
 = yield
 

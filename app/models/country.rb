@@ -8,7 +8,7 @@ class Country < ActiveRecord::Base
 
   def self.fuzzy_iso_find(n)
     if !n.blank?
-      self.find(:first, :conditions => [ "lower(iso) = ?", n.downcase.strip ])
+      self.find(:first, conditions: [ "lower(iso) = ?", n.downcase.strip ])
     else
       nil
     end

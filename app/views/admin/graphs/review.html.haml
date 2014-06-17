@@ -11,6 +11,6 @@
     @bikes -> should be an array of ownerships created on each day of @xaxis
   %p
     @stolen_bikes -> should be an array of stolen_records created on each day of the @xaxis
-  / %canvas#review-graph{ width: "1160", height: "500", :data => { labels: @xaxis, values1: @values1, values2: @values2 } }
+  / %canvas#review-graph{ width: "1160", height: "500", data: { labels: @xaxis, values1: @values1, values2: @values2 } }
   %p
     Set the variables on the data attributes of #review-graph, then grab them in app/assets/javascripts/views/admin/admin_chart_show.js.coffee and make a chart

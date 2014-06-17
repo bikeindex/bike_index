@@ -12,7 +12,7 @@
               = msg
 
   #chosen-container.new-bike-container{ class: "#{"stolen-add" if @bike.stolen}" }
-    = form_for @bike, :html => { class: "receptacle form-horizontal" }, :multipart => true do |f|
+    = form_for @bike, html: { class: "receptacle form-horizontal" }, multipart: true do |f|
       = f.hidden_field :cycle_type_id
       = f.hidden_field :b_param_id
       - if @bike.location_id.present?
@@ -30,7 +30,7 @@
               %span.stolen-color
                 stolen
           .dropdown
-            %a.dropdown-toggle#cycletypeBtn{ href: "/", role: "button", :data => { toggle: "dropdown", target:"#"} }
+            %a.dropdown-toggle#cycletypeBtn{ href: "/", role: "button", data: { toggle: "dropdown", target:"#"} }
               %span.craft-button
                 %strong#cycletype-text
                   Bike
@@ -40,7 +40,7 @@
               %ul.dropdown-menu#select-cycletype{ role: "menu", :aria =>{ labelledby: "cycletypeBtn" } }
                 - CycleType.all.each do |type|
                   %li
-                    %a.clickable{ id: "cycletype#{type.id}", :data => {id: type.id}, class: ("long-title" if type.name.length > 8) }
+                    %a.clickable{ id: "cycletype#{type.id}", data: {id: type.id}, class: ("long-title" if type.name.length > 8) }
                       = type.name
           %h2
             - if @bike.recovered
@@ -50,7 +50,7 @@
 
         .new-bike-fields
 
-          = render :partial => 'bikes/bike_fields/new_bike', :locals => { :f => f }
+          = render partial: 'bikes/bike_fields/new_bike', locals: { f: f }
 
           - if @bike.recovered
             = f.hidden_field :recovered, value: true
@@ -59,7 +59,7 @@
             = f.hidden_field :stolen, value: true
             = hidden_field_tag :stolen, value: true
             .input-group
-              %a.bikeform-tip{role: "button", title: "Why do we want your phone number?", :data => {toggle: "modal", target: "#phoneTip"} }
+              %a.bikeform-tip{role: "button", title: "Why do we want your phone number?", data: {toggle: "modal", target: "#phoneTip"} }
                 %span
                   ?
               .control-group
@@ -69,7 +69,7 @@
                   = f.text_field :phone, required: "true", value: current_user.phone
           
           .input-group
-            %a.bikeform-tip{role: "button", title: "An explanation of the email field.", :data => {toggle: "modal", target: "#emailTip"} }
+            %a.bikeform-tip{role: "button", title: "An explanation of the email field.", data: {toggle: "modal", target: "#emailTip"} }
               %span
                 ?
             .control-group
@@ -104,4 +104,4 @@
   .content
     .receptacle
       .inner-recep
-        = render :partial => "users/form"
+        = render partial: "users/form"

@@ -21,7 +21,7 @@
 
   - if @bikes.any?
     %ul.bike-boxes
-      = render partial: "/bikes/bike", collection: @bikes, :locals => {target: "show" }
+      = render partial: "/bikes/bike", collection: @bikes, locals: {target: "show" }
         
   - else
     %h2

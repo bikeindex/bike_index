@@ -4,7 +4,7 @@
     = header_tags
     = csrf_meta_tags
     <link rel="shortcut icon" href="/fav.ico" />
-    = stylesheet_link_tag "application", :media => "all"
+    = stylesheet_link_tag "application", media: "all"
     <link href='https://fonts.googleapis.com/css?family=Rambla:400' rel='stylesheet' type='text/css'>
     = javascript_include_tag "application"
     <!-- Pulled from https://code.google.com/p/html5shiv/ -->
@@ -16,7 +16,7 @@
     <![endif]-->
     
     - if controller_name == "blogs"
-      = auto_discovery_link_tag(:atom, blogs_url(format: "atom"), {:title => "Bike Index"})
+      = auto_discovery_link_tag(:atom, blogs_url(format: "atom"), {title: "Bike Index"})
 
   :plain
     <!--

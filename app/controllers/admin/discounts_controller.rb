@@ -21,7 +21,7 @@ class Admin::DiscountsController < Admin::BaseController
     # @discount = Discount.new(permitted_params.discount)
     @discount = Discount.create(params[:discount])
     if @discount.save(params[:discount])
-      redirect_to admin_discounts_url, :notice => 'Discount saved.'
+      redirect_to admin_discounts_url, notice: 'Discount saved.'
     else
       render action: :new
     end
@@ -30,7 +30,7 @@ class Admin::DiscountsController < Admin::BaseController
   def update
     # if @discount.update_attributes(permitted_params.discount)
     if @discount.update_attributes(params[:discount])
-      redirect_to admin_discounts_url, :notice => 'Discount saved.'
+      redirect_to admin_discounts_url, notice: 'Discount saved.'
     else
       render action: :edit
     end
@@ -38,7 +38,7 @@ class Admin::DiscountsController < Admin::BaseController
 
   def destroy
     @discount.destroy
-    redirect_to admin_discounts_path, :notice => "Discount deleted."
+    redirect_to admin_discounts_path, notice: "Discount deleted."
   end
 
   def find_discount

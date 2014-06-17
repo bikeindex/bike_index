@@ -6,7 +6,7 @@
       = link_to "Back to editing bike", edit_admin_bike_path(@bike)
 
   %ul.bike-boxes
-    = render partial: "/bikes/bike", :locals => {bike: @bike, target: "show" }
+    = render partial: "/bikes/bike", locals: {bike: @bike, target: "show" }
   .dl-holder
     %dl.dl-horizontal
       = @bike.dl_list_item(@bike.created_at.strftime("%m-%d-%Y"), "Created")
@@ -19,7 +19,7 @@
     %span.table-error
       BE CAREFUL. 
     YOU CAN BREAK STUFF HERE
-  = form_for [:admin, @ownership], :html => { class: "form form-horizontal" } do |f|
+  = form_for [:admin, @ownership], html: { class: "form form-horizontal" } do |f|
     - if @ownership.errors.any?
       #alert-block
         .alert.alert-error
