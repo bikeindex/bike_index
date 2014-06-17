@@ -102,7 +102,11 @@
           = f.label :owner_email, class: "control-label"
           .controls
             = f.text_field :owner_email, :required =>true
-
+        - if @bike.stolen
+          .control-group
+            = f.label :stolen, "Bike is stolen", class: "control-label"
+            .controls
+              = f.check_box :stolen
 
     .actions
       .control-group

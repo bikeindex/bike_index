@@ -38,7 +38,7 @@ SitemapGenerator::Sitemap.create do
   end
 
   group(:filename => :bikes) do
-    Bike.scoped.each { |b| add bike_path(b), priority: 0.9 }
+    Bike.scoped.each { |b| add bike_path(b), :changefreq => 'daily', priority: 0.9 }
   end
 
   group(:filename => :images) do
