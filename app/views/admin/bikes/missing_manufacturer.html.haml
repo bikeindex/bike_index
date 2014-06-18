@@ -3,12 +3,12 @@
     Multi manufacturer update
 = form_tag update_manufacturers_admin_bikes_path, class: 'padded', id: 'multi_bike_manufacturer_update' do
   .row-fluid.multi-bike-manufacturer-form
-    #chosen-container.span8.multi-manufacturer-selector
+    #chosen-container.span6.multi-manufacturer-selector
       .chosen-select
         = select_tag :manufacturer_id, options_from_collection_for_select(Manufacturer.frames, :id, :name), prompt: "Choose manufacturer"
           
       = submit_tag 'Update selected', class: 'button-blue'
-    .span4.paginate-container
+    .span6.paginate-container
       = will_paginate @bikes 
   %section.full-screen-table
     %table.table.table-striped.table-bordered
