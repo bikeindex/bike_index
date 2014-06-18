@@ -121,7 +121,7 @@ describe BikeCreatorOrganizer do
     it "should call organize with the org if it's in the bike params" do 
       bike = Bike.new
       b_param = BParam.new
-      b_param.stub(:params).and_return(:bike => {creation_organization_id: 69})
+      b_param.stub(:params).and_return(bike: {creation_organization_id: 69})
       creator = BikeCreatorOrganizer.new(b_param, bike)
       creator.should_receive(:organize).with(69)
       creator.check_organization

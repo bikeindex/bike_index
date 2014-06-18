@@ -1,10 +1,10 @@
 class CustomerMailer < ActionMailer::Base
 
-  default from: "\"Bike Index\" <contact@bikeindex.org>", :content_type => 'multipart/alternative', :parts_order => [ "text/calendar", "text/plain", "text/html", "text/enriched" ]
+  default from: "\"Bike Index\" <contact@bikeindex.org>", content_type: 'multipart/alternative', parts_order: [ "text/calendar", "text/plain", "text/html", "text/enriched" ]
 
   def welcome_email(user)
     @user = user
-    mail(:to => user.email, :subject => "Welcome to the Bike Index!") do |format|
+    mail(to: user.email, subject: "Welcome to the Bike Index!") do |format|
       format.text
       format.html { render layout: 'email'}
     end
@@ -12,7 +12,7 @@ class CustomerMailer < ActionMailer::Base
 
   def confirmation_email(user)
     @user = user
-    mail(:to => user.email, :subject => "Welcome to the Bike Index!") do |format|
+    mail(to: user.email, subject: "Welcome to the Bike Index!") do |format|
       format.text
       format.html { render layout: 'email'}
     end
@@ -20,7 +20,7 @@ class CustomerMailer < ActionMailer::Base
 
   def admin_stolen_email(customer_contact)
     @customer_contact = customer_contact
-    mail(:to => @customer_contact.user_email, from: @customer_contact.creator_email, :subject => @customer_contact.title) do |format|
+    mail(to: @customer_contact.user_email, from: @customer_contact.creator_email, subject: @customer_contact.title) do |format|
       format.text
       format.html { render layout: 'email'}
     end
@@ -29,7 +29,7 @@ class CustomerMailer < ActionMailer::Base
   def password_reset_email(user)
     @user = user
     @url = "#{root_url}users/password_reset?token=#{user.password_reset_token}"
-    mail(to: user.email, :subject => "Instructions to reset your password") do |format|
+    mail(to: user.email, subject: "Instructions to reset your password") do |format|
       format.text
       format.html { render layout: 'email' }
     end

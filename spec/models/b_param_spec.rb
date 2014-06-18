@@ -10,7 +10,7 @@ describe BParam do
   describe :bike do 
     it "should return the bike attribs" do 
       b_param = BParam.new 
-      b_param.stub(:params).and_return({:bike => {serial_number: "XXX"}})
+      b_param.stub(:params).and_return({bike: {serial_number: "XXX"}})
       b_param.bike[:serial_number].should eq("XXX")
     end
     it "shouldn't fail if there isn't a bike" do 

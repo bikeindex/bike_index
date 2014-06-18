@@ -23,21 +23,21 @@
       Lock type
   .lock-type
     %div
-      %input{ id: "locky_#{ulock_type.id}", type: "radio", name: "lock_types_select", :data => {value: ulock_type.id}}
+      %input{ id: "locky_#{ulock_type.id}", type: "radio", name: "lock_types_select", data: {value: ulock_type.id}}
     %label{ for: "locky_#{ulock_type.id}" }
       %span
         U-lock
       = image_tag "/assets/locks/u-lock.jpg"
   .lock-type
     %div
-      %input{ id: "locky_#{chain_type.id}", type: "radio", name: "lock_types_select", :data => {value: chain_type.id}}
+      %input{ id: "locky_#{chain_type.id}", type: "radio", name: "lock_types_select", data: {value: chain_type.id}}
     %label{ for: "locky_#{chain_type.id}" }
       %span
         Chain
       = image_tag "/assets/locks/chain-with-lock.jpg"
   .lock-type
     %div
-      %input{ id: "locky_#{cable_type.id}", type: "radio", name: "lock_types_select", :data => {value: cable_type.id}}
+      %input{ id: "locky_#{cable_type.id}", type: "radio", name: "lock_types_select", data: {value: cable_type.id}}
     %label{ for: "locky_#{cable_type.id}" }
       %span
         Cable lock
@@ -45,14 +45,14 @@
   .lock-type
     %div
       
-      %input{ id: "locky_#{skewer_type.id}", type: "radio", name: "lock_types_select", :data => {value: skewer_type.id}}
+      %input{ id: "locky_#{skewer_type.id}", type: "radio", name: "lock_types_select", data: {value: skewer_type.id}}
     %label{ for: "locky_#{skewer_type.id}" }
       %span
         Locking skewers
       = image_tag "/assets/locks/locking-skewer.jpg"
   .lock-type
     %div
-      %input{ id: "locky_#{other_type.id}", type: "radio", name: "lock_types_select", :data => {value: other_type.id}}
+      %input{ id: "locky_#{other_type.id}", type: "radio", name: "lock_types_select", data: {value: other_type.id}}
     %label{ for: "locky_#{other_type.id}" }
       %span
         Other lock style
@@ -95,17 +95,17 @@
     %h2
       Examples of serial numbers found on different types of bike lock keys
     %section
-      %a.lock-picture{ :data => { target: "https://www.bikeindex.org/assets/locks/krypto_small_key.jpg"} }
+      %a.lock-picture{ data: { target: "https://www.bikeindex.org/assets/locks/krypto_small_key.jpg"} }
         = image_tag("/assets/locks/krypto_small_key.jpg", alt: "Small kryptonite key")
       %p
         Small Kryptonite key
     %section
-      %a.lock-picture{ :data => { target: "https://www.bikeindex.org/assets/locks/krypto_large_key.jpg"} }
+      %a.lock-picture{ data: { target: "https://www.bikeindex.org/assets/locks/krypto_large_key.jpg"} }
         = image_tag("/assets/locks/krypto_large_key.jpg", alt: "Large kryptonite key")
       %p
         Large Kryptonite key
     %section
-      %a.lock-picture{ :data => { target: "https://www.bikeindex.org/assets/locks/pinhead_key.jpg"} }
+      %a.lock-picture{ data: { target: "https://www.bikeindex.org/assets/locks/pinhead_key.jpg"} }
         = image_tag("/assets/locks/pinhead_key.jpg", alt: "Pinhead key")
       %p
         Pinhead locking skewer key

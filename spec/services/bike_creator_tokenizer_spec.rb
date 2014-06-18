@@ -128,7 +128,7 @@ describe BikeCreatorTokenizer do
     it "should call tokenize with the token if it's in the bike params" do 
       bike = Bike.new
       b_param = BParam.new
-      b_param.stub(:params).and_return(:bike => {bike_token_id: 69})
+      b_param.stub(:params).and_return(bike: {bike_token_id: 69})
       creator = BikeCreatorTokenizer.new(b_param, bike)
       creator.should_receive(:tokenize).with(69)
       creator.check_token

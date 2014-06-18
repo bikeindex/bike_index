@@ -49,7 +49,7 @@ class Blog < ActiveRecord::Base
   before_create :set_title_slug
   def set_title_slug
     # We want to only set this once, and not change it, so that links don't break
-    t_slug = truncate(Slugifyer.slugify(self.title), length: 70, :omission => '')
+    t_slug = truncate(Slugifyer.slugify(self.title), length: 70, omission: '')
     # also - remove last char if a dash
     self.title_slug = t_slug.gsub(/\-$/, '')
   end

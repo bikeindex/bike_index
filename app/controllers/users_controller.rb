@@ -16,7 +16,7 @@ class UsersController < ApplicationController
       if @user.confirmed
         session[:user_id] = @user.id
         session[:last_seen] = Time.now
-        redirect_to user_home_url, :notice => "Logged in!" and return
+        redirect_to user_home_url, notice: "Logged in!" and return
       end
     else
       render action: :new
@@ -27,7 +27,7 @@ class UsersController < ApplicationController
     begin
       @user = User.find(params[:id])
       if @user.confirmed?
-        redirect_to new_session_url, :notice => "Your user account is already confirmed. Please log in"
+        redirect_to new_session_url, notice: "Your user account is already confirmed. Please log in"
       else
         if @user.confirm(params[:code])
           session[:user_id] = @user.id

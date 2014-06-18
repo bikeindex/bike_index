@@ -19,7 +19,7 @@ describe BikeCreator do
         frame_model: "Draft",
         primary_frame_color_id: color.id
       }
-      b_param = FactoryGirl.create(:b_param, :params => {bike: bike})
+      b_param = FactoryGirl.create(:b_param, params: {bike: bike})
       creator = BikeCreator.new(b_param).add_bike_book_data
 
       b_param.reload

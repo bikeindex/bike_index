@@ -2,7 +2,7 @@
 
 .form.form-horizontal
   = form_for [:admin, @organization] do |f|
-    = render :partial => 'form', :locals => { :f => f }
+    = render partial: 'form', locals: { f: f }
 
     .control-group.actions
       = f.submit "Create", class: 'button-green'

@@ -10,7 +10,7 @@
 - if @bikes.present?
 
   %ul.bike-boxes
-    = render partial: "/bikes/bike", collection: @bikes, :locals => {target: "show" }
+    = render partial: "/bikes/bike", collection: @bikes, locals: {target: "show" }
 
 
   .paginate-container
@@ -28,4 +28,4 @@
       #{params[:serial]}
 
   %ul.bike-boxes
-    = render partial: "/bikes/bike", collection: @secondary_bikes, :locals => {target: "show" }
+    = render partial: "/bikes/bike", collection: @secondary_bikes, locals: {target: "show" }

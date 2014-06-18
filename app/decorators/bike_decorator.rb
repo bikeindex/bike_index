@@ -85,7 +85,7 @@ class BikeDecorator < ApplicationDecorator
   end
 
   def list_image(target = nil)
-    h.content_tag :div, :class => "blist-image-holder" do 
+    h.content_tag :div, class: "blist-image-holder" do 
       h.link_to(list_link_url(target)) do 
         thumb_image
       end

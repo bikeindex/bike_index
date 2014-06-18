@@ -53,7 +53,7 @@
               %p
                 We are working on expanding this limit soon!
 
-    = form_for @bike, :html => { class: "form-horizontal" } do |f|
+    = form_for @bike, html: { class: "form-horizontal" } do |f|
       %nav#edit-menu
         %ul.edit-selection-select.nav
           %li
@@ -93,15 +93,15 @@
       - if @bike.stolen and @bike.current_stolen_record
         = f.fields_for :stolen_records do |builder|
           - if builder.object == @bike.current_stolen_record
-            = render :partial => 'bikes/bike_fields/stolen_record', :locals => { :f => builder, :bike => f }
+            = render partial: 'bikes/bike_fields/stolen_record', locals: { f: builder, bike: f }
           - else
             / For some weird reason, if you don't have an else here it prints out all of the form elements.
 
-      = render :partial => 'bikes/bike_fields/frame', :locals => { :f => f }
-      = render :partial => 'bikes/bike_fields/wheels', :locals => { :f => f }
+      = render partial: 'bikes/bike_fields/frame', locals: { f: f }
+      = render partial: 'bikes/bike_fields/wheels', locals: { f: f }
 
-      = render :partial => 'bikes/bike_fields/drivetrain_and_brakes', :locals => { :f => f }
-      = render :partial => 'bikes/bike_fields/additional_parts', :locals => { :f => f }
+      = render partial: 'bikes/bike_fields/drivetrain_and_brakes', locals: { f: f }
+      = render partial: 'bikes/bike_fields/additional_parts', locals: { f: f }
 
 
       - if @bike.verified?
@@ -112,7 +112,7 @@
           - if @bike.current_owner_exists
             .input-group
 
-              %a.collapsed{ href: "#change_ownership", :data => { toggle: "collapse" } }
+              %a.collapsed{ href: "#change_ownership", data: { toggle: "collapse" } }
                 - if @bike.stolen?
                   Mark your #{@bike.type} not stolen
                 - else

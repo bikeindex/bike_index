@@ -6,9 +6,9 @@
       back to viewing all locks
 
 
-= form_for @lock, :html => { class: "form-horizontal" } do |f|
+= form_for @lock, html: { class: "form-horizontal" } do |f|
   #lock-form
-    = render :partial => "locks/form", :locals => { :f => f }
+    = render partial: "locks/form", locals: { f: f }
 
     .control-group
       .control-label
@@ -20,7 +20,7 @@
       %label.control-label{ for: 'notes' }
         Additional notes
       .controls
-        = f.text_area :notes, :toolbar => 'Basic', class: 'ckeditor'
+        = f.text_area :notes, toolbar: 'Basic', class: 'ckeditor'
 
     .control-group.submit-button
       = submit_tag "Update the lock!", class: "button-green"

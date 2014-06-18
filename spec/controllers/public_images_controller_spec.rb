@@ -11,7 +11,7 @@ describe PublicImagesController do
       set_current_user(user)
       set_current_user(user)
       lambda do
-        delete :destroy, :id => public_image.id
+        delete :destroy, id: public_image.id
       end.should change(PublicImage, :count).by(-1)
     end
     
@@ -22,7 +22,7 @@ describe PublicImagesController do
       public_image = FactoryGirl.create(:public_image, imageable: bike)
       set_current_user(non_owner)
       lambda do
-        delete :destroy, :id => public_image.id
+        delete :destroy, id: public_image.id
       end.should_not change(PublicImage, :count)
     end
   end
@@ -55,7 +55,7 @@ describe PublicImagesController do
       public_image = FactoryGirl.create(:public_image, imageable: bike)
       bike.reload.owner.should eq(user)
       set_current_user(user)
-      put :update, {id: public_image.id, :public_image => {name: "Food"}}
+      put :update, {id: public_image.id, public_image: {name: "Food"}}
       response.should redirect_to(edit_bike_url(o.bike))
       public_image.reload.name.should eq("Food")
     end
@@ -73,7 +73,7 @@ describe PublicImagesController do
   #     pp @public_image1
   #     pp @public_image2
   #     pp @public_image3
-  #     post :order, :public_image => @public_image3.id, :new_listing_order => "1"
+  #     post :order, public_image: @public_image3.id, new_listing_order: "1"
   #     @public_image3.listing_order.should == 0
   #   end
   # end

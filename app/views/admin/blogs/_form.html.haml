@@ -43,7 +43,7 @@
       .controls.extra-field
         = @blog.published_at.strftime("%m-%d-%Y")
         
-        %a#change_published_date{ href: "#", :data => {date: "#{@blog.published_at.strftime("%m-%d-%Y")}" }}
+        %a#change_published_date{ href: "#", data: {date: "#{@blog.published_at.strftime("%m-%d-%Y")}" }}
           edit
 
     .control-group#blog-date.datepicker-container.initially-hidden

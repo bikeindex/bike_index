@@ -19,7 +19,7 @@
         - location = location.decorate
         %li
           .collapse-faq
-            %a.shop-title-link.collapsed{ href: "#shop#{location.org_location_id}", :data => { toggle: "collapse"} }
+            %a.shop-title-link.collapsed{ href: "#shop#{location.org_location_id}", data: { toggle: "collapse"} }
               %span
                 &#x25B6;
               = location.display_name
@@ -27,7 +27,7 @@
                 &nbsp;&nbsp;#{location.city}
           .shop-info.collapse{ id: "shop#{location.org_location_id}" }
             - if location.street.present?
-              %a.where-shop-location{:data => { lat: location.latitude, long: location.longitude } }
+              %a.where-shop-location{data: { lat: location.latitude, long: location.longitude } }
                 Show #{location.display_name} on map
               %p
                 #{location.street}, #{location.city}, #{location.state.abbreviation} #{location.zipcode}
@@ -65,7 +65,7 @@
         - location = location.decorate
         %li
           .collapse-faq
-            %a.shop-title-link.collapsed{ href: "#shop#{location.org_location_id}", :data => { toggle: "collapse"} }
+            %a.shop-title-link.collapsed{ href: "#shop#{location.org_location_id}", data: { toggle: "collapse"} }
               %span
                 &#x25B6;
               = location.display_name
@@ -73,7 +73,7 @@
                 &nbsp;&nbsp;#{location.city}
           .shop-info.collapse{ id: "shop#{location.org_location_id}" }
             - if location.street.present?
-              %a.where-shop-location{:data => { lat: location.latitude, long: location.longitude } }
+              %a.where-shop-location{data: { lat: location.latitude, long: location.longitude } }
                 Show #{location.display_name} on map
               %p
                 #{location.street}, #{location.city}, #{location.zipcode}, #{location.country.name}

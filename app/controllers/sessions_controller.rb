@@ -15,9 +15,9 @@ class SessionsController < ApplicationController
           session[:user_id] = user.id
           session[:last_seen] = Time.now
           if user.superuser
-            redirect_to admin_root_url, :notice => "Logged in!"
+            redirect_to admin_root_url, notice: "Logged in!"
           else
-            redirect_to user_home_url, :notice => "Logged in!"
+            redirect_to user_home_url, notice: "Logged in!"
           end
         else
           # User couldn't authenticate, so password is invalid
@@ -42,7 +42,7 @@ class SessionsController < ApplicationController
 
   def destroy
     session[:user_id] = nil
-    redirect_to goodbye_url(:subdomain => false), :notice => "Logged out!"
+    redirect_to goodbye_url(subdomain: false), notice: "Logged out!"
   end
 
 

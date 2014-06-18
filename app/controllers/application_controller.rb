@@ -29,11 +29,11 @@ protected
   def authenticate_user!
     if current_user.present?
       unless current_user.terms_of_service
-        redirect_to accept_terms_url(:subdomain => false) and return
+        redirect_to accept_terms_url(subdomain: false) and return
       end
     else
       flash[:error] = "You gotta log in!"
-      redirect_to new_session_url(:subdomain => false) and return
+      redirect_to new_session_url(subdomain: false) and return
     end
   end
 
@@ -41,11 +41,11 @@ protected
     if current_user.is_member_of?(current_organization)
       return true
       # unless current_user.vendor_terms_of_service
-      #   redirect_to accept_vendor_terms_url(:subdomain => false) and return
+      #   redirect_to accept_vendor_terms_url(subdomain: false) and return
       # end
     else
       flash[:error] = "You're not a member of that organization!"
-      redirect_to user_home_url(:subdomain => false) and return
+      redirect_to user_home_url(subdomain: false) and return
     end
   end
 
@@ -59,7 +59,7 @@ protected
   def require_superuser!
     unless current_user.present? and current_user.superuser?
       flash[:error] = "Gotta be an admin. Srys"
-      redirect_to user_home_url(:subdomain => false) and return
+      redirect_to user_home_url(subdomain: false) and return
     end
   end
 

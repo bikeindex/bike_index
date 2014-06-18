@@ -9,15 +9,15 @@ class ChargesController < ApplicationController
     @b_param = BParam.find(params[:b_param][:id])
     @amount = 699
     customer = Stripe::Customer.create(
-      :email => current_user.email,
-      :card  => params[:stripeToken]
+      email: current_user.email,
+      card:  params[:stripeToken]
     )
 
     charge = Stripe::Charge.create(
-      :customer    => customer.id,
-      :amount      => @amount,
-      :description => 'Bike Index Stripe customer',
-      :currency    => 'usd'
+      customer:    customer.id,
+      amount:      @amount,
+      description: 'Bike Index Stripe customer',
+      currency:    'usd'
     )
     @bike = BikeCreator.new(@b_param).create_paid_bike
 

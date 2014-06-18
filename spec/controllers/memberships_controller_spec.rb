@@ -20,7 +20,7 @@ describe MembershipsController do
       organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:user)
       membership = FactoryGirl.create(:membership, organization: organization, user: user, role: "admin")
-      put :update, {id: membership.id, :membership => {role: "admin"} }
+      put :update, {id: membership.id, membership: {role: "admin"} }
       membership.role.should eq("admin")
     end
   end

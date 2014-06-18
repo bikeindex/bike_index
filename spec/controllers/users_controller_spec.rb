@@ -26,17 +26,17 @@ describe UsersController do
     describe "success" do
       it "should create a non-confirmed record" do
         lambda do
-          post :create, :user => FactoryGirl.attributes_for(:user)
+          post :create, user: FactoryGirl.attributes_for(:user)
         end.should change(User, :count).by(1)
       end
       it "should call create_user_jobs" do
         CreateUserJobs.any_instance.should_receive(:do_jobs)
-        post :create, :user => FactoryGirl.attributes_for(:user)
+        post :create, user: FactoryGirl.attributes_for(:user)
       end
       it "should create a confirmed user, log in, and send welcome if user has org invite" do
         CreateUserJobs.any_instance.should_receive(:send_welcome_email)
         organization_invitation = FactoryGirl.create(:organization_invitation, invitee_email: "poo@pile.com")
-        post :create, :user => FactoryGirl.attributes_for(:user, email: "poo@pile.com")
+        post :create, user: FactoryGirl.attributes_for(:user, email: "poo@pile.com")
         session[:user_id].should eq(User.fuzzy_email_find("poo@pile.com").id)
         response.should redirect_to(user_home_url)
       end
@@ -51,11 +51,11 @@ describe UsersController do
       it "should not create a user or send a welcome email" do
         Resque.should_not_receive(:enqueue)
         lambda do
-          post :create, :user => user_attributes
+          post :create, user: user_attributes
         end.should_not change(User, :count)
       end
       it "should render new" do
-        post :create, :user => user_attributes
+        post :create, user: user_attributes
         response.should render_template('new')
       end
     end
@@ -64,8 +64,8 @@ describe UsersController do
   describe :confirm do  
     describe "user exists" do
       it "should tell the user to log in when already confirmed" do
-        @user = FactoryGirl.create(:user, :confirmed => true)
-        get :confirm, :id => @user.id, :code => "wtfmate"
+        @user = FactoryGirl.create(:user, confirmed: true)
+        get :confirm, id: @user.id, code: "wtfmate"
         response.should redirect_to new_session_url
       end
 
@@ -77,21 +77,21 @@ describe UsersController do
         
         it "should login and redirect when confirmation succeeds" do
           @user.should_receive(:confirm).and_return(true)
-          get :confirm, :id => @user.id, :code => @user.confirmation_token
+          get :confirm, id: @user.id, code: @user.confirmation_token
           session[:user_id].should == @user.id
           response.should redirect_to user_home_url
         end
 
         it "should show a view when confirmation fails" do
           @user.should_receive(:confirm).and_return(false)
-          get :confirm, :id => @user.id, :code => "Wtfmate"
+          get :confirm, id: @user.id, code: "Wtfmate"
           response.should render_template :confirm_error_bad_token
         end
       end
     end
 
     it "should show an appropriate message when the user is nil" do
-      get :confirm, :id => 1234, :code => "Wtfmate"
+      get :confirm, id: 1234, code: "Wtfmate"
       response.should render_template :confirm_error_404
     end
   end
@@ -101,25 +101,25 @@ describe UsersController do
       it "Should log in" do
         @user = FactoryGirl.create(:user, email: "ned@foo.com")
         @user.set_password_reset_token
-        post :password_reset, :token => @user.password_reset_token
+        post :password_reset, token: @user.password_reset_token
         session[:user_id].should == @user.id
       end
       it "Should redirect to the update password page" do 
         @user = FactoryGirl.create(:user, email: "ned@foo.com")
         @user.set_password_reset_token
-        post :password_reset, :token => @user.password_reset_token
+        post :password_reset, token: @user.password_reset_token
         response.should render_template :update_password
       end
     end
 
     it "should not log in if the token is present and valid" do
-      post :password_reset, :token => "Not Actually a token"
+      post :password_reset, token: "Not Actually a token"
       response.should render_template :request_password_reset
     end
 
     it "should enqueue a password reset email job" do
       @user = FactoryGirl.create(:user, email: "ned@foo.com")
-      post :password_reset, :email => @user.email
+      post :password_reset, email: @user.email
       ResetPasswordEmailJob.should have_queued(@user.id)
     end
   end
@@ -183,7 +183,7 @@ describe UsersController do
     it "should update the terms of service" do 
       user = FactoryGirl.create(:user, terms_of_service: false)
       session[:user_id] = user.id 
-      post :update, { id: user.username, :user => {terms_of_service: "1"} }
+      post :update, { id: user.username, user: {terms_of_service: "1"} }
       response.should redirect_to(user_home_url)
       user.reload.terms_of_service.should be_true
     end
@@ -192,7 +192,7 @@ describe UsersController do
       org =  FactoryGirl.create(:organization)
       FactoryGirl.create(:membership, organization: org, user: user)
       session[:user_id] = user.id 
-      post :update, { id: user.username, :user => {vendor_terms_of_service: "1"} }
+      post :update, { id: user.username, user: {vendor_terms_of_service: "1"} }
       response.code.should eq('302')
       user.reload.vendor_terms_of_service.should be_true
     end

@@ -12,7 +12,7 @@ Bikeindex::Application.routes.draw do
     resources :organization_invitations, only: [:new, :create]
   end
   
-  match '/' => 'stolen#index', :constraints => { subdomain: 'stolen' } 
+  match '/' => 'stolen#index', constraints: { subdomain: 'stolen' } 
 
   root to: 'welcome#index'
 
@@ -76,7 +76,7 @@ Bikeindex::Application.routes.draw do
   resources :locks
 
   namespace :admin do
-    root :to => 'dashboard#index'
+    root to: 'dashboard#index'
     resources :bikes do 
       collection do
         get :missing_manufacturer
@@ -157,7 +157,7 @@ Bikeindex::Application.routes.draw do
 
   resources :organization_deals, only: [:create, :new]
   resource :integrations, only: [:create]
-  match '/auth/:provider/callback', :to => "integrations#create"
+  match '/auth/:provider/callback', to: "integrations#create"
 
   %w[stolen_bikes protect_your_bike privacy terms serials about where roadmap security vendor_terms resources spokecard].each do |page|
     get page, controller: 'info', action: page
@@ -172,7 +172,7 @@ Bikeindex::Application.routes.draw do
   match '/422', to: 'errors#unprocessable_entity'
   match '/500', to: 'errors#server_error'
 
-  mount Sidekiq::Web => '/sidekiq', :constraints => AdminRestriction
-  mount Resque::Server.new, :at => '/resque', :constraints => AdminRestriction
+  mount Sidekiq::Web => '/sidekiq', constraints: AdminRestriction
+  mount Resque::Server.new, at: '/resque', constraints: AdminRestriction
   
 end

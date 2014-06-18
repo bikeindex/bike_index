@@ -104,7 +104,7 @@
    
 .delete-organization
   %p
-    %a.collapsed{:data => {toggle: "collapse", target: "#delete-organization"}}
+    %a.collapsed{data: {toggle: "collapse", target: "#delete-organization"}}
       I would like to terminate my account with the Bike Index
   #delete-organization.collapse
     = link_to "Delete #{@organization.name}!", organization_url(@organization), method: :delete, confirm: "Are you sure you want to?", class: "button-red"

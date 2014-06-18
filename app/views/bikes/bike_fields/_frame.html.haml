@@ -8,7 +8,7 @@
         Serial number
       .controls
         = @bike.serial_number.upcase
-      %a.serial-update-link.optional-form-block{role: "button", title: "Incorrect serial? Fix it!", :data => {toggle: "modal", target: "#submitSerialCorrection"} }
+      %a.serial-update-link.optional-form-block{role: "button", title: "Incorrect serial? Fix it!", data: {toggle: "modal", target: "#submitSerialCorrection"} }
         Submit serial number correction
     .control-group
       %label.control-label.unclickable
@@ -35,29 +35,29 @@
           Unknown year
 
   .input-group.with-additional-block#frame-sizer
-    %a.bikeform-tip{role: "button", title: "Seat tube measuring", :data => {toggle: "modal", target: "#seatTubeLengthTip"} }
+    %a.bikeform-tip{role: "button", title: "Seat tube measuring", data: {toggle: "modal", target: "#seatTubeLengthTip"} }
       %span
         ?
     .control-group
       %label.control-label.unclickable
         Frame size
       .controls
-        .groupedbtn-group{ :data =>  { toggle: "buttons-radio" }}
+        .groupedbtn-group{ data:  { toggle: "buttons-radio" }}
           .btn-group
-            %button.btn{ type: "button", :'data-size' => 'xs', :class => if @bike.frame_size == 'xs' then 'active' end}
+            %button.btn{ type: "button", :'data-size' => 'xs', class: if @bike.frame_size == 'xs' then 'active' end}
               XS
-            %button.btn{ type: "button", :'data-size' => 's', :class => if @bike.frame_size == 's' then 'active' end }
+            %button.btn{ type: "button", :'data-size' => 's', class: if @bike.frame_size == 's' then 'active' end }
               S
-            %button.btn{ type: "button", :'data-size' => 'm', :class => if @bike.frame_size == 'm' then 'active' end }
+            %button.btn{ type: "button", :'data-size' => 'm', class: if @bike.frame_size == 'm' then 'active' end }
               M
-            %button.btn{ type: "button", :'data-size' => 'l', :class => if @bike.frame_size == 'l' then 'active' end }
+            %button.btn{ type: "button", :'data-size' => 'l', class: if @bike.frame_size == 'l' then 'active' end }
               L
-            %button.btn{ type: "button", :'data-size' => 'xl', :class => if @bike.frame_size == 'xl' then 'active' end }
+            %button.btn{ type: "button", :'data-size' => 'xl', class: if @bike.frame_size == 'xl' then 'active' end }
               XL
           .btn-group
-            %button.btn{ type: "button", :'data-size' => 'cm', :class => if @bike.frame_size_unit == 'cm' then 'active' end }
+            %button.btn{ type: "button", :'data-size' => 'cm', class: if @bike.frame_size_unit == 'cm' then 'active' end }
               CM
-            %button.btn{ type: "button", :'data-size' => 'in', :class => if @bike.frame_size_unit == 'in' then 'active' end }
+            %button.btn{ type: "button", :'data-size' => 'in', class: if @bike.frame_size_unit == 'in' then 'active' end }
               IN
     .hidden-other.control-group
       = f.label :frame_size, "Seat tube length", class: "control-label"
@@ -68,7 +68,7 @@
 
 
   .input-group
-    %a.bikeform-tip{role: "button", title: "What's the frame made of?", :data => {toggle: "modal", target: "#frameMaterialTip"} }
+    %a.bikeform-tip{role: "button", title: "What's the frame made of?", data: {toggle: "modal", target: "#frameMaterialTip"} }
       %span
         ?
     .control-group
@@ -77,16 +77,16 @@
         = collection_select( :bike, :frame_material_id, FrameMaterial.all, :id, :name, prompt: "Choose material" )
 
   .input-group.with-optional-blocks
-    %a.bikeform-tip{role: "button", title: "Why do we do colors like this?", :data => {toggle: "modal", target: "#colorTip"} }
+    %a.bikeform-tip{role: "button", title: "Why do we do colors like this?", data: {toggle: "modal", target: "#colorTip"} }
       %span
         ?
     .control-group
       = f.label :primary_frame_color_id, class: "control-label"
       .controls
         = collection_select( :bike, :primary_frame_color_id, Color.all, :id, :name, required: true, prompt: "Choose color" )
-    %a#add-secondary.optional-form-block{:data => {target: "#secondary-color", toggle: "#rm-secondary"}}
+    %a#add-secondary.optional-form-block{data: {target: "#secondary-color", toggle: "#rm-secondary"}}
       Add a color
-    %a#rm-secondary.optional-form-block.rm-block.currently-hidden{:data => {target: "#secondary-color", toggle: "#add-secondary"}}
+    %a#rm-secondary.optional-form-block.rm-block.currently-hidden{data: {target: "#secondary-color", toggle: "#add-secondary"}}
       Remove color
     #secondary-color.hidden-other
       .control-group
@@ -94,9 +94,9 @@
           Secondary color
         .controls
           = collection_select( :bike, :secondary_frame_color_id, Color.all, :id, :name, include_blank: 'Choose color' )
-      %a#add-tertiary.optional-form-block{:data => {target: "#tertiary-color", toggle: "#rm-tertiary"}}
+      %a#add-tertiary.optional-form-block{data: {target: "#tertiary-color", toggle: "#rm-tertiary"}}
         Add a color
-      %a#rm-tertiary.optional-form-block.rm-block.currently-hidden{:data => {target: "#tertiary-color", toggle: "#add-tertiary"}}
+      %a#rm-tertiary.optional-form-block.rm-block.currently-hidden{data: {target: "#tertiary-color", toggle: "#add-tertiary"}}
         Remove color
     #tertiary-color.hidden-other
       .control-group

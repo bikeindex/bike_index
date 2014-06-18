@@ -69,7 +69,7 @@ describe Admin::StolenBikesController do
         bike = FactoryGirl.create(:bike)
         user = FactoryGirl.create(:user, superuser: true)
         set_current_user(user)
-        put :update, { id: bike.id, :bike => { manufacturer_id: nil}}
+        put :update, { id: bike.id, bike: { manufacturer_id: nil}}
       end
       it { should render_template(:edit) }
     end

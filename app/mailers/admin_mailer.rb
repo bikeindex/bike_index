@@ -1,6 +1,6 @@
 class AdminMailer < ActionMailer::Base
 
-  default from: "contact@bikeindex.org", :content_type => 'multipart/alternative', :parts_order => [ "text/calendar", "text/plain", "text/html", "text/enriched" ]
+  default from: "contact@bikeindex.org", content_type: 'multipart/alternative', parts_order: [ "text/calendar", "text/plain", "text/html", "text/enriched" ]
   default to: 'contact@bikeindex.org'
 
   def feedback_notification_email(feedback)

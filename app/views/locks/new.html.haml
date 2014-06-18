@@ -2,9 +2,9 @@
   %h1
     Save information about one of your locks
 
-= form_for @lock, :html => { class: "form-horizontal" } do |f|
+= form_for @lock, html: { class: "form-horizontal" } do |f|
   #lock-form
-    = render :partial => "locks/form", :locals => { :f => f }
+    = render partial: "locks/form", locals: { f: f }
 
     .control-group.submit-button
       = submit_tag "Add the lock!", class: "button-green"

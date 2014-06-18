@@ -10,7 +10,7 @@ else
   stdout_path "#{ENV['STACK_PATH']}/log/unicorn.stdout.log"
 end
 
-listen "/tmp/web_server.sock", :backlog => 64
+listen "/tmp/web_server.sock", backlog: 64
 
 timeout 30
 

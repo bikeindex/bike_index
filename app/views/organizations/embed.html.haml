@@ -1,5 +1,5 @@
 #stolen_fields_store
-= form_for @bike, :multipart => true do |f|
+= form_for @bike, multipart: true do |f|
   = f.hidden_field :b_param_id
   = f.hidden_field :creation_organization_id
   = f.hidden_field :embeded, value: true
@@ -57,9 +57,9 @@
       = f.label :primary_frame_color_id, "Frame color", class: "control-label"
       .controls
         = collection_select( :bike, :primary_frame_color_id, Color.all, :id, :name, required: true, prompt: "Choose color" )
-    %a#add-secondary.optional-form-block{:data => {target: "#secondary-color", toggle: "#rm-secondary"}}
+    %a#add-secondary.optional-form-block{data: {target: "#secondary-color", toggle: "#rm-secondary"}}
       Add a color
-    %a#rm-secondary.optional-form-block.rm-block.currently-hidden{:data => {target: "#secondary-color", toggle: "#add-secondary"}}
+    %a#rm-secondary.optional-form-block.rm-block.currently-hidden{data: {target: "#secondary-color", toggle: "#add-secondary"}}
       Remove color
     #secondary-color.hidden-other
       .control-group.chosen-select
@@ -67,9 +67,9 @@
           Secondary color
         .controls
           = collection_select( :bike, :secondary_frame_color_id, Color.all, :id, :name, prompt: "Choose color" )
-      %a#add-tertiary.optional-form-block{:data => {target: "#tertiary-color", toggle: "#rm-tertiary"}}
+      %a#add-tertiary.optional-form-block{data: {target: "#tertiary-color", toggle: "#rm-tertiary"}}
         Add a color
-      %a#rm-tertiary.optional-form-block.rm-block.currently-hidden{:data => {target: "#tertiary-color", toggle: "#add-tertiary"}}
+      %a#rm-tertiary.optional-form-block.rm-block.currently-hidden{data: {target: "#tertiary-color", toggle: "#add-tertiary"}}
         Remove color
     #tertiary-color.hidden-other
       .control-group

@@ -4,5 +4,5 @@ class NormalizedSerialSegment < ActiveRecord::Base
   validates_presence_of :bike_id
   validates_presence_of :segment
 
-  validates_uniqueness_of :segment, :scope => [:bike_id]
+  validates_uniqueness_of :segment, scope: [:bike_id]
 end
