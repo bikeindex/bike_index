@@ -75,5 +75,28 @@ describe Admin::BikesController do
     end
   end
 
+  describe :update_manufacturers do 
+    it "should update the products" do 
+      user = FactoryGirl.create(:user, superuser: true)
+      set_current_user(user)
+      request.env["HTTP_REFERER"] = 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
+
+      bike1 = FactoryGirl.create(:bike, manufacturer_other: 'hahaha')
+      bike2 = FactoryGirl.create(:bike, manufacturer_other: '69')
+      bike3 = FactoryGirl.create(:bike, manufacturer_other: '69')
+      manufacturer = FactoryGirl.create(:manufacturer)
+      update_params = {
+        manufacturer_id: manufacturer.id,
+        bikes_selected: { bike1.id => bike1.id, bike2.id => bike2.id }
+      }
+      post :update_manufacturers, update_params
+      bike1.reload.manufacturer.should eq(manufacturer)
+      bike2.reload.manufacturer.should eq(manufacturer)
+      bike1.manufacturer_other.should be_nil
+      bike2.manufacturer_other.should be_nil
+      bike3.manufacturer_other.should eq('69') # Sanity check
+    end
+  end
+
 
 end

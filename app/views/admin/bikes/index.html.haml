@@ -4,7 +4,7 @@
   = link_to "Manage component types", admin_ctypes_url, class: "sharing-links"
 - unless @unknown
   %p
-    = link_to "Bikes with unknown manufacturers", admin_bikes_url(missing_manufacturer: true)
+    = link_to "Bikes with unknown manufacturers", missing_manufacturer_admin_bikes_url
 .special-search-field-container
   .special-search-field
     = form_tag admin_bikes_path, method: :get do 

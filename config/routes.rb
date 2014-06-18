@@ -77,11 +77,17 @@ Bikeindex::Application.routes.draw do
 
   namespace :admin do
     root :to => 'dashboard#index'
+    resources :bikes do 
+      collection do
+        get :missing_manufacturer
+        post :update_manufacturers
+      end
+    end
     match 'invitations', to: 'dashboard#invitations'
     match 'maintenance', to: 'dashboard#maintenance'
     match 'bust_z_cache', to: 'dashboard#bust_z_cache'
     match 'destroy_example_bikes', to: 'dashboard#destroy_example_bikes'
-    resources :discounts, :memberships, :bikes, :organizations, :bike_token_invitations, :organization_invitations, :paints, :customer_contacts
+    resources :discounts, :memberships, :organizations, :bike_token_invitations, :organization_invitations, :paints, :customer_contacts
     match 'duplicate_bikes', to: 'bikes#duplicates'
     resources :flavor_texts, only: [:destroy, :create]
     resources :stolen_bikes do 

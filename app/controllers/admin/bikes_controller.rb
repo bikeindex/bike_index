@@ -7,14 +7,30 @@ class Admin::BikesController < Admin::BaseController
   def index
     if params[:email]
       bikes = Bike.admin_text_search(params[:email])
-    elsif params[:missing_manufacturer]
-      @unknown = true
-    	bikes = Bike.where(manufacturer_id: Manufacturer.find_by_slug('other').id)
     else 
       bikes = Bike.unscoped.order("created_at desc")
     end
     bikes = bikes.paginate(page: params[:page]).per_page(100)
     @bikes = bikes.decorate
+  end
+
+  def missing_manufacturer
+    bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.find_by_slug('other').id).order('manufacturer_other ASC')
+    bikes = bikes.paginate(page: params[:page]).per_page(100)
+    @bikes = bikes.decorate
+  end
+
+  def update_manufacturers
+    if params[:manufacturer_id].present? && params[:bikes_selected].present?
+      manufacturer_id = params[:manufacturer_id]
+      params[:bikes_selected].keys.each do |bid|
+        Bike.find(bid).update_attributes(manufacturer_id: manufacturer_id, manufacturer_other: nil)
+      end
+      flash[:notice] = 'Success. Bikes updated'
+      redirect_to :back and return
+    end
+    flash[:notice] = 'Sorry, you need to add bikes and a manufacturer'
+    redirect_to :back
   end
 
   def duplicates

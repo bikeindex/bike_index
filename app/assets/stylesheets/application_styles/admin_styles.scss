@@ -242,3 +242,33 @@
     }
   }
 }
+
+
+//________________________
+//
+// Multi manufacturer edit
+//
+//________________________
+
+.multi-bike-manufacturer-form {
+  .paginate-container {
+    clear: none;
+    margin-bottom: 0;
+    .pagination { margin-top: 0;}
+  }
+  .multi-manufacturer-selector {
+    margin-top: .5em;
+    .chosen-select {
+      width: 80%;
+      float: left;
+      float: left;
+      margin-top: .05em;
+      .select2-container { width: 100%; }
+    }
+    .button-blue {
+      width: 18%;
+      margin-left: 2%;
+      float: left;
+    }
+  }
+}

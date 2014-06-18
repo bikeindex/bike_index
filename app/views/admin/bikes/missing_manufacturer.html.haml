@@ -1,0 +1,83 @@
+%header.with-subtitle
+  %h1
+    Multi manufacturer update
+= form_tag update_manufacturers_admin_bikes_path, class: 'padded', id: 'multi_bike_manufacturer_update' do
+  .row-fluid.multi-bike-manufacturer-form
+    #chosen-container.span8.multi-manufacturer-selector
+      .chosen-select
+        = select_tag :manufacturer_id, options_from_collection_for_select(Manufacturer.frames, :id, :name), prompt: "Choose manufacturer"
+          
+      = submit_tag 'Update selected', class: 'button-blue'
+    .span4.paginate-container
+      = will_paginate @bikes 
+  %section.full-screen-table
+    %table.table.table-striped.table-bordered
+      %thead
+        %th
+          &#x2713;
+        %th
+          Date indexed
+        %th
+          Manufacturer
+        %th
+          Info
+        %th
+          Created by
+
+      %tbody
+        - @bikes.each do |bike|
+          %tr
+            %td
+              = check_box_tag "bikes_selected[#{bike.id}]", bike.id
+            %td
+              .less-strong-hold
+                %span.less-strong-right.medium-screens
+                  - if bike.example
+                    %span.table-error
+                      = bike.id 
+                  - else
+                    = bike.id 
+              %a{href: edit_admin_bike_url(bike) }
+
+                - if bike.created_at.today?
+                  Today at #{bike.created_at.strftime("%-I %p")}
+                - elsif Date.yesterday().beginning_of_day() <= bike.created_at          
+                  Yesterday at #{bike.created_at.strftime("%-I %p")}
+                - else
+                  = bike.created_at.strftime("%-m.%-d.%Y")
+            
+            %td
+              - if bike.manufacturer_other.present?
+                %span.table-error
+                  %span.hidden
+                    0 1
+                  = bike.manufacturer_other
+              - else
+                = bike.manufacturer.name
+            %td
+              .less-strong-hold
+                - desc = ''
+                - desc += "#{bike.year} " if bike.year.present?
+                - desc += "#{bike.frame_model} " if bike.frame_model.present?
+                - desc += "(#{bike.type})" unless bike.type == 'bike'
+                = desc
+                - if bike.paint.present? && bike.paint.color_id.blank?
+                  .large-screens.less-strong
+                    = link_to bike.paint.name, edit_admin_paint_url(bike.paint)
+                    = bike.frame_colors.to_sentence
+                - if bike.stolen
+                  %span.less-strong-right
+                    stolen
+
+            %td.not-tiny-screens
+              .less-strong-hold
+                = bike.creation_organization.name if bike.creation_organization.present?
+                - if bike.paid_for
+                  %span.less-strong
+                    Purchased
+                - if bike.registered_new
+                  %span.less-strong-right
+                    pos
+              
+  .paginate-container
+    = will_paginate @bikes 
