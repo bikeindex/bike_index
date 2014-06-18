@@ -18,6 +18,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     'change #bike_year':              'updateYear'
     'change #bike_unknown_year':      'toggleUnknownYear'
     'click #submit-serial-update':     'submitSerialUpdate'
+    'click #request-bike-delete':     'requestBikeDelete'
 
     
   initialize: ->
@@ -424,10 +425,29 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
         success: (data, textStatus, jqXHR) ->
           BikeIndex.alertMessage('success', 'Serial correction submitted', "Processing your updated serial now. We review all updates by hand, it could take up to a day before your bike is updated. Thanks!")
         error: (data, textStatus, jqXHR) ->
-          BikeIndex.alertMessage('error', 'Request failed', "We're!")
+          BikeIndex.alertMessage('error', 'Request failed', "We're unable to process the update! Try again?")
       $('#submitSerialCorrection').modal('hide')  
       
     else
       $('#submit-serial-error').slideDown('fast')
-    
-    #submitSerialCorrection
+
+  requestBikeDelete: (e) ->
+    e.preventDefault()
+    reason = $('#bike_delete_reason').val()
+    bike_id = $('#bike_delete_bike_id').val()
+    if reason.length > 0 && bike_id.length > 0
+      url = $('#requestBikeDelete').attr('data-url')
+      $.ajax
+        type: "POST"
+        url: url
+        data:
+          bike_delete_bike_id: bike_id
+          bike_delete_reason: reason
+        success: (data, textStatus, jqXHR) ->
+          BikeIndex.alertMessage('success', 'Bike delete submitted', "Deleting your bike now. We delete all bikes by hand, it could take up to a day before your bike is gone. Thanks for your patience!")
+        error: (data, textStatus, jqXHR) ->
+          BikeIndex.alertMessage('error', 'Request failed', "Oh no! Something went wrong and we couldn't send the delete request.")
+      $('#requestBikeDelete').modal('hide')  
+      
+    else
+      $('#request-delete-error').slideDown('fast')

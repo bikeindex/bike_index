@@ -85,7 +85,7 @@
           - if @bike.verified?
             %li
               %a{ href: "#edit_ownership" }
-                Ownership
+                Ownership, delete
                 %i.icon-chevron-right
           %li.save
             = submit_tag "Save changes", class: "button-green"
@@ -158,6 +158,17 @@
                   = f.text_field :owner_email
                 .controls.actions.padded
                   = submit_tag "Change #{@bike.type} owner", class: "button-yellow"
+          
+          .input-group
+
+            %a.collapsed{ href: "#delete_bike", :data => { toggle: "collapse" } }
+              Delete this bike
+          #delete_bike.collapse
+            .input-group
+              I would like to delete this bike
+              .control-group.padded
+                %a.button-red{role: "button", title: "request bike deletion", :data => {toggle: "modal", target: "#requestBikeDelete"} }
+                  Delete bike
 
       .edit-bike-fields
         %header
@@ -166,6 +177,7 @@
         .input-group.form-save
           = submit_tag "Save changes", class: "button-green"
  
+= render "/bikes/form_help/request_bike_delete"
 = render "/bikes/form_help/submit_serial_correction"
 = render "/bikes/form_help/rear_wheel_tip"
 = render "/bikes/form_help/color_tip"

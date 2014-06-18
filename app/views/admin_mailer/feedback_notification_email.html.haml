@@ -13,6 +13,18 @@
   %p
     - bike = Bike.find(@feedback.feedback_hash[:bike_id])
     = link_to 'View the bike', edit_admin_bike_url(bike)
+- elsif @feedback.feedback_type == "bike_delete_request"
+  %h1
+    Bike delete request
+  %p
+    From
+    = @feedback.email
+  %p
+    Reason for delete:
+    = @feedback.body
+  %p
+    - bike = Bike.find(@feedback.feedback_hash[:bike_id])
+    = link_to 'View the bike', edit_admin_bike_url(bike)
     
 - else
   %p

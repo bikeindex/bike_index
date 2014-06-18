@@ -129,6 +129,7 @@ Bikeindex::Application.routes.draw do
         collection do
           get 'current'
           post 'request_serial_update'
+          post 'request_bike_delete'
         end
       end
       match '*a', to: 'api_v1#not_found'
@@ -156,7 +157,7 @@ Bikeindex::Application.routes.draw do
     get page, controller: 'info', action: page
   end
 
-  get 'sitemap.xml.gz' => redirect("https://s3.amazonaws.com/bikeindex/sitemaps/sitemap_index.xml.gz")
+  # get 'sitemap.xml.gz' => redirect("https://s3.amazonaws.com/bikeindex/sitemaps/sitemap_index.xml.gz")
   # Somehow the redirect drops the .gz extension, which ruins it so this redirect is handled by Cloudflare
   # get "sitemaps/(*all)" => redirect("https://s3.amazonaws.com/bikeindex/sitemaps/%{all}")
   

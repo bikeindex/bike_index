@@ -159,7 +159,8 @@
   font-size: .9em;
   &:hover { color: $linkColor; }
 }
-#submit-serial-error { display: none; }
+
+#request-delete-error, #submit-serial-error { display: none; }
 
 
 //________________________
