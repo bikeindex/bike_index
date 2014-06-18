@@ -60,8 +60,10 @@
             #{link_to 'Grant Bike Tokens', admin_user_bike_tokens_url(user.id)}
   %p.pull-right
     #{User.count} users total
+    - today = User.where("created_at >= ?", Time.zone.now.beginning_of_day).count
+    - yesterday = (User.where("created_at >= ?", Time.zone.now.beginning_of_day - 1.day).count) - today
     %em
-      (#{User.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
+      (#{today} today, #{yesterday} yesterday)
 
 
 %section.full-screen-table
