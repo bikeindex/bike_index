@@ -54,26 +54,10 @@ class BikeIndex.Views.Global extends Backbone.View
       $('#head-search-bikes #query').select2
         tags: tags
         openOnEnter: false
-        # matcher: (term, text) ->
-        #   text.toUpperCase().indexOf(term.toUpperCase()) >= 0
         tokenSeparators: [","]
-          
-      
-    # v = @
-    # $.ajax
-    #   type: "GET"
-    #   url: $("#head-search-bikes #query").attr('data-url')
-    #   success: (data, textStatus, jqXHR) ->
-    #     v.setSearchfantasy(data.tags)
-
-  setSearchfantasy: (tags) ->
-    unless $('#sbr-body').length > 0
-      $('#head-search-bikes #query').select2
-        tags: tags
-        openOnEnter: false
-        # matcher: (term, text) ->
-        #   text.toUpperCase().indexOf(term.toUpperCase()) >= 0
-        tokenSeparators: [","]
+      mnfg_id = $('#header-search #manufacturer_id').val()
+      if mnfg_id.length > 0
+        $('#header-search #query').val(mnfg_id + $('#header-search #query').val()).change()
 
   updateManufacturerSearch: (e) ->
     if e.added?
@@ -122,15 +106,15 @@ class BikeIndex.Views.Global extends Backbone.View
         
 
   setProximityLocation: ->
-    if $('#stolenness_query').length > 0 && $('#stolenness_query').attr('data-stolen').length > 0
-      return true
-    $.ajax
-      type: "GET"
-      url: 'https://freegeoip.net/json/'
-      dataType: "jsonp",
-      success: (location) ->
-        $('#stolen-proximity #proximity').val("#{location.region_name}")
-        # loadStolenWidget(location) if $('#sbr-body').length > 0
+    # if $('#stolenness_query').length > 0 && $('#stolenness_query').attr('data-stolen').length > 0
+    #   return true
+    # $.ajax
+    #   type: "GET"
+    #   url: 'https://freegeoip.net/json/'
+    #   dataType: "jsonp",
+    #   success: (location) ->
+    #     $('#stolen-proximity #proximity').val("#{location.region_name}")
+    #     # loadStolenWidget(location) if $('#sbr-body').length > 0
   
   toggleCollapsibleHeader: ->
     # This is for the content pages where the search header is hidden
