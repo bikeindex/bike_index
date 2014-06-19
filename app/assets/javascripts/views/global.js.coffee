@@ -63,6 +63,9 @@ class BikeIndex.Views.Global extends Backbone.View
     if e.added?
       unless e.added.id == e.added.text 
         $('#header-search #manufacturer_id').val(e.added.id)
+    if e.removed?
+      if parseInt(e.removed.id,10) == parseInt($('#header-search #manufacturer_id').val(),10)
+        $('#header-search #manufacturer_id').val('')
 
   updateSerialAbsent: (e) ->
     e.preventDefault()
