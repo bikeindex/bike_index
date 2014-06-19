@@ -482,7 +482,7 @@ ul.state-list {
     }
   }
   &.final-list {
-    li { margin-left: 34%; }
+    li:first-of-type { margin-left: 16%; }
   }
 }
 
