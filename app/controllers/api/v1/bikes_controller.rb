@@ -9,14 +9,15 @@ module Api
       serialization_scope nil
 
       def search_tags
-        tags = []
-        Color.unscoped.commonness.each { |i| tags << i.name }
-        HandlebarType.all.each { |i| tags << i.name }
-        FrameMaterial.all.each  { |i| tags << i.name }
-        WheelSize.unscoped.commonness.each { |i| tags << "#{i.name} wheel" }
-        Manufacturer.all.each { |i| tags << i.name }
-        CycleType.all.each { |i| tags << i.name }
-        respond_with tags, root: 'tags'
+        # tags = []
+        # Color.unscoped.commonness.each { |i| tags << i.name }
+        # HandlebarType.all.each { |i| tags << i.name }
+        # FrameMaterial.all.each  { |i| tags << i.name }
+        # WheelSize.unscoped.commonness.each { |i| tags << "#{i.name} wheel" }
+        # Manufacturer.all.each { |i| tags << i.name }
+        # CycleType.all.each { |i| tags << i.name }
+        # respond_with tags, root: 'tags'
+        # respond_with Manufacturer.frames
       end
 
       def index

@@ -42,13 +42,13 @@
             = render 'sessions/form'
 
       = form_tag bikes_path, method: :get, id: "head-search-bikes" do 
-        .search-fields#header-search
+        .search-fields#header-search{ data: {manufacturers: Manufacturer.frames.map { |m| { id: m.id, text: m.name } }.to_json }}
           %span.search-background
           = text_field_tag :query,                          |
             params[:query],                                 |
             placeholder: "Search bike traits",              |
-            data: { url: search_tags_api_v1_bikes_url }, |
             class: "search-text-field"                      |
+          = hidden_field_tag :manufacturer_id, params[:manufacturer_id]
           .search-button
             = submit_tag "Search", name: "search", class: "button-blue"
           .optional-fields

@@ -7,7 +7,7 @@ describe BikeSearcher do
       search = BikeSearcher.new(stolen: true)
       search.should_receive(:matching_serial).and_return(true)
       search.should_receive(:matching_stolenness).and_return(true)
-      # search.should_receive(:matching_manufacturers).and_return(true)
+      search.should_receive(:matching_manufacturer).and_return(true)
       # search.should_receive(:matching_attr_cache).and_return(true)
       search.should_receive(:matching_query).and_return(true)
       search.find_bikes
@@ -33,6 +33,14 @@ describe BikeSearcher do
       bike = FactoryGirl.create(:bike, serial_number: 'K10DY00047-bkd')
       search = BikeSearcher.new(serial: 'bkd-K1oDYooo47')
       search.matching_serial.first.should eq(bike)
+    end
+  end
+
+  describe :matching_manufacturer do 
+    it "should find matching bikes" do 
+      bike = FactoryGirl.create(:bike)
+      search = BikeSearcher.new(manufacturer_id: bike.manufacturer_id, query: "something #{bike.manufacturer_id}")
+      search.matching_manufacturer(Bike.scoped).first.should eq(bike)
     end
   end
 

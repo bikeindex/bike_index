@@ -45,6 +45,16 @@ class BikeSearcher
     @bikes
   end
 
+  def matching_manufacturer(bikes)
+    if @params[:manufacturer_id].present?
+      @bikes = bikes.where(manufacturer_id: @params[:manufacturer_id])
+      if @params[:query].present?
+        @params[:query] = @params[:query].gsub(/#{@params[:manufacturer_id]}/, '')
+      end
+    end
+    @bikes
+  end
+
   def fuzzy_find_serial
     return nil unless @normer.normalized_segments.present?
     bike_ids = []
@@ -66,9 +76,10 @@ class BikeSearcher
   end
 
   def find_bikes
-    if @params[:stolen].present? or @params[:query].present? or @params[:serial].present?
-      @bikes = matching_serial    
+    if @params[:stolen].present? or @params[:query].present? or @params[:serial].present? or @params[:manufacturer_id].present?
+      @bikes = matching_serial 
       matching_stolenness(@bikes)
+      matching_manufacturer(@bikes)
       matching_query(@bikes)
       by_proximity if @params[:stolen] && @params[:proximity].present? && @params[:proximity].strip.length > 1
     else

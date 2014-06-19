@@ -9,6 +9,7 @@ class BikeIndex.Views.Global extends Backbone.View
     'click #serial-absent':                 'updateSerialAbsent'
     'focus #header-search':                 'expandSearch'
     'change input#stolen':                  'toggleProximitySearch'
+    'change #head-search-bikes #query':     'updateManufacturerSearch'
     # 'click #search-type-tabs':              'toggleSearchType'
     
   initialize: ->
@@ -47,12 +48,37 @@ class BikeIndex.Views.Global extends Backbone.View
     $('.chosen-select select').select2()
 
   initializeHeaderSearch: ->
-    v = @
-    $.ajax
-      type: "GET"
-      url: $("#head-search-bikes #query").attr('data-url')
-      success: (data, textStatus, jqXHR) ->
-        v.setSearchfantasy(data.tags)
+    unless $('#sbr-body').length > 0
+      tags = JSON.parse($("#header-search").attr('data-manufacturers'))
+      # console.log(tags[0])
+      $('#head-search-bikes #query').select2
+        tags: tags
+        openOnEnter: false
+        # matcher: (term, text) ->
+        #   text.toUpperCase().indexOf(term.toUpperCase()) >= 0
+        tokenSeparators: [","]
+          
+      
+    # v = @
+    # $.ajax
+    #   type: "GET"
+    #   url: $("#head-search-bikes #query").attr('data-url')
+    #   success: (data, textStatus, jqXHR) ->
+    #     v.setSearchfantasy(data.tags)
+
+  setSearchfantasy: (tags) ->
+    unless $('#sbr-body').length > 0
+      $('#head-search-bikes #query').select2
+        tags: tags
+        openOnEnter: false
+        # matcher: (term, text) ->
+        #   text.toUpperCase().indexOf(term.toUpperCase()) >= 0
+        tokenSeparators: [","]
+
+  updateManufacturerSearch: (e) ->
+    if e.added?
+      unless e.added.id == e.added.text 
+        $('#header-search #manufacturer_id').val(e.added.id)
 
   updateSerialAbsent: (e) ->
     e.preventDefault()
@@ -105,16 +131,6 @@ class BikeIndex.Views.Global extends Backbone.View
       success: (location) ->
         $('#stolen-proximity #proximity').val("#{location.region_name}")
         # loadStolenWidget(location) if $('#sbr-body').length > 0
-  
-
-  setSearchfantasy: (tags) ->
-    unless $('#sbr-body').length > 0
-      $('#head-search-bikes #query').select2
-        tags: tags
-        openOnEnter: false
-        # matcher: (term, text) ->
-        #   text.toUpperCase().indexOf(term.toUpperCase()) >= 0
-        tokenSeparators: [","]
   
   toggleCollapsibleHeader: ->
     # This is for the content pages where the search header is hidden
