@@ -77,7 +77,7 @@ class CustomerMailer < ActionMailer::Base
 
   def stolen_notification_email(stolen_notification)
     @stolen_notification = stolen_notification
-    mail(to: @stolen_notification.receiver.email, cc:  'bryan@bikeindex.org', bcc: "contact@bikeindex.org", subject: @stolen_notification.subject) do |format|
+    mail(to: "#{@stolen_notification.bike.owner_email}, bryan@bikeindex.org", bcc: "contact@bikeindex.org", subject: @stolen_notification.subject) do |format|
       format.text
       format.html { render layout: 'email'}
     end
