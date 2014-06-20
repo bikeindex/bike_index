@@ -19,6 +19,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     'change #bike_unknown_year':      'toggleUnknownYear'
     'click #submit-serial-update':     'submitSerialUpdate'
     'click #request-bike-delete':     'requestBikeDelete'
+    'click .submit-bike-update':      'checkIfPhoneBlank'
 
     
   initialize: ->
@@ -407,6 +408,10 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       $('#bike_unknown_year').prop('checked', true)
     else
       $('#bike_unknown_year').prop('checked', false)
+
+  checkIfPhoneBlank: (e) ->
+    unless $('#bike_stolen_records_attributes_0_phone').val().length > 0
+      BikeIndex.alertMessage('error', 'Phone number required', "<p>A phone number is required for stolen listings. We want to be able to contact you if your bike is found!</p><p>Your phone number will be private unless you choose to show it in <em>Show phone number to</em></p>")
   
   submitSerialUpdate: (e) ->
     e.preventDefault()

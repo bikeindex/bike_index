@@ -88,7 +88,7 @@
                 Ownership, delete
                 %i.icon-chevron-right
           %li.save
-            = submit_tag "Save changes", class: "button-green"
+            = submit_tag "Save changes", class: "button-green submit-bike-update"
 
       - if @bike.stolen and @bike.current_stolen_record
         = f.fields_for :stolen_records do |builder|
@@ -135,7 +135,7 @@
                 - if @bike.stolen
                   .control-group
                     .edit-bike-actions
-                    = submit_tag "I found my #{@bike.type}! It's no longer stolen", class: "button-yellow", id: "mark-unstolen"
+                    = submit_tag "I found my #{@bike.type}! It's no longer stolen", class: "button-yellow submit-bike-update", id: "mark-unstolen"
                 - else
                   %p
                     Oh no! This #{@bike.type} was stolen.
@@ -175,7 +175,7 @@
           %h2
             Save changes
         .input-group.form-save
-          = submit_tag "Save changes", class: "button-green"
+          = submit_tag "Save changes", class: "button-green submit-bike-update"
  
 = render "/bikes/form_help/request_bike_delete"
 = render "/bikes/form_help/submit_serial_correction"
