@@ -36,9 +36,9 @@ describe StolenRecord do
   describe :tsv_row do 
     it "should return the tsv row" do 
       stolen_record = FactoryGirl.create(:stolen_record)
-      stolen_record.bike.update_attribute :description, "I like tabs because i'm an ass\T sometimes\N"
+      stolen_record.bike.update_attribute :description, "I like tabs because i'm an \\tass\T right\N"
       row = stolen_record.tsv_row
-      row.split("\t").count.should eq(9)
+      row.split("\t").count.should eq(10)
       row.split("\n").count.should eq(1)
     end
   end
