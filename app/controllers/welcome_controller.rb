@@ -15,7 +15,7 @@ class WelcomeController < ApplicationController
 
   def user_home
     if current_user.present?
-      bikes = Bike.unscoped.find(current_user.bikes)
+      bikes = Bike.where('id in (?)', current_user.bikes)
       @bikes = BikeDecorator.decorate_collection(bikes)
       @locks = LockDecorator.decorate_collection(current_user.locks)
 

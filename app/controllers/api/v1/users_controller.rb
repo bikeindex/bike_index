@@ -30,7 +30,7 @@ module Api
             success = {success: 'submitted update'}
             render json: success and return
           end
-        end        
+        end
         message = {errors: {not_allowed: 'nuh-uh'}}
         render json: message, status: 403
       end
