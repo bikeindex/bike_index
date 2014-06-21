@@ -135,7 +135,7 @@ Bikeindex::Application.routes.draw do
         collection do
           get 'current'
           post 'request_serial_update'
-          post 'request_bike_delete'
+          post 'send_request'
         end
       end
       match '*a', to: 'api_v1#not_found'

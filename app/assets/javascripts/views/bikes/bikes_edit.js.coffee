@@ -20,6 +20,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     'click #submit-serial-update':     'submitSerialUpdate'
     'click #request-bike-delete':     'requestBikeDelete'
     'click .submit-bike-update':      'checkIfPhoneBlank'
+    # 'change #mark_recovered_we_helped': 'toggleCanWeTell'
 
     
   initialize: ->
@@ -220,9 +221,6 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       $($('#add-tertiary').attr('data-toggle')).show().removeClass('currently-hidden')
       $('#add-tertiary').addClass('currently-hidden').hide()
       $($('#add-tertiary').attr('data-target')).show().addClass('unhidden')
-
-  markUnstolen: ->
-    $('#bike_stolen').prop('checked', '')
 
   markStolen: ->
     $('#bike_stolen').prop('checked', 'true')
@@ -446,13 +444,45 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
         type: "POST"
         url: url
         data:
-          bike_delete_bike_id: bike_id
-          bike_delete_reason: reason
+          request_type: 'bike_delete_request'
+          request_bike_id: bike_id
+          request_reason: reason
         success: (data, textStatus, jqXHR) ->
           BikeIndex.alertMessage('success', 'Bike delete submitted', "Deleting your bike now. We delete all bikes by hand, it could take up to a day before your bike is gone. Thanks for your patience!")
         error: (data, textStatus, jqXHR) ->
           BikeIndex.alertMessage('error', 'Request failed', "Oh no! Something went wrong and we couldn't send the delete request.")
       $('#requestBikeDelete').modal('hide')  
-      
     else
       $('#request-delete-error').slideDown('fast')
+
+  toggleCanWeTell: (e) ->
+    if $('#mark_recovered_we_helped').prop('checked')
+      $('#can_we_tell').slideDown()
+    else
+      $('#can_we_tell').slideUp()
+
+  markUnstolen: (e) ->
+    e.preventDefault()
+    reason = $('#mark_recovered_reason').val()
+    bike_id = $('#mark_recovered_bike_id').val()
+    did_we_help = $('#mark_recovered_we_helped').prop('checked')
+    if reason.length > 0 && bike_id.length > 0
+      url = $('#markBikeRecovered').attr('data-url')
+      $.ajax
+        type: "POST"
+        url: url
+        data:
+          request_type: 'bike_recovery'
+          request_bike_id: bike_id
+          request_reason: reason
+          did_we_help: did_we_help
+        success: (data, textStatus, jqXHR) ->
+          # BikeIndex.alertMessage('success', 'Bike marked recovered', "Thanks! We're so glad you got your bike back!")
+          $('#requestBikeDelete').modal('hide')  
+          $('#bike_stolen').prop('checked', '')
+          $('.bikeedit-form-grab').submit()
+        error: (data, textStatus, jqXHR) ->
+          BikeIndex.alertMessage('error', 'Request failed', "Oh no! Something went wrong and we couldn't mark your bike recovered.")
+      $('#requestBikeDelete').modal('hide')  
+    else
+      $('#mark-recovered-error').slideDown('fast')

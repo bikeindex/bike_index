@@ -25,6 +25,20 @@
   %p
     - bike = Bike.find(@feedback.feedback_hash[:bike_id])
     = link_to 'View the bike', edit_admin_bike_url(bike)
+
+- elsif @feedback.feedback_type == "bike_recovery"
+  - bike = Bike.find(@feedback.feedback_hash[:bike_id])
+  %h1
+    A #{bike.type} has been recovered
+  %p
+    How the bike was recovered
+    = @feedback.body
+  %p
+    Did we help?
+    %strong
+      = @feedback.feedback_hash[:did_we_help]
+  %p
+    = link_to 'View the bike', edit_admin_bike_url(bike)
     
 - else
   %p

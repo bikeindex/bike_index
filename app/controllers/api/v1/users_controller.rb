@@ -35,15 +35,19 @@ module Api
         render json: message, status: 403
       end
 
-      def request_bike_delete
-        bike_id = params[:bike_delete_bike_id]
-        reason = params[:bike_delete_reason]
-        if current_user.present? && reason.present? && bike_id.present?
+      def send_request
+        bike_id = params[:request_bike_id]
+        reason = params[:request_reason]
+        feedback_type = params[:request_type]
+        if current_user.present? && reason.present? && bike_id.present? && feedback_type.present?
           bike = Bike.find(bike_id)
           if bike.owner == current_user
-            feedback = Feedback.new(email: current_user.email, body: reason, title: 'Bike deletion request', feedback_type: 'bike_delete_request')
+            feedback = Feedback.new(email: current_user.email, body: reason, title: "#{feedback_type.titleize}", feedback_type: feedback_type)
             feedback.name = (current_user.name.present? && current_user.name) || 'no name'
             feedback.feedback_hash = { bike_id: bike_id }
+            if params[:did_we_help].present?
+              feedback.feedback_hash[:did_we_help] = params[:did_we_help]
+            end
             feedback.save
             success = {success: 'submitted request'}
             render json: success and return

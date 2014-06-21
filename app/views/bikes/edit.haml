@@ -53,7 +53,7 @@
               %p
                 We are working on expanding this limit soon!
 
-    = form_for @bike, html: { class: "form-horizontal" } do |f|
+    = form_for @bike, html: { class: "form-horizontal bikeedit-form-grab" } do |f|
       %nav#edit-menu
         %ul.edit-selection-select.nav
           %li
@@ -135,7 +135,10 @@
                 - if @bike.stolen
                   .control-group
                     .edit-bike-actions
-                    = submit_tag "I found my #{@bike.type}! It's no longer stolen", class: "button-yellow submit-bike-update", id: "mark-unstolen"
+                    %a.button-yellow{role: "button", title: "Bike has been recovered", :data => {toggle: "modal", target: "#markBikeRecovered"} }
+                      I found my #{@bike.type}! It's no longer stolen
+
+                    / submit_tag "I found my #{@bike.type}! It's no longer stolen", class: "button-yellow submit-bike-update", id: "mark-unstolen"
                 - else
                   %p
                     Oh no! This #{@bike.type} was stolen.
@@ -177,6 +180,8 @@
         .input-group.form-save
           = submit_tag "Save changes", class: "button-green submit-bike-update"
  
+- if @bike.stolen
+  = render "/bikes/form_help/mark_bike_recovered"
 = render "/bikes/form_help/request_bike_delete"
 = render "/bikes/form_help/submit_serial_correction"
 = render "/bikes/form_help/rear_wheel_tip"

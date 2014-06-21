@@ -1,0 +1,46 @@
+- if Rails.env.production?
+  - request_url = "https://bikeindex.org"
+- else
+  - request_url = "http://lvh.me:3000"
+#markBikeRecovered.modal.hide.fade{ data: {url: request_url + send_request_api_v1_users_path } }
+  .modal-header
+    %button{ type: "button", class: "close", data: { dismiss: "modal" }, aria: {hidden: "true"} }
+      &times;
+    %h3
+      We're so excited you've recovered your #{@bike.type}
+  .modal-body.form.form-horizontal
+    #mark-recovered-error.alert.alert-error
+      %a.close{"data-dismiss" => "alert"} ×
+      %h4
+        Not enough information!
+      %p
+        Please tell us how you got your bike back, we really care!
+    = form_tag  do |t|
+      = hidden_field_tag :mark_recovered_bike_id, @bike.id
+      .input-group
+      .input-group
+        .control-group.large-text
+          %label.control-label{ for: :mark_recovered_reason }
+            How'd you get it back?
+          .controls
+            = text_area_tag :mark_recovered_reason, nil, rows: 5
+      .input-group
+        .control-group
+          %label.control-label{ for: :mark_recovered_we_helped }
+            Did we help?
+          .controls
+            %input#mark_recovered_we_helped{ type: 'checkbox' }
+            
+      / .input-group#can_we_tell.initially-hidden
+      /   .control-group
+      /     .control-label
+      /       %input#mark_recovered_can_we_tell{ type: 'checkbox' }
+      /     .controls
+      /       %label{ for: :mark_recovered_can_we_tell }
+      /         Can we tell people about it?            
+          
+      .input-group
+        .controls.actions.padded
+          %a#mark-unstolen.button-green{ href: '#' }
+            Mark recovered!
+          
