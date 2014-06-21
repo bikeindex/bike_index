@@ -19,31 +19,65 @@ describe Api::V1::UsersController do
     end
   end
 
-  describe :request_serial_update do 
-    xit "should create a new serial request mail" do 
+  describe :send_request do 
+    it "should create a new serial request mail" do 
       o = FactoryGirl.create(:ownership)
       user = o.creator
       bike = o.bike
       serial_request = { 
+        request_type: 'serial_update_request',
         user_id: user.id,
-        serial_update_bike_id: bike.id,
-        serial_update_email: user.email,
-        serial_update_serial: 'some new serial',
-        serial_update_reason: 'Some reason'
+        request_bike_id: bike.id,
+        request_reason: 'Some reason',
+        serial_update_serial: 'some new serial'
       }
       set_current_user(user)
-      # pp session
-      lambda {
-        put :request_serial_update, serial_request, format: :json
-      }.should change(Feedback, :count).by(1)
+      ActionMailer::Base.deliveries = []
+      Resque.should_receive(:enqueue)
+      post :send_request, serial_request
+      response.code.should eq('200')
+      FeedbackNotificationEmailJob.perform(Feedback.where(feedback_type: 'serial_update_request').first.id)
+      ActionMailer::Base.deliveries.should_not be_empty
+    end
+
+    it "should create a new bike delete request mail" do 
+      o = FactoryGirl.create(:ownership)
+      user = o.creator
+      bike = o.bike
+      delete_request = { 
+        request_type: 'bike_delete_request',
+        user_id: user.id,
+        request_bike_id: bike.id,
+        request_reason: 'Some reason',
+      }
+      set_current_user(user)
+      Resque.should_receive(:enqueue)
+      post :send_request, delete_request
+      response.code.should eq('200')
+    end
+
+    it "should create a new recovery request mail" do 
+      o = FactoryGirl.create(:ownership)
+      user = o.creator
+      bike = o.bike
+      recovery_request = { 
+        request_type: 'bike_recovery',
+        user_id: user.id,
+        request_bike_id: bike.id,
+        request_reason: 'Some reason',
+        did_we_help: 'some new serial'
+      }
+      set_current_user(user)
+      Resque.should_receive(:enqueue)
+      post :send_request, recovery_request
       response.code.should eq('200')
     end
     
     it "shouldn't create a new serial request mailer if a user isn't present" do 
       bike = FactoryGirl.create(:bike)
-      message = { serial_update_bike_id: bike.id, serial_update_serial: 'some update', serial_update_reason: 'Some reason' }
+      message = { request_bike_id: bike.id, serial_update_serial: 'some update', request_reason: 'Some reason' }
       # pp message
-      post :request_serial_update, message, format: :json
+      post :send_request, message, format: :json
       response.code.should eq('403')
     end
 
@@ -52,8 +86,8 @@ describe Api::V1::UsersController do
       bike = o.bike
       user = FactoryGirl.create(:user)
       set_current_user(user)
-      params = { serial_update_bike_id: bike.id, serial_update_email: user.email, serial_update_serial: 'some update', serial_update_reason: 'Some reason' }
-      post :request_serial_update, params
+      params = { request_bike_id: bike.id, serial_update_serial: 'some update', request_reason: 'Some reason' }
+      post :send_request, params
       # pp response 
       response.code.should eq('403')
     end

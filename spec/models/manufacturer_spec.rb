@@ -30,7 +30,7 @@ describe Manufacturer do
     it "should add in all the attributes that are listed" do 
       import_file = File.open(Rails.root.to_s + "/spec/manufacturer-test-import.csv")
       Manufacturer.import(import_file)
-      @manufacturer = Manufacturer.find_by_slug("surly-bikes")
+      @manufacturer = Manufacturer.find_by_slug("surly")
       @manufacturer.website.should eq('http://surlybikes.com')
       @manufacturer.frame_maker.should be_true
       @manufacturer.open_year.should eq(1900)

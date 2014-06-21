@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140615230212) do
+ActiveRecord::Schema.define(:version => 20140621013108) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -301,7 +301,6 @@ ActiveRecord::Schema.define(:version => 20140615230212) do
     t.integer  "close_year"
     t.string   "logo"
     t.text     "description"
-    t.string   "book_slug"
   end
 
   create_table "memberships", :force => true do |t|

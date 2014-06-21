@@ -422,9 +422,10 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
         type: "POST"
         url: url
         data:
+          request_type: 'serial_update_request'
+          request_bike_id: bike_id
+          request_reason: reason
           serial_update_serial: serial
-          serial_update_bike_id: bike_id
-          serial_update_reason: reason
         success: (data, textStatus, jqXHR) ->
           BikeIndex.alertMessage('success', 'Serial correction submitted', "Processing your updated serial now. We review all updates by hand, it could take up to a day before your bike is updated. Thanks!")
         error: (data, textStatus, jqXHR) ->

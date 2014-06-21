@@ -14,6 +14,34 @@ describe AdminMailer do
     end
   end
 
+  describe 'special_feedback_notification_email' do
+    before :each do
+      @bike = FactoryGirl.create(:bike)
+      @feedback = FactoryGirl.create(:feedback, feedback_hash: {bike_id: @bike.id})
+    end
+    it 'sends a delete request email' do
+      @feedback.update_attributes(feedback_type: 'bike_delete_request')
+      mail = AdminMailer.feedback_notification_email(@feedback)
+      mail.subject.should eq("New Feedback Submitted")
+      mail.to.should eq(["contact@bikeindex.org"])
+      mail.from.should eq([@feedback.email])
+    end
+    it 'sends a recovery email' do
+      @feedback.update_attributes(feedback_type: 'bike_recovery')
+      mail = AdminMailer.feedback_notification_email(@feedback)
+      mail.subject.should eq("New Feedback Submitted")
+      mail.to.should eq(["contact@bikeindex.org"])
+      mail.from.should eq([@feedback.email])
+    end
+    it 'sends a serial update email' do
+      @feedback.update_attributes(feedback_type: 'serial_update_request')
+      mail = AdminMailer.feedback_notification_email(@feedback)
+      mail.subject.should eq("New Feedback Submitted")
+      mail.to.should eq(["contact@bikeindex.org"])
+      mail.from.should eq([@feedback.email])
+    end
+  end
+
   describe :no_admins_notification_email do
     before :each do
       @organization = FactoryGirl.create(:organization)

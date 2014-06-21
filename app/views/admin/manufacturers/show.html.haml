@@ -17,7 +17,6 @@
       = @manufacturer.dl_list_item(link_to(@manufacturer.website, @manufacturer.website), "Website")
     = @manufacturer.dl_from_attribute('description')
     = @manufacturer.dl_from_attribute('id')
-    = @manufacturer.dl_from_attribute('book_slug')
   - if @manufacturer.logo.present?
     = image_tag @manufacturer.logo.url(:thumb)
 

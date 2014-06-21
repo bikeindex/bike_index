@@ -1,4 +1,4 @@
-- if @feedback.feedback_type == "serial_update_request"
+- if @feedback.feedback_type == 'serial_update_request'
   %h1
     Serial update request
   %p
@@ -13,7 +13,7 @@
   %p
     - bike = Bike.find(@feedback.feedback_hash[:bike_id])
     = link_to 'View the bike', edit_admin_bike_url(bike)
-- elsif @feedback.feedback_type == "bike_delete_request"
+- elsif @feedback.feedback_type == 'bike_delete_request'
   %h1
     Bike delete request
   %p
@@ -26,7 +26,7 @@
     - bike = Bike.find(@feedback.feedback_hash[:bike_id])
     = link_to 'View the bike', edit_admin_bike_url(bike)
 
-- elsif @feedback.feedback_type == "bike_recovery"
+- elsif @feedback.feedback_type == 'bike_recovery'
   - bike = Bike.find(@feedback.feedback_hash[:bike_id])
   %h1
     A #{bike.type} has been recovered

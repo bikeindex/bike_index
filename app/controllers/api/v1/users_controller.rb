@@ -16,25 +16,6 @@ module Api
         end
       end
 
-      def request_serial_update
-        new_serial = params[:serial_update_serial]
-        bike_id = params[:serial_update_bike_id]
-        reason = params[:serial_update_reason]
-        if current_user.present? && new_serial.present? && bike_id.present? && reason.present?
-          bike = Bike.find(bike_id)
-          if bike.owner == current_user
-            feedback = Feedback.new(email: current_user.email, body: reason, title: 'Serial update request', feedback_type: 'serial_update_request')
-            feedback.name = (current_user.name.present? && current_user.name) || 'no name'
-            feedback.feedback_hash = { bike_id: bike_id, new_serial: new_serial }
-            feedback.save
-            success = {success: 'submitted update'}
-            render json: success and return
-          end
-        end
-        message = {errors: {not_allowed: 'nuh-uh'}}
-        render json: message, status: 403
-      end
-
       def send_request
         bike_id = params[:request_bike_id]
         reason = params[:request_reason]
@@ -47,6 +28,8 @@ module Api
             feedback.feedback_hash = { bike_id: bike_id }
             if params[:did_we_help].present?
               feedback.feedback_hash[:did_we_help] = params[:did_we_help]
+            elsif params[:serial_update_serial].present?
+              feedback.feedback_hash[:new_serial] = params[:serial_update_serial]
             end
             feedback.save
             success = {success: 'submitted request'}
