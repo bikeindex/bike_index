@@ -43,22 +43,24 @@
             %ul
               - @stolen_bikes.each do |bike|
                 %li
+                  %a{ href: bike_url(bike) }
                   - if bike.thumb_image.present?
-                    = link_to bike.thumb_image, bike_url(bike), class: 'stolen-thumb'
+                    %span.stolen-thumb
+                      = bike.thumb_image
                   %h4
-                    = link_to bike.title, bike_url(bike)
+                    = bike.title
                   %p
+                    = bike.description.truncate(120)
+                  %p.less-strong
                     - location = []
                     - location << bike.current_stolen_record.city.titleize if bike.current_stolen_record.city.present?
                     - location << bike.current_stolen_record.state.abbreviation if bike.current_stolen_record.state.present?
                     - if location.any?
-                      Stolen from 
-                      = location.join(', ')
-                  %p.less-strong
+                      #{location.join(', ')} &mdash;
                     - if bike.current_stolen_record.date_stolen.today?
-                      Today at #{bike.current_stolen_record.date_stolen.strftime("%-I %p")}
+                      Today
                     - elsif Date.yesterday().beginning_of_day() <= bike.current_stolen_record.date_stolen
-                      Yesterday at #{bike.current_stolen_record.date_stolen.strftime("%-I %p")}
+                      Yesterday
                     - else
                       = bike.current_stolen_record.date_stolen.strftime("%-m/%-d/%Y")
             .get-widget-code

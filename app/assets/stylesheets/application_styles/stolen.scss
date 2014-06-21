@@ -267,8 +267,16 @@ $sbrBackground: #f9f9f9;
     // width: 49%;
     // float: left;
     position: relative;
+    a { position: absolute; width: 100%; height: 100%; }
     p, h4 { width: 73% }
-    h4 { margin: 0; font-size: 19px; }
+    h4 {
+      color: $linkColor;
+      margin: 0;
+      font-size: 21px;
+      line-height: 1em;
+    }
+    p { margin: .5em 0 0; font-size: 17px; }
+    .less-strong { font-size: .9em; }
     .stolen-thumb {
       float: right;
       position: relative;
@@ -281,8 +289,8 @@ $sbrBackground: #f9f9f9;
         height: auto;
       }
     }
+    &:hover { background: $grayLighterer; }
   }
-  .less-strong { font-size: .9em; }
   .get-widget-code {
     font-family: $baseFont;
     font-weight: 200;
