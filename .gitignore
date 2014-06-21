@@ -15,6 +15,7 @@ public/uploads/*
 public/caches
 .vagrant
 dump.rdb
+output.tsv
 
 
 # Ignore rvm stuff

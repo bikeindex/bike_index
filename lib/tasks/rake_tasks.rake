@@ -16,5 +16,6 @@ task :create_stolen_tsv => :environment do
   
   uploader = TsvUploader.new
   uploader.store!(output)
+  output.close
   puts uploader.url
 end
