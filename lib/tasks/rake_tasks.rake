@@ -3,7 +3,7 @@ task :start do
   system 'bundle exec foreman start -f Procfile_development'
 end
 
-desc "Scrape single product"
+desc "Create stolen tsv"
 task :create_stolen_tsv => :environment do
   out_file = File.join(Rails.root,'/output.tsv')
   headers = "Make\tModel\tSerial\tDescription\tArticleOrGun\tDateOfTheft\tCaseNumber\tLEName\tLEContact\tComments\n"
