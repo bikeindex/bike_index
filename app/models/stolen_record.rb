@@ -81,7 +81,7 @@ class StolenRecord < ActiveRecord::Base
 
   def tsv_col(i)
     col = ""
-    col << i.gsub("/\t","\t").gsub("\t","/\t").gsub("\r",' ').gsub("\n",' ') if i.present?
+    col << i.gsub(/\\?\\t/i, ' ').gsub(/\\?\\r/i,' ').gsub(/\\?\\n/i,' ') if i.present?
     col
   end
 
@@ -92,6 +92,8 @@ class StolenRecord < ActiveRecord::Base
     row << tsv_col(b.manufacturer_name)
     row << "\t"
     row << tsv_col(b.frame_model)
+    row << "\t"
+    row << tsv_col(b.serial_number) unless b.serial_number == 'absent'
     row << "\t"
     row << tsv_col(b.frame_colors.to_sentence)
     row << tsv_col(b.description)
