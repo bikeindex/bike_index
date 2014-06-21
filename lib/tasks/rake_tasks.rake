@@ -10,7 +10,7 @@ task :create_stolen_tsv => :environment do
   output = File.open(out_file, "w")
   output.puts headers
   StolenRecord.where(current: true).where(approved: true).includes(:bike).each do |sr|
-    output.puts sr.tsv_row
+    output.puts sr.tsv_row if sr.tsv_row.present?
   end
   output
   

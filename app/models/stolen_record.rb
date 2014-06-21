@@ -101,7 +101,7 @@ class StolenRecord < ActiveRecord::Base
     row << " Stolen from: #{tsv_col(self.address)}"
     row << "\t"
     row << "Article\t"
-    row << self.date_stolen.strftime("%Y-%m-%d-")
+    row << self.date_stolen.strftime("%Y-%m-%d")
     row << "\t"
     row << tsv_col(self.police_report_number)
     row << "\t"
