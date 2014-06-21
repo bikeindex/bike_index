@@ -20,6 +20,8 @@ We're an open source project. Take a gander through our code, report bugs, or do
 
 - *If you turn on caching locally:* [Dalli](https://github.com/mperham/dalli) ([railscast](http://railscasts.com/episodes/380-memcached-dalli?view=asciicast))
 
+- Requires 1gb of ram (or at least more than 512mb)
+
 
 ## Running the Bike Index locally
 
