@@ -410,6 +410,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
   checkIfPhoneBlank: (e) ->
     unless $('#bike_stolen_records_attributes_0_phone').val().length > 0
       BikeIndex.alertMessage('error', 'Phone number required', "<p>A phone number is required for stolen listings. We want to be able to contact you if your bike is found!</p><p>Your phone number will be private unless you choose to show it in <em>Show phone number to</em></p>")
+      
   
   submitSerialUpdate: (e) ->
     e.preventDefault()
@@ -464,6 +465,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
 
   markUnstolen: (e) ->
     e.preventDefault()
+    $('#primary_stolen_phone_field input').attr('required', false)
     reason = $('#mark_recovered_reason').val()
     bike_id = $('#mark_recovered_bike_id').val()
     did_we_help = $('#mark_recovered_we_helped').prop('checked')
@@ -484,6 +486,6 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
           $('.bikeedit-form-grab').submit()
         error: (data, textStatus, jqXHR) ->
           BikeIndex.alertMessage('error', 'Request failed', "Oh no! Something went wrong and we couldn't mark your bike recovered.")
-      $('#requestBikeDelete').modal('hide')  
+      $('#requestBikeDelete').modal('hide')
     else
       $('#mark-recovered-error').slideDown('fast')
