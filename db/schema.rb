@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140621013108) do
+ActiveRecord::Schema.define(:version => 20140621171727) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -439,8 +439,10 @@ ActiveRecord::Schema.define(:version => 20140621013108) do
     t.integer  "sender_id"
     t.integer  "receiver_id"
     t.integer  "bike_id"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
+    t.text     "send_dates"
+    t.string   "receiver_email"
   end
 
   create_table "stolen_records", :force => true do |t|

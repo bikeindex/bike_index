@@ -87,18 +87,21 @@ Bikeindex::Application.routes.draw do
     match 'maintenance', to: 'dashboard#maintenance'
     match 'bust_z_cache', to: 'dashboard#bust_z_cache'
     match 'destroy_example_bikes', to: 'dashboard#destroy_example_bikes'
-    resources :discounts, :memberships, :organizations, :bike_token_invitations, :organization_invitations, :paints, :customer_contacts
+    resources :discounts, :memberships, :organizations, :bike_token_invitations,
+      :organization_invitations, :paints, :customer_contacts
     match 'duplicate_bikes', to: 'bikes#duplicates'
     resources :flavor_texts, only: [:destroy, :create]
     resources :stolen_bikes do 
       member { post :approve }
+    end
+    resources :stolen_notifications do 
+      member { get :resend }
     end
     resources :graphs, only: [:index, :show] do 
       collection { get :review }
     end
     resources :failed_bikes, only: [:index, :show]
     resources :ownerships, only: [:edit, :update]
-    match 'resend_stolen_notification', to: 'stolen_notifications#resend'
     match 'recover_organization', to: 'organizations#recover' 
     match 'show_deleted_organizations', to: 'organizations#show_deleted' 
     resources :blogs, only: [:new, :create, :index, :edit, :update, :destroy]

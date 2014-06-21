@@ -72,14 +72,14 @@ describe CustomerMailer do
   end
 
   describe :stolen_notification_email do 
-    before :each do
-      @stolen_notification = FactoryGirl.create(:stolen_notification, message: "Test Message", subject: "Test subject")
-      @mail = CustomerMailer.stolen_notification_email(@stolen_notification)
-    end
-
-    it "should render email" do
-      @mail.subject.should eq("Test subject")
-      @mail.body.encoded.should match(@stolen_notification.message)
+    it "should render email and update sent_dates" do
+      stolen_notification = FactoryGirl.create(:stolen_notification, message: "Test Message", subject: "Test subject")
+      mail = CustomerMailer.stolen_notification_email(stolen_notification)
+      mail.subject.should eq("Test subject")
+      mail.body.encoded.should match(stolen_notification.message)
+      stolen_notification.send_dates[0].should eq(stolen_notification.updated_at.to_i)
+      CustomerMailer.stolen_notification_email(stolen_notification)
+      stolen_notification.send_dates[1].should eq(stolen_notification.updated_at.to_i)
     end
   end
 

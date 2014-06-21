@@ -1,0 +1,51 @@
+%header.with-subtitle
+  %h1
+    Stolen Notifications
+
+%h4
+  = StolenNotification.count
+  Stolen Notifications created,
+  %em
+    (#{StolenNotification.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
+
+.paginate-container
+  = will_paginate @stolen_notifications
+%section.full-screen-table
+  %table.table.table-striped.table-bordered
+    %thead
+      %th
+        Date created
+      %th.large-screens
+        Bike
+      %th
+        message
+      %th.not-tiny-screens
+        sent
+      
+    %tbody
+      - @stolen_notifications.each do |stolen_notification|
+        %tr
+          %td
+            %a{href: admin_stolen_notification_url(stolen_notification) }
+
+              - if stolen_notification.created_at.today?
+                Today at #{stolen_notification.created_at.strftime("%-I %p")}
+              - elsif Date.yesterday().beginning_of_day() <= stolen_notification.created_at          
+                Yesterday at #{stolen_notification.created_at.strftime("%-I %p")}
+              - else
+                = stolen_notification.created_at.strftime("%-m.%-d.%Y")
+          %td.large-screens
+            .less-strong-hold
+              %span.less-strong-right
+                = link_to stolen_notification.bike_id, edit_admin_stolen_bike_url(stolen_notification.bike)
+              = stolen_notification.bike.title_string    
+          %td
+            = stolen_notification.message.truncate(120)
+          %td.not-tiny-screens
+            - if stolen_notification.send_dates.count == 1
+              = "&#x2713;".html_safe 
+            - else
+              = stolen_notification.send_dates.count
+
+  .paginate-container
+    = will_paginate @stolen_notifications

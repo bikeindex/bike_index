@@ -193,7 +193,7 @@ FactoryGirl.define do
 
   factory :stolen_notification do
     association :sender, factory: :user
-    association :receiver, factory: :user    
+    association :receiver, factory: :user
     association :bike
     message 'This is a test email.'
     subject 'New Stolen Notification Submitted'
