@@ -48,10 +48,13 @@
                   %h4
                     = link_to bike.title, bike_url(bike)
                   %p
-                    Stolen from 
-                    = bike.current_stolen_record.city if bike.current_stolen_record.city.present?
-                    = bike.current_stolen_record.state.abbreviation if bike.current_stolen_record.state.present?
-                    on
+                    - location = []
+                    - location << bike.current_stolen_record.city.titleize if bike.current_stolen_record.city.present?
+                    - location << bike.current_stolen_record.state.abbreviation if bike.current_stolen_record.state.present?
+                    - if location.any?
+                      Stolen from 
+                      = location.join(', ')
+                  %p.less-strong
                     - if bike.current_stolen_record.date_stolen.today?
                       Today at #{bike.current_stolen_record.date_stolen.strftime("%-I %p")}
                     - elsif Date.yesterday().beginning_of_day() <= bike.current_stolen_record.date_stolen
