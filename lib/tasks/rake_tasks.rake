@@ -5,7 +5,7 @@ end
 
 desc "Create stolen tsv"
 task :create_stolen_tsv => :environment do
-  out_file = File.join(Rails.root,'/output.tsv')
+  out_file = File.join(Rails.root,'/current_stolen_bikes.tsv')
   headers = "Make\tModel\tSerial\tDescription\tArticleOrGun\tDateOfTheft\tCaseNumber\tLEName\tLEContact\tComments\n"
   output = File.open(out_file, "w")
   output.puts headers

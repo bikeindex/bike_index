@@ -15,7 +15,7 @@ public/uploads/*
 public/caches
 .vagrant
 dump.rdb
-output.tsv
+current_stolen_bikes.tsv
 
 
 # Ignore rvm stuff
