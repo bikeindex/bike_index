@@ -27,11 +27,11 @@
       %tr
         %td
           %code
-            manufacturer_id
+            manufacturer
         %td
-          integer
+          string
         %td
-          Limits your search to bikes made by this #{ link_to "frame manufacturer", "#manufacturers_ref", class: "scroll-to-ref"}.
+          Limits your search to bikes made by this #{ link_to "manufacturer", "#manufacturers_ref", class: "scroll-to-ref"}.
       %tr
         %td
           %code
@@ -63,7 +63,7 @@
 %article.code
   .code-label
     GET stolen bikes with the manufacturer "Trek"
-  - request_url = @root + api_v1_bikes_path(query: "Trek", stolen: true)
+  - request_url = @root + api_v1_bikes_path(manufacturer: "Trek", stolen: true)
   %pre
     :plain
       $.ajax({

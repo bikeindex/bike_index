@@ -46,6 +46,14 @@ class BikeSearcher
   end
 
   def matching_manufacturer(bikes)
+    if @params[:manufacturer].present?
+      manufacturer = Manufacturer.fuzzy_name_find(@params[:manufacturer])
+      if manufacturer.present?
+        @params[:manufacturer_id] = manufacturer.id 
+      else
+        @params[:manufacturer_id] = 0
+      end
+    end
     if @params[:manufacturer_id].present?
       @bikes = bikes.where(manufacturer_id: @params[:manufacturer_id])
       if @params[:query].present?

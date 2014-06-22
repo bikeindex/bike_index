@@ -37,9 +37,25 @@ describe BikeSearcher do
   end
 
   describe :matching_manufacturer do 
+    it "should find matching bikes from manufacturer without id" do 
+      manufacturer = FactoryGirl.create(:manufacturer, name: 'Special bikes co.')
+      bike = FactoryGirl.create(:bike, manufacturer: manufacturer)
+      bike2 = FactoryGirl.create(:bike)
+      search = BikeSearcher.new(manufacturer: 'Special', query: "")
+      search.matching_manufacturer(Bike.scoped).first.should eq(bike)
+      search.matching_manufacturer(Bike.scoped).pluck(:id).include?(bike2.id).should be_false
+    end
+
+    it "shouldn't return any bikes if we can't find the manufacturer" do 
+      manufacturer = FactoryGirl.create(:manufacturer, name: 'Special bikes co.')
+      bike = FactoryGirl.create(:bike, manufacturer: manufacturer)
+      search = BikeSearcher.new(manufacturer: '69696969', query: "")
+      search.matching_manufacturer(Bike.scoped).count.should eq(0)
+    end
+
     it "should find matching bikes" do 
       bike = FactoryGirl.create(:bike)
-      search = BikeSearcher.new(manufacturer_id: bike.manufacturer_id, query: "something #{bike.manufacturer_id}")
+      search = BikeSearcher.new(manufacturer_id: bike.manufacturer_id, query: "something")
       search.matching_manufacturer(Bike.scoped).first.should eq(bike)
     end
   end
