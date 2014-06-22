@@ -53,13 +53,8 @@ class BikeSearcher
       else
         @params[:manufacturer_id] = 0
       end
-    end
-    if @params[:manufacturer_id].present?
-      @bikes = bikes.where(manufacturer_id: @params[:manufacturer_id])
-      if @params[:query].present?
-        @params[:query] = @params[:query].gsub(/#{@params[:manufacturer_id]}/, '')
-      end
-    end
+    end    
+    @bikes = bikes.where(manufacturer_id: @params[:manufacturer_id]) if @params[:manufacturer_id].present?
     @bikes
   end
 
@@ -84,7 +79,7 @@ class BikeSearcher
   end
 
   def find_bikes
-    if @params[:stolen].present? or @params[:query].present? or @params[:serial].present? or @params[:manufacturer_id].present?
+    if @params[:stolen].present? or @params[:query].present? or @params[:serial].present? or @params[:manufacturer_id].present? or @params[:manufacturer].present?
       @bikes = matching_serial 
       matching_stolenness(@bikes)
       matching_manufacturer(@bikes)
