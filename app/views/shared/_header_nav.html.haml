@@ -57,7 +57,11 @@
           = hidden_field_tag :manufacturer_id, params[:manufacturer_id]
           = hidden_field_tag :serial, params[:serial]
           .search-button
-            = submit_tag "Search", name: "search", class: "button-blue"
+            = button_tag(type: "submit", class: "button-blue") do
+              = image_tag '/assets/stolen/search_white.svg'
+            / = button_tag(type: "submit", class: "sbrbtn") do
+            /   = image_tag '/assets/stolen/search.svg'
+            / # = submit_tag "Search", name: "search", class: "button-blue"
           .optional-fields
             / .additional-fields
             /   = text_field_tag :serial, params[:serial], placeholder: 'Serial number lookup'
