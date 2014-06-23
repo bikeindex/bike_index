@@ -47,9 +47,6 @@ class BikeIndex.Views.Global extends Backbone.View
   loadChosen: ->
     $('.chosen-select select').select2()
   
-  format = (manufacturer) ->
-    return manufacturer.text  unless manufacturer.id # optgroup
-    "<span class='mnchoice'>Made by</span>#{state.text}"
 
   initializeHeaderSearch: ->
     unless $('#sbr-body').length > 0
@@ -88,8 +85,13 @@ class BikeIndex.Views.Global extends Backbone.View
         tokenSeparators: [","]
       
       mnfg_id = $('#header-search #manufacturer_id').val()
+      serial = $('#header-search #serial').val()
       if mnfg_id.length > 0
         $('#header-search #query').val(mnfg_id + $('#header-search #query').val()).change()
+      if serial.length > 0
+        data = $('#query').select2('data')
+        data.push({id: '#', text: serial})
+        $('#query').select2('data',data)
 
   updateManufacturerSearch: (e) ->
     if e.added?
@@ -101,6 +103,8 @@ class BikeIndex.Views.Global extends Backbone.View
     if e.removed?
       if parseInt(e.removed.id,10) == parseInt($('#header-search #manufacturer_id').val(),10)
         $('#header-search #manufacturer_id').val('')
+      else if e.removed.id == '#'
+        $('#header-search #serial').val('')
 
   updateSerialAbsent: (e) ->
     e.preventDefault()
