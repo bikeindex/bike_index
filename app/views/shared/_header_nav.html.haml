@@ -49,7 +49,7 @@
         
         .search-fields#header-search{ data: { selected: mnfg.to_json, manufacturers: Manufacturer.frames.map { |m| { id: m.id, text: m.name } }.to_json} }
           %span.search-background
-          - params[:query] = params[:query].gsub(/,?#,?/,'').gsub(/(\A,|,\z)/, '')
+          - params[:query] = params[:query].gsub(/,?#,?/,'').gsub(/(\A,|,\z)/, '') if params[:query].present?
           = text_field_tag :query,                             |
             params[:query],                                    |
             placeholder: "Search bike traits or serials",      |
