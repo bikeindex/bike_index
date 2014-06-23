@@ -56,11 +56,11 @@ class BikeIndex.Views.Global extends Backbone.View
           if object.id?
             return nil unless query?
             if object.id == '#'
-              return "#{object.text} <span class='sch_s'>lookup serial</span>"
+              return "#{object.text} <span class='sch_s'><span>lookup </span>serial</span>"
             if object.id == object.text
-              return "<span class='sch_'>Search all bikes for</span> #{object.text}"
+              return "<span class='sch_'>Search <span>all bikes</span> for</span> #{object.text}"
             else
-              "<span class='sch_m'>Bikes made by</span> #{object.text}"
+              "<span class='sch_m'><span>Bikes </span>made by</span> #{object.text}"
         formatResultCssClass: (o) ->
           'sch_special' if o.id == '#'
           # return response + object.text
@@ -76,8 +76,8 @@ class BikeIndex.Views.Global extends Backbone.View
         formatSelection: (object, containter) ->
           return object.text if object.id == object.text
           if object.id == '#'
-            return "<span class='search_span_s'>serial: </span> #{object.text}"
-          "<span class='search_span_m'>made by: </span> #{object.text}"
+            return "<span class='search_span_s'>serial </span> #{object.text}"
+          "<span class='search_span_m'>made by </span> #{object.text}"
 
         escapeMarkup: (m) ->
           m

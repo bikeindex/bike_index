@@ -316,6 +316,7 @@
     .select2-results { max-height: 200px; }
     .sch_s, .sch_m, .sch_ {
       font-size: 14px;
+      span { display: none; }
     }
   }
 }
