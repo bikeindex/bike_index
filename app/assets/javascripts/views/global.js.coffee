@@ -57,9 +57,10 @@ class BikeIndex.Views.Global extends Backbone.View
             return nil unless query?
             if object.id == '#'
               return "#{object.text} <span class='sch_s'>lookup serial number</span>"
-            return "<span class='sch_'>Search all bikes for</span> #{object.text}"
-          else
-            "<span class='sch_m'>Bikes made by</span> #{object.text}"
+            if object.id == object.text
+              return "<span class='sch_'>Search all bikes for</span> #{object.text}"
+            else
+              "<span class='sch_m'>Bikes made by</span> #{object.text}"
         formatResultCssClass: (o) ->
           'sch_special' if o.id == '#'
           # return response + object.text
