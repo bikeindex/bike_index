@@ -76,12 +76,10 @@ class BikeIndex.Views.Global extends Backbone.View
           list.splice 0, 0, item, {id: '#', text: item.text }
         dropdownCssClass: 'mainsrchdr'
         formatSelection: (object, containter) ->
-          if object.id?
-            if object.id == '#'
-              return "<span class='search_span_s'>serial: </span> #{object.text}"
-            return object.text
-          else
-            "<span class='search_span_m'>made by: </span> #{object.text}"
+          return object.text if object.id == object.text
+          if object.id == '#'
+            return "<span class='search_span_s'>serial: </span> #{object.text}"
+          "<span class='search_span_m'>made by: </span> #{object.text}"
 
         escapeMarkup: (m) ->
           m
@@ -96,7 +94,10 @@ class BikeIndex.Views.Global extends Backbone.View
   updateManufacturerSearch: (e) ->
     if e.added?
       unless e.added.id == e.added.text 
-        $('#header-search #manufacturer_id').val(e.added.id)
+        if e.added.id == '#'
+          $('#header-search #serial').val(e.added.text)
+        else
+          $('#header-search #manufacturer_id').val(e.added.id)
     if e.removed?
       if parseInt(e.removed.id,10) == parseInt($('#header-search #manufacturer_id').val(),10)
         $('#header-search #manufacturer_id').val('')

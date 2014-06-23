@@ -11,6 +11,9 @@ class BikeSearcher
       end
     end
     if @params[:serial].present?
+      if @params[:query].present?
+        @params[:query] = @params[:query].gsub(/,?#,?/,'')
+      end
       @normer = SerialNormalizer.new(serial: @params[:serial])
     end
   end
