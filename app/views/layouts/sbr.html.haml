@@ -48,17 +48,19 @@
             = form_tag bikes_path, method: :get, class: 'sbr-search-fields' do 
               = hidden_field_tag :stolen, true
               = hidden_field_tag :search_type, 'description'
-              #search-type-tabs
-                %a.search-type-tab.active{ href: '#', data: { stype: 'description' } }
-                  %span.medium-screens
-                    Search bike
-                  descriptions
-                %a.search-type-tab{ href: '#', data: { stype: 'serial' } }
-                  %span.medium-screens
-                    Search bike
-                  serials
-              .sbr-search-inputs
-                = text_field_tag :query_typed, params[:query_typed], class: 'sbr-bike-search', autofocus: true
+              = hidden_field_tag :manufacturer_id, params[:manufacturer_id]
+              = hidden_field_tag :serial, params[:manufacturer_id]
+              / #search-type-tabs
+              /   %a.search-type-tab.active{ href: '#', data: { stype: 'description' } }
+              /     %span.medium-screens
+              /       Search bike
+              /     descriptions
+              /   %a.search-type-tab{ href: '#', data: { stype: 'serial' } }
+              /     %span.medium-screens
+              /       Search bike
+              /     serials
+              #sbr-search.sbr-search-inputs{ data: {manufacturers: Manufacturer.frames.map { |m| { id: m.id, text: m.name } }.to_json }}
+                = text_field_tag :query, params[:query], class: 'sbr-bike-search', autofocus: true
                 = button_tag(type: "submit", class: "sbrbtn") do
                   = image_tag '/assets/stolen/search.svg'
                 .proximity#stolen-proximity

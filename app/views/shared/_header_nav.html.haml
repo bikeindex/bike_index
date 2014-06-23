@@ -46,25 +46,25 @@
           %span.search-background
           = text_field_tag :query,                          |
             params[:query],                                 |
-            placeholder: "Search bike traits",              |
+            placeholder: "Search traits or serials",        |
             class: "search-text-field"                      |
           = hidden_field_tag :manufacturer_id, params[:manufacturer_id]
           .search-button
             = submit_tag "Search", name: "search", class: "button-blue"
           .optional-fields
-            .additional-fields
-              = text_field_tag :serial, params[:serial], placeholder: 'Serial number lookup'
-              / %span.absent-serial-blocker
-              / %a#serial-absent{href: "#"}
-              /   %span
-              /     has
-              /   no serial
+            / .additional-fields
+            /   = text_field_tag :serial, params[:serial], placeholder: 'Serial number lookup'
+            /   / %span.absent-serial-blocker
+            /   / %a#serial-absent{href: "#"}
+            /   /   %span
+            /   /     has
+            /   /   no serial
 
-            .stolenness
+            / .stolenness
 
-              %label{ for: "stolen" }
-                = check_box_tag :stolen, 1, params[:stolen]
-                Only stolen
+            /   %label{ for: "stolen" }
+            /     = check_box_tag :stolen, 1, params[:stolen]
+            /     Only stolen
             .proximity#stolen-proximity
               = text_field_tag :proximity, params[:proximity], placeholder: 'Location to prioritize'
               %span

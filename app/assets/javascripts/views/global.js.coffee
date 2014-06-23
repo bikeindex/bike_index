@@ -46,15 +46,50 @@ class BikeIndex.Views.Global extends Backbone.View
 
   loadChosen: ->
     $('.chosen-select select').select2()
+  
+  format = (manufacturer) ->
+    return manufacturer.text  unless manufacturer.id # optgroup
+    "<span class='mnchoice'>Made by</span>#{state.text}"
 
   initializeHeaderSearch: ->
     unless $('#sbr-body').length > 0
       tags = JSON.parse($("#header-search").attr('data-manufacturers'))
-      # console.log(tags[0])
       $('#head-search-bikes #query').select2
+        formatResult: (object, container, query) ->
+          if object.id?
+            return nil unless query?
+            if object.id == '#'
+              return "#{object.text} <span class='sch_s'>lookup serial number</span>"
+            return "<span class='sch_'>Search all bikes for</span> #{object.text}"
+          else
+            "<span class='sch_m'>Bikes made by</span> #{object.text}"
+        formatResultCssClass: (o) ->
+          'sch_special' if o.id == '#'
+          # return response + object.text
+        createSearchChoice: (term, data) ->
+          if $(data).filter(->
+            @text.localeCompare(term) is 0
+          ).length is 0
+            id: term
+            text: term
+        createSearchChoicePosition: (list, item) ->
+          list.splice 0, 0, item, {id: '#', text: item.text }
+        dropdownCssClass: 'mainsrchdr'
+        formatSelection: (object, containter) ->
+          if object.id != object.text
+            if object.id == '#'
+              return "<span class='search_span_s'>serial: </span> #{object.text}"
+            return "<span class='search_span_m'>made by: </span> #{object.text}"
+          else
+            object.text
+            
+
+        escapeMarkup: (m) ->
+          m
         tags: tags
         openOnEnter: false
         tokenSeparators: [","]
+      
       mnfg_id = $('#header-search #manufacturer_id').val()
       if mnfg_id.length > 0
         $('#header-search #query').val(mnfg_id + $('#header-search #query').val()).change()

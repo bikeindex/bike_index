@@ -285,6 +285,40 @@
   }
 }
 
+.mainsrchdr {
+  // background: purple;
+  border-color: #ccc;
+  .select2-results {
+    padding: 0;
+    margin-right: 0;
+    max-height: 300px;
+  }
+  .select2-result-label {
+    padding: .35em 7px;
+  }
+  .select2-highlighted { background: $btnAction; }
+
+  .sch_m, .sch_ {
+    color: #ccc;
+  }
+  .sch_s {
+    color: #bbb;
+    float: right;
+  }
+
+  .sch_special {
+    border-bottom: 1px solid #ddd;
+  }
+}
+
+.search_span_s, .search_span_m {
+  color: #bbb;
+  margin-left: 0;
+  margin-right: 3px;
+  display: inline;
+}
+
+
 //________________________
 //
 // Nav tabs
@@ -692,7 +726,7 @@
   .optional-fields {
     position: relative;
     float: right;
-    margin-top: .5em;
+    // margin-top: .5em;
   }
 }
 

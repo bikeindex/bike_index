@@ -53,8 +53,13 @@ class BikeSearcher
       else
         @params[:manufacturer_id] = 0
       end
-    end    
-    @bikes = bikes.where(manufacturer_id: @params[:manufacturer_id]) if @params[:manufacturer_id].present?
+    end
+    if @params[:manufacturer_id].present?
+      if @params[:query].present?
+        @params[:query] = @params[:query].gsub(/#{@params[:manufacturer_id]}/, '')
+      end
+      @bikes = bikes.where(manufacturer_id: @params[:manufacturer_id]) if @params[:manufacturer_id].present?
+    end
     @bikes
   end
 
@@ -65,7 +70,7 @@ class BikeSearcher
       next unless seg.length > 3
       bike_ids += NormalizedSerialSegment.where("LEVENSHTEIN(segment, ?) < 3", seg).map(&:bike_id)
     end
-    # Don't return exact matches
+    # Don't return exact matchesddd
     bike_ids = bike_ids.uniq - matching_serial.map(&:id)
     Bike.where('id in (?)', bike_ids)
   end    
