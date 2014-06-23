@@ -85,11 +85,11 @@ class BikeIndex.Views.Global extends Backbone.View
         openOnEnter: false
         tokenSeparators: [","]
       
-      mnfg_id = $('#header-search #manufacturer_id').val()
-      serial = $('#header-search #serial').val()
-      if mnfg_id.length > 0
-        $('#header-search #query').val(mnfg_id + $('#header-search #query').val()).change()
-      if serial.length > 0
+      if $('#header-search #manufacturer_id').val().length > 0
+        data = $('#query').select2('data')
+        data.push($('#header-search').data('selected'))
+        $('#query').select2('data',data)
+      if $('#header-search #serial').val().length > 0
         data = $('#query').select2('data')
         data.push({id: '#', text: serial})
         $('#query').select2('data',data)

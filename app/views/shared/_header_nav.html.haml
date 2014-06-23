@@ -42,12 +42,18 @@
             = render 'sessions/form'
 
       = form_tag bikes_path, method: :get, id: "head-search-bikes" do 
-        .search-fields#header-search{ data: {manufacturers: Manufacturer.frames.map { |m| { id: m.id, text: m.name } }.to_json }}
+        - if params[:manufacturer_id].present?
+          - mnfg = {id: params[:manufacturer_id], text: Manufacturer.find(params[:manufacturer_id]).name} if params[:manufacturer_id].present?
+        - else
+          - mnfg = '' 
+        
+        .search-fields#header-search{ data: { selected: mnfg.to_json, manufacturers: Manufacturer.frames.map { |m| { id: m.id, text: m.name } }.to_json} }
           %span.search-background
-          = text_field_tag :query,                          |
-            params[:query],                                 |
-            placeholder: "Search bike traits or serials",   |
-            class: "search-text-field"                      |
+          - params[:query] = params[:query].gsub(/,?#,?/,'').gsub(/(\A,|,\z)/, '')
+          = text_field_tag :query,                             |
+            params[:query],                                    |
+            placeholder: "Search bike traits or serials",      |
+            class: "search-text-field"                         |
           = hidden_field_tag :manufacturer_id, params[:manufacturer_id]
           = hidden_field_tag :serial, params[:serial]
           .search-button
