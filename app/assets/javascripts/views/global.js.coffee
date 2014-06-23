@@ -91,7 +91,7 @@ class BikeIndex.Views.Global extends Backbone.View
         $('#query').select2('data',data)
       if $('#header-search #serial').val().length > 0
         data = $('#query').select2('data')
-        data.push({id: '#', text: serial})
+        data.push({id: '#', text: $('#header-search #serial').val()})
         $('#query').select2('data',data)
 
   updateManufacturerSearch: (e) ->
