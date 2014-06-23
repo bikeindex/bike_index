@@ -49,6 +49,7 @@
             placeholder: "Search traits or serials",        |
             class: "search-text-field"                      |
           = hidden_field_tag :manufacturer_id, params[:manufacturer_id]
+          = hidden_field_tag :serial, params[:serial]
           .search-button
             = submit_tag "Search", name: "search", class: "button-blue"
           .optional-fields

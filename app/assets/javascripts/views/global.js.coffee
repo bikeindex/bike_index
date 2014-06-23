@@ -76,13 +76,12 @@ class BikeIndex.Views.Global extends Backbone.View
           list.splice 0, 0, item, {id: '#', text: item.text }
         dropdownCssClass: 'mainsrchdr'
         formatSelection: (object, containter) ->
-          if object.id != object.text
+          if object.id?
             if object.id == '#'
               return "<span class='search_span_s'>serial: </span> #{object.text}"
-            return "<span class='search_span_m'>made by: </span> #{object.text}"
+            return object.text
           else
-            object.text
-            
+            "<span class='search_span_m'>made by: </span> #{object.text}"
 
         escapeMarkup: (m) ->
           m
