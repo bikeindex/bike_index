@@ -97,7 +97,10 @@
           = f.label :creation_organization_id, class: "control-label"
           .controls
             = collection_select( :bike, :creation_organization_id, Organization.all, :id, :name, prompt: "Choose organization")
-
+        .control-group
+          = f.label :description, class: "control-label"
+          .controls
+            = f.text_field :description, :required =>true
         .control-group
           = f.label :owner_email, class: "control-label"
           .controls
