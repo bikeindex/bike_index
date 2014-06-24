@@ -221,6 +221,7 @@ class Bike < ActiveRecord::Base
 
   before_save :set_paints
   def set_paints
+    self.paint_id = nil if paint_id.present? && paint_name.blank?
     return true unless paint_name.present?
     return true if Color.fuzzy_name_find(paint_name).present?
     paint = Paint.fuzzy_name_find(paint_name)

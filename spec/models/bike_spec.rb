@@ -190,11 +190,18 @@ describe Bike do
   end
 
   describe :set_paints do 
-    it "should set return true if paint is a color" do 
+    it "should return true if paint is a color" do 
       FactoryGirl.create(:color, name: "Bluety")
       bike = Bike.new
       bike.stub(:paint_name).and_return(" blueTy")
       lambda { bike.set_paints }.should_not change(Paint, :count)
+      bike.paint.should be_nil
+    end
+    it "should remove paint id if paint_name is nil" do 
+      paint = FactoryGirl.create(:paint)
+      bike = Bike.new(paint_id: paint.id)
+      bike.stub(:paint_name).and_return('')
+      bike.set_paints
       bike.paint.should be_nil
     end
     it "should set the paint if it exists" do 

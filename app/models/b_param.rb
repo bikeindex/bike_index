@@ -101,6 +101,7 @@ class BParam < ActiveRecord::Base
       paint.manufacturer_id = bike[:manufacturer_id] if bike[:registered_new]
       paint.save
       params[:bike][:paint_id] = paint.id
+      bike[:paint_name] = paint.name
     end
     bike[:primary_frame_color_id] = Color.find_by_name("Black").id unless bike[:primary_frame_color_id].present?
   end

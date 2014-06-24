@@ -82,7 +82,6 @@ class BikeIndex.Views.Global extends Backbone.View
         escapeMarkup: (m) ->
           m
         tags: tags
-        openOnEnter: false
         tokenSeparators: [","]
       
       if $('#header-search #manufacturer_id').val().length > 0

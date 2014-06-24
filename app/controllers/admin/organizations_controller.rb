@@ -8,7 +8,9 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def show
     @locations = @organization.locations.decorate
-    @bikes = Bike.where(creation_organization_id: @organization.id)
+    bikes = Bike.where(creation_organization_id: @organization.id)
+    bikes = bikes.paginate(page: params[:page]).per_page(50)
+    @bikes = bikes.decorate
     @organization = @organization.decorate
   end
 

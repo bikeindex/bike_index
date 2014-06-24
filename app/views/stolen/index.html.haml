@@ -49,8 +49,8 @@
                       = bike.thumb_image
                   %h4
                     = bike.title
-                  %p
-                    = bike.description.truncate(120)
+                  / %p
+                  /   = bike.description.truncate(120)
                   %p.less-strong
                     - location = []
                     - location << bike.current_stolen_record.city.titleize if bike.current_stolen_record.city.present?

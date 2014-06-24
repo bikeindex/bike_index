@@ -195,7 +195,7 @@ describe Api::V1::BikesController do
       FactoryGirl.create(:membership, user: user, organization: org)
       manufacturer = FactoryGirl.create(:manufacturer)
       org.save
-      bike = { serial_number: "69 example bike",
+      bike = { serial_number: "69 example bikez",
         cycle_type_id: FactoryGirl.create(:cycle_type, slug: 'gluey').id,
         manufacturer_id: manufacturer.id,
         rear_tire_narrow: "true",
@@ -211,7 +211,7 @@ describe Api::V1::BikesController do
         post :create, { bike: bike, organization_slug: org.slug, access_token: org.access_token }
       }.should change(Ownership, :count).by(1)
       response.code.should eq("200")
-      b = Bike.unscoped.where(serial_number: "69 example bike").first
+      b = Bike.unscoped.where(serial_number: "69 example bikez").first
       b.example.should be_true
       b.paint.name.should eq("grazeen")
       b.description.should eq("something else")

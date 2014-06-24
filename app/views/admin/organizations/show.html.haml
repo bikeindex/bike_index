@@ -44,51 +44,14 @@
   %h2
     = pluralize(@bikes.count, "Bike")
 
-  %table#org-bikes-table.table.table-striped.table-bordered
-    %thead
-      / %th
-      /   Link&nbsp;&nbsp;
-      %th
-        Date indexed
-      %th
-        Sent to
-      %th
-        Manufacturer
-      %th
-        Color&nbsp;&nbsp;
-      %th
-        Rear Wheel size
-
-    %tbody
-      - @bikes.each do |bike|
-        %tr
-          / %td
-          / # = link_to "&rarr;".html_safe, bike_url(bike)
-          %td
-            - if bike.created_at.today?
-              %span.hidden
-                = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              Today at #{bike.created_at.strftime("%-I %p")}
-            - elsif Date.yesterday().beginning_of_day() <= bike.created_at
-              %span.hidden
-                = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              Yesterday at #{bike.created_at.strftime("%-I %p")}
-            - else
-              %span.hidden
-                = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              = bike.created_at.strftime("%-m/%-d/%Y at %-I %p")
-          %td
-            - if bike.created_with_token
-              %span.less-strong
-                Free bike ticket
-            - else
-              = bike.owner_email
-          %td
-            = bike.manufacturer_name
-          %td
-            = bike.primary_frame_color.name
-          %td
-            = bike.rear_wheel_size.name if bike.rear_wheel_size.present?
+- if @bikes.present?
+  .paginate-container
+    = will_paginate @bikes 
+  %section.full-screen-table
+    %table.table.table-striped.table-bordered
+      = render partial: "/admin/bikes/admin_bikes_table"
+  .paginate-container
+    = will_paginate @bikes 
 
 
 %section.full-screen-table
@@ -116,7 +79,7 @@
           %td
             = user.email
           %td
-            = @bikes.where(creator_id: user.id).count
+            = user.bikes.count
 
 
 %ul
