@@ -2,7 +2,12 @@ class Admin::PaintsController < Admin::BaseController
   before_filter :find_paint, only: [:show, :edit, :update, :destroy]
 
   def index
-    @paints = Paint.includes(:bikes).order("created_at asc")
+    if params[:name]
+      paints = Paint.where('name LIKE ?', "%#{params[:name]}%").includes(:bikes)
+    else 
+      paints = Paint.includes(:bikes).order("created_at asc")
+    end
+    @paints = paints.paginate(page: params[:page]).per_page(100)
   end
 
   # def new

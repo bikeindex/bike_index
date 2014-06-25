@@ -11,10 +11,17 @@
   = @paints.where('color_id IS NULL').count 
   are unlinked
     
+.special-search-field-container
+  .special-search-field
+    = form_tag admin_paints_path, method: :get do 
+      = text_field_tag :name, params[:name], placeholder: "Search paints by name"
+      = submit_tag "Search", name: "search", class: "button-blue"
 
 - if @paints.present?
+  .paginate-container
+    = will_paginate @paints 
   %section.full-screen-table
-    %table#truncated-data-table.table.table-striped.table-bordered
+    %table.table.table-striped.table-bordered
       %thead
         %th
           Date created
@@ -53,6 +60,8 @@
                 = "- #{paint.secondary_color.name}"
               - if paint.tertiary_color_id.present?
                 = "- #{paint.tertiary_color.name}"
+  .paginate-container
+    = will_paginate @paints
             
 
 - else

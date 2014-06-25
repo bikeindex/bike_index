@@ -28,6 +28,7 @@ class OrganizationsController < ApplicationController
 
   def embed_extended
     @bike = BikeCreator.new(@b_param).new_bike
+    @bike.owner_email = 'info@lumberyardmtb.com' if @organization.slug == 'lumberyard'
     @bike.owner_email = params[:email] if params[:email].present?
     if params[:sf_safe].present?
       render action: :embed_sf_safe, layout: 'embed_layout'
