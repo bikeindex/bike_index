@@ -50,7 +50,7 @@ class BikesController < ApplicationController
 
   def pdf
     bike = Bike.find(params[:id])
-    unless bike.owner == current_user
+    unless bike.owner == current_user or current_user.is_member_of?(bike.creation_organization)
       flash[:error] = "Sorry, that's not your bike!"
       redirect_to bike_path(bike) and return 
     end
