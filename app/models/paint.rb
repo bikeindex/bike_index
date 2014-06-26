@@ -100,7 +100,6 @@ class Paint < ActiveRecord::Base
     paint_str.gsub!(/bronze/, 'yellow')
     paint_str.gsub!(/mustard/, 'yellow')
     paint_str.gsub!(/golde?n?/, 'yellow')
-    paint_str.gsub!(/si?lve?r?/, 'gray')
     paint_str.gsub!(/(\A|\s)crcl(\s|\Z)/, ' gray ') #bad abbreviation of charcoal
     paint_str.gsub!(/gunmetal/, 'gray')
     paint_str.gsub!(/char(coa?l)?/, 'gray')
@@ -110,6 +109,7 @@ class Paint < ActiveRecord::Base
     paint_str.gsub!(/chrome/, 'gray')
     paint_str.gsub!(/quicksilver/, 'gray')
     paint_str.gsub!(/(\A|\s)gre?y(\s|\Z)/, ' gray ')
+    paint_str.gsub!(/si?lve?r?/, 'gray')
     paint_str.gsub!(/burgu?a?ndy/, "red")
   end
 end
