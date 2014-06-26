@@ -58,7 +58,7 @@ group :assets do
   gem "select2-rails"
 end
 
-group :develop do
+group :development do
   gem 'growl'
   gem 'brakeman'
   gem 'guard'
@@ -67,7 +67,7 @@ group :develop do
   gem 'bullet'
 end
 
-group :develop, :test do
+group :development, :test do
   gem 'rb-fsevent', '~> 0.9.1'
   gem 'rspec-rails'
   gem 'foreman'
