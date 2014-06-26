@@ -141,10 +141,11 @@ describe BParam do
 
   describe :set_paint_key do
     it "should associate the paint and set the color if it can" do
-      color = FactoryGirl.create(:color)
-      paint = FactoryGirl.create(:paint, color_id: color.id)
-      b_param = BParam.new
-      b_param.stub(:params).and_return({bike: {}})
+      FactoryGirl.create(:color, name: 'Black')
+      color = FactoryGirl.create(:color, name: 'Yellow')
+      paint = FactoryGirl.create(:paint, name: 'yellowish', color_id: color.id)
+      b_param = BParam.new(params: {bike: {}})
+      # b_param.stub(:params).and_return({bike: {}})
       b_param.set_paint_key(paint.name)
       b_param.params[:bike][:paint_id].should eq(paint.id)
       b_param.params[:bike][:primary_frame_color_id].should eq(color.id)

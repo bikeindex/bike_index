@@ -95,7 +95,6 @@ class BParam < ActiveRecord::Base
     paint = Paint.fuzzy_name_find(paint_entry)
     if paint.present?
       bike[:paint_id] = paint.id
-      bike[:primary_frame_color_id] = paint.color.id if paint.color_id.present?
     else
       paint = Paint.new(name: paint_entry)
       paint.manufacturer_id = bike[:manufacturer_id] if bike[:registered_new]
@@ -103,7 +102,13 @@ class BParam < ActiveRecord::Base
       params[:bike][:paint_id] = paint.id
       bike[:paint_name] = paint.name
     end
-    bike[:primary_frame_color_id] = Color.find_by_name("Black").id unless bike[:primary_frame_color_id].present?
+    unless bike[:primary_frame_color_id].present?
+      if paint.color_id.present?
+        bike[:primary_frame_color_id] = paint.color.id 
+      else
+        bike[:primary_frame_color_id] = Color.find_by_name("Black").id
+      end
+    end
   end
 
 end
