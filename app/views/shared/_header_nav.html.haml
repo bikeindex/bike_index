@@ -51,17 +51,15 @@
         .search-fields#header-search{ data: { selected: mnfg.to_json, options: select_list.to_json } }
           %span.search-background
           - params[:query] = params[:query].gsub(/,?#,?/,'').gsub(/(\A,|,\z)/, '') if params[:query].present?
-          = text_field_tag :query,                             |
-            params[:query],                                    |
-            placeholder: "Search bike traits or serials",      |
-            class: "search-text-field"                         
+          .sfieldr
+            = text_field_tag :query,                             |
+              params[:query],                                    |
+              placeholder: "Search bike traits or serials",      |
+              class: "search-text-field"                         
+            = button_tag(type: "submit", class: "searchit") do
+              = image_tag '/assets/stolen/search.svg'
           = hidden_field_tag :serial, params[:serial]
-          .search-button
-            = button_tag(type: "submit", class: "button-blue") do
-              = image_tag '/assets/stolen/search_white.svg'
-            / = button_tag(type: "submit", class: "sbrbtn") do
-            /   = image_tag '/assets/stolen/search.svg'
-            / # = submit_tag "Search", name: "search", class: "button-blue"
+            
           .optional-fields
             / .additional-fields
             /   = text_field_tag :serial, params[:serial], placeholder: 'Serial number lookup'
