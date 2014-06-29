@@ -26,9 +26,10 @@ class Admin::PaintsController < Admin::BaseController
 
   def update
     if @paint.update_attributes(params[:paint])
+      black_id = Color.find_by_name('Black').id
       flash[:notice] = "Paint updated!"
       if @paint.reload.color_id.present?
-        bikes = @paint.bikes.where(primary_frame_color_id: Color.find_by_name('Black').id)
+        bikes = @paint.bikes.where(primary_frame_color_id: black_id)
         bikes.each do |bike|
           next if bike.secondary_frame_color_id.present?
           next unless bike.primary_frame_color_id == black_id
