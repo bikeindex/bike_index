@@ -7,13 +7,13 @@ class OrganizationsController < ApplicationController
   layout "organization"
   
   def edit
-    @bikes = Bike.where(creation_organization_id: @organization.id).order("created_at asc")
-    # @bikes = bikes.decorate
+    @bikes = Bike.where(creation_organization_id: @organization.id).order("created_at desc")
     @organization = @organization.decorate
   end
 
   def show
-    bikes = Bike.where(creation_organization_id: @organization.id).order("created_at asc")
+    bikes = Bike.where(creation_organization_id: @organization.id).order("created_at desc")
+    bikes = bikes.paginate(page: params[:page]).per_page(100)
     @bikes = bikes.decorate
     @organization = @organization.decorate
   end

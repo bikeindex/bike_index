@@ -1,7 +1,12 @@
 %h1
   #{@organization.name} bikes
 
-= render partial: "/bikes/bike_org_table", locals: {target: ""}
+- if @bikes.present?
+  .paginate-container
+    = will_paginate @bikes 
+  = render partial: "/bikes/bike_org_table", locals: {target: ""}
+  .paginate-container
+    = will_paginate @bikes 
 
 .tutorials
   %h3
