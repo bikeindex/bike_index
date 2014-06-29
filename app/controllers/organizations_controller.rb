@@ -9,11 +9,13 @@ class OrganizationsController < ApplicationController
   def edit
     @bikes = Bike.where(creation_organization_id: @organization.id).order("created_at asc")
     # @bikes = bikes.decorate
+    @organization = @organization.decorate
   end
 
   def show
     bikes = Bike.where(creation_organization_id: @organization.id).order("created_at asc")
     @bikes = bikes.decorate
+    @organization = @organization.decorate
   end
 
   def embed
@@ -83,7 +85,7 @@ class OrganizationsController < ApplicationController
   end
 
   def find_organization 
-    @organization = Organization.find_by_slug(params[:id]).decorate
+    @organization = Organization.find_by_slug(params[:id])
   end
 
   def require_membership
