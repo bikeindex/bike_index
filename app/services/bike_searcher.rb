@@ -35,9 +35,8 @@ class BikeSearcher
   end
 
   def matching_query(bikes)
-    if @params[:query]
-      @bikes = bikes.text_search(@params[:query])
-    end
+    return bikes unless @params[:query].present?     
+    @bikes = bikes.text_search(@params[:query].gsub(/(,?c_\d+|,?m_\d+)/,''))
     @bikes
   end
 
@@ -57,11 +56,20 @@ class BikeSearcher
         @params[:manufacturer_id] = 0
       end
     end
-    if @params[:manufacturer_id].present?
-      if @params[:query].present?
-        @params[:query] = @params[:query].gsub(/#{@params[:manufacturer_id]}/, '')
+    if @params[:query] && @params[:query].match(/(,?m_\d+)/)
+      @params[:manufacturer_id] = @params[:query].match(/(,?m_\d+)/)[0].gsub(/,?m_/,'') 
+    end
+    @bikes = bikes.where(manufacturer_id: @params[:manufacturer_id]) if @params[:manufacturer_id].present?
+    @bikes
+  end
+
+  def matching_colors(bikes)
+    if @params[:query] && @params[:query].scan(/(,?c_\d+)/)
+      @params[:query].scan(/(,?c_\d+)/).flatten.each do |c|
+        c_id = c.gsub(/(,?c_)/,'')
+        bikes = bikes.where("primary_frame_color_id = ? OR secondary_frame_color_id = ? OR tertiary_frame_color_id = ?", c_id, c_id, c_id)
       end
-      @bikes = bikes.where(manufacturer_id: @params[:manufacturer_id]) if @params[:manufacturer_id].present?
+      @bikes = bikes
     end
     @bikes
   end
@@ -91,12 +99,13 @@ class BikeSearcher
       @bikes = matching_serial 
       matching_stolenness(@bikes)
       matching_manufacturer(@bikes)
+      matching_colors(@bikes)
       matching_query(@bikes)
       by_proximity if @params[:stolen] && @params[:proximity].present? && @params[:proximity].strip.length > 1
     else
       @bikes = Bike.where(stolen: false).order("RANDOM()")
     end
-    @bikes.includes(:cycle_type, :manufacturer, :primary_frame_color, :secondary_frame_color, :tertiary_frame_color).limit(100)
+    @bikes.includes(:cycle_type, :manufacturer, :primary_frame_color, :secondary_frame_color, :tertiary_frame_color).limit(00)
   end
 
   def close_serials

@@ -18,7 +18,7 @@
   
         
 
-  - if bike.stolen and bike.stolen_records.any?
+  - if bike.stolen and bike.current_stolen_record.present?
     .blist-stolen-info
       .dl-holder
         %dl.dl-horizontal

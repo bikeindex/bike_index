@@ -50,11 +50,13 @@ class BikeIndex.Views.Global extends Backbone.View
 
   initializeHeaderSearch: ->
     unless $('#sbr-body').length > 0
-      tags = JSON.parse($("#header-search").attr('data-manufacturers'))
+      tags = JSON.parse($("#header-search").attr('data-options'))
       $('#head-search-bikes #query').select2
         formatResult: (object, container, query) ->
           if object.id?
             return nil unless query?
+            if object.display
+              return "#{object.display} <span class='sch_c'>#{object.text}</span>"
             if object.id == '#'
               return "#{object.text} <span class='sch_s'><span>lookup </span>serial</span>"
             if object.id == object.text
@@ -77,6 +79,8 @@ class BikeIndex.Views.Global extends Backbone.View
           return object.text if object.id == object.text
           if object.id == '#'
             return "<span class='search_span_s'>serial </span> #{object.text}"
+          else if object.display?
+            return object.text
           "<span class='search_span_m'>made by </span> #{object.text}"
 
         escapeMarkup: (m) ->
@@ -84,10 +88,10 @@ class BikeIndex.Views.Global extends Backbone.View
         tags: tags
         tokenSeparators: [","]
       
-      if $('#header-search #manufacturer_id').val().length > 0
-        data = $('#query').select2('data')
-        data.push($('#header-search').data('selected'))
-        $('#query').select2('data',data)
+      # if $('#header-search #manufacturer_id').val().length > 0
+      #   data = $('#query').select2('data')
+      #   data.push($('#header-search').data('selected'))
+      #   $('#query').select2('data',data)
       if $('#header-search #serial').val().length > 0
         data = $('#query').select2('data')
         data.push({id: '#', text: $('#header-search #serial').val()})
@@ -98,12 +102,8 @@ class BikeIndex.Views.Global extends Backbone.View
       unless e.added.id == e.added.text 
         if e.added.id == '#'
           $('#header-search #serial').val(e.added.text)
-        else
-          $('#header-search #manufacturer_id').val(e.added.id)
     if e.removed?
-      if parseInt(e.removed.id,10) == parseInt($('#header-search #manufacturer_id').val(),10)
-        $('#header-search #manufacturer_id').val('')
-      else if e.removed.id == '#'
+      if e.removed.id == '#'
         $('#header-search #serial').val('')
 
   updateSerialAbsent: (e) ->

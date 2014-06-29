@@ -45,16 +45,16 @@
         - if params[:manufacturer_id].present?
           - mnfg = {id: params[:manufacturer_id], text: Manufacturer.find(params[:manufacturer_id]).name} if params[:manufacturer_id].present?
         - else
-          - mnfg = '' 
-        
-        .search-fields#header-search{ data: { selected: mnfg.to_json, manufacturers: Manufacturer.frames.map { |m| { id: m.id, text: m.name } }.to_json} }
+          - mnfg = ''
+        - select_list = Color.all.map { |c| { id: "c_#{c.id}", text: c.name, display: c.display } }
+        - select_list += Manufacturer.frames.map { |m| { id: "m_#{m.id}", text: m.name } }
+        .search-fields#header-search{ data: { selected: mnfg.to_json, options: select_list.to_json } }
           %span.search-background
           - params[:query] = params[:query].gsub(/,?#,?/,'').gsub(/(\A,|,\z)/, '') if params[:query].present?
           = text_field_tag :query,                             |
             params[:query],                                    |
             placeholder: "Search bike traits or serials",      |
             class: "search-text-field"                         |
-          = hidden_field_tag :manufacturer_id, params[:manufacturer_id]
           = hidden_field_tag :serial, params[:serial]
           .search-button
             = button_tag(type: "submit", class: "button-blue") do

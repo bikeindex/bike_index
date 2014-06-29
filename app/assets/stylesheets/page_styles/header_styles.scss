@@ -306,11 +306,30 @@
     color: #bbb;
     float: right;
   }
+  .sch_c {
+    color: #bbb;
+    display: inline-block;
+  }
 
   .sch_special {
     border-bottom: 1px solid #ddd;
   }
 }
+
+.sclr {
+  @include border-radius(3px);
+  // float: left;
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  border: 1px solid $grayMed;
+  margin: 0 6px 0 0;
+  font-size: .5em;
+  color: $grayLighter;
+  text-align: center;
+  padding-top: 1em;
+}
+
 @media (max-width: 600px) {
   .mainsrchdr {
     .select2-results { max-height: 200px; }
