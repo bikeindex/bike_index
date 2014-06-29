@@ -36,6 +36,7 @@ class Admin::PaintsController < Admin::BaseController
           bike.primary_frame_color_id = @paint.color_id
           bike.secondary_frame_color_id = @paint.secondary_color_id
           bike.tertiary_frame_color_id = @paint.tertiary_color_id
+          bike.paint_name = @paint.name
           bike.save
         end
       end
