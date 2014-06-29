@@ -113,9 +113,17 @@
   .input-group
     .control-group
       .receive-notifications
+        = f.label :proof_of_ownership do
+          = f.check_box :proof_of_ownership
+          Do you have proof of ownership of this #{@bike.type}?
+          %span
+            If this #{@bike.type} was added to the Index by a bike shop, it counts as proof of ownership
+  .input-group
+    .control-group
+      .receive-notifications
         = f.label :receive_notifications do
           = f.check_box :receive_notifications
-          Receive notifications from the Index about this stolen #{@bike.type}
+          Receive notifications from the Bike Index about this stolen #{@bike.type}
           %span
             eg if we tweet about or see someone searching for it's serial number
             

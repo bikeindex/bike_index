@@ -3,11 +3,11 @@ class Admin::PaintsController < Admin::BaseController
 
   def index
     if params[:name]
-      paints = Paint.where('name LIKE ?', "%#{params[:name]}%").includes(:bikes)
+      paints = Paint.where('name LIKE ?', "%#{params[:name]}%")
     else 
-      paints = Paint.includes(:bikes).order("created_at asc")
+      paints = Paint.order("created_at asc")
     end
-    @paints = paints.paginate(page: params[:page]).per_page(100)
+    @paints = paints.includes(:color, :secondary_color, :tertiary_color).paginate(page: params[:page]).per_page(100)
   end
 
   # def new

@@ -5,10 +5,11 @@ class Admin::BikesController < Admin::BaseController
   before_filter :find_bike, only: [:edit, :destroy, :update]
 
   def index
+    bikes = Bike.unscoped.includes(:creation_organization, :cycle_type, :manufacturer, :paint, :primary_frame_color, :secondary_frame_color, :tertiary_frame_color)
     if params[:email]
-      bikes = Bike.admin_text_search(params[:email])
+      bikes = bikes.admin_text_search(params[:email])
     else 
-      bikes = Bike.unscoped.order("created_at desc")
+      bikes = bikes.order("created_at desc")
     end
     bikes = bikes.paginate(page: params[:page]).per_page(100)
     @bikes = bikes.decorate

@@ -2,8 +2,8 @@ class Admin::DashboardController < ApplicationController
   before_filter :require_superuser!
   layout "admin"
   def index
-    @bikes = Bike.unscoped.order('created_at desc').limit(10)
-    @users = User.limit(5).order("created_at desc")    
+    @bikes = Bike.unscoped.includes(:creation_organization, :cycle_type, :manufacturer, :paint).order('created_at desc').limit(10)
+    @users = User.includes(:memberships => [:organization]).limit(5).order("created_at desc")
     @flavors = FlavorText.all
     @flavor = FlavorText.new
   end

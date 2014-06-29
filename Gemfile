@@ -59,6 +59,7 @@ group :assets do
 end
 
 group :development do
+  gem 'ruby_gntp'
   gem 'growl'
   gem 'brakeman'
   gem 'guard'

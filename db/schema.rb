@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140621171727) do
+ActiveRecord::Schema.define(:version => 20140629144444) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -473,6 +473,7 @@ ActiveRecord::Schema.define(:version => 20140621171727) do
     t.string   "secondary_phone"
     t.boolean  "approved",                 :default => false, :null => false
     t.boolean  "receive_notifications",    :default => true
+    t.boolean  "proof_of_ownership"
   end
 
   create_table "users", :force => true do |t|

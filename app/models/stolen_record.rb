@@ -22,6 +22,7 @@ class StolenRecord < ActiveRecord::Base
     :phone_for_shops,
     :phone_for_police,
     :receive_notifications,
+    :proof_of_ownership,
     :approved
     
   belongs_to :bike

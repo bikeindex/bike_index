@@ -94,9 +94,9 @@ class BikeSearcher
       matching_query(@bikes)
       by_proximity if @params[:stolen] && @params[:proximity].present? && @params[:proximity].strip.length > 1
     else
-      @bikes = Bike.where(stolen: false).order("RANDOM()").limit(100)
+      @bikes = Bike.where(stolen: false).order("RANDOM()")
     end
-    @bikes
+    @bikes.includes(:cycle_type, :manufacturer, :primary_frame_color, :secondary_frame_color, :tertiary_frame_color).limit(100)
   end
 
   def close_serials
