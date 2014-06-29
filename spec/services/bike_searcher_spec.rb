@@ -5,11 +5,11 @@ describe BikeSearcher do
   describe :find_bikes do 
     it "should call select manufacturers, attributes, stolen and query if stolen is present" do 
       search = BikeSearcher.new(stolen: true)
-      search.should_receive(:matching_serial).and_return(true)
-      search.should_receive(:matching_stolenness).and_return(true)
-      search.should_receive(:matching_manufacturer).and_return(true)
+      search.should_receive(:matching_serial).and_return(Bike)
+      search.should_receive(:matching_stolenness).and_return(Bike)
+      search.should_receive(:matching_manufacturer).and_return(Bike)
       # search.should_receive(:matching_attr_cache).and_return(true)
-      search.should_receive(:matching_query).and_return(true)
+      search.should_receive(:matching_query).and_return(Bike)
       search.find_bikes
     end
     it "shouldn't fail if nothing is present" do 
