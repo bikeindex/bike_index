@@ -17,7 +17,6 @@ class Paint < ActiveRecord::Base
   scope :official, where("manufacturer_id IS NOT NULL")
 
   before_save { |p| p.name = p.name.downcase.strip }
-  before_save :associate_colors
 
   def self.fuzzy_name_find(n)
     if !n.blank?
@@ -27,6 +26,7 @@ class Paint < ActiveRecord::Base
     end
   end
 
+  before_create :associate_colors
   def associate_colors
     color_ids = {}
     Color.all.each do |color|

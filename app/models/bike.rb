@@ -86,7 +86,7 @@ class Bike < ActiveRecord::Base
   belongs_to :frame_material
   belongs_to :propulsion_type
   belongs_to :cycle_type
-  belongs_to :paint
+  belongs_to :paint, counter_cache: true
   belongs_to :creator, class_name: "User"
   belongs_to :invoice
   belongs_to :creation_organization, class_name: "Organization"

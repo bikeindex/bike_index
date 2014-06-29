@@ -5,7 +5,7 @@ class Admin::PaintsController < Admin::BaseController
     if params[:name]
       paints = Paint.where('name LIKE ?', "%#{params[:name]}%")
     else 
-      paints = Paint.order("created_at asc")
+      paints = Paint.order("bikes_count DESC")
     end
     @paints = paints.includes(:color, :secondary_color, :tertiary_color).paginate(page: params[:page]).per_page(100)
   end
@@ -21,7 +21,7 @@ class Admin::PaintsController < Admin::BaseController
   end
 
   def edit
-    @bikes = @paint.bikes
+    @bikes = @paint.bikes.includes(:cycle_type, :paint, :manufacturer, :creation_organization)
   end
 
   def update
@@ -31,6 +31,7 @@ class Admin::PaintsController < Admin::BaseController
         bikes = @paint.bikes.where(primary_frame_color_id: Color.find_by_name('Black').id)
         bikes.each do |bike|
           next if bike.secondary_frame_color_id.present?
+          next unless bike.primary_frame_color_id == black_id
           bike.primary_frame_color_id = @paint.color_id
           bike.secondary_frame_color_id = @paint.secondary_color_id
           bike.tertiary_frame_color_id = @paint.tertiary_color_id
