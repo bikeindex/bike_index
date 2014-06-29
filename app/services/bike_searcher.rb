@@ -64,7 +64,7 @@ class BikeSearcher
   end
 
   def matching_colors(bikes)
-    if @params[:query] && @params[:query].scan(/(,?c_\d+)/)
+    if @params[:query] && @params[:query].match(/(,?c_\d+)/)
       @params[:query].scan(/(,?c_\d+)/).flatten.each do |c|
         c_id = c.gsub(/(,?c_)/,'')
         bikes = bikes.where("primary_frame_color_id = ? OR secondary_frame_color_id = ? OR tertiary_frame_color_id = ?", c_id, c_id, c_id)
@@ -105,7 +105,7 @@ class BikeSearcher
     else
       @bikes = Bike.where(stolen: false).order("RANDOM()")
     end
-    @bikes.includes(:cycle_type, :manufacturer, :primary_frame_color, :secondary_frame_color, :tertiary_frame_color).limit(00)
+    @bikes.limit(100)
   end
 
   def close_serials
