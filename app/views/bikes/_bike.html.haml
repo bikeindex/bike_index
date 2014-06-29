@@ -1,5 +1,5 @@
 %li{ class: bike.stolen && "blist-stolen" }
-  .blist-image-holder
+  %a.blist-image-holder{href: bike_url(bike) }
     = bike.thumb_image
   %h3
     = link_to bike.title_string, bike.list_link_url(target)
