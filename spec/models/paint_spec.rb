@@ -45,7 +45,6 @@ describe Paint do
     it "should associate only as many colors as it finds" do
       paint = Paint.new(name: "wood with leaf details")
       paint.associate_colors
-      pp paint
       expect(paint.color.name.downcase).to eq("brown")
       expect(paint.secondary_color).to be_nil
       expect(paint.tertiary_color).to be_nil

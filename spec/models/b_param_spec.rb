@@ -143,7 +143,7 @@ describe BParam do
     it "should associate the paint and set the color if it can" do
       FactoryGirl.create(:color, name: 'Black')
       color = FactoryGirl.create(:color, name: 'Yellow')
-      paint = FactoryGirl.create(:paint, name: 'yellowish', color_id: color.id)
+      paint = FactoryGirl.create(:paint, name: 'pinkly butter', color_id: color.id)
       b_param = BParam.new(params: {bike: {}})
       # b_param.stub(:params).and_return({bike: {}})
       b_param.set_paint_key(paint.name)

@@ -126,14 +126,14 @@ class Bike < ActiveRecord::Base
 
   include PgSearch
   pg_search_scope :search, against: {
-    cached_data: 'A',
-    description: 'B',
-    },
-    using: {tsearch: {dictionary: "english", prefix: true}}
+    serial_number: 'A',
+    cached_data:   'B',
+    description:   'C'
+  },
+  using: {tsearch: {dictionary: "english", prefix: true}}
 
-  pg_search_scope :admin_search, against: {
-    owner_email: 'A'
-    },
+  pg_search_scope :admin_search,
+    against: { owner_email: 'A' },
     associated_against: {ownerships: :owner_email, creator: :email},
     using: {tsearch: {dictionary: "english", prefix: true}}
 

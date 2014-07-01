@@ -32,8 +32,7 @@ class Paint < ActiveRecord::Base
     Color.all.each do |color|
       color_ids[color.name.split(/\W+/).first.downcase] = color.id
     end
-
-    paint_words = paint_name_parser(name).split(/\W+/).uniq
+    paint_words = paint_name_parser(name.clone).split(/\W+/).uniq
     used_ids = []
 
     # go through the paint words, add the colors id to the used ids if it's a known color
@@ -42,6 +41,7 @@ class Paint < ActiveRecord::Base
     self.color_id = used_ids[0] if used_ids[0]
     self.secondary_color_id = used_ids[1] if used_ids[1]
     self.tertiary_color_id = used_ids[2] if used_ids[2]
+    self
   end
 
   def paint_name_parser(paint_str)
@@ -56,7 +56,7 @@ class Paint < ActiveRecord::Base
       when 4 then "purple"
       when 5 then "blue"
       when 6 then "green"
-      when 7 then "gray"
+      when 7 then "silver"
       when 8 then "brown"
       #when 9 then "" This is white or black or gray
       end
@@ -105,7 +105,7 @@ class Paint < ActiveRecord::Base
     paint_str.gsub!(/chrome/, 'silver')
     paint_str.gsub!(/sli?ve?r?/, 'silver')
     paint_str.gsub!(/quicksilver/, 'silver')
-    paint_str.gsub!(/(\A|\s)gre?y(\s|\Z)/, ' silver ')
+    paint_str.gsub!(/gr(a|e)y/, ' silver ')
     paint_str.gsub!(/burgu?a?ndy/, "red")
     paint_str
   end

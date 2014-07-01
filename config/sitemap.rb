@@ -61,11 +61,6 @@ SitemapGenerator::Sitemap.create do
   end
 
 
-  group(filename: :bike_manufacturers) do
-    add "/manufacturers", priority: 0.5
-    Manufacturer.scoped.each { |m| add "/manufacturers/#{m.slug}", priority: 0.4 }
-  end
-
   group(filename: :resources) do
     paths = ["resources", "stolen_bikes", "serials", "stolen", "spokecard"]
     paths.each { |i| add "/#{i}" }                

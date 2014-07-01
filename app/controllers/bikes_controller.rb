@@ -21,8 +21,8 @@ class BikesController < ApplicationController
     search = BikeSearcher.new(params)
     bikes = search.find_bikes
     if params[:serial].present?
-      # secondary_bikes = search.fuzzy_find_serial
-      secondary_bikes = search.find_bikes
+      secondary_bikes = search.fuzzy_find_serial
+      # secondary_bikes = search.find_bikes
       @secondary_bikes = secondary_bikes.decorate if secondary_bikes.present?
     end
     (bikes.count <= 100) ? (total_bikes = bikes.count) : (total_bikes = 100)

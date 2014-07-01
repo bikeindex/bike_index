@@ -154,10 +154,9 @@
           = @bike.dl_list_item(@bike.tire_width("rear").titleize, "Tire Width")
       %dl.dl-horizontal
         = @bike.dl_from_attribute_othered("handlebar_type")
-        - if @bike.paint.present?
-          = @bike.dl_list_item(@bike.paint_description, "Paint")
-        - else
-          = @bike.dl_list_item(@bike.frame_colors.to_sentence, "Primary colors")
+        = @bike.dl_list_item(@bike.frame_colors.to_sentence, "Primary colors")
+        / - if @bike.paint.present?
+        /   = @bike.dl_list_item(@bike.paint_description, "Paint")
         = @bike.dl_list_item(@bike.ass_name("frame_material"), "Frame Material")
         = @bike.dl_list_item(@bike.ass_name("rear_gear_type"), "Rear gears")
         = @bike.dl_list_item(@bike.ass_name("front_gear_type"), "Front gears")
