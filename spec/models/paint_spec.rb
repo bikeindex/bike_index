@@ -35,16 +35,24 @@ describe Paint do
       end
     end
     it "should associate paint with reasonable colors" do
-      paint = FactoryGirl.create(:paint, name: "burgandy/ivory with black stripes")
+      paint = Paint.new(name: "burgandy/ivory with black stripes")
+      paint.associate_colors
       expect(paint.color.name.downcase).to eq("red")
       expect(paint.secondary_color.name.downcase).to eq("white")
       expect(paint.tertiary_color.name.downcase).to eq("black")
     end
+
     it "should associate only as many colors as it finds" do
-      paint = FactoryGirl.create(:paint, name: "wood with leaf details")
+      paint = Paint.new(name: "wood with leaf details")
+      paint.associate_colors
+      pp paint
       expect(paint.color.name.downcase).to eq("brown")
       expect(paint.secondary_color).to be_nil
       expect(paint.tertiary_color).to be_nil
+    end
+
+    it "should have before_create_callback_method" do
+      Paint._create_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:associate_colors).should == true
     end
   end
 end

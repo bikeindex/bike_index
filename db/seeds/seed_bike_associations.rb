@@ -34,7 +34,7 @@ end
 colors = [
   { name: 'Black', priority: 1, display: "<span class='sclr' style='background: #000'></span>" },
   { name: 'White', priority: 1, display: "<span class='sclr' style='background: #fff'></span>" },
-  { name: 'Gray or Silver', priority: 1, display: "<span class='sclr' style='background: #b0b0b0'></span>" },
+  { name: 'Silver or Gray', priority: 1, display: "<span class='sclr' style='background: #b0b0b0'></span>" },
   { name: 'Red', priority: 1, display: "<span class='sclr' style='background: #ec1313'></span>" },
   { name: 'Green', priority: 1, display: "<span class='sclr' style='background: #1ba100'></span>" },
   { name: 'Blue', priority: 1, display: "<span class='sclr' style='background: #386ed2'></span>" },

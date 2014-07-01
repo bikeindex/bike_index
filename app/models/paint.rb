@@ -33,18 +33,15 @@ class Paint < ActiveRecord::Base
       color_ids[color.name.split(/\W+/).first.downcase] = color.id
     end
 
-    symbols_to_fill = [:color_id, :secondary_color_id, :tertiary_color_id]
+    paint_words = paint_name_parser(name).split(/\W+/).uniq
+    used_ids = []
 
-    paint_str = self.name.clone
-    paint_name_parser(paint_str)
+    # go through the paint words, add the colors id to the used ids if it's a known color
+    paint_words.each { |w| used_ids << color_ids[w] if color_ids[w].present? }
 
-    # go through the paint string a word at a time and attempt to match each word against the Colors in the database. Assign color_id's when the match
-    words = paint_str.split(/\W+/).uniq
-    symbols_to_fill.each do |symbol|
-      while word = words.shift
-        break if self.send("#{symbol}=", color_ids[color_ids.keys.select{ |c| c == word }.first])
-      end
-    end
+    self.color_id = used_ids[0] if used_ids[0]
+    self.secondary_color_id = used_ids[1] if used_ids[1]
+    self.tertiary_color_id = used_ids[2] if used_ids[2]
   end
 
   def paint_name_parser(paint_str)
@@ -68,7 +65,6 @@ class Paint < ActiveRecord::Base
     paint_str.gsub!(/bluish/, 'blue')
     paint_str.gsub!(/reddish/, 'red')
     paint_str.gsub!(/ish( |\Z)/, ' ')
-
     paint_str.gsub!(/steel (blue|grey|gray|black)/, '\1')
     paint_str.gsub!(/steel/, 'raw')
     paint_str.gsub!(/maroon/, 'red')
@@ -111,5 +107,7 @@ class Paint < ActiveRecord::Base
     paint_str.gsub!(/quicksilver/, 'silver')
     paint_str.gsub!(/(\A|\s)gre?y(\s|\Z)/, ' silver ')
     paint_str.gsub!(/burgu?a?ndy/, "red")
+    paint_str
   end
+
 end
