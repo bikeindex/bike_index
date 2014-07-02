@@ -52,6 +52,10 @@ class BikeIndex.Views.Global extends Backbone.View
     unless $('#sbr-body').length > 0
       tags = JSON.parse($("#header-search").attr('data-options'))
       $('#head-search-bikes #query').select2
+        
+        tags: tags
+        tokenSeparators: [","]
+        openOnEnter: false
         formatResult: (object, container, query) ->
           if object.id?
             return nil unless query?
@@ -82,11 +86,6 @@ class BikeIndex.Views.Global extends Backbone.View
           else if object.display?
             return object.text
           "<span class='search_span_m'>made by </span> #{object.text}"
-
-        escapeMarkup: (m) ->
-          m
-        tags: tags
-        tokenSeparators: [","]
       
       # if $('#header-search #manufacturer_id').val().length > 0
       #   data = $('#query').select2('data')

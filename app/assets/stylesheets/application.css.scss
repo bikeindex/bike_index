@@ -1,5 +1,3 @@
-//= require select2
-
 // Import Base styles
 @import "application_styles/_colors.scss";
 @import "application_styles/_vars.scss";
@@ -22,6 +20,7 @@
 
 // Import includes
 @import "includes/datepicker.scss";
+@import "includes/select2-binx.scss";
 @import "application_styles/sharing_styles.scss";
 @import "includes/datatables_bootstrap.scss";
 

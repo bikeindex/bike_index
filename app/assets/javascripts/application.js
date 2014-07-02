@@ -26,7 +26,7 @@
 //= require external_scripts/jquery.sortable.js
 //= require external_scripts/jquery.ui.widget.js
 //= require external_scripts/are-you-sure.js.coffee
-//= require select2
+//= require external_scripts/select2.js
 //= require external_scripts/jquery.iframe-transport.js
 //= require external_scripts/jquery.fileupload.js
 //= require dataTables/jquery.dataTables
