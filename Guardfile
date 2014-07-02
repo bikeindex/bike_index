@@ -1,5 +1,5 @@
 rspec_opts = {
-  failed_mode: :true
+  failed_mode: :focus 
 }
 
 guard :rspec, rspec_opts do

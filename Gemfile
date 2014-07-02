@@ -63,7 +63,7 @@ group :development do
   gem 'growl'
   gem 'brakeman'
   gem 'guard'
-  gem 'guard-rspec'
+  gem 'guard-rspec', '~> 4.2.10'
   gem 'guard-livereload'
   gem 'bullet'
 end
