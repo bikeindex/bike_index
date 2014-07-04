@@ -30,8 +30,13 @@ describe AdminMailer do
       @feedback.update_attributes(feedback_type: 'bike_recovery')
       mail = AdminMailer.feedback_notification_email(@feedback)
       mail.subject.should eq("New Feedback Submitted")
-      mail.to.should eq(["contact@bikeindex.org"])
+      mail.to.should eq(["contact@bikeindex.org", "bryan@bikeindex.org"])
       mail.from.should eq([@feedback.email])
+    end
+    it 'sends a stolen_information email' do
+      @feedback.update_attributes(feedback_type: 'stolen_information')
+      mail = AdminMailer.feedback_notification_email(@feedback)
+      mail.to.should eq(["bryan@bikeindex.org"])
     end
     it 'sends a serial update email' do
       @feedback.update_attributes(feedback_type: 'serial_update_request')

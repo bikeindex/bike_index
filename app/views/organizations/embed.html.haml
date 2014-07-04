@@ -85,7 +85,7 @@
         = builder.hidden_field :phone_no_show, value: true
         .input-group
           .control-group
-            = f.label :phone, class: "control-label"
+            = builder.label :phone, class: "control-label"
             .controls
               = builder.text_field :phone, required: "true"
         .input-group
@@ -149,6 +149,12 @@
     .submit-registration
       = submit_tag "Register this", class: "button-submit"
       = collection_select( :bike, :cycle_type_id, CycleType.all, :id, :name, required: true)
+  - if @phone
+    .input-group#optional-phone
+      .control-group
+        = f.label :phone, 'Phone - optional', class: "control-label"
+        .controls
+          = f.text_field :phone
   .input-group.optional-group
   
     - if @b_param.image.present? or @b_param.image_tmp.present?

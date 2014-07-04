@@ -5,9 +5,15 @@ class AdminMailer < ActionMailer::Base
 
   def feedback_notification_email(feedback)
     @feedback = feedback
+    send_to = 'contact@bikeindex.org'
+    if @feedback.feedback_type.present?
+      send_to += ', bryan@bikeindex.org' if @feedback.feedback_type.match('bike_recovery')
+      send_to = 'bryan@bikeindex.org' if @feedback.feedback_type.match('stolen_information')
+    end
+
     mail(
       "Reply-To" => feedback.email,
-
+      to: send_to,
       from: feedback.email, subject: feedback.title) do |format|
         format.text
         format.html { render layout: 'email_no_border' }

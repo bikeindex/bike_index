@@ -11,6 +11,7 @@
             Report bike theft issues:
           .involve-report-form
             = form_for @feedback do |f|
+              = f.hidden_field :feedback_type, value: 'stolen_information'
               - if @feedback.errors.any?
                 #alert-block
                   .alert.alert-error
@@ -24,7 +25,7 @@
                           = msg  
               .report-type
                 %label
-                  = f.radio_button :title, "Someone is selling a stolen bike"
+                  = f.radio_button :title, "Someone is selling a stolen bike", checked: true
                   Report someone selling a stolen bike
                 %label
                   = f.radio_button :title, "Bike ChopShop report"
