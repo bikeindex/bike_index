@@ -3,6 +3,7 @@ class FeedbacksController < ApplicationController
   before_filter :set_feedback_active_section
 
   def index
+    @feedback = Feedback.new
   end
 
   def new

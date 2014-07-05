@@ -23,12 +23,13 @@ toggleRegistrationType = ->
   if $('#registration-type-tabs a.current-type').hasClass('stolen')
     $('#stolen_fields_container').slideUp 'medium', ->
       $('#stolen_fields').appendTo('#stolen_fields_store')
-    $('.has-no-serial .stolen').fadeOut 'fast', ->
+    # $('.has-no-serial .stolen').fadeOut 'fast', ->
+      $('#optional-phone').slideUp() if $('#optional-phone').length > 0
   else
     $('#stolen_fields').appendTo('#stolen_fields_container')
     # $('#stolen_fields_containter').html($('#stolen_fields').html())
     $('#stolen_fields_container').slideDown()
-
+    $('#optional-phone').slideDown() if $('#optional-phone').length > 0
 
 
 updateSerial = (e) ->

@@ -110,6 +110,7 @@
         = f.label :police_report_department, "Department & city", class: "control-label"
         .controls.police-report-check
           = f.text_field :police_report_department
+
   .input-group
     .control-group
       .receive-notifications
@@ -117,7 +118,7 @@
           = f.check_box :proof_of_ownership
           Do you have proof of ownership of this #{@bike.type}?
           %span
-            If this #{@bike.type} was added to the Index by a bike shop, it counts as proof of ownership
+            If this #{@bike.type} was added to the Index by a bike shop, that counts as proof of ownership
   .input-group
     .control-group
       .receive-notifications

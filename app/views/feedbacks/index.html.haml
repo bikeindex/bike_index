@@ -1,119 +1,19 @@
 %h1#top
   Help with the Bike Index
 
-%h4
-  Do you have a question?
+= render 'shared/faq'
 
-%p
-  #{link_to "Get in touch with us", contact_us_url} if you don't find the answer in our FAQ.
-
-%hr
-
-/ .faq-block
-/   .receptacle.overfloating
-/     .inner-recep.faq-holder
+%hr 
 
 %h3.padded
-  Frequently asked questions
-%article.faq-block
-  %dl
-    %dt.collapse-faq
-      %a.collapsed{ href: "#what-if-i-sell", data: { toggle: "collapse"} }
-        %span
-          &#x25B6;
-        What if I sell my bike?
-    %dd#what-if-i-sell.collapse
-      %p
-        Bike registration is permanent, it's free to transfer bikes.
-      %p.steps
-        Go to the edit page for the bike and click on the link at the bottom
-      = image_tag "/assets/home/transfer_shot1.png", alt: "Click to reveal the transfer fields", class: "demo-screen"
-      %p.steps
-        This will reveal the owner's email. Enter in the new owners email and click 
-        %em
-          Send Bike.
-      = image_tag "/assets/home/transfer_shot2.png", alt: "Click to reveal the transfer fields", class: "demo-screen"
+  Contact us!
 
+%p
+  Have a question we haven't answered?
+%p
+  Just want to say hi?
+%p
+  You can reach us at #{link_to "contact@bikeindex.org", "mailto:contact@bikeindex.org"}, or send your message right here.
 
-
-    %dt.collapse-faq
-      %a.collapsed{ href: "#how-vendor", data: { toggle: "collapse"} }
-        %span
-          &#x25B6;
-        Can my local bike shop partner with the Bike Index?
-    %dd#how-vendor.collapse
-      %p
-        Absolutely!
-      %p
-        Have them visit the #{link_to "organization signup page", vendor_signup_url}, we'll set them up with a organization account so they can register bikes for free.
-      
-    %dt.collapse-faq
-      %a.collapsed{ href: "#already-stolen", data: { toggle: "collapse"} }
-        %span
-          &#x25B6;
-        My bike was already stolen. What should I do?
-      %dd#already-stolen.collapse
-        %p
-          %strong
-            Add the bike and details about the theft to the Index now!
-        %p
-          Bike Index is a comprehensive public database - if your bike was stolen, we think everyone should know about it.
-        %p
-          Visit the #{link_to "stolen bikes page", stolen_bikes_url} to for more information, or #{link_to "add a stolen bike here", new_bike_url(stolen: true)}.  
-
-    %dt.collapse-faq
-      %a.collapsed{ href: "#what-about-privacy", data: { toggle: "collapse"} }
-        %span
-          &#x25B6;
-        What about my privacy?
-    %dd#what-about-privacy.collapse
-      %p
-        Your personal information is never viewed, shared or sold without your permission.
-      %p
-        Bikes are public and searchable, but no information about the owner is visible. You can choose to share information (such as your twitter or personal website) but this is turned off by default.
-      %p
-        To learn more check out 
-        = link_to "our blog post", "https://www.bikeindex.org/blogs/privacy-on-the-bike-index"
-        about privacy.
-    
-    %dt.collapse-faq
-      %a.collapsed{ href: "#does-this-prevent-theft", data: { toggle: "collapse"} }
-        %span
-          &#x25B6;
-        How does this prevent bike theft?
-    %dd#does-this-prevent-theft.collapse
-      %p
-        Right now people with good intentions buy stolen bikes because there isn't a single searchable, simple resource to check before buying a bike.
-      %p
-        Bike Index is that resource. The next time you buy a used bike, check the Index first.
-      %p
-        We also offer bike shops and law enforcement an easy to use interface to look up any suspicious bikes they encounter, and a way to quickly contact the proper owner.
-      / %p
-      /   We are starting the our battle battle against bike thieves and selling stolen bikes, but are by no means finished.
-      / Bike Index won't make bike theft go away over night, but with the biking communities support we will have a place to start.
-
-    %dt.collapse-faq
-      %a.collapsed{ href: "#kit-bro", data: { toggle: "collapse"} }
-        %span
-          &#x25B6;
-        How can I stay up to date on what the Bike Index is doing?
-      %dd#kit-bro.collapse
-        %p
-          Read our #{link_to "blog", blogs_url}! We post most cool things we do there.
-        %p
-          You can also follow us on #{link_to "Twitter", "https://twitter.com/BikeIndex"} and #{link_to "Facebook", "https://facebook.com/bikeindex"}.
-        
-    / %dt.collapse-faq
-    /   %a.collapsed{ href: "#business-type", data: { toggle: "collapse"} }
-    /     %span
-    /       &#x25B6;
-    /     Is the Bike Index a nonprofit?
-    /   %dd#business-type.collapse
-    /     %p
-    /       No, we're an Illinois 
-    /       = succeed "," do
-    /         %a{ href: "http://en.wikipedia.org/wiki/Benefit_corporation" }
-    /           benefit corporation
-    /       a type of for-profit company that is required by law to create benefit for society as well as shareholders.
-    /     %p
-    /       We decided to form a benefit corporation because we believe it's the best way to build an excellent service, be awesome, and fight bike theft.
+%article
+  = render 'feedbacks/form'

@@ -37,9 +37,10 @@ Bikeindex::Application.routes.draw do
 
   resources :feedbacks, only: [:create, :new]
   match 'vendor_signup', to: 'feedbacks#vendor_signup'
-  match 'contact', to: 'feedbacks#new'
-  match 'contact_us', to: 'feedbacks#new'
+  match 'contact', to: 'feedbacks#index'
+  match 'contact_us', to: 'feedbacks#index'
   match 'help', to: 'feedbacks#index'
+  match 'support', to: 'feedbacks#index'
 
   resources :users, only: [:new, :create, :show, :edit, :update] do
     collection do
