@@ -11,7 +11,13 @@
           - if bike.recovered
             Serial hidden
           - else 
-            = bike.serial_number
+            - if bike.serial_number.match('absent')
+              - if bike.stolen
+                Unknown
+              - else
+                Has no serial
+            - else
+              = bike.serial_number
         
         = bike.dl_list_item(bike.frame_colors.to_sentence, "Colors")
         
