@@ -40,12 +40,8 @@
           %td
             .less-strong-hold
               %span.less-strong-right.medium-screens
-                - if recovery.bike.example
-                  %span.table-error
-                    = recovery.bike.id 
-                - else
-                  = recovery.bike.id 
-              %a{href: edit_admin_bike_url(recovery.bike) }
+                = recovery.bike_id 
+              %a{href: "/admin/bikes/#{recovery.bike_id}" }
                 - if recovery.date_recovered.present?
                   Recovered on
                   = recovery.date_recovered.strftime("%-m.%-d.%Y")
