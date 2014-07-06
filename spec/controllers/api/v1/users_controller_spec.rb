@@ -57,20 +57,29 @@ describe Api::V1::UsersController do
     end
 
     it "should create a new recovery request mail" do 
+      require 'sidekiq/testing'
+      Sidekiq::Testing.inline!
+      # "recovery_share_approved"=>"true", "can_share_recovery"=>"true"}
       o = FactoryGirl.create(:ownership)
       user = o.creator
       bike = o.bike
+      stolen_record = FactoryGirl.create(:stolen_record, bike: bike)
       recovery_request = { 
         request_type: 'bike_recovery',
         user_id: user.id,
         request_bike_id: bike.id,
         request_reason: 'Some reason',
-        did_we_help: 'some new serial'
+        index_helped_recovery: 'true',
+        can_share_recovery: 'true'
       }
       set_current_user(user)
       Resque.should_receive(:enqueue)
       post :send_request, recovery_request
       response.code.should eq('200')
+      bike.current_stolen_record.date_recovered.should be_present
+      bike.current_stolen_record.recovery_share_approved.should be_false
+      bike.current_stolen_record.index_helped_recovery.should be_true
+      bike.current_stolen_record.can_share_recovery.should be_true
     end
     
     it "shouldn't create a new serial request mailer if a user isn't present" do 

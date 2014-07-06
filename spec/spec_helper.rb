@@ -10,6 +10,7 @@
 #   minimum_coverage 80
 # end
 require "codeclimate-test-reporter"
+require 'sidekiq/testing'
 CodeClimate::TestReporter.start
 
 ENV["RAILS_ENV"] ||= 'test'

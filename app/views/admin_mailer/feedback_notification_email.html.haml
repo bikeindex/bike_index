@@ -36,7 +36,15 @@
   %p
     Did we help?
     %strong
-      = @feedback.feedback_hash[:did_we_help]
+      = @feedback.feedback_hash[:index_helped_recovery]
+  - if @feedback.feedback_hash[:index_helped_recovery]
+    %p
+      Can we share?
+      %strong
+        = @feedback.feedback_hash[:can_share_recovery]
+    - if @feedback.feedback_hash[:can_share_recovery]
+      %h3
+        = link_to "Approve sharing this recovery!", admin_recoveries_url
   %p
     = link_to 'View the bike', edit_admin_bike_url(bike)
     

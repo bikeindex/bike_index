@@ -181,6 +181,10 @@ class Bike < ActiveRecord::Base
     self.stolen_records.last if self.stolen_records.any?
   end
 
+  def recovered_records
+    StolenRecord.recovered.where(id: self.id)
+  end
+
   def title_string
     t = ""
     t += "#{self.year} " if self.year.present?

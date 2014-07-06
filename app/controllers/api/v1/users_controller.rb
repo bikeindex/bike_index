@@ -26,10 +26,16 @@ module Api
             feedback = Feedback.new(email: current_user.email, body: reason, title: "#{feedback_type.titleize}", feedback_type: feedback_type)
             feedback.name = (current_user.name.present? && current_user.name) || 'no name'
             feedback.feedback_hash = { bike_id: bike_id }
-            if params[:did_we_help].present?
-              feedback.feedback_hash[:did_we_help] = params[:did_we_help]
-            elsif params[:serial_update_serial].present?
+            if params[:serial_update_serial].present?
               feedback.feedback_hash[:new_serial] = params[:serial_update_serial]
+            elsif feedback_type.match('bike_recovery')
+              RecoveryWorker.perform_async(bike.current_stolen_record.id, params) if bike.current_stolen_record.present?
+              if params[:index_helped_recovery].present?
+                feedback.feedback_hash[:index_helped_recovery] = params[:index_helped_recovery]
+                if params[:can_share_recovery].present?
+                  feedback.feedback_hash[:can_share_recovery] = params[:can_share_recovery]
+                end
+              end
             end
             feedback.save
             success = {success: 'submitted request'}

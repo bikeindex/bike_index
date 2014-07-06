@@ -1,0 +1,72 @@
+%header.with-subtitle
+  %h1
+    Recoveries
+/   - if @verified_only
+/     = link_to 'All stolen (not just unverified)', admin_stolen_bikes_url, class: "sharing-links"
+/   - else
+/     = link_to 'Only unverified bikes', admin_stolen_bikes_url(unapproved: true), class: "sharing-links"
+/ %h4
+/   = link_to "View stolen notifications sent", admin_stolen_notifications_url
+  
+%h4
+  = StolenRecord.recovered.count
+  Recoveries indexed,
+  / %em
+  /   (#{Bike.where(stolen: true).where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
+%h4
+  = StolenRecord.recovery_wait_share.count
+  are waiting to be shared
+
+.paginate-container
+  = will_paginate @recoveries
+%section.full-screen-table
+  %table.table.table-striped.table-bordered
+    %thead
+      %th
+        Date recovered
+      %th
+        Recovery info
+      %th.large-screens
+        Location
+      %th
+        We helped
+      %th
+        Waiting for share approval
+
+      
+    %tbody
+      - @recoveries.each do |recovery|
+        %tr
+          %td
+            .less-strong-hold
+              %span.less-strong-right.medium-screens
+                - if recovery.bike.example
+                  %span.table-error
+                    = recovery.bike.id 
+                - else
+                  = recovery.bike.id 
+              %a{href: edit_admin_bike_url(recovery.bike) }
+                - if recovery.date_recovered.present?
+                  Recovered on
+                  = recovery.date_recovered.strftime("%-m.%-d.%Y")
+                - else
+                  Stolen on
+                  = recovery.created_at.strftime("%-m.%-d.%Y")
+                  
+          %td
+            - if recovery.recovered_description.present?
+              = recovery.recovered_description
+            .large-screens.less-strong
+              = recovery.theft_description.truncate(200)
+          %td.large-screens
+            - if recovery.address.present?
+              = recovery.city
+          %td
+            - if recovery.index_helped_recovery
+              = "&#x2713;".html_safe
+          %td
+            - if recovery.can_share_recovery
+              = "&#x2713;".html_safe unless recovery.recovery_share_approved
+
+  .paginate-container
+    = will_paginate @bikes 

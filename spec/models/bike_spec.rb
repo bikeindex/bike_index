@@ -51,6 +51,17 @@ describe Bike do
     end
   end
 
+  describe :recovered_records do 
+    it "default scopes to created_at desc" do 
+      o = FactoryGirl.create(:ownership)
+      user = o.creator
+      bike = o.bike
+      recovered_2 = FactoryGirl.create(:stolen_record, bike: bike, current: false)
+      recovered_1 = FactoryGirl.create(:stolen_record, bike: bike, current: false, date_stolen: (Time.now - 1.day))
+      bike.reload.recovered_records.first.should eq(recovered_2)
+    end
+  end
+
   describe :attr_cache_search do
     it "should find bikes by attr cache" do
       bike = FactoryGirl.create(:bike)

@@ -23,7 +23,13 @@ class StolenRecord < ActiveRecord::Base
     :phone_for_police,
     :receive_notifications,
     :proof_of_ownership,
-    :approved
+    :approved,
+    :date_recovered,
+    :recovered_description,
+    :index_helped_recovery,
+    :can_share_recovery,
+    :recovery_share_approved,
+    :recovery_share_ignore
     
   belongs_to :bike
   belongs_to :country
@@ -33,6 +39,14 @@ class StolenRecord < ActiveRecord::Base
   validates_presence_of :bike, :date_stolen
 
   default_scope where(current: true)
+
+  scope :recovered, unscoped.where(current: false).order("date_stolen desc")
+  scope :recovery_wait_share, unscoped.where(
+    current: false,
+    can_share_recovery: true,
+    recovery_share_approved: false,
+    recovery_share_ignore: false
+  )
 
   def address
     return nil unless self.country
@@ -110,6 +124,22 @@ class StolenRecord < ActiveRecord::Base
     row << "\t\t"
     row << "https://bikeindex.org/bikes/#{b.id}\n"
     row
+  end
+
+  def add_recovery_information(info)
+    self.date_recovered = Time.now
+    self.recovered_description = info[:request_reason]
+    if info[:index_helped_recovery].present?
+      if info[:index_helped_recovery] or info[:index_helped_recovery].match(/true/i)
+        self.index_helped_recovery = true
+      end
+    end
+    if info[:can_share_recovery].present?
+      if info[:can_share_recovery] or info[:can_share_recovery].match(/true/i)
+        self.can_share_recovery = true
+      end
+    end
+    self.save
   end
 
 end

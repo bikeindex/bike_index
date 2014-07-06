@@ -31,13 +31,13 @@
           .controls
             %input#mark_recovered_we_helped{ type: 'checkbox' }
             
-      / .input-group#can_we_tell.initially-hidden
-      /   .control-group
-      /     .control-label
-      /       %input#mark_recovered_can_we_tell{ type: 'checkbox' }
-      /     .controls
-      /       %label{ for: :mark_recovered_can_we_tell }
-      /         Can we tell people about it?            
+      .input-group#can_we_tell.initially-hidden
+        .control-group
+          %label.control-label{ for: :mark_recovered_can_share_recovery }
+            Can we share your story?
+          .controls
+            %input#mark_recovered_can_share_recovery{ type: 'checkbox' }
+              
           
       .input-group
         .controls.actions.padded

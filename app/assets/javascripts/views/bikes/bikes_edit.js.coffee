@@ -20,7 +20,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     'click #submit-serial-update':     'submitSerialUpdate'
     'click #request-bike-delete':     'requestBikeDelete'
     'click .submit-bike-update':      'checkIfPhoneBlank'
-    # 'change #mark_recovered_we_helped': 'toggleCanWeTell'
+    'change #mark_recovered_we_helped': 'toggleCanWeTell'
 
     
   initialize: ->
@@ -469,6 +469,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     reason = $('#mark_recovered_reason').val()
     bike_id = $('#mark_recovered_bike_id').val()
     did_we_help = $('#mark_recovered_we_helped').prop('checked')
+    can_share_recovery = $('#mark_recovered_can_share_recovery').prop('checked')
     if reason.length > 0 && bike_id.length > 0
       url = $('#markBikeRecovered').attr('data-url')
       $.ajax
@@ -478,7 +479,8 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
           request_type: 'bike_recovery'
           request_bike_id: bike_id
           request_reason: reason
-          did_we_help: did_we_help
+          index_helped_recovery: did_we_help
+          can_share_recovery: can_share_recovery
         success: (data, textStatus, jqXHR) ->
           # BikeIndex.alertMessage('success', 'Bike marked recovered', "Thanks! We're so glad you got your bike back!")
           $('#requestBikeDelete').modal('hide')  
