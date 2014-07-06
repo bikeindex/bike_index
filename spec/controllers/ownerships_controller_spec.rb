@@ -38,6 +38,7 @@ describe OwnershipsController do
         @ownership.update_attributes(owner_email: @user.email.upcase)
         put :show, id: @ownership.id
         response.code.should eq('302')
+        response.should redirect_to edit_bike_url(@ownership.bike)
         flash.should be_present 
         @ownership.reload.claimed.should be_true
       end

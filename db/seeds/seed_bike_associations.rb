@@ -42,7 +42,6 @@ colors = [
   { name: 'Pink', priority: 1, display: "<span class='sclr' style='background: #ff7dfd'></span>" },
   { name: 'Orange', priority: 1, display: "<span class='sclr' style='background: #ff8d1d'></span>"},
   { name: 'Brown', priority: 1, display: "<span class='sclr' style='background: #734a22'></span>" },
-  { name: 'Raw metal', priority: 2, display: "<span class='sclr'>raw</span>" },
   { name: 'Yellow or Gold', priority: 1, display: "<span class='sclr' style='background: #fff44b'></span>" },
   { name: 'Teal', priority: 1, display: "<span class='sclr' style='background: #3bede7'></span>" },
   { name: 'Stickers tape or other cover-up', priority: 3, display: "<span class='sclr'>stckrs</span>" }
