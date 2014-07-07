@@ -57,9 +57,8 @@ describe Api::V1::UsersController do
     end
 
     it "should create a new recovery request mail" do 
-      require 'sidekiq/testing'
+      # require 'sidekiq/testing'
       Sidekiq::Testing.inline!
-      # "recovery_share_approved"=>"true", "can_share_recovery"=>"true"}
       o = FactoryGirl.create(:ownership)
       user = o.creator
       bike = o.bike

@@ -11,10 +11,8 @@ class StolenController < ApplicationController
 
   end
 
-  def tsv_download
-    tsv = "Make\tModel\tSerial\tDescription\tArticleOrGun\tDateOfTheft\tCaseNumber\tLEName\tLEContact\tComments\n"
-    StolenRecord.where(current: true).where(approved: true).each { |r| tsv << r.tsv_row }
-    send_data tsv, filename: 'stolen_bikes.tsv'
+  def current_tsv
+    redirect_to 'https://s3.amazonaws.com/bikeindex/uploads/current_stolen_bikes.tsv'
   end
 
   def links
