@@ -12,6 +12,7 @@ gem 'airbrake'
 gem 'resque', require: 'resque/server'
 gem 'sidekiq'
 gem 'sidekiq-failures'
+gem 'sidekiq-unique-jobs'
 gem 'geocoder', "~> 1.1.2"
 gem "money-rails", "~> 0.5.0"
 gem "i18n"

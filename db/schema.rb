@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140706170329) do
+ActiveRecord::Schema.define(:version => 20140713182107) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -111,7 +111,15 @@ ActiveRecord::Schema.define(:version => 20140706170329) do
     t.boolean  "approved_stolen"
   end
 
+  add_index "bikes", ["card_id"], :name => "index_bikes_on_card_id"
   add_index "bikes", ["creation_organization_id"], :name => "index_bikes_on_organization_id"
+  add_index "bikes", ["current_stolen_record_id"], :name => "index_bikes_on_current_stolen_record_id"
+  add_index "bikes", ["cycle_type_id"], :name => "index_bikes_on_cycle_type_id"
+  add_index "bikes", ["manufacturer_id"], :name => "index_bikes_on_manufacturer_id"
+  add_index "bikes", ["paint_id"], :name => "index_bikes_on_paint_id"
+  add_index "bikes", ["primary_frame_color_id"], :name => "index_bikes_on_primary_frame_color_id"
+  add_index "bikes", ["secondary_frame_color_id"], :name => "index_bikes_on_secondary_frame_color_id"
+  add_index "bikes", ["tertiary_frame_color_id"], :name => "index_bikes_on_tertiary_frame_color_id"
 
   create_table "blogs", :force => true do |t|
     t.text     "title"
@@ -159,6 +167,9 @@ ActiveRecord::Schema.define(:version => 20140706170329) do
     t.string   "manufacturer_other"
     t.string   "serial_number"
   end
+
+  add_index "components", ["bike_id"], :name => "index_components_on_bike_id"
+  add_index "components", ["manufacturer_id"], :name => "index_components_on_manufacturer_id"
 
   create_table "countries", :force => true do |t|
     t.string   "name"
@@ -247,6 +258,8 @@ ActiveRecord::Schema.define(:version => 20140706170329) do
     t.datetime "updated_at",    :null => false
   end
 
+  add_index "integrations", ["user_id"], :name => "index_integrations_on_user_id"
+
   create_table "locations", :force => true do |t|
     t.integer  "organization_id"
     t.string   "zipcode"
@@ -324,6 +337,8 @@ ActiveRecord::Schema.define(:version => 20140706170329) do
     t.datetime "updated_at", :null => false
   end
 
+  add_index "normalized_serial_segments", ["bike_id"], :name => "index_normalized_serial_segments_on_bike_id"
+
   create_table "organization_deals", :force => true do |t|
     t.integer  "organization_id"
     t.string   "deal_name"
@@ -345,6 +360,8 @@ ActiveRecord::Schema.define(:version => 20140706170329) do
     t.datetime "updated_at",                            :null => false
     t.datetime "deleted_at"
   end
+
+  add_index "organization_invitations", ["organization_id"], :name => "index_organization_invitations_on_organization_id"
 
   create_table "organizations", :force => true do |t|
     t.string   "name"
@@ -388,6 +405,10 @@ ActiveRecord::Schema.define(:version => 20140706170329) do
     t.boolean  "example",     :default => false, :null => false
     t.boolean  "send_email",  :default => true
   end
+
+  add_index "ownerships", ["bike_id"], :name => "index_ownerships_on_bike_id"
+  add_index "ownerships", ["creator_id"], :name => "index_ownerships_on_creator_id"
+  add_index "ownerships", ["user_id"], :name => "index_ownerships_on_user_id"
 
   create_table "paints", :force => true do |t|
     t.string   "name"
@@ -434,6 +455,8 @@ ActiveRecord::Schema.define(:version => 20140706170329) do
     t.datetime "created_at",   :null => false
     t.datetime "updated_at",   :null => false
   end
+
+  add_index "states", ["country_id"], :name => "index_states_on_country_id"
 
   create_table "stolen_notifications", :force => true do |t|
     t.string   "subject"
@@ -483,6 +506,8 @@ ActiveRecord::Schema.define(:version => 20140706170329) do
     t.boolean  "recovery_share_approved",  :default => false, :null => false
     t.boolean  "recovery_share_ignore",    :default => false, :null => false
   end
+
+  add_index "stolen_records", ["bike_id"], :name => "index_stolen_records_on_bike_id"
 
   create_table "users", :force => true do |t|
     t.string   "name"
