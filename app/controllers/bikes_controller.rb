@@ -18,7 +18,6 @@ class BikesController < ApplicationController
   layout 'no_container'
 
   def index
-    @ip = env["HTTP_X_FORWARDED_FOR"]
     search = BikeSearcher.new(params)
     bikes = search.find_bikes
     if params[:serial].present?
