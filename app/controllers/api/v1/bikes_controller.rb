@@ -20,6 +20,9 @@ module Api
       end
 
       def index
+        if params[:proximity] == 'ip'
+          params[:proximity] = request.env["HTTP_X_FORWARDED_FOR"].split(',')[0]
+        end
         respond_with BikeSearcher.new(params).find_bikes.limit(20)
       end
 
