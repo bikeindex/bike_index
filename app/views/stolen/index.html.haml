@@ -39,36 +39,10 @@
 
         .involve-widget
           %h3
-            Add a recent stolen bikes widget to your site.
-          .stolen-recent-widget
-            %ul
-              - @stolen_bikes.each do |bike|
-                %li
-                  %a{ href: bike_url(bike) }
-                  - if bike.thumb_image.present?
-                    %span.stolen-thumb
-                      = bike.thumb_image
-                  %h4
-                    = bike.title
-                  / %p
-                  /   = bike.description.truncate(120)
-                  %p.less-strong
-                    - location = []
-                    - location << bike.current_stolen_record.city.titleize if bike.current_stolen_record.city.present?
-                    - location << bike.current_stolen_record.state.abbreviation if bike.current_stolen_record.state.present?
-                    - if location.any?
-                      #{location.join(', ')} &mdash;
-                    - if bike.current_stolen_record.date_stolen.today?
-                      Today
-                    - elsif Date.yesterday().beginning_of_day() <= bike.current_stolen_record.date_stolen
-                      Yesterday
-                    - else
-                      = bike.current_stolen_record.date_stolen.strftime("%-m/%-d/%Y")
-            .get-widget-code
-              Get the 
-              = link_to 'WordPress plugin', 'https://github.com/purcebr/bike-index-listings'
-              or 
-              = link_to 'HTML code', 'https://github.com/sethherr/stolen_bikes_widget_html'
+            List recent stolen bikes on your site
+          
+          
+          #bi-stolen-widget{ data: { location: 'ip' } }
             
 
 %section
@@ -95,3 +69,4 @@
         <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
         <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
         </form>
+        <script type="text/javascript">var stolenBinxList,unableToBinxList,__indexOf=[].indexOf||function(e){for(var t=0,n=this.length;n>t;t++)if(t in this&&this[t]===e)return t;return-1};stolenBinxList=function(e){var t,n,i,r,a,s,o,c,l;for(s=document.getElementById("bi-stolen-widget"),i=document.createElement("ul"),i.innerHTML="",n=c=0,l=e.length;l>c&&(t=e[n],!(n>6));n=++c)a=new Date(Date.parse(t.stolen_record.date_stolen)),a=a.toString().split(/\d{2}:/)[0],r="<li>",null!=t.thumb&&(r+="<a href='"+t.url+"' class='stolen-thumb'><img src='"+t.thumb+"'></a>"),r+="  <h4>\n    <a href='"+t.url+"'>"+t.title+"</a>\n  </h4>\n  <p>\n    Stolen from "+t.stolen_record.location+"\n    &mdash; on "+a+"\n  </p>\n</li>",i.innerHTML+=r;return s.appendChild(i),o=document.createElement("div"),o.setAttribute("class","widget-info"),o.innerHTML="Get the <a href='https://github.com/purcebr/bike-index-listings'>WordPress plugin</a> or <a href='https://github.com/sethherr/stolen_bikes_widget_html'>HTML code</a>",s.appendChild(o)},unableToBinxList=function(){var e,t;return t=document.getElementById("bi-stolen-widget"),e=document.createElement("div"),e.innerHTML="<div class='binxerror'>\n<h4>Something went wrong. We couldn't get any recent stolen bikes. Check the <a href='https://bikeindex.org'>Bike Index</a> for an updated list.</h4>\n<pre>\n          ~~O     \n        -  /,    \n       -  -|~(*)  \n      -  (*)      \n\n     ---^------   \n</pre><p>... or maybe you should just go ride your bike</p></div>",t.appendChild(e)},function(){var cache,is_cached,location,req,time,url;return location=document.getElementById("bi-stolen-widget").getAttribute("data-location"),is_cached=!1,cache=localStorage.getItem("binx_rstolen"),time=(new Date).getTime(),null!=cache&&cache.length>0&&(cache=JSON.parse(cache),null!=cache.time&&time-cache.time<216e5&&(is_cached=!0,stolenBinxList(cache.bikes,location))),is_cached?void 0:(req=new XMLHttpRequest,url="https://bikeindex.org/api/v1/bikes?stolen=true&proximity="+location+"&proximity_radius=100",req.addEventListener("readystatechange",function(){var data,successResultCodes,_ref;return 4===req.readyState?(successResultCodes=[200],_ref=req.status,__indexOf.call(successResultCodes,_ref)>=0?(data=eval("("+req.responseText+")"),stolenBinxList(data.bikes,location),cache={bikes:data.bikes,time:time},localStorage.setItem("binx_rstolen",JSON.stringify(cache))):unableToBinxList()):void 0}),req.open("GET",url,!1),req.send())}();</script>
