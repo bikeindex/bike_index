@@ -107,6 +107,8 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
   setInitialValues: ->
     if $('#stolen_date').length > 0
       $('#stolen_date input').datepicker('format: mm-dd-yyy')
+      unless $('#stolen-bike-location select').val().length > 0
+        @updateCountry()
     @setWheelDiam('front')
     @setWheelDiam('rear')
     @showColors()
@@ -248,10 +250,9 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
   setStolenCountry: (country_id) ->
     c_select = $('#country_select_container select')
     if c_select.length > 0
-      if c_select.val().length > 0
+      unless c_select.val().length > 0
         @updateCountry()
-      else
-        c_select.val(country_id).change()
+      
         
 
   updateCountry: ->
