@@ -15,7 +15,7 @@ class StolenRecordUpdator
       if @user.present?
         @user.update_attributes(phone: phone) unless @user.phone
       end
-      phone 
+      return phone 
     end
   end
 
@@ -45,17 +45,6 @@ class StolenRecordUpdator
     end
   end
 
-  def create_new_record
-    mark_records_not_current
-    stolen_record = StolenRecord.new(bike: @bike, current: true, date_stolen: Time.now)
-    stolen_record.phone = updated_phone if updated_phone.present?
-    stolen_record = update_with_params(stolen_record)
-    if stolen_record.save
-      return true
-    end
-    raise StolenRecordError, "Awww shucks! We failed to mark this bike as stolen. Try again?"
-  end
-
   def set_creation_organization
     @bike.reload.current_stolen_record.update_attributes(creation_organization_id: @bike.creation_organization_id)
   end
@@ -80,6 +69,19 @@ class StolenRecordUpdator
     	stolen_record.phone_for_police = false
     end
     stolen_record
+  end
+
+  def create_new_record
+    mark_records_not_current
+    new_stolen_record = StolenRecord.new(bike: @bike, current: true, date_stolen: Time.now)
+    if updated_phone.present?
+      new_stolen_record.phone = updated_phone
+    end
+    stolen_record = update_with_params(new_stolen_record)
+    if stolen_record.save
+      return true
+    end
+    raise StolenRecordError, "Awww shucks! We failed to mark this bike as stolen. Try again?"
   end
 
 end
