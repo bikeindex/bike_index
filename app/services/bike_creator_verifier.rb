@@ -38,7 +38,7 @@ class BikeCreatorVerifier
   def stolenize
     @bike.stolen = true 
     @bike.payment_required = false 
-    add_phone
+    add_phone unless @bike.phone.present?
   end
 
   def recoverize

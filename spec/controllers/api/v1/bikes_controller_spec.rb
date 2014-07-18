@@ -155,6 +155,7 @@ describe Api::V1::BikesController do
 
     it "should create a stolen record" do
       manufacturer = FactoryGirl.create(:manufacturer)
+      @organization.users.first.update_attribute :phone, '123-456-6969'
       FactoryGirl.create(:cycle_type, slug: "bike")
       FactoryGirl.create(:country, iso: "US")
       FactoryGirl.create(:state, abbreviation: "Palace")
@@ -184,7 +185,6 @@ describe Api::V1::BikesController do
       b = Bike.unscoped.where(serial_number: "69 stolen bike").first
       b.current_stolen_record.address.should be_present
       b.current_stolen_record.phone.should eq("9999999")
-      pp b.current_stolen_record
       b.current_stolen_record.date_stolen.should eq(DateTime.strptime("03-01-2013 06", "%m-%d-%Y %H"))
     end
 
