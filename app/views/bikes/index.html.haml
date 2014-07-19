@@ -8,24 +8,36 @@
   %span#stolenness_query{data: {stolen: @stolenness[:stolen]} }
 
 - if @bikes.present?
+  .paginate-container
+    / .bike-pagination-counted
+    /   = @count
+    /   bikes found
+    /   - if @count > 100
+    /     Returned the first 100
+    = will_paginate @bikes 
 
   %ul.bike-boxes
     = render partial: "/bikes/bike", collection: @bikes, locals: {target: "show" }
 
 
-  .paginate-container
+  .paginate-container-bottom
     = will_paginate @bikes 
 
 - else
   %section.bottom-of-page
     %h1
-      Nothing matched your search
+      We're sorry,
+      - if @secondary_bikes.present?
+        no exact matches for that serial
+      - else
+        nothing matched your search
 
 - if @secondary_bikes.present?
-  %h2.secondary-bikes
-    Serial numbers close to 
-    %em
-      #{params[:serial]}
+  - unless @page.present? && @page > 1
+    %h2.secondary-bikes
+      Serial numbers close to 
+      %em
+        #{params[:serial]}
 
-  %ul.bike-boxes
-    = render partial: "/bikes/bike", collection: @secondary_bikes, locals: {target: "show" }
+    %ul.bike-boxes
+      = render partial: "/bikes/bike", collection: @secondary_bikes, locals: {target: "show" }

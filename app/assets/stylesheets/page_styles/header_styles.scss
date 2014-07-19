@@ -290,14 +290,16 @@
   .select2-result-label {
     padding: .35em 7px;
   }
-  .select2-highlighted { background: $btnAction; }
-
-  .sch_m, .sch_ {
-    color: #ccc;
+  .select2-highlighted {
+    background: $btnAction;
+    .sch_s { color: #ccc; }
   }
   .sch_s {
-    color: #bbb;
-    float: right;
+    color: $btnAction;
+    display: inline-block;
+  }
+  .sch_m, .sch_ {
+    color: #ccc;
   }
   .sch_c {
     color: #bbb;

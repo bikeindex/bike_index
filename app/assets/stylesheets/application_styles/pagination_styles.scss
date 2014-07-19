@@ -5,39 +5,41 @@
   margin-bottom: 30px;
 }
 
+.paginate-container-bottom {
+  @extend .paginate-container;
+  margin: 30px 0;
+}
+
 .pagination {
   @include clearfix;
   float: right;
-  // background: white;
   cursor: default;
-  margin: 13px 0 0 0;
+  margin: 0;
   // height: 22px;
   a, span, em {
-    padding: 0.1em 0.5em;
-    line-height: 38px;
+    background: $blue-light;
+    padding: 0.5em 1em;
+    line-height: 1.2em;
     display: block;
     float: left;
-    margin-right: 1px;
+    margin-left: .5em;
+    font-weight: bold;
+    color: #fff;
+    border: none;
   }
+  .previous_page, .next_page { font-weight: normal; }
   .disabled {
     display: none;
-    color: #999999;
-    border: 1px solid #dddddd;
   }
   .current {
     font-style: normal;
     font-weight: bold;
-    background: $linkColor;
-    color: white;
-    border: 1px solid darken($linkColor, 5%);
+    background: $blue;
   }
   a {
-    text-decoration: none;
-    color: $linkColor;
-    border: 1px solid $linkColor;
     &:hover, &:focus {
       color: #000033;
-      // border-color: #000033;
+      background: $blue-lighter;
     }
   }
   .page_info {
@@ -53,4 +55,7 @@
       padding: 0.1em 0.25em;
     }
   }
+}
+.bike-pagination-counted {
+  float: left;
 }

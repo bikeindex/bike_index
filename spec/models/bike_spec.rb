@@ -326,7 +326,7 @@ describe Bike do
     end
   end
 
-  describe :set_listing_order do 
+  describe :get_listing_order do 
     it "should be 1/1000 of the current timestamp" do 
       bike = Bike.new
       time = Time.now
