@@ -32,6 +32,7 @@ class StolenRecord < ActiveRecord::Base
     :recovery_share_ignore
     
   belongs_to :bike
+  has_one :current_bike, class_name: 'Bike', foreign_key: :current_stolen_record_id
   belongs_to :country
   belongs_to :state
   belongs_to :creation_organization, class_name: "Organization"

@@ -73,7 +73,7 @@ module Api
       def send_notification_email
         unless @organization.slug == 'example'
           bike = Bike.find(params[:bike_id])
-          if bike.current_stolen_record.present?
+          if bike.find_current_stolen_record.present?
             customer_contact = CustomerContact.new(body: params[:body], title: params[:title], bike_id: bike.id, contact_type: 'stolen_contact')
             customer_contact.user_email = bike.owner_email
             customer_contact.creator_id = @organization.auto_user.id

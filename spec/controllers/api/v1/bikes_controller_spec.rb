@@ -118,12 +118,13 @@ describe Api::V1::BikesController do
       b.creation_organization_id.should eq(@organization.id)
       b.year.should eq(1969)
       b.components.count.should eq(3)
-      b.components.first.serial_number.should eq('69')
-      b.components.first.description.should eq("yeah yay!")
-      b.components.first.ctype.slug.should eq("headset")
-      b.components.first.year.should eq(1999)
-      b.components.first.manufacturer_id.should eq(manufacturer.id)
-      b.components.first.model_name.should eq('Richie rich')
+      component = b.components[2]
+      component.serial_number.should eq('69')
+      component.description.should eq("yeah yay!")
+      component.ctype.slug.should eq("headset")
+      component.year.should eq(1999)
+      component.manufacturer_id.should eq(manufacturer.id)
+      component.model_name.should eq('Richie rich')
       b.public_images.count.should eq(2)
       f_count.should eq(Feedback.count)
     end
@@ -159,6 +160,7 @@ describe Api::V1::BikesController do
       FactoryGirl.create(:cycle_type, slug: "bike")
       FactoryGirl.create(:country, iso: "US")
       FactoryGirl.create(:state, abbreviation: "Palace")
+      # ListingOrderWorker.any_instance.should_receive(:perform).and_return(true)
       bike = { serial_number: "69 stolen bike",
         manufacturer_id: manufacturer.id,
         rear_tire_narrow: "true",
@@ -183,9 +185,10 @@ describe Api::V1::BikesController do
       }.should change(Ownership, :count).by(1)
       response.code.should eq("200")
       b = Bike.unscoped.where(serial_number: "69 stolen bike").first
-      b.current_stolen_record.address.should be_present
-      b.current_stolen_record.phone.should eq("9999999")
-      b.current_stolen_record.date_stolen.should eq(DateTime.strptime("03-01-2013 06", "%m-%d-%Y %H"))
+      csr = b.find_current_stolen_record
+      csr.address.should be_present
+      csr.phone.should eq("9999999")
+      csr.date_stolen.should eq(DateTime.strptime("03-01-2013 06", "%m-%d-%Y %H"))
     end
 
     it "should create an example bike if the bike is from example, and include all the options" do

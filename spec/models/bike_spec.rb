@@ -18,6 +18,7 @@ describe Bike do
     it { should belong_to :cycle_type }
     it { should belong_to :creator }
     it { should belong_to :creation_organization }
+    it { should belong_to :current_stolen_record }
     it { should belong_to :location }
     it { should have_many :b_params }
     it { should have_many :stolen_notifications }
@@ -91,7 +92,7 @@ describe Bike do
     end
   end
 
-  describe :current_stolen_record do 
+  describe :find_current_stolen_record do 
     it "should return the last current stolen record if bike is stolen" do 
       @bike = Bike.new 
       first_stolen_record = StolenRecord.new
@@ -100,13 +101,13 @@ describe Bike do
       second_stolen_record.stub(:current).and_return(true)
       @bike.stub(:stolen).and_return(true)
       @bike.stub(:stolen_records).and_return([first_stolen_record, second_stolen_record])
-      @bike.current_stolen_record.should eq(second_stolen_record)
+      @bike.find_current_stolen_record.should eq(second_stolen_record)
     end
 
     it "should be false if the bike isn't stolen" do 
       @bike = Bike.new 
       @bike.stub(:stolen).and_return(false)
-      @bike.current_stolen_record.should be_false
+      @bike.find_current_stolen_record.should be_false
     end
   end
 
@@ -266,11 +267,28 @@ describe Bike do
     end
   end
 
+  describe :cache_stolen_attributes do 
+    it "should save the stolen description to all description and set stolen_rec_id" do 
+      stolen_record = FactoryGirl.create(:stolen_record, theft_description: 'some theft description' )
+      bike = stolen_record.bike
+      bike.description = 'I love my bike'
+      bike.cache_stolen_attributes
+      bike.all_description.should eq('I love my bike some theft description')
+    end
+    it "should grab the desc and erase current_stolen_id" do 
+      bike = Bike.new(current_stolen_record_id: 69, description: 'lalalala')
+      bike.cache_stolen_attributes
+      bike.current_stolen_record_id.should_not be_present
+      bike.all_description.should eq('lalalala')
+    end
+  end
+
 
   describe :cache_bike do 
     it "should call cache photo and cache component and erase stolen_rec_id" do 
       bike = FactoryGirl.create(:bike, current_stolen_record_id: 69)
       bike.should_receive(:cache_photo)
+      bike.should_receive(:cache_stolen_attributes)
       bike.should_receive(:cache_attributes)
       bike.should_receive(:components_cache_string)
       bike.cache_bike
@@ -286,6 +304,7 @@ describe Bike do
       b.update_attributes( year: 1999, frame_material_id: material.id,
         secondary_frame_color_id: b.primary_frame_color_id,
         tertiary_frame_color_id: b.primary_frame_color_id,
+        stolen: true,
         frame_size: "SO MANY", frame_size_unit: "ballsacks",
         frame_model: "Some model", handlebar_type_id: handlebar.id)
       b.cache_bike

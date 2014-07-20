@@ -34,9 +34,9 @@ class StolenRecordUpdator
 
   def update_records
     if @bike.stolen
-      create_new_record unless @bike.current_stolen_record.present?
+      create_new_record unless @bike.find_current_stolen_record.present?
       if @date_stolen
-        stolen_record = @bike.reload.current_stolen_record
+        stolen_record = @bike.reload.find_current_stolen_record
         stolen_record.update_attributes(date_stolen: create_date_from_string(@date_stolen))
       end
     else
@@ -46,7 +46,8 @@ class StolenRecordUpdator
   end
 
   def set_creation_organization
-    @bike.reload.current_stolen_record.update_attributes(creation_organization_id: @bike.creation_organization_id)
+    csr = @bike.reload.find_current_stolen_record
+    csr.update_attributes(creation_organization_id: @bike.creation_organization_id)
   end
 
 

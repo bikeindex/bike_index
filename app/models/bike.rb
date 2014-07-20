@@ -91,6 +91,7 @@ class Bike < ActiveRecord::Base
   belongs_to :invoice
   belongs_to :creation_organization, class_name: "Organization"
   belongs_to :location
+  belongs_to :current_stolen_record, class_name: "StolenRecord"
 
   has_many :stolen_notifications, dependent: :destroy
   has_many :stolen_records, dependent: :destroy
@@ -128,7 +129,7 @@ class Bike < ActiveRecord::Base
   pg_search_scope :search, against: {
     serial_number: 'A',
     cached_data:   'B',
-    description:   'C'
+    all_description:   'C'
   },
   using: {tsearch: {dictionary: "english", prefix: true}}
 
@@ -177,7 +178,7 @@ class Bike < ActiveRecord::Base
     current_ownership.owner
   end
 
-  def current_stolen_record
+  def find_current_stolen_record
     self.stolen_records.last if self.stolen_records.any?
   end
 
@@ -286,13 +287,21 @@ class Bike < ActiveRecord::Base
     self.cached_attributes = ca 
   end
 
-  before_save :cache_bike
-  def cache_bike
-    if current_stolen_record.present?
-      self.current_stolen_record_id = current_stolen_record.id 
+  def cache_stolen_attributes
+    d = description
+    csr = find_current_stolen_record
+    if csr.present?
+      self.current_stolen_record_id = csr.id 
+      d = "#{d} #{csr.theft_description}"
     else
       self.current_stolen_record_id = nil
     end
+    self.all_description = d
+  end
+
+  before_save :cache_bike
+  def cache_bike
+    cache_stolen_attributes
     cache_photo
     cache_attributes
     c = ""

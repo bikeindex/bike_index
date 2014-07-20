@@ -12,6 +12,7 @@ describe AdminStolenEmailJob do
 
     it "should not send an email if the stolen bike has receive_notifications false" do
       stolen_record = FactoryGirl.create(:stolen_record, receive_notifications: false)
+      stolen_record.bike.update_attribute :stolen, true
       customer_contact = FactoryGirl.create(:customer_contact, bike: stolen_record.bike)
       ActionMailer::Base.deliveries = []
       AdminStolenEmailJob.perform(customer_contact.id)

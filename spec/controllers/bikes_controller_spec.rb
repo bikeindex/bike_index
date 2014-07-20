@@ -227,6 +227,7 @@ describe BikesController do
         manufacturer = FactoryGirl.create(:manufacturer)
         b_param = BParam.create(creator_id: organization.auto_user.id, params: {creation_organization_id: organization.id, embeded: true})
         test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, 'spec', 'factories', 'bike.jpg')))
+        ImageAssociatorWorker.any_instance.should_receive(:perform).and_return(true)
         bike = { serial_number: "69",
           b_param_id: b_param.id,
           creation_organization_id: organization.id,
@@ -240,7 +241,6 @@ describe BikesController do
           image: test_photo
         }
         post :create, { bike: bike}
-        expect(ImageAssociatorWorker).to have_enqueued_job
       end
     end
 

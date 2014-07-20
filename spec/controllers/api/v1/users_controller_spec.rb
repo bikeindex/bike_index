@@ -63,6 +63,7 @@ describe Api::V1::UsersController do
       user = o.creator
       bike = o.bike
       stolen_record = FactoryGirl.create(:stolen_record, bike: bike)
+      bike.update_attribute :stolen, true
       recovery_request = { 
         request_type: 'bike_recovery',
         user_id: user.id,

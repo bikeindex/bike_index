@@ -118,6 +118,7 @@ describe BikeCreator do
       bike.stub(:id).and_return(69)
       creator.should_receive(:create_associations).and_return(bike)
       creator.should_receive(:validate_record).and_return(bike)
+      ListingOrderWorker.any_instance.should_receive(:perform).and_return(true)
       new_bike = Bike.new(
         creation_organization_id: organization.id,
         propulsion_type_id: propulsion_type.id,
@@ -164,6 +165,7 @@ describe BikeCreator do
       creator = BikeCreator.new(b_param)
       creator.should_receive(:add_bike_book_data).at_least(1).times.and_return(nil)
       creator.should_receive(:build_bike).at_least(1).times.and_return(bike)
+      ListingOrderWorker.any_instance.should_receive(:perform).and_return(true)
       bike.should_receive(:save).and_return(true)
       creator.create_bike
     end
@@ -197,6 +199,7 @@ describe BikeCreator do
       creator.should_receive(:add_bike_book_data).at_least(1).times.and_return(nil)
       creator.should_receive(:build_bike).at_least(1).times.and_return(bike)
       bike.should_receive(:save).and_return(true)
+      ListingOrderWorker.any_instance.should_receive(:perform).and_return(true)
       creator.create_paid_bike
       bike.verified.should be_true
       bike.paid_for.should be_true

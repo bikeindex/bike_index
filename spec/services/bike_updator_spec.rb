@@ -31,8 +31,10 @@ describe BikeUpdator do
   describe :update_stolen_record do 
     it "should call update_stolen_record with the date_stolen_input if it exists" do 
       bike = FactoryGirl.create(:bike, stolen: true)
-      BikeUpdator.new(b_params: {id: bike.id, bike: {date_stolen_input: "07-09-2000"}}).update_stolen_record
-      bike.current_stolen_record.date_stolen.should eq(DateTime.strptime("07-09-2000 06", "%m-%d-%Y %H"))
+      updator = BikeUpdator.new(b_params: {id: bike.id, bike: {date_stolen_input: "07-09-2000"}})
+      updator.update_stolen_record
+      csr = bike.find_current_stolen_record
+      csr.date_stolen.should eq(DateTime.strptime("07-09-2000 06", "%m-%d-%Y %H"))
     end
     it "should create a stolen record if one doesn't exist" do 
       bike = FactoryGirl.create(:bike)
@@ -117,8 +119,7 @@ describe BikeUpdator do
     bike_params = {stolen: false}
     update_bike = BikeUpdator.new(user: user, b_params: {id: bike.id, bike: bike_params})
     update_bike.should_receive(:update_ownership).and_return(true)
-    expect {
-      update_bike.update_available_attributes
-    }.to change(ListingOrderWorker.jobs, :size).by(1)
+    ListingOrderWorker.any_instance.should_receive(:perform).and_return(true)    
+    update_bike.update_available_attributes
   end
 end
