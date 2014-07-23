@@ -82,20 +82,24 @@
             %a{ href: "#edit_additionals" }
               Additional information
               %i.icon-chevron-right
-          - if @bike.verified?
-            %li
-              %a{ href: "#edit_ownership" }
+          
+          %li
+            %a{ href: "#edit_ownership" }
+              - if @bike.stolen
+                Mark bike found!
+              - else
                 Change owner or delete
-                %i.icon-chevron-right
+              %i.icon-chevron-right
           %li.save
             = submit_tag "Save changes", class: "button-green submit-bike-update"
 
-      - if @bike.stolen and @bike.current_stolen_record
+      - if @bike.stolen and @bike.find_current_stolen_record.present?
         = f.fields_for :stolen_records do |builder|
-          - if builder.object == @bike.current_stolen_record
+          - if builder.object.current
             = render partial: 'bikes/bike_fields/stolen_record', locals: { f: builder, bike: f }
           - else
-            / For some weird reason, if you don't have an else here it prints out all of the form elements.
+            / Don't put anything
+          
 
       = render partial: 'bikes/bike_fields/frame', locals: { f: f }
       = render partial: 'bikes/bike_fields/wheels', locals: { f: f }
@@ -103,75 +107,66 @@
       = render partial: 'bikes/bike_fields/drivetrain_and_brakes', locals: { f: f }
       = render partial: 'bikes/bike_fields/additional_parts', locals: { f: f }
 
-
-      - if @bike.verified?
-        .edit-bike-fields#edit_ownership
-          %header
-            %h2
-              Change #{@bike.type.titleize} ownership
-          - if @bike.current_owner_exists
-            .input-group
-
-              %a.collapsed{ href: "#change_ownership", data: { toggle: "collapse" } }
-                - if @bike.stolen?
-                  Mark your #{@bike.type} not stolen
-                - else
-                  Change ownership or mark #{@bike.type} stolen
-            #change_ownership.collapse
-              - unless @bike.stolen?
-                - unless @creator 
-                  .input-group
-                    This #{@bike.type} is no longer mine, I am selling or giving it to someone:
-                    .control-group.padded
-                      %label.control-label{ for: 'bike_owner_email' }
-                        New owner's email
-                      .controls
-                        = f.text_field :owner_email
-                    .edit-bike-actions
-                      = submit_tag "Send #{@bike.type}", class: "button-yellow", confirm: "Are you sure? Once the new owner has claimed this #{@bike.type}, you will no longer be able to edit it."
-              .input-group
-                #bike-stolen-check.hidden
-                  = f.check_box :stolen
-                - if @bike.stolen
-                  .control-group
-                    .edit-bike-actions
-                    %a.button-yellow{role: "button", title: "Bike has been recovered", :data => {toggle: "modal", target: "#markBikeRecovered"} }
-                      I found my #{@bike.type}! It's no longer stolen
-
-                    / submit_tag "I found my #{@bike.type}! It's no longer stolen", class: "button-yellow submit-bike-update", id: "mark-unstolen"
-                - else
-                  %p
-                    Oh no! This #{@bike.type} was stolen.
-                  
-                  .control-group
-                    .edit-bike-actions
-                      = submit_tag "Mark #{@bike.type} stolen", class: "button-red", id: "mark-stolen", confirm: "Are you sure you want to mark this #{@bike.type} stolen?", class: "button-red"
-          - else
-            .input-group
-              .control-group.form-foot
-                %h4
-                  %strong
-                    You sent this #{@bike.type} to a new owner.
-                  They have yet to claim it.
-                %p
-                  Accidentally entered the wrong email address? You can correct it here.
-                %label.control-label{ for: 'bike_owner_email' }
-                  Owner's email
-                .controls
-                  = f.text_field :owner_email
-                .controls.actions.padded
-                  = submit_tag "Change #{@bike.type} owner", class: "button-yellow"
-          
+      .edit-bike-fields#edit_ownership
+        %header
+          %h2
+            - if @bike.stolen
+              Mark #{@bike.type} recovered
+            - else
+              Mark stolen or send #{@bike.type} to a new owner
+        #bike-stolen-check.hidden
+          = f.check_box :stolen
+        
+        - if @bike.current_owner_exists && @bike.stolen
           .input-group
+            .control-group
+              .edit-bike-actions
+                %a.button-yellow{role: "button", title: "Bike has been recovered", :data => {toggle: "modal", target: "#markBikeRecovered"} }
+                  I found my #{@bike.type}! It's no longer stolen
+        - elsif @bike.current_owner_exists
+          .input-group
+            This #{@bike.type} is no longer mine, I am selling or giving it to someone:
+            .control-group.padded
+              %label.control-label{ for: 'bike_owner_email' }
+                New owner's email
+              .controls
+                = f.text_field :owner_email
+            .edit-bike-actions
+              = submit_tag "Send #{@bike.type}", class: "button-yellow", confirm: "Are you sure? Once the new owner has claimed this #{@bike.type}, you will no longer be able to edit it."
 
-            %a.collapsed{ href: "#delete_bike", :data => { toggle: "collapse" } }
-              Delete this bike
-          #delete_bike.collapse
-            .input-group
-              I would like to delete this bike
-              .control-group.padded
-                %a.button-red{role: "button", title: "request bike deletion", :data => {toggle: "modal", target: "#requestBikeDelete"} }
-                  Delete bike
+          .input-group
+            %p
+              Oh no! This #{@bike.type} was stolen.
+              .control-group
+                .edit-bike-actions
+                  = submit_tag "Mark #{@bike.type} stolen", class: "button-red", id: "mark-stolen", confirm: "Are you sure you want to mark this #{@bike.type} stolen?", class: "button-red"
+          
+        - else
+          .input-group
+            .control-group.form-foot
+              %h4
+                %strong
+                  You sent this #{@bike.type} to a new owner.
+                They have yet to claim it.
+              %p
+                Accidentally entered the wrong email address? You can correct it here.
+              %label.control-label{ for: 'bike_owner_email' }
+                Owner's email
+              .controls
+                = f.text_field :owner_email
+              .controls.actions.padded
+                = submit_tag "Change #{@bike.type} owner", class: "button-yellow"
+        
+        .input-group
+
+          %a.collapsed{ href: "#delete_bike", :data => { toggle: "collapse" } }
+            Delete this bike
+        #delete_bike.collapse
+          .input-group
+            I would like to delete this bike
+            .control-group.padded
+              %a.button-red{role: "button", title: "request bike deletion", :data => {toggle: "modal", target: "#requestBikeDelete"} }
+                Delete bike
 
       .edit-bike-fields
         %header

@@ -47,7 +47,7 @@ describe SerialNormalizer do
       SerialNormalizer.new({serial: "another + : THING"}).save_segments(bike.id)
       segments = NormalizedSerialSegment.where(bike_id: bike.id)
       segments.count.should eq(2)
-      segments[0].segment.should eq('AN0THER')
+      segments[1].segment.should eq('AN0THER')
     end
 
     it "shouldn't make any if the bike is an example bike" do 

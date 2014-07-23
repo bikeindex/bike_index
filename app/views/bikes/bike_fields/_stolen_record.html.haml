@@ -46,7 +46,7 @@
       = bike.label :date_stolen_input, "When was it #{stolen_type}?", class: "control-label"
       .controls
         #stolen_date
-          = bike.text_field :date_stolen_input, value: @bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), required: true, data: { :'date-format' => "mm-dd-yyyy" }
+          = bike.text_field :date_stolen_input, value: @bike.find_current_stolen_record.date_stolen.strftime("%m-%d-%Y"), required: true, data: { :'date-format' => "mm-dd-yyyy" }
     / .span6.input-tip
     /   .tip-title
     /     %h2 When was this bike stolen
@@ -104,11 +104,11 @@
           %em.stolen-color
             extremely important
           for stolen bike recovery.
-        = f.label :police_report_number, "Police report number", class: "control-label"
+        = f.label :police_report_number, "Police report #", class: "control-label"
         .controls.police-report-check
           = f.text_field :police_report_number
         = f.label :police_report_department, "Department & city", class: "control-label"
-        .controls.police-report-check
+        .controls.police-report-check.extra-field
           = f.text_field :police_report_department
 
   .input-group

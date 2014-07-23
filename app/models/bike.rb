@@ -319,7 +319,6 @@ class Bike < ActiveRecord::Base
     c += "#{additional_registration} "
     c += "#{type} " unless self.type == "bike"
     c += components_cache_string if components_cache_string
-
     self.cached_data = c
   end
 
