@@ -3,10 +3,10 @@
 
 - if @bikes.present?
   .paginate-container
-    = will_paginate @bikes 
+    = will_paginate @bikes, next_label: "Next", previous_label: "Previous"
   = render partial: "/bikes/bike_org_table", locals: {target: ""}
   .paginate-container
-    = will_paginate @bikes 
+    = will_paginate @bikes, next_label: "Next", previous_label: "Previous"
 
 .tutorials
   %h3
@@ -51,13 +51,13 @@
         - else
           %span
             No user set!
-          Contact us at 
+          Contact us at
           = link_to "support@bikeindex.org", "mailto:support@bikeindex.org"
           to get set up for API access.
   - else
     %h4
       You aren't set up for API access
-    Contact us at 
+    Contact us at
     = link_to "bryan@bikeindex.org", "mailto:bryan@bikeindex.org"
     to get set up for API access
 
