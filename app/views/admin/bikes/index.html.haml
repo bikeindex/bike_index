@@ -7,7 +7,7 @@
     = link_to "Bikes with unknown manufacturers", missing_manufacturer_admin_bikes_url
 .special-search-field-container
   .special-search-field
-    = form_tag admin_bikes_path, method: :get do 
+    = form_tag admin_bikes_path, method: :get do
       = text_field_tag :email, params[:email], placeholder: "Search bikes by email"
       = submit_tag "Search", name: "search", class: "button-blue"
 
@@ -19,19 +19,19 @@
     = Bike.all.count
     indexed,
     %em
-      (#{Bike.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today) 
-    = Ownership.where(current: true).where(claimed: true).count 
+      (#{Bike.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
+    = Ownership.where(current: true).where(claimed: true).count
     claimed
-    
+
 
 - if @bikes.present?
   .paginate-container
-    = will_paginate @bikes 
+    = will_paginate @bikes, next_label: "Next", previous_label: "Previous"
   %section.full-screen-table
     %table.table.table-striped.table-bordered
       = render partial: "/admin/bikes/admin_bikes_table"
   .paginate-container
-    = will_paginate @bikes 
+    = will_paginate @bikes, next_label: "Next", previous_label: "Previous"
 - else
   %h1.padded
     No bikes found!

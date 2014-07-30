@@ -7,7 +7,7 @@
 /     = link_to 'Only unverified bikes', admin_stolen_bikes_url(unapproved: true), class: "sharing-links"
 / %h4
 /   = link_to "View stolen notifications sent", admin_stolen_notifications_url
-  
+
 %h4
   = StolenRecord.recovered.count
   Recoveries indexed,
@@ -18,7 +18,7 @@
   are waiting to be shared
 
 .paginate-container
-  = will_paginate @recoveries
+  = will_paginate @recoveries, next_label: "Next", previous_label: "Previous"
 %section.full-screen-table
   %table.table.table-striped.table-bordered
     %thead
@@ -33,14 +33,14 @@
       %th
         Waiting for share approval
 
-      
+
     %tbody
       - @recoveries.each do |recovery|
         %tr
           %td
             .less-strong-hold
               %span.less-strong-right.medium-screens
-                = recovery.bike_id 
+                = recovery.bike_id
               %a{href: "/admin/bikes/#{recovery.bike_id}" }
                 - if recovery.date_recovered.present?
                   Recovered on
@@ -48,7 +48,7 @@
                 - else
                   Stolen on
                   = recovery.created_at.strftime("%-m.%-d.%Y")
-                  
+
           %td
             - if recovery.recovered_description.present?
               = recovery.recovered_description
@@ -65,4 +65,4 @@
               = "&#x2713;".html_safe unless recovery.recovery_share_approved
 
   .paginate-container
-    = will_paginate @bikes 
+    = will_paginate @recoveries, next_label: "Next", previous_label: "Previous"

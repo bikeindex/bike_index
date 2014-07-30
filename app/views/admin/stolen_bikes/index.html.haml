@@ -7,7 +7,7 @@
     = link_to 'Only unverified bikes', admin_stolen_bikes_url(unapproved: true), class: "sharing-links"
 %h4
   = link_to "View stolen notifications sent", admin_stolen_notifications_url
-  
+
 %h4
   = Bike.where(stolen: true).count
   Stolen Bikes indexed,
@@ -18,7 +18,7 @@
   are unapproved
 
 .paginate-container
-  = will_paginate @bikes 
+  = will_paginate @bikes, next_label: "Next", previous_label: "Previous"
 %section.full-screen-table
   %table.table.table-striped.table-bordered
     %thead
@@ -33,7 +33,7 @@
       %th
         Approved
 
-      
+
     %tbody
       - @bikes.each do |bike|
         %tr
@@ -42,14 +42,14 @@
               %span.less-strong-right.medium-screens
                 - if bike.example
                   %span.table-error
-                    = bike.id 
+                    = bike.id
                 - else
-                  = bike.id 
+                  = bike.id
               %a{href: edit_admin_stolen_bike_url(bike) }
 
                 - if bike.created_at.today?
                   Today at #{bike.created_at.strftime("%-I %p")}
-                - elsif Date.yesterday().beginning_of_day() <= bike.created_at          
+                - elsif Date.yesterday().beginning_of_day() <= bike.created_at
                   Yesterday at #{bike.created_at.strftime("%-I %p")}
                 - else
                   = bike.created_at.strftime("%-m.%-d.%Y")
@@ -65,4 +65,4 @@
             = "&#x2713;".html_safe if bike.current_stolen_record.approved
 
   .paginate-container
-    = will_paginate @bikes 
+    = will_paginate @bikes, next_label: "Next", previous_label: "Previous"

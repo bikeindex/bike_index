@@ -4,7 +4,7 @@
   %span#attribute_values_searched
     = @attribute_select_values
   %span#proximity_searched{data: { proximity: @proximity }}
-    
+
   %span#stolenness_query{data: {stolen: @stolenness[:stolen]} }
 
 - if @bikes.present?
@@ -14,14 +14,14 @@
     /   bikes found
     /   - if @count > 100
     /     Returned the first 100
-    = will_paginate @bikes 
+    = will_paginate @bikes, next_label: "Next", previous_label: "Previous"
 
   %ul.bike-boxes
     = render partial: "/bikes/bike", collection: @bikes, locals: {target: "show" }
 
 
   .paginate-container-bottom
-    = will_paginate @bikes 
+    = will_paginate @bikes, next_label: "Next", previous_label: "Previous"
 
 - else
   %section.bottom-of-page
@@ -35,7 +35,7 @@
 - if @secondary_bikes.present?
   - unless @page.present? && @page > 1
     %h2.secondary-bikes
-      Serial numbers close to 
+      Serial numbers close to
       %em
         #{params[:serial]}
 

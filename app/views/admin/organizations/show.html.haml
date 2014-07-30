@@ -15,24 +15,24 @@
         - else
           %strong
             Not shown
-      
+
       = @organization.dl_from_attribute("org_type", "Type")
       = @organization.dl_from_attribute("slug")
       = @organization.dl_from_attribute("access_token")
       %dt Auto user email
       %dd
         = @organization.auto_user.email if @organization.auto_user.present?
-          
 
 
-      
-      
+
+
+
     %dl.dl-horizontal
       = @organization.dl_list_item(@organization.users.count, "Users")
       = @organization.dl_list_item(@organization.sent_invitation_count, "Sent invites")
       = @organization.dl_list_item(link_to(@organization.available_invitation_count, admin_organization_invitation_url(@organization.id)), link_to("Remaining invites", admin_organization_invitation_url(@organization.id)))
       = @organization.dl_from_attribute("website")
-   
+
 
     - if @organization.is_suspended
       %h2.red-text
@@ -46,12 +46,12 @@
 
 - if @bikes.present?
   .paginate-container
-    = will_paginate @bikes 
+    = will_paginate @bikes, next_label: "Next", previous_label: "Previous"
   %section.full-screen-table
     %table.table.table-striped.table-bordered
       = render partial: "/admin/bikes/admin_bikes_table"
   .paginate-container
-    = will_paginate @bikes 
+    = will_paginate @bikes, next_label: "Next", previous_label: "Previous"
 
 
 %section.full-screen-table
