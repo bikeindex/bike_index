@@ -1,4 +1,3 @@
-
 %header.with-subtitle
   %h1
     Manage Paints
@@ -7,19 +6,19 @@
   = @paints.count
   indexed,
   %em
-    (#{Paint.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today) 
-  = @paints.where('color_id IS NULL').count 
+    (#{Paint.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
+  = @paints.where('color_id IS NULL').count
   are unlinked
-    
+
 .special-search-field-container
   .special-search-field
-    = form_tag admin_paints_path, method: :get do 
+    = form_tag admin_paints_path, method: :get do
       = text_field_tag :name, params[:name], placeholder: "Search paints by name"
       = submit_tag "Search", name: "search", class: "button-blue"
 
 - if @paints.present?
   .paginate-container
-    = will_paginate @paints 
+    = will_paginate @paints, next_label: "Next", previous_label: "Previous"
   %section.full-screen-table
     %table.table.table-striped.table-bordered
       %thead
@@ -42,7 +41,7 @@
 
                 - if paint.created_at.today?
                   Today at #{paint.created_at.strftime("%-I %p")}
-                - elsif Date.yesterday().beginning_of_day() <= paint.created_at          
+                - elsif Date.yesterday().beginning_of_day() <= paint.created_at
                   Yesterday at #{paint.created_at.strftime("%-I %p")}
                 - else
                   = paint.created_at.strftime("%-m.%-d.%Y at %-H")
@@ -61,8 +60,8 @@
               - if paint.tertiary_color_id.present?
                 = "- #{paint.tertiary_color.name}"
   .paginate-container
-    = will_paginate @paints
-            
+    = will_paginate @paints, next_label: "Next", previous_label: "Previous"
+
 
 - else
   %h1.padded
