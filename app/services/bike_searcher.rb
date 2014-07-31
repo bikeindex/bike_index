@@ -2,7 +2,7 @@ class BikeSearcher
   def initialize(creation_params = {},approved=nil)
     @approved = approved
     @params = creation_params
-    @bikes = Bike.scoped
+    @bikes = Bike.scoped.includes(:current_stolen_record)
     if @params[:search_type].present?
       if @params[:search_type] == 'serial'
         @params[:serial] = @params[:query_typed]
