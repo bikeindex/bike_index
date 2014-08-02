@@ -97,7 +97,10 @@
             %ul#serials_submitted.multiserials-list
             .multiserial-fuzzy-box
               %a#multiserial_fuzzy.button-green{ href: '#', data: { target: close_serials_api_v1_bikes_url }}
-                Find bikes with serials close to searched serials
+                %span
+                  Find nearly matching serials (in case of a mis-entry)
+                %span.ms-short-fuzzy
+                  Find near matches
             
             #bikes_returned.padded
       

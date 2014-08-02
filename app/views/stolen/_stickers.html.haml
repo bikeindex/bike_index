@@ -17,7 +17,7 @@
       Death To Bike Thieves
     %p
       By and far the single most popular sticker I've ever created, the "death to bike thieves" sticker is short, sweet, and to the point. 
-    = image_tag '/assets/stolen/death_sticker.jpg', alt: "death to bike thieves"
+    = image_tag '/assets/stolen/death_sticker.jpg', alt: "death to bike thieves", class: 'sticker-image'
     :plain
       <form target="paypal" action="https://www.paypal.com/cgi-bin/webscr" method="post">
         <input type="hidden" name="cmd" value="_s-xclick">
@@ -38,38 +38,12 @@
       </form>
 
 
-      
-  .well.sticker-well
-    %h3
-      Bike Thieves Suck
-    %p
-      Bike Thieves Suck! They do! They are terrible, beings who profit by stealing the very happiness of others. 
-    = image_tag '/assets/stolen/suck_sticker.jpg', alt: 'Bike Thieves Suck'
-    :plain
-      <form target="paypal" action="https://www.paypal.com/cgi-bin/webscr" method="post">
-        <input type="hidden" name="cmd" value="_s-xclick">
-        <input type="hidden" name="hosted_button_id" value="LP6N4LHMR8MHL">
-        <table>
-        <tr><td><input type="hidden" name="on0" value="How many Bike Thieves Suck" stickers?">How many Bike Thieves Suck" stickers?</td></tr><tr><td><select name="os0">
-          <option value="1 sticker">1 sticker $2.50 USD</option>
-          <option value="2 stickers">2 stickers $4.00 USD</option>
-          <option value="3 stickers">3 stickers $5.00 USD</option>
-          <option value="4 stickers">4 stickers $7.00 USD</option>
-          <option value="10 stickers">10 stickers $20.00 USD</option>
-          <option value="20 stickers">20 stickers $40.00 USD</option>
-        </select> </td></tr>
-        </table>
-        <input type="hidden" name="currency_code" value="USD">
-        <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_cart_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-        <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-      </form>
-  
   .well.sticker-well
     %h3
       I Want My #@%!ing Bike Back</h3>
     %p
       Because, seriously ... I just want my #@%!ing bike back
-    = image_tag '/assets/stolen/bike_back_sticker.jpg', alt: "I Want My #@%!ing Bike Back"
+    = image_tag '/assets/stolen/bike_back_sticker.jpg', alt: "I Want My #@%!ing Bike Back", class: 'sticker-image'
     :plain
       <form target="paypal" action="https://www.paypal.com/cgi-bin/webscr" method="post">
         <input type="hidden" name="cmd" value="_s-xclick">

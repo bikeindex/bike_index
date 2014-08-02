@@ -374,6 +374,16 @@ describe Bike do
       lo.should eq(last_week.to_time.to_i/10000)
     end
 
+    it "shouldn't get out of integer errors" do
+      stolen_record = FactoryGirl.create(:stolen_record)
+      bike = stolen_record.bike
+      problem_date = Date.strptime("07-22-0014", "%m-%d-%Y")
+      bike.update_attribute :stolen, true
+      stolen_record.update_attribute :date_stolen, problem_date
+      bike.update_attribute :listing_order, bike.get_listing_order
+      bike.listing_order.should be > (Time.now - 1.year).to_time.to_i
+    end
+
   end
   
 end

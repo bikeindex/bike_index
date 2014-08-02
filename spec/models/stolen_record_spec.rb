@@ -51,7 +51,7 @@ describe StolenRecord do
     end
   end
 
-  describe :stolen_record do 
+  describe :set_phone do 
     it "it should set_phone" do 
       stolen_record = FactoryGirl.create(:stolen_record)
       stolen_record.phone = '000/000/0000'
@@ -62,6 +62,34 @@ describe StolenRecord do
     end
     it "should have before_save_callback_method defined as a before_save callback" do
       StolenRecord._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_phone).should == true
+    end
+  end
+
+  describe :fix_date do 
+    it "it should set the year to something not stupid" do 
+      stolen_record = StolenRecord.new
+      stupid_year = Date.strptime("07-22-0014", "%m-%d-%Y")
+      stolen_record.date_stolen = stupid_year
+      stolen_record.fix_date
+      stolen_record.date_stolen.year.should eq(2014)
+    end
+    it "it should set the year to not last century" do
+      stolen_record = StolenRecord.new
+      wrong_century = Date.strptime("07-22-1913", "%m-%d-%Y")
+      stolen_record.date_stolen = wrong_century
+      stolen_record.fix_date
+      stolen_record.date_stolen.year.should eq(2013)
+    end
+    it "it should set the year to the past year if the date hasn't happened yet" do 
+      stolen_record = FactoryGirl.create(:stolen_record)
+      next_year = (Time.now + 2.months)
+      stolen_record.date_stolen = next_year
+      stolen_record.fix_date
+      stolen_record.date_stolen.year.should eq(2013)
+    end
+
+    it "should have before_save_callback_method defined as a before_save callback" do
+      StolenRecord._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:fix_date).should == true
     end
   end
 

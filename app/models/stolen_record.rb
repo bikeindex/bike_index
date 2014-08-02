@@ -89,10 +89,23 @@ class StolenRecord < ActiveRecord::Base
     select_params
   end
 
-  before_save :set_phone
+  before_save :set_phone, :fix_date
   def set_phone
     self.phone = Phonifyer.phonify(self.phone) if self.phone 
     self.secondary_phone = Phonifyer.phonify(self.secondary_phone) if self.secondary_phone 
+  end
+
+  def fix_date
+    year = date_stolen.year
+    if date_stolen.year < (Time.now - 100.years).year
+      decade = year.to_s.chars.last(2).join('')
+      corrected = date_stolen.change({year: "20#{decade}".to_i })
+      self.date_stolen = corrected
+    end
+    if date_stolen > Time.now
+      corrected = date_stolen.change({year: date_stolen.year - 1 })
+      self.date_stolen = corrected
+    end
   end
 
   def tsv_col(i)

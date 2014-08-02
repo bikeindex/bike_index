@@ -164,7 +164,7 @@ class Bike < ActiveRecord::Base
   end
 
   def get_listing_order
-    return current_stolen_record.date_stolen.to_time.to_i if stolen && current_stolen_record.present?
+    return current_stolen_record.date_stolen.to_time.to_i.abs if stolen && current_stolen_record.present?
     t = updated_at.to_time.to_i/10000
     t = t/100 unless stock_photo_url.present? or public_images.present?
     t

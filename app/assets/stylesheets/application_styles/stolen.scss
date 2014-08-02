@@ -364,21 +364,20 @@ $sbrBackground: #f9f9f9;
 
 .sticker-wells { margin: 30px 0; }
 .sticker-well {
-  img { padding-bottom: 1em; }
   select { margin-top: .5em; }
+  .sticker-image {
+    @include box-shadow(1px 1px 2px rgba(black,.4));
+    margin-bottom: 1em; 
+  }
 }
 
 @media (min-width: 800px) {
   .sticker-wells { @include clearfix; }
   .sticker-well {
-    width: 48%;
+    width: 49%;
     float: left;
+    min-height:  350px;
     &:nth-of-type(2) { margin-left: 2%; }
-    &:nth-of-type(3) {
-      clear: both;
-      float: none;
-      margin: 0 auto; 
-    }
   }
 }
 
@@ -401,6 +400,7 @@ $multserial-textheight: 8em;
     text-align: center;
     margin: 0;
     padding: 0 0 1em;
+    font-size: 24px;
   }
   textarea {
     @include border-radius(3px);
@@ -454,13 +454,22 @@ $multserial-textheight: 8em;
 
 .multiserial-fuzzy-box {
   text-align: center;
-  a { display: none; }
+  a {
+    display: none;
+    span { display: none; }
+    .ms-short-fuzzy { display: inline-block; }
+  }
+
 }
 @media (min-width: 800px) {
   .multiserial-results div {
     width: 48%;
     float: left;
     margin-right: 4%;
+  }
+  .multiserial-fuzzy-box a {
+    span { display: inline-block; }
+    .ms-short-fuzzy { display: none; }
   }
 }
 
