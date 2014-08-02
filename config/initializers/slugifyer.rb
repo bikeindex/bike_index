@@ -17,7 +17,7 @@ class Slugifyer
   end
 
   def self.manufacturer(string)
-    book_slug(string.gsub(/\sco(\.|mpany)/i,' ').gsub(/\s(frame)?works/i,' '))
+    book_slug(string.gsub(/\sco(\.|mpany)/i,' ').gsub(/\s(frame)?works/i,' ').gsub(/\([^\)]*\)/i, ''))
   end
 
 end

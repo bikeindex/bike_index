@@ -45,6 +45,10 @@ describe Slugifyer do
       slug = Slugifyer.manufacturer("Worksman Cycles")
       slug.should eq('worksman')
     end
+    it "should remove parens from EAI" do 
+      slug = Slugifyer.manufacturer("EAI (Euro Asia Imports)")
+      slug.should eq('eai')
+    end
   end
   
 end
