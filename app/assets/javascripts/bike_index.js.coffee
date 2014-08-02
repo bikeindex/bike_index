@@ -82,4 +82,7 @@ $(document).ready ->
   
   else if $('#photo-page').length > 0
     view = new BikeIndex.Views.PhotosIndex
+
+  else if $('#multi_serial_search').length > 0
+    view = new BikeIndex.Views.StolenMultiSerialSearch
     

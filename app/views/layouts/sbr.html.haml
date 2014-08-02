@@ -26,8 +26,8 @@
     - if controller_name == "blogs"
       = auto_discovery_link_tag(:atom, blogs_url(format: "atom"), {title: "Bike Index"})
 
-  %body#sbr-body
-    .sbr-wrap
+  %body#body
+    .sbr-wrap#sbr-body
       %section.sbr-main-section
         .receptacle
           .inner-recep
@@ -44,7 +44,12 @@
               = image_tag '/assets/stolen/stolen-registry.svg'
             %h1
               Stolen Bike Registry
-
+            .multiserial-form#ms_form_section
+              %h3
+                Multiple Serial Search
+              = text_area_tag :multi_serial_search, nil, placeholder: 'Enter multiple serial numbers. Separate them with commas or new lines'
+              %a#search_serials.sbrbtn{ href: '#', data: { target: api_v1_bikes_url } }
+                = image_tag '/assets/stolen/search.svg'
             = form_tag bikes_path, method: :get, class: 'sbr-search-fields' do 
               = hidden_field_tag :stolen, true
               = hidden_field_tag :search_type, 'description'
@@ -67,13 +72,33 @@
                   %span
                     Stolen near
                   = text_field_tag :proximity, params[:proximity], placeholder: 'Anywhere'
+            %h4.multi-search-toggle
+              %a#show_multi_search{ href: '#' }
+                show
+                %span.multi
+                  multi-serial
+                %span.not-multi
+                  normal
+                search
       .sbr-banner
         Over 
-        2022
+        2030
         bikes recovered
         %span.medium-screens
           \- and counting
-          
+            
       = yield
+
+      %section#ms_search_section
+        .receptacle
+          .inner-recep.multiserial-response
+            %h2
+              Multi serial search results
+            %ul#serials_submitted.multiserials-list
+            .multiserial-fuzzy-box
+              %a#multiserial_fuzzy.button-green{ href: '#', data: { target: close_serials_api_v1_bikes_url }}
+                Find bikes with serials close to searched serials
+            
+            #bikes_returned.padded
       
     = render 'shared/footer'

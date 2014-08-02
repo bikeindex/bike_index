@@ -46,4 +46,8 @@ class StolenController < ApplicationController
     render action: 'index'
   end
 
+  def multi_serial_search
+    render layout: 'multi_serial'
+  end
+
 end
