@@ -17,6 +17,9 @@ class BikeIndex.Views.StolenMultiSerialSearch extends Backbone.View
   trim = (str) ->
     str.replace(/^\s\s*/, "").replace /\s\s*$/, ""
 
+  idify = (str) ->
+    str.replace(/[^a-z0-9]/g, "_")
+
   toggleMultiSearch: (e=null) ->
     e.preventDefault() if e?
     if $('#show_multi_search').hasClass('multi-in')
@@ -78,8 +81,8 @@ class BikeIndex.Views.StolenMultiSerialSearch extends Backbone.View
     s_i.addClass('ms-match').removeClass('ms-nomatch')
     unless s_i.find('a').length > 0
       # make the li a link, add the returned bikes container
-      s_i.append("<a href='##{serial}' class='scroll-to-ref'></a>")
-      $('#bikes_returned').append("<div id='#{serial}' class='multiserial-results'></div>")
+      s_i.append("<a href='##{idify(serial)}' class='scroll-to-ref'></a>")
+      $('#bikes_returned').append("<div id='#{idify(serial)}' class='multiserial-results'></div>")
     s_i.find('a').addClass('blink-class')
     setTimeout (->
       s_i.find('a').removeClass('blink-class')
@@ -92,7 +95,7 @@ class BikeIndex.Views.StolenMultiSerialSearch extends Backbone.View
       html = "<div><h3>"
     html += "<span class='serial-text'>#{serial}</span> - #{results} results</h3>"
     html += "<ul>#{@bikeList(bikes)}</ul></div>"
-    $("##{serial}").append(html)
+    $("##{idify(serial)}").append(html)
 
   searchSerialsFuzzy: (event) ->
     event.preventDefault()
