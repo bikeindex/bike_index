@@ -103,7 +103,7 @@ class StolenRecord < ActiveRecord::Base
       self.date_stolen = corrected
     end
     if date_stolen > Time.now
-      corrected = date_stolen.change({year: date_stolen.year - 1 })
+      corrected = date_stolen.change({year: Time.now.year - 1 })
       self.date_stolen = corrected
     end
   end
