@@ -1,7 +1,6 @@
 class BikeIndex.Views.AdminGraphs extends Backbone.View
     
   initialize: ->
-    console.log('shit')
     
     # if $('#graphy').length > 0
     #   @initialize_graph()

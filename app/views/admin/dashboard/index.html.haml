@@ -1,3 +1,4 @@
+= javascript_include_tag "//www.google.com/jsapi", "chartkick" 
 %section.full-screen-table
   %h2
     Recent
@@ -10,6 +11,8 @@
       - today = Bike.where("created_at >= ?", Time.zone.now.beginning_of_day).count
       - yesterday = (Bike.where("created_at >= ?", Time.zone.now.beginning_of_day - 1.day).count) - today
       (#{today} today, #{yesterday} yesterday)
+  - bikes = [ { name: 'Registrations', data: Bike.unscoped.group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.now).count }, { name: 'Stolen', data: Bike.unscoped.where(stolen: true).group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.now).count }]
+  = line_chart bikes
 
 %section.full-screen-table
   %h2

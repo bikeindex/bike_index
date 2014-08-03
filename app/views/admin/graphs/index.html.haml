@@ -1,4 +1,5 @@
 = javascript_include_tag "//www.google.com/jsapi", "chartkick" 
+/ = javascript_include_tag "path/to/highcharts.js", "chartkick"
 
 %section
   %h1
@@ -11,7 +12,11 @@
 
   %h2
     Bikes this past week
-  = line_chart Bike.unscoped.group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.now).count
+  - bikes = [ { name: 'Registrations', data: Bike.unscoped.group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.now).count }, { name: 'Stolen', data: Bike.unscoped.where(stolen: true).group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.now).count }]
+    
+  / = line_chart Bike.unscoped.group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.now).count
+  = line_chart bikes
+  / bikes_admin_graphs_path(past_week: true), discreet: true
 
   %h2
     Bikes Overall

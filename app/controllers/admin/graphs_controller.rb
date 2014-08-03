@@ -8,11 +8,19 @@ class Admin::GraphsController < Admin::BaseController
   end
 
   def users
-    render json: User.group_by_week(:created_at).count
+    render json: User.group_by_month(:created_at).count
   end
 
   def bikes
-    render json: Bike.unscoped.group_by_month(:created_at).count
+    if params[:past_week]
+      render json: [
+        { name: 'Registrations', data: Bike.unscoped.group_by_day(:created_at, range: 7.months.ago.midnight..Time.now).count },
+        # { name: 'Stolen', data: Bike.unscoped.where(stolen: true).group_by_day(:created_at, range: 3.months.ago.midnight..Time.now).count }
+      ]
+      # render json: bikes
+    else
+      render json: Bike.unscoped.group_by_month(:created_at).count
+    end
   end
 
   def show
