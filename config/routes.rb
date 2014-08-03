@@ -101,8 +101,11 @@ Bikeindex::Application.routes.draw do
     resources :stolen_notifications do 
       member { get :resend }
     end
-    resources :graphs, only: [:index, :show] do 
-      collection { get :review }
+    resources :graphs, only: [:index] do 
+      collection do
+        get :bikes
+        get :users
+      end
     end
     resources :failed_bikes, only: [:index, :show]
     resources :ownerships, only: [:edit, :update]

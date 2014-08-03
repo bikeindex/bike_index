@@ -1,17 +1,37 @@
-%section.full-screen-table
-  %h2
+= javascript_include_tag "//www.google.com/jsapi", "chartkick" 
+
+%section
+  %h1
     Bike Index graphs
 
-  %table.table.table-striped.table-bordered
-    %tbody
-      - ["users","bikes","organizations"].each do |graph_type|
-        %tr
-          %td
-            = graph_type.humanize
-          %td
-            = link_to "Since start", admin_graph_url("#{graph_type}")
-      %tr
-        %td
-          This week in review
-        %td
-          = link_to "Past week", review_admin_graphs_url
+#graph-holder
+  %h2
+    Users
+  = line_chart users_admin_graphs_path
+
+  %h2
+    Bikes this past week
+  = line_chart Bike.unscoped.group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.now).count
+
+  %h2
+    Bikes Overall
+  = line_chart bikes_admin_graphs_path
+
+/ # = pie_chart({"Football" => 10, "Basketball" => 5})
+
+/ = line_chart users_admin_graphs_path
+
+
+/ %table.table.table-striped.table-bordered
+/   %tbody
+/     - ["users","bikes","organizations"].each do |graph_type|
+/       %tr
+/         %td
+/           = graph_type.humanize
+/         %td
+/           = link_to "Since start", admin_graph_url("#{graph_type}")
+/     %tr
+/       %td
+/         This week in review
+/       %td
+/         = link_to "Past week", review_admin_graphs_url

@@ -49,6 +49,10 @@ gem 'sitemap_generator'
 gem 'whenever'
 gem 'unicorn'
 gem 'unicorn-worker-killer'
+
+gem 'chartkick'
+gem 'groupdate'
+
 # gem 'localeapp'
 
 group :assets do

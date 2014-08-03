@@ -1,6 +1,18 @@
 class Admin::GraphsController < Admin::BaseController
   def index
+    # @graph_type = 'bikes'
+    # range = date_range("2013-01-18 21:03:08")
+    # @xaxis = month_list(range).to_json
+    # @values1 = range_values(range, "bikes_value").to_json
+    # @values2 = range_values(range, "stolen_bike_value").to_json
+  end
 
+  def users
+    render json: User.group_by_week(:created_at).count
+  end
+
+  def bikes
+    render json: Bike.unscoped.group_by_month(:created_at).count
   end
 
   def show
@@ -11,7 +23,6 @@ class Admin::GraphsController < Admin::BaseController
     if params[:id] == 'bikes'
       @values2 = range_values(range, "stolen_bike_value").to_json
     end
-    render layout: 'graphs'
   end
 
   def review
@@ -25,7 +36,6 @@ class Admin::GraphsController < Admin::BaseController
 
     end
     @xaxis = xaxis.to_json
-    render layout: 'graphs'
   end
 
 protected
@@ -64,5 +74,6 @@ protected
   def organizations_value(date)
     Organization.where(["created_at < ?", date.end_of_month.end_of_day]).count
   end
+
 
 end
