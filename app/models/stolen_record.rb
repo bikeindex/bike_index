@@ -144,12 +144,12 @@ class StolenRecord < ActiveRecord::Base
     self.date_recovered = Time.now
     self.recovered_description = info[:request_reason]
     if info[:index_helped_recovery].present?
-      if info[:index_helped_recovery] or info[:index_helped_recovery].match(/true/i)
+      if info[:index_helped_recovery].to_s.match(/t|1/i)
         self.index_helped_recovery = true
       end
     end
     if info[:can_share_recovery].present?
-      if info[:can_share_recovery] or info[:can_share_recovery].match(/true/i)
+      if info[:can_share_recovery].to_s.match(/t|1/i)
         self.can_share_recovery = true
       end
     end

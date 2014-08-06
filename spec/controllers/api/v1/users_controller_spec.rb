@@ -74,7 +74,7 @@ describe Api::V1::UsersController do
       }
       set_current_user(user)
       Resque.should_receive(:enqueue)
-      post :send_request, recovery_request
+      post :send_request, recovery_request.as_json
       response.code.should eq('200')
       bike.current_stolen_record.date_recovered.should be_present
       bike.current_stolen_record.recovery_share_approved.should be_false

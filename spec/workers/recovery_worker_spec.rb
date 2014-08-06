@@ -8,4 +8,24 @@ describe RecoveryWorker do
     expect(RecoveryWorker).to have_enqueued_job
   end
 
+  it "should actually do things correctly" do 
+    Sidekiq::Testing.inline!
+    bike = FactoryGirl.create(:bike)
+    stolen_record = FactoryGirl.create(:stolen_record, bike: bike)
+    bike.update_attribute :stolen, true
+    recovery_request = { 
+      request_type: 'bike_recovery',
+      user_id: 69,
+      request_bike_id: bike.id,
+      request_reason: 'Some reason',
+      index_helped_recovery: 'true',
+      can_share_recovery: 'false'
+    }
+    RecoveryWorker.perform_async(stolen_record.id, recovery_request.as_json)
+    bike.current_stolen_record.date_recovered.should be_present
+    bike.current_stolen_record.recovery_share_approved.should be_false
+    bike.current_stolen_record.index_helped_recovery.should be_true
+    bike.current_stolen_record.can_share_recovery.should be_false
+  end
+
 end
