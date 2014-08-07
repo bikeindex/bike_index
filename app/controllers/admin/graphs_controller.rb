@@ -12,15 +12,27 @@ class Admin::GraphsController < Admin::BaseController
   end
 
   def bikes
-    if params[:past_week]
-      render json: [
-        { name: 'Registrations', data: Bike.unscoped.group_by_day(:created_at, range: 7.months.ago.midnight..Time.now).count },
-        # { name: 'Stolen', data: Bike.unscoped.where(stolen: true).group_by_day(:created_at, range: 3.months.ago.midnight..Time.now).count }
+    bikes = Bike.unscoped
+    
+    if params[:dates].present?
+      if params[:dates] == 'past_year'
+        range = 1.year.ago.midnight..Time.now
+      elsif params[:dates] == 'since_start'
+        range = Time.zone.parse('2007-01-01 1:00')..Time.now
+      end
+      bgraph = [
+        { name: 'Registrations', data: bikes.group_by_month(:created_at, range: range).count },
+        { name: 'Stolen', data: bikes.where(stolen: true).group_by_month(:created_at, range: range).count }
       ]
-      # render json: bikes
     else
-      render json: Bike.unscoped.group_by_month(:created_at).count
+      range = 1.weeks.ago.midnight..Time.now
+      bgraph = [
+        { name: 'Registrations', data: Bike.unscoped.group_by_day(:created_at, range: range).count },
+        { name: 'Stolen', data: Bike.unscoped.where(stolen: true).group_by_day(:created_at, range: range).count }
+      ]
+      render json: bgraph and return
     end
+    render json: bgraph
   end
 
   def show

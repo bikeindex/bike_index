@@ -5,22 +5,30 @@
   %h1
     Bike Index graphs
 
-#graph-holder
+%section
   %h2
     Users
   = line_chart users_admin_graphs_path
 
+%section
   %h2
-    Bikes this past week
-  - bikes = [ { name: 'Registrations', data: Bike.unscoped.group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.now).count }, { name: 'Stolen', data: Bike.unscoped.where(stolen: true).group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.now).count }]
-    
-  / = line_chart Bike.unscoped.group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.now).count
-  = line_chart bikes
-  / bikes_admin_graphs_path(past_week: true), discreet: true
+    Bikes past week
+  - range = 1.weeks.ago.midnight..Time.now
+  - bgraph = [ { name: 'Registrations', data: Bike.unscoped.group_by_day(:created_at, range: range).count }, { name: 'Stolen', data: Bike.unscoped.where(stolen: true).group_by_day(:created_at, range: range).count }]
 
-  %h2
-    Bikes Overall
   = line_chart bikes_admin_graphs_path
+
+%section
+  %h2
+    Bikes past year
+
+  = line_chart bikes_admin_graphs_path(dates: 'past_year')
+
+%section
+  %h2
+    Bikes since 2007
+
+  = line_chart bikes_admin_graphs_path(dates: 'since_start')
 
 / # = pie_chart({"Football" => 10, "Basketball" => 5})
 

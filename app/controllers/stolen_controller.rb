@@ -39,7 +39,7 @@ class StolenController < ApplicationController
   end
 
   def merging
-    @title = ' - Under construction'
+    @title = ' - stolen bike registration that works'
     stolen_bikes = StolenRecord.where(approved: true).order('date_stolen DESC').limit(6).pluck(:bike_id)
     @stolen_bikes = Bike.where('id in (?)', stolen_bikes).includes(:stolen_records).decorate
     @feedback = Feedback.new

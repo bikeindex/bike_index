@@ -153,7 +153,6 @@ class StolenRecord < ActiveRecord::Base
         self.can_share_recovery = true
       end
     end
-    self.save
   end
 
 end
