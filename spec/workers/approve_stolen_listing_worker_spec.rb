@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe ApproveStolenListingWorker do
-  it { should be_processed_in :stolen }
+  it { should be_processed_in :notify }
 
   it "enqueues another awesome job" do
     bike = FactoryGirl.create(:bike)

@@ -1,0 +1,37 @@
+class RecoveryNotifyWorker
+  include Sidekiq::Worker
+  sidekiq_options queue: 'notify'
+  sidekiq_options backtrace: true
+    
+  def perform(stolen_record_id)
+    stolen_record = StolenRecord.find(stolen_record_id)
+    return true if stolen_record.recovery_posted
+    require 'httparty'
+    root = 'https://bikeindex.org'
+    root = 'http://lvh.me:3000' unless Rails.env.production?
+    options = {
+      key: ENV['RECOVERY_APP_KEY'],
+      api_url: api_v1_bikes_url(stolen_record.bike),
+      theft_information: {
+        stolen_record_id: stolen_record_id,
+        date_stolen: stolen_record.date_stolen,
+        location: stolen_record.address
+      },
+      recovery_information: {
+        date_recovered: stolen_record.date_recovered,
+      }
+    }
+    if stolen_record.can_share_recovery
+      options[:recovery_information][:recovery_story] = stolen_record.recovery_share
+      options[:recovery_information][:tweet] = stolen_record.recovery_tweet
+    end
+    response = HTTParty.post(ENV['RECOVERY_APP_URL'],
+      body: options.to_json,
+      headers: { 'Content-Type' => 'application/json' })
+
+    if response.status_code == '200'
+      stolen_record.update_attribute :recovery_posted, true
+    end
+  end
+
+end

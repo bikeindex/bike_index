@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-describe RecoveryWorker do
+describe RecoveryUpdateWorker do
   it { should be_processed_in :updates }
 
   it "enqueues another awesome job" do
-    RecoveryWorker.perform_async
-    expect(RecoveryWorker).to have_enqueued_job
+    RecoveryUpdateWorker.perform_async
+    expect(RecoveryUpdateWorker).to have_enqueued_job
   end
 
   it "should actually do things correctly" do 
@@ -21,7 +21,7 @@ describe RecoveryWorker do
       index_helped_recovery: 'true',
       can_share_recovery: 'false'
     }
-    RecoveryWorker.perform_async(stolen_record.id, recovery_request.as_json)
+    RecoveryUpdateWorker.perform_async(stolen_record.id, recovery_request.as_json)
     bike.current_stolen_record.date_recovered.should be_present
     bike.current_stolen_record.recovery_share_approved.should be_false
     bike.current_stolen_record.index_helped_recovery.should be_true

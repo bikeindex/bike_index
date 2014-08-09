@@ -29,11 +29,15 @@ module Api
             if params[:serial_update_serial].present?
               feedback.feedback_hash[:new_serial] = params[:serial_update_serial]
             elsif feedback_type.match('bike_recovery')
-              RecoveryWorker.perform_async(bike.current_stolen_record.id, params) if bike.current_stolen_record.present?
-              if params[:index_helped_recovery].present?
-                feedback.feedback_hash[:index_helped_recovery] = params[:index_helped_recovery]
+              if bike.current_stolen_record.present?
+                RecoveryUpdateWorker.perform_async(bike.current_stolen_record.id, params)
+                if params[:index_helped_recovery].present?
+                  feedback.feedback_hash[:index_helped_recovery] = params[:index_helped_recovery]
+                end
                 if params[:can_share_recovery].present?
                   feedback.feedback_hash[:can_share_recovery] = params[:can_share_recovery]
+                else
+                  RecoveryNotifyWorker.perform_in(30.minutes, bike.current_stolen_record.id)
                 end
               end
             end

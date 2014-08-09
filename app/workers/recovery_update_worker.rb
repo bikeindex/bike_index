@@ -1,4 +1,4 @@
-class RecoveryWorker
+class RecoveryUpdateWorker
   include Sidekiq::Worker
   sidekiq_options queue: 'updates'
   sidekiq_options backtrace: true

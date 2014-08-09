@@ -29,7 +29,10 @@ class StolenRecord < ActiveRecord::Base
     :index_helped_recovery,
     :can_share_recovery,
     :recovery_share_approved,
-    :recovery_share_ignore
+    :recovery_share_ignore,
+    :recovery_share, # We edit this in the admin panel
+    :recovery_tweet, # We edit this in the admin panel
+    :recovery_posted
     
   belongs_to :bike
   has_one :current_bike, class_name: 'Bike', foreign_key: :current_stolen_record_id
