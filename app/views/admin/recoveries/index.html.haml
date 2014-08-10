@@ -49,7 +49,7 @@
                 - else
                   = recovery.created_at.strftime("%-m.%-d.%Y")
           %td.medium-screens
-            = link_to recovery.bike.title_string, edit_admin_bike_url(recovery.bike)
+            = link_to recovery.bike.title, edit_admin_bike_url(recovery.bike)
           %td
             - if recovery.recovered_description.present?
               = recovery.recovered_description
