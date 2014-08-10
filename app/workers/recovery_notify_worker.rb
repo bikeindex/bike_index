@@ -24,13 +24,13 @@ class RecoveryNotifyWorker
       options[:recovery_information][:tweet] = stolen_record.recovery_tweet
     end
 
-    response = HTTParty.post(ENV['RECOVERY_APP_URL'],
+    HTTParty.post(ENV['RECOVERY_APP_URL'],
       body: options.to_json,
       headers: { 'Content-Type' => 'application/json' })
 
-    if response.status_code == '200'
-      stolen_record.update_attribute :recovery_posted, true
-    end
+    # if response.status_code == '200'
+    #   stolen_record.update_attribute :recovery_posted, true
+    # end
   end
 
 end
