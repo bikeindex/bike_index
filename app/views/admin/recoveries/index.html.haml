@@ -45,10 +45,8 @@
                 = recovery.bike_id
               %a{href: "/admin/recoveries/#{recovery.id}/edit" }
                 - if recovery.date_recovered.present?
-                  Recovered on
                   = recovery.date_recovered.strftime("%-m.%-d.%Y")
                 - else
-                  Stolen on
                   = recovery.created_at.strftime("%-m.%-d.%Y")
           %td.medium-screens
             = link_to recovery.bike.title_string, edit_admin_bike_url(recovery.bike)
