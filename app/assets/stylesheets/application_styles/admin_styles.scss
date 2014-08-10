@@ -207,6 +207,19 @@
 
 //________________________
 //
+// Admin recoveries
+//
+//________________________
+
+
+.recovery-input-field {
+  @extend .blog-field;
+  textarea { height: 4em; }
+}
+
+
+//________________________
+//
 // Admin bikes & truncated short tables
 //
 //________________________

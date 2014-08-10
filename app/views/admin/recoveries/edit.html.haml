@@ -3,58 +3,59 @@
   %h1
     Edit recovery for #{@bike.type}
   %p
-    = link_to "Back to edit bike", edit_admin_bike_path(@bike)
+    = link_to "Back to recoveries", admin_recoveries_url
+%p
+  = link_to "Back to edit bike", edit_admin_bike_path(@bike)
+%ul.bike-boxes
+  = render partial: "/bikes/bike", locals: {bike: @bike, target: "show" }
+.dl-holder
+  %dl.dl-horizontal
+    = @bike.dl_list_item(@bike.created_at.strftime("%m-%d-%Y"), "Created")
+    = @bike.dl_from_attribute("owner_email")
+    = @bike.dl_list_item(@bike.owner.email, "Current Owner")
+    = @bike.dl_from_attribute("cached_data")
+%hr
+- url = {action: "update", controller: "recoveries"}
+= form_for([:admin ,@recovery], :url => url , html: { class: "form form-horizontal" }) do |f|
+  - if @recovery.errors.any?
+    #alert-block
+      .alert.alert-error
+        %h4
+          Please fix the following 
+          = pluralize(@recovery.errors.count, "error")
+        %ul
+          - @recovery.errors.full_messages.each do |msg|
+            %li
+              = msg
 
-  %ul.bike-boxes
-    = render partial: "/bikes/bike", locals: {bike: @bike, target: "show" }
-  .dl-holder
-    %dl.dl-horizontal
-      = @bike.dl_list_item(@bike.created_at.strftime("%m-%d-%Y"), "Created")
-      = @bike.dl_from_attribute("owner_email")
-      = @bike.dl_list_item(@bike.owner.email, "Current Owner")
-      = @bike.dl_from_attribute("cached_data")
-  %hr
+  
+  .control-group
+    = f.label :can_share_recovery, class: "control-label"
+    .controls
+      = f.check_box :can_share_recovery
 
-  = form_for [:admin, @recovery], html: { class: "form form-horizontal" } do |f|
-    - if @ownership.errors.any?
-      #alert-block
-        .alert.alert-error
-          %h4
-            Please fix the following 
-            = pluralize(@recovery.errors.count, "error")
-          %ul
-            - @recovery.errors.full_messages.each do |msg|
-              %li
-                = msg
+  .control-group
+    = f.label :index_helped_recovery, class: "control-label"
+    .controls
+      = f.check_box :index_helped_recovery
+  .padded
+    %p
+      = @recovery.recovered_description
+  .control-group.recovery-input-field
+    = f.label :recovery_share, "Story to share",   class: "control-label"
+    .controls
+      = f.text_area :recovery_share
+  / tweets - 140 chars, - 23 for URL
+  - tweet_length = 140 - 23
+  - if @bike.thumb_image.present?
+    / Minus 23 if bike has an image
+    - tweet_length = tweet_length - 23
+  .control-group#tweet_entry.recovery-input-field{ data: {length: tweet_length } }
+    = f.label :recovery_tweet, class: "control-label"
+    .controls
+      = f.text_area :recovery_tweet
 
-    
+  .actions
     .control-group
-      = f.label :can_share_recovery, class: "control-label"
-      .controls
-        = f.check_box :can_share_recovery
-
-    .control-group
-      = f.label :index_helped_recovery, class: "control-label"
-      .controls
-        = f.check_box :index_helped_recovery
-    .padded
-      %p
-        = @recovery.recovered_description
-    .control-group
-      = f.label :recovery_share, "Story to share", class: "control-label"
-      .controls
-        = f.text_area :recovery_share, :required =>true
-    / tweets - 140 chars, - 23 for URL
-    - tweet_length = 140 - 23
-    - if @bike.thumb_image.present?
-      / Minus 23 if bike has an image
-      - tweet_length = tweet_length - 23
-    .control-group#tweet_entry{ data: {length: tweet_length } }
-      = f.label :recovery_tweet, class: "control-label"
-      .controls
-        = f.text_area :recovery_tweet, :required =>true
-
-    .actions
-      .control-group
-        = submit_tag "Update the recovery", class: "button-green"
-        
+      = submit_tag "Update the recovery", class: "button-green"
+      

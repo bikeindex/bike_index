@@ -14,17 +14,18 @@ class Admin::RecoveriesController < Admin::BaseController
   end
 
   def edit
-    @recovery = StolenRecord.find(params[:id])
+    @recovery = StolenRecord.unscoped.find(params[:id])
     @bike = @recovery.bike.decorate
   end
 
   def update
-    @stolen_record = StolenRecord.find(params[:id])
-    if @stolen_record.update_attributes(params[:ownership])
+    @stolen_record = StolenRecord.unscoped.find(params[:id])
+    if @stolen_record.update_attributes(params[:stolen_record])
       RecoveryNotifyWorker.perform_async(params[:id])
       flash[:notice] = "Recovery Saved!"
       redirect_to admin_recoveries_url
     else
+      raise StandardError
       render action: :edit
     end
   end

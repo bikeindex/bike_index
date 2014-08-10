@@ -5,9 +5,7 @@ class ApproveStolenListingWorker
     
   def perform(bike_id)
     require 'httparty'
-    root = 'https://bikeindex.org'
-    root = 'http://lvh.me:3000' unless Rails.env.production?
-    options = {api_url: "#{root}/api/v1/bikes/#{bike_id}", key: ENV['STOLEN_TWITTERBOT_KEY']}
+    options = {api_url: "#{ROOT_URL}/api/v1/bikes/#{bike_id}", key: ENV['STOLEN_TWITTERBOT_KEY']}
     HTTParty.post(ENV['STOLEN_TWITTERBOT_URL'],
       body: options.to_json,
       headers: { 'Content-Type' => 'application/json' } )

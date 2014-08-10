@@ -31,9 +31,11 @@ We're an open source project. Take a gander through our code, report bugs, or do
 
 - `rake start` to start the server (this will start Redis locally)
 
-- **Access the site through [lvh.me:3000](http://lvh.me:3000)**. You can't log in through localhost:3000.
+- Currently accessing the site through [pow](http://pow.cx/) (on bikeindex_public.dev). if you want to use not pow, change the appropriate values in `session_store.rb` and `development.rb` and access the site through [lvh.me:3000](http://lvh.me:3000)
+
+  - **Access the site through [lvh.me:3000](http://lvh.me:3000)**. You can't log in through localhost:3000.
  
-  - if you want to use [pow](http://pow.cx/), change the appropriate values in `session_store.rb` and `development.rb`
+  
 
 - We use [RSpec](https://github.com/rspec/rspec) and [Guard](https://github.com/guard/guard) for testing. 
     

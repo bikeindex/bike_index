@@ -1,8 +1,4 @@
-- if Rails.env.production?
-  - request_url = "https://bikeindex.org"
-- else
-  - request_url = "http://lvh.me:3000"
-#requestBikeDelete.modal.hide.fade{ data: {url: request_url + send_request_api_v1_users_path } }
+#requestBikeDelete.modal.hide.fade{ data: {url: ROOT_URL + send_request_api_v1_users_path } }
   .modal-header
     %button{ type: "button", class: "close", :data => { dismiss: "modal" }, :aria => {hidden: "true"} }
       &times;

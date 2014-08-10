@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140720175226) do
+ActiveRecord::Schema.define(:version => 20140809102725) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -506,6 +506,9 @@ ActiveRecord::Schema.define(:version => 20140720175226) do
     t.boolean  "can_share_recovery",       :default => false, :null => false
     t.boolean  "recovery_share_approved",  :default => false, :null => false
     t.boolean  "recovery_share_ignore",    :default => false, :null => false
+    t.boolean  "recovery_posted",          :default => false
+    t.text     "recovery_tweet"
+    t.text     "recovery_share"
   end
 
   add_index "stolen_records", ["bike_id"], :name => "index_stolen_records_on_bike_id"

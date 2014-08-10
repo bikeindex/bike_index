@@ -7,11 +7,7 @@ class DocumentationController < ApplicationController
   end
 
   def api_v1
-    if Rails.env.production?
-      @root = "https://bikeindex.org"
-    else
-      @root = "http://lvh.me:3000"
-    end
+    @root = ROOT_URL
   end
 
 end
