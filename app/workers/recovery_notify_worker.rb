@@ -4,12 +4,12 @@ class RecoveryNotifyWorker
   sidekiq_options backtrace: true
     
   def perform(stolen_record_id)
-    stolen_record = StolenRecord.find(stolen_record_id)
+    stolen_record = StolenRecord.unscoped.find(stolen_record_id)
     return true if stolen_record.recovery_posted
     require 'httparty'
     options = {
       key: ENV['RECOVERY_APP_KEY'],
-      api_url: ROOT_URL + api_v1_bikes_path(stolen_record.bike),
+      api_url: ROOT_URL + "/api/v1/bikes/#{stolen_record.bike.id}",
       theft_information: {
         stolen_record_id: stolen_record_id,
         date_stolen: stolen_record.date_stolen,
