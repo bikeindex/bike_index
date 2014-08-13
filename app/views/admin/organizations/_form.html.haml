@@ -50,12 +50,12 @@
     = f.label :website
   .controls
     = f.text_field :website
-
-.control-group.chosen-select
-  .control-label
-    = f.label :embedable_user_email
-  .controls
-    = f.text_field :embedable_user_email, value: @embedable_email
+- if @organization.id.present?
+  .control-group.chosen-select
+    .control-label
+      = f.label :embedable_user_email
+    .controls
+      = f.text_field :embedable_user_email, value: @embedable_email
 
 .control-group.padded
   .control-label
