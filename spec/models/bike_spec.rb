@@ -113,20 +113,28 @@ describe Bike do
 
   describe :manufacturer_name do 
     it "should return the value of manufacturer_other if manufacturer is other" do 
-      @bike = Bike.new
+      bike = Bike.new
       other_manufacturer = Manufacturer.new 
       other_manufacturer.stub(:name).and_return("Other")
-      @bike.stub(:manufacturer).and_return(other_manufacturer)
-      @bike.stub(:manufacturer_other).and_return("Other manufacturer name")
-      @bike.manufacturer_name.should eq("Other manufacturer name")
+      bike.stub(:manufacturer).and_return(other_manufacturer)
+      bike.stub(:manufacturer_other).and_return("Other manufacturer name")
+      bike.manufacturer_name.should eq("Other manufacturer name")
     end
 
     it "should return the name of the manufacturer if it isn't other" do
-      @bike = Bike.new
+      bike = Bike.new
       manufacturer = Manufacturer.new 
       manufacturer.stub(:name).and_return("Mnfg name")
-      @bike.stub(:manufacturer).and_return(manufacturer)
-      @bike.manufacturer_name.should eq("Mnfg name")
+      bike.stub(:manufacturer).and_return(manufacturer)
+      bike.manufacturer_name.should eq("Mnfg name")
+    end
+
+    it "should return Just SE Bikes" do
+      bike = Bike.new
+      manufacturer = Manufacturer.new
+      manufacturer.stub(:name).and_return("SE Racing (S E Bikes)")
+      bike.stub(:manufacturer).and_return(manufacturer)
+      bike.manufacturer_name.should eq("SE Racing")
     end
   end
 

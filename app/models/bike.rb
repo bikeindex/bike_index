@@ -201,7 +201,7 @@ class Bike < ActiveRecord::Base
     if self.manufacturer.name == "Other" && self.manufacturer_other.present?
       self.manufacturer_other
     else
-      self.manufacturer.name
+      self.manufacturer.name.gsub(/\s?\([^\)]*\)/i,'')
     end
   end
 
