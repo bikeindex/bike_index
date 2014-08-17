@@ -52,10 +52,10 @@
                 - else
                   = recovery.created_at.strftime("%-m.%-d.%Y")
             %td.medium-screens
-              .less-strong-hold
-                %span.less-strong-right
-                  = link_to recovery.bike_id, edit_admin_bike_url(recovery.bike)
-                - if recovery.bike.present?
+              - if recovery.bike.present?
+                .less-strong-hold
+                  %span.less-strong-right
+                    = link_to recovery.bike_id, edit_admin_bike_url(recovery.bike)
                   = recovery.bike.title_string
                 
             %td
