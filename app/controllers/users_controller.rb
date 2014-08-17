@@ -86,7 +86,7 @@ class UsersController < ApplicationController
         redirect_to user_home_url, notice: "Sorry, that user isn't sharing their bikes" and return
       end
     end
-    bikes = Bike.find(user.bikes)
+    bikes = Bike.where('id in (?)', current_user.bikes).includes(:cycle_type, :manufacturer, :primary_frame_color, :secondary_frame_color, :tertiary_frame_color)
     @bikes = BikeDecorator.decorate_collection(bikes)
   end
 
