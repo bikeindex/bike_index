@@ -78,7 +78,7 @@ describe Api::V1::UsersController do
       response.code.should eq('200')
       # ALSO MAKE SURE IT RECOVERY NOTIFIES
       bike.current_stolen_record.date_recovered.should be_present
-      bike.current_stolen_record.recovery_share_approved.should be_false
+      bike.current_stolen_record.recovery_posted.should be_false
       bike.current_stolen_record.index_helped_recovery.should be_true
       bike.current_stolen_record.can_share_recovery.should be_true
     end

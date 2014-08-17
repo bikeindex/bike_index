@@ -1,11 +1,11 @@
-class BikeNotSavedError < StandardError
-end
-
 class Admin::RecoveriesController < Admin::BaseController
-  before_filter :find_bike, only: [:approve]
-
   def index
-    recoveries = StolenRecord.recovered.includes(:bike)
+    if params[:posted]
+      @posted = true
+      recoveries = StolenRecord.recovery_unposted.includes(:bike)
+    else
+      recoveries = StolenRecord.recovered.includes(:bike)
+    end
     @recoveries = recoveries.paginate(page: params[:page]).per_page(50)
   end
 
@@ -21,7 +21,6 @@ class Admin::RecoveriesController < Admin::BaseController
   def update
     @stolen_record = StolenRecord.unscoped.find(params[:id])
     if @stolen_record.update_attributes(params[:stolen_record])
-      RecoveryNotifyWorker.perform_async(params[:id])
       flash[:notice] = "Recovery Saved!"
       redirect_to admin_recoveries_url
     else
@@ -31,15 +30,9 @@ class Admin::RecoveriesController < Admin::BaseController
   end
 
   def approve
-    @bike.current_stolen_record.update_attribute :approved, true
-    @bike.update_attribute :approved_stolen, true
-    ApproveStolenListingWorker.perform_async(@bike.id)
-    redirect_to edit_admin_stolen_bike_url(@bike), notice: 'Bike was approved.'
+    RecoveryNotifyWorker.perform_async(params[:id].first.to_i)
+    redirect_to admin_recoveries_url, notice: 'Stolen record notification enqueued.'
+    
   end
 
-  protected
-
-  def find_bike
-    @bike = Bike.unscoped.find(params[:id])
-  end
 end

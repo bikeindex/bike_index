@@ -28,9 +28,9 @@ class RecoveryNotifyWorker
       body: options.to_json,
       headers: { 'Content-Type' => 'application/json' })
 
-    # if response.status_code == '200'
-    #   stolen_record.update_attribute :recovery_posted, true
-    # end
+    if response.code == '200'
+      stolen_record.update_attribute :recovery_posted, true
+    end
   end
 
 end

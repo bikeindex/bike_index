@@ -75,6 +75,8 @@ $(document).ready ->
     view = new BikeIndex.Views.DataTables
     if $('#admin-locations-fields').length > 0
       view = new BikeIndex.Views.AdminOrganizationsEdit
+    else if $('#admin-recoveries').length > 0
+      view = new BikeIndex.Views.AdminRecoveries
     else if $('#post-date-field').length > 0
       view = new BikeIndex.Views.AdminBlogsEdit
     else if $('#graph-holder').length > 0

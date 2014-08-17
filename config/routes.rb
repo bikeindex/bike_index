@@ -96,7 +96,7 @@ Bikeindex::Application.routes.draw do
       member { post :approve }
     end
     resources :recoveries do 
-      member { post :approve }
+      collection { post :approve }
     end
     resources :stolen_notifications do 
       member { get :resend }

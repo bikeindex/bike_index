@@ -37,7 +37,7 @@ describe StolenRecord do
     end
 
     it "should only include sharable unapproved in recovery_waiting_share_approval" do 
-      StolenRecord.recovery_wait_share.to_sql.should == StolenRecord.where(current: false, can_share_recovery: true, recovery_share_approved: false, recovery_share_ignore: false).to_sql
+      StolenRecord.recovery_unposted.to_sql.should == StolenRecord.where(current: false, recovery_posted: false).to_sql
     end
   end
 

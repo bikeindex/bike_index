@@ -28,8 +28,6 @@ class StolenRecord < ActiveRecord::Base
     :recovered_description,
     :index_helped_recovery,
     :can_share_recovery,
-    :recovery_share_approved,
-    :recovery_share_ignore,
     :recovery_share, # We edit this in the admin panel
     :recovery_tweet, # We edit this in the admin panel
     :recovery_posted
@@ -45,11 +43,9 @@ class StolenRecord < ActiveRecord::Base
   default_scope where(current: true)
 
   scope :recovered, unscoped.where(current: false).order("date_stolen desc")
-  scope :recovery_wait_share, unscoped.where(
+  scope :recovery_unposted, unscoped.where(
     current: false,
-    can_share_recovery: true,
-    recovery_share_approved: false,
-    recovery_share_ignore: false
+    recovery_posted: false
   )
 
   def address

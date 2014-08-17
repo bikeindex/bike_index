@@ -1,11 +1,10 @@
-
 %header.with-subtitle
   %h1
     Edit recovery for #{@bike.type}
   %p
     = link_to "Back to recoveries", admin_recoveries_url
 %p
-  = link_to "Back to edit bike", edit_admin_bike_path(@bike)
+  = link_to "Edit bike", edit_admin_bike_path(@bike)
 %ul.bike-boxes
   = render partial: "/bikes/bike", locals: {bike: @bike, target: "show" }
 .dl-holder
@@ -14,6 +13,16 @@
     = @bike.dl_from_attribute("owner_email")
     = @bike.dl_list_item(@bike.owner.email, "Current Owner")
     = @bike.dl_from_attribute("cached_data")
+  .dl-holder
+    %h2
+      - if @recovery.recovery_posted
+      
+        Recovery posted
+      - elsif @recovery.can_share_recovery == true
+        = link_to 'Share recovery', approve_admin_recoveries_url(id: @recovery.id), method: :post, confirm: "Approval will\n\n- Send out a tweet\n- And post to facebook.\n- It can NOT be effectively reversed\n", class: 'button-blue padded'
+      - else
+        = link_to 'Post recovery (no share)', approve_admin_recoveries_url(id: @recovery.id), method: :post, class: 'button-blue padded'
+
 %hr
 - url = {action: "update", controller: "recoveries"}
 = form_for([:admin ,@recovery], :url => url , html: { class: "form form-horizontal" }) do |f|
@@ -27,17 +36,16 @@
           - @recovery.errors.full_messages.each do |msg|
             %li
               = msg
-
+  .control-group
+    = f.label :index_helped_recovery, class: "control-label"
+    .controls
+      = f.check_box :index_helped_recovery
   
   .control-group
     = f.label :can_share_recovery, class: "control-label"
     .controls
       = f.check_box :can_share_recovery
 
-  .control-group
-    = f.label :index_helped_recovery, class: "control-label"
-    .controls
-      = f.check_box :index_helped_recovery
   .padded
     %p
       = @recovery.recovered_description

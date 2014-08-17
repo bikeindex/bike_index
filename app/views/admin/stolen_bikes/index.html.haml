@@ -55,14 +55,19 @@
                   = bike.created_at.strftime("%-m.%-d.%Y")
           %td.not-tiny-screens
             = bike.title_string
-          %td.large-screens
-            - if bike.current_stolen_record.present?
+          
+          - if bike.current_stolen_record.present?
+            %td.large-screens
               = bike.current_stolen_record.theft_description
-          %td
-            - if bike.current_stolen_record.address.present?
-              = bike.current_stolen_record.city
-          %td
-            = "&#x2713;".html_safe if bike.current_stolen_record.approved
+            %td
+              - if bike.current_stolen_record.address.present?
+                = bike.current_stolen_record.city
+            %td
+              = "&#x2713;".html_safe if bike.current_stolen_record.approved
+          - else
+            %td.large-screens
+            %td
+            %td
 
   .paginate-container
     = will_paginate @bikes, next_label: "Next", previous_label: "Previous"
