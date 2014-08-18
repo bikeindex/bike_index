@@ -90,7 +90,7 @@ class OrganizationsController < ApplicationController
 
   def find_organization
     @organization = Organization.find_by_slug(params[:id])
-    # render status: 404 and return unless @organization.present?
+    render status: 404 and return unless @organization.present?
   end
 
   def require_membership
