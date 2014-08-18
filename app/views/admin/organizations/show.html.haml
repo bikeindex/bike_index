@@ -17,7 +17,11 @@
             Not shown
 
       = @organization.dl_from_attribute("org_type", "Type")
-      = @organization.dl_from_attribute("slug")
+      %dt
+        Slug
+      %dd
+        = @organization.slug
+        (#{link_to "embed", embed_organization_url(@organization)})
       = @organization.dl_from_attribute("access_token")
       %dt Auto user email
       %dd

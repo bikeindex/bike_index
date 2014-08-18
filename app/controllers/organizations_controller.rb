@@ -77,6 +77,10 @@ class OrganizationsController < ApplicationController
   protected
 
   def set_bparam
+    unless @organization.auto_user.present?
+      flash[:error] = "We're sorry, that organization doesn't have a user set up to register bikes through. Email contact@bikeindex.org if this seems like an error."
+      redirect_to about_url and return
+    end
     if params[:b_param_id].present?
       @b_param = BParam.find(params[:b_param_id])
     else
@@ -84,8 +88,9 @@ class OrganizationsController < ApplicationController
     end
   end
 
-  def find_organization 
+  def find_organization
     @organization = Organization.find_by_slug(params[:id])
+    # render status: 404 and return unless @organization.present?
   end
 
   def require_membership

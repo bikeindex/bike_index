@@ -254,6 +254,7 @@ a {
   font-size: 40px;
   cursor: pointer;
   color: $grayLight;
+  z-index: 10000;
   &:hover {
     text-shadow: 0 0 2px rgba(black,.2);
     color: $grayMed;
