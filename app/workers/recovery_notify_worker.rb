@@ -9,7 +9,7 @@ class RecoveryNotifyWorker
     require 'httparty'
     options = {
       key: ENV['RECOVERY_APP_KEY'],
-      api_url: ROOT_URL + "/api/v1/bikes/#{stolen_record.bike.id}",
+      api_url: ENV['BASE_URL'] + "/api/v1/bikes/#{stolen_record.bike.id}",
       theft_information: {
         stolen_record_id: stolen_record_id,
         date_stolen: stolen_record.date_stolen,

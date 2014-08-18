@@ -5,7 +5,7 @@ class ApproveStolenListingWorker
     
   def perform(bike_id)
     require 'httparty'
-    options = {api_url: "#{ROOT_URL}/api/v1/bikes/#{bike_id}", key: ENV['STOLEN_TWITTERBOT_KEY']}
+    options = {api_url: "#{ENV['BASE_URL']}/api/v1/bikes/#{bike_id}", key: ENV['STOLEN_TWITTERBOT_KEY']}
     HTTParty.post(ENV['STOLEN_TWITTERBOT_URL'],
       body: options.to_json,
       headers: { 'Content-Type' => 'application/json' } )

@@ -7,7 +7,7 @@ class DocumentationController < ApplicationController
   end
 
   def api_v1
-    @root = ROOT_URL
+    @root = ENV['BASE_URL']
   end
 
 end
