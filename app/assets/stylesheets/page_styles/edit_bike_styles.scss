@@ -539,6 +539,11 @@
 //
 //________________________
 
+.form-info-addition {
+  display: block;
+  color: $grayLight;
+  font-size: 16px;
+}
 
 #edit_stolen {
   border: 1px solid $stolenColor;
@@ -564,11 +569,6 @@
   }
   label {
     font-size: 18px;
-  }
-  span {
-    display: block;
-    color: $grayLight;
-    font-size: 16px;
   }
 }
 
