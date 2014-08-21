@@ -2,7 +2,7 @@ class RecoveryNotifyWorker
   include Sidekiq::Worker
   sidekiq_options queue: 'notify'
   sidekiq_options backtrace: true
-    
+
   def perform(stolen_record_id)
     stolen_record = StolenRecord.unscoped.find(stolen_record_id)
     return true if stolen_record.recovery_posted
@@ -24,11 +24,11 @@ class RecoveryNotifyWorker
       options[:recovery_information][:tweet] = stolen_record.recovery_tweet
     end
 
-    HTTParty.post(ENV['RECOVERY_APP_URL'],
+    response = HTTParty.post(ENV['RECOVERY_APP_URL'],
       body: options.to_json,
       headers: { 'Content-Type' => 'application/json' })
 
-    if response.code == '200'
+    if response.code == 200
       stolen_record.update_attribute :recovery_posted, true
     end
   end
