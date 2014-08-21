@@ -18,14 +18,14 @@
 %section.full-screen-table
   = form_tag approve_admin_recoveries_path, class: '', id: 'multi_check' do
     = hidden_field_tag :multipost, true
-    / - unless @posted
-    /   .clearfix#multiapprove_submit
-    /     = submit_tag 'Apply to selected', class: 'button-blue pull-right'
+    - unless @posted
+      .clearfix#multiapprove_submit
+        = submit_tag 'Post checked recoveries', class: 'button-blue pull-right'
     %table.table.table-striped.table-bordered
       %thead
-        / - unless @posted
-        /   %th
-        /     %input#all_select{ type: 'checkbox' }
+        - unless @posted
+          %th
+            %input#all_select{ type: 'checkbox' }
         %th
           Date recovered
         %th.medium-screens
@@ -41,9 +41,9 @@
       %tbody
         - @recoveries.each do |recovery|
           %tr
-            / - unless @posted
-            /   %td.multipost_checkbox
-            /     = check_box_tag "recovery_selected[#{recovery.id}]", recovery.id
+            - unless @posted
+              %td.multipost_checkbox
+                = check_box_tag "recovery_selected[#{recovery.id}]", recovery.id
 
             %td
               %a{href: edit_admin_recovery_url(recovery.id) }

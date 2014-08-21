@@ -17,7 +17,7 @@ describe RecoveryNotifyWorker do
     bike.current_stolen_record.save
     work = RecoveryNotifyWorker.new
     work.perform(bike.current_stolen_record_id)
-    StolenRecord.find(bike.current_stolen_record_id).recovery_posted.should be true
+    bike.reload.current_stolen_record.recovery_posted.should be_true
   end
 
   it "should post to the recovery app with sharing" do
@@ -32,8 +32,7 @@ describe RecoveryNotifyWorker do
     bike.current_stolen_record.save
     work = RecoveryNotifyWorker.new
     work.perform(bike.current_stolen_record_id)
-    #bike.current_stolen_record.recovery_posted.should be_true
-    StolenRecord.find(bike.current_stolen_record_id).recovery_posted.should be true
+    bike.reload.current_stolen_record.recovery_posted.should be_true
   end
 
 end
