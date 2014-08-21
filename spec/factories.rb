@@ -23,14 +23,14 @@ FactoryGirl.define do
     "#{n}0"
   end
 
-  factory :user do 
+  factory :user do
     name
     email { generate(:unique_email)}
     password "testthisthing7$"
     password_confirmation "testthisthing7$"
     terms_of_service true
   end
-  
+
   factory :bike_token do
     association :user
     association :organization
@@ -45,7 +45,7 @@ FactoryGirl.define do
     invitee_email "george@test.com"
   end
 
-  factory :cycle_type do 
+  factory :cycle_type do
     name { FactoryGirl.generate(:unique_name) }
     slug { FactoryGirl.generate(:unique_name) }
   end
@@ -55,16 +55,16 @@ FactoryGirl.define do
     frame_maker true
   end
 
-  factory :frame_material do 
+  factory :frame_material do
     name { FactoryGirl.generate(:unique_name) }
     slug { FactoryGirl.generate(:unique_name) }
   end
 
-  factory :propulsion_type do 
+  factory :propulsion_type do
     name { FactoryGirl.generate(:unique_name) }
   end
 
-  factory :wheel_size do 
+  factory :wheel_size do
     name { FactoryGirl.generate(:unique_name) }
     iso_bsd { FactoryGirl.generate(:unique_iso) }
     priority 1
@@ -76,16 +76,16 @@ FactoryGirl.define do
     slug { FactoryGirl.generate(:unique_name) }
   end
 
-  factory :color do 
+  factory :color do
     name { FactoryGirl.generate(:unique_name) }
     priority 1
   end
 
-  factory :paint do 
+  factory :paint do
     name { FactoryGirl.generate(:unique_name) }
   end
 
-  factory :b_param do 
+  factory :b_param do
     association :creator, factory: :user
   end
 
@@ -102,13 +102,21 @@ FactoryGirl.define do
     association :primary_frame_color, factory: :color
     rear_tire_narrow true
     sequence(:owner_email) {|n| "bike_owner#{n}@example.com"}
+
+    factory :stolen_bike do
+      stolen true
+      after(:create) do |bike|
+        create(:stolen_record, bike: bike)
+        bike.save # updates current_stolen_record
+      end
+    end
   end
 
-  factory :cgroup do 
+  factory :cgroup do
     name { FactoryGirl.generate(:unique_name) }
   end
 
-  factory :ctype do 
+  factory :ctype do
     sequence(:name) {|n| "Component type#{n}"}
     association :cgroup
   end
@@ -120,7 +128,7 @@ FactoryGirl.define do
     sequence(:owner_email) {|n| "owner#{n}@example.com"}
   end
 
-  factory :component do 
+  factory :component do
     association :bike, factory: :bike
     association :ctype
   end
@@ -133,8 +141,8 @@ FactoryGirl.define do
     available_invitation_count 5
   end
 
-  factory :location do 
-    name 
+  factory :location do
+    name
     association :organization
     association :country
     association :state
@@ -143,22 +151,22 @@ FactoryGirl.define do
     street 'foo address'
   end
 
-  factory :country do 
-    name 
+  factory :country do
+    name
     sequence(:iso) {|n| "D#{n}"}
   end
 
-  factory :state do 
-    name 
+  factory :state do
+    name
     association :country
     sequence(:abbreviation) {|n| "Q#{n}"}
   end
 
-  factory :lock_type do 
+  factory :lock_type do
     name { FactoryGirl.generate(:unique_name) }
   end
 
-  factory :lock do 
+  factory :lock do
     association :user
     association :manufacturer
     association :lock_type
@@ -199,12 +207,12 @@ FactoryGirl.define do
     subject 'New Stolen Notification Submitted'
   end
 
-  factory :stolen_record do 
-    association :bike 
-    date_stolen Time.now 
+  factory :stolen_record do
+    bike
+    date_stolen Time.now
   end
 
-  factory :customer_contact do 
+  factory :customer_contact do
     association :creator, factory: :user
     association :bike
     title 'Some title'
