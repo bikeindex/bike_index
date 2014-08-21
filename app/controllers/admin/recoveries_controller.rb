@@ -30,9 +30,27 @@ class Admin::RecoveriesController < Admin::BaseController
   end
 
   def approve
-    RecoveryNotifyWorker.perform_async(params[:id].first.to_i)
-    redirect_to admin_recoveries_url, notice: 'Stolen record notification enqueued.'
-    
+    if params[:multipost]
+      enqueued = false
+      if params[:recovery_selected].present?
+        params[:recovery_selected].keys.each do |rid|
+          recovery = StolenRecord.unscoped.find(rid)
+          unless recovery.recovery_posted && recovery.can_share_recovery == false
+            RecoveryNotifyWorker.perform_async(rid.to_i)
+            enqueued = true
+          end
+        end
+      end
+      if enqueued
+        flash[:notice] = "Recovery notifications enqueued. Recoveries marked 'can share' haven't been posted, because they need your loving caress."
+      else 
+        flash[:error] = "No recoveries were selected (or only recoveries you need to caress were)"
+      end
+      redirect_to admin_recoveries_url
+    else
+      RecoveryNotifyWorker.perform_async(params[:id].to_i)
+      redirect_to admin_recoveries_url, notice: 'Recovery notification enqueued.'
+    end
   end
 
 end
