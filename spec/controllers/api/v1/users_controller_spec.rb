@@ -20,7 +20,7 @@ describe Api::V1::UsersController do
   end
 
   describe :send_request do 
-    it "should create a new serial request mail" do 
+    it "should create a new serial update mail and update the serial" do 
       o = FactoryGirl.create(:ownership)
       user = o.creator
       bike = o.bike
@@ -33,11 +33,13 @@ describe Api::V1::UsersController do
       }
       set_current_user(user)
       ActionMailer::Base.deliveries = []
+      SerialNormalizer.any_instance.should_receive(:save_segments)
       Resque.should_receive(:enqueue)
       post :send_request, serial_request
       response.code.should eq('200')
       FeedbackNotificationEmailJob.perform(Feedback.where(feedback_type: 'serial_update_request').first.id)
       ActionMailer::Base.deliveries.should_not be_empty
+      bike.reload.serial_number.should eq('some new serial')
     end
 
     it "should create a new bike delete request mail" do 
