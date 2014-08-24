@@ -28,6 +28,10 @@ module Api
             feedback.feedback_hash = { bike_id: bike_id }
             if params[:serial_update_serial].present?
               feedback.feedback_hash[:new_serial] = params[:serial_update_serial]
+              feedback.feedback_hash[:old_serial] = bike.serial_number
+              bike.serial_number = params[:serial_update_serial]
+              bike.save
+              SerialNormalizer.new({serial: params[:serial_update_serial]}).save_segments(bike.id)
             elsif feedback_type.match('bike_recovery')
               if bike.current_stolen_record.present?
                 RecoveryUpdateWorker.perform_async(bike.current_stolen_record.id, params)

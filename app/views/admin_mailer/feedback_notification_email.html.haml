@@ -1,12 +1,15 @@
 - if @feedback.feedback_type == 'serial_update_request'
   %h1
-    Serial update request
+    Serial update notification
   %p
     From
     = @feedback.email
   %p
     Reason for update:
     = @feedback.body
+  %p
+    Old serial:
+    = @feedback.feedback_hash[:old_serial]
   %p
     New serial:
     = @feedback.feedback_hash[:new_serial]
