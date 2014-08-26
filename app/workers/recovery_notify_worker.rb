@@ -13,7 +13,8 @@ class RecoveryNotifyWorker
       theft_information: {
         stolen_record_id: stolen_record_id,
         date_stolen: stolen_record.date_stolen,
-        location: stolen_record.address
+        latitude: stolen_record.latitude,
+        longitude: stolen_record.longitude
       },
       recovery_information: {
         date_recovered: stolen_record.date_recovered
