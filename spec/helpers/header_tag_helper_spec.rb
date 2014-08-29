@@ -124,8 +124,9 @@ describe HeaderTagHelper do
       hash[:meta_tags][:description].should_not eq("Blank")
     end
 
-    it "should return the bike name on and new on Show" do 
+    it "should return the bike name on Show" do 
       @bike = Bike.new
+      @bike.stub(:stock_photo_url).and_return("http://something.com")
       @bike.stub(:title_string).and_return("Something special 1969")
       @bike.stub(:stolen).and_return("true")
       @bike.stub(:stolen_string).and_return("")
@@ -134,6 +135,7 @@ describe HeaderTagHelper do
       hash = helper.bikes_header_tags
       hash[:title_tag][:title].should eq("Stolen Something special 1969")
       hash[:meta_tags][:description].should_not eq("Blank")
+      hash[:meta_tags][:"og:image"].should eq("http://something.com")
     end
   end
 

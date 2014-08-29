@@ -46,6 +46,16 @@
 <% bike_image = @bike.thumb_path if @bike.thumb_path %>
 
 <% if @bike.stolen %>
+  <div class="wrap" style="border: 1px solid #dfe3ee;border-radius: 4px;padding: 10px 5px;background: #f7f7f7; margin-bottom: 10px;">
+    <h2 style="font-family: helvetica;font-size: 28px;text-align: center;margin: .5em 0 .7em;">Spread the word!</h2>
+    <a href="http://www.facebook.com/share.php?u=<%= bike_url(@bike) %>" style="display: block;background: #dfe3ee;position: relative;border-radius: 4px;font-family: helvetica;height: 5em;">
+      <span class="facebook-butt" style="border-radius: 4px;display: block;background: #3b5998;position: relative;float: left;height: 100%;">
+        <img src="https://bikeindex.org/assets/facebook.svg" style="height: 100%;width: auto;display: block;">
+      </span>
+      <span class="text" style="display: block;text-align: center;margin-top: .5em;line-height: 1.2em;padding: 1em 1em 0;">Share on Facebook - so everyone knows to watch out for your <%= @bike.type %></span>
+    </a>
+  </div>
+
   <div class="bike-display" style="position: relative;width: 96%;height: 150px;padding: 10px 2%;background: #bf2f2f;border: 1px solid #ddd;max-width: 450px;margin: 30px auto 0;clear: both;">
 <% else %>
   <div class="bike-display" style="position: relative;width: 96%;height: 150px;padding: 10px 2%;background: #ebebeb;border: 1px solid #ddd;max-width: 450px;margin: 30px auto 0; clear: both;">

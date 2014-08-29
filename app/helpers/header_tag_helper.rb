@@ -116,14 +116,24 @@ protected
       hash[:title_tag][:title] = t "meta_title.bikes_new_stolen"
       hash[:meta_tags][:description] = t "meta_descriptions.bikes_new_stolen"
     end
-    if action_name == 'show'
-      hash[:title_tag][:title] = "#{'Stolen ' if @bike.stolen }#{@bike.title_string}"
-      hash[:meta_tags][:description] =  "#{@bike.frame_colors.to_sentence} #{@bike.title_string}, serial: #{@bike.serial_number}. #{@bike.stolen_string}#{@bike.description}"
-    end
     if action_name == 'edit'
       hash[:title_tag][:title] = "Edit #{@bike.title_string}"
     end
-    hash 
+    if action_name == 'show'
+      hash[:title_tag][:title] = "#{'Stolen ' if @bike.stolen }#{@bike.title_string}"
+      hash[:meta_tags][:description] =  "#{@bike.frame_colors.to_sentence} #{@bike.title_string}, serial: #{@bike.serial_number}. #{@bike.stolen_string}#{@bike.description}"
+      if @bike.thumb_path.present?
+        iurl = @bike.public_images.first.image_url
+      elsif @bike.stock_photo_url.present?
+        iurl = @bike.stock_photo_url
+      end
+      if iurl.present?
+        hash[:meta_tags][:"twitter:card"] = "summary_large_image"
+        hash[:meta_tags][:"og:image"] = iurl
+        hash[:meta_tags][:"twitter:image:src"] = iurl
+      end
+    end
+    hash
   end
 
   def users_header_tags
