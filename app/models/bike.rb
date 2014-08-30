@@ -215,6 +215,16 @@ class Bike < ActiveRecord::Base
     end
   end
 
+  before_save :set_mnfg_name
+  def set_mnfg_name
+    if manufacturer.name == "Other" && manufacturer_other.present?
+      name = manufacturer_other
+    else
+      name = manufacturer.name.gsub(/\s?\([^\)]*\)/i,'')
+    end
+    self.mnfg_name = name.strip
+  end
+
   before_save :set_normalized_serial
   def set_normalized_serial
     self.serial_normalized = SerialNormalizer.new({serial: serial_number}).normalized

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140817160101) do
+ActiveRecord::Schema.define(:version => 20140830152248) do
 
   create_table "b_params", :force => true do |t|
     t.text     "params"
@@ -110,6 +110,7 @@ ActiveRecord::Schema.define(:version => 20140817160101) do
     t.integer  "listing_order"
     t.boolean  "approved_stolen"
     t.text     "all_description"
+    t.string   "mnfg_name"
   end
 
   add_index "bikes", ["card_id"], :name => "index_bikes_on_card_id"

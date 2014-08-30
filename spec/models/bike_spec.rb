@@ -170,6 +170,19 @@ describe Bike do
     end
   end
 
+  describe :set_mnfg_name do 
+    it "should set a bikes normalized_serial" do 
+      manufacturer = FactoryGirl.create(:manufacturer, name: 'SE Racing ( S E Bikes )')
+      bike = Bike.new
+      bike.stub(:manufacturer).and_return(manufacturer)
+      bike.set_mnfg_name
+      bike.mnfg_name.should eq("SE Racing")
+    end
+    it "should have before_save_callback_method defined for set_mnfg_name" do
+      Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_mnfg_name).should == true
+    end
+  end
+
   describe :set_normalized_serial do 
     it "should set a bikes normalized_serial" do 
       bike = Bike.new
