@@ -122,7 +122,7 @@ protected
     if action_name == 'show'
       hash[:title_tag][:title] = "#{'Stolen ' if @bike.stolen }#{@bike.title_string}"
       hash[:meta_tags][:description] =  "#{@bike.frame_colors.to_sentence} #{@bike.title_string}, serial: #{@bike.serial_number}. #{@bike.stolen_string}#{@bike.description}"
-      if @bike.thumb_path.present?
+      if @bike.thumb_path.present? && @bike.public_images.present?
         iurl = @bike.public_images.first.image_url
       elsif @bike.stock_photo_url.present?
         iurl = @bike.stock_photo_url
