@@ -1,0 +1,119 @@
+$skinny-height: 15%;
+$fat-height: 25%;
+
+.global-header {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.bikes-nav {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.top-logo {
+  display: block;
+  width: $two-column;
+  position: relative;
+  float: left;
+  z-index: 10;
+  .logo {
+    display: block;
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+  .stripey {
+    display: block;
+    position: absolute;
+    z-index: 0;
+    left: -350%; 
+    width: 400%;
+    height: 100%;
+    background: url("/assets/updated/stripes.svg") repeat-x;
+    background-size: 100% 100%;
+  }
+  .top-stripes {
+    height: 100%;
+    display: block;
+    position: absolute;
+    z-index: 0;
+    left: -50%;
+  }
+}
+
+@media (min-width: 1500px) {
+  .top-logo .stripey {
+    width: 1000%;
+    left: -950%;
+  }
+}
+
+.top-user-nav {
+  position: relative;
+  float: left;
+  width: $ten-column;
+  margin-left: $gutter;
+  ul {
+    @extend .horizontal-list;
+    li {
+      float: right;
+      width: $one-column*1.2; // 12/10 (ten columns of twelve)
+      margin-right: $gutter*1.2;
+      text-align: center;
+      &.double-width { width: $two-column*1.2; }
+      &.first-link { margin-right: 0; }
+    }
+    a {
+      color: $blue-dark;
+      &:hover {
+        color: $blue;
+      }
+    }
+  }
+}
+
+.bike-search-form {
+  @include top-mar($standard-pad); 
+  @include clearfix;
+  display: block;
+  position: relative;
+  width: $nine-column;
+  // margin-left: $gutter;
+  float: right;
+  .searchit, .search-text-field {
+    font-size: 18px;
+    height: 2.5em;
+    display: block;
+    position: relative;
+    float: left;
+  }
+  .search-text-field {
+    width: $eight-column*1.333; // 12/9 (9 columns of 12)
+    border: none;
+    background: $blue-lighterer;
+    // &:active, &:focus { border-color: transparent; }
+    //   $shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 3px lighten($border-color, 20%);
+    //   @include box-shadow($shadow);
+    // }
+  }
+  .searchit {
+    width: ($one-column*1.333)+($gutter*1.333/2); // 12/(1 + .5 gutter)
+    margin-left: ($gutter*1.333/2);
+    background: $blue-dark;
+    @include transition(background ease-in-out .1s);
+    img {
+      display: block;
+      height: 100%;
+      width: auto;
+      margin: 0 auto;
+    }
+    &:hover, &:active, &:focus {
+      background: $blue;
+      @include transition(background ease-in-out .1s);
+    }
+  }
+}

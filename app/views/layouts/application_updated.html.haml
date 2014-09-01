@@ -1,0 +1,67 @@
+!!!
+%html
+  %head
+    = header_tags
+    = csrf_meta_tags
+    <link rel="shortcut icon" href="/fav.ico" />
+    = stylesheet_link_tag "updated", media: "all"
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400,300' rel='stylesheet' type='text/css'>
+    = javascript_include_tag "application"
+    <!-- Pulled from https://code.google.com/p/html5shiv/ -->
+    <!--[if lt IE 9]>
+    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lte IE 8]>
+    <script type="text/javascript">$(function() {$('body').prepend("<body class='welcome-page' id='body'><div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, the Bike Index (and the internet in general) is broken and ugly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>");});</script>
+    <![endif]-->
+    
+    - if controller_name == "blogs"
+      = auto_discovery_link_tag(:atom, blogs_url(format: "atom"), {title: "Bike Index"})
+
+  :plain
+    <!--
+                                                      
+        Stop reading code and go ride your bike!                          ~~O
+                                                                        -  /\,
+        https://github.com/bikeindex/bike_index                        -  -|~(*)
+                                                                      -  (*)
+        
+                                                                        ^--------                                         
+    -->
+  - body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
+  - body_class = "vendor-signup-page" if current_page?(:vendor_signup)
+  %body#body{ class: body_class }
+    / = render 'layouts/grid'
+    = render 'layouts/messages'
+    .bodywrap
+      %header.global-header
+        .container.bikes-nav
+          %a.top-logo{ href: root_url }
+            %span.stripey
+            = image_tag "/assets/updated/logo.svg", class: "logo"
+          .top-user-nav
+            %ul
+              %li.first-link
+                %a{ href: '#' }
+                  Log in
+              %li
+                %a{ href: '#' }
+                  Sign up
+          = form_tag bikes_path, method: :get, id: "head-search-bikes", class: 'bike-search-form' do 
+            = text_field_tag :query,                             |
+              params[:query],                                    |
+              placeholder: "Search bike traits or serials",      |
+              class: "search-text-field form-control"
+            = button_tag(type: "submit", class: "searchit btn") do
+              = image_tag '/assets/updated/search_white.svg'
+            = hidden_field_tag :serial, params[:serial]
+
+      .padded
+      
+      %section.content
+        .receptacle
+          .inner-recep
+
+            = yield
+        
+      = render 'shared/footer_updated'

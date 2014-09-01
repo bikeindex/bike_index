@@ -30,32 +30,33 @@
 #chosen-container
   %ul.bike-boxes
     = render partial: "/bikes/bike", locals: {bike: @bike, target: "show" }
-  %p
-    = @stolen_record.theft_description if @stolen_record.present?
-  .dl-holder
-    %dl.dl-horizontal
-      = @bike.dl_list_item(@bike.created_at.strftime("%m-%d-%Y"), "Created")
-      = @bike.dl_from_attribute("owner_email")
-      = @bike.dl_list_item(@bike.owner.email, "Current Owner")
-      - if @bike.creation_organization_id.present?
-        = @bike.dl_list_item(@bike.creation_organization.name, "Creation Organization")
-      %dt
-        Callable by
-      %dd
-        - if @stolen_record.phone_for_everyone
-          %strong
-            Everyone
+  - if @stolen_record.present?
+    %p
+      = @stolen_record.theft_description
+    .dl-holder
+      %dl.dl-horizontal
+        = @bike.dl_list_item(@bike.created_at.strftime("%m-%d-%Y"), "Created")
+        = @bike.dl_from_attribute("owner_email")
+        = @bike.dl_list_item(@bike.owner.email, "Current Owner")
+        - if @bike.creation_organization_id.present?
+          = @bike.dl_list_item(@bike.creation_organization.name, "Creation Organization")
+        %dt
+          Callable by
+        %dd
+          - if @stolen_record.phone_for_everyone
+            %strong
+              Everyone
+          - else
+            = "Users" if @stolen_record.phone_for_users
+            = " Shops" if @stolen_record.phone_for_shops
+            = " Police" if @stolen_record.phone_for_police
+        - if @stolen_record.approved 
+          %h2
+            Stolen bike approved
         - else
-          = "Users" if @stolen_record.phone_for_users
-          = " Shops" if @stolen_record.phone_for_shops
-          = " Police" if @stolen_record.phone_for_police
-      - if @stolen_record.approved 
-        %h2
-          Stolen bike approved
-      - else
-        = link_to 'Approve listing', approve_admin_stolen_bike_url(@bike), method: :post, confirm: "Approving will:\n\n- Send out a tweet\n- The #{@bike.type} will be posted to any pertinent blogs.\n- It can NOT be effectively reversed\n", class: 'button-blue padded'
-    %dl.dl-horizontal
-      - if @stolen_record.present?
+          = link_to 'Approve listing', approve_admin_stolen_bike_url(@bike), method: :post, confirm: "Approving will:\n\n- Send out a tweet\n- The #{@bike.type} will be posted to any pertinent blogs.\n- It can NOT be effectively reversed\n", class: 'button-blue padded'
+      %dl.dl-horizontal
+      
         %dt
           Stolen on
         %dd
@@ -77,11 +78,13 @@
         %dt
           Police Report
         = @stolen_record.police_report_number
-      - else
-        %h4
-          Stolen record not created yet.
+    - else
+      %h1.padded
+        Stolen record not created yet.
+      %p
+        Wait a minute or two and it will be here!
 
-  %hr
+  %hr.padded
   = link_to "Standard edit page", edit_admin_bike_url(@bike)
   .clearfix
     - @bike.public_images.each do |img|

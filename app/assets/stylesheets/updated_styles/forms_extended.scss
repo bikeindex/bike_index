@@ -1,0 +1,135 @@
+
+// select,
+// textarea,
+// input[type="text"],
+// input[type="password"],
+// input[type="datetime"],
+// input[type="datetime-local"],
+// input[type="date"],
+// input[type="month"],
+// input[type="time"],
+// input[type="week"],
+// input[type="number"],
+// input[type="email"],
+// input[type="url"],
+// input[type="search"],
+// input[type="tel"],
+// input[type="color"],
+// .uneditable-input {
+//   border-radius: 2px;
+//   height: auto;
+//   font-size: 1em;
+//   margin-top: -.25em;
+//   line-height: 1.3em;
+//   font-family: $body-font;
+// }
+
+.select2-choices {
+  border-radius: 2px;
+  font-size: 16px;
+  min-height: 29px;
+}
+
+.select2-container-multi .select2-choices .select2-search-choice {
+  margin-top: 5px;
+}
+.select2-container-multi .select2-choices .select2-search-field input, .select2-container-multi, .select2-container-multi input, .select2-choices, .select2-results {
+  font-family: $body-font;
+  font-size: 1em;
+}
+
+
+label { cursor: pointer; }
+
+.label-with-tip {
+  position: relative;
+  @include clearfix;
+  p {
+    float: left;
+    margin: 0;
+    width: 120px;
+  }
+}
+.formtip {
+  // font-family: courier;
+  display: block;
+  position: relative;
+  margin-top: -.2em;
+  cursor: help;
+  color: darken($blue, 10%);
+  padding: .2em .5em;
+  width: 20px;
+  text-decoration: none;
+  // font-weight: 800;
+  float: left;
+  a, a:hover {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+  }
+}
+
+.control-group.actions input {float: left;}
+
+.form-suggestion { margin-top: .5em; }
+
+@media (min-width: 480px) {
+  .control-group.actions {
+    width: 98%;
+    max-width: 650px;
+    padding-left: 370px;
+    margin-left: 2%;
+  }
+}
+
+@media (max-width: 600px) {
+  .control-group.actions {
+    padding-left: 0;
+    input {
+      float: right;
+    }
+  }
+}
+
+// .control-group.big-action {
+//   padding-left: 0;
+//   margin-left: 0;
+//   a, input { display: block; width: 90%; margin: 0 auto; float: none; }
+// }
+
+
+
+
+// .nested-form {
+//   max-width: 650px;
+//   background: $grayLighterer;
+//   border: 1px solid $grayMed;
+//   padding: 10px 10px 0;
+//   fieldset { position: relative; }
+//   .button {
+//     display: block;
+//     margin: 2em auto;
+//     text-align: center;
+//     text-transform: none;
+//   }
+// }
+
+// .remove-control {
+//   input {
+//     display: none;
+//   }
+//   label { 
+//     display: block;
+//     text-align: right;
+//     width: auto;
+//     position: absolute;
+//     bottom: 15px;
+//     right: 10px;
+//     color: $linkColor;
+//     &:hover {
+//       text-decoration: underline;
+//     }
+//   }
+// }

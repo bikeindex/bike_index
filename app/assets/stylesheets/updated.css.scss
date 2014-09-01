@@ -1,0 +1,23 @@
+// Mixins and vars
+@import "updated_styles/vars";
+@import "updated_styles/mixins/clearfix";
+@import "updated_styles/mixins/tab-focus";
+@import "updated_styles/mixins/vendor-prefixes";
+@import "updated_styles/mixins/forms";
+@import "updated_styles/mixins/sizing";
+@import "updated_styles/mixins/opacity";
+@import "updated_styles/mixins/buttons";
+@import "updated_styles/utilities";
+
+// Base styles
+@import "updated_styles/_colors.scss";
+@import "updated_styles/_fonts.scss";
+@import "updated_styles/buttons.scss";
+@import "updated_styles/forms.scss";
+@import "updated_styles/forms_extended.scss";
+
+// Page sections
+@import "updated_styles/body.scss";
+@import "updated_styles/header.scss";
+@import "updated_styles/footer";
+

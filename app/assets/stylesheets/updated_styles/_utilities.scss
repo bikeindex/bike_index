@@ -1,0 +1,116 @@
+//
+// Utility classes
+// --------------------------------------------------
+
+
+// Floats
+// -------------------------
+
+.clearfix {
+  @include clearfix();
+}
+.pull-right {
+  float: right !important;
+}
+.pull-left {
+  float: left !important;
+}
+
+
+// Toggling content
+// -------------------------
+
+// Note: Deprecated .hide in favor of .hidden or .sr-only (as appropriate) in v3.0.1
+.hide {
+  display: none !important;
+}
+.show {
+  display: block !important;
+}
+.invisible {
+  visibility: hidden;
+}
+
+
+// Hide from screenreaders and browsers
+//
+// Credit: HTML5 Boilerplate
+
+.hidden {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+// Lists
+
+.horizontal-list {
+  @include clearfix;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  li {
+    float: left;
+  }
+}
+
+// Page widths
+
+.container {
+  @include clearfix;
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.padded { @include top-pad($standard-pad); }
+.margined { @include top-mar($standard-pad); }
+
+
+
+
+$grid-columns:             12 !default;
+$column:                  6.5%;
+$gutter:                  2%;
+
+
+$one-column:                     (1 * $column) + (0 * $gutter);
+$two-column:                     (2 * $column) + (1 * $gutter);
+$three-column:                   (3 * $column) + (2 * $gutter);
+$four-column:                    (4 * $column) + (3 * $gutter);
+$five-column:                    (5 * $column) + (4 * $gutter);
+$six-column:                     (6 * $column) + (5 * $gutter);
+$seven-column:                   (7 * $column) + (6 * $gutter);
+$eight-column:                   (8 * $column) + (7 * $gutter);
+$nine-column:                    (9 * $column) + (8 * $gutter);
+$ten-column:                     (10 * $column) + (9 * $gutter);
+$eleven-column:                  (11 * $column) + (10 * $gutter);
+$twelve-column:                  100%;
+
+
+#grid-overlay {
+  // Add = render '/layouts/grid' to header.html to enable
+  // display: none;
+  position: fixed;
+  height: 100%; width: 100%;
+  z-index: 99999;
+  .grid-receptacle {
+    @extend .container;
+    padding: 0;
+    height: 100%;
+  } 
+  .inner-recep { height: 100%;}
+  .column {
+    float: left;
+    width: $one-column;
+    height: 100%;
+    margin-left: $gutter;
+    border: 1px solid #b2dec1;
+    border-top: none;
+    border-bottom: none;
+  }
+  .inner-recep .column:first-of-type {
+    margin-left: 0;
+  }
+}

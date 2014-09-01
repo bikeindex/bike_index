@@ -1,0 +1,81 @@
+$xl-breakpoint: 1150px;
+$l-breakpoint: 1024px;
+$m-breakpoint: 895px;
+$s-breakpoint: 500px;
+
+$standard-pad: 20px;
+$small-pad: 10px;
+$before-text-pad: 12px;
+
+
+
+
+@mixin top-pad($amount) {
+  padding-top: $amount;
+  @media(max-width: $s-breakpoint) { padding-top: $small-pad; }
+}
+@mixin right-pad($amount) {
+  padding-right: $amount;
+  @media(max-width: $s-breakpoint) { padding-right: $small-pad; }
+}
+@mixin bottom-pad($amount) {
+  padding-bottom: $amount;
+  @media(max-width: $s-breakpoint) { padding-bottom: $small-pad; }
+}
+
+@mixin left-pad($amount) {
+  padding-left: $amount;
+  @media(max-width: $s-breakpoint) { padding-left: $small-pad; }
+}
+
+
+@mixin top-mar($amount) {
+  margin-top: $amount;
+  @media(max-width: $s-breakpoint) { margin-top: $small-pad; }
+}
+@mixin bottom-mar($amount) {
+  margin-bottom: $amount;
+  @media(max-width: $s-breakpoint) { margin-bottom: $small-pad; }
+}
+@mixin left-mar($amount) {
+  margin-left: $amount;
+  @media(max-width: $s-breakpoint) { margin-left: $small-pad; }
+}
+@mixin right-mar($amount) {
+  margin-right: $amount;
+  @media(max-width: $s-breakpoint) { margin-right: $small-pad; }
+}
+
+@mixin tb-pad($amount) { 
+  @include top-pad($amount);
+  @include bottom-pad($amount);
+}
+
+@mixin tb-mar($amount) { 
+  @include top-mar($amount);
+  @include bottom-mar($amount);
+}
+
+@mixin lr-pad($amount) { 
+  @include left-pad($amount);
+  @include right-pad($amount);
+}
+
+@mixin lr-mar($amount) { 
+  @include left-mar($amount);
+  @include right-mar($amount);
+}
+
+@mixin all-pad($amount) { 
+  @include top-pad($amount);
+  @include bottom-pad($amount);
+  @include left-pad($amount);
+  @include right-pad($amount);
+}
+
+@mixin all-mar($amount) { 
+  @include top-mar($amount);
+  @include bottom-mar($amount);
+  @include left-mar($amount);
+  @include right-mar($amount);
+}

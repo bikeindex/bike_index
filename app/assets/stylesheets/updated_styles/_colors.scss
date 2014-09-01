@@ -1,0 +1,37 @@
+//________________________
+//
+// Colors
+//
+//________________________
+
+$blue-light: #99CBED;
+$blue-lighter: #EBF5FB;
+$blue-lighterer: #ECF0F1;
+$blue: #3498DB;
+$blue-dark: #2C3E50;
+
+$red: rgb(231,76,60);
+$red-dark: rgb(192,57,43);
+
+$yellow-light: rgb(231,220,188);
+
+$gray-lighterer: lighten(#eee, 4%);
+$gray-lighter: #cacaca;
+$gray-light: #a7a7a7;
+$gray: #bebebe;
+
+
+//________________________
+//
+// Useages
+//
+//________________________
+
+$link-color: $blue;
+$link-color-hover: darken($blue-dark, 10%);
+$placeholder: #aaa;
+$text-color: #111;
+$stolen-color: $red-dark;
+
+$body-bg: #fff;
+$footer-bg: rgb(249,249,249);
