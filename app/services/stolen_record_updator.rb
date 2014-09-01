@@ -78,6 +78,7 @@ class StolenRecordUpdator
     if updated_phone.present?
       new_stolen_record.phone = updated_phone
     end
+    new_stolen_record.country_id = Country.find_by_iso("US").id
     stolen_record = update_with_params(new_stolen_record)
     if stolen_record.save
       return true

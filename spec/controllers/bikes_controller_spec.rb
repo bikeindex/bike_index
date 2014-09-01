@@ -160,6 +160,7 @@ describe BikesController do
       end
 
       it "should create a new stolen bike" do
+        FactoryGirl.create(:country, iso: "US")
         @bike[:phone] = "312.379.9513"
         lambda {
           post :create, { stolen: "true", bike: @bike}

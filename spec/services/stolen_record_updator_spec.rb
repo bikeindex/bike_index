@@ -3,6 +3,7 @@ require 'spec_helper'
 describe StolenRecordUpdator do
   describe :create_new_record do 
     it "should create a new stolen record" do
+      FactoryGirl.create(:country, iso: "US")
       bike = FactoryGirl.create(:bike)
       update_stolen_record = StolenRecordUpdator.new(bike: bike)
       update_stolen_record.should_receive(:updated_phone).at_least(1).times.and_return("1231234444")
@@ -11,6 +12,7 @@ describe StolenRecordUpdator do
     end
 
     it "should call mark_records_not_current" do 
+      FactoryGirl.create(:country, iso: "US")
       bike = FactoryGirl.create(:bike, stolen: true)
       update_stolen_record = StolenRecordUpdator.new(bike: bike)
       update_stolen_record.should_receive(:updated_phone).at_least(1).times.and_return("1231234444")
@@ -48,6 +50,7 @@ describe StolenRecordUpdator do
 
   describe :update_records do
     it "should set the current stolen record as not current if the bike isn't stolen" do 
+      FactoryGirl.create(:country, iso: "US")
       bike = FactoryGirl.create(:bike, stolen: true)
       update_stolen_record = StolenRecordUpdator.new(bike: bike)
       update_stolen_record.should_receive(:updated_phone).at_least(1).times.and_return("1231234444")

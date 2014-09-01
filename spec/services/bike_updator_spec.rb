@@ -30,6 +30,7 @@ describe BikeUpdator do
 
   describe :update_stolen_record do 
     it "should call update_stolen_record with the date_stolen_input if it exists" do 
+      FactoryGirl.create(:country, iso: "US")
       bike = FactoryGirl.create(:bike, stolen: true)
       updator = BikeUpdator.new(b_params: {id: bike.id, bike: {date_stolen_input: "07-09-2000"}})
       updator.update_stolen_record
@@ -37,6 +38,7 @@ describe BikeUpdator do
       csr.date_stolen.should eq(DateTime.strptime("07-09-2000 06", "%m-%d-%Y %H"))
     end
     it "should create a stolen record if one doesn't exist" do 
+      FactoryGirl.create(:country, iso: "US")
       bike = FactoryGirl.create(:bike)
       BikeUpdator.new(b_params: {id: bike.id, bike: {stolen: true}}).update_stolen_record
       bike.stolen_records.count.should_not be_nil
