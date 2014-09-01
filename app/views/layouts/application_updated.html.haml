@@ -36,32 +36,62 @@
     .bodywrap
       %header.global-header
         .container.bikes-nav
-          %a.top-logo{ href: root_url }
-            %span.stripey
-            = image_tag "/assets/updated/logo.svg", class: "logo"
+          .small-header
+            %a.top-logo{ href: root_url }
+              %span.stripey
+              = image_tag "/assets/updated/logo.svg", class: "logo"
           .top-user-nav
             %ul
-              %li.first-link
-                %a{ href: '#' }
-                  Log in
+              - if current_user.present?
+                %li
+                  = link_to 'Logout', session_path, method: :delete, class: 'low-priority'
+                %li
+                  = link_to "Your bikes", '/user_home'
+                - if current_user.memberships.any?
+                  - current_user.memberships.each do |membership|
+                    %li
+                      %a{ href: "/organizations/#{membership.organization.slug}" }
+                        = membership.organization.short_name
+                - if current_user.superuser
+                  %li
+                    = link_to 'Admin', admin_root_path
+
+              - else
+                %li.first-link
+                  %a{href: new_session_url }
+                    Log in
+                %li
+                  %a{ href: new_user_url }
+                    Sign up
+                    
+              / %li
+              /   %a{ href: '#' }
+              /     How it works
               %li
-                %a{ href: '#' }
-                  Sign up
-          = form_tag bikes_path, method: :get, id: "head-search-bikes", class: 'bike-search-form' do 
+                %a.low-priority{ href: about_url }
+                  About
+              %li
+                %a.low-priority{ href: blogs_url }
+                  News
+          = form_tag bikes_path, method: :get, id: "head-search-bikes", class: 'bike-search-form' do
+            - params[:query] = params[:query].gsub(/,?#,?/,'').gsub(/(\A,|,\z)/, '') if params[:query].present?
             = text_field_tag :query,                             |
               params[:query],                                    |
               placeholder: "Search bike traits or serials",      |
               class: "search-text-field form-control"
             = button_tag(type: "submit", class: "searchit btn") do
               = image_tag '/assets/updated/search_white.svg'
-            = hidden_field_tag :serial, params[:serial]
-
-      .padded
+            - if params[:manufacturer_id].present?
+              - mnfg = {id: params[:manufacturer_id], text: Manufacturer.find(params[:manufacturer_id]).name} if params[:manufacturer_id].present?
+            - else
+              - mnfg = ''
+            - select_list = Color.all.map { |c| { id: "c_#{c.id}", text: c.name, display: c.display } }
+            - select_list += Manufacturer.frames.map { |m| { id: "m_#{m.id}", text: m.name } }
+            #header-search{ data: { selected: mnfg.to_json, options: select_list.to_json } }
+              = hidden_field_tag :serial, params[:serial]
       
-      %section.content
-        .receptacle
-          .inner-recep
-
-            = yield
-        
+      = yield
+      
       = render 'shared/footer_updated'
+
+      

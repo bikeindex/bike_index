@@ -6,19 +6,20 @@
 
 $blue-light: #99CBED;
 $blue-lighter: #EBF5FB;
-$blue-lighterer: #ECF0F1;
 $blue: #3498DB;
 $blue-dark: #2C3E50;
 
-$red: rgb(231,76,60);
+$red: #C0392B;
 $red-dark: rgb(192,57,43);
 
 $yellow-light: rgb(231,220,188);
 
-$gray-lighterer: lighten(#eee, 4%);
-$gray-lighter: #cacaca;
+$gray-lighterer: #F4F6F7;
+$gray-lighter: #ECF0F1;;
 $gray-light: #a7a7a7;
 $gray: #bebebe;
+
+$green: #2ECC71;
 
 
 //________________________
@@ -28,10 +29,23 @@ $gray: #bebebe;
 //________________________
 
 $link-color: $blue;
-$link-color-hover: darken($blue-dark, 10%);
+$link-color-hover: darken($blue, 15%);
 $placeholder: #aaa;
 $text-color: #111;
-$stolen-color: $red-dark;
+
+$stolen-color: $red;
+$safe-color: $green;
 
 $body-bg: #fff;
-$footer-bg: rgb(249,249,249);
+$footer-bg: $gray-lighter;
+
+
+
+//________________________
+//
+// Useages
+//
+//________________________
+
+.stolen-color { color: $stolen-color; }
+.safe-color { color: $safe-color; }

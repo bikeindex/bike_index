@@ -7,17 +7,28 @@
 @import "updated_styles/mixins/sizing";
 @import "updated_styles/mixins/opacity";
 @import "updated_styles/mixins/buttons";
+@import "updated_styles/mixins/text-overflow";
+@import "updated_styles/mixins/grid";
 @import "updated_styles/utilities";
 
+// External styles
+@import "includes/select2-binx.scss";
+
 // Base styles
-@import "updated_styles/_colors.scss";
-@import "updated_styles/_fonts.scss";
-@import "updated_styles/buttons.scss";
-@import "updated_styles/forms.scss";
-@import "updated_styles/forms_extended.scss";
+@import "updated_styles/_colors";
+@import "updated_styles/_fonts";
+@import "updated_styles/buttons";
+@import "updated_styles/forms";
+@import "updated_styles/forms_extended";
+@import "updated_styles/lists";
+@import "updated_styles/pagination";
 
 // Page sections
-@import "updated_styles/body.scss";
-@import "updated_styles/header.scss";
+@import "updated_styles/body";
+@import "updated_styles/header";
+@import "updated_styles/content";
 @import "updated_styles/footer";
 
+// Bike styles
+@import "updated_styles/bike_styles/base";
+@import "updated_styles/bike_styles/index";

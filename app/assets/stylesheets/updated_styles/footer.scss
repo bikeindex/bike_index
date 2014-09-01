@@ -32,7 +32,10 @@
       margin: 0;
       padding: 0;
       li { padding: .3em 0 0;}
-      a { color: $blue-light; }
+      a {
+        color: $blue-light;
+        &:hover { text-decoration: underline; }
+      }
 
     }
     .social {
@@ -50,7 +53,7 @@
         margin: 0 auto;
         max-width: 50px;
         margin: 0;
-        background: $blue;
+        background: $blue-dark;
         img {
           display: block;
           width: 100%;
@@ -58,7 +61,7 @@
         }
         &:hover {
           @include transition(background .15s linear);
-          background: $blue-dark;
+          background: $blue;
         }
         &:active {
           @include translate(1px,1px);

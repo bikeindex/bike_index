@@ -11,6 +11,14 @@
   text-rendering: optimizeLegibility;
 }
 
+html {
+  width: 100%;
+  max-width: 100%;
+  margin: 0; padding: 0;
+  background: $footer-bg;
+}
+
+
 body {
   width: 100%;
   max-width: 100%;
@@ -21,8 +29,8 @@ body {
   font-family: $body-font;
   font-weight: $body-font-weight;
   margin: 0; padding: 0;
-  @include top-pad($standard-pad);
 }
+
 .bodywrap {
   position: relative;
   width: 100%;
@@ -51,11 +59,11 @@ h1, h2, h3, h4 {
   }
 }
 
-html {
-  width: 100%;
-  max-width: 100%;
-  margin: 0; padding: 0;
+
+p {
+  margin: .5em 0 0;
 }
+
 
 
 
