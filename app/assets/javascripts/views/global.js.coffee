@@ -11,6 +11,7 @@ class BikeIndex.Views.Global extends Backbone.View
     'change input#stolen':                  'toggleProximitySearch'
     'change #head-search-bikes #query':     'updateManufacturerSearch'
     # 'click #search-type-tabs':              'toggleSearchType'
+    'click #expand_user':                   'expandUserNav'
     
   initialize: ->
     BikeIndex.hideFlash()
@@ -214,7 +215,10 @@ class BikeIndex.Views.Global extends Backbone.View
   expandSearch: ->
     # unless $('#total-top-header').hasClass('search-expanded')
     #   $('#header-search .optional-fields').fadeIn()
-
+  expandUserNav: (event) ->
+    event.preventDefault()
+    $('.top-user-nav').slideToggle()
+    
   # loadUserHeader: ->
     # This is minified and inlined in the header
     # 

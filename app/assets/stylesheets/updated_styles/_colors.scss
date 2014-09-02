@@ -1,0 +1,51 @@
+//________________________
+//
+// Colors
+//
+//________________________
+
+$blue-light: #99CBED;
+$blue-lighter: #EBF5FB;
+$blue: #3498DB;
+$blue-dark: #2C3E50;
+
+$red: #C0392B;
+$red-dark: rgb(192,57,43);
+
+$yellow-light: rgb(231,220,188);
+
+$gray-lighterer: #F4F6F7;
+$gray-lighter: #ECF0F1;;
+$gray-light: #a7a7a7;
+$gray: #bebebe;
+
+$green: #2ECC71;
+
+
+//________________________
+//
+// Useages
+//
+//________________________
+
+$link-color: $blue;
+$link-color-hover: darken($blue, 15%);
+$placeholder: #aaa;
+$text-color: #111;
+
+$stolen-color: $red;
+$safe-color: $green;
+
+$body-bg: #fff;
+$footer-bg: $gray-lighter;
+
+
+
+//________________________
+//
+// Useages
+//
+//________________________
+
+.stolen-color { color: $stolen-color; }
+.safe-color { color: $safe-color; }

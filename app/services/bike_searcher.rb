@@ -105,7 +105,7 @@ class BikeSearcher
     else
       @bikes = Bike.where(stolen: false).order("RANDOM()")
     end
-    @bikes.limit(100)
+    @bikes.limit(500)
   end
 
   def close_serials

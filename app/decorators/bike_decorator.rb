@@ -28,7 +28,15 @@ class BikeDecorator < ApplicationDecorator
     t = ""
     t += "#{object.year} " if object.year.present?
     t += "#{object.frame_model} by " if object.frame_model.present?
-    h.content_tag(:span, t) + h.content_tag(:strong, mnfg_name)
+    h.content_tag(:span, t) + h.content_tag(:strong, object.mnfg_name)
+  end
+
+  def title_u
+    t = ""
+    t += "#{object.year} " if object.year.present?
+    t += h.content_tag(:strong, object.mnfg_name)
+    t += " #{object.frame_model}" if object.frame_model.present?
+    t.html_safe
   end
 
   def stolen_string
@@ -74,7 +82,7 @@ class BikeDecorator < ApplicationDecorator
 
   def thumb_image
     if object.thumb_path
-      h.image_tag(object.thumb_path, alt: title_string)
+      h.image_tag(object.thumb_path, alt: title)
     elsif object.stock_photo_url.present?
       small = object.stock_photo_url.split('/')
       ext = "/small_" + small.pop

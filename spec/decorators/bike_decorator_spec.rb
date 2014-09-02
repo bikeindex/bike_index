@@ -57,8 +57,8 @@ describe BikeDecorator do
       bike = Bike.new
       bike.stub(:year).and_return("1999")
       bike.stub(:frame_model).and_return("model")
+      bike.stub(:mnfg_name).and_return("foo")
       decorator = BikeDecorator.new(bike)
-      decorator.stub(:mnfg_name).and_return("foo")
       decorator.title.should eq("<span>1999 model by </span><strong>foo</strong>")
     end
   end

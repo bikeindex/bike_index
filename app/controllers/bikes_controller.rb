@@ -26,14 +26,14 @@ class BikesController < ApplicationController
       @secondary_bikes = secondary_bikes.decorate if secondary_bikes.present?
     end
     @count = bikes.count
-    (bikes.count <= 100) ? (total_bikes = bikes.count) : (total_bikes = 100)
+    (bikes.count <= 500) ? (total_bikes = bikes.count) : (total_bikes = 500)
     @page = params[:page]
     bikes = bikes.paginate(page: params[:page], total_entries: total_bikes).per_page(25)
     @bikes = bikes.decorate
     @attribute_select_values = search.parsed_attributes
     @query = params[:query]
     @stolenness = { stolen: params[:stolen] }
-    render layout: 'application'
+    render layout: 'application_updated'
   end
 
   def show

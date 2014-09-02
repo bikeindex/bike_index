@@ -1,0 +1,54 @@
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Open Sans Light'), local('OpenSans-Light'), url(https://themes.googleusercontent.com/static/fonts/opensans/v8/DXI1ORHCpsQm3Vp6mXoaTaRDOzjiPcYnFooOUGCOsRk.woff) format('woff');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 300;
+  src: local('Open Sans Light Italic'), local('OpenSansLight-Italic'), url(https://themes.googleusercontent.com/static/fonts/opensans/v8/PRmiXeptR36kaC0GEAetxvR_54zmj3SbGZQh3vCOwvY.woff) format('woff');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Open Sans'), local('OpenSans'), url(https://themes.googleusercontent.com/static/fonts/opensans/v8/cJZKeOuBrn4kERxqtaUH3bO3LdcAZYWl9Si6vvxL-qU.woff) format('woff');
+}
+
+
+// Standard font:
+$body-font: 'Open Sans', sans-serif;
+
+@font-face{
+  font-family:'Klinic';
+  src:url("/assets/KlinicSlabBook.otf");
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face{
+  font-family:'Klinic';
+  src:url("/assets/KlinicSlabBookIt.otf");
+  font-weight: normal;
+  font-style: italic;
+}
+@font-face{
+  font-family:'Klinic';
+  src:url("/assets/KlinicSlabMedium.otf");
+  font-weight: bold;
+  font-style: normal;
+}
+
+$header-font: 'Klinic', sans-serif;
+$header-font-weight: 400;
+
+
+$body-font-weight: 400;
+$body-font-size: 16px;
+$small-font-size: 14px;
+
+$form-font-weight: 400;
+$form-font-size: 16px;
+$form-font-family: $body-font;
+

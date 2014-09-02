@@ -1,0 +1,99 @@
+!!!
+%html
+  %head
+    = header_tags
+    = csrf_meta_tags
+    <link rel="shortcut icon" href="/fav.ico" />
+    = stylesheet_link_tag "updated", media: "all"
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400,300' rel='stylesheet' type='text/css'>
+    = javascript_include_tag "application"
+    <!-- Pulled from https://code.google.com/p/html5shiv/ -->
+    <!--[if lt IE 9]>
+    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lte IE 8]>
+    <script type="text/javascript">$(function() {$('body').prepend("<body class='welcome-page' id='body'><div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, the Bike Index (and the internet in general) is broken and ugly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>");});</script>
+    <![endif]-->
+    
+    - if controller_name == "blogs"
+      = auto_discovery_link_tag(:atom, blogs_url(format: "atom"), {title: "Bike Index"})
+
+  :plain
+    <!--
+                                                      
+        Stop reading code and go ride your bike!                          ~~O
+                                                                        -  /\,
+        https://github.com/bikeindex/bike_index                        -  -|~(*)
+                                                                      -  (*)
+        
+                                                                        ^--------                                         
+    -->
+  - body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
+  - body_class = "vendor-signup-page" if current_page?(:vendor_signup)
+  %body#body{ class: body_class }
+    / = render 'layouts/grid'
+    = render 'layouts/messages'
+    .bodywrap
+      %header.global-header
+        .container.bikes-nav
+          .small-header
+            %a.top-logo{ href: root_url }
+              %span.stripey
+              = image_tag "/assets/updated/logo.svg", class: "logo"
+            %a#expand_user.hamburglar{ href: '#' }
+              = image_tag "/assets/updated/hamburglar.svg"
+          .top-user-nav
+            %ul
+              - if current_user.present?
+                %li
+                  = link_to 'Logout', session_path, method: :delete, class: 'low-priority'
+                %li
+                  = link_to "Your bikes", '/user_home'
+                - if current_user.memberships.any?
+                  - current_user.memberships.each do |membership|
+                    %li
+                      %a{ href: "/organizations/#{membership.organization.slug}" }
+                        = membership.organization.short_name
+                - if current_user.superuser
+                  %li
+                    = link_to 'Admin', admin_root_path
+
+              - else
+                %li.first-link
+                  %a{href: new_session_url }
+                    Log in
+                %li
+                  %a{ href: new_user_url }
+                    Sign up
+                    
+              / %li
+              /   %a{ href: '#' }
+              /     How it works
+              %li
+                %a.low-priority{ href: about_url }
+                  About
+              %li
+                %a.low-priority{ href: blogs_url }
+                  News
+          = form_tag bikes_path, method: :get, id: "head-search-bikes", class: 'bike-search-form' do
+            - params[:query] = params[:query].gsub(/,?#,?/,'').gsub(/(\A,|,\z)/, '') if params[:query].present?
+            = text_field_tag :query,                             |
+              params[:query],                                    |
+              placeholder: "Search bike traits or serials",      |
+              class: "search-text-field form-control"
+            = button_tag(type: "submit", class: "searchit btn") do
+              = image_tag '/assets/updated/search_white.svg'
+            - if params[:manufacturer_id].present?
+              - mnfg = {id: params[:manufacturer_id], text: Manufacturer.find(params[:manufacturer_id]).name} if params[:manufacturer_id].present?
+            - else
+              - mnfg = ''
+            - select_list = Color.all.map { |c| { id: "c_#{c.id}", text: c.name, display: c.display } }
+            - select_list += Manufacturer.frames.map { |m| { id: "m_#{m.id}", text: m.name } }
+            #header-search{ data: { selected: mnfg.to_json, options: select_list.to_json } }
+              = hidden_field_tag :serial, params[:serial]
+      
+      = yield
+      
+      = render 'shared/footer_updated'
+
+      

@@ -1,5 +1,6 @@
 class Bike < ActiveRecord::Base  
   include ActiveModel::Dirty
+  # include ActionView::Helpers::SanitizeHelper
   attr_accessible :verified,
     :payment_required,
     :paid_for,
@@ -218,7 +219,7 @@ class Bike < ActiveRecord::Base
   before_save :set_mnfg_name
   def set_mnfg_name
     if manufacturer.name == "Other" && manufacturer_other.present?
-      name = manufacturer_other
+      name = ActionController::Base.helpers.strip_tags(manufacturer_other)
     else
       name = manufacturer.name.gsub(/\s?\([^\)]*\)/i,'')
     end

@@ -1,0 +1,299 @@
+$skinny-height: 15%;
+$fat-height: 25%;
+
+.global-header {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+@media (min-width: $s-breakpoint+1) {
+  .global-header { padding-top: $standard-pad; }
+}
+
+.bikes-nav {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+}
+
+@media (min-width: $s-breakpoint+1) {
+  .top-logo {
+    display: block;
+    width: $two-column;
+    position: relative;
+    float: left;
+    z-index: 10;
+    .logo {
+      display: block;
+      width: 100%;
+      height: auto;
+      position: relative;
+    }
+    .stripey {
+      display: block;
+      position: absolute;
+      z-index: 0;
+      left: -350%; 
+      width: 400%;
+      height: 100%;
+      background: url("/assets/updated/stripes.svg") repeat-x;
+      background-size: 100% 100%;
+    }
+    .top-stripes {
+      height: 100%;
+      display: block;
+      position: absolute;
+      z-index: 0;
+      left: -50%;
+    }
+  }
+}
+
+.small-header .hamburglar {
+  position: absolute;
+  width: $two-column;
+  top: 16px;
+  height: 51px;
+  left: 20px;
+  img {
+    display: block;
+    height: 100%;
+    width: auto;
+  }
+}
+
+@media (max-width: $s-breakpoint) {
+  .container.bikes-nav { padding: 3px 0; }
+  .small-header {
+    width: 100%;
+    position: relative;
+    display: block;
+    margin-top: 3px;
+    background: url("/assets/updated/stripes.png") repeat-x;
+    background-size: 100% 100%;
+    height: 80px;
+    overflow: visible;
+    .top-logo {
+      display: block;
+      width: 100px;
+      position: relative;
+      margin: 0 auto;
+      img {
+        display: inline-block;
+        width: 100px;
+        height: auto;
+        margin-top: -8px;
+      }
+    }
+    .hamburglar { display: block; }
+  }
+}
+
+@media (min-width: 1500px) {
+  .top-logo .stripey {
+    width: 1000%;
+    left: -950%;
+  }
+}
+
+@media (min-width: $s-breakpoint+1) {
+  .top-user-nav {
+    position: relative;
+    float: left;
+    width: $ten-column;
+    margin-left: $gutter;
+    ul {
+      margin: 0;
+      padding: 0;
+      list-style-type: none;
+      li {
+        float: right;
+        width: $one-column*1.205; // 100/83 full width over 10 column
+        margin-right: $gutter*1.2;
+        text-align: center;
+        &.double-width { width: $two-column*1.2; }
+        &.first-link { margin-right: 0; }
+      }
+      a {
+        color: $blue-dark;
+        &.low-priority { color: $gray-light; }
+        &:hover {
+          color: $blue;
+        }
+      }
+    }
+  }
+}
+
+
+@media (max-width: $s-breakpoint) {
+  .top-user-nav { display: none; }
+}
+
+.bike-search-form {
+  @include top-mar($standard-pad); 
+  @include clearfix;
+  display: block;
+  position: relative;
+  // width: $nine-column;
+  // margin-left: $gutter;
+  // float: right;
+  $bike-search-height: 2.5em;
+  $bike-search-font-size: 18px;
+  .searchit, .search-text-field {
+    font-size: $bike-search-font-size;
+    display: block;
+    position: relative;
+    float: left;
+    padding: 4px 0;
+  }
+  $row-width: 1.342; // 100/74.5 - full width over 9 column
+  .search-text-field.select2-container.select2-container-multi {
+    // width: ($eight-column+$gutter)*$row-width; 
+    font-size: $bike-search-font-size;
+    border: none;
+    background: $gray-lighter;
+    border-radius: $border-radius 0 0 $border-radius;
+    padding: 0;
+    &:active, &:focus { box-shadow: none; }
+
+    .select2-choices {
+      height: $bike-search-height;
+      background: none;
+      border: none;
+      font-size: $bike-search-font-size;
+      line-height: 1em;
+      padding: .25em .5em;
+    }
+    .select2-search-choice {
+      font-size: $bike-search-font-size;
+      border-radius: $border-radius;
+      margin: .1em .25em 0 0;
+      padding: .35em .5em .35em 18px;
+      line-height: 1em;
+      background: $gray-lighterer;
+    }
+    .select2-search-choice-focus {
+      border-color: $blue;
+      background: lighten($gray-lighterer, 2%);
+    }
+  }
+  .searchit {
+    @include transition(background ease-in-out .1s);
+    border-radius: 0 $border-radius $border-radius 0;
+    // width: $one-column*$row-width; // 1 column + 1/2 gutter at row
+    margin-left: 0;
+    background: $blue-dark;
+    height: $bike-search-height;
+    img {
+      display: block;
+      height: 100%;
+      width: auto;
+      margin: 0 auto;
+    }
+    &:hover, &:active, &:focus {
+      @include transition(background ease-in-out .1s);
+      background: $blue;
+      box-shadow: none;
+    }
+  }
+}
+@media (max-width: $s-breakpoint) {
+  .bike-search-form {
+    width: 100%;
+    float: none;
+    padding: 0 $small-pad;
+    // clear: both;
+    .search-text-field.select2-container.select2-container-multi {
+      width: $ten-column+$gutter; 
+    }
+    .searchit {
+      width: $two-column; // 1 column + 1/2 gutter at row
+    }
+  }
+}
+
+@media (min-width: $s-breakpoint+1) {
+  .bike-search-form {
+    width: $nine-column;
+    float: right;
+    $row-width: 1.342; // 100/74.5 - full width over 9 column
+    .search-text-field.select2-container.select2-container-multi {
+      width: ($eight-column+$gutter)*$row-width; 
+    }
+    .searchit {
+      width: $one-column*$row-width; // 1 column + 1/2 gutter at row
+    }
+  }
+}
+
+#bikes-search { display: none; }
+
+.mainsrchdr {
+  background: $gray-lighterer;
+  border: 1px solid $gray-lighter;
+  // border: none;
+  border-top: 1px solid rgba($gray-lighter, .5);
+  // border-top: 1px solid darken($gray-lighter, 5%);
+  font-size: 18px;
+  border-radius: 0 0 $border-radius $border-radius;
+  
+  .select2-results {
+    padding: 0;
+    margin-right: 0;
+    max-height: 300px;
+  }
+  .select2-result-label {
+    padding: .35em 7px;
+  }
+  .select2-highlighted {
+    // background: $btnAction;
+    .sch_s { color: #ccc; }
+  }
+  .sch_s {
+    // color: $btnAction;
+    display: inline-block;
+  }
+  .sch_m, .sch_ {
+    color: #ccc;
+  }
+  .sch_c {
+    color: #bbb;
+    display: inline-block;
+  }
+
+  .sch_special {
+    border-bottom: 1px solid #ddd;
+  }
+}
+
+.sclr {
+  border-radius: 3px;
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  border: 1px solid white;
+  margin: 0 6px 0 0;
+  font-size: .5em;
+  // color: $grayLighter;
+  text-align: center;
+  padding-top: 1em;
+}
+
+@media (max-width: 600px) {
+  .mainsrchdr {
+    .select2-results { max-height: 200px; }
+    .sch_s, .sch_m, .sch_ {
+      font-size: 14px;
+      span { display: none; }
+    }
+  }
+}
+.search_span_s, .search_span_m {
+  color: #bbb;
+  margin-left: 0;
+  margin-right: 3px;
+  display: inline;
+}

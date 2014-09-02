@@ -1,0 +1,52 @@
+%li
+  .bike-box
+    %a.bg-link{ href: bike_u.list_link_url(target) }
+    .information-holder
+      .bike-information
+        %h3
+          = link_to bike_u.title_u, bike_u.list_link_url(target)
+        %p
+          %span.attr-title
+            Serial
+          %span.serial-text
+            - if bike_u.recovered
+              Serial hidden
+            - else 
+              - if bike_u.serial_number.match('absent')
+                - if bike_u.stolen
+                  Unknown
+                - else
+                  Has no serial
+              - else
+                = bike_u.serial_number
+        %p
+          %span.attr-title
+            Colors
+          = bike_u.frame_colors.to_sentence
+      - if bike_u.stolen
+        .theft-information
+          %h3
+            Status:
+            - if bike_u.recovered
+              Recovered by Organization
+            - else
+              STOLEN
+          - if bike_u.current_stolen_record.present?
+            %p
+              %span.attr-title
+                From
+              = bike_u.short_address(bike_u.current_stolen_record)
+            %p
+              %span.attr-title
+                Date
+              = bike_u.current_stolen_record.date_stolen.strftime("%m-%d-%Y")
+          
+          /         - date_label = "Stolen"
+          /         - date_label = "Recovered" 
+          /         = bike_u.dl_list_item(bike_u.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), date_label)
+          /       %dl.dl-horizontal
+          /         = bike_u.dl_list_item(bike_u.short_address(bike_u.current_stolen_record), "From")
+
+    %a.image-holder{href: bike_url(bike_u) }
+      
+      = bike_u.thumb_image 
