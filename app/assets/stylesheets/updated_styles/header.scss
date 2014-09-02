@@ -51,6 +51,19 @@ $fat-height: 25%;
   }
 }
 
+.small-header .hamburglar {
+  position: absolute;
+  width: $two-column;
+  top: 16px;
+  height: 51px;
+  left: 20px;
+  img {
+    display: block;
+    height: 100%;
+    width: auto;
+  }
+}
+
 @media (max-width: $s-breakpoint) {
   .container.bikes-nav { padding: 3px 0; }
   .small-header {
@@ -74,6 +87,7 @@ $fat-height: 25%;
         margin-top: -8px;
       }
     }
+    .hamburglar { display: block; }
   }
 }
 
@@ -200,6 +214,7 @@ $fat-height: 25%;
     }
   }
 }
+
 @media (min-width: $s-breakpoint+1) {
   .bike-search-form {
     width: $nine-column;

@@ -40,6 +40,8 @@
             %a.top-logo{ href: root_url }
               %span.stripey
               = image_tag "/assets/updated/logo.svg", class: "logo"
+            %a#expand_user.hamburglar{ href: '#' }
+              = image_tag "/assets/updated/hamburglar.svg"
           .top-user-nav
             %ul
               - if current_user.present?
