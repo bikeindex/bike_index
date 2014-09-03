@@ -1,0 +1,36 @@
+%header.with-subtitle
+  %h1
+    Manage Ads
+  = link_to 'New ad', new_admin_ad_url, class: "button-green sharing-links"
+
+%h4.padded
+  = @ads.count
+  ads are in the system so far!
+
+
+%section.full-screen-table
+  %table#admin-orgs-table.table.table-striped.table-bordered
+    %thead
+      %th.medium-screens
+        Created
+      %th
+        Name
+      
+    %tbody
+      - @ads.each do |ad|
+        %tr
+          %td.medium-screens
+            - if ad.created_at.today?
+              %span.hidden
+                = ad.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Today at #{ad.created_at.strftime("%-I %p")}
+            - elsif Date.yesterday().beginning_of_day() <= ad.created_at
+              %span.hidden
+                = ad.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Yesterday at #{ad.created_at.strftime("%-I %p")}
+            - else
+              %span.hidden
+                = ad.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              = ad.created_at.strftime("%-m/%-d/%Y at %-I %p")
+          %td
+            = link_to ad.name, admin_ad_url(ad)

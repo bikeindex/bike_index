@@ -11,7 +11,19 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140830152248) do
+ActiveRecord::Schema.define(:version => 20140902230041) do
+
+  create_table "ads", :force => true do |t|
+    t.string   "name"
+    t.string   "title"
+    t.text     "body"
+    t.string   "image"
+    t.text     "target_url"
+    t.integer  "organization_id"
+    t.boolean  "live",            :default => false, :null => false
+    t.datetime "created_at",                         :null => false
+    t.datetime "updated_at",                         :null => false
+  end
 
   create_table "b_params", :force => true do |t|
     t.text     "params"

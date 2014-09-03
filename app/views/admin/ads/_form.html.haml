@@ -1,0 +1,49 @@
+- if @ad.errors.any?
+  #alert-block
+    .alert.alert-error
+      %h4
+        Please fix the following
+        = pluralize(@ad.errors.count, "error")
+      %ul
+        - @ad.errors.full_messages.each do |msg|
+          %li
+            = msg
+
+.control-group.padded
+  .control-label
+    = f.label :name
+  .controls
+    = f.text_field :name
+
+.control-group
+  .control-label
+    = f.label :title
+  .controls
+    = f.text_field :title
+
+.control-group
+  .control-label
+    = f.label :target_url
+  .controls
+    = f.text_field :target_url
+  
+.control-group
+  .controls
+    = f.text_area :body, placeholder: 'ad body copy'
+
+.control-group.avatar-upload
+  %label.control-label
+    Ad image
+  .controls
+    .avatar-img
+      - if @ad.image? 
+        = image_tag(@ad.image_url(:small))
+      - else
+        %p
+          No picture!
+    = f.file_field :image
+    = f.hidden_field :image_cache
+
+/ :organization_id,
+/ :target_url,
+/ :live 

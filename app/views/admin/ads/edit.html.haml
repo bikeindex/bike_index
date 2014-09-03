@@ -1,0 +1,9 @@
+%h1.padded
+  Edit Ad
+
+.form
+  = form_for [:admin, @ad] do |f|
+    = render partial: 'form', locals: { f: f }
+    
+    .control-group.actions.big-action.padded
+      = f.submit "Update", class: 'button-green big-action'

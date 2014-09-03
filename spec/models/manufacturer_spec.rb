@@ -17,6 +17,10 @@ describe Manufacturer do
       mnfg = FactoryGirl.create(:manufacturer, name: "Poopy PANTERS")
       Manufacturer.fuzzy_name_find('poopy panters').should == mnfg
     end
+    it "should find users by email address when the case doesn't match" do
+      mnfg = FactoryGirl.create(:manufacturer, name: 'SE Racing (S E Bikes)')
+      Manufacturer.fuzzy_name_find('SE ').should == mnfg
+    end
   end
 
   describe "import csv" do 

@@ -13,6 +13,7 @@ config/deploy
 coverage/*
 public/uploads/*
 public/caches
+public/partner
 .vagrant
 dump.rdb
 current_stolen_bikes.tsv
