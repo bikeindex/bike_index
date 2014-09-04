@@ -25,10 +25,11 @@ body {
   position: relative;
   background: $body-bg;
   color: $text-color;
-  font-size: $body-font-size;
+  @include body-font-size;
   font-family: $body-font;
   font-weight: $body-font-weight;
-  margin: 0; padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .bodywrap {

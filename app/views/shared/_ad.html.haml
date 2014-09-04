@@ -1,10 +1,12 @@
 .container.partner-block-container
   .partner-block
-    %a.target-link{ href: @ad.target_url }
-    .partner-text
+    %a.partner-image{ href: @ad.target_url }
+      = image_tag @ad.image_url(:large)
+      %span.ad-label
+        Ad
+
+    %a.partner-text{ href: @ad.target_url }
       %h3
         = @ad.title
       %p
         = @ad.body
-    .partner-image
-      = image_tag @ad.image_url(:large)

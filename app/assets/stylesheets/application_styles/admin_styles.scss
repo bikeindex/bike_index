@@ -313,7 +313,7 @@
       font-family:  'Open Sans', sans-serif;;
     }
     h3 {  
-      font-size: 24px;
+      @include h3-font-size;
       margin: 0;
     }
     p {
@@ -376,7 +376,7 @@
   padding: 30px 0;
   margin-left: 0;
 }
-.big-action { margin-top: 40px;}
+.big-action { margin-top: 40px; }
 
 @media (min-width: 900px) {
   .ad-edit-form .ad-split-fields {

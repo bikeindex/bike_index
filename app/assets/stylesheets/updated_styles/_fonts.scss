@@ -45,10 +45,18 @@ $header-font-weight: 400;
 
 
 $body-font-weight: 400;
-$body-font-size: 16px;
 $small-font-size: 14px;
 
 $form-font-weight: 400;
 $form-font-size: 16px;
 $form-font-family: $body-font;
 
+
+@mixin body-font-size {
+  font-size: 16px;
+}
+
+@mixin h3-font-size {
+  font-size: 22px;
+  @media(max-width: $s-breakpoint) { font-size: 20px; }
+}

@@ -1,10 +1,8 @@
 .partner-block {
   clear: top;
-  float: right;
   position: relative;
-  $row-width: 1.515; // 100/66 - full width over 8 column
+  a { display: block; }
   .partner-text {
-    width: $five-column*$row-width;
     float: left;
     position: relative;
   }
@@ -13,54 +11,113 @@
     font-family: $body-font;
   }
   h3 {  
-    font-size: 24px;
+    @include h3-font-size;
     margin: 0;
   }
   p {
     margin: .5em 0 0;
   }
   .partner-image {
-    width: $three-column*$row-width;
-    margin-left: $gutter*$row-width;
     position: relative;
-    float: left;
+    float: right;
     img {
       width: 100%;
       height: auto;
       display: block;
     }
+
   }
-  .target-link {
+  .ad-label {
     display: block;
     position: absolute;
-    width: 100%;
-    height: 100%;
-    z-index: 10;
-  }
+    bottom: 0;
+    right: 0;
+    background: rgba($blue-light, .5);
+    color: $blue-lighter;
+    padding: .25em .5em;
+    z-index: 20;
+    border-radius: 4px 0 0 0;
+    font-size: 12px;
+  }  
 }
 
 .container.partner-block-container {
+
   @include top-pad(30px);
-  @include bottom-pad(50px);
+  padding-bottom: 50px;
 }
 
-@media (min-width: 726px + $standard-pad*2) {
+// 282+486
+$horiz-ad-width: 728px;
+
+@media (max-width: 550px) {
+  .container.partner-block-container { padding-bottom: 20px; }
   .partner-block {
-    min-width: 726px;
+    h3 { font-size: 20px; }
+    p { font-size: .9em; margin-top: .25em; }
+  }
+}
+
+@media (max-width: $horiz-ad-width + $standard-pad*2 - 1px) {
+  .container.partner-block-container { display: none; }
+  // .partner-block {
+  //   .partner-image {
+  //     margin: 0 auto;
+  //     max-width: 400px;
+  //     float: none;
+  //   }
+  //   .partner-text {
+  //     @include top-pad($standard-pad);
+  //     width: 100%;
+  //   }
+  // }
+}
+
+@media (min-width: $horiz-ad-width + $standard-pad*2) {
+  .partner-block { float: right; }
+}
+
+@media (min-width: 950px) {
+  .container.partner-block-container { padding-top: 0; }
+}
+
+@media (min-width: 1000px) {
+  .container.partner-block-container { margin-top: -42px; }
+}
+
+
+@media (min-width: $horiz-ad-width + $standard-pad*2) and (max-width: $l-breakpoint) {
+  .partner-block {
+    width: $horiz-ad-width;
+    .partner-text {
+      width: 63%;
+    }
+    .partner-image {
+      width: 35%;
+      margin-left: 2%;
+    }
   }
 }
 
 @media (min-width: $l-breakpoint+1) {
   .container.partner-block-container {
-    padding-top: 0;
-    margin-top: -40px;
+    margin-top: -56px;
   }
   .partner-block {
     width: $eight-column;
+    $row-width: 1.515; // 100/66 - full width over 8 column
+    .partner-text {
+      width: $five-column*$row-width;
+    }
+    .partner-image {
+      width: $three-column*$row-width;
+      margin-left: $gutter*$row-width;
+    }
   }
 }
+
 @media (max-width: $l-breakpoint) {
-  .partner-block {
-    width: $nine-column;
-  }
+  // .partner-block {
+  //   width: $nine-column;
+  // }
 }

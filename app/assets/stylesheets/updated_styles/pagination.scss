@@ -1,13 +1,14 @@
 .paginate-container {
   @include clearfix;
-  padding: 20px 0;
+  @include tb-pad($standard-pad);
   width: 100%;
   clear: both;
 }
 
 .paginate-container-bottom {
   @extend .paginate-container;
-  margin: 30px 0;
+  @include top-mar($standard-pad);
+  margin-bottom: 40px;
 }
 
 .pagination {
@@ -15,7 +16,6 @@
   float: right;
   cursor: default;
   margin: 0;
-  // height: 22px;
   a, span, em {
     border-radius: $border-radius;
     background: $blue-light;
@@ -29,6 +29,7 @@
     color: #fff;
     border: none;
   }
+  .previous_page { margin-left: 0; }
   .previous_page, .next_page { font-weight: normal; }
   .disabled {
     display: none;
@@ -58,6 +59,11 @@
     }
   }
 }
+
+@media (max-width: $s-breakpoint) {
+  .pagination a, span, em { padding: .5em .7em; }
+}
+
 .bike-pagination-counted {
   float: left;
 }

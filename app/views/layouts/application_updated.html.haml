@@ -45,9 +45,9 @@
           .top-user-nav
             %ul
               - if current_user.present?
-                %li
+                %li.first-link
                   = link_to 'Logout', session_path, method: :delete, class: 'low-priority'
-                %li
+                %li.double-width
                   = link_to "Your bikes", '/user_home'
                 - if current_user.memberships.any?
                   - current_user.memberships.each do |membership|
@@ -69,12 +69,15 @@
               / %li
               /   %a{ href: '#' }
               /     How it works
+
               %li
                 %a.low-priority{ href: about_url }
                   About
+
               / %li
               /   %a.low-priority{ href: blogs_url }
               /     News
+
           = form_tag bikes_path, method: :get, id: "head-search-bikes", class: 'bike-search-form' do
             - params[:query] = params[:query].gsub(/,?#,?/,'').gsub(/(\A,|,\z)/, '') if params[:query].present?
             = text_field_tag :query,                             |

@@ -8,16 +8,13 @@
   %span#stolenness_query{data: {stolen: @stolenness[:stolen]} }
 
 - if @bikes.present?
-  .container
-    .paginate-container
-      = will_paginate @bikes, next_label: "Next", previous_label: "Previous", inner_window: 1, outer_window: 1
 
   %ul.bike-boxes
     = render partial: "/bikes/bike_u", collection: @bikes, locals: {target: "show" }
 
   .container
     .paginate-container-bottom
-      = will_paginate @bikes, next_label: "Next", previous_label: "Previous"
+      = will_paginate @bikes, next_label: "Next", previous_label: "Previous", inner_window: 1, outer_window: 1
 
 - else
 

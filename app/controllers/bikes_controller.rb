@@ -26,7 +26,7 @@ class BikesController < ApplicationController
       @secondary_bikes = secondary_bikes.decorate if secondary_bikes.present?
     end
     @count = bikes.count
-    (bikes.count <= 500) ? (total_bikes = bikes.count) : (total_bikes = 500)
+    (bikes.count <= 250) ? (total_bikes = bikes.count) : (total_bikes = 250)
     @page = params[:page]
     bikes = bikes.paginate(page: params[:page], total_entries: total_bikes).per_page(25)
     @bikes = bikes.decorate
