@@ -72,9 +72,9 @@
               %li
                 %a.low-priority{ href: about_url }
                   About
-              %li
-                %a.low-priority{ href: blogs_url }
-                  News
+              / %li
+              /   %a.low-priority{ href: blogs_url }
+              /     News
           = form_tag bikes_path, method: :get, id: "head-search-bikes", class: 'bike-search-form' do
             - params[:query] = params[:query].gsub(/,?#,?/,'').gsub(/(\A,|,\z)/, '') if params[:query].present?
             = text_field_tag :query,                             |
@@ -91,7 +91,7 @@
             - select_list += Manufacturer.frames.map { |m| { id: "m_#{m.id}", text: m.name } }
             #header-search{ data: { selected: mnfg.to_json, options: select_list.to_json } }
               = hidden_field_tag :serial, params[:serial]
-      
+      = render 'shared/ad' if @ad.present?
       = yield
       
       = render 'shared/footer_updated'

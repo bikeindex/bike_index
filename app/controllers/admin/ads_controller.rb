@@ -1,5 +1,7 @@
 class Admin::AdsController < Admin::BaseController
   before_filter :find_ad, except: [:index, :new, :create]
+  before_filter :find_organizations, only: [:new, :edit]
+
   def index
     @ads = Ad.all
   end
@@ -9,6 +11,7 @@ class Admin::AdsController < Admin::BaseController
   end
 
   def edit
+    
   end
 
   def update
@@ -39,6 +42,10 @@ class Admin::AdsController < Admin::BaseController
 
   def find_ad
     @ad = Ad.find(params[:id])
+  end
+
+  def find_organizations
+    @organizations = Organization.all
   end
 
 end

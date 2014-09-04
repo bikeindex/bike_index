@@ -33,6 +33,7 @@ class BikesController < ApplicationController
     @attribute_select_values = search.parsed_attributes
     @query = params[:query]
     @stolenness = { stolen: params[:stolen] }
+    @ad = Ad.live.first if Ad.live.present?
     render layout: 'application_updated'
   end
 

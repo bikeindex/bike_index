@@ -1,49 +1,23 @@
-- if @ad.errors.any?
-  #alert-block
-    .alert.alert-error
-      %h4
-        Please fix the following
-        = pluralize(@ad.errors.count, "error")
-      %ul
-        - @ad.errors.full_messages.each do |msg|
-          %li
-            = msg
+.ad-edit-form#chosen-container
+  - if @ad.errors.any?
+    #alert-block
+      .alert.alert-error
+        %h4
+          Please fix the following
+          = pluralize(@ad.errors.count, "error")
+        %ul
+          - @ad.errors.full_messages.each do |msg|
+            %li
+              = msg
+  .ad-split-fields
+    .blog-field.chosen-select
+      = collection_select( :ad, :organization_id, @organizations, :id, :name, :required =>true, prompt: "Choose an organization")
 
-.control-group.padded
-  .control-label
-    = f.label :name
-  .controls
-    = f.text_field :name
+    .blog-field
+      = f.text_field :target_url, placeholder: 'Target url'
 
-.control-group
-  .control-label
-    = f.label :title
-  .controls
-    = f.text_field :title
-
-.control-group
-  .control-label
-    = f.label :target_url
-  .controls
-    = f.text_field :target_url
-  
-.control-group
-  .controls
+  .blog-field
+    = f.text_field :title, placeholder: "Title"
+    
+  .blog-field.ad-body
     = f.text_area :body, placeholder: 'ad body copy'
-
-.control-group.avatar-upload
-  %label.control-label
-    Ad image
-  .controls
-    .avatar-img
-      - if @ad.image? 
-        = image_tag(@ad.image_url(:small))
-      - else
-        %p
-          No picture!
-    = f.file_field :image
-    = f.hidden_field :image_cache
-
-/ :organization_id,
-/ :target_url,
-/ :live 

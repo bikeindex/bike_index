@@ -1,6 +1,5 @@
 class Ad < ActiveRecord::Base
-  attr_accessible :name,
-    :title,
+  attr_accessible :title,
     :body,
     :image,
     :image_cache,

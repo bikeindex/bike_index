@@ -8,6 +8,8 @@ class BikeIndex.Views.DataTables extends Backbone.View
       @loadDataTable('#admin-users-table')
     else if $('#admin-manufacturers-list').length > 0
       @loadDataTable('#admin-manufacturers-list')
+    else if $('#admin-ads-table').length > 0
+      @loadDataTable('#admin-ads-table')
 
     else if $('#admin-orgs-table').length > 0
       @loadDataTable('#admin-orgs-table')

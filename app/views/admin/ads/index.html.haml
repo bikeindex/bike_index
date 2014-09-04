@@ -9,28 +9,35 @@
 
 
 %section.full-screen-table
-  %table#admin-orgs-table.table.table-striped.table-bordered
+  %table#admin-ads-table.table.table-striped.table-bordered
     %thead
       %th.medium-screens
         Created
+      %th.large-screens
+        Organization
       %th
-        Name
+        Text
+      %th.medium-screens
+        image
       
     %tbody
       - @ads.each do |ad|
         %tr
           %td.medium-screens
             - if ad.created_at.today?
-              %span.hidden
-                = ad.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              Today at #{ad.created_at.strftime("%-I %p")}
+              - ad_created = 'Today'
             - elsif Date.yesterday().beginning_of_day() <= ad.created_at
-              %span.hidden
-                = ad.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              Yesterday at #{ad.created_at.strftime("%-I %p")}
+              - ad_created = 'Today'
             - else
-              %span.hidden
-                = ad.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              = ad.created_at.strftime("%-m/%-d/%Y at %-I %p")
-          %td
-            = link_to ad.name, admin_ad_url(ad)
+              - ad_created = ad.created_at.strftime("%d.%m")
+            = link_to ad_created, edit_admin_ad_url(ad)
+          %td.large-screens
+            = ad.organization.name if ad.organization.present?
+          %td.ad-body-cell
+            %h3
+              = link_to ad.title, edit_admin_ad_url(ad)
+            %p
+              = link_to ad.body, edit_admin_ad_url(ad)
+          %td.medium-screens
+            - if ad.image.present?
+              = image_tag ad.image_url(:small)

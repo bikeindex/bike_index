@@ -1,0 +1,10 @@
+.container.partner-block-container
+  .partner-block
+    %a.target-link{ href: @ad.target_url }
+    .partner-text
+      %h3
+        = @ad.title
+      %p
+        = @ad.body
+    .partner-image
+      = image_tag @ad.image_url(:large)
