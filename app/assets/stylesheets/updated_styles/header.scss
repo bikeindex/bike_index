@@ -52,6 +52,7 @@ $fat-height: 25%;
 }
 
 .small-header .hamburglar {
+  display: none;
   position: absolute;
   width: $one-column;
   top: 10px;
@@ -110,6 +111,7 @@ $fat-height: 25%;
       margin: 0;
       padding: 0;
       list-style-type: none;
+      min-height: 1.2em;
       li {
         float: right;
         width: $one-column*1.205; // 100/83 full width over 10 column

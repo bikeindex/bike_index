@@ -3,9 +3,6 @@
   @include clearfix;
   display: block;
   position: relative;
-  // width: $nine-column;
-  // margin-left: $gutter;
-  // float: right;
   $bike-search-height: 2.5em;
   $bike-search-font-size: 18px;
   .searchit, .search-text-field {
@@ -39,11 +36,11 @@
       margin: .1em .25em 0 0;
       padding: .35em .5em .35em 18px;
       line-height: 1em;
-      background: $gray-lighterer;
+      background: $gray-lightest;
     }
     .select2-search-choice-focus {
       border-color: $blue;
-      background: lighten($gray-lighterer, 2%);
+      background: lighten($gray-lightest, 2%);
     }
   }
   .searchit {
@@ -98,9 +95,8 @@
 #bikes-search { display: none; }
 
 .mainsrchdr {
-  background: $gray-lighterer;
+  background: $gray-lightest;
   border: 1px solid $gray-lighter;
-  // border: none;
   border-top: 1px solid rgba($gray-lighter, .5);
   // border-top: 1px solid darken($gray-lighter, 5%);
   font-size: 18px;

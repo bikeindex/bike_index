@@ -28,6 +28,13 @@ class BikeIndex.Views.Global extends Backbone.View
       if $('#what-spokecards-are').length > 0
         $('.spokecard-extension').addClass('on-spokecard-page')
     @setProximityLocation()
+    if $('#wheeled_wheel').length > 0
+      $(window).scroll ->
+        $('#wheeled_wheel').addClass('spun')
+        $(window).unbind('scroll')
+      h = $(window).height() - $('.wheel-holder').offset().top
+      $('.wheel-holder').css('height', "#{h}px")
+
     
 
   setLightspeedMovie: ->

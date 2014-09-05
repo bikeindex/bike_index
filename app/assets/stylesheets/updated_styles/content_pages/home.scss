@@ -1,0 +1,242 @@
+//________________________
+//
+// Page differences
+//
+//________________________
+
+
+.top-logo .logo.home-logo { display: none;  }
+
+.welcome-page {
+  background: $gray-lighterer;
+  // background: $blue-light;
+  // background: $blue-light;
+  .bike-search-form .search-text-field.select2-container.select2-container-multi {
+    background: #fff;
+  }
+  .mainsrchdr {
+    background: #f9f9f9;
+    border: 1px solid $gray-light;
+    border-top: 1px solid rgba($gray-lighter, .5);
+  }
+}
+
+@media (min-width: $s-breakpoint+1) {
+  .welcome-page {
+    .top-logo .logo { display: none;  }
+    .top-logo .logo.home-logo { display: block;  }
+
+  }
+}
+
+
+
+
+//________________________
+//
+// Body
+//
+//________________________
+
+
+.home-header {
+  h1 {
+    text-align: center;
+    font-size: 50px;
+    font-weight: 300;
+    padding: 40px 0 25px;
+    margin: 0;
+  }
+  h2 {
+    font-size: 20px;
+    text-align: center;
+    margin: 0 auto;
+    color: $blue-dark;
+  }
+}
+
+@media (min-width: $s-breakpoint) {
+  .home-header {
+    h1 {
+      padding: 30px 0 35px;
+      font-family: $body-font;
+      font-size: 50px;
+      font-weight: 600;
+      color: $blue-dark;
+      text-transform: uppercase;
+      line-height: 1em;
+      // letter-spacing: .04em;
+      span { display: block; }
+
+      $step: .004em;
+      $step-color: $blue;
+      text-shadow: -.01em .01em 0px $step-color,
+      -$step $step 0 $step-color,
+      -$step*2  $step*2  0 $step-color,
+      -$step*3  $step*3  0 $step-color,
+      -$step*4  $step*4  0 $step-color,
+      -$step*5  $step*5  0 $step-color,
+      -$step*6  $step*6  0 $step-color,
+      -$step*7  $step*7  0 $step-color,
+      -$step*8  $step*8  0 $step-color,
+      -$step*9  $step*9  0 $step-color,
+      -$step*10 $step*10 0 $step-color,
+      -$step*11 $step*11 0 $step-color,
+      -$step*12 $step*12 0 $step-color,
+      -$step*13 $step*13 0 $step-color,
+      -$step*14 $step*14 0 $step-color,
+      -$step*15 $step*15 0 $step-color;
+    }
+    h2 { font-size: 32px; }
+  }
+}
+
+
+@media (min-width: 901px) {
+  .home-header {
+    h1 { font-size: 75px; }
+  }
+}
+
+.wheeled {
+  padding: $standard-pad 0 0;
+  position: relative;
+}
+.register-container {
+  width: 100%;
+  position: absolute;
+  left: 0; top: 35%;
+  z-index: 20;
+  text-align: center;
+  .btn {
+    font-size: 40px;
+    font-family: $header-font;
+    border: none;
+    background: $green;
+    color: white;
+    padding: .25em 1em;
+    font-weight: 400;
+
+
+
+    $step: .006em;
+    $step-color: $green-dark;
+    box-shadow: -.01em .01em 0px $step-color,
+    -$step $step 0 $step-color,
+    -$step*2  $step*2  0 $step-color,
+    -$step*3  $step*3  0 $step-color,
+    -$step*4  $step*4  0 $step-color,
+    -$step*5  $step*5  0 $step-color,
+    -$step*6  $step*6  0 $step-color,
+    -$step*7  $step*7  0 $step-color,
+    -$step*8  $step*8  0 $step-color,
+    -$step*9  $step*9  0 $step-color,
+    -$step*10 $step*10 0 $step-color,
+    -$step*11 $step*11 0 $step-color,
+    -$step*12 $step*12 0 $step-color,
+    -$step*13 $step*13 0 $step-color,
+    -$step*14 $step*14 0 $step-color,
+    -$step*15 $step*15 0 $step-color;
+  }
+}
+
+.wheel-holder {
+  width: 70%;
+  margin: 0 auto;
+  overflow: hidden;
+  height: 300px;
+  $time: 1.5s;
+  img {
+    @include transition(all ease-in-out $time);
+    -webkit-transform: translate3d(0,0,0);
+    -webkit-backface-visibility: hidden;
+    display: block;
+    width: 100%;
+    height: auto;
+    &.spun {
+      @include transition(all ease-out $time);
+      @include rotate(25deg);
+    }
+  }
+}
+
+
+
+
+.home-body-container {
+  $bg: $gray-blue-light;
+  background: $bg;
+  $text-bg: #fff;
+  padding: 30px 0;
+
+  .testimonial-user {
+    @include tb-pad($standard-pad);
+    width: $two-column;
+    float: left;
+    position: relative;
+    img {
+      width: 75%;
+      height: auto;
+      display: block;
+      margin: 0 0 0 auto;
+    }
+    h3 {
+      text-align: right;
+      font-family: $body-font;
+      font-size: 20px;
+      font-weight: 600;
+      margin: .25em 0 0;
+    }
+    h4 {
+      text-align: right;
+      font-size: 18px;
+    }
+  }
+
+  .testimonial-quote {
+    float: left;
+    position: relative;
+    width: $ten-column;
+    margin-left: $gutter;
+    margin-top: 30px;
+    font-size: 24px;
+    background: $text-bg;
+    padding: 1em;
+    font-size: 24px; 
+    border-radius: 1px;
+
+    &:before {
+      $size: 10px;    
+      content: "";
+      height:0;
+      width:0;
+      margin-top: -($size);
+      top: 50%;
+      left: -($size - 1px);
+      position: absolute;
+      border-top: $size solid transparent;
+      border-bottom: $size solid transparent; 
+      border-right: $size solid $text-bg; 
+    }
+    p {
+      margin: 0;
+      line-height: 1.2em;
+      span {
+        // content: '"';
+        color: $gray-light;
+        font-size: 30px;
+        display: inline-block;
+      }
+    }
+  }
+}
+
+
+
+
+
+.home-blank-container {
+  width: 100%;
+  height: 300px;
+  background: #fff;
+}
