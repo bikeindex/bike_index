@@ -43,7 +43,6 @@ $testimonial-tri-size: 12px;
     margin: 0;
     background: $text-bg;
     border-radius: 1px;
-
     padding: 1em;
     font-size: 22px; 
     line-height: 1.3em;
@@ -129,6 +128,7 @@ $testimonial-tri-size: 12px;
 
 @media (max-width: $s-breakpoint) {
   .home-testimonial, .home-testimonial.testimonial-2 {
+    padding: 30px 0 20px;
     $text-bg: #fff;
     .testimonial-user {
       width: 100%;
