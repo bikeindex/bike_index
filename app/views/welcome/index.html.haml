@@ -6,7 +6,7 @@
   %h3
     = number_with_delimiter(Bike.count)
     bikes registered. Over
-    = number_with_delimiter(StolenRecord.recovered.where("created_at <= ?", Time.zone.now.beginning_of_day).count)
+    = number_with_delimiter(StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count)
     stolen bikes recovered.
 
 .wheeled
@@ -26,18 +26,20 @@
       The process is simple, secure, and free. 
       = link_to "Register your bike now!", choose_registration_path
 
-/ .home-testimonial
-/   .container
-/     .testimonial-user
-/       = image_tag "/assets/updated/home/recovery_testimonial_1.png"
-/       %h3
-/         Bob Spaziano
-/       %h4
-/         Bike recovery 9-2014
+.home-testimonial
+  .container
+    .testimonial-user
+      = image_tag "/assets/updated/home/recovery_testimonial_2.png"
+      %h3
+        Eva Linh
+      %h4
+        Bike
+        %span
+          recovered 9.2014
 
-/     .testimonial-quote
-/       %p
-/         I recovered my bike thanks to the Bike Index and the Raleigh Police! The police located it and used the Bike Index to identify it and return it to me.
+    .testimonial-quote
+      %p
+        A good samaritan found my bike abandoned by a tree, ran my bike's serial number on the Bike Index, found my contact info and returned it to me
 
 
 .info-blocks
@@ -69,7 +71,7 @@
     .testimonial-user
       = image_tag "/assets/updated/home/recovery_testimonial_1.png"
       %h3
-        Bob Spaziano
+        Bob
       %h4
         Jamis Citizen
         %span

@@ -50,6 +50,7 @@
                 - if recovery.date_recovered.present?
                   = recovery.date_recovered.strftime("%-m.%-d.%Y")
                 - else
+                  Stolen on
                   = recovery.created_at.strftime("%-m.%-d.%Y")
             %td.medium-screens
               - if recovery.bike.present?
@@ -62,7 +63,7 @@
               - if recovery.recovered_description.present?
                 = recovery.recovered_description
               .large-screens.less-strong
-                = recovery.theft_description.truncate(200)
+                = recovery.theft_description.truncate(200) if recovery.theft_description.present?
             %td.large-screens
               - if recovery.address.present?
                 = recovery.city
