@@ -3,7 +3,7 @@ class WelcomeController < ApplicationController
   before_filter :authenticate_user!, only: :user_home
   
   def index
-    render action: 'index', layout: 'no_container'
+    render action: 'index', layout: 'application_updated'
   end
 
   def update_browser

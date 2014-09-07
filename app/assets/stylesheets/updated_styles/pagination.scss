@@ -61,7 +61,9 @@
 }
 
 @media (max-width: $s-breakpoint) {
-  .pagination a, span, em { padding: .5em .7em; }
+  .pagination {
+    a, span, em { padding: .5em .7em; }
+  }
 }
 
 .bike-pagination-counted {

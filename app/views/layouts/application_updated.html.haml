@@ -5,7 +5,7 @@
     = csrf_meta_tags
     <link rel="shortcut icon" href="/fav.ico" />
     = stylesheet_link_tag "updated", media: "all"
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400,300' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400,300,600' rel='stylesheet' type='text/css'>
     = javascript_include_tag "application"
     <!-- Pulled from https://code.google.com/p/html5shiv/ -->
     <!--[if lt IE 9]>
@@ -39,6 +39,7 @@
           .small-header
             %a.top-logo{ href: root_url }
               %span.stripey
+              = image_tag "/assets/updated/home/logo.svg", class: 'logo home-logo'
               = image_tag "/assets/updated/logo.svg", class: "logo"
             %a#expand_user.hamburglar{ href: '#' }
               = image_tag "/assets/updated/hamburglar.svg"
