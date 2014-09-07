@@ -152,7 +152,7 @@
   width: 90%;
   margin: 0 auto;
   overflow: hidden;
-  height: 300px;
+  min-height: 250px;
   $time: 1.5s;
   img {
     @include transition(all ease-in-out $time);
