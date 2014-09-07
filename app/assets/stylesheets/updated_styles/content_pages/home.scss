@@ -101,6 +101,7 @@
   padding: $standard-pad 0 0;
   position: relative;
 }
+
 .register-container {
   width: 100%;
   position: absolute;
@@ -141,6 +142,10 @@
       background: #62D994;
     }
   }
+}
+
+@media (max-width: $s-breakpoint) {
+  .register-container .btn { font-size: 30px; }
 }
 
 .wheel-holder {

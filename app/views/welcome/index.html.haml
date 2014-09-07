@@ -4,7 +4,7 @@
     %span
       that Works
   %h3
-    #{Bike.where("created_at <= ?", Time.zone.now.beginning_of_day).count} bikes registered. Over #{StolenRecord.recovered.where("created_at <= ?", Time.zone.now.beginning_of_day).count} stolen bikes recovered
+    #{Bike.where("created_at <= ?", Time.zone.now.beginning_of_day).count} bikes registered. Over #{StolenRecord.recovered.where("created_at <= ?", Time.zone.now.beginning_of_day).count} stolen bikes recovered.
 
 .wheeled
   .register-container
