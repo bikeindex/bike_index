@@ -8,7 +8,8 @@
 .top-logo .logo.home-logo { display: none;  }
 
 .welcome-page {
-  background: $gray-lighterer;
+  // background: $gray-lighterer;
+  background: $gray-lighter;
   // background: $blue-light;
   // background: $blue-light;
   .bike-search-form .search-text-field.select2-container.select2-container-multi {
@@ -34,7 +35,7 @@
 
 //________________________
 //
-// Body
+// Headers
 //
 //________________________
 
@@ -42,12 +43,13 @@
 .home-header {
   h1 {
     text-align: center;
-    font-size: 50px;
+    font-size: 40px;
     font-weight: 300;
     padding: 40px 0 25px;
     margin: 0;
+    span { display: block; }
   }
-  h2 {
+  h3 {
     font-size: 20px;
     text-align: center;
     margin: 0 auto;
@@ -66,7 +68,6 @@
       text-transform: uppercase;
       line-height: 1em;
       // letter-spacing: .04em;
-      span { display: block; }
 
       $step: .004em;
       $step-color: $blue;
@@ -87,15 +88,13 @@
       -$step*14 $step*14 0 $step-color,
       -$step*15 $step*15 0 $step-color;
     }
-    h2 { font-size: 32px; }
+    h3 { font-size: 32px; }
   }
 }
 
 
 @media (min-width: 901px) {
-  .home-header {
-    h1 { font-size: 75px; }
-  }
+  .home-header h1 { font-size: 75px; }
 }
 
 .wheeled {
@@ -109,6 +108,7 @@
   z-index: 20;
   text-align: center;
   .btn {
+    @include transition(background ease-out .1s);
     font-size: 40px;
     font-family: $header-font;
     border: none;
@@ -116,8 +116,6 @@
     color: white;
     padding: .25em 1em;
     font-weight: 400;
-
-
 
     $step: .006em;
     $step-color: $green-dark;
@@ -137,11 +135,16 @@
     -$step*13 $step*13 0 $step-color,
     -$step*14 $step*14 0 $step-color,
     -$step*15 $step*15 0 $step-color;
+
+    &:hover {
+      @include transition(background ease-out .1s);
+      background: #62D994;
+    }
   }
 }
 
 .wheel-holder {
-  width: 70%;
+  width: 90%;
   margin: 0 auto;
   overflow: hidden;
   height: 300px;
@@ -155,88 +158,83 @@
     height: auto;
     &.spun {
       @include transition(all ease-out $time);
-      @include rotate(25deg);
+      @include rotate(30deg);
     }
   }
 }
 
-
-
-
-.home-body-container {
-  $bg: $gray-blue-light;
-  background: $bg;
-  $text-bg: #fff;
-  padding: 30px 0;
-
-  .testimonial-user {
-    @include tb-pad($standard-pad);
-    width: $two-column;
-    float: left;
-    position: relative;
-    img {
-      width: 75%;
-      height: auto;
-      display: block;
-      margin: 0 0 0 auto;
-    }
-    h3 {
-      text-align: right;
-      font-family: $body-font;
-      font-size: 20px;
-      font-weight: 600;
-      margin: .25em 0 0;
-    }
-    h4 {
-      text-align: right;
-      font-size: 18px;
-    }
-  }
-
-  .testimonial-quote {
-    float: left;
-    position: relative;
-    width: $ten-column;
-    margin-left: $gutter;
-    margin-top: 30px;
-    font-size: 24px;
-    background: $text-bg;
-    padding: 1em;
-    font-size: 24px; 
-    border-radius: 1px;
-
-    &:before {
-      $size: 10px;    
-      content: "";
-      height:0;
-      width:0;
-      margin-top: -($size);
-      top: 50%;
-      left: -($size - 1px);
-      position: absolute;
-      border-top: $size solid transparent;
-      border-bottom: $size solid transparent; 
-      border-right: $size solid $text-bg; 
-    }
-    p {
-      margin: 0;
-      line-height: 1.2em;
-      span {
-        // content: '"';
-        color: $gray-light;
-        font-size: 30px;
-        display: inline-block;
-      }
-    }
-  }
+@media (min-width: $m-breakpoint) {
+  .wheel-holder { width: 70%; }
 }
 
 
+.home-subhead {
+  background: #fff;
+  padding: 60px 0 50px;
+  text-align: center;
+  h2 {
+    font-family: $body-font;
+    font-size: 32px;
+  }
+  p {
+    max-width: 700px;
+    margin: .5em auto 0;
+    font-size: 22px;
+  }
+}
 
+@media (max-width: $s-breakpoint) {
+  .home-subhead {
+    h2 { font-size: 24px; }
+    p { font-size: 18px; }
+  }
+}
 
 
 .home-blank-container {
   width: 100%;
   height: 300px;
   background: #fff;
+}
+
+
+.info-blocks {
+  @include tb-pad($standard-pad);
+  width: 100%;
+  background: #fff;
+  article {
+    position: relative;
+    img {
+      display: block;
+      width: 60%;
+      height: auto;
+      margin: 0 auto;
+    }
+    p {
+      padding: 1em 0 20px;
+      margin: 0 auto;
+      width: 80%;
+    }
+  }
+}
+
+@media (min-width: $s-breakpoint) {
+  .info-blocks {
+    .container { padding: 30px 0 20px; }
+    article {
+      float: left;
+      width: $three-column;
+      margin-left: $one-column + $gutter;
+      padding-bottom: 20px;
+      &:first-of-type { margin-left: ($one-column + $gutter)*.5; }
+      p { width: 100%; }
+    }
+  }
+}
+
+.searches {
+  @include tb-pad($standard-pad);
+  width: 100%;
+  background: #fff;
+
 }

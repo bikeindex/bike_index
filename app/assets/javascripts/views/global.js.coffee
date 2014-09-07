@@ -32,6 +32,7 @@ class BikeIndex.Views.Global extends Backbone.View
       $(window).scroll ->
         $('#wheeled_wheel').addClass('spun')
         $(window).unbind('scroll')
+        $('.bike-background').addClass('scrolled')
       h = $(window).height() - $('.wheel-holder').offset().top
       $('.wheel-holder').css('height', "#{h}px")
 

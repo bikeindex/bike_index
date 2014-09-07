@@ -1,0 +1,85 @@
+
+.bike-background {
+  &.scrolled { background: url("/assets/updated/home/bikes_mosaic_large.jpg") fixed; } 
+  width: 100%;
+  // 1200 x 480
+}
+
+@media (min-width: 1200px) {
+  .bike-background.scrolled { background: url("/assets/updated/home/bikes_mosaic_large.jpg") fixed; }
+}
+
+.bike-background.scrolled .supporters { display: block; }
+
+.supporters {
+  display: none;
+  @include box-shadow(inset 0 0 2px rgba(black,.6));
+  position: relative;
+  min-height: 15em;
+  padding: 40px 0 4em;
+  h2 {
+    font-size: 30px;
+    margin: .75em 0;
+    // margin: 1em 0;
+    text-shadow: 1px 1px 2px rgba(black,.3);
+    color: white;
+  }
+  .horizontal-list {
+    li {
+      width: 33%;
+      padding: 15px;
+      a { display: block; width: 100%;}
+      img { width: 100%; }
+    }
+  }
+}
+
+.and-many-more {
+  position: absolute;
+  background: rgba(white,.7);
+  // border: $searchBorder;
+  border-bottom: 0;
+  border-radius: $border-radius $border-radius 0 0;
+  bottom: 0;
+  left: 3%;
+  width: 94%;
+  p {
+    text-align: center;
+    margin: 0;
+    padding: .5em 0 .25em;
+  }
+}
+
+@media (min-width: 625px) {
+  .supporters {
+    padding-bottom: 5em;
+    h2 { font-size: 40px; }
+    .horizontal-list li {
+      width: 16.66%;
+      padding: 0;
+    }
+    .and-many-more {
+      left: 5%;
+      width: 90%;
+      p { padding: .75em 0 .5em; }
+    }
+  }
+}
+
+@media (min-width: 1000px) {
+  .supporters {
+    h2 {
+      font-size: 50px;
+    }
+    .and-many-more {
+      left: 20%;
+      width: 60%;
+    }
+  }
+}
+
+@media (min-width: 1300px) {
+  .supporters h2 { margin-left: -5%; }
+}
+
+

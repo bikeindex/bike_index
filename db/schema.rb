@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140903191321) do
+ActiveRecord::Schema.define(:version => 20140907144150) do
 
   create_table "ads", :force => true do |t|
     t.string   "title"
@@ -264,7 +264,7 @@ ActiveRecord::Schema.define(:version => 20140903191321) do
 
   create_table "integrations", :force => true do |t|
     t.integer  "user_id"
-    t.string   "access_token"
+    t.text     "access_token"
     t.string   "provider_name"
     t.text     "information"
     t.datetime "created_at",    :null => false
