@@ -40,6 +40,6 @@
           %td.medium-screens
             = org_invite.membership_role
           %td
-            = link_to org_invite.organization.name, admin_organization_url(org_invite.organization.name)
+            = link_to org_invite.organization.name, admin_organization_url(org_invite.organization)
           %td.table-cell-check
             = "&#x2713;".html_safe if org_invite.redeemed

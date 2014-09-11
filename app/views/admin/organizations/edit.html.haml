@@ -1,5 +1,6 @@
 %h1.padded
-  Edit Organization
+  Edit
+  = link_to @organization.name, admin_organization_url(@organization)
 
 .form.form-horizontal
   = form_for [:admin, @organization] do |f|
@@ -40,4 +41,5 @@
         %a{ href: "#", data: {target: "#bike-notification" } }
           Show new bike notification
 
-    
+.actions.padded
+  = link_to "Manage organization invitations", admin_organization_invitation_url(@organization.id), class: "button-yellow"
