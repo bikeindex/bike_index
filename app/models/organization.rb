@@ -40,6 +40,7 @@ class Organization < ActiveRecord::Base
   scope :police, where(org_type: 'police')
   scope :advocacy, where(org_type: 'advocacy')
   scope :college, where(org_type: 'college')
+  scope :manufacturer, where(org_type: 'manufacturer')
 
   def to_param
     slug
