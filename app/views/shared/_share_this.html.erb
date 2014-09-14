@@ -1,6 +1,7 @@
-<div class="fb-like" data-href="http://<%= request.host+request.fullpath %>" data-send="false" data-layout="box_count" data-width="450" data-show-faces="false"></div>
+<div class="sharing-buttons">
+  <div class="fb-like" data-href="http://<%= request.host+request.fullpath %>" data-layout="button" data-action="like" data-show-faces="false" data-share="true"></div>
 
-<a href="https://twitter.com/share" class="twitter-share-button" data-size="large" data-count="none">Tweet</a>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-size="large" data-count="none">Tweet</a>
 
-<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</div>

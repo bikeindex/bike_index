@@ -62,7 +62,6 @@
       h3 { margin: .5em 0 .2em; }
     }
     h3 {
-      @include h3-font-size;
       font-family: $header-font;
       margin: 0;
     }

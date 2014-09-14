@@ -1,5 +1,5 @@
 // Mixins and vars
-@import "updated_styles/vars";
+@import "updated_styles/mixins/vars";
 @import "updated_styles/mixins/clearfix";
 @import "updated_styles/mixins/tab-focus";
 @import "updated_styles/mixins/vendor-prefixes";
@@ -9,31 +9,39 @@
 @import "updated_styles/mixins/buttons";
 @import "updated_styles/mixins/text-overflow";
 @import "updated_styles/mixins/grid";
-@import "updated_styles/utilities";
+@import "updated_styles/mixins/utilities";
+@import "updated_styles/mixins/alerts";
 
 // External styles
 @import "includes/select2-binx.scss";
 
 // Base styles
-@import "updated_styles/_colors";
-@import "updated_styles/_fonts";
-@import "updated_styles/buttons";
-@import "updated_styles/forms";
-@import "updated_styles/forms_extended";
-@import "updated_styles/lists";
-@import "updated_styles/pagination";
-@import "updated_styles/banner_ads";
+@import "updated_styles/components/_colors";
+@import "updated_styles/components/alerts";
+@import "updated_styles/components/_fonts";
+@import "updated_styles/components/buttons";
+@import "updated_styles/components/forms";
+@import "updated_styles/components/forms_extended";
+@import "updated_styles/components/wells";
+@import "updated_styles/components/close";
+@import "updated_styles/components/modals";
+@import "updated_styles/components/lists";
+@import "updated_styles/components/banner_ads";
+@import "updated_styles/components/sharing";
 
 // Page sections
-@import "updated_styles/body";
-@import "updated_styles/header";
-@import "updated_styles/bike_search_form";
-@import "updated_styles/content";
-@import "updated_styles/footer";
+@import "updated_styles/sections/body";
+@import "updated_styles/sections/header";
+@import "updated_styles/sections/bike_search_form";
+@import "updated_styles/sections/content";
+@import "updated_styles/sections/footer";
+@import "updated_styles/sections/pagination";
 
 // Bike styles
 @import "updated_styles/bike_styles/base";
 @import "updated_styles/bike_styles/index";
+@import "updated_styles/bike_styles/show";
+@import "updated_styles/bike_styles/show_photo";
 
 // Content pages
 @import "updated_styles/content_pages/home";

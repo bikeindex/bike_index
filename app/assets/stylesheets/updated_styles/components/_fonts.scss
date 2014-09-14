@@ -17,10 +17,6 @@
   src: local('Open Sans'), local('OpenSans'), url(https://themes.googleusercontent.com/static/fonts/opensans/v8/cJZKeOuBrn4kERxqtaUH3bO3LdcAZYWl9Si6vvxL-qU.woff) format('woff');
 }
 
-
-// Standard font:
-$body-font: 'Open Sans', sans-serif;
-
 @font-face{
   font-family:'Klinic';
   src:url("/assets/KlinicSlabBook.otf");
@@ -40,9 +36,14 @@ $body-font: 'Open Sans', sans-serif;
   font-style: normal;
 }
 
-$header-font: 'Klinic', sans-serif;
-$header-font-weight: 400;
 
+//________________________
+//
+// Body fonts
+//
+//________________________
+
+$body-font: 'Open Sans', sans-serif;
 
 $body-font-weight: 300;
 $small-font-size: 14px;
@@ -56,7 +57,61 @@ $form-font-family: $body-font;
   font-size: 16px;
 }
 
+
+
+//________________________
+//
+// Headers
+//
+//________________________
+
+$header-font: 'Klinic', sans-serif;
+$header-font-weight: 400;
+
 @mixin h3-font-size {
   font-size: 22px;
   @media(max-width: $s-breakpoint) { font-size: 20px; }
+}
+
+h3 { @include h3-font-size; }
+
+h1 { font-size: 40px; }
+
+@media (max-width: $m-breakpoint) {
+  h1 { font-size: 30px; }
+}
+
+@media (max-width: $s-breakpoint) {
+  h1 { font-size: 23px; }
+}
+
+header.with-subtitle {
+  @include clearfix;
+  @include bottom-pad($standard-pad);
+  padding-top: $standard-pad;
+  h1, h2, h3, h4 { margin: 0; }
+  p {
+    display: inline-block;
+    float: right;
+  }
+}
+
+@media (min-width: $m-breakpoint) {
+  header.with-subtitle {
+    h1, h2, h3, h4 {
+      float: left;
+      max-width: $nine-column;
+    }
+    p {
+      max-width: $three-column;
+      padding-top: 10px;
+    }
+  }
+}
+
+@media (min-width: $l-breakpoint) {
+  header.with-subtitle {
+    h1, h2, h3, h4 { max-width: $ten-column; }
+    p { max-width: $two-column; }
+  }
 }

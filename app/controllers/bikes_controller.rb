@@ -15,6 +15,7 @@ end
 
 class BikesController < ApplicationController
   before_filter :ensure_user_for_edit, only: [:edit, :update, :pdf]
+  before_filter :render_ad, only: [:index, :show]
   layout 'no_container'
 
   def index
@@ -33,7 +34,6 @@ class BikesController < ApplicationController
     @attribute_select_values = search.parsed_attributes
     @query = params[:query]
     @stolenness = { stolen: params[:stolen] }
-    @ad = Ad.live.first if Ad.live.present?
     render layout: 'application_updated'
   end
 
@@ -46,7 +46,7 @@ class BikesController < ApplicationController
     @bike = bike.decorate
     @stolen_notification = StolenNotification.new if @bike.stolen
     respond_to do |format|
-      format.html
+      format.html { render layout: 'application_updated' }
       format.gif  { render qrcode: scanned_bike_url(@bike), level: :h, unit: 50 }
     end
   end
@@ -204,6 +204,10 @@ protected
       flash[:error] = "Whoops! You have to sign up to be able to do that"
       redirect_to bike_path(bike) and return
     end
+  end
+
+  def render_ad
+    @ad = Ad.live.first if Ad.live.present?
   end
 
 end

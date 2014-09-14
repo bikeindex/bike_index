@@ -1,0 +1,16 @@
+#claim-ownership-modal.modal.fade
+  .modal-header
+    %button.close{ type: "button", :"data-dismiss" => "modal", :"aria-hidden" => "true" }
+      &times;
+    %h3
+      Bike ownership
+
+  .modal-body
+    %p
+      We're honored to have your #{@bike.type} on the Index.  
+    %p
+      Claim it so you can edit and upload pictures of it!
+      
+  .modal-footer
+    %a.btn.btn-primary{ href: "/ownerships/#{@bike.current_ownership.id}" }
+      Claim #{@bike.type}

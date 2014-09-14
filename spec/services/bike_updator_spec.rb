@@ -63,6 +63,7 @@ describe BikeUpdator do
 
   describe :update_available_attributes do 
     it "should not let protected attributes be updated" do 
+      FactoryGirl.create(:country, iso: "US")
       organization = FactoryGirl.create(:organization)
       bike = FactoryGirl.create(:bike, creation_organization_id: organization.id, verified: true, example: true)
       ownership = FactoryGirl.create(:ownership, bike: bike)

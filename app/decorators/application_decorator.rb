@@ -19,6 +19,14 @@ class ApplicationDecorator < Draper::Decorator
     end
   end
 
+  def attr_list_item(desc = nil, title)
+    return nil unless desc.present?
+    html = h.content_tag(:span, title, class: 'attr-title')
+    html = (h.content_tag(:li, html + desc))
+    html.html_safe
+  end
+
+
   def dl_list_item(dd = nil, dt)
     return nil unless dd.present?
     html = h.content_tag(:dt, dt)

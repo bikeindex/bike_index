@@ -217,3 +217,9 @@
       -ms-user-select: $select; // IE10+
           user-select: $select;
 }
+
+@mixin background-clip($clip) {
+  -webkit-background-clip: $clip;
+     -moz-background-clip: $clip;
+          background-clip: $clip;
+}

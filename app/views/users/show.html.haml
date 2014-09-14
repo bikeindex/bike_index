@@ -16,8 +16,7 @@
       .description
         = @user.description.html_safe
   .sharing-section
-    .sharing-buttons
-      = render "/shared/share_this"
+    = render "/shared/share_this"
 
   - if @bikes.any?
     %ul.bike-boxes

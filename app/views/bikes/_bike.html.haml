@@ -1,6 +1,7 @@
 %li{ class: bike.stolen && "blist-stolen" }
   %a.blist-image-holder{href: bike_url(bike) }
-    = bike.thumb_image
+    - if bike.thumb_path.present?
+      %img{ src: bike.thumb_path, alt: bike.title } 
   %h3
     = link_to bike.title_string, bike.list_link_url(target)
   .blist-primary-group

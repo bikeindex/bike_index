@@ -8,3 +8,16 @@
   display: inline-block;
   margin-right: .4em;
 }
+
+.attr-list {
+  @include clearfix;
+  list-style-type: none;
+  margin: 0; padding: 0;
+  position: relative;
+  li {
+    width: 100%;
+    padding: .5em 1em;
+    &:nth-of-type(2n-1) { background: $gray-lighter; }
+    .attr-title { font-weight: 600; }
+  }
+}

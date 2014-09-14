@@ -3,8 +3,6 @@
     <%= link_to image_tag(@bike.public_images.first.image_url(:large), alt: "Bike photo", id: "i|#{@bike.public_images.first.listing_order}"), @bike.public_images.first.image_url, target: "_blank", class: "current-photo", id: "image#{ @bike.public_images.first.id}" %>
   </div>
   <% if @bike.public_images.count > 1 %>
-    <span class="thumbnail-shadow"></span>
-    <span class="thumbnail-shadow-r"></span>
     <div id="thumbnail-photos" class="photo-list">
       <ul id="thumbnails">
         <% if @bike.video_embed_src.present? %>
@@ -28,12 +26,19 @@
   <% end %>
 <% elsif @bike.stock_photo_url.present? %>
   <div class="image-holder just1photo" id="selected-photo">
-    <h4 class="stock-photo">
-      Stock photo of a <%= @bike.year%> <%= @bike.frame_model %>
-      <span>Color may not match!</span>
-    </h4>
+    <div class="stock-photo">
+      <p>
+        Stock photo <span class="stock-photo-byline"><span>of a <%= @bike.year%> <%= @bike.frame_model %></span> (color may not match)</span>
+      </p>
+    </div>
     <a href="<%= @bike.stock_photo_url %>" class='current-photo' target='blank'>
       <%= image_tag(@bike.stock_photo_url, alt: "Bike photo", id: "i|0")%>
     </a>
   </div>
+<% else %>
+  <div class="image-holder empty" id="selected-photo">
+    <img src="/assets/bike_photo_placeholder.png" alt="No images uploaded!" />
+    <span>no image</span>
+  </div>
 <% end %>
+

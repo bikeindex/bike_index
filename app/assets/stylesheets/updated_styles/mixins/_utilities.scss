@@ -45,3 +45,8 @@
 .padded { @include top-pad($standard-pad); }
 
 .margined { @include top-mar($standard-pad); }
+
+
+.with-divider {
+  border-top: 1px solid #e6e6e6;
+}

@@ -13,7 +13,7 @@ class BikeDecorator < ApplicationDecorator
 
   def show_other_bikes
     if current_owner_exists and object.owner.show_bikes
-      html = "<a href='/users/#{object.owner.username}'>Check out this user's other bikes</a>" 
+      html = "<a href='/users/#{object.owner.username}'>View user's other bikes</a>" 
       html.html_safe
     end
   end
@@ -82,11 +82,11 @@ class BikeDecorator < ApplicationDecorator
 
   def thumb_image
     if object.thumb_path
-      h.image_tag(object.thumb_path, alt: title)
+      h.image_tag(object.thumb_path, alt: title_string)
     elsif object.stock_photo_url.present?
       small = object.stock_photo_url.split('/')
       ext = "/small_" + small.pop
-      h.image_tag(small.join('/') + ext, alt: title)
+      h.image_tag(small.join('/') + ext, alt: title_string)
     else
       # h.image_tag("/assets/bike_photo_placeholder.png", alt: title) + h.content_tag(:span, "no image")
     end    

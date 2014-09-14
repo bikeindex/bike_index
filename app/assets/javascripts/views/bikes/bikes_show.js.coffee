@@ -1,6 +1,6 @@
 class BikeIndex.Views.BikesShow extends Backbone.View
   events:
-    'click .single-bike-photos .clickable-image': 'clickPhoto'
+    'click #thumbnails .clickable-image': 'clickPhoto'
     'keyup': 'logKey'
     
   initialize: ->
@@ -9,35 +9,28 @@ class BikeIndex.Views.BikesShow extends Backbone.View
       $('#alert-block .alert-error').hide()
       $('#claim-ownership-modal').modal("show")
     @setPhotos()
+    if $('.show-bike-edit').length > 0
+      height = $('.show-bike-edit').outerHeight()
+      $('.global-footer').css('padding-bottom', "#{height+10}px")
+
 
   setPhotos: ->
     if $('#thumbnails').length > 0
       @initializePhotoSelector()
-      @prepPhotos()
+      $("#thumbnail-photos li:first-of-type a").addClass('current-thumb')
+      that = @
+      $(window).scroll ->
+        that.prepPhotos()
+        $(window).unbind('scroll')
+      
 
   initializePhotoSelector: ->
     setTimeout ( ->
-      if $('#thumbnails li').css('float') == "none"
-        li_size = $('#thumbnails li:first').height()
-        if (li_size * $('#thumbnail-photos li').length) > $('#thumbnail-photos').height()
-          $('#thumbnail-photos').addClass('overflown')
-      else
-        thumbnailsWidth = $('#thumbnails li').length * ($('#thumbnails li:first').width() + 20)
-        $('#thumbnails').addClass('horizontal')
-        $('#thumbnails.horizontal').width(thumbnailsWidth + 20)
-        if thumbnailsWidth > $('#thumbnail-photos').width()
-          $('#thumbnail-photos').addClass('overflown')
+      thumbnailsWidth = $('#thumbnails li').length * $('#thumbnails li:first').outerWidth(true)
+      $('#thumbnails').css('width', "#{thumbnailsWidth-10}px")
+      if thumbnailsWidth > $('#thumbnail-photos').width()
+        $('.bike-photos').addClass('overflown')
      ) , 500
-    
-    $(window).resize ->
-      if $('#thumbnails li').css('float') == "left"
-        unless $('#thumbnails').hasClass('horizontal')
-          $('#thumbnails').addClass('horizontal')
-          $('#thumbnails.horizontal').width( ($('#thumbnails li').length * ($('#thumbnails li:first').width() + 20)) + 30)
-      else
-        if $('#thumbnails').hasClass('horizontal')
-          $('#thumbnails').removeClass('horizontal')
-          $('#thumbnails').width('100%')
 
   logKey:(event) ->
     return true unless $('#thumbnail-photos').data('length') > 1
@@ -57,7 +50,7 @@ class BikeIndex.Views.BikesShow extends Backbone.View
   shiftToPhoto: (pos) ->
     targetPhotoID = $("#selected-photo a[data-pos='#{pos}']").attr("id")
     targetPhoto = $("#thumbnail-photos a[data-id='#{targetPhotoID}']")
-    @photoFadeOut(targetPhoto, targetPhotoID)
+    @photoFadeOut(targetPhotoID, targetPhoto)
 
       
 
@@ -65,26 +58,22 @@ class BikeIndex.Views.BikesShow extends Backbone.View
     event.preventDefault()
     targetPhoto = $(event.target).parents('.clickable-image')
     targetPhotoID = targetPhoto.attr('data-id')
-    @photoFadeOut(targetPhoto, targetPhotoID)
+    @photoFadeOut(targetPhotoID, targetPhoto)
 
-  photoFadeOut: (targetPhoto, targetPhotoID) ->
+  photoFadeOut: (targetPhotoID, targetPhoto) ->
     if $('#video_embed').length > 0
       if targetPhotoID == "video_embed"
         return false
       else
         $('#video_embed').remove() 
         @photoFadeIn(targetPhotoID, targetPhoto)
-    
-    $('#selected-photo .current-photo').fadeOut(
-      'fast', =>
-        $('#selected-photo .current-photo').hide().removeClass('current-photo')
-        if targetPhotoID == "video_embed"
-          $('#selected-photo').append("""
-            <iframe id="video_embed" width="684" height="462" src="#{targetPhoto.data('link')}" frameborder="0" allowfullscreen></iframe>
-            """)
-        else
-          @photoFadeIn(targetPhotoID, targetPhoto)
-      )
+    $('#selected-photo .current-photo').addClass('transitioning-photo').removeClass('current-photo')
+    if targetPhotoID == "video_embed"
+      $('#selected-photo').append("""
+        <iframe id="video_embed" width="684" height="462" src="#{targetPhoto.data('link')}" frameborder="0" allowfullscreen></iframe>
+        """)
+    else
+      @photoFadeIn(targetPhotoID, targetPhoto)
     return false # Not sure why this is here, so I left it
 
   injectPhoto: (targetPhotoID, targetPhoto) ->
@@ -108,8 +97,20 @@ class BikeIndex.Views.BikesShow extends Backbone.View
 
   photoFadeIn: (targetPhotoID, targetPhoto) ->
     if $("##{targetPhotoID}").length > 0
-      $("##{targetPhotoID}").addClass('current-photo')
+      $("##{targetPhotoID}, ##{targetPhotoID} img").css('display', 'block')
     else
       @injectPhoto(targetPhotoID, targetPhoto)
-      $("##{targetPhotoID}").addClass('current-photo')
-    $('#selected-photo .current-photo, #selected-photo .current-photo img').fadeIn('fast')
+    $("##{targetPhotoID}").addClass('current-photo').removeClass('transitioning-photo')
+    $("#thumbnail-photos a").removeClass('current-thumb')
+    $("#thumbnail-photos a[data-id='#{targetPhotoID}']").addClass('current-thumb')
+    setTimeout ( ->
+      $('#selected-photo .transitioning-photo').hide()
+      $('#selected-photo .transitioning-photo').removeClass('transitioning-photo current-photo')
+    ), 900
+    
+    # some portrait images are too tall. Let's make em smaller
+    ideal_height = $(window).height() * 0.75
+    if $("#selected-photo .current-photo").height() > ideal_height
+      $("##{targetPhotoID} img").css('height', "#{ideal_height}px").css('width', "auto")
+    else
+      $("##{targetPhotoID} img").css('height', "auto").css('width', "100%")

@@ -36,7 +36,7 @@ describe BikeDecorator do
       user.stub(:username).and_return("i")
       decorator = BikeDecorator.new(bike)
       decorator.stub(:current_owner_exists).and_return(true)
-      decorator.show_other_bikes.should eq("<a href='/users/i'>Check out this user's other bikes</a>")
+      decorator.show_other_bikes.match("href='/users/i").should be_present
     end
   end
 
@@ -164,13 +164,6 @@ describe BikeDecorator do
       decorator = BikeDecorator.new(bike)
       decorator.stub(:title_string).and_return("Title")
       decorator.thumb_image.should eq("<img alt=\"Title\" src=\"/assets/pathy\" />")
-    end
-    xit "should return the placeholder url otherwise" do 
-      bike = Bike.new
-      bike.stub(:thumb_path).and_return(nil)
-      decorator = BikeDecorator.new(bike)
-      decorator.stub(:title).and_return("Title")
-      decorator.thumb_image.should eq("<img alt=\"Title\" src=\"/assets/bike_photo_placeholder.png\" /><span>no image</span>")
     end
   end
 

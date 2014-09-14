@@ -11,7 +11,6 @@
     font-family: $body-font;
   }
   h3 {  
-    @include h3-font-size;
     margin: 0;
   }
   p {
