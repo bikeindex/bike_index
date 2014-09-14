@@ -239,6 +239,7 @@ class Bike < ActiveRecord::Base
   def set_paints
     self.paint_id = nil if paint_id.present? && paint_name.blank?
     return true unless paint_name.present?
+    self.paint_name = paint_name[0] if paint_name.kind_of?(Array)
     return true if Color.fuzzy_name_find(paint_name).present?
     paint = Paint.fuzzy_name_find(paint_name)
     paint = Paint.create(name: paint_name) unless paint.present?

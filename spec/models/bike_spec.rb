@@ -254,7 +254,7 @@ describe Bike do
     end
     it "should create a new paint and set it otherwise" do 
       bike = Bike.new
-      bike.stub(:paint_name).and_return("Food Time SOOON")
+      bike.paint_name = ["Food Time SOOON"]
       lambda { bike.set_paints }.should change(Paint, :count).by(1)
       bike.paint.name.should eq("food time sooon")
     end
