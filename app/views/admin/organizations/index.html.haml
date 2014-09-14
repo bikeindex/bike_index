@@ -27,17 +27,14 @@
           %td
             = link_to organization.name, admin_organization_url(organization)
           %td.medium-screens
+            %span.hidden
+              = organization.created_at.to_i
             - if organization.created_at.today?
-              %span.hidden
-                = organization.created_at.strftime("%-m.%-d.%Y %-H.%M")
               Today at #{organization.created_at.strftime("%-I %p")}
             - elsif Date.yesterday().beginning_of_day() <= organization.created_at
-              %span.hidden
-                = organization.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              
               Yesterday at #{organization.created_at.strftime("%-I %p")}
             - else
-              %span.hidden
-                = organization.created_at.strftime("%-m.%-d.%Y %-H.%M")
               = organization.created_at.strftime("%-m/%-d/%Y at %-I %p")
           %td
             = @bikes.where(creation_organization_id: organization.id).count
