@@ -21,6 +21,7 @@ class Admin::ManufacturersController < Admin::BaseController
   def update
     if @manufacturer.update_attributes(params[:manufacturer])
       flash[:notice] = "Manufacturer Saved!"
+      expire_fragment "header_search"
       redirect_to admin_manufacturer_url(@manufacturer)
     else
       render action: :edit
@@ -31,6 +32,7 @@ class Admin::ManufacturersController < Admin::BaseController
     @manufacturer = Manufacturer.create(params[:manufacturer])
     if @manufacturer.save
       flash[:notice] = "Manufacturer Created!"
+      expire_fragment "header_search"
       redirect_to admin_manufacturer_url(@manufacturer)
     else
       render action: :new

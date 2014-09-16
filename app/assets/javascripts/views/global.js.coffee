@@ -64,7 +64,7 @@ class BikeIndex.Views.Global extends Backbone.View
 
   initializeHeaderSearch: ->
     unless $('#sbr-body').length > 0
-      tags = JSON.parse($("#header-search").attr('data-options'))
+      tags = JSON.parse($("#header-search-select").attr('data-options'))
       $('#head-search-bikes #query').select2
         
         tags: tags

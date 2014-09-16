@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140907144150) do
+ActiveRecord::Schema.define(:version => 20140916141534) do
 
   create_table "ads", :force => true do |t|
     t.string   "title"
@@ -122,6 +122,7 @@ ActiveRecord::Schema.define(:version => 20140907144150) do
     t.boolean  "approved_stolen"
     t.text     "all_description"
     t.string   "mnfg_name"
+    t.boolean  "hidden",                   :default => false, :null => false
   end
 
   add_index "bikes", ["card_id"], :name => "index_bikes_on_card_id"

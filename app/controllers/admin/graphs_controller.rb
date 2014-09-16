@@ -45,6 +45,9 @@ class Admin::GraphsController < Admin::BaseController
     end
   end
 
+  def stolen_locations
+  end
+
   def review
     start_day = (1.week.ago - 1.day).to_date
     end_day = (1.day.ago).to_date

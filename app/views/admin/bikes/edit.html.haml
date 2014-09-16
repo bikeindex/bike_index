@@ -105,6 +105,10 @@
           = f.label :owner_email, class: "control-label"
           .controls
             = f.text_field :owner_email, :required =>true
+        .control-group
+          = f.label :hidden, "Hidden (fake delete)", class: "control-label"
+          .controls
+            = f.check_box :hidden
         - if @bike.stolen
           .control-group
             = f.label :stolen, "Bike is stolen", class: "control-label"

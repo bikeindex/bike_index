@@ -8,111 +8,111 @@
     bikes registered. Over
     = number_with_delimiter(StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count)
     stolen bikes recovered.
+- cache 'index_home' do 
+  .wheeled
+    .register-container
+      = link_to "Register a bike", choose_registration_path, class: "btn"
+    .wheel-holder
+      = image_tag "/assets/updated/home/wheel_white.png", id: 'wheeled_wheel'
 
-.wheeled
-  .register-container
-    = link_to "Register a bike", choose_registration_path, class: "btn"
-  .wheel-holder
-    = image_tag "/assets/updated/home/wheel_white.png", id: 'wheeled_wheel'
-
-.home-subhead
-  .container
-    %h2
-      Help us fight bicycle theft &mdash; one registration at a time
-    
-    %p
-      The Bike Index makes stolen bikes harder to sell and easier to recover.
-    %p
-      The process is simple, secure, and free. 
-      = link_to "Register your bike now!", choose_registration_path
-
-.home-testimonial
-  .container
-    .testimonial-user
-      = image_tag "/assets/updated/home/recovery_testimonial_2.png"
-      %h3
-        Eva Linh
-      %h4
-        Bike
-        %span
-          recovered 9.2014
-
-    .testimonial-quote
-      %p
-        A good samaritan found my bike abandoned by a tree, ran my bike's serial number on the Bike Index, found my contact info and returned it to me. It was stolen a little over a month ago and I still can't believe I got it back!
-
-
-.info-blocks
-  .container
-    %article
-      = image_tag "/assets/updated/info_blocks/bike_shop.png"
-      / %h2
-      /   Convenient & automatic
-      %p
-        We make registration convenient by letting advocacy groups and bike shops register bikes for their customers.
-
-    %article
-      = image_tag "/assets/updated/info_blocks/digital.png"
-      / %h2
-      /   Secure and safe
-      %p
-        Securely store the important information about your bike, so it's there when you need it the most.
-        / &mdash; with #{link_to "lots of ones and zeros", 'https://github.com/bikeindex/bike_index'}.
-
-    %article
-      = image_tag "/assets/updated/info_blocks/secure.png"
-      / %h2
-      /   Verified
-      %p
-        We give used bike sellers and buyers a publicly verifiable way to prove they aren't selling or buying stolen bikes.
-
-.home-testimonial.testimonial-2
-  .container
-    .testimonial-user
-      = image_tag "/assets/updated/home/recovery_testimonial_1.png"
-      %h3
-        Bob Spaziano
-      %h4
-        Jamis Citizen
-        %span
-          recovered 9.2014
-
-    .testimonial-quote
-      %p
-        I recovered my bike thanks to the Bike Index and the Raleigh Police! The police located it and used the Bike Index to identify it and return it to me.
-
-.bike-background
-  / .searches
-  /   .container 
-  /     %h2
-  /       Want your stolen bike to be found? Bike Index is the best place to store information about it - with over 1,000 searches a day, and multiple recoveries a week more people search the Bike Index for stolen bikes than other registries
-
-  .supporters
+  .home-subhead
     .container
       %h2
-        Recommended &amp; supported by:
-      %ul.horizontal-list
-        %li
-          %a{href: "http://www.peopleforbikes.org/", target: "_blank"}
-            = image_tag "/assets/supporters/people_for_bikes.png", alt: "People for bikes logo", title: "People for bikes"
-        %li
-          %a{href: "http://trailnet.org/", target: "_blank"}
-            = image_tag "/assets/supporters/trailnet.png", alt: "Trailnet logo", title: "Trailnet"
-        %li
-          %a{href: "http://bikepgh.org/", target: "_blank"}
-            = image_tag "/assets/supporters/bike_pgh.png", alt: "Bike Pittsburgh logo", title: "Bike Pittsburgh"
-        %li
-          %a{href: "https://www.BikeEastBay.org/", target: "_blank"}
-            = image_tag "/assets/supporters/bike_east_bay.png", alt: "Bike East Bay logo", title: "Bike East Bay"
-        %li
-          %a{href: "http://indycog.org/", target: "_blank"}
-            = image_tag "/assets/supporters/indycog.png", alt: "INDYCOG logo", title: "INDYCOG"
-        %li
-          %a{href: "http://www.activetrans.org/", target: "_blank"}
-            = image_tag "/assets/supporters/active_trans1.png", alt: "Active Transportation Alliance logo", title: "Active Transportation Alliance"
-        / %li
-        /   %a{href: "https://stlouis-mo.gov/", target: "_blank"}
-        /     = image_tag "/assets/supporters/st_louis.png", alt: "City of Saint Louis"
-    .and-many-more
+        Help us fight bicycle theft &mdash; one registration at a time
+      
       %p
-        \... and many more - #{link_to "view our partners", where_path}
+        The Bike Index makes stolen bikes harder to sell and easier to recover.
+      %p
+        The process is simple, secure, and free. 
+        = link_to "Register your bike now!", choose_registration_path
+
+  .home-testimonial
+    .container
+      .testimonial-user
+        = image_tag "/assets/updated/home/recovery_testimonial_2.png"
+        %h3
+          Eva Linh
+        %h4
+          Bike
+          %span
+            recovered 9.2014
+
+      .testimonial-quote
+        %p
+          A good samaritan found my bike abandoned by a tree, ran my bike's serial number on the Bike Index, found my contact info and returned it to me. It was stolen a little over a month ago and I still can't believe I got it back!
+
+
+  .info-blocks
+    .container
+      %article
+        = image_tag "/assets/updated/info_blocks/bike_shop.png"
+        / %h2
+        /   Convenient & automatic
+        %p
+          We make registration convenient by letting advocacy groups and bike shops register bikes for their customers.
+
+      %article
+        = image_tag "/assets/updated/info_blocks/digital.png"
+        / %h2
+        /   Secure and safe
+        %p
+          Securely store the important information about your bike, so it's there when you need it the most.
+          / &mdash; with #{link_to "lots of ones and zeros", 'https://github.com/bikeindex/bike_index'}.
+
+      %article
+        = image_tag "/assets/updated/info_blocks/secure.png"
+        / %h2
+        /   Verified
+        %p
+          We give used bike sellers and buyers a publicly verifiable way to prove they aren't selling or buying stolen bikes.
+
+  .home-testimonial.testimonial-2
+    .container
+      .testimonial-user
+        = image_tag "/assets/updated/home/recovery_testimonial_1.png"
+        %h3
+          Bob Spaziano
+        %h4
+          Jamis Citizen
+          %span
+            recovered 9.2014
+
+      .testimonial-quote
+        %p
+          I recovered my bike thanks to the Bike Index and the Raleigh Police! The police located it and used the Bike Index to identify it and return it to me.
+
+  .bike-background
+    / .searches
+    /   .container 
+    /     %h2
+    /       Want your stolen bike to be found? Bike Index is the best place to store information about it - with over 1,000 searches a day, and multiple recoveries a week more people search the Bike Index for stolen bikes than other registries
+
+    .supporters
+      .container
+        %h2
+          Recommended &amp; supported by:
+        %ul.horizontal-list
+          %li
+            %a{href: "http://www.peopleforbikes.org/", target: "_blank"}
+              = image_tag "/assets/supporters/people_for_bikes.png", alt: "People for bikes logo", title: "People for bikes"
+          %li
+            %a{href: "http://trailnet.org/", target: "_blank"}
+              = image_tag "/assets/supporters/trailnet.png", alt: "Trailnet logo", title: "Trailnet"
+          %li
+            %a{href: "http://bikepgh.org/", target: "_blank"}
+              = image_tag "/assets/supporters/bike_pgh.png", alt: "Bike Pittsburgh logo", title: "Bike Pittsburgh"
+          %li
+            %a{href: "https://www.BikeEastBay.org/", target: "_blank"}
+              = image_tag "/assets/supporters/bike_east_bay.png", alt: "Bike East Bay logo", title: "Bike East Bay"
+          %li
+            %a{href: "http://indycog.org/", target: "_blank"}
+              = image_tag "/assets/supporters/indycog.png", alt: "INDYCOG logo", title: "INDYCOG"
+          %li
+            %a{href: "http://www.activetrans.org/", target: "_blank"}
+              = image_tag "/assets/supporters/active_trans1.png", alt: "Active Transportation Alliance logo", title: "Active Transportation Alliance"
+          / %li
+          /   %a{href: "https://stlouis-mo.gov/", target: "_blank"}
+          /     = image_tag "/assets/supporters/st_louis.png", alt: "City of Saint Louis"
+      .and-many-more
+        %p
+          \... and many more - #{link_to "view our partners", where_path}

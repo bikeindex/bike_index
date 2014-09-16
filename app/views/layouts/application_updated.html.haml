@@ -91,9 +91,11 @@
               - mnfg = {id: params[:manufacturer_id], text: Manufacturer.find(params[:manufacturer_id]).name} if params[:manufacturer_id].present?
             - else
               - mnfg = ''
-            - select_list = Color.all.map { |c| { id: "c_#{c.id}", text: c.name, display: c.display } }
-            - select_list += Manufacturer.frames.map { |m| { id: "m_#{m.id}", text: m.name } }
-            #header-search{ data: { selected: mnfg.to_json, options: select_list.to_json } }
+            - cache 'header_search' do
+              - select_list = Color.all.map { |c| { id: "c_#{c.id}", text: c.name, display: c.display } }
+              - select_list += Manufacturer.frames.map { |m| { id: "m_#{m.id}", text: m.name } }
+              %span#header-search-select.hidden{ data: { options: select_list.to_json }}
+            #header-search{ data: { selected: mnfg.to_json } }
               = hidden_field_tag :serial, params[:serial]
       = render 'shared/ad' if @ad.present?
       = yield
