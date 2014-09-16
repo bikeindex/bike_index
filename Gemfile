@@ -13,7 +13,7 @@ gem 'resque', require: 'resque/server'
 gem 'sidekiq'
 gem 'sidekiq-failures'
 gem 'sidekiq-unique-jobs'
-gem 'geocoder', "~> 1.1.2"
+gem 'geocoder'
 gem "money-rails", "~> 0.5.0"
 gem "i18n"
 gem "haml-rails", '~> 0.3.5'
