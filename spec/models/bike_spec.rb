@@ -42,7 +42,7 @@ describe Bike do
 
   describe "scopes" do 
     it "default scopes to created_at desc" do 
-      Bike.scoped.to_sql.should == Bike.where(example: false).order("listing_order desc").to_sql
+      Bike.scoped.to_sql.should == Bike.where(example: false).where(hidden: false).order("listing_order desc").to_sql
     end
     it "scopes to only stolen bikes" do 
       Bike.stolen.to_sql.should == Bike.where(stolen: true).to_sql

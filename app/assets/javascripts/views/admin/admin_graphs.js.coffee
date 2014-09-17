@@ -1,6 +1,7 @@
 class BikeIndex.Views.AdminGraphs extends Backbone.View
     
   initialize: ->
+    $('#admin-content .receptacle').css('max-width', '100%')
     
     # if $('#graphy').length > 0
     #   @initialize_graph()

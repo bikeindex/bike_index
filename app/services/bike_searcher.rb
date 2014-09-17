@@ -90,7 +90,8 @@ class BikeSearcher
     proximity = 500
     proximity = @params[:proximity_radius] if @params[:proximity_radius].present? && @params[:proximity_radius].strip.length > 0
     stolen_ids = @bikes.pluck(:current_stolen_record_id)
-    bike_ids = StolenRecord.where('id in (?)', stolen_ids).near(@params[:proximity], proximity).pluck(:bike_id)
+    box = Geocoder::Calculations.bounding_box(@params[:proximity], proximity)
+    bike_ids = StolenRecord.where('id in (?)', stolen_ids).within_bounding_box(box).pluck(:bike_id)
     @bikes = @bikes.where('id in (?)', bike_ids)
   end
 

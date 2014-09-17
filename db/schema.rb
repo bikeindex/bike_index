@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140916141534) do
+ActiveRecord::Schema.define(:version => 20140916185511) do
 
   create_table "ads", :force => true do |t|
     t.string   "title"
@@ -523,6 +523,7 @@ ActiveRecord::Schema.define(:version => 20140916141534) do
   end
 
   add_index "stolen_records", ["bike_id"], :name => "index_stolen_records_on_bike_id"
+  add_index "stolen_records", ["latitude", "longitude"], :name => "index_stolen_records_on_latitude_and_longitude"
 
   create_table "users", :force => true do |t|
     t.string   "name"

@@ -16,6 +16,7 @@ end
 class BikesController < ApplicationController
   before_filter :ensure_user_for_edit, only: [:edit, :update, :pdf]
   before_filter :render_ad, only: [:index, :show]
+  before_filter :find_bike, only: [:show, :edit]
   layout 'no_container'
 
   def index
@@ -38,12 +39,11 @@ class BikesController < ApplicationController
   end
 
   def show
-    bike = Bike.unscoped.find(params[:id])
-    @components = bike.components.decorate
-    if bike.stolen and bike.current_stolen_record.present?
-      @stolen_record = bike.current_stolen_record.decorate
+    @components = @bike.components.decorate
+    if @bike.stolen and @bike.current_stolen_record.present?
+      @stolen_record = @bike.current_stolen_record.decorate
     end
-    @bike = bike.decorate
+    @bike = @bike.decorate
     @stolen_notification = StolenNotification.new if @bike.stolen
     respond_to do |format|
       format.html { render layout: 'application_updated' }
@@ -162,7 +162,6 @@ class BikesController < ApplicationController
 
 
   def edit
-    bike = Bike.unscoped.find(params[:id])
     begin
       BikeUpdator.new(user: current_user, b_params: params).ensure_ownership!
       rescue UserNotLoggedInError => e
@@ -170,9 +169,9 @@ class BikesController < ApplicationController
         redirect_to new_user_path and return
       rescue => e
         flash[:error] = e.message
-        redirect_to bike_path(bike) and return
+        redirect_to bike_path(@bike) and return
     end
-    @bike = bike.decorate
+    @bike = @bike.decorate
   end
 
 
@@ -197,6 +196,16 @@ class BikesController < ApplicationController
   end
 
 protected
+
+  def find_bike
+    @bike = Bike.unscoped.find(params[:id])
+    if @bike.hidden
+      unless current_user.present? && current_user.superuser
+        flash[:error] = "Bike deleted"
+        redirect_to root_url and return
+      end
+    end
+  end
 
   def ensure_user_for_edit
     unless current_user.present?

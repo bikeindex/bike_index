@@ -42,7 +42,7 @@ class StolenRecord < ActiveRecord::Base
 
   default_scope where(current: true)
 
-  scope :recovered, unscoped.where(current: false).order("date_stolen desc")
+  scope :recovered, unscoped.where(current: false).order("date_recovered desc")
   scope :recovery_unposted, unscoped.where(
     current: false,
     recovery_posted: false
@@ -88,7 +88,7 @@ class StolenRecord < ActiveRecord::Base
     select_params
   end
 
-  before_save :set_phone, :fix_date
+  before_save :set_phone, :fix_date, :titleize_city
   def set_phone
     self.phone = Phonifyer.phonify(self.phone) if self.phone 
     self.secondary_phone = Phonifyer.phonify(self.secondary_phone) if self.secondary_phone 
@@ -105,6 +105,14 @@ class StolenRecord < ActiveRecord::Base
       corrected = date_stolen.change({year: Time.now.year - 1 })
       self.date_stolen = corrected
     end
+  end
+
+  def titleize_city
+    if city.present?
+      self.city = city.gsub('USA','').gsub(/,?(,|\s)[A-Z]+\s?++\z/,'')
+      self.city = city.strip.titleize
+    end
+    true
   end
 
   def tsv_col(i)

@@ -205,6 +205,17 @@
   margin-top: 30px;
 }
 
+.graphs-list-values {
+  @include clearfix;
+  padding: 40px;
+  li {
+    float: left;
+    width: 15%;
+    padding-right: 20px;
+    min-width: 250px;
+  }
+}
+
 //________________________
 //
 // Admin recoveries

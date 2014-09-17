@@ -1,0 +1,56 @@
+= javascript_include_tag "//www.google.com/jsapi", "chartkick" 
+
+%section
+  %h1
+    Stolen location graphs
+
+#graph-holder
+  %h2
+    Stolen countries past year
+
+  - countries = StolenRecord.unscoped.where("created_at >= ?", Time.zone.now.beginning_of_year).where('country_id IS NOT NULL').group(:country).count
+  - groups = {}
+  - countries.keys.each { |c| groups[c.name] = countries[c] if c.present? }
+
+
+  = geo_chart groups
+
+  %ul.graphs-list-values
+    - groups.sort_by {|k,v| v}.reverse.each do |location|
+      %li
+        #{location[0]}: #{location[1]}
+
+    
+%section
+  %h2
+    Stolen states past year
+  - us = Country.fuzzy_iso_find('us').id
+  - states = StolenRecord.unscoped.where("created_at >= ?", 1.years.ago).where(country_id: us).where('state_id IS NOT NULL').group(:state).count
+  - display = ''
+  - states.keys.each { |state| display += ",['#{state.name}', #{states[state]}]" }
+
+  #stolen_month_us
+
+  / %ul.graphs-list-values
+  /   - states.sort_by {|k,v| v}.reverse.each do |location|
+  /     %li
+  /       #{location[0]}: #{location[1]}
+  :javascript
+    google.load('visualization', '1', {'packages': ['geochart']});
+    google.setOnLoadCallback(drawMarkersMap);
+    function drawMarkersMap() {
+      var data = google.visualization.arrayToDataTable([
+        ['State',  'Thefts']#{display}
+      ]);
+
+      var options = {
+        region: 'US',
+        resolution: 'provinces',
+        displayMode: 'markers',
+        colorAxis: {colors: ['#3498DB', '#2C3E50']}
+      };
+
+      var chart = new google.visualization.GeoChart(document.getElementById('stolen_month_us'));
+      chart.draw(data, options);
+    };
+

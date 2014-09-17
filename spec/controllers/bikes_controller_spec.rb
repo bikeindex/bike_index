@@ -32,6 +32,16 @@ describe BikesController do
       it { should respond_with(:success) }
       it { should render_template(:show) }
     end
+
+    describe "hiding hidden bikes" do 
+      before do 
+        ownership = FactoryGirl.create(:ownership)
+        ownership.bike.update_attributes(hidden: true)
+        get :show, id: ownership.bike.id
+      end
+      it { should set_the_flash }
+      it { should redirect_to root_url }
+    end
   end
 
   describe :spokecard do

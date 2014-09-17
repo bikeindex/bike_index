@@ -33,7 +33,7 @@ describe StolenRecord do
     end
   
     it "should only include non-current in recovered" do 
-      StolenRecord.recovered.to_sql.should == StolenRecord.where(current: false).order("date_stolen desc").to_sql
+      StolenRecord.recovered.to_sql.should == StolenRecord.where(current: false).order("date_recovered desc").to_sql
     end
 
     it "should only include sharable unapproved in recovery_waiting_share_approval" do 
@@ -62,6 +62,25 @@ describe StolenRecord do
     end
     it "should have before_save_callback_method defined as a before_save callback" do
       StolenRecord._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_phone).should == true
+    end
+  end
+
+  describe :titleize_city do 
+    it "it should titleize_city" do 
+      stolen_record = FactoryGirl.create(:stolen_record)
+      stolen_record.city = 'INDIANAPOLIS, IN USA'
+      stolen_record.titleize_city
+      stolen_record.city.should eq('Indianapolis')
+    end
+
+    it "it shouldn't remove other things" do 
+      stolen_record = FactoryGirl.create(:stolen_record)
+      stolen_record.city = 'Georgian la'
+      stolen_record.titleize_city
+      stolen_record.city.should eq('Georgian La')
+    end
+    it "should have before_save_callback_method defined as a before_save callback" do
+      StolenRecord._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:titleize_city).should == true
     end
   end
 

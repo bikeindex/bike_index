@@ -22,7 +22,10 @@ module Api
       def index
         if params[:proximity] == 'ip'
           params[:proximity] = request.env["HTTP_X_FORWARDED_FOR"].split(',')[0]
-          
+        end
+        if params[:ip_test]
+          info = { ip: params[:proximity], location: Geocoder.search(params[:proximity]) }
+          respond_with info and return
         end
         respond_with BikeSearcher.new(params).find_bikes.limit(20)
       end
