@@ -2,7 +2,7 @@ $testimonial-tri-size: 12px;
 .home-testimonial {
   padding: 20px 0;
   $bg: #fff;
-  $text-bg: $gray-lighter;
+  $text-bg: $gray-lightest;
   background: $bg;
   .testimonial-user {
     @include clearfix;
@@ -44,7 +44,6 @@ $testimonial-tri-size: 12px;
     background: $text-bg;
     border-radius: 1px;
     padding: 1em;
-    font-size: 22px; 
     line-height: 1.3em;
 
     &:before {
@@ -61,18 +60,12 @@ $testimonial-tri-size: 12px;
     p {
       margin: 0;
       line-height: 1.2em;
-      span {
-        // content: '"';
-        color: $gray-light;
-        font-size: 30px;
-        display: inline-block;
-      }
     }
   }
 }
 
 .testimonial-2 {
-  $bg: $gray-lighter;
+  $bg: $gray-lightest;
   $text-bg: #fff;
   background: $bg;
   .testimonial-quote {
@@ -109,7 +102,10 @@ $testimonial-tri-size: 12px;
 @media (min-width: $l-breakpoint) {
   .home-testimonial {
     .testimonial-user { width: $three-column; }   
-    .testimonial-quote { width: $nine-column; }
+    .testimonial-quote {
+      width: $nine-column;
+      font-size: 22px; 
+    }
   }
 }
 
@@ -128,7 +124,6 @@ $testimonial-tri-size: 12px;
 
 @media (max-width: $s-breakpoint) {
   .home-testimonial, .home-testimonial.testimonial-2 {
-    padding: 30px 0 20px;
     $text-bg: #fff;
     .testimonial-user {
       width: 100%;
