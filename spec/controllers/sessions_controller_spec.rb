@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe SessionsController do
 
-  describe :new do 
-    it "should set the user session to blank" do 
+  describe :new do
+    it "should set the user session to blank" do
       user = User.new
       user.stub(:id).and_return(69)
       set_current_user(user)
@@ -12,8 +12,8 @@ describe SessionsController do
     end
   end
 
-  describe :destroy do 
-    before do 
+  describe :destroy do
+    before do
       get :new
     end
     it { should respond_with(:success) }
@@ -34,6 +34,7 @@ describe SessionsController do
           request.env["HTTP_REFERER"] = user_home_url
           post :create, session: {}
           session[:user_id].should == @user.id
+          flash[:notice].should == I18n.t("flash.notice.logged_in")
           response.should redirect_to user_home_url
         end
       end
@@ -42,6 +43,7 @@ describe SessionsController do
         @user.should_receive(:authenticate).and_return(false)
         post :create, session: {}
         session[:user_id].should be_nil
+        flash[:alert].should == I18n.t("flash.alert.invalid_email_password")
         response.should render_template("new")
       end
     end

@@ -1,0 +1,6 @@
+en:
+  flash:
+    notice:
+      logged_in: "Logged in!"
+    alert:
+      invalid_email_password: "Invalid email/password"

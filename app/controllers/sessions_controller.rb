@@ -15,13 +15,13 @@ class SessionsController < ApplicationController
           session[:user_id] = user.id
           session[:last_seen] = Time.now
           if user.superuser
-            redirect_to admin_root_url, notice: "Logged in!"
+            redirect_to admin_root_url, notice: t("flash.notice.logged_in")
           else
-            redirect_to user_home_url, notice: "Logged in!"
+            redirect_to user_home_url, notice: t("flash.notice.logged_in")
           end
         else
           # User couldn't authenticate, so password is invalid
-          flash.now.alert = "Invalid email/password"
+          flash.now.alert = t "flash.alert.invalid_email_password"
           # If user is banned, tell them about it.
           if user.banned?
             flash.now.alert = "We're sorry, but it appears that your account has been locked. If you are unsure as to the reasons for this, please contact us"
@@ -35,7 +35,7 @@ class SessionsController < ApplicationController
       end
     else
       # Email address is not in the DB
-      flash.now.alert = "Invalid email/password"
+      flash.now.alert = t "flash.alert.invalid_email_password"
       render "new"
     end
   end
