@@ -187,7 +187,16 @@
     font-family: $body-font;
     font-weight: $body-font-weight;
   }
-  p { text-align: left; }
+  p {
+    text-align: left;
+    margin-top: 1.25em;
+  }
+}
+
+@media (min-width: $s-breakpoint) {
+  .how-it-works {
+    padding: 120px 0 100px;
+  }
 }
 
 @media (min-width: $m-breakpoint) {
@@ -234,6 +243,7 @@
 
 @media (min-width: $s-breakpoint) {
   .info-blocks {
+    padding-bottom: 100px;
     .container { padding: 30px 0 20px; }
     article {
       float: left;

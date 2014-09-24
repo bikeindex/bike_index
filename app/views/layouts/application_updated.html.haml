@@ -32,7 +32,7 @@
   - body_class = "vendor-signup-page" if current_page?(:vendor_signup)
   %body#body{ class: body_class }
     / = render 'layouts/grid'
-    = render 'layouts/messages_u'
+    = render 'layouts/messages'
     .bodywrap
       %header.global-header
         .container.bikes-nav
@@ -91,11 +91,9 @@
               - mnfg = {id: params[:manufacturer_id], text: Manufacturer.find(params[:manufacturer_id]).name} if params[:manufacturer_id].present?
             - else
               - mnfg = ''
-            - cache 'header_search' do
-              - select_list = Color.all.map { |c| { id: "c_#{c.id}", text: c.name, display: c.display } }
-              - select_list += Manufacturer.frames.map { |m| { id: "m_#{m.id}", text: m.name } }
-              %span#header-search-select.hidden{ data: { options: select_list.to_json }}
-            #header-search{ data: { selected: mnfg.to_json } }
+            - select_list = Color.all.map { |c| { id: "c_#{c.id}", text: c.name, display: c.display } }
+            - select_list += Manufacturer.frames.map { |m| { id: "m_#{m.id}", text: m.name } }
+            #header-search{ data: { selected: mnfg.to_json, options: select_list.to_json } }
               = hidden_field_tag :serial, params[:serial]
       = render 'shared/ad' if @ad.present?
       = yield

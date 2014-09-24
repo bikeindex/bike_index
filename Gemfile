@@ -41,7 +41,7 @@ gem "fog"
 gem 'dalli'
 gem 'dumper', "~>1.4.5"
 gem 'draper'
-# gem 'rack-mini-profiler' # I'm not actually doing anything useful with this and it's annoying.
+# gem 'rack-mini-profiler', require: 'false'
 gem 'dotenv-rails', "~> 0.8", git: "https://github.com/bkeepers/dotenv"
 gem 'wkhtmltopdf-binary'
 gem 'wicked_pdf'
