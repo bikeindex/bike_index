@@ -44,28 +44,26 @@
       .controls
         .groupedbtn-group{ data:  { toggle: "buttons-radio" }}
           .btn-group
-            %button.btn{ type: "button", :'data-size' => 'xs', class: if @bike.frame_size == 'xs' then 'active' end}
+            %button.btn{ type: "button", :'data-size' => 'xs', class: ( 'active' if @bike.frame_size == 'xs' ) }
               XS
-            %button.btn{ type: "button", :'data-size' => 's', class: if @bike.frame_size == 's' then 'active' end }
+            %button.btn{ type: "button", :'data-size' => 's', class: ( 'active' if @bike.frame_size == 's' ) }
               S
-            %button.btn{ type: "button", :'data-size' => 'm', class: if @bike.frame_size == 'm' then 'active' end }
+            %button.btn{ type: "button", :'data-size' => 'm', class: ( 'active' if @bike.frame_size == 'm' ) }
               M
-            %button.btn{ type: "button", :'data-size' => 'l', class: if @bike.frame_size == 'l' then 'active' end }
+            %button.btn{ type: "button", :'data-size' => 'l', class: ( 'active' if @bike.frame_size == 'l' ) }
               L
-            %button.btn{ type: "button", :'data-size' => 'xl', class: if @bike.frame_size == 'xl' then 'active' end }
+            %button.btn{ type: "button", :'data-size' => 'xl', class: ( 'active' if @bike.frame_size == 'xl' ) }
               XL
           .btn-group
-            %button.btn{ type: "button", :'data-size' => 'cm', class: if @bike.frame_size_unit == 'cm' then 'active' end }
+            %button.btn{ type: "button", :'data-size' => 'cm', class: ( 'active' if @bike.frame_size_unit == 'cm' ) }
               CM
-            %button.btn{ type: "button", :'data-size' => 'in', class: if @bike.frame_size_unit == 'in' then 'active' end }
+            %button.btn{ type: "button", :'data-size' => 'in', class: ( 'active' if @bike.frame_size_unit == 'in' ) }
               IN
     .hidden-other.control-group
       = f.label :frame_size, "Seat tube length", class: "control-label"
       .controls
         = f.hidden_field :frame_size_unit
         = f.text_field :frame_size
-
-
 
   .input-group
     %a.bikeform-tip{role: "button", title: "What's the frame made of?", data: {toggle: "modal", target: "#frameMaterialTip"} }
