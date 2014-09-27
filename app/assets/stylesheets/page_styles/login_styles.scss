@@ -364,3 +364,6 @@
     // span { color: #bbb;}
   }
 }
+@-moz-document url-prefix() { 
+  .front-behind .back-colored { display: none; }
+}

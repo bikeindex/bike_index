@@ -39,7 +39,6 @@ gem 'omniauth-facebook'
 gem 'omniauth'
 gem "fog"
 gem 'dalli'
-gem 'dumper', "~>1.4.5"
 gem 'draper'
 # gem 'rack-mini-profiler', require: 'false'
 gem 'dotenv-rails', "~> 0.8", git: "https://github.com/bkeepers/dotenv"
