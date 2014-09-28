@@ -14,7 +14,7 @@
           = image_tag @user.avatar.url(:medium)
     - if @user.description
       .description
-        = @user.description.html_safe
+        = @user.description
   .sharing-section
     = render "/shared/share_this"
 
