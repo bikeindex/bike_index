@@ -18,32 +18,34 @@
   .home-subhead
     .container
       %h2
-        Help us fight bicycle theft &mdash; one registration at a time
+        Help us fight bicycle theft &mdash; one registration at a time.
       
       %h3
-        The Bike Index makes stolen bikes harder to sell and easier to recover.
+        The Bike Index makes stolen bikes harder to sell and easier to recover by making sure important information about your bike is there when you need it the most.
       %h3
         The process is simple, secure, and free. 
-        = link_to "Register your bike now!", choose_registration_path
+        %a.scroll-to-ref{ href: "#how_it_works" }
+          Learn more
+        or
+        = link_to "register your bike now!", choose_registration_path
   .info-blocks
     .container
       %article
-        = image_tag "/assets/updated/info_blocks/bike_shop.png"
+        = image_tag "/assets/updated/info_blocks/computerized.svg"
         / %h2
         /   Convenient & automatic
         %p
-          We make registration convenient by letting advocacy groups and bike shops register bikes for their customers.
+          We keep all the important information about your bike in one place so it's there when you need it the most. 
 
       %article
-        = image_tag "/assets/updated/info_blocks/digital.png"
+        = image_tag "/assets/updated/info_blocks/secure.svg"
         / %h2
         /   Secure and safe
         %p
-          Securely store the important information about your bike, so it's there when you need it the most.
-          / &mdash; with #{link_to "lots of ones and zeros", 'https://github.com/bikeindex/bike_index'}.
+          We make buying and selling used bikes less risky by providing a way to easily verify that a bicycle isn’t stolen. 
 
       %article
-        = image_tag "/assets/updated/info_blocks/secure.png"
+        = image_tag "/assets/updated/info_blocks/verified.svg"
         / %h2
         /   Verified
         %p
@@ -64,18 +66,17 @@
         %p
           A good samaritan found my bike abandoned by a tree, ran my bike's serial number on the Bike Index, found my contact info and returned it to me. It was stolen a little over a month ago and I still can't believe I got it back!
 
-  .how-it-works
+  .how-it-works#how_it_works
     .container
       %h2
         How it works
       %p
-        It's simple: we offer an easy and efficient way to store and update important identifying information about your bike. We're an online storehouse for serial numbers, frame colors, components, and any other piece of owner information you can think of.
-
+        It's simple: we offer an easy and efficient way to store and update important identifying information about your bike. We're an online storehouse for serial numbers, frame colors, components, and any other piece of identifying information you can think of.
       %p
-        Police departments, pawn shops and individuals use the Bike Index to check bikes that they find or receive. When a bike is marked "stolen" on our site, it gives everyone a way to quickly get in touch with you so you and your ride can be reunited.
-
+        In the unfortunate event that your bike is stolen, you can harness the power of our network to help get it back. Registering with Bike Index ensures that law enforcement, bike shops, individuals, and everyone in between will have the information they need to help reunite you with your bike. 
       %p
-        With over 1,000 searches for bikes every day, Bike Index is the most  comprehensive, and widely used registration site for bike owners &mdash; and the best bet for finding stolen bikes.
+        Bike Index is the most widely used open bicycle registration site in the world. We strive to be the best online resource in the fight against bicycle theft.
+
     
   .home-testimonial
     .container

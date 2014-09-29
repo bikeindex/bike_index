@@ -1,8 +1,15 @@
 class ApplicationController < ActionController::Base
   include UrlHelper
   protect_from_forgery
+  before_filter :strict_transport_security    
 
 protected
+  def strict_transport_security
+    if request.ssl?
+      response.headers['Strict-Transport-Security'] = "max-age=31536000;"
+    end
+  end
+
   def current_user
     begin
       @current_user ||= User.find(session[:user_id]) if session[:user_id]
