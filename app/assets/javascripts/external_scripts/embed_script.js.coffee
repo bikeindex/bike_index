@@ -114,3 +114,4 @@ $(document).ready ->
 
   $('#stolen_record_date_stolen_input').datepicker('format: mm-dd-yyy')
   $('#stolen_fields').appendTo('#stolen_fields_store')
+  toggleRegistrationType() if $('#stolen_registration_only').length > 0

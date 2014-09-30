@@ -4,11 +4,14 @@
   = f.hidden_field :creation_organization_id
   = f.hidden_field :embeded, value: true
   .input-group
-    #registration-type-tabs
-      %a.registration-type-tab{ href: '#', data: { stype: 'description' } }
-        Register a non-stolen bike
-      %a.registration-type-tab.stolen.current-type{ href: '#', data: { stype: 'serial' } }
-        Register a stolen bike
+    - if @stolen
+      %span#stolen_registration_only
+    - unless @stolen || @non_stolen
+      #registration-type-tabs
+        %a.registration-type-tab{ href: '#', data: { stype: 'description' } }
+          Register a non-stolen bike
+        %a.registration-type-tab.stolen.current-type{ href: '#', data: { stype: 'serial' } }
+          Register a stolen bike
     .control-group
       = f.label :serial_number, class: "control-label"
       .controls

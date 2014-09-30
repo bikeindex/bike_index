@@ -21,6 +21,11 @@ class OrganizationsController < ApplicationController
   def embed
     @bike = BikeCreator.new(@b_param).new_bike
     @bike.owner_email = params[:email] if params[:email].present?
+    if params[:non_stolen]
+      @non_stolen = true 
+    elsif params[:stolen]
+      @stolen = true 
+    end
     if params[:sf_safe].present?
       render action: :embed_sf_safe, layout: 'embed_layout'
     else
