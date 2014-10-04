@@ -10,6 +10,7 @@ describe BikeSerializer do
     it { subject.manufacturer_name.should == bike.manufacturer_name }
     it { subject.manufacturer_id.should == bike.manufacturer_id }
     it { subject.stolen.should == bike.stolen }
+    it { subject.type_of_cycle.should == bike.cycle_type.name }
     it { subject.name.should == bike.name }
     it { subject.year.should == bike.year }
     it { subject.frame_model.should == bike.frame_model }

@@ -1,5 +1,5 @@
 - if @feedback.feedback_type == 'serial_update_request'
-  %h1
+  %h1{ :style => "font-weight: 400px;" }
     Serial update notification
   %p
     From
@@ -17,7 +17,7 @@
     - bike = Bike.find(@feedback.feedback_hash[:bike_id])
     = link_to 'View the bike', edit_admin_bike_url(bike)
 - elsif @feedback.feedback_type == 'bike_delete_request'
-  %h1
+  %h1{ :style => "font-weight: 400px;" }
     Bike delete request
   %p
     From
@@ -31,7 +31,7 @@
 
 - elsif @feedback.feedback_type == 'bike_recovery'
   - bike = Bike.find(@feedback.feedback_hash[:bike_id])
-  %h1
+  %h1{ :style => "font-weight: 400px;" }
     A #{bike.type} has been recovered
   %p
     How the bike was recovered
@@ -46,7 +46,7 @@
       %strong
         = @feedback.feedback_hash[:can_share_recovery]
     - if @feedback.feedback_hash[:can_share_recovery]
-      %h3
+      %h3{ :style => "font-weight: 400px;" }
         = link_to "Approve sharing this recovery!", admin_recoveries_url
   %p
     = link_to 'View the bike', edit_admin_bike_url(bike)
