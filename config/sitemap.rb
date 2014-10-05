@@ -43,7 +43,8 @@ SitemapGenerator::Sitemap.create do
 
   group(filename: :images) do
     PublicImage.bikes.each do |i|
-      unless Bike.unscoped.find(i.imageable_id).example == true
+      bike = Bike.unscoped.find(i.imageable_id)
+      unless bike.example == false && bike.hidden == false
         add(bike_path(i.imageable), images: [{
           loc: i.image_url,
           title: i.name }])

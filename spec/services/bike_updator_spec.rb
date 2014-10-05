@@ -70,7 +70,16 @@ describe BikeUpdator do
       user = ownership.creator
       new_creator = FactoryGirl.create(:user)
       og_bike = bike
-      bike_params = {description: "something long", serial_number: "69", manufacturer_id: 69, manufacturer_other: "Uggity Buggity", creator: new_creator, creation_organization_id: 69, example: false, stolen: true}
+      bike_params = {
+        description: "something long",
+        serial_number: "69",
+        manufacturer_id: 69,
+        manufacturer_other: "Uggity Buggity",
+        creator: new_creator,
+        creation_organization_id: 69,
+        example: false,
+        hidden: true,
+        stolen: true}
       BikeUpdator.new(user: user, b_params: {id: bike.id, bike: bike_params}).update_available_attributes
       bike.reload.serial_number.should eq(og_bike.serial_number)
       bike.manufacturer_id.should eq(og_bike.manufacturer_id)
@@ -78,7 +87,7 @@ describe BikeUpdator do
       bike.creation_organization_id.should eq(og_bike.creation_organization_id)
       bike.creator.should eq(og_bike.creator)
       bike.example.should eq(og_bike.example)
-      # bike.stolen.should be_true
+      bike.hidden.should be_false
       bike.verified.should be_true
       bike.description.should eq("something long")
     end
@@ -122,7 +131,7 @@ describe BikeUpdator do
     bike_params = {stolen: false}
     update_bike = BikeUpdator.new(user: user, b_params: {id: bike.id, bike: bike_params})
     update_bike.should_receive(:update_ownership).and_return(true)
-    ListingOrderWorker.any_instance.should_receive(:perform).and_return(true)    
     update_bike.update_available_attributes
+    expect(ListingOrderWorker).to have_enqueued_job(bike.id)
   end
 end
