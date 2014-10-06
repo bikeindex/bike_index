@@ -4,7 +4,7 @@ describe CustomerContact do
   describe :validations do
     it { should validate_presence_of :user_email }
     it { should validate_presence_of :creator_email }
-    it { should validate_presence_of :creator_id }
+    # it { should validate_presence_of :creator_id }
     it { should validate_presence_of :contact_type }
     it { should validate_presence_of :bike_id }
     it { should validate_presence_of :title }
@@ -12,6 +12,7 @@ describe CustomerContact do
     it { should belong_to :user }
     it { should belong_to :creator }
     it { should belong_to :bike }
+    it { should serialize :info_hash }
   end
 
   describe :normalize_email_and_find_user do 

@@ -89,12 +89,13 @@ Bikeindex::Application.routes.draw do
     match 'bust_z_cache', to: 'dashboard#bust_z_cache'
     match 'destroy_example_bikes', to: 'dashboard#destroy_example_bikes'
     resources :discounts, :memberships, :organizations, :bike_token_invitations,
-      :organization_invitations, :paints, :customer_contacts, :ads
+      :organization_invitations, :paints, :ads
     match 'duplicate_bikes', to: 'bikes#duplicates'
     resources :flavor_texts, only: [:destroy, :create]
     resources :stolen_bikes do 
       member { post :approve }
     end
+    resources :customer_contacts, only: [:create]
     resources :recoveries do 
       collection { post :approve }
     end
@@ -132,7 +133,6 @@ Bikeindex::Application.routes.draw do
           get 'search_tags'
           get 'close_serials'
           get 'stolen_ids'
-          post 'send_notification_email'
         end
       end
       resources :cycle_types, only: [:index]
@@ -142,6 +142,8 @@ Bikeindex::Application.routes.draw do
       resources :handlebar_types, only: [:index]
       resources :frame_materials, only: [:index]
       resources :manufacturers, only: [:index]
+      resources :notifications, only: [:create]
+      resources :organizations, only: [:show]
       resources :users do 
         collection do
           get 'current'
@@ -149,6 +151,7 @@ Bikeindex::Application.routes.draw do
           post 'send_request'
         end
       end
+      match 'not_found', to: 'api_v1#not_found'
       match '*a', to: 'api_v1#not_found'
     end
   end

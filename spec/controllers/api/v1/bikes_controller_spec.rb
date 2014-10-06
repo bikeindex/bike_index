@@ -268,53 +268,5 @@ describe Api::V1::BikesController do
     end
   end
 
-  describe :send_notification_email do 
-    it "should return correct code if not logged in" do 
-      bike = FactoryGirl.create(:bike)
-      options = { title: 'some email title',
-        body: 'some email text',
-        bike_id: bike.id
-      } 
-      post :send_notification_email, options
-      response.code.should eq("401")
-    end
-
-    it "should not send an email if the org is example" do
-      organization = FactoryGirl.create(:organization, name: 'Example')
-      user = FactoryGirl.create(:user)
-      FactoryGirl.create(:membership, user: user, organization: organization)
-      organization.save
-      bike = FactoryGirl.create(:bike)
-      options = { title: 'some email title',
-        body: 'some email text',
-        bike_id: bike.id,
-        organization_slug: organization.slug,
-        access_token: organization.access_token
-      } 
-      Resque.should_not_receive(:enqueue)
-      post :send_notification_email, options
-      response.code.should eq("422")
-    end
-
-    it "should send an ownership email" do
-      organization = FactoryGirl.create(:organization, short_name: 'example')
-      user = FactoryGirl.create(:user)
-      FactoryGirl.create(:membership, user: user, organization: organization)
-      organization.save
-      bike = FactoryGirl.create(:bike)
-      options = { title: 'some email title',
-        body: 'some email text',
-        bike_id: bike.id,
-        organization_slug: organization.slug,
-        access_token: organization.access_token
-      } 
-      Resque.should_not_receive(:enqueue)
-      post :send_notification_email, options
-      response.code.should eq("422")
-    end
-
-  end
-
-
     
 end

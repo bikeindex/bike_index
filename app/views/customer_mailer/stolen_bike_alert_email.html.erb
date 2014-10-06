@@ -1,0 +1,37 @@
+<h1 style="font-weight: 400; font-size: 30px;">We're spreading the word about your stolen <%= @biketype %>!</h1>
+
+<p style="">We sent out this tweet from <a href='https://twitter.com/<%= @info[:tweet_account_screen_name] %>'>@<%= @info[:tweet_account_screen_name] %></a>, the <% if @info[:location].present? %><%= @info[:location] %> area <% end %> stolen bike alerter.</p>
+
+<div style="margin: 30px 0 0; border: 1px solid #dfe3ee;border-radius: 4px; padding: 15px 2%; min-height: 120px;">
+  <div style="width: 10%; float: left; height: 120px;">
+    <a href="https://twitter.com/<%= @info[:tweet_account_screen_name] %>"><img style="max-width: 100%;" src="<%= @info[:tweet_account_image] %>"></a>
+  </div>
+  <div style="width: 86%; margin-left: 2%; ">
+    <a style="display: block; text-decoration: none; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;" href="https://twitter.com/<%= @info[:tweet_account_screen_name] %>/status/<%= @info[:tweet_id] %>">
+      <h3 style="font-size: 14px; line-height: 14px; margin: 0; font-weight: bold; color: #333333;"><%= @info[:tweet_account_name] %></h3>
+      <h3 style="font-size: 14px; line-height: 17px; margin: 0; color: #999; font-weight: 400;">@<%= @info[:tweet_account_screen_name] %></h3>
+    </a>
+    <p style="margin:0;color:#333333;font-family:Georgia,'Times New Roman',serif;font-size:22px;line-height:27px;margin-bottom:0;margin-top:5px;">
+      <%= @info[:tweet_account_tweet_string] %>
+      <a href="https://bikeindex.org/bikes/<%= @bike.id %>" style="border:none;color:#0084b4;text-decoration:none">BikeIndex.org/bikes/<%= @bike.id %></a>
+    </p>
+    <a href="https://twitter.com/<%= @info[:tweet_account_screen_name] %>/status/<%= @info[:tweet_id] %>" style="display:block;border:none;color:#0084b4;text-decoration:none;color:#999999;font-size: 12px; margin-top: 5px;" target="_blank"><%= Time.now.strftime("%I:%M %P - %d %b %y") %></a>
+  </div>
+</div>
+
+
+<% bike_image = "https://www.bikeindex.org/assets/bike_photo_placeholder.png" %>
+<% bike_image = @customer_contact.bike.stock_photo_url if @customer_contact.bike.stock_photo_url.present? %>
+<% bike_image = @customer_contact.bike.thumb_path if @customer_contact.bike.thumb_path %>
+
+<div class="bike-display" style="position: relative;width: 96%;height: 150px;padding: 10px 2%;background: #bf2f2f;border: 1px solid #ddd;max-width: 450px;margin: 30px auto 0;clear: both;">
+  <div class="image-holder" style="width: 33%;float: left;position: relative;">
+    <a href="<%= bike_url(@customer_contact.bike) %>">
+     <img src="<%= bike_image %>" style="width: auto;max-width: 100%;max-height: 150px;border: 1px solid #ddd;">
+  </div>
+  <div class="bike-info" style="position: relative;width: 63%;margin-left: 3%;float: left;padding-top: 30px; <%= 'color: white;' if @customer_contact.bike.stolen %>">
+    <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Make</span> <%= @customer_contact.bike.manufacturer_name  %></p>
+    <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Serial</span> <%= @customer_contact.bike.serial_number %></p>
+    <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Color</span><% if @customer_contact.bike.paint.present? %><%= @customer_contact.bike.paint.name %><% else %><%= @customer_contact.bike.primary_frame_color.name %><% end %></p>
+  </div>
+</div>

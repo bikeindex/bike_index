@@ -2,7 +2,7 @@ module Api
   module V1
     class BikesController < ApiV1Controller
       before_filter :cors_preflight_check
-      before_filter :authenticate_organization, only: [:create, :stolen_ids, :send_notification_email]
+      before_filter :authenticate_organization, only: [:create, :stolen_ids]
       skip_before_filter  :verify_authenticity_token
       after_filter :cors_set_access_control_headers
       caches_action :search_tags
@@ -73,25 +73,7 @@ module Api
           render json: e, status: :unprocessable_entity and return
         end
       end
-
-      def send_notification_email
-        unless @organization.slug == 'example'
-          bike = Bike.find(params[:bike_id])
-          if bike.find_current_stolen_record.present?
-            customer_contact = CustomerContact.new(body: params[:body], title: params[:title], bike_id: bike.id, contact_type: 'stolen_contact')
-            customer_contact.user_email = bike.owner_email
-            customer_contact.creator_id = @organization.auto_user.id
-            customer_contact.creator_email = @organization.auto_user.email
-            if customer_contact.save
-              Resque.enqueue(AdminStolenEmailJob, customer_contact.id)
-              render json: { success: true } and return
-            end
-            render json: {error: "Unable to save that Contact, srys"}, status: :unprocessable_entity and return
-          end
-        end
-        render json: {error: "Unable to send that email, srys"}, status: :unprocessable_entity and return
-      end
-    
+   
       def authenticate_organization
         organization = Organization.find_by_slug(params[:organization_slug])
         if organization.present? && organization.access_token == params[:access_token]

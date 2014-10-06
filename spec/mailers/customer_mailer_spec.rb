@@ -83,4 +83,39 @@ describe CustomerMailer do
     end
   end
 
+  describe :admin_contact_stolen_email do
+    it "should render email" do
+      stolen_record = FactoryGirl.create(:stolen_record)
+      user = FactoryGirl.create(:user, superuser: true)
+      customer_contact = CustomerContact.new(user_email: stolen_record.bike.owner_email,
+        creator_email: user.email, 
+        body: 'some message',
+        contact_type: 'stolen_contact',
+        bike_id: stolen_record.bike.id,
+        title: 'some title')
+      customer_contact.save
+      mail = CustomerMailer.admin_contact_stolen_email(customer_contact)
+      mail.subject.should eq("some title")
+      mail.body.encoded.should match('some message')
+    end
+  end
+  describe :stolen_bike_alert_email do
+    it "should render email" do
+      stolen_record = FactoryGirl.create(:stolen_record)
+      notification_hash = {
+        notification_type: 'stolen_twitter_alerter',
+        bike_id: stolen_record.bike.id,
+        tweet_id: 69,
+        tweet_string: "STOLEN - something special",
+        tweet_account_screen_name: "bikeindex",
+        tweet_account_name: "Bike Index",
+        tweet_account_image: "https://pbs.twimg.com/profile_images/3384343656/33893b31d39d69fb4b85912489c497b0_bigger.png",
+        location: 'Everywhere',
+        retweet_screennames: ['someother_screename']
+      }
+      customer_contact = FactoryGirl.create(:customer_contact, info_hash: notification_hash)
+      mail = CustomerMailer.stolen_bike_alert_email(customer_contact)
+    end
+  end
+
 end

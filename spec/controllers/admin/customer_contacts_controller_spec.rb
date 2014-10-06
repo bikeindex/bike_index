@@ -11,7 +11,7 @@ describe Admin::CustomerContactsController do
       customer_contact.contact_type = 'stolen_contact'
       customer_contact.bike_id = stolen_record.bike.id
       set_current_user(user)
-      Resque.should_receive(:enqueue).with(AdminStolenEmailJob, 1)
+      Resque.should_receive(:enqueue).with(AdminContactStolenEmailJob, 1)
       post :create, {customer_contact: customer_contact}
       response.should redirect_to edit_admin_stolen_bike_url(stolen_record.bike)
     end
