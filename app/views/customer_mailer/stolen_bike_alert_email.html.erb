@@ -21,7 +21,7 @@
 <% if @info[:retweet_screen_names].present? %>
   <% retweets = @info[:retweet_screen_names].map{ |sn| "<a href='https://twitter.com/#{sn}'>@#{sn}</a>" } %>
   <p style="color: #95A5A5; font-size: .9em; text-align: center; margin: 0 auto; clear: both; padding: .25em 1em .75em; width: 90%; background: #f7f7f7; border: 1px solid #dfe3ee; border-radius: 0 0 4px 4px;">
-    Alert retweeted by <%= retweets.html_safe.to_sentence %>
+    Alert retweeted by <%= retweets.to_sentence.html_safe %>
   </p>
 <% end %>
 
