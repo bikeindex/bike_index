@@ -12,7 +12,7 @@
       <h3 style="font-size: 14px; line-height: 17px; margin: 0; color: #999; font-weight: 400;">@<%= @info[:tweet_account_screen_name] %></h3>
     </a>
     <p style="margin:0;color:#333333;font-family:Georgia,'Times New Roman',serif;font-size:22px;line-height:27px;margin-bottom:0;margin-top:5px;">
-      <%= @info[:tweet_string] %>
+      <%= @info[:tweet_string].split('https://bikeindex.org')[0] %>
       <a href="https://bikeindex.org/bikes/<%= @bike.id %>" style="border:none;color:#0084b4;text-decoration:none">BikeIndex.org/bikes/<%= @bike.id %></a>
     </p>
     <a href="https://twitter.com/<%= @info[:tweet_account_screen_name] %>/status/<%= @info[:tweet_id] %>" style="display:block;border:none;color:#0084b4;text-decoration:none;color:#999999;font-size: 12px; margin-top: 5px;" target="_blank"><%= Time.now.strftime("%I:%M %P - %d %b %y") %></a>
@@ -21,7 +21,7 @@
 <% if @info[:retweet_screen_names].present? %>
   <% retweets = @info[:retweet_screen_names].map{ |sn| "<a href='https://twitter.com/#{sn}'>@#{sn}</a>" } %>
   <p style="color: #95A5A5; font-size: .9em; text-align: center; margin: 0 auto; clear: both; padding: .25em 1em .75em; width: 90%; background: #f7f7f7; border: 1px solid #dfe3ee; border-radius: 0 0 4px 4px;">
-    Alert retweeted by <%= retweets.to_sentence %>
+    Alert retweeted by <%= retweets.html_safe.to_sentence %>
   </p>
 <% end %>
 
