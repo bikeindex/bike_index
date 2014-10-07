@@ -4,16 +4,18 @@
 
 <div style="margin: 30px 0 0; border: 1px solid #dfe3ee;border-radius: 4px; padding: 15px 2%; min-height: 120px;">
   <div style="width: 10%; float: left; height: 120px;">
-    <a href="https://twitter.com/<%= @info[:tweet_account_screen_name] %>"><img style="max-width: 100%;" src="<%= @info[:tweet_account_image] %>"></a>
+    <a href="https://twitter.com/<%= @info[:tweet_account_screen_name] %>">
+      <img style="max-width: 100%;" src="<%= @info[:tweet_account_image] %>">
+    </a>
   </div>
-  <div style="width: 86%; margin-left: 2%; ">
+  <div style="width: 86%; margin-left: 2%;">
     <a style="display: block; text-decoration: none; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;" href="https://twitter.com/<%= @info[:tweet_account_screen_name] %>/status/<%= @info[:tweet_id] %>">
       <h3 style="font-size: 14px; line-height: 14px; margin: 0; font-weight: bold; color: #333333;"><%= @info[:tweet_account_name] %></h3>
       <h3 style="font-size: 14px; line-height: 17px; margin: 0; color: #999; font-weight: 400;">@<%= @info[:tweet_account_screen_name] %></h3>
     </a>
     <p style="margin:0;color:#333333;font-family:Georgia,'Times New Roman',serif;font-size:22px;line-height:27px;margin-bottom:0;margin-top:5px;">
       <%= @info[:tweet_string].split('https://bikeindex.org')[0] %>
-      <a href="https://bikeindex.org/bikes/<%= @bike.id %>" style="border:none;color:#0084b4;text-decoration:none">BikeIndex.org/bikes/<%= @bike.id %></a>
+      <a href="https://bikeindex.org/bikes/<%= @bike.id %>" style="border:none;color:#0084b4;text-decoration:none">Bike Index link</a>
     </p>
     <a href="https://twitter.com/<%= @info[:tweet_account_screen_name] %>/status/<%= @info[:tweet_id] %>" style="display:block;border:none;color:#0084b4;text-decoration:none;color:#999999;font-size: 12px; margin-top: 5px;" target="_blank"><%= Time.now.strftime("%I:%M %P - %d %b %y") %></a>
   </div>
@@ -25,6 +27,15 @@
   </p>
 <% end %>
 
+<h2 style="font-weight: 400; text-align: center; padding-top: .5em; margin-top: 2em; border-top: 1px solid #dfe3ee;font-size: 30px;">Next Steps</h2>
+<div class="wrap" style="border: 1px solid #dfe3ee;border-radius: 4px;padding: 10px 5px;background: #f7f7f7; margin-bottom: 10px;">
+  <h2 style="font-family: helvetica;font-size: 28px;text-align: center;margin: .5em 0 .7em; font-weight: 400;">Spread the word!</h2>
+  <a href="http://www.facebook.com/share.php?u=<%= bike_url(@bike) %>" style="display: block;background: #dfe3ee;position: relative;border-radius: 4px;font-family: helvetica;height: 50px;">
+    <img src="https://s3.amazonaws.com/bikeindex/facebook.png" style="height: 50px;width: 50px;display: block;float: left;">
+    <span class="text" style="display: block;text-align: center;margin-top: .5em;line-height: 1.2em;padding: 1em 1em 0;">Share on Facebook - so everyone knows to watch out for your <%= @bike.type %>!</span>
+  </a>
+</div>
+<p style="margin: 50px 0 0; padding: 20px 0 0; font-weight: 400; color: #95A5A5; text-align: center;">This email is about the stolen <%= @biketype %> registered on the Bike Index on <%= @bike.created_at.strftime("%d.%b.%y") %></p>
 
 <% bike_image = "https://www.bikeindex.org/assets/bike_photo_placeholder.png" %>
 <% bike_image = @customer_contact.bike.stock_photo_url if @customer_contact.bike.stock_photo_url.present? %>
