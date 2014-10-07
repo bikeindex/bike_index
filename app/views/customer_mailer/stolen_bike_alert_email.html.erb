@@ -8,7 +8,7 @@
       <img style="max-width: 100%;" src="<%= @info[:tweet_account_image] %>">
     </a>
   </div>
-  <div style="width: 85%; margin-left: 2%;">
+  <div style="width: 86%; margin-left: 2%; float: right;">
     <a style="display: block; text-decoration: none; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;" href="https://twitter.com/<%= @info[:tweet_account_screen_name] %>/status/<%= @info[:tweet_id] %>">
       <h3 style="font-size: 14px; line-height: 14px; margin: 0; font-weight: bold; color: #333333;"><%= @info[:tweet_account_name] %></h3>
       <h3 style="font-size: 14px; line-height: 17px; margin: 0; color: #999; font-weight: 400;">@<%= @info[:tweet_account_screen_name] %></h3>
@@ -35,7 +35,7 @@
     <span class="text" style="display: block;text-align: center;margin-top: .5em;line-height: 1.2em;padding: 1em 1em 0;">Share on Facebook - so everyone knows to watch out for your <%= @bike.type %>!</span>
   </a>
 </div>
-<p style="margin: 50px 0 0; padding: 20px 0 0; font-weight: 400; color: #95A5A5; text-align: center;">This email is about the stolen <%= @biketype %> registered on the Bike Index on <%= @bike.created_at.strftime("%d.%b.%y") %></p>
+<p style="margin: 50px 0 0; padding: 20px 0 0; font-weight: 400; color: #95A5A5; text-align: center;">This email is about the stolen <%= @biketype %> registered on the Bike Index on <%= @bike.created_at.strftime("%m.%d.%y") %></p>
 
 <% bike_image = "https://www.bikeindex.org/assets/bike_photo_placeholder.png" %>
 <% bike_image = @customer_contact.bike.stock_photo_url if @customer_contact.bike.stock_photo_url.present? %>
