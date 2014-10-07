@@ -29,5 +29,4 @@ describe CustomerContact do
   end
 
 
-
 end

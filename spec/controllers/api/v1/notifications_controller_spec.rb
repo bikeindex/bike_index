@@ -26,7 +26,7 @@ describe Api::V1::NotificationsController do
           tweet_account_screen_name: "bikeindex",
           tweet_account_name: "Bike Index",
           tweet_account_image: "https://pbs.twimg.com/profile_images/3384343656/33893b31d39d69fb4b85912489c497b0_bigger.png",
-          :retweet_screennames=>[]
+          :retweet_screen_names=>[]
         }
       }
       Resque.should_receive(:enqueue).with(StolenBikeAlertEmailJob, 1)

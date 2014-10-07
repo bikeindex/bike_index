@@ -14,7 +14,7 @@ describe StolenBikeAlertEmailJob do
         tweet_account_name: "Bike Index",
         tweet_account_image: "https://pbs.twimg.com/profile_images/3384343656/33893b31d39d69fb4b85912489c497b0_bigger.png",
         location: 'Everywhere',
-        retweet_screennames: ['someother_screename']
+        retweet_screen_names: ['someother_screename']
       }
       customer_contact = FactoryGirl.create(:customer_contact, bike: stolen_record.bike, info_hash: info_hash)
       ActionMailer::Base.deliveries = []
