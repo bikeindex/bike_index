@@ -44,7 +44,7 @@ class InfoController < ApplicationController
 
   def spokecard
     if current_user.present?
-      @bikes = Bike.find(current_user.bikes)
+      @bikes = Bike.where('id in (?)', current_user.bikes)
     end
   end
 
