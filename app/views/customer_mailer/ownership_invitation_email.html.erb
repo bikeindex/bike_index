@@ -17,25 +17,28 @@
 
   <hr style="margin: 40px 0 30px;">
   <p>
-    <strong>
-      <% if @creation_org.present? %>
-        <%= @creation_org.name %>
-      <% elsif @ownership.creator.name %>
-        <%= @ownership.creator.name %>
-      <% else %>
-        <%= @ownership.creator.email %>
-      <% end %>
-    </strong>
-    <% if @bike.stolen %>
-      added a stolen
-    <% elsif @new_bike %>
-      added a 
+    <% if @ownership.creator.email == @ownership.owner_email %>
+      You added a <% if @bike.stolen %>stolen<% end %> <%= @biketype %> to the Bike Index
     <% else %>
-      sent you a 
+      <strong>
+        <% if @creation_org.present? %>
+          <%= @creation_org.name %>
+        <% elsif @ownership.creator.name %>
+          <%= @ownership.creator.name %>
+        <% else %>
+          <%= @ownership.creator.email %>
+        <% end %>
+      </strong>
+      <% if @bike.stolen %>
+        added a stolen
+      <% elsif @new_bike %>
+        added a 
+      <% else %>
+        sent you a 
+      <% end %>
+      <%= @biketype %>
+      <% if @new_bike %> for you <% end %>
     <% end %>
-    <%= @biketype %>
-    on the Bike Index 
-    <% if @new_bike %> for you <% end %>
   .</p>
   
 <% end # end of the creation_org notification %>
