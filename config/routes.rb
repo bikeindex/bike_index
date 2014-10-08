@@ -1,8 +1,8 @@
 Bikeindex::Application.routes.draw do
 
   get "dashboard/show"
-  
-  resources :organizations, only: [:show, :edit, :update, :destroy] do 
+    
+  resources :organizations do 
     member do
       get :embed
       get :embed_extended
@@ -36,7 +36,7 @@ Bikeindex::Application.routes.draw do
   resources :stolen_notifications, only: [:create, :new]
 
   resources :feedbacks, only: [:create, :new]
-  match 'vendor_signup', to: 'feedbacks#vendor_signup'
+  match 'vendor_signup', to: 'organizations#new'
   match 'contact', to: 'feedbacks#index'
   match 'contact_us', to: 'feedbacks#index'
   match 'help', to: 'feedbacks#index'

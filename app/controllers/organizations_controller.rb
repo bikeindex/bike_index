@@ -1,10 +1,38 @@
 class OrganizationsController < ApplicationController
   before_filter :authenticate_user!, only: [:show, :edit, :update, :destroy]
-  before_filter :find_organization
+  before_filter :find_organization, except: [:new, :create]
   before_filter :require_membership, only: [:show, :edit, :update, :destroy]
   before_filter :require_admin, only: [:edit, :update, :destroy]
   before_filter :set_bparam, only: [:embed, :embed_extended]
   layout "organization"
+
+  def new
+    unless current_user.present?
+      @user = User.new
+    end
+    @organization = Organization.new
+    @active_section = "contact"
+    render layout: 'content'
+  end
+
+  def create
+    user = current_user
+    @organization = Organization.new(
+      name: params[:organization][:name],
+      website: params[:organization][:website],
+      org_type: params[:organization][:org_type]
+    )
+    if @organization.save
+      membership = Membership.create(user_id: user.id, role: 'admin', organization_id: @organization.id)
+      @organization.update_attribute :auto_user_id, user.id
+      flash[:notice] = "Organization Created successfully!"
+      if current_user.present?
+        redirect_to organization_url(@organization) and return
+      end
+    else
+      render action: :new and return
+    end
+  end
   
   def edit
     @bikes = Bike.where(creation_organization_id: @organization.id).order("created_at desc")

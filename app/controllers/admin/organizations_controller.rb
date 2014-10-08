@@ -33,6 +33,7 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def update
     if @organization.update_attributes(params[:organization])
+      @organization.update_attribute :approved, params[:organization][:approved]
       flash[:notice] = "Organization Saved!"
       redirect_to admin_organization_url(@organization)
     else
@@ -41,7 +42,8 @@ class Admin::OrganizationsController < Admin::BaseController
   end
 
   def create
-    @organization = Organization.create(params[:organization])
+    @organization = Organization.new(params[:organization])
+    @organization.approved = true
     if @organization.save
       flash[:notice] = "Organization Created!"
       redirect_to edit_admin_organization_url(@organization)

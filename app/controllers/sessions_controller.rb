@@ -42,6 +42,11 @@ class SessionsController < ApplicationController
 
   def destroy
     session[:user_id] = nil
+    if params[:redirect_location].present?
+      if params[:redirect_location].match('new_user')
+        redirect_to new_user_path, notice: "Logged out!" and return
+      end
+    end
     redirect_to goodbye_url(subdomain: false), notice: "Logged out!"
   end
 

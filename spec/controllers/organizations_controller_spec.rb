@@ -2,6 +2,39 @@ require 'spec_helper'
 
 describe OrganizationsController do
 
+  describe :new do 
+    describe "it should render the page without current user" do 
+      before do 
+        get :new
+      end
+      it { should respond_with(:success) }
+      it { should render_template(:new) }
+    end
+  end
+
+  describe :create do 
+    it "should create org, membership, filter approved attrs & redirect to org with current_user" do 
+      Organization.count.should eq(0)
+      user = FactoryGirl.create(:user)
+      set_current_user(user)
+      org_attrs = {
+        name: 'a new org',
+        org_type: 'shop',
+        api_access_approved: 'true',
+        approved: 'true'
+      }
+      post :create, organization: org_attrs
+      Organization.count.should eq(1)
+      organization = Organization.where(name: 'a new org').first
+      response.should redirect_to organization_url(organization)
+      organization.approved.should be_false
+      organization.api_access_approved.should be_false
+      organization.auto_user_id.should eq(user.id)
+      organization.memberships.count.should eq(1)
+      organization.memberships.first.user_id.should eq(user.id)
+    end
+  end
+
   describe :update do
     before :each do
       @organization = FactoryGirl.create(:organization)

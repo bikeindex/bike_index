@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141006184444) do
+ActiveRecord::Schema.define(:version => 20141008160942) do
 
   create_table "ads", :force => true do |t|
     t.string   "title"
@@ -396,6 +396,7 @@ ActiveRecord::Schema.define(:version => 20141006184444) do
     t.string   "access_token"
     t.text     "new_bike_notification"
     t.boolean  "api_access_approved",        :default => false,  :null => false
+    t.boolean  "approved",                   :default => false,  :null => false
   end
 
   add_index "organizations", ["slug"], :name => "index_organizations_on_slug", :unique => true
