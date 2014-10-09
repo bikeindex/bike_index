@@ -12,8 +12,12 @@
     Bikes
   %ul
     - @bikes.each do |bike|
+      - display = bike.title
+      - "#{display} (hidden)" if bike.hidden
+      - "#{display} (example)" if bike.example
+
       %li
-        = link_to bike.title, edit_admin_bike_url(bike)
+        = link_to display, edit_admin_bike_url(bike)
 
 
 %h3.padded
