@@ -26,7 +26,6 @@
   .welcome-page {
     .top-logo .logo { display: none;  }
     .top-logo .logo.home-logo { display: block;  }
-
   }
 }
 
@@ -203,7 +202,7 @@
 
 @media (min-width: $s-breakpoint) {
   .how-it-works {
-    padding: 120px 0 100px;
+    padding: 70px 0 100px;
   }
 }
 
