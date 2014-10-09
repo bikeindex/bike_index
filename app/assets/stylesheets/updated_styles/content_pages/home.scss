@@ -178,8 +178,8 @@
   padding: 60px 0 50px;
   text-align: center;
   h2 {
-    font-family: $body-font;
-    font-size: 32px;
+    // font-family: $body-font;
+    font-size: 44px;
   }
   p, h3 {
     margin: .5em auto 0;
@@ -190,7 +190,15 @@
   p {
     text-align: left;
     margin-top: 1.25em;
+    font-weight: 200;
   }
+}
+
+.how-it-works {
+  border-top: 10px solid $gray-blue-dark;
+  border-bottom: 10px solid $gray-blue-dark;
+  background: $blue;
+  color: white;
 }
 
 @media (min-width: $s-breakpoint) {
@@ -208,7 +216,7 @@
 @media (max-width: $s-breakpoint) {
   .home-subhead, .how-it-works {
     padding: 40px 0;
-    h2 { font-size: 24px; }
+    h2 { font-size: 30px; }
     p, h3 { font-size: 18px; }
   }
 }
@@ -227,14 +235,21 @@
   background: #fff;
   article {
     position: relative;
+    width: 90%;
+    margin: 0 auto;
     img {
       display: block;
       width: 40%;
       height: auto;
       margin: 0 auto;
     }
+    h2 {
+      text-align: center;
+      margin: 0;
+      padding: 20px 0 0;
+    }
     p {
-      padding: 1em 0 20px;
+      padding: .5em 0 20px;
       margin: 0 auto;
       width: 80%;
       text-align: center;
@@ -249,6 +264,7 @@
     article {
       float: left;
       width: $three-column;
+      margin: 0;
       margin-left: $one-column + $gutter;
       padding-bottom: 20px;
       img { width: 60%; }

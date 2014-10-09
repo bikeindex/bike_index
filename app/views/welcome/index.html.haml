@@ -31,25 +31,25 @@
   .info-blocks
     .container
       %article
-        = image_tag "/assets/updated/info_blocks/computerized.svg"
-        / %h2
-        /   Convenient & automatic
+        = image_tag "/assets/updated/info_blocks/online.svg"
+        %h2
+          Simple
         %p
           We keep all the important information about your bike in one place so it's there when you need it the most. 
 
       %article
-        = image_tag "/assets/updated/info_blocks/secure.svg"
-        / %h2
-        /   Secure and safe
+        = image_tag "/assets/updated/info_blocks/secured.svg"
+        %h2
+          Secure
         %p
-          We make buying and selling used bikes less risky by providing a way to easily verify that a bicycle isn’t stolen. 
+          We help used bike sellers and buyers by providing an easy way to verify that a bicycle isn’t stolen.
 
       %article
-        = image_tag "/assets/updated/info_blocks/verified.svg"
-        / %h2
-        /   Verified
+        = image_tag "/assets/updated/info_blocks/free.svg"
+        %h2
+          Free
         %p
-          We give used bike sellers and buyers a publicly verifiable way to prove they aren't selling or buying stolen bikes.
+          Bike Index is a free service for bike shops and individuals.
 
   .home-testimonial.testimonial-2
     .container
@@ -119,6 +119,6 @@
           / %li
           /   %a{href: "https://stlouis-mo.gov/", target: "_blank"}
           /     = image_tag "/assets/supporters/st_louis.png", alt: "City of Saint Louis"
-      .and-many-more
-        %p
-          \... and many more - #{link_to "view our partners", where_path}
+      
+      %p.and-many-more
+        \... and many more. #{link_to "View the complete list here", where_path}
