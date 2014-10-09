@@ -13,8 +13,8 @@
   %ul
     - @bikes.each do |bike|
       - display = bike.title
-      - "#{display} (hidden)" if bike.hidden
-      - "#{display} (example)" if bike.example
+      - display = "#{display} (hidden)" if bike.hidden
+      - display = "#{display} (example)" if bike.example
 
       %li
         = link_to display, edit_admin_bike_url(bike)
