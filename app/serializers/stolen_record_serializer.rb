@@ -9,7 +9,9 @@ class StolenRecordSerializer < ActiveModel::Serializer
     :police_report_number,
     :police_report_department,
     :created_at,
-    :id
+    :create_open311,
+    :id,
+
 
   def location
     a = [object.city]

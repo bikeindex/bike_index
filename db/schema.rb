@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141008160942) do
+ActiveRecord::Schema.define(:version => 20141010145930) do
 
   create_table "ads", :force => true do |t|
     t.string   "title"
@@ -522,6 +522,7 @@ ActiveRecord::Schema.define(:version => 20141008160942) do
     t.boolean  "recovery_posted",          :default => false
     t.text     "recovery_tweet"
     t.text     "recovery_share"
+    t.boolean  "create_open311",           :default => false, :null => false
   end
 
   add_index "stolen_records", ["bike_id"], :name => "index_stolen_records_on_bike_id"
