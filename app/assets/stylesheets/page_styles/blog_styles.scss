@@ -87,7 +87,7 @@
 
 .page-content {
   blockquote {
-    background: #f9f9f9;
+    background: $grayLighterer;
     border-left: 10px solid #ccc;
     margin: 1.5em 10px 0;
     padding: 0.5em 10px;
@@ -97,14 +97,15 @@
     color: #ccc;
     content: open-quote;
     font-size: 3em;
+    vertical-align: -.4em;
     line-height: 0.1em;
     margin-right: 0.25em;
-    vertical-align: -0.4em;
   }
   
   blockquote:after {
     content: close-quote;
-    display: none;
+    color: $grayLighterer;
+    font-size: 4px;
   }
 
   blockquote p { display: inline; }
@@ -112,7 +113,7 @@
 
   .blockquote-cite {
     text-align: right;
-    padding: .5em .25em 1em;
+    padding: .5em 10px 1em 0;
     color: $grayMed;
     font-weight: 200;
   }
