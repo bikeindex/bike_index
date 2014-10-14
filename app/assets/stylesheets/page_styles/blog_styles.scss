@@ -79,6 +79,45 @@
   margin: 0 1em 1em 0;
 }
 
+.post-image-right-40 {
+  float: right;
+  max-width: 40%;
+  margin: 1em 0 0 1em;
+}
+
+.page-content {
+  blockquote {
+    background: #f9f9f9;
+    border-left: 10px solid #ccc;
+    margin: 1.5em 10px 0;
+    padding: 0.5em 10px;
+    quotes: "\201C""\201D""\2018""\2019";
+  }
+  blockquote:before {
+    color: #ccc;
+    content: open-quote;
+    font-size: 3em;
+    line-height: 0.1em;
+    margin-right: 0.25em;
+    vertical-align: -0.4em;
+  }
+  
+  blockquote:after {
+    content: close-quote;
+    display: none;
+  }
+
+  blockquote p { display: inline; }
+  
+
+  .blockquote-cite {
+    text-align: right;
+    padding: .5em .25em 1em;
+    color: $grayMed;
+    font-weight: 200;
+  }
+}
+
 
 
 //________________________
