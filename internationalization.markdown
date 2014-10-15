@@ -33,10 +33,15 @@ Currently, the `config.i18n.enforce_available_locales` is set to `false`. If set
 
 ## Specifying the locale
 
-By default, the language should be determined by the header (HTTP_ACCEPT_LANGUAGE)
-The user can change the language in the footer, which will add a subdomain (es.bikeindex.org) or path (bikeindex.org/es)
+By default, the language should be determined in the following order:
 
-The default language (english) will have no sub domain or path specified
+1. by the the `locale` parameter (/en/welcome)
+1. by the header (HTTP_ACCEPT_LANGUAGE)
+1. by the default locale
+
+The user can change the language in the footer, which will redirect the user to the current path but with the specified locale (bikeindex.org/es).
+
+The default language (english) will have no locale path specified.
 
 ### Default url options
 
