@@ -2,6 +2,8 @@ class ApplicationController < ActionController::Base
   include UrlHelper
   protect_from_forgery
 
+  before_filter :set_locale
+
 protected
   def current_user
     begin
@@ -78,6 +80,10 @@ protected
     if Subdomain.matches?(request)
       @organzation = Organization.find_by_slug(request.subdomain)
     end
+  end
+
+  def set_locale
+    I18n.locale = http_accept_language.compatible_language_from(I18n.available_locales) || I18n.default_locale
   end
 
 end
