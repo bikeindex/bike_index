@@ -112,4 +112,36 @@ describe InfoController do
     it { should render_template(:spokecard)}
   end
 
+  context "locale scoped routes" do
+    let(:paths) { [:stolen_bikes, :protect_your_bike, :privacy, :terms, :serials,
+                   :about, :where, :roadmap, :security, :vendor_terms, :resources, :spokecard] }
+    let(:locales) { [:en, :de] }
+
+    before do
+      @available_locales = I18n.available_locales
+      I18n.available_locales = locales
+      Rails.application.reload_routes!
+    end
+
+    after do
+      I18n.available_locales = @available_locales
+      Rails.application.reload_routes!
+    end
+
+    it "should route to the correct locale if the locale exists" do
+      paths.each do |path|
+        { get: path }.should be_routable # should allow a route without a locale
+        locales.each do |locale|
+          { get: "#{locale}/#{path}" }.should be_routable # should allow a valid locale to be specified
+        end
+      end
+    end
+
+    it "should not route if the locale is not supported" do
+      paths.each do |path|
+        { get: "blah/#{path}" }.should_not be_routable
+      end
+    end
+  end
+
 end

@@ -1,8 +1,8 @@
 Bikeindex::Application.routes.draw do
 
   get "dashboard/show"
-  
-  resources :organizations, only: [:show, :edit, :update, :destroy] do 
+
+  resources :organizations, only: [:show, :edit, :update, :destroy] do
     member do
       get :embed
       get :embed_extended
@@ -11,8 +11,8 @@ Bikeindex::Application.routes.draw do
     resources :memberships, only: [:edit, :update, :destroy]
     resources :organization_invitations, only: [:new, :create]
   end
-  
-  match '/' => 'stolen#index', constraints: { subdomain: 'stolen' } 
+
+  match '/' => 'stolen#index', constraints: { subdomain: 'stolen' }
 
   root to: 'welcome#index'
 
@@ -20,7 +20,7 @@ Bikeindex::Application.routes.draw do
   match 'user_home', to: 'welcome#user_home'
   match 'choose_registration', to: 'welcome#choose_registration'
   match 'goodbye', to: 'welcome#goodbye'
-  
+
   resource :session, only: [:new, :create, :destroy]
   match 'logout', to: 'sessions#destroy'
 
@@ -53,19 +53,19 @@ Bikeindex::Application.routes.draw do
   end
   match 'my_account', to: 'users#edit'
   match 'accept_vendor_terms', to: 'users#accept_vendor_terms'
-  match "accept_terms", to: "users#accept_terms"  
+  match "accept_terms", to: "users#accept_terms"
   resources :bike_token_invitations, only: [:create]
   resources :user_embeds, only: [:show]
 
   resources :blogs, only: [:show, :index]
   match 'blog', to: redirect("/blogs")
 
-  resources :public_images, only: [:create, :show, :edit, :update, :index, :destroy] do 
+  resources :public_images, only: [:create, :show, :edit, :update, :index, :destroy] do
     collection do
       post :order
     end
   end
-  
+
   resources :bikes do
     collection { get :scanned }
     member do
@@ -78,7 +78,7 @@ Bikeindex::Application.routes.draw do
 
   namespace :admin do
     root to: 'dashboard#index'
-    resources :bikes do 
+    resources :bikes do
       collection do
         get :missing_manufacturer
         post :update_manufacturers
@@ -92,16 +92,16 @@ Bikeindex::Application.routes.draw do
       :organization_invitations, :paints, :customer_contacts, :ads
     match 'duplicate_bikes', to: 'bikes#duplicates'
     resources :flavor_texts, only: [:destroy, :create]
-    resources :stolen_bikes do 
+    resources :stolen_bikes do
       member { post :approve }
     end
-    resources :recoveries do 
+    resources :recoveries do
       collection { post :approve }
     end
-    resources :stolen_notifications do 
+    resources :stolen_notifications do
       member { get :resend }
     end
-    resources :graphs, only: [:index] do 
+    resources :graphs, only: [:index] do
       collection do
         get :bikes
         get :users
@@ -110,13 +110,13 @@ Bikeindex::Application.routes.draw do
     end
     resources :failed_bikes, only: [:index, :show]
     resources :ownerships, only: [:edit, :update]
-    match 'recover_organization', to: 'organizations#recover' 
-    match 'show_deleted_organizations', to: 'organizations#show_deleted' 
+    match 'recover_organization', to: 'organizations#recover'
+    match 'show_deleted_organizations', to: 'organizations#show_deleted'
     resources :blogs, only: [:new, :create, :index, :edit, :update, :destroy]
-    resources :ctypes, only: [:new, :create, :index, :edit, :update, :destroy] do 
+    resources :ctypes, only: [:new, :create, :index, :edit, :update, :destroy] do
       collection { post :import }
     end
-    resources :manufacturers do 
+    resources :manufacturers do
       collection { post :import }
     end
     resources :users, only: [:index, :edit, :update, :destroy] do
@@ -142,7 +142,7 @@ Bikeindex::Application.routes.draw do
       resources :handlebar_types, only: [:index]
       resources :frame_materials, only: [:index]
       resources :manufacturers, only: [:index]
-      resources :users do 
+      resources :users do
         collection do
           get 'current'
           post 'request_serial_update'
@@ -153,16 +153,16 @@ Bikeindex::Application.routes.draw do
     end
   end
 
-  resources :stolen, only: [:index] do 
-    collection do 
+  resources :stolen, only: [:index] do
+    collection do
       get 'current_tsv'
       %w[links faq tech identidots philosophy rfid_tags_for_the_win howworks about merging].each do |page|
         get page
       end
     end
   end
-  
-  
+
+
   resources :manufacturers, only: [:show, :index]
   match 'manufacturers_mock_csv', to: 'manufacturers#mock_csv'
 
@@ -170,14 +170,16 @@ Bikeindex::Application.routes.draw do
   resource :integrations, only: [:create]
   match '/auth/:provider/callback', to: "integrations#create"
 
-  %w[stolen_bikes protect_your_bike privacy terms serials about where roadmap security vendor_terms resources spokecard].each do |page|
-    get page, controller: 'info', action: page
+  scope "(:locale)", locale: Regexp.new(I18n.available_locales.map(&:to_s).join("|")) do
+    %w[stolen_bikes protect_your_bike privacy terms serials about where roadmap security vendor_terms resources spokecard].each do |page|
+      get page, controller: 'info', action: page
+    end
   end
 
   # get 'sitemap.xml.gz' => redirect("https://s3.amazonaws.com/bikeindex/sitemaps/sitemap_index.xml.gz")
   # Somehow the redirect drops the .gz extension, which ruins it so this redirect is handled by Cloudflare
   # get "sitemaps/(*all)" => redirect("https://s3.amazonaws.com/bikeindex/sitemaps/%{all}")
-  
+
   match '/400', to: 'errors#bad_request'
   match '/404', to: 'errors#not_found'
   match '/422', to: 'errors#unprocessable_entity'
@@ -185,5 +187,5 @@ Bikeindex::Application.routes.draw do
 
   mount Sidekiq::Web => '/sidekiq', constraints: AdminRestriction
   mount Resque::Server.new, at: '/resque', constraints: AdminRestriction
-  
+
 end
