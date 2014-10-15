@@ -165,5 +165,11 @@ end
 TODO:
 ------
 
+- [ ] style and place locales dropdown in footer
 - [ ] create and test localized views
 - [ ] create a valid `info/serials.es.html.erb (already tested)
+- [ ] move `config/locales/gflash.en.yml` to `config/locales/en.yml`
+- [ ] determine if all the entries in `config/locales/en.yml` are needed
+- [ ] move over hard string flash messages to `config/locales/flash.en.yml`
+- [ ] move over hard string model messages to `config/locales/models/<model_name>/en.yml`
+- [ ] move over hard string mailer messages to `config/locales/mailers/<mailer_name>/en.yml`
