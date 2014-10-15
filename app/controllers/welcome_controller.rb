@@ -1,13 +1,20 @@
 class WelcomeController < ApplicationController
   # caches_page :index
   before_filter :authenticate_user!, only: :user_home
-  
+
   def index
     render action: 'index', layout: 'application_updated'
   end
 
   def update_browser
     render action: 'update_browser', layout: false
+  end
+
+  def switch_locale
+    referrer = request.env["HTTP_REFERER"] || root_path
+    path = Rails.application.routes.recognize_path(referrer)
+    path.merge!({ locale: params[:switch_to] })
+    redirect_to path
   end
 
   def goodbye
@@ -24,7 +31,7 @@ class WelcomeController < ApplicationController
       end
       render action: 'user_home', layout: 'no_container'
     else
-      flash[:notice] = "Woops, you have to log in to be able to do that"  
+      flash[:notice] = "Woops, you have to log in to be able to do that"
       redirect_to new_session_url
     end
   end

@@ -20,6 +20,7 @@ Bikeindex::Application.routes.draw do
   match 'user_home', to: 'welcome#user_home'
   match 'choose_registration', to: 'welcome#choose_registration'
   match 'goodbye', to: 'welcome#goodbye'
+  put 'switch_locale', to: 'welcome#switch_locale'
 
   resource :session, only: [:new, :create, :destroy]
   match 'logout', to: 'sessions#destroy'
