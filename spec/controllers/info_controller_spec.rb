@@ -54,7 +54,7 @@ describe InfoController do
       render_views
 
       before do
-        I18n.locale = :es
+        I18n.default_locale = :es
         get :serials
       end
 
