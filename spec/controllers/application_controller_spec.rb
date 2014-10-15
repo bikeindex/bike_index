@@ -28,6 +28,17 @@ describe ApplicationController do
     I18n.locale.should == :en
   end
 
+  it "uses the locale sent from the parameters if it is specified" do
+    I18n.available_locales = [:en, :de]
+    get :index, locale: :de
+    I18n.locale.should == :de
+  end
+
+  it "ignores the locale sent from the parameters if it is not valid" do
+    get :index, locale: :de
+    I18n.locale.should == :en
+  end
+
   it "sets the locale parameter if it is different from the default locale" do
     I18n.default_locale = :en
     I18n.locale = :de

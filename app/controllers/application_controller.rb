@@ -83,7 +83,11 @@ protected
   end
 
   def set_locale
-    I18n.locale = http_accept_language.compatible_language_from(I18n.available_locales) || I18n.default_locale
+    I18n.locale = locale_from_param || http_accept_language.compatible_language_from(I18n.available_locales) || I18n.default_locale
+  end
+
+  def locale_from_param
+    params[:locale] if I18n.available_locales.map(&:to_s).include? params[:locale]
   end
 
   def default_url_options(options={})
