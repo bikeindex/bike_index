@@ -30,6 +30,9 @@
             = link_to image_tag("/assets/facebook.svg", alt: "Bike Index Facebook"), "https://facebook.com/bikeindex"
           %li
             = link_to image_tag("/assets/twitter.svg", alt: "Bike Index Twitter"), "https://twitter.com/BikeIndex"
+        %div
+          = form_tag :switch_locale, method: :put do
+            = select_tag :switch_to, options_for_select(locale_names.collect {|l| [l[:name], l[:code]]}, I18n.locale), onchange: "this.form.submit();"
 
     %p
       2014 &copy; Bike Index.
