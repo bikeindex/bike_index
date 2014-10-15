@@ -1,24 +1,12 @@
 # Internationalization
 
-* TODO:
-
-- [ ] create and test localized views
-- [ ] create a valid `info/serials.es.html.erb (already tested)
-
 ## Storing the translations
-
-## Specifying the locale
-
-By default, the language should be determined by the header (HTTP_ACCEPT_LANGUAGE)
-The user can change the language in the footer, which will add a subdomain (es.bikeindex.org) or path (bikeindex.org/es)
-
-The default language (english) will have no sub domain or path specified
-
-## Looking up translations
 
 ## Locale file hierarchy
 
 ```
+# config/locales
+
 |-defaults
 |--en.yml
 |-flash
@@ -30,6 +18,27 @@ The default language (english) will have no sub domain or path specified
 |--bikes
 |--blogs
 ```
+
+## Available locales
+
+The application is currently using the Rails default [`Backend::Simple`](https://github.com/svenfuchs/i18n/blob/master/lib/i18n/backend/simple.rb) to store the translations and the 
+available locales.
+
+In order to add/remove available locales from the application, you must modify the config entry for `config.i18n.available_locales` in the `config/application.rb` or the appropriate `config/environments/*.rb` file if
+you want to test a specific locale on a staging server.
+
+This should be the default. However, anywhere within the request lifecycle, you can modify the `I18n.available_locales` method. This may be useful if you are testing features for specific users (maybe using [flipper](https://github.com/jnunemaker/flipper)), etc.
+
+Currently, the `config.i18n.enforce_available_locales` is set to `false`. If set to `true`, then the application will throw a `I18n::InvalidLocale` if the system tries to set a locale that is not available within `I18n.available_locales`. If this value is `false` then the default locale will be used. This seems like the best setting.
+
+## Specifying the locale
+
+By default, the language should be determined by the header (HTTP_ACCEPT_LANGUAGE)
+The user can change the language in the footer, which will add a subdomain (es.bikeindex.org) or path (bikeindex.org/es)
+
+The default language (english) will have no sub domain or path specified
+
+## Looking up translations
 
 ## Localized views
 
@@ -80,3 +89,9 @@ end
 ```
 
 ## Retrieving translations
+
+TODO:
+------
+
+- [ ] create and test localized views
+- [ ] create a valid `info/serials.es.html.erb (already tested)
