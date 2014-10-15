@@ -86,4 +86,12 @@ protected
     I18n.locale = http_accept_language.compatible_language_from(I18n.available_locales) || I18n.default_locale
   end
 
+  def default_url_options(options={})
+    if I18n.locale != I18n.default_locale
+       options.merge({ locale: I18n.locale })
+    else
+      options
+    end
+  end
+
 end

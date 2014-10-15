@@ -28,6 +28,19 @@ describe ApplicationController do
     I18n.locale.should == :en
   end
 
+  it "sets the locale parameter if it is different from the default locale" do
+    I18n.default_locale = :en
+    I18n.locale = :de
+    get :index
+    @request.env["QUERY_STRING"].should == "locale=de"
+  end
+
+  it "does not set the locale if the locale is not different from the default" do
+    I18n.locale = I18n.default_locale
+    get :index
+    @request.env["QUERY_STRING"].should be_blank
+  end
+
   def set_preferred_language_header(language)
     @request.env['HTTP_ACCEPT_LANGUAGE'] = language
   end
