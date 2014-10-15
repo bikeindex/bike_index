@@ -1,5 +1,9 @@
 # Internationalization
 
+## TODO:
+
+* Testing of localized views within the controller tests
+
 ## Storing the translations
 
 ## Specifying the locale
@@ -25,6 +29,10 @@ The default language (english) will have no sub domain or path specified
 |--bikes
 |--blogs
 ```
+
+## Localized views
+
+## JavaScript/CoffeeScript
 
 ## Naming conventions
 
