@@ -47,6 +47,26 @@ These should be used when the view has a lot of static content and it would be c
 
 More information can be found in the [Rails Guides](http://guides.rubyonrails.org/i18n.html#localized-views).
 
+## Routing
+
+### Defining a route with a scope
+
+A scope is used to create an optional locale scope around the routes in the application. To create an optionally scoped route, just add the following scope around a route or group of routes in `config/routes.rb`.
+
+```rb
+  scope "(:locale)", locale: Regexp.new(I18n.available_locales.map(&:to_s).join("|")) do
+    #...
+  end
+```
+
+The paranthesis around `(:locale)` make it optional. The regular expression list out the available locales that the application supports. This keeps out the invalid locales from the routes but also still keeps
+a single place (`I18n.available_locales`) as the master list of available locales. This means that a path like `/blah/signin` would result in a 404 because `blah` is not a valid locale.
+
+We are using locales in the path rather than subdomains or tlds for two reasons. One, it is pretty easy to implement (with the line above) and it does not interfere with the existing subdomains which are used 
+for the organizations. Two, Google really likes this split out and recognizes it to use with [sitemaps](https://support.google.com/webmasters/answer/189077?hl=en).
+
+More information can be found in the [Rails Guides](http://guides.rubyonrails.org/i18n.html#setting-the-locale-from-the-url-params).
+
 ## JavaScript/CoffeeScript
 
 ## Naming conventions
@@ -82,6 +102,31 @@ describe HomeController do
       it 'renders the spanish localized template' do
         expect(response.body).to match /Holla/im
       end
+    end
+  end
+  #...
+end
+```
+
+### Testing locale scoped routes
+
+It is a good idea to test that your [routes for localization](#defining-a-route-with-a-scope) are set up correctly.
+
+You can test these within `ActionController` tests.
+
+Here is an example:
+
+```rb
+describe HomeController do
+  #...
+  context "locale scoped routes" do
+    it "should route to the correct locale if the locale exists" do
+      { get: :welcome }.should be_routable
+      { get 'de/welcome' }.should be_routable
+    end
+
+    it "should not route if the locale is not supported" do
+      { get: "blah/welcome" }.should_not be_routable
     end
   end
   #...
