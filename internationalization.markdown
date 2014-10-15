@@ -38,6 +38,10 @@ The user can change the language in the footer, which will add a subdomain (es.b
 
 The default language (english) will have no sub domain or path specified
 
+### Default url options
+
+The locale is specified in `ApplicationController#default_url_options` to include the locale so that the url helpers do not have to specify them individually. The default url option is only set if the current locale is different from the default locale. This keeps the urls clean from a locale if they do not need to specify it.
+
 ## Looking up translations
 
 ## Localized views
