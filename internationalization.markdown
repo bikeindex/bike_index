@@ -2,6 +2,24 @@
 
 ## Storing the translations
 
+Each available locale should have a translation for `language`. This is used to display the language within the dropdown list that allows a user to manually switch the locale.
+
+Here is an example:
+
+```rb
+# config/locales/en.yml
+
+en:
+  language: "English"
+```
+
+```rb
+# config/locales/es.yml
+
+es:
+  language: "Español"
+```
+
 ## Locale file hierarchy
 
 ```
