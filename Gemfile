@@ -53,6 +53,7 @@ gem 'unicorn-worker-killer'
 gem 'chartkick'
 gem 'groupdate'
 
+gem 'http_accept_language'
 # gem 'localeapp'
 
 group :assets do
