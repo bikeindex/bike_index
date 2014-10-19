@@ -13,6 +13,8 @@ gem 'resque', require: 'resque/server'
 gem 'sidekiq'
 gem 'sidekiq-failures'
 gem 'sidekiq-unique-jobs'
+gem 'rack-contrib'
+gem 'soulmate', :require => 'soulmate/server'
 gem 'geocoder'
 gem "money-rails", "~> 0.5.0"
 gem "i18n"
