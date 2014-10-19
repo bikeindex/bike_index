@@ -83,6 +83,7 @@ group :test do
   gem 'simplecov', require: false
   gem "codeclimate-test-reporter", require: nil
   gem 'resque_spec'
+  gem 'rspec-sidekiq'
   gem 'shoulda-matchers'
   gem 'pry'
 end

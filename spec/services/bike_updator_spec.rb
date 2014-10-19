@@ -123,7 +123,7 @@ describe BikeUpdator do
   end
 
   it "enque listing order working" do
-    Sidekiq::Worker.clear_all
+    Sidekiq::Testing.fake!
     bike = FactoryGirl.create(:bike, stolen: true)
     ownership = FactoryGirl.create(:ownership, bike: bike)
     user = ownership.creator
@@ -131,7 +131,8 @@ describe BikeUpdator do
     bike_params = {stolen: false}
     update_bike = BikeUpdator.new(user: user, b_params: {id: bike.id, bike: bike_params})
     update_bike.should_receive(:update_ownership).and_return(true)
-    update_bike.update_available_attributes
-    expect(ListingOrderWorker).to have_enqueued_job(bike.id)
+    expect {
+      update_bike.update_available_attributes
+    }.to change(ListingOrderWorker.jobs, :size).by(1)
   end
 end
