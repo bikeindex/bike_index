@@ -70,7 +70,7 @@ a {
 .input-group {
   @include clearfix;
   position: relative;
-  padding: 1.2em 2em 1em 1em;
+  padding: .5em 2em .5em 1em;
   border-bottom: 1px solid $grayLightish;
 }
 .input-group.add-additional {
@@ -178,8 +178,8 @@ a {
   @include clearfix;
 }
 .optional-group {
-  background: #f9f9f9;
-  border: none;
+  border-bottom: none;
+  border-top: 1px solid $grayLightish;
   .filefield-button { float: left; }
   span { float: left; color: $grayMed;}
 }
@@ -342,17 +342,19 @@ a {
 
 
 #registration-type-tabs {
-  position: absolute;
-  top: 5px; right: 5px;
-  z-index: 10;
+  // position: absolute;
+  // top: 5px; right: 5px;
+  // z-index: 10;
   // width: 25%;
 
   .registration-type-tab {
     @include border-radius(4px);
     display: none;
     padding: .5em 1em;
+    margin-bottom: .25em;
     color: white;
     text-decoration: none;
+    text-align: center;
     background: $linkColor;
     border: 1px solid darken($linkColor, 5%);
     &.current-type { display: block; }

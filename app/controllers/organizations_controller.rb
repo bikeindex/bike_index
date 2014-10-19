@@ -51,6 +51,8 @@ class OrganizationsController < ApplicationController
     @bike.owner_email = params[:email] if params[:email].present?
     if params[:non_stolen]
       @non_stolen = true 
+    elsif params[:stolen_first]
+      @stolen_first = true
     elsif params[:stolen]
       @stolen = true 
     end
@@ -112,7 +114,7 @@ class OrganizationsController < ApplicationController
   def set_bparam
     unless @organization.auto_user.present?
       flash[:error] = "We're sorry, that organization doesn't have a user set up to register bikes through. Email contact@bikeindex.org if this seems like an error."
-      redirect_to about_url and return
+      redirect_to root_url and return
     end
     if params[:b_param_id].present?
       @b_param = BParam.find(params[:b_param_id])
@@ -123,7 +125,10 @@ class OrganizationsController < ApplicationController
 
   def find_organization
     @organization = Organization.find_by_slug(params[:id])
-    render status: 404 and return unless @organization.present?
+    unless @organization.present?
+      flash[:error] = "We're sorry, that organization isn't on Bike Index yet. Email contact@bikeindex.org if this seems like an error."
+      redirect_to root_url and return
+    end
   end
 
   def require_membership
