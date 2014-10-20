@@ -4,13 +4,24 @@ describe Api::V1::OrganizationsController do
 
   describe :show do
     it "should return unauthorized unless organizations api token present" do 
-      get :show, id: 'something', format: :json
+      organization = FactoryGirl.create(:organization)
+      get :show, id: organization.slug, format: :json
       response.code.should eq("401")
     end
 
     it "should return the organization info if the token is present" do 
       organization = FactoryGirl.create(:organization)
       options = { id: organization.slug, access_token: ENV['ORGANIZATIONS_API_ACCESS_TOKEN']}
+      get :show, options, format: :json
+      response.code.should eq("200")
+      result = JSON.parse(response.body)
+      result['name'].should eq(organization.name)
+      result['can_add_bikes'].should be_false
+    end
+
+    it "should return the organization info if the org token is present" do 
+      organization = FactoryGirl.create(:organization)
+      options = { id: organization.slug, access_token: organization.access_token}
       get :show, options, format: :json
       response.code.should eq("200")
       result = JSON.parse(response.body)
