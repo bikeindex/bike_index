@@ -147,7 +147,7 @@ describe BikeCreator do
         creator.should_receive(:validate_record).and_return(bike)
         expect {
           creator.save_bike(bike)
-        }.to change(ListingOrderWorker.jobs, :size).by(1)
+        }.to change(ListingOrderWorker.jobs, :size).by(2)
       end
     end
 
