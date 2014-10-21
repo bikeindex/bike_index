@@ -88,8 +88,7 @@ class BikeIndex.Views.BikesNew extends Backbone.View
       ).done (data) ->
         that.getModelList(data.manufacturer.name)
 
-  otherManufacturerDisplay: ->
-    current_value = $('#bike_manufacturer_id').val()
+  otherManufacturerDisplay: (current_value) ->
     expand_value = $('#bike_manufacturer_id').parents('.input-group').find('.other-value').text()
     hidden_other = $('#bike_manufacturer_id').parents('.input-group').find('.hidden-other')
     if parseInt(current_value, 10) == parseInt(expand_value, 10)
@@ -128,6 +127,7 @@ class BikeIndex.Views.BikesNew extends Backbone.View
     that = @
     $(target).on "change", (e) ->
       id = e.val
+      that.otherManufacturerDisplay(id)
       console.log("#{window.root_url}/api/v1/manufacturers/#{id}")
       $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
       ).done (data) ->
