@@ -128,7 +128,6 @@ class BikeIndex.Views.BikesNew extends Backbone.View
     $(target).on "change", (e) ->
       id = e.val
       that.otherManufacturerDisplay(id)
-      console.log("#{window.root_url}/api/v1/manufacturers/#{id}")
       $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
       ).done (data) ->
         that.getModelList(data.manufacturer.name)
