@@ -53,4 +53,23 @@ describe Manufacturer do
 
   end
 
+  describe :sm_options do 
+    it "creates a hash for soulmate, and counts components if all is true" do 
+      manufacturer = FactoryGirl.create(:manufacturer)
+      component = FactoryGirl.create(:component, manufacturer_id: manufacturer.id)
+      bike = FactoryGirl.create(:bike, manufacturer_id: manufacturer.id)
+      target = {
+        id: manufacturer.id,
+        term: manufacturer.name,
+        score: 1,
+        data: {}
+      }
+      result = manufacturer.sm_options
+      result.should eq(target)
+      target[:score] = 2
+      result_all = manufacturer.sm_options(true)
+      result_all.should eq(target)
+    end
+  end
+
 end

@@ -3,6 +3,11 @@ task :start do
   system 'bundle exec foreman start -f Procfile_development'
 end
 
+desc "Create frame_makers and push to redis"
+task :sm_import_manufacturers => :environment do
+  SmExportWorker.perform_async
+end
+
 desc "Create stolen tsv"
 task :create_stolen_tsv => :environment do
   out_file = File.join(Rails.root,'/current_stolen_bikes.tsv')

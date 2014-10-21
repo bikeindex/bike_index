@@ -2,7 +2,6 @@ class BikeIndex.Views.BikesNew extends Backbone.View
   events:
     'change #bike_has_no_serial':     'updateSerial'
     'click a.optional-form-block':    'optionalFormUpdate'
-    'change #bike_manufacturer_id':   'updateManufacturer'
     'change #bike_year':              'updateYear'
     'change #bike_unknown_year':      'toggleUnknownYear' 
     'click #select-cycletype a':      'changeCycleType'
@@ -13,6 +12,8 @@ class BikeIndex.Views.BikesNew extends Backbone.View
     if $('#bike_has_no_serial').prop('checked') == true
       $('#bike_serial_number').val('absent').addClass('absent-serial')
     @updateCycleType()
+    window.root_url = $('#root_url').attr('data-url')
+    @initializeFrameMaker("#bike_manufacturer_id")
   
 
   updateSerial: (event) ->
@@ -52,27 +53,20 @@ class BikeIndex.Views.BikesNew extends Backbone.View
     autocomplete.data('typeahead').source = data 
     # $('#bike_frame_model').typeahead({source: data})
 
-  getModelList: ->
-    mnfg = $('#bike_manufacturer_id option:selected').text()
-    unless mnfg == "Choose manufacturer"
-      year = parseInt($('#bike_year').val(),10)
-      # could be bikebook.io - but then we'd have to pay for SSL...
-      url = "https://bikebook.herokuapp.com//model_list/?manufacturer=#{mnfg}"
-      url += "&year=#{year}" if year > 1
-      that = @
-      $.ajax
-        type: "GET"
-        url: url
-        success: (data, textStatus, jqXHR) ->
-          that.setModelTypeahead(data)
-        error: ->
-          that.setModelTypeahead()
+  getModelList: (mnfg_name) ->
+    year = parseInt($('#bike_year').val(),10)
+    # could be bikebook.io - but then we'd have to pay for SSL...
+    url = "https://bikebook.herokuapp.com//model_list/?manufacturer=#{mnfg_name}"
+    url += "&year=#{year}" if year > 1
+    that = @
+    $.ajax
+      type: "GET"
+      url: url
+      success: (data, textStatus, jqXHR) ->
+        that.setModelTypeahead(data)
+      error: ->
+        that.setModelTypeahead()
 
-
-  updateManufacturer: ->
-    @otherManufacturerDisplay()
-    @getModelList()
-  
   toggleUnknownYear: ->
     if $('#bike_unknown_year').prop('checked')
       $('#bike_year').val('').trigger('change')
@@ -87,7 +81,12 @@ class BikeIndex.Views.BikesNew extends Backbone.View
       $('#bike_unknown_year').prop('checked', true)
     else
       $('#bike_unknown_year').prop('checked', false)
-    @getModelList()
+    id = $('#bike_manufacturer_id').val()
+    if id.length > 0
+      that = this
+      $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
+      ).done (data) ->
+        that.getModelList(data.manufacturer.name)
 
   otherManufacturerDisplay: ->
     current_value = $('#bike_manufacturer_id').val()
@@ -101,3 +100,35 @@ class BikeIndex.Views.BikesNew extends Backbone.View
       if hidden_other.hasClass('unhidden')
         hidden_other.find('input').val('')
         hidden_other.removeClass('unhidden').slideUp()
+
+  initializeFrameMaker: (target) ->
+    url = "#{window.root_url}/api/v1/searcher?types[]=frame_makers?"
+    $(target).select2
+      minimumInputLength: 2
+      placeholder: 'Choose manufacturer'
+      ajax:
+        url: url
+        dataType: "json"
+        openOnEnter: true
+        data: (term, page) ->
+          term: term # search term
+          limit: 10
+        results: (data, page) -> # parse the results into the format expected by Select2.
+          remapped = data.results.frame_makers.map (i) -> {id: i.id, text: i.term}
+          results: remapped
+      initSelection: (element, callback) ->
+        id = $(element).val()
+        if id isnt ""
+          $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
+          ).done (data) ->
+            data =
+              id: element.val()
+              text: data.manufacturer.name
+            callback data
+    that = @
+    $(target).on "change", (e) ->
+      id = e.val
+      console.log("#{window.root_url}/api/v1/manufacturers/#{id}")
+      $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
+      ).done (data) ->
+        that.getModelList(data.manufacturer.name)

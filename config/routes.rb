@@ -142,7 +142,7 @@ Bikeindex::Application.routes.draw do
       resources :colors, only: [:index]
       resources :handlebar_types, only: [:index]
       resources :frame_materials, only: [:index]
-      resources :manufacturers, only: [:index]
+      resources :manufacturers, only: [:index, :show]
       resources :notifications, only: [:create]
       resources :organizations, only: [:show]
       resources :users do 
@@ -152,10 +152,10 @@ Bikeindex::Application.routes.draw do
           post 'send_request'
         end
       end
+      mount Soulmate::Server, :at => "/searcher"
       match 'not_found', to: 'api_v1#not_found'
       match '*a', to: 'api_v1#not_found'
     end
-    mount Soulmate::Server, :at => "/searcher"
   end
 
   resources :stolen, only: [:index] do 

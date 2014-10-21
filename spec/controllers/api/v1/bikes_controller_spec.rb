@@ -168,7 +168,8 @@ describe Api::V1::BikesController do
         primary_frame_color_id: FactoryGirl.create(:color).id,
         owner_email: "fun_times@examples.com",
         stolen: "true",
-        phone: "9999999"
+        phone: "9999999",
+        cycle_type_slug: 'bike'
       }
       stolen_record = { date_stolen: "03-01-2013",
         theft_description: "This bike was stolen and that's no fair.",

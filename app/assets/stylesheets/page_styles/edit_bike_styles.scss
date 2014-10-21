@@ -341,8 +341,11 @@
 }
 
 .chosen-select .controls .select2-container,
+.select-jsonified .select2-container,
 #stolen-bike-location .select2-container,
 #normal-bike-location .select2-container  { width: 210px;}
+
+.select2-results .select2-no-results { font-size: .85em; }
 
 .other-value, .input-group .gear-info-fields  {
   display: none;

@@ -7,6 +7,7 @@ class Country < ActiveRecord::Base
   has_many :locations
 
   def self.fuzzy_iso_find(n)
+    n = 'us' if n.match(/usa/i)
     if !n.blank?
       self.find(:first, conditions: [ "lower(iso) = ?", n.downcase.strip ])
     else
