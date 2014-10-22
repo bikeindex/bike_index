@@ -62,9 +62,12 @@ class StolenRecord < ActiveRecord::Base
     after_validation :geocode, if: lambda { self.city.present? && self.country.present? }
   end
 
-  def self.locking_description_select
-    lds = ["U-lock", "Two U-locks", "U-lock and cable", "Chain with padlock",
+  def self.locking_description
+    ["U-lock", "Two U-locks", "U-lock and cable", "Chain with padlock",
       "Cable lock", "Heavy duty bicycle security chain", "Not locked", "Other"]
+  end
+  def self.locking_description_select
+    lds = locking_description
     select_params = []
     lds.each do |l|
       select_params << [l,l]
@@ -72,8 +75,8 @@ class StolenRecord < ActiveRecord::Base
     select_params
   end
 
-  def self.lock_defeat_description_select
-    ldds = [
+  def self.locking_defeat_description
+    [
       "Lock was cut, and left at the scene.",
       "Lock was opened, and left unharmed at the scene.",
       "Lock is missing, along with the bike.",
@@ -81,6 +84,9 @@ class StolenRecord < ActiveRecord::Base
       "Other situation, please describe below.",
       "Bike was not locked"
     ]
+  end
+  def self.locking_defeat_description_select
+    ldds = locking_defeat_description
     select_params = []
     ldds.each do |l|
       select_params << [l,l]

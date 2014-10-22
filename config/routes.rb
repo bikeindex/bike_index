@@ -136,6 +136,7 @@ Bikeindex::Application.routes.draw do
           get 'stolen_ids'
         end
       end
+      resources :stolen_locking_response_suggestions, only: [:index]
       resources :cycle_types, only: [:index]
       resources :wheel_sizes, only: [:index]
       resources :component_types, only: [:index]

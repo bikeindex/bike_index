@@ -82,7 +82,7 @@
       .control-group.large-text
         = f.label :lock_defeat_description, "lock defeated", class: "control-label"
         .controls
-          = f.select(:lock_defeat_description, StolenRecord.lock_defeat_description_select, prompt: "How was the lock defeated?")
+          = f.select(:lock_defeat_description, StolenRecord.locking_defeat_description_select, prompt: "How was the lock defeated?")
 
     
   .input-group
