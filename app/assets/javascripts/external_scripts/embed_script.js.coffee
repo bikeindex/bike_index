@@ -1,31 +1,63 @@
+initializeFrameMaker = (target) ->
+  url = "#{window.root_url}/api/searcher?types[]=frame_makers&"
+  $(target).select2
+    minimumInputLength: 2
+    placeholder: 'Choose manufacturer'
+    ajax:
+      url: url
+      dataType: "json"
+      openOnEnter: true
+      data: (term, page) ->
+        term: term # search term
+        limit: 10
+      results: (data, page) -> # parse the results into the format expected by Select2.
+        remapped = data.results.frame_makers.map (i) -> {id: i.id, text: i.term}
+        results: remapped
+    initSelection: (element, callback) ->
+      id = $(element).val()
+      if id isnt ""
+        $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
+        ).done (data) ->
+          data =
+            id: element.val()
+            text: data.manufacturer.name
+          callback data
+  
+  $(target).on "change", (e) ->
+    id = e.val
+    otherManufacturerDisplay(id)
+    $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
+    ).done (data) ->
+      getModelList(data.manufacturer.name)
+
 setModelTypeahead = (data=[]) ->
   autocomplete = $('#bike_frame_model').typeahead()
   autocomplete.data('typeahead').source = data 
   # $('#bike_frame_model').typeahead({source: data})
 
-getModelList = ->
-  mnfg = $('#bike_manufacturer_id option:selected').text()
-  unless mnfg == "Choose manufacturer"
-    year = parseInt($('#bike_year').val(),10)
-    # could be bikebook.io - but then we'd have to pay for SSL...
-    url = "https://bikebook.herokuapp.com//model_list/?manufacturer=#{mnfg}"
-    url += "&year=#{year}" if year > 1
-    $.ajax
-      type: "GET"
-      url: url
-      success: (data, textStatus, jqXHR) ->
-        setModelTypeahead(data)
-      error: ->
-        setModelTypeahead()
+getModelList = (mnfg_name) ->
+  year = parseInt($('#bike_year').val(),10)
+  # could be bikebook.io - but then we'd have to pay for SSL...
+  url = "https://bikebook.herokuapp.com//model_list/?manufacturer=#{mnfg_name}"
+  url += "&year=#{year}" if year > 1
+  $.ajax
+    type: "GET"
+    url: url
+    success: (data, textStatus, jqXHR) ->
+      setModelTypeahead(data)
+    error: ->
+      setModelTypeahead()
 
 toggleRegistrationType = ->
   $('#registration-type-tabs a').toggleClass('current-type')
   if $('#registration-type-tabs a.current-type').hasClass('stolen')
+    $('#stolen_record_phone').attr('required', false)
     $('#stolen_fields_container').slideUp 'medium', ->
       $('#stolen_fields').appendTo('#stolen_fields_store')
     # $('.has-no-serial .stolen').fadeOut 'fast', ->
       $('#optional-phone').slideUp() if $('#optional-phone').length > 0
   else
+    $('#stolen_record_phone').attr('required', true)
     $('#stolen_fields').appendTo('#stolen_fields_container')
     # $('#stolen_fields_containter').html($('#stolen_fields').html())
     $('#stolen_fields_container').slideDown()
@@ -51,8 +83,7 @@ optionalFormUpdate = (e) ->
   else
     clickTarget.slideDown().addClass('unhidden').removeClass('currently-hidden')
 
-otherManufacturerUpdate = ->
-  current_value = $('#bike_manufacturer_id').val()
+otherManufacturerDisplay = (current_value) ->
   expand_value = $('#bike_manufacturer_id').parents('.input-group').find('.other-value').text()
   hidden_other = $('#bike_manufacturer_id').parents('.input-group').find('.hidden-other')
   if parseInt(current_value, 10) == parseInt(expand_value, 10)
@@ -81,7 +112,10 @@ updateYear = ->
   getModelList()
 
 $(document).ready ->
-  otherManufacturerUpdate()
+  window.root_url = $('#root_url').attr('data-url')
+  initializeFrameMaker("#bike_manufacturer_id")
+  otherManufacturerDisplay($("#bike_manufacturer_id").val())
+  $('#stolen_record_phone').attr('required', false)
 
   $('#bike_has_no_serial').change (e) ->
     updateSerial(e)
@@ -91,10 +125,6 @@ $(document).ready ->
 
   $('a.optional-form-block').click (e) ->
     optionalFormUpdate(e)
-
-  $('#bike_manufacturer_id').change ->
-    otherManufacturerUpdate()
-    getModelList()
 
   $('#bike_year').change ->
     updateYear()

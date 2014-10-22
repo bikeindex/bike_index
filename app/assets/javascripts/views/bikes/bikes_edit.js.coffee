@@ -25,6 +25,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     
   initialize: ->
     @setElement($('#body'))
+    window.root_url = $('#root_url').attr('data-url')
     menu_height = $('#edit-menu').offset().top 
     scroll_height = $(window).height() * .4
     @setDefaultCountryAndState()
@@ -105,6 +106,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
 
 
   setInitialValues: ->
+    @initializeComponentManufacturers()
     if $('#stolen_date').length > 0
       $('#stolen_date input').datepicker('format: mm-dd-yyy')
       if $('#stolen-bike-location select').val().length > 0
@@ -492,3 +494,32 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       $('#requestBikeDelete').modal('hide')
     else
       $('#mark-recovered-error').slideDown('fast')
+
+  initializeComponentManufacturers: ->
+    url = "#{window.root_url}/api/searcher?types[]=manufacturers&"
+    # console.log(url)
+    @setComponentManufacturer(m, url) for m in $('.component-mnfg-select input')
+
+  setComponentManufacturer: (target, url) ->
+    $(target).select2
+      minimumInputLength: 2
+      placeholder: 'Choose manufacturer'
+      ajax:
+        url: url
+        dataType: "json"
+        openOnEnter: true
+        data: (term, page) ->
+          term: term # search term
+          limit: 10
+        results: (data, page) -> # parse the results into the format expected by Select2.
+          remapped = data.results.manufacturers.map (i) -> {id: i.id, text: i.term}
+          results: remapped
+      initSelection: (element, callback) ->
+        id = $(element).val()
+        if id isnt ""
+          $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
+          ).done (data) ->
+            data =
+              id: element.val()
+              text: data.manufacturer.name
+            callback data

@@ -29,10 +29,10 @@
         = f.text_area :description, rows: 2
 
     .split-fields
-      .control-group.chosen-select.extra-field{data: {other: Manufacturer.find_by_slug("other").id, hidden: ".hidden-mnfg" }}
+      .control-group.select-jsonified.extra-field{data: {other: Manufacturer.find_by_slug("other").id, hidden: ".hidden-mnfg" }}
         = f.label :manufacturer_id, class: "control-label"
         .controls.component-mnfg-select
-          = f.collection_select( :manufacturer_id, Manufacturer.all, :id, :name, :required =>true, prompt: "Manufacturer")
+          = f.text_field :manufacturer_id
       
       .control-group.extra-field.component_model.short-label
         = f.label :model_name, "Model", class: "control-label"

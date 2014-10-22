@@ -103,7 +103,7 @@ class BikeIndex.Views.BikesNew extends Backbone.View
         hidden_other.removeClass('unhidden').slideUp()
 
   initializeFrameMaker: (target) ->
-    url = "#{window.root_url}/api/v1/searcher?types[]=frame_makers?"
+    url = "#{window.root_url}/api/searcher?types[]=frame_makers&"
     $(target).select2
       minimumInputLength: 2
       placeholder: 'Choose manufacturer'

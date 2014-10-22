@@ -1,4 +1,5 @@
 #stolen_fields_store
+#root_url.hidden{data: { url: ENV['BASE_URL'] }}
 = form_for @bike, multipart: true do |f|
   = f.hidden_field :b_param_id
   = f.hidden_field :creation_organization_id
@@ -25,10 +26,10 @@
           Has no serial
 
   .input-group.with-additional-block
-    .control-group.chosen-select
+    .control-group.select-jsonified
       = f.label :manufacturer_id, class: "control-label"
       .controls
-        = collection_select( :bike, :manufacturer_id, Manufacturer.frames, :id, :name, :required =>true, prompt: "Choose manufacturer")
+        = f.text_field :manufacturer_id
         %span.help-block
           Select 'Other' if manufacturer isn't listed
     %p.other-value

@@ -1,3 +1,4 @@
+#bike_edit_root_url.hidden{data: { url: ENV['BASE_URL'] }}
 #chosen-container
   %ul.bike-boxes
     = render partial: "/bikes/bike", locals: {bike: @bike, target: "show" }
@@ -51,10 +52,10 @@
           .controls
             = f.text_field :location_id
 
-        .control-group.chosen-select
+        .control-group.select-jsonified
           = f.label :manufacturer_id, class: "control-label"
           .controls
-            = collection_select( :bike, :manufacturer_id, Manufacturer.frames, :id, :name, :required =>true, prompt: "Choose manufacturer")
+            = f.text_field :manufacturer_id
 
         .control-group
           = f.label :manufacturer_other, "Other frame manufacturer", class: "control-label"

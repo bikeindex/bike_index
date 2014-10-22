@@ -26,7 +26,7 @@
         #{@bike.owner_email}
   %p
     = link_to "View the #{@bike.type}", bike_url(@bike)
-
+#root_url.hidden{data: { url: ENV['BASE_URL'] }}
 .edit-bike-container#chosen-container{ class: ("stolen-background" if @bike.stolen)}
   #edit-bike-form
     %span#clearing_span

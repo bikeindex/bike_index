@@ -73,7 +73,9 @@ $(document).ready ->
 
   else if $('#admin-content').length > 0
     view = new BikeIndex.Views.DataTables
-    if $('#admin-locations-fields').length > 0
+    if $('#bike_edit_root_url').length > 0
+      view = new BikeIndex.Views.AdminBikesEdit
+    else if $('#admin-locations-fields').length > 0
       view = new BikeIndex.Views.AdminOrganizationsEdit
     else if $('#admin-recoveries').length > 0
       view = new BikeIndex.Views.AdminRecoveries

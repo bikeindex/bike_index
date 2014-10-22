@@ -153,10 +153,10 @@ Bikeindex::Application.routes.draw do
           post 'send_request'
         end
       end
-      mount Soulmate::Server, :at => "/searcher"
       match 'not_found', to: 'api_v1#not_found'
       match '*a', to: 'api_v1#not_found'
     end
+    mount Soulmate::Server, :at => "/searcher"
   end
 
   resources :stolen, only: [:index] do 
