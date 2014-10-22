@@ -34,7 +34,7 @@ class Admin::BlogsController < Admin::BaseController
       flash[:notice] = "Blog created!"
       redirect_to edit_admin_blog_url(@blog)
     else
-      flash[:error] = "Blog error!"
+      flash[:error] = "Blog error! #{@blog.errors.full_messages.to_sentence}"
       redirect_to new_admin_blog_url
     end
   end

@@ -20,7 +20,9 @@
       %th.medium-screens
         Memberships
       %th.large-screens
-        Management links
+        Locations
+      %th
+        &#x2713;&nbsp;
     %tbody
       - @organizations.each do |organization|
         %tr
@@ -35,13 +37,20 @@
               
               Yesterday at #{organization.created_at.strftime("%-I %p")}
             - else
-              = organization.created_at.strftime("%-m/%-d/%Y at %-I %p")
+              = organization.created_at.strftime("%-m/%-d/%Y")
           %td
             = @bikes.where(creation_organization_id: organization.id).count
           %td.medium-screens
             = organization.memberships.count
           %td.large-screens
-            = link_to 'Edit', edit_admin_organization_url(organization)
+            .less-strong-hold
+              
+              = organization.locations.count
+              - if organization.show_on_map
+                %span.less-strong-right
+                  Mapped
+          %td
+            = 'f' unless organization.approved
 
 
 

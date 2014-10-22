@@ -225,7 +225,20 @@
 
 .recovery-input-field {
   @extend .blog-field;
-  textarea { height: 4em; }
+  textarea { height: 5em; }
+}
+
+#tweet-entry {
+  position: relative;
+}
+#tweet-length {
+  display: block;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding: .25em .5em;
+  background: $blueDark;
+  color: #fff;
 }
 
 

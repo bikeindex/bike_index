@@ -29,9 +29,9 @@ class Organization < ActiveRecord::Base
   has_many :locations, dependent: :destroy
   accepts_nested_attributes_for :locations, allow_destroy: true
 
-  validates_presence_of :name, :default_bike_token_count, :short_name
+  validates_presence_of :name, :default_bike_token_count
 
-  validates_uniqueness_of :slug, message: "Needs a unique slug"
+  validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact admin@bikeindex.org"
 
   default_scope order(:name)
 
@@ -46,11 +46,18 @@ class Organization < ActiveRecord::Base
     slug
   end
 
-  before_save :set_slug
-  def set_slug
-    self.slug = Slugifyer.slugify(self.short_name)
+  before_save :set_short_name_and_slug
+  def set_short_name_and_slug
+    self.short_name = name unless short_name.present?
+    new_slug = Slugifyer.slugify(self.short_name)
+    # If the organization exists, don't invalidate because of it's own slug
+    orgs = id.present? ? Organization.where('id != ?', id) : Organization.scoped
+    while orgs.where(slug: new_slug).exists?
+      i = i.present? ? i + 1 : 2
+      new_slug = "#{new_slug}-#{i}"
+    end
+    self.slug = new_slug
   end
-
 
   before_save :set_auto_user
   def set_auto_user

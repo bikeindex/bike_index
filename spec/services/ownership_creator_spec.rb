@@ -27,24 +27,27 @@ describe OwnershipCreator do
     it "should send a notification email" do 
       ownership = Ownership.new
       ownership.stub(:id).and_return(2)
-      Resque.should_receive(:enqueue)
-      OwnershipCreator.new().send_notification_email(ownership)
+      expect {
+        OwnershipCreator.new().send_notification_email(ownership)
+      }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
     end
 
     it "should not send a notification email for example bikes" do 
       ownership = Ownership.new
       ownership.stub(:id).and_return(2)
       ownership.stub(:example).and_return(true)
-      Resque.should_not_receive(:enqueue)
-      OwnershipCreator.new().send_notification_email(ownership)
+      expect {
+        OwnershipCreator.new().send_notification_email(ownership)
+      }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
     end
 
     it "should not send a notification email for ownerships with no_email set" do 
       ownership = Ownership.new
       ownership.stub(:id).and_return(2)
       ownership.stub(:send_email).and_return(false)
-      Resque.should_not_receive(:enqueue)
-      OwnershipCreator.new().send_notification_email(ownership)
+      expect {
+        OwnershipCreator.new().send_notification_email(ownership)
+      }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
     end
   end
 

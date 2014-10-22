@@ -18,7 +18,18 @@ class CustomerMailer < ActionMailer::Base
     end
   end
 
-  def admin_stolen_email(customer_contact)
+  def stolen_bike_alert_email(customer_contact)
+    @customer_contact = customer_contact
+    @info = customer_contact.info_hash
+    @bike = customer_contact.bike
+    @biketype = CycleType.find(@bike.cycle_type_id).name.downcase
+    mail(to: @customer_contact.user_email, from: @customer_contact.creator_email, subject: @customer_contact.title) do |format|
+      format.text
+      format.html { render layout: 'email'}
+    end
+  end
+
+  def admin_contact_stolen_email(customer_contact)
     @customer_contact = customer_contact
     mail(to: @customer_contact.user_email, from: @customer_contact.creator_email, subject: @customer_contact.title) do |format|
       format.text

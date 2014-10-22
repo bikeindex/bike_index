@@ -24,11 +24,11 @@
     %p
       = "Invitations sent: #{@organization.sent_invitation_count}"
 
-.control-group
-  .control-label
-    = f.label :default_bike_token_count
-  .controls
-    = f.number_field :default_bike_token_count
+/ .control-group
+/   .control-label
+/     = f.label :default_bike_token_count
+/   .controls
+/     = f.number_field :default_bike_token_count
 
 .control-group
   .control-label
@@ -57,17 +57,22 @@
     .controls
       = f.text_field :embedable_user_email, value: @embedable_email
 
-.control-group.padded
-  .control-label
-    = f.label :show_on_map
-  .controls
-    = f.check_box :show_on_map
+  .control-group.padded
+    .control-label
+      = f.label :show_on_map
+    .controls
+      = f.check_box :show_on_map
 
-.control-group.padded
-  .control-label
-    = f.label :api_access_approved
-  .controls
-    = f.check_box :api_access_approved
+  .control-group.padded
+    .control-label
+      = f.label :api_access_approved
+    .controls
+      = f.check_box :api_access_approved
+  .control-group.padded
+    .control-label
+      = f.label :approved, "Validated & approved"
+    .controls
+      = f.check_box :approved
 
 / .control-group.padded
 /   .control-label

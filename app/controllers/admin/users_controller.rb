@@ -15,7 +15,7 @@ class Admin::UsersController < Admin::BaseController
   end
 
   def edit
-    bikes = Bike.find(@user.bikes)
+    bikes = Bike.unscoped.find(@user.bikes)
     @bikes = BikeDecorator.decorate_collection(bikes)
   end
 

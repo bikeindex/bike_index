@@ -2,7 +2,7 @@ module Api
   module V1
     class BikesController < ApiV1Controller
       before_filter :cors_preflight_check
-      before_filter :authenticate_organization, only: [:create, :stolen_ids, :send_notification_email]
+      before_filter :authenticate_organization, only: [:create, :stolen_ids]
       skip_before_filter  :verify_authenticity_token
       after_filter :cors_set_access_control_headers
       caches_action :search_tags
@@ -33,9 +33,10 @@ module Api
       def stolen_ids
         stolen = StolenRecord.where(approved: true)
         if params[:proximity].present?
-          radius = 500
+          radius = 50
           radius = params[:proximity_radius] if params[:proximity_radius].present? && params[:proximity_radius].strip.length > 0
-          stolen = stolen.near(params[:proximity], radius)
+          box = Geocoder::Calculations.bounding_box(params[:proximity], radius)
+          stolen = stolen.within_bounding_box(box)
         end
         if params[:updated_since]
           since_date = Time.at(params[:updated_since].to_i).utc.to_datetime
@@ -72,25 +73,7 @@ module Api
           render json: e, status: :unprocessable_entity and return
         end
       end
-
-      def send_notification_email
-        unless @organization.slug == 'example'
-          bike = Bike.find(params[:bike_id])
-          if bike.find_current_stolen_record.present?
-            customer_contact = CustomerContact.new(body: params[:body], title: params[:title], bike_id: bike.id, contact_type: 'stolen_contact')
-            customer_contact.user_email = bike.owner_email
-            customer_contact.creator_id = @organization.auto_user.id
-            customer_contact.creator_email = @organization.auto_user.email
-            if customer_contact.save
-              Resque.enqueue(AdminStolenEmailJob, customer_contact.id)
-              render json: { success: true } and return
-            end
-            render json: {error: "Unable to save that Contact, srys"}, status: :unprocessable_entity and return
-          end
-        end
-        render json: {error: "Unable to send that email, srys"}, status: :unprocessable_entity and return
-      end
-    
+   
       def authenticate_organization
         organization = Organization.find_by_slug(params[:organization_slug])
         if organization.present? && organization.access_token == params[:access_token]

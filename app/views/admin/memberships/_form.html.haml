@@ -21,9 +21,10 @@
         
     .control-group.chosen-select
       %label.control-label
-        User ID
+        User email
       .controls
-        = collection_select( :membership, :user_id, @users, :id, :email, :required =>true, prompt: "Choose a user")
+        = f.text_field :invited_email
+        / # = collection_select( :membership, :user_id, @users, :id, :email, :required =>true, prompt: "Choose a user")
     
     .control-group
       = f.label :role, class: "control-label"

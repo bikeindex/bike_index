@@ -65,12 +65,11 @@ $testimonial-tri-size: 12px;
 }
 
 .testimonial-2 {
-  $bg: $gray-lightest;
-  $text-bg: #fff;
+  $bg: #fff;
+  $text-bg: $gray-lightest;
   background: $bg;
   .testimonial-quote {
-    background: $text-bg;
-    // float: right;
+    background: $text-bg;  
     margin: 0;
     &:before {
       left: 100%;

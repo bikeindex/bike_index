@@ -15,11 +15,14 @@ describe Admin::RecoveriesController do
 
   describe :approve do 
     it "should post a single recovery" do 
+      Sidekiq::Testing.fake!
       user = FactoryGirl.create(:user, superuser: true)
       set_current_user(user)
       recovery = FactoryGirl.create(:stolen_record)
-      post :approve, id: recovery.id
-      expect(RecoveryNotifyWorker).to have_enqueued_job(recovery.id)
+      expect {
+        post :approve, id: recovery.id
+      }.to change(RecoveryNotifyWorker.jobs, :size).by(1)
+      # expect(RecoveryNotifyWorker).to have_enqueued_job(recovery.id)
     end
 
     # it "shouldn't die if we're missing something" do 

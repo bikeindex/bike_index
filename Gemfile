@@ -9,10 +9,11 @@ gem 'bcrypt-ruby', '~> 3.0.0'
 gem 'active_model_serializers'
 gem 'aws-sdk', '~> 1.3.4'
 gem 'airbrake'
-gem 'resque', require: 'resque/server'
 gem 'sidekiq'
 gem 'sidekiq-failures'
 gem 'sidekiq-unique-jobs'
+gem 'rack-contrib'
+gem 'soulmate', :require => 'soulmate/server', github: 'sethherr/soulmate'
 gem 'geocoder'
 gem "money-rails", "~> 0.5.0"
 gem "i18n"
@@ -39,9 +40,8 @@ gem 'omniauth-facebook'
 gem 'omniauth'
 gem "fog"
 gem 'dalli'
-gem 'dumper', "~>1.4.5"
 gem 'draper'
-# gem 'rack-mini-profiler' # I'm not actually doing anything useful with this and it's annoying.
+# gem 'rack-mini-profiler', require: 'false'
 gem 'dotenv-rails', "~> 0.8", git: "https://github.com/bkeepers/dotenv"
 gem 'wkhtmltopdf-binary'
 gem 'wicked_pdf'
@@ -84,7 +84,6 @@ group :test do
   gem 'factory_girl_rails'
   gem 'simplecov', require: false
   gem "codeclimate-test-reporter", require: nil
-  gem 'resque_spec'
   gem 'rspec-sidekiq'
   gem 'shoulda-matchers'
   gem 'pry'

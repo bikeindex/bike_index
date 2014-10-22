@@ -13,11 +13,9 @@
 
     .control-group.chosen-select
       %label.control-label
-        Author
+        Author email
       .controls
-        = collection_select( :blog, :user_id, @users, :id, :email, :required =>true, prompt: "Choose a user")
-
-
+        = f.email_field :user_email, placeholder: 'your email', required: true, value: @blog.user.email
 
     .blog-field
       = f.text_field :title, placeholder: "Blog title"

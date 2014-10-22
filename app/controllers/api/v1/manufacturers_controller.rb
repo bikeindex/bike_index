@@ -20,6 +20,11 @@ module Api
         end
       end
 
+      def show
+        manufacturer = Manufacturer.where(id: params[:id]).first
+        respond_with manufacturer
+      end
+
     end
   end
 end

@@ -2,7 +2,7 @@ Bikeindex::Application.routes.draw do
 
   get "dashboard/show"
 
-  resources :organizations, only: [:show, :edit, :update, :destroy] do
+  resources :organizations do 
     member do
       get :embed
       get :embed_extended
@@ -37,7 +37,7 @@ Bikeindex::Application.routes.draw do
   resources :stolen_notifications, only: [:create, :new]
 
   resources :feedbacks, only: [:create, :new]
-  match 'vendor_signup', to: 'feedbacks#vendor_signup'
+  match 'vendor_signup', to: 'organizations#new'
   match 'contact', to: 'feedbacks#index'
   match 'contact_us', to: 'feedbacks#index'
   match 'help', to: 'feedbacks#index'
@@ -58,8 +58,9 @@ Bikeindex::Application.routes.draw do
   resources :bike_token_invitations, only: [:create]
   resources :user_embeds, only: [:show]
 
+  resources :news, only: [:show, :index]
   resources :blogs, only: [:show, :index]
-  match 'blog', to: redirect("/blogs")
+  match 'blog', to: redirect("/news")
 
   resources :public_images, only: [:create, :show, :edit, :update, :index, :destroy] do
     collection do
@@ -90,13 +91,14 @@ Bikeindex::Application.routes.draw do
     match 'bust_z_cache', to: 'dashboard#bust_z_cache'
     match 'destroy_example_bikes', to: 'dashboard#destroy_example_bikes'
     resources :discounts, :memberships, :organizations, :bike_token_invitations,
-      :organization_invitations, :paints, :customer_contacts, :ads
+      :organization_invitations, :paints, :ads
     match 'duplicate_bikes', to: 'bikes#duplicates'
     resources :flavor_texts, only: [:destroy, :create]
     resources :stolen_bikes do
       member { post :approve }
     end
-    resources :recoveries do
+    resources :customer_contacts, only: [:create]
+    resources :recoveries do 
       collection { post :approve }
     end
     resources :stolen_notifications do
@@ -133,7 +135,6 @@ Bikeindex::Application.routes.draw do
           get 'search_tags'
           get 'close_serials'
           get 'stolen_ids'
-          post 'send_notification_email'
         end
       end
       resources :cycle_types, only: [:index]
@@ -142,14 +143,18 @@ Bikeindex::Application.routes.draw do
       resources :colors, only: [:index]
       resources :handlebar_types, only: [:index]
       resources :frame_materials, only: [:index]
-      resources :manufacturers, only: [:index]
-      resources :users do
+      resources :manufacturers, only: [:index, :show]
+      resources :notifications, only: [:create]
+      resources :organizations, only: [:show]
+      resources :users do 
         collection do
           get 'current'
           post 'request_serial_update'
           post 'send_request'
         end
       end
+      mount Soulmate::Server, :at => "/searcher"
+      match 'not_found', to: 'api_v1#not_found'
       match '*a', to: 'api_v1#not_found'
     end
   end
@@ -187,6 +192,5 @@ Bikeindex::Application.routes.draw do
   match '/500', to: 'errors#server_error'
 
   mount Sidekiq::Web => '/sidekiq', constraints: AdminRestriction
-  mount Resque::Server.new, at: '/resque', constraints: AdminRestriction
 
 end

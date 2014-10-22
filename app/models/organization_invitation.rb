@@ -27,7 +27,7 @@ class OrganizationInvitation < ActiveRecord::Base
   
   after_create :enqueue_notification_job
   def enqueue_notification_job
-    Resque.enqueue(OrganizationInvitationEmailJob, self.id)
+    EmailOrganizationInvitationWorker.perform_async(id)
   end
 
   after_create :if_user_exists_assign

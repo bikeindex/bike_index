@@ -15,8 +15,8 @@
     <script type="text/javascript">$(function() {$('body').prepend("<body class='welcome-page' id='body'><div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, the Bike Index (and the internet in general) is broken and ugly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>");});</script>
     <![endif]-->
     
-    - if controller_name == "blogs"
-      = auto_discovery_link_tag(:atom, blogs_url(format: "atom"), {title: "Bike Index"})
+    - if controller_name == "news"
+      = auto_discovery_link_tag(:atom, news_url(format: "atom"), {title: "Bike Index"})
 
   :plain
     <!--
@@ -32,7 +32,7 @@
   - body_class = "vendor-signup-page" if current_page?(:vendor_signup)
   %body#body{ class: body_class }
     / = render 'layouts/grid'
-    = render 'layouts/messages_u'
+    = render 'layouts/messages'
     .bodywrap
       %header.global-header
         .container.bikes-nav

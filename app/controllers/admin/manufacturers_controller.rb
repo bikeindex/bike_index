@@ -1,5 +1,5 @@
 class Admin::ManufacturersController < Admin::BaseController
-  before_filter :find_manufacturer, only: [:edit, :update, :destroy]  
+  before_filter :find_manufacturer, only: [:edit, :update, :destroy]
 
   def index
     @manufacturers = Manufacturer.all
@@ -22,6 +22,7 @@ class Admin::ManufacturersController < Admin::BaseController
     if @manufacturer.update_attributes(params[:manufacturer])
       flash[:notice] = "Manufacturer Saved!"
       expire_fragment "header_search"
+      SmExportWorker.perform_async
       redirect_to admin_manufacturer_url(@manufacturer)
     else
       render action: :edit
@@ -33,6 +34,7 @@ class Admin::ManufacturersController < Admin::BaseController
     if @manufacturer.save
       flash[:notice] = "Manufacturer Created!"
       expire_fragment "header_search"
+      SmExportWorker.perform_async
       redirect_to admin_manufacturer_url(@manufacturer)
     else
       render action: :new

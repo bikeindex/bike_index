@@ -43,14 +43,14 @@ SitemapGenerator::Sitemap.create do
 
   group(filename: :images) do
     PublicImage.bikes.each do |i|
-      unless Bike.unscoped.find(i.imageable_id).example == true
+      bike = Bike.where(id: i.imageable_id).first
+      if bike.present?
         add(bike_path(i.imageable), images: [{
           loc: i.image_url,
           title: i.name }])
       end
     end
   end
-
   group(filename: :users) do
     User.where(show_bikes: true).each { |u| add "/users/#{u.username}", priority: 0.4 }
   end

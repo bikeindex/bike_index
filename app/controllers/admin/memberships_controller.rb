@@ -29,7 +29,15 @@ class Admin::MembershipsController < Admin::BaseController
   end
 
   def create
-    @membership = Membership.new(params[:membership])
+    user = User.fuzzy_email_find(params[:membership][:invited_email])
+    unless user.present?
+      flash[:error] = 'User not found. Perhaps you should invite them instead?'
+      @membership = Membership.new
+      render action: :new and return
+    end
+    @membership = Membership.new(user_id: user.id,
+      organization_id: params[:membership][:organization_id],
+      role: params[:membership][:role])
     if @membership.save
       flash[:notice] = "Membership Created!"
       redirect_to admin_membership_url(@membership)

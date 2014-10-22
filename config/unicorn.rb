@@ -37,9 +37,3 @@ before_fork do |server, worker|
   # defined?(ActiveRecord::Base) and
   #   ActiveRecord::Base.connection.disconnect!
 end
-
-after_fork do |server, worker|  
-  ActiveRecord::Base.establish_connection
-  Resque.redis.client.reconnect
-  File.write "/proc/#{Process.pid}/oom_adj", '12'
-end

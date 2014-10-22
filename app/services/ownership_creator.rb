@@ -27,7 +27,7 @@ class OwnershipCreator
   def send_notification_email(ownership)
     return true if ownership.example
     return true unless ownership.send_email
-    Resque.enqueue(OwnershipInvitationEmailJob, ownership.id)
+    EmailOwnershipInvitationWorker.perform_async(ownership.id)
   end
 
   def self_made?

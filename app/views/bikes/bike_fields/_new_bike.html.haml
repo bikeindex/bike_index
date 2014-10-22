@@ -1,3 +1,4 @@
+#root_url.hidden{data: { url: ENV['BASE_URL'] }}
 .input-group.with-optional-blocks.form-head
   %a.bikeform-tip{role: "button", title: "Help with bicycle serial numbers", data: {toggle: "modal", keyboard: "true", target: "#serialTip"} }
     %span
@@ -18,10 +19,10 @@
   %a.bikeform-tip{role: "button", title: "Help with choosing a frame manufacturer", data: {toggle: "modal", target: "#frameManufacturerTip"} }
     %span
       ?
-  .control-group.chosen-select
+  .control-group.select-jsonified
     = f.label :manufacturer_id, class: "control-label"
     .controls
-      = collection_select( :bike, :manufacturer_id, Manufacturer.frames, :id, :name, :required =>true, prompt: "Choose manufacturer")
+      = f.text_area :manufacturer_id
       %span.help-block
         Select 'Other' if manufacturer isn't listed
   %p.other-value

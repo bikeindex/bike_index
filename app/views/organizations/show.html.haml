@@ -61,21 +61,24 @@
     = link_to "bryan@bikeindex.org", "mailto:bryan@bikeindex.org"
     to get set up for API access
 
-%hr
+- if @organization.org_type == 'shop' && @organization.access_token.present?
+  %hr
 
-%h3
-  %a#show-lightspeed-info{href: "#"}
-    %span.shown-info
-      View
-    %span.hidden-info
-      Hide
-    LightSpeed Cloud information
-
-#lightspeed-info.initially-hidden
   %h3
-    Update your Lightspeed Cloud API key.
-  .well.span6.form.form-horizontal
-    = form_for @organization do |f|
-      .lightspeed-api-key-input
-        = f.text_field :lightspeed_cloud_api_key, placeholder: 'Enter your Lightspeed Cloud API key'
-      = f.submit "Update key", class: 'button-green'
+    %a{ href: "https://pos_integration.bikeindex.org/organizations/connect?id=#{@organization.slug}&access_token=#{@organization.access_token}"}
+      Lightspeed Cloud Integration
+/   %a#show-lightspeed-info{href: "#"}
+/     %span.shown-info
+/       View
+/     %span.hidden-info
+/       Hide
+/     LightSpeed Cloud information
+
+/ #lightspeed-info.initially-hidden
+/   %h3
+/     Update your Lightspeed Cloud API key.
+/   .well.span6.form.form-horizontal
+/     = form_for @organization do |f|
+/       .lightspeed-api-key-input
+/         = f.text_field :lightspeed_cloud_api_key, placeholder: 'Enter your Lightspeed Cloud API key'
+/       = f.submit "Update key", class: 'button-green'

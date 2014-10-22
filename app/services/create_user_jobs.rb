@@ -26,11 +26,11 @@ class CreateUserJobs
   end
 
   def send_welcome_email
-    Resque.enqueue(WelcomeEmailJob, @user.id)
+    EmailWelcomeWorker.perform_async(@user.id)
   end
 
   def send_confirmation_email
-    Resque.enqueue(ConfirmationEmailJob, @user.id)
+    EmailConfirmationWorker.perform_async(@user.id)
   end
 
   def do_jobs

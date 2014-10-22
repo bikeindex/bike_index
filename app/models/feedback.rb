@@ -11,7 +11,7 @@ class Feedback < ActiveRecord::Base
 
   after_create :notify_admins
   def notify_admins
-    Resque.enqueue(FeedbackNotificationEmailJob, self.id)
+    EmailFeedbackNotificationWorker.perform_async(id)
   end
 
 end

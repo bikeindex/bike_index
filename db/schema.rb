@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140916185511) do
+ActiveRecord::Schema.define(:version => 20141010145930) do
 
   create_table "ads", :force => true do |t|
     t.string   "title"
@@ -214,6 +214,7 @@ ActiveRecord::Schema.define(:version => 20140916185511) do
     t.integer  "bike_id"
     t.datetime "created_at",    :null => false
     t.datetime "updated_at",    :null => false
+    t.text     "info_hash"
   end
 
   create_table "cycle_types", :force => true do |t|
@@ -395,6 +396,7 @@ ActiveRecord::Schema.define(:version => 20140916185511) do
     t.string   "access_token"
     t.text     "new_bike_notification"
     t.boolean  "api_access_approved",        :default => false,  :null => false
+    t.boolean  "approved",                   :default => false,  :null => false
   end
 
   add_index "organizations", ["slug"], :name => "index_organizations_on_slug", :unique => true
@@ -520,6 +522,7 @@ ActiveRecord::Schema.define(:version => 20140916185511) do
     t.boolean  "recovery_posted",          :default => false
     t.text     "recovery_tweet"
     t.text     "recovery_share"
+    t.boolean  "create_open311",           :default => false, :null => false
   end
 
   add_index "stolen_records", ["bike_id"], :name => "index_stolen_records_on_bike_id"

@@ -11,9 +11,9 @@
           .btn-group
             %button.btn.ctype-position-both{ type: "button", :'data-position' => 'both' }
               Both
-            %button.btn{ type: "button", :'data-position' => 'front', class: if f.object.front then 'active' end }
+            %button.btn{ type: "button", :'data-position' => 'front', class: ('active' if f.object.front ) }
               Front
-            %button.btn{ type: "button", :'data-position' => 'rear', class: if f.object.rear then 'active' end }
+            %button.btn{ type: "button", :'data-position' => 'rear', class: ('active' if f.object.rear ) }
               Rear
           = f.hidden_field :front_or_rear, class: "front-or-rear"
     - other_show = ""

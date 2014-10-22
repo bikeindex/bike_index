@@ -18,7 +18,8 @@ class BikeSerializer < ActiveModel::Serializer
     :front_tire_narrow,
     :photo,
     :thumb,
-    :title
+    :title,
+    :type_of_cycle
 
   has_one :rear_wheel_size,
     :front_wheel_size,
@@ -27,7 +28,10 @@ class BikeSerializer < ActiveModel::Serializer
     :front_gear_type,
     :rear_gear_type,
     :stolen_record
-    
+  
+  def type_of_cycle
+    object.cycle_type.name
+  end  
   
   def url
     bike_url(object)

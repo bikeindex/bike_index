@@ -11,9 +11,10 @@ class Blog < ActiveRecord::Base
     :published,
     :old_title_slug,
     :description_abbr,
-    :update_title
+    :update_title,
+    :user_email
       
-  attr_accessor :post_date, :post_now, :update_title
+  attr_accessor :post_date, :post_now, :update_title, :user_email
 
   validates_presence_of :title, :body, :user_id
   validates_uniqueness_of :title, message: "has already been taken. If you believe that this message is an error, contact us!"
@@ -25,12 +26,16 @@ class Blog < ActiveRecord::Base
   scope :published, where(published: true)
   default_scope order("published_at desc")
 
-  before_save :set_published_at
-  def set_published_at
+  before_save :set_published_at_and_publishe
+  def set_published_at_and_publishe
     if self.post_date.present?
       self.published_at = DateTime.strptime("#{self.post_date} 06", "%m-%d-%Y %H")
     end
     self.published_at = Time.now if self.post_now == '1'
+    if self.user_email.present?
+      u = User.fuzzy_email_find(user_email)
+      self.user_id = u.id if u.present?
+    end
   end
 
   def description

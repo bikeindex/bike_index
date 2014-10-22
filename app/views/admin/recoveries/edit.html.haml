@@ -1,4 +1,4 @@
-%header.with-subtitle
+%header.with-subtitle#admin-recoveries
   %h1
     Edit recovery for #{@bike.type}
   %p
@@ -58,10 +58,13 @@
   - if @bike.thumb_image.present?
     / Minus 23 if bike has an image
     - tweet_length = tweet_length - 23
-  .control-group#tweet_entry.recovery-input-field{ data: {length: tweet_length } }
+  .control-group#tweet-entry.recovery-input-field{ data: {length: tweet_length } }
     = f.label :recovery_tweet, class: "control-label"
     .controls
       = f.text_area :recovery_tweet
+    %span#tweet-length
+      = tweet_length
+
 
   .actions
     .control-group

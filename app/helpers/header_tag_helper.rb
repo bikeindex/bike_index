@@ -2,7 +2,7 @@ module HeaderTagHelper
 
   def header_tags
     header_tag_hash = set_header_tag_hash
-    header_tag_hash = set_social_hash(header_tag_hash) if controller_name == "blogs"
+    header_tag_hash = set_social_hash(header_tag_hash) if controller_name == "news"
     html = title_tag_html(header_tag_hash)
     html << author_tag_html
     html << meta_tags_html(header_tag_hash)
@@ -12,7 +12,7 @@ module HeaderTagHelper
 protected
 
   def set_header_tag_hash
-    special_meta_tags = ['bikes', 'welcome', 'blogs', 'users', 'manufacturers']
+    special_meta_tags = ['bikes', 'welcome', 'news', 'users', 'manufacturers']
     if special_meta_tags.include? controller_name
       self.send("#{controller_name}_header_tags")
     else
@@ -34,7 +34,7 @@ protected
 
 
   def author_tag_html
-    return '' unless controller_name == 'blogs' and action_name == 'show'
+    return '' unless controller_name == 'news' and action_name == 'show'
     "<link rel='author' href='#{user_url(@blogger)}'/>"
   end
 
@@ -158,7 +158,7 @@ protected
     hash
   end
 
-  def blogs_header_tags
+  def news_header_tags
     hash = current_page_auto_hash
     # :"og:type"         => "article",
     if action_name == 'show'

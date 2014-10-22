@@ -1,0 +1,24 @@
+<%= @customer_contact.body.html_safe %>
+
+--------------------------------
+
+---
+Make: <%= @customer_contact.bike.manufacturer_name  %>
+    
+Serial: <%= @customer_contact.bike.serial_number %>
+    
+Color: <% if @customer_contact.bike.paint.present? %><%= @customer_contact.bike.paint.name %><% else %><%= @customer_contact.bike.primary_frame_color.name %><% end %>
+---  
+
+<% if @customer_contact.bike.stolen %>
+Hopefully you find the <%= @customer_contact.bike.type %> soon. Give us a heads up when you do!
+<% end %>
+
+
+* Claim the <%= @customer_contact.bike.type %> here: <%= bike_url(@customer_contact.bike) %> *
+
+Sign up or sign in to BikeIndex.org to claim your <%= @customer_contact.bike.type %> and edit it, upload photos and make sure you never lose track of your trusty steed!
+
+
+
+--------------------------------

@@ -1,10 +1,38 @@
 class OrganizationsController < ApplicationController
   before_filter :authenticate_user!, only: [:show, :edit, :update, :destroy]
-  before_filter :find_organization
+  before_filter :find_organization, except: [:new, :create]
   before_filter :require_membership, only: [:show, :edit, :update, :destroy]
   before_filter :require_admin, only: [:edit, :update, :destroy]
   before_filter :set_bparam, only: [:embed, :embed_extended]
   layout "organization"
+
+  def new
+    unless current_user.present?
+      @user = User.new
+    end
+    @organization = Organization.new
+    @active_section = "contact"
+    render layout: 'content'
+  end
+
+  def create
+    user = current_user
+    @organization = Organization.new(
+      name: params[:organization][:name],
+      website: params[:organization][:website],
+      org_type: params[:organization][:org_type]
+    )
+    if @organization.save
+      membership = Membership.create(user_id: user.id, role: 'admin', organization_id: @organization.id)
+      @organization.update_attribute :auto_user_id, user.id
+      flash[:notice] = "Organization Created successfully!"
+      if current_user.present?
+        redirect_to organization_url(@organization) and return
+      end
+    else
+      render action: :new and return
+    end
+  end
   
   def edit
     @bikes = Bike.where(creation_organization_id: @organization.id).order("created_at desc")
@@ -21,6 +49,13 @@ class OrganizationsController < ApplicationController
   def embed
     @bike = BikeCreator.new(@b_param).new_bike
     @bike.owner_email = params[:email] if params[:email].present?
+    if params[:non_stolen]
+      @non_stolen = true 
+    elsif params[:stolen_first]
+      @stolen_first = true
+    elsif params[:stolen]
+      @stolen = true 
+    end
     if params[:sf_safe].present?
       render action: :embed_sf_safe, layout: 'embed_layout'
     else
@@ -47,7 +82,7 @@ class OrganizationsController < ApplicationController
   def update
     if params[:organization][:lightspeed_cloud_api_key].present?
       api_key = params[:organization][:lightspeed_cloud_api_key]
-      Resque.enqueue(LightspeedNotificationEmailJob, @organization.id, api_key)
+      EmailLightspeedNotificationWorker.perform_async(@organization.id, api_key)
       flash[:notice] = "Thanks for updating your LightSpeed API Key!"
       redirect_to organization_url(@organization) and return
       # @stolen_notification = StolenNotification.new(params[:stolen_notification])
@@ -79,7 +114,7 @@ class OrganizationsController < ApplicationController
   def set_bparam
     unless @organization.auto_user.present?
       flash[:error] = "We're sorry, that organization doesn't have a user set up to register bikes through. Email contact@bikeindex.org if this seems like an error."
-      redirect_to about_url and return
+      redirect_to root_url and return
     end
     if params[:b_param_id].present?
       @b_param = BParam.find(params[:b_param_id])
@@ -90,7 +125,10 @@ class OrganizationsController < ApplicationController
 
   def find_organization
     @organization = Organization.find_by_slug(params[:id])
-    render status: 404 and return unless @organization.present?
+    unless @organization.present?
+      flash[:error] = "We're sorry, that organization isn't on Bike Index yet. Email contact@bikeindex.org if this seems like an error."
+      redirect_to root_url and return
+    end
   end
 
   def require_membership
