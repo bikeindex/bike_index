@@ -49,7 +49,7 @@ class PublicImagesController < ApplicationController
       redirect_to params[:return_url]
     else
       redirect_to edit_bike_url(@imageable) and return if @imageable.cycle_type_id
-      redirect_to edit_admin_blog(@imageable)
+      redirect_to edit_admin_news(@imageable)
     end
   end
 

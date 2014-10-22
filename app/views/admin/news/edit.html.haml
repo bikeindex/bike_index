@@ -2,7 +2,7 @@
   %h1
     Editing that blog!
   %p
-    = link_to "Back to blogs", admin_blogs_url
+    = link_to "Back to blogs", admin_news_index_url
 
 
 .blog-entry-fields
@@ -16,6 +16,6 @@
       %section
         = render "public_images/new_blog_form"
 
-  = link_to "Delete blog", admin_blog_url(@blog), method: :delete, confirm: "Are you sure?", class: "button-red"
+  = link_to "Delete blog", admin_news_url(@blog), method: :delete, confirm: "Are you sure?", class: "button-red"
 
   

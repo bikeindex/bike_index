@@ -1,4 +1,4 @@
-class Admin::BlogsController < Admin::BaseController
+class Admin::NewsController < Admin::BaseController
   before_filter :find_blog, only: [:show, :edit, :update, :destroy]
 
   def index
@@ -17,7 +17,7 @@ class Admin::BlogsController < Admin::BaseController
   def update
     if @blog.update_attributes(params[:blog])
       flash[:notice] = "Blog saved!"
-      redirect_to edit_admin_blog_url(@blog)
+      redirect_to edit_admin_news_url(@blog)
     else
       render action: :edit
     end
@@ -32,16 +32,16 @@ class Admin::BlogsController < Admin::BaseController
     })
     if @blog.save
       flash[:notice] = "Blog created!"
-      redirect_to edit_admin_blog_url(@blog)
+      redirect_to edit_admin_news_url(@blog)
     else
       flash[:error] = "Blog error! #{@blog.errors.full_messages.to_sentence}"
-      redirect_to new_admin_blog_url
+      redirect_to new_admin_news_index_url
     end
   end
 
   def destroy
     @blog.destroy
-    redirect_to admin_blogs_url
+    redirect_to admin_news_index_url
   end
 
   protected

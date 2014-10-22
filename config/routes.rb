@@ -114,7 +114,8 @@ Bikeindex::Application.routes.draw do
     resources :ownerships, only: [:edit, :update]
     match 'recover_organization', to: 'organizations#recover' 
     match 'show_deleted_organizations', to: 'organizations#show_deleted' 
-    resources :blogs, only: [:new, :create, :index, :edit, :update, :destroy]
+    match 'blog', to: redirect("/news")
+    resources :news, only: [:new, :create, :index, :edit, :update, :destroy]
     resources :ctypes, only: [:new, :create, :index, :edit, :update, :destroy] do 
       collection { post :import }
     end

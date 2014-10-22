@@ -1,13 +1,13 @@
 %header.with-subtitle
   %h1
     Our blogs
-  = link_to 'New Blog', new_admin_blog_url, class: "button-green sharing-links"
+  = link_to 'New Blog', new_admin_news_url, class: "button-green sharing-links"
 
 %hr
 
 - @blogs.each do |blog|
   %h2
-    = link_to blog.title, edit_admin_blog_url(blog)
+    = link_to blog.title, edit_admin_news_url(blog)
   %p.blog-index
     = blog.body_abbr.html_safe
 

@@ -25,7 +25,7 @@
 
 %hr
 - url = {action: "update", controller: "recoveries"}
-= form_for([:admin ,@recovery], :url => url , html: { class: "form form-horizontal" }) do |f|
+= form_for([:admin, @recovery], :url => url , html: { class: "form form-horizontal" }) do |f|
   - if @recovery.errors.any?
     #alert-block
       .alert.alert-error

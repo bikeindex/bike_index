@@ -4,7 +4,9 @@
 .row-fluid
   .span6.padded.well
     .form.form-horizontal#chosen-container
-      = form_for [:admin, @blog] do |f|
+      - url = {action: "create", controller: "news"}
+    
+      = form_for [:admin, @blog], :url => url do |f|
         - if @blog.errors.any?
           #alert-block
             .alert.alert-error

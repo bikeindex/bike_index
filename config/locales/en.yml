@@ -47,6 +47,7 @@ en:
     formats:
       standard_display: "%A, %B %d"
       short_with_year: "%a, %B %d %Y"
+      no_day_with_year: "%B %d %Y"
       blog: "%m_%d_%Y"
   errors: &errors
     format: ! '%{attribute} %{message}'

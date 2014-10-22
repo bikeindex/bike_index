@@ -1,5 +1,6 @@
 .form.form-horizontal#chosen-container
-  = form_for [:admin, @blog] do |f|
+  - url = {action: "update", controller: "news"}
+  = form_for [:admin, @blog], :url => url do |f|
     - if @blog.errors.any?
       #alert-block
         .alert.alert-error
