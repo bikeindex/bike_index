@@ -20,16 +20,18 @@ describe OrganizationInvitation do
       @o.valid?.should be_true
     end
 
-    it "should enqueue an email job" do
-      OrganizationInvitationEmailJob.should have_queued(@o.id)
-    end
-
     it "should assign to user if the user exists" do 
       @user = FactoryGirl.create(:user)
       @o1 = FactoryGirl.create(:organization_invitation, invitee_email: @user.email)
       @user.memberships.count.should eq(1)
       @o1.redeemed.should be_true
     end
+  end
+
+  it "should enqueue an email job" do
+    expect {
+      FactoryGirl.create(:organization_invitation)
+    }.to change(EmailOrganizationInvitationWorker.jobs, :size).by(1)
   end
 
   describe :normalize_email do 

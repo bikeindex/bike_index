@@ -82,7 +82,7 @@ class OrganizationsController < ApplicationController
   def update
     if params[:organization][:lightspeed_cloud_api_key].present?
       api_key = params[:organization][:lightspeed_cloud_api_key]
-      Resque.enqueue(LightspeedNotificationEmailJob, @organization.id, api_key)
+      EmailLightspeedNotificationWorker.perform_async(@organization.id, api_key)
       flash[:notice] = "Thanks for updating your LightSpeed API Key!"
       redirect_to organization_url(@organization) and return
       # @stolen_notification = StolenNotification.new(params[:stolen_notification])

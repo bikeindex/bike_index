@@ -29,8 +29,9 @@ describe Api::V1::NotificationsController do
           :retweet_screen_names=>[]
         }
       }
-      Resque.should_receive(:enqueue).with(StolenBikeAlertEmailJob, 1)
-      post :create, options, format: :json
+      expect {
+        post :create, options, format: :json
+      }.to change(EmailStolenBikeAlertWorker.jobs, :size).by(1)
       response.code.should eq("200")
       CustomerContact.count.should eq(1)
       customer_contact = CustomerContact.first

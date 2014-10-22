@@ -189,6 +189,5 @@ Bikeindex::Application.routes.draw do
   match '/500', to: 'errors#server_error'
 
   mount Sidekiq::Web => '/sidekiq', constraints: AdminRestriction
-  mount Resque::Server.new, at: '/resque', constraints: AdminRestriction
   
 end

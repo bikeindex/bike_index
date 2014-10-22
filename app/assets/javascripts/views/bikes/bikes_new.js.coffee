@@ -13,7 +13,9 @@ class BikeIndex.Views.BikesNew extends Backbone.View
       $('#bike_serial_number').val('absent').addClass('absent-serial')
     @updateCycleType()
     window.root_url = $('#root_url').attr('data-url')
+    
     @initializeFrameMaker("#bike_manufacturer_id")
+    @otherManufacturerDisplay($("#bike_manufacturer_id").val())
   
 
   updateSerial: (event) ->

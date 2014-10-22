@@ -24,8 +24,9 @@ describe StolenNotificationsController do
 
       it "should enqueue the stolen notification email job" do
         set_current_user(@user)
-        post :create, stolen_notification: stolen_notification_attributes
-        StolenNotificationEmailJob.should have_queued(StolenNotification.last.id)
+        expect {
+          post :create, stolen_notification: stolen_notification_attributes
+        }.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
       end
     end
 

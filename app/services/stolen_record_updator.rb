@@ -72,6 +72,8 @@ class StolenRecordUpdator
     	stolen_record.phone_for_shops = false
     	stolen_record.phone_for_police = false
     end
+    stolen_record.locking_description = sr[:locking_description]
+    stolen_record.lock_defeat_description = sr[:lock_defeat_description]
     stolen_record
   end
 

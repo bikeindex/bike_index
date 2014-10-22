@@ -60,7 +60,7 @@ describe OrganizationsController do
       membership = FactoryGirl.create(:membership, user: user, organization: organization)
       set_current_user(user)
       put :update, id: organization.slug, organization: { lightspeed_cloud_api_key: 'Some api key' }
-      LightspeedNotificationEmailJob.should have_queued(organization.id, 'Some api key')
+      expect(EmailLightspeedNotificationWorker).to have_enqueued_job(organization.id, 'Some api key')
     end
   end
 

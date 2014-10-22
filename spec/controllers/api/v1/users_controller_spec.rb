@@ -20,26 +20,29 @@ describe Api::V1::UsersController do
   end
 
   describe :send_request do 
-    it "should create a new serial update mail and update the serial" do 
-      o = FactoryGirl.create(:ownership)
-      user = o.creator
-      bike = o.bike
-      serial_request = { 
-        request_type: 'serial_update_request',
-        user_id: user.id,
-        request_bike_id: bike.id,
-        request_reason: 'Some reason',
-        serial_update_serial: 'some new serial'
-      }
-      set_current_user(user)
-      ActionMailer::Base.deliveries = []
-      SerialNormalizer.any_instance.should_receive(:save_segments)
-      Resque.should_receive(:enqueue)
-      post :send_request, serial_request
-      response.code.should eq('200')
-      FeedbackNotificationEmailJob.perform(Feedback.where(feedback_type: 'serial_update_request').first.id)
-      ActionMailer::Base.deliveries.should_not be_empty
-      bike.reload.serial_number.should eq('some new serial')
+    it "should actually send the mail" do 
+      Sidekiq::Testing.inline! do
+        # We don't test that this is being added to Sidekiq
+        # Because we're testing that sidekiq does what it 
+        # Needs to do here.
+        o = FactoryGirl.create(:ownership)
+        user = o.creator
+        bike = o.bike
+        serial_request = { 
+          request_type: 'serial_update_request',
+          user_id: user.id,
+          request_bike_id: bike.id,
+          request_reason: 'Some reason',
+          serial_update_serial: 'some new serial'
+        }
+        set_current_user(user)
+        ActionMailer::Base.deliveries = []
+        SerialNormalizer.any_instance.should_receive(:save_segments)
+        post :send_request, serial_request
+        response.code.should eq('200')
+        ActionMailer::Base.deliveries.should_not be_empty
+        bike.reload.serial_number.should eq('some new serial')
+      end
     end
 
     it "should create a new bike delete request mail" do 
@@ -53,14 +56,18 @@ describe Api::V1::UsersController do
         request_reason: 'Some reason',
       }
       set_current_user(user)
-      Resque.should_receive(:enqueue)
-      post :send_request, delete_request
+      expect {
+        post :send_request, delete_request
+      }.to change(EmailFeedbackNotificationWorker.jobs, :size).by(1)
       response.code.should eq('200')
     end
 
 
     it "should create a new recovery request mail" do 
       Sidekiq::Testing.inline! do 
+        # We don't test that this is being added to Sidekiq
+        # Because we're testing that sidekiq does what it 
+        # Needs to do here.
         o = FactoryGirl.create(:ownership)
         user = o.creator
         bike = o.bike
@@ -75,7 +82,6 @@ describe Api::V1::UsersController do
           can_share_recovery: 'true'
         }
         set_current_user(user)
-        Resque.should_receive(:enqueue)
         post :send_request, recovery_request.as_json
         response.code.should eq('200')
         # ALSO MAKE SURE IT RECOVERY NOTIFIES

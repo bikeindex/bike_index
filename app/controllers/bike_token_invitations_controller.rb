@@ -5,7 +5,7 @@ class BikeTokenInvitationsController < ApplicationController
     @bike_token_invitation = BikeTokenInvitation.new(params[:bike_token_invitation])
     @bike_token_invitation.inviter = current_user
     if @bike_token_invitation.save
-      Resque.enqueue(BikeTokenInvitationEmailJob, @bike_token_invitation.id)
+      EmailBikeTokenInvitationWorker.perform_async(@bike_token_invitation.id)
       flash[:notice] = "#{@bike_token_invitation.invitee_email} was sent #{@bike_token_invitation.bike_token_count} #{"bike".pluralize(@bike_token_invitation.bike_token_count)}!"
       redirect_to user_home_url
 

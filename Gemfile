@@ -9,7 +9,6 @@ gem 'bcrypt-ruby', '~> 3.0.0'
 gem 'active_model_serializers'
 gem 'aws-sdk', '~> 1.3.4'
 gem 'airbrake'
-gem 'resque', require: 'resque/server'
 gem 'sidekiq'
 gem 'sidekiq-failures'
 gem 'sidekiq-unique-jobs'
@@ -84,7 +83,6 @@ group :test do
   gem 'factory_girl_rails'
   gem 'simplecov', require: false
   gem "codeclimate-test-reporter", require: nil
-  gem 'resque_spec'
   gem 'rspec-sidekiq'
   gem 'shoulda-matchers'
   gem 'pry'

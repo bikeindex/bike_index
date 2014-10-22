@@ -105,7 +105,7 @@ class User < ActiveRecord::Base
 
   def send_password_reset_email
     self.set_password_reset_token
-    Resque.enqueue(ResetPasswordEmailJob, self.id)
+    EmailResetPasswordWorker.perform_async(self.id)
   end
 
   def confirm(token)

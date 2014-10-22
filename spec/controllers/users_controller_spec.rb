@@ -49,10 +49,10 @@ describe UsersController do
         user
       }
       it "should not create a user or send a welcome email" do
-        Resque.should_not_receive(:enqueue)
-        lambda do
+        expect{
           post :create, user: user_attributes
-        end.should_not change(User, :count)
+        }.to change(EmailWelcomeWorker.jobs, :size).by(0)
+        User.count.should eq(0)
       end
       it "should render new" do
         post :create, user: user_attributes
@@ -119,8 +119,9 @@ describe UsersController do
 
     it "should enqueue a password reset email job" do
       @user = FactoryGirl.create(:user, email: "ned@foo.com")
-      post :password_reset, email: @user.email
-      ResetPasswordEmailJob.should have_queued(@user.id)
+      expect {
+        post :password_reset, email: @user.email
+      }.to change(EmailResetPasswordWorker.jobs, :size).by(1)
     end
   end
 

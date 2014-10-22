@@ -178,7 +178,9 @@ describe Api::V1::BikesController do
         zipcode: "60622",
         state: "Palace",
         police_report_number: "99999999",
-        police_report_department: "Chicago"
+        police_report_department: "Chicago",
+        locking_description: 'some locking description',
+        lock_defeat_description: 'broken in some crazy way'
       }
       OwnershipCreator.any_instance.should_receive(:send_notification_email)
       lambda { 
@@ -190,6 +192,8 @@ describe Api::V1::BikesController do
       csr.address.should be_present
       csr.phone.should eq("9999999")
       csr.date_stolen.should eq(DateTime.strptime("03-01-2013 06", "%m-%d-%Y %H"))
+      csr.locking_description.should eq('some locking description')
+      csr.lock_defeat_description.should eq('broken in some crazy way')
     end
 
     it "should create an example bike if the bike is from example, and include all the options" do
@@ -211,10 +215,12 @@ describe Api::V1::BikesController do
         description: "something else",
         owner_email: "fun_times@examples.com"
       }
-      Resque.should_not_receive(:enqueue).with(OwnershipInvitationEmailJob, 1)
-      lambda { 
-        post :create, { bike: bike, organization_slug: org.slug, access_token: org.access_token }
-      }.should change(Ownership, :count).by(1)
+
+      expect {
+        lambda { 
+          post :create, { bike: bike, organization_slug: org.slug, access_token: org.access_token }
+        }.should change(Ownership, :count).by(1)
+      }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
       response.code.should eq("200")
       b = Bike.unscoped.where(serial_number: "69 example bikez").first
       b.example.should be_true
@@ -261,10 +267,11 @@ describe Api::V1::BikesController do
         send_email: 'false'
       }
       options = { bike: bike.to_json, organization_slug: @organization.slug, access_token: @organization.access_token } 
-      Resque.should_not_receive(:enqueue)
-      lambda { 
-        post :create, options
-      }.should change(Ownership, :count).by(1)
+      expect {
+        lambda { 
+          post :create, options
+        }.should change(Ownership, :count).by(1)
+      }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
       response.code.should eq("200")
     end
   end

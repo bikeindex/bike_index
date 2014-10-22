@@ -42,7 +42,7 @@ describe CreateUserJobs do
       user = User.new
       user.stub(:id).and_return(69)
       CreateUserJobs.new(user: user).send_welcome_email
-      WelcomeEmailJob.should have_queued(69)
+      expect(EmailWelcomeWorker).to have_enqueued_job(69)
     end
   end
 
@@ -51,7 +51,7 @@ describe CreateUserJobs do
       user = User.new
       user.stub(:id).and_return(69)
       CreateUserJobs.new(user: user).send_confirmation_email
-      ConfirmationEmailJob.should have_queued(69)
+      expect(EmailConfirmationWorker).to have_enqueued_job(69)
     end
   end
 
