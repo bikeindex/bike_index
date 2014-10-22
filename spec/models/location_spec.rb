@@ -14,18 +14,18 @@ describe Location do
 
   
   describe :set_phone do
-    it "should strip the non-digit numbers from the phone input" do
+    it "strips the non-digit numbers from the phone input" do
       location = FactoryGirl.create(:location, phone: '773.83ddp+83(887)')
       location.phone.should eq('7738383887')
     end
   end
 
   describe :address do 
-    it "should strip the non-digit numbers from the phone input" do
+    it "strips the non-digit numbers from the phone input" do
       location = FactoryGirl.create(:location)
       location.address.should be_a(String)
     end
-    it "should create an address" do 
+    it "creates an address" do 
       c = Country.create(name: "Neverland", iso: "XXX")
       s = State.create(country_id: c.id, name: "BullShit", abbreviation: "XXX")
       location = FactoryGirl.create(:location, street: "300 Blossom Hill Dr", city: "Lancaster", state_id: s.id, zipcode: "17601", country_id: c.id)
@@ -34,7 +34,7 @@ describe Location do
   end
 
   describe :org_location_id do 
-    it "should create a unique id that references the organization" do 
+    it "creates a unique id that references the organization" do 
       location = FactoryGirl.create(:location)
       location.org_location_id.should eq("#{location.organization_id}_#{location.id}")
     end

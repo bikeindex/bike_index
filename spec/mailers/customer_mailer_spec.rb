@@ -42,7 +42,7 @@ describe CustomerMailer do
       @mail = CustomerMailer.ownership_invitation_email(@ownership)
     end
 
-    it "should render email" do
+    it "renders email" do
       @mail.subject.should eq("Claim your bike on BikeIndex.org!")
     end
   end
@@ -54,7 +54,7 @@ describe CustomerMailer do
       @mail = CustomerMailer.organization_invitation_email(@organization_invitation)
     end
 
-    it "should render email" do
+    it "renders email" do
       @mail.subject.should eq("Join #{@organization.name} on the Bike Index")
     end
   end
@@ -65,14 +65,14 @@ describe CustomerMailer do
       @mail = CustomerMailer.bike_token_invitation_email(@bike_token_invitation)
     end
 
-    it "should render email" do
+    it "renders email" do
       @mail.subject.should eq("Test subject")
       @mail.body.encoded.should match(@bike_token_invitation.message)
     end
   end
 
   describe :stolen_notification_email do 
-    it "should render email and update sent_dates" do
+    it "renders email and update sent_dates" do
       stolen_notification = FactoryGirl.create(:stolen_notification, message: "Test Message", subject: "Test subject")
       mail = CustomerMailer.stolen_notification_email(stolen_notification)
       mail.subject.should eq("Test subject")
@@ -84,7 +84,7 @@ describe CustomerMailer do
   end
 
   describe :admin_contact_stolen_email do
-    it "should render email" do
+    it "renders email" do
       stolen_record = FactoryGirl.create(:stolen_record)
       user = FactoryGirl.create(:user, superuser: true)
       customer_contact = CustomerContact.new(user_email: stolen_record.bike.owner_email,
@@ -100,7 +100,7 @@ describe CustomerMailer do
     end
   end
   describe :stolen_bike_alert_email do
-    it "should render email" do
+    it "renders email" do
       stolen_record = FactoryGirl.create(:stolen_record)
       notification_hash = {
         notification_type: 'stolen_twitter_alerter',

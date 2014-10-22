@@ -9,14 +9,14 @@ describe Ctype do
       end
     end
 
-    it "should add component_types to the list" do
+    it "adds component_types to the list" do
       import_file = File.open(Rails.root.to_s + "/spec/component-type-test-import.csv")
       lambda {
         Ctype.import(import_file)
       }.should change(Ctype, :count).by(2)
     end
     
-    it "should add in all the attributes that are listed" do 
+    it "adds in all the attributes that are listed" do 
       import_file = File.open(Rails.root.to_s + "/spec/component-type-test-import.csv")
       Ctype.import(import_file)
       @component_type = Ctype.find_by_name("Pedal")
@@ -27,7 +27,7 @@ describe Ctype do
       @component_type2.secondary_name.should eq('Spinny')
     end
 
-    it "should update attributes on a second upload" do 
+    it "updates attributes on a second upload" do 
       import_file = File.open(Rails.root.to_s + "/spec/component-type-test-import.csv")
       Ctype.import(import_file)
       second_import_file = File.open(Rails.root.to_s + "/spec/component-type-test-import-second.csv")

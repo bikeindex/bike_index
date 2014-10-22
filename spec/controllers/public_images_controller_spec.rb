@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe PublicImagesController do
   describe :destroy do
-    it "should allow a the owner of a public_image to destroy the public_image" do
+    it "allows a the owner of a public_image to destroy the public_image" do
       user = FactoryGirl.create(:user)
       bike = FactoryGirl.create(:bike)
       o = FactoryGirl.create(:ownership, bike: bike, creator: user, owner_email: user.email)
@@ -15,7 +15,7 @@ describe PublicImagesController do
       end.should change(PublicImage, :count).by(-1)
     end
     
-    it "should ensure that current user owns image before allowing destroy" do
+    it "ensures that current user owns image before allowing destroy" do
       ownership = FactoryGirl.create(:ownership)
       bike = ownership.bike
       non_owner = FactoryGirl.create(:user, name: "Non Owner")
@@ -48,7 +48,7 @@ describe PublicImagesController do
   end
 
   describe :update do 
-    it "should update things and go back to editing the bike" do 
+    it "updates things and go back to editing the bike" do 
       user = FactoryGirl.create(:user)
       bike = FactoryGirl.create(:bike)
       o = FactoryGirl.create(:ownership, bike: bike, creator: user, owner_email: user.email)

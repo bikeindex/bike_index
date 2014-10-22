@@ -3,7 +3,7 @@ require 'spec_helper'
 describe BikeCreatorBuilder do
 
   describe :new_bike do 
-    it "should return a new bike object from the params with the b_param_id" do
+    it "returns a new bike object from the params with the b_param_id" do
       bike = Bike.new
       b_param = BParam.new 
       b_param.stub(:id).and_return(9)
@@ -15,7 +15,7 @@ describe BikeCreatorBuilder do
   end
 
   describe :add_front_wheel_size do
-    it "should set the front wheel equal to the rear wheel if it's present" do 
+    it "sets the front wheel equal to the rear wheel if it's present" do 
       cycle_type = FactoryGirl.create(:cycle_type, name: "Bike", slug: "bike")
       bike = Bike.new
       b_param = BParam.new 
@@ -29,7 +29,7 @@ describe BikeCreatorBuilder do
   end
 
   describe :add_required_attributes do 
-    it "should call the methods it needs to call" do 
+    it "calls the methods it needs to call" do 
       cycle_type = FactoryGirl.create(:cycle_type, name: "Bike", slug: "bike")
       propulsion_type = FactoryGirl.create(:propulsion_type, name: "Foot pedal")
       bike = Bike.new
@@ -42,7 +42,7 @@ describe BikeCreatorBuilder do
   end
 
   describe :verified_bike do
-    it "should call bike_creator_verifier the required attributes" do 
+    it "calls bike_creator_verifier the required attributes" do 
       b_param = BParam.new
       bike = Bike.new
       BikeCreatorVerifier.any_instance.should_receive(:verify).and_return(bike)
@@ -51,7 +51,7 @@ describe BikeCreatorBuilder do
   end
 
   describe :build_new do 
-    it "should call verified bike on new bike and return the bike" do 
+    it "calls verified bike on new bike and return the bike" do 
       bike = Bike.new 
       creator = BikeCreatorBuilder.new()
       creator.should_receive(:new_bike).and_return(bike)
@@ -62,7 +62,7 @@ describe BikeCreatorBuilder do
   end
 
   describe :build do 
-    it "should return the b_param bike if one exists" do 
+    it "returns the b_param bike if one exists" do 
       b_param = BParam.new
       bike = Bike.new 
       b_param.stub(:bike).and_return(bike)
@@ -70,7 +70,7 @@ describe BikeCreatorBuilder do
       BikeCreatorBuilder.new(b_param).build.should eq(bike)
     end
     
-    it "should use build_new and call other things" do 
+    it "uses build_new and call other things" do 
       b_param = BParam.new
       bike = Bike.new 
       b_param.stub(:created_bike).and_return(nil)

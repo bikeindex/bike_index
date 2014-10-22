@@ -11,11 +11,11 @@ describe Country do
 
 
   describe :fuzzy_iso_find do
-    it "should find the country by ISO address when the case doesn't match" do
+    it "finds the country by ISO address when the case doesn't match" do
       country = Country.create(name: "EEEEEEEh", iso: "LULZ" )
       Country.fuzzy_iso_find('lulz ').should == country
     end
-    it "should find USA" do
+    it "finds USA" do
       country = Country.create(name: "United States", iso: "US" )
       Country.fuzzy_iso_find('USA').should == country
     end

@@ -10,7 +10,7 @@ describe Feedback do
   end
 
   describe :create do
-    it "should enqueue an email job" do
+    it "enqueues an email job" do
       expect {
         FactoryGirl.create(:feedback)
       }.to change(EmailFeedbackNotificationWorker.jobs, :size).by(1)

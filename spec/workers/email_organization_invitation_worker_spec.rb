@@ -4,7 +4,7 @@ describe EmailOrganizationInvitationWorker do
   it { should be_processed_in :email }
 
 
-  it "should send an email" do
+  it "sends an email" do
     organization_invitation = FactoryGirl.create(:organization_invitation)
     ActionMailer::Base.deliveries = []
     EmailOrganizationInvitationWorker.new.perform(organization_invitation.id)

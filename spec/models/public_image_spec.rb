@@ -6,7 +6,7 @@ describe PublicImage do
   end
   
   describe :default_name do 
-    it "should set a default name from filename if not bike" do 
+    it "sets a default name from filename if not bike" do 
       public_image = PublicImage.new
       public_image.stub(:imageable_type).and_return("Nope")
       public_image.stub(:name).and_return("Boop")
@@ -14,7 +14,7 @@ describe PublicImage do
       public_image.name.should eq('Boop')
     end
 
-    it "should return the name of the manufacturer if it isn't other" do
+    it "returns the name of the manufacturer if it isn't other" do
       public_image = PublicImage.new
       bike = FactoryGirl.create(:bike, year: 1969, frame_model: "Hobo")
       public_image.stub(:imageable_type).and_return("Bike")

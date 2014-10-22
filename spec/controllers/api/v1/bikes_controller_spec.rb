@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Api::V1::BikesController do
   
   describe :index do
-    it "should load the page and have the correct headers" do
+    it "loads the page and have the correct headers" do
       FactoryGirl.create(:bike)
       get :index, format: :json
       response.code.should eq('200')
@@ -11,7 +11,7 @@ describe Api::V1::BikesController do
   end
 
   describe :stolen_ids do
-    it "should return correct code if no org" do 
+    it "returns correct code if no org" do 
       c = FactoryGirl.create(:color)
       get :stolen_ids, format: :json
       response.code.should eq("401")
@@ -35,7 +35,7 @@ describe Api::V1::BikesController do
   end
 
   describe :show do
-    it "should load the page" do
+    it "loads the page" do
       bike = FactoryGirl.create(:bike)
       get :show, id: bike.id, format: :json
       response.code.should eq("200")
@@ -52,26 +52,26 @@ describe Api::V1::BikesController do
       FactoryGirl.create(:propulsion_type, name: "Foot pedal")
     end
 
-    it "should return correct code if not logged in" do 
+    it "returns correct code if not logged in" do 
       c = FactoryGirl.create(:color)
       post :create, { bike: { serial_number: '69', color: c.name } }
       response.code.should eq("401")
     end
 
-    it "should return correct code if bike has errors" do 
+    it "returns correct code if bike has errors" do 
       c = FactoryGirl.create(:color)
       post :create, { bike: { serial_number: '69', color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }
       response.code.should eq("422")
     end
 
-    it "should email us if it can't create a record" do 
+    it "emails us if it can't create a record" do 
       c = FactoryGirl.create(:color)
       lambda {
         post :create, { bike: { serial_number: '69', color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }
       }.should change(Feedback, :count).by(1)
     end
 
-    it "should create a record and reset example" do
+    it "creates a record and reset example" do
       manufacturer = FactoryGirl.create(:manufacturer)
       FactoryGirl.create(:wheel_size, iso_bsd: 559)
       FactoryGirl.create(:cycle_type, slug: "bike")
@@ -129,7 +129,7 @@ describe Api::V1::BikesController do
       f_count.should eq(Feedback.count)
     end
 
-    it "should create a photos even inf one fails" do
+    it "creates a photos even inf one fails" do
       manufacturer = FactoryGirl.create(:manufacturer)
       FactoryGirl.create(:wheel_size, iso_bsd: 559)
       FactoryGirl.create(:cycle_type, slug: "bike")
@@ -154,7 +154,7 @@ describe Api::V1::BikesController do
       b.public_images.count.should eq(1)
     end
 
-    it "should create a stolen record" do
+    it "creates a stolen record" do
       manufacturer = FactoryGirl.create(:manufacturer)
       @organization.users.first.update_attribute :phone, '123-456-6969'
       FactoryGirl.create(:cycle_type, slug: "bike")
@@ -196,7 +196,7 @@ describe Api::V1::BikesController do
       csr.lock_defeat_description.should eq('broken in some crazy way')
     end
 
-    it "should create an example bike if the bike is from example, and include all the options" do
+    it "creates an example bike if the bike is from example, and include all the options" do
       FactoryGirl.create(:cycle_type, slug: "bike")
       FactoryGirl.create(:color, name: "Black")
       org = FactoryGirl.create(:organization, name: "Example organization")
@@ -230,7 +230,7 @@ describe Api::V1::BikesController do
       b.handlebar_type.slug.should eq("foo")
     end  
 
-    it "should create a record even if the post is a string" do
+    it "creates a record even if the post is a string" do
       manufacturer = FactoryGirl.create(:manufacturer)
       FactoryGirl.create(:wheel_size, iso_bsd: 559)
       FactoryGirl.create(:cycle_type, slug: "bike")
@@ -251,7 +251,7 @@ describe Api::V1::BikesController do
       response.code.should eq("200")    
     end
 
-    it "should not send an ownership email if it has no_email set" do
+    it "does not send an ownership email if it has no_email set" do
       manufacturer = FactoryGirl.create(:manufacturer)
       FactoryGirl.create(:wheel_size, iso_bsd: 559)
       FactoryGirl.create(:cycle_type, slug: "bike")

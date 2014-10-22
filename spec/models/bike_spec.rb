@@ -64,14 +64,14 @@ describe Bike do
   end
 
   describe :attr_cache_search do
-    it "should find bikes by attr cache" do
+    it "finds bikes by attr cache" do
       bike = FactoryGirl.create(:bike)
       query = ["1c#{bike.primary_frame_color_id}"]
       result = Bike.attr_cache_search(query)
       result.first.should eq(bike)
       result.class.should eq(ActiveRecord::Relation)
     end
-    it "should find bikes by wheel size" do
+    it "finds bikes by wheel size" do
       bike = FactoryGirl.create(:bike)
       query = ["1w#{bike.rear_wheel_size_id}"]
       result = Bike.attr_cache_search(query)
@@ -81,7 +81,7 @@ describe Bike do
   end
 
   describe :owner do
-    it "should receive owner from the last ownership" do
+    it "receives owner from the last ownership" do
       first_ownership = Ownership.new 
       second_ownership = Ownership.new
       @user = User.new
@@ -93,7 +93,7 @@ describe Bike do
   end
 
   describe :find_current_stolen_record do 
-    it "should return the last current stolen record if bike is stolen" do 
+    it "returns the last current stolen record if bike is stolen" do 
       @bike = Bike.new 
       first_stolen_record = StolenRecord.new
       second_stolen_record = StolenRecord.new
@@ -104,7 +104,7 @@ describe Bike do
       @bike.find_current_stolen_record.should eq(second_stolen_record)
     end
 
-    it "should be false if the bike isn't stolen" do 
+    it "is false if the bike isn't stolen" do 
       @bike = Bike.new 
       @bike.stub(:stolen).and_return(false)
       @bike.find_current_stolen_record.should be_false
@@ -112,7 +112,7 @@ describe Bike do
   end
 
   describe :manufacturer_name do 
-    it "should return the value of manufacturer_other if manufacturer is other" do 
+    it "returns the value of manufacturer_other if manufacturer is other" do 
       bike = Bike.new
       other_manufacturer = Manufacturer.new 
       other_manufacturer.stub(:name).and_return("Other")
@@ -121,7 +121,7 @@ describe Bike do
       bike.manufacturer_name.should eq("Other manufacturer name")
     end
 
-    it "should return the name of the manufacturer if it isn't other" do
+    it "returns the name of the manufacturer if it isn't other" do
       bike = Bike.new
       manufacturer = Manufacturer.new 
       manufacturer.stub(:name).and_return("Mnfg name")
@@ -129,7 +129,7 @@ describe Bike do
       bike.manufacturer_name.should eq("Mnfg name")
     end
 
-    it "should return Just SE Bikes" do
+    it "returns Just SE Bikes" do
       bike = Bike.new
       manufacturer = Manufacturer.new
       manufacturer.stub(:name).and_return("SE Racing (S E Bikes)")
@@ -139,7 +139,7 @@ describe Bike do
   end
 
   describe :type do 
-    it "should return the cycle type name" do 
+    it "returns the cycle type name" do 
       cycle_type = FactoryGirl.create(:cycle_type)
       bike = FactoryGirl.create(:bike, cycle_type: cycle_type)
       bike.type.should eq(cycle_type.name.downcase)
@@ -147,13 +147,13 @@ describe Bike do
   end
 
   describe :video_embed_src do 
-    it "should return false if there is no video_embed" do 
+    it "returns false if there is no video_embed" do 
       @bike = Bike.new 
       @bike.stub(:video_embed).and_return(nil)
       @bike.video_embed_src.should be_nil
     end
 
-    it "should return just the url of the video from a youtube iframe" do 
+    it "returns just the url of the video from a youtube iframe" do 
       youtube_share = '''
           <iframe width="560" height="315" src="//www.youtube.com/embed/Sv3xVOs7_No" frameborder="0" allowfullscreen></iframe>
         '''
@@ -162,7 +162,7 @@ describe Bike do
       @bike.video_embed_src.should eq('//www.youtube.com/embed/Sv3xVOs7_No')
     end
 
-    it "should return just the url of the video from a vimeo iframe" do 
+    it "returns just the url of the video from a vimeo iframe" do 
       vimeo_share = '''<iframe src="http://player.vimeo.com/video/13094257" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe><p><a href="http://vimeo.com/13094257">Fixed Gear Kuala Lumpur, RatsKL Putrajaya</a> from <a href="http://vimeo.com/user3635109">irmanhilmi</a> on <a href="http://vimeo.com">Vimeo</a>.</p>'''
       @bike = Bike.new 
       @bike.stub(:video_embed).and_return(vimeo_share)
@@ -171,14 +171,14 @@ describe Bike do
   end
 
   describe :set_mnfg_name do 
-    it "should set a bikes mnfg_name" do 
+    it "sets a bikes mnfg_name" do 
       manufacturer = FactoryGirl.create(:manufacturer, name: 'SE Racing ( S E Bikes )')
       bike = Bike.new
       bike.stub(:manufacturer).and_return(manufacturer)
       bike.set_mnfg_name
       bike.mnfg_name.should eq("SE Racing")
     end
-    it "should set a bikes mnfg_name" do 
+    it "sets a bikes mnfg_name" do 
       manufacturer = FactoryGirl.create(:manufacturer, name: 'Other')
       bike = Bike.new
       bike.stub(:manufacturer).and_return(manufacturer)
@@ -186,25 +186,25 @@ describe Bike do
       bike.set_mnfg_name
       bike.mnfg_name.should eq("stuff")
     end
-    it "should have before_save_callback_method defined for set_mnfg_name" do
+    it "has before_save_callback_method defined for set_mnfg_name" do
       Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_mnfg_name).should == true
     end
   end
 
   describe :set_normalized_serial do 
-    it "should set a bikes normalized_serial" do 
+    it "sets a bikes normalized_serial" do 
       bike = Bike.new
       SerialNormalizer.any_instance.should_receive(:normalized).and_return('normal')
       bike.set_normalized_serial
       bike.serial_normalized.should eq('normal')
     end
-    it "should have before_save_callback_method defined as a before_save callback" do
+    it "has before_save_callback_method defined as a before_save callback" do
       Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_normalized_serial).should == true
     end
   end
 
   describe :serial do 
-    it "should only return the serial if we should show people the serial" do 
+    it "only returns the serial if we should show people the serial" do 
       # We're hiding serial numbers for bikes that are recovered to provide a method of verifying 
       # ownership
       bike = Bike.new
@@ -216,13 +216,13 @@ describe Bike do
 
 
   describe "pg search" do 
-    it "should return a bike which has a matching part of its description" do
+    it "returns a bike which has a matching part of its description" do
       @bike = FactoryGirl.create(:bike, description: "Phil wood hub")
       @bikes = Bike.text_search("phil wood hub")
       @bikes.should include(@bike)
     end
 
-    it "should return the bikes in the default scope pattern if there is no query" do 
+    it "returns the bikes in the default scope pattern if there is no query" do 
       bike = FactoryGirl.create(:bike, description: "Phil wood hub")
       bike2 = FactoryGirl.create(:bike)
       bikes = Bike.text_search("")
@@ -231,40 +231,40 @@ describe Bike do
   end
 
   describe :set_paints do 
-    it "should return true if paint is a color" do 
+    it "returns true if paint is a color" do 
       FactoryGirl.create(:color, name: "Bluety")
       bike = Bike.new
       bike.stub(:paint_name).and_return(" blueTy")
       lambda { bike.set_paints }.should_not change(Paint, :count)
       bike.paint.should be_nil
     end
-    it "should remove paint id if paint_name is nil" do 
+    it "removes paint id if paint_name is nil" do 
       paint = FactoryGirl.create(:paint)
       bike = Bike.new(paint_id: paint.id)
       bike.stub(:paint_name).and_return('')
       bike.set_paints
       bike.paint.should be_nil
     end
-    it "should set the paint if it exists" do 
+    it "sets the paint if it exists" do 
       FactoryGirl.create(:paint, name: "poopy pile")
       bike = Bike.new
       bike.stub(:paint_name).and_return("Poopy PILE  ")
       lambda { bike.set_paints }.should_not change(Paint, :count)
       bike.paint.name.should eq("poopy pile")
     end
-    it "should create a new paint and set it otherwise" do 
+    it "creates a new paint and set it otherwise" do 
       bike = Bike.new
       bike.paint_name = ["Food Time SOOON"]
       lambda { bike.set_paints }.should change(Paint, :count).by(1)
       bike.paint.name.should eq("food time sooon")
     end
-    it "should have before_save_callback_method defined as a before_save callback" do
+    it "has before_save_callback_method defined as a before_save callback" do
       Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_paints).should == true
     end
   end
 
   describe :cache_photo do 
-    it "should cache the photo" do 
+    it "caches the photo" do 
       bike = FactoryGirl.create(:bike)
       image = FactoryGirl.create(:public_image, imageable: bike)
       bike.reload
@@ -274,7 +274,7 @@ describe Bike do
   end
 
   describe :components_cache_string do 
-    it "should cache the components" do 
+    it "caches the components" do 
       bike = FactoryGirl.create(:bike)
       c = FactoryGirl.create(:component, bike: bike)
       bike.save
@@ -283,7 +283,7 @@ describe Bike do
   end
 
   describe :cache_attributes do 
-    it "should cache the colors handlebar_type and wheel_size" do 
+    it "caches the colors handlebar_type and wheel_size" do 
       color = FactoryGirl.create(:color)
       handlebar = FactoryGirl.create(:handlebar_type)
       wheel = FactoryGirl.create(:wheel_size)
@@ -297,14 +297,14 @@ describe Bike do
   end
 
   describe :cache_stolen_attributes do 
-    it "should save the stolen description to all description and set stolen_rec_id" do 
+    it "saves the stolen description to all description and set stolen_rec_id" do 
       stolen_record = FactoryGirl.create(:stolen_record, theft_description: 'some theft description' )
       bike = stolen_record.bike
       bike.description = 'I love my bike'
       bike.cache_stolen_attributes
       bike.all_description.should eq('I love my bike some theft description')
     end
-    it "should grab the desc and erase current_stolen_id" do 
+    it "grabs the desc and erase current_stolen_id" do 
       bike = Bike.new(current_stolen_record_id: 69, description: 'lalalala')
       bike.cache_stolen_attributes
       bike.current_stolen_record_id.should_not be_present
@@ -314,7 +314,7 @@ describe Bike do
 
 
   describe :cache_bike do 
-    it "should call cache photo and cache component and erase stolen_rec_id" do 
+    it "calls cache photo and cache component and erase stolen_rec_id" do 
       bike = FactoryGirl.create(:bike, current_stolen_record_id: 69)
       bike.should_receive(:cache_photo)
       bike.should_receive(:cache_stolen_attributes)
@@ -323,7 +323,7 @@ describe Bike do
       bike.cache_bike
       bike.current_stolen_record_id.should be_nil
     end
-    it "should cache all the bike parts" do 
+    it "caches all the bike parts" do 
       type = FactoryGirl.create(:cycle_type, name: "Unicycle")
       handlebar = FactoryGirl.create(:handlebar_type)
       material = FactoryGirl.create(:frame_material)
@@ -340,14 +340,14 @@ describe Bike do
       b.cached_data.should eq("#{b.manufacturer_name} Hand pedaled 1999 #{b.primary_frame_color.name} #{b.secondary_frame_color.name} #{b.tertiary_frame_color.name} #{material.name} SO MANY ballsacks #{b.frame_model} #{b.rear_wheel_size.name} wheel  unicycle ")
       b.current_stolen_record_id.should eq(s.id)
     end
-    it "should have before_save_callback_method defined as a before_save callback" do
+    it "has before_save_callback_method defined as a before_save callback" do
       Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:cache_bike).should == true
     end
   end
 
 
   describe :frame_colors do 
-    it "should return an array of the frame colors" do 
+    it "returns an array of the frame colors" do 
       bike = Bike.new 
       color = Color.new
       color2 = Color.new
@@ -361,7 +361,7 @@ describe Bike do
   end
 
   describe :cgroup_array do
-    it "should grab a list of all the cgroups" do 
+    it "grabs a list of all the cgroups" do 
       bike = Bike.new
       component1 = Component.new 
       component2 = Component.new 
@@ -375,7 +375,7 @@ describe Bike do
   end
 
   describe :get_listing_order do 
-    it "should be 1/1000 of the current timestamp" do 
+    it "is 1/1000 of the current timestamp" do 
       bike = Bike.new
       time = Time.now
       bike.stub(:updated_at).and_return(time)
@@ -383,7 +383,7 @@ describe Bike do
       lo.should eq(time.to_time.to_i/1000000)
     end
     
-    it "should be the current stolen record date stolen * 1000" do 
+    it "is the current stolen record date stolen * 1000" do 
       bike = Bike.new
       bike.stub(:stolen).and_return(true)
       stolen_record = StolenRecord.new 
@@ -394,7 +394,7 @@ describe Bike do
       lo.should eq(yesterday.to_time.to_i)
     end
 
-    it "should be the updated_at" do 
+    it "is the updated_at" do 
       bike = Bike.new
       last_week = Time.now - 7.days
       bike.stub(:updated_at).and_return(last_week)
@@ -403,7 +403,7 @@ describe Bike do
       lo.should eq(last_week.to_time.to_i/10000)
     end
 
-    it "shouldn't get out of integer errors" do
+    it "does not get out of integer errors" do
       stolen_record = FactoryGirl.create(:stolen_record)
       bike = stolen_record.bike
       problem_date = Date.strptime("07-22-0014", "%m-%d-%Y")

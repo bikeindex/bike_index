@@ -68,9 +68,6 @@ GEM
       multi_json (~> 1.0)
     acts_as_paranoid (0.4.2)
       activerecord (~> 3.2)
-    airbrake (4.0.0)
-      builder
-      multi_json
     arel (3.0.3)
     aws-sdk (1.3.9)
       httparty (~> 0.7)
@@ -337,6 +334,7 @@ GEM
       sass (>= 3.1.10)
       tilt (~> 1.3)
     sexp_processor (4.4.3)
+    should_clean (0.0.3)
     shoulda-matchers (2.6.0)
       activesupport (>= 3.0.0)
     sidekiq (3.0.1)
@@ -415,7 +413,6 @@ PLATFORMS
 DEPENDENCIES
   active_model_serializers
   acts_as_paranoid (~> 0.4.0)
-  airbrake
   aws-sdk (~> 1.3.4)
   backbone-on-rails (~> 0.9.10.0)
   bcrypt-ruby (~> 3.0.0)
@@ -465,6 +462,7 @@ DEPENDENCIES
   rspec-sidekiq
   ruby_gntp
   sass-rails (~> 3.2.3)
+  should_clean
   shoulda-matchers
   sidekiq
   sidekiq-failures

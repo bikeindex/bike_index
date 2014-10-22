@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Api::V1::NotificationsController do
 
   describe :send_notification_email do 
-    it "should return correct code if authentication fails" do 
+    it "returns correct code if authentication fails" do 
       bike = FactoryGirl.create(:bike)
       options = { some_stuff: 'things',
         other_stuff: 'Things',
@@ -13,7 +13,7 @@ describe Api::V1::NotificationsController do
       response.code.should eq("401")
     end
 
-    it "should send an email if the authorization works" do
+    it "sends an email if the authorization works" do
       CustomerContact.count.should eq(0)
       stolen_record = FactoryGirl.create(:stolen_record)
       options = {

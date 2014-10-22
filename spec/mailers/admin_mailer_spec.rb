@@ -65,7 +65,7 @@ describe AdminMailer do
       @mail = AdminMailer.blocked_stolen_notification_email(@stolen_notification)
     end
 
-    it "should render email" do
+    it "renders email" do
       @mail.subject[/blocked/i].present?.should be_true
       @mail.body.encoded.should match(@stolen_notification.message)
     end

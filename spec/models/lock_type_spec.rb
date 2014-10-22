@@ -11,7 +11,7 @@ describe LockType do
   end
   
   describe :manufacturer_name do 
-    it "should return the value of manufacturer_other if manufacturer is other" do 
+    it "returns the value of manufacturer_other if manufacturer is other" do 
       lock = Lock.new
       other_manufacturer = Manufacturer.new 
       other_manufacturer.stub(:name).and_return("Other")
@@ -20,7 +20,7 @@ describe LockType do
       lock.manufacturer_name.should eq("Other manufacturer name")
     end
 
-    it "should return the name of the manufacturer if it isn't other" do
+    it "returns the name of the manufacturer if it isn't other" do
       lock = Lock.new
       manufacturer = Manufacturer.new 
       manufacturer.stub(:name).and_return("Mnfg name")

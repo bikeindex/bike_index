@@ -8,7 +8,7 @@ gem 'jquery-rails'
 gem 'bcrypt-ruby', '~> 3.0.0'
 gem 'active_model_serializers'
 gem 'aws-sdk', '~> 1.3.4'
-gem 'airbrake'
+
 gem 'sidekiq'
 gem 'sidekiq-failures'
 gem 'sidekiq-unique-jobs'
@@ -70,6 +70,7 @@ group :development do
   gem 'guard-rspec', '~> 4.2.10'
   gem 'guard-livereload'
   gem 'bullet'
+  gem 'should_clean'
 end
 
 group :development, :test do

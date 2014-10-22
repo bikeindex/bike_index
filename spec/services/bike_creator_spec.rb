@@ -3,12 +3,12 @@ require 'spec_helper'
 describe BikeCreator do
 
   describe :include_bike_book do 
-    it "should return the bike if stuff isn't present" do 
+    it "returns the bike if stuff isn't present" do 
       bike = Bike.new
       creator = BikeCreator.new()
       creator.add_bike_book_data.should be_nil
     end
-    it "should add se bike data if it exists" do 
+    it "adds se bike data if it exists" do 
       manufacturer = FactoryGirl.create(:manufacturer, name: "SE Bikes")
       color = FactoryGirl.create(:color)
       bike = {
@@ -32,7 +32,7 @@ describe BikeCreator do
   end
 
   describe :build_new_bike do 
-    it "should call creator_builder" do 
+    it "calls creator_builder" do 
       b_param = BParam.new
       BikeCreatorBuilder.any_instance.should_receive(:build_new).and_return(true)
       BikeCreator.new(b_param).build_new_bike
@@ -40,7 +40,7 @@ describe BikeCreator do
   end
 
   describe :build_bike do 
-    it "should call creator_builder" do 
+    it "calls creator_builder" do 
       b_param = BParam.new
       BikeCreatorBuilder.any_instance.should_receive(:build).and_return(Bike.new)
       BikeCreator.new(b_param).build_bike.should be_true
@@ -48,7 +48,7 @@ describe BikeCreator do
   end
 
   describe :create_associations do 
-    it "should call creator_associator" do 
+    it "calls creator_associator" do 
       b_param = BParam.new
       bike = Bike.new 
       b_param.stub(:bike).and_return(bike)
@@ -58,7 +58,7 @@ describe BikeCreator do
   end
 
   describe :clear_bike do
-    it "should remove the existing bike and transfer the errors to a new active record object" do 
+    it "removes the existing bike and transfer the errors to a new active record object" do 
       b_param = BParam.new
       bike = FactoryGirl.create(:bike)
       bike.errors.add(:rando_error, "LOLZ")
@@ -70,7 +70,7 @@ describe BikeCreator do
   end
 
   describe :validate_record do
-    it "should call remove associations if the bike was created and there are errors" do 
+    it "calls remove associations if the bike was created and there are errors" do 
       b_param = BParam.new
       bike = Bike.new 
       b_param.stub(:bike).and_return(bike)
@@ -80,7 +80,7 @@ describe BikeCreator do
       creator.validate_record(bike)
     end
 
-    it "should call delete the already existing bike if one exists" do 
+    it "calls delete the already existing bike if one exists" do 
       # This is to clean up duplicates, people press the 'add bike button' many times when its slow to respond
       b_param = BParam.new
       bike = FactoryGirl.create(:bike)
@@ -90,7 +90,7 @@ describe BikeCreator do
       Bike.where(id: bike1.id).should be_empty
     end
 
-    it "should associate the b_param with the bike and clear the bike_errors if the bike is created" do 
+    it "associates the b_param with the bike and clear the bike_errors if the bike is created" do 
       b_param = BParam.new
       bike = Bike.new
       b_param.stub(:id).and_return(42)
@@ -104,7 +104,7 @@ describe BikeCreator do
 
   describe :save_bike do 
     Sidekiq::Testing.inline! do 
-      it "should create a bike with the parameters it is passed and return it" do
+      it "creates a bike with the parameters it is passed and return it" do
         propulsion_type = FactoryGirl.create(:propulsion_type)
         cycle_type = FactoryGirl.create(:cycle_type)
         organization = FactoryGirl.create(:organization)
@@ -154,7 +154,7 @@ describe BikeCreator do
   end
 
   describe :new_bike do 
-    it "should call the required methods" do
+    it "calls the required methods" do
       creator = BikeCreator.new()
       creator.should_receive(:build_new_bike).and_return(true)
       creator.new_bike
@@ -163,7 +163,7 @@ describe BikeCreator do
 
   describe :create_bike do 
     Sidekiq::Testing.inline! do 
-      it "should save the bike" do 
+      it "saves the bike" do 
         b_param = BParam.new
         bike = Bike.new 
         creator = BikeCreator.new(b_param)
@@ -175,7 +175,7 @@ describe BikeCreator do
       end
     end
 
-    it "should return the bike instead of saving if the bike has payment_required errors" do 
+    it "returns the bike instead of saving if the bike has payment_required errors" do 
       b_param = BParam.new
       bike = Bike.new 
       creator = BikeCreator.new(b_param)
@@ -185,7 +185,7 @@ describe BikeCreator do
       creator.create_bike
     end
 
-    it "should return the bike instead of saving if the bike has errors" do 
+    it "returns the bike instead of saving if the bike has errors" do 
       b_param = BParam.new
       bike = Bike.new(serial_number: "LOLZ")
       bike.errors.add(:errory, "something")

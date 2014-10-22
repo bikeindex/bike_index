@@ -8,7 +8,7 @@ describe RecoveryNotifyWorker do
     expect(RecoveryNotifyWorker).to have_enqueued_job
   end
   Sidekiq::Testing.inline! do
-    it "should post to the recovery app with no sharing" do
+    it "posts to the recovery app with no sharing" do
       bike = FactoryGirl.create(:stolen_bike)
       bike.current_stolen_record.can_share_recovery.should be_false
       bike.current_stolen_record.date_recovered = Time.now
@@ -19,7 +19,7 @@ describe RecoveryNotifyWorker do
       bike.reload.current_stolen_record.recovery_posted.should be_true
     end
 
-    it "should post to the recovery app with sharing" do
+    it "posts to the recovery app with sharing" do
       bike = FactoryGirl.create(:stolen_bike)
       bike.current_stolen_record.can_share_recovery = true
       bike.current_stolen_record.date_recovered = Time.now

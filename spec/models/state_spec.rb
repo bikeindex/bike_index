@@ -13,7 +13,7 @@ describe State do
   end
 
   describe :fuzzy_abbr_find do
-    it "should find users by email address when the case doesn't match" do
+    it "finds users by email address when the case doesn't match" do
       state = FactoryGirl.create(:state, abbreviation: "LULZ" )
       State.fuzzy_abbr_find('lulz ').should == state
     end

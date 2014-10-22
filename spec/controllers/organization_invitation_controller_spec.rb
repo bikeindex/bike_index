@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe OrganizationInvitationsController do
   describe :new do 
-    it "should render the page" do 
+    it "renders the page" do 
       user = FactoryGirl.create(:user, email: "MEMBERSTHING@ggg.com")
       organization = FactoryGirl.create(:organization, available_invitation_count: 1)
       membership = FactoryGirl.create(:membership, organization: organization, user: user, role: "admin")
@@ -20,7 +20,7 @@ describe OrganizationInvitationsController do
       session[:user_id] = @user.id
     end
     
-    it "should create a new organization_invitation and reduce the organization invitation tokens by one" do
+    it "creates a new organization_invitation and reduce the organization invitation tokens by one" do
       lambda {
         put :create, organization_id: @organization.slug, organization_invitation: { 
           inviter_id: @user.id,
@@ -32,7 +32,7 @@ describe OrganizationInvitationsController do
       @organization.sent_invitation_count.should eq(1)
     end
 
-    it "should not create a new organization_invitation if there are no available invitations" do
+    it "does not create a new organization_invitation if there are no available invitations" do
       @organization.update_attributes(available_invitation_count: 0)
       lambda {
         put :create, organization_id: @organization.slug, organization_invitation: { 

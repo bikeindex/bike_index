@@ -3,7 +3,7 @@ require 'spec_helper'
 describe BikeCreatorTokenizer do
 
   describe :untokenize do
-    it "should remove the token attributes" do 
+    it "removes the token attributes" do 
       bike = Bike.new(created_with_token: true, bike_token_id: 2)
       b_param = BParam.new(params: {stolen: false})
       creator = BikeCreatorTokenizer.new(b_param, bike)
@@ -14,7 +14,7 @@ describe BikeCreatorTokenizer do
   end
 
   describe :use_token do
-    it "should mark the bike tokened" do 
+    it "marks the bike tokened" do 
       bike_token = BikeToken.new 
       bike = Bike.new(payment_required: true)
       b_param = FactoryGirl.create(:b_param, params: {stolen: false})
@@ -33,7 +33,7 @@ describe BikeCreatorTokenizer do
   end
 
   describe :tokenize do 
-    it "should find the bike token and call use token if token is usable" do
+    it "finds the bike token and call use token if token is usable" do
       bike = Bike.new
       b_param = BParam.new
       bike_token = BikeToken.new
@@ -47,14 +47,14 @@ describe BikeCreatorTokenizer do
   end
 
   describe :find_token do 
-    it "should add an error to the bike if the token doesn't exist" do 
+    it "adds an error to the bike if the token doesn't exist" do 
       bike = Bike.new
       b_param = BParam.new
       creator = BikeCreatorTokenizer.new(b_param, bike)
       creator.find_token(2).should be_false
       bike.errors[:bike_token].should_not be_nil
     end
-    it "should find the token and return it" do 
+    it "finds the token and return it" do 
       bike = Bike.new
       b_param = BParam.new
       bike_token = FactoryGirl.create(:bike_token)
@@ -64,7 +64,7 @@ describe BikeCreatorTokenizer do
   end
 
   describe :token_usable do 
-    it "should add an error if the creator isn't the owner" do
+    it "adds an error if the creator isn't the owner" do
       bike = Bike.new
       b_param = BParam.new
       bike_token = BikeToken.new
@@ -75,7 +75,7 @@ describe BikeCreatorTokenizer do
       creator.token_usable(bike_token).should be_false
       bike.errors[:bike_token].should_not be_nil
     end
-    it "should add an error if the token is used" do 
+    it "adds an error if the token is used" do 
       bike = Bike.new
       b_param = BParam.new
       bike_token = BikeToken.new
@@ -86,7 +86,7 @@ describe BikeCreatorTokenizer do
       creator.token_usable(bike_token).should be_false
       bike.errors[:bike_token].should_not be_nil
     end
-    it "should return true" do 
+    it "returns true" do 
       bike = Bike.new
       b_param = BParam.new
       bike_token = BikeToken.new
@@ -99,7 +99,7 @@ describe BikeCreatorTokenizer do
   end
 
   describe :check_token do
-    it "should return false if bike token is not present" do 
+    it "returns false if bike token is not present" do 
       bike = Bike.new
       b_param = BParam.new(params: {stolen: false})
       creator = BikeCreatorTokenizer.new(b_param, bike)
@@ -107,7 +107,7 @@ describe BikeCreatorTokenizer do
       creator.check_token
     end
 
-    it "should call tokenize with the token if it's on b_param" do 
+    it "calls tokenize with the token if it's on b_param" do 
       bike = Bike.new
       b_param = BParam.new
       b_param.stub(:bike_token_id).and_return(69)
@@ -116,7 +116,7 @@ describe BikeCreatorTokenizer do
       creator.check_token
     end
 
-    it "should call tokenize with the token if it's in the params" do 
+    it "calls tokenize with the token if it's in the params" do 
       bike = Bike.new
       b_param = BParam.new
       b_param.stub(:params).and_return(bike_token_id: 69)
@@ -125,7 +125,7 @@ describe BikeCreatorTokenizer do
       creator.check_token
     end
 
-    it "should call tokenize with the token if it's in the bike params" do 
+    it "calls tokenize with the token if it's in the bike params" do 
       bike = Bike.new
       b_param = BParam.new
       b_param.stub(:params).and_return(bike: {bike_token_id: 69})
@@ -136,7 +136,7 @@ describe BikeCreatorTokenizer do
   end
 
   describe :tokenized_bike do 
-    it "should untokenize if there are errors and return the bike" do 
+    it "untokenizes if there are errors and return the bike" do 
       bike = Bike.new(description: "Special description")
       bike.errors.add(:bike_token, "Oh no, you've already used that free bike ticket!")
       b_param = BParam.new

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe LockDecorator do
   describe :lock_type_name do 
-    it "should return the lock type name other name if present" do 
+    it "returns the lock type name other name if present" do 
       lock = Lock.new
       lock_type = LockType.new
       lock.stub(:lock_type).and_return(lock_type)

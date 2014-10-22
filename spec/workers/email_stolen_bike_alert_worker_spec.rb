@@ -4,7 +4,7 @@ describe EmailStolenBikeAlertWorker do
   it { should be_processed_in :email }
 
   describe :perform do
-    it "should send an email" do
+    it "sends an email" do
       stolen_record = FactoryGirl.create(:stolen_record)
       info_hash = {
         notification_type: 'stolen_twitter_alerter',
@@ -23,7 +23,7 @@ describe EmailStolenBikeAlertWorker do
       ActionMailer::Base.deliveries.should_not be_empty
     end
 
-    it "should not send an email if the stolen bike has receive_notifications false" do
+    it "does not send an email if the stolen bike has receive_notifications false" do
       stolen_record = FactoryGirl.create(:stolen_record, receive_notifications: false)
       stolen_record.bike.update_attribute :stolen, true
       customer_contact = FactoryGirl.create(:customer_contact, bike: stolen_record.bike)

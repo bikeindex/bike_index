@@ -11,15 +11,15 @@ describe StolenRecord do
     it { should belong_to :creation_organization }
   end
 
-  it "should mark current true by default" do 
+  it "marks current true by default" do 
     stolen_record = StolenRecord.new
     stolen_record.current.should be_true
   end
 
-  it "should only allow one current stolen record per bike"
+  it "only allows one current stolen record per bike"
 
   describe :address do 
-    it "should create an address" do 
+    it "creates an address" do 
       c = Country.create(name: "Neverland", iso: "XXX")
       s = State.create(country_id: c.id, name: "BullShit", abbreviation: "XXX")
       stolen_record = FactoryGirl.create(:stolen_record, street: "2200 N Milwaukee Ave", city: "Chicago", state_id: s.id, zipcode: "60647", country_id: c.id)
@@ -28,21 +28,21 @@ describe StolenRecord do
   end
 
   describe "scopes" do 
-    it "should only include current records" do 
+    it "only includes current records" do 
       StolenRecord.scoped.to_sql.should == StolenRecord.where(current: true).to_sql
     end
   
-    it "should only include non-current in recovered" do 
+    it "only includes non-current in recovered" do 
       StolenRecord.recovered.to_sql.should == StolenRecord.where(current: false).order("date_recovered desc").to_sql
     end
 
-    it "should only include sharable unapproved in recovery_waiting_share_approval" do 
+    it "only includes sharable unapproved in recovery_waiting_share_approval" do 
       StolenRecord.recovery_unposted.to_sql.should == StolenRecord.where(current: false, recovery_posted: false).to_sql
     end
   end
 
   describe :tsv_row do 
-    it "should return the tsv row" do 
+    it "returns the tsv row" do 
       stolen_record = FactoryGirl.create(:stolen_record)
       stolen_record.bike.update_attribute :description, "I like tabs because i'm an \\tass\T right\N"
       row = stolen_record.tsv_row
@@ -60,7 +60,7 @@ describe StolenRecord do
       stolen_record.phone.should eq('0000000000')
       stolen_record.secondary_phone.should eq('0000000000')
     end
-    it "should have before_save_callback_method defined as a before_save callback" do
+    it "has before_save_callback_method defined as a before_save callback" do
       StolenRecord._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_phone).should == true
     end
   end
@@ -79,7 +79,7 @@ describe StolenRecord do
       stolen_record.titleize_city
       stolen_record.city.should eq('Georgian La')
     end
-    it "should have before_save_callback_method defined as a before_save callback" do
+    it "has before_save_callback_method defined as a before_save callback" do
       StolenRecord._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:titleize_city).should == true
     end
   end
@@ -107,7 +107,7 @@ describe StolenRecord do
       stolen_record.date_stolen.year.should eq(2013)
     end
 
-    it "should have before_save_callback_method defined as a before_save callback" do
+    it "has before_save_callback_method defined as a before_save callback" do
       StolenRecord._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:fix_date).should == true
     end
   end

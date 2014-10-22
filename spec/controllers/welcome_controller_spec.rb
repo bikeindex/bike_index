@@ -42,7 +42,7 @@ describe WelcomeController do
     end
 
     describe "user things should be assigned" do 
-      it "should send the bikes and the locks" do 
+      it "sends the bikes and the locks" do 
         user = FactoryGirl.create(:user)
         ownership = FactoryGirl.create(:ownership, user: user, current: true)
         lock = FactoryGirl.create(:lock, user: user)

@@ -3,7 +3,7 @@ require 'spec_helper'
 describe EmailStolenNotificationWorker do
   it { should be_processed_in :email }
 
-  it "should send an email" do
+  it "sends an email" do
     stolen_notification = FactoryGirl.create(:stolen_notification)
     ActionMailer::Base.deliveries = []
     EmailStolenNotificationWorker.new.perform(stolen_notification.id)

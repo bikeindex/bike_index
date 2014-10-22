@@ -9,7 +9,7 @@ describe Admin::UsersController do
         get :edit, id: "STUFFFFFF"
       }.should raise_error(ActionController::RoutingError)
     end
-    it "should show the edit page if the user exists" do 
+    it "shows the edit page if the user exists" do 
       @admin = FactoryGirl.create(:user, superuser: true)
       @user = FactoryGirl.create(:user)
       set_current_user(@admin)
@@ -19,7 +19,7 @@ describe Admin::UsersController do
   end
 
   describe :update do 
-    it "should update all the things that can be edited" do 
+    it "updates all the things that can be edited" do 
       @admin = FactoryGirl.create(:user, superuser: true)
       @user = FactoryGirl.create(:user, confirmed: false)
       set_current_user(@admin)

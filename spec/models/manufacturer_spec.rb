@@ -13,25 +13,25 @@ describe Manufacturer do
 
 
   describe :fuzzy_name_find do
-    it "should find users by email address when the case doesn't match" do
+    it "finds users by email address when the case doesn't match" do
       mnfg = FactoryGirl.create(:manufacturer, name: "Poopy PANTERS")
       Manufacturer.fuzzy_name_find('poopy panters').should == mnfg
     end
-    it "should find users by email address when the case doesn't match" do
+    it "finds users by email address when the case doesn't match" do
       mnfg = FactoryGirl.create(:manufacturer, name: 'SE Racing (S E Bikes)')
       Manufacturer.fuzzy_name_find('SE ').should == mnfg
     end
   end
 
   describe "import csv" do 
-    it "should add manufacturers to the list" do
+    it "adds manufacturers to the list" do
       import_file = File.open(Rails.root.to_s + "/spec/manufacturer-test-import.csv")
       lambda {
         Manufacturer.import(import_file)
       }.should change(Manufacturer, :count).by(2)
     end
     
-    it "should add in all the attributes that are listed" do 
+    it "adds in all the attributes that are listed" do 
       import_file = File.open(Rails.root.to_s + "/spec/manufacturer-test-import.csv")
       Manufacturer.import(import_file)
       @manufacturer = Manufacturer.find_by_slug("surly")
@@ -43,7 +43,7 @@ describe Manufacturer do
       @manufacturer2.website.should eq('http://wethepeople.com')
     end
 
-    it "should update attributes on a second upload" do 
+    it "updates attributes on a second upload" do 
       import_file = File.open(Rails.root.to_s + "/spec/manufacturer-test-import.csv")
       Manufacturer.import(import_file)
       second_import_file = File.open(Rails.root.to_s + "/spec/manufacturer-test-import-second.csv")

@@ -3,7 +3,7 @@ require 'spec_helper'
 describe BikeCreatorOrganizer do
 
   describe :unorganize do
-    it "should remove the token attributes" do 
+    it "removes the token attributes" do 
       bike = Bike.new(creation_organization_id: 4)
       b_param = BParam.new(params: {stolen: false})
       creator = BikeCreatorOrganizer.new(b_param, bike)
@@ -13,7 +13,7 @@ describe BikeCreatorOrganizer do
   end
 
   describe :use_organization do
-    it "should mark the bike organized" do 
+    it "marks the bike organized" do 
       bike_token = BikeToken.new 
       bike = Bike.new(payment_required: true)
       b_param = BParam.new(params: {stolen: false})
@@ -28,7 +28,7 @@ describe BikeCreatorOrganizer do
   end
 
   describe :organize do 
-    it "should find the organization and call use organization if it's usable" do
+    it "finds the organization and call use organization if it's usable" do
       bike = Bike.new
       b_param = BParam.new
       organization = Organization.new
@@ -42,14 +42,14 @@ describe BikeCreatorOrganizer do
   end
 
   describe :find_organization do 
-    it "should add an error to the bike if the organization doesn't exist" do 
+    it "adds an error to the bike if the organization doesn't exist" do 
       bike = Bike.new
       b_param = BParam.new
       creator = BikeCreatorOrganizer.new(b_param, bike)
       creator.find_organization(2).should be_false
       bike.errors[:organization].should_not be_nil
     end
-    it "should find the organization and return it" do 
+    it "finds the organization and return it" do 
       bike = Bike.new
       b_param = BParam.new
       organization = FactoryGirl.create(:organization)
@@ -59,7 +59,7 @@ describe BikeCreatorOrganizer do
   end
 
   describe :organization_usable do 
-    it "should add an error if the creator doesn't have a membership to the organization and the bike isn't created with a bike token" do
+    it "adds an error if the creator doesn't have a membership to the organization and the bike isn't created with a bike token" do
       bike = Bike.new
       b_param = BParam.new
       organization = BikeToken.new
@@ -73,7 +73,7 @@ describe BikeCreatorOrganizer do
       creator.organization_usable(organization).should be_false
       bike.errors[:creation_organization].should_not be_nil
     end
-    it "should add an error if the organization is suspended is used" do 
+    it "adds an error if the organization is suspended is used" do 
       bike = Bike.new
       b_param = BParam.new
       organization = BikeToken.new
@@ -85,7 +85,7 @@ describe BikeCreatorOrganizer do
       bike.errors[:creation_organization].should_not be_nil
     end
 
-    it "should return true" do
+    it "returns true" do
       bike = Bike.new
       b_param = BParam.new
       organization = BikeToken.new
@@ -101,7 +101,7 @@ describe BikeCreatorOrganizer do
   end
 
   describe :check_organization do
-    it "should return false if organization is not present" do 
+    it "returns false if organization is not present" do 
       bike = Bike.new
       b_param = BParam.new(params: {stolen: false})
       creator = BikeCreatorOrganizer.new(b_param, bike)
@@ -109,7 +109,7 @@ describe BikeCreatorOrganizer do
       creator.check_organization
     end
 
-    it "should call organize with the organization id if if it's in the params" do 
+    it "calls organize with the organization id if if it's in the params" do 
       bike = Bike.new
       b_param = BParam.new
       b_param.stub(:params).and_return(creation_organization_id: 69)
@@ -118,7 +118,7 @@ describe BikeCreatorOrganizer do
       creator.check_organization
     end
 
-    it "should call organize with the org if it's in the bike params" do 
+    it "calls organize with the org if it's in the bike params" do 
       bike = Bike.new
       b_param = BParam.new
       b_param.stub(:params).and_return(bike: {creation_organization_id: 69})
@@ -129,7 +129,7 @@ describe BikeCreatorOrganizer do
   end
 
   describe :organized_bike do 
-    it "should unorganize if there are errors and return the bike" do
+    it "unorganizes if there are errors and return the bike" do
       bike = Bike.new(created_with_token: false)
       bike.errors.add(:creation_organization, "Oh no, wrong org")
       b_param = BParam.new

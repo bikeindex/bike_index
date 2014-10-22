@@ -17,7 +17,7 @@ describe BikeToken do
       @bike2 = FactoryGirl.create(:bike)
     end
 
-    it "should set the used_at timestamp when used" do
+    it "sets the used_at timestamp when used" do
       @bike_token.used_at.should be_nil
       @bike_token.bike = @bike
       @bike_token.save

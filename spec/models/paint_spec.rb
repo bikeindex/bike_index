@@ -13,7 +13,7 @@ describe Paint do
   it { should have_many :bikes }
 
   describe "lowercase name" do
-    it "should make the name lowercase on save" do
+    it "makes the name lowercase on save" do
       pd = Paint.create(name: "Hazel or Something")
       pd.name.should eq("hazel or something")
     end
@@ -21,7 +21,7 @@ describe Paint do
 
 
   describe :fuzzy_name_find do
-    it "should find users by email address when the case doesn't match" do
+    it "finds users by email address when the case doesn't match" do
       paint = FactoryGirl.create(:paint, name: "Poopy PAiNTERS")
       Paint.fuzzy_name_find('poopy painters').should == paint
     end
@@ -34,7 +34,7 @@ describe Paint do
         FactoryGirl.create(:color, name: col)
       end
     end
-    it "should associate paint with reasonable colors" do
+    it "associates paint with reasonable colors" do
       paint = Paint.new(name: "burgandy/ivory with black stripes")
       paint.associate_colors
       expect(paint.color.name.downcase).to eq("red")
@@ -42,7 +42,7 @@ describe Paint do
       expect(paint.tertiary_color.name.downcase).to eq("black")
     end
 
-    it "should associate only as many colors as it finds" do
+    it "associates only as many colors as it finds" do
       paint = Paint.new(name: "wood with leaf details")
       paint.associate_colors
       expect(paint.color.name.downcase).to eq("brown")
@@ -50,7 +50,7 @@ describe Paint do
       expect(paint.tertiary_color).to be_nil
     end
 
-    it "should have before_create_callback_method" do
+    it "has before_create_callback_method" do
       Paint._create_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:associate_colors).should == true
     end
   end

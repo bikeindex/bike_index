@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe HeaderTagHelper do
   describe :header_tags do 
-    it "should return the html for the tags" do
+    it "returns the html for the tags" do
       helper.stub(:set_header_tag_hash).and_return({ tags: true })
       helper.stub(:set_social_hash).and_return({ tags: true })
       helper.stub(:title_tag_html).and_return("<title>Foo 69 69</title>\n")
@@ -12,7 +12,7 @@ describe HeaderTagHelper do
   end
 
   describe :title_tag_html do 
-    it "should return the title wrapped in title tags" do 
+    it "returns the title wrapped in title tags" do 
       header_hash = {
         title_tag: { title: "Foo 69 69" },
         meta_tags: { charset: "utf-8" }
@@ -23,7 +23,7 @@ describe HeaderTagHelper do
   end
 
   describe :meta_tags_html do 
-    it "should return the meta tags in html" do 
+    it "returns the meta tags in html" do 
       header_hash = {
         title_tag: { title: "Foo 69 69" },
         meta_tags: { charset: "utf-8" }
@@ -34,7 +34,7 @@ describe HeaderTagHelper do
   end
 
   describe :set_social_hash do 
-    it "should have some values" do 
+    it "has some values" do 
       d = helper.set_social_hash({ title_tag: { title: "Loosers" }, meta_tags: {description: "Something 69"} })
       d[:meta_tags][:"og:title"].should eq("Loosers")
       d[:meta_tags][:"twitter:title"].should eq("Loosers")
@@ -44,7 +44,7 @@ describe HeaderTagHelper do
   end
 
   describe :default_hash do 
-    it "should have some values" do 
+    it "has some values" do 
       d = helper.default_hash
       d[:title_tag][:title].should eq("Bike Index")
       d[:meta_tags][:description].should_not be_nil
@@ -52,13 +52,13 @@ describe HeaderTagHelper do
     end
   end
   describe :set_header_tag_hash do 
-    it "should call the controller name header tags if it's listed" do 
+    it "calls the controller name header tags if it's listed" do 
       view.stub(:controller_name).and_return("bikes")
       helper.stub(:bikes_header_tags).and_return("69 and stuff")
       helper.set_header_tag_hash.should eq("69 and stuff")
     end
 
-    it "should return page default tags if controller doesn't match a condition" do 
+    it "returns page default tags if controller doesn't match a condition" do 
       view.stub(:controller_name).and_return("Something fucking weird")
       helper.stub(:current_page_auto_hash).and_return("defaulted")
       helper.set_header_tag_hash.should eq("defaulted")
@@ -73,7 +73,7 @@ describe HeaderTagHelper do
       })
     end
 
-    it "should return the description and title if localization name exists" do
+    it "returns the description and title if localization name exists" do
       view.stub(:action_name).and_return("index")
       view.stub(:controller_name).and_return("bikes")
       h = helper.current_page_auto_hash
@@ -81,7 +81,7 @@ describe HeaderTagHelper do
       h[:title_tag][:title].should eq("Search Results")
     end
 
-    it "should return the action name humanized and default description" do 
+    it "returns the action name humanized and default description" do 
       view.stub(:action_name).and_return("some_weird_action")
       h = helper.current_page_auto_hash
       h[:title_tag][:title].should eq("Some weird action")
@@ -90,13 +90,13 @@ describe HeaderTagHelper do
   end
 
   describe :title_auto_hash do 
-    it "should return the controller name on Index" do 
+    it "returns the controller name on Index" do 
       view.stub(:action_name).and_return("index")
       view.stub(:controller_name).and_return("cool_thing")
       helper.current_page_auto_hash[:title_tag][:title].should eq("Cool thing")
     end
 
-    it "should return the controller name and new on New" do 
+    it "returns the controller name and new on New" do 
       view.stub(:action_name).and_return("edit")
       view.stub(:controller_name).and_return("cool_things")
       helper.current_page_auto_hash[:title_tag][:title].should eq("Edit cool thing")
@@ -124,7 +124,7 @@ describe HeaderTagHelper do
       hash[:meta_tags][:description].should_not eq("Blank")
     end
 
-    it "should return the bike name on Show" do 
+    it "returns the bike name on Show" do 
       @bike = Bike.new
       @bike.stub(:stock_photo_url).and_return("http://something.com")
       @bike.stub(:title_string).and_return("Something special 1969")

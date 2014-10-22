@@ -48,7 +48,7 @@ describe Admin::BikesController do
       it { should set_the_flash }
     end
 
-    it "should call update_ownership" do
+    it "calls update_ownership" do
       BikeUpdator.any_instance.should_receive(:update_ownership)
       bike = FactoryGirl.create(:bike)
       user = FactoryGirl.create(:user, superuser: true)
@@ -56,7 +56,7 @@ describe Admin::BikesController do
       put :update, id: bike.id
     end
 
-    it "should call serial_normalizer" do
+    it "calls serial_normalizer" do
       SerialNormalizer.any_instance.should_receive(:save_segments)
       bike = FactoryGirl.create(:bike)
       user = FactoryGirl.create(:user, superuser: true)
@@ -76,7 +76,7 @@ describe Admin::BikesController do
   end
 
   describe :update_manufacturers do 
-    it "should update the products" do 
+    it "updates the products" do 
       user = FactoryGirl.create(:user, superuser: true)
       set_current_user(user)
       request.env["HTTP_REFERER"] = 'http://lvh.me:3000/admin/bikes/missing_manufacturers'

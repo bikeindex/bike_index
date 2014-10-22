@@ -13,7 +13,7 @@ describe OrganizationsController do
   end
 
   describe :create do 
-    it "should create org, membership, filter approved attrs & redirect to org with current_user" do 
+    it "creates org, membership, filter approved attrs & redirect to org with current_user" do 
       Organization.count.should eq(0)
       user = FactoryGirl.create(:user)
       set_current_user(user)
@@ -54,7 +54,7 @@ describe OrganizationsController do
       @organization.reload.website.should eq('http://www.drseuss.org')
     end
 
-    it "should send an admin notification if there is the lightspeed cloud api key" do 
+    it "sends an admin notification if there is the lightspeed cloud api key" do 
       user = FactoryGirl.create(:user)
       organization = FactoryGirl.create(:organization)
       membership = FactoryGirl.create(:membership, user: user, organization: organization)
@@ -78,7 +78,7 @@ describe OrganizationsController do
     end
     
     describe "when user is present" do 
-      it "should render" do 
+      it "renders" do 
         organization = FactoryGirl.create(:organization)
         user = FactoryGirl.create(:user)
         membership = FactoryGirl.create(:membership, user: user, organization: organization)
@@ -90,7 +90,7 @@ describe OrganizationsController do
   end
 
   describe :edit do 
-    it "should render when user is admin" do 
+    it "renders when user is admin" do 
       organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:user)
       membership = FactoryGirl.create(:membership, user: user, organization: organization, role: "admin")

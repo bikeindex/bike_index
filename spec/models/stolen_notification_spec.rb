@@ -13,7 +13,7 @@ describe StolenNotification do
   end
 
   describe :create do
-    it "should enqueue an email job, and enque a second one if user has permission to send multiple" do
+    it "enqueues an email job, and enque a second one if user has permission to send multiple" do
       user = FactoryGirl.create(:user, can_send_many_stolen_notifications: true)
       expect {
         FactoryGirl.create(:stolen_notification, sender: user)
@@ -24,7 +24,7 @@ describe StolenNotification do
         stolen_notification2 = FactoryGirl.create(:stolen_notification, sender: user)
       }.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
     end
-    it "should not enqueue an StolenNotificationEmailJob if user doesn't have permission" do 
+    it "does not enqueue an StolenNotificationEmailJob if user doesn't have permission" do 
       user = FactoryGirl.create(:user)
       expect {
         stolen_notification = FactoryGirl.create(:stolen_notification, sender: user)

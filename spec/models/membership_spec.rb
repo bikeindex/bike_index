@@ -8,7 +8,7 @@ describe Membership do
       @user = FactoryGirl.create(:user)
     end
 
-    it "should add bike tokens on create" do
+    it "adds bike tokens on create" do
       lambda {
         FactoryGirl.create(:membership, organization: @organization, user: @user)
       }.should change(BikeToken, :count).by(5)

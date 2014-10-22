@@ -9,7 +9,7 @@ describe Color do
   end
 
   describe :fuzzy_name_find do
-    it "should find users by email address when the case doesn't match" do
+    it "finds users by email address when the case doesn't match" do
       color = FactoryGirl.create(:color, name: "Poopy PANTERS")
       Color.fuzzy_name_find('poopy panters').should == color
     end

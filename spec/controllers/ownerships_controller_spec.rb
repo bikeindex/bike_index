@@ -19,14 +19,14 @@ describe OwnershipsController do
         set_current_user(@user)
       end
       
-      it "should redirect and not change the ownership" do
+      it "redirects and not change the ownership" do
         put :show, id: @ownership.id
         response.code.should eq('302')
         flash.should be_present 
         @ownership.reload.claimed.should be_false
       end
       
-      it "should redirect and not change the ownership if it isn't current" do
+      it "redirects and not change the ownership if it isn't current" do
         @ownership.update_attributes(owner_email: @user.email, current: false)
         put :show, id: @ownership.id
         response.code.should eq('302')
@@ -34,7 +34,7 @@ describe OwnershipsController do
         @ownership.reload.claimed.should be_false
       end
   
-      it "should redirect and mark current based on fuzzy find" do
+      it "redirects and mark current based on fuzzy find" do
         @ownership.update_attributes(owner_email: @user.email.upcase)
         put :show, id: @ownership.id
         response.code.should eq('302')

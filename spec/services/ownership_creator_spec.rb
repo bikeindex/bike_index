@@ -2,13 +2,13 @@ require 'spec_helper'
 
 describe OwnershipCreator do
   describe :owner_id do 
-    it "should find the user" do 
+    it "finds the user" do 
       user = FactoryGirl.create(:user, email: "foo@email.com")
       create_ownership = OwnershipCreator.new
       create_ownership.stub(:find_owner_email).and_return("foo@email.com")
       create_ownership.owner_id.should eq(user.id)
     end
-    it "should return false if the user doesn't exist" do 
+    it "returns false if the user doesn't exist" do 
       create_ownership = OwnershipCreator.new()
       create_ownership.stub(:find_owner_email).and_return("foo")
       create_ownership.owner_id.should be_nil
@@ -16,7 +16,7 @@ describe OwnershipCreator do
   end
 
   describe :find_owner_email do 
-    it "should be the bike params unless owner_email is present" do 
+    it "is the bike params unless owner_email is present" do 
       bike = Bike.new
       bike.stub(:owner_email).and_return("foo@email.com")
       OwnershipCreator.new(bike: bike).find_owner_email.should eq("foo@email.com")
@@ -24,7 +24,7 @@ describe OwnershipCreator do
   end
 
   describe :send_notification_email do 
-    it "should send a notification email" do 
+    it "sends a notification email" do 
       ownership = Ownership.new
       ownership.stub(:id).and_return(2)
       expect {
@@ -32,7 +32,7 @@ describe OwnershipCreator do
       }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
     end
 
-    it "should not send a notification email for example bikes" do 
+    it "does not send a notification email for example bikes" do 
       ownership = Ownership.new
       ownership.stub(:id).and_return(2)
       ownership.stub(:example).and_return(true)
@@ -41,7 +41,7 @@ describe OwnershipCreator do
       }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
     end
 
-    it "should not send a notification email for ownerships with no_email set" do 
+    it "does not send a notification email for ownerships with no_email set" do 
       ownership = Ownership.new
       ownership.stub(:id).and_return(2)
       ownership.stub(:send_email).and_return(false)
@@ -52,7 +52,7 @@ describe OwnershipCreator do
   end
 
   describe :new_ownership_params do
-    it "should create new ownership attributes" do 
+    it "creates new ownership attributes" do 
       user = User.new
       bike = Bike.new 
       user.stub(:id).and_return(69)
@@ -71,7 +71,7 @@ describe OwnershipCreator do
       new_params[:current].should be_true
     end
 
-    it "should create a current new ownership if the ownership is created by the same person" do 
+    it "creates a current new ownership if the ownership is created by the same person" do 
       user = User.new
       bike = Bike.new 
       user.stub(:id).and_return(69)
@@ -90,7 +90,7 @@ describe OwnershipCreator do
   end
 
   describe :mark_other_ownerships_not_current do 
-    it "should mark existing ownerships as not current" do 
+    it "marks existing ownerships as not current" do 
       ownership1 = FactoryGirl.create(:ownership)
       bike = ownership1.bike 
       ownership2 = FactoryGirl.create(:ownership, bike: bike)
@@ -112,7 +112,7 @@ describe OwnershipCreator do
   end
 
   describe :create_ownership do
-    it "should call mark not current and send notification and create a new ownership" do
+    it "calls mark not current and send notification and create a new ownership" do
       create_ownership = OwnershipCreator.new()
       new_params = {bike_id: 1,user_id: 69, owner_email: "f@f.com", creator_id: 69,claimed: true, current: true}
       create_ownership.stub(:mark_other_ownerships_not_current).and_return(true)
@@ -120,7 +120,7 @@ describe OwnershipCreator do
       create_ownership.should_receive(:send_notification_email).and_return(true)
       lambda { create_ownership.create_ownership }.should change(Ownership, :count).by(1)
     end
-    it "should call mark not current and send notification and create a new ownership" do
+    it "calls mark not current and send notification and create a new ownership" do
       create_ownership = OwnershipCreator.new()
       new_params = {creator_id: 69, claimed: true, current: true}
       create_ownership.stub(:mark_other_ownerships_not_current).and_return(true)

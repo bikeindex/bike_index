@@ -3,7 +3,7 @@ require 'spec_helper'
 describe BikeDecorator do
 
   describe :current_owner_exists do 
-    it "should make sure that the current owner exists" do 
+    it "makes sure that the current owner exists" do 
       # if you send the bike to a new owner, the creator has edit rights
       # We want to differentiate the two
       bike = Bike.new
@@ -15,7 +15,7 @@ describe BikeDecorator do
   end
 
   describe :can_be_claimed_by do 
-    it "should return true if the bike can be claimed" do 
+    it "returns true if the bike can be claimed" do 
       user = User.new
       ownership = Ownership.new
       bike = Bike.new
@@ -28,7 +28,7 @@ describe BikeDecorator do
   end
 
   describe :show_other_bikes do 
-    it "should link to bikes if the user is the current owner and wants to share" do 
+    it "links to bikes if the user is the current owner and wants to share" do 
       bike = Bike.new
       user = User.new 
       bike.stub(:owner).and_return(user)
@@ -41,7 +41,7 @@ describe BikeDecorator do
   end
 
   describe :bike_show_twitter_and_website do
-    it "should call the method from application decorator" do 
+    it "calls the method from application decorator" do 
       user = User.new
       bike = Bike.new
       bike.stub(:owner).and_return(user)
@@ -53,7 +53,7 @@ describe BikeDecorator do
   end
 
   describe :title do 
-    it "should return the major bike attribs formatted" do 
+    it "returns the major bike attribs formatted" do 
       bike = Bike.new
       bike.stub(:year).and_return("1999")
       bike.stub(:frame_model).and_return("model")
@@ -64,11 +64,11 @@ describe BikeDecorator do
   end
 
   describe :phoneable_by do 
-    it "shouldn't return anything if there isn't a stolen record" do 
+    it "does not return anything if there isn't a stolen record" do 
       bike = Bike.new
       BikeDecorator.new(bike).phoneable_by.should be_nil
     end
-    it "should return true if users can see it" do 
+    it "returns true if users can see it" do 
       bike = Bike.new 
       stolen_record = StolenRecord.new
       bike.stub(:stolen).and_return(true)
@@ -77,7 +77,7 @@ describe BikeDecorator do
       BikeDecorator.new(bike).phoneable_by.should be_true
     end
 
-    it "should return true if users can see it and user is there" do 
+    it "returns true if users can see it and user is there" do 
       user = User.new
       bike = Bike.new 
       stolen_record = StolenRecord.new
@@ -87,7 +87,7 @@ describe BikeDecorator do
       BikeDecorator.new(bike).phoneable_by(user).should be_true
     end
 
-    it "should return true if shops can see it and user has shop membership" do 
+    it "returns true if shops can see it and user has shop membership" do 
       user = User.new
       bike = Bike.new 
       stolen_record = StolenRecord.new
@@ -99,7 +99,7 @@ describe BikeDecorator do
       BikeDecorator.new(bike).phoneable_by(user).should be_true
     end
 
-    it "should return true if police can see it and user is police" do 
+    it "returns true if police can see it and user is police" do 
       user = User.new
       bike = Bike.new 
       stolen_record = StolenRecord.new
@@ -112,7 +112,7 @@ describe BikeDecorator do
       BikeDecorator.new(bike).phoneable_by(user).should be_true
     end
 
-    it "should return true for superusers" do 
+    it "returns true for superusers" do 
       user = User.new
       bike = Bike.new 
       stolen_record = StolenRecord.new
@@ -127,13 +127,13 @@ describe BikeDecorator do
   end
 
   describe :tire_width do 
-    it "should return wide if false" do 
+    it "returns wide if false" do 
       bike = Bike.new
       bike.stub(:front_tire_narrow).and_return(nil)
       decorator = BikeDecorator.new(bike).tire_width("front")
       decorator.should eq("wide")
     end
-    it "should return narrow if narrow" do 
+    it "returns narrow if narrow" do 
       bike = Bike.new
       bike.stub(:rear_tire_narrow).and_return(true)
       decorator = BikeDecorator.new(bike).tire_width("rear")
@@ -142,14 +142,14 @@ describe BikeDecorator do
   end
 
   describe :list_link_url do 
-    it "should return the bike edit path if edit" do 
+    it "returns the bike edit path if edit" do 
       bike = Bike.new 
       bike.stub(:id).and_return(69)
       decorator = BikeDecorator.new(bike).list_link_url("edit")
       decorator.should eq("/bikes/69/edit")
     end
 
-    it "should return the normal path if passed" do 
+    it "returns the normal path if passed" do 
       bike = Bike.new 
       bike.stub(:id).and_return(69)
       decorator = BikeDecorator.new(bike).list_link_url()
@@ -158,7 +158,7 @@ describe BikeDecorator do
   end
 
   describe :thumb_image do 
-    it "should return the thumb path if one exists" do 
+    it "returns the thumb path if one exists" do 
       bike = Bike.new
       bike.stub(:thumb_path).and_return("pathy")
       decorator = BikeDecorator.new(bike)
@@ -168,14 +168,14 @@ describe BikeDecorator do
   end
 
   describe :list_image do 
-    it "should return the link with  thumb path if nothing is passed" do 
+    it "returns the link with  thumb path if nothing is passed" do 
       bike = Bike.new
       bike.stub(:id).and_return(69)
       decorator = BikeDecorator.new(bike)
       decorator.stub(:thumb_image).and_return("imagey")
       decorator.list_image.should_not be_nil
     end
-    it "should return the images thumb path" do 
+    it "returns the images thumb path" do 
       bike = Bike.new
       bike.stub(:id).and_return(69)
       bike.stub(:thumb_path).and_return("something")

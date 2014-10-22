@@ -24,16 +24,16 @@ describe UsersController do
 
   describe :create do
     describe "success" do
-      it "should create a non-confirmed record" do
+      it "creates a non-confirmed record" do
         lambda do
           post :create, user: FactoryGirl.attributes_for(:user)
         end.should change(User, :count).by(1)
       end
-      it "should call create_user_jobs" do
+      it "calls create_user_jobs" do
         CreateUserJobs.any_instance.should_receive(:do_jobs)
         post :create, user: FactoryGirl.attributes_for(:user)
       end
-      it "should create a confirmed user, log in, and send welcome if user has org invite" do
+      it "creates a confirmed user, log in, and send welcome if user has org invite" do
         CreateUserJobs.any_instance.should_receive(:send_welcome_email)
         organization_invitation = FactoryGirl.create(:organization_invitation, invitee_email: "poo@pile.com")
         post :create, user: FactoryGirl.attributes_for(:user, email: "poo@pile.com")
@@ -48,13 +48,13 @@ describe UsersController do
         user[:password_confirmation] = "bazoo"
         user
       }
-      it "should not create a user or send a welcome email" do
+      it "does not create a user or send a welcome email" do
         expect{
           post :create, user: user_attributes
         }.to change(EmailWelcomeWorker.jobs, :size).by(0)
         User.count.should eq(0)
       end
-      it "should render new" do
+      it "renders new" do
         post :create, user: user_attributes
         response.should render_template('new')
       end
@@ -63,7 +63,7 @@ describe UsersController do
 
   describe :confirm do  
     describe "user exists" do
-      it "should tell the user to log in when already confirmed" do
+      it "tells the user to log in when already confirmed" do
         @user = FactoryGirl.create(:user, confirmed: true)
         get :confirm, id: @user.id, code: "wtfmate"
         response.should redirect_to new_session_url
@@ -75,14 +75,14 @@ describe UsersController do
           User.should_receive(:find).and_return(@user)
         end
         
-        it "should login and redirect when confirmation succeeds" do
+        it "logins and redirect when confirmation succeeds" do
           @user.should_receive(:confirm).and_return(true)
           get :confirm, id: @user.id, code: @user.confirmation_token
           session[:user_id].should == @user.id
           response.should redirect_to user_home_url
         end
 
-        it "should show a view when confirmation fails" do
+        it "shows a view when confirmation fails" do
           @user.should_receive(:confirm).and_return(false)
           get :confirm, id: @user.id, code: "Wtfmate"
           response.should render_template :confirm_error_bad_token
@@ -90,7 +90,7 @@ describe UsersController do
       end
     end
 
-    it "should show an appropriate message when the user is nil" do
+    it "shows an appropriate message when the user is nil" do
       get :confirm, id: 1234, code: "Wtfmate"
       response.should render_template :confirm_error_404
     end
@@ -112,12 +112,12 @@ describe UsersController do
       end
     end
 
-    it "should not log in if the token is present and valid" do
+    it "does not log in if the token is present and valid" do
       post :password_reset, token: "Not Actually a token"
       response.should render_template :request_password_reset
     end
 
-    it "should enqueue a password reset email job" do
+    it "enqueues a password reset email job" do
       @user = FactoryGirl.create(:user, email: "ned@foo.com")
       expect {
         post :password_reset, email: @user.email
@@ -133,7 +133,7 @@ describe UsersController do
       }.should raise_error(ActionController::RoutingError)
     end
     
-    it "should redirect to user home url if the user exists but doesn't want to show their page" do 
+    it "redirects to user home url if the user exists but doesn't want to show their page" do 
       @user = FactoryGirl.create(:user)
       @user.show_bikes = false
       @user.save
@@ -181,14 +181,14 @@ describe UsersController do
   end
 
   describe :update do 
-    it "should update the terms of service" do 
+    it "updates the terms of service" do 
       user = FactoryGirl.create(:user, terms_of_service: false)
       session[:user_id] = user.id 
       post :update, { id: user.username, user: {terms_of_service: "1"} }
       response.should redirect_to(user_home_url)
       user.reload.terms_of_service.should be_true
     end
-    it "should update the vendor terms of service" do 
+    it "updates the vendor terms of service" do 
       user = FactoryGirl.create(:user, terms_of_service: false)
       org =  FactoryGirl.create(:organization)
       FactoryGirl.create(:membership, organization: org, user: user)

@@ -15,7 +15,7 @@ describe Organization do
   end
 
   describe :set_urls do
-    it "should not add http:// to the website if the url doesn't have it so that the link goes somewhere" do
+    it "does not add http:// to the website if the url doesn't have it so that the link goes somewhere" do
       organization = FactoryGirl.create(:organization, website: "somewhere.org" )
       organization.website.should eq('somewhere.org')
     end
@@ -26,7 +26,7 @@ describe Organization do
   end
 
   describe :set_short_name_and_slug do 
-    it "should set the short_name and the slug" do 
+    it "sets the short_name and the slug" do 
       organization = Organization.new(name: 'something')
       organization.set_short_name_and_slug
       organization.short_name.should be_present
@@ -36,7 +36,7 @@ describe Organization do
       organization.slug.should eq(slug)
     end
 
-    it "should protect from name collisions, without erroring because of it's own slug" do 
+    it "protects from name collisions, without erroring because of it's own slug" do 
       org1 = Organization.create(name: 'Bicycle shop')
       org1.reload.save
       org1.reload.slug.should eq('bicycle-shop')
@@ -45,13 +45,13 @@ describe Organization do
       organization.slug.should eq('bicycle-shop-2')
     end
 
-    it "should have before_save_callback_method defined for set_short_name_and_slug" do
+    it "has before_save_callback_method defined for set_short_name_and_slug" do
       Organization._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_short_name_and_slug).should == true
     end
   end
 
   describe :set_auto_user do 
-    it "should set the embedable user" do 
+    it "sets the embedable user" do 
       organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:user, email: "embed@org.com")
       membership = FactoryGirl.create(:membership, organization: organization, user: user)
@@ -59,14 +59,14 @@ describe Organization do
       organization.save
       organization.reload.auto_user_id.should eq(user.id)
     end
-    it "should not set the embedable user if user is not a member" do 
+    it "does not set the embedable user if user is not a member" do 
       organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:user, email: "no_embed@org.com")
       organization.embedable_user_email = "no_embed@org.com"
       organization.save
       organization.reload.auto_user_id.should be_nil
     end
-    it "should set the embedable user if it isn't set and the org has members" do 
+    it "sets the embedable user if it isn't set and the org has members" do 
       organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:user)
       membership = FactoryGirl.create(:membership, user: user, organization: organization)

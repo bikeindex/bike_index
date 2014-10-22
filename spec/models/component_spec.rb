@@ -9,7 +9,7 @@ describe Component do
   end
 
   describe :component_type do 
-    it "should return the name of the ctype other if it should" do 
+    it "returns the name of the ctype other if it should" do 
       ctype = Ctype.new
       component = Component.new
       component.stub(:ctype).and_return(ctype)
@@ -18,7 +18,7 @@ describe Component do
       component.component_type.should eq("OOOP")
     end
 
-    it "should return the name of the ctype" do 
+    it "returns the name of the ctype" do 
       ctype = Ctype.new
       component = Component.new
       component.stub(:ctype).and_return(ctype)
@@ -28,7 +28,7 @@ describe Component do
   end
 
   describe :set_front_or_rear do 
-    it "should return the name of the ctype other if it should" do 
+    it "returns the name of the ctype other if it should" do 
       bike = FactoryGirl.create(:bike)
       component = FactoryGirl.create(:component, bike: bike,  front_or_rear: "both")
       bike.reload.components.count.should eq(2)
@@ -49,7 +49,7 @@ describe Component do
   end
 
   describe :manufacturer_name do 
-    it "should return the value of manufacturer_other if manufacturer is other" do 
+    it "returns the value of manufacturer_other if manufacturer is other" do 
       mnfg = Ctype.new
       component = Component.new
       component.stub(:manufacturer).and_return(mnfg)
@@ -57,7 +57,7 @@ describe Component do
       component.manufacturer_name.should eq("stuff")
     end
 
-    it "should return the name of the manufacturer if it isn't other" do
+    it "returns the name of the manufacturer if it isn't other" do
       mnfg = Ctype.new
       component = Component.new
       component.stub(:manufacturer).and_return(mnfg)

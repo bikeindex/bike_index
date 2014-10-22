@@ -14,7 +14,7 @@ describe Admin::RecoveriesController do
   end
 
   describe :approve do 
-    it "should post a single recovery" do 
+    it "posts a single recovery" do 
       Sidekiq::Testing.fake!
       user = FactoryGirl.create(:user, superuser: true)
       set_current_user(user)

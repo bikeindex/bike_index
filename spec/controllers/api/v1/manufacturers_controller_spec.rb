@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Api::V1::ManufacturersController do  
   describe :index do
-    it "should load the request" do
+    it "loads the request" do
       FactoryGirl.create(:manufacturer)
       get :index, format: :json
       response.code.should eq('200')

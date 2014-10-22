@@ -25,7 +25,7 @@ describe Admin::StolenNotificationsController do
   end
   
   describe :resend do 
-    it 'should resend the stolen notification' do
+    it 'resends the stolen notification' do
       Sidekiq::Worker.clear_all
       sender = FactoryGirl.create(:user)
       admin = FactoryGirl.create(:user, superuser: true)
@@ -37,7 +37,7 @@ describe Admin::StolenNotificationsController do
       }.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
     end
 
-    it 'should redirect if the stolen notification has already been sent' do
+    it 'redirects if the stolen notification has already been sent' do
       Sidekiq::Worker.clear_all
       sender = FactoryGirl.create(:user)
       admin = FactoryGirl.create(:user, superuser: true)
@@ -50,7 +50,7 @@ describe Admin::StolenNotificationsController do
       response.should redirect_to(:admin_stolen_notification)
     end
 
-    it 'should resend if the stolen notification has already been sent if we say pretty please' do
+    it 'resends if the stolen notification has already been sent if we say pretty please' do
       Sidekiq::Worker.clear_all
       sender = FactoryGirl.create(:user)
       admin = FactoryGirl.create(:user, superuser: true)

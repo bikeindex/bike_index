@@ -12,7 +12,7 @@ describe Ownership do
   end
 
   describe :normalize_email do 
-    it "should remove leading and trailing whitespace and downcase email" do 
+    it "removes leading and trailing whitespace and downcase email" do 
       ownership = Ownership.new 
       ownership.stub(:owner_email).and_return("   SomE@dd.com ")
       ownership.normalize_email.should eq("some@dd.com")
@@ -29,7 +29,7 @@ describe Ownership do
 
 
   describe :owner do 
-    it "should return the current owner if the ownership is claimed" do
+    it "returns the current owner if the ownership is claimed" do
       @user = FactoryGirl.create(:user)
       ownership = Ownership.new
       ownership.stub(:claimed).and_return(true)
@@ -37,7 +37,7 @@ describe Ownership do
       ownership.owner.should eq(@user)
     end
 
-    it "should return the creator if it isn't claimed" do 
+    it "returns the creator if it isn't claimed" do 
       @user = FactoryGirl.create(:user)
       ownership = Ownership.new
       ownership.stub(:claimed).and_return(false)
