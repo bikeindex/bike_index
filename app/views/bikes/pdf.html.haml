@@ -59,12 +59,13 @@
       .bike-details
         %table.table.table-striped
           %tbody
-            %tr
-              %td.td-title
-                Owner phone
-              %td
-                %a.phone-number-link{ href: "tell:#{@stolen_record.phone}" }
-                  = @stolen_record.display_phone
+            - if @stolen_record.phone.present?
+              %tr
+                %td.td-title
+                  Owner phone
+                %td
+                  %a.phone-number-link{ href: "tell:#{@stolen_record.phone}" }
+                    = @stolen_record.display_phone
             - if @stolen_record.police_report_number.present?
               %tr
                 %td.td-title
