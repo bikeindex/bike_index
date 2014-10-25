@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141010145930) do
+ActiveRecord::Schema.define(:version => 20141025185722) do
 
   create_table "ads", :force => true do |t|
     t.string   "title"
@@ -559,6 +559,7 @@ ActiveRecord::Schema.define(:version => 20141010145930) do
     t.string   "confirmation_token"
     t.boolean  "can_invite"
     t.boolean  "can_send_many_stolen_notifications", :default => false, :null => false
+    t.string   "auth_token"
   end
 
   add_index "users", ["password_reset_token"], :name => "index_users_on_password_reset_token"

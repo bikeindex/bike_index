@@ -48,7 +48,7 @@ class User < ActiveRecord::Base
   has_many :organization_invitations, class_name: 'OrganizationInvitation', inverse_of: :inviter
   has_many :organization_invitations, class_name: 'OrganizationInvitation', inverse_of: :invitee
 
-  before_create :generate_username_and_confirmation
+  before_create :generate_username_confirmation_and_auth
 
   validates_uniqueness_of :username, case_sensitive: false
   def to_param
@@ -207,7 +207,7 @@ class User < ActiveRecord::Base
 
   protected
 
-  def generate_username_and_confirmation
+  def generate_username_confirmation_and_auth
     begin
       username = SecureRandom.urlsafe_base64
     end while User.where(username: username).exists?
@@ -215,6 +215,10 @@ class User < ActiveRecord::Base
     if !self.confirmed
       self.confirmation_token = (Digest::MD5.hexdigest "#{SecureRandom.hex(10)}-#{DateTime.now.to_s}")
     end
+    begin
+      self.auth_token = SecureRandom.urlsafe_base64 + SecureRandom.urlsafe_base64
+    end while User.where(auth_token: auth_token).exists?
+    true
   end
 
 end

@@ -177,4 +177,11 @@ describe User do
     end
   end
 
+  describe :generate_username_confirmation_and_auth do 
+    it "should have before create" do 
+      User._create_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:generate_username_confirmation_and_auth).should == true      
+    end
+  end
+
+
 end
