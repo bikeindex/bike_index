@@ -69,7 +69,7 @@ describe OrganizationsController do
       before do 
         organization = FactoryGirl.create(:organization)
         user = FactoryGirl.create(:user)
-        session[:user_id] = user.id
+        set_current_user(user)
         get :show, id: organization.slug
       end
       it { should respond_with(:redirect) }
@@ -82,7 +82,7 @@ describe OrganizationsController do
         organization = FactoryGirl.create(:organization)
         user = FactoryGirl.create(:user)
         membership = FactoryGirl.create(:membership, user: user, organization: organization)
-        session[:user_id] = user.id
+        set_current_user(user)
         get :show, id: organization.slug
         response.code.should eq("200")
       end
@@ -94,7 +94,7 @@ describe OrganizationsController do
       organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:user)
       membership = FactoryGirl.create(:membership, user: user, organization: organization, role: "admin")
-      session[:user_id] = user.id
+      set_current_user(user)
       get :edit, id: organization.slug
       response.code.should eq("200")
     end

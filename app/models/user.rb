@@ -205,6 +205,12 @@ class User < ActiveRecord::Base
     self.username = Slugifyer.slugify(self.username) if self.username
   end
 
+  def generate_auth_token
+    begin
+      self.auth_token = SecureRandom.urlsafe_base64 + SecureRandom.urlsafe_base64
+    end while User.where(auth_token: auth_token).exists?
+  end
+
   protected
 
   def generate_username_confirmation_and_auth
@@ -215,9 +221,7 @@ class User < ActiveRecord::Base
     if !self.confirmed
       self.confirmation_token = (Digest::MD5.hexdigest "#{SecureRandom.hex(10)}-#{DateTime.now.to_s}")
     end
-    begin
-      self.auth_token = SecureRandom.urlsafe_base64 + SecureRandom.urlsafe_base64
-    end while User.where(auth_token: auth_token).exists?
+    generate_auth_token
     true
   end
 

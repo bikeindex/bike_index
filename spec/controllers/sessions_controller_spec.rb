@@ -33,7 +33,8 @@ describe SessionsController do
           @user.should_receive(:authenticate).and_return(true)
           request.env["HTTP_REFERER"] = user_home_url
           post :create, session: {}
-          session[:user_id].should == @user.id
+          cookies[:auth_token].should eq(@user.auth_token)
+          # session[:user_id].should == @user.id
           response.should redirect_to user_home_url
         end
       end
@@ -51,12 +52,12 @@ describe SessionsController do
       User.should_receive(:fuzzy_email_find).and_return(@user)
       post :create, session: {}
       response.should render_template(:new)
-      session[:user_id].should be_nil
+      cookies[:auth_token].should be_nil
     end
 
     it "does not log in the user when the user is not found" do
       post :create, session: { email: "notThere@example.com" }
-      session[:user_id].should be_nil
+      cookies[:auth_token].should be_nil
       response.should render_template(:new)
     end
   end
@@ -64,9 +65,10 @@ describe SessionsController do
 
   describe :logout do
     it "logs out the current user" do
-      session[:user_id] = 4
+      user = FactoryGirl.create(:user)
+      set_current_user(user)
       get :destroy
-      session[:user_id].should be_nil
+      cookies[:auth_token].should be_nil
       response.should redirect_to goodbye_url
     end
   end

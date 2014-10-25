@@ -3,6 +3,10 @@
     = f.email_field :email, placeholder: "Email address"
   .field
     = f.password_field :password, placeholder: "Password"
+  .field.rememberable
+    %label.checkbox
+      = f.check_box :remember_me, value: '1', checked: true
+      Keep me logged in
   = f.submit "Log in", class: 'button-blue'
 
 %p

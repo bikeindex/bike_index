@@ -12,8 +12,12 @@ class SessionsController < ApplicationController
     if user.present?
       if user.confirmed?
         if user.authenticate(params[:session][:password])
-          session[:user_id] = user.id
           session[:last_seen] = Time.now
+          if params[:session][:remember_me].to_s == '1'
+            cookies.permanent[:auth_token] = user.auth_token
+          else
+            cookies[:auth_token] = user.auth_token
+          end
           if user.superuser
             redirect_to admin_root_url, notice: "Logged in!"
           else
@@ -41,7 +45,7 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    session[:user_id] = nil
+    cookies.delete(:auth_token)
     if params[:redirect_location].present?
       if params[:redirect_location].match('new_user')
         redirect_to new_user_path, notice: "Logged out!" and return

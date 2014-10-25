@@ -5,7 +5,7 @@ describe LocksController do
   describe :index do
     before do 
       user = FactoryGirl.create(:user)
-      session[:user_id] = user.id
+      set_current_user(user)
       get :index
     end
     it { should respond_with(:success) }
@@ -16,7 +16,7 @@ describe LocksController do
   describe :show do 
     before do
       user = FactoryGirl.create(:user)
-      session[:user_id] = user.id
+      set_current_user(user)
       lock = FactoryGirl.create(:lock, user: user)
       get :show, id: lock.id
     end
@@ -28,7 +28,7 @@ describe LocksController do
   describe :new do 
     before do 
       user = FactoryGirl.create(:user)
-      session[:user_id] = user.id
+      set_current_user(user)
       get :new
     end
     it { should respond_with(:success) }
@@ -39,7 +39,7 @@ describe LocksController do
     describe "not correct lock owner" do 
       before do 
         user = FactoryGirl.create(:user)
-        session[:user_id] = user.id
+        set_current_user(user)
         lock = FactoryGirl.create(:lock)
         get :show, id: lock.id
       end
@@ -48,7 +48,7 @@ describe LocksController do
     describe "correct lock owner" do 
       before do 
         user = FactoryGirl.create(:user)
-        session[:user_id] = user.id
+        set_current_user(user)
         lock = FactoryGirl.create(:lock, user: user)
         get :edit, id: lock.id
       end

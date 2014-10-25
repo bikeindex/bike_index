@@ -43,7 +43,7 @@ RSpec.configure do |config|
 end
 
 def set_current_user(user)
-  session[:user_id] = user.id
+  cookies[:auth_token] = user.auth_token
 end
 
 OmniAuth.config.mock_auth[:facebook] = OmniAuth::AuthHash.new({

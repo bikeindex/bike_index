@@ -32,7 +32,7 @@ describe WelcomeController do
     describe "when user is present" do 
       before do 
         user = FactoryGirl.create(:user)
-        session[:user_id] = user.id
+        set_current_user(user)
         get :user_home
       end
 
@@ -46,7 +46,7 @@ describe WelcomeController do
         user = FactoryGirl.create(:user)
         ownership = FactoryGirl.create(:ownership, user: user, current: true)
         lock = FactoryGirl.create(:lock, user: user)
-        session[:user_id] = user.id
+        set_current_user(user)
         get :user_home
         assigns(:bikes).first.should eq(ownership.bike)
         assigns(:locks).first.should eq(lock)

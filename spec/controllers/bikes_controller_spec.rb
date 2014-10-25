@@ -79,7 +79,7 @@ describe BikesController do
       user = FactoryGirl.create(:user)
       FactoryGirl.create(:cycle_type, name: "Bike", slug: "bike")
       FactoryGirl.create(:propulsion_type, name: "Foot pedal")
-      session[:user_id] = user.id
+      set_current_user(user)
       get :new, { stolen: true }
       response.code.should eq('200')
       assigns(:bike).stolen.should be_true
@@ -89,7 +89,7 @@ describe BikesController do
       user = FactoryGirl.create(:user)
       FactoryGirl.create(:cycle_type, name: "Bike", slug: "bike")
       FactoryGirl.create(:propulsion_type, name: "Foot pedal")
-      session[:user_id] = user.id
+      set_current_user(user)
       get :new, { recovered: true }
       response.code.should eq('200')
       assigns(:bike).recovered.should be_true
@@ -101,7 +101,7 @@ describe BikesController do
       membership = FactoryGirl.create(:membership, user: user, organization: organization)
       FactoryGirl.create(:cycle_type, name: "Bike", slug: "bike")
       FactoryGirl.create(:propulsion_type, name: "Foot pedal")
-      session[:user_id] = user.id
+      set_current_user(user)
       get :new
       response.code.should eq('200')
     end
@@ -111,7 +111,7 @@ describe BikesController do
       bike_token = FactoryGirl.create(:bike_token, user: user)
       FactoryGirl.create(:cycle_type, name: "Bike", slug: "bike")
       FactoryGirl.create(:propulsion_type, name: "Foot pedal")
-      session[:user_id] = user.id
+      set_current_user(user)
       get :new, { bike_token_id: bike_token.id }
       response.code.should eq('200')
     end
@@ -126,7 +126,7 @@ describe BikesController do
         FactoryGirl.create(:cycle_type, name: "Bike", slug: "bike")
         FactoryGirl.create(:propulsion_type, name: "Foot pedal")
         manufacturer = FactoryGirl.create(:manufacturer)
-        session[:user_id] = @user.id
+        set_current_user(@user)
         @bike = { serial_number: "1234567890",
           b_param_id: @b_param.id,
           cycle_type_id: FactoryGirl.create(:cycle_type).id,
@@ -141,7 +141,7 @@ describe BikesController do
 
       it "renders new if b_param isn't owned by user" do
         user = FactoryGirl.create(:user)
-        session[:user_id] = user.id 
+        set_current_user(user) 
         post :create, { bike: @bike }
         # response.should render_template("new.html.haml")
         flash[:error].should eq("Oops, that isn't your bike")
@@ -274,7 +274,7 @@ describe BikesController do
       before do 
         ownership = FactoryGirl.create(:ownership)
         user = FactoryGirl.create(:user)
-        session[:user_id] = user.id
+        set_current_user(user)
         get :edit, id: ownership.bike.id
       end
       it { should respond_with(:redirect)}
@@ -285,7 +285,7 @@ describe BikesController do
       before do 
         ownership = FactoryGirl.create(:ownership)
         user = ownership.creator
-        session[:user_id] = user.id
+        set_current_user(user)
         get :edit, id: ownership.bike.id
       end
       it { should respond_with(:success)}
@@ -300,7 +300,7 @@ describe BikesController do
       before do 
         ownership = FactoryGirl.create(:ownership)
         user = FactoryGirl.create(:user)
-        session[:user_id] = user.id
+        set_current_user(user)
         put :update, {id: ownership.bike.id, bike: {serial_number: "69"}}
       end
       it { should respond_with(:redirect)}
@@ -312,7 +312,7 @@ describe BikesController do
       ownership = FactoryGirl.create(:ownership)
       ownership.bike.update_attributes(example: true)
       user = ownership.creator
-      session[:user_id] = user.id
+      set_current_user(user)
       put :update, {id: ownership.bike.id, bike: {description: "69"}}
       ownership.bike.reload.description.should eq("69")
       response.should redirect_to bike_url(ownership.bike)
@@ -329,7 +329,7 @@ describe BikesController do
     it "updates the bike when a user is present who is allowed to edit the bike" do 
       ownership = FactoryGirl.create(:ownership)
       user = ownership.creator
-      session[:user_id] = user.id
+      set_current_user(user)
       put :update, {id: ownership.bike.id, bike: {description: "69"}}
       ownership.bike.reload.description.should eq("69")
       response.should redirect_to bike_url(ownership.bike)
@@ -339,7 +339,7 @@ describe BikesController do
     it "creates a new ownership if the email changes" do 
       ownership = FactoryGirl.create(:ownership)
       user = ownership.creator
-      session[:user_id] = user.id
+      set_current_user(user)
       lambda { put :update,
         {id: ownership.bike.id, bike: {owner_email: "new@email.com"}}
       }.should change(Ownership, :count).by(1)

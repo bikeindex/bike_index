@@ -6,7 +6,7 @@ describe OrganizationInvitationsController do
       user = FactoryGirl.create(:user, email: "MEMBERSTHING@ggg.com")
       organization = FactoryGirl.create(:organization, available_invitation_count: 1)
       membership = FactoryGirl.create(:membership, organization: organization, user: user, role: "admin")
-      session[:user_id] = user.id
+      set_current_user(user)
       { put: "/organizations/#{organization.slug}/organization_invitations/new" }
       response.code.should eq("200")
     end
@@ -17,7 +17,7 @@ describe OrganizationInvitationsController do
       @user = FactoryGirl.create(:user)
       @organization = FactoryGirl.create(:organization, available_invitation_count: 1)
       @membership = FactoryGirl.create(:membership, organization: @organization, user: @user, role: "admin")
-      session[:user_id] = @user.id
+      set_current_user(@user)
     end
     
     it "creates a new organization_invitation and reduce the organization invitation tokens by one" do

@@ -9,7 +9,7 @@ describe MembershipsController do
       user2 = FactoryGirl.create(:user)
       membership = FactoryGirl.create(:membership, organization: organization, user: user, role: "admin")
       membership2 = FactoryGirl.create(:membership, organization: organization, user: user2)
-      session[:user_id] = user.id
+      set_current_user(user)
       { put: "/organizations/#{organization.slug}/memberships/#{membership.id}/edit" }
       response.code.should eq("200")
     end

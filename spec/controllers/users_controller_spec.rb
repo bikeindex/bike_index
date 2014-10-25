@@ -6,7 +6,7 @@ describe UsersController do
     describe "already signed in" do 
       before do 
         user = FactoryGirl.create(:user)
-        session[:user_id] = user.id
+        set_current_user(user)
         get :new
       end
       it { should redirect_to(:user_home) }
@@ -153,7 +153,7 @@ describe UsersController do
   describe :accept_vendor_terms do 
     before do 
       user = FactoryGirl.create(:user)
-      session[:user_id] = user.id
+      set_current_user(user)
       get :accept_vendor_terms
     end
     it { should respond_with(:success) }
@@ -163,7 +163,7 @@ describe UsersController do
   describe :accept_terms do 
     before do 
       user = FactoryGirl.create(:user)
-      session[:user_id] = user.id
+      set_current_user(user)
       get :accept_terms
     end
     it { should respond_with(:success) }
@@ -173,7 +173,7 @@ describe UsersController do
   describe :edit do 
     before do 
       user = FactoryGirl.create(:user)
-      session[:user_id] = user.id
+      set_current_user(user)
       get :edit
     end
     it { should respond_with(:success) }
@@ -183,7 +183,7 @@ describe UsersController do
   describe :update do 
     it "updates the terms of service" do 
       user = FactoryGirl.create(:user, terms_of_service: false)
-      session[:user_id] = user.id 
+      set_current_user(user) 
       post :update, { id: user.username, user: {terms_of_service: "1"} }
       response.should redirect_to(user_home_url)
       user.reload.terms_of_service.should be_true
@@ -192,7 +192,7 @@ describe UsersController do
       user = FactoryGirl.create(:user, terms_of_service: false)
       org =  FactoryGirl.create(:organization)
       FactoryGirl.create(:membership, organization: org, user: user)
-      session[:user_id] = user.id 
+      set_current_user(user) 
       post :update, { id: user.username, user: {vendor_terms_of_service: "1"} }
       response.code.should eq('302')
       user.reload.vendor_terms_of_service.should be_true
