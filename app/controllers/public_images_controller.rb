@@ -42,22 +42,12 @@ class PublicImagesController < ApplicationController
   end
 
   def destroy
-    @imageable = @public_image.imageable if @public_image.imageable_type == "Bike"
+    @imageable = @public_image.imageable
+    imageable_type = @public_image.imageable_type
     @public_image.destroy
     flash[:notice] = "Image was successfully deleted"
-    if params[:return_url].present?
-      id = params[:return_url].match(/[^\/]*\/edit/)[0].gsub('/edit','')
-      if params[:return_url].match(/news/i).present?
-        redirect_to edit_admin_news_url(id) and return
-      elsif params[:return_url].match(/bikes/i).present?
-        redirect_to edit_bike_url(id) and return
-      else
-        redirect_to root_url and return
-      end
-    else
-      redirect_to edit_bike_url(@imageable) and return if @imageable.cycle_type_id
-      redirect_to edit_admin_news(@imageable)
-    end
+    redirect_to edit_admin_news_url(@imageable.title_slug) and return if imageable_type == 'Blog'
+    redirect_to edit_bike_url(@imageable)
   end
 
   def order
