@@ -1,5 +1,7 @@
 class SessionsController < ApplicationController
+  include Sessionable
   def new
+    @targett = session[:return_to_oauth]
     if current_user.present?
       redirect_to user_home_url, notice: "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
     end
@@ -7,27 +9,17 @@ class SessionsController < ApplicationController
 
   def create
     # @photos = PublicImage.limit(18).order("created_at desc")
-    user = User.fuzzy_email_find(params[:session][:email])
+    @user = User.fuzzy_email_find(params[:session][:email])
 
-    if user.present?
-      if user.confirmed?
-        if user.authenticate(params[:session][:password])
-          session[:last_seen] = Time.now
-          if params[:session][:remember_me].to_s == '1'
-            cookies.permanent[:auth_token] = user.auth_token
-          else
-            cookies[:auth_token] = user.auth_token
-          end
-          if user.superuser
-            redirect_to admin_root_url, notice: "Logged in!"
-          else
-            redirect_to user_home_url, notice: "Logged in!"
-          end
+    if @user.present?
+      if @user.confirmed?
+        if @user.authenticate(params[:session][:password])
+          sign_in_and_redirect
         else
           # User couldn't authenticate, so password is invalid
           flash.now.alert = "Invalid email/password"
           # If user is banned, tell them about it.
-          if user.banned?
+          if @user.banned?
             flash.now.alert = "We're sorry, but it appears that your account has been locked. If you are unsure as to the reasons for this, please contact us"
           end
           render "new"

@@ -1,5 +1,7 @@
 Bikeindex::Application.routes.draw do
 
+  use_doorkeeper
+
   get "dashboard/show"
     
   resources :organizations do 

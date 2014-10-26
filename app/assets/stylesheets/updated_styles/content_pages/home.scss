@@ -107,39 +107,9 @@
   left: 0; top: 35%;
   z-index: 20;
   text-align: center;
-  .btn {
-    @include transition(background ease-out .1s);
-    font-size: 40px;
+  .btn.binxbtn {
     font-family: $header-font;
-    border: none;
-    background: $green;
-    color: white;
-    padding: .25em 1em;
-    font-weight: 400;
-
-    $step: .006em;
-    $step-color: $green-dark;
-    box-shadow: -.01em .01em 0px $step-color,
-    -$step $step 0 $step-color,
-    -$step*2  $step*2  0 $step-color,
-    -$step*3  $step*3  0 $step-color,
-    -$step*4  $step*4  0 $step-color,
-    -$step*5  $step*5  0 $step-color,
-    -$step*6  $step*6  0 $step-color,
-    -$step*7  $step*7  0 $step-color,
-    -$step*8  $step*8  0 $step-color,
-    -$step*9  $step*9  0 $step-color,
-    -$step*10 $step*10 0 $step-color,
-    -$step*11 $step*11 0 $step-color,
-    -$step*12 $step*12 0 $step-color,
-    -$step*13 $step*13 0 $step-color,
-    -$step*14 $step*14 0 $step-color,
-    -$step*15 $step*15 0 $step-color;
-
-    &:hover {
-      @include transition(background ease-out .1s);
-      background: #62D994;
-    }
+    font-size: 40px;
   }
 }
 
@@ -207,10 +177,11 @@
 }
 
 @media (min-width: $m-breakpoint) {
-  .home-subhead, .how-it-works {
+  .home-subhead {
     p, h3 { width: $ten-column; }
   }
 }
+
 
 @media (max-width: $s-breakpoint) {
   .home-subhead, .how-it-works {

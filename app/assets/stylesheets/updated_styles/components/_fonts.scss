@@ -46,6 +46,7 @@
 $body-font: 'Open Sans', sans-serif;
 
 $body-font-weight: 300;
+$body-font-size: 16px;
 $small-font-size: 14px;
 
 $form-font-weight: 400;
@@ -54,7 +55,7 @@ $form-font-family: $body-font;
 
 
 @mixin body-font-size {
-  font-size: 16px;
+  font-size: $body-font-size;
 }
 
 
@@ -68,13 +69,6 @@ $form-font-family: $body-font;
 $header-font: 'Klinic', sans-serif;
 $header-font-weight: 400;
 
-@mixin h3-font-size {
-  font-size: 22px;
-  @media(max-width: $s-breakpoint) { font-size: 20px; }
-}
-
-h3 { @include h3-font-size; }
-
 h1 { font-size: 40px; }
 
 @media (max-width: $m-breakpoint) {
@@ -85,6 +79,20 @@ h1 { font-size: 40px; }
   h1 { font-size: 23px; }
 }
 
+@mixin h3-font-size {
+  font-size: 22px;
+  @media(max-width: $s-breakpoint) { font-size: 20px; }
+}
+
+h3 { @include h3-font-size; }
+
+@mixin h4-font-size {
+  font-size: 20px;
+  @media(max-width: $s-breakpoint) { font-size: 18px; }
+}
+
+h4 { @include h4-font-size; }
+
 header.with-subtitle {
   @include clearfix;
   @include bottom-pad($standard-pad);
@@ -93,6 +101,8 @@ header.with-subtitle {
   p {
     display: inline-block;
     float: right;
+    margin-top: 0;
+    padding-top: 0;
   }
 }
 

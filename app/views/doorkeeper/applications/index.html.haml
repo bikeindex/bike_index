@@ -1,0 +1,19 @@
+%header.with-subtitle
+  %h1 Your applications
+  %p
+    = link_to 'New Application', new_oauth_application_path, class: 'btn binxbtn binxbtn-lg'
+
+%table.table.table-striped.margined
+  %thead
+    %tr
+      %th Name
+      %th Callback URL
+      %th
+      %th
+  %tbody
+    - @applications.each do |application|
+      %tr{:id => "application_#{application.id}"}
+        %td= link_to application.name, [:oauth, application]
+        %td= application.redirect_uri
+        %td= link_to 'Edit', edit_oauth_application_path(application), class: 'btn binxbtn-primary'
+        %td= render 'delete_form', application: application

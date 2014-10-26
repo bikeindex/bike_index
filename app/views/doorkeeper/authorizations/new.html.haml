@@ -1,0 +1,28 @@
+%header.page-header{:role => "banner"}
+  %h1 Authorize required
+%main.authorize-application-section{:role => "main"}
+  %p.h4
+    Authorize
+    %strong.text-info= @pre_auth.client.name
+    to use your account?
+  - if @pre_auth.scopes
+    #oauth-permissions
+      %p This application will be able to:
+      %ul.text-info
+        - @pre_auth.scopes.each do |scope|
+          %li= t scope, scope: [:doorkeeper, :scopes]
+  .actions.margined
+    = form_tag oauth_authorization_path, method: :post do
+      = hidden_field_tag :client_id, @pre_auth.client.uid
+      = hidden_field_tag :redirect_uri, @pre_auth.redirect_uri
+      = hidden_field_tag :state, @pre_auth.state
+      = hidden_field_tag :response_type, @pre_auth.response_type
+      = hidden_field_tag :scope, @pre_auth.scope
+      = submit_tag "Authorize", class: "btn binxbtn binxbtn-lg btn-block"
+    = form_tag oauth_authorization_path, method: :delete do
+      = hidden_field_tag :client_id, @pre_auth.client.uid
+      = hidden_field_tag :redirect_uri, @pre_auth.redirect_uri
+      = hidden_field_tag :state, @pre_auth.state
+      = hidden_field_tag :response_type, @pre_auth.response_type
+      = hidden_field_tag :scope, @pre_auth.scope
+      = submit_tag "Deny", class: "btn binxbtn-danger binxbtn-lg btn-block"

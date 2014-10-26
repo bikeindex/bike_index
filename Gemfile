@@ -49,6 +49,7 @@ gem 'sitemap_generator'
 gem 'whenever'
 gem 'unicorn'
 gem 'unicorn-worker-killer'
+gem 'doorkeeper'
 
 gem 'chartkick'
 gem 'groupdate'
