@@ -178,13 +178,15 @@ describe User do
   end
 
   describe :generate_username_confirmation_and_auth do 
-    it "should generate the required tokens" do 
+    it "generates the required tokens" do 
       user = FactoryGirl.create(:user)
       user.auth_token.should be_present
       user.username.should be_present
       user.confirmation_token.should be_present
+      time = Time.at(user.auth_token.match(/\d*\z/)[0].to_i)
+      time.should be > Time.now - 1.minutes
     end
-    it "should have before create" do 
+    it "haves before create callback" do 
       User._create_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:generate_username_confirmation_and_auth).should == true      
     end
   end

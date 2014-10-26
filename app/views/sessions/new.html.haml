@@ -21,6 +21,11 @@
           - i += 1
 .span4.signinup-form
   .well
+    .alert.alert-notice
+      %p
+        We just added the ability to keep you logged in.
+      %h4
+        We modified the way logging in worked, which may have signed you out. Sorry!
     %h3
       Log in!
     = render partial: "sessions/form"

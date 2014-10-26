@@ -10,13 +10,15 @@ describe IntegrationsController do
           post :create
         }.should change(Integration, :count).by(1)
         response.code.should eq('302')
+        user = User.last
+        cookies[:auth_token].should eq(user.auth_token)
       end
     end
 
     describe "when there is a user" do
       before :each do
         @user = FactoryGirl.create(:user)
-        session[:user_id] = @user.id
+        set_current_user(@user)
         request.env["omniauth.auth"] = OmniAuth.config.mock_auth[:facebook]
       end
 

@@ -207,7 +207,7 @@ class User < ActiveRecord::Base
 
   def generate_auth_token
     begin
-      self.auth_token = SecureRandom.urlsafe_base64 + SecureRandom.urlsafe_base64
+      self.auth_token = SecureRandom.urlsafe_base64 + "t#{Time.now.to_i}"
     end while User.where(auth_token: auth_token).exists?
   end
 

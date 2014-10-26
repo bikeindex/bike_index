@@ -6,7 +6,7 @@ class IntegrationsController < ApplicationController
     @integration.provider_name = request.env['omniauth.auth']['provider']
     @integration.information = request.env['omniauth.auth']
     if @integration.save
-      session[:user_id] = @integration.user.id
+      cookies.permanent[:auth_token] = @integration.user.auth_token
       session[:last_seen] = Time.now
       redirect_to user_home_url, notice: "Logged in!"
     else
