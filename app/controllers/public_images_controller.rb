@@ -46,7 +46,14 @@ class PublicImagesController < ApplicationController
     @public_image.destroy
     flash[:notice] = "Image was successfully deleted"
     if params[:return_url].present?
-      redirect_to params[:return_url]
+      id = params[:return_url].match(/[^\/]*\/edit/)[0].gsub('/edit','')
+      if params[:return_url].match(/news/i).present?
+        redirect_to edit_admin_news_url(id) and return
+      elsif params[:return_url].match(/bikes/i).present?
+        redirect_to edit_bike_url(id) and return
+      else
+        redirect_to root_url and return
+      end
     else
       redirect_to edit_bike_url(@imageable) and return if @imageable.cycle_type_id
       redirect_to edit_admin_news(@imageable)
