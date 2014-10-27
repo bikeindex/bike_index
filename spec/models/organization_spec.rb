@@ -11,6 +11,7 @@ describe Organization do
     it { should have_many :users }
     it { should have_many :organization_invitations }
     it { should have_many :locations }
+    it { should have_many :bikes }
     it { should belong_to :auto_user }
   end
 

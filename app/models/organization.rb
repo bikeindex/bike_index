@@ -26,6 +26,8 @@ class Organization < ActiveRecord::Base
   has_many :organization_invitations, dependent: :destroy
   belongs_to :auto_user, class_name: "User"
 
+  has_many :bikes, foreign_key: 'creation_organization_id'
+
   has_many :locations, dependent: :destroy
   accepts_nested_attributes_for :locations, allow_destroy: true
 
