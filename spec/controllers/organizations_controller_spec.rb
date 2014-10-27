@@ -40,7 +40,7 @@ describe OrganizationsController do
       @organization = FactoryGirl.create(:organization)
       @user = FactoryGirl.create(:user)
       @membership = FactoryGirl.create(:membership, role: 'admin', user: @user, organization: @organization)
-      session[:user_id] = @user.id
+      set_current_user(@user)
       User.any_instance.should_receive(:is_member_of?).and_return(true)
       User.any_instance.should_receive(:is_admin_of?).and_return(true)
     end

@@ -12,7 +12,10 @@ module Sessionable
     if session[:return_to].present?
       target = session[:return_to]
       session[:return_to] = nil
-      if target.match(/\A#{ENV['BASE_URL']}/i).present? || target.match(/\A\//).present?
+      if target.match('password_reset')
+        flash[:notice] = "You've been logged in. Please reset your password"
+        render action: :update_password and return
+      elsif target.match(/\A#{ENV['BASE_URL']}/i).present? || target.match(/\A\//).present?
         redirect_to target and return
       end
     end

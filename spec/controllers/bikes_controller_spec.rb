@@ -320,7 +320,7 @@ describe BikesController do
 
     xit "should redirect to edit if the bike has changed to be stolen" do 
       ownership = FactoryGirl.create(:ownership)
-      session[:user_id] = ownership.creator.id
+      set_current_user(ownership.creator)
       ownership.bike.update_attributes(verified: true)
       put :update, {id: ownership.bike.id, bike: {stolen: "1"}}
       response.should redirect_to edit_bike_url(ownership.bike)

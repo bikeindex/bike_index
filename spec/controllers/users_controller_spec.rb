@@ -37,7 +37,7 @@ describe UsersController do
         CreateUserJobs.any_instance.should_receive(:send_welcome_email)
         organization_invitation = FactoryGirl.create(:organization_invitation, invitee_email: "poo@pile.com")
         post :create, user: FactoryGirl.attributes_for(:user, email: "poo@pile.com")
-        session[:user_id].should eq(User.fuzzy_email_find("poo@pile.com").id)
+        cookies[:auth_token].should eq(User.fuzzy_email_find("poo@pile.com").auth_token)
         response.should redirect_to(user_home_url)
       end
     end
@@ -78,7 +78,7 @@ describe UsersController do
         it "logins and redirect when confirmation succeeds" do
           @user.should_receive(:confirm).and_return(true)
           get :confirm, id: @user.id, code: @user.confirmation_token
-          session[:user_id].should == @user.id
+          cookies[:auth_token].should == @user.auth_token
           response.should redirect_to user_home_url
         end
 
@@ -98,16 +98,11 @@ describe UsersController do
 
   describe :password_reset do 
     describe "if the token is present and valid" do 
-      it "Should log in" do
-        @user = FactoryGirl.create(:user, email: "ned@foo.com")
-        @user.set_password_reset_token
-        post :password_reset, token: @user.password_reset_token
-        session[:user_id].should == @user.id
-      end
-      it "Should redirect to the update password page" do 
-        @user = FactoryGirl.create(:user, email: "ned@foo.com")
-        @user.set_password_reset_token
-        post :password_reset, token: @user.password_reset_token
+      it "logs in and redirects" do
+        user = FactoryGirl.create(:user, email: "ned@foo.com")
+        user.set_password_reset_token
+        post :password_reset, token: user.password_reset_token
+        cookies[:auth_token].should == user.auth_token
         response.should render_template :update_password
       end
     end

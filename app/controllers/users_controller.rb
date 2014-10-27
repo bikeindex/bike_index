@@ -1,4 +1,5 @@
 class UsersController < ApplicationController
+  include Sessionable
   before_filter :authenticate_user!, only: [:edit]
   
   def new
@@ -13,11 +14,7 @@ class UsersController < ApplicationController
     @user = User.new(params[:user])
     if @user.save
       CreateUserJobs.new(user: @user).do_jobs
-      if @user.confirmed
-        session[:user_id] = @user.id
-        session[:last_seen] = Time.now
-        redirect_to user_home_url, notice: "Logged in!" and return
-      end
+      sign_in_and_redirect if @user.confirmed
     else
       render action: :new
     end
@@ -30,8 +27,7 @@ class UsersController < ApplicationController
         redirect_to new_session_url, notice: "Your user account is already confirmed. Please log in"
       else
         if @user.confirm(params[:code])
-          session[:user_id] = @user.id
-          redirect_to user_home_url
+          sign_in_and_redirect
         else
           render :confirm_error_bad_token
         end
@@ -52,9 +48,8 @@ class UsersController < ApplicationController
     if params[:token].present?
       @user = User.find_by_password_reset_token(params[:token])
       if @user.present?
-        session[:user_id] = @user.id
-        flash[:notice] = "You've been logged in. Please reset your password"
-        render action: :update_password
+        session[:return_to] = 'password_reset'
+        sign_in_and_redirect
       else
         flash[:error] = "We're sorry, but that link is no longer valid."
         render action: :request_password_reset
