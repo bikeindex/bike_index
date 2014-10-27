@@ -1,7 +1,3 @@
-//
-// Buttons
-// --------------------------------------------------
-
 
 // Base styles
 // --------------------------------------------------
@@ -154,4 +150,37 @@ input[type="button"] {
   &.btn-block {
     width: 100%;
   }
+}
+
+.binxbtn-lg {
+  padding: .25em 1em;
+  font-size: 20px;
+}
+
+.btn.binxbtn {
+  @include binx-button($green, #62D994, $green-dark, white);
+  font-size: $body-font-size;
+  font-family: $body-font;
+  &.binxbtn-lg { @extend .binxbtn-lg; }
+}
+
+.btn.binxbtn-primary {
+  @include binx-button($blue, #67B2E4, #46596C, white);
+  font-size: $body-font-size;
+  font-family: $body-font; 
+  &.binxbtn-lg { @extend .binxbtn-lg; }
+}
+
+.btn.binxbtn-default {
+  @include binx-button($gray-lighter, $gray-lightest, lighten($gray-light, 2%), $text-color);
+  font-size: $body-font-size;
+  font-family: $body-font; 
+  &.binxbtn-lg { @extend .binxbtn-lg; }
+}
+
+.btn.binxbtn-danger {
+  @include binx-button($peach-light, $peach-lighter, $red-dark, white);
+  font-size: $body-font-size;
+  font-family: $body-font; 
+  &.binxbtn-lg { @extend .binxbtn-lg; }
 }

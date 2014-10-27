@@ -34,7 +34,24 @@ describe SessionsController do
           request.env["HTTP_REFERER"] = user_home_url
           post :create, session: {}
           cookies[:auth_token].should eq(@user.auth_token)
-          # session[:user_id].should == @user.id
+          response.should redirect_to user_home_url
+        end
+
+        it "redirects to return_to if it's a valid oauth url" do
+          @user.should_receive(:authenticate).and_return(true)
+          session[:return_to] = oauth_authorization_url(cool_thing: true)
+          post :create, session: session
+          cookies[:auth_token].should eq(@user.auth_token)
+          session[:return_to].should be_nil
+          response.should redirect_to oauth_authorization_url(cool_thing: true)
+        end
+
+        it "doesn't redirect and clears the session if not a valid oauth url" do
+          @user.should_receive(:authenticate).and_return(true)
+          session[:return_to] = 'http://testhost.com/bad_place'
+          post :create, session: session
+          cookies[:auth_token].should eq(@user.auth_token)
+          session[:return_to].should be_nil
           response.should redirect_to user_home_url
         end
       end

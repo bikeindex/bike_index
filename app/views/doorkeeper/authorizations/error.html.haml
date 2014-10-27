@@ -1,0 +1,4 @@
+.page-header
+  %h1 An error has occurred
+%main{:role => "main"}
+  %pre= @pre_auth.error_response.body[:error_description]
