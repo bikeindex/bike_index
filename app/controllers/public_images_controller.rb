@@ -8,7 +8,7 @@ class PublicImagesController < ApplicationController
   def show
     @public_image = PublicImage.find(params[:id])
     if @public_image.present? && @public_image.imageable_type == "Bike"
-      @owner_viewing = true if @public_image.imageable.owner == current_user
+      @owner_viewing = true if @public_image.imageable.current_ownership.present? && @public_image.imageable.owner == current_user
     end
   end
 
