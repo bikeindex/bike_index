@@ -7,6 +7,9 @@ class PublicImagesController < ApplicationController
 
   def show
     @public_image = PublicImage.find(params[:id])
+    if @public_image.present? && @public_image.imageable_type == "Bike"
+      @owner_viewing = true if @public_image.imageable.owner == current_user
+    end
   end
 
   def create
@@ -67,7 +70,7 @@ class PublicImagesController < ApplicationController
   protected
 
   def find_image_if_owned
-    @public_image = PublicImage.find(params[:id])
+    @public_image = PublicImage.unscoped.find(params[:id])
     if @public_image.imageable_type == "Bike"
       unless @public_image.imageable.owner == current_user
         flash[:error] = "Sorry! You don't have permission to edit that image."

@@ -40,7 +40,22 @@
         %ul#public_images{ :"data-order-url" => order_public_images_url }
           - if @bike.public_images
             = render partial: "/public_images/public_image", collection: @bike.public_images, as: :public_image
-            
+        .private-images
+          - if @private_images.present?
+            %h2
+              Private images
+            %ul.private_images{ :"data-order-url" => order_public_images_url }
+              = render partial: "/public_images/public_image", collection: @private_images, as: :public_image
+          %p.small
+            Adding something else you'd like to be private (e.g. a receipt)?
+            / %br
+            Click 
+            %strong
+              edit
+            on the image, mark it
+            %strong
+              do not display
+            and save it.
         - if @bike.public_images.length < 49
           %section
             = render "public_images/new_form"

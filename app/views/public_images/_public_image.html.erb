@@ -5,7 +5,7 @@
   <div class="actions">
     <% if public_image.imageable_type == "Bike" %>
       <%= link_to "Edit", edit_public_image_path(public_image), class: "photo-edit" %>
-      <%= link_to "Remove", public_image_url(public_image, return_url: edit_bike_url(@bike)), method: :delete, class: "photo-remove" %>
+      <%= link_to "Delete", public_image_url(public_image, return_url: edit_bike_url(@bike)), method: :delete, class: "photo-remove" %>
     <% else %>
       <textarea class="code-to-enter">&lt;img class="post-image" src="<%= public_image.image_url(:large) %>" alt="ENTER YOUR TEXT HERE"&gt;</textarea>
       <p>

@@ -171,6 +171,7 @@ class BikesController < ApplicationController
         flash[:error] = e.message
         redirect_to bike_path(@bike) and return
     end
+    @private_images = PublicImage.unscoped.where(imageable_type: 'Bike').where(imageable_id: @bike.id).where(is_private: true)
     @bike = @bike.decorate
   end
 

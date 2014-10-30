@@ -723,7 +723,7 @@
   }
 }
 
-#public_images {
+#public_images, .private_images {
   @include clearfix;
   clear: both;
   list-style-type: none;
@@ -738,6 +738,14 @@
     float: left;
     text-align: center;
     padding-top: 5px;
+  }
+  .private-images {
+    padding: 10px;
+    border-top: 2px dashed $grayLighter;
+    background: $grayLighterer;
+    color: $grayMed;
+    text-align: center;
+    p { font-size: .8em;}
   }
 }
 

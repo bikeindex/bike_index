@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141026172449) do
+ActiveRecord::Schema.define(:version => 20141030140601) do
 
   create_table "ads", :force => true do |t|
     t.string   "title"
@@ -488,8 +488,9 @@ ActiveRecord::Schema.define(:version => 20141026172449) do
     t.integer  "listing_order",  :default => 0
     t.integer  "imageable_id"
     t.string   "imageable_type"
-    t.datetime "created_at",                    :null => false
-    t.datetime "updated_at",                    :null => false
+    t.datetime "created_at",                        :null => false
+    t.datetime "updated_at",                        :null => false
+    t.boolean  "is_private",     :default => false, :null => false
   end
 
   add_index "public_images", ["imageable_id", "imageable_type"], :name => "index_public_images_on_imageable_id_and_imageable_type"

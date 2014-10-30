@@ -1,0 +1,39 @@
+= form_for @public_image do |f|
+  - if @public_image.errors.any?
+    #alert-block
+      .alert-error
+        %a.close{ herf: "#", data: {dismiss: "alert"}}
+          x
+        %h4
+          #{pluralize(@public_image.errors.count, "Error")} prevented photo from saving
+        %ul
+          - @public_image.errors.full_messages.each do |msg|
+            %li
+              = msg
+
+  %section.padded
+    .form
+      .control-group.padded
+        = f.label :name, "Image name", class: "control-label"
+        .controls
+          = f.text_field :name
+      .clearfix
+        .alert.alert-notice
+          %p
+            Use this if you'd like to attach a photo of your receipt or something similarly private.
+          .control-group.padded
+            = f.label :is_private, class: "control-label" do 
+              Do not display
+              %em
+                (no one will be able to see this image except for you)
+              .controls
+                = f.check_box :is_private
+             
+      / .control-group
+      /   = f.label :image, "Choose a new image", class: 'control-label'
+      /   .controls
+      /     = f.file_field :image
+        
+    .bibox-btn.padded
+      = f.submit "Save image", class: "button-green"
+      = link_to 'Cancel Update', edit_bike_url(@public_image.imageable), class: "button-red"
