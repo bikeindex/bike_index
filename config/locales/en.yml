@@ -43,6 +43,9 @@ en:
     blogs_index: "Read Bike Index news. Also, periodically, learn magic spells."
     users_new: "Sign up for the Bike Index"
     documentation_api_v1: "API Version 1 documentation, and love"
+  doorkeeper:
+    scopes:
+      public: "Grants read-only access to public information"
   time:
     formats:
       standard_display: "%A, %B %d"
