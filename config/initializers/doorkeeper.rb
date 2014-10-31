@@ -42,10 +42,11 @@ Doorkeeper.configure do
   # enable_application_owner :confirmation => false
 
   # Define access token scopes for your provider
-  # For more information go to
-  # https://github.com/doorkeeper-gem/doorkeeper/wiki/Using-Scopes
   # default_scopes  :public
   # optional_scopes :write, :update
+  authentication_scopes do
+    scope :public, :default => true, :description => "Grants read-only access to public information"
+  end
 
   # Change the way client credentials are retrieved from the request object.
   # By default it retrieves first from the `HTTP_AUTHORIZATION` header, then
