@@ -1,0 +1,35 @@
+.top-user-nav
+  %ul
+    - if current_user.present?
+      %li.first-link
+        = link_to 'Logout', session_path, method: :delete, class: 'low-priority'
+      %li.double-width
+        = link_to "Your bikes", '/user_home'
+      - if current_user.memberships.any?
+        - current_user.memberships.each do |membership|
+          %li
+            %a{ href: "/organizations/#{membership.organization.slug}" }
+              = membership.organization.short_name
+      - if current_user.superuser
+        %li
+          = link_to 'Admin', admin_root_path
+
+    - else
+      %li.first-link
+        %a{href: new_session_url }
+          Log in
+      %li
+        %a{ href: new_user_url }
+          Sign up
+          
+    / %li
+    /   %a{ href: '#' }
+    /     How it works
+
+    %li
+      %a.low-priority{ href: about_url }
+        About
+
+    / %li
+    /   %a.low-priority{ href: blogs_url }
+    /     News

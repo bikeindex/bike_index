@@ -15,7 +15,7 @@ describe User do
     it { should have_many :bike_tokens }
     it { should have_many :locks }
     it { should have_many :organization_invitations }
-
+    it { should have_many :oauth_applications }
     it { should have_many :sent_stolen_notifications }
     it { should have_many :received_stolen_notifications }
     

@@ -165,7 +165,7 @@ input[type="button"] {
 }
 
 .btn.binxbtn-primary {
-  @include binx-button($blue, #67B2E4, #46596C, white);
+  @include binx-button($blue, #67B2E4, #2574A0, white);
   font-size: $body-font-size;
   font-family: $body-font; 
   &.binxbtn-lg { @extend .binxbtn-lg; }

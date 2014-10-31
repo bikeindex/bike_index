@@ -20,10 +20,27 @@ describe ErrorsController do
 
   describe :unprocessable_entity do 
     before do 
-      get :unprocessable_entity
+      get :unprocessable_entity, format: :xml
     end
     it { should respond_with(:unprocessable_entity) }
     it { should render_template(:unprocessable_entity) }
+  end
+
+  # Since this renders a 500, it doesn't test right.
+  # describe :server_error do 
+  #   before do 
+  #     get :server_error, format: :xml
+  #   end
+  #   it { should respond_with(:server_error) }
+  #   it { should render_template(:server_error) }
+  # end
+
+  describe :unauthorized do 
+    before do 
+      get :unauthorized, format: :json
+    end
+    it { should respond_with(:unauthorized) }
+    it { should render_template(:unauthorized) }
   end
 
 end

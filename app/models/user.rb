@@ -35,6 +35,7 @@ class User < ActiveRecord::Base
   has_many :current_ownerships, class_name: 'Ownership', foreign_key: :user_id, conditions: {current: true}
   has_many :owned_bikes, through: :ownerships, source: :bike
   has_many :currently_owned_bikes, through: :current_ownerships, source: :bike
+  has_many :oauth_applications, class_name: 'Doorkeeper::Application', as: :owner
 
   has_many :integrations, dependent: :destroy
   has_many :created_ownerships, class_name: 'Ownership', inverse_of: :creator

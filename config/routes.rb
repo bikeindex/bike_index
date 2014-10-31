@@ -1,6 +1,8 @@
 Bikeindex::Application.routes.draw do
 
-  use_doorkeeper
+  use_doorkeeper do 
+    controllers :applications => 'oauth/applications'      
+  end
 
   get "dashboard/show"
     
@@ -159,6 +161,10 @@ Bikeindex::Application.routes.draw do
       match 'not_found', to: 'api_v1#not_found'
       match '*a', to: 'api_v1#not_found'
     end
+    namespace :v2 do 
+      resources :manufacturers, only: [:index, :show]
+      resources :users do collection { get :current }  end
+    end
     mount Soulmate::Server, :at => "/searcher"
   end
 
@@ -188,6 +194,7 @@ Bikeindex::Application.routes.draw do
   # get "sitemaps/(*all)" => redirect("https://s3.amazonaws.com/bikeindex/sitemaps/%{all}")
   
   match '/400', to: 'errors#bad_request'
+  match '/401', to: 'errors#unauthorized'
   match '/404', to: 'errors#not_found'
   match '/422', to: 'errors#unprocessable_entity'
   match '/500', to: 'errors#server_error'

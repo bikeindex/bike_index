@@ -1,89 +1,29 @@
 class ApplicationController < ActionController::Base
   include UrlHelper
+  include AuthenticationHelper
   protect_from_forgery
   before_filter :strict_transport_security    
+  helper_method :current_user, :current_organization
+  
 
-protected
-  def strict_transport_security
-    if request.ssl?
-      response.headers['Strict-Transport-Security'] = "max-age=31536000;"
-    end
+  def cors_set_access_control_headers
+    headers['Access-Control-Allow-Origin'] = '*'
+    headers['Access-Control-Allow-Methods'] = 'POST, PUT, GET, OPTIONS'
+    headers['Access-Control-Request-Method'] = '*'
+    headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+    headers['Access-Control-Max-Age'] = "1728000"
   end
 
-  def current_user
-    begin
-      @current_user ||= User.find_by_auth_token!(cookies[:auth_token]) if cookies[:auth_token]
-    rescue ActiveRecord::RecordNotFound
-      return nil
-    end
-    if @current_user.present?
-      return @current_user
-    else
-      return nil
-    end
-  end
-  helper_method :current_user
-
-  # def permitted_params
-  #   @permitted_params ||= PermittedParams.new(params, current_user)
-  # end
-
-  def organization_list
-    @organization_list = Organization.all
-  end
-  helper_method :organization_list
-
-  def authenticate_user!
-    if current_user.present?
-      unless current_user.terms_of_service
-        redirect_to accept_terms_url(subdomain: false) and return
-      end
-    else
-      flash[:error] = "You gotta log in!"
-      redirect_to new_session_url(subdomain: false) and return
-    end
-  end
-
-  def require_member!
-    if current_user.is_member_of?(current_organization)
-      return true
-      # unless current_user.vendor_terms_of_service
-      #   redirect_to accept_vendor_terms_url(subdomain: false) and return
-      # end
-    else
-      flash[:error] = "You're not a member of that organization!"
-      redirect_to user_home_url(subdomain: false) and return
-    end
-  end
-
-  def require_admin!
-    unless current_user.is_admin_of?(current_organization)
-      flash[:error] = "You gotta be an organization administrator to do that!"
-      redirect_to user_home_url and return
-    end
-  end
-
-  def require_superuser!
-    unless current_user.present? and current_user.superuser?
-      flash[:error] = "Gotta be an admin. Srys"
-      redirect_to user_home_url(subdomain: false) and return
-    end
-  end
-
-  def current_organization
-    @organization ||= Organization.find_by_slug(request.subdomain)
-  end
-  helper_method :current_organization
-
-  def bust_cache!
-    response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Expires"] = "#{1.year.ago}"
-  end
-
-  def set_current_organization
-    if Subdomain.matches?(request)
-      @organzation = Organization.find_by_slug(request.subdomain)
+  # If this is a preflight OPTIONS request, then short-circuit the
+  # request, return only the necessary headers and return an empty
+  # text/plain.
+  def cors_preflight_check
+    if request.method == :options
+      headers['Access-Control-Allow-Origin'] = '*'
+      headers['Access-Control-Allow-Methods'] = 'POST, GET, OPTIONS'
+      headers['Access-Control-Allow-Headers'] = '*'
+      headers['Access-Control-Max-Age'] = '1728000'
+      render text: '', content_type: 'text/plain'
     end
   end
 

@@ -1,0 +1,4 @@
+<error-page>
+   <exception-type>500</exception-type>
+   <location>/500</location>
+</error-page>
