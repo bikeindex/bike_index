@@ -45,44 +45,55 @@
           Your current account (<strong>#{current_user.email}</strong>) will be a member of the organization you create.
         %p
           If you don't want that to be the case, #{link_to 'log out', session_path(redirect_location: 'new_user'), method: :delete} and sign up with the email you would like to use instead.
-      = form_for @organization do |f|
+      / - if current_user.memberships.count == 1
+      - if current_user.memberships.count > 0
+        - org = current_user.organizations.first
+        %h3.padded
+          You are already a member of #{link_to org.name, organization_url(org.slug)}.
+        %p.padded
+          %a.collapsed{ href: "#org-add-panel", data: { toggle: "collapse"} }
+            Click here
+          if you would like to create another organization.
 
-        - if @organization.errors.any?
-          #alert-block
-            .alert.alert-error
-              %a.close{"data-dismiss" => "alert"} ×
-              %h4
-                Please fix the following 
-                = pluralize(@organization.errors.count, "error")
-              %ul
-                - @organization.errors.full_messages.each do |msg|
-                  %li 
-                    = msg  
-        .well
-          %h3
-            New organization
-          .full-width-input
-            = f.label :name
-            = f.text_field :name, required: true, placeholder: "Organization name"
-          .full-width-input
-            = f.label :website, "Organization website"
-            = f.text_field :website, placeholder: "http://example.com"
+      #org-add-panel{ class: ('collapse' if org.present?) }
+        = form_for @organization do |f|
 
-          .controls.radio-controls
-            %label.radio
-              = f.radio_button :org_type, "shop"
-              Bike shop
-            %label.radio
-              = f.radio_button :org_type, "advocacy"
-              Advocacy group
-            %label.radio
-              = f.radio_button :org_type, "police"
-              Police department
-            %label.radio
-              = f.radio_button :org_type, "college"
-              College
-          .submit-new-org
-            = f.submit "Create organization", class: "button-blue"
+          - if @organization.errors.any?
+            #alert-block
+              .alert.alert-error
+                %a.close{"data-dismiss" => "alert"} ×
+                %h4
+                  Please fix the following 
+                  = pluralize(@organization.errors.count, "error")
+                %ul
+                  - @organization.errors.full_messages.each do |msg|
+                    %li 
+                      = msg  
+          .well
+            %h3
+              New organization
+            .full-width-input
+              = f.label :name
+              = f.text_field :name, required: true, placeholder: "Organization name"
+            .full-width-input
+              = f.label :website, "Organization website"
+              = f.text_field :website, placeholder: "http://example.com"
+
+            .controls.radio-controls
+              %label.radio
+                = f.radio_button :org_type, "shop"
+                Bike shop
+              %label.radio
+                = f.radio_button :org_type, "advocacy"
+                Advocacy group
+              %label.radio
+                = f.radio_button :org_type, "police"
+                Police department
+              %label.radio
+                = f.radio_button :org_type, "college"
+                College
+            .submit-new-org
+              = f.submit "Create organization", class: "button-blue"
     - else
       .alert.alert-info.padded
         %p

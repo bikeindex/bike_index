@@ -50,7 +50,16 @@
         = link_to "Approve sharing this recovery!", admin_recoveries_url
   %p
     = link_to 'View the bike', edit_admin_bike_url(bike)
-    
+- elsif @feedback.feedback_type == 'organization_created'
+  - organization = Organization.find(@feedback.feedback_hash[:organization_id])
+  %h1
+    #{organization.name} created 
+  %p
+    Created by #{@feedback.email}
+  %hr
+  %p
+    = link_to "View the organization", edit_admin_organization_url(organization)
+
 - else
   %p
     From: 

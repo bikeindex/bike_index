@@ -35,18 +35,21 @@ setModelTypeahead = (data=[]) ->
   autocomplete.data('typeahead').source = data 
   # $('#bike_frame_model').typeahead({source: data})
 
-getModelList = (mnfg_name) ->
-  year = parseInt($('#bike_year').val(),10)
-  # could be bikebook.io - but then we'd have to pay for SSL...
-  url = "https://bikebook.herokuapp.com//model_list/?manufacturer=#{mnfg_name}"
-  url += "&year=#{year}" if year > 1
-  $.ajax
-    type: "GET"
-    url: url
-    success: (data, textStatus, jqXHR) ->
-      setModelTypeahead(data)
-    error: ->
-      setModelTypeahead()
+getModelList = (mnfg_name='absent') ->
+  if mnfg_name == 'absent'
+    setModelTypeahead()
+  else
+    year = parseInt($('#bike_year').val(),10)
+    # could be bikebook.io - but then we'd have to pay for SSL...
+    url = "https://bikebook.herokuapp.com/model_list/?manufacturer=#{mnfg_name}"
+    url += "&year=#{year}" if year > 1
+    $.ajax
+      type: "GET"
+      url: url
+      success: (data, textStatus, jqXHR) ->
+        setModelTypeahead(data)
+      error: ->
+        setModelTypeahead()
 
 toggleRegistrationType = ->
   $('#registration-type-tabs a').toggleClass('current-type')
@@ -109,7 +112,15 @@ updateYear = ->
     $('#bike_unknown_year').prop('checked', true)
   else
     $('#bike_unknown_year').prop('checked', false)
-  getModelList()
+
+  id = $('#bike_manufacturer_id').val()
+  if id.length > 0
+    $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
+    ).done (data) ->
+      getModelList(data.manufacturer.name)
+
+  else
+    getModelList()
 
 $(document).ready ->
   window.root_url = $('#root_url').attr('data-url')

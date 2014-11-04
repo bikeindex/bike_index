@@ -25,6 +25,12 @@ class OrganizationsController < ApplicationController
     if @organization.save
       membership = Membership.create(user_id: user.id, role: 'admin', organization_id: @organization.id)
       @organization.update_attribute :auto_user_id, user.id
+
+      feedback = Feedback.create(email: current_user.email,
+        body: "#{@organization.name} signed up for the Index",
+        feedback_hash: { organization_id: @organization.id },
+        title: "New Organization created",
+        feedback_type: 'organization_created')
       flash[:notice] = "Organization Created successfully!"
       if current_user.present?
         redirect_to organization_url(@organization) and return

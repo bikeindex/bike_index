@@ -45,6 +45,14 @@ describe AdminMailer do
       mail.to.should eq(["contact@bikeindex.org"])
       mail.from.should eq([@feedback.email])
     end
+    it 'sends a new org email' do 
+      organization = FactoryGirl.create(:organization)
+      user = FactoryGirl.create(:user)
+      membership = FactoryGirl.create(:membership, user: user, organization: organization)
+      @feedback.update_attributes(feedback_hash: {organization_id: organization.id}, feedback_type: 'organization_created')
+      mail = AdminMailer.feedback_notification_email(@feedback)
+      mail.from.should eq([@feedback.email])
+    end
   end
 
   describe :no_admins_notification_email do

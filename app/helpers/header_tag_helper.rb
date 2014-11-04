@@ -12,7 +12,7 @@ module HeaderTagHelper
 protected
 
   def set_header_tag_hash
-    special_meta_tags = ['bikes', 'welcome', 'news', 'users', 'manufacturers']
+    special_meta_tags = ['bikes', 'welcome', 'news', 'users', 'manufacturers', 'organizations']
     if special_meta_tags.include? controller_name
       self.send("#{controller_name}_header_tags")
     else
@@ -132,6 +132,18 @@ protected
         hash[:meta_tags][:"og:image"] = iurl
         hash[:meta_tags][:"twitter:image:src"] = iurl
       end
+    end
+    hash
+  end
+
+  def organizations_header_tags
+    hash = current_page_auto_hash
+    if action_name == 'show'
+      hash[:title_tag][:title] = @organization.name
+    elsif action_name == 'edit'
+      hash[:title_tag][:title] = "Edit #{@organization.name}"
+    elsif action_name == "embed_extended"
+      hash[:title_tag][:title] = "Add a bike through #{@organization.name}"
     end
     hash
   end

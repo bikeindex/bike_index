@@ -13,7 +13,7 @@ describe OrganizationsController do
   end
 
   describe :create do 
-    it "creates org, membership, filter approved attrs & redirect to org with current_user" do 
+    it "creates org, membership, filters approved attrs & redirect to org with current_user" do 
       Organization.count.should eq(0)
       user = FactoryGirl.create(:user)
       set_current_user(user)
@@ -32,6 +32,21 @@ describe OrganizationsController do
       organization.auto_user_id.should eq(user.id)
       organization.memberships.count.should eq(1)
       organization.memberships.first.user_id.should eq(user.id)
+    end
+    it "mails us" do 
+      Sidekiq::Testing.inline! do
+        user = FactoryGirl.create(:user)
+        set_current_user(user)
+        org_attrs = {
+          name: 'a new org',
+          org_type: 'shop',
+          api_access_approved: 'true',
+          approved: 'true'
+        }
+        ActionMailer::Base.deliveries = []
+        post :create, organization: org_attrs
+        ActionMailer::Base.deliveries.should_not be_empty
+      end
     end
   end
 
