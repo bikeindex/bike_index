@@ -40,7 +40,7 @@ class BikeIndex.Views.Global extends Backbone.View
       # h = $(window).height() - $('.wheel-holder').offset().top
       # $('.wheel-holder').css('height', "#{h}px")
       # $('.bike-background').addClass('scrolled')
-
+    @intializeContent() if $('.content-nav').length > 0
     
 
   setLightspeedMovie: ->
@@ -213,17 +213,21 @@ class BikeIndex.Views.Global extends Backbone.View
     )
 
   intializeContent: ->
-    if $(window).width() > 650 
-      $('#content-menu').addClass('affix')
-      footer_offset = $('#page-foot').offset().top
-      menu = $('#content-menu')
-      tp = menu.css('padding-top')
-      bp = menu.css('padding-bottom')
-      menu_height = menu.height()
-      b_offset = footer_offset - ( menu_height + 120 ) 
+    # Add margin to the top of page content so that it doesn't break
+    h = $('.active-menu ul').height() - 40
+    $('#content-top-margin').css('margin-top', "#{h}px")
+
+    # if $(window).width() > 650 
+    #   $('#content-menu').addClass('affix')
+    #   footer_offset = $('#page-foot').offset().top
+    #   menu = $('#content-menu')
+    #   tp = menu.css('padding-top')
+    #   bp = menu.css('padding-bottom')
+    #   menu_height = menu.height()
+    #   b_offset = footer_offset - ( menu_height + 120 ) 
       
-      $("<style>#content-menu.affix{top:#{b_offset}px};</style>").appendTo('head')
-      $('#content-menu').attr('data-spy', 'affix').attr('data-offset-top', (b_offset))
+    #   $("<style>#content-menu.affix{top:#{b_offset}px};</style>").appendTo('head')
+    #   $('#content-menu').attr('data-spy', 'affix').attr('data-offset-top', (b_offset))
 
   expandSearch: ->
     # unless $('#total-top-header').hasClass('search-expanded')

@@ -63,6 +63,9 @@
     text-decoration: underline;
   }
 }
+#content-top-margin { display: none; }
+
+@media(max-width: 779px) { #content-top-margin { display: block; } }
 
 .page-content {
   position: relative;
