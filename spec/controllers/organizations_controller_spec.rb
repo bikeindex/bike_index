@@ -69,7 +69,7 @@ describe OrganizationsController do
       @organization.reload.website.should eq('http://www.drseuss.org')
     end
 
-    it "sends an admin notification if there is the lightspeed cloud api key" do 
+    it "sends an admin notification if there is the lightspeed retail api key" do 
       user = FactoryGirl.create(:user)
       organization = FactoryGirl.create(:organization)
       membership = FactoryGirl.create(:membership, user: user, organization: organization)

@@ -66,19 +66,19 @@
 
   %h3
     %a{ href: "https://pos_integration.bikeindex.org/organizations/connect?id=#{@organization.slug}&access_token=#{@organization.access_token}"}
-      Lightspeed Cloud Integration
+      Lightspeed Retail Integration
 /   %a#show-lightspeed-info{href: "#"}
 /     %span.shown-info
 /       View
 /     %span.hidden-info
 /       Hide
-/     LightSpeed Cloud information
+/     Lightspeed Retail information
 
 / #lightspeed-info.initially-hidden
 /   %h3
-/     Update your Lightspeed Cloud API key.
+/     Update your sightspeed Retail API key.
 /   .well.span6.form.form-horizontal
 /     = form_for @organization do |f|
 /       .lightspeed-api-key-input
-/         = f.text_field :lightspeed_cloud_api_key, placeholder: 'Enter your Lightspeed Cloud API key'
+/         = f.text_field :lightspeed_cloud_api_key, placeholder: 'Enter your sightspeed Retail API key'
 /       = f.submit "Update key", class: 'button-green'
