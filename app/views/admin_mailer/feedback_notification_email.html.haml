@@ -69,7 +69,7 @@
   %p
     = link_to 'View the bike', edit_admin_bike_url(bike)
 
-- elsif @feedback.feedback_type.match(/organization_/i)
+- elsif @feedback.feedback_type.present? && @feedback.feedback_type.match(/organization_/i)
   - organization = Organization.find(@feedback.feedback_hash[:organization_id])
   %h1
     = @feedback.body
