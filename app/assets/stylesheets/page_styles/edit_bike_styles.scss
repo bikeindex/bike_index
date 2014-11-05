@@ -154,13 +154,14 @@
   padding-top: 30px;
 }
 
-.serial-update-link {
+.submit-correction-link {
   color: $blueLight;
   font-size: .9em;
   &:hover { color: $linkColor; }
 }
 
-#mark-recovered-error, #request-delete-error, #submit-serial-error { display: none; }
+#mark-recovered-error, #submit-manufacturer-error,
+#request-delete-error, #submit-serial-error { display: none; }
 
 
 //________________________
@@ -625,6 +626,7 @@
   }
 }
 // .add-bike-photos .public_image { height: 130px; }
+.input-group.form-head.bike-photo-add-head { border-bottom: none; }
 .public_image {
   @include border-radius(2px);
   background: $searchBackground;

@@ -15,12 +15,14 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     'change #edit_drivetrain select': 'updateDrivetrainValue'
     'click #frame-sizer button': 'updateFrameSize'
     'change #country_select_container select': 'updateCountry'
-    'change #bike_year':              'updateYear'
-    'change #bike_unknown_year':      'toggleUnknownYear'
-    'click #submit-serial-update':     'submitSerialUpdate'
-    'click #request-bike-delete':     'requestBikeDelete'
-    'click .submit-bike-update':      'checkIfPhoneBlank'
-    'change #mark_recovered_we_helped': 'toggleCanWeTell'
+    'change #bike_year':                 'updateYear'
+    'change #bike_unknown_year':         'toggleUnknownYear'
+    'click #submit-serial-update':       'submitSerialUpdate'
+    'click #mnfg-update-modal':          'initializeManufacturerUpdate'
+    'click #submit-manufacturer-update': 'submitManufacturerUpdate'
+    'click #request-bike-delete':        'requestBikeDelete'
+    'click .submit-bike-update':         'checkIfPhoneBlank'
+    'change #mark_recovered_we_helped':  'toggleCanWeTell'
 
     
   initialize: ->
@@ -438,6 +440,49 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       
     else
       $('#submit-serial-error').slideDown('fast')
+
+  submitManufacturerUpdate: (e) ->
+    e.preventDefault()
+    manufacturer = $('#manufacturer_update_manufacturer').val()
+    reason = $('#manufacturer_update_reason').val()
+    bike_id = $('#manufacturer_update_bike_id').val()
+    if manufacturer.length > 0 && reason.length > 0 && bike_id.length > 0
+      url = $('#submitManufacturerCorrection').attr('data-url')
+      $.ajax
+        type: "POST"
+        url: url
+        data:
+          request_type: 'manufacturer_update_request'
+          request_bike_id: bike_id
+          request_reason: reason
+          manufacturer_update_manufacturer: manufacturer
+        success: (data, textStatus, jqXHR) ->
+          BikeIndex.alertMessage('success', 'Manufacturer correction submitted', "Processing your updated Manufacturer now. We review all updates by hand, it could take up to a day before your bike is updated. Thanks!")
+        error: (data, textStatus, jqXHR) ->
+          BikeIndex.alertMessage('error', 'Request failed', "We're unable to process the update! Try again?")
+      $('#submitManufacturerCorrection').modal('hide')  
+      
+    else
+      $('#submit-manufacturer-error').slideDown('fast')
+
+  initializeManufacturerUpdate: ->
+    url = "#{window.root_url}/api/searcher?types[]=frame_makers&"
+    $('#manufacturer_update_manufacturer').select2
+      minimumInputLength: 2
+      placeholder: 'Choose manufacturer'
+      ajax:
+        url: url
+        dataType: "json"
+        openOnEnter: true
+        data: (term, page) ->
+          term: term # search term
+          limit: 10
+        results: (data, page) -> # parse the results into the format expected by Select2.
+          remapped = data.results.frame_makers.map (i) -> {id: i.id, text: i.term}
+          results: remapped
+      initSelection: (element, callback) ->
+        id = $(element).val()
+        
 
   requestBikeDelete: (e) ->
     e.preventDefault()

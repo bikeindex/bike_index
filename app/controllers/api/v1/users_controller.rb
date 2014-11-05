@@ -32,6 +32,11 @@ module Api
               bike.serial_number = params[:serial_update_serial]
               bike.save
               SerialNormalizer.new({serial: params[:serial_update_serial]}).save_segments(bike.id)
+            elsif params[:manufacturer_update_manufacturer].present?
+              feedback.feedback_hash[:old_manufacturer] = bike.manufacturer
+              bike.manufacturer_id = params[:manufacturer_update_manufacturer]
+              bike.save
+              feedback.feedback_hash[:new_manufacturer] = bike.manufacturer.name
             elsif feedback_type.match('bike_recovery')
               if bike.current_stolen_record.present?
                 RecoveryUpdateWorker.perform_async(bike.current_stolen_record.id, params)

@@ -8,14 +8,15 @@
         Serial number
       .controls
         = @bike.serial_number.upcase
-      %a.serial-update-link.optional-form-block{role: "button", title: "Incorrect serial? Fix it!", data: {toggle: "modal", target: "#submitSerialCorrection"} }
-        Submit serial number correction
+      %a.submit-correction-link.optional-form-block{role: "button", title: "Incorrect serial? Fix it!", data: {toggle: "modal", target: "#submitSerialCorrection"} }
+        Submit serial correction
     .control-group
       %label.control-label.unclickable
         Manufacturer
       .controls
         = @bike.manufacturer_name
-
+      %a#mnfg-update-modal.submit-correction-link.optional-form-block{role: "button", title: "Incorrect manufacturer? Fix it!", data: {toggle: "modal", target: "#submitManufacturerCorrection"} }
+        Submit manufacturer correction
   .input-group
     .control-group
       = f.label :frame_model, class: "control-label"
