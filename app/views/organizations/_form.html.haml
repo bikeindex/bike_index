@@ -1,0 +1,55 @@
+.form.form-horizontal.padded.form-horizontal-collapse
+  - if @organization.errors.any?
+    #alert-block
+      .alert.alert-error
+        %h4
+          Please fix the following
+          = pluralize(@organization.errors.count, "error")
+        %ul
+          - @organization.errors.full_messages.each do |msg|
+            %li
+              = msg
+  .control-group.padded
+    .control-label
+      = f.label :name
+    .controls
+      = f.text_field :name
+
+  .control-group
+    .control-label
+      = f.label :website
+    .controls
+      = f.text_field :website
+
+  .control-group
+    .control-label
+      %label{ for: 'organization_wants_to_be_shown'}
+        Show on
+        %a{ href: where_url, target: '_blank' }
+          map
+    .controls
+      = f.check_box :wants_to_be_shown
+
+  .control-group
+    .control-label
+      %label
+        Organization type
+    .controls.radio-controls
+      %label.radio
+        = f.radio_button :org_type, "shop"
+        Bike shop
+      %label.radio
+        = f.radio_button :org_type, "advocacy"
+        Advocacy group
+      %label.radio
+        = f.radio_button :org_type, "police"
+        Police department
+      %label.radio
+        = f.radio_button :org_type, "college"
+        College
+      %label.radio
+        = f.radio_button :org_type, "manufacturer"
+        Manufacturer
+
+  / .control-group.padded.clearfix
+  /   = f.submit 'Update', class: 'button-green'

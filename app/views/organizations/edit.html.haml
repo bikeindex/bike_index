@@ -1,110 +1,123 @@
-%h1
-  A few settings for #{@organization.name}
+%h1#edit-organization-page
+  Manage #{@organization.name}
 
-  %h1
-    Manage #{@organization.name}'s users
+%h3.padded
+  You currently have #{pluralize(@organization.users.count, "member")}
 
+%section.full-screen-table
+  %table#org-users-table.table.table-striped.table-bordered
+    %thead
+      %th
+        Name
+      %th
+        Email
+      %th.medium-screens
+        Total indexed
+    %tbody
+      - @organization.memberships.each do |membership|
+        %tr
+          %td
+            = link_to membership.user.name, "/organizations/#{@organization.slug}/memberships/#{membership.id}/edit"
+          %td
+            = membership.user.email
+          %td.medium-screens
+            = @bikes.where(creator_id: membership.user.id).count
+.invitations
+  %h2
+    Invite more users to your organization
+  %h3.organization-description-list
+    You have sent #{pluralize(@organization.sent_invitation_count, "invitation")},
+    %br
+    and have 
+    = @organization.available_invitation_count
+    remaining #{"invitation".pluralize(current_organization.available_invitation_count)}.
+    - if @organization.available_invitation_count > 0
+      = link_to "Send an invitation to a member of your organization", "/organizations/#{@organization.slug}/organization_invitations/new", class: "button-yellow"
+      
+    
+      
 
-  %h3
-    You currently have #{pluralize(@organization.users.count, "member")},
+  - if @organization.organization_invitations.unclaimed.count > 0
+    %h3.invitations-sent
+      #{ pluralize(@organization.organization_invitations.unclaimed.count, "invitations") } you sent haven't been claimed yet
 
-  %section.full-screen-table
-    %table#org-users-table.table.table-striped.table-bordered
+    %table.table.table-striped
       %thead
-        %th
+        %th.medium-screens
           Name
         %th
           Email
-        %th.medium-screens
-          Total indexed
+        %th
+          Role
+        %th
+          Date sent
       %tbody
-        - @organization.memberships.each do |membership|
+        - @organization.organization_invitations.unclaimed.each do |org_invite| 
           %tr
-            %td
-              = link_to membership.user.name, "/organizations/#{@organization.slug}/memberships/#{membership.id}/edit"
-            %td
-              = membership.user.email
             %td.medium-screens
-              = @bikes.where(creator_id: membership.user.id).count
-  .invitations
-    %hr
-    %h2
-      Invitations
-    %h3.organization-description-list
-      You have sent #{pluralize(@organization.sent_invitation_count, "invitation")},
-      %br
-      and have 
-      = @organization.available_invitation_count
-      remaining #{"invitation".pluralize(current_organization.available_invitation_count)}.
-      - if @organization.available_invitation_count > 0
-        = link_to "Send an invitation to a member of your organization", "/organizations/#{@organization.slug}/organization_invitations/new", class: "button-yellow"
-        
-      
-        
+              - if org_invite.invitee_name
+                = org_invite.invitee_name
+            %td
+              = org_invite.invitee_email
+            %td
+              = org_invite.membership_role
+            %td
+              = org_invite.created_at.strftime("%-I %p on %-m/%-d/%Y ")
 
-    - if @organization.organization_invitations.unclaimed.count > 0
-      %h3.invitations-sent
-        #{ pluralize(@organization.organization_invitations.unclaimed.count, "invitations") } you sent haven't been claimed yet
+    .alert-info.invitations-wait-till
+      %p
+        You have to wait until invitations are claimed before you can edit the user (and before they can add bikes).
 
-      %table.table.table-striped
-        %thead
-          %th.medium-screens
-            Name
-          %th
-            Email
-          %th
-            Role
-          %th
-            Date sent
-        %tbody
-          - @organization.organization_invitations.unclaimed.each do |org_invite| 
-            %tr
-              %td.medium-screens
-                - if org_invite.invitee_name
-                  = org_invite.invitee_name
-              %td
-                = org_invite.invitee_email
-              %td
-                = org_invite.membership_role
-              %td
-                = org_invite.created_at.strftime("%-I %p on %-m/%-d/%Y ")
-
-      .alert-info.invitations-wait-till
-        %p
-          You have to wait until invitations are claimed before you can edit the users. And before they can add bikes.
+= form_for @organization do |f|
+  .container
+    .padded.row  
+      .well.span6
+        = render partial: 'form', locals: { f: f }
+      .span6
+        .nested-form
+          %p
+            %strong
+              = pluralize(@organization.locations.count, "Location")
+          %p#us-country-code.other-value
+            = Country.find_by_iso("US").id
+          %fieldset
+            / .horizontal-form-list
+            .form-horizontal.form-horizontal-collapse
+              = f.fields_for :locations do |builder|
+                = render 'location_fields', f: builder
+              = link_to_add_fields "Add a location", f, :locations
+  %section.organization-update-block.padded
+    / .control-group.actions.padded
+    = f.submit "Update #{@organization.name}", class: 'button-green'
 
 
+/ - if @organization.locations.any?
+/   - if @organization.locations.count > 1
+/     %h3.padded
+/       = pluralize(@organization.locations.count, "Location")
+/   - @organization.locations.each do |location|
 
+/     - location = location.decorate
+    
+/     - if location.name
+/       %p
+/         Name: 
+/         = location.name
+
+/     - if location.phone
+/       %p
+/         Phone: 
+/         = location.display_phone
+
+/     - if location.street
+/       %p
+/         Street address: 
+/         = location.street
 
 %hr.padded
-- if @organization.locations.any?
-  - if @organization.locations.count > 1
-    %h3.padded
-      = pluralize(@organization.locations.count, "Location")
-  - @organization.locations.each do |location|
-
-    - location = location.decorate
-    
-    - if location.name
-      %p
-        Name: 
-        = location.name
-
-    - if location.phone
-      %p
-        Phone: 
-        = location.display_phone
-
-    - if location.street
-      %p
-        Street address: 
-        = location.street
-    %hr
-
-   
-.delete-organization
+.delete-organization.padded
   %p
     %a.collapsed{data: {toggle: "collapse", target: "#delete-organization"}}
       I would like to terminate my account with the Bike Index
   #delete-organization.collapse
-    = link_to "Delete #{@organization.name}!", organization_url(@organization), method: :delete, confirm: "Are you sure you want to?", class: "button-red"
+    = link_to "Delete #{@organization.name}", organization_url(@organization), method: :delete, confirm: "Are you sure you want to? This will delete your organization forever.", class: "button-red"

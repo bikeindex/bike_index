@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141031152955) do
+ActiveRecord::Schema.define(:version => 20141105172149) do
 
   create_table "ads", :force => true do |t|
     t.string   "title"
@@ -440,6 +440,7 @@ ActiveRecord::Schema.define(:version => 20141031152955) do
     t.text     "new_bike_notification"
     t.boolean  "api_access_approved",        :default => false,  :null => false
     t.boolean  "approved",                   :default => false,  :null => false
+    t.boolean  "wants_to_be_shown",          :default => false,  :null => false
   end
 
   add_index "organizations", ["slug"], :name => "index_organizations_on_slug", :unique => true
@@ -572,6 +573,16 @@ ActiveRecord::Schema.define(:version => 20141031152955) do
   add_index "stolen_records", ["bike_id"], :name => "index_stolen_records_on_bike_id"
   add_index "stolen_records", ["latitude", "longitude"], :name => "index_stolen_records_on_latitude_and_longitude"
 
+  create_table "subscriptions", :force => true do |t|
+    t.integer  "user_id"
+    t.boolean  "is_current",        :default => true
+    t.string   "strip_customer_id"
+    t.string   "stripe_plan_id"
+    t.datetime "end_date"
+    t.datetime "created_at",                          :null => false
+    t.datetime "updated_at",                          :null => false
+  end
+
   create_table "users", :force => true do |t|
     t.string   "name"
     t.string   "email"
@@ -604,6 +615,8 @@ ActiveRecord::Schema.define(:version => 20141031152955) do
     t.boolean  "can_invite"
     t.boolean  "can_send_many_stolen_notifications", :default => false, :null => false
     t.string   "auth_token"
+    t.boolean  "make_subscription_request",          :default => false, :null => false
+    t.boolean  "is_subscribed",                      :default => false, :null => false
   end
 
   add_index "users", ["password_reset_token"], :name => "index_users_on_password_reset_token"

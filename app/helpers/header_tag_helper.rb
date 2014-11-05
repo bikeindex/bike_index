@@ -141,7 +141,7 @@ protected
     if action_name == 'show'
       hash[:title_tag][:title] = @organization.name
     elsif action_name == 'edit'
-      hash[:title_tag][:title] = "Edit #{@organization.name}"
+      hash[:title_tag][:title] = "Manage #{@organization.name}"
     elsif action_name == "embed_extended"
       hash[:title_tag][:title] = "Add a bike through #{@organization.name}"
     end

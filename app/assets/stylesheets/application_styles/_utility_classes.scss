@@ -345,3 +345,20 @@ header.with-subtitle {
 .smaller-text {
   font-size: .8em;
 }
+
+.centered-form-well { margin: 0 auto; float: none; }
+
+@media (max-width: 480px) {
+  .form-horizontal.form-horizontal-collapse {
+    .control-label { float: none; text-align: left; }
+  }   
+}
+
+@media (min-width: 480px) {
+  .form-horizontal.form-horizontal-collapse {
+    .controls {
+      select, input { max-width: 80%; }
+    }
+  }
+}
+

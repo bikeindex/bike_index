@@ -3,6 +3,8 @@ class MembershipsController < ApplicationController
   before_filter :find_membership
   before_filter :require_admin
 
+  layout "organization"
+
   def edit
     @user = @membership.user
     bikes = Bike.where(creator_id: @user.id).where(creation_organization_id: @organization.id).order("created_at asc")

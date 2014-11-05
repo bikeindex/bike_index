@@ -15,7 +15,8 @@ class Organization < ActiveRecord::Base
     :api_access_approved,
     :access_token,
     :new_bike_notification,
-    :lightspeed_cloud_api_key
+    :lightspeed_cloud_api_key, 
+    :wants_to_be_shown
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key
   acts_as_paranoid

@@ -1,11 +1,13 @@
 %h1
-  - if @user.name.present?
-    = @user.name
-  - else 
-    = @user.email
+  Edit membership for 
+  %em
+    - if @user.name.present?
+      = @user.name
+    - else 
+      = @user.email
 
 %p
-  Joined the bike index #{@user.created_at.strftime("%-m/%-d/%Y")}
+  Joined the Bike Index #{@user.created_at.strftime("%-m/%-d/%Y")}
 
 %section.full-screen-table.padded
   %p 
@@ -29,8 +31,6 @@
         Manufacturer
       %th.large-screens
         Color&nbsp;&nbsp;
-      %th.large-screens
-        Rear Wheel size
 
     %tbody
       - @bikes.each do |bike|
@@ -58,29 +58,27 @@
             = bike.manufacturer_name
           %td.large-screens
             = bike.primary_frame_color.name
-          %td.large-screens
-            = bike.rear_wheel_size.name
+          
 
-%hr
-%section
+%section.padded
+  .well.span6.centered-form-well
+    %h3
+      Edit #{@user.email}
 
-  %h4
-    Edit #{@user.email}
+    .form.form-horizontal.padded
+      = form_for @membership do |f|
+       
+        .control-group
+          = f.label :role, class: "control-label"
+          .controls.radio-controls
+            %label.radio
+              = f.radio_button :role, "admin"
+              Admin of organization
+            %label.radio
+              = f.radio_button :role, "member"
+              Member of organization
 
-  .form.form-horizontal
-    = form_for @membership do |f|
-     
-      .control-group
-        = f.label :role, class: "control-label"
-        .controls.radio-controls
-          %label.radio
-            = f.radio_button :role, "admin"
-            Admin of organization
-          %label.radio
-            = f.radio_button :role, "member"
-            Member of organization
-
-      .membership-actions
-        = f.submit 'Update role', class: 'button-green'
-        = link_to "Delete member", membership_url(@membership), method: :delete, confirm: "Are you sure you want to remove #{@user.email} from your organization?", class: "button-red"
-    
+        .membership-actions.clearfix
+          = f.submit 'Update role', class: 'button-green'
+          = link_to "Delete member", membership_url(@membership), method: :delete, confirm: "Are you sure you want to remove #{@user.email} from your organization?", class: "button-red"
+      

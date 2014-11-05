@@ -18,22 +18,17 @@ class OrganizationsController < ApplicationController
   def create
     user = current_user
     @organization = Organization.new(
-      name: params[:organization][:name],
+      name: params[:organization][:name].strip,
       website: params[:organization][:website],
       org_type: params[:organization][:org_type]
     )
     if @organization.save
       membership = Membership.create(user_id: user.id, role: 'admin', organization_id: @organization.id)
       @organization.update_attribute :auto_user_id, user.id
-
-      feedback = Feedback.create(email: current_user.email,
-        body: "#{@organization.name} signed up for the Index",
-        feedback_hash: { organization_id: @organization.id },
-        title: "New Organization created",
-        feedback_type: 'organization_created')
+      notify_admins('organization_created')
       flash[:notice] = "Organization Created successfully!"
       if current_user.present?
-        redirect_to organization_url(@organization) and return
+        redirect_to edit_organization_url(@organization) and return
       end
     else
       render action: :new and return
@@ -93,29 +88,43 @@ class OrganizationsController < ApplicationController
       redirect_to organization_url(@organization) and return
       # @stolen_notification = StolenNotification.new(params[:stolen_notification])
     else
-      websitey = params[:organization][:website]
-      if Urlifyer.urlify(websitey)
-        @organization.website = websitey
-        if @organization.save
-          # raise "organization saved"
-          redirect_to edit_organization_url(@organization), notice: "Organization updated"
-        else
-          raise "organization not saved"
-          render action: :settings
+      if @organization.update_attributes(allowed_attributes)
+        if @organization.wants_to_be_shown && @organization.show_on_map == false
+          notify_admins('wants_shown')
+        elsif @organization.wants_to_be_shown == false && @organization.show_on_map
+          notify_admins('wants_not_shown')
         end
+        # if Urlifyer.urlify(params[:organization][:website])
+        #   @organization.website = websitey
+        #   if @organization.save
+        redirect_to edit_organization_url(@organization), notice: "Organization updated"
       else
-        flash[:error] = "We're sorry, that didn't look like a valid url to us!"
-        render action: :settings
+        flash[:error] = "We're sorry, we had trouble updating your organization"
+        render action: :edit
       end
     end
   end
 
   def destroy
+    notify_admins(organization_destroyed)
     @organization.destroy
     redirect_to root_url
   end
 
   protected
+
+  def allowed_attributes
+    updates = {
+      name: params[:organization][:name],
+      website: params[:organization][:website],
+      wants_to_be_shown: params[:organization][:wants_to_be_shown],
+      org_type: params[:organization][:org_type]
+    }
+    if params[:organization][:locations_attributes].present?
+      updates[:locations_attributes] = params[:organization][:locations_attributes]
+    end
+    updates
+  end
 
   def set_bparam
     unless @organization.auto_user.present?
@@ -130,7 +139,11 @@ class OrganizationsController < ApplicationController
   end
 
   def find_organization
-    @organization = Organization.find_by_slug(params[:id])
+    if params[:id].match(/\A\d*\z/).present?
+      @organization = Organization.find(params[:id])
+    else
+      @organization = Organization.find_by_slug(params[:id])
+    end
     unless @organization.present?
       flash[:error] = "We're sorry, that organization isn't on Bike Index yet. Email contact@bikeindex.org if this seems like an error."
       redirect_to root_url and return
@@ -151,6 +164,30 @@ class OrganizationsController < ApplicationController
       flash[:error] = "You gotta be an organization administrator to do that!"
       redirect_to user_home_url and return
     end
+  end
+  
+  def notify_admins(type)
+    feedback = Feedback.new(email: current_user.email,
+      feedback_hash: { organization_id: @organization.id })
+    if type == 'organization_created'
+      feedback.body = "#{@organization.name} created an account"
+      feedback.title = "New Organization created"
+      feedback.feedback_type = 'organization_created'
+    elsif type == 'organization_destroyed'
+      feedback.body = "#{@organization.name} deleted their account"
+      feedback.title = "Organization deleted themselves"   
+      feedback.feedback_type = 'organization_destroyed'
+    else
+      feedback.feedback_type = 'organization_map'
+      if type == 'wants_shown'
+        feedback.body = "#{@organization.name} wants to be shown"
+        feedback.title = "Organization wants to be shown"   
+      else
+        feedback.body = "#{@organization.name} wants to NOT be shown"
+        feedback.title = "Organization wants OFF map"  
+      end
+    end
+    raise StandardError, "Couldn't notify admins" unless feedback.save
   end
 
 end

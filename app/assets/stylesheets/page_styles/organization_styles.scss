@@ -230,6 +230,7 @@
     .shown-info { display: none; }
   }
 }
+
 #lightspeed-info {
   input[type="text"] {
     width: 100%;
@@ -250,7 +251,7 @@
 
 
 .organization-description-list {
-  margin: 60px 0 40px;
+  // margin: 60px 0 40px;
   position: relative;
   .button-yellow {
     float: none;
@@ -274,9 +275,16 @@
   }
 }
 
+.organization-update-block {
+  .button-green {
+    display: block;
+    width: 100%;
+  }
+}
+
 .invitations {
-  max-width: 90%;
-  margin: 60px auto 0;
+  // max-width: 90%;
+  // margin: 30px auto 0;
   h2 { padding-top: 20px;}
 }
 
@@ -290,8 +298,6 @@
 }
 
 .membership-actions {
-  width: 600px;
-  max-width: 100%;
   .button-green {
     float: right;
     font-size: 1.2em;
