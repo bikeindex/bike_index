@@ -12,16 +12,16 @@
       = submit_tag "Search", name: "search", class: "button-blue"
 
   %p
-    There are currently #{PublicImage.count} bike images
+    There are currently #{number_with_delimiter(PublicImage.count)} bike images
     %em
       (#{PublicImage.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
   %h4
-    = Bike.all.count
+    = number_with_delimiter(Bike.all.count)
     indexed,
     %em
       (#{Bike.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
-    = Ownership.where(current: true).where(claimed: true).count
-    claimed
+    = number_with_delimiter(Ownership.where(current: true).where(claimed: true).count)
+    are claimed
 
 
 - if @bikes.present?

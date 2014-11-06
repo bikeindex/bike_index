@@ -8,7 +8,7 @@
       = submit_tag "Search", name: "search", class: "button-blue"
 
   %h4
-    = User.all.count
+    = number_with_delimiter(User.all.count)
     users have signed up so far!
 
 - if @users.present?
