@@ -199,6 +199,6 @@ Bikeindex::Application.routes.draw do
   match '/422', to: 'errors#unprocessable_entity'
   match '/500', to: 'errors#server_error'
 
-  mount Sidekiq::Web => '/sidekiq', constraints: AdminRestriction
+  mount Sidekiq::Web => '/sidekiq'
   
 end

@@ -248,6 +248,12 @@
 //
 //________________________
 
+#admin-recovery-fields {
+  display: none;
+  padding-top: 10px;
+  textarea { width: 100%; }
+}
+
 .special-search-field-container { 
   @include clearfix;
   margin-top: 30px;

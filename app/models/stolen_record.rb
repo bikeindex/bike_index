@@ -156,6 +156,7 @@ class StolenRecord < ActiveRecord::Base
   def add_recovery_information(info)
     self.date_recovered = Time.now
     self.recovered_description = info[:request_reason]
+    self.current = false
     if info[:index_helped_recovery].present?
       if info[:index_helped_recovery].to_s.match(/t|1/i)
         self.index_helped_recovery = true

@@ -60,7 +60,16 @@ class Admin::BikesController < Admin::BaseController
   def update
     BikeUpdator.new(user: current_user, b_params: params).update_ownership
     @bike = @bike.decorate
+    if params[:mark_recovered_reason].present?
+      info = {
+        request_reason: params[:mark_recovered_reason],
+        index_helped_recovery: params[:mark_recovered_we_helped],
+        can_share_recovery: false
+      }
+      RecoveryUpdateWorker.perform_async(@bike.current_stolen_record.id, info)
+    end
     if @bike.update_attributes(params[:bike])
+
       SerialNormalizer.new({serial: @bike.serial_number}).save_segments(@bike.id)
       redirect_to edit_admin_bike_url(@bike), notice: 'Bike was successfully updated.'
     else

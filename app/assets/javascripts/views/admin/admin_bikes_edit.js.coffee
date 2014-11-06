@@ -4,6 +4,13 @@ class BikeIndex.Views.AdminBikesEdit extends Backbone.View
     window.root_url = $('#bike_edit_root_url').attr('data-url')
     @setElement($('#body'))
     @initializeFrameMaker("#bike_manufacturer_id")
+    if $('#bike_stolen').prop('checked')
+      $('#bike_stolen').change ->
+        $('#admin-recovery-fields').slideToggle 'medium', ->
+          if $('#recovery_descr textarea').attr('required')
+            $('#recovery_descr textarea').attr('required', false)
+          else
+            $('#recovery_descr textarea').attr('required', true)
     
   initializeFrameMaker: (target) ->
     url = "#{window.root_url}/api/searcher?types[]=frame_makers&"
