@@ -13,7 +13,7 @@ class BikeSerializer < ActiveModel::Serializer
     :name,
     :year,
     :frame_model,
-    :size,
+    :frame_size,
     :description,
     :rear_tire_narrow,
     :front_tire_narrow,
@@ -66,15 +66,6 @@ class BikeSerializer < ActiveModel::Serializer
     else
       nil
     end    
-  end
-
-  def size
-    return nil unless object.frame_size.present?
-    if object.frame_size_unit.match(/\A(cm|in)/i)
-      object.frame_size + object.frame_size_unit
-    else
-      object.frame_size
-    end
   end
 
   def thumb

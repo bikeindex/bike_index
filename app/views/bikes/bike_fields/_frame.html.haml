@@ -64,7 +64,8 @@
       = f.label :frame_size, "Seat tube length", class: "control-label"
       .controls
         = f.hidden_field :frame_size_unit
-        = f.text_field :frame_size
+        = f.hidden_field :frame_size
+        = f.number_field :frame_size_number
 
   .input-group
     %a.bikeform-tip{role: "button", title: "What's the frame made of?", data: {toggle: "modal", target: "#frameMaterialTip"} }

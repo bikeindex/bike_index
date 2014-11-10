@@ -92,6 +92,53 @@ describe Bike do
     end
   end
 
+  describe :frame_size do 
+    it "removes crap from bike size strings" do 
+      bike = Bike.new(frame_size: "19\\\\\"")
+      bike.clean_frame_size
+      bike.frame_size_number.should eq(19)
+      bike.frame_size.should eq('19in')
+      bike.frame_size_unit.should eq('in')
+    end
+    it "sets things" do 
+      bike = Bike.new(frame_size_number: "19.5sa", frame_size_unit: 'in')
+      bike.clean_frame_size
+      bike.frame_size_number.should eq(19.5)
+      bike.frame_size.should eq('19.5in')
+      bike.frame_size_unit.should eq('in')
+    end
+    it "removes extra numbers and other things from size strings" do 
+      bike = Bike.new(frame_size: "19.5 somethingelse medium 54cm")
+      bike.clean_frame_size
+      bike.frame_size_number.should eq(19.5)
+      bike.frame_size.should eq('19.5in')
+      bike.frame_size_unit.should eq('in')
+    end
+    it "figures out that it's cm" do 
+      bike = Bike.new(frame_size: "Med/54cm")
+      bike.clean_frame_size 
+      bike.frame_size_number.should eq(54)
+      bike.frame_size.should eq('54cm')
+      bike.frame_size_unit.should eq('cm')
+    end
+    it "is cool with ordinal sizing" do 
+      bike = Bike.new(frame_size: "Med")
+      bike.clean_frame_size 
+      bike.frame_size.should eq('m')
+      bike.frame_size_unit.should eq('ordinal')
+    end
+    it "is cool with ordinal sizing" do 
+      bike = Bike.new(frame_size: "M")
+      bike.clean_frame_size 
+      bike.frame_size.should eq('m')
+      bike.frame_size_unit.should eq('ordinal')
+    end
+    
+    it "has before_save_callback_method defined for clean_frame_size" do
+      Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:clean_frame_size).should == true
+    end
+  end
+
   describe :find_current_stolen_record do 
     it "returns the last current stolen record if bike is stolen" do 
       @bike = Bike.new 
@@ -334,10 +381,10 @@ describe Bike do
         secondary_frame_color_id: b.primary_frame_color_id,
         tertiary_frame_color_id: b.primary_frame_color_id,
         stolen: true,
-        frame_size: "SO MANY", frame_size_unit: "ballsacks",
+        frame_size: "56", frame_size_unit: "ballsacks",
         frame_model: "Some model", handlebar_type_id: handlebar.id)
       b.cache_bike
-      b.cached_data.should eq("#{b.manufacturer_name} Hand pedaled 1999 #{b.primary_frame_color.name} #{b.secondary_frame_color.name} #{b.tertiary_frame_color.name} #{material.name} SO MANY ballsacks #{b.frame_model} #{b.rear_wheel_size.name} wheel  unicycle ")
+      b.cached_data.should eq("#{b.manufacturer_name} Hand pedaled 1999 #{b.primary_frame_color.name} #{b.secondary_frame_color.name} #{b.tertiary_frame_color.name} #{material.name} 56ballsacks #{b.frame_model} #{b.rear_wheel_size.name} wheel  unicycle ")
       b.current_stolen_record_id.should eq(s.id)
     end
     it "has before_save_callback_method defined as a before_save callback" do

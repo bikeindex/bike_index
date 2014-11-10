@@ -85,10 +85,12 @@ describe Api::V1::UsersController do
         post :send_request, recovery_request.as_json
         response.code.should eq('200')
         # ALSO MAKE SURE IT RECOVERY NOTIFIES
-        bike.current_stolen_record.date_recovered.should be_present
-        bike.current_stolen_record.recovery_posted.should be_false
-        bike.current_stolen_record.index_helped_recovery.should be_true
-        bike.current_stolen_record.can_share_recovery.should be_true
+        stolen_record.reload.current.should be_false
+        stolen_record.bike.should eq(bike)
+        stolen_record.date_recovered.should be_present
+        stolen_record.recovery_posted.should be_false
+        stolen_record.index_helped_recovery.should be_true
+        stolen_record.can_share_recovery.should be_true
       end
     end
       

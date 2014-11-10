@@ -333,9 +333,11 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       unless hidden_other.hasClass('unhidden')
         hidden_other.slideDown('fast').addClass('unhidden')
         $('#bike_frame_size').val('')
+        $('#bike_frame_size_number').val('')
         $('#frame-sizer .groupedbtn-group').addClass('ex-size')
     else
       $('#bike_frame_size_unit').val('ordinal')
+      $('#bike_frame_size_number').val('')
       $('#bike_frame_size').val(size)
       if hidden_other.hasClass('unhidden')
         hidden_other.removeClass('unhidden').slideUp('fast')

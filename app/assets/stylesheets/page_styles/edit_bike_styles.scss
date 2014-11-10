@@ -385,12 +385,12 @@
   }
 }
 
-#bike_frame_size { width: 100px; }
+#bike_frame_size_number { width: 100px; }
 
 @media (min-width: 925px) {
   #frame-sizer .groupedbtn-group { margin-top: -.4em; }
   #frame-sizer .groupedbtn-group.ex-size .btn-group:last-of-type {
-    top: 50px;
+    top: 47px;
   }
 }
 
@@ -404,7 +404,7 @@
 }
 @media (max-width: 479px){
   #frame-sizer .groupedbtn-group.ex-size .btn-group:last-of-type {
-    top: 72px;
+    top: 49px;
   }
 }
 

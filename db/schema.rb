@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141105172149) do
+ActiveRecord::Schema.define(:version => 20141110174307) do
 
   create_table "ads", :force => true do |t|
     t.string   "title"
@@ -123,6 +123,7 @@ ActiveRecord::Schema.define(:version => 20141105172149) do
     t.text     "all_description"
     t.string   "mnfg_name"
     t.boolean  "hidden",                   :default => false, :null => false
+    t.float    "frame_size_number"
   end
 
   add_index "bikes", ["card_id"], :name => "index_bikes_on_card_id"

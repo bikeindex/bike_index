@@ -22,10 +22,10 @@ describe RecoveryUpdateWorker do
         can_share_recovery: 'false'
       }
       RecoveryUpdateWorker.perform_async(stolen_record.id, recovery_request.as_json)
-      bike.current_stolen_record.date_recovered.should be_present
-      # bike.current_stolen_record.recovery_posted.should be_true
-      bike.current_stolen_record.index_helped_recovery.should be_true
-      bike.current_stolen_record.can_share_recovery.should be_false
+      bike.current_stolen_record.should_not be_present
+      stolen_record.reload.date_recovered.should be_present
+      stolen_record.index_helped_recovery.should be_true
+      stolen_record.can_share_recovery.should be_false
     end
   end
 

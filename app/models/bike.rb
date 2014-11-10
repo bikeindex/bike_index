@@ -26,6 +26,7 @@ class Bike < ActiveRecord::Base
     :handlebar_type_id,
     :handlebar_type_other,
     :frame_size,
+    :frame_size_number,
     :frame_size_unit,
     :rear_tire_narrow,
     :front_wheel_size_id,
@@ -121,7 +122,9 @@ class Bike < ActiveRecord::Base
   # validates_presence_of :rear_wheel_size_id
   # validates_inclusion_of :rear_tire_narrow, in: [true, false]
 
-  attr_accessor :other_listing_urls, :date_stolen_input, :receive_notifications, :phone, :image, :bike_token_id, :b_param_id, :payment_required, :embeded, :embeded_extended, :paint_name, :bike_image_cache, :send_email
+  attr_accessor :other_listing_urls, :date_stolen_input, :receive_notifications,
+    :phone, :image, :bike_token_id, :b_param_id, :payment_required, :embeded,
+    :embeded_extended, :paint_name, :bike_image_cache, :send_email
 
   default_scope where(example: false).where(hidden: false).order("listing_order desc")
   scope :stolen, where(stolen: true)
@@ -232,6 +235,46 @@ class Bike < ActiveRecord::Base
     self.serial_normalized = SerialNormalizer.new({serial: serial_number}).normalized
   end
 
+  before_save :clean_frame_size
+  def clean_frame_size 
+    return true unless frame_size.present? || frame_size_number.present?
+    if frame_size.present? && frame_size.match(/\d+\.?\d*/).present?
+      self.frame_size_number = frame_size.match(/\d+\.?\d*/)[0].to_f
+    end
+    
+    unless frame_size_unit.present?
+      if frame_size_number.present?
+        if frame_size_number < 30 # Good guessing?
+          self.frame_size_unit = 'in'
+        else
+          self.frame_size_unit = 'cm'
+        end
+      else
+        self.frame_size_unit = 'ordinal'
+      end
+    end
+
+    if frame_size_number.present?
+      self.frame_size = frame_size_number.to_s.gsub('.0','') + frame_size_unit
+    else
+      self.frame_size = case frame_size.downcase
+      when /x*sma/, 'xs'
+        'xs'
+      when /sma/, 's'
+        's'
+      when /med/, 'm'
+        'm'
+      when /(lg)|(large)/, 'l'
+        'l'
+      when /x*l/, 'xl'
+        'xl'
+      else 
+        nil
+      end
+    end
+    true
+  end
+
   def serial
     serial_number unless self.recovered
   end
@@ -325,7 +368,7 @@ class Bike < ActiveRecord::Base
     c += "#{secondary_frame_color.name} " if secondary_frame_color
     c += "#{tertiary_frame_color.name} " if tertiary_frame_color
     c += "#{frame_material.name} " if frame_material
-    c += "#{frame_size} #{frame_size_unit} " if frame_size
+    c += "#{frame_size} " if frame_size
     c += "#{frame_model} " if frame_model
     c += "#{rear_wheel_size.name} wheel " if rear_wheel_size
     c += "#{front_wheel_size.name} wheel " if front_wheel_size && front_wheel_size != rear_wheel_size
