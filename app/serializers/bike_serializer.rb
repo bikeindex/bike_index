@@ -67,6 +67,15 @@ class BikeSerializer < ActiveModel::Serializer
     end    
   end
 
+  def size
+    return nil unless object.frame_size.present?
+    if object.frame_size_unit.match(/\A(cm|in)/i)
+      object.frame_size + object.frame_size_unit
+    else
+      object.frame_size
+    end
+  end
+
   def thumb
     if object.public_images.present?
       object.public_images.first.image_url(:small)
