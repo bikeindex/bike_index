@@ -13,6 +13,7 @@ class BikeSerializer < ActiveModel::Serializer
     :name,
     :year,
     :frame_model,
+    :size,
     :description,
     :rear_tire_narrow,
     :front_tire_narrow,
