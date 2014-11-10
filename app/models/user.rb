@@ -89,6 +89,13 @@ class User < ActiveRecord::Base
     end
   end
 
+  def api_v2_scoped
+    {
+      username: username,
+      bike_ids: bikes
+    }
+  end
+
   def superuser?
     self.superuser
   end

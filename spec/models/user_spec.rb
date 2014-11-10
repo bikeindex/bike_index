@@ -54,7 +54,13 @@ describe User do
         @user.valid?.should be_false
         @user.errors.messages[:password].include?('must contain at least one letter').should be_true
       end
+    end
 
+    describe :api_v2_scoped do 
+      it "returns bikes and username" do 
+        user = User.new
+        user.api_v2_scoped.should eq({username: user.username, bike_ids: user.bikes})
+      end
     end
 
     describe :confirm do

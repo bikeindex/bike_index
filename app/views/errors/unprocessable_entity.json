@@ -1,3 +1,3 @@
 {
-  "422": "Couldn't process that, what did you do wrong"
+  "error": "422 - Couldn't process that, what did you do wrong"
 }

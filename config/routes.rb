@@ -163,7 +163,12 @@ Bikeindex::Application.routes.draw do
     end
     namespace :v2 do 
       resources :manufacturers, only: [:index, :show]
-      resources :users do collection { get :current }  end
+      resources :users do
+        collection do 
+          get :current
+          get :access_scope
+        end
+      end
     end
     mount Soulmate::Server, :at => "/searcher"
   end
