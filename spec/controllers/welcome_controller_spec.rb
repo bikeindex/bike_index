@@ -44,7 +44,7 @@ describe WelcomeController do
     describe "user things should be assigned" do 
       it "sends the bikes and the locks" do 
         user = FactoryGirl.create(:user)
-        ownership = FactoryGirl.create(:ownership, user: user, current: true)
+        ownership = FactoryGirl.create(:ownership, user_id: user.id, current: true)
         lock = FactoryGirl.create(:lock, user: user)
         set_current_user(user)
         get :user_home

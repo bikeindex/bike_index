@@ -56,13 +56,6 @@ describe User do
       end
     end
 
-    describe :api_v2_scoped do 
-      it "returns bikes and username" do 
-        user = User.new
-        user.api_v2_scoped.should eq({username: user.username, bike_ids: user.bikes})
-      end
-    end
-
     describe :confirm do
       before :each do
         @user = FactoryGirl.create(:user)
@@ -157,10 +150,14 @@ describe User do
       user = FactoryGirl.create(:user)
       user.bikes.should be_empty
     end
-    it "returns the user's bikes if they have any" do
+    it "returns the user's bikes if they have any hidden bikes" do
       user = FactoryGirl.create(:user)
       o = FactoryGirl.create(:ownership, owner_email: user.email, user_id: user.id)
+      o2 = FactoryGirl.create(:ownership, owner_email: user.email, user_id: user.id)
+      o2.bike.update_attribute :hidden, true
       user.bikes.should include(o.bike.id)
+      user.bikes.should_not include(o2.bike.id)
+      user.bikes.count.should eq(1)
     end
   end
 

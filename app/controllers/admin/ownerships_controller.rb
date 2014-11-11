@@ -2,7 +2,7 @@ class Admin::OwnershipsController < Admin::BaseController
 
   def edit
     @ownership = Ownership.find(params[:id])
-    @bike = @ownership.bike.decorate 
+    @bike = Bike.unscoped.find(@ownership.bike_id).decorate 
     @users = User.all
   end
 
@@ -10,7 +10,7 @@ class Admin::OwnershipsController < Admin::BaseController
     @ownership = Ownership.find(params[:id])
     if @ownership.update_attributes(params[:ownership])
       flash[:notice] = "Ownership Saved!"
-      redirect_to edit_admin_bike_url(@ownership.bike)
+      redirect_to edit_admin_bike_url(@ownership.bike_id)
     else
       render action: :edit
     end

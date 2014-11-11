@@ -8,6 +8,11 @@ task :sm_import_manufacturers => :environment do
   SmExportWorker.perform_async
 end
 
+desc "Create frame_makers and push to redis"
+task :remove_unused_ownerships => :environment do
+  Ownership.all.pluck(:id).each { |id| UnusedOwnershipRemovalWorker.perform_async(id) }
+end
+
 desc "Create stolen tsv"
 task :create_stolen_tsv => :environment do
   out_file = File.join(Rails.root,'/current_stolen_bikes.tsv')

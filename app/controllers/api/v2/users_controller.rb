@@ -1,21 +1,35 @@
 module Api
   module V2
     class UsersController < ApiV2Controller
-      before_filter :authenticate_current_resource_owner!
+      before_filter :authenticate_oauth_user!
+      # doorkeeper_for :all
 
       def current
-        respond_with current_resource_owner.api_v2_scoped
+        result = {
+          access_token: {
+            application: doorkeeper_token.application.name,
+            scope: oauth_scope,
+            # token_refresh_in: doorkeeper_token.expires_in
+          }
+        }
+        result[:user] = user_info if oauth_scope.include?('read_user')
+        result[:bikes] = bikes_info if oauth_scope.include?('read_bikes')
+        respond_with result
       end
 
-      def access_scope
-        if doorkeeper_token
-          scope = { scope: 'Authenticated through OAuth', oauth: doorkeeper_token }
-        elsif current_user.present?
-          scope = { scope: 'Authenticated through the Bike Index (NOT through OAuth)'}
-        end
-        respond_with scope
+      private
+      
+      def user_info
+        {
+          username: @oauth_user.username,
+          email: @oauth_user.email
+        }
       end
       
+      def bikes_info
+        @oauth_user.bikes
+      end
+     
     end
   end
 end

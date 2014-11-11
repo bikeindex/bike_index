@@ -21,7 +21,7 @@ Doorkeeper.configure do
   # end
 
   # Authorization Code expiration time (default 10 minutes).
-  # authorization_}code_expires_in 10.minutes
+  # authorization_code_expires_in 10.minutes
 
   # Access token expiration time (default 2 hours).
   # If you want to disable expiration, set this to nil.
@@ -32,14 +32,14 @@ Doorkeeper.configure do
   # reuse_access_token
 
   # Issue access tokens with refresh token (disabled by default)
-  # use_refresh_token
+  use_refresh_token
 
   # Provide support for an owner to be assigned to each registered application (disabled by default)
   enable_application_owner :confirmation => true
 
   # Define access token scopes for your provider
   default_scopes  :public
-  # optional_scopes :read_bikes
+  optional_scopes :read_user, :read_bikes, :write_user, :write_bikes, :create_bikes
 
   # Change the way client credentials are retrieved from the request object.
   # By default it retrieves first from the `HTTP_AUTHORIZATION` header, then

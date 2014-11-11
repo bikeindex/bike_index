@@ -5,12 +5,13 @@ describe UserEmbedsController do
   describe :show do 
     it "renders the page if username is found" do
       user = FactoryGirl.create(:user)
-      bike = FactoryGirl.create(:ownership, user: user).bike
+      ownership = FactoryGirl.create(:ownership, user_id: user.id, current: true)
       get :show, id: user.username
       response.code.should eq('200')
-      assigns(:bikes).first.should eq(bike)
+      assigns(:bikes).first.should eq(ownership.bike)
       assigns(:bikes).count.should eq(1)
     end
+
     it "renders the most recent bikes with images if it doesn't find the user" do
       FactoryGirl.create(:bike)
       bike = FactoryGirl.create(:bike, thumb_path: "blah")

@@ -89,13 +89,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  def api_v2_scoped
-    {
-      username: username,
-      bike_ids: bikes
-    }
-  end
-
   def superuser?
     self.superuser
   end
@@ -174,8 +167,11 @@ class User < ActiveRecord::Base
   end
 
   def bikes
-    ownerships = Ownership.where(user_id: self.id)
-      .where(example: false).where(current: true).pluck(:bike_id)
+    # owns = Ownership.where(user_id: id).where(example: false).where(current: true)
+    ownerships.where(example: false).where(current: true)
+      .map{ |o| o.bike_id if o.bike }.reject(&:blank?)
+    # return [] unless owns.present?
+    # owns.map{ |o| o.bike_id if o.bike }.reject{ |o| o.blank? }
   end
 
   def current_organization
