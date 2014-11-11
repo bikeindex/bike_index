@@ -29,7 +29,7 @@ class Manufacturer < ActiveRecord::Base
   def self.fuzzy_name_find(n)
     if !n.blank?
       n = Slugifyer.manufacturer(n)
-      return Manufacturer.find_by_slug('se_racing') if n == "se"
+      return Manufacturer.find_by_slug('se') if n == "se"
       self.find(:first, conditions: [ "slug = ?", n ])
     else
       nil
