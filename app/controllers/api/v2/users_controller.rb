@@ -13,7 +13,7 @@ module Api
           }
         }
         result[:user] = user_info if oauth_scope.include?('read_user')
-        result[:bike_ids] = bike_info if oauth_scope.include?('read_bikes')
+        result[:bike_ids] = bike_ids if oauth_scope.include?('read_bikes')
         respond_with result
       end
 
@@ -22,11 +22,14 @@ module Api
       def user_info
         {
           username: @oauth_user.username,
-          email: @oauth_user.email
+          name: @oauth_user.name,
+          email: @oauth_user.email, 
+          twitter: (@oauth_user.twitter if @oauth_user.show_twitter),
+          image: (@oauth_user.avatar_url if @oauth_user.show_bikes)
         }
       end
       
-      def bikes_info
+      def bike_ids
         @oauth_user.bikes
       end
      
