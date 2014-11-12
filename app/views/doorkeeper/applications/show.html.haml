@@ -25,5 +25,7 @@
               = link_to 'Authorize', oauth_authorization_path(client_id: @application.uid, redirect_uri: uri, response_type: 'code'), class: 'btn binxbtn', target: '_blank'
   .col-md-4
     %h3 Actions
-    %p= link_to 'Edit', edit_oauth_application_path(@application), class: 'btn binxbtn-primary'
-    %p= render 'delete_form', application: @application
+    %p
+      = link_to 'Edit', edit_oauth_application_path(@application), class: 'btn binxbtn-primary'
+    %p
+      = render 'delete_form', application: @application

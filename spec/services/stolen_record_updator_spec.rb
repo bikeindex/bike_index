@@ -134,7 +134,7 @@ describe StolenRecordUpdator do
       stolen_record.street.should eq(sr[:street])
       stolen_record.city.should eq(sr[:city])
       stolen_record.zipcode.should eq('60666')
-      stolen_record.date_stolen.today?.should be_true
+      stolen_record.date_stolen.should be > Time.now - 2.days
     end
 
     it "creates the associations that it's suppose to" do

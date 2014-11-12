@@ -13,7 +13,7 @@ module Api
           }
         }
         result[:user] = user_info if oauth_scope.include?('read_user')
-        result[:bikes] = bikes_info if oauth_scope.include?('read_bikes')
+        result[:bike_ids] = bike_info if oauth_scope.include?('read_bikes')
         respond_with result
       end
 
