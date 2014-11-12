@@ -9,8 +9,8 @@ module Api
           access_token: {
             application: doorkeeper_token.application.name,
             scope: oauth_scope,
-            # token_refresh_in: doorkeeper_token.expires_in
-          }
+          },
+          id: @oauth_user.id.to_s
         }
         result[:user] = user_info if oauth_scope.include?('read_user')
         result[:bike_ids] = bike_ids if oauth_scope.include?('read_bikes')

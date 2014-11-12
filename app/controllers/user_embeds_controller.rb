@@ -5,10 +5,10 @@ class UserEmbedsController < ApplicationController
     @text = params[:text]
     user = User.find_by_username(params[:id])
     bikes = Bike.find(user.bikes) if user.present?
-    unless user && bikes.present?
+    unless user && user.show_bikes? && bikes.present?
       @text = "Most Recent Indexed Bikes"
       bikes = Bike.where("thumb_path IS NOT NULL").limit(5)
-    end    
+    end
     @bikes = BikeDecorator.decorate_collection(bikes)
   end
 

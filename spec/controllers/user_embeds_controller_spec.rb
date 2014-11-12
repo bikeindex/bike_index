@@ -4,7 +4,7 @@ describe UserEmbedsController do
 
   describe :show do 
     it "renders the page if username is found" do
-      user = FactoryGirl.create(:user)
+      user = FactoryGirl.create(:user, show_bikes: true)
       ownership = FactoryGirl.create(:ownership, user_id: user.id, current: true)
       get :show, id: user.username
       response.code.should eq('200')
