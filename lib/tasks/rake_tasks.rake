@@ -10,7 +10,7 @@ end
 
 desc "Create frame_makers and push to redis"
 task :remove_unused_ownerships => :environment do
-  Ownership.all.pluck(:id).each { |id| UnusedOwnershipRemovalWorker.perform_async(id) }
+  Ownership.pluck(:id).each { |id| UnusedOwnershipRemovalWorker.perform_async(id) }
 end
 
 desc "Create stolen tsv"

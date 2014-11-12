@@ -15,12 +15,14 @@
       Callback urls:
 
     %table.table
-      - @application.redirect_uri.split.each do |uri|
-        %tr
-          %td
-            %code= uri
-          %td
-            = link_to 'Authorize', oauth_authorization_path(client_id: @application.uid, redirect_uri: uri, response_type: 'code'), class: 'btn binxbtn', target: '_blank'
+      %tbody
+        - @application.redirect_uri.split.each do |uri|
+          %tr
+            %td
+              %code
+                = uri
+            %td
+              = link_to 'Authorize', oauth_authorization_path(client_id: @application.uid, redirect_uri: uri, response_type: 'code'), class: 'btn binxbtn', target: '_blank'
   .col-md-4
     %h3 Actions
     %p= link_to 'Edit', edit_oauth_application_path(@application), class: 'btn binxbtn-primary'

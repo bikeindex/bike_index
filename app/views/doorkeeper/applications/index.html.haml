@@ -13,7 +13,13 @@
   %tbody
     - @applications.each do |application|
       %tr{:id => "application_#{application.id}"}
-        %td= link_to application.name, [:oauth, application]
-        %td= application.redirect_uri
-        %td= link_to 'Edit', edit_oauth_application_path(application), class: 'btn binxbtn-primary'
-        %td= render 'delete_form', application: application
+        %td
+          = application.name
+        %td
+          = application.redirect_uri
+        %td
+          = link_to "View", [:oauth, application], class: 'btn binxbtn-default'
+        %td
+          = link_to 'Edit', edit_oauth_application_path(application), class: 'btn binxbtn-primary'
+        %td
+          = render 'delete_form', application: application

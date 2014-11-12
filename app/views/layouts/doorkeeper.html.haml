@@ -31,6 +31,8 @@
             = render 'shared/top_user_nav'
 
       .bcontainer.doorkeeper-container
+        - if controller_name.match('application') && action_name != 'index'
+          = link_to "Your applications", oauth_applications_url, class: 'pull-right'
         = yield
       
       
