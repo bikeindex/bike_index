@@ -40,7 +40,7 @@ Doorkeeper.configure do
 
   # Define access token scopes for your provider
   default_scopes  :public
-  optional_scopes :read_user, :read_bikes, :write_user, :write_bikes, :create_bikes
+  optional_scopes :read_user, :write_user, :read_bikes, :write_bikes, :create_bikes, :read_bikewise, :write_bikewise
 
   # Change the way client credentials are retrieved from the request object.
   # By default it retrieves first from the `HTTP_AUTHORIZATION` header, then
