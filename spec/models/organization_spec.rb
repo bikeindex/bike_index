@@ -51,6 +51,18 @@ describe Organization do
     end
   end
 
+  describe :set_locations_shown do 
+    it "sets the locations shown to be org shown on save" do 
+      organization = FactoryGirl.create(:organization)
+      country = FactoryGirl.create(:country)
+      location = Location.create(country_id: country.id, city: 'Chicago', name: 'stuff', organization_id: organization.id)
+      organization.reload.update_attribute :show_on_map, true
+      location.reload.shown.should be_true
+      organization.update_attribute :show_on_map, false
+      location.reload.shown.should be_false
+    end
+  end
+
   describe :set_auto_user do 
     it "sets the embedable user" do 
       organization = FactoryGirl.create(:organization)

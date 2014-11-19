@@ -73,6 +73,11 @@ class Organization < ActiveRecord::Base
     end
   end
 
+  before_save :set_locations_shown
+  def set_locations_shown
+    locations.each { |l| l.update_attribute :shown, show_on_map }
+  end
+
   def suspended?
     is_suspended?
   end
