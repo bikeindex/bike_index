@@ -1,4 +1,4 @@
-class SmExportWorker
+class SmImportWorker
   include Sidekiq::Worker
   sidekiq_options queue: 'updates'
   sidekiq_options backtrace: true

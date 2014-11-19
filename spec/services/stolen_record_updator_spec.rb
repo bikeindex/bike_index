@@ -9,6 +9,7 @@ describe StolenRecordUpdator do
       update_stolen_record.should_receive(:updated_phone).at_least(1).times.and_return("1231234444")
       lambda { update_stolen_record.create_new_record }.should change(StolenRecord, :count).by(1)
       bike.stolen_records.count.should eq(1)
+      bike.current_stolen_record.should eq(bike.stolen_records.last)
     end
 
     it "calls mark_records_not_current" do 
@@ -86,12 +87,15 @@ describe StolenRecordUpdator do
     it "marks all the records not current" do 
       bike = FactoryGirl.create(:bike)
       stolen_record1 = FactoryGirl.create(:stolen_record, bike: bike)
+      bike.save
+      bike.current_stolen_record_id.should eq(stolen_record1.id)
       stolen_record2 = FactoryGirl.create(:stolen_record, bike: bike)
       stolen_record1.update_attributes(current: true)
       stolen_record2.update_attributes(current: true)
       StolenRecordUpdator.new(bike: bike).mark_records_not_current
       stolen_record1.reload.current.should be_false
       stolen_record2.reload.current.should be_false
+      bike.reload.current_stolen_record_id.should be_nil
     end
   end
 

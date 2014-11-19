@@ -14,7 +14,7 @@ describe Api::V1::UsersController do
       set_current_user(u)
       get :current, format: :json
       response.code.should eq('200')
-      pp response.body
+      # pp response.body
       JSON.parse(response.body).should include("user_present" => true)
     end
   end
@@ -84,6 +84,7 @@ describe Api::V1::UsersController do
         set_current_user(user)
         post :send_request, recovery_request.as_json
         response.code.should eq('200')
+        bike.reload.stolen.should be_false
         # ALSO MAKE SURE IT RECOVERY NOTIFIES
         stolen_record.reload.current.should be_false
         stolen_record.bike.should eq(bike)

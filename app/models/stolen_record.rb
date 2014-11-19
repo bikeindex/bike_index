@@ -154,6 +154,7 @@ class StolenRecord < ActiveRecord::Base
   end
 
   def add_recovery_information(info)
+    bike.update_attribute :stolen, false if bike.stolen
     self.date_recovered = Time.now
     self.recovered_description = info[:request_reason]
     self.current = false

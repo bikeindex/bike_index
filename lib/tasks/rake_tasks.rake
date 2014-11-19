@@ -5,7 +5,7 @@ end
 
 desc "Create frame_makers and push to redis"
 task :sm_import_manufacturers => :environment do
-  SmExportWorker.perform_async
+  SmImportWorker.perform_async
 end
 
 desc "Create frame_makers and push to redis"
