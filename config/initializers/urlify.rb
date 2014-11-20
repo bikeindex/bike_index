@@ -4,11 +4,9 @@ class Urlifyer
   # TODO: Improve this, add errors or something
   
   def self.urlify(string)
-    if string.length > 1
-      unless self.uri?(string)
-        string = 'http://' + string
-      end
-      return string
+    if string && string.length > 1
+      return string if string.match(/http.?:\/\//i).present?
+      "http://#{string}" 
     end
   end
 

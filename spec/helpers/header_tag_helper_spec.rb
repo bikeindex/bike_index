@@ -85,7 +85,7 @@ describe HeaderTagHelper do
       view.stub(:action_name).and_return("some_weird_action")
       h = helper.current_page_auto_hash
       h[:title_tag][:title].should eq("Some weird action")
-      h[:meta_tags][:description].should eq("Some weird action with the Bike Index")
+      h[:meta_tags][:description].should eq("Some weird action on the Bike Index")
     end
   end
 

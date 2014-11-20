@@ -13,6 +13,7 @@
         Please tell us how you got your bike back, we really care!
     = form_tag  do |t|
       = hidden_field_tag :mark_recovered_bike_id, @bike.id
+      = hidden_field_tag :mark_recovered_stolen_record_id, (@bike.current_stolen_record_id if @bike.current_stolen_record_id.present?)
       .input-group
       .input-group
         .control-group.large-text

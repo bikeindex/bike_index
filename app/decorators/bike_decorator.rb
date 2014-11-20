@@ -13,7 +13,7 @@ class BikeDecorator < ApplicationDecorator
 
   def show_other_bikes
     if current_owner_exists and object.owner.show_bikes
-      html = " <a href='/users/#{object.owner.username}'>View user's other bikes</a>" 
+      html = "<a href='/users/#{object.owner.username}'>View user's other bikes</a>" 
       html.html_safe
     end
   end

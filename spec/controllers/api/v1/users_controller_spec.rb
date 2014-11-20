@@ -79,13 +79,14 @@ describe Api::V1::UsersController do
           request_bike_id: bike.id,
           request_reason: 'Some reason',
           index_helped_recovery: 'true',
-          can_share_recovery: 'true'
+          can_share_recovery: 'true',
+          mark_recovered_stolen_record_id: stolen_record.id
         }
         set_current_user(user)
         bike.reload.update_attributes(stolen: false, current_stolen_record_id: nil)
+        bike.reload
         post :send_request, recovery_request.as_json
         response.code.should eq('200')
-        pp flash
         flash[:error].should_not be_present
         bike.reload.stolen.should be_false
         # ALSO MAKE SURE IT RECOVERY NOTIFIES
