@@ -1,6 +1,6 @@
 %fieldset.input-group.with-additional-block.add-component-fields
   %article
-    .control-group.chosen-select.has-position-select{data: {other: Ctype.find_by_slug("other").id, hidden: ".hidden-ctype" }}
+    .control-group.select_unattached.chosen-select.has-position-select{data: {other: Ctype.find_by_slug("other").id, hidden: ".hidden-ctype" }}
       = f.label :ctype_id, "Part type", class: "control-label"
       .controls.part-type-select
         = f.collection_select(:ctype_id, Ctype.all, :id, :name, :required =>true, prompt: "What type of part?" )
@@ -28,22 +28,23 @@
       .controls
         = f.text_area :description, rows: 2
 
-    .split-fields
-      .control-group.select-jsonified.extra-field{data: {other: Manufacturer.find_by_slug("other").id, hidden: ".hidden-mnfg" }}
-        = f.label :manufacturer_id, class: "control-label"
-        .controls.component-mnfg-select
-          = f.text_field :manufacturer_id
-      
-      .control-group.extra-field.component_model.short-label
-        = f.label :model_name, "Model", class: "control-label"
+    .mnfg-group
+      .split-fields
+        .control-group.select-jsonified.extra-field{data: {other: Manufacturer.find_by_slug("other").id, hidden: ".hidden-mnfg" }}
+          = f.label :manufacturer_id, class: "control-label"
+          .controls.component-mnfg-select.select_unattached
+            = f.text_field :manufacturer_id
+        
+        .control-group.extra-field.component_model.short-label
+          = f.label :model_name, "Model", class: "control-label"
+          .controls
+            = f.text_field :model_name
+      - other_show = ""
+      - other_show = "other_present" if f.object.manufacturer_id == Manufacturer.find_by_slug("other").id
+      .hidden-other.control-group.hidden-mnfg{class: other_show}
+        = f.label :manufacturer_other, "Other manufacturer", class: "control-label"
         .controls
-          = f.text_field :model_name
-    - other_show = ""
-    - other_show = "other_present" if f.object.manufacturer_id == Manufacturer.find_by_slug("other").id
-    .hidden-other.control-group.hidden-mnfg{class: other_show}
-      = f.label :manufacturer_other, "Other manufacturer", class: "control-label"
-      .controls
-        = f.text_field :manufacturer_other
+          = f.text_field :manufacturer_other
 
     .split-fields.extra-model-fields{class: ("hidden-other" unless f.object.model_name.present?)}
       .control-group.extra-field
