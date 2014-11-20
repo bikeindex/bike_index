@@ -1,7 +1,7 @@
 class SessionsController < ApplicationController
   include Sessionable
   def new
-    @targett = session[:return_to_oauth]
+    session[:return_to] = params[:return_to] if params[:return_to].present?
     if current_user.present?
       redirect_to user_home_url, notice: "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
     end
