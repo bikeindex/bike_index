@@ -20,16 +20,7 @@ protected
   end
 
   def current_user
-    begin
-      @current_user ||= User.find_by_auth_token!(cookies[:auth_token]) if cookies[:auth_token]
-    rescue ActiveRecord::RecordNotFound
-      return nil
-    end
-    if @current_user.present?
-      return @current_user
-    else
-      return nil
-    end
+    @current_user ||= User.from_auth(cookies.signed[:auth])
   end
 
   # def permitted_params

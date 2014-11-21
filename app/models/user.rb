@@ -217,6 +217,11 @@ class User < ActiveRecord::Base
 
   protected
 
+  def self.from_auth(auth)
+    return nil unless auth && auth.kind_of?(Array)
+    self.where(id: auth[0], auth_token: auth[1]).first
+  end
+
   def generate_username_confirmation_and_auth
     begin
       username = SecureRandom.urlsafe_base64

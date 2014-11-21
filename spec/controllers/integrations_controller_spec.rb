@@ -11,7 +11,7 @@ describe IntegrationsController do
         }.should change(Integration, :count).by(1)
         response.code.should eq('302')
         user = User.last
-        cookies[:auth_token].should eq(user.auth_token)
+        User.from_auth(cookies.signed[:auth]).should eq(user)
       end
     end
 
