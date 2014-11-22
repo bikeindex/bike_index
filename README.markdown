@@ -1,6 +1,6 @@
 # ![BIKE INDEX](https://github.com/bikeindex/bike_index/blob/master/bike_index.png?raw=true) This is the [Bike Index](https://www.bikeindex.org) [![Build Status](https://secure.travis-ci.org/bikeindex/bike_index.png)](http://travis-ci.org/bikeindex/bike_index)
 
-The Bike Index: bicycle registration that works: online, powerful, free.
+Bike registration that works: online, powerful, free.
 
 Registering a bike only takes a few minutes and gives cyclists a permanent record linked to their identity that proves ownership in the case of a theft.
 
@@ -16,7 +16,7 @@ We're an open source project. Take a gander through our code, report bugs, or do
 
 - Imagemagick ([railscast](http://railscasts.com/episodes/374-image-manipulation?view=asciicast))
 
-- [Resque](https://github.com/resque/resque) & [Sidekiq](https://github.com/mperham/sidekiq), which require [Redis](http://redis.io/). The [RailsCast on Resque](http://railscasts.com/episodes/271-resque?view=asciicast) is a good resource for getting up and running with Redis.
+- [Sidekiq](https://github.com/mperham/sidekiq), which requires [Redis](http://redis.io/). The [RailsCast on Resque](http://railscasts.com/episodes/271-resque?view=asciicast) is a good resource for getting up and running with Redis.
 
 - *If you turn on caching locally:* [Dalli](https://github.com/mperham/dalli) ([railscast](http://railscasts.com/episodes/380-memcached-dalli?view=asciicast))
 
