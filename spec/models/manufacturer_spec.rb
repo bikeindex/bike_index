@@ -68,4 +68,8 @@ describe Manufacturer do
     end
   end
 
+  it "has before_save_callback_method defined for set_website" do
+    Manufacturer._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_website).should == true
+  end
+
 end

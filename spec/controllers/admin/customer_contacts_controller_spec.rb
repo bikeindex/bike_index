@@ -5,7 +5,7 @@ describe Admin::CustomerContactsController do
   describe :create do 
     it "creates the contact, send the email and redirect to the bike" do 
       stolen_record = FactoryGirl.create(:stolen_record)
-      pp stolen_record.bike.id
+      # pp stolen_record.bike.id
       user = FactoryGirl.create(:user, superuser: true)
       customer_contact = { 
         user_email: stolen_record.bike.owner_email,

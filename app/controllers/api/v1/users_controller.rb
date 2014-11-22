@@ -43,7 +43,11 @@ module Api
               feedback.feedback_hash[:new_manufacturer] = bike.manufacturer.name
             elsif feedback_type.match('bike_recovery')
               if bike.current_stolen_record.present?
-                RecoveryUpdateWorker.perform_async(bike.current_stolen_record.id, params)
+                stolen_record_id = params[:mark_recovered_stolen_record_id]
+                unless stolen_record_id.present?
+                  stolen_record_id = bike.current_stolen_record_id
+                end
+                RecoveryUpdateWorker.perform_async(stolen_record_id, params)
                 if params[:index_helped_recovery].present?
                   feedback.feedback_hash[:index_helped_recovery] = params[:index_helped_recovery]
                 end

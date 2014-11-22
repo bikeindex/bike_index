@@ -39,7 +39,7 @@
     = @bike.dl_list_item(@stolen_record.police_report_number, "Police report #")
     = @bike.dl_list_item(@stolen_record.police_report_department, "Department & city")
 
-.bike-show-stolen-contact
+.bike-show-stolen-contact#stolen_bike_owner_contact
   %h3
     Know something about this #{@bike.type}?
     %span.stolen-color
@@ -67,6 +67,6 @@
     .stolen-contact
       %h3
 
-        = link_to "To contact the owner, sign in", new_session_url
+        = link_to "To contact the owner, sign in", new_session_url(return_to: "#{bike_url(@bike)}#stolen_bike_owner_contact")
 
         / = render 'sessions/form'

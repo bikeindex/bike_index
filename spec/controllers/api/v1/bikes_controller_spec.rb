@@ -27,7 +27,7 @@ describe Api::V1::BikesController do
       options = { stolen: true, organization_slug: organization.slug, access_token: organization.access_token}
       get :stolen_ids, options, format: :json
       response.code.should eq('200')
-      pp response
+      # pp response
       bikes = JSON.parse(response.body)
       bikes.count.should eq(1)
       bikes.first.should eq(stole2.bike.id)

@@ -1,7 +1,6 @@
 class AdminRestriction
   def self.matches?(request)
-    user_id = request.env['rack.session'][:user_id]
-    user = User.find_by_id(user_id)
+    user = User.find_by_auth_token!(request.env['rack.request.cookie_hash']['auth_token']) if request.env['rack.request.cookie_hash']['auth_token']
     return user && user.superuser?
   end
 end

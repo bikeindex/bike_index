@@ -20,12 +20,14 @@ class StolenRecordUpdator
   end
 
   def mark_records_not_current
-    if @bike.stolen_records.any?
-      @bike.stolen_records.each do |s|
+    stolen_records = StolenRecord.unscoped.where(bike_id: @bike.id)
+    if stolen_records.any?
+      stolen_records.each do |s|
         s.current = false
         s.save
       end
     end
+    @bike.update_attribute :current_stolen_record_id, nil
   end
 
   def create_date_from_string(date_string)
@@ -86,6 +88,7 @@ class StolenRecordUpdator
     new_stolen_record.country_id = Country.find_by_iso("US").id
     stolen_record = update_with_params(new_stolen_record)
     if stolen_record.save
+      @bike.update_attribute :current_stolen_record_id, stolen_record.id
       return true
     end
     raise StolenRecordError, "Awww shucks! We failed to mark this bike as stolen. Try again?"

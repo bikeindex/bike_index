@@ -1,7 +1,7 @@
 class SessionsController < ApplicationController
   include Sessionable
   def new
-    @targett = session[:return_to_oauth]
+    session[:return_to] = params[:return_to] if params[:return_to].present?
     if current_user.present?
       redirect_to user_home_url, notice: "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
     end
@@ -37,7 +37,7 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    cookies.delete(:auth_token)
+    cookies.delete(:auth)
     if params[:redirect_location].present?
       if params[:redirect_location].match('new_user')
         redirect_to new_user_path, notice: "Logged out!" and return

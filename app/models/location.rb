@@ -44,11 +44,6 @@ class Location < ActiveRecord::Base
     self.phone = Phonifyer.phonify(self.phone) if self.phone 
   end
 
-  before_save :set_shown
-  def set_shown
-    self.shown = true if organization.show_on_map
-  end
-
   def org_location_id
     "#{self.organization_id}_#{self.id}"
   end

@@ -39,6 +39,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     # $('#edit-menu').affix()
     @setInitialValues()
     $('.form-horizontal').areYouSure()
+    $('.select_unattached').removeClass('select_unattached')
 
     if $('#new_public_image').length > 0
       # we need to rename the damn field or it breaks
@@ -281,8 +282,9 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     time = new Date().getTime()
     regexp = new RegExp(target.attr('data-id'), 'g')
     target.before(target.data('fields').replace(regexp, time))
-    $('.add-component-fields .chosen-select select').select2()
-    # $('.input-group.add-additional .with-additional-block select').on 'change', @expandAdditionalBlock
+    $('.add-component-fields .chosen-select.select_unattached select').select2()
+    @setComponentManufacturer(m) for m in $('.component-mnfg-select.select_unattached input')
+    $('.select_unattached').removeClass('select_unattached')
 
 
   updatePartType: (event) ->
@@ -306,6 +308,47 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     target = $(event.target)
     component = target.parents('.has-position-select')
     component.find('.front-or-rear').val(target.attr('data-position'))
+
+  initializeComponentManufacturers: ->
+    @setComponentManufacturer(m) for m in $('.component-mnfg-select input')
+
+  setComponentManufacturer: (target, url="default") ->
+    url = "#{window.root_url}/api/searcher?types[]=manufacturers&" if url == "default"
+    target = $(target)
+    target.removeClass('select_unattached')
+    target.select2
+      minimumInputLength: 2
+      placeholder: 'Choose manufacturer'
+      ajax:
+        url: url
+        dataType: "json"
+        openOnEnter: true
+        data: (term, page) ->
+          term: term # search term
+          limit: 10
+        results: (data, page) -> # parse the results into the format expected by Select2.
+          remapped = data.results.manufacturers.map (i) -> {id: i.id, text: i.term}
+          results: remapped
+      initSelection: (element, callback) ->
+        id = $(element).val()
+        if id isnt ""
+          $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
+          ).done (data) ->
+            data =
+              id: element.val()
+              text: data.manufacturer.name
+            callback data
+    that = @
+    target.on "change", (e) ->
+      expand_value = target.parents('.control-group').attr('data-other')
+      hidden_other = target.parents('.mnfg-group').find('.hidden-mnfg')
+      if parseInt(e.val, 10) == parseInt(expand_value, 10)
+        hidden_other.slideDown().addClass('unhidden')
+      else 
+        if hidden_other.hasClass('unhidden')
+          hidden_other.find('input').val('')
+          hidden_other.removeClass('unhidden').slideUp()
+      
 
   toggleExtraModelField: (event) ->
     target = $(event.target)
@@ -541,32 +584,3 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       $('#requestBikeDelete').modal('hide')
     else
       $('#mark-recovered-error').slideDown('fast')
-
-  initializeComponentManufacturers: ->
-    url = "#{window.root_url}/api/searcher?types[]=manufacturers&"
-    # console.log(url)
-    @setComponentManufacturer(m, url) for m in $('.component-mnfg-select input')
-
-  setComponentManufacturer: (target, url) ->
-    $(target).select2
-      minimumInputLength: 2
-      placeholder: 'Choose manufacturer'
-      ajax:
-        url: url
-        dataType: "json"
-        openOnEnter: true
-        data: (term, page) ->
-          term: term # search term
-          limit: 10
-        results: (data, page) -> # parse the results into the format expected by Select2.
-          remapped = data.results.manufacturers.map (i) -> {id: i.id, text: i.term}
-          results: remapped
-      initSelection: (element, callback) ->
-        id = $(element).val()
-        if id isnt ""
-          $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
-          ).done (data) ->
-            data =
-              id: element.val()
-              text: data.manufacturer.name
-            callback data

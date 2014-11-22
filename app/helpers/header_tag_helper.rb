@@ -40,8 +40,6 @@ protected
 
   def meta_tags_html(hash)
     html = ""
-    # hash[:meta_tags][:title] = hash[:title]
-    # hash[:meta_tags][:"og:description"] = hash[:description]
     hash[:meta_tags].each do |k,value_or_array|
       values = value_or_array.is_a?(Array) ? value_or_array : [value_or_array]
       values.each do |v|
@@ -78,7 +76,7 @@ protected
     title = t "meta_title.#{controller_name}_#{action_name}", default: "Blank"
     title = auto_title if title == "Blank"
     hash[:title_tag][:title] = title
-    hash[:meta_tags][:description] = t "meta_descriptions.#{controller_name}_#{action_name}", default: "#{title} with the Bike Index"
+    hash[:meta_tags][:description] = t "meta_descriptions.#{controller_name}_#{action_name}", default: "#{title} on the Bike Index"
     hash
   end
 

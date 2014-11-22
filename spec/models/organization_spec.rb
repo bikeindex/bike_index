@@ -15,15 +15,8 @@ describe Organization do
     it { should belong_to :auto_user }
   end
 
-  describe :set_urls do
-    it "does not add http:// to the website if the url doesn't have it so that the link goes somewhere" do
-      organization = FactoryGirl.create(:organization, website: "somewhere.org" )
-      organization.website.should eq('somewhere.org')
-    end
-    xit "should remove http:// from the website url if it's already there" do
-      @user = FactoryGirl.create(:organization, website: "http://somewhere.com" )
-      @user.website.should eq('somewhere.com')
-    end
+  it "has before_save_callback_method defined for set_website" do
+    Organization._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_website).should == true
   end
 
   describe :set_short_name_and_slug do 
@@ -48,6 +41,18 @@ describe Organization do
 
     it "has before_save_callback_method defined for set_short_name_and_slug" do
       Organization._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_short_name_and_slug).should == true
+    end
+  end
+
+  describe :set_locations_shown do 
+    it "sets the locations shown to be org shown on save" do 
+      organization = FactoryGirl.create(:organization)
+      country = FactoryGirl.create(:country)
+      location = Location.create(country_id: country.id, city: 'Chicago', name: 'stuff', organization_id: organization.id)
+      organization.reload.update_attribute :show_on_map, true
+      location.reload.shown.should be_true
+      organization.update_attribute :show_on_map, false
+      location.reload.shown.should be_false
     end
   end
 

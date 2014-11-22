@@ -72,4 +72,10 @@ class Manufacturer < ActiveRecord::Base
     }
   end
 
+  before_save :set_website 
+  def set_website 
+    return true unless website.present?
+    self.website = Urlifyer.urlify(website)
+  end
+
 end
