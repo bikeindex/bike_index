@@ -11,6 +11,11 @@ SitemapGenerator::Sitemap.create do
     paths.each { |i| add "/#{i}", priority: 0.9 }
   end
 
+  group(filename: :how_it_works) do
+    paths = ["how_it_works"]
+    paths.each { |i| add "/#{i}", priority: 0.9 }
+  end
+
   group(filename: :news) do
     add '/blogs', priority: 0.9, changefreq: 'daily'
     Blog.published.each do |b|

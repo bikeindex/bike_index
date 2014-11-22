@@ -190,7 +190,7 @@ Bikeindex::Application.routes.draw do
   resource :integrations, only: [:create]
   match '/auth/:provider/callback', to: "integrations#create"
 
-  %w[stolen_bikes protect_your_bike privacy terms serials about where roadmap security vendor_terms resources spokecard].each do |page|
+  %w[stolen_bikes protect_your_bike privacy terms serials about where roadmap security vendor_terms resources spokecard how_it_works].each do |page|
     get page, controller: 'info', action: page
   end
 

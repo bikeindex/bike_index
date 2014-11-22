@@ -168,6 +168,11 @@
   border-bottom: 10px solid $gray-blue-dark;
   background: $blue;
   color: white;
+  a {
+    color: rgba(white, .8);
+    text-decoration: underline;
+    &:hover { color: $link-color-hover; }
+  }
 }
 
 @media (min-width: $s-breakpoint) {

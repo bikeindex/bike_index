@@ -24,6 +24,9 @@ class InfoController < ApplicationController
   def protect_your_bike
   end
 
+  def how_it_works
+  end
+
   def stolen_bikes
   end
 
@@ -51,7 +54,7 @@ class InfoController < ApplicationController
 protected
 
   def set_active_section
-    resources = ['serials', 'stolen_bikes', 'resources', 'spokecard', 'protect_your_bike']
+    resources = ['serials', 'stolen_bikes', 'resources', 'spokecard', 'protect_your_bike', 'how_it_works']
     if resources.include? action_name
       @active_section = 'resources'
     else

@@ -18,6 +18,14 @@ describe InfoController do
     it { should render_template(:protect_your_bike) }
   end
 
+  describe :how_it_works do 
+    before do 
+      get :how_it_works
+    end
+    it { should respond_with(:success) }
+    it { should render_template(:how_it_works) }
+  end
+
   describe :where do 
     before do 
       FactoryGirl.create(:country, iso: "US")
