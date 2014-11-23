@@ -91,6 +91,11 @@
     .bike-details
       %table.table.table-striped
         %tbody
+          %tr
+            %td.td-title
+              Registered
+            %td
+              = @bike.created_at.strftime("%m-%d-%Y")
           - unless @bike.serial_number == 'absent'
             %tr
               %td.td-title
