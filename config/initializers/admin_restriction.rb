@@ -1,6 +1,7 @@
 class AdminRestriction
-  def self.matches?(request)
-    user = User.find_by_auth_token!(request.env['rack.request.cookie_hash']['auth_token']) if request.env['rack.request.cookie_hash']['auth_token']
+  def self.matches?(req)
+    auth =  Rack::Session::Cookie::Base64::Marshal.new.decode(req.cookies["auth"])
+    user = User.from_auth(auth)
     return user && user.superuser?
   end
 end
