@@ -41,6 +41,7 @@ Bikeindex::Application.routes.draw do
 
   resources :feedbacks, only: [:create, :new]
   match 'vendor_signup', to: 'organizations#new'
+  match 'lightspeed_integration', to: 'organizations#lightspeed_integration'
   match 'contact', to: 'feedbacks#index'
   match 'contact_us', to: 'feedbacks#index'
   match 'help', to: 'feedbacks#index'

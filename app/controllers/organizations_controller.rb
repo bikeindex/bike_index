@@ -1,17 +1,18 @@
 class OrganizationsController < ApplicationController
   before_filter :authenticate_user!, only: [:show, :edit, :update, :destroy]
-  before_filter :find_organization, except: [:new, :create]
+  before_filter :find_organization, except: [:new, :lightspeed_integration, :create]
   before_filter :require_membership, only: [:show, :edit, :update, :destroy]
   before_filter :require_admin, only: [:edit, :update, :destroy]
   before_filter :set_bparam, only: [:embed, :embed_extended]
   layout "organization"
 
   def new
-    unless current_user.present?
-      @user = User.new
-    end
-    @organization = Organization.new
-    @active_section = "contact"
+    prep_new_organization
+    render layout: 'content'
+  end
+
+  def lightspeed_integration
+    prep_new_organization
     render layout: 'content'
   end
 
@@ -112,6 +113,14 @@ class OrganizationsController < ApplicationController
   end
 
   protected
+
+  def prep_new_organization
+    unless current_user.present?
+      @user = User.new
+    end
+    @organization = Organization.new
+    @active_section = "contact"
+  end
 
   def allowed_attributes
     updates = {

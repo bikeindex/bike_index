@@ -29,6 +29,20 @@
       The customer doesn't need to do anything else either. If they want to, they can sign in and upload photos or add details to their bike &mdash; but even if they don't, they have a permanent record of their bike.
     %p
       If their bike is ever stolen they have all the information they need to file a police report, make an insurance claim and, most importantly, they can mark their bike stolen on the Bike Index &mdash; where it has the best chance of being found.
+
+  %hr.padded
+
+  %h2.padded
+    Automated registration
+  %article
+    %p
+      We have an official
+      %strong
+        Lightspeed Retail Integration
+      that automates the entire process - #{link_to "learn how here", lightspeed_integration_url}.
+    %p
+      If you have a spreadsheets of serial numbers or want to set up batch uploading in some other way, #{link_to "contact us", "mailto:seth@bikeindex.org"}.
+
   %hr.padded
   %h2.padded
     Want to sign up?
@@ -39,66 +53,5 @@
       There are no commitments.
     %p
       We just want to stop bike theft.
-    - if current_user.present?
-      .alert.alert-warning.padded
-        %p
-          Your current account (<strong>#{current_user.email}</strong>) will be a member of the organization you create.
-        %p
-          If you don't want that to be the case, #{link_to 'log out', session_path(redirect_location: 'new_user'), method: :delete} and sign up with the email you would like to use instead.
-      / - if current_user.memberships.count == 1
-      - if current_user.memberships.count > 0
-        - org = current_user.organizations.first
-        %h3.padded
-          You are already a member of #{link_to org.name, organization_url(org.slug)}.
-        %p.padded
-          %a.collapsed{ href: "#org-add-panel", data: { toggle: "collapse"} }
-            Click here
-          if you would like to create another organization.
-
-      #org-add-panel{ class: ('collapse' if org.present?) }
-        = form_for @organization do |f|
-
-          - if @organization.errors.any?
-            #alert-block
-              .alert.alert-error
-                %a.close{"data-dismiss" => "alert"} ×
-                %h4
-                  Please fix the following 
-                  = pluralize(@organization.errors.count, "error")
-                %ul
-                  - @organization.errors.full_messages.each do |msg|
-                    %li 
-                      = msg  
-          .well
-            %h3
-              New organization
-            .full-width-input
-              = f.label :name
-              = f.text_field :name, required: true, placeholder: "Organization name"
-            .full-width-input
-              = f.label :website, "Organization website"
-              = f.text_field :website, placeholder: "http://example.com"
-
-            .controls.radio-controls
-              %label.radio
-                = f.radio_button :org_type, "shop"
-                Bike shop
-              %label.radio
-                = f.radio_button :org_type, "advocacy"
-                Advocacy group
-              %label.radio
-                = f.radio_button :org_type, "police"
-                Police department
-              %label.radio
-                = f.radio_button :org_type, "college"
-                College
-            .submit-new-org
-              = f.submit "Create organization", class: "button-blue"
-    - else
-      .alert.alert-info.padded
-        %p
-          To be able to add an organization, you first need to create an account on the Bike Index.
-        %p
-          Head over to our #{link_to "sign up page", new_user_url}.
-        %p
-          Once you're logged in you'll be able to add your organization right here.
+    
+    = render "new_form"
