@@ -4,9 +4,9 @@ module Sessionable
   def sign_in_and_redirect
     session[:last_seen] = Time.now
     if params[:session].present? && params[:session][:remember_me].present? && params[:session][:remember_me].to_s == '1'
-      cookies.signed[:auth] = {secure: true, httponly: true, value: [@user.id, @user.auth_token]}
+      cookies.permanent.signed[:auth] = cookie_options
     else
-      cookies.signed[:auth] = {secure: true, httponly: true, value: [@user.id, @user.auth_token]}
+      cookies.signed[:auth] = cookie_options
     end
 
     if session[:return_to].present?
@@ -25,6 +25,17 @@ module Sessionable
     else
       redirect_to user_home_url, notice: "Logged in!" and return
     end
+  end
+
+  protected
+
+  def cookie_options
+    c = {
+      httponly: true,
+      value: [@user.id, @user.auth_token]
+    }
+    # In development, secure: true breaks the cookie storage. Only add if production
+    Rails.env.production? ? c.merge({secure: true}) : c
   end
 
 end
