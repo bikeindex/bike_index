@@ -38,7 +38,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     # $('#edit-menu').attr('data-spy', 'affix').attr('data-offset-top', 10)
     # $('#edit-menu').affix()
     @setInitialValues()
-    $('.form-horizontal').areYouSure()
+    $('.bikeedit-form-grab').areYouSure()
     $('.select_unattached').removeClass('select_unattached')
 
     if $('#new_public_image').length > 0
