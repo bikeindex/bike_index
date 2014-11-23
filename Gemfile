@@ -29,8 +29,8 @@ gem 'rmagick'
 gem "mini_magick" # a smaller implementation of rmagick, required for rqrcode
 gem 'rqrcode-rails3'
 gem 'strong_parameters'
-gem 'libv8', '~> 3.11.8'
-gem 'rb-readline', '~> 0.4.2'
+gem 'libv8', '~> 3.16.14.7'
+gem 'rb-readline', '~> 0.5.0'
 gem 'backbone-on-rails', "~>0.9.10.0"
 gem 'stripe', git: 'https://github.com/stripe/stripe-ruby'
 gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'
@@ -59,7 +59,7 @@ gem 'groupdate'
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'
   gem 'coffee-rails', '~> 3.2.1'
-  gem 'therubyracer', platforms: :ruby
+  gem 'therubyracer', '~> 0.12.1' , platforms: :ruby
   gem 'uglifier', '>= 1.0.3'
 end
 
