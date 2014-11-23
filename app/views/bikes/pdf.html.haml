@@ -1,14 +1,14 @@
 :plain
   <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-  
+
 %html{ xmlns: "http://www.w3.org/1999/xhtml" }
   %head
     %meta{charset: "utf-8"}
     %meta{"http-equiv" => "X-UA-Compatible", content: "text/html; charset=UTF-8"}
     = wicked_pdf_stylesheet_link_tag "registration_pdf"
     <link href='https://fonts.googleapis.com/css?family=Rambla:400' rel='stylesheet' type='text/css'>
-    
+
     %title
       - tit = ''
       - tit += "#{@bike.year} " if @bike.year.present?
@@ -94,6 +94,11 @@
           - unless @bike.serial_number == 'absent'
             %tr
               %td.td-title
+                Registered
+              %td
+                = @bike.created_at.strftime("%m-%d-%Y")
+            %tr
+              %td.td-title
                 Bike Serial
               %td
                 = @bike.serial_number
@@ -147,7 +152,7 @@
                       - r_hub = hubs.where(rear: true).first
                       - if r_hub.present?
                         (#{r_hub.model_name} by #{r_hub.manufacturer_name})
-        
+
 
     .bike-details
       - unless @bike.stolen and @stolen_record.present?
@@ -158,7 +163,7 @@
                 Front wheel
               %td
                 = @bike.front_wheel_size.name if @bike.front_wheel_size.present?
-                with 
+                with
                 - if @bike.front_tire_narrow
                   narrow tires
                 - else
@@ -195,7 +200,7 @@
             Registration
           %h3
             printout
-          %p 
-            online @ 
+          %p
+            online @
             %a{href: bike_url(@bike) }
               bikeindex.org#{bike_path(@bike)}
