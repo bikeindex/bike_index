@@ -117,7 +117,11 @@ h1, h2, h3, h4, h5 { font-weight: 400; }
   width: 47.5%;
   position: relative;
   float: left;
-  td { border: 0; }
+  td {
+    border: 0;
+    padding-top:    5px;
+    padding-bottom: 4px;
+  }
   &:last-of-type { margin-left: 5%; }
   .td-title {
     width: 90px;
