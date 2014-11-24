@@ -1,25 +1,32 @@
 .vendor-signup
   %h1
-    Lightspeed Retail integration
+    Using our integration with Lightspeed Retail  
 
   %article
+    %h3
+      What the Bike Index is
+    %p.padded
+      Bicycle registration is a vital part of keeping bikes safe. While not every registered bike that is stolen will be recovered, it's far, far less likely an unregistered one will be.
     %p
-      We believe bike registration is incredibly important. While we can't guarantee a registered bike will be recovered if it's stolen, it's very unlikely that one that isn't registered will be.
+      Just about everyone would like their bike to be registered &mdash; most people won't bother to register on their own though. So it makes a lot of sense to register bikes right when they are sold.
     %p
-      So it makes sense to protect your customers right when you sell them a bike &mdash; and we designed the Index to be a great way for bike shops to register bikes for their customers.
+      We designed the Index to be a great way for bike shops to register bikes for their customers. If you register a bike for someone, we send them an email with the basic information about their bike in case they ever need it &mdash; and that's it. 
     %p
-      If you register a bike for someone, they receive an email with the basic information about their bike. If they choose to, they can sign in to the Bike Index and edit, update or mark the bike stolen.
-    .alert
-      We will not send your customers any email other than the registration email. We will never trade or sell their email to anyone.
+      Of course they can log in and edit the bike if they'd like, but they're protected regardless. We will never trade or sell their email, or send any sort of marketing email to them. We just protect their bikes, for free, because it's what we do.
     %p
       Read more about #{link_to "how and why the Bike Index works", how_it_works_url}.
   %hr.padded
   %article.padded
+    %h3
+      How the integration works
+    %p.padded
+      Once you connected your Lightspeed account, we can register every bike you sell automatically. If you'd prefer it can wait for approval before registering the bikes.
     %p
-      The Bike Index has an #{link_to "official integration with Lightspeed Retail", "http://www.lightspeedpos.com/retail/addons/", target: '_blank'} - you can find us in their
+      We're an #{link_to "official integration with Lightspeed Retail", "http://www.lightspeedpos.com/retail/addons/", target: '_blank'} - you can find us in their
       %em
         Great tools for bicycle retailers
       section. We've been vetted and approved by Lightspeed &mdash; we protect your data and we'll help protect your customers' bikes.
+
     %blockquote
       I started the Bike Index because I wanted to register bikes for my customers at the shop where I worked &mdash; with this integration, we're finally able to give shops a way to register bikes that doesn't interfere with selling them.
     .blockquote-cite
@@ -46,15 +53,15 @@
           Click on "integrate with the Bike Index" and follow the steps with Lightspeed Retail to connect your account.
     
     %p.padded
-      And that's it. Every bike you sell will automatically be registered, so long as you put in the customer's email and the bike has a serial number in the "serial number" field in Lightspeed.
+      And that's it. Every bike you sell will be registered, so long as you put in the customer's email and the bike has a serial number in the "serial number" field in Lightspeed.
     %p
       If a customer doesn't want to be registered, put "do not register" in the notes for the sale and we won't register the bike.
     
-    .alert
+    .alert.alert-info
       %p
-        We will not register any bikes that were sold before you signed up for the integration.
+        We will not automatically register bikes sold before you signed up for the integration.
       %p
-        You will be able to see these bikes in the Lightspeed Integration page and register them there if you choose to.
+        You will be able to see these bikes in the Lightspeed Integration page and register them there if you choose to though.
       / %p
       /   You can register these bikes by clicking edit, checking the "register despite issues" checkbox, and clicking the "Update bike" button. If you'd like to register a large quantity, #{link_to "contact us", "mailto:seth@bikeindex.org"}.
 
@@ -63,7 +70,9 @@
 
   %hr.padded
   %article.padded.vendor-signup-form.bottom-padded#add_organization
+    %h3
+      Sign your shop up
     / %p
     /   And with the integration with Lightspeed Retail, registering bikes is effortless &mdash; all you have to do is sell them.
-    
+
     = render "new_form"
