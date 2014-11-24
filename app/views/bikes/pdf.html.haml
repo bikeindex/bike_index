@@ -96,12 +96,12 @@
               Registered
             %td
               = @bike.created_at.strftime("%m-%d-%Y")
+              to 
+              - if @bike.owner.present? && @bike.owner.name.present?
+                = @bike.owner.name
+              - else
+                = @bike.owner_email
           - unless @bike.serial_number == 'absent'
-            %tr
-              %td.td-title
-                Registered
-              %td
-                = @bike.created_at.strftime("%m-%d-%Y")
             %tr
               %td.td-title
                 Bike Serial
