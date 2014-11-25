@@ -14,6 +14,7 @@ module Api
         }
         result[:user] = user_info if oauth_scope.include?('read_user')
         result[:bike_ids] = bike_ids if oauth_scope.include?('read_bikes')
+        result[:memberships] = organization_memberships if oauth_scope.include?('read_organization_membership')
         respond_with result
       end
 
@@ -31,6 +32,17 @@ module Api
       
       def bike_ids
         @oauth_user.bikes
+      end
+
+      def organization_memberships
+        return [] unless @oauth_user.memberships.any?
+        @oauth_user.memberships.map{ |membership| 
+          {
+            organization_name: membership.organization.name,
+            organization_slug: membership.organization.slug, 
+            user_is_organization_admin: (true ? membership.role == 'admin' : false)
+          }
+        }
       end
      
     end

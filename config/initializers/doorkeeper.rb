@@ -1,4 +1,4 @@
-OAUTH_SCOPES = [:read_user, :read_bikes, :write_user, :write_bikes, :read_bikewise, :write_bikewise]
+OAUTH_SCOPES = [:read_user, :read_bikes, :write_user, :write_bikes, :read_bikewise, :write_bikewise, :read_organization_membership]
 Doorkeeper.configure do
   # Change the ORM that doorkeeper will use.
   orm :active_record
@@ -40,7 +40,7 @@ Doorkeeper.configure do
 
   # Define access token scopes for your provider
   default_scopes  :public
-  optional_scopes :read_user, :write_user, :read_bikes, :write_bikes, :read_bikewise, :write_bikewise
+  optional_scopes :read_user, :write_user, :read_bikes, :write_bikes, :read_bikewise, :write_bikewise, :read_organization_membership
 
   # Change the way client credentials are retrieved from the request object.
   # By default it retrieves first from the `HTTP_AUTHORIZATION` header, then
