@@ -40,6 +40,7 @@ module Api
           {
             organization_name: membership.organization.name,
             organization_slug: membership.organization.slug, 
+            organization_access_token: membership.organization.access_token,
             user_is_organization_admin: (true ? membership.role == 'admin' : false)
           }
         }
