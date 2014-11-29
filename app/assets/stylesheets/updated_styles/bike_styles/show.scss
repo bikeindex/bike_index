@@ -73,6 +73,7 @@
     width: $six-column;
     float: left;
     &:nth-of-type(2n) { margin-left: $gutter; }
+    &:nth-of-type(2n+1) { clear: left; }
   }
 }
 
