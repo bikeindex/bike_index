@@ -29,19 +29,22 @@
       %span.vendor-tab-bg
       #what_we_are.tab-pane.active
         %article
-          %p.padded
-            Bicycle registration is a vital part of keeping bikes safe. While not every registered bike that is stolen will be recovered, it's far, far less likely an unregistered one will be.
           %p
-            Just about everyone would like their bike to be registered &mdash; but most people won't bother to register on their own. So it makes a lot of sense to register bikes right when they are sold.
+            Bicycle registration is a vital part of keeping bikes safe.
+
           %p
-            We designed the Index to be a great way for bike shops to register bikes for their customers. If you register a bike for someone, we send them an email with the basic information about their bike in case they ever need it &mdash; and that's it. 
+            While we know not every registered bike that is stolen will be recovered, unregistered stolen bikes are almost guaranteed to never turn up again. This is why we created Bike Index – to provide fast, free, and easy registration that people would actually want to use, so we could help recover stolen bikes.
           %p
-            Of course they can log in and edit the bike if they'd like, but they're protected regardless. We will never trade or sell their email, or send any sort of marketing to them. We just protect their bikes, for free, because it's what we do.
+            Just about everyone wants their bikes to be registered &mdash; but most people never bother to register on their own. It makes a lot of sense to register bikes right when they are sold - which is why we've partnered with Lightspeed Retail to do just that.
+          %p
+            We designed Bike Index from the outset to be a great way for bike shops to register bikes for their customers. If you register a bike for a customer, we will send them an email with the basic information about their bike in case they ever need it &mdash; and that's it.
+          %p
+            Registrants can log into the Index and edit their bikes later on, but they're protected even if they choose not to. Furthermore, Bike Index will never trade or sell their email, or send any sort of marketing to them. We just protect their bikes, for free, because it's what we do.
           %p
             Read more about #{link_to "how and why the Bike Index works", how_it_works_url}.
       #how_lightspeed_integration_works.tab-pane
         %article.padded
-          %p.padded
+          %p
             Once you connect your Lightspeed account, we will register every bike you sell automatically (unless you write "Do not sell" in the sales note). If you'd prefer, you can make the integration wait for approval before registering the bikes though.
           %p
             We're an #{link_to "official integration with Lightspeed Retail", "http://www.lightspeedpos.com/retail/addons/", target: '_blank'} - you can find us in their
@@ -78,7 +81,8 @@
           .alert.alert-info
             %p
               We will not automatically register bikes that were sold before you signed up for the integration.
-            / %p
+            %p
+              You can register these bikes manually or #{link_to "contact us", "mailto:seth@bikeindex.org"} for assistance.
             /   You can register these bikes by clicking edit, checking the "register despite issues" checkbox, and clicking the "Update bike" button. If you'd like to register a large quantity, #{link_to "contact us", "mailto:seth@bikeindex.org"}.
 
 
