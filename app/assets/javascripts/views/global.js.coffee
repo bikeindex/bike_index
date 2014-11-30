@@ -24,7 +24,7 @@ class BikeIndex.Views.Global extends Backbone.View
     else
       @initializeHeaderSearch()
       @loadChosen() if $('#chosen-container').length > 0
-      @setLightspeedMovie() if $('#lightspeed-automation').length > 0
+      @setLightspeedMovie() if $('#how_lightspeed_integration_works').length > 0
       if $('#what-spokecards-are').length > 0
         $('.spokecard-extension').addClass('on-spokecard-page')
     @setProximityLocation()
@@ -46,7 +46,7 @@ class BikeIndex.Views.Global extends Backbone.View
   setLightspeedMovie: ->
     height = '394'
     height = '315' if $(window).width() < 768
-    video = """<iframe width="100%" height="#{height}" src="//www.youtube.com/embed/52QTFWm7gHk" frameborder="0" allowfullscreen></iframe>"""
+    video = """<iframe width="100%" height="#{height}" src="//www.youtube.com/embed/XW1ieMEwkvY" frameborder="0" allowfullscreen></iframe>"""
     $('#lightspeed-tutorial-video').append(video)
     
   openNewWindow: (e) ->
