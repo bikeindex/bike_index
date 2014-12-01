@@ -2,9 +2,13 @@ class BikeBookIntegration
   require 'net/http'
   
   def make_request(query, method = nil)
-    uri = URI("http://bikebook.io#{method}")
-    uri.query = URI.encode_www_form(query)
-    res = Net::HTTP.get_response(uri)
+    begin
+      uri = URI("http://bikebook.io#{method}")
+      uri.query = URI.encode_www_form(query)
+      res = Net::HTTP.get_response(uri)
+    rescue
+      return nil
+    end
     return nil unless res.is_a?(Net::HTTPSuccess)
 
     response = JSON.parse(res.body)
