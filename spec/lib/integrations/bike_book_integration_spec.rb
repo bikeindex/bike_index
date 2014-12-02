@@ -29,6 +29,15 @@ describe BikeBookIntegration do
   end
 
   describe :get_model_list do 
+    it "doesn't fail if bikebook is down" do 
+      manufacturer = FactoryGirl.create(:manufacturer, name: "Giant")
+      all_giants = BikeBookIntegration.new.get_model_list({manufacturer: manufacturer.name})
+      all_giants.kind_of?(Array).should be_true
+      giants_from_2014 = BikeBookIntegration.new.get_model_list({manufacturer: manufacturer.name, year: 2014})
+      giants_from_2014.kind_of?(Array).should be_true
+      all_giants.count.should > giants_from_2014.count
+    end
+    
     it "returns an array with the models for Giant, and a smaller array for a specific year of giant" do 
       manufacturer = FactoryGirl.create(:manufacturer, name: "Giant")
       all_giants = BikeBookIntegration.new.get_model_list({manufacturer: manufacturer.name})
