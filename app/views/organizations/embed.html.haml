@@ -151,7 +151,9 @@
       .controls
         = f.email_field :owner_email
     .submit-registration
-      = submit_tag "Register this", class: "button-submit"
+      = submit_tag "Register", class: "button-submit"
+      %span.what-you-register
+        this
       = collection_select( :bike, :cycle_type_id, CycleType.all, :id, :name, required: true)
   - if @phone
     .input-group#optional-phone
