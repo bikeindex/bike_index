@@ -11,7 +11,9 @@ class Admin::StolenBikesController < Admin::BaseController
       bikes = Bike.stolen.where('approved_stolen IS NOT TRUE')
       @verified_only = true
     end
-    bikes = bikes.paginate(page: params[:page]).per_page(50)
+    page = params[:page] || 1
+    per_page = params[:per_page] || 50
+    bikes = bikes.page(page).per(per_page)
     @bikes = bikes.decorate
   end
 

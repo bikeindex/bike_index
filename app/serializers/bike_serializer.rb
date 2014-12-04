@@ -35,11 +35,11 @@ class BikeSerializer < ActiveModel::Serializer
   end  
   
   def url
-    bike_url(object)
+    "#{ENV['BASE_URL']}/bikes/#{object.id}"
   end
 
   def api_url
-    api_v1_bike_url(object)
+    "#{ENV['BASE_URL']}/api/v1/bikes/#{object.id}"
   end
 
   def title

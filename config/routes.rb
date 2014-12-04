@@ -162,17 +162,18 @@ Bikeindex::Application.routes.draw do
       match 'not_found', to: 'api_v1#not_found'
       match '*a', to: 'api_v1#not_found'
     end
-    namespace :v2 do 
-      resources :manufacturers, only: [:index, :show]
-      resources :users do
-        collection do 
-          get :current
-          get :access_scope
-        end
-      end
-    end
+    # namespace :v2 do 
+    #   resources :manufacturers, only: [:index, :show]
+    #   resources :users do
+    #     collection do 
+    #       get :current
+    #       get :access_scope
+    #     end
+    #   end
+    # end
     mount Soulmate::Server, :at => "/searcher"
   end
+  mount API::Root => '/api'
 
   resources :stolen, only: [:index] do 
     collection do 

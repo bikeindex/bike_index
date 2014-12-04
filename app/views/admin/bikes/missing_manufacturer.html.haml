@@ -9,7 +9,7 @@
 
       = submit_tag 'Update selected', class: 'button-blue'
     .span8.paginate-container
-      = will_paginate @bikes, next_label: "Next", previous_label: "Previous"
+      = paginate @bikes
   %section.full-screen-table
     %table.table.table-striped.table-bordered
       %thead
@@ -80,4 +80,4 @@
                     pos
 
   .paginate-container
-    = will_paginate @bikes, next_label: "Next", previous_label: "Previous"
+    = paginate @bikes

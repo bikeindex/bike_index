@@ -46,6 +46,14 @@ def set_current_user(user)
   cookies.signed[:auth] = {secure: true, httponly: true, value: [user.id, user.auth_token]}
 end
 
+def create_doorkeeper_app
+  @user = FactoryGirl.create(:user)
+  @application = Doorkeeper::Application.new(name: "MyApp", redirect_uri: "http://app.com")
+  @application.owner = @user
+  @application.save
+  @token = Doorkeeper::AccessToken.create!(application_id: @application.id, resource_owner_id: @user.id)
+end
+
 OmniAuth.config.mock_auth[:facebook] = OmniAuth::AuthHash.new({
   "provider"=>"facebook", 
   "uid"=>"64901670", 

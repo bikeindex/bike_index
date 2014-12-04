@@ -18,7 +18,7 @@
   are unapproved
 
 .paginate-container
-  = will_paginate @bikes, next_label: "Next", previous_label: "Previous"
+  = paginate @bikes
 %section.full-screen-table
   %table.table.table-striped.table-bordered
     %thead
@@ -70,4 +70,4 @@
             %td
 
   .paginate-container
-    = will_paginate @bikes, next_label: "Next", previous_label: "Previous"
+    = paginate @bikes

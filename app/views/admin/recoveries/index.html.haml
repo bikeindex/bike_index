@@ -14,7 +14,7 @@
   are waiting to be posted
 
 .paginate-container
-  = will_paginate @recoveries, next_label: "Next", previous_label: "Previous"
+  = paginate @recoveries
 %section.full-screen-table
   = form_tag approve_admin_recoveries_path, class: '', id: 'multi_check' do
     = hidden_field_tag :multipost, true
@@ -75,4 +75,4 @@
               = "&#x2713;".html_safe if recovery.can_share_recovery
           
   .paginate-container
-    = will_paginate @recoveries, next_label: "Next", previous_label: "Previous"
+    = paginate @recoveries

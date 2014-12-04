@@ -6,7 +6,9 @@ class Admin::RecoveriesController < Admin::BaseController
     else
       recoveries = StolenRecord.recovered.includes(:bike).order("created_at desc")
     end
-    @recoveries = recoveries.paginate(page: params[:page]).per_page(50)
+    page = params[:page] || 1
+    per_page = params[:per_page] || 50
+    @recoveries = recoveries.page(page).per(per_page)
   end
 
   def show

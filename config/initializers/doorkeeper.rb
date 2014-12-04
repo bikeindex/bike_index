@@ -1,4 +1,5 @@
 OAUTH_SCOPES = [:read_user, :read_bikes, :write_user, :write_bikes, :read_bikewise, :write_bikewise, :read_organization_membership]
+OAUTH_SCOPES_S = OAUTH_SCOPES.join(' ')
 Doorkeeper.configure do
   # Change the ORM that doorkeeper will use.
   orm :active_record
@@ -25,8 +26,7 @@ Doorkeeper.configure do
   # authorization_code_expires_in 10.minutes
 
   # Access token expiration time (default 2 hours).
-  # If you want to disable expiration, set this to nil.
-  # access_token_expires_in 2.hours
+  access_token_expires_in 1.hours
 
   # Reuse access token for the same resource owner within an application (disabled by default)
   # Rationale: https://github.com/doorkeeper-gem/doorkeeper/issues/383

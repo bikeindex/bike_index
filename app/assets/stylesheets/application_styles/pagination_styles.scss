@@ -12,10 +12,17 @@
 
 .pagination {
   @include clearfix;
-  float: right;
   cursor: default;
   margin: 0;
-  // height: 22px;
+  ul {
+    float: right;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    li {
+      float: left;
+    }
+  }
   a, span, em {
     background: $blue-light;
     padding: 0.5em 1em;
@@ -31,7 +38,7 @@
   .disabled {
     display: none;
   }
-  .current {
+  .current, .active a {
     font-style: normal;
     font-weight: bold;
     background: $blue;
