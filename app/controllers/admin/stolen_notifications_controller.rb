@@ -3,7 +3,9 @@ class Admin::StolenNotificationsController < Admin::BaseController
 
   def index
     stolen_notifications = StolenNotification.order("created_at desc").includes(:bike)
-    @stolen_notifications = stolen_notifications.paginate(page: params[:page]).per_page(100)
+    page = params[:page] || 1
+    per_page = params[:per_page] || 100
+    @stolen_notifications = stolen_notifications.page(page).per(per_page)
   end
 
   def resend

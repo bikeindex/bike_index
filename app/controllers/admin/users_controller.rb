@@ -11,7 +11,9 @@ class Admin::UsersController < Admin::BaseController
     else 
       users = User.order("created_at desc")
     end
-    @users = users.paginate(page: params[:page]).per_page(50)
+    page = params[:page] || 1
+    per_page = params[:per_page] || 25
+    @users = users.page(page).per(per_page)
   end
 
   def edit

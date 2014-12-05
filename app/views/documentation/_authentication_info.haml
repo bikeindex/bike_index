@@ -1,0 +1,66 @@
+:markdown
+  ## Authentication notes
+  Here are some notes on authentication with the Bike Index. It's messy but maybe it will while we're in the process of incorporating this into the documentation.
+
+  There are two supported ways of authenticating with the Bike Index through OAuth2:
+
+  1. Authorization flow (also called Explicit grant flow)
+
+  2. Client-side flow (also called Implicit grant flow)
+
+  The Authorization flow enables long lived access through refresh tokens (instead of logging out the user every hour), is more secure, and is generally what you should be using. Learn more about [Authorization flow in OAuth2](http://labs.hybris.com/2012/06/01/oauth2-authorization-code-flow/).
+
+  The Client-side flow is good for client-side javascript apps. Here's an article on [Client-side flow in OAuth2](http://labs.hybris.com/2012/06/05/oauth2-the-implicit-flow-aka-as-the-client-side-flow/).
+
+  To review the applications you've authorized, go to [/oauth/authorized_applications](#{ENV['BASE_URL']}/oauth/authorized_applications)
+
+  ### Authentication params
+
+  By default doorkeeper authenticates clients using HTTP Basic authentication scheme. If the basic auth is not found in the authorization header, then it falls back to post parameters (client_id and client_secret).
+
+  For example, this would be the HTTP request for Client Credentials flow, using basic auth:
+
+      POST /oauth/token
+      Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
+      grant_type=client_credentials
+
+  You have the option to include the client credentials using the request body instead of using HTTP Basic.
+
+      POST /oauth/token
+      grant_type=client_credentials&client_id=...&client_secret=...
+
+  Putting them in the parameters is useful for browser-based exploration of the API
+
+      #{ENV['BASE_URL']}/api/v1/users/current?access_token=lksafdlsadfl;jkafsdl;jkasdfasdf
+      
+
+
+  <span class="less-strong pull-right">(managed by doorkeeper [<reference>](https://github.com/doorkeeper-gem/doorkeeper/wiki/Changing-how-clients-are-authenticated))</span>
+
+
+
+  ### OAuth refresh tokens
+
+
+  in ruby: 
+
+      client = OAuth2::Client.new('app_id', 'app_secret', site: "#{ENV['BASE_URL']}")
+      puts client.auth_code.authorize_url(:redirect_uri => 'urn:ietf:wg:oauth:2.0:oob')
+      # Vist the URL that is printed out and authenticate.
+      # You will be sent to a page that shows you the access code, (because the redirect_uri is the one used for testing).
+      
+      token = client.auth_code.get_token(code, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob')
+      # Where "code" is the code from the page after authentication
+      # Bike Index tokens expire in 1 hour - (but that is subject to change without notice)
+
+      token.expired?
+      # => false
+
+      # If your token has expired, you will get this:
+      token.expired?
+      # => true
+
+      # And you can refresh your token with 
+      new_token = token.refresh!
+  
+  You will get a refresh token back when you create a token. So long as you have that token, you can create a new token when your existing token has expired.

@@ -20,7 +20,7 @@ gem "i18n"
 gem "haml-rails", '~> 0.3.5'
 gem "journey", "~> 1.0.3"
 gem 'rdiscount'
-gem 'will_paginate', '~> 3.0'
+gem 'kaminari'
 gem 'pg_search'
 gem 'nokogiri'
 gem 'carrierwave', '~> 0.9.0'
@@ -56,6 +56,12 @@ gem 'groupdate'
 
 # gem 'localeapp'
 
+gem 'grape'
+gem 'grape-active_model_serializers'
+gem 'grape-swagger'
+gem 'grape-doorkeeper'
+gem 'api-pagination'
+
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'
   gem 'coffee-rails', '~> 3.2.1'
@@ -65,6 +71,7 @@ end
 
 group :development do
   gem 'ruby_gntp'
+  gem 'rerun'
   gem 'growl'
   gem 'brakeman'
   gem 'guard'
@@ -79,6 +86,7 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'foreman'
   gem 'database_cleaner'
+  gem 'json_spec'
 end
 
 group :test do

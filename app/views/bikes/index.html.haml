@@ -14,7 +14,8 @@
 
   .container
     .paginate-container-bottom
-      = will_paginate @bikes, next_label: "Next", previous_label: "Previous", inner_window: 1, outer_window: 1
+      = paginate @bikes
+      
 
 - else
 
@@ -26,13 +27,12 @@
       - else
         nothing matched your search
 
-- if @secondary_bikes.present?
-  - unless @page.present? && @page > 1
-    .container
-      %h2.secondary-bikes
-        Serial numbers close to
-        %em
-          #{params[:serial]}
+- if @secondary_bikes.present?  
+  .container
+    %h2.secondary-bikes
+      Serial numbers close to
+      %em
+        #{params[:serial]}
 
     %ul.bike-boxes
       = render partial: "/bikes/bike_u", collection: @secondary_bikes, locals: {target: "show" }

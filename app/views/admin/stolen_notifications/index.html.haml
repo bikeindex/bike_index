@@ -9,7 +9,8 @@
     (#{StolenNotification.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
 
 .paginate-container
-  = will_paginate @stolen_notifications, next_label: "Next", previous_label: "Previous"
+  = paginate @stolen_notifications
+
 %section.full-screen-table
   %table.table.table-striped.table-bordered
     %thead
@@ -48,4 +49,4 @@
               = stolen_notification.send_dates.count
 
   .paginate-container
-    = will_paginate @stolen_notifications, next_label: "Next", previous_label: "Previous"
+    = paginate @stolen_notifications

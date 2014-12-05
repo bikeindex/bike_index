@@ -18,7 +18,7 @@
 
 - if @paints.present?
   .paginate-container
-    = will_paginate @paints, next_label: "Next", previous_label: "Previous"
+    = paginate @paints
   %section.full-screen-table
     %table.table.table-striped.table-bordered
       %thead
@@ -60,7 +60,7 @@
               - if paint.tertiary_color_id.present?
                 = "- #{paint.tertiary_color.name}"
   .paginate-container
-    = will_paginate @paints, next_label: "Next", previous_label: "Previous"
+    = paginate @paints
 
 
 - else

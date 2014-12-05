@@ -50,12 +50,12 @@
 
 - if @bikes.present?
   .paginate-container
-    = will_paginate @bikes, next_label: "Next", previous_label: "Previous"
+    = paginate @bikes
   %section.full-screen-table
     %table.table.table-striped.table-bordered
       = render partial: "/admin/bikes/admin_bikes_table"
   .paginate-container
-    = will_paginate @bikes, next_label: "Next", previous_label: "Previous"
+    = paginate @bikes
 
 
 %section.full-screen-table

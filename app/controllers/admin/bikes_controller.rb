@@ -11,13 +11,17 @@ class Admin::BikesController < Admin::BaseController
     else 
       bikes = bikes.order("created_at desc")
     end
-    bikes = bikes.paginate(page: params[:page]).per_page(100)
+    page = params[:page] || 1
+    per_page = params[:per_page] || 100
+    bikes = bikes.page(page).per(per_page)
     @bikes = bikes.decorate
   end
 
   def missing_manufacturer
     bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.find_by_slug('other').id).order('manufacturer_other ASC')
-    bikes = bikes.paginate(page: params[:page]).per_page(100)
+    page = params[:page] || 1
+    per_page = params[:per_page] || 100
+    bikes = bikes.page(page).per(per_page)
     @bikes = bikes.decorate
   end
 

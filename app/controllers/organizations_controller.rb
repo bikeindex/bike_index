@@ -43,7 +43,9 @@ class OrganizationsController < ApplicationController
 
   def show
     bikes = Bike.where(creation_organization_id: @organization.id).order("created_at desc")
-    bikes = bikes.paginate(page: params[:page]).per_page(100)
+    page = params[:page] || 1
+    per_page = params[:per_page] || 25
+    bikes = bikes.page(page).per(per_page)
     @bikes = bikes.decorate
     @organization = @organization.decorate
   end

@@ -30,7 +30,11 @@ Bikeindex::Application.routes.draw do
 
   resource :charges, only: [:new, :create]
   resources :documentation, only: [:index] do
-    collection { get :api_v1 }
+    collection do
+      get :api_v1
+      get :api_v2
+      get :o2c
+    end
   end
 
 
@@ -162,17 +166,9 @@ Bikeindex::Application.routes.draw do
       match 'not_found', to: 'api_v1#not_found'
       match '*a', to: 'api_v1#not_found'
     end
-    namespace :v2 do 
-      resources :manufacturers, only: [:index, :show]
-      resources :users do
-        collection do 
-          get :current
-          get :access_scope
-        end
-      end
-    end
     mount Soulmate::Server, :at => "/searcher"
   end
+  mount API::Base => '/api'
 
   resources :stolen, only: [:index] do 
     collection do 

@@ -22,15 +22,16 @@ class BikesController < ApplicationController
   def index
     search = BikeSearcher.new(params)
     bikes = search.find_bikes
-    if params[:serial].present?
+    @count = bikes.count
+    (bikes.count <= 250) ? (total_bikes = bikes.count) : (total_bikes = 250)
+    page = params[:page] || 1
+    per_page = params[:per_page] || 25
+    bikes = bikes.page(page).per(per_page)
+    if params[:serial].present? && page == 1
       secondary_bikes = search.fuzzy_find_serial
       # secondary_bikes = search.find_bikes
       @secondary_bikes = secondary_bikes.decorate if secondary_bikes.present?
     end
-    @count = bikes.count
-    (bikes.count <= 250) ? (total_bikes = bikes.count) : (total_bikes = 250)
-    @page = params[:page]
-    bikes = bikes.paginate(page: params[:page], total_entries: total_bikes).per_page(25)
     @bikes = bikes.decorate
     @attribute_select_values = search.parsed_attributes
     @query = params[:query]

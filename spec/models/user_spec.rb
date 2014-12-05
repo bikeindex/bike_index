@@ -194,5 +194,21 @@ describe User do
     end
   end
 
+  describe :access_tokens_for_application do 
+    it "returns [] if no application" do 
+      user = User.new 
+      user.access_tokens_for_application(nil).should eq([])
+    end
+    it "returns access tokens for the application" do 
+      user = FactoryGirl.create(:user)
+      application = Doorkeeper::Application.new(name: 'test', redirect_uri: 'http://foo.bar')
+      application.owner = user
+      application.save
+      access_token = Doorkeeper::AccessToken.create(application_id: application.id, resource_owner_id: user.id)
+      tokens = user.reload.access_tokens_for_application(application.id)
+      tokens.first.should eq(access_token)
+    end
+  end
+
 
 end

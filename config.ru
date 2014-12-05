@@ -13,6 +13,6 @@ if ENV['RAILS_ENV'] == 'production'
   # Max memory size (RSS) per worker
   use Unicorn::WorkerKiller::Oom, oom_min, oom_max
 end
-
+require 'grape-active_model_serializers'
 require ::File.expand_path('../config/environment',  __FILE__)
 run Bikeindex::Application
