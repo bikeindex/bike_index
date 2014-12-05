@@ -2,16 +2,20 @@ module API
   module V2
     class Root < Dispatch
       format :json
-      mount API::V2::Manufacturers
       mount API::V2::Users
+      mount API::V2::Manufacturers
       content_type :json, 'application/json'
       add_swagger_documentation base_path: "/api",
         api_version: 'v2',
         hide_format: true, # don't show .json
         hide_documentation_path: true,
+        mount_path: "/v2/swagger_doc",
         info: {
-            title: "BikeIndex API v1",
-            description: "This is an API for accessing information about bicycling related incidents. You can find the source code on <a href='https://github.com/bikeindex/bikewise'>GitHub</a>."
+            title: "BikeIndex API v2",
+            description: "This is the API for the Bike Index. It's authenticated with OAuth2 and is generally pretty awesome",
+            contact: "support@bikeindex.org",
+            license_url: "https://github.com/bikeindex/bike_index/blob/master/LICENSE",
+            terms_of_service_url: "https://bikeindex.org/terms"
           }
     end
   end

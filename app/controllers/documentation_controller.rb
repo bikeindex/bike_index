@@ -10,4 +10,12 @@ class DocumentationController < ApplicationController
     @root = ENV['BASE_URL']
   end
 
+  def api_v2
+    render layout: false
+  end
+
+  def o2c
+    render layout: false
+  end
+
 end

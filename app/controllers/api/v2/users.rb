@@ -34,7 +34,7 @@ module API
 
         desc "Current user's information allowed in the current access token scope"
         # This is the method that is called once authentication passes, to get info
-        # about the user. 
+        # about the user.
         get '/current' do
           result = {
             id: current_user.id.to_s

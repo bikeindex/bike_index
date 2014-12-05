@@ -7,7 +7,7 @@ module API
     end
   end
 
-  Root = Rack::Builder.new do
+  Base = Rack::Builder.new do
     use API::Logger
     run API::Dispatch
   end

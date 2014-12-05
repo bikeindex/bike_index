@@ -23,3 +23,6 @@
           = link_to 'Edit', edit_oauth_application_path(application), class: 'btn binxbtn-primary'
         %td
           = render 'delete_form', application: application
+.container
+  %h3.padded
+    Documentation on API V2 is available at #{link_to "documentation/api_v2", api_v2_documentation_index_url}

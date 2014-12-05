@@ -1,0 +1,122 @@
+
+.content-header {
+  // background: #000;
+  background: $gray-lighter;
+  box-shadow: 0px 1px 2px rgba(black, .2)
+}
+
+@media (min-width: $s-breakpoint+1) {
+  .content-header {
+    padding: 10px 0;
+    .top-logo {
+      width: $one-column;
+    }
+  }
+}
+
+
+.swagger-section {
+  #header {
+    // background-color: #89bf04;
+    // padding: 14px;
+    a#logo {
+      font-size: 1.5em;
+      font-weight: bold;
+      text-decoration: none;
+      background: transparent url("/assets/documentation_v2/logo_small.png") no-repeat left center;
+      padding: 20px 0 20px 40px;
+      color: white;
+    }
+    form#api_selector {
+      @include clearfix;
+      display: block;
+      width: 100%;
+      position: relative;
+      padding-top: 1em;
+    }
+    .api-header-group {
+      padding: 0 10px .25em;
+      label {
+        font-weight: $form-font-weight;
+        color: $gray;
+        margin-bottom: .3em;
+      }
+    }
+    .api-header-url {
+      input {
+        background: none;
+        border: none;
+      }
+    }
+
+    a#explore {
+      color: white;
+      float: right;
+      margin: .25em 10px 10px 0;
+    }
+  }
+}
+
+@media (min-width: $s-breakpoint) {
+  .swagger-section #header form#api_selector {
+    width: $eleven-column;
+    float: left;
+    padding-top: .3em;
+    .api-header-group {
+      float: left;
+      margin-right: 2%;
+      position: relative;
+      padding: 0;
+    }
+    .api-header-url { 
+      width: 33%;
+      label { padding-left: .5em; }
+    }
+    .api-header-key { width: 53%; }
+    a#explore {
+      float: left;
+      width: 10%;
+      margin: 1.2em 0 0;
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+}
+
+.swagger-section .container {
+  h2 { font-size: 24px; margin-top: 2em; }
+  h3 { margin-top: 1.5em; }
+  strong { font-weight: bold; }
+  .alert { line-height: 1.2em; }
+  p { padding-bottom: .5em; }
+  pre { 
+    margin: .5em 0 2em;
+    code { background: none; }
+  }
+  ol { list-style-type: decimal; padding-left: 2em; }
+
+}
+
+.swagger-section #api_info {
+  // We're going to do a better job introducing this ourselves
+  display: none; 
+}
+
+.api-info-header {
+  padding: 40px 0;
+}
+.api-info-footer {
+  padding: 40px 0;
+}
+
+@media (min-width: $s-breakpoint) {
+  .api-info-footer {
+    padding: 60px 0 40px;
+  }
+ 
+}
+
+#resources_container {
+  .toggleEndpointList { font-weight: 600; }
+//   input { @extend .form-control; }
+}
