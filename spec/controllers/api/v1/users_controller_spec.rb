@@ -10,6 +10,7 @@ describe Api::V1::UsersController do
     end
 
     it "returns user_present if a user is present" do 
+      # We need to test that cors isn't present
       u = FactoryGirl.create(:user)
       set_current_user(u)
       get :current, format: :json
