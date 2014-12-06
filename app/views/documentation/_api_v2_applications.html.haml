@@ -1,0 +1,44 @@
+%h2
+  Applications
+  %span.pull-right.less-strong
+    = link_to "Add an application", "/oauth/applications"
+
+- if @applications.present?
+  %ul.applications-list
+    - @applications.each do |application|
+      %li
+        .well
+          %h3
+            %strong
+              Application name:
+            = application.name
+          - tokens = application.access_tokens.where(resource_owner_id: current_user.id).select{ |t| t.expired? != true }
+          - if tokens.present?
+            %ul.access-tokens
+              - tokens.each do |token|
+                - next if token.expired?
+                %li
+                  %a.set-token.pull-right.btn.binxbtn-primary{href: '#', data: {token: token.token }}
+                    Use token
+                  %p
+                    Access token:
+                    %code
+                      = token.token
+                  %p
+                    Scopes:
+                    - token.scopes.each do |s|
+                      %code 
+                        = s
+          - else
+            %h4 no tokens
+  - else
+    %p
+      You don't have any applications set up! To be able to use the API you will need to create an application and generate an access token.
+    %p
+      #{link_to "Add an application here", "/oauth/applications"}.
+
+.alert.alert-info
+  %p
+    Coming soon (aka by the end of the weekend) - a way to generate and modify tokens on this page. Sorry that it isn't up yet!
+  %p
+    Right now, if you successfully create an access token, it will show up above, and give you the option to use it to authenticate requests here to test things out.

@@ -32,7 +32,15 @@ module API
           end
         end
 
-        desc "Current user's information allowed in the current access token scope"
+        desc "Current user's information allowed in the current access token scope", {
+          notes: <<-NOTE
+            Depending on your scopes you will get different things back.
+            - For an array of the bike ids, you need `read_bikes` access
+            - For information about the user (including their email address), you need `read_user` access
+            - For the names of the organizations and/or shops they're a part of, `read_organization_membership` access
+          NOTE
+        }
+
         # This is the method that is called once authentication passes, to get info
         # about the user.
         get '/current' do

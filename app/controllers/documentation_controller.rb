@@ -11,7 +11,11 @@ class DocumentationController < ApplicationController
   end
 
   def api_v2
-    @applications = current_user.oauth_applications if current_user.present?
+    if current_user.present?
+      @applications = current_user.oauth_applications
+    else
+      cookies[:return_to] = api_v2_documentation_index_url
+    end
     render layout: false
   end
 

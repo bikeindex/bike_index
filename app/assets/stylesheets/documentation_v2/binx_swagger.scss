@@ -41,6 +41,7 @@
         color: $gray;
         margin-bottom: .3em;
       }
+      input { box-shadow: none; }
     }
     .api-header-url {
       input {
@@ -55,6 +56,9 @@
       margin: .25em 10px 10px 0;
     }
   }
+  .content { min-height: 10px; }
+  .sandbox_header { padding: 5px 2px; }
+  input.submit { @extend .btn; @extend .binxbtn; }
 }
 
 @media (min-width: $s-breakpoint) {
@@ -93,9 +97,26 @@
     code { background: none; }
   }
   .access-tokens {
-    list-style-type: circle;
+    margin-left: .25em;
+    li {
+      background: white;
+      border-radius: 2px;
+      padding: .25em .5em;
+      margin: 0 0 .25em;
+    }
+    p { margin: 0; padding: .1em 0; }
   }
   ol { list-style-type: decimal; padding-left: 2em; }
+  .less-strong { color: $gray; font-size: .8em; }
+  .applications-list { 
+    margin: 1em 0 0;
+    background: white;
+  }
+
+  .applications-panel {
+    padding: 40px 0;
+  }
+
   .authentication-notes {
     margin-top: 40px;
     h3 { margin-top: 1.5em; }
@@ -108,7 +129,7 @@
 }
 
 .api-info-header {
-  padding: 40px 0;
+  padding: 0 0 40px;
 }
 .api-info-footer {
   padding: 40px 0;

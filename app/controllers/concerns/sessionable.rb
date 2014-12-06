@@ -9,9 +9,10 @@ module Sessionable
       cookies.signed[:auth] = cookie_options
     end
 
-    if session[:return_to].present?
-      target = session[:return_to]
+    if session[:return_to].present? || cookies[:return_to].present?
+      target = session[:return_to] || cookies[:return_to]
       session[:return_to] = nil
+      cookies[:return_to] = nil
       if target.match('password_reset')
         flash[:notice] = "You've been logged in. Please reset your password"
         render action: :update_password and return

@@ -43,7 +43,10 @@ $ ->
     addApiKeyAuthorization()
     return
 
-  
+  $('.set-token').click (e) ->
+    e.preventDefault()
+    $("#input_apiKey").val($(e.target).attr('data-token')).change()
+
   # if you have an apiKey you would like to pre-populate on the page for demonstration purposes...
   # apiKey = "68f00e0a1cec56d569facebb39aff7e033af49db234c1213901770fb10b39f30"
   # $("#input_apiKey").val apiKey

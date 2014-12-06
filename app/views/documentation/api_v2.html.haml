@@ -52,39 +52,8 @@
             %strong
               API V2 is under construction!
             The "/user/current" route is locked in and won't change - but otherwise no guarantees for the next few weeks as we finish building this out. If you've got suggestions or requirements for this API, please contact #{link_to "support@bikeindex.org", "mailto:support@bikeindex.org"}. (12/5/2014)
-        
-        %h2
-          Applications
-        - if @applications.present?
-          %ul
-            - @applications.each do |application|
-              %li
-                .well
-                  %h3
-                    %strong
-                      Application name:
-                    = application.name
-                  - tokens = application.access_tokens.where(resource_owner_id: current_user.id).select{ |t| t.expired? != true }
-                  - if tokens.present?
-                    %h4
-                      Your access tokens:
-                    %ul.access-tokens
-                      - tokens.each do |token|
-                        - next if token.expired?
-                        %li
-                          Access token: 
-                          %code
-                            = token.token
-                          Scopes
-                          %code
-                            = token.scopes
-                  - else
-                    %h4 no tokens
-          - else
-            %p
-              You don't have any applications set up! To be able to use the API you will need to create an application and generate an access token.
-            %p
-              #{link_to "Add an application here", "/oauth/applications"}.
+        .applications-panel
+          = render 'api_v2_applications'
 
     #message-bar.swagger-ui-wrap &nbsp;
 
