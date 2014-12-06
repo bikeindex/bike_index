@@ -18,20 +18,20 @@
 
   By default doorkeeper authenticates clients using HTTP Basic authentication scheme. If the basic auth is not found in the authorization header, then it falls back to post parameters (client_id and client_secret).
 
-  For example, this would be the HTTP request for Client Credentials flow, using basic auth:
+  / For example, this would be the HTTP request for Client Credentials flow, using basic auth:
 
-      POST /oauth/token
-      Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
-      grant_type=client_credentials
+  /     POST /oauth/token
+  /     Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
+  /     grant_type=client_credentials
 
-  You have the option to include the client credentials using the request body instead of using HTTP Basic.
+  / You have the option to include the client credentials using the request body instead of using HTTP Basic.
 
-      POST /oauth/token
-      grant_type=client_credentials&client_id=...&client_secret=...
+  /     POST /oauth/token
+  /     grant_type=client_credentials&client_id=...&client_secret=...
 
-  Putting them in the parameters is useful for browser-based exploration of the API
+  / Putting them in the parameters is useful for browser-based exploration of the API
 
-      #{ENV['BASE_URL']}/api/v1/users/current?access_token=lksafdlsadfl;jkafsdl;jkasdfasdf
+  /     #{ENV['BASE_URL']}/api/v1/users/current?access_token=lksafdlsadfl;jkafsdl;jkasdfasdf
       
 
 

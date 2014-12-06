@@ -11,6 +11,7 @@ class DocumentationController < ApplicationController
   end
 
   def api_v2
+    @applications = current_user.oauth_applications if current_user.present?
     render layout: false
   end
 

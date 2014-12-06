@@ -84,8 +84,7 @@
 }
 
 .swagger-section .container {
-  h2 { font-size: 24px; margin-top: 2em; }
-  h3 { margin-top: 1.5em; }
+  h2 { font-size: 24px; }
   strong { font-weight: bold; }
   .alert { line-height: 1.2em; }
   p { padding-bottom: .5em; }
@@ -93,8 +92,14 @@
     margin: .5em 0 2em;
     code { background: none; }
   }
+  .access-tokens {
+    list-style-type: circle;
+  }
   ol { list-style-type: decimal; padding-left: 2em; }
-
+  .authentication-notes {
+    margin-top: 40px;
+    h3 { margin-top: 1.5em; }
+  }
 }
 
 .swagger-section #api_info {
