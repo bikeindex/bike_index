@@ -31,15 +31,22 @@
       If their bike is ever stolen they have all the information they need to file a police report, make an insurance claim and, most importantly, they can mark their bike stolen on the Bike Index &mdash; where it has the best chance of being found.
 
   %hr.padded
-
-  %h2.padded
-    Automated registration
+  %h2.padded.lightspeed-logod
+    %a{ href: lightspeed_integration_url }
+      %img.lightspeed-logo{ src: "/assets/lightspeed_logo.png" }
+      integration
   %article
     %p
       We have an official
       %strong
         Lightspeed Retail Integration
       that automates the entire process - #{link_to "learn how here", lightspeed_integration_url}.
+  
+  %hr.padded
+
+  %h2.padded
+    Batch registration
+  %article
     %p
       If you have a spreadsheets of serial numbers or want to set up batch uploading in some other way, #{link_to "contact us", "mailto:seth@bikeindex.org"}.
 

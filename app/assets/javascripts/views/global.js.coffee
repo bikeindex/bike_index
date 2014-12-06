@@ -24,7 +24,7 @@ class BikeIndex.Views.Global extends Backbone.View
     else
       @initializeHeaderSearch()
       @loadChosen() if $('#chosen-container').length > 0
-      @setLightspeedMovie() if $('#how_lightspeed_integration_works').length > 0
+      @setLightspeedMovie() if $('#lightspeed-tutorial-video').length > 0
       if $('#what-spokecards-are').length > 0
         $('.spokecard-extension').addClass('on-spokecard-page')
     @setProximityLocation()

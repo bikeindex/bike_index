@@ -25,6 +25,20 @@
       margin: 0 auto;
     }
   }
+
+  .lightspeed-logod {
+    a {
+      display: block;
+      color: $grayDark;
+      &:hover { text-decoration: none; }
+    }
+    img {
+      display: block;
+      float: left;
+      width: 165px;
+      margin: -6px .5em 0 0;
+    }
+  }
 }
 
 @media (min-width: 767px) {
