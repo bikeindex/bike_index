@@ -19,7 +19,7 @@ gem "money-rails", "~> 0.5.0"
 gem "i18n"
 gem "haml-rails", '~> 0.3.5'
 gem "journey", "~> 1.0.3"
-gem 'rdiscount'
+gem 'kramdown'
 gem 'kaminari'
 gem 'pg_search'
 gem 'nokogiri'

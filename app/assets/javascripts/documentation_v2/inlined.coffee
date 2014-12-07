@@ -19,7 +19,7 @@ $ ->
       "delete"
     ]
     onComplete: (swaggerApi, swaggerUi) ->
-      log "Loaded SwaggerUI"
+      # log "Loaded SwaggerUI"
       # if typeof initOAuth is "function"
       #   initOAuth
       #     clientId: "your-client-id"

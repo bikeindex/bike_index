@@ -6,7 +6,7 @@
 
   1. Authorization flow (also called Explicit grant flow)
 
-  2. Client-side flow (also called Implicit grant flow)
+  2. Client-side flow (also called Implicit grant flow or Bearer flow)
 
   The Authorization flow enables long lived access through refresh tokens (instead of logging out the user every hour), is more secure, and is generally what you should be using. Learn more about [Authorization flow in OAuth2](http://labs.hybris.com/2012/06/01/oauth2-authorization-code-flow/).
 
@@ -18,31 +18,20 @@
 
   By default doorkeeper authenticates clients using HTTP Basic authentication scheme. If the basic auth is not found in the authorization header, then it falls back to post parameters (client_id and client_secret).
 
-  / For example, this would be the HTTP request for Client Credentials flow, using basic auth:
 
-  /     POST /oauth/token
-  /     Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
-  /     grant_type=client_credentials
-
-  / You have the option to include the client credentials using the request body instead of using HTTP Basic.
-
-  /     POST /oauth/token
-  /     grant_type=client_credentials&client_id=...&client_secret=...
-
-  / Putting them in the parameters is useful for browser-based exploration of the API
-
-  /     #{ENV['BASE_URL']}/api/v1/users/current?access_token=lksafdlsadfl;jkafsdl;jkasdfasdf
-      
-
-
-  <span class="less-strong pull-right">(managed by doorkeeper [<reference>](https://github.com/doorkeeper-gem/doorkeeper/wiki/Changing-how-clients-are-authenticated))</span>
+  <span class="less-strong pull-right">([managed by doorkeeper](https://github.com/doorkeeper-gem/doorkeeper/wiki/Changing-how-clients-are-authenticated))</span>
 
 
 
   ### OAuth refresh tokens
 
+  Since you have to send an access token with every request and they give access to someone's how you authenticate, it's important that they expire after 1 hour - so if someone compromises an access token, they don't have unlimited access to an account.
 
-  in ruby: 
+  When you get an access token you also receive a refresh token. When your access token expires, you can get a new one by making a POST request with your app id and the refresh token:
+
+      POST #{ENV['BASE_URL']}/oauth/token?grant_type=refresh_token&client_id=<app_id>&refresh_token=<refresh_token>
+
+  in ruby, using the OAuth2 library: 
 
       client = OAuth2::Client.new('app_id', 'app_secret', site: "#{ENV['BASE_URL']}")
       puts client.auth_code.authorize_url(:redirect_uri => 'urn:ietf:wg:oauth:2.0:oob')
@@ -62,5 +51,6 @@
 
       # And you can refresh your token with 
       new_token = token.refresh!
+
   
-  You will get a refresh token back when you create a token. So long as you have that token, you can create a new token when your existing token has expired.
+  You will get a refresh token back when you create a token. As long as you have that token, you can create a new token when your existing token has expired.

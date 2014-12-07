@@ -12,12 +12,15 @@
             %strong
               Application name:
             = application.name
-          - tokens = application.access_tokens.where(resource_owner_id: current_user.id).select{ |t| t.expired? != true }
+          - tokens = application.access_tokens.where(resource_owner_id: current_user.id).where('revoked_at IS NULL').select{ |t| t.expired? != true }
           - if tokens.present?
             %ul.access-tokens
               - tokens.each do |token|
                 - next if token.expired?
                 %li
+                  = form_tag oauth_authorized_application_path(application) do
+                    %input{:name => "_method", :type => "hidden", :value => "delete"}/
+                    = submit_tag 'Delete', onclick: "return confirm('Are you sure?')", class: 'btn binxbtn-danger pull-right'
                   %a.set-token.pull-right.btn.binxbtn-primary{href: '#', data: {token: token.token }}
                     Use token
                   %p
@@ -30,7 +33,10 @@
                       %code 
                         = s
           - else
+            %a.btn.binxbtn.pull-right{ href: '' }
+              Create a new token
             %h4 no tokens
+
   - else
     %p
       You don't have any applications set up! To be able to use the API you will need to create an application and generate an access token.

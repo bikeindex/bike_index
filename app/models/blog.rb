@@ -1,5 +1,4 @@
 class Blog < ActiveRecord::Base
-  require 'rdiscount'
   include ActionView::Helpers::TextHelper
   attr_accessible :title,
     :body,
@@ -63,7 +62,7 @@ class Blog < ActiveRecord::Base
   before_save :create_abbreviation
   def create_abbreviation
     # Render markdown,
-    markdown = RDiscount.new(self.body)
+    markdown = Kramdown::Document.new(body)
     abbr = strip_tags(markdown.to_html)
     # strip tags, then remove extra spaces
     abbr = abbr.gsub(/\n/,' ').gsub(/\s+/, ' ').strip

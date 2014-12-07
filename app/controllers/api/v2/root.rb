@@ -10,6 +10,7 @@ module API
         hide_format: true, # don't show .json
         hide_documentation_path: true,
         mount_path: "/v2/swagger_doc",
+        markdown: GrapeSwagger::Markdown::KramdownAdapter,
         info: {
             title: "BikeIndex API v2",
             description: "This is the API for the Bike Index. It's authenticated with OAuth2 and is generally pretty awesome",
