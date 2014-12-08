@@ -77,14 +77,19 @@
         /   Sending us your access tokens in requests
         / %p
         / By default we authenticate you with HTTP Basic authentication scheme. If the basic auth is not found in the authorization header, then it falls back to post parameters (client_id and client_secret).
-        .applications-panel
+    .applications-panel
+      .container
+        .api-info-header
           %h2
             Applications:
             %span.pull-right.less-strong
               = link_to "Add an application", "/oauth/applications"
 
           = render 'api_v2_applications'
-
+    .container
+      
+      %h2.padded
+        Bike Index API V2 endpoints
     #message-bar.swagger-ui-wrap &nbsp;
 
     #swagger-ui-container.swagger-ui-wrap

@@ -44,13 +44,15 @@
     %h3
       Success!
     %p
-      It looks like this access code has already been turned into an access token and is now expired. Return to the #{link_to "documentation page", api_v2_documentation_index_url} to use the token.
+      It looks like this access code has already been turned into an access token and is now expired.
+    %h3
+      Return to the #{link_to "documentation page", api_v2_documentation_index_url} to use the token.
     %article
       .alert.alert-success
         Since the token has already been used, the response below is an error.
       
   - else
-    %p
+    %h3
       You can now return to the #{link_to "documentation page", api_v2_documentation_index_url} to use your token.
   %article
     %p

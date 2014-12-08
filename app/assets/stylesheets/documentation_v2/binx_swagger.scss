@@ -100,7 +100,7 @@
     margin-left: .25em;
     li {
       background: white;
-      border-radius: 2px;
+      border-radius: 4px;
       padding: .25em .5em;
       margin: 0 0 .25em;
     }
@@ -108,22 +108,64 @@
   }
   ol { list-style-type: decimal; padding-left: 2em; }
   .less-strong { color: $gray; font-size: .8em; }
+
+  .authentication-notes {
+    margin-top: 40px;
+    h3 { margin-top: 1.5em; }
+  }
+}
+
+.applications-panel {
+  padding: 40px 0;
+  background: $gray-lightest;
+  border-top: 1px solid $gray-lighter;
   .applications-list { 
-    margin: 1em 0 0;
-    background: white;
+    margin: 0;
+    li {
+      padding: .5em 1em .25em;
+      background: white;
+      margin: 1em 0 0;
+      border-radius: 4px;
+    }
     .authorize-new-explain {
       margin: 0;
       padding: 1em 0 0 0;
     }
   }
-
-  .applications-panel {
-    padding: 40px 0;
+  .application-info {
+    padding-bottom: .5em;
+    position: relative;
+    .tokens-table {
+      margin-bottom: 0;
+      .binxbtn-primary { margin-bottom: .25em; } // For when it's small
+    }
   }
-
-  .authentication-notes {
-    margin-top: 40px;
-    h3 { margin-top: 1.5em; }
+  .listed-app-name {
+    margin: 0;
+    display: block; width: 100%;
+    span {
+      @include rotate(90deg);
+      margin-right: .75em;
+      -webkit-transition: all .1s ease-out;
+      -moz-transition: all .1s ease-out;
+      -o-transition: all .1s ease-out;
+      transition: all .1s ease-out;
+      float: left;
+      display: block;
+      font-size: 10px;
+      font-family: helvetica;
+    }
+    a:active span {
+      -webkit-transition: all .1s ease-out;
+      -moz-transition: all .1s ease-out;
+      -o-transition: all .1s ease-out;
+      transition: all .1s ease-out;
+    }
+    .listed-app-name:active, &.uncollapsed {
+      span { 
+        @include rotate(0deg);
+      }
+    }
   }
 }
 

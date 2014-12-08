@@ -64,6 +64,11 @@ $ ->
     app_id = app.attr('data-id')
     app.find('.add-token-form, .add-token-form-btn').slideToggle()
 
+  $('.listed-app-name').click (e) ->
+    e.preventDefault()
+    target = $(e.target)
+    target.parents('li').find('.application-info').slideToggle('fast')
+    target.toggleClass('uncollapsed')
 
   # if you have an apiKey you would like to pre-populate on the page for demonstration purposes...
   # apiKey = "68f00e0a1cec56d569facebb39aff7e033af49db234c1213901770fb10b39f30"

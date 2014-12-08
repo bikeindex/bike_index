@@ -2,40 +2,58 @@
   %ul.applications-list
     - @applications.each do |application|
       %li.application_list_box{ data: {id: application.id}}
-        .well
-          %p
-            %strong
-              Application name:
+        / .well
+        %h4
+          %a.listed-app-name.uncollapsed{ href: "#"}
+            %span
+              &#x25B6;
             = application.name
-          %p
-            %strong
-              ID:
-            = application.uid
+        .application-info.initially-hidden
+          %table.table
+            %tbody
+              %tr
+                %td
+                  ID:
+                %td
+                  = application.uid
+              %tr
+                %td
+                  Secret:
+                %td
+                  = application.secret
           - tokens = application.access_tokens.where(resource_owner_id: current_user.id).where('revoked_at IS NULL').select{ |t| t.expired? != true }
           - if tokens.present?
-            %ul.access-tokens
-              - tokens.each do |token|
-                - next if token.expired?
-                %li
-                  = form_tag oauth_authorized_application_path(application), class: 'pull-right' do
-                    %input{:name => "_method", :type => "hidden", :value => "delete"}/
-                    = submit_tag 'Delete', onclick: "return confirm('Are you sure?')", class: 'btn binxbtn-danger pull-right'
-                  %a.set-token.pull-right.btn.binxbtn-primary{href: '#', data: {token: token.token }}
-                    Use token
-                  %p
-                    Access token:
-                    %code
-                      = token.token
-                  %p
-                    Scopes:
-                    - token.scopes.each do |s|
-                      %code 
-                        = s
+            %table.table.tokens-table
+              %thead
+                %tr
+                  %th
+                    Access token
+                  %th
+                    Scopes
+                  %th
+                  %th
+              %tbody
+                - tokens.each do |token|
+                  - next if token.expired?
+                  %tr
+                    %td
+                      %pre
+                        = token.token
+                    %td
+                      - token.scopes.each do |s|
+                        %code 
+                          = s
+                    %td
+                      %a.set-token.btn.binxbtn-primary{href: '#', data: {token: token.token }}
+                        Use token
+                      = form_tag oauth_authorized_application_path(application), class: 'pull-right' do
+                        %input{:name => "_method", :type => "hidden", :value => "delete"}/
+                        = submit_tag 'Delete', onclick: "return confirm('Are you sure?')", class: 'btn binxbtn-danger'
           - else
             %h4 no tokens
             .clearfix
               %a.btn.binxbtn.pull-right.add-token-form-btn{ href: "#", data: {target: "add-token-app#{application.id}"}}
-                +
+                Add token
               .initially-hidden.add-token-form
                 %hr
                 .form.form-inline
