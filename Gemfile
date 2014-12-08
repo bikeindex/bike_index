@@ -20,8 +20,7 @@ gem "i18n"
 gem "haml-rails"
 gem "journey", "~> 1.0.3"
 gem 'kramdown'
-gem 'rdiscount'
-# gem 'haml-kramdown'
+gem 'haml-kramdown'
 gem 'kaminari'
 gem 'pg_search'
 gem 'nokogiri'
