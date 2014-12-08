@@ -214,6 +214,8 @@ GEM
       guard (~> 2.1)
       rspec (>= 2.14, < 4.0)
     haml (3.1.8)
+    haml-kramdown (0.0.1)
+      haml
     haml-rails (0.3.5)
       actionpack (>= 3.1, < 4.1)
       activesupport (>= 3.1, < 4.1)
@@ -494,7 +496,8 @@ DEPENDENCIES
   guard
   guard-livereload
   guard-rspec (~> 4.2.10)
-  haml-rails (~> 0.3.5)
+  haml-kramdown
+  haml-rails
   high_voltage
   i18n
   journey (~> 1.0.3)

@@ -462,7 +462,25 @@ ul.state-list {
 //
 //________________________
 
-.the-team { margin-top: 60px; } 
+.page-content .about-people {
+  list-style-type: none;
+  margin-left: 0;
+  li {
+    @include clearfix;
+    padding-top: 1em;
+  }
+  img {
+    max-width: 25%;
+    float: left;
+    margin-right: 2%;
+  }
+}
+
+@media (min-width: 780px) {
+  .page-content .about-people { margin-left: 50px; }
+}
+
+.the-alumni { clear: both; padding-top: 60px; } 
 
 .about-list {
   @include clearfix;
@@ -482,9 +500,9 @@ ul.state-list {
       width: 100%;
     }
   }
-  // &.final-list {
-  //   li:first-of-type { margin-left: 16%; }
-  // }
+  &.final-list {
+    li:first-of-type { margin-left: 16%; }
+  }
 }
 
 // .second-about-list {

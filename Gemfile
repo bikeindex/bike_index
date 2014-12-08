@@ -17,9 +17,11 @@ gem 'soulmate', :require => 'soulmate/server', github: 'sethherr/soulmate'
 gem 'geocoder'
 gem "money-rails", "~> 0.5.0"
 gem "i18n"
-gem "haml-rails", '~> 0.3.5'
+gem "haml-rails"
 gem "journey", "~> 1.0.3"
 gem 'kramdown'
+gem 'rdiscount'
+# gem 'haml-kramdown'
 gem 'kaminari'
 gem 'pg_search'
 gem 'nokogiri'

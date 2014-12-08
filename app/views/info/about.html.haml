@@ -1,48 +1,89 @@
 %h1
-  We don't just bike on the weekend
+  About the Bike Index
 
 %p
-  Bicycles are a defining feature of our lives. We work with them professionally, we wear lycra sometimes, we have pedal scars, we believe everyone should be riding all the time.
-
+  %strong
+    Bike Index is small.
 %p
-  We want to make biking as fun and free of stress as possible. Bike theft is a major source of worry, so we're stopping it.
-
+  We don't have funding or even any full-time staff.
 %p
-  Registering bikes is a vital part of reducing bike theft &mdash; so we've made it easy.
+  We don't have many official police or city government partnerships either.
 %p
-  The Bike Index was founded in Chicago in 2013. We're a #{link_to 'benefit corporation', "http://en.wikipedia.org/wiki/Benefit_corporation" }, we ran a successful #{link_to "Kickstarter campaign", "https://www.kickstarter.com/projects/1073266317/the-bike-index-lets-stop-bike-theft-together"} and we're nerds (Bike Index is open source, #{link_to "all the code is available on GitHub", 'https://github.com/bikeindex/bike_index'}).
+  Registering your bike on the Index will not make your bike show up in your local government's records (even in St. Louis, where #{link_to "we're the official city registry", "https://bikeindex.org/news/bike-index-official-registry-of-st-louis"}).
+%h3
+  Here's what we do
+%ul.fancy-bullets
+  %li
+    %span.blue-bullet
+    %p
+      <strong>We make it easy to register</strong>. We've made registration entirely automatic for #{link_to "some manufacturers", "https://bikeindex.org/news/heritage-bicycles-are-now-automatically-registered"} and for #{link_to "for bike shops", "https://bikeindex.org/news/lightspeed-retail--bikeindex--win"}. We offer an easy way for any bike shop or advocacy organization to register bikes for their constituents.
 
-%h2.the-team 
-  Bike Index team
+  %li
+    %span.blue-bullet
+    %p
+      %strong
+        We recover stolen bikes
+      every single week. During the summer we average more than one recovery a day. We generally #{link_to "tweet", "https://twitter.com/BikeIndex"} about them.
+  %li
+    %span.blue-bullet
+    %p
+      %strong
+        We're the best place to list your stolen bike
+      if you want to get it back. The Index is easy to search, so people find bikes and return them (lots of police use the Index even though they don't have official integrations). There are lots of bike registries <a href="http://www.bikeshepherd.org/" title="BikeShepherd">1</a>, <a href="http://project529.com/" title="Project529">2</a>, <a href="http://nationalbikeregistry.com/" title="NBR">3</a>, <a href="http://safebikes.org/" title="SfSafe">4</a>, <a href="http://bikeregistry.com/" title="BikeRegistry.com">5</a> &mdash; none of the are easy to search, so not many stolen bikes are recovered. Feel free to register other places too, though (e.g. if you're in Chicago, cross list on #{link_to "chicago.stolenbike", "http://chicago.stolenbike.org/"}, it's well run and widely used in the bike community).
+
+  %li
+    %span.blue-bullet
+    %p
+      %strong
+        We're not going to disappear. 
+      Bryan ran StolenBikeRegistry.com for 10 years without getting paid. Bike Index only costs a few hundred dollars a month to run and we're clearly not doing this for the money. We're really excited about making enough money from advertising that a few of us can work on this all the time though - contact #{link_to "advertising@bikeindex.org", "mailto:ads@bikeindex.org"} if you have something you'd like a bunch of people searching for bikes to see.
+  %li
+    %span.blue-bullet
+    %p
+      %strong
+        We're not going to rip you off.
+      We won't sell your personal information, start charging hidden fees or send you unsolicited email. Selling stolen bikes shouldn't be easy, bike registration should be and we're going to keep working on this to make sure that happens.
+
+%h2
+  The team
+
+%ul.about-people
+  %li
+    %p
+      = image_tag "/assets/who/seth-herr.jpg", alt: 'Seth Herr'
+      %strong
+        Seth Herr
+      learned to program so that he could build the Bike Index, because he was a bike mechanic and was frustrated that something like it didn't exist. He does part-time programming contracts and spends most of his time working on the improving the Bike Index.
+  %li
+    %p
+      = image_tag "/assets/who/bryan-hance.jpg", alt: 'Bryan Hance'
+      %strong
+        Bryan Hance
+      created StolenBicycleRegistry.com in 2005 because 5 of his bikes were stolen in 9 years. The first week it was live he recovered a bike - and realized recovering bikes was really fun. He lives in Portland and recovers lots of bikes.
+  %li
+    %p
+      = image_tag "/assets/who/laura-nash.jpg", alt: 'Laura Nash'
+      %strong
+        Laura Nash
+      handles our #{link_to "Twitter", "https://twitter.com/BikeIndex"} and #{link_to "Facebook", "http://facebook.com/bikeindex"} accounts, contacts people about their stolen bikes and reviews stolen listings.
+  %li
+    %p
+      = image_tag "/assets/who/michael-catano.jpg", alt: 'Michael Catano'
+      %strong
+        Michael Catano
+      is in charge of making sure the words read gooder. In his spare time he builds fancy bicycle frames under the name #{link_to "Humble Frameworks", "http://www.humbleframeworks.cc/"} and hangs out with his cats.
+  %li
+    %p
+      = image_tag "/assets/who/mike-oleon.jpg", alt: 'Mike Oleon'
+      %strong
+        Mike Oleon
+      does the graphic design and illustration for the Index. If anything looks good, it's probably his fault.
+
+
+%h2.the-alumni
+  Alumni
 
 %ul.about-list
-  %li
-    = image_tag "/assets/who/seth-herr.jpg", alt: 'Seth Herr'
-    %h4
-      Seth Herr
-  %li
-    = image_tag "/assets/who/bryan-hance.jpg", alt: 'Bryan Hance'
-    %h4
-      Bryan Hance
-  %li
-    = image_tag "/assets/who/laura-nash.jpg", alt: 'Laura Nash'
-    %h4
-      Laura Nash
-  
-%ul.about-list
-  %li
-    = image_tag "/assets/who/mike-oleon.jpg", alt: 'Mike Oleon'
-    %h4
-      Mike Oleon
-  %li
-    = image_tag "/assets/who/stephanie-scheurich1.jpg", alt: 'Stephanie Scheurich'
-    %h4
-      Stephanie Scheurich
-  %li
-    = image_tag "/assets/who/bike-mike.jpg", alt: 'Mike Pickerd'
-    %h4
-      Mike Pickerd
-%ul.about-list.final-list
   %li
     = image_tag "/assets/who/will-barrett.jpg", alt: 'Will Barrett'
     %h4
@@ -55,3 +96,12 @@
     = image_tag "/assets/who/andrew-herr.jpg", alt: 'Andrew Herr'
     %h4
       Andrew Herr
+%ul.about-list.final-list
+  %li
+    = image_tag "/assets/who/stephanie-scheurich1.jpg", alt: 'Stephanie Scheurich'
+    %h4
+      Stephanie Scheurich
+  %li
+    = image_tag "/assets/who/bike-mike.jpg", alt: 'Mike Pickerd'
+    %h4
+      Mike Pickerd
