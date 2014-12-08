@@ -25,9 +25,15 @@ module API
           end
         end
 
+        before do
+          header['Access-Control-Allow-Origin'] = '*'
+          header['Access-Control-Request-Method'] = '*'
+        end
+
         doorkeeper_for :all
 
         rescue_from ActiveRecord::RecordNotFound do |e|
+          e.message ||= "Not found"
           Rack::Response.new({message: e.message}.to_json, 404).finish
         end
 

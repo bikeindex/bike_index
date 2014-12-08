@@ -1,3 +1,3 @@
 class WheelSizeSerializer < ActiveModel::Serializer
-  attributes :iso_bsd, :name, :description
+  attributes :iso_bsd, :name, :description, :popularity
 end

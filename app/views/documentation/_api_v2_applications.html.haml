@@ -50,7 +50,7 @@
                   %a.authorize_new_token_link{ href: url, data: {base: url}}
                     = url
           - unless application.redirect_uri.match("#{authorize_documentation_index_url}")
-            .alert.alert-danger
+            .alert.alert-danger.margined
               This application doesn't have the documentation URL as a redirect, so  you can't create tokens for it here. #{link_to "Add the documentation URL", edit_oauth_application_url(application)} as a redirect url if you would like to be able to.
 
   - else

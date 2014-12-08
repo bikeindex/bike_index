@@ -11,4 +11,12 @@ class WheelSize < ActiveRecord::Base
     "[#{iso_bsd}] #{description}"
   end
 
+  def self.popularities
+    ["Standard", "Common", "Uncommon", "Rare"]
+  end
+
+  def popularity
+    WheelSize.popularities[priority-1]
+  end
+
 end

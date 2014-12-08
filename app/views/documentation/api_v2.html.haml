@@ -47,12 +47,36 @@
       .api-info-header
         %h1.padded
           Bike Index API V2
-        .alert.alert-danger
+        .alert
           %p
             %strong
               API V2 is under construction!
             The "/user/current" route is locked in and won't change - but otherwise no guarantees for the next few weeks as we finish building this out. If you've got suggestions or requirements for this API, please contact #{link_to "support@bikeindex.org", "mailto:support@bikeindex.org"}. (12/5/2014)
+        %h2 
+          Authentication notes
+        .alert.alert-info
         
+          The Bike Index uses OAuth2. Every connection to the bikes route or the users route needs to pass an access token.
+        %p
+          There are two supported ways of authenticating with the Bike Index through OAuth2:
+        %ol
+          %li
+            Authorization flow, also called Explicit grant flow. If you create a token on this page, this what the token is created with.
+
+          %li
+            Client-side flow, also called Implicit grant flow or Bearer flow.
+        %p
+          The Authorization flow enables long lived access through refresh tokens (instead of logging out the user every hour), is more secure, and is generally what you should be using. Learn more about #{link_to "Authorization flow in OAuth2", "http://labs.hybris.com/2012/06/01/oauth2-authorization-code-flow/"}.
+
+        %p
+          The Client-side flow is good for client-side javascript apps. Here's an article on #{link_to "Client-side flow in OAuth2", "http://labs.hybris.com/2012/06/05/oauth2-the-implicit-flow-aka-as-the-client-side-flow/"}.
+        %p
+          To review the applications you've authorized, go to #{link_to "/oauth/authorized_applications", "#{ENV['BASE_URL']}/oauth/authorized_applications"}.
+
+        / %h3
+        /   Sending us your access tokens in requests
+        / %p
+        / By default we authenticate you with HTTP Basic authentication scheme. If the basic auth is not found in the authorization header, then it falls back to post parameters (client_id and client_secret).
         .applications-panel
           %h2
             Applications:
@@ -66,8 +90,8 @@
     #swagger-ui-container.swagger-ui-wrap
     .container
       .api-info-footer       
-        .authentication-notes
-          #{render 'authentication_info'}
+        / .authentication-notes
+        /   #{render 'authentication_info'}
 
         .alert.alert-info.margined
           %p

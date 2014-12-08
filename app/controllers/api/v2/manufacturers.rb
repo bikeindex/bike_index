@@ -4,14 +4,17 @@ module API
       include API::V2::Defaults
 
       resource :manufacturers do
-        desc "Return all the manufacturers with pagination"
+        desc "All the manufacturers with pagination"
         paginate
         get '/', protected: false do
           paginate Manufacturer.scoped
         end
       
-        desc "Manufacturer matching ID or name" 
-        # You can get manufacturers by their name or their ID
+        desc "Manufacturer matching ID or name", {
+          notes: <<-NOTE
+            You can request a manufacturer by either their name or their ID
+          NOTE
+        }
         params do
           requires :id, type: String, desc: 'Manufacturer id or slug'
         end

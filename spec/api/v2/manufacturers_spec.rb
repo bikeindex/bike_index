@@ -10,12 +10,8 @@ describe 'Manufacturers API V2' do
       pagination_link = "<http://www.example.com/api/v2/manufacturers?page=2&per_page=1>; rel=\"last\", <http://www.example.com/api/v2/manufacturers?page=2&per_page=1>; rel=\"next\""
       expect(response.header['Link']).to eq(pagination_link)
       response.code.should == '200'
-      # We need to test cors...
-      # response.headers['Access-Control-Allow-Origin'].should eq('*')
-      # response.headers['Access-Control-Allow-Methods'].should eq('POST, PUT, GET, OPTIONS')
-      # response.headers['Access-Control-Request-Method'].should eq('*')
-      # response.headers['Access-Control-Allow-Headers'].should eq('Origin, X-Requested-With, Content-Type, Accept, Authorization')
-      # response.headers['Access-Control-Max-Age'].should eq("1728000")
+      response.headers['Access-Control-Allow-Origin'].should eq('*')
+      response.headers['Access-Control-Request-Method'].should eq('*')
       expect(JSON.parse(response.body)['manufacturers'][0]['id']).to eq(manufacturer.id)
     end
   end

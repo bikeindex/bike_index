@@ -3,7 +3,10 @@ module API
     class Root < Dispatch
       format :json
       mount API::V2::Users
+      mount API::V2::Bikes
       mount API::V2::Manufacturers
+      mount API::V2::WheelSizes
+      mount API::V2::Selections
       content_type :json, 'application/json'
       add_swagger_documentation base_path: "/api",
         api_version: 'v2',
