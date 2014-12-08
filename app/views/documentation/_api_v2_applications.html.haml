@@ -1,24 +1,23 @@
-%h2
-  Applications
-  %span.pull-right.less-strong
-    = link_to "Add an application", "/oauth/applications"
-
 - if @applications.present?
   %ul.applications-list
     - @applications.each do |application|
-      %li
+      %li.application_list_box{ data: {id: application.id}}
         .well
-          %h3
+          %p
             %strong
               Application name:
             = application.name
+          %p
+            %strong
+              ID:
+            = application.uid
           - tokens = application.access_tokens.where(resource_owner_id: current_user.id).where('revoked_at IS NULL').select{ |t| t.expired? != true }
           - if tokens.present?
             %ul.access-tokens
               - tokens.each do |token|
                 - next if token.expired?
                 %li
-                  = form_tag oauth_authorized_application_path(application) do
+                  = form_tag oauth_authorized_application_path(application), class: 'pull-right' do
                     %input{:name => "_method", :type => "hidden", :value => "delete"}/
                     = submit_tag 'Delete', onclick: "return confirm('Are you sure?')", class: 'btn binxbtn-danger pull-right'
                   %a.set-token.pull-right.btn.binxbtn-primary{href: '#', data: {token: token.token }}
@@ -33,18 +32,29 @@
                       %code 
                         = s
           - else
-            %a.btn.binxbtn.pull-right{ href: '' }
-              Create a new token
             %h4 no tokens
+            .clearfix
+              %a.btn.binxbtn.pull-right.add-token-form-btn{ href: "#", data: {target: "add-token-app#{application.id}"}}
+                +
+              .initially-hidden.add-token-form
+                %hr
+                .form.form-inline
+                  - OAUTH_SCOPES.each do |scope|
+                    %label.checkbox.newtoken-scope-check
+                      = check_box_tag scope
+                      = scope.to_s
+                - url = oauth_authorization_url(client_id: application.uid, redirect_uri: authorize_documentation_index_url, response_type: 'code')
+                %p.authorize-new-explain
+                  Authorize this new token:
+                %pre
+                  %a.authorize_new_token_link{ href: url, data: {base: url}}
+                    = url
+          - unless application.redirect_uri.match("#{authorize_documentation_index_url}")
+            .alert.alert-danger
+              This application doesn't have the documentation URL as a redirect, so  you can't create tokens for it here. #{link_to "Add the documentation URL", edit_oauth_application_url(application)} as a redirect url if you would like to be able to.
 
   - else
     %p
       You don't have any applications set up! To be able to use the API you will need to create an application and generate an access token.
     %p
       #{link_to "Add an application here", "/oauth/applications"}.
-
-.alert.alert-info
-  %p
-    Coming soon (aka by the end of the weekend) - a way to generate and modify tokens on this page. Sorry that it isn't up yet!
-  %p
-    Right now, if you successfully create an access token, it will show up above, and give you the option to use it to authenticate requests here to test things out.

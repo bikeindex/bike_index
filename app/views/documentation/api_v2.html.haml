@@ -52,7 +52,13 @@
             %strong
               API V2 is under construction!
             The "/user/current" route is locked in and won't change - but otherwise no guarantees for the next few weeks as we finish building this out. If you've got suggestions or requirements for this API, please contact #{link_to "support@bikeindex.org", "mailto:support@bikeindex.org"}. (12/5/2014)
+        
         .applications-panel
+          %h2
+            Applications:
+            %span.pull-right.less-strong
+              = link_to "Add an application", "/oauth/applications"
+
           = render 'api_v2_applications'
 
     #message-bar.swagger-ui-wrap &nbsp;

@@ -1,0 +1,96 @@
+- if @application.present?
+  %h1
+    Congrats #{current_user.name},
+  %h2
+    you just created an access code!
+  %p.padded
+    %strong
+      Access code:
+    = @access_code
+  %p.padded
+    %strong
+      Access code converted into a token at this url:
+  - url = oauth_token_url(code: @access_code, client_secret: @application.secret, client_id: @application.uid, grant_type: 'authorization_code', redirect_uri: authorize_documentation_index_url)
+  %article
+    
+    %pre
+      = link_to url, url, method: :post
+  %p
+    Since this needs to be a <code>POST</code> request, we make the request via 
+    %a.collapsed{ href: "#javascript-request-code", data: { toggle: "collapse"} }
+      javascript
+    and put the response in the box below. 
+    %article#javascript-request-code.collapse
+      %pre.javascript
+        :plain
+          $.ajax({
+            type: "POST",
+            url: "#{oauth_token_url}",
+            data: {
+              "code": "#{@access_code}",
+              "client_secret": "#{@application.secret}",
+              "client_id": "#{@application.uid}",
+              "grant_type": "authorization_code",
+              "redirect_uri": #{authorize_documentation_index_url}
+            },
+            success: function(data, textStatus, jqXHR) {
+              $('#access_grant_response').text(JSON.stringify(data,undefined,2))
+            },
+            error: function(data, textStatus, jqXHR) {
+              $('#access_grant_response').text(JSON.stringify(data, void 0, 2));
+            }
+          });
+  - if @access_grant.revoked_at.present?
+    %h3
+      Success!
+    %p
+      It looks like this access code has already been turned into an access token and is now expired. Return to the #{link_to "documentation page", api_v2_documentation_index_url} to use the token.
+    %article
+      .alert.alert-success
+        Since the token has already been used, the response below is an error.
+      
+  - else
+    %p
+      You can now return to the #{link_to "documentation page", api_v2_documentation_index_url} to use your token.
+  %article
+    %p
+      %strong
+        Access token response
+    %pre#access_grant_response
+
+  %hr
+  %p.padded
+    Access codes expire in 10 minutes. If you get an expired response, try returning to the #{link_to "documentation url", api_v2_documentation_index_url}.
+  :javascript
+    $.ajax({
+      type: "POST",
+      url: "#{oauth_token_url}",
+      data: {
+        "code": "#{@access_code}",
+        "client_secret": "#{@application.secret}",
+        "client_id": "#{@application.uid}",
+        "grant_type": "authorization_code",
+        "redirect_uri": "#{authorize_documentation_index_url}"
+      },
+      success: function(data, textStatus, jqXHR) {
+        $('#access_grant_response').text(JSON.stringify(data,undefined,2))
+      },
+      error: function(data, textStatus, jqXHR) {
+        $('#access_grant_response').text(JSON.stringify(data, undefined, 2));
+      }
+    });
+    
+- else
+  %h1
+    Uh-oh
+  %article
+    .alert.alert-danger
+      We couldn't find the application for that access token
+  %h3
+    You submitted the access code:
+    %code
+      = @access_code
+  %p
+    Maybe you're playing around? Maybe that isn't your access token?
+  %p
+    Contact us if that isn't the case #{link_to "support@bikeindex.org", "mailto:support@bikeindex.org"}.

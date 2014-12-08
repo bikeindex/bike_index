@@ -111,6 +111,10 @@
   .applications-list { 
     margin: 1em 0 0;
     background: white;
+    .authorize-new-explain {
+      margin: 0;
+      padding: 1em 0 0 0;
+    }
   }
 
   .applications-panel {
@@ -145,4 +149,20 @@
 #resources_container {
   .toggleEndpointList { font-weight: 600; }
 //   input { @extend .form-control; }
+}
+
+.access-tokens {
+  li {
+    .btn {
+      padding: .25em .5em;
+      margin-left: .5em; 
+    }
+  }
+}
+
+.add-token-form {
+  label { 
+    font-weight: $form-font-weight;
+    margin-right: .5em;
+  }
 }

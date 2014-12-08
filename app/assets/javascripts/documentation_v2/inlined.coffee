@@ -45,7 +45,25 @@ $ ->
 
   $('.set-token').click (e) ->
     e.preventDefault()
+    $('body').animate( scrollTop: (0), 'fast' )
     $("#input_apiKey").val($(e.target).attr('data-token')).change()
+  
+  $('.newtoken-scope-check').change (e) ->
+    app = $(e.target).parents('.application_list_box')
+    link = app.find('.authorize_new_token_link')
+    checked = app.find('.newtoken-scope-check input:checked')
+    scopes = []
+    scopes.push($(s).attr('id')) for s in checked   
+    url = link.attr('data-base')
+    url = "#{url}&scope=#{scopes.join('+')}" if scopes.length > 0
+    link.attr('href', url).text(url)
+
+  $('.add-token-form-btn').click (e) ->
+    e.preventDefault()
+    app = $(e.target).parents('.application_list_box')
+    app_id = app.attr('data-id')
+    app.find('.add-token-form, .add-token-form-btn').slideToggle()
+
 
   # if you have an apiKey you would like to pre-populate on the page for demonstration purposes...
   # apiKey = "68f00e0a1cec56d569facebb39aff7e033af49db234c1213901770fb10b39f30"
