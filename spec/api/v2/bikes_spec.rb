@@ -22,7 +22,7 @@ describe 'Bikes API V2' do
       expect(response.header['Total']).to eq('2')
       expect(response.header['Link'].match('page=2&per_page=1>; rel=\"next\"')).to be_present
       result = response.body
-      expect(JSON.parse(result)['bikes'][0]['id']).to eq(@bike.id)
+      expect(JSON.parse(result)['bikes'][0]['id']).to be_present
     end
 
     it "stolen search works" do
@@ -31,7 +31,7 @@ describe 'Bikes API V2' do
       response.code.should == '200'
       expect(response.header['Total']).to eq('1')
       result = response.body
-      expect(JSON.parse(result)['bikes'][0]['id']).to eq(bike.id)
+      expect(JSON.parse(result)['bikes'][0]['id']).to be_present
     end
 
     it "responds with 401" do 
