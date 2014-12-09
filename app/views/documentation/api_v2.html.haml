@@ -76,13 +76,13 @@
           The Bike Index uses OAuth2. Every connection to the bikes route or the users route needs to pass an access token.
         %p
           There are two supported ways of authenticating with the Bike Index through OAuth2:
-        %ol.padded
+        %ol
           %li
             <strong>Authorization flow</strong>, also called Explicit grant flow. If you create a token on this page, this what the token is created with.
 
           %li
             <strong>Client-side flow</strong>, also called Implicit grant flow or Bearer flow.
-        %p
+        %p.padded
           The Authorization flow enables long lived access through refresh tokens (instead of logging out the user every hour), is more secure, and is generally what you should be using. Learn more about #{link_to "Authorization flow in OAuth2", "http://labs.hybris.com/2012/06/01/oauth2-authorization-code-flow/", target: '_blank'}.
 
         %p
@@ -97,7 +97,7 @@
         %h3.padded
           Refresh tokens
         %p
-          Since you have to send an access token with every request and they give access to someone's how you authenticate, it's important that they expire after 1 hour - so if someone compromises an access token, they don't have unlimited access to an account.
+          Since tokens provide access to someone's account, one of the ways OAuth2 keeps things secure is by having tokens expire - so if someone compromises an access token, they don't have unlimited access to an account. The Bike Index expires tokens after 1 hour.
         %p
           When your access token expires, you can get a new one by making a POST request with your app id and the refresh token:
         %pre
