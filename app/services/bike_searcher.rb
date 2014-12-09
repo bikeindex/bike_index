@@ -121,7 +121,8 @@ class BikeSearcher
 
 
   def find_bikes
-    if @params[:stolen].present? || @params[:query].present? || @params[:serial].present? || @params[:manufacturer_id].present? || @params[:manufacturer].present?
+    possibilities = [:stolen, :query, :serial, :manufacturer_id, :manufacturer, :colors]
+    if possibilities.detect {|p| @params[p].present? }
       @bikes = matching_serial 
       matching_stolenness(@bikes)
       matching_manufacturer(@bikes)
