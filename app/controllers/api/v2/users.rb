@@ -32,18 +32,16 @@ module API
           end
         end
 
-        desc "Current user's information allowed in the current access token scope", {
+        desc "Current user's information in access token's scope", {
           notes: <<-NOTE
-            Depending on your scopes you will get different things back.
+            Current user is the owner of the `access_token` you use in the request. Depending on your scopes you will get different things back.
+            You will always get the user's `id`
             For an array of the user's bike ids, you need `read_bikes` access
             For a hash of information about the user (including their email address), you need `read_user` access
             For an array of the organizations and/or shops they're a part of, `read_organization_membership` access
 
           NOTE
         }
-
-        # This is the method that is called once authentication passes, to get info
-        # about the user.
         get '/current' do
           result = {
             id: current_user.id.to_s
@@ -52,6 +50,18 @@ module API
           result[:bike_ids] = bike_ids if current_scopes.include?('read_bikes')
           result[:memberships] = organization_memberships if current_scopes.include?('read_organization_membership')
           result
+        end
+
+        desc "Current user's bikes", {
+          notes: <<-NOTE
+            This returns the current user's bikes, so long as the access_token has the `read_bikes` scope.
+            This uses the bike list bike objects, which only contains the most important information.
+            To get all possible information about a bike use `/bikes/{id}`
+
+          NOTE
+        }
+        get '/current/bikes', scopes: [:read_bikes], each_serializer: BikeV2Serializer, root: 'bikes' do
+          Bike.where('id in (?)', bike_ids)        
         end
       
       end

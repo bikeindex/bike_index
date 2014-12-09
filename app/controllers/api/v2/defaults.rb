@@ -41,13 +41,15 @@ module API
           Rack::Response.new({message: "Unauthorized: no authentication present. Go to /oauth/applications to create an application. Read the documentation at /documentation/api_v2"}.to_json, 401).finish
         end
 
-        rescue_from :all do |e|
-          Rack::Response.new({
-            # error: "internal-server-error",
-            message: "#{e.message}",
-            trace: e.backtrace[0,10]
-          }.to_json, 500).finish
-        end
+        # unless Rails.env.production?
+        #   rescue_from :all do |e|
+        #     Rack::Response.new({
+        #       # error: "internal-server-error",
+        #       message: "#{e.message}",
+        #       trace: e.backtrace[0,10]
+        #     }.to_json, 500).finish
+        #   end
+        # end
 
       end
     end

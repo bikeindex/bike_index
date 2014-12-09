@@ -77,6 +77,20 @@
         /   Sending us your access tokens in requests
         / %p
         / By default we authenticate you with HTTP Basic authentication scheme. If the basic auth is not found in the authorization header, then it falls back to post parameters (client_id and client_secret).
+        %h2
+          Notes about values
+        %p
+          %strong
+            Time
+          Bike Index API V2 display everything in unix timestamps (integers). Any parameters that you send that include time need to be in timestamps as well.
+        / %p
+        /   %strong
+        /     Booleans
+        /   Sometimes there are booleans. They should be sent as 0 (false) or 1 (true).
+        %p
+          %strong
+            "Bike"
+          We use the work bike throughout this documentation to mean anything that is registered (be it a tandem, ice-cream cart or standard bicycle). If we are referring specifically to standard bicycles, we will make note of that.
     .applications-panel
       .container
         .api-info-header

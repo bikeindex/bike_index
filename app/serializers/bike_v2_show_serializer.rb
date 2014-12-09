@@ -1,6 +1,5 @@
 class BikeV2ShowSerializer < BikeV2Serializer
   self.root = 'bike'
-  
   attributes :registration_created_at,
     :registration_updated_at,
     :url,
@@ -42,11 +41,11 @@ class BikeV2ShowSerializer < BikeV2Serializer
   end
   
   def registration_created_at
-    object.created_at
+    object.created_at.to_i
   end
   
   def registration_updated_at
-    object.updated_at
+    object.updated_at.to_i
   end
 
   def stolen_record

@@ -1,4 +1,5 @@
 class BikeV2Serializer < ActiveModel::Serializer
+  self.root = 'bikes'
   attributes :id,
     :serial,
     :manufacturer_name,
@@ -15,7 +16,7 @@ class BikeV2Serializer < ActiveModel::Serializer
   end
   
   def title
-    object.title_string + "(#{object.frame_colors.to_sentence.downcase})"
+    object.title_string
   end
   
 

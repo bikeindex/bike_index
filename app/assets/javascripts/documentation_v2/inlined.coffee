@@ -20,6 +20,10 @@ $ ->
     ]
     onComplete: (swaggerApi, swaggerUi) ->
       # log "Loaded SwaggerUI"
+      token = localStorage.getItem('access_token')
+      if token? && token.length > 0
+        $("#input_apiKey").val(token).change()
+
       # if typeof initOAuth is "function"
       #   initOAuth
       #     clientId: "your-client-id"
@@ -41,6 +45,7 @@ $ ->
   )
   $("#input_apiKey").change ->
     addApiKeyAuthorization()
+    localStorage.setItem('access_token', $('#input_apiKey').val())
     return
 
   $('.set-token').click (e) ->
