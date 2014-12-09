@@ -91,8 +91,10 @@ class BikeSearcher
   end    
 
   def by_proximity
-    radius = 500
-    radius = @params[:proximity_radius] if @params[:proximity_radius].present? && @params[:proximity_radius].strip.length > 0
+    if @params[:proximity_radius].present? && (@params[:proximity_radius].kind_of?(Integer) || @params[:proximity_radius].strip.length > 0)
+      radius = @params[:proximity_radius] if @params[:proximity_radius].present?
+    end
+    radius ||= 500
     stolen_ids = @bikes.pluck(:current_stolen_record_id)
     box = Geocoder::Calculations.bounding_box(@params[:proximity], radius)
     unless box[0].nan?
