@@ -35,6 +35,14 @@ class Manufacturer < ActiveRecord::Base
     end
   end
 
+  def self.fuzzy_id_or_name_find(n)
+    if n.match(/\A\d*\z/).present?
+      Manufacturer.where(id: n).first
+    else
+      Manufacturer.fuzzy_name_find(n)
+    end
+  end
+
 
   def self.import(file)
     CSV.foreach(file.path, headers: true) do |row|

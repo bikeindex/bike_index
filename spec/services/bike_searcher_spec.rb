@@ -60,6 +60,17 @@ describe BikeSearcher do
     end
   end
 
+  describe 'matching_colors' do 
+    it "finds matching colors" do
+      color = FactoryGirl.create(:color)
+      bike = FactoryGirl.create(:bike, tertiary_frame_color_id: color.id)
+      FactoryGirl.create(:bike)
+      search = BikeSearcher.new({colors: "something, #{color.name}"}).matching_colors(Bike.scoped)
+      search.count.should eq(1)
+      search.first.should eq(bike)
+    end
+  end
+
   describe :fuzzy_find_serial do 
     # If these specs are failing and saying things about LEVENSHTEIN not existing
     # You need to install fuzzystrmatch in your test db. Read README for more info

@@ -1,6 +1,5 @@
 class BikeSearcher
-  def initialize(creation_params = {},approved=nil)
-    @approved = approved
+  def initialize(creation_params = {})
     @params = creation_params
     @bikes = Bike.scoped
     if @params[:search_type].present?
@@ -23,7 +22,7 @@ class BikeSearcher
       @bikes = bikes.non_stolen unless @params[:stolen]
       @bikes = bikes.stolen unless @params[:non_stolen]
     end
-    @bikes 
+    @bikes
   end
 
   def parsed_attributes
@@ -49,7 +48,7 @@ class BikeSearcher
 
   def matching_manufacturer(bikes)
     if @params[:manufacturer].present?
-      manufacturer = Manufacturer.fuzzy_name_find(@params[:manufacturer])
+      manufacturer = Manufacturer.fuzzy_id_or_name_find(@params[:manufacturer])
       if manufacturer.present?
         @params[:manufacturer_id] = manufacturer.id 
       else
@@ -64,12 +63,17 @@ class BikeSearcher
   end
 
   def matching_colors(bikes)
-    if @params[:query] && @params[:query].match(/(,?c_\d+)/)
-      @params[:query].scan(/(,?c_\d+)/).flatten.each do |c|
-        c_id = c.gsub(/(,?c_)/,'')
-        bikes = bikes.where("primary_frame_color_id = ? OR secondary_frame_color_id = ? OR tertiary_frame_color_id = ?", c_id, c_id, c_id)
+    if @params[:colors].present?
+      color_ids = @params[:colors].split(',')
+        .collect{ |c| Color.fuzzy_name_find(c).id if Color.fuzzy_name_find(c) }
+    elsif @params[:query] && @params[:query].match(/(,?c_\d+)/)
+      color_ids = @params[:query].scan(/(,?c_\d+)/).flatten
+        .map{ |c| c.gsub(/(,?c_)/,'') }
+    end
+    if color_ids.present?
+      color_ids.compact.each do |c_id|
+        @bikes = bikes.where("primary_frame_color_id = ? OR secondary_frame_color_id = ? OR tertiary_frame_color_id = ?", c_id, c_id, c_id)
       end
-      @bikes = bikes
     end
     @bikes
   end
@@ -109,7 +113,7 @@ class BikeSearcher
     else
       @bikes = Bike.where(stolen: false).order("RANDOM()")
     end
-    @bikes.limit(500)
+    @bikes
   end
 
   def close_serials

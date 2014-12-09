@@ -75,6 +75,10 @@ $ ->
     target.parents('li').find('.application-info').slideToggle('fast')
     target.toggleClass('uncollapsed')
 
+  param_token = window.location.href.match(/access_token=[^#|\/]*/i)
+  if param_token? && param_token.length > 0
+    $("#input_apiKey").val(param_token[0].replace('access_token=', '')).change()
+
   # if you have an apiKey you would like to pre-populate on the page for demonstration purposes...
   # apiKey = "68f00e0a1cec56d569facebb39aff7e033af49db234c1213901770fb10b39f30"
   # $("#input_apiKey").val apiKey

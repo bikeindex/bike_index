@@ -1,7 +1,11 @@
 %h1#documentation_head{ data: {production: (1 if Rails.env.production?)}}
   Bike Index API V1
 %p
-  This is the documentation for the Bike Index JSON API.
+  This is the documentation for the Bike Index JSON API v1
+
+%article
+  .alert
+    We're updating our API&mdash;this version will continue to exist indefinitely, but it will probably get slower. Check out #{link_to "the v2 documentation", api_v2_documentation_index_url} and give us feedback!
 
 %p
   The Bike Index API supports Cross-Origin Resource Sharing (CORS). The CORS spec allows web applications to make cross domain AJAX calls without using workarounds such as JSONP.

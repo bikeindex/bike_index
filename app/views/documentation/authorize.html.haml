@@ -34,7 +34,7 @@
               "redirect_uri": #{authorize_documentation_index_url}
             },
             success: function(data, textStatus, jqXHR) {
-              $('#access_grant_response').text(JSON.stringify(data,undefined,2))
+              $('#access_grant_response').text(JSON.stringify(data,undefined,2));
             },
             error: function(data, textStatus, jqXHR) {
               $('#access_grant_response').text(JSON.stringify(data, void 0, 2));
@@ -46,14 +46,14 @@
     %p
       It looks like this access code has already been turned into an access token and is now expired.
     %h3
-      Return to the #{link_to "documentation page", api_v2_documentation_index_url} to use the token.
+      Return to the #{link_to "documentation page", api_v2_documentation_index_url, class: 'documentation_url'} to use the token.
     %article
       .alert.alert-success
         Since the token has already been used, the response below is an error.
       
   - else
     %h3
-      You can now return to the #{link_to "documentation page", api_v2_documentation_index_url} to use your token.
+      You can now return to the #{link_to "documentation page", api_v2_documentation_index_url, class: 'documentation_url'} to use your token.
   %article
     %p
       %strong
@@ -62,7 +62,7 @@
 
   %hr
   %p.padded
-    Access codes expire in 10 minutes. If you get an expired response, try returning to the #{link_to "documentation url", api_v2_documentation_index_url}.
+    Access codes expire in 10 minutes. If you get an expired response, try returning to the #{link_to "documentation url", api_v2_documentation_index_url, class: 'documentation_url'}.
   :javascript
     $.ajax({
       type: "POST",
@@ -75,7 +75,9 @@
         "redirect_uri": "#{authorize_documentation_index_url}"
       },
       success: function(data, textStatus, jqXHR) {
-        $('#access_grant_response').text(JSON.stringify(data,undefined,2))
+        auth_info = data;
+        $('#access_grant_response').text(JSON.stringify(data,undefined,2));
+        $('.documentation_url').attr("href", "#{api_v2_documentation_index_url}?access_token=" + data.access_token);
       },
       error: function(data, textStatus, jqXHR) {
         $('#access_grant_response').text(JSON.stringify(data, undefined, 2));
