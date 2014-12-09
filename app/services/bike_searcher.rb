@@ -92,7 +92,7 @@ class BikeSearcher
 
   def by_proximity
     if @params[:proximity_radius].present? && (@params[:proximity_radius].kind_of?(Integer) || @params[:proximity_radius].strip.length > 0)
-      radius = @params[:proximity_radius] if @params[:proximity_radius].present?
+      radius = @params[:proximity_radius]
     end
     radius ||= 500
     stolen_ids = @bikes.pluck(:current_stolen_record_id)
@@ -104,14 +104,33 @@ class BikeSearcher
     @bikes
   end
 
+  def by_date
+    stolen_records = StolenRecord.where('id in (?)', @bikes.pluck(:current_stolen_record_id))
+    if @params[:stolen_before].present?
+      before = Time.at(@params[:stolen_before]).utc.to_datetime
+      stolen_records = stolen_records.where("date_stolen <= ?", before)
+    end
+    if @params[:stolen_after].present?
+      after = Time.at(@params[:stolen_after]).utc.to_datetime
+      stolen_records = stolen_records.where("date_stolen >= ?", after)
+    end
+    @bikes = @bikes.where('id in (?)', stolen_records.pluck(:bike_id))
+    @bikes
+  end
+
+
+
   def find_bikes
-    if @params[:stolen].present? or @params[:query].present? or @params[:serial].present? or @params[:manufacturer_id].present? or @params[:manufacturer].present?
+    if @params[:stolen].present? || @params[:query].present? || @params[:serial].present? || @params[:manufacturer_id].present? || @params[:manufacturer].present?
       @bikes = matching_serial 
       matching_stolenness(@bikes)
       matching_manufacturer(@bikes)
       matching_colors(@bikes)
       matching_query(@bikes)
-      by_proximity if @params[:stolen] && @params[:proximity].present? && @params[:proximity].strip.length > 1
+      if @params[:stolen]
+        by_proximity if @params[:proximity].present? && @params[:proximity].strip.length > 1
+        by_date if @params[:stolen_before].present? || @params[:stolen_after].present?
+      end
     else
       @bikes = Bike.where(stolen: false).order("RANDOM()")
     end
