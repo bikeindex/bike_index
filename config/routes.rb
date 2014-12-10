@@ -98,7 +98,7 @@ Bikeindex::Application.routes.draw do
     match 'maintenance', to: 'dashboard#maintenance'
     match 'bust_z_cache', to: 'dashboard#bust_z_cache'
     match 'destroy_example_bikes', to: 'dashboard#destroy_example_bikes'
-    resources :discounts, :memberships, :organizations, :bike_token_invitations,
+    resources :memberships, :organizations, :bike_token_invitations,
       :organization_invitations, :paints, :ads
     match 'duplicate_bikes', to: 'bikes#duplicates'
     resources :flavor_texts, only: [:destroy, :create]
