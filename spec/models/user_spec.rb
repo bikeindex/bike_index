@@ -3,6 +3,8 @@ require 'spec_helper'
 describe User do
   
   describe :validations do
+    it { should have_many :payments }
+    it { should have_many :subscriptions }
     it { should have_many :memberships }
     it { should have_many :organization_embeds }
     it { should have_many :organizations }
@@ -18,7 +20,9 @@ describe User do
     it { should have_many :oauth_applications }
     it { should have_many :sent_stolen_notifications }
     it { should have_many :received_stolen_notifications }
-    
+    it { should serialize :paid_membership_info }
+    it { should validate_presence_of :email }
+    it { should validate_uniqueness_of :email }
   end
 
   describe :validate do
@@ -207,6 +211,29 @@ describe User do
       access_token = Doorkeeper::AccessToken.create(application_id: application.id, resource_owner_id: user.id)
       tokens = user.reload.access_tokens_for_application(application.id)
       tokens.first.should eq(access_token)
+    end
+  end
+
+  # describe :current_subscription do 
+  #   it "returns current subscription" do 
+  #     user = FactoryGirl.create(:user)
+  #     subscription = Subscription.create(stripe_plan_id: '69', user_id: user.id)
+  #     user.current_subscription.should eq(subscription)
+  #     subscription.mark_closed(Time.now)
+  #     subscription.save
+  #     user.reload.current_subscription.should be_nil
+  #   end
+  #   it "returns nil if no subscription" do 
+  #     user = User.new
+  #     user.current_subscription.should be_nil
+  #   end
+  # end
+
+  describe :subscriptions do 
+    it "returns the payment if payment is subscription" do 
+      user = FactoryGirl.create(:user)
+      payment = Payment.create(is_recurring: true, user_id: user)
+      user.subscriptions.should eq(user.payments.where(is_recurring: true))
     end
   end
 

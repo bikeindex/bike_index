@@ -28,7 +28,7 @@ Bikeindex::Application.routes.draw do
   resource :session, only: [:new, :create, :destroy]
   match 'logout', to: 'sessions#destroy'
 
-  resource :charges, only: [:new, :create]
+  resources :payments
   resources :documentation, only: [:index] do
     collection do
       get :api_v1
@@ -37,7 +37,6 @@ Bikeindex::Application.routes.draw do
       get :authorize
     end
   end
-
 
   resources :ownerships, only: [:show]
   resources :memberships, only: [:update, :destroy]

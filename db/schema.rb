@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141110174307) do
+ActiveRecord::Schema.define(:version => 20141210031732) do
 
   create_table "ads", :force => true do |t|
     t.string   "title"
@@ -482,6 +482,20 @@ ActiveRecord::Schema.define(:version => 20141110174307) do
     t.integer  "bikes_count",        :default => 0, :null => false
   end
 
+  create_table "payments", :force => true do |t|
+    t.integer  "user_id"
+    t.boolean  "is_current",         :default => true
+    t.boolean  "is_recurring",       :default => false, :null => false
+    t.string   "stripe_id"
+    t.datetime "last_payment_date"
+    t.datetime "first_payment_date"
+    t.integer  "amount"
+    t.datetime "created_at",                            :null => false
+    t.datetime "updated_at",                            :null => false
+  end
+
+  add_index "payments", ["user_id"], :name => "index_payments_on_user_id"
+
   create_table "propulsion_types", :force => true do |t|
     t.string   "name"
     t.datetime "created_at", :null => false
@@ -606,6 +620,9 @@ ActiveRecord::Schema.define(:version => 20141110174307) do
     t.boolean  "can_invite"
     t.boolean  "can_send_many_stolen_notifications", :default => false, :null => false
     t.string   "auth_token"
+    t.string   "stripe_id"
+    t.boolean  "is_paid_member",                     :default => false, :null => false
+    t.text     "paid_membership_info"
   end
 
   add_index "users", ["password_reset_token"], :name => "index_users_on_password_reset_token"

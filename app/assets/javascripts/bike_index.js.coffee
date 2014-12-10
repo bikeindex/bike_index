@@ -40,6 +40,9 @@ $(document).ready ->
       view = new BikeIndex.Views.ContentWhere
     if $('#manufacturers-list').length > 0
       view = new BikeIndex.Views.ContentManufacturers
+  
+  if $('#stripe_form').length > 0
+    view = new BikeIndex.Views.PaymentsForm
 
   else if $('#choose-registration-type').length > 0
     view = new BikeIndex.Views.BikesChooseRegistration

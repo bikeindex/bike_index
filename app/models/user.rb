@@ -26,8 +26,12 @@ class User < ActiveRecord::Base
     :has_stolen_bikes,
     :can_send_many_stolen_notifications
 
+  # stripe_id, is_paid_member, paid_membership_info
+
   mount_uploader :avatar, AvatarUploader
 
+  has_many :payments
+  has_many :subscriptions, class_name: "Payment", conditions: Proc.new { payments.where(is_recurring: true) }
   has_many :memberships, dependent: :destroy
   has_many :organization_embeds, class_name: 'Organization', foreign_key: :auto_user_id
   has_many :organizations, through: :memberships
@@ -50,6 +54,7 @@ class User < ActiveRecord::Base
   has_many :organization_invitations, class_name: 'OrganizationInvitation', inverse_of: :invitee
 
   before_create :generate_username_confirmation_and_auth
+  serialize :paid_membership_info
 
   validates_uniqueness_of :username, case_sensitive: false
   def to_param
@@ -172,6 +177,15 @@ class User < ActiveRecord::Base
       .map{ |o| o.bike_id if o.bike }.reject(&:blank?)
     # return [] unless owns.present?
     # owns.map{ |o| o.bike_id if o.bike }.reject{ |o| o.blank? }
+  end
+
+  def current_subscription
+    subscriptions.current.first
+  end
+
+  def delay_subscription_request
+    update_attribute :make_subscription_request, false
+    MarkForSubscriptionRequestWorker.perform_in(1.days, id)
   end
 
   def current_organization

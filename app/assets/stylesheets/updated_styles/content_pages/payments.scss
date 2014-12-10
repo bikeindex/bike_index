@@ -1,0 +1,69 @@
+.payments-page {
+  padding: 40px 0 60px;
+  form {
+    .binxbtn {
+      margin: 0 auto;
+      display: block;
+      font-size: 20px;
+      max-width: 200px;
+    }
+  }
+}
+
+.payment-types-list {
+  @include clearfix;
+  position: relative;
+  list-style-type: none;
+  margin: 0; 
+  padding: 30px 0;
+  li {
+    display: block;
+    float: left;
+    position: relative;
+    a {
+      @include transition(background ease-out .1s);
+      border-radius: 4px;
+      display: block;
+      width: 100%;
+      padding: 1.5em 1em;
+    }
+    .unselected {
+      @include binx-button($gray-lighter, $gray-lightest, lighten($gray-light, 2%), rgba($text-color,.9), .015em);
+    }
+    .active {
+      @include binx-button($blue, #67B2E4, #2574A0, rgba(white,.9), .015em);
+      hr { border-bottom: 1px solid rgba(white,.15); } 
+    }
+    h3 {
+      padding-top: 1em;
+      color: $gray-blue-dark;
+      font-size: 20px;
+    }
+    hr {
+      margin: 1em 0;
+      border: none;
+      border-top: 1px solid rgba(black,.1);
+      border-bottom: 1px solid rgba(white,.8);
+    }
+    .perks { min-height: 7em; }
+    .donation {
+      min-height: 3em;
+      padding: 0 1em;
+      input { width: 100%; }
+    }
+  }
+}
+
+@media (min-width: $m-breakpoint) {
+  .payments-page {
+    padding: 60px 0 100px;
+  }
+  .payment-types-list {
+    li {
+      margin: 0 0 0 1%;
+      width: 19%;
+      // &:first-of-type { margin-left: 0; }
+      &:first-of-type { margin-left: 10%; }
+    }
+  }
+}
