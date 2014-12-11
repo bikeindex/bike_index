@@ -54,6 +54,9 @@ class InfoController < ApplicationController
   def support_the_index
     render layout: 'application_updated'
   end
+  def support_the_bike_index
+    redirect_to support_the_index_url
+  end
 
 protected
 
