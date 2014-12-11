@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141210031732) do
+ActiveRecord::Schema.define(:version => 20141210233551) do
 
   create_table "ads", :force => true do |t|
     t.string   "title"
@@ -492,6 +492,7 @@ ActiveRecord::Schema.define(:version => 20141210031732) do
     t.integer  "amount"
     t.datetime "created_at",                            :null => false
     t.datetime "updated_at",                            :null => false
+    t.string   "email"
   end
 
   add_index "payments", ["user_id"], :name => "index_payments_on_user_id"

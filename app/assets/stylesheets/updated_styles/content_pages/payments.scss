@@ -21,7 +21,7 @@
     float: left;
     position: relative;
     a {
-      @include transition(background ease-out .1s);
+      @include transition(all ease-out .1s);
       border-radius: 4px;
       display: block;
       width: 100%;
@@ -33,6 +33,7 @@
     .active {
       @include binx-button($blue, #67B2E4, #2574A0, rgba(white,.9), .015em);
       hr { border-bottom: 1px solid rgba(white,.15); } 
+      .donation input { background: #67B2E4; color: white; }
     }
     h3 {
       padding-top: 1em;
@@ -49,12 +50,13 @@
     .donation {
       min-height: 3em;
       padding: 0 1em;
-      input { width: 100%; }
+      text-align: center;
+      input { width: 100%; text-align: center; background: $gray-lightest; }
     }
   }
 }
 
-@media (min-width: $m-breakpoint) {
+@media (min-width: $m-breakpoint+1) {
   .payments-page {
     padding: 60px 0 100px;
   }
@@ -62,8 +64,20 @@
     li {
       margin: 0 0 0 1%;
       width: 19%;
+      &:first-of-type { margin-left: 0; }
+      // &:first-of-type { margin-left: 10%; }
+    }
+  }
+}
+
+@media (max-width: $m-breakpoint) {
+  .payment-types-list {
+    li {
+      margin: 20px 0 0 2%;
+      width: 47%;
       // &:first-of-type { margin-left: 0; }
-      &:first-of-type { margin-left: 10%; }
+      &:nth-of-type(5) { margin-left: 26%; }
+      // &:first-of-type { margin-left: 10%; }
     }
   }
 }

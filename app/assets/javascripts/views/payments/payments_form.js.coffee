@@ -31,7 +31,8 @@ class BikeIndex.Views.PaymentsForm extends Backbone.View
       desc = selected_opt.find('h3').text()
 
     $('#stripe_amount').val(amount)
-
+    $('#stripe_subscription').val(selected_opt.attr('data-subscription'))
+    $('#stripe_plan').val(selected_opt.attr('data-plan'))
     handler.open
       name: "Bike Index"
       description: desc

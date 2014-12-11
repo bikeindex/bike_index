@@ -5,7 +5,7 @@
     Want to protect bikes? Think what we're doing is pretty cool? Help us keep going!
   %ul.payment-types-list
     %li
-      %a.unselected.select-payment{ href: '#', data: {amount: 250, subscription: 0, label: 'Buy coffee'}}
+      %a.unselected.select-payment{ href: '#', data: {amount: 250, label: 'Buy coffee'}}
         %h3
           Buy us a cup of coffee
         %hr
@@ -17,22 +17,20 @@
           %p
             $2.50
 
-    / %li
-    /   %a.active.select-payment{ href: '#', data: {amount: 399, subscription: 1, label: 'Subscribe'}}
-    /     %h3
-    /       Monthly membership
-    /     %hr
-    /     .perks
-    /       %p
-    /         We stop asking for money
-    /       %p
-    /         No more search ads.
-    /     %hr
-    /     .donation
-    /       %p
-    /         $3.99 per month
     %li
-      %a.active.select-payment{ href: '#', data: {amount: 3999, subscription: 0, label: 'Donate'}}
+      %a.active.select-payment{ href: '#', data: {amount: 399, subscription: 1, label: 'Subscribe', plan: "01"}}
+        %h3
+          Monthly membership
+        %hr
+        .perks
+          %p
+            We stop asking for money.
+        %hr
+        .donation
+          %p
+            $3.99 per month
+    %li
+      %a.unselected.select-payment{ href: '#', data: {amount: 3999, label: 'Donate'}}
         %h3
           Year of membership
         %hr
@@ -44,37 +42,37 @@
           %p
             $39.99
     %li
-      %a.unselected.select-payment{ href: '#', data: {amount: 9999, subscription: 0, label: 'Donate'}}
+      %a.unselected.select-payment{ href: '#', data: {amount: 9999, label: 'Donate'}}
         %h3
           Lifetime membership
         %hr
         .perks
           %p
-            No more money asking! We'll probably figure out some other cool stuff for you.
+            No more asking for money, ever!
         %hr
         .donation
           %p
             $99.99
     %li
-      %a.unselected.select-payment{ href: '#', data: {subscription: 0, label: 'Donate', arbitrary: 1}}
+      %a.unselected.select-payment{ href: '#', data: { label: 'Donate', arbitrary: 1}}
         %h3
-          Some other amount
+          Something else
         %hr
         .perks
           %p
             Help out however much you feel like!
         %hr
         .donation
-          %input#arbitraty-amount.form-control{ type: 'number', value: 3.14 }
-            
-
-
-  / # %form#stripe_button{ action:"/payments", method: "POST", data: {key: "#{ENV['STRIPE_PUBLISHABLE_KEY']}", email: "#{current_user.email}"}}
-  = form_tag payments_path, {id: 'stripe_form', data: {key: "#{ENV['STRIPE_PUBLISHABLE_KEY']}", email: "#{current_user.email}"}} do 
+          %input#arbitraty-amount.form-control{ type: 'number', value: 3.14, min: '0' }
+  - stripe_form_hash = {id: 'stripe_form', data: {key: "#{ENV['STRIPE_PUBLISHABLE_KEY']}"}}
+  - stripe_form_hash[:email] = "#{current_user.email}" if current_user.present?
+  = form_tag payments_path, stripe_form_hash do 
     <script src="https://checkout.stripe.com/checkout.js"></script>
     = hidden_field_tag :stripe_token
     = hidden_field_tag :stripe_amount
     = hidden_field_tag :stripe_email
+    = hidden_field_tag :stripe_subscription
+    = hidden_field_tag :stripe_plan
 
     %a#open_stripe_checkout_btn.btn.binxbtn.binxbtn-lg{ href: '#' }
       Purchase

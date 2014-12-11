@@ -1,40 +1,60 @@
 class PaymentsController < ApplicationController
   layout 'application_updated'
-  before_filter :authenticate_user!
 
   def new
   end
 
   def create
     @amount = params[:stripe_amount]
-
-    if current_user.stripe_id.present?
-      customer = Stripe::Customer.retrieve(current_user.stripe_id)
+    @subscription = params[:stripe_subscription] || false
+    user = current_user || User.fuzzy_email_find(params[:stripe_email])
+    email = params[:stripe_email].strip.downcase
+    if user.present? && user.stripe_id.present?
+      customer = Stripe::Customer.retrieve(user.stripe_id)
       customer.card = params[:stripe_token]
       customer.save
-    else
+    elsif user.present?
       customer = Stripe::Customer.create(
-        email: current_user.email,
+        email: email,
         card: params[:stripe_token]
       )
-      current_user.update_attribute :stripe_id, customer.id
+      user.update_attribute :stripe_id, customer.id
+    else
+      customer = Stripe::Customer.all.detect { |c| c[:email].match(email).present? }
+      if customer.present? 
+        customer.card = params[:stripe_token]
+        customer.save
+      else
+        customer = Stripe::Customer.create(
+          email: email,
+          card: params[:stripe_token]
+        )
+      end
     end
-    charge = Stripe::Charge.create(
-      customer:     customer.id,
-      amount:       @amount,
-      description:  'Bike Index customer',
-      currency:     'usd'
-    )
-    attrs = {
-      user_id: current_user.id,
-      # is_current: false,
-      # is_recurring: false,
+    @customer_id = customer.id
+    if @subscription
+      charge = customer.subscriptions.create(plan: params[:stripe_plan])
+      charge_time = charge.current_period_start
+    else
+      charge = Stripe::Charge.create(
+        customer:     @customer_id,
+        amount:       @amount,
+        description:  'Bike Index customer',
+        currency:     'usd'
+      )
+      charge_time = charge.created
+    end
+    payment = Payment.new(user_id: (user.id if user.present?),
+      email: email,
+      is_current: true,
+      is_recurring: @subscription,
       stripe_id: charge.id,
-      last_payment_date: Time.now,
-      first_payment_date: Time.now,
+      first_payment_date: Time.at(charge_time).utc.to_datetime,
       amount: @amount
-    }
-    Payment.create(attrs)
+    )
+    unless payment.save
+      raise StandardError, "Unable to create a payment. #{payment.to_yaml}"
+    end
 
   rescue Stripe::CardError => e
     flash[:error] = e.message

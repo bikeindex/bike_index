@@ -18,6 +18,14 @@ class CustomerMailer < ActionMailer::Base
     end
   end
 
+  def invoice_email(payment)
+    @payment = payment
+    mail(to: payment.email, subject: "Thank you for supporting the Bike Index!") do |format|
+      format.text
+      format.html { render layout: 'email'}
+    end
+  end
+
   def stolen_bike_alert_email(customer_contact)
     @customer_contact = customer_contact
     @info = customer_contact.info_hash

@@ -89,6 +89,11 @@ FactoryGirl.define do
     association :creator, factory: :user
   end
 
+  factory :payment do
+    association :user
+    amount '999'
+  end
+
   factory :bike do
     # Warning: the bikes controller forces every bike to have an ownership
     # But this factory allows creating bikes without ownerships.

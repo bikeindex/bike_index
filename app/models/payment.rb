@@ -1,5 +1,6 @@
 class Payment < ActiveRecord::Base
   attr_accessible :user_id,
+    :email,
     :is_current,
     :is_recurring,
     :stripe_id,
@@ -8,26 +9,20 @@ class Payment < ActiveRecord::Base
     :amount
 
   belongs_to :user
-  validates_presence_of :user_id
+  validates_presence_of :email
+
+  before_validation :set_email_from_user
+  def set_email_from_user
+    return true unless user.present?
+    self.email = user.email
+  end
 
   scope :current, where(is_current: true)
   scope :subscription, where(is_recurring: true)
   
-
-  # before_create :mark_subscribed 
-  # def mark_subscribed 
-  #   if user.present?
-  #     user.update_attribute :is_subscribed, true 
-  #   end
-  #   true
-  # end
-
-  # def mark_closed(time) 
-  #   return true unless is_current
-  #   self.is_current = false 
-  #   self.end_date = time
-  #   user.update_attribute :is_subscribed, false
-  #   save
-  # end
+  after_create :send_invoice_email
+  def send_invoice_email
+    EmailInvoiceWorker.perform_async(id)
+  end
 
 end
