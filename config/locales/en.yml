@@ -26,6 +26,7 @@ en:
     documentation_api_v1: "Bike Index API documentation"
     organization_invitations_new: "New invitation"
     payments_new: "Support the Index!"
+    payments_create: "Thanks for your support!"
   meta_descriptions:
     welcome_index: "Bicycle registration: online, powerful, free."
     info_about: "Why we made the Bike Index and who we are"

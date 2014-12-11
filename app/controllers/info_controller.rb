@@ -51,6 +51,10 @@ class InfoController < ApplicationController
     end
   end
 
+  def support_the_index
+    render layout: 'application_updated'
+  end
+
 protected
 
   def set_active_section
