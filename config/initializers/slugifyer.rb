@@ -6,7 +6,7 @@ class Slugifyer
   def self.book_slug(string)
     slug = I18n.transliterate(string.downcase)
     key_hash = {
-      '\s(bi)?cycles?|bikes?' => ' ',
+      '\s((bi)?cycles?|bikes?)' => ' ',
       '\+'                   => 'plus',
       '([^A-Za-z0-9])'      => ' '
     }

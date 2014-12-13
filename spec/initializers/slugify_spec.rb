@@ -41,6 +41,10 @@ describe Slugifyer do
       slug = Slugifyer.manufacturer("WorkCycles")
       slug.should eq('workcycles')
     end
+    it "does not remove haibike" do 
+      slug = Slugifyer.manufacturer("Haibike (Currietech)")
+      slug.should eq('haibike')      
+    end
     it "does not remove worksman" do 
       slug = Slugifyer.manufacturer("Worksman Cycles")
       slug.should eq('worksman')
