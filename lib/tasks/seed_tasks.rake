@@ -22,7 +22,7 @@ task seed_test_users_and_bikes: :environment do
   org.save
   membership = Membership.create(organization_id: org.id, user_id: User.find_by_email("member@example.com").id, role: "admin")
   membership.save
-  org = Organization.create(name: "Example organization", website: "", short_name: "Example org", default_bike_token_count: 5, show_on_map: false)
+  org = Organization.create(name: "Example organization", website: "", short_name: "Example org", default_bike_token_count: 5, show_on_map: false, access_token: "7fb1c38526e57a98ec57760aa7f84992")
   org.save
   membership = Membership.create(organization_id: org.id, user_id: User.find_by_email("example_user@bikeindex.org").id, role: "member")
   membership.save
