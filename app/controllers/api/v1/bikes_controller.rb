@@ -21,7 +21,11 @@ module Api
 
       def index
         if params[:proximity] == 'ip'
-          params[:proximity] = request.env["HTTP_X_FORWARDED_FOR"].split(',')[0]
+          if Rails.env == 'production'
+            params[:proximity] = request.env["HTTP_X_FORWARDED_FOR"].split(',')[0]
+          else
+            params[:proximity] = request.remote_ip
+          end
         end
         if params[:ip_test]
           info = { ip: params[:proximity], location: Geocoder.search(params[:proximity]) }

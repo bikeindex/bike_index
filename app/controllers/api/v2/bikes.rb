@@ -13,6 +13,13 @@ module API
           optional :serial, type: String, desc: "Serial number"
         end
 
+        params :stolen_search do 
+          optional :proximity, type: String, desc: "Center of location for proximity search", documentation: { example: '45.521728,-122.67326'}
+          optional :proximity_square, type: Integer, desc: "Size of the proximity search", default: 100
+          optional :stolen_before, type: Integer, desc: "Find bikes stolen before timestamp"
+          optional :stolen_after, type: Integer, desc: "Find bikes stolen after timestamp"
+        end
+
         def find_bike
           Bike.unscoped.find(params[:id])
         end
@@ -22,9 +29,13 @@ module API
         end
 
         def set_proximity
-          params[:proximity_radius] = params[:proximity_square] ||= 500
+          params[:proximity_radius] = params[:proximity_square] ||= 100
           return nil unless params[:proximity] == 'ip'
-          params[:proximity] = request.env["HTTP_X_FORWARDED_FOR"].split(',')[0]
+          if Rails.env == 'production'
+            params[:proximity] = request.env["HTTP_X_FORWARDED_FOR"].split(',')[0]
+          else
+            params[:proximity] = request.remote_ip
+          end
         end
       end
 
@@ -68,16 +79,38 @@ module API
         paginate
         params do
           use :search_bikes
-          optional :proximity, type: String, desc: "Center of location for proximity search", documentation: { example: '45.521728,-122.67326'}
-          optional :proximity_square, type: Integer, desc: "Size of the proximity search", default: 500
-          optional :stolen_before, type: Integer, desc: "Find bikes stolen before timestamp"
-          optional :stolen_after, type: Integer, desc: "Find bikes stolen after timestamp"
+          use :stolen_search
         end
         get '/stolen', each_serializer: BikeV2Serializer, root: 'bikes' do 
           params[:stolen] = true
           { "declared_params" => declared(params, include_missing: false) }
           set_proximity
           paginate find_bikes
+        end
+
+        desc "Count", {
+          notes: <<-NOTE
+            Use all the options you would pass in other places, responds with how many of bikes there are of each type:
+
+            ```javascript
+            {
+              "proximity": X, // Proximity for ip address unless specified
+              "stolen": X, 
+              "non_stolen": X
+            }
+            ```
+
+            *the `stolen` paramater is ignored, but shown here for consistency*
+          NOTE
+        }
+        params do
+          use :search_bikes
+          use :stolen_search
+        end
+        get '/count', root: 'bikes', protected: false do
+          { "declared_params" => declared(params, include_missing: false) }
+          set_proximity
+          BikeSearcher.new(params).find_bike_counts
         end
 
 

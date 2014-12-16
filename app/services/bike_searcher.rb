@@ -138,6 +138,23 @@ class BikeSearcher
     @bikes
   end
 
+  def find_bike_counts
+    @bikes = matching_serial
+    matching_manufacturer(@bikes)
+    matching_colors(@bikes)
+    matching_query(@bikes)
+    result = { non_stolen: @bikes.non_stolen.count }
+    
+    @params[:stolen] = true
+    matching_stolenness(@bikes)
+    by_date if @params[:stolen_before].present? || @params[:stolen_after].present?
+    
+    result[:stolen] = @bikes.count
+    
+    by_proximity if @params[:proximity].present? && @params[:proximity].strip.length > 1        
+    result.merge({proximity: @bikes.count})
+  end
+
   def close_serials
     @bikes = fuzzy_find_serial
     matching_stolenness(@bikes)
