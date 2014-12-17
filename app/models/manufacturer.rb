@@ -43,6 +43,11 @@ class Manufacturer < ActiveRecord::Base
     end
   end
 
+  def self.fuzzy_id(n)
+    m = self.fuzzy_id_or_name_find(n)
+    return m.id if m.present?
+  end
+
 
   def self.import(file)
     CSV.foreach(file.path, headers: true) do |row|

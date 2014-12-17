@@ -136,8 +136,10 @@
                 #state-select.controls.extra-field.chosen-select
                   = s.collection_select(:state_id, State.all, :id, :name, include_blank: true, prompt: "State" )
             .bike-fields
-              .controls.extra-field
-                = s.text_field :theft_description, placeholder: "City"
+              .control-group
+                = f.label :theft_description, "theft description", class: "control-label"
+                .controls
+                  = s.text_field :theft_description, placeholder: "description"
           - else
             / Don't put anything
             / Because there might be more stolen records and it breaks without

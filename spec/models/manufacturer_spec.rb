@@ -46,7 +46,18 @@ describe Manufacturer do
       Manufacturer.import(second_import_file)
       @manufacturer = Manufacturer.find_by_slug("surly-bikes")
     end
+  end
 
+  describe :fuzzy_id do 
+    it "gets id from name" do 
+      manufacturer = FactoryGirl.create(:manufacturer)
+      result = Manufacturer.fuzzy_id(manufacturer.name)
+      result.should eq(manufacturer.id)
+    end
+    it "fails with nil" do 
+      result = Manufacturer.fuzzy_id('some stuff')
+      result.should be_nil
+    end
   end
 
   describe :sm_options do 

@@ -34,7 +34,11 @@ class BParam < ActiveRecord::Base
   def set_foreign_keys
     return true unless params.present? && bike.present?
     set_wheel_size_key unless bike[:rear_wheel_size_id].present?
-    set_manufacturer_key unless bike[:manufacturer_id].present?
+    if bike[:manufacturer_id].present?
+      bike[:manufacturer_id] = Manufacturer.fuzzy_id(bike[:manufacturer_id])
+    else
+      set_manufacturer_key
+    end
     set_color_key unless bike[:primary_frame_color_id].present?
     set_cycle_type_key if bike[:cycle_type_slug].present?
     set_handlebar_type_key if bike[:handlebar_type_slug].present?
