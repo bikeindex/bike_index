@@ -19,7 +19,7 @@ class BikeSearcher
 
   def matching_stolenness(bikes)
     if @params[:non_stolen] or @params[:stolen]
-      @bikes = bikes.non_stolen unless @params[:stolen]
+      @bikes = bikes.non_stolen unless @params[:stolen] && @params[:stolen].length > 0
       @bikes = bikes.stolen unless @params[:non_stolen]
     end
     @bikes
@@ -91,7 +91,7 @@ class BikeSearcher
   end    
 
   def by_proximity
-    return @bikes if @params[:non_proximity] && @params[:non_proximity].to_s != 'false'
+    return @bikes if @params[:non_proximity] && @params[:non_proximity].length > 0
     if @params[:proximity_radius].present? && (@params[:proximity_radius].kind_of?(Integer) || @params[:proximity_radius].strip.length > 0)
       radius = @params[:proximity_radius]
     end
