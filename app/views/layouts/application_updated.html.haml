@@ -53,6 +53,20 @@
               class: "search-text-field form-control"
             = button_tag(type: "submit", class: "searchit btn") do
               = image_tag '/assets/updated/search_white.svg'
+            .stolen-search-link
+              %a#most_recent_stolen_bikes{href: '#'}
+                View recent stolen bikes near you
+
+            .stolen-search-fields
+              = text_field_tag :proximity, params[:proximity], placeholder: 'Anywhere', class: 'form-control stolen-proximity'
+              %span
+                miles of
+              = number_field_tag :proximity_radius, params[:proximity_radius] || 100, placeholder: '100', min: 0, class: 'form-control stolen-radius'
+              %span
+                within
+              = hidden_field_tag :stolen, params[:stolen] || true
+              = hidden_field_tag :non_stolen, params[:non_stolen] || false
+              = hidden_field_tag :non_proximity, params[:non_proximity] || false
             - if params[:manufacturer_id].present?
               - mnfg = {id: params[:manufacturer_id], text: Manufacturer.find(params[:manufacturer_id]).name} if params[:manufacturer_id].present?
             - else

@@ -81,7 +81,7 @@ $horiz-ad-width: 728px;
 }
 
 @media (min-width: 1000px) {
-  .container.partner-block-container { margin-top: -42px; }
+  .container.partner-block-container { margin-top: -12px; }
 }
 
 
@@ -100,7 +100,7 @@ $horiz-ad-width: 728px;
 
 @media (min-width: $l-breakpoint+1) {
   .container.partner-block-container {
-    margin-top: -56px;
+    margin-top: -30px;
   }
   .partner-block {
     width: $eight-column;

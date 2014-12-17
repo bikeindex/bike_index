@@ -33,8 +33,6 @@ module API
           return nil unless params[:proximity] == 'ip'
           if Rails.env == 'production'
             params[:proximity] = request.env["HTTP_X_FORWARDED_FOR"].split(',')[0]
-          else
-            params[:proximity] = request.remote_ip
           end
         end
       end
@@ -91,6 +89,7 @@ module API
         desc "Count", {
           notes: <<-NOTE
             Use all the options you would pass in other places, responds with how many of bikes there are of each type:
+            Unless you pass a proximity, we use IP geolocation
 
             ```javascript
             {
@@ -109,6 +108,7 @@ module API
         end
         get '/count', root: 'bikes', protected: false do
           { "declared_params" => declared(params, include_missing: false) }
+          params[:proximity] = params[:proximity] || "ip"
           set_proximity
           BikeSearcher.new(params).find_bike_counts
         end

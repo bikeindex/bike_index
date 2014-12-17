@@ -62,6 +62,37 @@
       box-shadow: none;
     }
   }
+  .stolen-search-link {
+    clear: both;
+    // text-align: right;
+    a {
+      padding: .5em 0 .5em .8em;
+      color: rgba($link-color, .6);
+      display: block;
+      &:hover { color: $link-color; }
+    }
+  }
+  .stolen-search-fields {
+    display: none;
+    @include clearfix; 
+    padding: .5em 0;
+    clear: both;
+    input, span {
+      display: block;
+      float: right;
+      padding: .25em .5em;
+    }
+    input {
+      background: $gray-lighter;
+      border-radius: $border-radius;
+      border: none;
+    }
+    .stolen-radius { width: 4.2em; }
+    .stolen-proximity { width: 30%; }
+    span {
+      color: $gray;
+    }
+  }
 }
 @media (max-width: $s-breakpoint) {
   .bike-search-form {

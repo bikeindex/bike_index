@@ -7,6 +7,41 @@
 
   %span#stolenness_query{data: {stolen: @stolenness[:stolen]} }
 
+- if params[:stolen].present? && params[:stolen].to_s != 'false'
+  - if params[:non_proximity].present? && params[:non_proximity].to_s != 'false'
+    - active = 'stolen'
+  - else
+    - active = 'proximity'
+- else
+  - active = 'non_stolen'
+- url = request.original_url.split('bikes?').last
+- url = "#{ENV['BASE_URL']}/api/v2/bikes/count?#{url}"
+%nav#search_tabs.bikes-search-type-tabs{ data: {url: url }}
+  .container
+    %ul
+      %li
+        %a#proximity_tab{ href: '#', class: ('active' if active == 'proximity')}
+          Stolen within
+          %span#search_distance
+            X
+          miles of
+          %span#search_location
+            you
+          %span.count
+      %li
+        %a#stolen_tab{ href: '#', class: ('active' if active == 'stolen') }
+          Stolen anywhere
+          %span.count
+      %li
+        %a#non_stolen_tab{ href: '#', class: ('active' if active == 'non_stolen') }
+          Not marked stolen
+          %span.count
+      / %li
+      /   %a.most-recent#stolen_most_recent{ href: '#' }
+      /     Most recent stolen bikes near you
+    .bottom-cover
+          
+
 - if @bikes.present?
 
   %ul.bike-boxes

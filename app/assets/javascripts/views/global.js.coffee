@@ -12,6 +12,7 @@ class BikeIndex.Views.Global extends Backbone.View
     'change #head-search-bikes #query':     'updateManufacturerSearch'
     # 'click #search-type-tabs':              'toggleSearchType'
     'click #expand_user':                   'expandUserNav'
+    'click #most_recent_stolen_bikes':      'mostRecentStolen'
     
   initialize: ->
     BikeIndex.hideFlash()
@@ -109,6 +110,19 @@ class BikeIndex.Views.Global extends Backbone.View
         data = $('#query').select2('data')
         data.push({id: '#', text: $('#header-search #serial').val()})
         $('#query').select2('data',data)
+
+      unless $('#bikes-search').length > 0
+        location = localStorage.getItem('location')
+        unless location? and location.length > 0
+          localStorage.setItem('location', 'ip')
+          $.ajax
+            type: "GET"
+            url: 'https://freegeoip.net/json/'
+            dataType: "jsonp",
+            success: (location) ->
+              localStorage.setItem('location', location.region_name)
+            
+            
 
   updateManufacturerSearch: (e) ->
     if e.added?
@@ -235,6 +249,11 @@ class BikeIndex.Views.Global extends Backbone.View
   expandUserNav: (event) ->
     event.preventDefault()
     $('.top-user-nav').slideToggle()
+
+  mostRecentStolen: (e) ->
+    e.preventDefault()
+    $('#stolen').val('true')
+    $('#head-search-bikes').submit()
     
   # loadUserHeader: ->
     # This is minified and inlined in the header
