@@ -95,7 +95,22 @@ class User < ActiveRecord::Base
   end
 
   def superuser?
-    self.superuser
+    superuser
+  end
+
+  def content?
+    is_content_admin
+  end
+
+  def admin_authorized(type)
+    return true if superuser
+    return case type
+    when 'content'
+      true if is_content_admin
+    when 'any'
+      true if is_content_admin
+    end
+    false
   end
 
   def set_password_reset_token

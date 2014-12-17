@@ -89,7 +89,7 @@ describe User do
       end
     end
 
-    describe :update
+    describe :update do
       before :each do
         @user = FactoryGirl.create(:user)
         @user.valid?.should be_true
@@ -122,6 +122,29 @@ describe User do
         @user.valid?.should be_false
         @user.errors.messages[:password].include?('must contain at least one letter').should be_true
       end
+    end
+  end
+
+  describe :admin_authorized do 
+    before :all do
+      @content = FactoryGirl.create(:user, is_content_admin: true)
+      @admin = FactoryGirl.create(:user, superuser: true)
+    end
+
+    it "auths full" do 
+      @admin.admin_authorized('full').should be_true
+      @content.admin_authorized('full').should be_false
+    end
+
+    it "auths content" do 
+      @admin.admin_authorized('content').should be_true
+      @content.admin_authorized('content').should be_true
+    end
+
+    it "auths any" do 
+      @admin.admin_authorized('any').should be_true
+      @content.admin_authorized('any').should be_true
+    end
   end
 
   describe :fuzzy_email_find do

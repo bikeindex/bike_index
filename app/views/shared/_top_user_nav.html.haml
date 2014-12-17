@@ -10,9 +10,9 @@
           %li
             %a{ href: "/organizations/#{membership.organization.slug}" }
               = membership.organization.short_name
-      - if current_user.superuser
+      - if current_user.admin_authorized('any')
         %li
-          = link_to 'Admin', admin_root_path
+          = link_to 'Admin', user_root_url
 
     - else
       %li.first-link

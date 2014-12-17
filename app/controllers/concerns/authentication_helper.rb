@@ -12,6 +12,17 @@ module AuthenticationHelper
     end
   end
 
+  def user_root_url
+    return root_url unless current_user.present?
+    if current_user.superuser
+      admin_root_url
+    elsif current_user.is_content_admin
+      admin_news_index_url
+    else
+      user_home_url(subdomain: false)
+    end
+  end
+
 protected
   def strict_transport_security
     if request.ssl?
@@ -41,15 +52,20 @@ protected
 
   def require_admin!
     unless current_user.is_admin_of?(current_organization)
-      flash[:error] = "You gotta be an organization administrator to do that!"
+      flash[:error] = "You have to be an organization administrator to do that!"
       redirect_to user_home_url and return
     end
   end
 
-  def require_superuser!
-    unless current_user.present? and current_user.superuser?
-      flash[:error] = "Gotta be an admin. Srys"
-      redirect_to user_home_url(subdomain: false) and return
+  def require_index_admin!
+    type = 'full'
+    content_accessible = ['news']
+    if content_accessible.include?(controller_name)
+      type = 'content'
+    end
+    unless current_user.present? && current_user.admin_authorized(type)
+      flash[:error] = "You don't have permission to do that!"
+      redirect_to user_root_url
     end
   end
 

@@ -27,6 +27,7 @@ class Admin::UsersController < Admin::BaseController
     @user.email = params[:user][:email]
     @user.confirmed = params[:user][:confirmed]
     @user.superuser = params[:user][:superuser]
+    @user.is_content_admin = params[:user][:is_content_admin]
     @user.can_invite = params[:user][:can_invite]
     @user.banned = params[:user][:banned]
     @user.username = params[:user][:username]

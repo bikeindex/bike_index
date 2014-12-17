@@ -11,6 +11,30 @@ describe Admin::DashboardController do
     it { should render_template(:index) }
   end
 
+  describe :index do 
+    it "fails for non logged in" do 
+      get :index
+      response.code.should eq('302')
+      response.should redirect_to(root_url)
+    end
+
+    it "fails for non admins" do 
+      user = FactoryGirl.create(:user)
+      set_current_user(user)
+      get :index
+      response.code.should eq('302')
+      response.should redirect_to(user_home_url)
+    end
+
+    it "fails for content admins" do 
+      user = FactoryGirl.create(:user, is_content_admin: true)
+      set_current_user(user)
+      get :index
+      response.code.should eq('302')
+      response.should redirect_to(admin_news_index_url)
+    end
+  end
+
   describe :invitations do 
     before do 
       user = FactoryGirl.create(:user, superuser: true)

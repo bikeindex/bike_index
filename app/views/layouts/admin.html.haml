@@ -8,31 +8,38 @@
 
 %header.replace-header
   .inner-recep
-    %h2.new-title
-      = admin_nav_link "Go hard", admin_root_path
-    %ul
-      %li
-        = admin_nav_link "Organizations", admin_organizations_url
+    - if current_user.superuser?
+      %h2.new-title 
+        = admin_nav_link "Go hard", admin_root_path
+      %ul
+        %li
+          = admin_nav_link "Organizations", admin_organizations_url
 
-      %li
-        = admin_nav_link "Users", admin_users_url
+        %li
+          = admin_nav_link "Users", admin_users_url
 
-      %li
-        = admin_nav_link "Memberships", admin_memberships_url
+        %li
+          = admin_nav_link "Memberships", admin_memberships_url
 
-      %li
-        = admin_nav_link "Manufacturers", admin_manufacturers_url
+        %li
+          = admin_nav_link "Manufacturers", admin_manufacturers_url
 
-      %li
-        = admin_nav_link "Bikes", admin_bikes_url
+        %li
+          = admin_nav_link "Bikes", admin_bikes_url
 
-      %li
-        = admin_nav_link "Invitations", admin_invitations_url
+        %li
+          = admin_nav_link "Invitations", admin_invitations_url
 
-      %li
-        = admin_nav_link "News", admin_news_index_url
-      %li
-        = admin_nav_link "Stolen", admin_stolen_bikes_url
+        %li
+          = admin_nav_link "News", admin_news_index_url
+        %li
+          = admin_nav_link "Stolen", admin_stolen_bikes_url
+    - elsif current_user.is_content_admin?
+      %h2.new-title 
+        = admin_nav_link "Go hard", admin_news_index_url
+      %ul
+        %li
+          = admin_nav_link "News", admin_news_index_url
 
 
 

@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
   include AuthenticationHelper
   protect_from_forgery
   before_filter :strict_transport_security    
-  helper_method :current_user, :current_organization
+  helper_method :current_user, :current_organization, :user_root_url
   
 
   def cors_set_access_control_headers
