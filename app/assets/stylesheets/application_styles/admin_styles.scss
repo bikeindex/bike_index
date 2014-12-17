@@ -277,7 +277,8 @@
     .bike-fields {
       width: 48%;
       float: left;
-      &:first-of-type { margin-right: 2%; }
+      margin-left: 2%;
+      &:first-of-type { margin-left: 0; }
     }
     .actions {
       width: 60%;

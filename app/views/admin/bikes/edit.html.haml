@@ -118,9 +118,9 @@
     - if @bike.stolen and @bike.find_current_stolen_record.present?
       %hr
       .clearfix
-        .bike-fields
-          = f.fields_for :stolen_records do |s|
-            - if s.object.current
+        = f.fields_for :stolen_records do |s|
+          - if s.object.current
+            .bike-fields
               #stolen-bike-location.control-group
                 = s.label :street, "Stolen location", class: "control-label"
                 #country_select_container.controls
@@ -134,11 +134,14 @@
                 .controls.extra-field
                   = s.text_field :zipcode, placeholder: "Zipcode"
                 #state-select.controls.extra-field.chosen-select
-                  = s.collection_select(:state_id, State.all, :id, :name, include_blank: true, prompt: "State" )            
-            - else
-              / Don't put anything
-              / Because there might be more stolen records and it breaks without
-              / an else
+                  = s.collection_select(:state_id, State.all, :id, :name, include_blank: true, prompt: "State" )
+            .bike-fields
+              .controls.extra-field
+                = s.text_field :theft_description, placeholder: "City"
+          - else
+            / Don't put anything
+            / Because there might be more stolen records and it breaks without
+            / an else
         .bike-fields
           .control-group
             = f.label :stolen, "Bike is stolen", class: "control-label"
