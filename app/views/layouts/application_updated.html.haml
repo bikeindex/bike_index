@@ -65,8 +65,8 @@
               %span
                 within
               = hidden_field_tag :stolen, params[:stolen] || true
-              = hidden_field_tag :non_stolen, params[:non_stolen] || false
-              = hidden_field_tag :non_proximity, params[:non_proximity] || false
+              = hidden_field_tag :non_stolen, params[:non_stolen] || ''
+              = hidden_field_tag :non_proximity, params[:non_proximity] || ''
             - if params[:manufacturer_id].present?
               - mnfg = {id: params[:manufacturer_id], text: Manufacturer.find(params[:manufacturer_id]).name} if params[:manufacturer_id].present?
             - else
