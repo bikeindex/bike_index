@@ -116,12 +116,13 @@ class BikeIndex.Views.Global extends Backbone.View
         unless location.length > 0
           $('#proximity').val('ip')
           localStorage.setItem('location', 'ip')
-          $.ajax
-            type: "GET"
-            url: 'https://freegeoip.net/json/'
-            dataType: "jsonp",
-            success: (location) ->
-              localStorage.setItem('location', location.region_name)
+          # $.ajax
+          #   type: "GET"
+          #   url: 'https://freegeoip.net/json/'
+          #   dataType: "jsonp",
+          #   success: (location) ->
+          #     localStorage.setItem('location', location.region_name)
+        $('#proximity').val(localStorage.getItem('location'))
             
             
 
