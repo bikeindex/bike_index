@@ -114,6 +114,7 @@ class BikeIndex.Views.Global extends Backbone.View
       unless $('#bikes-search').length > 0
         location = localStorage.getItem('location')
         unless location? and location.length > 0
+          $('#proximity').val('ip')
           localStorage.setItem('location', 'ip')
           $.ajax
             type: "GET"
