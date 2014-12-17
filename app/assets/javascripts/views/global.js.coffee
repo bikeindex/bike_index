@@ -113,18 +113,17 @@ class BikeIndex.Views.Global extends Backbone.View
 
       unless $('#bikes-search').length > 0
         location = localStorage.getItem('location')
-        unless location.length > 0
+        $('#proximity').val(localStorage.getItem('location'))
+        unless location? and location.length > 0
           $('#proximity').val('ip')
           localStorage.setItem('location', 'ip')
-          # $.ajax
-          #   type: "GET"
-          #   url: 'https://freegeoip.net/json/'
-          #   dataType: "jsonp",
-          #   success: (location) ->
-          #     localStorage.setItem('location', location.region_name)
-        $('#proximity').val(localStorage.getItem('location'))
-            
-            
+          $.getJSON "http://www.telize.com/geoip?callback=?", (json) ->
+            location = ""
+            location += "#{json.city} " if json.city?
+            location += "#{json.region}" if json.region?
+            if location.length > 0
+              localStorage.setItem('location', location)
+              $('#proximity').val(location)
 
   updateManufacturerSearch: (e) ->
     if e.added?

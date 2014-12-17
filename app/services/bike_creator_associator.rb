@@ -8,7 +8,7 @@ class BikeCreatorAssociator
     send = @b_param.params[:bike][:send_email] 
     if send == false
       send_email = false
-    elsif send.present? && send != true && send[/false/i]
+    elsif send.present? && send != true && send.to_s[/false/i]
       send_email = false
     end
     OwnershipCreator.new(bike: bike, creator: @b_param.creator, send_email: send_email).create_ownership
