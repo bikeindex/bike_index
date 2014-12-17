@@ -36,7 +36,7 @@ class Manufacturer < ActiveRecord::Base
   end
 
   def self.fuzzy_id_or_name_find(n)
-    if n.match(/\A\d*\z/).present?
+    if n.kind_of?(Integer) || n.match(/\A\d*\z/).present?
       Manufacturer.where(id: n).first
     else
       Manufacturer.fuzzy_name_find(n)
