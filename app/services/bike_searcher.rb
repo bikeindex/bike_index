@@ -91,7 +91,7 @@ class BikeSearcher
   end    
 
   def by_proximity
-    return @bikes if @params[:non_proximity]
+    return @bikes if @params[:non_proximity] && @params[:non_proximity].to_s != 'false'
     if @params[:proximity_radius].present? && (@params[:proximity_radius].kind_of?(Integer) || @params[:proximity_radius].strip.length > 0)
       radius = @params[:proximity_radius]
     end
