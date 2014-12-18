@@ -5,12 +5,18 @@ class BikeIndex.Views.BikesNew extends Backbone.View
     'change #bike_year':              'updateYear'
     'change #bike_unknown_year':      'toggleUnknownYear' 
     'click #select-cycletype a':      'changeCycleType'
+    'change #country_select_container select': 'updateCountry'
     
   
   initialize: ->
     @setElement($('#body'))
     if $('#bike_has_no_serial').prop('checked') == true
       $('#bike_serial_number').val('absent').addClass('absent-serial')
+    if $('#country_select_container').length > 0
+      if $('#country_select_container select').val().length > 0
+        @updateCountry()
+      else
+        @setDefaultCountry() 
     @updateCycleType()
     window.root_url = $('#root_url').attr('data-url')
     
@@ -101,6 +107,24 @@ class BikeIndex.Views.BikesNew extends Backbone.View
       if hidden_other.hasClass('unhidden')
         hidden_other.find('input').val('')
         hidden_other.removeClass('unhidden').slideUp()
+    
+  setDefaultCountry: ->
+    $.getJSON "http://www.telize.com/geoip?callback=?", (json) ->
+      select = $('#country_select_container select')
+      country_id = select.find("option").filter(->
+        $(this).text() is json.country
+      ).val()
+      select.val(country_id).change()
+
+  updateCountry: ->
+    c_select = $('#country_select_container select')
+    c_select.select2()
+    us_val = parseInt($('#country_select_container .other-value').text(), 10)
+    if parseInt(c_select.val(), 10) == us_val
+      $('#state-select').slideDown()
+    else
+      $('#state-select').slideUp()
+      $('#state-select select').val('').change()
 
   initializeFrameMaker: (target) ->
     url = "#{window.root_url}/api/searcher?types[]=frame_makers&"
