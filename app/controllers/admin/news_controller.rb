@@ -10,16 +10,41 @@ class Admin::NewsController < Admin::BaseController
     @users = User.all
   end
 
+  def image_edit
+    @listicle = Listicle.find(params[:id])
+    @blog = @listicle.blog
+  end
+
+  def show
+    redirect_to edit_admin_news_url
+  end
+
   def edit
     @users = User.all
   end
 
   def update
-    if @blog.update_attributes(params[:blog])
-      flash[:notice] = "Blog saved!"
-      redirect_to edit_admin_news_url(@blog)
+    if params[:cropping_bait_block]
+      bb = BaitBlock.find(params[:bait_block_id])
+      bb.update_attribute :crop_top_offset, params[:crop_top_offset]
+      BaitBlockImageSizeWorker.perform_async(bb.id)
+      flash[:notice] = "Image crop updated"
+      redirect_to image_edit_admin_news_url(id: bb.id)
     else
-      render action: :edit
+      body = "blog"
+      title = params[:blog][:title]
+      body = params[:blog][:body]
+      if @blog.update_attributes(params[:blog])
+        @blog.reload
+        if @blog.listicles.present?
+          @blog.listicles.pluck(:id).each { |id| ListicleImageSizeWorker.perform_in(1.minutes, id) }
+        end
+        flash[:notice] = "Blog saved!"
+        redirect_to edit_admin_news_url(@blog)
+      else
+        @users = User.blog_admin
+        render action: :edit
+      end
     end
   end
 
@@ -28,7 +53,8 @@ class Admin::NewsController < Admin::BaseController
       title: params[:blog][:title],
       user_id: current_user.id,
       body: "No content yet, write some now!",
-      published_at: Time.now
+      published_at: Time.now,
+      is_listicle: params[:blog][:is_listicle]
     })
     if @blog.save
       flash[:notice] = "Blog created!"

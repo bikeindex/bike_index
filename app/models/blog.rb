@@ -11,8 +11,13 @@ class Blog < ActiveRecord::Base
     :old_title_slug,
     :description_abbr,
     :update_title,
+    :is_listicle,
+    :listicles_attributes,
     :user_email
-      
+
+  has_many :listicles, dependent: :destroy
+  accepts_nested_attributes_for :listicles, allow_destroy: true
+
   attr_accessor :post_date, :post_now, :update_title, :user_email
 
   validates_presence_of :title, :body, :user_id
@@ -23,10 +28,11 @@ class Blog < ActiveRecord::Base
   has_many :public_images, as: :imageable, dependent: :destroy
 
   scope :published, where(published: true)
+  scope :listicle_blogs, where(is_listicle: true)
   default_scope order("published_at desc")
 
-  before_save :set_published_at_and_publishe
-  def set_published_at_and_publishe
+  before_save :set_published_at_and_published
+  def set_published_at_and_published
     if self.post_date.present?
       self.published_at = DateTime.strptime("#{self.post_date} 06", "%m-%d-%Y %H")
     end

@@ -133,6 +133,26 @@
   }
 }
 
+//________________________
+//
+// Listicles!
+//
+//________________________
+
+.list-nav-wrap {
+  @include clearfix;
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto; 
+  a { @extend .button-blue; }
+  .prev { float: left; }
+  .next { float: right; }
+}
+
+.listicle-image-credit {
+  text-align: right;
+  font-size: .8em;
+}
 
 
 //________________________

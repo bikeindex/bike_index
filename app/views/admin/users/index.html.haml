@@ -1,5 +1,5 @@
 %h1
-  Manage users
+  Manage #{link_to "users", admin_users_path}
 
 .special-search-field-container
   .special-search-field
@@ -10,7 +10,8 @@
   %h4
     = number_with_delimiter(User.all.count)
     users have signed up so far!
-
+.pull-right
+  #{link_to "Superusers", admin_users_path(superusers: true)}|#{link_to "content admins", admin_users_path(content_admins: true)}
 - if @users.present?
   .paginate-container
     = paginate @users
