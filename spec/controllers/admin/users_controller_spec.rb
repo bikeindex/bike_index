@@ -28,6 +28,7 @@ describe Admin::UsersController do
         email: "newemail@example.com",
         confirmed: true,
         superuser: true,
+        is_content_admin: true,
         can_invite: true,
         can_send_many_stolen_notifications: true,
         banned: true
