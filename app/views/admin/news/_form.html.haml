@@ -1,73 +1,39 @@
-.form.form-horizontal#chosen-container
-  - url = {action: "update", controller: "news"}
-  = form_for [:admin, @blog], :url => url do |f|
-    - if @blog.errors.any?
-      #alert-block
-        .alert.alert-error
-          %h4
-            Please fix the following 
-            = pluralize(@blog.errors.count, "error")
-          %ul
-            - @blog.errors.full_messages.each do |msg|
-              %li
-                = msg
 
-    .control-group.chosen-select
-      %label.control-label
-        Author email
-      .controls
-        = f.email_field :user_email, placeholder: 'your email', required: true, value: @blog.user.email
+.blog-field
+  = f.text_area :body, placeholder: "Blog post (in markdown)"
 
-    .blog-field
-      = f.text_field :title, placeholder: "Blog title"
+.control-group.tags
+  = f.label :tags, "Tags, should include a main category: Tech, Design, or Update", class: "control-label"
+  .controls
+    = f.text_area :tags, placeholder: "Separate tags with commas"
 
-    .blog-field
-      = f.text_field :description_abbr, placeholder: "Blog description (155 Characters) - Generated automatically, unless you enter something"
+.control-group
+  %label.control-label
+    Published date 
+  .controls.radio-controls
+    %label.checkbox
+      = f.check_box :post_now
+      Publish now
+  .controls.extra-field
+    = @blog.published_at.strftime("%m-%d-%Y")
+    
+    %a#change_published_date{ href: "#", data: {date: "#{@blog.published_at.strftime("%m-%d-%Y")}" }}
+      edit
 
-    .blog-field
-      = f.text_area :body, placeholder: "Blog post (in markdown)"
+.control-group#blog-date.datepicker-container.initially-hidden
+  = label :post_date, "Post date", class: "control-label"
+  .controls
+    #post-date-field
+      = f.text_field :post_date
 
-    .control-group.tags
-      = f.label :tags, "Tags, should include a main category: Tech, Design, or Update", class: "control-label"
-      .controls
-        = f.text_area :tags, placeholder: "Separate tags with commas"
+.control-group
+  = f.label :published, "Published", class: "control-label"
+  .controls
+    = f.check_box :published
 
-    .control-group
-      %label.control-label
-        Published date 
-      .controls.radio-controls
-        %label.checkbox
-          = f.check_box :post_now
-          Publish now
-      .controls.extra-field
-        = @blog.published_at.strftime("%m-%d-%Y")
-        
-        %a#change_published_date{ href: "#", data: {date: "#{@blog.published_at.strftime("%m-%d-%Y")}" }}
-          edit
-
-    .control-group#blog-date.datepicker-container.initially-hidden
-      = label :post_date, "Post date", class: "control-label"
-      .controls
-        #post-date-field
-          = f.text_field :post_date
-
-    .control-group
-      = f.label :published, "Published", class: "control-label"
-      .controls
-        = f.check_box :published
-
-    .control-group
-      = f.label :update_title, "Update URL", class: "control-label"
-      .controls
-        = f.check_box :update_title
-        %span.this-will-break-links
-          This will break existing links!
-
-
-    .padded
-      %a.button-blue.pull-left{target: "_blank", href: blog_url(@blog)}
-        preview post
-      = f.submit 'Save', class: 'button-green pull-right'
-          
-
-  
+.control-group
+  = f.label :update_title, "Update URL", class: "control-label"
+  .controls
+    = f.check_box :update_title
+    %span.this-will-break-links
+      This will break existing links!

@@ -1,0 +1,22 @@
+.listicle-block.row-fluid
+  %fieldset.well
+    .span10
+      .blog-field
+        = f.text_field :title, placeholder: 'Title', class: 'form-control'
+      .blog-field
+        = f.text_area :body, placeholder: 'Body content - HTML or Markdown', class: 'form-control'
+      .blog-field
+        = f.text_field :image_credits, placeholder: 'Image credits - should be a link in HTML or Markdown', class: 'form-control'
+    .span2{ class: "page_number_#{f.object.list_order}"}
+      .listicle-image-input
+        = f.file_field :image
+        %span.min-width-notice
+          min-width  726px
+      .list-order
+        %span
+          Order
+        = f.number_field :list_order, placeholder: '1', class: 'form-control'
+        %span.current-count
+    = f.hidden_field :_destroy, class: 'remove-listicle-block'
+    %a.remove_fields
+      Remove

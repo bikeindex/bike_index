@@ -1,0 +1,20 @@
+- if @list_item.present?
+  %article
+    = image_tag @list_item.image_url(:large) if @list_item.image.present?
+    - if @list_item.image_credits.present?
+      .listicle-image-credit
+        = @list_item.image_credits_html.html_safe
+  %h2.list-item-title
+    = @list_item.title
+  %article
+    = @list_item.body_html.html_safe if @list_item.body_html.present?
+    
+%article.padded
+  .list-nav-wrap
+    - if @prev_item
+      %a.list-nav.prev{ href: news_url(id: @blog.title_slug, page: (@page - 1)), rel: 'prev'}
+        \< Previous
+        
+    - if @next_item
+      %a.list-nav.next{ href: news_url(id: @blog.title_slug, page: (@page + 1)), rel: 'next'}
+        Next >

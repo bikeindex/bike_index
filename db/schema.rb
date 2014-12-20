@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141217191826) do
+ActiveRecord::Schema.define(:version => 20141217200937) do
 
   create_table "ads", :force => true do |t|
     t.string   "title"
@@ -142,13 +142,14 @@ ActiveRecord::Schema.define(:version => 20141217191826) do
     t.text     "body"
     t.text     "body_abbr"
     t.integer  "user_id"
-    t.datetime "created_at",       :null => false
-    t.datetime "updated_at",       :null => false
+    t.datetime "created_at",                          :null => false
+    t.datetime "updated_at",                          :null => false
     t.datetime "published_at"
     t.string   "tags"
     t.boolean  "published"
     t.string   "old_title_slug"
     t.text     "description_abbr"
+    t.boolean  "is_listicle",      :default => false, :null => false
   end
 
   create_table "cgroups", :force => true do |t|
@@ -275,6 +276,22 @@ ActiveRecord::Schema.define(:version => 20141217191826) do
   end
 
   add_index "integrations", ["user_id"], :name => "index_integrations_on_user_id"
+
+  create_table "listicles", :force => true do |t|
+    t.integer  "list_order"
+    t.text     "body"
+    t.integer  "blog_id"
+    t.string   "image"
+    t.text     "title"
+    t.text     "body_html"
+    t.integer  "image_width"
+    t.integer  "image_height"
+    t.text     "image_credits"
+    t.text     "image_credits_html"
+    t.integer  "crop_top_offset"
+    t.datetime "created_at",         :null => false
+    t.datetime "updated_at",         :null => false
+  end
 
   create_table "locations", :force => true do |t|
     t.integer  "organization_id"

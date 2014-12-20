@@ -8,6 +8,10 @@ class Admin::UsersController < Admin::BaseController
       # users = User.where('email LIKE ?', params[:user_query]).all
       # users += User.where('name LIKE ?', params[:user_query]).all
       # @users = users
+    elsif params[:superusers]
+      users = User.where(superuser: true)
+    elsif params[:content_admins]
+      users = User.where(is_content_admin: true)
     else 
       users = User.order("created_at desc")
     end

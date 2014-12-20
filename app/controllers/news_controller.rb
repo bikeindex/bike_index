@@ -9,6 +9,13 @@ class NewsController < ApplicationController
     unless @blog
       raise ActionController::RoutingError.new('Not Found')
     end
+    if @blog.is_listicle
+      @page = params[:page].to_i 
+      @page = 1 unless @page > 0
+      @list_item = @blog.listicles[@page-1]
+      @next_item = true unless @page >= @blog.listicles.count
+      @prev_item = true unless @page == 1
+    end
     @blogger = @blog.user
   end
 

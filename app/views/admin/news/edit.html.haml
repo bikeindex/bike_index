@@ -1,4 +1,4 @@
-%header.with-subtitle
+%header.with-subtitle#blog-edit
   %h1
     Editing that blog!
   %p
@@ -6,16 +6,61 @@
 
 
 .blog-entry-fields
-  .well
-    = render partial: "form"
+  / .well
+  .form.form-horizontal#chosen-container
+    - url = {action: "update", controller: "news"}
+    = form_for [:admin, @blog], :url => url do |f|
+      - if @blog.errors.any?
+        #alert-block
+          .alert.alert-error
+            %h4
+              Please fix the following 
+              = pluralize(@blog.errors.count, "error")
+            %ul
+              - @blog.errors.full_messages.each do |msg|
+                %li
+                  = msg
+      - if @blog.is_listicle
+        = render partial: "listicle_form", locals: { f: f }
+      - else
+        = render partial: "form", locals: { f: f }
 
-    .add-blog-photos
-      %ul#public_images{ :"data-order-url" => order_public_images_url }
-        - if @blog.public_images
-          = render partial: "/public_images/public_image", collection: @blog.public_images, as: :public_image
-      %section
-        = render "public_images/new_blog_form"
 
-  = link_to "Delete story", admin_news_url(@blog), method: :delete, confirm: "Are you sure?", class: "button-red"
+      .blog-final-actions
+        .well
+          .control-group.chosen-select
+            %label.control-label
+              Author email
+            .controls
+              = f.email_field :user_email, placeholder: 'your email', required: true, value: @blog.user.email
+              - user = User.fuzzy_email_find(@blog.user.email)
+              - unless user.present? && user.show_bikes
+                Please #{link_to "turn on your personal page", my_account_url, target: '_blank'}!
 
-  
+          .blog-field
+            = f.text_field :title, placeholder: "Blog title"
+          .blog-field
+            = f.text_field :description_abbr, placeholder: "Blog description (155 Characters) - Generated automatically, unless you enter something"
+          .padded
+            %a.button-blue.pull-left{target: "_blank", href: blog_url(@blog)}
+              preview post
+            = f.submit 'Save', class: 'button-green pull-right'
+
+
+  - unless @blog.is_listicle
+    .well
+      .add-blog-photos
+        %ul#public_images{ :"data-order-url" => order_public_images_url }
+          - if @blog.public_images
+            = render partial: "/public_images/public_image", collection: @blog.public_images, as: :public_image
+        %section
+          = render "public_images/new_blog_form"
+
+  .alert.alert-info
+    %p
+      The content blocks accept HTML or Markdown for styling and linking things. Check out this #{link_to "Markdown cheat sheet", "https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet", target: "_blank"} if you're curious.
+
+  .padded.clearfix
+    = link_to "Delete post", admin_news_url(@blog), method: :delete, confirm: "Are you sure?", class: "button-red"
+
+    

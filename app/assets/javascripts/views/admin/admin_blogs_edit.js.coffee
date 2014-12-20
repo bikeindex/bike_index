@@ -7,7 +7,8 @@ class BikeIndex.Views.AdminBlogsEdit extends Backbone.View
   initialize: ->
     @setElement($('#body'))
     $('#public_image_image').attr('name', "public_image[image]")
-    @publicImageFileUpload()
+    @publicImageFileUpload() if $('#new_public_image').length > 0
+    @listicleEdit() if $('#listicle_image').length > 0
     $('.edit_blog').areYouSure()
     
   publicImageFileUpload: ->
@@ -52,3 +53,27 @@ class BikeIndex.Views.AdminBlogsEdit extends Backbone.View
       # , value: @blog.published_at.strftime("%m-%d-%Y"), required: true, data: { :'date-format' => "mm-dd-yyyy" }
 
 
+  listicleEdit: -> 
+    for image in $('#listicle_image .list-image')
+      block_number = $(image).attr('data-order')
+      $(".page_number_#{block_number}").prepend($(image))
+
+    total = $('.listicle-block fieldset').length
+    $('.listicle-block .current-count').text("/#{total}")
+
+    $('form').on 'click', '.add_fields', (event) ->
+      event.preventDefault()
+      time = new Date().getTime()
+      regexp = new RegExp($(this).data('id'), 'g')
+      $(this).before($(this).data('fields').replace(regexp, time))
+      last_item = 0
+      for lo, i in $('.list-order input')
+        list_order = parseInt($(lo).val(), 10)
+        last_item = list_order if list_order > last_item
+
+      $('.list-order input').last().val(last_item + 1)
+
+    $('form').on 'click', '.remove_fields', (event) ->
+      $(this).prev('.remove-listicle-block').val('1')
+      $(this).closest('fieldset').slideUp()
+      event.preventDefault()
