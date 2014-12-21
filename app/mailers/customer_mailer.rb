@@ -57,6 +57,7 @@ class CustomerMailer < ActionMailer::Base
   def ownership_invitation_email(ownership)
     @ownership = ownership
     @bike = @ownership.bike
+    @new_pos_registration = true if @bike.registered_new && @bike.ownerships.count == 1
     @biketype = CycleType.find(@bike.cycle_type_id).name.downcase
     @new_bike = @bike.ownerships.count == 1
     @new_user = true unless User.fuzzy_email_find(@ownership.owner_email)
