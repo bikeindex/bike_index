@@ -9,6 +9,9 @@
   %h2
     = link_to blog.title, edit_admin_news_url(blog)
   %p.blog-index
-    = blog.body_abbr.html_safe
+    - if blog.listicles.present?
+      = blog.listicles.first.title
+    - else
+      = blog.body_abbr.html_safe
 
   %hr
