@@ -70,5 +70,3 @@ class ListicleImageUploader < CarrierWave::Uploader::Base
   end
 
 end
-
-# Check out BaitBlockImageSizeWorker too!

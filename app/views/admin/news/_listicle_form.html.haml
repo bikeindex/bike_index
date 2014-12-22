@@ -10,8 +10,8 @@
           - if l.image_width < 726
             %span.bb-image-width-small
               Image is too small
-        %a.edit-image-crop{ href: listicle_image_edit_admin_news_index_url(id: l.id), target: '_blank' }
-          Crop image
+        / %a.edit-image-crop{ href: listicle_image_edit_admin_news_index_url(id: l.id), target: '_blank' }
+        /   Crop image
 = f.fields_for :listicles do |builder|
   = render 'listicle_fields', f: builder
 .padded.clearfix.listicle-block
