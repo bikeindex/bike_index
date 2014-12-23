@@ -1,4 +1,21 @@
 - if @application.present?
+  #tokenCreationSuccess.modal.fade
+    .modal-header
+      %button.close{ type: "button", :"data-dismiss" => "modal", :"aria-hidden" => "true" }
+        &times;
+      %h3
+        Access Token created successfully!
+
+    .modal-body
+      %p
+        You can return to the #{link_to "documentation page", api_v2_documentation_index_url, class: 'documentation_url'}!
+      %p
+        If you're curious about what just happened though, close this and read this page.
+  :javascript
+    $(document).ready(function() {
+      return $('#tokenCreationSuccess').modal('show');
+    });
+
   %h1
     Congrats #{current_user.name},
   %h2
@@ -12,7 +29,6 @@
       Access code converted into a token at this url:
   - url = oauth_token_url(code: @access_code, client_secret: @application.secret, client_id: @application.uid, grant_type: 'authorization_code', redirect_uri: authorize_documentation_index_url)
   %article
-    
     %pre
       = link_to url, url, method: :post
   %p

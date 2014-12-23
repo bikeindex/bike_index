@@ -16,8 +16,8 @@ module API
         params :stolen_search do 
           optional :proximity, type: String, desc: "Center of location for proximity search", documentation: { example: '45.521728,-122.67326'}
           optional :proximity_square, type: Integer, desc: "Size of the proximity search", default: 100
-          optional :stolen_before, type: Integer, desc: "Find bikes stolen before timestamp"
-          optional :stolen_after, type: Integer, desc: "Find bikes stolen after timestamp"
+          optional :stolen_before, type: Integer, desc: "Bikes stolen before timestamp"
+          optional :stolen_after, type: Integer, desc: "Bikes stolen after timestamp"
         end
 
         def find_bike
@@ -89,7 +89,7 @@ module API
         desc "Count", {
           notes: <<-NOTE
             Use all the options you would pass in other places, responds with how many of bikes there are of each type:
-            Unless you pass a proximity, we use IP geolocation
+            Unless you pass a proximity, we use IP geolocation. If you include a serial query, we return `close_serials`
 
             ```javascript
             {

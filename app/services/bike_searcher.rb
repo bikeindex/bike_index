@@ -147,7 +147,9 @@ class BikeSearcher
     matching_colors(@bikes)
     matching_query(@bikes)
     result = { non_stolen: @bikes.non_stolen.count }
-    
+    if @params[:serial].present?
+      result[:close_serials] = fuzzy_find_serial.count
+    end
     @params[:stolen] = true
     matching_stolenness(@bikes)
     by_date if @params[:stolen_before].present? || @params[:stolen_after].present?

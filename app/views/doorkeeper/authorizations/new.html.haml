@@ -2,7 +2,9 @@
   %h1 Authorize required
 %main.authorize-application-section{:role => "main"}
   %p.h4
-    Authorize
+    Hey #{@current_user.name || @current_user.email},
+    %br
+    Would you like to authorize
     %strong.text-info= @pre_auth.client.name
     to use your account?
   - if @pre_auth.scopes
