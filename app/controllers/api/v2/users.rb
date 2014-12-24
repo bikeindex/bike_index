@@ -16,7 +16,7 @@ module API
           end
           
           def bike_ids
-            current_user.bikes
+            current_user.bike_ids
           end
 
           def organization_memberships

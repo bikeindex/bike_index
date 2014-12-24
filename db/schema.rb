@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141217200937) do
+ActiveRecord::Schema.define(:version => 20141224165646) do
 
   create_table "ads", :force => true do |t|
     t.string   "title"
@@ -482,6 +482,7 @@ ActiveRecord::Schema.define(:version => 20141217200937) do
     t.boolean  "claimed"
     t.boolean  "example",     :default => false, :null => false
     t.boolean  "send_email",  :default => true
+    t.boolean  "user_hidden", :default => false, :null => false
   end
 
   add_index "ownerships", ["bike_id"], :name => "index_ownerships_on_bike_id"

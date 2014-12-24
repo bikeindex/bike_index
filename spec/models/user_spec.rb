@@ -182,9 +182,9 @@ describe User do
       o = FactoryGirl.create(:ownership, owner_email: user.email, user_id: user.id)
       o2 = FactoryGirl.create(:ownership, owner_email: user.email, user_id: user.id)
       o2.bike.update_attribute :hidden, true
-      user.bikes.should include(o.bike.id)
-      user.bikes.should_not include(o2.bike.id)
-      user.bikes.count.should eq(1)
+      user.bike_ids.include?(o.bike.id).should be_true
+      user.bike_ids.include?(o2.bike.id).should_not be_true
+      user.bike_ids.count.should eq(1)
     end
   end
 

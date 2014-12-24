@@ -6,6 +6,7 @@ class Ownership < ActiveRecord::Base
     :user_id, # is the owner
     :claimed,
     :example,
+    :user_hidden,
     :send_email
 
   validates_presence_of :owner_email

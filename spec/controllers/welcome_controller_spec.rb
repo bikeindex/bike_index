@@ -32,6 +32,7 @@ describe WelcomeController do
     describe "when user is present" do 
       before do 
         user = FactoryGirl.create(:user)
+        FactoryGirl.create(:ownership, user_id: user.id, current: true)
         set_current_user(user)
         get :user_home
       end

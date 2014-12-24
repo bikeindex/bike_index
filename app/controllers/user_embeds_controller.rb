@@ -4,7 +4,7 @@ class UserEmbedsController < ApplicationController
   def show
     @text = params[:text]
     user = User.find_by_username(params[:id])
-    bikes = Bike.find(user.bikes) if user.present?
+    bikes = user.bikes if user.present?
     unless user && user.show_bikes? && bikes.present?
       @text = "Most Recent Indexed Bikes"
       bikes = Bike.where("thumb_path IS NOT NULL").limit(5)

@@ -187,11 +187,12 @@ class User < ActiveRecord::Base
   end
 
   def bikes
-    # owns = Ownership.where(user_id: id).where(example: false).where(current: true)
+    Bike.unscoped.find(bike_ids)
+  end
+
+  def bike_ids
     ownerships.where(example: false).where(current: true)
-      .map{ |o| o.bike_id if o.bike }.reject(&:blank?)
-    # return [] unless owns.present?
-    # owns.map{ |o| o.bike_id if o.bike }.reject{ |o| o.blank? }
+      .map{ |o| o.bike_id if o.user_hidden || o.bike }.reject(&:blank?)
   end
 
   def current_subscription

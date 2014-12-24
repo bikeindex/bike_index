@@ -21,7 +21,7 @@ class Admin::UsersController < Admin::BaseController
   end
 
   def edit
-    bikes = Bike.unscoped.find(@user.bikes)
+    bikes = @user.bikes
     @bikes = BikeDecorator.decorate_collection(bikes)
   end
 
@@ -45,7 +45,7 @@ class Admin::UsersController < Admin::BaseController
     if @user.save
       redirect_to admin_users_url, notice: 'User Updated'
     else
-      bikes = Bike.find(@user.bikes)
+      bikes = @user.bikes
       @bikes = BikeDecorator.decorate_collection(bikes)
       render action: :edit
     end
