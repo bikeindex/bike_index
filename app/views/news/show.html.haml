@@ -21,17 +21,15 @@
   :kramdown
     #{@blog.body}
 
-%article.padded
-  .party-blck
-    :plain
-      <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-      <ins class="adsbygoogle"
-           style="width:320px;height:100px"
-           data-ad-client="ca-pub-8140931939249510"
-           data-ad-slot="7822695384"></ins>
-      <script>
-      (adsbygoogle = window.adsbygoogle || []).push({});
-      </script>
+%article.padded  
+  :plain
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <ins class="adsbygoogle party-blck"
+         style="width:320px;height:100px"
+         data-ad-client="ca-pub-8140931939249510"
+         data-ad-slot="7822695384"></ins>
+
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 
 %article.content-comments
   = render "/shared/disqus"
