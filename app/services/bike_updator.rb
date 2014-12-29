@@ -4,7 +4,6 @@ end
 class BikeUpdatorError < StandardError
 end
 
-
 class BikeUpdator
   def initialize(creation_params = nil)
     @user = creation_params[:user] 
@@ -14,18 +13,23 @@ class BikeUpdator
 
   def find_bike
     begin
-    return Bike.unscoped.find(@bike_params[:id])
+      return Bike.unscoped.find(@bike_params[:id])
     rescue
       raise BikeUpdatorError, "Oh no! We couldn't find that bike"
     end
   end
 
   def update_ownership
-    if @bike_params[:bike] and @bike_params[:bike][:owner_email]
-      unless @bike.owner_email == @bike_params[:bike][:owner_email]
-        owner_email = @bike_params[:bike][:owner_email]
-        OwnershipCreator.new(bike: @bike, owner_email: owner_email, creator: @user, send_email: true).create_ownership
-      end
+    if @bike_params[:bike] &&
+      @bike_params[:bike][:owner_email] &&
+      @bike.owner_email != @bike_params[:bike][:owner_email]
+      opts = {
+        owner_email: @bike_params[:bike][:owner_email],
+        bike: @bike,
+        creator: @user,
+        send_email: true
+      }
+      OwnershipCreator.new(opts).create_ownership
     end
   end
 

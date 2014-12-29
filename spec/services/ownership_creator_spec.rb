@@ -100,6 +100,21 @@ describe OwnershipCreator do
     end
   end
 
+  describe :current_is_hidden do 
+    it "returns true if existing ownerships is user hidden" do
+      ownership = FactoryGirl.create(:ownership, user_hidden: true)
+      bike = ownership.bike
+      bike.update_attribute :hidden, true
+      create_ownership = OwnershipCreator.new(bike: bike)
+      create_ownership.current_is_hidden.should be_true
+    end
+    it "returns false" do 
+      bike = Bike.new
+      create_ownership = OwnershipCreator.new(bike: bike)
+      create_ownership.current_is_hidden.should be_false
+    end
+  end
+
   describe :add_errors_to_bike do 
     xit "should add the errors to the bike" do 
       ownership = Ownership.new 
@@ -118,6 +133,7 @@ describe OwnershipCreator do
       create_ownership.stub(:mark_other_ownerships_not_current).and_return(true)
       create_ownership.stub(:new_ownership_params).and_return(new_params)
       create_ownership.should_receive(:send_notification_email).and_return(true)
+      create_ownership.should_receive(:current_is_hidden).and_return(true)
       lambda { create_ownership.create_ownership }.should change(Ownership, :count).by(1)
     end
     it "calls mark not current and send notification and create a new ownership" do

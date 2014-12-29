@@ -177,7 +177,7 @@ describe User do
       user = FactoryGirl.create(:user)
       user.bikes.should be_empty
     end
-    it "returns the user's bikes if they have any hidden bikes" do
+    it "returns the user's bikes if they have any hidden bikes without the hidden bikes" do
       user = FactoryGirl.create(:user)
       o = FactoryGirl.create(:ownership, owner_email: user.email, user_id: user.id)
       o2 = FactoryGirl.create(:ownership, owner_email: user.email, user_id: user.id)
@@ -185,6 +185,12 @@ describe User do
       user.bike_ids.include?(o.bike.id).should be_true
       user.bike_ids.include?(o2.bike.id).should_not be_true
       user.bike_ids.count.should eq(1)
+    end
+    it "returns the user's bikes if they have any hidden bikes without the hidden bikes" do
+      user = FactoryGirl.create(:user)
+      ownership = FactoryGirl.create(:ownership, owner_email: user.email, user_id: user.id, user_hidden: true)
+      ownership.bike.update_attribute :hidden, true
+      user.bike_ids.include?(ownership.bike.id).should be_true
     end
   end
 

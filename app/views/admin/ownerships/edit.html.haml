@@ -38,6 +38,11 @@
         = f.check_box :current
 
     .control-group
+      = f.label :user_hidden, class: "control-label"
+      .controls
+        = f.check_box :user_hidden
+
+    .control-group
       = f.label :claimed, class: "control-label"
       .controls
         = f.check_box :claimed

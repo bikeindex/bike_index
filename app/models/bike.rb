@@ -71,7 +71,9 @@ class Bike < ActiveRecord::Base
     :send_email,
     :other_listing_urls,
     :listing_order,
-    :approved_stolen
+    :approved_stolen, 
+    :marked_user_hidden,
+    :marked_user_unhidden
 
   mount_uploader :pdf, PdfUploader
   process_in_background :pdf
@@ -124,7 +126,8 @@ class Bike < ActiveRecord::Base
 
   attr_accessor :other_listing_urls, :date_stolen_input, :receive_notifications,
     :phone, :image, :bike_token_id, :b_param_id, :payment_required, :embeded,
-    :embeded_extended, :paint_name, :bike_image_cache, :send_email
+    :embeded_extended, :paint_name, :bike_image_cache, :send_email,
+    :marked_user_hidden, :marked_user_unhidden
 
   default_scope where(example: false).where(hidden: false).order("listing_order desc")
   scope :stolen, where(stolen: true)
@@ -183,6 +186,10 @@ class Bike < ActiveRecord::Base
     current_ownership.owner
   end
 
+  def user_hidden
+    hidden && current_ownership && current_ownership.user_hidden
+  end
+
   def find_current_stolen_record
     self.stolen_records.last if self.stolen_records.any?
   end
@@ -228,6 +235,18 @@ class Bike < ActiveRecord::Base
       name = manufacturer.name.gsub(/\s?\([^\)]*\)/i,'')
     end
     self.mnfg_name = name.strip
+  end
+
+  before_save :set_user_hidden
+  def set_user_hidden
+    if marked_user_hidden
+      self.hidden = true
+      current_ownership.update_attribute :user_hidden, true unless current_ownership.user_hidden
+    elsif marked_user_unhidden
+      self.hidden = false
+      current_ownership.update_attribute :user_hidden, false if current_ownership.user_hidden 
+    end
+    true
   end
 
   before_save :set_normalized_serial

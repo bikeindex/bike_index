@@ -139,6 +139,44 @@ describe Bike do
     end
   end
 
+  describe :user_hidden do 
+    it "is true if bike is hidden and ownership is user hidden" do 
+      bike = Bike.new(hidden: true)
+      ownership = Ownership.new(user_hidden: true)
+      bike.stub(:current_ownership).and_return(ownership)
+      bike.user_hidden.should be_true
+    end
+    it "is false otherwise" do 
+      bike = Bike.new(hidden: true)
+      bike.user_hidden.should be_false
+    end
+  end
+
+  describe :set_user_hidden do 
+    it "unmarks user hidden, saves ownership and marks self unhidden" do 
+      ownership = FactoryGirl.create(:ownership, user_hidden: true)
+      bike = ownership.bike
+      bike.hidden = true
+      bike.marked_user_unhidden = true
+      bike.set_user_hidden
+      bike.hidden.should be_false
+      ownership.reload.user_hidden.should be_false
+    end
+
+    it "marks updates ownership user hidden, marks self hidden" do 
+      ownership = FactoryGirl.create(:ownership)
+      bike = ownership.bike
+      bike.marked_user_hidden = true
+      bike.set_user_hidden
+      bike.hidden.should be_true 
+      ownership.reload.user_hidden.should be_true
+    end
+
+    it "has before_save_callback_method defined for set_user_hidden" do
+      Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_user_hidden).should == true
+    end
+  end
+
   describe :find_current_stolen_record do 
     it "returns the last current stolen record if bike is stolen" do 
       @bike = Bike.new 

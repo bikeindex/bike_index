@@ -7,6 +7,7 @@ class OwnershipCreator
     @bike = creation_params[:bike]
     @owner_email = creation_params[:owner_email]
     @send_email = creation_params[:send_email]
+    @user_hidden = creation_params[:user_hidden]
   end
 
   def find_owner_email
@@ -43,7 +44,8 @@ class OwnershipCreator
       claimed: self_made?,
       example: @bike.example,
       current: true,
-      send_email: @send_email
+      send_email: @send_email,
+      user_hidden: @user_hidden
     }
     ownership
   end
@@ -64,7 +66,12 @@ class OwnershipCreator
     @bike
   end
 
+  def current_is_hidden
+    @bike && @bike.user_hidden
+  end
+
   def create_ownership
+    @user_hidden = current_is_hidden
     mark_other_ownerships_not_current
     ownership = Ownership.new(new_ownership_params)
 

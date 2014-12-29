@@ -22,6 +22,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     'click #submit-manufacturer-update': 'submitManufacturerUpdate'
     'click #request-bike-delete':        'requestBikeDelete'
     'click .submit-bike-update':         'checkIfPhoneBlank'
+    'click #hide_bike_toggle':           'toggleBikeHidden'
     'change #mark_recovered_we_helped':  'toggleCanWeTell'
 
     
@@ -460,6 +461,10 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
   checkIfPhoneBlank: (e) ->
     unless $('#bike_stolen_records_attributes_0_phone').val().length > 0
       BikeIndex.alertMessage('error', 'Phone number required', "<p>A phone number is required for stolen listings. We want to be able to contact you if your bike is found!</p><p>Your phone number will be private unless you choose to show it in <em>Show phone number to</em></p>")
+
+  toggleBikeHidden: ->
+    $('#hide_bike_toggle_group input').prop('checked', true)
+    $('form.bikeedit-form-grab').submit()
       
   
   submitSerialUpdate: (e) ->

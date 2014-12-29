@@ -175,13 +175,27 @@
         .input-group
 
           %a.collapsed{ href: "#delete_bike", :data => { toggle: "collapse" } }
-            Delete this bike
+            Delete this #{@bike.type}
         #delete_bike.collapse
           .input-group
-            I would like to delete this bike
+            I would like to delete this #{@bike.type}
             .control-group.padded
-              %a.button-red{role: "button", title: "request bike deletion", :data => {toggle: "modal", target: "#requestBikeDelete"} }
-                Delete bike
+              %a.button-red{role: "button", title: "request #{@bike.type} deletion", :data => {toggle: "modal", target: "#requestBikeDelete"} }
+                Delete #{@bike.type}
+        .input-group
+          - hideAction = @bike.user_hidden ? "Un-hide" : "Hide"
+          %a.collapsed{ href: "#hide_bike_toggle_group", :data => { toggle: "collapse" } }
+            #{hideAction} this #{@bike.type}
+        #hide_bike_toggle_group.collapse
+          - if @bike.user_hidden
+            = f.hidden_field :marked_user_unhidden
+          - else
+            = f.hidden_field :marked_user_hidden
+          .input-group
+            I would like to hide this bike, because hidden bikes are a bummer
+            .control-group.padded
+              %a.button-red#hide_bike_toggle{role: "button", title: "Hide bike"}
+                = hideAction
 
       .edit-bike-fields
         %header

@@ -92,6 +92,19 @@ describe BikeUpdator do
       bike.description.should eq("something long")
     end
 
+    it "marks a bike user hidden" do 
+      organization = FactoryGirl.create(:organization)
+      bike = FactoryGirl.create(:bike, creation_organization_id: organization.id, verified: true, example: true)
+      ownership = FactoryGirl.create(:ownership, bike: bike)
+      user = ownership.creator
+      new_creator = FactoryGirl.create(:user)
+      bike.user_hidden.should be_false
+      bike_params = {marked_user_hidden: true}
+      BikeUpdator.new(user: user, b_params: {id: bike.id, bike: bike_params}).update_available_attributes
+      bike.reload.hidden.should be_true
+      bike.user_hidden.should be_true
+    end
+
     # it "should not let bikes that weren't created by an organization become non-stolen" do 
     it "Actually, for now, we let anyone mark anything not stolen" do 
       bike = FactoryGirl.create(:bike, stolen: true)
