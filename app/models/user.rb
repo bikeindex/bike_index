@@ -186,13 +186,18 @@ class User < ActiveRecord::Base
     self.organizations.shop.any?
   end
 
-  def bikes
-    Bike.unscoped.find(bike_ids)
+  def bikes(user_hidden=true)
+    Bike.unscoped.find(bike_ids(user_hidden))
   end
 
-  def bike_ids
-    ownerships.where(example: false).where(current: true)
-      .map{ |o| o.bike_id if o.user_hidden || o.bike }.reject(&:blank?)
+  def bike_ids(user_hidden=true)
+    ows = ownerships.where(example: false).where(current: true)
+    if user_hidden
+      ows = ows.map{ |o| o.bike_id if o.user_hidden || o.bike }
+    else
+      ows = ows.map{ |o| o.bike_id if o.bike }
+    end
+    ows.reject(&:blank?)
   end
 
   def current_subscription

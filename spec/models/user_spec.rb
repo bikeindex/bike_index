@@ -192,6 +192,12 @@ describe User do
       ownership.bike.update_attribute :hidden, true
       user.bike_ids.include?(ownership.bike.id).should be_true
     end
+    it "returns the user's bikes without hidden bikes if user_hidden" do
+      user = FactoryGirl.create(:user)
+      ownership = FactoryGirl.create(:ownership, owner_email: user.email, user_id: user.id, user_hidden: true)
+      ownership.bike.update_attribute :hidden, true
+      user.bike_ids(false).include?(ownership.bike.id).should be_false
+    end
   end
 
   describe :available_bike_tokens do

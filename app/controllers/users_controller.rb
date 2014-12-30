@@ -81,7 +81,7 @@ class UsersController < ApplicationController
         redirect_to user_home_url, notice: "Sorry, that user isn't sharing their bikes" and return
       end
     end
-    bikes = user.bikes
+    bikes = user.bikes(true)
     @bikes = BikeDecorator.decorate_collection(bikes)
   end
 
