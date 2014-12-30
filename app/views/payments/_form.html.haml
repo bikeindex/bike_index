@@ -16,31 +16,33 @@
         .donation
           %p
             $2.50
+    %li
+      %a.unselected.select-payment{ href: '#', data: {amount: 2500, label: 'Donate'}}
+        %h3
+          Awesome support
+        %hr
+        .perks
+          %p
+            Give us a hand up!
+            %br
+            (or 10 cups of coffee)
+        %hr
+        .donation
+          %p
+            $25.00
 
     %li
-      %a.active.select-payment{ href: '#', data: {amount: 399, subscription: 1, label: 'Subscribe', plan: "01"}}
+      %a.active.select-payment{ href: '#', data: {amount: 199, subscription: 1, label: 'Subscribe', plan: "01"}}
         %h3
           Monthly membership
         %hr
         .perks
           %p
-            We stop asking for money.
+            We stop asking for money (we haven't actually started asking yet - but we will sometime).
         %hr
         .donation
           %p
-            $3.99 per month
-    %li
-      %a.unselected.select-payment{ href: '#', data: {amount: 3999, label: 'Donate'}}
-        %h3
-          Year of membership
-        %hr
-        .perks
-          %p
-            Get a discount on a year of membership!
-        %hr
-        .donation
-          %p
-            $39.99
+            $1.99 per month
     %li
       %a.unselected.select-payment{ href: '#', data: {amount: 9999, label: 'Donate'}}
         %h3
@@ -64,6 +66,7 @@
         %hr
         .donation
           %input#arbitraty-amount.form-control{ type: 'number', value: 3.14, min: '0' }
+
   - stripe_form_hash = {id: 'stripe_form', data: {key: "#{ENV['STRIPE_PUBLISHABLE_KEY']}"}}
   - stripe_form_hash[:data][:email] = "#{current_user.email}" if current_user.present?
   = form_tag payments_path, stripe_form_hash do 

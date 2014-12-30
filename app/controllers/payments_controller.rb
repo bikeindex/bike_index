@@ -6,7 +6,7 @@ class PaymentsController < ApplicationController
 
   def create
     @amount = params[:stripe_amount]
-    @subscription = params[:stripe_subscription] || false
+    @subscription = params[:stripe_subscription] if params[:stripe_subscription].present?
     user = current_user || User.fuzzy_email_find(params[:stripe_email])
     email = params[:stripe_email].strip.downcase
     if user.present? && user.stripe_id.present?
@@ -47,11 +47,11 @@ class PaymentsController < ApplicationController
     payment = Payment.new(user_id: (user.id if user.present?),
       email: email,
       is_current: true,
-      is_recurring: @subscription,
       stripe_id: charge.id,
       first_payment_date: Time.at(charge_time).utc.to_datetime,
       amount: @amount
     )
+    payment.is_recurring = true if @subscription
     unless payment.save
       raise StandardError, "Unable to create a payment. #{payment.to_yaml}"
     end

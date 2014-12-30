@@ -60,7 +60,9 @@ describe PaymentsController do
       user = FactoryGirl.create(:user)
       opts = { stripe_token: token.id,
         stripe_amount: 4000,
-        stripe_email: user.email
+        stripe_email: user.email,
+        stripe_plan: '',
+        stripe_subscription: ''
       }
       lambda {
         post :create, opts
