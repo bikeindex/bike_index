@@ -330,10 +330,21 @@ describe BikesController do
       ownership = FactoryGirl.create(:ownership)
       user = ownership.creator
       set_current_user(user)
-      put :update, {id: ownership.bike.id, bike: {description: "69"}}
+      put :update, {id: ownership.bike.id, bike: {description: "69", marked_user_hidden: "0"}}
       ownership.bike.reload.description.should eq("69")
       response.should redirect_to bike_url(ownership.bike)
       assigns(:bike).should be_decorated
+      ownership.bike.hidden.should be_false
+    end
+
+    it "marks the bike unhidden" do 
+      ownership = FactoryGirl.create(:ownership)
+      ownership.bike.update_attribute :marked_user_hidden, '1'
+      ownership.bike.reload.hidden.should be_true
+      user = ownership.creator
+      set_current_user(user)
+      put :update, {id: ownership.bike.id, bike: {marked_user_unhidden: "true"}}
+      ownership.bike.hidden.should be_false
     end
 
     it "creates a new ownership if the email changes" do 

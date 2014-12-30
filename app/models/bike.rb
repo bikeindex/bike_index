@@ -239,10 +239,10 @@ class Bike < ActiveRecord::Base
 
   before_save :set_user_hidden
   def set_user_hidden
-    if marked_user_hidden
+    if marked_user_hidden.present? && marked_user_hidden.to_s != '0'
       self.hidden = true
       current_ownership.update_attribute :user_hidden, true unless current_ownership.user_hidden
-    elsif marked_user_unhidden
+    elsif marked_user_unhidden.present? && marked_user_unhidden.to_s != '0'
       self.hidden = false
       current_ownership.update_attribute :user_hidden, false if current_ownership.user_hidden 
     end

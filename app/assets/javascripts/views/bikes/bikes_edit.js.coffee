@@ -463,7 +463,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       BikeIndex.alertMessage('error', 'Phone number required', "<p>A phone number is required for stolen listings. We want to be able to contact you if your bike is found!</p><p>Your phone number will be private unless you choose to show it in <em>Show phone number to</em></p>")
 
   toggleBikeHidden: ->
-    $('#hide_bike_toggle_group input').prop('checked', true)
+    $('#hide_bike_toggle_group input').val('true')
     $('form.bikeedit-form-grab').submit()
       
   
