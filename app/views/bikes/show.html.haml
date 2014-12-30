@@ -3,6 +3,12 @@
 
 - elsif @bike.owner == current_user
   .show-bike-edit
+    - if @bike.user_hidden
+      %p
+        %strong
+          This bike is hidden.
+        
+        No one can see it but you
     %p
       - if @bike.current_owner_exists
         - if @bike.recovered
@@ -67,8 +73,6 @@
         - if @bike.frame_size_unit.present?
           - if @bike.frame_size_unit.match('ordinal')
             - size = size.upcase
-          - else
-            - size = "#{size} #{@bike.frame_size_unit}"
         = @bike.attr_list_item(size, 'Frame size')
       = @bike.attr_list_item(@bike.ass_name("frame_material"), 'Frame Material')
       = @bike.attr_list_item(@bike.ass_name("handlebar_type"), 'Handlebar type')

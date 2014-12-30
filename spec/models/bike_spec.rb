@@ -63,6 +63,33 @@ describe Bike do
     end
   end
 
+  describe :visible_by do 
+    it "shouldn't be visible to owner unless user hidden" do 
+      bike = Bike.new(hidden: true)
+      user = User.new
+      bike.stub(:owner).and_return(user)
+      bike.stub(:user_hidden).and_return(false)
+      bike.visible_by(user).should be_false
+    end
+    it "should be visible to owner" do 
+      bike = Bike.new(hidden: true)
+      user = User.new
+      bike.stub(:owner).and_return(user)
+      bike.stub(:user_hidden).and_return(true)
+      bike.visible_by(user).should be_true
+    end
+    it "should be visible to superuser" do 
+      bike = Bike.new(hidden: true)
+      user = User.new
+      user.superuser = true
+      bike.visible_by(user).should be_true
+    end
+    it "should be visible if not hidden" do 
+      bike = Bike.new
+      bike.visible_by.should be_true
+    end
+  end
+
   describe :attr_cache_search do
     it "finds bikes by attr cache" do
       bike = FactoryGirl.create(:bike)

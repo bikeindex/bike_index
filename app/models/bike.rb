@@ -190,6 +190,15 @@ class Bike < ActiveRecord::Base
     hidden && current_ownership && current_ownership.user_hidden
   end
 
+  def visible_by(user=nil)
+    return true unless hidden
+    if user.present?
+      return true if user.superuser
+      return true if owner == user && user_hidden
+    end
+    false
+  end
+
   def find_current_stolen_record
     self.stolen_records.last if self.stolen_records.any?
   end

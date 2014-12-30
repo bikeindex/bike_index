@@ -42,6 +42,17 @@ describe BikesController do
       it { should set_the_flash }
       it { should redirect_to root_url }
     end
+
+    describe "showing user-hidden bikes" do
+      it "responds with success" do 
+        user = FactoryGirl.create(:user)
+        ownership = FactoryGirl.create(:ownership, user: user, claimed: true)
+        ownership.bike.update_attributes(marked_user_hidden: 'true')
+        set_current_user(user)
+        get :show, id: ownership.bike_id
+        response.code.should eq('200')
+      end
+    end
   end
 
   describe :spokecard do
@@ -344,7 +355,7 @@ describe BikesController do
       user = ownership.creator
       set_current_user(user)
       put :update, {id: ownership.bike.id, bike: {marked_user_unhidden: "true"}}
-      ownership.bike.hidden.should be_false
+      ownership.bike.reload.hidden.should be_false
     end
 
     it "creates a new ownership if the email changes" do 

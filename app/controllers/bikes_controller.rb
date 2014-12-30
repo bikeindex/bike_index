@@ -208,8 +208,8 @@ protected
 
   def find_bike
     @bike = Bike.unscoped.find(params[:id])
-    if @bike.hidden
-      unless current_user.present? && current_user.superuser
+    if @bike.hidden 
+      unless current_user.present? && @bike.visible_by(current_user)
         flash[:error] = "Bike deleted"
         redirect_to root_url and return
       end
