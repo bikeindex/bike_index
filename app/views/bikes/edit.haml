@@ -192,10 +192,19 @@
           - else
             = f.hidden_field :marked_user_hidden
           .input-group
-            I would like to hide this bike, even though hidden bikes are a bummer
+            %p
+              %strong
+                Keeping your bike public is the best way to recover stolen bikes and deter theft.
+            %p
+              You can read more about why this is important to us in our #{link_to "FAQs", support_path(anchor: 'public-serials')}.
+            %p
+              We strongly recommend keeping your #{@bike.type} visible, but you can hide this #{@bike.type} so nobody but you can see it if you'd like. We don't think this is a good idea though.
+
             .control-group.padded
-              %a.button-red#hide_bike_toggle{role: "button", title: "Hide bike"}
+              - btnColor = @bike.user_hidden ? "button-green" : "button-red"              
+              %a#hide_bike_toggle{role: "button", title: "Hide bike", class: btnColor}
                 = hideAction
+                  
 
       .edit-bike-fields
         %header

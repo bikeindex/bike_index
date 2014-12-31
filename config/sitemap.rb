@@ -19,7 +19,7 @@ SitemapGenerator::Sitemap.create do
   group(filename: :news) do
     add '/blogs', priority: 0.9, changefreq: 'daily'
     Blog.published.each do |b|
-      add("/blogs/#{b.title_slug}", priority: 0.9, news: {
+      add("/news/#{b.title_slug}", priority: 0.9, news: {
           publication_name: "Bike Index Blog",
           publication_language: "en",
           title: b.title,

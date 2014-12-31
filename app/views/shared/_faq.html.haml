@@ -1,5 +1,5 @@
 %article
-  .faq-block
+  .faq-block#main-faq-block
     %h3
       Common issues & frequently asked questions
     %dl
@@ -80,23 +80,7 @@
           %p
             Bike Index is a comprehensive public database - if your bike was stolen, we think everyone should know about it.
           %p
-            Visit the #{link_to "stolen bikes page", stolen_bikes_url} to for more information, or #{link_to "add a stolen bike here", new_bike_url(stolen: true)}.  
-
-      %dt.collapse-faq
-        %a.collapsed{ href: "#what-about-privacy", data: { toggle: "collapse"} }
-          %span
-            &#x25B6;
-          What about my privacy?
-      %dd#what-about-privacy.collapse
-        %p
-          Your personal information is never viewed, shared or sold without your permission.
-        %p
-          Bikes are public and searchable, but no information about the owner is visible. You can choose to share information (such as your twitter or personal website) but this is turned off by default.
-        %p
-          To learn more check out 
-          = link_to "our blog post", "https://www.bikeindex.org/blogs/privacy-on-the-bike-index"
-          about privacy.
-      
+            Visit the #{link_to "stolen bikes page", stolen_bikes_url} to for more information, or #{link_to "add a stolen bike here", new_bike_url(stolen: true)}.        
       %dt.collapse-faq
         %a.collapsed{ href: "#does-this-prevent-theft", data: { toggle: "collapse"} }
           %span
@@ -141,3 +125,48 @@
           
           %p
             We decided to form a benefit corporation because we believe it's the best way to build an excellent service, be awesome, and fight bike theft.
+
+      %dt.collapse-faq
+        %a.collapsed{ href: "#used-for-evil", data: { toggle: "collapse"} }
+          %span
+            &#x25B6;
+          Is it possible for bike thieves to search Index to check if a bike is listed as stolen before they sell it?
+        %dd#used-for-evil.collapse
+          %p
+            It is possible, but not common. We track and flag suspect activities to prevent abuse of the Bike Index. 
+
+      %dt.collapse-faq
+        %a.collapsed{ href: "#what-about-privacy", data: { toggle: "collapse"} }
+          %span
+            &#x25B6;
+          What about my privacy?
+      %dd#what-about-privacy.collapse
+        %p
+          Your personal information is never viewed, shared or sold without your permission.
+        %p
+          Bikes are public and searchable, but no information about the owner is visible. You can choose to share information (such as your twitter or personal website) but this is turned off by default.
+        %p
+          To learn more check out 
+          = link_to "our article", "https://www.bikeindex.org/news/privacy-on-the-bike-index"
+          about privacy.
+
+      %dt.collapse-faq
+        %a.collapsed{ href: "#public-serials", data: { toggle: "collapse"} }
+          %span
+            &#x25B6;
+          Why are serial numbers and non-stolen bikes public?
+        %dd#public-serials.collapse
+          %p
+            %strong
+              We make serial numbers public because it's the best way to recover stolen bikes and deter theft.
+            The faster and easier it is to access serials, the more stolen bikes we recover. Restricting access to serial numbers only helps thieves.
+          %p
+            This isn't optimistic speculation: we've proved this and continue to do so with every stolen bike we recover.
+          %p
+            We've recovered bikes before they could even be marked stolen because they could be found on the Index.
+          %p
+            Other registries generally hide serials because of their technical limitations. They keep information away from those most likely to use it for good, even though #{link_to "security by obscurity", "https://en.wikipedia.org/wiki/Security_through_obscurity"} doesn't work.
+          %p
+            While serial numbers and bike information is public, there is nothing to connect users to the bikes they own. We never make user information available unless the user explicitly choses to do so.
+          %p
+            We care about your privacy more than anyone&mdash;you can hide your registration so nobody but you can see it. We just don't think this is a good idea.
