@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141224165646) do
+ActiveRecord::Schema.define(:version => 20141231170329) do
 
   create_table "ads", :force => true do |t|
     t.string   "title"
@@ -542,6 +542,19 @@ ActiveRecord::Schema.define(:version => 20141224165646) do
     t.datetime "updated_at",                    :null => false
     t.boolean  "standard"
   end
+
+  create_table "recovery_displays", :force => true do |t|
+    t.integer  "stolen_record_id"
+    t.text     "quote"
+    t.string   "quote_by"
+    t.datetime "date_recovered"
+    t.string   "link"
+    t.string   "image"
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
+  end
+
+  add_index "recovery_displays", ["stolen_record_id"], :name => "index_recovery_displays_on_stolen_record_id"
 
   create_table "states", :force => true do |t|
     t.string   "name"

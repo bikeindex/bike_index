@@ -6,6 +6,7 @@ describe StolenRecord do
     it { should validate_presence_of :bike }
     it { should validate_presence_of :date_stolen }
     it { should belong_to :bike }
+    it { should have_one :recovery_display }
     it { should belong_to :country }
     it { should belong_to :state }
     it { should belong_to :creation_organization }

@@ -1,13 +1,17 @@
-$testimonial-tri-size: 20px;
-.home-testimonial {
-  padding: 20px 0;
-  $bg: #fff;
-  $text-bg: $gray-lightest;
-  background: $bg;
+.testimonial-container {
+  width: 100%;
+  position: relative;
+}
+
+
+$testimonial-tri-size: 15px;
+$testimonial-text-bg: #fff;
+.testimonial-block {
+  @include clearfix;
   .testimonial-user {
     @include clearfix;
     position: relative;
-    margin: 0 $gutter 0 0;
+    margin: 0 0 0 $gutter;
     float: left;
   }
   img {
@@ -31,14 +35,8 @@ $testimonial-tri-size: 20px;
   h3, h4 { 
     float: left;
     text-align: right;
-    margin-right: $gutter*$row-width;
+    margin-left: $gutter*$row-width;
     width: 80%-$gutter*$row-width;        
-  }
-  &.testimonial-2 {
-    h3, h4 {
-      margin-left: $gutter*$row-width;
-      margin-right: 0; 
-    }
   }
 
   .testimonial-quote {
@@ -46,22 +44,19 @@ $testimonial-tri-size: 20px;
     position: relative;
     width: $nine-column;
     margin: 0;
-    background: $text-bg;
-    border-radius: 1px;
+    background: $testimonial-text-bg;
     padding: 1em;
     line-height: 1.3em;
-    border-radius: 0px 4px 4px 4px;
 
     &:before {
       content: "";
       height:0;
       width:0;
       // top: 1.5em;
-      top: 0;
-      left: -($testimonial-tri-size - 1px);
+      right: -($testimonial-tri-size - 1px);
       position: absolute;
       border-bottom: $testimonial-tri-size*1.5 solid transparent; 
-      border-right: $testimonial-tri-size solid $text-bg; 
+      border-left: $testimonial-tri-size solid $testimonial-text-bg; 
     }
     p {
       margin: 0;
@@ -70,36 +65,16 @@ $testimonial-tri-size: 20px;
   }
 }
 
-.testimonial-2 {
-  $bg: #fff;
-  $text-bg: $gray-lightest;
-  background: $bg;
-  .testimonial-quote {
-    background: $text-bg;  
-    margin: 0;
-    border-radius: 4px 0px 4px 4px;
-    &:before {
-      left: 100%;
-      border-right: none; 
-      border-left: $testimonial-tri-size solid $text-bg; 
-      // border-top: $testimonial-tri-size solid transparent; 
-    }
-  }
-  h3, h4 {
-    float: right;
-    text-align: left;
-  }
-  img { float: left; }
-  .testimonial-user { 
-    float: right; 
-    margin: 0 0 0 $gutter;
-  }
-}
+// .testimonial-block.active {
+//   display: block;
+//   @include clearfix;
+// }
 
-@media (min-width: $s-breakpoint) {
-  .home-testimonial {
+
+@media (min-width: $s-breakpoint+1) {
+  .testimonial-block {
     .testimonial-user {
-      width: $three-column;
+      width: $three-column - .5%;
       padding-top: .5em;
     }
     img {
@@ -113,33 +88,33 @@ $testimonial-tri-size: 20px;
     }
     .testimonial-quote {
       margin-top: 40px;
-      font-size: 20px; 
+      font-size: 18px; 
+      border-radius: 4px 0px 4px 4px;
+      &:before { top: 0; }
     }
   }
-  .testimonial-2 .testimonial-quote { float: left; }
 }
 
 @media (min-width: $l-breakpoint) {
-  .home-testimonial {
-    padding: 50px 0;
+  .testimonial-block {
     h3 { font-size: 24px; }
     h4 { font-size: 14px; }
     &.testmonial-2 { padding: 20px 0; }
-    .testimonial-user { width: $two-column; }   
+    .testimonial-user { width: $two-column - .5%; }   
     .testimonial-quote {
       width: $ten-column;
-      font-size: 22px; 
+      font-size: 20px; 
     }
   }
 }
 
 @media (max-width: $m-breakpoint) and (min-width: $s-breakpoint) {
- .home-testimonial {
+ .testimonial-block {
     .testimonial-user { 
       padding-top: 1em;
       padding-left: .5em;
     }
-    h4 span {
+    h4 .recovery-date {
       display: block; 
       margin-top: -.25em;
     }
@@ -147,11 +122,10 @@ $testimonial-tri-size: 20px;
 }
 
 @media (max-width: $s-breakpoint) {
-  .home-testimonial, .home-testimonial.testimonial-2 {
-    $text-bg: #fff;
+  .testimonial-block {
     .testimonial-user {
       width: 100%;
-      padding: 0 0 20px;
+      padding: 20px 0 0;
     }
     h3 { margin-top: 1em; }
     h3, h4 {
@@ -165,17 +139,15 @@ $testimonial-tri-size: 20px;
     .testimonial-quote {
       width: 100%;
       margin: 0;
+      position: relative;
+      border-radius: 4px 4px 0 4px;
       &:before {
-        left: 88%;
-        top: -$testimonial-tri-size;
-        border-right: $testimonial-tri-size solid transparent;; 
-        border-left: $testimonial-tri-size solid transparent; 
-        border-bottom: $testimonial-tri-size solid $gray-lightest; 
-        border-top: none;
+        right: 0;
+        bottom: -$testimonial-tri-size;
+        border-left: $testimonial-tri-size solid transparent;; 
+        border-bottom: $testimonial-tri-size*1.5 solid transparent; 
+        border-right: $testimonial-tri-size solid $testimonial-text-bg; 
       }
     }
-  }
-  .home-testimonial.testimonial-2 .testimonial-quote:before {
-    // border-bottom: $testimonial-tri-size solid #fff; 
   }
 }

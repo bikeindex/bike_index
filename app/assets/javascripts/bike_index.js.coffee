@@ -29,7 +29,7 @@ window.BikeIndex =
 $(document).ready ->
   view = new BikeIndex.Views.Global
   
-  if $('#home-title').length > 0
+  if $('#home_headies').length > 0
     view = new BikeIndex.Views.Home 
 
   else if $('#documentation-menu').length > 0

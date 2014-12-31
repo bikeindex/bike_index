@@ -71,6 +71,13 @@ label { cursor: pointer; }
 
 .less-strong { color: darken($grayMed, 5%); }
 
+input.less-strong {
+  border: none;
+  background: transparent;
+  font-size: .8em;
+  box-shadow: none;
+}
+
 .overflow-text { @include text-overflow();}
 
 .initially-hidden, .hidden, .hide {

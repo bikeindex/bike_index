@@ -55,6 +55,7 @@ en:
       short_with_year: "%a, %B %d %Y"
       no_day_with_year: "%B %d %Y"
       blog: "%m_%d_%Y"
+      dotted: "%m.%d.%Y"
   errors: &errors
     format: ! '%{attribute} %{message}'
     messages:

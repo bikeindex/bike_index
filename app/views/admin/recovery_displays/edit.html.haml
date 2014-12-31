@@ -1,0 +1,12 @@
+#admin-recoveries
+  %header.with-subtitle
+    %h1
+      Edit recovery
+    - if @bike.present?
+      %p
+        for #{link_to @bike.title_string.strip, edit_admin_bike_url(@bike)}, #{link_to "recovery", edit_admin_recovery_url(@recovery_display.stolen_record_id)}
+
+  .row-fluid
+    = render partial: "form"
+
+  = link_to "Delete recovery display", admin_recovery_display_url(@recovery_display), method: :delete, confirm: "Are you sure?", class: "button-red"

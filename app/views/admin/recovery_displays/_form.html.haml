@@ -1,0 +1,71 @@
+.form.form-horizontal#chosen-container
+  = form_for [:admin, @recovery_display] do |f|
+    - if @recovery_display.errors.any?
+      #alert-block
+        .alert.alert-error
+          %h4
+            Please fix the following 
+            = pluralize(@recovery_display.errors.count, "error")
+          %ul
+            - @recovery_display.errors.full_messages.each do |msg|
+              %li
+                = msg
+    - if @recovery_display.stolen_record_id.present?
+      = f.hidden_field :stolen_record_id, value: @recovery_display.stolen_record_id
+    .well.clearfix
+      .span6
+        .control-group
+          = f.label :quote_by, class: "control-label"
+          .controls
+            = f.text_field :quote_by
+        .control-group
+          = f.label :link, class: "control-label"
+          .controls
+            = f.text_field :link
+        - if @bike.present?
+          .control-group.extra-field
+            %label.control-label
+              Bike url
+            .controls
+              %input.less-strong{ type: 'text', value: bike_url(@recovery_display.bike) }
+              
+      .span6
+        .control-group
+          = f.label :date_input, class: "control-label"
+          .controls
+            - date = @recovery_display.date_recovered || Time.now
+            = f.text_field :date_input, value: date.strftime("%m-%d-%Y")
+        .control-group.avatar-upload
+          = f.label :image, "Component type avatar", class: "control-label"
+          .controls
+            .avatar-img
+              - if @recovery_display.image?
+                = image_tag(@recovery_display.image_url(:thumb))
+              - else
+                %p
+                  No picture!
+            = f.file_field :image
+        - if @bike.present? && @recovery_display.image.blank?
+          .control-group.extra-field
+            - if @bike.public_images.present? || @bike.stock_photo_url.present?
+              - if @bike.public_images.present?
+                - text = "has image"
+                - url = @bike.public_images.first.image_url
+              - else
+                - text = "has stock image"
+                - url = @bike.stock_photo_url
+              %label.control-label
+                #{link_to "Bike", bike_url(@bike), target: "_blank"} #{text}
+              .controls
+                %a.btn.btn-default#use_image_for_display{ href: '#', data: {url: url}}
+                  Use first image
+                = f.hidden_field :remote_image_url
+            - else
+              .controls
+                Bike has no image
+    .blog-field.padded
+      = f.text_area :quote, placeholder: 'Quote about recovery', rows: 4
+    .clearfix
+      .padded
+        = f.submit 'Save', class: 'button-green pull-right'
+  

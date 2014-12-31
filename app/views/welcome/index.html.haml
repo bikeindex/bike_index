@@ -1,33 +1,56 @@
-.container.home-header
-  %h1
-    Bike Registration
-    %span
-      that Works
-  %h3
-    = number_with_delimiter(Bike.count)
-    bikes registered. Over
-    = number_with_delimiter(StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count)
-    stolen bikes recovered.
-- cache 'index_home' do 
-  .wheeled
-    .register-container
-      = link_to "Register a bike", choose_registration_path, class: "btn binxbtn binxbtn-lg"
-    .wheel-holder
-      = image_tag "/assets/updated/home/wheel_white.png", id: 'wheeled_wheel'
+- cache 'index_home_head' do 
+  .container.home-header#home_headies
+    %h1
+      Bike Registration
+      %span
+        that Works
+    .testimonial-container
+      - recoveries = RecoveryDisplay.limit(10)
+      - recoveries.each_with_index do |recovery, i|
+        .testimonial-block{class: "testimonial-#{recovery.id}"}
+          .testimonial-quote
+            %p
+              = recovery.quote
+          .testimonial-user
+            - if recovery.image_url.present?
+              = image_tag recovery.image_url(:medium)
+            - if recovery.quote_by
+              %h3
+                = recovery.quote_by
+            %h4
+              - if recovery.bike.present?
+                = recovery.bike.type
+              - else
+                bike
+              - txt = "recovered #{l recovery.date_recovered, format: :dotted}"
+              - if recovery.link.present?
+                %a.recover-date{href: recovery.link}
+                  = txt
+              - else
+                %span.recover-date
+                  = txt
+                
+    .wheeled
+      .register-container
+        = link_to "Register a bike", choose_registration_path, class: "btn binxbtn binxbtn-lg"
+      .wheel-holder
+        = image_tag "/assets/updated/home/wheel_white.png", id: 'wheeled_wheel'
 
-  .home-subhead
-    .container
-      %h2
-        Help us fight bicycle theft &mdash; one registration at a time.
-      
-      %h3
-        The Bike Index makes stolen bikes harder to sell and easier to recover by making sure important information about your bike is there when you need it the most.
-      %h3
-        The process is simple, secure, and free. 
-        %a.scroll-to-ref{ href: "#how_it_works" }
-          Learn more
-        or
-        = link_to "register your bike now!", choose_registration_path
+.home-subhead
+  .container
+    %h2
+      Help us fight bicycle theft &mdash; one registration at a time.
+    
+    %h3
+      The Bike Index makes stolen bikes harder to sell and easier to recover by making sure important information about your bike is there when you need it the most.
+    %h3
+      So far we've registered #{number_with_delimiter(Bike.count)} bikes and recovered over #{number_with_delimiter(StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count)} stolen bikes.
+    %h3
+      The process is simple, secure, and free. 
+      %a.scroll-to-ref{ href: "#how_it_works" }
+        Learn more
+      or #{link_to "register your bike now", choose_registration_path}.
+- cache 'index_home' do 
   .info-blocks
     .container
       %article
@@ -51,21 +74,6 @@
         %p
           Bike Index is a free service for bike shops and individuals.
 
-  .home-testimonial.testimonial-2
-    .container
-      .testimonial-user
-        = image_tag "/assets/updated/home/recovery_testimonial_3.png"
-        %h3
-          Dharma Indurthy
-        %h4
-          Bike
-          %span
-            recovered 11.2014
-
-      .testimonial-quote
-        %p
-          I recovered my bike thanks to the Bike Index &mdash; a Good Samaritan saw it being ridden, got a weird feeling, and offered to buy it. He checked the Index, confirmed it was stolen, got in touch with me, and returned it to me.
-
   .how-it-works#how_it_works
     .container
       %h2
@@ -80,20 +88,6 @@
         = link_to "Learn more", how_it_works_url
 
     
-  .home-testimonial
-    .container
-      .testimonial-user
-        = image_tag "/assets/updated/home/recovery_testimonial_2.png"
-        %h3
-          Eva Linh
-        %h4
-          Bike
-          %span
-            recovered Fall 2014
-
-      .testimonial-quote
-        %p
-          Someone found my bike abandoned by a tree, ran my bike's serial number on the Bike Index, found my contact info and returned it to me. It was stolen a little over a month ago and I still can't believe I got it back!
   .bike-background
     .supporters
       .container

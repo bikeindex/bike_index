@@ -1,0 +1,34 @@
+%section.full-screen-table
+  %header.with-subtitle
+    %h1
+      Recoveries to display
+    = link_to "New recovery display", new_admin_recovery_display_url, class: "button-green sharing-links"
+  %p 
+    Displaying #{pluralize(@recovery_displays.count, "recovery")}.
+
+  %table.table.table-striped.table-bordered.padded
+    %thead
+      %th
+        Date
+      %th
+        Quote
+      %th.large-screens
+        Quoter
+      %th
+        image?
+      %th.large-screens
+        Association?
+    %tbody
+      - @recovery_displays.each do |recovery_display|
+        %tr
+          %td
+            - date = l recovery_display.date_recovered, format: :dotted
+            = link_to date, edit_admin_recovery_display_url(recovery_display)
+          %td
+            = truncate(recovery_display.quote, length: 70)
+          %td.large-screens
+            = recovery_display.quote_by
+          %td
+            = "&#x2713;".html_safe if recovery_display.image?
+          %td.large-screens
+            = "&#x2713;".html_safe if recovery_display.stolen_record_id.present?

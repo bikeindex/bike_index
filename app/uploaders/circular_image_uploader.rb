@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-class ListicleImageUploader < CarrierWave::Uploader::Base
+class CircularImageUploader < CarrierWave::Uploader::Base
   include ::CarrierWave::Backgrounder::Delay
   include CarrierWave::MiniMagick
   # Include the Sprockets helpers for Rails 3.1+ asset pipeline compatibility:
@@ -32,19 +32,25 @@ class ListicleImageUploader < CarrierWave::Uploader::Base
     "uploads/#{model.class.to_s[0, 2]}"
   end
 
-  process :fix_exif_rotation
-  process :strip # Remove EXIF data, because we don't need it
-
-  version :at_width do
-    process resize_to_fit: [726, 10000]
+  def filename
+    "recovery_#{model.id}.png"
   end
 
-  version :large, :from_version => :at_width do
-    process :crop
+
+  process :fix_exif_rotation
+  process :strip # Remove EXIF data, because we don't need it
+  process :convert => 'jpg'
+  
+  # def default_url
+  #   'https://s3.amazonaws.com/bikeindex/blank.png'
+  # end  
+
+  version :large do
+    process :round_image
   end
 
   version :medium, :from_version => :large do
-    process resize_to_fill: [260, 260]
+    process resize_to_fill: [400, 400]
   end
 
   version :thumb, :from_version => :medium do
@@ -55,16 +61,29 @@ class ListicleImageUploader < CarrierWave::Uploader::Base
     %w(jpg jpeg gif png tiff tif)
   end
 
-  def crop
-    # resize_to_fit(726, 10000)
+  def round_image
     manipulate! do |img|
-      x = 0
-      y = model.crop_top_offset.to_i
-      w = 726
-      h = 450
-      img.crop "#{w}x#{h}+#{x}+#{y}"
-      img
+
+      path = img.path
+
+      new_tmp_path = File.join(Rails.root, 'tmp/uploads', "/round_#{File.basename(path)}")
+
+      width, height = img[:dimensions]
+
+      radius_point = ((width > height) ? [width / 2, height] : [width, height / 2]).join(',')
+
+      imagemagick_command = ['convert',
+                           "-size #{ width }x#{ height }",
+                           'xc:transparent',
+                           "-fill #{ path }",
+                           "-draw 'circle #{ width / 2 },#{ height / 2 } #{ radius_point }'",
+                           "+repage #{new_tmp_path}"].join(' ')
+
+      system(imagemagick_command)
+      MiniMagick::Image.open(new_tmp_path)
     end
   end
+
+
 
 end

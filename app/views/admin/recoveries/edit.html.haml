@@ -15,13 +15,17 @@
     = @bike.dl_from_attribute("cached_data")
   .dl-holder
     %h2
-      - if @recovery.recovery_posted
-      
-        Recovery posted
-      - elsif @recovery.can_share_recovery == true
-        = link_to 'Share recovery', approve_admin_recoveries_url(id: @recovery.id), method: :post, confirm: "Approval will\n\n- Send out a tweet\n- And post to facebook.\n- It can NOT be effectively reversed\n", class: 'button-blue padded'
+      - if @recovery.recovery_display.present?
+        Recovery displayed
       - else
-        = link_to 'Post recovery (no share)', approve_admin_recoveries_url(id: @recovery.id), method: :post, class: 'button-blue padded'
+        = link_to 'Display recovery', new_admin_recovery_display_url(stolen_record_id: @recovery.id), class: 'button-blue padded'        
+        - if @recovery.recovery_posted
+          Recovery posted
+
+        / - elsif @recovery.can_share_recovery == true
+        /   = link_to 'Share recovery', approve_admin_recoveries_url(id: @recovery.id), method: :post, confirm: "Approval will\n\n- Send out a tweet\n- And post to facebook.\n- It can NOT be effectively reversed\n", class: 'button-blue padded'
+        / - else
+        /   = link_to 'Post recovery (no share)', approve_admin_recoveries_url(id: @recovery.id), method: :post, class: 'button-blue padded'
 
 %hr
 - url = {action: "update", controller: "recoveries"}
