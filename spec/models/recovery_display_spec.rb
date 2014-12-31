@@ -36,7 +36,7 @@ describe RecoveryDisplay do
       recovery_display = RecoveryDisplay.new
       recovery_display.from_stolen_record(stolen_record.id)
       recovery_display.quote.should eq('stuff')
-      recovery_display.date_recovered.should eq(t)
+      recovery_display.date_recovered.should be > Time.now - 5.seconds
       recovery_display.stolen_record_id.should eq(stolen_record.id)
     end
     it "sets name from stolen record" do 

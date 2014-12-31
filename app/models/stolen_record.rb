@@ -44,6 +44,7 @@ class StolenRecord < ActiveRecord::Base
   default_scope where(current: true)
 
   scope :recovered, unscoped.where(current: false).order("date_recovered desc")
+  scope :displayable, unscoped.where(current: false, can_share_recovery: true).order("date_recovered desc")
   scope :recovery_unposted, unscoped.where(
     current: false,
     recovery_posted: false

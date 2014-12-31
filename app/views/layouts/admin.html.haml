@@ -35,6 +35,8 @@
         %li
           = admin_nav_link "Stolen", admin_stolen_bikes_url
         %li
+          = admin_nav_link "Recoveries", admin_recoveries_url
+        %li
           = admin_nav_link "Recovery displays", admin_recovery_displays_url
     - elsif current_user.is_content_admin?
       %h2.new-title 

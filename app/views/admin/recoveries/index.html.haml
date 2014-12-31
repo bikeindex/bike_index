@@ -1,10 +1,16 @@
 %header.with-subtitle#admin-recoveries
   %h1
     Recoveries
-  - if @posted
-    = link_to 'Only unposted', admin_recoveries_url, class: "sharing-links"
+    - unless @all_recoveries
+      that can be displayed
+    
+  / - if @posted
+  /   = link_to 'Only unposted', admin_recoveries_url, class: "sharing-links"
+  - if @all_recoveries
+    = link_to 'Only displayable', admin_recoveries_url, class: "sharing-links"
   - else
-    = link_to 'All recoveries (including posted)', admin_recoveries_url(posted: true), class: "sharing-links"
+    = link_to 'All recoveries', admin_recoveries_url(all_recoveries: true), class: "sharing-links"
+
 
 %h4
   = StolenRecord.recovered.count

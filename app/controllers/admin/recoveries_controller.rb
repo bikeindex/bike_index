@@ -3,8 +3,10 @@ class Admin::RecoveriesController < Admin::BaseController
     if params[:posted]
       @posted = true
       recoveries = StolenRecord.recovery_unposted.includes(:bike).order("created_at desc")
-    else
+    elsif params[:all_recoveries]
       recoveries = StolenRecord.recovered.includes(:bike).order("created_at desc")
+    else 
+      recoveries = StolenRecord.displayable.includes(:bike).order("created_at desc")
     end
     page = params[:page] || 1
     per_page = params[:per_page] || 50

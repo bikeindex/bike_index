@@ -13,6 +13,10 @@
     = @bike.dl_from_attribute("owner_email")
     = @bike.dl_list_item(@bike.owner.email, "Current Owner")
     = @bike.dl_from_attribute("cached_data")
+    %dt
+      Location
+    %dd
+      = @recovery.address
   .dl-holder
     %h2
       - if @recovery.recovery_display.present?
