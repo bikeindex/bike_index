@@ -10,7 +10,7 @@
         .testimonial-block{class: "testimonial-#{recovery.id}"}
           .testimonial-quote
             %p
-              = recovery.quote
+              = recovery.quote.html_safe
           .testimonial-user
             - if recovery.image.present?
               = image_tag recovery.image_url(:medium)
