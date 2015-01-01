@@ -24,9 +24,9 @@
 %section.full-screen-table
   = form_tag approve_admin_recoveries_path, class: '', id: 'multi_check' do
     = hidden_field_tag :multipost, true
-    - unless @posted
-      .clearfix#multiapprove_submit
-        = submit_tag 'Post checked recoveries', class: 'button-blue pull-right'
+    / - unless @posted
+    /   .clearfix#multiapprove_submit
+    /     = submit_tag 'Post checked recoveries', class: 'button-blue pull-right'
     %table.table.table-striped.table-bordered
       %thead
         - unless @posted

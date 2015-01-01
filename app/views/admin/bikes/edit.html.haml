@@ -182,6 +182,8 @@
         Current?
       %th
         Claimed?
+      %th
+        User hidden
     %tbody
       - @bike.ownerships.each do |ownership|
         %tr
@@ -212,4 +214,6 @@
             = "&#x2713;".html_safe if ownership.current
           %td.table-cell-check
             = "&#x2713;".html_safe if ownership.claimed
+          %td.table-cell-check
+            = "&#x2713;".html_safe if ownership.user_hidden
 

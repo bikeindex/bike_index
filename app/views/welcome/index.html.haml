@@ -12,23 +12,21 @@
             %p
               = recovery.quote
           .testimonial-user
-            - if recovery.image_url.present?
+            - if recovery.image.present?
               = image_tag recovery.image_url(:medium)
+            - else
+              %span.no-image-spacer
             - if recovery.quote_by
               %h3
                 = recovery.quote_by
             %h4
-              - if recovery.bike.present?
-                = recovery.bike.type
-              - else
-                bike
-              - txt = "recovered #{l recovery.date_recovered, format: :dotted}"
+              - txt = recovery.bike.present? ? recovery.bike.type.titleize : 'Bike'
+              - txt += " <span class='recover-date'>recovered #{l recovery.date_recovered, format: :dotted}</span>"
               - if recovery.link.present?
                 %a.recover-date{href: recovery.link}
-                  = txt
+                  = txt.html_safe
               - else
-                %span.recover-date
-                  = txt
+                = txt.html_safe
                 
     .wheeled
       .register-container

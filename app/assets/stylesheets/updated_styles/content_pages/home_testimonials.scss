@@ -65,17 +65,16 @@ $testimonial-text-bg: #fff;
   }
 }
 
-// .testimonial-block.active {
-//   display: block;
-//   @include clearfix;
-// }
-
-
 @media (min-width: $s-breakpoint+1) {
   .testimonial-block {
     .testimonial-user {
       width: $three-column - .5%;
       padding-top: .5em;
+    }
+    .no-image-spacer {
+      display: block;
+      width: 100%;
+      padding: 10px;
     }
     img {
       width: 100%;
@@ -126,6 +125,7 @@ $testimonial-text-bg: #fff;
     .testimonial-user {
       width: 100%;
       padding: 20px 0 0;
+      margin-left: 0;
     }
     h3 { margin-top: 1em; }
     h3, h4 {

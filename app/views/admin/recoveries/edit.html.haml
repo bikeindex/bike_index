@@ -20,7 +20,7 @@
   .dl-holder
     %h2
       - if @recovery.recovery_display.present?
-        Recovery displayed
+        = link_to "Recovery displayed", edit_admin_recovery_display_url(@recovery.recovery_display)
       - else
         = link_to 'Display recovery', new_admin_recovery_display_url(stolen_record_id: @recovery.id), class: 'button-blue padded'        
         - if @recovery.recovery_posted
