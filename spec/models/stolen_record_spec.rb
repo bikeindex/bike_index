@@ -105,7 +105,7 @@ describe StolenRecord do
       next_year = (Time.now + 2.months)
       stolen_record.date_stolen = next_year
       stolen_record.fix_date
-      stolen_record.date_stolen.year.should eq(2013)
+      stolen_record.date_stolen.year.should eq(Time.now.year - 1)
     end
 
     it "has before_save_callback_method defined as a before_save callback" do

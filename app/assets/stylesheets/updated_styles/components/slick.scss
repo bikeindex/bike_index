@@ -178,7 +178,6 @@ $slick-opacity-not-active: .25 !default;
 
     &.slick-disabled {
         opacity: 0;
-        // opacity: $slick-opacity-not-active;
     }
 }
 @media (min-width: $m-breakpoint) {
