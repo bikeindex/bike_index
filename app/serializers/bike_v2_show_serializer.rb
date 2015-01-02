@@ -11,8 +11,7 @@ class BikeV2ShowSerializer < BikeV2Serializer
     :description,
     :rear_tire_narrow,
     :front_tire_narrow,
-    :type_of_cycle,
-    :images
+    :type_of_cycle
 
   has_one :rear_wheel_size,
     :front_wheel_size,
@@ -22,11 +21,7 @@ class BikeV2ShowSerializer < BikeV2Serializer
     :rear_gear_type,
     :stolen_record
 
-  has_many :components
-
-  def images
-    object.public_images
-  end
+  has_many :public_images, :components
   
   def type_of_cycle
     object.cycle_type.name
@@ -50,16 +45,6 @@ class BikeV2ShowSerializer < BikeV2Serializer
 
   def stolen_record
     object.current_stolen_record if object.current_stolen_record.present?
-  end
-
-  def photo
-    if object.public_images.present?
-      object.public_images.first.image_url(:large)
-    elsif object.stock_photo_url.present?
-      object.stock_photo_url
-    else
-      nil
-    end    
   end
 
 end
