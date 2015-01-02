@@ -2,6 +2,7 @@ module API
   module V2
     class Root < Dispatch
       format :json
+      mount API::V2::Me
       mount API::V2::Users
       mount API::V2::Bikes
       mount API::V2::Manufacturers

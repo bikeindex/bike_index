@@ -1,9 +1,9 @@
 module API
   module V2
-    class Users < API::V2::Root
+    class Me < API::V2::Root
       include API::V2::Defaults
 
-      resource :users do
+      resource :me do
         helpers do 
           def user_info
             {
@@ -42,7 +42,7 @@ module API
 
           NOTE
         }
-        get '/current', hidden: true do
+        get '/' do
           result = {
             id: current_user.id.to_s
           }
@@ -60,8 +60,8 @@ module API
 
           NOTE
         }
-        get '/current/bikes', scopes: [:read_bikes], hidden: true, each_serializer: BikeV2Serializer do
-          Bike.where('id in (?)', bike_ids)        
+        get '/bikes', scopes: [:read_bikes], each_serializer: BikeV2Serializer, root: 'bikes' do
+          current_user.bikes
         end
       
       end
