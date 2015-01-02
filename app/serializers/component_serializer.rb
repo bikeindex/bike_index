@@ -1,5 +1,7 @@
 class ComponentSerializer < ActiveModel::Serializer
-  attributes :component_type,
+  attributes :description,
+    :serial_number,
+    :component_type,
     :component_group,
     :rear,
     :front,

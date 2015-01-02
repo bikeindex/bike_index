@@ -33,19 +33,6 @@ describe Component do
       component = FactoryGirl.create(:component, bike: bike,  front_or_rear: "both")
       bike.reload.components.count.should eq(2)
     end
-    # it "should return an array even if front_or_rear isn't there" do 
-    #   ctype = FactoryGirl.create(:ctype, name: "Stuff")
-    #   c = { year: 999 }
-    #   components = ComponentCreator.new().set_duplicate(c)
-    #   components[0][:year].should eq(999)
-    # end
-    # it "should create a second component if front_or_rear is both" do 
-    #   ctype = FactoryGirl.create(:ctype, name: "Stuff")
-    #   c = { front_or_rear: "Both" }
-    #   components = ComponentCreator.new().set_duplicate(c)
-    #   components[0][:front].should be_true
-    #   components[1][:rear].should be_true
-    # end
   end
 
   describe :manufacturer_name do 
