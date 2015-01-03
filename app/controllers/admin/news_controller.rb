@@ -1,12 +1,16 @@
 class Admin::NewsController < Admin::BaseController
   before_filter :find_blog, only: [:show, :edit, :update, :destroy]
+  before_filter :set_dignified_name
 
   def index
     @blogs = Blog.order("created_at asc")
   end
 
   def new
-    @blog = Blog.new(published_at: Time.now, user_id: current_user.id)
+    @blog = Blog.new(published_at: Time.now,
+      user_id: current_user.id,
+      is_listicle: current_user.is_content_admin
+    )
     @users = User.all
   end
 
@@ -63,6 +67,11 @@ class Admin::NewsController < Admin::BaseController
   end
 
   protected
+
+  def set_dignified_name
+    @dignified_name = "short form creative non-fiction"
+    @dignified_name = "collection of vignettes" if @blog && @blog.is_listicle
+  end
 
   def find_blog
     @blog = Blog.find_by_title_slug(params[:id])

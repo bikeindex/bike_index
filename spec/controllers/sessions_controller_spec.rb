@@ -37,6 +37,15 @@ describe SessionsController do
           response.should redirect_to user_home_url
         end
 
+        it "authenticates and redirects to admin" do
+          @user.update_attribute :is_content_admin, true
+          @user.should_receive(:authenticate).and_return(true)
+          request.env["HTTP_REFERER"] = user_home_url
+          post :create, session: {}
+          cookies.signed[:auth][1].should eq(@user.auth_token)
+          response.should redirect_to admin_news_index_url
+        end
+
         it "redirects to return_to if it's a valid oauth url" do
           @user.should_receive(:authenticate).and_return(true)
           session[:return_to] = oauth_authorization_url(cool_thing: true)

@@ -1,5 +1,5 @@
 class UserSerializer < ActiveModel::Serializer
-  attributes :user_present, :is_superuser, :email
+  attributes :user_present, :is_superuser, :is_content_admin, :email
   has_many :memberships
 
   def user_present

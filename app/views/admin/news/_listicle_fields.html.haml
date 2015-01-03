@@ -15,7 +15,7 @@
       .list-order
         %span
           Order
-        = f.number_field :list_order, placeholder: '1', class: 'form-control'
+        = f.number_field :list_order, placeholder: '1', min: 0, class: 'form-control'
         %span.current-count
     = f.hidden_field :_destroy, class: 'remove-listicle-block'
     %a.remove_fields

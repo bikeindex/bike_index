@@ -1,17 +1,37 @@
 %header.with-subtitle
   %h1
-    Our blogs
+    Our #{@dignified_name}
   = link_to 'New Blog', new_admin_news_url, class: "button-green sharing-links"
 
-%hr
-
-- @blogs.each do |blog|
-  %h2
-    = link_to blog.title, edit_admin_news_url(blog)
-  %p.blog-index
-    - if blog.listicles.present?
-      = blog.listicles.first.title
-    - else
-      = blog.body_abbr.html_safe
-
-  %hr
+%section.full-screen-table
+  %table.table.table-striped.table-bordered
+    %thead
+      %th.medium-screens
+        Date
+      %th.medium-screens
+        Creator
+      %th
+        Content
+      %th.medium-screens
+        Vignettes
+      %th
+        Published
+    %tbody
+      - @blogs.each do |blog|
+        %tr
+          %td.medium-screens
+            = l blog.published_at, format: :dotted
+          %td.medium-screens
+            = blog.user.name || blog.user.email
+          %td
+            %p.blog-index
+              = link_to blog.title, edit_admin_news_url(blog)
+              %br
+              - if blog.listicles.present?
+                = blog.listicles.first.title
+              - else
+                = blog.body_abbr.html_safe
+          %td
+            = "&#x2713;".html_safe if blog.is_listicle
+          %td
+            = "&#x2713;".html_safe if blog.published

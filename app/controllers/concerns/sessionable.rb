@@ -21,11 +21,7 @@ module Sessionable
       end
     end
 
-    if @user.superuser
-      redirect_to admin_root_url, notice: "Logged in!" and return
-    else
-      redirect_to user_home_url, notice: "Logged in!" and return
-    end
+    redirect_to user_root_url, notice: "Logged in!" and return
   end
 
   protected

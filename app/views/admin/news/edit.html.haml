@@ -1,6 +1,6 @@
 %header.with-subtitle#blog-edit
   %h1
-    Editing that blog!
+    Editing that #{@dignified_name}!
   %p
     = link_to "Back to all", admin_news_index_url
 
@@ -26,16 +26,52 @@
         = render partial: "form", locals: { f: f }
 
 
-      .blog-final-actions
+      .blog-final-actions.row-fluid
         .well
-          .control-group.chosen-select
-            %label.control-label
-              Author email
-            .controls
-              = f.email_field :user_email, placeholder: 'your email', required: true, value: @blog.user.email
-              - user = User.fuzzy_email_find(@blog.user.email)
-              - unless user.present? && user.show_bikes
-                Please #{link_to "turn on your personal page", my_account_url, target: '_blank'}!
+          .span6
+            .control-group
+              %label.control-label
+                Published date 
+              .controls.radio-controls
+                %label.checkbox
+                  = f.check_box :post_now
+                  Publish now
+              .controls.extra-field
+                = @blog.published_at.strftime("%m-%d-%Y")
+                
+                %a#change_published_date{ href: "#", data: {date: "#{@blog.published_at.strftime("%m-%d-%Y")}" }}
+                  edit
+
+            .control-group#blog-date.datepicker-container.initially-hidden
+              = label :post_date, "Post date", class: "control-label"
+              .controls
+                #post-date-field
+                  = f.text_field :post_date
+
+            .control-group
+              = f.label :published, "Published", class: "control-label"
+              .controls
+                = f.check_box :published
+            .control-group.chosen-select
+              %label.control-label
+                Author email
+              .controls
+                = f.email_field :user_email, placeholder: 'your email', required: true, value: @blog.user.email
+                - user = User.fuzzy_email_find(@blog.user.email)
+                - unless user.present? && user.show_bikes
+                  Please #{link_to "turn on your personal page", my_account_url, target: '_blank'}!
+          .span6
+            .control-group.tags
+              = f.label :tags, "Tags, should include a main category: Tech, Design, or Update", class: "control-label"
+              .controls
+                = f.text_area :tags, placeholder: "Separate tags with commas"
+              .control-group
+                = f.label :update_title, "Update URL", class: "control-label"
+                .controls
+                  = f.check_box :update_title
+                  %span.this-will-break-links
+                    This will break existing links!
+          
 
           .blog-field
             = f.text_field :title, placeholder: "Blog title"

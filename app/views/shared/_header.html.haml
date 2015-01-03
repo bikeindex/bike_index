@@ -39,8 +39,8 @@
         var links, membership, tab, _i, _len, _ref;
         if (data["user_present"]) {
           $('#total-top-header .yes_user').removeClass('hidden');
-          if (data["is_superuser"]) {
-            $('#total-top-header .super_user').removeClass('hidden');
+          if (data["is_superuser"] || data['is_content_admin']) {
+            $("#total-top-header .super_user").removeClass("hidden");
           }
           if (_.isArray(data["memberships"])) {
             _ref = data["memberships"];
