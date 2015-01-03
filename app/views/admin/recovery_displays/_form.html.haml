@@ -36,7 +36,7 @@
             - date = @recovery_display.date_recovered || Time.now
             = f.text_field :date_input, value: date.strftime("%m-%d-%Y")
         .control-group.avatar-upload
-          = f.label :image, "Component type avatar", class: "control-label"
+          = f.label :image, "Recovery photo", class: "control-label"
           .controls
             .avatar-img
               - if @recovery_display.image?
