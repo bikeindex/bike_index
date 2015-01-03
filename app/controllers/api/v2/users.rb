@@ -60,8 +60,8 @@ module API
 
           NOTE
         }
-        get '/current/bikes', scopes: [:read_bikes], hidden: true, each_serializer: BikeV2Serializer do
-          Bike.where('id in (?)', bike_ids)        
+        get '/current/bikes', scopes: [:read_bikes], hidden: true, each_serializer: BikeV2Serializer, root: 'bikes' do
+          current_user.bikes
         end
       
       end

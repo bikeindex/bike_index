@@ -63,7 +63,8 @@ describe 'Users API V2' do
       @token.update_attribute :scopes, 'read_bikes'
       get '/api/v2/users/current/bikes', :format => :json, :access_token => @token.token
       # get '/api/v2/users/current/bikes', {}, 'Authorization' => "Basic #{Base64.encode64("#{@token.token}:X")}"
-      JSON.parse(response.body)['bikes'].kind_of?(Array).should be_true
+      result = JSON.parse(response.body)
+      result['bikes'].kind_of?(Array).should be_true
       response.response_code.should eq(200)
     end
     it "403s if read_bikes_spec isn't in token" do 
