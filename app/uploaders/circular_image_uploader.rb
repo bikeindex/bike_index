@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 class CircularImageUploader < CarrierWave::Uploader::Base
-  # include ::CarrierWave::Backgrounder::Delay
+  include ::CarrierWave::Backgrounder::Delay
   include CarrierWave::MiniMagick
   # Include the Sprockets helpers for Rails 3.1+ asset pipeline compatibility:
   include Sprockets::Helpers::RailsHelper

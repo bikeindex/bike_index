@@ -45,7 +45,12 @@
                 %p
                   No picture!
             = f.file_field :image
-        - if @bike.present? && @recovery_display.image.blank?
+        - if @recovery_display.image.present?
+          .control-group
+            = f.label :remove_image, class: "control-label"
+            .controls
+              = f.check_box :remove_image
+        - elsif @bike.present? && @recovery_display.image.blank?
           .control-group.extra-field
             - if @bike.public_images.present? || @bike.stock_photo_url.present?
               - if @bike.public_images.present?

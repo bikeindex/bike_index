@@ -6,11 +6,12 @@ class RecoveryDisplay < ActiveRecord::Base
     :link,
     :image,
     :remote_image_url,
-    :date_input
+    :date_input,
+    :remove_image
 
   validates_presence_of :quote, :date_recovered
   mount_uploader :image, CircularImageUploader
-  # process_in_background :image
+  process_in_background :image
   belongs_to :stolen_record
 
   default_scope order("date_recovered desc")

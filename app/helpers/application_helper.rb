@@ -18,7 +18,7 @@ module ApplicationHelper
     elsif controller_name == "bike_token_invitations" && link_text == "Invitations"
       class_name = "active"
     else
-      class_name = controller_name == link_text.downcase ? 'active' : ''
+      class_name = controller_name == link_text.downcase.gsub(' ', '_') ? 'active' : ''
     end
 
     html = link_to link_text, link_path, class: class_name
