@@ -19,8 +19,11 @@ class BikeSearcher
 
   def matching_stolenness(bikes)
     if @params[:non_stolen] or @params[:stolen]
-      @bikes = bikes.non_stolen unless @params[:stolen] && @params[:stolen].to_s.length > 0
-      @bikes = bikes.stolen unless @params[:non_stolen]
+      if @params[:stolen] && @params[:stolen].to_s.length > 0
+        @bikes = bikes.stolen 
+      elsif @params[:non_stolen].to_s.length > 0
+        @bikes = bikes.non_stolen 
+      end
     end
     @bikes
   end
