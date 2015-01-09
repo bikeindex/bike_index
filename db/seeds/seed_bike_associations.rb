@@ -32,22 +32,22 @@ end
 
 # Seed the colors
 colors = [
-  { name: 'Black', priority: 1, display: "<span class='sclr' style='background: #000'></span>" },
-  { name: 'White', priority: 1, display: "<span class='sclr' style='background: #fff'></span>" },
-  { name: 'Silver or Gray', priority: 1, display: "<span class='sclr' style='background: #b0b0b0'></span>" },
-  { name: 'Red', priority: 1, display: "<span class='sclr' style='background: #ec1313'></span>" },
-  { name: 'Green', priority: 1, display: "<span class='sclr' style='background: #1ba100'></span>" },
-  { name: 'Blue', priority: 1, display: "<span class='sclr' style='background: #386ed2'></span>" },
-  { name: 'Purple', priority: 1, display: "<span class='sclr' style='background: #a745c0'></span>" },
-  { name: 'Pink', priority: 1, display: "<span class='sclr' style='background: #ff7dfd'></span>" },
-  { name: 'Orange', priority: 1, display: "<span class='sclr' style='background: #ff8d1d'></span>"},
-  { name: 'Brown', priority: 1, display: "<span class='sclr' style='background: #734a22'></span>" },
-  { name: 'Yellow or Gold', priority: 1, display: "<span class='sclr' style='background: #fff44b'></span>" },
-  { name: 'Teal', priority: 1, display: "<span class='sclr' style='background: #3bede7'></span>" },
-  { name: 'Stickers tape or other cover-up', priority: 3, display: "<span class='sclr'>stckrs</span>" }
+  {:name=>"Black", :priority=>1, :display=>"<span class='sclr' style='background: #000'></span>"},
+  {:name=>"Blue", :priority=>1, :display=>"<span class='sclr' style='background: #386ed2'></span>"},
+  {:name=>"Brown", :priority=>1, :display=>"<span class='sclr' style='background: #734a22'></span>"},
+  {:name=>"Green", :priority=>1, :display=>"<span class='sclr' style='background: #1ba100'></span>"},
+  {:name=>"Orange", :priority=>1, :display=>"<span class='sclr' style='background: #ff8d1d'></span>"},
+  {:name=>"Pink", :priority=>1, :display=>"<span class='sclr' style='background: #ff7dfd'></span>"},
+  {:name=>"Purple", :priority=>1, :display=>"<span class='sclr' style='background: #a745c0'></span>"},
+  {:name=>"Red", :priority=>1, :display=>"<span class='sclr' style='background: #ec1313'></span>"},
+  {:name=>"Silver or Gray", :priority=>1, :display=>"<span class='sclr' style='background: #b0b0b0'></span>"},
+  {:name=>"Stickers tape or other cover-up", :priority=>3, :display=>"<span class='sclr'>stckrs</span>"},
+  {:name=>"Teal", :priority=>1, :display=>"<span class='sclr' style='background: #3bede7'></span>"},
+  {:name=>"White", :priority=>1, :display=>"<span class='sclr' style='background: #fff'></span>"},
+  {:name=>"Yellow or Gold", :priority=>1, :display=>"<span class='sclr' style='background: #fff44b'></span>"}
 ]
 colors.each do |c|
-  color = Color.create(name: c[:name], priority: c[:priority])
+  color = Color.create(name: c[:name], priority: c[:priority], display: c[:display])
   color.save
 end
 

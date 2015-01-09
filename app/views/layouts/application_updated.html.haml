@@ -47,9 +47,9 @@
 
           = form_tag bikes_path, method: :get, id: "head-search-bikes", class: 'bike-search-form' do
             - params[:query] = params[:query].gsub(/,?#,?/,'').gsub(/(\A,|,\z)/, '') if params[:query].present?
-            = text_field_tag :query,                             |
-              params[:query],                                    |
-              placeholder: "Search bike traits or serials",      |
+            = text_field_tag :query,                  |
+              params[:query],                         |
+              placeholder: "Search Bike Index",       |
               class: "search-text-field form-control"
             = button_tag(type: "submit", class: "searchit btn") do
               = image_tag '/assets/updated/search_white.svg'
@@ -72,7 +72,7 @@
             - else
               - mnfg = ''
             - cache 'header_search' do
-              - select_list = Color.all.map { |c| { id: "c_#{c.id}", text: c.name, display: c.display } }
+              - select_list = Color.all.map { |c| { id: "c_#{c.id}", text: "#{c.name} bikes", display: c.display } }
               - select_list += Manufacturer.frames.map { |m| { id: "m_#{m.id}", text: m.name } }
               %span#header-search-select.hidden{ data: { options: select_list.to_json }}
             #header-search{ data: { selected: mnfg.to_json } }

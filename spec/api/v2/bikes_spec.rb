@@ -27,10 +27,10 @@ describe 'Bikes API V2' do
     it "stolen search works" do
       bike = FactoryGirl.create(:stolen_bike)
       get '/api/v2/bikes/stolen?per_page=1', :format => :json
-      response.code.should == '200'
+      result = JSON.parse(response.body)
       expect(response.header['Total']).to eq('1')
-      result = response.body
-      expect(JSON.parse(result)['bikes'][0]['id']).to be_present
+      expect(result['bikes'][0]['id']).to be_present
+      response.code.should == '200'
     end
   end
 

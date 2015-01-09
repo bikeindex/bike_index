@@ -6,11 +6,7 @@ class BikeIndex.Views.Global extends Backbone.View
     'click .footnote-back-link':            'scrollToRef'
     'click .scroll-to-ref':                 'scrollToRef'
     'click .no-tab':                        'openNewWindow'
-    'click #serial-absent':                 'updateSerialAbsent'
-    'focus #header-search':                 'expandSearch'
-    'change input#stolen':                  'toggleProximitySearch'
-    'change #head-search-bikes #query':     'updateManufacturerSearch'
-    # 'click #search-type-tabs':              'toggleSearchType'
+    'change #head-search-bikes #query':     'updateSearchAssociations'
     'click #expand_user':                   'expandUserNav'
     'click #most_recent_stolen_bikes':      'mostRecentStolen'
     
@@ -18,25 +14,13 @@ class BikeIndex.Views.Global extends Backbone.View
     BikeIndex.hideFlash()
     @setElement($('#body'))
     on_stolen = false
-    if $('#sbr-body').length > 0
-      that = @
-      $('#search-type-tabs').click (e) ->
-        that.toggleSearchType(e)
-    else
+    unless $('#sbr-body').length > 0
       @initializeHeaderSearch()
       @loadChosen() if $('#chosen-container').length > 0
       @setLightspeedMovie() if $('#lightspeed-tutorial-video').length > 0
       if $('#what-spokecards-are').length > 0
         $('.spokecard-extension').addClass('on-spokecard-page')
-    @setProximityLocation()
     @intializeContent() if $('.content-nav').length > 0
-    
-
-  setLightspeedMovie: ->
-    height = '394'
-    height = '315' if $(window).width() < 768
-    video = """<iframe width="100%" height="#{height}" src="//www.youtube.com/embed/XW1ieMEwkvY" frameborder="0" allowfullscreen></iframe>"""
-    $('#lightspeed-tutorial-video').append(video)
     
   openNewWindow: (e) ->
     e.preventDefault()
@@ -49,13 +33,32 @@ class BikeIndex.Views.Global extends Backbone.View
 
   loadChosen: ->
     $('.chosen-select select').select2()
-  
+
+  scrollToRef: (event) ->
+    event.preventDefault()
+    target = $(event.target).attr('href')
+    $('body').animate( 
+      scrollTop: ($(target).offset().top - 20), 'fast' 
+    )
+
+
+  #
+  #
+  # Updated header nav stuff
+
+  mostRecentStolen: (e) ->
+    e.preventDefault()
+    $('#stolen').val('true')
+    $('#head-search-bikes').submit()
+
+  expandUserNav: (event) ->
+    event.preventDefault()
+    $('.top-user-nav').slideToggle()
 
   initializeHeaderSearch: ->
     unless $('#sbr-body').length > 0
       tags = JSON.parse($("#header-search-select").attr('data-options'))
       $('#head-search-bikes #query').select2
-        
         tags: tags
         tokenSeparators: [","]
         openOnEnter: false
@@ -113,7 +116,7 @@ class BikeIndex.Views.Global extends Backbone.View
               localStorage.setItem('location', location)
               $('#proximity').val(location)
 
-  updateManufacturerSearch: (e) ->
+  updateSearchAssociations: (e) ->
     if e.added?
       unless e.added.id == e.added.text 
         if e.added.id == '#'
@@ -122,17 +125,19 @@ class BikeIndex.Views.Global extends Backbone.View
       if e.removed.id == '#'
         $('#header-search #serial').val('')
 
-  updateSerialAbsent: (e) ->
-    e.preventDefault()
-    $('#serial-absent, .absent-serial-blocker').toggleClass('absents')
-    if $('#serial-absent').hasClass('absents')
-      $('#serial')
-        .val('absent')
-        .addClass('absent-serial')
-    else
-      $('#serial')
-        .val('')
-        .removeClass('absent-serial')
+
+
+
+  # 
+  # 
+  # Page specific things I've been too lazy to make separate backbone views
+
+  setLightspeedMovie: ->
+    height = '394'
+    height = '315' if $(window).width() < 768
+    video = """<iframe width="100%" height="#{height}" src="//www.youtube.com/embed/XW1ieMEwkvY" frameborder="0" allowfullscreen></iframe>"""
+    $('#lightspeed-tutorial-video').append(video)
+
 
   loadStolenWidget: (location) ->
     $.ajax
@@ -141,39 +146,14 @@ class BikeIndex.Views.Global extends Backbone.View
       dataType: "jsonp",
       success: (location) ->
         $('#stolen-proximity #proximity').val("#{location.region_name}")
-        loadStolenWidget(location) if $('#sbr-body').length > 0
+        loadStolenWidget(location) if $('#sbr-body').length > 0      
 
-  toggleSearchType: (e) ->
-    e.preventDefault()
-    target = $(e.target)
-    target = target.parents('a') if target.is('span')
-    unless $(target).hasClass('active')
-      $('.search-type-tab').toggleClass('active')
-      $('#search_type').val(target.attr('data-stype'))
 
-  toggleProximitySearch: ->
-    if $('#stolen-proximity').hasClass('unhidden')
-      $('#stolen-proximity span').fadeOut 100, ->
-        $('#stolen-proximity')
-          .slideUp "medium"
-          .removeClass('unhidden')
-    else
-      $('#stolen-proximity').slideDown "medium", ->
-        $('#stolen-proximity span').fadeIn 100
-        $('#stolen-proximity').addClass('unhidden')
-        
 
-  setProximityLocation: ->
-    # if $('#stolenness_query').length > 0 && $('#stolenness_query').attr('data-stolen').length > 0
-    #   return true
-    # $.ajax
-    #   type: "GET"
-    #   url: 'https://freegeoip.net/json/'
-    #   dataType: "jsonp",
-    #   success: (location) ->
-    #     $('#stolen-proximity #proximity').val("#{location.region_name}")
-    #     # loadStolenWidget(location) if $('#sbr-body').length > 0
-  
+  # 
+  # 
+  # Old layout things. Delete once everything is updated
+
   toggleCollapsibleHeader: ->
     # This is for the content pages where the search header is hidden
     $('#total-top-header').find('.search-background').toggleClass('show')
@@ -208,13 +188,6 @@ class BikeIndex.Views.Global extends Backbone.View
         $('#header-tabs').addClass('visibled')
         target.tab('show')
 
-  scrollToRef: (event) ->
-    event.preventDefault()
-    target = $(event.target).attr('href')
-    $('body').animate( 
-      scrollTop: ($(target).offset().top - 20), 'fast' 
-    )
-
   intializeContent: ->
     # Add margin to the top of page content so that it doesn't break
     h = $('.active-menu ul').height() - 40
@@ -226,19 +199,7 @@ class BikeIndex.Views.Global extends Backbone.View
       if anchor?
         $("##{anchor}").collapse()
 
-  expandSearch: ->
-    # unless $('#total-top-header').hasClass('search-expanded')
-    #   $('#header-search .optional-fields').fadeIn()
-
-  expandUserNav: (event) ->
-    event.preventDefault()
-    $('.top-user-nav').slideToggle()
-
-  mostRecentStolen: (e) ->
-    e.preventDefault()
-    $('#stolen').val('true')
-    $('#head-search-bikes').submit()
-    
+   
   # loadUserHeader: ->
     # This is minified and inlined in the header
     # 

@@ -117,10 +117,6 @@ describe BikeSearcher do
        bikes.should_receive(:text_search).and_return("booger")
        search.matching_query(bikes).should eq("booger")
      end
-     it "returns all bikes" do 
-       search = BikeSearcher.new.matching_query(Bike.scoped)
-       search.should eq(Bike.scoped)
-     end
    end
 
 end

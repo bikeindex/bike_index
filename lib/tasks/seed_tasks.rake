@@ -71,7 +71,7 @@ task seed_dup_bikes: :environment do
   @cycle_type_id = CycleType.find_by_name('Bike').id
   @serial_number = (0...10).map{(65+rand(26)).chr}.join
   @manufacturer_id = (rand(Manufacturer.frames.count) + 1)
-  5.times do 
+  500.times do 
     bike = Bike.new(
       cycle_type_id: @cycle_type_id,
       propulsion_type_id: @propulsion_type_id,
@@ -82,9 +82,9 @@ task seed_dup_bikes: :environment do
       handlebar_type_id: HandlebarType.first.id,
       creator: @user,
       owner_email: @user.email,
-      serial_number: @serial_number
+      serial_number: @serial_number,
+      creation_organization_id: @org.id
     )
-    bike.organization_id = @org.id
     if bike.save
       ownership = Ownership.new(bike_id: bike.id, creator_id: @member.id, user_id: @user.id, owner_email: @user.email, current: true)
       unless ownership.save
