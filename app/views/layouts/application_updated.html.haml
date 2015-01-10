@@ -61,7 +61,7 @@
               = text_field_tag :proximity, params[:proximity], placeholder: 'Anywhere', class: 'form-control stolen-proximity'
               %span
                 miles of
-              = number_field_tag :proximity_radius, params[:proximity_radius] || 100, placeholder: '100', min: 0, class: 'form-control stolen-radius'
+              = number_field_tag :proximity_radius, params[:proximity_radius] || 100, placeholder: '100', min: 5, class: 'form-control stolen-radius'
               %span
                 within
               = hidden_field_tag :stolen, params[:stolen] || true
