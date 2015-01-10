@@ -102,12 +102,13 @@ class BikeSearcher
   end    
 
   def by_proximity
-    return nil if stolenness == 'stolen'
-    return nil if @params[:non_proximity] && @params[:non_proximity].to_s.length > 0
+    return nil unless stolenness == 'stolen'
+    return nil if @params[:non_proximity] && @params[:non_proximity].present?
     if @params[:proximity_radius].present? && (@params[:proximity_radius].kind_of?(Integer) || @params[:proximity_radius].strip.length > 0)
-      radius = @params[:proximity_radius]
+      radius = @params[:proximity_radius].to_i
     end
     radius ||= 500
+    puts "Radius of this search is #{radius}"
     stolen_ids = @bikes.pluck(:current_stolen_record_id)
     box = Geocoder::Calculations.bounding_box(@params[:proximity], radius)
     unless box[0].nan?
@@ -118,6 +119,7 @@ class BikeSearcher
   end
 
   def by_date
+    return nil unless stolenness == 'stolen'
     return @bikes if @params[:stolen_before].present? || @params[:stolen_after].present?
     stolen_records = StolenRecord.where('id in (?)', @bikes.pluck(:current_stolen_record_id))
     if @params[:stolen_before].present?
