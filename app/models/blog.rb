@@ -98,7 +98,7 @@ class Blog < ActiveRecord::Base
         pi = public_images.find(index_image_id)
       end
     else
-      if is_listicle && listicles.first.image.present?
+      if is_listicle && listicles.present? && listicles.first.image.present?
         li = listicles.first
         # self.index_image = listicles.first.image_url(:medium)
         self.index_image_id = i.id
