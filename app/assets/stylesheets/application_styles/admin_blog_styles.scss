@@ -11,6 +11,12 @@
   input, textarea {
     width: 100%;
   }
+  .description_abbr {
+    padding: .25em 6px 0;
+
+    color: $grayDark;
+    font-size: .9em;
+  }
 }
 
 .control-group.tags textarea {
@@ -50,10 +56,19 @@
   clear: both;
   padding: 40px 0 0;
   li {
+    @include clearfix;
     cursor: default;
     float: none;
     width: 100%;
     margin: 0 0 10px;
+    overflow: hidden;
+    .index-image-select {
+      height: 100%;
+      float: right;
+      padding: 1em;
+      width: 5%;
+      input { text-align: center;}
+    }
     img {
       width: 75px;
       position: absolute;
@@ -61,8 +76,9 @@
       margin-right: 10px;
     }
     .actions {
-      width: 100%;
+      width: 95%;
       padding-left: 85px;
+      float: left;
     }
     textarea {
       display: block;
@@ -75,6 +91,12 @@
       &:hover { color: $linkColorHover; }
     }
   }
+}
+
+label.index-image-select {
+  color: $grayDark;
+  margin: 2px 0;
+  input { margin-top: -.25em; }
 }
 
 @media (max-width: 710px) {
@@ -110,21 +132,22 @@
       display: block;
       text-align: center;
     }
+    span {
+      font-size: .8em;
+      text-align: center;
+      display: block;
+    }
+    .list-image-width-small { color: $stolenColor; }
   }
   .min-width-notice {
     display: block;
     text-align: center;
     color: $grayLight;
+    font-size: .8em;
   }
 }
 
-
-
 @media (max-width: 1000px) {
-  .listicle-block .list-image {
-    position: absolute; 
-    left: 15px;
-  }
   .listicle-block .col-md-2 { 
     padding-top: 20px;
     padding-left: 15px + 120px;

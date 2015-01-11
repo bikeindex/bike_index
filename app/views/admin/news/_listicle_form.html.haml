@@ -5,10 +5,10 @@
       .list-image{ data: { order: l.list_order } }
         = image_tag l.image_url(:thumb)
         - if l.image_width.present?
-          %span.bb-image-width
+          %span.list-image-width
             W: #{l.image_width} H: #{l.image_height}
           - if l.image_width < 726
-            %span.bb-image-width-small
+            %span.list-image-width-small
               Image is too small
         / %a.edit-image-crop{ href: listicle_image_edit_admin_news_index_url(id: l.id), target: '_blank' }
         /   Crop image

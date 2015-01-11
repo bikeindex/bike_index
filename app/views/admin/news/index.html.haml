@@ -27,10 +27,7 @@
             %p.blog-index
               = link_to blog.title, edit_admin_news_url(blog)
               %br
-              - if blog.listicles.present?
-                = blog.listicles.first.title
-              - else
-                = blog.body_abbr.html_safe
+              = blog.body_abbr.html_safe
           %td
             = "&#x2713;".html_safe if blog.is_listicle
           %td

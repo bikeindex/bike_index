@@ -12,6 +12,9 @@
         = f.file_field :image
         %span.min-width-notice
           min-width  726px
+      %label.index-image-select
+        <input type="radio" name="index_image_id" value="#{f.object.id}" class="index_image_#{f.object.id}">
+        Primary image
       .list-order
         %span
           Order

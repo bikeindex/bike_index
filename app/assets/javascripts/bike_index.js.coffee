@@ -31,6 +31,8 @@ $(document).ready ->
   
   if $('#home_headies').length > 0
     view = new BikeIndex.Views.Home 
+  if $('#news_display').length > 0
+    view = new BikeIndex.Views.NewsDisplay 
 
   else if $('#documentation-menu').length > 0
     view = new BikeIndex.Views.DocumentationIndex

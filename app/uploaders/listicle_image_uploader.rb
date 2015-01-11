@@ -44,7 +44,7 @@ class ListicleImageUploader < CarrierWave::Uploader::Base
   end
 
   version :medium, :from_version => :large do
-    process resize_to_fill: [260, 260]
+    process resize_to_fill: [300, 300]
   end
 
   version :thumb, :from_version => :medium do

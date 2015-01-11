@@ -55,12 +55,20 @@ describe Blog do
       blog.body_abbr.should eq("Lorem ipsum dolor sit amet! Consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ...")
     end
 
+    it "creates the body abbr from a listicle" do 
+      @user = FactoryGirl.create(:user)
+      blog = Blog.create(title: "Blog title", user_id: @user.id, published_at: Time.now, body: "stuff", is_listicle: true)
+      Listicle.create(blog_id: blog.id, body: "View the link\n[here](http://something)\n\n<img class='post-image' src='https://bikeindex.s3.amazonaws.com/uploads/Pu/1003/large_photo__6_.JPG' alt='Bike Index shirt and stickers'>\n![PBR, a bike bag and drawings](http://imgur.com/e4zzEjP.jpg) and also this")
+      blog.reload.save
+      blog.reload.body_abbr.should eq("View the link here and also this")
+    end
+
     it "removes any link information and images" do 
       # TODO: remove markdown images
       # Also, it would be cool if we could end on a word instead of in the middle of one...
       @user = FactoryGirl.create(:user)
       blog = Blog.new(title: "Blog title", user_id: @user.id, published_at: Time.now )
-      blog.body = """View the link\n[here](http://something)\n\n<img class='post-image' src='https://bikeindex.s3.amazonaws.com/uploads/Pu/1003/large_photo__6_.JPG' alt='Bike Index shirt and stickers'>\n![PBR, a bike bag and drawings](http://imgur.com/e4zzEjP.jpg) and also this"""
+      blog.body = "View the link\n[here](http://something)\n\n<img class='post-image' src='https://bikeindex.s3.amazonaws.com/uploads/Pu/1003/large_photo__6_.JPG' alt='Bike Index shirt and stickers'>\n![PBR, a bike bag and drawings](http://imgur.com/e4zzEjP.jpg) and also this"
       blog.save
       blog.body_abbr.should eq("View the link here and also this")
     end

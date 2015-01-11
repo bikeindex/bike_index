@@ -4,6 +4,9 @@
 //
 //________________________
 
+$padding-right: 50px;
+$max-content-width: 728px + $padding-right;
+
 #content-wrap {
   position: relative;
 }
@@ -225,7 +228,7 @@
     margin-top: 20px;
   }
   .page-content {
-    min-height: 700px;
+    min-height: $max-content-width;
     padding-left: 0;
     padding-right: 0;
     margin-left: 26%;
@@ -249,7 +252,7 @@
 @media (min-width: 1000px) {
   .page-content {
     h1, h2, ol, ul, dl, &>h3, &>h4, &>h5, &>p, &>img, article {
-     max-width: 700px;
+     max-width: $max-content-width;
     }
     p {
       margin-bottom: 16px;
@@ -486,7 +489,7 @@ ul.state-list {
   @include clearfix;
   width: 100%;
   position: relative;
-  max-width: 700px;
+  max-width: $max-content-width;
   list-style-type: none;
   margin: 20px 0 0 0;
   li {

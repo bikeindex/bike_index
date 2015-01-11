@@ -1,3 +1,6 @@
+%article
+  .party-blck.lg-party{ data: {width: '728px', height: '90px', slot: '4209970585'}}
+  .party-blck.sm-party{ data: {width: '320px', height: '100px', slot: '6605033789'}}
 - if @list_item.present?
   %article
     = image_tag @list_item.image_url(:large) if @list_item.image.present?
@@ -8,13 +11,26 @@
     = @list_item.title
   %article
     = @list_item.body_html.html_safe if @list_item.body_html.present?
-    
+%article
+  .party-blck.lg-party{ data: {width: '728px', height: '90px', slot: '6744634586'}}
+  .party-blck.sm-party{ data: {width: '320px', height: '100px', slot: '7822695384'}}
+
 %article.padded
   .list-nav-wrap
     - if @prev_item
       %a.list-nav.prev{ href: news_url(id: @blog.title_slug, page: (@page - 1)), rel: 'prev'}
         \< Previous
-        
     - if @next_item
       %a.list-nav.next{ href: news_url(id: @blog.title_slug, page: (@page + 1)), rel: 'next'}
         Next >
+/ %hr
+%article
+  .sharing-st
+    <span class='st_facebook_large' displayText='Facebook'></span>
+    <span class='st_twitter_large' displayText='Tweet'></span>
+    <span class='st_pinterest_large' displayText='Pinterest'></span>
+    <span class='st_email_large' displayText='Email'></span>
+    <div class="fb-like" data-href="https://www.facebook.com/bikeindex" data-layout="box_count" data-action="like" data-show-faces="false" data-share="false"></div>
+<script type="text/javascript">var switchTo5x=true;</script>
+<script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
+<script type="text/javascript">stLight.options({publisher: "02ef36a4-fe6e-4fd0-bfa1-2b0def071ed1", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>

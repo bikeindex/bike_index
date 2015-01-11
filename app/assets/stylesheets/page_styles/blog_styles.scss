@@ -1,6 +1,6 @@
 //________________________
 //
-// Blog styles
+// Blog index styles
 //
 //________________________
 
@@ -8,12 +8,50 @@
   color: $grayMed;
 }
 
-.blog-header {
-  h4 {
-    
+ul.news-index-list {
+  width: 100%;
+  max-width: 100%;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  li {
+    @include clearfix;
+    padding: 10px 0 20px;
+    h2 {
+      font-size: 23px;
+    }
+    .index-image-link {
+      display: block;
+      width: 15%;
+      float: left;
+      margin-right: 2%;
+      img {
+        width: 100%;
+        display: block;
+        height: auto;
+      }
+    }
+    h2 {
+      margin: 0;
+      padding: 0;
+    }
+    p { }
   }
-  hr { margin-bottom: 30px; }
 }
+
+//________________________
+//
+// Blog show styles
+//
+//________________________
+
+.blog-header {
+  padding-top: 30px; 
+  h1.global-title {
+    margin-bottom: 0;
+  }
+}
+
 .blogger-info {
   @include clearfix;
   position: relative;
@@ -21,6 +59,10 @@
     color: $grayMed;
     margin: .5em 0 0;
     strong { color: $gray; font-weight: normal; }
+  }
+  h4 { float: left; }
+  .pub-date {
+    float: right;
   }
 }
 
@@ -44,7 +86,31 @@
 
 #change_published_date { margin-left: .5em; }
 
-.party-blck { display: block; margin: 0 auto; }
+.party-blck {
+  display: none; 
+  clear: both;
+  position: relative;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 30px 0;
+  ins { 
+    display: block;
+    margin: 0 auto;
+  }
+}
+
+
+@media (max-width: 730px) {
+  .party-blck.sm-party { display: block; }
+}
+@media (min-width: 731px) {
+  .party-blck.lg-party { display: block; }
+}
+
+.sharing-st {
+  width: 217px;
+  margin: 30px auto;
+}
 
 //________________________
 //
@@ -134,27 +200,36 @@
   }
 }
 
+
 //________________________
 //
 // Listicles!
 //
 //________________________
 
-.list-nav-wrap {
-  @include clearfix;
-  width: 100%;
-  max-width: 300px;
-  margin: 0 auto; 
-  a { @extend .button-blue; }
-  .prev { float: left; }
-  .next { float: right; }
-}
-
 .listicle-image-credit {
   text-align: right;
   font-size: .8em;
 }
 
+.list-item-title {
+  font-family: $headerFont;
+  font-size: $standardFontSize*1.2;
+}
+
+.list-nav-wrap {
+  @include clearfix;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto; 
+  a { 
+    @extend .button-blue;
+    width: 45%;
+    padding: 1em .25em;
+  }
+  .prev { float: left; }
+  .next { float: right; }
+}
 
 //________________________
 //

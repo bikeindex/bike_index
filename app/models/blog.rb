@@ -13,7 +13,9 @@ class Blog < ActiveRecord::Base
     :update_title,
     :is_listicle,
     :listicles_attributes,
-    :user_email
+    :user_email,
+    :index_image_id,
+    :index_image
 
   has_many :listicles, dependent: :destroy
   accepts_nested_attributes_for :listicles, allow_destroy: true
@@ -45,7 +47,7 @@ class Blog < ActiveRecord::Base
 
   def description
     return description_abbr if description_abbr.present?
-    self.body_abbr
+    body_abbr
   end
 
   before_save :update_title_save
@@ -67,12 +69,42 @@ class Blog < ActiveRecord::Base
 
   before_save :create_abbreviation
   def create_abbreviation
-    # Render markdown,
-    markdown = Kramdown::Document.new(body)
-    abbr = strip_tags(markdown.to_html)
-    # strip tags, then remove extra spaces
-    abbr = abbr.gsub(/\n/,' ').gsub(/\s+/, ' ').strip
-    self.body_abbr = truncate(abbr, length: 200)
+    if description_abbr.present?
+      self.body_abbr = description_abbr
+    else
+      if is_listicle && listicles.first.present?
+        body_html = Listicle.first.body_html
+      else
+        # Render markdown,
+        markdown = Kramdown::Document.new(body)
+        body_html = markdown.to_html
+      end
+      abbr = strip_tags(body_html)
+      # strip tags, then remove extra spaces
+      abbr = abbr.gsub(/\n/,' ').gsub(/\s+/, ' ').strip
+      self.body_abbr = truncate(abbr, length: 200)
+    end
+    true
+  end
+
+  before_save :set_index_image
+  def set_index_image
+    if index_image_id.present?
+      if is_listicle
+        self.index_image = listicles.find(index_image_id).image_url(:medium)
+      else
+        self.index_image = public_images.find(index_image_id).image_url(:small)
+      end
+    else
+      if is_listicle && listicles.first.image.present?
+        self.index_image = listicles.first.image_url(:medium)
+        self.index_image_id = listicles.first.id
+      elsif public_images.present?
+        self.index_image = public_images.last.image_url(:small) 
+        self.index_image_id = public_images.last.id
+      end
+    end
+    true
   end
 
   def to_param

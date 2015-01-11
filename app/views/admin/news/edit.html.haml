@@ -20,6 +20,7 @@
               - @blog.errors.full_messages.each do |msg|
                 %li
                   = msg
+      = f.hidden_field :index_image_id
       - if @blog.is_listicle
         = render partial: "listicle_form", locals: { f: f }
       - else
@@ -72,15 +73,17 @@
                   %span.this-will-break-links
                     This will break existing links!
           
-
-          .blog-field
-            = f.text_field :title, placeholder: "Blog title"
-          .blog-field
-            = f.text_field :description_abbr, placeholder: "Blog description (155 Characters) - Generated automatically, unless you enter something"
-          .padded
-            %a.button-blue.pull-left{target: "_blank", href: blog_url(@blog)}
-              preview post
-            = f.submit 'Save', class: 'button-green pull-right'
+          .clearfix
+            .blog-field
+              = f.text_field :title, placeholder: "Blog title"
+            .blog-field
+              = f.text_field :description_abbr, placeholder: "Description/subtitle shown on the homepage - will be the text below unless you enter something."
+              .description_abbr
+                = @blog.body_abbr
+            .padded
+              %a.button-blue.pull-left{target: "_blank", href: blog_url(@blog)}
+                preview post
+              = f.submit 'Save', class: 'button-green pull-right'
 
 
   - unless @blog.is_listicle

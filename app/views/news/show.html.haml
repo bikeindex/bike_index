@@ -1,35 +1,27 @@
-.blog-header  
-  %article.blogger-info
-    %h4
-      %a.blog-poster{href: user_path(@blogger)}
-        = @blogger.name if @blogger.name
-    %h4
-      - if @blog.published_at > Time.now - 1.week
-        #{l @blog.published_at, format: :standard_display}
-      - else
-        #{l @blog.published_at, format: :no_day_with_year}
+#news_display
+  .blog-header
+    %h1.global-title
+      = @blog.title
+    %article.blogger-info
+      %h4
+        by
+        %a.blog-poster{href: user_path(@blogger)}
+          = @blogger.name if @blogger.name
+      %h4.pub-date
+        - if @blog.published_at > Time.now - 1.week
+          #{l @blog.published_at, format: :standard_display}
+        - else
+          #{l @blog.published_at, format: :no_day_with_year}
+  - if @blog.is_listicle
+    = render "listicle_page"
 
-  %hr
+  - else
+    :kramdown
+      #{@blog.body}
 
-%h1
-  = @blog.title
-  
-- if @blog.is_listicle
-  = render "listicle_page"
+    %article.padded
+      .party-blck.lg-party{ data: {width: '728px', height: '90px', slot: '6744634586'}}
+      .party-blck.sm-party{ data: {width: '320px', height: '100px', slot: '7822695384'}}
 
-- else
-  :kramdown
-    #{@blog.body}
 
-%article.padded  
-  :plain
-    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-    <ins class="adsbygoogle party-blck"
-         style="width:320px;height:100px"
-         data-ad-client="ca-pub-8140931939249510"
-         data-ad-slot="7822695384"></ins>
-
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-
-%article.content-comments
-  = render "/shared/disqus"
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>

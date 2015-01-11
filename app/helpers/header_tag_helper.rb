@@ -179,7 +179,11 @@ protected
       hash[:meta_tags][:"og:modified_time"] = @blog.updated_at.utc
       hash[:meta_tags][:"twitter:creator"] = "@#{@blog.user.twitter}" if @blog.user.twitter
       
-      if @blog.public_images.any?
+      if @blog.index_image.present?
+        hash[:meta_tags][:"twitter:card"] = "summary_large_image"
+        hash[:meta_tags][:"og:image"] = @blog.index_image
+        hash[:meta_tags][:"twitter:image:src"] = @blog.index_image
+      elsif @blog.public_images.any?
         hash[:meta_tags][:"twitter:card"] = "summary_large_image"
         hash[:meta_tags][:"og:image"] = @blog.public_images.last.image_url 
         hash[:meta_tags][:"twitter:image:src"] = @blog.public_images.last.image_url 

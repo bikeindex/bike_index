@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141231170329) do
+ActiveRecord::Schema.define(:version => 20150111193842) do
 
   create_table "ads", :force => true do |t|
     t.string   "title"
@@ -150,6 +150,8 @@ ActiveRecord::Schema.define(:version => 20141231170329) do
     t.string   "old_title_slug"
     t.text     "description_abbr"
     t.boolean  "is_listicle",      :default => false, :null => false
+    t.string   "index_image"
+    t.integer  "index_image_id"
   end
 
   create_table "cgroups", :force => true do |t|

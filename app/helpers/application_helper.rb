@@ -1,7 +1,6 @@
 module ApplicationHelper 
   def nav_link(link_text, link_path)
     class_name = current_page?(link_path) ? 'active' : ''
-    class_name = "active" if controller_name == "blogs" && link_path == blogs_url
     html = link_to raw(link_text), link_path, class: class_name
     return html.html_safe
   end

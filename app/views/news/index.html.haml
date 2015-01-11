@@ -1,12 +1,19 @@
-%h1.blog-index-head
-  Bike Index news
-
-%hr
-
-- @blogs.each do |blog|
-  %h2
-    = link_to blog.title, news_url(blog)
-  %p.blog-index
-    = blog.body_abbr.html_safe
+#news_display
+  %h1.blog-index-head
+    Bike Index news
 
   %hr
+%article
+  %ul.news-index-list
+    - @blogs.each_with_index do |blog, index|
+      %li
+        - if index < 10 && blog.index_image.present?
+          %a.index-image-link{ href: news_url(blog) }
+            = image_tag blog.index_image  
+        %h2
+          %a{ href: news_url(blog) }
+            %span
+              = blog.title
+
+        %p.blog-index
+          = blog.description
