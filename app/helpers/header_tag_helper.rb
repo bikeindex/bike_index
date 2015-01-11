@@ -181,8 +181,8 @@ protected
       
       if @blog.index_image.present?
         hash[:meta_tags][:"twitter:card"] = "summary_large_image"
-        hash[:meta_tags][:"og:image"] = @blog.index_image
-        hash[:meta_tags][:"twitter:image:src"] = @blog.index_image
+        hash[:meta_tags][:"og:image"] = @blog.index_image_lg
+        hash[:meta_tags][:"twitter:image:src"] = @blog.index_image_lg
       elsif @blog.public_images.any?
         hash[:meta_tags][:"twitter:card"] = "summary_large_image"
         hash[:meta_tags][:"og:image"] = @blog.public_images.last.image_url 

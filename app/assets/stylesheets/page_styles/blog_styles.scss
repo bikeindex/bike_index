@@ -4,6 +4,8 @@
 //
 //________________________
 
+$bst-break: 767px;
+
 .blog-index-head {
   color: $grayMed;
 }
@@ -35,7 +37,7 @@ ul.news-index-list {
   }
 }
 
-@media (max-width: 767px) {
+@media (max-width: $bst-break) {
   ul.news-index-list li {
     h2 { font-size: 19px; }
   }
@@ -55,6 +57,10 @@ ul.news-index-list {
   }
 }
 
+@media (max-width: $bst-break) {
+  .blog-header h1.global-title { font-size: 24px; } 
+}
+
 .blogger-info {
   @include clearfix;
   position: relative;
@@ -70,7 +76,7 @@ ul.news-index-list {
 }
 
 
-@media (min-width: 780px) {
+@media (min-width: $bst-break+1) {
   .blog-header {
     hr {
       margin-bottom: 50px;

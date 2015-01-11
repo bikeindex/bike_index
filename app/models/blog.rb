@@ -93,18 +93,26 @@ class Blog < ActiveRecord::Base
       if index_image_id == 0
         self.index_image = nil
       elsif is_listicle
-        self.index_image = listicles.find(index_image_id).image_url(:medium)
+        li = listicles.find(index_image_id)
       else
-        self.index_image = public_images.find(index_image_id).image_url(:small)
+        pi = public_images.find(index_image_id)
       end
     else
       if is_listicle && listicles.first.image.present?
-        self.index_image = listicles.first.image_url(:medium)
-        self.index_image_id = listicles.first.id
+        li = listicles.first
+        # self.index_image = listicles.first.image_url(:medium)
+        self.index_image_id = i.id
       elsif public_images.present?
-        self.index_image = public_images.last.image_url(:small) 
+        pi = public_images.last
         self.index_image_id = public_images.last.id
       end
+    end
+    if li.present?
+      self.index_image = li.image_url(:medium) 
+      self.index_image_lg = li.image_url(:large)
+    elsif pi.present?
+      self.index_image = pi.image_url(:small) 
+      self.index_image_lg = pi.image_url(:large)
     end
     true
   end
