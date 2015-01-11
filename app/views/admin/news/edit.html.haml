@@ -72,13 +72,12 @@
                   = f.check_box :update_title
                   %span.this-will-break-links
                     This will break existing links!
+
               .control-group
-                %label
-                  No primary image
                 .controls
-                  <input type="radio" name="index_image_id" value="#{f.object.id}" class="index_image_#{f.object.id}">
-                  %span.this-will-break-links
-                    Please don't do this!
+                  %label.index-image-select
+                    <input type="radio" name="index_image_id" value="0" class="index_image_0">
+                    No primary image
           
           .clearfix
             .blog-field

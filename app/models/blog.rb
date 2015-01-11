@@ -73,7 +73,7 @@ class Blog < ActiveRecord::Base
       self.body_abbr = description_abbr
     else
       if is_listicle && listicles.first.present?
-        body_html = Listicle.first.body_html
+        body_html = listicles.first.body_html
       else
         # Render markdown,
         markdown = Kramdown::Document.new(body)
@@ -90,7 +90,7 @@ class Blog < ActiveRecord::Base
   before_save :set_index_image
   def set_index_image
     if index_image_id.present?
-      if index_image_id == 'none'
+      if index_image_id == 0
         self.index_image = nil
       elsif is_listicle
         self.index_image = listicles.find(index_image_id).image_url(:medium)
