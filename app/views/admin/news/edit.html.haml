@@ -72,6 +72,13 @@
                   = f.check_box :update_title
                   %span.this-will-break-links
                     This will break existing links!
+              .control-group
+                %label
+                  No primary image
+                .controls
+                  <input type="radio" name="index_image_id" value="#{f.object.id}" class="index_image_#{f.object.id}">
+                  %span.this-will-break-links
+                    Please don't do this!
           
           .clearfix
             .blog-field
@@ -80,6 +87,7 @@
               = f.text_field :description_abbr, placeholder: "Description/subtitle shown on the homepage - will be the text below unless you enter something."
               .description_abbr
                 = @blog.body_abbr
+
             .padded
               %a.button-blue.pull-left{target: "_blank", href: blog_url(@blog)}
                 preview post

@@ -9,7 +9,7 @@
       %li
         - if index < 10 && blog.index_image.present?
           %a.index-image-link{ href: news_url(blog) }
-            = image_tag blog.index_image  
+            = image_tag blog.index_image
         %h2
           %a{ href: news_url(blog) }
             %span

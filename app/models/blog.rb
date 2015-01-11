@@ -90,7 +90,9 @@ class Blog < ActiveRecord::Base
   before_save :set_index_image
   def set_index_image
     if index_image_id.present?
-      if is_listicle
+      if index_image_id == 'none'
+        self.index_image = nil
+      elsif is_listicle
         self.index_image = listicles.find(index_image_id).image_url(:medium)
       else
         self.index_image = public_images.find(index_image_id).image_url(:small)

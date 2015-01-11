@@ -24,7 +24,7 @@ class NewsController < ApplicationController
   end
 
   def set_blogs_active_section
-    # @active_section = "about"
+    @active_section = "about"
   end
 
 end

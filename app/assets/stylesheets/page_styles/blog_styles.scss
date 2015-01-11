@@ -35,8 +35,15 @@ ul.news-index-list {
       margin: 0;
       padding: 0;
     }
-    p { }
+    &:nth-of-type(2n) {
+      .index-image-link {
+        float: right;
+        margin-right: 0;
+        margin-left: 2%;
+      }
+    }
   }
+
 }
 
 //________________________
