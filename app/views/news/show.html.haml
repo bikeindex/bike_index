@@ -12,12 +12,13 @@
           #{l @blog.published_at, format: :standard_display}
         - else
           #{l @blog.published_at, format: :no_day_with_year}
-  - if @blog.is_listicle
-    = render "listicle_page"
+          
+- if @blog.is_listicle
+  = render "listicle_page"
 
-  - else
-    :kramdown
-      #{@blog.body}
+- else
+  :kramdown
+    #{@blog.body}
 
     %article.padded
       .party-blck.lg-party{ data: {width: '728px', height: '90px', slot: '6744634586'}}

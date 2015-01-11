@@ -19,6 +19,7 @@ ul.news-index-list {
     padding: 10px 0 20px;
     h2 {
       font-size: 23px;
+      margin: 0; padding: 0;
     }
     .index-image-link {
       display: block;
@@ -31,12 +32,13 @@ ul.news-index-list {
         height: auto;
       }
     }
-    h2 {
-      margin: 0;
-      padding: 0;
-    }
   }
+}
 
+@media (max-width: 767px) {
+  ul.news-index-list li {
+    h2 { font-size: 19px; }
+  }
 }
 
 //________________________
@@ -46,7 +48,8 @@ ul.news-index-list {
 //________________________
 
 .blog-header {
-  padding-top: 30px; 
+  padding-top: 20px; 
+  padding-bottom: 30px; 
   h1.global-title {
     margin-bottom: 0;
   }
