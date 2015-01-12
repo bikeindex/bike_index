@@ -1,10 +1,16 @@
+
+$bst-break: 767px;
+
+@media (max-width: $bst-break) {
+  body.news-page .page-content { padding: 10px; }
+}
+
 //________________________
 //
 // Blog index styles
 //
 //________________________
 
-$bst-break: 767px;
 
 .blog-index-head {
   color: $grayMed;
@@ -110,6 +116,7 @@ ul.news-index-list {
 
 
 @media (max-width: 730px) {
+  .party-blck { padding: 10px 0; }
   .party-blck.sm-party { display: block; }
 }
 @media (min-width: 731px) {
