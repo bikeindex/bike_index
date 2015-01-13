@@ -9,7 +9,8 @@ class BikeV2Serializer < ActiveModel::Serializer
     :frame_model,
     :thumb,
     :stock_thumb,
-    :title
+    :title,
+    :updated_at
 
   def manufacturer_name
     object.mnfg_name
@@ -18,7 +19,10 @@ class BikeV2Serializer < ActiveModel::Serializer
   def title
     object.title_string
   end
-  
+
+  def updated_at
+    object.updated_at.to_i
+  end  
 
   def thumb
     if object.public_images.present?

@@ -119,7 +119,7 @@ class BikeSearcher
 
   def by_date
     return nil unless stolenness == 'stolen'
-    return @bikes if @params[:stolen_before].present? || @params[:stolen_after].present?
+    return @bikes unless @params[:stolen_before].present? || @params[:stolen_after].present?
     stolen_records = StolenRecord.where('id in (?)', @bikes.pluck(:current_stolen_record_id))
     if @params[:stolen_before].present?
       before = Time.at(@params[:stolen_before]).utc.to_datetime
