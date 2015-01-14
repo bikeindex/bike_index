@@ -20,7 +20,6 @@
         Name
       %th 
         Callback URLs
-      
       %th
         Access tokens
   %tbody
@@ -31,7 +30,10 @@
         %td
           = application.owner.display_name
         %td
-          = application.name
+          .less-strong-hold
+            = application.name
+            %span.less-strong-right
+              = application.id
         %td
           = application.redirect_uri
         %td

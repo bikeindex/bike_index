@@ -1,3 +1,14 @@
+table {
+  .less-strong-hold { position: relative; }
+  .less-strong-right {
+    color: $gray; 
+    position: absolute;
+    right: -.3em;
+    bottom: -.5em;
+    font-size: .8em;
+  }
+}
+
 //
 // Tables
 // --------------------------------------------------
