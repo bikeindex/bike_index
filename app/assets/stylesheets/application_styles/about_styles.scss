@@ -88,6 +88,8 @@
       float: left;
       display: block;
       position: relative;
+      img { width: 100%; }
+      &.blackbg { background: black; }
     }
     p {
       float: left;

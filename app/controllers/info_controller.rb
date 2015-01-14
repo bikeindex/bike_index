@@ -45,6 +45,9 @@ class InfoController < ApplicationController
   def resources
   end
 
+  def image_resources
+  end
+
   def spokecard
     if current_user.present?
       @bikes = current_user.bikes
@@ -61,7 +64,7 @@ class InfoController < ApplicationController
 protected
 
   def set_active_section
-    resources = ['serials', 'stolen_bikes', 'resources', 'spokecard', 'protect_your_bike', 'how_it_works']
+    resources = ['serials', 'stolen_bikes', 'resources', 'spokecard', 'protect_your_bike', 'how_it_works', 'image_resources']
     if resources.include? action_name
       @active_section = 'resources'
     else

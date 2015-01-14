@@ -15,7 +15,7 @@
     = @feedback.feedback_hash[:new_serial]
   %p
     - bike = Bike.find(@feedback.feedback_hash[:bike_id])
-    = link_to 'View the bike', edit_admin_bike_url(bike)
+    = link_to edit_admin_bike_url(bike), edit_admin_bike_url(bike)
 - if @feedback.feedback_type == 'manufacturer_update_request'
   %h1{ :style => "font-weight: 400px;" }
     Manufacturer update notification
@@ -33,7 +33,7 @@
     = @feedback.feedback_hash[:new_manufacturer]
   %p
     - bike = Bike.find(@feedback.feedback_hash[:bike_id])
-    = link_to 'View the bike', edit_admin_bike_url(bike)
+    = link_to edit_admin_bike_url(bike), edit_admin_bike_url(bike)
 - elsif @feedback.feedback_type == 'bike_delete_request'
   %h1{ :style => "font-weight: 400px;" }
     Bike delete request
@@ -45,7 +45,7 @@
     = @feedback.body
   %p
     - bike = Bike.find(@feedback.feedback_hash[:bike_id])
-    = link_to 'View the bike', edit_admin_bike_url(bike)
+    = link_to edit_admin_bike_url(bike), edit_admin_bike_url(bike)
 
 - elsif @feedback.feedback_type == 'bike_recovery'
   - bike = Bike.find(@feedback.feedback_hash[:bike_id])
@@ -67,7 +67,7 @@
       %h3{ :style => "font-weight: 400px;" }
         = link_to "Approve sharing this recovery!", admin_recoveries_url
   %p
-    = link_to 'View the bike', edit_admin_bike_url(bike)
+    = link_to edit_admin_bike_url(bike), edit_admin_bike_url(bike)
 
 - elsif @feedback.feedback_type.present? && @feedback.feedback_type.match(/organization_/i)
   - organization = Organization.find(@feedback.feedback_hash[:organization_id])

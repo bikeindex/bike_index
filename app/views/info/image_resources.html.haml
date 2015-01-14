@@ -1,0 +1,24 @@
+%h1
+  Bike Index image assets
+
+
+%ul.serial-pictures
+  %li
+    %a.serial-image{ href: '/assets/resources/logo_striped.svg'}
+      = image_tag('/assets/resources/logo_striped_short.svg', alt: "Basic logo")        
+    %p
+      Striped logo (#{link_to 'svg', '/assets/resources/logo_striped.svg'}, #{link_to 'png', '/assets/resources/logo_striped.png'})
+  %li
+    %a.serial-image{ href: '/assets/resources/logo.svg'}
+      = image_tag('/assets/resources/logo.svg', alt: "Basic logo")        
+    %p
+      Basic logo (#{link_to 'svg', '/assets/resources/logo.svg'}, #{link_to 'png', '/assets/resources/logo.png'})
+  
+  %li
+    %a.serial-image.blackbg{ href: '/assets/resources/logo_white.svg'}
+      = image_tag('/assets/resources/logo_white.svg', alt: "Basic logo in white")
+    %p
+      Basic logo in white (#{link_to 'svg', '/assets/resources/logo_white.svg'}, #{link_to 'png', '/assets/resources/logo_white.png'})
+      %br
+      %span.less-strong
+        image has no background, shown here with black for visibility

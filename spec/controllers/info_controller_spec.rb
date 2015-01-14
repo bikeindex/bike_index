@@ -59,6 +59,14 @@ describe InfoController do
     it { should render_template(:serials)}
   end
 
+  describe :image_resources do 
+    before do 
+      get :image_resources
+    end
+    it { should respond_with(:success) }
+    it { should render_template(:image_resources)}
+  end
+
   describe :stolen_bikes do 
     before do 
       get :stolen_bikes
