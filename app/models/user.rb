@@ -102,6 +102,10 @@ class User < ActiveRecord::Base
     is_content_admin
   end
 
+  def display_name
+    name || email
+  end
+
   def admin_authorized(type)
     return true if superuser
     return case type

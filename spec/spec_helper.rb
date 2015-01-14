@@ -49,6 +49,10 @@ def set_current_user(user)
   cookies.signed[:auth] = {secure: true, httponly: true, value: [user.id, user.auth_token]}
 end
 
+def create_v2_access_id
+  ENV['V2_ACCESSOR_ID'] = FactoryGirl.create(:user).id.to_s
+end
+
 def create_doorkeeper_app
   @user = FactoryGirl.create(:user)
   @application = Doorkeeper::Application.new(name: "MyApp", redirect_uri: "http://app.com")

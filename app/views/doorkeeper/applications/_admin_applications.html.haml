@@ -1,0 +1,38 @@
+- applications = Doorkeeper::Application.order("created_at desc")
+%hr.margined
+
+%h1.margined.padded
+  All applications 
+  %span.less-strong
+    (admin list)
+
+%h3
+  #{pluralize(applications.count, "application")} created
+
+%table.table.table-striped.margined
+  %thead
+    %tr
+      %th
+        Created
+      %th
+        User
+      %th
+        Name
+      %th 
+        Callback URLs
+      
+      %th
+        Access tokens
+  %tbody
+    - applications.each do |application|
+      %tr{:id => "application_#{application.id}"}
+        %td
+          =l application.created_at, format: :short_with_hour
+        %td
+          = application.owner.display_name
+        %td
+          = application.name
+        %td
+          = application.redirect_uri
+        %td
+          = application.access_tokens.count

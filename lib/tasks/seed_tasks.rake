@@ -17,6 +17,9 @@ task seed_test_users_and_bikes: :environment do
   user = User.create(name: "Example user", email: "example_user@bikeindex.org", password: "please12", password_confirmation: "please12", terms_of_service: true)
   user.confirmed = true 
   user.save
+  user = User.create(name: "Api Accessor", email: "api@example.com", password: "please12", password_confirmation: "please12", terms_of_service: true)
+  user.confirmed = true
+  user.save
 
   org = Organization.create(name: "Ikes Bike's", website: "", short_name: "Ikes", default_bike_token_count: 5, show_on_map: true)
   org.save

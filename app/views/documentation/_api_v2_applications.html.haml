@@ -3,7 +3,7 @@
     - @applications.each do |application|
       %li.application_list_box{ data: {id: application.id}}
         / .well
-        = link_to "edit", edit_oauth_application_url(application), class: 'pull-right'
+        = link_to "edit app", edit_oauth_application_url(application), class: 'pull-right'
         %h4
 
           %a.listed-app-name.uncollapsed{ href: "#"}
@@ -12,7 +12,28 @@
             = application.name
 
         .application-info.initially-hidden
-          %table.table
+          - v2_accessor = application.access_tokens.where(resource_owner_id: ENV['V2_ACCESSOR_ID']).first
+          - if v2_accessor.present?
+            %table.table.tokens-table
+              %thead
+                %th
+                  Permanent public access token
+                  %span.less-strong
+                    Use this token if you don't need to authorize anything
+                %th
+                  Scopes
+                %th
+              %tbody
+                %td
+                  %pre
+                    = v2_accessor.token
+                %td
+                  %code 
+                    public
+                %td
+                  %a.set-token.btn.binxbtn-primary{href: '#', data: {token: v2_accessor.token }}
+                    Use token
+          %table.table.padded
             %tbody
               %tr
                 %td
