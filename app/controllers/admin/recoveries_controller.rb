@@ -2,11 +2,11 @@ class Admin::RecoveriesController < Admin::BaseController
   def index
     if params[:posted]
       @posted = true
-      recoveries = StolenRecord.recovery_unposted.includes(:bike).order("created_at desc")
+      recoveries = StolenRecord.recovery_unposted.includes(:bike).order("date_recovered desc")
     elsif params[:all_recoveries]
-      recoveries = StolenRecord.recovered.includes(:bike).order("created_at desc")
+      recoveries = StolenRecord.recovered.includes(:bike).order("date_recovered desc")
     else 
-      recoveries = StolenRecord.displayable.includes(:bike).order("created_at desc")
+      recoveries = StolenRecord.displayable.includes(:bike).order("date_recovered desc")
     end
     page = params[:page] || 1
     per_page = params[:per_page] || 50
