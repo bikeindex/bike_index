@@ -74,11 +74,16 @@
     .container-fluid
       %h2.padded
         General notes:
-      .alert.alert-info.margined
+      .alert.alert-danger.margined
+        %strong 
+          If there isn't an Access token in the in the header, most of the API will not work.
+        %br
         The Bike Index uses OAuth2. 
         %a.scroll-link{ href: '#applications_list'}
           Create an application 
-        and use an access token, or nothing will work. 
+        and use an access token.
+        
+
       %p
         %strong
           Authentication

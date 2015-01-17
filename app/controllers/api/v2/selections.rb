@@ -10,7 +10,7 @@ module API
   module V2
     class Selections < API::V2::Root
       include API::V2::Defaults
-      resource :selections do
+      resource :selections, desc: "Accepted selections" do
         desc "lists of options for bike attribute selections we provide", {
           notes: <<-NOTE          
           Accepted selections for bikes. Useful to know if you're creating or updating bikes.

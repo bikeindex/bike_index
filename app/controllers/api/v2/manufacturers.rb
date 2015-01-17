@@ -3,7 +3,7 @@ module API
     class Manufacturers < API::V2::Root
       include API::V2::Defaults
 
-      resource :manufacturers do
+      resource :manufacturers, desc: "Accepted manufacturers" do
         desc "All the manufacturers with pagination"
         paginate
         get '/', protected: false do

@@ -161,7 +161,7 @@ describe 'Bikes API V2' do
 
     it "requires stolen attrs if stolen"
 
-    it "responds with 401" do 
+    xit "responds with 401" do 
       post "/api/v2/bikes", {}
       response.code.should == '401'
     end

@@ -3,7 +3,7 @@ module API
     class WheelSizes < API::V2::Root
       include API::V2::Defaults
 
-      resource :wheel_sizes do
+      resource :wheel_sizes, desc: "Accepted wheel sizes" do
         desc "All the wheels sizes with pagination (optionally sorted by popularity)", {
           notes: <<-NOTE
             We identify wheel sizes by ISO - if you'd like to learn more about ISO, check out [Sheldon Brown's article on tire-sizing](http://sheldonbrown.com/tire-sizing.html#iso).
