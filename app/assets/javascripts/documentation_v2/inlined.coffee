@@ -1,3 +1,10 @@
+scrollToRef = (event) ->
+  event.preventDefault()
+  target = $(event.target).attr('href')
+  $('body').animate( 
+    scrollTop: ($(target).offset().top - 20), 'fast' 
+  )
+
 # This coffeescript is the js that is inlined on the swagger index page
 $ ->
   addApiKeyAuthorization = ->
@@ -43,15 +50,25 @@ $ ->
     docExpansion: "none"
     sorter: "alpha"
   )
+
+  $('.scroll-link').click (e) ->
+    scrollToRef(e)
+
   $("#input_apiKey").change ->
     addApiKeyAuthorization()
     localStorage.setItem('access_token', $('#input_apiKey').val())
     return
 
+  $('#header').headroom()
   $('.set-token').click (e) ->
     e.preventDefault()
-    $('body').animate( scrollTop: (0), 'fast' )
-    $("#input_apiKey").val($(e.target).attr('data-token')).change()
+    $('#header').addClass('headroom--pinned').removeClass('headroom--unpinned')
+    input_key = $("#input_apiKey")
+    input_key.fadeOut('fast', ->
+      input_key.val($(e.target).attr('data-token')).change()
+      input_key.fadeIn('fast')
+    )
+    
   
   $('.newtoken-scope-check').change (e) ->
     app = $(e.target).parents('.application_list_box')
@@ -72,7 +89,7 @@ $ ->
   $('.listed-app-name').click (e) ->
     e.preventDefault()
     target = $(e.target)
-    target.parents('li').find('.application-info').slideToggle('fast')
+    target.parents('.application_list_box').find('.application-info').slideToggle('fast')
     target.toggleClass('uncollapsed')
 
   param_token = window.location.href.match(/access_token=[^#|\/]*/i)

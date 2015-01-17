@@ -20,8 +20,24 @@ module API
           optional :stolen_after, type: Integer, desc: "Bikes stolen after timestamp"
         end
 
+        params :bike_attrs do           
+          optional :rear_wheel_bsd, type: Integer, desc: "rear_wheel_bsd"
+          # optional :rear_tire_narrow, type: Boolean, desc: "boolean. Is it a skinny tire?"
+
+          optional :rear_wheel_bsd, type: String, desc: "Duplicates `rear_wheel_bsd` if not set"
+          # optional :rear_tire_narrow, type: Boolean, desc: "Duplicates `rear_tire_narrow` if not set"
+          
+          optional :frame_model, type: String, desc: "What frame model?"
+          optional :year, type: Integer, desc: "What year was the frame made?"
+          optional :description, type: String, desc: "General description"
+        end
+
         def find_bike
           Bike.unscoped.find(params[:id])
+        end
+
+        def authorize_bike_for_user
+
         end
 
         def find_bikes
@@ -41,7 +57,7 @@ module API
         desc "All bike search", {
           notes: <<-NOTE
             If you find any matching bike, use this endpoint.
-            You can not use location information here, since this includes non_stolen bikes (which don't have locaiton information)
+            You can not use location information here, since this includes non_stolen bikes (which don't have location information)
           NOTE
         }
         paginate
@@ -52,6 +68,7 @@ module API
           { "declared_params" => declared(params, include_missing: false) }
           paginate find_bikes
         end
+
 
         desc "Non-stolen bike search"
         paginate
@@ -86,7 +103,8 @@ module API
           paginate find_bikes
         end
 
-        desc "Count", {
+
+        desc "Count of bikes matching search", {
           notes: <<-NOTE
             Use all the options you would pass in other places, responds with how many of bikes there are of each type:
             Unless you pass a proximity, we use IP geolocation. If you include a serial query, we return `close_serials`
@@ -131,13 +149,66 @@ module API
         end
 
 
-        desc "Bike matching ID" 
+        desc "View bike with a give ID" 
         params do
           requires :id, type: Integer, desc: 'Bike id'
         end
         get ':id', serializer: BikeV2ShowSerializer do 
           bike = find_bike
         end
+
+
+      #   desc "Add a bike to the Index!", {
+      #     notes: <<-NOTE
+      #       **Creating test bikes**: To create test bikes, set `test` to true. These bikes:
+
+      #       - Do not show turn up in searches
+      #       - Do not send an email to the owner on creation
+      #       - Are automatically deleted after a few days
+      #       - You can view them in the API /v2/bikes/{id} (same as normal bikes)
+      #       - You can view them on the HTML site (same as normal bikes)
+
+      #       *`test` is automatically marked true on this documentation page. Set it to false it if you want to create actual bikes*
+
+      #       **Ownership**: Bikes you create will be created by the user token you authenticate with, but they will be sent to the email address you specify.
+            
+      #     NOTE
+      #   }
+      #   params do 
+      #     requires :serial_number, type: String, desc: "The serial number for the bike"
+      #     requires :manufacturer, type: String, desc: "Manufacturer name or ID"
+      #     # [Manufacturer name or ID](api_v2#!/manufacturers/GET_version_manufacturers_format)
+
+      #     # optional :test, type: Boolean, desc: "Is this a test bike?"
+      #     requires :owner_email, type: String, desc: "Owner email"
+      #     requires :primary_frame_color, type: String, desc: "Color"
+      #     optional :secondary_frame_color, type: String, desc: "Color"
+      #     optional :tertiary_frame_color, type: String, desc: "Color"
+
+      #     optional :stolen, type: Hash do 
+      #       requires :phone, type: String, desc: "Owner's phone number"
+      #       requires :city, type: String, desc: "Where the bike was stolen"
+      #       requires :country, type: String, desc: "Where the bike was stolen"
+      #       optional :zipcode, type: String, desc: "Where the bike was stolen"
+      #       optional :state, type: String, desc: "Where the bike was stolen"
+      #       optional :address, type: String, desc: "Where the bike was stolen"
+      #       requires :date_stolen, type: Integer, desc: "When was the bike stolen"
+      #     end
+
+      #     optional :components, type: Array do
+      #       requires :manufacturer, type: String, desc: "Manufacturer name or ID"
+      #       # [Manufacturer name or ID](api_v2#!/manufacturers/GET_version_manufacturers_format)
+      #       requires :ctype
+      #     end
+
+      #     use :bike_attrs 
+      #   end
+      #   post do 
+      #     authorize_bike_for_user
+      #     # { "declared_params" => declared(params, include_missing: false) }
+
+      #   end
+
       end
 
     end

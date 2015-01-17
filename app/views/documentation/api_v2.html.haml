@@ -26,24 +26,25 @@
     = javascript_include_tag "documentation_v2"
     
   %body.swagger-section
-    %header#header.content-header
-      .container.bikes-nav
-        .small-header
-          %a.top-logo{ href: root_url }
-            %span.stripey
-            = image_tag "/assets/updated/home/logo.svg", class: 'logo'
-        %form#api_selector.form
-          .api-header-group.api-header-url
-            %label{ for: 'baseUrl' }
-              Swagger doc url
-            %input#input_baseUrl.form-control{:name => "baseUrl", :placeholder => "https://bikeindex.org/api/v2", :type => "text"}
-          .api-header-group.api-header-key
-            %label{ for: 'baseUrl' }
-              API key
-            %input#input_apiKey.form-control{:name => "apiKey", :placeholder => "api_key", :type => "text"}
-          %a#explore.btn.binxbtn{:href => "#"}
-            Explore
-    .container
+    %header#header
+      .content-header
+        .container-fluid.bikes-nav
+          .small-header
+            %a.top-logo{ href: root_url }
+              %span.stripey
+              = image_tag "/assets/updated/home/logo.svg", class: 'logo'
+          %form#api_selector.form
+            .api-header-group.api-header-url
+              / %label{ for: 'baseUrl' }
+              /   Swagger doc url
+              / %input#input_baseUrl.form-control{:name => "baseUrl", :placeholder => "https://bikeindex.org/api/v2", :type => "text"}
+            .api-header-group.api-header-key
+              %label{ for: 'baseUrl' }
+                Access token
+              %input#input_apiKey.form-control{:name => "apiKey", :placeholder => "api_key", :type => "text"}
+            %a#explore.btn.binxbtn{:href => "#"}
+              Explore
+    .container-fluid
       .api-info-header
         %h1.padded
           Bike Index API V2
@@ -51,10 +52,11 @@
           %p
             %strong
               API V2 is under construction!
-            The "/user/current" route is locked in and won't change - but otherwise no guarantees for the next few weeks as we finish building this out. If you've got suggestions or requirements for this API, please contact #{link_to "support@bikeindex.org", "mailto:support@bikeindex.org"}. (12/5/2014)
+            The "/me" route is locked in and won't change - but otherwise no guarantees for the next few weeks as we finish building this out. If you've got suggestions or requirements for this API, please contact #{link_to "support@bikeindex.org", "mailto:support@bikeindex.org"}.
           %p.padded
             %strong
-              Upcoming features:
+              Upcoming features
+            (fully featured beta release on 1/23):
           %ul
             %li
               Bike creation
@@ -69,59 +71,24 @@
             %li
               Client-side flow documentation
 
-        %h2.padded
-          Authentication notes
-        .alert.alert-info
-          The Bike Index uses OAuth2. Create an application and use it, or nothing will work.
-        %p
-          There are two supported ways of authenticating with the Bike Index through OAuth2:
-        %ol
-          %li
-            <strong>Authorization flow</strong>, also called Explicit grant flow. If you create a token on this page, this what the token is created with.
-
-          %li
-            <strong>Client-side flow</strong>, also called Implicit grant flow or Bearer flow.
-        %p.padded
-          The Authorization flow enables long lived access through refresh tokens (instead of logging out the user every hour), is more secure, and is generally what you should be using. Learn more about #{link_to "Authorization flow in OAuth2", "http://labs.hybris.com/2012/06/01/oauth2-authorization-code-flow/", target: '_blank'}.
-
-        %p
-          The Client-side flow is good for client-side javascript apps. Here's an article on #{link_to "Client-side flow in OAuth2", "http://labs.hybris.com/2012/06/05/oauth2-the-implicit-flow-aka-as-the-client-side-flow/", target: '_blank'}.
-        %p
-          To review the applications you've authorized, go to #{link_to "/oauth/authorized_applications", "#{ENV['BASE_URL']}/oauth/authorized_applications"}.
-
-        / %h3.padded
-        /   Sending us your access tokens in requests
-        / %p
-        /   By default we authenticate you with HTTP Basic authentication scheme. If the basic auth is not found in the authorization header, then it falls back to post parameters (all authenticated requests in the docuentation below put the access token in the parameters).
-        %h3.padded
-          Refresh tokens
-        %p
-          Since tokens provide access to someone's account, one of the ways OAuth2 keeps things secure is by having tokens expire - so if someone compromises an access token, they don't have unlimited access to an account. The Bike Index expires tokens after 1 hour.
-        %p
-          When your access token expires, you can get a new one by making a POST request with your app id and the refresh token:
-        %pre
-          POST #{ENV['BASE_URL']}/oauth/token?grant_type=refresh_token&client_id={app_id}&refresh_token={refresh_token}
-        %p
-          %strong
-            We'll add this to the applications section via a button for requesting a refresh token soon!
-
-
-    .applications-panel
-      .container
-        .api-info-header
-          %h2
-            Applications:
-            %span.pull-right.less-strong
-              = link_to "Add an application", "/oauth/applications"
-
-          = render 'api_v2_applications'
-    .container
+    .container-fluid
       %h2.padded
         General notes:
+      .alert.alert-info.margined
+        The Bike Index uses OAuth2. 
+        %a.scroll-link{ href: '#applications_list'}
+          Create an application 
+        and use an access token, or nothing will work. 
+      %p
+        %strong
+          Authentication
+        %a.scroll-link{href: '#authentication_notes'}
+          read more about authentication
+        at the bottom of the page
       %p
         %strong
           Time
-        Bike Index API V2 display everything in #{link_to "UTC unix timestamps", "https://en.wikipedia.org/wiki/Unix_time", target: '_blank'} (integers). Any time parameters you send need to use timestamps as well.
+        Bike Index API V2 display everything in #{link_to "UTC unix timestamps", "https://en.wikipedia.org/wiki/Unix_time", target: '_blank'} (integers). All time parameters you send need to use timestamps as well.
       / %p
       /   %strong
       /     Booleans
@@ -130,21 +97,76 @@
         %strong
           Bike
         We use the work "bike" throughout this documentation to mean anything that is registered (be it a tandem, ice-cream cart or standard bicycle). If we are referring specifically to standard bicycles, we will make note of that.
-      %h2.padded
-        Bike Index API V2 endpoints
+      %p
+        %strong
+          Bike URLs
+        for the HTML pages of the Bike Index follow the same pattern as the API - the url for a bike is https://bikeindex.org/bikes/{bike_id}.
+
+      .start-of-swagger-ui
+        %h2
+          Bike Index API V2 endpoints
 
     #message-bar.swagger-ui-wrap &nbsp;
 
     #swagger-ui-container.swagger-ui-wrap
-    .container
-      .api-info-footer       
-        / .authentication-notes
-        /   #{render 'authentication_info'}
+  
+    .applications-panel#applications_list
+      .container-fluid
+        .clearfix
+          %h2
+            Your applications:
+            %span.pull-right.less-strong
+              = link_to "Add an application", "/oauth/applications"
+          = render 'api_v2_applications'
+    .container-fluid
+      .api-info-footer
+        #authentication_notes
+          %h2
+            Authentication details and description
+          
+          %p
+            There are two supported ways of authenticating with the Bike Index through OAuth2:
+          %ol
+            %li
+              <strong>Authorization flow</strong>, also called Explicit grant flow. If you create a token on this page, this what the token is created with.
 
-        .alert.alert-info.margined
+            %li
+              <strong>Client-side flow</strong>, also called Implicit grant flow or Bearer flow.
+          %p.padded
+            The Authorization flow enables long lived access through refresh tokens (instead of logging out the user every hour), is more secure, and is generally what you should be using. Learn more about #{link_to "Authorization flow in OAuth2", "http://labs.hybris.com/2012/06/01/oauth2-authorization-code-flow/", target: '_blank'}.
+
+          %p
+            The Client-side flow is good for client-side javascript apps. Here's an article on #{link_to "Client-side flow in OAuth2", "http://labs.hybris.com/2012/06/05/oauth2-the-implicit-flow-aka-as-the-client-side-flow/", target: '_blank'}.
+          %p
+            To review the applications you've authorized, go to #{link_to "/oauth/authorized_applications", "#{ENV['BASE_URL']}/oauth/authorized_applications"}.
+
+          / %h3.padded
+          /   Sending us your access tokens in requests
+          / %p
+          /   By default we authenticate you with HTTP Basic authentication scheme. If the basic auth is not found in the authorization header, then it falls back to post parameters (all authenticated requests in the docuentation below put the access token in the parameters).
+          %h3.padded
+            Refresh tokens
+          %p
+            Since tokens provide access to someone's account, one of the ways OAuth2 keeps things secure is by having tokens expire - so if someone compromises an access token, they don't have unlimited access to an account. The Bike Index expires tokens after 1 hour.
+          %p
+            When your access token expires, you can get a new one by making a POST request with your app id and the refresh token:
+          %pre
+            POST #{ENV['BASE_URL']}/oauth/token?grant_type=refresh_token&client_id={app_id}&refresh_token={refresh_token}
           %p
             %strong
-              About this documentation:
-            this documentation is generated by #{link_to "Swagger.io", "https://github.com/swagger-api/swagger-ui", target: '_blank'}. To learn more about Swagger and why it's awesome check out #{link_to "Swagger.io", "http://swagger.io/", target: '_blank'}.
+              We'll add this to the applications section via a button for requesting a refresh token soon!
+          / .authentication-notes
+          /   #{render 'authentication_info'}
+    %hr
+    .container-fluid
+      .alert.alert-info.margined
+        %p
+          / %strong
+          /   About this documentation:
+          This documentation is generated by #{link_to "Swagger.io", "https://github.com/swagger-api/swagger-ui", target: '_blank'}. To learn more about Swagger and why it's awesome check out #{link_to "Swagger.io", "http://swagger.io/", target: '_blank'}.
+        .form-group
+          %label.control-label{ for: 'input_baseUrl' }
+            Swagger doc url
+          %input#input_baseUrl.form-control{:name => "baseUrl", :placeholder => "https://bikeindex.org/api/v2", :type => "text"}
 
     = render 'shared/footer_updated'

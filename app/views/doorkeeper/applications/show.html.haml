@@ -29,3 +29,7 @@
       = link_to 'Edit', edit_oauth_application_path(@application), class: 'btn binxbtn-primary'
     %p
       = render 'delete_form', application: @application
+
+%hr
+  %h2
+    Return to #{link_to "Documentation page", api_v2_documentation_index_url}.
