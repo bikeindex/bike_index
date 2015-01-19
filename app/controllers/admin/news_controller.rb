@@ -57,7 +57,7 @@ class Admin::NewsController < Admin::BaseController
       redirect_to edit_admin_news_url(@blog)
     else
       flash[:error] = "Blog error! #{@blog.errors.full_messages.to_sentence}"
-      redirect_to new_admin_news_index_url
+      redirect_to new_admin_news_path
     end
   end
 

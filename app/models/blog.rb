@@ -81,7 +81,7 @@ class Blog < ActiveRecord::Base
       end
       abbr = strip_tags(body_html)
       # strip tags, then remove extra spaces
-      abbr = abbr.gsub(/\n/,' ').gsub(/\s+/, ' ').strip
+      abbr = abbr.gsub(/\n/,' ').gsub(/\s+/, ' ').strip if abbr.present?
       self.body_abbr = truncate(abbr, length: 200)
     end
     true
@@ -101,7 +101,7 @@ class Blog < ActiveRecord::Base
       if is_listicle && listicles.present? && listicles.first.image.present?
         li = listicles.first
         # self.index_image = listicles.first.image_url(:medium)
-        self.index_image_id = i.id
+        self.index_image_id = li.id
       elsif public_images.present?
         pi = public_images.last
         self.index_image_id = public_images.last.id

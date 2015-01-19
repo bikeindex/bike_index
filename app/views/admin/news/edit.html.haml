@@ -3,6 +3,20 @@
     Editing that #{@dignified_name}!
   %p
     = link_to "Back to all", admin_news_index_url
+- if params[:show_photos]
+  .well
+    %p
+      - if @blog.is_listicle
+        - images = @blog.listicles.map(&:image_url)
+      - else
+        - images = @blog.public_images.map(&:image_url)
+      - images.each do |i| 
+        %br
+        = link_to i, i
+      - images.each do |i|
+        %br
+        = image_tag i
+
 
 
 .blog-entry-fields
