@@ -423,6 +423,7 @@ GEM
       activesupport (~> 3.0)
       railties (~> 3.0)
     subexec (0.2.3)
+    swagger-ui_rails (0.1.7)
     temple (0.6.7)
     terminal-table (1.4.5)
     therubyracer (0.12.1)
@@ -536,6 +537,7 @@ DEPENDENCIES
   soulmate!
   stripe!
   strong_parameters
+  swagger-ui_rails
   therubyracer (~> 0.12.1)
   uglifier (>= 1.0.3)
   unicorn
