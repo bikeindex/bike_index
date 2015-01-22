@@ -21,7 +21,7 @@
           %td
             = membership.user.email
           %td.medium-screens
-            = @bikes.where(creator_id: membership.user.id).count
+            = @bikes.where(creator_id: membership.user.id).count if @bikes.present?
 .invitations
   %h2
     Invite more users to your organization
