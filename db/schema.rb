@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150111211009) do
+ActiveRecord::Schema.define(:version => 20150122195921) do
 
   create_table "ads", :force => true do |t|
     t.string   "title"
@@ -337,6 +337,19 @@ ActiveRecord::Schema.define(:version => 20150111211009) do
   end
 
   add_index "locks", ["user_id"], :name => "index_locks_on_user_id"
+
+  create_table "mail_snippets", :force => true do |t|
+    t.string   "name"
+    t.boolean  "is_enabled",            :default => false, :null => false
+    t.boolean  "is_location_triggered", :default => false, :null => false
+    t.text     "body"
+    t.string   "address"
+    t.float    "latitude"
+    t.float    "longitude"
+    t.integer  "proximity_radius"
+    t.datetime "created_at",                               :null => false
+    t.datetime "updated_at",                               :null => false
+  end
 
   create_table "manufacturers", :force => true do |t|
     t.string   "name"

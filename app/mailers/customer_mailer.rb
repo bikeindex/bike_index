@@ -1,6 +1,13 @@
 class CustomerMailer < ActionMailer::Base
 
-  default from: "\"Bike Index\" <contact@bikeindex.org>", content_type: 'multipart/alternative', parts_order: [ "text/calendar", "text/plain", "text/html", "text/enriched" ]
+  default from: "\"Bike Index\" <contact@bikeindex.org>",
+    content_type: 'multipart/alternative',
+    parts_order: [ "text/calendar", "text/plain", "text/html", "text/enriched" ]
+ 
+  def add_snippet(opts={})
+    snippet = MailSnippet.matching_opts(opts.merge({mailer_method: @_action_name}))
+    @snippet_body = snippet.body if snippet.present?
+  end
 
   def welcome_email(user)
     @user = user
@@ -67,6 +74,7 @@ class CustomerMailer < ActionMailer::Base
     else
       subject = "Claim your bike on BikeIndex.org!"
     end
+    add_snippet({bike: @bike})
     mail(to: @ownership.owner_email, subject: subject) do |format|
       format.text
       format.html { render layout: 'email'}

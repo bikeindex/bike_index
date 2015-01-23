@@ -59,10 +59,10 @@ class StolenRecord < ActiveRecord::Base
     (a+[zipcode, country.name]).compact.join(', ')
   end
 
-  unless Rails.env.test?
+  # unless Rails.env.test?
     geocoded_by :address
     after_validation :geocode, if: lambda { (self.city.present? || self.zipcode.present?) && self.country.present? }
-  end
+  # end
 
   def self.locking_description
     ["U-lock", "Two U-locks", "U-lock and cable", "Chain with padlock",

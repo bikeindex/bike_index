@@ -1,12 +1,19 @@
 require 'spec_helper'
 describe CustomerMailer do
 
-  before :each do
-    @user = FactoryGirl.create(:user)
+  describe :including_snippet do 
+    it "includes the snippet" do 
+      @ownership = FactoryGirl.create(:ownership)
+      mail_snippet = MailSnippet.new(body: "<h1>LOLS</h1>")
+      MailSnippet.should_receive(:matching_opts).and_return(mail_snippet)
+      @mail = CustomerMailer.ownership_invitation_email(@ownership)
+      @mail.body.encoded.should match(mail_snippet.body)
+    end
   end
 
   describe :welcome_email do
     before :each do
+      @user = FactoryGirl.create(:user)
       @mail = CustomerMailer.welcome_email(@user)
     end
 
@@ -17,6 +24,7 @@ describe CustomerMailer do
 
   describe :confirmation_email do
     before :each do
+      @user = FactoryGirl.create(:user)
       @mail = CustomerMailer.confirmation_email(@user)
     end
 
@@ -27,6 +35,7 @@ describe CustomerMailer do
 
   describe :password_reset_email do
     before :each do
+      @user = FactoryGirl.create(:user)
       @mail = CustomerMailer.password_reset_email(@user)
     end
 
@@ -37,12 +46,9 @@ describe CustomerMailer do
   end
 
   describe :ownership_invitation_email do
-    before :each do
+    it "renders email" do
       @ownership = FactoryGirl.create(:ownership)
       @mail = CustomerMailer.ownership_invitation_email(@ownership)
-    end
-
-    it "renders email" do
       @mail.subject.should eq("Claim your bike on BikeIndex.org!")
     end
   end

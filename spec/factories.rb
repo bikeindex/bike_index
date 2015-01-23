@@ -227,4 +227,13 @@ FactoryGirl.define do
     contact_type 'stolen_message'
   end
 
+  factory :mail_snippet do 
+    name
+    is_enabled true
+    is_location_triggered true
+    proximity_radius 100
+    address "New York, NY"
+    body "<p>Foo</p>"
+  end
+
 end

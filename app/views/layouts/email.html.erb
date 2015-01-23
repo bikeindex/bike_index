@@ -28,6 +28,8 @@
   </div>
 
   <div class="body-content" style="margin: 0;padding: 20px 20px 30px;margin-bottom: 10px;clear:both;">
+    
+    <% if @snippet_body.present? %><%= @snippet_body.html_safe %><% end %>
 
     <%= yield %>
 
