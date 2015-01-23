@@ -2,7 +2,6 @@ module API
   module V2
     class Me < API::V2::Root
       include API::V2::Defaults
-      # info: {desc: "SOMETHING"}
 
       resource :me, desc: "Operations about the current user" do
         helpers do 

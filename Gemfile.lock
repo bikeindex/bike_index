@@ -26,6 +26,14 @@ GIT
       dotenv (= 0.11.1)
 
 GIT
+  remote: https://github.com/jrhe/grape-active_model_serializers
+  revision: ca9c8faaa99727300ff21419aa20471ac27eed42
+  specs:
+    grape-active_model_serializers (1.3.1)
+      active_model_serializers (>= 0.9.0)
+      grape
+
+GIT
   remote: https://github.com/stripe/stripe-ruby
   revision: 48f76057f425ab5c3bb147f3d71c3d36d951159f
   specs:
@@ -50,7 +58,7 @@ GEM
       rack-cache (~> 1.2)
       rack-test (~> 0.6.1)
       sprockets (~> 2.2.1)
-    active_model_serializers (0.9.0)
+    active_model_serializers (0.9.3)
       activemodel (>= 3.2)
     activemodel (3.2.21)
       activesupport (= 3.2.21)
@@ -68,7 +76,7 @@ GEM
       multi_json (~> 1.0)
     acts_as_paranoid (0.4.2)
       activerecord (~> 3.2)
-    api-pagination (3.1.0)
+    api-pagination (4.0.0)
     arel (3.0.3)
     aws-sdk (1.3.9)
       httparty (~> 0.7)
@@ -175,7 +183,7 @@ GEM
       thor (>= 0.13.6)
     formatador (0.2.5)
     geocoder (1.2.5)
-    grape (0.9.0)
+    grape (0.10.1)
       activesupport
       builder
       hashie (>= 2.1.0)
@@ -185,17 +193,14 @@ GEM
       rack-accept
       rack-mount
       virtus (>= 1.0.0)
-    grape-active_model_serializers (1.3.1)
-      active_model_serializers (>= 0.9.0)
-      grape (~> 0.3)
     grape-doorkeeper (0.0.2)
       doorkeeper (~> 1.4.0)
       grape (~> 0.9)
     grape-entity (0.4.4)
       activesupport
       multi_json (>= 1.3.2)
-    grape-swagger (0.8.0)
-      grape
+    grape-swagger (0.9.0)
+      grape (>= 0.8.0)
       grape-entity
     groupdate (2.2.1)
       activesupport (>= 3)
@@ -221,7 +226,7 @@ GEM
       activesupport (>= 3.1, < 4.1)
       haml (~> 3.1)
       railties (>= 3.1, < 4.1)
-    hashie (2.1.2)
+    hashie (3.3.2)
     high_voltage (2.1.0)
     highline (1.6.21)
     hike (1.2.3)
@@ -229,7 +234,7 @@ GEM
     httparty (0.13.1)
       json (~> 1.8)
       multi_xml (>= 0.5.2)
-    i18n (0.6.11)
+    i18n (0.7.0)
     ice_nine (0.11.1)
     journey (1.0.4)
     jquery-rails (3.1.0)
@@ -280,8 +285,8 @@ GEM
       multi_json (~> 1.3)
       multi_xml (~> 0.5)
       rack (~> 1.2)
-    omniauth (1.2.1)
-      hashie (>= 1.2, < 3)
+    omniauth (1.2.2)
+      hashie (>= 1.2, < 4)
       rack (~> 1.0)
     omniauth-facebook (1.6.0)
       omniauth-oauth2 (~> 1.1)
@@ -450,7 +455,7 @@ GEM
     uuidtools (2.1.4)
     vegas (0.1.11)
       rack (>= 1.0.0)
-    virtus (1.0.3)
+    virtus (1.0.4)
       axiom-types (~> 0.1)
       coercible (~> 1.0)
       descendants_tracker (~> 0.0, >= 0.0.3)
@@ -489,7 +494,7 @@ DEPENDENCIES
   foreman
   geocoder
   grape
-  grape-active_model_serializers
+  grape-active_model_serializers!
   grape-doorkeeper
   grape-swagger
   groupdate

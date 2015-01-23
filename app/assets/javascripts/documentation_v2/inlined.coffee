@@ -5,6 +5,11 @@ scrollToRef = (event) ->
     scrollTop: ($(target).offset().top - 20), 'fast' 
   )
 
+operationsAfterSwaggerLoads = ->
+  # delayed, runs after swagger is loaded (hopefully)
+  $('select[name="test"]').val('true')
+
+
 # This coffeescript is the js that is inlined on the swagger index page
 $ ->
   addApiKeyAuthorization = ->
@@ -97,4 +102,7 @@ $ ->
     $("#input_apiKey").val(param_token[0].replace('access_token=', '')).change()
 
   window.swaggerUi.load()
+  window.setTimeout (->
+    operationsAfterSwaggerLoads()
+  ), 2000
   

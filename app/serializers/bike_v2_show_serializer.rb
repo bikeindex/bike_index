@@ -1,5 +1,4 @@
 class BikeV2ShowSerializer < BikeV2Serializer
-  self.root = 'bike'
   attributes :registration_created_at,
     :registration_updated_at,
     :url,
@@ -11,7 +10,8 @@ class BikeV2ShowSerializer < BikeV2Serializer
     :description,
     :rear_tire_narrow,
     :front_tire_narrow,
-    :type_of_cycle
+    :type_of_cycle, 
+    :test_bike
 
   has_one :rear_wheel_size,
     :front_wheel_size,
@@ -33,6 +33,10 @@ class BikeV2ShowSerializer < BikeV2Serializer
 
   def api_url
     "#{ENV['BASE_URL']}/api/v1/bikes/#{object.id}"
+  end
+
+  def test_bike
+    object.example
   end
   
   def registration_created_at

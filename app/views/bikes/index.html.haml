@@ -15,7 +15,7 @@
 - else
   - active = 'non_stolen'
 - url = request.original_url.split('bikes?').last
-- url = "#{ENV['BASE_URL']}/api/v2/bikes/count?#{url}"
+- url = "#{ENV['BASE_URL']}/api/v2/bikes_search/count?#{url}"
 %nav#search_tabs.bikes-search-type-tabs{ data: {url: url }}
   .container
     %ul

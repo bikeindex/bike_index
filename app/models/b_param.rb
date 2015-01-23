@@ -7,7 +7,10 @@ class BParam < ActiveRecord::Base
     :bike_token_id,
     :bike_errors,
     :image,
-    :image_processed
+    :image_processed, 
+    :api_v2
+
+  attr_accessor :api_v2
 
   mount_uploader :image, ImageUploader
   store_in_background :image
@@ -28,6 +31,18 @@ class BParam < ActiveRecord::Base
   def clean_errors
     return true unless bike_errors.present?
     self.bike_errors = bike_errors.delete_if { |a| a[/(bike can.t be blank|are you sure the bike was created)/i] }
+  end
+
+  before_save :massage_v2
+  def massage_v2
+    return true unless api_v2
+    h = { bike: params }
+    h[:bike][:serial_number] = h[:bike].delete :serial
+    h[:test] = h[:bike].delete :test
+    org = Organization.find_by_slug(h[:bike].delete :organization_slug)
+    h[:creation_organization_id] = org.id if org.present?
+    self.params = h
+    true
   end
 
   before_save :set_foreign_keys

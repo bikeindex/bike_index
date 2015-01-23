@@ -1,4 +1,14 @@
+// THINGS THAT SHOULD BE ADDED TO SWAGGER
+.swagger-ui-wrap {
+  ul { margin: 0; }
+  select.parameter { width: 100%;}
+}
 
+// 
+// 
+// BINX STYLES
+// 
+// 
 .content-header {
   // background: #000;
   background: $gray-lighter;
@@ -111,6 +121,7 @@
 }
 
 .start-of-swagger-ui { padding-top: 40px; }
+
 @media (min-width: $m-breakpoint) { 
   .start-of-swagger-ui { padding-top: 80px; }
 }

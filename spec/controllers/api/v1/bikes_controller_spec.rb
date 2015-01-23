@@ -48,7 +48,7 @@ describe Api::V1::BikesController do
       user = FactoryGirl.create(:user)
       FactoryGirl.create(:membership, user: user, organization: @organization)
       @organization.save
-      FactoryGirl.create(:cycle_type, name: "Bike")
+      FactoryGirl.create(:cycle_type, slug: "bike")
       FactoryGirl.create(:propulsion_type, name: "Foot pedal")
     end
 

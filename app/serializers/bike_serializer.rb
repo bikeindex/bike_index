@@ -1,4 +1,5 @@
 class BikeSerializer < ActiveModel::Serializer
+
   attributes :id,
     :serial,
     :registration_created_at,
@@ -29,7 +30,7 @@ class BikeSerializer < ActiveModel::Serializer
     :front_gear_type,
     :rear_gear_type,
     :stolen_record
-  
+
   def type_of_cycle
     object.cycle_type.name
   end  

@@ -6,7 +6,8 @@ class StolenNotification < ActiveRecord::Base
     :bike_id,
     :bike,
     :receiver_email,
-    :send_dates
+    :send_dates,
+    :application_id
 
   belongs_to :bike
   belongs_to :sender, class_name: 'User', foreign_key: :sender_id

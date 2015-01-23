@@ -20,6 +20,33 @@ describe BParam do
     end
   end
 
+  describe :massage_v2 do 
+    it "renames v2 keys" do 
+      p = {
+        serial: 'something',
+        manufacturer: 'something else',
+        test: true
+      }
+      b_param = BParam.new(params: p, api_v2: true)
+      b_param.massage_v2
+      k = b_param.params[:bike]
+      (k.keys.include?(:serial_number)).should be_true
+      (k.keys.include?(:manufacturer)).should be_true
+      k.keys.length.should eq(2)
+      b_param.params[:test].should be_true
+    end
+    it "gets the organization id" do 
+      org = FactoryGirl.create(:organization, name: "Something")
+      p = { organization_slug: org.slug }
+      b_param = BParam.new(params: p, api_v2: true)
+      b_param.massage_v2
+      b_param.params[:bike][:creation_organization_id].should eq(org.id)
+    end
+    it "has before_save_callback_method defined as a before_save callback" do
+      BParam._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:massage_v2).should == true
+    end
+  end
+
   describe :set_foreign_keys do 
     it "calls set_foreign_keys" do 
       b_param = BParam.new
@@ -36,6 +63,9 @@ describe BParam do
       b_param.should_receive(:set_handlebar_type_key).and_return(true)
       b_param.should_receive(:set_frame_material_key).and_return(true)
       b_param.set_foreign_keys
+    end
+    it "has before_save_callback_method defined as a before_save callback" do
+      BParam._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_foreign_keys).should == true
     end
   end
 

@@ -38,20 +38,19 @@
           %p
             %strong
               API V2 is under construction!
-            The "/me" route is locked in and won't change - but otherwise no guarantees for the next few weeks as we finish building this out. If you've got suggestions or requirements for this API, please contact #{link_to "support@bikeindex.org", "mailto:support@bikeindex.org"}.
+            There were just significant breaking changes. There probably will be more significant breaking changes in the next three days (1/23).
           %p.padded
             %strong
-              Upcoming features
-            (fully featured beta release on 1/23):
+              Upcoming features rolling out over the weekend (currently exist but aren't stable & tested):
           %ul
-            %li
-              Bike creation
             %li
               Bike editing/updating
             %li
-              Contacting stolen bike owners
-            %li
               User editing/updating
+          %p
+            %strong
+              Documentation improvements, (live by 1/28):
+          %ul
             %li
               Refresh token documentation
             %li
@@ -80,10 +79,6 @@
         %strong
           Time
         Bike Index API V2 display everything in #{link_to "UTC unix timestamps", "https://en.wikipedia.org/wiki/Unix_time", target: '_blank'} (integers). All time parameters you send need to use timestamps as well.
-      / %p
-      /   %strong
-      /     Booleans
-      /   Sometimes there are booleans. They should be sent as 0 (false) or 1 (true).
       %p
         %strong
           Bike

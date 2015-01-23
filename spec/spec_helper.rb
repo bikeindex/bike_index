@@ -53,12 +53,12 @@ def create_v2_access_id
   ENV['V2_ACCESSOR_ID'] = FactoryGirl.create(:user).id.to_s
 end
 
-def create_doorkeeper_app
+def create_doorkeeper_app(opts={})
   @user = FactoryGirl.create(:user)
   @application = Doorkeeper::Application.new(name: "MyApp", redirect_uri: "http://app.com")
   @application.owner = @user
   @application.save
-  @token = Doorkeeper::AccessToken.create!(application_id: @application.id, resource_owner_id: @user.id)
+  @token = Doorkeeper::AccessToken.create!(application_id: @application.id, resource_owner_id: @user.id, scopes: opts && opts[:scopes])
 end
 
 OmniAuth.config.mock_auth[:facebook] = OmniAuth::AuthHash.new({

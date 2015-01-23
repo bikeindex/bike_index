@@ -41,7 +41,7 @@ gem 'omniauth-facebook'
 gem 'omniauth'
 gem "fog"
 gem 'dalli'
-gem 'draper'
+gem 'draper', require: false
 # gem 'rack-mini-profiler', require: 'false'
 gem 'dotenv-rails', "~> 0.8", git: "https://github.com/bkeepers/dotenv"
 gem 'wkhtmltopdf-binary'
@@ -58,7 +58,7 @@ gem 'groupdate'
 # gem 'localeapp'
 
 gem 'grape'
-gem 'grape-active_model_serializers'
+gem 'grape-active_model_serializers', git: "https://github.com/jrhe/grape-active_model_serializers"
 gem 'grape-swagger'
 gem 'swagger-ui_rails'
 gem 'grape-doorkeeper'

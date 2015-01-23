@@ -1,5 +1,4 @@
 class BikeV2Serializer < ActiveModel::Serializer
-  self.root = 'bikes'
   attributes :id,
     :serial,
     :manufacturer_name,

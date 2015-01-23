@@ -16,7 +16,7 @@ class BikeCreatorBuilder
 
   def add_required_attributes(bike)
     unless bike.cycle_type_id.present?
-      bike.cycle_type_id = CycleType.find_by_name("Bike").id 
+      bike.cycle_type_id = CycleType.find_by_slug("bike").id 
     end
     unless bike.propulsion_type_id.present?
       bike.propulsion_type_id = PropulsionType.find_by_name("Foot pedal").id 

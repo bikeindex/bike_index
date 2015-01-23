@@ -19,6 +19,7 @@ class BikeCreatorVerifier
 
   def check_example
     example_org = Organization.find_by_name('Example organization')
+    @bike.creation_organization_id = example_org.id if @b_param.params[:test] == true
     if @bike.creation_organization_id.present? && example_org.present?
       @bike.example = true if @bike.creation_organization_id == example_org.id
     else

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150122195921) do
+ActiveRecord::Schema.define(:version => 20150123233624) do
 
   create_table "ads", :force => true do |t|
     t.string   "title"
@@ -417,15 +417,16 @@ ActiveRecord::Schema.define(:version => 20150122195921) do
   add_index "oauth_access_tokens", ["token"], :name => "index_oauth_access_tokens_on_token", :unique => true
 
   create_table "oauth_applications", :force => true do |t|
-    t.string   "name",                            :null => false
-    t.string   "uid",                             :null => false
-    t.string   "secret",                          :null => false
-    t.text     "redirect_uri",                    :null => false
-    t.datetime "created_at",                      :null => false
-    t.datetime "updated_at",                      :null => false
+    t.string   "name",                                             :null => false
+    t.string   "uid",                                              :null => false
+    t.string   "secret",                                           :null => false
+    t.text     "redirect_uri",                                     :null => false
+    t.datetime "created_at",                                       :null => false
+    t.datetime "updated_at",                                       :null => false
     t.integer  "owner_id"
     t.string   "owner_type"
-    t.boolean  "is_internal",  :default => false, :null => false
+    t.boolean  "is_internal",                   :default => false, :null => false
+    t.boolean  "can_send_stolen_notifications", :default => false, :null => false
   end
 
   add_index "oauth_applications", ["owner_id", "owner_type"], :name => "index_oauth_applications_on_owner_id_and_owner_type"
@@ -588,11 +589,14 @@ ActiveRecord::Schema.define(:version => 20150122195921) do
     t.integer  "sender_id"
     t.integer  "receiver_id"
     t.integer  "bike_id"
-    t.datetime "created_at",     :null => false
-    t.datetime "updated_at",     :null => false
+    t.datetime "created_at",           :null => false
+    t.datetime "updated_at",           :null => false
     t.text     "send_dates"
     t.string   "receiver_email"
+    t.integer  "oauth_application_id"
   end
+
+  add_index "stolen_notifications", ["oauth_application_id"], :name => "index_stolen_notifications_on_oauth_application_id"
 
   create_table "stolen_records", :force => true do |t|
     t.string   "zipcode"
