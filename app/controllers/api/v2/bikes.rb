@@ -124,8 +124,8 @@ module API
         end
         post ':id/send_stolen_notification', scopes: [:read_user], serializer: StolenNotificationSerializer  do 
           bike = Bike.unscoped.find(params[:id])
-          error!("Bike is not stolen", 401) unless bike.stolen
-          unless bike.current_owner == current_user
+          error!("Bike is not stolen", 401) unless bike.present? && bike.stolen
+          unless bike.owner == current_user
             error!("You do not own that bike! (This application is not authorized to send notifications)", 401) 
           end
           StolenNotification.create(bike_id: params[:id],

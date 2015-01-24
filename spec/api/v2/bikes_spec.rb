@@ -112,37 +112,40 @@ describe 'Bikes API V2' do
   describe :send_stolen_notification do 
     it "fails to send a stolen notification without read_user" do
       create_doorkeeper_app
-      bike = FactoryGirl.create(:stolen_bike)
+      bike = FactoryGirl.create(:ownership).bike
+      bike.stub(:stolen).and_return(true)
       params = {message: "Something I'm sending you"}
       post "/api/v2/bikes/#{bike.id}/send_stolen_notification?access_token=#{@token.token}",
         params.to_json,
         { 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       response.code.should eq('403')
+      response.body.match('is not stolen').should_not be_present
     end
 
     it "fails if the bike isn't stolen" do 
       create_doorkeeper_app({scopes: 'read_user'})
-      bike = FactoryGirl.create(:bike)
-      params = {message: "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod \ntempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, \nquis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo \nconsequat. Duis aute irure dolor in reprehenderit in voluptate velit esse \ncillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non \nproident, sunt in culpa qui officia deserunt mollit anim id est laborum."}
-      post "/api/v2/bikes/#{bike.id}/send_stolen_notification?access_token=#{@token.token}",
-        params.to_json,
-        { 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
-      pp response.body
-      response.code.should eq('401')
-    end
-
-    xit "fails if the bike isn't owned by the access token user" do
-      create_doorkeeper_app({scopes: 'read_user'})
-      bike = FactoryGirl.create(:bike)
+      bike = FactoryGirl.create(:ownership).bike
       params = {message: "Something I'm sending you"}
       post "/api/v2/bikes/#{bike.id}/send_stolen_notification?access_token=#{@token.token}",
         params.to_json,
         { 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
-      pp response.body
       response.code.should eq('401')
+      response.body.match('is not stolen').should be_present
     end
 
-    xit "sends a notification" do 
+    it "fails if the bike isn't owned by the access token user" do
+      create_doorkeeper_app({scopes: 'read_user'})
+      bike = FactoryGirl.create(:ownership).bike
+      bike.update_attribute :stolen, true
+      params = {message: "Something I'm sending you"}
+      post "/api/v2/bikes/#{bike.id}/send_stolen_notification?access_token=#{@token.token}",
+        params.to_json,
+        { 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      response.code.should eq('401')
+      response.body.match('is not stolen').should_not be_present
+    end
+
+    it "sends a notification" do 
       create_doorkeeper_app({scopes: 'read_user'})
       bike = FactoryGirl.create(:stolen_bike, owner_email: @user.id)
       params = {message: "Something I'm sending you"}

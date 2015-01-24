@@ -179,11 +179,11 @@ class Bike < ActiveRecord::Base
   end
 
   def current_ownership
-    ownerships.last
+    ownerships && ownerships.last
   end
 
   def owner
-    current_ownership.owner
+    current_ownership && current_ownership.owner
   end
 
   def user_hidden
