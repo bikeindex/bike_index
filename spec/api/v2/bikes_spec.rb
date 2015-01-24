@@ -113,7 +113,7 @@ describe 'Bikes API V2' do
     it "fails to send a stolen notification without read_user" do
       create_doorkeeper_app
       bike = FactoryGirl.create(:ownership).bike
-      bike.stub(:stolen).and_return(true)
+      bike.update_attribute :stolen, true
       params = {message: "Something I'm sending you"}
       post "/api/v2/bikes/#{bike.id}/send_stolen_notification?access_token=#{@token.token}",
         params.to_json,
@@ -147,12 +147,14 @@ describe 'Bikes API V2' do
 
     it "sends a notification" do 
       create_doorkeeper_app({scopes: 'read_user'})
-      bike = FactoryGirl.create(:stolen_bike, owner_email: @user.id)
+      bike = FactoryGirl.create(:ownership, user_id: @user.id, creator_id: @user.id).bike
+      bike.update_attribute :stolen, true
       params = {message: "Something I'm sending you"}
       expect{
         post "/api/v2/bikes/#{bike.id}/send_stolen_notification?access_token=#{@token.token}",
           params.to_json,
           { 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+        pp response.body
       }.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
       response.code.should eq('201')
     end

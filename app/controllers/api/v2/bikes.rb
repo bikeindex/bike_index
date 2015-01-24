@@ -129,8 +129,8 @@ module API
             error!("You do not own that bike! (This application is not authorized to send notifications)", 401) 
           end
           StolenNotification.create(bike_id: params[:id],
-            message: message,
-            sender_id: current_user.id
+            message: params[:message],
+            sender: current_user
           )
         end
 
