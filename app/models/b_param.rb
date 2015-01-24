@@ -40,7 +40,7 @@ class BParam < ActiveRecord::Base
     h[:bike][:serial_number] = h[:bike].delete :serial
     h[:test] = h[:bike].delete :test
     org = Organization.find_by_slug(h[:bike].delete :organization_slug)
-    h[:creation_organization_id] = org.id if org.present?
+    h[:bike][:creation_organization_id] = org.id if org.present?
     self.params = h
     true
   end

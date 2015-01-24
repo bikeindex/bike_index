@@ -1,5 +1,5 @@
 # ![BIKE INDEX](https://github.com/bikeindex/bike_index/blob/master/bike_index.png?raw=true) This is the [Bike Index](https://www.bikeindex.org) [![Build Status](https://secure.travis-ci.org/bikeindex/bike_index.png)](http://travis-ci.org/bikeindex/bike_index)
-[![Code Climate](https://codeclimate.com/github/bikeindex/bike_index/badges/gpa.svg)](https://codeclimate.com/github/bikeindex/bike_index)
+<a style="float:right;" href="https://codeclimate.com/github/bikeindex/bike_index"><img src="https://codeclimate.com/github/bikeindex/bike_index/badges/coverage.svg" /></a><a style="float:right;" href="https://codeclimate.com/github/bikeindex/bike_index"><img src="https://codeclimate.com/github/bikeindex/bike_index/badges/gpa.svg" /></a>
 
 Bike registration that works: online, powerful, free.
 

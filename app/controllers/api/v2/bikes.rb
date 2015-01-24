@@ -1,3 +1,4 @@
+CYCLE_TYPE_SLUGS = CycleType && CycleType.slugs
 module API
   module V2
     class Bikes < API::V2::Root
@@ -81,7 +82,7 @@ module API
           requires :color, type: String, desc: "Main color or paint - does not have to be one of the accepted colors"
           optional :test, type: Boolean, desc: "Is this a test bike?"
           optional :organization_slug, type: String, desc: "Organization bike should be created by. **Only works** if user is a member of the organization"
-          optional :cycle_type_slug, type: String, values: CycleType.slugs, default: 'bike', desc: "Type of cycle"
+          optional :cycle_type_slug, type: String, values: CYCLE_TYPE_SLUGS, default: 'bike', desc: "Type of cycle"
 
           use :bike_attrs 
         end

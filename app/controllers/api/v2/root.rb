@@ -7,12 +7,7 @@ module API
       mount API::V2::Bikes
       mount API::V2::BikesSearch
       mount API::V2::Manufacturers
-      mount API::V2::WheelSizes
-      mount API::V2::CycleTypes
-      mount API::V2::ComponentTypes
-      mount API::V2::Colors
-      mount API::V2::HandlebarTypes
-      mount API::V2::FrameMaterials
+      mount API::V2::Selections
       content_type :json, 'application/json'
       add_swagger_documentation base_path: "/api",
         api_version: 'v2',
