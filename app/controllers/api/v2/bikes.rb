@@ -1,4 +1,4 @@
-CYCLE_TYPE_SLUGS = CycleType && CycleType.slugs
+CYCLE_TYPE_SLUGS = !!CycleType && CycleType.slugs rescue ['bike']
 module API
   module V2
     class Bikes < API::V2::Root
@@ -119,12 +119,12 @@ module API
         }
         params do 
           requires :id, type: Integer, desc: "The ID of the bike. **MUST BE A STOLEN BIKE**"
-          requires :message, type: 'text', desc: "The message you are sending to the owner"
+          requires :message, desc: "The message you are sending to the owner"
         end
         post ':id/send_stolen_notification', scopes: [:read_user], serializer: StolenNotificationSerializer  do 
           bike = Bike.unscoped.find(params[:id])
           error!("Bike is not stolen", 401) unless bike.stolen
-          stolen_notification = StolenNotification.create
+          # stolen_notification = StolenNotification.create
           stolen_notification
         end
 
