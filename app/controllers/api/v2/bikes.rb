@@ -1,4 +1,5 @@
 CYCLE_TYPE_SLUGS = !!CycleType && CycleType.slugs rescue ['bike']
+COLOR_NAMES = !!Color && Color.pluck(:name) rescue []
 module API
   module V2
     class Bikes < API::V2::Root
@@ -14,9 +15,9 @@ module API
           optional :year, type: Integer, desc: "What year was the frame made?"
           optional :description, type: String, desc: "General description"
           
-          optional :primary_frame_color, type: String, values: Color.pluck(:name), desc: "Main color of frame"
-          optional :secondary_frame_color, type: String, values: Color.pluck(:name), desc: "Secondary color"
-          optional :tertiary_frame_color, type: String, values: Color.pluck(:name), desc: "If you have a third color"
+          optional :primary_frame_color, type: String, values: COLOR_NAMES, desc: "Main color of frame"
+          optional :secondary_frame_color, type: String, values: COLOR_NAMES, desc: "Secondary color"
+          optional :tertiary_frame_color, type: String, values: COLOR_NAMES, desc: "If you have a third color"
         end
 
 
@@ -119,13 +120,18 @@ module API
         }
         params do 
           requires :id, type: Integer, desc: "The ID of the bike. **MUST BE A STOLEN BIKE**"
-          requires :message, desc: "The message you are sending to the owner"
+          requires :message, type: String, desc: "The message you are sending to the owner"
         end
         post ':id/send_stolen_notification', scopes: [:read_user], serializer: StolenNotificationSerializer  do 
           bike = Bike.unscoped.find(params[:id])
           error!("Bike is not stolen", 401) unless bike.stolen
-          # stolen_notification = StolenNotification.create
-          stolen_notification
+          unless bike.current_owner == current_user
+            error!("You do not own that bike! (This application is not authorized to send notifications)", 401) 
+          end
+          StolenNotification.create(bike_id: params[:id],
+            message: message,
+            sender_id: current_user.id
+          )
         end
 
       end

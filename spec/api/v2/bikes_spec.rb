@@ -123,7 +123,7 @@ describe 'Bikes API V2' do
     it "fails if the bike isn't stolen" do 
       create_doorkeeper_app({scopes: 'read_user'})
       bike = FactoryGirl.create(:bike)
-      params = {message: "Something I'm sending you"}
+      params = {message: "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod \ntempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, \nquis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo \nconsequat. Duis aute irure dolor in reprehenderit in voluptate velit esse \ncillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non \nproident, sunt in culpa qui officia deserunt mollit anim id est laborum."}
       post "/api/v2/bikes/#{bike.id}/send_stolen_notification?access_token=#{@token.token}",
         params.to_json,
         { 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
