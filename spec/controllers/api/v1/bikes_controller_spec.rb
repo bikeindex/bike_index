@@ -74,7 +74,6 @@ describe Api::V1::BikesController do
     it "creates a record and reset example" do
       manufacturer = FactoryGirl.create(:manufacturer)
       FactoryGirl.create(:wheel_size, iso_bsd: 559)
-      FactoryGirl.create(:cycle_type, slug: "bike")
       FactoryGirl.create(:ctype, name: "wheel")
       FactoryGirl.create(:ctype, name: "headset")
       f_count = Feedback.count
@@ -132,7 +131,6 @@ describe Api::V1::BikesController do
     it "creates a photos even inf one fails" do
       manufacturer = FactoryGirl.create(:manufacturer)
       FactoryGirl.create(:wheel_size, iso_bsd: 559)
-      FactoryGirl.create(:cycle_type, slug: "bike")
       FactoryGirl.create(:ctype, name: "wheel")
       FactoryGirl.create(:ctype, name: "headset")
       f_count = Feedback.count
@@ -157,7 +155,6 @@ describe Api::V1::BikesController do
     it "creates a stolen record" do
       manufacturer = FactoryGirl.create(:manufacturer)
       @organization.users.first.update_attribute :phone, '123-456-6969'
-      FactoryGirl.create(:cycle_type, slug: "bike")
       FactoryGirl.create(:country, iso: "US")
       FactoryGirl.create(:state, abbreviation: "Palace")
       # ListingOrderWorker.any_instance.should_receive(:perform).and_return(true)
@@ -197,7 +194,6 @@ describe Api::V1::BikesController do
     end
 
     it "creates an example bike if the bike is from example, and include all the options" do
-      FactoryGirl.create(:cycle_type, slug: "bike")
       FactoryGirl.create(:color, name: "Black")
       org = FactoryGirl.create(:organization, name: "Example organization")
       user = FactoryGirl.create(:user)
@@ -233,7 +229,6 @@ describe Api::V1::BikesController do
     it "creates a record even if the post is a string" do
       manufacturer = FactoryGirl.create(:manufacturer)
       FactoryGirl.create(:wheel_size, iso_bsd: 559)
-      FactoryGirl.create(:cycle_type, slug: "bike")
       FactoryGirl.create(:ctype, slug: "wheel")
       FactoryGirl.create(:ctype, slug: "headset")
       f_count = Feedback.count
@@ -254,7 +249,6 @@ describe Api::V1::BikesController do
     it "does not send an ownership email if it has no_email set" do
       manufacturer = FactoryGirl.create(:manufacturer)
       FactoryGirl.create(:wheel_size, iso_bsd: 559)
-      FactoryGirl.create(:cycle_type, slug: "bike")
       FactoryGirl.create(:ctype, slug: "wheel")
       FactoryGirl.create(:ctype, slug: "headset")
       f_count = Feedback.count

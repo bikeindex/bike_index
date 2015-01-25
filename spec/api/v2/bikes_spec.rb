@@ -105,9 +105,9 @@ describe 'Bikes API V2' do
     end
 
     it "requires stolen attrs if stolen"
+    it "adds in components and stolen attrs"
+    it "does photo uploads"
   end
-
-  
 
   describe :send_stolen_notification do 
     it "fails to send a stolen notification without read_user" do
@@ -154,7 +154,6 @@ describe 'Bikes API V2' do
         post "/api/v2/bikes/#{bike.id}/send_stolen_notification?access_token=#{@token.token}",
           params.to_json,
           { 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
-        pp response.body
       }.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
       response.code.should eq('201')
     end
