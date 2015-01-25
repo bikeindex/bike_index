@@ -17,7 +17,7 @@ module API
           
           optional :primary_frame_color, type: String, values: COLOR_NAMES, desc: "Main color of frame"
           optional :secondary_frame_color, type: String, values: COLOR_NAMES, desc: "Secondary color"
-          optional :tertiary_frame_color, type: String, values: COLOR_NAMES, desc: "If you have a third color"
+          optional :tertiary_frame_color, type: String, values: COLOR_NAMES, desc: "Third color"
         end
 
 
@@ -41,10 +41,16 @@ module API
           @bike = Bike.unscoped.find(params[:id])
         end
 
-        def authorize_bike_for_user
-          # pp current_scopes
-          true
+        def authorize_bike_for_user(addendum='')
+          return true if @bike.owner == current_user
+          @bike.current_ownership.can_be_claimed_by(current_user)
+          if @bike.current_ownership.can_be_claimed_by(current_user)
+            @bike.current_ownership.mark_claimed
+            return true
+          end  
+          error!("You do not own that #{@bike.type}#{addendum}", 403) 
         end
+
       end
 
       resource :bikes do
@@ -55,6 +61,7 @@ module API
         get ':id', serializer: BikeV2ShowSerializer, root:  'bike' do 
           find_bike
         end
+
 
         desc "Add a bike to the Index!", {
           notes: <<-NOTE
@@ -68,7 +75,7 @@ module API
             - Do not send an email to the owner on creation
             - Are automatically deleted after a few days
             - Can be viewed in the API /v2/bikes/{id} (same as non-test bikes)
-            - Can be viewed on the HTML site (same as non-test bikes)
+            - Can be viewed on the HTML site /bikes/{id} (same as non-test bikes)
 
             *`test` is automatically marked true on this documentation page. Set it to false it if you want to create actual bikes*
 
@@ -88,7 +95,6 @@ module API
           use :bike_attrs 
         end
         post '/', scopes: [:write_bikes], serializer: BikeV2Serializer, root: 'bike' do
-          authorize_bike_for_user
           declared_p = { "declared_params" => declared(params, include_missing: false) }
           b_param = BParam.create(creator_id: current_user.id, params: declared_p['declared_params'], api_v2: true)
           bike = BikeCreator.new(b_param).create_bike
@@ -96,9 +102,36 @@ module API
             bike
           else
             e = bike.present? ? bike.errors : b_param.errors
-            error!("Unable to register bike: #{e.full_messages.to_sentence}", 401)
+            error!(e.full_messages, 401)
           end
         end
+
+
+        desc "Update a bike you own!", {
+          notes: <<-NOTE
+            **Requires** `read_user` **in the access token** you use to send the notification.
+            
+            Update a bike owned by the access token you're using.
+
+          NOTE
+        }
+        params  do 
+          requires :id, type: Integer, desc: "Bike ID"
+          use :bike_attrs
+        end
+        put ':id', scopes: [:write_bikes], serializer: BikeV2Serializer, root: 'bike' do
+          declared_p = { "declared_params" => declared(params, include_missing: false) }
+          find_bike
+          authorize_bike_for_user
+          hash = BParam.v2_params(declared_p['declared_params'])
+          begin
+            BikeUpdator.new(user: current_user, b_params: hash).update_available_attributes
+          rescue => e
+            error!("Unable to update bike: #{e}", 401)
+          end
+          @bike.reload
+        end
+
 
         desc "Send a stolen notification", {
           notes: <<-NOTE 
@@ -110,24 +143,19 @@ module API
 
             Your application has to be approved to be able to do this. Email support@bikeindex.org to get access.
 
-            Before your application is approved you can send notifications yourself, through a `bike_id` that you own that's stolen.
-
-            <hr>
-
-            **This might not actually work right now. srys. I'm going to drink some beer, it's been a long day.**
+            Before your application is approved you can send notifications to yourself (to a bike that you own that's stolen).
 
           NOTE
         }
         params do 
-          requires :id, type: Integer, desc: "The ID of the bike. **MUST BE A STOLEN BIKE**"
+          requires :id, type: Integer, desc: "Bike ID. **MUST BE A STOLEN BIKE**"
           requires :message, type: String, desc: "The message you are sending to the owner"
         end
         post ':id/send_stolen_notification', scopes: [:read_user], serializer: StolenNotificationSerializer  do 
-          bike = Bike.unscoped.find(params[:id])
-          error!("Bike is not stolen", 401) unless bike.present? && bike.stolen
-          unless bike.owner == current_user
-            error!("You do not own that bike! (This application is not authorized to send notifications)", 401) 
-          end
+          find_bike
+          error!("Bike is not stolen", 400) unless @bike.present? && @bike.stolen
+          # Unless application is authorized....
+          authorize_bike_for_user(" (this application is not approved to send notifications)") 
           StolenNotification.create(bike_id: params[:id],
             message: params[:message],
             sender: current_user

@@ -1,9 +1,5 @@
 module CarrierWave
   module MiniMagick
-    def permitted_image_files
-      %w(jpg jpeg gif png tiff tif)
-    end
-
     # Rotates the image based on the EXIF Orientation
     def fix_exif_rotation
       manipulate! do |img|

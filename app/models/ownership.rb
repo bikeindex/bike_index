@@ -42,7 +42,12 @@ class Ownership < ActiveRecord::Base
 
   def mark_claimed
     self.claimed = true
+    self.user_id = User.fuzzy_email_find(owner_email).id unless user.present?
     self.save
+  end
+
+  def can_be_claimed_by(u)
+    u == User.fuzzy_email_find(owner_email) || u == user
   end
 
 end

@@ -86,6 +86,8 @@ describe 'Bikes API V2' do
         bike.to_json,
         { 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       response.code.should eq("401")
+      result = JSON.parse(response.body)
+      result['error'].kind_of?(Array).should be_true
     end
 
     it "creates a bike through an organization" do 
@@ -109,54 +111,106 @@ describe 'Bikes API V2' do
     it "does photo uploads"
   end
 
+  describe 'update' do
+    before :each do 
+      create_doorkeeper_app({scopes: 'read_user write_bikes'})
+      @bike = FactoryGirl.create(:ownership, creator_id: @user.id).bike
+      @params = {
+        year: 1999,
+        serial_number: 'XXX69XXX'
+      }
+      @url = "/api/v2/bikes/#{@bike.id}?access_token=#{@token.token}"
+    end
+
+    it "doesn't update if user doesn't own the bike" do 
+      @bike.current_ownership.update_attributes(user_id: FactoryGirl.create(:user), claimed: true)
+      Bike.any_instance.should_receive(:type).and_return('unicorn')
+      put @url,
+        @params.to_json,
+        { 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      response.code.should eq('403') 
+      response.body.match('do not own that unicorn').should be_present
+    end
+
+    it "doesn't update if not in scope" do 
+      @token.update_attribute :scopes, 'public'
+      put @url,
+        @params.to_json,
+        { 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      response.code.should eq('403') 
+      response.body.match('scope').should be_present
+    end
+
+    it "updates a bike, but doesn't update locked attrs" do 
+      @bike.year.should be_nil
+      serial = @bike.serial_number
+      put @url,
+        @params.to_json,
+        { 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      response.code.should eq('200')
+      @bike.reload.year.should eq(@params[:year])
+      @bike.serial_number.should eq(serial)
+    end
+
+    it "claims a bike and updates if it should" do 
+      @bike.year.should be_nil
+      @bike.current_ownership.update_attributes(owner_email: @user.email, creator_id: FactoryGirl.create(:user).id, claimed: false)
+      @bike.reload.owner.should_not eq(@user)
+      put @url,
+        @params.to_json,
+        { 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      response.code.should eq('200')
+      @bike.reload.current_ownership.claimed.should be_true
+      @bike.owner.should eq(@user)
+      @bike.year.should eq(@params[:year])
+    end
+  end
+
   describe :send_stolen_notification do 
+    before :each do 
+      create_doorkeeper_app({scopes: 'read_user'})
+      @bike = FactoryGirl.create(:ownership, creator_id: @user.id).bike
+      @bike.update_attribute :stolen, true
+      @params = {message: "Something I'm sending you"}
+      @url = "/api/v2/bikes/#{@bike.id}/send_stolen_notification?access_token=#{@token.token}"
+    end
+
     it "fails to send a stolen notification without read_user" do
-      create_doorkeeper_app
-      bike = FactoryGirl.create(:ownership).bike
-      bike.update_attribute :stolen, true
-      params = {message: "Something I'm sending you"}
-      post "/api/v2/bikes/#{bike.id}/send_stolen_notification?access_token=#{@token.token}",
-        params.to_json,
+      @token.update_attribute :scopes, 'public'
+      post @url,
+        @params.to_json,
         { 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       response.code.should eq('403')
+      response.body.match('scope').should be_present
       response.body.match('is not stolen').should_not be_present
     end
 
     it "fails if the bike isn't stolen" do 
-      create_doorkeeper_app({scopes: 'read_user'})
-      bike = FactoryGirl.create(:ownership).bike
-      params = {message: "Something I'm sending you"}
-      post "/api/v2/bikes/#{bike.id}/send_stolen_notification?access_token=#{@token.token}",
-        params.to_json,
+      @bike.update_attribute :stolen, false
+      post @url,
+        @params.to_json,
         { 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
-      response.code.should eq('401')
+      response.code.should eq('400')
       response.body.match('is not stolen').should be_present
     end
 
     it "fails if the bike isn't owned by the access token user" do
-      create_doorkeeper_app({scopes: 'read_user'})
-      bike = FactoryGirl.create(:ownership).bike
-      bike.update_attribute :stolen, true
-      params = {message: "Something I'm sending you"}
-      post "/api/v2/bikes/#{bike.id}/send_stolen_notification?access_token=#{@token.token}",
-        params.to_json,
+      @bike.current_ownership.update_attributes(user_id: FactoryGirl.create(:user), claimed: true)
+      post @url,
+        @params.to_json,
         { 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
-      response.code.should eq('401')
-      response.body.match('is not stolen').should_not be_present
+      response.code.should eq('403')
+      response.body.match('application is not approved').should be_present
     end
 
     it "sends a notification" do 
-      create_doorkeeper_app({scopes: 'read_user'})
-      bike = FactoryGirl.create(:ownership, user_id: @user.id, creator_id: @user.id).bike
-      bike.update_attribute :stolen, true
-      params = {message: "Something I'm sending you"}
       expect{
-        post "/api/v2/bikes/#{bike.id}/send_stolen_notification?access_token=#{@token.token}",
-          params.to_json,
+        post @url,
+          @params.to_json,
           { 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       }.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
       response.code.should eq('201')
     end
   end
-  
+
 end

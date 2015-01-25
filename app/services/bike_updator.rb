@@ -34,7 +34,7 @@ class BikeUpdator
   end
 
   def ensure_ownership!
-    return true if @bike.owner == @user
+    return true if @user && @bike.owner == @user
     raise BikeUpdatorError, "Oh no! It looks like you don't own that bike."
   end
 

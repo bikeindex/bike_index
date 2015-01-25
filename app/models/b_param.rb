@@ -33,16 +33,20 @@ class BParam < ActiveRecord::Base
     self.bike_errors = bike_errors.delete_if { |a| a[/(bike can.t be blank|are you sure the bike was created)/i] }
   end
 
-  before_save :massage_v2
-  def massage_v2
-    return true unless api_v2
-    h = { bike: params }
+  before_save :massage_if_v2
+  def massage_if_v2
+    self.params = self.class.v2_params(params) if api_v2
+    true
+  end
+
+  def self.v2_params(hash)
+    h = { bike: hash }
     h[:bike][:serial_number] = h[:bike].delete :serial
-    h[:test] = h[:bike].delete :test
     org = Organization.find_by_slug(h[:bike].delete :organization_slug)
     h[:bike][:creation_organization_id] = org.id if org.present?
-    self.params = h
-    true
+    # Move un-nested params outside of bike
+    [:test, :id].each { |k| h[k] = h[:bike].delete k }
+    h
   end
 
   before_save :set_foreign_keys

@@ -45,4 +45,23 @@ describe Ownership do
       ownership.owner.should eq(@user)
     end
   end
+
+  describe :can_be_claimed_by do 
+    it "true if user email matches" do 
+      user = FactoryGirl.create(:user)
+      ownership = Ownership.new(owner_email: " #{user.email.upcase}")
+      ownership.can_be_claimed_by(user).should be_true
+    end
+    it "true if user matches" do 
+      user = FactoryGirl.create(:user)
+      ownership = Ownership.new(user_id: user.id)
+      ownership.can_be_claimed_by(user).should be_true
+    end
+    it "false if it can't be claimed by user" do 
+      user = FactoryGirl.create(:user)
+      ownership = Ownership.new(owner_email: "fake#{user.email.titleize}")
+      ownership.can_be_claimed_by(user).should be_false
+    end
+  end
+
 end

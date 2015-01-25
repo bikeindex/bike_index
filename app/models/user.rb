@@ -153,7 +153,7 @@ class User < ActiveRecord::Base
   
   def self.fuzzy_email_find(email)
     if !email.blank?
-      self.find(:first, conditions: [ "lower(email) = ?", email.downcase ])
+      self.find(:first, conditions: [ "lower(email) = ?", email.downcase.strip ])
     else
       nil
     end
