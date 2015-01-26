@@ -82,7 +82,8 @@
                 .initially-hidden.add-token-form
                   %hr
                   .form.form-inline
-                    - OAUTH_SCOPES.each do |scope|
+                    
+                    - OAUTH_SCOPES.reject { |s| s.to_s.match('bikewise').present? }.each do |scope|
                       %label.checkbox.newtoken-scope-check
                         = check_box_tag scope
                         = scope.to_s
