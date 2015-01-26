@@ -25,7 +25,11 @@ describe BParam do
       p = {
         serial: 'something',
         manufacturer: 'something else',
-        test: true
+        test: true,
+        stolen_record: {
+          date_stolen: '',
+          phone: nil
+        }
       }
       b_param = BParam.new(params: p, api_v2: true)
       b_param.massage_if_v2
@@ -34,6 +38,8 @@ describe BParam do
       (k.keys.include?(:manufacturer)).should be_true
       k.keys.length.should eq(2)
       b_param.params[:test].should be_true
+      b_param.params[:stolen].should be_false
+      b_param.params[:stolen_record].should_not be_present
     end
     it "gets the organization id" do
       org = FactoryGirl.create(:organization, name: "Something")

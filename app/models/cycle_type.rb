@@ -7,9 +7,4 @@ class CycleType < ActiveRecord::Base
 
   has_many :bikes
 
-  def self.slugs
-    slugs = self.pluck(:slug) 
-    return slugs.any? ? slugs : ['bike']
-  end
-
 end

@@ -59,7 +59,7 @@ describe StolenRecordUpdator do
       update_stolen_record.update_records
     end
 
-    it "calls create if a stolen record doesn't exist doesn't exist" do 
+    it "calls create if a stolen record doesn't exist" do 
       bike = FactoryGirl.create(:bike, stolen: true)
       update_stolen_record = StolenRecordUpdator.new(bike: bike)
       update_stolen_record.should_receive(:create_new_record)
@@ -130,7 +130,7 @@ describe StolenRecordUpdator do
       b_param = BParam.new
       b_param.stub(:params).and_return({stolen_record: sr})
       stolen_record = StolenRecord.new 
-      updator = StolenRecordUpdator.new(new_bike_b_param: b_param)
+      updator = StolenRecordUpdator.new(b_param: b_param.params)
       stolen_record = updator.update_with_params(stolen_record)
       stolen_record.police_report_number.should eq(sr[:police_report_number])
       stolen_record.police_report_department.should eq(sr[:police_report_department])
@@ -150,7 +150,7 @@ describe StolenRecordUpdator do
       b_param = BParam.new
       b_param.stub(:params).and_return({stolen_record: sr})
       stolen_record = StolenRecord.new 
-      updator = StolenRecordUpdator.new(new_bike_b_param: b_param)
+      updator = StolenRecordUpdator.new(b_param: b_param.params)
       stolen_record = updator.update_with_params(stolen_record)
       stolen_record.country.should eq(country)
       stolen_record.state.should eq(state)

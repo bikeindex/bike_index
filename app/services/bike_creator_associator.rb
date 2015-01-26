@@ -19,8 +19,9 @@ class BikeCreatorAssociator
   end
 
   def create_stolen_record(bike)
-    StolenRecordUpdator.new(bike: bike, user: @b_param.creator, new_bike_b_param: @b_param).create_new_record
+    StolenRecordUpdator.new(bike: bike, user: @b_param.creator, b_param: @b_param.params).create_new_record
     StolenRecordUpdator.new(bike: bike).set_creation_organization if bike.creation_organization.present?
+    bike.save
   end
 
   def create_normalized_serial_segments(bike)
@@ -66,6 +67,7 @@ class BikeCreatorAssociator
       attach_photo(bike)
       attach_photos(bike)
       add_other_listings(bike)
+      bike.reload
     rescue => e
       bike.errors.add(:association_error, e.message)
     end

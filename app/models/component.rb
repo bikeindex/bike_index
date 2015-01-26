@@ -57,15 +57,15 @@ class Component < ActiveRecord::Base
 
   def component_group
     return "Additional parts" unless ctype.present?
-    self.ctype.cgroup.name
+    ctype.cgroup.name
   end
 
   def manufacturer_name
-    return nil unless self.manufacturer
-    if self.manufacturer.name == "Other" && self.manufacturer_other.present?
-      return self.manufacturer_other
+    return nil unless manufacturer
+    if manufacturer.name == "Other" && manufacturer_other.present?
+      return manufacturer_other
     else
-      return self.manufacturer.name 
+      return manufacturer.name 
     end
   end
 

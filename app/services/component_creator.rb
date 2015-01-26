@@ -37,10 +37,10 @@ class ComponentCreator
 
   def whitelist_attributes(component)
     comp_attributes = {
-      model_name: component[:model_name],
+      model_name: component[:model_name] || component[:model],
       description: component[:description],
       year: component[:year],
-      serial_number: component[:serial_number],
+      serial_number: component[:serial_number] || component[:serial],
       front: component[:front],
       rear: component[:rear],
       front_or_rear: component[:front_or_rear],

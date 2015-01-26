@@ -12,6 +12,13 @@ class StolenRecordSerializer < ActiveModel::Serializer
     :create_open311,
     :id,
 
+  def date_stolen
+    object.date_stolen.to_i
+  end
+
+  def created_at
+    object.created_at.to_i
+  end
 
   def location
     a = [object.city]

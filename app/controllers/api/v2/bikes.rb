@@ -1,12 +1,10 @@
-CYCLE_TYPE_SLUGS = !!CycleType && CycleType.slugs rescue ['bike']
-COLOR_NAMES = !!Color && Color.pluck(:name) rescue []
 module API
   module V2
     class Bikes < API::V2::Root
       include API::V2::Defaults
 
       helpers do
-        params :bike_attrs do           
+        params :bike_attrs do
           optional :rear_wheel_bsd, type: Integer, desc: "rear_wheel_bsd"
           optional :rear_tire_narrow, type: Boolean, desc: "boolean. Is it a skinny tire?"
           optional :rear_wheel_bsd, type: String, desc: "Copies `rear_wheel_bsd` if not set"
@@ -14,28 +12,42 @@ module API
           optional :frame_model, type: String, desc: "What frame model?"
           optional :year, type: Integer, desc: "What year was the frame made?"
           optional :description, type: String, desc: "General description"
+          optional :primary_frame_color, type: String, values: COLOR_NAMES, desc: "Main color of frame (case sensitive match)"
+          optional :secondary_frame_color, type: String, values: COLOR_NAMES, desc: "Secondary color (case sensitive match)"
+          optional :tertiary_frame_color, type: String, values: COLOR_NAMES, desc: "Third color (case sensitive match)"
+
+          optional :components, type: Array do
+            optional :manufacturer, type: String, desc: "Manufacturer name or ID"
+            # [Manufacturer name or ID](api_v2#!/manufacturers/GET_version_manufacturers_format)
+            optional :component_type, type: String, desc: 'Type of component', values: CTYPE_NAMES, desc: 'Type - case sensitive match'
+            optional :model, type: String, desc: "Component model"
+            optional :year, type: Integer, desc: "Component year"
+            optional :description, type: String, desc: "Component description"
+            optional :serial, type: String, desc: "Component serial"
+            optional :front_or_rear, type: String, desc: "Component front_or_rear"
+          end
           
-          optional :primary_frame_color, type: String, values: COLOR_NAMES, desc: "Main color of frame"
-          optional :secondary_frame_color, type: String, values: COLOR_NAMES, desc: "Secondary color"
-          optional :tertiary_frame_color, type: String, values: COLOR_NAMES, desc: "Third color"
+          optional :stolen_record, type: Hash do
+            optional :phone, type: String, desc: "Owner's phone number, **required to create stolen**"
+            optional :city, type: String, desc: "City where stolen <br> **required to create stolen**"
+            optional :country, type: String, values: COUNTRY_ISOS, desc: "Country the bike was stolen"
+            optional :zipcode, type: String, desc: "Where the bike was stolen from"
+            optional :state, type: String, desc: "State postal abbreviation if in US - e.g. OR, IL, NY"
+            optional :address, type: String, desc: "Public. Use an intersection if you'd prefer the specific address not be revealed"
+            optional :date_stolen, type: Integer, desc: "When was the bike stolen (defaults to current time)"
+
+            optional :police_report_number, type: String, desc: 'Police report number'
+            optional :police_report_department, type: String, desc: 'Police department reported to (include if report number present)'
+
+          #   # link to LOCKING options!
+          #   # optional :locking_description_slug, type: String, desc: 'Locking description. description.'
+          #   # optional :lock_defeat_description_slug, type: String, desc: 'Lock defeat description. One of the values from lock defeat desc'
+          #   # optional :theft_description, type: String, desc: 'stuff'
+
+          #   # optional :phone_for_everyone, type: Boolean, default: false, desc: 'Show phone number to non logged in users'
+          #   # optional :phone_for_users, type: Boolean, default: true, desc: 'Show phone to logged in users'
+          end
         end
-
-
-        # group :stolen do 
-        #   optional :phone, type: String, desc: "Owner's phone number"
-        #   optional :city, type: String, desc: "Where the bike was stolen"
-        #   optional :country, type: String, desc: "Where the bike was stolen"
-        #   optional :zipcode, type: String, desc: "Where the bike was stolen"
-        #   optional :state, type: String, desc: "Where the bike was stolen"
-        #   optional :address, type: String, desc: "Where the bike was stolen"
-        #   optional :date_stolen, type: Integer, desc: "When was the bike stolen"
-        #   # all_or_none_of :phone, :city, :country, :zipcode, :date_stolen
-        # end
-        # optional :components, type: Array do
-        #   requires :manufacturer, type: String, desc: "Manufacturer name or ID"
-        #   # [Manufacturer name or ID](api_v2#!/manufacturers/GET_version_manufacturers_format)
-        #   requires :ctype
-        # end
 
         def find_bike
           @bike = Bike.unscoped.find(params[:id])
@@ -49,6 +61,13 @@ module API
             return true
           end  
           error!("You do not own that #{@bike.type}#{addendum}", 403) 
+        end
+
+        def ensure_required_stolen_attrs(hash)
+          return true unless hash[:bike][:stolen]
+          [:phone, :city].each do |k|
+            error!("Could not create stolen record: missing #{k.to_s}", 401) unless hash[:stolen_record][k].present?
+          end
         end
 
       end
@@ -80,6 +99,7 @@ module API
             *`test` is automatically marked true on this documentation page. Set it to false it if you want to create actual bikes*
 
             **Ownership**: Bikes you create will be created by the user token you authenticate with, but they will be sent to the email address you specify.
+
           NOTE
         }
         params do
@@ -90,24 +110,24 @@ module API
           requires :color, type: String, desc: "Main color or paint - does not have to be one of the accepted colors"
           optional :test, type: Boolean, desc: "Is this a test bike?"
           optional :organization_slug, type: String, desc: "Organization bike should be created by. **Only works** if user is a member of the organization"
-          optional :cycle_type_slug, type: String, values: CYCLE_TYPE_SLUGS, default: 'bike', desc: "Type of cycle"
-
+          optional :cycle_type_name, type: String, values: CYCLE_TYPE_NAMES, default: 'bike', desc: "Type of cycle (case sensitive match)"
           use :bike_attrs 
         end
-        post '/', scopes: [:write_bikes], serializer: BikeV2Serializer, root: 'bike' do
+        post '/', scopes: [:write_bikes], serializer: BikeV2ShowSerializer, root: 'bike' do
           declared_p = { "declared_params" => declared(params, include_missing: false) }
           b_param = BParam.create(creator_id: current_user.id, params: declared_p['declared_params'], api_v2: true)
+          ensure_required_stolen_attrs(b_param.params)
           bike = BikeCreator.new(b_param).create_bike
           if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
             bike
           else
             e = bike.present? ? bike.errors : b_param.errors
-            error!(e.full_messages, 401)
+            error!(e.full_messages.to_sentence, 401)
           end
         end
 
 
-        desc "Update a bike you own!", {
+        desc "Update a bike owned by the access token", {
           notes: <<-NOTE
             **Requires** `read_user` **in the access token** you use to send the notification.
             
@@ -119,11 +139,12 @@ module API
           requires :id, type: Integer, desc: "Bike ID"
           use :bike_attrs
         end
-        put ':id', scopes: [:write_bikes], serializer: BikeV2Serializer, root: 'bike' do
+        put ':id', scopes: [:write_bikes], serializer: BikeV2ShowSerializer, root: 'bike' do
           declared_p = { "declared_params" => declared(params, include_missing: false) }
           find_bike
           authorize_bike_for_user
           hash = BParam.v2_params(declared_p['declared_params'])
+          ensure_required_stolen_attrs(hash) if hash[:stolen_record].present? && @bike.stolen != true
           begin
             BikeUpdator.new(user: current_user, b_params: hash).update_available_attributes
           rescue => e

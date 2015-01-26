@@ -45,13 +45,19 @@ class BParam < ActiveRecord::Base
     org = Organization.find_by_slug(h[:bike].delete :organization_slug)
     h[:bike][:creation_organization_id] = org.id if org.present?
     # Move un-nested params outside of bike
-    [:test, :id].each { |k| h[k] = h[:bike].delete k }
+    [:test, :id, :components].each { |k| h[k] = h[:bike].delete k }
+    stolen = h[:bike].delete :stolen_record
+    if stolen && stolen.delete_if { |k,v| v.blank? } && stolen.keys.any?
+      h[:bike][:stolen] = true
+      h[:stolen_record] = stolen 
+    end
     h
   end
 
   before_save :set_foreign_keys
   def set_foreign_keys
     return true unless params.present? && bike.present?
+    bike[:stolen] = true if params[:stolen_record].present?
     set_wheel_size_key unless bike[:rear_wheel_size_id].present?
     if bike[:manufacturer_id].present?
       bike[:manufacturer_id] = Manufacturer.fuzzy_id(bike[:manufacturer_id])
@@ -59,15 +65,19 @@ class BParam < ActiveRecord::Base
       set_manufacturer_key
     end
     set_color_key unless bike[:primary_frame_color_id].present?
-    set_cycle_type_key if bike[:cycle_type_slug].present?
+    set_cycle_type_key if bike[:cycle_type_slug].present? || bike[:cycle_type_name].present?
     set_handlebar_type_key if bike[:handlebar_type_slug].present?
     set_frame_material_key if bike[:frame_material_slug].present?
   end
 
   def set_cycle_type_key
-    ct = CycleType.find(:first, conditions: [ "slug = ?", bike[:cycle_type_slug].downcase.strip ])
+    if bike[:cycle_type_name].present?
+      ct = CycleType.find(:first, conditions: [ "lower(name) = ?", bike[:cycle_type_name].downcase.strip ])
+    else
+      ct = CycleType.find(:first, conditions: [ "slug = ?", bike[:cycle_type_slug].downcase.strip ])
+    end
     bike[:cycle_type_id] = ct.id if ct.present?
-    bike.delete(:cycle_type_slug)
+    bike.delete(:cycle_type_slug) || bike.delete(:cycle_type_name)
   end
 
   def set_frame_material_key

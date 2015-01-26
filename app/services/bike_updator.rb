@@ -9,6 +9,7 @@ class BikeUpdator
     @user = creation_params[:user] 
     @bike_params = creation_params[:b_params]
     @bike = find_bike
+    @currently_stolen = @bike.stolen
   end
 
   def find_bike
@@ -39,10 +40,16 @@ class BikeUpdator
   end
 
   def update_stolen_record
-    if @bike_params[:bike] and @bike_params[:bike][:date_stolen_input]
-      StolenRecordUpdator.new(bike: @bike.reload, date_stolen_input: @bike_params[:bike][:date_stolen_input]).update_records
+    @bike.reload
+    if @bike_params[:bike] && @bike_params[:bike][:date_stolen_input]
+      StolenRecordUpdator.new(bike: @bike, date_stolen_input: @bike_params[:bike][:date_stolen_input]).update_records
     else
-      StolenRecordUpdator.new(bike: @bike.reload).update_records
+      if @bike_params[:stolen_record].present?
+        StolenRecordUpdator.new(bike: @bike, b_param: @bike_params).update_records
+        @bike.reload
+      elsif @currently_stolen != @bike.stolen
+        StolenRecordUpdator.new(bike: @bike).update_records
+      end
     end
   end
 
