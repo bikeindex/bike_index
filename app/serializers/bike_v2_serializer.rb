@@ -1,5 +1,6 @@
 class BikeV2Serializer < ActiveModel::Serializer
   attributes :id,
+    :title,
     :serial,
     :manufacturer_name,
     :frame_colors,
