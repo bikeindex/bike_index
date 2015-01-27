@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150123233624) do
+ActiveRecord::Schema.define(:version => 20150127220842) do
 
   create_table "ads", :force => true do |t|
     t.string   "title"
@@ -260,6 +260,7 @@ ActiveRecord::Schema.define(:version => 20150123233624) do
     t.datetime "created_at",                    :null => false
     t.datetime "updated_at",                    :null => false
     t.boolean  "standard"
+    t.string   "slug"
   end
 
   create_table "handlebar_types", :force => true do |t|
@@ -536,6 +537,7 @@ ActiveRecord::Schema.define(:version => 20150123233624) do
     t.string   "name"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+    t.string   "slug"
   end
 
   create_table "public_images", :force => true do |t|
@@ -558,6 +560,7 @@ ActiveRecord::Schema.define(:version => 20150123233624) do
     t.datetime "created_at",                    :null => false
     t.datetime "updated_at",                    :null => false
     t.boolean  "standard"
+    t.string   "slug"
   end
 
   create_table "recovery_displays", :force => true do |t|

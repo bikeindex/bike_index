@@ -7,4 +7,8 @@ class FrontGearType < ActiveRecord::Base
   scope :standard, where(standard: true)
   scope :internal, where(internal: true)
   scope :fixed, where(count: 1)
+  before_create :set_slug
+  def set_slug
+    self.slug = Slugifyer.slugify(self.name)
+  end
 end

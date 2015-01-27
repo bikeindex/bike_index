@@ -11,15 +11,15 @@ class BikeV2ShowSerializer < BikeV2Serializer
     :rear_tire_narrow,
     :front_tire_narrow,
     :type_of_cycle, 
-    :test_bike
+    :test_bike,
+    :rear_wheel_size_iso_bsd,
+    :front_wheel_size_iso_bsd,
+    :handlebar_type_slug,
+    :frame_material_slug,
+    :front_gear_type_slug,
+    :rear_gear_type_slug
 
-  has_one :rear_wheel_size,
-    :front_wheel_size,
-    :handlebar_type,
-    :frame_material,
-    :front_gear_type,
-    :rear_gear_type,
-    :stolen_record
+  has_one :stolen_record
 
   has_many :public_images, :components
   
@@ -50,5 +50,31 @@ class BikeV2ShowSerializer < BikeV2Serializer
   def stolen_record
     object.current_stolen_record if object.current_stolen_record.present?
   end
+
+  def rear_wheel_size_iso_bsd
+    object.rear_wheel_size && object.rear_wheel_size.iso_bsd
+  end
+
+  def front_wheel_size_iso_bsd
+    object.front_wheel_size && object.front_wheel_size.iso_bsd
+  end
+
+  def handlebar_type_slug
+    object.handlebar_type && object.handlebar_type.slug
+  end
+
+  def frame_material_slug
+    object.frame_material && object.frame_material.slug
+  end
+
+  def front_gear_type_slug
+    object.front_gear_type && object.front_gear_type.slug
+  end
+
+  def rear_gear_type_slug
+    object.rear_gear_type && object.rear_gear_type.slug
+  end
+
+
 
 end

@@ -1,3 +1,3 @@
 class FrontGearTypeSerializer < ActiveModel::Serializer
-  attributes :name
+  attributes :name, :slug
 end

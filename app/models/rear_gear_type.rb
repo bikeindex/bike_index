@@ -7,4 +7,9 @@ class RearGearType < ActiveRecord::Base
   scope :standard, where(standard: true)
   scope :internal, where(internal: true)
   scope :fixed, where(name: "Fixed")
+
+  before_create :set_slug
+  def set_slug
+    self.slug = Slugifyer.slugify(self.name)
+  end
 end

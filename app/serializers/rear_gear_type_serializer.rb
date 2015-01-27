@@ -1,3 +1,3 @@
 class RearGearTypeSerializer < ActiveModel::Serializer
-  attributes :name
+  attributes :name, :slug
 end

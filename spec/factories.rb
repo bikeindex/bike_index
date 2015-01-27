@@ -64,6 +64,16 @@ FactoryGirl.define do
     name { FactoryGirl.generate(:unique_name) }
   end
 
+  factory :front_gear_type do
+    name { FactoryGirl.generate(:unique_name) }
+    count 1
+  end
+
+  factory :rear_gear_type do
+    name { FactoryGirl.generate(:unique_name) }
+    count 1
+  end
+
   factory :wheel_size do
     name { FactoryGirl.generate(:unique_name) }
     iso_bsd { FactoryGirl.generate(:unique_iso) }

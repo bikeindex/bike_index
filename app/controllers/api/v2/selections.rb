@@ -25,9 +25,24 @@ module API
           FrameMaterial.scoped
         end
 
+        desc "Front gear types"
+        get '/front_gear_types', protected: false, root: 'front_gear_types' do
+          FrontGearType.scoped
+        end
+
+        desc "Rear gear types"
+        get '/rear_gear_types', protected: false, root: 'rear_gear_types' do
+          RearGearType.scoped
+        end
+
         desc "Handlebars"
         get '/handlebar_types', protected: false, root: 'handlebar_types' do
           HandlebarType.scoped
+        end
+
+        desc "Propulsion types"
+        get '/propulsion_types', protected: false, root: 'propulsion_types' do
+          PropulsionType.scoped
         end
         
         desc "Wheel sizes (paginated)", {
