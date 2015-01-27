@@ -80,6 +80,7 @@ end
 propulsions = ['Foot pedal', 'Hand pedal', 'Sail', 'Insufflation', 'Electric Assist', 'Electric throttle', 'Gas', 'Other style']
 propulsions.each do |prop|
   propulsion_type = PropulsionType.create(name: prop)
+  propulsion_type.slug = 'other' if prop == 'Other style'
   propulsion_type.save
 end
 
