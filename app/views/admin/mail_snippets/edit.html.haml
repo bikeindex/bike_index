@@ -1,0 +1,29 @@
+%h1.padded
+  Edit Snippet
+
+.form.form-horizontal
+  = form_for [:admin, @mail_snippet] do |f|
+    = render partial: 'form', locals: { f: f }
+
+    / .well.span6.ad-form-actions
+    /   .control-group.avatar-upload
+    /     %label.control-label
+    /       Ad image
+    /     .controls
+    /       .avatar-img
+    /         - if @ad.image? 
+    /           = image_tag(@ad.image_url(:small))
+    /         - else
+    /           %p
+    /             No picture!
+    /       = f.file_field :image
+    /       = f.hidden_field :image_cache
+
+    .control-group
+      .control-label
+        = f.label :is_enabled
+      .controls
+        = f.check_box :is_enabled
+    .span5
+      .control-group.actions.big-action
+        = f.submit "Update", class: 'button-green big-action'

@@ -1,0 +1,39 @@
+%header.with-subtitle
+  %h1
+    Manage Snippets
+  = link_to 'New snippet', new_admin_mail_snippet_url, class: "button-green sharing-links"
+
+%h4.padded
+  = @mail_snippets.count
+  mail_snippets are in the system so far!
+
+
+%section.full-screen-table
+  %table#admin-mailsnippets-table.table.table-striped.table-bordered
+    %thead
+      %th.medium-screens
+        Created
+      %th
+        Name
+      %th
+        Location
+      %th
+        Live?
+      
+    %tbody
+      - @mail_snippets.each do |mail_snippet|
+        %tr
+          %td.medium-screens
+            - if mail_snippet.created_at.today?
+              - snippet_created = 'Today'
+            - elsif Date.yesterday().beginning_of_day() <= mail_snippet.created_at
+              - snippet_created = 'Today'
+            - else
+              - snippet_created = mail_snippet.created_at.strftime("%d.%m")
+            = link_to snippet_created, edit_admin_mail_snippet_url(mail_snippet)
+          %td
+            = mail_snippet.name
+          %td
+            = mail_snippet.address
+          %td.medium-screens
+            = "&#x2713;".html_safe if mail_snippet.is_enabled

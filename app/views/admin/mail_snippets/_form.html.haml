@@ -1,0 +1,29 @@
+.snippet-edit-form
+  - if @mail_snippet.errors.any?
+    #alert-block
+      .alert.alert-error
+        %h4
+          Please fix the following
+          = pluralize(@mail_snippet.errors.count, "error")
+        %ul
+          - @mail_snippet.errors.full_messages.each do |msg|
+            %li
+              = msg
+  
+
+  .control-group
+    = f.label :name, class: "control-label"
+    .controls
+      = f.text_field :name, :required =>true
+  .control-group
+    = f.label :address, class: "control-label"
+    .controls
+      = f.text_field :address, :required =>true
+  .control-group
+    = f.label :proximity_radius, class: "control-label"
+    .controls
+      = f.number_field :proximity_radius, :required =>true
+
+  .blog-field
+    = f.text_area :body, placeholder: "Body"
+    

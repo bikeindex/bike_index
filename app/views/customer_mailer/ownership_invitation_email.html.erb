@@ -14,7 +14,9 @@
   <% else %>
     <h1 style="font-weight: 400;">Congrats on adding your bike to the index!</h1>
   <% end %>
-
+  
+  <% if @snippet_body.present? %><%= @snippet_body.html_safe %><% end %>
+  
   <hr style="margin: 40px 0 30px;">
   <p>
     <% if @ownership.creator.email == @ownership.owner_email %>

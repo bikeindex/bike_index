@@ -1,0 +1,8 @@
+%h1 New Snippet
+
+.form.form-horizontal
+  = form_for [:admin, @mail_snippet] do |f|
+    = render partial: 'form', locals: { f: f }
+    = f.hidden_field :is_location_triggered, value: true
+    .control-group.actions
+      = f.submit "Create", class: 'button-green'
