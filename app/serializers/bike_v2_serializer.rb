@@ -5,6 +5,7 @@ class BikeV2Serializer < ActiveModel::Serializer
     :manufacturer_name,
     :frame_colors,
     :stolen,
+    :stolen_location,
     :year,
     :frame_model,
     :thumb,
@@ -38,6 +39,16 @@ class BikeV2Serializer < ActiveModel::Serializer
 
   def stock_thumb
     object.stock_photo_url.present? ? true : false
+  end
+
+  def stolen_location
+    return nil unless object.current_stolen_record.present?
+    sr = object.current_stolen_record
+    a = [sr.city]
+    a << sr.state.abbreviation if sr.state.present?
+    a << sr.zipcode if sr.zipcode.present?
+    a << sr.country.iso if sr.country.present? && sr.country.iso != 'US'
+    a.compact.join(', ')
   end
 
 end

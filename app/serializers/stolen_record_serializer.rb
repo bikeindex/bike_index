@@ -10,7 +10,7 @@ class StolenRecordSerializer < ActiveModel::Serializer
     :police_report_department,
     :created_at,
     :create_open311,
-    :id,
+    :id
 
 
   def location
