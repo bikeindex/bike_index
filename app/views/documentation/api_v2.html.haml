@@ -38,6 +38,7 @@
           %p
             %strong
               This API is in beta.
+            contact #{link_to "seth@bikeindex.org", "mailto:seth@bikeindex.org"} with questions or for updates.
           %p.padded
             %strong
               Upcoming features:
@@ -67,13 +68,13 @@
       %h2.padded
         General notes:
       .alert.alert-danger.margined
-        %strong 
-          If there isn't an Access token in the in the header, most of the API will not work.
-        %br
         The Bike Index uses OAuth2. 
         %a.scroll-link{ href: '#applications_list'}
           Create an application 
-        and use an access token.
+        and use an access token, or you won't be able to access user information or make PUT or POST requests.
+        / %br
+        / %strong 
+        /   If there isn't an Access token in the in the header, you will not be able to access user specific information or make PUT or POST requests.
         
 
       %p

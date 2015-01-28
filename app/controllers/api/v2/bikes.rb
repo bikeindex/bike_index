@@ -77,7 +77,7 @@ module API
         params do
           requires :id, type: Integer, desc: 'Bike id'
         end
-        get ':id', serializer: BikeV2ShowSerializer, root:  'bike' do 
+        get ':id', protected: false, serializer: BikeV2ShowSerializer, root:  'bike' do 
           find_bike
         end
 
@@ -165,7 +165,6 @@ module API
             Your application has to be approved to be able to do this. Email support@bikeindex.org to get access.
 
             Before your application is approved you can send notifications to yourself (to a bike that you own that's stolen).
-
           NOTE
         }
         params do 

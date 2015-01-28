@@ -45,7 +45,7 @@ module API
         params do
           use :search_bikes
         end
-        get '/', root: 'bikes', root: 'bikes', each_serializer: BikeV2Serializer do 
+        get '/', protected: false, root: 'bikes', each_serializer: BikeV2Serializer do 
           { "declared_params" => declared(params, include_missing: false) }
           paginate find_bikes
         end
@@ -64,7 +64,7 @@ module API
           use :search_bikes
           use :stolen_search
         end
-        get '/stolen', root: 'bikes', root: 'bikes', each_serializer: BikeV2Serializer do 
+        get '/stolen', protected: false, root: 'bikes', each_serializer: BikeV2Serializer do 
           params[:stolen] = true
           { "declared_params" => declared(params, include_missing: false) }
           set_proximity
@@ -76,7 +76,7 @@ module API
         params do
           use :search_bikes
         end
-        get '/non_stolen', root: 'bikes', root: 'bikes', each_serializer: BikeV2Serializer do 
+        get '/non_stolen', protected: false, root: 'bikes', each_serializer: BikeV2Serializer do 
           params[:non_stolen] = true
           { "declared_params" => declared(params, include_missing: false) }
           paginate find_bikes
@@ -104,7 +104,7 @@ module API
           use :search_bikes
           use :stolen_search
         end
-        get '/count', protected: false, root: 'bikes', root: 'bikes', each_serializer: BikeV2Serializer do
+        get '/count', protected: false, root: 'bikes', each_serializer: BikeV2Serializer do
           { "declared_params" => declared(params, include_missing: false) }
           params[:proximity] = params[:proximity] || "ip"
           set_proximity
@@ -123,7 +123,7 @@ module API
         params do 
           requires :serial, type: String, desc: "Serial to search for"
         end
-        get '/close_serials', root: 'bikes', root: 'bikes', each_serializer: BikeV2Serializer do
+        get '/close_serials', protected: false, root: 'bikes', each_serializer: BikeV2Serializer do
           bikes = BikeSearcher.new(params).close_serials
           paginate bikes
         end
