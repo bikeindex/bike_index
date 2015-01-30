@@ -32,7 +32,7 @@ module API
           end
         end
 
-        desc "Current user's information in access token's scope", {
+        desc "Current user's information in access token's scope<span class='accstr'>*</span>", {
           notes: <<-NOTE
             Current user is the owner of the `access_token` you use in the request. Depending on your scopes you will get different things back.
             You will always get the user's `id`
@@ -52,7 +52,7 @@ module API
           result
         end
 
-        desc "Current user's bikes", {
+        desc "Current user's bikes<span class='accstr'>*</span>", {
           notes: <<-NOTE
             This returns the current user's bikes, so long as the access_token has the `read_bikes` scope.
             This uses the bike list bike objects, which only contains the most important information.

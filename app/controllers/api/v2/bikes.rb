@@ -73,16 +73,16 @@ module API
       end
 
       resource :bikes do
-        desc "View bike with a given ID" 
+        desc "View bike with a given ID"
         params do
           requires :id, type: Integer, desc: 'Bike id'
         end
-        get ':id', protected: false, serializer: BikeV2ShowSerializer, root:  'bike' do 
+        get ':id', protected: false, hide: true, serializer: BikeV2ShowSerializer, root:  'bike' do 
           find_bike
         end
 
 
-        desc "Add a bike to the Index!", {
+        desc "Add a bike to the Index!<span class='accstr'>*</span>", {
           notes: <<-NOTE
             **Requires** `write_bikes` **in the access token** you use to create the bike.
 
@@ -127,7 +127,7 @@ module API
         end
 
 
-        desc "Update a bike owned by the access token", {
+        desc "Update a bike owned by the access token<span class='accstr'>*</span>", {
           notes: <<-NOTE
             **Requires** `read_user` **in the access token** you use to send the notification.
             
@@ -154,7 +154,7 @@ module API
         end
 
 
-        desc "Send a stolen notification", {
+        desc "Send a stolen notification<span class='accstr'>*</span>", {
           notes: <<-NOTE 
             **Requires** `read_user` **in the access token** you use to send the notification.
 

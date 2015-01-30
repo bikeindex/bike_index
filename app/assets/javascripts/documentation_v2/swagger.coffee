@@ -31,7 +31,6 @@ $ ->
       "delete"
     ]
     onComplete: (swaggerApi, swaggerUi) ->
-      # log "Loaded SwaggerUI"
       token = localStorage.getItem('access_token')
       if token? && token.length > 0
         $("#input_apiKey").val(token).change()
@@ -52,7 +51,7 @@ $ ->
       log "Unable to Load SwaggerUI"
       return
 
-    docExpansion: "none"
+    docExpansion: "list"
     sorter: "alpha"
   )
 

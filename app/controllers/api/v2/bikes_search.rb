@@ -35,6 +35,7 @@ module API
       
 
       resource :bikes_search, desc: 'Searching for bikes' do
+       
         desc "All bike search", {
           notes: <<-NOTE
             If you want to find any matching bike, use this endpoint.

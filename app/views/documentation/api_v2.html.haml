@@ -32,70 +32,40 @@
               Explore
     .container-fluid
       .api-info-header
-        %h1.padded
-          Bike Index API V2
-        .alert
-          %p
-            %strong
-              This API is in beta.
-            contact #{link_to "seth@bikeindex.org", "mailto:seth@bikeindex.org"} with questions or for updates.
-          %p.padded
-            %strong
-              Upcoming features:
-          %ul
-            / %li
-            /   Updating/deleting existing components
-            %li
-              Marking a bike recovered
-            %li
-              User creation
-            %li
-              Uploading photos of bikes
-          %p
-            %strong
-              The documentation is going to be improving significantly (live by 1/28):
-          %ul
-            %li
-              Refresh token documentation
-            %li
-              Client-side flow documentation
-            %li
-              Examples of bike creation and editing
-            %li
-              Links to external Bike Index tools
 
-    .container-fluid
-      %h2.padded
-        General notes:
-      .alert.alert-danger.margined
-        The Bike Index uses OAuth2. 
-        %a.scroll-link{ href: '#applications_list'}
-          Create an application 
-        and use an access token, or you won't be able to access user information or make PUT or POST requests.
-        / %br
-        / %strong 
-        /   If there isn't an Access token in the in the header, you will not be able to access user specific information or make PUT or POST requests.
-        
+        / .alert
+        /   %p
+        /     %strong
+        /       This API is in beta.
+        /     contact #{link_to "seth@bikeindex.org", "mailto:seth@bikeindex.org"} with questions or for updates.
+        /   %p.padded
+        /     %strong
+        /       Upcoming features:
+        /   %ul
+        /     / %li
+        /     /   Updating/deleting existing components
+        /     %li
+        /       Marking a bike recovered
+        /     %li
+        /       User creation
+        /     %li
+        /       Uploading photos of bikes
+        /   %p
+        /     %strong
+        /       The documentation is going to be improving significantly (live by 1/28):
+        /   %ul
+        /     %li
+        /       Refresh token documentation
+        /     %li
+        /       Client-side flow documentation
+        /     %li
+        /       Examples of bike creation and editing
+        /     %li
+        /       Links to external Bike Index tools
 
-      %p
-        %strong
-          Authentication
-        %a.scroll-link{href: '#authentication_notes'}
-          read more about authentication
-        at the bottom of the page
-      %p
-        %strong
-          Time
-        Bike Index API V2 display everything in #{link_to "UTC unix timestamps", "https://en.wikipedia.org/wiki/Unix_time", target: '_blank'} (integers). All time parameters you send need to use timestamps as well.
-      %p
-        %strong
-          Bike
-        We use the work "bike" throughout this documentation to mean anything that is registered (be it a tandem, ice-cream cart or standard bicycle). If we are referring specifically to standard bicycles, we will make note of that.
-      %p
-        %strong
-          Bike URLs
-        for the HTML pages of the Bike Index follow the same pattern as the API - the url for a bike is https://bikeindex.org/bikes/{bike_id}.
-
+        :plain
+          #{render "documentation/api_v2/info_header"}
+      
       .start-of-swagger-ui
         %h2
           Bike Index API V2 endpoints

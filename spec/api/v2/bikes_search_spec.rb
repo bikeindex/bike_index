@@ -59,5 +59,4 @@ describe 'Bikes API V2' do
       response.code.should == '200'
     end
   end
-  
 end
