@@ -31,7 +31,7 @@ class ComponentCreator
       component[:ctype_id] = Ctype.find_by_slug('unknown').id
       component[:ctype_other] = name 
     end
-    component.delete(:component_type)
+    component.delete :component_type
     component
   end
 
@@ -49,13 +49,27 @@ class ComponentCreator
       manufacturer_id: component[:manufacturer_id],
       manufacturer_other: component[:manufacturer_other]
     }
-    comp_attributes
+    comp_attributes.select { |k, v| v.present? }
   end
 
   def create_component(component)
     c = Component.new(bike_id: @bike.id)
     component = whitelist_attributes(component)
     c.update_attributes(component)
+  end
+
+  def update_components_from_params
+    @b_param[:components].each_with_index do |comp, index|
+      if comp[:id].present?
+        component = @bike.components.find(comp[:id])
+        (component.destroy && next) if comp[:destroy]
+      else
+        component = @bike.components.new
+      end
+      comp = set_manufacturer_key(comp)
+      comp = set_component_type(comp)
+      component.update_attributes whitelist_attributes(comp)
+    end
   end
 
   def create_components_from_params

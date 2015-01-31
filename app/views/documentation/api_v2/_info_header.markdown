@@ -22,7 +22,7 @@ Endpoints with Red Stars (<span class="accstr">*</span>) require an access token
 
 <img alt="example of a protected endpoint" src="/assets/updated/documentation/protected_endpoint.png" class="protected-endpoint-img">
 
-Libraries and external tools for the Bike Index <a href="#authentication_notes" class="scroll-link">are available at the bottom of the page</a>, along with some more information about our implementation of OAuth.
+Libraries and external tools for the Bike Index <a href="#authentication" class="scroll-link">are available at the bottom of the page</a>, along with some more information about our implementation of OAuth.
 
 *There may be rate limiting on the future for non-authenticated requests - so if you have an access token, consider using it for everything.*
 

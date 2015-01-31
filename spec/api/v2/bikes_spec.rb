@@ -49,7 +49,7 @@ describe 'Bikes API V2' do
       response.code.should eq('403')
     end
 
-    it "creates a non example bike" do 
+    it "creates a non example bike, with components" do 
       manufacturer = FactoryGirl.create(:manufacturer)
       FactoryGirl.create(:ctype, name: "wheel")
       FactoryGirl.create(:ctype, name: "Headset")
@@ -210,20 +210,47 @@ describe 'Bikes API V2' do
       @bike.current_stolen_record.police_report_number.should eq("999999")
     end
 
-    it "updates a bike, adds a stolen record, doesn't update locked attrs" do
-      stolen_record = FactoryGirl.create(:stolen_record, bike: @bike)
-      @bike.reload.update_attribute :stolen, true
-      @bike.current_stolen_record.should eq(stolen_record)
-      @params[:stolen_record] = {
-        city: 'Chicago',
-        police_report_number: "999999"
-      }
+    it "updates a bike, adds and removes components" do
+      # FactoryGirl.create(:manufacturer, name: 'Other')
+      manufacturer = FactoryGirl.create(:manufacturer)
+      wheels = FactoryGirl.create(:ctype, name: "wheel")
+      headsets = FactoryGirl.create(:ctype, name: "Headset")
+      comp = FactoryGirl.create(:component, bike: @bike, ctype: headsets)
+      comp2 = FactoryGirl.create(:component, bike: @bike, ctype: wheels)
+      # pp comp2
+      @bike.reload
+      @bike.components.count.should eq(2)
+      components = [
+        {
+          manufacturer: manufacturer.name,
+          year: "1999",
+          component_type: 'headset',
+          description: "Second component",
+          serial_number: '69',
+          model_name: 'Richie rich'
+        },{
+          manufacturer: "BLUE TEETH",
+          front_or_rear: "Rear",
+          description: 'third component'
+        },{
+          id: comp.id,
+          destroy: true
+        },{
+          id: comp2.id,
+          year: '1999',
+          description: 'First component'
+        }
+      ]
+      @params.merge!({components: components})
+
       put @url, @params.to_json, JSON_CONTENT
-      result = JSON.parse(response.body)['bike']
       response.code.should eq('200')
-      @bike.reload.year.should eq(@params[:year])
-      @bike.stolen.should be_true
-      result['stolen_record']['police_report_number'].should eq("999999")
+      @bike.reload
+      @bike.components.reload
+      @bike.year.should eq(@params[:year])
+      comp2.reload.year.should eq(1999)
+      @bike.components.pluck(:manufacturer_id).include?(manufacturer.id).should be_true
+      @bike.components.count.should eq(3)
     end
 
     it "claims a bike and updates if it should" do 

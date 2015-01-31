@@ -90,6 +90,8 @@
                   - url = oauth_authorization_url(client_id: application.uid, redirect_uri: authorize_documentation_index_url, response_type: 'code')
                   %p.authorize-new-explain
                     Authorize this new token:
+                    %span.less-strogn
+                      (click the link)
                   %pre
                     %a.authorize_new_token_link{ href: url, data: {base: url}}
                       = url

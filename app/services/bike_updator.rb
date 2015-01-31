@@ -39,6 +39,10 @@ class BikeUpdator
     raise BikeUpdatorError, "Oh no! It looks like you don't own that bike."
   end
 
+  def update_api_components
+    ComponentCreator.new(bike: @bike, b_param: @bike_params).update_components_from_params
+  end
+
   def update_stolen_record
     @bike.reload
     if @bike_params[:bike] && @bike_params[:bike][:date_stolen_input]
@@ -67,7 +71,7 @@ class BikeUpdator
   def remove_blank_components
     return false unless @bike.components.any?
     @bike.components.each do |c|
-      c.destroy unless c.ctype.present? or c.description.present?
+      c.destroy unless c.ctype_id.present? || c.description.present? 
     end
   end
 
@@ -75,6 +79,7 @@ class BikeUpdator
     ensure_ownership!
     set_protected_attributes
     update_ownership
+    update_api_components if @bike_params[:components].present?
     update_stolen_record if @bike.update_attributes(@bike_params[:bike])
     ListingOrderWorker.perform_in(1.minutes, @bike.id) if @bike.present?
     remove_blank_components

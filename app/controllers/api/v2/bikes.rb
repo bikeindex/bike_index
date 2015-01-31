@@ -15,17 +15,6 @@ module API
           optional :primary_frame_color, type: String, values: COLOR_NAMES, desc: "Main color of frame (case sensitive match)"
           optional :secondary_frame_color, type: String, values: COLOR_NAMES, desc: "Secondary color (case sensitive match)"
           optional :tertiary_frame_color, type: String, values: COLOR_NAMES, desc: "Third color (case sensitive match)"
-
-          optional :components, type: Array do
-            optional :manufacturer, type: String, desc: "Manufacturer name or ID"
-            # [Manufacturer name or ID](api_v2#!/manufacturers/GET_version_manufacturers_format)
-            optional :component_type, type: String, desc: 'Type of component', values: CTYPE_NAMES, desc: 'Type - case sensitive match'
-            optional :model, type: String, desc: "Component model"
-            optional :year, type: Integer, desc: "Component year"
-            optional :description, type: String, desc: "Component description"
-            optional :serial, type: String, desc: "Component serial"
-            optional :front_or_rear, type: String, desc: "Component front_or_rear"
-          end
           
           optional :stolen_record, type: Hash do
             optional :phone, type: String, desc: "Owner's phone number, **required to create stolen**"
@@ -47,6 +36,17 @@ module API
           #   # optional :phone_for_everyone, type: Boolean, default: false, desc: 'Show phone number to non logged in users'
           #   # optional :phone_for_users, type: Boolean, default: true, desc: 'Show phone to logged in users'
           end
+        end
+
+        params :components_attrs do 
+          optional :manufacturer, type: String, desc: "Manufacturer name or ID"
+          # [Manufacturer name or ID](api_v2#!/manufacturers/GET_version_manufacturers_format)
+          optional :component_type, type: String, desc: 'Type of component', values: CTYPE_NAMES, desc: 'Type - case sensitive match'
+          optional :model, type: String, desc: "Component model"
+          optional :year, type: Integer, desc: "Component year"
+          optional :description, type: String, desc: "Component description"
+          optional :serial, type: String, desc: "Component serial"
+          optional :front_or_rear, type: String, desc: "Component front_or_rear"
         end
 
         def find_bike
@@ -111,7 +111,10 @@ module API
           optional :test, type: Boolean, desc: "Is this a test bike?"
           optional :organization_slug, type: String, desc: "Organization bike should be created by. **Only works** if user is a member of the organization"
           optional :cycle_type_name, type: String, values: CYCLE_TYPE_NAMES, default: 'bike', desc: "Type of cycle (case sensitive match)"
-          use :bike_attrs 
+          use :bike_attrs
+          optional :components, type: Array do
+            use :components_attrs
+          end
         end
         post '/', scopes: [:write_bikes], serializer: BikeV2ShowSerializer, root: 'bike' do
           declared_p = { "declared_params" => declared(params, include_missing: false) }
@@ -138,6 +141,11 @@ module API
         params  do 
           requires :id, type: Integer, desc: "Bike ID"
           use :bike_attrs
+          optional :components, type: Array do
+            optional :id, type: Integer, desc: "Component ID - if you don't supply this you will create a new component instead of update an existing one"
+            use :components_attrs
+            optional :destroy, type: Boolean, desc: "Delete this component (requires an ID)"
+          end
         end
         put ':id', scopes: [:write_bikes], serializer: BikeV2ShowSerializer, root: 'bike' do
           declared_p = { "declared_params" => declared(params, include_missing: false) }

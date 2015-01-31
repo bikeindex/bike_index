@@ -246,13 +246,6 @@
   padding: 40px 0;
 }
 
-@media (min-width: $s-breakpoint) {
-  .api-info-footer {
-    padding: 60px 0 40px;
-  }
- 
-}
-
 #resources_container {
   .toggleEndpointList { font-weight: 600; }
 //   input { @extend .form-control; }
