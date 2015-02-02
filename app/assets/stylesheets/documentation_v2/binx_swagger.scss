@@ -28,7 +28,7 @@
 
 #header {
   position: fixed;
-  top: 0;
+  top: 0; left: 0;
   width: 100%;
   z-index: 1000;
   background: $gray-lighter;
@@ -275,4 +275,30 @@
 .protected-endpoint-img {
   margin: 0 auto;
   display: block;
+}
+
+.docs-section-list { display: none; }
+
+@media (min-width: 1000px) {
+  .swagger-section { padding-left: 12%; }
+  .docs-section-list {
+    display: block;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 12%;
+    height: 100%;
+    background: $gray-lighter;
+    border-bottom: 1px solid darken($gray-lighter, 7%);
+    padding: 120px 10px 0;
+    a {
+      color: $text-color;
+      &.active, &:hover {
+        color: $link-color;
+        text-decoration: underline;
+      }
+    }
+    ul { margin-left: .75em; }
+    ul a { font-size: .9em; }
+  }
 }

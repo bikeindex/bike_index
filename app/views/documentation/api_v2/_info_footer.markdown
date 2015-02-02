@@ -1,13 +1,24 @@
-##Authentication details##
+##Authentication <a id="ref_authentication">
 
-###Plugins and tools###
+The Bike Index uses OAuth2. <a href="#applications_list" class="scroll-link">Create an application</a> and use an access token for any requests that need authorization.
+
+Endpoints with Red Stars (<span class="accstr">*</span>) require an access token to use:
+
+<img alt="example of a protected endpoint" src="/assets/updated/documentation/protected_endpoint.png" class="protected-endpoint-img">
+
+Libraries and external tools for the Bike Index <a href="#authentication" class="scroll-link">are available at the bottom of the page</a>, along with some more information about our implementation of OAuth.
+
+*There may be rate limiting on the future for non-authenticated requests - so if you have an access token, consider using it for everything.*
+
+
+###Plugins and external libraries <a id="ref_plugins">
 
 - **Ruby**: [omniauth-bike-index](https://github.com/bikeindex/omniauth-bike-index) gem
 
 - **Javascript**: We're [working on a Hello.js module](https://github.com/MrSwitch/hello.js/pull/190).
 
 
-###OAuth Flows###
+###OAuth Flows <a id="ref_oauth_flows">
 
 There are two supported ways of authenticating with the Bike Index through OAuth2:
 
@@ -20,16 +31,16 @@ The Authorization flow enables long lived access through refresh tokens (instead
 
 The Client-side flow is good for client-side javascript apps. Here's an article on [Client-side flow in OAuth2](http://labs.hybris.com/2012/06/05/oauth2-the-implicit-flow-aka-as-the-client-side-flow/).
 
-###Applications you've authorized###
+###Applications you've authorized <a id="ref_applications_authorized">
 
 Review the applications you've authorized at [/oauth/authorized_applications](/oauth/authorized_applications).
 
-###Sending your access tokens in requests###
+###Sending your access tokens in requests <a id="ref_sending_in_requests">
 
 By default we authenticate you with HTTP Basic authentication scheme. If the basic auth is not found in the authorization header, then it falls back to post parameters (all authenticated requests in this documentation put the access token in the parameters).
 
 
-###Refresh tokens###
+###Refresh tokens <a id="ref_refresh_tokens">
 
 Since tokens provide access to someone's account, one of the ways OAuth2 keeps things secure is by having tokens expire - so if someone compromises an access token, they don't have unlimited access to an account. The Bike Index expires tokens after 1 hour.
 

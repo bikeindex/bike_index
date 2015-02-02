@@ -12,6 +12,8 @@
     = javascript_include_tag "documentation_v2"
     
   %body.swagger-section
+    / { data: { spy: 'scroll', target: '.docs-section-list'}}
+    / data-spy="scroll" data-target=".navbar"
     %header#header
       .content-header
         .container-fluid.bikes-nav
@@ -30,6 +32,63 @@
               %input#input_apiKey.form-control{:name => "apiKey", :placeholder => "api_key", :type => "text"}
             %a#explore.btn.binxbtn{:href => "#"}
               Explore
+    %nav.docs-section-list#navmenu-fixed
+      %a{ href: '#ref_title' }
+        Bike Index API V2
+      %ul
+        %li
+          %a{ href: "#ref_introduction" }
+            Introduction
+        %li
+          %a{ href: "#ref_the_word_bike" }
+            The word "bike"
+        %li
+          %a{ href: "#ref_bike_urls" }
+            Bike urls
+        %li
+          %a{ href: "#ref_time" }
+            Time
+      %a{ href: '#ref_endpoints' }
+        Endpoints
+      %ul
+        %li
+          %a{ href: '#resource_me' }
+            Me
+        %li
+          %a{ href: '#resource_bikes' }
+            Bikes
+        %li
+          %a{ href: '#resource_bikes_search' }
+            Bikes search
+        %li
+          %a{ href: '#resource_manufacturers' }
+            Manufacturers
+        %li
+          %a{ href: '#resource_selections' }
+            Selections
+      %a{ href: '#ref_your_applications' }
+        Your applications
+      %ul
+      %a{ href: '#ref_authentication' }
+        Authentication
+      %ul
+        %li
+          %a{ href: '#ref_plugins' }
+            Plugins and external libraries
+        %li
+          %a{ href: '#ref_oauth_flows' }
+            OAuth flows
+        %li
+          %a{ href: '#ref_applications_authorized' }
+            Applications authorized
+        %li
+          %a{ href: '#ref_sending_in_requests' }
+            Sending access tokens
+        %li
+          %a{ href: '#ref_refresh_tokens' }
+            Refresh tokens
+
+
     .container-fluid
       .api-info-header
 
@@ -56,6 +115,7 @@
       .start-of-swagger-ui
         %h2
           Bike Index API V2 endpoints
+          <a id="ref_endpoints"></a>
 
     #message-bar.swagger-ui-wrap &nbsp;
 
@@ -68,6 +128,7 @@
             Your applications:
             %span.pull-right.less-strong
               = link_to "Add an application", "/oauth/applications"
+            <a id="ref_your_applications"></a>
           = render 'api_v2_applications'
 
     .container-fluid
@@ -75,7 +136,7 @@
         :plain
           #{render "documentation/api_v2/info_footer"}
 
-    %hr
+    / %hr
     .container-fluid
       .alert.alert-info.margined
         %p
