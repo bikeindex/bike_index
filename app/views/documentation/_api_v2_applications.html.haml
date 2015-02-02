@@ -12,27 +12,6 @@
             = application.name
 
         .application-info.initially-hidden
-          / - v2_accessor = application.access_tokens.where(resource_owner_id: ENV['V2_ACCESSOR_ID']).first
-          / - if v2_accessor.present?
-          /   %table.table.tokens-table
-          /     %thead
-          /       %th
-          /         Permanent public token
-          /         %span.less-strong
-          /           use to search the Bike Index or to play around on this documentation page.
-          /       %th
-          /         Scopes
-          /       %th
-          /     %tbody
-          /       %td
-          /         %pre
-          /           = v2_accessor.token
-          /       %td
-          /         %code 
-          /           public
-          /       %td
-          /         %a.set-token.btn.binxbtn-primary{href: '#', data: {token: v2_accessor.token }}
-          /           Use token
           %table.table.padded
             %tbody
               %tr

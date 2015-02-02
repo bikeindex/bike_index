@@ -4,7 +4,7 @@
 
 - **Ruby**: [omniauth-bike-index](https://github.com/bikeindex/omniauth-bike-index) gem
 
-- **Javascript**: We're [Working on a Hello.js module](https://github.com/MrSwitch/hello.js/pull/190).
+- **Javascript**: We're [working on a Hello.js module](https://github.com/MrSwitch/hello.js/pull/190).
 
 
 ###OAuth Flows###

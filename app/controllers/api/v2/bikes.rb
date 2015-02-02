@@ -161,6 +161,35 @@ module API
           @bike.reload
         end
 
+        desc "Add an image to a bike", {
+          notes: <<-NOTE
+
+            To post a file to the API with curl:
+
+            `curl -X POST -i -F file=@{test_file.jpg} "#{ENV['BASE_URL']}/api/v2/bikes/{bike_id}/image?access_token={access_token}"`
+
+            Replace `{text_file.jpg}` with the relative path of the file you're posting.
+
+            **RIGHT NOW THIS DEMO DOESN'T WORK.** The `curl` command above does. We're working on the documentation issue, check back soon.
+
+          NOTE
+        }
+        params  do 
+          requires :id, type: Integer, desc: "Bike ID"
+          requires :file, :type => Rack::Multipart::UploadedFile, :desc => "Attachment."
+        end
+        post ':id/image', scopes: [:write_bikes], serializer: PublicImageSerializer, root: 'image' do 
+          declared_p = { "declared_params" => declared(params, include_missing: false) }
+          find_bike
+          authorize_bike_for_user
+          public_image = PublicImage.new(imageable: @bike, image: params[:file])
+          if public_image.save
+            public_image
+          else
+            error!(public_image.errors.full_messages.to_sentence, 401)
+          end
+        end
+
 
         desc "Send a stolen notification<span class='accstr'>*</span>", {
           notes: <<-NOTE 

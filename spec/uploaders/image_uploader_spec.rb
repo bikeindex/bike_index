@@ -9,7 +9,7 @@ describe ImageUploader do
   # before do
   #   ImageUploader.enable_processing = true
   #   @uploader = ImageUploader.new(@user, :avatar)
-  #   @uploader.store!(File.open(File.join(Rails.root, 'spec', 'factories', 'bike.jpg')))
+  #   @uploader.store!(File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg')))
   # end
 
   # after do

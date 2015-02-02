@@ -203,7 +203,7 @@ FactoryGirl.define do
   end
 
   factory :public_image do |u|
-    u.image { File.open(File.join(Rails.root, 'spec', 'factories', 'bike.jpg')) }
+    u.image { File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg')) }
     association :imageable, factory: :bike
   end
 

@@ -79,7 +79,7 @@ describe BikeCreatorAssociator do
     it "creates public images for the attached image" do 
       bike = FactoryGirl.create(:bike)
       b_param = FactoryGirl.create(:b_param)
-      test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, 'spec', 'factories', 'bike.jpg')))
+      test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg')))
       b_param.image = test_photo
       b_param.save 
       b_param.image.should be_present
@@ -93,7 +93,7 @@ describe BikeCreatorAssociator do
   #   it "should associate the public image" do 
   #     bike = FactoryGirl.create(:bike)
   #     b_param = FactoryGirl.create(:b_param)
-  #     b_param.params = {bike: {bike_image: File.open(File.join(Rails.root, 'spec', 'factories', 'bike.jpg'))}}
+  #     b_param.params = {bike: {bike_image: File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg'))}}
   #     b_param.save
   #     BikeCreatorAssociator.new(b_param).add_uploaded_image(bike)
   #     bike.reload.public_images.count.should eq(1)

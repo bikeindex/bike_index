@@ -217,6 +217,7 @@ describe 'Bikes API V2' do
       headsets = FactoryGirl.create(:ctype, name: "Headset")
       comp = FactoryGirl.create(:component, bike: @bike, ctype: headsets)
       comp2 = FactoryGirl.create(:component, bike: @bike, ctype: wheels)
+      not_urs = FactoryGirl.create(:component)
       # pp comp2
       @bike.reload
       @bike.components.count.should eq(2)
@@ -242,8 +243,8 @@ describe 'Bikes API V2' do
         }
       ]
       @params.merge!({components: components})
-
       put @url, @params.to_json, JSON_CONTENT
+      # pp response.body
       response.code.should eq('200')
       @bike.reload
       @bike.components.reload
@@ -251,6 +252,27 @@ describe 'Bikes API V2' do
       comp2.reload.year.should eq(1999)
       @bike.components.pluck(:manufacturer_id).include?(manufacturer.id).should be_true
       @bike.components.count.should eq(3)
+    end
+
+    it "doesn't remove components that aren't the bikes" do
+      manufacturer = FactoryGirl.create(:manufacturer)
+      comp = FactoryGirl.create(:component, bike: @bike)
+      not_urs = FactoryGirl.create(:component)
+      components = [
+        {
+          id: comp.id,
+          year: 1999
+        },{
+          id: not_urs.id,
+          destroy: true
+        }
+      ]
+      @params.merge!({components: components})
+      put @url, @params.to_json, JSON_CONTENT
+      response.code.should eq('401')
+      @bike.reload.components.reload.count.should eq(1)
+      @bike.components.pluck(:year).first.should eq(1999) # Feature, not a bug?
+      not_urs.reload.id.should be_present
     end
 
     it "claims a bike and updates if it should" do 
@@ -262,6 +284,42 @@ describe 'Bikes API V2' do
       @bike.reload.current_ownership.claimed.should be_true
       @bike.owner.should eq(@user)
       @bike.year.should eq(@params[:year])
+    end
+  end
+
+  describe :image do 
+    it "doesn't post an image to a bike if the bike isn't owned by the user" do 
+      create_doorkeeper_app({scopes: 'read_user write_bikes'})
+      bike = FactoryGirl.create(:ownership).bike
+      file = File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg'))
+      url = "/api/v2/bikes/#{bike.id}/image?access_token=#{@token.token}"
+      bike.public_images.count.should eq(0)
+      post url, {file: Rack::Test::UploadedFile.new(file)}
+      response.code.should eq('403')
+      bike.reload.public_images.count.should eq(0)
+    end
+
+    it "errors on non whitelisted extensions" do 
+      create_doorkeeper_app({scopes: 'read_user write_bikes'})
+      bike = FactoryGirl.create(:ownership, creator_id: @user.id).bike
+      file = File.open(File.join(Rails.root, 'spec', 'spec_helper.rb'))
+      url = "/api/v2/bikes/#{bike.id}/image?access_token=#{@token.token}"
+      bike.public_images.count.should eq(0)
+      post url, {file: Rack::Test::UploadedFile.new(file)}
+      response.body.match(/not allowed to upload .?.rb/i).should be_present
+      response.code.should eq('401')
+      bike.reload.public_images.count.should eq(0)
+    end
+
+    it "posts an image" do 
+      create_doorkeeper_app({scopes: 'read_user write_bikes'})
+      bike = FactoryGirl.create(:ownership, creator_id: @user.id).bike
+      file = File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg'))
+      url = "/api/v2/bikes/#{bike.id}/image?access_token=#{@token.token}"
+      bike.public_images.count.should eq(0)
+      post url, {file: Rack::Test::UploadedFile.new(file)}
+      response.code.should eq('201')
+      bike.reload.public_images.count.should eq(1)
     end
   end
 
