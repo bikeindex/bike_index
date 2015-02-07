@@ -18,9 +18,9 @@
         %td
           = application.redirect_uri
         %td
-          = link_to "View", [:oauth, application], class: 'btn binxbtn-default'
+          = link_to "View", oauth_application_url(application), class: 'btn binxbtn-default'
         %td
-          = link_to 'Edit', edit_oauth_application_path(application), class: 'btn binxbtn-primary'
+          = link_to 'Edit', edit_oauth_application_url(application), class: 'btn binxbtn-primary'
         %td
           = render 'delete_form', application: application
 .container

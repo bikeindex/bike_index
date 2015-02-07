@@ -254,8 +254,8 @@ class User < ActiveRecord::Base
     end while User.where(auth_token: auth_token).exists?
   end
 
-  def access_tokens_for_application(id)
-    Doorkeeper::AccessToken.where(resource_owner_id: id)
+  def access_tokens_for_application(i)
+    Doorkeeper::AccessToken.where(resource_owner_id: id, application_id: i)
   end
 
   protected

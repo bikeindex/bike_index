@@ -33,6 +33,7 @@ module API
         end
 
         desc "Current user's information in access token's scope", {
+          authorizations: { oauth2: [] },
           notes: <<-NOTE
             Current user is the owner of the `access_token` you use in the request. Depending on your scopes you will get different things back.
             You will always get the user's `id`
@@ -53,6 +54,7 @@ module API
         end
 
         desc "Current user's bikes", {
+          authorizations: { oauth2: [{ scope: :read_bikes }] },
           notes: <<-NOTE
             This returns the current user's bikes, so long as the access_token has the `read_bikes` scope.
             This uses the bike list bike objects, which only contains the most important information.
@@ -60,7 +62,7 @@ module API
 
           NOTE
         }
-        get '/current/bikes', scopes: [:read_bikes], hidden: true, each_serializer: BikeV2Serializer, root: 'bikes' do
+        get '/current/bikes', hidden: true, each_serializer: BikeV2Serializer, root: 'bikes' do
           current_user.bikes
         end
       

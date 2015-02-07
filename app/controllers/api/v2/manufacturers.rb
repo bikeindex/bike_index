@@ -6,7 +6,7 @@ module API
       resource :manufacturers, desc: "Accepted manufacturers" do
         desc "All the manufacturers with pagination"
         paginate
-        get '/', protected: false do
+        get '/' do
           paginate Manufacturer.scoped
         end
       
@@ -18,7 +18,7 @@ module API
         params do
           requires :id, type: String, desc: 'Manufacturer id or slug'
         end
-        get ':id', serializer: ManufacturerV2ShowSerializer, protected: false do 
+        get ':id', serializer: ManufacturerV2ShowSerializer do 
           manufacturer = Manufacturer.fuzzy_id_or_name_find(params[:id])
           unless manufacturer.present?
             msg = "Unable to find manufacturer with name or id: #{params[:id]}"

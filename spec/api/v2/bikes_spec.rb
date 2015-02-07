@@ -8,15 +8,22 @@ describe 'Bikes API V2' do
     it "returns one with from an id" do
       bike = FactoryGirl.create(:bike)
       get "/api/v2/bikes/#{bike.id}", :format => :json
-      result = response.body
+      result = JSON.parse(response.body)
       response.code.should == '200'
-      expect(JSON.parse(result)['bike']['id']).to eq(bike.id)
+      expect(result['bike']['id']).to eq(bike.id)
+      response.headers['Content-Type'].match('json').should be_present
+      response.headers['Access-Control-Allow-Origin'].should eq('*')
+      response.headers['Access-Control-Request-Method'].should eq('*')
     end
 
     it "responds with missing" do 
       get "/api/v2/bikes/10", :format => :json
+      result = JSON(response.body)
       response.code.should == '404'
-      expect(JSON(response.body)["message"].present?).to be_true
+      expect(result["message"].present?).to be_true
+      response.headers['Content-Type'].match('json').should be_present
+      response.headers['Access-Control-Allow-Origin'].should eq('*')
+      response.headers['Access-Control-Request-Method'].should eq('*')
     end
   end
 
@@ -176,7 +183,8 @@ describe 'Bikes API V2' do
       @token.update_attribute :scopes, 'public'
       put @url, @params.to_json, JSON_CONTENT
       response.code.should eq('403') 
-      response.body.match('scope').should be_present
+      response.body.match(/oauth/i).should be_present
+      response.body.match(/permissions/i).should be_present
     end
 
     it "fails to update bike if required stolen attrs aren't present" do
@@ -275,6 +283,9 @@ describe 'Bikes API V2' do
       @params.merge!({components: components})
       put @url, @params.to_json, JSON_CONTENT
       response.code.should eq('401')
+      response.headers['Content-Type'].match('json').should be_present
+      # response.headers['Access-Control-Allow-Origin'].should eq('*')
+      # response.headers['Access-Control-Request-Method'].should eq('*')
       @bike.reload.components.reload.count.should eq(1)
       @bike.components.pluck(:year).first.should eq(1999) # Feature, not a bug?
       not_urs.reload.id.should be_present
@@ -286,6 +297,7 @@ describe 'Bikes API V2' do
       @bike.reload.owner.should_not eq(@user)
       put @url, @params.to_json, JSON_CONTENT
       response.code.should eq('200')
+      response.headers['Content-Type'].match('json').should be_present
       @bike.reload.current_ownership.claimed.should be_true
       @bike.owner.should eq(@user)
       @bike.year.should eq(@params[:year])
@@ -301,6 +313,7 @@ describe 'Bikes API V2' do
       bike.public_images.count.should eq(0)
       post url, {file: Rack::Test::UploadedFile.new(file)}
       response.code.should eq('403')
+      response.headers['Content-Type'].match('json').should be_present
       bike.reload.public_images.count.should eq(0)
     end
 
@@ -324,6 +337,7 @@ describe 'Bikes API V2' do
       bike.public_images.count.should eq(0)
       post url, {file: Rack::Test::UploadedFile.new(file)}
       response.code.should eq('201')
+      response.headers['Content-Type'].match('json').should be_present
       bike.reload.public_images.count.should eq(1)
     end
   end
@@ -341,7 +355,8 @@ describe 'Bikes API V2' do
       @token.update_attribute :scopes, 'public'
       post @url, @params.to_json, JSON_CONTENT
       response.code.should eq('403')
-      response.body.match('scope').should be_present
+      response.body.match('OAuth').should be_present
+      response.body.match('permissions').should be_present
       response.body.match('is not stolen').should_not be_present
     end
 

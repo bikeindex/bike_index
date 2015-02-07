@@ -77,12 +77,13 @@ module API
         params do
           requires :id, type: Integer, desc: 'Bike id'
         end
-        get ':id', protected: false, hide: true, serializer: BikeV2ShowSerializer, root:  'bike' do 
+        get ':id', serializer: BikeV2ShowSerializer, root:  'bike' do 
           find_bike
         end
 
 
         desc "Add a bike to the Index!<span class='accstr'>*</span>", {
+          authorizations: { oauth2: [{ scope: :write_bikes }] },
           notes: <<-NOTE
             **Requires** `write_bikes` **in the access token** you use to create the bike.
 
@@ -116,7 +117,7 @@ module API
             use :components_attrs
           end
         end
-        post '/', scopes: [:write_bikes], serializer: BikeV2ShowSerializer, root: 'bike' do
+        post '/', serializer: BikeV2ShowSerializer, root: 'bike' do
           declared_p = { "declared_params" => declared(params, include_missing: false) }
           b_param = BParam.create(creator_id: current_user.id, params: declared_p['declared_params'], api_v2: true)
           ensure_required_stolen_attrs(b_param.params)
@@ -131,6 +132,7 @@ module API
 
 
         desc "Update a bike owned by the access token<span class='accstr'>*</span>", {
+          authorizations: { oauth2: [{ scope: :write_bikes }] },
           notes: <<-NOTE
             **Requires** `read_user` **in the access token** you use to send the notification.
             
@@ -148,7 +150,7 @@ module API
             optional :destroy, type: Boolean, desc: "Delete this component (requires an ID)"
           end
         end
-        put ':id', scopes: [:write_bikes], serializer: BikeV2ShowSerializer, root: 'bike' do
+        put ':id', serializer: BikeV2ShowSerializer, root: 'bike' do
           declared_p = { "declared_params" => declared(params, include_missing: false) }
           find_bike
           authorize_bike_for_user
@@ -163,6 +165,7 @@ module API
         end
 
         desc "Add an image to a bike", {
+          authorizations: { oauth2: [{ scope: :write_bikes }] },
           notes: <<-NOTE
 
             To post a file to the API with curl:
@@ -179,7 +182,7 @@ module API
           requires :id, type: Integer, desc: "Bike ID"
           requires :file, :type => Rack::Multipart::UploadedFile, :desc => "Attachment."
         end
-        post ':id/image', scopes: [:write_bikes], serializer: PublicImageSerializer, root: 'image' do 
+        post ':id/image', serializer: PublicImageSerializer, root: 'image' do 
           declared_p = { "declared_params" => declared(params, include_missing: false) }
           find_bike
           authorize_bike_for_user
@@ -193,6 +196,7 @@ module API
 
 
         desc "Send a stolen notification<span class='accstr'>*</span>", {
+          authorizations: { oauth2: [{ scope: :read_user }] },
           notes: <<-NOTE 
             **Requires** `read_user` **in the access token** you use to send the notification.
 
@@ -209,7 +213,7 @@ module API
           requires :id, type: Integer, desc: "Bike ID. **MUST BE A STOLEN BIKE**"
           requires :message, type: String, desc: "The message you are sending to the owner"
         end
-        post ':id/send_stolen_notification', scopes: [:read_user], serializer: StolenNotificationSerializer  do 
+        post ':id/send_stolen_notification', serializer: StolenNotificationSerializer  do 
           find_bike
           error!("Bike is not stolen", 400) unless @bike.present? && @bike.stolen
           # Unless application is authorized....

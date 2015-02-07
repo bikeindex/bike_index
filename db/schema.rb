@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150127220842) do
+ActiveRecord::Schema.define(:version => 20150208001048) do
 
   create_table "ads", :force => true do |t|
     t.string   "title"
@@ -428,6 +428,7 @@ ActiveRecord::Schema.define(:version => 20150127220842) do
     t.string   "owner_type"
     t.boolean  "is_internal",                   :default => false, :null => false
     t.boolean  "can_send_stolen_notifications", :default => false, :null => false
+    t.string   "scopes",                        :default => "",    :null => false
   end
 
   add_index "oauth_applications", ["owner_id", "owner_type"], :name => "index_oauth_applications_on_owner_id_and_owner_type"

@@ -7,6 +7,8 @@ describe Api::V1::UsersController do
     it "returns user_present = false if there is no user present" do
       get :current, format: :json
       response.code.should eq('200')
+      response.headers['Access-Control-Allow-Origin'].should_not be_present
+      response.headers['Access-Control-Request-Method'].should_not be_present
     end
 
     it "returns user_present if a user is present" do 
@@ -17,6 +19,8 @@ describe Api::V1::UsersController do
       response.code.should eq('200')
       # pp response.body
       JSON.parse(response.body).should include("user_present" => true)
+      response.headers['Access-Control-Allow-Origin'].should_not be_present
+      response.headers['Access-Control-Request-Method'].should_not be_present
     end
   end
 

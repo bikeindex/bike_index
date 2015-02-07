@@ -6,42 +6,42 @@ module API
       resource :selections, desc: "Selections (static options)" do
 
         desc "Frame colors"
-        get '/colors', protected: false, root: 'colors' do
+        get '/colors', root: 'colors' do
           Color.scoped
         end
 
         desc "Types of components"
-        get '/component_types', protected: false, each_serializer: CtypeSerializer, root: 'component_types' do 
+        get '/component_types', each_serializer: CtypeSerializer, root: 'component_types' do 
           Ctype.scoped
         end
 
         desc "Types of cycles"
-        get '/cycle_types', protected: false, root: 'cycle_types' do
+        get '/cycle_types', root: 'cycle_types' do
           CycleType.scoped
         end
 
         desc "Frame materials"
-        get '/frame_materials', protected: false, root: 'frame_materials' do
+        get '/frame_materials', root: 'frame_materials' do
           FrameMaterial.scoped
         end
 
         desc "Front gear types"
-        get '/front_gear_types', protected: false, root: 'front_gear_types' do
+        get '/front_gear_types', root: 'front_gear_types' do
           FrontGearType.scoped
         end
 
         desc "Rear gear types"
-        get '/rear_gear_types', protected: false, root: 'rear_gear_types' do
+        get '/rear_gear_types', root: 'rear_gear_types' do
           RearGearType.scoped
         end
 
         desc "Handlebars"
-        get '/handlebar_types', protected: false, root: 'handlebar_types' do
+        get '/handlebar_types', root: 'handlebar_types' do
           HandlebarType.scoped
         end
 
         desc "Propulsion types"
-        get '/propulsion_types', protected: false, root: 'propulsion_types' do
+        get '/propulsion_types', root: 'propulsion_types' do
           PropulsionType.scoped
         end
         
@@ -56,7 +56,7 @@ module API
         params do 
           optional :min_popularity, type: String, desc: 'Minimum commonness of wheel size to include', values: WheelSize.popularities
         end
-        get '/wheel_sizes', protected: false, root: 'wheel_sizes' do
+        get '/wheel_sizes', root: 'wheel_sizes' do
           priority = WheelSize.popularities.index(params[:min_popularity]) || 0
           wheel_sizes = WheelSize.where("priority  > ?", priority)
           paginate wheel_sizes

@@ -15,7 +15,8 @@ class Oauth::ApplicationsController < Doorkeeper::ApplicationsController
     @application.owner = current_user
     if @application.save
       flash[:notice] = I18n.t(:notice, :scope => [:doorkeeper, :flash, :applications, :create])
-       respond_with( :oauth, @application, location: oauth_application_url(@application) )
+       # respond_with( :oauth, @application, location: oauth_application_url(@application) )
+       redirect_to oauth_application_url(@application)
     else
       render :new
     end

@@ -240,12 +240,18 @@ describe User do
     end
     it "returns access tokens for the application" do 
       user = FactoryGirl.create(:user)
-      application = Doorkeeper::Application.new(name: 'test', redirect_uri: 'http://foo.bar')
+      application = Doorkeeper::Application.new(name: 'test', redirect_uri: 'https://foo.bar')
+      application2 = Doorkeeper::Application.new(name: 'other_test', redirect_uri: 'https://foo.bar')
       application.owner = user
       application.save
+      application2.owner = user
+      application2.save
       access_token = Doorkeeper::AccessToken.create(application_id: application.id, resource_owner_id: user.id)
+      access_token2 = Doorkeeper::AccessToken.create(application_id: application2.id, resource_owner_id: user.id)
       tokens = user.reload.access_tokens_for_application(application.id)
       tokens.first.should eq(access_token)
+      tokens = user.reload.access_tokens_for_application(application2.id)
+      tokens.first.should eq(access_token2)
     end
   end
 

@@ -10,6 +10,7 @@ describe 'Manufacturers API V2' do
       pagination_link = "<http://www.example.com/api/v2/manufacturers?page=2&per_page=1>; rel=\"last\", <http://www.example.com/api/v2/manufacturers?page=2&per_page=1>; rel=\"next\""
       expect(response.header['Link']).to eq(pagination_link)
       response.code.should == '200'
+      # pp response.headers
       response.headers['Access-Control-Allow-Origin'].should eq('*')
       response.headers['Access-Control-Request-Method'].should eq('*')
       expect(JSON.parse(response.body)['manufacturers'][0]['id']).to eq(manufacturer.id)
@@ -27,10 +28,13 @@ describe 'Manufacturers API V2' do
       expect(JSON.parse(result)['manufacturer']['id']).to eq(@manufacturer.id)
     end
 
-    it "responds with missing" do 
+    it "responds with missing and cors headers" do 
       get "/api/v2/manufacturers/10000"
       response.code.should == '404'
       expect(JSON(response.body)["message"].present?).to be_true
+      response.headers['Access-Control-Allow-Origin'].should eq('*')
+      response.headers['Access-Control-Request-Method'].should eq('*')
+      response.headers['Content-Type'].match('json').should be_present
     end
 
     it "returns one from a name" do 
@@ -41,6 +45,18 @@ describe 'Manufacturers API V2' do
       result = response.body
       response.code.should == '200'
       expect(JSON.parse(result)['manufacturer']['id']).to eq(@manufacturer.id)
+    end
+  end
+
+  describe "JUST CRAZY 404" do 
+    it "responds with missing and cors headers" do 
+      get "/api/v2/manufacturersdddd"
+      # pp JSON.parse(response.body)
+      response.code.should == '404'
+      expect(JSON(response.body)["message"].present?).to be_true
+      response.headers['Access-Control-Allow-Origin'].should eq('*')
+      response.headers['Access-Control-Request-Method'].should eq('*')
+      response.headers['Content-Type'].match('json').should be_present
     end
   end
 end

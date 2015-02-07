@@ -20,7 +20,7 @@ describe Oauth::ApplicationsController do
         name: "Some app",
         redirect_uri: "urn:ietf:wg:oauth:2.0:oob"
       }
-      post :create, application: app_attrs
+      post :create, {doorkeeper_application: app_attrs}
       app = user.oauth_applications.first
       app.name.should eq(app_attrs[:name])
     end

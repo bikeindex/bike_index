@@ -39,7 +39,7 @@ Doorkeeper.configure do
   enable_application_owner :confirmation => true
 
   # Define access token scopes for your provider
-  default_scopes  :public
+  # default_scopes  :public
   optional_scopes :read_user, :write_user, :read_bikes, :write_bikes, :read_bikewise, :write_bikewise, :read_organization_membership
 
   # Change the way client credentials are retrieved from the request object.
@@ -71,7 +71,7 @@ Doorkeeper.configure do
   #
   # If not specified, Doorkeeper enables all the four grant flows.
   #
-  # grant_flows %w(authorization_code implicit password client_credentials)
+  grant_flows %w(authorization_code implicit password client_credentials)
 
   # Under some circumstances you might want to have applications auto-approved,
   # so that the user skips the authorization step.
