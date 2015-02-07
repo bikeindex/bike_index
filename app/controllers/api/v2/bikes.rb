@@ -141,6 +141,7 @@ module API
         params  do 
           requires :id, type: Integer, desc: "Bike ID"
           use :bike_attrs
+          optional :owner_email, type: String, desc: "Send the bike to a new owner!"
           optional :components, type: Array do
             optional :id, type: Integer, desc: "Component ID - if you don't supply this you will create a new component instead of update an existing one"
             use :components_attrs

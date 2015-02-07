@@ -18,12 +18,13 @@ describe 'Me API V2' do
       @token.update_attribute :scopes, OAUTH_SCOPES_S
       token = Doorkeeper::AccessToken.create!(application_id: @application.id, resource_owner_id: @user.id, scopes: OAUTH_SCOPES_S)
       get '/api/v2/me', :format => :json, :access_token => @token.token
-      response.response_code.should eq(200)
       result = JSON.parse(response.body)
+      expect(result['user']['name']).to eq(@user.name)
       expect(result['id']).to eq(@user.id.to_s)
       expect(result['user'].kind_of?(Hash)).to be_true
       expect(result['bike_ids'].kind_of?(Array)).to be_true
       expect(result['memberships'].kind_of?(Array)).to be_true
+      response.response_code.should eq(200)
     end
 
     it "responds with all available attributes with full scoped token" do

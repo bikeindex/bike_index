@@ -201,7 +201,10 @@ describe 'Bikes API V2' do
         phone: '1234567890',
         police_report_number: "999999"
       }
-      put @url, @params.to_json, JSON_CONTENT
+      @params[:owner_email] = "foo@new_owner.com"
+      lambda {
+        put @url, @params.to_json, JSON_CONTENT
+      }.should change(Ownership, :count).by(1)
       response.code.should eq('200')
       @bike.reload.year.should eq(@params[:year])
       @bike.serial_number.should eq(serial)
@@ -243,7 +246,9 @@ describe 'Bikes API V2' do
         }
       ]
       @params.merge!({components: components})
-      put @url, @params.to_json, JSON_CONTENT
+      lambda {
+        put @url, @params.to_json, JSON_CONTENT
+      }.should change(Ownership, :count).by(0)
       # pp response.body
       response.code.should eq('200')
       @bike.reload
