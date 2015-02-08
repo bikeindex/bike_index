@@ -6,16 +6,18 @@ If you encounter any errors here (or anywhere on the Bike Index), please [submit
 
 If you have questions contact [seth@bikeindex.org](mailto:seth@bikeindex.org").
 
+*This documentation isn't tested or supported in IE.*
+
 
 ##Introduction <a id="ref_introduction">
 
 The Bike Index API is organized around REST. Our API is designed to have predictable, resource-oriented URLs and to use HTTP response codes to indicate API errors. JSON will be returned in all responses from the API, including errors.
 
-The Bike Index API supports Cross-Origin Resource Sharing (CORS). The CORS spec allows web applications to make cross domain AJAX calls without using workarounds such as JSONP.
+###CORS <a id="ref_cors">
 
-For more information about CORS, read [this article][http://www.nczonline.net/blog/2010/05/25/cross-domain-ajax-with-cross-origin-resource-sharing/], or [the spec](http://www.w3.org/TR/access-control/#simple-cross-origin-request-and-actual-r").
+Every endpoint on the Bike Index API supports Cross-Origin Resource Sharing (CORS).
 
-This documentation is interactive to help you figure out how to use the API. It isn't tested or supported in IE.
+The CORS spec allows web applications to make cross domain AJAX calls without using workarounds such as JSONP. For more information about CORS, read [this article](http://www.nczonline.net/blog/2010/05/25/cross-domain-ajax-with-cross-origin-resource-sharing/), or [the spec](http://www.w3.org/TR/access-control/#simple-cross-origin-request-and-actual-r").
 
 
 ###The word "bike" <a id="ref_the_word_bike">
