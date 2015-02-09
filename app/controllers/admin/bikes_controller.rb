@@ -68,7 +68,7 @@ class Admin::BikesController < Admin::BaseController
       info = {
         request_reason: params[:mark_recovered_reason],
         index_helped_recovery: params[:mark_recovered_we_helped],
-        can_share_recovery: false
+        can_share_recovery: params[:can_share_recovery]
       }
       RecoveryUpdateWorker.perform_async(@bike.current_stolen_record.id, info)
     end

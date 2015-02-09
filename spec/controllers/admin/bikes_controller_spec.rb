@@ -73,6 +73,24 @@ describe Admin::BikesController do
       end
       it { should render_template(:edit) }
     end
+
+    it "should mark a stolen bike recovered" do 
+      bike = FactoryGirl.create(:stolen_bike)
+      bike.reload.stolen.should be_true
+      opts = {
+        id: bike.id,
+        mark_recovered_reason: "I recovered it", 
+        index_helped_recovery: true,
+        can_share_recovery: 1,
+        bike: { stolen: 0 }
+      }
+      user = FactoryGirl.create(:admin)
+      set_current_user(user)
+      expect {
+        put :update, opts
+      }.to change(RecoveryUpdateWorker.jobs, :size).by(1)
+      bike.reload.stolen.should be_false
+    end
   end
 
   describe :update_manufacturers do 

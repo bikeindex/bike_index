@@ -163,7 +163,13 @@
                   Did the Index help?
                 .controls
                   = check_box_tag :mark_recovered_we_helped, true
-
+            .input-group
+              .control-group
+                %label.control-label{ for: :can_share_recovery }
+                  Can we share?
+                .controls
+                  = check_box_tag :can_share_recovery, true
+            
 
 
 
