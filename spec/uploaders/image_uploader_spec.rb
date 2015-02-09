@@ -18,18 +18,18 @@ describe ImageUploader do
   # end
 
   context 'the small version' do
-    xit "should scale down a landscape image to be exactly 64 by 64 pixels" do
+    xit "scales down a landscape image to be exactly 64 by 64 pixels" do
       @uploader.large.should be_no_larger_than(1200, 900)
     end
   end
 
   context 'the small version' do
-    xit "should scale down a landscape image to fit within 200 by 200 pixels" do
+    xit "scales down a landscape image to fit within 200 by 200 pixels" do
       @uploader.medium.should be_no_larger_than(700, 525)
     end
   end
   context 'the small version' do
-    xit "should scale down a landscape image to fit within 200 by 200 pixels" do
+    xit "scales down a landscape image to fit within 200 by 200 pixels" do
       @uploader.small.should have_dimensions(300, 300)
     end
   end

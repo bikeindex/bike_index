@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Admin::PaintsController do
   describe :index do 
     before do 
-      user = FactoryGirl.create(:user, superuser: true)
+      user = FactoryGirl.create(:admin)
       set_current_user(user)
       get :index
     end
@@ -13,7 +13,7 @@ describe Admin::PaintsController do
 
   describe :edit do 
     before do 
-      user = FactoryGirl.create(:user, superuser: true)
+      user = FactoryGirl.create(:admin)
       set_current_user(user)
       paint = FactoryGirl.create(:paint)
       get :edit, id: paint.id 

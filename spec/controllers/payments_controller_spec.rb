@@ -22,7 +22,7 @@ describe PaymentsController do
   end
 
   describe :create do 
-    it "should make a onetime payment with current user" do 
+    it "makes a onetime payment with current user" do 
       token = Stripe::Token.create(
         :card => {
           :number => "4242424242424242",
@@ -48,7 +48,7 @@ describe PaymentsController do
       payment.last_payment_date.should_not be_present
     end
 
-    it "should make a onetime payment with email for signed up user" do 
+    it "makes a onetime payment with email for signed up user" do 
       token = Stripe::Token.create(
         :card => {
           :number => "4242424242424242",
@@ -75,7 +75,7 @@ describe PaymentsController do
       payment.last_payment_date.should_not be_present
     end
 
-    it "should make a onetime payment with no user, but associate with stripe" do 
+    it "makes a onetime payment with no user, but associate with stripe" do 
       token = Stripe::Token.create(
         :card => {
           :number => "4242424242424242",
@@ -99,7 +99,7 @@ describe PaymentsController do
       payment.last_payment_date.should_not be_present
     end
 
-    it "should sign up for a plan" do 
+    it "signs up for a plan" do 
       token = Stripe::Token.create(
         :card => {
           :number => "4242424242424242",

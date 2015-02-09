@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Admin::DashboardController do
   describe :index do 
     before do 
-      user = FactoryGirl.create(:user, superuser: true)
+      user = FactoryGirl.create(:admin)
       set_current_user(user)
       get :index
     end
@@ -37,7 +37,7 @@ describe Admin::DashboardController do
 
   describe :invitations do 
     before do 
-      user = FactoryGirl.create(:user, superuser: true)
+      user = FactoryGirl.create(:admin)
       set_current_user(user)
       b_param = BParam.create(creator_id: user.id)
       get :invitations
@@ -51,7 +51,7 @@ describe Admin::DashboardController do
       FactoryGirl.create(:manufacturer, name: "other")
       FactoryGirl.create(:ctype, name: "other")
       FactoryGirl.create(:handlebar_type, slug: "other")
-      user = FactoryGirl.create(:user, superuser: true)
+      user = FactoryGirl.create(:admin)
       set_current_user(user)
       b_param = BParam.create(creator_id: user.id)
       get :maintenance

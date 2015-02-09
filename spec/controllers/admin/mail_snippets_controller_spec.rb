@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Admin::MailSnippetsController do
   describe :index do 
     before do 
-      user = FactoryGirl.create(:user, superuser: true)
+      user = FactoryGirl.create(:admin)
       set_current_user(user)
       get :index
     end
@@ -13,7 +13,7 @@ describe Admin::MailSnippetsController do
 
   describe :edit do 
     before do 
-      user = FactoryGirl.create(:user, superuser: true)
+      user = FactoryGirl.create(:admin)
       set_current_user(user)
       snippet = FactoryGirl.create(:mail_snippet)
       get :edit, id: snippet.id

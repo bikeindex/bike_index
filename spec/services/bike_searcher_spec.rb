@@ -74,7 +74,7 @@ describe BikeSearcher do
   describe :fuzzy_find_serial do 
     # If these specs are failing and saying things about LEVENSHTEIN not existing
     # You need to install fuzzystrmatch in your test db. Read README for more info
-    xit "should find matching serial segments" do 
+    xit "finds matching serial segments" do 
       bike = FactoryGirl.create(:bike, serial_number: 'st00d-fferd')
       SerialNormalizer.new({serial: bike.serial_number}).save_segments(bike.id)
       search = BikeSearcher.new(serial: 'fferds')
@@ -82,7 +82,7 @@ describe BikeSearcher do
       result.first.should eq(bike)
       result.count.should eq(1)
     end
-    xit "shouldn't find exact matches" do 
+    xit "doesn't find exact matches" do 
       bike = FactoryGirl.create(:bike, serial_number: 'K10DY00047-bkd')
       search = BikeSearcher.new(serial: 'bkd-K1oDYooo47')
       search.fuzzy_find_serial.should be_empty

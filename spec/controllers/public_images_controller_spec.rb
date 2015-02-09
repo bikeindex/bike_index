@@ -69,7 +69,7 @@ describe PublicImagesController do
   #     @public_image3.listing_order = 3
   #   end
 
-  #   it "Should receive a public_image and new_listing_order, and update the correct photo's order should be updated" do  
+  #   it "receives a public_image and new_listing_order, and update the correct photo's order should be updated" do  
   #     pp @public_image1
   #     pp @public_image2
   #     pp @public_image3

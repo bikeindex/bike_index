@@ -3,14 +3,14 @@ require 'spec_helper'
 describe Admin::UsersController do
 
   describe :edit do 
-    xit "should 404 if the user doesn't exist" do 
+    xit "404s if the user doesn't exist" do 
       # I have no idea why this fails. It works really, but not in tests!
       lambda {
         get :edit, id: "STUFFFFFF"
       }.should raise_error(ActionController::RoutingError)
     end
     it "shows the edit page if the user exists" do 
-      @admin = FactoryGirl.create(:user, superuser: true)
+      @admin = FactoryGirl.create(:admin)
       @user = FactoryGirl.create(:user)
       set_current_user(@admin)
       get :edit, id: @user.username
@@ -20,7 +20,7 @@ describe Admin::UsersController do
 
   describe :update do 
     it "updates all the things that can be edited" do 
-      @admin = FactoryGirl.create(:user, superuser: true)
+      @admin = FactoryGirl.create(:admin)
       @user = FactoryGirl.create(:user, confirmed: false)
       set_current_user(@admin)
       post :update, id: @user.username, :user =>{

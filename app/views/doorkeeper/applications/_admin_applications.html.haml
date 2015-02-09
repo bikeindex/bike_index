@@ -36,5 +36,9 @@
               = application.id
         %td
           = application.redirect_uri
+          %br
+          .less-strong-hold
+            %span.less-strong-right
+              #{link_to "view", oauth_application_url(application)} | #{link_to 'edit', edit_oauth_application_url(application)}
         %td
           = application.access_tokens.count

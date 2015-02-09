@@ -167,7 +167,7 @@ describe BikesController do
         response.should render_template("new")
       end
 
-      xit "should redirect to charges if payment is required" do
+      xit "redirects to charges if payment is required" do
         # DISABLE FOR NOW, we're not accepting any payments.
         post :create, { bike: @bike }
         response.should redirect_to(new_charges_url(b_param_id: @b_param.id))
@@ -329,7 +329,7 @@ describe BikesController do
       response.should redirect_to bike_url(ownership.bike)
     end
 
-    xit "should redirect to edit if the bike has changed to be stolen" do 
+    xit "redirects to edit if the bike has changed to be stolen" do 
       ownership = FactoryGirl.create(:ownership)
       set_current_user(ownership.creator)
       ownership.bike.update_attributes(verified: true)

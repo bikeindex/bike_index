@@ -197,7 +197,7 @@ describe BikeCreator do
   end
 
   describe :create_paid_bike do 
-    xit "should set the bike as paid" do 
+    xit "sets the bike as paid" do 
       b_param = BParam.new
       bike = Bike.new 
       creator = BikeCreator.new(b_param)

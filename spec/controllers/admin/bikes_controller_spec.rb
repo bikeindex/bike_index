@@ -4,7 +4,7 @@ describe Admin::BikesController do
 
   describe :index do 
     before do 
-      user = FactoryGirl.create(:user, superuser: true)
+      user = FactoryGirl.create(:admin)
       set_current_user(user)
       get :index
     end
@@ -16,7 +16,7 @@ describe Admin::BikesController do
   describe :edit do 
     before do 
       bike = FactoryGirl.create(:bike)
-      user = FactoryGirl.create(:user, superuser: true)
+      user = FactoryGirl.create(:admin)
       set_current_user(user)
       get :edit, id: bike.id 
     end
@@ -28,7 +28,7 @@ describe Admin::BikesController do
   describe :destroy do 
     before do 
       bike = FactoryGirl.create(:bike)
-      user = FactoryGirl.create(:user, superuser: true)
+      user = FactoryGirl.create(:admin)
       set_current_user(user)
       delete :destroy, id: bike.id 
     end
@@ -40,7 +40,7 @@ describe Admin::BikesController do
     describe "success" do 
       before do 
         bike = FactoryGirl.create(:bike)
-        user = FactoryGirl.create(:user, superuser: true)
+        user = FactoryGirl.create(:admin)
         set_current_user(user)
         put :update, id: bike.id
       end
@@ -51,7 +51,7 @@ describe Admin::BikesController do
     it "calls update_ownership" do
       BikeUpdator.any_instance.should_receive(:update_ownership)
       bike = FactoryGirl.create(:bike)
-      user = FactoryGirl.create(:user, superuser: true)
+      user = FactoryGirl.create(:admin)
       set_current_user(user)
       put :update, id: bike.id
     end
@@ -59,7 +59,7 @@ describe Admin::BikesController do
     it "calls serial_normalizer" do
       SerialNormalizer.any_instance.should_receive(:save_segments)
       bike = FactoryGirl.create(:bike)
-      user = FactoryGirl.create(:user, superuser: true)
+      user = FactoryGirl.create(:admin)
       set_current_user(user)
       put :update, id: bike.id
     end
@@ -67,7 +67,7 @@ describe Admin::BikesController do
     describe "failure" do 
       before do 
         bike = FactoryGirl.create(:bike)
-        user = FactoryGirl.create(:user, superuser: true)
+        user = FactoryGirl.create(:admin)
         set_current_user(user)
         put :update, { id: bike.id, bike: { manufacturer_id: nil}}
       end
@@ -77,7 +77,7 @@ describe Admin::BikesController do
 
   describe :update_manufacturers do 
     it "updates the products" do 
-      user = FactoryGirl.create(:user, superuser: true)
+      user = FactoryGirl.create(:admin)
       set_current_user(user)
       request.env["HTTP_REFERER"] = 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
 

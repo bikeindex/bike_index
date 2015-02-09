@@ -92,7 +92,7 @@ describe CustomerMailer do
   describe :admin_contact_stolen_email do
     it "renders email" do
       stolen_record = FactoryGirl.create(:stolen_record)
-      user = FactoryGirl.create(:user, superuser: true)
+      user = FactoryGirl.create(:admin)
       customer_contact = CustomerContact.new(user_email: stolen_record.bike.owner_email,
         creator_email: user.email, 
         body: 'some message',

@@ -128,7 +128,7 @@ describe User do
   describe :admin_authorized do 
     before :all do
       @content = FactoryGirl.create(:user, is_content_admin: true)
-      @admin = FactoryGirl.create(:user, superuser: true)
+      @admin = FactoryGirl.create(:admin)
     end
 
     it "auths full" do 
@@ -155,7 +155,7 @@ describe User do
   end
 
   describe :set_urls do
-    xit "should add http:// to twitter and website if the url doesn't have it so that the link goes somewhere" do
+    xit "adds http:// to twitter and website if the url doesn't have it so that the link goes somewhere" do
       @user = FactoryGirl.create(:user, show_twitter: true, twitter: "http://somewhere.com", show_website: true, website: "somewhere.org" )
       @user.website.should eq('http://somewhere.org')
     end

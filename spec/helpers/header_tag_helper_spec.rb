@@ -111,7 +111,7 @@ describe HeaderTagHelper do
       })
     end
 
-    xit "should say new stolen on new stolen" do 
+    xit "says new stolen on new stolen" do 
       # It can't find current user. And I don't know why.
       # So fuck it
       @bike = Bike.new 

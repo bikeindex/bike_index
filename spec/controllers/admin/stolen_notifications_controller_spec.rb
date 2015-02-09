@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Admin::StolenNotificationsController do
   describe :index do 
     before do 
-      user = FactoryGirl.create(:user, superuser: true)
+      user = FactoryGirl.create(:admin)
       set_current_user(user)
       get :index
     end
@@ -15,7 +15,7 @@ describe Admin::StolenNotificationsController do
   describe :show do 
     before do 
       stolen_notification = FactoryGirl.create(:stolen_notification)
-      user = FactoryGirl.create(:user, superuser: true)
+      user = FactoryGirl.create(:admin)
       set_current_user(user)
       get :show, id: stolen_notification.id 
     end
@@ -28,7 +28,7 @@ describe Admin::StolenNotificationsController do
     it 'resends the stolen notification' do
       Sidekiq::Worker.clear_all
       sender = FactoryGirl.create(:user)
-      admin = FactoryGirl.create(:user, superuser: true)
+      admin = FactoryGirl.create(:admin)
       stolen_notification = FactoryGirl.create(:stolen_notification, sender: sender)
       # pp expect(EmailStolenNotificationWorker).to have_enqueued_job
       set_current_user(admin)
@@ -40,7 +40,7 @@ describe Admin::StolenNotificationsController do
     it 'redirects if the stolen notification has already been sent' do
       Sidekiq::Worker.clear_all
       sender = FactoryGirl.create(:user)
-      admin = FactoryGirl.create(:user, superuser: true)
+      admin = FactoryGirl.create(:admin)
       stolen_notification = FactoryGirl.create(:stolen_notification, sender: sender)
       stolen_notification.update_attribute :send_dates, [69]
       set_current_user(admin)
@@ -53,7 +53,7 @@ describe Admin::StolenNotificationsController do
     it 'resends if the stolen notification has already been sent if we say pretty please' do
       Sidekiq::Worker.clear_all
       sender = FactoryGirl.create(:user)
-      admin = FactoryGirl.create(:user, superuser: true)
+      admin = FactoryGirl.create(:admin)
       stolen_notification = FactoryGirl.create(:stolen_notification, sender: sender)
       stolen_notification.update_attribute :send_dates, [69]
       set_current_user(admin)

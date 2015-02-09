@@ -29,6 +29,9 @@ FactoryGirl.define do
     password "testthisthing7$"
     password_confirmation "testthisthing7$"
     terms_of_service true
+    factory :admin do
+      superuser true
+    end
   end
 
   factory :bike_token do

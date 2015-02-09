@@ -90,7 +90,7 @@ describe BikeCreatorAssociator do
   end
 
   # describe :add_uploaded_image do 
-  #   it "should associate the public image" do 
+  #   it "associates the public image" do 
   #     bike = FactoryGirl.create(:bike)
   #     b_param = FactoryGirl.create(:b_param)
   #     b_param.params = {bike: {bike_image: File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg'))}}

@@ -121,7 +121,7 @@ describe UsersController do
   end
 
   describe :show do 
-    xit "Should 404 if the user doesn't exist" do 
+    xit "404s if the user doesn't exist" do 
       # I have no idea why this fails. It works really, but not in tests!
       lambda {
         get :edit, id: "fake_user"
@@ -136,7 +136,7 @@ describe UsersController do
       response.should redirect_to user_home_url
     end
     
-    it "Should show the page if the user exists and wants to show their page" do 
+    it "shows the page if the user exists and wants to show their page" do 
       @user = FactoryGirl.create(:user)
       @user.show_bikes = true
       @user.save

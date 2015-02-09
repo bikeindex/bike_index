@@ -4,7 +4,7 @@ describe Admin::StolenBikesController do
 
   describe :index do 
     before do 
-      user = FactoryGirl.create(:user, superuser: true)
+      user = FactoryGirl.create(:admin)
       set_current_user(user)
       get :index
     end
@@ -16,7 +16,7 @@ describe Admin::StolenBikesController do
   describe :edit do 
     before do 
       bike = FactoryGirl.create(:bike)
-      user = FactoryGirl.create(:user, superuser: true)
+      user = FactoryGirl.create(:admin)
       set_current_user(user)
       get :edit, id: bike.id 
     end
@@ -28,7 +28,7 @@ describe Admin::StolenBikesController do
   describe :destroy do 
     before do 
       bike = FactoryGirl.create(:bike)
-      user = FactoryGirl.create(:user, superuser: true)
+      user = FactoryGirl.create(:admin)
       set_current_user(user)
       delete :destroy, id: bike.id 
     end
@@ -40,7 +40,7 @@ describe Admin::StolenBikesController do
     describe "success" do 
       before do 
         bike = FactoryGirl.create(:bike)
-        user = FactoryGirl.create(:user, superuser: true)
+        user = FactoryGirl.create(:admin)
         set_current_user(user)
         put :update, id: bike.id
       end
@@ -51,7 +51,7 @@ describe Admin::StolenBikesController do
     it "calls update_ownership" do
       BikeUpdator.any_instance.should_receive(:update_ownership)
       bike = FactoryGirl.create(:bike)
-      user = FactoryGirl.create(:user, superuser: true)
+      user = FactoryGirl.create(:admin)
       set_current_user(user)
       put :update, id: bike.id
     end
@@ -59,7 +59,7 @@ describe Admin::StolenBikesController do
     it "calls serial_normalizer" do
       SerialNormalizer.any_instance.should_receive(:save_segments)
       bike = FactoryGirl.create(:bike)
-      user = FactoryGirl.create(:user, superuser: true)
+      user = FactoryGirl.create(:admin)
       set_current_user(user)
       put :update, id: bike.id
     end
@@ -67,7 +67,7 @@ describe Admin::StolenBikesController do
     describe "failure" do 
       before do 
         bike = FactoryGirl.create(:bike)
-        user = FactoryGirl.create(:user, superuser: true)
+        user = FactoryGirl.create(:admin)
         set_current_user(user)
         put :update, { id: bike.id, bike: { manufacturer_id: nil}}
       end

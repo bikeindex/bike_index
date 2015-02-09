@@ -105,7 +105,7 @@ describe BikeUpdator do
       bike.user_hidden.should be_true
     end
 
-    # it "should not let bikes that weren't created by an organization become non-stolen" do 
+    # it "doesn't let bikes that weren't created by an organization become non-stolen" do 
     it "Actually, for now, we let anyone mark anything not stolen" do 
       bike = FactoryGirl.create(:bike, stolen: true)
       ownership = FactoryGirl.create(:ownership, bike: bike)

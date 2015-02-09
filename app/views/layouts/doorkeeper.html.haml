@@ -31,6 +31,10 @@
             = render 'shared/top_user_nav'
 
       .bcontainer.doorkeeper-container
+        - if @current_user && @current_user.superuser && @application.present?
+          Application by
+          %strong
+            = @application.owner.display_name
         - if controller_name.match('application') && action_name != 'index'
           = link_to "Your applications", oauth_applications_url, class: 'pull-right'
         = yield

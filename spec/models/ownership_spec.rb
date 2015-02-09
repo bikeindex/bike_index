@@ -20,7 +20,7 @@ describe Ownership do
   end
 
   describe :mark_claimed do 
-    it "Should associate with a user" do 
+    it "associates with a user" do 
       o = FactoryGirl.create(:ownership)
       o.mark_claimed
       o.claimed.should be_true
