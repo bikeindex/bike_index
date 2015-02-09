@@ -21,14 +21,14 @@ describe Manufacturer do
 
   describe "import csv" do 
     it "adds manufacturers to the list" do
-      import_file = File.open(Rails.root.to_s + "/spec/manufacturer-test-import.csv")
+      import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import.csv")
       lambda {
         Manufacturer.import(import_file)
       }.should change(Manufacturer, :count).by(2)
     end
     
     it "adds in all the attributes that are listed" do 
-      import_file = File.open(Rails.root.to_s + "/spec/manufacturer-test-import.csv")
+      import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import.csv")
       Manufacturer.import(import_file)
       @manufacturer = Manufacturer.find_by_slug("surly")
       @manufacturer.website.should eq('http://surlybikes.com')
@@ -40,9 +40,9 @@ describe Manufacturer do
     end
 
     it "updates attributes on a second upload" do 
-      import_file = File.open(Rails.root.to_s + "/spec/manufacturer-test-import.csv")
+      import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import.csv")
       Manufacturer.import(import_file)
-      second_import_file = File.open(Rails.root.to_s + "/spec/manufacturer-test-import-second.csv")
+      second_import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import-second.csv")
       Manufacturer.import(second_import_file)
       @manufacturer = Manufacturer.find_by_slug("surly-bikes")
     end
