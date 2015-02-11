@@ -59,6 +59,14 @@ class StolenRecord < ActiveRecord::Base
     (a+[zipcode, country.name]).compact.join(', ')
   end
 
+  def address_short
+    a = [city]
+    a << state.abbreviation if state.present?
+    a << zipcode if zipcode.present?
+    a << country.iso if country.present? && country.iso != 'US'
+    a.compact.join(', ')
+  end
+
   # unless Rails.env.test?
     geocoded_by :address
     after_validation :geocode, if: lambda { (self.city.present? || self.zipcode.present?) && self.country.present? }
