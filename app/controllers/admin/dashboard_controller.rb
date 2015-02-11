@@ -4,6 +4,7 @@ class Admin::DashboardController < Admin::BaseController
     @users = User.includes(:memberships => [:organization]).limit(5).order("created_at desc")
     @flavors = FlavorText.all
     @flavor = FlavorText.new
+    @bike_groups = []
   end
 
   def invitations

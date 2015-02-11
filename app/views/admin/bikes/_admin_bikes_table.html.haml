@@ -1,3 +1,4 @@
+- bikes ||= @bikes
 %thead
   %th
     Date indexed
@@ -11,7 +12,7 @@
     Created by
 
 %tbody
-  - @bikes.each do |bike|
+  - bikes.each do |bike|
     %tr
       %td
         .less-strong-hold

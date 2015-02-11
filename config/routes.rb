@@ -92,6 +92,7 @@ Bikeindex::Application.routes.draw do
     root to: 'dashboard#index'
     resources :bikes do 
       collection do
+        get :duplicates
         get :missing_manufacturer
         post :update_manufacturers
       end
@@ -102,7 +103,6 @@ Bikeindex::Application.routes.draw do
     match 'destroy_example_bikes', to: 'dashboard#destroy_example_bikes'
     resources :memberships, :organizations, :bike_token_invitations,
       :organization_invitations, :paints, :ads, :recovery_displays, :mail_snippets
-    match 'duplicate_bikes', to: 'bikes#duplicates'
     resources :flavor_texts, only: [:destroy, :create]
     resources :stolen_bikes do 
       member { post :approve }

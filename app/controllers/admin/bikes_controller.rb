@@ -40,11 +40,11 @@ class Admin::BikesController < Admin::BaseController
 
   def duplicates
     @bike_groups = []
-    serials = Bike.all.map(&:serial_number)
-    new_ary = serials.select {|item| serials.count(item) > 1}
-    new_ary.uniq.each do |serial|
-      @bike_groups << Bike.where(serial_number: serial)
-    end
+    # serials = Bike.all.map(&:serial_number)
+    # new_ary = serials.select {|item| serials.count(item) > 1}
+    # new_ary.uniq.each do |serial|
+    #   @bike_groups << Bike.where(serial_number: serial)
+    # end
   end
 
   def destroy

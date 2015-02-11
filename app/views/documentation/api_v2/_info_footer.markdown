@@ -1,3 +1,8 @@
+<a id="ref_oauth">
+
+## OAuth2 - Authentication on the Bike Index
+
+The Bike Index uses OAuth2. The following or 
 
 <a id="ref_plugins">
 
@@ -48,7 +53,7 @@ When your access token expires, you can get a new one by making a POST request w
 
     POST <%= ENV['BASE_URL'] %>/oauth/token?grant_type=refresh_token&client_id={app_id}&refresh_token={refresh_token}
 
-Since this is a POST Request, we use javascript to do it here. Finishing up the explanation for this soon...
+Since this is a POST Request, we use javascript to do it here. Adding a demonstration for this soon...
 
 <!-- 
     $.ajax({

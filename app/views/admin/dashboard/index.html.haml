@@ -4,7 +4,7 @@
     Recent
     = link_to "Bikes", admin_bikes_url
   %table.table.table-striped.table-bordered
-    = render partial: "/admin/bikes/admin_bikes_table"
+    = render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: @bikes }
   %p.pull-right
     #{Bike.count} bikes total
     %em
@@ -70,6 +70,13 @@
     %em
       (#{today} today, #{yesterday} yesterday)
 
+%section.full-screen-table
+  %h2
+    Suspicious 
+    = link_to "DUPED bikes", duplicates_admin_bikes_url
+  %table.table.table-striped.table-bordered
+    - @bike_groups.each do |bikes|
+      = render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: bikes }
 
 %section.full-screen-table
   %header.with-subtitle
@@ -115,8 +122,6 @@
   %ul
     %li
       = link_to "Maintenance", admin_maintenance_url
-    %li
-      = link_to "Possible dupes", admin_duplicate_bikes_url
     %li
       = link_to "Failed bikes", admin_failed_bikes_url
     %li

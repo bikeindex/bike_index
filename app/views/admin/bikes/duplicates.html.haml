@@ -6,8 +6,7 @@
 
 %section.full-screen-table
   - @bike_groups.each do |bikes|
-    - @bikes = bikes
     %h3
-      = @bikes.first.serial_number    
+      = bikes.first.serial_number    
     %table.table.table-striped.table-bordered
-      = render partial: "/admin/bikes/admin_bikes_table"
+      = render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: bikes }
