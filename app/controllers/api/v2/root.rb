@@ -39,6 +39,7 @@ module API
         hide_format: true, # don't show .json
         hide_documentation_path: true,
         mount_path: "/swagger_doc",
+        base_path: ENV['BASE_URL'],
         markdown: GrapeSwagger::Markdown::KramdownAdapter,
         cascade: false,
         info: {

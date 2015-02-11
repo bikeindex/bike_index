@@ -1,15 +1,3 @@
-##Authentication <a id="ref_authentication">
-
-The Bike Index uses OAuth2. <a href="#applications_list" class="scroll-link">Create an application</a> and use an access token for any requests that need authorization.
-
-Endpoints with Red Stars (<span class="accstr">*</span>) require an access token to use:
-
-<img alt="example of a protected endpoint" src="/assets/updated/documentation/protected_endpoint.png" class="protected-endpoint-img">
-
-Libraries and external tools for the Bike Index <a href="#authentication" class="scroll-link">are available at the bottom of the page</a>, along with some more information about our implementation of OAuth.
-
-*There may be rate limiting on the future for non-authenticated requests - so if you have an access token, consider using it for everything.*
-
 
 ###Plugins and external libraries <a id="ref_plugins">
 
@@ -30,6 +18,8 @@ There are two supported ways of authenticating with the Bike Index through OAuth
 The Authorization flow enables long lived access through refresh tokens (instead of logging out the user every hour), is more secure, and is generally what you should be using. Learn more about [Authorization flow in OAuth2](http://labs.hybris.com/2012/06/01/oauth2-authorization-code-flow).
 
 The Client-side flow is good for client-side javascript apps. Here's an article on [Client-side flow in OAuth2](http://labs.hybris.com/2012/06/05/oauth2-the-implicit-flow-aka-as-the-client-side-flow/).
+
+*There may be rate limiting on the future for non-authenticated requests - so if you have an access token, consider using it for everything.*
 
 ###Applications you've authorized <a id="ref_applications_authorized">
 

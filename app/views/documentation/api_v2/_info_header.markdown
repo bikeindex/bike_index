@@ -35,3 +35,12 @@ The HTML pages of the Bike Index follow the same pattern as the API - the url fo
 ###Time <a id="ref_time">
 
 Bike Index API V2 display everything in <a href="https://en.wikipedia.org/wiki/Unix_time" target="_blank">UTC unix timestamps</a> (integers). All time parameters you send need to use timestamps as well.
+
+##Authentication <a id="ref_authentication">
+
+The Bike Index uses OAuth2. <a href="#applications_list" class="scroll-link">Create an application</a> and use an access token for any requests that need authorization.
+
+Endpoints with Red Stars (<span class="accstr">*</span>) require an access token to use:
+
+<img alt="example of a protected endpoint" src="/assets/updated/documentation/protected_endpoint.png" class="protected-endpoint-img">
+

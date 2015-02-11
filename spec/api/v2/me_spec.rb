@@ -19,7 +19,7 @@ describe 'Me API V2' do
 
     it "responds with all available attributes with full scoped token" do
       @token.update_attribute :scopes, OAUTH_SCOPES_S
-      token = Doorkeeper::AccessToken.create!(application_id: @application.id, resource_owner_id: @user.id, scopes: OAUTH_SCOPES_S)
+      # token = Doorkeeper::AccessToken.create!(application_id: @application.id, resource_owner_id: @user.id, scopes: OAUTH_SCOPES_S)
       get '/api/v2/me', :format => :json, :access_token => @token.token
       result = JSON.parse(response.body)
       response.headers['Access-Control-Allow-Origin'].should == '*'
@@ -33,7 +33,7 @@ describe 'Me API V2' do
 
     it "responds with all available attributes with full scoped token" do
       @token.update_attribute :scopes, OAUTH_SCOPES_S
-      token = Doorkeeper::AccessToken.create!(application_id: @application.id, resource_owner_id: @user.id, scopes: OAUTH_SCOPES_S)
+      # token = Doorkeeper::AccessToken.create!(application_id: @application.id, resource_owner_id: @user.id, scopes: OAUTH_SCOPES_S)
       get '/api/v2/me', :format => :json, :access_token => @token.token
       response.response_code.should eq(200)
       result = JSON.parse(response.body)
