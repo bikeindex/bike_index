@@ -94,11 +94,13 @@ class BikeSearcher
       next unless seg.length > 3
       bike_ids += NormalizedSerialSegment.where("LEVENSHTEIN(segment, ?) < 3", seg).map(&:bike_id)
     end
+    bike_ids
   end
 
   def fuzzy_find_serial
     return nil unless @normer.normalized_segments.present?
     bike_ids = fuzzy_find_serial_ids
+    pp bike_ids
     # Don't return exact matches
     bike_ids = bike_ids.uniq - matching_serial.map(&:id)
     Bike.where('id in (?)', bike_ids)
