@@ -28,10 +28,10 @@ module API
           'Access-Control-Request-Method' => '*',
         }).finish
       end
+      mount API::V2::BikesSearch
+      mount API::V2::Bikes
       mount API::V2::Me
       mount API::V2::Users
-      mount API::V2::Bikes
-      mount API::V2::BikesSearch
       mount API::V2::Manufacturers
       mount API::V2::Selections
       add_swagger_documentation base_path: "/api",
@@ -39,7 +39,7 @@ module API
         hide_format: true, # don't show .json
         hide_documentation_path: true,
         mount_path: "/swagger_doc",
-        base_path: ENV['BASE_URL'],
+        base_path: "#{ENV['BASE_URL']}/api",
         markdown: GrapeSwagger::Markdown::KramdownAdapter,
         cascade: false,
         info: {
