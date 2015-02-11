@@ -51,6 +51,7 @@
         margin-right: 8%;
         float: left;
         padding: 0;
+        cursor: pointer;
         &:last-of-type { margin-right: 0; } 
       }
       a {
@@ -58,7 +59,7 @@
         margin: 0 auto;
         margin: 0;
         background-clip: padding-box;
-        &.footer-facebook {
+        &.footer-facebook, &.footer-instagram {
           background: $blue-dark;
           &:hover { background: lighten($blue-dark, 20%); }
         }

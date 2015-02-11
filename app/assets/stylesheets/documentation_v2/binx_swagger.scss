@@ -293,7 +293,8 @@
     padding: 120px 10px 0;
     a {
       color: $text-color;
-      &.active, &:hover {
+      // Scroll target ;)
+      &.scrltrgt, &:hover {
         color: $link-color;
         text-decoration: underline;
       }

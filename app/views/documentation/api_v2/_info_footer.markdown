@@ -1,12 +1,16 @@
 
-###Plugins and external libraries <a id="ref_plugins">
+<a id="ref_plugins">
+
+###Plugins and external libraries
 
 - **Ruby**: [omniauth-bike-index](https://github.com/bikeindex/omniauth-bike-index) gem
 
 - **Javascript**: We're [working on a Hello.js module](https://github.com/MrSwitch/hello.js/pull/190).
 
 
-###OAuth Flows <a id="ref_oauth_flows">
+<a id="ref_oauth_flows">
+
+###OAuth Flows
 
 There are two supported ways of authenticating with the Bike Index through OAuth2:
 
@@ -21,16 +25,22 @@ The Client-side flow is good for client-side javascript apps. Here's an article 
 
 *There may be rate limiting on the future for non-authenticated requests - so if you have an access token, consider using it for everything.*
 
-###Applications you've authorized <a id="ref_applications_authorized">
+<a id="ref_applications_authorized">
+
+###Applications you've authorized
 
 Review the applications you've authorized at [/oauth/authorized_applications](/oauth/authorized_applications).
 
-###Sending your access tokens in requests <a id="ref_sending_in_requests">
+<a id="ref_sending_in_requests">
+
+###Sending your access tokens in requests
 
 By default we authenticate you with HTTP Basic authentication scheme. If the basic auth is not found in the authorization header, then it falls back to post parameters (all authenticated requests in this documentation put the access token in the parameters).
 
 
-###Refresh tokens <a id="ref_refresh_tokens">
+<a id="ref_refresh_tokens">
+
+###Refresh tokens
 
 Since tokens provide access to someone's account, one of the ways OAuth2 keeps things secure is by having tokens expire - so if someone compromises an access token, they don't have unlimited access to an account. The Bike Index expires tokens after 1 hour.
 

@@ -2,27 +2,21 @@ scrollToRef = (event) ->
   event.preventDefault()
   target = $(event.target).attr('href')
   $('body').animate( 
-    scrollTop: ($(target).offset().top - 120), 'fast' 
+    scrollTop: ($(target).offset().top - 10), 'fast' 
   )
 
 waypointer = ->
   for l in $('#navmenu-fixed a')
     link = $(l)
-    # console.log(link.attr('href'))
-    new Waypoint(
-      element: $(link.attr('href'))
-      handler: ->
-        # console.log(l)
-        # $('#navmenu-fixed .active').removeClass('active')
-        link.addClass('active')
-        return
-    )
-
+    waypoints = $(link.attr('href')).waypoint handler: (direction) ->
+      $('#navmenu-fixed a').removeClass('scrltrgt')
+      $("#m_#{@element.id}").addClass('scrltrgt')
+      return
 
 operationsAfterSwaggerLoads = ->
   # delayed, runs after swagger is loaded (hopefully)
   $('select[name="test"]').val('true')
-  # waypointer() if $('#navmenu-fixed').is(':visible')
+  waypointer() if $('#navmenu-fixed').is(':visible')
 
 
 # This coffeescript is the js that is inlined on the swagger index page
@@ -70,7 +64,7 @@ $ ->
     sorter: "alpha"
   )
 
-  $('.scroll-link, .docs-section-list a').click (e) ->
+  $('.scroll-link, #navmenu-fixed a').click (e) ->
     scrollToRef(e)
 
   $("#input_apiKey").change ->
