@@ -51,11 +51,21 @@
   .controls
     = f.text_field :website
 - if @organization.id.present?
+  - emails = @organization.users.pluck(:email)
+  - emails << ENV['AUTO_ORG_MEMBER'] unless emails.any?
   .control-group.chosen-select
     .control-label
       = f.label :embedable_user_email
     .controls
-      = f.text_field :embedable_user_email, value: @embedable_email
+      = f.select :embedable_user_email, emails, prompt: "Select email", selected: @embedable_email
+    .controls.extra-field
+      .less-strong
+        - if @organization.memberships.count == 0
+          You can use #{ENV['AUTO_ORG_MEMBER']} if 
+          %br
+          there are no members of the organization
+
+
 
   .control-group.padded
     .control-label

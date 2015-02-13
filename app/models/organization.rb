@@ -67,6 +67,10 @@ class Organization < ActiveRecord::Base
     if self.embedable_user_email.present?
       u = User.fuzzy_email_find(embedable_user_email)
       self.auto_user_id = u.id if u.is_member_of?(self)
+      if auto_user_id.blank? && embedable_user_email == ENV['AUTO_ORG_MEMBER']
+        Membership.create(user_id: u.id, organization_id: id, role: 'member')
+        self.auto_user_id = u.id
+      end
     elsif self.auto_user_id.blank?
       return nil unless self.users.any?
       self.auto_user_id = self.users.first.id

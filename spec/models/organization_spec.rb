@@ -72,6 +72,13 @@ describe Organization do
       organization.save
       organization.reload.auto_user_id.should be_nil
     end
+    it "Makes a membership if the user is auto user" do 
+      organization = FactoryGirl.create(:organization)
+      user = FactoryGirl.create(:user, email: ENV['AUTO_ORG_MEMBER'])
+      organization.embedable_user_email = ENV['AUTO_ORG_MEMBER']
+      organization.save
+      organization.reload.auto_user_id.should eq(user.id)
+    end
     it "sets the embedable user if it isn't set and the org has members" do 
       organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:user)
