@@ -20,7 +20,7 @@ describe 'Bikes API V2' do
       get "/api/v2/bikes/10", :format => :json
       result = JSON(response.body)
       response.code.should == '404'
-      expect(result["message"].present?).to be_true
+      expect(result["error"].present?).to be_true
       response.headers['Content-Type'].match('json').should be_present
       response.headers['Access-Control-Allow-Origin'].should eq('*')
       response.headers['Access-Control-Request-Method'].should eq('*')

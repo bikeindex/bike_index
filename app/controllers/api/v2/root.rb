@@ -20,7 +20,7 @@ module API
         else
           (e.respond_to? :status) && e.status || 500
         end
-        opts = { message: "#{message || e.message}" }
+        opts = { error: "#{message || e.message}" }
         opts[:trace] = e.backtrace[0,10] unless Rails.env.production?
         Rack::Response.new(opts.to_json, status, {
           'Content-Type' => "application/json",

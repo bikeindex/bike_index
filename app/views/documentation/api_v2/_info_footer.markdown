@@ -1,10 +1,10 @@
-<a id="ref_oauth">
+<a class="ref" id="ref_oauth">
 
 ## OAuth2 - Authentication on the Bike Index
 
 The Bike Index uses OAuth2. The following or 
 
-<a id="ref_plugins">
+<a class="ref" id="ref_plugins">
 
 ###Plugins and external libraries
 
@@ -13,7 +13,7 @@ The Bike Index uses OAuth2. The following or
 - **Javascript**: We're [working on a Hello.js module](https://github.com/MrSwitch/hello.js/pull/190).
 
 
-<a id="ref_oauth_flows">
+<a class="ref" id="ref_oauth_flows">
 
 ###OAuth Flows
 
@@ -30,20 +30,20 @@ The Client-side flow is good for client-side javascript apps. Here's an article 
 
 *There may be rate limiting on the future for non-authenticated requests - so if you have an access token, consider using it for everything.*
 
-<a id="ref_applications_authorized">
+<a class="ref" id="ref_applications_authorized">
 
 ###Applications you've authorized
 
 Review the applications you've authorized at [/oauth/authorized_applications](/oauth/authorized_applications).
 
-<a id="ref_sending_in_requests">
+<a class="ref" id="ref_sending_in_requests">
 
 ###Sending your access tokens in requests
 
 By default we authenticate you with HTTP Basic authentication scheme. If the basic auth is not found in the authorization header, then it falls back to post parameters (all authenticated requests in this documentation put the access token in the parameters).
 
 
-<a id="ref_refresh_tokens">
+<a class="ref" id="ref_refresh_tokens">
 
 ###Refresh tokens
 
