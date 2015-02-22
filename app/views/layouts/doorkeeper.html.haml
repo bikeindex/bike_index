@@ -31,7 +31,7 @@
             = render 'shared/top_user_nav'
 
       .bcontainer.doorkeeper-container
-        - if @current_user && @current_user.superuser && @application.present?
+        - if @current_user && @current_user.superuser && @application.present? && @application.owner.present?
           Application by
           %strong
             = @application.owner.display_name
