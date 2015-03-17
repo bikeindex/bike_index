@@ -106,7 +106,7 @@
       .controls
         = f.text_area :description, rows: 3, placeholder: "Any extra words?"
   .input-group.form-foot
-    .control-group
+    .control-group.form-photo-group
       - if @b_param.image.present? or @b_param.image_tmp.present?
         %strong
           Image has been uploaded

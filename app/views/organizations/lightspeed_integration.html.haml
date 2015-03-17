@@ -1,13 +1,22 @@
 .vendor-signup
   %h1
     How to: Lightspeed Retail and Bike Index Integration
-
   %article
     .alert.alert-info
-      %p
-        This page gives instructions on integrating Bike Index registration with your Lightspeed Retail POS system. <strong><a href="#{about_url}">Read our about page</a></strong> for general information about what the Bike Index is and why it's important.
+      %h3.padded
+        Our integration is recommended by Lightspeed
+        %br
+        %small
+          You can find us under "Great tools for bicycle retailers" on #{link_to "Lightspeed's add-on page", "http://www.lightspeedpos.com/retail/addons/"}
+    .padded
+
+    %p
+      This page gives instructions on integrating Bike Index registration with your Lightspeed Retail POS system. <strong><a href="#{about_url}">Read our about page</a></strong> for general information about what the Bike Index is and why it's important.
+  %hr
+  %article
     %p
       At Bike Index we believe that bicycle registration is one of the simplest and most effective ways to fight bicycle theft. By offering complete integration with Lightspeed Retail, we've made registration a quick, painless, and automated process for you and your customers.
+
     - if current_user.present? && current_user.memberships.present?
       %p
         This video will show you how to connect your shop to Lightspeed Retail:

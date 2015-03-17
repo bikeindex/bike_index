@@ -207,6 +207,7 @@ a {
   border-bottom: 0;
   @include clearfix;
 }
+.form-photo-group { padding-bottom: 30px; }
 .optional-group {
   border-bottom: none;
   border-top: 1px solid $grayLightish;
