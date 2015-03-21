@@ -49,6 +49,17 @@ module API
           optional :front_or_rear, type: String, desc: "Component front_or_rear"
         end
 
+        def creation_user_id
+          if current_user.id == ENV['V2_ACCESSOR_ID'].to_i
+            org = params[:organization_slug].present? && Organization.find_by_slug(params[:organization_slug])
+            if org && current_token.application.owner && current_token.application.owner.is_admin_of?(org)
+              return org.auto_user_id
+            end
+            error!("Permanent tokens can only be used to create bikes for organizations your are an admin of", 403)
+          end  
+          current_user.id
+        end
+
         def find_bike
           @bike = Bike.unscoped.find(params[:id])
         end
@@ -119,7 +130,7 @@ module API
         end
         post '/', serializer: BikeV2ShowSerializer, root: 'bike' do
           declared_p = { "declared_params" => declared(params, include_missing: false) }
-          b_param = BParam.create(creator_id: current_user.id, params: declared_p['declared_params'], api_v2: true)
+          b_param = BParam.create(creator_id: creation_user_id, params: declared_p['declared_params'], api_v2: true)
           ensure_required_stolen_attrs(b_param.params)
           bike = BikeCreator.new(b_param).create_bike
           if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?

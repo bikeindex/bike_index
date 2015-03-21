@@ -17,6 +17,7 @@ class Oauth::ApplicationsController < Doorkeeper::ApplicationsController
     if @application.save
       flash[:notice] = I18n.t(:notice, :scope => [:doorkeeper, :flash, :applications, :create])
        # respond_with( :oauth, @application, location: oauth_application_url(@application) )
+       Doorkeeper::AccessToken.create!(application_id: @application.id, resource_owner_id: ENV['V2_ACCESSOR_ID'], expires_in: nil, scopes: 'write_bikes')
        redirect_to oauth_application_url(@application)
     else
       render :new

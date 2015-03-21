@@ -160,6 +160,67 @@ describe 'Bikes API V2' do
     end
   end
 
+  describe 'create v2_accessor' do 
+    before :each do 
+      create_doorkeeper_app({with_v2_accessor: true})
+      manufacturer = FactoryGirl.create(:manufacturer)
+      color = FactoryGirl.create(:color)
+      FactoryGirl.create(:wheel_size, iso_bsd: 559)
+      FactoryGirl.create(:cycle_type, slug: "bike")
+      FactoryGirl.create(:propulsion_type, name: "Foot pedal")
+      @organization = FactoryGirl.create(:organization)
+      @bike = { serial: "69 non-example",
+        manufacturer: manufacturer.name,
+        rear_tire_narrow: "true",
+        rear_wheel_bsd: "559",
+        color: color.name,
+        year: '1969',
+        owner_email: "fun_times@examples.com",
+        organization_slug: @organization.slug
+      }
+    end
+    
+    it "creates a bike for organization with v2_accessor" do
+      FactoryGirl.create(:membership, user: @user, organization: @organization, role: 'admin')
+      @organization.save
+      post "/api/v2/bikes?access_token=#{@accessor_token.token}",
+        @bike.to_json,
+        JSON_CONTENT
+      result = JSON.parse(response.body)['bike']
+      response.code.should eq("201")
+      b = Bike.find(result['id'])
+      b.creation_organization.should eq(@organization)
+      b.creator.should eq(@user)
+    end
+
+    it "doesn't create a bike without an organization with v2_accessor" do
+      FactoryGirl.create(:membership, user: @user, organization: @organization, role: 'admin')
+      @organization.save
+      @bike.delete(:organization_slug)
+      post "/api/v2/bikes?access_token=#{@accessor_token.token}",
+        @bike.to_json,
+        JSON_CONTENT
+      result = JSON.parse(response.body)
+      
+      response.code.should eq("403")
+      result = JSON.parse(response.body)
+      result['error'].kind_of?(String).should be_true
+    end
+
+    it "fails to create a bike if the app owner isn't a member of the organization" do
+      expect(@user.has_membership?).to be_false
+      post "/api/v2/bikes?access_token=#{@accessor_token.token}",
+        @bike.to_json,
+        JSON_CONTENT
+      result = JSON.parse(response.body)
+      response.code.should eq("403")
+      result = JSON.parse(response.body)
+      result['error'].kind_of?(String).should be_true
+    end
+  end
+
+
+
   describe 'update' do
     before :each do 
       create_doorkeeper_app({scopes: 'read_user write_bikes'})

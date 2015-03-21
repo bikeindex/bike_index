@@ -17,6 +17,10 @@ describe Manufacturer do
       mnfg = FactoryGirl.create(:manufacturer, name: "Poopy PANTERS")
       Manufacturer.fuzzy_name_find('poopy panters').should == mnfg
     end
+    it "removes Accell (because it's widespread mnfg)" do
+      mnfg = FactoryGirl.create(:manufacturer, name: "Poopy PANTERS")
+      Manufacturer.fuzzy_id_or_name_find('poopy panters Accell').should == mnfg
+    end
   end
 
   describe "import csv" do 

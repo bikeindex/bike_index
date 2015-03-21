@@ -175,19 +175,19 @@ class User < ActiveRecord::Base
 
   def is_admin_of?(organization)
     m = Membership.where(user_id: self.id, organization_id: organization.id).first
-    m.role == "admin"
+    m.present? && m.role == "admin"
   end
   
   def has_membership?
-    self.memberships.any?
+    memberships.any?
   end
 
   def has_police_membership?
-    self.organizations.police.any?
+    organizations.police.any?
   end
 
   def has_shop_membership?
-    self.organizations.shop.any?
+    organizations.shop.any?
   end
 
   def bikes(user_hidden=true)

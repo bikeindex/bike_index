@@ -12,6 +12,34 @@
             = application.name
 
         .application-info.initially-hidden
+          - v2_accessor = application.access_tokens.where(resource_owner_id: ENV['V2_ACCESSOR_ID']).first
+          - if v2_accessor.present? && current_user.has_membership?
+            %table.table.tokens-table
+              %thead
+                %th
+                  Permanent bike creation token
+                  %span.less-strong
+                    use to create bikes for
+                    = current_user.organizations.map(&:name).to_sentence
+                  %br
+                  %span.less-strong
+                    ** You must include an 
+                    %code
+                      organization_slug
+                    when creating a bike to use this token **
+                %th
+                  Scopes
+                %th
+              %tbody
+                %td
+                  %pre
+                    = v2_accessor.token
+                %td
+                  %code 
+                    write_bikes
+                %td
+                  %a.set-token.btn.binxbtn-primary{href: '#', data: {token: v2_accessor.token }}
+                    Use token
           %table.table.padded
             %tbody
               %tr
@@ -58,7 +86,7 @@
               %code
                 = application.access_tokens.where(resource_owner_id: current_user.id).where('revoked_at IS NULL').last.refresh_token
           - else
-            %h4 no tokens
+            %h4 no personal tokens
             - if application.redirect_uri.match("#{authorize_documentation_index_url}")
               .clearfix
                 %a.btn.binxbtn.pull-right.add-token-form-btn{ href: "#", data: {target: "add-token-app#{application.id}"}}

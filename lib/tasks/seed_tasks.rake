@@ -14,6 +14,9 @@ task seed_test_users_and_bikes: :environment do
   user = User.create(name: "user", email: "user@example.com", password: "please12", password_confirmation: "please12", terms_of_service: true)
   user.confirmed = true 
   user.save
+  user = User.create(name: "Api Accessor", email: "api@example.com", password: "please12", password_confirmation: "please12", terms_of_service: true)
+  user.confirmed = true
+  user.save
   user = User.create(name: "Example user", email: "example_user@bikeindex.org", password: "please12", password_confirmation: "please12", terms_of_service: true)
   user.confirmed = true 
   user.save

@@ -29,7 +29,9 @@ class Manufacturer < ActiveRecord::Base
   def self.fuzzy_name_find(n)
     if !n.blank?
       n = Slugifyer.manufacturer(n)
-      return self.find(:first, conditions: [ "slug = ?", n ])
+      found = self.find(:first, conditions: [ "slug = ?", n ])
+      return found if found.present?
+      return self.find(:first, conditions: [ "slug = ?", fill_stripped(n)])
     else
       nil
     end
@@ -48,6 +50,10 @@ class Manufacturer < ActiveRecord::Base
     return m.id if m.present?
   end
 
+  def self.fill_stripped(n)
+    n.gsub!(/accell/i,'') if n.match(/accell/i).present? 
+    Slugifyer.manufacturer(n)
+  end
 
   def self.import(file)
     CSV.foreach(file.path, headers: true) do |row|
