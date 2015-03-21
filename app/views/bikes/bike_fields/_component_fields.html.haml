@@ -55,7 +55,7 @@
       .control-group.extra-field.short-label
         = f.label :serial_number, "Part Serial", class: "control-label"
         .controls
-          = f.text_field :serial_number
+          = f.text_field :serial_number, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
 
     .remove-part
       = f.check_box :_destroy

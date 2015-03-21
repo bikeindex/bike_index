@@ -16,7 +16,7 @@
     .control-group
       = f.label :serial_number, class: "control-label"
       .controls
-        = f.text_field :serial_number, :required =>true
+        = f.text_field :serial_number, :required =>true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
     .has-no-serial.optional-block
       %label
         = f.check_box :has_no_serial, tabindex: -1 
