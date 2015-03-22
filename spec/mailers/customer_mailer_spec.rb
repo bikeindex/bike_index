@@ -85,7 +85,7 @@ describe CustomerMailer do
       mail.body.encoded.should match(stolen_notification.message)
       stolen_notification.send_dates[0].should eq(stolen_notification.updated_at.to_i)
       CustomerMailer.stolen_notification_email(stolen_notification)
-      stolen_notification.send_dates[1].should eq(stolen_notification.updated_at.to_i)
+      stolen_notification.send_dates[1].should be > stolen_notification.updated_at.to_i - 2
     end
   end
 
