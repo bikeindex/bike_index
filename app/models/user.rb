@@ -14,6 +14,7 @@ class User < ActiveRecord::Base
     :phone,
     :zipcode,
     :title,
+    :my_bikes_hash,
     :avatar,
     :avatar_cache,
     :description,
@@ -24,8 +25,12 @@ class User < ActiveRecord::Base
     :show_bikes,
     :show_phone,
     :has_stolen_bikes,
-    :can_send_many_stolen_notifications
+    :can_send_many_stolen_notifications,
+    :my_bikes_link_target,
+    :my_bikes_link_title
 
+
+  attr_accessor :my_bikes_link_target, :my_bikes_link_title
   # stripe_id, is_paid_member, paid_membership_info
 
   mount_uploader :avatar, AvatarUploader
@@ -55,6 +60,7 @@ class User < ActiveRecord::Base
 
   before_create :generate_username_confirmation_and_auth
   serialize :paid_membership_info
+  serialize :my_bikes_hash
 
   validates_uniqueness_of :username, case_sensitive: false
   def to_param
@@ -233,9 +239,22 @@ class User < ActiveRecord::Base
 
   before_save :set_urls
   def set_urls
-    if self.website
+    if website
       self.website = Urlifyer.urlify(self.website)
     end
+    mbh = my_bikes_hash || {}
+    mbh[:link_target] = my_bikes_link_target if my_bikes_link_target.present?
+    mbh[:link_title] = my_bikes_link_title if my_bikes_link_title.present?
+    self.my_bikes_hash = mbh
+    true
+  end
+
+  def mb_link_target
+    my_bikes_hash && my_bikes_hash[:link_target]
+  end
+
+  def mb_link_title
+    (my_bikes_hash && my_bikes_hash[:link_title]) || mb_link_target
   end
 
   before_save :set_phone

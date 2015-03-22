@@ -1,12 +1,17 @@
 .user-page
   %header.with-subtitle
     %h1
-      - if @user.title
+      - if @user.title.present?
         = @user.title
       - else
         This user's bikes
     %p.sharing-links
       = @user.show_twitter_and_website(@user)
+  - if @user.mb_link_target.present?
+    
+    %h3
+      %a{href: @user.mb_link_target}
+        = @user.mb_link_title
   .description-avatar
     - if @user.avatar
       - unless @user.avatar.url(:medium) == "https://s3.amazonaws.com/bikeindex/blank.png"

@@ -129,6 +129,17 @@
           %span.add-on
             http&#58;&#47;&#47;
           = f.text_field :website, placeholder: "Enter site url"
+    .control-group
+      %label.control-label{ for: "title" }
+        Additional Link
+      .controls
+        = f.text_field :my_bikes_link_target, value: @user.mb_link_target, placeholder: "http://example.com"
+    .control-group
+      %label.control-label{ for: "title" }
+        Title for link
+      .controls
+        = f.text_field :my_bikes_link_title, value: @user.mb_link_title, placeholder: "My awesome link"
+
     .control-group#username_ref
       %p
         Your username is the url for your sharing page and the bike embed form. Update it if you care about those things.
@@ -137,7 +148,6 @@
           Username
         .controls
           = f.text_field :username
-
 
     .control-group.actions
       = f.submit "Update sharing", class: 'button-green'

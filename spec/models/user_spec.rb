@@ -21,6 +21,7 @@ describe User do
     it { should have_many :sent_stolen_notifications }
     it { should have_many :received_stolen_notifications }
     it { should serialize :paid_membership_info }
+    it { should serialize :my_bikes_hash }
     it { should validate_presence_of :email }
     it { should validate_uniqueness_of :email }
   end
@@ -156,12 +157,15 @@ describe User do
 
   describe :set_urls do
     xit "adds http:// to twitter and website if the url doesn't have it so that the link goes somewhere" do
-      @user = FactoryGirl.create(:user, show_twitter: true, twitter: "http://somewhere.com", show_website: true, website: "somewhere.org" )
-      @user.website.should eq('http://somewhere.org')
+      user = User.new(show_twitter: true, twitter: "http://somewhere.com", show_website: true, website: "somewhere.org" )
+      user.set_urls
+      user.website.should eq('http://somewhere.org')
     end
     it "does not add http:// to twitter if it's already there" do
-      @user = FactoryGirl.create(:user, show_twitter: true, twitter: "http://somewhere.com", show_website: true, website: "somewhere" )
-      @user.twitter.should eq('http://somewhere.com')
+      user = User.new(show_twitter: true, twitter: "http://somewhere.com", show_website: true, website: "somewhere", my_bikes_link_target: 'https://something.com')
+      user.set_urls
+      user.my_bikes_hash[:link_target].should eq('https://something.com')
+      user.twitter.should eq('http://somewhere.com')
     end
   end
 
