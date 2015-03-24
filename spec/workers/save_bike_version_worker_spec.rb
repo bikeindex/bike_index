@@ -5,7 +5,7 @@ describe SaveBikeVersionWorker do
   
   it "sends the bike" do
     bike = FactoryGirl.create(:bike)
-    SaveBikeVersionWorker.new.perform(bike.id)
+    SaveBikeVersionWorker.perform_async(bike.id)
     expect(SaveBikeVersionWorker).to have_enqueued_job(bike.id)
   end
 
