@@ -13,7 +13,7 @@
               = recovery.quote.html_safe
           .testimonial-user
             - if recovery.image.present?
-              = image_tag recovery.image_url(:medium)
+              %img{ data: { lazy: recovery.image_url(:medium) }}
             - else
               %span.no-image-spacer
             - if recovery.quote_by

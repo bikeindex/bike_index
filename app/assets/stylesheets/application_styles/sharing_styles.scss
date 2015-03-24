@@ -64,6 +64,22 @@
     float: left;
   }
 }
+
+.home-sharing-section {
+  @include clearfix;
+  .twitter-follow-button {
+    display: block;
+    float: left;
+    margin-right: 5px;
+    // margin-top: -20px;
+  }
+  .fb-like {
+    // margin-top: -41px;
+    display: block;
+    float: left;
+  }
+}
+
 @media (min-width: 1200px) {
   .home-sharing {
     padding-right: 30px;
