@@ -5,8 +5,9 @@ class SaveBikeVersionWorker
 
   def perform(bike_id)
     bike = Bike.unscoped.find(bike_id)
-    bike_json = BikeV2ShowSerializer.new(bike, root: false).to_json
-    puts `ruby #{ENV['VERSIONER_LOCATION']}versioner.rb -l '#{ENV['VERSIONER_LOCATION']}'  -i #{bike_id} -b '#{bike_json}'`
+    bike_json = BikeV2ShowSerializer.new(bike, root: false).to_json.gsub("'", '\'')
+    File.open("#{ENV['VERSIONER_LOCATION']}/bikes/#{bike_id}.json", 'w+') {|f| f.write(bike_json) }
+    `ruby #{ENV['VERSIONER_LOCATION']}/versioner.rb -l '#{ENV['VERSIONER_LOCATION']}'  -i #{bike_id}`
   end
 
 end
