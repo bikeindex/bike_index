@@ -406,4 +406,10 @@ class Bike < ActiveRecord::Base
     self.cached_data = c
   end
 
+  after_save :after_bike_save_actions
+  def after_bike_save_actions
+    SaveBikeVersionWorker.perform_async(id)
+  end
+
+
 end
