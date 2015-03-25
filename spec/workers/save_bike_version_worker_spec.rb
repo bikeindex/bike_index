@@ -9,4 +9,11 @@ describe SaveBikeVersionWorker do
     expect(SaveBikeVersionWorker).to have_enqueued_job(bike.id)
   end
 
+  it "creates pretty json" do 
+    bike = FactoryGirl.create(:bike)
+    bike.update_attribute :updator_id, 42
+    result = SaveBikeVersionWorker.new.perform(bike.id)
+    JSON.parse(result)['updator_id'].should eq(42)
+  end
+
 end

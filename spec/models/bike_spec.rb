@@ -17,6 +17,7 @@ describe Bike do
     it { should belong_to :paint }
     it { should belong_to :cycle_type }
     it { should belong_to :creator }
+    it { should belong_to :updator }
     it { should belong_to :creation_organization }
     it { should belong_to :current_stolen_record }
     it { should belong_to :location }

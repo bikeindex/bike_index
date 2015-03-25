@@ -1,4 +1,4 @@
-class Bike < ActiveRecord::Base  
+class Bike < ActiveRecord::Base
   include ActiveModel::Dirty
   # include ActionView::Helpers::SanitizeHelper
   attr_accessible :verified,
@@ -93,6 +93,7 @@ class Bike < ActiveRecord::Base
   belongs_to :cycle_type
   belongs_to :paint, counter_cache: true
   belongs_to :creator, class_name: "User"
+  belongs_to :updator, class_name: "User"
   belongs_to :invoice
   belongs_to :creation_organization, class_name: "Organization"
   belongs_to :location

@@ -1,0 +1,44 @@
+{
+  "id": 1,
+  "title": "Special_name10 special_name8",
+  "serial": "serial2",
+  "manufacturer_name": "Special_name10",
+  "frame_model": null,
+  "year": null,
+  "frame_colors": [
+    "Special_name14"
+  ],
+  "thumb": null,
+  "large_img": null,
+  "is_stock_img": false,
+  "stolen": false,
+  "stolen_location": null,
+  "date_stolen": null,
+  "registration_created_at": 1427297202,
+  "registration_updated_at": 1427297202,
+  "url": "http://test.host/bikes/1",
+  "api_url": "http://test.host/api/v1/bikes/1",
+  "manufacturer_id": 1,
+  "paint_description": null,
+  "name": null,
+  "frame_size": null,
+  "description": null,
+  "rear_tire_narrow": true,
+  "front_tire_narrow": null,
+  "type_of_cycle": "Special_name8",
+  "test_bike": false,
+  "rear_wheel_size_iso_bsd": 20,
+  "front_wheel_size_iso_bsd": null,
+  "handlebar_type_slug": null,
+  "frame_material_slug": null,
+  "front_gear_type_slug": null,
+  "rear_gear_type_slug": null,
+  "stolen_record": null,
+  "public_images": [
+
+  ],
+  "components": [
+
+  ],
+  "updator_id": 42
+}

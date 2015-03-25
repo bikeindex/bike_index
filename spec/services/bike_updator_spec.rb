@@ -48,9 +48,13 @@ describe BikeUpdator do
   describe :update_ownership do 
     it "calls create_ownership if the email has changed" do 
       bike = FactoryGirl.create(:bike)
-      update_bike = BikeUpdator.new(b_params: {id: bike.id, bike: {owner_email: "another@email.co"}})
+      user = FactoryGirl.create(:user)
+      bike.updator_id.should be_nil
+      update_bike = BikeUpdator.new(b_params: {id: bike.id, bike: {owner_email: "another@email.co"}}, user: user)
       OwnershipCreator.any_instance.should_receive(:create_ownership)
       update_bike.update_ownership
+      bike.reload
+      bike.updator.should eq(user)
     end
 
     it "does not call create_ownership if the email hasn't changed" do 

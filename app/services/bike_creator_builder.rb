@@ -28,6 +28,7 @@ class BikeCreatorBuilder
     bike = Bike.new(@b_param.bike)
     bike.b_param_id = @b_param.id
     bike.creator_id = @b_param.creator_id 
+    bike.updator_id = bike.creator_id
     bike
   end
 
