@@ -11,6 +11,7 @@ class WelcomeController < ApplicationController
   end
 
   def goodbye
+    redirect_to logout_url if current_user.present?
   end
 
   def user_home
