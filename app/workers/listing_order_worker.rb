@@ -8,6 +8,7 @@ class ListingOrderWorker
     if bike.present?
       bike.update_attribute :listing_order, bike.get_listing_order
     end
+    SaveBikeVersionWorker.perform_async(bike_id)
   end
 
 end

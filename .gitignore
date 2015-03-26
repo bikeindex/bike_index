@@ -30,5 +30,6 @@ current_stolen_bikes.tsv
 .env
 log/localeapp.yml
 
-# Ignore soulmate import files
+# Ignore import files
 sm_import_*.json
+spec/fixtures/bikes/*.json

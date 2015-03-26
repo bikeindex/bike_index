@@ -8,4 +8,10 @@ describe ListingOrderWorker do
     expect(ListingOrderWorker).to have_enqueued_job
   end
 
+  it "enqueues version worker" do 
+    bike = FactoryGirl.create(:bike)
+    ListingOrderWorker.new.perform(bike.id)
+    expect(SaveBikeVersionWorker).to have_enqueued_job(bike.id)
+  end
+
 end
