@@ -66,6 +66,8 @@ class BParam < ActiveRecord::Base
     end
     set_color_key unless bike[:primary_frame_color_id].present?
     set_cycle_type_key if bike[:cycle_type_slug].present? || bike[:cycle_type_name].present?
+    set_rear_gear_type_slug if bike[:rear_gear_type_slug].present?
+    set_front_gear_type_slug if bike[:front_gear_type_slug].present?
     set_handlebar_type_key if bike[:handlebar_type_slug].present?
     set_frame_material_key if bike[:frame_material_slug].present?
   end
@@ -110,6 +112,16 @@ class BParam < ActiveRecord::Base
     end
     bike[:manufacturer_id] = manufacturer.id if manufacturer.present?
     bike.delete(:manufacturer)
+  end
+
+  def set_rear_gear_type_slug
+    gear = RearGearType.where(slug: bike.delete(:rear_gear_type_slug)).first
+    bike[:rear_gear_type_id] = gear && gear.id
+  end
+
+  def set_front_gear_type_slug
+    gear = FrontGearType.where(slug: bike.delete(:front_gear_type_slug)).first
+    bike[:front_gear_type_id] = gear && gear.id
   end
 
   def set_color_key

@@ -59,13 +59,17 @@ describe BParam do
       bike = {
         frame_material_slug: "something",
         handlebar_type_slug: "else",
-        cycle_type_slug: "entirely"
+        cycle_type_slug: "entirely",
+        rear_gear_type_slug: "gears awesome",
+        front_gear_type_slug: "cool gears"
       }
       b_param.stub(:params).and_return({bike: bike})
       b_param.should_receive(:set_manufacturer_key).and_return(true)
       b_param.should_receive(:set_color_key).and_return(true)
       b_param.should_receive(:set_wheel_size_key).and_return(true)
       b_param.should_receive(:set_cycle_type_key).and_return(true)
+      b_param.should_receive(:set_rear_gear_type_slug).and_return(true)
+      b_param.should_receive(:set_front_gear_type_slug).and_return(true)
       b_param.should_receive(:set_handlebar_type_key).and_return(true)
       b_param.should_receive(:set_frame_material_key).and_return(true)
       b_param.set_foreign_keys
@@ -153,6 +157,27 @@ describe BParam do
       b_param.set_manufacturer_key
       b_param.params[:bike][:manufacturer].should_not be_present
       b_param.params[:bike][:manufacturer_id].should eq(m.id)
+    end
+  end
+
+  describe :gear_slugs do
+    it "sets the rear gear slug" do
+      gear = FactoryGirl.create(:rear_gear_type)
+      bike = { rear_gear_type_slug: gear.slug }
+      b_param = BParam.new
+      b_param.stub(:params).and_return({bike: bike})
+      b_param.set_rear_gear_type_slug
+      b_param.params[:bike][:rear_gear_type_slug].should_not be_present
+      b_param.params[:bike][:rear_gear_type_id].should eq(gear.id)
+    end
+    it "sets the front gear slug" do
+      gear = FactoryGirl.create(:front_gear_type)
+      bike = { front_gear_type_slug: gear.slug }
+      b_param = BParam.new
+      b_param.stub(:params).and_return({bike: bike})
+      b_param.set_front_gear_type_slug
+      b_param.params[:bike][:front_gear_type_slug].should_not be_present
+      b_param.params[:bike][:front_gear_type_id].should eq(gear.id)
     end
   end
 

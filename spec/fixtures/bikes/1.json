@@ -1,12 +1,12 @@
 {
   "id": 1,
-  "title": "Special_name10 special_name8",
-  "serial": "serial2",
-  "manufacturer_name": "Special_name10",
+  "title": "Special_name2037 special_name2035",
+  "serial": "serial251",
+  "manufacturer_name": "Special_name2037",
   "frame_model": null,
   "year": null,
   "frame_colors": [
-    "Special_name14"
+    "Special_name2041"
   ],
   "thumb": null,
   "large_img": null,
@@ -14,7 +14,7 @@
   "stolen": false,
   "stolen_location": null,
   "date_stolen": null,
-  "registration_created_at": 1427382748,
+  "registration_created_at": 1427731742,
   "url": "http://test.host/bikes/1",
   "api_url": "http://test.host/api/v1/bikes/1",
   "manufacturer_id": 1,
@@ -24,9 +24,9 @@
   "description": null,
   "rear_tire_narrow": true,
   "front_tire_narrow": null,
-  "type_of_cycle": "Special_name8",
+  "type_of_cycle": "Special_name2035",
   "test_bike": false,
-  "rear_wheel_size_iso_bsd": 20,
+  "rear_wheel_size_iso_bsd": 2680,
   "front_wheel_size_iso_bsd": null,
   "handlebar_type_slug": null,
   "frame_material_slug": null,

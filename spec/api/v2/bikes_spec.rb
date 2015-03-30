@@ -60,6 +60,7 @@ describe 'Bikes API V2' do
       manufacturer = FactoryGirl.create(:manufacturer)
       FactoryGirl.create(:ctype, name: "wheel")
       FactoryGirl.create(:ctype, name: "Headset")
+      front_gear_type = FactoryGirl.create(:front_gear_type)
       components = [
         {
           manufacturer: manufacturer.name,
@@ -75,7 +76,7 @@ describe 'Bikes API V2' do
           component_type: 'wheel'
         }
       ]
-      @bike.merge!({components: components})
+      @bike.merge!({components: components, front_gear_type_slug: front_gear_type.slug})
       expect{
         post "/api/v2/bikes?access_token=#{@token.token}",
           @bike.to_json,
@@ -90,6 +91,7 @@ describe 'Bikes API V2' do
       bike.components.count.should eq(3)
       bike.components.pluck(:manufacturer_id).include?(manufacturer.id).should be_true
       bike.components.pluck(:ctype_id).uniq.count.should eq(2)
+      bike.front_gear_type.should eq(front_gear_type)
     end
 
     it "creates an example bike" do
