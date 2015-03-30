@@ -15,8 +15,10 @@ module API
           optional :primary_frame_color, type: String, values: COLOR_NAMES, desc: "Main color of frame (case sensitive match)"
           optional :secondary_frame_color, type: String, values: COLOR_NAMES, desc: "Secondary color (case sensitive match)"
           optional :tertiary_frame_color, type: String, values: COLOR_NAMES, desc: "Third color (case sensitive match)"
+
           optional :rear_gear_type_slug, type: String, desc: 'rear gears (has to be one of the `selections`)'
           optional :front_gear_type_slug, type: String, desc: 'front gears (has to be one of the `selections`)'
+          optional :handlebar_type_slug, type: String, desc: 'handlebar type (has to be one of the `selections`)'
           
           optional :stolen_record, type: Hash do
             optional :phone, type: String, desc: "Owner's phone number, **required to create stolen**"

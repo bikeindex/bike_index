@@ -86,7 +86,7 @@ FactoryGirl.define do
 
   factory :handlebar_type do
     name { FactoryGirl.generate(:unique_name) }
-    slug { FactoryGirl.generate(:unique_name) }
+    slug { FactoryGirl.generate(:unique_name).downcase }
   end
 
   factory :color do
