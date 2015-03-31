@@ -33,4 +33,3 @@ log/localeapp.yml
 # Ignore import files
 sm_import_*.json
 spec/fixtures/bikes/*.json
-spec/fixtures/bikes/1.json
