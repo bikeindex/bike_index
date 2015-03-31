@@ -43,7 +43,7 @@ We're an open source project. Take a gander through our code, report bugs, or do
     
     - Run the test suit in the background with `bundle exec guard`
 
-- You may have to manually add the fuzzystrmatch extension, which we use for near serial searches, to your databases the migration should take care of this but sometimes doesn't. Open the databases in postgres (`psql bikeindex_development` and `psql bikeindex_test`) and add the extension.
+- You may have to manually add the fuzzystrmatch extension, which we use for near serial searches, to your databases. The migration should take care of this but sometimes doesn't. Open the databases in postgres (`psql bikeindex_development` and `psql bikeindex_test`) and add the extension.
     
 ```
 CREATE EXTENSION fuzzystrmatch;

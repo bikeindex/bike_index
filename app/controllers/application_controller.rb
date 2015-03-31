@@ -6,6 +6,10 @@ class ApplicationController < ActionController::Base
   helper_method :current_user, :current_organization, :user_root_url
   
 
+  def handle_unverified_request
+    raise ActionController::InvalidAuthenticityToken
+  end
+
   def cors_set_access_control_headers
     headers['Access-Control-Allow-Origin'] = '*'
     headers['Access-Control-Allow-Methods'] = 'POST, PUT, GET, OPTIONS'
