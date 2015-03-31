@@ -76,12 +76,12 @@ group :development do
   gem 'ruby_gntp'
   gem 'rerun'
   gem 'growl'
-  gem 'brakeman'
   gem 'guard'
   gem 'guard-rspec', '~> 4.2.10'
   gem 'guard-livereload'
   gem 'bullet'
   gem 'should_clean'
+  gem "brakeman", :require => false
 end
 
 group :development, :test do
