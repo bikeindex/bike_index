@@ -6,8 +6,8 @@ window.BikeIndex =
   init: ->
 
   hideFlash:() ->
-    # Fade out hovering alerts after 7 seconds
-    setTimeout("$('#alert-block').fadeOut('slow')", 7000)
+    # Fade out hovering alerts after 10 seconds
+    setTimeout("$('#alert-block').fadeOut('slow')", 10000)
 
   alertMessage:(type, title, message) ->
     $('#alert-block>div').addClass("hidden")

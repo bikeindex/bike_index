@@ -8,6 +8,7 @@ class User < ActiveRecord::Base
     :email,
     :password,
     :password_confirmation,
+    :current_password,
     :terms_of_service,
     :vendor_terms_of_service,
     :when_vendor_terms_of_service,
@@ -30,7 +31,7 @@ class User < ActiveRecord::Base
     :my_bikes_link_title
 
 
-  attr_accessor :my_bikes_link_target, :my_bikes_link_title
+  attr_accessor :my_bikes_link_target, :my_bikes_link_title, :current_password
   # stripe_id, is_paid_member, paid_membership_info
 
   mount_uploader :avatar, AvatarUploader

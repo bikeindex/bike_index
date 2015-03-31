@@ -24,6 +24,10 @@ module AuthenticationHelper
   end
 
 protected
+  def remove_session
+    cookies.delete(:auth)
+  end
+  
   def strict_transport_security
     if request.ssl?
       response.headers['Strict-Transport-Security'] = "max-age=31536000;"

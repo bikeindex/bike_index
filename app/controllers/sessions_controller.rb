@@ -37,7 +37,7 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    cookies.delete(:auth)
+    remove_session
     if params[:redirect_location].present?
       if params[:redirect_location].match('new_user')
         redirect_to new_user_path, notice: "Logged out!" and return

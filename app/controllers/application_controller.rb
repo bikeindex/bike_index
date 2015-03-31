@@ -3,11 +3,13 @@ class ApplicationController < ActionController::Base
   include AuthenticationHelper
   protect_from_forgery
   before_filter :strict_transport_security    
-  helper_method :current_user, :current_organization, :user_root_url
+  helper_method :current_user, :current_organization, :user_root_url, :remove_session
   
 
   def handle_unverified_request
-    raise ActionController::InvalidAuthenticityToken
+    remove_session
+    flash[:notice] = "CSRF invalid. If you weren't intentionally doing something dumb, please contact us"
+    redirect_to goodbye_url
   end
 
   def cors_set_access_control_headers

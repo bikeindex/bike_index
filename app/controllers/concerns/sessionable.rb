@@ -6,7 +6,7 @@ module Sessionable
     if params[:session].present? && params[:session][:remember_me].present? && params[:session][:remember_me].to_s == '1'
       cookies.permanent.signed[:auth] = cookie_options
     else
-      cookies.signed[:auth] = cookie_options
+      default_session_set
     end
 
     if session[:return_to].present? || cookies[:return_to].present?
@@ -22,6 +22,10 @@ module Sessionable
     end
 
     redirect_to user_root_url, notice: "Logged in!" and return
+  end
+
+  def default_session_set
+    cookies.signed[:auth] = cookie_options
   end
 
   protected

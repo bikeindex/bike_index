@@ -91,15 +91,18 @@ class UsersController < ApplicationController
 
   def update
     @user = current_user
-    # respond_to do |format|
-    if @user.update_attributes(params[:user])
+    @user.generate_auth_token if is_pass_update = params[:user][:password].present?
+    params[:user].delete :email
+    if is_pass_update  && !@user.authenticate(params[:user][:current_password])
+      @user.errors.add(:base, "Current password doesn't match, it's required for updating your password")
+    elsif @user.update_attributes(params[:user])
       if params[:user][:terms_of_service].present?
         if params[:user][:terms_of_service] == '1'
           @user.terms_of_service = true
           @user.save
-          redirect_to user_home_url, notice: "Thanks! Now you can use the Bike Index"
+          redirect_to user_home_url, notice: "Thanks! Now you can use the Bike Index" and return
         else
-          redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index"
+          redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index" and return
         end
       elsif params[:user][:vendor_terms_of_service].present?
         if params[:user][:vendor_terms_of_service] == '1'
@@ -109,18 +112,18 @@ class UsersController < ApplicationController
           else
             flash[:notice] = "Thanks for accepting the terms of service!"
           end
-          redirect_to user_home_url
+          redirect_to user_home_url and return
           # TODO: Redirect to the correct page, somehow this breaks things right now though.
-          # redirect_to organization_home
+          # redirect_to organization_home and return
         else
-          redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index as through the organization"
+          redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index as through the organization" and return
         end
       else
-        redirect_to my_account_url, notice: 'Your information was successfully updated.'
+        default_session_set if is_pass_update
+        redirect_to my_account_url, notice: 'Your information was successfully updated.' and return
       end
-    else
-      render action: :edit
     end
+    render action: :edit
   end
 
   def accept_terms

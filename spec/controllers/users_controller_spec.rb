@@ -176,6 +176,31 @@ describe UsersController do
   end
 
   describe :update do 
+    it "doesn't update user if password doesn't match" do 
+      user = FactoryGirl.create(:user, terms_of_service: false, password: 'old_pass', password_confirmation: 'old_pass')
+      set_current_user(user) 
+      post :update, { id: user.username, user: {password: "new_pass", password_confirmation: 'new_pass'} }
+      user.reload.authenticate("new_pass").should be_false
+    end
+
+    it "resets users auth if password changed, updates current session" do 
+      user = FactoryGirl.create(:user, terms_of_service: false, password: 'old_pass', password_confirmation: 'old_pass')
+      auth = user.auth_token
+      email = user.email
+      set_current_user(user)
+      post :update, { id: user.username, user: {
+        email: 'cool_new_email@something.com',
+        current_password: 'old_pass',
+        password: "new_pass",
+        password_confirmation: 'new_pass'} 
+      }
+      response.should redirect_to(my_account_url)
+      user.reload.authenticate("new_pass").should be_true
+      user.auth_token.should_not eq(auth)
+      user.email.should eq(email)
+      cookies.signed[:auth][1].should eq(user.auth_token)
+    end
+
     it "updates the terms of service" do 
       user = FactoryGirl.create(:user, terms_of_service: false)
       set_current_user(user) 
@@ -183,6 +208,7 @@ describe UsersController do
       response.should redirect_to(user_home_url)
       user.reload.terms_of_service.should be_true
     end
+
     it "updates the vendor terms of service" do 
       user = FactoryGirl.create(:user, terms_of_service: false)
       org =  FactoryGirl.create(:organization)

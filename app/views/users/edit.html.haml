@@ -23,7 +23,16 @@
           Name
         .controls
           = f.text_field :name
-
+      .control-group
+        %label.label-with-tip.control-label{ for: "user_zipcode" }
+          %p
+            Zipcode
+          / %span.formtip
+          /   ?
+          /   %a.tooltip{ rel: "tooltip", :"data-placement" => "bottom", title: "If entered, closer bikes will appear first in search results." }
+          /     ?
+        .controls
+          = f.text_field :zipcode, placeholder: "Default search location"
       .control-group
         %label.control-label{ for: "user_Password" }
           Password
@@ -35,15 +44,9 @@
         .controls
           = f.password_field :password_confirmation, placeholder: "Password confirmation"
       .control-group
-        %label.label-with-tip.control-label{ for: "user_zipcode" }
-          %p
-            Zipcode
-          / %span.formtip
-          /   ?
-          /   %a.tooltip{ rel: "tooltip", :"data-placement" => "bottom", title: "If entered, closer bikes will appear first in search results." }
-          /     ?
+        = f.label :current_password, class: "control-label"
         .controls
-          = f.text_field :zipcode, placeholder: "Default search location"
+          = f.password_field :current_password, placeholder: "For password update"
 
     .control-group.actions
       = f.submit "Update information", class: 'button-green'
