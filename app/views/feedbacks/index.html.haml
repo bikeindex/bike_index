@@ -14,6 +14,9 @@
   Just want to say hi?
 %p
   You can reach us at #{link_to "contact@bikeindex.org", "mailto:contact@bikeindex.org"}, or send your message right here.
-
-%article
-  = render 'feedbacks/form'
+- if current_user.present?
+  %article
+    = render 'feedbacks/form'
+- else
+  %h3
+    Sorry, you have to be signed in to send comments because people on the internet.
