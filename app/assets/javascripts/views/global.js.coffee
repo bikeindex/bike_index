@@ -112,7 +112,6 @@ class BikeIndex.Views.Global extends Backbone.View
             location = ""
             location += "#{json.city} " if json.city?
             location += "#{json.region}" if json.region?
-            console.log(location)
             if location.length > 0
               localStorage.setItem('location', location)
               $('#proximity').val(location)
