@@ -11,6 +11,8 @@ if defined?(Bundler)
   # Bundler.require(:default, :assets, Rails.env)
 end
 
+ENV['MIN_MAX_RATE'] ||= '1000'
+
 module Bikeindex
   class Application < Rails::Application
     require 'draper'
@@ -52,8 +54,8 @@ module Bikeindex
 
     # Send error routes the route.rb
     config.exceptions_app = self.routes
-
-    config.middleware.use Rack::Throttle::Minute, :max => 200, :cache => Redis.new, :key_prefix => :throttle
+    
+    config.middleware.use Rack::Throttle::Minute, :max => ENV['MIN_MAX_RATE'].to_i, :cache => Redis.new, :key_prefix => :throttle
 
     config.to_prepare do
       Doorkeeper::ApplicationsController.layout "doorkeeper"

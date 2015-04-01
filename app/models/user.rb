@@ -126,7 +126,7 @@ class User < ActiveRecord::Base
 
   def reset_token_time
     t = password_reset_token && password_reset_token.split('-')[0]
-    t = (t.present? && t.to_i > 1427848192) ? t.to_i : 1364777722
+    t = (t.present? && t.to_i > 1427848192) ? t.to_i : 1364777722   
     Time.at(t)
   end
 
@@ -252,7 +252,7 @@ class User < ActiveRecord::Base
       self.website = Urlifyer.urlify(self.website)
     end
     mbh = my_bikes_hash || {}
-    mbh[:link_target] = my_bikes_link_target if my_bikes_link_target.present?
+    mbh[:link_target] = Urlifyer.urlify(my_bikes_link_target) if my_bikes_link_target.present?
     mbh[:link_title] = my_bikes_link_title if my_bikes_link_title.present?
     self.my_bikes_hash = mbh
     true

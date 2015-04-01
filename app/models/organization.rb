@@ -51,6 +51,7 @@ class Organization < ActiveRecord::Base
 
   before_save :set_short_name_and_slug
   def set_short_name_and_slug
+    self.name = "Stop messing about" unless name[/\d|\w/].present?
     self.short_name = name unless short_name.present?
     new_slug = Slugifyer.slugify(self.short_name)
     # If the organization exists, don't invalidate because of it's own slug
