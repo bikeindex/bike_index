@@ -184,7 +184,7 @@ describe UsersController do
     end
 
     it "resets users auth if password changed, updates current session" do 
-      user = FactoryGirl.create(:user, terms_of_service: false, password: 'old_pass', password_confirmation: 'old_pass')
+      user = FactoryGirl.create(:user, terms_of_service: false, password: 'old_pass', password_confirmation: 'old_pass', password_reset_token: 'stuff')
       auth = user.auth_token
       email = user.email
       set_current_user(user)
@@ -198,6 +198,7 @@ describe UsersController do
       user.reload.authenticate("new_pass").should be_true
       user.auth_token.should_not eq(auth)
       user.email.should eq(email)
+      user.password_reset_token.should_not eq('stuff')
       cookies.signed[:auth][1].should eq(user.auth_token)
     end
 

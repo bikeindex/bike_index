@@ -64,6 +64,7 @@ task seed_test_users_and_bikes: :environment do
     end
   end
   Bike.pluck(:id).each { |b| ListingOrderWorker.perform_async(b) }
+  SmImportWorker.perform_async
 end
 
 task seed_dup_bikes: :environment do

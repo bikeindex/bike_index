@@ -119,7 +119,10 @@ class UsersController < ApplicationController
           redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index as through the organization" and return
         end
       else
-        default_session_set if is_pass_update
+        if is_pass_update
+          @user.set_password_reset_token
+          default_session_set
+        end
         redirect_to my_account_url, notice: 'Your information was successfully updated.' and return
       end
     end
