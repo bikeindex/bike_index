@@ -1,4 +1,5 @@
 class UserEmbedsController < ApplicationController
+  skip_before_filter :set_x_frame_options_header
   layout 'embed_user_layout'
 
   def show

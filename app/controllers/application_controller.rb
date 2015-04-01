@@ -2,7 +2,7 @@ class ApplicationController < ActionController::Base
   include UrlHelper
   include AuthenticationHelper
   protect_from_forgery
-  before_filter :strict_transport_security    
+  ensure_security_headers
   helper_method :current_user, :current_organization, :user_root_url, :remove_session
   
 

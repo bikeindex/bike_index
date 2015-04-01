@@ -10,6 +10,7 @@ describe UserEmbedsController do
       response.code.should eq('200')
       assigns(:bikes).first.should eq(ownership.bike)
       assigns(:bikes).count.should eq(1)
+      response.headers['X-Frame-Options'].should_not be_present
     end
 
     it "renders the most recent bikes with images if it doesn't find the user" do
@@ -18,6 +19,8 @@ describe UserEmbedsController do
       get :show, id: "NOT A USER"
       response.code.should eq('200')
       assigns(:bikes).count.should eq(1)
+      response.headers['X-Frame-Options'].should_not be_present
     end
   end
+
 end

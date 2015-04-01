@@ -28,12 +28,6 @@ protected
     cookies.delete(:auth)
   end
   
-  def strict_transport_security
-    if request.ssl?
-      response.headers['Strict-Transport-Security'] = "max-age=31536000;"
-    end
-  end
-
   def current_user
     @current_user ||= User.from_auth(cookies.signed[:auth])
   end

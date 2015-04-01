@@ -386,6 +386,7 @@ GEM
       railties (~> 3.2.0)
       sass (>= 3.1.10)
       tilt (~> 1.3)
+    secure_headers (2.0.1)
     sexp_processor (4.5.0)
     should_clean (0.0.3)
     shoulda-matchers (2.6.0)
@@ -531,6 +532,7 @@ DEPENDENCIES
   rspec-sidekiq
   ruby_gntp
   sass-rails (~> 3.2.3)
+  secure_headers
   should_clean
   shoulda-matchers
   sidekiq

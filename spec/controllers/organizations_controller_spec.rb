@@ -166,7 +166,7 @@ describe OrganizationsController do
   end
 
   describe :embed do 
-    before do 
+    it "renders embed" do 
       organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:user)
       membership = FactoryGirl.create(:membership, user: user, organization: organization)
@@ -174,9 +174,26 @@ describe OrganizationsController do
       FactoryGirl.create(:cycle_type, slug: "bike")
       FactoryGirl.create(:propulsion_type, name: "Foot pedal")
       get :embed, id: organization.slug
+      response.code.should eq("200")
+      response.should render_template(:embed)
+      response.headers['X-Frame-Options'].should_not be_present
     end
-    it { should respond_with(:success) }
-    it { should render_template(:embed) }
+  end
+
+  describe :embed_extended do 
+    it "renders embed" do 
+      organization = FactoryGirl.create(:organization)
+      user = FactoryGirl.create(:user)
+      membership = FactoryGirl.create(:membership, user: user, organization: organization)
+      organization.save
+      FactoryGirl.create(:cycle_type, slug: "bike")
+      FactoryGirl.create(:propulsion_type, name: "Foot pedal")
+      get :embed_extended, id: organization.slug
+      response.code.should eq("200")
+      response.should render_template(:embed)
+      pp response.headers
+      response.headers['X-Frame-Options'].should_not be_present
+    end
   end
 
 end

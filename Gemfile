@@ -54,6 +54,7 @@ gem 'doorkeeper',   '~> 2.0.1'
 gem 'wine_bouncer'
 
 gem 'rack-throttle'
+gem 'secure_headers'
 
 gem 'chartkick'
 gem 'groupdate'

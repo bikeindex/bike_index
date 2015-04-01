@@ -108,10 +108,10 @@ class BikeIndex.Views.Global extends Backbone.View
         unless location? and location.length > 0
           $('#proximity').val('ip')
           localStorage.setItem('location', 'ip')
-          $.getJSON "https://www.telize.com/geoip?callback=?", (json) ->
+          $.getJSON "https://freegeoip.net/json/", (json) ->
             location = ""
             location += "#{json.city} " if json.city?
-            location += "#{json.region}" if json.region?
+            location += "#{json.region_name}" if json.region_name?
             if location.length > 0
               localStorage.setItem('location', location)
               $('#proximity').val(location)
