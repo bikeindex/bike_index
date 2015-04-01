@@ -15,14 +15,10 @@ describe Organization do
     it { should belong_to :auto_user }
   end
 
-  it "has before_save_callback_method defined for set_website" do
-    Organization._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_website).should == true
-  end
-
-  describe :set_short_name_and_slug do 
-    it "sets the short_name and the slug" do 
+  describe :set_and_clean_attributes do 
+    it "sets the short_name and the slug on save" do 
       organization = Organization.new(name: 'something')
-      organization.set_short_name_and_slug
+      organization.set_and_clean_attributes
       organization.short_name.should be_present
       organization.slug.should be_present
       slug = organization.slug 
@@ -33,7 +29,7 @@ describe Organization do
     it "doesn't xss" do 
       org = Organization.new(name: '<script>alert(document.cookie)</script>', 
         website: '<script>alert(document.cookie)</script>')
-      org.set_short_name_and_slug
+      org.set_and_clean_attributes
       org.name.should eq("alert(document.cookie)")
       org.website.should eq("http://<script>alert(document.cookie)</script>")
       org.short_name.should eq("alert(document.cookie)")
@@ -44,12 +40,12 @@ describe Organization do
       org1.reload.save
       org1.reload.slug.should eq('bicycle-shop')
       organization = Organization.new(name: 'Bicycle shop')
-      organization.set_short_name_and_slug
+      organization.set_and_clean_attributes
       organization.slug.should eq('bicycle-shop-2')
     end
 
-    it "has before_save_callback_method defined for set_short_name_and_slug" do
-      Organization._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_short_name_and_slug).should == true
+    it "has before_save_callback_method defined for set_and_clean_attributes" do
+      Organization._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_and_clean_attributes).should == true
     end
   end
 

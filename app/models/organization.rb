@@ -50,13 +50,13 @@ class Organization < ActiveRecord::Base
     slug
   end
 
-  before_save :set_short_name_and_slug
-  def set_short_name_and_slug
-    self.name = strip_tags(name).gsub(/\Aadmin/i, '')
+  before_save :set_and_clean_attributes
+  def set_and_clean_attributes
+    self.name = strip_tags(name)
     self.name = "Stop messing about" unless name[/\d|\w/].present?
-    self.website = Urlifyer.urlify(website)
+    self.website = Urlifyer.urlify(website) if website.present?
     self.short_name = name unless short_name.present?
-    new_slug = Slugifyer.slugify(self.short_name)
+    new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, '')
     # If the organization exists, don't invalidate because of it's own slug
     orgs = id.present? ? Organization.where('id != ?', id) : Organization.scoped
     while orgs.where(slug: new_slug).exists?
@@ -104,12 +104,6 @@ class Organization < ActiveRecord::Base
     begin
       self.access_token = SecureRandom.hex
     end while self.class.exists?(access_token: access_token)
-  end
-
-  before_save :set_website 
-  def set_website 
-    return true unless website.present?
-    self.website = Urlifyer.urlify(website)
   end
 
 end

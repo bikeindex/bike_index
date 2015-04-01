@@ -99,7 +99,7 @@ class BikeIndex.Views.Global extends Backbone.View
       #   $('#query').select2('data',data)
       if $('#header-search #serial').val().length > 0
         data = $('#query').select2('data')
-        data.push({id: '#', text: $('#header-search #serial').val()})
+        data.push({id: '#', text: encodeURI($('#header-search #serial').val())})
         $('#query').select2('data',data)
 
       unless $('#bikes-search').length > 0
@@ -108,10 +108,11 @@ class BikeIndex.Views.Global extends Backbone.View
         unless location? and location.length > 0
           $('#proximity').val('ip')
           localStorage.setItem('location', 'ip')
-          $.getJSON "http://www.telize.com/geoip?callback=?", (json) ->
+          $.getJSON "https://www.telize.com/geoip?callback=?", (json) ->
             location = ""
             location += "#{json.city} " if json.city?
             location += "#{json.region}" if json.region?
+            console.log(location)
             if location.length > 0
               localStorage.setItem('location', location)
               $('#proximity').val(location)
