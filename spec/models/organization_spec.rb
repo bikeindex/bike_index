@@ -30,6 +30,15 @@ describe Organization do
       organization.slug.should eq(slug)
     end
 
+    it "doesn't xss" do 
+      org = Organization.new(name: '<script>alert(document.cookie)</script>', 
+        website: '<script>alert(document.cookie)</script>')
+      org.set_short_name_and_slug
+      org.name.should eq("alert(document.cookie)")
+      org.website.should eq("http://<script>alert(document.cookie)</script>")
+      org.short_name.should eq("alert(document.cookie)")
+    end
+
     it "protects from name collisions, without erroring because of it's own slug" do 
       org1 = Organization.create(name: 'Bicycle shop')
       org1.reload.save
@@ -87,5 +96,6 @@ describe Organization do
       organization.reload.auto_user_id.should_not be_nil
     end
   end
+
 
 end

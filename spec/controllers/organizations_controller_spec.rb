@@ -34,6 +34,24 @@ describe OrganizationsController do
       organization.memberships.first.user_id.should eq(user.id)
     end
 
+    it "Doesn't xss" do
+      Organization.count.should eq(0)
+      user = FactoryGirl.create(:user)
+      set_current_user(user)
+      org_attrs = {
+        name: '<script>alert(document.cookie)</script>',
+        website: '<script>alert(document.cookie)</script>',
+        org_type: 'shop',
+        api_access_approved: 'true',
+        approved: 'true'
+      }
+      post :create, organization: org_attrs
+      Organization.count.should eq(1)
+      organization = Organization.last
+      organization.name.should_not eq('<script>alert(document.cookie)</script>')
+      organization.website.should_not eq('<script>alert(document.cookie)</script>')
+    end
+
     it "mails us" do 
       Sidekiq::Testing.inline! do
         user = FactoryGirl.create(:user)

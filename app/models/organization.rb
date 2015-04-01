@@ -1,4 +1,5 @@
 class Organization < ActiveRecord::Base
+  include ActionView::Helpers::SanitizeHelper
   attr_accessible :available_invitation_count,
     :sent_invitation_count,
     :name,
@@ -51,7 +52,9 @@ class Organization < ActiveRecord::Base
 
   before_save :set_short_name_and_slug
   def set_short_name_and_slug
+    self.name = strip_tags(name).gsub(/\Aadmin/i, '')
     self.name = "Stop messing about" unless name[/\d|\w/].present?
+    self.website = Urlifyer.urlify(website)
     self.short_name = name unless short_name.present?
     new_slug = Slugifyer.slugify(self.short_name)
     # If the organization exists, don't invalidate because of it's own slug

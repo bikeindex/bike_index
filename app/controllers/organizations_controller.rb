@@ -1,5 +1,4 @@
 class OrganizationsController < ApplicationController
-  include ActionView::Helpers::SanitizeHelper
   before_filter :authenticate_user!, only: [:show, :edit, :update, :destroy]
   before_filter :find_organization, except: [:new, :lightspeed_integration, :create]
   before_filter :require_membership, only: [:show, :edit, :update, :destroy]
@@ -23,8 +22,8 @@ class OrganizationsController < ApplicationController
   def create
     user = current_user
     @organization = Organization.new(
-      name: strip_tags(params[:organization][:name].strip),
-      website: Urlifyer.urlify(params[:organization][:website]),
+      name: params[:organization][:name].strip,
+      website: params[:organization][:website],
       org_type: params[:organization][:org_type]
     )
     if @organization.save
