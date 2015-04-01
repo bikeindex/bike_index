@@ -7,7 +7,7 @@ class PublicImage < ActiveRecord::Base
     :is_private
 
   mount_uploader :image, ImageUploader
-  # process_in_background :image
+  # process_in_background :image, CarrierWaveProcessWorker
 
   belongs_to :imageable, polymorphic: true
 

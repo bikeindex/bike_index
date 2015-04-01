@@ -55,7 +55,7 @@
           - params[:query] = params[:query].gsub(/,?#,?/,'').gsub(/(\A,|,\z)/, '') if params[:query].present?
           .sfieldr
             = text_field_tag :query,                             |
-              params[:query],                                    |
+              strip_tags(params[:query]),                        |
               placeholder: "Search bike traits or serials",      |
               class: "search-text-field"                         
             = button_tag(type: "submit", class: "searchit") do

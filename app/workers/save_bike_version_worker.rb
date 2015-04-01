@@ -1,7 +1,6 @@
 class SaveBikeVersionWorker
   include Sidekiq::Worker
-  sidekiq_options queue: 'versioner'
-  sidekiq_options backtrace: true
+  sidekiq_options queue: 'versioner', backtrace: true, :retry => false
 
   def perform(bike_id)
     if ENV['VERSIONER_LOCATION'].present?

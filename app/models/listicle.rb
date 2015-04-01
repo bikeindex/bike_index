@@ -13,7 +13,7 @@ class Listicle < ActiveRecord::Base
 
   belongs_to :blog 
   mount_uploader :image, ListicleImageUploader
-  process_in_background :image
+  process_in_background :image, CarrierWaveProcessWorker
 
   default_scope { order('list_order ASC') }
 

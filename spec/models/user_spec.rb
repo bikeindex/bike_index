@@ -259,6 +259,40 @@ describe User do
     end
   end
 
+  describe :reset_token_time do 
+    it "gets long time ago if not there" do 
+      user = User.new
+      user.stub(:password_reset_token).and_return("c7c3b99a319ac09e2b00-2015-03-31 19:29:52 -0500")
+      user.reset_token_time.should eq(Time.at(1364777722))
+    end
+    it "gets the time" do 
+      user = User.new 
+      user.set_password_reset_token
+      user.reset_token_time.should be > Time.now - 2.seconds
+    end
+  end
+
+  describe :send_password_reset_email do 
+    it "enqueues sending the password reset" do 
+      user = FactoryGirl.create(:user)
+      user.password_reset_token.should be_nil
+      expect {
+        user.send_password_reset_email
+      }.to change(EmailResetPasswordWorker.jobs, :size).by(1)
+      user.reload.password_reset_token.should_not be_nil
+    end
+    
+    it "doesn't send another one immediately" do 
+      user = FactoryGirl.create(:user)
+      user.send_password_reset_email
+      user.should_not_receive(:set_password_reset_token)
+      user.send_password_reset_email
+      expect {
+        user.send_password_reset_email
+      }.to change(EmailResetPasswordWorker.jobs, :size).by(0)
+    end
+  end
+
   # describe :current_subscription do 
   #   it "returns current subscription" do 
   #     user = FactoryGirl.create(:user)

@@ -48,7 +48,7 @@
           = form_tag bikes_path, method: :get, id: "head-search-bikes", class: 'bike-search-form' do
             - params[:query] = params[:query].gsub(/,?#,?/,'').gsub(/(\A,|,\z)/, '') if params[:query].present?
             = text_field_tag :query,                  |
-              params[:query],                         |
+              strip_tags(params[:query]),             |
               placeholder: "Search Bike Index",       |
               class: "search-text-field form-control"
             = button_tag(type: "submit", class: "searchit btn") do

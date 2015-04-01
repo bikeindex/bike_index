@@ -124,20 +124,28 @@ class User < ActiveRecord::Base
     false
   end
 
+  def reset_token_time
+    t = password_reset_token && password_reset_token.split('-')[0]
+    t = (t.present? && t.to_i > 1427848192) ? t.to_i : 1364777722
+    Time.at(t)
+  end
+
   def set_password_reset_token
-    self.password_reset_token = (Digest::MD5.hexdigest "#{SecureRandom.hex(10)}-#{DateTime.now.to_s}")
-    self.save
+    self.password_reset_token = "#{Time.now.to_i}-" + Digest::MD5.hexdigest("#{SecureRandom.hex(10)}-#{DateTime.now}")
+    save
   end
 
   def accept_vendor_terms_of_service
     self.vendor_terms_of_service = true
     self.when_vendor_terms_of_service = DateTime.now
-    self.save
+    save
   end
 
   def send_password_reset_email
-    self.set_password_reset_token
-    EmailResetPasswordWorker.perform_async(self.id)
+    unless reset_token_time > Time.now - 2.minutes
+      set_password_reset_token
+      EmailResetPasswordWorker.perform_async(id)
+    end
   end
 
   def confirm(token)
@@ -167,7 +175,7 @@ class User < ActiveRecord::Base
   end
 
   def role(organization)
-    m = Membership.where(user_id: self.id, organization_id: organization.id).first
+    m = Membership.where(user_id: id, organization_id: organization.id).first
     if m.present?
       return m.role
     end
@@ -175,13 +183,13 @@ class User < ActiveRecord::Base
 
   def is_member_of?(organization)
     if organization.present?
-      m = Membership.where(user_id: self.id, organization_id: organization.id)
+      m = Membership.where(user_id: id, organization_id: organization.id)
       m.present?
     end
   end
 
   def is_admin_of?(organization)
-    m = Membership.where(user_id: self.id, organization_id: organization.id).first
+    m = Membership.where(user_id: id, organization_id: organization.id).first
     m.present? && m.role == "admin"
   end
   

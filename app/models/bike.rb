@@ -76,7 +76,7 @@ class Bike < ActiveRecord::Base
     :marked_user_unhidden
 
   mount_uploader :pdf, PdfUploader
-  process_in_background :pdf
+  process_in_background :pdf, CarrierWaveProcessWorker
 
   belongs_to :manufacturer
   serialize(:cached_attributes, Array)

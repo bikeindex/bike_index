@@ -11,7 +11,7 @@ class RecoveryDisplay < ActiveRecord::Base
 
   validates_presence_of :quote, :date_recovered
   mount_uploader :image, CircularImageUploader
-  process_in_background :image
+  process_in_background :image, CarrierWaveProcessWorker
   belongs_to :stolen_record
 
   default_scope order("date_recovered desc")

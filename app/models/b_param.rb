@@ -13,7 +13,7 @@ class BParam < ActiveRecord::Base
   attr_accessor :api_v2
 
   mount_uploader :image, ImageUploader
-  store_in_background :image
+  store_in_background :image, CarrierWaveStoreWorker
 
   serialize :params
   serialize :bike_errors
