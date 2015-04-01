@@ -2,6 +2,7 @@ require File.expand_path('../boot', __FILE__)
 
 require 'csv'
 require 'rails/all'
+require 'rack/throttle'
 
 if defined?(Bundler)
   # If you precompile assets before deploying to production, use this line
@@ -51,6 +52,8 @@ module Bikeindex
 
     # Send error routes the route.rb
     config.exceptions_app = self.routes
+
+    config.middleware.use Rack::Throttle::Minute, :max => 200, :cache => Redis.new, :key_prefix => :throttle
 
     config.to_prepare do
       Doorkeeper::ApplicationsController.layout "doorkeeper"

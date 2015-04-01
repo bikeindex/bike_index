@@ -53,6 +53,8 @@ gem 'unicorn-worker-killer'
 gem 'doorkeeper',   '~> 2.0.1'
 gem 'wine_bouncer'
 
+gem 'rack-throttle'
+
 gem 'chartkick'
 gem 'groupdate'
 
