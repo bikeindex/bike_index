@@ -5,7 +5,7 @@ class Urlifyer
   
   def self.urlify(string)
     if string && string.length > 1
-      return string if string.match(/http.?:\/\//i).present?
+      return string if string.match(/\Ahttp.?:\/\//i).present?
       "http://#{string}" 
     end
   end

@@ -19,5 +19,10 @@ describe Urlifyer do
       website = Urlifyer.urlify('http://www.somafab.com')
       website.should eq('http://www.somafab.com')
     end
+
+    it "doesn't let you do sweet XSS because http is present in the string" do 
+      website = Urlifyer.urlify('javascript://alert("XSS Payload")//http://')
+      website.should match(/\Ahttp:\/\//)
+    end
   end
 end

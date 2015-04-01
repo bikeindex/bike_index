@@ -11,8 +11,6 @@ if defined?(Bundler)
   # Bundler.require(:default, :assets, Rails.env)
 end
 
-ENV['MIN_MAX_RATE'] ||= '1000'
-
 module Bikeindex
   class Application < Rails::Application
     require 'draper'
