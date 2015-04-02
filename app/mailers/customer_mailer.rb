@@ -9,6 +9,15 @@ class CustomerMailer < ActionMailer::Base
     @snippet_body = snippet.body if snippet.present?
   end
 
+  def welcome_email(user)
+    @user = user
+    mail(to: user.email, subject: "Welcome to the Bike Index!") do |format|
+      format.text
+      format.html { render layout: 'email'}
+    end
+  end
+
+
   def confirmation_email(user)
     @user = user
     mail(to: user.email, subject: "Welcome to the Bike Index!") do |format|
