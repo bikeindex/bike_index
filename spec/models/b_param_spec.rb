@@ -235,4 +235,36 @@ describe BParam do
     end
   end
 
+  describe :generate_username_confirmation_and_auth do 
+    it "generates the required tokens" do 
+      b_param = BParam.new
+      b_param.generate_id_token
+      b_param.id_token.length.should be > 10
+    end
+    it "haves before create callback" do 
+      BParam._create_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:generate_id_token).should == true      
+    end
+  end
+
+  describe :from_id_token do 
+    it "gets from a token" do 
+      b_param = FactoryGirl.create(:b_param)
+      BParam.from_id_token(b_param.id_token).should eq(b_param)
+    end
+
+    it "doesn't get an old token" do 
+      b_param = FactoryGirl.create(:b_param)
+      b_param.update_attribute :created_at, Time.now - 2.days
+      b_param.reload
+      BParam.from_id_token(b_param.id_token).should be_nil
+    end
+
+    it "gets with time passed in" do 
+      b_param = FactoryGirl.create(:b_param)
+      b_param.update_attribute :created_at, Time.now - 2.days
+      b_param.reload
+      BParam.from_id_token(b_param.id_token, "1969-12-31 18:00:00").should eq(b_param)
+    end
+  end
+
 end

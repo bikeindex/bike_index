@@ -1,7 +1,7 @@
 #stolen_fields_store
 #root_url.hidden{data: { url: ENV['BASE_URL'] }}
 = form_for @bike, multipart: true do |f|
-  = f.hidden_field :b_param_id
+  = f.hidden_field :b_param_id_token
   = f.hidden_field :creation_organization_id
   = f.hidden_field :embeded, value: true
   .input-group

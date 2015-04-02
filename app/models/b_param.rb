@@ -23,6 +23,8 @@ class BParam < ActiveRecord::Base
   belongs_to :bike_token
   validates_presence_of :creator
 
+  before_create :generate_id_token
+
   def bike
     params[:bike]
   end
@@ -155,5 +157,25 @@ class BParam < ActiveRecord::Base
       end
     end
   end
+
+  def self.from_id_token(toke, after=nil)
+    return nil unless toke.present?
+    after ||= Time.now - 1.days
+    where("created_at >= ?", after).where(id_token: toke).first
+  end
+
+  def generate_id_token
+    self.id_token = generate_unique_token
+  end
+
+  protected
+
+  def generate_unique_token
+    begin
+      toke = SecureRandom.urlsafe_base64
+    end while BParam.where(id_token: toke).exists?
+    toke
+  end
+
 
 end

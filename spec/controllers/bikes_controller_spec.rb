@@ -139,7 +139,7 @@ describe BikesController do
         manufacturer = FactoryGirl.create(:manufacturer)
         set_current_user(@user)
         @bike = { serial_number: "1234567890",
-          b_param_id: @b_param.id,
+          b_param_id_token: @b_param.id_token,
           cycle_type_id: FactoryGirl.create(:cycle_type).id,
           manufacturer_id: manufacturer.id,
           rear_tire_narrow: "true",
@@ -166,17 +166,11 @@ describe BikesController do
         @b_param.reload.bike_errors.should_not be_nil
         response.should render_template("new")
       end
-
-      xit "redirects to charges if payment is required" do
-        # DISABLE FOR NOW, we're not accepting any payments.
-        post :create, { bike: @bike }
-        response.should redirect_to(new_charges_url(b_param_id: @b_param.id))
-      end
       
       it "redirects to the created bike if it exists" do
         bike = FactoryGirl.create(:bike)
         @b_param.update_attributes(created_bike_id: bike.id)
-        post :create, {bike: {b_param_id: @b_param.id}}
+        post :create, {bike: {b_param_id_token: @b_param.id_token}}
         response.should redirect_to(edit_bike_url(bike))
       end
 
@@ -222,7 +216,7 @@ describe BikesController do
         manufacturer = FactoryGirl.create(:manufacturer)
         b_param = BParam.create(creator_id: organization.auto_user.id, params: {creation_organization_id: organization.id, embeded: true})
         bike = { serial_number: "69",
-          b_param_id: b_param.id,
+          b_param_id_token: b_param.id_token,
           creation_organization_id: organization.id,
           embeded: true,
           cycle_type_id: FactoryGirl.create(:cycle_type).id,
@@ -252,7 +246,7 @@ describe BikesController do
           test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg')))
           ImageAssociatorWorker.any_instance.should_receive(:perform).and_return(true)
           bike = { serial_number: "69",
-            b_param_id: b_param.id,
+            b_param_id_token: b_param.id_token,
             creation_organization_id: organization.id,
             embeded: true,
             embeded_extended: true,

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150325145515) do
+ActiveRecord::Schema.define(:version => 20150402051334) do
 
   create_table "ads", :force => true do |t|
     t.string   "title"
@@ -36,6 +36,7 @@ ActiveRecord::Schema.define(:version => 20150325145515) do
     t.string   "image"
     t.string   "image_tmp"
     t.boolean  "image_processed", :default => true
+    t.text     "id_token"
   end
 
   create_table "bike_token_invitations", :force => true do |t|

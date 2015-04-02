@@ -27,6 +27,7 @@ class BikeCreatorBuilder
   def new_bike
     bike = Bike.new(@b_param.bike)
     bike.b_param_id = @b_param.id
+    bike.b_param_id_token = @b_param.id_token
     bike.creator_id = @b_param.creator_id 
     bike.updator_id = bike.creator_id
     bike

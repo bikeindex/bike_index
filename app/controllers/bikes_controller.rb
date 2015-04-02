@@ -112,7 +112,7 @@ class BikesController < ApplicationController
 
   def create
     if params[:bike][:embeded]
-      @b_param = BParam.find(params[:bike][:b_param_id])
+      @b_param = BParam.from_id_token(params[:bike][:b_param_id_token])
       @bike = Bike.new
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@bike)
@@ -130,9 +130,9 @@ class BikesController < ApplicationController
         @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
         flash[:error] = @b_param.bike_errors.to_sentence
         if params[:bike][:embeded_extended]
-          redirect_to embed_extended_organization_url(id: @bike.creation_organization.slug, b_param_id: @b_param.id) and return  
+          redirect_to embed_extended_organization_url(id: @bike.creation_organization.slug, b_param_id_token: @b_param.id_token) and return  
         else
-          redirect_to embed_organization_url(id: @bike.creation_organization.slug, b_param_id: @b_param.id) and return  
+          redirect_to embed_organization_url(id: @bike.creation_organization.slug, b_param_id_token: @b_param.id_token) and return  
         end
       else
         if params[:bike][:embeded_extended]
@@ -143,10 +143,8 @@ class BikesController < ApplicationController
         end
       end
     else
-      users_b_params = BParam.where(creator_id: current_user.id)
-      begin
-        @b_param = users_b_params.find(params[:bike][:b_param_id])
-      rescue
+      @b_param = BParam.from_id_token(params[:bike][:b_param_id_token], "2014-12-31 18:00:00")
+      unless @b_param && @b_param.creator_id == current_user.id
         @bike = Bike.new
         flash[:error] = "Oops, that isn't your bike"
         redirect_to action: :new, layout: 'no_header' and return
@@ -160,11 +158,7 @@ class BikesController < ApplicationController
         @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
         render action: :new, layout: 'no_header' and return
       end
-      if @bike.payment_required
-        redirect_to new_charges_url(b_param_id: @b_param.id) and return
-      else
-        redirect_to edit_bike_url(@bike), notice: "Bike successfully added to the index!"      
-      end
+      redirect_to edit_bike_url(@bike), notice: "Bike successfully added to the index!"
     end
   end
 

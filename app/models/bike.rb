@@ -73,7 +73,8 @@ class Bike < ActiveRecord::Base
     :listing_order,
     :approved_stolen, 
     :marked_user_hidden,
-    :marked_user_unhidden
+    :marked_user_unhidden,
+    :b_param_id_token
 
   mount_uploader :pdf, PdfUploader
   process_in_background :pdf, CarrierWaveProcessWorker
@@ -128,7 +129,7 @@ class Bike < ActiveRecord::Base
   attr_accessor :other_listing_urls, :date_stolen_input, :receive_notifications,
     :phone, :image, :bike_token_id, :b_param_id, :payment_required, :embeded,
     :embeded_extended, :paint_name, :bike_image_cache, :send_email,
-    :marked_user_hidden, :marked_user_unhidden
+    :marked_user_hidden, :marked_user_unhidden, :b_param_id_token
 
   default_scope where(example: false).where(hidden: false).order("listing_order desc")
   scope :stolen, where(stolen: true)

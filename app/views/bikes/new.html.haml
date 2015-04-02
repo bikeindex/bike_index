@@ -14,7 +14,7 @@
   #chosen-container.new-bike-container{ class: "#{"stolen-add" if @bike.stolen}" }
     = form_for @bike, html: { class: "receptacle form-horizontal" }, multipart: true do |f|
       = f.hidden_field :cycle_type_id
-      = f.hidden_field :b_param_id
+      = f.hidden_field :b_param_id_token
       - if @bike.location_id.present?
         = f.hidden_field :location_id, value: @location.id
       - if @bike.creation_organization_id.present?
