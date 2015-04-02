@@ -273,9 +273,9 @@ class User < ActiveRecord::Base
     self.phone = Phonifyer.phonify(self.phone) if self.phone 
   end
 
-  before_save :slug_username
+  before_validation :slug_username
   def slug_username
-    self.username = Slugifyer.slugify(self.username) if self.username
+    self.username = Slugifyer.slugify(username) if username
   end
 
   def generate_auth_token

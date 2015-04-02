@@ -293,20 +293,23 @@ describe User do
     end
   end
 
-  # describe :current_subscription do 
-  #   it "returns current subscription" do 
-  #     user = FactoryGirl.create(:user)
-  #     subscription = Subscription.create(stripe_plan_id: '69', user_id: user.id)
-  #     user.current_subscription.should eq(subscription)
-  #     subscription.mark_closed(Time.now)
-  #     subscription.save
-  #     user.reload.current_subscription.should be_nil
-  #   end
-  #   it "returns nil if no subscription" do 
-  #     user = User.new
-  #     user.current_subscription.should be_nil
-  #   end
-  # end
+  describe :slug_username do 
+    it "doesn't let you overwrite usernames" do 
+      target = "coolname"
+      user1 = FactoryGirl.create(:user)
+      user1.update_attribute :username, target
+      user1.reload.username.should eq(target)
+      user2 = FactoryGirl.create(:user)
+      user2.username = "#{target}'"
+      user2.save.should be_false
+      user2.errors.full_messages.to_s.should match('Username has already been taken')
+      user2.reload.username.should_not eq(target)
+      user1.reload.username.should eq(target)
+    end
+    it "haves before validation callback" do 
+      User._validation_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:slug_username).should == true      
+    end
+  end
 
   describe :subscriptions do 
     it "returns the payment if payment is subscription" do 
