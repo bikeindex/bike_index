@@ -1,6 +1,6 @@
 class Bike < ActiveRecord::Base
   include ActiveModel::Dirty
-  # include ActionView::Helpers::SanitizeHelper
+  include ActionView::Helpers::SanitizeHelper
   attr_accessible :verified,
     :payment_required,
     :paid_for,
@@ -209,14 +209,11 @@ class Bike < ActiveRecord::Base
   end
 
   def title_string
-    t = ""
-    t += "#{self.year} " if self.year.present?
-    t += "#{manufacturer_name} "
-    t += "#{self.frame_model} " if self.frame_model.present?
+    t = [year, manufacturer_name, frame_model].join(' ').gsub(/\s+/,' ')
     if self.type != "bike"
       t += "#{self.type}" 
     end
-    t
+    strip_tags(t)
   end
 
   def manufacturer_name
