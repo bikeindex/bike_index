@@ -24,4 +24,14 @@ describe PublicImage do
     end
   end
 
+  describe 'lottapixel' do 
+    it "doesn't break" do 
+      lottapixel = File.open(File.join(Rails.root, 'spec', 'fixtures', 'lottapixel.jpg'))
+      public_image = FactoryGirl.build(:public_image, image: lottapixel)
+      public_image.save
+      public_image.id.should be_nil
+      public_image.errors.full_messages.to_s.match('dimensions too large').should be_true
+    end
+  end
+
 end

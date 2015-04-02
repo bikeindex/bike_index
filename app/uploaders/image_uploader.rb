@@ -39,6 +39,7 @@ class ImageUploader < CarrierWave::Uploader::Base
     %w(jpg jpeg gif png tiff tif)
   end
 
+  process :validate_dimensions
   process :fix_exif_rotation
   process :strip
 
