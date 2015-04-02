@@ -23,7 +23,7 @@ class PublicImage < ActiveRecord::Base
   before_create :default_name
   def default_name
     if imageable_type == "Bike"
-      self.name = BikeDecorator.new(imageable).title_string
+      self.name = imageable.title_string
       self.name += " #{imageable.frame_colors.to_sentence}"
     else
       self.name ||= File.basename(image.filename, '.*').titleize if image

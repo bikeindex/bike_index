@@ -209,11 +209,9 @@ class Bike < ActiveRecord::Base
   end
 
   def title_string
-    t = [year, manufacturer_name, frame_model].join(' ').gsub(/\s+/,' ')
-    if self.type != "bike"
-      t += "#{self.type}" 
-    end
-    strip_tags(t)
+    t = [year, manufacturer_name, frame_model].join(' ')
+    t += " #{type}" if type != "bike"
+    strip_tags(t.gsub(/\s+/,' ')).strip
   end
 
   def manufacturer_name

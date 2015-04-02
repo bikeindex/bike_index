@@ -20,7 +20,7 @@ describe PublicImage do
       public_image.stub(:imageable_type).and_return("Bike")
       public_image.stub(:imageable).and_return(bike)
       public_image.default_name
-      public_image.name.should eq("1969 #{bike.manufacturer.name} Hobo #{bike.type} #{bike.frame_colors.to_sentence}")
+      public_image.name.should eq("#{bike.title_string} #{bike.frame_colors.to_sentence}")
     end
   end
 

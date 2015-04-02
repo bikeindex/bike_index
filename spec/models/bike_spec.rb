@@ -525,7 +525,16 @@ describe Bike do
       bike.update_attribute :listing_order, bike.get_listing_order
       bike.listing_order.should be > (Time.now - 1.year).to_time.to_i
     end
+  end
 
+  describe :title_string do 
+    it "escapes correctly" do
+      bike = Bike.new(frame_model: "</title><svg/onload=alert(document.cookie)>")
+      bike.stub(:manufacturer_name).and_return('baller')
+      bike.stub(:type).and_return('bike')
+      bike.title_string.should_not match('</title><svg/onload=alert(document.cookie)>')
+      bike.title_string.length.should be > 5
+    end
   end
   
 end
