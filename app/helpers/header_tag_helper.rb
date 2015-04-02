@@ -99,7 +99,7 @@ protected
     hash = current_page_auto_hash
     if action_name == 'user_home' 
       hash[:title_tag][:title] = "Your bikes"
-      hash[:title_tag][:title] = current_user.name if current_user.name.present?
+      hash[:title_tag][:title] = strip_tags(current_user.name) if current_user.name.present?
     end
     if action_name == 'choose_registration'
       hash[:title_tag][:title] = t "meta_title.bikes_new"

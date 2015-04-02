@@ -248,6 +248,7 @@ class User < ActiveRecord::Base
 
   before_save :set_urls
   def set_urls
+    self.title = strip_tags(title) if title.present?
     if website
       self.website = Urlifyer.urlify(self.website)
     end
