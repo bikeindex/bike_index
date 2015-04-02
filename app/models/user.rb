@@ -130,8 +130,8 @@ class User < ActiveRecord::Base
     Time.at(t)
   end
 
-  def set_password_reset_token
-    self.password_reset_token = "#{Time.now.to_i}-" + Digest::MD5.hexdigest("#{SecureRandom.hex(10)}-#{DateTime.now}")
+  def set_password_reset_token(t=Time.now.to_i)
+    self.password_reset_token = "#{t}-" + Digest::MD5.hexdigest("#{SecureRandom.hex(10)}-#{DateTime.now}")
     save
   end
 

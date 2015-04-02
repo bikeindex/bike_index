@@ -91,11 +91,19 @@ class UsersController < ApplicationController
 
   def update
     @user = current_user
-    @user.generate_auth_token if is_pass_update = params[:user][:password].present?
-    params[:user].delete :email
-    if is_pass_update  && !@user.authenticate(params[:user][:current_password])
-      @user.errors.add(:base, "Current password doesn't match, it's required for updating your password")
-    elsif @user.update_attributes(params[:user])
+    if params[:user][:password_reset_token].present?
+      if @user.password_reset_token != params[:user][:password_reset_token]
+        @user.errors.add(:base, "Doesn't match user's password reset token")
+      elsif @user.reset_token_time < (Time.now - 10.minutes)
+        @user.errors.add(:base, "Password reset token expired, try resetting password again")
+      end
+    elsif params[:user][:password].present?
+      unless @user.authenticate(params[:user][:current_password])
+        @user.errors.add(:base, "Current password doesn't match, it's required for updating your password")
+      end
+    end
+    if !@user.errors.any? && @user.
+      update_attributes(params[:user].except(:email, :password_reset_token))
       if params[:user][:terms_of_service].present?
         if params[:user][:terms_of_service] == '1'
           @user.terms_of_service = true
@@ -118,13 +126,14 @@ class UsersController < ApplicationController
         else
           redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index as through the organization" and return
         end
-      else
-        if is_pass_update
-          @user.set_password_reset_token
-          default_session_set
-        end
-        redirect_to my_account_url, notice: 'Your information was successfully updated.' and return
       end
+      if params[:user][:password].present?
+        @user.generate_auth_token
+        @user.set_password_reset_token
+        @user.reload
+        default_session_set
+      end
+      redirect_to my_account_url, notice: 'Your information was successfully updated.' and return
     end
     render action: :edit
   end

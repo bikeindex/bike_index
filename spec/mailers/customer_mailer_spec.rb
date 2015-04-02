@@ -11,17 +11,6 @@ describe CustomerMailer do
     end
   end
 
-  describe :welcome_email do
-    before :each do
-      @user = FactoryGirl.create(:user)
-      @mail = CustomerMailer.welcome_email(@user)
-    end
-
-    it "renders email" do
-      @mail.subject.should eq("Welcome to the Bike Index!")
-    end
-  end
-
   describe :confirmation_email do
     before :each do
       @user = FactoryGirl.create(:user)

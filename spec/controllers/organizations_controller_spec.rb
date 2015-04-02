@@ -191,7 +191,6 @@ describe OrganizationsController do
       get :embed_extended, id: organization.slug
       response.code.should eq("200")
       response.should render_template(:embed)
-      pp response.headers
       response.headers['X-Frame-Options'].should_not be_present
     end
   end

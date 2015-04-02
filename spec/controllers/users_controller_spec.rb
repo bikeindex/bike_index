@@ -176,11 +176,84 @@ describe UsersController do
   end
 
   describe :update do 
+    it "doesn't update user if current password not present" do 
+      user = FactoryGirl.create(:user, terms_of_service: false, password: 'old_pass', password_confirmation: 'old_pass')
+      set_current_user(user) 
+      post :update, { id: user.username, user: {
+        password: "new_pass",
+        password_confirmation: 'new_pass'}
+      }
+      user.reload.authenticate("new_pass").should be_false
+    end
+
     it "doesn't update user if password doesn't match" do 
       user = FactoryGirl.create(:user, terms_of_service: false, password: 'old_pass', password_confirmation: 'old_pass')
       set_current_user(user) 
-      post :update, { id: user.username, user: {password: "new_pass", password_confirmation: 'new_pass'} }
+      post :update, { id: user.username, user: {
+        current_password: 'old_pass',
+        password: "new_pass",
+        password_confirmation: 'new_passd'}
+      }
       user.reload.authenticate("new_pass").should be_false
+    end
+
+    it "Updates user if there is a reset_pass token" do 
+      user = FactoryGirl.create(:user)
+      user.set_password_reset_token
+      user.reload
+      auth = user.auth_token
+      email = user.email
+      set_current_user(user)
+      post :update, { id: user.username, user: {
+        email: 'cool_new_email@something.com',
+        password_reset_token: user.password_reset_token,
+        password: "new_pass",
+        password_confirmation: 'new_pass'} 
+      }
+      user.reload.authenticate("new_pass").should be_true
+      user.email.should eq(email)
+      user.password_reset_token.should_not eq('stuff')
+      user.auth_token.should_not eq(auth)
+      cookies.signed[:auth][1].should eq(user.auth_token)
+      response.should redirect_to(my_account_url)
+    end
+
+    it "Doesn't updates user if reset_pass token doesn't match" do 
+      user = FactoryGirl.create(:user)
+      user.set_password_reset_token
+      user.reload
+      reset = user.password_reset_token
+      auth = user.auth_token
+      email = user.email
+      set_current_user(user)
+      post :update, { id: user.username, user: {
+        password_reset_token: 'something_else',
+        password: "new_pass",
+        password_confirmation: 'new_pass'} 
+      }
+      user.reload.authenticate("new_pass").should be_false
+      user.password_reset_token.should eq(reset)
+    end
+
+    it "Doesn't update user if reset_pass token is more than 10 mins old" do 
+      user = FactoryGirl.create(:user)
+      user.set_password_reset_token
+      user.reload
+      auth = user.auth_token
+      email = user.email
+      set_current_user(user)
+      post :update, { id: user.username, user: {
+        email: 'cool_new_email@something.com',
+        password_reset_token: user.password_reset_token,
+        password: "new_pass",
+        password_confirmation: 'new_pass'} 
+      }
+      user.reload.authenticate("new_pass").should be_true
+      user.auth_token.should_not eq(auth)
+      user.email.should eq(email)
+      user.password_reset_token.should_not eq('stuff')
+      cookies.signed[:auth][1].should eq(user.auth_token)
+      response.should redirect_to(my_account_url)
     end
 
     it "resets users auth if password changed, updates current session" do 
