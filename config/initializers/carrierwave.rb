@@ -3,8 +3,11 @@ module CarrierWave
     # check for images that are too large
     def validate_dimensions
       manipulate! do |img|
-        raise CarrierWave::ProcessingError, "dimensions too large" if img.dimensions.any?{|i| i > 8000 }
-      end      
+        if img.dimensions.any?{|i| i > 8000 }
+          raise CarrierWave::ProcessingError, "dimensions too large" 
+        end
+        img
+      end
     end
     # Rotates the image based on the EXIF Orientation
     def fix_exif_rotation
