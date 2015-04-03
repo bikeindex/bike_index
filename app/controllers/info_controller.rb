@@ -61,6 +61,10 @@ class InfoController < ApplicationController
     redirect_to support_the_index_url
   end
 
+  def how_not_to_buy_stolen
+    redirect_to 'https://s3.amazonaws.com/bikeindex/stored/BikeIndex_How_To_Not_Buy_Stolen.pdf'
+  end
+
 protected
 
   def set_active_section
