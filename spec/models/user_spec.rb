@@ -270,6 +270,11 @@ describe User do
       user.set_password_reset_token
       user.reset_token_time.should be > Time.now - 2.seconds
     end
+    it "uses input time" do 
+      user = FactoryGirl.create(:user)
+      user.set_password_reset_token((Time.now - 61.minutes).to_i)
+      user.reload.reset_token_time.should be < (Time.now - 1.hours)
+    end
   end
 
   describe :send_password_reset_email do 

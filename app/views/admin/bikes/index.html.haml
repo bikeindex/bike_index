@@ -29,7 +29,10 @@
     = paginate @bikes
   %section.full-screen-table
     %table.table.table-striped.table-bordered
-      = render partial: "/admin/bikes/admin_bikes_table"
+      - if params[:multi_delete]
+        = render partial: "/admin/bikes/admin_bikes_table_multidelete"
+      - else
+        = render partial: "/admin/bikes/admin_bikes_table"
   .paginate-container
     = paginate @bikes
 - else

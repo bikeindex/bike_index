@@ -39,6 +39,8 @@ class AvatarUploader < CarrierWave::Uploader::Base
     "uploads/#{model.class.to_s[0, 2]}"
   end
 
+  process :validate_dimensions
+
   def extension_white_list
     %w(jpg jpeg gif png)
   end

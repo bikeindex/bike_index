@@ -107,6 +107,13 @@ describe UsersController do
       end
     end
 
+    it "renders get request" do
+      user = FactoryGirl.create(:user, email: "ned@foo.com")
+      user.set_password_reset_token
+      get :password_reset, token: user.password_reset_token
+      response.code.should eq('200')
+    end
+
     it "does not log in if the token is present and valid" do
       post :password_reset, token: "Not Actually a token"
       response.should render_template :request_password_reset
@@ -199,7 +206,7 @@ describe UsersController do
 
     it "Updates user if there is a reset_pass token" do 
       user = FactoryGirl.create(:user)
-      user.set_password_reset_token
+      user.set_password_reset_token((Time.now - 30.minutes).to_i)
       user.reload
       auth = user.auth_token
       email = user.email
@@ -235,25 +242,21 @@ describe UsersController do
       user.password_reset_token.should eq(reset)
     end
 
-    it "Doesn't update user if reset_pass token is more than 10 mins old" do 
+    it "Doesn't update user if reset_pass token is more than an hour old" do 
       user = FactoryGirl.create(:user)
-      user.set_password_reset_token
-      user.reload
+      user.set_password_reset_token((Time.now - 61.minutes).to_i)
       auth = user.auth_token
       email = user.email
       set_current_user(user)
       post :update, { id: user.username, user: {
-        email: 'cool_new_email@something.com',
         password_reset_token: user.password_reset_token,
         password: "new_pass",
         password_confirmation: 'new_pass'} 
       }
-      user.reload.authenticate("new_pass").should be_true
-      user.auth_token.should_not eq(auth)
-      user.email.should eq(email)
+      user.reload.authenticate("new_pass").should_not be_true
+      user.auth_token.should eq(auth)
       user.password_reset_token.should_not eq('stuff')
       cookies.signed[:auth][1].should eq(user.auth_token)
-      response.should redirect_to(my_account_url)
     end
 
     it "resets users auth if password changed, updates current session" do 

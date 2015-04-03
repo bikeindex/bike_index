@@ -27,6 +27,8 @@ en:
     organization_invitations_new: "New invitation"
     payments_new: "Support the Index!"
     payments_create: "Thanks for your support!"
+    sessions_new: "Log in"
+    sessions_create: "Log in"
   meta_descriptions:
     welcome_index: "Bicycle registration: online, powerful, free."
     info_about: "Why we made the Bike Index and who we are"
@@ -46,6 +48,8 @@ en:
     blogs_index: "Read Bike Index news. Also, periodically, learn magic spells."
     users_new: "Sign up for the Bike Index"
     documentation_api_v1: "API Version 1 documentation, and love"
+    sessions_new: "Log in to the Bike Index"
+    sessions_create: "Log in to the Bike Index"
   doorkeeper:
     scopes:
       public: "Authenticate with you, view public information"

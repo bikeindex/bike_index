@@ -2,14 +2,16 @@
 %thead
   %th
     Date indexed
+  %th.not-tiny-screens
+    Organization
   %th.medium-screens
     Sent to
-  %th
-    Manufacturer
   %th.large-screens
     Info
-  %th.not-tiny-screens
-    Created by
+  %th
+    Remove
+  
+
 
 %tbody
   - bikes.each do |bike|
@@ -30,32 +32,6 @@
             Yesterday at #{bike.created_at.strftime("%-I %p")}
           - else
             = bike.created_at.strftime("%-m.%-d.%Y")
-      %td.medium-screens
-        - if bike.created_with_token
-          %span.less-strong
-            Free bike token
-        - else
-          = bike.owner_email
-      %td
-        - if bike.manufacturer_other.present?
-          %span.table-error
-            %span.hidden
-              0 1
-            = bike.manufacturer_other
-        - else
-          = bike.manufacturer_name
-      %td.large-screens
-        .less-strong-hold
-          = [bike.year, bike.frame_model].join(' ')
-          = "(#{bike.type})" unless bike.type == 'bike'
-          - if bike.paint.present? && bike.paint.color_id.blank?
-            .large-screens.less-strong
-              = link_to bike.paint.name, edit_admin_paint_url(bike.paint)
-              = bike.frame_colors.to_sentence
-          - if bike.stolen
-            %span.less-strong-right
-              stolen
-
       %td.not-tiny-screens
         .less-strong-hold
           = bike.creation_organization.name if bike.creation_organization.present?
@@ -65,4 +41,28 @@
           - if bike.registered_new
             %span.less-strong-right
               pos
-        
+      %td.medium-screens
+        - if bike.created_with_token
+          %span.less-strong
+            Free bike token
+        - else
+          = bike.owner_email
+      %td.large-screens
+        .less-strong-hold
+          %strong
+            = bike.manufacturer_name
+          = [bike.year, bike.frame_model].join(' ')
+          = "(#{bike.type})" unless bike.type == 'bike'
+          - if bike.paint.present? && bike.paint.color_id.blank?
+            .large-screens.less-strong
+              = link_to bike.paint.name, edit_admin_paint_url(bike.paint)
+              = bike.frame_colors.to_sentence
+          %br
+          %small
+            = bike.description
+          - if bike.stolen
+            %span.less-strong-right
+              stolen
+
+        %td
+          = link_to "Delete", admin_bike_url(bike, multi_delete: @page), method: :delete

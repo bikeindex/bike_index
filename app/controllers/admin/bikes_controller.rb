@@ -11,9 +11,9 @@ class Admin::BikesController < Admin::BaseController
     else 
       bikes = bikes.order("created_at desc")
     end
-    page = params[:page] || 1
+    @page = params[:page] || 1
     per_page = params[:per_page] || 100
-    bikes = bikes.page(page).per(per_page)
+    bikes = bikes.page(@page).per(per_page)
     @bikes = bikes.decorate
   end
 
@@ -50,7 +50,8 @@ class Admin::BikesController < Admin::BaseController
   def destroy
     @bike.destroy
     flash[:notice] = "Bike deleted!"
-    redirect_to admin_bikes_url
+    opts = {page: params[:multi_delete], multi_delete: 1} if params[:multi_delete]
+    redirect_to admin_bikes_url(opts || {})
   end
 
   def show

@@ -127,13 +127,13 @@ class User < ActiveRecord::Base
 
   def reset_token_time
     t = password_reset_token && password_reset_token.split('-')[0]
-    t = (t.present? && t.to_i > 1427848192) ? t.to_i : 1364777722   
+    t = (t.present? && t.to_i > 1427848192) ? t.to_i : 1364777722
     Time.at(t)
   end
 
   def set_password_reset_token(t=Time.now.to_i)
     self.password_reset_token = "#{t}-" + Digest::MD5.hexdigest("#{SecureRandom.hex(10)}-#{DateTime.now}")
-    save
+    self.save
   end
 
   def accept_vendor_terms_of_service

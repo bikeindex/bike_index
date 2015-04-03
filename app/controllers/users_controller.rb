@@ -94,7 +94,7 @@ class UsersController < ApplicationController
     if params[:user][:password_reset_token].present?
       if @user.password_reset_token != params[:user][:password_reset_token]
         @user.errors.add(:base, "Doesn't match user's password reset token")
-      elsif @user.reset_token_time < (Time.now - 10.minutes)
+      elsif @user.reset_token_time < (Time.now - 1.hours)
         @user.errors.add(:base, "Password reset token expired, try resetting password again")
       end
     elsif params[:user][:password].present?
