@@ -2,6 +2,11 @@
   tbody { font-weight: 200; }
 }
 
+#admin-bikes-index {
+  td { word-break: break-all; }
+  .large-screens { max-width: 550px; }  
+}
+
 
 div.dataTables_length label {
   float: left;
@@ -16,7 +21,7 @@ div.dataTables_filter label {
   float: right;
 }
 
-div.dataTables_info {
+div.dataTables_info { 
   padding-top: 8px;
 }
 

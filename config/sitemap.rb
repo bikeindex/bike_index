@@ -29,7 +29,7 @@ SitemapGenerator::Sitemap.create do
   end
 
   group(filename: :stolen) do 
-    paths = %w[links faq tech identidots philosophy rfid_tags_for_the_win howworks about merging]
+    paths = %w[links faq tech philosophy rfid_tags_for_the_win howworks about merging]
     paths.each { |i| add "stolen/#{i}", priority: 0.9 }
   end
 

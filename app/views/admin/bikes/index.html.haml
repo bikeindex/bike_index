@@ -28,7 +28,7 @@
   .paginate-container
     = paginate @bikes
   %section.full-screen-table
-    %table.table.table-striped.table-bordered
+    %table.table.table-striped.table-bordered#admin-bikes-index
       - if params[:multi_delete]
         = render partial: "/admin/bikes/admin_bikes_table_multidelete"
       - else

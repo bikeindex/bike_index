@@ -2,7 +2,7 @@ class BikeNotSavedError < StandardError
 end
 
 class Admin::BikesController < Admin::BaseController
-  before_filter :find_bike, only: [:edit, :destroy, :update]
+  before_filter :find_bike, only: [:edit, :destroy, :update, :get_destroy]
 
   def index
     bikes = Bike.unscoped.includes(:creation_organization, :cycle_type, :manufacturer, :paint, :primary_frame_color, :secondary_frame_color, :tertiary_frame_color)
@@ -48,10 +48,11 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def destroy
-    @bike.destroy
-    flash[:notice] = "Bike deleted!"
-    opts = {page: params[:multi_delete], multi_delete: 1} if params[:multi_delete]
-    redirect_to admin_bikes_url(opts || {})
+    destroy_bike
+  end
+
+  def get_destroy
+    destroy_bike
   end
 
   def show
@@ -83,6 +84,17 @@ class Admin::BikesController < Admin::BaseController
   end
 
   protected
+
+  def destroy_bike
+    @bike.destroy
+    flash[:notice] = "Bike deleted!"
+    if params[:multi_delete]
+      redirect_to admin_root_url
+      # redirect_to admin_bikes_url(page: params[:multi_delete], multi_delete: 1)
+    else
+      redirect_to admin_bikes_url
+    end
+  end
 
   def find_bike
     @bike = Bike.unscoped.find(params[:id])

@@ -26,10 +26,6 @@ class StolenController < ApplicationController
     @title = ' - Technology for fighting bike theft'
   end
 
-  def identidots
-    @title = ' - Identidots'
-  end
-
   def rfid_tags_for_the_win
     @title = ' - Open Source Bike Recovery On The Cheap'
   end

@@ -96,6 +96,7 @@ Bikeindex::Application.routes.draw do
         get :missing_manufacturer
         post :update_manufacturers
       end
+      member { get :get_destroy }
     end
     match 'invitations', to: 'dashboard#invitations'
     match 'maintenance', to: 'dashboard#maintenance'
@@ -179,7 +180,7 @@ Bikeindex::Application.routes.draw do
   resources :stolen, only: [:index] do 
     collection do 
       get 'current_tsv'
-      %w[links faq tech identidots philosophy rfid_tags_for_the_win howworks about merging].each do |page|
+      %w[links faq tech philosophy rfid_tags_for_the_win howworks about merging].each do |page|
         get page
       end
     end

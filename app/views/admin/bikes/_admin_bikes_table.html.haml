@@ -49,7 +49,7 @@
           = [bike.year, bike.frame_model].join(' ')
           = "(#{bike.type})" unless bike.type == 'bike'
           - if bike.paint.present? && bike.paint.color_id.blank?
-            .large-screens.less-strong
+            .less-strong
               = link_to bike.paint.name, edit_admin_paint_url(bike.paint)
               = bike.frame_colors.to_sentence
           - if bike.stolen
