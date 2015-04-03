@@ -139,8 +139,6 @@ class BikeSearcher
     # @bikes
   end
 
-
-
   def find_bikes
     @bikes = matching_serial 
     matching_stolenness(@bikes)

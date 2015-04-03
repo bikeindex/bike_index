@@ -65,4 +65,4 @@
               stolen
 
         %td
-          = link_to "Delete", admin_bike_url(bike, multi_delete: @page), method: :delete
+          = link_to "Delete", get_destroy_admin_bike_url(bike, multi_delete: @page)

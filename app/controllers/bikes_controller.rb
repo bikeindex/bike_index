@@ -20,6 +20,7 @@ class BikesController < ApplicationController
   layout 'no_container'
 
   def index
+    params[:stolen] = true unless params[:stolen].present? || params[:non_stolen].present?
     if params[:proximity].present? && params[:proximity].strip.downcase == 'ip'
       params[:proximity] = request.env["HTTP_X_FORWARDED_FOR"].split(',')[0]
       # Geocoder.search(request.env["HTTP_X_FORWARDED_FOR"].split(',')[0])
@@ -37,10 +38,7 @@ class BikesController < ApplicationController
       @secondary_bikes = secondary_bikes.decorate if secondary_bikes.present?
     end
     @bikes = bikes.decorate
-    @attribute_select_values = search.parsed_attributes
     @query = params[:query]
-    @stolenness = { stolen: params[:stolen] }
-    @non_proximity = params[:non_proximity]
     @query = request.query_parameters()
     @url = request.original_url
     render layout: 'application_updated'

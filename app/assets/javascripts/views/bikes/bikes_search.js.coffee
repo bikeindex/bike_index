@@ -20,7 +20,6 @@ class BikeIndex.Views.BikesSearch extends Backbone.View
       proximity = localStorage.getItem('location')
       proximity = "ip" unless proximity? and proximity.length > 0
       $('#proximity').val(proximity)
-    
     $('#search_distance').text($('#proximity_radius').val())
     $('#search_location').text(proximity)
 

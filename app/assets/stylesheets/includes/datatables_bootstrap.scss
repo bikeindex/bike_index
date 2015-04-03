@@ -3,8 +3,10 @@
 }
 
 #admin-bikes-index {
-  td { word-break: break-all; }
-  .large-screens { max-width: 550px; }  
+  .large-screens { 
+    max-width: 550px;
+    word-break: break-all;
+  }  
 }
 
 

@@ -1,11 +1,7 @@
 #bikes-search
   %span#query_searched
     = @query
-  %span#attribute_values_searched
-    = @attribute_select_values
-  %span#proximity_searched{data: { proximity: @proximity }}
 
-  %span#stolenness_query{data: {stolen: @stolenness[:stolen]} }
 
 - if params[:stolen].present? && params[:stolen].to_s != 'false'
   - if params[:non_proximity].present? && params[:non_proximity].to_s != 'false'
@@ -53,14 +49,19 @@
       
 
 - else
-
   .container
     %h1.no-results
-      We're sorry,
+      - if active == 'proximity'
+        - desc = "nearby stolen bikes"
+      - elsif active == 'non_stolen'
+        - desc = 'non-stolen bikes'
+      - elsif active == 'stolen'
+        - desc = 'bikes stolen anywhere'
+      No #{desc}
       - if @secondary_bikes.present?
-        no exact matches for that serial
+        exactly match that serial
       - else
-        nothing matched your search
+        matched your search
 
 - if @secondary_bikes.present?  
   .container

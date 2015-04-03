@@ -17,7 +17,7 @@ class BikeIndex.Views.DataTables extends Backbone.View
         aaSorting: [ ]
         aLengthMenu: [[25, 50, 100, 200, -1], [25, 50, 100, 200, "All"]]
         iDisplayLength: '-1'
-        sDom: "<'hidden'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
+        sDom: "<'hidden'<'span6'l><'span6'f>r>t<'hidden'<'span6'i><'span6'p>>"
         sPaginationType: "bootstrap"
       
 
