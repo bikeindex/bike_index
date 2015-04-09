@@ -7,5 +7,6 @@
     .inner-recep
 
       = yield
-  
-= render 'shared/footer'
+
+- cache 'footer_old' do 
+  = render 'shared/footer'

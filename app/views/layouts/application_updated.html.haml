@@ -84,6 +84,7 @@
 
       = yield
       
-      = render 'shared/footer_updated'
+      - cache 'footer_updated' do
+        = render 'shared/footer_updated'
 
       

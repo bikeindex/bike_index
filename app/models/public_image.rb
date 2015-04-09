@@ -23,11 +23,15 @@ class PublicImage < ActiveRecord::Base
   before_create :default_name
   def default_name
     if imageable_type == "Bike"
-      self.name = imageable.title_string
-      self.name += " #{imageable.frame_colors.to_sentence}"
+      self.name = "#{imageable.title_string} #{imageable.frame_colors.to_sentence}"
     else
       self.name ||= File.basename(image.filename, '.*').titleize if image
     end
+  end
+
+  before_save :truncate_name 
+  def truncate_name
+    self.name = name.truncate(100)
   end
 
 end
