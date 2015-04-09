@@ -20,7 +20,6 @@ class PublicImage < ActiveRecord::Base
     self.listing_order = self.imageable.public_images.length
   end
 
-  before_create :default_name
   def default_name
     if imageable_type == "Bike"
       self.name = "#{imageable.title_string} #{imageable.frame_colors.to_sentence}"
@@ -31,7 +30,7 @@ class PublicImage < ActiveRecord::Base
 
   before_save :truncate_name 
   def truncate_name
-    self.name = name.truncate(100)
+    self.name = (name || default_name).truncate(100)
   end
 
 end

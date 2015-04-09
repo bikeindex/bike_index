@@ -1,42 +1,43 @@
-%footer.global-footer#page-foot
-  .receptacle
-    %ul.footer-links
-      %li
-        = link_to "Register a bike", choose_registration_url
-        %ul
-          %li
-            = link_to "Bike Index partner organizations", where_url
-          %li
-            = link_to "Bike Index resources", resources_url
-          
-      %li
-        = link_to "About the Bike Index", about_url  
-        %ul       
-          %li
-            = link_to "Bike Index news", news_index_url
-          %li
-            = link_to "List of manufacturers", manufacturers_url         
-         
-      %li.contact-nav-btns
-        = link_to "Help", help_url
-        %ul
-          %li
-            = link_to "Contact us", contact_us_url
-            = link_to "Sign up a shop or organization", vendor_signup_url
+- cache 'footer_old' do 
+  %footer.global-footer#page-foot
+    .receptacle
+      %ul.footer-links
+        %li
+          = link_to "Register a bike", choose_registration_url
+          %ul
+            %li
+              = link_to "Bike Index partner organizations", where_url
+            %li
+              = link_to "Bike Index resources", resources_url
             
-      %li.social
-        %ul
-          %li
-            = link_to image_tag("/assets/facebook.svg", alt: "Bike Index Facebook"), "https://facebook.com/bikeindex"
-          %li
-            = link_to image_tag("/assets/twitter.svg", alt: "Bike Index Twitter"), "https://twitter.com/BikeIndex"
+        %li
+          = link_to "About the Bike Index", about_url  
+          %ul       
+            %li
+              = link_to "Bike Index news", news_index_url
+            %li
+              = link_to "List of manufacturers", manufacturers_url         
+           
+        %li.contact-nav-btns
+          = link_to "Help", help_url
+          %ul
+            %li
+              = link_to "Contact us", contact_us_url
+              = link_to "Sign up a shop or organization", vendor_signup_url
+              
+        %li.social
+          %ul
+            %li
+              = link_to image_tag("/assets/facebook.svg", alt: "Bike Index Facebook"), "https://facebook.com/bikeindex"
+            %li
+              = link_to image_tag("/assets/twitter.svg", alt: "Bike Index Twitter"), "https://twitter.com/BikeIndex"
 
-    %p
-      %span{data: {license: "https://github.com/bikeindex/bike_index/blob/master/LICENSE"}}
-        2015 &copy; Bike Index.
-      - if current_user.present? && current_user.has_membership?
-        #{link_to "Privacy policy", privacy_url}, #{link_to "vendor terms", vendor_terms_url}
-      - else
-        #{link_to "Privacy policy", privacy_url}
-      and #{link_to "terms and conditions", terms_url}.
-      
+      %p
+        %span{data: {license: "https://github.com/bikeindex/bike_index/blob/master/LICENSE"}}
+          2015 &copy; Bike Index.
+        - if current_user.present? && current_user.has_membership?
+          #{link_to "Privacy policy", privacy_url}, #{link_to "vendor terms", vendor_terms_url}
+        - else
+          #{link_to "Privacy policy", privacy_url}
+        and #{link_to "terms and conditions", terms_url}.
+        

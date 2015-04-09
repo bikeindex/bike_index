@@ -128,7 +128,7 @@ describe Api::V1::BikesController do
       f_count.should eq(Feedback.count)
     end
 
-    it "creates a photos even inf one fails" do
+    it "creates a photos even if one fails" do
       manufacturer = FactoryGirl.create(:manufacturer)
       FactoryGirl.create(:wheel_size, iso_bsd: 559)
       FactoryGirl.create(:ctype, name: "wheel")

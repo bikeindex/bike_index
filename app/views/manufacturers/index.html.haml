@@ -1,41 +1,42 @@
-%h1
-  Manufacturers we know about
+- cache 'manufacturers_index' do 
+  %h1
+    Manufacturers we know about
 
-%section.full-screen-table
-  %table#manufacturers-list.table.table-striped.table-bordered
-    %thead
-      %th
-        Name
-      %th.large-screens
-        Frame maker
-      %th.med-width
-        Website
-    %tbody
-      - @manufacturers.each do |manufacturer|
-        %tr
-          %td
-            = manufacturer.name
-          %td.large-screens
-            = "&#x2713;".html_safe if manufacturer.frame_maker
-          %td.med-width
-            - if manufacturer.website
-              %a{href: manufacturer.website}
-                %span.large-screens
-                  = manufacturer.website.gsub(/https?:\/\/(www\.)?/,'').truncate(30)
-                %span.not-large-screens
-                  Website
+  %section.full-screen-table
+    %table#manufacturers-list.table.table-striped.table-bordered
+      %thead
+        %th
+          Name
+        %th.large-screens
+          Frame maker
+        %th.med-width
+          Website
+      %tbody
+        - @manufacturers.each do |manufacturer|
+          %tr
+            %td
+              = manufacturer.name
+            %td.large-screens
+              = "&#x2713;".html_safe if manufacturer.frame_maker
+            %td.med-width
+              - if manufacturer.website
+                %a{href: manufacturer.website}
+                  %span.large-screens
+                    = manufacturer.website.gsub(/https?:\/\/(www\.)?/,'').truncate(30)
+                  %span.not-large-screens
+                    Website
 
-%h2.padded
-  OH NO! We're missing a manufacturer?
-%p
-  That's not actually surprising, there are a bunch.
-%p
-  Give us a heads up in a comment below.
+  %h2.padded
+    OH NO! We're missing a manufacturer?
+  %p
+    That's not actually surprising, there are a bunch.
+  %p
+    Give us a heads up in a comment below.
 
-%article.padded
-  .alert.alert-info
-    %p
-      Even better, #{link_to "this list is stored on GitHub", "https://github.com/bikeindex/resources/blob/master/manufacturers.csv"}. It's downloadable in csv format and is open source. If you'd like to make a correction or an addition, you could be awesome and #{link_to "submit a pull request", "https://help.github.com/articles/using-pull-requests"}.
+  %article.padded
+    .alert.alert-info
+      %p
+        Even better, #{link_to "this list is stored on GitHub", "https://github.com/bikeindex/resources/blob/master/manufacturers.csv"}. It's downloadable in csv format and is open source. If you'd like to make a correction or an addition, you could be awesome and #{link_to "submit a pull request", "https://help.github.com/articles/using-pull-requests"}.
 
 %article.content-comments
   = render "/shared/disqus"
