@@ -57,7 +57,7 @@ module API
             Keep in mind that it only returns stolen bikes - so if you do a serial search, and nothing turns up that doesn't mean that the bike isn't registered.
             **Notes on location searching**: 
             - `proximity` accepts an ip address (IPv6 is supported), an address, zipcode, city, or latitude,longitude. e.g. `70.210.133.87`, `210 NW 11th Ave, Portland, OR`, `60647`, `Chicago, IL`, or `45.521728,-122.67326`
-            - `proximity_square` sets the length of the sides of the square to find matches inside of. The square is centered on the location specified by `proximity`. It defaults to 500.
+            - `proximity_square` sets the length of the sides of the square to find matches inside of. The square is centered on the location specified by `proximity`. It defaults to 100.
           NOTE
         }
         paginate
