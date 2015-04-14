@@ -10,7 +10,7 @@ The Bike Index uses OAuth2. The following or
 
 - **Ruby**: [omniauth-bike-index](https://github.com/bikeindex/omniauth-bike-index) gem
 
-- **Javascript**: We're [working on a Hello.js module](https://github.com/MrSwitch/hello.js/pull/190).
+- **Javascript**: [HelloJS](http://adodson.com/hello.js/modules.html#hellojs-already-has-you-connected) Bike Index Module
 
 
 <a class="ref" id="ref_oauth_flows">
