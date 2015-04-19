@@ -4,7 +4,7 @@ class OrganizationsController < ApplicationController
   before_filter :require_membership, only: [:show, :edit, :update, :destroy]
   before_filter :require_admin, only: [:edit, :update, :destroy]
   before_filter :set_bparam, only: [:embed, :embed_extended]
-  skip_before_filter :set_x_frame_options_header, only: [:embed, :embed_extended]
+  skip_before_filter :set_x_frame_options_header, only: [:embed, :embed_extended, :embed_create_success]
   layout "organization"
 
   def new

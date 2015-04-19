@@ -166,7 +166,7 @@ describe OrganizationsController do
   end
 
   describe :embed do 
-    it "renders embed" do 
+    it "renders embed without xframe block" do 
       organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:user)
       membership = FactoryGirl.create(:membership, user: user, organization: organization)
@@ -181,7 +181,7 @@ describe OrganizationsController do
   end
 
   describe :embed_extended do 
-    it "renders embed" do 
+    it "renders embed without xframe block" do 
       organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:user)
       membership = FactoryGirl.create(:membership, user: user, organization: organization)
@@ -191,6 +191,17 @@ describe OrganizationsController do
       get :embed_extended, id: organization.slug
       response.code.should eq("200")
       response.should render_template(:embed)
+      response.headers['X-Frame-Options'].should_not be_present
+    end
+  end
+
+  describe :embed do 
+    it "renders embed without xframe block" do 
+      organization = FactoryGirl.create(:organization)
+      bike = FactoryGirl.create(:bike)
+      get :embed_create_success, id: organization.slug, bike_id: bike.id
+      response.code.should eq("200")
+      response.should render_template(:embed_create_success)
       response.headers['X-Frame-Options'].should_not be_present
     end
   end

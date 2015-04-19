@@ -1,7 +1,10 @@
-%h1
-  #{@bike.type.titleize} registered successfully
-%h3
-  #{@organization.name} sent 
-  %em
-    #{@bike.owner_email}
-  = link_to "this #{@bike.type}.", bike_url(@bike), target: "_blank"
+
+.embed-success-block
+  = image_tag "/assets/resources/logo_striped.svg"
+  %h1
+    Your #{@bike.type} has been added to Bike Index!
+  %p
+    = link_to @bike.title, bike_url(@bike), target: "_blank"
+    was sent to you through #{@organization.name}.
+  %p
+    You will receive an email confirmation shortly.

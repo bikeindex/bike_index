@@ -437,3 +437,22 @@ a {
    margin-top: -10px;
  }
 }
+
+.embed-success-block {
+  padding: 20px;
+  h1, h3 {
+    font-weight: 200;
+    font-family: $sansFontFamily;
+  }
+  h1 { text-align: center; }
+  // h3 { text-align: right; }
+  p {
+    font-family: $sansFontFamily;
+    text-align: center;
+  }
+  img {
+    width: 35%;
+    display: block;
+    height: auto;
+  }
+}
