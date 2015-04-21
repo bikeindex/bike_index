@@ -523,6 +523,7 @@ DEPENDENCIES
   rails (= 3.2.21)
   rb-fsevent (~> 0.9.1)
   rb-readline (~> 0.5.0)
+  redis
   rerun
   rmagick
   rqrcode-rails3

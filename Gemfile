@@ -9,6 +9,7 @@ gem 'bcrypt-ruby', '~> 3.0.0'
 gem 'active_model_serializers'
 gem 'aws-sdk', '~> 1.3.4'
 
+gem 'redis'
 gem 'sidekiq'
 gem 'sidekiq-failures'
 gem 'sidekiq-unique-jobs'
