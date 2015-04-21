@@ -21,7 +21,7 @@ class ApplicationController < ActionController::Base
   end
 
   def set_return_to
-    session[:return_to] ||= params[:return_to] if params[:return_to].present?
+    session[:return_to] = params[:return_to] if params[:return_to].present?
   end
 
   def return_to_if_present

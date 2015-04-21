@@ -153,7 +153,7 @@ GEM
     em-websocket (0.5.1)
       eventmachine (>= 0.12.9)
       http_parser.rb (~> 0.6.0)
-    equalizer (0.0.9)
+    equalizer (0.0.11)
     erubis (2.7.0)
     eventmachine (1.0.3)
     excon (0.14.3)
@@ -182,7 +182,7 @@ GEM
       thor (>= 0.13.6)
     formatador (0.2.5)
     geocoder (1.2.5)
-    grape (0.10.1)
+    grape (0.11.0)
       activesupport
       builder
       hashie (>= 2.1.0)
@@ -222,7 +222,7 @@ GEM
       activesupport (>= 3.1, < 4.1)
       haml (~> 3.1)
       railties (>= 3.1, < 4.1)
-    hashie (3.4.0)
+    hashie (3.4.1)
     high_voltage (2.1.0)
     highline (1.6.21)
     hike (1.2.3)
@@ -429,7 +429,7 @@ GEM
       libv8 (~> 3.16.14.0)
       ref
     thor (0.19.1)
-    thread_safe (0.3.4)
+    thread_safe (0.3.5)
     tilt (1.4.1)
     timers (4.0.1)
       hitimes
@@ -450,7 +450,7 @@ GEM
     uuidtools (2.1.4)
     vegas (0.1.11)
       rack (>= 1.0.0)
-    virtus (1.0.4)
+    virtus (1.0.5)
       axiom-types (~> 0.1)
       coercible (~> 1.0)
       descendants_tracker (~> 0.0, >= 0.0.3)
@@ -460,9 +460,9 @@ GEM
       chronic (>= 0.6.3)
     wicked_pdf (0.10.2)
       rails
-    wine_bouncer (0.2.2)
-      doorkeeper (>= 1.4, <= 2.0.1)
-      grape (~> 0.8)
+    wine_bouncer (0.3.1)
+      doorkeeper (>= 1.4, < 2.2)
+      grape (~> 0.8, < 0.12)
     wkhtmltopdf-binary (0.9.9.1)
 
 PLATFORMS
