@@ -354,7 +354,7 @@ describe Bike do
     it "removes paint id if paint_name is nil" do 
       paint = FactoryGirl.create(:paint)
       bike = Bike.new(paint_id: paint.id)
-      bike.stub(:paint_name).and_return('')
+      bike.paint_name = ''
       bike.set_paints
       bike.paint.should be_nil
     end

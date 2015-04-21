@@ -8,9 +8,11 @@ describe ListingOrderWorker do
     expect(ListingOrderWorker).to have_enqueued_job
   end
 
-  it "enqueues version worker" do 
-    bike = FactoryGirl.create(:bike)
+  it "enqueues version worker, doesn't reset paint accidentally" do 
+    paint = FactoryGirl.create(:paint)
+    bike = FactoryGirl.create(:bike, paint_id: paint.id)
     ListingOrderWorker.new.perform(bike.id)
+    bike.reload.paint.should eq(paint)
     expect(SaveBikeVersionWorker).to have_enqueued_job(bike.id)
   end
 
