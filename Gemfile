@@ -50,8 +50,15 @@ gem 'sitemap_generator'
 gem 'whenever'
 gem 'unicorn'
 gem 'unicorn-worker-killer'
+
 gem 'doorkeeper',   '~> 2.0.1'
 gem 'wine_bouncer'
+gem 'grape'
+gem 'grape-active_model_serializers', git: "https://github.com/jrhe/grape-active_model_serializers"
+gem 'grape-swagger'
+gem 'swagger-ui_rails'
+gem 'api-pagination'
+
 
 gem 'rack-throttle'
 gem 'secure_headers'
@@ -60,14 +67,6 @@ gem 'chartkick'
 gem 'groupdate'
 
 # gem 'localeapp'
-
-gem 'grape'
-gem 'grape-active_model_serializers', git: "https://github.com/jrhe/grape-active_model_serializers"
-gem 'grape-swagger'
-gem 'swagger-ui_rails'
-# gem 'grape-doorkeeper'
-gem 'api-pagination'
-
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'
   gem 'coffee-rails', '~> 3.2.1'

@@ -86,6 +86,7 @@ class Admin::BikesController < Admin::BaseController
   protected
 
   def destroy_bike
+    AfterBikeSaveWorker.perform_async(@bike.id)
     @bike.destroy
     flash[:notice] = "Bike deleted!"
     if params[:multi_delete]

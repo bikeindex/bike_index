@@ -26,14 +26,16 @@ describe Admin::BikesController do
   end
 
   describe :destroy do 
-    before do 
+    it "destroys the bike" do 
       bike = FactoryGirl.create(:bike)
       user = FactoryGirl.create(:admin)
       set_current_user(user)
-      delete :destroy, id: bike.id 
+      delete :destroy, id: bike.id
+      response.should redirect_to(:admin_bikes)
+      flash[:notice].downcase.should match('deleted')
+      expect(AfterBikeSaveWorker).to have_enqueued_job(bike.id)
+      lambda{Bike.find(bike.id)}.should raise_error(ActiveRecord::RecordNotFound)
     end
-    it { should redirect_to(:admin_bikes) }
-    it { should set_the_flash }
   end
 
   describe :update do 

@@ -13,7 +13,7 @@ describe ListingOrderWorker do
     bike = FactoryGirl.create(:bike, paint_id: paint.id)
     ListingOrderWorker.new.perform(bike.id)
     bike.reload.paint.should eq(paint)
-    expect(SaveBikeVersionWorker).to have_enqueued_job(bike.id)
+    expect(AfterBikeSaveWorker).to have_enqueued_job(bike.id)
   end
 
 end

@@ -180,6 +180,19 @@ describe Bike do
     end
   end
 
+  describe :fake_deleted do 
+    it "is true if bike is hidden and ownership is user hidden" do 
+      bike = Bike.new(hidden: true)
+      ownership = Ownership.new(user_hidden: true)
+      bike.stub(:current_ownership).and_return(ownership)
+      bike.fake_deleted.should be_false
+    end
+    it "is false otherwise" do 
+      bike = Bike.new(hidden: true)
+      bike.fake_deleted.should be_true
+    end
+  end
+
   describe :set_user_hidden do 
     it "unmarks user hidden, saves ownership and marks self unhidden" do 
       ownership = FactoryGirl.create(:ownership, user_hidden: true)

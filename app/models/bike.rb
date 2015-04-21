@@ -192,6 +192,10 @@ class Bike < ActiveRecord::Base
     hidden && current_ownership && current_ownership.user_hidden
   end
 
+  def fake_deleted
+    hidden && !user_hidden
+  end
+
   def visible_by(user=nil)
     return true unless hidden
     if user.present?

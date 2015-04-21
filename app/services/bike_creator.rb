@@ -82,7 +82,7 @@ class BikeCreator
     validate_record(@bike)
     if @bike.present?
       ListingOrderWorker.perform_async(@bike.id)
-      ListingOrderWorker.perform_in(30.seconds, @bike.id) 
+      ListingOrderWorker.perform_in(10.seconds, @bike.id) 
     end
     @bike
   end
