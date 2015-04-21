@@ -17,6 +17,7 @@ class BikesController < ApplicationController
   before_filter :ensure_user_for_edit, only: [:edit, :update, :pdf]
   before_filter :render_ad, only: [:index, :show]
   before_filter :find_bike, only: [:show, :edit]
+  before_filter :set_return_to, only: [:edit]
   layout 'no_container'
 
   def index
@@ -189,6 +190,7 @@ class BikesController < ApplicationController
       render action: :edit
     else
       flash[:notice] = "Bike successfully updated!" 
+      return if return_to_if_present
       if bike.stolen && params[:bike][:stolen] != false
         redirect_to edit_bike_url(@bike), layout: 'no_header' and return
       end

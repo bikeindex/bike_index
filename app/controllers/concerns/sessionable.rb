@@ -9,19 +9,9 @@ module Sessionable
       default_session_set
     end
 
-    if session[:return_to].present? || cookies[:return_to].present?
-      target = session[:return_to] || cookies[:return_to]
-      session[:return_to] = nil
-      cookies[:return_to] = nil
-      if target.match('password_reset')
-        flash[:notice] = "You've been logged in. Please reset your password"
-        render action: :update_password and return
-      elsif target.match(/\A#{ENV['BASE_URL']}/i).present? || target.match(/\A\//).present?
-        redirect_to target and return
-      end
+    unless return_to_if_present
+      redirect_to user_root_url, notice: "Logged in!" and return
     end
-
-    redirect_to user_root_url, notice: "Logged in!" and return
   end
 
   def default_session_set

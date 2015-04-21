@@ -20,6 +20,25 @@ class ApplicationController < ActionController::Base
     headers['Access-Control-Max-Age'] = "1728000"
   end
 
+  def set_return_to
+    session[:return_to] ||= params[:return_to] if params[:return_to].present?
+  end
+
+  def return_to_if_present
+    if session[:return_to].present? || cookies[:return_to].present?
+      target = session[:return_to] || cookies[:return_to]
+      session[:return_to] = nil
+      cookies[:return_to] = nil
+      case target.downcase
+      when 'password_reset'
+        flash[:notice] = "You've been logged in. Please reset your password"
+        render action: :update_password and return true
+      when /\A#{ENV['BASE_URL']}/, /\A\//
+        redirect_to(target) and return true
+      end
+    end
+  end
+
   # If this is a preflight OPTIONS request, then short-circuit the
   # request, return only the necessary headers and return an empty
   # text/plain.

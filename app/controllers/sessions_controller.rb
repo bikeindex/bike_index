@@ -1,14 +1,14 @@
 class SessionsController < ApplicationController
   include Sessionable
+  before_filter :set_return_to, only: [:new]
+
   def new
-    session[:return_to] = params[:return_to] if params[:return_to].present?
     if current_user.present?
       redirect_to user_home_url, notice: "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
     end
   end
 
   def create
-    # @photos = PublicImage.limit(18).order("created_at desc")
     @user = User.fuzzy_email_find(params[:session][:email])
 
     if @user.present?

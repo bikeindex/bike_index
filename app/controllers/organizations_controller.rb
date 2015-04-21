@@ -8,13 +8,13 @@ class OrganizationsController < ApplicationController
   layout "organization"
 
   def new
-    session[:return_to] = new_organization_url unless current_user.present?
+    session[:return_to] ||= new_organization_url unless current_user.present?
     prep_new_organization
     render layout: 'content'
   end
 
   def lightspeed_integration
-    session[:return_to] = lightspeed_integration_url unless current_user.present?
+    session[:return_to] ||= lightspeed_integration_url unless current_user.present?
     @stuff = session[:return_to]
     prep_new_organization
     render layout: 'content'

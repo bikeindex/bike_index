@@ -360,6 +360,26 @@ describe BikesController do
         {id: ownership.bike.id, bike: {owner_email: "new@email.com"}}
       }.should change(Ownership, :count).by(1)
     end
+
+    it "redirects to return_to if it's a valid url" do
+      ownership = FactoryGirl.create(:ownership)
+      user = ownership.creator
+      set_current_user(user)
+      session[:return_to] = '/about'
+      put :update, {id: ownership.bike.id, bike: {description: "69", marked_user_hidden: "0"}}
+      ownership.bike.reload.description.should eq("69")
+      response.should redirect_to "/about"
+      session[:return_to].should be_nil
+    end
+
+    it "doesn't redirect and clears the session if not a valid url" do
+      @user.should_receive(:authenticate).and_return(true)
+      session[:return_to] = 'http://testhost.com/bad_place'
+      post :create, session: session
+      User.from_auth(cookies.signed[:auth]).should eq(@user)
+      session[:return_to].should be_nil
+      response.should redirect_to user_home_url
+    end
   end
 
 end

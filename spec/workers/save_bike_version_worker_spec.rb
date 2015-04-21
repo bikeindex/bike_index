@@ -10,12 +10,16 @@ describe SaveBikeVersionWorker do
   end
 
   it "creates pretty json without registration_updated_at" do 
+    ENV['VERSIONER_LOCATION'] = 'spec/fixtures'
     bike = FactoryGirl.create(:bike)
     bike.update_attribute :updator_id, 42
     result = SaveBikeVersionWorker.new.perform(bike.id)
     result = JSON.parse(result)
     result['updator_id'].should eq(42)
     result['registration_updated_at'].should_not be_present
+    ENV['VERSIONER_LOCATION'] = nil
   end
 
 end
+
+
