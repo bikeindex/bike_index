@@ -373,12 +373,14 @@ describe BikesController do
     end
 
     it "doesn't redirect and clears the session if not a valid url" do
-      @user.should_receive(:authenticate).and_return(true)
+      ownership = FactoryGirl.create(:ownership)
+      user = ownership.creator
+      set_current_user(user)
       session[:return_to] = 'http://testhost.com/bad_place'
-      post :create, session: session
-      User.from_auth(cookies.signed[:auth]).should eq(@user)
+      put :update, {id: ownership.bike.id, bike: {description: "69", marked_user_hidden: "0"}}
+      ownership.bike.reload.description.should eq("69")
       session[:return_to].should be_nil
-      response.should redirect_to user_home_url
+      response.should redirect_to bike_url
     end
   end
 
