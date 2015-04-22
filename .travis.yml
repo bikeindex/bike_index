@@ -1,9 +1,12 @@
 language: ruby
+services:
+- redis
 rvm:
 - 2.1.0
 script:
 - RAILS_ENV=test bundle exec rake db:migrate && bundle exec rspec
 before_script:
+- redis-cli info
 - psql -c 'create database bikeindex_test' -U postgres
 env:
   global:

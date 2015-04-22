@@ -100,7 +100,6 @@ group :test do
   gem 'simplecov', require: false
   gem "codeclimate-test-reporter", require: nil
   gem 'rspec-sidekiq'
-  gem 'mock_redis'
   gem 'shoulda-matchers'
   gem 'pry'
 end

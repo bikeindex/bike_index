@@ -511,7 +511,6 @@ DEPENDENCIES
   kramdown
   libv8 (~> 3.16.14.7)
   mini_magick
-  mock_redis
   money-rails (~> 0.5.0)
   nokogiri
   omniauth
