@@ -5,7 +5,6 @@ describe AfterBikeSaveWorker do
   
   it "sends a delete hash if the bike is hidden" do
     bike = FactoryGirl.create(:bike, hidden: true)
-    WebhookRunner.any_instance.should_receive(:after_bike_update).with(bike.id).once
     result = JSON.parse(AfterBikeSaveWorker.new.perform(bike.id))
     result['deleted'].should eq(true)
   end
@@ -15,12 +14,11 @@ describe AfterBikeSaveWorker do
     bike = ownership.bike 
     bike.update_attribute :hidden, true
     bike.reload.user_hidden.should be_true
-    WebhookRunner.any_instance.should_receive(:after_bike_update).with(bike.id).once
     result = JSON.parse(AfterBikeSaveWorker.new.perform(bike.id))
     result['deleted'].should_not be_present
   end
 
-  it "creates pretty json without registration_updated_at" do 
+  it "creates pretty json without registration_updated_at, sends webhook runner" do 
     ENV['VERSIONER_LOCATION'] = 'spec/fixtures'
     bike = FactoryGirl.create(:bike)
     bike.update_attribute :updator_id, 42
@@ -34,10 +32,10 @@ describe AfterBikeSaveWorker do
     ENV['VERSIONER_LOCATION'] = nil
   end
 
-  it "doesn't create a new file if one doesn't exist for deleted bikes, returns delete hash" do 
+  it "doesn't create a new file if one doesn't exist for deleted bikes, returns delete hash, doesn't run webhook runner" do 
     ENV['VERSIONER_LOCATION'] = 'spec/fixtures'
     id = 1111
-    WebhookRunner.any_instance.should_receive(:after_bike_update).with(id).once
+    WebhookRunner.any_instance.should_not_receive(:after_bike_update).with(id).once
     r = AfterBikeSaveWorker.new.perform(id)
     result = JSON.parse(r)
     result['deleted'].should be_true

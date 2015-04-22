@@ -17,8 +17,8 @@ class AfterBikeSaveWorker
     if ENV['VERSIONER_LOCATION'].present? && should_write_update?(fpath, out, deleted || false)
       File.open(fpath, 'w') {|f| f.write(out) }
       `ruby #{ENV['VERSIONER_LOCATION']}/versioner.rb -l '#{ENV['VERSIONER_LOCATION']}' -i #{bike_id}` if Rails.env.production?
+      WebhookRunner.new.after_bike_update(bike_id)
     end
-    WebhookRunner.new.after_bike_update(bike_id)
     out
   end
 

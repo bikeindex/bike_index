@@ -150,6 +150,6 @@ describe BikeUpdator do
     update_bike.should_receive(:update_ownership).and_return(true)
     expect {
       update_bike.update_available_attributes
-    }.to change(ListingOrderWorker.jobs, :size).by(1)
+    }.to change(ListingOrderWorker.jobs, :size).by(2)
   end
 end

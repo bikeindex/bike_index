@@ -82,7 +82,10 @@ class BikeUpdator
     update_ownership
     update_api_components if @bike_params[:components].present?
     update_stolen_record if @bike.update_attributes(@bike_params[:bike])
-    ListingOrderWorker.perform_in(10.seconds, @bike.id) if @bike.present?
+    if @bike.present?
+      ListingOrderWorker.perform_async(@bike.id) # run immediately
+      ListingOrderWorker.perform_in(60.seconds, @bike.id) # also later in case uploads or something.
+    end
     remove_blank_components
     @bike
   end
