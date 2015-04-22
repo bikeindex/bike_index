@@ -18,4 +18,9 @@ describe ListingOrderWorker do
     expect(AfterUserChangeWorker).to have_enqueued_job(ownership.creator.id)
   end
 
+  it "doesn't break if it isn't a bike" do 
+    ListingOrderWorker.new.perform(96)
+    expect(AfterBikeSaveWorker).to have_enqueued_job(96)
+  end
+
 end
