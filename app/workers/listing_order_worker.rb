@@ -8,6 +8,7 @@ class ListingOrderWorker
     if bike.present?
       bike.update_attribute :listing_order, bike.get_listing_order
     end
+    AfterUserChangeWorker.perform_async(bike.owner.id) if bike.owner.present?
     AfterBikeSaveWorker.perform_async(bike_id)
   end
 

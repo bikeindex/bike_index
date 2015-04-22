@@ -11,9 +11,11 @@ describe ListingOrderWorker do
   it "enqueues version worker, doesn't reset paint accidentally" do 
     paint = FactoryGirl.create(:paint)
     bike = FactoryGirl.create(:bike, paint_id: paint.id)
+    ownership = FactoryGirl.create(:ownership, bike: bike)
     ListingOrderWorker.new.perform(bike.id)
     bike.reload.paint.should eq(paint)
     expect(AfterBikeSaveWorker).to have_enqueued_job(bike.id)
+    expect(AfterUserChangeWorker).to have_enqueued_job(ownership.creator.id)
   end
 
 end

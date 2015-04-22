@@ -1,6 +1,6 @@
 class AfterBikeSaveWorker
   include Sidekiq::Worker
-  sidekiq_options queue: 'versioner', backtrace: true, :retry => false
+  sidekiq_options queue: 'afterwards', backtrace: true, :retry => false
 
   def perform(bike_id)
     bike = Bike.unscoped.where(id: bike_id).first

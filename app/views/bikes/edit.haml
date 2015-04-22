@@ -47,14 +47,14 @@
             %ul.private_images{ :"data-order-url" => order_public_images_url }
               = render partial: "/public_images/public_image", collection: @private_images, as: :public_image
           %p.small
-            Adding something else you'd like to be private (e.g. a receipt)?
+            Adding something you'd like to be private (e.g. a receipt)?
             / %br
             Click 
             %strong
               edit
             on the image, mark it
             %strong
-              do not display
+              "do not display"
             and save it.
         - if @bike.public_images.length < 49
           %section

@@ -22,15 +22,32 @@ describe WebhookRunner do
     it "doesn't fail if there aren't any urls" do 
       runner = WebhookRunner.new
       id = 9999
-      Redis.new.expire(runner.redis_id('after_bike_update'), 0)
+      MockRedis.new.expire(runner.redis_id('after_bike_update'), 0)
       runner.after_bike_update(id).should be_true
+    end
+  end
+
+  describe :after_user_update do
+    it "calls make request" do
+      runner = WebhookRunner.new
+      id = 9999
+      runner.should receive(:hook_urls).with('after_user_update').and_return(['http://tester.com/users/#{user_id}'])
+      runner.should receive(:make_request).with("http://tester.com/users/#{id}")
+      runner.after_user_update(id)
+    end
+
+    it "doesn't fail if there aren't any urls" do 
+      runner = WebhookRunner.new
+      id = 9999
+      MockRedis.new.expire(runner.redis_id('after_user_update'), 0)
+      runner.after_user_update(id).should be_true
     end
   end
 
   describe :hook_urls do 
     it "calls the redis array" do 
       runner = WebhookRunner.new
-      redis = Redis.new
+      redis = MockRedis.new
       rid = runner.redis_id('after_bike_update')
       redis.expire(rid, 0)
       redis.lpush(rid, 'http://tester.com')

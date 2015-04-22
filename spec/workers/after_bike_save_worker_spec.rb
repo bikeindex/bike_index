@@ -1,15 +1,8 @@
 require 'spec_helper'
 
 describe AfterBikeSaveWorker do
-  it { should be_processed_in :versioner }
+  it { should be_processed_in :afterwards }
   
-  it "sends a delete hash if the bike is hidden" do
-    bike = FactoryGirl.create(:bike, hidden: true)
-    WebhookRunner.any_instance.should_receive(:after_bike_update).with(bike.id).once
-    result = JSON.parse(AfterBikeSaveWorker.new.perform(bike.id))
-    result['deleted'].should eq(true)
-  end
-
   it "sends a delete hash if the bike is hidden" do
     bike = FactoryGirl.create(:bike, hidden: true)
     WebhookRunner.any_instance.should_receive(:after_bike_update).with(bike.id).once
@@ -41,7 +34,7 @@ describe AfterBikeSaveWorker do
     ENV['VERSIONER_LOCATION'] = nil
   end
 
-  it "doesn't create a new file if one doesn't exist for deleted bikes" do 
+  it "doesn't create a new file if one doesn't exist for deleted bikes, returns delete hash" do 
     ENV['VERSIONER_LOCATION'] = 'spec/fixtures'
     id = 1111
     WebhookRunner.any_instance.should_receive(:after_bike_update).with(id).once

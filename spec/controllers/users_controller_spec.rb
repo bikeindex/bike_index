@@ -199,9 +199,11 @@ describe UsersController do
       post :update, { id: user.username, user: {
         current_password: 'old_pass',
         password: "new_pass",
+        name: 'Mr. Slick',
         password_confirmation: 'new_passd'}
       }
       user.reload.authenticate("new_pass").should be_false
+      user.name.should_not eq('Mr. Slick')
     end
 
     it "Updates user if there is a reset_pass token" do 
@@ -268,6 +270,7 @@ describe UsersController do
         email: 'cool_new_email@something.com',
         current_password: 'old_pass',
         password: "new_pass",
+        name: 'Mr. Slick',
         password_confirmation: 'new_pass'} 
       }
       response.should redirect_to(my_account_url)
@@ -275,6 +278,7 @@ describe UsersController do
       user.auth_token.should_not eq(auth)
       user.email.should eq(email)
       user.password_reset_token.should_not eq('stuff')
+      user.name.should eq('Mr. Slick')
       cookies.signed[:auth][1].should eq(user.auth_token)
     end
 
@@ -294,6 +298,15 @@ describe UsersController do
       post :update, { id: user.username, user: {vendor_terms_of_service: "1"} }
       response.code.should eq('302')
       user.reload.vendor_terms_of_service.should be_true
+    end
+
+    it "enqueues job (it enqueues job whenever update is successful)" do
+      user = FactoryGirl.create(:user)
+      set_current_user(user) 
+      expect {
+        post :update, { id: user.username, user: {name: "Cool stuff"} }
+      }.to change(AfterUserChangeWorker.jobs, :size).by(1)
+      user.reload.name.should eq('Cool stuff')
     end
   end
 
