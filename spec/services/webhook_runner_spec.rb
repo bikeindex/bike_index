@@ -6,7 +6,7 @@ describe WebhookRunner do
     it "doesn't error if webhook doesn't return" do
       runner = WebhookRunner.new 
       response = runner.make_request("https://testing.bikeindex.org/about/something")
-      response.should be_nil
+      response.should be_present
     end
   end
 

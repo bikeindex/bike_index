@@ -1,15 +1,14 @@
 class WebhookRunner
-  require 'net/http'
+  require 'httparty'
   
   def make_request(url)
     begin
-      uri = URI(url)
-      res = Net::HTTP.get_response(uri)
-    rescue
-      return nil
+      response = HTTParty.get(url,
+        :headers => { 'Content-Type' => 'application/json' } )
+      JSON.parse(response.body)
+    rescue => e
+      e.message
     end
-    return nil unless res.is_a?(Net::HTTPSuccess)
-    res
   end
 
   def after_bike_update(bike_id)
