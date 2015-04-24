@@ -22,3 +22,12 @@
       %br
       %span.less-strong
         image has no background, shown here with black for visibility
+
+  %li
+    %a.serial-image.blackbg{ href: '/assets/resources/logo_backgrounded.svg'}
+      = image_tag('/assets/resources/logo_backgrounded.svg', alt: "Logo with background cutout")
+    %p
+      Logo with background cutout (#{link_to 'svg', '/assets/resources/logo_backgrounded.svg'}, #{link_to 'png', '/assets/resources/logo_backgrounded.png'})
+      %br
+      %span.less-strong
+        Black background shown here for visibility
