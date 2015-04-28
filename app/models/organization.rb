@@ -100,6 +100,11 @@ class Organization < ActiveRecord::Base
     generate_access_token unless self.access_token.present?
   end
 
+  after_save :clear_map_cache
+  def clear_map_cache
+    Rails.cache.delete "views/info_where_page"
+  end
+
   def generate_access_token    
     begin
       self.access_token = SecureRandom.hex

@@ -115,4 +115,12 @@ describe InfoController do
     it { should render_template(:spokecard)}
   end
 
+  describe :support_the_index do 
+    before do 
+      get :support_the_index
+    end
+    it { should respond_with(:success) }
+    it { should render_template(:support_the_index)}
+  end
+
 end

@@ -93,5 +93,11 @@ describe Organization do
     end
   end
 
+  describe :clear_map_cache do 
+    it "has before_save_callback_method defined for clear clear_map_cache" do
+      Organization._save_callbacks.select { |cb| cb.kind.eql?(:after) }.map(&:raw_filter).include?(:clear_map_cache).should == true
+    end
+  end
+
 
 end
