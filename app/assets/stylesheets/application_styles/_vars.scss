@@ -61,7 +61,7 @@ $standardPadding: 20px;
 $singlePad: 20px;
 $footerHeight: 250px;
 
-$standardFontSize: 16px;
+$standardFontSize: 16px !global;
 @media (min-width: 900px) { $standardFontSize: 17px; }
 $smallText: 14px;
 

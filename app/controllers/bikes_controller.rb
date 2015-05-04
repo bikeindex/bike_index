@@ -62,7 +62,7 @@ class BikesController < ApplicationController
     bike = Bike.find(params[:id])
     unless bike.owner == current_user or current_user.is_member_of?(bike.creation_organization)
       flash[:error] = "Sorry, that's not your bike!"
-      redirect_to bike_path(bike) and return 
+      redirect_to bike_path(bike) and return
     end
     if bike.stolen and bike.current_stolen_record.present?
       @stolen_record = bike.current_stolen_record.decorate
@@ -70,9 +70,9 @@ class BikesController < ApplicationController
     @bike = bike.decorate
     filename = "Registration_" + @bike.updated_at.strftime("%m%d_%H%M")[0..-1]
     unless @bike.pdf.present? && @bike.pdf.file.filename == "#{filename}.pdf"
-      pdf = render_to_string pdf: filename, template: 'bikes/pdf.html.haml'
+      pdf = render_to_string pdf: filename, template: 'bikes/pdf'
       save_path = "#{Rails.root}/tmp/#{filename}.pdf"
-      File.open(save_path, 'wb') do |file| 
+      File.open(save_path, 'wb') do |file|
         file << pdf
       end
       # @bike.pdf = File.open(pdf, 'wb') { |file| file << pdf }
@@ -104,7 +104,7 @@ class BikesController < ApplicationController
       @b_param = BParam.create(creator_id: current_user.id, params: params)
       @bike = BikeCreator.new(@b_param).new_bike
     else
-      @user = User.new 
+      @user = User.new
     end
     render layout: 'no_header'
   end
@@ -129,16 +129,16 @@ class BikesController < ApplicationController
         @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
         flash[:error] = @b_param.bike_errors.to_sentence
         if params[:bike][:embeded_extended]
-          redirect_to embed_extended_organization_url(id: @bike.creation_organization.slug, b_param_id_token: @b_param.id_token) and return  
+          redirect_to embed_extended_organization_url(id: @bike.creation_organization.slug, b_param_id_token: @b_param.id_token) and return
         else
-          redirect_to embed_organization_url(id: @bike.creation_organization.slug, b_param_id_token: @b_param.id_token) and return  
+          redirect_to embed_organization_url(id: @bike.creation_organization.slug, b_param_id_token: @b_param.id_token) and return
         end
       else
         if params[:bike][:embeded_extended]
           flash[:notice] = "Success! #{@bike.type} was sent to #{@bike.owner_email}."
-          redirect_to embed_extended_organization_url(@bike.creation_organization) and return  
+          redirect_to embed_extended_organization_url(@bike.creation_organization) and return
         else
-          redirect_to controller: :organizations, action: :embed_create_success, id: @bike.creation_organization.slug, bike_id: @bike.id and return  
+          redirect_to controller: :organizations, action: :embed_create_success, id: @bike.creation_organization.slug, bike_id: @bike.id and return
         end
       end
     else
@@ -184,12 +184,12 @@ class BikesController < ApplicationController
       flash[:error] = e.message
       redirect_to bike_path(params[:id]) and return
     end
-    @bike = bike.decorate 
+    @bike = bike.decorate
     if bike.errors.any?
       flash[:error] = bike.errors.full_messages
       render action: :edit
     else
-      flash[:notice] = "Bike successfully updated!" 
+      flash[:notice] = "Bike successfully updated!"
       return if return_to_if_present
       if bike.stolen && params[:bike][:stolen] != false
         redirect_to edit_bike_url(@bike), layout: 'no_header' and return
@@ -202,7 +202,7 @@ protected
 
   def find_bike
     @bike = Bike.unscoped.find(params[:id])
-    if @bike.hidden 
+    if @bike.hidden
       unless current_user.present? && @bike.visible_by(current_user)
         flash[:error] = "Bike deleted"
         redirect_to root_url and return
