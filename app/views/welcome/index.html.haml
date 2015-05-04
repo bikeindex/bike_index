@@ -42,12 +42,15 @@
     %h3
       The Bike Index makes stolen bikes harder to sell and easier to recover by making sure important information about your bike is there when you need it the most.
     %h3
-      So far we've <strong>registered #{number_with_delimiter(Bike.count)} bikes</strong> and <strong>recovered over #{number_with_delimiter(StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count)}</strong> stolen bikes.
-    %h3
       The process is simple, secure, and free. 
       %a.scroll-to-ref{ href: "#how_it_works" }
         Learn more
       or #{link_to "register your bike now", choose_registration_path}.
+    
+    %h3
+      - cache 'index_home_organizations' do 
+        We have <strong>#{Organization.count} partner bike shops, police departments, bike advocacy groups and blogs</strong>,
+      we've <strong>registered #{number_with_delimiter(Bike.count)} bikes</strong> and we've <strong>recovered over #{number_with_delimiter(StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count)}</strong> stolen bikes.
 - cache 'index_home' do 
   .info-blocks
     .container
