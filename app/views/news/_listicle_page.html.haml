@@ -1,6 +1,3 @@
-%article
-  .party-blck.lg-party{ data: {width: '728px', height: '90px', slot: '4209970585'}}
-  .party-blck.sm-party{ data: {width: '320px', height: '100px', slot: '6605033789'}}
 - if @list_item.present?
   %article
     = image_tag @list_item.image_url(:large) if @list_item.image.present?
@@ -11,9 +8,6 @@
     = @list_item.title
   %article
     = @list_item.body_html.html_safe if @list_item.body_html.present?
-%article
-  .party-blck.lg-party{ data: {width: '728px', height: '90px', slot: '6744634586'}}
-  .party-blck.sm-party{ data: {width: '320px', height: '100px', slot: '7822695384'}}
 
 %article.padded
   .list-nav-wrap

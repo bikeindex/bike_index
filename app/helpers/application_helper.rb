@@ -1,6 +1,7 @@
 module ApplicationHelper 
   def nav_link(link_text, link_path)
     class_name = current_page?(link_path) ? 'active' : ''
+    class_name = 'active' if link_path.match(news_index_path) && controller_name == 'news'
     html = link_to raw(link_text), link_path, class: class_name
     return html.html_safe
   end
