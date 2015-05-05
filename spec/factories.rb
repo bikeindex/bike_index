@@ -210,6 +210,12 @@ FactoryGirl.define do
     association :imageable, factory: :bike
   end
 
+  factory :blog do 
+    user
+    body "Some sweet blog content that everyone loves"
+    sequence(:title) {|n| "Blog title #{n}"}
+  end
+
   factory :feedback do
     email 'foo@boy.com'
     body 'This is a test email.'

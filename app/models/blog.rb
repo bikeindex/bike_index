@@ -89,6 +89,7 @@ class Blog < ActiveRecord::Base
 
   before_save :set_index_image
   def set_index_image
+    self.index_image_id = nil unless PublicImage.where(id: index_image_id).present?
     if index_image_id.present?
       if index_image_id == 0
         self.index_image = nil

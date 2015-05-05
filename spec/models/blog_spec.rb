@@ -73,4 +73,27 @@ describe Blog do
       blog.body_abbr.should eq("View the link here and also this")
     end
   end
+
+  describe :set_index_image do 
+    it "sets the public image for a blog" do 
+      blog = FactoryGirl.create(:blog)
+      public_image = FactoryGirl.create(:public_image, imageable: blog)
+      blog.reload # Reload so it knows about association
+      blog.set_index_image
+      blog.index_image_id.should eq(public_image.id)
+    end
+
+    it "doesn't break if image doesn't exist" do 
+      blog = FactoryGirl.create(:blog)
+      public_image = FactoryGirl.create(:public_image, imageable: blog)
+      blog.reload # Reload so it knows about association
+      blog.index_image_id = 3399
+      blog.set_index_image
+      blog.index_image_id.should eq(public_image.id)
+    end
+
+    it "has before_save_callback_method defined for set_index_image" do
+      Blog._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_index_image).should == true
+    end
+  end
 end
