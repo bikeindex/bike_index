@@ -47,6 +47,13 @@
         = f.label :current_password, class: "control-label"
         .controls
           = f.password_field :current_password, placeholder: "For password update"
+      .control-group.emailme-maybe
+        = f.label :is_emailable, class: "control-label" do 
+          Get quarterly updates
+        .controls
+          = f.check_box :is_emailable
+          
+          
 
     .control-group.actions
       = f.submit "Update information", class: 'button-green'

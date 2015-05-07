@@ -37,7 +37,7 @@
         .control-group
           = f.label :name, "Name", class: "control-label email-control-label"
           .controls
-            = f.text_field :name, placeholder: "You got a name?"
+            = f.text_field :name, placeholder: "What would you like us to call you?"
 
         .control-group
           = f.label :email, class: "control-label email-control-label"
@@ -53,12 +53,16 @@
             = f.password_field :password_confirmation, placeholder: "Password confirmation"
         
         .control-group.tos
-          
           %label{for: "user_terms_of_service" }
             = f.check_box :terms_of_service
             I agree to the Bike Index 
             %a.no-tab{ data: {target: "#{terms_url}"} }
               Terms and conditions
+
+        .control-group.emailme-maybe
+          %label{for: "user_is_emailable" }
+            = f.check_box :is_emailable
+            Get quarterly Bike Index email updates
         
         = f.submit "Sign up", class: 'button-blue'
 

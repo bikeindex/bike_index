@@ -5,7 +5,7 @@ cycle_types = [
   { name: 'Unicycle', slug: 'unicycle' },
   { name: 'Tricycle', slug: 'tricycle' },
   { name: 'Recumbent', slug: 'recumbent' },
-  { name: 'Pedi Cab', slug: 'pedi-cab' },
+  { name: 'Pedi Cab (rickshaw)', slug: 'pedi-cab' },
   { name: 'Cargo Bike (front storage)', slug: 'cargo' },
   { name: 'Cargo Bike (rear storage)', slug: 'cargo-rear' },
   { name: 'Cargo Tricycle (front storage)', slug: 'cargo-trike' },

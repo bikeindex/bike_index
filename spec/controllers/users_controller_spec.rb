@@ -290,14 +290,16 @@ describe UsersController do
       user.reload.terms_of_service.should be_true
     end
 
-    it "updates the vendor terms of service" do 
-      user = FactoryGirl.create(:user, terms_of_service: false)
+    it "updates the vendor terms of service and emailable" do 
+      user = FactoryGirl.create(:user, terms_of_service: false, is_emailable: false)
+      user.is_emailable.should be_false
       org =  FactoryGirl.create(:organization)
       FactoryGirl.create(:membership, organization: org, user: user)
       set_current_user(user) 
-      post :update, { id: user.username, user: {vendor_terms_of_service: "1"} }
+      post :update, { id: user.username, user: {vendor_terms_of_service: "1", is_emailable: true} }
       response.code.should eq('302')
       user.reload.vendor_terms_of_service.should be_true
+      user.is_emailable.should be_true
     end
 
     it "enqueues job (it enqueues job whenever update is successful)" do

@@ -29,7 +29,8 @@ class User < ActiveRecord::Base
     :has_stolen_bikes,
     :can_send_many_stolen_notifications,
     :my_bikes_link_target,
-    :my_bikes_link_title
+    :my_bikes_link_title,
+    :is_emailable
 
 
   attr_accessor :my_bikes_link_target, :my_bikes_link_title, :current_password

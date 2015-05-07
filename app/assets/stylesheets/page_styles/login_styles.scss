@@ -30,15 +30,20 @@
   clear: both;
 }
 .signinup-form {
-  .tos {
-    label { font-size: $standardFontSize; }
-    input { margin: 0 10px 0 0; }
+  .tos, .emailme-maybe {
+    // label { font-size: $standardFontSize * .9; }
+    input { margin: 0 5px 0 0; }
+  }
+  .emailme-maybe {
+    input {
+
+    }
   }
 }
 
 @media (max-width: 479px) {
   .signup-form {
-   .tos {
+   .tos, .emailme-maybe {
     .control-label {
       width: auto;
       height: auto;
@@ -57,6 +62,7 @@
   }
     .signup-form {
     // margin-left: $fourColumn + $gutterW;
+      .control-group { margin-bottom: 10px; }
       label.control-label {
         float: none;
         width: auto;
@@ -69,7 +75,7 @@
         position: relative;
         input { width: 90%;}
       }
-      .tos {
+      .tos, .emailme-maybe {
         // margin-bottom: 0;
         .control-label {
         width: 20px;

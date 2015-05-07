@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150402051334) do
+ActiveRecord::Schema.define(:version => 20150507222158) do
 
   create_table "ads", :force => true do |t|
     t.string   "title"
@@ -683,6 +683,7 @@ ActiveRecord::Schema.define(:version => 20150402051334) do
     t.text     "paid_membership_info"
     t.boolean  "is_content_admin",                   :default => false, :null => false
     t.text     "my_bikes_hash"
+    t.boolean  "is_emailable",                       :default => false, :null => false
   end
 
   add_index "users", ["password_reset_token"], :name => "index_users_on_password_reset_token"
