@@ -19,6 +19,17 @@
   }
 }
 
+.visuallyhidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
 @media (min-width: $s-breakpoint+1) {
   .welcome-page {
     .top-logo .logo { display: none;  }
@@ -101,6 +112,7 @@
 }
 
 .register-container {
+  display: block;
   width: 100%;
   position: absolute;
   left: 0; top: 35%;
@@ -123,6 +135,7 @@
 }
 
 .wheel-holder {
+  display: block;
   width: 90%;
   margin: 0 auto;
   overflow: hidden;

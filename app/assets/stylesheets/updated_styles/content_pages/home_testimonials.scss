@@ -3,36 +3,50 @@
   position: relative;
 }
 
+// .h3testimonial, .h4testimonial, .ptestimonial {
+//   display: block;
+//   clear: both;
+//   // line-height: 1;
+//   // padding-top: 0;
+// }
 
 $testimonial-tri-size: 15px;
 $testimonial-text-bg: #fff;
 .testimonial-block {
   @include clearfix;
+  
+  h3, h4, p { margin: 0; }
   .testimonial-user {
+    display: block;
     @include clearfix;
     position: relative;
     margin: 0 0 0 $gutter;
-    float: left;
+    float: right;
   }
   img {
     display: block;
     margin: 0;
     width: 20%;
+    font-size: 16px;
     height: auto;
     float: right;
     padding-bottom: .5em;
   }
-  h3 {
+  .h3testimonial {
     margin: .25em 0 0;
     font-size: 18px;
+    display: block;
+    font-family: $header-font;
+    font-weight: normal;
   }
-  h4 {
+  .h4testimonial {
     font-size: 14px;
+    display: block;
     font-family: $body-font;
   }
   // $row-width: 3.438; // 100/32 - full width over 4 column  
   $row-width: 2.083; // 100/48 - full width over 4 column  
-  h3, h4 { 
+  .h3testimonial, .h4testimonial { 
     float: left;
     text-align: right;
     margin-left: $gutter*$row-width;
@@ -58,19 +72,22 @@ $testimonial-text-bg: #fff;
       border-bottom: $testimonial-tri-size*1.5 solid transparent; 
       border-left: $testimonial-tri-size solid $testimonial-text-bg; 
     }
-    p {
+    .ptestimonial {
       margin: 0;
       line-height: 1.2em;
     }
   }
 }
-
+// @media (min-width: $l-breakpoint+1) {
+//   .testimonial-block {.h3testimonial, .h4testimonial { margin-left: 0; }}
+// }
 @media (min-width: $s-breakpoint+1) {
   .testimonial-block {
     .testimonial-user {
       width: $three-column - .5%;
       padding-top: .5em;
     }
+    .h3testimonial, .h4testimonial { margin-left: 0; }
     .no-image-spacer {
       display: block;
       width: 100%;
@@ -79,8 +96,8 @@ $testimonial-text-bg: #fff;
     img {
       width: 100%;
     }
-    h3 { padding-top: 1em; }
-    h3, h4 {
+    .h3testimonial { padding-top: 1em; }
+    .h3testimonial, .h4testimonial {
       width: 100%;
       float: none;
       text-align: center;
@@ -96,8 +113,8 @@ $testimonial-text-bg: #fff;
 
 @media (min-width: $l-breakpoint) {
   .testimonial-block {
-    h3 { font-size: 24px; }
-    h4 { font-size: 14px; }
+    .h3testimonial { font-size: 24px; }
+    .h4testimonial { font-size: 14px; }
     &.testmonial-2 { padding: 20px 0; }
     .testimonial-user { width: $two-column - .5%; }   
     .testimonial-quote {
@@ -113,7 +130,7 @@ $testimonial-text-bg: #fff;
       padding-top: 1em;
       padding-left: .5em;
     }
-    h4 .recovery-date {
+    .h4testimonial .recovery-date {
       display: block; 
       margin-top: -.25em;
     }
@@ -127,8 +144,8 @@ $testimonial-text-bg: #fff;
       padding: 20px 0 0;
       margin-left: 0;
     }
-    h3 { margin-top: 1em; }
-    h3, h4 {
+    .h3testimonial { margin-top: 1em; }
+    .h3testimonial, .h4testimonial {
       text-align: right;
       margin-right: $gutter;
       margin-left: 0;

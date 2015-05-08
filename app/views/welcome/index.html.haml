@@ -5,21 +5,23 @@
       %span
         that Works
     .testimonial-container
+      %h2.visuallyhidden
+        Testimonials:
       - recoveries = RecoveryDisplay.limit(10)
       - recoveries.each_with_index do |recovery, i|
         .testimonial-block{class: "testimonial-#{recovery.id}"}
-          .testimonial-quote
-            %p
+          %p.testimonial-quote
+            %span.ptestimonial
               = recovery.quote.html_safe
-          .testimonial-user
+          %span.testimonial-user
             - if recovery.image.present?
               %img{ data: { lazy: recovery.image_url(:medium) }}
             - else
               %span.no-image-spacer
             - if recovery.quote_by
-              %h3
+              %span.h3testimonial
                 = recovery.quote_by
-            %h4
+            %span.h4testimonial
               - txt = recovery.bike.present? ? recovery.bike.type.titleize : 'Bike'
               - txt += " <span class='recover-date'>recovered #{l recovery.date_recovered, format: :dotted}</span>"
               - if recovery.link.present?
@@ -29,10 +31,10 @@
                 = txt.html_safe
                 
     .wheeled
-      .register-container
+      %span.register-container
         = link_to "Register a bike", choose_registration_path, class: "btn binxbtn binxbtn-lg"
-      .wheel-holder
-        = image_tag "/assets/updated/home/wheel_white.png", id: 'wheeled_wheel'
+      %span.wheel-holder
+        = image_tag "/assets/updated/home/wheel_white.png", alt: "(spinning wheel graphic)", id: 'wheeled_wheel', role: 'presentation', :"aria-hidden" => "true"
 
 .home-subhead
   .container
@@ -46,11 +48,10 @@
       %a.scroll-to-ref{ href: "#how_it_works" }
         Learn more
       or #{link_to "register your bike now", choose_registration_path}.
-    
     %h3
-      - cache 'index_home_organizations' do 
-        We have <strong>#{Organization.count} partner bike shops, police departments, bike advocacy groups and blogs</strong>,
-      we've <strong>registered #{number_with_delimiter(Bike.count)} bikes</strong> and we've <strong>recovered over #{number_with_delimiter(StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count)}</strong> stolen bikes.
+      / - cache 'index_home_organizations' do 
+      /   We have <strong>#{Organization.count} partner bike shops, police departments, </strong> and <strong>bike advocacy organizations</strong>.
+      So far we've <strong>registered #{number_with_delimiter(Bike.count)} bikes</strong> and <strong>recovered #{number_with_delimiter(StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count)}</strong> stolen bikes.
 - cache 'index_home' do 
   .info-blocks
     .container
