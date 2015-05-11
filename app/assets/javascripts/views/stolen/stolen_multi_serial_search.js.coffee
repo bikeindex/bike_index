@@ -6,7 +6,7 @@ class BikeIndex.Views.StolenMultiSerialSearch extends Backbone.View
     'click #multiserial_fuzzy':       'searchSerialsFuzzy'
     
   initialize: ->
-    @setElement($('#sbr-body'))
+    @setElement($('body'))
     @toggleMultiSearch() if window.location.href.match(/multi.serial.search/i)
 
   Array::uniq = ->
@@ -22,15 +22,12 @@ class BikeIndex.Views.StolenMultiSerialSearch extends Backbone.View
 
   toggleMultiSearch: (e=null) ->
     e.preventDefault() if e?
-    if $('#show_multi_search').hasClass('multi-in')
-      $('.sbr-banner, .sbr-search-fields').slideDown()
-      $('#ms_search_section, #ms_form_section').slideUp 'medium', ->
-        $('#sbr-body').append($('#ms_search_section'))
-    else
-      $('.sbr-banner').after($('#ms_search_section'))
-      $('.sbr-banner, .sbr-search-fields').slideUp()
-      $('#ms_search_section, #ms_form_section').slideDown()
-    $('#show_multi_search').toggleClass('multi-in')
+    $('.multi-search-toggle').fadeOut()
+    $('.sbr-banner').after($('#ms_search_section'))
+    $('.sbr-banner, .sbr-search-fields').slideUp()
+    $('#ms_search_section, #ms_form_section').slideDown()
+
+
 
   unlockSearch: ->
     $('#multiserial_fuzzy, #search_serials').addClass('ms_unlocked')
@@ -45,6 +42,7 @@ class BikeIndex.Views.StolenMultiSerialSearch extends Backbone.View
     serials = serials.map (s) -> trim(s)
     serials = serials.uniq()
     for serial in serials
+      $('#ms_search_section').slideDown().removeClass('hidden')
       if serial.length > 1
         $('#serials_submitted').append("<li name='#{serial}'>#{serial}</li>")
         @getSerialResponse(serial)

@@ -5,8 +5,6 @@
 //________________________
 
 
-.top-logo .logo.home-logo { display: none;  }
-
 .welcome-page {
   background: $gray-lighter;
   .bike-search-form .search-text-field.select2-container.select2-container-multi {
@@ -29,14 +27,6 @@
   position: absolute;
   width: 1px;
 }
-
-@media (min-width: $s-breakpoint+1) {
-  .welcome-page {
-    .top-logo .logo { display: none;  }
-    .top-logo .logo.home-logo { display: block;  }
-  }
-}
-
 
 
 

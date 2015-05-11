@@ -7,27 +7,11 @@
     = stylesheet_link_tag "updated", media: "all"
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400,300,600' rel='stylesheet' type='text/css'>
     = javascript_include_tag "application"
-    <!-- Pulled from https://code.google.com/p/html5shiv/ -->
-    <!--[if lt IE 9]>
-    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <!--[if lte IE 8]>
-    <script type="text/javascript">$(function() {$('body').prepend("<body class='welcome-page' id='body'><div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, the Bike Index (and the internet in general) is broken and ugly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>");});</script>
-    <![endif]-->
+    <!--[if lt IE 9]><script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]--><!--[if lte IE 8]><script type="text/javascript">$(function() {$('body').prepend("<body class='welcome-page' id='body'><div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, the Bike Index (and the internet in general) is broken and ugly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>");});</script><![endif]-->
     
     - if controller_name == "news"
       = auto_discovery_link_tag(:atom, news_index_url(format: "atom"), {title: "Bike Index"})
 
-  :plain
-    <!--
-                                                      
-        Stop reading code and go ride your bike!                          ~~O
-                                                                        -  /\,
-        https://github.com/bikeindex/bike_index                        -  -|~(*)
-                                                                      -  (*)
-        
-                                                                        ^--------                                         
-    -->
   - body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
   - body_class = "vendor-signup-page" if current_page?(:vendor_signup)
   %body#body{ class: body_class }
@@ -39,8 +23,10 @@
           .small-header
             %a.top-logo{ href: root_url }
               %span.stripey
-              = image_tag "/assets/updated/home/logo.svg", class: 'logo home-logo', alt: "Logo with dark background"
-              = image_tag "/assets/updated/logo.svg", class: "logo", alt: "Bike Index logo"
+              - if body_class == 'welcome-page'
+                = image_tag "/assets/updated/home/logo.svg", class: 'logo home-logo', alt: "Logo with dark background"
+              - else
+                = image_tag "/assets/updated/logo.svg", class: "logo", alt: "Bike Index logo"
             %a#expand_user.hamburglar{ href: '#' }
               = image_tag "/assets/updated/hamburglar.svg", alt: "Expand menu graphic", role: 'presentation', :"aria-hidden" => "true"
           = render 'shared/top_user_nav'
@@ -87,4 +73,5 @@
       - cache 'footer_updated' do
         = render 'shared/footer_updated'
 
-      
+  :plain
+    <!-- Open source, https://github.com/bikeindex/bike_index -->

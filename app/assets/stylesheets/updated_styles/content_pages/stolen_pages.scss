@@ -1,0 +1,434 @@
+.stolen-bike-merge-alert {
+  margin: 30px auto;
+  max-width: 600px;
+}
+//________________________
+//
+// Stolen styles
+//
+//________________________
+
+$sbr-background: #f9f9f9;
+
+.sbr-wrap {
+  // font-family: $headerFont;
+  // h1, h2, h3, h4, input { font-family: $baseFont; }
+  // input { font-family: $headerFont; }
+  background: $sbr-background;
+  color: #7a7a7a;
+  .list-stolen-bike {
+    margin-top: 3px;
+    float: right;
+    // color: #7a7a7a;
+    // color: $link-color;
+  }
+  section {
+    border-bottom: 1px solid $gray;
+    padding: 30px 0;
+    &:nth-of-type(2n) { background: #fff; }
+  }
+}
+
+.sbr-main-section {
+  .alert h4 { font-size: 24px; }
+  .stolen-registry-logo {
+    width: 200px;
+    margin: 0 auto;
+    padding: 2.5em 0 30px;
+    img { 
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+  }
+  h1 {
+    font-size: 30px;
+    text-align: center;
+    color: darken(#7a7a7a, 25%);
+    padding: 0 0 40px;
+  }
+}
+@media (min-width: 600px) {
+  .sbr-main-section {
+    h1 { font-size: 40px; }
+    .stolen-registry-logo { width: 280px; padding-top: 0; }
+  }
+}
+
+@media (min-width: 1000px) {
+  .sbr-main-section {
+    padding: 50px 0 40px;
+    .stolen-registry-logo {
+      margin-top: 50px;}
+    h1 {
+      font-size: 50px;
+    }
+    .list-stolen-bike {
+      font-size: 1.5em;
+    }
+  }
+}
+
+.sbr-search-fields {
+  @include clearfix;
+  max-width: 800px;
+  margin: 0 auto;
+  padding-bottom: 40px;
+  input {
+    box-shadow: none;
+    border: 1px solid #cccdc8;
+    background: #fff;
+    color: darken(#7a7a7a, 20%);
+    margin-bottom: .75em;
+    &:focus { box-shadow: none; border-color: #cccdc8; }
+  }
+  .proximity {
+    clear: both;
+    input {
+      background: none;
+      border: none;
+      box-shadow: none;
+      margin: 2px 0 .1em .1em;
+      padding: 0;
+      line-height: 1em;
+      color: #7a7a7a;
+      width: 10em;
+      border-bottom: 1px dashed #cccdc8;
+    }
+  }
+  .sbr-search-inputs { position: relative; }
+  .sbr-bike-search {
+    box-shadow: none;
+    padding: .4em .7em;
+    width: 100%;
+    float: left;
+    border-radius: 2px;
+    // border-left: none;
+    margin-top: 5px;
+  }
+  .search-type-tab {
+    background: #E6E6E6;
+    padding: 5px 10px 3px 10px;
+    color: #7a7a7a;
+    margin-left: 5px;
+    border: 1px solid #cccdc8;
+    border-radius: 2px 2px 0 0;
+    border-bottom: none;
+    position: relative;
+    z-index: 10;
+    &:first-of-type { margin-left: 10px; }
+    &.active {
+      background: #fff;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #fff;
+      &:hover { background: #fff; }
+    }
+    &:hover {
+      // background: darken(#f9f9f9, 10%);
+      background: $sbr-background;
+      text-decoration: none;
+    }
+  }
+}
+.sbrbtn {
+  height: 1.9em;
+  position: absolute;
+  top: .36em; right: .2em;
+  border: none;
+  padding: 3px;
+  background: none;
+  font-size: 19px;
+  border-radius: 2px;
+  img {
+    display: block;
+    height: 100%;
+    width: auto;
+  }
+  &:hover, &:active, &:focus {
+    background: #DC7D59;
+    box-shadow: none;
+    border: none;
+    outline: none; 
+  }
+  &:active {
+    background: #D25627;
+  }
+}
+
+@media (max-width: 600px) {
+  .sbr-search-fields {
+    .sbrbtn { top: .4em; }
+    .proximity input { width: 8em; }
+  }
+}
+
+.sbr-banner {
+  width: 100%;
+  padding: 1em 0;
+  text-align: center;
+  background: #3B97D3;
+  color: #fff;
+}
+
+.sbr-get-involved {
+  .banner {
+    text-align: center;
+    padding: 20px 0 60px;
+    font-weight: 400;
+    font-size: 20px;
+  }
+  @include clearfix;
+  h1 { 
+    text-align: center;
+    margin: 0 0 1em;
+  }
+}
+
+.involve-report-form {
+  background: #6EB2DF;
+  border: 1px solid #3B97D3;
+  border-radius: 4px;
+  padding: 20px 10px;
+  color: #fff;
+  form { margin: 0; }
+  input { background: #fff; }
+  input[type="email"], textarea {
+    font-size: 16px;
+
+    box-shadow: none;
+    border-radius: 2px;
+    border: 1px solid #cccdc8;
+    background: $sbr-background;
+    color: darken(#7a7a7a, 20%);
+    margin-bottom: .75em;
+    // &:focus, &:active {
+    //   background: #fff;
+    // }
+    // &:focus { box-shadow: none; border-color: #cccdc8; }
+  }
+  .contact-text {
+    padding-top: 1em;
+    width: 100%;
+    position: relative;
+    textarea {
+      display: block;
+      width: 100%;
+      resize: none;
+      padding: .5em;
+    }
+  }
+  .contact-actions {
+    @include clearfix;
+    width: 100%;
+    position: relative;
+    input[type="email"] {
+      display: block;
+      width: 70%;
+      float: left;
+      padding-left: .5em;
+      padding-right: .5em;
+    }
+    .btn {
+      font-size: 16px;
+      // border-radius: 3px;
+      display: block;
+      float: left;
+      width: 28%;
+      margin: 0 0 0 2%;
+      // padding: .3em .5em;
+    }
+  }
+}
+
+.involve-yerself {
+  padding-top: 1em;
+}
+
+.report-type label {
+  font-size: 19px;
+  input { margin: -.25em .5em 0 0; }
+}
+
+#binx_stolen_widget { height: 350px; }
+
+@media(min-width: 800px) {
+  .involve-yerself {
+    @include clearfix;
+    padding-bottom: 60px;
+    h3 { margin-top: 0; }
+  }
+  .involve-report {
+    width: 60%;
+    float: left;
+    .involve-report-form { height: 350px; }
+  }
+
+  .involve-widget {
+    width: 38%;
+    float: left;
+    margin-left: 2%;
+  }
+  // .stolen-recent-widget {
+  //   max-height: 350px;
+  //   overflow: auto;
+  // }
+}
+
+
+
+//________________________
+//
+// Sticker styles
+//
+//________________________
+.contribute-sbr {
+  margin: .5em 0 1em;
+  text-align: center;
+}
+
+.sticker-wells { margin: 30px 0; }
+.sticker-well {
+  select { margin-top: .5em; }
+  .sticker-image {
+    @include box-shadow(1px 1px 2px rgba(black,.4));
+    margin-bottom: 1em; 
+  }
+}
+
+@media (min-width: 800px) {
+  .sticker-wells { @include clearfix; }
+  .sticker-well {
+    width: 49%;
+    float: left;
+    min-height:  350px;
+    &:nth-of-type(2) { margin-left: 2%; }
+  }
+}
+
+
+//________________________
+//
+// Multi serial search
+//
+//________________________
+
+$multserial-textheight: 8em;
+.multiserial-form {
+  @include clearfix;
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 0 30px;
+  h3 {
+    text-align: center;
+    margin: 0;
+    padding: 0 0 1em;
+    font-size: 24px;
+  }
+  textarea {
+    border-radius: 3px;
+    font-family: courier;
+    box-shadow: none;
+    display: block;
+    width: 100%;
+    height: $multserial-textheight;
+    margin: 0;
+    padding: .5em .5em .6em;
+    background: #fff;
+    resize: none;
+  }
+  .sbrbtn { top: $multserial-textheight - .2em; }
+}
+
+.multiserial-response {
+  min-height: 10em;
+}
+
+.multiserials-list {
+  @include clearfix;
+  list-style-type: none;
+  margin: 0;
+  padding: 10px 0 30px; 
+  li {
+    border-radius: 2px;
+    @include transition(all linear .5s);
+    float: left;
+    position: relative;
+    padding: .2em .5em;
+    background: #f7f7f7;
+    margin: 0 5px 5px 0;
+    &.ms-nomatch { text-decoration: line-through; }
+    &.ms-match {
+      background: $link-color;
+      color: #fff;
+    }
+    a {
+      @include transition(all ease-in .2s);
+      position: absolute;
+      width: 100%; height: 100%;
+      left: 0; top: 0;
+      cursor: pointer;
+      opacity: .9; 
+      &.blink-class { background: lighten($link-color, 40%); }
+    }
+  }
+
+}
+
+.multiserial-fuzzy-box {
+  text-align: center;
+  a {
+    display: none;
+    span { display: none; }
+    .ms-short-fuzzy { display: inline-block; }
+  }
+
+}
+@media (min-width: 800px) {
+  .multiserial-results div {
+    width: 48%;
+    float: left;
+    margin-right: 4%;
+  }
+  .multiserial-fuzzy-box a {
+    span { display: inline-block; }
+    .ms-short-fuzzy { display: none; }
+  }
+}
+
+.multiserial-results {
+  @include clearfix;
+  position: relative;
+  border: 1px solid $gray-lighter;
+  padding: 20px 10px;
+  margin: 1em 0;
+  h3 { margin-top: 0;}
+  .serial-text {
+    font-size: .9em;
+    color: $gray-light;
+  }
+  li .serial-text { padding-left: .5em; }
+  .multiserial-fuzzy-result {
+    margin-right: 0;
+    h3 {
+      color: $gray-light;
+      .serial-text { color: $gray-lighter; }
+    }
+  }
+}
+
+#ms_form_section, #ms_search_section { display: none; }
+
+.multi-search-toggle {
+  font-size: 20px;
+
+  margin: 0 0 1em;
+  a {
+    text-decoration: none;
+    color: $blue-light;
+    &:hover { color: $link-color;}
+  }
+  .multi { display: inline-block; }  
+  
+}

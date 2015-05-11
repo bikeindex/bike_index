@@ -23,8 +23,7 @@
           .small-header
             %a.top-logo{ href: root_url }
               %span.stripey
-              = image_tag "/assets/updated/home/logo.svg", class: 'logo home-logo'
-              = image_tag "/assets/updated/logo.svg", class: "logo"
+              = image_tag "/assets/updated/home/logo.svg", class: 'logo', alt: "Logo with dark background"
             %a#expand_user.hamburglar{ href: '#' }
               = image_tag "/assets/updated/hamburglar.svg"
           - if @current_user.present?

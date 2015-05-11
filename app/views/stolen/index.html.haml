@@ -1,11 +1,50 @@
-%section.sbr-get-involved
-  .receptacle
-    .inner-recep
-      %h2
+.home-subhead
+  .container
+    %h2
+      Help us fight bicycle theft&mdash;Index your stolen bike.
+    
+    %h3
+      The Bike Index makes stolen bikes harder to sell and easier to recover by making it possible to find and contact stolen bike owners.
+    %h3
+      The process is simple, secure, and free. #{link_to "Register your stolen bike", new_bike_url(stolen: true)}
+    %h3
+      We've <strong>registered #{number_with_delimiter(Bike.count)} bikes</strong> and <strong>recovered #{number_with_delimiter(StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count)}</strong> stolen bikes.
+    %h3
+      - cache 'stolen_home_organizations' do 
+        So far we have <strong>#{Organization.count} partner bike shops, police departments, </strong> and <strong>bike advocacy organizations</strong>.
+.container
+  %h4.multi-search-toggle
+    %a#show_multi_search{ href: '#' }
+      show multi-serial search
+  .multiserial-form#ms_form_section
+    .padded
+    %h3
+      Multiple Serial Search
+    = text_area_tag :multi_serial_search, nil, placeholder: 'Enter multiple serial numbers. Separate them with commas or new lines', class: 'form-control'
+    %a#search_serials.sbrbtn{ href: '#', data: { target: api_v1_bikes_url } }
+      = image_tag '/assets/stolen/search.svg'
+    %section#ms_search_section.hidden
+      .padded
+      .multiserial-response
+        %h2
+          Multi serial search results
+        %ul#serials_submitted.multiserials-list
+        .multiserial-fuzzy-box
+          %a#multiserial_fuzzy.button-green{ href: '#', data: { target: close_serials_api_v1_bikes_url }}
+            %span
+              Find nearly matching serials (in case of a mis-entry)
+            %span.ms-short-fuzzy
+              Find near matches
+        
+        #bikes_returned.padded
+.sbr-wrap#sbr-body
+  
+  %section.sbr-get-involved
+    .container
+      %h1
         Get Involved! Help us stop bike theft
 
       .involve-yerself
-
         .involve-report
           %h3
             Report bike theft issues:
@@ -32,9 +71,9 @@
                   Report a bicycle chop shop
                     
               .contact-text
-                = f.text_area :body, placeholder: "Where is this happening? URL, address - any information you have", rows: 5
+                = f.text_area :body, placeholder: "Where is this happening? URL, address - any information you have", rows: 5, class: 'form-control'
               .contact-actions.control-group
-                = f.email_field :email, placeholder: "Your email address"
+                = f.email_field :email, placeholder: "Your email address", class: 'form-control'
                 = f.submit 'Send alert!', class: 'btn pull-right'
 
         .involve-widget
@@ -44,21 +83,28 @@
           
           #binx_stolen_widget{ data: { location: 'ip', height: '350px' } }
           <script src="https://binx-widget.herokuapp.com/include.js"></script>
-            
+                
 
-%section
-  .receptacle
-    .inner-recep
+    %section
+      .container
+        = render 'stolen/stickers'
 
-      = render 'stolen/stickers'
+    %section
+      .container
+        %h3
+          #{link_to "Donation is also always appreciated", support_the_index_path}
+        %p
+          If stickers aren't your thing, a 
+          %strong
+            donation is also always appreciated.
+          Every single penny you donate goes towards recovering more bikes.
+        .padded
+    .container
 
-%section
-  .receptacle
-    .inner-recep
-      %h3
-        You can also make a donation!
-      %p
-        If stickers aren't your thing, a 
-        %strong
-          donation is also always appreciated.
-        Every single penny you donate goes towards recovering more bikes.
+      .alert.alert-info.stolen-bike-merge-alert
+        %h4
+          StolenBicycleRegistry.com leveled up!
+        %p
+          StolenBicycleRegistry.com merged with Bike Index in 2014 to become the largest open bike registration service. You can read the #{link_to 'Bike Index post', 'https://bikeindex.org/news/providing-the-largest-and-most-effective-bicycle-registry---ever'} and #{link_to "StolenBikeRegistry.com's anouncement", 'https://medium.com/@stolenbikessfo/stolenbicycleregistry-just-merged-with-bikeindex-org-102ffa548821'}!
+        %p
+          \- Bryan Hance & Bike Index

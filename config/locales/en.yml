@@ -29,6 +29,12 @@ en:
     payments_create: "Thanks for your support!"
     sessions_new: "Log in"
     sessions_create: "Log in"
+    stolen_index: "The best stolen bike registration system in the universe"
+    links: "links"
+    about: "FAQ"
+    tech: "Technology for fighting bike theft"
+    stolen_howworks: "how it works"
+    stolen_merging: "Stolen bike registration that works"
   meta_descriptions:
     welcome_index: "The largest and most successful open bike registry in the world: online, powerful, free."
     info_about: "Why we made the Bike Index and who we are"
