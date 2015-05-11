@@ -60,7 +60,7 @@ en:
       no_day_with_year: "%B %d %Y"
       blog: "%m_%d_%Y"
       dotted: "%m.%d.%Y"
-      short_with_hour: "%m.%d.%y %l%p"
+      short_with_hour: "%m.%d.%y %l%P"
   errors: &errors
     format: ! '%{attribute} %{message}'
     messages:
