@@ -1,5 +1,5 @@
 class StolenNotificationsController < ApplicationController
-  before_filter :authenticate_user!
+  before_filter :authenticate_user
 
   def new
     @stolen_notification = StolenNotification.new

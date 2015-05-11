@@ -11,7 +11,7 @@ class BikeIndex.Views.Global extends Backbone.View
     'click #most_recent_stolen_bikes':      'mostRecentStolen'
     
   initialize: ->
-    BikeIndex.hideFlash()
+    # BikeIndex.hideFlash() # not sure that it's something we ever want
     @setElement($('#body'))
     on_stolen = false
     unless $('#sbr-body').length > 0

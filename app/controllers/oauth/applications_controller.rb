@@ -2,7 +2,7 @@
 class Oauth::ApplicationsController < Doorkeeper::ApplicationsController
   include AuthenticationHelper
   helper_method :current_user, :current_organization, :user_root_url
-  before_filter :authenticate_user!
+  before_filter :authenticate_user
   before_filter :set_current_user_instance
   before_filter :ensure_app_owner!, except: [:index, :new, :create]
 

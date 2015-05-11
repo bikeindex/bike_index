@@ -1,5 +1,5 @@
 class OrganizationsController < ApplicationController
-  before_filter :authenticate_user!, only: [:show, :edit, :update, :destroy]
+  before_filter :authenticate_user, only: [:show, :edit, :update, :destroy]
   before_filter :find_organization, except: [:new, :lightspeed_integration, :create]
   before_filter :require_membership, only: [:show, :edit, :update, :destroy]
   before_filter :require_admin, only: [:edit, :update, :destroy]

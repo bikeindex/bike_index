@@ -3,13 +3,21 @@ require "spec_helper"
 describe OwnershipsController do
 
   describe :show do
-    describe "user not present" do
-      before do 
-        ownership = FactoryGirl.create(:ownership)
-        put :show, id: ownership.id
-      end
-      it { should redirect_to(:new_session) }
-      it { should set_the_flash }
+    it "sets the flash with absent user for create account" do
+      ownership = FactoryGirl.create(:ownership)
+      put :show, id: ownership.id
+      response.should redirect_to(:new_user)
+      flash[:error].match("to claim").should be_present
+      flash[:error].match(/create an account/i).should be_present
+    end
+
+    it "sets the flash with sign in for owner exists" do
+      user = FactoryGirl.create(:user)
+      ownership = FactoryGirl.create(:ownership, user: user)
+      put :show, id: ownership.id
+      response.should redirect_to(:new_session)
+      flash[:error].match("to claim").should be_present
+      flash[:error].match(/sign in/i).should be_present
     end
 
     describe "user present" do 

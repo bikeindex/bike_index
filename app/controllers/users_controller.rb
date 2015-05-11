@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   include Sessionable
-  before_filter :authenticate_user!, only: [:edit]
+  before_filter :authenticate_user, only: [:edit]
   
   def new
     @user = User.new

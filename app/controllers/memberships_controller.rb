@@ -1,5 +1,5 @@
 class MembershipsController < ApplicationController
-  before_filter :authenticate_user!
+  before_filter :authenticate_user
   before_filter :find_membership
   before_filter :require_admin
 

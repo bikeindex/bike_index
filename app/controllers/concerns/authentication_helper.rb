@@ -1,14 +1,18 @@
 module AuthenticationHelper
   extend ActiveSupport::Concern
 
-  def authenticate_user!
+  def authenticate_user(msg="Sorry, you have to log in")
     if current_user.present?
       unless current_user.terms_of_service
         redirect_to accept_terms_url(subdomain: false) and return
       end
     else
-      flash[:error] = "You gotta log in!"
-      redirect_to new_session_url(subdomain: false) and return
+      flash[:error] = msg
+      if msg.match(/create an account/i).present?
+        redirect_to new_user_url(subdomain: false) and return
+      else
+        redirect_to new_session_url(subdomain: false) and return
+      end
     end
   end
 

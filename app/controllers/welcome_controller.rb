@@ -1,6 +1,5 @@
 class WelcomeController < ApplicationController
-  # caches_page :index
-  before_filter :authenticate_user!, only: :user_home
+  before_filter :authenticate_user, only: :user_home
   
   def index
     render action: 'index', layout: 'application_updated'
