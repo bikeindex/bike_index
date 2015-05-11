@@ -6,7 +6,7 @@
     %h3
       The Bike Index makes stolen bikes harder to sell and easier to recover by making it possible to find and contact stolen bike owners.
     %h3
-      The process is simple, secure, and free. #{link_to "Register your stolen bike", new_bike_url(stolen: true)}
+      The process is simple, secure, and free. #{link_to "Register your stolen bike", new_bike_url(stolen: true)}.
     %h3
       We've <strong>registered #{number_with_delimiter(Bike.count)} bikes</strong> and <strong>recovered #{number_with_delimiter(StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count)}</strong> stolen bikes.
     %h3
