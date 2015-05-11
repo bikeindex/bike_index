@@ -66,9 +66,7 @@ class BikeIndex.Views.StolenMultiSerialSearch extends Backbone.View
         
       list += '<span class="stolen-color">Stolen</span>' if bike.stolen
       list += """
-          <a href='#{bike.url}' target='_blank'>
-            #{encodeURI(bike.title)}
-          </a>
+          <a href='#{bike.url}' target='_blank'>#{bike.title}</a>
           <span class='serial-text'>##{encodeURI(bike.serial)}</span>
         </li>
       """

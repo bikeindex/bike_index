@@ -29,14 +29,14 @@ en:
     payments_create: "Thanks for your support!"
     sessions_new: "Log in"
     sessions_create: "Log in"
-    stolen_index: "The best stolen bike registration system in the universe"
+    stolen_index: "Bike registry"
     links: "links"
     about: "FAQ"
     tech: "Technology for fighting bike theft"
-    stolen_howworks: "how it works"
-    stolen_merging: "Stolen bike registration that works"
+    stolen_howworks: "How it works"
+    stolen_merging: "Stolen bike registry"
   meta_descriptions:
-    welcome_index: "The largest and most successful open bike registry in the world: online, powerful, free."
+    welcome_index: "The best bike registry: Simple, secure, and free."
     info_about: "Why we made the Bike Index and who we are"
     info_resources: "Bike Index resources and useful tools"
     info_stolen_bikes: "What to do if your bike is stolen - next steps the Bike Index recommends taking."
@@ -56,6 +56,8 @@ en:
     documentation_api_v1: "API Version 1 documentation, and love"
     sessions_new: "Log in to the Bike Index"
     sessions_create: "Log in to the Bike Index"
+    stolen_index: "Bike Index helps recover your stolen bike"
+    stolen_merging: "StolenBicycleRegistry.com merged with Bike Index in 2014 to become the largest open bike registration service in the world"
   doorkeeper:
     scopes:
       public: "Authenticate with you, view public information"
