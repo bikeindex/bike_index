@@ -20,7 +20,7 @@ class OwnershipsController < ApplicationController
   end
 
   def no_user_flash_msg
-    type = "#{@ownership.bike}"
+    type = "#{@ownership.bike.type}"
     if @ownership.user.present?
       "The owner of this #{type} already has an account on the Bike Index. Sign in to claim it!"
     else
