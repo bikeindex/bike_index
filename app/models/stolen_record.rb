@@ -138,7 +138,7 @@ class StolenRecord < ActiveRecord::Base
     col
   end
 
-  def tsv_row
+  def tsv_row(with_article=true)
     b = self.bike 
     return '' unless b.present?
     row = ""
@@ -153,7 +153,7 @@ class StolenRecord < ActiveRecord::Base
     row << " #{tsv_col(self.theft_description)}"
     row << " Stolen from: #{tsv_col(self.address)}"
     row << "\t"
-    row << "Article\t"
+    row << "Article\t" if with_article
     row << self.date_stolen.strftime("%Y-%m-%d")
     row << "\t"
     row << tsv_col(self.police_report_number)
