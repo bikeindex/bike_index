@@ -73,8 +73,8 @@
               .controls
                 = f.email_field :user_email, placeholder: 'your email', required: true, value: @blog.user.email
                 - user = User.fuzzy_email_find(@blog.user.email)
-                - unless user.present? && user.show_bikes
-                  Please #{link_to "turn on your personal page", my_account_url, target: '_blank'}!
+                - unless user.present? && user.userlink.present?
+                  Please #{link_to "turn on your personal page", my_account_url, target: '_blank'}, or link your twitter!
           .span6
             .control-group.tags
               = f.label :tags, "Tags, should include a main category: Tech, Design, or Update", class: "control-label"

@@ -5,7 +5,7 @@
     %article.blogger-info
       %h4
         by
-        %a.blog-poster{href: user_path(@blogger)}
+        %a.blog-poster{href: @blogger.userlink}
           = @blogger.name if @blogger.name
       %h4.pub-date
         - if @blog.published_at > Time.now - 1.week

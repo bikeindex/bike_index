@@ -324,5 +324,19 @@ describe User do
     end
   end
 
+  describe :userlink do 
+    it "returns user path if user show" do 
+      user = User.new(show_bikes: true, username: 'coolstuff')
+      # pp user
+      user.userlink.should eq('/users/coolstuff')
+    end
+
+    it "returns twitter if user twitter" do 
+      user = User.new(show_bikes: false, username: 'coolstuff', twitter: 'bikeindex')
+      # pp user
+      user.userlink.should eq('https://twitter.com/bikeindex')
+    end
+  end
+
 
 end

@@ -279,6 +279,16 @@ class User < ActiveRecord::Base
     self.username = Slugifyer.slugify(username) if username
   end
 
+  def userlink
+    if show_bikes
+      "/users/#{username}" 
+    elsif twitter.present?
+      "https://twitter.com/#{twitter}"
+    else
+      ""
+    end
+  end
+
   def generate_auth_token
     begin
       self.auth_token = SecureRandom.urlsafe_base64 + "t#{Time.now.to_i}"
