@@ -42,6 +42,7 @@ class StolenRecord < ActiveRecord::Base
   validates_presence_of :bike, :date_stolen
 
   default_scope where(current: true)
+  scope :approveds, where(current: true).where(approved: true)
 
   scope :recovered, unscoped.where(current: false).order("date_recovered desc")
   scope :displayable, unscoped.where(current: false, can_share_recovery: true).order("date_recovered desc")
