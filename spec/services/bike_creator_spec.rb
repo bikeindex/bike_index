@@ -25,6 +25,8 @@ describe BikeCreator do
       b_param.reload
       # pp b_param.params
       b_param.params[:components].count.should > 5
+      b_param.params[:components].select{ |c| c[:is_stock] }.count.should be > 5
+      b_param.params[:components].select{ |c| !c[:is_stock] }.count.should eq(0) 
       b_param.bike[:description].should_not eq("Input description")
       b_param.bike[:serial_number].should eq("Some serial")
       b_param.bike[:primary_frame_color_id].should eq(1)

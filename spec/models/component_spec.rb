@@ -54,4 +54,37 @@ describe Component do
     end
   end
 
+  describe :set_is_stock do 
+    it "sets not stock if description changed" do 
+      component = FactoryGirl.create(:component, is_stock: true)
+      component.is_stock.should be_true
+      component.year = 1987
+      component.is_stock.should be_true
+      component.manufacturer_id = 69
+      component.set_is_stock
+      component.is_stock.should be_true
+      component.description = "A new description"
+      component.set_is_stock
+      component.is_stock.should be_false
+    end
+    it "sets not stock if model_name changed" do 
+      component = FactoryGirl.create(:component, is_stock: true)
+      component.is_stock.should be_true
+      component.model_name = "New mode"
+      component.set_is_stock
+      component.is_stock.should be_false
+    end
+    it "skips if setting_is_stock" do 
+      component = FactoryGirl.create(:component, is_stock: true)
+      component.is_stock.should be_true
+      component.setting_is_stock = true
+      component.model_name = "New mode"
+      component.set_is_stock
+      component.is_stock.should be_true
+    end
+    it "has before_save_callback_method defined for clean_frame_size" do
+      Component._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_is_stock).should == true
+    end
+  end
+
 end

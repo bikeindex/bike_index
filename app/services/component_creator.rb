@@ -47,7 +47,8 @@ class ComponentCreator
       ctype_id: component[:ctype_id],
       ctype_other: component[:ctype_other],
       manufacturer_id: component[:manufacturer_id],
-      manufacturer_other: component[:manufacturer_other]
+      manufacturer_other: component[:manufacturer_other],
+      mnfg_name: component[:manufacturer_name] || component[:manufacturer_name] || component[:mnfg_name]
     }
     comp_attributes.select { |k, v| v.present? }
   end

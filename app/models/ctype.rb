@@ -46,7 +46,16 @@ class Ctype < ActiveRecord::Base
   def set_slug
     # We don't care about updating the slug, since this information will rarely
     # if ever change, and the slug can always stay the same.
-    self.slug = Slugifyer.slugify(self.name)
+    self.slug = Slugifyer.slugify(name)
+  end
+
+  def self.fuzzy_name_find(n)
+    if !n.blank?
+      n = Slugifyer.slugify(n)
+      found = self.find(:first, conditions: [ "slug = ?", n ])
+      return found if found.present?
+    end
+    nil
   end
 
 end

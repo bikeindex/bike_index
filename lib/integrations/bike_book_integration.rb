@@ -17,6 +17,13 @@ class BikeBookIntegration
   end
 
   def get_model(options = {})
+    if options.kind_of?(Bike)
+      options = {
+        year: options.year,
+        manufacturer: options.manufacturer.name,
+        frame_model: options.frame_model
+      }
+    end
     return nil unless options[:year].present? && options[:manufacturer].present? && options[:frame_model].present?
     # We're book sluging everything because, url safe (It's the same method bikebook uses)
     query = { manufacturer: Slugifyer.manufacturer(options[:manufacturer]),

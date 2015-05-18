@@ -1,4 +1,5 @@
 class Component < ActiveRecord::Base
+  include ActiveModel::Dirty
   attr_accessible :model_name,
     :year,
     :ctype,
@@ -6,6 +7,7 @@ class Component < ActiveRecord::Base
     :ctype_other,
     :manufacturer,
     :manufacturer_id,
+    :mnfg_name,
     :manufacturer_other,
     :description,
     :bike_id,
@@ -15,7 +17,7 @@ class Component < ActiveRecord::Base
     :rear,
     :front_or_rear
     
-  attr_accessor :front_or_rear
+  attr_accessor :front_or_rear, :mnfg_name, :setting_is_stock
 
   belongs_to :manufacturer
   belongs_to :ctype
@@ -68,5 +70,21 @@ class Component < ActiveRecord::Base
       return manufacturer.name 
     end
   end
+
+  before_save :set_is_stock
+  def set_is_stock
+    return true if setting_is_stock
+    if id.present? && is_stock && description_changed? || model_name_changed?
+      self.is_stock = false
+    end
+    true
+  end
+
+  before_validation :set_manufacturer
+  def set_manufacturer
+    return true unless mnfg_name.present?
+    self.manufacturer_id = Manufacturer.fuzzy_id(mnfg_name)
+  end
+
 
 end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150507222158) do
+ActiveRecord::Schema.define(:version => 20150518192613) do
 
   create_table "ads", :force => true do |t|
     t.string   "title"
@@ -180,13 +180,14 @@ ActiveRecord::Schema.define(:version => 20150507222158) do
     t.integer  "manufacturer_id"
     t.integer  "ctype_id"
     t.string   "ctype_other"
-    t.datetime "created_at",         :null => false
-    t.datetime "updated_at",         :null => false
+    t.datetime "created_at",                            :null => false
+    t.datetime "updated_at",                            :null => false
     t.integer  "bike_id"
     t.boolean  "front"
     t.boolean  "rear"
     t.string   "manufacturer_other"
     t.string   "serial_number"
+    t.boolean  "is_stock",           :default => false, :null => false
   end
 
   add_index "components", ["bike_id"], :name => "index_components_on_bike_id"

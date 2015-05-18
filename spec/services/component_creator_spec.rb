@@ -41,10 +41,12 @@ describe ComponentCreator do
   describe :create_component do 
     it "creates the component" do 
       bike = FactoryGirl.create(:bike)
-      component = {description: "Stuff"}
+      manufacturer = FactoryGirl.create(:manufacturer, name: "Somecool THING")
+      component = {description: "Stuff", mnfg_name: "Somecool thing"}
       component_creator = ComponentCreator.new(bike: bike)
       component_creator.create_component(component)
       bike.reload.components.count.should eq(1)
+      bike.components.last.manufacturer.should eq(manufacturer)
     end
     it "creates the component and ignore attributes it shouldn't use" do 
       bike = FactoryGirl.create(:bike)
