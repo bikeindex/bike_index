@@ -198,6 +198,7 @@ ul.news-index-list {
     margin: 1.5em 10px 0;
     padding: 0.5em 10px;
     quotes: "\201C""\201D""\2018""\2019";
+    &.beside-float-40 { margin: 0; }
   }
   blockquote:before {
     color: #ccc;
