@@ -318,10 +318,11 @@ describe Bike do
   end
 
   describe :set_normalized_serial do 
-    it "sets a bikes normalized_serial" do 
-      bike = Bike.new
+    it "sets a bikes normalized_serial and switches unknown to absent" do 
+      bike = Bike.new(serial_number: ' UNKNOWn ')
       SerialNormalizer.any_instance.should_receive(:normalized).and_return('normal')
       bike.set_normalized_serial
+      bike.serial_number.should eq('absent')
       bike.serial_normalized.should eq('normal')
     end
     it "has before_save_callback_method defined as a before_save callback" do

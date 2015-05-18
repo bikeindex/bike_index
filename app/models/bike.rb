@@ -262,6 +262,7 @@ class Bike < ActiveRecord::Base
 
   before_save :set_normalized_serial
   def set_normalized_serial
+    self.serial_number = 'absent' if serial_number.strip.downcase == 'unknown'
     self.serial_normalized = SerialNormalizer.new({serial: serial_number}).normalized
   end
 
