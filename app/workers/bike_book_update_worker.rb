@@ -15,7 +15,7 @@ class BikeBookUpdateWorker
           if component.present? 
             next unless component.description == bb_comp['description']
           else
-            component = Component.new(bike_id: bike.id)
+            component = Component.new(bike_id: bike.id, ctype_id: ctype.id)
           end
           component.is_stock = true
           component.setting_is_stock = true

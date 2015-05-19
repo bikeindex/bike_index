@@ -45,6 +45,7 @@ describe BikeBookUpdateWorker do
     bike.components.where(id: component1.id).first.is_stock.should be_true
     bike.components.where(id: component2.id).first.is_stock.should be_false
     bike.components.where(ctype_id: component2.ctype_id).count.should eq(1)
+    (Ctype.pluck(:id) - bike.components.pluck(:ctype_id)).should eq([])
   end
 
   
