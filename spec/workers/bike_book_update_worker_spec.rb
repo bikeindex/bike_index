@@ -41,9 +41,10 @@ describe BikeBookUpdateWorker do
       description: "Sweet cranks")
     BikeBookUpdateWorker.new.perform(bike.id)
     bike.reload
-    bike.components.count.should be > 10
+    bike.components.count.should eq(14)
     bike.components.where(id: component1.id).first.is_stock.should be_true
     bike.components.where(id: component2.id).first.is_stock.should be_false
+    bike.components.where(is_stock: false).count.should eq(1)
     bike.components.where(ctype_id: component2.ctype_id).count.should eq(1)
     (Ctype.pluck(:id) - bike.components.pluck(:ctype_id)).should eq([])
   end

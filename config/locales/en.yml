@@ -36,7 +36,7 @@ en:
     stolen_howworks: "How it works"
     stolen_merging: "Stolen bike registry"
   meta_descriptions:
-    welcome_index: "The best bike registry: Simple, secure, and free."
+    welcome_index: "The best bike registry: Simple, secure and free."
     info_about: "Why we made the Bike Index and who we are"
     info_resources: "Bike Index resources and useful tools"
     info_stolen_bikes: "What to do if your bike is stolen - next steps the Bike Index recommends taking."
@@ -53,7 +53,8 @@ en:
     feedbacks_index: "Help using the Bike Index. Frequently asked questions and other things."
     blogs_index: "Read Bike Index news. Also, periodically, learn magic spells."
     users_new: "Sign up for the Bike Index"
-    documentation_api_v1: "API Version 1 documentation, and love"
+    documentation_api_v1: "API Version 1 documentation and love"
+    documentation_api_v2: "Bike Index API v2 documentation. Authentication with OAuth2, uses JSON, is RESTful and is generally pretty awesome"
     sessions_new: "Log in to the Bike Index"
     sessions_create: "Log in to the Bike Index"
     stolen_index: "Bike Index helps recover your stolen bike"

@@ -3,13 +3,13 @@
 #Bike Index API V2
   
 
-The Bike Index is open source. You can [view the source code on GitHub](https://github.com/bikeindex/bike_index)&mdash;the API is in [app/controllers/v2](https://github.com/bikeindex/bike_index/tree/master/app/controllers/api/v2) and the tests for it are in [spec/api/v2](https://github.com/bikeindex/bike_index/tree/master/spec/api/v2).
+The Bike Index is open source. You can [view the source code on GitHub](https://github.com/bikeindex/bike_index)&mdash;the API is in [app/controllers/api/v2](https://github.com/bikeindex/bike_index/tree/master/app/controllers/api/v2) and the tests for it are in [spec/api/v2](https://github.com/bikeindex/bike_index/tree/master/spec/api/v2).
 
 If you encounter any errors here (or anywhere on the Bike Index), please [submit an issue on GitHub](https://github.com/bikeindex/bike_index/issues/new).
 
 If you have questions contact [seth@bikeindex.org](mailto:seth@bikeindex.org").
 
-This documentation is temporarily displaying the port number in the demo requests - e.g. [bikeindex.org:**443**/api/v2/bikes_search](https://bikeindex.org/api/v2/bikes_search). While this works, it's unnecessary. You can remove the `:443` - e.g. bikeindex.org/api/v2/bikes_search.
+This documentation displays the port number in the demo requests - e.g. [bikeindex.org:**443**/api/v2/bikes_search](https://bikeindex.org/api/v2/bikes_search). While this works, it's unnecessary. You can remove the `:443` - e.g. bikeindex.org/api/v2/bikes_search.
 
 *This documentation isn't tested or supported in IE, we recommend you use a different browser*
 
