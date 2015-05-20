@@ -7,7 +7,7 @@ class BikeIndex.Views.StolenMultiSerialSearch extends Backbone.View
     
   initialize: ->
     @setElement($('body'))
-    @toggleMultiSearch() if window.location.href.match(/multi.serial.search/i)
+    @toggleMultiSearch() if window.location.href.match(/multi.?serial.?search/i)
 
   Array::uniq = ->
     output = {}
