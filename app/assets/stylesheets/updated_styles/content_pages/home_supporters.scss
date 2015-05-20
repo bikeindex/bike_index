@@ -26,8 +26,10 @@
   }
   .horizontal-list {
     li {
-      width: 33%;
+      width: 32.8%;
+      margin-left: 0.2%;
       padding: 15px;
+      &:first-of-type { margin-left: 0; }
       a { display: block; width: 100%;}
       img { width: 100%; }
     }
@@ -55,7 +57,7 @@
     padding-bottom: 5em;
     h2 { font-size: 40px; }
     .horizontal-list li {
-      width: 16.66%;
+      width: 16.46%;
       padding: 0;
     }
     .four-supporters li:first-of-type { margin-left: 16.66%; }
