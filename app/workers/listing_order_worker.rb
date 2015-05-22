@@ -5,10 +5,7 @@ class ListingOrderWorker
     
   def perform(bike_id)
     bike = Bike.unscoped.where(id: bike_id).first
-    if bike.present?
-      bike.update_attribute :listing_order, bike.get_listing_order
-      AfterUserChangeWorker.perform_async(bike.owner.id) if bike.owner.present?
-    end
+    bike.update_attribute :listing_order, bike.get_listing_order if bike.present?
     AfterBikeSaveWorker.perform_async(bike_id)
   end
 

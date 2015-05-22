@@ -15,7 +15,6 @@ describe ListingOrderWorker do
     ListingOrderWorker.new.perform(bike.id)
     bike.reload.paint.should eq(paint)
     expect(AfterBikeSaveWorker).to have_enqueued_job(bike.id)
-    expect(AfterUserChangeWorker).to have_enqueued_job(ownership.creator.id)
   end
 
   it "doesn't break if it isn't a bike" do 
