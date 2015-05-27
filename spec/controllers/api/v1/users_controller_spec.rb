@@ -25,46 +25,46 @@ describe Api::V1::UsersController do
   end
 
   describe :send_request do 
-    it "actuallies send the mail" do 
+    it "actuallies send the mail" do
       Sidekiq::Testing.inline! do
         # We don't test that this is being added to Sidekiq
         # Because we're testing that sidekiq does what it 
-        # Needs to do here.
+        # Needs to do here. Slow tests, but we know it actually works :(
         o = FactoryGirl.create(:ownership)
         user = o.creator
         bike = o.bike
-        serial_request = { 
-          request_type: 'serial_update_request',
+        delete_request = { 
+          request_type: 'bike_delete_request',
           user_id: user.id,
           request_bike_id: bike.id,
           request_reason: 'Some reason',
-          serial_update_serial: 'some new serial'
         }
         set_current_user(user)
         ActionMailer::Base.deliveries = []
-        SerialNormalizer.any_instance.should_receive(:save_segments)
-        post :send_request, serial_request
+        post :send_request, delete_request
         response.code.should eq('200')
         ActionMailer::Base.deliveries.should_not be_empty
-        bike.reload.serial_number.should eq('some new serial')
       end
     end
 
-    it "creates a new bike delete request mail" do 
+    it "doesn't create a new serial request mail" do 
       o = FactoryGirl.create(:ownership)
       user = o.creator
       bike = o.bike
-      delete_request = { 
-        request_type: 'bike_delete_request',
+      serial_request = { 
+        request_type: 'serial_update_request',
         user_id: user.id,
         request_bike_id: bike.id,
         request_reason: 'Some reason',
+        serial_update_serial: 'some new serial'
       }
       set_current_user(user)
+      SerialNormalizer.any_instance.should_receive(:save_segments)
       expect {
-        post :send_request, delete_request
-      }.to change(EmailFeedbackNotificationWorker.jobs, :size).by(1)
+        post :send_request, serial_request
+      }.to change(EmailFeedbackNotificationWorker.jobs, :size).by(0)
       response.code.should eq('200')
+      bike.reload.serial_number.should eq('some new serial')
     end
 
 
