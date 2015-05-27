@@ -198,9 +198,9 @@ Bikeindex::Application.routes.draw do
     get page, controller: 'info', action: page
   end
 
-  # get 'sitemap.xml.gz' => redirect("https://s3.amazonaws.com/bikeindex/sitemaps/sitemap_index.xml.gz")
+  # get 'sitemap.xml.gz' => redirect("https://files.bikeindex.org/sitemaps/sitemap_index.xml.gz")
   # Somehow the redirect drops the .gz extension, which ruins it so this redirect is handled by Cloudflare
-  # get "sitemaps/(*all)" => redirect("https://s3.amazonaws.com/bikeindex/sitemaps/%{all}")
+  # get "sitemaps/(*all)" => redirect("https://files.bikeindex.org/sitemaps/%{all}")
   
   match '/400', to: 'errors#bad_request'
   match '/401', to: 'errors#unauthorized'

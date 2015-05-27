@@ -19,7 +19,7 @@
 
 %body
   %header
-    - if @bike.manufacturer.logo && @bike.manufacturer.logo.url != "https://s3.amazonaws.com/bikeindex/blank.png"
+    - if @bike.manufacturer.logo && @bike.manufacturer.logo.url != "https://files.bikeindex.org/blank.png"
       .mnfg-logo
         %img{ src: @bike.manufacturer.logo }
     - if @bike.public_images.present?
@@ -199,7 +199,7 @@
 
       .index-block{ class: ('stolen' if @bike.stolen) }
         .logo-block
-          %img{ src: "https://s3.amazonaws.com/bikeindex/logo.png" }
+          %img{ src: "https://files.bikeindex.org/logo.png" }
         .index-text
           %h2
             Registration

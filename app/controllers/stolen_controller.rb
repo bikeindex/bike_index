@@ -7,7 +7,7 @@ class StolenController < ApplicationController
   end
 
   def current_tsv
-    redirect_to 'https://s3.amazonaws.com/bikeindex/uploads/current_stolen_bikes.tsv'
+    redirect_to 'https://files.bikeindex.org/uploads/current_stolen_bikes.tsv'
   end
 
   def links

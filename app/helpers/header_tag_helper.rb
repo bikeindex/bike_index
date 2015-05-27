@@ -151,7 +151,7 @@ protected
     if action_name == 'show'
       hash[:title_tag][:title] = @user.title if @user.title.present?
       hash[:meta_tags][:description] = "#{@user.title} on the Bike Index" if @user.title.present?
-      hash[:meta_tags][:"og:image"] = @user.avatar.url unless @user.avatar.url(:medium) == "https://s3.amazonaws.com/bikeindex/blank.png"
+      hash[:meta_tags][:"og:image"] = @user.avatar.url unless @user.avatar.url(:medium) == "https://files.bikeindex.org/blank.png"
     end
     if action_name == 'edit'
       hash[:title_tag][:title] = "Edit your account"

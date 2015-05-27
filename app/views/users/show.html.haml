@@ -14,7 +14,7 @@
         = @user.mb_link_title
   .description-avatar
     - if @user.avatar
-      - unless @user.avatar.url(:medium) == "https://s3.amazonaws.com/bikeindex/blank.png"
+      - unless @user.avatar.url(:medium) == "https://files.bikeindex.org/blank.png"
         .avatar
           = image_tag @user.avatar.url(:medium)
     - if @user.description
