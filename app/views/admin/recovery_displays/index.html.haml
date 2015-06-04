@@ -24,6 +24,9 @@
           %td
             - date = l recovery_display.date_recovered, format: :dotted
             = link_to date, edit_admin_recovery_display_url(recovery_display)
+            .less-strong-hold
+              %span.less-strong-right.medium-screens
+                = bike.id 
           %td
             = truncate(recovery_display.quote, length: 70)
           %td.large-screens
