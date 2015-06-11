@@ -11,5 +11,10 @@ describe 'Swagger API V2 docs' do
         response.code.should eq('200')
       end
     end
+
+    it "redirects to documentation on API call" do
+      get 'api'
+      response.should redirect_to("/documentation")
+    end
   end
 end

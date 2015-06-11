@@ -14,7 +14,7 @@ class API::Logger
 
     ActiveSupport::Notifications.instrument "grape.request", payload do
       @app.call(env).tap do |response|
-        if env["api.endpoint"].params.present? 
+        if env["api.endpoint"] && env["api.endpoint"].params.present? 
           payload[:params] = env["api.endpoint"].params.to_hash
           payload[:params].delete("route_info")
           payload[:params].delete("format")

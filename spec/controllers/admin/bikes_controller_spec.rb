@@ -41,7 +41,6 @@ describe Admin::BikesController do
   describe :update do 
     describe "success" do 
       before do 
-        session[:return_to] = nil
         bike = FactoryGirl.create(:bike)
         user = FactoryGirl.create(:admin)
         set_current_user(user)

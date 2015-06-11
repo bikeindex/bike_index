@@ -145,6 +145,7 @@ Bikeindex::Application.routes.draw do
   end
 
   namespace :api, defaults: {format: 'json'} do
+    match '/', to: redirect('/documentation')
     namespace :v1 do
       resources :bikes, only: [:index, :show, :create] do
         collection do
