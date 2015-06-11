@@ -41,6 +41,7 @@ describe Admin::BikesController do
   describe :update do 
     describe "success" do 
       before do 
+        session[:return_to] = nil
         bike = FactoryGirl.create(:bike)
         user = FactoryGirl.create(:admin)
         set_current_user(user)
@@ -76,7 +77,7 @@ describe Admin::BikesController do
       it { should render_template(:edit) }
     end
 
-    it "should mark a stolen bike recovered" do 
+    it "should mark a stolen bike recovered, and pass attr update through" do 
       bike = FactoryGirl.create(:stolen_bike)
       bike.reload.stolen.should be_true
       opts = {
@@ -84,6 +85,7 @@ describe Admin::BikesController do
         mark_recovered_reason: "I recovered it", 
         index_helped_recovery: true,
         can_share_recovery: 1,
+        fast_attr_update: true,
         bike: { stolen: 0 }
       }
       user = FactoryGirl.create(:admin)
@@ -91,7 +93,23 @@ describe Admin::BikesController do
       expect {
         put :update, opts
       }.to change(RecoveryUpdateWorker.jobs, :size).by(1)
+      assigns(:fast_attr_update).should be_true
       bike.reload.stolen.should be_false
+    end
+
+    it "redirects to return_to if it's a valid url" do
+      user = FactoryGirl.create(:admin)
+      bike = FactoryGirl.create(:bike, serial_number: 'og serial')
+      set_current_user(user)
+      session[:return_to] = '/about'
+      opts = {
+        id: bike.id,
+        bike: { serial_number: 'ssssssssss' }
+      }
+      put :update, opts
+      bike.reload.serial_number.should eq("ssssssssss")
+      response.should redirect_to "/about"
+      session[:return_to].should be_nil
     end
   end
 

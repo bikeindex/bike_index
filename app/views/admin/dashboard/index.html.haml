@@ -70,13 +70,13 @@
     %em
       (#{today} today, #{yesterday} yesterday)
 
-%section.full-screen-table
-  %h2
-    Suspicious 
-    = link_to "DUPED bikes", duplicates_admin_bikes_url
-  %table.table.table-striped.table-bordered
-    - @bike_groups.each do |bikes|
-      = render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: bikes }
+/ %section.full-screen-table
+/   %h2
+/     Suspicious 
+/     = link_to "DUPED bikes", duplicates_admin_bikes_url
+/   %table.table.table-striped.table-bordered
+/     - @bike_groups.each do |bikes|
+/       = render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: bikes }
 
 %section.full-screen-table
   %header.with-subtitle

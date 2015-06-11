@@ -190,7 +190,19 @@
   .special-search-field { float: none; }
 }
 
-
+.admin-bike-edit .fast-attr-update {
+  padding-bottom: 2em;
+  textarea { height: 8em; }
+  .control-group { margin-bottom: 10px; }
+  .admin-tire-widths-controls {
+    margin-top: -20px;
+    .radio { 
+      float: left;
+      width: 6em; 
+      &:last-of-type { margin-top: 4px; }
+    }
+  }
+}
 @media (min-width: 1000px) {
   .admin-bike-edit {
     .bike-fields {

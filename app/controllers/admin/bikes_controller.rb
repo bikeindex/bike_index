@@ -18,7 +18,9 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def missing_manufacturer
-    bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.find_by_slug('other').id).order('manufacturer_other ASC')
+    session[:missing_manufacturer_time_order] = params[:time_ordered] if params[:time_ordered].present?
+    bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.find_by_slug('other').id)
+    bikes = session[:missing_manufacturer_time_order] ? bikes.order('created_at desc') : bikes.order('manufacturer_other ASC')
     page = params[:page] || 1
     per_page = params[:per_page] || 100
     bikes = bikes.page(page).per(per_page)
@@ -61,9 +63,11 @@ class Admin::BikesController < Admin::BaseController
 
   def edit
     @bike = @bike.decorate
+    @fast_attr_update = params[:fast_attr_update]
   end
 
   def update
+    @fast_attr_update = params.delete(:fast_attr_update)
     BikeUpdator.new(user: current_user, b_params: params).update_ownership
     @bike = @bike.decorate
     if params[:mark_recovered_reason].present?
@@ -75,9 +79,14 @@ class Admin::BikesController < Admin::BaseController
       RecoveryUpdateWorker.perform_async(@bike.current_stolen_record.id, info)
     end
     if @bike.update_attributes(params[:bike])
-
       SerialNormalizer.new({serial: @bike.serial_number}).save_segments(@bike.id)
-      redirect_to edit_admin_bike_url(@bike), notice: 'Bike was successfully updated.'
+      return if return_to_if_present
+      flash[:notice] = "Bike was successfully updated."
+      if @fast_attr_update.present? && @fast_attr_update
+        redirect_to edit_admin_bike_url(@bike, fast_attr_update: true) and return
+      else
+        redirect_to edit_admin_bike_url(@bike) and return
+      end
     else
       render action: "edit"
     end

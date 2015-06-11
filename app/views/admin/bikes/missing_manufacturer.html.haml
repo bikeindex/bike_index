@@ -1,7 +1,14 @@
+
 %header.with-subtitle
   %h1
     Multi manufacturer update
-= form_tag update_manufacturers_admin_bikes_path, class: 'padded', id: 'multi_bike_manufacturer_update' do
+  .sharing-links
+    %label.checkbox.disabled
+      = check_box_tag :time_ordered, 'time_ordered', session[:missing_manufacturer_time_order]
+      time ordered
+      
+
+= form_tag update_manufacturers_admin_bikes_path, id: 'multi_bike_manufacturer_update' do
   .row-fluid.multi-bike-manufacturer-form
     #chosen-container.span4.multi-manufacturer-selector
       .chosen-select

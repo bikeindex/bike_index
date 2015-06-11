@@ -1,225 +1,230 @@
-#bike_edit_root_url.hidden{data: { url: ENV['BASE_URL'] }}
-#chosen-container
-  %ul.bike-boxes
-    = render partial: "/bikes/bike", locals: {bike: @bike, target: "show" }
-  - if @bike.stolen
-    %h4
-      = link_to "Stolen edit page", edit_admin_stolen_bike_url(@bike)
-  .dl-holder
-    %dl.dl-horizontal
-      = @bike.dl_from_attribute("owner_email")
-      = @bike.dl_list_item((link_to @bike.owner.email, edit_admin_user_url(@bike.owner)), "Current Owner")
-      - if @bike.current_stolen_record.present?
-        = @bike.dl_list_item(@bike.current_stolen_record.phone, "Phone")
-    %dl.dl-horizontal
-      = @bike.dl_list_item(@bike.created_at.strftime("%m-%d-%Y"), "Created")
-      - if @bike.creation_organization.present?
-        = @bike.dl_list_item(@bike.creation_organization.name, "Creation org")
-        = @bike.dl_from_attribute("cached_data")
-  %hr
-
-  = form_for [:admin, @bike], html: { class: "form form-horizontal admin-bike-edit" } do |f|
-    .clearfix
-      .bike-fields
-        - if @bike.errors.any?
-          #alert-block
-            .alert.alert-error
-              %h4
-                Please fix the following 
-                = pluralize(@bike.errors.count, "error")
-              %ul
-                - @bike.errors.full_messages.each do |msg|
-                  %li
-                    = msg
-        .control-group
-          = f.label :cycle_type_id, "Cycle type", class: "control-label"
-          .controls
-            = collection_select( :bike, :cycle_type_id, CycleType.all, :id, :name, :required =>true )
-
-        .control-group
-          = f.label :serial_number, class: "control-label"
-          .controls
-            = f.text_field :serial_number, :required =>true
-        
-        .control-group
-          = f.label :has_no_serial, class: "control-label"
-          .controls
-            = f.check_box :has_no_serial
-
-
-        .control-group.chosen-select
-          = f.label :location_id, class: "control-label"
-          .controls
-            = f.text_field :location_id
-
-        .control-group.select-jsonified
-          = f.label :manufacturer_id, class: "control-label"
-          .controls
-            = f.text_field :manufacturer_id
-
-        .control-group
-          = f.label :manufacturer_other, "Other frame manufacturer", class: "control-label"
-          .controls
-            = f.text_field :manufacturer_other
-        
-        .control-group
-          = f.label :card_id, "Spokecard id", class: "control-label"
-          .controls
-            = f.text_field :card_id
-
-      .bike-fields
-        .control-group
-          = f.label :frame_model, class: "control-label"
-          .controls
-            = f.text_field :frame_model
-        .control-group
-          = f.label :year, class: "control-label"
-          .controls
-            = f.text_field :year
-        / disabled because we don't use it 
-        / .control-group
-        /   = f.label :created_with_token, class: "control-label"
-        /   .controls
-        /     = f.check_box :created_with_token
-        .control-group.chosen-select
-          = f.label :paint_id, "Paint description", class: "control-label"
-          .controls
-            = collection_select( :bike, :paint_id, Paint.all, :id, :name, required: true, prompt: "Choose paint" )
-        .control-group.chosen-select
-          = f.label :primary_frame_color_id, class: "control-label"
-          .controls
-            = collection_select( :bike, :primary_frame_color_id, Color.all, :id, :name, required: true, prompt: "Choose color" )
-        / Disabled for performance reasons 
-        / .control-group.chosen-select
-        /   = f.label :creator_id, class: "control-label"
-        /   .controls
-        /     = collection_select( :bike, :creator_id, User.all, :id, :email, :required =>true, prompt: "Choose creator")
-        .control-group.chosen-select
-          = f.label :creation_organization_id, class: "control-label"
-          .controls
-            = collection_select( :bike, :creation_organization_id, Organization.all, :id, :name, prompt: "Choose organization")
-        .control-group
-          = f.label :description, class: "control-label"
-          .controls
-            = f.text_field :description
-        .control-group
-          = f.label :owner_email, class: "control-label"
-          .controls
-            = f.text_field :owner_email, :required =>true
-        .control-group
-          = f.label :hidden, "Hidden (fake delete)", class: "control-label"
-          .controls
-            = f.check_box :hidden
-        
-    .actions
-      .control-group
-        = submit_tag "Update the bike", class: "button-green"
-        = link_to "Delete bike", admin_bike_url(@bike), method: :delete, confirm: "Are you sure?", class: "button-red"
-    - if @bike.stolen and @bike.find_current_stolen_record.present?
-      %hr
+- if @fast_attr_update
+  = render 'fast_attr_update'
+- else
+  #bike_edit_root_url.hidden{data: { url: ENV['BASE_URL'] }}
+  #chosen-container
+    %ul.bike-boxes
+      = render partial: "/bikes/bike", locals: {bike: @bike, target: "show" }
+    - if @bike.stolen
+      %h4
+        = link_to "Stolen edit page", edit_admin_stolen_bike_url(@bike)
+    .dl-holder
+      %dl.dl-horizontal
+        = @bike.dl_from_attribute("owner_email")
+        = @bike.dl_list_item((link_to @bike.owner.email, edit_admin_user_url(@bike.owner)), "Current Owner")
+        - if @bike.current_stolen_record.present?
+          = @bike.dl_list_item(@bike.current_stolen_record.phone, "Phone")
+      %dl.dl-horizontal
+        = @bike.dl_list_item(@bike.created_at.strftime("%m-%d-%Y"), "Created")
+        - if @bike.creation_organization.present?
+          = @bike.dl_list_item(@bike.creation_organization.name, "Creation org")
+          = @bike.dl_from_attribute("cached_data")
+    %hr
+    = form_for [:admin, @bike], html: { class: "form form-horizontal admin-bike-edit" } do |f|
+      = hidden_field_tag :fast_attr_update, @fast_attr_update
+    
+    
       .clearfix
-        = f.fields_for :stolen_records do |s|
-          - if s.object.current
-            .bike-fields
-              #stolen-bike-location.control-group
-                = s.label :street, "Stolen location", class: "control-label"
-                #country_select_container.controls
-                  = s.collection_select(:country_id, Country.all, :id, :name, prompt: "Choose country" )
-                  %p.other-value
-                    = Country.find_by_iso("US").id
-                .controls.extra-field
-                  = s.text_field :street, placeholder: "Intersection or address"
-                .controls.extra-field
-                  = s.text_field :city, placeholder: "City"
-                .controls.extra-field
-                  = s.text_field :zipcode, placeholder: "Zipcode"
-                #state-select.controls.extra-field.chosen-select
-                  = s.collection_select(:state_id, State.all, :id, :name, include_blank: true, prompt: "State" )
-            .bike-fields
-              .control-group
-                = f.label :theft_description, "theft description", class: "control-label"
-                .controls
-                  = s.text_field :theft_description, placeholder: "description"
-          - else
-            / Don't put anything
-            / Because there might be more stolen records and it breaks without
-            / an else
+        .bike-fields
+          - if @bike.errors.any?
+            #alert-block
+              .alert.alert-error
+                %h4
+                  Please fix the following 
+                  = pluralize(@bike.errors.count, "error")
+                %ul
+                  - @bike.errors.full_messages.each do |msg|
+                    %li
+                      = msg
+          .control-group
+            = f.label :cycle_type_id, "Cycle type", class: "control-label"
+            .controls
+              = collection_select( :bike, :cycle_type_id, CycleType.all, :id, :name, :required =>true )
+
+          .control-group
+            = f.label :serial_number, class: "control-label"
+            .controls
+              = f.text_field :serial_number, :required =>true
+          
+          .control-group
+            = f.label :has_no_serial, class: "control-label"
+            .controls
+              = f.check_box :has_no_serial
+
+
+          .control-group.chosen-select
+            = f.label :location_id, class: "control-label"
+            .controls
+              = f.text_field :location_id
+
+          .control-group.select-jsonified
+            = f.label :manufacturer_id, class: "control-label"
+            .controls
+              = f.text_field :manufacturer_id
+
+          .control-group
+            = f.label :manufacturer_other, "Other frame manufacturer", class: "control-label"
+            .controls
+              = f.text_field :manufacturer_other
+          
+          .control-group
+            = f.label :card_id, "Spokecard id", class: "control-label"
+            .controls
+              = f.text_field :card_id
+
         .bike-fields
           .control-group
-            = f.label :stolen, "Bike is stolen", class: "control-label"
+            = f.label :frame_model, class: "control-label"
             .controls
-              = f.check_box :stolen
-          #admin-recovery-fields
-            .input-group
-            .input-group
-              .control-group.large-text
-                %label.control-label{ for: :mark_recovered_reason }
-                  How was it recovered
-                .controls#recovery_descr
-                  = text_area_tag :mark_recovered_reason, nil, rows: 3
-            .input-group
-              .control-group
-                %label.control-label{ for: :mark_recovered_we_helped }
-                  Did the Index help?
-                .controls
-                  = check_box_tag :mark_recovered_we_helped, true
-            .input-group
-              .control-group
-                %label.control-label{ for: :can_share_recovery }
-                  Can we share?
-                .controls
-                  = check_box_tag :can_share_recovery, true
-            
-
-
-
-%section.full-screen-table
-  %table.table.table-striped.table-bordered
-    %thead
-      %th
-        ID
-      %th
-        Date Created
-      %th
-        Creator
-      %th
-        Owner email
-      %th
-        Current?
-      %th
-        Claimed?
-      %th
-        User hidden
-    %tbody
-      - @bike.ownerships.each do |ownership|
-        %tr
-          %td
-            = link_to ownership.id, edit_admin_ownership_url(ownership.id)
-          %td
-            - if ownership.created_at.today?
-              %span.hidden
-                = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              Today at #{ownership.created_at.strftime("%-I %p")}
-            - elsif Date.yesterday().beginning_of_day() <= ownership.created_at
-              %span.hidden
-                = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              Yesterday at #{ownership.created_at.strftime("%-I %p")}
+              = f.text_field :frame_model
+          .control-group
+            = f.label :year, class: "control-label"
+            .controls
+              = f.text_field :year
+          / disabled because we don't use it 
+          / .control-group
+          /   = f.label :created_with_token, class: "control-label"
+          /   .controls
+          /     = f.check_box :created_with_token
+          .control-group.chosen-select
+            = f.label :paint_id, "Paint description", class: "control-label"
+            .controls
+              = collection_select( :bike, :paint_id, Paint.all, :id, :name, required: true, prompt: "Choose paint" )
+          .control-group.chosen-select
+            = f.label :primary_frame_color_id, class: "control-label"
+            .controls
+              = collection_select( :bike, :primary_frame_color_id, Color.all, :id, :name, required: true, prompt: "Choose color" )
+          / Disabled for performance reasons 
+          / .control-group.chosen-select
+          /   = f.label :creator_id, class: "control-label"
+          /   .controls
+          /     = collection_select( :bike, :creator_id, User.all, :id, :email, :required =>true, prompt: "Choose creator")
+          .control-group.chosen-select
+            = f.label :creation_organization_id, class: "control-label"
+            .controls
+              = collection_select( :bike, :creation_organization_id, Organization.all, :id, :name, prompt: "Choose organization")
+          .control-group
+            = f.label :description, class: "control-label"
+            .controls
+              = f.text_field :description
+          .control-group
+            = f.label :owner_email, class: "control-label"
+            .controls
+              = f.text_field :owner_email, :required =>true
+          .control-group
+            = f.label :hidden, "Hidden (fake delete)", class: "control-label"
+            .controls
+              = f.check_box :hidden
+          
+      .actions
+        .control-group
+          = submit_tag "Update the bike", class: "button-green"
+          = link_to "Delete bike", admin_bike_url(@bike), method: :delete, confirm: "Are you sure?", class: "button-red"
+      - if @bike.stolen and @bike.find_current_stolen_record.present?
+        %hr
+        .clearfix
+          = f.fields_for :stolen_records do |s|
+            - if s.object.current
+              .bike-fields
+                #stolen-bike-location.control-group
+                  = s.label :street, "Stolen location", class: "control-label"
+                  #country_select_container.controls
+                    = s.collection_select(:country_id, Country.all, :id, :name, prompt: "Choose country" )
+                    %p.other-value
+                      = Country.find_by_iso("US").id
+                  .controls.extra-field
+                    = s.text_field :street, placeholder: "Intersection or address"
+                  .controls.extra-field
+                    = s.text_field :city, placeholder: "City"
+                  .controls.extra-field
+                    = s.text_field :zipcode, placeholder: "Zipcode"
+                  #state-select.controls.extra-field.chosen-select
+                    = s.collection_select(:state_id, State.all, :id, :name, include_blank: true, prompt: "State" )
+              .bike-fields
+                .control-group
+                  = f.label :theft_description, "theft description", class: "control-label"
+                  .controls
+                    = s.text_field :theft_description, placeholder: "description"
             - else
-              %span.hidden
-                = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              = ownership.created_at.strftime("%-m/%-d/%Y at %-I %p")
-          %td
-            - u = ownership.creator
-            - if u.name.present?
-              = u.name
-            - else
-              = u.email
-          %td
-            = ownership.owner_email
-          %td.table-cell-check
-            = "&#x2713;".html_safe if ownership.current
-          %td.table-cell-check
-            = "&#x2713;".html_safe if ownership.claimed
-          %td.table-cell-check
-            = "&#x2713;".html_safe if ownership.user_hidden
+              / Don't put anything
+              / Because there might be more stolen records and it breaks without
+              / an else
+          .bike-fields
+            .control-group
+              = f.label :stolen, "Bike is stolen", class: "control-label"
+              .controls
+                = f.check_box :stolen
+            #admin-recovery-fields
+              .input-group
+              .input-group
+                .control-group.large-text
+                  %label.control-label{ for: :mark_recovered_reason }
+                    How was it recovered
+                  .controls#recovery_descr
+                    = text_area_tag :mark_recovered_reason, nil, rows: 3
+              .input-group
+                .control-group
+                  %label.control-label{ for: :mark_recovered_we_helped }
+                    Did the Index help?
+                  .controls
+                    = check_box_tag :mark_recovered_we_helped, true
+              .input-group
+                .control-group
+                  %label.control-label{ for: :can_share_recovery }
+                    Can we share?
+                  .controls
+                    = check_box_tag :can_share_recovery, true
+              
+
+
+
+  %section.full-screen-table
+    %table.table.table-striped.table-bordered
+      %thead
+        %th
+          ID
+        %th
+          Date Created
+        %th
+          Creator
+        %th
+          Owner email
+        %th
+          Current?
+        %th
+          Claimed?
+        %th
+          User hidden
+      %tbody
+        - @bike.ownerships.each do |ownership|
+          %tr
+            %td
+              = link_to ownership.id, edit_admin_ownership_url(ownership.id)
+            %td
+              - if ownership.created_at.today?
+                %span.hidden
+                  = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
+                Today at #{ownership.created_at.strftime("%-I %p")}
+              - elsif Date.yesterday().beginning_of_day() <= ownership.created_at
+                %span.hidden
+                  = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
+                Yesterday at #{ownership.created_at.strftime("%-I %p")}
+              - else
+                %span.hidden
+                  = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
+                = ownership.created_at.strftime("%-m/%-d/%Y at %-I %p")
+            %td
+              - u = ownership.creator
+              - if u.name.present?
+                = u.name
+              - else
+                = u.email
+            %td
+              = ownership.owner_email
+            %td.table-cell-check
+              = "&#x2713;".html_safe if ownership.current
+            %td.table-cell-check
+              = "&#x2713;".html_safe if ownership.claimed
+            %td.table-cell-check
+              = "&#x2713;".html_safe if ownership.user_hidden
 

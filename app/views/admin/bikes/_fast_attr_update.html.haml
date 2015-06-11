@@ -1,0 +1,207 @@
+#bike_edit_root_url.hidden{data: { url: ENV['BASE_URL'] }}
+#chosen-container
+  %ul.bike-boxes
+    = render partial: "/bikes/bike", locals: {bike: @bike, target: "show" }
+  %hr
+  = form_for [:admin, @bike], html: { class: "form form-horizontal admin-bike-edit" } do |f|
+    = hidden_field_tag :fast_attr_update, @fast_attr_update
+  
+    .clearfix.fast-attr-update
+      .bike-fields
+        - if @bike.errors.any?
+          #alert-block
+            .alert.alert-error
+              %h4
+                Please fix the following 
+                = pluralize(@bike.errors.count, "error")
+              %ul
+                - @bike.errors.full_messages.each do |msg|
+                  %li
+                    = msg
+        .control-group
+          = f.label :cycle_type_id, "Cycle type", class: "control-label"
+          .controls
+            = collection_select( :bike, :cycle_type_id, CycleType.all, :id, :name, :required =>true )
+        .control-group.chosen-select
+          = f.label :frame_material_id, "Frame material", class: "control-label"
+          .controls
+            = collection_select( :bike, :frame_material_id, FrameMaterial.all, :id, :name, include_blank: true, prompt: "Choose material")
+        .control-group.chosen-select
+          = f.label :handlebar_type_id, class: "control-label"
+          .controls
+            = collection_select( :bike, :handlebar_type_id, HandlebarType.all, :id, :name, label: "Handlebar Style", :required =>true, input_html: { class: "has-hidden-other" }, prompt: "Choose handlebar" )
+
+        .control-group.chosen-select
+          %label.control-label
+            Front wheel
+          .controls
+            = collection_select( :bike, :front_wheel_size_id, WheelSize.all, :id, :select_value, include_blank: true, prompt: "Front wheel size")
+          %br
+          .controls.radio-controls.admin-tire-widths-controls
+            %label.radio.wide-tire
+              = f.radio_button :front_tire_narrow, "false"
+              Wide
+            %label.radio
+              = f.radio_button :front_tire_narrow, "true"
+              Narrow
+      
+        .control-group.chosen-select
+          %label.control-label
+            Rear wheel
+          .controls
+            = collection_select(:bike, :rear_wheel_size_id, WheelSize.all, :id, :select_value, include_blank: true, prompt: "Rear wheel size")
+          %br
+          .controls.radio-controls.admin-tire-widths-controls
+            %label.radio.wide-tire
+              = f.radio_button :rear_tire_narrow, "false"
+              Wide
+            %label.radio
+              = f.radio_button :rear_tire_narrow, "true"
+              Narrow
+      
+        .control-group
+          %label.control-label
+            Drivetrain
+          #drivetrain_checks.controls
+            - fixed = @bike.rear_gear_type == RearGearType.fixed.first
+            %label.checkbox
+              %input#fixed_gear_check.checkbox.drive-check{ type: "checkbox", checked: fixed }
+              Fixed gear
+            %label.checkbox.not-fixed
+              = f.check_box :coaster_brake, class: 'drive-check'
+              Coaster brake (backpedal to brake)
+            %label.checkbox.not-fixed
+              = f.check_box :belt_drive
+              Belt drive
+          
+        / .input-group.not-fixed
+        .control-group
+          %label.control-label{ for: 'front_gear_select'}
+            Front gears
+          .controls
+            
+            = collection_select( :bike, :front_gear_type_id, FrontGearType.all, :id, :name, prompt: "Chainrings?")
+        .control-group
+          %label.control-label{ for: 'rear_gear_select' }
+            Rear gears
+          .controls
+            = collection_select( :bike, :rear_gear_type_id, RearGearType.all, :id, :name, prompt: "Rear cogs?")
+      .bike-fields
+        .control-group.select-jsonified
+          = f.label :manufacturer_id, class: "control-label"
+          .controls
+            = f.text_field :manufacturer_id
+
+        .control-group
+          = f.label :manufacturer_other, "Other manufacturer", class: "control-label"
+          .controls
+            = f.text_field :manufacturer_other
+        
+        .control-group
+          = f.label :frame_model, class: "control-label"
+          .controls
+            = f.text_field :frame_model
+        .control-group
+          = f.label :year, class: "control-label"
+          .controls
+            = f.text_field :year
+        - if @bike.creation_organization.present?
+          .control-group
+            = f.label :creation_organization_id, "Creation org", class: "control-label"
+            .controls
+              %span.less-strong
+              = @bike.creation_organization.name
+              - if @bike.registered_new
+                %br
+                %strong
+                  Registered at POS
+            
+        .control-group
+          = f.label :description, class: "control-label"
+          .controls
+            = f.text_area :description
+        .input-group.with-additional-block#frame-sizer
+          .control-group
+            %label.control-label.unclickable
+              Frame size
+            .controls
+              .groupedbtn-group{ data:  { toggle: "buttons-radio" }}
+                .btn-group
+                  %button.btn{ type: "button", :'data-size' => 'xs', class: ( 'active' if @bike.frame_size == 'xs' ) }
+                    XS
+                  %button.btn{ type: "button", :'data-size' => 's', class: ( 'active' if @bike.frame_size == 's' ) }
+                    S
+                  %button.btn{ type: "button", :'data-size' => 'm', class: ( 'active' if @bike.frame_size == 'm' ) }
+                    M
+                  %button.btn{ type: "button", :'data-size' => 'l', class: ( 'active' if @bike.frame_size == 'l' ) }
+                    L
+                  %button.btn{ type: "button", :'data-size' => 'xl', class: ( 'active' if @bike.frame_size == 'xl' ) }
+                    XL
+                .btn-group
+                  %button.btn{ type: "button", :'data-size' => 'cm', class: ( 'active' if @bike.frame_size_unit == 'cm' ) }
+                    CM
+                  %button.btn{ type: "button", :'data-size' => 'in', class: ( 'active' if @bike.frame_size_unit == 'in' ) }
+                    IN
+          .hidden-other.control-group
+            = f.label :frame_size, "Seat tube length", class: "control-label"
+            .controls
+              = f.hidden_field :frame_size_unit
+              = f.hidden_field :frame_size
+              = f.number_field :frame_size_number
+    .actions
+      .control-group
+        = submit_tag "Update the bike", class: "button-green"
+        - if current_user.superuser
+          = link_to "Normal edit", edit_admin_bike_url(@bike)
+.padded
+%hr
+%section.full-screen-table
+  %table.table.table-striped.table-bordered
+    %thead
+      %th
+        Ownership history
+      %th
+        Date Created
+      %th
+        Creator
+      %th
+        Owner email
+      %th
+        Current?
+      %th
+        Claimed?
+      %th
+        User hidden
+    %tbody
+      - @bike.ownerships.each do |ownership|
+        %tr
+          %td
+            = ownership.id
+          %td
+            - if ownership.created_at.today?
+              %span.hidden
+                = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Today at #{ownership.created_at.strftime("%-I %p")}
+            - elsif Date.yesterday().beginning_of_day() <= ownership.created_at
+              %span.hidden
+                = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              Yesterday at #{ownership.created_at.strftime("%-I %p")}
+            - else
+              %span.hidden
+                = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              = ownership.created_at.strftime("%-m/%-d/%Y at %-I %p")
+          %td
+            - u = ownership.creator
+            - if u.name.present?
+              = u.name
+            - else
+              = u.email
+          %td
+            = ownership.owner_email
+          %td.table-cell-check
+            = "&#x2713;".html_safe if ownership.current
+          %td.table-cell-check
+            = "&#x2713;".html_safe if ownership.claimed
+          %td.table-cell-check
+            = "&#x2713;".html_safe if ownership.user_hidden
+
