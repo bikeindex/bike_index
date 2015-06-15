@@ -3,7 +3,7 @@ require 'yaml'
 CarrierWave.configure do |config|
   config.cache_dir = "#{Rails.root}/tmp/uploads"
   config.storage = :fog # For some reason, uploading sitemap doesn't work unless this is included.
-  config.asset_host = 'https://files.bikeindex.org'
+  config.asset_host = 'https://files.bikeindex.org' unless Rails.env.development?
   config.fog_credentials = {
     provider:               'AWS',       # required
     aws_access_key_id:      ENV['S3_ACCESS_KEY'],

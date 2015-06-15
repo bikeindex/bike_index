@@ -1,9 +1,7 @@
 .bike-photos .image-holder {
   z-index: 1;
-  overflow: hidden;
-  a {
-    display: block;
-  }
+  // overflow: hidden;
+  a { display: block; }
   img {
     @include transition(opacity ease-in-out .3s);
     cursor: pointer;

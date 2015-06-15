@@ -48,8 +48,8 @@ class BikeIndex.Views.BikesShow extends Backbone.View
         @shiftToPhoto(pos)
 
   shiftToPhoto: (pos) ->
-    targetPhotoID = $("#selected-photo a[data-pos='#{pos}']").attr("id")
-    targetPhoto = $("#thumbnail-photos a[data-id='#{targetPhotoID}']")
+    targetPhotoID = $("#selected-photo div[data-pos='#{pos}']").attr("id")
+    targetPhoto = $("#thumbnail-photos div[data-id='#{targetPhotoID}']")
     @photoFadeOut(targetPhotoID, targetPhoto)
 
       
@@ -78,9 +78,9 @@ class BikeIndex.Views.BikesShow extends Backbone.View
 
   injectPhoto: (targetPhotoID, targetPhoto) ->
     $('#selected-photo').append("""
-      <a href="#{targetPhoto.data('link')}" target="_blank" id="#{targetPhotoID}" style="display: none;">
-        <img alt="#{targetPhoto.attr('alt')}" src="#{targetPhoto.attr('data-img')}" id="#{targetPhoto.find('img').attr('id')}" class="initially-hidden">
-      </a>
+      <div id="#{targetPhotoID}" style="display: none;">
+        <img alt="#{targetPhoto.attr('alt')}" src="#{targetPhoto.attr('data-img')}" id="#{targetPhoto.find('img').attr('id')}" data-action="zoom" data-fullsize="#{targetPhoto.data('link')}" class="initially-hidden">
+      </div>
     """)
 
   prepPhotos: ->

@@ -1,6 +1,8 @@
 <% if @bike.public_images.any? %>
   <div class="image-holder <%= "just1photo" if @bike.public_images.count == 1 %>" id="selected-photo">
-    <%= link_to image_tag(@bike.public_images.first.image_url(:large), alt: "Bike photo", id: "i|#{@bike.public_images.first.listing_order}"), @bike.public_images.first.image_url, target: "_blank", class: "current-photo", id: "image#{ @bike.public_images.first.id}" %>
+    <div class="current-photo" id="image<%= @bike.public_images.first.id %>">
+      <%= image_tag(@bike.public_images.first.image_url(:large), alt: "Bike photo", id: "i|#{@bike.public_images.first.listing_order}", data: {action: "zoom", fullsize: @bike.public_images.first.image_url}) %>
+    </div>
   </div>
   <% if @bike.public_images.count > 1 %>
     <span class="thumbnail-shadow"></span>
