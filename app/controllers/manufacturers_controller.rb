@@ -10,9 +10,8 @@ class ManufacturersController < ApplicationController
     end
   end
 
-  def mock_csv
-    @manufacturers = Manufacturer.all
-    render layout: false
+  def tsv
+    redirect_to 'https://files.bikeindex.org/uploads/manufacturers.tsv'
   end
 
   def show

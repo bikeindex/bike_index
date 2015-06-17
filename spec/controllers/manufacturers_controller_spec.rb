@@ -19,12 +19,11 @@ describe ManufacturersController do
     it { should render_template(:show) }
   end
 
-  describe :mock_csv do 
+  describe :tsv do 
     before do 
-      get :mock_csv
+      get :tsv
     end
-    it { should respond_with(:success) }
-    it { should render_template(:mock_csv) }
+    it { should respond_with(:redirect) }
   end
 
 end

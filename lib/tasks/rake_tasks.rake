@@ -14,18 +14,8 @@ task :remove_unused_ownerships => :environment do
 end
 
 desc "Create stolen tsv"
-task :create_stolen_tsv => :environment do
-  out_file = File.join(Rails.root,'/current_stolen_bikes.tsv')
-  headers = "Make\tModel\tSerial\tDescription\tArticleOrGun\tDateOfTheft\tCaseNumber\tLEName\tLEContact\tComments\n"
-  output = File.open(out_file, "w")
-  output.puts headers
-  StolenRecord.where(current: true).where(approved: true).includes(:bike).each do |sr|
-    output.puts sr.tsv_row if sr.tsv_row.present?
-  end
-  output
-  
-  uploader = TsvUploader.new
-  uploader.store!(output)
-  output.close
-  puts uploader.url
+task :create_tsvs => :environment do
+  TsvCreatorWorker.perform_async('create_manufacturer')
+  TsvCreatorWorker.perform_async('create_stolen')
+  TsvCreatorWorker.perform_async('create_stolen_with_reports')
 end

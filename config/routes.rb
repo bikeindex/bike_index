@@ -188,8 +188,10 @@ Bikeindex::Application.routes.draw do
   end
   
   
-  resources :manufacturers, only: [:show, :index]
-  match 'manufacturers_mock_csv', to: 'manufacturers#mock_csv'
+  resources :manufacturers, only: [:show, :index] do 
+    collection { get 'tsv' }
+  end
+  match 'manufacturers_tsv', to: 'manufacturers#tsv'
 
   resources :organization_deals, only: [:create, :new]
   resource :integrations, only: [:create]
