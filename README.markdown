@@ -37,7 +37,6 @@ We're an open source project. Take a gander through our code, report bugs, or do
 
   - If you want to use [Pow](http://pow.cx/) (or some other setup that isn't through lvh.me:3000), change the appropriate values in [session_store.rb](config/initializers/session_store.rb) and [.env.development](.env.development).
  
-  
 
 - We use [RSpec](https://github.com/rspec/rspec) and [Guard](https://github.com/guard/guard) for testing. 
     
@@ -68,4 +67,4 @@ Please submit all pull requests as *_wip branches. If your pull request contains
 
 
 
-and go hard
+... and go hard

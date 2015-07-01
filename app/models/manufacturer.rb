@@ -6,7 +6,9 @@ class Manufacturer < ActiveRecord::Base
     :open_year,
     :close_year,
     :logo,
+    :remote_logo_url,
     :logo_cache,
+    :logo_source,
     :description
 
   validates_presence_of :name
@@ -21,6 +23,8 @@ class Manufacturer < ActiveRecord::Base
   default_scope order(:name)
 
   scope :frames, where(frame_maker: true)
+  scope :with_websites, where("website IS NOT NULL")
+  scope :with_logos, where("logo IS NOT NULL")
 
   def to_param
     slug
@@ -91,10 +95,15 @@ class Manufacturer < ActiveRecord::Base
     }
   end
 
-  before_save :set_website 
-  def set_website 
-    return true unless website.present?
-    self.website = Urlifyer.urlify(website)
+  before_save :set_website_and_logo_source
+  def set_website_and_logo_source
+    self.website = website.present? ? Urlifyer.urlify(website) : nil
+    if logo.present?
+      self.logo_source ||= 'manual' 
+    else
+      self.logo_source = nil
+    end
+    true
   end
 
 end

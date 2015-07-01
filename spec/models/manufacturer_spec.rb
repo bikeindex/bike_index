@@ -34,13 +34,13 @@ describe Manufacturer do
     it "adds in all the attributes that are listed" do 
       import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import.csv")
       Manufacturer.import(import_file)
-      @manufacturer = Manufacturer.find_by_slug("surly")
-      @manufacturer.website.should eq('http://surlybikes.com')
-      @manufacturer.frame_maker.should be_true
-      @manufacturer.open_year.should eq(1900)
-      @manufacturer.close_year.should eq(3000)
-      @manufacturer2 = Manufacturer.find_by_slug("wethepeople")
-      @manufacturer2.website.should eq('http://wethepeople.com')
+      manufacturer = Manufacturer.find_by_slug("surly")
+      manufacturer.website.should eq('http://surlybikes.com')
+      manufacturer.frame_maker.should be_true
+      manufacturer.open_year.should eq(1900)
+      manufacturer.close_year.should eq(3000)
+      manufacturer2 = Manufacturer.find_by_slug("wethepeople")
+      manufacturer2.website.should eq('http://wethepeople.com')
     end
 
     it "updates attributes on a second upload" do 
@@ -48,7 +48,7 @@ describe Manufacturer do
       Manufacturer.import(import_file)
       second_import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import-second.csv")
       Manufacturer.import(second_import_file)
-      @manufacturer = Manufacturer.find_by_slug("surly-bikes")
+      manufacturer = Manufacturer.find_by_slug("surly-bikes")
     end
   end
 
@@ -83,8 +83,30 @@ describe Manufacturer do
     end
   end
 
-  it "has before_save_callback_method defined for set_website" do
-    Manufacturer._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_website).should == true
+  describe :set_website_and_logo_source do 
+    it "has before_save_callback_method defined for set_website" do
+      Manufacturer._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_website_and_logo_source).should == true
+    end
+
+    it "sets logo source" do 
+      manufacturer = Manufacturer.new
+      manufacturer.stub(:logo).and_return('http://example.com/logo.png')
+      manufacturer.set_website_and_logo_source
+      manufacturer.logo_source.should eq('manual')
+    end
+
+    it "doesn't overwrite logo source" do 
+      manufacturer = Manufacturer.new(logo_source: 'something cool')
+      manufacturer.stub(:logo).and_return('http://example.com/logo.png')
+      manufacturer.set_website_and_logo_source
+      manufacturer.logo_source.should eq('something cool')
+    end
+
+    it "empties if no logo" do 
+      manufacturer = Manufacturer.new(logo_source: 'something cool')
+      manufacturer.set_website_and_logo_source
+      manufacturer.logo_source.should be_nil
+    end
   end
 
 end

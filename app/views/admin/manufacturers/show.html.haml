@@ -24,8 +24,11 @@
     %dd
       = @manufacturer.components.count
 
-  - if @manufacturer.logo.present?
-    = image_tag @manufacturer.logo.url(:thumb)
+    - if @manufacturer.logo.present?
+      %dt
+        Logo
+      %dd
+        = image_tag @manufacturer.logo.url(:thumb)
 
   
 .actions.padded

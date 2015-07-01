@@ -3,8 +3,10 @@
   = link_to 'New Manufacturer', new_admin_manufacturer_url, class: "button-green sharing-links"
 
 %h4
-  = @manufacturers.count
-  have been added so far!
+  #{@manufacturers.count} total, 
+  %span.less-strong
+    #{Manufacturer.with_websites.count} with websites,
+    #{Manufacturer.with_logos.count} with logos,
 
 %ul 
 %section.full-screen-table

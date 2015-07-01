@@ -19,3 +19,10 @@ task :create_tsvs => :environment do
   TsvCreatorWorker.perform_async('create_stolen')
   TsvCreatorWorker.perform_async('create_stolen_with_reports')
 end
+
+desc "download manufacturer logos" 
+task :download_manufacturer_logos => :environment do
+  Manufacturer.with_websites.pluck(:id).each_with_index do |id, index|
+    GetManufacturerLogoWorker.perform_in((5*index).seconds, id)
+  end
+end
