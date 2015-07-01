@@ -23,8 +23,8 @@ class Manufacturer < ActiveRecord::Base
   default_scope order(:name)
 
   scope :frames, where(frame_maker: true)
-  scope :with_websites, where("website IS NOT NULL")
-  scope :with_logos, where("logo IS NOT NULL")
+  scope :with_websites, where("website is NOT NULL and website != ''")
+  scope :with_logos, where("logo is NOT NULL and logo != ''")
 
   def to_param
     slug
