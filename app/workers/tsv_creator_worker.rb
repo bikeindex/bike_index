@@ -4,7 +4,8 @@ class TsvCreatorWorker
   sidekiq_options backtrace: true
     
   def perform(tsv_method)
-    TsvCreator.new.send(tsv_method)
+    creator = TsvCreator.new
+    creator.send(tsv_method)
   end
 
 end

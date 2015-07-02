@@ -9,8 +9,8 @@ describe TsvCreatorWorker do
   end
 
   it "sends tsv creator the method it's passed" do 
-    TsvCreator.any_instance.should_receive(:create_manufacturer).and_return(true)
-    TsvCreatorWorker.new.perform('create_manufacturer')
+    TsvCreator.any_instance.should_receive(:create_stolen).and_return(true)
+    TsvCreatorWorker.new.perform('create_stolen')
   end
 
 end

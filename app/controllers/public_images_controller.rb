@@ -61,7 +61,7 @@ class PublicImagesController < ApplicationController
       end
       i = PublicImage.find(params[:list_of_photos].last)
       if i.imageable_type == "Bike" # if it's a bike save the bike to update cached thumbnail
-        i.imageable.save
+        i.imageable.save if i.imageable.present?
       end
     end
     render nothing: true

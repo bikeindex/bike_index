@@ -6,11 +6,5 @@ module UrlHelper
     [subdomain, request.domain].join
   end
   
-  def url_for(options = nil)
-    if options.kind_of?(Hash) && options.has_key?(:subdomain)
-      options[:host] = with_subdomain(options.delete(:subdomain))
-      options[:port] = request.port_string.gsub(':','') unless request.port_string.empty?
-    end
-    super
-  end
+  
 end
