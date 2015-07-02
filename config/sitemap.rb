@@ -65,9 +65,8 @@ SitemapGenerator::Sitemap.create do
     paths.each { |i| add "/#{i}", priority: 0.8 }
   end
 
-
   group(filename: :resources) do
-    paths = ["resources", "stolen_bikes", "serials", "stolen", "spokecard"]
+    paths = ["resources", "stolen_bikes", "serials", "stolen", "spokecard" "image_resources", "how_not_to_buy_stolen"]
     paths.each { |i| add "/#{i}" }                
   end
 
