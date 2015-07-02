@@ -44,7 +44,8 @@
     Know something about this #{@bike.type}?
     %span.stolen-color
       Contact the owner now!
-  
+  %p
+    If you are contacting this person about an ad you found online <strong>include a link to the ad</strong>.
   - if current_user.present?  
     - if @bike.recovered
       Is this your bike? Send proof of ownership (such as the bike's serial number or a photo of you with the bike)
@@ -57,7 +58,7 @@
         - if @bike.phoneable_by(current_user)
           %p
             %strong
-              Owner's phone number
+              Owner's phone number:
             
             %a{ href: "tell:#{@stolen_record.phone}" }
               = @stolen_record.phone
