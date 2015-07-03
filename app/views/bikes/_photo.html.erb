@@ -34,8 +34,8 @@
       Stock photo of a <%= @bike.year%> <%= @bike.frame_model %>
       <span>Color may not match!</span>
     </h4>
-    <a href="<%= @bike.stock_photo_url %>" class='current-photo' target='blank'>
-      <%= image_tag(@bike.stock_photo_url, alt: "Bike photo", id: "i|0")%>
-    </a>
+    <div class="current-photo">
+      <%= image_tag(@bike.stock_photo_url, alt: "Bike photo", id: "i|0", data: {action: "zoom", original: @bike.stock_photo_url})%>
+    </div>
   </div>
 <% end %>
