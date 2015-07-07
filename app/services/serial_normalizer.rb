@@ -12,17 +12,18 @@ class SerialNormalizer
   def normalized
     return "absent" if @serial.downcase == "absent"
     normalized = @serial.upcase
-    key_hash = {'O' => '0',
-      '|IL' => '1',
-      'S' => '5',
-      'Z' => '2',
-      'B' => '8'
+    key_hash = {
+      'O'    => '0',
+      '|IL'  => '1',
+      'S'    => '5',
+      'Z'    => '2',
+      'B'    => '8',
     }
     key_hash.keys.each do |k|
       normalized.gsub!(/[#{k}]/, key_hash[k])
       normalized.gsub!(/[^\w]|[_]/, ' ') # turn all non letter/numbers into spaces
     end
-    @serial = normalized.gsub(/\s+/,' ') # remove multiple spaces
+    @serial = normalized.gsub(/^0+/,'').gsub(/\s+/,' ') # remove leading zeros and multiple spaces
   end
 
   def normalized_segments

@@ -44,6 +44,9 @@ module Bikeindex
     # parameters by using an attr_accessible or attr_protected declaration.
     config.active_record.whitelist_attributes = true
 
+    # Force sql schema use so we get sql extensions for fuzzy searching
+    config.active_record.schema_format = :sql
+
     # Enable the asset pipeline
     config.assets.enabled = true
 

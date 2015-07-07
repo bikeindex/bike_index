@@ -1,6 +1,6 @@
 OAUTH_SCOPES = [:public, :read_user, :read_bikes, :write_user, :write_bikes, :read_bikewise, :write_bikewise, :read_organization_membership]
 OAUTH_SCOPES_S = OAUTH_SCOPES.join(' ')
-if Rails.env.development?
+if Rails.env.development? && defined?(User) && defined?(User.first)
   ENV['V2_ACCESSOR_ID'] = (User.fuzzy_email_find('api@example.com') || User.first).id.to_s
 end
 Doorkeeper.configure do

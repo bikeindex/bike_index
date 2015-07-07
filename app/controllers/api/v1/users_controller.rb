@@ -31,7 +31,7 @@ module Api
               feedback.feedback_hash[:old_serial] = bike.serial_number
               bike.serial_number = params[:serial_update_serial]
               bike.save
-              SerialNormalizer.new({serial: params[:serial_update_serial]}).save_segments(bike.id)
+              bike.create_normalized_serial_segments
             elsif params[:manufacturer_update_manufacturer].present?
               feedback.feedback_hash[:old_manufacturer] = bike.manufacturer.name
               if bike.manufacturer_other.present?

@@ -24,6 +24,15 @@ describe 'Bikes API V2' do
       expect(JSON.parse(result)['bikes'][0]['id']).to be_present
     end
 
+    it "serial search works" do 
+      bike = FactoryGirl.create(:bike, serial_number: '0000HEYBB')
+      get "/api/v2/bikes_search/?serial=0HEYBB", :format => :json
+      result = JSON.parse(response.body)
+      response.code.should == '200'
+      expect(response.header['Total']).to eq('1')
+      expect(result['bikes'][0]['id']).to eq(bike.id)
+    end
+
     it "stolen search works" do
       bike = FactoryGirl.create(:stolen_bike)
       get '/api/v2/bikes_search/stolen?per_page=1', :format => :json
@@ -35,15 +44,14 @@ describe 'Bikes API V2' do
   end
 
   describe 'fuzzy serial search' do
-    xit "returns one with from an id " do
-      # This fails because of levenshtein being gone most of the time (every time test db is reloaded). No biggie
-      # bike = FactoryGirl.create(:bike, serial_number: 'Something1')
-      # get "/api/v2/bikes_search", :format => :json
-      get "/api/v2/bikes_search/close_serials?serial=s0meth1ngl", :format => :json
-      result = response.body
+    it "finds a close one" do
+      bike = FactoryGirl.create(:bike, serial_number: 'Something1')
+      bike.create_normalized_serial_segments
+      get "/api/v2/bikes_search/close_serials?serial=s0meth1nglvv", :format => :json
+      result = JSON.parse(response.body)
       response.code.should == '200'
       expect(response.header['Total']).to eq('1')
-      expect(JSON.parse(result)['bike']['id']).to eq(bike.id)
+      expect(result['bikes'][0]['id']).to eq(bike.id)
     end
   end
 

@@ -274,6 +274,10 @@ class Bike < ActiveRecord::Base
     self.serial_normalized = SerialNormalizer.new({serial: serial_number}).normalized
   end
 
+  def create_normalized_serial_segments
+    SerialNormalizer.new({serial: serial_number}).save_segments(id)
+  end
+
   before_save :clean_frame_size
   def clean_frame_size 
     return true unless frame_size.present? || frame_size_number.present?

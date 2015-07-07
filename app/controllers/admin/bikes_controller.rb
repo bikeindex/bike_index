@@ -79,7 +79,7 @@ class Admin::BikesController < Admin::BaseController
       RecoveryUpdateWorker.perform_async(@bike.current_stolen_record.id, info)
     end
     if @bike.update_attributes(params[:bike])
-      SerialNormalizer.new({serial: @bike.serial_number}).save_segments(@bike.id)
+      @bike.create_normalized_serial_segments
       return if return_to_if_present
       flash[:notice] = "Bike was successfully updated."
       if @fast_attr_update.present? && @fast_attr_update

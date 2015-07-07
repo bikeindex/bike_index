@@ -13,6 +13,11 @@ describe SerialNormalizer do
       result = SerialNormalizer.new({serial: serial}).normalized
       result.should eq("5 E R 1 A 1")
     end
+    it "remove leading zeros and ohs" do
+      serial = "00O38675971596"
+      result = SerialNormalizer.new({serial: serial}).normalized
+      result.should eq("38675971596")
+    end
   end
 
   describe :normalized_segments do 

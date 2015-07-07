@@ -25,7 +25,7 @@ class BikeCreatorAssociator
   end
 
   def create_normalized_serial_segments(bike)
-    SerialNormalizer.new({serial: bike.serial_number}).save_segments(bike.id)
+    bike.create_normalized_serial_segments
   end
 
   def update_bike_token(bike)
