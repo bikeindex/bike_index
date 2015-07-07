@@ -112,11 +112,21 @@ describe Bike do
     it "receives owner from the last ownership" do
       first_ownership = Ownership.new 
       second_ownership = Ownership.new
-      @user = User.new
-      @bike = Bike.new 
-      @bike.stub(:ownerships).and_return([first_ownership, second_ownership])
-      second_ownership.stub(:owner).and_return(@user)
-      @bike.owner.should eq(@user)
+      user = User.new
+      bike = Bike.new 
+      bike.stub(:ownerships).and_return([first_ownership, second_ownership])
+      second_ownership.stub(:owner).and_return(user)
+      bike.owner.should eq(user)
+    end
+  end
+
+  describe :first_owner_email do
+    it "gets owner email from the first ownership" do
+      first_ownership = Ownership.new(owner_email: 'foo@example.com')
+      second_ownership = Ownership.new
+      bike = Bike.new 
+      bike.stub(:ownerships).and_return([first_ownership, second_ownership])
+      bike.first_owner_email.should eq('foo@example.com')
     end
   end
 

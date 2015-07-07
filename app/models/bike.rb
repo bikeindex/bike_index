@@ -189,6 +189,14 @@ class Bike < ActiveRecord::Base
     current_ownership && current_ownership.owner
   end
 
+  def first_ownership
+    ownerships.first
+  end
+
+  def first_owner_email
+    first_ownership.owner_email
+  end
+
   def user_hidden
     hidden && current_ownership && current_ownership.user_hidden
   end

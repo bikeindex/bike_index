@@ -21,22 +21,22 @@ class Ownership < ActiveRecord::Base
 
   before_save :normalize_email 
   def normalize_email
-    self.owner_email.downcase.strip!
+    owner_email.downcase.strip!
   end
 
   def name_for_creator
-    if self.creator.name.present?
-      self.creator.name
+    if creator.name.present?
+      creator.name
     else
-      self.creator.email 
+      creator.email 
     end
   end
 
   def owner
-    if self.claimed
-      self.user
+    if claimed
+      user
     else
-      self.creator
+      creator
     end
   end
 
@@ -49,6 +49,14 @@ class Ownership < ActiveRecord::Base
 
   def can_be_claimed_by(u)
     u == User.fuzzy_email_find(owner_email) || u == user
+  end
+
+  def proper_owner
+    user
+  end
+
+  def proper_owner_name
+    proper_owner && proper_owner.name
   end
 
 end

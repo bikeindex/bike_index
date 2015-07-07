@@ -160,7 +160,7 @@ class StolenRecord < ActiveRecord::Base
     row << "\t"
     row << tsv_col(self.police_report_department)
     row << "\t\t"
-    row << "https://bikeindex.org/bikes/#{b.id}\n"
+    row << "#{ENV['BASE_URL']}/bikes/#{b.id}\n"
     row
   end
 

@@ -17,6 +17,7 @@ public/partner
 .vagrant
 dump.rdb
 current_stolen_bikes.tsv
+spec/fixtures/tsv_creation/*.tsv
 
 
 # Ignore rvm stuff

@@ -64,4 +64,20 @@ describe Ownership do
     end
   end
 
+  describe :proper_owner_name do 
+    it "is nil if no owner" do 
+      ownership = Ownership.new(owner_email: 'something@example.com')
+      user = User.new(name: 'foo')
+      ownership.stub(:creator).and_return(user)
+      expect(ownership.proper_owner_name).to be_nil
+    end
+
+    it "is owners name" do 
+      ownership = Ownership.new(owner_email: 'something@example.com')
+      user = User.new(name: 'foo')
+      ownership.stub(:user).and_return(user)
+      expect(ownership.proper_owner_name).to eq('foo')
+    end
+  end
+
 end

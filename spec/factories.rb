@@ -120,7 +120,9 @@ FactoryGirl.define do
     association :primary_frame_color, factory: :color
     rear_tire_narrow true
     sequence(:owner_email) {|n| "bike_owner#{n}@example.com"}
-
+    factory :organization_bike do
+      association :creation_organization, factory: :organization
+    end
     factory :stolen_bike do
       stolen true
       after(:create) do |bike|
@@ -144,6 +146,9 @@ FactoryGirl.define do
     association :creator, factory: :user
     current true
     sequence(:owner_email) {|n| "owner#{n}@example.com"}
+    factory :organization_ownership do 
+      association :bike, factory: :organization_bike
+    end
   end
 
   factory :component do
