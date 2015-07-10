@@ -31,6 +31,11 @@ class TsvCreator
   end
 
   def manufacturer_row(mnfg)
+    popularity = mnfg.bikes.count + 1
+    popularity = 500 if popularity > 500
+    popularity = 250 if popularity.between?(250, 499)
+    popularity = 100 if popularity.between?(100, 249)
+    popularity = 10  if popularity.between?(2, 99)
     row = "#{mnfg.id}\t#{mnfg.name}\t"
     row << (mnfg.frame_maker ? 'Frame manufacturer' : 'Manufacturer')
     row << "\t"
