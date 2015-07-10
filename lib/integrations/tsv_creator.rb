@@ -1,6 +1,6 @@
 class TsvCreator
   def initialize
-    @file_prefix = Rails.env.test? ? "/spec/fixtures/tsv_creation/" : "/"
+    @file_prefix = Rails.env.test? ? "/spec/fixtures/tsv_creation/" : ""
   end
 
   def manufacturers_header
