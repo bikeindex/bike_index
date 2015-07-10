@@ -4,7 +4,7 @@ class TsvCreator
   end
 
   def manufacturers_header
-    "text\tcategory\tpriority\twebsite\tlogo\n"
+    "id\ttext\tcategory\tpriority\twebsite\tlogo\n"
   end
 
   def stolen_header
@@ -31,7 +31,7 @@ class TsvCreator
   end
 
   def manufacturer_row(mnfg)
-    row = "#{mnfg.name}\t"
+    row = "#{mnfg.id}\t#{mnfg.name}\t"
     row << (mnfg.frame_maker ? 'Frame manufacturer' : 'Manufacturer')
     row << "\t"
     row << "#{mnfg.bikes.count}"
