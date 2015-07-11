@@ -25,7 +25,7 @@ class TsvUploader < CarrierWave::Uploader::Base
   end
 
   def store_dir
-    "#{base_store_dir}/tsvs"
+    "#{base_store_dir}tsvs"
   end
   
   def base_store_dir
