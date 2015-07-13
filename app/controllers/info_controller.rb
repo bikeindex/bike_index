@@ -62,7 +62,7 @@ class InfoController < ApplicationController
   end
 
   def how_not_to_buy_stolen
-    redirect_to 'https://files.bikeindex.org/stored/BikeIndex_How_To_Not_Buy_Stolen.pdf'
+    redirect_to 'https://files.bikeindex.org/stored/dont_buy_stolen.pdf'
   end
 
 protected
