@@ -36,4 +36,10 @@ describe StolenNotification do
     end
   end
 
+  describe :default_subject do 
+    it "default subject" do 
+      StolenNotification.new.default_subject.should eq("Stolen bike contact")
+    end
+  end
+
 end

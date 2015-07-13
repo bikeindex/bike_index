@@ -79,9 +79,11 @@ describe CustomerMailer do
 
   describe :stolen_notification_email do 
     it "renders email and update sent_dates" do
-      stolen_notification = FactoryGirl.create(:stolen_notification, message: "Test Message", subject: "Test subject")
+      stolen_notification = FactoryGirl.create(:stolen_notification, message: "Test Message")
       mail = CustomerMailer.stolen_notification_email(stolen_notification)
-      mail.subject.should eq("Test subject")
+      mail.subject.should eq(stolen_notification.default_subject)
+      mail.from.count.should eq(1)
+      mail.from.first.should eq('bryan@bikeindex.org')
       mail.body.encoded.should match(stolen_notification.message)
       stolen_notification.send_dates[0].should eq(stolen_notification.updated_at.to_i)
       CustomerMailer.stolen_notification_email(stolen_notification)

@@ -34,4 +34,12 @@ class StolenNotification < ActiveRecord::Base
     end
   end
 
+  def default_subject
+    "Stolen bike contact"
+  end
+
+  def display_subject
+    subject || default_subject
+  end
+
 end

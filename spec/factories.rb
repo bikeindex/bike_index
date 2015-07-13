@@ -233,7 +233,6 @@ FactoryGirl.define do
     association :receiver, factory: :user
     association :bike
     message 'This is a test email.'
-    subject 'New Stolen Notification Submitted'
   end
 
   factory :stolen_record do
