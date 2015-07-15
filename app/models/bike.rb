@@ -198,7 +198,7 @@ class Bike < ActiveRecord::Base
   end
 
   def current_owner_exists
-    current_ownership.claimed
+    current_ownership && current_ownership.claimed
   end
 
   def can_be_claimed_by(u)

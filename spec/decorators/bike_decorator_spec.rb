@@ -10,7 +10,7 @@ describe BikeDecorator do
       user.stub(:show_bikes).and_return(true)
       user.stub(:username).and_return("i")
       decorator = BikeDecorator.new(bike)
-      decorator.stub(:current_owner_exists).and_return(true)
+      bike.stub(:current_owner_exists).and_return(true)
       decorator.show_other_bikes.match("href='/users/i").should be_present
     end
   end
@@ -21,7 +21,7 @@ describe BikeDecorator do
       bike = Bike.new
       bike.stub(:owner).and_return(user)
       decorator = BikeDecorator.new(bike)
-      decorator.stub(:current_owner_exists).and_return(true)
+      bike.stub(:current_owner_exists).and_return(true)
       decorator.should_receive(:show_twitter_and_website).with(user)
       decorator.bike_show_twitter_and_website
     end
