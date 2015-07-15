@@ -2,31 +2,6 @@ require 'spec_helper'
 
 describe BikeDecorator do
 
-  describe :current_owner_exists do 
-    it "makes sure that the current owner exists" do 
-      # if you send the bike to a new owner, the creator has edit rights
-      # We want to differentiate the two
-      bike = Bike.new
-      ownership = Ownership.new 
-      bike.stub(:current_ownership).and_return(ownership)
-      ownership.stub(:claimed).and_return(true)
-      BikeDecorator.new(bike).current_owner_exists.should be_true
-    end
-  end
-
-  describe :can_be_claimed_by do 
-    it "returns true if the bike can be claimed" do 
-      user = User.new
-      ownership = Ownership.new
-      bike = Bike.new
-      bike.stub(:current_ownership).and_return(ownership)
-      ownership.stub(:user).and_return(user)
-      decorator = BikeDecorator.new(bike)
-      decorator.stub(:current_owner_exists).and_return(false)
-      decorator.can_be_claimed_by(user).should be_true
-    end
-  end
-
   describe :show_other_bikes do 
     it "links to bikes if the user is the current owner and wants to share" do 
       bike = Bike.new

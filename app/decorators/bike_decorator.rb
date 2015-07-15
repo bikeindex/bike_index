@@ -1,25 +1,15 @@
 class BikeDecorator < ApplicationDecorator 
   delegate_all
 
-  def current_owner_exists
-    true if object.current_ownership.claimed
-  end
-
-  def can_be_claimed_by(user)
-    unless current_owner_exists
-      true if object.current_ownership.user == user
-    end
-  end
-
   def show_other_bikes
-    if current_owner_exists and object.owner.show_bikes
+    if object.current_owner_exists and object.owner.show_bikes
       html = "<a href='/users/#{object.owner.username}'>View user's other bikes</a>" 
       html.html_safe
     end
   end
 
   def bike_show_twitter_and_website
-    return nil unless current_owner_exists
+    return nil unless object.current_owner_exists
     user = object.owner
     show_twitter_and_website(user)
   end

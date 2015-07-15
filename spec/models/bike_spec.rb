@@ -177,6 +177,40 @@ describe Bike do
     end
   end
 
+  describe :current_owner_exists do 
+    it "returns false if ownership isn't claimed" do
+      bike = Bike.new 
+      ownership = Ownership.new
+      bike.stub(:ownerships).and_return([ownership])
+      bike.current_owner_exists.should be_false
+    end
+    it "returns true if ownership is claimed" do
+      bike = Bike.new 
+      ownership = Ownership.new(claimed: true)
+      bike.stub(:ownerships).and_return([ownership])
+      bike.current_owner_exists.should be_true
+    end
+  end
+
+  describe :can_be_claimed_by do 
+    it "returns false if the bike is already claimed" do 
+      user = User.new
+      bike = Bike.new
+      bike.stub(:current_owner_exists).and_return(true)
+      bike.can_be_claimed_by(user).should be_false
+    end
+
+    it "returns true if the bike can be claimed" do 
+      user = User.new
+      ownership = Ownership.new
+      bike = Bike.new
+      bike.stub(:current_ownership).and_return(ownership)
+      ownership.stub(:user).and_return(user)
+      bike.stub(:current_owner_exists).and_return(false)
+      bike.can_be_claimed_by(user).should be_true
+    end
+  end
+
   describe :user_hidden do 
     it "is true if bike is hidden and ownership is user hidden" do 
       bike = Bike.new(hidden: true)

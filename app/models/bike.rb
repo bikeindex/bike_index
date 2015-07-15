@@ -197,6 +197,14 @@ class Bike < ActiveRecord::Base
     first_ownership.owner_email
   end
 
+  def current_owner_exists
+    current_ownership.claimed
+  end
+
+  def can_be_claimed_by(u)
+    !current_owner_exists && current_ownership.user == u
+  end
+
   def user_hidden
     hidden && current_ownership && current_ownership.user_hidden
   end
