@@ -8,6 +8,8 @@ script:
 before_script:
 - redis-cli info
 - psql -c 'create database bikeindex_test' -U postgres
+cache: bundler
+sudo: false
 env:
   global:
     secure: nFEP4tS5b44gE84jiZmcUebG6uflwYGwDyX2OR5vqVbYjFRqxwCUaLLUO98kga2KmzMsELQRpZz8mFWXMt9o37Fl0wbSJN574Mb/8z9kOZfUJutJOps2qYgbTgbAYNBnPPoFJIu2t2Dw6MOSRGgUguHmUV0gGEIeBInxZa23QOw=
