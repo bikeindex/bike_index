@@ -17,6 +17,10 @@ describe Ownership do
       ownership.stub(:owner_email).and_return("   SomE@dd.com ")
       ownership.normalize_email.should eq("some@dd.com")
     end
+
+    it "haves before save callback" do 
+      Ownership._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:normalize_email).should == true
+    end
   end
 
   describe :mark_claimed do 

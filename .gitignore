@@ -15,7 +15,7 @@ public/uploads/*
 public/caches
 public/partner
 .vagrant
-dump.rdb
+*.rdb
 current_stolen_bikes.tsv
 spec/fixtures/tsv_creation/*.tsv
 

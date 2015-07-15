@@ -169,13 +169,6 @@ describe User do
     end
   end
 
-  describe :set_phone do
-    it "strips the non-digit numbers from the phone input" do
-      @user = FactoryGirl.create(:user, phone: '773.83ddp+83(887)')
-      @user.phone.should eq('7738383887')
-    end
-  end
-
   describe :bikes do
     it "returns nil if the user has no bikes" do
       user = FactoryGirl.create(:user)
@@ -298,7 +291,14 @@ describe User do
     end
   end
 
-  describe :slug_username do 
+  describe :fuzzy_id do 
+    it "fails with nil" do
+      result = User.fuzzy_id('some stuff')
+      result.should be_nil
+    end
+  end
+
+  describe :normalize_attributes do
     it "doesn't let you overwrite usernames" do 
       target = "coolname"
       user1 = FactoryGirl.create(:user)
@@ -311,8 +311,22 @@ describe User do
       user2.reload.username.should_not eq(target)
       user1.reload.username.should eq(target)
     end
-    it "haves before validation callback" do 
-      User._validation_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:slug_username).should == true      
+
+    it "has before validation callback for normalizing" do
+      User._validation_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:normalize_attributes).should == true
+    end
+  end
+
+  describe "normalize_attributes" do 
+    let(:user) { FactoryGirl.build(:user, phone: "773.83ddp+83(887)", email: "SOMethinG@example.com\n") }
+    before(:each) { user.normalize_attributes }
+
+    it "strips the non-digit numbers from the phone input" do
+      user.phone.should eq('7738383887')
+    end
+
+    it "normalizes the email" do 
+      user.email.should eq('something@example.com')
     end
   end
 
@@ -337,6 +351,5 @@ describe User do
       user.userlink.should eq('https://twitter.com/bikeindex')
     end
   end
-
 
 end

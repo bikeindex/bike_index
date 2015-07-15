@@ -50,17 +50,18 @@
     .control-group.chosen-select
       = f.label :creator_id, class: "control-label"
       .controls
-        = collection_select( :ownership, :creator_id, User.all, :id, :email, :required =>true, prompt: "Choose creator")
+        = f.email_field :creator_email, value: @ownership.creator.email, required: true, prompt: "Creator's email"
 
     .control-group.chosen-select
       = f.label :user_id, class: "control-label"
       .controls
-        = collection_select( :ownership, :user_id, User.all, :id, :email, include_blank: "Choose Owner")
+        - user_email = @ownership.user.present? ? @ownership.user.email : ''
+        = f.email_field :user_email, value: user_email, required: true, prompt: "Owner's email"
 
     .control-group
       = f.label :owner_email, class: "control-label"
       .controls
-        = f.text_field :owner_email, :required =>true
+        = f.text_field :owner_email, required: true
 
     .actions
       .control-group

@@ -9,6 +9,8 @@ class Ownership < ActiveRecord::Base
     :user_hidden,
     :send_email
 
+  attr_accessor :creator_email, :user_email
+
   validates_presence_of :owner_email
   validates_presence_of :creator_id
   validates_presence_of :bike_id
@@ -21,7 +23,7 @@ class Ownership < ActiveRecord::Base
 
   before_save :normalize_email 
   def normalize_email
-    owner_email.downcase.strip!
+    self.owner_email = EmailNormalizer.new(owner_email).normalized
   end
 
   def name_for_creator

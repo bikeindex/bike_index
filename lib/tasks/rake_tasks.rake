@@ -1,3 +1,14 @@
+task :slow_save => :environment do
+  User.find_in_batches(batch_size: 500) do |b|
+    b.each { |i| User.save }
+  end
+
+  # Bike.where("thumb_path IS NOT NULL").find_in_batches(batch_size: 150) do |b|
+  #   b.each { |i| AfterBikeSaveWorker.perform_async(i.id) }
+  #   sleep(50)
+  # end
+end
+
 task :start do
   system 'redis-server &'
   system 'bundle exec foreman start -f Procfile_development'

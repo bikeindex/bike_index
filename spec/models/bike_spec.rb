@@ -327,16 +327,21 @@ describe Bike do
     end
   end
 
-  describe :set_normalized_serial do 
+  describe :set_normalized_attributes do 
     it "sets a bikes normalized_serial and switches unknown to absent" do 
       bike = Bike.new(serial_number: ' UNKNOWn ')
       SerialNormalizer.any_instance.should_receive(:normalized).and_return('normal')
-      bike.set_normalized_serial
+      bike.normalize_attributes
       bike.serial_number.should eq('absent')
       bike.serial_normalized.should eq('normal')
     end
-    it "has before_save_callback_method defined as a before_save callback" do
-      Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_normalized_serial).should == true
+    it "sets normalized owner email" do 
+      bike = Bike.new(owner_email: '  somethinG@foo.orG')
+      bike.normalize_attributes
+      expect(bike.owner_email).to eq('something@foo.org')
+    end
+    it "has before_save_callback_method defined" do
+      Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:normalize_attributes).should == true
     end
   end
 

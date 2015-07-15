@@ -26,7 +26,6 @@ class Admin::UsersController < Admin::BaseController
   end
 
   def update
-    @membership = Membership.new
     @user.name = params[:user][:name]
     @user.email = params[:user][:email]
     @user.confirmed = params[:user][:confirmed]
@@ -36,12 +35,6 @@ class Admin::UsersController < Admin::BaseController
     @user.banned = params[:user][:banned]
     @user.username = params[:user][:username]
     @user.can_send_many_stolen_notifications = params[:user][:can_send_many_stolen_notifications]
-    # m = Membership.new
-    # .membership = params[:user][:organizations]
-
-    # @membership = Membership.new(params[:membership])
-    # @membership.organization_id = params[:user][:organizations]
-    # # @user.organization_role = params[:user][:organization_role]
     if @user.save
       redirect_to admin_users_url, notice: 'User Updated'
     else

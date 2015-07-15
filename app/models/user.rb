@@ -176,6 +176,11 @@ class User < ActiveRecord::Base
     end
   end
 
+  def self.fuzzy_id(n)
+    u = self.fuzzy_email_find(n)
+    return u.id if u.present?
+  end
+
   def role(organization)
     m = Membership.where(user_id: id, organization_id: organization.id).first
     if m.present?
@@ -269,14 +274,11 @@ class User < ActiveRecord::Base
     (my_bikes_hash && my_bikes_hash[:link_title]) || mb_link_target
   end
 
-  before_save :set_phone
-  def set_phone
-    self.phone = Phonifyer.phonify(self.phone) if self.phone 
-  end
-
-  before_validation :slug_username
-  def slug_username
+  before_validation :normalize_attributes
+  def normalize_attributes
+    self.phone = Phonifyer.phonify(phone) if phone 
     self.username = Slugifyer.slugify(username) if username
+    self.email = EmailNormalizer.new(email).normalized
   end
 
   def userlink

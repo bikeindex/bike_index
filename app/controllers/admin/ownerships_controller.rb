@@ -8,19 +8,20 @@ class Admin::OwnershipsController < Admin::BaseController
 
   def update
     @ownership = Ownership.find(params[:id])
+    if params[:ownership]
+      if params[:ownership][:user_email].present?
+        params[:ownership][:user_id] = User.fuzzy_id(params[:ownership].delete(:user_email)) 
+      end
+      if params[:ownership][:creator_email].present?
+        params[:ownership][:creator_id] = User.fuzzy_id(params[:ownership].delete(:creator_email))
+      end
+    end
     if @ownership.update_attributes(params[:ownership])
       flash[:notice] = "Ownership Saved!"
-      redirect_to edit_admin_bike_url(@ownership.bike_id)
+      redirect_to edit_admin_ownership_url(@ownership.id)
     else
       render action: :edit
     end
   end
-
-
-  # def destroy
-  #   @bike = @ownership.bike
-  #   @ownership.destroy
-  #   redirect_to admin_bike_url(@bike)
-  # end
 
 end
