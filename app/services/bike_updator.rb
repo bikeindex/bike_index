@@ -24,7 +24,7 @@ class BikeUpdator
     @bike.update_attribute :updator_id, @user.id  if @user.present? && @bike.updator_id != @user.id
     if @bike_params[:bike] &&
       @bike_params[:bike][:owner_email] &&
-      @bike.owner_email != @bike_params[:bike][:owner_email]
+        @bike.owner_email != @bike_params[:bike][:owner_email]
       opts = {
         owner_email: @bike_params[:bike][:owner_email],
         bike: @bike,
