@@ -22,7 +22,7 @@ describe Admin::OwnershipsController do
         set_current_user(user)
         put :update, id: ownership.id
       end
-      it { should redirect_to(:edit_ownership_bike) }
+      it { should redirect_to(:edit_admin_ownership) }
       it { should set_the_flash }
     end
 
