@@ -131,9 +131,9 @@ protected
         hash[:meta_tags][:"og:image"] = iurl
         hash[:meta_tags][:"twitter:image"] = iurl
       end
-    end
-    if @bike.owner && @bike.owner.show_twitter && @bike.owner.twitter.present?
-      hash[:meta_tags][:"twitter:creator"] = "@#{@bike.owner.twitter}"
+      if @bike.owner && @bike.owner.show_twitter && @bike.owner.twitter.present?
+        hash[:meta_tags][:"twitter:creator"] = "@#{@bike.owner.twitter}"
+      end
     end
     hash
   end
