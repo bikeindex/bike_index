@@ -41,14 +41,22 @@ describe HeaderTagHelper do
       d[:meta_tags][:"og:description"].should eq("Something 69")
       d[:meta_tags][:"twitter:description"].should eq("Something 69")
     end
+
+    it "duplicates the title to twitter" do 
+      hash = helper.set_social_hash({ title_tag: { title: "Foo Title" }, meta_tags: {description: "An amazing description of awesome"} })
+      hash[:meta_tags][:"og:title"].should eq("Foo Title")
+      hash[:meta_tags][:"twitter:title"].should eq("Foo Title")
+      hash[:meta_tags][:"og:description"].should eq("An amazing description of awesome")
+      hash[:meta_tags][:"twitter:description"].should eq("An amazing description of awesome")
+    end
   end
 
   describe :default_hash do 
     it "has some values" do 
-      d = helper.default_hash
-      d[:title_tag][:title].should eq("Bike Index")
-      d[:meta_tags][:description].should_not be_nil
-      d[:meta_tags][:charset].should_not be_empty
+      hash = helper.default_hash
+      hash[:title_tag][:title].should eq("Bike Index")
+      hash[:meta_tags][:description].should_not be_nil
+      hash[:meta_tags][:charset].should_not be_empty
     end
   end
   describe :set_header_tag_hash do 
@@ -109,9 +117,15 @@ describe HeaderTagHelper do
         title_tag: { title: "Default" },
         meta_tags: { description: "Blank" }
       })
+      @bike = Bike.new
+      @bike.stub(:stock_photo_url).and_return("http://something.com")
+      @bike.stub(:title_string).and_return("Something special 1969")
+      @bike.stub(:stolen).and_return("true")
+      @bike.stub(:stolen_string).and_return("")
+      @bike.stub(:frame_colors).and_return(["blue"])
     end
 
-    xit "says new stolen on new stolen" do 
+    xit "says new stolen on new stolen" do
       # It can't find current user. And I don't know why.
       # So fuck it
       @bike = Bike.new 
@@ -125,17 +139,28 @@ describe HeaderTagHelper do
     end
 
     it "returns the bike name on Show" do 
-      @bike = Bike.new
-      @bike.stub(:stock_photo_url).and_return("http://something.com")
-      @bike.stub(:title_string).and_return("Something special 1969")
-      @bike.stub(:stolen).and_return("true")
-      @bike.stub(:stolen_string).and_return("")
-      @bike.stub(:frame_colors).and_return(["blue"])
       view.stub(:action_name).and_return("show")
       hash = helper.bikes_header_tags
       hash[:title_tag][:title].should eq("Stolen Something special 1969")
       hash[:meta_tags][:description].should_not eq("Blank")
       hash[:meta_tags][:"og:image"].should eq("http://something.com")
+      hash[:meta_tags][:"twitter:image"].should eq("http://something.com")
+    end
+
+    it "has twitter creator if present and shown" do 
+      user = User.new(twitter: 'coolio', show_twitter: true)
+      @bike.stub(:owner).and_return(user)
+      view.stub(:action_name).and_return("show")
+      hash = helper.bikes_header_tags
+      hash[:meta_tags][:"twitter:creator"].should eq("@coolio")
+    end
+
+    it "doesn't have twitter creator if present and not shown" do 
+      user = User.new(twitter: 'coolio')
+      @bike.stub(:owner).and_return(user)
+      view.stub(:action_name).and_return("show")
+      hash = helper.bikes_header_tags
+      hash[:meta_tags][:"twitter:creator"].should_not be_present
     end
   end
 

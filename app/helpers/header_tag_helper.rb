@@ -2,7 +2,7 @@ module HeaderTagHelper
 
   def header_tags
     header_tag_hash = set_header_tag_hash
-    header_tag_hash = set_social_hash(header_tag_hash) if controller_name == "news"
+    header_tag_hash = set_social_hash(header_tag_hash)
     html = title_tag_html(header_tag_hash)
     html << author_tag_html
     html << meta_tags_html(header_tag_hash)
@@ -25,11 +25,12 @@ protected
   end
 
   def set_social_hash(hash)
-    t = hash[:title_tag][:title]
-    hash[:meta_tags][:"og:title"], hash[:meta_tags][:"twitter:title"] = t, t
-    d = hash[:meta_tags][:description]
-    hash[:meta_tags][:"og:description"], hash[:meta_tags][:"twitter:description"] = d, d
-    return hash
+    title = hash[:title_tag][:title]
+    desc = hash[:meta_tags][:description]
+    hash[:meta_tags][:"og:title"], hash[:meta_tags][:"twitter:title"] = title, title
+    hash[:meta_tags][:"og:description"], hash[:meta_tags][:"twitter:description"] = desc, desc
+    
+    hash
   end
 
 
@@ -66,6 +67,7 @@ protected
         :"og:image"        => "#{root_url}assets/logos/bw_transparent.png",
         :"og:site_name"    => "Bike Index",
         :"twitter:card"    => "summary",
+        :"twitter:creator" => "@bikeindex",
         :"twitter:site"    => "@bikeindex"
       }
     }
@@ -128,8 +130,11 @@ protected
       if iurl.present?
         hash[:meta_tags][:"twitter:card"] = "summary_large_image"
         hash[:meta_tags][:"og:image"] = iurl
-        hash[:meta_tags][:"twitter:image:src"] = iurl
+        hash[:meta_tags][:"twitter:image"] = iurl
       end
+    end
+    if @bike.owner && @bike.owner.show_twitter && @bike.owner.twitter.present?
+      hash[:meta_tags][:"twitter:creator"] = "@#{@bike.owner.twitter}"
     end
     hash
   end
@@ -170,7 +175,6 @@ protected
 
   def news_header_tags
     hash = current_page_auto_hash
-    # :"og:type"         => "article",
     if action_name == 'show'
       hash[:title_tag][:title] = @blog.title
       hash[:meta_tags][:description] = @blog.description
@@ -178,15 +182,15 @@ protected
       hash[:meta_tags][:"og:published_time"] = @blog.published_at.utc
       hash[:meta_tags][:"og:modified_time"] = @blog.updated_at.utc
       hash[:meta_tags][:"twitter:creator"] = "@#{@blog.user.twitter}" if @blog.user.twitter
-      
+
       if @blog.index_image.present?
         hash[:meta_tags][:"twitter:card"] = "summary_large_image"
         hash[:meta_tags][:"og:image"] = @blog.index_image_lg
-        hash[:meta_tags][:"twitter:image:src"] = @blog.index_image_lg
+        hash[:meta_tags][:"twitter:image"] = @blog.index_image_lg
       elsif @blog.public_images.any?
         hash[:meta_tags][:"twitter:card"] = "summary_large_image"
         hash[:meta_tags][:"og:image"] = @blog.public_images.last.image_url 
-        hash[:meta_tags][:"twitter:image:src"] = @blog.public_images.last.image_url 
+        hash[:meta_tags][:"twitter:image"] = @blog.public_images.last.image_url 
       end
     end
     hash
