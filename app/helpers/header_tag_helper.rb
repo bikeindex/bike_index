@@ -29,7 +29,6 @@ protected
     desc = hash[:meta_tags][:description]
     hash[:meta_tags][:"og:title"], hash[:meta_tags][:"twitter:title"] = title, title
     hash[:meta_tags][:"og:description"], hash[:meta_tags][:"twitter:description"] = desc, desc
-    
     hash
   end
 

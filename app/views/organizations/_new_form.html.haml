@@ -59,8 +59,8 @@
 - else
   .alert.alert-info.padded
     %p
-      To be able to add an organization, you first need to create an account on the Bike Index.
+      You'll first have to create an account on the Bike Index.
     %p
-      Head over to our #{link_to "sign up page", new_user_url}.
-    %p
-      Once you're logged in you'll be able to add your organization right here.
+      After you create a user account you'll be redirected here to create your organization.
+  = link_to "Create an organization account", new_user_url(return_to: new_organization_url ), class: 'button-blue call-to-action-new-org text-center'
+

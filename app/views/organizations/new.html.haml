@@ -1,5 +1,19 @@
 .vendor-signup
-  %header
+  %h2.padded
+    Want to sign up?
+  %article.vendor-signup-form
+    %p
+      It's free.
+    %p
+      There are no commitments.
+    %p
+      We just want to stop bike theft.
+    
+    = render "new_form"
+
+  %hr.padded
+
+  %header.padded
     .header-text
       %h1
         Are you a bike shop? 
@@ -49,16 +63,3 @@
   %article
     %p
       If you have a spreadsheets of serial numbers or want to set up batch uploading in some other way, #{link_to "contact us", "mailto:seth@bikeindex.org"}.
-
-  %hr.padded
-  %h2.padded
-    Want to sign up?
-  %article.vendor-signup-form.bottom-padded
-    %p
-      It's free.
-    %p
-      There are no commitments.
-    %p
-      We just want to stop bike theft.
-    
-    = render "new_form"
