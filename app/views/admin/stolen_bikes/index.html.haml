@@ -2,9 +2,9 @@
   %h1
     Stolen Bikes
   - if @verified_only
-    = link_to 'All stolen (not just unverified)', admin_stolen_bikes_url, class: "sharing-links"
+    = link_to 'All stolen (not just unverified)', admin_stolen_bikes_url(unapproved: true), class: "sharing-links"
   - else
-    = link_to 'Only unverified bikes', admin_stolen_bikes_url(unapproved: true), class: "sharing-links"
+    = link_to 'Only unverified bikes', admin_stolen_bikes_url, class: "sharing-links"
 %h4
   = link_to "View stolen notifications sent", admin_stolen_notifications_url
 
