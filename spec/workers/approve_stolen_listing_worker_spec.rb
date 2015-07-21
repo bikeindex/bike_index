@@ -9,4 +9,9 @@ describe ApproveStolenListingWorker do
     expect(ApproveStolenListingWorker).to have_enqueued_job(bike.id)
   end
 
+  it "calls stolen twitterbot integration" do 
+    StolenTwitterbotIntegration.any_instance.should_receive(:send_tweet).with(111)
+    ApproveStolenListingWorker.new.perform(111)
+  end
+
 end
