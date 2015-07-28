@@ -35,10 +35,12 @@ class Ownership < ActiveRecord::Base
   end
 
   def owner
-    if claimed
+    if claimed && user.present?
       user
-    else
+    elsif creator.present?
       creator
+    else
+      User.fuzzy_email_find(ENV['AUTO_ORG_MEMBER'])
     end
   end
 

@@ -118,6 +118,16 @@ describe Bike do
       second_ownership.stub(:owner).and_return(user)
       bike.owner.should eq(user)
     end
+    it "doesn't break if the owner is deleted" do
+      delete_user = FactoryGirl.create(:user)
+      ownership = FactoryGirl.create(:ownership, user_id: delete_user.id)
+      ownership.mark_claimed
+      bike = ownership.bike
+      expect(bike.owner).to eq(delete_user)
+      delete_user.delete
+      ownership.reload
+      expect(bike.owner).to eq(ownership.creator)
+    end
   end
 
   describe :first_owner_email do

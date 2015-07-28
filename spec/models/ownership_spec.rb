@@ -34,19 +34,25 @@ describe Ownership do
 
   describe :owner do 
     it "returns the current owner if the ownership is claimed" do
-      @user = FactoryGirl.create(:user)
+      user = FactoryGirl.create(:user)
       ownership = Ownership.new
       ownership.stub(:claimed).and_return(true)
-      ownership.stub(:user).and_return(@user)
-      ownership.owner.should eq(@user)
+      ownership.stub(:user).and_return(user)
+      ownership.owner.should eq(user)
     end
 
     it "returns the creator if it isn't claimed" do 
-      @user = FactoryGirl.create(:user)
+      user = FactoryGirl.create(:user)
       ownership = Ownership.new
       ownership.stub(:claimed).and_return(false)
-      ownership.stub(:creator).and_return(@user)
-      ownership.owner.should eq(@user)
+      ownership.stub(:creator).and_return(user)
+      ownership.owner.should eq(user)
+    end
+
+    it "returns auto user if creator is deleted" do 
+      user = FactoryGirl.create(:user, email: ENV['AUTO_ORG_MEMBER'])
+      ownership = Ownership.new 
+      ownership.owner.should eq(user)
     end
   end
 
