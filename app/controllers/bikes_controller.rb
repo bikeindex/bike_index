@@ -213,7 +213,12 @@ protected
   def ensure_user_for_edit
     unless current_user.present?
       bike = Bike.find(params[:id])
-      flash[:error] = "Whoops! You have to sign up to be able to do that"
+      if current_owner_exists
+        flash[:error] = "Whoops! You have to sign in to be able to edit that bike."
+      else
+        flash[:error] = "That bike hasn't been claimed yet. If it's your bike sign up and you'll be able to edit it!"
+      end
+
       redirect_to bike_path(bike) and return
     end
   end
