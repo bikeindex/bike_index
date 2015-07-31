@@ -70,7 +70,6 @@ module API
 
         def authorize_bike_for_user(addendum='')
           return true if @bike.owner == current_user
-          @bike.current_ownership.can_be_claimed_by(current_user)
           if @bike.current_ownership.can_be_claimed_by(current_user)
             @bike.current_ownership.mark_claimed
             return true

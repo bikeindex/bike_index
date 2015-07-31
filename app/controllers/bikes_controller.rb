@@ -14,9 +14,9 @@ class BikeTyperError < StandardError
 end
 
 class BikesController < ApplicationController
+  before_filter :find_bike, only: [:show, :edit]
   before_filter :ensure_user_for_edit, only: [:edit, :update, :pdf]
   before_filter :render_ad, only: [:index, :show]
-  before_filter :find_bike, only: [:show, :edit]
   before_filter :set_return_to, only: [:edit]
   layout 'no_container'
 
@@ -212,14 +212,12 @@ protected
 
   def ensure_user_for_edit
     unless current_user.present?
-      bike = Bike.find(params[:id])
-      if current_owner_exists
-        flash[:error] = "Whoops! You have to sign in to be able to edit that bike."
+      if @bike.current_owner_exists
+        flash[:error] = "Whoops! You have to sign in to be able to edit that #{@bike.type}."
       else
-        flash[:error] = "That bike hasn't been claimed yet. If it's your bike sign up and you'll be able to edit it!"
+        flash[:error] = "That #{@bike.type} hasn't been claimed yet. If it's your bike sign up and you'll be able to edit it!"
       end
-
-      redirect_to bike_path(bike) and return
+      redirect_to bike_path(@bike) and return
     end
   end
 

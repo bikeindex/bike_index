@@ -241,11 +241,11 @@ describe 'Bikes API V2' do
     end
 
     it "doesn't update if user doesn't own the bike" do 
-      @bike.current_ownership.update_attributes(user_id: FactoryGirl.create(:user), claimed: true)
+      @bike.current_ownership.update_attributes(user_id: FactoryGirl.create(:user).id, claimed: true)
       Bike.any_instance.should_receive(:type).and_return('unicorn')
       put @url, @params.to_json, JSON_CONTENT
-      response.code.should eq('403') 
       response.body.match('do not own that unicorn').should be_present
+      response.code.should eq('403')
     end
 
     it "doesn't update if not in scope" do 
@@ -437,7 +437,7 @@ describe 'Bikes API V2' do
     end
 
     it "fails if the bike isn't owned by the access token user" do
-      @bike.current_ownership.update_attributes(user_id: FactoryGirl.create(:user), claimed: true)
+      @bike.current_ownership.update_attributes(user_id: FactoryGirl.create(:user).id, claimed: true)
       post @url, @params.to_json, JSON_CONTENT
       response.code.should eq('403')
       response.body.match('application is not approved').should be_present
