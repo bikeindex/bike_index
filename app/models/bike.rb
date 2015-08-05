@@ -74,7 +74,8 @@ class Bike < ActiveRecord::Base
     :approved_stolen, 
     :marked_user_hidden,
     :marked_user_unhidden,
-    :b_param_id_token
+    :b_param_id_token,
+    :is_for_sale
 
   mount_uploader :pdf, PdfUploader
   process_in_background :pdf, CarrierWaveProcessWorker

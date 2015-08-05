@@ -19,6 +19,7 @@ module API
           optional :rear_gear_type_slug, type: String, desc: 'rear gears (has to be one of the `selections`)'
           optional :front_gear_type_slug, type: String, desc: 'front gears (has to be one of the `selections`)'
           optional :handlebar_type_slug, type: String, desc: 'handlebar type (has to be one of the `selections`)'
+          optional :is_for_sale, type: Boolean
           
           optional :stolen_record, type: Hash do
             optional :phone, type: String, desc: "Owner's phone number, **required to create stolen**"

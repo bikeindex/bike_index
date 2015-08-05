@@ -80,7 +80,8 @@ describe 'Bikes API V2' do
       @bike.merge!({
         components: components,
         front_gear_type_slug: front_gear_type.slug,
-        handlebar_type_slug: handlebar_type.slug
+        handlebar_type_slug: handlebar_type.slug,
+        is_for_sale: true,
       })
       expect{
         post "/api/v2/bikes?access_token=#{@token.token}",
@@ -93,6 +94,7 @@ describe 'Bikes API V2' do
       result['manufacturer_name'].should eq(@bike[:manufacturer])
       bike = Bike.find(result['id'])
       bike.example.should be_false
+      bike.is_for_sale.should be_true
       bike.components.count.should eq(3)
       bike.components.pluck(:manufacturer_id).include?(manufacturer.id).should be_true
       bike.components.pluck(:ctype_id).uniq.count.should eq(2)
@@ -111,7 +113,9 @@ describe 'Bikes API V2' do
       result = JSON.parse(response.body)['bike']
       result['serial'].should eq(@bike[:serial])
       result['manufacturer_name'].should eq(@bike[:manufacturer])
-      Bike.unscoped.find(result['id']).example.should be_true
+      bike = Bike.unscoped.find(result['id'])
+      bike.example.should be_true
+      bike.is_for_sale.should be_false
     end
 
     it "fails to create a bike if the user isn't a member of the organization" do
@@ -322,7 +326,7 @@ describe 'Bikes API V2' do
           description: 'First component'
         }
       ]
-      @params.merge!({components: components})
+      @params.merge!({is_for_sale: true, components: components})
       lambda {
         put @url, @params.to_json, JSON_CONTENT
       }.should change(Ownership, :count).by(0)
@@ -330,6 +334,7 @@ describe 'Bikes API V2' do
       response.code.should eq('200')
       @bike.reload
       @bike.components.reload
+      @bike.is_for_sale.should be_true
       @bike.year.should eq(@params[:year])
       comp2.reload.year.should eq(1999)
       @bike.components.pluck(:manufacturer_id).include?(manufacturer.id).should be_true

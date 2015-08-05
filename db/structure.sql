@@ -260,7 +260,8 @@ CREATE TABLE bikes (
     mnfg_name character varying(255),
     hidden boolean DEFAULT false NOT NULL,
     frame_size_number double precision,
-    updator_id integer
+    updator_id integer,
+    is_for_sale boolean DEFAULT false NOT NULL
 );
 
 
@@ -3027,3 +3028,5 @@ INSERT INTO schema_migrations (version) VALUES ('20150507222158');
 INSERT INTO schema_migrations (version) VALUES ('20150518192613');
 
 INSERT INTO schema_migrations (version) VALUES ('20150701151619');
+
+INSERT INTO schema_migrations (version) VALUES ('20150805160333');
