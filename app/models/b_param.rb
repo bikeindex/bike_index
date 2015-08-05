@@ -44,6 +44,7 @@ class BParam < ActiveRecord::Base
   def self.v2_params(hash)
     h = { bike: hash }
     h[:bike][:serial_number] = h[:bike].delete :serial
+    h[:bike][:send_email] = !(h[:bike].delete :no_notify)
     org = Organization.find_by_slug(h[:bike].delete :organization_slug)
     h[:bike][:creation_organization_id] = org.id if org.present?
     # Move un-nested params outside of bike

@@ -102,6 +102,15 @@ describe 'Bikes API V2' do
       bike.handlebar_type.should eq(handlebar_type)
     end
 
+    it "doesn't send an email" do
+      expect{
+        post "/api/v2/bikes?access_token=#{@token.token}",
+          @bike.merge(no_notify: true).to_json,
+          JSON_CONTENT
+      }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
+      response.code.should eq("201")
+    end
+
     it "creates an example bike" do
       FactoryGirl.create(:organization, name: "Example organization")
       expect{

@@ -36,7 +36,7 @@ describe BParam do
       k = b_param.params[:bike]
       (k.keys.include?(:serial_number)).should be_true
       (k.keys.include?(:manufacturer)).should be_true
-      k.keys.length.should eq(2)
+      k.keys.length.should eq(3)
       b_param.params[:test].should be_true
       b_param.params[:stolen].should be_false
       b_param.params[:stolen_record].should_not be_present
