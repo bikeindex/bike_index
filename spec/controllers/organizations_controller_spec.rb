@@ -188,10 +188,11 @@ describe OrganizationsController do
       organization.save
       FactoryGirl.create(:cycle_type, slug: "bike")
       FactoryGirl.create(:propulsion_type, name: "Foot pedal")
-      get :embed_extended, id: organization.slug
+      get :embed_extended, {id: organization.slug, email: 'something@example.com'}
       response.code.should eq("200")
       response.should render_template(:embed)
       response.headers['X-Frame-Options'].should_not be_present
+      assigns(:persist_email).should be_true
     end
   end
 

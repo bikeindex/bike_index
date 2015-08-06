@@ -1,5 +1,6 @@
 #root_url.hidden{data: { url: ENV['BASE_URL'] }}
 = form_for @bike, multipart: true do |f|
+  = hidden_field_tag :persist_email, @persist_email
   = f.hidden_field :b_param_id_token
   = f.hidden_field :creation_organization_id
   = f.hidden_field :embeded, value: true

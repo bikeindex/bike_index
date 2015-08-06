@@ -136,7 +136,8 @@ class BikesController < ApplicationController
       else
         if params[:bike][:embeded_extended]
           flash[:notice] = "Success! #{@bike.type} was sent to #{@bike.owner_email}."
-          redirect_to embed_extended_organization_url(@bike.creation_organization) and return
+          persisted_email = params[:persist_email] ? @bike.owner_email : nil
+          redirect_to embed_extended_organization_url(@bike.creation_organization, email: persisted_email) and return
         else
           redirect_to controller: :organizations, action: :embed_create_success, id: @bike.creation_organization.slug, bike_id: @bike.id and return
         end

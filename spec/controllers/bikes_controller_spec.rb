@@ -233,7 +233,7 @@ describe BikesController do
     end
 
     describe "extended embeded submission" do 
-      it "registers a bike and upload an image" do 
+      it "registers a bike and uploads an image" do 
         Sidekiq::Testing.inline! do 
           organization = FactoryGirl.create(:organization)
           user = FactoryGirl.create(:user)
@@ -258,7 +258,34 @@ describe BikesController do
             image: test_photo
           }
           post :create, { bike: bike}
+          response.should redirect_to(embed_extended_organization_url(organization))
         end
+      end
+    end
+
+    describe 'extended embed submission with persisted email' do 
+      it "registers a bike and redirects with persist_email" do 
+        organization = FactoryGirl.create(:organization)
+        user = FactoryGirl.create(:user)
+        FactoryGirl.create(:membership, user: user, organization: organization)
+        organization.save
+        FactoryGirl.create(:cycle_type, name: "Bike", slug: "bike")
+        FactoryGirl.create(:propulsion_type, name: "Foot pedal")
+        manufacturer = FactoryGirl.create(:manufacturer)
+        b_param = BParam.create(creator_id: organization.auto_user.id, params: {creation_organization_id: organization.id, embeded: true})
+        bike = { serial_number: "69",
+          b_param_id_token: b_param.id_token,
+          creation_organization_id: organization.id,
+          embeded: true,
+          embeded_extended: true,
+          cycle_type_id: FactoryGirl.create(:cycle_type).id,
+          manufacturer_id: manufacturer.id,
+          primary_frame_color_id: FactoryGirl.create(:color).id,
+          handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
+          owner_email: "Flow@goodtimes.com",
+        }
+        post :create, { bike: bike, persist_email: true }
+        response.should redirect_to(embed_extended_organization_url(organization, email: "flow@goodtimes.com"))
       end
     end
 
