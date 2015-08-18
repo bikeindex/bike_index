@@ -197,9 +197,10 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
   
   setWheelDiam: (position) ->
     wheelDiam = $("#bike_#{position}_wheel_size_id").val()
-    if $("##{position}_standard option[value=#{wheelDiam}]").length
-      $("##{position}_standard").val(wheelDiam)
-      $("#bike_#{position}_wheel_size_id").hide()
+    if $("##{position}_standard").val().length
+      if $("##{position}_standard option[value=#{wheelDiam}]").length
+        $("##{position}_standard").val(wheelDiam)
+        $("#bike_#{position}_wheel_size_id").hide()
     else
       $("##{position}_standard").hide()
       $("#show-#{position}-wheel-diams").addClass('currently-hidden').hide()
