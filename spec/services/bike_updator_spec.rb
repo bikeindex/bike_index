@@ -47,7 +47,7 @@ describe BikeUpdator do
 
   describe :update_ownership do 
     it "calls create_ownership if the email has changed" do 
-      bike = FactoryGirl.create(:bike, is_for_sale: true)
+      bike = FactoryGirl.create(:bike)
       user = FactoryGirl.create(:user)
       bike.updator_id.should be_nil
       update_bike = BikeUpdator.new(b_params: {id: bike.id, bike: {owner_email: "another@email.co"}}, user: user)
@@ -55,7 +55,6 @@ describe BikeUpdator do
       update_bike.update_ownership
       bike.reload
       bike.updator.should eq(user)
-      bike.is_for_sale.should be_false
     end
 
     it "does not call create_ownership if the email hasn't changed" do 
@@ -70,7 +69,11 @@ describe BikeUpdator do
     it "does not let protected attributes be updated" do 
       FactoryGirl.create(:country, iso: "US")
       organization = FactoryGirl.create(:organization)
-      bike = FactoryGirl.create(:bike, creation_organization_id: organization.id, verified: true, example: true)
+      bike = FactoryGirl.create(:bike,
+        creation_organization_id: organization.id,
+        verified: true,
+        example: true,
+        owner_email: 'foo@bar.com')
       ownership = FactoryGirl.create(:ownership, bike: bike)
       user = ownership.creator
       new_creator = FactoryGirl.create(:user)
@@ -84,7 +87,9 @@ describe BikeUpdator do
         creation_organization_id: 69,
         example: false,
         hidden: true,
-        stolen: true}
+        stolen: true,
+        owner_email: ' ',
+      }
       BikeUpdator.new(user: user, b_params: {id: bike.id, bike: bike_params}).update_available_attributes
       bike.reload.serial_number.should eq(og_bike.serial_number)
       bike.manufacturer_id.should eq(og_bike.manufacturer_id)
@@ -95,6 +100,7 @@ describe BikeUpdator do
       bike.hidden.should be_false
       bike.verified.should be_true
       bike.description.should eq("something long")
+      bike.owner_email.should eq('foo@bar.com')
     end
 
     it "marks a bike user hidden" do 
@@ -135,8 +141,18 @@ describe BikeUpdator do
       update_bike.should_receive(:update_ownership).and_return(true)
       update_bike.update_available_attributes
       bike.reload.coaster_brake.should be_true
-      bike.reload.year.should be_nil
+      bike.year.should be_nil
       bike.components.count.should eq(0)
+    end
+
+    it "updates the bike sets is_for_sale to false" do 
+      bike = FactoryGirl.create(:bike, is_for_sale: true)
+      ownership = FactoryGirl.create(:ownership, bike: bike)
+      user = ownership.creator
+      new_creator = FactoryGirl.create(:user)
+      update_bike = BikeUpdator.new(user: user, b_params: {id: bike.id, bike: {owner_email: new_creator.email}})
+      update_bike.update_available_attributes
+      bike.reload.is_for_sale.should be_false
     end
   end
 

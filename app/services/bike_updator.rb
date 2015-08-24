@@ -24,14 +24,18 @@ class BikeUpdator
     @bike.update_attribute :updator_id, @user.id if @user.present? && @bike.updator_id != @user.id
     if @bike_params[:bike] && @bike_params[:bike][:owner_email] &&
       @bike.owner_email != @bike_params[:bike][:owner_email]
-      opts = {
-        owner_email: @bike_params[:bike][:owner_email],
-        bike: @bike,
-        creator: @user,
-        send_email: true
-      }
-      OwnershipCreator.new(opts).create_ownership
-      @bike.update_attribute :is_for_sale, false if @bike.is_for_sale
+      if @bike_params[:bike][:owner_email].blank?
+        @bike_params[:bike].delete(:owner_email)
+      else
+        opts = {
+          owner_email: @bike_params[:bike][:owner_email],
+          bike: @bike,
+          creator: @user,
+          send_email: true
+        }
+        OwnershipCreator.new(opts).create_ownership
+        @bike_params[:bike][:is_for_sale] = false
+      end
     end
   end
 
