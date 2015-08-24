@@ -69,15 +69,15 @@ class TsvCreator
   # end
 
   def create_manufacturer
-    out_file = File.join(Rails.root,"#{@file_prefix}manufacturers.tsv")
+    out_file = File.join(Rails.root,"#{@file_prefix}#{"approved_" if blacklist}manufacturers.tsv")
     output = File.open(out_file, "w")
     output.puts manufacturers_header
     Manufacturer.all.each { |m| output.puts manufacturer_row(m) }
     send_to_uploader(output)
   end
 
-  def create_stolen
-    out_file = File.join(Rails.root,"#{@file_prefix}current_stolen_bikes.tsv")
+  def create_stolen(blacklist=false)
+    out_file = File.join(Rails.root,"#{@file_prefix}#{"approved_" if blacklist}current_stolen_bikes.tsv")
     output = File.open(out_file, "w")
     output.puts stolen_header
     StolenRecord.approveds.includes(:bike).each do |sr|
@@ -86,7 +86,7 @@ class TsvCreator
     send_to_uploader(output)
   end
 
-  def create_stolen_with_reports
+  def create_stolen_with_reports(blacklist=false)
     out_file = File.join(Rails.root,"#{@file_prefix}current_stolen_with_reports.tsv")
     output = File.open(out_file, "w")
     output.puts stolen_with_reports_header
@@ -103,9 +103,9 @@ class TsvCreator
     uploader.store!(output)
     output.close
     if TsvUploader.storage.to_s.match(/fog/i) # If we're in fog, we need to open via a URL
-      path = file.url
+      path = uploader.url
     else
-      path = output.current_path
+      path = uploader.current_path
     end
     TsvMaintainer.update_tsv_info(path)
     output

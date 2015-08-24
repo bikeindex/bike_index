@@ -27,8 +27,8 @@ end
 desc "Create stolen tsv"
 task :create_tsvs => :environment do
   TsvCreatorWorker.perform_async('create_manufacturer')
-  TsvCreatorWorker.perform_async('create_stolen_with_reports')
-  TsvCreatorWorker.perform_in(1.hour, 'create_stolen')
+  TsvCreatorWorker.perform_async('create_stolen_with_reports', true)
+  TsvCreatorWorker.perform_in(1.hour, 'create_stolen', true)
 end
 
 desc "download manufacturer logos" 
