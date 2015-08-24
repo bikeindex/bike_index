@@ -59,5 +59,31 @@ describe Admin::DashboardController do
     it { should respond_with(:success) }
     it { should render_template(:maintenance) }
   end
+
+  describe :tsvs do 
+    it "renders and assigns tsvs" do 
+      user = FactoryGirl.create(:admin)
+      set_current_user(user)
+      t = Time.now
+      TsvMaintainer.reset_tsv_info('current_stolen_bikes.tsv', t)
+      tsvs = [{filename: 'current_stolen_bikes.tsv', updated_at: "#{t.to_i}", description: 'Approved Stolen bikes'}]
+      blacklist = ['1010101', '2', '4', '6']
+      TsvMaintainer.reset_blacklist_ids(blacklist)
+      get :tsvs
+      response.code.should eq('200')
+      # assigns(:tsvs).should eq(tsvs)
+      assigns(:blacklist).include?('2').should be_true
+    end
+  end
+
+  describe :update_tsv_blacklist do 
+    it "renders and updates" do 
+      user = FactoryGirl.create(:admin)
+      set_current_user(user)
+      ids = "\n1\n2\n69\n200\n22222\n\n\n"
+      put :update_tsv_blacklist, {blacklist: ids}
+      expect(TsvMaintainer.blacklist).to eq([1, 2, 69, 200, 22222].map(&:to_s))
+    end
+  end
   
 end

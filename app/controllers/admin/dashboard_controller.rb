@@ -40,4 +40,15 @@ class Admin::DashboardController < Admin::BaseController
     redirect_to admin_root_url
   end
 
+  def tsvs
+    @blacklist = TsvMaintainer.blacklist
+    @tsvs = TsvMaintainer.tsvs
+  end
+
+  def update_tsv_blacklist
+    new_blacklist = params[:blacklist].split(/\n|\r/).reject{|t| t.blank?}
+    TsvMaintainer.reset_blacklist_ids(new_blacklist)
+    redirect_to admin_tsvs_path
+  end
+
 end

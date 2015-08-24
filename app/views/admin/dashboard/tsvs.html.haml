@@ -1,0 +1,26 @@
+%section.full-screen-table
+  %h2
+    TSV Exports!
+
+%p
+  TSVs are generated every night.
+
+%table.table.table-striped.table-bordered
+  %tbody
+    - TsvMaintainer.tsvs.each do |tsv_info|
+      %tr
+        %td
+          Stolen Reports
+        %td
+          %a{href: tsv_info[:filename] }
+        %td
+          =l Time.zone.parse(tsv_info[:updated_at]), format: :short_with_hour
+  
+= form_tag admin_update_tsv_blacklist_path, method: :put, multipart: true do
+  .control-group.padded
+    = label_tag :tsv_blacklist, class: 'control-label' do
+      Blacklist Bike Urls, <strong>1 per line</strong>. These can be the id (the number in the url), the bike url, admin url or edit url
+    .blog-field
+      = text_area_tag :blacklist, @blacklist.map{|i| "#{ENV['BASE_URL']}/bikes/#{i}"}.join("\n"), rows: 10, class: 'control-field'
+  .control-group.actions.big-action
+    = submit_tag "Save changes", class: "button-green submit-bike-update"

@@ -100,6 +100,8 @@ Bikeindex::Application.routes.draw do
     end
     match 'invitations', to: 'dashboard#invitations'
     match 'maintenance', to: 'dashboard#maintenance'
+    put 'update_tsv_blacklist', to: 'dashboard#update_tsv_blacklist'
+    match 'tsvs', to: 'dashboard#tsvs'
     match 'bust_z_cache', to: 'dashboard#bust_z_cache'
     match 'destroy_example_bikes', to: 'dashboard#destroy_example_bikes'
     resources :memberships, :organizations, :bike_token_invitations,

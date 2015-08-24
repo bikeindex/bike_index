@@ -102,6 +102,12 @@ class TsvCreator
     uploader = TsvUploader.new
     uploader.store!(output)
     output.close
+    if TsvUploader.storage.to_s.match(/fog/i) # If we're in fog, we need to open via a URL
+      path = file.url
+    else
+      path = output.current_path
+    end
+    TsvMaintainer.update_tsv_info(path)
     output
   end
 

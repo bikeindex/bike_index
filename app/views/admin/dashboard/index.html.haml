@@ -121,6 +121,8 @@
 .admin-adv-list
   %ul
     %li
+      = link_to "TSV Exports", admin_tsvs_url
+    %li
       = link_to "Maintenance", admin_maintenance_url
     %li
       = link_to "Failed bikes", admin_failed_bikes_url
@@ -130,4 +132,5 @@
       = link_to "Graphs", admin_graphs_url
     %li
       = link_to "Edit paints", admin_paints_url
+
   = link_to "Clear cache", admin_bust_z_cache_url, class: "button-blue"
