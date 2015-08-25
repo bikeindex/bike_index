@@ -69,7 +69,7 @@ class TsvCreator
   # end
 
   def create_manufacturer
-    out_file = File.join(Rails.root,"#{@file_prefix}#{"approved_" if blacklist}manufacturers.tsv")
+    out_file = File.join(Rails.root,"#{@file_prefix}manufacturers.tsv")
     output = File.open(out_file, "w")
     output.puts manufacturers_header
     Manufacturer.all.each { |m| output.puts manufacturer_row(m) }
@@ -87,7 +87,7 @@ class TsvCreator
   end
 
   def create_stolen_with_reports(blacklist=false)
-    out_file = File.join(Rails.root,"#{@file_prefix}current_stolen_with_reports.tsv")
+    out_file = File.join(Rails.root,"#{@file_prefix}#{"approved_" if blacklist}current_stolen_with_reports.tsv")
     output = File.open(out_file, "w")
     output.puts stolen_with_reports_header
     StolenRecord.approveds.where("police_report_number IS NOT NULL").

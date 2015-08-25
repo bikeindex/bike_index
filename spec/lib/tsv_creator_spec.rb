@@ -19,6 +19,7 @@ describe TsvCreator do
       TsvUploader.any_instance.should_receive(:store!)
       output = creator.create_org_count(organization)
       expect(File.read(output)).to eq(target)
+      expect(TsvMaintainer.tsvs.kind_of?(Array)).to be_true
     end
   end
 
