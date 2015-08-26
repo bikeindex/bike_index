@@ -10,9 +10,10 @@
     - TsvMaintainer.tsvs.each do |tsv_info|
       %tr
         %td
-          Stolen Reports
+          = tsv_info['description']
         %td
-          %a{href: tsv_info[:filename] }
+          %a{href: tsv_info['filename'] }
+            = tsv_info['filename']
         %td
           - if tsv_info['updated_at'].present?
             = l Time.zone.parse(tsv_info['updated_at']), format: :short_with_hour
