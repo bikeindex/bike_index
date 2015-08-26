@@ -23,8 +23,10 @@ class TsvMaintainer
 
     def descriptions
       {
-        'current_stolen_bikes.tsv' => 'Stolen bikes',
-        'approved_current_stolen_bikes.tsv' => 'Stolen bikes (without blacklisted bikes)'
+        'current_stolen_bikes.tsv' => 'Stolen',
+        'approved_current_stolen_bikes.tsv' => 'Stolen (without blacklisted bikes)',
+        'current_stolen_with_reports.tsv' => 'Stolen with serials & police reports',
+        'approved_current_stolen_with_reports.tsv' => 'Stolen with serials & police reports (without blacklisted bikes)',
       }
     end
 
