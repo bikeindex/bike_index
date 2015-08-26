@@ -23,7 +23,8 @@ class TsvMaintainer
 
     def descriptions
       {
-        'current_stolen_bikes.tsv' => 'Approved Stolen bikes'
+        'current_stolen_bikes.tsv' => 'Stolen bikes',
+        'approved_current_stolen_bikes.tsv' => 'Stolen bikes (without blacklisted bikes)'
       }
     end
 
@@ -42,10 +43,20 @@ class TsvMaintainer
       update_tsv_info(filename, updated_at)
     end
 
+    def tsv_info_hash(k)
+      path = Pathname.new(k)
+      {
+        path: k,
+        filename: path.basename.to_s,
+        updated_at: @result[k],
+        description: descriptions[path.basename.to_s]
+      }
+    end
+
     def tsvs
       return [] unless redis.type(info_id) == 'hash'
-      result = redis.hgetall(info_id)
-      result.keys.map{ |k| {filename: k, updated_at: result[k], description: descriptions[k]} }
+      @result = redis.hgetall(info_id)
+      @result.keys.map{ |k| tsv_info_hash(k).with_indifferent_access }
     end
 
     def normalized(id)

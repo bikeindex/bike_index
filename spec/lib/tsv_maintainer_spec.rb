@@ -21,11 +21,21 @@ describe TsvMaintainer do
     end
   end
 
-  describe :update_tsv_info do 
-    it "updates tsv info" do 
+  describe 'tsv info' do 
+    it "updates tsv info and returns with indifferent access" do 
       t = Time.now
       TsvMaintainer.reset_tsv_info('current_stolen_bikes.tsv', t)
-      expect(TsvMaintainer.tsvs).to eq([{filename: 'current_stolen_bikes.tsv', updated_at: "#{t.to_i}", description: 'Approved Stolen bikes'}])
+      tsv = TsvMaintainer.tsvs[0]
+      expect(tsv[:updated_at]).to eq("#{t.to_i}")
+      expect(tsv['path']).to eq("current_stolen_bikes.tsv")
+    end
+
+    it "returns the way we want" do 
+      t = Time.now 
+      TsvMaintainer.reset_tsv_info('https://files.bikeindex.org/uploads/tsvs/approved_current_stolen_bikes.tsv', t)
+      tsv = TsvMaintainer.tsvs.first
+      expect(tsv[:filename]).to eq('approved_current_stolen_bikes.tsv')
+      expect(tsv[:description]).to eq('Stolen bikes (without blacklisted bikes)')
     end
   end
 

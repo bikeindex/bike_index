@@ -10,13 +10,13 @@
     - TsvMaintainer.tsvs.each do |tsv_info|
       %tr
         %td
-          = tsv_info['description']
+          = tsv_info[:description]
         %td
-          %a{href: tsv_info['filename'] }
-            = tsv_info['filename']
+          %a{href: tsv_info[:path] }
+            = tsv_info[:filename]
         %td
-          - if tsv_info['updated_at'].present?
-            = l Time.zone.parse(tsv_info['updated_at']), format: :short_with_hour
+          - if tsv_info[:updated_at].present?
+            = l Time.zone.parse(tsv_info[:updated_at]), format: :short_with_hour
   
 = form_tag admin_update_tsv_blacklist_path, method: :put, multipart: true do
   .control-group.padded
