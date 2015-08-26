@@ -1,5 +1,7 @@
 class TsvCreatorWorker
   include Sidekiq::Worker
+  require 'tsv_creator'
+  require 'tsv_maintainer'
   sidekiq_options queue: 'updates'
   sidekiq_options backtrace: true
     

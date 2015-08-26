@@ -2,10 +2,13 @@ class TsvMaintainer
 
   class << self
     def set_blacklist_ids(ids)
-      redis.sadd blacklist_id, ids.map{ |i| normalized(i) }.reject{ |i| i.blank? }
+      if ids.present?
+        redis.sadd blacklist_id, ids.map{ |i| normalized(i) }.reject{ |i| i.blank? }
+      end
     end
 
     def blacklist
+      return [] unless redis.type(info_id) == 'set'
       redis.smembers blacklist_id
     end
 

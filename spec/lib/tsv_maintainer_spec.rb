@@ -7,6 +7,10 @@ describe TsvMaintainer do
       TsvMaintainer.reset_blacklist_ids([1, 1, 2, 4, 'https://bikeindex.org/admin/bikes/6'])
       expect(TsvMaintainer.blacklist).to eq(['1', '2', '4', '6'])
     end
+    it "doesn't break if it's empty" do 
+      TsvMaintainer.reset_blacklist_ids([])
+      expect(TsvMaintainer.blacklist).to eq([])
+    end
   end
 
   describe :blacklist_include do 
