@@ -26,7 +26,11 @@ class TsvMaintainer
 
     def update_tsv_info(filename, updated_at=nil)
       updated_at ||= Time.now
-      redis.hset info_id, filename, updated_at.to_i
+      begin
+        redis.hset info_id, filename, updated_at.to_i
+      rescue => e
+        puts e # Sometimes key errors if wrong type, but we need to use hset or we don't create it
+      end
       tsvs
     end
 
