@@ -28,6 +28,7 @@ describe TsvMaintainer do
       tsv = TsvMaintainer.tsvs[0]
       expect(tsv[:updated_at]).to eq("#{t.to_i}")
       expect(tsv['path']).to eq("current_stolen_bikes.tsv")
+      expect(tsv['description']).to eq("Stolen")
     end
 
     it "returns the way we want" do 
@@ -35,7 +36,7 @@ describe TsvMaintainer do
       TsvMaintainer.reset_tsv_info('https://files.bikeindex.org/uploads/tsvs/approved_current_stolen_bikes.tsv', t)
       tsv = TsvMaintainer.tsvs.first
       expect(tsv[:filename]).to eq('approved_current_stolen_bikes.tsv')
-      expect(tsv[:description]).to eq('Stolen bikes (without blacklisted bikes)')
+      expect(tsv[:description]).to eq('Stolen (without blacklisted bikes)')
     end
   end
 
