@@ -13,6 +13,17 @@ describe Admin::BikesController do
     it { should_not set_the_flash }
   end
 
+  describe :duplicates do 
+    before do 
+      user = FactoryGirl.create(:admin)
+      set_current_user(user)
+      get :duplicates
+    end
+    it { should respond_with(:success) }
+    it { should render_template(:duplicates) }
+    it { should_not set_the_flash }
+  end
+
   describe :edit do 
     before do 
       bike = FactoryGirl.create(:bike)
@@ -109,6 +120,34 @@ describe Admin::BikesController do
       bike.reload.serial_number.should eq("ssssssssss")
       response.should redirect_to "/about"
       session[:return_to].should be_nil
+    end
+  end
+
+  describe :ignore_duplicate do 
+    it "marks a duplicate group ignore" do 
+      user = FactoryGirl.create(:admin)
+      set_current_user(user)
+      request.env["HTTP_REFERER"] = 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
+      duplicate_bike_group = DuplicateBikeGroup.create
+      expect(duplicate_bike_group.ignore).to be_false
+      put :ignore_duplicate_toggle, id: duplicate_bike_group.id 
+      duplicate_bike_group.reload
+
+      expect(duplicate_bike_group.ignore).to be_true
+      response.should redirect_to 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
+    end
+
+    it "marks a duplicate group unignore" do 
+      user = FactoryGirl.create(:admin)
+      set_current_user(user)
+      request.env["HTTP_REFERER"] = 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
+      duplicate_bike_group = DuplicateBikeGroup.create(ignore: true)
+      expect(duplicate_bike_group.ignore).to be_true
+      put :ignore_duplicate_toggle, id: duplicate_bike_group.id 
+      duplicate_bike_group.reload
+
+      expect(duplicate_bike_group.ignore).to be_false
+      response.should redirect_to 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
     end
   end
 

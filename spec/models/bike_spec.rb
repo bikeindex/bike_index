@@ -21,6 +21,7 @@ describe Bike do
     it { should belong_to :creation_organization }
     it { should belong_to :current_stolen_record }
     it { should belong_to :location }
+    it { should have_many :duplicate_bike_groups }
     it { should have_many :b_params }
     it { should have_many :stolen_notifications }
     it { should have_many :stolen_records }

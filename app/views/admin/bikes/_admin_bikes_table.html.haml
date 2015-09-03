@@ -1,15 +1,18 @@
 - bikes ||= @bikes
-%thead
-  %th
-    Date indexed
-  %th.medium-screens
-    Sent to
-  %th
-    Manufacturer
-  %th.large-screens
-    Info
-  %th.not-tiny-screens
-    Created by
+- no_show_header ||= false
+- show_serial ||= false
+- unless no_show_header
+  %thead
+    %th
+      Date indexed
+    %th.medium-screens
+      Sent to
+    %th
+      Manufacturer
+    %th.large-screens
+      Info
+    %th.not-tiny-screens
+      Created by
 
 %tbody
   - bikes.each do |bike|
@@ -55,6 +58,10 @@
           - if bike.stolen
             %span.less-strong-right
               stolen
+          - if show_serial
+            %br
+            %span.less-strong
+              = bike.serial_number
 
       %td.not-tiny-screens
         .less-strong-hold

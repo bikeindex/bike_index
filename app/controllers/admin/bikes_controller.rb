@@ -41,12 +41,22 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def duplicates
-    @bike_groups = []
-    # serials = Bike.all.map(&:serial_number)
-    # new_ary = serials.select {|item| serials.count(item) > 1}
-    # new_ary.uniq.each do |serial|
-    #   @bike_groups << Bike.where(serial_number: serial)
-    # end
+    if params[:show_ignored]
+      duplicate_groups = DuplicateBikeGroup.order("created_at desc")
+    else
+      duplicate_groups = DuplicateBikeGroup.unignored.order("created_at desc")
+    end
+    @page = params[:page] || 1
+    per_page = params[:per_page] || 25
+    @duplicate_groups = duplicate_groups.page(@page).per(per_page)
+  end
+
+  def ignore_duplicate_toggle
+    duplicate_bike_group = DuplicateBikeGroup.find(params[:id])
+    duplicate_bike_group.ignore = !duplicate_bike_group.ignore
+    duplicate_bike_group.save
+    flash[:notice] = "Successfully marked #{duplicate_bike_group.segment} #{duplicate_bike_group.ignore ? 'ignored' : 'Un-ignored'}"
+    redirect_to :back
   end
 
   def destroy

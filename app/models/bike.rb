@@ -109,6 +109,7 @@ class Bike < ActiveRecord::Base
   has_many :public_images, as: :imageable, dependent: :destroy
   has_many :components, dependent: :destroy
   has_many :b_params, as: :created_bike
+  has_many :duplicate_bike_groups, through: :normalized_serial_segments  
   
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :components, allow_destroy: true

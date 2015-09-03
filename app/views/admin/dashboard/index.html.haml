@@ -70,13 +70,18 @@
     %em
       (#{today} today, #{yesterday} yesterday)
 
-/ %section.full-screen-table
-/   %h2
-/     Suspicious 
-/     = link_to "DUPED bikes", duplicates_admin_bikes_url
-/   %table.table.table-striped.table-bordered
-/     - @bike_groups.each do |bikes|
-/       = render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: bikes }
+%section.full-screen-table
+  %h2
+    Suspicious 
+    = link_to "DUPED bikes", duplicates_admin_bikes_url
+  - @duplicate_groups.each do |duplicate_group|
+    %p
+      Bikes with serial numbers matching 
+      %strong
+        #{duplicate_group.segment}
+      = link_to "ignore #{duplicate_group.segment}", ignore_duplicate_toggle_admin_bikes_path(id: duplicate_group.id), method: 'PUT', class: 'pull-right less-strong'
+    %table.table.table-striped.table-bordered
+      = render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: duplicate_group.bikes, no_show_header: true, show_serial: true }
 
 %section.full-screen-table
   %header.with-subtitle

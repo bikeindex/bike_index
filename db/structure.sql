@@ -576,6 +576,38 @@ ALTER SEQUENCE cycle_types_id_seq OWNED BY cycle_types.id;
 
 
 --
+-- Name: duplicate_bike_groups; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE duplicate_bike_groups (
+    id integer NOT NULL,
+    ignore boolean DEFAULT false NOT NULL,
+    added_bike_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: duplicate_bike_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE duplicate_bike_groups_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: duplicate_bike_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE duplicate_bike_groups_id_seq OWNED BY duplicate_bike_groups.id;
+
+
+--
 -- Name: feedbacks; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1054,7 +1086,8 @@ CREATE TABLE normalized_serial_segments (
     segment character varying(255),
     bike_id integer,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    duplicate_bike_group_id integer
 );
 
 
@@ -1930,6 +1963,13 @@ ALTER TABLE ONLY cycle_types ALTER COLUMN id SET DEFAULT nextval('cycle_types_id
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY duplicate_bike_groups ALTER COLUMN id SET DEFAULT nextval('duplicate_bike_groups_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY feedbacks ALTER COLUMN id SET DEFAULT nextval('feedbacks_id_seq'::regclass);
 
 
@@ -2259,6 +2299,14 @@ ALTER TABLE ONLY customer_contacts
 
 ALTER TABLE ONLY cycle_types
     ADD CONSTRAINT cycle_types_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: duplicate_bike_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY duplicate_bike_groups
+    ADD CONSTRAINT duplicate_bike_groups_pkey PRIMARY KEY (id);
 
 
 --
@@ -2635,6 +2683,13 @@ CREATE INDEX index_memberships_on_user_id ON memberships USING btree (user_id);
 --
 
 CREATE INDEX index_normalized_serial_segments_on_bike_id ON normalized_serial_segments USING btree (bike_id);
+
+
+--
+-- Name: index_normalized_serial_segments_on_duplicate_bike_group_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_normalized_serial_segments_on_duplicate_bike_group_id ON normalized_serial_segments USING btree (duplicate_bike_group_id);
 
 
 --
@@ -3030,3 +3085,5 @@ INSERT INTO schema_migrations (version) VALUES ('20150518192613');
 INSERT INTO schema_migrations (version) VALUES ('20150701151619');
 
 INSERT INTO schema_migrations (version) VALUES ('20150805160333');
+
+INSERT INTO schema_migrations (version) VALUES ('20150903194549');

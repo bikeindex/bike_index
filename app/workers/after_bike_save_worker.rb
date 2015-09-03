@@ -4,6 +4,7 @@ class AfterBikeSaveWorker
 
   def perform(bike_id)
     bike = Bike.unscoped.where(id: bike_id).first
+    DuplicateBikeFinderWorker.perform_async(bike_id)
     if bike.present? && !bike.fake_deleted
       bike_json = BikeV2ShowSerializer.new(bike, root: false).as_json
       bike_json.delete(:registration_updated_at)

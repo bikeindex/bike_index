@@ -2,11 +2,16 @@
 %header.with-subtitle
   %h1
     Possible duplicate bikes
-  = link_to "Manage component types", admin_ctypes_url, class: "sharing-links"
-
+.paginate-container
+  = paginate @duplicate_groups
 %section.full-screen-table
-  - @bike_groups.each do |bikes|
-    %h3
-      = bikes.first.serial_number    
+  - @duplicate_groups.each do |duplicate_group|
+    %p
+      Bikes with serial numbers matching 
+      %strong
+        #{duplicate_group.segment}
+      = link_to "ignore #{duplicate_group.segment}", ignore_duplicate_toggle_admin_bikes_path(id: duplicate_group.id), class: 'pull-right less-strong'
     %table.table.table-striped.table-bordered
-      = render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: bikes }
+      = render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: duplicate_group.bikes, no_show_header: true, show_serial: true }
+.paginate-container
+  = paginate @duplicate_groups

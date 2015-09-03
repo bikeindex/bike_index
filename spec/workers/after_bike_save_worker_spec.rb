@@ -18,6 +18,13 @@ describe AfterBikeSaveWorker do
     result['deleted'].should_not be_present
   end
 
+  it "enqueues the duplicate_bike_finder_worker" do
+    ownership = FactoryGirl.create(:ownership, user_hidden: true)
+    expect{
+      JSON.parse(AfterBikeSaveWorker.new.perform(ownership.bike_id))
+    }.to change(DuplicateBikeFinderWorker.jobs, :size).by(1)
+  end
+
   it "creates pretty json without registration_updated_at, sends webhook runner" do 
     ENV['VERSIONER_LOCATION'] = 'spec/fixtures'
     bike = FactoryGirl.create(:bike)
