@@ -8,11 +8,13 @@
     <p>Good thinking! We’re glad you’ve joined, you smarty pants.</p>
   <% end %>
 
-  <% if @bike.stolen %>
-    <h1 style="font-weight: 400;">Bike thieves are jerks.</h1>
-    <h2 style="font-weight: 400;">We're sorry your bike was stolen.</h2>
+  <% if @bike.recovered %>
+    <h1 style="font-weight: 400;">Thank you for adding this <%= @biketype %> you found to the index!</h1>
+  <% elsif @bike.stolen %>
+    <h1 style="font-weight: 400;"><%= @biketype.titleize %> thieves are jerks.</h1>
+    <h2 style="font-weight: 400;">We're sorry your <%= @biketype %> was stolen.</h2>
   <% else %>
-    <h1 style="font-weight: 400;">Congrats on adding your bike to the index!</h1>
+    <h1 style="font-weight: 400;">Congrats on adding your <%= @biketype %> to the index!</h1>
   <% end %>
   
   <% if @snippet_body.present? %><%= @snippet_body.html_safe %><% end %>
@@ -20,7 +22,7 @@
   <hr style="margin: 40px 0 30px;">
   <p>
     <% if @ownership.creator.email == @ownership.owner_email %>
-      You added a <% if @bike.stolen %>stolen<% end %> <%= @biketype %> to the Bike Index
+      You added a <% if @bike.recovered %>recovered/found<% elsif @bike.stolen %>stolen<% end %> <%= @biketype %> to the Bike Index
     <% else %>
       <strong>
         <% if @creation_org.present? %>
@@ -31,7 +33,9 @@
           <%= @ownership.creator.email %>
         <% end %>
       </strong>
-      <% if @bike.stolen %>
+      <% if @bike.recovered %>
+        added a recovered
+      <% elsif @bike.stolen %>
         added a stolen
       <% elsif @new_bike %>
         added a 
@@ -69,8 +73,9 @@
     </p>
   </div>
 </div>
-
-<% if @bike.stolen %>
+<% if @bike.recovered %>
+  <p>Hopefully you find the owner soon. Give us a heads up when you do!</p>
+<% elsif @bike.stolen %>
   <p>Hopefully you find the <%= @biketype %> soon. Give us a heads up when you do!</p>
 <% elsif @bike.created_with_token %>
   
@@ -81,45 +86,46 @@
 
   <p class="explanation" style="text-align: center;color: #555;">Sign up or sign in to BikeIndex.org to claim your <%= @biketype %> and edit it, upload photos and make sure you never lose track of your trusty steed!</p>
 <% end %>
-
-<hr style="margin: 40px 0 30px;">
-<h2>
-Protect your bike by following these locking guidelines.
-</h2>
-<ul>
-<li>
-<p>
-<strong>
-Use a U-Lock. Cable locks should never be used as a primary means of locking a bike in a city.
-</strong>
-</p>
-</li>
-<li>
-<p>
-Secure both wheels - either with two U-locks, or one U-lock and one heavy duty cable.
-</p>
-</li>
-<li>
-<p>
-Do not lock to anything without first checking to make sure it can't be easily removed.
-</p>
-</li>
-<li>
-<p>
-<a href="https://www.bikeindex.org/protect_your_bike">Read more about protecting your bike here</a>
-</p>
-</li>
-</ul>
-<div class="locking-demonstration" style="-webkit-border-radius: 3px;-moz-border-radius: 3px;border-radius: 3px;-webkit-box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);-moz-box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);background: #cacaca;padding: 10px;max-width: 500px;margin: 30px auto;">
-<div class="locked" style="-webkit-border-radius: 2px;-moz-border-radius: 2px;border-radius: 2px;width: 100%;background: #FFF;">
-<img alt="Correctly locking a bike" src="https://files.bikeindex.org/Locking.gif" title="Pink Power U-Locks are a registered trademark of Bike Index, Inc" style="width: 100%;">
-</div>
-<p style="color: white;width: 100%;margin: 0;padding: 10px 10px 0;">
-<em>
-<strong>
-A correctly locked bike.
-</strong>
-The frame is locked to the bike rack and both wheels are secured.
-</em>
-</p>
-</div>
+<% unless @bike.recovered %>
+  <hr style="margin: 40px 0 30px;">
+  <h2>
+  Protect your bike by following these locking guidelines.
+  </h2>
+  <ul>
+  <li>
+  <p>
+  <strong>
+  Use a U-Lock. Cable locks should never be used as a primary means of locking a bike in a city.
+  </strong>
+  </p>
+  </li>
+  <li>
+  <p>
+  Secure both wheels - either with two U-locks, or one U-lock and one heavy duty cable.
+  </p>
+  </li>
+  <li>
+  <p>
+  Do not lock to anything without first checking to make sure it can't be easily removed.
+  </p>
+  </li>
+  <li>
+  <p>
+  <a href="https://www.bikeindex.org/protect_your_bike">Read more about protecting your bike here</a>
+  </p>
+  </li>
+  </ul>
+  <div class="locking-demonstration" style="-webkit-border-radius: 3px;-moz-border-radius: 3px;border-radius: 3px;-webkit-box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);-moz-box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);background: #cacaca;padding: 10px;max-width: 500px;margin: 30px auto;">
+  <div class="locked" style="-webkit-border-radius: 2px;-moz-border-radius: 2px;border-radius: 2px;width: 100%;background: #FFF;">
+  <img alt="Correctly locking a bike" src="https://files.bikeindex.org/Locking.gif" title="Pink Power U-Locks are a registered trademark of Bike Index, Inc" style="width: 100%;">
+  </div>
+  <p style="color: white;width: 100%;margin: 0;padding: 10px 10px 0;">
+  <em>
+  <strong>
+  A correctly locked bike.
+  </strong>
+  The frame is locked to the bike rack and both wheels are secured.
+  </em>
+  </p>
+  </div>
+<% end %>

@@ -8,7 +8,9 @@
 Good thinking! We’re glad you’ve joined, you smarty pants.
 
 <% end %>
-<% if @bike.stolen %>
+<% if @bike.recovered %>
+Thanks for adding this bike that you found!
+<% elsif @bike.stolen %>
 Bike thieves are jerks.
 We're sorry your bike was stolen.
 <% else %>
@@ -20,7 +22,7 @@ Congrats on adding your bike to the index!
 <% if @creation_org.present? %><%= @creation_org.name %>
 <% elsif @ownership.creator.name %><%= @ownership.creator.name %>
 <% else %><%= @ownership.creator.email %><% end %>
-<% if @bike.stolen %>Added a stolen<% elsif @new_bike %> added a <% else %> sent you a <% end %>
+<% if @bike.recovered %>Added a recovered<% elsif @bike.stolen %>Added a stolen<% elsif @new_bike %> added a <% else %> sent you a <% end %>
 <%= @biketype %> on the Bike Index <% if @new_bike %> for you <% end %>
 <% end # end of the creation_org notification %>
 
@@ -31,8 +33,9 @@ Serial: <%= @bike.serial_number %>
     
 Color: <%= @bike.frame_colors.to_sentence %>
 ---  
-
-<% if @bike.stolen %>
+<% if @bike.recovered %>
+Hopefully you find the owner soon. Give us a heads up when you do!
+<% elsif @bike.stolen %>
 Hopefully you find the <%= @biketype %> soon. Give us a heads up when you do!
 <% end %>
 
