@@ -55,14 +55,7 @@
       = render 'bikes/photo'
     
     %ul.attr-list
-      - serial = @bike.serial_number
-      - if serial.match('absent')
-        - if @bike.stolen
-          - serial = 'Do not know'
-        - else
-          - serial = 'Has no serial'
-
-      = @bike.attr_list_item(serial, 'Serial')
+      = @bike.attr_list_item(@bike.serial_display, 'Serial')
       - unless @bike.type == "bike"
         = @bike.attr_list_item(@bike.type.titleize, "Cycle type")
       = @bike.attr_list_item(@bike.mnfg_name, 'Manufacturer')

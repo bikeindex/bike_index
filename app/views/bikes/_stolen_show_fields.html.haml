@@ -44,11 +44,12 @@
     Know something about this #{@bike.type}?
     %span.stolen-color
       Contact the owner now!
-  %p
-    If you are contacting this person about an ad you found online <strong>include a link to the ad</strong>.
+  - if @bike.recovered
+    Is this your bike? Send proof of ownership (such as the bike's serial number or a photo of you with the bike)
+  - else
+    %p
+      If you are contacting this person about an ad you found online <strong>include a link to the ad</strong>.
   - if current_user.present?  
-    - if @bike.recovered
-      Is this your bike? Send proof of ownership (such as the bike's serial number or a photo of you with the bike)
     = form_for @stolen_notification do |f|
       = f.hidden_field :bike_id, value: @bike.id
       = f.text_area :message, required: true, placeholder: "Send a message to the owner of this #{@bike.type}! Help them get their #{@bike.type} back!", rows: 3, class: 'form-control'

@@ -7,18 +7,7 @@
   .blist-primary-group
     .dl-holder
       %dl.dl-horizontal
-        %dt Serial
-        %dd.serial-text
-          - if bike.recovered
-            Serial hidden
-          - else 
-            - if bike.serial_number.match('absent')
-              - if bike.stolen
-                Unknown
-              - else
-                Has no serial
-            - else
-              = bike.serial_number
+        = bike.dl_list_item(bike.serial_display, "Serial")  
         
         = bike.dl_list_item(bike.frame_colors.to_sentence, "Colors")
         

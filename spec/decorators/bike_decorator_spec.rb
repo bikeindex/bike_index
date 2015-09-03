@@ -160,4 +160,35 @@ describe BikeDecorator do
     end
   end
 
+  describe :serial_display do 
+    it "returns do not know if stolen" do 
+      bike = Bike.new(serial_number: 'absent')
+      bike.stub(:stolen).and_return(true)
+      decorator = BikeDecorator.new(bike)
+      expect(decorator.serial_display).to eq('Do not know')
+    end
+
+    it "returns has no serial if not stolen" do 
+      bike = Bike.new(serial_number: 'absent')
+      bike.stub(:stolen).and_return(false)
+      decorator = BikeDecorator.new(bike)
+      expect(decorator.serial_display).to eq('Has no serial')
+    end
+    it "returns hidden if recovered" do   
+      bike = Bike.new(serial_number: 'asdf')
+      bike.stub(:stolen).and_return(false)
+      bike.stub(:recovered).and_return(true)
+      decorator = BikeDecorator.new(bike)
+      expect(decorator.serial_display).to eq('Hidden')
+    end
+
+    it "returns serial number" do
+      bike = Bike.new(serial_number: 'test_serial')
+      bike.stub(:stolen).and_return(false)
+      bike.stub(:recovered).and_return(false)
+      decorator = BikeDecorator.new(bike)
+      expect(decorator.serial_display).to eq('test_serial')
+    end
+  end
+
 end

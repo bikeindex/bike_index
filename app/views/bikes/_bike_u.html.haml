@@ -10,16 +10,7 @@
             %span.attr-title
               Serial
             %span.serial-text
-              - if bike_u.recovered
-                Serial hidden
-              - else 
-                - if bike_u.serial_number.match('absent')
-                  - if bike_u.stolen
-                    Unknown
-                  - else
-                    Has no serial
-                - else
-                  = bike_u.serial_number
+              = bike_u.serial_display
           %p
             %span.attr-title
               Colors
@@ -29,7 +20,7 @@
             %h3
               Status:
               - if bike_u.recovered
-                Recovered by Organization
+                Recovered/Found
               - else
                 STOLEN
             - if bike_u.current_stolen_record.present?

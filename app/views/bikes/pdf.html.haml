@@ -101,12 +101,11 @@
                 = @bike.owner.name
               - else
                 = @bike.owner_email
-          - unless @bike.serial_number == 'absent'
-            %tr
-              %td.td-title
-                Bike Serial
-              %td
-                = @bike.serial_number
+          %tr
+            %td.td-title
+              Bike Serial
+            %td
+              = @bike.serial_display
           %tr
             %td.td-title
               Manufacturer
