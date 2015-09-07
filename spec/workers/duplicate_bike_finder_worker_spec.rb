@@ -3,7 +3,7 @@ require 'spec_helper'
 describe DuplicateBikeFinderWorker do
   it { should be_processed_in :afterwards }
   
-  it "should take a bike id and search for groups" do
+  it "takes a bike id and search for groups" do
     bike1 = FactoryGirl.create(:bike, serial_number: "applejacks cereal")
     bike1.create_normalized_serial_segments
     bike2 = FactoryGirl.create(:bike, serial_number: "applejacks Funtimes")
@@ -13,7 +13,14 @@ describe DuplicateBikeFinderWorker do
     expect(bike2.normalized_serial_segments.first.duplicate_bike_group).to eq(duplicate_group)
   end
 
-  it "should add a bike to an existing duplicate bike group" do 
+  it "doesn't create a duplicate if only one match" do
+    bike = FactoryGirl.create(:bike, serial_number: "applejacks")
+    bike.create_normalized_serial_segments
+    DuplicateBikeFinderWorker.new.perform(bike.id)
+    expect(bike.normalized_serial_segments.first.duplicate_bike_group).to_not be_present
+  end
+
+  it "adds a bike to an existing duplicate bike group" do 
     bike1 = FactoryGirl.create(:bike, serial_number: "applejacks")
     bike1.create_normalized_serial_segments
     bike2 = FactoryGirl.create(:bike, serial_number: "applejacks")
