@@ -76,7 +76,6 @@
     = link_to "DUPED bikes", duplicates_admin_bikes_url
   - @duplicate_groups.each do |duplicate_group|
     %p
-      Bikes with serial numbers matching 
       %strong
         #{duplicate_group.segment}
       = link_to "ignore #{duplicate_group.segment}", ignore_duplicate_toggle_admin_bikes_path(id: duplicate_group.id), method: 'PUT', class: 'pull-right less-strong'
