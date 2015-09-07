@@ -12,7 +12,7 @@ class Admin::OrganizationsController < Admin::BaseController
     page = params[:page] || 1
     per_page = params[:per_page] || 25
     bikes = bikes.page(page).per(per_page)
-    @bikes = bikes.decorate
+    @bikes = bikes.order("created_at desc").decorate
     @organization = @organization.decorate
   end
 
