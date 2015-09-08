@@ -43,49 +43,50 @@
 
       .blog-final-actions.row-fluid
         .well
-          .span6
-            .control-group
-              %label.control-label
-                Published date 
-              .controls.radio-controls
-                %label.checkbox
-                  = f.check_box :post_now
-                  Publish now
-              .controls.extra-field
-                = @blog.published_at.strftime("%m-%d-%Y")
-                
-                %a#change_published_date{ href: "#", data: {date: "#{@blog.published_at.strftime("%m-%d-%Y")}" }}
-                  edit
-
-            .control-group#blog-date.datepicker-container.initially-hidden
-              = label :post_date, "Post date", class: "control-label"
-              .controls
-                #post-date-field
-                  = f.text_field :post_date
-
-            .control-group
-              = f.label :published, "Published", class: "control-label"
-              .controls
-                = f.check_box :published
-            .control-group.chosen-select
-              %label.control-label
-                Author email
-              .controls
-                = f.email_field :user_email, placeholder: 'your email', required: true, value: @blog.user.email
-                - user = User.fuzzy_email_find(@blog.user.email)
-                - unless user.present? && user.userlink.present?
-                  Please #{link_to "turn on your personal page", my_account_url, target: '_blank'}, or link your twitter!
-          .span6
-            .control-group.tags
-              = f.label :tags, "Tags, should include a main category: Tech, Design, or Update", class: "control-label"
-              .controls
-                = f.text_area :tags, placeholder: "Separate tags with commas"
+          .clearfix
+            .span6
               .control-group
-                = f.label :update_title, "Update URL", class: "control-label"
+                %label.control-label
+                  Published date 
+                .controls.radio-controls
+                  %label.checkbox
+                    = f.check_box :post_now
+                    Publish now
+                .controls.extra-field
+                  = @blog.published_at.strftime("%m-%d-%Y")
+                  
+                  %a#change_published_date{ href: "#", data: {date: "#{@blog.published_at.strftime("%m-%d-%Y")}" }}
+                    edit
+
+              .control-group#blog-date.datepicker-container.initially-hidden
+                = label :post_date, "Post date", class: "control-label"
                 .controls
-                  = f.check_box :update_title
-                  %span.this-will-break-links
-                    This will break existing links!
+                  #post-date-field
+                    = f.text_field :post_date
+
+              .control-group
+                = f.label :published, "Published", class: "control-label"
+                .controls
+                  = f.check_box :published
+              .control-group.chosen-select
+                %label.control-label
+                  Author email
+                .controls
+                  = f.email_field :user_email, placeholder: 'your email', required: true, value: @blog.user.email
+                  - user = User.fuzzy_email_find(@blog.user.email)
+                  - unless user.present? && user.userlink.present?
+                    Please #{link_to "turn on your personal page", my_account_url, target: '_blank'}, or link your twitter!
+            .span6
+              .control-group.tags
+                = f.label :tags, "Tags, should include a main category: Tech, Design, or Update", class: "control-label"
+                .controls
+                  = f.text_area :tags, placeholder: "Separate tags with commas"
+                .control-group
+                  = f.label :update_title, "Update URL", class: "control-label"
+                  .controls
+                    = f.check_box :update_title
+                    %span.this-will-break-links
+                      This will break existing links!
 
               .control-group
                 .controls
@@ -93,18 +94,17 @@
                     <input type="radio" name="index_image_id" value="0" class="index_image_0">
                     No primary image
           
-          .clearfix
-            .blog-field
-              = f.text_field :title, placeholder: "Blog title"
-            .blog-field
-              = f.text_field :description_abbr, placeholder: "Description/subtitle shown on the homepage - will be the text below unless you enter something."
-              .description_abbr
-                = @blog.body_abbr
+          .blog-field
+            = f.text_field :title, placeholder: "Blog title"
+          .blog-field
+            = f.text_field :description_abbr, placeholder: "Description/subtitle shown on the homepage - will be the text below unless you enter something."
+            .description_abbr
+              = @blog.body_abbr
 
-            .padded
-              %a.button-blue.pull-left{target: "_blank", href: blog_url(@blog)}
-                preview post
-              = f.submit 'Save', class: 'button-green pull-right'
+          .padded
+            %a.button-blue.pull-left{target: "_blank", href: blog_url(@blog)}
+              preview post
+            = f.submit 'Save', class: 'button-green pull-right'
 
 
   - unless @blog.is_listicle
