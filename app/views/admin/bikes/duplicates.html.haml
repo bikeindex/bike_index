@@ -7,6 +7,7 @@
 %section.full-screen-table
   - @duplicate_groups.each do |duplicate_group|
     %p
+      %strong
         #{duplicate_group.segment}
       = link_to "ignore #{duplicate_group.segment}", ignore_duplicate_toggle_admin_bikes_path(id: duplicate_group.id), class: 'pull-right less-strong'
     %table.table.table-striped.table-bordered
