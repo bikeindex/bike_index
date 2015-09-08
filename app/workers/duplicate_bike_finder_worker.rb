@@ -19,9 +19,11 @@ class DuplicateBikeFinderWorker
             next if duplicate_segment.duplicate_bike_group_id.present?
             duplicate_segment.update_attribute :duplicate_bike_group_id, duplicate_group.id
           end
+          duplicate_group.destroy if duplicate_group.normalized_serial_segments.empty?
         end
       end
     end
+
 
   end
 
