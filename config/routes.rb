@@ -1,3 +1,4 @@
+require 'soulheart/server'
 Bikeindex::Application.routes.draw do
 
   use_doorkeeper do 
@@ -178,6 +179,7 @@ Bikeindex::Application.routes.draw do
       match '*a', to: 'api_v1#not_found'
     end
     mount Soulmate::Server, :at => "/searcher"
+    mount Soulheart::Server, :at => "/autocomplete"
   end
   mount API::Base => '/api'
 

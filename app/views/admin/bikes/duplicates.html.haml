@@ -9,7 +9,7 @@
     %p
       %strong
         #{duplicate_group.segment}
-      = link_to "ignore #{duplicate_group.segment}", ignore_duplicate_toggle_admin_bikes_path(id: duplicate_group.id), class: 'pull-right less-strong'
+      = link_to "ignore #{duplicate_group.segment}", ignore_duplicate_toggle_admin_bikes_path(id: duplicate_group.id), method: 'PUT', class: 'pull-right less-strong'
     %table.table.table-striped.table-bordered
       = render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: duplicate_group.bikes, no_show_header: true, show_serial: true }
 .paginate-container

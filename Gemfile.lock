@@ -228,6 +228,7 @@ GEM
     high_voltage (2.1.0)
     highline (1.6.21)
     hike (1.2.3)
+    hiredis (0.4.5)
     hitimes (1.2.2)
     http-cookie (1.0.2)
       domain_name (~> 0.5)
@@ -420,6 +421,12 @@ GEM
     sitemap_generator (5.0.2)
       builder
     slop (3.5.0)
+    soulheart (0.2.2)
+      hiredis (~> 0.4.5)
+      json
+      redis (>= 3.0.6)
+      sinatra
+      vegas (>= 0.1.0)
     sprockets (2.2.3)
       hike (~> 1.2)
       multi_json (~> 1.0)
@@ -549,6 +556,7 @@ DEPENDENCIES
   sidekiq-unique-jobs
   simplecov
   sitemap_generator
+  soulheart
   soulmate!
   stripe!
   strong_parameters

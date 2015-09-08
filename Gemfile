@@ -15,6 +15,7 @@ gem 'sidekiq-failures'
 gem 'sidekiq-unique-jobs'
 gem 'rack-contrib'
 gem 'soulmate', :require => 'soulmate/server', github: 'sethherr/soulmate'
+gem 'soulheart'
 gem 'geocoder'
 gem "money-rails", "~> 0.5.0"
 gem "i18n"

@@ -95,6 +95,20 @@ class Manufacturer < ActiveRecord::Base
     }
   end
 
+  def autocomplete_hash_category
+    frame_maker ? 'frame_mnfg' : 'mnfg'
+  end
+
+  def autocomplete_hash
+    {
+      id: id,
+      text: name,
+      category: autocomplete_hash_category,
+      priority: (bikes.count + components.count),
+      data: {},
+    }.as_json
+  end
+
   before_save :set_website_and_logo_source
   def set_website_and_logo_source
     self.website = website.present? ? Urlifyer.urlify(website) : nil
