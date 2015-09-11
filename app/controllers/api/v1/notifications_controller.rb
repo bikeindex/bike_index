@@ -11,7 +11,7 @@ module Api
             customer_contact = CustomerContact.new(body: 'EMPTY',
               bike_id: bike.id,
               contact_type: 'stolen_twitter_alerter',
-              title: "We tweeted about your stolen bike!",
+              title: title_tag(bike),
               user_email: bike.owner_email,
               creator_email: 'bryan@bikeindex.org',
               info_hash: params[:notification_hash])
@@ -30,6 +30,14 @@ module Api
       def authenticate_notification_permission
         unless params[:access_token] == ENV['NOTIFICATIONS_API_KEY']
           render json: "Not authorized", status: :unauthorized and return
+        end
+      end
+
+      def title_tag(bike)
+        if bike.recovered
+          "We tweeted about the bike you recovered!"
+        else
+          "We tweeted about your stolen bike!"
         end
       end
 

@@ -1,4 +1,5 @@
-<h1 style="font-weight: 400; font-size: 30px;">We're spreading the word about your stolen <%= @biketype %>!</h1>
+<% stolen_word = @bike.recovered ? "recovered/found" : "stolen" %>
+<h1 style="font-weight: 400; font-size: 30px;">We're spreading the word about your <%= stolen_word %> <%= @biketype %>!</h1>
 
 <p style="">We sent out this tweet from <a href='https://twitter.com/<%= @info[:tweet_account_screen_name] %>'>@<%= @info[:tweet_account_screen_name] %></a>, the <% if @info[:location].present? %><%= @info[:location] %> area <% end %> stolen bike alerter.</p>
 
@@ -35,7 +36,7 @@
     <span class="text" style="display: block;text-align: center;margin-top: .5em;line-height: 1.2em;padding: 1em 1em 0;">Share on Facebook - so everyone knows to watch out for your <%= @bike.type %>!</span>
   </a>
 </div>
-<p style="margin: 50px 0 0; padding: 20px 0 0; font-weight: 400; color: #95A5A5; text-align: center;">This email is about the stolen <%= @biketype %> registered on the Bike Index on <%= @bike.created_at.strftime("%m.%d.%y") %></p>
+<p style="margin: 50px 0 0; padding: 20px 0 0; font-weight: 400; color: #95A5A5; text-align: center;">This email is about the <%= stolen_word %> <%= @biketype %> registered on the Bike Index on <%= @bike.created_at.strftime("%m.%d.%y") %></p>
 
 <% bike_image = "https://www.bikeindex.org/assets/bike_photo_placeholder.png" %>
 <% bike_image = @customer_contact.bike.stock_photo_url if @customer_contact.bike.stock_photo_url.present? %>
