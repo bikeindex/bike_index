@@ -50,6 +50,13 @@ describe StolenRecord do
       row.split("\t").count.should eq(10)
       row.split("\n").count.should eq(1)
     end
+
+    it "doesn't show the serial for recovered bikes" do 
+      stolen_record = FactoryGirl.create(:stolen_record)
+      stolen_record.bike.update_attributes(serial_number: "SERIAL_SERIAL", recovered: true)
+      row = stolen_record.tsv_row
+      row.should_not match(/serial_serial/i)
+    end
   end
 
   describe :set_phone do 
