@@ -17,6 +17,38 @@ describe StolenRecord do
     stolen_record.current.should be_true
   end
 
+  describe :scopes do 
+    it "default scopes to current" do 
+      StolenRecord.scoped.to_sql.should == StolenRecord.where(current: true).to_sql
+    end
+    it "scopes approveds" do 
+      StolenRecord.approveds.to_sql.should == StolenRecord.where(current: true).where(approved: true).to_sql
+    end
+    it "scopes approveds_with_reports" do 
+      StolenRecord.approveds_with_reports.to_sql.should == StolenRecord.where(current: true).where(approved: true).
+        where("police_report_number IS NOT NULL").where("police_report_department IS NOT NULL").to_sql
+    end
+    
+    it "scopes not_tsved" do 
+      StolenRecord.not_tsved.to_sql.should == StolenRecord.where(current: true).where("tsved_at IS NULL").to_sql
+    end
+    it "scopes recovered" do 
+      StolenRecord.recovered.to_sql.should == StolenRecord.unscoped.where(current: false).order("date_recovered desc").to_sql
+    end
+    it "scopes displayable" do 
+      StolenRecord.displayable.to_sql.should == StolenRecord.unscoped.where(current: false, can_share_recovery: true).order("date_recovered desc").to_sql
+    end
+    it "scopes recovery_unposted" do 
+      StolenRecord.recovery_unposted.to_sql.should == StolenRecord.unscoped.where(current: false, recovery_posted: false).to_sql
+    end
+    it "scopes tsv_today" do 
+      stolen1 = FactoryGirl.create(:stolen_record, current: true, tsved_at: Time.now)
+      stolen2 = FactoryGirl.create(:stolen_record, current: true, tsved_at: nil)
+
+      expect(StolenRecord.tsv_today.pluck(:id)).to eq([stolen1.id, stolen2.id])
+    end
+  end
+
   it "only allows one current stolen record per bike"
 
   describe :address do 

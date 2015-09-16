@@ -4,19 +4,19 @@
 
 %p
   TSVs are generated every night.
-
-%table.table.table-striped.table-bordered
-  %tbody
-    - TsvMaintainer.tsvs.each do |tsv_info|
-      %tr
-        %td
-          - if tsv_info[:updated_at].present?
-            = l Time.zone.at(tsv_info[:updated_at].to_i), format: :short_with_hour
-        %td
-          %a{href: tsv_info[:path] }
-            = tsv_info[:filename]
-        %td
-          = tsv_info[:description]
+.tsv_export_list
+  %table.table.table-striped.table-bordered
+    %tbody
+      - TsvMaintainer.tsvs.each do |tsv_info|
+        %tr
+          %td
+            - if tsv_info[:updated_at].present?
+              = l Time.zone.at(tsv_info[:updated_at].to_i), format: :short_with_hour
+          %td
+            %a{href: tsv_info[:path] }
+              = tsv_info[:filename]
+          %td
+            = tsv_info[:description]
   
 = form_tag admin_update_tsv_blacklist_path, method: :put, multipart: true do
   .control-group.padded

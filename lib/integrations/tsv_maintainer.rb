@@ -47,9 +47,11 @@ class TsvMaintainer
 
     def tsv_info_hash(k)
       path = Pathname.new(k)
+      daily_export = path.basename.to_s.match(/\A\d+/).present?
       {
         path: k,
         filename: path.basename.to_s,
+        daily: daily_export,
         updated_at: @result[k],
         description: descriptions[path.basename.to_s]
       }
@@ -58,7 +60,8 @@ class TsvMaintainer
     def tsvs
       return [] unless redis.type(info_id) == 'hash'
       @result = redis.hgetall(info_id)
-      @result.keys.map{ |k| tsv_info_hash(k).with_indifferent_access }
+      @result.keys.map{ |k| tsv_info_hash(k).with_indifferent_access }.
+        sort_by{ |t| t[:filename] }.sort_by{ |t| t[:daily] ? 1 : 0 }
     end
 
     def normalized(id)

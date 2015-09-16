@@ -26,6 +26,21 @@
   }
 }
 
+//________________________
+//
+// TSV exports
+//
+//________________________
+
+.tsv_export_list {
+  max-height: 200px;
+  overflow: scroll;
+  margin-bottom: 20px;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  .table { margin-bottom: 0; }
+}
+
 
 //________________________
 //

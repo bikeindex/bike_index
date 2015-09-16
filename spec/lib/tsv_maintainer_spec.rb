@@ -27,6 +27,7 @@ describe TsvMaintainer do
       TsvMaintainer.reset_tsv_info('current_stolen_bikes.tsv', t)
       tsv = TsvMaintainer.tsvs[0]
       expect(tsv[:updated_at]).to eq("#{t.to_i}")
+      expect(tsv[:daily]).to be_false
       expect(tsv['path']).to eq("current_stolen_bikes.tsv")
       expect(tsv['description']).to eq("Stolen")
     end
@@ -34,9 +35,14 @@ describe TsvMaintainer do
     it "returns the way we want" do 
       t = Time.now 
       TsvMaintainer.reset_tsv_info('https://files.bikeindex.org/uploads/tsvs/approved_current_stolen_bikes.tsv', t)
-      tsv = TsvMaintainer.tsvs.first
-      expect(tsv[:filename]).to eq('approved_current_stolen_bikes.tsv')
-      expect(tsv[:description]).to eq('Stolen (without blacklisted bikes)')
+      TsvMaintainer.update_tsv_info("https://files.bikeindex.org/uploads/tsvs/current_stolen_bikes.tsv")
+      TsvMaintainer.update_tsv_info("https://files.bikeindex.org/uploads/tsvs/#{Time.now.strftime('%Y_%-m_%-d')}_approved_current_stolen_bikes.tsv")
+      TsvMaintainer.update_tsv_info("https://files.bikeindex.org/uploads/tsvs/#{Time.now.strftime('%Y_%-m_%-d')}_current_stolen_bikes.tsv")
+      
+      expect(TsvMaintainer.tsvs[0][:filename]).to eq('current_stolen_bikes.tsv')
+      expect(TsvMaintainer.tsvs[1][:filename]).to eq('approved_current_stolen_bikes.tsv')
+      expect(TsvMaintainer.tsvs[2][:filename]).to eq("#{Time.now.strftime('%Y_%-m_%-d')}_current_stolen_bikes.tsv")
+      expect(TsvMaintainer.tsvs[3][:filename]).to eq("#{Time.now.strftime('%Y_%-m_%-d')}_approved_current_stolen_bikes.tsv")
     end
   end
 

@@ -1746,7 +1746,8 @@ CREATE TABLE stolen_records (
     recovery_posted boolean DEFAULT false,
     recovery_tweet text,
     recovery_share text,
-    create_open311 boolean DEFAULT false NOT NULL
+    create_open311 boolean DEFAULT false NOT NULL,
+    tsved_at timestamp without time zone
 );
 
 
@@ -3087,3 +3088,5 @@ INSERT INTO schema_migrations (version) VALUES ('20150701151619');
 INSERT INTO schema_migrations (version) VALUES ('20150805160333');
 
 INSERT INTO schema_migrations (version) VALUES ('20150903194549');
+
+INSERT INTO schema_migrations (version) VALUES ('20150916133842');

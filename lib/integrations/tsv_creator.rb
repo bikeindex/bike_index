@@ -1,4 +1,13 @@
 class TsvCreator
+  def self.enqueue_creation
+    TsvCreatorWorker.perform_async('create_manufacturer')
+    TsvCreatorWorker.perform_async('create_daily_tsvs')
+    TsvCreatorWorker.perform_in(20.minutes, 'create_stolen_with_reports', true)
+    TsvCreatorWorker.perform_in(1.hour, 'create_stolen', true)
+  end
+
+  attr_reader :file_prefix
+
   def initialize
     @file_prefix = Rails.env.test? ? "/spec/fixtures/tsv_creation/" : ""
   end
@@ -76,22 +85,25 @@ class TsvCreator
     send_to_uploader(output)
   end
 
-  def create_stolen(blacklist=false)
-    out_file = File.join(Rails.root,"#{@file_prefix}#{"approved_" if blacklist}current_stolen_bikes.tsv")
+  def create_stolen(blacklist=false, stolen_records: nil)
+    stolen_records ||= StolenRecord.approveds
+    filename = "#{@file_prefix}#{"approved_" if blacklist}current_stolen_bikes.tsv"
+    out_file = File.join(Rails.root, filename)
     output = File.open(out_file, "w")
     output.puts stolen_header
-    StolenRecord.approveds.includes(:bike).each do |sr|
+    stolen_records.includes(:bike).each do |sr|
       output.puts sr.tsv_row if sr.tsv_row.present?
     end
     send_to_uploader(output)
   end
 
-  def create_stolen_with_reports(blacklist=false)
-    out_file = File.join(Rails.root,"#{@file_prefix}#{"approved_" if blacklist}current_stolen_with_reports.tsv")
+  def create_stolen_with_reports(blacklist=false, stolen_records: nil)
+    stolen_records ||= StolenRecord.approveds_with_reports
+    filename = "#{@file_prefix}#{"approved_" if blacklist}current_stolen_with_reports.tsv"
+    out_file = File.join(Rails.root, filename)
     output = File.open(out_file, "w")
     output.puts stolen_with_reports_header
-    StolenRecord.approveds.where("police_report_number IS NOT NULL").
-      where("police_report_department IS NOT NULL").joins(:bike).merge(Bike.with_serial).each do |sr|
+    stolen_records.joins(:bike).merge(Bike.with_serial).each do |sr|
         next unless sr.police_report_number.present?
       output.puts sr.tsv_row(false) if sr.tsv_row.present?
     end
@@ -109,6 +121,14 @@ class TsvCreator
     end
     TsvMaintainer.update_tsv_info(path)
     output
+  end
+
+  def create_daily_tsvs
+    @file_prefix = "#{@file_prefix}#{Time.now.strftime('%Y_%-m_%-d')}_"
+    create_stolen(true, stolen_records: StolenRecord.approveds.tsv_today)
+    create_stolen_with_reports(true, stolen_records: StolenRecord.approveds_with_reports.tsv_today)
+    t = Time.now
+    StolenRecord.tsv_today.map{ |sr| sr.update_attribute :tsved_at, t }
   end
 
 end

@@ -30,7 +30,9 @@ class StolenRecord < ActiveRecord::Base
     :can_share_recovery,
     :recovery_share, # We edit this in the admin panel
     :recovery_tweet, # We edit this in the admin panel
-    :recovery_posted
+    :recovery_posted,
+    :tsved_at
+
     
   belongs_to :bike
   has_one :current_bike, class_name: 'Bike', foreign_key: :current_stolen_record_id
@@ -42,7 +44,11 @@ class StolenRecord < ActiveRecord::Base
   validates_presence_of :bike, :date_stolen
 
   default_scope where(current: true)
-  scope :approveds, where(current: true).where(approved: true)
+  scope :approveds, where(approved: true)
+  scope :approveds_with_reports, approveds.where("police_report_number IS NOT NULL").
+    where("police_report_department IS NOT NULL")
+  scope :not_tsved, where("tsved_at IS NULL")
+  scope :tsv_today, where("tsved_at IS NULL OR tsved_at >= '#{Time.now.beginning_of_day}'")
 
   scope :recovered, unscoped.where(current: false).order("date_recovered desc")
   scope :displayable, unscoped.where(current: false, can_share_recovery: true).order("date_recovered desc")
