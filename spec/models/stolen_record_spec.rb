@@ -158,7 +158,7 @@ describe StolenRecord do
       stolen_record = FactoryGirl.create(:stolen_record, tsved_at: t)
       stolen_record.update_attributes(theft_description: 'Something new description wise')
       stolen_record.reload
-      expect(stolen_record.tsved_at).to eq(t)
+      expect(stolen_record.tsved_at.to_i).to eq(t.to_i)
     end
     it "should reset from an update to police report" do 
       t = Time.now - 1.minute
