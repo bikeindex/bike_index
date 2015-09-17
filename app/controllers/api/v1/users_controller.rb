@@ -27,6 +27,7 @@ module Api
             feedback.name = (current_user.name.present? && current_user.name) || 'no name'
             feedback.feedback_hash = { bike_id: bike_id }
             if params[:serial_update_serial].present?
+              bike.current_stolen_record.update_attribute :tsved_at, nil if bike.current_stolen_record.present?
               feedback.feedback_hash[:new_serial] = params[:serial_update_serial]
               feedback.feedback_hash[:old_serial] = bike.serial_number
               bike.serial_number = params[:serial_update_serial]

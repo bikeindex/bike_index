@@ -67,6 +67,30 @@ describe Api::V1::UsersController do
       bike.reload.serial_number.should eq('some new serial')
     end
 
+    it "it untsvs a bike" do 
+      t = Time.now - 1.minute
+      stolen_record = FactoryGirl.create(:stolen_record, tsved_at: t)
+      o = FactoryGirl.create(:ownership, bike: stolen_record.bike)
+      user = o.creator
+      bike = o.bike
+      bike.update_attribute :current_stolen_record_id, bike.find_current_stolen_record.id
+      serial_request = { 
+        request_type: 'serial_update_request',
+        user_id: user.id,
+        request_bike_id: bike.id,
+        request_reason: 'Some reason',
+        serial_update_serial: 'some new serial'
+      }
+      set_current_user(user)
+      SerialNormalizer.any_instance.should_receive(:save_segments)
+      post :send_request, serial_request
+      response.code.should eq('200')
+      bike.reload
+      bike.serial_number.should eq('some new serial')
+      stolen_record.reload
+      stolen_record.tsved_at.should be_nil
+    end
+
 
     it "creates a new recovery request mail" do 
       Sidekiq::Testing.inline! do 

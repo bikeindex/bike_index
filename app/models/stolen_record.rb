@@ -1,4 +1,5 @@
 class StolenRecord < ActiveRecord::Base
+  include ActiveModel::Dirty
   attr_accessible :police_report_number,
     :police_report_department,
     :locking_description,
@@ -102,6 +103,7 @@ class StolenRecord < ActiveRecord::Base
       "Bike was not locked"
     ]
   end
+
   def self.locking_defeat_description_select
     ldds = locking_defeat_description
     select_params = []
@@ -111,7 +113,7 @@ class StolenRecord < ActiveRecord::Base
     select_params
   end
 
-  before_save :set_phone, :fix_date, :titleize_city
+  before_save :set_phone, :fix_date, :titleize_city, :update_tsved_at
   def set_phone
     self.phone = Phonifyer.phonify(self.phone) if self.phone 
     self.secondary_phone = Phonifyer.phonify(self.secondary_phone) if self.secondary_phone 
@@ -135,6 +137,11 @@ class StolenRecord < ActiveRecord::Base
       self.city = city.gsub('USA','').gsub(/,?(,|\s)[A-Z]+\s?++\z/,'')
       self.city = city.strip.titleize
     end
+    true
+  end
+
+  def update_tsved_at
+    self.tsved_at = nil if police_report_number_changed? || police_report_department_changed?
     true
   end
 
