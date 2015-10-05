@@ -9,7 +9,7 @@
     = javascript_include_tag "application"
     <!--[if lt IE 9]><script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]--><!--[if lte IE 8]><script type="text/javascript">$(function() {$('body').prepend("<body class='welcome-page' id='body'><div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, the Bike Index (and the internet in general) is broken and ugly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>");});</script><![endif]-->
     
-    = auto_discovery_link_tag(:atom, news_index_url(format: "atom"), {title: "Bike Index"})
+    = auto_discovery_link_tag(:atom, news_index_url(format: "atom"), {title: "Bike Index news"})
 
   - body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
   - body_class = "vendor-signup-page" if current_page?(:vendor_signup)

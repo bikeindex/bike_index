@@ -1,5 +1,5 @@
 atom_feed ({id: request.url, schema_date: 2014}) do |feed|
-  feed.title "Bike Index"
+  feed.title "Bike Index news"
   feed.updated(@blogs[0].published_at) if @blogs.length > 0
   @blogs.each do |blog|
     feed.entry blog, published: blog.published_at do |entry|
