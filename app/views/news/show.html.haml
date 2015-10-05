@@ -12,9 +12,12 @@
           #{l @blog.published_at, format: :standard_display}
         - else
           #{l @blog.published_at, format: :no_day_with_year}
-- if @blog.is_listicle
-  - @blog.listicles.each do |list_item|
+- if @blog.is_listicle  
+  - @blog.listicles.each_with_index do |list_item, i|
+    - unless i == 0
+      %hr.listicle-separator
     = listicle_html(list_item)
+
 
 - else
   :kramdown
