@@ -3,6 +3,7 @@ $bst-break: 767px;
 
 @media (max-width: $bst-break) {
   body.news-page .page-content { padding: 10px; }
+  %h1.blog-index-head { padding-top: .5em; }
 }
 
 //________________________
@@ -14,6 +15,12 @@ $bst-break: 767px;
 
 .blog-index-head {
   color: $grayMed;
+  a {
+    float: right;
+    opacity: .4;
+    &:hover { opacity: 1; }
+    img { height: .75em; margin-top: -.2em; }
+  }
 }
 
 ul.news-index-list {

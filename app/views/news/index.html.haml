@@ -1,6 +1,7 @@
 #news_display
   %h1.blog-index-head
     Bike Index news
+    = link_to image_tag("feed_icon.svg"), news_index_url(format: "atom"), {title: "Bike Index news feed"}
 
   %hr
 %article
