@@ -36,7 +36,8 @@ class TsvMaintainer
       begin
         redis.hset info_id, filename, updated_at.to_i
       rescue => e
-        puts e # Sometimes key errors if wrong type, but we need to use hset or we don't create it
+        # Sometimes key errors from wrong type, so reset it!
+        reset_tsv_info(filename, updated_at)
       end
       tsvs
     end

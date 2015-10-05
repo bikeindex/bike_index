@@ -18,9 +18,21 @@ describe ApplicationHelper do
   end
 
   describe :content_nav_class do 
-    it "Should return active if the section is the active_section" do 
+    it "returns active if the section is the active_section" do 
       @active_section = "resources"
       helper.content_nav_class("resources").should eq("active-menu")
+    end
+  end
+
+  describe :listicle_html do 
+    it "returns the html formatted as we want" do 
+      l = Listicle.new(body: "body", title: 'title', image_credits: 'credit')
+      l.htmlize_content
+      html = helper.listicle_html(l)
+      target = '<article><div class="listicle-image-credit"><p>credit</p>' + 
+        "\n" + '</div><h2 class="list-item-title">title</h2></article><article><p>body</p>' +
+        "\n" + '</article>'
+      html.should eq(target)
     end
   end
 

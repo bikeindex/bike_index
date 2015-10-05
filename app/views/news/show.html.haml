@@ -13,7 +13,8 @@
         - else
           #{l @blog.published_at, format: :no_day_with_year}
 - if @blog.is_listicle
-  = render "listicle_page"
+  - @blog.listicles.each do |list_item|
+    = listicle_html(list_item)
 
 - else
   :kramdown

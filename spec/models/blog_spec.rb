@@ -96,4 +96,22 @@ describe Blog do
       Blog._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_index_image).should == true
     end
   end
+
+  describe :feed_content do 
+    it "returns html content for non-listicles" do 
+      blog = Blog.new(body: 'something')
+      expect(blog.feed_content).to eq("<p>something</p>\n")
+    end
+
+    it 'returns listicles' do 
+      blog = Blog.new(is_listicle: true)
+      listicle = Listicle.new(body: "body", title: 'title', image_credits: 'credit')
+      listicle.htmlize_content
+      blog.stub(:listicles).and_return([listicle])
+      target = '<article><div class="listicle-image-credit"><p>credit</p>' + 
+        "\n" + '</div><h2 class="list-item-title">title</h2></article><article><p>body</p>' +
+        "\n" + '</article>'
+      blog.feed_content.should eq(target)
+    end
+  end
 end

@@ -50,6 +50,16 @@ class Blog < ActiveRecord::Base
     body_abbr
   end
 
+  def feed_content
+    if is_listicle
+      listicles.collect { |l| 
+        ApplicationController.helpers.listicle_html(l)
+      }.join.html_safe
+    else
+      Kramdown::Document.new(body).to_html
+    end    
+  end
+
   before_save :update_title_save
   def update_title_save
     return true unless update_title.present?

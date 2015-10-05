@@ -4,7 +4,7 @@ atom_feed ({id: request.url, schema_date: 2014}) do |feed|
   @blogs.each do |blog|
     feed.entry blog, published: blog.published_at do |entry|
       entry.title(blog.title)
-      entry.content(Kramdown::Document.new(blog.body).to_html, type: 'html')
+      entry.content(blog.feed_content, type: 'html')
       entry.author do |author|
         author.name (blog.user.name)
       end
