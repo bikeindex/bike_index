@@ -1,56 +1,65 @@
-= render 'shared/header'
-%header.global-header.collapsible-head.invisibled#header
-  = render 'shared/header_nav'
+!!!
+%html
+  = render 'shared/header'
   
-%a#nav-header-collapse.expandable
-  %span.e +
-  %span.c -
+  - body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
+  - body_class = "vendor-signup-page" if current_page?(:vendor_signup)
+  - body_class = "news-page" if controller_name == "news"
+  %body#body{ class: body_class }
+    = render 'layouts/messages'
 
-%header.replace-header
-  .inner-recep
-    - if current_user.superuser?
-      %h2.new-title 
-        = admin_nav_link "Go hard", admin_root_path
-      %ul
-        %li
-          = admin_nav_link "Organizations", admin_organizations_url
+    %header.global-header.collapsible-head.invisibled#header
+      = render 'shared/header_nav'
+      
+    %a#nav-header-collapse.expandable
+      %span.e +
+      %span.c -
 
-        %li
-          = admin_nav_link "Users", admin_users_url
+    %header.replace-header
+      .inner-recep
+        - if current_user.superuser?
+          %h2.new-title 
+            = admin_nav_link "Go hard", admin_root_path
+          %ul
+            %li
+              = admin_nav_link "Organizations", admin_organizations_url
 
-        %li
-          = admin_nav_link "Memberships", admin_memberships_url
+            %li
+              = admin_nav_link "Users", admin_users_url
 
-        %li
-          = admin_nav_link "Manufacturers", admin_manufacturers_url
+            %li
+              = admin_nav_link "Memberships", admin_memberships_url
 
-        %li
-          = admin_nav_link "Bikes", admin_bikes_url
+            %li
+              = admin_nav_link "Manufacturers", admin_manufacturers_url
 
-        %li
-          = admin_nav_link "Invitations", admin_invitations_url
+            %li
+              = admin_nav_link "Bikes", admin_bikes_url
 
-        %li
-          = admin_nav_link "News", admin_news_index_url
-        %li
-          = admin_nav_link "Stolen", admin_stolen_bikes_url
-        / %li
-        /   = admin_nav_link "Recoveries", admin_recoveries_url
-        %li
-          = admin_nav_link "Recovery displays", admin_recovery_displays_url
-    - elsif current_user.is_content_admin?
-      %h2.new-title 
-        = admin_nav_link "Go hard", admin_news_index_url
-      %ul
-        %li
-          = admin_nav_link "News", admin_news_index_url
+            %li
+              = admin_nav_link "Invitations", admin_invitations_url
+
+            %li
+              = admin_nav_link "News", admin_news_index_url
+            %li
+              = admin_nav_link "Stolen", admin_stolen_bikes_url
+            / %li
+            /   = admin_nav_link "Recoveries", admin_recoveries_url
+            %li
+              = admin_nav_link "Recovery displays", admin_recovery_displays_url
+        - elsif current_user.is_content_admin?
+          %h2.new-title 
+            = admin_nav_link "Go hard", admin_news_index_url
+          %ul
+            %li
+              = admin_nav_link "News", admin_news_index_url
 
 
 
-%section.content#admin-content
-  .receptacle
-    .inner-recep
+    %section.content#admin-content
+      .receptacle
+        .inner-recep
 
-      = yield
-  
-= render 'shared/footer'
+          = yield
+      
+    = render 'shared/footer'

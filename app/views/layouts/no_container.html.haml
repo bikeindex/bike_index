@@ -1,8 +1,16 @@
-= render 'shared/header'    
-%header.global-header#header
-  = render 'shared/header_nav'
+!!!
+%html
+  = render 'shared/header'
+  
+  - body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
+  - body_class = "vendor-signup-page" if current_page?(:vendor_signup)
+  - body_class = "news-page" if controller_name == "news"
+  %body#body{ class: body_class }
+    = render 'layouts/messages'
+    %header.global-header#header
+      = render 'shared/header_nav'
 
-%section.content
-  = yield
+    %section.content
+      = yield
 
-= render 'shared/footer'
+    = render 'shared/footer'

@@ -1,11 +1,19 @@
-= render 'shared/header'
-%header.global-header#header
-  = render 'shared/header_nav'
-
-%section.content
-  .receptacle
-    .inner-recep.legal-content#legal-terms
-
-      = yield
+!!!
+%html
+  = render 'shared/header'
   
-= render 'shared/footer'
+  - body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
+  - body_class = "vendor-signup-page" if current_page?(:vendor_signup)
+  - body_class = "news-page" if controller_name == "news"
+  %body#body{ class: body_class }
+    = render 'layouts/messages'
+    %header.global-header#header
+      = render 'shared/header_nav'
+
+    %section.content
+      .receptacle
+        .inner-recep.legal-content#legal-terms
+
+          = yield
+      
+    = render 'shared/footer'

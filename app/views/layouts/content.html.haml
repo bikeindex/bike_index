@@ -1,70 +1,78 @@
-= render 'shared/header'
+!!!
+%html
+  = render 'shared/header'
+  
+  - body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
+  - body_class = "vendor-signup-page" if current_page?(:vendor_signup)
+  - body_class = "news-page" if controller_name == "news"
+  %body#body{ class: body_class }
+    = render 'layouts/messages'
 
-#content-wrap.header-closed
-  %header.global-header.collapsible-head.invisibled#header
-    = render 'shared/header_nav'
+    #content-wrap.header-closed
+      %header.global-header.collapsible-head.invisibled#header
+        = render 'shared/header_nav'
 
-  %a#nav-header-collapse.expandable
-    %span.e +
-    %span.c -
+      %a#nav-header-collapse.expandable
+        %span.e +
+        %span.c -
 
 
-  %header.content-sidebar#content-menu
-    .header-content
-      .logo
-        %a.follow-link.logo{ href: root_url }
-          = image_tag "/assets/logo.svg"
-          %h2
-            Bike Index
-    %nav.content-nav
-      %ul.content-sections{ class: "#{@active_section}_menu"}
-        %li{ class: content_nav_class("about") }
-          = nav_link "About<span> the Bike Index</span>", about_url
-          %ul
-            %li
-              = nav_link "Bike Index news", news_index_url
-            %li
-              = nav_link "Bike Index partner organizations", where_url
-
-        %li{ class: content_nav_class("resources") }
-          = nav_link "Resources", resources_url
-          %ul
-            %li
-              = nav_link "How it works", how_it_works_url
-            %li
-              = nav_link "Protect your bike", protect_your_bike_url
-            %li
-              = nav_link "What to do if your bike is stolen", stolen_bikes_url
-            %li
-              = nav_link "Information about bicycle serial numbers", serials_url
-            %li
-              = nav_link "List of manufacturers", manufacturers_url
-            %li
-              = nav_link "Bike Index spoke cards", spokecard_url
-              %ul.spokecard-extension
+      %header.content-sidebar#content-menu
+        .header-content
+          .logo
+            %a.follow-link.logo{ href: root_url }
+              = image_tag "/assets/logo.svg"
+              %h2
+                Bike Index
+        %nav.content-nav
+          %ul.content-sections{ class: "#{@active_section}_menu"}
+            %li{ class: content_nav_class("about") }
+              = nav_link "About<span> the Bike Index</span>", about_url
+              %ul
                 %li
-                  = link_to "Spoke cards?", spokecard_url(anchor: 'what-spokecards-are')
+                  = nav_link "Bike Index news", news_index_url
                 %li
-                  = link_to "About Bike Index spoke cards", spokecard_url(anchor: 'bike-index-specifics')
-                  
-                %li
-                  = link_to "Making your own", spokecard_url(anchor: 'making-one')
-            %li
-              = nav_link "Image & design assets", image_resources_url
-                  
-        %li.contact-nav-btns{ class: content_nav_class("contact") }
-          = nav_link "Help", help_url
-          %ul
-            %li
-              = nav_link "Contact", contact_us_url
-            %li
-              = nav_link "Sign up a shop or organization", vendor_signup_url
-            / %li
-            /   = nav_link "Lightspeed Retail integration", lightspeed_integration_url
-            
+                  = nav_link "Bike Index partner organizations", where_url
 
-  #content-top-margin
-  %section.page-content
-    = yield
-    
-  = render 'shared/footer'
+            %li{ class: content_nav_class("resources") }
+              = nav_link "Resources", resources_url
+              %ul
+                %li
+                  = nav_link "How it works", how_it_works_url
+                %li
+                  = nav_link "Protect your bike", protect_your_bike_url
+                %li
+                  = nav_link "What to do if your bike is stolen", stolen_bikes_url
+                %li
+                  = nav_link "Information about bicycle serial numbers", serials_url
+                %li
+                  = nav_link "List of manufacturers", manufacturers_url
+                %li
+                  = nav_link "Bike Index spoke cards", spokecard_url
+                  %ul.spokecard-extension
+                    %li
+                      = link_to "Spoke cards?", spokecard_url(anchor: 'what-spokecards-are')
+                    %li
+                      = link_to "About Bike Index spoke cards", spokecard_url(anchor: 'bike-index-specifics')
+                      
+                    %li
+                      = link_to "Making your own", spokecard_url(anchor: 'making-one')
+                %li
+                  = nav_link "Image & design assets", image_resources_url
+                      
+            %li.contact-nav-btns{ class: content_nav_class("contact") }
+              = nav_link "Help", help_url
+              %ul
+                %li
+                  = nav_link "Contact", contact_us_url
+                %li
+                  = nav_link "Sign up a shop or organization", vendor_signup_url
+                / %li
+                /   = nav_link "Lightspeed Retail integration", lightspeed_integration_url
+                
+
+      #content-top-margin
+      %section.page-content
+        = yield
+        
+      = render 'shared/footer'
