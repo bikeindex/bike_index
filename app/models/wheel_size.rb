@@ -4,8 +4,8 @@ class WheelSize < ActiveRecord::Base
   validates_uniqueness_of :description, :iso_bsd
   has_many :bikes
 
-  default_scope order(:iso_bsd)
-  scope :commonness, order("priority ASC, iso_bsd DESC")
+  default_scope { order(:iso_bsd) }
+  scope :commonness, -> { order("priority ASC, iso_bsd DESC") }
 
   def select_value
     "[#{iso_bsd}] #{description}"

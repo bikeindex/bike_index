@@ -4,9 +4,9 @@ class FrontGearType < ActiveRecord::Base
   validates_uniqueness_of :name
   has_many :bikes
 
-  scope :standard, where(standard: true)
-  scope :internal, where(internal: true)
-  scope :fixed, where(count: 1)
+  scope :standard, -> { where(standard: true) }
+  scope :internal, -> { where(internal: true) }
+  scope :fixed, -> { where(count: 1) }
   before_create :set_slug
   def set_slug
     self.slug = Slugifyer.slugify(self.name)

@@ -16,7 +16,7 @@ class Organization < ActiveRecord::Base
     :api_access_approved,
     :access_token,
     :new_bike_notification,
-    :lightspeed_cloud_api_key, 
+    :lightspeed_cloud_api_key,
     :wants_to_be_shown
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key
@@ -37,14 +37,14 @@ class Organization < ActiveRecord::Base
 
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact admin@bikeindex.org"
 
-  default_scope order(:name)
+  default_scope { order(:name) }
 
-  scope :shown_on_map, where(show_on_map: true)
-  scope :shop, where(org_type: 'shop')
-  scope :police, where(org_type: 'police')
-  scope :advocacy, where(org_type: 'advocacy')
-  scope :college, where(org_type: 'college')
-  scope :manufacturer, where(org_type: 'manufacturer')
+  scope :shown_on_map, -> { where(show_on_map: true) }
+  scope :shop, -> { where(org_type: 'shop') }
+  scope :police, -> { where(org_type: 'police') }
+  scope :advocacy, -> { where(org_type: 'advocacy') }
+  scope :college, -> { where(org_type: 'college') }
+  scope :manufacturer, -> { where(org_type: 'manufacturer') }
 
   def to_param
     slug
@@ -105,7 +105,7 @@ class Organization < ActiveRecord::Base
     Rails.cache.delete "views/info_where_page"
   end
 
-  def generate_access_token    
+  def generate_access_token
     begin
       self.access_token = SecureRandom.hex
     end while self.class.exists?(access_token: access_token)

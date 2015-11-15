@@ -17,9 +17,9 @@ class Payment < ActiveRecord::Base
     self.email = user.email
   end
 
-  scope :current, where(is_current: true)
-  scope :subscription, where(is_recurring: true)
-  
+  scope :current, -> { where(is_current: true) }
+  scope :subscription, -> { where(is_recurring: true) }
+
   after_create :send_invoice_email
   def send_invoice_email
     EmailInvoiceWorker.perform_async(id)

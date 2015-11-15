@@ -5,8 +5,8 @@ class Color < ActiveRecord::Base
   has_many :bikes
   has_many :paints
 
-  default_scope order(:name)
-  scope :commonness, order("priority ASC, name ASC")
+  default_scope { order(:name) }
+  scope :commonness, -> { order("priority ASC, name ASC") }
 
   def self.fuzzy_name_find(n)
     if !n.blank?
@@ -15,5 +15,5 @@ class Color < ActiveRecord::Base
       nil
     end
   end
-  
+
 end

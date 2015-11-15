@@ -19,9 +19,9 @@ class Ownership < ActiveRecord::Base
   belongs_to :user
   belongs_to :creator, class_name: 'User'
 
-  default_scope order(:created_at)
+  default_scope { order(:created_at) }
 
-  before_save :normalize_email 
+  before_save :normalize_email
   def normalize_email
     self.owner_email = EmailNormalizer.new(owner_email).normalized
   end
@@ -30,7 +30,7 @@ class Ownership < ActiveRecord::Base
     if creator.name.present?
       creator.name
     else
-      creator.email 
+      creator.email
     end
   end
 

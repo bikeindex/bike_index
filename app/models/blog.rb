@@ -25,13 +25,13 @@ class Blog < ActiveRecord::Base
   validates_presence_of :title, :body, :user_id
   validates_uniqueness_of :title, message: "has already been taken. If you believe that this message is an error, contact us!"
   validates_uniqueness_of :title_slug, message: "somehow that overlaps with another title! Sorrys."
-  
+
   belongs_to :user
   has_many :public_images, as: :imageable, dependent: :destroy
 
-  scope :published, where(published: true)
-  scope :listicle_blogs, where(is_listicle: true)
-  default_scope order("published_at desc")
+  scope :published, -> { where(published: true) }
+  scope :listicle_blogs, -> { where(is_listicle: true) }
+  default_scope { order("published_at desc") }
 
   before_save :set_published_at_and_published
   def set_published_at_and_published
@@ -52,12 +52,12 @@ class Blog < ActiveRecord::Base
 
   def feed_content
     if is_listicle
-      listicles.collect { |l| 
+      listicles.collect { |l|
         ApplicationController.helpers.listicle_html(l)
       }.join.html_safe
     else
       Kramdown::Document.new(body).to_html
-    end    
+    end
   end
 
   before_save :update_title_save
@@ -119,10 +119,10 @@ class Blog < ActiveRecord::Base
       end
     end
     if li.present?
-      self.index_image = li.image_url(:medium) 
+      self.index_image = li.image_url(:medium)
       self.index_image_lg = li.image_url(:large)
     elsif pi.present?
-      self.index_image = pi.image_url(:small) 
+      self.index_image = pi.image_url(:small)
       self.index_image_lg = pi.image_url(:large)
     end
     true
