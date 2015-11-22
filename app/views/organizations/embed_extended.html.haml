@@ -10,6 +10,10 @@
       = f.label :serial_number, class: "control-label"
       .controls
         = f.text_field :serial_number, :required =>true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
+      - if @organization.use_additional_registration_field
+        = f.label :additional_registration, "Additional registration number", class: "control-label"
+        .controls
+          = f.text_field :additional_registration, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off' 
     .has-no-serial.optional-block
       %label
         = f.check_box :has_no_serial, tabindex: -1 

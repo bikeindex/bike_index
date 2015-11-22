@@ -219,6 +219,7 @@ describe BikesController do
           b_param_id_token: b_param.id_token,
           creation_organization_id: organization.id,
           embeded: true,
+          additional_registration: 'Testly secondary',
           cycle_type_id: FactoryGirl.create(:cycle_type).id,
           manufacturer_id: manufacturer.id,
           primary_frame_color_id: FactoryGirl.create(:color).id,
@@ -228,7 +229,9 @@ describe BikesController do
         lambda { 
           post :create, { bike: bike}
         }.should change(Ownership, :count).by(1)
-        Bike.last.creation_organization_id.should eq(organization.id)
+        bike = Bike.last
+        bike.creation_organization_id.should eq(organization.id)
+        bike.additional_registration.should eq('Testly secondary')
       end
     end
 

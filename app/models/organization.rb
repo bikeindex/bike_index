@@ -17,6 +17,7 @@ class Organization < ActiveRecord::Base
     :access_token,
     :new_bike_notification,
     :lightspeed_cloud_api_key,
+    :use_additional_registration_field,
     :wants_to_be_shown
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key

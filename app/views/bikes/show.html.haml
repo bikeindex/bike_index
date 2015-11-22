@@ -56,6 +56,7 @@
     
     %ul.attr-list
       = @bike.attr_list_item(@bike.serial_display, 'Serial')
+      = @bike.attr_list_item(@bike.additional_registration, 'Additional Registration number')
       - unless @bike.type == "bike"
         = @bike.attr_list_item(@bike.type.titleize, "Cycle type")
       = @bike.attr_list_item(@bike.mnfg_name, 'Manufacturer')

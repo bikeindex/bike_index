@@ -84,6 +84,12 @@
     .controls
       = f.check_box :approved
 
+  .control-group.padded
+    .control-label
+      = f.label :use_additional_registration_field, "Show secondary registration number on embed"
+    .controls
+      = f.check_box :use_additional_registration_field
+
 / .control-group.padded
 /   .control-label
 /     = f.label :is_suspended
