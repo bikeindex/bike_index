@@ -21,8 +21,8 @@ class Location < ActiveRecord::Base
   validates_presence_of :name, :organization_id, :city, :country_id
   has_many :bikes
 
-  scope :by_state, order(:state_id)
-  scope :shown, where(shown: true)
+  scope :by_state, -> { order(:state_id) }
+  scope :shown, -> { where(shown: true) }
   # scope :international, where("country_id IS NOT #{Country.find_by_iso("US").id}")
 
   def address
@@ -41,7 +41,7 @@ class Location < ActiveRecord::Base
 
   before_save :set_phone
   def set_phone
-    self.phone = Phonifyer.phonify(self.phone) if self.phone 
+    self.phone = Phonifyer.phonify(self.phone) if self.phone
   end
 
   def org_location_id
@@ -49,8 +49,8 @@ class Location < ActiveRecord::Base
   end
 
   def display_name
-    if name == organization.name 
-      name 
+    if name == organization.name
+      name
     else
       "#{organization.name} - #{name}"
     end

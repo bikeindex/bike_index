@@ -34,7 +34,7 @@ class StolenRecord < ActiveRecord::Base
     :recovery_posted,
     :tsved_at
 
-    
+
   belongs_to :bike
   has_one :current_bike, class_name: 'Bike', foreign_key: :current_stolen_record_id
   has_one :recovery_display
@@ -44,19 +44,19 @@ class StolenRecord < ActiveRecord::Base
 
   validates_presence_of :bike, :date_stolen
 
-  default_scope where(current: true)
-  scope :approveds, where(approved: true)
-  scope :approveds_with_reports, approveds.where("police_report_number IS NOT NULL").
-    where("police_report_department IS NOT NULL")
-  scope :not_tsved, where("tsved_at IS NULL")
-  scope :tsv_today, where("tsved_at IS NULL OR tsved_at >= '#{Time.now.beginning_of_day}'")
+  default_scope { where(current: true) }
+  scope :approveds, -> { where(approved: true) }
+  scope :approveds_with_reports, -> { approveds.where("police_report_number IS NOT NULL").
+    where("police_report_department IS NOT NULL") }
+  scope :not_tsved, -> { where("tsved_at IS NULL") }
+  scope :tsv_today, -> { where("tsved_at IS NULL OR tsved_at >= '#{Time.now.beginning_of_day}'") }
 
-  scope :recovered, unscoped.where(current: false).order("date_recovered desc")
-  scope :displayable, unscoped.where(current: false, can_share_recovery: true).order("date_recovered desc")
-  scope :recovery_unposted, unscoped.where(
+  scope :recovered, -> { unscoped.where(current: false).order("date_recovered desc") }
+  scope :displayable, -> { unscoped.where(current: false, can_share_recovery: true).order("date_recovered desc") }
+  scope :recovery_unposted, -> { unscoped.where(
     current: false,
     recovery_posted: false
-  )
+  )}
 
   def address
     return nil unless self.country
@@ -115,8 +115,8 @@ class StolenRecord < ActiveRecord::Base
 
   before_save :set_phone, :fix_date, :titleize_city, :update_tsved_at
   def set_phone
-    self.phone = Phonifyer.phonify(self.phone) if self.phone 
-    self.secondary_phone = Phonifyer.phonify(self.secondary_phone) if self.secondary_phone 
+    self.phone = Phonifyer.phonify(self.phone) if self.phone
+    self.secondary_phone = Phonifyer.phonify(self.secondary_phone) if self.secondary_phone
   end
 
   def fix_date
@@ -152,7 +152,7 @@ class StolenRecord < ActiveRecord::Base
   end
 
   def tsv_row(with_article=true)
-    b = self.bike 
+    b = self.bike
     return '' unless b.present?
     row = ""
     row << tsv_col(b.manufacturer_name)

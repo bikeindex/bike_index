@@ -4,9 +4,9 @@ class RearGearType < ActiveRecord::Base
   validates_uniqueness_of :name
   has_many :bikes
 
-  scope :standard, where(standard: true)
-  scope :internal, where(internal: true)
-  scope :fixed, where(name: "Fixed")
+  scope :standard, -> { where(standard: true) }
+  scope :internal, -> { where(internal: true) }
+  scope :fixed, -> { where(name: "Fixed") }
 
   before_create :set_slug
   def set_slug

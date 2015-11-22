@@ -2,7 +2,7 @@ class Manufacturer < ActiveRecord::Base
   attr_accessible :name,
     :slug,
     :website,
-    :frame_maker,    
+    :frame_maker,
     :open_year,
     :close_year,
     :logo,
@@ -20,11 +20,11 @@ class Manufacturer < ActiveRecord::Base
   has_many :components
 
   mount_uploader :logo, AvatarUploader
-  default_scope order(:name)
+  default_scope { order(:name) }
 
-  scope :frames, where(frame_maker: true)
-  scope :with_websites, where("website is NOT NULL and website != ''")
-  scope :with_logos, where("logo is NOT NULL and logo != ''")
+  scope :frames, -> { where(frame_maker: true) }
+  scope :with_websites, -> { where("website is NOT NULL and website != ''") }
+  scope :with_logos, -> { where("logo is NOT NULL and logo != ''") }
 
   def to_param
     slug
@@ -55,7 +55,7 @@ class Manufacturer < ActiveRecord::Base
   end
 
   def self.fill_stripped(n)
-    n.gsub!(/accell/i,'') if n.match(/accell/i).present? 
+    n.gsub!(/accell/i,'') if n.match(/accell/i).present?
     Slugifyer.manufacturer(n)
   end
 
@@ -68,7 +68,7 @@ class Manufacturer < ActiveRecord::Base
       end
     end
   end
-  
+
   def self.to_csv
     CSV.generate do |csv|
       csv << column_names
@@ -78,7 +78,7 @@ class Manufacturer < ActiveRecord::Base
     end
   end
 
-  
+
   before_save :set_slug
   def set_slug
     self.slug = Slugifyer.manufacturer(self.name)
@@ -113,7 +113,7 @@ class Manufacturer < ActiveRecord::Base
   def set_website_and_logo_source
     self.website = website.present? ? Urlifyer.urlify(website) : nil
     if logo.present?
-      self.logo_source ||= 'manual' 
+      self.logo_source ||= 'manual'
     else
       self.logo_source = nil
     end

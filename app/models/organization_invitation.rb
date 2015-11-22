@@ -22,9 +22,9 @@ class OrganizationInvitation < ActiveRecord::Base
   belongs_to :inviter, class_name: 'User', foreign_key: :inviter_id
   belongs_to :invitee, class_name: 'User', foreign_key: :invitee_id
 
-  default_scope order(:created_at)
-  scope :unclaimed, where(redeemed: nil)
-  
+  default_scope { order(:created_at) }
+  scope :unclaimed, -> { where(redeemed: nil) }
+
   after_create :enqueue_notification_job
   def enqueue_notification_job
     EmailOrganizationInvitationWorker.perform_async(id)
@@ -33,12 +33,12 @@ class OrganizationInvitation < ActiveRecord::Base
   after_create :if_user_exists_assign
   def if_user_exists_assign
     user = User.fuzzy_email_find(self.invitee_email)
-    if user 
+    if user
       self.assign_to(user)
     end
   end
 
-  before_save :normalize_email 
+  before_save :normalize_email
   def normalize_email
     self.invitee_email.downcase.strip!
   end
@@ -47,7 +47,7 @@ class OrganizationInvitation < ActiveRecord::Base
     if self.inviter.name.present?
       self.inviter.name
     else
-      self.inviter.email 
+      self.inviter.email
     end
   end
 
@@ -66,7 +66,7 @@ class OrganizationInvitation < ActiveRecord::Base
   def create_membership
     membership = Membership.new
     membership.organization = self.organization
-    membership.user = self.invitee 
+    membership.user = self.invitee
     membership.role = self.membership_role
     membership.save!
   end

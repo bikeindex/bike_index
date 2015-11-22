@@ -14,7 +14,7 @@ class RecoveryDisplay < ActiveRecord::Base
   process_in_background :image, CarrierWaveProcessWorker
   belongs_to :stolen_record
 
-  default_scope order("date_recovered desc")
+  default_scope { order("date_recovered desc") }
 
   attr_accessor :date_input
 

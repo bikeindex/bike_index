@@ -14,7 +14,7 @@ class Paint < ActiveRecord::Base
   belongs_to :secondary_color, class_name: 'Color'
   belongs_to :tertiary_color, class_name: 'Color'
 
-  scope :official, where("manufacturer_id IS NOT NULL")
+  scope :official, -> { where("manufacturer_id IS NOT NULL") }
 
   before_save { |p| p.name = p.name.downcase.strip }
 

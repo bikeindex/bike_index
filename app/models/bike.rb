@@ -6,7 +6,7 @@ class Bike < ActiveRecord::Base
     :paid_for,
     :registered_new, # Was this bike registered at point of sale?
     :cycle_type_id,
-    :manufacturer_id, 
+    :manufacturer_id,
     :manufacturer_other,
     :serial_number,
     :serial_normalized,
@@ -21,8 +21,8 @@ class Bike < ActiveRecord::Base
     :stolen,
     :current_stolen_record_id,
     :recovered,
-    :frame_material_id, 
-    :frame_model, 
+    :frame_material_id,
+    :frame_model,
     :handlebar_type_id,
     :handlebar_type_other,
     :frame_size,
@@ -32,7 +32,7 @@ class Bike < ActiveRecord::Base
     :front_wheel_size_id,
     :rear_wheel_size_id,
     :front_tire_narrow,
-    :number_of_seats, 
+    :number_of_seats,
     :primary_frame_color_id,
     :secondary_frame_color_id,
     :tertiary_frame_color_id,
@@ -71,7 +71,7 @@ class Bike < ActiveRecord::Base
     :send_email,
     :other_listing_urls,
     :listing_order,
-    :approved_stolen, 
+    :approved_stolen,
     :marked_user_hidden,
     :marked_user_unhidden,
     :b_param_id_token,
@@ -109,8 +109,8 @@ class Bike < ActiveRecord::Base
   has_many :public_images, as: :imageable, dependent: :destroy
   has_many :components, dependent: :destroy
   has_many :b_params, as: :created_bike
-  has_many :duplicate_bike_groups, through: :normalized_serial_segments  
-  
+  has_many :duplicate_bike_groups, through: :normalized_serial_segments
+
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :components, allow_destroy: true
 
@@ -122,7 +122,7 @@ class Bike < ActiveRecord::Base
   validates_presence_of :cycle_type_id
   validates_presence_of :creator
   validates_presence_of :manufacturer_id
-  
+
   validates_uniqueness_of :card_id, allow_nil: true
   validates_presence_of :primary_frame_color_id
   # validates_presence_of :rear_wheel_size_id
@@ -133,10 +133,10 @@ class Bike < ActiveRecord::Base
     :embeded_extended, :paint_name, :bike_image_cache, :send_email,
     :marked_user_hidden, :marked_user_unhidden, :b_param_id_token
 
-  default_scope where(example: false).where(hidden: false).order("listing_order desc")
-  scope :stolen, where(stolen: true)
-  scope :non_stolen, where(stolen: false)
-  scope :with_serial, where("serial_number != ?", "absent")
+  default_scope { where(example: false).where(hidden: false).order("listing_order desc") }
+  scope :stolen, -> { where(stolen: true) }
+  scope :non_stolen, -> { where(stolen: false) }
+  scope :with_serial, -> { where("serial_number != ?", "absent") }
 
   include PgSearch
   pg_search_scope :search, against: {
@@ -273,7 +273,7 @@ class Bike < ActiveRecord::Base
       current_ownership.update_attribute :user_hidden, true unless current_ownership.user_hidden
     elsif marked_user_unhidden.present? && marked_user_unhidden.to_s != '0'
       self.hidden = false
-      current_ownership.update_attribute :user_hidden, false if current_ownership.user_hidden 
+      current_ownership.update_attribute :user_hidden, false if current_ownership.user_hidden
     end
     true
   end
@@ -291,12 +291,12 @@ class Bike < ActiveRecord::Base
   end
 
   before_save :clean_frame_size
-  def clean_frame_size 
+  def clean_frame_size
     return true unless frame_size.present? || frame_size_number.present?
     if frame_size.present? && frame_size.match(/\d+\.?\d*/).present?
       self.frame_size_number = frame_size.match(/\d+\.?\d*/)[0].to_f
     end
-    
+
     unless frame_size_unit.present?
       if frame_size_number.present?
         if frame_size_number < 30 # Good guessing?
@@ -323,7 +323,7 @@ class Bike < ActiveRecord::Base
         'l'
       when /x*l/, 'xl'
         'xl'
-      else 
+      else
         nil
       end
     end
@@ -395,14 +395,14 @@ class Bike < ActiveRecord::Base
     ca << "h#{handlebar_type_id}" if handlebar_type
     ca << "#{rear_wheel_size.priority}w#{rear_wheel_size_id}" if rear_wheel_size_id
     ca << "#{front_wheel_size.priority}w#{front_wheel_size_id}" if front_wheel_size_id && front_wheel_size != rear_wheel_size
-    self.cached_attributes = ca 
+    self.cached_attributes = ca
   end
 
   def cache_stolen_attributes
     d = description
     csr = find_current_stolen_record
     if csr.present?
-      self.current_stolen_record_id = csr.id 
+      self.current_stolen_record_id = csr.id
       d = "#{d} #{csr.theft_description}"
     else
       self.current_stolen_record_id = nil

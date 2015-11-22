@@ -1,13 +1,13 @@
 class BikeToken < ActiveRecord::Base
   attr_accessible :user, :organization
-  
+
   belongs_to :bike
   belongs_to :user
   belongs_to :organization
   has_many :b_params
   validates_presence_of :user, :organization
 
-  scope :available, where(bike_id: nil)
+  scope :available, -> { where(bike_id: nil) }
 
   before_save :set_used_at
   def set_used_at

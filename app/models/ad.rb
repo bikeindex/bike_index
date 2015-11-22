@@ -5,14 +5,14 @@ class Ad < ActiveRecord::Base
     :image_cache,
     :organization_id,
     :target_url,
-    :live 
+    :live
 
-  belongs_to :organization 
+  belongs_to :organization
   validates_presence_of :title
   validates_uniqueness_of :title
 
   mount_uploader :image, PartnerUploader
 
-  scope :live, where(live: true)
+  scope :live, -> { where(live: true) }
 
 end

@@ -11,10 +11,10 @@ class PublicImage < ActiveRecord::Base
 
   belongs_to :imageable, polymorphic: true
 
-  default_scope where(is_private: false).order(:listing_order)
+  default_scope { where(is_private: false).order(:listing_order) }
 
   after_create :set_order
-  scope :bikes, where(imageable_type: "Bike")
+  scope :bikes, -> { where(imageable_type: "Bike") }
 
   def set_order
     self.listing_order = self.imageable.public_images.length
@@ -28,7 +28,7 @@ class PublicImage < ActiveRecord::Base
     end
   end
 
-  before_save :truncate_name 
+  before_save :truncate_name
   def truncate_name
     self.name = (name || default_name).truncate(100)
   end
