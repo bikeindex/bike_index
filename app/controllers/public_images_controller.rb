@@ -1,10 +1,6 @@
 class PublicImagesController < ApplicationController
   before_filter :find_image_if_owned, only: [:edit, :update, :destroy]
 
-  def index
-    @public_images = PublicImage.all 
-  end
-
   def show
     @public_image = PublicImage.find(params[:id])
     if @public_image.present? && @public_image.imageable_type == "Bike"

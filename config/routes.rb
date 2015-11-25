@@ -73,7 +73,7 @@ Bikeindex::Application.routes.draw do
   resources :blogs, only: [:show, :index]
   match 'blog', to: redirect("/news")
 
-  resources :public_images, only: [:create, :show, :edit, :update, :index, :destroy] do 
+  resources :public_images, only: [:create, :show, :edit, :update, :destroy] do 
     collection do
       post :order
     end
