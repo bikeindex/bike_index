@@ -64,6 +64,7 @@ gem 'api-pagination'
 
 gem 'rack-throttle'
 gem 'secure_headers'
+gem 'eventmachine', '1.0.3'
 
 gem 'chartkick'
 gem 'groupdate'

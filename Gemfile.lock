@@ -504,6 +504,7 @@ DEPENDENCIES
   doorkeeper (~> 2.0.1)
   dotenv-rails (~> 0.8)!
   draper
+  eventmachine (= 1.0.3)
   factory_girl_rails
   fog
   foreman
