@@ -1,6 +1,8 @@
 language: ruby
 services:
 - redis
+rvm:
+- 2.1.3
 script:
 - RAILS_ENV=test bundle exec rake db:migrate && bundle exec rspec
 before_script:
