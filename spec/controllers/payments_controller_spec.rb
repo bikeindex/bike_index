@@ -53,7 +53,7 @@ describe PaymentsController do
         :card => {
           :number => "4242424242424242",
           :exp_month => 12,
-          :exp_year => 2015,
+          :exp_year => 2025,
           :cvc => "314"
         },
       )
