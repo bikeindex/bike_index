@@ -21,6 +21,9 @@
           - i += 1
 .span4.signinup-form
   .well
+    %p.already-have-account
+      Already have an account? 
+      = link_to 'log in instead', new_session_url
     .signup-form
       = form_for @user, html: { class: "form-horizontal" } do |f|
         - if @user.errors.any?
@@ -66,9 +69,6 @@
         
         = f.submit "Sign up", class: 'button-blue'
 
-      %p.switch-login-signup
-        Already have an account? 
-        = link_to 'log in instead', new_session_url
 
       %p
         Or #{link_to "Sign up with facebook", "/auth/facebook"}.

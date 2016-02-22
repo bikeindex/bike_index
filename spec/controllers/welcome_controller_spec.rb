@@ -25,8 +25,8 @@ describe WelcomeController do
         get :user_home
       end
       it { should respond_with(:redirect) }
-      it { should redirect_to(new_session_url) }
-      it { should set_the_flash }
+      it { should redirect_to(new_user_url) }
+      it { should_not set_the_flash }
     end
 
     describe "when user is present" do 

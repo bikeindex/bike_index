@@ -20,6 +20,9 @@
     margin-top: 3em;
     color: $grayDark;
   }
+  .already-have-account {
+    color: $grayMed;
+  }
 }
 @media (max-width: 767px) {
   .signinup-form .well { max-width: 500px; margin: 20px auto}

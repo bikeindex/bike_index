@@ -1,6 +1,4 @@
 class WelcomeController < ApplicationController
-  before_filter :authenticate_user, only: :user_home
-  
   def index
     render action: 'index', layout: 'application_updated'
   end
@@ -24,8 +22,7 @@ class WelcomeController < ApplicationController
       end
       render action: 'user_home', layout: 'no_container'
     else
-      flash[:notice] = "Woops, you have to log in to be able to do that"  
-      redirect_to new_session_url
+      redirect_to new_user_url
     end
   end
 
