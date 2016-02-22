@@ -1,0 +1,7 @@
+---
+:queues:
+  - afterwards
+  - [carrierwave, 2]
+  - [notify, 5]
+  - [email, 10]
+  
