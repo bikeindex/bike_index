@@ -49,6 +49,12 @@
     font-family: $body-font;
     text-transform: uppercase;
     span { display: block; }
+    & a {
+      width: 100%;
+      height: 2em;
+      left: 0;
+      position: absolute;
+    }
   }
   h3 {
     font-size: 20px;
@@ -61,6 +67,9 @@
   .home-header {
     h1 {
       text-shadow: -2px 2px 0 $blue;
+      & a {
+        height: 4em;
+      }
     }
   }
 }
