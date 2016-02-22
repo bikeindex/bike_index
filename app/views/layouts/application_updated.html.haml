@@ -20,7 +20,7 @@
       %header.global-header
         .container.bikes-nav
           .small-header
-            %a.top-logo{ href: user_home_url }
+            %a.top-logo{ href: (body_class == "welcome-page" ? user_home_url : root_url) }
               %span.stripey
               - if body_class == 'welcome-page'
                 = image_tag "/assets/updated/home/logo.svg", class: 'logo home-logo', alt: "Logo with dark background"
