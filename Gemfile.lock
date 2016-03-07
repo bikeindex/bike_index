@@ -76,6 +76,7 @@ GEM
       multi_json (~> 1.0)
     acts_as_paranoid (0.4.2)
       activerecord (~> 3.2)
+    addressable (2.4.0)
     api-pagination (4.1.0)
     arel (3.0.3)
     ast (2.2.0)
@@ -234,8 +235,14 @@ GEM
     hike (1.2.3)
     hiredis (0.4.5)
     hitimes (1.2.2)
+    http (0.9.8)
+      addressable (~> 2.3)
+      http-cookie (~> 1.0)
+      http-form_data (~> 1.0.1)
+      http_parser.rb (~> 0.6.0)
     http-cookie (1.0.2)
       domain_name (~> 0.5)
+    http-form_data (1.0.1)
     http_parser.rb (0.6.0)
     httparty (0.13.5)
       json (~> 1.8)
@@ -442,6 +449,8 @@ GEM
       redis (>= 3.0.6)
       sinatra
       vegas (>= 0.1.0)
+    sparkpost (0.1.2)
+      http (= 0.9.8)
     sprockets (2.2.3)
       hike (~> 1.2)
       multi_json (~> 1.0)
@@ -576,6 +585,7 @@ DEPENDENCIES
   sitemap_generator
   soulheart
   soulmate!
+  sparkpost
   stripe!
   strong_parameters
   swagger-ui_rails
