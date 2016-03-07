@@ -37,13 +37,7 @@ Bikeindex::Application.configure do
 
   # Don't care if the mailer can't send
   config.action_mailer.raise_delivery_errors = true
-  ActionMailer::Base.smtp_settings = {
-      port:           ENV['MANDRILL_PORT'],
-      address:        'smtp.mandrillapp.com',
-      user_name:      ENV['MANDRILL_USERNAME'],
-      password:       ENV['MANDRILL_PASSWORD'],
-      authentication: :plain
-  }
+  # Rest of configuration is in config/initializers/mailer_configuration
   ActionMailer::Base.delivery_method = :smtp
 
   config.logger = Logger.new(STDOUT)
