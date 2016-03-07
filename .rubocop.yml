@@ -1,0 +1,21 @@
+AllCops:
+  TargetRubyVersion: 2.1
+  Exclude:
+    - 'bin/**/*'
+    - 'db/schema.rb'
+    - 'db/migrate/**/*'
+
+Style/Documentation:
+  Enabled: false
+
+Style/SymbolProc:
+  Enabled: false
+
+Metrics/LineLength:
+  Enabled: false
+
+Style/AndOr:
+  Enabled: false
+
+ParameterLists:
+  CountKeywordArgs: false
