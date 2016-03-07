@@ -84,6 +84,7 @@ group :development do
   gem 'guard'
   gem 'guard-rspec', '~> 4.2.10'
   gem 'guard-livereload'
+  gem 'guard-rubocop'
   gem 'bullet'
   gem 'should_clean'
   gem "brakeman", :require => false
