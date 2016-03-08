@@ -132,7 +132,7 @@ module API
 
             This is a cached response, updated a few times a day. The most recent update time is in the `Last-Modified` header.
 
-            Note: if you load this here, in the documentation, it will take a LONG time because this page parses the response and pretty prints it.
+            Note: this redirects to a static, cached JSON file. It doesn't work in the documentation.
             NOTE
         }
         get '/all_stolen' do
