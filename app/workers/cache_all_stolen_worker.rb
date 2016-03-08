@@ -28,16 +28,13 @@ class CacheAllStolenWorker
     File.join(Rails.root, filename)
   end
 
-  def stolen_bikes
-    Bike.stolen
-  end
-
   def write_stolen
     File.open(tmp_path, 'w') {}
     File.open(tmp_path, 'a+') do |file|
       file << '{"bikes": ['
-      stolen_bikes.each { |bike| file << BikeV2Serializer.new(bike, root: false).to_json }
-      file << ']}'
+      Bike.stolen.find_each { |bike| file << BikeV2Serializer.new(bike, root: false).to_json + ',' }
     end
+    File.truncate(tmp_path, File.size(tmp_path) - 1) # remove final comma
+    File.open(tmp_path, 'a+') { |file| file << ']}' }
   end
 end

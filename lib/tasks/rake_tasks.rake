@@ -26,7 +26,7 @@ end
 
 desc 'cache all stolen response'
 task :cache_all_stolen => :environment do
-  CacheAllStolenWorker.new.perform_async
+  CacheAllStolenWorker.perform_async
 end
 
 desc 'Create stolen tsv'
