@@ -1,50 +1,40 @@
 class MailerIntegration
   class << self
-    def templates
-      {
-        welcome_email:
-          { title: 'Welcome to the Bike Index!',
-            description: 'Sent on sign up' },
-        confirmation_email:
-          { title: 'Welcome to the Bike Index!',
-            description: 'Sent on signup, requires clicking to verify email' },
-        invoice_email:
-          { title: 'Thank you for supporting the Bike Index!',
-            description: 'Sent on signing up to be a member of the Bike Index' },
-        stolen_bike_alert_email:
-          { title: nil,
-            description: 'Email to Bike Index staff from support page' },
-        password_reset_email:
-          { title: 'Instructions to reset your password',
-            description: 'Password reset requested, requires clicking link' },
-        ownership_invitation_email:
-          { title: 'Claim your bike on BikeIndex.org',
-            description: 'Sent when a bike is registered' },
-        stolen_ownership_invitation_email:
-          { title: 'Your stolen bike',
-            description: 'Sent when a stolen bike is registered' },
-        organization_invitation_email:
-          { title: nil,
-            description: 'Sent when you are invited to be part of an organization' },
-        stolen_notification_email:
-          { title: nil,
-            description: 'Sent when someone contacts the owner of a stolen bike through the contact form on Bike Index' }
-      }
+    def templates_path
+      Rails.root.join('app', 'views', 'mailer_integrations')
     end
 
-    def template_body(template)
+    def templates_config
+      @templates_config ||= read_templates_config
+    end
 
+    def read_templates_config
+      require 'yaml'
+      YAML.load_file(templates_path.join('template_config.yml'))['templates']
+    end
+
+    def template_path(template_name)
+      templates_path.join("#{template_name}.html.erb")
+    end
+
+    def template_body(template_name)
+      view = ActionView::Base.new(ActionController::Base.view_paths, {})
+      view.render(file: template_path(template_name))
     end
   end
 
-  def integration_array(template:, to_email:, args: {})
+  def template_config(template_name)
+    config = self.class.templates_config.detect { |t| t['name'] == template_name }
+    config.present? ? config : (raise ActiveRecord::RecordNotFound)
+  end
+
+  def integration_array(template_name:, to_email:, args: {})
     [
       to_email,
       '"Bike Index" <contact@bikeindex.org>',
-      (args[:title] || self.class.templates[template.to_sym][:title]),
-      self.class.template_body(template),
+      (args[:title] || template_config(template_name)['title']),
+      self.class.template_body(template_name),
       args
     ]
   end
-
 end

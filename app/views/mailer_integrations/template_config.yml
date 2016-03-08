@@ -1,0 +1,37 @@
+templates:
+  - name: 'welcome_email'
+    title: 'Welcome to the Bike Index!'
+    description: 'Sent on sign up'
+    args: 
+  - name: 'confirmation_email'
+    title: 'Welcome to the Bike Index!'
+    description: 'Sent on signup, requires clicking to verify email'
+    args: 
+  - name: 'invoice_email'
+    title: 'Thank you for supporting the Bike Index!'
+    description: 'Sent on signing up to be a member of the Bike Index'
+    args: 
+  - name: 'stolen_bike_alert_email'
+    title:
+    description: 'Email to Bike Index staff from support page'
+    args: 
+  - name: 'password_reset_email'
+    title: 'Instructions to reset your password'
+    description: 'Password reset requested, requires clicking link'
+    args: 
+  - name: 'ownership_invitation_email'
+    title: 'Claim your bike on BikeIndex.org'
+    description: 'Sent when a bike is registered'
+    args: 
+  - name: 'stolen_ownership_invitation_email'
+    title: 'Your stolen bike'
+    description: 'Sent when a stolen bike is registered'
+    args: 
+  - name: 'organization_invitation_email'
+    title:
+    description: 'Sent when you are invited to be part of an organization'
+    args: 
+  - name: 'stolen_notification_email'
+    title:
+    description: 'Sent when someone contacts the owner of a stolen bike through the contact form on Bike Index'
+    args: 
