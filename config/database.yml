@@ -17,4 +17,4 @@ staging:
 production:
   adapter: postgresql
   database: bikeindex
-  pool: 25
+  pool: 35
