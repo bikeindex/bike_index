@@ -53,13 +53,7 @@ Bikeindex::Application.configure do
   # Disable delivery errors, bad email addresses will be ignored
   # config.action_mailer.raise_delivery_errors = false
   config.action_mailer.default_url_options = { protocol: 'https', host: "bikeindex.org" }
-  ActionMailer::Base.smtp_settings = {
-      port:           ENV['MANDRILL_PORT'],
-      address:        'smtp.mandrillapp.com',
-      user_name:      ENV['MANDRILL_USERNAME'],
-      password:       ENV['MANDRILL_PASSWORD'],
-      authentication: :plain
-  }
+  # Rest of configuration is in config/initializers/mailer_configuration
   ActionMailer::Base.delivery_method = :smtp
 
   # Enable threaded mode
