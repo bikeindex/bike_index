@@ -18,7 +18,7 @@ public/partner
 *.rdb
 current_stolen_bikes.tsv
 spec/fixtures/tsv_creation/*.tsv
-
+spec/fixtures/tsv_creation/*.json
 
 # Ignore rvm stuff
 .rvmrc

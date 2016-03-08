@@ -28,6 +28,7 @@ class TsvMaintainer
         'approved_current_stolen_bikes.tsv' => 'Stolen (without blacklisted bikes)',
         'current_stolen_with_reports.tsv' => 'Stolen with serials & police reports',
         'approved_current_stolen_with_reports.tsv' => 'Stolen with serials & police reports (without blacklisted bikes)',
+        'all_stolen_cache.json' => 'Cached API response of all stolen bikes'
       }
     end
 
@@ -64,6 +65,10 @@ class TsvMaintainer
       @result = redis.hgetall(info_id)
       @result.keys.map{ |k| tsv_info_hash(k).with_indifferent_access }.
         sort_by{ |t| t[:filename] }.sort_by{ |t| t[:daily] ? 1 : 0 }
+    end
+
+    def cached_all_stolen
+      tsvs.reverse.detect { |t| t['filename'] =~ /all_stolen_cache\.json/ }
     end
 
     def normalized(id)

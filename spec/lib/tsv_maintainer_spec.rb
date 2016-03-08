@@ -1,6 +1,23 @@
 require 'spec_helper'
 
 describe TsvMaintainer do
+
+  describe :cached_all_stolen do
+    it 'returns the most recent all_stolen' do
+      TsvMaintainer.redis.expire(TsvMaintainer.info_id, 0)
+      TsvMaintainer.update_tsv_info('1456863086_all_stolen_cache.json', 1456863086)
+      t = Time.now.to_i
+      TsvMaintainer.update_tsv_info("#{t}_all_stolen_cache.json", t)
+      target = {
+        'path' => "#{t}_all_stolen_cache.json",
+        'filename' => "#{t}_all_stolen_cache.json",
+        'daily' => true,
+        'updated_at' => t.to_s,
+        'description' => nil
+      }
+      expect(TsvMaintainer.cached_all_stolen).to eq(target)
+    end
+  end
   
   describe :blacklist_ids do
     it "gets and sets the ids" do 
