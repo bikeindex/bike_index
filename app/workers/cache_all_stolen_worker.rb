@@ -1,6 +1,7 @@
 class CacheAllStolenWorker
   include Sidekiq::Worker
   sidekiq_options queue: 'carrierwave', backtrace: true, retry: false
+  attr_reader :filename
 
   def perform
     write_stolen

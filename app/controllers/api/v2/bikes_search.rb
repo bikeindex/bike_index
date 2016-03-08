@@ -2,7 +2,6 @@ module API
   module V2
     class BikesSearch < API::V2::Root
       include API::V2::Defaults
-
       helpers do
         params :search_bikes do 
           optional :colors, type: String, desc: "Comma separated list. Results will match **all** colors"
@@ -32,8 +31,6 @@ module API
           end
         end
       end
-      
-
       resource :bikes_search, desc: 'Searching for bikes' do
        
         desc "All bike search", {
@@ -47,7 +44,7 @@ module API
           use :search_bikes
         end
         get '/', root: 'bikes', each_serializer: BikeV2Serializer do 
-          { "declared_params" => declared(params, include_missing: false) }
+          { 'declared_params' => declared(params, include_missing: false) }
           paginate find_bikes
         end
 
@@ -67,7 +64,7 @@ module API
         end
         get '/stolen', root: 'bikes', each_serializer: BikeV2Serializer do 
           params[:stolen] = true
-          { "declared_params" => declared(params, include_missing: false) }
+          { 'declared_params' => declared(params, include_missing: false) }
           set_proximity
           paginate find_bikes
         end
@@ -79,12 +76,12 @@ module API
         end
         get '/non_stolen', root: 'bikes', each_serializer: BikeV2Serializer do 
           params[:non_stolen] = true
-          { "declared_params" => declared(params, include_missing: false) }
+          { 'declared_params' => declared(params, include_missing: false) }
           paginate find_bikes
         end
 
 
-        desc "Count of bikes matching search", {
+        desc 'Count of bikes matching search', {
           notes: <<-NOTE
             Include all the options you would pass in in your search. This will respond with a hash of the number of bikes matching your search for each type:
 
@@ -106,14 +103,14 @@ module API
           use :stolen_search
         end
         get '/count', root: 'bikes', each_serializer: BikeV2Serializer do
-          { "declared_params" => declared(params, include_missing: false) }
+          { 'declared_params' => declared(params, include_missing: false) }
           params[:proximity] = params[:proximity] || "ip"
           set_proximity
           BikeSearcher.new(params).find_bike_counts
         end
 
 
-        desc "Close serials", {
+        desc 'Close serials', {
           notes: <<-NOTE
             We can find bikes with serials close to the serial you search you input.
             Close serials are serials that are off by one or two characters
@@ -129,8 +126,21 @@ module API
           paginate bikes
         end
 
-      end
+        desc 'All stolen bikes', {
+          notes: <<-NOTE
+            Returns all the stolen bikes. Not paginated, the response is over > 10mb 
 
+            This is a cached response, updated a few times a day. The most recent update time is in the `Last-Modified` header.
+
+            Note: if you load this here, in the documentation, it will take a LONG time because this page parses the response and pretty prints it.
+            NOTE
+        }
+        get '/all_stolen' do
+          all_stolen = TsvMaintainer.cached_all_stolen
+          header 'Last-Modified', Time.at(all_stolen['updated_at'].to_i).httpdate
+          Rails.env.production? ? redirect(all_stolen['path']) : JSON.parse(File.read(all_stolen['path']))
+        end
+      end
     end
   end
 end
