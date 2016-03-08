@@ -192,7 +192,7 @@ Bikeindex::Application.routes.draw do
     end
   end
 
-  resources :email_templates, only: [:show]
+  resources :mailer_integrations, only: [:show]
 
   resources :manufacturers, only: [:show, :index] do 
     collection { get 'tsv' }
