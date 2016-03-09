@@ -4,7 +4,6 @@ describe TsvMaintainer do
 
   describe :cached_all_stolen do
     it 'returns the most recent all_stolen' do
-      TsvMaintainer.redis.expire(TsvMaintainer.info_id, 0)
       TsvMaintainer.update_tsv_info('1456863086_all_stolen_cache.json', 1456863086)
       t = Time.now.to_i
       TsvMaintainer.update_tsv_info("#{t}_all_stolen_cache.json", t)

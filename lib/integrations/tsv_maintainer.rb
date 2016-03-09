@@ -68,7 +68,7 @@ class TsvMaintainer
     end
 
     def cached_all_stolen
-      tsvs.reverse.detect { |t| t['filename'] =~ /all_stolen_cache\.json/ }
+      tsvs.detect { |t| t['filename'] =~ /all_stolen_cache\.json/ }
     end
 
     def normalized(id)
