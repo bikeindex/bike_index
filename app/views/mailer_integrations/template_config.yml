@@ -6,32 +6,40 @@ templates:
   - name: 'confirmation_email'
     title: 'Welcome to the Bike Index!'
     description: 'Sent on signup, requires clicking to verify email'
-    args: 
+    args: confirm_users_url
   - name: 'invoice_email'
     title: 'Thank you for supporting the Bike Index!'
     description: 'Sent on signing up to be a member of the Bike Index'
-    args: 
+    args: payment_amount
+  - name: 'invoice_subscription_email'
+    title: 'Thank you for supporting the Bike Index!'
+    description: 'Sent on signing up to be a member of the Bike Index'
+    args: payment_amount
   - name: 'stolen_bike_alert_email'
-    title:
-    description: 'Email to Bike Index staff from support page'
-    args: 
+    title: 
+    description: 'When we tweet about a bike that was stolen'
+    args: stolen_word, bike_type, twitter_screen_name, twitter_name, twitter_area, twitter_image_url, tweet_string_no_link, tweet_id, tweet_time, retweeters_links_html, retweeters_to_sentence, bike_url, bike_registered_at, bike_thumb_url, bike_manufacturer, bike_serial, bike_paint_string
   - name: 'password_reset_email'
     title: 'Instructions to reset your password'
     description: 'Password reset requested, requires clicking link'
-    args: 
+    args: reset_url
+  - name: 'organization_ownership_invitation_email'
+    title: 'Claim your bike on BikeIndex.org'
+    description: 'Sent when a bike is registered through an organization'
+    args: bunches!
   - name: 'ownership_invitation_email'
     title: 'Claim your bike on BikeIndex.org'
     description: 'Sent when a bike is registered'
-    args: 
+    args: bunches!
   - name: 'stolen_ownership_invitation_email'
     title: 'Your stolen bike'
     description: 'Sent when a stolen bike is registered'
-    args: 
+    args: bunches!
   - name: 'organization_invitation_email'
-    title:
+    title: 
     description: 'Sent when you are invited to be part of an organization'
-    args: 
+    args: is_new_user, inviter_display_name, new_user_url, organization_name
   - name: 'stolen_notification_email'
     title:
     description: 'Sent when someone contacts the owner of a stolen bike through the contact form on Bike Index'
-    args: 
+    args: sender_email, bike_url, bike_type, stolen_notification_message, sender_display_name

@@ -1,0 +1,20 @@
+<%= render partial: 'mailer_integrations/standard_top' %>
+
+<h1 style="font-weight: 400;">Hello,</h1>
+{{if is_new_user}}
+  <h2 style="font-size: 30px;font-weight: 400;">Welcome to the Bike Index</h2>
+{{end}}
+
+<p>{{inviter_display_name}} has indicated that you are a member of {{organization_name}}.</p>
+
+<a href="{{ new_user_url }}" class="button" style="text-decoration: none;-webkit-border-radius: 3px;-moz-border-radius: 3px;border-radius: 3px;-webkit-box-shadow: 1px 0 2px rgba(0,0,0,0.3);-moz-box-shadow: 1px 0 2px rgba(0,0,0,0.3);box-shadow: 1px 0 2px rgba(0,0,0,0.3);display: block;padding: .5em 1em;margin: 1.5em auto;width: 250px;max-width: 100%;font-size: 2em;background: #2e9f67;border: 1px solid #288b5a;color: white;text-align: center;">Join {{organization_name}}</a>
+
+
+
+<p class="explanation" style="text-align: center;color: #555;">Click <em>Join {{organization_name}}</em> and sign up or sign in to join the organization!</p>
+
+
+<a href="http://youtu.be/rCj6Gkndm1k" style="display: block;"><img style="display: block; margin: 20px auto 10px;" src="https://files.bikeindex.org/org_manage_screencast_screenshot.png"></a>
+<p style="text-align: center;">Watch our screencast on <a href="http://youtu.be/rCj6Gkndm1k">getting started with organizations</a> on the Bike Index</p>
+
+<%= render partial: 'mailer_integrations/standard_bottom' %>
