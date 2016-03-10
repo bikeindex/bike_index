@@ -5,16 +5,11 @@ class MailerIntegration
     end
 
     def templates_config
-      @templates_config ||= read_templates_config
-    end
-
-    def read_templates_config
-      require 'yaml'
-      YAML.load_file(templates_path.join('template_config.yml'))['templates']
+      @templates_config ||= YAML.load_file(Rails.root.join('config', 'mailer_integration_templates.yml'))['templates']
     end
 
     def template_path(template_name)
-      templates_path.join("#{template_name}.html.erb")
+      templates_path.join(template_name)
     end
 
     def template_body(template_name)
