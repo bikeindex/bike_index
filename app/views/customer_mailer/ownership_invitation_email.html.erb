@@ -63,7 +63,8 @@
 
   <div class="image-holder" style="width: 33%;float: left;position: relative;">
     <a href="<%= ownership_url(@ownership) %>">
-     <img src="<%= bike_image %>" style="width: auto;max-width: 100%;max-height: 150px;border: 1px solid #ddd;">
+      <img src="<%= bike_image %>" style="width: auto;max-width: 100%;max-height: 150px;border: 1px solid #ddd;">
+    </a>
   </div>
   <div class="bike-info" style="position: relative;width: 63%;margin-left: 3%;float: left;padding-top: 30px; <%= 'color: white;' if @bike.stolen %>">
     <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Make</span> <%= @bike.manufacturer_name  %></p>

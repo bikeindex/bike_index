@@ -15,18 +15,35 @@ describe MailerIntegration do
       MailerIntegration.templates_config.each do |template|
         expect(template.keys).to eq config_keys
       end
-      expect(template_names.count).to eq 9
+      expect(template_names.count).to eq 10
       expect(template_names.include?('welcome_email')).to be_true
     end
   end
 
   describe 'template_body' do
-    # test rendering each of the templates from template_config
-    # test that it includes the args from config
-    # test that it doesn't include args not in config
-    it 'returns the template body as a string' do
-      rendered_string = MailerIntegration.template_body('welcome_email')
-      expect(rendered_string).to match('<h1>Welcome to the Bike Index</h1>')
+    MailerIntegration.templates_config.each do |template|
+      context template['name'] do
+        before :all do
+          @rendered_string = MailerIntegration.template_body(template['name'])
+        end
+
+        it 'renders' do
+          expect(@rendered_string).to be_present
+        end
+
+        it 'includes all expected substitutions args' do
+          # separated tests for each substitution add significant delay (and failures print the whole template)
+          # instead test against everything at once, then print all failures if there are any
+          substitutions = template['args'] && template['args'].map { |arg| "#{arg}}}" }
+          if substitutions && substitutions.detect { |s| !@rendered_string.include?(s) }
+            missing = []
+            substitutions.each do |arg|
+              missing << "{{#{arg}" unless @rendered_string.match(arg)
+            end
+            raise "#{template['name']} does not include expected substitutions #{missing.join(', ')}"
+          end
+        end
+      end
     end
   end
 

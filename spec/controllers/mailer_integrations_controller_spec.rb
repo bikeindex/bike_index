@@ -1,6 +1,14 @@
 require 'spec_helper'
 
 describe MailerIntegrationsController do
+  describe 'index' do
+    before do
+      get :index
+    end
+    it { should respond_with(:success) }
+    it { should render_template(:index) }
+  end
+
   describe 'show' do
     context 'unknown template_name' do
       it 'raises not found' do
