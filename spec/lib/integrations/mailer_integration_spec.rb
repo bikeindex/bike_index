@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe MailerIntegration do
-  let(:config_keys) { %w(name title description args) }
+  let(:config_keys) { %w(name subject description args) }
   describe 'template_dir' do
     it 'returns the expected rails path' do
       expect(MailerIntegration.templates_path.is_a?(Pathname)).to be_true
@@ -20,27 +20,62 @@ describe MailerIntegration do
     end
   end
 
+  describe 'subject' do
+    MailerIntegration.templates_config.select { |t| t['subject'] =~ /\{\{/ }.each do |template|
+      context template['name'] do
+        let(:subject_args) { template['subject'].match(/\{\{[^\}]*/).to_a.map { |s| s.delete('{') } }
+        it 'includes all expect substitution args' do
+          expect(template['args']).to include(*subject_args)
+        end
+
+        it 'renders the expected string' do
+          target = template['subject']
+          passed_args = Hash[template['args'].each_with_index.map { |arg, index| [arg, "foo #{index}"] }]
+          subject_args.each { |arg| target = target.gsub("{{#{arg}}}", passed_args[arg]) }
+          expect(MailerIntegration.new.rendered_subject(template['name'], args: passed_args)).to eq target
+        end
+
+        it 'raises an informative error if missing the substitution data' do
+          passed_args = Hash[subject_args.map { |arg| [arg, ''] }]
+          expect do
+            MailerIntegration.new.rendered_subject(template['name'], args: passed_args)
+          end.to raise_error(/#{subject_args.first}/i)
+        end
+      end
+    end
+
+    MailerIntegration.templates_config.reject { |t| t['subject'] =~ /\{\{/ }.each do |template|
+      context template['name'] do
+        it 'renders the expected subject' do
+          expect(MailerIntegration.new.rendered_subject(template['name'])).to eq(template['subject'])
+        end
+      end
+    end
+  end
+
   describe 'template_body' do
     MailerIntegration.templates_config.each do |template|
       context template['name'] do
         before :all do
           @rendered_string = MailerIntegration.template_body(template['name'])
+          @subject_args = template['subject'].match(/\{\{[^\}]*/).to_a.map { |s| s.delete('{') }
         end
-
         it 'renders' do
           expect(@rendered_string).to be_present
         end
 
-        it 'includes all expected substitutions args' do
-          # separated tests for each substitution add significant delay (and failures print the whole template)
+        it 'includes all expected substitution args' do
+          # individual for each substitution add significant delay (and failures print the whole template)
           # instead test against everything at once, then print all failures if there are any
           substitutions = template['args'] && template['args'].map { |arg| "#{arg}}}" }
           if substitutions && substitutions.detect { |s| !@rendered_string.include?(s) }
             missing = []
             substitutions.each do |arg|
+              next if @subject_args.include?(arg.delete('{}'))
               missing << "{{#{arg}" unless @rendered_string.match(arg)
             end
-            raise "#{template['name']} does not include expected substitutions #{missing.join(', ')}"
+            next unless missing.any?
+            raise "#{template['name']} body does not include expected substitutions #{missing.join(', ')}"
           end
         end
       end

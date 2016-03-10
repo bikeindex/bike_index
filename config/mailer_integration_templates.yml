@@ -1,25 +1,25 @@
 templates:
   - name: welcome_email
-    title: 'Welcome to the Bike Index!'
+    subject: 'Welcome to the Bike Index!'
     description: 'On sign up'
     args:
   - name: confirmation_email
-    title: 'Welcome to the Bike Index!'
+    subject: 'Welcome to the Bike Index!'
     description: 'On signup, requires clicking to verify email'
     args:
       - confirm_users_url
   - name: invoice_email
-    title: 'Thank you for supporting the Bike Index!'
+    subject: 'Thank you for supporting the Bike Index!'
     description: 'On signing up to be a member of the Bike Index'
     args:
       - payment_amount
   - name: invoice_subscription_email
-    title: 'Thank you for supporting the Bike Index!'
+    subject: 'Thank you for supporting the Bike Index!'
     description: 'On signing up to be a member of the Bike Index'
     args:
       - payment_amount
   - name: stolen_bike_alert_email
-    title: '{{notification_subject}}'
+    subject: '{{notification_subject}}'
     description: 'When we tweet about a bike that was stolen'
     args:
       - stolen_word
@@ -43,12 +43,12 @@ templates:
       - bike_paint_string
       - notification_subject
   - name: password_reset_email
-    title: 'Instructions to reset your password'
+    subject: 'Instructions to reset your password'
     description: 'Password reset requested, requires clicking link'
     args:
       - reset_url
   - name: ownership_invitation_email
-    title: 'Claim your bike on BikeIndex.org'
+    subject: 'Claim your bike on BikeIndex.org'
     description: 'Sent when a bike is registered'
     # notes:
     #  bike_display_background == #bf2f2f or #ebebeb
@@ -71,7 +71,7 @@ templates:
       - bike_serial
       - bike_paint_string
   - name: ownership_invitation_from_organization_email
-    title: 'Claim your bike on BikeIndex.org'
+    subject: 'Claim your bike on BikeIndex.org'
     description: 'Sent when a bike is registered through an organization'
     # notes: 
     #   creator_display_name is ownership organization name
@@ -93,7 +93,7 @@ templates:
       - bike_serial
       - bike_paint_string
   - name: organization_invitation_email
-    title: 'Join {{organization_name}} on the Bike Index'
+    subject: 'Join {{organization_name}} on the Bike Index'
     description: 'Sent when you are invited to be part of an organization'
     args:
       - is_new_user
@@ -101,7 +101,7 @@ templates:
       - new_user_url
       - organization_name
   - name: stolen_notification_email
-    title: '{{stolen_notification_display_subject}}'
+    subject: '{{stolen_notification_display_subject}}'
     description: 'Sent when someone contacts the owner of a stolen bike through the contact form on Bike Index'
     args:
       - sender_email

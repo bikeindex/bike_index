@@ -23,11 +23,22 @@ class MailerIntegration
     config.present? ? config : (raise ActiveRecord::RecordNotFound)
   end
 
+  def rendered_subject(template_name, args: {})
+    str = template_config(template_name).clone['subject']
+    str.match(/\{\{[^\}]*\}\}/).to_a.each do |substitution|
+      unless args[substitution.delete('{}')].present?
+        raise ArgumentError, "Unable to render template, missing subject substitution data #{substitution}"
+      end
+      str = str.gsub(substitution, args[substitution.delete('{}')])
+    end
+    str
+  end
+
   def integration_array(template_name:, to_email:, args: {})
     [
       to_email,
       '"Bike Index" <contact@bikeindex.org>',
-      (args[:title] || template_config(template_name)['title']),
+      rendered_subject(template_name, args: args),
       self.class.template_body(template_name),
       args
     ]
