@@ -1,0 +1,112 @@
+templates:
+  - name: welcome_email
+    subject: 'Welcome to the Bike Index!'
+    description: 'On sign up'
+    args:
+  - name: confirmation_email
+    subject: 'Welcome to the Bike Index!'
+    description: 'On signup, requires clicking to verify email'
+    args:
+      - confirm_users_url
+  - name: invoice_email
+    subject: 'Thank you for supporting the Bike Index!'
+    description: 'On signing up to be a member of the Bike Index'
+    args:
+      - payment_amount
+  - name: invoice_subscription_email
+    subject: 'Thank you for supporting the Bike Index!'
+    description: 'On signing up to be a member of the Bike Index'
+    args:
+      - payment_amount
+  - name: stolen_bike_alert_email
+    subject: '{{notification_subject}}'
+    description: 'When we tweet about a bike that was stolen'
+    args:
+      - stolen_word
+      - bike_type
+      - twitter_screen_name
+      - twitter_name
+      - twitter_area
+      - twitter_image_url
+      - tweet_string_no_link
+      - tweet_id
+      - tweet_time
+      - retweeters_links_html
+      - retweeters_to_sentence
+      - bike_url
+      - bike_registered_at
+      - bike_display_background
+      - bike_display_text_color
+      - bike_thumb_url
+      - bike_manufacturer
+      - bike_serial
+      - bike_paint_string
+      - notification_subject
+  - name: password_reset_email
+    subject: 'Instructions to reset your password'
+    description: 'Password reset requested, requires clicking link'
+    args:
+      - reset_url
+  - name: ownership_invitation_email
+    subject: 'Claim your bike on BikeIndex.org'
+    description: 'Sent when a bike is registered'
+    # notes:
+    #  bike_display_background == #bf2f2f or #ebebeb
+    #  bike_display_text_color == white or black
+    #  bike_url here is bike_ownership_url
+    args:
+      - is_new_user
+      - is_recovered_bike
+      - is_stolen_bike
+      - is_registered_by_owner
+      - is_new_registration
+      - bike_stolenness_display
+      - creator_display_name
+      - bike_thumb_url
+      - bike_display_background
+      - bike_display_text_color
+      - bike_url
+      - bike_thumb_url
+      - bike_manufacturer
+      - bike_serial
+      - bike_paint_string
+  - name: ownership_invitation_from_organization_email
+    subject: 'Claim your bike on BikeIndex.org'
+    description: 'Sent when a bike is registered through an organization'
+    # notes: 
+    #   creator_display_name is ownership organization name
+    args:
+      - creation_org_new_bike_header_html
+      - is_new_registration_from_pos
+      - is_new_user
+      - is_recovered_bike
+      - is_stolen_bike
+      - is_new_registration
+      - bike_stolenness_display
+      - creator_display_name
+      - bike_thumb_url
+      - bike_display_background
+      - bike_display_text_color
+      - bike_url
+      - bike_thumb_url
+      - bike_manufacturer
+      - bike_serial
+      - bike_paint_string
+  - name: organization_invitation_email
+    subject: 'Join {{organization_name}} on the Bike Index'
+    description: 'Sent when you are invited to be part of an organization'
+    args:
+      - is_new_user
+      - inviter_display_name
+      - new_user_url
+      - organization_name
+  - name: stolen_notification_email
+    subject: '{{stolen_notification_display_subject}}'
+    description: 'Sent when someone contacts the owner of a stolen bike through the contact form on Bike Index'
+    args:
+      - sender_email
+      - bike_url
+      - bike_type
+      - stolen_notification_message
+      - sender_display_name
+      - stolen_notification_display_subject

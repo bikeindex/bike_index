@@ -69,6 +69,8 @@ gem 'eventmachine', '~> 1.0.3'
 gem 'chartkick'
 gem 'groupdate'
 
+gem 'sparkpost' # ruby client for email
+
 # gem 'localeapp'
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'
