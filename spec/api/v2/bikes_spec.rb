@@ -138,8 +138,9 @@ describe 'Bikes API V2' do
       result['error'].kind_of?(String).should be_true
     end
 
-    it "creates a stolen bike through an organization" do 
+    it 'creates a stolen bike through an organization and uses the passed phone' do 
       organization = FactoryGirl.create(:organization)
+      @user.update_attribute :phone, '0987654321'
       FactoryGirl.create(:membership, user: @user, organization: organization)
       FactoryGirl.create(:country, iso: "US")
       FactoryGirl.create(:state, abbreviation: "Palace")
@@ -174,6 +175,7 @@ describe 'Bikes API V2' do
       b.stolen.should be_true
       b.current_stolen_record_id.should be_present
       b.current_stolen_record.police_report_number.should eq(bike[:stolen_record][:police_report_number])
+      b.current_stolen_record.phone.should eq('1234567890')
     end
 
     it "does not register a stolen bike unless attrs are present" do
