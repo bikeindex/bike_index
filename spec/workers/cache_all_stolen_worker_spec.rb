@@ -6,9 +6,9 @@ describe CacheAllStolenWorker do
   describe 'output_stolen' do
     it 'creates a stolen cache' do
       FactoryGirl.create(:stolen_bike)
-      TsvMaintainer.redis.expire(TsvMaintainer.info_id, 0)
+      FileCacheMaintainer.redis.expire(FileCacheMaintainer.info_id, 0)
       CacheAllStolenWorker.new.perform
-      tsv_record = TsvMaintainer.tsvs.last
+      tsv_record = FileCacheMaintainer.files.last
       expect(tsv_record['filename']).to match 'all_stolen_cache.json'
     end
   end

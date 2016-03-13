@@ -73,7 +73,7 @@ describe 'Bikes API V2' do
       FactoryGirl.create(:stolen_bike)
       t = Time.now.to_i
       CacheAllStolenWorker.new.perform
-      cached_all_stolen = TsvMaintainer.cached_all_stolen
+      cached_all_stolen = FileCacheMaintainer.cached_all_stolen
       expect(cached_all_stolen['updated_at'].to_i).to be >= t
       get 'api/v2/bikes_search/all_stolen', format: :json
       result = JSON.parse(response.body)

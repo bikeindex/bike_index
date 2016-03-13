@@ -9,7 +9,7 @@ class CacheAllStolenWorker
     file = File.open(tmp_path)
     uploader.store!(file)
     file.close
-    TsvMaintainer.update_tsv_info(output_url(uploader))
+    FileCacheMaintainer.update_file_info(output_url(uploader))
   end
 
   def output_url(uploader)

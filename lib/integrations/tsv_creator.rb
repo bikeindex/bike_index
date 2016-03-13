@@ -119,7 +119,7 @@ class TsvCreator
     else
       path = uploader.current_path
     end
-    TsvMaintainer.update_tsv_info(path)
+    FileCacheMaintainer.update_file_info(path)
     output
   end
 
