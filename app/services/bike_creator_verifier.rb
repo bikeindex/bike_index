@@ -1,7 +1,7 @@
 class BikeCreatorVerifier
   def initialize(b_param = nil, bike = nil)
     @b_param = b_param
-    @bike = bike 
+    @bike = bike
   end
 
   def set_no_payment_required
@@ -38,14 +38,14 @@ class BikeCreatorVerifier
   end
 
   def stolenize
-    @bike.stolen = true 
-    @bike.payment_required = false 
+    @bike.stolen = true
+    @bike.payment_required = false
     add_phone unless @bike.phone.present?
   end
 
   def recoverize
-    @bike.recovered = true 
-    @bike.payment_required = false 
+    @bike.recovered = true
+    @bike.payment_required = false
     stolenize
   end
 
@@ -69,5 +69,4 @@ class BikeCreatorVerifier
     check_example
     @bike
   end
-
 end
