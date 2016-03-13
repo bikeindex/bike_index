@@ -93,7 +93,7 @@ class Organization < ActiveRecord::Base
 
   before_save :truncate_short_name
   def truncate_short_name
-    self.short_name = self.short_name.truncate(20)
+    self.short_name = self.short_name.truncate(30)
   end
 
   before_save :set_access_token
