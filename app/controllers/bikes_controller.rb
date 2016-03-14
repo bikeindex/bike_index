@@ -31,8 +31,8 @@ class BikesController < ApplicationController
     @count = bikes.count
     (bikes.count <= 250) ? (total_bikes = bikes.count) : (total_bikes = 250)
     page = params[:page] || 1
-    per_page = params[:per_page] || 25
-    bikes = bikes.page(page).per(per_page)
+    @per_page = params[:per_page] || 10
+    bikes = bikes.page(page).per(@per_page)
     if params[:serial].present? && page == 1
       secondary_bikes = search.fuzzy_find_serial
       # secondary_bikes = search.find_bikes

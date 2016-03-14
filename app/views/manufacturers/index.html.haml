@@ -8,23 +8,18 @@
         %th
           Name
         %th.large-screens
-          Frame maker
-        %th.med-width
-          Website
+          Only makes components
       %tbody
         - @manufacturers.each do |manufacturer|
           %tr
             %td
-              = manufacturer.name
-            %td.large-screens
-              = "&#x2713;".html_safe if manufacturer.frame_maker
-            %td.med-width
               - if manufacturer.website
                 %a{href: manufacturer.website}
-                  %span.large-screens
-                    = manufacturer.website.gsub(/https?:\/\/(www\.)?/,'').truncate(30)
-                  %span.not-large-screens
-                    Website
+                  = manufacturer.name
+              - else
+                = manufacturer.name
+            %td.large-screens
+              = "&#x2713;".html_safe unless manufacturer.frame_maker
 
   %h2.padded
     OH NO! We're missing a manufacturer?

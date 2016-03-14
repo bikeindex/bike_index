@@ -234,8 +234,6 @@ CREATE TABLE bikes (
     rear_wheel_size_id integer,
     rear_gear_type_id integer,
     front_gear_type_id integer,
-    verified boolean,
-    paid_for boolean,
     cached_attributes text,
     additional_registration character varying(255),
     belt_drive boolean DEFAULT false NOT NULL,
@@ -261,7 +259,9 @@ CREATE TABLE bikes (
     hidden boolean DEFAULT false NOT NULL,
     frame_size_number double precision,
     updator_id integer,
-    is_for_sale boolean DEFAULT false NOT NULL
+    is_for_sale boolean DEFAULT false NOT NULL,
+    verified boolean,
+    paid_for boolean
 );
 
 

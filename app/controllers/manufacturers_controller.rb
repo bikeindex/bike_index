@@ -14,12 +14,6 @@ class ManufacturersController < ApplicationController
     redirect_to 'https://files.bikeindex.org/uploads/tsvs/manufacturers.tsv'
   end
 
-  def show
-    manufacturer = Manufacturer.find_by_slug(params[:id])
-    raise ActionController::RoutingError.new('Not Found') unless manufacturer.present?
-    @manufacturer = manufacturer.decorate
-  end
-
   def set_manufacturers_active_section
     @active_section = "resources"
   end

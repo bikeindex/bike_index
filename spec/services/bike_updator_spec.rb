@@ -71,7 +71,6 @@ describe BikeUpdator do
       organization = FactoryGirl.create(:organization)
       bike = FactoryGirl.create(:bike,
         creation_organization_id: organization.id,
-        verified: true,
         example: true,
         owner_email: 'foo@bar.com')
       ownership = FactoryGirl.create(:ownership, bike: bike)

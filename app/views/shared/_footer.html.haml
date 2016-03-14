@@ -22,8 +22,8 @@
           = link_to "Help", help_url
           %ul
             %li
-              = link_to "Contact us", contact_us_url
-              = link_to "Sign up a shop or organization", vendor_signup_url
+              = link_to "Contact us", help_path(anchor: 'contact_us_section')
+              = link_to "Sign up a shop or organization", new_organization_path
               
         %li.social
           %ul
