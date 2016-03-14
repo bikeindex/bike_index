@@ -114,7 +114,6 @@ describe BikeUpdator do
       bike.user_hidden.should be_true
     end
 
-    # it "doesn't let bikes that weren't created by an organization become non-stolen" do 
     it "Actually, for now, we let anyone mark anything not stolen" do 
       bike = FactoryGirl.create(:bike, stolen: true)
       ownership = FactoryGirl.create(:ownership, bike: bike)
@@ -128,8 +127,6 @@ describe BikeUpdator do
     end
 
     it "updates the bike and set year to nothing if year nil" do 
-      # I was having trouble setting year to nil and having it update.
-      # So, now we're setting it to 69 if there is no year
       bike = FactoryGirl.create(:bike, year: 2014)
       ownership = FactoryGirl.create(:ownership, bike: bike)
       user = ownership.creator
