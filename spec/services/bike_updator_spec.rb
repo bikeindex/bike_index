@@ -97,7 +97,6 @@ describe BikeUpdator do
       bike.creator.should eq(og_bike.creator)
       bike.example.should eq(og_bike.example)
       bike.hidden.should be_false
-      bike.verified.should be_true
       bike.description.should eq("something long")
       bike.owner_email.should eq('foo@bar.com')
     end
