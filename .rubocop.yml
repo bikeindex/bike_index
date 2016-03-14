@@ -19,3 +19,6 @@ Style/AndOr:
 
 ParameterLists:
   CountKeywordArgs: false
+
+NumericLiterals:
+  Enabled: false

@@ -136,7 +136,7 @@ module API
             NOTE
         }
         get '/all_stolen' do
-          all_stolen = TsvMaintainer.cached_all_stolen
+          all_stolen = FileCacheMaintainer.cached_all_stolen
           header 'Last-Modified', Time.at(all_stolen['updated_at'].to_i).httpdate
           Rails.env.production? ? redirect(all_stolen['path']) : JSON.parse(File.read(all_stolen['path']))
         end

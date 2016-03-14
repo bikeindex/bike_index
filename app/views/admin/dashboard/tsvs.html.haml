@@ -7,7 +7,7 @@
 .tsv_export_list
   %table.table.table-striped.table-bordered
     %tbody
-      - TsvMaintainer.tsvs.each do |tsv_info|
+      - FileCacheMaintainer.files.each do |tsv_info|
         %tr
           %td
             - if tsv_info[:updated_at].present?
