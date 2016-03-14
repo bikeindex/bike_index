@@ -223,7 +223,7 @@ protected
   end
 
   def render_ad
-    @ad = Ad.live.first if Ad.live.present?
+    @ad = true
   end
 
 end
