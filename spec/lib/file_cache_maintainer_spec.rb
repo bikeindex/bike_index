@@ -64,7 +64,6 @@ describe FileCacheMaintainer do
   describe 'remove_file' do
     it 'deletes the file' do
       FactoryGirl.create(:stolen_bike)
-      t = Time.now.to_i
       FileCacheMaintainer.reset_file_info('1456863086_all_stolen_cache.json', 1456863086)
       CacheAllStolenWorker.new.perform
       files_count = FileCacheMaintainer.files.count
@@ -72,7 +71,7 @@ describe FileCacheMaintainer do
       expect(Dir['spec/fixtures/tsv_creation/*'].join).to match(cached_all_stolen['filename'])
       FileCacheMaintainer.remove_file(cached_all_stolen)
       expect(FileCacheMaintainer.files.count).to eq(files_count - 1)
-      # For some reason, carrierwave doesn't deleting the file in tests, but it works 
+      # For some reason, carrierwave doesn't deleting the file in tests, but it works
       # in development and production. Obviously, no good - but... Moving on right now.
       # expect(Dir['spec/fixtures/tsv_creation/*'].join(' ')).to_not match(cached_all_stolen['filename'])
     end
