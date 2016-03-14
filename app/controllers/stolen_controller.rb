@@ -10,27 +10,8 @@ class StolenController < ApplicationController
     redirect_to 'https://files.bikeindex.org/uploads/tsvs/current_stolen_bikes.tsv'
   end
 
-  def links
-  end
-
-  def about
-  end
-
-  def tech
-  end
-
-  def rfid_tags_for_the_win
-  end
-
-  def howworks
-  end
-
-  def merging
-    @title = ' - stolen bike registration that works'
-    stolen_bikes = StolenRecord.where(approved: true).order('date_stolen DESC').limit(6).pluck(:bike_id)
-    @stolen_bikes = Bike.where('id in (?)', stolen_bikes).includes(:stolen_records).decorate
-    @feedback = Feedback.new
-    render action: 'index'
+  def show
+    redirect_to stolen_index_url
   end
 
   def multi_serial_search

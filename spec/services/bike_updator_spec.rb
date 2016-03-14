@@ -71,7 +71,6 @@ describe BikeUpdator do
       organization = FactoryGirl.create(:organization)
       bike = FactoryGirl.create(:bike,
         creation_organization_id: organization.id,
-        verified: true,
         example: true,
         owner_email: 'foo@bar.com')
       ownership = FactoryGirl.create(:ownership, bike: bike)
@@ -98,7 +97,6 @@ describe BikeUpdator do
       bike.creator.should eq(og_bike.creator)
       bike.example.should eq(og_bike.example)
       bike.hidden.should be_false
-      bike.verified.should be_true
       bike.description.should eq("something long")
       bike.owner_email.should eq('foo@bar.com')
     end

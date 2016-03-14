@@ -8,6 +8,8 @@ Bikeindex::Application.routes.draw do
 
   get 'dashboard/show'
 
+  match '/discuss', to: redirect(ENV['DISCOURSE_URL']), as: :discuss
+
   resources :organizations do
     member do
       get :embed
@@ -45,13 +47,12 @@ Bikeindex::Application.routes.draw do
 
   resources :stolen_notifications, only: [:create, :new]
 
-  resources :feedbacks, only: [:create, :new]
-  match 'vendor_signup', to: 'organizations#new'
+  resources :feedbacks, only: [:create]
+  match 'vendor_signup', to: redirect('/organizations/new')
   match 'lightspeed_integration', to: 'organizations#lightspeed_integration'
-  match 'contact', to: 'feedbacks#index'
-  match 'contact_us', to: 'feedbacks#index'
   match 'help', to: 'feedbacks#index'
-  match 'support', to: 'feedbacks#index'
+  match 'feedbacks/new', to: redirect('/help')
+  %w(support contact contact_us).each { |p| match p, to: redirect('/help') }
 
   resources :users, only: [:new, :create, :show, :edit, :update] do
     collection do
@@ -182,18 +183,15 @@ Bikeindex::Application.routes.draw do
   end
   mount API::Base => '/api'
 
-  resources :stolen, only: [:index] do
+  resources :stolen, only: [:index, :show] do
     collection do
       get 'current_tsv'
-      %w(links faq tech philosophy rfid_tags_for_the_win howworks about merging).each do |page|
-        get page
-      end
     end
   end
 
   resources :mailer_integrations, only: [:show, :index]
 
-  resources :manufacturers, only: [:show, :index] do
+  resources :manufacturers, only: [:index] do
     collection { get 'tsv' }
   end
   match 'manufacturers_tsv', to: 'manufacturers#tsv'
@@ -202,11 +200,12 @@ Bikeindex::Application.routes.draw do
   resource :integrations, only: [:create]
   match '/auth/:provider/callback', to: 'integrations#create'
 
-  %w(support_the_index support_the_bike_index stolen_bikes protect_your_bike privacy terms
-     serials about where roadmap security vendor_terms resources spokecard how_it_works
-     image_resources how_not_to_buy_stolen).each do |page|
+  %w(support_the_index support_the_bike_index protect_your_bike privacy terms serials
+     about where vendor_terms resources image_resources how_not_to_buy_stolen).each do |page|
     get page, controller: 'info', action: page
   end
+
+  %w(stolen_bikes roadmap security spokecard how_it_works).each { |p| match p, to: redirect('/resources') }
 
   # get 'sitemap.xml.gz' => redirect('https://files.bikeindex.org/sitemaps/sitemap_index.xml.gz')
   # Somehow the redirect drops the .gz extension, which ruins it so this redirect is handled by Cloudflare

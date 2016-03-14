@@ -12,22 +12,10 @@ class InfoController < ApplicationController
     @countries = Country.where('iso != ?', 'US').includes(:locations)
   end
 
-  def roadmap
-  end
-
-  def security
-  end
-
   def serials
   end
 
   def protect_your_bike
-  end
-
-  def how_it_works
-  end
-
-  def stolen_bikes
   end
 
   def privacy
@@ -48,15 +36,10 @@ class InfoController < ApplicationController
   def image_resources
   end
 
-  def spokecard
-    if current_user.present?
-      @bikes = current_user.bikes
-    end
-  end
-
   def support_the_index
     render layout: 'application_updated'
   end
+
   def support_the_bike_index
     redirect_to support_the_index_url
   end
@@ -68,7 +51,7 @@ class InfoController < ApplicationController
 protected
 
   def set_active_section
-    resources = ['serials', 'stolen_bikes', 'resources', 'spokecard', 'protect_your_bike', 'how_it_works', 'image_resources']
+    resources = %w(serials resources protect_your_bike image_resources)
     if resources.include? action_name
       @active_section = 'resources'
     else

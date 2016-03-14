@@ -1,11 +1,12 @@
 - cache 'info_where_page' do 
   %h1#where-bike-index
     Bike Index partners
+    %small
+      = link_to 'add your organization', new_organization_path
 
   %article
     .map-of-shops
       = render "/shared/shops_map"
-
   %h3.padded
     US Partner organizations
 
@@ -106,4 +107,4 @@
   %hr.where-add-shops
 
   %p
-    If you're a bike shop and would like to join us, check out our #{link_to "signup page", vendor_signup_url}.
+    If you're a bike shop and would like to join us, check out our #{link_to "signup page", new_organization_path}.

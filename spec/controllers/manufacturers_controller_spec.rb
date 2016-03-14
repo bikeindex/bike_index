@@ -10,15 +10,6 @@ describe ManufacturersController do
     it { should render_template(:index) }
   end
 
-  describe :show do 
-    before do 
-      mnfg = FactoryGirl.create(:manufacturer)
-      get :show, id: mnfg.slug
-    end
-    it { should respond_with(:success) }
-    it { should render_template(:show) }
-  end
-
   describe :tsv do 
     before do 
       get :tsv
