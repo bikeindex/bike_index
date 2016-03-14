@@ -29,6 +29,16 @@ task :cache_all_stolen => :environment do
   CacheAllStolenWorker.perform_async
 end
 
+desc 'Remove expired file caches'
+task :remove_expired_file_caches => :environment do
+  RemoveExpiredFileCacheWorker.perform_async
+end
+
+desc 'remove unused'
+task :cache_all_stolen => :environment do
+  CacheAllStolenWorker.perform_async
+end
+
 desc 'Create stolen tsv'
 task :create_tsvs => :environment do
   TsvCreator.enqueue_creation
