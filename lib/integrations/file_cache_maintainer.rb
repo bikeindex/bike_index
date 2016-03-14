@@ -92,7 +92,7 @@ class FileCacheMaintainer
     end
 
     def uploader_from_filename(filename)
-      filename.match('.json') ? JsonUploader.new : TsvUploader.new
+      filename =~ /\.json/ ? JsonUploader.new : TsvUploader.new
     end
 
     def remove_file(file_info_hash)

@@ -72,9 +72,9 @@ describe FileCacheMaintainer do
       expect(Dir['spec/fixtures/tsv_creation/*'].join).to match(cached_all_stolen['filename'])
       FileCacheMaintainer.remove_file(cached_all_stolen)
       expect(FileCacheMaintainer.files.count).to eq(files_count - 1)
-      # For some reason, carrierwave isn't deleting these in tests, but it works in production.
-      # Obviously, no good - but... Moving on right now.
-      # expect(Dir['spec/fixtures/tsv_creation/*'].join).to_not match(cached_all_stolen['filename'])
+      # For some reason, carrierwave doesn't deleting the file in tests, but it works 
+      # in development and production. Obviously, no good - but... Moving on right now.
+      # expect(Dir['spec/fixtures/tsv_creation/*'].join(' ')).to_not match(cached_all_stolen['filename'])
     end
   end
 end
