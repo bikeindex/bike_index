@@ -16,7 +16,7 @@ describe BikeCreatorTokenizer do
   describe :use_token do
     it "marks the bike tokened" do 
       bike_token = BikeToken.new 
-      bike = Bike.new(payment_required: true)
+      bike = Bike.new
       b_param = FactoryGirl.create(:b_param, params: {stolen: false})
       bike_token.stub(:organization_id).and_return(42)
       bike_token.stub(:id).and_return(2)
@@ -24,10 +24,7 @@ describe BikeCreatorTokenizer do
       creator.use_token(bike_token)
       bike.bike_token_id.should eq(2)
       bike.created_with_token.should be_true
-      bike.payment_required.should be_false 
-      bike.verified.should be_true
       bike.creation_organization_id.should eq(42)
-      bike.verified.should be_true
       b_param.reload.bike_token_id.should eq(2)
     end
   end

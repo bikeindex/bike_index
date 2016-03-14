@@ -4,11 +4,6 @@ class BikeCreatorVerifier
     @bike = bike
   end
 
-  def set_no_payment_required
-    @bike.payment_required = false
-    @bike.verified = true
-  end
-
   def check_token
     @bike = BikeCreatorTokenizer.new(@b_param, @bike).tokenized_bike
   end
@@ -39,13 +34,11 @@ class BikeCreatorVerifier
 
   def stolenize
     @bike.stolen = true
-    @bike.payment_required = false
     add_phone unless @bike.phone.present?
   end
 
   def recoverize
     @bike.recovered = true
-    @bike.payment_required = false
     stolenize
   end
 
@@ -62,7 +55,6 @@ class BikeCreatorVerifier
   end
 
   def verify
-    set_no_payment_required
     check_token
     check_organization
     check_stolen_and_recovered

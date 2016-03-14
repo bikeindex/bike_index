@@ -234,8 +234,6 @@ CREATE TABLE bikes (
     rear_wheel_size_id integer,
     rear_gear_type_id integer,
     front_gear_type_id integer,
-    verified boolean,
-    paid_for boolean,
     cached_attributes text,
     additional_registration character varying(255),
     belt_drive boolean DEFAULT false NOT NULL,
@@ -3093,3 +3091,5 @@ INSERT INTO schema_migrations (version) VALUES ('20150903194549');
 INSERT INTO schema_migrations (version) VALUES ('20150916133842');
 
 INSERT INTO schema_migrations (version) VALUES ('20151122175408');
+
+INSERT INTO schema_migrations (version) VALUES ('20160314144745');

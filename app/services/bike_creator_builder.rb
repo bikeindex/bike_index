@@ -4,7 +4,7 @@ class BikeCreatorBuilder
   end
 
   def verified_bike(bike)
-    bike = BikeCreatorVerifier.new(@b_param, bike).verify
+    BikeCreatorVerifier.new(@b_param, bike).verify
   end
 
   def add_front_wheel_size(bike)

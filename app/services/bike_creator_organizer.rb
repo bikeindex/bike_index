@@ -10,8 +10,6 @@ class BikeCreatorOrganizer
 
   def use_organization(organization)
     @bike.creation_organization_id = organization.id
-    @bike.payment_required = false
-    @bike.verified = true
   end
 
   def organization_usable(organization)

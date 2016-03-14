@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe BikeCreator do
-
   describe :include_bike_book do 
     it "returns the bike if stuff isn't present" do 
       bike = Bike.new
@@ -177,16 +176,6 @@ describe BikeCreator do
       end
     end
 
-    it "returns the bike instead of saving if the bike has payment_required errors" do 
-      b_param = BParam.new
-      bike = Bike.new 
-      creator = BikeCreator.new(b_param)
-      bike.stub(:payment_required).and_return(true)
-      creator.should_receive(:build_bike).and_return(bike)
-      bike.should_not_receive(:save)
-      creator.create_bike
-    end
-
     it "returns the bike instead of saving if the bike has errors" do 
       b_param = BParam.new
       bike = Bike.new(serial_number: "LOLZ")
@@ -197,21 +186,4 @@ describe BikeCreator do
       response.errors[:errory].should eq(["something"])
     end
   end
-
-  describe :create_paid_bike do 
-    xit "sets the bike as paid" do 
-      b_param = BParam.new
-      bike = Bike.new 
-      creator = BikeCreator.new(b_param)
-      creator.should_receive(:add_bike_book_data).at_least(1).times.and_return(nil)
-      creator.should_receive(:build_bike).at_least(1).times.and_return(bike)
-      bike.should_receive(:save).and_return(true)
-      ListingOrderWorker.any_instance.should_receive(:perform).and_return(true)
-      creator.create_paid_bike
-      bike.verified.should be_true
-      bike.paid_for.should be_true
-      bike.payment_required.should be_false
-    end
-  end
-
 end
