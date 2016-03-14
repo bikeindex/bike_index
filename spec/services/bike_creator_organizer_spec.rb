@@ -15,15 +15,13 @@ describe BikeCreatorOrganizer do
   describe :use_organization do
     it "marks the bike organized" do 
       bike_token = BikeToken.new 
-      bike = Bike.new(payment_required: true)
+      bike = Bike.new
       b_param = BParam.new(params: {stolen: false})
       organization = Organization.new 
       organization.stub(:id).and_return(2)
       creator = BikeCreatorOrganizer.new(b_param, bike)
       creator.use_organization(organization)
       bike.creation_organization_id.should eq(2)
-      bike.payment_required.should be_false 
-      bike.verified.should be_true
     end
   end
 

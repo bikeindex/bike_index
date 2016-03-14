@@ -13,8 +13,6 @@ class BikeCreatorTokenizer
     @bike.created_with_token = true
     @bike.bike_token_id = token.id
     @bike.creation_organization_id = token.organization_id
-    @bike.payment_required = false
-    @bike.verified = true
     @b_param.update_attributes(bike_token_id: token.id)
   end
 

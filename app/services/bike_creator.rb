@@ -96,17 +96,6 @@ class BikeCreator
     add_bike_book_data
     @bike = build_bike
     return @bike if @bike.errors.present?
-    return @bike if @bike.payment_required
     save_bike(@bike)
   end
-
-  def create_paid_bike
-    add_bike_book_data
-    @bike = build_bike
-    @bike.payment_required = false
-    @bike.verified = true
-    @bike.paid_for = true
-    save_bike(@bike)
-  end
-
 end

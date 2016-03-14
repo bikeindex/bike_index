@@ -103,7 +103,7 @@ describe BikeUpdator do
 
     it "marks a bike user hidden" do 
       organization = FactoryGirl.create(:organization)
-      bike = FactoryGirl.create(:bike, creation_organization_id: organization.id, verified: true, example: true)
+      bike = FactoryGirl.create(:bike, creation_organization_id: organization.id, example: true)
       ownership = FactoryGirl.create(:ownership, bike: bike)
       user = ownership.creator
       new_creator = FactoryGirl.create(:user)

@@ -68,7 +68,6 @@ class BikeUpdator
     @bike_params[:bike][:manufacturer_other] = @bike.manufacturer_other
     @bike_params[:bike][:creation_organization_id] = @bike.creation_organization_id
     @bike_params[:bike][:creator] = @bike.creator
-    @bike_params[:bike][:verified] = @bike.verified
     @bike_params[:bike][:example] = @bike.example
     @bike_params[:bike][:hidden] = @bike.hidden
   end

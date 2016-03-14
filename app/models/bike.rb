@@ -1,10 +1,7 @@
 class Bike < ActiveRecord::Base
   include ActiveModel::Dirty
   include ActionView::Helpers::SanitizeHelper
-  attr_accessible :verified,
-    :payment_required,
-    :paid_for,
-    :registered_new, # Was this bike registered at point of sale?
+  attr_accessible :registered_new, # Was this bike registered at point of sale?
     :cycle_type_id,
     :manufacturer_id,
     :manufacturer_other,
@@ -129,7 +126,7 @@ class Bike < ActiveRecord::Base
   # validates_inclusion_of :rear_tire_narrow, in: [true, false]
 
   attr_accessor :other_listing_urls, :date_stolen_input, :receive_notifications,
-    :phone, :image, :bike_token_id, :b_param_id, :payment_required, :embeded,
+    :phone, :image, :bike_token_id, :b_param_id, :embeded,
     :embeded_extended, :paint_name, :bike_image_cache, :send_email,
     :marked_user_hidden, :marked_user_unhidden, :b_param_id_token
 
