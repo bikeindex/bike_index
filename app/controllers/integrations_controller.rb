@@ -2,7 +2,7 @@ class IntegrationsController < ApplicationController
   include Sessionable
  
   def create
-    @integration = Integration.new    
+    @integration = Integration.new
     @integration.access_token = request.env['omniauth.auth']['credentials']['token']
     @integration.provider_name = request.env['omniauth.auth']['provider']
     @integration.information = request.env['omniauth.auth']

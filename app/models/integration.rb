@@ -20,7 +20,7 @@ class Integration < ActiveRecord::Base
 
   before_create :associate_with_user 
   def associate_with_user
-    if self.provider_name == "facebook"
+    if self.provider_name == 'facebook'
       i_email = self.information['info']['email']
       i_name = self.information['info']['name']
       i_user = User.fuzzy_email_find(i_email)
@@ -43,11 +43,14 @@ class Integration < ActiveRecord::Base
         if i_user.save
           CreateUserJobs.new(user: i_user).do_jobs
         else
-          raise IntegrationAssociationError, "Oh shit something broke"
+          raise IntegrationAssociationError, 'Oh shit something broke'
         end
       end
       self.user = i_user
       self.user
+    else
+      pp self
+      raise StandardError
     end
   end
 
