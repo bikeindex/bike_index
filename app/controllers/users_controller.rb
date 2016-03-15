@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
   include Sessionable
   before_filter :authenticate_user, only: [:edit]
+  before_filter :set_return_to, only: [:new]
   
   def new
     @user = User.new
@@ -154,5 +155,4 @@ class UsersController < ApplicationController
       redirect_to vendor_terms_url
     end
   end
-
 end
