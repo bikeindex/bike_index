@@ -1,0 +1,51 @@
+{
+  "provider": "strava",
+  "uid": "2430215",
+  "info": {
+    "name": "foo bar",
+    "first_name": "foo",
+    "last_name": "bar",
+    "email": "bar@example.com",
+    "location": "Chicago IL"
+  },
+  "credentials": {
+    "token": "79vcx97xcv7vcda0623d8b8f52b2f5cfc2b91118",
+    "expires": false
+  },
+  "extra": {
+    "recent_ride_totals": null,
+    "ytd_ride_totals": null,
+    "all_ride_totals": null,
+    "raw_info": {
+      "id": 2430215,
+      "username": "foobar",
+      "resource_state": 3,
+      "firstname": "foo",
+      "lastname": "bar",
+      "profile_medium": "https:/dgalywyr863hv.cloudfront.net/pictures/athletes/2430215/2807433/1/medium.jpg",
+      "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/2430215/2807433/1/large.jpg",
+      "city": "Chicago",
+      "state": "IL",
+      "country": "United States",
+      "sex": "M",
+      "premium": false,
+      "created_at": "2013-06-26T20:41:15Z",
+      "updated_at": "2016-03-14T15:06:31Z",
+      "badge_type_id": 0,
+      "friend": null,
+      "follower": null,
+      "follower_count": 6,
+      "friend_count": 5,
+      "mutual_friend_count": 0,
+      "athlete_type": 0,
+      "date_preference": "%m/%d/%Y",
+      "measurement_preference": "meters",
+      "email": "bar@example.com",
+      "ftp": 245,
+      "weight": 76.2035,
+      "clubs": [],
+      "bikes": [],
+      "shoes": []
+    }
+  }
+}

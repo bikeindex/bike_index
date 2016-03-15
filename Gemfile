@@ -17,10 +17,10 @@ gem 'rack-contrib'
 gem 'soulmate', :require => 'soulmate/server', github: 'sethherr/soulmate'
 gem 'soulheart'
 gem 'geocoder'
-gem "money-rails", "~> 0.5.0"
-gem "i18n"
-gem "haml-rails"
-gem "journey", "~> 1.0.3"
+gem 'money-rails', '~> 0.5.0'
+gem 'i18n'
+gem 'haml-rails'
+gem 'journey', '~> 1.0.3'
 gem 'kramdown'
 gem 'haml-kramdown'
 gem 'kaminari'
@@ -29,23 +29,24 @@ gem 'nokogiri'
 gem 'carrierwave', '~> 0.9.0'
 gem 'carrierwave_backgrounder'
 gem 'rmagick'
-gem "mini_magick" # a smaller implementation of rmagick, required for rqrcode
+gem 'mini_magick' # a smaller implementation of rmagick, required for rqrcode
 gem 'rqrcode-rails3'
 gem 'strong_parameters'
 gem 'libv8', '~> 3.16.14.7'
 gem 'rb-readline', '~> 0.5.0'
-gem 'backbone-on-rails', "~>0.9.10.0"
+gem 'backbone-on-rails', '~>0.9.10.0'
 gem 'stripe', git: 'https://github.com/stripe/stripe-ruby'
 gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'
-gem "acts_as_paranoid", "~>0.4.0"
-gem "high_voltage"
+gem 'acts_as_paranoid', '~>0.4.0'
+gem 'high_voltage'
 gem 'omniauth-facebook'
+gem 'omniauth-strava'
 gem 'omniauth'
-gem "fog"
+gem 'fog'
 gem 'dalli'
 gem 'draper', require: false
 # gem 'rack-mini-profiler', require: 'false'
-gem 'dotenv-rails', "~> 0.8", git: "https://github.com/bkeepers/dotenv"
+gem 'dotenv-rails', '~> 0.8', git: 'https://github.com/bkeepers/dotenv'
 gem 'wkhtmltopdf-binary'
 gem 'wicked_pdf'
 gem 'sitemap_generator'
@@ -56,7 +57,7 @@ gem 'unicorn-worker-killer'
 gem 'doorkeeper',   '~> 2.0.1'
 gem 'wine_bouncer'
 gem 'grape'
-gem 'grape-active_model_serializers', git: "https://github.com/jrhe/grape-active_model_serializers"
+gem 'grape-active_model_serializers', git: 'https://github.com/jrhe/grape-active_model_serializers'
 gem 'grape-swagger'
 gem 'swagger-ui_rails'
 gem 'api-pagination'
@@ -89,7 +90,7 @@ group :development do
   gem 'guard-rubocop'
   gem 'bullet'
   gem 'should_clean'
-  gem "brakeman", :require => false
+  gem 'brakeman', :require => false
 end
 
 group :development, :test do
@@ -103,7 +104,7 @@ end
 group :test do
   gem 'factory_girl_rails'
   gem 'simplecov', require: false
-  gem "codeclimate-test-reporter", require: nil
+  gem 'codeclimate-test-reporter', require: nil
   gem 'rspec-sidekiq'
   gem 'shoulda-matchers'
   gem 'pry'

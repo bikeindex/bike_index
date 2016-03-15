@@ -20,6 +20,8 @@ class Integration < ActiveRecord::Base
     self.provider_name ||= information['provider']
     if provider_name == 'facebook'
       update_or_create_user(email: information['info']['email'], name: information['info']['name'])
+    elsif provider_name == 'strava'
+      update_or_create_user(email: information['info']['email'], name: information['info']['name'])
     end
   end
 
