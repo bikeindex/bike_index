@@ -18,6 +18,7 @@ class BikesController < ApplicationController
   before_filter :ensure_user_for_edit, only: [:edit, :update, :pdf]
   before_filter :render_ad, only: [:index, :show]
   before_filter :set_return_to, only: [:edit]
+  before_filter :remove_subdomain, only: [:index]
   layout 'no_container'
 
   def index
@@ -226,4 +227,7 @@ protected
     @ad = true
   end
 
+  def remove_subdomain
+    redirect_to bikes_url(subdomain: false) if request.subdomain.present?
+  end
 end

@@ -3,15 +3,24 @@ require 'spec_helper'
 describe BikesController do
 
   describe :index do
-    before do
-      get :index
-    end
-    it { should respond_with(:success) }
-    it { should render_template(:index) }
-    it { should_not set_the_flash }
+    context 'no subdomain' do
+      before do
+        get :index
+      end
+      it { should respond_with(:success) }
+      it { should render_template(:index) }
+      it { should_not set_the_flash }
 
-    it 'should set per_page correctly' do
-      expect(assigns(:per_page)).to eq 10
+      it 'should set per_page correctly' do
+        expect(assigns(:per_page)).to eq 10
+      end
+    end
+    context 'with subdomain' do
+      it 'should redirect to no subdomain' do
+        @request.host = 'stolen.example.com'
+        get :index
+        expect(response).to redirect_to bikes_url(subdomain: false)
+      end
     end
   end
 
