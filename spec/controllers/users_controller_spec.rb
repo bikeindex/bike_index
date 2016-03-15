@@ -4,7 +4,7 @@ describe UsersController do
 
   describe :new do 
     describe "already signed in" do 
-      before do 
+      before do
         user = FactoryGirl.create(:user)
         set_current_user(user)
         get :new
@@ -19,6 +19,10 @@ describe UsersController do
       it { should respond_with(:success) }
       it { should_not redirect_to(:new_session) }
       it { should render_template(:new) }
+    end
+    it 'calls set_return_to' do
+      expect(controller).to receive(:set_return_to)
+      get :new
     end
   end
 

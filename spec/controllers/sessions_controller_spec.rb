@@ -10,6 +10,10 @@ describe SessionsController do
       get :destroy
       session[:user_id].should be_nil
     end
+    it 'calls set_return_to' do
+      expect(controller).to receive(:set_return_to)
+      get :new
+    end
   end
 
   describe :destroy do 
@@ -46,6 +50,14 @@ describe SessionsController do
           response.should redirect_to admin_news_index_url
         end
 
+        it "redirects to discourse_authentication url if it's a valid oauth url" do
+          @user.should_receive(:authenticate).and_return(true)
+          session[:discourse_redirect] = 'sso=foo&sig=bar'
+          post :create, session: session
+          User.from_auth(cookies.signed[:auth]).should eq(@user)
+          response.should redirect_to discourse_authentication_url
+        end
+
         it "redirects to return_to if it's a valid oauth url" do
           @user.should_receive(:authenticate).and_return(true)
           session[:return_to] = oauth_authorization_url(cool_thing: true)
@@ -57,7 +69,7 @@ describe SessionsController do
 
         it "doesn't redirect and clears the session if not a valid oauth url" do
           @user.should_receive(:authenticate).and_return(true)
-          session[:return_to] = 'http://testhost.com/bad_place'
+          session[:return_to] = "http://testhost.com/bad_place?f=#{oauth_authorization_url(cool_thing: true)}"
           post :create, session: session
           User.from_auth(cookies.signed[:auth]).should eq(@user)
           session[:return_to].should be_nil

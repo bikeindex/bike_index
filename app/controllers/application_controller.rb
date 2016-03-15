@@ -36,6 +36,8 @@ class ApplicationController < ActionController::Base
       when /\A#{ENV['BASE_URL']}/, /\A\//
         redirect_to(target) and return true
       end
+    elsif session[:discourse_redirect]
+      redirect_to discourse_authentication_url
     end
   end
 

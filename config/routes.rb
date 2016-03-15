@@ -9,6 +9,7 @@ Bikeindex::Application.routes.draw do
   get 'dashboard/show'
 
   match '/discuss', to: redirect(ENV['DISCOURSE_URL']), as: :discuss
+  match 'discourse_authentication', to: 'discourse_authentication#index'
 
   resources :organizations do
     member do
