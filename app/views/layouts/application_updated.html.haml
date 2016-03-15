@@ -14,6 +14,8 @@
   - body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
   - body_class = "vendor-signup-page" if current_page?(:vendor_signup)
   %body#body{ class: body_class }
+    - cache 'facebook_pixel' do
+      = render '/shared/facebook_pixel'
     / = render 'layouts/grid'
     = render 'layouts/messages'
     .bodywrap
@@ -72,6 +74,5 @@
       
       - cache 'footer_updated' do
         = render 'shared/footer_updated'
-
   :plain
     <!-- Open source, https://github.com/bikeindex/bike_index -->
