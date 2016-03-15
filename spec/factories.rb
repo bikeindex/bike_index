@@ -207,7 +207,6 @@ FactoryGirl.define do
 
   factory :integration do
     access_token "12345teststststs"
-    provider_name "facebook"
   end
 
   factory :public_image do |u|
