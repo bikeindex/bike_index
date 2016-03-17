@@ -8,7 +8,6 @@ class ApplicationController < ActionController::Base
 
   def enable_rack_profiler
     if current_user && current_user.developer?
-      raise StandardError
       Rack::MiniProfiler.authorize_request
     end
   end
@@ -60,5 +59,4 @@ class ApplicationController < ActionController::Base
       render text: '', content_type: 'text/plain'
     end
   end
-
 end

@@ -11,7 +11,7 @@ end
 
 task :start do
   system 'redis-server &'
-  system 'bundle exec foreman start -f Procfile_development'
+  exec 'bundle exec foreman start -f Procfile_development'
 end
 
 desc 'Create frame_makers and push to redis'
