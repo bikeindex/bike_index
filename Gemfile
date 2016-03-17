@@ -61,7 +61,6 @@ gem 'grape-swagger'
 gem 'swagger-ui_rails'
 gem 'api-pagination'
 
-
 gem 'rack-throttle'
 gem 'secure_headers'
 gem 'eventmachine', '~> 1.0.3'
@@ -71,10 +70,10 @@ gem 'groupdate'
 
 gem 'sparkpost' # ruby client for email
 
-# gem 'localeapp'
-
+gem 'stackprof', require: false
+gem 'memory_profiler', require: false
 gem 'flamegraph', require: false
-gem 'rack-mini-profiler', require: false
+gem 'rack-mini-profiler', require: false # If you can't see it you can't make it better
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'
   gem 'coffee-rails', '~> 3.2.1'
