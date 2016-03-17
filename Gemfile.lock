@@ -169,8 +169,13 @@ GEM
       railties (>= 3.0.0)
     faraday (0.9.0)
       multipart-post (>= 1.2, < 3)
+    fast_stack (0.1.0)
+      rake
+      rake-compiler
     fastercsv (1.5.5)
     ffi (1.9.3)
+    flamegraph (0.1.0)
+      fast_stack
     fog (1.4.0)
       builder
       excon (~> 0.14.0)
@@ -331,6 +336,8 @@ GEM
       rack (>= 0.4)
     rack-contrib (1.1.0)
       rack (>= 0.9.1)
+    rack-mini-profiler (0.9.9.2)
+      rack (>= 1.2.0)
     rack-mount (0.8.3)
       rack (>= 1.0.0)
     rack-protection (1.5.3)
@@ -359,6 +366,8 @@ GEM
     rainbow (2.1.0)
     raindrops (0.13.0)
     rake (10.4.2)
+    rake-compiler (0.9.7)
+      rake
     rb-fsevent (0.9.4)
     rb-inotify (0.9.5)
       ffi (>= 0.5.0)
@@ -534,6 +543,7 @@ DEPENDENCIES
   draper
   eventmachine (~> 1.0.3)
   factory_girl_rails
+  flamegraph
   fog
   foreman
   geocoder
@@ -567,6 +577,7 @@ DEPENDENCIES
   pg_search
   pry
   rack-contrib
+  rack-mini-profiler
   rack-throttle
   rails (= 3.2.22)
   rb-fsevent (~> 0.9.1)

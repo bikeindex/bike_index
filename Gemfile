@@ -45,7 +45,6 @@ gem 'omniauth'
 gem 'fog'
 gem 'dalli'
 gem 'draper', require: false
-# gem 'rack-mini-profiler', require: 'false'
 gem 'dotenv-rails', '~> 0.8', git: 'https://github.com/bkeepers/dotenv'
 gem 'wkhtmltopdf-binary'
 gem 'wicked_pdf'
@@ -73,6 +72,9 @@ gem 'groupdate'
 gem 'sparkpost' # ruby client for email
 
 # gem 'localeapp'
+
+gem 'flamegraph', require: false
+gem 'rack-mini-profiler', require: false
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'
   gem 'coffee-rails', '~> 3.2.1'
