@@ -107,6 +107,10 @@ class User < ActiveRecord::Base
     superuser
   end
 
+  def developer?
+    developer
+  end
+
   def content?
     is_content_admin
   end

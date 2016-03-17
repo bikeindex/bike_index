@@ -259,9 +259,7 @@ CREATE TABLE bikes (
     hidden boolean DEFAULT false NOT NULL,
     frame_size_number double precision,
     updator_id integer,
-    is_for_sale boolean DEFAULT false NOT NULL,
-    verified boolean,
-    paid_for boolean
+    is_for_sale boolean DEFAULT false NOT NULL
 );
 
 
@@ -1813,7 +1811,8 @@ CREATE TABLE users (
     paid_membership_info text,
     is_content_admin boolean DEFAULT false NOT NULL,
     my_bikes_hash text,
-    is_emailable boolean DEFAULT false NOT NULL
+    is_emailable boolean DEFAULT false NOT NULL,
+    developer boolean DEFAULT false NOT NULL
 );
 
 
@@ -3095,3 +3094,5 @@ INSERT INTO schema_migrations (version) VALUES ('20150916133842');
 INSERT INTO schema_migrations (version) VALUES ('20151122175408');
 
 INSERT INTO schema_migrations (version) VALUES ('20160314144745');
+
+INSERT INTO schema_migrations (version) VALUES ('20160317183354');

@@ -4,7 +4,14 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
   ensure_security_headers
   helper_method :current_user, :current_organization, :user_root_url, :remove_session
-  
+  before_filter :enable_rack_profiler
+
+  def enable_rack_profiler
+    if current_user && current_user.developer?
+      raise StandardError
+      Rack::MiniProfiler.authorize_request
+    end
+  end
 
   def handle_unverified_request
     remove_session
