@@ -32,6 +32,11 @@
       = f.label :superuser, class: "control-label"
       .controls
         = f.check_box :superuser
+    - if current_user.developer?
+      .control-group
+      = f.label :developer, class: "control-label"
+      .controls
+        = f.check_box :developer
     .control-group
       = f.label :can_invite, class: "control-label"
       .controls
