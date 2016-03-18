@@ -26,6 +26,8 @@
 %article 
   = render '/shared/ad'
 
+/ Clear the ad overhang with a padded block
+.padded
 %article#discourse-comments
   :javascript
 
@@ -37,4 +39,3 @@
       d.src = DiscourseEmbed.discourseUrl + 'javascripts/embed.js';
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(d);
     })();
-  
