@@ -203,7 +203,11 @@ class BikesController < ApplicationController
 protected
 
   def find_bike
-    @bike = Bike.unscoped.find(params[:id])
+    begin
+      @bike = Bike.unscoped.find(params[:id])
+    rescue ActiveRecord::StatementInvalid => e
+      fail e.to_s =~ /PG..NumericValueOutOfRange/ ? ActiveRecord::RecordNotFound : e
+    end
     if @bike.hidden
       unless current_user.present? && @bike.visible_by(current_user)
         flash[:error] = "Bike deleted"

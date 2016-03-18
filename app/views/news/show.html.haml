@@ -26,7 +26,7 @@
 %article 
   = render '/shared/ad'
 
-- if Rails.env.production?
+- if Rails.env.production? && @blog.published
   / Clear the ad overhang with a padded block
   .padded
   %article#discourse-comments
