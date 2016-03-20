@@ -66,6 +66,14 @@ describe BikesController do
         response.code.should eq('200')
       end
     end
+
+    describe 'too large of integer' do
+      it 'responds with not found' do
+        expect do
+          get :show, id: 57549641769762268311552
+        end.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
   end
 
   describe :spokecard do
