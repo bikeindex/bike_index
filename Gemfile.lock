@@ -227,13 +227,15 @@ GEM
       guard (~> 2.0)
       rubocop (~> 0.20)
     haml (3.1.8)
-    haml-kramdown (0.0.1)
-      haml
     haml-rails (0.3.5)
       actionpack (>= 3.1, < 4.1)
       activesupport (>= 3.1, < 4.1)
       haml (~> 3.1)
       railties (>= 3.1, < 4.1)
+    hamlit (2.2.3)
+      temple (~> 0.7.6)
+      thor
+      tilt
     hashie (3.4.1)
     high_voltage (2.1.0)
     highline (1.6.21)
@@ -476,6 +478,7 @@ GEM
       activesupport (~> 3.0)
       railties (~> 3.0)
     swagger-ui_rails (0.1.7)
+    temple (0.7.6)
     terminal-table (1.4.5)
     therubyracer (0.12.1)
       libv8 (~> 3.16.14.0)
@@ -558,8 +561,8 @@ DEPENDENCIES
   guard-livereload
   guard-rspec (~> 4.2.10)
   guard-rubocop
-  haml-kramdown
   haml-rails
+  hamlit
   high_voltage
   i18n
   journey (~> 1.0.3)
