@@ -8,7 +8,7 @@ class ApplicationController < ActionController::Base
 
   def enable_rack_profiler
     if current_user && current_user.developer?
-      Rack::MiniProfiler.authorize_request
+      Rack::MiniProfiler.authorize_request unless Rails.env.test?
     end
   end
 
