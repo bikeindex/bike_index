@@ -78,11 +78,11 @@
         %dt
           Police Report
         = @stolen_record.police_report_number
-    - else
-      %h1.padded
-        Stolen record not created yet.
-      %p
-        Wait a minute or two and it will be here!
+  - else
+    %h1.padded
+      Stolen record not created yet.
+    %p
+      Wait a minute or two and it will be here!
 
   %hr.padded
   = link_to "Standard edit page", edit_admin_bike_url(@bike)
