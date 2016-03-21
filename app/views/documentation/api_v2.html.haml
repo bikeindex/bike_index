@@ -101,7 +101,7 @@
     .container-fluid
       .api-info-header
 
-        :plain
+        :markdown
           #{render "documentation/api_v2/info_header"}
       
       .start-of-swagger-ui
@@ -121,11 +121,17 @@
             %span.pull-right.less-strong
               = link_to "Add an application", "/oauth/applications"
             <a id="ref_your_applications"></a>
-          = render 'api_v2_applications'
+          - if @applications.present?
+            = render 'api_v2_applications'
+          - else
+            %p
+              You don't have any applications set up! To be able to use the API you will need to create an application and generate an access token.
+            %p
+              #{link_to "Add an application here", "/oauth/applications"}.
 
     .container-fluid
       .api-info-footer
-        :plain
+        :markdown
           #{render "documentation/api_v2/info_footer"}
 
     .container-fluid

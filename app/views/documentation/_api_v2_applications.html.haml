@@ -1,118 +1,110 @@
-- if @applications.present?
-  %ul.applications-list
-    - @applications.each do |application|
-      %li.application_list_box{ data: {id: application.id}}
-        / .well
-        = link_to "edit app", edit_oauth_application_url(application), class: 'pull-right'
-        %h4
+%ul.applications-list
+  - @applications.each do |application|
+    %li.application_list_box{ data: {id: application.id}}
+      / .well
+      = link_to "edit app", edit_oauth_application_url(application), class: 'pull-right'
+      %h4
 
-          %a.listed-app-name.uncollapsed{ href: "#"}
-            %span
-              &#x25B6;
-            = application.name
+        %a.listed-app-name.uncollapsed{ href: "#"}
+          %span
+            &#x25B6;
+          = application.name
 
-        .application-info.initially-hidden
-          - v2_accessor = application.access_tokens.where(resource_owner_id: ENV['V2_ACCESSOR_ID']).first
-          - if v2_accessor.present? && current_user.has_membership?
-            %table.table.tokens-table
-              %thead
+      .application-info.initially-hidden
+        - v2_accessor = application.access_tokens.where(resource_owner_id: ENV['V2_ACCESSOR_ID']).first
+        - if v2_accessor.present? && current_user.has_membership?
+          %table.table.tokens-table
+            %thead
+              %th
+                Permanent bike creation token
+                %span.less-strong
+                  use to create bikes for
+                  = current_user.organizations.map(&:name).to_sentence
+                %br
+                %span.less-strong
+                  ** You must include an 
+                  %code
+                    organization_slug
+                  when creating a bike to use this token **
+              %th
+                Scopes
+              %th
+            %tbody
+              %td
+                %pre
+                  = v2_accessor.token
+              %td
+                %code 
+                  write_bikes
+              %td
+                %a.set-token.btn.binxbtn-primary{href: '#', data: {token: v2_accessor.token }}
+                  Use token
+        %table.table.padded
+          %tbody
+            %tr
+              %td
+                ID:
+              %td
+                = application.uid
+            %tr
+              %td
+                Secret:
+              %td
+                = application.secret
+        - tokens = application.access_tokens.where(resource_owner_id: current_user.id).where('revoked_at IS NULL').select{ |t| t.expired? != true }
+        - if tokens.present?
+          %table.table.tokens-table
+            %thead
+              %tr
                 %th
-                  Permanent bike creation token
-                  %span.less-strong
-                    use to create bikes for
-                    = current_user.organizations.map(&:name).to_sentence
-                  %br
-                  %span.less-strong
-                    ** You must include an 
-                    %code
-                      organization_slug
-                    when creating a bike to use this token **
+                  Access token
                 %th
                   Scopes
                 %th
-              %tbody
-                %td
-                  %pre
-                    = v2_accessor.token
-                %td
-                  %code 
-                    write_bikes
-                %td
-                  %a.set-token.btn.binxbtn-primary{href: '#', data: {token: v2_accessor.token }}
-                    Use token
-          %table.table.padded
+                %th
             %tbody
-              %tr
-                %td
-                  ID:
-                %td
-                  = application.uid
-              %tr
-                %td
-                  Secret:
-                %td
-                  = application.secret
-          - tokens = application.access_tokens.where(resource_owner_id: current_user.id).where('revoked_at IS NULL').select{ |t| t.expired? != true }
-          - if tokens.present?
-            %table.table.tokens-table
-              %thead
+              - tokens.each do |token|
+                - next if token.expired?
                 %tr
-                  %th
-                    Access token
-                  %th
-                    Scopes
-                  %th
-                  %th
-              %tbody
-                - tokens.each do |token|
-                  - next if token.expired?
-                  %tr
-                    %td
-                      %pre
-                        = token.token
-                    %td
-                      - token.scopes.each do |s|
-                        %code 
-                          = s
-                    %td
-                      %a.set-token.btn.binxbtn-primary{href: '#', data: {token: token.token }}
-                        Use token
-                      = form_tag oauth_authorized_application_path(application), class: 'pull-right' do
-                        %input{:name => "_method", :type => "hidden", :value => "delete"}/
-                        = submit_tag 'Delete', onclick: "return confirm('Are you sure?')", class: 'btn binxbtn-danger'
-            / - tokens = 
-            %p
-              Refresh token:
-              %code
-                = application.access_tokens.where(resource_owner_id: current_user.id).where('revoked_at IS NULL').last.refresh_token
+                  %td
+                    %pre
+                      = token.token
+                  %td
+                    - token.scopes.each do |s|
+                      %code 
+                        = s
+                  %td
+                    %a.set-token.btn.binxbtn-primary{href: '#', data: {token: token.token }}
+                      Use token
+                    = form_tag oauth_authorized_application_path(application), class: 'pull-right' do
+                      %input{:name => "_method", :type => "hidden", :value => "delete"}/
+                      = submit_tag 'Delete', onclick: "return confirm('Are you sure?')", class: 'btn binxbtn-danger'
+          %p
+            Refresh token:
+            %code
+              = application.access_tokens.where(resource_owner_id: current_user.id).where('revoked_at IS NULL').last.refresh_token
+        - else
+          %h4 no personal tokens
+          - if application.redirect_uri.match("#{authorize_documentation_index_url}")
+            .clearfix
+              %a.btn.binxbtn.pull-right.add-token-form-btn{ href: "#", data: {target: "add-token-app#{application.id}"}}
+                Add token
+              .initially-hidden.add-token-form
+                %hr
+                .form.form-inline
+                  
+                  - OAUTH_SCOPES.reject { |s| s.to_s.match(/(bikewise)|(public)/i).present? }.each do |scope|
+                    %label.checkbox.newtoken-scope-check
+                      = check_box_tag scope
+                      = scope.to_s
+                - url = oauth_authorization_url(client_id: application.uid, redirect_uri: authorize_documentation_index_url, response_type: 'code')
+                %p.authorize-new-explain
+                  Authorize this new token:
+                  %span.less-strogn
+                    (click the link)
+                %pre
+                  %a.authorize_new_token_link{ href: url, data: {base: url}}
+                    = url
           - else
-            %h4 no personal tokens
-            - if application.redirect_uri.match("#{authorize_documentation_index_url}")
-              .clearfix
-                %a.btn.binxbtn.pull-right.add-token-form-btn{ href: "#", data: {target: "add-token-app#{application.id}"}}
-                  Add token
-                .initially-hidden.add-token-form
-                  %hr
-                  .form.form-inline
-                    
-                    - OAUTH_SCOPES.reject { |s| s.to_s.match(/(bikewise)|(public)/i).present? }.each do |scope|
-                      %label.checkbox.newtoken-scope-check
-                        = check_box_tag scope
-                        = scope.to_s
-                  - url = oauth_authorization_url(client_id: application.uid, redirect_uri: authorize_documentation_index_url, response_type: 'code')
-                  %p.authorize-new-explain
-                    Authorize this new token:
-                    %span.less-strogn
-                      (click the link)
-                  %pre
-                    %a.authorize_new_token_link{ href: url, data: {base: url}}
-                      = url
-            - else
-              .alert.alert-danger.margined
-                This application doesn't have the documentation URL as a redirect, so  you can't create tokens for it here. #{link_to "Add the documentation URL", edit_oauth_application_url(application)} as a redirect url if you would like to be able to.
-
-  - else
-    %p
-      You don't have any applications set up! To be able to use the API you will need to create an application and generate an access token.
-    %p
-      #{link_to "Add an application here", "/oauth/applications"}.
+            .alert.alert-danger.margined
+              This application doesn't have the documentation URL as a redirect, so  you can't create tokens for it here. #{link_to "Add the documentation URL", edit_oauth_application_url(application)} as a redirect url if you would like to be able to.
