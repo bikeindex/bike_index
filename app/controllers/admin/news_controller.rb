@@ -7,11 +7,7 @@ class Admin::NewsController < Admin::BaseController
   end
 
   def new
-    @blog = Blog.new(published_at: Time.now,
-      user_id: current_user.id,
-      is_listicle: current_user.is_content_admin
-    )
-    @users = User.all
+    @blog = Blog.new(published_at: Time.now, user_id: current_user.id)
   end
 
   def image_edit
@@ -24,7 +20,6 @@ class Admin::NewsController < Admin::BaseController
   end
 
   def edit
-    @users = User.all
   end
 
   def update
@@ -50,7 +45,7 @@ class Admin::NewsController < Admin::BaseController
       user_id: current_user.id,
       body: "No content yet, write some now!",
       published_at: Time.now,
-      is_listicle: params[:blog][:is_listicle]
+      is_listicle: false
     })
     if @blog.save
       flash[:notice] = "Blog created!"
