@@ -34,11 +34,7 @@
           - else
             = bike.created_at.strftime("%-m.%-d.%Y")
       %td.medium-screens
-        - if bike.created_with_token
-          %span.less-strong
-            Free bike token
-        - else
-          = bike.owner_email
+        = bike.owner_email
       %td
         - if bike.manufacturer_other.present?
           %span.table-error

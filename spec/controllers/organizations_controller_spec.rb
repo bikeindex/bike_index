@@ -75,7 +75,6 @@ describe OrganizationsController do
       user2 = FactoryGirl.create(:user)
       org = {available_invitation_count:"10",
         sent_invitation_count: "1",
-        default_bike_token_count: "2",
         is_suspended: false,
         embedable_user_email: user.email,
         auto_user_id: user.id,
@@ -92,7 +91,6 @@ describe OrganizationsController do
       set_current_user(user)
       org_update = {available_invitation_count:"20",
         sent_invitation_count: "0",
-        default_bike_token_count: "39",
         is_suspended: true,
         embedable_user_email: user2.email,
         auto_user_id: user2.id,

@@ -11,7 +11,7 @@ describe ApplicationHelper do
 
   describe :admin_nav_link do 
     it "returns link, active if it ought to be" do 
-      view.stub(:controller_name).and_return("bike_token_invitations")
+      view.stub(:controller_name).and_return("organization_invitations")
       generated = '<a href="/invitations" class="">Invitations</a>'
       helper.nav_link("Invitations", "/invitations").should eq(generated)
     end

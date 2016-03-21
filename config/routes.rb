@@ -67,7 +67,6 @@ Bikeindex::Application.routes.draw do
   match 'my_account', to: 'users#edit'
   match 'accept_vendor_terms', to: 'users#accept_vendor_terms'
   match 'accept_terms', to: 'users#accept_terms'
-  resources :bike_token_invitations, only: [:create]
   resources :user_embeds, only: [:show]
 
   resources :news, only: [:show, :index]
@@ -107,8 +106,8 @@ Bikeindex::Application.routes.draw do
     match 'tsvs', to: 'dashboard#tsvs'
     match 'bust_z_cache', to: 'dashboard#bust_z_cache'
     match 'destroy_example_bikes', to: 'dashboard#destroy_example_bikes'
-    resources :memberships, :organizations, :bike_token_invitations,
-              :organization_invitations, :paints, :ads, :recovery_displays, :mail_snippets
+    resources :memberships, :organizations, :organization_invitations,
+              :paints, :ads, :recovery_displays, :mail_snippets
     resources :flavor_texts, only: [:destroy, :create]
     resources :stolen_bikes do
       member { post :approve }
@@ -143,10 +142,7 @@ Bikeindex::Application.routes.draw do
     resources :manufacturers do
       collection { post :import }
     end
-    resources :users, only: [:index, :edit, :update, :destroy] do
-      get :bike_tokens
-      post :add_bike_tokens
-    end
+    resources :users, only: [:index, :edit, :update, :destroy]
   end
 
   namespace :api, defaults: { format: 'json' } do

@@ -10,13 +10,6 @@ class CreateUserJobs
     end
   end
 
-  def associate_token_invites
-    bike_token_invitations = BikeTokenInvitation.where(["lower(invitee_email) = ?", @user.email.downcase.strip])
-    if bike_token_invitations.any?
-      bike_token_invitations.each { |i| i.assign_to(@user) }
-    end
-  end
-
   def associate_membership_invites
     organization_invitations = OrganizationInvitation.where(["lower(invitee_email) = ?", @user.email.downcase.strip])
     if organization_invitations.any?
@@ -35,7 +28,6 @@ class CreateUserJobs
 
   def do_jobs
     associate_ownerships
-    associate_token_invites
     associate_membership_invites
 
     if @user.confirmed 

@@ -13,11 +13,9 @@ class BikeCreatorOrganizer
   end
 
   def organization_usable(organization)
-    unless @bike.created_with_token
-      unless @b_param.creator.is_member_of?(organization)
-        @bike.errors.add(:creation_organization, "You have to be part of #{organization.name} to add a bike through them")
-        return false
-      end
+    unless @b_param.creator.is_member_of?(organization)
+      @bike.errors.add(:creation_organization, "You have to be part of #{organization.name} to add a bike through them")
+      return false
     end
     if organization.is_suspended
       @bike.errors.add(:creation_organization, "Oh no! #{organization.name} is currently suspended. Contact us if this is a surprise.")

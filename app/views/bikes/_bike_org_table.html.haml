@@ -37,10 +37,6 @@
           %td.large-screens
             = bike.primary_frame_color.name
           %td.medium-screens
-            - if bike.created_with_token
-              %span.less-strong
-                Free bike token
-            - else
-              = bike.owner_email
+            = bike.owner_email
           %td.large-screens
             = link_to "PDF", pdf_bike_url(bike)

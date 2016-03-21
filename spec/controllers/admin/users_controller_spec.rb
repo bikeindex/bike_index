@@ -30,7 +30,6 @@ describe Admin::UsersController do
           superuser: true,
           developer: true,
           is_content_admin: true,
-          can_invite: true,
           can_send_many_stolen_notifications: true,
           banned: true
         }
@@ -39,7 +38,6 @@ describe Admin::UsersController do
         user.confirmed.should be_true
         user.superuser.should be_true
         user.developer.should be_false
-        user.can_invite.should be_true
         user.can_send_many_stolen_notifications.should be_true
         user.banned.should be_true
       end
@@ -58,7 +56,6 @@ describe Admin::UsersController do
           email: user.email,
           superuser: false,
           is_content_admin: true,
-          can_invite: true,
           can_send_many_stolen_notifications: true,
           banned: true
         }

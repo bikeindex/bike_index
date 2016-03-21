@@ -80,18 +80,8 @@ describe BikeCreatorVerifier do
     end
   end
 
-  describe :check_token do
-    it 'sets the bike to what BikeCreatorTokenizer returns' do 
-      bike = Bike.new
-      b_param = BParam.new(params: {stolen: false})
-      creator = BikeCreatorVerifier.new(b_param, bike)
-      BikeCreatorTokenizer.any_instance.should_receive(:tokenized_bike).and_return(bike)
-      creator.check_token.should eq(bike)
-    end
-  end
-
   describe :check_organization do
-    it 'sets the bike to what BikeCreatorTokenizer returns' do 
+    it 'sets the bike to what BikeCreatorOrganizer returns' do 
       bike = Bike.new
       b_param = BParam.new(params: {stolen: false})
       creator = BikeCreatorVerifier.new(b_param, bike)
@@ -145,7 +135,6 @@ describe BikeCreatorVerifier do
       bike = Bike.new
       b_param = BParam.new(params: {stolen: true})
       creator = BikeCreatorVerifier.new(b_param, bike)
-      creator.should_receive(:check_token).and_return(true) 
       creator.should_receive(:check_stolen_and_recovered).and_return(true)
       creator.should_receive(:check_example).and_return(true)
       creator.verify.should eq(bike)
