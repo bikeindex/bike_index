@@ -5,7 +5,7 @@ describe BikeCreatorOrganizer do
   describe :unorganize do
     it "removes the token attributes" do 
       bike = Bike.new(creation_organization_id: 4)
-      b_param = BParam.new(params: {stolen: false})
+      b_param = BParam.new(params: { stolen: false })
       creator = BikeCreatorOrganizer.new(b_param, bike)
       creator.unorganize
       bike.creation_organization_id.should be_nil
@@ -14,9 +14,8 @@ describe BikeCreatorOrganizer do
 
   describe :use_organization do
     it "marks the bike organized" do 
-      bike_token = BikeToken.new 
       bike = Bike.new
-      b_param = BParam.new(params: {stolen: false})
+      b_param = BParam.new(params: { stolen: false })
       organization = Organization.new 
       organization.stub(:id).and_return(2)
       creator = BikeCreatorOrganizer.new(b_param, bike)
@@ -57,14 +56,13 @@ describe BikeCreatorOrganizer do
   end
 
   describe :organization_usable do 
-    it "adds an error if the creator doesn't have a membership to the organization and the bike isn't created with a bike token" do
+    it "adds an error if the creator doesn't have a membership to the organization" do
       bike = Bike.new
       b_param = BParam.new
-      organization = BikeToken.new
       user = User.new
+      organization = Organization.new
       organization.stub(:is_suspended).and_return(false)
       organization.stub(:name).and_return("Ballsy")
-      bike.stub(:created_with_token).and_return(false)
       b_param.stub(:creator).and_return(user)
       user.stub(:is_member_of?).and_return(false)
       creator = BikeCreatorOrganizer.new(b_param, bike)
@@ -74,23 +72,23 @@ describe BikeCreatorOrganizer do
     it "adds an error if the organization is suspended is used" do 
       bike = Bike.new
       b_param = BParam.new
-      organization = BikeToken.new
-      bike.stub(:created_with_token).and_return(true)
+      user = User.new
+      organization = Organization.new
+      b_param.stub(:creator).and_return(user)
+      user.stub(:is_member_of?).and_return(true)
       organization.stub(:name).and_return("Ballsy")
       organization.stub(:is_suspended).and_return(true)
       creator = BikeCreatorOrganizer.new(b_param, bike)
       creator.organization_usable(organization).should be_false
       bike.errors[:creation_organization].should_not be_nil
     end
-
     it "returns true" do
       bike = Bike.new
       b_param = BParam.new
-      organization = BikeToken.new
       user = User.new
+      organization = Organization.new
       organization.stub(:is_suspended).and_return(false)
       organization.stub(:name).and_return("Ballsy")
-      bike.stub(:created_with_token).and_return(false)
       b_param.stub(:creator).and_return(user)
       user.stub(:is_member_of?).and_return(true)
       creator = BikeCreatorOrganizer.new(b_param, bike)
@@ -101,7 +99,7 @@ describe BikeCreatorOrganizer do
   describe :check_organization do
     it "returns false if organization is not present" do 
       bike = Bike.new
-      b_param = BParam.new(params: {stolen: false})
+      b_param = BParam.new(params: { stolen: false })
       creator = BikeCreatorOrganizer.new(b_param, bike)
       creator.should_receive(:unorganize).and_return(true)
       creator.check_organization
@@ -119,7 +117,7 @@ describe BikeCreatorOrganizer do
     it "calls organize with the org if it's in the bike params" do 
       bike = Bike.new
       b_param = BParam.new
-      b_param.stub(:params).and_return(bike: {creation_organization_id: 69})
+      b_param.stub(:params).and_return(bike: { creation_organization_id: 69 })
       creator = BikeCreatorOrganizer.new(b_param, bike)
       creator.should_receive(:organize).with(69)
       creator.check_organization
@@ -128,7 +126,7 @@ describe BikeCreatorOrganizer do
 
   describe :organized_bike do 
     it "unorganizes if there are errors and return the bike" do
-      bike = Bike.new(created_with_token: false)
+      bike = Bike.new
       bike.errors.add(:creation_organization, "Oh no, wrong org")
       b_param = BParam.new
       creator = BikeCreatorOrganizer.new(b_param, bike)

@@ -5,7 +5,6 @@ describe Organization do
   describe :validations do
     # it { should validate_uniqueness_of :slug }
     it { should validate_presence_of :name }
-    it { should validate_presence_of :default_bike_token_count }
     it { should have_many :memberships }
     it { should have_many :organization_deals }
     it { should have_many :users }

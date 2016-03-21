@@ -28,12 +28,6 @@
         Email
       %th
         Bikes
-      %th.medium-screens
-        Memberships
-      %th.large-screens
-        Tickets
-      %th.large-screens
-        Management links
     %tbody
       - @users.each do |user|
         %tr
@@ -58,11 +52,6 @@
             - if user.memberships.present?
               - user.memberships.each do |membership|
                 = link_to "#{membership.organization.name} ", admin_membership_url(membership)
-          %td.large-screens
-            - if user.bike_tokens.count > 0
-              = user.bike_tokens.count
-          %td.large-screens
-            #{link_to 'Grant Bike Tokens', admin_user_bike_tokens_url(user.id)}
   %p.pull-right
     #{User.count} users total
     - today = User.where("created_at >= ?", Time.zone.now.beginning_of_day).count

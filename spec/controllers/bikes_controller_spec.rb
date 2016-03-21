@@ -137,16 +137,6 @@ describe BikesController do
       get :new
       response.code.should eq('200')
     end
-
-    it 'renders a new bike_token bike' do
-      user = FactoryGirl.create(:user)
-      bike_token = FactoryGirl.create(:bike_token, user: user)
-      FactoryGirl.create(:cycle_type, name: 'Bike', slug: 'bike')
-      FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
-      set_current_user(user)
-      get :new, { bike_token_id: bike_token.id }
-      response.code.should eq('200')
-    end
   end
   
 
@@ -204,15 +194,6 @@ describe BikesController do
         @b_param.reload.created_bike_id.should_not be_nil
         @b_param.reload.bike_errors.should be_nil
         @user.reload.phone.should eq('3123799513')
-      end
-
-      it 'updates the bike token to be used when creating a bike token bike' do
-        bike_tokend = FactoryGirl.create(:bike_token, user: @user)
-        @bike[:bike_token_id] = bike_tokend.id 
-        lambda {
-          post :create, {bike: @bike}
-        }.should change(Ownership, :count).by(1)
-        bike_tokend.reload.used?.should be_true
       end
 
       it 'creates a new ownership and bike from an organization' do

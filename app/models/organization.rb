@@ -6,7 +6,6 @@ class Organization < ActiveRecord::Base
     :short_name,
     :slug,
     :website,
-    :default_bike_token_count,
     :show_on_map,
     :is_suspended,
     :org_type,
@@ -34,7 +33,7 @@ class Organization < ActiveRecord::Base
   has_many :locations, dependent: :destroy
   accepts_nested_attributes_for :locations, allow_destroy: true
 
-  validates_presence_of :name, :default_bike_token_count
+  validates_presence_of :name
 
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact admin@bikeindex.org"
 

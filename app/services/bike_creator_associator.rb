@@ -28,14 +28,6 @@ class BikeCreatorAssociator
     bike.create_normalized_serial_segments
   end
 
-  def update_bike_token(bike)
-    if @b_param.bike_token_id.present?
-      bike_token = BikeToken.find(@b_param.bike_token_id)
-      bike_token.bike_id = bike.id
-      return true if bike_token.save
-    end
-  end
-
   def attach_photo(bike)
     return true unless @b_param.image.present?
     public_image = PublicImage.new(image: @b_param.image)
@@ -63,7 +55,6 @@ class BikeCreatorAssociator
       create_components(bike)
       create_normalized_serial_segments(bike)
       create_stolen_record(bike) if bike.stolen
-      update_bike_token(bike) if bike.created_with_token
       attach_photo(bike)
       attach_photos(bike)
       add_other_listings(bike)

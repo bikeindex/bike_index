@@ -80,15 +80,3 @@
   .locks-well
     .well
       = render "locks/lock_home"
-
-
-  - if current_user.can_invite
-    - if current_user.memberships.any?
-      .user-token-invitations
-        = render "/bike_token_invitations/form"
-    - else
-      .user-token-invitations
-        %h2
-          Whoops, you need to be part of an organization to send free bike tokens
-        %p
-          Please contact someone with administrator privileges to fix this!

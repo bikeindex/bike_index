@@ -18,15 +18,6 @@ describe CreateUserJobs do
     end
   end
 
-  describe :associate_token_invites do
-    it "assigns any bike token invitations that match the user email" do 
-      @bike_token_invitation = FactoryGirl.create(:bike_token_invitation, invitee_email: "owner1@a.com", bike_token_count: 13)
-      @user = FactoryGirl.create(:user, email: "owner1@A.COM")
-      CreateUserJobs.new(user: @user).associate_token_invites
-      @user.reload.bike_tokens.count.should eq(13)
-    end
-  end
-
   describe :associate_membership_invites do 
     it "assigns any organization invitations that match the user email, and mark user confirmed if invited" do 
       organization_invitation = FactoryGirl.create(:organization_invitation, invitee_email: "owNER1@a.com")
@@ -61,7 +52,6 @@ describe CreateUserJobs do
       create_user_jobs = CreateUserJobs.new(user: user)
       user.stub(:confirmed).and_return(false)
       create_user_jobs.should_receive(:associate_ownerships).and_return(true)
-      create_user_jobs.should_receive(:associate_token_invites).and_return(true)
       create_user_jobs.should_receive(:associate_membership_invites).and_return(true)
       create_user_jobs.should_receive(:send_confirmation_email)
       create_user_jobs.do_jobs
@@ -72,7 +62,6 @@ describe CreateUserJobs do
       create_user_jobs = CreateUserJobs.new(user: user)
       user.stub(:confirmed).and_return(true)
       create_user_jobs.should_receive(:associate_ownerships).and_return(true)
-      create_user_jobs.should_receive(:associate_token_invites).and_return(true)
       create_user_jobs.should_receive(:associate_membership_invites).and_return(true)
       create_user_jobs.should_receive(:send_welcome_email)
       create_user_jobs.do_jobs

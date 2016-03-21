@@ -4,10 +4,6 @@ class BikeCreatorVerifier
     @bike = bike
   end
 
-  def check_token
-    @bike = BikeCreatorTokenizer.new(@b_param, @bike).tokenized_bike
-  end
-
   def check_organization
     @bike = BikeCreatorOrganizer.new(@b_param, @bike).organized_bike
   end
@@ -55,7 +51,6 @@ class BikeCreatorVerifier
   end
 
   def verify
-    check_token
     check_organization
     check_stolen_and_recovered
     check_example

@@ -31,7 +31,6 @@ class Admin::UsersController < Admin::BaseController
     @user.confirmed = params[:user][:confirmed]
     @user.superuser = params[:user][:superuser]
     @user.is_content_admin = params[:user][:is_content_admin]
-    @user.can_invite = params[:user][:can_invite]
     @user.banned = params[:user][:banned]
     @user.username = params[:user][:username]
     @user.can_send_many_stolen_notifications = params[:user][:can_send_many_stolen_notifications]
@@ -41,24 +40,6 @@ class Admin::UsersController < Admin::BaseController
       bikes = @user.bikes
       @bikes = BikeDecorator.decorate_collection(bikes)
       render action: :edit
-    end
-  end
-
-  def bike_tokens
-    @user = User.find(params[:user_id])
-  end
-
-  def add_bike_tokens
-    @user = User.find(params[:user_id])
-    if params[:count].present? and params[:organization_id].present?
-      params[:count].to_i.times do
-        bt = BikeToken.new
-        bt.user = @user
-        bt.organization = Organization.find(params[:organization_id])
-        bt.save!
-      end
-    else
-      render action: :bike_tokens
     end
   end
 

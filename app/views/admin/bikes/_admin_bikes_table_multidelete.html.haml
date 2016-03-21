@@ -39,11 +39,7 @@
             %span.less-strong-right
               pos
       %td.medium-screens
-        - if bike.created_with_token
-          %span.less-strong
-            Free bike token
-        - else
-          = bike.owner_email
+        = bike.owner_email
       %td.large-screens
         .less-strong-hold
           %strong

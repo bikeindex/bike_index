@@ -9,7 +9,6 @@ task seed_test_users_and_bikes: :environment do
   user.save
   user = User.create(name: "member", email: "member@example.com", password: "please12", password_confirmation: "please12", terms_of_service: true)
   user.confirmed = true 
-  user.can_invite = true
   user.save
   user = User.create(name: "user", email: "user@example.com", password: "please12", password_confirmation: "please12", terms_of_service: true)
   user.confirmed = true 
@@ -21,11 +20,11 @@ task seed_test_users_and_bikes: :environment do
   user.confirmed = true 
   user.save
 
-  org = Organization.create(name: "Ikes Bike's", website: "", short_name: "Ikes", default_bike_token_count: 5, show_on_map: true)
+  org = Organization.create(name: "Ikes Bike's", website: "", short_name: "Ikes", show_on_map: true)
   org.save
   membership = Membership.create(organization_id: org.id, user_id: User.find_by_email("member@example.com").id, role: "admin")
   membership.save
-  org = Organization.create(name: "Example organization", website: "", short_name: "Example org", default_bike_token_count: 5, show_on_map: false, access_token: "7fb1c38526e57a98ec57760aa7f84992")
+  org = Organization.create(name: "Example organization", website: "", short_name: "Example org", show_on_map: false, access_token: "7fb1c38526e57a98ec57760aa7f84992")
   org.save
   membership = Membership.create(organization_id: org.id, user_id: User.find_by_email("example_user@bikeindex.org").id, role: "member")
   membership.save
