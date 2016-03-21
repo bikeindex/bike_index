@@ -4,7 +4,6 @@ class BParam < ActiveRecord::Base
     :creator_id,
     :bike_title,
     :created_bike_id,
-    :bike_token_id,
     :bike_errors,
     :image,
     :image_processed, 
@@ -20,7 +19,6 @@ class BParam < ActiveRecord::Base
 
   belongs_to :created_bike, class_name: "Bike"
   belongs_to :creator, class_name: "User"
-  belongs_to :bike_token
   validates_presence_of :creator
 
   before_create :generate_id_token

@@ -49,11 +49,7 @@
                 = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
               = bike.created_at.strftime("%-m/%-d/%Y at %-I %p")
           %td.medium-screens
-            - if bike.created_with_token
-              %span.less-strong
-                Free bike ticket
-            - else
-              = bike.owner_email
+            = bike.owner_email
           %td
             = bike.manufacturer_name
           %td.large-screens

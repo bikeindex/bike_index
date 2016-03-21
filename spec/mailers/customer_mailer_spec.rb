@@ -65,18 +65,6 @@ describe CustomerMailer do
     end
   end
 
-  describe :bike_token_invitation_email do
-    before :each do
-      @bike_token_invitation = FactoryGirl.create(:bike_token_invitation, message: "Test Message", subject: "Test subject")
-      @mail = CustomerMailer.bike_token_invitation_email(@bike_token_invitation)
-    end
-
-    it "renders email" do
-      @mail.subject.should eq("Test subject")
-      @mail.body.encoded.should match(@bike_token_invitation.message)
-    end
-  end
-
   describe :stolen_notification_email do 
     it "renders email and update sent_dates" do
       stolen_notification = FactoryGirl.create(:stolen_notification, message: "Test Message")

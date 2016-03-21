@@ -91,7 +91,6 @@ CREATE TABLE b_params (
     created_bike_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    bike_token_id integer,
     bike_errors text,
     image character varying(255),
     image_tmp character varying(255),
@@ -117,79 +116,6 @@ CREATE SEQUENCE b_params_id_seq
 --
 
 ALTER SEQUENCE b_params_id_seq OWNED BY b_params.id;
-
-
---
--- Name: bike_token_invitations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE bike_token_invitations (
-    id integer NOT NULL,
-    subject text DEFAULT 'Bike Index? Awesome!'::text,
-    message text DEFAULT 'I just sent you a free bike registration.'::text,
-    bike_token_count integer DEFAULT 1,
-    inviter_id integer,
-    invitee_id integer,
-    organization_id integer,
-    invitee_name character varying(255),
-    invitee_email character varying(255),
-    redeemed boolean,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: bike_token_invitations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE bike_token_invitations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: bike_token_invitations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE bike_token_invitations_id_seq OWNED BY bike_token_invitations.id;
-
-
---
--- Name: bike_tokens; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE bike_tokens (
-    id integer NOT NULL,
-    user_id integer,
-    bike_id integer,
-    used_at timestamp without time zone,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    organization_id integer
-);
-
-
---
--- Name: bike_tokens_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE bike_tokens_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: bike_tokens_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE bike_tokens_id_seq OWNED BY bike_tokens.id;
 
 
 --
@@ -222,7 +148,6 @@ CREATE TABLE bikes (
     year integer,
     has_no_serial boolean DEFAULT false NOT NULL,
     creator_id integer,
-    created_with_token boolean DEFAULT false NOT NULL,
     location_id integer,
     front_tire_narrow boolean,
     primary_frame_color_id integer,
@@ -1304,7 +1229,6 @@ CREATE TABLE organizations (
     updated_at timestamp without time zone NOT NULL,
     website character varying(255),
     short_name character varying(255),
-    default_bike_token_count integer DEFAULT 5 NOT NULL,
     show_on_map boolean,
     sent_invitation_count integer DEFAULT 0,
     deleted_at timestamp without time zone,
@@ -1803,7 +1727,6 @@ CREATE TABLE users (
     when_vendor_terms_of_service timestamp without time zone,
     confirmed boolean,
     confirmation_token character varying(255),
-    can_invite boolean,
     can_send_many_stolen_notifications boolean DEFAULT false NOT NULL,
     auth_token character varying(255),
     stripe_id character varying(255),
@@ -1881,20 +1804,6 @@ ALTER TABLE ONLY ads ALTER COLUMN id SET DEFAULT nextval('ads_id_seq'::regclass)
 --
 
 ALTER TABLE ONLY b_params ALTER COLUMN id SET DEFAULT nextval('b_params_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY bike_token_invitations ALTER COLUMN id SET DEFAULT nextval('bike_token_invitations_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY bike_tokens ALTER COLUMN id SET DEFAULT nextval('bike_tokens_id_seq'::regclass);
 
 
 --
@@ -2212,22 +2121,6 @@ ALTER TABLE ONLY ads
 
 ALTER TABLE ONLY b_params
     ADD CONSTRAINT b_params_pkey PRIMARY KEY (id);
-
-
---
--- Name: bike_token_invitations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY bike_token_invitations
-    ADD CONSTRAINT bike_token_invitations_pkey PRIMARY KEY (id);
-
-
---
--- Name: bike_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY bike_tokens
-    ADD CONSTRAINT bike_tokens_pkey PRIMARY KEY (id);
 
 
 --
@@ -3096,3 +2989,5 @@ INSERT INTO schema_migrations (version) VALUES ('20151122175408');
 INSERT INTO schema_migrations (version) VALUES ('20160314144745');
 
 INSERT INTO schema_migrations (version) VALUES ('20160317183354');
+
+INSERT INTO schema_migrations (version) VALUES ('20160320154610');

@@ -10,7 +10,6 @@ class Admin::DashboardController < Admin::BaseController
   def invitations
     @organizations = Organization.all 
     @organization_invitation = OrganizationInvitation.new 
-    @bike_token_invitation = BikeTokenInvitation.new 
   end
 
   def maintenance

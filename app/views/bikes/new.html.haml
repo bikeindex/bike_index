@@ -19,9 +19,6 @@
         = f.hidden_field :location_id, value: @location.id
       - if @bike.creation_organization_id.present?
         = f.hidden_field :creation_organization_id
-      - if @bike.created_with_token.present?
-        = hidden_field_tag :bike_token_id, @bike.bike_token_id
-
       .inner-recep
         .adding-bike{ class: "#{"recovered-color" if @bike.recovered}" }
           %h1

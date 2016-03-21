@@ -14,7 +14,6 @@ describe User do
     it { should have_many :currently_owned_bikes }
     it { should have_many :integrations }
     it { should have_many :created_ownerships }
-    it { should have_many :bike_tokens }
     it { should have_many :locks }
     it { should have_many :organization_invitations }
     it { should have_many :oauth_applications }
@@ -194,25 +193,6 @@ describe User do
       ownership = FactoryGirl.create(:ownership, owner_email: user.email, user_id: user.id, user_hidden: true)
       ownership.bike.update_attribute :hidden, true
       user.bike_ids(false).include?(ownership.bike.id).should be_false
-    end
-  end
-
-  describe :available_bike_tokens do
-    before :each do
-      @organization = FactoryGirl.create(:organization)
-      @user = FactoryGirl.create(:user)
-      5.times do
-        FactoryGirl.create(:bike_token, user: @user, organization: @organization)
-      end
-      @bike = FactoryGirl.create(:bike)
-    end
-
-    it "returns the available bike tokens" do
-      @user.available_bike_tokens.count.should eq(5)
-      @user.available_bike_tokens.first.destroy
-      @user.available_bike_tokens.count.should eq(4)
-      @user.available_bike_tokens.first.update_column(:bike_id, @bike)
-      @user.available_bike_tokens.count.should eq(3)
     end
   end
 

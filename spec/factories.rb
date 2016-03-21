@@ -34,20 +34,6 @@ FactoryGirl.define do
     end
   end
 
-  factory :bike_token do
-    association :user
-    association :organization
-  end
-
-  factory :bike_token_invitation do
-    association :inviter, factory: :user
-    association :organization
-    message "You've been sent a bike token!"
-    subject "Join the Bike Index, we're awesome"
-    bike_token_count 1
-    invitee_email "george@test.com"
-  end
-
   factory :cycle_type do
     name { FactoryGirl.generate(:unique_name) }
     slug { FactoryGirl.generate(:unique_name) }
@@ -160,7 +146,6 @@ FactoryGirl.define do
     name
     sequence(:short_name) {|n| "short_name#{n}"}
     slug
-    default_bike_token_count 5
     available_invitation_count 5
   end
 

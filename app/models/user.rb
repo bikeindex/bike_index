@@ -52,7 +52,6 @@ class User < ActiveRecord::Base
   has_many :integrations, dependent: :destroy
   has_many :created_ownerships, class_name: 'Ownership', inverse_of: :creator
   has_many :created_bicycles, class_name: 'Bike', inverse_of: :creator
-  has_many :bike_tokens, dependent: :destroy
   has_many :locks, dependent: :destroy
 
   has_many :sent_stolen_notifications, class_name: 'StolenNotification', foreign_key: :sender_id
@@ -247,10 +246,6 @@ class User < ActiveRecord::Base
       stolen = true if Bike.find(bike_id).stolen
     end
     return stolen
-  end
-
-  def available_bike_tokens
-    self.bike_tokens.available
   end
 
   before_save :set_urls

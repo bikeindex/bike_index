@@ -94,16 +94,6 @@ class CustomerMailer < ActionMailer::Base
     end
   end
 
-  def bike_token_invitation_email(bt_invitation)
-    @bike_token_invitation = bt_invitation
-    @inviter = User.find(@bike_token_invitation.inviter_id)
-    @new_user = true unless User.fuzzy_email_find(@bike_token_invitation.invitee_email)
-    mail(to: @bike_token_invitation.invitee_email, from: @inviter.email, subject: @bike_token_invitation.subject) do |format|
-      format.text
-      format.html { render layout: 'email'}
-    end
-  end
-
   def stolen_notification_email(stolen_notification)  
     @stolen_notification = stolen_notification
     mail(to: "#{@stolen_notification.receiver_email}, bryan@bikeindex.org", from: "bryan@bikeindex.org", subject: @stolen_notification.display_subject) do |format|

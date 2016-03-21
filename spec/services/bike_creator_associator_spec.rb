@@ -63,18 +63,6 @@ describe BikeCreatorAssociator do
     end
   end
 
-  describe :update_bike_token do 
-    it "sets the bike_token to the bike" do 
-      b_param = BParam.new
-      bike_token = FactoryGirl.create(:bike_token)
-      bike = Bike.new 
-      b_param.stub(:bike_token_id).and_return(bike_token.id)
-      bike.stub(:id).and_return(2)
-      BikeCreatorAssociator.new(b_param).update_bike_token(bike)
-      bike_token.reload.bike_id.should eq(2)
-    end
-  end
-
   describe :attach_photo do 
     it "creates public images for the attached image" do 
       bike = FactoryGirl.create(:bike)
@@ -105,10 +93,8 @@ describe BikeCreatorAssociator do
       bike = Bike.new
       creator = BikeCreatorAssociator.new()
       bike.stub(:stolen).and_return(true)
-      bike.stub(:created_with_token).and_return(true)
       creator.should_receive(:create_ownership).and_return(bike)
       creator.should_receive(:create_stolen_record).and_return(bike)
-      creator.should_receive(:update_bike_token).and_return(bike)
       creator.should_receive(:create_components).and_return(bike)
       creator.should_receive(:create_normalized_serial_segments).and_return(bike)
       creator.should_receive(:attach_photo)
