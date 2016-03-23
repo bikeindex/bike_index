@@ -23,6 +23,41 @@ describe Manufacturer do
     end
   end
 
+  describe 'autocomplete_hash_category' do
+    context '0 bikes or components' do
+      it 'returns 0' do
+        manufacturer = Manufacturer.new
+        allow(manufacturer).to receive(:bikes) { [] }
+        allow(manufacturer).to receive(:components) { [] }
+        expect(manufacturer.autocomplete_hash_priority).to eq(0)
+      end
+    end
+    context '1 component' do
+      it 'returns 10' do
+        manufacturer = Manufacturer.new
+        allow(manufacturer).to receive(:bikes) { [] }
+        allow(manufacturer).to receive(:components) { [2] }
+        expect(manufacturer.autocomplete_hash_priority).to eq(10)
+      end
+    end
+    context '25 bikes and 50 components' do
+      it 'returns 15' do
+        manufacturer = Manufacturer.new
+        allow(manufacturer).to receive(:bikes) { Array(0..24) }
+        allow(manufacturer).to receive(:components) { Array(0..50) }
+        expect(manufacturer.autocomplete_hash_priority).to eq(15)
+      end
+    end
+    context '1020 bikes' do
+      it 'returns 100' do
+        manufacturer = Manufacturer.new
+        allow(manufacturer).to receive(:bikes) { Array(1..1020) }
+        allow(manufacturer).to receive(:components) { [2, 2, 2] }
+        expect(manufacturer.autocomplete_hash_priority).to eq(100)
+      end
+    end
+  end
+
   describe "import csv" do 
     it "adds manufacturers to the list" do
       import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import.csv")

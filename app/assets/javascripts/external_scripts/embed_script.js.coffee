@@ -1,34 +1,33 @@
 initializeFrameMaker = (target) ->
-  url = "#{window.root_url}/api/searcher?types[]=frame_makers&"
   $(target).select2
-    minimumInputLength: 2
-    placeholder: 'Choose manufacturer'
+    # allowClear: true
+    placeholder: 'Choose a manufacturer'
+    minimumInputLength: 0
     ajax:
-      url: url
-      dataType: "json"
-      openOnEnter: true
-      data: (term, page) ->
-        term: term # search term
-        limit: 10
-      results: (data, page) -> # parse the results into the format expected by Select2.
-        remapped = data.results.frame_makers.map (i) -> {id: i.id, text: i.term}
-        results: remapped
-    initSelection: (element, callback) ->
-      id = $(element).val()
-      if id isnt ""
-        $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
-        ).done (data) ->
-          data =
-            id: element.val()
-            text: data.manufacturer.name
-          callback data
-  
+      url: "#{window.root_url}/api/autocomplete"
+      dataType: 'json'
+      # width: 'style'
+      delay: 250
+      data: (params) ->
+        {
+          q: params.term
+          page: params.page
+          per_page: 10
+        }
+      processResults: (data, page) ->
+        {
+          results: data.matches.map((item) ->
+            {
+              id: item.id
+              text: item.text
+            }
+          )
+          pagination: more: data.matches.length == 10
+        }
   $(target).on "change", (e) ->
-    id = e.val
-    otherManufacturerDisplay(id)
-    $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
-    ).done (data) ->
-      getModelList(data.manufacturer.name)
+    slug = $(target).val()
+    otherManufacturerDisplay(slug)
+    getModelList(slug)
 
 setModelTypeahead = (data=[]) ->
   autocomplete = $('#bike_frame_model').typeahead()
@@ -87,9 +86,9 @@ optionalFormUpdate = (e) ->
     clickTarget.slideDown().addClass('unhidden').removeClass('currently-hidden')
 
 otherManufacturerDisplay = (current_value) ->
-  expand_value = $('#bike_manufacturer_id').parents('.input-group').find('.other-value').text()
+  expand_value = 'other'
   hidden_other = $('#bike_manufacturer_id').parents('.input-group').find('.hidden-other')
-  if parseInt(current_value, 10) == parseInt(expand_value, 10)
+  if current_value == expand_value
     # show the bugger!
     hidden_other.slideDown().addClass('unhidden')
   else 
@@ -113,11 +112,9 @@ updateYear = ->
   else
     $('#bike_unknown_year').prop('checked', false)
 
-  id = $('#bike_manufacturer_id').val()
-  if id.length > 0
-    $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
-    ).done (data) ->
-      getModelList(data.manufacturer.name)
+  slug = $('#bike_manufacturer_id').val()
+  if slug.length > 0
+    getModelList(slug)
 
   else
     getModelList()

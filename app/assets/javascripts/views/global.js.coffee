@@ -54,64 +54,64 @@ class BikeIndex.Views.Global extends Backbone.View
     $('.top-user-nav').slideToggle()
 
   initializeHeaderSearch: ->
-    tags = JSON.parse($("#header-search-select").attr('data-options'))
-    $('#head-search-bikes #query').select2
-      tags: tags
-      tokenSeparators: [","]
-      openOnEnter: false
-      formatResult: (object, container, query) ->
-        if object.id?
-          return nil unless query?
-          if object.display
-            return "#{object.display} <span class='sch_c'>#{object.text}</span>"
-          if object.id == '#'
-            return "<span class='sch_s'><span>Find </span>serial</span> #{object.text}"
-          if object.id == object.text
-            return "<span class='sch_'>Search <span>all bikes</span> for</span> #{object.text}"
-          else
-            "<span class='sch_m'><span>Bikes </span>made by</span> #{object.text}"
-      formatResultCssClass: (o) ->
-        'sch_special' if o.id == '#'
-        # return response + object.text
-      createSearchChoice: (term, data) ->
-        if $(data).filter(->
-          @text.localeCompare(term) is 0
-        ).length is 0
-          id: term
-          text: term
-      createSearchChoicePosition: (list, item) ->
-        list.splice 0, 0, item, {id: '#', text: item.text }
-      dropdownCssClass: 'mainsrchdr'
-      formatSelection: (object, containter) ->
-        return object.text if object.id == object.text
-        if object.id == '#'
-          return "<span class='search_span_s'>serial </span> #{object.text}"
-        else if object.display?
-          return object.text
-        "<span class='search_span_m'>made by </span> #{object.text}"
+    # tags = JSON.parse($("#header-search-select").attr('data-options'))
+    # $('#head-search-bikes #query').select2
+    #   tags: tags
+    #   tokenSeparators: [","]
+    #   openOnEnter: false
+    #   formatResult: (object, container, query) ->
+    #     if object.id?
+    #       return nil unless query?
+    #       if object.display
+    #         return "#{object.display} <span class='sch_c'>#{object.text}</span>"
+    #       if object.id == '#'
+    #         return "<span class='sch_s'><span>Find </span>serial</span> #{object.text}"
+    #       if object.id == object.text
+    #         return "<span class='sch_'>Search <span>all bikes</span> for</span> #{object.text}"
+    #       else
+    #         "<span class='sch_m'><span>Bikes </span>made by</span> #{object.text}"
+    #   formatResultCssClass: (o) ->
+    #     'sch_special' if o.id == '#'
+    #     # return response + object.text
+    #   createSearchChoice: (term, data) ->
+    #     if $(data).filter(->
+    #       @text.localeCompare(term) is 0
+    #     ).length is 0
+    #       id: term
+    #       text: term
+    #   createSearchChoicePosition: (list, item) ->
+    #     list.splice 0, 0, item, {id: '#', text: item.text }
+    #   dropdownCssClass: 'mainsrchdr'
+    #   formatSelection: (object, containter) ->
+    #     return object.text if object.id == object.text
+    #     if object.id == '#'
+    #       return "<span class='search_span_s'>serial </span> #{object.text}"
+    #     else if object.display?
+    #       return object.text
+    #     "<span class='search_span_m'>made by </span> #{object.text}"
     
-    # if $('#header-search #manufacturer_id').val().length > 0
+    # # if $('#header-search #manufacturer_id').val().length > 0
+    # #   data = $('#query').select2('data')
+    # #   data.push($('#header-search').data('selected'))
+    # #   $('#query').select2('data',data)
+    # if $('#header-search #serial').val().length > 0
     #   data = $('#query').select2('data')
-    #   data.push($('#header-search').data('selected'))
+    #   data.push({id: '#', text: encodeURI($('#header-search #serial').val())})
     #   $('#query').select2('data',data)
-    if $('#header-search #serial').val().length > 0
-      data = $('#query').select2('data')
-      data.push({id: '#', text: encodeURI($('#header-search #serial').val())})
-      $('#query').select2('data',data)
 
-    unless $('#bikes-search').length > 0
-      location = localStorage.getItem('location')
-      $('#proximity').val(localStorage.getItem('location'))
-      unless location? and location.length > 0
-        $('#proximity').val('ip')
-        localStorage.setItem('location', 'ip')
-        $.getJSON "https://freegeoip.net/json/", (json) ->
-          location = ""
-          location += "#{json.city} " if json.city?
-          location += "#{json.region_name}" if json.region_name?
-          if location.length > 0
-            localStorage.setItem('location', location)
-            $('#proximity').val(location)
+    # unless $('#bikes-search').length > 0
+    #   location = localStorage.getItem('location')
+    #   $('#proximity').val(localStorage.getItem('location'))
+    #   unless location? and location.length > 0
+    #     $('#proximity').val('ip')
+    #     localStorage.setItem('location', 'ip')
+    #     $.getJSON "https://freegeoip.net/json/", (json) ->
+    #       location = ""
+    #       location += "#{json.city} " if json.city?
+    #       location += "#{json.region_name}" if json.region_name?
+    #       if location.length > 0
+    #         localStorage.setItem('location', location)
+    #         $('#proximity').val(location)
 
   updateSearchAssociations: (e) ->
     if e.added?

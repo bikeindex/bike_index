@@ -64,7 +64,7 @@ class BikeIndex.Views.BikesNew extends Backbone.View
   getModelList: (mnfg_name) ->
     year = parseInt($('#bike_year').val(),10)
     # could be bikebook.io - but then we'd have to pay for SSL...
-    url = "https://bikebook.herokuapp.com//model_list/?manufacturer=#{mnfg_name}"
+    url = "https://bikebook.herokuapp.com/model_list/?manufacturer=#{mnfg_name}"
     url += "&year=#{year}" if year > 1
     that = @
     $.ajax
@@ -127,33 +127,60 @@ class BikeIndex.Views.BikesNew extends Backbone.View
       $('#state-select select').val('').change()
 
   initializeFrameMaker: (target) ->
-    url = "#{window.root_url}/api/searcher?types[]=frame_makers&"
+    console.log('party')
+    url = "#{window.root_url}/api/autocomplete"
     $(target).select2
-      minimumInputLength: 2
-      placeholder: 'Choose manufacturer'
+      allowClear: true
+      placeholder: 'Choose a manufacturer'
       ajax:
-        url: url
-        dataType: "json"
-        openOnEnter: true
-        data: (term, page) ->
-          term: term # search term
-          limit: 10
-        results: (data, page) -> # parse the results into the format expected by Select2.
-          remapped = data.results.frame_makers.map (i) -> {id: i.id, text: i.term}
-          results: remapped
-      initSelection: (element, callback) ->
-        id = $(element).val()
-        if id isnt ""
-          $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
-          ).done (data) ->
-            data =
-              id: element.val()
-              text: data.manufacturer.name
-            callback data
-    that = @
-    $(target).on "change", (e) ->
-      id = e.val
-      that.otherManufacturerDisplay(id)
-      $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
-      ).done (data) ->
-        that.getModelList(data.manufacturer.name)
+        url: "#{window.root_url}/api/autocomplete"
+        # dataType: 'json'
+        # width: 'style'
+        # delay: 250
+        # data: (params) ->
+        #   return {
+        #     q: params.term
+        #     page: params.page
+        #     per_page: 10
+        #   }
+        # processResults: (data, page) ->
+        #   {
+        #     results: data.matches.map((item) ->
+        #       {
+        #         id: item.id
+        #         text: item.text
+        #       }
+        #     )
+        #     pagination: more: data.matches.length == 10
+        #   }
+        # cache: true
+
+  #   $(target).select2
+  #     minimumInputLength: 0
+  #     placeholder: 'Choose manufacturer'
+  #     ajax:
+  #       url: url
+  #       dataType: "json"
+  #       openOnEnter: true
+  #       data: (term, page) ->
+  #         term: term # search term
+  #         limit: 10
+  #       results: (data, page) -> # parse the results into the format expected by Select2.
+  #         remapped = data.results.frame_makers.map (i) -> {id: i.id, text: i.term}
+  #         results: remapped
+  #     initSelection: (element, callback) ->
+  #       id = $(element).val()
+  #       if id isnt ""
+  #         $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
+  #         ).done (data) ->
+  #           data =
+  #             id: element.val()
+  #             text: data.manufacturer.name
+  #           callback data
+  #   that = @
+  #   $(target).on "change", (e) ->
+  #     id = e.val
+  #     that.otherManufacturerDisplay(id)
+  #     $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
+  #     ).done (data) ->
+  #       that.getModelList(data.manufacturer.name)

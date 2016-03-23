@@ -99,12 +99,18 @@ class Manufacturer < ActiveRecord::Base
     frame_maker ? 'frame_mnfg' : 'mnfg'
   end
 
+  def autocomplete_hash_priority
+    return 0 unless (bikes.count + components.count) > 0
+    pop = (2*bikes.count + components.count) / 20 + 10
+    pop > 100 ? 100 : pop
+  end
+
   def autocomplete_hash
     {
-      id: id,
+      id: slug,
       text: name,
       category: autocomplete_hash_category,
-      priority: (bikes.count + components.count),
+      priority: autocomplete_hash_priority,
       data: {},
     }.as_json
   end

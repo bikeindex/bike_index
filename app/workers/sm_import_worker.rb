@@ -16,8 +16,7 @@ class SmImportWorker
     result2 = `soulmate load manufacturers < sm_import_manufacturers.json`
 
     soulhearts = []
-    Manufacturer.find_each{ |m| soulhearts << m.autocomplete_hash }
+    Manufacturer.find_each { |m| soulhearts << m.autocomplete_hash }
     Soulheart::Loader.new.load(soulhearts)
   end
-
 end

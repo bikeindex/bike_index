@@ -33,7 +33,7 @@
     .control-group.select-jsonified
       = f.label :manufacturer_id, class: "control-label"
       .controls
-        = f.text_field :manufacturer_id
+        = f.select :manufacturer_id, []
         %span.help-block
           Select 'Other' if manufacturer isn't listed
     %p.other-value
