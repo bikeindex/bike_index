@@ -1,0 +1,19 @@
+class AutocompleteLoader
+  class << self
+    def clear
+      Soulheart::Loader.new.clear(true)
+    end
+
+    def clear_cache
+      # Doesn't work correctly because it doesn't regenerate the categories afterward
+      # This is a bug in Soulheart
+      Soulheart::Loader.new.clear_cache
+    end
+
+    def load_manufacturers
+      mnfgs_list = []
+      Manufacturer.find_each { |m| mnfgs_list << m.autocomplete_hash }
+      Soulheart::Loader.new.load(mnfgs_list)
+    end
+  end
+end

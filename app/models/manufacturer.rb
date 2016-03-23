@@ -78,7 +78,6 @@ class Manufacturer < ActiveRecord::Base
     end
   end
 
-
   before_save :set_slug
   def set_slug
     self.slug = Slugifyer.manufacturer(self.name)
@@ -107,11 +106,11 @@ class Manufacturer < ActiveRecord::Base
 
   def autocomplete_hash
     {
-      id: slug,
+      id: id,
       text: name,
       category: autocomplete_hash_category,
       priority: autocomplete_hash_priority,
-      data: {},
+      data: { slug: slug },
     }.as_json
   end
 

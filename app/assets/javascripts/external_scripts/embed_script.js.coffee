@@ -1,6 +1,5 @@
 initializeFrameMaker = (target) ->
   $(target).select2
-    # allowClear: true
     placeholder: 'Choose a manufacturer'
     minimumInputLength: 0
     ajax:
@@ -18,7 +17,7 @@ initializeFrameMaker = (target) ->
         {
           results: data.matches.map((item) ->
             {
-              id: item.id
+              id: item.slug
               text: item.text
             }
           )
@@ -32,7 +31,6 @@ initializeFrameMaker = (target) ->
 setModelTypeahead = (data=[]) ->
   autocomplete = $('#bike_frame_model').typeahead()
   autocomplete.data('typeahead').source = data 
-  # $('#bike_frame_model').typeahead({source: data})
 
 getModelList = (mnfg_name='absent') ->
   if mnfg_name == 'absent'

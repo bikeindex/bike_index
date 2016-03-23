@@ -30,17 +30,21 @@
 
     .mnfg-group
       .split-fields
-        .control-group.select-jsonified.extra-field{data: {other: Manufacturer.find_by_slug("other").id, hidden: ".hidden-mnfg" }}
+        .control-group.select-jsonified.extra-field{ data: { other: @manufacturer_other_id, hidden: ".hidden-mnfg" } }
           = f.label :manufacturer_id, class: "control-label"
           .controls.component-mnfg-select.select_unattached
-            = f.text_field :manufacturer_id
+            - if f.object.manufacturer.present?
+              - mnfg = f.object.manufacturer
+              = f.select :manufacturer_id, [[mnfg.name, mnfg.slug]], selected: mnfg.slug
+            - else
+              = f.select :manufacturer_id, []
         
         .control-group.extra-field.component_model.short-label
           = f.label :model_name, "Model", class: "control-label"
           .controls
             = f.text_field :model_name
       - other_show = ""
-      - other_show = "other_present" if f.object.manufacturer_id == Manufacturer.find_by_slug("other").id
+      - other_show = "other_present" if f.object.manufacturer_id == @manufacturer_other_id
       .hidden-other.control-group.hidden-mnfg{class: other_show}
         = f.label :manufacturer_other, "Other manufacturer", class: "control-label"
         .controls

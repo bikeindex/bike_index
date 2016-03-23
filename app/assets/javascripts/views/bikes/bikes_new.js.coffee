@@ -5,6 +5,7 @@ class BikeIndex.Views.BikesNew extends Backbone.View
     'change #bike_year':              'updateYear'
     'change #bike_unknown_year':      'toggleUnknownYear' 
     'click #select-cycletype a':      'changeCycleType'
+    'change #bike_manufacturer_id':   'onManufacturerChange'
     'change #country_select_container select': 'updateCountry'
     
   
@@ -43,6 +44,7 @@ class BikeIndex.Views.BikesNew extends Backbone.View
         clickTarget.slideUp().removeClass('unhidden').addClass('currently-hidden')
       else
         clickTarget.slideDown().addClass('unhidden').removeClass('currently-hidden')
+
   updateCycleType: ->
     current_value = $("#cycletype#{$("#bike_cycle_type_id").val()}")
     $('#cycletype-text').removeClass('long-title')
@@ -58,22 +60,24 @@ class BikeIndex.Views.BikesNew extends Backbone.View
 
   setModelTypeahead: (data=[]) ->
     autocomplete = $('#bike_frame_model').typeahead()
-    autocomplete.data('typeahead').source = data 
-    # $('#bike_frame_model').typeahead({source: data})
+    autocomplete.data('typeahead').source = data
 
   getModelList: (mnfg_name) ->
-    year = parseInt($('#bike_year').val(),10)
-    # could be bikebook.io - but then we'd have to pay for SSL...
-    url = "https://bikebook.herokuapp.com/model_list/?manufacturer=#{mnfg_name}"
-    url += "&year=#{year}" if year > 1
-    that = @
-    $.ajax
-      type: "GET"
-      url: url
-      success: (data, textStatus, jqXHR) ->
-        that.setModelTypeahead(data)
-      error: ->
-        that.setModelTypeahead()
+    if mnfg_name == 'absent'
+      @setModelTypeahead()
+    else
+      year = parseInt($('#bike_year').val(),10)
+      # could be bikebook.io - but then we'd have to pay for SSL...
+      url = "https://bikebook.herokuapp.com/model_list/?manufacturer=#{mnfg_name}"
+      url += "&year=#{year}" if year > 1
+      that = @
+      $.ajax
+        type: "GET"
+        url: url
+        success: (data, textStatus, jqXHR) ->
+          that.setModelTypeahead(data)
+        error: ->
+          that.setModelTypeahead()
 
   toggleUnknownYear: ->
     if $('#bike_unknown_year').prop('checked')
@@ -89,17 +93,21 @@ class BikeIndex.Views.BikesNew extends Backbone.View
       $('#bike_unknown_year').prop('checked', true)
     else
       $('#bike_unknown_year').prop('checked', false)
-    id = $('#bike_manufacturer_id').val()
-    if id.length > 0
-      that = this
-      $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
-      ).done (data) ->
-        that.getModelList(data.manufacturer.name)
+    slug = $('#bike_manufacturer_id').val()
+    if slug.length > 0
+      @getModelList(slug)
+    else
+      @getModelList()
+
+  onManufacturerChange: ->
+    slug = $('#bike_manufacturer_id').val()
+    @otherManufacturerDisplay(slug)
+    @getModelList(slug)
 
   otherManufacturerDisplay: (current_value) ->
-    expand_value = $('#bike_manufacturer_id').parents('.input-group').find('.other-value').text()
+    expand_value = 'other'
     hidden_other = $('#bike_manufacturer_id').parents('.input-group').find('.hidden-other')
-    if parseInt(current_value, 10) == parseInt(expand_value, 10)
+    if current_value == expand_value
       # show the bugger!
       hidden_other.slideDown().addClass('unhidden')
     else 
@@ -127,60 +135,27 @@ class BikeIndex.Views.BikesNew extends Backbone.View
       $('#state-select select').val('').change()
 
   initializeFrameMaker: (target) ->
-    console.log('party')
-    url = "#{window.root_url}/api/autocomplete"
     $(target).select2
-      allowClear: true
       placeholder: 'Choose a manufacturer'
+      minimumInputLength: 0
       ajax:
         url: "#{window.root_url}/api/autocomplete"
-        # dataType: 'json'
-        # width: 'style'
-        # delay: 250
-        # data: (params) ->
-        #   return {
-        #     q: params.term
-        #     page: params.page
-        #     per_page: 10
-        #   }
-        # processResults: (data, page) ->
-        #   {
-        #     results: data.matches.map((item) ->
-        #       {
-        #         id: item.id
-        #         text: item.text
-        #       }
-        #     )
-        #     pagination: more: data.matches.length == 10
-        #   }
-        # cache: true
+        dataType: 'json'
+        delay: 250
+        data: (params) ->
+          {
+            q: params.term
+            page: params.page
+            per_page: 10
+          }
+        processResults: (data, page) ->
+          {
+            results: data.matches.map((item) ->
+              {
+                id: item.slug
+                text: item.text
+              }
+            )
+            pagination: more: data.matches.length == 10
+          }
 
-  #   $(target).select2
-  #     minimumInputLength: 0
-  #     placeholder: 'Choose manufacturer'
-  #     ajax:
-  #       url: url
-  #       dataType: "json"
-  #       openOnEnter: true
-  #       data: (term, page) ->
-  #         term: term # search term
-  #         limit: 10
-  #       results: (data, page) -> # parse the results into the format expected by Select2.
-  #         remapped = data.results.frame_makers.map (i) -> {id: i.id, text: i.term}
-  #         results: remapped
-  #     initSelection: (element, callback) ->
-  #       id = $(element).val()
-  #       if id isnt ""
-  #         $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
-  #         ).done (data) ->
-  #           data =
-  #             id: element.val()
-  #             text: data.manufacturer.name
-  #           callback data
-  #   that = @
-  #   $(target).on "change", (e) ->
-  #     id = e.val
-  #     that.otherManufacturerDisplay(id)
-  #     $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
-  #     ).done (data) ->
-  #       that.getModelList(data.manufacturer.name)

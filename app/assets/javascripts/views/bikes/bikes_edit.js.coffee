@@ -285,7 +285,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     regexp = new RegExp(target.attr('data-id'), 'g')
     target.before(target.data('fields').replace(regexp, time))
     $('.add-component-fields .chosen-select.select_unattached select').select2()
-    @setComponentManufacturer(m) for m in $('.component-mnfg-select.select_unattached input')
+    @setComponentManufacturer(m) for m in $('.component-mnfg-select.select_unattached select')
     $('.select_unattached').removeClass('select_unattached')
 
 
@@ -312,34 +312,33 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     component.find('.front-or-rear').val(target.attr('data-position'))
 
   initializeComponentManufacturers: ->
-    @setComponentManufacturer(m) for m in $('.component-mnfg-select input')
+    @setComponentManufacturer(m) for m in $('.component-mnfg-select select')
 
   setComponentManufacturer: (target, url="default") ->
-    url = "#{window.root_url}/api/searcher?types[]=manufacturers&" if url == "default"
     target = $(target)
-    target.removeClass('select_unattached')
     target.select2
-      minimumInputLength: 2
-      placeholder: 'Choose manufacturer'
+      placeholder: 'Choose a manufacturer'
+      minimumInputLength: 0
       ajax:
-        url: url
-        dataType: "json"
-        openOnEnter: true
-        data: (term, page) ->
-          term: term # search term
-          limit: 10
-        results: (data, page) -> # parse the results into the format expected by Select2.
-          remapped = data.results.manufacturers.map (i) -> {id: i.id, text: i.term}
-          results: remapped
-      initSelection: (element, callback) ->
-        id = $(element).val()
-        if id isnt ""
-          $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
-          ).done (data) ->
-            data =
-              id: element.val()
-              text: data.manufacturer.name
-            callback data
+        url: "#{window.root_url}/api/autocomplete"
+        dataType: 'json'
+        delay: 250
+        data: (params) ->
+          {
+            q: params.term
+            page: params.page
+            per_page: 10
+          }
+        processResults: (data, page) ->
+          {
+            results: data.matches.map((item) ->
+              {
+                id: item.id # Using actual id, because it makes things 
+                text: item.text
+              }
+            )
+            pagination: more: data.matches.length == 10
+          }
     that = @
     target.on "change", (e) ->
       expand_value = target.parents('.control-group').attr('data-other')

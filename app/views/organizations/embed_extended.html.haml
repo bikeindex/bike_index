@@ -26,11 +26,13 @@
     .control-group.select-jsonified
       = f.label :manufacturer_id, class: "control-label"
       .controls
-        = f.text_field :manufacturer_id
+        - if @bike.manufacturer.present?
+          - mnfg = @bike.manufacturer
+          = f.select :manufacturer_id, [[mnfg.name, mnfg.slug]], selected: mnfg.slug
+        - else
+          = f.select :manufacturer_id, []
         %span.help-block
           Select 'Other' if manufacturer isn't listed
-    %p.other-value
-      = Manufacturer.find_by_slug("other").id
     .hidden-other.control-group.manufacturer-other-input
       = f.label :manufacturer_other, "Other manufacturer", class: "control-label"
       .controls
