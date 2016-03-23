@@ -23,8 +23,7 @@
   :markdown
     #{@blog.body}
 
-%article 
-  = render '/shared/google_text_ad'
+= render '/shared/content_footer_ad'
 
 - if Rails.env.production? && @blog.published
   / Clear the ad overhang with a padded block

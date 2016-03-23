@@ -64,8 +64,10 @@
               %span#header-search-select.hidden{ data: { options: select_list.to_json }}
             #header-search{ data: { selected: mnfg.to_json } }
               = hidden_field_tag :serial, params[:serial]
-      / = render '/shared/ad' if @ad.present?
-      = render '/shared/google_ad' if @ad.present?
+      - if @ad.present?
+        .container.partner-block-container
+          .partner-block
+            = render '/shared/google_text_ad'
       
       %h1
         = strip_tags(params[:queryd])

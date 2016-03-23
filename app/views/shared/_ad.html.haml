@@ -1,3 +1,22 @@
 .container.partner-block-container
   .partner-block
-    = render '/shared/google_text_ad'
+    %a.partner-image{ href: @ad.target_url }
+      = image_tag @ad.image_url(:large) if @ad.image.present?
+      %span.ad-label
+        Ad
+    %a.partner-text{ href: @ad.target_url }
+      %h3
+        = @ad.title
+      %p
+        = @ad.body
+:plain
+  <script>
+  $('.partner-block a').click(function(e) {
+    var domain, target;
+    e.preventDefault();
+    target = $(e.target).parents('a').attr('href');
+    domain = target.split('.')[0].replace(/http..?\/?/, '');
+    _gaq.push(['_trackEvent', 'Ad click', '"' + domain + '"']);
+    window.location.href = target
+  });
+  </script>
