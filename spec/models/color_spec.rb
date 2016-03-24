@@ -14,4 +14,14 @@ describe Color do
       Color.fuzzy_name_find('poopy panters').should == color
     end
   end
+
+  describe 'autocomplete_hash' do
+    it 'returns what we want' do
+      color = FactoryGirl.create(:color, name: 'blue', display: "<span class='sclr' style='background: #386ed2'></span>")
+      result = color.autocomplete_hash
+      expect(result.keys).to eq(['id', 'text', 'category', 'priority', 'data'])
+      target_display = "#{color.display} <span class='sch_c'>#{color.name}</span>"
+      expect(result['data']['display']).to eq target_display
+    end
+  end
 end

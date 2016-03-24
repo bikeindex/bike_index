@@ -16,4 +16,17 @@ class Color < ActiveRecord::Base
     end
   end
 
+  def autocomplete_hash
+    {
+      id: id,
+      text: name,
+      category: 'colors',
+      priority: 1000,
+      data: {
+        priority: 1000,
+        display: "#{display} <span class='sch_c'>#{name}</span>"
+      }
+    }.as_json
+  end
+
 end

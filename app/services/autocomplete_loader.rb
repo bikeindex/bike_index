@@ -10,6 +10,10 @@ class AutocompleteLoader
       Soulheart::Loader.new.clear_cache
     end
 
+    def load_colors
+      Soulheart::Loader.new.load(Color.all.map{ |c| c.autocomplete_hash })
+    end
+
     def load_manufacturers
       mnfgs_list = []
       Manufacturer.find_each { |m| mnfgs_list << m.autocomplete_hash }
