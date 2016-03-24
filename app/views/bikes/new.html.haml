@@ -11,7 +11,7 @@
             %li
               = msg
 
-  #chosen-container.new-bike-container{ class: "#{"stolen-add" if @bike.stolen}" }
+  .new-bike-container{ class: "#{"stolen-add" if @bike.stolen}" }
     = form_for @bike, html: { class: "receptacle form-horizontal" }, multipart: true do |f|
       = f.hidden_field :cycle_type_id
       = f.hidden_field :b_param_id_token
@@ -68,9 +68,9 @@
               = fields_for :stolen_record do |builder|
                 #stolen-bike-location.control-group
                   = builder.label :street, "Where was it stolen?", class: "control-label"
-                  #country_select_container.controls
+                  #country_select_container.controls.special-select-single
                     = builder.collection_select(:country_id, Country.all, :id, :name, prompt: "Choose country" )
-                    %p.other-value
+                    %p.other-value#us_country_id
                       = Country.find_by_iso("US").id
                   .controls.extra-field
                     = builder.text_field :street, placeholder: "Intersection or address"
@@ -78,7 +78,7 @@
                     = builder.text_field :city, placeholder: "City"
                   .controls.extra-field
                     = builder.text_field :zipcode, placeholder: "Zipcode"
-                  #state-select.controls.extra-field.chosen-select
+                  #state-select.controls.extra-field.special-select-single
                     = builder.collection_select(:state_id, State.all, :id, :name, include_blank: true, prompt: "State" )
                   %span.form-info-addition.padded
                     Address is public - use a nearby intersection instead of your home address

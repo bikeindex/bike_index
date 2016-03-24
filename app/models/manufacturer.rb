@@ -110,7 +110,7 @@ class Manufacturer < ActiveRecord::Base
       text: name,
       category: autocomplete_hash_category,
       priority: autocomplete_hash_priority,
-      data: { slug: slug },
+      data: { slug: slug, priority: autocomplete_hash_priority },
     }.as_json
   end
 

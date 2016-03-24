@@ -17,7 +17,7 @@ class BikeIndex.Views.BikesNew extends Backbone.View
       if $('#country_select_container select').val().length > 0
         @updateCountry()
       else
-        @setDefaultCountry() 
+        @setDefaultCountry()
     @updateCycleType()
     window.root_url = $('#root_url').attr('data-url')
     
@@ -42,6 +42,7 @@ class BikeIndex.Views.BikesNew extends Backbone.View
     else
       if target.hasClass('rm-block')
         clickTarget.slideUp().removeClass('unhidden').addClass('currently-hidden')
+        clickTarget.find('select').selectize()[0].selectize.setValue('')
       else
         clickTarget.slideDown().addClass('unhidden').removeClass('currently-hidden')
 
@@ -59,8 +60,16 @@ class BikeIndex.Views.BikesNew extends Backbone.View
     @updateCycleType()
 
   setModelTypeahead: (data=[]) ->
-    autocomplete = $('#bike_frame_model').typeahead()
-    autocomplete.data('typeahead').source = data
+    $('#bike_frame_model').selectize()[0].selectize.destroy()
+    if data.length > 0
+      window.m_data = data.map (i) -> { id: i }
+      $('#bike_frame_model').selectize
+        options: data.map (i) -> { 'name': i }
+        create: true
+        maxItems: 1
+        valueField: 'name'
+        labelField: 'name'
+        searchField: 'name'
 
   getModelList: (mnfg_name) ->
     if mnfg_name == 'absent'
@@ -80,19 +89,22 @@ class BikeIndex.Views.BikesNew extends Backbone.View
           that.setModelTypeahead()
 
   toggleUnknownYear: ->
+    year_select = $('#bike_year').selectize()[0].selectize
     if $('#bike_unknown_year').prop('checked')
-      $('#bike_year').val('').trigger('change')
-      $('#bike_year').select2 "enable", false
+      year_select.setValue('')
+      year_select.disable()
     else
-      $('#bike_year').val(new Date().getFullYear()).trigger('change')
-      $('#bike_year').select2 "enable", true
+      year_select.setValue(new Date().getFullYear())
+      year_select.enable()
   
   updateYear: ->
-    if $('#bike_year').val().length == 0
-      $('#bike_year').select2 "enable", false
-      $('#bike_unknown_year').prop('checked', true)
-    else
-      $('#bike_unknown_year').prop('checked', false)
+    if $('#bike_year').val()
+      if $('#bike_year').val().length == 0
+        $('#bike_year').selectize()[0].selectize.disable()
+        $('#bike_unknown_year').prop('checked', true)
+      else
+        $('#bike_unknown_year').prop('checked', false)
+
     slug = $('#bike_manufacturer_id').val()
     if slug.length > 0
       @getModelList(slug)
@@ -117,45 +129,34 @@ class BikeIndex.Views.BikesNew extends Backbone.View
         hidden_other.removeClass('unhidden').slideUp()
     
   setDefaultCountry: ->
-    $.getJSON "http://www.telize.com/geoip?callback=?", (json) ->
-      select = $('#country_select_container select')
-      country_id = select.find("option").filter(->
-        $(this).text() is json.country
-      ).val()
-      select.val(country_id).change()
-
+    # we should geocode the country in here if possible...
+    default_country_id = parseInt($('#us_country_id').text(), 10)
+    $('#country_select_container select').selectize()[0].selectize.setValue(default_country_id)
+    
   updateCountry: ->
     c_select = $('#country_select_container select')
-    c_select.select2()
     us_val = parseInt($('#country_select_container .other-value').text(), 10)
     if parseInt(c_select.val(), 10) == us_val
       $('#state-select').slideDown()
     else
       $('#state-select').slideUp()
-      $('#state-select select').val('').change()
+      $('#state-select select').selectize()[0].selectize.setValue('')
 
   initializeFrameMaker: (target) ->
-    $(target).select2
-      placeholder: 'Choose a manufacturer'
-      minimumInputLength: 0
-      ajax:
-        url: "#{window.root_url}/api/autocomplete"
-        dataType: 'json'
-        delay: 250
-        data: (params) ->
-          {
-            q: params.term
-            page: params.page
-            per_page: 10
-          }
-        processResults: (data, page) ->
-          {
-            results: data.matches.map((item) ->
-              {
-                id: item.slug
-                text: item.text
-              }
-            )
-            pagination: more: data.matches.length == 10
-          }
-
+    per_page = 10
+    frame_mnfg_url = "#{window.root_url}/api/autocomplete?per_page=#{per_page}&categories=frame_mnfg&q="
+    $(target).selectize
+      preload: true
+      create: false
+      maxItems: 1
+      valueField: 'slug'
+      labelField: 'text'
+      searchField: 'text'
+      load: (query, callback) ->
+        $.ajax
+          url: "#{frame_mnfg_url}#{encodeURIComponent(query)}"
+          type: 'GET'
+          error: ->
+            callback()
+          success: (res) ->
+            callback res.matches.slice(0, per_page)

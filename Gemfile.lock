@@ -7,16 +7,6 @@ GIT
       sass-rails
 
 GIT
-  remote: git://github.com/sethherr/soulmate.git
-  revision: 1056a323ccfeb228de6b8a1b2ef72f6838f1b5a8
-  specs:
-    soulmate (1.1.0)
-      multi_json (>= 1.0)
-      redis (>= 3.0)
-      sinatra (>= 1.0)
-      vegas (>= 0.1.0)
-
-GIT
   remote: https://github.com/bkeepers/dotenv
   revision: 8c6417a3fdecd32c8a739a4c594a515f44be268c
   specs:
@@ -604,8 +594,7 @@ DEPENDENCIES
   sidekiq-unique-jobs
   simplecov
   sitemap_generator
-  soulheart
-  soulmate!
+  soulheart (~> 0.2.6)
   sparkpost
   stackprof
   stripe!

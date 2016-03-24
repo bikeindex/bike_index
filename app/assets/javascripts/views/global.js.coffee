@@ -14,7 +14,7 @@ class BikeIndex.Views.Global extends Backbone.View
     # BikeIndex.hideFlash() # not sure that it's something we ever want
     @setElement($('#body'))
     @initializeHeaderSearch()
-    @loadChosen() if $('#chosen-container').length > 0
+    @loadFancySelects()
     @setLightspeedMovie() if $('#lightspeed-tutorial-video').length > 0
     if $('#what-spokecards-are').length > 0
       $('.spokecard-extension').addClass('on-spokecard-page')
@@ -29,8 +29,10 @@ class BikeIndex.Views.Global extends Backbone.View
     else
       window.open(local, '_blank')
 
-  loadChosen: ->
-    $('.chosen-select select').select2()
+  loadFancySelects: ->
+    $('.chosen-select select').selectize() # legacy
+    $('.special-select-single select').selectize
+      create: false
 
   scrollToRef: (event) ->
     event.preventDefault()

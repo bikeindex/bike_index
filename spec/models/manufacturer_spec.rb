@@ -115,6 +115,7 @@ describe Manufacturer do
       target[:score] = 2
       result_all = manufacturer.sm_options(true)
       result_all.should eq(target)
+      fail
     end
   end
 
