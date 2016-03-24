@@ -17,6 +17,8 @@ class ComponentCreator
       end
       component[:manufacturer_id] = manufacturer.id if manufacturer.present?
       component.delete(:manufacturer)
+    elsif component[:manufacturer_id]
+      component[:manufacturer_id] = Manufacturer.fuzzy_id(component[:manufacturer_id])
     end
     component
   end

@@ -3,20 +3,33 @@ require 'spec_helper'
 describe ComponentCreator do
 
   describe :set_manufacturer_key do
-    it "sets the manufacturer if it finds it and set the set the foreign keys" do
-      m = FactoryGirl.create(:manufacturer, name: "SRAM")
-      c = { manufacturer: "sram" }
-      component = ComponentCreator.new().set_manufacturer_key(c)
-      component[:manufacturer_id].should eq(m.id)
-      component[:manufacturer].should_not be_present
+    context 'manufacturer in db' do
+      it 'sets the manufacturer_id' do
+        m = FactoryGirl.create(:manufacturer, name: 'SRAM')
+        c = { manufacturer: 'sram' }
+        component = ComponentCreator.new().set_manufacturer_key(c)
+        component[:manufacturer_id].should eq(m.id)
+        component[:manufacturer].should_not be_present
+      end
     end
-    it "adds other manufacturer name and set the set the foreign keys" do
-      m = FactoryGirl.create(:manufacturer, name: "Other")
-      c = { manufacturer: "Gobbledy Gooky" }
-      component = ComponentCreator.new().set_manufacturer_key(c)
-      component[:manufacturer_id].should eq(m.id)
-      component[:manufacturer].should_not be_present
-      component[:manufacturer_other].should eq('Gobbledy Gooky')
+    context 'unknown manufacturer' do
+      it 'adds other manufacturer name and set the set the foreign keys' do
+        m = FactoryGirl.create(:manufacturer, name: 'Other')
+        c = { manufacturer: 'Gobbledy Gooky' }
+        component = ComponentCreator.new().set_manufacturer_key(c)
+        component[:manufacturer_id].should eq(m.id)
+        component[:manufacturer].should_not be_present
+        component[:manufacturer_other].should eq('Gobbledy Gooky')
+      end
+    end
+    context 'manufacturer_id a manufacturer name' do
+      it 'sets manufacturer_id correctly' do
+        m = FactoryGirl.create(:manufacturer, name: 'SRAM')
+        c = { manufacturer_id: 'sram' }
+        component = ComponentCreator.new().set_manufacturer_key(c)
+        component[:manufacturer_id].should eq(m.id)
+        component[:manufacturer].should_not be_present
+      end
     end
   end
 

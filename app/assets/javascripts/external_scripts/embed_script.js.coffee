@@ -94,7 +94,7 @@ otherManufacturerDisplay = (current_value) ->
   else 
     # if it's visible, clear it and slide up
     if hidden_other.hasClass('unhidden')
-      hidden_other.find('input').val('')
+      hidden_other.find('input').selectize()[0].selectize.setValue('')
       hidden_other.removeClass('unhidden').slideUp()
 
 toggleUnknownYear = ->

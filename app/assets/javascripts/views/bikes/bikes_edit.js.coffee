@@ -115,6 +115,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       $('#stolen_date input').datepicker('format: mm-dd-yyy')
       if $('#stolen-bike-location select').val().length > 0
         @updateCountry()
+    $('#edit_wheels select').selectize()
     @setWheelDiam('front')
     @setWheelDiam('rear')
     @showColors()
@@ -175,32 +176,29 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     else
       if target.hasClass('rm-block')
         clickTarget.slideUp().removeClass('unhidden').addClass('currently-hidden')
+        clickTarget.find('select').selectize()[0].selectize.setValue('')
       else
         clickTarget.slideDown().addClass('unhidden').removeClass('currently-hidden')
 
 
   updateWheels: (target, clickTarget) ->
     standard = clickTarget.parents('.controls').find('.standard-diams')
+    all = clickTarget.parents('.controls').find('.all-dims')
     if target.hasClass('show-all')
       standard.fadeOut('fast', ->
         clickTarget.fadeIn()
       )
     else
-      clickTarget.fadeOut('fast', ->
-        if $(standard).find("option[value=#{clickTarget.val()}]").length
-          $(standard).val(clickTarget.val())
-        else
-          clickTarget.val('')
-          standard.val('')
+      all.fadeOut('fast', ->
+        standard.find('select').selectize()[0].selectize.setValue(all.find('select').val())
         standard.fadeIn()
       )
   
   setWheelDiam: (position) ->
     wheelDiam = $("#bike_#{position}_wheel_size_id").val()
-    if $("##{position}_standard").val().length
-      if $("##{position}_standard option[value=#{wheelDiam}]").length
-        $("##{position}_standard").val(wheelDiam)
-        $("#bike_#{position}_wheel_size_id").hide()
+    $("##{position}_standard select").selectize()[0].selectize.setValue(wheelDiam)
+    if $("##{position}_standard select").val()
+      $("##{position}_all").hide()
     else
       $("##{position}_standard").hide()
       $("#show-#{position}-wheel-diams").addClass('currently-hidden').hide()
@@ -222,11 +220,11 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     $('#cycletype-text').text(current_value.text())
 
   showColors: ->
-    if $('#bike_secondary_color_id').val()
+    if $('#bike_secondary_frame_color_id').val()
       $($('#add-secondary').attr('data-toggle')).show().removeClass('currently-hidden')
       $('#add-secondary').addClass('currently-hidden').hide()
       $($('#add-secondary').attr('data-target')).show().addClass('unhidden')
-    if $('bike_tertiary_color_id').val()
+    if $('bike_tertiary_frame_color_id').val()
       $($('#add-tertiary').attr('data-toggle')).show().removeClass('currently-hidden')
       $('#add-tertiary').addClass('currently-hidden').hide()
       $($('#add-tertiary').attr('data-target')).show().addClass('unhidden')
@@ -235,24 +233,8 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     $('#bike_stolen').prop('checked', 'true')
 
   setDefaultCountryAndState: ->
-    if $('#normal-bike-location .chosen-select select').val().length > 0
-      @setStolenCountry($('#normal-bike-location .chosen-select select').val())
-    else 
-      @grabCountryFromIP()
-
-  grabCountryFromIP: ->
-    view = @
-    $.ajax
-      type: "GET"
-      url: 'https://freegeoip.net/json/'
-      dataType: "jsonp",
-      success: (location) ->
-        select = $('#normal-bike-location .chosen-select select')
-        country_id = select.find("option").filter(->
-          $(this).text() is location.country_name
-        ).val()
-        select.val(country_id).change()
-        view.setStolenCountry(country_id)
+    if $('#normal-bike-location select').val().length > 0
+      @setStolenCountry($('#normal-bike-location select').val())
 
   setStolenCountry: (country_id) ->
     c_select = $('#country_select_container select')
@@ -263,7 +245,6 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
 
   updateCountry: ->
     c_select = $('#country_select_container select')
-    c_select.select2()
     us_val = parseInt($('#country_select_container .other-value').text(), 10)
     if parseInt(c_select.val(), 10) == us_val
       $('#state-select').slideDown()
@@ -284,8 +265,8 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     time = new Date().getTime()
     regexp = new RegExp(target.attr('data-id'), 'g')
     target.before(target.data('fields').replace(regexp, time))
-    $('.add-component-fields .chosen-select.select_unattached select').select2()
-    @setComponentManufacturer(m) for m in $('.component-mnfg-select.select_unattached select')
+    $('.add-component-fields .special-select-single.select_unattached select').selectize()
+    @setComponentManufacturer(m) for m in $('.component-mnfg-select.select_unattached input')
     $('.select_unattached').removeClass('select_unattached')
 
 
@@ -312,42 +293,44 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     component.find('.front-or-rear').val(target.attr('data-position'))
 
   initializeComponentManufacturers: ->
-    @setComponentManufacturer(m) for m in $('.component-mnfg-select select')
+    @setComponentManufacturer(m) for m in $('.component-mnfg-select.select_unattached input')
 
   setComponentManufacturer: (target, url="default") ->
     target = $(target)
-    target.select2
-      placeholder: 'Choose a manufacturer'
-      minimumInputLength: 0
-      ajax:
-        url: "#{window.root_url}/api/autocomplete"
-        dataType: 'json'
-        delay: 250
-        data: (params) ->
-          {
-            q: params.term
-            page: params.page
-            per_page: 10
-          }
-        processResults: (data, page) ->
-          {
-            results: data.matches.map((item) ->
-              {
-                id: item.id # Using actual id, because it makes things 
-                text: item.text
-              }
-            )
-            pagination: more: data.matches.length == 10
-          }
+    target.parents('.controls').removeClass('select_unattached')
+    per_page = 10
+    mnfg_url = "#{window.root_url}/api/autocomplete?per_page=#{per_page}&categories=frame_mnfg+mnfg&q="
+    target.selectize
+      preload: true
+      create: false
+      maxItems: 1
+      valueField: 'id'
+      labelField: 'text'
+      searchField: 'text'
+      load: (query, callback) ->
+        $.ajax
+          url: "#{mnfg_url}#{encodeURIComponent(query)}"
+          type: 'GET'
+          error: ->
+            callback()
+          success: (res) ->
+            callback res.matches.slice(0, per_page)
+
+    existing_name = target.parents('.controls').attr('data-initialname')
+    if existing_name
+      val = target.val()
+      target.selectize()[0].selectize.updateOption(val, { id: val, text: existing_name })
+      target.selectize()[0].selectize.addItem(val)
+
     that = @
     target.on "change", (e) ->
       expand_value = target.parents('.control-group').attr('data-other')
       hidden_other = target.parents('.mnfg-group').find('.hidden-mnfg')
-      if parseInt(e.val, 10) == parseInt(expand_value, 10)
+      if parseInt(target.val(), 10) == parseInt(expand_value, 10)
         hidden_other.slideDown().addClass('unhidden')
       else 
         if hidden_other.hasClass('unhidden')
-          hidden_other.find('input').val('')
+          hidden_other.find('input').selectize()[0].selectize.setValue('')
           hidden_other.removeClass('unhidden').slideUp()
       
 
@@ -446,17 +429,21 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
         $('#rear_gear_select').val(rcount)
   
   toggleUnknownYear: ->
+    year_select = $('#bike_year').selectize()[0].selectize
     if $('#bike_unknown_year').prop('checked')
-      $('#bike_year').val('').trigger('change')
+      year_select.setValue('')
+      year_select.disable()
     else
-      $('#bike_year').val(new Date().getFullYear()).trigger('change')
-      $('#bike_year').select2 "enable", true
+      year_select.setValue(new Date().getFullYear())
+      year_select.enable()
   
   updateYear: ->
-    if $('#bike_year').val().length == 0
-      $('#bike_unknown_year').prop('checked', true)
-    else
-      $('#bike_unknown_year').prop('checked', false)
+    if $('#bike_year').val()
+      if $('#bike_year').val().length == 0
+        $('#bike_year').selectize()[0].selectize.disable()
+        $('#bike_unknown_year').prop('checked', true)
+      else
+        $('#bike_unknown_year').prop('checked', false)
 
   checkIfPhoneBlank: (e) ->
     unless $('#bike_stolen_records_attributes_0_phone').val().length > 0
@@ -516,22 +503,38 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       $('#submit-manufacturer-error').slideDown('fast')
 
   initializeManufacturerUpdate: ->
-    url = "#{window.root_url}/api/searcher?types[]=frame_makers&"
-    $('#manufacturer_update_manufacturer').select2
-      minimumInputLength: 2
-      placeholder: 'Choose manufacturer'
-      ajax:
-        url: url
-        dataType: "json"
-        openOnEnter: true
-        data: (term, page) ->
-          term: term # search term
-          limit: 10
-        results: (data, page) -> # parse the results into the format expected by Select2.
-          remapped = data.results.frame_makers.map (i) -> {id: i.id, text: i.term}
-          results: remapped
-      initSelection: (element, callback) ->
-        id = $(element).val()
+    per_page = 10
+    frame_mnfg_url = "#{window.root_url}/api/autocomplete?per_page=#{per_page}&categories=frame_mnfg&q="
+    $('#manufacturer_update_manufacturer').selectize
+      preload: true
+      create: false
+      maxItems: 1
+      valueField: 'slug'
+      labelField: 'text'
+      searchField: 'text'
+      load: (query, callback) ->
+        $.ajax
+          url: "#{frame_mnfg_url}#{encodeURIComponent(query)}"
+          type: 'GET'
+          error: ->
+            callback()
+          success: (res) ->
+            callback res.matches.slice(0, per_page)
+    # $('#manufacturer_update_manufacturer').select2
+    #   minimumInputLength: 2
+    #   placeholder: 'Choose manufacturer'
+    #   ajax:
+    #     url: url
+    #     dataType: "json"
+    #     openOnEnter: true
+    #     data: (term, page) ->
+    #       term: term # search term
+    #       limit: 10
+    #     results: (data, page) -> # parse the results into the format expected by Select2.
+    #       remapped = data.results.frame_makers.map (i) -> {id: i.id, text: i.term}
+    #       results: remapped
+    #   initSelection: (element, callback) ->
+    #     id = $(element).val()
         
 
   requestBikeDelete: (e) ->

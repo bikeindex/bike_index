@@ -10,26 +10,28 @@
       %label.control-label{for: "front_standard"}
         Front wheel
       .controls
-        %select#front_standard.standard-diams
-          %option{value: ''}
-            Choose diameter
-          %option{value: WheelSize.find_by_iso_bsd(622).id}
-            700c (includes 29ers)
-          %option{value: WheelSize.find_by_iso_bsd(584).id}
-            650b
-          %option{value: WheelSize.find_by_iso_bsd(630).id}
-            27in
-          %option{value: WheelSize.find_by_iso_bsd(559).id}
-            26in
-          %option{value: WheelSize.find_by_iso_bsd(406).id}
-            20in
-          %option{value: WheelSize.find_by_iso_bsd(355).id}
-            18in
-          %option{value: WheelSize.find_by_iso_bsd(305).id}
-            16in
-          %option{value: WheelSize.find_by_iso_bsd(203).id}
-            12in
-        = collection_select( :bike, :front_wheel_size_id, WheelSize.all , :id, :select_value, html: { :required =>true }, prompt: "All diameters")
+        #front_standard.standard-diams
+          %select
+            %option{value: ''}
+              Choose diameter
+            %option{value: WheelSize.find_by_iso_bsd(622).id}
+              700c (includes 29ers)
+            %option{value: WheelSize.find_by_iso_bsd(584).id}
+              650b
+            %option{value: WheelSize.find_by_iso_bsd(630).id}
+              27in
+            %option{value: WheelSize.find_by_iso_bsd(559).id}
+              26in
+            %option{value: WheelSize.find_by_iso_bsd(406).id}
+              20in
+            %option{value: WheelSize.find_by_iso_bsd(355).id}
+              18in
+            %option{value: WheelSize.find_by_iso_bsd(305).id}
+              16in
+            %option{value: WheelSize.find_by_iso_bsd(203).id}
+              12in
+        #front_all.all-dims
+          = collection_select( :bike, :front_wheel_size_id, WheelSize.all , :id, :select_value, html: { :required =>true }, prompt: "All diameters")
     %a#show-front-wheel-diams.wh_sw.show-all.optional-form-block{data: {target: "#bike_front_wheel_size_id", toggle: "#hide-front-wheel-diams"}}
       Show more sizes
     %a#hide-front-wheel-diams.wh_sw.optional-form-block.currently-hidden{data: {target: "#bike_front_wheel_size_id", toggle: "#show-front-wheel-diams"}}
@@ -52,29 +54,31 @@
       %label.control-label{for: "rear_standard"}
         Rear wheel
       .controls
-        %select#rear_standard.standard-diams
-          %option{value: ''}
-            Choose diameter
-          %option{value: WheelSize.find_by_iso_bsd(622).id}
-            700c (includes 29ers)
-          %option{value: WheelSize.find_by_iso_bsd(584).id}
-            650b
-          %option{value: WheelSize.find_by_iso_bsd(630).id}
-            27in
-          %option{value: WheelSize.find_by_iso_bsd(559).id}
-            26in
-          %option{value: WheelSize.find_by_iso_bsd(406).id}
-            20in
-          %option{value: WheelSize.find_by_iso_bsd(355).id}
-            18in
-          %option{value: WheelSize.find_by_iso_bsd(305).id}
-            16in
-          %option{value: WheelSize.find_by_iso_bsd(203).id}
-            12in
-        = collection_select( :bike, :rear_wheel_size_id, WheelSize.all , :id, :select_value, html: { :required =>true }, prompt: "All diameters")
-    %a#show-rear-wheel-diams.wh_sw.show-all.optional-form-block{data: {target: "#bike_rear_wheel_size_id", toggle: "#hide-rear-wheel-diams"}}
+        #rear_standard.standard-diams
+          %select
+            %option{value: ''}
+              Choose diameter
+            %option{value: WheelSize.find_by_iso_bsd(622).id}
+              700c (includes 29ers)
+            %option{value: WheelSize.find_by_iso_bsd(584).id}
+              650b
+            %option{value: WheelSize.find_by_iso_bsd(630).id}
+              27in
+            %option{value: WheelSize.find_by_iso_bsd(559).id}
+              26in
+            %option{value: WheelSize.find_by_iso_bsd(406).id}
+              20in
+            %option{value: WheelSize.find_by_iso_bsd(355).id}
+              18in
+            %option{value: WheelSize.find_by_iso_bsd(305).id}
+              16in
+            %option{value: WheelSize.find_by_iso_bsd(203).id}
+              12in
+        #rear_all.all-dims
+          = collection_select( :bike, :rear_wheel_size_id, WheelSize.all , :id, :select_value, html: { :required =>true }, prompt: "All diameters")
+    %a#show-rear-wheel-diams.wh_sw.show-all.optional-form-block{data: {target: "#rear_all", toggle: "#hide-rear-wheel-diams"}}
       Show more sizes
-    %a#hide-rear-wheel-diams.wh_sw.optional-form-block.currently-hidden{data: {target: "#bike_rear_wheel_size_id", toggle: "#show-rear-wheel-diams"}}
+    %a#hide-rear-wheel-diams.wh_sw.optional-form-block.currently-hidden{data: {target: "#rear_standard", toggle: "#show-rear-wheel-diams"}}
       Hide extra sizes
     .control-group.wheel-diameter
       %label.control-label
