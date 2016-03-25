@@ -55,7 +55,72 @@ class BikeIndex.Views.Global extends Backbone.View
     event.preventDefault()
     $('.top-user-nav').slideToggle()
 
+  updateIncludeSerialOption: ->
+    # Check if the header search includes the serial string match, set it on the window
+    window.includeSerialOption = !($('#head-search-bikes #query').val().match(/s(#|%23)[^(#|%23)]*(#|%23)/))
+
   initializeHeaderSearch: ->
+    # Empty the query field
+    # add the items for objects to the page in JSON (the autocomplete_hash),
+    # add the items to selectize and @updateIncludeSerialOption
+    @updateIncludeSerialOption()
+
+    # 
+    per_page = 10
+    updateIncludeSerialOption = @updateIncludeSerialOption
+    renderOption = @renderOption
+    $('#head-search-bikes #query').selectize
+      plugins: ['restore_on_backspace', 'remove_button']
+      preload: true
+      create: true
+      persist: false # Don't show items the users has entered after deleting them
+      valueField: 'search_id'
+      labelField: 'text'
+      searchField: 'text'
+      load: (query, callback) ->
+        $.ajax
+          url: "/api/autocomplete?per_page=#{per_page}&q=#{encodeURIComponent(query)}"
+          type: 'GET'
+          error: ->
+            callback()
+          success: (res) ->
+            result = res.matches.slice(0, per_page)
+            result.push({ id: '#', search_id: "s##{query}#", text: "#{query}" }) if window.includeSerialOption
+            callback result
+      render:
+        option: (item, escape) ->
+          renderOption(item, escape)
+        option_create: (data, escape) ->
+          # For some reason, without &hellip; at the end of this it breaks
+          "<div class='create'><span class='sch_'>Search all bikes for</span> <span class='label'>" + escape(data.input) + "</span>&hellip;</div>"
+      onChange: (value) ->
+        # On change doesn't cover everything, so run it all the time
+        updateIncludeSerialOption()
+        true
+      onItemAdd: (value, $item) ->
+        updateIncludeSerialOption()
+        true
+      onItemRemove: (value) ->
+        updateIncludeSerialOption()
+        true
+
+  renderOption: (item, escape) ->
+    prefix = switch
+      when item.category == 'colors'
+        p = "<span class='sch_'>Bikes that are </span>"
+        if item.display
+          p + "<span class='sclr' style='background: #{item.display};'></span>"
+        else
+          p + "<span class='sclr'>stckrs</span>"
+      when item.category == 'mnfg' || item.category == 'frame_mnfg'
+        "<span class='sch_'>Bikes made by</span>"
+      when item.id == '#' # because we set this in serialOpt
+        "<span class='sch_'>Find serial</span>"
+      else
+        'entered'
+    "<div>#{prefix} <span class='label'>" + escape(item.text) + '</span></div>'
+
+
     # tags = JSON.parse($("#header-search-select").attr('data-options'))
     # $('#head-search-bikes #query').select2
     #   tags: tags

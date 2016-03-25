@@ -7,5 +7,4 @@ describe AutocompleteLoaderWorker do
     expect_any_instance_of(AutocompleteLoader).to receive(:party)
     AutocompleteLoaderWorker.new.perform('party')
   end
-
 end

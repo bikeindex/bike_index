@@ -62,8 +62,8 @@
             /   - select_list = Color.all.map { |c| { id: "c_#{c.id}", text: "#{c.name} bikes", display: c.display } }
             /   - select_list += Manufacturer.frames.map { |m| { id: "m_#{m.id}", text: m.name } }
             /   %span#header-search-select.hidden{ data: { options: select_list.to_json }}
-            #header-search{ data: { selected: mnfg.to_json } }
-              = hidden_field_tag :serial, params[:serial]
+            / #header-search{ data: { selected: mnfg.to_json } }
+            /   = hidden_field_tag :serial, params[:serial]
       - if @ad.present?
         .container.partner-block-container
           .partner-block

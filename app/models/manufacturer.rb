@@ -110,7 +110,11 @@ class Manufacturer < ActiveRecord::Base
       text: name,
       category: autocomplete_hash_category,
       priority: autocomplete_hash_priority,
-      data: { slug: slug, priority: autocomplete_hash_priority },
+      data: { 
+        slug: slug,
+        priority: autocomplete_hash_priority,
+        search_id: "m_#{id}"
+      }
     }.as_json
   end
 

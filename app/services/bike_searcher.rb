@@ -9,12 +9,32 @@ class BikeSearcher
         @params[:query] = @params[:query_typed]
       end
     end
+    @params = interpreted_params(@params)
     if @params[:serial].present?
       if @params[:query].present?
         @params[:query] = @params[:query].gsub(/,?#,?/,'')
       end
       @normer = SerialNormalizer.new(serial: @params[:serial])
     end
+  end
+
+  attr_accessor :params
+
+  def interpreted_params(i_params)
+    query = i_params[:query]
+    return i_params unless query.present?
+    # serial segment looks like s#SERIAL#
+    serial_matcher = /
+      s(\#|%23)    # hash, either normal or encoded
+      [^(\#|%23)]* # any chars except hash
+      (\#|%23)     # final chars
+    /x
+    query.gsub!(serial_matcher) do |match|
+      # Set the serial to the match, with the first part chopped and the last part chopped
+      i_params[:serial] = match.gsub(/\As(#|%23)/, '').gsub(/(#|%23)\z/, '')
+      '' # remove it from query
+    end
+    i_params.merge(query: query)
   end
 
   def stolenness

@@ -520,21 +520,6 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
             callback()
           success: (res) ->
             callback res.matches.slice(0, per_page)
-    # $('#manufacturer_update_manufacturer').select2
-    #   minimumInputLength: 2
-    #   placeholder: 'Choose manufacturer'
-    #   ajax:
-    #     url: url
-    #     dataType: "json"
-    #     openOnEnter: true
-    #     data: (term, page) ->
-    #       term: term # search term
-    #       limit: 10
-    #     results: (data, page) -> # parse the results into the format expected by Select2.
-    #       remapped = data.results.frame_makers.map (i) -> {id: i.id, text: i.term}
-    #       results: remapped
-    #   initSelection: (element, callback) ->
-    #     id = $(element).val()
         
 
   requestBikeDelete: (e) ->

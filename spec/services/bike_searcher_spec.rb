@@ -2,6 +2,15 @@ require 'spec_helper'
 
 describe BikeSearcher do
 
+  describe :initialize do
+    it 'deletes the serial gsub expression if it is present' do
+      params = {query: 'm_940%2Cs%23sdfc%23%2Cc_1'}
+      searcher = BikeSearcher.new(params)
+      expect(searcher.params[:serial]).to eq('sdfc')
+      expect(searcher.params[:query]).to eq('m_940%2C%2Cc_1')
+    end
+  end
+
   describe :find_bikes do 
     it "calls select manufacturers, attributes, stolen and query if stolen is present" do 
       search = BikeSearcher.new(stolen: true)
