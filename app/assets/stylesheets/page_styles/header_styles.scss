@@ -695,31 +695,9 @@
 
 //________________________
 //
-// Overrides for header select2
+// Overrides for header search
 //
 //________________________
-
-#head-search-bikes {
-  .select2-container {
-    * {
-      -moz-box-sizing: content-box;
-      -webkit-box-sizing: content-box;
-      box-sizing: content-box;
-      border-color: #ccc;
-    }
-  }
-  .select2-container-multi .select2-choices .select2-search-choice {
-    padding-top: .3em;
-    padding-bottom: .3em;
-    margin-top: .25em;
-    // margin-bottom: .3em;
-  }
-  .select2-search-choice-close { top: 5px; }
-  // .additional-fields input { margin-top: 0; }
-}
-
-
-///////////// Overrides
 
 #header {
   #header-tabs {
@@ -750,6 +728,14 @@
     float: right;
     // margin-top: .5em;
   }
+}
+
+@media (min-width: 800px) {
+  #header .search-fields { padding-top: 3em; }
+}
+
+@media (min-width: 1200px) {
+  #header .search-fields { padding-bottom: 3em; }
 }
 
 @media (max-width: 599px) {
