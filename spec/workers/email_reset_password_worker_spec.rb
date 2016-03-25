@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe EmailResetPasswordWorker do
-  it { should be_processed_in :email }
+  it { should be_processed_in :notify }
 
   it "sends a password_reset email" do
     user = FactoryGirl.create(:user)

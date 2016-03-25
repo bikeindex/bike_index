@@ -1,6 +1,6 @@
 class UnusedOwnershipRemovalWorker
   include Sidekiq::Worker
-  sidekiq_options queue: 'updates'
+  sidekiq_options queue: 'afterwards'
   sidekiq_options backtrace: true
     
   def perform(id)
@@ -9,5 +9,4 @@ class UnusedOwnershipRemovalWorker
       ownership.update_attribute :current, false 
     end
   end
-
 end
