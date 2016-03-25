@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe UnusedOwnershipRemovalWorker do
-  it { should be_processed_in :updates }
+  it { should be_processed_in :afterwards }
 
   it "enqueues listing ordering job" do
     UnusedOwnershipRemovalWorker.perform_async

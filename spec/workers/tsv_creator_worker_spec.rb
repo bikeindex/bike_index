@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe TsvCreatorWorker do
-  it { should be_processed_in :updates }
+  it { should be_processed_in :carrierwave }
 
   it "enqueues another awesome job" do
     TsvCreatorWorker.perform_async

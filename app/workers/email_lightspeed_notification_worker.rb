@@ -1,6 +1,6 @@
 class EmailLightspeedNotificationWorker
   include Sidekiq::Worker
-  sidekiq_options queue: 'email'
+  sidekiq_options queue: 'notify'
   sidekiq_options backtrace: true
 
   def perform(organization_id, api_key)

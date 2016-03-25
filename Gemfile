@@ -10,7 +10,7 @@ gem 'active_model_serializers'
 gem 'aws-sdk', '~> 1.3.4'
 
 gem 'redis'
-gem 'sidekiq'
+gem 'sidekiq', '~> 4.1.1'
 gem 'sidekiq-failures'
 gem 'sidekiq-unique-jobs'
 gem 'rack-contrib'
