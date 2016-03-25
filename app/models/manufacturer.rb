@@ -83,17 +83,6 @@ class Manufacturer < ActiveRecord::Base
     self.slug = Slugifyer.manufacturer(self.name)
   end
 
-  def sm_options(all=false)
-    score = bikes.count
-    score = score + components.count if all
-    {
-      id: id,
-      term: name,
-      score: score,
-      data: {}
-    }
-  end
-
   def autocomplete_hash_category
     frame_maker ? 'frame_mnfg' : 'mnfg'
   end
