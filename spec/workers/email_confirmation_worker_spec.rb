@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe EmailConfirmationWorker do
-  it { should be_processed_in :email }
+  it { should be_processed_in :notify }
   
   it "sends a welcome email" do
     user = FactoryGirl.create(:user)

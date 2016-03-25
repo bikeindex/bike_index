@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe EmailStolenBikeAlertWorker do
-  it { should be_processed_in :email }
+  it { should be_processed_in :notify }
 
   describe :perform do
     it "sends an email" do
