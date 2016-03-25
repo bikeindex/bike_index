@@ -18,6 +18,7 @@ module Bikeindex
 
     # Custom directories with classes and modules you want to be autoloadable.
     config.autoload_paths += %W(#{config.root}/lib #{config.root}/lib/jobs #{config.root}/lib/integrations)
+     config.autoload_paths += Dir[ Rails.root.join('app', 'models', "concerns", '**/') ]
     config.autoload_paths += Dir[ Rails.root.join('app', 'controllers', "concerns", '**/') ]
 
     config.time_zone = 'Central Time (US & Canada)'

@@ -4,10 +4,34 @@ describe BikeSearcher do
 
   describe :initialize do
     it 'deletes the serial gsub expression if it is present' do
-      params = {query: 'm_940%2Cs%23sdfc%23%2Cc_1'}
+      params = { query: 'm_940%2Cs%23sdfc%23%2Cc_1' }
       searcher = BikeSearcher.new(params)
       expect(searcher.params[:serial]).to eq('sdfc')
       expect(searcher.params[:query]).to eq('m_940%2C%2Cc_1')
+    end
+  end
+
+  describe 'search selectize options' do
+    it 'returns the selectized items if passed through the expected things' do
+      manufacturer = FactoryGirl.create(:manufacturer)
+      color_1 = FactoryGirl.create(:color)
+      color_2 = FactoryGirl.create(:color)
+      params = { query: "c_#{color_1.id},c_#{color_2.id}%2Cm_#{manufacturer.id}%2Csomething+cool%2Cs%238xcvxcvcx%23" }
+      searcher = BikeSearcher.new(params)
+      searcher.matching_manufacturer(Bike.scoped)
+      searcher.matching_colors(Bike.scoped)
+      opts = 
+      target = [
+        manufacturer.autocomplete_result_hash,
+        color_1.autocomplete_result_hash,
+        color_2.autocomplete_result_hash,
+        { id: 'serial', search_id: "s#8xcvxcvcx#", text: '8xcvxcvcx' },
+        { text: 'something+cool', search_id: 'something+cool'}
+      ].as_json
+      result = searcher.selectize_items
+      expect(result).to eq target
+      result.each { |t| expect(target.include?(t)).to be_true }
+      target.each { |t| expect(result.include?(t)).to be_true }
     end
   end
 

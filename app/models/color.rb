@@ -1,4 +1,5 @@
 class Color < ActiveRecord::Base
+  include AutocompleteHashable
   attr_accessible :name, :priority, :display
   validates_presence_of :name, :priority
   validates_uniqueness_of :name

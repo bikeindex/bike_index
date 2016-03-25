@@ -6,7 +6,6 @@ class BikeIndex.Views.Global extends Backbone.View
     'click .footnote-back-link':            'scrollToRef'
     'click .scroll-to-ref':                 'scrollToRef'
     'click .no-tab':                        'openNewWindow'
-    'change #head-search-bikes #query':     'updateSearchAssociations'
     'click #expand_user':                   'expandUserNav'
     'click #most_recent_stolen_bikes':      'mostRecentStolen'
     
@@ -60,19 +59,16 @@ class BikeIndex.Views.Global extends Backbone.View
     window.includeSerialOption = !($('#head-search-bikes #query').val().match(/s(#|%23)[^(#|%23)]*(#|%23)/))
 
   initializeHeaderSearch: ->
-    # Empty the query field
-    # add the items for objects to the page in JSON (the autocomplete_hash),
-    # add the items to selectize and @updateIncludeSerialOption
-    @updateIncludeSerialOption()
-
-    # 
+    initial_opts = $('#selectize_items').data('initial')
     per_page = 10
-    updateIncludeSerialOption = @updateIncludeSerialOption
     renderOption = @renderOption
+    updateIncludeSerialOption = @updateIncludeSerialOption
     $('#head-search-bikes #query').selectize
       plugins: ['restore_on_backspace', 'remove_button']
       preload: true
       create: true
+      options:  initial_opts # So that they have words
+      items: initial_opts.map (i) -> i.search_id
       persist: false # Don't show items the users has entered after deleting them
       valueField: 'search_id'
       labelField: 'text'
@@ -85,11 +81,16 @@ class BikeIndex.Views.Global extends Backbone.View
             callback()
           success: (res) ->
             result = res.matches.slice(0, per_page)
-            result.push({ id: '#', search_id: "s##{query}#", text: "#{query}" }) if window.includeSerialOption
+            result.push({ id: 'serial', search_id: "s##{query}#", text: "#{query}" }) if window.includeSerialOption
             callback result
       render:
         option: (item, escape) ->
           renderOption(item, escape)
+        item: (item, escape) ->
+          if item.id == 'serial'
+            "<div><span class='search_span_s'>serial</span> #{item.text}</div>"
+          else  
+            "<div> #{item.text}</div>"
         option_create: (data, escape) ->
           # For some reason, without &hellip; at the end of this it breaks
           "<div class='create'><span class='sch_'>Search all bikes for</span> <span class='label'>" + escape(data.input) + "</span>&hellip;</div>"
@@ -103,6 +104,9 @@ class BikeIndex.Views.Global extends Backbone.View
       onItemRemove: (value) ->
         updateIncludeSerialOption()
         true
+      onInitialize: ->
+        updateIncludeSerialOption()
+
 
   renderOption: (item, escape) ->
     prefix = switch
@@ -114,83 +118,11 @@ class BikeIndex.Views.Global extends Backbone.View
           p + "<span class='sclr'>stckrs</span>"
       when item.category == 'mnfg' || item.category == 'frame_mnfg'
         "<span class='sch_'>Bikes made by</span>"
-      when item.id == '#' # because we set this in serialOpt
+      when item.id == 'serial' # because we set this item up in the success callback
         "<span class='sch_'>Find serial</span>"
       else
         'entered'
     "<div>#{prefix} <span class='label'>" + escape(item.text) + '</span></div>'
-
-
-    # tags = JSON.parse($("#header-search-select").attr('data-options'))
-    # $('#head-search-bikes #query').select2
-    #   tags: tags
-    #   tokenSeparators: [","]
-    #   openOnEnter: false
-    #   formatResult: (object, container, query) ->
-    #     if object.id?
-    #       return nil unless query?
-    #       if object.display
-    #         return "#{object.display} <span class='sch_c'>#{object.text}</span>"
-    #       if object.id == '#'
-    #         return "<span class='sch_s'><span>Find </span>serial</span> #{object.text}"
-    #       if object.id == object.text
-    #         return "<span class='sch_'>Search <span>all bikes</span> for</span> #{object.text}"
-    #       else
-    #         "<span class='sch_m'><span>Bikes </span>made by</span> #{object.text}"
-    #   formatResultCssClass: (o) ->
-    #     'sch_special' if o.id == '#'
-    #     # return response + object.text
-    #   createSearchChoice: (term, data) ->
-    #     if $(data).filter(->
-    #       @text.localeCompare(term) is 0
-    #     ).length is 0
-    #       id: term
-    #       text: term
-    #   createSearchChoicePosition: (list, item) ->
-    #     list.splice 0, 0, item, {id: '#', text: item.text }
-    #   dropdownCssClass: 'mainsrchdr'
-    #   formatSelection: (object, containter) ->
-    #     return object.text if object.id == object.text
-    #     if object.id == '#'
-    #       return "<span class='search_span_s'>serial </span> #{object.text}"
-    #     else if object.display?
-    #       return object.text
-    #     "<span class='search_span_m'>made by </span> #{object.text}"
-    
-    # # if $('#header-search #manufacturer_id').val().length > 0
-    # #   data = $('#query').select2('data')
-    # #   data.push($('#header-search').data('selected'))
-    # #   $('#query').select2('data',data)
-    # if $('#header-search #serial').val().length > 0
-    #   data = $('#query').select2('data')
-    #   data.push({id: '#', text: encodeURI($('#header-search #serial').val())})
-    #   $('#query').select2('data',data)
-
-    # unless $('#bikes-search').length > 0
-    #   location = localStorage.getItem('location')
-    #   $('#proximity').val(localStorage.getItem('location'))
-    #   unless location? and location.length > 0
-    #     $('#proximity').val('ip')
-    #     localStorage.setItem('location', 'ip')
-    #     $.getJSON "https://freegeoip.net/json/", (json) ->
-    #       location = ""
-    #       location += "#{json.city} " if json.city?
-    #       location += "#{json.region_name}" if json.region_name?
-    #       if location.length > 0
-    #         localStorage.setItem('location', location)
-    #         $('#proximity').val(location)
-
-  updateSearchAssociations: (e) ->
-    if e.added?
-      unless e.added.id == e.added.text 
-        if e.added.id == '#'
-          $('#header-search #serial').val(e.added.text)
-    if e.removed?
-      if e.removed.id == '#'
-        $('#header-search #serial').val('')
-
-
-
 
   # 
   # 

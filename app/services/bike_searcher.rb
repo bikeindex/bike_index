@@ -37,6 +37,32 @@ class BikeSearcher
     i_params.merge(query: query)
   end
 
+  # Remove the encoding tricks we use with selectize
+  def stripped_query
+    @params[:query]
+      .gsub(/m_\d+/, '') # manufacturers
+      .gsub(/c_\d+/, '') # colors
+      .gsub(/%2C/i, ',') # unencode commas
+  end
+
+  def selectize_items
+    items = []
+    if @params[:manufacturer_id].present?
+      items << Manufacturer.find(@params[:manufacturer_id]).autocomplete_result_hash
+    end
+    if @color_ids.present?
+      @color_ids.each { |c_id| items << Color.find(c_id).autocomplete_result_hash }
+    end
+    if @params[:serial].present?
+      items << { id: 'serial', search_id: "s##{@params[:serial]}#", text: @params[:serial] }.as_json
+    end
+    if @params[:query]
+      stripped_query.split(',').reject(&:blank?)
+        .each { |q| items << { search_id: q, text: q }.as_json }
+    end
+    items
+  end
+
   def stolenness
     if @params[:non_stolen].present? || @params[:stolen].present?
       if @params[:stolen].present? && @params[:stolen]
@@ -66,7 +92,7 @@ class BikeSearcher
 
   def matching_query(bikes)
     return nil unless @params[:query].present?
-    @bikes = bikes.text_search(@params[:query].gsub(/(,?c_\d+|,?m_\d+)/,''))
+    @bikes = bikes.text_search(stripped_query.gsub(',', ' '))
     @bikes
   end
 
@@ -87,7 +113,7 @@ class BikeSearcher
       end
     end
     if @params[:query] && @params[:query].match(/(,?m_\d+)/)
-      @params[:manufacturer_id] = @params[:query].match(/(,?m_\d+)/)[0].gsub(/,?m_/,'') 
+      @params[:manufacturer_id] = @params[:query].match(/(,?m_\d+)/)[0].gsub(/,?m_/,'')
     end
     @bikes = bikes.where(manufacturer_id: @params[:manufacturer_id]) if @params[:manufacturer_id].present?
     @bikes
@@ -95,14 +121,14 @@ class BikeSearcher
 
   def matching_colors(bikes)
     if @params[:colors].present?
-      color_ids = @params[:colors].split(',')
+      @color_ids = @params[:colors].split(',')
         .collect{ |c| Color.fuzzy_name_find(c).id if Color.fuzzy_name_find(c) }
     elsif @params[:query] && @params[:query].match(/(,?c_\d+)/)
-      color_ids = @params[:query].scan(/(,?c_\d+)/).flatten
+      @color_ids = @params[:query].scan(/(,?c_\d+)/).flatten
         .map{ |c| c.gsub(/(,?c_)/,'') }
     end
-    if color_ids.present?
-      color_ids.compact.each do |c_id|
+    if @color_ids.present?
+      @color_ids.compact.each do |c_id|
         @bikes = bikes.where("primary_frame_color_id = ? OR secondary_frame_color_id = ? OR tertiary_frame_color_id = ?", c_id, c_id, c_id)
       end
     end

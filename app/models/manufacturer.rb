@@ -1,4 +1,5 @@
 class Manufacturer < ActiveRecord::Base
+  include AutocompleteHashable
   attr_accessible :name,
     :slug,
     :website,

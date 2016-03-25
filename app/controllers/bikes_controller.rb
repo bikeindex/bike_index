@@ -43,6 +43,7 @@ class BikesController < ApplicationController
     @query = params[:query]
     @query = request.query_parameters()
     @url = request.original_url
+    @selectize_items = search.selectize_items
     render layout: 'application_updated'
   end
 

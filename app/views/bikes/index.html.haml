@@ -1,7 +1,5 @@
 #bikes-search
-  %span#query_searched
-    = @query
-
+  %span#selectize_items{ data: { initial: @selectize_items.to_json } }
 
 - if params[:stolen].present? && params[:stolen].to_s != 'false'
   - if params[:non_proximity].present? && params[:non_proximity].to_s != 'false'
