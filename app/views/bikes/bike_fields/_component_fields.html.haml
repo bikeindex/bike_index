@@ -1,6 +1,6 @@
 %fieldset.input-group.with-additional-block.add-component-fields
   %article
-    .control-group.select_unattached.chosen-select.has-position-select{data: {other: Ctype.find_by_slug("other").id, hidden: ".hidden-ctype" }}
+    .control-group.select_unattached.special-select-single.has-position-select{data: {other: Ctype.find_by_slug("other").id, hidden: ".hidden-ctype" }}
       = f.label :ctype_id, "Part type", class: "control-label"
       .controls.part-type-select
         = f.collection_select(:ctype_id, Ctype.all, :id, :name, :required =>true, prompt: "What type of part?" )
@@ -30,17 +30,18 @@
 
     .mnfg-group
       .split-fields
-        .control-group.select-jsonified.extra-field{data: {other: Manufacturer.find_by_slug("other").id, hidden: ".hidden-mnfg" }}
+        .control-group.select-jsonified.extra-field{ data: { other: @manufacturer_other_id, hidden: ".hidden-mnfg" } }
           = f.label :manufacturer_id, class: "control-label"
-          .controls.component-mnfg-select.select_unattached
+          - c_mnfg = f.object.manufacturer
+          / - initial = c_mnfg.present? ? { id: c_mnfg.id, text: c_mnfg.name }.to_json : nil
+          .controls.component-mnfg-select.select_unattached{ data: { initialname:  c_mnfg && c_mnfg.name } }
             = f.text_field :manufacturer_id
-        
         .control-group.extra-field.component_model.short-label
           = f.label :model_name, "Model", class: "control-label"
           .controls
             = f.text_field :model_name
       - other_show = ""
-      - other_show = "other_present" if f.object.manufacturer_id == Manufacturer.find_by_slug("other").id
+      - other_show = "other_present" if f.object.manufacturer_id == @manufacturer_other_id
       .hidden-other.control-group.hidden-mnfg{class: other_show}
         = f.label :manufacturer_other, "Other manufacturer", class: "control-label"
         .controls

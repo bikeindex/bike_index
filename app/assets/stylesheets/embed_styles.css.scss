@@ -1,4 +1,5 @@
-@import "includes/select2-binx.scss";
+@import "includes/selectize_bootstrap3.scss";
+.control-group .selectize-control { width: 210px; }
 @import "application_styles/_colors.scss";
 @import "includes/bootstrap/_variables.scss";
 @import "includes/bootstrap/_mixins.scss";

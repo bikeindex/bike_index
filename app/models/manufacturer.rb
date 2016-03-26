@@ -1,4 +1,5 @@
 class Manufacturer < ActiveRecord::Base
+  include AutocompleteHashable
   attr_accessible :name,
     :slug,
     :website,
@@ -78,25 +79,19 @@ class Manufacturer < ActiveRecord::Base
     end
   end
 
-
   before_save :set_slug
   def set_slug
     self.slug = Slugifyer.manufacturer(self.name)
   end
 
-  def sm_options(all=false)
-    score = bikes.count
-    score = score + components.count if all
-    {
-      id: id,
-      term: name,
-      score: score,
-      data: {}
-    }
-  end
-
   def autocomplete_hash_category
     frame_maker ? 'frame_mnfg' : 'mnfg'
+  end
+
+  def autocomplete_hash_priority
+    return 0 unless (bikes.count + components.count) > 0
+    pop = (2*bikes.count + components.count) / 20 + 10
+    pop > 100 ? 100 : pop
   end
 
   def autocomplete_hash
@@ -104,8 +99,12 @@ class Manufacturer < ActiveRecord::Base
       id: id,
       text: name,
       category: autocomplete_hash_category,
-      priority: (bikes.count + components.count),
-      data: {},
+      priority: autocomplete_hash_priority,
+      data: { 
+        slug: slug,
+        priority: autocomplete_hash_priority,
+        search_id: "m_#{id}"
+      }
     }.as_json
   end
 

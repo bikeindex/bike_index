@@ -13,34 +13,33 @@
     padding: 4px 0;
   }
   $row-width: 1.342; // 100/74.5 - full width over 9 column
-  .search-text-field.select2-container.select2-container-multi {
-    // width: ($eight-column+$gutter)*$row-width; 
+  .search-text-field {
     font-size: $bike-search-font-size;
     border: none;
     background: $gray-lighter;
-    border-radius: $border-radius 0 0 $border-radius;
     padding: 0;
-    &:active, &:focus { box-shadow: none; }
-
-    .select2-choices {
+    border-radius: $border-radius 0 0 $border-radius;
+    .selectize-input {
+      line-height: 1.5em !important;
+      border-radius: $border-radius 0 0 $border-radius;
       height: $bike-search-height;
-      background: none;
-      border: none;
-      font-size: $bike-search-font-size;
-      line-height: 1em;
-      padding: .25em .5em;
+      &>div {
+        background: none;
+        border: 1px solid rgba($blue, 0.8);
+        // background: rgba($blue, 0.8);
+        font-size: $bike-search-font-size;
+        line-height: 1em;
+        padding-top: .4em;
+        padding-left: .4em;
+        padding-bottom: .4em;
+      }
     }
-    .select2-search-choice {
-      font-size: $bike-search-font-size;
-      border-radius: $border-radius;
-      margin: .1em .25em 0 0;
-      padding: .35em .5em .35em 18px;
-      line-height: 1em;
-      background: $gray-lightest;
-    }
-    .select2-search-choice-focus {
-      border-color: $blue;
-      background: lighten($gray-lightest, 2%);
+    .selectize-dropdown {
+      &.multi.form-control { top: -.1em !important; }
+      .sch_ .highlight { background: none; }
+      .selectize-dropdown-content .active {
+        background: rgba($blue, 0.3); 
+      }
     }
   }
   .searchit {
@@ -100,7 +99,7 @@
     float: none;
     padding: 0 $small-pad;
     // clear: both;
-    .search-text-field.select2-container.select2-container-multi {
+    .search-text-field {
       width: $ten-column+$gutter; 
     }
     .searchit {
@@ -114,7 +113,7 @@
     width: $nine-column;
     float: right;
     $row-width: 1.342; // 100/74.5 - full width over 9 column
-    .search-text-field.select2-container.select2-container-multi {
+    .search-text-field {
       width: ($eight-column+$gutter)*$row-width; 
     }
     .searchit {
@@ -125,7 +124,7 @@
 
 #bikes-search { display: none; }
 
-.mainsrchdr {
+.selectize-dropdown-content {
   background: $gray-lightest;
   border: 1px solid $gray-lighter;
   border-top: 1px solid rgba($gray-lighter, .5);
@@ -165,9 +164,10 @@
 .sclr {
   border-radius: 3px;
   display: inline-block;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border: 1px solid white;
+  line-height: .8em;
   margin: 0 6px 0 0;
   font-size: .5em;
   // color: $grayLighter;
@@ -176,7 +176,7 @@
 }
 
 @media (max-width: 600px) {
-  .mainsrchdr {
+  .selectize-dropdown-content {
     .select2-results { max-height: 200px; }
     .sch_s, .sch_m, .sch_ {
       font-size: 14px;

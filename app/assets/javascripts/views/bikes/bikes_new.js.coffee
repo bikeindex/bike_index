@@ -5,6 +5,7 @@ class BikeIndex.Views.BikesNew extends Backbone.View
     'change #bike_year':              'updateYear'
     'change #bike_unknown_year':      'toggleUnknownYear' 
     'click #select-cycletype a':      'changeCycleType'
+    'change #bike_manufacturer_id':   'onManufacturerChange'
     'change #country_select_container select': 'updateCountry'
     
   
@@ -16,7 +17,7 @@ class BikeIndex.Views.BikesNew extends Backbone.View
       if $('#country_select_container select').val().length > 0
         @updateCountry()
       else
-        @setDefaultCountry() 
+        @setDefaultCountry()
     @updateCycleType()
     window.root_url = $('#root_url').attr('data-url')
     
@@ -41,8 +42,10 @@ class BikeIndex.Views.BikesNew extends Backbone.View
     else
       if target.hasClass('rm-block')
         clickTarget.slideUp().removeClass('unhidden').addClass('currently-hidden')
+        clickTarget.find('select').selectize()[0].selectize.setValue('')
       else
         clickTarget.slideDown().addClass('unhidden').removeClass('currently-hidden')
+
   updateCycleType: ->
     current_value = $("#cycletype#{$("#bike_cycle_type_id").val()}")
     $('#cycletype-text').removeClass('long-title')
@@ -57,49 +60,66 @@ class BikeIndex.Views.BikesNew extends Backbone.View
     @updateCycleType()
 
   setModelTypeahead: (data=[]) ->
-    autocomplete = $('#bike_frame_model').typeahead()
-    autocomplete.data('typeahead').source = data 
-    # $('#bike_frame_model').typeahead({source: data})
+    $('#bike_frame_model').selectize()[0].selectize.destroy()
+    if data.length > 0
+      window.m_data = data.map (i) -> { id: i }
+      $('#bike_frame_model').selectize
+        options: data.map (i) -> { 'name': i }
+        create: true
+        maxItems: 1
+        valueField: 'name'
+        labelField: 'name'
+        searchField: 'name'
 
   getModelList: (mnfg_name) ->
-    year = parseInt($('#bike_year').val(),10)
-    # could be bikebook.io - but then we'd have to pay for SSL...
-    url = "https://bikebook.herokuapp.com//model_list/?manufacturer=#{mnfg_name}"
-    url += "&year=#{year}" if year > 1
-    that = @
-    $.ajax
-      type: "GET"
-      url: url
-      success: (data, textStatus, jqXHR) ->
-        that.setModelTypeahead(data)
-      error: ->
-        that.setModelTypeahead()
+    if mnfg_name == 'absent'
+      @setModelTypeahead()
+    else
+      year = parseInt($('#bike_year').val(),10)
+      # could be bikebook.io - but then we'd have to pay for SSL...
+      url = "https://bikebook.herokuapp.com/model_list/?manufacturer=#{mnfg_name}"
+      url += "&year=#{year}" if year > 1
+      that = @
+      $.ajax
+        type: "GET"
+        url: url
+        success: (data, textStatus, jqXHR) ->
+          that.setModelTypeahead(data)
+        error: ->
+          that.setModelTypeahead()
 
   toggleUnknownYear: ->
+    year_select = $('#bike_year').selectize()[0].selectize
     if $('#bike_unknown_year').prop('checked')
-      $('#bike_year').val('').trigger('change')
-      $('#bike_year').select2 "enable", false
+      year_select.setValue('')
+      year_select.disable()
     else
-      $('#bike_year').val(new Date().getFullYear()).trigger('change')
-      $('#bike_year').select2 "enable", true
+      year_select.setValue(new Date().getFullYear())
+      year_select.enable()
   
   updateYear: ->
-    if $('#bike_year').val().length == 0
-      $('#bike_year').select2 "enable", false
-      $('#bike_unknown_year').prop('checked', true)
+    if $('#bike_year').val()
+      if $('#bike_year').val().length == 0
+        $('#bike_year').selectize()[0].selectize.disable()
+        $('#bike_unknown_year').prop('checked', true)
+      else
+        $('#bike_unknown_year').prop('checked', false)
+
+    slug = $('#bike_manufacturer_id').val()
+    if slug.length > 0
+      @getModelList(slug)
     else
-      $('#bike_unknown_year').prop('checked', false)
-    id = $('#bike_manufacturer_id').val()
-    if id.length > 0
-      that = this
-      $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
-      ).done (data) ->
-        that.getModelList(data.manufacturer.name)
+      @getModelList()
+
+  onManufacturerChange: ->
+    slug = $('#bike_manufacturer_id').val()
+    @otherManufacturerDisplay(slug)
+    @getModelList(slug)
 
   otherManufacturerDisplay: (current_value) ->
-    expand_value = $('#bike_manufacturer_id').parents('.input-group').find('.other-value').text()
+    expand_value = 'other'
     hidden_other = $('#bike_manufacturer_id').parents('.input-group').find('.hidden-other')
-    if parseInt(current_value, 10) == parseInt(expand_value, 10)
+    if current_value == expand_value
       # show the bugger!
       hidden_other.slideDown().addClass('unhidden')
     else 
@@ -109,51 +129,34 @@ class BikeIndex.Views.BikesNew extends Backbone.View
         hidden_other.removeClass('unhidden').slideUp()
     
   setDefaultCountry: ->
-    $.getJSON "http://www.telize.com/geoip?callback=?", (json) ->
-      select = $('#country_select_container select')
-      country_id = select.find("option").filter(->
-        $(this).text() is json.country
-      ).val()
-      select.val(country_id).change()
-
+    # we should geocode the country in here if possible...
+    default_country_id = parseInt($('#us_country_id').text(), 10)
+    $('#country_select_container select').selectize()[0].selectize.setValue(default_country_id)
+    
   updateCountry: ->
     c_select = $('#country_select_container select')
-    c_select.select2()
     us_val = parseInt($('#country_select_container .other-value').text(), 10)
     if parseInt(c_select.val(), 10) == us_val
       $('#state-select').slideDown()
     else
       $('#state-select').slideUp()
-      $('#state-select select').val('').change()
+      $('#state-select select').selectize()[0].selectize.setValue('')
 
   initializeFrameMaker: (target) ->
-    url = "#{window.root_url}/api/searcher?types[]=frame_makers&"
-    $(target).select2
-      minimumInputLength: 2
-      placeholder: 'Choose manufacturer'
-      ajax:
-        url: url
-        dataType: "json"
-        openOnEnter: true
-        data: (term, page) ->
-          term: term # search term
-          limit: 10
-        results: (data, page) -> # parse the results into the format expected by Select2.
-          remapped = data.results.frame_makers.map (i) -> {id: i.id, text: i.term}
-          results: remapped
-      initSelection: (element, callback) ->
-        id = $(element).val()
-        if id isnt ""
-          $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
-          ).done (data) ->
-            data =
-              id: element.val()
-              text: data.manufacturer.name
-            callback data
-    that = @
-    $(target).on "change", (e) ->
-      id = e.val
-      that.otherManufacturerDisplay(id)
-      $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
-      ).done (data) ->
-        that.getModelList(data.manufacturer.name)
+    per_page = 10
+    frame_mnfg_url = "#{window.root_url}/api/autocomplete?per_page=#{per_page}&categories=frame_mnfg&q="
+    $(target).selectize
+      preload: true
+      create: false
+      maxItems: 1
+      valueField: 'slug'
+      labelField: 'text'
+      searchField: 'text'
+      load: (query, callback) ->
+        $.ajax
+          url: "#{frame_mnfg_url}#{encodeURIComponent(query)}"
+          type: 'GET'
+          error: ->
+            callback()
+          success: (res) ->
+            callback res.matches.slice(0, per_page)

@@ -18,7 +18,6 @@
 //= require external_scripts/bootstrap-collapse.js
 //= require external_scripts/bootstrap-tab.js
 //= require external_scripts/bootstrap-datepicker.js
-//= require external_scripts/bootstrap-typeahead.js
 //= require external_scripts/bootstrap-dropdown.js
 //= require external_scripts/zoom.js
 //= require external_scripts/bootstrap-button.js
@@ -27,7 +26,7 @@
 //= require external_scripts/jquery.sortable.js
 //= require external_scripts/jquery.ui.widget.js
 //= require external_scripts/are-you-sure.js.coffee
-//= require external_scripts/select2.js
+//= require external_scripts/selectize.js
 //= require external_scripts/slick.js
 //= require external_scripts/jquery.iframe-transport.js
 //= require external_scripts/jquery.fileupload.js

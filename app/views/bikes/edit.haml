@@ -1,3 +1,4 @@
+- @manufacturer_other_id = Manufacturer.find_by_slug("other").id
 - if @bike.errors.any?
   #alert-block
     .alert.alert-error
@@ -27,7 +28,7 @@
   %p
     = link_to "View the #{@bike.type}", bike_url(@bike)
 #root_url.hidden{data: { url: ENV['BASE_URL'] }}
-.edit-bike-container#chosen-container{ class: ("stolen-background" if @bike.stolen)}
+.edit-bike-container{ class: ("stolen-background" if @bike.stolen)}
   #edit-bike-form
     %span#clearing_span
     .edit-bike-fields#edit_photos

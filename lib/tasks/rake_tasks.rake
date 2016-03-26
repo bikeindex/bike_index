@@ -16,7 +16,7 @@ end
 
 desc 'Create frame_makers and push to redis'
 task :sm_import_manufacturers => :environment do
-  SmImportWorker.perform_async
+  AutocompleteLoaderWorker.perform_async('load_manufacturers')
 end
 
 desc 'Create frame_makers and push to redis'

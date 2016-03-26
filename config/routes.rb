@@ -175,7 +175,6 @@ Bikeindex::Application.routes.draw do
       match 'not_found', to: 'api_v1#not_found'
       match '*a', to: 'api_v1#not_found'
     end
-    mount Soulmate::Server, at: '/searcher'
     mount Soulheart::Server, at: '/autocomplete'
   end
   mount API::Base => '/api'

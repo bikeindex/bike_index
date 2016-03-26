@@ -40,43 +40,5 @@
           
           #signup.tab-pane.login-header.no_user.hidden
             = render 'sessions/form'
-
-      = form_tag bikes_path, method: :get, id: "head-search-bikes" do 
-        - if params[:manufacturer_id].present?
-          - mnfg = {id: params[:manufacturer_id], text: Manufacturer.find(params[:manufacturer_id]).name} if params[:manufacturer_id].present?
-        - else
-          - mnfg = ''
-        - cache 'header_search' do
-          - select_list = Color.all.map { |c| { id: "c_#{c.id}", text: c.name, display: c.display } }
-          - select_list += Manufacturer.frames.map { |m| { id: "m_#{m.id}", text: m.name } }
-          %span#header-search-select.hidden{ data: { options: select_list.to_json }}
-        .search-fields#header-search{ data: { selected: mnfg.to_json } }
-          %span.search-background
-          - params[:query] = params[:query].gsub(/,?#,?/,'').gsub(/(\A,|,\z)/, '') if params[:query].present?
-          .sfieldr
-            = text_field_tag :query,                             |
-              strip_tags(params[:query]),                        |
-              placeholder: "Search bike traits or serials",      |
-              class: "search-text-field"                         
-            = button_tag(type: "submit", class: "searchit") do
-              = image_tag '/assets/stolen/search.svg'
-          = hidden_field_tag :serial, params[:serial]
-            
-          .optional-fields
-            / .additional-fields
-            /   = text_field_tag :serial, params[:serial], placeholder: 'Serial number lookup'
-            /   / %span.absent-serial-blocker
-            /   / %a#serial-absent{href: "#"}
-            /   /   %span
-            /   /     has
-            /   /   no serial
-
-            / .stolenness
-
-            /   %label{ for: "stolen" }
-            /     = check_box_tag :stolen, 1, params[:stolen]
-            /     Only stolen
-            .proximity#stolen-proximity
-              = text_field_tag :proximity, params[:proximity], placeholder: 'Location to prioritize'
-              %span
-                area thefts first
+      #head-search-bikes
+        .search-fields

@@ -22,7 +22,7 @@ class Admin::ManufacturersController < Admin::BaseController
     if @manufacturer.update_attributes(params[:manufacturer])
       flash[:notice] = "Manufacturer Saved!"
       expire_fragment "header_search"
-      SmImportWorker.perform_async
+      AutocompleteLoaderWorker.perform_async('load_manufacturers')
       redirect_to admin_manufacturer_url(@manufacturer)
     else
       render action: :edit
@@ -34,7 +34,7 @@ class Admin::ManufacturersController < Admin::BaseController
     if @manufacturer.save
       flash[:notice] = "Manufacturer Created!"
       expire_fragment "header_search"
-      SmImportWorker.perform_async
+      AutocompleteLoaderWorker.perform_async('load_manufacturers')
       redirect_to admin_manufacturer_url(@manufacturer)
     else
       render action: :new

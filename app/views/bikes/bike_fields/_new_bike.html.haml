@@ -22,18 +22,16 @@
   .control-group.select-jsonified
     = f.label :manufacturer_id, class: "control-label"
     .controls
-      = f.text_field :manufacturer_id
+      = f.text_field :manufacturer_id, value: @bike.manufacturer && @bike.manufacturer.name
       %span.help-block
         Select 'Other' if manufacturer isn't listed
-  %p.other-value
-    = Manufacturer.find_by_slug("other").id
   .hidden-other.control-group
     = f.label :manufacturer_other, "Other manufacturer", class: "control-label"
     .controls
       = f.text_field :manufacturer_other, placeholder: "Manufacturer name"
 
 .input-group.with-optional-blocks
-  .control-group.chosen-select
+  .control-group.special-select-single
     = f.label :year, "Model year", class: "control-label"
     .controls
       - years = (1900..Time.now.year+1).to_a.reverse.map {|i| [i,i] }
@@ -53,7 +51,7 @@
   %a.bikeform-tip{role: "button", title: "Why do we do colors like this?", data: {toggle: "modal", target: "#colorTip"} }
     %span
       ?
-  .control-group.chosen-select
+  .control-group.special-select-single
     = f.label :primary_frame_color_id, "Frame color", class: "control-label"
     .controls
       = collection_select( :bike, :primary_frame_color_id, Color.all, :id, :name, required: true, prompt: "Choose color" )
@@ -62,7 +60,7 @@
   %a#rm-secondary.optional-form-block.rm-block.currently-hidden{data: {target: "#secondary-color", toggle: "#add-secondary"}}
     Remove color
   #secondary-color.hidden-other
-    .control-group.chosen-select
+    .control-group.special-select-single
       %label.control-label
         Secondary color
       .controls
@@ -72,7 +70,7 @@
     %a#rm-tertiary.optional-form-block.rm-block.currently-hidden{data: {target: "#tertiary-color", toggle: "#add-tertiary"}}
       Remove color
   #tertiary-color.hidden-other
-    .control-group.chosen-select
+    .control-group.special-select-single
       %label.control-label
         Third color
       .controls

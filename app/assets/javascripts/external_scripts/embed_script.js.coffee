@@ -1,39 +1,38 @@
 initializeFrameMaker = (target) ->
-  url = "#{window.root_url}/api/searcher?types[]=frame_makers&"
-  $(target).select2
-    minimumInputLength: 2
-    placeholder: 'Choose manufacturer'
-    ajax:
-      url: url
-      dataType: "json"
-      openOnEnter: true
-      data: (term, page) ->
-        term: term # search term
-        limit: 10
-      results: (data, page) -> # parse the results into the format expected by Select2.
-        remapped = data.results.frame_makers.map (i) -> {id: i.id, text: i.term}
-        results: remapped
-    initSelection: (element, callback) ->
-      id = $(element).val()
-      if id isnt ""
-        $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
-        ).done (data) ->
-          data =
-            id: element.val()
-            text: data.manufacturer.name
-          callback data
-  
+  per_page = 10
+  frame_mnfg_url = "#{window.root_url}/api/autocomplete?per_page=#{per_page}&categories=frame_mnfg&q="
+  $(target).selectize
+    preload: true
+    create: false
+    maxItems: 1
+    valueField: 'slug'
+    labelField: 'text'
+    searchField: 'text'
+    load: (query, callback) ->
+      $.ajax
+        url: "#{frame_mnfg_url}#{encodeURIComponent(query)}"
+        type: 'GET'
+        error: ->
+          callback()
+        success: (res) ->
+          callback res.matches.slice(0, per_page)
   $(target).on "change", (e) ->
-    id = e.val
-    otherManufacturerDisplay(id)
-    $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
-    ).done (data) ->
-      getModelList(data.manufacturer.name)
+    slug = $(target).val()
+    otherManufacturerDisplay(slug)
+    getModelList(slug)
 
 setModelTypeahead = (data=[]) ->
-  autocomplete = $('#bike_frame_model').typeahead()
-  autocomplete.data('typeahead').source = data 
-  # $('#bike_frame_model').typeahead({source: data})
+  model_sel = $('#bike_frame_model').selectize()[0].selectize
+  model_sel.destroy()
+  if data.length > 0
+    window.m_data = data.map (i) -> { id: i }
+    $('#bike_frame_model').selectize
+      options: data.map (i) -> { 'name': i }
+      create: true
+      maxItems: 1
+      valueField: 'name'
+      labelField: 'name'
+      searchField: 'name'
 
 getModelList = (mnfg_name='absent') ->
   if mnfg_name == 'absent'
@@ -81,43 +80,43 @@ optionalFormUpdate = (e) ->
   target.addClass('currently-hidden').hide()
 
   if target.hasClass('rm-block')
-    clickTarget.find('select').val('')
+    clickTarget.find('select').selectize()[0].selectize.setValue('')
     clickTarget.slideUp().removeClass('unhidden')
   else
     clickTarget.slideDown().addClass('unhidden').removeClass('currently-hidden')
 
 otherManufacturerDisplay = (current_value) ->
-  expand_value = $('#bike_manufacturer_id').parents('.input-group').find('.other-value').text()
+  expand_value = 'other'
   hidden_other = $('#bike_manufacturer_id').parents('.input-group').find('.hidden-other')
-  if parseInt(current_value, 10) == parseInt(expand_value, 10)
+  if current_value == expand_value
     # show the bugger!
     hidden_other.slideDown().addClass('unhidden')
   else 
     # if it's visible, clear it and slide up
     if hidden_other.hasClass('unhidden')
-      hidden_other.find('input').val('')
+      hidden_other.find('input').selectize()[0].selectize.setValue('')
       hidden_other.removeClass('unhidden').slideUp()
 
 toggleUnknownYear = ->
+  year_select = $('#bike_year').selectize()[0].selectize
   if $('#bike_unknown_year').prop('checked')
-    $('#bike_year').val('').trigger('change')
-    $('#bike_year').select2 "enable", false
+    year_select.setValue('')
+    year_select.disable()
   else
-    $('#bike_year').val(new Date().getFullYear()).trigger('change')
-    $('#bike_year').select2 "enable", true
+    year_select.setValue(new Date().getFullYear())
+    year_select.enable()
 
 updateYear = ->
-  if $('#bike_year').val().length == 0
-    $('#bike_year').select2 "enable", false
-    $('#bike_unknown_year').prop('checked', true)
-  else
-    $('#bike_unknown_year').prop('checked', false)
+  if $('#bike_year').val()
+    if $('#bike_year').val().length == 0
+      $('#bike_year').selectize()[0].selectize.disable()
+      $('#bike_unknown_year').prop('checked', true)
+    else
+      $('#bike_unknown_year').prop('checked', false)
 
-  id = $('#bike_manufacturer_id').val()
-  if id.length > 0
-    $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
-    ).done (data) ->
-      getModelList(data.manufacturer.name)
+  slug = $('#bike_manufacturer_id').val()
+  if slug.length > 0
+    getModelList(slug)
 
   else
     getModelList()
@@ -143,7 +142,8 @@ $(document).ready ->
   $('#bike_unknown_year').change ->
     toggleUnknownYear()
 
-  $('.chosen-select select').select2()
+  $('.special-select-single select').selectize
+    create: false
 
   $('#registration-type-tabs a').click (e) ->
     e.preventDefault()

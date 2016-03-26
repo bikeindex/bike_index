@@ -39,7 +39,7 @@ class Component < ActiveRecord::Base
       self.rear = true
     end
   end
-        
+
   def component_type
     return nil unless ctype.present?
     if ctype.name && ctype.name == "Other" && ctype_other.present?

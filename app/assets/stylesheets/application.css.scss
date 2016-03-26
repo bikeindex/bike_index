@@ -21,7 +21,8 @@
 
 // Import includes
 @import "includes/datepicker.scss";
-@import "includes/select2-binx.scss";
+@import "includes/selectize_bootstrap3.scss";
+.control-group .selectize-control { width: 210px; }
 @import "application_styles/sharing_styles.scss";
 @import "includes/datatables_bootstrap.scss";
 

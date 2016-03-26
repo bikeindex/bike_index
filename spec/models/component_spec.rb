@@ -87,4 +87,16 @@ describe Component do
     end
   end
 
+  # describe :fuzzy_assign_mnfg do
+  #   context 'manufacturer_id a manufacturer name' do
+  #     it 'sets manufacturer_id correctly' do
+  #       m = FactoryGirl.create(:manufacturer, name: 'SRAM')
+  #       c = { manufacturer_id: 'sram' }
+  #       component = ComponentCreator.new().set_manufacturer_key(c)
+  #       component[:manufacturer_id].should eq(m.id)
+  #       component[:manufacturer].should_not be_present
+  #     end
+  #   end
+  # end
+
 end
