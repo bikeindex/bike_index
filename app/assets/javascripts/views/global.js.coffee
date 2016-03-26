@@ -197,7 +197,7 @@ class BikeIndex.Views.Global extends Backbone.View
 
    
   # loadUserHeader: ->
-    # This is minified and inlined in the header
+    # This is minified and inlined in the header in legacy pages
     # 
     # $('#header-tabs').prepend("<div id='tab-cover'></div>")
     # $.ajax({

@@ -54,16 +54,6 @@
               = hidden_field_tag :stolen, params[:stolen] || true
               = hidden_field_tag :non_stolen, params[:non_stolen] || ''
               = hidden_field_tag :non_proximity, params[:non_proximity] || ''
-            / - if params[:manufacturer_id].present?
-            /   - mnfg = {id: params[:manufacturer_id], text: Manufacturer.find(params[:manufacturer_id]).name} if params[:manufacturer_id].present?
-            / - else
-            /   - mnfg = ''
-            / - cache 'header_search' do
-            /   - select_list = Color.all.map { |c| { id: "c_#{c.id}", text: "#{c.name} bikes", display: c.display } }
-            /   - select_list += Manufacturer.frames.map { |m| { id: "m_#{m.id}", text: m.name } }
-            /   %span#header-search-select.hidden{ data: { options: select_list.to_json }}
-            / #header-search{ data: { selected: mnfg.to_json } }
-            /   = hidden_field_tag :serial, params[:serial]
       - if @ad.present?
         .container.partner-block-container
           .partner-block
