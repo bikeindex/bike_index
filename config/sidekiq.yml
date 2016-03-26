@@ -1,7 +1,7 @@
 ---
 :queues:
-  - afterwards
-  - [carrierwave, 2]
-  - [notify, 5]
-  - [email, 10]
+  - afterwards # Lowest priority, general things, non-user-facing
+  - [carrierwave, 2] # Also includes file_caching/tsv creation
+  - [notify, 20] # sending email & notifications
+  - [updates, 20] # User facing updates, execute immediately
   

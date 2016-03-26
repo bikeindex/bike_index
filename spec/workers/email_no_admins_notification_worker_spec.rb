@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe EmailNoAdminsNotificationWorker do
-  it { should be_processed_in :email }
+  it { should be_processed_in :notify }
 
   it "sends an email" do
     organization = FactoryGirl.create(:organization)

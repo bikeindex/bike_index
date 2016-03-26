@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe EmailBlockedStolenNotificationWorker do
-  it { should be_processed_in :email }
+  it { should be_processed_in :notify }
 
   it "sends an email" do
     stolen_notification = FactoryGirl.create(:stolen_notification)
