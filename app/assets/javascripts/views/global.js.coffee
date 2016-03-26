@@ -59,7 +59,8 @@ class BikeIndex.Views.Global extends Backbone.View
     window.includeSerialOption = !($('#head-search-bikes #query').val().match(/s(#|%23)[^(#|%23)]*(#|%23)/))
 
   initializeHeaderSearch: ->
-    initial_opts = $('#selectize_items').data('initial')
+    initial_opts = []
+    initial_opts = $('#selectize_items').data('initial') if $('#selectize_items').data('initial')
     per_page = 10
     renderOption = @renderOption
     updateIncludeSerialOption = @updateIncludeSerialOption
