@@ -46,7 +46,7 @@ describe Api::V1::UsersController do
         ActionMailer::Base.deliveries.should_not be_empty
       end
     end
-    context 'manufacturer_update_manufacturer' do
+    context 'manufacturer_update_manufacturer present' do
       it 'updates the manufacturer' do
         o = FactoryGirl.create(:ownership)
         manufacturer = FactoryGirl.create(:manufacturer)
@@ -66,6 +66,27 @@ describe Api::V1::UsersController do
         expect(bike.manufacturer).to eq manufacturer
       end
     end
+
+    context 'manufacturer_update_manufacturer present' do
+      it 'does not make nil manufacturer' do
+        o = FactoryGirl.create(:ownership)
+        user = o.creator
+        bike = o.bike
+        update_manufacturer_request = { 
+          request_type: 'manufacturer_update_manufacturer',
+          user_id: user.id,
+          request_bike_id: bike.id,
+          request_reason: 'Need to update manufacturer',
+          manufacturer_update_manufacturer: 'doadsfizxcv'
+        }
+        set_current_user(user)
+        post :send_request, update_manufacturer_request
+        response.code.should eq('200')
+        bike.reload
+        expect(bike.manufacturer).to be_present
+      end
+    end
+
     context 'serial request mail' do
       it "doesn't create a new serial request mail" do 
         o = FactoryGirl.create(:ownership)

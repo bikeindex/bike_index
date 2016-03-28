@@ -40,8 +40,10 @@ module Api
                 bike.manufacturer_other = nil
               end
               bike.manufacturer_id = Manufacturer.fuzzy_id(params[:manufacturer_update_manufacturer])
-              bike.save
-              feedback.feedback_hash[:new_manufacturer] = bike.manufacturer.name
+              if bike.manufacturer_id.present?
+                bike.save
+                feedback.feedback_hash[:new_manufacturer] = bike.manufacturer.name
+              end
             elsif feedback_type.match('bike_recovery')
               if bike.current_stolen_record.present?
                 stolen_record_id = params[:mark_recovered_stolen_record_id]
