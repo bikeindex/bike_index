@@ -46,25 +46,46 @@ describe Api::V1::UsersController do
         ActionMailer::Base.deliveries.should_not be_empty
       end
     end
-
-    it "doesn't create a new serial request mail" do 
-      o = FactoryGirl.create(:ownership)
-      user = o.creator
-      bike = o.bike
-      serial_request = { 
-        request_type: 'serial_update_request',
-        user_id: user.id,
-        request_bike_id: bike.id,
-        request_reason: 'Some reason',
-        serial_update_serial: 'some new serial'
-      }
-      set_current_user(user)
-      SerialNormalizer.any_instance.should_receive(:save_segments)
-      expect {
-        post :send_request, serial_request
-      }.to change(EmailFeedbackNotificationWorker.jobs, :size).by(0)
-      response.code.should eq('200')
-      bike.reload.serial_number.should eq('some new serial')
+    context 'manufacturer_update_manufacturer' do
+      it 'updates the manufacturer' do
+        o = FactoryGirl.create(:ownership)
+        manufacturer = FactoryGirl.create(:manufacturer)
+        user = o.creator
+        bike = o.bike
+        update_manufacturer_request = { 
+          request_type: 'manufacturer_update_manufacturer',
+          user_id: user.id,
+          request_bike_id: bike.id,
+          request_reason: 'Need to update manufacturer',
+          manufacturer_update_manufacturer: manufacturer.slug
+        }
+        set_current_user(user)
+        post :send_request, update_manufacturer_request
+        response.code.should eq('200')
+        bike.reload
+        expect(bike.manufacturer).to eq manufacturer
+      end
+    end
+    context 'serial request mail' do
+      it "doesn't create a new serial request mail" do 
+        o = FactoryGirl.create(:ownership)
+        user = o.creator
+        bike = o.bike
+        serial_request = { 
+          request_type: 'serial_update_request',
+          user_id: user.id,
+          request_bike_id: bike.id,
+          request_reason: 'Some reason',
+          serial_update_serial: 'some new serial'
+        }
+        set_current_user(user)
+        SerialNormalizer.any_instance.should_receive(:save_segments)
+        expect {
+          post :send_request, serial_request
+        }.to change(EmailFeedbackNotificationWorker.jobs, :size).by(0)
+        response.code.should eq('200')
+        bike.reload.serial_number.should eq('some new serial')
+      end
     end
 
     it "it untsvs a bike" do 

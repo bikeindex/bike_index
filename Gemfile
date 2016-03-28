@@ -81,7 +81,7 @@ group :assets do
 end
 
 group :development do
-  gem 'ruby_gntp'
+  # gem 'ruby_gntp' # For linux
   gem 'rerun'
   gem 'growl'
   gem 'guard'
