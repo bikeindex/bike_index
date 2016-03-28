@@ -20,4 +20,4 @@
     = render 'feedbacks/form'
 - else
   %h3
-    Sorry, you have to be signed in to send comments because people on the internet.
+    = link_to 'Log in to send a comment!', new_session_url(return_to: help_url(anchor: 'contact_us_section'))
