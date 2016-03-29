@@ -29,8 +29,6 @@ class BikesController < ApplicationController
     end
     search = BikeSearcher.new(params)
     bikes = search.find_bikes
-    @count = bikes.count
-    (bikes.count <= 250) ? (total_bikes = bikes.count) : (total_bikes = 250)
     page = params[:page] || 1
     @per_page = params[:per_page] || 10
     bikes = bikes.page(page).per(@per_page)
