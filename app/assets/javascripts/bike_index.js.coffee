@@ -5,11 +5,11 @@ window.BikeIndex =
   Routers: {}
   init: ->
 
-  hideFlash:() ->
+  hideFlash: () ->
     # Fade out hovering alerts after 10 seconds
     setTimeout("$('#alert-block').fadeOut('slow')", 10000)
 
-  alertMessage:(type, title, message) ->
+  alertMessage: (type, title, message) ->
     $('#alert-block>div').addClass("hidden")
     $('#alert-block').css('display', 'block')
     $('#alert-block').append("""
@@ -20,78 +20,77 @@ window.BikeIndex =
         </div>
       """)
     BikeIndex.hideFlash()
-
     links = links + "</ul></div>"
-    
+
     # $('#total-top-header .global-tabs').append(tab)
     # $('#total-top-header .tab-content').append(links)
 
 $(document).ready ->
-  view = new BikeIndex.Views.Global
+  new BikeIndex.Views.Global
+
+  if document.getElementById('home_headies')
+    new BikeIndex.Views.Home 
+  if document.getElementById('news_display')
+    new BikeIndex.Views.NewsDisplay 
+
+  else if document.getElementById('documentation-menu')
+    new BikeIndex.Views.DocumentationIndex
+
+  else if document.getElementById('content-wrap')
+    if document.getElementById('where-bike-index')
+      new BikeIndex.Views.ContentWhere
+    if document.getElementById('manufacturers-list')
+      new BikeIndex.Views.ContentManufacturers
   
-  if $('#home_headies').length > 0
-    view = new BikeIndex.Views.Home 
-  if $('#news_display').length > 0
-    view = new BikeIndex.Views.NewsDisplay 
+  if document.getElementById('stripe_form')
+    new BikeIndex.Views.PaymentsForm
 
-  else if $('#documentation-menu').length > 0
-    view = new BikeIndex.Views.DocumentationIndex
+  else if document.getElementById('choose-registration-type')
+    new BikeIndex.Views.BikesChooseRegistration
 
-  else if $('#content-wrap').length > 0
-    if $('#where-bike-index').length > 0
-      view = new BikeIndex.Views.ContentWhere
-    if $('#manufacturers-list').length > 0
-      view = new BikeIndex.Views.ContentManufacturers
+  else if document.getElementById('bikes-search')
+    new BikeIndex.Views.BikesSearch
+
+  else if document.getElementById('bike-show')
+    new BikeIndex.Views.BikesShow
+
+  else if document.getElementById('photos-flip')
+    new BikeIndex.Views.LoginSignup
+
+  else if document.getElementById('organization-content')
+    new BikeIndex.Views.OrganizationsShow
+
+  else if document.getElementById('user-home-page')
+    new BikeIndex.Views.DataTables
   
-  if $('#stripe_form').length > 0
-    view = new BikeIndex.Views.PaymentsForm
+  else if document.getElementById('edit-bike-form')
+    new BikeIndex.Views.BikesEdit
 
-  else if $('#choose-registration-type').length > 0
-    view = new BikeIndex.Views.BikesChooseRegistration
+  else if document.getElementById('edit-user-form')
+    new BikeIndex.Views.UsersEdit
 
-  else if $('#bikes-search').length > 0
-    view = new BikeIndex.Views.BikesSearch
+  else if document.getElementById('lock-form')
+    new BikeIndex.Views.LocksForm
 
-  else if $('#bike-show').length > 0
-    view = new BikeIndex.Views.BikesShow
+  else if document.getElementById('new_bike')
+    new BikeIndex.Views.BikesNew
 
-  else if $('#photos-flip').length > 0
-    view = new BikeIndex.Views.LoginSignup
-
-  else if $('#organization-content').length > 0
-    view = new BikeIndex.Views.OrganizationsShow
-
-  else if $('#user-home-page').length > 0
-    view = new BikeIndex.Views.DataTables
+  else if document.getElementById('admin-content')
+    new BikeIndex.Views.DataTables
+    if document.getElementById('bike_edit_root_url')
+      new BikeIndex.Views.AdminBikesEdit
+    else if document.getElementById('admin-locations-fields')
+      new BikeIndex.Views.AdminOrganizationsEdit
+    else if document.getElementById('admin-recoveries')
+      new BikeIndex.Views.AdminRecoveries
+    else if document.getElementById('blog-edit')
+      new BikeIndex.Views.AdminBlogsEdit
+    else if document.getElementById('graph-holder')
+      new BikeIndex.Views.AdminGraphs
   
-  else if $('#edit-bike-form').length > 0
-    view = new BikeIndex.Views.BikesEdit
+  else if document.getElementById('photo-page')
+    new BikeIndex.Views.PhotosIndex
 
-  else if $('#edit-user-form').length > 0
-    view = new BikeIndex.Views.UsersEdit
-
-  else if $('#lock-form').length > 0
-    view = new BikeIndex.Views.LocksForm
-
-  else if $('#new_bike').length > 0
-    view = new BikeIndex.Views.BikesNew
-
-  else if $('#admin-content').length > 0
-    view = new BikeIndex.Views.DataTables
-    if $('#bike_edit_root_url').length > 0
-      view = new BikeIndex.Views.AdminBikesEdit
-    else if $('#admin-locations-fields').length > 0
-      view = new BikeIndex.Views.AdminOrganizationsEdit
-    else if $('#admin-recoveries').length > 0
-      view = new BikeIndex.Views.AdminRecoveries
-    else if $('#blog-edit').length > 0
-      view = new BikeIndex.Views.AdminBlogsEdit
-    else if $('#graph-holder').length > 0
-      view = new BikeIndex.Views.AdminGraphs
-  
-  else if $('#photo-page').length > 0
-    view = new BikeIndex.Views.PhotosIndex
-
-  if $('#multi_serial_search').length > 0
-    view = new BikeIndex.Views.StolenMultiSerialSearch
+  if document.getElementById('multi_serial_search')
+    new BikeIndex.Views.StolenMultiSerialSearch
     
