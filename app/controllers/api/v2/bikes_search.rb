@@ -24,7 +24,8 @@ module API
         end
 
         def set_proximity
-          params[:proximity_radius] = params[:proximity_square] ||= 100
+          params[:proximity_radius] ||= params[:proximity_square] if params[:proximity_square].present?
+          params[:proximity_radius] ||= 100
           return nil unless params[:proximity] == 'ip'
           if Rails.env == 'production'
             params[:proximity] = request.env["HTTP_X_FORWARDED_FOR"].split(',')[0]

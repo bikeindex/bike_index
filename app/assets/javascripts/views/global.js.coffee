@@ -12,7 +12,7 @@ class BikeIndex.Views.Global extends Backbone.View
   initialize: ->
     # BikeIndex.hideFlash() # not sure that it's something we ever want
     @setElement($('#body'))
-    @initializeHeaderSearch()
+    @initializeHeaderSearch() if document.getElementById('head-search-bikes')
     @loadFancySelects()
     @setLightspeedMovie() if $('#lightspeed-tutorial-video').length > 0
     if $('#what-spokecards-are').length > 0
@@ -40,7 +40,6 @@ class BikeIndex.Views.Global extends Backbone.View
       scrollTop: ($(target).offset().top - 20), 'fast' 
     )
 
-
   #
   #
   # Updated header nav stuff
@@ -54,11 +53,38 @@ class BikeIndex.Views.Global extends Backbone.View
     event.preventDefault()
     $('.top-user-nav').slideToggle()
 
+  setSearchProximity: ->
+    proximity = $('#proximity').val()
+    unless proximity? and proximity.length > 0
+      proximity = localStorage.getItem('location')
+      proximity = "ip" unless proximity? and proximity.length > 0
+      $('#proximity').val(proximity)
+    localStorage.setItem('location', proximity)
+    if document.getElementById('bikes-search') # set up search view if we're on bike search
+      @setSearchTabInfo(proximity)
+
+  setSearchTabInfo: (proximity) ->
+    $('#search_distance').text($('#proximity_radius').val())
+    $('#search_location').text(proximity)
+    insertTabCounts = @insertTabCounts
+    $.ajax
+      type: "GET"
+      url: $('#search_tabs').attr('data-url')
+      success: (data) ->
+        insertTabCounts(data)
+
+  insertTabCounts: (counts) ->
+    $("#stolen_tab .count").text("(#{counts.stolen})")
+    $("#proximity_tab .count").text("(#{counts.proximity})")
+    $("#non_stolen_tab .count").text("(#{counts.non_stolen})")
+
+
   updateIncludeSerialOption: ->
     # Check if the header search includes the serial string match, set it on the window
     window.includeSerialOption = !($('#head-search-bikes #query').val().match(/s(#|%23)[^(#|%23)]*(#|%23)/))
 
   initializeHeaderSearch: ->
+    @setSearchProximity() # Call here, since we only want to call if search exists
     initial_opts = []
     initial_opts = $('#selectize_items').data('initial') if $('#selectize_items').data('initial')
     per_page = 10
@@ -107,7 +133,6 @@ class BikeIndex.Views.Global extends Backbone.View
         true
       onInitialize: ->
         updateIncludeSerialOption()
-
 
   renderOption: (item, escape) ->
     prefix = switch
