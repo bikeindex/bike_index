@@ -115,7 +115,9 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       $('#stolen_date input').datepicker('format: mm-dd-yyy')
       if $('#stolen-bike-location select').val().length > 0
         @updateCountry()
-    $('#edit_wheels select').selectize()
+    $('#edit_wheels select').selectize
+      create: false
+      plugins: ['restore_on_backspace']
     @setWheelDiam('front')
     @setWheelDiam('rear')
     @showColors()
@@ -265,7 +267,9 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     time = new Date().getTime()
     regexp = new RegExp(target.attr('data-id'), 'g')
     target.before(target.data('fields').replace(regexp, time))
-    $('.add-component-fields .special-select-single.select_unattached select').selectize()
+    $('.add-component-fields .special-select-single.select_unattached select').selectize
+      plugins: ['restore_on_backspace']
+      create: false
     @setComponentManufacturer(m) for m in $('.component-mnfg-select.select_unattached input')
     $('.select_unattached').removeClass('select_unattached')
 
@@ -301,7 +305,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     per_page = 10
     mnfg_url = "#{window.root_url}/api/autocomplete?per_page=#{per_page}&categories=frame_mnfg+mnfg&q="
     target.selectize
-      preload: true
+      preload: false
       create: false
       maxItems: 1
       valueField: 'id'
@@ -506,6 +510,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     per_page = 10
     frame_mnfg_url = "#{window.root_url}/api/autocomplete?per_page=#{per_page}&categories=frame_mnfg&q="
     $('#manufacturer_update_manufacturer').selectize
+      plugins: ['restore_on_backspace']
       preload: true
       create: false
       maxItems: 1

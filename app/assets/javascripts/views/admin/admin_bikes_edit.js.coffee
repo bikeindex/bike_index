@@ -19,29 +19,51 @@ class BikeIndex.Views.AdminBikesEdit extends Backbone.View
       @setFrameSize()
     
   initializeFrameMaker: (target) ->
-    url = "#{window.root_url}/api/searcher?types[]=frame_makers&"
-    $(target).select2
-      minimumInputLength: 2
-      placeholder: 'Choose manufacturer'
-      ajax:
-        url: url
-        dataType: "json"
-        openOnEnter: true
-        data: (term, page) ->
-          term: term # search term
-          limit: 10
-        results: (data, page) -> # parse the results into the format expected by Select2.
-          remapped = data.results.frame_makers.map (i) -> {id: i.id, text: i.term}
-          results: remapped
-      initSelection: (element, callback) ->
-        id = $(element).val()
-        if id isnt ""
-          $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
-          ).done (data) ->
-            data =
-              id: element.val()
-              text: data.manufacturer.name
-            callback data
+    per_page = 10
+    frame_mnfg_url = "#{window.root_url}/api/autocomplete?per_page=#{per_page}&categories=frame_mnfg&q="
+    initial = $('#bike_manufacturer_id').data('initial')
+    $(target).selectize
+      plugins: ['restore_on_backspace']
+      preload: false
+      options: [initial]
+      items: [initial.id]
+      create: false
+      maxItems: 1
+      valueField: 'id'
+      labelField: 'text'
+      searchField: 'text'
+      load: (query, callback) ->
+        $.ajax
+          url: "#{frame_mnfg_url}#{encodeURIComponent(query)}"
+          type: 'GET'
+          error: ->
+            callback()
+          success: (res) ->
+            callback res.matches.slice(0, per_page)
+
+    # url = "#{window.root_url}/api/searcher?types[]=frame_makers&"
+    # $(target).select2
+    #   minimumInputLength: 2
+    #   placeholder: 'Choose manufacturer'
+    #   ajax:
+    #     url: url
+    #     dataType: "json"
+    #     openOnEnter: true
+    #     data: (term, page) ->
+    #       term: term # search term
+    #       limit: 10
+    #     results: (data, page) -> # parse the results into the format expected by Select2.
+    #       remapped = data.results.frame_makers.map (i) -> {id: i.id, text: i.term}
+    #       results: remapped
+    #   initSelection: (element, callback) ->
+    #     id = $(element).val()
+    #     if id isnt ""
+    #       $.ajax("#{window.root_url}/api/v1/manufacturers/#{id}",
+    #       ).done (data) ->
+    #         data =
+    #           id: element.val()
+    #           text: data.manufacturer.name
+    #         callback data
 
   setFrameSize: ->
     unit = $('#bike_frame_size_unit').val()

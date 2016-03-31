@@ -60,7 +60,7 @@
           .control-group.select-jsonified
             = f.label :manufacturer_id, class: "control-label"
             .controls
-              = f.text_field :manufacturer_id
+              = f.text_field :manufacturer_id, data: { initial: { id: @bike.manufacturer.id, text: @bike.manufacturer.name }.to_json }
 
           .control-group
             = f.label :manufacturer_other, "Other frame manufacturer", class: "control-label"
@@ -81,10 +81,11 @@
             = f.label :year, class: "control-label"
             .controls
               = f.text_field :year
-          .control-group.chosen-select
-            = f.label :paint_id, "Paint description", class: "control-label"
-            .controls
-              = collection_select( :bike, :paint_id, Paint.all, :id, :name, required: true, prompt: "Choose paint" )
+          / Disable for performance reasons.
+          / .control-group.chosen-select
+          /   = f.label :paint_id, "Paint description", class: "control-label"
+          /   .controls
+          /     = collection_select( :bike, :paint_id, Paint.all, :id, :name, required: true, prompt: "Choose paint" )
           .control-group.chosen-select
             = f.label :primary_frame_color_id, class: "control-label"
             .controls

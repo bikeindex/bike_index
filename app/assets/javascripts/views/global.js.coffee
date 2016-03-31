@@ -32,6 +32,8 @@ class BikeIndex.Views.Global extends Backbone.View
     $('.chosen-select select').selectize() # legacy
     $('.special-select-single select').selectize
       create: false
+      plugins: ['restore_on_backspace']
+
 
   scrollToRef: (event) ->
     event.preventDefault()
