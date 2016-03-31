@@ -90,7 +90,7 @@
         .control-group.select-jsonified
           = f.label :manufacturer_id, class: "control-label"
           .controls
-            = f.text_field :manufacturer_id
+            = f.text_field :manufacturer_id, data: { initial: { id: @bike.manufacturer.id, text: @bike.manufacturer.name }.to_json }
 
         .control-group
           = f.label :manufacturer_other, "Other manufacturer", class: "control-label"
@@ -151,8 +151,7 @@
     .actions
       .control-group
         = submit_tag "Update the bike", class: "button-green"
-        - if current_user.superuser
-          = link_to "Normal edit", edit_admin_bike_url(@bike)
+        = link_to "Normal edit", edit_admin_bike_url(@bike)
 .padded
 %hr
 %section.full-screen-table

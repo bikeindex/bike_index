@@ -116,6 +116,9 @@
         .control-group
           = submit_tag "Update the bike", class: "button-green"
           = link_to "Delete bike", admin_bike_url(@bike), method: :delete, confirm: "Are you sure?", class: "button-red"
+          - if current_user.superuser
+            = link_to "edit bike attributes", edit_admin_bike_url(@bike, fast_attr_update: true)
+
       - if @bike.stolen and @bike.find_current_stolen_record.present?
         %hr
         .clearfix
