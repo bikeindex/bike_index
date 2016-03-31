@@ -192,10 +192,7 @@ class BikesController < ApplicationController
     else
       flash[:notice] = "Bike successfully updated!"
       return if return_to_if_present
-      if bike.stolen && params[:bike][:stolen] != false
-        redirect_to edit_bike_url(@bike), layout: 'no_header' and return
-      end
-      redirect_to bike_url(@bike), layout: 'no_header' and return
+      redirect_to edit_bike_url(@bike), layout: 'no_header' and return
     end
   end
 

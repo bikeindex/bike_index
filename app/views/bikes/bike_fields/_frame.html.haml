@@ -24,7 +24,7 @@
         = f.text_field :frame_model
 
   .input-group.with-optional-blocks
-    .control-group.special-select-single
+    .control-group.special-select-single-placeholder
       = f.label :year, class: "control-label"
       .controls
         - years = (1900..Time.now.year+1).to_a.reverse.map {|i| [i,i] }
@@ -71,10 +71,10 @@
     %a.bikeform-tip{role: "button", title: "What's the frame made of?", data: {toggle: "modal", target: "#frameMaterialTip"} }
       %span
         ?
-    .control-group.special-select-single
+    .control-group.special-select-single-placeholder
       = f.label :frame_material_id, "Primary frame material", class: "control-label"
       .controls
-        = collection_select( :bike, :frame_material_id, FrameMaterial.all, :id, :name, prompt: "Choose material" )
+        = collection_select( :bike, :frame_material_id, FrameMaterial.all, :id, :name, prompt: "Choose material")
 
   .input-group.with-optional-blocks
     %a.bikeform-tip{role: "button", title: "Why do we do colors like this?", data: {toggle: "modal", target: "#colorTip"} }

@@ -415,7 +415,6 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     position = $(event.target).attr('id')
     @setDrivetrainValue(position)
     
-
   setInitialGears: ->
     if $('#fixed_gear_check').prop('checked') == true
       @setFixed()
@@ -450,8 +449,10 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
         $('#bike_unknown_year').prop('checked', false)
 
   checkIfPhoneBlank: (e) ->
-    unless $('#bike_stolen_records_attributes_0_phone').val().length > 0
-      BikeIndex.alertMessage('error', 'Phone number required', "<p>A phone number is required for stolen listings. We want to be able to contact you if your bike is found!</p><p>Your phone number will be private unless you choose to show it in <em>Show phone number to</em></p>")
+    phone_input = $('#bike_stolen_records_attributes_0_phone')
+    if phone_input.length > 0
+      unless phone_input.val().length > 0
+        BikeIndex.alertMessage('error', 'Phone number required', "<p>A phone number is required for stolen listings. We want to be able to contact you if your bike is found!</p><p>Your phone number will be private unless you choose to show it in <em>Show phone number to</em></p>")
 
   toggleBikeHidden: ->
     $('#hide_bike_toggle_group input').val('true')

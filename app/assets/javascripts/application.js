@@ -27,6 +27,7 @@
 //= require external_scripts/jquery.ui.widget.js
 //= require external_scripts/are-you-sure.js.coffee
 //= require external_scripts/selectize.js
+//= require external_scripts/selectize_placeholder_plugin.js
 //= require external_scripts/slick.js
 //= require external_scripts/jquery.iframe-transport.js
 //= require external_scripts/jquery.fileupload.js

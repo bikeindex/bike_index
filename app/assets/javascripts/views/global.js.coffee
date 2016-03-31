@@ -29,11 +29,15 @@ class BikeIndex.Views.Global extends Backbone.View
       window.open(local, '_blank')
 
   loadFancySelects: ->
-    $('.chosen-select select').selectize() # legacy
+    $('.chosen-select select').selectize # legacy
+      create: false
+      plugins: ['restore_on_backspace']
     $('.special-select-single select').selectize
       create: false
       plugins: ['restore_on_backspace']
-
+    $('.special-select-single-placeholder select').selectize # When empty options are allowed
+      create: false
+      plugins: ['restore_on_backspace', 'selectable_placeholder']
 
   scrollToRef: (event) ->
     event.preventDefault()
