@@ -385,6 +385,7 @@ GEM
       mime-types (>= 1.16, < 3.0)
       netrc (~> 0.7)
     rmagick (2.14.0)
+    rollout (2.2.3)
     rqrcode (0.4.2)
     rqrcode-rails3 (0.1.7)
       rqrcode (>= 0.4.2)
@@ -435,7 +436,7 @@ GEM
       concurrent-ruby (~> 1.0)
       connection_pool (~> 2.2, >= 2.2.0)
       redis (~> 3.2, >= 3.2.1)
-    sidekiq-failures (0.4.1)
+    sidekiq-failures (0.4.5)
       sidekiq (>= 2.16.0)
     sidekiq-unique-jobs (3.0.2)
       mock_redis
@@ -585,6 +586,7 @@ DEPENDENCIES
   redis
   rerun
   rmagick
+  rollout
   rqrcode-rails3
   rspec-rails
   rspec-sidekiq
