@@ -8,6 +8,8 @@ body .selectize-dropdown [data-selectable] .highlight {
   background: rgba(#3498DB, 0.2); // Bike Index blue ;)
 }
 
+body .selectize-dropdown .active { background-color: lighten(#bebebe, 10%); }
+
 
 /**
  * selectize.bootstrap3.css (v0.12.1) - Bootstrap 3 Theme

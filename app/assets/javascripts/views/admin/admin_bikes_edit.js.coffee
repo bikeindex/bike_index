@@ -19,19 +19,21 @@ class BikeIndex.Views.AdminBikesEdit extends Backbone.View
       @setFrameSize()
     
   initializeFrameMaker: (target) ->
-    per_page = 10
     frame_mnfg_url = "#{window.root_url}/api/autocomplete?per_page=#{per_page}&categories=frame_mnfg&q="
-    initial = $('#bike_manufacturer_id').data('initial')
     $(target).selectize
       plugins: ['restore_on_backspace']
-      preload: false
-      options: [initial]
-      items: [initial.id]
+      preload: true
+      persist: false
       create: false
       maxItems: 1
-      valueField: 'id'
+      valueField: 'slug'
       labelField: 'text'
       searchField: 'text'
+      loadThrottle: 150
+      score: (search) ->
+        score = this.getScoreFunction(search)
+        return (item) ->
+          score(item) * (1 + Math.min(item.priority / 100, 1))
       load: (query, callback) ->
         $.ajax
           url: "#{frame_mnfg_url}#{encodeURIComponent(query)}"

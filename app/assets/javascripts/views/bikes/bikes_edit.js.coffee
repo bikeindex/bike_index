@@ -311,6 +311,11 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       valueField: 'id'
       labelField: 'text'
       searchField: 'text'
+      loadThrottle: 150
+      score: (search) ->
+        score = this.getScoreFunction(search)
+        return (item) ->
+          score(item) * (1 + Math.min(item.priority / 100, 1))
       load: (query, callback) ->
         $.ajax
           url: "#{mnfg_url}#{encodeURIComponent(query)}"
@@ -518,6 +523,11 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       valueField: 'slug'
       labelField: 'text'
       searchField: 'text'
+      loadThrottle: 150
+      score: (search) ->
+        score = this.getScoreFunction(search)
+        return (item) ->
+          score(item) * (1 + Math.min(item.priority / 100, 1))
       load: (query, callback) ->
         $.ajax
           url: "#{frame_mnfg_url}#{encodeURIComponent(query)}"

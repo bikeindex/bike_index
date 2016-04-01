@@ -98,15 +98,29 @@ class BikeIndex.Views.Global extends Backbone.View
     updateIncludeSerialOption = @updateIncludeSerialOption
     $('#head-search-bikes #query').selectize
       plugins: ['restore_on_backspace', 'remove_button']
-      preload: true
       create: true
       options:  initial_opts # So that they have words
       items: initial_opts.map (i) -> i.search_id
       persist: false # Don't show items the users has entered after deleting them
       valueField: 'search_id'
+      preload: true
       labelField: 'text'
       searchField: 'text'
+      loadThrottle: 150
+      score: (search) ->
+        score = this.getScoreFunction(search)
+        return (item) ->
+          if item.id == 'serial'
+            # Only show serial query that is the same as the query we've entered
+            if search == item.search && search.length > 2
+              return 0.0001
+            else
+              return 0
+          else
+            score(item) * (1 + Math.min(item.priority / 100, 1))
+      sortField: 'priority'
       load: (query, callback) ->
+        that = this
         $.ajax
           url: "/api/autocomplete?per_page=#{per_page}&q=#{encodeURIComponent(query)}"
           type: 'GET'
@@ -114,7 +128,9 @@ class BikeIndex.Views.Global extends Backbone.View
             callback()
           success: (res) ->
             result = res.matches.slice(0, per_page)
-            result.push({ id: 'serial', search_id: "s##{query}#", text: "#{query}" }) if window.includeSerialOption
+            # Only add serial option if they've entered more than 2 char
+            if query.length > 2 && window.includeSerialOption
+              result.push({ id: 'serial', search_id: "s##{query}#", text: "#{query}", search: query })
             callback result
       render:
         option: (item, escape) ->
@@ -130,6 +146,14 @@ class BikeIndex.Views.Global extends Backbone.View
       onChange: (value) ->
         # On change doesn't cover everything, so run it all the time
         updateIncludeSerialOption()
+        true
+      onType: (str) ->
+        for k in Object.keys(this.options)
+          # If they are serial ids
+          if k.match /^s\#/ 
+            # if the serials are longer than the current str, delete them
+            # Also delete them if we're down to 2 chars
+            delete this.options[k] if (k.length > str + 3) || str.length < 3
         true
       onItemAdd: (value, $item) ->
         updateIncludeSerialOption()
