@@ -1,0 +1,25 @@
+!!!
+%html
+  %head
+    = header_tags
+    = csrf_meta_tags
+    <link rel="shortcut icon" href="/fav.ico" />
+    = stylesheet_link_tag "updated", media: "all"
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400,300,700' rel='stylesheet' type='text/css'>
+    = javascript_include_tag 'application_revised'
+    <!--[if lt IE 9]><script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]--><!--[if lte IE 8]><script type="text/javascript">$(function() {$('body').prepend("<body class='welcome-page' id='body'><div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, the Bike Index (and the internet in general) is broken and ugly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>");});</script><![endif]-->
+    
+    = auto_discovery_link_tag(:atom, news_index_url(format: "atom"), {title: "Bike Index news"})
+
+  %body{ id: body_id }
+    - cache 'facebook_pixel' do
+      = render '/shared/facebook_pixel'
+    = render 'layouts/messages'
+    .bodywrap
+
+      = yield
+      
+      - cache 'footer_updated' do
+        = render 'shared/footer_updated'
+  :plain
+    <!-- Open source, https://github.com/bikeindex/bike_index -->

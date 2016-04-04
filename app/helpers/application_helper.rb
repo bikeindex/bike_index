@@ -59,4 +59,14 @@ module ApplicationHelper
     c
   end
 
+  # For application_revised.js init scoping
+  def body_id
+    "#{sub_module_name}#{controller_name}_#{action_name}"
+  end
+
+  private
+
+  def sub_module_name
+    controller.class.parent.name == 'Object' ? '' : "#{controller.class.parent.name.downcase}_"
+  end
 end
