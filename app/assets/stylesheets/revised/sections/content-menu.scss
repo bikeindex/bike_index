@@ -1,0 +1,21 @@
+$horizontal-content-menu-padding: 6px;
+.content-menu {
+  .content-nav-group {
+    h3 {
+      background: $gray;
+      color: white;
+      padding: $vertical-height $horizontal-content-menu-padding;
+    }
+    ul {
+      @include list-unstyled;
+      a {
+        padding: $horizontal-content-menu-padding;
+        color: $gray;
+      }
+    }
+  }
+}
+
+@media(min: $grid-breakpoint-lg) {
+  
+}

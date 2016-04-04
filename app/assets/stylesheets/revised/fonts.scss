@@ -1,7 +1,3 @@
-$body-color: #666666;
-$link-color: #3498DB;
-$header-color: #333333;
-
 // body font style
 .body-font {
   font-family: 'Open Sans', sans-serif;
@@ -10,7 +6,7 @@ $header-color: #333333;
   margin: 0 0 24px;
   font-size: 15px;
   line-height: 2em;
-  color: $body-color;
+  color: $body-font-color;
   em { font-style: italic; }
   strong { font-weight: 700; }
   a {
@@ -23,11 +19,12 @@ $header-color: #333333;
   }
 }
 
+body { @extend .body-font; }
+
 p { @extend .body-font; }
 
 // p.intro on typecast
-// And we don't use h5
-h4 {
+h5 {
   @extend .body-font;
   font-size: 18px;
   font-weight: 600;
@@ -51,7 +48,7 @@ h4 {
    letter-spacing: -1px;
    font-size: 54px;
    line-height: 1.12em;
-   color: $header-color;
+   color: $header-font-color;
    strong { font-weight: 700; }
    a {
     color: $link-color;
@@ -74,4 +71,11 @@ h3 {
   @extend .header-font;
   font-size: 24px;
   line-height: 1em;
+}
+
+// Primary menu header height
+h4 {
+  @extend .header-font;
+  font-size: 15px;
+  line-height: 18px;
 }

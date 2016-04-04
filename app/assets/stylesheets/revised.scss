@@ -55,19 +55,27 @@
 
 /*!
  * Bike Index styles
- * For revised version in 2016
+ * for revised style in 2016
  */
 
-// Mixins and vars
-@import "revised/fonts";
+// Because Mike Oleon is obsessed with the imperial system
+// or something dumb like that
+$vertical-height: 12px;
+
+// To make grid breakpoints variables for now
+$grid-breakpoint-lg: 992px;
 
 // External styles
 @import "includes/selectize_bootstrap3.scss";
 
+// Settings
+@import "revised/mixins/colors";
+@import "revised/fonts";
 
-.container-temp {
-  max-width: 1040px;
-  padding: 40px 20px;
-  margin: 0 auto;
-}
+// shared styles
+@import "revised/sections/primary_header_nav";
+@import "revised/sections/content-menu";
+@import "revised/sections/content";
 
+// page styles
+@import "revised/pages/about";

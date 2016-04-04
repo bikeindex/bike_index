@@ -16,10 +16,37 @@
     - cache 'facebook_pixel' do
       = render '/shared/facebook_pixel'
     = render 'layouts/messages'
-  
+    %nav.primary-header-nav
+      .container
+        %a.primary-logo{ href: user_root_url }
+          = image_tag "/assets/revised/logo.svg", class: 'primary-nav', alt: "Primary nav logo"
+        %nav.primary-main-menu
+          - if current_user.present?
+            %h4.primary-nav-item
+              = link_to 'Sign up', new_user_url, class: 'nav-link signup-link'
+            %h4.primary-nav-item
+              = link_to 'log in', new_session_url, class: 'nav-link'
+          / - else
+          %h4.primary-nav-item
+            = link_to 'help', help_path, class: 'nav-link'
+          %h4.primary-nav-item
+            = link_to 'About', about_path, class: 'nav-link'
+          %h4.primary-nav-item
+            = link_to 'News', news_index_path, class: 'nav-link'
+          %h4.primary-nav-item
+            = link_to 'Community', '#', class: 'nav-link'
+          %h4.primary-nav-item
+            = link_to 'Search bikes', bikes_path, class: 'nav-link'
 
-    .container
-      = yield
+    .container.content-container
+      - if controller_name == 'info'
+        .row
+          .col-md-8
+            = yield
+          .col-md-4.content-menu
+            = render 'shared/content_menu'
+      / - else
+
     
     - cache 'footer_updated' do
       = render 'shared/footer_updated'
