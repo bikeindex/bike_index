@@ -14,6 +14,6 @@
 //= require jquery_ujs
 //= require external_scripts/selectize.js
 //= require external_scripts/selectize_placeholder_plugin.js
-//= require underscore
+//= require bootstrap-sprockets
 //= require init.coffee
 //= require_tree ./revised

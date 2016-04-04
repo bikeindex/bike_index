@@ -9,12 +9,13 @@ gem 'bcrypt-ruby', '~> 3.0.0'
 gem 'active_model_serializers'
 gem 'aws-sdk', '~> 1.3.4'
 
+# Redis and redis dependents
 gem 'redis'
-gem 'sidekiq', '~> 4.1.1'
+gem 'sidekiq', '~> 4.1.1' # Background processing
 gem 'sidekiq-failures'
 gem 'sidekiq-unique-jobs'
-gem 'rollout'
-gem 'soulheart', '~> 0.2.6'
+gem 'rollout' # Feature flags
+gem 'soulheart', '~> 0.2.6' # typeahead/autocomplete features
 
 gem 'rack-contrib'
 gem 'geocoder'
@@ -24,7 +25,7 @@ gem 'hamlit'
 gem 'haml-rails'
 gem 'journey', '~> 1.0.3'
 gem 'kramdown'
-gem 'kaminari'
+gem 'kaminari' # pagination
 gem 'pg_search'
 gem 'nokogiri'
 gem 'carrierwave', '~> 0.9.0'
@@ -35,9 +36,7 @@ gem 'rqrcode-rails3'
 gem 'strong_parameters'
 gem 'libv8', '~> 3.16.14.7'
 gem 'rb-readline', '~> 0.5.0'
-gem 'backbone-on-rails', '~>0.9.10.0'
 gem 'stripe', git: 'https://github.com/stripe/stripe-ruby'
-gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'
 gem 'acts_as_paranoid', '~>0.4.0'
 gem 'high_voltage'
 gem 'omniauth-facebook'
@@ -49,11 +48,12 @@ gem 'draper', require: false
 gem 'dotenv-rails', '~> 0.8', git: 'https://github.com/bkeepers/dotenv'
 gem 'wkhtmltopdf-binary'
 gem 'wicked_pdf'
+gem 'eventmachine', '~> 1.0.3'
 gem 'sitemap_generator'
-gem 'whenever'
 gem 'unicorn'
 gem 'unicorn-worker-killer'
 
+# OAuth provider, Grape, associated parts of API V2
 gem 'doorkeeper',   '~> 2.0.1'
 gem 'wine_bouncer'
 gem 'grape'
@@ -62,15 +62,19 @@ gem 'grape-swagger'
 gem 'swagger-ui_rails'
 gem 'api-pagination'
 
+# Secure things
 gem 'rack-throttle'
 gem 'secure_headers'
-gem 'eventmachine', '~> 1.0.3'
 
-gem 'chartkick'
+# Frontend
+gem 'backbone-on-rails', '~>0.9.10.0' 
+gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'
+gem 'chartkick' # Display charts
 gem 'groupdate'
-
+gem 'bootstrap', '~> 4.0.0.alpha3' # Bootstrap 4 - used for revised stylesheets
 gem 'sparkpost' # ruby client for email
 
+# 
 gem 'stackprof', require: false
 gem 'memory_profiler', require: false
 gem 'flamegraph', require: false

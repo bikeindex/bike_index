@@ -2,13 +2,9 @@
 # All of the classes in the
 
 class window.BikeIndex
-  pageClasses:
-    info_about: BikeIndex.InfoAbout
-
   initialize: ->
     body_id = document.getElementsByTagName('body')[0].id
-    console.log 'party here'
-    console.log @pageClasses
+
     new @pageClasses[body_id]
 
 
