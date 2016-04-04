@@ -1,0 +1,51 @@
+.primary-header-nav {
+  background: $primary-nav-background;
+  .primary-logo {
+    position: relative;
+    float: left;
+    padding: $vertical-height 0;
+    img {
+      display: block;
+      height: 82px;
+      width: auto;
+    }
+  }
+  .primary-main-menu {
+    @include list-unstyled;
+    display: block;
+    .primary-nav-item {
+      display: block;
+      margin: 0;
+      a {
+        color: $primary-nav-text-color;
+        display: block;
+        transition: color .05s linear;
+        &:hover { color: #fff; }
+      }
+    }
+  }
+}
+
+@media (min-width: $grid-breakpoint-lg) {
+  .primary-header-nav {
+    .primary-main-menu {
+      .primary-nav-item {
+        padding: 3*$vertical-height 0;
+        float: right;
+        a {
+          padding: $vertical-height 0.5*$grid-gutter-width;
+        }
+        // On large screens, the signup link is a button
+        .signup-link {
+          border-radius: 1px;
+          border: 1px solid $link-color;
+          transition: background .05s linear;
+          &:hover {
+            background: rgba(white, .1);
+            color: $primary-nav-text-color;
+          }
+        }
+      }
+    }
+  }
+}

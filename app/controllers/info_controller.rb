@@ -2,6 +2,15 @@ class InfoController < ApplicationController
   layout 'content'
   # caches_page :about, :where, :roadmap, :security, :serials, :stolen_bikes, :privacy, :terms, :vendor_terms, :downloads, :resources, :spokecard
   before_filter :set_active_section
+  before_filter :set_revised_layout
+
+  def set_revised_layout
+    self.class.layout 'application_revised' if revised_layout_enabled_for_user
+  end
+
+  def revised_layout_enabled_for_user
+    current_user && $rollout.active?(:revised_view, current_user)
+  end
 
   def about
   end

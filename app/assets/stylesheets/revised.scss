@@ -1,0 +1,81 @@
+/*!
+ * Bootstrap v4.0.0-alpha.2 (http://getbootstrap.com)
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ */
+
+// Core variables and mixins
+@import "bootstrap/variables";
+@import "bootstrap/mixins";
+
+// Reset and dependencies
+@import "bootstrap/normalize";
+@import "bootstrap/print";
+
+// Core CSS
+@import "bootstrap/reboot";
+// @import "bootstrap/type";
+@import "bootstrap/images";
+@import "bootstrap/code";
+@import "bootstrap/grid";
+@import "bootstrap/tables";
+@import "bootstrap/forms";
+@import "bootstrap/buttons";
+
+// Components
+@import "bootstrap/animation";
+@import "bootstrap/dropdown";
+@import "bootstrap/button-group";
+@import "bootstrap/input-group";
+@import "bootstrap/custom-forms";
+@import "bootstrap/nav";
+@import "bootstrap/navbar";
+@import "bootstrap/card";
+@import "bootstrap/breadcrumb";
+@import "bootstrap/pagination";
+// @import "bootstrap/tags";
+@import "bootstrap/jumbotron";
+@import "bootstrap/alert";
+@import "bootstrap/progress";
+@import "bootstrap/media";
+@import "bootstrap/list-group";
+@import "bootstrap/responsive-embed";
+@import "bootstrap/close";
+
+// Components w/ JavaScript
+@import "bootstrap/modal";
+@import "bootstrap/tooltip";
+@import "bootstrap/popover";
+@import "bootstrap/carousel";
+
+// Utility classes
+@import "bootstrap/utilities";
+
+
+
+/*!
+ * Bike Index styles
+ * for revised style in 2016
+ */
+
+// Because Mike Oleon is obsessed with the imperial system
+// or something dumb like that
+$vertical-height: 12px;
+
+// To make grid breakpoints variables for now
+$grid-breakpoint-lg: 992px;
+
+// External styles
+@import "includes/selectize_bootstrap3.scss";
+
+// Settings
+@import "revised/mixins/colors";
+@import "revised/fonts";
+
+// shared styles
+@import "revised/sections/primary_header_nav";
+@import "revised/sections/content-menu";
+@import "revised/sections/content";
+
+// page styles
+@import "revised/pages/about";

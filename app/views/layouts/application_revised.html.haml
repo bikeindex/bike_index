@@ -1,0 +1,54 @@
+!!!
+%html
+  %head
+    = header_tags
+    = csrf_meta_tags
+    <link rel="shortcut icon" href="/fav.ico" />
+    = stylesheet_link_tag 'revised', media: "all"
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+    = javascript_include_tag 'application_revised'
+    <!--[if lt IE 9]><script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]--><!--[if lte IE 8]><script type="text/javascript">$(function() {$('body').prepend("<body class='welcome-page' id='body'><div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, the Bike Index (and the internet in general) is broken and ugly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>");});</script><![endif]-->
+    
+    = auto_discovery_link_tag(:atom, news_index_url(format: "atom"), {title: "Bike Index news"})
+
+  %body{ id: body_id }
+    - cache 'facebook_pixel' do
+      = render '/shared/facebook_pixel'
+    = render 'layouts/messages'
+    %nav.primary-header-nav
+      .container
+        %a.primary-logo{ href: user_root_url }
+          = image_tag "/assets/revised/logo.svg", class: 'primary-nav', alt: "Primary nav logo"
+        %nav.primary-main-menu
+          - if current_user.present?
+            %h4.primary-nav-item
+              = link_to 'Sign up', new_user_url, class: 'nav-link signup-link'
+            %h4.primary-nav-item
+              = link_to 'log in', new_session_url, class: 'nav-link'
+          / - else
+          %h4.primary-nav-item
+            = link_to 'help', help_path, class: 'nav-link'
+          %h4.primary-nav-item
+            = link_to 'About', about_path, class: 'nav-link'
+          %h4.primary-nav-item
+            = link_to 'News', news_index_path, class: 'nav-link'
+          %h4.primary-nav-item
+            = link_to 'Community', '#', class: 'nav-link'
+          %h4.primary-nav-item
+            = link_to 'Search bikes', bikes_path, class: 'nav-link'
+
+    .container.content-container
+      - if controller_name == 'info'
+        .row
+          .col-md-8
+            = yield
+          .col-md-4.content-menu
+            = render 'shared/content_menu'
+      / - else
+
+    
+    - cache 'footer_updated' do
+      = render 'shared/footer_updated'
+  :plain
+    <!-- Open source, https://github.com/bikeindex/bike_index -->
