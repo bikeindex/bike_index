@@ -40,7 +40,7 @@
               %li.primary-nav-item
                 = nav_link 'Admin', user_root_url
             - if current_user.memberships.any?
-              - current_user.membergships.each do |membership|
+              - current_user.memberships.each do |membership|
                 %li.primary-nav-item
                   = nav_link membership.organization.short_name, "/organizations/#{membership.organization.slug}", class_name: 'nav-link'
           - else
