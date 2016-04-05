@@ -22,6 +22,8 @@
     display: block;
     margin: 0;
     a {
+      @extend h4;
+      cursor: pointer;
       color: $primary-nav-text-color;
       display: block;
       transition: color .05s linear;
@@ -84,6 +86,7 @@ $mainmenu-open-zindex: 10;
     }
     .primary-nav-item {
       a {
+        margin: 0;
         padding: $vertical-height 2*$vertical-height;
         &:active, &.active {
           background: $gray-light;
@@ -132,6 +135,7 @@ $mainmenu-open-zindex: 10;
       transition: padding 200ms linear;
       a {
         padding: $vertical-height 0.5*$grid-gutter-width;
+        // margin: 0;
         &.active {
           text-decoration: none;
           &::after {
@@ -166,6 +170,28 @@ $mainmenu-open-zindex: 10;
           width: auto;
         }
       }
+    }
+  }
+  .open > .primary-submenu { display: block; }
+  .primary-submenu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    display: none;
+    float: left;
+    min-width: 400px;
+    padding: 5px 0;
+    margin: 2px 0 0;
+    font-size: 1rem;
+    text-align: left;
+    list-style: none;
+    background-color: $primary-nav-background;
+    background-clip: padding-box;
+    border: 1px solid rgba($gray, .3);
+    border-radius: 1px;
+    z-index: 1;
+    li {
+      font-size: 80%;
     }
   }
   // To prevent flashing on initial load, before JS arrives

@@ -45,7 +45,6 @@ h5 {
    font-style: normal;
    margin: 0 0 24px;
    text-transform: uppercase;
-   letter-spacing: -1px;
    font-size: 54px;
    line-height: 1.12em;
    color: $header-font-color;
@@ -59,7 +58,10 @@ h5 {
   }
 }
 
-h1 { @extend .header-font; }
+h1 {
+  @extend .header-font;
+  letter-spacing: -1px;
+}
 
 h2 {
   @extend .header-font;

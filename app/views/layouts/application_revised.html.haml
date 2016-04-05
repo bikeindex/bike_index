@@ -26,34 +26,37 @@
             &#9776;
         %nav.primary-main-menu
           - if current_user.present?
-            %h4.primary-nav-item
-              %a.nav-link.settings-link{ href: my_account_path, class: (current_page?(my_account_path) ? 'active' : '') }
+            %li.primary-nav-item
+              %a.nav-link.settings-link#settingsSubmenu{ 'aria-haspopup' => "true", 'aria-expanded' => "false", data: { toggle: 'dropdown' } }
                 %span.settings-text
                   Settings
                 = image_tag '/assets/revised/settings.svg', title: 'Your settings'
-            %h4.primary-nav-item
+              %ul.primary-submenu{ 'aria-labelledby' => '#settingsSubmenu' }
+                = nav_link "#{current_user.email} settings", my_account_path, class_name: 'nav-link'
+                = link_to 'Logout', session_path, method: :delete, class: 'low-priority'
+            %li.primary-nav-item
               = nav_link 'Your bikes', user_home_path, class_name: 'nav-link'
             - if current_user.admin_authorized('any')
-              %h4.primary-nav-item
+              %li.primary-nav-item
                 = nav_link 'Admin', user_root_url
             - if current_user.memberships.any?
-              - current_user.memberships.each do |membership|
-                %h4.primary-nav-item
+              - current_user.membergships.each do |membership|
+                %li.primary-nav-item
                   = nav_link membership.organization.short_name, "/organizations/#{membership.organization.slug}", class_name: 'nav-link'
           - else
-            %h4.primary-nav-item
+            %li.primary-nav-item
               = nav_link 'Sign up', new_user_url, class_name: 'nav-link signup-link'
-            %h4.primary-nav-item
+            %li.primary-nav-item
               = nav_link 'log in', new_session_url, class_name: 'nav-link'
-          %h4.primary-nav-item
+          %li.primary-nav-item
             = nav_link 'help', help_path, class_name: 'nav-link'
-          %h4.primary-nav-item
+          %li.primary-nav-item
             = nav_link 'About', about_path, class_name: 'nav-link'
-          %h4.primary-nav-item
+          %li.primary-nav-item
             = nav_link 'News', news_index_path, class_name: 'nav-link'
-          %h4.primary-nav-item
+          %li.primary-nav-item
             = nav_link 'Community', '#', class_name: 'nav-link'
-          %h4.primary-nav-item
+          %li.primary-nav-item
             = nav_link 'Search bikes', bikes_path, class_name: 'nav-link'
 
     .container.content-container
