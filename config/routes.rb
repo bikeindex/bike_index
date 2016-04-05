@@ -64,9 +64,9 @@ Bikeindex::Application.routes.draw do
       get 'update_password'
     end
   end
-  match 'my_account', to: 'users#edit'
-  match 'accept_vendor_terms', to: 'users#accept_vendor_terms'
-  match 'accept_terms', to: 'users#accept_terms'
+  get :my_account, to: 'users#edit', as: :my_account
+  get :accept_vendor_terms, to: 'users#accept_vendor_terms'
+  get :accept_terms, to: 'users#accept_terms'
   resources :user_embeds, only: [:show]
 
   resources :news, only: [:show, :index]

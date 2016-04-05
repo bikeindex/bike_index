@@ -12,7 +12,7 @@
   a {
     color: $link-color;
     text-decoration: none;
-    &:hover {
+    &:hover, &:active, &.active {
       text-decoration: underline;
       color: $link-color;
     }
@@ -52,7 +52,7 @@ h5 {
    strong { font-weight: 700; }
    a {
     color: $link-color;
-    &:hover {
+    &:hover, &:active, &.active {
       text-decoration: underline;
       color: $link-color;
     }

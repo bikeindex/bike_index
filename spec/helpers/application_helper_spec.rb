@@ -2,10 +2,29 @@ require 'spec_helper'
 
 describe ApplicationHelper do
   describe :nav_link do
-    it 'returns the link active if it ought to be' do
-      view.stub(:current_page?).and_return(true)
-      generated = '<a href="http://bikeindex.org" class="active">Bike Index blog</a>'
-      helper.nav_link('Bike Index blog', 'http://bikeindex.org').should eq(generated)
+    context 'without a class' do
+      it 'returns the link active if it ought to be' do
+        view.stub(:current_page?).and_return(true)
+        generated = '<a href="http://bikeindex.org" class=" active">Bike Index about</a>'
+        expect(helper.nav_link('Bike Index about', 'http://bikeindex.org')).to eq generated
+      end
+    end
+    context 'match controller true' do
+      let(:request) { double('request', url: new_bike_url) }
+      before { allow(helper).to receive(:request).and_return(request) }
+      it 'returns the link active if it is a bikes page' do
+        generated = '<a href="' + new_bike_url + '" class="seeeeeeee active">Bike Index bikes page</a>'
+        result = helper.nav_link('Bike Index bikes page', new_bike_url, match_controller: true, class_name: 'seeeeeeee')
+        expect(result).to eq generated
+      end
+    end
+    context 'current with a class' do
+      it 'returns the link active if it ought to be' do
+        view.stub(:current_page?).and_return(true)
+        generated = '<a href="http://bikeindex.org" class="nav-party-link active">Bike Index about</a>'
+        result = helper.nav_link('Bike Index about', 'http://bikeindex.org', class_name: 'nav-party-link')
+        expect(result).to eq generated
+      end
     end
   end
 

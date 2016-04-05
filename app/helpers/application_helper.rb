@@ -1,5 +1,19 @@
 module ApplicationHelper 
-  def nav_link(link_text, link_path)
+  def nav_link(link_text, link_path, match_controller: false, class_name: '')
+    class_name += ' active' if current_page_active(link_path, match_controller: match_controller)
+    link_to(raw(link_text), link_path, class: class_name).html_safe
+  end
+
+  def current_page_active(link_path, match_controller: false)
+    if match_controller
+      link_controller = Rails.application.routes.recognize_path(link_path)[:controller]
+      Rails.application.routes.recognize_path(request.url)[:controller] == link_controller
+    else
+      current_page?(link_path)
+    end
+  end
+
+  def current_link(link_text, link_path, class: '') # Revised layout link
     class_name = current_page?(link_path) ? 'active' : ''
     class_name = 'active' if link_path.match(news_index_path) && controller_name == 'news'
     html = link_to raw(link_text), link_path, class: class_name

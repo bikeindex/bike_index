@@ -74,7 +74,7 @@ gem 'groupdate'
 gem 'bootstrap', '~> 4.0.0.alpha3' # Bootstrap 4 - used for revised stylesheets
 gem 'sparkpost' # ruby client for email
 
-# 
+# Show performance metrics
 gem 'stackprof', require: false
 gem 'memory_profiler', require: false
 gem 'flamegraph', require: false

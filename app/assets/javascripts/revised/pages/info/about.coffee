@@ -1,3 +1,3 @@
-class InfoAbout extends BikeIndex
+class BikeIndex.InfoAbout extends BikeIndex
   constructor: ->
     console.log('InfoAbout initialized')

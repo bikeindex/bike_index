@@ -20,9 +20,12 @@
         color: $primary-nav-text-color;
         display: block;
         transition: color .05s linear;
-        &:hover { color: #fff; }
+        &:hover, &:active, &.active { color: #fff; }
       }
     }
+  }
+  .settings-link {
+    img { display: none; }
   }
 }
 
@@ -32,8 +35,22 @@
       .primary-nav-item {
         padding: 3*$vertical-height 0;
         float: right;
+        position: relative;
         a {
           padding: $vertical-height 0.5*$grid-gutter-width;
+          &.active {
+            text-decoration: none;
+            &::after {
+              content: '';
+              position: absolute;
+              left: 50%;
+              bottom: 3*$vertical-height;
+              height: 2px;
+              width: 24%;
+              margin-left: -12%;
+              background: $blue;
+            }
+          }
         }
         // On large screens, the signup link is a button
         .signup-link {
@@ -43,6 +60,16 @@
           &:hover {
             background: rgba(white, .1);
             color: $primary-nav-text-color;
+          }
+        }
+        .settings-link {
+          padding-top: .5*$vertical-height;
+          padding-bottom: .5*$vertical-height;
+          .settings-text { display: none; }
+          img {
+            display: block;
+            height: 2*$vertical-height;
+            width: auto;
           }
         }
       }
