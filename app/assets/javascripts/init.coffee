@@ -7,7 +7,7 @@ class window.BikeIndex
   pageLoad: ->
     new BikeIndex.NavHeader
     body_id = document.getElementsByTagName('body')[0].id
-    # new @pageClasses[body_id]
+    new @pageClasses[body_id] if @pageClasses[body_id]
 
 
 

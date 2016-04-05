@@ -20,7 +20,10 @@
       .container
         %a.primary-logo{ href: user_root_url }
           = image_tag "/assets/revised/logo.svg", class: 'primary-nav', alt: "Primary nav logo"
-
+        %a#menu-opened-backdrop
+        .hamburgler
+          %a#primary_nav_hamburgler
+            &#9776;
         %nav.primary-main-menu
           - if current_user.present?
             %h4.primary-nav-item

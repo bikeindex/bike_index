@@ -1,3 +1,9 @@
 .content-container {
-  padding-top: 4*$vertical-height;
+  padding-top: 8*$vertical-height
+}
+
+@media (min-width: $grid-breakpoint-lg) {
+  .content-container {
+    padding-top: 12*$vertical-height;
+  }
 }

@@ -1,78 +1,180 @@
 .primary-header-nav {
   background: $primary-nav-background;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  z-index: $zindex-navbar-fixed;
   .primary-logo {
     position: relative;
     float: left;
     padding: $vertical-height 0;
     img {
       display: block;
-      height: 82px;
+      height: 44px;
       width: auto;
     }
   }
   .primary-main-menu {
     @include list-unstyled;
     display: block;
-    .primary-nav-item {
+  }
+  .primary-nav-item {
+    display: block;
+    margin: 0;
+    a {
+      color: $primary-nav-text-color;
       display: block;
-      margin: 0;
-      a {
-        color: $primary-nav-text-color;
-        display: block;
-        transition: color .05s linear;
-        &:hover, &:active, &.active { color: #fff; }
-      }
+      transition: color .05s linear;
+      &:hover, &:active, &.active { color: #fff; }
     }
   }
+  .hamburgler { font-family: courier; }
   .settings-link {
     img { display: none; }
   }
 }
 
+// 
+// Small Screen Styles
+$mainmenu-transform-speed: 200ms;
+$mainmenu-width: 80%;
+$mainmenu-open-zindex: 10;
+@media (max-width: $grid-breakpoint-lg - 1px) {
+  .primary-header-nav {
+    transition: transform 200ms linear;
+    &.headroom--pinned { transform: translate(0, 0%); }
+    &.headroom--unpinned { transform: translate(0, -100%); }
+    .hamburgler {
+      float: right;
+      position: relative;
+      transition: padding $mainmenu-transform-speed linear;
+      padding: 1.5*$vertical-height 0;
+      z-index: $mainmenu-open-zindex + 3;
+      a {
+        font-size: 36px;
+        display: block;
+        cursor: pointer;
+        color: $gray;
+        background: $primary-nav-background;
+        transition: transform 100ms linear;
+        &:hover { 
+          color: #fff;
+          text-decoration: none;
+        }
+        &:active, &.active {
+          color: #fff;
+          text-decoration: none;
+          transform: rotate(45deg)
+        }
+      }
+    }
+    .primary-main-menu { 
+      display: block;
+      background: $primary-nav-background;
+      position: fixed;
+      right: 0;
+      top: 4*$vertical-height;
+      transform: translate(100%, 0);
+      width: $mainmenu-width;
+      height: 100%;
+      transition: transform $mainmenu-transform-speed linear;
+      z-index: $mainmenu-open-zindex;
+      overflow-y: auto;
+      padding: 2*$vertical-height 0 100px;
+    }
+    .primary-nav-item {
+      a {
+        padding: $vertical-height 2*$vertical-height;
+        &:active, &.active {
+          background: $gray-light;
+          text-decoration: none;
+        }
+      }
+    }
+    #menu-opened-backdrop {
+      display: none;
+      position: fixed;
+      top: 5*$vertical-height;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: none;
+      z-index: $mainmenu-open-zindex - 1;
+    }
+  }
+  // 
+  // Mobile menu visible
+  body.menu-in { overflow: hidden; }
+  .primary-header-nav.menu-in {
+    #menu-opened-backdrop { display: block; }
+    .hamburgler { padding-right: $mainmenu-width - 5%; }
+    .primary-main-menu { transform: translate(0%, 0); }
+  }
+}
+
+// 
+// Large screen styles
 @media (min-width: $grid-breakpoint-lg) {
   .primary-header-nav {
-    .primary-main-menu {
+    &.headroom--pinned, &.headroom--unpinned {
+      .primary-logo img { height: 48px; }
       .primary-nav-item {
-        padding: 3*$vertical-height 0;
-        float: right;
-        position: relative;
-        a {
-          padding: $vertical-height 0.5*$grid-gutter-width;
-          &.active {
-            text-decoration: none;
-            &::after {
-              content: '';
-              position: absolute;
-              left: 50%;
-              bottom: 3*$vertical-height;
-              height: 2px;
-              width: 24%;
-              margin-left: -12%;
-              background: $blue;
-            }
-          }
-        }
-        // On large screens, the signup link is a button
-        .signup-link {
-          border-radius: 1px;
-          border: 1px solid $link-color;
-          transition: background .05s linear;
-          &:hover {
-            background: rgba(white, .1);
-            color: $primary-nav-text-color;
-          }
-        }
-        .settings-link {
-          padding-top: .5*$vertical-height;
-          padding-bottom: .5*$vertical-height;
-          .settings-text { display: none; }
-          img {
-            display: block;
-            height: 2*$vertical-height;
-            width: auto;
+        padding: $vertical-height 0 0;
+        a.active::after { bottom: 0; }
+      }
+    }
+    .primary-logo img { transition: height 200ms linear; }
+    .hamburgler { display: none; }
+    .primary-nav-item {
+      float: right;
+      position: relative;
+      padding: $vertical-height 0 0;
+      transition: padding 200ms linear;
+      a {
+        padding: $vertical-height 0.5*$grid-gutter-width;
+        &.active {
+          text-decoration: none;
+          &::after {
+            transition: bottom 200ms linear;
+            content: '';
+            position: absolute;
+            left: 50%;
+            height: 2px;
+            width: 24%;
+            margin-left: -12%;
+            background: $blue;
           }
         }
       }
+      // On large screens, the signup link is a button
+      .signup-link {
+        border-radius: 1px;
+        border: 1px solid $link-color;
+        transition: background .05s linear;
+        &:hover {
+          background: rgba(white, .1);
+          color: $primary-nav-text-color;
+        }
+      }
+      .settings-link {
+        padding-top: .5*$vertical-height;
+        padding-bottom: .5*$vertical-height;
+        .settings-text { display: none; }
+        img {
+          display: block;
+          height: 2*$vertical-height;
+          width: auto;
+        }
+      }
+    }
+  }
+  // To prevent flashing on initial load, before JS arrives
+  .primary-header-nav, .primary-header-nav.headroom--top, 
+  .primary-header-nav.headroom--top.headroom--pinned {
+    .primary-logo img { height: 82px; }
+    .primary-nav-item {
+      padding: 3*$vertical-height 0 2*$vertical-height;
+      a.active::after { bottom: 2*$vertical-height; }
     }
   }
 }
