@@ -267,7 +267,7 @@ describe BParam do
     end
   end
 
-  # 
+  #
   # Revised attrs
   describe :find_or_new_from_token do
     let(:user) { FactoryGirl.create(:user) }
@@ -398,13 +398,11 @@ describe BParam do
           stolen: true,
           creator_id: 777,
           b_param_id: 122,
-          cycle_type_id: CycleType.standard_bike
+          cycle_type_id: CycleType.bike.id,
           creation_organization_id: nil
         }
         expect(b_param.safe_bike_attrs(stolen: true)).to eq(target)
       end
     end
   end
-  # context 'revised with bike_attrs' do
-  # end
 end

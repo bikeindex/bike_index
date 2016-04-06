@@ -205,7 +205,7 @@ class BParam < ActiveRecord::Base
   end
 
   def cycle_type_id
-    (bike_attrs && bike_attrs['cycle_type_id']) || CycleType.bike.id
+    (bike_attrs && bike_attrs['cycle_type_id'].present? && bike_attrs['cycle_type_id']) || CycleType.bike.id
   end
 
   def creation_organization_id
