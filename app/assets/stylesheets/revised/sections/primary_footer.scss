@@ -1,0 +1,57 @@
+.primary-footer {
+  .primary-footer-nav, .terms-and-stuff {
+    padding: 3*$vertical-height 0;
+  }
+  a {
+    text-decoration: none;
+    &:hover, &:active, &.active { text-decoration: underline; }
+  }
+  .primary-footer-nav h4 a, .terms-and-stuff a {
+    color: $blue-light;
+    &:hover, &:active, &.active { color: $blue-light; }
+  }
+  .primary-footer-nav {
+    background: $gray-dark;
+    a { color: $gray-light; }
+    h4 { margin-bottom: 0.5*$vertical-height; }
+    ul {
+      @include list-unstyled;
+      margin: 0;
+    }
+    .social-nav {
+      text-align: center;
+      li {
+        display: block;
+        float: left;
+        width: 33.33%;
+      }
+      a {
+        display: block;
+        position: relative;
+      }
+      img {
+        display: inline-block;
+        max-height: 4*$vertical-height;
+      }
+    }
+  }
+  .terms-and-stuff {
+    background: $black-off;
+    color: $gray-light;
+    text-align: center;
+    p {
+      margin: 0;
+      font-size: 12px;
+      padding: 0;
+    }
+  }
+}
+
+
+// 
+// Small Screen Styles
+@media (max-width: $grid-breakpoint-lg - 1px) {
+  .primary-footer-nav nav {
+    margin-top: 3.5*$vertical-height;
+  }
+}

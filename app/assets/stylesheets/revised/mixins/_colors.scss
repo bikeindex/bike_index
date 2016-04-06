@@ -1,17 +1,21 @@
 $green: #2ecc71;
 $red: #e74c3c;
-$blue: #3498db;
 
-$gray: #666666;
+$blue: #3498db;
+$blue-light: #92c8ec;
+
+$gray-dark: #222;
+$gray: #666;
 $gray-light: #A4A4A4;
 $gray-lighter: #f2f2f2;
 
 
-
-$body-font-color: #666666;
+$body-font-color: $gray;
 $link-color: $blue;
 $header-font-color: #333333;
 
+$black-off: #111;
+
 // Nav colors
-$primary-nav-background: #222;
+$primary-nav-background: $black-off;
 $primary-nav-text-color: $gray-light;

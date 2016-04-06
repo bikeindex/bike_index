@@ -8,6 +8,7 @@ Bikeindex::Application.routes.draw do
 
   get 'dashboard/show'
 
+  match '/shop', to: redirect('https://bikeindex.myshopify.com'), as: :shop
   match '/discuss', to: redirect(ENV['DISCOURSE_URL']), as: :discuss
   match 'discourse_authentication', to: 'discourse_authentication#index'
 
@@ -197,7 +198,7 @@ Bikeindex::Application.routes.draw do
   match '/auth/:provider/callback', to: 'integrations#create'
 
   %w(support_the_index support_the_bike_index protect_your_bike privacy terms serials
-     about where vendor_terms resources image_resources how_not_to_buy_stolen).each do |page|
+     about where vendor_terms resources image_resources how_not_to_buy_stolen dev_and_design).each do |page|
     get page, controller: 'info', action: page
   end
 
