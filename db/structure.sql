@@ -95,7 +95,8 @@ CREATE TABLE b_params (
     image character varying(255),
     image_tmp character varying(255),
     image_processed boolean DEFAULT true,
-    id_token text
+    id_token text,
+    bike_attrs json
 );
 
 
@@ -2991,3 +2992,5 @@ INSERT INTO schema_migrations (version) VALUES ('20160314144745');
 INSERT INTO schema_migrations (version) VALUES ('20160317183354');
 
 INSERT INTO schema_migrations (version) VALUES ('20160320154610');
+
+INSERT INTO schema_migrations (version) VALUES ('20160406180845');

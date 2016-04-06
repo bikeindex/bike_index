@@ -52,6 +52,7 @@ gem 'eventmachine', '~> 1.0.3'
 gem 'sitemap_generator'
 gem 'unicorn'
 gem 'unicorn-worker-killer'
+gem 'rake', '< 11' # Lock rake to remove validation errors
 
 # OAuth provider, Grape, associated parts of API V2
 gem 'doorkeeper',   '~> 2.0.1'

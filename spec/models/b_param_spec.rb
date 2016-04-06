@@ -4,24 +4,24 @@ describe BParam do
   describe :validations do
     it { should belong_to :created_bike }
     it { should belong_to :creator }
-    it { should validate_presence_of :creator }
+    # it { should validate_presence_of :creator }
   end
 
-  describe :bike do 
-    it "returns the bike attribs" do 
+  describe :bike do
+    it "returns the bike attribs" do
       b_param = BParam.new 
       b_param.stub(:params).and_return({bike: {serial_number: "XXX"}})
       b_param.bike[:serial_number].should eq("XXX")
     end
-    it "does not fail if there isn't a bike" do 
+    it "does not fail if there isn't a bike" do
       user = FactoryGirl.create(:user)
       b_param = BParam.new(creator_id: user.id, params: { stolen: true })
       b_param.save.should be_true
     end
   end
 
-  describe :massage_if_v2 do 
-    it "renames v2 keys" do 
+  describe :massage_if_v2 do
+    it "renames v2 keys" do
       p = {
         serial: 'something',
         manufacturer: 'something else',
@@ -53,8 +53,8 @@ describe BParam do
     end
   end
 
-  describe :set_foreign_keys do 
-    it "calls set_foreign_keys" do 
+  describe :set_foreign_keys do
+    it "calls set_foreign_keys" do
       b_param = BParam.new
       bike = {
         frame_material_slug: "something",
@@ -79,8 +79,8 @@ describe BParam do
     end
   end
 
-  describe :clean_errors do 
-    it "removes error messages we don't want to show users" do 
+  describe :clean_errors do
+    it "removes error messages we don't want to show users" do
       errors = ["Manufacturer can't be blank", "Bike can't be blank", "Association error Ownership wasn't saved. Are you sure the bike was created?"]
       b_param = BParam.new(bike_errors: errors)
       b_param.clean_errors
@@ -191,7 +191,7 @@ describe BParam do
       b_param.params[:bike][:color].should_not be_present
       b_param.params[:bike][:primary_frame_color_id].should eq(color.id)
     end
-    it "set_paint_keys if it it isn't a color" do 
+    it "set_paint_keys if it it isn't a color" do
       bike = { color: "Goop" }
       b_param = BParam.new
       b_param.stub(:params).and_return({bike: bike})
@@ -235,31 +235,31 @@ describe BParam do
     end
   end
 
-  describe :generate_username_confirmation_and_auth do 
-    it "generates the required tokens" do 
+  describe :generate_username_confirmation_and_auth do
+    it "generates the required tokens" do
       b_param = BParam.new
       b_param.generate_id_token
       b_param.id_token.length.should be > 10
     end
-    it "haves before create callback" do 
+    it "haves before create callback" do
       BParam._create_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:generate_id_token).should == true      
     end
   end
 
-  describe :from_id_token do 
-    it "gets from a token" do 
+  describe :from_id_token do
+    it "gets from a token" do
       b_param = FactoryGirl.create(:b_param)
       BParam.from_id_token(b_param.id_token).should eq(b_param)
     end
 
-    it "doesn't get an old token" do 
+    it "doesn't get an old token" do
       b_param = FactoryGirl.create(:b_param)
       b_param.update_attribute :created_at, Time.now - 2.days
       b_param.reload
       BParam.from_id_token(b_param.id_token).should be_nil
     end
 
-    it "gets with time passed in" do 
+    it "gets with time passed in" do
       b_param = FactoryGirl.create(:b_param)
       b_param.update_attribute :created_at, Time.now - 2.days
       b_param.reload
@@ -267,4 +267,114 @@ describe BParam do
     end
   end
 
+  # 
+  # Revised attrs
+  describe :find_or_new_from_token do
+    let(:user) { FactoryGirl.create(:user) }
+    #
+    # Because for now we aren't updating the factory, use this let for b_params factory
+    let(:b_param) { BParam.create }
+    let(:expire_b_param) { b_param.update_attribute :created_at, Time.zone.now - 1.year }
+    context 'with user_id passed' do
+      context 'without token' do
+        it 'returns a new b_param' do
+          result = BParam.find_or_new_from_token(nil, user_id: user.id)
+          expect(result.is_a?(BParam)).to be_true
+          expect(result.id).to be_nil
+        end
+      end
+      context 'existing token' do
+        context 'with creator of same user and expired b_param' do
+          it 'returns the b_param - also testing that we get the *correct* b_param' do
+            expire_b_param
+            BParam.create(creator_id: user.id)
+            b_param.update_attribute :creator_id, user.id
+            expect(BParam.find_or_new_from_token(b_param.id_token, user_id: user.id)).to eq b_param
+          end
+        end
+        context 'with creator of different user' do
+          it 'fails' do
+            other_user = FactoryGirl.create(:user)
+            b_param.update_attribute :creator_id, user.id
+            result = BParam.find_or_new_from_token(b_param.id_token, user_id: other_user.id)
+            expect(result.is_a?(BParam)).to be_true
+            expect(result.id).to be_nil
+          end
+        end
+        context 'with no creator' do
+          it 'returns the b_param' do
+            expect(BParam.find_or_new_from_token(b_param.id_token, user_id: user.id)).to eq b_param
+          end
+          context 'with expired b_param' do
+            it 'fails' do
+              expire_b_param
+              result = BParam.find_or_new_from_token(b_param.id_token, user_id: user.id)
+              expect(result.is_a?(BParam)).to be_true
+              expect(result.id).to be_nil
+            end
+          end
+        end
+      end
+      it 'updates with the organization' do
+        organization_id = 42
+        result = BParam.find_or_new_from_token(user_id: user.id, organization_id: organization_id)
+        expect(result.is_a?(BParam)).to be_true
+        expect(result.creation_organization_id).to eq(organization_id)
+        expect(result.creator_id).to eq(user.id)
+        expect(result.id).to be_nil
+      end
+      context 'with existing bike' do
+        it 'fails and says expired' do
+          b_param.update_attribute :created_bike_id, 33
+          result = BParam.find_or_new_from_token(b_param.id_token)
+          expect(result.is_a?(BParam)).to be_true
+          expect(result.id).to be_nil
+        end
+      end
+    end
+    context 'without user_id passed' do
+      context 'without token' do
+        it 'returns a new b_param' do
+          result = BParam.find_or_new_from_token
+          expect(result.is_a?(BParam)).to be_true
+          expect(result.id).to be_nil
+        end
+      end
+      context 'with organization' do
+        context 'organization not set' do
+          it 'updates with the organization' do
+            organization_id = 42
+            result = BParam.find_or_new_from_token(b_param.id_token, organization_id: organization_id)
+            expect(result).to eq b_param
+            expect(result.creation_organization_id).to eq(organization_id)
+          end
+        end
+      end
+      context 'without user' do
+        it 'returns the b_param also testing that we get the *correct* b_param' do
+          BParam.create
+          expect(BParam.find_or_new_from_token(b_param.id_token)).to eq b_param
+          expect(BParam.first).to_not eq b_param # Ensuring we aren't picking it accidentally
+        end
+        context 'expired_b_param' do
+          it 'returns new b_param' do
+            expire_b_param
+            result = BParam.find_or_new_from_token(b_param.id_token)
+            expect(result.is_a?(BParam)).to be_true
+            expect(result.id).to be_nil
+          end
+        end
+        context 'with creator' do
+          it 'returns new b_param' do
+            b_param.update_attribute :creator_id, user.id
+            result = BParam.find_or_new_from_token(b_param.id_token)
+            expect(result.is_a?(BParam)).to be_true
+            expect(result.id).to be_nil
+          end
+        end
+      end
+    end
+  end
+  # context 'revised with bike_attrs' do
+  # end
 end

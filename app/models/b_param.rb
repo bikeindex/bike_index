@@ -7,7 +7,8 @@ class BParam < ActiveRecord::Base
     :bike_errors,
     :image,
     :image_processed, 
-    :api_v2
+    :api_v2,
+    :bike_attrs
 
   attr_accessor :api_v2
 
@@ -16,12 +17,22 @@ class BParam < ActiveRecord::Base
 
   serialize :params
   serialize :bike_errors
+  serialize :bike_attrs, JSON
 
   belongs_to :created_bike, class_name: "Bike"
   belongs_to :creator, class_name: "User"
-  validates_presence_of :creator
+
+  scope :without_bike, -> { where('created_bike_id IS NULL') }
+  scope :without_creator, -> { where('creator_id IS NULL') }
+
+  # Commented out for revision. Remove if specs are passing
+  # validates_presence_of :creator
 
   before_create :generate_id_token
+  before_validation do
+   # ensure valid bike_attrs as json object
+    self.bike_attrs ||= {}
+  end
 
   def bike
     params[:bike]
@@ -157,10 +168,26 @@ class BParam < ActiveRecord::Base
     end
   end
 
-  def self.from_id_token(toke, after=nil)
+  def self.from_id_token(toke, after = nil)
     return nil unless toke.present?
     after ||= Time.now - 1.days
-    where("created_at >= ?", after).where(id_token: toke).first
+    where('created_at >= ?', after).where(id_token: toke).first
+  end
+
+  def self.find_or_new_from_token(toke = nil, user_id: nil, organization_id: nil)
+    b = without_bike.where(creator_id: user_id, id_token: toke).first if user_id.present?
+    b ||= without_bike.without_creator.where('created_at >= ?', Time.now - 1.month).where(id_token: toke).first
+    b ||= BParam.new(creator_id: user_id, bike_attrs: {})
+    # If the org_id is present, add it to the bike_attrs. Only save it if the b_param is created
+    if organization_id.present? && b.creation_organization_id != organization_id
+      b.bike_attrs = b.bike_attrs.merge(creation_organization_id: organization_id).as_json
+      b.update_attribute :bike_attrs, b.bike_attrs if b.id.present?
+    end
+    b
+  end
+
+  def creation_organization_id
+    bike_attrs && bike_attrs['creation_organization_id']
   end
 
   def generate_id_token
@@ -175,6 +202,4 @@ class BParam < ActiveRecord::Base
     end while BParam.where(id_token: toke).exists?
     toke
   end
-
-
 end

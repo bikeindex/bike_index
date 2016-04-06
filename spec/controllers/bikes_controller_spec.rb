@@ -102,40 +102,79 @@ describe BikesController do
   end
 
   describe :new do
-    it "does not redirect to new user if a user isn't present" do
-      get :new, stolen: true
-      response.code.should eq('200')
+    context 'legacy' do
+      it "does not redirect to new user if a user isn't present" do
+        get :new, stolen: true
+        response.code.should eq('200')
+      end
+
+      it 'renders a new stolen bike' do
+        user = FactoryGirl.create(:user)
+        FactoryGirl.create(:cycle_type, name: 'Bike', slug: 'bike')
+        FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
+        set_current_user(user)
+        get :new, { stolen: true }
+        response.code.should eq('200')
+        assigns(:bike).stolen.should be_true
+      end
+
+      it 'renders a new recovered bike' do
+        user = FactoryGirl.create(:user)
+        FactoryGirl.create(:cycle_type, name: 'Bike', slug: 'bike')
+        FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
+        set_current_user(user)
+        get :new, { recovered: true }
+        response.code.should eq('200')
+        assigns(:bike).recovered.should be_true
+      end
+
+      it 'renders a new organization bike' do
+        user = FactoryGirl.create(:user)
+        organization = FactoryGirl.create(:organization)
+        membership = FactoryGirl.create(:membership, user: user, organization: organization)
+        FactoryGirl.create(:cycle_type, name: 'Bike', slug: 'bike')
+        FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
+        set_current_user(user)
+        get :new
+        response.code.should eq('200')
+      end
     end
 
-    it 'renders a new stolen bike' do
-      user = FactoryGirl.create(:user)
-      FactoryGirl.create(:cycle_type, name: 'Bike', slug: 'bike')
-      FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
-      set_current_user(user)
-      get :new, { stolen: true }
-      response.code.should eq('200')
-      assigns(:bike).stolen.should be_true
-    end
+    context 'revised layout' do
+      before do
+        allow(controller).to receive(:revised_layout_enabled) { true }
+      end
 
-    it 'renders a new recovered bike' do
-      user = FactoryGirl.create(:user)
-      FactoryGirl.create(:cycle_type, name: 'Bike', slug: 'bike')
-      FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
-      set_current_user(user)
-      get :new, { recovered: true }
-      response.code.should eq('200')
-      assigns(:bike).recovered.should be_true
-    end
+      it 'renders a new stolen bike' do
+        user = FactoryGirl.create(:user)
+        FactoryGirl.create(:cycle_type, name: 'Bike', slug: 'bike')
+        FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
+        set_current_user(user)
+        get :new, { stolen: true }
+        response.code.should eq('200')
+        assigns(:bike).stolen.should be_true
+      end
 
-    it 'renders a new organization bike' do
-      user = FactoryGirl.create(:user)
-      organization = FactoryGirl.create(:organization)
-      membership = FactoryGirl.create(:membership, user: user, organization: organization)
-      FactoryGirl.create(:cycle_type, name: 'Bike', slug: 'bike')
-      FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
-      set_current_user(user)
-      get :new
-      response.code.should eq('200')
+      it 'renders a new recovered bike' do
+        user = FactoryGirl.create(:user)
+        FactoryGirl.create(:cycle_type, name: 'Bike', slug: 'bike')
+        FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
+        set_current_user(user)
+        get :new, { recovered: true }
+        response.code.should eq('200')
+        assigns(:bike).recovered.should be_true
+      end
+
+      it 'renders a new organization bike' do
+        user = FactoryGirl.create(:user)
+        organization = FactoryGirl.create(:organization)
+        membership = FactoryGirl.create(:membership, user: user, organization: organization)
+        FactoryGirl.create(:cycle_type, name: 'Bike', slug: 'bike')
+        FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
+        set_current_user(user)
+        get :new
+        response.code.should eq('200')
+      end
     end
   end
   

@@ -102,9 +102,14 @@ class BikesController < ApplicationController
   def new
     if current_user.present?
       @b_param = BParam.create(creator_id: current_user.id, params: params)
+      @b_param = BParam.create(creator_id: current_user.id, params: params)
       @bike = BikeCreator.new(@b_param).new_bike
     else
       @user = User.new
+    end
+    if revised_layout_enabled
+      self.class.layout 'application_revised'
+      render :new_revised and return
     end
     render layout: 'no_header'
   end
@@ -196,7 +201,15 @@ class BikesController < ApplicationController
     end
   end
 
-protected
+  protected
+
+  def set_bparam
+    if params[:b_param_id_token].present?
+      @b_param = BParam.create_from_id_token(params[:b_param_id_token], user: current_user)
+    else
+      @b_param = BParam.create(creator_id: @organization.auto_user.id, params: {creation_organization_id: @organization.id, embeded: true})
+    end
+  end
 
   def find_bike
     begin

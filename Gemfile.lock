@@ -371,7 +371,7 @@ GEM
       thor (>= 0.14.6, < 2.0)
     rainbow (2.1.0)
     raindrops (0.13.0)
-    rake (11.1.2)
+    rake (10.5.0)
     rake-compiler (0.9.7)
       rake
     rb-fsevent (0.9.7)
@@ -584,6 +584,7 @@ DEPENDENCIES
   rack-mini-profiler
   rack-throttle
   rails (= 3.2.22)
+  rake (< 11)
   rb-fsevent (~> 0.9.1)
   rb-readline (~> 0.5.0)
   redis
