@@ -1,0 +1,23 @@
+.container.content-container
+  .row
+    .col-md-8.primary-content-block
+      = yield
+    .col-md-4.content-menu-block
+      %nav.content-nav-group
+        %h3
+          Related
+        %ul
+          %li
+            = link_to "about", about_path
+          %li
+            = link_to "where", where_path
+      %nav.content-nav-group
+        %h3
+          Un-Related content
+        %ul
+          %li
+            = link_to "about", about_path
+
+          %li
+            = link_to "where", where_path
+            

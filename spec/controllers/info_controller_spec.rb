@@ -40,7 +40,7 @@ describe InfoController do
     %w(about protect_your_bike where serials image_resources resources dev_and_design).each do |page|
       context "#{page} with revised_layout enabled" do
         it 'renders with revised_layout' do
-          allow(controller).to receive(:revised_layout_enabled_for_user) { true }
+          allow(controller).to receive(:revised_layout_enabled) { true }
           get page.to_sym
           expect(response.status).to eq(200)
           expect(response).to render_template(page.to_sym)

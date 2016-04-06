@@ -1,6 +1,7 @@
 .content-container {
   padding-top: 8*$vertical-height;
   padding-bottom: 6*$vertical-height;
+  img { max-width: 100%; }
 }
 
 @media (min-width: $grid-breakpoint-lg) {

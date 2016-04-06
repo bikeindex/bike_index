@@ -1,7 +1,7 @@
 module AuthenticationHelper
   extend ActiveSupport::Concern
 
-  def authenticate_user(msg="Sorry, you have to log in")
+  def authenticate_user(msg = 'Sorry, you have to log in')
     if current_user.present?
       unless current_user.terms_of_service
         redirect_to accept_terms_url(subdomain: false) and return
@@ -27,11 +27,16 @@ module AuthenticationHelper
     end
   end
 
-protected
+  def revised_layout_enabled
+    current_user && $rollout.active?(:revised_view, current_user) || params[:revised_layout]
+  end
+
+  protected
+
   def remove_session
     cookies.delete(:auth)
   end
-  
+
   def current_user
     @current_user ||= User.from_auth(cookies.signed[:auth])
   end
@@ -41,20 +46,14 @@ protected
   # end
 
   def require_member!
-    if current_user.is_member_of?(current_organization)
-      return true
-      # unless current_user.vendor_terms_of_service
-      #   redirect_to accept_vendor_terms_url(subdomain: false) and return
-      # end
-    else
-      flash[:error] = "You're not a member of that organization!"
-      redirect_to user_home_url(subdomain: false) and return
-    end
+    return true if current_user.is_member_of?(current_organization)
+    flash[:error] = "You're not a member of that organization!"
+    redirect_to user_home_url(subdomain: false) and return
   end
 
   def require_admin!
     unless current_user.is_admin_of?(current_organization)
-      flash[:error] = "You have to be an organization administrator to do that!"
+      flash[:error] = 'You have to be an organization administrator to do that!'
       redirect_to user_home_url and return
     end
   end
@@ -62,9 +61,7 @@ protected
   def require_index_admin!
     type = 'full'
     content_accessible = ['news']
-    if content_accessible.include?(controller_name)
-      type = 'content'
-    end
+    type = 'content' if content_accessible.include?(controller_name)
     unless current_user.present? && current_user.admin_authorized(type)
       flash[:error] = "You don't have permission to do that!"
       redirect_to user_root_url

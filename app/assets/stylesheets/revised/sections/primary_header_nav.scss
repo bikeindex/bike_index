@@ -95,6 +95,7 @@ $mainmenu-open-zindex: 10;
         }
       }
     }
+    .primary-submenu { padding-left: 12px; }
     #menu-opened-backdrop {
       display: none;
       position: fixed;
@@ -136,24 +137,21 @@ $mainmenu-open-zindex: 10;
       transition: padding 200ms linear;
       a {
         padding: $vertical-height 0.5*$grid-gutter-width;
-        // margin: 0;
-        &.active {
-          text-decoration: none;
-          &::after {
-            transition: bottom 200ms linear;
-            content: '';
-            position: absolute;
-            left: 50%;
-            height: 2px;
-            width: 24%;
-            margin-left: -12%;
-            background: $blue;
-          }
+        &.active, &:active { text-decoration: none; }
+        &.active::after {
+          transition: bottom 200ms linear;
+          content: '';
+          position: absolute;
+          left: 50%;
+          height: 2px;
+          width: 24%;
+          margin-left: -12%;
+          background: $blue;
         }
       }
       // On large screens, the signup link is a button
       .signup-link {
-        border-radius: 1px;
+        border-radius: $border-radius;
         border: 1px solid $link-color;
         transition: background .05s linear;
         &:hover {
@@ -190,7 +188,7 @@ $mainmenu-open-zindex: 10;
     background-color: $primary-nav-background;
     background-clip: padding-box;
     border: 1px solid rgba($gray, .3);
-    border-radius: 1px;
+    border-radius: $border-radius;
     z-index: 1;
     li {
       font-size: 80%;
