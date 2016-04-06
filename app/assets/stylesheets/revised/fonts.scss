@@ -3,7 +3,6 @@
   font-family: 'Open Sans', sans-serif;
   font-weight: 400;
   font-style: normal;
-  margin: 0 0 24px;
   font-size: 15px;
   line-height: 2em;
   color: $body-font-color;
@@ -21,7 +20,10 @@
 
 body { @extend .body-font; }
 
-p { @extend .body-font; }
+p {
+  @extend .body-font;
+  margin: 0 0 24px;
+}
 
 // p.intro on typecast
 h5 {
@@ -62,6 +64,11 @@ h1 {
   @extend .header-font;
   letter-spacing: -1px;
 }
+
+@media (max-width: $grid-breakpoint-sm) {
+  h1 { font-size: 42px; }  
+}
+
 
 h2 {
   @extend .header-font;

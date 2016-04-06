@@ -1,0 +1,21 @@
+%h1
+  Development and design resources
+%h5
+  Bike Index is meant to be useable and expandable by everyone. We're way into open source and stuff.
+%p
+  Here are some other things that might be interesting or useful:
+%ul
+  %li
+    Bike Index itself is open source - check it out #{ link_to 'on GitHub', 'https://github.com/bikeindex/bike_index' }.
+  %li
+    = link_to 'Our API documentation', documentation_index_path
+  %li
+    = link_to 'Image and design assets', image_resources_path
+  %li
+    #{ link_to 'Nearby stolen widget', 'https://github.com/bikeindex/stolen_bikes_widget_html' } (on GitHub)
+  %li
+    #{ link_to 'Personal bike display widget', user_embed_path(current_user) } (must be logged in - also, has no usage instructions...)
+  %li
+    #{link_to "OAuth Applications you've made", oauth_applications_path } (must be logged in)
+  %li
+    #{ link_to "OAuth Applications you've authorized", oauth_authorized_applications_path } (must be logged in)

@@ -67,7 +67,13 @@
 $vertical-height: 12px;
 
 // To make grid breakpoints variables for now
+$grid-breakpoint-xs: 0;
+$grid-breakpoint-sm: 544px;
+$grid-breakpoint-md: 768px;
 $grid-breakpoint-lg: 992px;
+$grid-breakpoint-xl: 1200px;
+
+
 
 // External styles
 @import "includes/selectize_bootstrap3.scss";
@@ -78,8 +84,11 @@ $grid-breakpoint-lg: 992px;
 
 // shared styles
 @import "revised/sections/primary_header_nav";
+@import "revised/sections/primary_footer";
 @import "revised/sections/content-menu";
 @import "revised/sections/content";
 
 // page styles
 @import "revised/pages/about";
+
+html { background: $black-off; }

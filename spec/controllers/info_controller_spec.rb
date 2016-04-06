@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe InfoController do
   describe 'non-react views' do
-    %w(about protect_your_bike where serials image_resources resources).each do |page|
+    %w(about protect_your_bike where serials image_resources resources dev_and_design).each do |page|
       context page do
         it 'renders with content layout' do
           get page.to_sym
@@ -37,7 +37,7 @@ describe InfoController do
   describe 'revised views' do
     # Because layouts are set manually, we aren't testing:
     # privacy terms vendor_terms support_the_index
-    %w(about protect_your_bike where serials image_resources resources).each do |page|
+    %w(about protect_your_bike where serials image_resources resources dev_and_design).each do |page|
       context "#{page} with revised_layout enabled" do
         it 'renders with revised_layout' do
           allow(controller).to receive(:revised_layout_enabled_for_user) { true }

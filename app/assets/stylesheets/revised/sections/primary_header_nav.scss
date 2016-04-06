@@ -16,6 +16,7 @@
   }
   .primary-main-menu {
     @include list-unstyled;
+    margin: 0;
     display: block;
   }
   .primary-nav-item {
@@ -23,6 +24,7 @@
     margin: 0;
     a {
       @extend h4;
+      margin: 0;
       cursor: pointer;
       color: $primary-nav-text-color;
       display: block;
@@ -86,7 +88,6 @@ $mainmenu-open-zindex: 10;
     }
     .primary-nav-item {
       a {
-        margin: 0;
         padding: $vertical-height 2*$vertical-height;
         &:active, &.active {
           background: $gray-light;
@@ -159,6 +160,7 @@ $mainmenu-open-zindex: 10;
           background: rgba(white, .1);
           color: $primary-nav-text-color;
         }
+        &.active::after { display: none; }
       }
       .settings-link {
         padding-top: .5*$vertical-height;
@@ -199,7 +201,7 @@ $mainmenu-open-zindex: 10;
   .primary-header-nav.headroom--top.headroom--pinned {
     .primary-logo img { height: 82px; }
     .primary-nav-item {
-      padding: 3*$vertical-height 0 2*$vertical-height;
+      padding: 2.66*$vertical-height 0 2*$vertical-height;
       a.active::after { bottom: 2*$vertical-height; }
     }
   }

@@ -1,4 +1,4 @@
-# This file initializes js for the application
+# This file initializes scripts for the application
 
 class window.BikeIndex
   pageClasses:

@@ -53,6 +53,9 @@ class InfoController < ApplicationController
     redirect_to support_the_index_url
   end
 
+  def dev_and_design
+  end
+
   def how_not_to_buy_stolen
     redirect_to 'https://files.bikeindex.org/stored/dont_buy_stolen.pdf'
   end

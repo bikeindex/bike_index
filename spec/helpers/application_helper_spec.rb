@@ -28,6 +28,13 @@ describe ApplicationHelper do
     end
   end
 
+  describe :current_page_content_page? do
+    it 'returns link, active if it ought to be' do
+      view.stub(:controller_name).and_return('info')
+      helper.current_page_content_page?.should be true
+    end
+  end
+
   describe :admin_nav_link do
     it 'returns link, active if it ought to be' do
       view.stub(:controller_name).and_return('organization_invitations')

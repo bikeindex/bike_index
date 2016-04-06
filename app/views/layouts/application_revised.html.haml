@@ -10,11 +10,9 @@
     = javascript_include_tag 'application_revised'
     <!--[if lt IE 9]><script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]--><!--[if lte IE 8]><script type="text/javascript">$(function() {$('body').prepend("<body class='welcome-page' id='body'><div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, the Bike Index (and the internet in general) is broken and ugly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>");});</script><![endif]-->
     
-    = auto_discovery_link_tag(:atom, news_index_url(format: "atom"), {title: "Bike Index news"})
+    = auto_discovery_link_tag(:atom, news_index_url(format: "atom"), {title: "Bike Index news atom feed"})
 
   %body{ id: body_id }
-    - cache 'facebook_pixel' do
-      = render '/shared/facebook_pixel'
     = render 'layouts/messages'
     %nav.primary-header-nav
       .container
@@ -24,7 +22,7 @@
         .hamburgler
           %a#primary_nav_hamburgler
             &#9776;
-        %nav.primary-main-menu
+        %ul.primary-main-menu
           - if current_user.present?
             %li.primary-nav-item
               %a.nav-link.settings-link#settingsSubmenu{ 'aria-haspopup' => "true", 'aria-expanded' => "false", data: { toggle: 'dropdown' } }
@@ -60,16 +58,58 @@
             = nav_link 'Search bikes', bikes_path, class_name: 'nav-link'
 
     .container.content-container
-      - if controller_name == 'info'
+      / If on a content page, we wrap the content
+      / Otherwise, we just show the content. Should be improved...
+      - if current_page_content_page?
         .row
           .col-md-8
             = yield
           .col-md-4.content-menu
             = render 'shared/content_menu'
-      / - else
+      - else
+        = yield
 
-    
-    - cache 'footer_updated' do
-      = render 'shared/footer_updated'
-  :plain
-    <!-- Open source, https://github.com/bikeindex/bike_index -->
+    %footer.primary-footer
+      .primary-footer-nav
+        .container
+          %nav.col-md-3.pull-right
+            %h4
+              = nav_link 'Donate to the Bike Index', support_the_index_path
+            %ul
+              %li
+                = nav_link 'Store', shop_path
+          %nav.col-md-3.pull-right
+            %h4
+              = nav_link 'Help', help_path
+            %ul
+              %li
+                = nav_link 'Sign up a shop or organization', new_organization_path
+              %li
+                = nav_link 'List of manufacturers', manufacturers_path
+          %nav.col-md-3.pull-right
+            %h4
+              = nav_link 'Dev and Design Resources', dev_and_design_path
+            %ul
+              %li
+                = nav_link 'API documentation', documentation_index_path
+          %nav.col-md-3.social-nav
+            %ul
+              %li
+                = link_to image_tag('/assets/revised/facebook.svg', alt: 'Bike Index Facebook'), 'https://facebook.com/bikeindex', class: 'footer-facebook'
+              %li
+                = link_to image_tag('/assets/revised/twitter.svg', alt: 'Bike Index Twitter'), 'https://twitter.com/BikeIndex', class: 'footer-twitter'
+              %li
+                = link_to image_tag('/assets/revised/instagram.svg', alt: 'Bike Index Instagram'), 'http://instagram.com/bikeindex/', class: 'footer-instagram'
+
+      %nav.terms-and-stuff
+        .container
+          %p
+            %span{data: {license: "https://github.com/bikeindex/bike_index/blob/master/LICENSE"}}
+              #{Time.zone.now.year} &copy; Bike Index.
+            - if current_user.present? && current_user.has_membership?
+              #{link_to "Privacy policy", privacy_path}, #{link_to "vendor terms", vendor_terms_path}
+            - else
+              #{link_to "Privacy policy", privacy_path}
+            and #{link_to "terms and conditions", terms_path}.
+    - cache 'facebook_pixel' do
+      = render '/shared/facebook_pixel'
