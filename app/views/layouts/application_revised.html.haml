@@ -96,7 +96,8 @@
     - if current_page_content_page?
       = render '/shared/content_skeleton'
     - else
-      = yield
+      .container.content-container
+        = yield
 
     %footer.primary-footer
       .primary-footer-nav
