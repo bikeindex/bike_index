@@ -89,10 +89,12 @@ $grid-breakpoint-xl: 1200px;
 // shared styles
 @import "revised/sections/primary_header_nav";
 @import "revised/sections/primary_footer";
-@import "revised/sections/content-menu";
-@import "revised/sections/content";
+@import "revised/sections/content_menu";
+@import "revised/sections/main_container_wrap";
+@import "revised/sections/form_well";
 
 // page styles
 @import "revised/pages/about";
 
 html { background: $black-off; }
+body { min-height: 400px; }

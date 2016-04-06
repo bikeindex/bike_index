@@ -100,18 +100,25 @@ class BikesController < ApplicationController
   end
 
   def new
-    if current_user.present?
-      @b_param = BParam.create(creator_id: current_user.id, params: params)
-      @b_param = BParam.create(creator_id: current_user.id, params: params)
-      @bike = BikeCreator.new(@b_param).new_bike
-    else
-      @user = User.new
-    end
     if revised_layout_enabled
-      self.class.layout 'application_revised'
-      render :new_revised and return
+      revised_new
+    else
+      if current_user.present?
+        @b_param = BParam.create(creator_id: current_user.id, params: params)
+        @b_param = BParam.create(creator_id: current_user.id, params: params)
+        @bike = BikeCreator.new(@b_param).new_bike
+      else
+        @user = User.new
+      end
+      render layout: 'no_header'
     end
-    render layout: 'no_header'
+  end
+
+  def revised_new
+    @b_param = BParam.find_or_new_from_token(params[:b_param_token], user_id: current_user.id)
+    flash[:notice] = "Sorry! We couldn't find that bike" if @b_param.id.blank? && params[:b_param_token].present?
+    @bike = @b_param.bike_from_attrs(stolen: params[:stolen])
+    render :new_revised, layout: 'application_revised'
   end
 
   def create
@@ -202,14 +209,6 @@ class BikesController < ApplicationController
   end
 
   protected
-
-  def set_bparam
-    if params[:b_param_id_token].present?
-      @b_param = BParam.create_from_id_token(params[:b_param_id_token], user: current_user)
-    else
-      @b_param = BParam.create(creator_id: @organization.auto_user.id, params: {creation_organization_id: @organization.id, embeded: true})
-    end
-  end
 
   def find_bike
     begin

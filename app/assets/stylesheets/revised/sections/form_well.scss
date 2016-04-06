@@ -1,0 +1,23 @@
+.form-well {
+  margin: 2*$vertical-height 0 0;
+  border-radius: $border-radius;
+  .below-input-help {
+    display: block;
+    color: $gray-light;
+  }
+  // Offset is broken
+  .selectize-control { line-height: 0; }
+}
+
+
+// 
+// Large screen styles
+@media (min-width: $grid-breakpoint-lg) {
+  .form-well {
+    padding: 4*$vertical-height 0 2*$vertical-height;
+    background: $blue-light;
+    width: 100%;
+    position: relative;
+    .form-control-label { text-align: right; }
+  }
+}

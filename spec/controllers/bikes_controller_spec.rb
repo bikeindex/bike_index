@@ -102,16 +102,18 @@ describe BikesController do
   end
 
   describe :new do
+    let(:user) { FactoryGirl.create(:user) }
     context 'legacy' do
+      before do
+        CycleType.bike
+        PropulsionType.foot_pedal
+      end
       it "does not redirect to new user if a user isn't present" do
         get :new, stolen: true
         response.code.should eq('200')
       end
 
       it 'renders a new stolen bike' do
-        user = FactoryGirl.create(:user)
-        FactoryGirl.create(:cycle_type, name: 'Bike', slug: 'bike')
-        FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
         set_current_user(user)
         get :new, { stolen: true }
         response.code.should eq('200')
@@ -119,9 +121,6 @@ describe BikesController do
       end
 
       it 'renders a new recovered bike' do
-        user = FactoryGirl.create(:user)
-        FactoryGirl.create(:cycle_type, name: 'Bike', slug: 'bike')
-        FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
         set_current_user(user)
         get :new, { recovered: true }
         response.code.should eq('200')
@@ -129,11 +128,8 @@ describe BikesController do
       end
 
       it 'renders a new organization bike' do
-        user = FactoryGirl.create(:user)
         organization = FactoryGirl.create(:organization)
         membership = FactoryGirl.create(:membership, user: user, organization: organization)
-        FactoryGirl.create(:cycle_type, name: 'Bike', slug: 'bike')
-        FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
         set_current_user(user)
         get :new
         response.code.should eq('200')
@@ -142,38 +138,49 @@ describe BikesController do
 
     context 'revised layout' do
       before do
+        # instantiate the required bike attrs... there is a better way to do this.
+        CycleType.bike
+        PropulsionType.foot_pedal
         allow(controller).to receive(:revised_layout_enabled) { true }
+        set_current_user(user)
+      end
+      context 'stolen from params' do
+        it 'renders a new stolen bike' do
+          get :new, stolen: true
+          response.code.should eq('200')
+          assigns(:bike).stolen.should be_true
+          expect(response).to render_with_layout('application_revised')
+        end
       end
 
-      it 'renders a new stolen bike' do
-        user = FactoryGirl.create(:user)
-        FactoryGirl.create(:cycle_type, name: 'Bike', slug: 'bike')
-        FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
-        set_current_user(user)
-        get :new, { stolen: true }
-        response.code.should eq('200')
-        assigns(:bike).stolen.should be_true
-      end
-
-      it 'renders a new recovered bike' do
-        user = FactoryGirl.create(:user)
-        FactoryGirl.create(:cycle_type, name: 'Bike', slug: 'bike')
-        FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
-        set_current_user(user)
-        get :new, { recovered: true }
-        response.code.should eq('200')
-        assigns(:bike).recovered.should be_true
-      end
-
-      it 'renders a new organization bike' do
-        user = FactoryGirl.create(:user)
-        organization = FactoryGirl.create(:organization)
-        membership = FactoryGirl.create(:membership, user: user, organization: organization)
-        FactoryGirl.create(:cycle_type, name: 'Bike', slug: 'bike')
-        FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
-        set_current_user(user)
-        get :new
-        response.code.should eq('200')
+      context 'bike through b_param' do
+        context 'valid b_param' do
+          it 'renders the bike from b_param' do
+            bike_attrs = {
+              manufacturer_id: 12,
+              primary_frame_color_id: 8,
+              owner_email: 'something@stuff.com',
+            }
+            b_param = BParam.create(bike_attrs: bike_attrs)
+            get :new, b_param_token: b_param.id_token
+            bike = assigns(:bike)
+            expect(assigns(:b_param)).to eq b_param
+            expect(bike.is_a?(Bike)).to be_true
+            bike_attrs.each { |k,v| expect(bike.send(k)).to eq(v) }
+            expect(response).to render_with_layout('application_revised')
+          end
+        end
+        context 'invalid b_param' do
+          it 'renders a new bike, has a flash message' do
+            b_param = BParam.create(creator_id: FactoryGirl.create(:user).id)
+            get :new, b_param_token: b_param.id_token
+            bike = assigns(:bike)
+            expect(bike.is_a?(Bike)).to be_true
+            expect(assigns(:b_param)).to_not eq b_param
+            expect(response).to render_with_layout('application_revised')
+            flash[:notice].should match(/sorry/i)
+          end
+        end
       end
     end
   end

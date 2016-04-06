@@ -186,12 +186,34 @@ class BParam < ActiveRecord::Base
     b
   end
 
+  def bike_from_attrs(stolen: nil)
+    Bike.new safe_bike_attrs({'stolen' => stolen})
+  end
+
+  def safe_bike_attrs(param_overrides)
+    bike_attrs.merge(param_overrides).select { |k, v| self.class.assignable_attrs.include?(k.to_s) }
+      .merge(b_param_id: id,
+             creator_id: creator_id,
+             cycle_type_id: cycle_type_id,
+             creation_organization_id: creation_organization_id)
+  end
+
+  def self.assignable_attrs
+    %w(manufacturer_id manufacturer_other frame_model year owner_email
+       stolen recovered serial_number has_no_serial made_without_serial
+       primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id)
+  end
+
+  def cycle_type_id
+    (bike_attrs && bike_attrs['cycle_type_id']) || CycleType.bike.id
+  end
+
   def creation_organization_id
     bike_attrs && bike_attrs['creation_organization_id']
   end
 
   def generate_id_token
-    self.id_token = generate_unique_token
+    self.id_token ||= generate_unique_token
   end
 
   protected

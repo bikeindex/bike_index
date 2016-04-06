@@ -375,6 +375,36 @@ describe BParam do
       end
     end
   end
+
+  describe :safe_bike_hash do
+    context 'with creator' do
+      it 'returns the hash we pass, ignoring ignored and overriding param_overrides' do
+        bike_attrs = {
+          manufacturer_id: 12,
+          primary_frame_color_id: 8,
+          owner_email: 'something@stuff.com',
+          stolen: false,
+          creator_id: 1,
+          b_param_id: 79999,
+          creation_organization_id: 888,
+          something_else_cool: 'party'
+        }
+        b_param = BParam.new(bike_attrs: bike_attrs, creator_id: 777)
+        b_param.id = 122
+        target = {
+          manufacturer_id: 12,
+          primary_frame_color_id: 8,
+          owner_email: 'something@stuff.com',
+          stolen: true,
+          creator_id: 777,
+          b_param_id: 122,
+          cycle_type_id: CycleType.standard_bike
+          creation_organization_id: nil
+        }
+        expect(b_param.safe_bike_attrs(stolen: true)).to eq(target)
+      end
+    end
+  end
   # context 'revised with bike_attrs' do
   # end
 end

@@ -1,0 +1,40 @@
+%h1
+  Enter #{@bike.type} details
+.row
+  .col-md-8.col-md-offset-2
+    = form_for @bike, html: { class: "form-well" }, multipart: true do |f|
+      = f.hidden_field :b_param_id_token
+      - if @bike.location_id.present?
+        = f.hidden_field :location_id, value: @location.id
+      - if @bike.creation_organization_id.present?
+        = f.hidden_field :creation_organization_id
+      .form-group.row
+        = f.label :cycle_type_id, 'This is a', class: 'form-control-label col-sm-3'
+        .col-sm-6.fancy-select.unfancy
+          = f.collection_select(:cycle_type_id, CycleType.all, :id, :name, {required: true}, {class: 'form-control'})
+      .form-group.row
+        = f.label :serial_number, class: 'form-control-label col-sm-3'
+        .col-sm-6
+          = f.text_field :serial_number, :required =>true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', class: 'form-control'
+      .form-group.row
+        = f.label :manufacturer_id, class: 'form-control-label col-sm-3'
+        .col-sm-6
+          = f.text_field :manufacturer_id, value: @bike.manufacturer && @bike.manufacturer.name, class: 'form-control unfancy'
+          %span.below-input-help
+            Select 'Other' if manufacturer isn't listed
+        / .hidden-other.control-group
+        /   = f.label :manufacturer_other, "Other manufacturer", class: "control-label"
+        /   .controls
+        /     = f.text_field :manufacturer_other, placeholder: "Manufacturer name"
+      .form-group.row
+        = f.label :year, 'Model year', class: 'form-control-label col-sm-3'
+        .col-sm-6
+          = f.text_field :year, :required =>true, class: 'form-control'
+      .form-group.row
+        = f.label :frame_model, class: 'form-control-label col-sm-3'
+        .col-sm-6
+          = f.text_field :frame_model, :required =>true, class: 'form-control'
+      .form-group.row
+        = f.label :primary_frame_color, class: 'form-control-label col-sm-3'
+        .col-sm-6.fancy-select.unfancy
+          = f.collection_select(:primary_frame_color_id, Color.all, :id, :name, required: true, prompt: "Choose color" )
