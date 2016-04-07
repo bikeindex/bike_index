@@ -25,7 +25,7 @@ class BikeIndex.Views.PaymentsForm extends Backbone.View
 
     if selected_opt.attr('data-arbitrary') > 0
       amount = selected_opt.find('input').val() * 100
-      desc = "Donate $#{amount/100.00}"
+      desc = "#{selected_opt.attr('data-label')} $#{amount/100.00}"
     else
       amount = selected_opt.attr('data-amount')
       desc = selected_opt.find('h3').text()
