@@ -1,6 +1,5 @@
 class BikeIndex.ManufacturersSelect extends BikeIndex
   constructor: (target_selector, preload = false, frame_mnfg = true) ->
-    console.log 'hhhhhhh'
     $target = $(target_selector)
     return true unless $target.hasClass('unfancy')
     per_page = 10
