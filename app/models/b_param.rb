@@ -215,6 +215,10 @@ class BParam < ActiveRecord::Base
     params && params['revised_new']
   end
 
+  def creation_organization_id
+    bike[:creation_organization_id]
+  end
+
   def generate_id_token
     self.id_token ||= generate_unique_token
   end
