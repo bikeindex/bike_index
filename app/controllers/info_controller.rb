@@ -5,7 +5,7 @@ class InfoController < ApplicationController
   before_filter :set_revised_layout
 
   def set_revised_layout
-    self.class.layout 'application_revised' if revised_layout_enabled
+    self.class.layout 'application_revised' if revised_layout_enabled?
   end
 
   def about

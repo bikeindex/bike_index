@@ -1,0 +1,36 @@
+.form-well {
+  margin: 2*$vertical-height 0 0;
+  border-radius: $border-radius;
+  .below-input-help {
+    @extend small;
+    display: block;
+    line-height: 1.5em;
+    padding-bottom: .5em;
+    color: $gray-light;
+  }
+  .selectize-control { line-height: 0; } // label isn't lined up
+  a.optional-form-block { cursor: pointer; }
+  .hidden-other {
+    margin-top: -1rem;
+    display: none;
+    &.unhidden { margin-bottom: 1.5rem; }
+  }
+  .currently-hidden { display: none; }
+}
+
+.submit-form-well {
+  .btn {}
+}
+
+
+// 
+// Large screen styles
+@media (min-width: $grid-breakpoint-lg) {
+  .form-well {
+    padding: 4*$vertical-height 0 2*$vertical-height;
+    // background: $blue-light;
+    width: 100%;
+    position: relative;
+    .form-control-label { text-align: right; }
+  }
+}

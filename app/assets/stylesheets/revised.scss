@@ -24,7 +24,7 @@ $border-radius-sm:       1px;
 @import "bootstrap/grid";
 @import "bootstrap/tables";
 @import "bootstrap/forms";
-@import "bootstrap/buttons";
+// @import "bootstrap/buttons"; // Override buttons with our own buttons
 
 // Components
 @import "bootstrap/animation";
@@ -77,22 +77,25 @@ $grid-breakpoint-md: 768px;
 $grid-breakpoint-lg: 992px;
 $grid-breakpoint-xl: 1200px;
 
-
-
-// External styles
-@import "includes/selectize_bootstrap3.scss";
-
 // Settings
 @import "revised/mixins/colors";
 @import "revised/fonts";
 
+// Bootstrap overrides
+@import "revised/mixins/buttons";
+
+// External styles
+@import "includes/selectize_bootstrap3.scss";
+
 // shared styles
 @import "revised/sections/primary_header_nav";
 @import "revised/sections/primary_footer";
-@import "revised/sections/content-menu";
-@import "revised/sections/content";
+@import "revised/sections/content_menu";
+@import "revised/sections/main_container_wrap";
+@import "revised/sections/form_well";
 
 // page styles
-@import "revised/pages/about";
+@import "revised/pages/bikes_new";
 
 html { background: $black-off; }
+body { min-height: 400px; }

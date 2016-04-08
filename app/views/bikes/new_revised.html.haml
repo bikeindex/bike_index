@@ -1,0 +1,83 @@
+%h1
+  Enter #{@bike.type} details
+.row
+  .col-md-8.col-md-offset-2
+    = form_for @bike, multipart: true do |f|
+      .form-well
+        - if @b_param.bike_errors.present?
+          .alert.alert-error
+            %a.close{"data-dismiss" => "alert"} ×
+            %h4
+              Please fix the following 
+              = pluralize(@b_param.bike_errors.count, "error")
+            %ul
+              - @b_param.bike_errors.each do |msg|
+                %li
+                  = msg
+        = f.hidden_field :b_param_id_token
+        - if @bike.location_id.present?
+          = f.hidden_field :location_id, value: @location.id
+        - if @bike.creation_organization_id.present?
+          = f.hidden_field :creation_organization_id
+        .form-group.row
+          = f.label :cycle_type_id, 'This is a', class: 'form-control-label col-sm-3'
+          .col-sm-6.fancy-select.unfancy
+            = f.collection_select(:cycle_type_id, CycleType.all, :id, :name, {required: true}, {class: 'form-control'})
+        .form-group.row
+          = f.label :serial_number, class: 'form-control-label col-sm-3'
+          .col-sm-6
+            = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', placeholder: 'highly recommended', class: 'form-control'
+        .related-fields
+          .form-group.row
+            = f.label :manufacturer_id, class: 'form-control-label col-sm-3'
+            .col-sm-6
+              = f.text_field :manufacturer_id, value: @bike.manufacturer && @bike.manufacturer.name, class: 'form-control unfancy'
+              %span.below-input-help
+                Select 'Other' if manufacturer isn't listed
+          .form-group.row.hidden-other
+            = f.label :manufacturer_other, 'Other manufacturer', class: 'form-control-label col-sm-3'
+            .col-sm-6
+              = f.text_field :manufacturer_other, class: 'form-control'
+        .form-group.row.fancy-select.unfancy
+          = f.label :year, 'Model year', class: 'form-control-label col-sm-3'
+          .col-sm-6
+            - years = (1900..Time.now.year+1).to_a.reverse.map {|i| [i,i] }
+            = f.select :year, years, prompt: "Unsure or unknown", selected: Time.now.year
+          .col-sm-3.right-input-help
+            %label
+              %input#bike_unknown_year{ type: 'checkbox', tabindex: -1 }
+              Unknown year
+        .form-group.row
+          = f.label :frame_model, class: 'form-control-label col-sm-3'
+          .col-sm-6
+            = f.text_field :frame_model, required: true, class: 'form-control'
+        .related-fields
+          .form-group.row
+            = f.label :primary_frame_color, class: 'form-control-label col-sm-3'
+            .col-sm-6.fancy-select.unfancy
+              = f.collection_select(:primary_frame_color_id, Color.all, :id, :name, required: true, prompt: 'Choose color' )
+            .col-sm-3.right-input-help
+              %a#add-secondary.optional-form-block{ data: { target: '#secondary-color', toggle: '#rm-secondary' } }
+                Add a color
+              %a#rm-secondary.optional-form-block.rm-block.currently-hidden{ data: {target: '#secondary-color', toggle: '#add-secondary' } }
+                Remove color
+          #secondary-color.form-group.row.hidden-other
+            = f.label :secondary_frame_color, class: 'form-control-label col-sm-3'
+            .col-sm-6.fancy-select.unfancy
+              = f.collection_select(:secondary_frame_color_id, Color.all, :id, :name, required: true, prompt: 'Choose color' )
+            .col-sm-3.right-input-help
+              %a#add-tertiary.optional-form-block{ data: { target: '#tertiary-color', toggle: '#rm-tertiary' } }
+                Add a color
+              %a#rm-tertiary.optional-form-block.rm-block.currently-hidden{ data: {target: '#tertiary-color', toggle: '#add-tertiary' } }
+                Remove color
+          #tertiary-color.form-group.row.hidden-other
+            = f.label :tertiary_frame_color, class: 'form-control-label col-sm-3'
+            .col-sm-6.fancy-select.unfancy
+              = f.collection_select(:tertiary_frame_color_id, Color.all, :id, :name, required: true, prompt: 'Choose color' )
+        .form-group.row
+          = f.label :owner_email, class: 'form-control-label col-sm-3'
+          .col-sm-6
+            - email = @bike.owner_email || current_user && current_user.email
+            = f.text_field :owner_email, value: email, required: true, placeholder: 'highly recommended', class: 'form-control'
+      .register-button-wrapper
+        = submit_tag "Register", class: "btn btn-lg btn-primary"

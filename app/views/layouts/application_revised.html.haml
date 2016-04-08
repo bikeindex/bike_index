@@ -7,6 +7,7 @@
     = stylesheet_link_tag 'revised', media: "all"
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+    <script type="text/javascript">window.root_url = "#{ENV['BASE_URL']}";</script>
     = javascript_include_tag 'application_revised'
     <!--[if lt IE 9]><script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]--><!--[if lte IE 8]><script type="text/javascript">$(function() {$('body').prepend("<body class='welcome-page' id='body'><div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, the Bike Index (and the internet in general) is broken and ugly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>");});</script><![endif]-->
     
@@ -96,7 +97,8 @@
     - if current_page_content_page?
       = render '/shared/content_skeleton'
     - else
-      = yield
+      .container.main-container-wrap
+        = yield
 
     %footer.primary-footer
       .primary-footer-nav

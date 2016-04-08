@@ -1,14 +1,28 @@
 # This file initializes scripts for the application
-
 class window.BikeIndex
-  pageClasses:
-    info_about: BikeIndex.InfoAbout
-
   pageLoad: ->
     new BikeIndex.NavHeader
-    body_id = document.getElementsByTagName('body')[0].id
-    new @pageClasses[body_id] if @pageClasses[body_id]
+    @loadFancySelects()
+    # Put this last, so if it fails, we still have some functionality
+    @loadPageScript(document.getElementsByTagName('body')[0].id)
+    
 
+  loadPageScript: (body_id) ->
+    # All the per-page javascripts
+    pageClasses =
+      info_about: BikeIndex.InfoAbout
+      bikes_new: BikeIndex.BikesNew
+    new pageClasses[body_id] if Object.keys(pageClasses).includes(body_id)
+
+  loadFancySelects: ->
+    $('.unfancy.fancy-select select').selectize
+      create: false
+      plugins: ['restore_on_backspace']
+    $('.unfancy.fancy-select-placeholder select').selectize # When empty options are allowed
+      create: false
+      plugins: ['restore_on_backspace', 'selectable_placeholder']
+    # Remove them so we don't initialize twice
+    $('.special-select-single.unfancy').removeClass('unfancy')
 
 
 
