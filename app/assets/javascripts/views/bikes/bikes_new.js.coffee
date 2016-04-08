@@ -148,7 +148,7 @@ class BikeIndex.Views.BikesNew extends Backbone.View
     frame_mnfg_url = "#{window.root_url}/api/autocomplete?per_page=#{per_page}&categories=frame_mnfg&q="
     $(target).selectize
       plugins: ['restore_on_backspace']
-      preload: true
+      # preload: true
       persist: false
       create: false
       maxItems: 1
