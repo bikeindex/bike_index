@@ -4,6 +4,16 @@
   .col-md-8.col-md-offset-2
     = form_for @bike, multipart: true do |f|
       .form-well
+        - if @b_param.bike_errors.present?
+          .alert.alert-error
+            %a.close{"data-dismiss" => "alert"} ×
+            %h4
+              Please fix the following 
+              = pluralize(@b_param.bike_errors.count, "error")
+            %ul
+              - @b_param.bike_errors.each do |msg|
+                %li
+                  = msg
         = f.hidden_field :b_param_id_token
         - if @bike.location_id.present?
           = f.hidden_field :location_id, value: @location.id
@@ -16,7 +26,7 @@
         .form-group.row
           = f.label :serial_number, class: 'form-control-label col-sm-3'
           .col-sm-6
-            = f.text_field :serial_number, :required =>true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', placeholder: 'highly recommended', class: 'form-control'
+            = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', placeholder: 'highly recommended', class: 'form-control'
         .related-fields
           .form-group.row
             = f.label :manufacturer_id, class: 'form-control-label col-sm-3'
@@ -40,7 +50,7 @@
         .form-group.row
           = f.label :frame_model, class: 'form-control-label col-sm-3'
           .col-sm-6
-            = f.text_field :frame_model, :required =>true, class: 'form-control'
+            = f.text_field :frame_model, required: true, class: 'form-control'
         .related-fields
           .form-group.row
             = f.label :primary_frame_color, class: 'form-control-label col-sm-3'
@@ -64,5 +74,10 @@
             = f.label :tertiary_frame_color, class: 'form-control-label col-sm-3'
             .col-sm-6.fancy-select.unfancy
               = f.collection_select(:tertiary_frame_color_id, Color.all, :id, :name, required: true, prompt: 'Choose color' )
+        .form-group.row
+          = f.label :owner_email, class: 'form-control-label col-sm-3'
+          .col-sm-6
+            - email = @bike.owner_email || current_user && current_user.email
+            = f.text_field :owner_email, value: email, required: true, placeholder: 'highly recommended', class: 'form-control'
       .register-button-wrapper
         = submit_tag "Register", class: "btn btn-lg btn-primary"

@@ -24,7 +24,7 @@ $border-radius-sm:       1px;
 @import "bootstrap/grid";
 @import "bootstrap/tables";
 @import "bootstrap/forms";
-@import "bootstrap/buttons";
+// @import "bootstrap/buttons"; // Override buttons with our own buttons
 
 // Components
 @import "bootstrap/animation";
@@ -77,14 +77,15 @@ $grid-breakpoint-md: 768px;
 $grid-breakpoint-lg: 992px;
 $grid-breakpoint-xl: 1200px;
 
-
-
-// External styles
-@import "includes/selectize_bootstrap3.scss";
-
 // Settings
 @import "revised/mixins/colors";
 @import "revised/fonts";
+
+// Bootstrap overrides
+@import "revised/mixins/buttons";
+
+// External styles
+@import "includes/selectize_bootstrap3.scss";
 
 // shared styles
 @import "revised/sections/primary_header_nav";

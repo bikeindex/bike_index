@@ -100,8 +100,8 @@ class BikesController < ApplicationController
   end
 
   def new
-    if revised_layout_enabled
-      revised_new
+    if revised_layout_enabled?
+      render_revised_new
     else
       if current_user.present?
         @b_param = BParam.create(creator_id: current_user.id, params: params)
@@ -114,15 +114,18 @@ class BikesController < ApplicationController
     end
   end
 
-  def revised_new
-    @b_param = BParam.find_or_new_from_token(params[:b_param_token], user_id: current_user.id)
+  def render_revised_new
+    find_or_new_b_param
+    # Let them know if they sent an invalid b_param token
     flash[:notice] = "Sorry! We couldn't find that bike" if @b_param.id.blank? && params[:b_param_token].present?
     @bike = @b_param.bike_from_attrs(stolen: params[:stolen])
     render :new_revised, layout: 'application_revised'
   end
 
   def create
-    if params[:bike][:embeded]
+    if revised_layout_enabled?
+      revised_create
+    elsif params[:bike][:embeded]
       @b_param = BParam.from_id_token(params[:bike][:b_param_id_token])
       @bike = Bike.new
       if @b_param.created_bike.present?
@@ -170,6 +173,22 @@ class BikesController < ApplicationController
         @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
         render action: :new, layout: 'no_header' and return
       end
+      redirect_to edit_bike_url(@bike), notice: "Bike successfully added to the index!"
+    end
+  end
+
+  def revised_create
+    find_or_new_b_param
+    if @b_param.created_bike.present?
+      redirect_to edit_bike_url(@b_param.created_bike) and return
+    end
+    @b_param.params = params
+    @b_param.set_foreign_keys
+    @bike = BikeCreator.new(@b_param).create_bike
+    if @bike.errors.any?
+      @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
+      render action: :new, layout: 'no_header'
+    else
       redirect_to edit_bike_url(@bike), notice: "Bike successfully added to the index!"
     end
   end
@@ -222,6 +241,10 @@ class BikesController < ApplicationController
         redirect_to root_url and return
       end
     end
+  end
+
+  def find_or_new_b_param
+    @b_param = BParam.find_or_new_from_token(params[:b_param_token], user_id: current_user.id)
   end
 
   def ensure_user_for_edit

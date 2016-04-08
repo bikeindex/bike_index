@@ -7,8 +7,7 @@ class BParam < ActiveRecord::Base
     :bike_errors,
     :image,
     :image_processed, 
-    :api_v2,
-    :bike_attrs
+    :api_v2
 
   attr_accessor :api_v2
 
@@ -17,7 +16,6 @@ class BParam < ActiveRecord::Base
 
   serialize :params
   serialize :bike_errors
-  serialize :bike_attrs, JSON
 
   belongs_to :created_bike, class_name: "Bike"
   belongs_to :creator, class_name: "User"
@@ -29,13 +27,16 @@ class BParam < ActiveRecord::Base
   # validates_presence_of :creator
 
   before_create :generate_id_token
+  before_create do
+    self.params ||= { 'bike' => {} }
+  end
+
   before_validation do
-   # ensure valid bike_attrs as json object
-    self.bike_attrs ||= {}
+    self.params = self.params.as_json
   end
 
   def bike
-    params[:bike]
+    (params['bike'] || {}).with_indifferent_access
   end
 
   before_save :clean_errors
@@ -51,17 +52,17 @@ class BParam < ActiveRecord::Base
   end
 
   def self.v2_params(hash)
-    h = { bike: hash }
-    h[:bike][:serial_number] = h[:bike].delete :serial
-    h[:bike][:send_email] = !(h[:bike].delete :no_notify)
-    org = Organization.find_by_slug(h[:bike].delete :organization_slug)
-    h[:bike][:creation_organization_id] = org.id if org.present?
+    h = { 'bike' => hash }
+    h['bike']['serial_number'] = h['bike'].delete 'serial'
+    h['bike']['send_email'] = !(h['bike'].delete 'no_notify')
+    org = Organization.find_by_slug(h['bike'].delete 'organization_slug')
+    h['bike']['creation_organization_id'] = org.id if org.present?
     # Move un-nested params outside of bike
-    [:test, :id, :components].each { |k| h[k] = h[:bike].delete k }
-    stolen = h[:bike].delete :stolen_record
+    %w(test id components).each { |k| h[k] = h['bike'].delete k }
+    stolen = h['bike'].delete 'stolen_record'
     if stolen && stolen.delete_if { |k,v| v.blank? } && stolen.keys.any?
-      h[:bike][:stolen] = true
-      h[:stolen_record] = stolen 
+      h['bike']['stolen'] = true
+      h['stolen_record'] = stolen
     end
     h
   end
@@ -69,101 +70,101 @@ class BParam < ActiveRecord::Base
   before_save :set_foreign_keys
   def set_foreign_keys
     return true unless params.present? && bike.present?
-    bike[:stolen] = true if params[:stolen_record].present?
-    set_wheel_size_key unless bike[:rear_wheel_size_id].present?
-    if bike[:manufacturer_id].present?
-      bike[:manufacturer_id] = Manufacturer.fuzzy_id(bike[:manufacturer_id])
+    bike['stolen'] = true if params['stolen_record'].present?
+    set_wheel_size_key unless bike['rear_wheel_size_id'].present?
+    if bike['manufacturer_id'].present?
+      params['bike']['manufacturer_id'] = Manufacturer.fuzzy_id(bike['manufacturer_id'])
     else
       set_manufacturer_key
     end
-    set_color_key unless bike[:primary_frame_color_id].present?
-    set_cycle_type_key if bike[:cycle_type_slug].present? || bike[:cycle_type_name].present?
-    set_rear_gear_type_slug if bike[:rear_gear_type_slug].present?
-    set_front_gear_type_slug if bike[:front_gear_type_slug].present?
-    set_handlebar_type_key if bike[:handlebar_type_slug].present?
-    set_frame_material_key if bike[:frame_material_slug].present?
+    set_color_key unless bike['primary_frame_color_id'].present?
+    set_cycle_type_key if bike['cycle_type_slug'].present? || bike['cycle_type_name'].present?
+    set_rear_gear_type_slug if bike['rear_gear_type_slug'].present?
+    set_front_gear_type_slug if bike['front_gear_type_slug'].present?
+    set_handlebar_type_key if bike['handlebar_type_slug'].present?
+    set_frame_material_key if bike['frame_material_slug'].present?
   end
 
   def set_cycle_type_key
-    if bike[:cycle_type_name].present?
-      ct = CycleType.find(:first, conditions: [ "lower(name) = ?", bike[:cycle_type_name].downcase.strip ])
+    if bike['cycle_type_name'].present?
+      ct = CycleType.find(:first, conditions: [ "lower(name) = ?", bike['cycle_type_name'].downcase.strip ])
     else
-      ct = CycleType.find(:first, conditions: [ "slug = ?", bike[:cycle_type_slug].downcase.strip ])
+      ct = CycleType.find(:first, conditions: [ "slug = ?", bike['cycle_type_slug'].downcase.strip ])
     end
-    bike[:cycle_type_id] = ct.id if ct.present?
-    bike.delete(:cycle_type_slug) || bike.delete(:cycle_type_name)
+    params['bike']['cycle_type_id'] = ct.id if ct.present?
+    bike.delete('cycle_type_slug') || bike.delete('cycle_type_name')
   end
 
   def set_frame_material_key
-    fm = FrameMaterial.find(:first, conditions: [ "slug = ?", bike[:frame_material_slug].downcase.strip ])
-    bike[:frame_material_id] = fm.id if fm.present?
-    bike.delete(:frame_material_slug)
+    fm = FrameMaterial.find(:first, conditions: [ "slug = ?", bike['frame_material_slug'].downcase.strip ])
+    params['bike']['frame_material_id'] = fm.id if fm.present?
+    bike.delete('frame_material_slug')
   end
 
   def set_handlebar_type_key
-    ht = HandlebarType.find(:first, conditions: [ "slug = ?", bike[:handlebar_type_slug].downcase.strip ])
-    bike[:handlebar_type_id] = ht.id if ht.present?
-    bike.delete(:handlebar_type_slug)
+    ht = HandlebarType.find(:first, conditions: [ "slug = ?", bike['handlebar_type_slug'].downcase.strip ])
+    params['bike']['handlebar_type_id'] = ht.id if ht.present?
+    bike.delete('handlebar_type_slug')
   end
 
   def set_wheel_size_key
-    if bike[:rear_wheel_bsd].present?
-      ct = WheelSize.find_by_iso_bsd(bike[:rear_wheel_bsd])
-      bike[:rear_wheel_size_id] = ct.id if ct.present?
-      bike.delete(:rear_wheel_bsd)
+    if bike['rear_wheel_bsd'].present?
+      ct = WheelSize.find_by_iso_bsd(bike['rear_wheel_bsd'])
+      params['bike']['rear_wheel_size_id'] = ct.id if ct.present?
+      bike.delete('rear_wheel_bsd')
     end
   end
 
   def set_manufacturer_key
-    m_name = params[:bike][:manufacturer] if bike.present?
+    m_name = bike['manufacturer'] if bike.present?
     return false unless m_name.present?
     manufacturer = Manufacturer.fuzzy_name_find(m_name)
     unless manufacturer.present?
       manufacturer = Manufacturer.find_by_name("Other")
-      bike[:manufacturer_other] = m_name.titleize if m_name.present?
+      params['bike']['manufacturer_other'] = m_name.titleize if m_name.present?
     end
-    bike[:manufacturer_id] = manufacturer.id if manufacturer.present?
-    bike.delete(:manufacturer)
+    params['bike']['manufacturer_id'] = manufacturer.id if manufacturer.present?
+    bike.delete('manufacturer')
   end
 
   def set_rear_gear_type_slug
-    gear = RearGearType.where(slug: bike.delete(:rear_gear_type_slug)).first
-    bike[:rear_gear_type_id] = gear && gear.id
+    gear = RearGearType.where(slug: bike.delete('rear_gear_type_slug')).first
+    params['bike']['rear_gear_type_id'] = gear && gear.id
   end
 
   def set_front_gear_type_slug
-    gear = FrontGearType.where(slug: bike.delete(:front_gear_type_slug)).first
-    bike[:front_gear_type_id] = gear && gear.id
+    gear = FrontGearType.where(slug: bike.delete('front_gear_type_slug')).first
+    params['bike']['front_gear_type_id'] = gear && gear.id
   end
 
   def set_color_key
-    paint = params[:bike][:color]
+    paint = bike['color']
     color = Color.fuzzy_name_find(paint.strip) if paint.present?
     if color.present?
-      bike[:primary_frame_color_id] = color.id
+      params['bike']['primary_frame_color_id'] = color.id
     else
       set_paint_key(paint)
     end
-    self.bike.delete(:color)
+    self.bike.delete('color')
   end
 
   def set_paint_key(paint_entry)
     return nil unless paint_entry.present?
     paint = Paint.fuzzy_name_find(paint_entry)
     if paint.present?
-      bike[:paint_id] = paint.id
+      bike['paint_id'] = paint.id
     else
       paint = Paint.new(name: paint_entry)
-      paint.manufacturer_id = bike[:manufacturer_id] if bike[:registered_new]
+      paint.manufacturer_id = bike['manufacturer_id'] if bike['registered_new']
       paint.save
-      params[:bike][:paint_id] = paint.id
-      bike[:paint_name] = paint.name
+      params['bike']['paint_id'] = paint.id
+      params['bike']['paint_name'] = paint.name
     end
-    unless bike[:primary_frame_color_id].present?
+    unless bike['primary_frame_color_id'].present?
       if paint.color_id.present?
-        bike[:primary_frame_color_id] = paint.color.id 
+        params['bike']['primary_frame_color_id'] = paint.color.id
       else
-        bike[:primary_frame_color_id] = Color.find_by_name("Black").id
+        params['bike']['primary_frame_color_id'] = Color.find_by_name('Black').id
       end
     end
   end
@@ -177,25 +178,25 @@ class BParam < ActiveRecord::Base
   def self.find_or_new_from_token(toke = nil, user_id: nil, organization_id: nil)
     b = without_bike.where(creator_id: user_id, id_token: toke).first if user_id.present?
     b ||= without_bike.without_creator.where('created_at >= ?', Time.now - 1.month).where(id_token: toke).first
-    b ||= BParam.new(creator_id: user_id, bike_attrs: {})
-    # If the org_id is present, add it to the bike_attrs. Only save it if the b_param is created
+    b ||= BParam.new(creator_id: user_id, params: { revised_new: true }.as_json)
+    # If the org_id is present, add it to the params. Only save it if the b_param is created
     if organization_id.present? && b.creation_organization_id != organization_id
-      b.bike_attrs = b.bike_attrs.merge(creation_organization_id: organization_id).as_json
-      b.update_attribute :bike_attrs, b.bike_attrs if b.id.present?
+      b.params = b.params.merge('bike' => b.bike.merge('creation_organization_id' => organization_id))
+      b.update_attribute :params, b.params if b.id.present?
     end
     b
   end
 
   def bike_from_attrs(stolen: nil)
-    Bike.new safe_bike_attrs({'stolen' => stolen})
+    Bike.new safe_bike_attrs('stolen' => stolen)
   end
 
   def safe_bike_attrs(param_overrides)
-    bike_attrs.merge(param_overrides).select { |k, v| self.class.assignable_attrs.include?(k.to_s) }
-      .merge(b_param_id: id,
-             creator_id: creator_id,
-             cycle_type_id: cycle_type_id,
-             creation_organization_id: creation_organization_id)
+    bike.merge(param_overrides).select { |k, v| self.class.assignable_attrs.include?(k.to_s) }
+        .merge('b_param_id' => id,
+               'creator_id' => creator_id,
+               'cycle_type_id' => cycle_type_id,
+               'creation_organization_id' => creation_organization_id)
   end
 
   def self.assignable_attrs
@@ -204,16 +205,20 @@ class BParam < ActiveRecord::Base
        primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id)
   end
 
+  def revised_new?
+    params && params['revised_new']
+  end
+
   def cycle_type_id
-    (bike_attrs && bike_attrs['cycle_type_id'].present? && bike_attrs['cycle_type_id']) || CycleType.bike.id
+    (bike['cycle_type_id'].present? && bike['cycle_type_id']) || CycleType.bike.id
   end
 
   def creation_organization_id
-    bike_attrs && bike_attrs['creation_organization_id']
+    bike['creation_organization_id']
   end
 
   def generate_id_token
-    self.id_token ||= generate_unique_token
+    self.id_token = generate_unique_token
   end
 
   protected

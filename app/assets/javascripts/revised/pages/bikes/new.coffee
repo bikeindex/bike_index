@@ -1,6 +1,6 @@
 class BikeIndex.BikesNew extends BikeIndex
   constructor: ->
-    new BikeIndex.ManufacturersSelect('#bike_manufacturer_id', true)
+    new BikeIndex.ManufacturersSelect('#bike_manufacturer_id')
     @initializeEventListeners()
 
     if $('#bike_has_no_serial').prop('checked') == true

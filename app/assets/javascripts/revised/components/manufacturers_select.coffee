@@ -1,5 +1,5 @@
 class BikeIndex.ManufacturersSelect extends BikeIndex
-  constructor: (target_selector, preload = false, frame_mnfg = true) ->
+  constructor: (target_selector, frame_mnfg = true) ->
     $target = $(target_selector)
     return true unless $target.hasClass('unfancy')
     per_page = 10
@@ -11,10 +11,11 @@ class BikeIndex.ManufacturersSelect extends BikeIndex
       value_field = 'id' # for convenience instantiating
     $target.selectize
       plugins: ['restore_on_backspace']
-      preload: preload
+      # preload: true # Not unless we get pagination, since it confuses people
       persist: false
       create: false
       maxItems: 1
+      selectOnTab: true
       valueField: value_field
       labelField: 'text'
       searchField: 'text'
