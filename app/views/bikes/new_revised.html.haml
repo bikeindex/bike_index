@@ -31,7 +31,8 @@
           .form-group.row
             = f.label :manufacturer_id, class: 'form-control-label col-sm-3'
             .col-sm-6
-              = f.text_field :manufacturer_id, value: @bike.manufacturer && @bike.manufacturer.name, class: 'form-control unfancy'
+              - initial = @bike.manufacturer && { id: @bike.manufacturer.id, text: @bike.manufacturer.name }.to_json
+              = f.text_field :manufacturer_id, value: @bike.manufacturer && @bike.manufacturer.name, class: 'form-control unfancy', data: { initial: initial }
               %span.below-input-help
                 Select 'Other' if manufacturer isn't listed
           .form-group.row.hidden-other

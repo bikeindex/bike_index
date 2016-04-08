@@ -7,8 +7,6 @@ class BikeIndex.BikesNew extends BikeIndex
       $('#bike_serial_number').val('absent').addClass('absent-serial')
     @otherManufacturerDisplay($('#bike_manufacturer_id').val())
 
-
-
   initializeEventListeners: ->
     pagespace = @
     $('#bike_manufacturer_id').change (e) ->

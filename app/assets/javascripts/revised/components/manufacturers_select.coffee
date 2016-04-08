@@ -1,6 +1,8 @@
 class BikeIndex.ManufacturersSelect extends BikeIndex
   constructor: (target_selector, frame_mnfg = true) ->
     $target = $(target_selector)
+    initial_opts = []
+    initial_opts = [$target.data('initial')] if $target.data('initial')
     return true unless $target.hasClass('unfancy')
     per_page = 10
     if frame_mnfg
@@ -12,6 +14,7 @@ class BikeIndex.ManufacturersSelect extends BikeIndex
     $target.selectize
       plugins: ['restore_on_backspace']
       # preload: true # Not unless we get pagination, since it confuses people
+      options: initial_opts
       persist: false
       create: false
       maxItems: 1
