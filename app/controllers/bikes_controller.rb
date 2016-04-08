@@ -123,9 +123,7 @@ class BikesController < ApplicationController
   end
 
   def create
-    if revised_layout_enabled?
-      revised_create
-    elsif params[:bike][:embeded]
+    if params[:bike][:embeded]
       @b_param = BParam.from_id_token(params[:bike][:b_param_id_token])
       @bike = Bike.new
       if @b_param.created_bike.present?
@@ -157,6 +155,8 @@ class BikesController < ApplicationController
           redirect_to controller: :organizations, action: :embed_create_success, id: @bike.creation_organization.slug, bike_id: @bike.id and return
         end
       end
+    elsif revised_layout_enabled?
+      revised_create
     else
       @b_param = BParam.from_id_token(params[:bike][:b_param_id_token], "2014-12-31 18:00:00")
       unless @b_param && @b_param.creator_id == current_user.id
