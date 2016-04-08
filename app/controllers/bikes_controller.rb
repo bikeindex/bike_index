@@ -182,8 +182,7 @@ class BikesController < ApplicationController
     if @b_param.created_bike.present?
       redirect_to edit_bike_url(@b_param.created_bike) and return
     end
-    @b_param.params = params
-    @b_param.set_foreign_keys
+    @b_param.clean_params(params)
     @bike = BikeCreator.new(@b_param).create_bike
     if @bike.errors.any?
       @b_param.update_attributes(bike_errors: @bike.errors.full_messages)

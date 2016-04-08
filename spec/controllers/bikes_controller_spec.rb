@@ -244,7 +244,7 @@ describe BikesController do
           FactoryGirl.create(:country, iso: 'US')
           @bike[:phone] = '312.379.9513'
           lambda {
-            post :create, { stolen: 'true', bike: @bike}
+            post :create, { stolen: 'true', bike: @bike }
           }.should change(StolenRecord, :count).by(1)
           @b_param.reload.created_bike_id.should_not be_nil
           @b_param.reload.bike_errors.should be_nil
@@ -256,7 +256,7 @@ describe BikesController do
           membership = FactoryGirl.create(:membership, user: @user, organization: organization)
           @bike[:creation_organization_id] = organization.id
           lambda { 
-            post :create, { bike: @bike}
+            post :create, { bike: @bike }
           }.should change(Ownership, :count).by(1)
           Bike.last.creation_organization_id.should eq(organization.id)
         end
@@ -282,7 +282,7 @@ describe BikesController do
             owner_email: 'Flow@goodtimes.com'
           }
           lambda { 
-            post :create, { bike: bike}
+            post :create, { bike: bike }
           }.should change(Ownership, :count).by(1)
           bike = Bike.last
           bike.creation_organization_id.should eq(organization.id)
@@ -313,7 +313,7 @@ describe BikesController do
               owner_email: 'Flow@goodtimes.com',
               image: test_photo
             }
-            post :create, { bike: bike}
+            post :create, { bike: bike }
             response.should redirect_to(embed_extended_organization_url(organization))
           end
         end
