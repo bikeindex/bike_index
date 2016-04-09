@@ -8,10 +8,9 @@ describe BParam do
   end
 
   describe :bike do
-    it "returns the bike attribs" do
-      b_param = BParam.new 
-      b_param.stub(:params).and_return({ bike: { serial_number: 'XXX' } })
-      b_param.bike['serial_number'].should eq("XXX")
+    it 'returns the bike attribs' do
+      b_param = BParam.new(params: { bike: { serial_number: 'XXX' } })
+      b_param.bike['serial_number'].should eq('XXX')
     end
     it "does not fail if there isn't a bike" do
       user = FactoryGirl.create(:user)
@@ -26,7 +25,7 @@ describe BParam do
         expect(b_param).to receive(:set_foreign_keys)
         expect(b_param).to receive(:massage_if_v2)
         expect(b_param).to receive(:clean_errors)
-        b_param.clean_params({ bike: { cool: 'lol' } })
+        b_param.clean_params(bike: { cool: 'lol' })
         expect(b_param.params['bike']['cool']).to eq('lol') # indifferent access
       end
     end
@@ -37,13 +36,24 @@ describe BParam do
         expect(b_param.params['bike']['cool']).to eq('lol')
       end
     end
-    it "has before_save_callback_method defined as a before_save callback" do
+    context 'existing and passed params' do
+      it 'makes indifferent' do
+        b_param = BParam.new(params: { bike: { cool: 'lol' }, stolen_record: { something: 42 } })
+        merge_params = { bike: { owner_email: 'foo@example.com' }, stolen_record: { phone: '171-829-2625' } }
+        b_param.clean_params(merge_params)
+        expect(b_param.params[:bike][:cool]).to eq('lol')
+        expect(b_param.params[:bike][:owner_email]).to eq('foo@example.com')
+        expect(b_param.params[:stolen_record][:something]).to eq(42)
+        expect(b_param.params[:stolen_record][:phone]).to eq('171-829-2625')
+      end
+    end
+    it 'has before_save_callback_method defined as a before_save callback' do
       BParam._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:clean_params).should == true
     end
   end
 
   describe :massage_if_v2 do
-    it "renames v2 keys" do
+    it 'renames v2 keys' do
       p = {
         serial: 'something',
         manufacturer: 'something else',
@@ -63,8 +73,8 @@ describe BParam do
       b_param.params[:stolen].should be_false
       b_param.params[:stolen_record].should_not be_present
     end
-    it "gets the organization id" do
-      org = FactoryGirl.create(:organization, name: "Something")
+    it 'gets the organization id' do
+      org = FactoryGirl.create(:organization, name: 'Something')
       p = { organization_slug: org.slug }
       b_param = BParam.new(params: p, api_v2: true)
       b_param.massage_if_v2
@@ -73,13 +83,13 @@ describe BParam do
   end
 
   describe :set_foreign_keys do
-    it "calls set_foreign_keys" do
+    it 'calls set_foreign_keys' do
       bike = {
-        frame_material_slug: "something",
-        handlebar_type_slug: "else",
-        cycle_type_slug: "entirely",
-        rear_gear_type_slug: "gears awesome",
-        front_gear_type_slug: "cool gears"
+        frame_material_slug: 'something',
+        handlebar_type_slug: 'else',
+        cycle_type_slug: 'entirely',
+        rear_gear_type_slug: 'gears awesome',
+        front_gear_type_slug: 'cool gears'
       }
       b_param = BParam.new(params: { bike: bike })
       b_param.should_receive(:set_manufacturer_key).and_return(true)
@@ -104,8 +114,8 @@ describe BParam do
   end
 
   describe :set_wheel_size_key do
-    it "sets rear_wheel_size_id to the bsd submitted" do
-      ws = FactoryGirl.create(:wheel_size, iso_bsd: "Bike")
+    it 'sets rear_wheel_size_id to the bsd submitted' do
+      ws = FactoryGirl.create(:wheel_size, iso_bsd: 'Bike')
       bike = { rear_wheel_bsd: ws.iso_bsd }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_wheel_size_key
@@ -114,9 +124,9 @@ describe BParam do
   end
 
   describe :set_cycle_type_key do
-    it "sets cycle_type_id to the cycle type from name submitted" do
-      ct = FactoryGirl.create(:cycle_type, name: "Boo Boo", slug: "boop")
-      bike = { serial_number: "gobble gobble", cycle_type_slug: " booP " }
+    it 'sets cycle_type_id to the cycle type from name submitted' do
+      ct = FactoryGirl.create(:cycle_type, name: 'Boo Boo', slug: 'boop')
+      bike = { serial_number: 'gobble gobble', cycle_type_slug: ' booP ' }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_cycle_type_key
       b_param.bike[:cycle_type_id].should eq(ct.id)
@@ -125,9 +135,9 @@ describe BParam do
   end
 
   describe :set_frame_material_key do
-    it "sets cycle_type_id to the cycle type from name submitted" do
-      fm = FactoryGirl.create(:frame_material, name: "goo goo", slug: "goop")
-      bike = { serial_number: "gobble gobble", frame_material_slug: " gooP " }
+    it 'sets cycle_type_id to the cycle type from name submitted' do
+      fm = FactoryGirl.create(:frame_material, name: 'goo goo', slug: 'goop')
+      bike = { serial_number: 'gobble gobble', frame_material_slug: ' gooP ' }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_frame_material_key
       b_param.bike[:frame_material_slug].present?.should be_false
@@ -224,7 +234,7 @@ describe BParam do
     end
 
     it "associates the manufacturer with the paint if it's a new bike" do
-      color = FactoryGirl.create(:color, name: 'Black')
+      FactoryGirl.create(:color, name: 'Black')
       m = FactoryGirl.create(:manufacturer)
       bike = { registered_new: true, manufacturer_id: m.id }
       b_param = BParam.new(params: { bike: bike })
@@ -241,7 +251,7 @@ describe BParam do
       b_param.id_token.length.should be > 10
     end
     it 'haves before create callback' do
-      BParam._create_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:generate_id_token).should == true      
+      BParam._create_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:generate_id_token).should == true
     end
   end
 
@@ -258,11 +268,11 @@ describe BParam do
       BParam.from_id_token(b_param.id_token).should be_nil
     end
 
-    it "gets with time passed in" do
+    it 'gets with time passed in' do
       b_param = FactoryGirl.create(:b_param)
       b_param.update_attribute :created_at, Time.now - 2.days
       b_param.reload
-      BParam.from_id_token(b_param.id_token, "1969-12-31 18:00:00").should eq(b_param)
+      BParam.from_id_token(b_param.id_token, '1969-12-31 18:00:00').should eq(b_param)
     end
   end
 
@@ -301,8 +311,10 @@ describe BParam do
           end
         end
         context 'with no creator' do
-          it 'returns the b_param' do
-            expect(BParam.find_or_new_from_token(b_param.id_token, user_id: user.id)).to eq b_param
+          it 'returns the b_param, with creator of user_id' do
+            result = BParam.find_or_new_from_token(b_param.id_token, user_id: user.id)
+            expect(result.id).to eq b_param.id
+            expect(result.creator_id).to eq user.id
           end
           context 'with expired b_param' do
             it 'fails' do
@@ -401,6 +413,29 @@ describe BParam do
           creation_organization_id: nil
         }.with_indifferent_access
         expect(b_param.safe_bike_attrs(stolen: true).with_indifferent_access).to eq(target)
+      end
+    end
+  end
+
+  describe :display_email? do
+    context 'owner_email present' do
+      it 'is false' do
+        b_param = BParam.new(params: { bike: { owner_email: 'something@stuff.com' }.with_indifferent_access })
+        expect(b_param.display_email?).to be_false
+      end
+    end
+    context 'owner_email not present' do
+      it 'is true' do
+        b_param = BParam.new(params: { bike: { owner_email: '' }.with_indifferent_access })
+        expect(b_param.display_email?).to be_true
+      end
+    end
+    context 'Bike has errors' do
+      it 'is true' do
+        b_param = BParam.new(params: {
+                               bike: { owner_email: 'something@stuff.com' }.with_indifferent_access
+                             }, bike_errors: ['Some error'])
+        expect(b_param.display_email?).to be_true
       end
     end
   end

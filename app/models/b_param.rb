@@ -23,21 +23,16 @@ class BParam < ActiveRecord::Base
   scope :without_bike, -> { where('created_bike_id IS NULL') }
   scope :without_creator, -> { where('creator_id IS NULL') }
 
-  # Commented out for revision. Remove if specs are passing
-  # validates_presence_of :creator
-
   before_create :generate_id_token
-  before_validation do
-   # ensure valid json object
-    self.params ||= { bike: {} }
-  end
 
   before_save :clean_params
-  def clean_params(updated_params = nil) # So we can pass in the params
-    self.params = (updated_params || params).with_indifferent_access
+  def clean_params(updated_params = {}) # So we can pass in the params
+    self.params ||= { bike: {} } # ensure valid json object
+    self.params = params.with_indifferent_access.deep_merge(updated_params.with_indifferent_access)
     clean_errors
     massage_if_v2
     set_foreign_keys
+    self
   end
 
   def clean_errors
@@ -122,7 +117,7 @@ class BParam < ActiveRecord::Base
     return false unless m_name.present?
     manufacturer = Manufacturer.fuzzy_name_find(m_name)
     unless manufacturer.present?
-      manufacturer = Manufacturer.find_by_name("Other")
+      manufacturer = Manufacturer.find_by_name('Other')
       params[:bike][:manufacturer_other] = m_name.titleize if m_name.present?
     end
     params[:bike][:manufacturer_id] = manufacturer.id if manufacturer.present?
@@ -164,9 +159,9 @@ class BParam < ActiveRecord::Base
     end
     unless bike[:primary_frame_color_id].present?
       if paint.color_id.present?
-        params[:bike][:primary_frame_color_id] = paint.color.id 
+        params[:bike][:primary_frame_color_id] = paint.color.id
       else
-        params[:bike][:primary_frame_color_id] = Color.find_by_name("Black").id
+        params[:bike][:primary_frame_color_id] = Color.find_by_name('Black').id
       end
     end
   end
@@ -181,6 +176,7 @@ class BParam < ActiveRecord::Base
     b = without_bike.where(creator_id: user_id, id_token: toke).first if user_id.present?
     b ||= without_bike.without_creator.where('created_at >= ?', Time.now - 1.month).where(id_token: toke).first
     b ||= BParam.new(creator_id: user_id, params: { revised_new: true }.as_json)
+    b.creator_id ||= user_id
     # If the org_id is present, add it to the params. Only save it if the b_param is created
     if organization_id.present? && b.creation_organization_id != organization_id
       b.params = b.params.merge(bike: b.bike.merge(creation_organization_id: organization_id))
@@ -221,6 +217,14 @@ class BParam < ActiveRecord::Base
 
   def generate_id_token
     self.id_token ||= generate_unique_token
+  end
+
+  def owner_email
+    bike[:owner_email]
+  end
+
+  def display_email? # For revised form. If there aren't errors and there is an email, then we don't need to show
+    true unless owner_email.present? && bike_errors.blank?
   end
 
   protected

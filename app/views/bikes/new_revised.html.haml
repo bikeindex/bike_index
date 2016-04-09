@@ -27,6 +27,11 @@
           = f.label :serial_number, class: 'form-control-label col-sm-3'
           .col-sm-6
             = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', placeholder: 'highly recommended', class: 'form-control'
+          .col-sm-3.right-input-help
+            %label
+              = f.check_box :has_no_serial, tabindex: -1
+              - else
+                No serial
         .related-fields
           .form-group.row
             = f.label :manufacturer_id, class: 'form-control-label col-sm-3'
@@ -42,7 +47,7 @@
         .form-group.row.fancy-select.unfancy
           = f.label :year, 'Model year', class: 'form-control-label col-sm-3'
           .col-sm-6
-            - years = (1900..Time.now.year+1).to_a.reverse.map {|i| [i,i] }
+            - years = (1900..Time.now.year+1).to_a.reverse.map { |i| [i,i] }
             = f.select :year, years, prompt: "Unsure or unknown", selected: Time.now.year
           .col-sm-3.right-input-help
             %label
@@ -75,10 +80,11 @@
             = f.label :tertiary_frame_color, class: 'form-control-label col-sm-3'
             .col-sm-6.fancy-select.unfancy
               = f.collection_select(:tertiary_frame_color_id, Color.all, :id, :name, required: true, prompt: 'Choose color' )
-        .form-group.row
-          = f.label :owner_email, class: 'form-control-label col-sm-3'
-          .col-sm-6
-            - email = @bike.owner_email || current_user && current_user.email
-            = f.text_field :owner_email, value: email, required: true, placeholder: 'highly recommended', class: 'form-control'
+        - if @b_param.display_email?
+          .form-group.row
+            = f.label :owner_email, class: 'form-control-label col-sm-3'
+            .col-sm-6
+              - email = @bike.owner_email || current_user && current_user.email
+              = f.text_field :owner_email, value: email, required: true, placeholder: 'highly recommended', class: 'form-control'
       .register-button-wrapper
         = submit_tag "Register", class: "btn btn-lg btn-primary"
