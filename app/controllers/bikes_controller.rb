@@ -243,7 +243,9 @@ class BikesController < ApplicationController
   end
 
   def find_or_new_b_param
-    @b_param = BParam.find_or_new_from_token(params[:b_param_token], user_id: current_user.id)
+    token = params[:b_param_token]
+    token ||= params[:bike] && params[:bike][:b_param_id_token]
+    @b_param = BParam.find_or_new_from_token(token, user_id: current_user.id)
   end
 
   def ensure_user_for_edit

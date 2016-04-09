@@ -1,5 +1,6 @@
 $body-font-family: 'Open Sans', sans-serif;
 $header-font-family: 'Montserrat', sans-serif;;
+$strong-font-weight: 700;
 // body font style
 .body-font {
   font-family: $body-font-family;
@@ -9,7 +10,7 @@ $header-font-family: 'Montserrat', sans-serif;;
   line-height: 2em;
   color: $body-font-color;
   em { font-style: italic; }
-  strong { font-weight: 700; }
+  strong { font-weight: $strong-font-weight; }
   a {
     color: $link-color;
     text-decoration: none;
@@ -50,7 +51,7 @@ h5 {
   text-transform: uppercase;
   margin: 0 0 24px;
   color: $header-font-color;
-  strong { font-weight: 700; }
+  strong { font-weight: $strong-font-weight; }
   a {
     color: $link-color;
     &:hover, &:active, &.active {

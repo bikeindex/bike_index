@@ -138,16 +138,17 @@ $mainmenu-open-zindex: 10;
       a {
         padding: $vertical-height 0.5*$grid-gutter-width;
         &.active, &:active { text-decoration: none; }
-        &.active::after {
-          transition: bottom 200ms linear;
-          content: '';
-          position: absolute;
-          left: 50%;
-          height: 2px;
-          width: 24%;
-          margin-left: -12%;
-          background: $blue;
-        }
+      }
+      // Only apply to primary nav items, not submenus
+      &>a.active::after {
+        transition: bottom 200ms linear;
+        content: '';
+        position: absolute;
+        left: 50%;
+        height: 2px;
+        width: 24%;
+        margin-left: -12%;
+        background: $blue;
       }
       // On large screens, the signup link is a button
       .signup-link {

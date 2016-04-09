@@ -1,10 +1,9 @@
 class BikeIndex.BikesNew extends BikeIndex
   constructor: ->
     new BikeIndex.ManufacturersSelect('#bike_manufacturer_id')
+    new BikeIndex.FormWell
     @initializeEventListeners()
-
-    if $('#bike_has_no_serial').prop('checked') == true
-      $('#bike_serial_number').val('absent').addClass('absent-serial')
+    @updateSerial($('#bike_has_no_serial').prop('checked'))
     @otherManufacturerDisplay($('#bike_manufacturer_id').val())
 
   initializeEventListeners: ->
@@ -19,6 +18,33 @@ class BikeIndex.BikesNew extends BikeIndex
       pagespace.updateYear()
     $('a.optional-form-block').click (e) ->
       new BikeIndex.OptionalFormUpdate(e)
+    $('#bike_has_no_serial').change (e) ->
+      pagespace.updateSerial($('#bike_has_no_serial').prop('checked'))
+    $('#made-without-serial-button').click (e) ->
+      pagespace.madeWithoutSerial(true)
+    $('#bike_made_without_serial').change (e) -> # Only ever called when visible, so it's time to close
+      pagespace.updateSerial(true)
+
+  updateSerial: (serial_absent) ->
+    @madeWithoutSerial()
+    if serial_absent
+      $('#bike_serial_number').val('absent').addClass('absent-serial')
+      $('#made-without-serial-help .hidden-other').slideDown()
+    else
+      $('#bike_serial_number').val('').removeClass('absent-serial')
+      $('#made-without-serial-help .hidden-other').slideUp()
+
+  madeWithoutSerial: (no_serial = false) ->
+    # Show the made_without_serial checkbox, hide other serial inputs
+    $('#made-without-serial-modal').modal('hide')
+    if no_serial
+      $('#serial-input').slideUp()
+      $('#made-without-serial-input').slideDown()
+      $('#bike_made_without_serial').prop('checked', true)
+    else
+      $('#serial-input').slideDown()
+      $('#made-without-serial-input').slideUp()
+      $('#bike_made_without_serial').prop('checked', false)
 
   otherManufacturerDisplay: (slug) ->
     hidden_other = $('#bike_manufacturer_id').parents('.related-fields').find('.hidden-other')

@@ -1,0 +1,26 @@
+// 
+// Unlinke buttons, we're leaving the standard modal code alone and extending
+// here
+
+.modal-header {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.modal-footer { 
+  border-top: none;
+  padding-top: 0;
+}
+
+.modal {
+  .close {
+    font-size: inherit;
+    font-family: sans-serif;
+    font-weight: 100;
+    color: $gray-light;
+  }
+  .btn {
+    padding-top: 1em;
+    padding-bottom: 1em;
+  }
+}

@@ -352,28 +352,55 @@ describe BikesController do
         allow(controller).to receive(:revised_layout_enabled?) { true }
         set_current_user(user)
       end
+      context 'no existing b_param' do
+        it 'creates a bike' do
+          bike_params = {
+            b_param_id_token: '',
+            cycle_type_id: CycleType.bike.id.to_s,
+            serial_number: 'example serial',
+            manufacturer_id: manufacturer.slug,
+            manufacturer_other: '',
+            year: '2016',
+            frame_model: 'Cool frame model',
+            primary_frame_color_id: color.id.to_s,
+            secondary_frame_color_id: '',
+            tertiary_frame_color_id: '',
+            owner_email: 'something@stuff.com'
+          }
+          expect do
+            post :create, bike: bike_params.as_json
+          end.to change(Bike, :count).by(1)
+          bike = Bike.last
+          bike_params.delete(:manufacturer_id)
+          bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v }
+          expect(bike.manufacturer).to eq manufacturer
+        end
+      end
+      context 'existing b_param' do
+        it 'creates a bike' do
+          bike_params = {
+            cycle_type_id: CycleType.bike.id.to_s,
+            serial_number: 'example serial',
+            manufacturer_other: '',
+            year: '2016',
+            frame_model: 'Cool frame model',
+            primary_frame_color_id: color.id.to_s,
+            secondary_frame_color_id: '',
+            tertiary_frame_color_id: '',
+            owner_email: 'something@stuff.com'
+          }
+          b_param = BParam.create(params: { bike: bike_params })
+          expect do
+            post :create, bike: { manufacturer_id: manufacturer.slug, b_param_id_token: b_param.id_token }
+          end.to change(Bike, :count).by(1)
+          bike = Bike.last
 
-      it 'creates a bike without a b_param existing' do
-        bike_params = {
-          b_param_id_token: '',
-          cycle_type_id: CycleType.bike.id.to_s,
-          serial_number: 'example serial',
-          manufacturer_id: manufacturer.slug,
-          manufacturer_other: '',
-          year: '2016',
-          frame_model: 'Cool frame model',
-          primary_frame_color_id: color.id.to_s,
-          secondary_frame_color_id: '',
-          tertiary_frame_color_id: '',
-          owner_email: 'something@stuff.com'
-        }
-        expect do
-          post :create, bike: bike_params.as_json
-        end.to change(Bike, :count).by(1)
-        bike = Bike.last
-        bike_params.delete(:manufacturer_id)
-        bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v }
-        expect(bike.manufacturer).to eq manufacturer
+          b_param.reload
+          expect(b_param.created_bike_id).to eq bike.id
+          bike_params.delete(:manufacturer_id)
+          bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v }
+          expect(bike.manufacturer).to eq manufacturer
+        end
       end
     end
   end

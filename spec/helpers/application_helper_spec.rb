@@ -35,6 +35,23 @@ describe ApplicationHelper do
     end
   end
 
+  describe :current_page_form_well? do
+    context 'bikes new' do
+      it 'returns link, active if it ought to be' do
+        view.stub(:controller_name).and_return('bikes')
+        view.stub(:action_name).and_return('new')
+        helper.current_page_form_well?.should be_true
+      end
+    end
+    context 'bikes show' do
+      it 'returns link, active if it ought to be' do
+        view.stub(:controller_name).and_return('bikes')
+        view.stub(:action_name).and_return('show')
+        helper.current_page_form_well?.should be_false
+      end
+    end
+  end
+
   describe :admin_nav_link do
     it 'returns link, active if it ought to be' do
       view.stub(:controller_name).and_return('organization_invitations')

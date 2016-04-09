@@ -6,10 +6,16 @@
 
 // Core variables and mixins
 @import "bootstrap/variables";
+
+// 
+// Overrides
 $border-radius:          1px;
 $border-radius-lg:       1px;
 $border-radius-sm:       1px;
+@import "revised/mixins/colors";
 
+// 
+// More bootstrap
 @import "bootstrap/mixins";
 
 // Reset and dependencies
@@ -47,6 +53,8 @@ $border-radius-sm:       1px;
 @import "bootstrap/close";
 
 // Components w/ JavaScript
+$modal-backdrop-bg: $blue-dark;
+$modal-backdrop-opacity: 0.8;
 @import "bootstrap/modal";
 @import "bootstrap/tooltip";
 @import "bootstrap/popover";
@@ -55,9 +63,9 @@ $border-radius-sm:       1px;
 // Utility classes
 @import "bootstrap/utilities";
 
+
 //
-// Other external styles
-// @import "includes/jasny-bootstrap.scss";
+// Other (non-bootstrap) external styles
 
 
 
@@ -78,11 +86,11 @@ $grid-breakpoint-lg: 992px;
 $grid-breakpoint-xl: 1200px;
 
 // Settings
-@import "revised/mixins/colors";
 @import "revised/fonts";
 
 // Bootstrap overrides
 @import "revised/mixins/buttons";
+@import "revised/sections/modals";
 
 // External styles
 @import "includes/selectize_bootstrap3.scss";
@@ -93,6 +101,7 @@ $grid-breakpoint-xl: 1200px;
 @import "revised/sections/content_menu";
 @import "revised/sections/main_container_wrap";
 @import "revised/sections/form_well";
+@import "revised/sections/horizontal_lines";
 
 // page styles
 @import "revised/pages/bikes_new";

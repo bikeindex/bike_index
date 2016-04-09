@@ -1,6 +1,19 @@
+$form-well-background: $gray-lighter;
+
+.form-well-header { padding-top: 8*$vertical-height; }
+
+.form-circle-item { // Mixin for help blocks
+  padding: .5em .25em;
+  border-radius: 1em;
+  line-height: 0;
+  cursor: pointer;
+  color: $gray;
+  font-size: 125%;
+  text-decoration: none;
+}
+
 .form-well {
-  margin: 2*$vertical-height 0 0;
-  border-radius: $border-radius;
+  form { padding: 2*$vertical-height 0; }
   .below-input-help {
     @extend small;
     display: block;
@@ -9,26 +22,105 @@
     color: $gray-light;
   }
   .selectize-control { line-height: 0; } // label isn't lined up
-  a.optional-form-block { cursor: pointer; }
+  a.optional-form-block {
+    cursor: pointer;
+    color: $gray;
+    &:hover { 
+      color: $link-color;
+      text-decoration: none;
+      .context-display-help { color: $link-color; }
+    }
+  }
+  .context-display-help {
+    @extend .form-circle-item;
+    display: inline-block;
+    background: #fff;
+    border: 1px solid #e4e4e4;
+  }
   .hidden-other {
     margin-top: -1rem;
     display: none;
     &.unhidden { margin-bottom: 1.5rem; }
   }
+  .inline-input-help {
+    @extend .form-circle-item;
+    display: block;
+    border: 2px solid $gray;
+    position: absolute;
+    right: 1.5em; top: .4em;
+    font-weight: $strong-font-weight;
+    z-index: 100;
+    transition: all .05s linear;
+    &:hover, &:active, &.active {
+      text-decoration: none;
+      border-color: $link-color;
+      color: $link-color;
+    }
+  }
   .currently-hidden { display: none; }
+  .form-well-label, .form-well-input, .right-input-help {
+    @include make-col(); 
+  }
+  .related-fields {
+    padding-bottom: $vertical-height;
+    .form-group { clear: both; }
+  }
 }
 
-.submit-form-well {
-  .btn {}
+.form-well-container {
+  padding-bottom: 6*$vertical-height;
 }
 
+// 
+// XS screens
+@media (max-width: $grid-breakpoint-sm - 1px) {
+  .form-well {
+    .form-well-input { @include make-col-span(8); }
+    .form-well-label { @include make-col-span(4); }
+    .right-input-help {
+      @include make-col-offset(4);
+      @include make-col-span(8);
+      margin-top: -.5em;
+    }
+    .unnested-field::after, .related-fields::after {
+      content: '';
+      display: block;
+      width: 90%;
+      margin: 0 0 2*$vertical-height 10%;
+      border-bottom: 1px #b2b2b2 solid;
+      padding-top: $vertical-height;
+    }
+    .last-form-group::after { display: none; }
+  }
+}
 
+// 
+// Small screens and larger
+@media (min-width: $grid-breakpoint-sm) {
+  .form-well {
+    .form-well-input {  @include make-col-span(6); }
+    .form-well-label { @include make-col-span(3); }
+    .right-input-help { @include make-col-span(3); }
+  }
+}
+
+@media (max-width: $grid-breakpoint-md - 1px) {
+  .form-well-container.container {
+    max-width: 100%;
+    background: $form-well-background;
+  }
+}
+
+@media (min-width: $grid-breakpoint-md) and (max-width: $grid-breakpoint-lg - 1px) {
+  .form-well { background: $form-well-background; }
+}
 // 
 // Large screen styles
 @media (min-width: $grid-breakpoint-lg) {
-  .form-well {
+  .form-well-header { padding-top: 12*$vertical-height; } // Just like in main_container_wrap
+  .form-well form {
+    background: $form-well-background;
     padding: 4*$vertical-height 0 2*$vertical-height;
-    // background: $blue-light;
     width: 100%;
     position: relative;
     .form-control-label { text-align: right; }

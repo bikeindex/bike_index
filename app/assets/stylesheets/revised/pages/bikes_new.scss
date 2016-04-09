@@ -1,17 +1,40 @@
-
-// On new bike registration, this is the wrapper
-.register-button-wrapper {
-  margin-top: $vertical-height;
-  width: 100%;
-  text-align: center;
-  // .btn {
-  //   @extend h4;
-  //   display: block;
-  //   width: 33%;
-  //   margin: 0 auto;
-  //   background: $blue;
-  //   color: white;
-  //   border-radius: $border-radius;
-  //   padding: 2*$vertical-height 2em;
-  // }
+#bikes_new {
+  .form-control.absent-serial {
+    background: darken(white, 10%);
+    color: $gray-light;
+    cursor: default;
+    // margin-bottom: 1em;
+    &:active, &:focus {
+      border: 1px solid #ccc;
+      @include box-shadow(none);
+    }
+  }
+  #made-without-serial-input {
+    display: none;
+  }
+  #made-without-serial-help {
+    .hidden-other { margin-top: .5em; }
+    a { cursor: pointer; }
+  }
+  #made-without-serial-modal {
+    ul { margin-top: -1em; } // Line height looks better this way...
+    li.li-or {
+      list-style-type: none;
+      font-style: italic;
+    }
+    .modal-footer {
+      text-align: center;
+      .btn {
+        display: block;
+        width: 100%;
+      }
+    }
+  }
+  // On new bike registration, this is the wrapper
+  .register-button-wrapper {
+    margin-top: $vertical-height;
+    width: 100%;
+    text-align: center;
+    .btn { min-width: 33.33%; }
+  }
 }
