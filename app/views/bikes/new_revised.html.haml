@@ -26,12 +26,20 @@
         .form-group.row
           = f.label :serial_number, class: 'form-control-label col-sm-3'
           .col-sm-6
-            = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', placeholder: 'highly recommended', class: 'form-control'
+            #serial-input
+              = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', placeholder: 'highly recommended', class: 'form-control'
+            #made-without-serial-input
+              %label
+                = f.check_box :made_without_serial
+                Made without serial
+            .below-input-help#made-without-serial-help
+              .hidden-other
+                %a{ data: { toggle: 'modal', target: '#made-without-serial-modal' } }
+                  This #{@bike.type} was made with no serial number
           .col-sm-3.right-input-help
             %label
               = f.check_box :has_no_serial, tabindex: -1
-              - else
-                No serial
+              Missing serial
         .related-fields
           .form-group.row
             = f.label :manufacturer_id, class: 'form-control-label col-sm-3'
@@ -88,3 +96,42 @@
               = f.text_field :owner_email, value: email, required: true, placeholder: 'highly recommended', class: 'form-control'
       .register-button-wrapper
         = submit_tag "Register", class: "btn btn-lg btn-primary"
+
+
+.modal.fade#made-without-serial-modal
+  .modal-dialog{:role => 'document'}
+    .modal-content
+      .modal-header
+        %h2.modal-title
+          Are you certain?
+          %button.close{'aria-label' => 'Close', 'data-dismiss' => 'modal', type: 'button'}
+            %span{'aria-hidden' => 'true'} &times;
+        %hr
+      .modal-body
+        %p
+          Very
+          %em
+            very
+          few bikes are made without serials. Unless this #{@bike.type}:
+        %ul
+          %li
+            Was made before 1970
+          %li.li-or
+            \- or -
+          %li
+            Is a handmade frame
+        %p
+          It probably has a serial number.
+        %p 
+          Read about #{link_to 'how to find your serial number', serials_url, target: '_blank' }
+          %small
+            (opens in a separate window)
+      .modal-footer
+        .col-xs-6
+          %button.btn.btn-default{'data-dismiss' => 'modal', type: 'button'}
+            Nevermind
+          I just don't know the serial
+        .col-xs-6
+          %button.btn.btn-danger#made-without-serial-button{type: 'button'}
+            I'm 100% sure
+          This #{@bike.type} was made without a serial
