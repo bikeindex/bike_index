@@ -17,6 +17,12 @@ module ApplicationHelper
     %w(info news).include?(controller_name)
   end
 
+  def current_page_form_well?
+    if controller_name == 'bikes'
+      %w(new edit update create).include?(action_name)
+    end
+  end
+
   def current_link(link_text, link_path, class: '') # Revised layout link
     class_name = current_page?(link_path) ? 'active' : ''
     class_name = 'active' if link_path.match(news_index_path) && controller_name == 'news'

@@ -1,9 +1,9 @@
 class BikeIndex.OptionalFormUpdate extends BikeIndex
   constructor: (e) ->
     $target = $(e.target)
-    console.log($target)
+    unless $target.is('a') # Ensure we aren't clicking on an interior element
+      $target = $target.parents('.optional-form-block')
     $click_target = $($target.attr('data-target'))
-    console.log $click_target
     $($target.attr('data-toggle')).show().removeClass('currently-hidden')
     $target.addClass('currently-hidden').hide()
     if $target.hasClass('wh_sw')

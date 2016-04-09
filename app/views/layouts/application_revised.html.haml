@@ -96,6 +96,8 @@
 
     - if current_page_content_page?
       = render '/shared/content_skeleton'
+    - elsif current_page_form_well?
+      = yield
     - else
       .container.main-container-wrap
         = yield
