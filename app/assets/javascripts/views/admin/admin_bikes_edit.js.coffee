@@ -25,8 +25,8 @@ class BikeIndex.Views.AdminBikesEdit extends Backbone.View
     per_page = 10
     frame_mnfg_url = "#{window.root_url}/api/autocomplete?per_page=#{per_page}&categories=frame_mnfg&q="
     $target.selectize
-      plugins: ['restore_on_backspace']
       options: initial_opts
+      selectOnTab: true
       preload: false
       persist: false
       create: false
