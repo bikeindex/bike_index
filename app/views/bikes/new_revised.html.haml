@@ -1,3 +1,5 @@
+- serial_help_content = "Every bike has a unique serial number, it's how they are identified. To learn more or see some examples, go to #{link_to 'our serial page', serials_url, target: '_blank' } <small>(opens in a separate window)</small>."
+- primary_color_help_content = "The color of the frame and fork&mdash;not the wheels, cranks, or anything else. After registering you can give a more detailed description, <em>this</em> is to get a general color to make searching easier. Choose the option that fits best."
 .form-well-header.container
   %h1
     Enter #{@bike.type} details
@@ -23,14 +25,13 @@
         .form-group.row.unnested-field
           = f.label :cycle_type_id, 'This is a', class: 'form-control-label form-well-label'
           .form-well-input.fancy-select.unfancy
-            = f.collection_select(:cycle_type_id, CycleType.all, :id, :name, {required: true}, {class: 'form-control'})
+            = f.collection_select(:cycle_type_id, CycleType.all, :id, :name, required: true, class: 'form-control')
 
         .form-group.row.unnested-field
           = f.label :serial_number, class: 'form-control-label form-well-label'
           .form-well-input
             #serial-input
               = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', placeholder: 'highly recommended', class: 'form-control'
-              - serial_help_content = "Every bike has a unique serial number, it's how they are identified. To learn more or see some examples, go to #{link_to 'our serial page', serials_url, target: '_blank' } <small>(opens in a separate window)</small>."
               %a.inline-input-help{ title: 'Serial help', data: { toggle: 'popover', content: serial_help_content } }
                 ?
             #made-without-serial-input
@@ -79,6 +80,8 @@
             = f.label :primary_frame_color, class: 'form-control-label form-well-label'
             .form-well-input.fancy-select.unfancy
               = f.collection_select(:primary_frame_color_id, Color.all, :id, :name, required: true, prompt: 'Choose color' )
+              %a.inline-input-help{ title: 'Color help', data: { toggle: 'popover', content: primary_color_help_content } }
+                ?
             .right-input-help
               %a#add-secondary.optional-form-block{ data: { target: '#secondary-color', toggle: '#rm-secondary' } }
                 %span.context-display-help

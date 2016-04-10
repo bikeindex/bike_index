@@ -32,7 +32,7 @@
   }
   // On new bike registration, this is the wrapper
   .register-button-wrapper {
-    margin-top: $vertical-height;
+    padding-top: $vertical-height;
     width: 100%;
     text-align: center;
     .btn { min-width: 33.33%; }

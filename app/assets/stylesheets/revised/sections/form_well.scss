@@ -47,7 +47,7 @@ $form-well-background: $gray-lighter;
     display: block;
     border: 2px solid $gray;
     position: absolute;
-    right: 1.5em; top: .4em;
+    right: 1.5em; top: .3em;
     font-weight: $strong-font-weight;
     z-index: 100;
     transition: all .05s linear;
@@ -57,6 +57,7 @@ $form-well-background: $gray-lighter;
       color: $link-color;
     }
   }
+  .fancy-select .inline-input-help { right: 2.5em; } // To not cover up select pointer
   .currently-hidden { display: none; }
   .form-well-label, .form-well-input, .right-input-help {
     @include make-col(); 

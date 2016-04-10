@@ -353,7 +353,7 @@ describe BikesController do
         set_current_user(user)
       end
       context 'no existing b_param' do
-        it 'creates a bike' do
+        it "creates a bike and doesn't create a b_param" do
           bike_params = {
             b_param_id_token: '',
             cycle_type_id: CycleType.bike.id.to_s,
@@ -367,9 +367,11 @@ describe BikesController do
             tertiary_frame_color_id: '',
             owner_email: 'something@stuff.com'
           }
+          expect(BParam.all.count).to eq 0
           expect do
             post :create, bike: bike_params.as_json
           end.to change(Bike, :count).by(1)
+          expect(BParam.all.count).to eq 0
           bike = Bike.last
           bike_params.delete(:manufacturer_id)
           bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v }

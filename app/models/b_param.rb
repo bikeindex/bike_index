@@ -1,13 +1,13 @@
 # b_param stands for Bike param
 class BParam < ActiveRecord::Base
   attr_accessible :params,
-    :creator_id,
-    :bike_title,
-    :created_bike_id,
-    :bike_errors,
-    :image,
-    :image_processed, 
-    :api_v2
+                  :creator_id,
+                  :bike_title,
+                  :created_bike_id,
+                  :bike_errors,
+                  :image,
+                  :image_processed, 
+                  :api_v2
 
   attr_accessor :api_v2
 
@@ -20,11 +20,15 @@ class BParam < ActiveRecord::Base
   belongs_to :created_bike, class_name: "Bike"
   belongs_to :creator, class_name: "User"
 
+  scope :with_bike, -> { where('created_bike_id IS NOT NULL') }
   scope :without_bike, -> { where('created_bike_id IS NULL') }
   scope :without_creator, -> { where('creator_id IS NULL') }
 
   before_create :generate_id_token
 
+  # Right now this is a partial update. It's improved from where it was, but it still uses the BikeCreator
+  # code for protection. Ideally, we would use the revised merge code to ensure we aren't letting users
+  # write illegal things to the bikes
   before_save :clean_params
   def clean_params(updated_params = {}) # So we can pass in the params
     self.params ||= { bike: {} } # ensure valid json object
@@ -172,6 +176,14 @@ class BParam < ActiveRecord::Base
     where('created_at >= ?', after).where(id_token: toke).first
   end
 
+  def generate_id_token
+    self.id_token ||= generate_unique_token
+  end
+
+  # Below here is revised setup, an attempt to make the process of upgrading rails easier
+  # by reducing reliance on attr_accessor, and also not creating b_params unless we need to
+  # To protect organization registration and other non-user-set options in revised setup,
+  # Set the protected attrs separately from the params hash and merging over the passed params
   def self.find_or_new_from_token(toke = nil, user_id: nil, organization_id: nil)
     b = without_bike.where(creator_id: user_id, id_token: toke).first if user_id.present?
     b ||= without_bike.without_creator.where('created_at >= ?', Time.now - 1.month).where(id_token: toke).first
@@ -213,10 +225,6 @@ class BParam < ActiveRecord::Base
 
   def creation_organization_id
     bike[:creation_organization_id]
-  end
-
-  def generate_id_token
-    self.id_token ||= generate_unique_token
   end
 
   def owner_email
