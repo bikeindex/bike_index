@@ -1,24 +1,4 @@
 - primary_color_help_content = "The color of the frame and fork&mdash;not the wheels, cranks, or anything else. You can put a more detailed description in paint description, <em>this</em> is to get a general color to make searching easier"
-.form-well-header.container{ id: "bikes_edit_#{@edit_template}" }
-  .edit-bike-header
-    %h1
-      %span.large-display
-        Edit
-        = @bike.year
-        = @bike.manufacturer_name
-        = @bike.frame_model
-        = @bike.type unless @bike.type == 'bike'
-      %span.small-display
-        = @edit_templates[@edit_template]
-    - unless @bike.current_owner_exists
-      %p.edit-bike-title-submenu
-        Sent to 
-        %em
-          = @bike.owner_email
-        but it hasn't been claimed yet
-    %p.edit-bike-title-submenu
-      = link_to "View #{@bike.type.titleize}"
-  = render partial: '/shared/form_errors', locals: { errors: @bike.errors } 
 
 = form_for @bike, multipart: true do |f|
   .form-well-container.container
@@ -42,6 +22,11 @@
           = submit_tag 'Save changes', class: 'btn btn-lg btn-primary'
 
       .col-lg-8.form-well
+        /
+        /
+        /
+        / ABOVE THIS IS DUPLICATION
+        /
         .form-wrap
           .edit-bike-form-header
             %h3

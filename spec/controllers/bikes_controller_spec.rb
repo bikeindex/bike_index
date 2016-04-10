@@ -450,18 +450,18 @@ describe BikesController do
             get :edit, id: ownership.bike.id
             expect(response).to render_with_layout('application_revised')
             expect(response).to be_success
-            expect(assigns(:edit_template)).to eq(:root)
-            expect(response).to render_template(:edit_root)
+            expect(assigns(:edit_template)).to eq('root')
+            expect(response).to render_template('edit_root')
           end
         end
-        %w(root photos wheels_drivetrain accessories change_ownership stolen).each do |template|
+        %w(root photos wheels_drivetrain accessories ownership stolen).each do |template|
           context template do
-            xit 'renders the template' do
+            it 'renders the template' do
               get :edit, id: ownership.bike.id, page: template
               expect(response).to render_with_layout('application_revised')
               expect(response).to be_success
-              expect(response).to render_template(template.to_sym)
-              expect(assigns(:edit_template)).to eq("edit_#{template}")
+              expect(response).to render_template("edit_#{template}")
+              expect(assigns(:edit_template)).to eq(template)
             end
           end
         end

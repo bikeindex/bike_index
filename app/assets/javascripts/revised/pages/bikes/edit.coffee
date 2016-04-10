@@ -2,7 +2,6 @@ class BikeIndex.BikesEdit extends BikeIndex
   constructor: ->
     new BikeIndex.FormWell
     @initializeEventListeners()
-    @initializeEditMenu()
 
   initializeEventListeners: ->
     pagespace = @
@@ -29,12 +28,3 @@ class BikeIndex.BikesEdit extends BikeIndex
     else
       year_select.setValue(new Date().getFullYear())
       year_select.enable()
-
-  initializeEditMenu: ->
-    # $target = $('.bike-edit-page-select')
-    # c-select is added to style without JS, but fucks things up for selectize
-    # $target.removeClass('c-select')
-    # $('.bike-edit-page-select').selectize
-    #   create: false
-    #   maxItems: 1
-    #   # selectOnTab: true

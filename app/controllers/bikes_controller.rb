@@ -204,9 +204,8 @@ class BikesController < ApplicationController
         redirect_to bike_path(@bike) and return
     end
     if revised_layout_enabled?
-      t_index = edit_templates.keys.find_index(params[:page]) || 0
-      @edit_template = edit_templates.keys[t_index]
-      render "edit_#{@edit_template}", layout: 'application_revised'
+      @edit_template = edit_templates[params[:page]].present? ? params[:page] : edit_templates.keys.first
+      render "edit_#{@edit_template}".to_sym, layout: 'application_revised'
     else
       @private_images = PublicImage.unscoped.where(imageable_type: 'Bike').where(imageable_id: @bike.id).where(is_private: true)
       @bike = @bike.decorate
@@ -240,7 +239,7 @@ class BikesController < ApplicationController
       accessories: 'Accessories + Components',
       ownership: 'Change Owner or Delete',
       stolen: (@bike.stolen ? 'Stolen report' : 'Report Stolen or Missing')
-    }
+    }.as_json
   end
 
   protected
