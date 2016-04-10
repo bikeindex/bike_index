@@ -67,7 +67,7 @@
             .form-well-input
               = f.text_field :frame_model, class: 'form-control'
 
-          .related-fields.row{ class: (if @b_param.display_email? ? '' : 'no-divider-row') }
+          .related-fields.row{ class: (@b_param.display_email? ? '' : 'no-divider-row') }
             .form-group
               = f.label :primary_frame_color, class: 'form-control-label form-well-label'
               .form-well-input.fancy-select.unfancy

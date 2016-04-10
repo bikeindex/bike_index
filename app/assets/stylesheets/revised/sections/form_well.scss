@@ -60,7 +60,7 @@ $form-well-border-color: #e4e4e4;
   }
   .fancy-select .inline-input-help { right: 2.75em; } // To not cover up select pointer
   .currently-hidden { display: none; }
-  .form-well-label, .form-well-input, .right-input-help {
+  .form-well-label, .form-well-input, .form-well-input-large, .right-input-help {
     @include make-col(); 
   }
   .related-fields {
@@ -77,7 +77,7 @@ $form-well-border-color: #e4e4e4;
 // XS screens
 @media (max-width: $grid-breakpoint-sm - 1px) {
   .form-well {
-    .form-well-input { @include make-col-span(8); }
+    .form-well-input, .form-well-input-large { @include make-col-span(8); }
     .form-well-label { @include make-col-span(4); }
     .right-input-help {
       @include make-col-offset(4);
@@ -100,7 +100,8 @@ $form-well-border-color: #e4e4e4;
 // Small screens and larger
 @media (min-width: $grid-breakpoint-sm) {
   .form-well {
-    .form-well-input {  @include make-col-span(6); }
+    .form-well-input { @include make-col-span(6); }
+    .form-well-input-large { @include make-col-span(8); }
     .form-well-label { @include make-col-span(3); }
     .right-input-help { @include make-col-span(3); }
   }

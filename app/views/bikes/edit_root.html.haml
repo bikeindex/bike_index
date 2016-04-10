@@ -80,7 +80,7 @@
             .form-well-input
               = f.text_field :frame_model, class: 'form-control'
 
-          .related-fields.row.no-divider-row
+          .related-fields.row
             .form-group
               = f.label :primary_frame_color, class: 'form-control-label form-well-label'
               .form-well-input.fancy-select.unfancy
@@ -113,7 +113,40 @@
               = f.label :tertiary_frame_color, class: 'form-control-label form-well-label'
               .form-well-input.fancy-select.unfancy
                 = f.collection_select(:tertiary_frame_color_id, Color.all, :id, :name, prompt: 'Choose color' )
-
-
           
-          
+          .form-group.row.unnested-field
+            = f.label :frame_material_id, 'Primary frame material', class: 'form-control-label form-well-label'
+            .form-well-input.fancy-select.unfancy
+              = f.collection_select(:frame_material_id, FrameMaterial.all, :id, :name)
+
+          .form-group.row.unnested-field
+            = f.label :frame_size, class: 'form-control-label form-well-label'
+            .form-well-input
+              = f.text_field :frame_size, class: 'form-control'
+              .below-input-help
+                Need to implement the scripts for this
+
+          .form-group.row.unnested-field
+            = f.label :paint_name, 'Paint description', class: 'form-control-label form-well-label'
+            .form-well-input
+              = f.text_field :paint_name, class: 'form-control'
+
+          .form-group.row.unnested-field
+            = f.label :name, 'Bike Name', class: 'form-control-label form-well-label'
+            .form-well-input
+              = f.text_field :name, class: 'form-control'
+
+          .form-group.row.unnested-field
+            = f.label :description, 'General description', class: 'form-control-label form-well-label'
+            .form-well-input-large
+              = f.text_area :description, rows: 3, class: 'form-control', placeholder: 'Tell us about your bike!'
+
+          .form-group.row.unnested-field
+            = f.label :additional_registration, class: 'form-control-label form-well-label'
+            .form-well-input
+              = f.text_field :additional_registration, class: 'form-control'
+
+          .form-group.row.unnested-field.no-divider-row
+            = f.label :location, class: 'form-control-label form-well-label'
+            .form-well-input
+              = f.text_field :location, class: 'form-control', placeholder: 'zip code'
