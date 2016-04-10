@@ -183,7 +183,7 @@ describe BikesController do
             expect(bike.is_a?(Bike)).to be_true
             expect(assigns(:b_param)).to_not eq b_param
             expect(response).to render_with_layout('application_revised')
-            flash[:notice].should match(/sorry/i)
+            expect(flash[:notice]).to match(/sorry/i)
           end
         end
       end
@@ -221,7 +221,7 @@ describe BikesController do
           set_current_user(user) 
           post :create, { bike: @bike }
           # response.should render_template('new.html.haml')
-          flash[:error].should eq("Oops, that isn't your bike")
+          expect(flash[:error]).to eq("Oops, that isn't your bike")
         end
 
         it 'renders new if there is an error and update the b_params' do
@@ -396,7 +396,6 @@ describe BikesController do
             post :create, bike: { manufacturer_id: manufacturer.slug, b_param_id_token: b_param.id_token }
           end.to change(Bike, :count).by(1)
           bike = Bike.last
-
           b_param.reload
           expect(b_param.created_bike_id).to eq bike.id
           bike_params.delete(:manufacturer_id)
@@ -409,37 +408,64 @@ describe BikesController do
 
 
   describe :edit do
-    describe 'when there is no user' do
-      before do
-        ownership = FactoryGirl.create(:ownership)
+    let(:ownership) { FactoryGirl.create(:ownership) }
+    context 'when there is no user' do
+      it 'redirects and sets the flash' do
         get :edit, id: ownership.bike.id
+        expect(response).to redirect_to bike_path(ownership.bike)
+        expect(flash[:error]).to be_present
       end
-      it { should respond_with(:redirect) }
-      it { should redirect_to(bike_url) }
-      it { should set_the_flash }
     end
-    describe "when a user is present but isn't allowed to edit the bike" do
-      before do
-        ownership = FactoryGirl.create(:ownership)
+    context "when a user is present but isn't allowed to edit the bike" do
+      it 'redirects and sets the flash' do
         user = FactoryGirl.create(:user)
         set_current_user(user)
         get :edit, id: ownership.bike.id
+        expect(response).to redirect_to bike_path(ownership.bike)
+        expect(flash).to be_present
+        expect(flash[:error]).to be_present
       end
-      it { should respond_with(:redirect)}
-      it { should redirect_to(bike_url) }
-      it { should set_the_flash }
     end
-    describe 'when a user is present who is allowed to edit the bike' do
-      before do
-        ownership = FactoryGirl.create(:ownership)
-        user = ownership.creator
-        set_current_user(user)
-        get :edit, id: ownership.bike.id
+    context 'user allowed to edit the bike' do
+      let(:user) { ownership.creator }
+
+      context 'legacy' do
+        it 'responds with success' do
+          set_current_user(user)
+          get :edit, id: ownership.bike.id
+          expect(flash).to_not be_present
+          expect(response).to be_success
+          expect(assigns(:bike)).to be_decorated
+          expect(response).to render_template(:edit)
+        end
       end
-      it { should respond_with(:success)}
-      it { should render_template(:edit) }
-      it { should_not set_the_flash }   
-      it { assigns(:bike).should be_decorated }
+
+      context 'revised' do
+        before do
+          set_current_user(user)
+          allow(controller).to receive(:revised_layout_enabled?) { true }
+        end
+        context 'root' do
+          it 'renders the bike_details template' do
+            get :edit, id: ownership.bike.id
+            expect(response).to render_with_layout('application_revised')
+            expect(response).to be_success
+            expect(assigns(:edit_template)).to eq(:root)
+            expect(response).to render_template(:edit_root)
+          end
+        end
+        %w(root photos wheels_drivetrain accessories change_ownership stolen).each do |template|
+          context template do
+            xit 'renders the template' do
+              get :edit, id: ownership.bike.id, page: template
+              expect(response).to render_with_layout('application_revised')
+              expect(response).to be_success
+              expect(response).to render_template(template.to_sym)
+              expect(assigns(:edit_template)).to eq("edit_#{template}")
+            end
+          end
+        end
+      end
     end
   end
 

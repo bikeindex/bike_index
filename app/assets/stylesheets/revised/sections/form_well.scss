@@ -1,4 +1,5 @@
 $form-well-background: $gray-lighter;
+$form-well-border-color: #e4e4e4;
 
 .form-well-header { padding-top: 8*$vertical-height; }
 
@@ -13,7 +14,7 @@ $form-well-background: $gray-lighter;
 }
 
 .form-well {
-  form { padding: 2*$vertical-height 0; }
+  .form-wrap { padding: 2*$vertical-height 0 4*$vertical-height; }
   .below-input-help {
     @extend small;
     display: block;
@@ -35,7 +36,7 @@ $form-well-background: $gray-lighter;
     @extend .form-circle-item;
     display: inline-block;
     background: #fff;
-    border: 1px solid #e4e4e4;
+    border: 1px solid $form-well-border-color;
   }
   .hidden-other {
     margin-top: -1rem;
@@ -57,7 +58,7 @@ $form-well-background: $gray-lighter;
       color: $link-color;
     }
   }
-  .fancy-select .inline-input-help { right: 2.5em; } // To not cover up select pointer
+  .fancy-select .inline-input-help { right: 2.75em; } // To not cover up select pointer
   .currently-hidden { display: none; }
   .form-well-label, .form-well-input, .right-input-help {
     @include make-col(); 
@@ -91,7 +92,7 @@ $form-well-background: $gray-lighter;
       border-bottom: 1px #b2b2b2 solid;
       padding-top: $vertical-height;
     }
-    .last-form-group::after { display: none; }
+    .no-divider-row::after { display: none; }
   }
 }
 
@@ -113,15 +114,20 @@ $form-well-background: $gray-lighter;
 }
 
 @media (min-width: $grid-breakpoint-md) and (max-width: $grid-breakpoint-lg - 1px) {
-  .form-well { background: $form-well-background; }
+  .form-well {
+    background: $form-well-background;
+    border: 1px solid $form-well-border-color;
+  }
 }
 // 
 // Large screen styles
 @media (min-width: $grid-breakpoint-lg) {
   .form-well-header { padding-top: 12*$vertical-height; } // Just like in main_container_wrap
-  .form-well form {
+  .form-well { border: none; background: none; }
+  .form-well .form-wrap {
     background: $form-well-background;
-    padding: 4*$vertical-height 0 2*$vertical-height;
+    border: 1px solid $form-well-border-color;
+    padding-top: 4*$vertical-height;
     width: 100%;
     position: relative;
     .form-control-label { text-align: right; }

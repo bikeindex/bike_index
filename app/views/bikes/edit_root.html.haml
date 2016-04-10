@@ -1,0 +1,119 @@
+- primary_color_help_content = "The color of the frame and fork&mdash;not the wheels, cranks, or anything else. You can put a more detailed description in paint description, <em>this</em> is to get a general color to make searching easier"
+.form-well-header.container{ id: "bikes_edit_#{@edit_template}" }
+  .edit-bike-header
+    %h1
+      %span.large-display
+        Edit
+        = @bike.year
+        = @bike.manufacturer_name
+        = @bike.frame_model
+        = @bike.type unless @bike.type == 'bike'
+      %span.small-display
+        = @edit_templates[@edit_template]
+    - unless @bike.current_owner_exists
+      %p.edit-bike-title-submenu
+        Sent to 
+        %em
+          = @bike.owner_email
+        but it hasn't been claimed yet
+    %p.edit-bike-title-submenu
+      = link_to "View #{@bike.type.titleize}"
+  = render partial: '/shared/form_errors', locals: { errors: @bike.errors } 
+
+= form_for @bike, multipart: true do |f|
+  .form-well-container.container
+    .row
+      %nav.col-lg-4.primary-edit-bike-menu
+        %ul
+          - @edit_templates.each do |template, description|
+            %li
+              - classname = @edit_template == template ? 'active' : ''
+              %a{ href: edit_bike_path(page: template), class: classname }
+                %h4
+                  = description
+        .bike-edit-page-select
+          %span.menu-select-overlay
+            You are editing
+          %select
+            - @edit_templates.each do |template, description|
+              %option{ selected: (@edit_template == template), value: template }
+                = description
+        .edit-bike-submit-wrapper
+          = submit_tag 'Save changes', class: 'btn btn-lg btn-primary'
+
+      .col-lg-8.form-well
+        .form-wrap
+          .edit-bike-form-header
+            %h3
+              = @edit_templates[@edit_template]
+
+          .related-fields.row
+            .form-group
+              = f.label :serial_number, class: 'form-control-label form-well-label'
+              .form-well-input
+                %p.form-control-static
+                  = @bike.serial_number
+                .below-input-help
+                  %a
+                    Submit serial correction
+            .form-group
+              = f.label :manufacturer, class: 'form-control-label form-well-label'
+              .form-well-input
+                %p.form-control-static
+                  = @bike.manufacturer_name
+                .below-input-help
+                  %a
+                    Submit Manufacturer Correction
+
+          .form-group.row.fancy-select.unfancy.unnested-field
+            = f.label :year, 'Model year', class: 'form-control-label form-well-label'
+            .form-well-input
+              - years = (1900..Time.now.year+1).to_a.reverse.map { |i| [i,i] }
+              = f.select :year, years, prompt: "Unsure or unknown", selected: Time.now.year
+            .right-input-help
+              %label
+                %input#bike_unknown_year{ type: 'checkbox', tabindex: -1 }
+                Unknown year
+
+          .form-group.row.unnested-field
+            = f.label :frame_model, class: 'form-control-label form-well-label'
+            .form-well-input
+              = f.text_field :frame_model, class: 'form-control'
+
+          .related-fields.row.no-divider-row
+            .form-group
+              = f.label :primary_frame_color, class: 'form-control-label form-well-label'
+              .form-well-input.fancy-select.unfancy
+                = f.collection_select(:primary_frame_color_id, Color.all, :id, :name, required: true, prompt: 'Choose color' )
+                %a.inline-input-help{ title: 'Color help', data: { toggle: 'popover', content: primary_color_help_content } }
+                  ?
+              .right-input-help
+                %a#add-secondary.optional-form-block{ data: { target: '#secondary-color', toggle: '#rm-secondary' } }
+                  %span.context-display-help
+                    +
+                  Add a color
+                %a#rm-secondary.optional-form-block.rm-block.currently-hidden{ data: {target: '#secondary-color', toggle: '#add-secondary' } }
+                  %span.context-display-help
+                    &ndash;
+                  Remove color
+            #secondary-color.form-group.hidden-other
+              = f.label :secondary_frame_color, class: 'form-control-label form-well-label'
+              .form-well-input.fancy-select.unfancy
+                = f.collection_select(:secondary_frame_color_id, Color.all, :id, :name, prompt: 'Choose color' )
+              .right-input-help
+                %a#add-tertiary.optional-form-block{ data: { target: '#tertiary-color', toggle: '#rm-tertiary' } }
+                  %span.context-display-help
+                    +
+                  Add a color
+                %a#rm-tertiary.optional-form-block.rm-block.currently-hidden{ data: {target: '#tertiary-color', toggle: '#add-tertiary' } }
+                  %span.context-display-help
+                    &ndash;
+                  Remove color
+            #tertiary-color.form-group.hidden-other
+              = f.label :tertiary_frame_color, class: 'form-control-label form-well-label'
+              .form-well-input.fancy-select.unfancy
+                = f.collection_select(:tertiary_frame_color_id, Color.all, :id, :name, prompt: 'Choose color' )
+
+
+          
+          
