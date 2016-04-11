@@ -41,7 +41,10 @@ $form-well-border-color: #e4e4e4;
   .hidden-other {
     margin-top: -1rem;
     display: none;
-    &.unhidden { margin-bottom: 1.5rem; }
+    &.unhidden {
+      margin-bottom: 1.5rem;
+      display: block;
+    }
   }
   .inline-input-help {
     @extend .form-circle-item;

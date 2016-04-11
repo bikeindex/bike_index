@@ -1,4 +1,5 @@
 = form_for @bike, multipart: true do |f|
+  = hidden_field_tag :edit_template, @edit_template
   .form-well-container.container
     .row
       = render partial: '/bikes/edit_primary_menu'
@@ -33,10 +34,10 @@
                         16in
                       %option{ value: WheelSize.find_by_iso_bsd(203).id }
                         12in
-                  .currently-hidden{ id: "#{side}_all" }
+                  .all-diams.currently-hidden{ id: "#{side}_all" }
                     = f.collection_select("#{side}_wheel_size_id".to_sym, WheelSize.all , :id, :select_value, prompt: 'All diameters')
                 .right-input-help
-                  %a.wh_sw.optional-form-block{ id: "show_#{side}_wheel_diams", data: { target: "##{side}_all", toggle: "#hide_#{side}_wheel_diams", action: 'swap', swap: "##{side}_standard" } }
+                  %a.wh_sw.show-all-diams.optional-form-block{ id: "show_#{side}_wheel_diams", data: { target: "##{side}_all", toggle: "#hide_#{side}_wheel_diams", action: 'swap', swap: "##{side}_standard" } }
                     Show more sizes
                   %a.wh_sw.optional-form-block.currently-hidden{ id: "hide_#{side}_wheel_diams", data: { target: "##{side}_standard", toggle: "#show_#{side}_wheel_diams", action: 'swap', swap: "##{side}_all" } }
                     Hide extra sizes

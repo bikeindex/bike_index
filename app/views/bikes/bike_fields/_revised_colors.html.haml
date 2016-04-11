@@ -1,6 +1,7 @@
 - classname ||= ''
 - primary_color_help_content = "The color of the frame and fork&mdash;not the wheels, cranks, or anything else. You can put a more detailed description in paint description (once you've registered), <em>this</em> is to get a general color to make searching easier"
-
+- display_secondary_color = @bike.secondary_frame_color_id.present?
+- display_tertiary_color = @bike.tertiary_frame_color_id.present?
 .related-fields.row{ class: classname }
   .form-group
     = f.label :primary_frame_color, class: 'form-control-label form-well-label'
@@ -9,28 +10,28 @@
       %a.inline-input-help{ title: 'Color help', data: { toggle: 'popover', content: primary_color_help_content } }
         ?
     .right-input-help
-      %a#add-secondary.optional-form-block{ data: { target: '#secondary-color', toggle: '#rm-secondary' } }
+      %a#add-secondary.optional-form-block{ class: ('currently-hidden' if display_secondary_color), data: { target: '#secondary-color', toggle: '#rm-secondary' } }
         %span.context-display-help
           +
         Add a color
-      %a#rm-secondary.optional-form-block.currently-hidden{ data: { target: '#secondary-color', toggle: '#add-secondary', action: 'rm-block' } }
+      %a#rm-secondary.optional-form-block{ class: ('currently-hidden' unless display_secondary_color), data: { target: '#secondary-color', toggle: '#add-secondary', action: 'rm-block' } }
         %span.context-display-help
           &ndash;
         Remove color
-  #secondary-color.form-group.hidden-other
+  #secondary-color.form-group.hidden-other{ class: ('unhidden' if display_secondary_color) }
     = f.label :secondary_frame_color, class: 'form-control-label form-well-label'
     .form-well-input.fancy-select.unfancy
       = f.collection_select(:secondary_frame_color_id, Color.all, :id, :name, prompt: 'Choose color' )
     .right-input-help
-      %a#add-tertiary.optional-form-block{ data: { target: '#tertiary-color', toggle: '#rm-tertiary' } }
+      %a#add-tertiary.optional-form-block{ class: ('currently-hidden' if display_tertiary_color), data: { target: '#tertiary-color', toggle: '#rm-tertiary' } }
         %span.context-display-help
           +
         Add a color
-      %a#rm-tertiary.optional-form-block.currently-hidden{ data: { target: '#tertiary-color', toggle: '#add-tertiary', action: 'rm-block' } }
+      %a#rm-tertiary.optional-form-block{ class: ('currently-hidden' unless display_tertiary_color), data: { target: '#tertiary-color', toggle: '#add-tertiary', action: 'rm-block' } }
         %span.context-display-help
           &ndash;
         Remove color
-  #tertiary-color.form-group.hidden-other
+  #tertiary-color.form-group.hidden-other{ class: ('unhidden' if display_tertiary_color) }
     = f.label :tertiary_frame_color, class: 'form-control-label form-well-label'
     .form-well-input.fancy-select.unfancy
       = f.collection_select(:tertiary_frame_color_id, Color.all, :id, :name, prompt: 'Choose color' )
