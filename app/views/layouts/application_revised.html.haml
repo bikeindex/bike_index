@@ -96,8 +96,11 @@
 
     - if current_page_content_page?
       = render '/shared/content_skeleton'
-    - elsif controller_name == 'bikes' && (action_name == 'edit' || action_name == 'update')
-      = render '/shared/edit_bike_skeleton'
+    - elsif controller_name == 'bikes'
+      - if %w(edit update).include?(action_name)
+        = render '/shared/edit_bike_skeleton'
+      - if %w(new create).include?(action_name)
+        = yield
     - else
       .container.main-container-wrap
         = yield

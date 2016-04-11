@@ -1,0 +1,17 @@
+%nav.col-lg-4.primary-edit-bike-menu
+  %ul
+    - @edit_templates.each do |template, description|
+      %li
+        - classname = @edit_template == template ? 'active' : ''
+        %a{ href: edit_bike_path(page: template), class: classname }
+          %h4
+            = description
+  .bike-edit-page-select
+    %span.menu-select-overlay
+      You are editing
+    %select
+      - @edit_templates.each do |template, description|
+        %option{ selected: (@edit_template == template), value: edit_bike_path(page: template) }
+          = description
+  .edit-bike-submit-wrapper
+    = submit_tag 'Save changes', class: 'btn btn-lg btn-primary'

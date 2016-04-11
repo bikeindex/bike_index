@@ -67,6 +67,18 @@ $form-well-border-color: #e4e4e4;
     padding-bottom: $vertical-height;
     .form-group { clear: both; }
   }
+  .form-group {
+    .radio-inline, .checkbox-inline { 
+      padding-top: .5em;
+      input[type="radio"], input[type="checkbox"] {
+        margin-top: .5em;
+      }
+    }
+  }
+  hr {
+    clear: both;
+    margin-top: 3*$vertical-height;
+  }
 }
 
 .form-well-container {
@@ -93,6 +105,7 @@ $form-well-border-color: #e4e4e4;
       padding-top: $vertical-height;
     }
     .no-divider-row::after { display: none; }
+    hr { margin-top: 5*$vertical-height } // It isn't cleared correctly on small screens
   }
 }
 
@@ -104,6 +117,9 @@ $form-well-border-color: #e4e4e4;
     .form-well-input-large { @include make-col-span(8); }
     .form-well-label { @include make-col-span(3); }
     .right-input-help { @include make-col-span(3); }
+  }
+  .secondary-form-well {
+    margin-top: 3*$vertical-height;
   }
 }
 

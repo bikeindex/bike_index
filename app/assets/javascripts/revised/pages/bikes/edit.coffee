@@ -9,8 +9,6 @@ class BikeIndex.BikesEdit extends BikeIndex
       pagespace.toggleUnknownYear()
     $('#bike_year').change (e) ->
       pagespace.updateYear()
-    $('a.optional-form-block').click (e) ->
-      new BikeIndex.OptionalFormUpdate(e)
     $('.bike-edit-page-select select').change (e) ->
       pagespace.updatePageLocation(this.value)
 

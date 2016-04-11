@@ -1,5 +1,7 @@
 class BikeIndex.FormWell extends BikeIndex
   constructor: ->
+    # Enable optional form update buttons
+    new BikeIndex.OptionalFormUpdate
     # Enable popovers
     placement = @popoverPlacement
     $('[data-toggle="popover"]').popover

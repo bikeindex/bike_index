@@ -1,34 +1,58 @@
 = form_for @bike, multipart: true do |f|
   .form-well-container.container
     .row
-      %nav.col-lg-4.primary-edit-bike-menu
-        %ul
-          - @edit_templates.each do |template, description|
-            %li
-              - classname = @edit_template == template ? 'active' : ''
-              %a{ href: edit_bike_path(page: template), class: classname }
-                %h4
-                  = description
-        .bike-edit-page-select
-          %span.menu-select-overlay
-            You are editing
-          %select
-            - @edit_templates.each do |template, description|
-              %option{ selected: (@edit_template == template), value: edit_bike_path(page: template) }
-                = description
-        .edit-bike-submit-wrapper
-          = submit_tag 'Save changes', class: 'btn btn-lg btn-primary'
-
+      = render partial: '/bikes/edit_primary_menu'
       .col-lg-8.form-well
-        /
-        /
-        /
-        / ABOVE THIS IS DUPLICATION
-        /
-
         .form-wrap
           .edit-bike-form-header
             %h3
-              = @edit_templates[@edit_template]
+              Wheels
+          - %w(front rear).each do |side|
+            .related-fields.row
+              .form-group
+                %label.form-control-label.form-well-label{for: "#{side}_standard"}
+                  #{side.titleize} wheel
+                .form-well-input.fancy-select-placeholder.unfancy
+                  .standard-diams{ id: "#{side}_standard"}
+                    %select.form-control
+                      %option{ value: '' }
+                        Choose diameter
+                      %option{ value: WheelSize.find_by_iso_bsd(622).id }
+                        700c (includes 29ers)
+                      %option{ value: WheelSize.find_by_iso_bsd(584).id }
+                        650b
+                      %option{ value: WheelSize.find_by_iso_bsd(630).id }
+                        27in
+                      %option{ value: WheelSize.find_by_iso_bsd(559).id }
+                        26in
+                      %option{ value: WheelSize.find_by_iso_bsd(406).id }
+                        20in
+                      %option{ value: WheelSize.find_by_iso_bsd(355).id }
+                        18in
+                      %option{ value: WheelSize.find_by_iso_bsd(305).id }
+                        16in
+                      %option{ value: WheelSize.find_by_iso_bsd(203).id }
+                        12in
+                  .currently-hidden{ id: "#{side}_all" }
+                    = f.collection_select("#{side}_wheel_size_id".to_sym, WheelSize.all , :id, :select_value, prompt: 'All diameters')
+                .right-input-help
+                  %a.wh_sw.optional-form-block{ id: "show_#{side}_wheel_diams", data: { target: "##{side}_all", toggle: "#hide_#{side}_wheel_diams", action: 'swap', swap: "##{side}_standard" } }
+                    Show more sizes
+                  %a.wh_sw.optional-form-block.currently-hidden{ id: "hide_#{side}_wheel_diams", data: { target: "##{side}_standard", toggle: "#show_#{side}_wheel_diams", action: 'swap', swap: "##{side}_all" } }
+                    Hide extra sizes
+            .form-group.row.unnested-field
+              %label.form-control-label.form-well-label
+                #{side.titleize} tire
+              %label.radio-inline
+                = f.radio_button "#{side}_tire_narrow".to_sym, 'true'
+                Narrow
+              %label.radio-inline
+                = f.radio_button "#{side}_tire_narrow".to_sym, 'false'
+                Wide
 
-          
+
+      .col-lg-8.form-well.secondary-form-well
+        .form-wrap
+          .edit-bike-form-header
+            %h3
+              Drivetrain

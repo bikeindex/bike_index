@@ -1,0 +1,36 @@
+- classname ||= ''
+- primary_color_help_content = "The color of the frame and fork&mdash;not the wheels, cranks, or anything else. You can put a more detailed description in paint description (once you've registered), <em>this</em> is to get a general color to make searching easier"
+
+.related-fields.row{ class: classname }
+  .form-group
+    = f.label :primary_frame_color, class: 'form-control-label form-well-label'
+    .form-well-input.fancy-select.unfancy
+      = f.collection_select(:primary_frame_color_id, Color.all, :id, :name, required: true, prompt: 'Choose color' )
+      %a.inline-input-help{ title: 'Color help', data: { toggle: 'popover', content: primary_color_help_content } }
+        ?
+    .right-input-help
+      %a#add-secondary.optional-form-block{ data: { target: '#secondary-color', toggle: '#rm-secondary' } }
+        %span.context-display-help
+          +
+        Add a color
+      %a#rm-secondary.optional-form-block.currently-hidden{ data: { target: '#secondary-color', toggle: '#add-secondary', action: 'rm-block' } }
+        %span.context-display-help
+          &ndash;
+        Remove color
+  #secondary-color.form-group.hidden-other
+    = f.label :secondary_frame_color, class: 'form-control-label form-well-label'
+    .form-well-input.fancy-select.unfancy
+      = f.collection_select(:secondary_frame_color_id, Color.all, :id, :name, prompt: 'Choose color' )
+    .right-input-help
+      %a#add-tertiary.optional-form-block{ data: { target: '#tertiary-color', toggle: '#rm-tertiary' } }
+        %span.context-display-help
+          +
+        Add a color
+      %a#rm-tertiary.optional-form-block.currently-hidden{ data: { target: '#tertiary-color', toggle: '#add-tertiary', action: 'rm-block' } }
+        %span.context-display-help
+          &ndash;
+        Remove color
+  #tertiary-color.form-group.hidden-other
+    = f.label :tertiary_frame_color, class: 'form-control-label form-well-label'
+    .form-well-input.fancy-select.unfancy
+      = f.collection_select(:tertiary_frame_color_id, Color.all, :id, :name, prompt: 'Choose color' )
