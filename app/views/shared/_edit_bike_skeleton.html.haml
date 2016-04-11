@@ -1,0 +1,21 @@
+= render partial: '/shared/form_errors', locals: { errors: @bike.errors }
+.form-well-header.container{ data: { template: @edit_template } }
+  .edit-bike-header
+    %h1
+      %span.large-display
+        Edit
+        = @bike.year
+        = @bike.manufacturer_name
+        = @bike.frame_model
+        = @bike.type unless @bike.type == 'bike'
+      %span.small-display
+        = @edit_templates[@edit_template]
+    - unless @bike.current_owner_exists
+      %p.edit-bike-title-submenu
+        Sent to 
+        %em
+          = @bike.owner_email
+        but it hasn't been claimed yet
+    %p.edit-bike-title-submenu
+      = link_to "View #{@bike.type.titleize}", bike_path(@bike)
+= yield

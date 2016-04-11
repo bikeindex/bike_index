@@ -1,125 +1,87 @@
 - serial_help_content = "Every bike has a unique serial number, it's how they are identified. To learn more or see some examples, go to #{link_to 'our serial page', serials_url, target: '_blank' } <small>(opens in a separate window)</small>."
-- primary_color_help_content = "The color of the frame and fork&mdash;not the wheels, cranks, or anything else. After registering you can give a more detailed description, <em>this</em> is to get a general color to make searching easier. Choose the option that fits best."
+
+= render partial: '/shared/form_errors', locals: { errors: @b_param.bike_errors }
 .form-well-header.container
   %h1
     Enter #{@bike.type} details
-.form-well-container.container
-  .row
-    .col-lg-8.col-lg-offset-2.form-well
-      = form_for @bike, multipart: true do |f|
-        - if @b_param.bike_errors.present?
-          .alert.alert-error
-            %a.close{'data-dismiss' => 'alert'} ×
-            %h4
-              Please fix the following 
-              = pluralize(@b_param.bike_errors.count, 'error')
-            %ul
-              - @b_param.bike_errors.each do |msg|
-                %li
-                  = msg
-        = f.hidden_field :b_param_id_token
-        - if @bike.location_id.present?
-          = f.hidden_field :location_id, value: @location.id
-        - if @bike.creation_organization_id.present?
-          = f.hidden_field :creation_organization_id
-        .form-group.row.unnested-field
-          = f.label :cycle_type_id, 'This is a', class: 'form-control-label form-well-label'
-          .form-well-input.fancy-select.unfancy
-            = f.collection_select(:cycle_type_id, CycleType.all, :id, :name, required: true, class: 'form-control')
+= form_for @bike, multipart: true do |f|
+  .form-well-container.container
+    .row
+      .col-lg-8.col-lg-offset-2.form-well
+        .form-wrap
+          = f.hidden_field :b_param_id_token
+          - if @bike.location_id.present?
+            = f.hidden_field :location_id, value: @location.id
+          - if @bike.creation_organization_id.present?
+            = f.hidden_field :creation_organization_id
+          .form-group.row.unnested-field
+            = f.label :cycle_type_id, 'This is a', class: 'form-control-label form-well-label'
+            .form-well-input.fancy-select.unfancy
+              = f.collection_select(:cycle_type_id, CycleType.all, :id, :name, required: true, class: 'form-control')
 
-        .form-group.row.unnested-field
-          = f.label :serial_number, class: 'form-control-label form-well-label'
-          .form-well-input
-            #serial-input
-              = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', placeholder: 'highly recommended', class: 'form-control'
-              %a.inline-input-help{ title: 'Serial help', data: { toggle: 'popover', content: serial_help_content } }
-                ?
-            #made-without-serial-input
+          .form-group.row.unnested-field
+            = f.label :serial_number, class: 'form-control-label form-well-label'
+            .form-well-input
+              #serial-input
+                = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', placeholder: 'highly recommended', class: 'form-control'
+                %a.inline-input-help{ title: 'Serial help', data: { toggle: 'popover', content: serial_help_content } }
+                  ?
+              #made-without-serial-input
+                %label
+                  = f.check_box :made_without_serial
+                  Made without serial
+              .below-input-help#made-without-serial-help
+                .hidden-other
+                  %a{ data: { toggle: 'modal', target: '#made-without-serial-modal' } }
+                    This #{@bike.type} was made without a serial number
+            .right-input-help
               %label
-                = f.check_box :made_without_serial
-                Made without serial
-            .below-input-help#made-without-serial-help
-              .hidden-other
-                %a{ data: { toggle: 'modal', target: '#made-without-serial-modal' } }
-                  This #{@bike.type} was made without a serial number
-          .right-input-help
-            %label
-              = f.check_box :has_no_serial, tabindex: -1
-              Missing serial
+                = f.check_box :has_no_serial, tabindex: -1
+                Missing serial
 
-        .related-fields.row
-          .form-group
-            = f.label :manufacturer_id, class: 'form-control-label form-well-label'
+          .related-fields.row
+            .form-group
+              = f.label :manufacturer_id, class: 'form-control-label form-well-label'
+              .form-well-input
+                - initial = @bike.manufacturer && { id: @bike.manufacturer.id, text: @bike.manufacturer.name }.to_json
+                = f.text_field :manufacturer_id, value: @bike.manufacturer && @bike.manufacturer.name, class: 'form-control unfancy', data: { initial: initial }
+                %span.below-input-help
+                  Select 'Other' if manufacturer isn't listed
+            .form-group.hidden-other
+              = f.label :manufacturer_other, 'Other manufacturer', class: 'form-control-label form-well-label'
+              .form-well-input
+                = f.text_field :manufacturer_other, class: 'form-control'
+
+          .form-group.row.fancy-select.unfancy.unnested-field
+            = f.label :year, 'Model year', class: 'form-control-label form-well-label'
             .form-well-input
-              - initial = @bike.manufacturer && { id: @bike.manufacturer.id, text: @bike.manufacturer.name }.to_json
-              = f.text_field :manufacturer_id, value: @bike.manufacturer && @bike.manufacturer.name, class: 'form-control unfancy', data: { initial: initial }
-              %span.below-input-help
-                Select 'Other' if manufacturer isn't listed
-          .form-group.hidden-other
-            = f.label :manufacturer_other, 'Other manufacturer', class: 'form-control-label form-well-label'
-            .form-well-input
-              = f.text_field :manufacturer_other, class: 'form-control'
-
-        .form-group.row.fancy-select.unfancy.unnested-field
-          = f.label :year, 'Model year', class: 'form-control-label form-well-label'
-          .form-well-input
-            - years = (1900..Time.now.year+1).to_a.reverse.map { |i| [i,i] }
-            = f.select :year, years, prompt: "Unsure or unknown", selected: Time.now.year
-          .right-input-help
-            %label
-              %input#bike_unknown_year{ type: 'checkbox', tabindex: -1 }
-              Unknown year
-
-        .form-group.row.unnested-field
-          = f.label :frame_model, class: 'form-control-label form-well-label'
-          .form-well-input
-            = f.text_field :frame_model, required: true, class: 'form-control'
-
-        .related-fields.row
-          .form-group
-            = f.label :primary_frame_color, class: 'form-control-label form-well-label'
-            .form-well-input.fancy-select.unfancy
-              = f.collection_select(:primary_frame_color_id, Color.all, :id, :name, required: true, prompt: 'Choose color' )
-              %a.inline-input-help{ title: 'Color help', data: { toggle: 'popover', content: primary_color_help_content } }
-                ?
+              - years = (1900..Time.now.year+1).to_a.reverse.map { |i| [i,i] }
+              = f.select :year, years, prompt: "Unsure or unknown", selected: Time.now.year
             .right-input-help
-              %a#add-secondary.optional-form-block{ data: { target: '#secondary-color', toggle: '#rm-secondary' } }
-                %span.context-display-help
-                  +
-                Add a color
-              %a#rm-secondary.optional-form-block.rm-block.currently-hidden{ data: {target: '#secondary-color', toggle: '#add-secondary' } }
-                %span.context-display-help
-                  &ndash;
-                Remove color
-          #secondary-color.form-group.hidden-other
-            = f.label :secondary_frame_color, class: 'form-control-label form-well-label'
-            .form-well-input.fancy-select.unfancy
-              = f.collection_select(:secondary_frame_color_id, Color.all, :id, :name, required: true, prompt: 'Choose color' )
-            .right-input-help
-              %a#add-tertiary.optional-form-block{ data: { target: '#tertiary-color', toggle: '#rm-tertiary' } }
-                %span.context-display-help
-                  +
-                Add a color
-              %a#rm-tertiary.optional-form-block.rm-block.currently-hidden{ data: {target: '#tertiary-color', toggle: '#add-tertiary' } }
-                %span.context-display-help
-                  &ndash;
-                Remove color
-          #tertiary-color.form-group.hidden-other
-            = f.label :tertiary_frame_color, class: 'form-control-label form-well-label'
-            .form-well-input.fancy-select.unfancy
-              = f.collection_select(:tertiary_frame_color_id, Color.all, :id, :name, required: true, prompt: 'Choose color' )
-        - if @b_param.display_email?
-          .form-group.row.unnested-field.last-form-group
-            = f.label :owner_email, class: 'form-control-label form-well-label'
+              %label
+                %input#bike_unknown_year{ type: 'checkbox', tabindex: -1 }
+                Unknown year
+
+          .form-group.row.unnested-field
+            = f.label :frame_model, class: 'form-control-label form-well-label'
             .form-well-input
-              - email = @bike.owner_email || current_user && current_user.email
-              = f.text_field :owner_email, value: email, required: true, placeholder: 'highly recommended', class: 'form-control'
-      .register-button-wrapper
+              = f.text_field :frame_model, class: 'form-control'
+          
+          - classname = (@b_param.display_email? ? '' : 'no-divider-row')
+          = render partial: '/bikes/bike_fields/revised_colors', locals: { f: f, classname: classname }
+
+          - if @b_param.display_email?
+            .form-group.row.unnested-field.no-divider-row
+              = f.label :owner_email, class: 'form-control-label form-well-label'
+              .form-well-input
+                - email = @bike.owner_email || current_user && current_user.email
+                = f.email_field :owner_email, value: email, required: true, placeholder: 'required', class: 'form-control'
+      .new-bike-submit-wrapper
         = submit_tag 'Register', class: 'btn btn-lg btn-primary'
 
 
 .modal.fade#made-without-serial-modal
-  .modal-dialog{:role => 'document'}
+  .modal-dialog{role: 'document'}
     .modal-content
       .modal-header
         %h2.modal-title

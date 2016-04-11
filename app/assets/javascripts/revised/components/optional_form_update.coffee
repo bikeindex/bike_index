@@ -1,31 +1,34 @@
 class BikeIndex.OptionalFormUpdate extends BikeIndex
-  constructor: (e) ->
+  constructor: ->
+    updateForm = @updateForm
+    # Add optional parameter for use when triggering manually
+    $('a.optional-form-block').click (e, erase = true) ->
+      updateForm(e, erase)
+
+  updateForm: (e, erase) ->
     $target = $(e.target)
     unless $target.is('a') # Ensure we aren't clicking on an interior element
       $target = $target.parents('.optional-form-block')
     $click_target = $($target.attr('data-target'))
     $($target.attr('data-toggle')).show().removeClass('currently-hidden')
     $target.addClass('currently-hidden').hide()
-    if $target.hasClass('wh_sw')
-      @updateWheels($target, $click_target)
-    else
-      if $target.hasClass('rm-block')
-        $click_target.slideUp().removeClass('unhidden').addClass('currently-hidden')
-        selectize = $click_target.find('select').selectize()[0]
-        selectize.selectize.setValue('') if selectize
-      else
-        console.log $click_target.slideDown()
+    action = $target.attr('data-action')
+
+    if action == 'rm-block'
+      $click_target.slideUp 'fast', ->
+        $click_target.removeClass('unhidden').addClass('currently-hidden')
+
+    else if action == 'swap'
+      $swap = $($target.attr('data-swap'))
+      $swap.slideUp 'fast', ->
+        $click_target.fadeIn()
+        $click_target.slideDown().addClass('unhidden').removeClass('currently-hidden')
+        $swap.addClass('currently-hidden').removeClass('unhidden')
+
+    else # It is showing a block. No action label required
+      $click_target.slideDown 'fast', ->
         $click_target.slideDown().addClass('unhidden').removeClass('currently-hidden')
 
-  updateWheels: ($target, $click_target) ->
-    $standard = $click_target.parents('.controls').find('.standard-diams')
-    $all = $click_target.parents('.controls').find('.all-dims')
-    if $target.hasClass('show-all')
-      $standard.fadeOut('fast', ->
-        $click_target.fadeIn()
-      )
-    else
-      $all.fadeOut('fast', ->
-        $standard.find('select').selectize()[0].selectize.setValue(all.find('select').val())
-        $standard.fadeIn()
-      )
+    if erase
+      selectize = $click_target.find('select').selectize()[0]
+      selectize.selectize.setValue('') if selectize

@@ -1,0 +1,123 @@
+= form_for @bike, multipart: true do |f|
+  .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
+    .row
+      = render partial: '/bikes/edit_primary_menu'
+      .col-lg-8.form-well
+        .form-wrap
+          .edit-bike-form-header
+            %h3
+              Wheels
+
+
+          - %w(front rear).each do |side|
+            .related-fields.row
+              .form-group
+                %label.form-control-label.form-well-label{for: "#{side}_standard"}
+                  #{side.titleize} wheel
+                .form-well-input.fancy-select-placeholder.unfancy
+                  .standard-diams{ id: "#{side}_standard"}
+                    %select.form-control
+                      %option{ value: '' }
+                        Choose diameter
+                      %option{ value: WheelSize.find_by_iso_bsd(622).id }
+                        700c (includes 29ers)
+                      %option{ value: WheelSize.find_by_iso_bsd(584).id }
+                        650b
+                      %option{ value: WheelSize.find_by_iso_bsd(630).id }
+                        27in
+                      %option{ value: WheelSize.find_by_iso_bsd(559).id }
+                        26in
+                      %option{ value: WheelSize.find_by_iso_bsd(406).id }
+                        20in
+                      %option{ value: WheelSize.find_by_iso_bsd(355).id }
+                        18in
+                      %option{ value: WheelSize.find_by_iso_bsd(305).id }
+                        16in
+                      %option{ value: WheelSize.find_by_iso_bsd(203).id }
+                        12in
+                  .all-diams.currently-hidden{ id: "#{side}_all" }
+                    = f.collection_select("#{side}_wheel_size_id".to_sym, WheelSize.all , :id, :select_value, prompt: 'All diameters')
+                .right-input-help
+                  %a.wh_sw.show-all-diams.optional-form-block{ id: "show_#{side}_wheel_diams", data: { target: "##{side}_all", toggle: "#hide_#{side}_wheel_diams", action: 'swap', swap: "##{side}_standard" } }
+                    Show more sizes
+                  %a.wh_sw.optional-form-block.currently-hidden{ id: "hide_#{side}_wheel_diams", data: { target: "##{side}_standard", toggle: "#show_#{side}_wheel_diams", action: 'swap', swap: "##{side}_all" } }
+                    Hide extra sizes
+            .form-group.row.unnested-field
+              %label.form-control-label.form-well-label
+                #{side.titleize} tire
+              .form-well-input
+                %label.radio-inline
+                  = f.radio_button "#{side}_tire_narrow".to_sym, 'true'
+                  Narrow
+                %label.radio-inline
+                  = f.radio_button "#{side}_tire_narrow".to_sym, 'false'
+                  Wide
+
+
+        .form-wrap.secondary-form-wrap#edit_drivetrain
+          .edit-bike-form-header
+            %h3
+              Drivetrain
+          - rear_fixed = RearGearType.fixed.first.id
+          - front_fixed = FrontGearType.fixed.first.id
+          - fixed = @bike.rear_gear_type_id == rear_fixed
+          .form-group.row.unnested-field
+            %label.form-control-label.form-well-label
+              Drivetrain type
+            %label.checkbox-inline
+              %input#fixed_gear_check.checkbox.drive-check{ type: "checkbox", checked: fixed }
+              Fixed
+            %label.checkbox-inline.not-fixed
+              = f.check_box :coaster_brake
+              Coaster Brake
+            %label.checkbox-inline.not-fixed
+              = f.check_box :belt_drive
+              Belt Drive
+
+          .related-fields.row.fancy-select.unfancy.not-fixed.no-divider-row
+            .form-group
+              %label.form-control-label.form-well-label{ for: 'front_gear_select'}
+                Front gears
+              .form-well-input
+                %select#front_gear_select.form-control
+                  %option.placeholder{ value: ''}
+                    Select chainring count
+                  - FrontGearType.standard.each do |gt|
+                    %option{ value: gt.count }
+                      = gt.name
+              .right-input-help
+                - f_internal = (@bike.front_gear_type ? @bike.front_gear_type.internal : false)
+                %label
+                  %input#front_gear_select_internal.drive-check{ type: 'checkbox', checked: f_internal }
+                  Internal front gears
+              .currently-hidden#front_gear_select_value{ data: { initialcount: (@bike.front_gear_type.count if @bike.front_gear_type), fixed: front_fixed } }
+                = f.radio_button 'front_gear_type_id', nil, class: 'no-gear-selected'
+                - FrontGearType.all.each do |gt|
+                  = f.radio_button 'front_gear_type_id', gt.id, class: "count_#{gt.count} internal_#{gt.internal}", data: { count: gt.count }
+
+          .related-fields.row.fancy-select.unfancy.not-fixed.no-divider-row
+            .form-group
+              %label.form-control-label.form-well-label{ for: 'rear_gear_select' }
+                Rear gears
+              .form-well-input
+                %select#rear_gear_select.form-control
+                  %option.placeholder{ value: '' }
+                    Select cog count
+                  - RearGearType.standard.each do |gt|
+                    %option{ value: gt.count }
+                      = gt.name
+              .right-input-help
+                - r_internal = (@bike.rear_gear_type ? @bike.rear_gear_type.internal : false)
+                %label
+                  %input#rear_gear_select_internal.drive-check{ type: 'checkbox', checked: r_internal }
+                  Internal rear gears
+
+              .currently-hidden#rear_gear_select_value{ data: { initialcount: (@bike.rear_gear_type.count if @bike.rear_gear_type), fixed: rear_fixed } }
+                = f.radio_button 'rear_gear_type_id', nil, class: 'no-gear-selected'
+                - RearGearType.all.each do |gt|
+                  - if gt.id == rear_fixed
+                    = f.radio_button 'rear_gear_type_id', gt.id
+                  - else
+                    = f.radio_button 'rear_gear_type_id', gt.id, class: "count_#{gt.count} internal_#{gt.internal}", data: {count: gt.count }
+
+

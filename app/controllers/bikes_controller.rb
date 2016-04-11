@@ -118,7 +118,7 @@ class BikesController < ApplicationController
     find_or_new_b_param
     # Let them know if they sent an invalid b_param token
     flash[:notice] = "Sorry! We couldn't find that bike" if @b_param.id.blank? && params[:b_param_token].present?
-    @bike = @b_param.bike_from_attrs(stolen: params[:stolen])
+    @bike ||= @b_param.bike_from_attrs(stolen: params[:stolen])
     render :new_revised, layout: 'application_revised'
   end
 
@@ -186,7 +186,7 @@ class BikesController < ApplicationController
     @bike = BikeCreator.new(@b_param).create_bike
     if @bike.errors.any?
       @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
-      render action: :new, layout: 'no_header'
+      redirect_to new_bike_url(b_param_token: @b_param.id_token)
     else
       redirect_to edit_bike_url(@bike), notice: "Bike successfully added to the index!"
     end
@@ -203,8 +203,13 @@ class BikesController < ApplicationController
         flash[:error] = e.message
         redirect_to bike_path(@bike) and return
     end
-    @private_images = PublicImage.unscoped.where(imageable_type: 'Bike').where(imageable_id: @bike.id).where(is_private: true)
-    @bike = @bike.decorate
+    if revised_layout_enabled?
+      @edit_template = edit_templates[params[:page]].present? ? params[:page] : edit_templates.keys.first
+      render "edit_#{@edit_template}".to_sym, layout: 'application_revised'
+    else
+      @private_images = PublicImage.unscoped.where(imageable_type: 'Bike').where(imageable_id: @bike.id).where(is_private: true)
+      @bike = @bike.decorate
+    end
   end
 
 
@@ -222,8 +227,23 @@ class BikesController < ApplicationController
     else
       flash[:notice] = "Bike successfully updated!"
       return if return_to_if_present
-      redirect_to edit_bike_url(@bike), layout: 'no_header' and return
+      if params[:edit_template].present?
+        redirect_to edit_bike_url(@bike, page: params[:edit_template]), layout: 'no_header' and return
+      else
+        redirect_to edit_bike_url(@bike), layout: 'no_header' and return
+      end
     end
+  end
+
+  def edit_templates
+    @edit_templates ||= {
+      root: 'Bike Details',
+      photos: 'Photos',
+      drivetrain: 'Wheels + Drivetrain',
+      accessories: 'Accessories + Components',
+      ownership: 'Change Owner or Delete',
+      stolen: (@bike.stolen ? 'Stolen report' : 'Report Stolen or Missing')
+    }.as_json
   end
 
   protected

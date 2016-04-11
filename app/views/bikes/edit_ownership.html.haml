@@ -1,0 +1,74 @@
+= form_for @bike, multipart: true do |f|
+  .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
+    .row
+      = render partial: '/bikes/edit_primary_menu'
+      .col-lg-8.form-well
+        .form-wrap
+          .edit-bike-form-header
+            %h3
+              #{@edit_templates[@edit_template]} #{@bike.type}
+
+          .form-group.row.unnested-field.no-divider-row
+            = f.label :owner_email, class: 'form-control-label form-well-label'
+            .form-well-input
+              = f.email_field :owner_email, required: true, class: 'form-control'
+
+          %hr
+          
+          .related-fields.row.hide-this-bike.no-divider-row
+            - hide_toggle = @bike.user_hidden ? 'Un-hide' : 'Hide'
+            .hide-this-bike-link
+              %a.collapsed{ href: '#hide_bike_toggle_group', data: { toggle: 'collapse' } }
+                #{hide_toggle} this #{@bike.type}
+            #hide_bike_toggle_group.collapse
+              - if @bike.user_hidden
+                = f.hidden_field :marked_user_unhidden
+              - else
+                = f.hidden_field :marked_user_hidden
+              .hide-explanation
+                %p
+                  %strong
+                    Keeping your bike public is the best way to help recover stolen bikes and deter theft.
+                %p
+                  You can read more about why this is important to us in our #{link_to "FAQs", support_path(anchor: 'public-serials')}.
+                %p
+                  We strongly recommend keeping your #{@bike.type} visible, but you can hide this #{@bike.type} if you prefer. Even though we don't think it's a good idea.
+                - btn_type = @bike.user_hidden ? 'btn-success' : 'btn-danger'
+                %a#hide_bike_toggle.btn.btn-lg{role: 'button', class: btn_type}
+                  #{hide_toggle} #{@bike.type}
+
+          %hr
+
+          .delete-from-index.no-divider-row
+            %a{data: { toggle: 'modal', target: "#request-bike-delete" } }
+              = render '/shared/trash_icon'
+              Delete this #{@bike.type} from the Bike Index
+
+
+.modal.fade#request-bike-delete{ data: {url: ENV['BASE_URL'] + send_request_api_v1_users_path } }
+  .modal-dialog{role: 'document'}
+    .modal-content
+      .modal-header
+        %h2.modal-title
+          Are you sure you want to delete this #{@bike.type}?
+          %button.close{'aria-label' => 'Close', 'data-dismiss' => 'modal', type: 'button'}
+            %span{'aria-hidden' => 'true'} &times;
+        %hr
+      .modal-body
+        #request-delete-error.alert.alert-error
+          %button.close{'aria-label' => 'Close', 'data-dismiss' => 'modal', type: 'button'}
+            %span{'aria-hidden' => 'true'} &times;
+          %h4
+            We want to know why!
+          %p
+            Please fill in the reason for the bike deletion
+        = form_tag  do |t|
+          = hidden_field_tag :bike_delete_bike_id, @bike.id
+          .form-group
+            %label{ for: :bike_delete_reason }
+              Reason for deletion
+            = text_area_tag :bike_delete_reason, '', class: 'form-control'
+          .form-group
+            %a#request-bike-delete-btn.btn.btn-danger{ href: '#' }
+              Delete bike
+              

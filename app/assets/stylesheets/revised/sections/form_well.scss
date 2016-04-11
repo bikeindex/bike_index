@@ -1,4 +1,5 @@
 $form-well-background: $gray-lighter;
+$form-well-border-color: #e4e4e4;
 
 .form-well-header { padding-top: 8*$vertical-height; }
 
@@ -13,7 +14,8 @@ $form-well-background: $gray-lighter;
 }
 
 .form-well {
-  form { padding: 2*$vertical-height 0; }
+  label { text-transform: capitalize; }
+  .form-wrap { padding: 2*$vertical-height 0 4*$vertical-height; }
   .below-input-help {
     @extend small;
     display: block;
@@ -35,12 +37,15 @@ $form-well-background: $gray-lighter;
     @extend .form-circle-item;
     display: inline-block;
     background: #fff;
-    border: 1px solid #e4e4e4;
+    border: 1px solid $form-well-border-color;
   }
   .hidden-other {
     margin-top: -1rem;
     display: none;
-    &.unhidden { margin-bottom: 1.5rem; }
+    &.unhidden {
+      margin-bottom: 1.5rem;
+      display: block;
+    }
   }
   .inline-input-help {
     @extend .form-circle-item;
@@ -57,14 +62,26 @@ $form-well-background: $gray-lighter;
       color: $link-color;
     }
   }
-  .fancy-select .inline-input-help { right: 2.5em; } // To not cover up select pointer
+  .fancy-select .inline-input-help { right: 2.75em; } // To not cover up select pointer
   .currently-hidden { display: none; }
-  .form-well-label, .form-well-input, .right-input-help {
+  .form-well-label, .form-well-input, .form-well-input-large, .right-input-help {
     @include make-col(); 
   }
   .related-fields {
     padding-bottom: $vertical-height;
     .form-group { clear: both; }
+  }
+  .form-group {
+    .radio-inline, .checkbox-inline { 
+      padding-top: .5em;
+      input[type="radio"], input[type="checkbox"] {
+        margin-top: .6em;
+      }
+    }
+  }
+  hr {
+    clear: both;
+    margin-top: 3*$vertical-height;
   }
 }
 
@@ -76,7 +93,7 @@ $form-well-background: $gray-lighter;
 // XS screens
 @media (max-width: $grid-breakpoint-sm - 1px) {
   .form-well {
-    .form-well-input { @include make-col-span(8); }
+    .form-well-input, .form-well-input-large { @include make-col-span(8); }
     .form-well-label { @include make-col-span(4); }
     .right-input-help {
       @include make-col-offset(4);
@@ -91,15 +108,17 @@ $form-well-background: $gray-lighter;
       border-bottom: 1px #b2b2b2 solid;
       padding-top: $vertical-height;
     }
-    .last-form-group::after { display: none; }
+    .no-divider-row::after { display: none; }
+    hr { margin-top: 5*$vertical-height } // It isn't cleared correctly on small screens
   }
 }
 
-// 
+//
 // Small screens and larger
 @media (min-width: $grid-breakpoint-sm) {
   .form-well {
-    .form-well-input {  @include make-col-span(6); }
+    .form-well-input { @include make-col-span(6); }
+    .form-well-input-large { @include make-col-span(8); }
     .form-well-label { @include make-col-span(3); }
     .right-input-help { @include make-col-span(3); }
   }
@@ -113,17 +132,39 @@ $form-well-background: $gray-lighter;
 }
 
 @media (min-width: $grid-breakpoint-md) and (max-width: $grid-breakpoint-lg - 1px) {
-  .form-well { background: $form-well-background; }
+  .form-well {
+    background: $form-well-background;
+    border: 1px solid $form-well-border-color;
+  }
 }
-// 
+
+//
+// Everything but large screens
+@media (max-width: $grid-breakpoint-lg - 1px) {
+  // Remove some padding between the forms
+  .form-well {
+    .form-wrap.secondary-form-wrap {
+      padding-top: 0; 
+      margin-top: -2*$vertical-height
+    }
+  }
+}
+
+//
 // Large screen styles
 @media (min-width: $grid-breakpoint-lg) {
   .form-well-header { padding-top: 12*$vertical-height; } // Just like in main_container_wrap
-  .form-well form {
+  .form-well { border: none; background: none; }
+  .form-well .form-wrap {
     background: $form-well-background;
-    padding: 4*$vertical-height 0 2*$vertical-height;
+    border: 1px solid $form-well-border-color;
+    padding-top: 4*$vertical-height;
     width: 100%;
     position: relative;
     .form-control-label { text-align: right; }
+    // Add some space between the forms
+    &.secondary-form-wrap {
+      margin-top: 3*$vertical-height;
+    }
   }
 }

@@ -1,4 +1,4 @@
-module ApplicationHelper 
+module ApplicationHelper
   def nav_link(link_text, link_path, match_controller: false, class_name: '')
     class_name += ' active' if current_page_active(link_path, match_controller: match_controller)
     link_to(raw(link_text), link_path, class: class_name).html_safe

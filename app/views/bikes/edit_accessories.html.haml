@@ -1,0 +1,16 @@
+= form_for @bike, multipart: true do |f|
+  .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
+    .row
+      = render partial: '/bikes/edit_primary_menu'
+      .col-lg-8.form-well
+        .form-wrap
+          .edit-bike-form-header
+            %h3
+              = @edit_templates[@edit_template]
+
+
+          .form-group.row.unnested-field.no-divider-row
+            = f.label :handlebar_type_id, class: 'form-control-label form-well-label'
+            .form-well-input.fancy-select-placeholder.unfancy
+              = f.collection_select(:handlebar_type_id, HandlebarType.all, :id, :name, prompt: ' ')
+          %hr

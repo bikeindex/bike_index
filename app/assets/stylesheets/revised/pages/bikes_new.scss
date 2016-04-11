@@ -1,4 +1,5 @@
 #bikes_new {
+  .form-wrap { padding-bottom: 2*$vertical-height; } // Because submit is below, smaller padding
   .form-control.absent-serial {
     background: darken(white, 10%);
     color: $gray-light;
@@ -31,7 +32,8 @@
     }
   }
   // On new bike registration, this is the wrapper
-  .register-button-wrapper {
+  .new-bike-submit-wrapper {
+    clear: both; // For full size, ensure break from container
     padding-top: $vertical-height;
     width: 100%;
     text-align: center;

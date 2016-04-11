@@ -1,0 +1,43 @@
+.edit-bike-page-ownership {
+  .delete-from-index {
+    max-width: 300px;
+    margin: 0 auto;
+    display: block;
+    padding-top: 2*$vertical-height;
+    a {
+      cursor: pointer;
+      color: $body-font-color;
+      &:hover, &:active, &.active {
+        color: $link-color;
+        text-decoration: none;
+      }
+    }
+    .trash-can-icon {
+      float: left;
+      margin-top: -6px;
+      @include trash-can-icon($body-font-color, $link-color, $form-well-background, 42px);
+    }
+  }
+
+  .hide-this-bike {
+    padding: $vertical-height 0.9375rem 0;
+    .hide-this-bike-link { 
+      color: $body-font-color;
+      display: block;
+      text-align: center;
+      &:hover, &:active, &.active {
+        text-decoration: none;
+        color: $link-color;
+      }
+    }
+  }
+}
+
+@media (min-width: $grid-breakpoint-md) {
+  .edit-bike-page-ownership .hide-this-bike {
+    padding: $vertical-height 2*0.9375rem 0;
+  }
+}
+
+// Have to overpower the modal show css
+#request-bike-delete #request-delete-error { display: none; }
