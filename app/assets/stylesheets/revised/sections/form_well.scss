@@ -14,6 +14,7 @@ $form-well-border-color: #e4e4e4;
 }
 
 .form-well {
+  label { text-transform: capitalize; }
   .form-wrap { padding: 2*$vertical-height 0 4*$vertical-height; }
   .below-input-help {
     @extend small;
@@ -74,7 +75,7 @@ $form-well-border-color: #e4e4e4;
     .radio-inline, .checkbox-inline { 
       padding-top: .5em;
       input[type="radio"], input[type="checkbox"] {
-        margin-top: .5em;
+        margin-top: .6em;
       }
     }
   }
@@ -112,7 +113,7 @@ $form-well-border-color: #e4e4e4;
   }
 }
 
-// 
+//
 // Small screens and larger
 @media (min-width: $grid-breakpoint-sm) {
   .form-well {
@@ -120,9 +121,6 @@ $form-well-border-color: #e4e4e4;
     .form-well-input-large { @include make-col-span(8); }
     .form-well-label { @include make-col-span(3); }
     .right-input-help { @include make-col-span(3); }
-  }
-  .secondary-form-well {
-    margin-top: 3*$vertical-height;
   }
 }
 
@@ -139,7 +137,20 @@ $form-well-border-color: #e4e4e4;
     border: 1px solid $form-well-border-color;
   }
 }
-// 
+
+//
+// Everything but large screens
+@media (max-width: $grid-breakpoint-lg - 1px) {
+  // Remove some padding between the forms
+  .form-well {
+    .form-wrap.secondary-form-wrap {
+      padding-top: 0; 
+      margin-top: -2*$vertical-height
+    }
+  }
+}
+
+//
 // Large screen styles
 @media (min-width: $grid-breakpoint-lg) {
   .form-well-header { padding-top: 12*$vertical-height; } // Just like in main_container_wrap
@@ -151,5 +162,9 @@ $form-well-border-color: #e4e4e4;
     width: 100%;
     position: relative;
     .form-control-label { text-align: right; }
+    // Add some space between the forms
+    &.secondary-form-wrap {
+      margin-top: 3*$vertical-height;
+    }
   }
 }

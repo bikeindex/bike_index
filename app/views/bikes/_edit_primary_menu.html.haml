@@ -14,4 +14,5 @@
         %option{ selected: (@edit_template == template), value: edit_bike_path(page: template) }
           = description
   .edit-bike-submit-wrapper
+    = hidden_field_tag :edit_template, @edit_template
     = submit_tag 'Save changes', class: 'btn btn-lg btn-primary'

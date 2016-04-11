@@ -14,7 +14,6 @@
     = auto_discovery_link_tag(:atom, news_index_url(format: "atom"), {title: "Bike Index news atom feed"})
 
   %body{ id: body_id }
-    = render 'layouts/messages'
     %nav.primary-header-nav
       .container
         %a.primary-logo{ href: user_root_url }
@@ -93,6 +92,7 @@
             = nav_link 'Community', '#', class_name: 'nav-link'
           %li.primary-nav-item
             = nav_link 'Search bikes', bikes_path, class_name: 'nav-link'
+    = render 'layouts/messages'
 
     - if current_page_content_page?
       = render '/shared/content_skeleton'

@@ -1,9 +1,9 @@
 - serial_help_content = "Every bike has a unique serial number, it's how they are identified. To learn more or see some examples, go to #{link_to 'our serial page', serials_url, target: '_blank' } <small>(opens in a separate window)</small>."
 
+= render partial: '/shared/form_errors', locals: { errors: @b_param.bike_errors }
 .form-well-header.container
   %h1
     Enter #{@bike.type} details
-  = render partial: '/shared/form_errors', locals: { errors: @b_param.bike_errors } 
 = form_for @bike, multipart: true do |f|
   .form-well-container.container
     .row

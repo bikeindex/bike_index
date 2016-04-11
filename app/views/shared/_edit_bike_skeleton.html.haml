@@ -1,3 +1,4 @@
+= render partial: '/shared/form_errors', locals: { errors: @bike.errors }
 .form-well-header.container#edit_page{ data: { template: @edit_template } }
   .edit-bike-header
     %h1
@@ -17,6 +18,4 @@
         but it hasn't been claimed yet
     %p.edit-bike-title-submenu
       = link_to "View #{@bike.type.titleize}", bike_path(@bike)
-  = render partial: '/shared/form_errors', locals: { errors: @bike.errors }
-
 = yield
