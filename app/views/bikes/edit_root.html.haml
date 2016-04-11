@@ -16,7 +16,7 @@
             You are editing
           %select
             - @edit_templates.each do |template, description|
-              %option{ selected: (@edit_template == template), value: template }
+              %option{ selected: (@edit_template == template), value: edit_bike_path(page: template) }
                 = description
         .edit-bike-submit-wrapper
           = submit_tag 'Save changes', class: 'btn btn-lg btn-primary'

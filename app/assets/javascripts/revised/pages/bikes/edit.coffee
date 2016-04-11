@@ -11,6 +11,8 @@ class BikeIndex.BikesEdit extends BikeIndex
       pagespace.updateYear()
     $('a.optional-form-block').click (e) ->
       new BikeIndex.OptionalFormUpdate(e)
+    $('.bike-edit-page-select select').change (e) ->
+      pagespace.updatePageLocation(this.value)
 
   updateYear: ->
     if $('#bike_year').val()
@@ -28,3 +30,6 @@ class BikeIndex.BikesEdit extends BikeIndex
     else
       year_select.setValue(new Date().getFullYear())
       year_select.enable()
+
+  updatePageLocation: (url) ->
+    window.location.href = url
