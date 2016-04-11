@@ -1,4 +1,4 @@
-class BikeIndex.BikesEditWheelsDrivetrain extends BikeIndex
+class BikeIndex.BikesEditDrivetrain extends BikeIndex
   constructor: ->
     @initializeEventListeners()
     @initializeWheelDiams(side) for side in ['front', 'rear']
@@ -12,8 +12,6 @@ class BikeIndex.BikesEditWheelsDrivetrain extends BikeIndex
       pagespace.toggleDrivetrainChecks(e)
     $('#edit_drivetrain select').change (e) ->
       pagespace.updateDrivetrainValue(e)
-    # 'change .drive-check': 'toggleDrivetrainChecks'
-    # 'change #edit_drivetrain select': 'updateDrivetrainValue'
 
   # 
   # Wheels

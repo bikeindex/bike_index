@@ -92,6 +92,9 @@ $grid-breakpoint-xl: 1200px;
 @import "revised/mixins/buttons";
 @import "revised/sections/modals";
 
+// Bike Index mixins
+@import "revised/mixins/trash_can_icon";
+
 // External styles
 @import "includes/selectize_bootstrap3.scss";
 
@@ -108,6 +111,7 @@ $grid-breakpoint-xl: 1200px;
 // page styles
 @import "revised/pages/bikes_new";
 @import "revised/pages/bikes_edit_root";
+@import "revised/pages/bikes_edit_ownership";
 
 html { background: $black-off; }
 body { min-height: 400px; }

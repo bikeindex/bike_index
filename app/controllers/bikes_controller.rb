@@ -239,7 +239,7 @@ class BikesController < ApplicationController
     @edit_templates ||= {
       root: 'Bike Details',
       photos: 'Photos',
-      wheels_drivetrain: 'Wheels + Drivetrain',
+      drivetrain: 'Wheels + Drivetrain',
       accessories: 'Accessories + Components',
       ownership: 'Change Owner or Delete',
       stolen: (@bike.stolen ? 'Stolen report' : 'Report Stolen or Missing')

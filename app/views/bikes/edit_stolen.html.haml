@@ -1,5 +1,5 @@
 = form_for @bike, multipart: true do |f|
-  .form-well-container.container
+  .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
       = render partial: '/bikes/edit_primary_menu'
       .col-lg-8.form-well
@@ -7,6 +7,5 @@
           .edit-bike-form-header
             %h3
               = @edit_templates[@edit_template]
-              /
-              /
-              /
+              
+              

@@ -454,7 +454,7 @@ describe BikesController do
             expect(response).to render_template('edit_root')
           end
         end
-        %w(root photos wheels_drivetrain accessories ownership stolen).each do |template|
+        %w(root photos drivetrain accessories ownership stolen).each do |template|
           context template do
             it 'renders the template' do
               get :edit, id: ownership.bike.id, page: template

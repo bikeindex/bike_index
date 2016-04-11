@@ -1,5 +1,5 @@
 = form_for @bike, multipart: true do |f|
-  .form-well-container.container
+  .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
       = render partial: '/bikes/edit_primary_menu'
       .col-lg-8.form-well
@@ -7,6 +7,8 @@
           .edit-bike-form-header
             %h3
               Wheels
+
+
           - %w(front rear).each do |side|
             .related-fields.row
               .form-group
@@ -72,7 +74,7 @@
               = f.check_box :belt_drive
               Belt Drive
 
-          .related-fields.row.fancy-select.unfancy.not-fixed
+          .related-fields.row.fancy-select.unfancy.not-fixed.no-divider-row
             .form-group
               %label.form-control-label.form-well-label{ for: 'front_gear_select'}
                 Front gears
@@ -93,7 +95,7 @@
                 - FrontGearType.all.each do |gt|
                   = f.radio_button 'front_gear_type_id', gt.id, class: "count_#{gt.count} internal_#{gt.internal}", data: { count: gt.count }
 
-          .related-fields.row.fancy-select.unfancy.not-fixed
+          .related-fields.row.fancy-select.unfancy.not-fixed.no-divider-row
             .form-group
               %label.form-control-label.form-well-label{ for: 'rear_gear_select' }
                 Rear gears

@@ -3,9 +3,10 @@ class BikeIndex.BikesEdit extends BikeIndex
     new BikeIndex.FormWell
     @initializeEventListeners()
     # Get the template name, call page specific Scripts if we have them
-    switch $('#edit_page').attr('data-template')
+    switch $('.form-well-header.container').attr('data-template')
       when 'root' then new BikeIndex.BikesEditRoot
-      when 'wheels_drivetrain' then new BikeIndex.BikesEditWheelsDrivetrain
+      when 'ownership' then new BikeIndex.BikesEditOwnership
+      when 'drivetrain' then new BikeIndex.BikesEditDrivetrain
 
   initializeEventListeners: ->
     pagespace = @
