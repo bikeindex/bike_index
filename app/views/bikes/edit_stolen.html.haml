@@ -7,5 +7,102 @@
           .edit-bike-form-header
             %h3
               = @edit_templates[@edit_template]
-              
-              
+          - if @bike.stolen and @bike.find_current_stolen_record.present?
+            / Helper text display
+            - stolen_type = @bike.recovered ? 'recovered' : 'stolen'
+            = f.fields_for :stolen_records do |srecord|
+              - next unless srecord.object.current
+              .form-group.row.unnested-field
+                = f.label :date_stolen_input, "When was it #{stolen_type}", class: 'form-well-label'
+                .form-well-input
+                  = f.text_field :date_stolen_input, required: true, class: 'form-control'
+
+              .form-group.row.unnested-field
+                = srecord.label :phone, class: 'form-well-label'
+                .form-well-input
+                  = srecord.text_field :phone, class: 'form-control'
+
+              .form-group.row.unnested-field
+                = srecord.label :secondary_phone, class: 'form-well-label'
+                .form-well-input
+                  = srecord.text_field :secondary_phone, class: 'form-control'
+
+              .related-fields.row
+                .form-group.fancy-select.unfancy
+                  %label.form-well-label
+                    Where was it stolen?
+                  .form-well-input
+                    = srecord.collection_select(:country_id, Country.all, :id, :name, required: true, prompt: 'Choose country')
+                .form-group
+                  %label.form-well-label
+                  .form-well-input
+                    = srecord.text_field :street, required: true, placeholder: 'Address or intersection', class: 'form-control'
+                .form-group
+                  %label.form-well-label
+                  .form-well-input
+                    = srecord.text_field :city, required: true, placeholder: 'City', class: 'form-control'
+                .form-group.fancy-select-placeholder.unfancy
+                  %label.form-well-label
+                  .form-well-input
+                    = srecord.collection_select(:state_id, State.all, :id, :name, include_blank: true, prompt: 'State')
+
+              - unless @bike.recovered
+                .form-group.row.unnested-field.fancy-select-placeholder.unfancy
+                  = srecord.label :locking_description, class:  'form-well-label'
+                  .form-well-input
+                    = srecord.select(:locking_description, StolenRecord.locking_description_select, prompt: '')
+                .form-group.row.unnested-field.fancy-select-placeholder.unfancy
+                  = srecord.label :lock_defeat_description, class:  'form-well-label'
+                  .form-well-input
+                    = srecord.select(:lock_defeat_description, StolenRecord.locking_defeat_description_select, prompt: '')
+
+              .form-group.row.unnested-field.fancy-select-placeholder.unfancy
+                - description_label = @bike.recovered ? "How did you recovered the #{@bike.type}" : 'Description of the incident'
+                = srecord.label :theft_description, description_label, class:  'form-well-label'
+                .form-well-input
+                  = srecord.text_area :theft_description, rows: 3, class: 'form-control'
+
+              .form-group.row.unnested-field
+                = srecord.label :police_report_number, 'Police report #', class: 'form-well-label'
+                .form-well-input
+                  = srecord.text_field :police_report_number, class: 'form-control'
+              .form-group.row.unnested-field.no-divider-row
+                = srecord.label :police_report_department, 'Department & city', class: 'form-well-label'
+                .form-well-input
+                  = srecord.text_field :police_report_department, class: 'form-control'
+
+              %hr
+              .form-group.row.unnested-field.full-width-section.no-divider-row
+                %label
+                  = srecord.check_box :proof_of_ownership
+                  Do you have proof of ownership of this #{@bike.type}?
+                .full-width-checkbox-help
+                  If this #{@bike.type} was added to the Index by a bike shop, that counts as proof of ownership
+              %hr
+              .form-group.row.unnested-field.full-width-section.no-divider-row
+                %label
+                  = srecord.check_box :receive_notifications
+                  Receive notifications from the Bike Index about this stolen #{@bike.type}
+                .full-width-checkbox-help
+                  e.g. if we tweet about or see someone searching for its serial number
+          - else
+            = f.hidden_field :stolen
+            .mark-bike-stolen.no-divider-row
+              %a.btn.btn-danger.btn-lg{data: { toggle: 'modal', target: '#mark-bike-stolen' } }
+                This #{@bike.type} is stolen or missing!
+
+
+- modal_body = capture_haml do
+  .modal-body
+    %p
+      Is your #{@bike.type} actually missing or stolen?
+  .modal-btn-footer
+    .col-xs-6
+      %button.btn.btn-secondary{'data-dismiss' => 'modal', type: 'button'}
+        Nevermind
+    .col-xs-6
+      %button.btn.btn-danger#mark-bike-stolen-btn{type: 'button'}
+        Yes, it is!
+
+= render partial: '/shared/modal', locals: { title: 'Oh no!', id: 'mark-bike-stolen', modal_body: modal_body }
+  

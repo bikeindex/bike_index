@@ -116,7 +116,11 @@ protected
       hash[:meta_tags][:description] = t "meta_descriptions.bikes_new_stolen"
     end
     if action_name == 'edit'
-      hash[:title_tag][:title] = "Edit #{@bike.title_string}"
+      if @edit_templates.present?
+        hash[:title_tag][:title] = "#{@edit_templates[@edit_template]} - #{@bike.title_string}"
+      else
+        hash[:title_tag][:title] = "Edit #{@bike.title_string}"
+      end
     end
     if action_name == 'show'
       hash[:title_tag][:title] = "#{'Stolen ' if @bike.stolen }#{@bike.title_string}"

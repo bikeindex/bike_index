@@ -20,7 +20,8 @@
   }
 
   .hide-this-bike {
-    padding: $vertical-height 0.9375rem 0;
+    @extend .full-width-section;
+    padding-top: $vertical-height;
     .hide-this-bike-link { 
       color: $body-font-color;
       display: block;
@@ -32,12 +33,3 @@
     }
   }
 }
-
-@media (min-width: $grid-breakpoint-md) {
-  .edit-bike-page-ownership .hide-this-bike {
-    padding: $vertical-height 2*0.9375rem 0;
-  }
-}
-
-// Have to overpower the modal show css
-#request-bike-delete #request-delete-error { display: none; }

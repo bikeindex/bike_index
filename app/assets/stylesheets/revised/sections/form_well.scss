@@ -23,6 +23,10 @@ $form-well-border-color: #e4e4e4;
     padding-bottom: .5em;
     color: $gray-light;
   }
+  .full-width-checkbox-help {
+    @extend .below-input-help;
+    margin: -1em 0 0 17px;
+  }
   .selectize-control { line-height: 0; } // label isn't lined up
   a.optional-form-block {
     cursor: pointer;
@@ -63,13 +67,17 @@ $form-well-border-color: #e4e4e4;
     }
   }
   .fancy-select .inline-input-help { right: 2.75em; } // To not cover up select pointer
-  .currently-hidden { display: none; }
+  .form-well-label { @extend .form-control-label; }
   .form-well-label, .form-well-input, .form-well-input-large, .right-input-help {
     @include make-col(); 
   }
   .related-fields {
     padding-bottom: $vertical-height;
     .form-group { clear: both; }
+  }
+  .full-width-section { // pad the sides so that it fits the row.
+    padding-left: $row-side-padding;
+    padding-right: $row-side-padding;
   }
   .form-group {
     .radio-inline, .checkbox-inline { 
@@ -135,6 +143,13 @@ $form-well-border-color: #e4e4e4;
   .form-well {
     background: $form-well-background;
     border: 1px solid $form-well-border-color;
+  }
+}
+
+@media (min-width: $grid-breakpoint-md) {
+  .form-well .full-width-section {
+    padding-left: 2*$row-side-padding;
+    padding-right: 2*$row-side-padding;
   }
 }
 

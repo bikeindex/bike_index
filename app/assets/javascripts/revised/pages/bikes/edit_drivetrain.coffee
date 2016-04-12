@@ -91,12 +91,6 @@ class BikeIndex.BikesEditDrivetrain extends BikeIndex
     else
       for side in ['front', 'rear']
         count = $("##{side}_gear_select_value").attr('data-initialcount')
-        console.log side, count
         unless isNaN(count)
           selectize = $("##{side}_gear_select").selectize()[0]
           selectize.selectize.setValue(count)
-
-      # if isNaN(rear_count)
-      #   $('#rear_gear_select .placeholder').prop('selected', 'selected')
-      # else
-      #   $('#rear_gear_select').val(rear_count)

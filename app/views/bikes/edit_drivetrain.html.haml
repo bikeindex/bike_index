@@ -12,7 +12,7 @@
           - %w(front rear).each do |side|
             .related-fields.row
               .form-group
-                %label.form-control-label.form-well-label{for: "#{side}_standard"}
+                %label.form-well-label{for: "#{side}_standard"}
                   #{side.titleize} wheel
                 .form-well-input.fancy-select-placeholder.unfancy
                   .standard-diams{ id: "#{side}_standard"}
@@ -43,7 +43,7 @@
                   %a.wh_sw.optional-form-block.currently-hidden{ id: "hide_#{side}_wheel_diams", data: { target: "##{side}_standard", toggle: "#show_#{side}_wheel_diams", action: 'swap', swap: "##{side}_all" } }
                     Hide extra sizes
             .form-group.row.unnested-field
-              %label.form-control-label.form-well-label
+              %label.form-well-label
                 #{side.titleize} tire
               .form-well-input
                 %label.radio-inline
@@ -62,7 +62,7 @@
           - front_fixed = FrontGearType.fixed.first.id
           - fixed = @bike.rear_gear_type_id == rear_fixed
           .form-group.row.unnested-field
-            %label.form-control-label.form-well-label
+            %label.form-well-label
               Drivetrain type
             %label.checkbox-inline
               %input#fixed_gear_check.checkbox.drive-check{ type: "checkbox", checked: fixed }
@@ -76,7 +76,7 @@
 
           .related-fields.row.fancy-select.unfancy.not-fixed.no-divider-row
             .form-group
-              %label.form-control-label.form-well-label{ for: 'front_gear_select'}
+              %label.form-well-label{ for: 'front_gear_select'}
                 Front gears
               .form-well-input
                 %select#front_gear_select.form-control
@@ -97,7 +97,7 @@
 
           .related-fields.row.fancy-select.unfancy.not-fixed.no-divider-row
             .form-group
-              %label.form-control-label.form-well-label{ for: 'rear_gear_select' }
+              %label.form-well-label{ for: 'rear_gear_select' }
                 Rear gears
               .form-well-input
                 %select#rear_gear_select.form-control

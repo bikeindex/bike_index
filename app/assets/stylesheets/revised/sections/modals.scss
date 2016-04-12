@@ -12,15 +12,22 @@
   padding-top: 0;
 }
 
+.modal-btn-footer {
+  @extend .modal-footer;
+  text-align: center;
+  .btn {
+    display: block;
+    width: 100%;
+    padding-top: 1em;
+    padding-bottom: 1em;
+  }
+}
+
 .modal {
   .close {
     font-size: inherit;
     font-family: sans-serif;
     font-weight: 100;
-    color: $gray-light;
-  }
-  .btn {
-    padding-top: 1em;
-    padding-bottom: 1em;
+    color: $gray;
   }
 }

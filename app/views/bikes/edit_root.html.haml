@@ -11,7 +11,7 @@
 
           .related-fields.row
             .form-group
-              = f.label :serial_number, class: 'form-control-label form-well-label'
+              = f.label :serial_number, class: 'form-well-label'
               .form-well-input
                 %p.form-control-static
                   = @bike.serial_number
@@ -19,7 +19,7 @@
                   %a
                     Submit serial correction
             .form-group
-              = f.label :manufacturer, class: 'form-control-label form-well-label'
+              = f.label :manufacturer, class: 'form-well-label'
               .form-well-input
                 %p.form-control-static
                   = @bike.manufacturer_name
@@ -28,7 +28,7 @@
                     Submit Manufacturer Correction
 
           .form-group.row.fancy-select.unfancy.unnested-field
-            = f.label :year, 'Model year', class: 'form-control-label form-well-label'
+            = f.label :year, 'Model year', class: 'form-well-label'
             .form-well-input
               - years = (1900..Time.now.year+1).to_a.reverse.map { |i| [i,i] }
               = f.select :year, years, prompt: "Unsure or unknown", selected: Time.now.year
@@ -38,45 +38,45 @@
                 Unknown year
 
           .form-group.row.unnested-field
-            = f.label :frame_model, class: 'form-control-label form-well-label'
+            = f.label :frame_model, class: 'form-well-label'
             .form-well-input
               = f.text_field :frame_model, class: 'form-control'
 
           = render partial: '/bikes/bike_fields/revised_colors', locals: { f: f }
 
           .form-group.row.unnested-field
-            = f.label :frame_material_id, 'Main frame material', class: 'form-control-label form-well-label'
+            = f.label :frame_material_id, 'Main frame material', class: 'form-well-label'
             .form-well-input.fancy-select-placeholder.unfancy
               = f.collection_select(:frame_material_id, FrameMaterial.all, :id, :name, prompt: 'Choose material')
 
           .form-group.row.unnested-field
-            = f.label :frame_size, class: 'form-control-label form-well-label'
+            = f.label :frame_size, class: 'form-well-label'
             .form-well-input
               = f.text_field :frame_size, class: 'form-control'
               .below-input-help
                 Need to implement the scripts for this
 
           .form-group.row.unnested-field
-            = f.label :paint_name, 'Paint description', class: 'form-control-label form-well-label'
+            = f.label :paint_name, 'Paint description', class: 'form-well-label'
             .form-well-input
               = f.text_field :paint_name, class: 'form-control'
 
           .form-group.row.unnested-field
-            = f.label :name, 'Bike Name', class: 'form-control-label form-well-label'
+            = f.label :name, 'Bike Name', class: 'form-well-label'
             .form-well-input
               = f.text_field :name, class: 'form-control'
 
           .form-group.row.unnested-field
-            = f.label :description, 'General description', class: 'form-control-label form-well-label'
+            = f.label :description, 'General description', class: 'form-well-label'
             .form-well-input-large
               = f.text_area :description, rows: 3, class: 'form-control', placeholder: 'Tell us about your bike!'
 
           .form-group.row.unnested-field
-            = f.label :additional_registration, class: 'form-control-label form-well-label'
+            = f.label :additional_registration, class: 'form-well-label'
             .form-well-input
               = f.text_field :additional_registration, class: 'form-control'
 
           .form-group.row.unnested-field.no-divider-row
-            = f.label :zipcode, class: 'form-control-label form-well-label'
+            = f.label :zipcode, class: 'form-well-label'
             .form-well-input
               = f.text_field :zipcode, class: 'form-control', placeholder: 'zip code'

@@ -84,6 +84,7 @@ $grid-breakpoint-sm: 544px;
 $grid-breakpoint-md: 768px;
 $grid-breakpoint-lg: 992px;
 $grid-breakpoint-xl: 1200px;
+$row-side-padding: 0.9375rem;
 
 // Settings
 @import "revised/fonts";
@@ -112,6 +113,8 @@ $grid-breakpoint-xl: 1200px;
 @import "revised/pages/bikes_new";
 @import "revised/pages/bikes_edit_root";
 @import "revised/pages/bikes_edit_ownership";
+@import "revised/pages/bikes_edit_stolen";
 
 html { background: $black-off; }
 body { min-height: 400px; }
+.currently-hidden { display: none; }

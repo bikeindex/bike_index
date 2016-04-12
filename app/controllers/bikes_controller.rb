@@ -235,15 +235,21 @@ class BikesController < ApplicationController
     end
   end
 
-  def edit_templates
-    @edit_templates ||= {
+  def edit_templates_hash
+    hash = {
       root: 'Bike Details',
       photos: 'Photos',
       drivetrain: 'Wheels + Drivetrain',
       accessories: 'Accessories + Components',
       ownership: 'Change Owner or Delete',
-      stolen: (@bike.stolen ? 'Stolen report' : 'Report Stolen or Missing')
-    }.as_json
+      stolen: (@bike.stolen ? 'Theft details' : 'Report Stolen or Missing')
+    }
+    # To make stolen the first key if bike is stolen & as_json for string keys instead of sym
+    (@bike.stolen ? hash.to_a.rotate(-1).to_h : hash).as_json
+  end
+
+  def edit_templates
+    @edit_templates ||= edit_templates_hash
   end
 
   protected
