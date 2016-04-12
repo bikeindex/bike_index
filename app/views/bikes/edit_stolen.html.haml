@@ -1,8 +1,9 @@
 = form_for @bike, multipart: true do |f|
+  = f.hidden_field :stolen
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
       = render partial: '/bikes/edit_primary_menu'
-      .col-lg-8.form-well
+      .col-md-8.form-well
         .form-wrap
           .edit-bike-form-header
             %h3
@@ -86,23 +87,69 @@
                 .full-width-checkbox-help
                   e.g. if we tweet about or see someone searching for its serial number
           - else
-            = f.hidden_field :stolen
-            .mark-bike-stolen.no-divider-row
-              %a.btn.btn-danger.btn-lg{data: { toggle: 'modal', target: '#mark-bike-stolen' } }
+            .toggle-stolen.no-divider-row
+              %a.btn.btn-danger.btn-lg{data: { toggle: 'modal', target: '#toggle-stolen' } }
                 This #{@bike.type} is stolen or missing!
 
+        / if stolen, we also add an exterior block for marking not stolen
+        - if @bike.stolen and @bike.find_current_stolen_record.present?
+          .form-wrap.secondary-form-wrap
+            .edit-bike-form-header
+              %h3
+                Recovered
+            .toggle-stolen.no-divider-row
+              %a.btn.btn-success.btn-lg{data: { toggle: 'modal', target: '#toggle-stolen' } }
+                This #{@bike.type} has been returned!
 
-- modal_body = capture_haml do
-  .modal-body
-    %p
-      Is your #{@bike.type} actually missing or stolen?
-  .modal-btn-footer
-    .col-xs-6
-      %button.btn.btn-secondary{'data-dismiss' => 'modal', type: 'button'}
-        Nevermind
-    .col-xs-6
-      %button.btn.btn-danger#mark-bike-stolen-btn{type: 'button'}
-        Yes, it is!
+- if @bike.stolen and @bike.find_current_stolen_record.present?
+  - modal_title = "We're so glad you got your #{@bike.type} back!"
+  - modal_body = capture_haml do
+    .modal-body
+      .alert.alert-error.currently-hidden#toggle-stolen-error
+        %button.close{'aria-label' => 'Close', 'data-dismiss' => 'modal', type: 'button'}
+          %span{'aria-hidden' => 'true'} &times;
+        %h4
+          Not enough information!
+        %p
+          Please tell us how you got your #{@bike.type} back, we really care! 
+        %p
+          It's how we get better at recovering bikes.
+      = form_tag  do |t|
+        = hidden_field_tag :mark_recovered_bike_id, @bike.id
+        = hidden_field_tag :mark_recovered_stolen_record_id, (@bike.current_stolen_record_id if @bike.current_stolen_record_id.present?)
+        .form-group
+          %label{ for: :mark_recovered_reason }
+            How did you get it back?
+          = text_area_tag :mark_recovered_reason, '', class: 'form-control'
+        .checkbox
+          %label
+            %input#mark_recovered_we_helped{ type: 'checkbox' }
+            Did we help?
+        .checkbox
+          %label
+            %input#mark_recovered_can_share_recovery{ type: 'checkbox' }
+            Can we share your story?
+        .modal-btn-footer
+          .col-xs-6
+            %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
+              Nevermind
+          .col-xs-6
+            %button.btn.btn-success#mark-recovered-btn{ type: 'button' }
+              Mark recovered
 
-= render partial: '/shared/modal', locals: { title: 'Oh no!', id: 'mark-bike-stolen', modal_body: modal_body }
+- else
+  - modal_title = 'Oh no!'
+  - modal_body = capture_haml do
+    .modal-body
+      %p
+        Is your #{@bike.type} actually missing or stolen?
+    .modal-btn-footer
+      .col-xs-6
+        %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
+          Nevermind
+      .col-xs-6
+        %button.btn.btn-danger#mark-stolen-btn{ type: 'button' }
+          Yes, it is!
+
+= render partial: '/shared/modal', locals: { title: modal_title, id: 'toggle-stolen', modal_body: modal_body, data_hash: { url: "#{ENV['BASE_URL']}#{send_request_api_v1_users_path}" } }
   

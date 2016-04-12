@@ -2,7 +2,7 @@
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
       = render partial: '/bikes/edit_primary_menu'
-      .col-lg-8.form-well
+      .col-md-8.form-well
         .form-wrap
           .edit-bike-form-header
             %h3
@@ -40,14 +40,14 @@
           %hr
 
           .delete-from-index.no-divider-row
-            %a{data: { toggle: 'modal', target: '#request-bike-delete' } }
+            %a{data: { toggle: 'modal', target: '#request-delete' } }
               = render '/shared/trash_icon'
               Delete this #{@bike.type} from the Bike Index
 
 
 - modal_body = capture_haml do
   .modal-body
-    .alert.alert-error.currently-hidden#request-bike-delete-error
+    .alert.alert-error.currently-hidden#request-delete-error
       %button.close{'aria-label' => 'Close', 'data-dismiss' => 'modal', type: 'button'}
         %span{'aria-hidden' => 'true'} &times;
       %h4
@@ -61,6 +61,6 @@
           Reason for deletion
         = text_area_tag :bike_delete_reason, '', class: 'form-control'
       .form-group
-        %a.btn.btn-danger#request-bike-delete-btn{ href: '#' }
+        %a.btn.btn-danger#request-delete-btn{ href: '#' }
           Delete bike
-= render partial: '/shared/modal', locals: { title: "Are you sure you want to delete this #{@bike.type}?", id: 'request-bike-delete', data_hash: { url: "#{ENV['BASE_URL']}#{send_request_api_v1_users_path}" },  modal_body: modal_body }
+= render partial: '/shared/modal', locals: { title: "Are you sure you want to delete this #{@bike.type}?", id: 'request-delete', data_hash: { url: "#{ENV['BASE_URL']}#{send_request_api_v1_users_path}" },  modal_body: modal_body }

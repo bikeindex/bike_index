@@ -14,7 +14,6 @@ $form-well-border-color: #e4e4e4;
 }
 
 .form-well {
-  label { text-transform: capitalize; }
   .form-wrap { padding: 2*$vertical-height 0 4*$vertical-height; }
   .below-input-help {
     @extend small;
@@ -67,7 +66,12 @@ $form-well-border-color: #e4e4e4;
     }
   }
   .fancy-select .inline-input-help { right: 2.75em; } // To not cover up select pointer
-  .form-well-label { @extend .form-control-label; }
+  .form-well-label {
+    @extend .form-control-label;
+    text-transform: capitalize;
+    line-height: 1.2em;
+    padding-top: 0.65rem;
+  }
   .form-well-label, .form-well-input, .form-well-input-large, .right-input-help {
     @include make-col(); 
   }

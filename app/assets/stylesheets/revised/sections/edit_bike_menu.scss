@@ -63,17 +63,10 @@ $active-bike-edit-border-width: 2px;
     }
   }
 }
-
 // 
-// Hide with media query so as not to override selectize
-@media (min-width: $grid-breakpoint-lg ) {
-  .bike-edit-page-select { display: none; }
-}
-
-
-// 
-// Menu fixed to bottom of the screen
-@media (max-width: $grid-breakpoint-lg - 1px) {
+// Small screen styles
+@media (max-width: $grid-breakpoint-md - 1px) {
+  // Menu fixed to bottom of the screen
   .primary-edit-bike-menu {
     z-index: $zindex-navbar-fixed + 1;
     padding: 0;
@@ -91,10 +84,20 @@ $active-bike-edit-border-width: 2px;
 }
 
 // 
-// Large screen styles
-@media (min-width: $grid-breakpoint-lg) {
+// Medium and up screen styles
+@media (min-width: $grid-breakpoint-md) {
   .primary-edit-bike-menu {
     ul { display: block; }  
     .edit-bike-submit-wrapper { padding-top: 1em; }
+  }
+  // Hide with media query so as not to override selectize
+  .bike-edit-page-select { display: none; }
+}
+
+// XL screens - smaller menu, offset it
+@media (min-width: $grid-breakpoint-xl) {
+  .primary-edit-bike-menu {
+    @include make-col-span(3);
+    margin-right: 8.3333%; // 1 col margin - Manually set the offset via margin
   }
 }
