@@ -28,7 +28,6 @@ spec/fixtures/tsv_creation/*.json
 
 # Ignore localeapp
 .localeapp
-.env
 log/localeapp.yml
 
 # Ignore import files
