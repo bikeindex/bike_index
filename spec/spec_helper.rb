@@ -1,3 +1,4 @@
+ENV['BASE_URL'] = 'http://test.host' # Assign here because only one .env file
 require 'sidekiq/testing'
 if ENV['CODECLIMATE_REPO_TOKEN']
   require "codeclimate-test-reporter"
