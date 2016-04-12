@@ -409,10 +409,11 @@ describe BikesController do
 
   describe :edit do
     let(:ownership) { FactoryGirl.create(:ownership) }
+    let(:bike) { ownership.bike }
     context 'when there is no user' do
       it 'redirects and sets the flash' do
-        get :edit, id: ownership.bike.id
-        expect(response).to redirect_to bike_path(ownership.bike)
+        get :edit, id: bike.id
+        expect(response).to redirect_to bike_path(bike)
         expect(flash[:error]).to be_present
       end
     end
@@ -420,8 +421,8 @@ describe BikesController do
       it 'redirects and sets the flash' do
         user = FactoryGirl.create(:user)
         set_current_user(user)
-        get :edit, id: ownership.bike.id
-        expect(response).to redirect_to bike_path(ownership.bike)
+        get :edit, id: bike.id
+        expect(response).to redirect_to bike_path(bike)
         expect(flash).to be_present
         expect(flash[:error]).to be_present
       end
@@ -432,7 +433,7 @@ describe BikesController do
       context 'legacy' do
         it 'responds with success' do
           set_current_user(user)
-          get :edit, id: ownership.bike.id
+          get :edit, id: bike.id
           expect(flash).to_not be_present
           expect(response).to be_success
           expect(assigns(:bike)).to be_decorated
@@ -446,18 +447,50 @@ describe BikesController do
           allow(controller).to receive(:revised_layout_enabled?) { true }
         end
         context 'root' do
-          it 'renders the bike_details template' do
-            get :edit, id: ownership.bike.id
-            expect(response).to render_with_layout('application_revised')
-            expect(response).to be_success
-            expect(assigns(:edit_template)).to eq('root')
-            expect(response).to render_template('edit_root')
+          context 'non-stolen bike' do
+            it 'renders the bike_details template' do
+              edit_templates = {
+                root: 'Bike Details',
+                photos: 'Photos',
+                drivetrain: 'Wheels + Drivetrain',
+                accessories: 'Accessories + Components',
+                ownership: 'Change Owner or Delete',
+                stolen: 'Report Stolen or Missing'
+              }.as_json
+              get :edit, id: bike.id
+              expect(response).to render_with_layout 'application_revised'
+              expect(response).to be_success
+              expect(assigns(:edit_template)).to eq 'root'
+              expect(assigns(:edit_templates)).to eq edit_templates
+              expect(response).to render_template 'edit_root'
+            end
+          end
+          context 'stolen bike' do
+            it 'renders with stolen as first template, different description' do
+              edit_templates = {
+                stolen: 'Theft details',
+                root: 'Bike Details',
+                photos: 'Photos',
+                drivetrain: 'Wheels + Drivetrain',
+                accessories: 'Accessories + Components',
+                ownership: 'Change Owner or Delete'
+              }.as_json
+              bike.update_attribute :stolen, true
+              bike.reload
+              expect(bike.stolen).to be_true
+              get :edit, id: bike.id
+              expect(response).to render_with_layout 'application_revised'
+              expect(response).to be_success
+              expect(assigns(:edit_template)).to eq 'stolen'
+              expect(assigns(:edit_templates)).to eq edit_templates
+              expect(response).to render_template 'edit_stolen'
+            end
           end
         end
         %w(root photos drivetrain accessories ownership stolen).each do |template|
           context template do
             it 'renders the template' do
-              get :edit, id: ownership.bike.id, page: template
+              get :edit, id: bike.id, page: template
               expect(response).to render_with_layout('application_revised')
               expect(response).to be_success
               expect(response).to render_template("edit_#{template}")

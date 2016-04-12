@@ -33,4 +33,4 @@ class BikeIndex.BikesEditOwnership extends BikeIndex
           # BikeIndex.alertMessage('error', 'Request failed', "Oh no! Something went wrong and we couldn't send the delete request.")
       $('#request-bike-delete').modal('hide')
     else
-      $('#request-delete-error').slideDown('fast').removeClass('currently-hidden')
+      $('#request-bike-delete-error').slideDown('fast').removeClass('currently-hidden')

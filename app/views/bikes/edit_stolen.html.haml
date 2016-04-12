@@ -7,5 +7,23 @@
           .edit-bike-form-header
             %h3
               = @edit_templates[@edit_template]
-              
-              
+          - if !@bike.stolen
+            = f.hidden_field :stolen
+            .mark-bike-stolen.no-divider-row
+              %a.btn.btn-danger.btn-lg{data: { toggle: 'modal', target: '#mark-bike-stolen' } }
+                This #{@bike.type} is stolen or missing!
+          - else
+- modal_body = capture_haml do
+  .modal-body
+    %p
+      Is your #{@bike.type} actually missing or stolen?
+  .modal-btn-footer
+    .col-xs-6
+      %button.btn.btn-secondary{'data-dismiss' => 'modal', type: 'button'}
+        Nevermind
+    .col-xs-6
+      %button.btn.btn-danger#mark-bike-stolen-btn{type: 'button'}
+        Yes, it is!
+
+= render partial: '/shared/modal', locals: { title: 'Oh no!', modal_body: modal_body }
+  

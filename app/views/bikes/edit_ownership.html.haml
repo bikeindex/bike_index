@@ -20,7 +20,7 @@
             .hide-this-bike-link
               %a.collapsed{ href: '#hide_bike_toggle_group', data: { toggle: 'collapse' } }
                 #{hide_toggle} this #{@bike.type}
-            #hide_bike_toggle_group.collapse
+            .collapse#hide_bike_toggle_group
               - if @bike.user_hidden
                 = f.hidden_field :marked_user_unhidden
               - else
@@ -34,13 +34,13 @@
                 %p
                   We strongly recommend keeping your #{@bike.type} visible, but you can hide this #{@bike.type} if you prefer. Even though we don't think it's a good idea.
                 - btn_type = @bike.user_hidden ? 'btn-success' : 'btn-danger'
-                %a#hide_bike_toggle.btn.btn-lg{role: 'button', class: btn_type}
+                %a.btn.btn-lg#hide_bike_toggle{role: 'button', class: btn_type}
                   #{hide_toggle} #{@bike.type}
 
           %hr
 
           .delete-from-index.no-divider-row
-            %a{data: { toggle: 'modal', target: "#request-bike-delete" } }
+            %a{data: { toggle: 'modal', target: '#request-bike-delete' } }
               = render '/shared/trash_icon'
               Delete this #{@bike.type} from the Bike Index
 
@@ -55,7 +55,7 @@
             %span{'aria-hidden' => 'true'} &times;
         %hr
       .modal-body
-        #request-delete-error.alert.alert-error
+        .alert.alert-error#request-bike-delete-error
           %button.close{'aria-label' => 'Close', 'data-dismiss' => 'modal', type: 'button'}
             %span{'aria-hidden' => 'true'} &times;
           %h4
@@ -69,6 +69,6 @@
               Reason for deletion
             = text_area_tag :bike_delete_reason, '', class: 'form-control'
           .form-group
-            %a#request-bike-delete-btn.btn.btn-danger{ href: '#' }
+            %a.btn.btn-danger#request-bike-delete-btn{ href: '#' }
               Delete bike
               
