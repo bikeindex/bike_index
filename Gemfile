@@ -45,7 +45,6 @@ gem 'omniauth'
 gem 'fog'
 gem 'dalli'
 gem 'draper', require: false
-gem 'dotenv-rails', '~> 0.8', git: 'https://github.com/bkeepers/dotenv'
 gem 'wkhtmltopdf-binary'
 gem 'wicked_pdf'
 gem 'eventmachine', '~> 1.0.3'
@@ -84,7 +83,7 @@ group :assets do
   gem 'sass-rails',   '~> 3.2.3'
   gem 'coffee-rails', '~> 3.2.1'
   gem 'therubyracer', '~> 0.12.1' , platforms: :ruby
-  gem 'uglifier', '>= 1.0.3'
+  gem 'uglifier', '>= 2.7.2'
 end
 
 group :development do
@@ -106,6 +105,7 @@ group :development, :test do
   gem 'foreman'
   gem 'database_cleaner'
   gem 'json_spec'
+  gem 'dotenv-rails'
 end
 
 group :test do
