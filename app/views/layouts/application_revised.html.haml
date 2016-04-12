@@ -26,13 +26,13 @@
           - if current_user.present?
             - memberships = current_user.memberships.includes(:organization)
             %li.primary-nav-item
-              %a.nav-link.settings-link#settingsSubmenu{ 'aria-haspopup' => "true", 'aria-expanded' => "false", data: { toggle: 'dropdown' } }
+              %a.nav-link.settings-link#setting_submenu{ 'aria-haspopup' => "true", 'aria-expanded' => "false", data: { toggle: 'dropdown' } }
                 %span.settings-text
                   Settings
                 = image_tag '/assets/revised/settings.svg', title: 'Your settings'
-              %ul.primary-submenu{ 'aria-labelledby' => '#settingsSubmenu' }
+              %ul.primary-submenu{ 'aria-labelledby' => '#setting_submenu' }
                 = nav_link 'Register a new bike', new_bike_path, class_name: 'nav-link'
-                / Add personal bikes here if user has organizations
+                / Include personal bikes here if user has organizations
                 - if memberships.any?
                   = nav_link 'Your bikes', user_home_path, class_name: 'nav-link'
                 %li
@@ -51,9 +51,9 @@
             - memberships.each do |membership|
               - organization = membership.organization
               %li.primary-nav-item
-                %a.nav-link{ id: "#{organization.slug}Submenu", 'aria-haspopup' => "true", 'aria-expanded' => "false", data: { toggle: 'dropdown' } }
+                %a.nav-link{ id: "#{organization.slug}_submenu", 'aria-haspopup' => "true", 'aria-expanded' => "false", data: { toggle: 'dropdown' } }
                   = organization.short_name
-                %ul.primary-submenu{ 'aria-labelledby' => "##{organization.slug}Submenu" }
+                %ul.primary-submenu{ 'aria-labelledby' => "##{organization.slug}_submenu" }
                   %li
                     = nav_link 'EZ Registration form', embed_extended_organization_path(organization), class_name: 'nav-link'
                   %li
@@ -71,19 +71,20 @@
             %li.primary-nav-item
               = nav_link 'log in', new_session_url, class_name: 'nav-link'
           %li.primary-nav-item
-            %a.nav-link{ id: "helpSubmenu", 'aria-haspopup' => "true", 'aria-expanded' => "false", data: { toggle: 'dropdown' } }
-              Help
-            %ul.primary-submenu{ 'aria-labelledby' => "#helpSubmenu" }
-              %li
-                = nav_link 'For Cyclists', help_path, class_name: 'nav-link'
-              %li
-                = nav_link 'For Bike Shops', help_path, class_name: 'nav-link'
-              %li
-                = nav_link 'For Law Enforcement', help_path, class_name: 'nav-link'
-              %li
-                = nav_link 'For Universities', help_path, class_name: 'nav-link'
-              %li
-                = nav_link 'Contact us', help_path, class_name: 'nav-link'
+            = nav_link 'Help', help_path, class_name: 'nav-link'
+            / %a.nav-link{ id: "helpSubmenu", 'aria-haspopup' => "true", 'aria-expanded' => "false", data: { toggle: 'dropdown' } }
+            /   Help
+            / %ul.primary-submenu{ 'aria-labelledby' => "#helpSubmenu" }
+            /   %li
+            /     = nav_link 'For Cyclists', help_path, class_name: 'nav-link'
+            /   %li
+            /     = nav_link 'For Bike Shops', help_path, class_name: 'nav-link'
+            /   %li
+            /     = nav_link 'For Law Enforcement', help_path, class_name: 'nav-link'
+            /   %li
+            /     = nav_link 'For Universities', help_path, class_name: 'nav-link'
+            /   %li
+            /     = nav_link 'Contact us', help_path, class_name: 'nav-link'
           %li.primary-nav-item
             = nav_link 'About', about_path, class_name: 'nav-link'
           %li.primary-nav-item
