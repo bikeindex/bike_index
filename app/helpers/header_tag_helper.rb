@@ -117,7 +117,7 @@ protected
     end
     if action_name == 'edit'
       if @edit_templates.present?
-        hash[:title_tag][:title] = "#{@edit_templates[@edit_template]}: #{@bike.title_string}"
+        hash[:title_tag][:title] = "#{@edit_templates[@edit_template]} - #{@bike.title_string}"
       else
         hash[:title_tag][:title] = "Edit #{@bike.title_string}"
       end

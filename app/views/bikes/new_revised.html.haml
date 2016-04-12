@@ -15,12 +15,12 @@
           - if @bike.creation_organization_id.present?
             = f.hidden_field :creation_organization_id
           .form-group.row.unnested-field
-            = f.label :cycle_type_id, 'This is a', class: 'form-control-label form-well-label'
+            = f.label :cycle_type_id, 'This is a', class: 'form-well-label'
             .form-well-input.fancy-select.unfancy
               = f.collection_select(:cycle_type_id, CycleType.all, :id, :name, required: true, class: 'form-control')
 
           .form-group.row.unnested-field
-            = f.label :serial_number, class: 'form-control-label form-well-label'
+            = f.label :serial_number, class: 'form-well-label'
             .form-well-input
               #serial-input
                 = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', placeholder: 'highly recommended', class: 'form-control'
@@ -41,19 +41,19 @@
 
           .related-fields.row
             .form-group
-              = f.label :manufacturer_id, class: 'form-control-label form-well-label'
+              = f.label :manufacturer_id, class: 'form-well-label'
               .form-well-input
                 - initial = @bike.manufacturer && { id: @bike.manufacturer.id, text: @bike.manufacturer.name }.to_json
                 = f.text_field :manufacturer_id, value: @bike.manufacturer && @bike.manufacturer.name, class: 'form-control unfancy', data: { initial: initial }
                 %span.below-input-help
                   Select 'Other' if manufacturer isn't listed
             .form-group.hidden-other
-              = f.label :manufacturer_other, 'Other manufacturer', class: 'form-control-label form-well-label'
+              = f.label :manufacturer_other, 'Other manufacturer', class: 'form-well-label'
               .form-well-input
                 = f.text_field :manufacturer_other, class: 'form-control'
 
           .form-group.row.fancy-select.unfancy.unnested-field
-            = f.label :year, 'Model year', class: 'form-control-label form-well-label'
+            = f.label :year, 'Model year', class: 'form-well-label'
             .form-well-input
               - years = (1900..Time.now.year+1).to_a.reverse.map { |i| [i,i] }
               = f.select :year, years, prompt: "Unsure or unknown", selected: Time.now.year
@@ -63,7 +63,7 @@
                 Unknown year
 
           .form-group.row.unnested-field
-            = f.label :frame_model, class: 'form-control-label form-well-label'
+            = f.label :frame_model, class: 'form-well-label'
             .form-well-input
               = f.text_field :frame_model, class: 'form-control'
           
@@ -72,48 +72,40 @@
 
           - if @b_param.display_email?
             .form-group.row.unnested-field.no-divider-row
-              = f.label :owner_email, class: 'form-control-label form-well-label'
+              = f.label :owner_email, class: 'form-well-label'
               .form-well-input
                 - email = @bike.owner_email || current_user && current_user.email
                 = f.email_field :owner_email, value: email, required: true, placeholder: 'required', class: 'form-control'
       .new-bike-submit-wrapper
         = submit_tag 'Register', class: 'btn btn-lg btn-primary'
 
-
-.modal.fade#made-without-serial-modal
-  .modal-dialog{role: 'document'}
-    .modal-content
-      .modal-header
-        %h2.modal-title
-          Are you certain?
-          %button.close{'aria-label' => 'Close', 'data-dismiss' => 'modal', type: 'button'}
-            %span{'aria-hidden' => 'true'} &times;
-        %hr
-      .modal-body
-        %p
-          Very
-          %em
-            very
-          few bikes are made without serials. Unless this #{@bike.type}:
-        %ul
-          %li
-            Was made before 1970
-          %li.li-or
-            \- or -
-          %li
-            Is a handmade frame
-        %p
-          It probably has a serial number.
-        %p 
-          Read about #{link_to 'how to find your serial number', serials_url, target: '_blank' }
-          %small
-            (opens in a separate window)
-      .modal-btn-footer
-        .col-xs-6
-          %button.btn.btn-secondary{'data-dismiss' => 'modal', type: 'button'}
-            Nevermind
-          I just don't know the serial
-        .col-xs-6
-          %button.btn.btn-danger#made-without-serial-button{type: 'button'}
-            I'm 100% sure
-          This #{@bike.type} was made without a serial
+- modal_body = capture_haml do
+  .modal-body
+    %p
+      Very
+      %em
+        very
+      few bikes are made without serials. Unless this #{@bike.type}:
+    %ul
+      %li
+        Was made before 1970
+      %li.li-or
+        \- or -
+      %li
+        Is a handmade frame
+    %p
+      It probably has a serial number.
+    %p 
+      Read about #{link_to 'how to find your serial number', serials_url, target: '_blank' }
+      %small
+        (opens in a separate window)
+  .modal-btn-footer
+    .col-xs-6
+      %button.btn.btn-secondary{'data-dismiss' => 'modal', type: 'button'}
+        Nevermind
+      I just don't know the serial
+    .col-xs-6
+      %button.btn.btn-danger#made-without-serial-button{type: 'button'}
+        I'm 100% sure
+      This #{@bike.type} was made without a serial
+= render partial: '/shared/modal', locals: { title: 'Are you certain?', id: 'made-without-serial-modal', modal_body: modal_body }

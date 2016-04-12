@@ -4,7 +4,7 @@
 - display_tertiary_color = @bike.tertiary_frame_color_id.present?
 .related-fields.row{ class: classname }
   .form-group
-    = f.label :primary_frame_color, class: 'form-control-label form-well-label'
+    = f.label :primary_frame_color, class: 'form-well-label'
     .form-well-input.fancy-select.unfancy
       = f.collection_select(:primary_frame_color_id, Color.all, :id, :name, required: true, prompt: 'Choose color' )
       %a.inline-input-help{ title: 'Color help', data: { toggle: 'popover', content: primary_color_help_content } }
@@ -19,7 +19,7 @@
           &ndash;
         Remove color
   #secondary-color.form-group.hidden-other{ class: ('unhidden' if display_secondary_color) }
-    = f.label :secondary_frame_color, class: 'form-control-label form-well-label'
+    = f.label :secondary_frame_color, class: 'form-well-label'
     .form-well-input.fancy-select.unfancy
       = f.collection_select(:secondary_frame_color_id, Color.all, :id, :name, prompt: 'Choose color' )
     .right-input-help
@@ -32,6 +32,6 @@
           &ndash;
         Remove color
   #tertiary-color.form-group.hidden-other{ class: ('unhidden' if display_tertiary_color) }
-    = f.label :tertiary_frame_color, class: 'form-control-label form-well-label'
+    = f.label :tertiary_frame_color, class: 'form-well-label'
     .form-well-input.fancy-select.unfancy
       = f.collection_select(:tertiary_frame_color_id, Color.all, :id, :name, prompt: 'Choose color' )
