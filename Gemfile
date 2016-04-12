@@ -83,7 +83,7 @@ group :assets do
   gem 'sass-rails',   '~> 3.2.3'
   gem 'coffee-rails', '~> 3.2.1'
   gem 'therubyracer', '~> 0.12.1' , platforms: :ruby
-  gem 'uglifier', '>= 2.7.2'
+  gem 'uglifier', '~> 2.7.2'
 end
 
 group :development do
