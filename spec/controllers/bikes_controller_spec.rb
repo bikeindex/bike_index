@@ -508,75 +508,85 @@ describe BikesController do
         ownership = FactoryGirl.create(:ownership)
         user = FactoryGirl.create(:user)
         set_current_user(user)
-        put :update, {id: ownership.bike.id, bike: {serial_number: '69'}}
+        put :update, id: ownership.bike.id, bike: { serial_number: '69' }
       end
       it { should respond_with(:redirect)}
       it { should redirect_to(bike_url) }
       it { should set_the_flash }
     end
 
-    context 'user present who is allowed to edit' do
-
-      it 'allows you to edit an example bike' do
-        ownership = FactoryGirl.create(:ownership)
-        ownership.bike.update_attributes(example: true)
-        user = ownership.creator
+    context 'creator present (who is allowed to edit)' do
+      let(:ownership) { FactoryGirl.create(:ownership) }
+      let(:user) { ownership.creator }
+      let(:bike) { ownership.bike }
+      before do
         set_current_user(user)
-        put :update, {id: ownership.bike.id, bike: {description: '69'}}
-        ownership.bike.reload.description.should eq('69')
-        response.should redirect_to edit_bike_url(ownership.bike)
       end
 
-      it 'updates the bike when a user is present who is allowed to edit the bike' do
-        ownership = FactoryGirl.create(:ownership)
-        user = ownership.creator
-        set_current_user(user)
-        put :update, {id: ownership.bike.id, bike: {description: '69', marked_user_hidden: '0'}}
-        ownership.bike.reload.description.should eq('69')
-        response.should redirect_to edit_bike_url(ownership.bike)
+      it 'allows you to edit an example bike' do
+        ownership.bike.update_attributes(example: true)
+        put :update, id: bike.id, bike: { description: '69' }
+        response.should redirect_to edit_bike_url(bike)
+        bike.reload
+        bike.description.should eq('69')
+      end
+
+      it 'updates the bike' do
+        put :update, id: bike.id, bike: { description: '69', marked_user_hidden: '0' }
+        bike.reload
+        bike.description.should eq('69')
+        response.should redirect_to edit_bike_url(bike)
         assigns(:bike).should be_decorated
-        ownership.bike.hidden.should be_false
+        bike.hidden.should be_false
       end
 
       it 'marks the bike unhidden' do
-        ownership = FactoryGirl.create(:ownership)
-        ownership.bike.update_attribute :marked_user_hidden, '1'
-        ownership.bike.reload.hidden.should be_true
-        user = ownership.creator
-        set_current_user(user)
-        put :update, {id: ownership.bike.id, bike: {marked_user_unhidden: 'true'}}
-        ownership.bike.reload.hidden.should be_false
+        bike.update_attribute :marked_user_hidden, '1'
+        bike.reload
+        bike.hidden.should be_true
+        put :update, id: bike.id, bike: { marked_user_unhidden: 'true' }
+        bike.reload.hidden.should be_false
       end
 
       it 'creates a new ownership if the email changes' do
-        ownership = FactoryGirl.create(:ownership)
-        user = ownership.creator
-        set_current_user(user)
-        lambda { put :update,
-          {id: ownership.bike.id, bike: {owner_email: 'new@email.com'}}
-        }.should change(Ownership, :count).by(1)
+        expect do 
+          put :update, id: bike.id, bike: { owner_email: 'new@email.com' }
+        end.to change(Ownership, :count).by(1)
       end
 
       it "redirects to return_to if it's a valid url" do
-        ownership = FactoryGirl.create(:ownership)
-        user = ownership.creator
-        set_current_user(user)
         session[:return_to] = '/about'
-        put :update, {id: ownership.bike.id, bike: {description: '69', marked_user_hidden: '0'}}
-        ownership.bike.reload.description.should eq('69')
+        put :update, id: bike.id, bike: { description: '69', marked_user_hidden: '0' }
+        bike.reload.description.should eq('69')
         response.should redirect_to '/about'
         session[:return_to].should be_nil
       end
 
       it "doesn't redirect and clears the session if not a valid url" do
-        ownership = FactoryGirl.create(:ownership)
-        user = ownership.creator
-        set_current_user(user)
         session[:return_to] = 'http://testhost.com/bad_place'
-        put :update, {id: ownership.bike.id, bike: {description: '69', marked_user_hidden: '0'}}
-        ownership.bike.reload.description.should eq('69')
+        put :update, id: bike.id, bike: { description: '69', marked_user_hidden: '0' }
+        bike.reload
+        bike.description.should eq('69')
         session[:return_to].should be_nil
         response.should redirect_to edit_bike_url
+      end
+    end
+    context 'owner present (who is allowed to edit)' do
+      let(:user) { FactoryGirl.create(:user) }
+      let(:ownership) { FactoryGirl.create(:ownership, owner_email: user.email) }
+      let(:bike) { ownership.bike }
+      before do
+        ownership.mark_claimed
+        set_current_user(user)
+        expect(ownership.owner).to eq user
+      end
+      it 'updates the bike' do
+        put :update, id: bike.id, bike: { description: '69', marked_user_hidden: '0' }
+        bike.reload
+        bike.description.should eq('69')
+        response.should redirect_to edit_bike_url(bike)
+        assigns(:bike).should be_decorated
+        bike.hidden.should be_false
       end
     end
   end

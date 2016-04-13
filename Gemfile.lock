@@ -25,6 +25,7 @@ GIT
 
 GEM
   remote: https://rubygems.org/
+  remote: https://rails-assets.org/
   specs:
     actionmailer (3.2.22)
       actionpack (= 3.2.22)
@@ -355,6 +356,8 @@ GEM
       activesupport (= 3.2.22)
       bundler (~> 1.0)
       railties (= 3.2.22)
+    rails-assets-mustache (2.2.1)
+    rails-assets-tether (1.1.1)
     railties (3.2.22)
       actionpack (= 3.2.22)
       activesupport (= 3.2.22)
@@ -577,6 +580,8 @@ DEPENDENCIES
   rack-mini-profiler
   rack-throttle
   rails (= 3.2.22)
+  rails-assets-mustache (~> 2.2.1)!
+  rails-assets-tether (~> 1.1.0)!
   rake (< 11)
   rb-fsevent (~> 0.9.1)
   rb-readline (~> 0.5.0)

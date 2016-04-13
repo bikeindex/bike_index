@@ -1,13 +1,18 @@
+/ NOTE
+/ There is a mustache alert template in revised_messages
+/ that needs to be updated when this changes
+
 - class_names ||= ''
 - type ||= 'error'
 - class_names += " alert-#{type}"
+- seconds ||= 7
 
 - title ||= false
 - body ||= ''
 - unless body.include? '<' # Ensure we make it html
   - body = content_tag(:p, body)
 
-.alert{ class: class_names }
+.alert.in{ class: class_names, data: { seconds: seconds } }
   %button.close{'aria-label' => 'Close', 'data-dismiss' => 'alert', type: 'button'}
     %span{'aria-hidden' => 'true' } &times;
   - if title

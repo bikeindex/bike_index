@@ -14,8 +14,8 @@ class BikeTyperError < StandardError
 end
 
 class BikesController < ApplicationController
-  before_filter :find_bike, only: [:show, :edit]
-  before_filter :ensure_user_for_edit, only: [:edit, :update, :pdf]
+  before_filter :find_bike, only: [:show, :edit, :update, :pdf]
+  before_filter :ensure_user_allowed_to_edit, only: [:edit, :update, :pdf]
   before_filter :render_ad, only: [:index, :show]
   before_filter :set_return_to, only: [:edit]
   before_filter :remove_subdomain, only: [:index]
@@ -59,7 +59,6 @@ class BikesController < ApplicationController
   end
 
   def pdf
-    bike = Bike.find(params[:id])
     unless bike.owner == current_user or current_user.is_member_of?(bike.creation_organization)
       flash[:error] = "Sorry, that's not your bike!"
       redirect_to bike_path(bike) and return
@@ -207,17 +206,17 @@ class BikesController < ApplicationController
 
   def update
     begin
-      bike = BikeUpdator.new(user: current_user, b_params: params).update_available_attributes
+      @bike = BikeUpdator.new(user: current_user, bike: @bike, b_params: params, current_ownership: @current_ownership).update_available_attributes
     rescue => e
       flash[:error] = e.message
       redirect_to bike_path(params[:id]) and return
     end
-    @bike = bike.decorate
-    if bike.errors.any?
+    @bike = @bike.decorate
+    if @bike.errors.any?
       if revised_layout_enabled?
         @page_errors = @bike.errors
       else
-        flash[:error] = bike.errors.full_messages
+        flash[:error] = @bike.errors.full_messages
       end
       render action: :edit
     else
@@ -270,20 +269,24 @@ class BikesController < ApplicationController
     @b_param = BParam.find_or_new_from_token(token, user_id: current_user.id)
   end
 
-  def ensure_user_for_edit
+  def ensure_user_allowed_to_edit
     @current_ownership = @bike.current_ownership
+    type = @bike && @bike.type || 'bike'
     if current_user.present?
       unless @current_ownership && @current_ownership.owner == current_user
-        flash[:error] = "Oh no! It looks like you don't own that #{@bike.type}."
+        error = "Oh no! It looks like you don't own that #{type}."
       end
     else
       if @current_ownership && @bike.current_ownership.claimed
-        flash[:error] = "Whoops! You have to sign in to be able to edit that #{@bike.type}."
+        error = "Whoops! You have to sign in to be able to edit that #{type}."
       else
-        flash[:error] = "That #{@bike.type} hasn't been claimed yet. If it's your {@bike.typ} sign up and you'll be able to edit it!"
+        error = "That #{type} hasn't been claimed yet. If it's your {type} sign up and you'll be able to edit it!"
       end
     end
-    redirect_to bike_path(@bike) and return if flash[:error].present?
+    if error.present? # Can't assign directly to flash here, sometimes kick out of edit because other flash error
+      flash[:error] = error
+      redirect_to bike_path(@bike) and return
+    end
   end
 
   def render_ad

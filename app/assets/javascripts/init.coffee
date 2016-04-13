@@ -3,6 +3,7 @@ class window.BikeIndex
   pageLoad: ->
     new BikeIndex.NavHeader
     @loadFancySelects()
+    window.BikeIndexAlerts = new BikeIndex.Alerts
     # Put this last, so if it fails, we still have some functionality
     @loadPageScript(document.getElementsByTagName('body')[0].id)
     

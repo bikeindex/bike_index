@@ -49,6 +49,7 @@
     width: 100%;
     clear: both;
   }
+  &.faded { display: none; }
 }
 @media (max-width: $grid-breakpoint-md - 1px) {
   .primary-alert-block {
