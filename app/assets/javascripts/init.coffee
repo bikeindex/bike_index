@@ -3,6 +3,7 @@ class window.BikeIndex
   pageLoad: ->
     new BikeIndex.NavHeader
     @loadFancySelects()
+    window.BikeIndexAlerts = new BikeIndex.Alerts
     # Put this last, so if it fails, we still have some functionality
     @loadPageScript(document.getElementsByTagName('body')[0].id)
     
@@ -13,7 +14,7 @@ class window.BikeIndex
       info_about: BikeIndex.InfoAbout
       bikes_new: BikeIndex.BikesNew
       bikes_edit: BikeIndex.BikesEdit
-    new pageClasses[body_id] if Object.keys(pageClasses).includes(body_id)
+    window.pageScript = new pageClasses[body_id] if Object.keys(pageClasses).includes(body_id)
 
   loadFancySelects: ->
     $('.unfancy.fancy-select select').selectize

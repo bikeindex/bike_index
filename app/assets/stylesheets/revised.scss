@@ -45,7 +45,7 @@ $border-radius-sm:       1px;
 @import "bootstrap/pagination";
 // @import "bootstrap/tags";
 @import "bootstrap/jumbotron";
-@import "bootstrap/alert";
+// @import "bootstrap/alert";
 @import "bootstrap/progress";
 @import "bootstrap/media";
 @import "bootstrap/list-group";
@@ -92,6 +92,7 @@ $row-side-padding: 0.9375rem;
 // Bootstrap overrides
 @import "revised/mixins/buttons";
 @import "revised/sections/modals";
+@import "revised/sections/alerts";
 
 // Bike Index mixins
 @import "revised/mixins/trash_can_icon";
@@ -109,11 +110,16 @@ $row-side-padding: 0.9375rem;
 @import "revised/sections/edit_bike_title";
 @import "revised/sections/horizontal_lines";
 
-// page styles
-@import "revised/pages/bikes_new";
-@import "revised/pages/bikes_edit_root";
-@import "revised/pages/bikes_edit_ownership";
-@import "revised/pages/bikes_edit_stolen";
+// 
+// Page styles
+// 
+
+
+// Bike pages
+@import "revised/pages/bikes/bikes_new";
+@import "revised/pages/bikes/bikes_edit_root";
+@import "revised/pages/bikes/bikes_edit_ownership";
+@import "revised/pages/bikes/bikes_edit_stolen";
 
 html { background: $black-off; }
 body { min-height: 400px; }

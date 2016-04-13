@@ -14,8 +14,8 @@ class BikeTyperError < StandardError
 end
 
 class BikesController < ApplicationController
-  before_filter :find_bike, only: [:show, :edit]
-  before_filter :ensure_user_for_edit, only: [:edit, :update, :pdf]
+  before_filter :find_bike, only: [:show, :edit, :update, :pdf]
+  before_filter :ensure_user_allowed_to_edit, only: [:edit, :update, :pdf]
   before_filter :render_ad, only: [:index, :show]
   before_filter :set_return_to, only: [:edit]
   before_filter :remove_subdomain, only: [:index]
@@ -59,7 +59,6 @@ class BikesController < ApplicationController
   end
 
   def pdf
-    bike = Bike.find(params[:id])
     unless bike.owner == current_user or current_user.is_member_of?(bike.creation_organization)
       flash[:error] = "Sorry, that's not your bike!"
       redirect_to bike_path(bike) and return
@@ -194,16 +193,8 @@ class BikesController < ApplicationController
 
 
   def edit
-    begin
-      BikeUpdator.new(user: current_user, b_params: params).ensure_ownership!
-      rescue UserNotLoggedInError => e
-        flash[:error] = e.message
-        redirect_to new_user_path and return
-      rescue => e
-        flash[:error] = e.message
-        redirect_to bike_path(@bike) and return
-    end
     if revised_layout_enabled?
+      @page_errors = @bike.errors
       @edit_template = edit_templates[params[:page]].present? ? params[:page] : edit_templates.keys.first
       render "edit_#{@edit_template}".to_sym, layout: 'application_revised'
     else
@@ -215,14 +206,18 @@ class BikesController < ApplicationController
 
   def update
     begin
-      bike = BikeUpdator.new(user: current_user, b_params: params).update_available_attributes
+      @bike = BikeUpdator.new(user: current_user, bike: @bike, b_params: params, current_ownership: @current_ownership).update_available_attributes
     rescue => e
       flash[:error] = e.message
       redirect_to bike_path(params[:id]) and return
     end
-    @bike = bike.decorate
-    if bike.errors.any?
-      flash[:error] = bike.errors.full_messages
+    @bike = @bike.decorate
+    if @bike.errors.any?
+      if revised_layout_enabled?
+        @page_errors = @bike.errors
+      else
+        flash[:error] = @bike.errors.full_messages
+      end
       render action: :edit
     else
       flash[:notice] = "Bike successfully updated!"
@@ -244,7 +239,7 @@ class BikesController < ApplicationController
       ownership: 'Change Owner or Delete',
       stolen: (@bike.stolen ? 'Theft details' : 'Report Stolen or Missing')
     }
-    # To make stolen the first key if bike is stolen & as_json for string keys instead of sym
+    # To make stolen the first key if bike is stolen. using as_json for string keys instead of sym
     (@bike.stolen ? hash.to_a.rotate(-1).to_h : hash).as_json
   end
 
@@ -274,13 +269,22 @@ class BikesController < ApplicationController
     @b_param = BParam.find_or_new_from_token(token, user_id: current_user.id)
   end
 
-  def ensure_user_for_edit
-    unless current_user.present?
-      if @bike.current_owner_exists
-        flash[:error] = "Whoops! You have to sign in to be able to edit that #{@bike.type}."
-      else
-        flash[:error] = "That #{@bike.type} hasn't been claimed yet. If it's your bike sign up and you'll be able to edit it!"
+  def ensure_user_allowed_to_edit
+    @current_ownership = @bike.current_ownership
+    type = @bike && @bike.type || 'bike'
+    if current_user.present?
+      unless @current_ownership && @current_ownership.owner == current_user
+        error = "Oh no! It looks like you don't own that #{type}."
       end
+    else
+      if @current_ownership && @bike.current_ownership.claimed
+        error = "Whoops! You have to sign in to be able to edit that #{type}."
+      else
+        error = "That #{type} hasn't been claimed yet. If it's your {type} sign up and you'll be able to edit it!"
+      end
+    end
+    if error.present? # Can't assign directly to flash here, sometimes kick out of edit because other flash error
+      flash[:error] = error
       redirect_to bike_path(@bike) and return
     end
   end

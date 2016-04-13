@@ -1,0 +1,22 @@
+.primary-alert-block
+  - flash.each do |name, msg|
+    = render partial: '/shared/alert', locals: { body: msg, type: name }
+
+  - if @page_errors.any? # Primarily used for form object errors
+    - title = "Please fix the following #{pluralize(@page_errors.count, 'error')}"
+    - error_body = capture_haml do
+      %ul
+        - @page_errors.each do |msg|
+          %li
+            = msg
+    = render partial: '/shared/alert', locals: { body: error_body, title: title }
+
+:plain
+  <script id="alert-template" type="x-tmpl-mustache">
+    <div class="alert alert-{{alert_type}} in" data-seconds="{{seconds}}">
+      <button aria-label="Close" class="close" data-dismiss="alert" type="button">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      {{alert_body}}
+    </div>
+  </script>

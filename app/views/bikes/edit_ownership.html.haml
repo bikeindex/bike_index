@@ -1,4 +1,4 @@
-= form_for @bike, multipart: true do |f|
+= form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do |f|
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
       = render partial: '/bikes/edit_primary_menu'
@@ -46,21 +46,18 @@
 
 
 - modal_body = capture_haml do
-  .modal-body
-    .alert.alert-error.currently-hidden#request-delete-error
-      %button.close{'aria-label' => 'Close', 'data-dismiss' => 'modal', type: 'button'}
-        %span{'aria-hidden' => 'true'} &times;
-      %h4
-        We want to know why!
-      %p
-        Please fill in the reason for the bike deletion
-    = form_tag  do |t|
+  = form_tag do |t|
+    .modal-body
+      = render partial: '/shared/alert', locals: { body: "Please fill in the reason for the #{@bike.type} deletion", title: 'We want to know why!', class_names: 'currently-hidden' }
       = hidden_field_tag :bike_delete_bike_id, @bike.id
       .form-group
         %label{ for: :bike_delete_reason }
           Reason for deletion
         = text_area_tag :bike_delete_reason, '', class: 'form-control'
-      .form-group
-        %a.btn.btn-danger#request-delete-btn{ href: '#' }
-          Delete bike
-= render partial: '/shared/modal', locals: { title: "Are you sure you want to delete this #{@bike.type}?", id: 'request-delete', data_hash: { url: "#{ENV['BASE_URL']}#{send_request_api_v1_users_path}" },  modal_body: modal_body }
+    .modal-btn-footer
+      .col-xs-6.col-xs-push-6
+        = submit_tag 'Delete bike', class: 'btn btn-danger'
+      .col-xs-6.col-xs-pull-6
+        %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
+          Nevermind
+= render partial: '/shared/modal', locals: { title: "Are you sure you want to delete this #{@bike.type}?", id: 'request-delete', modal_body: modal_body }

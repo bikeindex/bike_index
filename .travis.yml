@@ -1,17 +1,19 @@
 language: ruby
 services:
-- redis
+  - redis
 addons:
   postgresql: '9.4'
 rvm:
-- 2.1.3
+  - 2.1.3
+before_install:
+   - gem install bundler -v 1.9.10
 script:
-- RAILS_ENV=test bundle exec rake db:migrate && bundle exec rspec
+  - bundle exec rspec
 before_script:
-- redis-cli info
-- psql -c 'create database bikeindex_test' -U postgres
+  - redis-cli info
+  - psql -c 'create database bikeindex_test' -U postgres
+  - bundle exec rake db:structure:load
 cache: bundler
-sudo: false
 env:
   global:
     secure: nFEP4tS5b44gE84jiZmcUebG6uflwYGwDyX2OR5vqVbYjFRqxwCUaLLUO98kga2KmzMsELQRpZz8mFWXMt9o37Fl0wbSJN574Mb/8z9kOZfUJutJOps2qYgbTgbAYNBnPPoFJIu2t2Dw6MOSRGgUguHmUV0gGEIeBInxZa23QOw=

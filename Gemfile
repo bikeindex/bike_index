@@ -79,11 +79,19 @@ gem 'stackprof', require: false
 gem 'memory_profiler', require: false
 gem 'flamegraph', require: false
 gem 'rack-mini-profiler', require: false # If you can't see it you can't make it better
+
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'
   gem 'coffee-rails', '~> 3.2.1'
   gem 'therubyracer', '~> 0.12.1' , platforms: :ruby
   gem 'uglifier', '~> 2.7.2'
+end
+
+gem 'bundler', '>= 1.8.4' # required for rails-assets
+# rails-assets.org - JS and CSS stuff
+source 'https://rails-assets.org' do
+  gem 'rails-assets-tether', '~> 1.1.0'
+  gem 'rails-assets-mustache', '~> 2.2.1'
 end
 
 group :development do
@@ -92,7 +100,6 @@ group :development do
   gem 'growl'
   gem 'guard'
   gem 'guard-rspec', '~> 4.2.10'
-  gem 'guard-livereload'
   gem 'guard-rubocop'
   gem 'bullet'
   gem 'should_clean'

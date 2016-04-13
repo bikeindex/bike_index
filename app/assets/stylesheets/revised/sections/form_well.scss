@@ -75,15 +75,13 @@ $form-well-border-color: #e4e4e4;
   .form-well-label, .form-well-input, .form-well-input-large, .right-input-help {
     @include make-col(); 
   }
-  .related-fields {
-    padding-bottom: $vertical-height;
-    .form-group { clear: both; }
-  }
+  .related-fields { padding-bottom: $vertical-height; }
   .full-width-section { // pad the sides so that it fits the row.
     padding-left: $row-side-padding;
     padding-right: $row-side-padding;
   }
   .form-group {
+    clear: both;
     .radio-inline, .checkbox-inline { 
       padding-top: .5em;
       input[type="radio"], input[type="checkbox"] {
@@ -105,12 +103,15 @@ $form-well-border-color: #e4e4e4;
 // XS screens
 @media (max-width: $grid-breakpoint-sm - 1px) {
   .form-well {
-    .form-well-input, .form-well-input-large { @include make-col-span(8); }
+    .form-well-input { @include make-col-span(8); }
     .form-well-label { @include make-col-span(4); }
+    .form-well-input-large, .form-well-label-large-input { @include make-col-span(12); }
+    .form-well-label-large-input { padding-top: 0; }
     .right-input-help {
       @include make-col-offset(4);
       @include make-col-span(8);
       margin-top: -.5em;
+      label { padding-top: .5em; } // To pad checkboxes a bit
     }
     .unnested-field::after, .related-fields::after {
       content: '';

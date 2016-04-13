@@ -6,31 +6,32 @@ class BikeIndex.BikesEditOwnership extends BikeIndex
     pagespace = @
     $('#hide_bike_toggle').click (e) ->
       pagespace.toggleHidden(e)
-    $('#request-bike-delete-btn').click (e) ->
-      pagespace.requestDelete(e)
+    $('#request-delete form').submit (e) ->
+      e.preventDefault()
+      pagespace.requestDelete()
 
   toggleHidden: (e) ->
     e.preventDefault()
     $('#hide_bike_toggle_group input').val('true')
-    $('form.edit_bike').submit()
+    window.pageScript.submitBikeEditForm()
 
-  requestDelete: (e) ->
-    e.preventDefault()
+  requestDeleteRequestCallback: (data, success) ->
+    if success
+      msg = 'Deleting your bike now. We delete all bikes by hand, it could take up to a day before your bike is gone. Thanks for your patience!'
+      window.BikeIndexAlerts.add('info', msg, window.pageScript.submitBikeEditForm)
+    else
+      msg = "Oh no! Something went wrong and we couldn't send the delete request."
+      window.BikeIndexAlerts.add('error', msg)
+
+  requestDelete: ->
     reason = $('#bike_delete_reason').val()
     bike_id = $('#bike_delete_bike_id').val()
     if reason.length > 0 && bike_id.length > 0
-      url = $('#request-delete').attr('data-url')
-      $.ajax
-        type: "POST"
-        url: url
-        data:
-          request_type: 'bike_delete_request'
-          request_bike_id: bike_id
-          request_reason: reason
-        success: (data, textStatus, jqXHR) ->
-          # BikeIndex.alertMessage('success', 'Bike delete submitted', "Deleting your bike now. We delete all bikes by hand, it could take up to a day before your bike is gone. Thanks for your patience!")
-        error: (data, textStatus, jqXHR) ->
-          # BikeIndex.alertMessage('error', 'Request failed', "Oh no! Something went wrong and we couldn't send the delete request.")
-      $('#request-delete').modal('hide')
+      data =
+        request_type: 'bike_delete_request'
+        request_bike_id: bike_id
+        request_reason: reason
+      response_callback = @requestDeleteRequestCallback
+      new BikeIndex.SubmitUserRequest(data, response_callback)
     else
-      $('#request-delete-error').slideDown('fast').removeClass('currently-hidden')
+      $('#request-delete .alert').slideDown('fast').removeClass('currently-hidden')

@@ -16,3 +16,9 @@ class BikeIndex.BikesEdit extends BikeIndex
 
   updatePageLocation: (url) ->
     window.location.href = url
+
+  submitBikeEditForm: ->
+    $('form.primary-edit-bike-form').submit()
+    setTimeout (-> # Sometimes the page reload isn't triggered. Do it manually
+      location.reload(true)
+    ), 300
