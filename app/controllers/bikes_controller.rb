@@ -194,16 +194,8 @@ class BikesController < ApplicationController
 
 
   def edit
-    begin
-      BikeUpdator.new(user: current_user, b_params: params).ensure_ownership!
-      rescue UserNotLoggedInError => e
-        flash[:error] = e.message
-        redirect_to new_user_path and return
-      rescue => e
-        flash[:error] = e.message
-        redirect_to bike_path(@bike) and return
-    end
     if revised_layout_enabled?
+      @page_errors = @bike.errors
       @edit_template = edit_templates[params[:page]].present? ? params[:page] : edit_templates.keys.first
       render "edit_#{@edit_template}".to_sym, layout: 'application_revised'
     else
@@ -222,7 +214,11 @@ class BikesController < ApplicationController
     end
     @bike = bike.decorate
     if bike.errors.any?
-      flash[:error] = bike.errors.full_messages
+      if revised_layout_enabled?
+        @page_errors = @bike.errors
+      else
+        flash[:error] = bike.errors.full_messages
+      end
       render action: :edit
     else
       flash[:notice] = "Bike successfully updated!"
@@ -244,7 +240,7 @@ class BikesController < ApplicationController
       ownership: 'Change Owner or Delete',
       stolen: (@bike.stolen ? 'Theft details' : 'Report Stolen or Missing')
     }
-    # To make stolen the first key if bike is stolen & as_json for string keys instead of sym
+    # To make stolen the first key if bike is stolen. using as_json for string keys instead of sym
     (@bike.stolen ? hash.to_a.rotate(-1).to_h : hash).as_json
   end
 
@@ -275,14 +271,19 @@ class BikesController < ApplicationController
   end
 
   def ensure_user_for_edit
-    unless current_user.present?
-      if @bike.current_owner_exists
+    @current_ownership = @bike.current_ownership
+    if current_user.present?
+      unless @current_ownership && @current_ownership.owner == current_user
+        flash[:error] = "Oh no! It looks like you don't own that #{@bike.type}."
+      end
+    else
+      if @current_ownership && @bike.current_ownership.claimed
         flash[:error] = "Whoops! You have to sign in to be able to edit that #{@bike.type}."
       else
-        flash[:error] = "That #{@bike.type} hasn't been claimed yet. If it's your bike sign up and you'll be able to edit it!"
+        flash[:error] = "That #{@bike.type} hasn't been claimed yet. If it's your {@bike.typ} sign up and you'll be able to edit it!"
       end
-      redirect_to bike_path(@bike) and return
     end
+    redirect_to bike_path(@bike) and return if flash[:error].present?
   end
 
   def render_ad

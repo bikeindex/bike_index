@@ -45,7 +45,7 @@ $border-radius-sm:       1px;
 @import "bootstrap/pagination";
 // @import "bootstrap/tags";
 @import "bootstrap/jumbotron";
-@import "bootstrap/alert";
+// @import "bootstrap/alert";
 @import "bootstrap/progress";
 @import "bootstrap/media";
 @import "bootstrap/list-group";
@@ -92,6 +92,7 @@ $row-side-padding: 0.9375rem;
 // Bootstrap overrides
 @import "revised/mixins/buttons";
 @import "revised/sections/modals";
+@import "revised/sections/alerts";
 
 // Bike Index mixins
 @import "revised/mixins/trash_can_icon";

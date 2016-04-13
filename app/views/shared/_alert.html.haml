@@ -7,10 +7,10 @@
 - unless body.include? '<' # Ensure we make it html
   - body = content_tag(:p, body)
 
-.alert.alert-error.currently-hidden
+.alert{ class: class_names }
+  %button.close{'aria-label' => 'Close', 'data-dismiss' => 'alert', type: 'button'}
+    %span{'aria-hidden' => 'true' } &times;
   - if title
     %h4
       = title
-  %button.close{'aria-label' => 'Close', 'data-dismiss' => 'modal', type: 'button'}
-    %span{'aria-hidden' => 'true'} &times;
   = body
