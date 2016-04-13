@@ -9,7 +9,7 @@ class BikeIndex.FormWell extends BikeIndex
       placement: placement
 
   popoverPlacement: ->
-    # When $grid-breakpoint-sm or less, do to the left so we don't overflow
+    # When $grid-breakpoint-sm or less, place popovers to the left so we don't overflow
     if window.innerWidth < 544
       'left'
     else

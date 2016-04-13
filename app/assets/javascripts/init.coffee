@@ -13,7 +13,7 @@ class window.BikeIndex
       info_about: BikeIndex.InfoAbout
       bikes_new: BikeIndex.BikesNew
       bikes_edit: BikeIndex.BikesEdit
-    new pageClasses[body_id] if Object.keys(pageClasses).includes(body_id)
+    window.pageScript = new pageClasses[body_id] if Object.keys(pageClasses).includes(body_id)
 
   loadFancySelects: ->
     $('.unfancy.fancy-select select').selectize
