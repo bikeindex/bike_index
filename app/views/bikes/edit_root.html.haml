@@ -12,20 +12,18 @@
           .related-fields.row
             .form-group
               = f.label :serial_number, class: 'form-well-label'
-              .form-well-input
-                %p.form-control-static
-                  = @bike.serial_number
-                .below-input-help
-                  %a
-                    Submit serial correction
+              %p.serial-and-manufacturer-input
+                = @bike.serial_number
+              .submit-correction-block
+                %a{data: { toggle: 'modal', target: '#serial-correction' } }
+                  Submit serial correction
             .form-group
               = f.label :manufacturer, class: 'form-well-label'
-              .form-well-input
-                %p.form-control-static
-                  = @bike.manufacturer_name
-                .below-input-help
-                  %a
-                    Submit Manufacturer Correction
+              %p.serial-and-manufacturer-input
+                = @bike.manufacturer_name
+              .submit-correction-block
+                %a{data: { toggle: 'modal', target: '#manufacturer-correction' } }
+                  Submit Manufacturer Correction
 
           .form-group.row.fancy-select.unfancy.unnested-field
             = f.label :year, 'Model year', class: 'form-well-label'
@@ -67,7 +65,7 @@
               = f.text_field :name, class: 'form-control'
 
           .form-group.row.unnested-field
-            = f.label :description, 'General description', class: 'form-well-label'
+            = f.label :description, 'General description', class: 'form-well-label form-well-label-large-input'
             .form-well-input-large
               = f.text_area :description, rows: 3, class: 'form-control', placeholder: 'Tell us about your bike!'
 

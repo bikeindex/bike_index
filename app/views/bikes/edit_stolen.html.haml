@@ -12,7 +12,7 @@
             / Helper text display
             - stolen_type = @bike.recovered ? 'recovered' : 'stolen'
             = f.fields_for :stolen_records do |srecord|
-              - next unless srecord.object.current
+              - next unless srecord.object.current # Because they may have multiple stolen records
               .form-group.row.unnested-field
                 = f.label :date_stolen_input, "When was it #{stolen_type}", class: 'form-well-label'
                 .form-well-input

@@ -103,12 +103,15 @@ $form-well-border-color: #e4e4e4;
 // XS screens
 @media (max-width: $grid-breakpoint-sm - 1px) {
   .form-well {
-    .form-well-input, .form-well-input-large { @include make-col-span(8); }
+    .form-well-input { @include make-col-span(8); }
     .form-well-label { @include make-col-span(4); }
+    .form-well-input-large, .form-well-label-large-input { @include make-col-span(12); }
+    .form-well-label-large-input { padding-top: 0; }
     .right-input-help {
       @include make-col-offset(4);
       @include make-col-span(8);
       margin-top: -.5em;
+      label { padding-top: .5em; } // To pad checkboxes a bit
     }
     .unnested-field::after, .related-fields::after {
       content: '';
