@@ -87,12 +87,11 @@ group :assets do
   gem 'uglifier', '~> 2.7.2'
 end
 
-
+# Rails assets - JS and CSS stuff
 source 'https://rails-assets.org' do
   gem 'rails-assets-tether', '~> 1.1.0'
   gem 'rails-assets-mustache', '~> 2.2.1'
 end
-
 
 group :development do
   # gem 'ruby_gntp' # For linux
