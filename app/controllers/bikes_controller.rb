@@ -59,14 +59,10 @@ class BikesController < ApplicationController
   end
 
   def pdf
-    unless bike.owner == current_user or current_user.is_member_of?(bike.creation_organization)
-      flash[:error] = "Sorry, that's not your bike!"
-      redirect_to bike_path(bike) and return
+    if @bike.stolen and @bike.current_stolen_record.present?
+      @stolen_record = @bike.current_stolen_record.decorate
     end
-    if bike.stolen and bike.current_stolen_record.present?
-      @stolen_record = bike.current_stolen_record.decorate
-    end
-    @bike = bike.decorate
+    @bike = @bike.decorate
     filename = "Registration_" + @bike.updated_at.strftime("%m%d_%H%M")[0..-1]
     unless @bike.pdf.present? && @bike.pdf.file.filename == "#{filename}.pdf"
       pdf = render_to_string pdf: filename, template: 'bikes/pdf'
