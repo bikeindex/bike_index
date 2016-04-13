@@ -530,6 +530,7 @@ DEPENDENCIES
   bootstrap (~> 4.0.0.alpha3)
   brakeman
   bullet
+  bundler (>= 1.8.4)
   carrierwave (~> 0.9.0)
   carrierwave_backgrounder
   chartkick
@@ -614,3 +615,6 @@ DEPENDENCIES
   wicked_pdf
   wine_bouncer
   wkhtmltopdf-binary
+
+BUNDLED WITH
+   1.11.2

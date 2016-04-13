@@ -87,7 +87,8 @@ group :assets do
   gem 'uglifier', '~> 2.7.2'
 end
 
-# Rails assets - JS and CSS stuff
+gem 'bundler', '>= 1.8.4'
+# https://rails-assets.org - JS and CSS stuff
 source 'https://rails-assets.org' do
   gem 'rails-assets-tether', '~> 1.1.0'
   gem 'rails-assets-mustache', '~> 2.2.1'
