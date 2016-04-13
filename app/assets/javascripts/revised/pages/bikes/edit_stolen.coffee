@@ -16,14 +16,13 @@ class BikeIndex.BikesEditStolen extends BikeIndex
     window.pageScript.submitBikeEditForm()
 
   recoveredRequestCallback: (message, success) ->
-    $('#toggle-stolen').modal('hide')
     if success
-      console.log 'IN SUCCESS'
-      # BikeIndex.alertMessage('success', 'Bike marked recovered', "Thanks! We're so glad you got your bike back!")
+      msg = "Thanks for telling us! We're so glad you got your bike back!"
       $('#bike_stolen').prop('checked', '')
-      window.pageScript.submitBikeEditForm()
+      window.BikeIndexAlerts.add('success', msg, window.pageScript.submitBikeEditForm)
     else
-      # BikeIndex.alertMessage('error', 'Request failed', "Oh no! Something went wrong and we couldn't mark your bike recovered.")
+      msg = "Oh no! Something went wrong and we couldn't mark your bike recovered."
+      window.BikeIndexAlerts.add('error', msg)
 
   markRecovered: () ->
     $('#primary_stolen_phone_field input').attr('required', false)

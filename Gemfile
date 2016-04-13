@@ -87,8 +87,8 @@ group :assets do
   gem 'uglifier', '~> 2.7.2'
 end
 
-gem 'bundler', '>= 1.8.4'
-# https://rails-assets.org - JS and CSS stuff
+gem 'bundler', '>= 1.8.4' # required for rails-assets
+# rails-assets.org - JS and CSS stuff
 source 'https://rails-assets.org' do
   gem 'rails-assets-tether', '~> 1.1.0'
   gem 'rails-assets-mustache', '~> 2.2.1'
@@ -100,7 +100,6 @@ group :development do
   gem 'growl'
   gem 'guard'
   gem 'guard-rspec', '~> 4.2.10'
-  # gem 'guard-livereload'
   gem 'guard-rubocop'
   gem 'bullet'
   gem 'should_clean'

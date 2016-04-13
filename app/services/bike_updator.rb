@@ -41,8 +41,6 @@ class BikeUpdator
   end
 
   def ensure_ownership!
-    pp @current_ownership
-    pp @user
     return true if @current_ownership && @current_ownership.owner == @user # So we can pass in ownership and skip query
     return true if @user && @bike.owner == @user
     raise BikeUpdatorError, "Oh no! It looks like you don't own that bike."

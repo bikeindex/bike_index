@@ -5,7 +5,7 @@ class BikeIndex.Alerts extends BikeIndex
 
   add: (alert_type = 'error', alert_body = '', callback = false) ->
     if callback # The only reason to pass a callback is if it will reload the page
-      @storeAlert(alert_type, alert_body, callback)
+      @storeAlert(alert_type, alert_body, callback) # So store the alert and run the callback
     else
       @displayAlert(alert_type, alert_body)
 
@@ -44,7 +44,7 @@ class BikeIndex.Alerts extends BikeIndex
       alert_type: alert_type
       alert_body: alert_body
     localStorage.setItem('stored_alert', JSON.stringify(stored_alert))
-    callback
+    callback()
 
   displayStoredAlerts: ->
     stored_alert = localStorage.getItem 'stored_alert'

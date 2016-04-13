@@ -34,16 +34,18 @@ class BikeIndex.BikesEditRoot extends BikeIndex
       year_select.enable()
 
   requestSerialUpdateRequestCallback: (data, success) ->
-    # BikeIndex.alertMessage('success', 'Serial correction submitted', "Processing your updated serial now. We review all updates by hand, it could take up to a day before your bike is updated. Thanks!")
-    # BikeIndex.alertMessage('error', 'Request failed', "We're unable to process the update! Try again?")
-    $('.modal.in').modal('hide')
-    window.pageScript.submitBikeEditForm()
+    if success
+      msg = "We've updated your serial!"
+      window.BikeIndexAlerts.add('success', msg, window.pageScript.submitBikeEditForm)
+    else
+      window.BikeIndexAlerts.add('error', "We're unable to process the update! Try again?")
 
   requestManufacturerUpdateRequestCallback: (data, success) ->
-    # BikeIndex.alertMessage('success', 'Manufacturer correction submitted', "Processing your updated Manufacturer now. We review all updates by hand, it could take up to a day before your bike is updated. Thanks!")
-    # BikeIndex.alertMessage('error', 'Request failed', "We're unable to process the update! Try again?")
-    $('.modal.in').modal('hide')
-    window.pageScript.submitBikeEditForm()
+    if success
+      msg = "We've updated your manufacturer!"
+      window.BikeIndexAlerts.add('success', msg, window.pageScript.submitBikeEditForm)
+    else
+      window.BikeIndexAlerts.add('error', "We're unable to process the update! Try again?")
 
   requestSerialUpdate: ->
     serial = $('#serial_update_serial').val()

@@ -16,10 +16,12 @@ class BikeIndex.BikesEditOwnership extends BikeIndex
     window.pageScript.submitBikeEditForm()
 
   requestDeleteRequestCallback: (data, success) ->
-    # BikeIndex.alertMessage('success', 'Bike delete submitted', "Deleting your bike now. We delete all bikes by hand, it could take up to a day before your bike is gone. Thanks for your patience!")
-    # BikeIndex.alertMessage('error', 'Request failed', "Oh no! Something went wrong and we couldn't send the delete request.")
-    $('.modal.in').modal('hide')
-    window.pageScript.submitBikeEditForm()
+    if success
+      msg = 'Deleting your bike now. We delete all bikes by hand, it could take up to a day before your bike is gone. Thanks for your patience!'
+      window.BikeIndexAlerts.add('info', msg, window.pageScript.submitBikeEditForm)
+    else
+      msg = "Oh no! Something went wrong and we couldn't send the delete request."
+      window.BikeIndexAlerts.add('error', msg)
 
   requestDelete: ->
     reason = $('#bike_delete_reason').val()
