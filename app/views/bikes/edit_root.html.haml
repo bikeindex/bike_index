@@ -78,3 +78,45 @@
             = f.label :zipcode, class: 'form-well-label'
             .form-well-input
               = f.text_field :zipcode, class: 'form-control', placeholder: 'zip code'
+
+- serial_correction_body = capture_haml do
+  = form_tag do |t|
+    .modal-body
+      = render partial: '/shared/alert', locals: { body: 'Please fill in both fields', class_names: 'currently-hidden' }
+      = hidden_field_tag :serial_update_bike_id, @bike.id
+      .form-group
+        %label{ for: :serial_update_serial }
+          Updated serial
+        = text_field_tag :serial_update_serial, '', class: 'form-control'
+      .form-group
+        %label{ for: :serial_update_reason }
+          Reason for update
+        = text_area_tag :serial_update_reason, '', class: 'form-control'
+    .modal-btn-footer
+      .col-xs-6.col-xs-push-6
+        = submit_tag 'Submit update', class: 'btn btn-primary'
+      .col-xs-6.col-xs-pull-6
+        %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
+          Nevermind
+= render partial: '/shared/modal', locals: { title: 'Update serial number', id: 'serial-correction', modal_body: serial_correction_body }
+
+- manufacturer_correction_body = capture_haml do
+  = form_tag do |t|
+    .modal-body
+      = render partial: '/shared/alert', locals: { body: 'Please fill in both fields', class_names: 'currently-hidden' }
+      = hidden_field_tag :manufacturer_update_bike_id, @bike.id
+      .form-group
+        %label{ for: :manufacturer_update_manufacturer }
+          Manufacturer
+        = text_field_tag :manufacturer_update_manufacturer, '', class: 'form-control unfancy'
+      .form-group
+        %label{ for: :manufacturer_update_reason }
+          Reason for update
+        = text_area_tag :manufacturer_update_reason, '', class: 'form-control'
+    .modal-btn-footer
+      .col-xs-6.col-xs-push-6
+        = submit_tag 'Submit update', class: 'btn btn-primary'
+      .col-xs-6.col-xs-pull-6
+        %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
+          Nevermind
+= render partial: '/shared/modal', locals: { title: 'Update manufacturer', id: 'manufacturer-correction', modal_body: manufacturer_correction_body }

@@ -13,7 +13,6 @@ class BikeIndex.ManufacturersSelect extends BikeIndex
       value_field = 'id' # for convenience instantiating
     $target.selectize
       plugins: ['restore_on_backspace']
-      # preload: true # Not unless we get pagination, since it confuses people
       options: initial_opts
       persist: false
       create: false

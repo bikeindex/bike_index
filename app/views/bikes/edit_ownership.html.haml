@@ -48,13 +48,7 @@
 - modal_body = capture_haml do
   = form_tag do |t|
     .modal-body
-      .alert.alert-error.currently-hidden#request-delete-error
-        %button.close{'aria-label' => 'Close', 'data-dismiss' => 'modal', type: 'button'}
-          %span{'aria-hidden' => 'true'} &times;
-        %h4
-          We want to know why!
-        %p
-          Please fill in the reason for the bike deletion
+      = render partial: '/shared/alert', locals: { body: "Please fill in the reason for the #{@bike.type} deletion", title: 'We want to know why!', class_names: 'currently-hidden' }
       = hidden_field_tag :bike_delete_bike_id, @bike.id
       .form-group
         %label{ for: :bike_delete_reason }

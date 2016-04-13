@@ -41,4 +41,4 @@ class BikeIndex.BikesEditStolen extends BikeIndex
       response_callback = @recoveredRequestCallback
       new BikeIndex.SubmitUserRequest(data, response_callback)
     else
-      $('#toggle-stolen-error').slideDown('fast')
+      $('#toggle-stolen .alert').slideDown('fast').removeClass('currently-hidden')

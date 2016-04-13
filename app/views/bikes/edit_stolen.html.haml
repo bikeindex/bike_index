@@ -103,17 +103,14 @@
 
 - if @bike.stolen and @bike.find_current_stolen_record.present?
   - modal_title = "We're so glad you got your #{@bike.type} back!"
+  - alert_body = capture_haml do
+    %p
+      Please tell us how you got your #{@bike.type} back, we really care! 
+    %p
+      It's how we get better at recovering bikes.
   - modal_body = capture_haml do
     .modal-body
-      .alert.alert-error.currently-hidden#toggle-stolen-error
-        %button.close{'aria-label' => 'Close', 'data-dismiss' => 'modal', type: 'button'}
-          %span{'aria-hidden' => 'true'} &times;
-        %h4
-          Not enough information!
-        %p
-          Please tell us how you got your #{@bike.type} back, we really care! 
-        %p
-          It's how we get better at recovering bikes.
+      = render partial: '/shared/alert', locals: { body: alert_body, title: 'Not enough information!', class_names: 'currently-hidden' }
       = form_tag  do |t|
         = hidden_field_tag :mark_recovered_bike_id, @bike.id
         = hidden_field_tag :mark_recovered_stolen_record_id, (@bike.current_stolen_record_id if @bike.current_stolen_record_id.present?)

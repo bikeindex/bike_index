@@ -1,0 +1,16 @@
+- class_names ||= ''
+- type ||= 'error'
+- class_names += " alert-#{type}"
+
+- title ||= false
+- body ||= ''
+- unless body.include? '<' # Ensure we make it html
+  - body = content_tag(:p, body)
+
+.alert.alert-error.currently-hidden
+  - if title
+    %h4
+      = title
+  %button.close{'aria-label' => 'Close', 'data-dismiss' => 'modal', type: 'button'}
+    %span{'aria-hidden' => 'true'} &times;
+  = body

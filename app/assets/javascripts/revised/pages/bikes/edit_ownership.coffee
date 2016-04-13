@@ -18,7 +18,7 @@ class BikeIndex.BikesEditOwnership extends BikeIndex
   requestDeleteRequestCallback: (data, success) ->
     # BikeIndex.alertMessage('success', 'Bike delete submitted', "Deleting your bike now. We delete all bikes by hand, it could take up to a day before your bike is gone. Thanks for your patience!")
     # BikeIndex.alertMessage('error', 'Request failed', "Oh no! Something went wrong and we couldn't send the delete request.")
-    $('#request-delete').modal('hide')
+    $('.modal.in').modal('hide')
     window.pageScript.submitBikeEditForm()
 
   requestDelete: ->
@@ -32,4 +32,4 @@ class BikeIndex.BikesEditOwnership extends BikeIndex
       response_callback = @requestDeleteRequestCallback
       new BikeIndex.SubmitUserRequest(data, response_callback)
     else
-      $('#request-delete-error').slideDown('fast').removeClass('currently-hidden')
+      $('#request-delete .alert').slideDown('fast').removeClass('currently-hidden')
