@@ -21,12 +21,17 @@ class BikeIndex.Alerts extends BikeIndex
     @fadeOutAlerts()
 
   fadeOutAlerts: ->
-    for alert in $('.primary-alert-block .in')
-      $alert = $(alert)
-      # Set seconds to 0 to display forever
-      if $alert.data('seconds') > 0
-        $alert.removeClass('in')
-        @fadeAlert($alert, $alert.attr('data-seconds'))
+    if $('.primary-alert-block .alert').length > 0
+      for alert in $('.primary-alert-block .in')
+        $alert = $(alert)
+        # Set seconds to 0 to display forever
+        if $alert.data('seconds') > 0
+          $alert.removeClass('in')
+          @fadeAlert($alert, $alert.attr('data-seconds'))
+    else
+      # There aren't any alerts, so remove the fixed position block
+      $('.primary-alert-block').addClass('faded')
+
 
   fadeAlert: ($alert, seconds) ->
     setTimeout (->

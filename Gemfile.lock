@@ -113,10 +113,10 @@ GEM
     coffee-rails (3.2.2)
       coffee-script (>= 2.2.0)
       railties (~> 3.2.0)
-    coffee-script (2.2.0)
+    coffee-script (2.4.1)
       coffee-script-source
       execjs
-    coffee-script-source (1.7.0)
+    coffee-script-source (1.10.0)
     concurrent-ruby (1.0.1)
     connection_pool (2.2.0)
     dalli (2.7.0)
@@ -349,7 +349,19 @@ GEM
       activesupport (= 3.2.22)
       bundler (~> 1.0)
       railties (= 3.2.22)
+    rails-assets-headroom.js (0.7.0)
+    rails-assets-jquery (2.2.3)
+    rails-assets-jquery.dirtyforms (2.0.0)
+      rails-assets-jquery (>= 1.4.2)
+    rails-assets-microplugin (0.0.3)
+    rails-assets-moment (2.12.0)
     rails-assets-mustache (2.2.1)
+    rails-assets-pikaday (1.4.0)
+    rails-assets-selectize (0.12.1)
+      rails-assets-jquery (>= 1.7.0)
+      rails-assets-microplugin (~> 0.0.0)
+      rails-assets-sifter (~> 0.4.0)
+    rails-assets-sifter (0.4.5)
     rails-assets-tether (1.1.1)
     railties (3.2.22)
       actionpack (= 3.2.22)
@@ -528,7 +540,7 @@ DEPENDENCIES
   carrierwave_backgrounder
   chartkick
   codeclimate-test-reporter
-  coffee-rails (~> 3.2.1)
+  coffee-rails (~> 3.2.2)
   dalli
   database_cleaner
   doorkeeper (~> 2.0.1)
@@ -573,7 +585,12 @@ DEPENDENCIES
   rack-mini-profiler
   rack-throttle
   rails (= 3.2.22)
+  rails-assets-headroom.js (~> 0.7.0)!
+  rails-assets-jquery.dirtyforms (~> 2.0.0)!
+  rails-assets-moment (~> 2.12.0)!
   rails-assets-mustache (~> 2.2.1)!
+  rails-assets-pikaday (~> 1.4.0)!
+  rails-assets-selectize (~> 0.12.1)!
   rails-assets-tether (~> 1.1.0)!
   rake (< 11)
   rb-fsevent (~> 0.9.1)
@@ -585,7 +602,7 @@ DEPENDENCIES
   rqrcode-rails3
   rspec-rails
   rspec-sidekiq
-  sass-rails (~> 3.2.3)
+  sass-rails (~> 3.2.6)
   secure_headers
   should_clean
   shoulda-matchers

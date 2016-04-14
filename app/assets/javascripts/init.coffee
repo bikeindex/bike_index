@@ -13,7 +13,10 @@ class window.BikeIndex
     pageClasses =
       info_about: BikeIndex.InfoAbout
       bikes_new: BikeIndex.BikesNew
+      bikes_create: BikeIndex.BikesNew
       bikes_edit: BikeIndex.BikesEdit
+      bikes_update: BikeIndex.BikesEdit
+
     window.pageScript = new pageClasses[body_id] if Object.keys(pageClasses).includes(body_id)
 
   loadFancySelects: ->

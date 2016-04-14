@@ -1,6 +1,8 @@
 class BikeIndex.BikesEditStolen extends BikeIndex
   constructor: ->
     @initializeEventListeners()
+    if $('#bike_date_stolen_input').length > 0
+      @initializeDateSelector()
 
   initializeEventListeners: ->
     pagespace = @
@@ -9,6 +11,12 @@ class BikeIndex.BikesEditStolen extends BikeIndex
     $('#toggle-stolen form').submit (e) ->
       e.preventDefault()
       pagespace.markRecovered()
+
+  initializeDateSelector: ->
+    new Pikaday(
+      field: $('#bike_date_stolen_input')[0]
+      format: 'MM-DD-YYYY'
+    )
 
   markStolen: (e) ->
     e.preventDefault()

@@ -2,10 +2,6 @@
 /.bundle
 
 
-# Ignore the deploy location and certs
-config/certs
-config/deploy
-
 # Ignore all logfiles and tempfiles.
 /log/*.log
 /tmp
@@ -13,6 +9,7 @@ config/deploy
 coverage/*
 public/uploads/*
 public/caches
+.sass-cache
 public/partner
 .vagrant
 *.rdb

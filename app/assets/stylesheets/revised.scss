@@ -1,3 +1,10 @@
+/*
+ * Revised manifest file
+ * things from rails-assets
+ *= require pikaday
+ *= require selectize/selectize.bootstrap3.scss
+ */
+
 /*!
  * Bootstrap v4.0.0-alpha.2 (http://getbootstrap.com)
  * Copyright 2011-2016 Twitter, Inc.
@@ -97,9 +104,6 @@ $row-side-padding: 0.9375rem;
 // Bike Index mixins
 @import "revised/mixins/trash_can_icon";
 
-// External styles
-@import "includes/selectize_bootstrap3.scss";
-
 // shared styles
 @import "revised/sections/primary_header_nav";
 @import "revised/sections/primary_footer";
@@ -113,8 +117,6 @@ $row-side-padding: 0.9375rem;
 // 
 // Page styles
 // 
-
-
 // Bike pages
 @import "revised/pages/bikes/bikes_new";
 @import "revised/pages/bikes/bikes_edit_root";
@@ -124,3 +126,13 @@ $row-side-padding: 0.9375rem;
 html { background: $black-off; }
 body { min-height: 400px; }
 .currently-hidden { display: none; }
+
+
+// 
+// External overrides
+// 
+// Bike Index selectize overrides
+.selectize-dropdown [data-selectable] .highlight { background: rgba($blue, 0.2); }
+.selectize-dropdown .active { background-color: lighten(#bebebe, 10%); }
+// Pickaday overrides
+.pika-button:hover { background: $blue; }

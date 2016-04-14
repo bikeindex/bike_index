@@ -205,16 +205,15 @@ class BikesController < ApplicationController
       @bike = BikeUpdator.new(user: current_user, bike: @bike, b_params: params, current_ownership: @current_ownership).update_available_attributes
     rescue => e
       flash[:error] = e.message
-      redirect_to bike_path(params[:id]) and return
     end
     @bike = @bike.decorate
-    if @bike.errors.any?
+    if @bike.errors.any? || flash[:error].present?
       if revised_layout_enabled?
-        @page_errors = @bike.errors
+        edit and return
       else
-        flash[:error] = @bike.errors.full_messages
+        flash[:error] ||= @bike.errors.full_messages
+        render action: :edit and return
       end
-      render action: :edit
     else
       flash[:notice] = "Bike successfully updated!"
       return if return_to_if_present

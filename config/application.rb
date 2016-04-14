@@ -4,9 +4,12 @@ require 'csv'
 require 'rails/all'
 require 'rack/throttle'
 
-# Require the gems listed in Gemfile, including any gems
-# you've limited to :test, :development, or :production.
-Bundler.require(*Rails.groups)
+if defined?(Bundler)
+  # Require the gems listed in Gemfile, including any gems
+  # If you precompile assets before deploying to production, use this line     
+  # you've limited to :test, :development, or :production.
+  Bundler.require(*Rails.groups(assets: %w(development test)))
+end
 
 module Bikeindex
   class Application < Rails::Application
