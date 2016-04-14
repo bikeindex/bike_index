@@ -42,7 +42,7 @@ describe LocksController do
       it 'redirects to user_home' do
         lock = FactoryGirl.create(:lock)
         get :show, id: lock.id
-        expect(response).to redirect_to(:user_hom)
+        expect(response).to redirect_to(:user_home)
       end
     end
     context 'lock owner' do
@@ -54,5 +54,4 @@ describe LocksController do
       end
     end
   end
-
 end
