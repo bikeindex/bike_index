@@ -1,0 +1,30 @@
+#info_protect_your_bike {
+  h2 { @extend h5; }
+  #locking-demonstration {
+    @include border-radius(3px);
+    @include box-shadow(0 0 2px rgba(black,.2));
+    background: $gray-light;
+    padding: 10px;
+    margin: 0 0 60px;
+    .locked { 
+      @include border-radius(2px);
+      width: 100%;
+      background: #FFF;
+    }
+    img {
+      display: block;
+      max-width: 100%;
+      margin: 0 auto;
+      max-height: 450px;
+    }
+    p {
+      text-align: center;
+      font-style: italic;
+      color: white;
+      width: 100%;
+      margin: 0;
+      padding: 10px 10px 0;
+    }
+  }
+
+}

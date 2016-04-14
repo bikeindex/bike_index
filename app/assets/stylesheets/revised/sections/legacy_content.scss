@@ -1,6 +1,6 @@
 // Legacy content styles that apply to multiple legacy content pages
 .legacy-content-wrap {
-  .padded { padding-top: 2*$vertical-height; }
+  .footnotes, .padded { padding-top: 2*$vertical-height; }
   .fancy-bullets {
     position: relative;
     list-style-type: none;
@@ -40,7 +40,30 @@
     background: $green;
     border: 1px solid darken($green, 10%); 
   }
+
+  // Used by Serials and also image_resources
+  .serial-pictures {
+    @include list-unstyled;
+    margin: 30px 0;
+    list-style-type: none;
+    li {
+      @include clearfix;
+      margin: 20px 0 0 0;
+      position: relative;
+      width: 100%;
+      .serial-image {
+        width: 27%;
+        float: left;
+        display: block;
+        position: relative;
+        img { width: 100%; }
+        &.blackbg { background: black; } // This, for example, is only image_resources
+      }
+      p {
+        float: left;
+        margin-left: 3%;
+        width: 70%;
+      }
+    }
+  }
 }
-
-
-
