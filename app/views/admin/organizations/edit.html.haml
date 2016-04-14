@@ -11,7 +11,7 @@
         %strong
           Locations
       %p#us-country-code.other-value
-        = Country.find_by_iso("US").id
+        = Country.united_states.id
       %fieldset
         #admin-locations-fields.horizontal-form-list
           = f.fields_for :locations do |builder|

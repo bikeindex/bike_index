@@ -19,7 +19,7 @@ class Admin::BikesController < Admin::BaseController
 
   def missing_manufacturer
     session[:missing_manufacturer_time_order] = params[:time_ordered] if params[:time_ordered].present?
-    bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.find_by_slug('other').id)
+    bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.other_manufacturer.id)
     bikes = session[:missing_manufacturer_time_order] ? bikes.order('created_at desc') : bikes.order('manufacturer_other ASC')
     page = params[:page] || 1
     per_page = params[:per_page] || 100
@@ -105,7 +105,7 @@ class Admin::BikesController < Admin::BaseController
   protected
 
   def destroy_bike
-    AfterBikeSaveWorker.perform_async(@bike.id)
+    AfterBikeSaveWorker.new.perform(@bike.id)
     @bike.destroy
     flash[:notice] = "Bike deleted!"
     if params[:multi_delete]

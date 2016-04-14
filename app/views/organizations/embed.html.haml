@@ -105,7 +105,7 @@
           .control-group.special-select-single
             = builder.label :street, "Where was it stolen?", class: "control-label"
             #country_select_container.controls.special-select-single
-              = builder.collection_select(:country_id, Country.all, :id, :name, prompt: "Choose country", selected: Country.find_by_iso("US").id )
+              = builder.collection_select(:country_id, Country.all, :id, :name, prompt: "Choose country", selected: Country.united_states.id )
           .control-group.extra-group.special-select-single
             .controls
               = builder.text_field :street, placeholder: "Intersection or address"

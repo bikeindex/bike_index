@@ -1,6 +1,6 @@
 %fieldset.input-group.with-additional-block.add-component-fields
   %article
-    .control-group.select_unattached.special-select-single.has-position-select{data: {other: Ctype.find_by_slug("other").id, hidden: ".hidden-ctype" }}
+    .control-group.select_unattached.special-select-single.has-position-select{data: {other: Ctype.other.id, hidden: ".hidden-ctype" }}
       = f.label :ctype_id, "Part type", class: "control-label"
       .controls.part-type-select
         = f.collection_select(:ctype_id, Ctype.all, :id, :name, :required =>true, prompt: "What type of part?" )
@@ -17,7 +17,7 @@
               Rear
           = f.hidden_field :front_or_rear, class: "front-or-rear"
     - other_show = ""
-    - other_show = "other_present" if f.object.ctype_id == Ctype.find_by_slug("other").id
+    - other_show = "other_present" if f.object.ctype_id == Ctype.other.id
     .hidden-other.control-group.hidden-ctype{class: other_show }
       = f.label :ctype_other, "Other part type", class: "control-label"
       .controls

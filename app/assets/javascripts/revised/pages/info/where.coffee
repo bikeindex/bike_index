@@ -1,7 +1,7 @@
 class BikeIndex.InfoWhere extends BikeIndex
   constructor: ->
     @initializeEventListeners()
-    google.maps.event.addDomListener(window, 'load', @initializeMap);
+    google.maps.event.addDomListener(window, 'load', @initializeMap)
 
   initializeEventListeners: ->
     pagespace = @

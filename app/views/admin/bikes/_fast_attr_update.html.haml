@@ -63,7 +63,7 @@
           %label.control-label
             Drivetrain
           #drivetrain_checks.controls
-            - fixed = @bike.rear_gear_type == RearGearType.fixed.first
+            - fixed = @bike.rear_gear_type == RearGearType.fixed
             %label.checkbox
               %input#fixed_gear_check.checkbox.drive-check{ type: "checkbox", checked: fixed }
               Fixed gear

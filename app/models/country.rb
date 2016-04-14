@@ -15,4 +15,9 @@ class Country < ActiveRecord::Base
     end
   end
 
+
+  def self.united_states
+    where(name: 'United States', iso: 'US').first_or_create
+  end
+
 end
