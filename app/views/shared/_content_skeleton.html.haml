@@ -1,6 +1,9 @@
 .container.main-container-wrap
   .row
-    .col-md-8.primary-content-block
+    / Unless one of the whitelisted pages, wrap it in .legacy-content-wrap
+    - additional_class = %w().include?(content_page_type) ? '' : 'legacy-content-wrap'
+    .col-md-8.primary-content-block{ class: additional_class }
+
       = yield
     .col-md-4.primary-content-menu
       %nav.content-nav-group

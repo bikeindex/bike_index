@@ -11,7 +11,7 @@ class window.BikeIndex
   loadPageScript: (body_id) ->
     # All the per-page javascripts
     pageClasses =
-      info_about: BikeIndex.InfoAbout
+      info_where: BikeIndex.InfoWhere
       bikes_new: BikeIndex.BikesNew
       bikes_create: BikeIndex.BikesNew
       bikes_edit: BikeIndex.BikesEdit

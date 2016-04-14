@@ -1,12 +1,20 @@
 $body-font-family: 'Open Sans', sans-serif;
 $header-font-family: 'Montserrat', sans-serif;;
 $strong-font-weight: 700;
+
+$body-font-size: 15px;
+$h1-font-size: 54px;
+$h2-font-size: 36px;
+$h3-font-size: 24px;
+$h4-font-size: 15px;
+$h5-font-size: 18px;
+
 // body font style
 .body-font {
   font-family: $body-font-family;
   font-weight: 400;
   font-style: normal;
-  font-size: 15px;
+  font-size: $body-font-size;
   line-height: 2em;
   color: $body-font-color;
   em { font-style: italic; }
@@ -31,7 +39,7 @@ p {
 // p.intro on typecast
 h5 {
   @extend .body-font;
-  font-size: 18px;
+  font-size: $h5-font-size;
   font-weight: 600;
   line-height: 1.5em;
 }
@@ -64,7 +72,7 @@ h5 {
 h1 {
   @extend .header-font;
   letter-spacing: -1px;
-  font-size: 54px;
+  font-size: $h1-font-size;
   line-height: 1.12em;
 }
 
@@ -75,19 +83,19 @@ h1 {
 
 h2 {
   @extend .header-font;
-  font-size: 36px;
+  font-size: $h2-font-size;
   line-height: 1em;
 }
 
 h3 {
   @extend .header-font;
-  font-size: 24px;
+  font-size: $h3-font-size;
   line-height: 1em;
 }
 
 // Primary menu header height
 h4 {
   @extend .header-font;
-  font-size: 15px;
+  font-size: $h4-font-size;
   line-height: 18px;
 }
