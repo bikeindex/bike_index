@@ -16,7 +16,7 @@
     @include box-shadow(1px 1px 1px rgba(black,.2));
     display: block;
     position: absolute;
-    left: 0; top: 0;
+    left: 0; top: 1em;
     width: .6em; height: .6em;
     margin: .3em .6em 0 0;
     background: $blue;
