@@ -63,7 +63,7 @@ describe BikesController do
         ownership.bike.update_attributes(marked_user_hidden: 'true')
         set_current_user(user)
         get :show, id: ownership.bike_id
-        response.code.should eq('200')
+        expect(response.code).to eq('200')
       end
     end
 
@@ -80,7 +80,7 @@ describe BikesController do
     it 'renders the page from bike id' do
       bike = FactoryGirl.create(:bike)
       get :spokecard, id: bike.id
-      response.code.should eq('200')
+      expect(response.code).to eq('200')
     end
   end
 
@@ -88,16 +88,16 @@ describe BikesController do
     it 'renders the page from bike id' do
       bike = FactoryGirl.create(:bike)
       get :scanned, id: bike.id
-      response.should redirect_to bike_url(bike)
+      expect(response).to redirect_to bike_url(bike)
     end
     it 'redirects to the proper page' do
       bike = FactoryGirl.create(:bike, card_id: 2)
       get :scanned, card_id: bike.card_id
-      response.should redirect_to bike_url(bike)
+      expect(response).to redirect_to bike_url(bike)
     end
     it "renders a page if there isn't a connection" do
       get :scanned, card_id: 12
-      response.code.should eq('200')
+      expect(response.code).to eq('200')
     end
   end
 
@@ -110,21 +110,21 @@ describe BikesController do
       end
       it "does not redirect to new user if a user isn't present" do
         get :new, stolen: true
-        response.code.should eq('200')
+        expect(response.code).to eq('200')
       end
 
       it 'renders a new stolen bike' do
         set_current_user(user)
         get :new, { stolen: true }
-        response.code.should eq('200')
-        assigns(:bike).stolen.should be_true
+        expect(response.code).to eq('200')
+        expect(assigns(:bike).stolen).to be_true
       end
 
       it 'renders a new recovered bike' do
         set_current_user(user)
         get :new, { recovered: true }
-        response.code.should eq('200')
-        assigns(:bike).recovered.should be_true
+        expect(response.code).to eq('200')
+        expect(assigns(:bike).recovered).to be_true
       end
 
       it 'renders a new organization bike' do
@@ -132,7 +132,7 @@ describe BikesController do
         membership = FactoryGirl.create(:membership, user: user, organization: organization)
         set_current_user(user)
         get :new
-        response.code.should eq('200')
+        expect(response.code).to eq('200')
       end
     end
 
@@ -147,7 +147,7 @@ describe BikesController do
       context 'stolen from params' do
         it 'renders a new stolen bike' do
           get :new, stolen: true
-          response.code.should eq('200')
+          expect(response.code).to eq('200')
           expect(assigns(:bike).stolen).to be_true
           b_param = assigns(:b_param)
           expect(b_param.revised_new?).to be_true
@@ -220,7 +220,7 @@ describe BikesController do
           user = FactoryGirl.create(:user)
           set_current_user(user) 
           post :create, { bike: @bike }
-          # response.should render_template('new.html.haml')
+          # expect(response).to render_template('new.html.haml')
           expect(flash[:error]).to eq("Oops, that isn't your bike")
         end
 
@@ -230,22 +230,22 @@ describe BikesController do
           BikeCreator.any_instance.should_receive(:create_bike).and_return(bike)
           post :create, { bike: @bike }
           @b_param.reload.bike_errors.should_not be_nil
-          response.should render_template('new')
+          expect(response).to render_template('new')
         end
         
         it 'redirects to the created bike if it exists' do
           bike = FactoryGirl.create(:bike)
           @b_param.update_attributes(created_bike_id: bike.id)
           post :create, {bike: {b_param_id_token: @b_param.id_token}}
-          response.should redirect_to(edit_bike_url(bike))
+          expect(response).to redirect_to(edit_bike_url(bike))
         end
 
         it 'creates a new stolen bike' do
           FactoryGirl.create(:country, iso: 'US')
           @bike[:phone] = '312.379.9513'
-          lambda {
+          expect do
             post :create, { stolen: 'true', bike: @bike }
-          }.should change(StolenRecord, :count).by(1)
+          end.to change(StolenRecord, :count).by(1)
           @b_param.reload.created_bike_id.should_not be_nil
           @b_param.reload.bike_errors.should be_nil
           @user.reload.phone.should eq('3123799513')
@@ -255,9 +255,9 @@ describe BikesController do
           organization = FactoryGirl.create(:organization)
           membership = FactoryGirl.create(:membership, user: @user, organization: organization)
           @bike[:creation_organization_id] = organization.id
-          lambda { 
+          expect do
             post :create, { bike: @bike }
-          }.should change(Ownership, :count).by(1)
+          end.to change(Ownership, :count).by(1)
           Bike.last.creation_organization_id.should eq(organization.id)
         end
       end
@@ -281,9 +281,9 @@ describe BikesController do
             handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
             owner_email: 'Flow@goodtimes.com'
           }
-          lambda { 
+          expect do
             post :create, { bike: bike }
-          }.should change(Ownership, :count).by(1)
+          end.to change(Ownership, :count).by(1)
           bike = Bike.last
           bike.creation_organization_id.should eq(organization.id)
           bike.additional_registration.should eq('Testly secondary')
@@ -314,7 +314,7 @@ describe BikesController do
               image: test_photo
             }
             post :create, { bike: bike }
-            response.should redirect_to(embed_extended_organization_url(organization))
+            expect(response).to redirect_to(embed_extended_organization_url(organization))
           end
         end
       end
@@ -339,7 +339,7 @@ describe BikesController do
             owner_email: 'Flow@goodtimes.com',
           }
           post :create, { bike: bike, persist_email: true }
-          response.should redirect_to(embed_extended_organization_url(organization, email: 'flow@goodtimes.com'))
+          expect(response).to redirect_to(embed_extended_organization_url(organization, email: 'flow@goodtimes.com'))
         end
       end
     end
@@ -526,7 +526,7 @@ describe BikesController do
       it 'allows you to edit an example bike' do
         ownership.bike.update_attributes(example: true)
         put :update, id: bike.id, bike: { description: '69' }
-        response.should redirect_to edit_bike_url(bike)
+        expect(response).to redirect_to edit_bike_url(bike)
         bike.reload
         bike.description.should eq('69')
       end
@@ -535,7 +535,7 @@ describe BikesController do
         put :update, id: bike.id, bike: { description: '69', marked_user_hidden: '0' }
         bike.reload
         bike.description.should eq('69')
-        response.should redirect_to edit_bike_url(bike)
+        expect(response).to redirect_to edit_bike_url(bike)
         assigns(:bike).should be_decorated
         bike.hidden.should be_false
       end
@@ -558,7 +558,7 @@ describe BikesController do
         session[:return_to] = '/about'
         put :update, id: bike.id, bike: { description: '69', marked_user_hidden: '0' }
         bike.reload.description.should eq('69')
-        response.should redirect_to '/about'
+        expect(response).to redirect_to '/about'
         session[:return_to].should be_nil
       end
 
@@ -568,7 +568,7 @@ describe BikesController do
         bike.reload
         bike.description.should eq('69')
         session[:return_to].should be_nil
-        response.should redirect_to edit_bike_url
+        expect(response).to redirect_to edit_bike_url
       end
     end
     context 'owner present (who is allowed to edit)' do
@@ -584,7 +584,7 @@ describe BikesController do
         put :update, id: bike.id, bike: { description: '69', marked_user_hidden: '0' }
         bike.reload
         bike.description.should eq('69')
-        response.should redirect_to edit_bike_url(bike)
+        expect(response).to redirect_to edit_bike_url(bike)
         assigns(:bike).should be_decorated
         bike.hidden.should be_false
       end
