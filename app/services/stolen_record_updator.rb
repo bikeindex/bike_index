@@ -92,7 +92,7 @@ class StolenRecordUpdator
     if updated_phone.present?
       new_stolen_record.phone = updated_phone
     end
-    new_stolen_record.country_id = Country.find_by_iso("US").id rescue (raise StolenRecordError, "US isn't instantiated - Stolen Record updater error")
+    new_stolen_record.country_id = Country.united_states.id rescue (raise StolenRecordError, "US isn't instantiated - Stolen Record updater error")
     stolen_record = update_with_params(new_stolen_record)
     if stolen_record.save
       @bike.reload.update_attribute :current_stolen_record_id, stolen_record.id

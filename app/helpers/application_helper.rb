@@ -1,5 +1,5 @@
 module ApplicationHelper
-  def nav_link(link_text, link_path, match_controller: false, class_name: '')
+  def active_link(link_text, link_path, match_controller: false, class_name: '')
     class_name += ' active' if current_page_active(link_path, match_controller: match_controller)
     link_to(raw(link_text), link_path, class: class_name).html_safe
   end
@@ -17,10 +17,12 @@ module ApplicationHelper
     %w(info news).include?(controller_name)
   end
 
-  def current_page_form_well?
-    if controller_name == 'bikes'
-      %w(new edit update create).include?(action_name)
-    end
+  def content_page_type
+    if controller_name == 'info'
+      action_name
+    elsif controller_name == 'news'
+      'news'
+    end        
   end
 
   def current_link(link_text, link_path, class: '') # Revised layout link

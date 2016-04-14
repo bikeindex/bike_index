@@ -1,5 +1,5 @@
-$horizontal-content-menu-padding: 6px;
-.content-menu {
+$horizontal-content-menu-padding: $vertical-height;
+.primary-content-menu {
   .content-nav-group {
     h3 {
       background: $gray;
@@ -8,14 +8,16 @@ $horizontal-content-menu-padding: 6px;
     }
     ul {
       @include list-unstyled;
+      li { padding: 0 $horizontal-content-menu-padding; }
       a {
-        padding: $horizontal-content-menu-padding;
+        display: block;
+        // padding: $horizontal-content-menu-padding;
         color: $gray;
       }
     }
   }
 }
-
-@media(min: $grid-breakpoint-lg) {
-  
+@media(max-width: $grid-breakpoint-lg) {
+  .primary-content-menu { padding-top: 3*$vertical-height; }
 }
+

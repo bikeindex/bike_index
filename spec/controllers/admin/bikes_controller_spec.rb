@@ -1,162 +1,137 @@
 require 'spec_helper'
 
 describe Admin::BikesController do
+  let(:user) { FactoryGirl.create(:admin) }
+  before do
+    set_current_user(user)
+  end
 
-  describe :index do 
-    before do 
-      user = FactoryGirl.create(:admin)
-      set_current_user(user)
+  describe :index do
+    it 'renders' do
       get :index
+      expect(response.code).to eq('200')
+      expect(response).to render_template('index')
+      expect(flash).to_not be_present
     end
-    it { should respond_with(:success) }
-    it { should render_template(:index) }
-    it { should_not set_the_flash }
   end
 
-  describe :duplicates do 
-    before do 
-      user = FactoryGirl.create(:admin)
-      set_current_user(user)
+  describe :duplicates do
+    it 'renders' do
       get :duplicates
+      expect(response.code).to eq('200')
+      expect(response).to render_template('duplicates')
+      expect(flash).to_not be_present
     end
-    it { should respond_with(:success) }
-    it { should render_template(:duplicates) }
-    it { should_not set_the_flash }
   end
 
-  describe :edit do 
-    before do 
+  describe :edit do
+    it 'renders' do
       bike = FactoryGirl.create(:bike)
-      user = FactoryGirl.create(:admin)
-      set_current_user(user)
-      get :edit, id: bike.id 
+      get :edit, id: bike.id
+      expect(response.code).to eq('200')
+      expect(response).to render_template('edit')
+      expect(flash).to_not be_present
     end
-    it { should respond_with(:success) }
-    it { should render_template(:edit) }
-    it { should_not set_the_flash }
   end
 
-  describe :destroy do 
-    it "destroys the bike" do 
+  describe :destroy do
+    it 'destroys the bike' do
       bike = FactoryGirl.create(:bike)
-      user = FactoryGirl.create(:admin)
-      set_current_user(user)
-      delete :destroy, id: bike.id
-      response.should redirect_to(:admin_bikes)
-      flash[:notice].downcase.should match('deleted')
-      expect(AfterBikeSaveWorker).to have_enqueued_job(bike.id)
-      lambda{Bike.find(bike.id)}.should raise_error(ActiveRecord::RecordNotFound)
+      # We execute the after bike save worker inline because we're destroying the bike
+      expect_any_instance_of(AfterBikeSaveWorker).to receive(:perform) { bike.id }
+      expect do
+        delete :destroy, id: bike.id
+      end.to change(Bike, :count).by(-1)
+      expect(response).to redirect_to(:admin_bikes)
+      expect(flash[:notice]).to match(/deleted/i)
     end
   end
 
-  describe :update do 
-    describe "success" do 
-      before do 
+  describe :update do
+    context 'success' do
+      it 'updates the bike and calls update_ownership and serial_normalizer' do
+        expect_any_instance_of(BikeUpdator).to receive(:update_ownership)
+        expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
         bike = FactoryGirl.create(:bike)
-        user = FactoryGirl.create(:admin)
-        set_current_user(user)
         put :update, id: bike.id
+        expect(response).to redirect_to(:edit_admin_bike)
+        expect(flash).to be_present
       end
-      it { should redirect_to(:edit_admin_bike) }
-      it { should set_the_flash }
     end
 
-    it "calls update_ownership" do
-      BikeUpdator.any_instance.should_receive(:update_ownership)
-      bike = FactoryGirl.create(:bike)
-      user = FactoryGirl.create(:admin)
-      set_current_user(user)
-      put :update, id: bike.id
-    end
-
-    it "calls serial_normalizer" do
-      SerialNormalizer.any_instance.should_receive(:save_segments)
-      bike = FactoryGirl.create(:bike)
-      user = FactoryGirl.create(:admin)
-      set_current_user(user)
-      put :update, id: bike.id
-    end
-
-    describe "failure" do 
-      before do 
-        bike = FactoryGirl.create(:bike)
-        user = FactoryGirl.create(:admin)
-        set_current_user(user)
-        put :update, { id: bike.id, bike: { manufacturer_id: nil}}
+    context 'fast_attr_update' do
+      it 'marks a stolen bike recovered and passes attr update through' do
+        bike = FactoryGirl.create(:stolen_bike)
+        bike.reload
+        expect(bike.stolen).to be_true
+        opts = {
+          id: bike.id,
+          mark_recovered_reason: "I recovered it", 
+          index_helped_recovery: true,
+          can_share_recovery: 1,
+          fast_attr_update: true,
+          bike: { stolen: 0 }
+        }
+        expect do
+          put :update, opts
+        end.to change(RecoveryUpdateWorker.jobs, :size).by(1)
+        expect(assigns(:fast_attr_update)).to be_true
+        bike.reload
+        expect(bike.stolen).to be_false
       end
-      it { should render_template(:edit) }
     end
 
-    it "should mark a stolen bike recovered, and pass attr update through" do 
-      bike = FactoryGirl.create(:stolen_bike)
-      bike.reload.stolen.should be_true
-      opts = {
-        id: bike.id,
-        mark_recovered_reason: "I recovered it", 
-        index_helped_recovery: true,
-        can_share_recovery: 1,
-        fast_attr_update: true,
-        bike: { stolen: 0 }
-      }
-      user = FactoryGirl.create(:admin)
-      set_current_user(user)
-      expect {
+    context 'valid return_to url' do
+      it 'redirects' do
+        bike = FactoryGirl.create(:bike, serial_number: 'og serial')
+        session[:return_to] = '/about'
+        opts = {
+          id: bike.id,
+          bike: { serial_number: 'ssssssssss' }
+        }
         put :update, opts
-      }.to change(RecoveryUpdateWorker.jobs, :size).by(1)
-      assigns(:fast_attr_update).should be_true
-      bike.reload.stolen.should be_false
-    end
-
-    it "redirects to return_to if it's a valid url" do
-      user = FactoryGirl.create(:admin)
-      bike = FactoryGirl.create(:bike, serial_number: 'og serial')
-      set_current_user(user)
-      session[:return_to] = '/about'
-      opts = {
-        id: bike.id,
-        bike: { serial_number: 'ssssssssss' }
-      }
-      put :update, opts
-      bike.reload.serial_number.should eq("ssssssssss")
-      response.should redirect_to "/about"
-      session[:return_to].should be_nil
+        bike.reload
+        expect(bike.serial_number).to eq('ssssssssss')
+        expect(response).to redirect_to '/about'
+        expect(session[:return_to]).to be_nil
+      end
     end
   end
 
-  describe :ignore_duplicate do 
-    it "marks a duplicate group ignore" do 
-      user = FactoryGirl.create(:admin)
-      set_current_user(user)
+  describe :ignore_duplicate do
+    before do
       request.env["HTTP_REFERER"] = 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
-      duplicate_bike_group = DuplicateBikeGroup.create
-      expect(duplicate_bike_group.ignore).to be_false
-      put :ignore_duplicate_toggle, id: duplicate_bike_group.id 
-      duplicate_bike_group.reload
+    end
+    context 'marked ignore' do
+      it 'duplicates are ignore' do
+        duplicate_bike_group = DuplicateBikeGroup.create
+        expect(duplicate_bike_group.ignore).to be_false
+        put :ignore_duplicate_toggle, id: duplicate_bike_group.id 
+        duplicate_bike_group.reload
 
-      expect(duplicate_bike_group.ignore).to be_true
-      response.should redirect_to 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
+        expect(duplicate_bike_group.ignore).to be_true
+        expect(response).to redirect_to 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
+      end
     end
 
-    it "marks a duplicate group unignore" do 
-      user = FactoryGirl.create(:admin)
-      set_current_user(user)
-      request.env["HTTP_REFERER"] = 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
-      duplicate_bike_group = DuplicateBikeGroup.create(ignore: true)
-      expect(duplicate_bike_group.ignore).to be_true
-      put :ignore_duplicate_toggle, id: duplicate_bike_group.id 
-      duplicate_bike_group.reload
+    context 'duplicate group unignore' do
+      it "marks a duplicate group unignore" do
+        duplicate_bike_group = DuplicateBikeGroup.create(ignore: true)
+        expect(duplicate_bike_group.ignore).to be_true
+        put :ignore_duplicate_toggle, id: duplicate_bike_group.id 
+        duplicate_bike_group.reload
 
-      expect(duplicate_bike_group.ignore).to be_false
-      response.should redirect_to 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
+        expect(duplicate_bike_group.ignore).to be_false
+        expect(response).to redirect_to 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
+      end
     end
   end
 
-  describe :update_manufacturers do 
-    it "updates the products" do 
-      user = FactoryGirl.create(:admin)
-      set_current_user(user)
-      request.env["HTTP_REFERER"] = 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
-
+  describe :update_manufacturers do
+    before do
+      request.env['HTTP_REFERER'] = 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
+    end
+    it 'updates the products' do
       bike1 = FactoryGirl.create(:bike, manufacturer_other: 'hahaha')
       bike2 = FactoryGirl.create(:bike, manufacturer_other: '69')
       bike3 = FactoryGirl.create(:bike, manufacturer_other: '69')
@@ -166,13 +141,13 @@ describe Admin::BikesController do
         bikes_selected: { bike1.id => bike1.id, bike2.id => bike2.id }
       }
       post :update_manufacturers, update_params
-      bike1.reload.manufacturer.should eq(manufacturer)
-      bike2.reload.manufacturer.should eq(manufacturer)
-      bike1.manufacturer_other.should be_nil
-      bike2.manufacturer_other.should be_nil
-      bike3.manufacturer_other.should eq('69') # Sanity check
+      [bike1, bike2].each do |bike|
+        bike.reload
+        expect(bike.manufacturer).to eq manufacturer
+        expect(bike.manufacturer_other).to be_nil
+      end
+      bike3.reload
+      expect(bike3.manufacturer_other).to eq '69' # Sanity check
     end
   end
-
-
 end

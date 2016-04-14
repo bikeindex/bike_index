@@ -42,6 +42,10 @@ class Manufacturer < ActiveRecord::Base
     end
   end
 
+  def self.other_manufacturer
+    where(name: 'Other', frame_maker: true).first_or_create
+  end
+
   def self.fuzzy_id_or_name_find(n)
     if n.kind_of?(Integer) || n.match(/\A\d*\z/).present?
       Manufacturer.where(id: n).first

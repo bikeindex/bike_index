@@ -114,6 +114,7 @@ class BikesController < ApplicationController
     # Let them know if they sent an invalid b_param token
     flash[:notice] = "Sorry! We couldn't find that bike" if @b_param.id.blank? && params[:b_param_token].present?
     @bike ||= @b_param.bike_from_attrs(stolen: params[:stolen])
+    @page_errors = @bike.errors
     render :new_revised, layout: 'application_revised'
   end
 

@@ -1,0 +1,46 @@
+// Legacy content styles that apply to multiple legacy content pages
+.legacy-content-wrap {
+  .padded { padding-top: 2*$vertical-height; }
+  .fancy-bullets {
+    position: relative;
+    list-style-type: none;
+    padding: 0;
+    margin: 1em 0 0 0;
+    li {
+      padding-left: 1.25em;
+      position: relative;
+    }
+  }
+  .bullet-point {
+    @include border-radius(.3em);
+    @include box-shadow(1px 1px 1px rgba(black,.2));
+    display: block;
+    position: absolute;
+    left: 0; top: 1em;
+    width: .6em; height: .6em;
+    margin: .3em .6em 0 0;
+    background: $blue;
+    border: 1px solid $gray-light;
+    // background: $linkColor;
+    // border: 1px solid darken($linkColor, 5%);
+  }
+  .blue-bullet {
+    @include border-radius(1px);
+    @include box-shadow(1px 1px 1px rgba(black,.2));
+    display: block;
+    position: absolute;
+    left: 0; top: 0;
+    width: .4em; height: .4em;
+    margin: .4em .3em 0 0;
+    background: $blue-dark;
+    border: 1px solid darken($blue-dark, 10%); 
+  }
+  .green-bullet {
+    @extend .blue-bullet;
+    background: $green;
+    border: 1px solid darken($green, 10%); 
+  }
+}
+
+
+

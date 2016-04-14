@@ -6,7 +6,10 @@ class RearGearType < ActiveRecord::Base
 
   scope :standard, -> { where(standard: true) }
   scope :internal, -> { where(internal: true) }
-  scope :fixed, -> { where(name: "Fixed") }
+
+  def self.fixed
+    where(name: 'Fixed', count: 1, internal: false).first_or_create
+  end
 
   before_create :set_slug
   def set_slug

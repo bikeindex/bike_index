@@ -1,42 +1,47 @@
 .container.main-container-wrap
   .row
-    .col-md-8.primary-content-block
+    / Unless one of the whitelisted pages, wrap it in .legacy-content-wrap
+    - additional_class = %w().include?(content_page_type) ? '' : 'legacy-content-wrap'
+    .col-md-8.primary-content-block{ class: additional_class }
+
       = yield
-    .col-md-4.content-menu-block
+    .col-md-4.primary-content-menu
       %nav.content-nav-group
         %h3
           Related
         %ul
+          - if content_page_type == 'news'
+            %li
+              = active_link 'Bike Index news', news_index_path
           %li
-            forum
-          %li
-            contact
-          %li
-            sign up your org (on mnfg and where)
-          %li
-            = link_to "about", about_path
-          %li
-            = link_to "where", where_path
+            = active_link 'About', about_path
+          - unless content_page_type == 'news'
+            %li
+              = active_link 'Forum', discuss_url
+            %li
+              = active_link 'Help', help_url
+            %li
+              = active_link 'Where', where_path
+            - if %w(manufacturers where).include?(content_page_type)
+              %li
+                = active_link 'Sign up your organization', new_organization_path
+
       %nav.content-nav-group
         %h3
-          Un-Related content
+          Other pages
         %ul
           %li
-            Bike Index news
+            = active_link 'Bike Index news', news_index_path
           %li
-            protect_your_bike
+            = active_link 'Protect your bike', protect_your_bike_path
+          - if %w(news about manufacturers).include?(content_page_type)
+            %li
+              = active_link 'Donate', support_the_index_path
+          - if %w(news serials manufacturers).include?(content_page_type)
+            %li
+              = active_link 'Bike Index Store', shop_path
           %li
-            donate (on about page)
+            = active_link 'dev and design resources', dev_and_design_path
           %li
-            store (serials page)
-          %li
-            dev and design resources
-          %li
-            sign up your organization
-          / all for news ^
-          %li
-            = link_to "about", about_path
+            = active_link 'Sign up your organization', new_organization_path
 
-          %li
-            = link_to "where", where_path
-            

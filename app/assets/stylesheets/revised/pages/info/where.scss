@@ -1,0 +1,84 @@
+#info_where {
+  h1 {
+    small { 
+      font-size: $h5-font-size;
+      display: block;
+    }
+  }
+
+  .map-of-shops {
+    position: relative;
+    border: 1px solid $gray-light;
+    #map_canvas {
+      min-height: 400px;
+      height: 100%;
+      width: 100%;
+    }
+    h3 {
+      margin: 0;
+    }
+    h4 {
+      margin: .5em 0 0 0;
+    }
+    p {
+      margin: .5em 0 0 0;
+    }
+    .map-telephone { padding-bottom: .5em; }
+  }
+
+
+  .where-shops-list {
+    width: 100%;
+    position: relative;
+    margin: 0;
+    a.shop-title-link {
+      font-weight: normal;
+      color: $body-font-color;
+      span {
+        color: $body-font-color;
+        margin-bottom: 2px;
+      }
+      em {
+        color: $gray-light;
+        font-size: .9em;
+        font-style: normal;
+      }
+    }
+    .shop-info { margin-left: 27px; }
+    .shop-info.collapse.in { padding-bottom: .6em; }
+    
+    .where-shop-location {
+      color: $link-color;
+    }
+
+    h4 {
+      // font-size: $standardFontSize;
+      margin: 0;
+      font-weight: 400;
+    }
+    p { margin: .5em 0 0; }
+    .map-window { display: none; }
+  }
+
+  ul.state-list {
+    @include clearfix;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    position: relative;
+  }
+
+  .where-add-shops { margin: 60px 0 40px; }
+}
+
+@media (min-width: 600px) {
+  #info_where {
+    // .where-shops-list p { margin-top: 1em; }
+    ul.state-list li {
+      width: 50%;
+      float: left;
+    }
+    .state-name { margin-top: 1em; }
+  }
+}
