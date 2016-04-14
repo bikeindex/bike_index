@@ -31,21 +31,21 @@
                   Settings
                 = image_tag '/assets/revised/settings.svg', title: 'Your settings'
               %ul.primary-submenu{ 'aria-labelledby' => '#setting_submenu' }
-                = nav_link 'Register a new bike', new_bike_path, class_name: 'nav-link'
+                = active_link 'Register a new bike', new_bike_path, class_name: 'nav-link'
                 / Include personal bikes here if user has organizations
                 - if memberships.any?
-                  = nav_link 'Your bikes', user_home_path, class_name: 'nav-link'
+                  = active_link 'Your bikes', user_home_path, class_name: 'nav-link'
                 %li
-                  = nav_link "#{current_user.email} settings", my_account_path, class_name: 'nav-link'
+                  = active_link "#{current_user.email} settings", my_account_path, class_name: 'nav-link'
                 %li
                   = link_to 'Logout', session_path, method: :delete, class: 'nav-link'
             - unless memberships.any?
               / If the user is in an organization, bikes are in their settings button
               %li.primary-nav-item
-                = nav_link 'Your bikes', user_home_path, class_name: 'nav-link'
+                = active_link 'Your bikes', user_home_path, class_name: 'nav-link'
             - if current_user.admin_authorized('any')
               %li.primary-nav-item
-                = nav_link 'Admin', user_root_url, class_name: 'nav-link'
+                = active_link 'Admin', user_root_url, class_name: 'nav-link'
             /
             / Organization submenus
             - memberships.each do |membership|
@@ -55,44 +55,44 @@
                   = organization.short_name
                 %ul.primary-submenu{ 'aria-labelledby' => "##{organization.slug}_submenu" }
                   %li
-                    = nav_link 'EZ Registration form', embed_extended_organization_path(organization), class_name: 'nav-link'
+                    = active_link 'EZ Registration form', embed_extended_organization_path(organization), class_name: 'nav-link'
                   %li
-                    = nav_link "#{organization.short_name} bikes", organization_path(organization), class_name: 'nav-link'
+                    = active_link "#{organization.short_name} bikes", organization_path(organization), class_name: 'nav-link'
                   - if membership.admin?
                     %li
-                      = nav_link 'Manage Members', edit_organization_path(organization), class_name: 'nav-link'
+                      = active_link 'Manage Members', edit_organization_path(organization), class_name: 'nav-link'
                     %li
-                      = nav_link "Manage #{organization.short_name} settings", edit_organization_path(organization), class_name: 'nav-link'
+                      = active_link "Manage #{organization.short_name} settings", edit_organization_path(organization), class_name: 'nav-link'
                   %li
-                    = nav_link 'Dev resources', organization_path(organization), class_name: 'nav-link'
+                    = active_link 'Dev resources', organization_path(organization), class_name: 'nav-link'
           - else
             %li.primary-nav-item
-              = nav_link 'Sign up', new_user_url, class_name: 'nav-link signup-link'
+              = active_link 'Sign up', new_user_url, class_name: 'nav-link signup-link'
             %li.primary-nav-item
-              = nav_link 'log in', new_session_url, class_name: 'nav-link'
+              = active_link 'log in', new_session_url, class_name: 'nav-link'
           %li.primary-nav-item
-            = nav_link 'Help', help_path, class_name: 'nav-link'
+            = active_link 'Help', help_path, class_name: 'nav-link'
             / %a.nav-link{ id: "helpSubmenu", 'aria-haspopup' => "true", 'aria-expanded' => "false", data: { toggle: 'dropdown' } }
             /   Help
             / %ul.primary-submenu{ 'aria-labelledby' => "#helpSubmenu" }
             /   %li
-            /     = nav_link 'For Cyclists', help_path, class_name: 'nav-link'
+            /     = active_link 'For Cyclists', help_path, class_name: 'nav-link'
             /   %li
-            /     = nav_link 'For Bike Shops', help_path, class_name: 'nav-link'
+            /     = active_link 'For Bike Shops', help_path, class_name: 'nav-link'
             /   %li
-            /     = nav_link 'For Law Enforcement', help_path, class_name: 'nav-link'
+            /     = active_link 'For Law Enforcement', help_path, class_name: 'nav-link'
             /   %li
-            /     = nav_link 'For Universities', help_path, class_name: 'nav-link'
+            /     = active_link 'For Universities', help_path, class_name: 'nav-link'
             /   %li
-            /     = nav_link 'Contact us', help_path, class_name: 'nav-link'
+            /     = active_link 'Contact us', help_path, class_name: 'nav-link'
           %li.primary-nav-item
-            = nav_link 'About', about_path, class_name: 'nav-link'
+            = active_link 'About', about_path, class_name: 'nav-link'
           %li.primary-nav-item
-            = nav_link 'News', news_index_path, class_name: 'nav-link'
+            = active_link 'News', news_index_path, class_name: 'nav-link'
           %li.primary-nav-item
-            = nav_link 'Community', '#', class_name: 'nav-link'
+            = active_link 'Community', '#', class_name: 'nav-link'
           %li.primary-nav-item
-            = nav_link 'Search bikes', bikes_path, class_name: 'nav-link'
+            = active_link 'Search bikes', bikes_path, class_name: 'nav-link'
     = render 'layouts/revised_messages'
 
     - if current_page_content_page?
@@ -100,7 +100,7 @@
     - elsif controller_name == 'bikes'
       - if %w(edit update).include?(action_name)
         = render '/shared/edit_bike_skeleton'
-      - if %w(new create).include?(action_name)
+      - elsif %w(new create).include?(action_name)
         = yield
     - else
       .container.main-container-wrap
@@ -112,24 +112,24 @@
           .row
             %nav.col-md-3.pull-right
               %h4
-                = nav_link 'Donate to the Bike Index', support_the_index_path
+                = active_link 'Donate to the Bike Index', support_the_index_path
               %ul
                 %li
-                  = nav_link 'Store', shop_path
+                  = active_link 'Store', shop_path
             %nav.col-md-3.pull-right
               %h4
-                = nav_link 'Help', help_path
+                = active_link 'Help', help_path
               %ul
                 %li
-                  = nav_link 'Sign up a shop or organization', new_organization_path
+                  = active_link 'Sign up a shop or organization', new_organization_path
                 %li
-                  = nav_link 'List of manufacturers', manufacturers_path
+                  = active_link 'List of manufacturers', manufacturers_path
             %nav.col-md-3.pull-right
               %h4
-                = nav_link 'Dev and Design Resources', dev_and_design_path
+                = active_link 'Dev and Design Resources', dev_and_design_path
               %ul
                 %li
-                  = nav_link 'API documentation', documentation_index_path
+                  = active_link 'API documentation', documentation_index_path
             %nav.col-md-3.social-nav
               %ul
                 %li

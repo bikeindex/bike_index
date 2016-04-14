@@ -16,14 +16,14 @@
     %header.replace-header
       .inner-recep
         %h2.new-title
-          = nav_link current_organization.name, organization_path(@organization)
+          = active_link current_organization.name, organization_path(@organization)
         %ul.org-links
           - if current_user.is_admin_of?(current_organization)
             %li
-              = nav_link "Manage", edit_organization_url(@organization)
+              = active_link "Manage", edit_organization_url(@organization)
           - if current_organization.auto_user_id.present?
             %li
-              = nav_link "Continuous upload form", embed_extended_organization_url(@organization)
+              = active_link "Continuous upload form", embed_extended_organization_url(@organization)
         
         .org-add-bike
           = link_to "Add a bike to the Index", new_bike_url(creation_organization_id: current_organization.id), class: "button-green"

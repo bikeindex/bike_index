@@ -1,7 +1,7 @@
 %h1
   Development and design resources
 %h5
-  Bike Index is meant to be useable and expandable by everyone. We're way into open source and stuff.
+  Bike Index is meant to be useable and expandable by everyone. We're way into the open source.
 %p
   Here are some other things that might be interesting or useful:
 %ul
@@ -14,7 +14,8 @@
   %li
     #{ link_to 'Nearby stolen widget', 'https://github.com/bikeindex/stolen_bikes_widget_html' } (on GitHub)
   %li
-    #{ link_to 'Personal bike display widget', user_embed_path(current_user) } (must be logged in - also, has no usage instructions...)
+    - url_for_embed = current_user ? user_embed_path(current_user) : new_user_url(return_to: dev_and_design_path)
+    #{ link_to 'Personal bike display widget', url_for_embed } (must be logged in - also, has no usage instructions...)
   %li
     #{link_to "OAuth Applications you've made", oauth_applications_path } (must be logged in)
   %li
