@@ -19,7 +19,6 @@ describe InfoController do
           expect(response.status).to eq(200)
           expect(response).to render_template(page.to_sym)
           expect(response).to render_with_layout('application_updated')
-          expect(response).to have_selector('title', text: 'Support the Bike Index')
         end
       end
     end
