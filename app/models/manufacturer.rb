@@ -89,6 +89,7 @@ class Manufacturer < ActiveRecord::Base
   # Because of issues with autocomplete if the names are the same
   # Also, probably just a good idea in general
   def ensure_non_blocking_name
+    return true unless name
     errors.add(:name, 'Cannot be the same as a color name') if Color.pluck(:name).map(&:downcase).include?(name.strip.downcase)
   end
 
