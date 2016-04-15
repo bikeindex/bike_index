@@ -1,8 +1,6 @@
 $form-well-background: $gray-lighter;
 $form-well-border-color: #e4e4e4;
 
-.form-well-header { padding-top: 8*$vertical-height; }
-
 .form-circle-item { // Mixin for help blocks
   padding: .5em .25em;
   border-radius: 1em;
@@ -68,7 +66,6 @@ $form-well-border-color: #e4e4e4;
   .fancy-select .inline-input-help { right: 2.75em; } // To not cover up select pointer
   .form-well-label {
     @extend .form-control-label;
-    text-transform: capitalize;
     line-height: 1.2em;
     padding-top: 0.65rem;
   }
@@ -93,10 +90,6 @@ $form-well-border-color: #e4e4e4;
     clear: both;
     margin-top: 3*$vertical-height;
   }
-}
-
-.form-well-container {
-  padding-bottom: 6*$vertical-height;
 }
 
 // 
@@ -173,7 +166,6 @@ $form-well-border-color: #e4e4e4;
 //
 // Large screen styles
 @media (min-width: $grid-breakpoint-lg) {
-  .form-well-header { padding-top: 12*$vertical-height; } // Just like in main_container_wrap
   .form-well { border: none; background: none; }
   .form-well .form-wrap {
     background: $form-well-background;

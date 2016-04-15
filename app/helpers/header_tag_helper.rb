@@ -21,7 +21,7 @@ protected
   end
   
   def title_tag_html(hash)
-    "<title lang='en'>#{hash[:title_tag][:title]}</title>\n"
+    "<title lang='en'>#{(@page_title ? @page_title : hash[:title_tag][:title])}</title>\n"
   end
 
   def set_social_hash(hash)

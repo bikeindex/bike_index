@@ -95,16 +95,10 @@
             = active_link 'Search bikes', bikes_path, class_name: 'nav-link'
     = render 'layouts/revised_messages'
 
-    - if current_page_content_page?
-      = render '/shared/content_skeleton'
-    - elsif controller_name == 'bikes'
-      - if %w(edit update).include?(action_name)
-        = render '/shared/edit_bike_skeleton'
-      - elsif %w(new create).include?(action_name)
-        = yield
+    - if current_page_skeleton
+      = render "/shared/#{current_page_skeleton}"
     - else
-      .container.main-container-wrap
-        = yield
+      = yield
 
     %footer.primary-footer
       .primary-footer-nav

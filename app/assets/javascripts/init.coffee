@@ -12,10 +12,12 @@ class window.BikeIndex
     # All the per-page javascripts
     pageClasses =
       info_where: BikeIndex.InfoWhere
+      info_support_the_index: BikeIndex.InfoSupportTheIndex
       bikes_new: BikeIndex.BikesNew
       bikes_create: BikeIndex.BikesNew
       bikes_edit: BikeIndex.BikesEdit
       bikes_update: BikeIndex.BikesEdit
+
 
     window.pageScript = new pageClasses[body_id] if Object.keys(pageClasses).includes(body_id)
 

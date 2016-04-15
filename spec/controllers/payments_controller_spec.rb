@@ -1,132 +1,152 @@
 require 'spec_helper'
 
 describe PaymentsController do
+  let(:user) { FactoryGirl.create(:user) }
 
-  describe :new do 
-    describe :with_user do 
-      before do 
-        user = FactoryGirl.create(:user)
+  describe :new do
+    context 'with user' do
+      before do
         set_current_user(user)
-        get :new
       end
-      it { should respond_with(:success) }
-      it { should render_template(:new) }
+      context 'legacy' do
+        it 'renders' do
+          get :new
+          expect(response.code).to eq('200')
+          expect(response).to render_template('new')
+          expect(response).to render_with_layout('application_updated')
+          expect(flash).to_not be_present
+        end
+      end
+      context 'revised' do
+        it 'renders' do
+          allow(controller).to receive(:revised_layout_enabled?) { true }
+          get :new
+          expect(response.code).to eq('200')
+          expect(response).to render_template('new')
+          expect(response).to render_with_layout('application_revised')
+          expect(flash).to_not be_present
+        end
+      end
     end
-    describe :without_user do 
-      before do 
-        get :new
+    context 'without user' do
+      context 'legacy' do
+        it 'renders' do
+          get :new
+          expect(response.code).to eq('200')
+          expect(response).to render_template('new')
+          expect(response).to render_with_layout('application_updated')
+          expect(flash).to_not be_present
+        end
       end
-      it { should respond_with(:success) }
-      it { should render_template(:new) }
+      context 'revised' do
+        it 'renders' do
+          allow(controller).to receive(:revised_layout_enabled?) { true }
+          get :new
+          expect(response.code).to eq('200')
+          expect(response).to render_template('new')
+          expect(response).to render_with_layout('application_revised')
+          expect(flash).to_not be_present
+        end
+      end
     end
   end
 
-  describe :create do 
-    it "makes a onetime payment with current user" do 
-      token = Stripe::Token.create(
-        :card => {
-          :number => "4242424242424242",
-          :exp_month => 12,
-          :exp_year => 2025,
-          :cvc => "314"
-        },
+  describe :create do
+    let(:token) do
+      Stripe::Token.create(
+        card: {
+          number: '4242424242424242',
+          exp_month: 12,
+          exp_year: 2025,
+          cvc: '314'
+        }
       )
-      user = FactoryGirl.create(:user)
-      set_current_user(user)
-      opts = { stripe_token: token.id,
-        stripe_email: user.email,
-        stripe_amount: 4000
-      }
-      lambda {
-        post :create, opts
-      }.should change(Payment, :count).by(1)
-      payment = Payment.last
-      payment.user_id.should eq(user.id)
-      user.reload.stripe_id.should be_present
-      payment.stripe_id.should be_present
-      payment.first_payment_date.should be_present
-      payment.last_payment_date.should_not be_present
     end
 
-    it "makes a onetime payment with email for signed up user" do 
-      token = Stripe::Token.create(
-        :card => {
-          :number => "4242424242424242",
-          :exp_month => 12,
-          :exp_year => 2025,
-          :cvc => "314"
-        },
-      )
-      user = FactoryGirl.create(:user)
-      opts = { stripe_token: token.id,
-        stripe_amount: 4000,
-        stripe_email: user.email,
-        stripe_plan: '',
-        stripe_subscription: ''
-      }
-      lambda {
-        post :create, opts
-      }.should change(Payment, :count).by(1)
-      payment = Payment.last
-      payment.user_id.should eq(user.id)
-      user.reload.stripe_id.should be_present
-      payment.stripe_id.should be_present
-      payment.first_payment_date.should be_present
-      payment.last_payment_date.should_not be_present
+    context 'with user' do
+      before do
+        set_current_user(user)
+      end
+      it 'makes a onetime payment with current user (and renders with revised_layout if suppose to)' do
+        opts = {
+          stripe_token: token.id,
+          stripe_email: user.email,
+          stripe_amount: 4000
+        }
+        allow(controller).to receive(:revised_layout_enabled?) { true }
+        expect do
+          post :create, opts
+        end.to change(Payment, :count).by(1)
+        expect(response).to render_with_layout('application_revised')
+        payment = Payment.last
+        expect(payment.user_id).to eq(user.id)
+        user.reload
+        expect(user.stripe_id).to be_present
+        expect(payment.stripe_id).to be_present
+        expect(payment.first_payment_date).to be_present
+        expect(payment.last_payment_date).to_not be_present
+      end
+
+      it 'signs up for a plan' do
+        opts = {
+          stripe_token: token.id,
+          stripe_email: user.email,
+          stripe_amount: 4000,
+          stripe_subscription: 1,
+          stripe_plan: '01'
+        }
+        expect do
+          post :create, opts
+        end.to change(Payment, :count).by(1)
+        payment = Payment.last
+        expect(payment.is_recurring).to be_true
+        expect(payment.user_id).to eq user.id
+        user.reload
+        expect(user.stripe_id).to be_present
+        expect(payment.stripe_id).to be_present
+        expect(payment.first_payment_date).to be_present
+        expect(payment.last_payment_date).to_not be_present
+      end
     end
 
-    it "makes a onetime payment with no user, but associate with stripe" do 
-      token = Stripe::Token.create(
-        :card => {
-          :number => "4242424242424242",
-          :exp_month => 12,
-          :exp_year => 2025,
-          :cvc => "314"
-        },
-      )
-      opts = { stripe_token: token.id,
-        stripe_amount: 4000,
-        stripe_email: "test_user@rspec.com"
-      }
-      lambda {
-        post :create, opts
-      }.should change(Payment, :count).by(1)
-      payment = Payment.last
-      payment.email.should eq("test_user@rspec.com")
-      # assigns(:customer_id).should eq('cus_5IwBxTiMCDIqYM')
-      payment.stripe_id.should be_present
-      payment.first_payment_date.should be_present
-      payment.last_payment_date.should_not be_present
+    context 'email of signed up user' do
+      it 'makes a onetime payment with email for signed up user' do
+        opts = {
+          stripe_token: token.id,
+          stripe_amount: 4000,
+          stripe_email: user.email,
+          stripe_plan: '',
+          stripe_subscription: ''
+        }
+        expect do
+          post :create, opts
+        end.to change(Payment, :count).by(1)
+        expect(response).to render_with_layout('application_updated')
+        payment = Payment.last
+        expect(payment.user_id).to eq(user.id)
+        user.reload
+        expect(user.stripe_id).to be_present
+        expect(payment.stripe_id).to be_present
+        expect(payment.first_payment_date).to be_present
+        expect(payment.last_payment_date).to_not be_present
+      end
     end
-
-    it "signs up for a plan" do 
-      token = Stripe::Token.create(
-        :card => {
-          :number => "4242424242424242",
-          :exp_month => 12,
-          :exp_year => 2025,
-          :cvc => "314"
-        },
-      )
-      user = FactoryGirl.create(:user)
-      set_current_user(user)
-      opts = { stripe_token: token.id,
-        stripe_email: user.email,
-        stripe_amount: 4000,
-        stripe_subscription: 1,
-        stripe_plan: "01",
-      }
-      lambda {
-        post :create, opts
-      }.should change(Payment, :count).by(1)
-      payment = Payment.last
-      payment.is_recurring.should be_true
-      payment.user_id.should eq(user.id)
-      user.reload.stripe_id.should be_present
-      payment.stripe_id.should be_present
-      payment.first_payment_date.should be_present
-      payment.last_payment_date.should_not be_present
+    context 'no user email on file' do
+      it 'makes a onetime payment with no user, but associate with stripe' do
+        opts = {
+          stripe_token: token.id,
+          stripe_amount: 4000,
+          stripe_email: 'test_user@test.com'
+        }
+        expect do
+          post :create, opts
+        end.to change(Payment, :count).by(1)
+        payment = Payment.last
+        payment.email.should eq('test_user@test.com')
+        expect(payment.stripe_id).to be_present
+        expect(payment.first_payment_date).to be_present
+        expect(payment.last_payment_date).to_not be_present
+      end
     end
   end
-
 end

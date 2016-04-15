@@ -1,12 +1,21 @@
+// Legacy payments styles
+// 
+// Every payment page (form and create) is wrapped in cpayments-page class
+// ... so forgoing using page ids here, for now
+
 .payments-page {
-  padding: 40px 0 60px;
+  h2 { @extend h5; }
   form {
     .binxbtn {
+      @extend .btn;
       margin: 0 auto;
       display: block;
       font-size: 20px;
       max-width: 200px;
     }
+  }
+  #open_stripe_checkout_btn {
+    @extend .btn-primary;
   }
 }
 
@@ -20,25 +29,33 @@
     display: block;
     float: left;
     position: relative;
+    p {
+      @extend .body-font;
+      line-height: 1.5em;
+      margin: 0;
+    }
     a {
+      @extend .btn;
+      white-space: normal;
       @include transition(all ease-out .1s);
-      border-radius: 4px;
       display: block;
       width: 100%;
-      padding: 1.5em 1em;
+      padding: $vertical-height .5em 0;
     }
     .unselected {
-      @include binx-button($gray-lighter, $gray-lightest, lighten($gray-light, 2%), rgba($text-color,.9), .015em);
+      @extend .btn-secondary;
     }
     .active {
-      @include binx-button($blue, #67B2E4, #2574A0, rgba(white,.9), .015em);
+      @extend .btn-success;
+      text-decoration: none;
+      p { color: $gray-lightest; }
       hr { border-bottom: 1px solid rgba(white,.15); } 
       .donation input { background: #67B2E4; color: white; }
     }
     h3 {
-      padding-top: 1em;
-      color: $gray-blue-dark;
-      font-size: 20px;
+      @extend h4;
+      margin: 0;
+      font-size: 14px;
     }
     hr {
       margin: 1em 0;
@@ -62,27 +79,24 @@
     display: block;
     float: none;
     a {
-      @include binx-button($gray-lighter, $gray-lightest, lighten($gray-light, 2%), rgba($text-color,.9), .015em);
-      .donation input { background: #fff; color: $text-color; }
+      @extend .btn;
+      @extend .btn-secondary;
+      .donation input { background: #fff; color: $body-font-color; }
     }
   }
 }
 
-@media (min-width: $m-breakpoint+1) {
-  .payments-page {
-    padding: 60px 0 100px;
-  }
-  .payment-types-list {
+@media (min-width: $grid-breakpoint-md) {
+   .payment-types-list {
     li {
       margin: 0 0 0 1%;
       width: 19%;
       &:first-of-type { margin-left: 0; }
-      // &:first-of-type { margin-left: 10%; }
-    }
+     }
   }
 }
 
-@media (max-width: $m-breakpoint) {
+@media (max-width: $grid-breakpoint-md - 1px) {
   .payment-types-list {
     li {
       margin: 20px 0 0 2%;

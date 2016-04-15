@@ -35,10 +35,61 @@ describe ApplicationHelper do
     end
   end
 
-  describe :current_page_content_page? do
-    it 'returns link, active if it ought to be' do
-      view.stub(:controller_name).and_return('info')
-      helper.current_page_content_page?.should be true
+  describe :current_page_skeleton do
+    context 'bikes' do
+      before { allow(view).to receive(:controller_name) { 'bikes' } }
+      %w(new create).each do |action|
+        context action do
+          it 'returns nil' do
+            allow(view).to receive(:action_name) { action }
+            expect(helper.current_page_skeleton).to be_nil
+          end
+        end
+      end
+      %w(edit update).each do |action|
+        context action do
+          it 'returns edit_bike_skeleton' do
+            allow(view).to receive(:action_name) { action }
+            expect(helper.current_page_skeleton).to eq 'edit_bike_skeleton'
+          end
+        end
+      end
+    end
+    context 'info' do
+      before { allow(view).to receive(:controller_name) { 'info' } }
+      %w(about protect_your_bike where serials image_resources resources dev_and_design).each do |action|
+        context action do
+          it 'returns content_skeleton' do
+            allow(view).to receive(:action_name) { action }
+            expect(helper.current_page_skeleton).to eq 'content_skeleton'
+          end
+        end
+      end
+      context 'support_the_index' do
+        it 'returns nil' do
+          allow(view).to receive(:action_name) { 'support_the_index' }
+          expect(helper.current_page_skeleton).to be_nil
+        end
+      end
+      %w(terms vendor_terms privacy).each do |action|
+        context action do
+          it 'returns nil' do
+            allow(view).to receive(:action_name) { action }
+            expect(helper.current_page_skeleton).to be_nil
+          end
+        end
+      end
+    end
+    context 'payments' do
+      before { allow(view).to receive(:controller_name) { 'payments' } }
+      %w(new create).each do |action|
+        context action do
+          it 'returns nil' do
+            allow(view).to receive(:action_name) { action }
+            expect(helper.current_page_skeleton).to be_nil
+          end
+        end
+      end
     end
   end
 

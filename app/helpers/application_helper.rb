@@ -13,62 +13,69 @@ module ApplicationHelper
     end
   end
 
-  def current_page_content_page?
-    %w(info news).include?(controller_name)
+  # Used to render the page wrapper
+  # MUST be either:
+  #  - a valid partial file in views/shared
+  #  - nil - which just calls yield directly
+  def current_page_skeleton
+    case controller_name
+    when 'bikes'
+      'edit_bike_skeleton' if %w(edit update).include?(action_name)
+    when 'info'
+      'content_skeleton' unless %w(terms vendor_terms privacy support_the_index).include?(action_name)
+    end
   end
 
+  # For determining menu items to display on content skeleton
   def content_page_type
     if controller_name == 'info'
       action_name
     elsif controller_name == 'news'
       'news'
-    end        
+    end
   end
 
   def current_link(link_text, link_path, class: '') # Revised layout link
     class_name = current_page?(link_path) ? 'active' : ''
     class_name = 'active' if link_path.match(news_index_path) && controller_name == 'news'
-    html = link_to raw(link_text), link_path, class: class_name
-    return html.html_safe
+    (link_to raw(link_text), link_path, class: class_name).html_safe
   end
 
   def admin_nav_link(link_text, link_path)
-    if controller_name == "dashboard" 
-      if action_name == "invitations" && link_text == "Invitations"
-        class_name = "active"
-      elsif action_name == "show" && link_text == "Go hard"
-        class_name = "active"
+    if controller_name == 'dashboard'
+      if action_name == 'invitations' && link_text == 'Invitations'
+        class_name = 'active'
+      elsif action_name == 'show' && link_text == 'Go hard'
+        class_name = 'active'
       end
-    elsif controller_name == "organization_invitations" && link_text == "Invitations"
-      class_name = "active"
+    elsif controller_name == 'organization_invitations' && link_text == 'Invitations'
+      class_name = 'active'
     else
       class_name = controller_name == link_text.downcase.gsub(' ', '_') ? 'active' : ''
     end
-
-    html = link_to link_text, link_path, class: class_name
-    return html.html_safe
+    (link_to link_text, link_path, class: class_name).html_safe
   end
 
   def content_nav_class(section)
-    "active-menu" if section == @active_section
+    'active-menu' if section == @active_section
   end
 
   def link_to_add_fields(name, f, association)
     new_object = f.object.send(association).klass.new
     id = new_object.object_id
     fields = f.fields_for(association, new_object, child_index: id) do |builder|
-      render(association.to_s.singularize + "_fields", f: builder)
+      render(association.to_s.singularize + '_fields', f: builder)
     end
-    link_to(name, '#', class: "add_fields button-blue", data: {id: id, fields: fields.gsub("\n", "")})
+    link_to(name, '#', class: 'add_fields button-blue', data: { id: id, fields: fields.gsub("\n", '') })
   end
 
   def link_to_add_components(name, f, association, component_scope)
     new_object = f.object.send(association).klass.new
     id = new_object.object_id
     fields = f.fields_for(association, new_object, child_index: id) do |builder|
-      render("/bikes/bike_fields/component_fields", f: builder, component_group: component_scope)
+      render('/bikes/bike_fields/component_fields', f: builder, component_group: component_scope)
     end
-    link_to(name, '#', class: "add_fields button-blue", data: {id: id, fields: fields.gsub("\n", "")})
+    link_to(name, '#', class: 'add_fields button-blue', data: { id: id, fields: fields.gsub("\n", '') })
   end
 
   def listicle_html(list_item)
