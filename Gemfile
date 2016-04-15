@@ -90,6 +90,7 @@ source 'https://rails-assets.org' do # JS land is crazy, so lock everything
   gem 'rails-assets-headroom.js', '~> 0.7.0' # Would prefer 0.8 but it isn't on rails-assets yet
   gem 'rails-assets-pikaday', '~> 1.4.0'
   gem 'rails-assets-moment', '~> 2.12.0'
+  gem 'rails-assets-jquery-file-upload', '~> 9.12.1'
 end
 
 

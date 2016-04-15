@@ -117,10 +117,11 @@ $row-side-padding: 0.9375rem;
 // Page styles
 // 
 // Bike pages
-@import "revised/pages/bikes/bikes_new";
-@import "revised/pages/bikes/bikes_edit_root";
-@import "revised/pages/bikes/bikes_edit_ownership";
-@import "revised/pages/bikes/bikes_edit_stolen";
+@import "revised/pages/bikes/new";
+@import "revised/pages/bikes/edit_root";
+@import "revised/pages/bikes/edit_ownership";
+@import "revised/pages/bikes/edit_stolen";
+@import "revised/pages/bikes/edit_accessories";
 @import "revised/pages/info/where";
 @import "revised/pages/info/about";
 @import "revised/pages/info/protect_your_bike";
