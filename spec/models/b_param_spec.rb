@@ -47,7 +47,7 @@ describe BParam do
         expect(b_param.params[:stolen_record][:phone]).to eq('171-829-2625')
       end
     end
-    it 'has before_save_callback_method defined as a before_save callback' do
+    it 'has before_save_callback_method of clean_params' do
       BParam._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:clean_params).should == true
     end
   end
