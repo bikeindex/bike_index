@@ -1,5 +1,10 @@
 class PaymentsController < ApplicationController
   layout 'application_updated'
+  before_filter :set_revised_layout
+
+  def set_revised_layout
+    self.class.layout 'application_revised' if revised_layout_enabled?
+  end
 
   def new
   end
