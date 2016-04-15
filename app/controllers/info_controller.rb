@@ -42,7 +42,8 @@ class InfoController < ApplicationController
   end
 
   def support_the_index
-    render layout: 'application_updated'
+    @page_title = 'Support the Bike Index'
+    render layout: (revised_layout_enabled? ? 'application_revised' : 'application_updated')
   end
 
   def support_the_bike_index

@@ -17,6 +17,7 @@ $h5-font-size: 18px;
   font-size: $body-font-size;
   line-height: 2em;
   color: $body-font-color;
+  text-transform: none;
   em { font-style: italic; }
   strong { font-weight: $strong-font-weight; }
   a {

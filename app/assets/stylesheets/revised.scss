@@ -82,7 +82,7 @@ $modal-backdrop-opacity: 0.8;
  */
 
 // Because Mike Oleon is obsessed with the imperial system
-// or something dumb like that
+// or something wack like that
 $vertical-height: 12px;
 
 // To make grid breakpoints variables for now
@@ -104,11 +104,10 @@ $row-side-padding: 0.9375rem;
 // Bike Index mixins
 @import "revised/mixins/trash_can_icon";
 
-// shared styles
+// Shared styles
 @import "revised/sections/primary_header_nav";
 @import "revised/sections/primary_footer";
 @import "revised/sections/content_menu";
-@import "revised/sections/main_container_wrap";
 @import "revised/sections/form_well";
 @import "revised/sections/edit_bike_menu";
 @import "revised/sections/edit_bike_title";
@@ -134,6 +133,7 @@ $row-side-padding: 0.9375rem;
 html { background: $black-off; }
 body { min-height: 400px; }
 .currently-hidden { display: none; }
+img { max-width: 100%; } // don't break random stuff images!
 
 
 // 
