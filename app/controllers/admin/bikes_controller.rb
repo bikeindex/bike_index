@@ -105,9 +105,9 @@ class Admin::BikesController < Admin::BaseController
   protected
 
   def destroy_bike
-    AfterBikeSaveWorker.new.perform(@bike.id)
     @bike.destroy
-    flash[:notice] = "Bike deleted!"
+    AfterBikeSaveWorker.perform_async(@bike.id)
+    flash[:notice] = 'Bike deleted!'
     if params[:multi_delete]
       redirect_to admin_root_url
       # redirect_to admin_bikes_url(page: params[:multi_delete], multi_delete: 1)
