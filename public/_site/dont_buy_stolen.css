@@ -1,41 +1,98 @@
+@font-face {
+  font-family: 'KlinicSlab';
+  src: url("/KlinicSlabBold.otf") format("opentype"); }
+@font-face {
+  font-family: 'Oswald';
+  font-style: normal;
+  font-weight: 400;
+  src: local("Oswald Regular"), local("Oswald-Regular"), url(https://fonts.gstatic.com/s/oswald/v10/pEobIV_lL25TKBpqVI_a2w.woff2) format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000; }
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
   background: #ECF5FB !important;
-  font-family: TradeGothic,Arial,Helvetica,sans-serif;
+  font-family: 'Oswald' !important;
   text-align: center; }
 
+.main-header {
+  font-size: 38pt;
+  font-family: 'KlinicSlab';
+  background: #2C3E50;
+  color: white;
+  text-align: left;
+  line-height: 35px; }
+  .main-header .top-line {
+    margin-top: 30px; }
+
+.main-footer {
+  background: #2C3E50;
+  font-size: 38pt;
+  color: white;
+  text-align: center;
+  margin-top: 20px; }
+  .main-footer p {
+    margin: 0 0 0; }
+
+.end-section {
+  font-size: 18pt;
+  text-align: left;
+  margin-top: 20px; }
+
 .upper-section-text {
-  font-size: 18pt; }
+  font-size: 18pt;
+  font-weight: bold; }
+  .upper-section-text .middle-red {
+    color: red; }
 
 .section-header {
   background: #2C3E50;
   font-size: 38pt;
   color: white;
-  text-align: left; }
+  text-align: left;
+  max-height: 100px; }
+  .section-header p {
+    font-family: 'KlinicSlab';
+    margin: 10px 30px 10px; }
 
 .section-footer {
   background: #3C97D3;
-  font-size: 12pt;
+  font-size: 18pt;
   color: white;
-  text-align: left; }
+  text-align: left;
+  border-top: 15px solid darkgray; }
+  .section-footer span, .section-footer p {
+    margin: 20px;
+    letter-spacing: 1px; }
+  .section-footer b {
+    font-family: 'KlinicSlab'; }
 
 .section-middle {
   font-size: 14pt;
   text-align: left; }
+  .section-middle h3 {
+    font-weight: bold;
+    letter-spacing: 1px; }
+  .section-middle li {
+    list-style-type: none; }
 
 .section-subtext {
   font-size: 16pt;
   text-align: left; }
 
 .section-image {
-  width: 90px;
-  height: 120px;
+  width: 120px;
+  height: 140px;
   border: 3px solid #2C3E50;
   margin-top: 20px;
-  margin-left: 40px; }
+  background: white;
+  white-space: nowrap; }
+  .section-image .header-image {
+    display: inline;
+    float: left;
+    overflow-y: auto;
+    overflow-x: auto; }
 
 @media (min-width: 1100px) {
   .container {

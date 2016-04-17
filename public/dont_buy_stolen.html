@@ -1,3 +1,5 @@
+---
+---
  <!DOCTYPE html>
 <html>
   <head>
@@ -12,222 +14,68 @@
   
   <body>
 	  <div class="container">
-		  <div class="jumbotron">
-	        <h1>Bike Index</h1>
-	      </div>
 
-		<!-- Header section -->
+		<!-- Header -->
+	    <div class="row main-header">
+			<div class="col-md-2"><div class="section-image"></div></div>
+			<div class="col-md-4">
+				<p class="top-line">How NOT to</p>
+				<p class="bottom-line">buy a stolen</p>
+			</div>
+			<div class="col-md-2"><div class="section-image"></div></div>
+			<div class="col-md-4">
+				<p class="top-line">in four</p>
+				<p class="bottom-line">easy steps</p>
+			</div>
+	    </div>
+
+		<!-- Beginning section -->
 		<div class="row">
 			<div class="col-md-2">&nbsp;</div>
-			<div class="col-md-2"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></div>
-			<div class="col-md-2"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></div>
-			<div class="col-md-2"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></div>
-			<div class="col-md-2"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></div>
+			<div class="col-md-2"><div class="section-image"></div></div>
+			<div class="col-md-2"><div class="section-image"></div></div>
+			<div class="col-md-2"><div class="section-image"></div></div>
+			<div class="col-md-2"><div class="section-image"></div></div>
 			<div class="col-md-2">&nbsp;</div>
 		</div>
 		<div class="row">
-			<div class="col-md-12">
-				<p class="upper-section-text">If you don’t want to buy a stolen bike</p>
-				<p class="upper-section-text">– and you want to help stop the rampant black market for bikes –</p>
-				<p class="upper-section-text">use these 4 simple steps when buying online</p>
+			<div class="col-md-12 upper-section-text">
+				<p>If you don’t want to buy a stolen bike</p>
+				<p class="middle-red">– and you want to help stop the rampant black market for bikes –</p>
+				<p>use these 4 simple steps when buying online</p>
 			</div>
 		</div>
 
-		<!-- Ad section -->
+		<!-- Templated sections -->
+		{% for section in site.data.sections %}
+			{% include dont_buy_stolen_section.html section-data=section %}
+		{% endfor %}
+
+		<!-- Ending section -->
+		<div class="row end-section">
+			<div class="col-md-2">&nbsp;</div>
+			<div class="col-md-10">
+				<p>BikeIndex.org is a free, open source bicycle registration database run by people who love their bikes - and hate bike thieves. Through BikeIndex.org, our tools, and our partnerships across the world, we make stolen bikes harder to sell and easier to recover. All for free!</p>
+			</div>
+		</div>
 		<div class="row">
-			<div class="col-md-2">
+			<div class="col-md-3">&nbsp;</div>
+			<div class="col-md-3">
 				<div class="section-image"></div>
 			</div>
-			<div class="col-md-10">
-				<div class="row section-header">
-					<p>Check the Ad</p>
-				</div>
-				<div class="row section-subtext">
-					<div class="col-md-2"><span class="glyphicon glyphicon-flag" aria-hidden="true"></span></div>
-					<div class="col-md-8">
-						<p>Here are several red flags to watch out for when looking at ads online:</p>
-					</div>
-					<div class="col-md-2">&nbsp;</div>
-				</div>
-			</div>
-		</div>
-		<div class="row section-middle">
-			<div class="col-md-4">
-				<span class="glyphicon glyphicon-knight" aria-hidden="true"></span><br />
-				<h3>THE PRICE IS TOO GOOD TO BE TRUE.</h3>
-				<p>Stolen bikes are often wildly underpriced for a “quick sell.”</p>
-			</div>
-			<div class="col-md-4">
-				<span class="glyphicon glyphicon-knight" aria-hidden="true"></span><br />
-				<h3>STOCK PHOTOS ARE SUSPECT.</h3>
-				<p>Unless there is an actual photo of the bike for sale, beware.</p>
-			</div>
-			<div class="col-md-4">
-				<span class="glyphicon glyphicon-knight" aria-hidden="true"></span><br />
-				<h3>SHORT ADS LACKING KEY INFO.</h3>
-				<p>Beware! Ads like “slick track bike $300” are suspicious and are usually written to avoid identification.</p>
-			</div>
-		</div>
-		<div class="row section-middle">
-			<div class="col-md-4">
-				<span class="glyphicon glyphicon-knight" aria-hidden="true"></span><br />
-				<h3>OVERLY ANONYMOUS SELLERS.</h3>
-				<p>Sellers who *really* go out of their way to remain anonymous - no name, no email, no phone number - are suspect. Some anonymity is OK, but a total lack of ID is usually a red flag.</p>
-			</div>
-			<div class="col-md-4">
-				<span class="glyphicon glyphicon-knight" aria-hidden="true"></span><br />
-				<h3>THE WORSE THE GRAMMAR AND SPELLING IN AN AD, THE MORE SUSPICIOUS YOU SHOULD BE. </h3>
-				<p>Ads with bad spelling and grammar usually mean it’s a dodgy seller.</p>
-			</div>
-			<div class="col-md-4">
-				<span class="glyphicon glyphicon-knight" aria-hidden="true"></span><br />
-				<h3>IF THEY SELL A LOT OF BIKES, OR THEIR STORIES ARE CONTRIVED AND CONTRADICTORY, BEWARE.</h3>
-				<p>Sellers whose stories simply don’t add up should be avoided at all costs.</p>
-			</div>
-		</div>
-		<div class="row section-footer">
-			<div class="col-md-2"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span></div>
-			<div class="col-md-8">
-				<p>REMEMBER: You should always check a bike’s details with the stolen bike reports at stolen.bikeindex.org.</p>
-			</div>
-			<div class="col-md-2">&nbsp;</div>
-		</div>
-
-		<!-- Seller section -->
-		<div class="row">
-			<div class="col-md-2">
+			<div class="col-md-3">
 				<div class="section-image"></div>
 			</div>
-			<div class="col-md-10">
-				<div class="row section-header">
-					<p>Check the Seller</p>
-				</div>
-				<div class="row section-subtext">
-					<div class="col-md-2"><span class="glyphicon glyphicon-flag" aria-hidden="true"></span></div>
-					<div class="col-md-8">
-						<p>It pays to do your homework on the seller, too. Here are some steps you can take to determine a seller’s legitimacy:</p>
-					</div>
-					<div class="col-md-2">&nbsp;</div>
-				</div>
-			</div>
-		</div>
-		<div class="row section-middle">
-			<div class="col-md-4">
-				<span class="glyphicon glyphicon-knight" aria-hidden="true"></span><br />
-				<h3>CHECK SELLER’S INFO.</h3>
-				<p>If you can’t find a name, number, email, or sales history on your seller, be wary. Again, excessive reluctance to provide you with info usually means a seller is hiding something.</p>
-			</div>
-			<div class="col-md-4">
-				<span class="glyphicon glyphicon-knight" aria-hidden="true"></span><br />
-				<h3>LOTS OF BIKES FOR SALE?</h3>
-				<p>Use common sense: if they sell lots of underpriced bikes from inside a storage unit or an alley, be extra cautious.</p>
-			</div>
-			<div class="col-md-4">
-				<span class="glyphicon glyphicon-knight" aria-hidden="true"></span><br />
-				<h3>MEETING PLACE.</h3>
-				<p>For your own safety, be sure to schedule any real-life meetings near a local police department. At the very least, don’t go alone, and meet in a well lit and crowded public meeting place.</p>
-			</div>
-		</div>
-		<div class="row section-footer">
-			<div class="col-md-2"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span></div>
-			<div class="col-md-8">
-				<p>REMEMBER: You can report noncooperative or questionable sellers to badsellers@bikeindex.org. We crowdsource our reports to help people make better informed - and safer - online purchases</p>
-			</div>
-			<div class="col-md-2">&nbsp;</div>
-		</div>
-
-		<!-- Serial section -->
-		<div class="row">
-			<div class="col-md-2">
+			<div class="col-md-3">
 				<div class="section-image"></div>
 			</div>
-			<div class="col-md-10">
-				<div class="row section-header">
-					<p>Check the Serial</p>
-				</div>
-				<div class="row section-subtext">
-					<div class="col-md-2"><span class="glyphicon glyphicon-flag" aria-hidden="true"></span></div>
-					<div class="col-md-8">
-						<p>Checking a bike’s serial number with BikeIndex.org is the single most important step you can take when examining a bike.</p>
-					</div>
-					<div class="col-md-2">&nbsp;</div>
-				</div>
-			</div>
-		</div>
-		<div class="row section-middle">
-			<div class="col-md-4">
-				<span class="glyphicon glyphicon-knight" aria-hidden="true"></span><br />
-				<h3>CHECK THE SERIAL NUMBER.</h3>
-				<p>To see if a serial has been reported stolen, enter it at stolen.bikeindex.org or tweet it to @isitstolen.</p>
-			</div>
-			<div class="col-md-4">
-				<span class="glyphicon glyphicon-knight" aria-hidden="true"></span><br />
-				<h3>SELLER CAN’T OR WON’T GIVE SERIAL.</h3>
-				<p>If the seller refuses to give you the serial - or even let you look for one - walk away. Please also report them to badsellers@bikeindex.org</p>
-			</div>
-			<div class="col-md-4">
-				<span class="glyphicon glyphicon-knight" aria-hidden="true"></span><br />
-				<h3>A FILED-OFF OR HIDDEN SERIAL.</h3>
-				<p>If the serial number has been filed off or covered up, it’s probably a stolen bike. Please don’t buy it, and report it to badsellers@bikeindex.org</p>
-			</div>
-		</div>
-		<div class="row section-footer">
-			<div class="col-md-2"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span></div>
-			<div class="col-md-8">
-				<p>REMEMBER: It only takes a few seconds to check a bike’s serial number at stolen.bikeindex.org - or by tweeting it to our Twitterbot @isitstolen.</p>
-			</div>
-			<div class="col-md-2">&nbsp;</div>
 		</div>
 
-		<!-- Bike check section -->
-		<div class="row">
-			<div class="col-md-2">
-				<div class="section-image"></div>
-			</div>
-			<div class="col-md-10">
-				<div class="row section-header">
-					<p>Check the Bike</p>
-				</div>
-				<div class="row section-subtext">
-					<div class="col-md-2"><span class="glyphicon glyphicon-flag" aria-hidden="true"></span></div>
-					<div class="col-md-8">
-						<p>When examining the bike, be on the lookout for any of these red flags:</p>
-					</div>
-					<div class="col-md-2">&nbsp;</div>
-				</div>
-			</div>
+		<!-- Footer -->
+		<div class="row main-footer">
+			<p>BIKEINDEX.ORG</p>
 		</div>
-		<div class="row section-middle">
-			<div class="col-md-4">
-				<span class="glyphicon glyphicon-knight" aria-hidden="true"></span><br />
-				<h3>CHECK THE SERIAL NUMBER.</h3>
-				<p>To see if a serial has been reported stolen, enter it at stolen.bikeindex.org or tweet it to @isitstolen.</p>
-			</div>
-			<div class="col-md-4">
-				<div>
-					<span class="glyphicon glyphicon-knight" aria-hidden="true"></span><br />
-					<h3>SELLER CAN’T OR WON’T GIVE SERIAL.</h3>
-					<p>If the seller refuses to give you the serial - or even let you look for one - walk away. Please also report them to badsellers@bikeindex.org</p>
-				</div>
-				<div>
-					<span class="glyphicon glyphicon-knight" aria-hidden="true"></span><br />
-					<h3>SELLER CAN’T OR WON’T GIVE SERIAL.</h3>
-					<p>If the seller refuses to give you the serial - or even let you look for one - walk away. Please also report them to badsellers@bikeindex.org</p>
-				</div>
-			</div>
-			<div class="col-md-4">
-				<span class="glyphicon glyphicon-knight" aria-hidden="true"></span><br />
-				<h3>A FILED-OFF OR HIDDEN SERIAL.</h3>
-				<p>If the serial number has been filed off or covered up, it’s probably a stolen bike. Please don’t buy it, and report it to badsellers@bikeindex.org</p>
-			</div>
-		</div>
-		<div class="row section-footer">
-			<div class="col-md-2"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span></div>
-			<div class="col-md-8">
-				<p>REMEMBER: Thieves often misreport bike details in ads, and will mix and match seats, saddles, wheels, and grip tape to hide a stolen bike’s origin. Again, you can always report questionable sellers with suspect bikes to badsellers@bikeindex.org.</p>
-			</div>
-			<div class="col-md-2">&nbsp;</div>
-		</div>
+
 	  </div>
   </body>
 
