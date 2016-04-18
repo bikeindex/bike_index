@@ -5,3 +5,5 @@ $rollout = Rollout.new($redis)
 
 $rollout.define_group(:developer) { |user| user.developer }
 $rollout.define_group(:superuser) { |user| user.superuser }
+
+$rollout.activate_group(:revised_view, :developer)

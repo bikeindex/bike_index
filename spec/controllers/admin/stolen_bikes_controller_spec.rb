@@ -1,79 +1,41 @@
 require 'spec_helper'
 
 describe Admin::StolenBikesController do
+  let(:user) { FactoryGirl.create(:admin) }
+  before do
+    set_current_user(user)
+  end
 
-  describe :index do 
-    before do 
-      user = FactoryGirl.create(:admin)
-      set_current_user(user)
+  describe :index do
+    it 'renders' do
       get :index
+      expect(response.code).to eq('200')
+      expect(response).to render_template('index')
+      expect(flash).to_not be_present
     end
-    it { should respond_with(:success) }
-    it { should render_template(:index) }
-    it { should_not set_the_flash }
   end
 
-  describe :edit do 
-    before do 
+  describe :edit do
+    it 'renders' do
       bike = FactoryGirl.create(:bike)
-      user = FactoryGirl.create(:admin)
-      set_current_user(user)
       get :edit, id: bike.id 
+      expect(response.code).to eq('200')
+      expect(response).to render_template('edit')
+      expect(flash).to_not be_present
     end
-    it { should respond_with(:success) }
-    it { should render_template(:edit) }
-    it { should_not set_the_flash }
   end
 
-  describe :destroy do 
-    before do 
-      bike = FactoryGirl.create(:bike)
-      user = FactoryGirl.create(:admin)
-      set_current_user(user)
-      delete :destroy, id: bike.id 
-    end
-    it { should redirect_to(:admin_bikes) }
-    it { should set_the_flash }
-  end
-
-  describe :update do 
-    describe "success" do 
-      before do 
-        bike = FactoryGirl.create(:bike)
-        user = FactoryGirl.create(:admin)
-        set_current_user(user)
+  describe :update do
+    context 'success' do
+      it 'updates the bike and calls update_ownership and serial_normalizer' do
+        expect_any_instance_of(BikeUpdator).to receive(:update_ownership)
+        expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
+        ownership = FactoryGirl.create(:ownership)
+        bike = ownership.bike
         put :update, id: bike.id
+        expect(response).to redirect_to(:edit_admin_stolen_bike)
+        expect(flash).to be_present
       end
-      it { should redirect_to(:edit_admin_stolen_bike) }
-      it { should set_the_flash }
-    end
-
-    it "calls update_ownership" do
-      BikeUpdator.any_instance.should_receive(:update_ownership)
-      bike = FactoryGirl.create(:bike)
-      user = FactoryGirl.create(:admin)
-      set_current_user(user)
-      put :update, id: bike.id
-    end
-
-    it "calls serial_normalizer" do
-      SerialNormalizer.any_instance.should_receive(:save_segments)
-      bike = FactoryGirl.create(:bike)
-      user = FactoryGirl.create(:admin)
-      set_current_user(user)
-      put :update, id: bike.id
-    end
-
-    describe "failure" do 
-      before do 
-        bike = FactoryGirl.create(:bike)
-        user = FactoryGirl.create(:admin)
-        set_current_user(user)
-        put :update, { id: bike.id, bike: { manufacturer_id: nil}}
-      end
-      it { should render_template(:edit) }
     end
   end
-
-
 end

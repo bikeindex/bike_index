@@ -33,6 +33,11 @@ class Blog < ActiveRecord::Base
   scope :listicle_blogs, -> { where(is_listicle: true) }
   default_scope { order("published_at desc") }
 
+  before_create :set_published_at
+  def set_published_at
+    self.published_at ||= Time.now # We need to have a published time...
+  end
+
   before_save :set_published_at_and_published
   def set_published_at_and_published
     if self.post_date.present?

@@ -7,20 +7,25 @@
       = render partial: "/bikes/bike", locals: {bike: @bike, target: "show" }
     - if @bike.stolen
       %h4
-        = link_to "Stolen edit page", edit_admin_stolen_bike_url(@bike)
+        = link_to 'Stolen edit page', edit_admin_stolen_bike_url(@bike)
     .dl-holder
       %dl.dl-horizontal
-        = @bike.dl_from_attribute("owner_email")
-        = @bike.dl_list_item((link_to @bike.owner.email, edit_admin_user_url(@bike.owner)), "Current Owner")
+        = @bike.dl_from_attribute('owner_email')
+        - if @bike.owner.present?
+          = @bike.dl_list_item((link_to @bike.owner.email, edit_admin_user_url(@bike.owner)), 'Current Owner')
+        - else
+          %strong
+            Missing owner!
+
         - if @bike.current_stolen_record.present?
-          = @bike.dl_list_item(@bike.current_stolen_record.phone, "Phone")
+          = @bike.dl_list_item(@bike.current_stolen_record.phone, 'Phone')
       %dl.dl-horizontal
-        = @bike.dl_list_item(@bike.created_at.strftime("%m-%d-%Y"), "Created")
+        = @bike.dl_list_item(@bike.created_at.strftime('%m-%d-%Y'), 'Created')
         - if @bike.creation_organization.present?
-          = @bike.dl_list_item(@bike.creation_organization.name, "Creation org")
-          = @bike.dl_from_attribute("cached_data")
+          = @bike.dl_list_item(@bike.creation_organization.name, 'Creation org')
+          = @bike.dl_from_attribute('cached_data')
     %hr
-    = form_for [:admin, @bike], html: { class: "form form-horizontal admin-bike-edit" } do |f|
+    = form_for [:admin, @bike], html: { class: 'form form-horizontal admin-bike-edit' } do |f|
       = hidden_field_tag :fast_attr_update, @fast_attr_update
     
     
@@ -130,7 +135,7 @@
                   #country_select_container.controls
                     = s.collection_select(:country_id, Country.all, :id, :name, prompt: "Choose country" )
                     %p.other-value
-                      = Country.find_by_iso("US").id
+                      = Country.united_states.id
                   .controls.extra-field
                     = s.text_field :street, placeholder: "Intersection or address"
                   .controls.extra-field

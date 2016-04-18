@@ -11,14 +11,27 @@ describe HeaderTagHelper do
     end
   end
 
-  describe :title_tag_html do 
-    it "returns the title wrapped in title tags" do 
-      header_hash = {
-        title_tag: { title: "Foo 69 69" },
-        meta_tags: { charset: "utf-8" }
-      }
-      title_tag = helper.title_tag_html(header_hash)
-      title_tag.should eq("<title lang='en'>Foo 69 69</title>\n")
+  describe :title_tag_html do
+    context 'from header_tag_hash' do
+      it 'returns the title wrapped in title tags' do 
+        header_hash = {
+          title_tag: { title: 'Foo 69 69' },
+          meta_tags: { charset: 'utf-8' }
+        }
+        title_tag = helper.title_tag_html(header_hash)
+        title_tag.should eq("<title lang='en'>Foo 69 69</title>\n")
+      end
+    end
+    context 'from override' do
+      before { controller.instance_variable_set(:@page_title, 'OVERRIDE - Fancy Page title') }
+      it 'returns the override' do 
+        header_hash = {
+          title_tag: { title: 'Foo 69 69' },
+          meta_tags: { charset: 'utf-8' }
+        }
+        title_tag = helper.title_tag_html(header_hash)
+        expect(title_tag).to eq("<title lang='en'>OVERRIDE - Fancy Page title</title>\n")
+      end
     end
   end
 

@@ -9,12 +9,13 @@ gem 'bcrypt-ruby', '~> 3.0.0'
 gem 'active_model_serializers'
 gem 'aws-sdk', '~> 1.3.4'
 
+# Redis and redis dependents
 gem 'redis'
-gem 'sidekiq', '~> 4.1.1'
+gem 'sidekiq', '~> 4.1.1' # Background processing
 gem 'sidekiq-failures'
 gem 'sidekiq-unique-jobs'
-gem 'rollout'
-gem 'soulheart', '~> 0.2.6'
+gem 'rollout' # Feature flags
+gem 'soulheart', '~> 0.2.6' # typeahead/autocomplete features
 
 gem 'rack-contrib'
 gem 'geocoder'
@@ -24,7 +25,7 @@ gem 'hamlit'
 gem 'haml-rails'
 gem 'journey', '~> 1.0.3'
 gem 'kramdown'
-gem 'kaminari'
+gem 'kaminari' # pagination
 gem 'pg_search'
 gem 'nokogiri'
 gem 'carrierwave', '~> 0.9.0'
@@ -35,9 +36,7 @@ gem 'rqrcode-rails3'
 gem 'strong_parameters'
 gem 'libv8', '~> 3.16.14.7'
 gem 'rb-readline', '~> 0.5.0'
-gem 'backbone-on-rails', '~>0.9.10.0'
 gem 'stripe', git: 'https://github.com/stripe/stripe-ruby'
-gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'
 gem 'acts_as_paranoid', '~>0.4.0'
 gem 'high_voltage'
 gem 'omniauth-facebook'
@@ -46,14 +45,15 @@ gem 'omniauth'
 gem 'fog'
 gem 'dalli'
 gem 'draper', require: false
-gem 'dotenv-rails', '~> 0.8', git: 'https://github.com/bkeepers/dotenv'
 gem 'wkhtmltopdf-binary'
 gem 'wicked_pdf'
+gem 'eventmachine', '~> 1.0.3'
 gem 'sitemap_generator'
-gem 'whenever'
 gem 'unicorn'
 gem 'unicorn-worker-killer'
+gem 'rake', '< 11' # Lock rake to remove validation errors
 
+# OAuth provider, Grape, associated parts of API V2
 gem 'doorkeeper',   '~> 2.0.1'
 gem 'wine_bouncer'
 gem 'grape'
@@ -62,24 +62,43 @@ gem 'grape-swagger'
 gem 'swagger-ui_rails'
 gem 'api-pagination'
 
+# Secure things
 gem 'rack-throttle'
 gem 'secure_headers'
-gem 'eventmachine', '~> 1.0.3'
 
-gem 'chartkick'
+# Frontend
+gem 'backbone-on-rails', '~>0.9.10.0' 
+gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'
+gem 'chartkick' # Display charts
 gem 'groupdate'
-
+gem 'bootstrap', '~> 4.0.0.alpha3' # Bootstrap 4 - used for revised stylesheets
 gem 'sparkpost' # ruby client for email
 
+# Show performance metrics
 gem 'stackprof', require: false
 gem 'memory_profiler', require: false
 gem 'flamegraph', require: false
 gem 'rack-mini-profiler', require: false # If you can't see it you can't make it better
+
+
+gem 'bundler', '>= 1.8.4' # required for rails-assets.org - JS and CSS assets
+source 'https://rails-assets.org' do # JS land is crazy, so lock everything
+  gem 'rails-assets-tether', '~> 1.1.0'
+  gem 'rails-assets-mustache', '~> 2.2.1'
+  gem 'rails-assets-jquery.dirtyforms', '~> 2.0.0'
+  gem 'rails-assets-selectize', '~> 0.12.1' # Manually configured scss
+  gem 'rails-assets-headroom.js', '~> 0.7.0' # Would prefer 0.8 but it isn't on rails-assets yet
+  gem 'rails-assets-pikaday', '~> 1.4.0'
+  gem 'rails-assets-moment', '~> 2.12.0'
+  gem 'rails-assets-jquery-file-upload', '~> 9.12.1'
+end
+
+
 group :assets do
-  gem 'sass-rails',   '~> 3.2.3'
-  gem 'coffee-rails', '~> 3.2.1'
+  gem 'sass-rails',   '~> 3.2.6'
+  gem 'coffee-rails', '~> 3.2.2'
   gem 'therubyracer', '~> 0.12.1' , platforms: :ruby
-  gem 'uglifier', '>= 1.0.3'
+  gem 'uglifier', '~> 2.7.2'
 end
 
 group :development do
@@ -88,7 +107,6 @@ group :development do
   gem 'growl'
   gem 'guard'
   gem 'guard-rspec', '~> 4.2.10'
-  gem 'guard-livereload'
   gem 'guard-rubocop'
   gem 'bullet'
   gem 'should_clean'
@@ -101,6 +119,7 @@ group :development, :test do
   gem 'foreman'
   gem 'database_cleaner'
   gem 'json_spec'
+  gem 'dotenv-rails'
 end
 
 group :test do

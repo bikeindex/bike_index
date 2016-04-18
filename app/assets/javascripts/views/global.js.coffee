@@ -93,7 +93,7 @@ class BikeIndex.Views.Global extends Backbone.View
     @setSearchProximity() # Call here, since we only want to call if search exists
     initial_opts = []
     initial_opts = $('#selectize_items').data('initial') if $('#selectize_items').data('initial')
-    per_page = 10
+    per_page = 15
     renderOption = @renderOption
     updateIncludeSerialOption = @updateIncludeSerialOption
     $('#head-search-bikes #query').selectize

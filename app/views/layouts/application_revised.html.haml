@@ -1,0 +1,147 @@
+!!!
+%html
+  %head
+    = header_tags
+    = csrf_meta_tags
+    <link rel="shortcut icon" href="/fav.ico" />
+    = stylesheet_link_tag 'revised', media: "all"
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+    <script type="text/javascript">window.root_url = "#{ENV['BASE_URL']}";</script>
+    = javascript_include_tag 'application_revised'
+    <!--[if lt IE 9]><script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]--><!--[if lte IE 8]><script type="text/javascript">$(function() {$('body').prepend("<body class='welcome-page' id='body'><div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, the Bike Index (and the internet in general) is broken and ugly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>");});</script><![endif]-->
+    
+    = auto_discovery_link_tag(:atom, news_index_url(format: "atom"), {title: "Bike Index news atom feed"})
+
+  %body{ id: body_id }
+    %nav.primary-header-nav
+      .container
+        %a.primary-logo{ href: user_root_url }
+          = image_tag "/assets/revised/logo.svg", class: 'primary-nav', alt: "Primary nav logo"
+        %a#menu-opened-backdrop
+        .hamburgler
+          %a#primary_nav_hamburgler
+            &#9776;
+        %ul.primary-main-menu
+          - if current_user.present?
+            - memberships = current_user.memberships.includes(:organization)
+            %li.primary-nav-item
+              %a.nav-link.settings-link#setting_submenu{ 'aria-haspopup' => "true", 'aria-expanded' => "false", data: { toggle: 'dropdown' } }
+                %span.settings-text
+                  Settings
+                = image_tag '/assets/revised/settings.svg', title: 'Your settings'
+              %ul.primary-submenu{ 'aria-labelledby' => '#setting_submenu' }
+                = active_link 'Register a new bike', new_bike_path, class_name: 'nav-link'
+                / Include personal bikes here if user has organizations
+                - if memberships.any?
+                  = active_link 'Your bikes', user_home_path, class_name: 'nav-link'
+                %li
+                  = active_link "#{current_user.email} settings", my_account_path, class_name: 'nav-link'
+                %li
+                  = link_to 'Logout', session_path, method: :delete, class: 'nav-link'
+            - unless memberships.any?
+              / If the user is in an organization, bikes are in their settings button
+              %li.primary-nav-item
+                = active_link 'Your bikes', user_home_path, class_name: 'nav-link'
+            - if current_user.admin_authorized('any')
+              %li.primary-nav-item
+                = active_link 'Admin', user_root_url, class_name: 'nav-link'
+            /
+            / Organization submenus
+            - memberships.each do |membership|
+              - organization = membership.organization
+              %li.primary-nav-item
+                %a.nav-link{ id: "#{organization.slug}_submenu", 'aria-haspopup' => "true", 'aria-expanded' => "false", data: { toggle: 'dropdown' } }
+                  = organization.short_name
+                %ul.primary-submenu{ 'aria-labelledby' => "##{organization.slug}_submenu" }
+                  %li
+                    = active_link 'EZ Registration form', embed_extended_organization_path(organization), class_name: 'nav-link'
+                  %li
+                    = active_link "#{organization.short_name} bikes", organization_path(organization), class_name: 'nav-link'
+                  - if membership.admin?
+                    %li
+                      = active_link 'Manage Members', edit_organization_path(organization), class_name: 'nav-link'
+                    %li
+                      = active_link "Manage #{organization.short_name} settings", edit_organization_path(organization), class_name: 'nav-link'
+                  %li
+                    = active_link 'Dev resources', organization_path(organization), class_name: 'nav-link'
+          - else
+            %li.primary-nav-item
+              = active_link 'Sign up', new_user_url, class_name: 'nav-link signup-link'
+            %li.primary-nav-item
+              = active_link 'log in', new_session_url, class_name: 'nav-link'
+          %li.primary-nav-item
+            = active_link 'Help', help_path, class_name: 'nav-link'
+            / %a.nav-link{ id: "helpSubmenu", 'aria-haspopup' => "true", 'aria-expanded' => "false", data: { toggle: 'dropdown' } }
+            /   Help
+            / %ul.primary-submenu{ 'aria-labelledby' => "#helpSubmenu" }
+            /   %li
+            /     = active_link 'For Cyclists', help_path, class_name: 'nav-link'
+            /   %li
+            /     = active_link 'For Bike Shops', help_path, class_name: 'nav-link'
+            /   %li
+            /     = active_link 'For Law Enforcement', help_path, class_name: 'nav-link'
+            /   %li
+            /     = active_link 'For Universities', help_path, class_name: 'nav-link'
+            /   %li
+            /     = active_link 'Contact us', help_path, class_name: 'nav-link'
+          %li.primary-nav-item
+            = active_link 'About', about_path, class_name: 'nav-link'
+          %li.primary-nav-item
+            = active_link 'News', news_index_path, class_name: 'nav-link'
+          %li.primary-nav-item
+            = active_link 'Community', '#', class_name: 'nav-link'
+          %li.primary-nav-item
+            = active_link 'Search bikes', bikes_path, class_name: 'nav-link'
+    = render 'layouts/revised_messages'
+
+    - if current_page_skeleton
+      = render "/shared/#{current_page_skeleton}"
+    - else
+      = yield
+
+    %footer.primary-footer
+      .primary-footer-nav
+        .container
+          .row
+            %nav.col-md-3.pull-right
+              %h4
+                = active_link 'Donate to the Bike Index', support_the_index_path
+              %ul
+                %li
+                  = active_link 'Store', shop_path
+            %nav.col-md-3.pull-right
+              %h4
+                = active_link 'Help', help_path
+              %ul
+                %li
+                  = active_link 'Sign up a shop or organization', new_organization_path
+                %li
+                  = active_link 'List of manufacturers', manufacturers_path
+            %nav.col-md-3.pull-right
+              %h4
+                = active_link 'Dev and Design Resources', dev_and_design_path
+              %ul
+                %li
+                  = active_link 'API documentation', documentation_index_path
+            %nav.col-md-3.social-nav
+              %ul
+                %li
+                  = link_to image_tag('/assets/revised/facebook.svg', alt: 'Bike Index Facebook'), 'https://facebook.com/bikeindex', class: 'footer-facebook'
+                %li
+                  = link_to image_tag('/assets/revised/twitter.svg', alt: 'Bike Index Twitter'), 'https://twitter.com/BikeIndex', class: 'footer-twitter'
+                %li
+                  = link_to image_tag('/assets/revised/instagram.svg', alt: 'Bike Index Instagram'), 'http://instagram.com/bikeindex/', class: 'footer-instagram'
+
+      %nav.terms-and-stuff
+        .container
+          %p
+            %span{data: {license: "https://github.com/bikeindex/bike_index/blob/master/LICENSE"}}
+              #{Time.zone.now.year} &copy; Bike Index.
+            - if current_user.present? && current_user.has_membership?
+              #{link_to "Privacy policy", privacy_path}, #{link_to "vendor terms", vendor_terms_path}
+            - else
+              #{link_to "Privacy policy", privacy_path}
+            and #{link_to "terms and conditions", terms_path}.
+    - cache 'facebook_pixel' do
+      = render '/shared/facebook_pixel'

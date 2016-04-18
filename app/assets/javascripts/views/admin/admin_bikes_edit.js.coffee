@@ -19,14 +19,19 @@ class BikeIndex.Views.AdminBikesEdit extends Backbone.View
       @setFrameSize()
     
   initializeFrameMaker: (target) ->
+    $target = $(target)
+    initial_opts = []
+    initial_opts = [$target.data('initial')] if $target.data('initial')
+    per_page = 10
     frame_mnfg_url = "#{window.root_url}/api/autocomplete?per_page=#{per_page}&categories=frame_mnfg&q="
-    $(target).selectize
-      plugins: ['restore_on_backspace']
-      preload: true
+    $target.selectize
+      options: initial_opts
+      selectOnTab: true
+      preload: false
       persist: false
       create: false
       maxItems: 1
-      valueField: 'slug'
+      valueField: 'id'
       labelField: 'text'
       searchField: 'text'
       loadThrottle: 150

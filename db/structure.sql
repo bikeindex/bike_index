@@ -184,7 +184,8 @@ CREATE TABLE bikes (
     hidden boolean DEFAULT false NOT NULL,
     frame_size_number double precision,
     updator_id integer,
-    is_for_sale boolean DEFAULT false NOT NULL
+    is_for_sale boolean DEFAULT false NOT NULL,
+    made_without_serial boolean DEFAULT false NOT NULL
 );
 
 
@@ -2991,3 +2992,9 @@ INSERT INTO schema_migrations (version) VALUES ('20160314144745');
 INSERT INTO schema_migrations (version) VALUES ('20160317183354');
 
 INSERT INTO schema_migrations (version) VALUES ('20160320154610');
+
+INSERT INTO schema_migrations (version) VALUES ('20160406180845');
+
+INSERT INTO schema_migrations (version) VALUES ('20160406202125');
+
+INSERT INTO schema_migrations (version) VALUES ('20160408192902');

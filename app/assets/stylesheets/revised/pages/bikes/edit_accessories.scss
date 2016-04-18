@@ -1,0 +1,26 @@
+.edit-bike-page-accessories {
+  .add-additional-components-block {
+    // max-width: 300px;
+    margin: 0 auto;
+    display: block;
+    padding-top: 2*$vertical-height;
+    a {
+      display: block;
+      text-align: center;
+      cursor: pointer;
+      color: $body-font-color;
+      &:hover, &:active, &.active {
+        color: $link-color;
+        text-decoration: none;
+      }
+    }
+  }
+  .remove-part {
+    float: right;
+    label {
+      cursor: pointer;
+      margin-bottom: 0;
+    }
+    input { display: none; }
+  }
+}

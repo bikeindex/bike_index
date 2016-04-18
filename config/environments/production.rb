@@ -48,7 +48,7 @@ Bikeindex::Application.configure do
   # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
   #
   config.assets.initialize_on_precompile = false
-  config.assets.precompile += %w( graphs.js embed.js embed_user.js spokecard.css embed_styles.css embed_user_styles.css registration_pdf.css updated.css documentation_v2.css documentation_v2.js)
+  config.assets.precompile += %w( graphs.js embed.js embed_user.js spokecard.css embed_styles.css embed_user_styles.css registration_pdf.css updated.css documentation_v2.css documentation_v2.js revised.css application_revised.js)
 
   # Disable delivery errors, bad email addresses will be ignored
   # config.action_mailer.raise_delivery_errors = false

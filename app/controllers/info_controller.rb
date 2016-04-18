@@ -2,6 +2,11 @@ class InfoController < ApplicationController
   layout 'content'
   # caches_page :about, :where, :roadmap, :security, :serials, :stolen_bikes, :privacy, :terms, :vendor_terms, :downloads, :resources, :spokecard
   before_filter :set_active_section
+  before_filter :set_revised_layout
+
+  def set_revised_layout
+    self.class.layout 'application_revised' if revised_layout_enabled?
+  end
 
   def about
   end
@@ -37,11 +42,15 @@ class InfoController < ApplicationController
   end
 
   def support_the_index
-    render layout: 'application_updated'
+    @page_title = 'Support the Bike Index'
+    render layout: (revised_layout_enabled? ? 'application_revised' : 'application_updated')
   end
 
   def support_the_bike_index
     redirect_to support_the_index_url
+  end
+
+  def dev_and_design
   end
 
   def how_not_to_buy_stolen
