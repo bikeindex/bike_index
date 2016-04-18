@@ -91,6 +91,7 @@ source 'https://rails-assets.org' do # JS land is crazy, so lock everything
   gem 'rails-assets-pikaday', '~> 1.4.0'
   gem 'rails-assets-moment', '~> 2.12.0'
   gem 'rails-assets-jquery-file-upload', '~> 9.12.1'
+  gem 'rails-assets-Stickyfill', '~> 1.1.3'
 end
 
 

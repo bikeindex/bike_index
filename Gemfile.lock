@@ -349,6 +349,7 @@ GEM
       activesupport (= 3.2.22)
       bundler (~> 1.0)
       railties (= 3.2.22)
+    rails-assets-Stickyfill (1.1.3)
     rails-assets-blueimp-canvas-to-blob (3.3.0)
     rails-assets-blueimp-load-image (2.6.1)
     rails-assets-blueimp-tmpl (3.4.0)
@@ -593,6 +594,7 @@ DEPENDENCIES
   rack-mini-profiler
   rack-throttle
   rails (= 3.2.22)
+  rails-assets-Stickyfill (~> 1.1.3)!
   rails-assets-headroom.js (~> 0.7.0)!
   rails-assets-jquery-file-upload (~> 9.12.1)!
   rails-assets-jquery.dirtyforms (~> 2.0.0)!
