@@ -37,13 +37,12 @@ describe Admin::BikesController do
   describe :destroy do
     it 'destroys the bike' do
       bike = FactoryGirl.create(:bike)
-      # We execute the after bike save worker inline because we're destroying the bike
-      expect_any_instance_of(AfterBikeSaveWorker).to receive(:perform) { bike.id }
       expect do
         delete :destroy, id: bike.id
       end.to change(Bike, :count).by(-1)
       expect(response).to redirect_to(:admin_bikes)
       expect(flash[:notice]).to match(/deleted/i)
+      expect(AfterBikeSaveWorker).to have_enqueued_job(bike.id)
     end
   end
 
