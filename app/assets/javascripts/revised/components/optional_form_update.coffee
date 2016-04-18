@@ -1,7 +1,7 @@
 class BikeIndex.OptionalFormUpdate extends BikeIndex
   constructor: ->
     updateForm = @updateForm
-    # Add optional parameter for use when triggering manually
+    # Add optional parameter for use when triggering manually (so we don't clear on initial setup)
     $('a.optional-form-block').click (e, erase = true) ->
       updateForm(e, erase)
 
@@ -27,7 +27,7 @@ class BikeIndex.OptionalFormUpdate extends BikeIndex
 
     else # It is showing a block. No action label required
       $click_target.slideDown 'fast', ->
-        $click_target.slideDown().addClass('unhidden').removeClass('currently-hidden')
+        $click_target.addClass('unhidden').removeClass('currently-hidden')
 
     if erase
       selectize = $click_target.find('select').selectize()[0]

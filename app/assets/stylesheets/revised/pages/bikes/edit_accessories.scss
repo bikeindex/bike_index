@@ -15,4 +15,12 @@
       }
     }
   }
+  .remove-part {
+    float: right;
+    label {
+      cursor: pointer;
+      margin-bottom: 0;
+    }
+    input { display: none; }
+  }
 }

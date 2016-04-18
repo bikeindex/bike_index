@@ -29,10 +29,10 @@ class window.BikeIndex
       create: false
       plugins: ['restore_on_backspace', 'selectable_placeholder']
     # Remove them so we don't initialize twice
-    $('.special-select-single.unfancy').removeClass('unfancy')
+    $('.unfancy.fancy-select, .unfancy.fancy-select-placeholder').removeClass('unfancy')
 
 
 
 $(document).ready ->
-  bike_index = new window.BikeIndex
-  bike_index.pageLoad()
+  window.BikeIndexInit = new window.BikeIndex
+  window.BikeIndexInit.pageLoad()

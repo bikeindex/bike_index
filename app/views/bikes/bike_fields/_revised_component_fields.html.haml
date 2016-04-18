@@ -1,65 +1,63 @@
-%fieldset.input-group.with-additional-block.add-component-fields
-  %article
-    .control-group.select_unattached.special-select-single.has-position-select{data: {other: Ctype.other.id, hidden: ".hidden-ctype" }}
-      = f.label :ctype_id, "Part type", class: "control-label"
-      .controls.part-type-select
-        = f.collection_select(:ctype_id, Ctype.all, :id, :name, :required =>true, prompt: "What type of part?" )
-      .controls
-        - position_visibility = "initially-hidden"
-        - position_visibility = "" if f.object.front || f.object.rear
-        .groupedbtn-group{ class: position_visibility, data:  { toggle: "buttons-radio" }}
-          .btn-group
-            %button.btn.ctype-position-both{ type: "button", :'data-position' => 'both' }
-              Both
-            %button.btn{ type: "button", :'data-position' => 'front', class: ('active' if f.object.front ) }
-              Front
-            %button.btn{ type: "button", :'data-position' => 'rear', class: ('active' if f.object.rear ) }
-              Rear
-          = f.hidden_field :front_or_rear, class: "front-or-rear"
-    - other_show = ""
-    - other_show = "other_present" if f.object.ctype_id == Ctype.other.id
-    .hidden-other.control-group.hidden-ctype{class: other_show }
-      = f.label :ctype_other, "Other part type", class: "control-label"
-      .controls
-        = f.text_field :ctype_other
+%fieldset.additional-component
+  - initial_manufacturer = f.object.manufacturer && { id: f.object.manufacturer.id, text: f.object.manufacturer.name }.to_json
+  - other_mnfg_show = (f.object.manufacturer_id == @manufacturer_other_id) ? 'unhidden' : ''
+  - other_ctype_show = f.object.ctype_id == @ctype_other_id ? 'unhidden' : ''
+  - other_model_show = (f.object.model_name.present?) ? 'unhidden' : ''
+  .related-fields.row
+    .right-input-help.remove-part
+      = f.label :_destroy do
+        %span.context-display-help
+          &ndash;
+        = f.check_box :_destroy
+        Remove part
 
-    .control-group.large-text.extra-field
-      = f.label :description, "Part Description", class: "control-label"
-      .controls
-        = f.text_area :description, rows: 2
+  .related-fields.row
+    = f.label :ctype_id, 'Part type', class: 'form-well-label'
+    .form-well-input.fancy-select.unfancy
+      = f.collection_select(:ctype_id, Ctype.all, :id, :name, { required: true }, { class: 'form-control component-ctype-input' })
+    / We really should display Position here, but we aren't right now because of implementation issues 
+    / .right-input-help
+    /   - position_visibility = (f.object.front || f.object.rear) ? '' : 'hidden-other'
+    /   .groupedbtn-group{ class: position_visibility, data:  { toggle: 'buttons-radio' } }
+    /     .btn-group{ role: 'group' }
+    /       %button.btn.btn-default.ctype-position-both{ class: ('active' if f.object.both) data: { position: 'both' } }
+    /         Both
+    /       %button.btn.btn-default{ class: ('active' if f.object.front ), data: { position: 'front' } }
+    /         Front
+    /       %button.btn.btn-default{ class: ('active' if f.object.rear ), data: { position: 'rear' } }
+    /         Rear
+    /     = f.hidden_field :front_or_rear, class: 'front-or-rear'
+    .form-group.hidden-other.hidden-ctype{ class: other_ctype_show }
+      = f.label :ctype_other, 'Other part type', class: 'form-well-label'
+      .form-well-input
+        = f.text_field :ctype_other, class: 'form-control'
 
-    .mnfg-group
-      .split-fields
-        .control-group.select-jsonified.extra-field{ data: { other: @manufacturer_other_id, hidden: ".hidden-mnfg" } }
-          = f.label :manufacturer_id, class: "control-label"
-          - c_mnfg = f.object.manufacturer
-          / - initial = c_mnfg.present? ? { id: c_mnfg.id, text: c_mnfg.name }.to_json : nil
-          .controls.component-mnfg-select.select_unattached{ data: { initialname:  c_mnfg && c_mnfg.name } }
-            = f.text_field :manufacturer_id
-        .control-group.extra-field.component_model.short-label
-          = f.label :model_name, "Model", class: "control-label"
-          .controls
-            = f.text_field :model_name
-      - other_show = ""
-      - other_show = "other_present" if f.object.manufacturer_id == @manufacturer_other_id
-      .hidden-other.control-group.hidden-mnfg{class: other_show}
-        = f.label :manufacturer_other, "Other manufacturer", class: "control-label"
-        .controls
-          = f.text_field :manufacturer_other
+  .form-group.row.unnested-field
+    = f.label :description, 'Part Description', class: 'form-well-label form-well-label-large-input'
+    .form-well-input-large
+      = f.text_area :description, rows: 2, class: 'form-control'
 
-    .split-fields.extra-model-fields{class: ("hidden-other" unless f.object.model_name.present?)}
-      .control-group.extra-field
-        = f.label :year, "Model Year", class: "control-label"
-        .controls
-          = f.text_field :year
+  .related-fields.row
+    .form-group
+      = f.label :manufacturer_id, class: 'form-well-label'
+      .form-well-input
+        = f.text_field :manufacturer_id, class: 'form-control component-manufacturer-input unfancy', data: { initial: initial_manufacturer }
+    .hidden-other.form-group{ class: other_mnfg_show }
+      = f.label :manufacturer_other, 'Other manufacturer', class: 'form-well-label'
+      .form-well-input
+        = f.text_field :manufacturer_other, class: 'form-control'
 
-      .control-group.extra-field.short-label
-        = f.label :serial_number, "Part Serial", class: "control-label"
-        .controls
-          = f.text_field :serial_number, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
-
-    .remove-part
-      = f.check_box :_destroy
-      = f.label :_destroy, "Remove component", class: "remove_fields"
-    
-    
+  .related-fields.row
+    .form-group
+      = f.label :model_name, 'Model', class: 'form-well-label'
+      .form-well-input.form-well-input.component_model
+        = f.text_field :model_name, class: 'form-control'
+    .form-group.hidden-other{ class: other_model_show }
+      = f.label :year, 'Model Year', class: 'form-well-label'
+      .form-well-input
+        = f.text_field :year, class: 'form-control'
+    .form-group.hidden-other{ class: other_model_show }
+      = f.label :serial_number, 'Part Serial', class: 'form-well-label'
+      .form-well-input
+        = f.text_field :serial_number, class: 'form-control', autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
+  
