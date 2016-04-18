@@ -5,6 +5,8 @@ class BikeIndex.BikesEdit extends BikeIndex
 
     # Initialize dirty forms. 
     $('form.primary-edit-bike-form').dirtyForms()
+    # Affix the edit menu to the page
+    $('.primary-edit-bike-menu').Stickyfill()
     # Get the template name, call page specific Scripts if we have them
     switch $('.form-well-header.container').attr('data-template')
       when 'root' then new BikeIndex.BikesEditRoot
@@ -17,7 +19,7 @@ class BikeIndex.BikesEdit extends BikeIndex
   initializeEventListeners: ->
     pagespace = @
     $('.bike-edit-page-select select').change (e) ->
-      pagespace.updatePageLocation(this.value)
+      pagespace.updatePageLocation(this.valnue)
 
   updatePageLocation: (url) ->
     window.location.href = url

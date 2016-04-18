@@ -24,15 +24,15 @@ class InfoController < ApplicationController
   end
 
   def privacy
-    render layout: 'legal'
+    render layout: 'legal' unless revised_layout_enabled?
   end
 
   def terms
-    render layout: 'legal'
+    render layout: 'legal' unless revised_layout_enabled?
   end
 
   def vendor_terms
-    render layout: 'legal'
+    render layout: 'legal' unless revised_layout_enabled?
   end
 
   def resources
