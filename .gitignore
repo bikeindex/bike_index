@@ -1,6 +1,8 @@
 # Ignore bundler config
 /.bundle
 
+# Temporarily ignore public/_site for jekyll stuff
+
 
 # Ignore all logfiles and tempfiles.
 /log/*.log
