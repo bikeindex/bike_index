@@ -1,43 +1,67 @@
 require 'spec_helper'
 
 describe NewsController do
-  describe :index do
-    before do 
-      get :index
+  context 'legacy' do
+    describe :index do
+      it 'renders' do
+        get :index
+        expect(response.status).to eq(200)
+        expect(response).to render_template('index')
+        expect(response).to render_with_layout('content')
+      end
     end
-    it { should respond_with(:success) }
-    it { should render_template(:index) }
+
+    describe :show do
+      let(:user) { FactoryGirl.create(:user) }
+      let(:blog) { Blog.create(title: 'foo title', body: "ummmmm good", user_id: user.id, old_title_slug: 'an-older-title') }
+      context 'title slug' do
+        it 'renders' do
+          get :show, id: blog.title_slug
+          expect(response.status).to eq(200)
+          expect(response).to render_template('show')
+          expect(response).to render_with_layout('content')
+        end
+      end
+      context 'old title slug' do
+        it 'renders' do
+          get :show, id: blog.old_title_slug
+          expect(response.status).to eq(200)
+          expect(response).to render_template('show')
+          expect(response).to render_with_layout('content')
+        end
+      end
+      context 'id' do
+        it 'renders' do
+          get :show, id: blog.id
+          expect(response.status).to eq(200)
+          expect(response).to render_template('show')
+          expect(response).to render_with_layout('content')
+        end
+      end
+    end
   end
 
-  describe :show do 
-    before do 
-      user = FactoryGirl.create(:user)
-      blog = Blog.create(title: "foo title", body: "ummmmm good", user_id: user.id)
-      get :show, id: blog.title_slug
+  context 'revised' do
+    describe :index do
+      it 'renders' do
+        allow(controller).to receive(:revised_layout_enabled?) { true }
+        get :index
+        expect(response.status).to eq(200)
+        expect(response).to render_template('index')
+        expect(response).to render_with_layout('application_revised')
+      end
     end
-    it { should respond_with(:success) }
-    it { should render_template(:show) }
-  end
-  
-  describe :show do 
-    # It should render the blog if the old title slug matches
-    before do
-      user = FactoryGirl.create(:user)
-      blog = Blog.create(title: "foo title", body: "ummmmm good", user_id: user.id, old_title_slug: "an-older-title")
-      get :show, id: blog.old_title_slug
-    end
-    it { should respond_with(:success) }
-    it { should render_template(:show) }
-  end
 
-  describe :show do 
-    # It should render the blog if the id matches
-    before do
-      user = FactoryGirl.create(:user)
-      blog = Blog.create(title: "foo title", body: "ummmmm good", user_id: user.id, old_title_slug: "an-older-title")
-      get :show, id: blog.id
+    describe :show do
+      let(:user) { FactoryGirl.create(:user) }
+      let(:blog) { Blog.create(title: 'foo title', body: "ummmmm good", user_id: user.id, old_title_slug: 'an-older-title') }
+      it 'renders' do
+        allow(controller).to receive(:revised_layout_enabled?) { true }
+        get :show, id: blog.title_slug
+        expect(response.status).to eq(200)
+        expect(response).to render_template('show')
+        expect(response).to render_with_layout('application_revised')
+      end
     end
-    it { should respond_with(:success) }
-    it { should render_template(:show) }
   end
 end
