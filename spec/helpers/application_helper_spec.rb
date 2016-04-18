@@ -80,6 +80,17 @@ describe ApplicationHelper do
         end
       end
     end
+    context 'news' do
+      before { allow(view).to receive(:controller_name) { 'news' } }
+      %w(index show).each do |action|
+        context action do
+          it 'returns nil' do
+            allow(view).to receive(:action_name) { action }
+            expect(helper.current_page_skeleton).to eq 'content_skeleton'
+          end
+        end
+      end
+    end
     context 'payments' do
       before { allow(view).to receive(:controller_name) { 'payments' } }
       %w(new create).each do |action|

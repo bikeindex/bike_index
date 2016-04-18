@@ -34,6 +34,25 @@ $border-radius-sm:       1px;
 // @import "bootstrap/type";
 @import "bootstrap/images";
 @import "bootstrap/code";
+.code {
+  .code-label {
+    border-radius: $border-radius $border-radius 0 0;
+    width: 100%;
+    background: $gray-lighter;
+    border: 1px solid $gray-lightish;
+    margin-top: 1em;
+    margin-bottom: 0;
+    padding: 7px 9px 5px;
+    font-size: 15px;
+    font-weight: bold;
+  }
+  pre {
+    border-radius: 0 0 $border-radius $border-radius;
+    box-shadow: inset 0 0 1px rgba(black,.2);
+    border: 1px solid $gray-lightish;
+    border-top: 0;
+  }
+}
 @import "bootstrap/grid";
 @import "bootstrap/tables";
 @import "bootstrap/forms";
@@ -127,6 +146,10 @@ $row-side-padding: 0.9375rem;
 @import "revised/pages/info/about";
 @import "revised/pages/info/protect_your_bike";
 @import "revised/pages/payments/payments";
+
+// News pages
+@import "revised/pages/news/index";
+@import "revised/pages/news/show";
 
 
 // LEGACY PAGES general styles - replace as soon as all pages have been restyled
