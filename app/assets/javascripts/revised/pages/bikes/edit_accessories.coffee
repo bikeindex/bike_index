@@ -19,8 +19,6 @@ class BikeIndex.BikesEditAccessories extends BikeIndex
     return true unless $target.hasClass 'form-control'
     other_id = $('#form_well_wrap').data("#{field_type}other")
     $other_field = $target.parents('.related-fields').find('.hidden-other')
-    console.log other_id
-    console.log $target.val()
     if "#{$target.val()}" == "#{other_id}"
       $other_field.slideDown 'fast', ->
         $other_field.addClass('unhidden').removeClass('currently-hidden')
