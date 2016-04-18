@@ -41,7 +41,8 @@ $form-well-border-color: #e4e4e4;
     border: 1px solid $form-well-border-color;
   }
   .hidden-other {
-    margin-top: -1rem;
+    margin-top: 0;
+    padding-top: .5*$vertical-height;
     display: none;
     &.unhidden {
       margin-bottom: 1.5rem;

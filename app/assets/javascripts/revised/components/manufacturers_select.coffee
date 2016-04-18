@@ -9,7 +9,7 @@ class BikeIndex.ManufacturersSelect extends BikeIndex
       url = "#{window.root_url}/api/autocomplete?per_page=#{per_page}&categories=frame_mnfg&q="
       value_field = 'slug' # for convenience in viewing, also functionality without JS
     else
-      url = "#{window.root_url}/api/autocomplete?per_page=#{per_page}&categories=frame_mnfg+mnfg&q="
+      url = "#{window.root_url}/api/autocomplete?per_page=#{per_page}&categories=frame_mnfg,mnfg&q="
       value_field = 'id' # for convenience instantiating
     $target.selectize
       plugins: ['restore_on_backspace']

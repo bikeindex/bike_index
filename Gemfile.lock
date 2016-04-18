@@ -349,8 +349,16 @@ GEM
       activesupport (= 3.2.22)
       bundler (~> 1.0)
       railties (= 3.2.22)
+    rails-assets-blueimp-canvas-to-blob (3.3.0)
+    rails-assets-blueimp-load-image (2.6.1)
+    rails-assets-blueimp-tmpl (3.4.0)
     rails-assets-headroom.js (0.7.0)
     rails-assets-jquery (2.2.3)
+    rails-assets-jquery-file-upload (9.12.1)
+      rails-assets-blueimp-canvas-to-blob (>= 2.1.1)
+      rails-assets-blueimp-load-image (>= 1.13.0)
+      rails-assets-blueimp-tmpl (>= 2.5.4)
+      rails-assets-jquery (>= 1.6)
     rails-assets-jquery.dirtyforms (2.0.0)
       rails-assets-jquery (>= 1.4.2)
     rails-assets-microplugin (0.0.3)
@@ -586,6 +594,7 @@ DEPENDENCIES
   rack-throttle
   rails (= 3.2.22)
   rails-assets-headroom.js (~> 0.7.0)!
+  rails-assets-jquery-file-upload (~> 9.12.1)!
   rails-assets-jquery.dirtyforms (~> 2.0.0)!
   rails-assets-moment (~> 2.12.0)!
   rails-assets-mustache (~> 2.2.1)!

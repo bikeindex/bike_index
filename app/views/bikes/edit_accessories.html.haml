@@ -2,15 +2,21 @@
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
       = render partial: '/bikes/edit_primary_menu'
-      .col-md-8.form-well
+      - @ctype_other_id = Ctype.other.id
+      - @manufacturer_other_id = Manufacturer.other_manufacturer.id
+      .col-md-8.form-well#form_well_wrap{ data: { ctypeother: @ctype_other_id, manufacturerother: @manufacturer_other_id } }
         .form-wrap
           .edit-bike-form-header
             %h3
               = @edit_templates[@edit_template]
-
-
           .form-group.row.unnested-field.no-divider-row
             = f.label :handlebar_type_id, class: 'form-well-label'
             .form-well-input.fancy-select-placeholder.unfancy
               = f.collection_select(:handlebar_type_id, HandlebarType.all, :id, :name, prompt: ' ')
-          %hr
+          %fieldset.add-additional
+            #has_multiples_parts{ data: { ids: Ctype.where(has_multiple: true).map(&:id).to_json } }
+            = f.fields_for :components do |builder|
+              = render '/bikes/bike_fields/revised_component_fields', f: builder
+            %hr
+            .add-additional-components-block.no-divider-row
+              = revised_link_to_add_components 'Add a component', f, :components, 'Frame and fork'

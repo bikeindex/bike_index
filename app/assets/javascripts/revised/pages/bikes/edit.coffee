@@ -12,6 +12,7 @@ class BikeIndex.BikesEdit extends BikeIndex
       when 'drivetrain' then new BikeIndex.BikesEditDrivetrain
       when 'stolen' then new BikeIndex.BikesEditStolen
       when 'photos' then new BikeIndex.BikesEditPhotos
+      when 'accessories' then new BikeIndex.BikesEditAccessories
 
   initializeEventListeners: ->
     pagespace = @
