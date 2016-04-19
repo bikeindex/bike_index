@@ -3,11 +3,6 @@ class NewsController < ApplicationController
   before_filter :set_blogs_active_section
   before_filter :set_revised_layout
 
-  def set_revised_layout
-    self.class.layout 'application_revised' if revised_layout_enabled?
-  end
-
-
   def show
     @blog = Blog.find_by_title_slug(params[:id])
     @blog = Blog.find_by_old_title_slug(params[:id]) unless @blog

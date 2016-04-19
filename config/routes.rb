@@ -9,7 +9,7 @@ Bikeindex::Application.routes.draw do
   get 'dashboard/show'
 
   match '/shop', to: redirect('https://bikeindex.myshopify.com'), as: :shop
-  match '/discuss', to: redirect(ENV['DISCOURSE_URL']), as: :discuss
+  match '/discuss', to: redirect('https://discuss.bikeindex.org'), as: :discuss
   match 'discourse_authentication', to: 'discourse_authentication#index'
 
   resources :organizations do

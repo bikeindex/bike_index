@@ -1,0 +1,157 @@
+$facebook-login-color: #3C5A99;
+$strava-login-color: #FC4C02;
+$sign-in-up-form-bg: $gray-lighter;
+
+@mixin oauth-login-bar($oauth-login-bg, $oauth-login-bg-hover: darken($oauth-login-bg, 7%)) {
+  span { background: $oauth-login-bg; }
+  &:hover, &:active, &:visited { text-decoration: none; }
+  &:hover span { background: $oauth-login-bg-hover; }
+  &:active span { background: darken($oauth-login-bg-hover, 5%) }
+}
+
+.sign-in-up {
+  .sign-in-up-header h1 { margin-bottom: 4*$vertical-height; }
+  .sign-in-up-main-form-header {
+    padding: 1.5*$vertical-height 0 $vertical-height  ;
+    small {
+      @extend .body-font;
+      float: right;
+    }
+  }
+  .sign-in-up-or, .oauth-providers {
+    @include make-col();
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+  .sign-in-up-or {
+    display: none;
+    h3 { 
+      margin: 0;
+      text-align: center;
+    }
+  }
+  .oauth-providers {
+    .facebook-login { @include oauth-login-bar($facebook-login-color) }
+    .strava-login { @include oauth-login-bar($strava-login-color) }
+    a {
+      @extend .row;
+      margin: $vertical-height 0;
+    }
+    span {
+      font-family: $header-font-family;
+      font-weight: 400;
+      font-style: normal;
+      text-transform: uppercase;
+      color: white;
+      margin-bottom: 0;
+    }
+    .oauth-logo-block {
+      height: 4*$vertical-height;
+      border-radius: $border-radius 0 0 $border-radius;
+      flex: 0 0 16.6667%;
+      padding: $vertical-height .5*$vertical-height;
+    }
+    .oauth-text-block {
+      border-radius: 0 $border-radius $border-radius 0;
+      flex: 0 0 82.6666%;
+      margin-left: .66667%;
+      line-height: 1;
+      padding: 1.5*$vertical-height .5*$vertical-height $vertical-height;
+    }
+    img {
+      display: block;
+      height: 100%;
+      width: auto;
+      margin: 0 auto;
+    }
+  }
+  .main-form {
+    @include make-col();
+    .btn {
+      padding-top: $vertical-height;
+      padding-bottom: $vertical-height;
+      margin: 0 auto;
+      display: block;
+      width: 250px;
+    }
+    p { 
+      margin: 2*$vertical-height 0 0;
+    }
+  }
+}
+
+//
+// Small screens and larger
+@media (max-width: $grid-breakpoint-md - 1px) {
+  .sign-in-up {
+    .sign-in-up-wrap {
+      background: $sign-in-up-form-bg;
+      border: 1px solid $gray-lightish;
+      border-radius: $border-radius;
+      padding: 2*$vertical-height 0.9375rem;
+    }
+    .oauth-providers, .main-form { 
+      @include make-col-span(12);
+    }
+  }
+}
+
+//
+// Large screen styles
+@media (min-width: $grid-breakpoint-md) {
+  .sign-in-up {
+    .sign-in-up-or {
+      display: block;
+      width: 0; // Or else it overflows and breaks everything
+      @include make-col-push(1);
+      @include make-col-span(1);
+    }
+    .oauth-providers {
+      @include make-col-span(5);
+      @include make-col-push(7);
+    }
+    .sign-in-up-main-form-header { padding: 0; }
+    .main-form {
+      padding-top: 0;
+      // Main form gets bg
+      background: $sign-in-up-form-bg;
+      border: 1px solid $gray-lightish;
+      border-radius: $border-radius;
+      padding-top: 2*$vertical-height;
+      padding-bottom: 2*$vertical-height;
+    }
+  }
+}
+
+@media (min-width: $grid-breakpoint-lg) {
+  .sign-in-up {
+    .oauth-providers {
+      font-size: 18px;
+      .oauth-text-block {
+        padding-left: $vertical-height;
+        padding-right: $vertical-height;
+      }
+    }
+  }
+}
+
+
+@media (min-width: $grid-breakpoint-md) and (max-width: $grid-breakpoint-xl - 1px) {
+  .sign-in-up {
+    .main-form {
+      @include make-col-span(6);
+      @include make-col-pull(6);
+    }
+  }
+}
+
+//
+// XL screen styles
+@media (min-width: $grid-breakpoint-xl) {
+  .sign-in-up {
+    .main-form {
+      @include make-col-span(5);
+      @include make-col-pull(5);
+    }
+  }
+}

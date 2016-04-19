@@ -3,6 +3,7 @@ class window.BikeIndex
   pageLoad: ->
     new BikeIndex.NavHeader
     @loadFancySelects()
+    @initializeNoTabLinks()
     window.BikeIndexAlerts = new BikeIndex.Alerts
     # Put this last, so if it fails, we still have some functionality
     @loadPageScript(document.getElementsByTagName('body')[0].id)
@@ -31,6 +32,16 @@ class window.BikeIndex
     # Remove them so we don't initialize twice
     $('.unfancy.fancy-select, .unfancy.fancy-select-placeholder').removeClass('unfancy')
 
+  initializeNoTabLinks: ->
+    # So in forms we can provide help without breaking tab index
+    $('.no-tab').click (e) ->
+      e.preventDefault()
+      $target = $(e.target)
+      local = $target.attr('data-target')
+      if $target.hasClass('same-window')
+        window.location = local
+      else
+        window.open(local, '_blank')
 
 
 $(document).ready ->

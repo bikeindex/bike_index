@@ -13,7 +13,7 @@
 
 // Core variables and mixins
 @import "bootstrap/variables";
-
+$enable-flex: true; // Flexbox!!
 // 
 // Overrides
 $border-radius:          1px;
@@ -132,6 +132,7 @@ $row-side-padding: 0.9375rem;
 @import "revised/sections/edit_bike_title";
 @import "revised/sections/horizontal_lines";
 @import "revised/sections/legal";
+@import "revised/sections/sign_in_up";
 
 // 
 // Page styles

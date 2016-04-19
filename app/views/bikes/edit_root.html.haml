@@ -111,11 +111,12 @@
           Reason for update
         = text_area_tag :serial_update_reason, '', class: 'form-control'
     .modal-btn-footer
-      .col-xs-6.col-xs-push-6
-        = submit_tag 'Submit update', class: 'btn btn-primary'
-      .col-xs-6.col-xs-pull-6
-        %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
-          Nevermind
+      .row
+        .col-xs-6.col-xs-push-6
+          = submit_tag 'Submit update', class: 'btn btn-primary'
+        .col-xs-6.col-xs-pull-6
+          %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
+            Nevermind
 = render partial: '/shared/modal', locals: { title: 'Update serial number', id: 'serial-correction', modal_body: serial_correction_body }
 
 - manufacturer_correction_body = capture_haml do
@@ -132,9 +133,10 @@
           Reason for update
         = text_area_tag :manufacturer_update_reason, '', class: 'form-control'
     .modal-btn-footer
-      .col-xs-6.col-xs-push-6
-        = submit_tag 'Submit update', class: 'btn btn-primary'
-      .col-xs-6.col-xs-pull-6
-        %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
-          Nevermind
+      .row
+        .col-xs-6.col-xs-push-6
+          = submit_tag 'Submit update', class: 'btn btn-primary'
+        .col-xs-6.col-xs-pull-6
+          %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
+            Nevermind
 = render partial: '/shared/modal', locals: { title: 'Update manufacturer', id: 'manufacturer-correction', modal_body: manufacturer_correction_body }
