@@ -11,7 +11,7 @@
           - %w(front rear).each do |side|
             .related-fields.row
               .form-group
-                %label.form-well-label{for: "#{side}_standard"}
+                %label.form-well-label{ for: "#{side}_standard" }
                   #{side.titleize} wheel
                 .form-well-input.fancy-select-placeholder.unfancy
                   .standard-diams{ id: "#{side}_standard"}

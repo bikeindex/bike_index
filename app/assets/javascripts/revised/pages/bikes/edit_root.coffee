@@ -2,6 +2,7 @@ class BikeIndex.BikesEditRoot extends BikeIndex
   constructor: ->
     @initializeEventListeners()
     new BikeIndex.ManufacturersSelect('#manufacturer_update_manufacturer')
+    @setFrameSize()
 
   initializeEventListeners: ->
     pagespace = @
@@ -15,6 +16,8 @@ class BikeIndex.BikesEditRoot extends BikeIndex
     $('#manufacturer-correction form').submit (e) ->
       e.preventDefault()
       pagespace.requestManufacturerUpdate()
+    $('.frame-sizes .btn').click (e) ->
+      pagespace.updateFrameSize(e)
 
   updateYear: ->
     if $('#bike_year').val()
@@ -32,6 +35,37 @@ class BikeIndex.BikesEditRoot extends BikeIndex
     else
       year_select.setValue(new Date().getFullYear())
       year_select.enable()
+
+  setFrameSize: ->
+    unit = $('#bike_frame_size_unit').val()
+    if unit != 'ordinal' and unit.length > 0
+      $('.frame-size-other').slideDown().addClass('unhidden')
+      $('.frame-size-units').addClass('ex-size')
+
+  updateFrameSize: (e) ->
+    $target = $(e.target)
+    size = $target.attr('data-size')
+    $hidden_other = $('.frame-size-other')
+    if size == 'cm' or size == 'in'
+      $('#bike_frame_size_unit').val(size)
+      $('.frame-sizes').removeClass('unexpanded-unit-size') # For small display setuip
+      unless $hidden_other.hasClass('unhidden')
+        $hidden_other.slideDown 'fast', -> 
+          $hidden_other.addClass('unhidden')
+          $('.ordinal-sizes .btn').removeClass('active')
+        $('#bike_frame_size').val('')
+        $('#bike_frame_size_number').val('')
+        $('.frame-size-units').addClass('ex-size')
+    else
+      $('#bike_frame_size_unit').val('ordinal')
+      $('#bike_frame_size_number').val('')
+      $('#bike_frame_size').val(size)
+      $('.frame-sizes').addClass('unexpanded-unit-size') # For small display setuip
+      if $hidden_other.hasClass('unhidden')
+        $hidden_other.slideUp 'fast', ->
+          $hidden_other.removeClass('unhidden')
+        $('.frame-size-units').removeClass('ex-size')
+        $('.frame-size-units .btn').removeClass('active')
 
   requestSerialUpdateRequestCallback: (data, success) ->
     if success

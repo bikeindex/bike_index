@@ -42,7 +42,6 @@ $form-well-border-color: $gray-lightish;
   }
   .hidden-other {
     margin-top: 0;
-    padding-top: .5*$vertical-height;
     display: none;
     &.unhidden {
       margin-bottom: 1.5rem;
@@ -73,7 +72,13 @@ $form-well-border-color: $gray-lightish;
   .form-well-label, .form-well-input, .form-well-input-large, .right-input-help {
     @include make-col(); 
   }
-  .related-fields { padding-bottom: $vertical-height; }
+  .related-fields {
+    .form-group {
+      padding-top: .5*$vertical-height;
+      &:first-of-type { padding-top: 0; }
+    }
+    padding-bottom: 1.5*$vertical-height;
+  }
   .full-width-section { // pad the sides so that it fits the row.
     padding-left: $row-side-padding;
     padding-right: $row-side-padding;
