@@ -87,10 +87,10 @@ $active-bike-edit-border-width: 2px;
 // Medium and up screen styles
 @media (min-width: $grid-breakpoint-md) {
   .primary-edit-bike-menu {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 8*$vertical-height; // Same as the padding top for body in primary_header_nav
-    margin-top: -8*$vertical-height;
+    // position: -webkit-sticky;
+    // position: sticky;
+    // top: 8*$vertical-height; // Same as the padding top for body in primary_header_nav
+    // margin-top: -8*$vertical-height;
     ul {
 
       display: block;
