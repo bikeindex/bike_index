@@ -1,0 +1,8 @@
+.sign-in-up {
+  .sign-in-up-main-form-header {
+    small {
+      @extend .body-font;
+      float: right;
+    }
+  }
+}
