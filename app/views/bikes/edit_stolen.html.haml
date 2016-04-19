@@ -127,11 +127,12 @@
             %input#mark_recovered_can_share_recovery{ type: 'checkbox' }
             Can we share your story?
         .modal-btn-footer
-          .col-xs-6.col-xs-push-6
-            = submit_tag 'Mark recovered', class: 'btn btn-success'
-          .col-xs-6.col-xs-pull-6
-            %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
-              Nevermind
+          .row
+            .col-xs-6.col-xs-push-6
+              = submit_tag 'Mark recovered', class: 'btn btn-success'
+            .col-xs-6.col-xs-pull-6
+              %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
+                Nevermind
               
 
 - else
@@ -141,12 +142,13 @@
       %p
         Is your #{@bike.type} actually missing or stolen?
     .modal-btn-footer
-      .col-xs-6
-        %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
-          Nevermind
-      .col-xs-6
-        %button.btn.btn-danger#mark-stolen-btn{ type: 'button' }
-          Yes, it is!
+      .row
+        .col-xs-6
+          %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
+            Nevermind
+        .col-xs-6
+          %button.btn.btn-danger#mark-stolen-btn{ type: 'button' }
+            Yes, it is!
 
 / Only one modal if stolen, only one (different) modal if not stolen
 = render partial: '/shared/modal', locals: { title: modal_title, id: 'toggle-stolen', modal_body: modal_body }

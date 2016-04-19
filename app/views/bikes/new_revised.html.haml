@@ -38,15 +38,15 @@
                 = f.check_box :has_no_serial, tabindex: -1
                 Missing serial
 
-          .related-fields.row
-            .form-group
+          .related-fields
+            .form-group.row
               = f.label :manufacturer_id, class: 'form-well-label'
               .form-well-input
                 - initial = @bike.manufacturer && { id: @bike.manufacturer.id, text: @bike.manufacturer.name }.to_json
                 = f.text_field :manufacturer_id, value: @bike.manufacturer && @bike.manufacturer.name, class: 'form-control unfancy', data: { initial: initial }
                 %span.below-input-help
                   Select 'Other' if manufacturer isn't listed
-            .form-group.hidden-other
+            .form-group.hidden-other.row
               = f.label :manufacturer_other, 'Other manufacturer', class: 'form-well-label'
               .form-well-input
                 = f.text_field :manufacturer_other, class: 'form-control'
@@ -99,13 +99,14 @@
       %small
         (opens in a separate window)
   .modal-btn-footer
-    .col-xs-6
-      %button.btn.btn-secondary{'data-dismiss' => 'modal', type: 'button'}
-        Nevermind
-      I just don't know the serial
-    .col-xs-6
-      %button.btn.btn-danger#made-without-serial-button{type: 'button'}
-        I'm 100% sure
-      This #{@bike.type} was made without a serial
+    .row
+      .col-xs-6
+        %button.btn.btn-secondary{'data-dismiss' => 'modal', type: 'button'}
+          Nevermind
+        I just don't know the serial
+      .col-xs-6
+        %button.btn.btn-danger#made-without-serial-button{type: 'button'}
+          I'm 100% sure
+        This #{@bike.type} was made without a serial
 
 = render partial: '/shared/modal', locals: { title: 'Are you certain?', id: 'made-without-serial-modal', modal_body: modal_body }

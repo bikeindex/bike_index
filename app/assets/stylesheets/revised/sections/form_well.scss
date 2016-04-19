@@ -45,7 +45,8 @@ $form-well-border-color: $gray-lightish;
     display: none;
     &.unhidden {
       margin-bottom: 1.5rem;
-      display: block;
+      display: flex !important;
+      flex-wrap: wrap;
     }
   }
   .inline-input-help {
