@@ -5,7 +5,7 @@ class InfoController < ApplicationController
   before_filter :set_revised_layout
 
   def set_revised_layout
-    self.class.layout 'application_revised' if revised_layout_enabled
+    self.class.layout 'application_revised' if revised_layout_enabled?
   end
 
   def about
@@ -24,15 +24,15 @@ class InfoController < ApplicationController
   end
 
   def privacy
-    render layout: 'legal'
+    render layout: 'legal' unless revised_layout_enabled?
   end
 
   def terms
-    render layout: 'legal'
+    render layout: 'legal' unless revised_layout_enabled?
   end
 
   def vendor_terms
-    render layout: 'legal'
+    render layout: 'legal' unless revised_layout_enabled?
   end
 
   def resources
@@ -42,7 +42,8 @@ class InfoController < ApplicationController
   end
 
   def support_the_index
-    render layout: 'application_updated'
+    @page_title = 'Support the Bike Index'
+    render layout: (revised_layout_enabled? ? 'application_revised' : 'application_updated')
   end
 
   def support_the_bike_index

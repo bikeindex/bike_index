@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
   ensure_security_headers
   helper_method :current_user, :current_organization, :user_root_url,
-                :remove_session, :revised_layout_enabled
+                :remove_session, :revised_layout_enabled?
   before_filter :enable_rack_profiler
 
   def enable_rack_profiler

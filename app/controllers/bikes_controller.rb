@@ -14,8 +14,8 @@ class BikeTyperError < StandardError
 end
 
 class BikesController < ApplicationController
-  before_filter :find_bike, only: [:show, :edit]
-  before_filter :ensure_user_for_edit, only: [:edit, :update, :pdf]
+  before_filter :find_bike, only: [:show, :edit, :update, :pdf]
+  before_filter :ensure_user_allowed_to_edit, only: [:edit, :update, :pdf]
   before_filter :render_ad, only: [:index, :show]
   before_filter :set_return_to, only: [:edit]
   before_filter :remove_subdomain, only: [:index]
@@ -59,15 +59,10 @@ class BikesController < ApplicationController
   end
 
   def pdf
-    bike = Bike.find(params[:id])
-    unless bike.owner == current_user or current_user.is_member_of?(bike.creation_organization)
-      flash[:error] = "Sorry, that's not your bike!"
-      redirect_to bike_path(bike) and return
+    if @bike.stolen and @bike.current_stolen_record.present?
+      @stolen_record = @bike.current_stolen_record.decorate
     end
-    if bike.stolen and bike.current_stolen_record.present?
-      @stolen_record = bike.current_stolen_record.decorate
-    end
-    @bike = bike.decorate
+    @bike = @bike.decorate
     filename = "Registration_" + @bike.updated_at.strftime("%m%d_%H%M")[0..-1]
     unless @bike.pdf.present? && @bike.pdf.file.filename == "#{filename}.pdf"
       pdf = render_to_string pdf: filename, template: 'bikes/pdf'
@@ -100,13 +95,27 @@ class BikesController < ApplicationController
   end
 
   def new
-    if current_user.present?
-      @b_param = BParam.create(creator_id: current_user.id, params: params)
-      @bike = BikeCreator.new(@b_param).new_bike
+    if revised_layout_enabled?
+      render_revised_new
     else
-      @user = User.new
+      if current_user.present?
+        @b_param = BParam.create(creator_id: current_user.id, params: params)
+        @b_param = BParam.create(creator_id: current_user.id, params: params)
+        @bike = BikeCreator.new(@b_param).new_bike
+      else
+        @user = User.new
+      end
+      render layout: 'no_header'
     end
-    render layout: 'no_header'
+  end
+
+  def render_revised_new
+    find_or_new_b_param
+    # Let them know if they sent an invalid b_param token
+    flash[:notice] = "Sorry! We couldn't find that bike" if @b_param.id.blank? && params[:b_param_token].present?
+    @bike ||= @b_param.bike_from_attrs(stolen: params[:stolen])
+    @page_errors = @bike.errors
+    render :new_revised, layout: 'application_revised'
   end
 
   def create
@@ -142,6 +151,8 @@ class BikesController < ApplicationController
           redirect_to controller: :organizations, action: :embed_create_success, id: @bike.creation_organization.slug, bike_id: @bike.id and return
         end
       end
+    elsif revised_layout_enabled?
+      revised_create
     else
       @b_param = BParam.from_id_token(params[:bike][:b_param_id_token], "2014-12-31 18:00:00")
       unless @b_param && @b_param.creator_id == current_user.id
@@ -162,41 +173,77 @@ class BikesController < ApplicationController
     end
   end
 
+  def revised_create
+    find_or_new_b_param
+    if @b_param.created_bike.present?
+      redirect_to edit_bike_url(@b_param.created_bike) and return
+    end
+    @b_param.clean_params(params)
+    @bike = BikeCreator.new(@b_param).create_bike
+    if @bike.errors.any?
+      @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
+      redirect_to new_bike_url(b_param_token: @b_param.id_token)
+    else
+      redirect_to edit_bike_url(@bike), notice: "Bike successfully added to the index!"
+    end
+  end
+
 
   def edit
-    begin
-      BikeUpdator.new(user: current_user, b_params: params).ensure_ownership!
-      rescue UserNotLoggedInError => e
-        flash[:error] = e.message
-        redirect_to new_user_path and return
-      rescue => e
-        flash[:error] = e.message
-        redirect_to bike_path(@bike) and return
+    if revised_layout_enabled?
+      @page_errors = @bike.errors
+      @edit_template = edit_templates[params[:page]].present? ? params[:page] : edit_templates.keys.first
+      render "edit_#{@edit_template}".to_sym, layout: 'application_revised'
+    else
+      @private_images = PublicImage.unscoped.where(imageable_type: 'Bike').where(imageable_id: @bike.id).where(is_private: true)
+      @bike = @bike.decorate
     end
-    @private_images = PublicImage.unscoped.where(imageable_type: 'Bike').where(imageable_id: @bike.id).where(is_private: true)
-    @bike = @bike.decorate
   end
 
 
   def update
     begin
-      bike = BikeUpdator.new(user: current_user, b_params: params).update_available_attributes
+      @bike = BikeUpdator.new(user: current_user, bike: @bike, b_params: params, current_ownership: @current_ownership).update_available_attributes
     rescue => e
       flash[:error] = e.message
-      redirect_to bike_path(params[:id]) and return
     end
-    @bike = bike.decorate
-    if bike.errors.any?
-      flash[:error] = bike.errors.full_messages
-      render action: :edit
+    @bike = @bike.decorate
+    if @bike.errors.any? || flash[:error].present?
+      if revised_layout_enabled?
+        edit and return
+      else
+        flash[:error] ||= @bike.errors.full_messages
+        render action: :edit and return
+      end
     else
       flash[:notice] = "Bike successfully updated!"
       return if return_to_if_present
-      redirect_to edit_bike_url(@bike), layout: 'no_header' and return
+      if params[:edit_template].present?
+        redirect_to edit_bike_url(@bike, page: params[:edit_template]), layout: 'no_header' and return
+      else
+        redirect_to edit_bike_url(@bike), layout: 'no_header' and return
+      end
     end
   end
 
-protected
+  def edit_templates_hash
+    hash = {
+      root: 'Bike Details',
+      photos: 'Photos',
+      drivetrain: 'Wheels + Drivetrain',
+      accessories: 'Accessories + Components',
+      ownership: 'Change Owner or Delete',
+      stolen: (@bike.stolen ? 'Theft details' : 'Report Stolen or Missing')
+    }
+    # To make stolen the first key if bike is stolen. using as_json for string keys instead of sym
+    (@bike.stolen ? hash.to_a.rotate(-1).to_h : hash).as_json
+  end
+
+  def edit_templates
+    @edit_templates ||= edit_templates_hash
+  end
+
+  protected
 
   def find_bike
     begin
@@ -212,13 +259,28 @@ protected
     end
   end
 
-  def ensure_user_for_edit
-    unless current_user.present?
-      if @bike.current_owner_exists
-        flash[:error] = "Whoops! You have to sign in to be able to edit that #{@bike.type}."
-      else
-        flash[:error] = "That #{@bike.type} hasn't been claimed yet. If it's your bike sign up and you'll be able to edit it!"
+  def find_or_new_b_param
+    token = params[:b_param_token]
+    token ||= params[:bike] && params[:bike][:b_param_id_token]
+    @b_param = BParam.find_or_new_from_token(token, user_id: current_user.id)
+  end
+
+  def ensure_user_allowed_to_edit
+    @current_ownership = @bike.current_ownership
+    type = @bike && @bike.type || 'bike'
+    if current_user.present?
+      unless @current_ownership && @current_ownership.owner == current_user
+        error = "Oh no! It looks like you don't own that #{type}."
       end
+    else
+      if @current_ownership && @bike.current_ownership.claimed
+        error = "Whoops! You have to sign in to be able to edit that #{type}."
+      else
+        error = "That #{type} hasn't been claimed yet. If it's your {type} sign up and you'll be able to edit it!"
+      end
+    end
+    if error.present? # Can't assign directly to flash here, sometimes kick out of edit because other flash error
+      flash[:error] = error
       redirect_to bike_path(@bike) and return
     end
   end

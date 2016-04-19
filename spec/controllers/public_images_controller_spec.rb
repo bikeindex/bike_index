@@ -28,27 +28,30 @@ describe PublicImagesController do
   end
 
   describe :show do 
-    before do 
+    it 'renders' do
       image = FactoryGirl.create(:public_image)
       get :show, id: image.id
+      expect(response.code).to eq('200')
+      expect(response).to render_template('show')
+      expect(flash).to_not be_present
     end
-    it { should respond_with(:success) }
-    it { should render_template(:show) }
   end
 
-
   describe :edit do 
-    before do
-      image = FactoryGirl.create(:public_image)
-      controller.should_receive(:find_image_if_owned).and_return(image)
+    it 'renders' do
+      ownership = FactoryGirl.create(:ownership)
+      user = ownership.owner
+      set_current_user(user)
+      image = FactoryGirl.create(:public_image, imageable: ownership.bike)
       get :edit, id: image.id
+      expect(response.code).to eq('200')
+      expect(response).to render_template('edit')
+      expect(flash).to_not be_present
     end
-    it { should respond_with(:success) }
-    it { should render_template(:edit) }
   end
 
   describe :update do 
-    it "updates things and go back to editing the bike" do 
+    it 'updates things and go back to editing the bike' do 
       user = FactoryGirl.create(:user)
       bike = FactoryGirl.create(:bike)
       o = FactoryGirl.create(:ownership, bike: bike, creator: user, owner_email: user.email)

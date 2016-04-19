@@ -8,4 +8,8 @@ class PropulsionType < ActiveRecord::Base
   def set_slug
     self.slug = Slugifyer.slugify(self.name)
   end
+
+  def self.foot_pedal
+    first_or_create(name: 'Foot pedal')
+  end
 end

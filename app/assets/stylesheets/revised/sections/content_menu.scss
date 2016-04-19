@@ -1,0 +1,23 @@
+$horizontal-content-menu-padding: $vertical-height;
+.primary-content-menu {
+  .content-nav-group {
+    h3 {
+      background: $gray;
+      color: white;
+      padding: $vertical-height $horizontal-content-menu-padding;
+    }
+    ul {
+      @include list-unstyled;
+      li { padding: 0 $horizontal-content-menu-padding; }
+      a {
+        display: block;
+        // padding: $horizontal-content-menu-padding;
+        color: $gray;
+      }
+    }
+  }
+}
+@media(max-width: $grid-breakpoint-lg) {
+  .primary-content-menu { padding-top: 3*$vertical-height; }
+}
+

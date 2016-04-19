@@ -1,60 +1,57 @@
 require 'spec_helper'
 
 describe LocksController do
+  let(:user) { FactoryGirl.create(:user) }
+  before do
+    set_current_user(user)
+    # We have to create all the lock types.... Could be improved ;)
+    ['U-lock', 'Chain with lock', 'Cable', 'Locking skewer', 'Other style'].each do |name|
+      LockType.create(name: name)
+    end
+  end
 
   describe :index do
-    before do 
-      user = FactoryGirl.create(:user)
-      set_current_user(user)
+    it 'renders' do
       get :index
+      expect(response.code).to eq('200')
+      expect(response).to render_template('index')
+      expect(assigns(:locks)).to be_decorated
     end
-    it { should respond_with(:success) }
-    it { should render_template(:index) }
-    it { assigns(:locks).should be_decorated }
   end
 
-  describe :show do 
-    before do
-      user = FactoryGirl.create(:user)
-      set_current_user(user)
+  describe :show do
+    it 'renders' do
       lock = FactoryGirl.create(:lock, user: user)
       get :show, id: lock.id
+      expect(response.code).to eq('200')
+      expect(response).to render_template('show')
+      expect(assigns(:lock)).to be_decorated
     end
-    it { should respond_with(:success) }
-    it { should render_template(:show) }
-    it { assigns(:lock).should be_decorated }
   end
 
-  describe :new do 
-    before do 
-      user = FactoryGirl.create(:user)
-      set_current_user(user)
+  describe :new do
+    it 'renders' do
       get :new
+      expect(response.code).to eq('200')
+      expect(response).to render_template('new')
     end
-    it { should respond_with(:success) }
-    it { should render_template(:new) }
   end
 
-  describe :edit do 
-    describe "not correct lock owner" do 
-      before do 
-        user = FactoryGirl.create(:user)
-        set_current_user(user)
+  describe :edit do
+    context 'not lock owner' do
+      it 'redirects to user_home' do
         lock = FactoryGirl.create(:lock)
         get :show, id: lock.id
+        expect(response).to redirect_to(:user_home)
       end
-      it { should redirect_to(:user_home) }
     end
-    describe "correct lock owner" do 
-      before do 
-        user = FactoryGirl.create(:user)
-        set_current_user(user)
+    context 'lock owner' do
+      it 'renders' do
         lock = FactoryGirl.create(:lock, user: user)
         get :edit, id: lock.id
+        expect(response.code).to eq('200')
+        expect(response).to render_template('edit')
       end
-      it { should respond_with(:success) }
-      it { should render_template(:edit) }
     end
   end
-
 end

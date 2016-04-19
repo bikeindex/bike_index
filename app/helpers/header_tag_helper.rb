@@ -21,7 +21,7 @@ protected
   end
   
   def title_tag_html(hash)
-    "<title lang='en'>#{hash[:title_tag][:title]}</title>\n"
+    "<title lang='en'>#{(@page_title ? @page_title : hash[:title_tag][:title])}</title>\n"
   end
 
   def set_social_hash(hash)
@@ -111,12 +111,16 @@ protected
 
   def bikes_header_tags
     hash = current_page_auto_hash
-    if action_name == 'new' && current_user.present? && @bike.stolen
+    if (action_name == 'new' || action_name == 'create') && current_user.present? && @bike.stolen
       hash[:title_tag][:title] = t "meta_title.bikes_new_stolen"
       hash[:meta_tags][:description] = t "meta_descriptions.bikes_new_stolen"
     end
-    if action_name == 'edit'
-      hash[:title_tag][:title] = "Edit #{@bike.title_string}"
+    if action_name == 'edit' || action_name == 'update'
+      if @edit_templates.present?
+        hash[:title_tag][:title] = "#{@edit_templates[@edit_template]} - #{@bike.title_string}"
+      else
+        hash[:title_tag][:title] = "Edit #{@bike.title_string}"
+      end
     end
     if action_name == 'show'
       hash[:title_tag][:title] = "#{'Stolen ' if @bike.stolen }#{@bike.title_string}"

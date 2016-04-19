@@ -27,6 +27,8 @@ class Manufacturer < ActiveRecord::Base
   scope :with_websites, -> { where("website is NOT NULL and website != ''") }
   scope :with_logos, -> { where("logo is NOT NULL and logo != ''") }
 
+  validate :ensure_non_blocking_name
+
   def to_param
     slug
   end
@@ -40,6 +42,10 @@ class Manufacturer < ActiveRecord::Base
     else
       nil
     end
+  end
+
+  def self.other_manufacturer
+    where(name: 'Other', frame_maker: true).first_or_create
   end
 
   def self.fuzzy_id_or_name_find(n)
@@ -79,9 +85,27 @@ class Manufacturer < ActiveRecord::Base
     end
   end
 
-  before_save :set_slug
+  validate :ensure_non_blocking_name
+  # Because of issues with autocomplete if the names are the same
+  # Also, probably just a good idea in general
+  def ensure_non_blocking_name
+    return true unless name
+    errors.add(:name, 'Cannot be the same as a color name') if Color.pluck(:name).map(&:downcase).include?(name.strip.downcase)
+  end
+
+  before_save :set_slug, :set_website_and_logo_source
   def set_slug
     self.slug = Slugifyer.manufacturer(self.name)
+  end
+
+  def set_website_and_logo_source
+    self.website = website.present? ? Urlifyer.urlify(website) : nil
+    if logo.present?
+      self.logo_source ||= 'manual'
+    else
+      self.logo_source = nil
+    end
+    true
   end
 
   def autocomplete_hash_category
@@ -107,16 +131,4 @@ class Manufacturer < ActiveRecord::Base
       }
     }.as_json
   end
-
-  before_save :set_website_and_logo_source
-  def set_website_and_logo_source
-    self.website = website.present? ? Urlifyer.urlify(website) : nil
-    if logo.present?
-      self.logo_source ||= 'manual'
-    else
-      self.logo_source = nil
-    end
-    true
-  end
-
 end

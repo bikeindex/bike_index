@@ -1,7 +1,10 @@
 class PaymentsController < ApplicationController
-  layout 'application_updated'
+  def revised_layout_if_enabled
+    revised_layout_enabled? ? 'application_revised' : 'application_updated'
+  end
 
   def new
+    render layout: revised_layout_if_enabled
   end
 
   def create
@@ -21,7 +24,7 @@ class PaymentsController < ApplicationController
       user.update_attribute :stripe_id, customer.id
     else
       customer = Stripe::Customer.all.detect { |c| c[:email].match(email).present? }
-      if customer.present? 
+      if customer.present?
         customer.card = params[:stripe_token]
         customer.save
       else
@@ -44,21 +47,20 @@ class PaymentsController < ApplicationController
       )
       charge_time = charge.created
     end
-    payment = Payment.new(user_id: (user.id if user.present?),
+    payment = Payment.new(
+      user_id: (user.id if user.present?),
       email: email,
       is_current: true,
       stripe_id: charge.id,
       first_payment_date: Time.at(charge_time).utc.to_datetime,
-      amount: @amount
-    )
+      amount: @amount)
     payment.is_recurring = true if @subscription
     unless payment.save
       raise StandardError, "Unable to create a payment. #{payment.to_yaml}"
     end
-
+    render layout: revised_layout_if_enabled
   rescue Stripe::CardError => e
     flash[:error] = e.message
-    redirect_to new_payment_path
+    redirect_to new_payment_path and return
   end
-
 end

@@ -83,9 +83,9 @@ Bikeindex::Application.routes.draw do
   resources :bikes do
     collection { get :scanned }
     member do
-      get 'spokecard'
-      get 'scanned'
-      get 'pdf'
+      get :spokecard
+      get :scanned
+      get :pdf
     end
   end
   resources :locks

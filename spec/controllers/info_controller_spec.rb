@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe InfoController do
-  describe 'non-react views' do
+  describe 'non-updated views' do
     %w(about protect_your_bike where serials image_resources resources dev_and_design).each do |page|
       context page do
         it 'renders with content layout' do
@@ -14,7 +14,7 @@ describe InfoController do
     end
     %w(support_the_index).each do |page|
       context page do
-        it 'renders with application_updated' do
+        it 'renders with application_updated and overriden title' do
           get page.to_sym
           expect(response.status).to eq(200)
           expect(response).to render_template(page.to_sym)
@@ -35,16 +35,36 @@ describe InfoController do
   end
 
   describe 'revised views' do
-    # Because layouts are set manually, we aren't testing:
-    # privacy terms vendor_terms support_the_index
-    %w(about protect_your_bike where serials image_resources resources dev_and_design).each do |page|
-      context "#{page} with revised_layout enabled" do
-        it 'renders with revised_layout' do
-          allow(controller).to receive(:revised_layout_enabled) { true }
-          get page.to_sym
-          expect(response.status).to eq(200)
-          expect(response).to render_template(page.to_sym)
-          expect(response).to render_with_layout('application_revised')
+    let(:user) { FactoryGirl.create(:user) }
+    pages = %w(about protect_your_bike where serials image_resources resources dev_and_design support_the_index terms vendor_terms support_the_index)
+    context 'no user' do
+      pages.each do |page|
+        context "#{page} with revised_layout enabled" do
+          it 'renders with revised_layout' do
+            allow(controller).to receive(:revised_layout_enabled?) { true }
+            get page.to_sym
+            expect(response.status).to eq(200)
+            expect(response).to render_template(page.to_sym)
+            expect(response).to render_with_layout('application_revised')
+          end
+        end
+      end
+    end
+    context 'signed in user' do
+      # Since we're rendering things, and these are important pages,
+      # let's test with users as well
+      before do
+        set_current_user(user)
+      end
+      pages.each do |page|
+        context "#{page} with revised_layout enabled" do
+          it 'renders with revised_layout' do
+            allow(controller).to receive(:revised_layout_enabled?) { true }
+            get page.to_sym
+            expect(response.status).to eq(200)
+            expect(response).to render_template(page.to_sym)
+            expect(response).to render_with_layout('application_revised')
+          end
         end
       end
     end

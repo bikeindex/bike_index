@@ -27,8 +27,8 @@ module AuthenticationHelper
     end
   end
 
-  def revised_layout_enabled
-    current_user && $rollout.active?(:revised_view, current_user) || params[:revised_layout]
+  def revised_layout_enabled?
+    current_user && $rollout.active?(:revised_view, current_user)
   end
 
   protected

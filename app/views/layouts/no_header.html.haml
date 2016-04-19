@@ -16,7 +16,8 @@
     %header.replace-header
       .inner-recep
         %h2.new-title
-          = FlavorText.first(offset: rand(FlavorText.count)).message
+          - if FlavorText.count > 0
+            = FlavorText.first(offset: rand(FlavorText.count)).message
 
     = yield
 

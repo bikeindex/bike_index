@@ -1,13 +1,13 @@
 class Ownership < ActiveRecord::Base
   attr_accessible :owner_email,
-    :bike_id,
-    :creator_id,
-    :current,
-    :user_id, # is the owner
-    :claimed,
-    :example,
-    :user_hidden,
-    :send_email
+                  :bike_id,
+                  :creator_id,
+                  :current,
+                  :user_id, # is the owner
+                  :claimed,
+                  :example,
+                  :user_hidden,
+                  :send_email
 
   attr_accessor :creator_email, :user_email
 

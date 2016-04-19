@@ -1,0 +1,111 @@
+$active-bike-edit-border-width: 2px;
+
+.primary-edit-bike-menu {
+  z-index: 1;
+  ul { 
+    display: none;
+    @include list-unstyled;
+    margin: 0;
+    li {
+      display: block;
+      &:nth-of-type(n+5) {
+        border-top: 1px solid $gray-light;
+      }
+    }
+    a {
+      padding: $vertical-height 0;
+      display: block;
+      width: 100%;
+      h4 {
+        padding-left: .25em;
+        margin: 0;
+        border-left: $active-bike-edit-border-width solid transparent;
+      }
+      &:hover, &:active, &.active, h4 { text-decoration: none; }
+      &:hover h4 { color: $link-color; }
+      &:active, &.active {
+        h4 {
+          border-left: $active-bike-edit-border-width solid $blue;
+          font-weight: $strong-font-weight;
+          color: $header-font-color;
+        }
+      }
+    }
+  }
+  .edit-bike-submit-wrapper {
+    .btn {
+      font-size: 15px;
+      width: 100%;
+    }
+  }
+  .bike-edit-page-select {
+    float: left;
+    width: 50%;
+    select {
+      @extend .c-select; width: 100%;
+      font-family: $header-font-family;
+      font-weight: $strong-font-weight;
+      text-transform: uppercase;
+      color: $header-font-color;
+      border-radius: 0;
+      border: none;
+      font-size: 15px;
+      line-height: 1em;
+      padding: 1.25em 1.75rem .6em .75em;
+    }
+    .menu-select-overlay {
+      @extend small;
+      position: absolute;
+      display: block;
+      margin-left: 12px;
+      line-height: 1em;
+      left: 0; top: 7px;
+    }
+  }
+}
+// 
+// Small screen styles
+@media (max-width: $grid-breakpoint-md - 1px) {
+  // Menu fixed to bottom of the screen
+  .primary-edit-bike-menu {
+    z-index: $zindex-navbar-fixed + 1;
+    padding: 0;
+    position: fixed;
+    width: 100%;
+    bottom: 0; left: 0;
+    box-shadow: 0 -1px 2px rgba(black, .2);
+    .bike-edit-page-select { display: block; }
+    .edit-bike-submit-wrapper {
+      width: 50%;
+      float: left;
+      .btn { border-radius: 0; border: none; }
+    }
+  }
+}
+
+// 
+// Medium and up screen styles
+@media (min-width: $grid-breakpoint-md) {
+  .primary-edit-bike-menu {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 8*$vertical-height; // Same as the padding top for body in primary_header_nav
+    margin-top: -8*$vertical-height;
+    ul {
+
+      display: block;
+      
+    }
+    .edit-bike-submit-wrapper { padding-top: 1em; }
+  }
+  // Hide with media query so as not to override selectize
+  .bike-edit-page-select { display: none; }
+}
+
+// XL screens - smaller menu, offset it
+@media (min-width: $grid-breakpoint-xl) {
+  .primary-edit-bike-menu {
+    @include make-col-span(3);
+    margin-right: 8.3333%; // 1 col margin - Manually set the offset via margin
+  }
+}

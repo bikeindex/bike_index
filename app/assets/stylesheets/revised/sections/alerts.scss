@@ -1,0 +1,113 @@
+//
+// Base styles
+//
+
+.alert {
+  padding: $vertical-height 1em;
+  margin-bottom: $vertical-height;
+  border-radius: $border-radius;
+  background: #fff;
+}
+
+// Headings for larger alerts
+.alert-heading {
+  // Specified to prevent conflicts of changing $headings-color
+  color: inherit;
+}
+
+// Provide class for links that match alerts
+.alert-link {
+  font-weight: $alert-link-font-weight;
+}
+
+
+// Dismissible alerts
+//
+// Expand the right padding and account for the close button's positioning.
+
+.alert-dismissible {
+  padding-right: ($alert-padding + 20px);
+
+  // Adjust close link position
+  .close {
+    position: relative;
+    top: -2px;
+    right: -21px;
+    color: inherit;
+  }
+}
+
+// floating top alert block
+// 
+// Wrapper and stuff
+.primary-alert-block {
+  position: fixed;
+  z-index: $zindex-navbar-fixed + 10;
+  padding-right: 0.9375rem;
+  padding-left: 0.9375rem;
+  .alert {
+    width: 100%;
+    clear: both;
+  }
+  &.faded { display: none; }
+}
+@media (max-width: $grid-breakpoint-md - 1px) {
+  .primary-alert-block {
+    width: 83.33333%;
+    top: 90px;
+    right: 0;
+  }
+}
+@media (min-width: $grid-breakpoint-md) and (max-width: $grid-breakpoint-xl - 1px) {
+  .primary-alert-block {
+    width: 66.66667%;
+    top: 150px;
+    right: 8.3333%;
+  }
+}
+@media (min-width: $grid-breakpoint-xl) {
+  .primary-alert-block {
+    width: 600px;
+    top: 150px;
+    left: 50%;
+  }
+}
+
+
+// Alternate styles
+//
+// Generate contextual modifier classes for colorizing the alert.
+
+@mixin binx-alert-variant($alert-color, $alert-body-color) {
+  border: 1px solid $alert-color;
+  color: $alert-body-color;
+
+  p, h1, h2, h3, h4 {
+    color: $alert-body-color;
+    a { color: darken($alert-body-color, 10%); }
+  }
+  p:last-of-type { margin-bottom: 0; }
+  hr {
+    border-top-color: darken($alert-color, 5%);
+  }
+
+  .close {
+    color: $alert-color;
+    opacity: .8;
+    &:hover { opacity: 1; }
+  }
+}
+
+.alert-success, .alert-notice {
+  @include binx-alert-variant($green, $green);
+}
+.alert-info {
+  @include binx-alert-variant($blue, $blue);
+}
+.alert-warning {
+  @include binx-alert-variant(orange, orange);
+}
+.alert-danger, .alert-error {
+  @include binx-alert-variant($red, $red);
+}
+

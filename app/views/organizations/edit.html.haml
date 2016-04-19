@@ -79,7 +79,7 @@
             %strong
               = pluralize(@organization.locations.count, "Location")
           %p#us-country-code.other-value
-            = Country.find_by_iso("US").id
+            = Country.united_states.id
           %fieldset
             / .horizontal-form-list
             .form-horizontal.form-horizontal-collapse

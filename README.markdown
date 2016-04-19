@@ -63,7 +63,9 @@ Keep track of development and community news.
 
 ## Contributing
 
-Please submit all pull requests as *_wip branches. If your pull request contains Ruby patches or features, you must include relevant rspec tests.
+Open a Pull request! The earlier you open the pull request, the earlier it's possible to discuss the direction of the changes.
+
+If your pull request contains Ruby patches or features, you must include relevant rspec tests.
 
 
 

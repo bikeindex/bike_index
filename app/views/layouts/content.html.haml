@@ -27,34 +27,34 @@
         %nav.content-nav
           %ul.content-sections{ class: "#{@active_section}_menu"}
             %li{ class: content_nav_class("about") }
-              = nav_link "About<span> the Bike Index</span>", about_path
+              = active_link "About<span> the Bike Index</span>", about_path
               %ul
                 %li
-                  = nav_link "Bike Index news", news_index_path, match_controller: true
+                  = active_link "Bike Index news", news_index_path, match_controller: true
                 %li
-                  = nav_link "Bike Index partner organizations", where_path
+                  = active_link "Bike Index partner organizations", where_path
 
             %li{ class: content_nav_class("resources") }
-              = nav_link "Resources", resources_path
+              = active_link "Resources", resources_path
               %ul
                 %li
-                  = nav_link "Protect your bike", protect_your_bike_path
+                  = active_link "Protect your bike", protect_your_bike_path
                 %li
-                  = nav_link "Information about bicycle serial numbers", serials_path
+                  = active_link "Information about bicycle serial numbers", serials_path
                 %li
-                  = nav_link "List of manufacturers", manufacturers_path
+                  = active_link "List of manufacturers", manufacturers_path
                 %li
-                  = nav_link "Image & design assets", image_resources_path
+                  = active_link "Image & design assets", image_resources_path
                       
             %li.contact-nav-btns{ class: content_nav_class("contact") }
-              = nav_link "Help", help_path
+              = active_link "Help", help_path
               %ul
                 %li
-                  = nav_link "Contact", help_path(anchor: 'contact_us_section')
+                  = active_link "Contact", help_path(anchor: 'contact_us_section')
                 %li
-                  = nav_link "Sign up a shop or organization", vendor_signup_path
+                  = active_link "Sign up a shop or organization", vendor_signup_path
                 / %li
-                /   = nav_link "Lightspeed Retail integration", lightspeed_integration_path
+                /   = active_link "Lightspeed Retail integration", lightspeed_integration_path
                 
 
       #content-top-margin

@@ -1,3 +1,4 @@
+ENV['BASE_URL'] = 'http://test.host' # Assign here because only one .env file
 require 'sidekiq/testing'
 if ENV['CODECLIMATE_REPO_TOKEN']
   require "codeclimate-test-reporter"
@@ -19,6 +20,7 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
   config.infer_base_class_for_anonymous_controllers = false
+  config.render_views
   
   config.before :suite do
     DatabaseCleaner.clean

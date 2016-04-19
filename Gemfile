@@ -45,13 +45,13 @@ gem 'omniauth'
 gem 'fog'
 gem 'dalli'
 gem 'draper', require: false
-gem 'dotenv-rails', '~> 0.8', git: 'https://github.com/bkeepers/dotenv'
 gem 'wkhtmltopdf-binary'
 gem 'wicked_pdf'
 gem 'eventmachine', '~> 1.0.3'
 gem 'sitemap_generator'
 gem 'unicorn'
 gem 'unicorn-worker-killer'
+gem 'rake', '< 11' # Lock rake to remove validation errors
 
 # OAuth provider, Grape, associated parts of API V2
 gem 'doorkeeper',   '~> 2.0.1'
@@ -79,11 +79,27 @@ gem 'stackprof', require: false
 gem 'memory_profiler', require: false
 gem 'flamegraph', require: false
 gem 'rack-mini-profiler', require: false # If you can't see it you can't make it better
+
+
+gem 'bundler', '>= 1.8.4' # required for rails-assets.org - JS and CSS assets
+source 'https://rails-assets.org' do # JS land is crazy, so lock everything
+  gem 'rails-assets-tether', '~> 1.1.0'
+  gem 'rails-assets-mustache', '~> 2.2.1'
+  gem 'rails-assets-jquery.dirtyforms', '~> 2.0.0'
+  gem 'rails-assets-selectize', '~> 0.12.1' # Manually configured scss
+  gem 'rails-assets-headroom.js', '~> 0.7.0' # Would prefer 0.8 but it isn't on rails-assets yet
+  gem 'rails-assets-pikaday', '~> 1.4.0'
+  gem 'rails-assets-moment', '~> 2.12.0'
+  gem 'rails-assets-jquery-file-upload', '~> 9.12.1'
+  gem 'rails-assets-Stickyfill', '~> 1.1.3'
+end
+
+
 group :assets do
-  gem 'sass-rails',   '~> 3.2.3'
-  gem 'coffee-rails', '~> 3.2.1'
+  gem 'sass-rails',   '~> 3.2.6'
+  gem 'coffee-rails', '~> 3.2.2'
   gem 'therubyracer', '~> 0.12.1' , platforms: :ruby
-  gem 'uglifier', '>= 1.0.3'
+  gem 'uglifier', '~> 2.7.2'
 end
 
 group :development do
@@ -92,7 +108,6 @@ group :development do
   gem 'growl'
   gem 'guard'
   gem 'guard-rspec', '~> 4.2.10'
-  gem 'guard-livereload'
   gem 'guard-rubocop'
   gem 'bullet'
   gem 'should_clean'
@@ -105,6 +120,7 @@ group :development, :test do
   gem 'foreman'
   gem 'database_cleaner'
   gem 'json_spec'
+  gem 'dotenv-rails'
 end
 
 group :test do

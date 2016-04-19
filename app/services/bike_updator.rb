@@ -5,10 +5,11 @@ class BikeUpdatorError < StandardError
 end
 
 class BikeUpdator
-  def initialize(creation_params = nil)
+  def initialize(creation_params = {})
     @user = creation_params[:user] 
     @bike_params = creation_params[:b_params]
-    @bike = find_bike
+    @bike = creation_params[:bike] || find_bike
+    @current_ownership = creation_params[:current_ownership]
     @currently_stolen = @bike.stolen
   end
 
@@ -40,6 +41,7 @@ class BikeUpdator
   end
 
   def ensure_ownership!
+    return true if @current_ownership && @current_ownership.owner == @user # So we can pass in ownership and skip query
     return true if @user && @bike.owner == @user
     raise BikeUpdatorError, "Oh no! It looks like you don't own that bike."
   end

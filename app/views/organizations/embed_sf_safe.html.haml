@@ -46,7 +46,7 @@
         %span.help-block
           Select 'Other' if manufacturer isn't listed
     %p.other-value
-      = Manufacturer.find_by_slug("other").id
+      = Manufacturer.other_manufacturer.id
     .hidden-other.control-group.manufacturer-other-input
       = f.label :manufacturer_other, "Other manufacturer", class: "control-label"
       .controls
