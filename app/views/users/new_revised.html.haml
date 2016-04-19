@@ -25,18 +25,29 @@
           %h3.sign-in-up-main-form-header
             = t("sign_in_up.#{controller_name}_main_form_action")
             %small
-              don't have an account? #{ link_to 'sign up', new_user_path }
-          = form_for :session, url: session_url do |f|
+              already have an account? #{ link_to 'log in', new_session_path }
+          = form_for @user do |f|
             .form-group
               = f.label :email, class: 'sr-only'
               = f.email_field :email, placeholder: 'email', class: 'form-control'
             .form-group
+              = f.label :name, class: 'sr-only'
+              = f.text_field :name, placeholder: 'name', class: 'form-control'
+            .form-group
               = f.label :password, class: 'sr-only'
               = f.password_field :password, placeholder: 'password', class: 'form-control'
+
             .checkbox
               %label
-                = f.check_box :remember_me, value: '1', checked: true
-                Keep me logged in
+                = f.check_box :terms_of_service
+                I agree to the Bike Index 
+                %a.no-tab{ data: { target: terms_url } }
+                  terms and conditions
+            .checkbox
+              %label
+                = f.check_box :is_emailable
+                Get the Bike Index's Newsletter
+
             = f.submit t("sign_in_up.#{controller_name}_main_form_action"), class: 'btn btn-primary btn-lg'
 
           %p

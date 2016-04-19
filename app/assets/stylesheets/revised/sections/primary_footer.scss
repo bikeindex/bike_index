@@ -26,13 +26,20 @@
         float: left;
         width: 33.33%;
       }
+      svg {
+        display: inline-block;
+        max-height: 4*$vertical-height;
+      }
+      .svgpath { 
+        fill: $gray-light;
+        transition: color .05s linear;
+      }
       a {
         display: block;
         position: relative;
-      }
-      img {
-        display: inline-block;
-        max-height: 4*$vertical-height;
+        &:hover, &:active {
+          .svgpath { fill: lighten($gray-light, 15%); }
+        }
       }
     }
   }

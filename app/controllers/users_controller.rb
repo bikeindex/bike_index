@@ -8,6 +8,8 @@ class UsersController < ApplicationController
     if current_user.present?
       flash[:notice] = "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
       redirect_to user_home_url and return
+    elsif revised_layout_enabled?
+      render 'new_revised', layout: 'application_revised'
     end
   end
 
