@@ -24,9 +24,10 @@
         color: white;
       }
     }
+    .ordinal-sizes .btn { max-width: 20%; } // Ensure buttons never overflow onto a second line
     .right-input-help { float: right; }
     .frame-size-units {
-      width: 100%;
+      min-width: 6.5em;
       position: absolute;
       top: 0;
       transition: top .1s linear;
@@ -53,13 +54,13 @@
         @include make-col-span(3);
         @include make-col-offset(0);
       }
-      .frame-size-units { top: 15px; }
+      .frame-size-units {
+        top: 15px;
+        right: 0.9375rem;
+      }
       &.unexpanded-unit-size { padding-bottom: 6*$vertical-height; }
     }
-    .frame-size-other {
-      .form-well-input { @include make-col-span(5); }
-      // .form-well-label { @include make-col-span(3); }
-    }
+    .frame-size-other .form-well-input { @include make-col-span(5); }
   }
 }
 

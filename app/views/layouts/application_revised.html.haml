@@ -10,14 +10,15 @@
     <script type="text/javascript">window.root_url = "#{ENV['BASE_URL']}";</script>
     = javascript_include_tag 'application_revised'
     <!--[if lt IE 9]><script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]--><!--[if lte IE 8]><script type="text/javascript">$(function() {$('body').prepend("<body class='welcome-page' id='body'><div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, the Bike Index (and the internet in general) is broken and ugly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>");});</script><![endif]-->
-    
-    = auto_discovery_link_tag(:atom, news_index_url(format: "atom"), {title: "Bike Index news atom feed"})
+
+    - if content_page_type == 'news'
+      = auto_discovery_link_tag(:atom, news_index_url(format: "atom"), { title: 'Bike Index news atom feed' })
 
   %body{ id: body_id }
     %nav.primary-header-nav
       .container
         %a.primary-logo{ href: user_root_url }
-          = image_tag "/assets/revised/logo.svg", class: 'primary-nav', alt: "Primary nav logo"
+          = image_tag "/assets/revised/logo.svg", class: 'primary-nav', alt: 'Bike Index home'
         %a#menu-opened-backdrop
         .hamburgler
           %a#primary_nav_hamburgler

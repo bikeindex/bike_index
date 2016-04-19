@@ -43,16 +43,15 @@ class BikeIndex.BikesEditRoot extends BikeIndex
       $('.frame-size-units').addClass('ex-size')
 
   updateFrameSize: (e) ->
-    $target = $(e.target)
-    size = $target.attr('data-size')
+    size = $(e.target).attr('data-size')
     $hidden_other = $('.frame-size-other')
     if size == 'cm' or size == 'in'
       $('#bike_frame_size_unit').val(size)
-      $('.frame-sizes').removeClass('unexpanded-unit-size') # For small display setuip
       unless $hidden_other.hasClass('unhidden')
         $hidden_other.slideDown 'fast', -> 
           $hidden_other.addClass('unhidden')
           $('.ordinal-sizes .btn').removeClass('active')
+          $('.frame-sizes').removeClass('unexpanded-unit-size') # For small display setup. Remove space after appear
         $('#bike_frame_size').val('')
         $('#bike_frame_size_number').val('')
         $('.frame-size-units').addClass('ex-size')
@@ -60,7 +59,7 @@ class BikeIndex.BikesEditRoot extends BikeIndex
       $('#bike_frame_size_unit').val('ordinal')
       $('#bike_frame_size_number').val('')
       $('#bike_frame_size').val(size)
-      $('.frame-sizes').addClass('unexpanded-unit-size') # For small display setuip
+      $('.frame-sizes').addClass('unexpanded-unit-size') # For small display setup. Add space before collapse
       if $hidden_other.hasClass('unhidden')
         $hidden_other.slideUp 'fast', ->
           $hidden_other.removeClass('unhidden')

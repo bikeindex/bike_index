@@ -74,10 +74,14 @@ $mainmenu-open-zindex: 10;
           color: #fff;
           text-decoration: none;
         }
+        &:active { }
         &:active, &.active {
           color: #fff;
           text-decoration: none;
-          transform: rotate(45deg)
+        }
+        &:active, &.active:active { transform: rotate(45deg) }
+        &.active { 
+          transform: rotate(90deg)
         }
       }
     }

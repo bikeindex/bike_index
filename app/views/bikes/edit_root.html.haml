@@ -48,7 +48,7 @@
               = f.collection_select(:frame_material_id, FrameMaterial.all, :id, :name, prompt: 'Choose material')
 
           .row.related-fields
-            .form-group.frame-sizes.unexpanded-unit-size
+            .form-group.frame-sizes{ class: ('unexpanded-unit-size' unless %w(cm in).include?(@bike.frame_size_unit)) }
               %label.form-well-label
                 Frame size
               .form-well-input
