@@ -9,6 +9,10 @@ class UsersController < ApplicationController
       flash[:notice] = "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
       redirect_to user_home_url and return
     end
+    if revised_layout_enabled
+      self.class.layout 'application_revised'
+      render :new_revised and return
+    end
   end
 
   def create

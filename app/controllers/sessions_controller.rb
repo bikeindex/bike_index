@@ -1,16 +1,17 @@
 class SessionsController < ApplicationController
   include Sessionable
   before_filter :set_return_to, only: [:new]
+  before_filter :set_revised_layout, only: [:new, :destroy]
 
   def new
     if current_user.present?
       redirect_to user_home_url, notice: "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
     end
+    render :new_revised if revised_layout_enabled?
   end
 
   def create
     @user = User.fuzzy_email_find(params[:session][:email])
-
     if @user.present?
       if @user.confirmed?
         if @user.authenticate(params[:session][:password])

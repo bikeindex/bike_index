@@ -13,6 +13,10 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def set_revised_layout
+    self.class.layout 'application_revised' if revised_layout_enabled?
+  end
+
   def handle_unverified_request
     remove_session
     flash[:notice] = "CSRF invalid. If you weren't intentionally doing something dumb, please contact us"
