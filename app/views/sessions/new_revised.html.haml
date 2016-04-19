@@ -1,39 +1,43 @@
 .sign-in-up
-  .form-well-header.container
-    %h1
-      Get on the Bike Index
-  .container
+  .sign-in-up-header.container
     .row
-      .oauth-providers.col-md-5.col-md-push-7
-        %a.facebook-login{ href: '/auth/facebook' }
-          %span
-            = image_tag '/assets/revised/facebook_login.svg'
-          Log in with
-          
-        %a.strava-login{ href: '/auth/strava' }
-          %span
-            = image_tag '/assets/revised/strava_login.svg'
-          Log in with Strava
-      .or-block.col-md-1.col-md-push-1
-        %h3
-          Or
-      .main-form.col-md-6.col-md-pull-6
-        %h3.sign-in-up-main-form-header
-          Log in
-          %small
-            don't have an account? #{link_to 'sign up', new_user_url}
-        = form_for :session, url: session_url do |f|
-          .form-group
-            = f.label :email, class: 'sr-only'
-            = f.email_field :email, placeholder: 'email', class: 'form-control'
-          .form-group
-            = f.label :password, class: 'sr-only'
-            = f.password_field :password, placeholder: 'password', class: 'form-control'
-          .checkbox
-            %label
-              = f.check_box :remember_me, value: '1', checked: true
-              Keep me logged in
-          = f.submit 'Log in', class: 'btn btn-primary btn-lg'
+      %h1
+        = t("sign_in_up.#{controller_name}_h1")
+  .container
+    .sign-in-up-wrap
+      .row
+        .oauth-providers
+          %a.facebook-login{ href: '/auth/facebook' }
+            %span.oauth-logo-block
+              = image_tag '/assets/revised/facebook_login.svg'
+            %span.oauth-text-block
+              #{t("sign_in_up.#{controller_name}_oauth_text_block")} Facebook
+            
+          %a.strava-login{ href: '/auth/strava' }
+            %span.oauth-logo-block
+              = image_tag '/assets/revised/strava_login.svg'
+            %span.oauth-text-block
+              #{t("sign_in_up.#{controller_name}_oauth_text_block")} Strava
+        .sign-in-up-or
+          %h3
+            Or
+        .main-form
+          %h3.sign-in-up-main-form-header
+            = t("sign_in_up.#{controller_name}_main_form_action")
+            %small
+              don't have an account? #{link_to 'sign up', new_user_url}
+          = form_for :session, url: session_url do |f|
+            .form-group
+              = f.label :email, class: 'sr-only'
+              = f.email_field :email, placeholder: 'email', class: 'form-control'
+            .form-group
+              = f.label :password, class: 'sr-only'
+              = f.password_field :password, placeholder: 'password', class: 'form-control'
+            .checkbox
+              %label
+                = f.check_box :remember_me, value: '1', checked: true
+                Keep me logged in
+            = f.submit t("sign_in_up.#{controller_name}_main_form_action"), class: 'btn btn-primary btn-lg'
 
-        %p
-          = link_to 'Forgot your password?', '/users/request_password_reset', class: 'forgotten-pass form-link'
+          %p
+            = link_to t('sign_in_up.forgot_password'), '/users/request_password_reset'

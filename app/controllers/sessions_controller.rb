@@ -1,13 +1,13 @@
 class SessionsController < ApplicationController
   include Sessionable
   before_filter :set_return_to, only: [:new]
-  before_filter :set_revised_layout, only: [:new, :destroy]
 
   def new
     if current_user.present?
       redirect_to user_home_url, notice: "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
+    elsif revised_layout_enabled?
+      render 'new_revised', layout: 'application_revised'
     end
-    render :new_revised if revised_layout_enabled?
   end
 
   def create
@@ -18,22 +18,22 @@ class SessionsController < ApplicationController
           sign_in_and_redirect
         else
           # User couldn't authenticate, so password is invalid
-          flash.now.alert = "Invalid email/password"
+          flash.now.alert = 'Invalid email/password'
           # If user is banned, tell them about it.
           if @user.banned?
             flash.now.alert = "We're sorry, but it appears that your account has been locked. If you are unsure as to the reasons for this, please contact us"
           end
-          render "new"
+          render :new
         end
       else
         # Email address is not confirmed
-        flash.now.alert = "You must confirm your email address to continue"
-        render "new"
+        flash.now.alert = 'You must confirm your email address to continue'
+        render :new
       end
     else
       # Email address is not in the DB
-      flash.now.alert = "Invalid email/password"
-      render "new"
+      flash.now.alert = 'Invalid email/password'
+      render 'new'
     end
   end
 
@@ -41,10 +41,10 @@ class SessionsController < ApplicationController
     remove_session
     if params[:redirect_location].present?
       if params[:redirect_location].match('new_user')
-        redirect_to new_user_path, notice: "Logged out!" and return
+        redirect_to new_user_path, notice: 'Logged out!' and return
       end
     end
-    redirect_to goodbye_url(subdomain: false), notice: "Logged out!"
+    redirect_to goodbye_url(subdomain: false), notice: 'Logged out!'
   end
 
 

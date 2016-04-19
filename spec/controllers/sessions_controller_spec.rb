@@ -93,21 +93,24 @@ describe SessionsController do
         post :create, session: {}
         session[:user_id].should be_nil
         response.should render_template('new')
+        expect(response).to render_with_layout('application')
       end
     end
 
     it 'does not log in unconfirmed users' do
-      @user = FactoryGirl.create(:user, confirmed: true)
-      User.should_receive(:fuzzy_email_find).and_return(@user)
+      user = FactoryGirl.create(:user, confirmed: true)
+      User.should_receive(:fuzzy_email_find).and_return(user)
       post :create, session: {}
       response.should render_template(:new)
       cookies.signed[:auth].should be_nil
+      expect(response).to render_with_layout('application')
     end
 
     it 'does not log in the user when the user is not found' do
       post :create, session: { email: 'notThere@example.com' }
       cookies.signed[:auth].should be_nil
       response.should render_template(:new)
+      expect(response).to render_with_layout('application')
     end
   end
 end
