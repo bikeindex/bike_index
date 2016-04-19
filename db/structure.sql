@@ -95,7 +95,8 @@ CREATE TABLE b_params (
     image character varying(255),
     image_tmp character varying(255),
     image_processed boolean DEFAULT true,
-    id_token text
+    id_token text,
+    bike_attrs json
 );
 
 
