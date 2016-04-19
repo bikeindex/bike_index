@@ -3,18 +3,19 @@
   - other_mnfg_show = (f.object.manufacturer_id == @manufacturer_other_id) ? 'unhidden' : ''
   - other_ctype_show = f.object.ctype_id == @ctype_other_id ? 'unhidden' : ''
   - other_model_show = (f.object.model_name.present?) ? 'unhidden' : ''
-  .related-fields.row
-    .right-input-help.remove-part
-      = f.label :_destroy do
-        %span.context-display-help
-          &ndash;
-        = f.check_box :_destroy
-        Remove part
 
-  .related-fields.row
-    = f.label :ctype_id, 'Part type', class: 'form-well-label'
-    .form-well-input.fancy-select.unfancy
-      = f.collection_select(:ctype_id, Ctype.all, :id, :name, { required: true }, { class: 'form-control component-ctype-input' })
+  .right-input-help.remove-part
+    = f.label :_destroy do
+      %span.context-display-help
+        &ndash;
+      = f.check_box :_destroy
+      Remove part
+
+  .related-fields
+    .form-group.row
+      = f.label :ctype_id, 'Part type', class: 'form-well-label'
+      .form-well-input.fancy-select.unfancy
+        = f.collection_select(:ctype_id, Ctype.all, :id, :name, { required: true }, { class: 'form-control component-ctype-input' })
     / We really should display Position here, but we aren't right now because of implementation issues 
     / .right-input-help
     /   - position_visibility = (f.object.front || f.object.rear) ? '' : 'hidden-other'
@@ -27,7 +28,7 @@
     /       %button.btn.btn-default{ class: ('active' if f.object.rear ), data: { position: 'rear' } }
     /         Rear
     /     = f.hidden_field :front_or_rear, class: 'front-or-rear'
-    .form-group.hidden-other.hidden-ctype{ class: other_ctype_show }
+    .form-group.row.hidden-other.hidden-ctype{ class: other_ctype_show }
       = f.label :ctype_other, 'Other part type', class: 'form-well-label'
       .form-well-input
         = f.text_field :ctype_other, class: 'form-control'
@@ -37,27 +38,26 @@
     .form-well-input-large
       = f.text_area :description, rows: 2, class: 'form-control'
 
-  .related-fields.row
-    .form-group
+  .related-fields
+    .form-group.row
       = f.label :manufacturer_id, class: 'form-well-label'
       .form-well-input
         = f.text_field :manufacturer_id, class: 'form-control component-manufacturer-input unfancy', data: { initial: initial_manufacturer }
-    .hidden-other.form-group{ class: other_mnfg_show }
+    .hidden-other.form-group.row{ class: other_mnfg_show }
       = f.label :manufacturer_other, 'Other manufacturer', class: 'form-well-label'
       .form-well-input
         = f.text_field :manufacturer_other, class: 'form-control'
 
-  .related-fields.row
-    .form-group
+  .related-fields
+    .form-group.row
       = f.label :model_name, 'Model', class: 'form-well-label'
       .form-well-input.form-well-input.component_model
         = f.text_field :model_name, class: 'form-control'
-    .form-group.hidden-other{ class: other_model_show }
+    .form-group.row.hidden-other{ class: other_model_show }
       = f.label :year, 'Model Year', class: 'form-well-label'
       .form-well-input
         = f.text_field :year, class: 'form-control'
-    .form-group.hidden-other{ class: other_model_show }
+    .form-group.row.hidden-other{ class: other_model_show }
       = f.label :serial_number, 'Part Serial', class: 'form-well-label'
       .form-well-input
         = f.text_field :serial_number, class: 'form-control', autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
-  

@@ -9,15 +9,15 @@
               = @edit_templates[@edit_template]
 
 
-          .related-fields.row
-            .form-group
+          .related-fields
+            .form-group.row
               = f.label :serial_number, class: 'form-well-label'
               %p.serial-and-manufacturer-input
                 = @bike.serial_number
               .submit-correction-block
                 %a{data: { toggle: 'modal', target: '#serial-correction' } }
                   Submit serial correction
-            .form-group
+            .form-group.row
               = f.label :manufacturer, class: 'form-well-label'
               %p.serial-and-manufacturer-input
                 = @bike.manufacturer_name
@@ -47,8 +47,8 @@
             .form-well-input.fancy-select-placeholder.unfancy
               = f.collection_select(:frame_material_id, FrameMaterial.all, :id, :name, prompt: 'Choose material')
 
-          .row.related-fields
-            .form-group.frame-sizes{ class: ('unexpanded-unit-size' unless %w(cm in).include?(@bike.frame_size_unit)) }
+          .related-fields
+            .form-group.row.frame-sizes{ class: ('unexpanded-unit-size' unless %w(cm in).include?(@bike.frame_size_unit)) }
               %label.form-well-label
                 Frame size
               .form-well-input
@@ -65,7 +65,7 @@
                     %label.btn.btn-secondary{ class: ('active' if active), data: { size: unit } }
                       %input{ type: 'radio', name: 'frame_size', autocomplete: 'off', checked: active }
                       = unit.upcase
-            .form-group.hidden-other.frame-size-other
+            .form-group.row.hidden-other.frame-size-other
               = f.label :frame_size, 'Seat tube length', class: 'form-well-label'
               .form-well-input
                 = f.hidden_field :frame_size_unit

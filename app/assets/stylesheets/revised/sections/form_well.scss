@@ -76,6 +76,7 @@ $form-well-border-color: $gray-lightish;
   .related-fields {
     .form-group {
       padding-top: .5*$vertical-height;
+      margin-bottom: 0;
       &:first-of-type { padding-top: 0; }
     }
     padding-bottom: 1.5*$vertical-height;

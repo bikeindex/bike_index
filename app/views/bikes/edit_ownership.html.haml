@@ -15,27 +15,28 @@
 
           %hr
           
-          .related-fields.row.hide-this-bike.no-divider-row
-            - hide_toggle = @bike.user_hidden ? 'Un-hide' : 'Hide'
-            .hide-this-bike-link
-              %a.collapsed{ href: '#hide_bike_toggle_group', data: { toggle: 'collapse' } }
-                #{hide_toggle} this #{@bike.type}
-            .collapse#hide_bike_toggle_group
-              - if @bike.user_hidden
-                = f.hidden_field :marked_user_unhidden
-              - else
-                = f.hidden_field :marked_user_hidden
-              .hide-explanation
-                %p
-                  %strong
-                    Keeping your bike public is the best way to help recover stolen bikes and deter theft.
-                %p
-                  You can read more about why this is important to us in our #{link_to "FAQs", support_path(anchor: 'public-serials')}.
-                %p
-                  We strongly recommend keeping your #{@bike.type} visible, but you can hide this #{@bike.type} if you prefer. Even though we don't think it's a good idea.
-                - btn_type = @bike.user_hidden ? 'btn-success' : 'btn-danger'
-                %a.btn.btn-lg#hide_bike_toggle{role: 'button', class: btn_type}
-                  #{hide_toggle} #{@bike.type}
+          .related-fields.hide-this-bike.no-divider-row
+            .form-group.row
+              - hide_toggle = @bike.user_hidden ? 'Un-hide' : 'Hide'
+              .hide-this-bike-link
+                %a.collapsed{ href: '#hide_bike_toggle_group', data: { toggle: 'collapse' } }
+                  #{hide_toggle} this #{@bike.type}
+              .collapse#hide_bike_toggle_group
+                - if @bike.user_hidden
+                  = f.hidden_field :marked_user_unhidden
+                - else
+                  = f.hidden_field :marked_user_hidden
+                .hide-explanation
+                  %p
+                    %strong
+                      Keeping your bike public is the best way to help recover stolen bikes and deter theft.
+                  %p
+                    You can read more about why this is important to us in our #{link_to "FAQs", support_path(anchor: 'public-serials')}.
+                  %p
+                    We strongly recommend keeping your #{@bike.type} visible, but you can hide this #{@bike.type} if you prefer. Even though we don't think it's a good idea.
+                  - btn_type = @bike.user_hidden ? 'btn-success' : 'btn-danger'
+                  %a.btn.btn-lg#hide_bike_toggle{role: 'button', class: btn_type}
+                    #{hide_toggle} #{@bike.type}
 
           %hr
 

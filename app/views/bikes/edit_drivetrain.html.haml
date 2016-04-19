@@ -9,8 +9,8 @@
               Wheels
 
           - %w(front rear).each do |side|
-            .related-fields.row
-              .form-group
+            .related-fields
+              .form-group.row
                 %label.form-well-label{ for: "#{side}_standard" }
                   #{side.titleize} wheel
                 .form-well-input.fancy-select-placeholder.unfancy
@@ -73,8 +73,8 @@
               = f.check_box :belt_drive
               Belt Drive
 
-          .related-fields.row.fancy-select.unfancy.not-fixed.no-divider-row
-            .form-group
+          .related-fields.fancy-select.unfancy.not-fixed.no-divider-row
+            .form-group.row
               %label.form-well-label{ for: 'front_gear_select'}
                 Front gears
               .form-well-input
@@ -89,13 +89,13 @@
                 %label
                   %input#front_gear_select_internal.drive-check{ type: 'checkbox', checked: f_internal }
                   Internal front gears
-              .currently-hidden#front_gear_select_value{ data: { initialcount: (@bike.front_gear_type.count if @bike.front_gear_type), fixed: front_fixed } }
+              .row.currently-hidden#front_gear_select_value{ data: { initialcount: (@bike.front_gear_type.count if @bike.front_gear_type), fixed: front_fixed } }
                 = f.radio_button 'front_gear_type_id', nil, class: 'no-gear-selected'
                 - FrontGearType.all.each do |gt|
                   = f.radio_button 'front_gear_type_id', gt.id, class: "count_#{gt.count} internal_#{gt.internal}", data: { count: gt.count }
 
-          .related-fields.row.fancy-select.unfancy.not-fixed.no-divider-row
-            .form-group
+          .related-fields.fancy-select.unfancy.not-fixed.no-divider-row
+            .form-group.row
               %label.form-well-label{ for: 'rear_gear_select' }
                 Rear gears
               .form-well-input
@@ -111,7 +111,7 @@
                   %input#rear_gear_select_internal.drive-check{ type: 'checkbox', checked: r_internal }
                   Internal rear gears
 
-              .currently-hidden#rear_gear_select_value{ data: { initialcount: (@bike.rear_gear_type.count if @bike.rear_gear_type), fixed: rear_fixed } }
+              .row.currently-hidden#rear_gear_select_value{ data: { initialcount: (@bike.rear_gear_type.count if @bike.rear_gear_type), fixed: rear_fixed } }
                 = f.radio_button 'rear_gear_type_id', nil, class: 'no-gear-selected'
                 - RearGearType.all.each do |gt|
                   - if gt.id == rear_fixed

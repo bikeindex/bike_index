@@ -23,12 +23,16 @@
     @extend .full-width-section;
     padding-top: $vertical-height;
     .hide-this-bike-link { 
-      color: $body-font-color;
-      display: block;
-      text-align: center;
-      &:hover, &:active, &.active {
-        text-decoration: none;
-        color: $link-color;
+      width: 100%;
+      a {
+        color: $body-font-color;
+        display: block;
+        width: 100%;
+        text-align: center;
+        &:hover, &:active, &.active {
+          text-decoration: none;
+          color: $link-color;
+        }
       }
     }
   }

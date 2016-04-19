@@ -51,8 +51,9 @@
   .edit-bike-page-root {
     .frame-sizes {
       .right-input-help {
-        @include make-col-span(3);
-        @include make-col-offset(0);
+        // @include make-col-span(3);
+        // @include make-col-offset(0);
+        flex: 0 0 66.6667%;
       }
       .frame-size-units {
         top: 15px;

@@ -28,21 +28,21 @@
                 .form-well-input
                   = srecord.text_field :secondary_phone, class: 'form-control'
 
-              .related-fields.row
-                .form-group.fancy-select.unfancy
+              .related-fields
+                .form-group.row.fancy-select.unfancy
                   %label.form-well-label
                     Where was it stolen?
                   .form-well-input
                     = srecord.collection_select(:country_id, Country.all, :id, :name, required: true, prompt: 'Choose country')
-                .form-group
+                .form-group.row
                   %label.form-well-label
                   .form-well-input
                     = srecord.text_field :street, required: true, placeholder: 'Address or intersection', class: 'form-control'
-                .form-group
+                .form-group.row
                   %label.form-well-label
                   .form-well-input
                     = srecord.text_field :city, required: true, placeholder: 'City', class: 'form-control'
-                .form-group.fancy-select-placeholder.unfancy
+                .form-group.row.fancy-select-placeholder.unfancy
                   %label.form-well-label
                   .form-well-input
                     = srecord.collection_select(:state_id, State.all, :id, :name, include_blank: true, prompt: 'State')

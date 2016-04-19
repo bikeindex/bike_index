@@ -6,6 +6,7 @@ class BikeIndex.OptionalFormUpdate extends BikeIndex
       updateForm(e, erase)
 
   updateForm: (e, erase) ->
+    e.preventDefault()
     $target = $(e.target)
     unless $target.is('a') # Ensure we aren't clicking on an interior element
       $target = $target.parents('.optional-form-block')
