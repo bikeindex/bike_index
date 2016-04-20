@@ -1,17 +1,16 @@
 require 'spec_helper'
 
-describe TsvCreator do
-  
-  describe :create_manufacturer do 
+describe TsvCreator do  
+  describe 'create_manufacturer' do
     it "makes mnfgs"
   end
 
-  describe :sent_to_uploader do 
+  describe 'sent_to_uploader' do
     it "sends to uploader" 
   end
 
-  describe :create_organization_count do 
-    it "creates tsv with output bikes" do 
+  describe 'create_organization_count' do
+    it "creates tsv with output bikes" do
       ownership = FactoryGirl.create(:organization_ownership)
       organization = ownership.bike.creation_organization
       creator = TsvCreator.new
@@ -23,8 +22,8 @@ describe TsvCreator do
     end
   end
 
-  describe :enqueue_creation do 
-    it "creates jobs for the TSV creation" do 
+  describe 'enqueue_creation' do
+    it "creates jobs for the TSV creation" do
       expect{
         TsvCreator.enqueue_creation
       }.to change(TsvCreatorWorker.jobs, :size).by(4)
@@ -36,8 +35,8 @@ describe TsvCreator do
     end
   end
 
-  describe :create_daily_tsvs do 
-    it "calls create_stolen and create_stolen_with_reports with scoped query" do 
+  describe 'create_daily_tsvs' do
+    it "calls create_stolen and create_stolen_with_reports with scoped query" do
       stolen_record = FactoryGirl.create(:stolen_record, current: true, tsved_at: nil)
       tsv_creator = TsvCreator.new
       expect(tsv_creator).to receive(:create_stolen_with_reports).with(true, stolen_records: StolenRecord.approveds_with_reports.tsv_today)

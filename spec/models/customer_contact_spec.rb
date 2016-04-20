@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe CustomerContact do
-  describe :validations do
+  describe 'validations' do
     it { is_expected.to validate_presence_of :user_email }
     it { is_expected.to validate_presence_of :creator_email }
     # it { should validate_presence_of :creator_id }
@@ -15,7 +15,7 @@ describe CustomerContact do
     it { is_expected.to serialize :info_hash }
   end
 
-  describe :normalize_email_and_find_user do 
+  describe 'normalize_email_and_find_user' do 
     it "finds email and associate" do 
       user = FactoryGirl.create(:user)
       cc = CustomerContact.new

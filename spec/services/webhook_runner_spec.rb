@@ -1,8 +1,7 @@
 require 'spec_helper'
 
 describe WebhookRunner do
-
-  describe :make_request do 
+  describe 'make_request' do
     it "doesn't error if webhook doesn't return" do
       runner = WebhookRunner.new 
       response = runner.make_request("https://testing.bikeindex.org/about/something")
@@ -10,7 +9,7 @@ describe WebhookRunner do
     end
   end
 
-  describe :after_bike_update do 
+  describe 'after_bike_update' do
     it "calls make request" do
       runner = WebhookRunner.new
       id = 9999
@@ -19,7 +18,7 @@ describe WebhookRunner do
       runner.after_bike_update(id)
     end
 
-    it "doesn't fail if there aren't any urls" do 
+    it "doesn't fail if there aren't any urls" do
       runner = WebhookRunner.new
       id = 9999
       Redis.new.expire(runner.redis_id('after_bike_update'), 0)
@@ -27,7 +26,7 @@ describe WebhookRunner do
     end
   end
 
-  describe :after_user_update do
+  describe 'after_user_update' do
     it "calls make request" do
       runner = WebhookRunner.new
       id = 9999
@@ -36,7 +35,7 @@ describe WebhookRunner do
       runner.after_user_update(id)
     end
 
-    it "doesn't fail if there aren't any urls" do 
+    it "doesn't fail if there aren't any urls" do
       runner = WebhookRunner.new
       id = 9999
       Redis.new.expire(runner.redis_id('after_user_update'), 0)
@@ -44,8 +43,8 @@ describe WebhookRunner do
     end
   end
 
-  describe :hook_urls do 
-    it "calls the redis array" do 
+  describe 'hook_urls' do
+    it "calls the redis array" do
       runner = WebhookRunner.new
       redis = Redis.new
       rid = runner.redis_id('after_bike_update')

@@ -112,15 +112,15 @@ group :development, :test do
   gem 'rb-fsevent', '~> 0.9.1'
   gem 'rspec', '~> 3.3.0'
   gem 'rspec-rails', '~> 3.3.0'
+  gem 'shoulda-matchers', '~> 2.8.0'
   gem 'foreman'
   gem 'database_cleaner'
   gem 'dotenv-rails'
 end
 
 group :test do
-  gem 'factory_girl_rails'
+  gem 'factory_girl_rails', '~> 4.2.1'
   gem 'codeclimate-test-reporter', require: nil
   gem 'rspec-sidekiq', '~> 2.2.0'
-  gem 'shoulda-matchers'
   gem 'pry'
 end

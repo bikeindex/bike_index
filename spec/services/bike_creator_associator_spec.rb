@@ -1,9 +1,8 @@
 require 'spec_helper'
 
 describe BikeCreatorAssociator do
-
-  describe :create_ownership do 
-    it "calls create ownership" do 
+  describe 'create_ownership' do
+    it "calls create ownership" do
       b_param = BParam.new
       bike = Bike.new
       allow(b_param).to receive(:params).and_return({bike: bike})
@@ -12,7 +11,7 @@ describe BikeCreatorAssociator do
       expect_any_instance_of(OwnershipCreator).to receive(:create_ownership).and_return(true)
       BikeCreatorAssociator.new(b_param).create_ownership(bike)
     end
-    it "calls create ownership with send_email false if b_param has that" do 
+    it "calls create ownership with send_email false if b_param has that" do
       b_param = BParam.new
       bike = Bike.new
       allow(b_param).to receive(:params).and_return({bike: {send_email: false}})
@@ -23,8 +22,8 @@ describe BikeCreatorAssociator do
     end
   end
 
-  describe :create_components do 
-    it "calls create components" do 
+  describe 'create_components' do
+    it "calls create components" do
       b_param = BParam.new
       bike = Bike.new 
       expect_any_instance_of(ComponentCreator).to receive(:create_components_from_params).and_return(true)
@@ -32,8 +31,8 @@ describe BikeCreatorAssociator do
     end
   end
 
-  describe :create_normalized_serial_segments do 
-    it "calls create components" do 
+  describe 'create_normalized_serial_segments' do
+    it "calls create components" do
       b_param = BParam.new
       bike = Bike.new 
       expect_any_instance_of(SerialNormalizer).to receive(:save_segments).and_return(true)
@@ -41,8 +40,8 @@ describe BikeCreatorAssociator do
     end
   end
 
-  describe :create_stolen_record do
-    it "calls create stolen record and set_creation_organization" do 
+  describe 'create_stolen_record' do
+    it "calls create stolen record and set_creation_organization" do
       b_param = BParam.new
       bike = Bike.new 
       allow(bike).to receive(:creation_organization).and_return(true)
@@ -52,8 +51,8 @@ describe BikeCreatorAssociator do
     end
   end
 
-  describe :add_other_listings do 
-    it "calls create stolen record and set_creation_organization" do 
+  describe 'add_other_listings' do
+    it "calls create stolen record and set_creation_organization" do
       b_param = BParam.new
       bike = FactoryGirl.create(:bike)
       urls = ['http://some_blog.com', 'http://some_thing.com']
@@ -63,8 +62,8 @@ describe BikeCreatorAssociator do
     end
   end
 
-  describe :attach_photo do 
-    it "creates public images for the attached image" do 
+  describe 'attach_photo' do
+    it "creates public images for the attached image" do
       bike = FactoryGirl.create(:bike)
       b_param = FactoryGirl.create(:b_param)
       test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg')))
@@ -77,8 +76,8 @@ describe BikeCreatorAssociator do
     end
   end
 
-  # describe :add_uploaded_image do 
-  #   it "associates the public image" do 
+  # describe 'add_uploaded_image' do
+  #   it "associates the public image" do
   #     bike = FactoryGirl.create(:bike)
   #     b_param = FactoryGirl.create(:b_param)
   #     b_param.params = {bike: {bike_image: File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg'))}}
@@ -88,7 +87,7 @@ describe BikeCreatorAssociator do
   #   end
   # end
 
-  describe :associate do 
+  describe 'associate' do
     it "calls the required methods" do
       bike = Bike.new
       creator = BikeCreatorAssociator.new()
@@ -102,7 +101,7 @@ describe BikeCreatorAssociator do
       expect(creator).to receive(:add_other_listings)
       creator.associate(bike)
     end
-    it "rescues from the error and add the message to the bike" do 
+    it "rescues from the error and add the message to the bike" do
       bike = Bike.new
       creator = BikeCreatorAssociator.new()
       allow(bike).to receive(:stolen).and_return(true)

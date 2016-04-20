@@ -3,7 +3,7 @@ require "spec_helper"
 describe EmailStolenBikeAlertWorker do
   it { is_expected.to be_processed_in :notify }
 
-  describe :perform do
+  describe 'perform' do
     it "sends an email" do
       stolen_record = FactoryGirl.create(:stolen_record)
       info_hash = {

@@ -2,7 +2,7 @@
 require 'spec_helper'
 
 describe Phonifyer do
-  describe :phonify do 
+  describe 'phonify' do
     it "strips and remove non digits" do
       number = Phonifyer.phonify("(999) 899 - 999")
       expect(number).to eq("999899999")

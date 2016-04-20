@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe ApplicationDecorator do
 
-  describe :mnfg_name do 
+  describe 'mnfg_name' do 
     it "returns the manufacturer other name if present" do 
       manufacturer = Manufacturer.new
       lock = Lock.new
@@ -20,7 +20,7 @@ describe ApplicationDecorator do
     end
   end
 
-  describe :dl_list_item do
+  describe 'dl_list_item' do
     it "returns a dt and dd from what's passed attribute" do 
       bike = Bike.new
       dl_list = ApplicationDecorator.new(bike).dl_list_item("description", "title")
@@ -28,7 +28,7 @@ describe ApplicationDecorator do
     end
   end
 
-  describe :dl_from_attribute do 
+  describe 'dl_from_attribute' do 
     it "returns nil if the attribute isn't present" do 
       bike = Bike.new
       decorator = ApplicationDecorator.new(bike)
@@ -44,7 +44,7 @@ describe ApplicationDecorator do
     end
   end
 
-  describe :dl_from_attribute_othered do 
+  describe 'dl_from_attribute_othered' do 
     it "returns the attribute dl" do 
       bike = Bike.new
       handlebar_type = HandlebarType.new 
@@ -66,7 +66,7 @@ describe ApplicationDecorator do
     end
   end
 
-  describe :if_present do 
+  describe 'if_present' do 
     it "returns the attribute if it's present" do 
       lock = Lock.new
       allow(lock).to receive(:manufacturer_other).and_return("thingsy")
@@ -74,7 +74,7 @@ describe ApplicationDecorator do
     end
   end
 
-  describe :websiteable do 
+  describe 'websiteable' do 
     it "creates a link if bike owner wants one shown" do 
       user = User.new 
       allow(user).to receive(:show_website).and_return(true)
@@ -84,7 +84,7 @@ describe ApplicationDecorator do
     end
   end
 
-  describe :twitterable do 
+  describe 'twitterable' do 
     it "creates a link if bike owner wants one shown" do 
       user = User.new 
       allow(user).to receive(:show_twitter).and_return(true)
@@ -94,7 +94,7 @@ describe ApplicationDecorator do
     end
   end
 
-  describe :show_twitter_and_website do 
+  describe 'show_twitter_and_website' do 
     it "combines twitter and website" do 
       user = User.new
       decorator = ApplicationDecorator.new(user)
@@ -112,7 +112,7 @@ describe ApplicationDecorator do
     end
   end
 
-  describe :ass_name do 
+  describe 'ass_name' do 
     it "grabs the association name" do 
       bike = Bike.new 
       handlebar_type = FactoryGirl.create(:handlebar_type, name: "cool bars")
@@ -121,7 +121,7 @@ describe ApplicationDecorator do
     end
   end
 
-  describe :display_phone do 
+  describe 'display_phone' do 
     it "displays the phone with an area code" do 
       location = Location.new 
       allow(location).to receive(:phone).and_return("999 999 9999")

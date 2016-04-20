@@ -1,8 +1,7 @@
 require 'spec_helper'
 
-describe User do
-  
-  describe :validations do
+describe User do  
+  describe 'validations' do
     it { is_expected.to have_many :payments }
     it { is_expected.to have_many :subscriptions }
     it { is_expected.to have_many :memberships }
@@ -25,8 +24,8 @@ describe User do
     it { is_expected.to validate_uniqueness_of :email }
   end
 
-  describe :validate do
-    describe :create do
+  describe 'validate' do
+    describe 'create' do
       before :each do
         @user = User.new(FactoryGirl.attributes_for(:user))
         expect(@user.valid?).to be_truthy
@@ -60,7 +59,7 @@ describe User do
       end
     end
 
-    describe :confirm do
+    describe 'confirm' do
       before :each do
         @user = FactoryGirl.create(:user)
       end
@@ -89,7 +88,7 @@ describe User do
       end
     end
 
-    describe :update do
+    describe 'update' do
       before :each do
         @user = FactoryGirl.create(:user)
         expect(@user.valid?).to be_truthy
@@ -125,7 +124,7 @@ describe User do
     end
   end
 
-  describe :admin_authorized do 
+  describe 'admin_authorized' do 
     before :all do
       @content = FactoryGirl.create(:user, is_content_admin: true)
       @admin = FactoryGirl.create(:admin)
@@ -147,14 +146,14 @@ describe User do
     end
   end
 
-  describe :fuzzy_email_find do
+  describe 'fuzzy_email_find' do
     it "finds users by email address when the case doesn't match" do
       @user = FactoryGirl.create(:user, email: "ned@foo.com")
       expect(User.fuzzy_email_find('NeD@fOO.coM')).to eq(@user)
     end
   end
 
-  describe :set_urls do
+  describe 'set_urls' do
     xit "adds http:// to twitter and website if the url doesn't have it so that the link goes somewhere" do
       user = User.new(show_twitter: true, twitter: "http://somewhere.com", show_website: true, website: "somewhere.org" )
       user.set_urls
@@ -168,7 +167,7 @@ describe User do
     end
   end
 
-  describe :bikes do
+  describe 'bikes' do
     it "returns nil if the user has no bikes" do
       user = FactoryGirl.create(:user)
       expect(user.bikes).to be_empty
@@ -196,7 +195,7 @@ describe User do
     end
   end
 
-  describe :generate_username_confirmation_and_auth do 
+  describe 'generate_username_confirmation_and_auth' do 
     it "generates the required tokens" do 
       user = FactoryGirl.create(:user)
       expect(user.auth_token).to be_present
@@ -210,7 +209,7 @@ describe User do
     end
   end
 
-  describe :access_tokens_for_application do 
+  describe 'access_tokens_for_application' do 
     it "returns [] if no application" do 
       user = User.new 
       expect(user.access_tokens_for_application(nil)).to eq([])
@@ -232,7 +231,7 @@ describe User do
     end
   end
 
-  describe :reset_token_time do 
+  describe 'reset_token_time' do 
     it "gets long time ago if not there" do 
       user = User.new
       allow(user).to receive(:password_reset_token).and_return("c7c3b99a319ac09e2b00-2015-03-31 19:29:52 -0500")
@@ -250,7 +249,7 @@ describe User do
     end
   end
 
-  describe :send_password_reset_email do 
+  describe 'send_password_reset_email' do 
     it "enqueues sending the password reset" do 
       user = FactoryGirl.create(:user)
       expect(user.password_reset_token).to be_nil
@@ -271,14 +270,14 @@ describe User do
     end
   end
 
-  describe :fuzzy_id do 
+  describe 'fuzzy_id' do 
     it "fails with nil" do
       result = User.fuzzy_id('some stuff')
       expect(result).to be_nil
     end
   end
 
-  describe :normalize_attributes do
+  describe 'normalize_attributes' do
     it "doesn't let you overwrite usernames" do 
       target = "coolname"
       user1 = FactoryGirl.create(:user)
@@ -310,7 +309,7 @@ describe User do
     end
   end
 
-  describe :subscriptions do 
+  describe 'subscriptions' do 
     it "returns the payment if payment is subscription" do 
       user = FactoryGirl.create(:user)
       payment = Payment.create(is_recurring: true, user_id: user)
@@ -318,7 +317,7 @@ describe User do
     end
   end
 
-  describe :userlink do 
+  describe 'userlink' do 
     it "returns user path if user show" do 
       user = User.new(show_bikes: true, username: 'coolstuff')
       # pp user

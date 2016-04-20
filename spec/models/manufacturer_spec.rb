@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Manufacturer do
-  describe :validations do 
+  describe 'validations' do
     it { is_expected.to validate_presence_of :name }
     it { is_expected.to validate_uniqueness_of :name }
     xit { is_expected.to validate_uniqueness_of :slug }
@@ -11,7 +11,7 @@ describe Manufacturer do
     it { is_expected.to have_many :paints }
   end
 
-  describe :ensure_non_blocking_name do
+  describe 'ensure_non_blocking_name' do
     before { FactoryGirl.create(:color, name: 'Purple') }
     context 'name same as a color' do
       it 'adds an error' do
@@ -29,7 +29,7 @@ describe Manufacturer do
     end
   end
 
-  describe :fuzzy_name_find do
+  describe 'fuzzy_name_find' do
     it "finds manufacturers by their slug" do
       mnfg = FactoryGirl.create(:manufacturer, name: "Poopy PANTERS")
       expect(Manufacturer.fuzzy_name_find('poopy panters')).to eq(mnfg)
@@ -85,7 +85,7 @@ describe Manufacturer do
     end
   end
 
-  describe "import csv" do 
+  describe "import csv" do
     it "adds manufacturers to the list" do
       import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import.csv")
       expect {
@@ -93,7 +93,7 @@ describe Manufacturer do
       }.to change(Manufacturer, :count).by(2)
     end
     
-    it "adds in all the attributes that are listed" do 
+    it "adds in all the attributes that are listed" do
       import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import.csv")
       Manufacturer.import(import_file)
       manufacturer = Manufacturer.find_by_slug("surly")
@@ -105,7 +105,7 @@ describe Manufacturer do
       expect(manufacturer2.website).to eq('http://wethepeople.com')
     end
 
-    it "updates attributes on a second upload" do 
+    it "updates attributes on a second upload" do
       import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import.csv")
       Manufacturer.import(import_file)
       second_import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import-second.csv")
@@ -114,38 +114,38 @@ describe Manufacturer do
     end
   end
 
-  describe :fuzzy_id do 
-    it "gets id from name" do 
+  describe 'fuzzy_id' do
+    it "gets id from name" do
       manufacturer = FactoryGirl.create(:manufacturer)
       result = Manufacturer.fuzzy_id(manufacturer.name)
       expect(result).to eq(manufacturer.id)
     end
-    it "fails with nil" do 
+    it "fails with nil" do
       result = Manufacturer.fuzzy_id('some stuff')
       expect(result).to be_nil
     end
   end
 
-  describe :set_website_and_logo_source do 
+  describe 'set_website_and_logo_source' do
     it "has before_save_callback_method defined for set_website" do
       expect(Manufacturer._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_website_and_logo_source)).to eq(true)
     end
 
-    it "sets logo source" do 
+    it "sets logo source" do
       manufacturer = Manufacturer.new
       allow(manufacturer).to receive(:logo).and_return('http://example.com/logo.png')
       manufacturer.set_website_and_logo_source
       expect(manufacturer.logo_source).to eq('manual')
     end
 
-    it "doesn't overwrite logo source" do 
+    it "doesn't overwrite logo source" do
       manufacturer = Manufacturer.new(logo_source: 'something cool')
       allow(manufacturer).to receive(:logo).and_return('http://example.com/logo.png')
       manufacturer.set_website_and_logo_source
       expect(manufacturer.logo_source).to eq('something cool')
     end
 
-    it "empties if no logo" do 
+    it "empties if no logo" do
       manufacturer = Manufacturer.new(logo_source: 'something cool')
       manufacturer.set_website_and_logo_source
       expect(manufacturer.logo_source).to be_nil

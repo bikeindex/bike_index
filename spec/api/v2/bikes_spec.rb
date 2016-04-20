@@ -388,7 +388,7 @@ describe 'Bikes API V2' do
     end
   end
 
-  describe :image do 
+  describe 'image' do 
     it "doesn't post an image to a bike if the bike isn't owned by the user" do 
       create_doorkeeper_app({scopes: 'read_user write_bikes'})
       bike = FactoryGirl.create(:ownership).bike
@@ -426,7 +426,7 @@ describe 'Bikes API V2' do
     end
   end
 
-  describe :send_stolen_notification do 
+  describe 'send_stolen_notification' do 
     before :each do 
       create_doorkeeper_app({scopes: 'read_user'})
       @bike = FactoryGirl.create(:ownership, creator_id: @user.id).bike

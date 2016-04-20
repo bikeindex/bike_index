@@ -1,8 +1,7 @@
 require "spec_helper"
 
 describe Ownership do
-
-  describe :validations do
+  describe 'validations' do
     it { is_expected.to belong_to :bike }
     it { is_expected.to belong_to :user }
     it { is_expected.to belong_to :creator }
@@ -11,7 +10,7 @@ describe Ownership do
     it { is_expected.to validate_presence_of :owner_email }
   end
 
-  describe :normalize_email do 
+  describe 'normalize_email' do 
     it "removes leading and trailing whitespace and downcase email" do 
       ownership = Ownership.new 
       allow(ownership).to receive(:owner_email).and_return("   SomE@dd.com ")
@@ -23,7 +22,7 @@ describe Ownership do
     end
   end
 
-  describe :mark_claimed do 
+  describe 'mark_claimed' do 
     it "associates with a user" do 
       o = FactoryGirl.create(:ownership)
       o.mark_claimed
@@ -32,7 +31,7 @@ describe Ownership do
   end
 
 
-  describe :owner do 
+  describe 'owner' do 
     it "returns the current owner if the ownership is claimed" do
       user = FactoryGirl.create(:user)
       ownership = Ownership.new
@@ -56,7 +55,7 @@ describe Ownership do
     end
   end
 
-  describe :can_be_claimed_by do 
+  describe 'can_be_claimed_by' do 
     it "true if user email matches" do 
       user = FactoryGirl.create(:user)
       ownership = Ownership.new(owner_email: " #{user.email.upcase}")
@@ -74,7 +73,7 @@ describe Ownership do
     end
   end
 
-  describe :proper_owner_name do 
+  describe 'proper_owner_name' do 
     it "is nil if no owner" do 
       ownership = Ownership.new(owner_email: 'something@example.com')
       user = User.new(name: 'foo')

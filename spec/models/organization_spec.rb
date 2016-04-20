@@ -1,8 +1,7 @@
 require 'spec_helper'
 
 describe Organization do
-  
-  describe :validations do
+  describe 'validations' do
     # it { should validate_uniqueness_of :slug }
     it { is_expected.to validate_presence_of :name }
     it { is_expected.to have_many :memberships }
@@ -14,7 +13,7 @@ describe Organization do
     it { is_expected.to belong_to :auto_user }
   end
 
-  describe :set_and_clean_attributes do 
+  describe 'set_and_clean_attributes' do 
     it "sets the short_name and the slug on save" do 
       organization = Organization.new(name: 'something')
       organization.set_and_clean_attributes
@@ -48,7 +47,7 @@ describe Organization do
     end
   end
 
-  describe :set_locations_shown do 
+  describe 'set_locations_shown' do 
     it "sets the locations shown to be org shown on save" do 
       organization = FactoryGirl.create(:organization)
       country = FactoryGirl.create(:country)
@@ -60,7 +59,7 @@ describe Organization do
     end
   end
 
-  describe :set_auto_user do 
+  describe 'set_auto_user' do 
     it "sets the embedable user" do 
       organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:user, email: "embed@org.com")
@@ -92,7 +91,7 @@ describe Organization do
     end
   end
 
-  describe :clear_map_cache do 
+  describe 'clear_map_cache' do 
     it "has before_save_callback_method defined for clear clear_map_cache" do
       expect(Organization._save_callbacks.select { |cb| cb.kind.eql?(:after) }.map(&:raw_filter).include?(:clear_map_cache)).to eq(true)
     end

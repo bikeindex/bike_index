@@ -1,8 +1,7 @@
 require 'spec_helper'
 
 describe Feedback do
-
-  describe :validations do
+  describe 'validations' do
     it { is_expected.to validate_presence_of :body }
     it { is_expected.to validate_presence_of :email }
     it { is_expected.to validate_presence_of :title }
@@ -10,7 +9,7 @@ describe Feedback do
     # it { should belong_to :application } # This is Doorkeeper::Application, not application
   end
 
-  describe :create do
+  describe 'create' do
     it "enqueues an email job" do
       expect {
         FactoryGirl.create(:feedback)

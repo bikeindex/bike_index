@@ -1,9 +1,8 @@
 require 'spec_helper'
 
 describe BikeCreatorVerifier do
-
-  describe :add_phone do 
-    it 'calls add the org phone if one exists' do 
+  describe 'add_phone' do
+    it 'calls add the org phone if one exists' do
       bike = Bike.new
       organization = Organization.new
       location = Location.new
@@ -15,7 +14,7 @@ describe BikeCreatorVerifier do
       creator.add_phone
       expect(bike.phone).to eq('6969')
     end
-    it 'adds the user phone if one exists and creation org has no phone' do 
+    it 'adds the user phone if one exists and creation org has no phone' do
       bike = Bike.new
       b_param = BParam.new
       user = User.new
@@ -26,7 +25,7 @@ describe BikeCreatorVerifier do
       creator.add_phone
       expect(bike.phone).to eq('69')
     end
-    it "does not raise an error if it can't find a phone" do 
+    it "does not raise an error if it can't find a phone" do
       bike = Bike.new
       b_param = BParam.new
       user = User.new
@@ -39,8 +38,8 @@ describe BikeCreatorVerifier do
     end
   end
 
-  describe :check_example do 
-    it 'makes the bike an example if it was created by example organization' do 
+  describe 'check_example' do
+    it 'makes the bike an example if it was created by example organization' do
       org = FactoryGirl.create(:organization, name: 'Example organization')
       bike = Bike.new
       b_param = BParam.new
@@ -49,7 +48,7 @@ describe BikeCreatorVerifier do
       creator.check_example
       expect(bike.example).to be_truthy
     end
-    it 'does not make the bike an example' do 
+    it 'does not make the bike an example' do
       bike = Bike.new
       b_param = BParam.new
       creator = BikeCreatorVerifier.new(b_param, bike)
@@ -58,8 +57,8 @@ describe BikeCreatorVerifier do
     end
   end
 
-  describe :stolenize do 
-    it 'calls add_phone and marks the bike stolen' do 
+  describe 'stolenize' do
+    it 'calls add_phone and marks the bike stolen' do
       bike = Bike.new
       b_param = BParam.new
       creator = BikeCreatorVerifier.new(b_param, bike)
@@ -69,8 +68,8 @@ describe BikeCreatorVerifier do
     end
   end
 
-  describe :recoverize do 
-    it 'marks the bike recovered and stolen' do 
+  describe 'recoverize' do
+    it 'marks the bike recovered and stolen' do
       bike = Bike.new
       b_param = BParam.new
       creator = BikeCreatorVerifier.new(b_param, bike)
@@ -80,8 +79,8 @@ describe BikeCreatorVerifier do
     end
   end
 
-  describe :check_organization do
-    it 'sets the bike to what BikeCreatorOrganizer returns' do 
+  describe 'check_organization' do
+    it 'sets the bike to what BikeCreatorOrganizer returns' do
       bike = Bike.new
       b_param = BParam.new(params: {stolen: false})
       creator = BikeCreatorVerifier.new(b_param, bike)
@@ -90,7 +89,7 @@ describe BikeCreatorVerifier do
     end
   end
 
-  describe :check_stolen_and_recovered do 
+  describe 'check_stolen_and_recovered' do
     it "returns false if the bike isn't stolen or recovered" do
       bike = Bike.new
       b_param = BParam.new(params: {stolen: false})
@@ -105,7 +104,7 @@ describe BikeCreatorVerifier do
       expect(creator).to receive(:stolenize).and_return(true)
       creator.check_stolen_and_recovered
     end
-    it 'calls stolenize if the stolen parameter is passed' do 
+    it 'calls stolenize if the stolen parameter is passed' do
       bike = Bike.new
       b_param = BParam.new(params: {stolen: true})
       creator = BikeCreatorVerifier.new(b_param, bike)
@@ -121,7 +120,7 @@ describe BikeCreatorVerifier do
       expect(creator).to receive(:recoverize).and_return(true)
       creator.check_stolen_and_recovered
     end
-    it 'calls recoverize if the recovered parameter is passed' do 
+    it 'calls recoverize if the recovered parameter is passed' do
       bike = Bike.new
       b_param = BParam.new(params: {recovered: true})
       creator = BikeCreatorVerifier.new(b_param, bike)
@@ -130,8 +129,8 @@ describe BikeCreatorVerifier do
     end
   end
 
-  describe :verify do
-    it 'calls the methods it needs to call' do 
+  describe 'verify' do
+    it 'calls the methods it needs to call' do
       bike = Bike.new
       b_param = BParam.new(params: {stolen: true})
       creator = BikeCreatorVerifier.new(b_param, bike)

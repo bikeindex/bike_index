@@ -1,8 +1,7 @@
 require "spec_helper"
 
 describe OrganizationInvitation do
-
-  describe :validations do
+  describe 'validations' do
     it { is_expected.to belong_to :inviter }
     it { is_expected.to belong_to :invitee }
     it { is_expected.to validate_presence_of :invitee_email }
@@ -11,16 +10,16 @@ describe OrganizationInvitation do
     it { is_expected.to validate_presence_of :membership_role }
   end  
 
-  describe :create do
+  describe 'create' do
     before :each do
       @o = FactoryGirl.create(:organization_invitation)
     end
 
-    it "creates a valid organization_invitation" do 
+    it "creates a valid organization_invitation" do
       expect(@o.valid?).to be_truthy
     end
 
-    it "assigns to user if the user exists" do 
+    it "assigns to user if the user exists" do
       @user = FactoryGirl.create(:user)
       @o1 = FactoryGirl.create(:organization_invitation, invitee_email: @user.email)
       expect(@user.memberships.count).to eq(1)
@@ -34,8 +33,8 @@ describe OrganizationInvitation do
     }.to change(EmailOrganizationInvitationWorker.jobs, :size).by(1)
   end
 
-  describe :normalize_email do 
-    it "removes leading and trailing whitespace and downcase email" do 
+  describe 'normalize_email' do
+    it "removes leading and trailing whitespace and downcase email" do
       oi = OrganizationInvitation.new 
       allow(oi).to receive(:invitee_email).and_return("   SomE@dd.com ")
       expect(oi.normalize_email).to eq("some@dd.com")
@@ -43,7 +42,7 @@ describe OrganizationInvitation do
   end
   
 
-  describe "assign_to(user)" do 
+  describe "assign_to(user)" do
 
     before :each do
       @organization = FactoryGirl.create(:organization)

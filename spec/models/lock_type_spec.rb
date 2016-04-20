@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe LockType do
-  describe :validations do
+  describe 'validations' do
     before do
       @lock_type = LockType.create(name: "something")
     end
@@ -10,7 +10,7 @@ describe LockType do
     it { is_expected.to validate_uniqueness_of :slug }
   end
   
-  describe :manufacturer_name do 
+  describe 'manufacturer_name' do 
     it "returns the value of manufacturer_other if manufacturer is other" do 
       lock = Lock.new
       other_manufacturer = Manufacturer.new 

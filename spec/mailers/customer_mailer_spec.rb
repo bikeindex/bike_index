@@ -1,17 +1,16 @@
 require 'spec_helper'
 describe CustomerMailer do
-
-  describe :including_snippet do 
-    it "includes the snippet" do 
+  describe 'including_snippet' do
+    it 'includes the snippet' do
       @ownership = FactoryGirl.create(:ownership)
-      mail_snippet = MailSnippet.new(body: "<h1>LOLS</h1>")
+      mail_snippet = MailSnippet.new(body: '<h1>LOLS</h1>')
       expect(MailSnippet).to receive(:matching_opts).and_return(mail_snippet)
       @mail = CustomerMailer.ownership_invitation_email(@ownership)
       expect(@mail.body.encoded).to match(mail_snippet.body)
     end
   end
 
-  describe :welcome_email do
+  describe 'welcome_email' do
     before :each do
       @user = FactoryGirl.create(:user)
       @mail = CustomerMailer.welcome_email(@user)
@@ -22,7 +21,7 @@ describe CustomerMailer do
     end
   end
 
-  describe :confirmation_email do
+  describe 'confirmation_email' do
     before :each do
       @user = FactoryGirl.create(:user)
       @mail = CustomerMailer.confirmation_email(@user)
@@ -33,7 +32,7 @@ describe CustomerMailer do
     end
   end
 
-  describe :password_reset_email do
+  describe 'password_reset_email' do
     before :each do
       @user = FactoryGirl.create(:user)
       @mail = CustomerMailer.password_reset_email(@user)
@@ -45,7 +44,7 @@ describe CustomerMailer do
     end
   end
 
-  describe :ownership_invitation_email do
+  describe 'ownership_invitation_email' do
     it "renders email" do
       @ownership = FactoryGirl.create(:ownership)
       @mail = CustomerMailer.ownership_invitation_email(@ownership)
@@ -53,7 +52,7 @@ describe CustomerMailer do
     end
   end
 
-  describe :organization_invitation_email do
+  describe 'organization_invitation_email' do
     before :each do
       @organization = FactoryGirl.create(:organization)
       @organization_invitation = FactoryGirl.create(:organization_invitation, organization: @organization)
@@ -65,7 +64,7 @@ describe CustomerMailer do
     end
   end
 
-  describe :stolen_notification_email do 
+  describe 'stolen_notification_email' do
     it "renders email and update sent_dates" do
       stolen_notification = FactoryGirl.create(:stolen_notification, message: "Test Message")
       mail = CustomerMailer.stolen_notification_email(stolen_notification)
@@ -79,7 +78,7 @@ describe CustomerMailer do
     end
   end
 
-  describe :admin_contact_stolen_email do
+  describe 'admin_contact_stolen_email' do
     it "renders email" do
       stolen_record = FactoryGirl.create(:stolen_record)
       user = FactoryGirl.create(:admin)
@@ -95,7 +94,7 @@ describe CustomerMailer do
       expect(mail.body.encoded).to match('some message')
     end
   end
-  describe :stolen_bike_alert_email do
+  describe 'stolen_bike_alert_email' do
     it "renders email" do
       stolen_record = FactoryGirl.create(:stolen_record)
       notification_hash = {

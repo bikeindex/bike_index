@@ -1,11 +1,11 @@
 require 'spec_helper'
 
 describe MailSnippet do
-  describe :validations do
+  describe 'validations' do
     it { is_expected.to validate_presence_of :name }
   end
 
-  describe :matching_opts do 
+  describe 'matching_opts' do 
     it "finds an enabled snippet in the proximity" do 
       # Creating far too many objects here. Need to reduce that...
       mail_snippet = FactoryGirl.create(:mail_snippet)

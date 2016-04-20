@@ -1,18 +1,18 @@
 require 'spec_helper'
 
 describe BikeUpdator do
-  describe :find_bike do 
-    it "raises an error if it can't find the bike" do 
+  describe 'find_bike' do
+    it "raises an error if it can't find the bike" do
       expect {BikeUpdator.new(b_params: {id: 696969}).find_bike}.to raise_error(BikeUpdatorError)
     end
-    it "finds the bike from the bike_params" do 
+    it "finds the bike from the bike_params" do
       bike = FactoryGirl.create(:bike)
       response = BikeUpdator.new(b_params: {id: bike.id}).find_bike
       expect(response).to eq(bike)
     end
   end
 
-  describe :ensure_ownership! do 
+  describe 'ensure_ownership!' do
     it "raises an error if the user doesn't own the bike" do
       ownership = FactoryGirl.create(:ownership)
       user = FactoryGirl.create(:user)
@@ -20,16 +20,16 @@ describe BikeUpdator do
       expect {BikeUpdator.new(user: user, b_params: {id: bike.id}).ensure_ownership!}.to raise_error(BikeUpdatorError)
     end
 
-    it "returns true if the bike is owned by the user" do 
+    it "returns true if the bike is owned by the user" do
       ownership = FactoryGirl.create(:ownership)
       user = ownership.creator
       bike = ownership.bike
-      expect{ BikeUpdator.new(user: user, b_params: {id: bike.id}).ensure_ownership!}.to be_truthy
+      expect(BikeUpdator.new(user: user, b_params: {id: bike.id}).ensure_ownership!).to be_true
     end
   end
 
-  describe :update_stolen_record do 
-    it "calls update_stolen_record with the date_stolen_input if it exists" do 
+  describe 'update_stolen_record' do
+    it "calls update_stolen_record with the date_stolen_input if it exists" do
       FactoryGirl.create(:country, iso: "US")
       bike = FactoryGirl.create(:bike, stolen: true)
       updator = BikeUpdator.new(b_params: {id: bike.id, bike: {date_stolen_input: "07-09-2000"}})
@@ -37,7 +37,7 @@ describe BikeUpdator do
       csr = bike.find_current_stolen_record
       expect(csr.date_stolen).to eq(DateTime.strptime("07-09-2000 06", "%m-%d-%Y %H"))
     end
-    it "creates a stolen record if one doesn't exist" do 
+    it "creates a stolen record if one doesn't exist" do
       FactoryGirl.create(:country, iso: "US")
       bike = FactoryGirl.create(:bike)
       BikeUpdator.new(b_params: {id: bike.id, bike: {stolen: true}}).update_stolen_record
@@ -45,8 +45,8 @@ describe BikeUpdator do
     end
   end
 
-  describe :update_ownership do 
-    it "calls create_ownership if the email has changed" do 
+  describe 'update_ownership' do
+    it "calls create_ownership if the email has changed" do
       bike = FactoryGirl.create(:bike)
       user = FactoryGirl.create(:user)
       expect(bike.updator_id).to be_nil
@@ -57,7 +57,7 @@ describe BikeUpdator do
       expect(bike.updator).to eq(user)
     end
 
-    it "does not call create_ownership if the email hasn't changed" do 
+    it "does not call create_ownership if the email hasn't changed" do
       bike = FactoryGirl.create(:bike, owner_email: "another@email.co")
       update_bike = BikeUpdator.new(b_params: {id: bike.id, bike: {owner_email: "another@email.co"}})
       expect_any_instance_of(OwnershipCreator).not_to receive(:create_ownership)
@@ -65,8 +65,8 @@ describe BikeUpdator do
     end
   end
 
-  describe :update_available_attributes do 
-    it "does not let protected attributes be updated" do 
+  describe 'update_available_attributes' do
+    it "does not let protected attributes be updated" do
       FactoryGirl.create(:country, iso: "US")
       organization = FactoryGirl.create(:organization)
       bike = FactoryGirl.create(:bike,
@@ -101,7 +101,7 @@ describe BikeUpdator do
       expect(bike.owner_email).to eq('foo@bar.com')
     end
 
-    it "marks a bike user hidden" do 
+    it "marks a bike user hidden" do
       organization = FactoryGirl.create(:organization)
       bike = FactoryGirl.create(:bike, creation_organization_id: organization.id, example: true)
       ownership = FactoryGirl.create(:ownership, bike: bike)
@@ -114,7 +114,7 @@ describe BikeUpdator do
       expect(bike.user_hidden).to be_truthy
     end
 
-    it "Actually, for now, we let anyone mark anything not stolen" do 
+    it "Actually, for now, we let anyone mark anything not stolen" do
       bike = FactoryGirl.create(:bike, stolen: true)
       ownership = FactoryGirl.create(:ownership, bike: bike)
       user = ownership.creator
@@ -126,7 +126,7 @@ describe BikeUpdator do
       expect(bike.reload.stolen).not_to be_truthy
     end
 
-    it "updates the bike and set year to nothing if year nil" do 
+    it "updates the bike and set year to nothing if year nil" do
       bike = FactoryGirl.create(:bike, year: 2014)
       ownership = FactoryGirl.create(:ownership, bike: bike)
       user = ownership.creator
@@ -140,7 +140,7 @@ describe BikeUpdator do
       expect(bike.components.count).to eq(0)
     end
 
-    it "updates the bike sets is_for_sale to false" do 
+    it "updates the bike sets is_for_sale to false" do
       bike = FactoryGirl.create(:bike, is_for_sale: true)
       ownership = FactoryGirl.create(:ownership, bike: bike)
       user = ownership.creator

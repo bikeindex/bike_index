@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe OwnershipCreator do
-  describe :owner_id do 
+  describe 'owner_id' do 
     it "finds the user" do 
       user = FactoryGirl.create(:user, email: "foo@email.com")
       create_ownership = OwnershipCreator.new
@@ -15,7 +15,7 @@ describe OwnershipCreator do
     end
   end
 
-  describe :find_owner_email do 
+  describe 'find_owner_email' do 
     it "is the bike params unless owner_email is present" do 
       bike = Bike.new
       allow(bike).to receive(:owner_email).and_return("foo@email.com")
@@ -23,7 +23,7 @@ describe OwnershipCreator do
     end
   end
 
-  describe :send_notification_email do 
+  describe 'send_notification_email' do 
     it "sends a notification email" do 
       ownership = Ownership.new
       allow(ownership).to receive(:id).and_return(2)
@@ -51,7 +51,7 @@ describe OwnershipCreator do
     end
   end
 
-  describe :new_ownership_params do
+  describe 'new_ownership_params' do
     it "creates new ownership attributes" do 
       user = User.new
       bike = Bike.new 
@@ -89,7 +89,7 @@ describe OwnershipCreator do
     end
   end
 
-  describe :mark_other_ownerships_not_current do 
+  describe 'mark_other_ownerships_not_current' do 
     it "marks existing ownerships as not current" do 
       ownership1 = FactoryGirl.create(:ownership)
       bike = ownership1.bike 
@@ -100,7 +100,7 @@ describe OwnershipCreator do
     end
   end
 
-  describe :current_is_hidden do 
+  describe 'current_is_hidden' do 
     it "returns true if existing ownerships is user hidden" do
       ownership = FactoryGirl.create(:ownership, user_hidden: true)
       bike = ownership.bike
@@ -115,7 +115,7 @@ describe OwnershipCreator do
     end
   end
 
-  describe :add_errors_to_bike do 
+  describe 'add_errors_to_bike' do 
     xit "adds the errors to the bike" do 
       ownership = Ownership.new 
       bike = Bike.new 
@@ -126,7 +126,7 @@ describe OwnershipCreator do
     end
   end
 
-  describe :create_ownership do
+  describe 'create_ownership' do
     it "calls mark not current and send notification and create a new ownership" do
       create_ownership = OwnershipCreator.new()
       new_params = {bike_id: 1,user_id: 69, owner_email: "f@f.com", creator_id: 69,claimed: true, current: true}

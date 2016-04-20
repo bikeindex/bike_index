@@ -1,8 +1,7 @@
 require 'spec_helper'
 
 describe CreateUserJobs do
-
-  describe :associate_ownerships do
+  describe 'associate_ownerships' do
     it "assigns any ownerships that match the user email" do
       bike = FactoryGirl.create(:bike, owner_email: "owner1@a.com")
       ownership = FactoryGirl.create(:ownership, owner_email: "OWner1@a.com", bike: bike)
@@ -18,8 +17,8 @@ describe CreateUserJobs do
     end
   end
 
-  describe :associate_membership_invites do 
-    it "assigns any organization invitations that match the user email, and mark user confirmed if invited" do 
+  describe 'associate_membership_invites' do
+    it "assigns any organization invitations that match the user email, and mark user confirmed if invited" do
       organization_invitation = FactoryGirl.create(:organization_invitation, invitee_email: "owNER1@a.com")
       user = FactoryGirl.create(:user, email: "owner1@A.COM")
       CreateUserJobs.new(user: user).associate_membership_invites
@@ -28,8 +27,8 @@ describe CreateUserJobs do
     end
   end
 
-  describe :send_welcome_email do 
-    it "enques the email" do 
+  describe 'send_welcome_email' do
+    it "enques the email" do
       user = User.new
       allow(user).to receive(:id).and_return(69)
       CreateUserJobs.new(user: user).send_welcome_email
@@ -37,8 +36,8 @@ describe CreateUserJobs do
     end
   end
 
-  describe :send_confirmation_email do 
-    it "enques the email" do 
+  describe 'send_confirmation_email' do
+    it "enques the email" do
       user = User.new
       allow(user).to receive(:id).and_return(69)
       CreateUserJobs.new(user: user).send_confirmation_email
@@ -46,8 +45,8 @@ describe CreateUserJobs do
     end
   end
 
-  describe :do_jobs do 
-    it "calls associate_existing and send confirmation email if user isn't confirmed" do 
+  describe 'do_jobs' do
+    it "calls associate_existing and send confirmation email if user isn't confirmed" do
       user = User.new
       create_user_jobs = CreateUserJobs.new(user: user)
       allow(user).to receive(:confirmed).and_return(false)
@@ -57,7 +56,7 @@ describe CreateUserJobs do
       create_user_jobs.do_jobs
     end
 
-    it "calls associate_existing and send welcome email if user is confirmed" do 
+    it "calls associate_existing and send welcome email if user is confirmed" do
       user = User.new
       create_user_jobs = CreateUserJobs.new(user: user)
       allow(user).to receive(:confirmed).and_return(true)

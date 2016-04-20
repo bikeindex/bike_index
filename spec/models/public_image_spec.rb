@@ -1,11 +1,11 @@
 require 'spec_helper'
 
 describe PublicImage do
-  describe :validations do
+  describe 'validations' do
     it { is_expected.to belong_to :imageable }
   end
   
-  describe :default_name do 
+  describe 'default_name' do 
     it "sets a default name from filename if not bike" do 
       public_image = PublicImage.new
       allow(public_image).to receive(:imageable_type).and_return("Nope")

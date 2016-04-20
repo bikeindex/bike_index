@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe AdminMailer do
-  describe :feedback_notification_email do
+  describe 'feedback_notification_email' do
     before :each do
       @feedback = FactoryGirl.create(:feedback)
       @mail = AdminMailer.feedback_notification_email(@feedback)
@@ -54,7 +54,7 @@ describe AdminMailer do
     end
   end
 
-  describe :no_admins_notification_email do
+  describe 'no_admins_notification_email' do
     before :each do
       @organization = FactoryGirl.create(:organization)
       @mail = AdminMailer.no_admins_notification_email(@organization)
@@ -66,7 +66,7 @@ describe AdminMailer do
     end
   end
 
-  describe :blocked_stolen_notification_email do
+  describe 'blocked_stolen_notification_email' do
     before :each do
       @stolen_notification = FactoryGirl.create(:stolen_notification, message: 'Test Message', subject: 'Test subject')
       @mail = AdminMailer.blocked_stolen_notification_email(@stolen_notification)

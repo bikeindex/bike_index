@@ -1,16 +1,15 @@
 require 'spec_helper'
 
 describe Paint do
-
-
-
-  it { is_expected.to validate_presence_of :name }
-  it { is_expected.to validate_uniqueness_of :name }
-  it { is_expected.to belong_to :color }
-  it { is_expected.to belong_to :secondary_color }
-  it { is_expected.to belong_to :tertiary_color }
-  it { is_expected.to belong_to :manufacturer }
-  it { is_expected.to have_many :bikes }
+  describe 'validations' do
+    it { is_expected.to validate_presence_of :name }
+    it { is_expected.to validate_uniqueness_of :name }
+    it { is_expected.to belong_to :color }
+    it { is_expected.to belong_to :secondary_color }
+    it { is_expected.to belong_to :tertiary_color }
+    it { is_expected.to belong_to :manufacturer }
+    it { is_expected.to have_many :bikes }
+  end
 
   describe "lowercase name" do
     it "makes the name lowercase on save" do
@@ -20,14 +19,14 @@ describe Paint do
   end
 
 
-  describe :fuzzy_name_find do
+  describe 'fuzzy_name_find' do
     it "finds users by email address when the case doesn't match" do
       paint = FactoryGirl.create(:paint, name: "Poopy PAiNTERS")
       expect(Paint.fuzzy_name_find('poopy painters')).to eq(paint)
     end
   end
 
-  describe :assign_colors do
+  describe 'assign_colors' do
     before(:each) do
       bi_colors = ["Black", "Blue", "Brown", "Green", "Orange", "Pink", "Purple", "Red", "Silver or Gray", "Stickers tape or other cover-up", "Teal", "White", "Yellow or Gold"]
       bi_colors.each do |col|

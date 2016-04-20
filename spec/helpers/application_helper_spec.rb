@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe ApplicationHelper do
-  describe :active_link do
+  describe 'active_link' do
     context 'without a class' do
       it 'returns the link active if it ought to be' do
         allow(view).to receive(:current_page?).and_return(true)
@@ -35,7 +35,7 @@ describe ApplicationHelper do
     end
   end
 
-  describe :current_page_skeleton do
+  describe 'current_page_skeleton' do
     context 'bikes' do
       before { allow(view).to receive(:controller_name) { 'bikes' } }
       %w(new create).each do |action|
@@ -128,14 +128,14 @@ describe ApplicationHelper do
     end
   end
 
-  describe :content_nav_class do
+  describe 'content_nav_class' do
     it 'returns active if the section is the active_section' do
       @active_section = 'resources'
       expect(helper.content_nav_class('resources')).to eq('active-menu')
     end
   end
 
-  describe :listicle_html do
+  describe 'listicle_html' do
     it 'returns the html formatted as we want' do
       l = Listicle.new(body: 'body', title: 'title', image_credits: 'credit')
       l.htmlize_content
@@ -149,7 +149,7 @@ describe ApplicationHelper do
     end
   end
 
-  describe :body_id do
+  describe 'body_id' do
     context 'admin bikes index' do
       it 'returns admin_users_controller index_action' do
         controller = Admin::StolenBikesController.new

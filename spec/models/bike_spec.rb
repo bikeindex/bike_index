@@ -1,8 +1,7 @@
 require 'spec_helper'
 
 describe Bike do
-
-  describe :validations do
+  describe 'validations' do
     it { is_expected.to belong_to :manufacturer }
     it { is_expected.to belong_to :primary_frame_color }
     it { is_expected.to belong_to :secondary_frame_color }
@@ -54,7 +53,7 @@ describe Bike do
     end
   end
 
-  describe :recovered_records do 
+  describe 'recovered_records' do 
     it "default scopes to created_at desc" do 
       o = FactoryGirl.create(:ownership)
       user = o.creator
@@ -65,7 +64,7 @@ describe Bike do
     end
   end
 
-  describe :visible_by do 
+  describe 'visible_by' do 
     it "isn't be visible to owner unless user hidden" do 
       bike = Bike.new(hidden: true)
       user = User.new
@@ -92,7 +91,7 @@ describe Bike do
     end
   end
 
-  describe :attr_cache_search do
+  describe 'attr_cache_search' do
     it "finds bikes by attr cache" do
       bike = FactoryGirl.create(:bike)
       query = ["1c#{bike.primary_frame_color_id}"]
@@ -109,7 +108,7 @@ describe Bike do
     end
   end
 
-  describe :owner do
+  describe 'owner' do
     it "receives owner from the last ownership" do
       first_ownership = Ownership.new 
       second_ownership = Ownership.new
@@ -131,7 +130,7 @@ describe Bike do
     end
   end
 
-  describe :first_owner_email do
+  describe 'first_owner_email' do
     it "gets owner email from the first ownership" do
       first_ownership = Ownership.new(owner_email: 'foo@example.com')
       second_ownership = Ownership.new
@@ -141,7 +140,7 @@ describe Bike do
     end
   end
 
-  describe :frame_size do 
+  describe 'frame_size' do 
     it "removes crap from bike size strings" do 
       bike = Bike.new(frame_size: "19\\\\\"")
       bike.clean_frame_size
@@ -188,7 +187,7 @@ describe Bike do
     end
   end
 
-  describe :current_owner_exists do 
+  describe 'current_owner_exists' do 
     it "returns false if ownership isn't claimed" do
       bike = Bike.new 
       ownership = Ownership.new
@@ -203,7 +202,7 @@ describe Bike do
     end
   end
 
-  describe :can_be_claimed_by do 
+  describe 'can_be_claimed_by' do 
     it "returns false if the bike is already claimed" do 
       user = User.new
       bike = Bike.new
@@ -222,7 +221,7 @@ describe Bike do
     end
   end
 
-  describe :user_hidden do 
+  describe 'user_hidden' do 
     it "is true if bike is hidden and ownership is user hidden" do 
       bike = Bike.new(hidden: true)
       ownership = Ownership.new(user_hidden: true)
@@ -235,7 +234,7 @@ describe Bike do
     end
   end
 
-  describe :fake_deleted do 
+  describe 'fake_deleted' do 
     it "is true if bike is hidden and ownership is user hidden" do 
       bike = Bike.new(hidden: true)
       ownership = Ownership.new(user_hidden: true)
@@ -248,7 +247,7 @@ describe Bike do
     end
   end
 
-  describe :set_user_hidden do 
+  describe 'set_user_hidden' do 
     it "unmarks user hidden, saves ownership and marks self unhidden" do 
       ownership = FactoryGirl.create(:ownership, user_hidden: true)
       bike = ownership.bike
@@ -273,7 +272,7 @@ describe Bike do
     end
   end
 
-  describe :find_current_stolen_record do 
+  describe 'find_current_stolen_record' do 
     it "returns the last current stolen record if bike is stolen" do 
       @bike = Bike.new 
       first_stolen_record = StolenRecord.new
@@ -292,7 +291,7 @@ describe Bike do
     end
   end
 
-  describe :manufacturer_name do 
+  describe 'manufacturer_name' do 
     it "returns the value of manufacturer_other if manufacturer is other" do 
       bike = Bike.new
       other_manufacturer = Manufacturer.new 
@@ -319,7 +318,7 @@ describe Bike do
     end
   end
 
-  describe :type do 
+  describe 'type' do 
     it "returns the cycle type name" do 
       cycle_type = FactoryGirl.create(:cycle_type)
       bike = FactoryGirl.create(:bike, cycle_type: cycle_type)
@@ -327,7 +326,7 @@ describe Bike do
     end
   end
 
-  describe :video_embed_src do 
+  describe 'video_embed_src' do 
     it "returns false if there is no video_embed" do 
       @bike = Bike.new 
       allow(@bike).to receive(:video_embed).and_return(nil)
@@ -351,7 +350,7 @@ describe Bike do
     end
   end
 
-  describe :set_mnfg_name do 
+  describe 'set_mnfg_name' do 
     it "sets a bikes mnfg_name" do 
       manufacturer = FactoryGirl.create(:manufacturer, name: 'SE Racing ( S E Bikes )')
       bike = Bike.new
@@ -372,7 +371,7 @@ describe Bike do
     end
   end
 
-  describe :set_normalized_attributes do 
+  describe 'set_normalized_attributes' do 
     it "sets a bikes normalized_serial and switches unknown to absent" do 
       bike = Bike.new(serial_number: ' UNKNOWn ')
       expect_any_instance_of(SerialNormalizer).to receive(:normalized).and_return('normal')
@@ -390,7 +389,7 @@ describe Bike do
     end
   end
 
-  describe :serial do 
+  describe 'serial' do 
     it "only returns the serial if we should show people the serial" do 
       # We're hiding serial numbers for bikes that are recovered to provide a method of verifying 
       # ownership
@@ -417,7 +416,7 @@ describe Bike do
     end
   end
 
-  describe :set_paints do 
+  describe 'set_paints' do 
     it "returns true if paint is a color" do 
       FactoryGirl.create(:color, name: "Bluety")
       bike = Bike.new
@@ -450,7 +449,7 @@ describe Bike do
     end
   end
 
-  describe :cache_photo do 
+  describe 'cache_photo' do 
     it "caches the photo" do 
       bike = FactoryGirl.create(:bike)
       image = FactoryGirl.create(:public_image, imageable: bike)
@@ -460,7 +459,7 @@ describe Bike do
     end
   end
 
-  describe :components_cache_string do 
+  describe 'components_cache_string' do 
     it "caches the components" do 
       bike = FactoryGirl.create(:bike)
       c = FactoryGirl.create(:component, bike: bike)
@@ -469,7 +468,7 @@ describe Bike do
     end
   end
 
-  describe :cache_attributes do 
+  describe 'cache_attributes' do 
     it "caches the colors handlebar_type and wheel_size" do 
       color = FactoryGirl.create(:color)
       handlebar = FactoryGirl.create(:handlebar_type)
@@ -483,7 +482,7 @@ describe Bike do
     end
   end
 
-  describe :cache_stolen_attributes do 
+  describe 'cache_stolen_attributes' do 
     it "saves the stolen description to all description and set stolen_rec_id" do 
       stolen_record = FactoryGirl.create(:stolen_record, theft_description: 'some theft description' )
       bike = stolen_record.bike
@@ -500,7 +499,7 @@ describe Bike do
   end
 
 
-  describe :cache_bike do 
+  describe 'cache_bike' do 
     it "calls cache photo and cache component and erase stolen_rec_id" do 
       bike = FactoryGirl.create(:bike, current_stolen_record_id: 69)
       expect(bike).to receive(:cache_photo)
@@ -533,7 +532,7 @@ describe Bike do
   end
 
 
-  describe :frame_colors do 
+  describe 'frame_colors' do 
     it "returns an array of the frame colors" do 
       bike = Bike.new 
       color = Color.new
@@ -547,7 +546,7 @@ describe Bike do
     end
   end
 
-  describe :cgroup_array do
+  describe 'cgroup_array' do
     it "grabs a list of all the cgroups" do 
       bike = Bike.new
       component1 = Component.new 
@@ -561,7 +560,7 @@ describe Bike do
     end
   end
 
-  describe :get_listing_order do 
+  describe 'get_listing_order' do 
     it "is 1/1000 of the current timestamp" do 
       bike = Bike.new
       time = Time.now
@@ -602,7 +601,7 @@ describe Bike do
     end
   end
 
-  describe :title_string do 
+  describe 'title_string' do 
     it "escapes correctly" do
       bike = Bike.new(frame_model: "</title><svg/onload=alert(document.cookie)>")
       allow(bike).to receive(:manufacturer_name).and_return('baller')

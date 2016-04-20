@@ -1,8 +1,7 @@
 require 'spec_helper'
 
 describe StolenNotification do
-
-  describe :validations do
+  describe 'validations' do
     it { is_expected.to belong_to :bike }
     it { is_expected.to belong_to :sender }
     it { is_expected.to belong_to :receiver }
@@ -12,7 +11,7 @@ describe StolenNotification do
     it { is_expected.to serialize :send_dates }
   end
 
-  describe :create do
+  describe 'create' do
     it "enqueues an email job, and enque a second one if user has permission to send multiple" do
       user = FactoryGirl.create(:user, can_send_many_stolen_notifications: true)
       expect {
@@ -36,7 +35,7 @@ describe StolenNotification do
     end
   end
 
-  describe :default_subject do 
+  describe 'default_subject' do 
     it "default subject" do 
       expect(StolenNotification.new.default_subject).to eq("Stolen bike contact")
     end

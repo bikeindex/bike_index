@@ -1,8 +1,7 @@
 require 'spec_helper'
 
 describe BikeCreatorOrganizer do
-
-  describe :unorganize do
+  describe 'unorganize' do
     it "removes the token attributes" do 
       bike = Bike.new(creation_organization_id: 4)
       b_param = BParam.new(params: { stolen: false })
@@ -12,7 +11,7 @@ describe BikeCreatorOrganizer do
     end
   end
 
-  describe :use_organization do
+  describe 'use_organization' do
     it "marks the bike organized" do 
       bike = Bike.new
       b_param = BParam.new(params: { stolen: false })
@@ -24,7 +23,7 @@ describe BikeCreatorOrganizer do
     end
   end
 
-  describe :organize do 
+  describe 'organize' do 
     it "finds the organization and call use organization if it's usable" do
       bike = Bike.new
       b_param = BParam.new
@@ -38,7 +37,7 @@ describe BikeCreatorOrganizer do
     end
   end
 
-  describe :find_organization do 
+  describe 'find_organization' do 
     it "adds an error to the bike if the organization doesn't exist" do 
       bike = Bike.new
       b_param = BParam.new
@@ -55,7 +54,7 @@ describe BikeCreatorOrganizer do
     end
   end
 
-  describe :organization_usable do 
+  describe 'organization_usable' do 
     it "adds an error if the creator doesn't have a membership to the organization" do
       bike = Bike.new
       b_param = BParam.new
@@ -96,7 +95,7 @@ describe BikeCreatorOrganizer do
     end
   end
 
-  describe :check_organization do
+  describe 'check_organization' do
     it "returns false if organization is not present" do 
       bike = Bike.new
       b_param = BParam.new(params: { stolen: false })
@@ -124,7 +123,7 @@ describe BikeCreatorOrganizer do
     end
   end
 
-  describe :organized_bike do 
+  describe 'organized_bike' do 
     it "unorganizes if there are errors and return the bike" do
       bike = Bike.new
       bike.errors.add(:creation_organization, "Oh no, wrong org")

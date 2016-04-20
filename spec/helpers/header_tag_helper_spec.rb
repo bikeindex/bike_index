@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe HeaderTagHelper do
-  describe :header_tags do 
+  describe 'header_tags' do
     it "returns the html for the tags" do
       allow(helper).to receive(:set_header_tag_hash).and_return({ tags: true })
       allow(helper).to receive(:set_social_hash).and_return({ tags: true })
@@ -11,9 +11,9 @@ describe HeaderTagHelper do
     end
   end
 
-  describe :title_tag_html do
+  describe 'title_tag_html' do
     context 'from header_tag_hash' do
-      it 'returns the title wrapped in title tags' do 
+      it 'returns the title wrapped in title tags' do
         header_hash = {
           title_tag: { title: 'Foo 69 69' },
           meta_tags: { charset: 'utf-8' }
@@ -24,7 +24,7 @@ describe HeaderTagHelper do
     end
     context 'from override' do
       before { controller.instance_variable_set(:@page_title, 'OVERRIDE - Fancy Page title') }
-      it 'returns the override' do 
+      it 'returns the override' do
         header_hash = {
           title_tag: { title: 'Foo 69 69' },
           meta_tags: { charset: 'utf-8' }
@@ -35,8 +35,8 @@ describe HeaderTagHelper do
     end
   end
 
-  describe :meta_tags_html do 
-    it "returns the meta tags in html" do 
+  describe 'meta_tags_html' do
+    it "returns the meta tags in html" do
       header_hash = {
         title_tag: { title: "Foo 69 69" },
         meta_tags: { charset: "utf-8" }
@@ -46,8 +46,8 @@ describe HeaderTagHelper do
     end
   end
 
-  describe :set_social_hash do 
-    it "has some values" do 
+  describe 'set_social_hash' do
+    it "has some values" do
       d = helper.set_social_hash({ title_tag: { title: "Loosers" }, meta_tags: {description: "Something 69"} })
       expect(d[:meta_tags][:"og:title"]).to eq("Loosers")
       expect(d[:meta_tags][:"twitter:title"]).to eq("Loosers")
@@ -55,7 +55,7 @@ describe HeaderTagHelper do
       expect(d[:meta_tags][:"twitter:description"]).to eq("Something 69")
     end
 
-    it "duplicates the title to twitter" do 
+    it "duplicates the title to twitter" do
       hash = helper.set_social_hash({ title_tag: { title: "Foo Title" }, meta_tags: {description: "An amazing description of awesome"} })
       expect(hash[:meta_tags][:"og:title"]).to eq("Foo Title")
       expect(hash[:meta_tags][:"twitter:title"]).to eq("Foo Title")
@@ -64,30 +64,30 @@ describe HeaderTagHelper do
     end
   end
 
-  describe :default_hash do 
-    it "has some values" do 
+  describe 'default_hash' do
+    it "has some values" do
       hash = helper.default_hash
       expect(hash[:title_tag][:title]).to eq("Bike Index")
       expect(hash[:meta_tags][:description]).not_to be_nil
       expect(hash[:meta_tags][:charset]).not_to be_empty
     end
   end
-  describe :set_header_tag_hash do 
-    it "calls the controller name header tags if it's listed" do 
+  describe 'set_header_tag_hash' do
+    it "calls the controller name header tags if it's listed" do
       allow(view).to receive(:controller_name).and_return("bikes")
       allow(helper).to receive(:bikes_header_tags).and_return("69 and stuff")
       expect(helper.set_header_tag_hash).to eq("69 and stuff")
     end
 
-    it "returns page default tags if controller doesn't match a condition" do 
+    it "returns page default tags if controller doesn't match a condition" do
       allow(view).to receive(:controller_name).and_return("Something fucking weird")
       allow(helper).to receive(:current_page_auto_hash).and_return("defaulted")
       expect(helper.set_header_tag_hash).to eq("defaulted")
     end
   end
   
-  describe :current_page_auto_hash do 
-    before do 
+  describe 'current_page_auto_hash' do
+    before do
       allow(view).to receive(:default_hash).and_return({
         title_tag: { title: "Default" },
         meta_tags: { description: "Blank" }
@@ -102,7 +102,7 @@ describe HeaderTagHelper do
       expect(h[:title_tag][:title]).to eq("Search Results")
     end
 
-    it "returns the action name humanized and default description" do 
+    it "returns the action name humanized and default description" do
       allow(view).to receive(:action_name).and_return("some_weird_action")
       h = helper.current_page_auto_hash
       expect(h[:title_tag][:title]).to eq("Some weird action")
@@ -110,22 +110,22 @@ describe HeaderTagHelper do
     end
   end
 
-  describe :title_auto_hash do 
-    it "returns the controller name on Index" do 
+  describe 'title_auto_hash' do
+    it "returns the controller name on Index" do
       allow(view).to receive(:action_name).and_return("index")
       allow(view).to receive(:controller_name).and_return("cool_thing")
       expect(helper.current_page_auto_hash[:title_tag][:title]).to eq("Cool thing")
     end
 
-    it "returns the controller name and new on New" do 
+    it "returns the controller name and new on New" do
       allow(view).to receive(:action_name).and_return("edit")
       allow(view).to receive(:controller_name).and_return("cool_things")
       expect(helper.current_page_auto_hash[:title_tag][:title]).to eq("Edit cool thing")
     end
   end
 
-  describe :bikes_header_tags do 
-    before do 
+  describe 'bikes_header_tags' do
+    before do
       allow(helper).to receive(:current_page_auto_hash).and_return({
         title_tag: { title: "Default" },
         meta_tags: { description: "Blank" }
@@ -151,7 +151,7 @@ describe HeaderTagHelper do
       expect(hash[:meta_tags][:description]).not_to eq("Blank")
     end
 
-    it "returns the bike name on Show" do 
+    it "returns the bike name on Show" do
       allow(view).to receive(:action_name).and_return("show")
       hash = helper.bikes_header_tags
       expect(hash[:title_tag][:title]).to eq("Stolen Something special 1969")
@@ -160,7 +160,7 @@ describe HeaderTagHelper do
       expect(hash[:meta_tags][:"twitter:image"]).to eq("http://something.com")
     end
 
-    it "has twitter creator if present and shown" do 
+    it "has twitter creator if present and shown" do
       user = User.new(twitter: 'coolio', show_twitter: true)
       allow(@bike).to receive(:owner).and_return(user)
       allow(view).to receive(:action_name).and_return("show")
@@ -168,7 +168,7 @@ describe HeaderTagHelper do
       expect(hash[:meta_tags][:"twitter:creator"]).to eq("@coolio")
     end
 
-    it "doesn't have twitter creator if present and not shown" do 
+    it "doesn't have twitter creator if present and not shown" do
       user = User.new(twitter: 'coolio')
       allow(@bike).to receive(:owner).and_return(user)
       allow(view).to receive(:action_name).and_return("show")

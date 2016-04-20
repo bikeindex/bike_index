@@ -1,14 +1,13 @@
 require 'spec_helper'
 
 describe Component do
-
-  describe :validations do
+  describe 'validations' do
     it { is_expected.to belong_to :bike }
     it { is_expected.to belong_to :manufacturer }
     it { is_expected.to belong_to :ctype }
   end
 
-  describe :component_type do 
+  describe 'component_type' do 
     it "returns the name of the ctype other if it should" do 
       ctype = Ctype.new
       component = Component.new
@@ -27,7 +26,7 @@ describe Component do
     end
   end
 
-  describe :set_front_or_rear do 
+  describe 'set_front_or_rear' do 
     it "returns the name of the ctype other if it should" do 
       bike = FactoryGirl.create(:bike)
       component = FactoryGirl.create(:component, bike: bike,  front_or_rear: "both")
@@ -35,7 +34,7 @@ describe Component do
     end
   end
 
-  describe :manufacturer_name do 
+  describe 'manufacturer_name' do 
     it "returns the value of manufacturer_other if manufacturer is other" do 
       mnfg = Ctype.new
       component = Component.new
@@ -54,7 +53,7 @@ describe Component do
     end
   end
 
-  describe :set_is_stock do 
+  describe 'set_is_stock' do 
     it "sets not stock if description changed" do 
       component = FactoryGirl.create(:component, is_stock: true)
       expect(component.is_stock).to be_truthy
@@ -87,7 +86,7 @@ describe Component do
     end
   end
 
-  # describe :fuzzy_assign_mnfg do
+  # describe 'fuzzy_assign_mnfg' do
   #   context 'manufacturer_id a manufacturer name' do
   #     it 'sets manufacturer_id correctly' do
   #       m = FactoryGirl.create(:manufacturer, name: 'SRAM')
