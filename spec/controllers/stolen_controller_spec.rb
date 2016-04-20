@@ -10,7 +10,7 @@ describe StolenController do
       it { should render_template(:index) }
     end
     context 'with subdomain' do
-      it 'should redirect to no subdomain' do
+      it 'redirects to no subdomain' do
         @request.host = 'stolen.example.com'
         get :index
         expect(response).to redirect_to stolen_index_url(subdomain: false)

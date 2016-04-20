@@ -104,30 +104,26 @@ end
 
 group :development do
   # gem 'ruby_gntp' # For linux
+  # gem 'growl' # Think we can get by without the notifier
   gem 'rerun'
-  gem 'growl'
   gem 'guard'
   gem 'guard-rspec', '~> 4.2.10'
   gem 'guard-rubocop'
-  gem 'bullet'
-  gem 'should_clean'
-  gem 'brakeman', :require => false
 end
 
 group :development, :test do
   gem 'rb-fsevent', '~> 0.9.1'
-  gem 'rspec-rails'
+  gem 'rspec-rails', '~> 2.99'
   gem 'foreman'
   gem 'database_cleaner'
-  gem 'json_spec'
+  # gem 'json_spec' # Don't think this is used... - remove if possible
   gem 'dotenv-rails'
 end
 
 group :test do
   gem 'factory_girl_rails'
-  gem 'simplecov', require: false
   gem 'codeclimate-test-reporter', require: nil
-  gem 'rspec-sidekiq'
+  gem 'rspec-sidekiq', '~> 1.1.0' # After upgrade, 2.2.0
   gem 'shoulda-matchers'
   gem 'pry'
 end

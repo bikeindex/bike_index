@@ -11,12 +11,12 @@ describe BikesController do
       it { should render_template(:index) }
       it { should_not set_the_flash }
 
-      it 'should set per_page correctly' do
+      it 'sets per_page correctly' do
         expect(assigns(:per_page)).to eq 10
       end
     end
     context 'with subdomain' do
-      it 'should redirect to no subdomain' do
+      it 'redirects to no subdomain' do
         @request.host = 'stolen.example.com'
         get :index
         expect(response).to redirect_to bikes_url(subdomain: false)
