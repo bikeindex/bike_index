@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe Admin::FailedBikesController do
-  describe :index do 
-    before do 
+  describe 'index' do
+    before do
       user = FactoryGirl.create(:admin)
       set_current_user(user)
       get :index
@@ -11,8 +11,8 @@ describe Admin::FailedBikesController do
     it { is_expected.to render_template(:index) }
   end
 
-  describe :show do 
-    before do 
+  describe 'show' do
+    before do
       user = FactoryGirl.create(:admin)
       set_current_user(user)
       b_param = BParam.create(creator_id: user.id)

@@ -1,8 +1,7 @@
 require 'spec_helper'
 
 describe Api::V1::BikesController do
-  
-  describe :index do
+  describe 'index' do
     it "loads the page and have the correct headers" do
       FactoryGirl.create(:bike)
       get :index, format: :json
@@ -10,7 +9,7 @@ describe Api::V1::BikesController do
     end
   end
 
-  describe :stolen_ids do
+  describe 'stolen_ids' do
     it "returns correct code if no org" do 
       c = FactoryGirl.create(:color)
       get :stolen_ids, format: :json
@@ -34,7 +33,7 @@ describe Api::V1::BikesController do
     end
   end
 
-  describe :show do
+  describe 'show' do
     it "loads the page" do
       bike = FactoryGirl.create(:bike)
       get :show, id: bike.id, format: :json
@@ -42,7 +41,7 @@ describe Api::V1::BikesController do
     end
   end
 
-  describe :create do 
+  describe 'create' do 
     before :each do
       @organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:user)

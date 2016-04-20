@@ -1,10 +1,9 @@
 require 'spec_helper'
 
 describe OrganizationsController do
-
-  describe :new do 
-    describe "it should render the page without current user" do 
-      before do 
+  describe 'new' do
+    describe "it should render the page without current user" do
+      before do
         get :new
       end
       it { is_expected.to respond_with(:success) }
@@ -12,8 +11,8 @@ describe OrganizationsController do
     end
   end
 
-  describe :create do 
-    it "creates org, membership, filters approved attrs & redirect to org with current_user" do 
+  describe 'create' do
+    it "creates org, membership, filters approved attrs & redirect to org with current_user" do
       expect(Organization.count).to eq(0)
       user = FactoryGirl.create(:user)
       set_current_user(user)
@@ -52,7 +51,7 @@ describe OrganizationsController do
       expect(organization.website).not_to eq('<script>alert(document.cookie)</script>')
     end
 
-    it "mails us" do 
+    it "mails us" do
       Sidekiq::Testing.inline! do
         user = FactoryGirl.create(:user)
         set_current_user(user)
@@ -69,7 +68,7 @@ describe OrganizationsController do
     end
   end
 
-  describe :update do
+  describe 'update' do
     it "updates some fields, send a message about maps" do
       user = FactoryGirl.create(:user)
       user2 = FactoryGirl.create(:user)
@@ -117,7 +116,7 @@ describe OrganizationsController do
       expect(msg.feedback_hash[:organization_id]).to eq(organization.id)
     end
 
-    it "sends an admin notification if there is the lightspeed retail api key" do 
+    it "sends an admin notification if there is the lightspeed retail api key" do
       user = FactoryGirl.create(:user)
       organization = FactoryGirl.create(:organization)
       membership = FactoryGirl.create(:membership, user: user, organization: organization, role: 'admin')
@@ -127,9 +126,9 @@ describe OrganizationsController do
     end
   end
 
-  describe :show do 
-    describe "user not member" do 
-      before do 
+  describe 'show' do
+    describe "user not member" do
+      before do
         organization = FactoryGirl.create(:organization)
         user = FactoryGirl.create(:user)
         set_current_user(user)
@@ -140,8 +139,8 @@ describe OrganizationsController do
       it { is_expected.to set_the_flash }
     end
     
-    describe "when user is present" do 
-      it "renders" do 
+    describe "when user is present" do
+      it "renders" do
         organization = FactoryGirl.create(:organization)
         user = FactoryGirl.create(:user)
         membership = FactoryGirl.create(:membership, user: user, organization: organization)
@@ -152,8 +151,8 @@ describe OrganizationsController do
     end
   end
 
-  describe :edit do 
-    it "renders when user is admin" do 
+  describe 'edit' do
+    it "renders when user is admin" do
       organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:user)
       membership = FactoryGirl.create(:membership, user: user, organization: organization, role: "admin")
@@ -163,8 +162,8 @@ describe OrganizationsController do
     end
   end
 
-  describe :embed do 
-    it "renders embed without xframe block" do 
+  describe 'embed' do
+    it "renders embed without xframe block" do
       organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:user)
       membership = FactoryGirl.create(:membership, user: user, organization: organization)
@@ -178,8 +177,8 @@ describe OrganizationsController do
     end
   end
 
-  describe :embed_extended do 
-    it "renders embed without xframe block" do 
+  describe 'embed_extended' do
+    it "renders embed without xframe block" do
       organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:user)
       membership = FactoryGirl.create(:membership, user: user, organization: organization)
@@ -194,8 +193,8 @@ describe OrganizationsController do
     end
   end
 
-  describe :embed do 
-    it "renders embed without xframe block" do 
+  describe 'embed' do
+    it "renders embed without xframe block" do
       organization = FactoryGirl.create(:organization)
       bike = FactoryGirl.create(:bike)
       get :embed_create_success, id: organization.slug, bike_id: bike.id

@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe Admin::FlavorTextsController do
-  describe :destroy do 
-    before do 
+  describe 'destroy' do
+    before do
       text = FlavorText.create(message: "lulz")
       user = FactoryGirl.create(:admin)
       set_current_user(user)
@@ -12,9 +12,9 @@ describe Admin::FlavorTextsController do
     it { is_expected.to set_the_flash }
   end
 
-  describe :update do 
-    describe "success" do 
-      before do 
+  describe 'update' do
+    describe "success" do
+      before do
         user = FactoryGirl.create(:admin)
         set_current_user(user)
         post :create, {flavor_text: {message: "lulz"}}

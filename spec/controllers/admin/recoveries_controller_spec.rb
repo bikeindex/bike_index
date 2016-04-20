@@ -1,9 +1,8 @@
 require 'spec_helper'
 
 describe Admin::RecoveriesController do
-
-  describe :index do 
-    before do 
+  describe 'index' do
+    before do
       user = FactoryGirl.create(:admin)
       set_current_user(user)
       get :index
@@ -13,8 +12,8 @@ describe Admin::RecoveriesController do
     it { is_expected.not_to set_the_flash }
   end
 
-  describe :approve do 
-    it "posts a single recovery" do 
+  describe 'approve' do
+    it "posts a single recovery" do
       Sidekiq::Testing.fake!
       user = FactoryGirl.create(:admin)
       set_current_user(user)

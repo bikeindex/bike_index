@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe StolenController do
-  describe :index do
+  describe 'index' do
     context 'no subdomain' do
       before do
         get :index
@@ -18,7 +18,7 @@ describe StolenController do
     end
   end
 
-  describe :faq do
+  describe 'faq' do
     it 'redirects other pages to index' do
       get :show, id: 'faq'
       expect(response).to redirect_to stolen_index_url

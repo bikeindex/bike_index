@@ -6,7 +6,7 @@ describe Admin::BikesController do
     set_current_user(user)
   end
 
-  describe :index do
+  describe 'index' do
     it 'renders' do
       get :index
       expect(response.code).to eq('200')
@@ -15,7 +15,7 @@ describe Admin::BikesController do
     end
   end
 
-  describe :duplicates do
+  describe 'duplicates' do
     it 'renders' do
       get :duplicates
       expect(response.code).to eq('200')
@@ -24,7 +24,7 @@ describe Admin::BikesController do
     end
   end
 
-  describe :edit do
+  describe 'edit' do
     it 'renders' do
       bike = FactoryGirl.create(:bike)
       get :edit, id: bike.id
@@ -34,7 +34,7 @@ describe Admin::BikesController do
     end
   end
 
-  describe :destroy do
+  describe 'destroy' do
     it 'destroys the bike' do
       bike = FactoryGirl.create(:bike)
       expect do
@@ -46,7 +46,7 @@ describe Admin::BikesController do
     end
   end
 
-  describe :update do
+  describe 'update' do
     context 'success' do
       it 'updates the bike and calls update_ownership and serial_normalizer' do
         expect_any_instance_of(BikeUpdator).to receive(:update_ownership)
@@ -97,7 +97,7 @@ describe Admin::BikesController do
     end
   end
 
-  describe :ignore_duplicate do
+  describe 'ignore_duplicate' do
     before do
       request.env["HTTP_REFERER"] = 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
     end
@@ -126,7 +126,7 @@ describe Admin::BikesController do
     end
   end
 
-  describe :update_manufacturers do
+  describe 'update_manufacturers' do
     before do
       request.env['HTTP_REFERER'] = 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
     end

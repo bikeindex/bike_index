@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe NewsController do
   context 'legacy' do
-    describe :index do
+    describe 'index' do
       it 'renders' do
         get :index
         expect(response.status).to eq(200)
@@ -11,7 +11,7 @@ describe NewsController do
       end
     end
 
-    describe :show do
+    describe 'show' do
       let(:user) { FactoryGirl.create(:user) }
       let(:blog) { Blog.create(title: 'foo title', body: "ummmmm good", user_id: user.id, old_title_slug: 'an-older-title') }
       context 'title slug' do
@@ -42,7 +42,7 @@ describe NewsController do
   end
 
   context 'revised' do
-    describe :index do
+    describe 'index' do
       it 'renders' do
         allow(controller).to receive(:revised_layout_enabled?) { true }
         get :index
@@ -52,7 +52,7 @@ describe NewsController do
       end
     end
 
-    describe :show do
+    describe 'show' do
       let(:user) { FactoryGirl.create(:user) }
       let(:blog) { Blog.create(title: 'foo title', body: "ummmmm good", user_id: user.id, old_title_slug: 'an-older-title') }
       it 'renders' do

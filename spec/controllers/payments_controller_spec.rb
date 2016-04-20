@@ -3,7 +3,7 @@ require 'spec_helper'
 describe PaymentsController do
   let(:user) { FactoryGirl.create(:user) }
 
-  describe :new do
+  describe 'new' do
     context 'with user' do
       before do
         set_current_user(user)
@@ -51,7 +51,7 @@ describe PaymentsController do
     end
   end
 
-  describe :create do
+  describe 'create' do
     let(:token) do
       Stripe::Token.create(
         card: {

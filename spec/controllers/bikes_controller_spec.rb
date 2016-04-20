@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe BikesController do
 
-  describe :index do
+  describe 'index' do
     context 'no subdomain' do
       before do
         get :index
@@ -24,7 +24,7 @@ describe BikesController do
     end
   end
 
-  describe :show do
+  describe 'show' do
     describe 'showing' do
       before do
         ownership = FactoryGirl.create(:ownership)
@@ -76,7 +76,7 @@ describe BikesController do
     end
   end
 
-  describe :spokecard do
+  describe 'spokecard' do
     it 'renders the page from bike id' do
       bike = FactoryGirl.create(:bike)
       get :spokecard, id: bike.id
@@ -84,7 +84,7 @@ describe BikesController do
     end
   end
 
-  describe :scanned do
+  describe 'scanned' do
     it 'renders the page from bike id' do
       bike = FactoryGirl.create(:bike)
       get :scanned, id: bike.id
@@ -101,7 +101,7 @@ describe BikesController do
     end
   end
 
-  describe :new do
+  describe 'new' do
     let(:user) { FactoryGirl.create(:user) }
     context 'legacy' do
       before do
@@ -191,7 +191,7 @@ describe BikesController do
   end
   
 
-  describe :create do
+  describe 'create' do
     before do
       # instantiate the required bike attrs... there is a better way to do this.
       CycleType.bike
@@ -407,7 +407,7 @@ describe BikesController do
   end
 
 
-  describe :edit do
+  describe 'edit' do
     let(:ownership) { FactoryGirl.create(:ownership) }
     let(:bike) { ownership.bike }
     context 'when there is no user' do
@@ -502,7 +502,7 @@ describe BikesController do
     end
   end
 
-  describe :update do
+  describe 'update' do
     context 'user is present but is not allowed to edit' do
       before do
         ownership = FactoryGirl.create(:ownership)

@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe Admin::MailSnippetsController do
-  describe :index do 
-    before do 
+  describe 'index' do
+    before do
       user = FactoryGirl.create(:admin)
       set_current_user(user)
       get :index
@@ -11,8 +11,8 @@ describe Admin::MailSnippetsController do
     it { is_expected.to render_template(:index) }
   end
 
-  describe :edit do 
-    before do 
+  describe 'edit' do
+    before do
       user = FactoryGirl.create(:admin)
       set_current_user(user)
       snippet = FactoryGirl.create(:mail_snippet)

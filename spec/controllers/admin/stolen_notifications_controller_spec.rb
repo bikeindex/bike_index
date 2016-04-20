@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe Admin::StolenNotificationsController do
-  describe :index do 
-    before do 
+  describe 'index' do
+    before do
       user = FactoryGirl.create(:admin)
       set_current_user(user)
       get :index
@@ -12,8 +12,8 @@ describe Admin::StolenNotificationsController do
     it { is_expected.not_to set_the_flash }
   end
 
-  describe :show do 
-    before do 
+  describe 'show' do
+    before do
       stolen_notification = FactoryGirl.create(:stolen_notification)
       user = FactoryGirl.create(:admin)
       set_current_user(user)
@@ -24,7 +24,7 @@ describe Admin::StolenNotificationsController do
     it { is_expected.not_to set_the_flash }
   end
   
-  describe :resend do 
+  describe 'resend' do
     it 'resends the stolen notification' do
       Sidekiq::Worker.clear_all
       sender = FactoryGirl.create(:user)

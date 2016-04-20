@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe PublicImagesController do
-  describe :destroy do
+  describe 'destroy' do
     it "allows a the owner of a public_image to destroy the public_image" do
       user = FactoryGirl.create(:user)
       bike = FactoryGirl.create(:bike)
@@ -27,7 +27,7 @@ describe PublicImagesController do
     end
   end
 
-  describe :show do 
+  describe 'show' do 
     it 'renders' do
       image = FactoryGirl.create(:public_image)
       get :show, id: image.id
@@ -37,7 +37,7 @@ describe PublicImagesController do
     end
   end
 
-  describe :edit do 
+  describe 'edit' do 
     it 'renders' do
       ownership = FactoryGirl.create(:ownership)
       user = ownership.owner
@@ -50,7 +50,7 @@ describe PublicImagesController do
     end
   end
 
-  describe :update do 
+  describe 'update' do 
     it 'updates things and go back to editing the bike' do 
       user = FactoryGirl.create(:user)
       bike = FactoryGirl.create(:bike)
@@ -65,7 +65,7 @@ describe PublicImagesController do
   end
 
 
-  # describe :order do 
+  # describe 'order' do 
   #   before :each do 
   #     @public_image2.listing_order = 2
   #     @public_image3 = FactoryGirl.create(:public_image, imageable: @bike)

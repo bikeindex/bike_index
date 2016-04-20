@@ -1,9 +1,8 @@
 require 'spec_helper'
 
 describe MembershipsController do
-
-  describe :edit do 
-    it "renders the edit" do 
+  describe 'edit' do
+    it "renders the edit" do
       organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:user)
       user2 = FactoryGirl.create(:user)
@@ -15,8 +14,8 @@ describe MembershipsController do
     end
   end
 
-  describe :update do 
-    it "renders the edit" do 
+  describe 'update' do
+    it "renders the edit" do
       organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:user)
       membership = FactoryGirl.create(:membership, organization: organization, user: user, role: "admin")

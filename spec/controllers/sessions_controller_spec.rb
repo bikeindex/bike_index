@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe SessionsController do
-  describe :new do
+  describe 'new' do
     context 'legacy' do
       it 'renders and calls set_return_to' do
         expect(controller).to receive(:set_return_to)
@@ -25,7 +25,7 @@ describe SessionsController do
     end
   end
 
-  describe :destroy do
+  describe 'destroy' do
     it 'logs out the current user' do
       user = FactoryGirl.create(:user)
       set_current_user(user)
@@ -36,7 +36,7 @@ describe SessionsController do
     end
   end
 
-  describe :create do
+  describe 'create' do
     describe 'when user is found' do
       before do
         @user = FactoryGirl.create(:user, confirmed: true)

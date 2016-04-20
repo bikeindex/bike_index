@@ -1,14 +1,14 @@
 require 'spec_helper'
 
 describe Admin::UsersController do
-  describe :edit do 
-    xit "404s if the user doesn't exist" do 
+  describe 'edit' do
+    xit "404s if the user doesn't exist" do
       # I have no idea why this fails. It works really, but not in tests!
       expect {
         get :edit, id: 'STUFFFFFF'
       }.to raise_error(ActionController::RoutingError)
     end
-    it 'shows the edit page if the user exists' do 
+    it 'shows the edit page if the user exists' do
       admin = FactoryGirl.create(:admin)
       user = FactoryGirl.create(:user)
       set_current_user(admin)
@@ -17,9 +17,9 @@ describe Admin::UsersController do
     end
   end
 
-  describe :update do 
+  describe 'update' do
     context 'non developer' do
-      it 'updates all the things that can be edited' do 
+      it 'updates all the things that can be edited' do
         admin = FactoryGirl.create(:admin)
         user = FactoryGirl.create(:user, confirmed: false)
         set_current_user(admin)

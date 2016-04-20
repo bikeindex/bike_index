@@ -1,9 +1,7 @@
 require "spec_helper"
 
 describe Api::V1::UsersController do
-
-  describe :current do 
-
+  describe 'current' do
     it "returns user_present = false if there is no user present" do
       get :current, format: :json
       expect(response.code).to eq('200')
@@ -11,7 +9,7 @@ describe Api::V1::UsersController do
       expect(response.headers['Access-Control-Request-Method']).not_to be_present
     end
 
-    it "returns user_present if a user is present" do 
+    it "returns user_present if a user is present" do
       # We need to test that cors isn't present
       u = FactoryGirl.create(:user)
       set_current_user(u)
@@ -24,7 +22,7 @@ describe Api::V1::UsersController do
     end
   end
 
-  describe :send_request do 
+  describe 'send_request' do
     it "actuallies send the mail" do
       Sidekiq::Testing.inline! do
         # We don't test that this is being added to Sidekiq
@@ -88,7 +86,7 @@ describe Api::V1::UsersController do
     end
 
     context 'serial request mail' do
-      it "doesn't create a new serial request mail" do 
+      it "doesn't create a new serial request mail" do
         o = FactoryGirl.create(:ownership)
         user = o.creator
         bike = o.bike
@@ -109,7 +107,7 @@ describe Api::V1::UsersController do
       end
     end
 
-    it "it untsvs a bike" do 
+    it "it untsvs a bike" do
       t = Time.now - 1.minute
       stolen_record = FactoryGirl.create(:stolen_record, tsved_at: t)
       o = FactoryGirl.create(:ownership, bike: stolen_record.bike)
@@ -134,8 +132,8 @@ describe Api::V1::UsersController do
     end
 
 
-    it "creates a new recovery request mail" do 
-      Sidekiq::Testing.inline! do 
+    it "creates a new recovery request mail" do
+      Sidekiq::Testing.inline! do
         # We don't test that this is being added to Sidekiq
         # Because we're testing that sidekiq does what it 
         # Needs to do here.
@@ -170,7 +168,7 @@ describe Api::V1::UsersController do
       end
     end
       
-    it "does not create a new serial request mailer if a user isn't present" do 
+    it "does not create a new serial request mailer if a user isn't present" do
       bike = FactoryGirl.create(:bike)
       message = { request_bike_id: bike.id, serial_update_serial: 'some update', request_reason: 'Some reason' }
       # pp message
@@ -178,7 +176,7 @@ describe Api::V1::UsersController do
       expect(response.code).to eq('403')
     end
 
-    it "does not create a new serial request mailer if wrong user user is present" do 
+    it "does not create a new serial request mailer if wrong user user is present" do
       o = FactoryGirl.create(:ownership)
       bike = o.bike
       user = FactoryGirl.create(:user)

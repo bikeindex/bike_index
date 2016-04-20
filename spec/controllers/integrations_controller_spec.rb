@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe IntegrationsController do
-  describe :create do
+  describe 'create' do
     describe 'when there is no user' do
       it 'creates an integration' do
         request.env['omniauth.auth'] = OmniAuth.config.mock_auth[:facebook]

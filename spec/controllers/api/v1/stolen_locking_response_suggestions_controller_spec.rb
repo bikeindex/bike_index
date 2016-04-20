@@ -1,9 +1,8 @@
 require 'spec_helper'
 
 describe Api::V1::StolenLockingResponseSuggestionsController do
-  
-  describe :index do
-    it "loads the page" do
+  describe 'index' do
+    it 'loads the page' do
       get :index, format: :json
       # pp response.body
       expect(response.code).to eq('200')

@@ -1,9 +1,8 @@
 require 'spec_helper'
 
-describe Api::V1::FrameMaterialsController do
-  
-  describe :index do
-    it "loads the page" do
+describe Api::V1::FrameMaterialsController do  
+  describe 'index' do
+    it 'loads the page' do
       FactoryGirl.create(:frame_material)
       get :index, format: :json
       expect(response.code).to eq('200')

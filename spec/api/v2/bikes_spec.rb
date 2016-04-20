@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe 'Bikes API V2' do
   JSON_CONTENT = { 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
-  
 
   describe 'find by id' do
     it "returns one with from an id" do

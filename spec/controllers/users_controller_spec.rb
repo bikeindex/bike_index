@@ -1,8 +1,7 @@
 require 'spec_helper'
 
 describe UsersController do
-
-  describe :new do
+  describe 'new' do
     context 'legacy' do
       context 'already signed in' do
         it 'redirects and sets the flash' do
@@ -38,7 +37,7 @@ describe UsersController do
     end
   end
 
-  describe :create do
+  describe 'create' do
     context 'legacy' do
       describe 'success' do
         it 'creates a non-confirmed record' do
@@ -78,7 +77,7 @@ describe UsersController do
       end
     end
 
-    describe :confirm do 
+    describe 'confirm' do 
       describe 'user exists' do
         it 'tells the user to log in when already confirmed' do
           @user = FactoryGirl.create(:user, confirmed: true)
@@ -133,7 +132,7 @@ describe UsersController do
     end
   end
 
-  describe :password_reset do
+  describe 'password_reset' do
     describe 'if the token is present and valid' do
       it 'logs in and redirects' do
         user = FactoryGirl.create(:user, email: 'ned@foo.com')
@@ -164,7 +163,7 @@ describe UsersController do
     end
   end
 
-  describe :show do
+  describe 'show' do
     xit "404s if the user doesn't exist" do
       # I have no idea why this fails. It works really, but not in tests!
       expect {
@@ -189,7 +188,7 @@ describe UsersController do
     end
   end
 
-  describe :accept_vendor_terms do
+  describe 'accept_vendor_terms' do
     before do
       user = FactoryGirl.create(:user)
       set_current_user(user)
@@ -199,7 +198,7 @@ describe UsersController do
     it { is_expected.to render_template(:accept_vendor_terms) }
   end
 
-  describe :accept_terms do
+  describe 'accept_terms' do
     before do
       user = FactoryGirl.create(:user)
       set_current_user(user)
@@ -209,7 +208,7 @@ describe UsersController do
     it { is_expected.to render_template(:accept_terms) }
   end
 
-  describe :edit do
+  describe 'edit' do
     before do
       user = FactoryGirl.create(:user)
       set_current_user(user)
@@ -219,7 +218,7 @@ describe UsersController do
     it { is_expected.to render_template(:edit) }
   end
 
-  describe :update do
+  describe 'update' do
     it "doesn't update user if current password not present" do
       user = FactoryGirl.create(:user, terms_of_service: false, password: 'old_pass', password_confirmation: 'old_pass')
       set_current_user(user) 

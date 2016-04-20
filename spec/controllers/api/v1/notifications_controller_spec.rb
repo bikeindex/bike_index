@@ -1,9 +1,8 @@
 require 'spec_helper'
 
 describe Api::V1::NotificationsController do
-
-  describe :send_notification_email do 
-    it "returns correct code if authentication fails" do 
+  describe 'send_notification_email' do
+    it "returns correct code if authentication fails" do
       bike = FactoryGirl.create(:bike)
       options = { some_stuff: 'things',
         other_stuff: 'Things',

@@ -1,9 +1,8 @@
 require 'spec_helper'
 
 describe Admin::OwnershipsController do
-
-  describe :edit do 
-    before do 
+  describe 'edit' do
+    before do
       ownership = FactoryGirl.create(:ownership)
       user = FactoryGirl.create(:admin)
       set_current_user(user)
@@ -14,9 +13,9 @@ describe Admin::OwnershipsController do
     it { is_expected.not_to set_the_flash }
   end
 
-  describe :update do 
-    describe "success" do 
-      before do 
+  describe 'update' do
+    describe "success" do
+      before do
         ownership = FactoryGirl.create(:ownership)
         user = FactoryGirl.create(:admin)
         set_current_user(user)

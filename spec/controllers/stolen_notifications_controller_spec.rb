@@ -7,7 +7,7 @@ describe StolenNotificationsController do
     @bike = FactoryGirl.create(:bike)
     @ownership = FactoryGirl.create(:ownership, {user: @user, bike: @bike, current: true})
   end
-  describe :create do
+  describe 'create' do
     describe "success" do
       let(:stolen_notification_attributes) { 
         stolen_notification = FactoryGirl.attributes_for(:stolen_notification)
