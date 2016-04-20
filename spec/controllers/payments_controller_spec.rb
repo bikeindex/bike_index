@@ -3,7 +3,7 @@ require 'spec_helper'
 describe PaymentsController do
   let(:user) { FactoryGirl.create(:user) }
 
-  describe :new do
+  describe 'new' do
     context 'with user' do
       before do
         set_current_user(user)
@@ -51,7 +51,7 @@ describe PaymentsController do
     end
   end
 
-  describe :create do
+  describe 'create' do
     let(:token) do
       Stripe::Token.create(
         card: {
@@ -99,7 +99,7 @@ describe PaymentsController do
           post :create, opts
         end.to change(Payment, :count).by(1)
         payment = Payment.last
-        expect(payment.is_recurring).to be_true
+        expect(payment.is_recurring).to be_truthy
         expect(payment.user_id).to eq user.id
         user.reload
         expect(user.stripe_id).to be_present
@@ -142,7 +142,7 @@ describe PaymentsController do
           post :create, opts
         end.to change(Payment, :count).by(1)
         payment = Payment.last
-        payment.email.should eq('test_user@test.com')
+        expect(payment.email).to eq('test_user@test.com')
         expect(payment.stripe_id).to be_present
         expect(payment.first_payment_date).to be_present
         expect(payment.last_payment_date).to_not be_present

@@ -1,221 +1,220 @@
 require 'spec_helper'
 
-describe User do
-  
-  describe :validations do
-    it { should have_many :payments }
-    it { should have_many :subscriptions }
-    it { should have_many :memberships }
-    it { should have_many :organization_embeds }
-    it { should have_many :organizations }
-    it { should have_many :ownerships }
-    it { should have_many :current_ownerships }
-    it { should have_many :owned_bikes }
-    it { should have_many :currently_owned_bikes }
-    it { should have_many :integrations }
-    it { should have_many :created_ownerships }
-    it { should have_many :locks }
-    it { should have_many :organization_invitations }
-    it { should have_many :oauth_applications }
-    it { should have_many :sent_stolen_notifications }
-    it { should have_many :received_stolen_notifications }
-    it { should serialize :paid_membership_info }
-    it { should serialize :my_bikes_hash }
-    it { should validate_presence_of :email }
-    it { should validate_uniqueness_of :email }
+describe User do  
+  describe 'validations' do
+    it { is_expected.to have_many :payments }
+    it { is_expected.to have_many :subscriptions }
+    it { is_expected.to have_many :memberships }
+    it { is_expected.to have_many :organization_embeds }
+    it { is_expected.to have_many :organizations }
+    it { is_expected.to have_many :ownerships }
+    it { is_expected.to have_many :current_ownerships }
+    it { is_expected.to have_many :owned_bikes }
+    it { is_expected.to have_many :currently_owned_bikes }
+    it { is_expected.to have_many :integrations }
+    it { is_expected.to have_many :created_ownerships }
+    it { is_expected.to have_many :locks }
+    it { is_expected.to have_many :organization_invitations }
+    it { is_expected.to have_many :oauth_applications }
+    it { is_expected.to have_many :sent_stolen_notifications }
+    it { is_expected.to have_many :received_stolen_notifications }
+    it { is_expected.to serialize :paid_membership_info }
+    it { is_expected.to serialize :my_bikes_hash }
+    it { is_expected.to validate_presence_of :email }
+    it { is_expected.to validate_uniqueness_of :email }
   end
 
-  describe :validate do
-    describe :create do
+  describe 'validate' do
+    describe 'create' do
       before :each do
         @user = User.new(FactoryGirl.attributes_for(:user))
-        @user.valid?.should be_true
+        expect(@user.valid?).to be_truthy
       end
 
-      it "requires password on create" do 
+      it "requires password on create" do
         @user.password = nil
         @user.password_confirmation = nil
-        @user.valid?.should be_false
-        @user.errors.messages[:password].include?("can't be blank").should be_true
+        expect(@user.valid?).to be_falsey
+        expect(@user.errors.messages[:password].include?("can't be blank")).to be_truthy
       end
 
       it "requires password and confirmation to match" do
         @user.password_confirmation = "wtf"
-        @user.valid?.should be_false
-        @user.errors.messages[:password].include?("doesn't match confirmation").should be_true
+        expect(@user.valid?).to be_falsey
+        expect(@user.errors.messages[:password].include?("doesn't match confirmation")).to be_truthy
       end
 
       it "requires at least 8 characters for the password" do
         @user.password = 'hi'
         @user.password_confirmation = 'hi'
-        @user.valid?.should be_false
-        @user.errors.messages[:password].include?('is too short (minimum is 6 characters)').should be_true
+        expect(@user.valid?).to be_falsey
+        expect(@user.errors.messages[:password].include?('is too short (minimum is 6 characters)')).to be_truthy
       end
 
       it "makes sure there is at least one letter" do
         @user.password = '1234567890'
         @user.password_confirmation = '1234567890'
-        @user.valid?.should be_false
-        @user.errors.messages[:password].include?('must contain at least one letter').should be_true
+        expect(@user.valid?).to be_falsey
+        expect(@user.errors.messages[:password].include?('must contain at least one letter')).to be_truthy
       end
     end
 
-    describe :confirm do
+    describe 'confirm' do
       before :each do
         @user = FactoryGirl.create(:user)
       end
 
       it "requires confirmation" do
-        @user.confirmed.should be_false
-        @user.confirmation_token.should_not be_nil
+        expect(@user.confirmed).to be_falsey
+        expect(@user.confirmation_token).not_to be_nil
       end
 
       it "confirms users" do
-        @user.confirm(@user.confirmation_token).should be_true
-        @user.confirmed.should be_true
-        @user.confirmation_token.should be_nil
+        expect(@user.confirm(@user.confirmation_token)).to be_truthy
+        expect(@user.confirmed).to be_truthy
+        expect(@user.confirmation_token).to be_nil
       end
 
       it "fails to confirm users" do
-        @user.confirm("wtfmate").should be_false
-        @user.confirmed.should be_false
-        @user.confirmation_token.should_not be_nil
+        expect(@user.confirm("wtfmate")).to be_falsey
+        expect(@user.confirmed).to be_falsey
+        expect(@user.confirmation_token).not_to be_nil
       end
 
       it "is bannable" do
         @user.banned = true
         @user.save
-        @user.authenticate('testme21').should == false
+        expect(@user.authenticate('testme21')).to eq(false)
       end
     end
 
-    describe :update do
+    describe 'update' do
       before :each do
         @user = FactoryGirl.create(:user)
-        @user.valid?.should be_true
+        expect(@user.valid?).to be_truthy
       end
 
       it "does not require a password on update" do
         @user.save
         @user.password = nil
         @user.password_confirmation = nil
-        @user.valid?.should be_true
+        expect(@user.valid?).to be_truthy
       end
 
 
       it "requires password and confirmation to match" do
         @user.password_confirmation = "wtf"
-        @user.valid?.should be_false
-        @user.errors.messages[:password].include?("doesn't match confirmation").should be_true
+        expect(@user.valid?).to be_falsey
+        expect(@user.errors.messages[:password].include?("doesn't match confirmation")).to be_truthy
       end
 
       it "requires at least 8 characters for the password" do
         @user.password = 'hi'
         @user.password_confirmation = 'hi'
-        @user.valid?.should be_false
-        @user.errors.messages[:password].include?('is too short (minimum is 6 characters)').should be_true
+        expect(@user.valid?).to be_falsey
+        expect(@user.errors.messages[:password].include?('is too short (minimum is 6 characters)')).to be_truthy
       end
 
       it "makes sure there is at least one letter" do
         @user.password = '1234567890'
         @user.password_confirmation = '1234567890'
-        @user.valid?.should be_false
-        @user.errors.messages[:password].include?('must contain at least one letter').should be_true
+        expect(@user.valid?).to be_falsey
+        expect(@user.errors.messages[:password].include?('must contain at least one letter')).to be_truthy
       end
     end
   end
 
-  describe :admin_authorized do 
+  describe 'admin_authorized' do
     before :all do
       @content = FactoryGirl.create(:user, is_content_admin: true)
       @admin = FactoryGirl.create(:admin)
     end
 
-    it "auths full" do 
-      @admin.admin_authorized('full').should be_true
-      @content.admin_authorized('full').should be_false
+    it "auths full" do
+      expect(@admin.admin_authorized('full')).to be_truthy
+      expect(@content.admin_authorized('full')).to be_falsey
     end
 
-    it "auths content" do 
-      @admin.admin_authorized('content').should be_true
-      @content.admin_authorized('content').should be_true
+    it "auths content" do
+      expect(@admin.admin_authorized('content')).to be_truthy
+      expect(@content.admin_authorized('content')).to be_truthy
     end
 
-    it "auths any" do 
-      @admin.admin_authorized('any').should be_true
-      @content.admin_authorized('any').should be_true
+    it "auths any" do
+      expect(@admin.admin_authorized('any')).to be_truthy
+      expect(@content.admin_authorized('any')).to be_truthy
     end
   end
 
-  describe :fuzzy_email_find do
+  describe 'fuzzy_email_find' do
     it "finds users by email address when the case doesn't match" do
       @user = FactoryGirl.create(:user, email: "ned@foo.com")
-      User.fuzzy_email_find('NeD@fOO.coM').should == @user
+      expect(User.fuzzy_email_find('NeD@fOO.coM')).to eq(@user)
     end
   end
 
-  describe :set_urls do
+  describe 'set_urls' do
     xit "adds http:// to twitter and website if the url doesn't have it so that the link goes somewhere" do
       user = User.new(show_twitter: true, twitter: "http://somewhere.com", show_website: true, website: "somewhere.org" )
       user.set_urls
-      user.website.should eq('http://somewhere.org')
+      expect(user.website).to eq('http://somewhere.org')
     end
     it "does not add http:// to twitter if it's already there" do
       user = User.new(show_twitter: true, twitter: "http://somewhere.com", show_website: true, website: "somewhere", my_bikes_link_target: 'https://something.com')
       user.set_urls
-      user.my_bikes_hash[:link_target].should eq('https://something.com')
-      user.twitter.should eq('http://somewhere.com')
+      expect(user.my_bikes_hash[:link_target]).to eq('https://something.com')
+      expect(user.twitter).to eq('http://somewhere.com')
     end
   end
 
-  describe :bikes do
+  describe 'bikes' do
     it "returns nil if the user has no bikes" do
       user = FactoryGirl.create(:user)
-      user.bikes.should be_empty
+      expect(user.bikes).to be_empty
     end
     it "returns the user's bikes if they have any hidden bikes without the hidden bikes" do
       user = FactoryGirl.create(:user)
       o = FactoryGirl.create(:ownership, owner_email: user.email, user_id: user.id)
       o2 = FactoryGirl.create(:ownership, owner_email: user.email, user_id: user.id)
       o2.bike.update_attribute :hidden, true
-      user.bike_ids.include?(o.bike.id).should be_true
-      user.bike_ids.include?(o2.bike.id).should_not be_true
-      user.bike_ids.count.should eq(1)
+      expect(user.bike_ids.include?(o.bike.id)).to be_truthy
+      expect(user.bike_ids.include?(o2.bike.id)).not_to be_truthy
+      expect(user.bike_ids.count).to eq(1)
     end
     it "returns the user's bikes if they have any hidden bikes without the hidden bikes" do
       user = FactoryGirl.create(:user)
       ownership = FactoryGirl.create(:ownership, owner_email: user.email, user_id: user.id, user_hidden: true)
       ownership.bike.update_attribute :hidden, true
-      user.bike_ids.include?(ownership.bike.id).should be_true
+      expect(user.bike_ids.include?(ownership.bike.id)).to be_truthy
     end
     it "returns the user's bikes without hidden bikes if user_hidden" do
       user = FactoryGirl.create(:user)
       ownership = FactoryGirl.create(:ownership, owner_email: user.email, user_id: user.id, user_hidden: true)
       ownership.bike.update_attribute :hidden, true
-      user.bike_ids(false).include?(ownership.bike.id).should be_false
+      expect(user.bike_ids(false).include?(ownership.bike.id)).to be_falsey
     end
   end
 
-  describe :generate_username_confirmation_and_auth do 
-    it "generates the required tokens" do 
+  describe 'generate_username_confirmation_and_auth' do
+    it "generates the required tokens" do
       user = FactoryGirl.create(:user)
-      user.auth_token.should be_present
-      user.username.should be_present
-      user.confirmation_token.should be_present
+      expect(user.auth_token).to be_present
+      expect(user.username).to be_present
+      expect(user.confirmation_token).to be_present
       time = Time.at(user.auth_token.match(/\d*\z/)[0].to_i)
-      time.should be > Time.now - 1.minutes
+      expect(time).to be > Time.now - 1.minutes
     end
-    it "haves before create callback" do 
-      User._create_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:generate_username_confirmation_and_auth).should == true      
+    it "haves before create callback" do
+      expect(User._create_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:generate_username_confirmation_and_auth)).to eq(true)      
     end
   end
 
-  describe :access_tokens_for_application do 
-    it "returns [] if no application" do 
+  describe 'access_tokens_for_application' do
+    it "returns [] if no application" do
       user = User.new 
-      user.access_tokens_for_application(nil).should eq([])
+      expect(user.access_tokens_for_application(nil)).to eq([])
     end
-    it "returns access tokens for the application" do 
+    it "returns access tokens for the application" do
       user = FactoryGirl.create(:user)
       application = Doorkeeper::Application.new(name: 'test', redirect_uri: 'https://foo.bar')
       application2 = Doorkeeper::Application.new(name: 'other_test', redirect_uri: 'https://foo.bar')
@@ -226,44 +225,44 @@ describe User do
       access_token = Doorkeeper::AccessToken.create(application_id: application.id, resource_owner_id: user.id)
       access_token2 = Doorkeeper::AccessToken.create(application_id: application2.id, resource_owner_id: user.id)
       tokens = user.reload.access_tokens_for_application(application.id)
-      tokens.first.should eq(access_token)
+      expect(tokens.first).to eq(access_token)
       tokens = user.reload.access_tokens_for_application(application2.id)
-      tokens.first.should eq(access_token2)
+      expect(tokens.first).to eq(access_token2)
     end
   end
 
-  describe :reset_token_time do 
-    it "gets long time ago if not there" do 
+  describe 'reset_token_time' do
+    it "gets long time ago if not there" do
       user = User.new
-      user.stub(:password_reset_token).and_return("c7c3b99a319ac09e2b00-2015-03-31 19:29:52 -0500")
-      user.reset_token_time.should eq(Time.at(1364777722))
+      allow(user).to receive(:password_reset_token).and_return("c7c3b99a319ac09e2b00-2015-03-31 19:29:52 -0500")
+      expect(user.reset_token_time).to eq(Time.at(1364777722))
     end
-    it "gets the time" do 
+    it "gets the time" do
       user = User.new 
       user.set_password_reset_token
-      user.reset_token_time.should be > Time.now - 2.seconds
+      expect(user.reset_token_time).to be > Time.now - 2.seconds
     end
-    it "uses input time" do 
+    it "uses input time" do
       user = FactoryGirl.create(:user)
       user.set_password_reset_token((Time.now - 61.minutes).to_i)
-      user.reload.reset_token_time.should be < (Time.now - 1.hours)
+      expect(user.reload.reset_token_time).to be < (Time.now - 1.hours)
     end
   end
 
-  describe :send_password_reset_email do 
-    it "enqueues sending the password reset" do 
+  describe 'send_password_reset_email' do
+    it "enqueues sending the password reset" do
       user = FactoryGirl.create(:user)
-      user.password_reset_token.should be_nil
+      expect(user.password_reset_token).to be_nil
       expect {
         user.send_password_reset_email
       }.to change(EmailResetPasswordWorker.jobs, :size).by(1)
-      user.reload.password_reset_token.should_not be_nil
+      expect(user.reload.password_reset_token).not_to be_nil
     end
     
-    it "doesn't send another one immediately" do 
+    it "doesn't send another one immediately" do
       user = FactoryGirl.create(:user)
       user.send_password_reset_email
-      user.should_not_receive(:set_password_reset_token)
+      expect(user).not_to receive(:set_password_reset_token)
       user.send_password_reset_email
       expect {
         user.send_password_reset_email
@@ -271,64 +270,64 @@ describe User do
     end
   end
 
-  describe :fuzzy_id do 
+  describe 'fuzzy_id' do
     it "fails with nil" do
       result = User.fuzzy_id('some stuff')
-      result.should be_nil
+      expect(result).to be_nil
     end
   end
 
-  describe :normalize_attributes do
-    it "doesn't let you overwrite usernames" do 
+  describe 'normalize_attributes' do
+    it "doesn't let you overwrite usernames" do
       target = "coolname"
       user1 = FactoryGirl.create(:user)
       user1.update_attribute :username, target
-      user1.reload.username.should eq(target)
+      expect(user1.reload.username).to eq(target)
       user2 = FactoryGirl.create(:user)
       user2.username = "#{target}'"
-      user2.save.should be_false
-      user2.errors.full_messages.to_s.should match('Username has already been taken')
-      user2.reload.username.should_not eq(target)
-      user1.reload.username.should eq(target)
+      expect(user2.save).to be_falsey
+      expect(user2.errors.full_messages.to_s).to match('Username has already been taken')
+      expect(user2.reload.username).not_to eq(target)
+      expect(user1.reload.username).to eq(target)
     end
 
     it "has before validation callback for normalizing" do
-      User._validation_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:normalize_attributes).should == true
+      expect(User._validation_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:normalize_attributes)).to eq(true)
     end
   end
 
-  describe "normalize_attributes" do 
+  describe "normalize_attributes" do
     let(:user) { FactoryGirl.build(:user, phone: "773.83ddp+83(887)", email: "SOMethinG@example.com\n") }
     before(:each) { user.normalize_attributes }
 
     it "strips the non-digit numbers from the phone input" do
-      user.phone.should eq('7738383887')
+      expect(user.phone).to eq('7738383887')
     end
 
-    it "normalizes the email" do 
-      user.email.should eq('something@example.com')
+    it "normalizes the email" do
+      expect(user.email).to eq('something@example.com')
     end
   end
 
-  describe :subscriptions do 
-    it "returns the payment if payment is subscription" do 
+  describe 'subscriptions' do
+    it "returns the payment if payment is subscription" do
       user = FactoryGirl.create(:user)
       payment = Payment.create(is_recurring: true, user_id: user)
-      user.subscriptions.should eq(user.payments.where(is_recurring: true))
+      expect(user.subscriptions).to eq(user.payments.where(is_recurring: true))
     end
   end
 
-  describe :userlink do 
-    it "returns user path if user show" do 
+  describe 'userlink' do
+    it "returns user path if user show" do
       user = User.new(show_bikes: true, username: 'coolstuff')
       # pp user
-      user.userlink.should eq('/users/coolstuff')
+      expect(user.userlink).to eq('/users/coolstuff')
     end
 
-    it "returns twitter if user twitter" do 
+    it "returns twitter if user twitter" do
       user = User.new(show_bikes: false, username: 'coolstuff', twitter: 'bikeindex')
       # pp user
-      user.userlink.should eq('https://twitter.com/bikeindex')
+      expect(user.userlink).to eq('https://twitter.com/bikeindex')
     end
   end
 

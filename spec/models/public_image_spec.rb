@@ -1,36 +1,36 @@
 require 'spec_helper'
 
 describe PublicImage do
-  describe :validations do
-    it { should belong_to :imageable }
+  describe 'validations' do
+    it { is_expected.to belong_to :imageable }
   end
   
-  describe :default_name do 
-    it "sets a default name from filename if not bike" do 
+  describe 'default_name' do
+    it "sets a default name from filename if not bike" do
       public_image = PublicImage.new
-      public_image.stub(:imageable_type).and_return("Nope")
-      public_image.stub(:name).and_return("Boop")
+      allow(public_image).to receive(:imageable_type).and_return("Nope")
+      allow(public_image).to receive(:name).and_return("Boop")
       public_image.default_name
-      public_image.name.should eq('Boop')
+      expect(public_image.name).to eq('Boop')
     end
 
     it "returns the name of the manufacturer if it isn't other" do
       public_image = PublicImage.new
       bike = FactoryGirl.create(:bike, year: 1969, frame_model: "Hobo")
-      public_image.stub(:imageable_type).and_return("Bike")
-      public_image.stub(:imageable).and_return(bike)
+      allow(public_image).to receive(:imageable_type).and_return("Bike")
+      allow(public_image).to receive(:imageable).and_return(bike)
       public_image.default_name
-      public_image.name.should eq("#{bike.title_string} #{bike.frame_colors.to_sentence}")
+      expect(public_image.name).to eq("#{bike.title_string} #{bike.frame_colors.to_sentence}")
     end
   end
 
-  describe 'lottapixel' do 
+  describe 'lottapixel' do
     it "doesn't break" do
       lottapixel = File.open(File.join(Rails.root, 'spec', 'fixtures', 'hugeimg.png'))
       public_image = FactoryGirl.build(:public_image, image: lottapixel)
       public_image.save
-      public_image.id.should be_nil
-      public_image.errors.full_messages.to_s.match('dimensions too large').should be_true
+      expect(public_image.id).to be_nil
+      expect(public_image.errors.full_messages.to_s.match('dimensions too large')).to be_truthy
     end
   end
 

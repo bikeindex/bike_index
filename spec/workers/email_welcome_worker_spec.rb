@@ -1,12 +1,12 @@
 require 'spec_helper'
 
 describe EmailWelcomeWorker do
-  it { should be_processed_in :notify }
+  it { is_expected.to be_processed_in :notify }
 
   it "enqueues listing ordering job" do
     user = FactoryGirl.create(:user)
     EmailWelcomeWorker.new.perform(user.id)
-    ActionMailer::Base.deliveries.empty?.should be_false    
+    expect(ActionMailer::Base.deliveries.empty?).to be_falsey    
   end
 
 end

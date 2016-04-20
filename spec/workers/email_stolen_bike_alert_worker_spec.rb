@@ -1,9 +1,9 @@
 require "spec_helper"
 
 describe EmailStolenBikeAlertWorker do
-  it { should be_processed_in :notify }
+  it { is_expected.to be_processed_in :notify }
 
-  describe :perform do
+  describe 'perform' do
     it "sends an email" do
       stolen_record = FactoryGirl.create(:stolen_record)
       info_hash = {
@@ -20,7 +20,7 @@ describe EmailStolenBikeAlertWorker do
       customer_contact = FactoryGirl.create(:customer_contact, bike: stolen_record.bike, info_hash: info_hash)
       ActionMailer::Base.deliveries = []
       EmailStolenBikeAlertWorker.new.perform(customer_contact.id)
-      ActionMailer::Base.deliveries.should_not be_empty
+      expect(ActionMailer::Base.deliveries).not_to be_empty
     end
 
     it "does not send an email if the stolen bike has receive_notifications false" do
@@ -29,7 +29,7 @@ describe EmailStolenBikeAlertWorker do
       customer_contact = FactoryGirl.create(:customer_contact, bike: stolen_record.bike)
       ActionMailer::Base.deliveries = []
       EmailStolenBikeAlertWorker.new.perform(customer_contact.id)
-      ActionMailer::Base.deliveries.should be_empty
+      expect(ActionMailer::Base.deliveries).to be_empty
     end
   end
   

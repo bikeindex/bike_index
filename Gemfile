@@ -94,7 +94,6 @@ source 'https://rails-assets.org' do # JS land is crazy, so lock everything
   gem 'rails-assets-Stickyfill', '~> 1.1.3'
 end
 
-
 group :assets do
   gem 'sass-rails',   '~> 3.2.6'
   gem 'coffee-rails', '~> 3.2.2'
@@ -103,31 +102,25 @@ group :assets do
 end
 
 group :development do
-  # gem 'ruby_gntp' # For linux
   gem 'rerun'
-  gem 'growl'
   gem 'guard'
-  gem 'guard-rspec', '~> 4.2.10'
+  gem 'guard-rspec', '~> 4.6.4'
   gem 'guard-rubocop'
-  gem 'bullet'
-  gem 'should_clean'
-  gem 'brakeman', :require => false
 end
 
 group :development, :test do
   gem 'rb-fsevent', '~> 0.9.1'
-  gem 'rspec-rails'
+  gem 'rspec', '~> 3.3.0'
+  gem 'rspec-rails', '~> 3.3.0'
+  gem 'shoulda-matchers', '~> 2.8.0'
   gem 'foreman'
   gem 'database_cleaner'
-  gem 'json_spec'
   gem 'dotenv-rails'
 end
 
 group :test do
-  gem 'factory_girl_rails'
-  gem 'simplecov', require: false
+  gem 'factory_girl_rails', '~> 4.2.1'
   gem 'codeclimate-test-reporter', require: nil
-  gem 'rspec-sidekiq'
-  gem 'shoulda-matchers'
+  gem 'rspec-sidekiq', '~> 2.2.0'
   gem 'pry'
 end

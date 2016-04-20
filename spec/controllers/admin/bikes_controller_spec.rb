@@ -6,7 +6,7 @@ describe Admin::BikesController do
     set_current_user(user)
   end
 
-  describe :index do
+  describe 'index' do
     it 'renders' do
       get :index
       expect(response.code).to eq('200')
@@ -15,7 +15,7 @@ describe Admin::BikesController do
     end
   end
 
-  describe :duplicates do
+  describe 'duplicates' do
     it 'renders' do
       get :duplicates
       expect(response.code).to eq('200')
@@ -24,7 +24,7 @@ describe Admin::BikesController do
     end
   end
 
-  describe :edit do
+  describe 'edit' do
     it 'renders' do
       bike = FactoryGirl.create(:bike)
       get :edit, id: bike.id
@@ -34,7 +34,7 @@ describe Admin::BikesController do
     end
   end
 
-  describe :destroy do
+  describe 'destroy' do
     it 'destroys the bike' do
       bike = FactoryGirl.create(:bike)
       expect do
@@ -46,7 +46,7 @@ describe Admin::BikesController do
     end
   end
 
-  describe :update do
+  describe 'update' do
     context 'success' do
       it 'updates the bike and calls update_ownership and serial_normalizer' do
         expect_any_instance_of(BikeUpdator).to receive(:update_ownership)
@@ -62,7 +62,7 @@ describe Admin::BikesController do
       it 'marks a stolen bike recovered and passes attr update through' do
         bike = FactoryGirl.create(:stolen_bike)
         bike.reload
-        expect(bike.stolen).to be_true
+        expect(bike.stolen).to be_truthy
         opts = {
           id: bike.id,
           mark_recovered_reason: "I recovered it", 
@@ -74,9 +74,9 @@ describe Admin::BikesController do
         expect do
           put :update, opts
         end.to change(RecoveryUpdateWorker.jobs, :size).by(1)
-        expect(assigns(:fast_attr_update)).to be_true
+        expect(assigns(:fast_attr_update)).to be_truthy
         bike.reload
-        expect(bike.stolen).to be_false
+        expect(bike.stolen).to be_falsey
       end
     end
 
@@ -97,18 +97,18 @@ describe Admin::BikesController do
     end
   end
 
-  describe :ignore_duplicate do
+  describe 'ignore_duplicate' do
     before do
       request.env["HTTP_REFERER"] = 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
     end
     context 'marked ignore' do
       it 'duplicates are ignore' do
         duplicate_bike_group = DuplicateBikeGroup.create
-        expect(duplicate_bike_group.ignore).to be_false
+        expect(duplicate_bike_group.ignore).to be_falsey
         put :ignore_duplicate_toggle, id: duplicate_bike_group.id 
         duplicate_bike_group.reload
 
-        expect(duplicate_bike_group.ignore).to be_true
+        expect(duplicate_bike_group.ignore).to be_truthy
         expect(response).to redirect_to 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
       end
     end
@@ -116,17 +116,17 @@ describe Admin::BikesController do
     context 'duplicate group unignore' do
       it "marks a duplicate group unignore" do
         duplicate_bike_group = DuplicateBikeGroup.create(ignore: true)
-        expect(duplicate_bike_group.ignore).to be_true
+        expect(duplicate_bike_group.ignore).to be_truthy
         put :ignore_duplicate_toggle, id: duplicate_bike_group.id 
         duplicate_bike_group.reload
 
-        expect(duplicate_bike_group.ignore).to be_false
+        expect(duplicate_bike_group.ignore).to be_falsey
         expect(response).to redirect_to 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
       end
     end
   end
 
-  describe :update_manufacturers do
+  describe 'update_manufacturers' do
     before do
       request.env['HTTP_REFERER'] = 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
     end

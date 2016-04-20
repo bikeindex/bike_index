@@ -6,7 +6,7 @@ describe Admin::StolenBikesController do
     set_current_user(user)
   end
 
-  describe :index do
+  describe 'index' do
     it 'renders' do
       get :index
       expect(response.code).to eq('200')
@@ -15,7 +15,7 @@ describe Admin::StolenBikesController do
     end
   end
 
-  describe :edit do
+  describe 'edit' do
     it 'renders' do
       bike = FactoryGirl.create(:bike)
       get :edit, id: bike.id 
@@ -25,7 +25,7 @@ describe Admin::StolenBikesController do
     end
   end
 
-  describe :update do
+  describe 'update' do
     context 'success' do
       it 'updates the bike and calls update_ownership and serial_normalizer' do
         expect_any_instance_of(BikeUpdator).to receive(:update_ownership)

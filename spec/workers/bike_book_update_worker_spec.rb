@@ -1,19 +1,19 @@
 require 'spec_helper'
 
 describe BikeBookUpdateWorker do
-  it { should be_processed_in :updates }
+  it { is_expected.to be_processed_in :updates }
 
   it "enqueues listing ordering job" do
     BikeBookUpdateWorker.perform_async
     expect(BikeBookUpdateWorker).to have_enqueued_job
   end
 
-  it "Doesn't break if the bike isn't on bikebook" do 
+  it "Doesn't break if the bike isn't on bikebook" do
     bike = FactoryGirl.create(:bike)
     BikeBookUpdateWorker.new.perform(bike.id)
   end
 
-  it "grabs the components and doesn't overwrite components nothing if the bike isn't on bikebook" do 
+  it "grabs the components and doesn't overwrite components nothing if the bike isn't on bikebook" do
     manufacturer = FactoryGirl.create(:manufacturer, name: "SE Bikes")
     bike = FactoryGirl.create(:bike,
       manufacturer_id: manufacturer.id,
@@ -35,18 +35,18 @@ describe BikeBookUpdateWorker do
     component1 = FactoryGirl.create(:component,
       bike: bike, ctype_id: Ctype.find_by_slug('fork').id,
       description: "SE straight Leg Hi-Ten w/ Fender Mounts & Wide Tire Clearance")
-    component1.is_stock.should be_false
+    expect(component1.is_stock).to be_falsey
     component2 = FactoryGirl.create(:component,
       bike: bike, ctype_id: Ctype.find_by_slug('crankset').id,
       description: "Sweet cranks")
     BikeBookUpdateWorker.new.perform(bike.id)
     bike.reload
-    bike.components.count.should eq(14)
-    bike.components.where(id: component1.id).first.is_stock.should be_true
-    bike.components.where(id: component2.id).first.is_stock.should be_false
-    bike.components.where(is_stock: false).count.should eq(1)
-    bike.components.where(ctype_id: component2.ctype_id).count.should eq(1)
-    (Ctype.pluck(:id) - bike.components.pluck(:ctype_id)).should eq([])
+    expect(bike.components.count).to eq(14)
+    expect(bike.components.where(id: component1.id).first.is_stock).to be_truthy
+    expect(bike.components.where(id: component2.id).first.is_stock).to be_falsey
+    expect(bike.components.where(is_stock: false).count).to eq(1)
+    expect(bike.components.where(ctype_id: component2.ctype_id).count).to eq(1)
+    expect(Ctype.pluck(:id) - bike.components.pluck(:ctype_id)).to eq([])
   end
 
   

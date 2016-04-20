@@ -5,8 +5,8 @@ describe MailerIntegrationsController do
     before do
       get :index
     end
-    it { should respond_with(:success) }
-    it { should render_template(:index) }
+    it { is_expected.to respond_with(:success) }
+    it { is_expected.to render_template(:index) }
   end
 
   describe 'show' do
@@ -23,8 +23,8 @@ describe MailerIntegrationsController do
         before do
           get :show, id: template_name
         end
-        it { should respond_with(:success) }
-        it { should render_template(template_name) }
+        it { is_expected.to respond_with(:success) }
+        it { is_expected.to render_template(template_name) }
       end
     end
   end

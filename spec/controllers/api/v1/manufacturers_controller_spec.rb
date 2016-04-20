@@ -1,17 +1,17 @@
 require 'spec_helper'
 
 describe Api::V1::ManufacturersController do  
-  describe :index do
-    it "loads the request" do
+  describe 'index' do
+    it 'loads the request' do
       m = FactoryGirl.create(:manufacturer)
       get :index, format: :json
-      response.code.should eq('200')
-      JSON.parse(response.body)['manufacturers'][0]['name'].should eq(m.name)
-      response.headers['Access-Control-Allow-Origin'].should eq('*')
-      response.headers['Access-Control-Allow-Methods'].should eq('POST, PUT, GET, OPTIONS')
-      response.headers['Access-Control-Request-Method'].should eq('*')
-      response.headers['Access-Control-Allow-Headers'].should eq('Origin, X-Requested-With, Content-Type, Accept, Authorization')
-      response.headers['Access-Control-Max-Age'].should eq("1728000")
+      expect(response.code).to eq('200')
+      expect(JSON.parse(response.body)['manufacturers'][0]['name']).to eq(m.name)
+      expect(response.headers['Access-Control-Allow-Origin']).to eq('*')
+      expect(response.headers['Access-Control-Allow-Methods']).to eq('POST, PUT, GET, OPTIONS')
+      expect(response.headers['Access-Control-Request-Method']).to eq('*')
+      expect(response.headers['Access-Control-Allow-Headers']).to eq('Origin, X-Requested-With, Content-Type, Accept, Authorization')
+      expect(response.headers['Access-Control-Max-Age']).to eq("1728000")
     end
   end    
 end

@@ -1,22 +1,21 @@
 require 'spec_helper'
 
 describe BikesController do
-
-  describe :index do
+  describe 'index' do
     context 'no subdomain' do
       before do
         get :index
       end
-      it { should respond_with(:success) }
-      it { should render_template(:index) }
-      it { should_not set_the_flash }
+      it { is_expected.to respond_with(:success) }
+      it { is_expected.to render_template(:index) }
+      it { is_expected.not_to set_the_flash }
 
-      it 'should set per_page correctly' do
+      it 'sets per_page correctly' do
         expect(assigns(:per_page)).to eq 10
       end
     end
     context 'with subdomain' do
-      it 'should redirect to no subdomain' do
+      it 'redirects to no subdomain' do
         @request.host = 'stolen.example.com'
         get :index
         expect(response).to redirect_to bikes_url(subdomain: false)
@@ -24,16 +23,16 @@ describe BikesController do
     end
   end
 
-  describe :show do
+  describe 'show' do
     describe 'showing' do
       before do
         ownership = FactoryGirl.create(:ownership)
         get :show, id: ownership.bike.id
       end
-      it { should respond_with(:success) }
-      it { should render_template(:show) }
-      it { should_not set_the_flash }
-      it { assigns(:bike).should be_decorated }
+      it { is_expected.to respond_with(:success) }
+      it { is_expected.to render_template(:show) }
+      it { is_expected.not_to set_the_flash }
+      it { expect(assigns(:bike)).to be_decorated }
     end
 
     describe 'showing example' do
@@ -42,8 +41,8 @@ describe BikesController do
         ownership.bike.update_attributes(example: true)
         get :show, id: ownership.bike.id
       end
-      it { should respond_with(:success) }
-      it { should render_template(:show) }
+      it { is_expected.to respond_with(:success) }
+      it { is_expected.to render_template(:show) }
     end
 
     describe 'hiding hidden bikes' do
@@ -52,8 +51,8 @@ describe BikesController do
         ownership.bike.update_attributes(hidden: true)
         get :show, id: ownership.bike.id
       end
-      it { should set_the_flash }
-      it { should redirect_to root_url }
+      it { is_expected.to set_the_flash }
+      it { is_expected.to redirect_to root_url }
     end
 
     describe 'showing user-hidden bikes' do
@@ -76,7 +75,7 @@ describe BikesController do
     end
   end
 
-  describe :spokecard do
+  describe 'spokecard' do
     it 'renders the page from bike id' do
       bike = FactoryGirl.create(:bike)
       get :spokecard, id: bike.id
@@ -84,7 +83,7 @@ describe BikesController do
     end
   end
 
-  describe :scanned do
+  describe 'scanned' do
     it 'renders the page from bike id' do
       bike = FactoryGirl.create(:bike)
       get :scanned, id: bike.id
@@ -101,7 +100,7 @@ describe BikesController do
     end
   end
 
-  describe :new do
+  describe 'new' do
     let(:user) { FactoryGirl.create(:user) }
     context 'legacy' do
       before do
@@ -117,14 +116,14 @@ describe BikesController do
         set_current_user(user)
         get :new, { stolen: true }
         expect(response.code).to eq('200')
-        expect(assigns(:bike).stolen).to be_true
+        expect(assigns(:bike).stolen).to be_truthy
       end
 
       it 'renders a new recovered bike' do
         set_current_user(user)
         get :new, { recovered: true }
         expect(response.code).to eq('200')
-        expect(assigns(:bike).recovered).to be_true
+        expect(assigns(:bike).recovered).to be_truthy
       end
 
       it 'renders a new organization bike' do
@@ -148,9 +147,9 @@ describe BikesController do
         it 'renders a new stolen bike' do
           get :new, stolen: true
           expect(response.code).to eq('200')
-          expect(assigns(:bike).stolen).to be_true
+          expect(assigns(:bike).stolen).to be_truthy
           b_param = assigns(:b_param)
-          expect(b_param.revised_new?).to be_true
+          expect(b_param.revised_new?).to be_truthy
           expect(response).to render_with_layout('application_revised')
         end
       end
@@ -170,7 +169,7 @@ describe BikesController do
             get :new, b_param_token: b_param.id_token
             bike = assigns(:bike)
             expect(assigns(:b_param)).to eq b_param
-            expect(bike.is_a?(Bike)).to be_true
+            expect(bike.is_a?(Bike)).to be_truthy
             bike_attrs.each { |k,v| expect(bike.send(k)).to eq(v) }
             expect(response).to render_with_layout('application_revised')
           end
@@ -180,7 +179,7 @@ describe BikesController do
             b_param = BParam.create(creator_id: FactoryGirl.create(:user).id)
             get :new, b_param_token: b_param.id_token
             bike = assigns(:bike)
-            expect(bike.is_a?(Bike)).to be_true
+            expect(bike.is_a?(Bike)).to be_truthy
             expect(assigns(:b_param)).to_not eq b_param
             expect(response).to render_with_layout('application_revised')
             expect(flash[:notice]).to match(/sorry/i)
@@ -191,7 +190,7 @@ describe BikesController do
   end
   
 
-  describe :create do
+  describe 'create' do
     before do
       # instantiate the required bike attrs... there is a better way to do this.
       CycleType.bike
@@ -227,9 +226,9 @@ describe BikesController do
         it 'renders new if there is an error and update the b_params' do
           bike = Bike.new(@bike)
           bike.errors.add(:errory, 'something')
-          BikeCreator.any_instance.should_receive(:create_bike).and_return(bike)
+          expect_any_instance_of(BikeCreator).to receive(:create_bike).and_return(bike)
           post :create, { bike: @bike }
-          @b_param.reload.bike_errors.should_not be_nil
+          expect(@b_param.reload.bike_errors).not_to be_nil
           expect(response).to render_template('new')
         end
         
@@ -246,9 +245,9 @@ describe BikesController do
           expect do
             post :create, { stolen: 'true', bike: @bike }
           end.to change(StolenRecord, :count).by(1)
-          @b_param.reload.created_bike_id.should_not be_nil
-          @b_param.reload.bike_errors.should be_nil
-          @user.reload.phone.should eq('3123799513')
+          expect(@b_param.reload.created_bike_id).not_to be_nil
+          expect(@b_param.reload.bike_errors).to be_nil
+          expect(@user.reload.phone).to eq('3123799513')
         end
 
         it 'creates a new ownership and bike from an organization' do
@@ -258,7 +257,7 @@ describe BikesController do
           expect do
             post :create, { bike: @bike }
           end.to change(Ownership, :count).by(1)
-          Bike.last.creation_organization_id.should eq(organization.id)
+          expect(Bike.last.creation_organization_id).to eq(organization.id)
         end
       end
       
@@ -285,8 +284,8 @@ describe BikesController do
             post :create, { bike: bike }
           end.to change(Ownership, :count).by(1)
           bike = Bike.last
-          bike.creation_organization_id.should eq(organization.id)
-          bike.additional_registration.should eq('Testly secondary')
+          expect(bike.creation_organization_id).to eq(organization.id)
+          expect(bike.additional_registration).to eq('Testly secondary')
         end
       end
 
@@ -300,7 +299,7 @@ describe BikesController do
             manufacturer = FactoryGirl.create(:manufacturer)
             b_param = BParam.create(creator_id: organization.auto_user.id, params: {creation_organization_id: organization.id, embeded: true})
             test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg')))
-            ImageAssociatorWorker.any_instance.should_receive(:perform).and_return(true)
+            expect_any_instance_of(ImageAssociatorWorker).to receive(:perform).and_return(true)
             bike = { serial_number: '69',
               b_param_id_token: b_param.id_token,
               creation_organization_id: organization.id,
@@ -407,7 +406,7 @@ describe BikesController do
   end
 
 
-  describe :edit do
+  describe 'edit' do
     let(:ownership) { FactoryGirl.create(:ownership) }
     let(:bike) { ownership.bike }
     context 'when there is no user' do
@@ -477,7 +476,7 @@ describe BikesController do
               }.as_json
               bike.update_attribute :stolen, true
               bike.reload
-              expect(bike.stolen).to be_true
+              expect(bike.stolen).to be_truthy
               get :edit, id: bike.id
               expect(response).to render_with_layout 'application_revised'
               expect(response).to be_success
@@ -502,7 +501,7 @@ describe BikesController do
     end
   end
 
-  describe :update do
+  describe 'update' do
     context 'user is present but is not allowed to edit' do
       before do
         ownership = FactoryGirl.create(:ownership)
@@ -510,9 +509,9 @@ describe BikesController do
         set_current_user(user)
         put :update, id: ownership.bike.id, bike: { serial_number: '69' }
       end
-      it { should respond_with(:redirect)}
-      it { should redirect_to(bike_url) }
-      it { should set_the_flash }
+      it { is_expected.to respond_with(:redirect)}
+      it { is_expected.to redirect_to(bike_url) }
+      it { is_expected.to set_the_flash }
     end
 
     context 'creator present (who is allowed to edit)' do
@@ -528,28 +527,28 @@ describe BikesController do
         put :update, id: bike.id, bike: { description: '69' }
         expect(response).to redirect_to edit_bike_url(bike)
         bike.reload
-        bike.description.should eq('69')
+        expect(bike.description).to eq('69')
       end
 
       it 'updates the bike' do
         put :update, id: bike.id, bike: { description: '69', marked_user_hidden: '0' }
         bike.reload
-        bike.description.should eq('69')
+        expect(bike.description).to eq('69')
         expect(response).to redirect_to edit_bike_url(bike)
-        assigns(:bike).should be_decorated
-        bike.hidden.should be_false
+        expect(assigns(:bike)).to be_decorated
+        expect(bike.hidden).to be_falsey
       end
 
       it 'marks the bike unhidden' do
         bike.update_attribute :marked_user_hidden, '1'
         bike.reload
-        bike.hidden.should be_true
+        expect(bike.hidden).to be_truthy
         put :update, id: bike.id, bike: { marked_user_unhidden: 'true' }
-        bike.reload.hidden.should be_false
+        expect(bike.reload.hidden).to be_falsey
       end
 
       it 'creates a new ownership if the email changes' do
-        expect do 
+        expect do
           put :update, id: bike.id, bike: { owner_email: 'new@email.com' }
         end.to change(Ownership, :count).by(1)
       end
@@ -557,17 +556,17 @@ describe BikesController do
       it "redirects to return_to if it's a valid url" do
         session[:return_to] = '/about'
         put :update, id: bike.id, bike: { description: '69', marked_user_hidden: '0' }
-        bike.reload.description.should eq('69')
+        expect(bike.reload.description).to eq('69')
         expect(response).to redirect_to '/about'
-        session[:return_to].should be_nil
+        expect(session[:return_to]).to be_nil
       end
 
       it "doesn't redirect and clears the session if not a valid url" do
         session[:return_to] = 'http://testhost.com/bad_place'
         put :update, id: bike.id, bike: { description: '69', marked_user_hidden: '0' }
         bike.reload
-        bike.description.should eq('69')
-        session[:return_to].should be_nil
+        expect(bike.description).to eq('69')
+        expect(session[:return_to]).to be_nil
         expect(response).to redirect_to edit_bike_url
       end
     end
@@ -583,10 +582,10 @@ describe BikesController do
       it 'updates the bike' do
         put :update, id: bike.id, bike: { description: '69', marked_user_hidden: '0' }
         bike.reload
-        bike.description.should eq('69')
+        expect(bike.description).to eq('69')
         expect(response).to redirect_to edit_bike_url(bike)
-        assigns(:bike).should be_decorated
-        bike.hidden.should be_false
+        expect(assigns(:bike)).to be_decorated
+        expect(bike.hidden).to be_falsey
       end
     end
   end

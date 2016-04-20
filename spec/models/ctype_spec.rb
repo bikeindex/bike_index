@@ -11,29 +11,29 @@ describe Ctype do
 
     it "adds component_types to the list" do
       import_file = File.open(Rails.root.to_s + "/spec/fixtures/component-type-test-import.csv")
-      lambda {
+      expect {
         Ctype.import(import_file)
-      }.should change(Ctype, :count).by(2)
+      }.to change(Ctype, :count).by(2)
     end
     
-    it "adds in all the attributes that are listed" do 
+    it "adds in all the attributes that are listed" do
       import_file = File.open(Rails.root.to_s + "/spec/fixtures/component-type-test-import.csv")
       Ctype.import(import_file)
       @component_type = Ctype.find_by_name("Pedal")
-      @component_type.name.should eq('Pedal')
-      @component_type.secondary_name.should eq('Wingnut')
-      @component_type.cgroup_id.should eq(@component_group.id)
+      expect(@component_type.name).to eq('Pedal')
+      expect(@component_type.secondary_name).to eq('Wingnut')
+      expect(@component_type.cgroup_id).to eq(@component_group.id)
       @component_type2 = Ctype.find_by_slug("wheel")
-      @component_type2.secondary_name.should eq('Spinny')
+      expect(@component_type2.secondary_name).to eq('Spinny')
     end
 
-    it "updates attributes on a second upload" do 
+    it "updates attributes on a second upload" do
       import_file = File.open(Rails.root.to_s + "/spec/fixtures/component-type-test-import.csv")
       Ctype.import(import_file)
       second_import_file = File.open(Rails.root.to_s + "/spec/fixtures/component-type-test-import-second.csv")
       Ctype.import(second_import_file)
       @component_type = Ctype.find_by_slug("pedal")
-      @component_type.secondary_name.should eq('New name')
+      expect(@component_type.secondary_name).to eq('New name')
     end
 
   end

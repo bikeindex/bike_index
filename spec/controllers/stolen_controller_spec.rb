@@ -1,16 +1,16 @@
 require 'spec_helper'
 
 describe StolenController do
-  describe :index do
+  describe 'index' do
     context 'no subdomain' do
       before do
         get :index
       end
-      it { should respond_with(:success) }
-      it { should render_template(:index) }
+      it { is_expected.to respond_with(:success) }
+      it { is_expected.to render_template(:index) }
     end
     context 'with subdomain' do
-      it 'should redirect to no subdomain' do
+      it 'redirects to no subdomain' do
         @request.host = 'stolen.example.com'
         get :index
         expect(response).to redirect_to stolen_index_url(subdomain: false)
@@ -18,7 +18,7 @@ describe StolenController do
     end
   end
 
-  describe :faq do
+  describe 'faq' do
     it 'redirects other pages to index' do
       get :show, id: 'faq'
       expect(response).to redirect_to stolen_index_url

@@ -1,9 +1,8 @@
 require 'spec_helper'
 
 describe Admin::CustomerContactsController do
-
-  describe :create do 
-    it "creates the contact, send the email and redirect to the bike" do 
+  describe 'create' do
+    it "creates the contact, send the email and redirect to the bike" do
       stolen_record = FactoryGirl.create(:stolen_record)
       # pp stolen_record.bike.id
       user = FactoryGirl.create(:admin)
@@ -18,8 +17,7 @@ describe Admin::CustomerContactsController do
       expect {
         post :create, {customer_contact: customer_contact}
       }.to change(EmailAdminContactStolenWorker.jobs, :size).by(1)
-      response.should redirect_to edit_admin_stolen_bike_url(stolen_record.bike.id)
+      expect(response).to redirect_to edit_admin_stolen_bike_url(stolen_record.bike.id)
     end
   end
-
 end

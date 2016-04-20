@@ -1,20 +1,19 @@
 require 'spec_helper'
 
 describe Api::V1::BikesController do
-  
-  describe :index do
+  describe 'index' do
     it "loads the page and have the correct headers" do
       FactoryGirl.create(:bike)
       get :index, format: :json
-      response.code.should eq('200')
+      expect(response.code).to eq('200')
     end
   end
 
-  describe :stolen_ids do
-    it "returns correct code if no org" do 
+  describe 'stolen_ids' do
+    it "returns correct code if no org" do
       c = FactoryGirl.create(:color)
       get :stolen_ids, format: :json
-      response.code.should eq("401")
+      expect(response.code).to eq("401")
     end
 
     xit "should return an array of ids" do
@@ -26,23 +25,23 @@ describe Api::V1::BikesController do
       FactoryGirl.create(:membership, user: user, organization: organization)
       options = { stolen: true, organization_slug: organization.slug, access_token: organization.access_token}
       get :stolen_ids, options, format: :json
-      response.code.should eq('200')
+      expect(response.code).to eq('200')
       # pp response
       bikes = JSON.parse(response.body)
-      bikes.count.should eq(1)
-      bikes.first.should eq(stole2.bike.id)
+      expect(bikes.count).to eq(1)
+      expect(bikes.first).to eq(stole2.bike.id)
     end
   end
 
-  describe :show do
+  describe 'show' do
     it "loads the page" do
       bike = FactoryGirl.create(:bike)
       get :show, id: bike.id, format: :json
-      response.code.should eq("200")
+      expect(response.code).to eq("200")
     end
   end
 
-  describe :create do 
+  describe 'create' do
     before :each do
       @organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:user)
@@ -52,23 +51,23 @@ describe Api::V1::BikesController do
       FactoryGirl.create(:propulsion_type, name: "Foot pedal")
     end
 
-    it "returns correct code if not logged in" do 
+    it "returns correct code if not logged in" do
       c = FactoryGirl.create(:color)
       post :create, { bike: { serial_number: '69', color: c.name } }
-      response.code.should eq("401")
+      expect(response.code).to eq("401")
     end
 
-    it "returns correct code if bike has errors" do 
+    it "returns correct code if bike has errors" do
       c = FactoryGirl.create(:color)
       post :create, { bike: { serial_number: '69', color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }
-      response.code.should eq("422")
+      expect(response.code).to eq("422")
     end
 
-    it "emails us if it can't create a record" do 
+    it "emails us if it can't create a record" do
       c = FactoryGirl.create(:color)
-      lambda {
+      expect {
         post :create, { bike: { serial_number: '69', color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }
-      }.should change(Feedback, :count).by(1)
+      }.to change(Feedback, :count).by(1)
     end
 
     it "creates a record and reset example" do
@@ -107,25 +106,25 @@ describe Api::V1::BikesController do
         'http://i.imgur.com/lybYl1l.jpg',
         'http://i.imgur.com/3BGQeJh.jpg'
       ]
-      OwnershipCreator.any_instance.should_receive(:send_notification_email)
-      lambda { 
+      expect_any_instance_of(OwnershipCreator).to receive(:send_notification_email)
+      expect { 
         post :create, { bike: bike, organization_slug: @organization.slug, access_token: @organization.access_token, components: components, photos: photos}
-      }.should change(Ownership, :count).by(1)
-      response.code.should eq("200")
+      }.to change(Ownership, :count).by(1)
+      expect(response.code).to eq("200")
       b = Bike.where(serial_number: "69 non-example").first
-      b.example.should be_false
-      b.creation_organization_id.should eq(@organization.id)
-      b.year.should eq(1969)
-      b.components.count.should eq(3)
+      expect(b.example).to be_falsey
+      expect(b.creation_organization_id).to eq(@organization.id)
+      expect(b.year).to eq(1969)
+      expect(b.components.count).to eq(3)
       component = b.components[2]
-      component.serial_number.should eq('69')
-      component.description.should eq("yeah yay!")
-      component.ctype.slug.should eq("headset")
-      component.year.should eq(1999)
-      component.manufacturer_id.should eq(manufacturer.id)
-      component.model_name.should eq('Richie rich')
-      b.public_images.count.should eq(2)
-      f_count.should eq(Feedback.count)
+      expect(component.serial_number).to eq('69')
+      expect(component.description).to eq("yeah yay!")
+      expect(component.ctype.slug).to eq("headset")
+      expect(component.year).to eq(1999)
+      expect(component.manufacturer_id).to eq(manufacturer.id)
+      expect(component.model_name).to eq('Richie rich')
+      expect(b.public_images.count).to eq(2)
+      expect(f_count).to eq(Feedback.count)
     end
 
     it "creates a photos even if one fails" do
@@ -149,7 +148,7 @@ describe Api::V1::BikesController do
       ]
       post :create, { bike: bike, organization_slug: @organization.slug, access_token: @organization.access_token, photos: photos}
       b = Bike.where(serial_number: "69 photo-test").first
-      b.public_images.count.should eq(1)
+      expect(b.public_images.count).to eq(1)
     end
 
     it "creates a stolen record" do
@@ -179,18 +178,18 @@ describe Api::V1::BikesController do
         locking_description: 'some locking description',
         lock_defeat_description: 'broken in some crazy way'
       }
-      OwnershipCreator.any_instance.should_receive(:send_notification_email)
-      lambda { 
+      expect_any_instance_of(OwnershipCreator).to receive(:send_notification_email)
+      expect { 
         post :create, { bike: bike, stolen_record: stolen_record, organization_slug: @organization.slug, access_token: @organization.access_token }
-      }.should change(Ownership, :count).by(1)
-      response.code.should eq("200")
+      }.to change(Ownership, :count).by(1)
+      expect(response.code).to eq("200")
       b = Bike.unscoped.where(serial_number: "69 stolen bike").first
       csr = b.find_current_stolen_record
-      csr.address.should be_present
-      csr.phone.should eq("9999999")
-      csr.date_stolen.should eq(DateTime.strptime("03-01-2013 06", "%m-%d-%Y %H"))
-      csr.locking_description.should eq('some locking description')
-      csr.lock_defeat_description.should eq('broken in some crazy way')
+      expect(csr.address).to be_present
+      expect(csr.phone).to eq("9999999")
+      expect(csr.date_stolen).to eq(DateTime.strptime("03-01-2013 06", "%m-%d-%Y %H"))
+      expect(csr.locking_description).to eq('some locking description')
+      expect(csr.lock_defeat_description).to eq('broken in some crazy way')
     end
 
     it "creates an example bike if the bike is from example, and include all the options" do
@@ -213,17 +212,17 @@ describe Api::V1::BikesController do
       }
 
       expect {
-        lambda { 
+        expect { 
           post :create, { bike: bike, organization_slug: org.slug, access_token: org.access_token }
-        }.should change(Ownership, :count).by(1)
+        }.to change(Ownership, :count).by(1)
       }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
-      response.code.should eq("200")
+      expect(response.code).to eq("200")
       b = Bike.unscoped.where(serial_number: "69 example bikez").first
-      b.example.should be_true
-      b.paint.name.should eq("grazeen")
-      b.description.should eq("something else")
-      b.frame_material.slug.should eq("whatevah")
-      b.handlebar_type.slug.should eq("foo")
+      expect(b.example).to be_truthy
+      expect(b.paint.name).to eq("grazeen")
+      expect(b.description).to eq("something else")
+      expect(b.frame_material.slug).to eq("whatevah")
+      expect(b.handlebar_type.slug).to eq("foo")
     end  
 
     it "creates a record even if the post is a string" do
@@ -240,10 +239,10 @@ describe Api::V1::BikesController do
         owner_email: "jsoned@examples.com"
       }
       options = { bike: bike.to_json, organization_slug: @organization.slug, access_token: @organization.access_token } 
-      lambda { 
+      expect { 
         post :create, options
-      }.should change(Ownership, :count).by(1)
-      response.code.should eq("200")    
+      }.to change(Ownership, :count).by(1)
+      expect(response.code).to eq("200")    
     end
 
     it "does not send an ownership email if it has no_email set" do
@@ -262,11 +261,11 @@ describe Api::V1::BikesController do
       }
       options = { bike: bike.to_json, organization_slug: @organization.slug, access_token: @organization.access_token } 
       expect {
-        lambda { 
+        expect { 
           post :create, options
-        }.should change(Ownership, :count).by(1)
+        }.to change(Ownership, :count).by(1)
       }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
-      response.code.should eq("200")
+      expect(response.code).to eq("200")
     end
   end
 
