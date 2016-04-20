@@ -8,12 +8,12 @@ describe BikeBookUpdateWorker do
     expect(BikeBookUpdateWorker).to have_enqueued_job
   end
 
-  it "Doesn't break if the bike isn't on bikebook" do 
+  it "Doesn't break if the bike isn't on bikebook" do
     bike = FactoryGirl.create(:bike)
     BikeBookUpdateWorker.new.perform(bike.id)
   end
 
-  it "grabs the components and doesn't overwrite components nothing if the bike isn't on bikebook" do 
+  it "grabs the components and doesn't overwrite components nothing if the bike isn't on bikebook" do
     manufacturer = FactoryGirl.create(:manufacturer, name: "SE Bikes")
     bike = FactoryGirl.create(:bike,
       manufacturer_id: manufacturer.id,

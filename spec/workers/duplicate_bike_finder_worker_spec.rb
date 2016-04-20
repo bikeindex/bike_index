@@ -20,7 +20,7 @@ describe DuplicateBikeFinderWorker do
     expect(bike.normalized_serial_segments.first.duplicate_bike_group).to_not be_present
   end
 
-  it "adds a bike to an existing duplicate bike group" do 
+  it "adds a bike to an existing duplicate bike group" do
     bike1 = FactoryGirl.create(:bike, serial_number: "applejacks")
     bike1.create_normalized_serial_segments
     bike2 = FactoryGirl.create(:bike, serial_number: "applejacks")

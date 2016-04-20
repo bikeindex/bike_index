@@ -30,7 +30,7 @@ describe StolenNotificationsController do
       end
     end
 
-    describe "failure" do 
+    describe "failure" do
       let(:stolen_notification_attributes) { 
         stolen_notification = FactoryGirl.attributes_for(:stolen_notification, receiver: nil, bike: @bike)
         stolen_notification

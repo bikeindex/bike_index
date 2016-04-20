@@ -8,8 +8,8 @@ describe RecoveryUpdateWorker do
     expect(RecoveryUpdateWorker).to have_enqueued_job
   end
   
-  it "actuallies do things correctly" do 
-    Sidekiq::Testing.inline! do 
+  it "actuallies do things correctly" do
+    Sidekiq::Testing.inline! do
       bike = FactoryGirl.create(:bike)
       stolen_record = FactoryGirl.create(:stolen_record, bike: bike)
       bike.update_attribute :stolen, true

@@ -8,7 +8,7 @@ describe UnusedOwnershipRemovalWorker do
     expect(UnusedOwnershipRemovalWorker).to have_enqueued_job
   end
 
-  it "makes non existent ownerships not current" do 
+  it "makes non existent ownerships not current" do
     ownership = Ownership.create(owner_email: 'something@d.com', creator_id: 69, bike_id: 69, current: true)
     UnusedOwnershipRemovalWorker.new.perform(ownership.id)
     expect(ownership.reload.current).to be_falsey

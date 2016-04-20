@@ -24,7 +24,7 @@ describe BikeUpdator do
       ownership = FactoryGirl.create(:ownership)
       user = ownership.creator
       bike = ownership.bike
-      expect(BikeUpdator.new(user: user, b_params: {id: bike.id}).ensure_ownership!).to be_true
+      expect(BikeUpdator.new(user: user, b_params: {id: bike.id}).ensure_ownership!).to be_truthy
     end
   end
 

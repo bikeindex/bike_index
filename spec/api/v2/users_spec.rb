@@ -55,11 +55,11 @@ describe 'Users API V2' do
     end
   end
 
-  describe "current/bikes" do 
-    before :each do 
+  describe "current/bikes" do
+    before :each do
       create_doorkeeper_app
     end
-    it "works if it's authorized" do 
+    it "works if it's authorized" do
       @token.update_attribute :scopes, 'read_bikes'
       get '/api/v2/users/current/bikes', :format => :json, :access_token => @token.token
       # get '/api/v2/users/current/bikes', {}, 'Authorization' => "Basic #{Base64.encode64("#{@token.token}:X")}"
@@ -67,7 +67,7 @@ describe 'Users API V2' do
       expect(result['bikes'].kind_of?(Array)).to be_truthy
       expect(response.response_code).to eq(200)
     end
-    it "403s if read_bikes_spec isn't in token" do 
+    it "403s if read_bikes_spec isn't in token" do
       get '/api/v2/users/current/bikes', :format => :json, :access_token => @token.token
       expect(response.response_code).to eq(403)
     end

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'Swagger API V2 docs' do
-  describe 'all the paths' do 
+  describe 'all the paths' do
     it "responds with swagger for all the apis" do
       get 'api/v2/swagger_doc'
       result = JSON(response.body)

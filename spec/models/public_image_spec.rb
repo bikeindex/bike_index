@@ -5,8 +5,8 @@ describe PublicImage do
     it { is_expected.to belong_to :imageable }
   end
   
-  describe 'default_name' do 
-    it "sets a default name from filename if not bike" do 
+  describe 'default_name' do
+    it "sets a default name from filename if not bike" do
       public_image = PublicImage.new
       allow(public_image).to receive(:imageable_type).and_return("Nope")
       allow(public_image).to receive(:name).and_return("Boop")
@@ -24,7 +24,7 @@ describe PublicImage do
     end
   end
 
-  describe 'lottapixel' do 
+  describe 'lottapixel' do
     it "doesn't break" do
       lottapixel = File.open(File.join(Rails.root, 'spec', 'fixtures', 'hugeimg.png'))
       public_image = FactoryGirl.build(:public_image, image: lottapixel)

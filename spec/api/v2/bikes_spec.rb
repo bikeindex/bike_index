@@ -15,7 +15,7 @@ describe 'Bikes API V2' do
       expect(response.headers['Access-Control-Request-Method']).to eq('*')
     end
 
-    it "responds with missing" do 
+    it "responds with missing" do
       get "/api/v2/bikes/10", :format => :json
       result = JSON(response.body)
       expect(response.code).to eq('404')
@@ -27,7 +27,7 @@ describe 'Bikes API V2' do
   end
 
   describe 'create' do
-    before :each do 
+    before :each do
       create_doorkeeper_app({scopes: 'read_bikes write_bikes'})
       manufacturer = FactoryGirl.create(:manufacturer)
       color = FactoryGirl.create(:color)
@@ -44,18 +44,18 @@ describe 'Bikes API V2' do
       }
     end
 
-    it "responds with 401" do 
+    it "responds with 401" do
       post "/api/v2/bikes", @bike.to_json
       expect(response.code).to eq('401')
     end
 
-    it "fails if the token doesn't have write_bikes scope" do 
+    it "fails if the token doesn't have write_bikes scope" do
       @token.update_attribute :scopes, 'read_bikes'
       post "/api/v2/bikes?access_token=#{@token.token}", @bike.to_json, JSON_CONTENT
       expect(response.code).to eq('403')
     end
 
-    it "creates a non example bike, with components" do 
+    it "creates a non example bike, with components" do
       manufacturer = FactoryGirl.create(:manufacturer)
       FactoryGirl.create(:ctype, name: "wheel")
       FactoryGirl.create(:ctype, name: "Headset")
@@ -137,7 +137,7 @@ describe 'Bikes API V2' do
       expect(result['error'].kind_of?(String)).to be_truthy
     end
 
-    it 'creates a stolen bike through an organization and uses the passed phone' do 
+    it 'creates a stolen bike through an organization and uses the passed phone' do
       organization = FactoryGirl.create(:organization)
       @user.update_attribute :phone, '0987654321'
       FactoryGirl.create(:membership, user: @user, organization: organization)
@@ -182,8 +182,8 @@ describe 'Bikes API V2' do
     end
   end
 
-  describe 'create v2_accessor' do 
-    before :each do 
+  describe 'create v2_accessor' do
+    before :each do
       create_doorkeeper_app({with_v2_accessor: true})
       manufacturer = FactoryGirl.create(:manufacturer)
       color = FactoryGirl.create(:color)
@@ -244,7 +244,7 @@ describe 'Bikes API V2' do
 
 
   describe 'update' do
-    before :each do 
+    before :each do
       create_doorkeeper_app({scopes: 'read_user write_bikes'})
       @bike = FactoryGirl.create(:ownership, creator_id: @user.id).bike
       @params = {
@@ -254,7 +254,7 @@ describe 'Bikes API V2' do
       @url = "/api/v2/bikes/#{@bike.id}?access_token=#{@token.token}"
     end
 
-    it "doesn't update if user doesn't own the bike" do 
+    it "doesn't update if user doesn't own the bike" do
       @bike.current_ownership.update_attributes(user_id: FactoryGirl.create(:user).id, claimed: true)
       expect_any_instance_of(Bike).to receive(:type).and_return('unicorn')
       put @url, @params.to_json, JSON_CONTENT
@@ -262,7 +262,7 @@ describe 'Bikes API V2' do
       expect(response.code).to eq('403')
     end
 
-    it "doesn't update if not in scope" do 
+    it "doesn't update if not in scope" do
       @token.update_attribute :scopes, 'public'
       put @url, @params.to_json, JSON_CONTENT
       expect(response.code).to eq('403') 
@@ -375,7 +375,7 @@ describe 'Bikes API V2' do
       expect(not_urs.reload.id).to be_present
     end
 
-    it "claims a bike and updates if it should" do 
+    it "claims a bike and updates if it should" do
       expect(@bike.year).to be_nil
       @bike.current_ownership.update_attributes(owner_email: @user.email, creator_id: FactoryGirl.create(:user).id, claimed: false)
       expect(@bike.reload.owner).not_to eq(@user)
@@ -388,8 +388,8 @@ describe 'Bikes API V2' do
     end
   end
 
-  describe 'image' do 
-    it "doesn't post an image to a bike if the bike isn't owned by the user" do 
+  describe 'image' do
+    it "doesn't post an image to a bike if the bike isn't owned by the user" do
       create_doorkeeper_app({scopes: 'read_user write_bikes'})
       bike = FactoryGirl.create(:ownership).bike
       file = File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg'))
@@ -401,7 +401,7 @@ describe 'Bikes API V2' do
       expect(bike.reload.public_images.count).to eq(0)
     end
 
-    it "errors on non whitelisted extensions" do 
+    it "errors on non whitelisted extensions" do
       create_doorkeeper_app({scopes: 'read_user write_bikes'})
       bike = FactoryGirl.create(:ownership, creator_id: @user.id).bike
       file = File.open(File.join(Rails.root, 'spec', 'spec_helper.rb'))
@@ -413,7 +413,7 @@ describe 'Bikes API V2' do
       expect(bike.reload.public_images.count).to eq(0)
     end
 
-    it "posts an image" do 
+    it "posts an image" do
       create_doorkeeper_app({scopes: 'read_user write_bikes'})
       bike = FactoryGirl.create(:ownership, creator_id: @user.id).bike
       file = File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg'))
@@ -426,8 +426,8 @@ describe 'Bikes API V2' do
     end
   end
 
-  describe 'send_stolen_notification' do 
-    before :each do 
+  describe 'send_stolen_notification' do
+    before :each do
       create_doorkeeper_app({scopes: 'read_user'})
       @bike = FactoryGirl.create(:ownership, creator_id: @user.id).bike
       @bike.update_attribute :stolen, true
@@ -444,7 +444,7 @@ describe 'Bikes API V2' do
       expect(response.body.match('is not stolen')).not_to be_present
     end
 
-    it "fails if the bike isn't stolen" do 
+    it "fails if the bike isn't stolen" do
       @bike.update_attribute :stolen, false
       post @url, @params.to_json, JSON_CONTENT
       expect(response.code).to eq('400')
@@ -458,7 +458,7 @@ describe 'Bikes API V2' do
       expect(response.body.match('application is not approved')).to be_present
     end
 
-    it "sends a notification" do 
+    it "sends a notification" do
       expect{
         post @url, @params.to_json, JSON_CONTENT
       }.to change(EmailStolenNotificationWorker.jobs, :size).by(1)

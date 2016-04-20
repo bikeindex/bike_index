@@ -7,8 +7,8 @@ describe Component do
     it { is_expected.to belong_to :ctype }
   end
 
-  describe 'component_type' do 
-    it "returns the name of the ctype other if it should" do 
+  describe 'component_type' do
+    it "returns the name of the ctype other if it should" do
       ctype = Ctype.new
       component = Component.new
       allow(component).to receive(:ctype).and_return(ctype)
@@ -17,7 +17,7 @@ describe Component do
       expect(component.component_type).to eq("OOOP")
     end
 
-    it "returns the name of the ctype" do 
+    it "returns the name of the ctype" do
       ctype = Ctype.new
       component = Component.new
       allow(component).to receive(:ctype).and_return(ctype)
@@ -26,16 +26,16 @@ describe Component do
     end
   end
 
-  describe 'set_front_or_rear' do 
-    it "returns the name of the ctype other if it should" do 
+  describe 'set_front_or_rear' do
+    it "returns the name of the ctype other if it should" do
       bike = FactoryGirl.create(:bike)
       component = FactoryGirl.create(:component, bike: bike,  front_or_rear: "both")
       expect(bike.reload.components.count).to eq(2)
     end
   end
 
-  describe 'manufacturer_name' do 
-    it "returns the value of manufacturer_other if manufacturer is other" do 
+  describe 'manufacturer_name' do
+    it "returns the value of manufacturer_other if manufacturer is other" do
       mnfg = Ctype.new
       component = Component.new
       allow(component).to receive(:manufacturer).and_return(mnfg)
@@ -53,8 +53,8 @@ describe Component do
     end
   end
 
-  describe 'set_is_stock' do 
-    it "sets not stock if description changed" do 
+  describe 'set_is_stock' do
+    it "sets not stock if description changed" do
       component = FactoryGirl.create(:component, is_stock: true)
       expect(component.is_stock).to be_truthy
       component.year = 1987
@@ -66,14 +66,14 @@ describe Component do
       component.set_is_stock
       expect(component.is_stock).to be_falsey
     end
-    it "sets not stock if model_name changed" do 
+    it "sets not stock if model_name changed" do
       component = FactoryGirl.create(:component, is_stock: true)
       expect(component.is_stock).to be_truthy
       component.model_name = "New mode"
       component.set_is_stock
       expect(component.is_stock).to be_falsey
     end
-    it "skips if setting_is_stock" do 
+    it "skips if setting_is_stock" do
       component = FactoryGirl.create(:component, is_stock: true)
       expect(component.is_stock).to be_truthy
       component.setting_is_stock = true

@@ -23,7 +23,7 @@ describe StolenNotification do
         stolen_notification2 = FactoryGirl.create(:stolen_notification, sender: user)
       }.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
     end
-    it "does not enqueue an StolenNotificationEmailJob if user doesn't have permission" do 
+    it "does not enqueue an StolenNotificationEmailJob if user doesn't have permission" do
       user = FactoryGirl.create(:user)
       expect {
         stolen_notification = FactoryGirl.create(:stolen_notification, sender: user)
@@ -35,8 +35,8 @@ describe StolenNotification do
     end
   end
 
-  describe 'default_subject' do 
-    it "default subject" do 
+  describe 'default_subject' do
+    it "default subject" do
       expect(StolenNotification.new.default_subject).to eq("Stolen bike contact")
     end
   end

@@ -5,8 +5,8 @@ describe MailSnippet do
     it { is_expected.to validate_presence_of :name }
   end
 
-  describe 'matching_opts' do 
-    it "finds an enabled snippet in the proximity" do 
+  describe 'matching_opts' do
+    it "finds an enabled snippet in the proximity" do
       # Creating far too many objects here. Need to reduce that...
       mail_snippet = FactoryGirl.create(:mail_snippet)
       country = FactoryGirl.create(:country, iso: "US")

@@ -31,7 +31,7 @@ describe User do
         expect(@user.valid?).to be_truthy
       end
 
-      it "requires password on create" do 
+      it "requires password on create" do
         @user.password = nil
         @user.password_confirmation = nil
         expect(@user.valid?).to be_falsey
@@ -124,23 +124,23 @@ describe User do
     end
   end
 
-  describe 'admin_authorized' do 
+  describe 'admin_authorized' do
     before :all do
       @content = FactoryGirl.create(:user, is_content_admin: true)
       @admin = FactoryGirl.create(:admin)
     end
 
-    it "auths full" do 
+    it "auths full" do
       expect(@admin.admin_authorized('full')).to be_truthy
       expect(@content.admin_authorized('full')).to be_falsey
     end
 
-    it "auths content" do 
+    it "auths content" do
       expect(@admin.admin_authorized('content')).to be_truthy
       expect(@content.admin_authorized('content')).to be_truthy
     end
 
-    it "auths any" do 
+    it "auths any" do
       expect(@admin.admin_authorized('any')).to be_truthy
       expect(@content.admin_authorized('any')).to be_truthy
     end
@@ -195,8 +195,8 @@ describe User do
     end
   end
 
-  describe 'generate_username_confirmation_and_auth' do 
-    it "generates the required tokens" do 
+  describe 'generate_username_confirmation_and_auth' do
+    it "generates the required tokens" do
       user = FactoryGirl.create(:user)
       expect(user.auth_token).to be_present
       expect(user.username).to be_present
@@ -204,17 +204,17 @@ describe User do
       time = Time.at(user.auth_token.match(/\d*\z/)[0].to_i)
       expect(time).to be > Time.now - 1.minutes
     end
-    it "haves before create callback" do 
+    it "haves before create callback" do
       expect(User._create_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:generate_username_confirmation_and_auth)).to eq(true)      
     end
   end
 
-  describe 'access_tokens_for_application' do 
-    it "returns [] if no application" do 
+  describe 'access_tokens_for_application' do
+    it "returns [] if no application" do
       user = User.new 
       expect(user.access_tokens_for_application(nil)).to eq([])
     end
-    it "returns access tokens for the application" do 
+    it "returns access tokens for the application" do
       user = FactoryGirl.create(:user)
       application = Doorkeeper::Application.new(name: 'test', redirect_uri: 'https://foo.bar')
       application2 = Doorkeeper::Application.new(name: 'other_test', redirect_uri: 'https://foo.bar')
@@ -231,26 +231,26 @@ describe User do
     end
   end
 
-  describe 'reset_token_time' do 
-    it "gets long time ago if not there" do 
+  describe 'reset_token_time' do
+    it "gets long time ago if not there" do
       user = User.new
       allow(user).to receive(:password_reset_token).and_return("c7c3b99a319ac09e2b00-2015-03-31 19:29:52 -0500")
       expect(user.reset_token_time).to eq(Time.at(1364777722))
     end
-    it "gets the time" do 
+    it "gets the time" do
       user = User.new 
       user.set_password_reset_token
       expect(user.reset_token_time).to be > Time.now - 2.seconds
     end
-    it "uses input time" do 
+    it "uses input time" do
       user = FactoryGirl.create(:user)
       user.set_password_reset_token((Time.now - 61.minutes).to_i)
       expect(user.reload.reset_token_time).to be < (Time.now - 1.hours)
     end
   end
 
-  describe 'send_password_reset_email' do 
-    it "enqueues sending the password reset" do 
+  describe 'send_password_reset_email' do
+    it "enqueues sending the password reset" do
       user = FactoryGirl.create(:user)
       expect(user.password_reset_token).to be_nil
       expect {
@@ -259,7 +259,7 @@ describe User do
       expect(user.reload.password_reset_token).not_to be_nil
     end
     
-    it "doesn't send another one immediately" do 
+    it "doesn't send another one immediately" do
       user = FactoryGirl.create(:user)
       user.send_password_reset_email
       expect(user).not_to receive(:set_password_reset_token)
@@ -270,7 +270,7 @@ describe User do
     end
   end
 
-  describe 'fuzzy_id' do 
+  describe 'fuzzy_id' do
     it "fails with nil" do
       result = User.fuzzy_id('some stuff')
       expect(result).to be_nil
@@ -278,7 +278,7 @@ describe User do
   end
 
   describe 'normalize_attributes' do
-    it "doesn't let you overwrite usernames" do 
+    it "doesn't let you overwrite usernames" do
       target = "coolname"
       user1 = FactoryGirl.create(:user)
       user1.update_attribute :username, target
@@ -296,7 +296,7 @@ describe User do
     end
   end
 
-  describe "normalize_attributes" do 
+  describe "normalize_attributes" do
     let(:user) { FactoryGirl.build(:user, phone: "773.83ddp+83(887)", email: "SOMethinG@example.com\n") }
     before(:each) { user.normalize_attributes }
 
@@ -304,27 +304,27 @@ describe User do
       expect(user.phone).to eq('7738383887')
     end
 
-    it "normalizes the email" do 
+    it "normalizes the email" do
       expect(user.email).to eq('something@example.com')
     end
   end
 
-  describe 'subscriptions' do 
-    it "returns the payment if payment is subscription" do 
+  describe 'subscriptions' do
+    it "returns the payment if payment is subscription" do
       user = FactoryGirl.create(:user)
       payment = Payment.create(is_recurring: true, user_id: user)
       expect(user.subscriptions).to eq(user.payments.where(is_recurring: true))
     end
   end
 
-  describe 'userlink' do 
-    it "returns user path if user show" do 
+  describe 'userlink' do
+    it "returns user path if user show" do
       user = User.new(show_bikes: true, username: 'coolstuff')
       # pp user
       expect(user.userlink).to eq('/users/coolstuff')
     end
 
-    it "returns twitter if user twitter" do 
+    it "returns twitter if user twitter" do
       user = User.new(show_bikes: false, username: 'coolstuff', twitter: 'bikeindex')
       # pp user
       expect(user.userlink).to eq('https://twitter.com/bikeindex')

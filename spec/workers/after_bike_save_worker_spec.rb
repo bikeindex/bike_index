@@ -25,7 +25,7 @@ describe AfterBikeSaveWorker do
     }.to change(DuplicateBikeFinderWorker.jobs, :size).by(1)
   end
 
-  it "creates pretty json without registration_updated_at, sends webhook runner" do 
+  it "creates pretty json without registration_updated_at, sends webhook runner" do
     ENV['VERSIONER_LOCATION'] = 'spec/fixtures'
     bike = FactoryGirl.create(:bike)
     bike.update_attribute :updator_id, 42
@@ -39,7 +39,7 @@ describe AfterBikeSaveWorker do
     ENV['VERSIONER_LOCATION'] = nil
   end
 
-  it "doesn't create a new file if one doesn't exist for deleted bikes, returns delete hash, doesn't run webhook runner" do 
+  it "doesn't create a new file if one doesn't exist for deleted bikes, returns delete hash, doesn't run webhook runner" do
     ENV['VERSIONER_LOCATION'] = 'spec/fixtures'
     id = 1111
     expect_any_instance_of(WebhookRunner).not_to receive(:after_bike_update).with(id).once

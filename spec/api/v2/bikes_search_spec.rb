@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'Bikes API V2' do
   describe 'bike search' do
-    before :each do 
+    before :each do
       @bike = FactoryGirl.create(:bike)
       FactoryGirl.create(:bike)
     end
@@ -24,7 +24,7 @@ describe 'Bikes API V2' do
       expect(JSON.parse(result)['bikes'][0]['id']).to be_present
     end
 
-    it 'serial search works' do 
+    it 'serial search works' do
       bike = FactoryGirl.create(:bike, serial_number: '0000HEYBB')
       get "/api/v2/bikes_search/?serial=0HEYBB", format: :json
       result = JSON.parse(response.body)

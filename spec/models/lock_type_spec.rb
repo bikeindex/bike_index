@@ -10,8 +10,8 @@ describe LockType do
     it { is_expected.to validate_uniqueness_of :slug }
   end
   
-  describe 'manufacturer_name' do 
-    it "returns the value of manufacturer_other if manufacturer is other" do 
+  describe 'manufacturer_name' do
+    it "returns the value of manufacturer_other if manufacturer is other" do
       lock = Lock.new
       other_manufacturer = Manufacturer.new 
       allow(other_manufacturer).to receive(:name).and_return("Other")

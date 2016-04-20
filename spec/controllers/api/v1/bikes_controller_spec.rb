@@ -10,7 +10,7 @@ describe Api::V1::BikesController do
   end
 
   describe 'stolen_ids' do
-    it "returns correct code if no org" do 
+    it "returns correct code if no org" do
       c = FactoryGirl.create(:color)
       get :stolen_ids, format: :json
       expect(response.code).to eq("401")
@@ -41,7 +41,7 @@ describe Api::V1::BikesController do
     end
   end
 
-  describe 'create' do 
+  describe 'create' do
     before :each do
       @organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:user)
@@ -51,19 +51,19 @@ describe Api::V1::BikesController do
       FactoryGirl.create(:propulsion_type, name: "Foot pedal")
     end
 
-    it "returns correct code if not logged in" do 
+    it "returns correct code if not logged in" do
       c = FactoryGirl.create(:color)
       post :create, { bike: { serial_number: '69', color: c.name } }
       expect(response.code).to eq("401")
     end
 
-    it "returns correct code if bike has errors" do 
+    it "returns correct code if bike has errors" do
       c = FactoryGirl.create(:color)
       post :create, { bike: { serial_number: '69', color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }
       expect(response.code).to eq("422")
     end
 
-    it "emails us if it can't create a record" do 
+    it "emails us if it can't create a record" do
       c = FactoryGirl.create(:color)
       expect {
         post :create, { bike: { serial_number: '69', color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }

@@ -41,20 +41,20 @@ describe Bike do
   end
 
 
-  describe "scopes" do 
-    it "default scopes to created_at desc" do 
+  describe "scopes" do
+    it "default scopes to created_at desc" do
       expect(Bike.scoped.to_sql).to eq(Bike.where(example: false).where(hidden: false).order("listing_order desc").to_sql)
     end
-    it "scopes to only stolen bikes" do 
+    it "scopes to only stolen bikes" do
       expect(Bike.stolen.to_sql).to eq(Bike.where(stolen: true).to_sql)
     end
-    it "non_stolen scopes to only non_stolen bikes" do 
+    it "non_stolen scopes to only non_stolen bikes" do
       expect(Bike.non_stolen.to_sql).to eq(Bike.where(stolen: false).to_sql)
     end
   end
 
-  describe 'recovered_records' do 
-    it "default scopes to created_at desc" do 
+  describe 'recovered_records' do
+    it "default scopes to created_at desc" do
       o = FactoryGirl.create(:ownership)
       user = o.creator
       bike = o.bike
@@ -64,28 +64,28 @@ describe Bike do
     end
   end
 
-  describe 'visible_by' do 
-    it "isn't be visible to owner unless user hidden" do 
+  describe 'visible_by' do
+    it "isn't be visible to owner unless user hidden" do
       bike = Bike.new(hidden: true)
       user = User.new
       allow(bike).to receive(:owner).and_return(user)
       allow(bike).to receive(:user_hidden).and_return(false)
       expect(bike.visible_by(user)).to be_falsey
     end
-    it "is visible to owner" do 
+    it "is visible to owner" do
       bike = Bike.new(hidden: true)
       user = User.new
       allow(bike).to receive(:owner).and_return(user)
       allow(bike).to receive(:user_hidden).and_return(true)
       expect(bike.visible_by(user)).to be_truthy
     end
-    it "is visible to superuser" do 
+    it "is visible to superuser" do
       bike = Bike.new(hidden: true)
       user = User.new
       user.superuser = true
       expect(bike.visible_by(user)).to be_truthy
     end
-    it "is visible if not hidden" do 
+    it "is visible if not hidden" do
       bike = Bike.new
       expect(bike.visible_by).to be_truthy
     end
@@ -140,42 +140,42 @@ describe Bike do
     end
   end
 
-  describe 'frame_size' do 
-    it "removes crap from bike size strings" do 
+  describe 'frame_size' do
+    it "removes crap from bike size strings" do
       bike = Bike.new(frame_size: "19\\\\\"")
       bike.clean_frame_size
       expect(bike.frame_size_number).to eq(19)
       expect(bike.frame_size).to eq('19in')
       expect(bike.frame_size_unit).to eq('in')
     end
-    it "sets things" do 
+    it "sets things" do
       bike = Bike.new(frame_size_number: "19.5sa", frame_size_unit: 'in')
       bike.clean_frame_size
       expect(bike.frame_size_number).to eq(19.5)
       expect(bike.frame_size).to eq('19.5in')
       expect(bike.frame_size_unit).to eq('in')
     end
-    it "removes extra numbers and other things from size strings" do 
+    it "removes extra numbers and other things from size strings" do
       bike = Bike.new(frame_size: "19.5 somethingelse medium 54cm")
       bike.clean_frame_size
       expect(bike.frame_size_number).to eq(19.5)
       expect(bike.frame_size).to eq('19.5in')
       expect(bike.frame_size_unit).to eq('in')
     end
-    it "figures out that it's cm" do 
+    it "figures out that it's cm" do
       bike = Bike.new(frame_size: "Med/54cm")
       bike.clean_frame_size 
       expect(bike.frame_size_number).to eq(54)
       expect(bike.frame_size).to eq('54cm')
       expect(bike.frame_size_unit).to eq('cm')
     end
-    it "is cool with ordinal sizing" do 
+    it "is cool with ordinal sizing" do
       bike = Bike.new(frame_size: "Med")
       bike.clean_frame_size 
       expect(bike.frame_size).to eq('m')
       expect(bike.frame_size_unit).to eq('ordinal')
     end
-    it "is cool with ordinal sizing" do 
+    it "is cool with ordinal sizing" do
       bike = Bike.new(frame_size: "M")
       bike.clean_frame_size 
       expect(bike.frame_size).to eq('m')
@@ -187,7 +187,7 @@ describe Bike do
     end
   end
 
-  describe 'current_owner_exists' do 
+  describe 'current_owner_exists' do
     it "returns false if ownership isn't claimed" do
       bike = Bike.new 
       ownership = Ownership.new
@@ -202,15 +202,15 @@ describe Bike do
     end
   end
 
-  describe 'can_be_claimed_by' do 
-    it "returns false if the bike is already claimed" do 
+  describe 'can_be_claimed_by' do
+    it "returns false if the bike is already claimed" do
       user = User.new
       bike = Bike.new
       allow(bike).to receive(:current_owner_exists).and_return(true)
       expect(bike.can_be_claimed_by(user)).to be_falsey
     end
 
-    it "returns true if the bike can be claimed" do 
+    it "returns true if the bike can be claimed" do
       user = User.new
       ownership = Ownership.new
       bike = Bike.new
@@ -221,34 +221,34 @@ describe Bike do
     end
   end
 
-  describe 'user_hidden' do 
-    it "is true if bike is hidden and ownership is user hidden" do 
+  describe 'user_hidden' do
+    it "is true if bike is hidden and ownership is user hidden" do
       bike = Bike.new(hidden: true)
       ownership = Ownership.new(user_hidden: true)
       allow(bike).to receive(:current_ownership).and_return(ownership)
       expect(bike.user_hidden).to be_truthy
     end
-    it "is false otherwise" do 
+    it "is false otherwise" do
       bike = Bike.new(hidden: true)
       expect(bike.user_hidden).to be_falsey
     end
   end
 
-  describe 'fake_deleted' do 
-    it "is true if bike is hidden and ownership is user hidden" do 
+  describe 'fake_deleted' do
+    it "is true if bike is hidden and ownership is user hidden" do
       bike = Bike.new(hidden: true)
       ownership = Ownership.new(user_hidden: true)
       allow(bike).to receive(:current_ownership).and_return(ownership)
       expect(bike.fake_deleted).to be_falsey
     end
-    it "is false otherwise" do 
+    it "is false otherwise" do
       bike = Bike.new(hidden: true)
       expect(bike.fake_deleted).to be_truthy
     end
   end
 
-  describe 'set_user_hidden' do 
-    it "unmarks user hidden, saves ownership and marks self unhidden" do 
+  describe 'set_user_hidden' do
+    it "unmarks user hidden, saves ownership and marks self unhidden" do
       ownership = FactoryGirl.create(:ownership, user_hidden: true)
       bike = ownership.bike
       bike.hidden = true
@@ -258,7 +258,7 @@ describe Bike do
       expect(ownership.reload.user_hidden).to be_falsey
     end
 
-    it "marks updates ownership user hidden, marks self hidden" do 
+    it "marks updates ownership user hidden, marks self hidden" do
       ownership = FactoryGirl.create(:ownership)
       bike = ownership.bike
       bike.marked_user_hidden = true
@@ -272,8 +272,8 @@ describe Bike do
     end
   end
 
-  describe 'find_current_stolen_record' do 
-    it "returns the last current stolen record if bike is stolen" do 
+  describe 'find_current_stolen_record' do
+    it "returns the last current stolen record if bike is stolen" do
       @bike = Bike.new 
       first_stolen_record = StolenRecord.new
       second_stolen_record = StolenRecord.new
@@ -284,15 +284,15 @@ describe Bike do
       expect(@bike.find_current_stolen_record).to eq(second_stolen_record)
     end
 
-    it "is false if the bike isn't stolen" do 
+    it "is false if the bike isn't stolen" do
       @bike = Bike.new 
       allow(@bike).to receive(:stolen).and_return(false)
       expect(@bike.find_current_stolen_record).to be_falsey
     end
   end
 
-  describe 'manufacturer_name' do 
-    it "returns the value of manufacturer_other if manufacturer is other" do 
+  describe 'manufacturer_name' do
+    it "returns the value of manufacturer_other if manufacturer is other" do
       bike = Bike.new
       other_manufacturer = Manufacturer.new 
       allow(other_manufacturer).to receive(:name).and_return("Other")
@@ -318,22 +318,22 @@ describe Bike do
     end
   end
 
-  describe 'type' do 
-    it "returns the cycle type name" do 
+  describe 'type' do
+    it "returns the cycle type name" do
       cycle_type = FactoryGirl.create(:cycle_type)
       bike = FactoryGirl.create(:bike, cycle_type: cycle_type)
       expect(bike.type).to eq(cycle_type.name.downcase)
     end
   end
 
-  describe 'video_embed_src' do 
-    it "returns false if there is no video_embed" do 
+  describe 'video_embed_src' do
+    it "returns false if there is no video_embed" do
       @bike = Bike.new 
       allow(@bike).to receive(:video_embed).and_return(nil)
       expect(@bike.video_embed_src).to be_nil
     end
 
-    it "returns just the url of the video from a youtube iframe" do 
+    it "returns just the url of the video from a youtube iframe" do
       youtube_share = '''
           <iframe width="560" height="315" src="//www.youtube.com/embed/Sv3xVOs7_No" frameborder="0" allowfullscreen></iframe>
         '''
@@ -342,7 +342,7 @@ describe Bike do
       expect(@bike.video_embed_src).to eq('//www.youtube.com/embed/Sv3xVOs7_No')
     end
 
-    it "returns just the url of the video from a vimeo iframe" do 
+    it "returns just the url of the video from a vimeo iframe" do
       vimeo_share = '''<iframe src="http://player.vimeo.com/video/13094257" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe><p><a href="http://vimeo.com/13094257">Fixed Gear Kuala Lumpur, RatsKL Putrajaya</a> from <a href="http://vimeo.com/user3635109">irmanhilmi</a> on <a href="http://vimeo.com">Vimeo</a>.</p>'''
       @bike = Bike.new 
       allow(@bike).to receive(:video_embed).and_return(vimeo_share)
@@ -350,15 +350,15 @@ describe Bike do
     end
   end
 
-  describe 'set_mnfg_name' do 
-    it "sets a bikes mnfg_name" do 
+  describe 'set_mnfg_name' do
+    it "sets a bikes mnfg_name" do
       manufacturer = FactoryGirl.create(:manufacturer, name: 'SE Racing ( S E Bikes )')
       bike = Bike.new
       allow(bike).to receive(:manufacturer).and_return(manufacturer)
       bike.set_mnfg_name
       expect(bike.mnfg_name).to eq("SE Racing")
     end
-    it "sets a bikes mnfg_name" do 
+    it "sets a bikes mnfg_name" do
       manufacturer = FactoryGirl.create(:manufacturer, name: 'Other')
       bike = Bike.new
       allow(bike).to receive(:manufacturer).and_return(manufacturer)
@@ -371,15 +371,15 @@ describe Bike do
     end
   end
 
-  describe 'set_normalized_attributes' do 
-    it "sets a bikes normalized_serial and switches unknown to absent" do 
+  describe 'set_normalized_attributes' do
+    it "sets a bikes normalized_serial and switches unknown to absent" do
       bike = Bike.new(serial_number: ' UNKNOWn ')
       expect_any_instance_of(SerialNormalizer).to receive(:normalized).and_return('normal')
       bike.normalize_attributes
       expect(bike.serial_number).to eq('absent')
       expect(bike.serial_normalized).to eq('normal')
     end
-    it "sets normalized owner email" do 
+    it "sets normalized owner email" do
       bike = Bike.new(owner_email: '  somethinG@foo.orG')
       bike.normalize_attributes
       expect(bike.owner_email).to eq('something@foo.org')
@@ -389,8 +389,8 @@ describe Bike do
     end
   end
 
-  describe 'serial' do 
-    it "only returns the serial if we should show people the serial" do 
+  describe 'serial' do
+    it "only returns the serial if we should show people the serial" do
       # We're hiding serial numbers for bikes that are recovered to provide a method of verifying 
       # ownership
       bike = Bike.new
@@ -401,14 +401,14 @@ describe Bike do
   end
 
 
-  describe "pg search" do 
+  describe "pg search" do
     it "returns a bike which has a matching part of its description" do
       @bike = FactoryGirl.create(:bike, description: "Phil wood hub")
       @bikes = Bike.text_search("phil wood hub")
       expect(@bikes).to include(@bike)
     end
 
-    it "returns the bikes in the default scope pattern if there is no query" do 
+    it "returns the bikes in the default scope pattern if there is no query" do
       bike = FactoryGirl.create(:bike, description: "Phil wood hub")
       bike2 = FactoryGirl.create(:bike)
       bikes = Bike.text_search("")
@@ -416,29 +416,29 @@ describe Bike do
     end
   end
 
-  describe 'set_paints' do 
-    it "returns true if paint is a color" do 
+  describe 'set_paints' do
+    it "returns true if paint is a color" do
       FactoryGirl.create(:color, name: "Bluety")
       bike = Bike.new
       allow(bike).to receive(:paint_name).and_return(" blueTy")
       expect { bike.set_paints }.not_to change(Paint, :count)
       expect(bike.paint).to be_nil
     end
-    it "removes paint id if paint_name is nil" do 
+    it "removes paint id if paint_name is nil" do
       paint = FactoryGirl.create(:paint)
       bike = Bike.new(paint_id: paint.id)
       bike.paint_name = ''
       bike.set_paints
       expect(bike.paint).to be_nil
     end
-    it "sets the paint if it exists" do 
+    it "sets the paint if it exists" do
       FactoryGirl.create(:paint, name: "poopy pile")
       bike = Bike.new
       allow(bike).to receive(:paint_name).and_return("Poopy PILE  ")
       expect { bike.set_paints }.not_to change(Paint, :count)
       expect(bike.paint.name).to eq("poopy pile")
     end
-    it "creates a new paint and set it otherwise" do 
+    it "creates a new paint and set it otherwise" do
       bike = Bike.new
       bike.paint_name = ["Food Time SOOON"]
       expect { bike.set_paints }.to change(Paint, :count).by(1)
@@ -449,8 +449,8 @@ describe Bike do
     end
   end
 
-  describe 'cache_photo' do 
-    it "caches the photo" do 
+  describe 'cache_photo' do
+    it "caches the photo" do
       bike = FactoryGirl.create(:bike)
       image = FactoryGirl.create(:public_image, imageable: bike)
       bike.reload
@@ -459,8 +459,8 @@ describe Bike do
     end
   end
 
-  describe 'components_cache_string' do 
-    it "caches the components" do 
+  describe 'components_cache_string' do
+    it "caches the components" do
       bike = FactoryGirl.create(:bike)
       c = FactoryGirl.create(:component, bike: bike)
       bike.save
@@ -468,8 +468,8 @@ describe Bike do
     end
   end
 
-  describe 'cache_attributes' do 
-    it "caches the colors handlebar_type and wheel_size" do 
+  describe 'cache_attributes' do
+    it "caches the colors handlebar_type and wheel_size" do
       color = FactoryGirl.create(:color)
       handlebar = FactoryGirl.create(:handlebar_type)
       wheel = FactoryGirl.create(:wheel_size)
@@ -482,15 +482,15 @@ describe Bike do
     end
   end
 
-  describe 'cache_stolen_attributes' do 
-    it "saves the stolen description to all description and set stolen_rec_id" do 
+  describe 'cache_stolen_attributes' do
+    it "saves the stolen description to all description and set stolen_rec_id" do
       stolen_record = FactoryGirl.create(:stolen_record, theft_description: 'some theft description' )
       bike = stolen_record.bike
       bike.description = 'I love my bike'
       bike.cache_stolen_attributes
       expect(bike.all_description).to eq('I love my bike some theft description')
     end
-    it "grabs the desc and erase current_stolen_id" do 
+    it "grabs the desc and erase current_stolen_id" do
       bike = Bike.new(current_stolen_record_id: 69, description: 'lalalala')
       bike.cache_stolen_attributes
       expect(bike.current_stolen_record_id).not_to be_present
@@ -499,8 +499,8 @@ describe Bike do
   end
 
 
-  describe 'cache_bike' do 
-    it "calls cache photo and cache component and erase stolen_rec_id" do 
+  describe 'cache_bike' do
+    it "calls cache photo and cache component and erase stolen_rec_id" do
       bike = FactoryGirl.create(:bike, current_stolen_record_id: 69)
       expect(bike).to receive(:cache_photo)
       expect(bike).to receive(:cache_stolen_attributes)
@@ -509,7 +509,7 @@ describe Bike do
       bike.cache_bike
       expect(bike.current_stolen_record_id).to be_nil
     end
-    it "caches all the bike parts" do 
+    it "caches all the bike parts" do
       type = FactoryGirl.create(:cycle_type, name: "Unicycle")
       handlebar = FactoryGirl.create(:handlebar_type)
       material = FactoryGirl.create(:frame_material)
@@ -532,8 +532,8 @@ describe Bike do
   end
 
 
-  describe 'frame_colors' do 
-    it "returns an array of the frame colors" do 
+  describe 'frame_colors' do
+    it "returns an array of the frame colors" do
       bike = Bike.new 
       color = Color.new
       color2 = Color.new
@@ -547,7 +547,7 @@ describe Bike do
   end
 
   describe 'cgroup_array' do
-    it "grabs a list of all the cgroups" do 
+    it "grabs a list of all the cgroups" do
       bike = Bike.new
       component1 = Component.new 
       component2 = Component.new 
@@ -560,8 +560,8 @@ describe Bike do
     end
   end
 
-  describe 'get_listing_order' do 
-    it "is 1/1000 of the current timestamp" do 
+  describe 'get_listing_order' do
+    it "is 1/1000 of the current timestamp" do
       bike = Bike.new
       time = Time.now
       allow(bike).to receive(:updated_at).and_return(time)
@@ -569,7 +569,7 @@ describe Bike do
       expect(lo).to eq(time.to_time.to_i/1000000)
     end
     
-    it "is the current stolen record date stolen * 1000" do 
+    it "is the current stolen record date stolen * 1000" do
       bike = Bike.new
       allow(bike).to receive(:stolen).and_return(true)
       stolen_record = StolenRecord.new 
@@ -580,7 +580,7 @@ describe Bike do
       expect(lo).to eq(yesterday.to_time.to_i)
     end
 
-    it "is the updated_at" do 
+    it "is the updated_at" do
       bike = Bike.new
       last_week = Time.now - 7.days
       allow(bike).to receive(:updated_at).and_return(last_week)
@@ -601,7 +601,7 @@ describe Bike do
     end
   end
 
-  describe 'title_string' do 
+  describe 'title_string' do
     it "escapes correctly" do
       bike = Bike.new(frame_model: "</title><svg/onload=alert(document.cookie)>")
       allow(bike).to receive(:manufacturer_name).and_return('baller')

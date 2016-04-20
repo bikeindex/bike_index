@@ -19,8 +19,8 @@ describe OwnershipsController do
       expect(flash[:error].match(/sign in/i)).to be_present
     end
 
-    describe 'user present' do 
-      before :each do 
+    describe 'user present' do
+      before :each do
         @user = FactoryGirl.create(:user)
         @ownership = FactoryGirl.create(:ownership)
         set_current_user(@user)

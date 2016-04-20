@@ -15,8 +15,8 @@ describe CustomerContact do
     it { is_expected.to serialize :info_hash }
   end
 
-  describe 'normalize_email_and_find_user' do 
-    it "finds email and associate" do 
+  describe 'normalize_email_and_find_user' do
+    it "finds email and associate" do
       user = FactoryGirl.create(:user)
       cc = CustomerContact.new
       allow(cc).to receive(:user_email).and_return(user.email)

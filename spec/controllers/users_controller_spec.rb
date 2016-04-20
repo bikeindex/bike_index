@@ -77,7 +77,7 @@ describe UsersController do
       end
     end
 
-    describe 'confirm' do 
+    describe 'confirm' do
       describe 'user exists' do
         it 'tells the user to log in when already confirmed' do
           @user = FactoryGirl.create(:user, confirmed: true)

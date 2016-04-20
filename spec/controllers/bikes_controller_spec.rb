@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe BikesController do
-
   describe 'index' do
     context 'no subdomain' do
       before do
@@ -549,7 +548,7 @@ describe BikesController do
       end
 
       it 'creates a new ownership if the email changes' do
-        expect do 
+        expect do
           put :update, id: bike.id, bike: { owner_email: 'new@email.com' }
         end.to change(Ownership, :count).by(1)
       end
