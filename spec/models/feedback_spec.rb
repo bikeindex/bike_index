@@ -3,10 +3,10 @@ require 'spec_helper'
 describe Feedback do
 
   describe :validations do
-    it { should validate_presence_of :body }
-    it { should validate_presence_of :email }
-    it { should validate_presence_of :title }
-    it { should serialize :feedback_hash }
+    it { is_expected.to validate_presence_of :body }
+    it { is_expected.to validate_presence_of :email }
+    it { is_expected.to validate_presence_of :title }
+    it { is_expected.to serialize :feedback_hash }
     # it { should belong_to :application } # This is Doorkeeper::Application, not application
   end
 

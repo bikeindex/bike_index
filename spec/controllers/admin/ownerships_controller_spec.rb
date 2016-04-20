@@ -9,9 +9,9 @@ describe Admin::OwnershipsController do
       set_current_user(user)
       get :edit, id: ownership.id 
     end
-    it { should respond_with(:success) }
-    it { should render_template(:edit) }
-    it { should_not set_the_flash }
+    it { is_expected.to respond_with(:success) }
+    it { is_expected.to render_template(:edit) }
+    it { is_expected.not_to set_the_flash }
   end
 
   describe :update do 
@@ -22,8 +22,8 @@ describe Admin::OwnershipsController do
         set_current_user(user)
         put :update, id: ownership.id
       end
-      it { should redirect_to(:edit_admin_ownership) }
-      it { should set_the_flash }
+      it { is_expected.to redirect_to(:edit_admin_ownership) }
+      it { is_expected.to set_the_flash }
     end
 
     it "updates ownership" do

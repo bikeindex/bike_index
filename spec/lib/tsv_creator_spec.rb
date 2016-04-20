@@ -16,10 +16,10 @@ describe TsvCreator do
       organization = ownership.bike.creation_organization
       creator = TsvCreator.new
       target = "#{creator.org_counts_header}#{creator.org_count_row(ownership.bike)}"
-      TsvUploader.any_instance.should_receive(:store!)
+      expect_any_instance_of(TsvUploader).to receive(:store!)
       output = creator.create_org_count(organization)
       expect(File.read(output)).to eq(target)
-      expect(FileCacheMaintainer.files.kind_of?(Array)).to be_true
+      expect(FileCacheMaintainer.files.kind_of?(Array)).to be_truthy
     end
   end
 
@@ -40,8 +40,8 @@ describe TsvCreator do
     it "calls create_stolen and create_stolen_with_reports with scoped query" do 
       stolen_record = FactoryGirl.create(:stolen_record, current: true, tsved_at: nil)
       tsv_creator = TsvCreator.new
-      tsv_creator.should_receive(:create_stolen_with_reports).with(true, stolen_records: StolenRecord.approveds_with_reports.tsv_today)
-      tsv_creator.should_receive(:create_stolen).with(true, stolen_records: StolenRecord.approveds.tsv_today)
+      expect(tsv_creator).to receive(:create_stolen_with_reports).with(true, stolen_records: StolenRecord.approveds_with_reports.tsv_today)
+      expect(tsv_creator).to receive(:create_stolen).with(true, stolen_records: StolenRecord.approveds.tsv_today)
       
       tsv_creator.create_daily_tsvs
       expect(tsv_creator.file_prefix).to eq("/spec/fixtures/tsv_creation/#{Time.now.year}_#{Time.now.month}_#{Time.now.day}_")

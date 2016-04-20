@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Listicle do
   describe :validations do 
-    it { should belong_to :blog }
+    it { is_expected.to belong_to :blog }
   end
 
 end

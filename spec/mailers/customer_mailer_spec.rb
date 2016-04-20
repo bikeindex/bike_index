@@ -5,9 +5,9 @@ describe CustomerMailer do
     it "includes the snippet" do 
       @ownership = FactoryGirl.create(:ownership)
       mail_snippet = MailSnippet.new(body: "<h1>LOLS</h1>")
-      MailSnippet.should_receive(:matching_opts).and_return(mail_snippet)
+      expect(MailSnippet).to receive(:matching_opts).and_return(mail_snippet)
       @mail = CustomerMailer.ownership_invitation_email(@ownership)
-      @mail.body.encoded.should match(mail_snippet.body)
+      expect(@mail.body.encoded).to match(mail_snippet.body)
     end
   end
 
@@ -18,7 +18,7 @@ describe CustomerMailer do
     end
 
     it "renders email" do
-      @mail.subject.should eq("Welcome to the Bike Index!")
+      expect(@mail.subject).to eq("Welcome to the Bike Index!")
     end
   end
 
@@ -29,7 +29,7 @@ describe CustomerMailer do
     end
 
     it "renders email" do
-      @mail.subject.should eq("Welcome to the Bike Index!")
+      expect(@mail.subject).to eq("Welcome to the Bike Index!")
     end
   end
 
@@ -40,8 +40,8 @@ describe CustomerMailer do
     end
 
     it "renders email" do
-      @mail.subject.should eq("Instructions to reset your password")
-      @mail.body.encoded.should match("reset")
+      expect(@mail.subject).to eq("Instructions to reset your password")
+      expect(@mail.body.encoded).to match("reset")
     end
   end
 
@@ -49,7 +49,7 @@ describe CustomerMailer do
     it "renders email" do
       @ownership = FactoryGirl.create(:ownership)
       @mail = CustomerMailer.ownership_invitation_email(@ownership)
-      @mail.subject.should eq("Claim your bike on BikeIndex.org!")
+      expect(@mail.subject).to eq("Claim your bike on BikeIndex.org!")
     end
   end
 
@@ -61,7 +61,7 @@ describe CustomerMailer do
     end
 
     it "renders email" do
-      @mail.subject.should eq("Join #{@organization.name} on the Bike Index")
+      expect(@mail.subject).to eq("Join #{@organization.name} on the Bike Index")
     end
   end
 
@@ -69,13 +69,13 @@ describe CustomerMailer do
     it "renders email and update sent_dates" do
       stolen_notification = FactoryGirl.create(:stolen_notification, message: "Test Message")
       mail = CustomerMailer.stolen_notification_email(stolen_notification)
-      mail.subject.should eq(stolen_notification.default_subject)
-      mail.from.count.should eq(1)
-      mail.from.first.should eq('bryan@bikeindex.org')
-      mail.body.encoded.should match(stolen_notification.message)
-      stolen_notification.send_dates[0].should eq(stolen_notification.updated_at.to_i)
+      expect(mail.subject).to eq(stolen_notification.default_subject)
+      expect(mail.from.count).to eq(1)
+      expect(mail.from.first).to eq('bryan@bikeindex.org')
+      expect(mail.body.encoded).to match(stolen_notification.message)
+      expect(stolen_notification.send_dates[0]).to eq(stolen_notification.updated_at.to_i)
       CustomerMailer.stolen_notification_email(stolen_notification)
-      stolen_notification.send_dates[1].should be > stolen_notification.updated_at.to_i - 2
+      expect(stolen_notification.send_dates[1]).to be > stolen_notification.updated_at.to_i - 2
     end
   end
 
@@ -91,8 +91,8 @@ describe CustomerMailer do
         title: 'some title')
       customer_contact.save
       mail = CustomerMailer.admin_contact_stolen_email(customer_contact)
-      mail.subject.should eq("some title")
-      mail.body.encoded.should match('some message')
+      expect(mail.subject).to eq("some title")
+      expect(mail.body.encoded).to match('some message')
     end
   end
   describe :stolen_bike_alert_email do

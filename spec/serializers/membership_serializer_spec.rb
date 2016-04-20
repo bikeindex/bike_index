@@ -6,11 +6,11 @@ describe MembershipSerializer do
   let(:membership) { FactoryGirl.create(:membership, organization_id: organization.id, user_id: user.id, role: "member")}
   subject { MembershipSerializer.new(membership) }
   
-  it { subject.organization_name.should == organization.name }
-  it { subject.short_name.should == organization.short_name }
-  it { subject.organization_id.should == organization.id }
-  it { subject.slug.should == organization.slug }
-  it { subject.is_admin.should be_false }
-  it { subject.locations.should == [{ name: organization.name, id: nil}] }
+  it { expect(subject.organization_name).to eq(organization.name) }
+  it { expect(subject.short_name).to eq(organization.short_name) }
+  it { expect(subject.organization_id).to eq(organization.id) }
+  it { expect(subject.slug).to eq(organization.slug) }
+  it { expect(subject.is_admin).to be_falsey }
+  it { expect(subject.locations).to eq([{ name: organization.name, id: nil}]) }
 
 end

@@ -5,7 +5,7 @@ describe 'Selections API V2' do
     it "responds on index" do
       selection = FactoryGirl.create(:color)
       get '/api/v2/selections/colors'
-      response.code.should == '200'
+      expect(response.code).to eq('200')
       result = JSON.parse(response.body)['colors'][0]
       expect(result["name"]).to eq(selection.name)
     end
@@ -15,7 +15,7 @@ describe 'Selections API V2' do
     it "responds on index with pagination" do
       selection = FactoryGirl.create(:ctype)
       get '/api/v2/selections/component_types'
-      response.code.should == '200'
+      expect(response.code).to eq('200')
       result = JSON.parse(response.body)['component_types'][0]
       expect(result["name"]).to eq(selection.name)
     end
@@ -25,7 +25,7 @@ describe 'Selections API V2' do
     it "responds on index with pagination" do
       selection = FactoryGirl.create(:cycle_type)
       get '/api/v2/selections/cycle_types'
-      response.code.should == '200'
+      expect(response.code).to eq('200')
       result = JSON.parse(response.body)['cycle_types'][0]
       expect(result["name"]).to eq(selection.name)
     end
@@ -35,7 +35,7 @@ describe 'Selections API V2' do
     it "responds on index with pagination" do
       selection = FactoryGirl.create(:frame_material)
       get '/api/v2/selections/frame_materials'
-      response.code.should == '200'
+      expect(response.code).to eq('200')
       result = JSON.parse(response.body)['frame_materials'][0]
       expect(result["name"]).to eq(selection.name)
     end
@@ -45,7 +45,7 @@ describe 'Selections API V2' do
     it "responds on index with pagination" do
       selection = FactoryGirl.create(:front_gear_type)
       get '/api/v2/selections/front_gear_types'
-      response.code.should == '200'
+      expect(response.code).to eq('200')
       result = JSON.parse(response.body)['front_gear_types'][0]
       expect(result["name"]).to eq(selection.name)
     end
@@ -55,7 +55,7 @@ describe 'Selections API V2' do
     it "responds on index with pagination" do
       selection = FactoryGirl.create(:rear_gear_type)
       get '/api/v2/selections/rear_gear_types'
-      response.code.should == '200'
+      expect(response.code).to eq('200')
       result = JSON.parse(response.body)['rear_gear_types'][0]
       expect(result["name"]).to eq(selection.name)
     end
@@ -65,7 +65,7 @@ describe 'Selections API V2' do
     it "responds on index with pagination" do
       selection = FactoryGirl.create(:handlebar_type)
       get '/api/v2/selections/handlebar_types'
-      response.code.should == '200'
+      expect(response.code).to eq('200')
       result = JSON.parse(response.body)['handlebar_types'][0]
       expect(result["name"]).to eq(selection.name)
     end
@@ -75,7 +75,7 @@ describe 'Selections API V2' do
     it "responds on index with pagination" do
       selection = FactoryGirl.create(:propulsion_type)
       get '/api/v2/selections/propulsion_types'
-      response.code.should == '200'
+      expect(response.code).to eq('200')
       result = JSON.parse(response.body)['propulsion_types'][0]
       expect(result["name"]).to eq(selection.name)
     end
@@ -90,7 +90,7 @@ describe 'Selections API V2' do
       expect(response.header['Total']).to eq('2')
       pagination_link = "<http://www.example.com/api/v2/selections/wheel_sizes?page=2&per_page=1>; rel=\"last\", <http://www.example.com/api/v2/selections/wheel_sizes?page=2&per_page=1>; rel=\"next\""
       expect(response.header['Link']).to eq(pagination_link)
-      response.code.should == '200'
+      expect(response.code).to eq('200')
       result = JSON.parse(response.body)['wheel_sizes'][0]
       expect(result["iso_bsd"]).to eq(wheel_size.iso_bsd)
       expect(result["popularity"]).to eq(wheel_size.popularity)

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe DuplicateBikeFinderWorker do
-  it { should be_processed_in :afterwards }
+  it { is_expected.to be_processed_in :afterwards }
   
   it "takes a bike id and search for groups" do
     bike1 = FactoryGirl.create(:bike, serial_number: "applejacks cereal")

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe UnusedOwnershipRemovalWorker do
-  it { should be_processed_in :afterwards }
+  it { is_expected.to be_processed_in :afterwards }
 
   it "enqueues listing ordering job" do
     UnusedOwnershipRemovalWorker.perform_async
@@ -11,7 +11,7 @@ describe UnusedOwnershipRemovalWorker do
   it "makes non existent ownerships not current" do 
     ownership = Ownership.create(owner_email: 'something@d.com', creator_id: 69, bike_id: 69, current: true)
     UnusedOwnershipRemovalWorker.new.perform(ownership.id)
-    ownership.reload.current.should be_false
+    expect(ownership.reload.current).to be_falsey
   end
 
 end

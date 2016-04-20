@@ -6,10 +6,10 @@ describe Api::V1::StolenLockingResponseSuggestionsController do
     it "loads the page" do
       get :index, format: :json
       # pp response.body
-      response.code.should eq('200')
+      expect(response.code).to eq('200')
       result = JSON.parse(response.body)
-      result['locking_defeat_descriptions'].count.should eq(6)
-      result['locking_descriptions'].count.should eq(8)
+      expect(result['locking_defeat_descriptions'].count).to eq(6)
+      expect(result['locking_descriptions'].count).to eq(8)
     end
   end   
 end

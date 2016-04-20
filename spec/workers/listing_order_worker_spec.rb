@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe ListingOrderWorker do
-  it { should be_processed_in :updates }
+  it { is_expected.to be_processed_in :updates }
 
   it 'enqueues listing ordering job' do
     ListingOrderWorker.perform_async
@@ -14,7 +14,7 @@ describe ListingOrderWorker do
     ownership = FactoryGirl.create(:ownership, bike: bike)
     ListingOrderWorker.new.perform(bike.id)
     bike.reload
-    bike.paint.should eq(paint)
+    expect(bike.paint).to eq(paint)
   end
 
   it "doesn't break if it isn't a bike" do 

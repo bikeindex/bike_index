@@ -7,12 +7,12 @@ describe PublicImagesController do
       bike = FactoryGirl.create(:bike)
       o = FactoryGirl.create(:ownership, bike: bike, creator: user, owner_email: user.email)
       public_image = FactoryGirl.create(:public_image, imageable: bike)
-      bike.reload.owner.should eq(user)
+      expect(bike.reload.owner).to eq(user)
       set_current_user(user)
       set_current_user(user)
-      lambda do
+      expect do
         delete :destroy, id: public_image.id
-      end.should change(PublicImage, :count).by(-1)
+      end.to change(PublicImage, :count).by(-1)
     end
     
     it "ensures that current user owns image before allowing destroy" do
@@ -21,9 +21,9 @@ describe PublicImagesController do
       non_owner = FactoryGirl.create(:user, name: "Non Owner")
       public_image = FactoryGirl.create(:public_image, imageable: bike)
       set_current_user(non_owner)
-      lambda do
+      expect do
         delete :destroy, id: public_image.id
-      end.should_not change(PublicImage, :count)
+      end.not_to change(PublicImage, :count)
     end
   end
 
@@ -56,11 +56,11 @@ describe PublicImagesController do
       bike = FactoryGirl.create(:bike)
       o = FactoryGirl.create(:ownership, bike: bike, creator: user, owner_email: user.email)
       public_image = FactoryGirl.create(:public_image, imageable: bike)
-      bike.reload.owner.should eq(user)
+      expect(bike.reload.owner).to eq(user)
       set_current_user(user)
       put :update, {id: public_image.id, public_image: {name: "Food"}}
-      response.should redirect_to(edit_bike_url(o.bike))
-      public_image.reload.name.should eq("Food")
+      expect(response).to redirect_to(edit_bike_url(o.bike))
+      expect(public_image.reload.name).to eq("Food")
     end
   end
 

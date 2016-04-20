@@ -6,9 +6,9 @@ describe Api::V1::UsersController do
 
     it "returns user_present = false if there is no user present" do
       get :current, format: :json
-      response.code.should eq('200')
-      response.headers['Access-Control-Allow-Origin'].should_not be_present
-      response.headers['Access-Control-Request-Method'].should_not be_present
+      expect(response.code).to eq('200')
+      expect(response.headers['Access-Control-Allow-Origin']).not_to be_present
+      expect(response.headers['Access-Control-Request-Method']).not_to be_present
     end
 
     it "returns user_present if a user is present" do 
@@ -16,11 +16,11 @@ describe Api::V1::UsersController do
       u = FactoryGirl.create(:user)
       set_current_user(u)
       get :current, format: :json
-      response.code.should eq('200')
+      expect(response.code).to eq('200')
       # pp response.body
-      JSON.parse(response.body).should include("user_present" => true)
-      response.headers['Access-Control-Allow-Origin'].should_not be_present
-      response.headers['Access-Control-Request-Method'].should_not be_present
+      expect(JSON.parse(response.body)).to include("user_present" => true)
+      expect(response.headers['Access-Control-Allow-Origin']).not_to be_present
+      expect(response.headers['Access-Control-Request-Method']).not_to be_present
     end
   end
 
@@ -42,8 +42,8 @@ describe Api::V1::UsersController do
         set_current_user(user)
         ActionMailer::Base.deliveries = []
         post :send_request, delete_request
-        response.code.should eq('200')
-        ActionMailer::Base.deliveries.should_not be_empty
+        expect(response.code).to eq('200')
+        expect(ActionMailer::Base.deliveries).not_to be_empty
       end
     end
     context 'manufacturer_update_manufacturer present' do
@@ -61,7 +61,7 @@ describe Api::V1::UsersController do
         }
         set_current_user(user)
         post :send_request, update_manufacturer_request
-        response.code.should eq('200')
+        expect(response.code).to eq('200')
         bike.reload
         expect(bike.manufacturer).to eq manufacturer
       end
@@ -81,7 +81,7 @@ describe Api::V1::UsersController do
         }
         set_current_user(user)
         post :send_request, update_manufacturer_request
-        response.code.should eq('200')
+        expect(response.code).to eq('200')
         bike.reload
         expect(bike.manufacturer).to be_present
       end
@@ -100,12 +100,12 @@ describe Api::V1::UsersController do
           serial_update_serial: 'some new serial'
         }
         set_current_user(user)
-        SerialNormalizer.any_instance.should_receive(:save_segments)
+        expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
         expect {
           post :send_request, serial_request
         }.to change(EmailFeedbackNotificationWorker.jobs, :size).by(0)
-        response.code.should eq('200')
-        bike.reload.serial_number.should eq('some new serial')
+        expect(response.code).to eq('200')
+        expect(bike.reload.serial_number).to eq('some new serial')
       end
     end
 
@@ -124,13 +124,13 @@ describe Api::V1::UsersController do
         serial_update_serial: 'some new serial'
       }
       set_current_user(user)
-      SerialNormalizer.any_instance.should_receive(:save_segments)
+      expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
       post :send_request, serial_request
-      response.code.should eq('200')
+      expect(response.code).to eq('200')
       bike.reload
-      bike.serial_number.should eq('some new serial')
+      expect(bike.serial_number).to eq('some new serial')
       stolen_record.reload
-      stolen_record.tsved_at.should be_nil
+      expect(stolen_record.tsved_at).to be_nil
     end
 
 
@@ -157,16 +157,16 @@ describe Api::V1::UsersController do
         bike.reload.update_attributes(stolen: false, current_stolen_record_id: nil)
         bike.reload
         post :send_request, recovery_request.as_json
-        response.code.should eq('200')
-        flash[:error].should_not be_present
-        bike.reload.stolen.should be_false
+        expect(response.code).to eq('200')
+        expect(flash[:error]).not_to be_present
+        expect(bike.reload.stolen).to be_falsey
         # ALSO MAKE SURE IT RECOVERY NOTIFIES
-        stolen_record.reload.current.should be_false
-        stolen_record.bike.should eq(bike)
-        stolen_record.date_recovered.should be_present
-        stolen_record.recovery_posted.should be_false
-        stolen_record.index_helped_recovery.should be_true
-        stolen_record.can_share_recovery.should be_true
+        expect(stolen_record.reload.current).to be_falsey
+        expect(stolen_record.bike).to eq(bike)
+        expect(stolen_record.date_recovered).to be_present
+        expect(stolen_record.recovery_posted).to be_falsey
+        expect(stolen_record.index_helped_recovery).to be_truthy
+        expect(stolen_record.can_share_recovery).to be_truthy
       end
     end
       
@@ -175,7 +175,7 @@ describe Api::V1::UsersController do
       message = { request_bike_id: bike.id, serial_update_serial: 'some update', request_reason: 'Some reason' }
       # pp message
       post :send_request, message, format: :json
-      response.code.should eq('403')
+      expect(response.code).to eq('403')
     end
 
     it "does not create a new serial request mailer if wrong user user is present" do 
@@ -186,7 +186,7 @@ describe Api::V1::UsersController do
       params = { request_bike_id: bike.id, serial_update_serial: 'some update', request_reason: 'Some reason' }
       post :send_request, params
       # pp response 
-      response.code.should eq('403')
+      expect(response.code).to eq('403')
     end
   end
 

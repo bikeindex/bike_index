@@ -6,8 +6,8 @@ describe StolenController do
       before do
         get :index
       end
-      it { should respond_with(:success) }
-      it { should render_template(:index) }
+      it { is_expected.to respond_with(:success) }
+      it { is_expected.to render_template(:index) }
     end
     context 'with subdomain' do
       it 'redirects to no subdomain' do

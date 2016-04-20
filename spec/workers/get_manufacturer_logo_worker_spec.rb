@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe GetManufacturerLogoWorker do
-  it { should be_processed_in :afterwards }
+  it { is_expected.to be_processed_in :afterwards }
 
   it "enqueues listing ordering job" do
     GetManufacturerLogoWorker.perform_async
@@ -26,14 +26,14 @@ describe GetManufacturerLogoWorker do
 
   it "returns true if no website present" do 
     manufacturer = FactoryGirl.create(:manufacturer)
-    expect(GetManufacturerLogoWorker.new.perform(manufacturer.id)).to be_true
+    expect(GetManufacturerLogoWorker.new.perform(manufacturer.id)).to be_truthy
   end
 
   it "returns true if no website present" do
     local_image = File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg'))
     manufacturer = FactoryGirl.create(:manufacturer, logo: local_image, website: 'http://example.com')
     expect(manufacturer.logo).to be_present
-    expect(GetManufacturerLogoWorker.new.perform(manufacturer.id)).to be_true
+    expect(GetManufacturerLogoWorker.new.perform(manufacturer.id)).to be_truthy
   end
 
 end

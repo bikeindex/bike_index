@@ -17,9 +17,9 @@ describe StolenNotificationsController do
       
       it "creates a Stolen Notification record" do
         set_current_user(@user)
-        lambda do
+        expect do
           post :create, stolen_notification: stolen_notification_attributes
-        end.should change(StolenNotification, :count).by(1)
+        end.to change(StolenNotification, :count).by(1)
       end
 
       it "enqueues the stolen notification email job" do
@@ -37,9 +37,9 @@ describe StolenNotificationsController do
       }
 
       it "does not work unless there is a user logged in" do
-        lambda do
+        expect do
           post :create, stolen_notification: stolen_notification_attributes
-        end.should_not change(StolenNotification, :count)
+        end.not_to change(StolenNotification, :count)
       end
     end
   end

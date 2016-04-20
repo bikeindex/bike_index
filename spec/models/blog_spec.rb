@@ -15,7 +15,7 @@ describe Blog do
       @user = FactoryGirl.create(:user)
       blog = Blog.new(title: "A really really really really loooooooooooooooooooooooooooooooooooong title that absolutely rocks so hard", body: "some things", user_id: @user.id, published_at: Time.now)
       blog.save
-      blog.title_slug.should eq("a-really-really-really-really-loooooooooooooooooooooooooooooooooooong")
+      expect(blog.title_slug).to eq("a-really-really-really-really-loooooooooooooooooooooooooooooooooooong")
     end
   end
 
@@ -27,8 +27,8 @@ describe Blog do
       blog.title = "New Title"
       blog.update_title = '1'
       blog.save
-      blog.title_slug.should eq('new-title')
-      blog.old_title_slug.should eq("a-really-really-really-really-loooooooooooooooooooooooooooooooooooong")
+      expect(blog.title_slug).to eq('new-title')
+      expect(blog.old_title_slug).to eq("a-really-really-really-really-loooooooooooooooooooooooooooooooooooong")
     end
   end
 
@@ -52,7 +52,7 @@ describe Blog do
       lorem  
       """
       blog.save
-      blog.body_abbr.should eq("Lorem ipsum dolor sit amet! Consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ...")
+      expect(blog.body_abbr).to eq("Lorem ipsum dolor sit amet! Consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ...")
     end
 
     it "creates the body abbr from a listicle" do 
@@ -60,7 +60,7 @@ describe Blog do
       blog = Blog.create(title: "Blog title", user_id: @user.id, published_at: Time.now, body: "stuff", is_listicle: true)
       Listicle.create(blog_id: blog.id, body: "View the link\n[here](http://something)\n\n<img class='post-image' src='https://files.bikeindex.org/uploads/Pu/1003/large_photo__6_.JPG' alt='Bike Index shirt and stickers'>\n![PBR, a bike bag and drawings](http://imgur.com/e4zzEjP.jpg) and also this")
       blog.reload.save
-      blog.reload.body_abbr.should eq("View the link here and also this")
+      expect(blog.reload.body_abbr).to eq("View the link here and also this")
     end
 
     it "removes any link information and images" do 
@@ -70,7 +70,7 @@ describe Blog do
       blog = Blog.new(title: "Blog title", user_id: @user.id, published_at: Time.now )
       blog.body = "View the link\n[here](http://something)\n\n<img class='post-image' src='https://files.bikeindex.org/uploads/Pu/1003/large_photo__6_.JPG' alt='Bike Index shirt and stickers'>\n![PBR, a bike bag and drawings](http://imgur.com/e4zzEjP.jpg) and also this"
       blog.save
-      blog.body_abbr.should eq("View the link here and also this")
+      expect(blog.body_abbr).to eq("View the link here and also this")
     end
   end
 
@@ -80,7 +80,7 @@ describe Blog do
       public_image = FactoryGirl.create(:public_image, imageable: blog)
       blog.reload # Reload so it knows about association
       blog.set_index_image
-      blog.index_image_id.should eq(public_image.id)
+      expect(blog.index_image_id).to eq(public_image.id)
     end
 
     it "doesn't break if image doesn't exist" do 
@@ -89,11 +89,11 @@ describe Blog do
       blog.reload # Reload so it knows about association
       blog.index_image_id = 3399
       blog.set_index_image
-      blog.index_image_id.should eq(public_image.id)
+      expect(blog.index_image_id).to eq(public_image.id)
     end
 
     it "has before_save_callback_method defined for set_index_image" do
-      Blog._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_index_image).should == true
+      expect(Blog._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_index_image)).to eq(true)
     end
   end
 
@@ -107,11 +107,11 @@ describe Blog do
       blog = Blog.new(is_listicle: true)
       listicle = Listicle.new(body: "body", title: 'title', image_credits: 'credit')
       listicle.htmlize_content
-      blog.stub(:listicles).and_return([listicle])
+      allow(blog).to receive(:listicles).and_return([listicle])
       target = '<article><div class="listicle-image-credit"><p>credit</p>' + 
         "\n" + '</div><h2 class="list-item-title">title</h2></article><article><p>body</p>' +
         "\n" + '</article>'
-      blog.feed_content.should eq(target)
+      expect(blog.feed_content).to eq(target)
     end
   end
 end

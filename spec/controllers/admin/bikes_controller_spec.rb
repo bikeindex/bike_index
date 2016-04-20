@@ -62,7 +62,7 @@ describe Admin::BikesController do
       it 'marks a stolen bike recovered and passes attr update through' do
         bike = FactoryGirl.create(:stolen_bike)
         bike.reload
-        expect(bike.stolen).to be_true
+        expect(bike.stolen).to be_truthy
         opts = {
           id: bike.id,
           mark_recovered_reason: "I recovered it", 
@@ -74,9 +74,9 @@ describe Admin::BikesController do
         expect do
           put :update, opts
         end.to change(RecoveryUpdateWorker.jobs, :size).by(1)
-        expect(assigns(:fast_attr_update)).to be_true
+        expect(assigns(:fast_attr_update)).to be_truthy
         bike.reload
-        expect(bike.stolen).to be_false
+        expect(bike.stolen).to be_falsey
       end
     end
 
@@ -104,11 +104,11 @@ describe Admin::BikesController do
     context 'marked ignore' do
       it 'duplicates are ignore' do
         duplicate_bike_group = DuplicateBikeGroup.create
-        expect(duplicate_bike_group.ignore).to be_false
+        expect(duplicate_bike_group.ignore).to be_falsey
         put :ignore_duplicate_toggle, id: duplicate_bike_group.id 
         duplicate_bike_group.reload
 
-        expect(duplicate_bike_group.ignore).to be_true
+        expect(duplicate_bike_group.ignore).to be_truthy
         expect(response).to redirect_to 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
       end
     end
@@ -116,11 +116,11 @@ describe Admin::BikesController do
     context 'duplicate group unignore' do
       it "marks a duplicate group unignore" do
         duplicate_bike_group = DuplicateBikeGroup.create(ignore: true)
-        expect(duplicate_bike_group.ignore).to be_true
+        expect(duplicate_bike_group.ignore).to be_truthy
         put :ignore_duplicate_toggle, id: duplicate_bike_group.id 
         duplicate_bike_group.reload
 
-        expect(duplicate_bike_group.ignore).to be_false
+        expect(duplicate_bike_group.ignore).to be_falsey
         expect(response).to redirect_to 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
       end
     end

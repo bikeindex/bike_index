@@ -6,13 +6,13 @@ describe BikeCreatorBuilder do
     it "returns a new bike object from the params with the b_param_id" do
       bike = Bike.new
       b_param = BParam.new 
-      b_param.stub(:id).and_return(9)
-      b_param.stub(:creator_id).and_return(6)
-      b_param.stub(:params).and_return(bike: {serial_number: "AAAA"})
+      allow(b_param).to receive(:id).and_return(9)
+      allow(b_param).to receive(:creator_id).and_return(6)
+      allow(b_param).to receive(:params).and_return(bike: {serial_number: "AAAA"})
       bike = BikeCreatorBuilder.new(b_param).new_bike
-      bike.serial_number.should eq("AAAA")
-      bike.updator_id.should eq(6)
-      bike.b_param_id.should eq(9)
+      expect(bike.serial_number).to eq("AAAA")
+      expect(bike.updator_id).to eq(6)
+      expect(bike.b_param_id).to eq(9)
     end
   end
 
@@ -21,12 +21,12 @@ describe BikeCreatorBuilder do
       cycle_type = FactoryGirl.create(:cycle_type, name: "Bike", slug: "bike")
       bike = Bike.new
       b_param = BParam.new 
-      bike.stub(:cycle_type_id).and_return(cycle_type.id)
-      bike.stub(:rear_wheel_size_id).and_return(1)
-      bike.stub(:rear_tire_narrow).and_return(true)
+      allow(bike).to receive(:cycle_type_id).and_return(cycle_type.id)
+      allow(bike).to receive(:rear_wheel_size_id).and_return(1)
+      allow(bike).to receive(:rear_tire_narrow).and_return(true)
       BikeCreatorBuilder.new(b_param).add_front_wheel_size(bike)
-      bike.front_wheel_size_id.should eq(1)
-      bike.rear_tire_narrow.should be_true
+      expect(bike.front_wheel_size_id).to eq(1)
+      expect(bike.rear_tire_narrow).to be_truthy
     end
   end
 
@@ -38,8 +38,8 @@ describe BikeCreatorBuilder do
       b_param = BParam.new
       creator = BikeCreatorBuilder.new(b_param)
       creator.add_required_attributes(bike)
-      bike.cycle_type.should eq(cycle_type)
-      bike.propulsion_type.should eq(propulsion_type)
+      expect(bike.cycle_type).to eq(cycle_type)
+      expect(bike.propulsion_type).to eq(propulsion_type)
     end
   end
 
@@ -47,8 +47,8 @@ describe BikeCreatorBuilder do
     it "calls bike_creator_verifier the required attributes" do 
       b_param = BParam.new
       bike = Bike.new
-      BikeCreatorVerifier.any_instance.should_receive(:verify).and_return(bike)
-      BikeCreatorBuilder.new(b_param).verified_bike(bike).should eq(bike)
+      expect_any_instance_of(BikeCreatorVerifier).to receive(:verify).and_return(bike)
+      expect(BikeCreatorBuilder.new(b_param).verified_bike(bike)).to eq(bike)
     end
   end
 
@@ -56,10 +56,10 @@ describe BikeCreatorBuilder do
     it "calls verified bike on new bike and return the bike" do 
       bike = Bike.new 
       creator = BikeCreatorBuilder.new()
-      creator.should_receive(:new_bike).and_return(bike)
-      creator.should_receive(:verified_bike).and_return(bike)
-      creator.stub(:add_required_attributes).and_return(bike)
-      creator.build_new.should eq(bike)
+      expect(creator).to receive(:new_bike).and_return(bike)
+      expect(creator).to receive(:verified_bike).and_return(bike)
+      allow(creator).to receive(:add_required_attributes).and_return(bike)
+      expect(creator.build_new).to eq(bike)
     end
   end
 
@@ -67,19 +67,19 @@ describe BikeCreatorBuilder do
     it "returns the b_param bike if one exists" do 
       b_param = BParam.new
       bike = Bike.new 
-      b_param.stub(:bike).and_return(bike)
-      b_param.stub(:created_bike).and_return(bike)
-      BikeCreatorBuilder.new(b_param).build.should eq(bike)
+      allow(b_param).to receive(:bike).and_return(bike)
+      allow(b_param).to receive(:created_bike).and_return(bike)
+      expect(BikeCreatorBuilder.new(b_param).build).to eq(bike)
     end
     
     it "uses build_new and call other things" do 
       b_param = BParam.new
       bike = Bike.new 
-      b_param.stub(:created_bike).and_return(nil)
+      allow(b_param).to receive(:created_bike).and_return(nil)
       creator = BikeCreatorBuilder.new(b_param)
-      creator.stub(:build_new).and_return(bike)
-      creator.should_receive(:add_front_wheel_size).and_return(true)
-      creator.build.should eq(bike)
+      allow(creator).to receive(:build_new).and_return(bike)
+      expect(creator).to receive(:add_front_wheel_size).and_return(true)
+      expect(creator.build).to eq(bike)
     end
   end
 

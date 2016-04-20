@@ -7,31 +7,31 @@ describe Admin::DashboardController do
       set_current_user(user)
       get :index
     end
-    it { should respond_with(:success) }
-    it { should render_template(:index) }
+    it { is_expected.to respond_with(:success) }
+    it { is_expected.to render_template(:index) }
   end
 
   describe :index do 
     it "fails for non logged in" do 
       get :index
-      response.code.should eq('302')
-      response.should redirect_to(root_url)
+      expect(response.code).to eq('302')
+      expect(response).to redirect_to(root_url)
     end
 
     it "fails for non admins" do 
       user = FactoryGirl.create(:user)
       set_current_user(user)
       get :index
-      response.code.should eq('302')
-      response.should redirect_to(user_home_url)
+      expect(response.code).to eq('302')
+      expect(response).to redirect_to(user_home_url)
     end
 
     it "fails for content admins" do 
       user = FactoryGirl.create(:user, is_content_admin: true)
       set_current_user(user)
       get :index
-      response.code.should eq('302')
-      response.should redirect_to(admin_news_index_url)
+      expect(response.code).to eq('302')
+      expect(response).to redirect_to(admin_news_index_url)
     end
   end
 
@@ -42,8 +42,8 @@ describe Admin::DashboardController do
       b_param = BParam.create(creator_id: user.id)
       get :invitations
     end
-    it { should respond_with(:success) }
-    it { should render_template(:invitations) }
+    it { is_expected.to respond_with(:success) }
+    it { is_expected.to render_template(:invitations) }
   end
 
   describe :maintenance do 
@@ -56,8 +56,8 @@ describe Admin::DashboardController do
       b_param = BParam.create(creator_id: user.id)
       get :maintenance
     end
-    it { should respond_with(:success) }
-    it { should render_template(:maintenance) }
+    it { is_expected.to respond_with(:success) }
+    it { is_expected.to render_template(:maintenance) }
   end
 
   describe :tsvs do 
@@ -70,9 +70,9 @@ describe Admin::DashboardController do
       blacklist = ['1010101', '2', '4', '6']
       FileCacheMaintainer.reset_blacklist_ids(blacklist)
       get :tsvs
-      response.code.should eq('200')
+      expect(response.code).to eq('200')
       # assigns(:tsvs).should eq(tsvs)
-      assigns(:blacklist).include?('2').should be_true
+      expect(assigns(:blacklist).include?('2')).to be_truthy
     end
   end
 

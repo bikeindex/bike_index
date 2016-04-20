@@ -8,7 +8,7 @@ describe OrganizationInvitationsController do
       membership = FactoryGirl.create(:membership, organization: organization, user: user, role: "admin")
       set_current_user(user)
       { put: "/organizations/#{organization.slug}/organization_invitations/new" }
-      response.code.should eq("200")
+      expect(response.code).to eq("200")
     end
   end
 
@@ -21,26 +21,26 @@ describe OrganizationInvitationsController do
     end
     
     it "creates a new organization_invitation and reduce the organization invitation tokens by one" do
-      lambda {
+      expect {
         put :create, organization_id: @organization.slug, organization_invitation: { 
           inviter_id: @user.id,
           membership_role: "member",
           invitee_email: "bike_email@bike_shop.com"
         }
-      }.should change(OrganizationInvitation, :count).by(1)
-      @organization.reload.available_invitation_count.should eq(0)
-      @organization.sent_invitation_count.should eq(1)
+      }.to change(OrganizationInvitation, :count).by(1)
+      expect(@organization.reload.available_invitation_count).to eq(0)
+      expect(@organization.sent_invitation_count).to eq(1)
     end
 
     it "does not create a new organization_invitation if there are no available invitations" do
       @organization.update_attributes(available_invitation_count: 0)
-      lambda {
+      expect {
         put :create, organization_id: @organization.slug, organization_invitation: { 
           inviter_id: @user.id,
           membership_role: "member",
           invitee_email: "bike_email@bike_shop.com"
         }
-      }.should_not change(OrganizationInvitation, :count).by(1)
+      }.not_to change(OrganizationInvitation, :count).by(1)
     end
   end
 

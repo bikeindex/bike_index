@@ -18,7 +18,7 @@ describe Admin::CustomerContactsController do
       expect {
         post :create, {customer_contact: customer_contact}
       }.to change(EmailAdminContactStolenWorker.jobs, :size).by(1)
-      response.should redirect_to edit_admin_stolen_bike_url(stolen_record.bike.id)
+      expect(response).to redirect_to edit_admin_stolen_bike_url(stolen_record.bike.id)
     end
   end
 

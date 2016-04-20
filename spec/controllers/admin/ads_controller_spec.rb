@@ -7,8 +7,8 @@ describe Admin::AdsController do
       set_current_user(user)
       get :index
     end
-    it { should respond_with(:success) }
-    it { should render_template(:index) }
+    it { is_expected.to respond_with(:success) }
+    it { is_expected.to render_template(:index) }
   end
 
 end

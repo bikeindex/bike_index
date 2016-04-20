@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe RecoveryNotifyWorker do
-  it { should be_processed_in :notify }
+  it { is_expected.to be_processed_in :notify }
 
   it "enqueues another awesome job" do
     RecoveryNotifyWorker.perform_async
@@ -24,8 +24,8 @@ describe RecoveryNotifyWorker do
       bike.save
       work = RecoveryNotifyWorker.new
       work.perform(stolen_record.id)
-      stolen_record.recovery_share.should be_present
-      stolen_record.recovery_tweet.should be_present
+      expect(stolen_record.recovery_share).to be_present
+      expect(stolen_record.recovery_tweet).to be_present
       # stolen_record.reload.recovery_posted.should be_true
     end
   # end

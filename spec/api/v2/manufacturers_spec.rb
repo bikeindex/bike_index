@@ -9,10 +9,10 @@ describe 'Manufacturers API V2' do
       expect(response.header['Total']).to eq('2')
       pagination_link = "<http://www.example.com/api/v2/manufacturers?page=2&per_page=1>; rel=\"last\", <http://www.example.com/api/v2/manufacturers?page=2&per_page=1>; rel=\"next\""
       expect(response.header['Link']).to eq(pagination_link)
-      response.code.should == '200'
+      expect(response.code).to eq('200')
       # pp response.headers
-      response.headers['Access-Control-Allow-Origin'].should eq('*')
-      response.headers['Access-Control-Request-Method'].should eq('*')
+      expect(response.headers['Access-Control-Allow-Origin']).to eq('*')
+      expect(response.headers['Access-Control-Request-Method']).to eq('*')
       expect(JSON.parse(response.body)['manufacturers'][0]['id']).to eq(manufacturer.id)
     end
   end
@@ -24,17 +24,17 @@ describe 'Manufacturers API V2' do
     it "returns one with from an id" do
       get "/api/v2/manufacturers/#{@manufacturer.id}"
       result = response.body
-      response.code.should == '200'
+      expect(response.code).to eq('200')
       expect(JSON.parse(result)['manufacturer']['id']).to eq(@manufacturer.id)
     end
 
     it "responds with missing and cors headers" do 
       get "/api/v2/manufacturers/10000"
-      response.code.should == '404'
-      expect(JSON(response.body)["error"].present?).to be_true
-      response.headers['Access-Control-Allow-Origin'].should eq('*')
-      response.headers['Access-Control-Request-Method'].should eq('*')
-      response.headers['Content-Type'].match('json').should be_present
+      expect(response.code).to eq('404')
+      expect(JSON(response.body)["error"].present?).to be_truthy
+      expect(response.headers['Access-Control-Allow-Origin']).to eq('*')
+      expect(response.headers['Access-Control-Request-Method']).to eq('*')
+      expect(response.headers['Content-Type'].match('json')).to be_present
     end
 
     it "returns one from a name" do 
@@ -43,7 +43,7 @@ describe 'Manufacturers API V2' do
       manufacturer = FactoryGirl.create(:manufacturer, name: 'awesome')
       get "/api/v2/manufacturers/awesome"
       result = response.body
-      response.code.should == '200'
+      expect(response.code).to eq('200')
       expect(JSON.parse(result)['manufacturer']['id']).to eq(@manufacturer.id)
     end
   end
@@ -52,11 +52,11 @@ describe 'Manufacturers API V2' do
     it "responds with missing and cors headers" do 
       get "/api/v2/manufacturersdddd"
       # pp JSON.parse(response.body)
-      response.code.should == '404'
-      expect(JSON(response.body)["error"].present?).to be_true
-      response.headers['Access-Control-Allow-Origin'].should eq('*')
-      response.headers['Access-Control-Request-Method'].should eq('*')
-      response.headers['Content-Type'].match('json').should be_present
+      expect(response.code).to eq('404')
+      expect(JSON(response.body)["error"].present?).to be_truthy
+      expect(response.headers['Access-Control-Allow-Origin']).to eq('*')
+      expect(response.headers['Access-Control-Request-Method']).to eq('*')
+      expect(response.headers['Content-Type'].match('json')).to be_present
     end
   end
 end

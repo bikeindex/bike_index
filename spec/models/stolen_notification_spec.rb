@@ -3,13 +3,13 @@ require 'spec_helper'
 describe StolenNotification do
 
   describe :validations do
-    it { should belong_to :bike }
-    it { should belong_to :sender }
-    it { should belong_to :receiver }
-    it { should validate_presence_of :sender }
-    it { should validate_presence_of :bike }
-    it { should validate_presence_of :message }
-    it { should serialize :send_dates }
+    it { is_expected.to belong_to :bike }
+    it { is_expected.to belong_to :sender }
+    it { is_expected.to belong_to :receiver }
+    it { is_expected.to validate_presence_of :sender }
+    it { is_expected.to validate_presence_of :bike }
+    it { is_expected.to validate_presence_of :message }
+    it { is_expected.to serialize :send_dates }
   end
 
   describe :create do
@@ -19,7 +19,7 @@ describe StolenNotification do
         FactoryGirl.create(:stolen_notification, sender: user)
       }.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
       stolen_notification = StolenNotification.where(sender_id: user.id).first
-      stolen_notification.send_dates.should eq([])
+      expect(stolen_notification.send_dates).to eq([])
       expect {
         stolen_notification2 = FactoryGirl.create(:stolen_notification, sender: user)
       }.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
@@ -38,7 +38,7 @@ describe StolenNotification do
 
   describe :default_subject do 
     it "default subject" do 
-      StolenNotification.new.default_subject.should eq("Stolen bike contact")
+      expect(StolenNotification.new.default_subject).to eq("Stolen bike contact")
     end
   end
 

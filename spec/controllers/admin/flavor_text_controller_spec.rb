@@ -8,8 +8,8 @@ describe Admin::FlavorTextsController do
       set_current_user(user)
       delete :destroy, id: text.id
     end
-    it { should redirect_to(:admin_root) }
-    it { should set_the_flash }
+    it { is_expected.to redirect_to(:admin_root) }
+    it { is_expected.to set_the_flash }
   end
 
   describe :update do 
@@ -19,8 +19,8 @@ describe Admin::FlavorTextsController do
         set_current_user(user)
         post :create, {flavor_text: {message: "lulz"}}
       end
-      it { should redirect_to(:admin_root) }
-      it { should set_the_flash }
+      it { is_expected.to redirect_to(:admin_root) }
+      it { is_expected.to set_the_flash }
     end
   end
 end

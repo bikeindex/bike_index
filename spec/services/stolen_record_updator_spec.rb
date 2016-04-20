@@ -6,18 +6,18 @@ describe StolenRecordUpdator do
       FactoryGirl.create(:country, iso: "US")
       bike = FactoryGirl.create(:bike)
       update_stolen_record = StolenRecordUpdator.new(bike: bike)
-      update_stolen_record.should_receive(:updated_phone).at_least(1).times.and_return("1231234444")
-      lambda { update_stolen_record.create_new_record }.should change(StolenRecord, :count).by(1)
-      bike.stolen_records.count.should eq(1)
-      bike.current_stolen_record.should eq(bike.stolen_records.last)
+      expect(update_stolen_record).to receive(:updated_phone).at_least(1).times.and_return("1231234444")
+      expect { update_stolen_record.create_new_record }.to change(StolenRecord, :count).by(1)
+      expect(bike.stolen_records.count).to eq(1)
+      expect(bike.current_stolen_record).to eq(bike.stolen_records.last)
     end
 
     it "calls mark_records_not_current" do 
       FactoryGirl.create(:country, iso: "US")
       bike = FactoryGirl.create(:bike, stolen: true)
       update_stolen_record = StolenRecordUpdator.new(bike: bike)
-      update_stolen_record.should_receive(:updated_phone).at_least(1).times.and_return("1231234444")
-      update_stolen_record.should_receive(:mark_records_not_current)
+      expect(update_stolen_record).to receive(:updated_phone).at_least(1).times.and_return("1231234444")
+      expect(update_stolen_record).to receive(:mark_records_not_current)
       update_stolen_record.create_new_record
     end
   end
@@ -26,17 +26,17 @@ describe StolenRecordUpdator do
     it "does not set the phone if the user already has a phone" do 
       user = FactoryGirl.create(:user, phone: "0000000000")
       bike = Bike.new 
-      bike.stub(:phone).and_return("699.999.9999")
-      StolenRecordUpdator.new(bike: bike, user: user).updated_phone.should eq("699.999.9999")
-      user.phone.should eq("0000000000")
+      allow(bike).to receive(:phone).and_return("699.999.9999")
+      expect(StolenRecordUpdator.new(bike: bike, user: user).updated_phone).to eq("699.999.9999")
+      expect(user.phone).to eq("0000000000")
     end
 
     it "sets the owner's phone if one is passed in" do 
       user = FactoryGirl.create(:user)
       bike = Bike.new
-      bike.stub(:phone).and_return("699.999.9999")
-      StolenRecordUpdator.new(bike: bike, user: user).updated_phone.should eq("699.999.9999")
-      user.phone.should eq("6999999999")
+      allow(bike).to receive(:phone).and_return("699.999.9999")
+      expect(StolenRecordUpdator.new(bike: bike, user: user).updated_phone).to eq("699.999.9999")
+      expect(user.phone).to eq("6999999999")
     end
   end 
  
@@ -45,7 +45,7 @@ describe StolenRecordUpdator do
       date_time = DateTime.strptime("07-09-2000 06", "%m-%d-%Y %H")
       bike = Bike.new
       u = StolenRecordUpdator.new(bike: bike)
-      u.create_date_from_string("07-09-2000").should eq(date_time)
+      expect(u.create_date_from_string("07-09-2000")).to eq(date_time)
     end
   end
 
@@ -54,15 +54,15 @@ describe StolenRecordUpdator do
       FactoryGirl.create(:country, iso: "US")
       bike = FactoryGirl.create(:bike, stolen: true)
       update_stolen_record = StolenRecordUpdator.new(bike: bike)
-      update_stolen_record.should_receive(:updated_phone).at_least(1).times.and_return("1231234444")
-      update_stolen_record.should_receive(:mark_records_not_current)
+      expect(update_stolen_record).to receive(:updated_phone).at_least(1).times.and_return("1231234444")
+      expect(update_stolen_record).to receive(:mark_records_not_current)
       update_stolen_record.update_records
     end
 
     it "calls create if a stolen record doesn't exist" do 
       bike = FactoryGirl.create(:bike, stolen: true)
       update_stolen_record = StolenRecordUpdator.new(bike: bike)
-      update_stolen_record.should_receive(:create_new_record)
+      expect(update_stolen_record).to receive(:create_new_record)
       update_stolen_record.update_records
     end
 
@@ -71,15 +71,15 @@ describe StolenRecordUpdator do
       bike = stolen_record.bike
       bike.update_attributes(stolen: true)
       StolenRecordUpdator.new(bike: bike, date_stolen_input: "01-01-1969").update_records
-      bike.reload.current_stolen_record.date_stolen.should eq(DateTime.strptime("01-01-1969 06", "%m-%d-%Y %H"))
+      expect(bike.reload.current_stolen_record.date_stolen).to eq(DateTime.strptime("01-01-1969 06", "%m-%d-%Y %H"))
     end
 
     it "marks all stolen records false and mark the bike unrecovered if the bike isn't stolen" do 
       bike = FactoryGirl.create(:bike, stolen: false, recovered: true)
       update_stolen_record = StolenRecordUpdator.new(bike: bike)
-      update_stolen_record.should_receive(:mark_records_not_current)
+      expect(update_stolen_record).to receive(:mark_records_not_current)
       update_stolen_record.update_records
-      bike.recovered.should be_false
+      expect(bike.recovered).to be_falsey
     end
   end
 
@@ -88,14 +88,14 @@ describe StolenRecordUpdator do
       bike = FactoryGirl.create(:bike)
       stolen_record1 = FactoryGirl.create(:stolen_record, bike: bike)
       bike.save
-      bike.current_stolen_record_id.should eq(stolen_record1.id)
+      expect(bike.current_stolen_record_id).to eq(stolen_record1.id)
       stolen_record2 = FactoryGirl.create(:stolen_record, bike: bike)
       stolen_record1.update_attributes(current: true)
       stolen_record2.update_attributes(current: true)
       StolenRecordUpdator.new(bike: bike).mark_records_not_current
-      stolen_record1.reload.current.should be_false
-      stolen_record2.reload.current.should be_false
-      bike.reload.current_stolen_record_id.should be_nil
+      expect(stolen_record1.reload.current).to be_falsey
+      expect(stolen_record2.reload.current).to be_falsey
+      expect(bike.reload.current_stolen_record_id).to be_nil
     end
   end
 
@@ -105,7 +105,7 @@ describe StolenRecordUpdator do
       bike = FactoryGirl.create(:bike, creation_organization_id: organization.id)
       stolen_record = FactoryGirl.create(:stolen_record, bike: bike)
       updated = StolenRecordUpdator.new(bike: bike).set_creation_organization
-      stolen_record.reload.creation_organization.should eq(organization)
+      expect(stolen_record.reload.creation_organization).to eq(organization)
     end
   end
 
@@ -114,7 +114,7 @@ describe StolenRecordUpdator do
     it "returns the stolen record if no stolen record is associated" do 
       stolen_record = StolenRecord.new 
       updator = StolenRecordUpdator.new().update_with_params(stolen_record)
-      updator.should eq(stolen_record)
+      expect(updator).to eq(stolen_record)
     end
 
     it "sets the data that is submitted" do 
@@ -128,17 +128,17 @@ describe StolenRecordUpdator do
         zipcode: '60666'
       }
       b_param = BParam.new
-      b_param.stub(:params).and_return({stolen_record: sr})
+      allow(b_param).to receive(:params).and_return({stolen_record: sr})
       stolen_record = StolenRecord.new 
       updator = StolenRecordUpdator.new(b_param: b_param.params)
       stolen_record = updator.update_with_params(stolen_record)
-      stolen_record.police_report_number.should eq(sr[:police_report_number])
-      stolen_record.police_report_department.should eq(sr[:police_report_department])
-      stolen_record.theft_description.should eq(sr[:theft_description])
-      stolen_record.street.should eq(sr[:street])
-      stolen_record.city.should eq(sr[:city])
-      stolen_record.zipcode.should eq('60666')
-      stolen_record.date_stolen.should be > Time.now - 2.days
+      expect(stolen_record.police_report_number).to eq(sr[:police_report_number])
+      expect(stolen_record.police_report_department).to eq(sr[:police_report_department])
+      expect(stolen_record.theft_description).to eq(sr[:theft_description])
+      expect(stolen_record.street).to eq(sr[:street])
+      expect(stolen_record.city).to eq(sr[:city])
+      expect(stolen_record.zipcode).to eq('60666')
+      expect(stolen_record.date_stolen).to be > Time.now - 2.days
     end
 
     it "creates the associations that it's suppose to" do
@@ -148,12 +148,12 @@ describe StolenRecordUpdator do
         country: country.iso
       }
       b_param = BParam.new
-      b_param.stub(:params).and_return({stolen_record: sr})
+      allow(b_param).to receive(:params).and_return({stolen_record: sr})
       stolen_record = StolenRecord.new 
       updator = StolenRecordUpdator.new(b_param: b_param.params)
       stolen_record = updator.update_with_params(stolen_record)
-      stolen_record.country.should eq(country)
-      stolen_record.state.should eq(state)
+      expect(stolen_record.country).to eq(country)
+      expect(stolen_record.state).to eq(state)
     end
   end
 

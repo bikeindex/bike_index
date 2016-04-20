@@ -4,13 +4,13 @@ describe Membership do
     context 'admin' do
       it 'returns true' do
         membership = Membership.new(role: 'admin')
-        expect(membership.admin?).to be_true
+        expect(membership.admin?).to be_truthy
       end
     end
     context 'member' do
       it 'returns true' do
         membership = Membership.new(role: 'member')
-        expect(membership.admin?).to be_false
+        expect(membership.admin?).to be_falsey
       end
     end
   end

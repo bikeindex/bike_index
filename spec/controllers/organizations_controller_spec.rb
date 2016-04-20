@@ -7,14 +7,14 @@ describe OrganizationsController do
       before do 
         get :new
       end
-      it { should respond_with(:success) }
-      it { should render_template(:new) }
+      it { is_expected.to respond_with(:success) }
+      it { is_expected.to render_template(:new) }
     end
   end
 
   describe :create do 
     it "creates org, membership, filters approved attrs & redirect to org with current_user" do 
-      Organization.count.should eq(0)
+      expect(Organization.count).to eq(0)
       user = FactoryGirl.create(:user)
       set_current_user(user)
       org_attrs = {
@@ -24,18 +24,18 @@ describe OrganizationsController do
         approved: 'true'
       }
       post :create, organization: org_attrs
-      Organization.count.should eq(1)
+      expect(Organization.count).to eq(1)
       organization = Organization.where(name: 'a new org').first
-      response.should redirect_to edit_organization_url(organization)
-      organization.approved.should be_false
-      organization.api_access_approved.should be_false
-      organization.auto_user_id.should eq(user.id)
-      organization.memberships.count.should eq(1)
-      organization.memberships.first.user_id.should eq(user.id)
+      expect(response).to redirect_to edit_organization_url(organization)
+      expect(organization.approved).to be_falsey
+      expect(organization.api_access_approved).to be_falsey
+      expect(organization.auto_user_id).to eq(user.id)
+      expect(organization.memberships.count).to eq(1)
+      expect(organization.memberships.first.user_id).to eq(user.id)
     end
 
     it "Doesn't xss" do
-      Organization.count.should eq(0)
+      expect(Organization.count).to eq(0)
       user = FactoryGirl.create(:user)
       set_current_user(user)
       org_attrs = {
@@ -46,10 +46,10 @@ describe OrganizationsController do
         approved: 'true'
       }
       post :create, organization: org_attrs
-      Organization.count.should eq(1)
+      expect(Organization.count).to eq(1)
       organization = Organization.last
-      organization.name.should_not eq('<script>alert(document.cookie)</script>')
-      organization.website.should_not eq('<script>alert(document.cookie)</script>')
+      expect(organization.name).not_to eq('<script>alert(document.cookie)</script>')
+      expect(organization.website).not_to eq('<script>alert(document.cookie)</script>')
     end
 
     it "mails us" do 
@@ -64,7 +64,7 @@ describe OrganizationsController do
         }
         ActionMailer::Base.deliveries = []
         post :create, organization: org_attrs
-        ActionMailer::Base.deliveries.should_not be_empty
+        expect(ActionMailer::Base.deliveries).not_to be_empty
       end
     end
   end
@@ -103,18 +103,18 @@ describe OrganizationsController do
         wants_to_be_shown: true
       }
       put :update, {id: organization.slug, organization: org_update}
-      response.code.should eq('302')
-      organization.reload.name.should eq('some new name')
-      organization.website.should eq('http://www.drseuss.org')
+      expect(response.code).to eq('302')
+      expect(organization.reload.name).to eq('some new name')
+      expect(organization.website).to eq('http://www.drseuss.org')
       org.keys.each do |k|
         unless k == :wants_to_be_shown || k == :org_type
 
-          "#{organization.send(k)}".should eq("#{org[k]}")
+          expect("#{organization.send(k)}").to eq("#{org[k]}")
         end
       end
       msg = Feedback.last
-      msg.feedback_type.should eq('organization_map')
-      msg.feedback_hash[:organization_id].should eq(organization.id)
+      expect(msg.feedback_type).to eq('organization_map')
+      expect(msg.feedback_hash[:organization_id]).to eq(organization.id)
     end
 
     it "sends an admin notification if there is the lightspeed retail api key" do 
@@ -135,9 +135,9 @@ describe OrganizationsController do
         set_current_user(user)
         get :show, id: organization.slug
       end
-      it { should respond_with(:redirect) }
-      it { should redirect_to(user_home_url) }
-      it { should set_the_flash }
+      it { is_expected.to respond_with(:redirect) }
+      it { is_expected.to redirect_to(user_home_url) }
+      it { is_expected.to set_the_flash }
     end
     
     describe "when user is present" do 
@@ -147,7 +147,7 @@ describe OrganizationsController do
         membership = FactoryGirl.create(:membership, user: user, organization: organization)
         set_current_user(user)
         get :show, id: organization.slug
-        response.code.should eq("200")
+        expect(response.code).to eq("200")
       end
     end
   end
@@ -159,7 +159,7 @@ describe OrganizationsController do
       membership = FactoryGirl.create(:membership, user: user, organization: organization, role: "admin")
       set_current_user(user)
       get :edit, id: organization.slug
-      response.code.should eq("200")
+      expect(response.code).to eq("200")
     end
   end
 
@@ -172,9 +172,9 @@ describe OrganizationsController do
       FactoryGirl.create(:cycle_type, slug: "bike")
       FactoryGirl.create(:propulsion_type, name: "Foot pedal")
       get :embed, id: organization.slug
-      response.code.should eq("200")
-      response.should render_template(:embed)
-      response.headers['X-Frame-Options'].should_not be_present
+      expect(response.code).to eq("200")
+      expect(response).to render_template(:embed)
+      expect(response.headers['X-Frame-Options']).not_to be_present
     end
   end
 
@@ -187,10 +187,10 @@ describe OrganizationsController do
       FactoryGirl.create(:cycle_type, slug: "bike")
       FactoryGirl.create(:propulsion_type, name: "Foot pedal")
       get :embed_extended, {id: organization.slug, email: 'something@example.com'}
-      response.code.should eq("200")
-      response.should render_template(:embed)
-      response.headers['X-Frame-Options'].should_not be_present
-      assigns(:persist_email).should be_true
+      expect(response.code).to eq("200")
+      expect(response).to render_template(:embed)
+      expect(response.headers['X-Frame-Options']).not_to be_present
+      expect(assigns(:persist_email)).to be_truthy
     end
   end
 
@@ -199,9 +199,9 @@ describe OrganizationsController do
       organization = FactoryGirl.create(:organization)
       bike = FactoryGirl.create(:bike)
       get :embed_create_success, id: organization.slug, bike_id: bike.id
-      response.code.should eq("200")
-      response.should render_template(:embed_create_success)
-      response.headers['X-Frame-Options'].should_not be_present
+      expect(response.code).to eq("200")
+      expect(response).to render_template(:embed_create_success)
+      expect(response.headers['X-Frame-Options']).not_to be_present
     end
   end
 
