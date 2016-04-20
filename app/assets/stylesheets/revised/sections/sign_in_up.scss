@@ -12,7 +12,7 @@ $sign-in-up-form-bg: $gray-lighter;
 .sign-in-up {
   .sign-in-up-header h1 { margin-bottom: 4*$vertical-height; }
   .sign-in-up-main-form-header {
-    padding: 1.5*$vertical-height 0 $vertical-height  ;
+    padding: 1.5*$vertical-height 0 $vertical-height;
     small {
       @extend .body-font;
       float: right;
@@ -67,6 +67,12 @@ $sign-in-up-form-bg: $gray-lighter;
   }
   .main-form {
     @include make-col();
+    .checkbox input[type="checkbox"] { margin-top: .65rem; }
+    a, h3.sign-in-up-main-form-header a {
+      color: $body-font-color;
+      font-weight: $strong-font-weight;
+      &:hover, &:active, &.active { color: $body-font-color; }
+    }
     .btn {
       padding-top: $vertical-height;
       padding-bottom: $vertical-height;
@@ -126,7 +132,7 @@ $sign-in-up-form-bg: $gray-lighter;
 @media (min-width: $grid-breakpoint-lg) {
   .sign-in-up {
     .oauth-providers {
-      font-size: 18px;
+      font-size: 15px;
       .oauth-text-block {
         padding-left: $vertical-height;
         padding-right: $vertical-height;
@@ -149,6 +155,7 @@ $sign-in-up-form-bg: $gray-lighter;
 // XL screen styles
 @media (min-width: $grid-breakpoint-xl) {
   .sign-in-up {
+    .oauth-providers { @include make-col-span(4); }
     .main-form {
       @include make-col-span(5);
       @include make-col-pull(5);

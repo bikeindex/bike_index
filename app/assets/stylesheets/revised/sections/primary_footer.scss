@@ -1,5 +1,6 @@
+$primary-footer-top-margin: 6*$vertical-height; // Because sometimes we cover this up other places
 .primary-footer {
-  margin-top: 6*$vertical-height;
+  margin-top: $primary-footer-top-margin;
   .primary-footer-nav, .terms-and-stuff {
     padding: 3*$vertical-height 0;
   }
@@ -14,7 +15,10 @@
   .primary-footer-nav {
     background: $gray-dark;
     a { color: $gray-light; }
-    h4 { margin-bottom: 0.5*$vertical-height; }
+    h4 { 
+      margin-bottom: 0.5*$vertical-height;
+      font-size: 15px;
+    }
     ul {
       @include list-unstyled;
       margin: 0;
@@ -54,7 +58,6 @@
     }
   }
 }
-
 
 // 
 // Small Screen Styles

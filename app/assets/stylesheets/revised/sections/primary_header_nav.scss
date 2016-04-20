@@ -149,7 +149,7 @@ $mainmenu-open-zindex: 10;
       padding: $vertical-height 0 0;
       transition: padding 200ms linear;
       a {
-        padding: $vertical-height 0.5*$grid-gutter-width;
+        padding: 8px 0.5*$grid-gutter-width;
         &.active, &:active { text-decoration: none; }
       }
       // Only apply to primary nav items, not submenus
@@ -165,7 +165,7 @@ $mainmenu-open-zindex: 10;
       }
       // On large screens, the signup link is a button
       .signup-link {
-        border-radius: $border-radius;
+        border-radius: 4px;
         border: 1px solid $link-color;
         transition: background .05s linear;
         &:hover {

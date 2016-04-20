@@ -142,6 +142,7 @@ $form-well-border-color: $gray-lightish;
   .form-well-container.container {
     max-width: 100%;
     background: $form-well-background;
+    .form-well { width: 100%; }
   }
 }
 
@@ -162,6 +163,8 @@ $form-well-border-color: $gray-lightish;
 //
 // Everything but large screens
 @media (max-width: $grid-breakpoint-lg - 1px) {
+  // Cover up the margin beneath
+  .form-well-container.container { margin-bottom: - $primary-footer-top-margin; }
   // Remove some padding between the forms
   .form-well {
     .form-wrap.secondary-form-wrap {

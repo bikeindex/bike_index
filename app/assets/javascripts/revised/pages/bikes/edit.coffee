@@ -3,7 +3,7 @@ class BikeIndex.BikesEdit extends BikeIndex
     new BikeIndex.FormWell
     @initializeEventListeners()
 
-    # Initialize dirty forms. 
+    # Initialize dirty forms. Add class 'dirtyignore' to fields to ignore them
     $('form.primary-edit-bike-form').dirtyForms()
     # Affix the edit menu to the page
     $('.primary-edit-bike-menu').Stickyfill()
@@ -19,7 +19,7 @@ class BikeIndex.BikesEdit extends BikeIndex
   initializeEventListeners: ->
     pagespace = @
     $('.bike-edit-page-select select').change (e) ->
-      pagespace.updatePageLocation(this.valnue)
+      pagespace.updatePageLocation(this.value)
 
   updatePageLocation: (url) ->
     window.location.href = url

@@ -3,11 +3,12 @@ $header-font-family: 'Montserrat', sans-serif;;
 $strong-font-weight: 700;
 
 $body-font-size: 15px;
-$h1-font-size: 54px;
+$h1-font-size: 42px;
 $h2-font-size: 36px;
 $h3-font-size: 24px;
-$h4-font-size: 15px;
+$h4-font-size: 12px;
 $h5-font-size: 18px;
+$btn-font-size:15px;
 
 // body font style
 .body-font {
@@ -77,11 +78,6 @@ h1 {
   line-height: 1.12em;
 }
 
-@media (max-width: $grid-breakpoint-sm) {
-  h1 { font-size: 42px; }  
-}
-
-
 h2 {
   @extend .header-font;
   font-size: $h2-font-size;
@@ -100,3 +96,18 @@ h4 {
   font-size: $h4-font-size;
   line-height: 18px;
 }
+
+// WebKit, Blink, Edge
+::-webkit-input-placeholder { color: $gray-light; }
+// Mozilla Firefox 4 to 18
+:-moz-placeholder {
+   color: $gray-light;
+   opacity:  1;
+}
+// Mozilla Firefox 19+
+::-moz-placeholder {
+   color: $gray-light;
+   opacity:  1;
+}
+// Internet Explorer 10-11
+:-ms-input-placeholder { color: $gray-light; }

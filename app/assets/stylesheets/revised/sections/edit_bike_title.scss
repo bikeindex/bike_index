@@ -1,7 +1,6 @@
 .form-well-header .edit-bike-header {
   margin-bottom: 24px;
   h1 { margin-bottom: 0; }
-  .large-display { display: none; } // Hidden on sm screens, shown via mediaquery
   .edit-bike-title-submenu {
     margin: 0;
     a {
@@ -27,9 +26,5 @@
 // 
 // Medium screen styles
 @media (min-width: $grid-breakpoint-md) {
-  .form-well-header .edit-bike-header {
-    .large-display { display: inline; }
-    .small-display { display: none; }
-  }
   .edit-bike-form-header { display: block; }
 }

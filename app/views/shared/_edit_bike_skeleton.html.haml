@@ -1,21 +1,15 @@
 .form-well-header.container{ data: { template: @edit_template } }
   .edit-bike-header
     %h1
-      %span.large-display
-        - if @bike.stolen and @bike.find_current_stolen_record.present?
-          %span.text-danger
-            Stolen
-        - else
-          Edit
-        = @bike.year
-        = @bike.manufacturer_name
-        = @bike.frame_model
-        = @bike.type unless @bike.type == 'bike'
-      %span.small-display
-        - if @bike.stolen and @bike.find_current_stolen_record.present?
-          %span.text-danger
-            Stolen
-        = @edit_templates[@edit_template]
+      - if @bike.stolen and @bike.find_current_stolen_record.present?
+        %span.text-danger
+          Stolen
+      - else
+        Edit
+      = @bike.year
+      = @bike.manufacturer_name
+      = @bike.frame_model
+      = @bike.type unless @bike.type == 'bike'
     - unless @bike.current_owner_exists
       %p.edit-bike-title-submenu
         Sent to 
