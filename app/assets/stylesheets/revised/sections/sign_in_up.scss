@@ -56,7 +56,7 @@ $sign-in-up-form-bg: $gray-lighter;
       flex: 0 0 82.6666%;
       margin-left: .66667%;
       line-height: 1;
-      padding: 1.5*$vertical-height .5*$vertical-height $vertical-height;
+      padding: 17px 0 0 3*$vertical-height;
     }
     img {
       display: block;
@@ -129,15 +129,10 @@ $sign-in-up-form-bg: $gray-lighter;
   }
 }
 
-@media (min-width: $grid-breakpoint-lg) {
-  .sign-in-up {
-    .oauth-providers {
-      font-size: 15px;
-      .oauth-text-block {
-        padding-left: $vertical-height;
-        padding-right: $vertical-height;
-      }
-    }
+// Small awkward point where we need less padding to fit the buttons
+@media (min-width: $grid-breakpoint-md) and (max-width: $grid-breakpoint-lg - 1px) {
+  .sign-in-up .oauth-providers {
+    .oauth-text-block { padding-left: $vertical-height; }
   }
 }
 
