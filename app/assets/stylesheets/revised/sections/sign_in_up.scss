@@ -31,10 +31,14 @@ $sign-in-up-form-bg: $gray-lighter;
     }
   }
   .oauth-providers {
-    .facebook-login { @include oauth-login-bar($facebook-login-color) }
-    .strava-login { @include oauth-login-bar($strava-login-color) }
+    .facebook-login { @include oauth-login-bar($facebook-login-color); }
+    .strava-login {
+      @include oauth-login-bar($strava-login-color);
+      img { padding-top: 6px; }
+    }
     a {
-      @extend .row;
+      display: flex;
+      flex-wrap: wrap;
       margin: $vertical-height 0;
     }
     span {
@@ -60,7 +64,7 @@ $sign-in-up-form-bg: $gray-lighter;
     }
     img {
       display: block;
-      height: 100%;
+      max-height: 100%;
       width: auto;
       margin: 0 auto;
     }
@@ -151,9 +155,10 @@ $sign-in-up-form-bg: $gray-lighter;
 @media (min-width: $grid-breakpoint-xl) {
   .sign-in-up {
     .oauth-providers { @include make-col-span(4); }
+    .sign-in-up-or { @include make-col-push(2); }
     .main-form {
       @include make-col-span(5);
-      @include make-col-pull(5);
+      @include make-col-pull(4);
     }
   }
 }

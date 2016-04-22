@@ -158,6 +158,16 @@ $form-well-border-color: $gray-lightish;
     padding-left: 2*$row-side-padding;
     padding-right: 2*$row-side-padding;
   }
+  // because we have to use floats instead of flex with sticky (affixing edit menu)
+  .form-well-container.container > .row {
+    display: block;
+    @include clearfix;
+    .col-md-8.form-well {
+      display: block;
+      float: right;
+      width: 66.66667%;
+    }
+  }
 }
 
 //
