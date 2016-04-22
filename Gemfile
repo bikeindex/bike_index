@@ -92,7 +92,6 @@ source 'https://rails-assets.org' do # JS land is crazy, so lock everything
   gem 'rails-assets-moment', '~> 2.12.0' # Time stuff
   gem 'rails-assets-Stickyfill', '~> 1.1.3' # Affix bike edit menu
   gem 'rails-assets-jquery-sortable', '~> 0.9.13' # Sort photo order
-  gem 'rails-assets-jquery-file-upload', '~> 9.12.1'
 end
 
 group :production do

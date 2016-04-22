@@ -107,8 +107,28 @@
   }
 }
 
+// Actual item that is in the air, being dragged by you
 .dragged {
   position: absolute;
   opacity: 0.5;
   z-index: 2000;
+  transform: rotate(-15deg);
+}
+
+.upload {
+  @include border-radius(2px);
+  border: 1px solid $form-well-border-color;
+  background: white;
+  width: 80%;
+  margin: 10px 10% 0;
+  padding: 10px;
+  .progress, .alert-success { margin-bottom: 0;}
+  p {
+    // Mixin called textoverflow if used again...
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-bottom: .5*$vertical-height;
+  }
+  
 }

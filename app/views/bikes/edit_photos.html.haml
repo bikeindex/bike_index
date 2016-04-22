@@ -1,5 +1,4 @@
 = form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do |f|
-  = hidden_field_tag :hidden_images, @private_images
 .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
   .row
     = render partial: '/bikes/edit_primary_menu'
@@ -11,7 +10,7 @@
           %h5.light-italic
             Drag the uploaded photos to rearrange the order in which they appear
 
-        %ul#public_images.edit-photo-display-list{ data: { orderurl: order_public_images_url } }
+        %ul#public_images.edit-photo-display-list{ data: { orderurl: order_public_images_url, imagesurl: public_images_url } }
           = render partial: '/public_images/revised_public_image', collection: @bike.public_images, as: :image
           = render partial: '/public_images/revised_public_image', collection: @private_images, as: :image
 
@@ -26,8 +25,5 @@
                   Upload Photos 
                 button
               %label.file
-                \#{f.file_field :image, multiple: true, name: "public_image[image]"}
+                = f.file_field :image, multiple: true, name: "public_image[image]"
                 %span.file-custom
-              /   .multifilefield-button
-              /     Upload photos
-              /     \#{f.file_field :image, multiple: true, name: "public_image[image]"}
