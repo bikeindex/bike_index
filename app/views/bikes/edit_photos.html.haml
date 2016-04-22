@@ -11,7 +11,7 @@
           %h5.light-italic
             Drag the uploaded photos to rearrange the order in which they appear
 
-        %ul.row.edit-photo-display-list{ data: { orderurl: order_public_images_url } }
+        %ul#public_images.edit-photo-display-list{ data: { orderurl: order_public_images_url } }
           = render partial: '/public_images/revised_public_image', collection: @bike.public_images, as: :image
           = render partial: '/public_images/revised_public_image', collection: @private_images, as: :image
 

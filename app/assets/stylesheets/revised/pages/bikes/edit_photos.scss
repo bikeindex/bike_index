@@ -1,10 +1,8 @@
 .edit-bike-page-photos {
   .edit-photo-display-list {
     @include list-unstyled;
-    li {
-      @include make-col();
-      @include make-col-span(4);
-    }
+    @include clearfix;
+    display: block;
     .edit-photo-display-wrap {
       padding: $vertical-height .5*$vertical-height 0; // Trash can has bottom space
       background: white;
@@ -66,4 +64,51 @@
       }
     }
   }
+}
+
+.edit-photo-display-list-item {
+  // @include make-col();
+  // @include make-col-span(4);
+  display: block;
+  float: left;
+  position: relative;
+  width: 33.33%;
+  padding-left: 0.9375rem;
+  padding-right: 0.9375rem;
+  // user-select prevents the contents of your
+  // list items from being selectable by the cursor
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: move;
+}
+
+// This class is unique to html5sortable for
+// the placeholder that's shown while in motion
+.placeholder {
+  @extend .edit-photo-display-list-item;
+  height: 280px;
+  border: 3px dashed #CCC;
+
+  &:before {
+    position: absolute;
+    content: "";
+    width: 0;
+    height: 0;
+    margin-top: -5px;
+    left: -12px;
+    top: -7px;
+    border: 5px solid transparent;
+    border-left-color: $blue;
+    border-right: none;
+  }
+}
+
+.dragged {
+  position: absolute;
+  opacity: 0.5;
+  z-index: 2000;
 }
