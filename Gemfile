@@ -91,7 +91,8 @@ source 'https://rails-assets.org' do # JS land is crazy, so lock everything
   gem 'rails-assets-pikaday', '~> 1.4.0' # Datepicker
   gem 'rails-assets-moment', '~> 2.12.0' # Time stuff
   gem 'rails-assets-Stickyfill', '~> 1.1.3' # Affix bike edit menu
-  gem 'rails-assets-jquery-sortable', '~> 0.9.13' # Sort photo order
+  # Sortable breaks assets:precompile, so it's included manually
+  # gem 'rails-assets-jquery-sortable', '~> 0.9.12' # Sort photo order
 end
 
 group :production do

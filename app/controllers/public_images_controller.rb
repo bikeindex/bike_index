@@ -64,7 +64,7 @@ class PublicImagesController < ApplicationController
     if params[:list_of_photos]
       last_image = params[:list_of_photos].count
       params[:list_of_photos].each_with_index do |id, index|
-        image = PublicImage.find id
+        image = PublicImage.unscoped.find(id)
         image.update_attribute :listing_order, index+1 if current_user_image_owner(image)
         next unless last_image == index && image.imageable_type == 'Bike'
         Bike.unscoped.find(image.imageable_id).save
