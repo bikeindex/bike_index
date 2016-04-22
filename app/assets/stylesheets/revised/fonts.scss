@@ -1,6 +1,7 @@
 $body-font-family: 'Open Sans', sans-serif;
 $header-font-family: 'Montserrat', sans-serif;;
 $strong-font-weight: 700;
+$light-italic-weight: 300;
 
 $body-font-size: 15px;
 $h1-font-size: 42px;
@@ -29,6 +30,12 @@ $btn-font-size:15px;
       color: $link-color;
     }
   }
+}
+
+.light-italic {
+  font-weight: $light-italic-weight;
+  font-style: italic;
+  strong { font-style: normal; font-weight: $strong-font-weight; }
 }
 
 body { @extend .body-font; }

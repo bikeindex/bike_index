@@ -2,28 +2,65 @@ require 'spec_helper'
 
 describe PublicImagesController do
   describe 'destroy' do
-    it "allows a the owner of a public_image to destroy the public_image" do
-      user = FactoryGirl.create(:user)
-      bike = FactoryGirl.create(:bike)
-      o = FactoryGirl.create(:ownership, bike: bike, creator: user, owner_email: user.email)
-      public_image = FactoryGirl.create(:public_image, imageable: bike)
-      expect(bike.reload.owner).to eq(user)
-      set_current_user(user)
-      set_current_user(user)
-      expect do
-        delete :destroy, id: public_image.id
-      end.to change(PublicImage, :count).by(-1)
+    context 'legacy' do
+      context 'owner' do
+        it 'allows the destroy of public_image' do
+          user = FactoryGirl.create(:user)
+          bike = FactoryGirl.create(:bike)
+          o = FactoryGirl.create(:ownership, bike: bike, creator: user, owner_email: user.email)
+          public_image = FactoryGirl.create(:public_image, imageable: bike)
+          expect(bike.reload.owner).to eq(user)
+          set_current_user(user)
+          set_current_user(user)
+          expect do
+            delete :destroy, id: public_image.id
+          end.to change(PublicImage, :count).by(-1)
+        end
+      end
+      context 'non owner' do
+        it 'rejects the destroy' do
+          ownership = FactoryGirl.create(:ownership)
+          bike = ownership.bike
+          non_owner = FactoryGirl.create(:user, name: "Non Owner")
+          public_image = FactoryGirl.create(:public_image, imageable: bike)
+          set_current_user(non_owner)
+          expect do
+            delete :destroy, id: public_image.id
+          end.not_to change(PublicImage, :count)
+        end
+      end
+      context 'owner and hidden bike' do
+        it 'allows the destroy' do
+          user = FactoryGirl.create(:user)
+          bike = FactoryGirl.create(:bike, hidden: true)
+          o = FactoryGirl.create(:ownership, bike: bike, creator: user, owner_email: user.email)
+          public_image = FactoryGirl.create(:public_image, imageable: bike)
+          expect(bike.reload.owner).to eq(user)
+          set_current_user(user)
+          set_current_user(user)
+          expect do
+            delete :destroy, id: public_image.id, page: 'redirect_page'
+          end.to change(PublicImage, :count).by(-1)
+          expect(response).to redirect_to(edit_bike_path(bike, page: 'redirect_page'))
+        end
+      end
     end
-    
-    it "ensures that current user owns image before allowing destroy" do
-      ownership = FactoryGirl.create(:ownership)
-      bike = ownership.bike
-      non_owner = FactoryGirl.create(:user, name: "Non Owner")
-      public_image = FactoryGirl.create(:public_image, imageable: bike)
-      set_current_user(non_owner)
-      expect do
-        delete :destroy, id: public_image.id
-      end.not_to change(PublicImage, :count)
+    context 'revised' do
+      context 'owner' do
+        it 'allows a the owner of a public_image to destroy the public_image' do
+          user = FactoryGirl.create(:user)
+          bike = FactoryGirl.create(:bike)
+          o = FactoryGirl.create(:ownership, bike: bike, creator: user, owner_email: user.email)
+          public_image = FactoryGirl.create(:public_image, imageable: bike)
+          expect(bike.reload.owner).to eq(user)
+          set_current_user(user)
+          set_current_user(user)
+          expect do
+            delete :destroy, id: public_image.id, page: 'redirect_page'
+          end.to change(PublicImage, :count).by(-1)
+          expect(response).to redirect_to(edit_bike_path(bike, page: 'redirect_page'))
+        end
+      end
     end
   end
 
@@ -64,7 +101,6 @@ describe PublicImagesController do
     end
   end
 
-
   # describe 'order' do
   #   before :each do
   #     @public_image2.listing_order = 2
@@ -80,5 +116,4 @@ describe PublicImagesController do
   #     @public_image3.listing_order.should == 0
   #   end
   # end
-
 end

@@ -193,6 +193,9 @@ class BikesController < ApplicationController
     if revised_layout_enabled?
       @page_errors = @bike.errors
       @edit_template = edit_templates[params[:page]].present? ? params[:page] : edit_templates.keys.first
+      if @edit_template == 'photos'
+        @private_images = PublicImage.unscoped.where(imageable_type: 'Bike').where(imageable_id: @bike.id).where(is_private: true)
+      end
       render "edit_#{@edit_template}".to_sym, layout: 'application_revised'
     else
       @private_images = PublicImage.unscoped.where(imageable_type: 'Bike').where(imageable_id: @bike.id).where(is_private: true)

@@ -14,7 +14,10 @@
 
 .edit-bike-form-header {
   display: none; // Hidden on sm screens, shown via mediaquery
-  h3, h4 { padding: 0 $vertical-height; }
+  h3, h5 {
+    padding: 0 $vertical-height;
+    margin-bottom: 2*$vertical-height;
+  }
 }
 
 @media (min-width: $grid-breakpoint-lg) {

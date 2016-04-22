@@ -1,4 +1,5 @@
 $form-well-background: $gray-lighter;
+$form-well-background: $gray-light;
 $form-well-border-color: $gray-lightish;
 
 .form-circle-item { // Mixin for help blocks
@@ -167,6 +168,11 @@ $form-well-border-color: $gray-lightish;
       float: right;
       width: 66.66667%;
     }
+  }
+  // To properly space the sides of the containers
+  .form-wrap .row {
+    margin-left: 0;
+    margin-right: 0;
   }
 }
 
