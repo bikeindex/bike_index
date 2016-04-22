@@ -168,6 +168,11 @@ $form-well-border-color: $gray-lightish;
       width: 66.66667%;
     }
   }
+  // To properly space the sides of the containers
+  .form-wrap .row {
+    margin-left: 0;
+    margin-right: 0;
+  }
 }
 
 //

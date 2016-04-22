@@ -494,6 +494,7 @@ describe BikesController do
               expect(response).to be_success
               expect(response).to render_template("edit_#{template}")
               expect(assigns(:edit_template)).to eq(template)
+              expect(assigns(:private_images)).to eq([]) if template == 'photos'
             end
           end
         end

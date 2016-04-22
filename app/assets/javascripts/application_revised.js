@@ -15,5 +15,9 @@
 //= require headroom.js/jQuery.headroom.js
 //= require moment
 //= require pikaday
+//= require jquery-sortable/jquery-sortable.js
+//= require external_scripts/jquery.ui.widget.js
+//= require external_scripts/jquery.iframe-transport.js
+//= require external_scripts/jquery.fileupload.js
 //= require init.coffee
 //= require_tree ./revised

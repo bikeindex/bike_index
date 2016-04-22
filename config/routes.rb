@@ -78,6 +78,7 @@ Bikeindex::Application.routes.draw do
     collection do
       post :order
     end
+    member { post :is_private }
   end
 
   resources :bikes do

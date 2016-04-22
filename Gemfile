@@ -85,13 +85,13 @@ gem 'bundler', '>= 1.8.4' # required for rails-assets.org - JS and CSS assets
 source 'https://rails-assets.org' do # JS land is crazy, so lock everything
   gem 'rails-assets-tether', '~> 1.1.0'
   gem 'rails-assets-mustache', '~> 2.2.1'
-  gem 'rails-assets-jquery.dirtyforms', '~> 2.0.0'
+  gem 'rails-assets-jquery.dirtyforms', '~> 2.0.0' # Alert on attempts to leave with dirt on forms
   gem 'rails-assets-selectize', '~> 0.12.1' # Manually configured scss
   gem 'rails-assets-headroom.js', '~> 0.7.0' # Would prefer 0.8 but it isn't on rails-assets yet
-  gem 'rails-assets-pikaday', '~> 1.4.0'
-  gem 'rails-assets-moment', '~> 2.12.0'
-  gem 'rails-assets-jquery-file-upload', '~> 9.12.1'
-  gem 'rails-assets-Stickyfill', '~> 1.1.3'
+  gem 'rails-assets-pikaday', '~> 1.4.0' # Datepicker
+  gem 'rails-assets-moment', '~> 2.12.0' # Time stuff
+  gem 'rails-assets-Stickyfill', '~> 1.1.3' # Affix bike edit menu
+  gem 'rails-assets-jquery-sortable', '~> 0.9.13' # Sort photo order
 end
 
 group :production do

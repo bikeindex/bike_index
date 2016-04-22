@@ -1,0 +1,12 @@
+%li.edit-photo-display-list-item{ id: image.id }
+  .edit-photo-display-wrap
+    %label.keep-private
+      keep image private
+      %input.is_private_check{ type: 'checkbox', checked: image.is_private }
+    .processing
+      \... processing
+
+    = image_tag(image.image_url(:small)) if image.image?
+
+    = link_to public_image_url(image, return_url: edit_bike_url(@bike, page: 'photos')), method: :delete, class: 'photo-remove' do
+      = render '/shared/trash_icon'
