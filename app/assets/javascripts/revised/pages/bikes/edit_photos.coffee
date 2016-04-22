@@ -3,6 +3,7 @@ class BikeIndex.BikesEditPhotos extends BikeIndex
     @initializeEventListeners()
     @initializeSortablePhotos()
     @initializeImageUploads()
+    $('.edit-bike-submit-wrapper .btn').hide()
 
   initializeEventListeners: ->
     pagespace = @

@@ -78,6 +78,8 @@ $active-bike-edit-border-width: 2px;
     .edit-bike-submit-wrapper {
       width: 50%;
       float: left;
+      background: white;
+      height: 42px;
       .btn { border-radius: 0; border: none; }
     }
   }
@@ -92,11 +94,7 @@ $active-bike-edit-border-width: 2px;
     position: -webkit-sticky;
     position: sticky;
     top: 8*$vertical-height; // Same as the padding top for body in primary_header_nav
-    ul {
-
-      display: block;
-      
-    }
+    ul { display: block; }
     .edit-bike-submit-wrapper { padding-top: 1em; }
   }
   // Hide with media query so as not to override selectize

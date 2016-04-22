@@ -146,7 +146,7 @@ describe PublicImagesController do
         public_image = FactoryGirl.create(:public_image, imageable: bike, name: 'party')
         set_current_user(user)
         post :is_private, id: public_image.id, is_private: 'true'
-        expect(public_image.is_private).to be_truthy
+        expect(public_image.is_private).to be_falsey
       end
     end
   end
