@@ -552,7 +552,7 @@ describe Bike do
       component1 = Component.new 
       component2 = Component.new 
       component3 = Component.new 
-      bike.stub_chain(:components).and_return([component1, component2, component3])
+      allow(bike).to receive(:components) { [component1, component2, component3] }
       allow(component1).to receive(:cgroup_id).and_return(1)
       allow(component2).to receive(:cgroup_id).and_return(2)
       allow(component3).to receive(:cgroup_id).and_return(2)

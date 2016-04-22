@@ -8,7 +8,7 @@ describe BikesController do
       end
       it { is_expected.to respond_with(:success) }
       it { is_expected.to render_template(:index) }
-      it { is_expected.not_to set_the_flash }
+      it { is_expected.not_to set_flash }
 
       it 'sets per_page correctly' do
         expect(assigns(:per_page)).to eq 10
@@ -31,7 +31,7 @@ describe BikesController do
       end
       it { is_expected.to respond_with(:success) }
       it { is_expected.to render_template(:show) }
-      it { is_expected.not_to set_the_flash }
+      it { is_expected.not_to set_flash }
       it { expect(assigns(:bike)).to be_decorated }
     end
 
@@ -51,7 +51,7 @@ describe BikesController do
         ownership.bike.update_attributes(hidden: true)
         get :show, id: ownership.bike.id
       end
-      it { is_expected.to set_the_flash }
+      it { is_expected.to set_flash }
       it { is_expected.to redirect_to root_url }
     end
 
@@ -511,7 +511,7 @@ describe BikesController do
       end
       it { is_expected.to respond_with(:redirect)}
       it { is_expected.to redirect_to(bike_url) }
-      it { is_expected.to set_the_flash }
+      it { is_expected.to set_flash }
     end
 
     context 'creator present (who is allowed to edit)' do

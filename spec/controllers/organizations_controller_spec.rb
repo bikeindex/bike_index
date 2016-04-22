@@ -136,7 +136,7 @@ describe OrganizationsController do
       end
       it { is_expected.to respond_with(:redirect) }
       it { is_expected.to redirect_to(user_home_url) }
-      it { is_expected.to set_the_flash }
+      it { is_expected.to set_flash }
     end
     
     describe "when user is present" do

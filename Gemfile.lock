@@ -119,11 +119,11 @@ GEM
     dotenv (1.0.2)
     dotenv-rails (1.0.2)
       dotenv (= 1.0.2)
-    draper (1.3.0)
+    draper (2.1.0)
       actionpack (>= 3.0)
       activemodel (>= 3.0)
       activesupport (>= 3.0)
-      request_store (~> 1.0.3)
+      request_store (~> 1.0)
     eco (1.0.0)
       coffee-script
       eco-source
@@ -214,6 +214,7 @@ GEM
     hike (1.2.3)
     hiredis (0.6.1)
     hitimes (1.2.3)
+    honeybadger (2.5.3)
     http (0.9.8)
       addressable (~> 2.3)
       http-cookie (~> 1.0)
@@ -375,7 +376,7 @@ GEM
       json (~> 1.4)
     redis (3.2.2)
     ref (1.0.5)
-    request_store (1.0.5)
+    request_store (1.3.1)
     rerun (0.10.0)
       listen (~> 2.7, >= 2.7.3)
     rest-client (1.8.0)
@@ -548,6 +549,7 @@ DEPENDENCIES
   haml-rails
   hamlit
   high_voltage
+  honeybadger (~> 2.0)
   i18n
   journey (~> 1.0.3)
   jquery-datatables-rails!

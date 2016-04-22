@@ -7,7 +7,7 @@ describe WelcomeController do
     end
     it { is_expected.to respond_with(:success) }
     it { is_expected.to render_template(:index) }
-    it { is_expected.not_to set_the_flash }
+    it { is_expected.not_to set_flash }
   end
 
   describe 'goodbye' do
@@ -25,7 +25,7 @@ describe WelcomeController do
       end
       it { is_expected.to respond_with(:redirect) }
       it { is_expected.to redirect_to(new_user_url) }
-      it { is_expected.not_to set_the_flash }
+      it { is_expected.not_to set_flash }
     end
 
     describe "when user is present" do
@@ -36,7 +36,7 @@ describe WelcomeController do
         get :user_home
       end
 
-      it { is_expected.not_to set_the_flash }
+      it { is_expected.not_to set_flash }
       it { is_expected.to respond_with(:success) }
       it { is_expected.to render_template(:user_home) }
     end

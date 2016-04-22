@@ -9,7 +9,7 @@ describe Admin::FlavorTextsController do
       delete :destroy, id: text.id
     end
     it { is_expected.to redirect_to(:admin_root) }
-    it { is_expected.to set_the_flash }
+    it { is_expected.to set_flash }
   end
 
   describe 'update' do
@@ -20,7 +20,7 @@ describe Admin::FlavorTextsController do
         post :create, {flavor_text: {message: "lulz"}}
       end
       it { is_expected.to redirect_to(:admin_root) }
-      it { is_expected.to set_the_flash }
+      it { is_expected.to set_flash }
     end
   end
 end

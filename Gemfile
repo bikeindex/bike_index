@@ -94,6 +94,10 @@ source 'https://rails-assets.org' do # JS land is crazy, so lock everything
   gem 'rails-assets-Stickyfill', '~> 1.1.3'
 end
 
+group :production do
+  gem 'honeybadger', '~> 2.0'
+end
+
 group :assets do
   gem 'sass-rails',   '~> 3.2.6'
   gem 'coffee-rails', '~> 3.2.2'
