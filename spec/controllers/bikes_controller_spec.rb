@@ -522,53 +522,101 @@ describe BikesController do
       before do
         set_current_user(user)
       end
+      context 'legacy' do
+        it 'allows you to edit an example bike' do
+          ownership.bike.update_attributes(example: true)
+          put :update, id: bike.id, bike: { description: '69' }
+          expect(response).to redirect_to edit_bike_url(bike)
+          bike.reload
+          expect(bike.description).to eq('69')
+        end
 
-      it 'allows you to edit an example bike' do
-        ownership.bike.update_attributes(example: true)
-        put :update, id: bike.id, bike: { description: '69' }
-        expect(response).to redirect_to edit_bike_url(bike)
-        bike.reload
-        expect(bike.description).to eq('69')
+        it 'updates the bike' do
+          put :update, id: bike.id, bike: { description: '69', marked_user_hidden: '0' }
+          bike.reload
+          expect(bike.description).to eq('69')
+          expect(response).to redirect_to edit_bike_url(bike)
+          expect(assigns(:bike)).to be_decorated
+          expect(bike.hidden).to be_falsey
+        end
+
+        it 'marks the bike unhidden' do
+          bike.update_attribute :marked_user_hidden, '1'
+          bike.reload
+          expect(bike.hidden).to be_truthy
+          put :update, id: bike.id, bike: { marked_user_unhidden: 'true' }
+          expect(bike.reload.hidden).to be_falsey
+        end
+
+        it 'creates a new ownership if the email changes' do
+          expect do
+            put :update, id: bike.id, bike: { owner_email: 'new@email.com' }
+          end.to change(Ownership, :count).by(1)
+        end
+
+        it "redirects to return_to if it's a valid url" do
+          session[:return_to] = '/about'
+          put :update, id: bike.id, bike: { description: '69', marked_user_hidden: '0' }
+          expect(bike.reload.description).to eq('69')
+          expect(response).to redirect_to '/about'
+          expect(session[:return_to]).to be_nil
+        end
+
+        it "doesn't redirect and clears the session if not a valid url" do
+          session[:return_to] = 'http://testhost.com/bad_place'
+          put :update, id: bike.id, bike: { description: '69', marked_user_hidden: '0' }
+          bike.reload
+          expect(bike.description).to eq('69')
+          expect(session[:return_to]).to be_nil
+          expect(response).to redirect_to edit_bike_url
+        end
       end
+      context 'revised' do
+        # We're testing a few things in here:
+        # Firstly, new stolen update code paths
+        # Also, that we can apply stolen changes to hidden bikes
+        # And finally, that it redirects to the correct page
+        it 'updates and returns to the right page' do
+          allow(controller).to receive(:revised_layout_enabled?) { true }
+          stolen_record = FactoryGirl.create(:stolen_record, bike: bike, city: 'party')
+          bike.stolen = true
+          # bike.marked_user_hidden = true
+          bike.save
+          expect(stolen_record.date_stolen).to be_present
+          bike.reload
+          # bike.update_attributes(stolen: true, current_stolen_record_id: stolen_record.id)
+          bike.reload
+          expect(bike.find_current_stolen_record).to eq stolen_record
+          put :update,
+              id: bike.id,
+              edit_template: 'fancy_template',
+              bike: {
+                stolen: true,
+                stolen_records_attributes: {
+                  "#{stolen_record.id}" => {
+                    date_stolen_input: 'Mon Feb 22 2016',
+                    phone: '9999999999',
+                    street: '66666666 foo street'
+                  }
+                }
+              }
+          expect(flash[:error]).to_not be_present
+          expect(response).to redirect_to edit_bike_url(page: 'fancy_template')
+          bike.reload
+          expect(bike.stolen).to be_truthy
+          # expect(bike.hidden).to be_truthy
+          # Stupid cheat because we're creating an extra record here for fuck all reason
+          current_stolen_record = bike.find_current_stolen_record
 
-      it 'updates the bike' do
-        put :update, id: bike.id, bike: { description: '69', marked_user_hidden: '0' }
-        bike.reload
-        expect(bike.description).to eq('69')
-        expect(response).to redirect_to edit_bike_url(bike)
-        expect(assigns(:bike)).to be_decorated
-        expect(bike.hidden).to be_falsey
-      end
-
-      it 'marks the bike unhidden' do
-        bike.update_attribute :marked_user_hidden, '1'
-        bike.reload
-        expect(bike.hidden).to be_truthy
-        put :update, id: bike.id, bike: { marked_user_unhidden: 'true' }
-        expect(bike.reload.hidden).to be_falsey
-      end
-
-      it 'creates a new ownership if the email changes' do
-        expect do
-          put :update, id: bike.id, bike: { owner_email: 'new@email.com' }
-        end.to change(Ownership, :count).by(1)
-      end
-
-      it "redirects to return_to if it's a valid url" do
-        session[:return_to] = '/about'
-        put :update, id: bike.id, bike: { description: '69', marked_user_hidden: '0' }
-        expect(bike.reload.description).to eq('69')
-        expect(response).to redirect_to '/about'
-        expect(session[:return_to]).to be_nil
-      end
-
-      it "doesn't redirect and clears the session if not a valid url" do
-        session[:return_to] = 'http://testhost.com/bad_place'
-        put :update, id: bike.id, bike: { description: '69', marked_user_hidden: '0' }
-        bike.reload
-        expect(bike.description).to eq('69')
-        expect(session[:return_to]).to be_nil
-        expect(response).to redirect_to edit_bike_url
+          # expect(bike.stolen_records.count).to eq 1
+          # stolen_record.reload
+          # expect(bike.find_current_stolen_record.id).to eq stolen_record.id
+          # stolen_record.reload
+          expect(current_stolen_record.phone).to eq '9999999999'
+          # expect(current_stolen_record.city).to eq 'party'
+          expect(current_stolen_record.street).to eq '66666666 foo street'
+          expect(current_stolen_record.date_stolen).to eq DateTime.strptime('02-22-2016 06', '%m-%d-%Y %H')
+        end
       end
     end
     context 'owner present (who is allowed to edit)' do

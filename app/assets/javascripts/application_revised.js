@@ -14,7 +14,6 @@
 //= require external_scripts/selectize_placeholder_plugin.js
 //= require headroom.js
 //= require headroom.js/jQuery.headroom.js
-//= require moment
 //= require pikaday
 //= require external_scripts/jquery_sortable_0.9.13.js
 //= require external_scripts/jquery.ui.widget.js

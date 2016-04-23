@@ -1,8 +1,10 @@
 class BikeIndex.BikesEditStolen extends BikeIndex
   constructor: ->
     @initializeEventListeners()
-    if $('#bike_date_stolen_input').length > 0
+    if $('.date_stolen_input').length > 0
       @initializeDateSelector()
+      united_stated_id = $('#form_well_wrap').data('usid')
+      new BikeIndex.ToggleHiddenOther('.country-select-input', united_stated_id)
 
   initializeEventListeners: ->
     pagespace = @
@@ -14,7 +16,7 @@ class BikeIndex.BikesEditStolen extends BikeIndex
 
   initializeDateSelector: ->
     new Pikaday(
-      field: $('#bike_date_stolen_input')[0]
+      field: $('.date_stolen_input')[0]
       format: 'MM-DD-YYYY'
     )
 

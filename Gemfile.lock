@@ -340,7 +340,6 @@ GEM
       rails-assets-jquery (>= 1.4.2)
     rails-assets-lodash (4.9.0)
     rails-assets-microplugin (0.0.3)
-    rails-assets-moment (2.12.0)
     rails-assets-mustache (2.2.1)
     rails-assets-pikaday (1.4.0)
     rails-assets-selectize (0.12.1)
@@ -568,7 +567,6 @@ DEPENDENCIES
   rails-assets-headroom.js (~> 0.7.0)!
   rails-assets-jquery.dirtyforms (~> 2.0.0)!
   rails-assets-lodash (~> 4.9.0)!
-  rails-assets-moment (~> 2.12.0)!
   rails-assets-mustache (~> 2.2.1)!
   rails-assets-pikaday (~> 1.4.0)!
   rails-assets-selectize (~> 0.12.1)!

@@ -90,7 +90,6 @@ source 'https://rails-assets.org' do # JS land is crazy, so lock everything
   gem 'rails-assets-selectize', '~> 0.12.1' # Manually configured scss
   gem 'rails-assets-headroom.js', '~> 0.7.0' # Would prefer 0.8 but it isn't on rails-assets yet
   gem 'rails-assets-pikaday', '~> 1.4.0' # Datepicker
-  gem 'rails-assets-moment', '~> 2.12.0' # Time stuff
   gem 'rails-assets-Stickyfill', '~> 1.1.3' # Affix bike edit menu
   # Sortable breaks assets:precompile, so it's included manually
   # gem 'rails-assets-jquery-sortable', '~> 0.9.12' # Sort photo order

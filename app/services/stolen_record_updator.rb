@@ -31,11 +31,8 @@ class StolenRecordUpdator
   end
 
   def create_date_from_string(date_string)
-    if date_string.kind_of?(Integer)
-      return Time.at(date_string)
-    else
-      return DateTime.strptime("#{date_string} 06", "%m-%d-%Y %H")
-    end
+    return Time.at(date_string) if date_string.kind_of?(Integer)
+    DateTime.strptime("#{date_string} 06", '%m-%d-%Y %H')
   end
 
   def update_records
@@ -100,5 +97,4 @@ class StolenRecordUpdator
     end
     raise StolenRecordError, "Awww shucks! We failed to mark this bike as stolen. Try again?"
   end
-
 end

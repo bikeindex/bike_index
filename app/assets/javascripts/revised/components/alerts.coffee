@@ -12,7 +12,7 @@ class BikeIndex.Alerts extends BikeIndex
   displayAlert: (alert_type, alert_body, seconds = 7) ->
     $('.primary-alert-block').removeClass('faded')
     template = $('#alert-template').html()
-    # Mustache.parse(template) # Unsure if this is useful if we call it every time?
+    # Mustache.parse(template) # Probably not useful for performance to call it every time...
     attrs =
       alert_type: alert_type
       alert_body: alert_body
