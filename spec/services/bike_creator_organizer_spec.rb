@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe BikeCreatorOrganizer do
   describe 'unorganize' do
-    it "removes the token attributes" do
+    it 'removes the token attributes' do
       bike = Bike.new(creation_organization_id: 4)
       b_param = BParam.new(params: { stolen: false })
       creator = BikeCreatorOrganizer.new(b_param, bike)
@@ -12,10 +12,10 @@ describe BikeCreatorOrganizer do
   end
 
   describe 'use_organization' do
-    it "marks the bike organized" do
+    it 'marks the bike organized' do
       bike = Bike.new
       b_param = BParam.new(params: { stolen: false })
-      organization = Organization.new 
+      organization = Organization.new
       allow(organization).to receive(:id).and_return(2)
       creator = BikeCreatorOrganizer.new(b_param, bike)
       creator.use_organization(organization)
@@ -45,7 +45,7 @@ describe BikeCreatorOrganizer do
       expect(creator.find_organization(2)).to be_falsey
       expect(bike.errors[:organization]).not_to be_nil
     end
-    it "finds the organization and return it" do
+    it 'finds the organization and return it' do
       bike = Bike.new
       b_param = BParam.new
       organization = FactoryGirl.create(:organization)
@@ -61,33 +61,33 @@ describe BikeCreatorOrganizer do
       user = User.new
       organization = Organization.new
       allow(organization).to receive(:is_suspended).and_return(false)
-      allow(organization).to receive(:name).and_return("Ballsy")
+      allow(organization).to receive(:name).and_return('Ballsy')
       allow(b_param).to receive(:creator).and_return(user)
       allow(user).to receive(:is_member_of?).and_return(false)
       creator = BikeCreatorOrganizer.new(b_param, bike)
       expect(creator.organization_usable(organization)).to be_falsey
       expect(bike.errors[:creation_organization]).not_to be_nil
     end
-    it "adds an error if the organization is suspended is used" do
+    it 'adds an error if the organization is suspended is used' do
       bike = Bike.new
       b_param = BParam.new
       user = User.new
       organization = Organization.new
       allow(b_param).to receive(:creator).and_return(user)
       allow(user).to receive(:is_member_of?).and_return(true)
-      allow(organization).to receive(:name).and_return("Ballsy")
+      allow(organization).to receive(:name).and_return('Ballsy')
       allow(organization).to receive(:is_suspended).and_return(true)
       creator = BikeCreatorOrganizer.new(b_param, bike)
       expect(creator.organization_usable(organization)).to be_falsey
       expect(bike.errors[:creation_organization]).not_to be_nil
     end
-    it "returns true" do
+    it 'returns true' do
       bike = Bike.new
       b_param = BParam.new
       user = User.new
       organization = Organization.new
       allow(organization).to receive(:is_suspended).and_return(false)
-      allow(organization).to receive(:name).and_return("Ballsy")
+      allow(organization).to receive(:name).and_return('Ballsy')
       allow(b_param).to receive(:creator).and_return(user)
       allow(user).to receive(:is_member_of?).and_return(true)
       creator = BikeCreatorOrganizer.new(b_param, bike)
@@ -96,7 +96,7 @@ describe BikeCreatorOrganizer do
   end
 
   describe 'check_organization' do
-    it "returns false if organization is not present" do
+    it 'returns false if organization is not present' do
       bike = Bike.new
       b_param = BParam.new(params: { stolen: false })
       creator = BikeCreatorOrganizer.new(b_param, bike)
@@ -124,9 +124,9 @@ describe BikeCreatorOrganizer do
   end
 
   describe 'organized_bike' do
-    it "unorganizes if there are errors and return the bike" do
+    it 'unorganizes if there are errors and return the bike' do
       bike = Bike.new
-      bike.errors.add(:creation_organization, "Oh no, wrong org")
+      bike.errors.add(:creation_organization, 'Oh no, wrong org')
       b_param = BParam.new
       creator = BikeCreatorOrganizer.new(b_param, bike)
       expect(creator).to receive(:check_organization).and_return(true)
@@ -134,5 +134,4 @@ describe BikeCreatorOrganizer do
       expect(creator.organized_bike).to eq(bike)
     end
   end
-
 end

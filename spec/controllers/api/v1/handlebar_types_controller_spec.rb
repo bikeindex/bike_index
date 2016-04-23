@@ -7,5 +7,5 @@ describe Api::V1::HandlebarTypesController do
       get :index, format: :json
       expect(response.code).to eq('200')
     end
-  end   
+  end
 end

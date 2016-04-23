@@ -3,17 +3,17 @@ require 'spec_helper'
 describe RecoveryUpdateWorker do
   it { is_expected.to be_processed_in :updates }
 
-  it "enqueues another awesome job" do
+  it 'enqueues another awesome job' do
     RecoveryUpdateWorker.perform_async
     expect(RecoveryUpdateWorker).to have_enqueued_job
   end
-  
-  it "actuallies do things correctly" do
+
+  it 'actuallies do things correctly' do
     Sidekiq::Testing.inline! do
       bike = FactoryGirl.create(:bike)
       stolen_record = FactoryGirl.create(:stolen_record, bike: bike)
       bike.update_attribute :stolen, true
-      recovery_request = { 
+      recovery_request = {
         request_type: 'bike_recovery',
         user_id: 69,
         request_bike_id: bike.id,
@@ -28,5 +28,4 @@ describe RecoveryUpdateWorker do
       expect(stolen_record.can_share_recovery).to be_falsey
     end
   end
-
 end

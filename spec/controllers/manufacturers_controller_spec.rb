@@ -15,5 +15,4 @@ describe ManufacturersController do
     end
     it { is_expected.to respond_with(:redirect) }
   end
-
 end

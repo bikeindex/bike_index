@@ -6,12 +6,11 @@ describe Payment do
     it { is_expected.to validate_presence_of :email }
   end
 
-
   describe 'create' do
-    it "enqueues an email job" do
-      expect {
+    it 'enqueues an email job' do
+      expect do
         FactoryGirl.create(:payment)
-      }.to change(EmailInvoiceWorker.jobs, :size).by(1)
+      end.to change(EmailInvoiceWorker.jobs, :size).by(1)
     end
   end
 end

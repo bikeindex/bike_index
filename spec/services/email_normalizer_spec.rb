@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe EmailNormalizer do
   describe 'normalized' do
-    it "normalizes with spaces and downcase" do
+    it 'normalizes with spaces and downcase' do
       normalizer = EmailNormalizer.new(" awesome@stuff.COM \t")
       expect(normalizer.normalized).to eq('awesome@stuff.com')
     end
@@ -12,5 +12,4 @@ describe EmailNormalizer do
       expect(normalizer.normalized).to eq('')
     end
   end
-
 end

@@ -1,4 +1,4 @@
-require "spec_helper"
+require 'spec_helper'
 
 describe UserSerializer do
   let(:user) { FactoryGirl.create(:user) }
@@ -9,5 +9,4 @@ describe UserSerializer do
   it { expect(subject.user_present).to be_truthy }
   it { expect(subject.is_superuser).to be_falsey }
   xit { expect(subject.memberships.first).to eq(membership) }
-
 end

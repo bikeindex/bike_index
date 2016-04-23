@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe RemoveExpiredBParamsWorker do
   it { is_expected.to be_processed_in :afterwards }
-  
+
   it "doesn't fail if b_param doesn't exist" do
     expect(RemoveExpiredBParamsWorker.new.perform(494949)).to be_truthy
   end

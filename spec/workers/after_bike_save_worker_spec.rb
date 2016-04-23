@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe AfterBikeSaveWorker do
   it { is_expected.to be_processed_in :afterwards }
-  
-  it "sends a delete hash if the bike is hidden" do
+
+  it 'sends a delete hash if the bike is hidden' do
     bike = FactoryGirl.create(:bike, hidden: true)
     result = JSON.parse(AfterBikeSaveWorker.new.perform(bike.id))
     expect(result['deleted']).to eq(true)
@@ -11,21 +11,21 @@ describe AfterBikeSaveWorker do
 
   it "doesn't send a delete hash if the bike is user hidden" do
     ownership = FactoryGirl.create(:ownership, user_hidden: true)
-    bike = ownership.bike 
+    bike = ownership.bike
     bike.update_attribute :hidden, true
     expect(bike.reload.user_hidden).to be_truthy
     result = JSON.parse(AfterBikeSaveWorker.new.perform(bike.id))
     expect(result['deleted']).not_to be_present
   end
 
-  it "enqueues the duplicate_bike_finder_worker" do
+  it 'enqueues the duplicate_bike_finder_worker' do
     ownership = FactoryGirl.create(:ownership, user_hidden: true)
-    expect{
+    expect do
       JSON.parse(AfterBikeSaveWorker.new.perform(ownership.bike_id))
-    }.to change(DuplicateBikeFinderWorker.jobs, :size).by(1)
+    end.to change(DuplicateBikeFinderWorker.jobs, :size).by(1)
   end
 
-  it "creates pretty json without registration_updated_at, sends webhook runner" do
+  it 'creates pretty json without registration_updated_at, sends webhook runner' do
     ENV['VERSIONER_LOCATION'] = 'spec/fixtures'
     bike = FactoryGirl.create(:bike)
     bike.update_attribute :updator_id, 42
@@ -49,7 +49,4 @@ describe AfterBikeSaveWorker do
     expect(File.exist?(Rails.root.to_s + "/spec/fixtures/bikes/#{id}.json")).to be_falsey
     ENV['VERSIONER_LOCATION'] = nil
   end
-
 end
-
-

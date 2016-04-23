@@ -42,7 +42,7 @@ class BikesController < ApplicationController
     @query = request.query_parameters()
     @url = request.original_url
     @selectize_items = search.selectize_items
-    render layout: 'application_updated'
+    render layout: (revised_layout_enabled? ? 'application_revised' : 'application_updated')
   end
 
   def show
@@ -53,7 +53,7 @@ class BikesController < ApplicationController
     @bike = @bike.decorate
     @stolen_notification = StolenNotification.new if @bike.stolen
     respond_to do |format|
-      format.html { render layout: 'application_updated' }
+      format.html { render layout: (revised_layout_enabled? ? 'application_revised' : 'application_updated') }
       format.gif  { render qrcode: scanned_bike_url(@bike), level: :h, unit: 50 }
     end
   end

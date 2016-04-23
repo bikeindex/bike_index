@@ -1,12 +1,12 @@
-require "spec_helper"
+require 'spec_helper'
 
 describe BikeSerializer do
-  describe "standard validations" do
+  describe 'standard validations' do
     let(:bike) { FactoryGirl.create(:bike, frame_size: '42') }
-    let(:component) { FactoryGirl.create(:component, bike: bike)}
-    let(:public_image) { FactoryGirl.create(:public_image, imageable_type: "Bike", imageable_id: bike.id)}
+    let(:component) { FactoryGirl.create(:component, bike: bike) }
+    let(:public_image) { FactoryGirl.create(:public_image, imageable_type: 'Bike', imageable_id: bike.id) }
     subject { BikeSerializer.new(bike) }
-    
+
     it { expect(subject.manufacturer_name).to eq(bike.manufacturer_name) }
     it { expect(subject.manufacturer_id).to eq(bike.manufacturer_id) }
     it { expect(subject.stolen).to eq(bike.stolen) }
@@ -25,9 +25,8 @@ describe BikeSerializer do
     it { expect(subject.front_gear_type).to eq(bike.front_gear_type) }
     it { expect(subject.rear_gear_type).to eq(bike.rear_gear_type) }
     it { expect(subject.stolen_record).to eq(bike.current_stolen_record) }
-    it { expect(subject.frame_size).to eq("42cm") }
+    it { expect(subject.frame_size).to eq('42cm') }
     # it { subject.photo.should == bike.reload.public_images.first.image_url(:large) }
     # it { subject.thumb.should == bike.reload.public_images.first.image_url(:small) }
   end
-
 end

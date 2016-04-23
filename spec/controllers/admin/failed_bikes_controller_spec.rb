@@ -21,5 +21,4 @@ describe Admin::FailedBikesController do
     it { is_expected.to respond_with(:success) }
     it { is_expected.to render_template(:show) }
   end
-  
 end

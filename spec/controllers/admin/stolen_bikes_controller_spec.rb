@@ -18,7 +18,7 @@ describe Admin::StolenBikesController do
   describe 'edit' do
     it 'renders' do
       bike = FactoryGirl.create(:bike)
-      get :edit, id: bike.id 
+      get :edit, id: bike.id
       expect(response.code).to eq('200')
       expect(response).to render_template('edit')
       expect(flash).to_not be_present

@@ -3,7 +3,7 @@ require 'spec_helper'
 describe TsvCreatorWorker do
   it { is_expected.to be_processed_in :carrierwave }
 
-  it "enqueues another awesome job" do
+  it 'enqueues another awesome job' do
     TsvCreatorWorker.perform_async
     expect(TsvCreatorWorker).to have_enqueued_job
   end
@@ -13,5 +13,4 @@ describe TsvCreatorWorker do
     expect_any_instance_of(TsvCreator).to receive(:create_stolen).with(false).and_return(true)
     TsvCreatorWorker.new.perform('create_stolen', true)
   end
-
 end

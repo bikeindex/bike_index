@@ -41,5 +41,4 @@ describe ErrorsController do
     it { is_expected.to respond_with(:unauthorized) }
     it { is_expected.to render_template(:unauthorized) }
   end
-
 end

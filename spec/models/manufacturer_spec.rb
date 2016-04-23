@@ -30,12 +30,12 @@ describe Manufacturer do
   end
 
   describe 'fuzzy_name_find' do
-    it "finds manufacturers by their slug" do
-      mnfg = FactoryGirl.create(:manufacturer, name: "Poopy PANTERS")
+    it 'finds manufacturers by their slug' do
+      mnfg = FactoryGirl.create(:manufacturer, name: 'Poopy PANTERS')
       expect(Manufacturer.fuzzy_name_find('poopy panters')).to eq(mnfg)
     end
     it "removes Accell (because it's widespread mnfg)" do
-      mnfg = FactoryGirl.create(:manufacturer, name: "Poopy PANTERS")
+      mnfg = FactoryGirl.create(:manufacturer, name: 'Poopy PANTERS')
       expect(Manufacturer.fuzzy_id_or_name_find('poopy panters Accell')).to eq(mnfg)
     end
   end
@@ -85,53 +85,53 @@ describe Manufacturer do
     end
   end
 
-  describe "import csv" do
-    it "adds manufacturers to the list" do
-      import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import.csv")
-      expect {
+  describe 'import csv' do
+    it 'adds manufacturers to the list' do
+      import_file = File.open(Rails.root.to_s + '/spec/fixtures/manufacturer-test-import.csv')
+      expect do
         Manufacturer.import(import_file)
-      }.to change(Manufacturer, :count).by(2)
+      end.to change(Manufacturer, :count).by(2)
     end
-    
-    it "adds in all the attributes that are listed" do
-      import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import.csv")
+
+    it 'adds in all the attributes that are listed' do
+      import_file = File.open(Rails.root.to_s + '/spec/fixtures/manufacturer-test-import.csv')
       Manufacturer.import(import_file)
-      manufacturer = Manufacturer.find_by_slug("surly")
+      manufacturer = Manufacturer.find_by_slug('surly')
       expect(manufacturer.website).to eq('http://surlybikes.com')
       expect(manufacturer.frame_maker).to be_truthy
       expect(manufacturer.open_year).to eq(1900)
       expect(manufacturer.close_year).to eq(3000)
-      manufacturer2 = Manufacturer.find_by_slug("wethepeople")
+      manufacturer2 = Manufacturer.find_by_slug('wethepeople')
       expect(manufacturer2.website).to eq('http://wethepeople.com')
     end
 
-    it "updates attributes on a second upload" do
-      import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import.csv")
+    it 'updates attributes on a second upload' do
+      import_file = File.open(Rails.root.to_s + '/spec/fixtures/manufacturer-test-import.csv')
       Manufacturer.import(import_file)
-      second_import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import-second.csv")
+      second_import_file = File.open(Rails.root.to_s + '/spec/fixtures/manufacturer-test-import-second.csv')
       Manufacturer.import(second_import_file)
-      manufacturer = Manufacturer.find_by_slug("surly-bikes")
+      manufacturer = Manufacturer.find_by_slug('surly-bikes')
     end
   end
 
   describe 'fuzzy_id' do
-    it "gets id from name" do
+    it 'gets id from name' do
       manufacturer = FactoryGirl.create(:manufacturer)
       result = Manufacturer.fuzzy_id(manufacturer.name)
       expect(result).to eq(manufacturer.id)
     end
-    it "fails with nil" do
+    it 'fails with nil' do
       result = Manufacturer.fuzzy_id('some stuff')
       expect(result).to be_nil
     end
   end
 
   describe 'set_website_and_logo_source' do
-    it "has before_save_callback_method defined for set_website" do
+    it 'has before_save_callback_method defined for set_website' do
       expect(Manufacturer._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_website_and_logo_source)).to eq(true)
     end
 
-    it "sets logo source" do
+    it 'sets logo source' do
       manufacturer = Manufacturer.new
       allow(manufacturer).to receive(:logo).and_return('http://example.com/logo.png')
       manufacturer.set_website_and_logo_source
@@ -145,11 +145,10 @@ describe Manufacturer do
       expect(manufacturer.logo_source).to eq('something cool')
     end
 
-    it "empties if no logo" do
+    it 'empties if no logo' do
       manufacturer = Manufacturer.new(logo_source: 'something cool')
       manufacturer.set_website_and_logo_source
       expect(manufacturer.logo_source).to be_nil
     end
   end
-
 end
