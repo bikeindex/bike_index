@@ -15,6 +15,14 @@
       }
     }
   }
+  // Separate the components
+  .additional-component { border-top: 1px $form-well-divider-color solid; }
+  // Separator for components that are added to the page with js
+  .add-additional-components-block .additional-component {
+    border-top: none;
+    border-bottom: 1px $form-well-divider-color solid;
+  }
+  .add_fields { margin-top: $vertical-height; }
   .remove-part {
     float: right;
     label {

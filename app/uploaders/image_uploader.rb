@@ -1,5 +1,4 @@
 # encoding: utf-8
-
 class ImageUploader < CarrierWave::Uploader::Base
   include ::CarrierWave::Backgrounder::Delay
   include CarrierWave::MiniMagick
@@ -54,5 +53,4 @@ class ImageUploader < CarrierWave::Uploader::Base
   version :small, from_version: :medium do
     process resize_to_fill: [300,300]
   end
-
 end

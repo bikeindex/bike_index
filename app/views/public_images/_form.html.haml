@@ -28,12 +28,6 @@
                 (no one will be able to see this image except for you)
               .controls
                 = f.check_box :is_private
-             
-      / .control-group
-      /   = f.label :image, "Choose a new image", class: 'control-label'
-      /   .controls
-      /     = f.file_field :image
-        
     .bibox-btn.padded
       = f.submit "Save image", class: "button-green"
       = link_to 'Cancel Update', edit_bike_url(@public_image.imageable), class: "button-red"

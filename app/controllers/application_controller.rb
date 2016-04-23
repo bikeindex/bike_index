@@ -1,5 +1,4 @@
 class ApplicationController < ActionController::Base
-  include UrlHelper
   include AuthenticationHelper
   protect_from_forgery
   ensure_security_headers

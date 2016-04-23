@@ -11,7 +11,7 @@ class PublicImagesController < ApplicationController
   def create
     @public_image = PublicImage.new(params[:public_image])
     if params[:bike_id].present?
-      @bike = Bike.find(params[:bike_id])
+      @bike = Bike.unscoped.find(params[:bike_id])
       if @bike.owner == current_user
         @public_image.imageable = @bike
         @public_image.save
@@ -27,6 +27,7 @@ class PublicImagesController < ApplicationController
       flash[:error] = "Whoops! We can't let you create that image."
       redirect_to @imageable
     end
+    render revised_layout_enabled? ? 'create_revised' : 'create'
   end
 
   def edit

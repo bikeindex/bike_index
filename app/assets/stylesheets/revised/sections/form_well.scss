@@ -1,5 +1,6 @@
 $form-well-background: $gray-lighter;
 $form-well-border-color: $gray-lightish;
+$form-well-divider-color: #b2b2b2;
 
 .form-circle-item { // Mixin for help blocks
   padding: .5em .25em;
@@ -119,7 +120,7 @@ $form-well-border-color: $gray-lightish;
       display: block;
       width: 90%;
       margin: 0 0 2*$vertical-height 10%;
-      border-bottom: 1px #b2b2b2 solid;
+      border-bottom: 1px $form-well-divider-color solid;
       padding-top: $vertical-height;
     }
     .no-divider-row::after { display: none; }
