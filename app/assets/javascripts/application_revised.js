@@ -3,6 +3,7 @@
 // require self
 //= require jquery
 //= require jquery_ujs
+//= require lodash
 //= require tether
 //= require bootstrap
 //= require jquery.dirtyforms

@@ -7,10 +7,10 @@ class BikeIndex.BikesEditAccessories extends BikeIndex
     pagespace = @
     $('#form_well_wrap').on 'click', '.remove-part label', (e) ->
       pagespace.removeComponent(e)
-    $('#form_well_wrap').change '.component-manufacturer-input', (e) ->
-      pagespace.toggleOtherDisplay(e, 'manufacturer')
-    $('#form_well_wrap').change '.component-ctype-input', (e) ->
+    $('#form_well_wrap').on 'change', '.component-ctype-input', (e) ->
       pagespace.toggleOtherDisplay(e, 'ctype')
+    $('#form_well_wrap').on 'change', '.component-manufacturer-input', (e) ->
+      pagespace.toggleOtherDisplay(e, 'manufacturer')
     $('.add_fields').click (e) ->
       pagespace.addComponent(e)
 
