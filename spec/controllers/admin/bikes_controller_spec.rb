@@ -99,7 +99,7 @@ describe Admin::BikesController do
 
   describe 'ignore_duplicate' do
     before do
-      request.env["HTTP_REFERER"] = 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
+      request.env["HTTP_REFERER"] = 'http://localhost:3000/admin/bikes/missing_manufacturers'
     end
     context 'marked ignore' do
       it 'duplicates are ignore' do
@@ -109,7 +109,7 @@ describe Admin::BikesController do
         duplicate_bike_group.reload
 
         expect(duplicate_bike_group.ignore).to be_truthy
-        expect(response).to redirect_to 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
+        expect(response).to redirect_to 'http://localhost:3000/admin/bikes/missing_manufacturers'
       end
     end
 
@@ -121,14 +121,14 @@ describe Admin::BikesController do
         duplicate_bike_group.reload
 
         expect(duplicate_bike_group.ignore).to be_falsey
-        expect(response).to redirect_to 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
+        expect(response).to redirect_to 'http://localhost:3000/admin/bikes/missing_manufacturers'
       end
     end
   end
 
   describe 'update_manufacturers' do
     before do
-      request.env['HTTP_REFERER'] = 'http://lvh.me:3000/admin/bikes/missing_manufacturers'
+      request.env['HTTP_REFERER'] = 'http://localhost:3000/admin/bikes/missing_manufacturers'
     end
     it 'updates the products' do
       bike1 = FactoryGirl.create(:bike, manufacturer_other: 'hahaha')
