@@ -22,7 +22,7 @@ Bikeindex::Application.routes.draw do
     resources :organization_invitations, only: [:new, :create]
   end
 
-  match '/' => 'stolen#index', constraints: { subdomain: 'stolen' }
+  match '/', to: redirect(:root_url, subdomain: false), constraints: { subdomain: 'stolen' }
 
   root to: 'welcome#index'
 

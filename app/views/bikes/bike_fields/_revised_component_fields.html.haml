@@ -1,21 +1,20 @@
 %fieldset.additional-component
   - initial_manufacturer = f.object.manufacturer && { id: f.object.manufacturer.id, text: f.object.manufacturer.name }.to_json
   - other_mnfg_show = (f.object.manufacturer_id == @manufacturer_other_id) ? 'unhidden' : ''
-  - other_ctype_show = f.object.ctype_id == @ctype_other_id ? 'unhidden' : ''
+  - ctype_id = f.object.ctype_id
+  - other_ctype_show = ctype_id == @ctype_other_id ? 'unhidden' : ''
   - other_model_show = (f.object.model_name.present?) ? 'unhidden' : ''
-
   .right-input-help.remove-part
     = f.label :_destroy do
       %span.context-display-help
         &ndash;
       = f.check_box :_destroy
       Remove part
-
   .related-fields
     .form-group.row
       = f.label :ctype_id, 'Part type', class: 'form-well-label'
       .form-well-input.fancy-select.unfancy
-        = f.collection_select(:ctype_id, Ctype.all, :id, :name, { required: true }, { class: 'form-control component-ctype-input' })
+        = f.collection_select(:ctype_id, Ctype.all, :id, :name, { required: true, prompt: 'Component type' }, { class: 'form-control component-ctype-input' })
     / We really should display Position here, but we aren't right now because of implementation issues 
     / .right-input-help
     /   - position_visibility = (f.object.front || f.object.rear) ? '' : 'hidden-other'

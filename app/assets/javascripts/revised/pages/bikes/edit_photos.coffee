@@ -3,15 +3,19 @@ class BikeIndex.BikesEditPhotos extends BikeIndex
     @initializeEventListeners()
     @initializeSortablePhotos()
     @initializeImageUploads()
-    $('.edit-bike-submit-wrapper .btn').hide()
 
   initializeEventListeners: ->
     pagespace = @
     $('#public_images').on 'change', '.is_private_check', (e) ->
       pagespace.updateImagePrivateness(e)
+    $('.edit-bike-submit-wrapper .btn').click (e) ->
+      e.preventDefault()
+      location.reload(true)
 
   initializeImageUploads: ->
     initializeSortablePhotos = @initializeSortablePhotos
+    finished_upload_template = $('#image-upload-finished-template').html()
+    Mustache.parse(finished_upload_template)
     $('#new_public_image').fileupload
       dataType: "script"
       add: (e, data) ->
@@ -23,7 +27,7 @@ class BikeIndex.BikesEditPhotos extends BikeIndex
           $('#new_public_image').append(data.context)
           data.submit()
         else
-          alert("#{file.name} is not a gif, jpeg, or png image file")
+          window.BikeIndexAlerts.add('error', "#{file.name} is not a gif, jpeg, or png image file")
       progress: (e, data) ->
         if data.context
           progress = parseInt(data.loaded / data.total * 95, 10) # Multiply by 95, so that it doesn't look done, since progress doesn't work.
@@ -32,13 +36,8 @@ class BikeIndex.BikesEditPhotos extends BikeIndex
         initializeSortablePhotos()
         file = data.files[0]
         $.each(data.files, (index, file) ->
-          data.context.addClass('finished_upload').html("""
-              <p><em>#{file.name}</em></p>
-              <div class='alert alert-info'>
-                <button aria-label="Close" class="close" data-dismiss="alert" type="button">
-                Finished uploading
-              </div>
-            """).fadeOut('slow')
+          data.context.addClass('finished_upload')
+            .html(Mustache.render(finished_upload_template, file)).fadeOut()
           )
 
   initializeSortablePhotos: ->

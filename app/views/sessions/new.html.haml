@@ -5,6 +5,7 @@
     - cache('new_session_pictures') do
       - i = 0
       - PublicImage.bikes.order("created_at desc").limit(25).each do |photo|
+        - next unless Bike.where(id: photo.imageable_id).present? # So that example bikes and private images are hidden
         - unless Bike.unscoped.find(photo.imageable_id).example # We extras, in case of example photos
           .bike-photo{id: "photo#{i}"}
             .flipper

@@ -1,10 +1,8 @@
 .edit-bike-page-photos {
   .edit-photo-display-list {
     @include list-unstyled;
-    @include clearfix;
-    display: block;
     .edit-photo-display-wrap {
-      padding: $vertical-height .5*$vertical-height 0; // Trash can has bottom space
+      padding: 0 .5*$vertical-height;
       background: white;
       border: 1px solid $form-well-border-color;
       img {
@@ -34,15 +32,19 @@
       color: $gray-light;
       z-index: 0;
     }
+    .trash-can-icon {
+      @include trash-can-icon($gray-light, $link-color, white, 2*$vertical-height);
+      display: inline-block;
+    }
     .photo-remove {
       display: block;
       width: 100%;
       text-align: center;
       margin-top: .5*$vertical-height;
-    }
-    .trash-can-icon {
-      @include trash-can-icon($gray-light, $link-color, white, 2*$vertical-height);
-      display: inline-block;
+      // Hovering anywhere on the link colors the trash-can-icon
+      &:hover, &:active, &.active {
+        .hover-colorize { background-color: $link-color; }
+      }
     }
   }
   .edit-photo-upload {
@@ -66,16 +68,8 @@
   }
 
   .edit-photo-display-list-item {
-    // @include make-col();
-    // @include make-col-span(4);
-    display: block;
-    float: left;
+    margin-top: $vertical-height;
     position: relative;
-    width: 33.33%;
-    padding-left: 0.9375rem;
-    padding-right: 0.9375rem;
-    // user-select prevents the contents of your
-    // list items from being selectable by the cursor
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -91,20 +85,6 @@
     @extend .edit-photo-display-list-item;
     height: 280px;
     border: 3px dashed #CCC;
-
-    // If you want a blue triangle cursor icon
-    // &:before {
-    //   position: absolute;
-    //   content: "";
-    //   width: 0;
-    //   height: 0;
-    //   margin-top: -5px;
-    //   left: -12px;
-    //   top: -7px;
-    //   border: 5px solid transparent;
-    //   border-left-color: $blue;
-    //   border-right: none;
-    // }
   }
 
   // Actual item that is in the air, being dragged by you
@@ -116,20 +96,16 @@
   }
 
   .upload {
-    @include border-radius(2px);
     border: 1px solid $form-well-border-color;
+    border-radius: $border-radius;
     background: white;
     width: 80%;
     margin: 10px 10% 0;
-    padding: 10px;
+    padding: $vertical-height .5*$vertical-height;
     .progress, .alert-success { margin-bottom: 0;}
     p {
-      // Mixin called textoverflow if used again...
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      @include textoverflow;
       margin-bottom: .5*$vertical-height;
     }
-    
   }
 }

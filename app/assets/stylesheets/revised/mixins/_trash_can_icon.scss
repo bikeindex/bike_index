@@ -9,7 +9,8 @@
     background-color: $color;
   }
   &:hover, &:active, &.active {
-   .trash-lid, .trash-container { background-color: $hover-color; }
+    cursor: pointer;
+   .hover-colorize { background-color: $hover-color; }
   }
   .trash-lid {
     width: 62%;

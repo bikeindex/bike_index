@@ -71,10 +71,4 @@ module AuthenticationHelper
   def current_organization
     @organization ||= Organization.find_by_slug(request.subdomain)
   end
-
-  def set_current_organization
-    if Subdomain.matches?(request)
-      @organzation = Organization.find_by_slug(request.subdomain)
-    end
-  end
 end

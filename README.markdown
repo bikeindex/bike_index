@@ -27,20 +27,30 @@ We're an open source project. Take a gander through our code, report bugs, or do
 
 ## Running the Bike Index locally
 
-- Create and seed your database (`rake db:setup`)
+This explanation assumes you're familiar with developing Ruby on Rails applications.
 
-- `rake seed_test_users_and_bikes` to add the three test user accounts: admin@example.com, member@example.com, user@example.com (all have password `please12`) and give user@example.com 50 bikes
+- `bundle install` install gems
 
-- `rake start` to start the server (this will start Redis locally)
+- `rake db:setup` create and seed your database
 
-- **Access the site through [lvh.me:3000](http://lvh.me:3000)**. You can't log in through localhost:3000.
+- `rake seed_test_users_and_bikes` to:
+  - Add the three test user accounts: admin@example.com, member@example.com, user@example.com (all have password `please12`)
+  - Give user@example.com 50 bikes
 
-  - If you want to use [Pow](http://pow.cx/) (or some other setup that isn't through lvh.me:3000), change the appropriate values in [session_store.rb](config/initializers/session_store.rb) and [.env.development](.env.development).
+- `./start` start the server.
+
+  - [start](start) is a bash script. It starts redis in the background and runs foreman with the [dev procfile](Procfile_development). If you need/prefer something else, do that
+
+- Go to [localhost:3000](http://localhost:3000)
+
+  - if you want to use [Pow](http://pow.cx/) (or some other setup that isn't through localhost:3000), change the appropriate values in [session_store.rb](config/initializers/session_store.rb) and [.env](.env).
+
+
+## Testing
  
-
-- We use [RSpec](https://github.com/rspec/rspec) and [Guard](https://github.com/guard/guard) for testing. 
+We use [RSpec](https://github.com/rspec/rspec) and [Guard](https://github.com/guard/guard) for testing.
     
-    - Run the test suit in the background with `bundle exec guard`
+- Run the test suit in the background with `bundle exec guard`
 
 - You may have to manually add the fuzzystrmatch extension, which we use for near serial searches, to your databases. The migration should take care of this but sometimes doesn't. Open the databases in postgres (`psql bikeindex_development` and `psql bikeindex_test`) and add the extension.
     

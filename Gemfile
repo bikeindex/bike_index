@@ -83,6 +83,7 @@ gem 'rack-mini-profiler', require: false # If you can't see it you can't make it
 
 gem 'bundler', '>= 1.8.4' # required for rails-assets.org - JS and CSS assets
 source 'https://rails-assets.org' do # JS land is crazy, so lock everything
+  gem 'rails-assets-lodash', '~> 4.9.0'
   gem 'rails-assets-tether', '~> 1.1.0'
   gem 'rails-assets-mustache', '~> 2.2.1'
   gem 'rails-assets-jquery.dirtyforms', '~> 2.0.0' # Alert on attempts to leave with dirt on forms

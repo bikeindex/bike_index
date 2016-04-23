@@ -1,4 +1,13 @@
 .edit-bike-page-ownership {
+  .trash-can-icon {
+    float: left;
+    margin-top: -6px;
+    @include trash-can-icon($body-font-color, $link-color, $form-well-background, 42px);
+  }
+  .delete-from-index a {
+    // Hovering anywhere on the link colors the trash-can-icon
+    &:hover, &:active, &.active { .hover-colorize { background-color: $link-color; } }
+  }
   .delete-from-index {
     max-width: 300px;
     margin: 0 auto;
@@ -11,11 +20,6 @@
         color: $link-color;
         text-decoration: none;
       }
-    }
-    .trash-can-icon {
-      float: left;
-      margin-top: -6px;
-      @include trash-can-icon($body-font-color, $link-color, $form-well-background, 42px);
     }
   }
 

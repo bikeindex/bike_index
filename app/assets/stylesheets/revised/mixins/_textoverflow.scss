@@ -1,0 +1,9 @@
+// 
+// Mixins
+
+// Hide overflow text, append an ellipsis
+@mixin textoverflow {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

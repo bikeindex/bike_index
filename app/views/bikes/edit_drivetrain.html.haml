@@ -15,7 +15,8 @@
                   #{side.titleize} wheel
                 .form-well-input.fancy-select-placeholder.unfancy
                   .standard-diams{ id: "#{side}_standard"}
-                    %select.form-control
+                    // ignore this select in dirty forms
+                    %select.form-control.dirtyignore
                       %option{ value: '' }
                         Choose diameter
                       %option{ value: WheelSize.find_id_by_bsd(622) }
@@ -78,7 +79,8 @@
               %label.form-well-label{ for: 'front_gear_select'}
                 Front gears
               .form-well-input
-                %select#front_gear_select.form-control
+                // ignore this select in dirty forms
+                %select#front_gear_select.form-control.dirtyignore
                   %option.placeholder{ value: ''}
                     Select chainring count
                   - FrontGearType.standard.each do |gt|
@@ -99,7 +101,8 @@
               %label.form-well-label{ for: 'rear_gear_select' }
                 Rear gears
               .form-well-input
-                %select#rear_gear_select.form-control
+                // ignore this select in dirty forms
+                %select#rear_gear_select.form-control.dirtyignore
                   %option.placeholder{ value: '' }
                     Select cog count
                   - RearGearType.standard.each do |gt|

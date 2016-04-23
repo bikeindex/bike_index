@@ -1,12 +1,11 @@
-%li.edit-photo-display-list-item{ id: image.id }
+%li.col-xs-6.col-sm-4.edit-photo-display-list-item{ id: image.id }
   .edit-photo-display-wrap
     %label.keep-private
       keep image private
       %input.is_private_check{ type: 'checkbox', checked: image.is_private }
     .processing
       \... processing
-
-    = image_tag(image.image_url(:small)) if image.image?
-
-    = link_to public_image_url(image, return_url: edit_bike_url(@bike, page: 'photos')), method: :delete, class: 'photo-remove' do
+    - if image.image?
+      %img{ src: image.image_url(:small) }
+    %a.photo-remove{ href: public_image_url(image, page: 'photos', return_url: edit_bike_url(@bike, page: 'photos')), rel: 'nofollow', 'data-method' => 'delete' }
       = render '/shared/trash_icon'
