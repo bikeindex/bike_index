@@ -23,7 +23,7 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
 
   def update
     if @recovery_display.update_attributes(params[:recovery_display])
-      clear_cache_if_most_recent_changed
+      clear_index_wrap_cache
       flash[:notice] = "Recovery display saved!"
       redirect_to admin_recovery_displays_url
     else
@@ -34,7 +34,7 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
   def create
     @recovery_display = RecoveryDisplay.create(params[:recovery_display])
     if @recovery_display.save
-      clear_cache_if_most_recent_changed
+      clear_index_wrap_cache
       flash[:notice] = "Recovery display created!"
       redirect_to admin_recovery_displays_url
     else
@@ -49,8 +49,8 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
 
   protected
 
-  def clear_cache_if_most_recent_changed
-
+  def clear_index_wrap_cache
+    expire_fragment 'root_head_wrap'
   end
 
   def find_recovery_displays
