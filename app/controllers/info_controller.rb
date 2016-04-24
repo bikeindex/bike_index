@@ -8,9 +8,7 @@ class InfoController < ApplicationController
   end
   
   def where
-    @bike_shops = Organization.shop.shown_on_map.decorate
-    @states = State.includes(:locations).all
-    @countries = Country.where('iso != ?', 'US').includes(:locations)
+    @organizations = Organization.shown_on_map
   end
 
   def serials

@@ -39,7 +39,7 @@ class Organization < ActiveRecord::Base
 
   default_scope { order(:name) }
 
-  scope :shown_on_map, -> { where(show_on_map: true) }
+  scope :shown_on_map, -> { where(show_on_map: true, approved: true) }
   scope :shop, -> { where(org_type: 'shop') }
   scope :police, -> { where(org_type: 'police') }
   scope :advocacy, -> { where(org_type: 'advocacy') }
@@ -81,9 +81,14 @@ class Organization < ActiveRecord::Base
     end
   end
 
+  def allowed_show
+    show_on_map && approved
+  end
+
   before_save :set_locations_shown
   def set_locations_shown
-    locations.each { |l| l.update_attribute :shown, show_on_map }
+    # Locations set themselves on save
+    locations.each { |l| l.save unless l.shown == allowed_show }
   end
 
   def suspended?

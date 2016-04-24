@@ -13,6 +13,12 @@ describe Organization do
     it { is_expected.to belong_to :auto_user }
   end
 
+  describe 'scopes' do
+    it 'Shown on map is shown on map *and* validated' do
+      expect(Organization.shown_on_map.to_sql).to eq(Organization.where(show_on_map: true).where(approved: true).order(:name).to_sql)
+    end
+  end
+
   describe 'set_and_clean_attributes' do
     it 'sets the short_name and the slug on save' do
       organization = Organization.new(name: 'something')
@@ -48,14 +54,29 @@ describe Organization do
   end
 
   describe 'set_locations_shown' do
-    it 'sets the locations shown to be org shown on save' do
-      organization = FactoryGirl.create(:organization)
-      country = FactoryGirl.create(:country)
-      location = Location.create(country_id: country.id, city: 'Chicago', name: 'stuff', organization_id: organization.id)
-      organization.reload.update_attribute :show_on_map, true
-      expect(location.reload.shown).to be_truthy
-      organization.update_attribute :show_on_map, false
-      expect(location.reload.shown).to be_falsey
+    let(:country) { FactoryGirl.create(:country) }
+    let(:organization) { FactoryGirl.create(:organization, show_on_map: true) }
+    let(:location) { Location.create(country_id: country.id, city: 'Chicago', name: 'stuff', organization_id: organization.id, shown: true) }
+    context 'organization approved' do
+      before do
+        organization.update_attribute :approved, true
+        organization.reload
+      end
+      it 'sets the locations shown to be org shown on save' do
+        expect(organization.allowed_show).to be_truthy
+        organization.set_locations_shown
+        expect(location.reload.shown).to be_truthy
+      end
+    end
+    context 'not approved' do
+      it 'sets not shown' do
+        expect(organization.show_on_map).to be_truthy
+        organization.set_locations_shown
+        expect(location.reload.shown).to be_falsey
+      end
+    end
+    it 'has before_save_callback_method defined for set_locations_shown' do
+      expect(Organization._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_locations_shown)).to eq(true)
     end
   end
 

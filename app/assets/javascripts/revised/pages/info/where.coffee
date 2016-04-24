@@ -9,14 +9,9 @@ class BikeIndex.InfoWhere extends BikeIndex
       pagespace.updateMapLocation(e)
   
   initializeMap: ->
-    $.ajax
-      type: "GET"
-      url: 'https://freegeoip.net/json/'
-      dataType: "jsonp",
-      success: (location) ->
-        createMap(location.latitude,location.longitude,7)
-      error: (location) ->
-        createMap(40.111689,-96.81839,4)
+    # Ideally we'll use the localstorage location information about the user 
+    # Which is what we'll use for bike proximity searching for the user
+    createMap(40.111689,-96.81839,4)
 
   updateMapLocation: (event) ->
     target = $(event.target)
