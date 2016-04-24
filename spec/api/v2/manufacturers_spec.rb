@@ -7,7 +7,7 @@ describe 'Manufacturers API V2' do
       FactoryGirl.create(:manufacturer)
       get '/api/v2/manufacturers?per_page=1'
       expect(response.header['Total']).to eq('2')
-      pagination_link = "<http://www.example.com/api/v2/manufacturers?page=2&per_page=1>; rel=\"last\", <http://www.example.com/api/v2/manufacturers?page=2&per_page=1>; rel=\"next\""
+      pagination_link = '<http://www.example.com/api/v2/manufacturers?page=2&per_page=1>; rel="last", <http://www.example.com/api/v2/manufacturers?page=2&per_page=1>; rel="next"'
       expect(response.header['Link']).to eq(pagination_link)
       expect(response.code).to eq('200')
       # pp response.headers
@@ -16,7 +16,7 @@ describe 'Manufacturers API V2' do
       expect(JSON.parse(response.body)['manufacturers'][0]['id']).to eq(manufacturer.id)
     end
   end
-  
+
   describe 'find by id or name' do
     before :all do
       @manufacturer = FactoryGirl.create(:manufacturer)

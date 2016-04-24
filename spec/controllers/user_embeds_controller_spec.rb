@@ -21,5 +21,4 @@ describe UserEmbedsController do
       expect(response.headers['X-Frame-Options']).not_to be_present
     end
   end
-
 end

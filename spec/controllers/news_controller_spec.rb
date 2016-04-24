@@ -13,7 +13,7 @@ describe NewsController do
 
     describe 'show' do
       let(:user) { FactoryGirl.create(:user) }
-      let(:blog) { Blog.create(title: 'foo title', body: "ummmmm good", user_id: user.id, old_title_slug: 'an-older-title') }
+      let(:blog) { Blog.create(title: 'foo title', body: 'ummmmm good', user_id: user.id, old_title_slug: 'an-older-title') }
       context 'title slug' do
         it 'renders' do
           get :show, id: blog.title_slug
@@ -54,7 +54,7 @@ describe NewsController do
 
     describe 'show' do
       let(:user) { FactoryGirl.create(:user) }
-      let(:blog) { Blog.create(title: 'foo title', body: "ummmmm good", user_id: user.id, old_title_slug: 'an-older-title') }
+      let(:blog) { Blog.create(title: 'foo title', body: 'ummmmm good', user_id: user.id, old_title_slug: 'an-older-title') }
       it 'renders' do
         allow(controller).to receive(:revised_layout_enabled?) { true }
         get :show, id: blog.title_slug

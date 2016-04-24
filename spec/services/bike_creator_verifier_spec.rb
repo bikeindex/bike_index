@@ -82,7 +82,7 @@ describe BikeCreatorVerifier do
   describe 'check_organization' do
     it 'sets the bike to what BikeCreatorOrganizer returns' do
       bike = Bike.new
-      b_param = BParam.new(params: {stolen: false})
+      b_param = BParam.new(params: { stolen: false })
       creator = BikeCreatorVerifier.new(b_param, bike)
       expect_any_instance_of(BikeCreatorOrganizer).to receive(:organized_bike).and_return(bike)
       expect(creator.check_organization).to eq(bike)
@@ -92,21 +92,21 @@ describe BikeCreatorVerifier do
   describe 'check_stolen_and_recovered' do
     it "returns false if the bike isn't stolen or recovered" do
       bike = Bike.new
-      b_param = BParam.new(params: {stolen: false})
+      b_param = BParam.new(params: { stolen: false })
       creator = BikeCreatorVerifier.new(b_param, bike).check_stolen_and_recovered
       expect(creator).to be_falsey
     end
     it 'calls stolenize if there is a stolen attribute included' do
       bike = Bike.new
       b_param = BParam.new
-      allow(b_param).to receive(:params).and_return(bike: {stolen: true})
+      allow(b_param).to receive(:params).and_return(bike: { stolen: true })
       creator = BikeCreatorVerifier.new(b_param, bike)
       expect(creator).to receive(:stolenize).and_return(true)
       creator.check_stolen_and_recovered
     end
     it 'calls stolenize if the stolen parameter is passed' do
       bike = Bike.new
-      b_param = BParam.new(params: {stolen: true})
+      b_param = BParam.new(params: { stolen: true })
       creator = BikeCreatorVerifier.new(b_param, bike)
       expect(creator).to receive(:stolenize).and_return(true)
       creator.check_stolen_and_recovered
@@ -115,14 +115,14 @@ describe BikeCreatorVerifier do
     it 'calls recoverize if there is a recovered attribute included' do
       bike = Bike.new
       b_param = BParam.new
-      allow(b_param).to receive(:params).and_return(bike: {recovered: true})
+      allow(b_param).to receive(:params).and_return(bike: { recovered: true })
       creator = BikeCreatorVerifier.new(b_param, bike)
       expect(creator).to receive(:recoverize).and_return(true)
       creator.check_stolen_and_recovered
     end
     it 'calls recoverize if the recovered parameter is passed' do
       bike = Bike.new
-      b_param = BParam.new(params: {recovered: true})
+      b_param = BParam.new(params: { recovered: true })
       creator = BikeCreatorVerifier.new(b_param, bike)
       expect(creator).to receive(:recoverize).and_return(true)
       creator.check_stolen_and_recovered
@@ -132,13 +132,11 @@ describe BikeCreatorVerifier do
   describe 'verify' do
     it 'calls the methods it needs to call' do
       bike = Bike.new
-      b_param = BParam.new(params: {stolen: true})
+      b_param = BParam.new(params: { stolen: true })
       creator = BikeCreatorVerifier.new(b_param, bike)
       expect(creator).to receive(:check_stolen_and_recovered).and_return(true)
       expect(creator).to receive(:check_example).and_return(true)
       expect(creator.verify).to eq(bike)
     end
   end
-
-
 end

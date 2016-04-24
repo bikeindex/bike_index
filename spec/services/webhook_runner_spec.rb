@@ -3,14 +3,14 @@ require 'spec_helper'
 describe WebhookRunner do
   describe 'make_request' do
     it "doesn't error if webhook doesn't return" do
-      runner = WebhookRunner.new 
-      response = runner.make_request("https://testing.bikeindex.org/about/something")
+      runner = WebhookRunner.new
+      response = runner.make_request('https://testing.bikeindex.org/about/something')
       expect(response).to be_present
     end
   end
 
   describe 'after_bike_update' do
-    it "calls make request" do
+    it 'calls make request' do
       runner = WebhookRunner.new
       id = 9999
       expect(runner).to receive(:hook_urls).with('after_bike_update').and_return(['http://tester.com/bikes/#{bike_id}'])
@@ -27,7 +27,7 @@ describe WebhookRunner do
   end
 
   describe 'after_user_update' do
-    it "calls make request" do
+    it 'calls make request' do
       runner = WebhookRunner.new
       id = 9999
       expect(runner).to receive(:hook_urls).with('after_user_update').and_return(['http://tester.com/users/#{user_id}'])
@@ -44,7 +44,7 @@ describe WebhookRunner do
   end
 
   describe 'hook_urls' do
-    it "calls the redis array" do
+    it 'calls the redis array' do
       runner = WebhookRunner.new
       redis = Redis.new
       rid = runner.redis_id('after_bike_update')
@@ -54,5 +54,4 @@ describe WebhookRunner do
       expect(runner.hook_urls('after_bike_update')).to eq(redis.lrange(rid, 0, 0))
     end
   end
-
 end

@@ -65,7 +65,7 @@ describe Admin::BikesController do
         expect(bike.stolen).to be_truthy
         opts = {
           id: bike.id,
-          mark_recovered_reason: "I recovered it", 
+          mark_recovered_reason: 'I recovered it',
           index_helped_recovery: true,
           can_share_recovery: 1,
           fast_attr_update: true,
@@ -99,13 +99,13 @@ describe Admin::BikesController do
 
   describe 'ignore_duplicate' do
     before do
-      request.env["HTTP_REFERER"] = 'http://localhost:3000/admin/bikes/missing_manufacturers'
+      request.env['HTTP_REFERER'] = 'http://localhost:3000/admin/bikes/missing_manufacturers'
     end
     context 'marked ignore' do
       it 'duplicates are ignore' do
         duplicate_bike_group = DuplicateBikeGroup.create
         expect(duplicate_bike_group.ignore).to be_falsey
-        put :ignore_duplicate_toggle, id: duplicate_bike_group.id 
+        put :ignore_duplicate_toggle, id: duplicate_bike_group.id
         duplicate_bike_group.reload
 
         expect(duplicate_bike_group.ignore).to be_truthy
@@ -114,10 +114,10 @@ describe Admin::BikesController do
     end
 
     context 'duplicate group unignore' do
-      it "marks a duplicate group unignore" do
+      it 'marks a duplicate group unignore' do
         duplicate_bike_group = DuplicateBikeGroup.create(ignore: true)
         expect(duplicate_bike_group.ignore).to be_truthy
-        put :ignore_duplicate_toggle, id: duplicate_bike_group.id 
+        put :ignore_duplicate_toggle, id: duplicate_bike_group.id
         duplicate_bike_group.reload
 
         expect(duplicate_bike_group.ignore).to be_falsey

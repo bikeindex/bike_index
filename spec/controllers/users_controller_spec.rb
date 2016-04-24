@@ -59,15 +59,15 @@ describe UsersController do
       end
 
       describe 'failure' do
-        let(:user_attributes) { 
+        let(:user_attributes) do
           user = FactoryGirl.attributes_for(:user)
           user[:password_confirmation] = 'bazoo'
           user
-        }
+        end
         it 'does not create a user or send a welcome email' do
-          expect{
+          expect do
             post :create, user: user_attributes
-          }.to change(EmailWelcomeWorker.jobs, :size).by(0)
+          end.to change(EmailWelcomeWorker.jobs, :size).by(0)
           expect(User.count).to eq(0)
         end
         it 'renders new' do
@@ -90,7 +90,7 @@ describe UsersController do
             @user = FactoryGirl.create(:user)
             expect(User).to receive(:find).and_return(@user)
           end
-          
+
           it 'logins and redirect when confirmation succeeds' do
             expect(@user).to receive(:confirm).and_return(true)
             get :confirm, id: @user.id, code: @user.confirmation_token
@@ -118,7 +118,7 @@ describe UsersController do
           email: 'foo1@bar.com',
           password: 'coolpasswprd$$$$$',
           terms_of_service: '0',
-          is_emailable: '0' 
+          is_emailable: '0'
         }
       end
 
@@ -157,20 +157,20 @@ describe UsersController do
 
     it 'enqueues a password reset email job' do
       @user = FactoryGirl.create(:user, email: 'ned@foo.com')
-      expect {
+      expect do
         post :password_reset, email: @user.email
-      }.to change(EmailResetPasswordWorker.jobs, :size).by(1)
+      end.to change(EmailResetPasswordWorker.jobs, :size).by(1)
     end
   end
 
   describe 'show' do
     xit "404s if the user doesn't exist" do
       # I have no idea why this fails. It works really, but not in tests!
-      expect {
+      expect do
         get :edit, id: 'fake_user'
-      }.to raise_error(ActionController::RoutingError)
+      end.to raise_error(ActionController::RoutingError)
     end
-    
+
     it "redirects to user home url if the user exists but doesn't want to show their page" do
       @user = FactoryGirl.create(:user)
       @user.show_bikes = false
@@ -178,13 +178,13 @@ describe UsersController do
       get :show, id: @user.username
       expect(response).to redirect_to user_home_url
     end
-    
+
     it 'shows the page if the user exists and wants to show their page' do
       @user = FactoryGirl.create(:user)
       @user.show_bikes = true
       @user.save
       get :show, id: @user.username
-      expect(response).to render_template :show 
+      expect(response).to render_template :show
     end
   end
 
@@ -221,24 +221,22 @@ describe UsersController do
   describe 'update' do
     it "doesn't update user if current password not present" do
       user = FactoryGirl.create(:user, terms_of_service: false, password: 'old_pass', password_confirmation: 'old_pass')
-      set_current_user(user) 
-      post :update, { id: user.username, user: {
-        password: "new_pass",
-        password_confirmation: 'new_pass'}
-      }
-      expect(user.reload.authenticate("new_pass")).to be_falsey
+      set_current_user(user)
+      post :update, id: user.username, user: {
+        password: 'new_pass',
+        password_confirmation: 'new_pass' }
+      expect(user.reload.authenticate('new_pass')).to be_falsey
     end
 
     it "doesn't update user if password doesn't match" do
       user = FactoryGirl.create(:user, terms_of_service: false, password: 'old_pass', password_confirmation: 'old_pass')
-      set_current_user(user) 
-      post :update, { id: user.username, user: {
+      set_current_user(user)
+      post :update, id: user.username, user: {
         current_password: 'old_pass',
         password: 'new_pass',
         name: 'Mr. Slick',
-        password_confirmation: 'new_passd'}
-      }
-      expect(user.reload.authenticate("new_pass")).to be_falsey
+        password_confirmation: 'new_passd' }
+      expect(user.reload.authenticate('new_pass')).to be_falsey
       expect(user.name).not_to eq('Mr. Slick')
     end
 
@@ -249,12 +247,11 @@ describe UsersController do
       auth = user.auth_token
       email = user.email
       set_current_user(user)
-      post :update, { id: user.username, user: {
+      post :update, id: user.username, user: {
         email: 'cool_new_email@something.com',
         password_reset_token: user.password_reset_token,
         password: 'new_pass',
-        password_confirmation: 'new_pass'} 
-      }
+        password_confirmation: 'new_pass' }
       expect(user.reload.authenticate('new_pass')).to be_truthy
       expect(user.email).to eq(email)
       expect(user.password_reset_token).not_to eq('stuff')
@@ -271,11 +268,10 @@ describe UsersController do
       auth = user.auth_token
       email = user.email
       set_current_user(user)
-      post :update, { id: user.username, user: {
+      post :update, id: user.username, user: {
         password_reset_token: 'something_else',
         password: 'new_pass',
-        password_confirmation: 'new_pass'} 
-      }
+        password_confirmation: 'new_pass' }
       expect(user.reload.authenticate('new_pass')).to be_falsey
       expect(user.password_reset_token).to eq(reset)
     end
@@ -286,31 +282,29 @@ describe UsersController do
       auth = user.auth_token
       email = user.email
       set_current_user(user)
-      post :update, { id: user.username, user: {
+      post :update, id: user.username, user: {
         password_reset_token: user.password_reset_token,
-        password: "new_pass",
-        password_confirmation: 'new_pass'} 
-      }
-      expect(user.reload.authenticate("new_pass")).not_to be_truthy
+        password: 'new_pass',
+        password_confirmation: 'new_pass' }
+      expect(user.reload.authenticate('new_pass')).not_to be_truthy
       expect(user.auth_token).to eq(auth)
       expect(user.password_reset_token).not_to eq('stuff')
       expect(cookies.signed[:auth][1]).to eq(user.auth_token)
     end
 
-    it "resets users auth if password changed, updates current session" do
+    it 'resets users auth if password changed, updates current session' do
       user = FactoryGirl.create(:user, terms_of_service: false, password: 'old_pass', password_confirmation: 'old_pass', password_reset_token: 'stuff')
       auth = user.auth_token
       email = user.email
       set_current_user(user)
-      post :update, { id: user.username, user: {
+      post :update, id: user.username, user: {
         email: 'cool_new_email@something.com',
         current_password: 'old_pass',
-        password: "new_pass",
+        password: 'new_pass',
         name: 'Mr. Slick',
-        password_confirmation: 'new_pass'} 
-      }
+        password_confirmation: 'new_pass' }
       expect(response).to redirect_to(my_account_url)
-      expect(user.reload.authenticate("new_pass")).to be_truthy
+      expect(user.reload.authenticate('new_pass')).to be_truthy
       expect(user.auth_token).not_to eq(auth)
       expect(user.email).to eq(email)
       expect(user.password_reset_token).not_to eq('stuff')
@@ -318,35 +312,33 @@ describe UsersController do
       expect(cookies.signed[:auth][1]).to eq(user.auth_token)
     end
 
-    it "updates the terms of service" do
+    it 'updates the terms of service' do
       user = FactoryGirl.create(:user, terms_of_service: false)
-      set_current_user(user) 
-      post :update, { id: user.username, user: {terms_of_service: "1"} }
+      set_current_user(user)
+      post :update, id: user.username, user: { terms_of_service: '1' }
       expect(response).to redirect_to(user_home_url)
       expect(user.reload.terms_of_service).to be_truthy
     end
 
-    it "updates the vendor terms of service and emailable" do
+    it 'updates the vendor terms of service and emailable' do
       user = FactoryGirl.create(:user, terms_of_service: false, is_emailable: false)
       expect(user.is_emailable).to be_falsey
-      org =  FactoryGirl.create(:organization)
+      org = FactoryGirl.create(:organization)
       FactoryGirl.create(:membership, organization: org, user: user)
-      set_current_user(user) 
-      post :update, { id: user.username, user: {vendor_terms_of_service: "1", is_emailable: true} }
+      set_current_user(user)
+      post :update, id: user.username, user: { vendor_terms_of_service: '1', is_emailable: true }
       expect(response.code).to eq('302')
       expect(user.reload.vendor_terms_of_service).to be_truthy
       expect(user.is_emailable).to be_truthy
     end
 
-    it "enqueues job (it enqueues job whenever update is successful)" do
+    it 'enqueues job (it enqueues job whenever update is successful)' do
       user = FactoryGirl.create(:user)
-      set_current_user(user) 
-      expect {
-        post :update, { id: user.username, user: {name: "Cool stuff"} }
-      }.to change(AfterUserChangeWorker.jobs, :size).by(1)
+      set_current_user(user)
+      expect do
+        post :update, id: user.username, user: { name: 'Cool stuff' }
+      end.to change(AfterUserChangeWorker.jobs, :size).by(1)
       expect(user.reload.name).to eq('Cool stuff')
     end
   end
-
-
 end

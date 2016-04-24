@@ -10,5 +10,5 @@ describe Api::V1::StolenLockingResponseSuggestionsController do
       expect(result['locking_defeat_descriptions'].count).to eq(6)
       expect(result['locking_descriptions'].count).to eq(8)
     end
-  end   
+  end
 end

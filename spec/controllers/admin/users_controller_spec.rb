@@ -4,9 +4,9 @@ describe Admin::UsersController do
   describe 'edit' do
     xit "404s if the user doesn't exist" do
       # I have no idea why this fails. It works really, but not in tests!
-      expect {
+      expect do
         get :edit, id: 'STUFFFFFF'
-      }.to raise_error(ActionController::RoutingError)
+      end.to raise_error(ActionController::RoutingError)
     end
     it 'shows the edit page if the user exists' do
       admin = FactoryGirl.create(:admin)
@@ -51,7 +51,7 @@ describe Admin::UsersController do
         set_current_user(admin)
         user = FactoryGirl.create(:user)
 
-        post :update, id: user.username, user: { 
+        post :update, id: user.username, user: {
           developer: true,
           email: user.email,
           superuser: false,

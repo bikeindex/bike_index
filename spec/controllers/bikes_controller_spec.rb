@@ -114,14 +114,14 @@ describe BikesController do
 
       it 'renders a new stolen bike' do
         set_current_user(user)
-        get :new, { stolen: true }
+        get :new, stolen: true
         expect(response.code).to eq('200')
         expect(assigns(:bike).stolen).to be_truthy
       end
 
       it 'renders a new recovered bike' do
         set_current_user(user)
-        get :new, { recovered: true }
+        get :new, recovered: true
         expect(response.code).to eq('200')
         expect(assigns(:bike).recovered).to be_truthy
       end
@@ -170,7 +170,7 @@ describe BikesController do
             bike = assigns(:bike)
             expect(assigns(:b_param)).to eq b_param
             expect(bike.is_a?(Bike)).to be_truthy
-            bike_attrs.each { |k,v| expect(bike.send(k)).to eq(v) }
+            bike_attrs.each { |k, v| expect(bike.send(k)).to eq(v) }
             expect(response).to render_with_layout('application_revised')
           end
         end
@@ -188,7 +188,6 @@ describe BikesController do
       end
     end
   end
-  
 
   describe 'create' do
     before do
@@ -204,21 +203,21 @@ describe BikesController do
           manufacturer = FactoryGirl.create(:manufacturer)
           set_current_user(@user)
           @bike = { serial_number: '1234567890',
-            b_param_id_token: @b_param.id_token,
-            cycle_type_id: FactoryGirl.create(:cycle_type).id,
-            manufacturer_id: manufacturer.id,
-            rear_tire_narrow: 'true',
-            rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
-            primary_frame_color_id: FactoryGirl.create(:color).id,
-            handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
-            owner_email: @user.email
+                    b_param_id_token: @b_param.id_token,
+                    cycle_type_id: FactoryGirl.create(:cycle_type).id,
+                    manufacturer_id: manufacturer.id,
+                    rear_tire_narrow: 'true',
+                    rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
+                    primary_frame_color_id: FactoryGirl.create(:color).id,
+                    handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
+                    owner_email: @user.email
           }
         end
 
         it "renders new if b_param isn't owned by user" do
           user = FactoryGirl.create(:user)
-          set_current_user(user) 
-          post :create, { bike: @bike }
+          set_current_user(user)
+          post :create, bike: @bike
           # expect(response).to render_template('new.html.haml')
           expect(flash[:error]).to eq("Oops, that isn't your bike")
         end
@@ -227,15 +226,15 @@ describe BikesController do
           bike = Bike.new(@bike)
           bike.errors.add(:errory, 'something')
           expect_any_instance_of(BikeCreator).to receive(:create_bike).and_return(bike)
-          post :create, { bike: @bike }
+          post :create, bike: @bike
           expect(@b_param.reload.bike_errors).not_to be_nil
           expect(response).to render_template('new')
         end
-        
+
         it 'redirects to the created bike if it exists' do
           bike = FactoryGirl.create(:bike)
           @b_param.update_attributes(created_bike_id: bike.id)
-          post :create, {bike: {b_param_id_token: @b_param.id_token}}
+          post :create, bike: { b_param_id_token: @b_param.id_token }
           expect(response).to redirect_to(edit_bike_url(bike))
         end
 
@@ -243,7 +242,7 @@ describe BikesController do
           FactoryGirl.create(:country, iso: 'US')
           @bike[:phone] = '312.379.9513'
           expect do
-            post :create, { stolen: 'true', bike: @bike }
+            post :create, stolen: 'true', bike: @bike
           end.to change(StolenRecord, :count).by(1)
           expect(@b_param.reload.created_bike_id).not_to be_nil
           expect(@b_param.reload.bike_errors).to be_nil
@@ -255,12 +254,12 @@ describe BikesController do
           membership = FactoryGirl.create(:membership, user: @user, organization: organization)
           @bike[:creation_organization_id] = organization.id
           expect do
-            post :create, { bike: @bike }
+            post :create, bike: @bike
           end.to change(Ownership, :count).by(1)
           expect(Bike.last.creation_organization_id).to eq(organization.id)
         end
       end
-      
+
       describe 'embeded submission' do
         it 'creates a new ownership and bike from an organization' do
           organization = FactoryGirl.create(:organization)
@@ -268,20 +267,20 @@ describe BikesController do
           FactoryGirl.create(:membership, user: user, organization: organization)
           organization.save
           manufacturer = FactoryGirl.create(:manufacturer)
-          b_param = BParam.create(creator_id: organization.auto_user.id, params: {creation_organization_id: organization.id, embeded: true})
+          b_param = BParam.create(creator_id: organization.auto_user.id, params: { creation_organization_id: organization.id, embeded: true })
           bike = { serial_number: '69',
-            b_param_id_token: b_param.id_token,
-            creation_organization_id: organization.id,
-            embeded: true,
-            additional_registration: 'Testly secondary',
-            cycle_type_id: FactoryGirl.create(:cycle_type).id,
-            manufacturer_id: manufacturer.id,
-            primary_frame_color_id: FactoryGirl.create(:color).id,
-            handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
-            owner_email: 'Flow@goodtimes.com'
+                   b_param_id_token: b_param.id_token,
+                   creation_organization_id: organization.id,
+                   embeded: true,
+                   additional_registration: 'Testly secondary',
+                   cycle_type_id: FactoryGirl.create(:cycle_type).id,
+                   manufacturer_id: manufacturer.id,
+                   primary_frame_color_id: FactoryGirl.create(:color).id,
+                   handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
+                   owner_email: 'Flow@goodtimes.com'
           }
           expect do
-            post :create, { bike: bike }
+            post :create, bike: bike
           end.to change(Ownership, :count).by(1)
           bike = Bike.last
           expect(bike.creation_organization_id).to eq(organization.id)
@@ -297,22 +296,22 @@ describe BikesController do
             FactoryGirl.create(:membership, user: user, organization: organization)
             organization.save
             manufacturer = FactoryGirl.create(:manufacturer)
-            b_param = BParam.create(creator_id: organization.auto_user.id, params: {creation_organization_id: organization.id, embeded: true})
+            b_param = BParam.create(creator_id: organization.auto_user.id, params: { creation_organization_id: organization.id, embeded: true })
             test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg')))
             expect_any_instance_of(ImageAssociatorWorker).to receive(:perform).and_return(true)
             bike = { serial_number: '69',
-              b_param_id_token: b_param.id_token,
-              creation_organization_id: organization.id,
-              embeded: true,
-              embeded_extended: true,
-              cycle_type_id: FactoryGirl.create(:cycle_type).id,
-              manufacturer_id: manufacturer.id,
-              primary_frame_color_id: FactoryGirl.create(:color).id,
-              handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
-              owner_email: 'Flow@goodtimes.com',
-              image: test_photo
+                     b_param_id_token: b_param.id_token,
+                     creation_organization_id: organization.id,
+                     embeded: true,
+                     embeded_extended: true,
+                     cycle_type_id: FactoryGirl.create(:cycle_type).id,
+                     manufacturer_id: manufacturer.id,
+                     primary_frame_color_id: FactoryGirl.create(:color).id,
+                     handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
+                     owner_email: 'Flow@goodtimes.com',
+                     image: test_photo
             }
-            post :create, { bike: bike }
+            post :create, bike: bike
             expect(response).to redirect_to(embed_extended_organization_url(organization))
           end
         end
@@ -325,19 +324,19 @@ describe BikesController do
           FactoryGirl.create(:membership, user: user, organization: organization)
           organization.save
           manufacturer = FactoryGirl.create(:manufacturer)
-          b_param = BParam.create(creator_id: organization.auto_user.id, params: {creation_organization_id: organization.id, embeded: true})
+          b_param = BParam.create(creator_id: organization.auto_user.id, params: { creation_organization_id: organization.id, embeded: true })
           bike = { serial_number: '69',
-            b_param_id_token: b_param.id_token,
-            creation_organization_id: organization.id,
-            embeded: true,
-            embeded_extended: true,
-            cycle_type_id: FactoryGirl.create(:cycle_type).id,
-            manufacturer_id: manufacturer.id,
-            primary_frame_color_id: FactoryGirl.create(:color).id,
-            handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
-            owner_email: 'Flow@goodtimes.com',
+                   b_param_id_token: b_param.id_token,
+                   creation_organization_id: organization.id,
+                   embeded: true,
+                   embeded_extended: true,
+                   cycle_type_id: FactoryGirl.create(:cycle_type).id,
+                   manufacturer_id: manufacturer.id,
+                   primary_frame_color_id: FactoryGirl.create(:color).id,
+                   handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
+                   owner_email: 'Flow@goodtimes.com'
           }
-          post :create, { bike: bike, persist_email: true }
+          post :create, bike: bike, persist_email: true
           expect(response).to redirect_to(embed_extended_organization_url(organization, email: 'flow@goodtimes.com'))
         end
       end
@@ -404,7 +403,6 @@ describe BikesController do
       end
     end
   end
-
 
   describe 'edit' do
     let(:ownership) { FactoryGirl.create(:ownership) }
@@ -510,7 +508,7 @@ describe BikesController do
         set_current_user(user)
         put :update, id: ownership.bike.id, bike: { serial_number: '69' }
       end
-      it { is_expected.to respond_with(:redirect)}
+      it { is_expected.to respond_with(:redirect) }
       it { is_expected.to redirect_to(bike_url) }
       it { is_expected.to set_flash }
     end
@@ -593,7 +591,7 @@ describe BikesController do
               bike: {
                 stolen: true,
                 stolen_records_attributes: {
-                  "#{stolen_record.id}" => {
+                  stolen_record.id.to_s => {
                     date_stolen_input: 'Mon Feb 22 2016',
                     phone: '9999999999',
                     street: '66666666 foo street'

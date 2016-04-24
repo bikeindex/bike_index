@@ -3,7 +3,7 @@ require 'spec_helper'
 
 describe Urlifyer do
   describe 'urlify' do
-    it "does nothing if no website is present" do
+    it 'does nothing if no website is present' do
       website = Urlifyer.urlify(nil)
       expect(website).to be_nil
       website = Urlifyer.urlify('i')

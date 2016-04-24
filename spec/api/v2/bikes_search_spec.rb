@@ -26,7 +26,7 @@ describe 'Bikes API V2' do
 
     it 'serial search works' do
       bike = FactoryGirl.create(:bike, serial_number: '0000HEYBB')
-      get "/api/v2/bikes_search/?serial=0HEYBB", format: :json
+      get '/api/v2/bikes_search/?serial=0HEYBB', format: :json
       result = JSON.parse(response.body)
       expect(response.code).to eq('200')
       expect(response.header['Total']).to eq('1')
@@ -47,7 +47,7 @@ describe 'Bikes API V2' do
     it 'finds a close one' do
       bike = FactoryGirl.create(:bike, serial_number: 'Something1')
       bike.create_normalized_serial_segments
-      get "/api/v2/bikes_search/close_serials?serial=s0meth1nglvv", format: :json
+      get '/api/v2/bikes_search/close_serials?serial=s0meth1nglvv', format: :json
       result = JSON.parse(response.body)
       expect(response.code).to eq('200')
       expect(response.header['Total']).to eq('1')
@@ -69,7 +69,7 @@ describe 'Bikes API V2' do
 
     it 'proximity square does not overwrite the proximity_radius' do
       opts = { proximity_square: 100, proximity_radius: '10' }
-      target = Hashie::Mash.new(opts.merge(proximity: "ip"))
+      target = Hashie::Mash.new(opts.merge(proximity: 'ip'))
       expect_any_instance_of(BikeSearcher).to receive(:initialize).with(target)
       get '/api/v2/bikes_search/count', opts, format: :json
     end

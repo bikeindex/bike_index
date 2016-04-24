@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Api::V1::BikesController do
   describe 'index' do
-    it "loads the page and have the correct headers" do
+    it 'loads the page and have the correct headers' do
       FactoryGirl.create(:bike)
       get :index, format: :json
       expect(response.code).to eq('200')
@@ -10,20 +10,20 @@ describe Api::V1::BikesController do
   end
 
   describe 'stolen_ids' do
-    it "returns correct code if no org" do
+    it 'returns correct code if no org' do
       c = FactoryGirl.create(:color)
       get :stolen_ids, format: :json
-      expect(response.code).to eq("401")
+      expect(response.code).to eq('401')
     end
 
-    xit "should return an array of ids" do
+    xit 'should return an array of ids' do
       bike = FactoryGirl.create(:bike)
       stole1 = FactoryGirl.create(:stolen_record)
       stole2 = FactoryGirl.create(:stolen_record, approved: true)
       organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:user)
       FactoryGirl.create(:membership, user: user, organization: organization)
-      options = { stolen: true, organization_slug: organization.slug, access_token: organization.access_token}
+      options = { stolen: true, organization_slug: organization.slug, access_token: organization.access_token }
       get :stolen_ids, options, format: :json
       expect(response.code).to eq('200')
       # pp response
@@ -34,10 +34,10 @@ describe Api::V1::BikesController do
   end
 
   describe 'show' do
-    it "loads the page" do
+    it 'loads the page' do
       bike = FactoryGirl.create(:bike)
       get :show, id: bike.id, format: :json
-      expect(response.code).to eq("200")
+      expect(response.code).to eq('200')
     end
   end
 
@@ -47,58 +47,58 @@ describe Api::V1::BikesController do
       user = FactoryGirl.create(:user)
       FactoryGirl.create(:membership, user: user, organization: @organization)
       @organization.save
-      FactoryGirl.create(:cycle_type, slug: "bike")
-      FactoryGirl.create(:propulsion_type, name: "Foot pedal")
+      FactoryGirl.create(:cycle_type, slug: 'bike')
+      FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
     end
 
-    it "returns correct code if not logged in" do
+    it 'returns correct code if not logged in' do
       c = FactoryGirl.create(:color)
       post :create, { bike: { serial_number: '69', color: c.name } }
-      expect(response.code).to eq("401")
+      expect(response.code).to eq('401')
     end
 
-    it "returns correct code if bike has errors" do
+    it 'returns correct code if bike has errors' do
       c = FactoryGirl.create(:color)
       post :create, { bike: { serial_number: '69', color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }
-      expect(response.code).to eq("422")
+      expect(response.code).to eq('422')
     end
 
     it "emails us if it can't create a record" do
       c = FactoryGirl.create(:color)
-      expect {
+      expect do
         post :create, { bike: { serial_number: '69', color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }
-      }.to change(Feedback, :count).by(1)
+      end.to change(Feedback, :count).by(1)
     end
 
-    it "creates a record and reset example" do
+    it 'creates a record and reset example' do
       manufacturer = FactoryGirl.create(:manufacturer)
       FactoryGirl.create(:wheel_size, iso_bsd: 559)
-      FactoryGirl.create(:ctype, name: "wheel")
-      FactoryGirl.create(:ctype, name: "headset")
+      FactoryGirl.create(:ctype, name: 'wheel')
+      FactoryGirl.create(:ctype, name: 'headset')
       f_count = Feedback.count
-      bike = { serial_number: "69 non-example",
-        manufacturer_id: manufacturer.id,
-        rear_tire_narrow: "true",
-        rear_wheel_bsd: "559",
-        color: FactoryGirl.create(:color).name,
-        example: true,
-        year: '1969',
-        owner_email: "fun_times@examples.com"
+      bike = { serial_number: '69 non-example',
+               manufacturer_id: manufacturer.id,
+               rear_tire_narrow: 'true',
+               rear_wheel_bsd: '559',
+               color: FactoryGirl.create(:color).name,
+               example: true,
+               year: '1969',
+               owner_email: 'fun_times@examples.com'
       }
       components = [
         {
           manufacturer: manufacturer.name,
-          year: "1999",
+          year: '1999',
           component_type: 'Headset',
-          cgroup: "Frame and fork",
-          description: "yeah yay!",
+          cgroup: 'Frame and fork',
+          description: 'yeah yay!',
           serial_number: '69',
           model_name: 'Richie rich'
         },
         {
-          manufacturer: "BLUE TEETH",
-          front_or_rear: "Both",
-          cgroup: "Wheels",
+          manufacturer: 'BLUE TEETH',
+          front_or_rear: 'Both',
+          cgroup: 'Wheels',
           component_type: 'wheel'
         }
       ]
@@ -107,19 +107,19 @@ describe Api::V1::BikesController do
         'http://i.imgur.com/3BGQeJh.jpg'
       ]
       expect_any_instance_of(OwnershipCreator).to receive(:send_notification_email)
-      expect { 
-        post :create, { bike: bike, organization_slug: @organization.slug, access_token: @organization.access_token, components: components, photos: photos}
-      }.to change(Ownership, :count).by(1)
-      expect(response.code).to eq("200")
-      b = Bike.where(serial_number: "69 non-example").first
+      expect do
+        post :create, bike: bike, organization_slug: @organization.slug, access_token: @organization.access_token, components: components, photos: photos
+      end.to change(Ownership, :count).by(1)
+      expect(response.code).to eq('200')
+      b = Bike.where(serial_number: '69 non-example').first
       expect(b.example).to be_falsey
       expect(b.creation_organization_id).to eq(@organization.id)
       expect(b.year).to eq(1969)
       expect(b.components.count).to eq(3)
       component = b.components[2]
       expect(component.serial_number).to eq('69')
-      expect(component.description).to eq("yeah yay!")
-      expect(component.ctype.slug).to eq("headset")
+      expect(component.description).to eq('yeah yay!')
+      expect(component.ctype.slug).to eq('headset')
       expect(component.year).to eq(1999)
       expect(component.manufacturer_id).to eq(manufacturer.id)
       expect(component.model_name).to eq('Richie rich')
@@ -127,147 +127,145 @@ describe Api::V1::BikesController do
       expect(f_count).to eq(Feedback.count)
     end
 
-    it "creates a photos even if one fails" do
+    it 'creates a photos even if one fails' do
       manufacturer = FactoryGirl.create(:manufacturer)
       FactoryGirl.create(:wheel_size, iso_bsd: 559)
-      FactoryGirl.create(:ctype, name: "wheel")
-      FactoryGirl.create(:ctype, name: "headset")
+      FactoryGirl.create(:ctype, name: 'wheel')
+      FactoryGirl.create(:ctype, name: 'headset')
       f_count = Feedback.count
-      bike = { serial_number: "69 photo-test",
-        manufacturer_id: manufacturer.id,
-        rear_tire_narrow: "true",
-        rear_wheel_bsd: "559",
-        color: FactoryGirl.create(:color).name,
-        example: true,
-        year: '1969',
-        owner_email: "fun_times@examples.com"
+      bike = { serial_number: '69 photo-test',
+               manufacturer_id: manufacturer.id,
+               rear_tire_narrow: 'true',
+               rear_wheel_bsd: '559',
+               color: FactoryGirl.create(:color).name,
+               example: true,
+               year: '1969',
+               owner_email: 'fun_times@examples.com'
       }
       photos = [
         'http://i.imgur.com/lybYl1l.jpg',
         'http://bikeindex.org/not_actually_a_thing_404_and_shit'
       ]
-      post :create, { bike: bike, organization_slug: @organization.slug, access_token: @organization.access_token, photos: photos}
-      b = Bike.where(serial_number: "69 photo-test").first
+      post :create, bike: bike, organization_slug: @organization.slug, access_token: @organization.access_token, photos: photos
+      b = Bike.where(serial_number: '69 photo-test').first
       expect(b.public_images.count).to eq(1)
     end
 
-    it "creates a stolen record" do
+    it 'creates a stolen record' do
       manufacturer = FactoryGirl.create(:manufacturer)
       @organization.users.first.update_attribute :phone, '123-456-6969'
-      FactoryGirl.create(:country, iso: "US")
-      FactoryGirl.create(:state, abbreviation: "Palace")
+      FactoryGirl.create(:country, iso: 'US')
+      FactoryGirl.create(:state, abbreviation: 'Palace')
       # ListingOrderWorker.any_instance.should_receive(:perform).and_return(true)
-      bike = { serial_number: "69 stolen bike",
-        manufacturer_id: manufacturer.id,
-        rear_tire_narrow: "true",
-        rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
-        primary_frame_color_id: FactoryGirl.create(:color).id,
-        owner_email: "fun_times@examples.com",
-        stolen: "true",
-        phone: "9999999",
-        cycle_type_slug: 'bike'
+      bike = { serial_number: '69 stolen bike',
+               manufacturer_id: manufacturer.id,
+               rear_tire_narrow: 'true',
+               rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
+               primary_frame_color_id: FactoryGirl.create(:color).id,
+               owner_email: 'fun_times@examples.com',
+               stolen: 'true',
+               phone: '9999999',
+               cycle_type_slug: 'bike'
       }
-      stolen_record = { date_stolen: "03-01-2013",
-        theft_description: "This bike was stolen and that's no fair.",
-        country: "US",
-        street: "Cortland and Ashland",
-        zipcode: "60622",
-        state: "Palace",
-        police_report_number: "99999999",
-        police_report_department: "Chicago",
-        locking_description: 'some locking description',
-        lock_defeat_description: 'broken in some crazy way'
+      stolen_record = { date_stolen: '03-01-2013',
+                        theft_description: "This bike was stolen and that's no fair.",
+                        country: 'US',
+                        street: 'Cortland and Ashland',
+                        zipcode: '60622',
+                        state: 'Palace',
+                        police_report_number: '99999999',
+                        police_report_department: 'Chicago',
+                        locking_description: 'some locking description',
+                        lock_defeat_description: 'broken in some crazy way'
       }
       expect_any_instance_of(OwnershipCreator).to receive(:send_notification_email)
-      expect { 
-        post :create, { bike: bike, stolen_record: stolen_record, organization_slug: @organization.slug, access_token: @organization.access_token }
-      }.to change(Ownership, :count).by(1)
-      expect(response.code).to eq("200")
-      b = Bike.unscoped.where(serial_number: "69 stolen bike").first
+      expect do
+        post :create, bike: bike, stolen_record: stolen_record, organization_slug: @organization.slug, access_token: @organization.access_token
+      end.to change(Ownership, :count).by(1)
+      expect(response.code).to eq('200')
+      b = Bike.unscoped.where(serial_number: '69 stolen bike').first
       csr = b.find_current_stolen_record
       expect(csr.address).to be_present
-      expect(csr.phone).to eq("9999999")
-      expect(csr.date_stolen).to eq(DateTime.strptime("03-01-2013 06", "%m-%d-%Y %H"))
+      expect(csr.phone).to eq('9999999')
+      expect(csr.date_stolen).to eq(DateTime.strptime('03-01-2013 06', '%m-%d-%Y %H'))
       expect(csr.locking_description).to eq('some locking description')
       expect(csr.lock_defeat_description).to eq('broken in some crazy way')
     end
 
-    it "creates an example bike if the bike is from example, and include all the options" do
-      FactoryGirl.create(:color, name: "Black")
-      org = FactoryGirl.create(:organization, name: "Example organization")
+    it 'creates an example bike if the bike is from example, and include all the options' do
+      FactoryGirl.create(:color, name: 'Black')
+      org = FactoryGirl.create(:organization, name: 'Example organization')
       user = FactoryGirl.create(:user)
       FactoryGirl.create(:membership, user: user, organization: org)
       manufacturer = FactoryGirl.create(:manufacturer)
       org.save
-      bike = { serial_number: "69 example bikez",
-        cycle_type_id: FactoryGirl.create(:cycle_type, slug: 'gluey').id,
-        manufacturer_id: manufacturer.id,
-        rear_tire_narrow: "true",
-        rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
-        color: "grazeen",
-        handlebar_type_slug: FactoryGirl.create(:handlebar_type, slug: "foo").slug,
-        frame_material_slug: FactoryGirl.create(:frame_material, slug: "whatevah").slug,
-        description: "something else",
-        owner_email: "fun_times@examples.com"
+      bike = { serial_number: '69 example bikez',
+               cycle_type_id: FactoryGirl.create(:cycle_type, slug: 'gluey').id,
+               manufacturer_id: manufacturer.id,
+               rear_tire_narrow: 'true',
+               rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
+               color: 'grazeen',
+               handlebar_type_slug: FactoryGirl.create(:handlebar_type, slug: 'foo').slug,
+               frame_material_slug: FactoryGirl.create(:frame_material, slug: 'whatevah').slug,
+               description: 'something else',
+               owner_email: 'fun_times@examples.com'
       }
 
-      expect {
-        expect { 
-          post :create, { bike: bike, organization_slug: org.slug, access_token: org.access_token }
-        }.to change(Ownership, :count).by(1)
-      }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
-      expect(response.code).to eq("200")
-      b = Bike.unscoped.where(serial_number: "69 example bikez").first
+      expect do
+        expect do
+          post :create, bike: bike, organization_slug: org.slug, access_token: org.access_token
+        end.to change(Ownership, :count).by(1)
+      end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
+      expect(response.code).to eq('200')
+      b = Bike.unscoped.where(serial_number: '69 example bikez').first
       expect(b.example).to be_truthy
-      expect(b.paint.name).to eq("grazeen")
-      expect(b.description).to eq("something else")
-      expect(b.frame_material.slug).to eq("whatevah")
-      expect(b.handlebar_type.slug).to eq("foo")
-    end  
-
-    it "creates a record even if the post is a string" do
-      manufacturer = FactoryGirl.create(:manufacturer)
-      FactoryGirl.create(:wheel_size, iso_bsd: 559)
-      FactoryGirl.create(:ctype, slug: "wheel")
-      FactoryGirl.create(:ctype, slug: "headset")
-      f_count = Feedback.count
-      bike = { serial_number: "69 string",
-        manufacturer_id: manufacturer.id,
-        rear_tire_narrow: "true",
-        rear_wheel_bsd: "559",
-        color: FactoryGirl.create(:color).name,
-        owner_email: "jsoned@examples.com"
-      }
-      options = { bike: bike.to_json, organization_slug: @organization.slug, access_token: @organization.access_token } 
-      expect { 
-        post :create, options
-      }.to change(Ownership, :count).by(1)
-      expect(response.code).to eq("200")    
+      expect(b.paint.name).to eq('grazeen')
+      expect(b.description).to eq('something else')
+      expect(b.frame_material.slug).to eq('whatevah')
+      expect(b.handlebar_type.slug).to eq('foo')
     end
 
-    it "does not send an ownership email if it has no_email set" do
+    it 'creates a record even if the post is a string' do
       manufacturer = FactoryGirl.create(:manufacturer)
       FactoryGirl.create(:wheel_size, iso_bsd: 559)
-      FactoryGirl.create(:ctype, slug: "wheel")
-      FactoryGirl.create(:ctype, slug: "headset")
+      FactoryGirl.create(:ctype, slug: 'wheel')
+      FactoryGirl.create(:ctype, slug: 'headset')
       f_count = Feedback.count
-      bike = { serial_number: "69 string",
-        manufacturer_id: manufacturer.id,
-        rear_tire_narrow: "true",
-        rear_wheel_bsd: "559",
-        color: FactoryGirl.create(:color).name,
-        owner_email: "jsoned@examples.com",
-        send_email: 'false'
+      bike = { serial_number: '69 string',
+               manufacturer_id: manufacturer.id,
+               rear_tire_narrow: 'true',
+               rear_wheel_bsd: '559',
+               color: FactoryGirl.create(:color).name,
+               owner_email: 'jsoned@examples.com'
       }
-      options = { bike: bike.to_json, organization_slug: @organization.slug, access_token: @organization.access_token } 
-      expect {
-        expect { 
+      options = { bike: bike.to_json, organization_slug: @organization.slug, access_token: @organization.access_token }
+      expect do
+        post :create, options
+      end.to change(Ownership, :count).by(1)
+      expect(response.code).to eq('200')
+    end
+
+    it 'does not send an ownership email if it has no_email set' do
+      manufacturer = FactoryGirl.create(:manufacturer)
+      FactoryGirl.create(:wheel_size, iso_bsd: 559)
+      FactoryGirl.create(:ctype, slug: 'wheel')
+      FactoryGirl.create(:ctype, slug: 'headset')
+      f_count = Feedback.count
+      bike = { serial_number: '69 string',
+               manufacturer_id: manufacturer.id,
+               rear_tire_narrow: 'true',
+               rear_wheel_bsd: '559',
+               color: FactoryGirl.create(:color).name,
+               owner_email: 'jsoned@examples.com',
+               send_email: 'false'
+      }
+      options = { bike: bike.to_json, organization_slug: @organization.slug, access_token: @organization.access_token }
+      expect do
+        expect do
           post :create, options
-        }.to change(Ownership, :count).by(1)
-      }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
-      expect(response.code).to eq("200")
+        end.to change(Ownership, :count).by(1)
+      end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
+      expect(response.code).to eq('200')
     end
   end
-
-    
 end

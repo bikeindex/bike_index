@@ -19,7 +19,7 @@ describe WelcomeController do
   end
 
   describe 'user_home' do
-    describe "user not present" do
+    describe 'user not present' do
       before do
         get :user_home
       end
@@ -28,7 +28,7 @@ describe WelcomeController do
       it { is_expected.not_to set_flash }
     end
 
-    describe "when user is present" do
+    describe 'when user is present' do
       before do
         user = FactoryGirl.create(:user)
         FactoryGirl.create(:ownership, user_id: user.id, current: true)
@@ -41,8 +41,8 @@ describe WelcomeController do
       it { is_expected.to render_template(:user_home) }
     end
 
-    describe "user things should be assigned" do
-      it "sends the bikes and the locks" do
+    describe 'user things should be assigned' do
+      it 'sends the bikes and the locks' do
         user = FactoryGirl.create(:user)
         ownership = FactoryGirl.create(:ownership, user_id: user.id, current: true)
         lock = FactoryGirl.create(:lock, user: user)
@@ -52,9 +52,5 @@ describe WelcomeController do
         expect(assigns(:locks).first).to eq(lock)
       end
     end
-
   end
-
-
-
 end

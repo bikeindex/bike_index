@@ -1,41 +1,41 @@
-require "spec_helper"
+require 'spec_helper'
 
 describe Api::V1::UsersController do
   describe 'current' do
-    it "returns user_present = false if there is no user present" do
+    it 'returns user_present = false if there is no user present' do
       get :current, format: :json
       expect(response.code).to eq('200')
       expect(response.headers['Access-Control-Allow-Origin']).not_to be_present
       expect(response.headers['Access-Control-Request-Method']).not_to be_present
     end
 
-    it "returns user_present if a user is present" do
+    it 'returns user_present if a user is present' do
       # We need to test that cors isn't present
       u = FactoryGirl.create(:user)
       set_current_user(u)
       get :current, format: :json
       expect(response.code).to eq('200')
       # pp response.body
-      expect(JSON.parse(response.body)).to include("user_present" => true)
+      expect(JSON.parse(response.body)).to include('user_present' => true)
       expect(response.headers['Access-Control-Allow-Origin']).not_to be_present
       expect(response.headers['Access-Control-Request-Method']).not_to be_present
     end
   end
 
   describe 'send_request' do
-    it "actuallies send the mail" do
+    it 'actuallies send the mail' do
       Sidekiq::Testing.inline! do
         # We don't test that this is being added to Sidekiq
-        # Because we're testing that sidekiq does what it 
+        # Because we're testing that sidekiq does what it
         # Needs to do here. Slow tests, but we know it actually works :(
         o = FactoryGirl.create(:ownership)
         user = o.creator
         bike = o.bike
-        delete_request = { 
+        delete_request = {
           request_type: 'bike_delete_request',
           user_id: user.id,
           request_bike_id: bike.id,
-          request_reason: 'Some reason',
+          request_reason: 'Some reason'
         }
         set_current_user(user)
         ActionMailer::Base.deliveries = []
@@ -50,7 +50,7 @@ describe Api::V1::UsersController do
         manufacturer = FactoryGirl.create(:manufacturer)
         user = o.creator
         bike = o.bike
-        update_manufacturer_request = { 
+        update_manufacturer_request = {
           request_type: 'manufacturer_update_manufacturer',
           user_id: user.id,
           request_bike_id: bike.id,
@@ -70,7 +70,7 @@ describe Api::V1::UsersController do
         o = FactoryGirl.create(:ownership)
         user = o.creator
         bike = o.bike
-        update_manufacturer_request = { 
+        update_manufacturer_request = {
           request_type: 'manufacturer_update_manufacturer',
           user_id: user.id,
           request_bike_id: bike.id,
@@ -90,7 +90,7 @@ describe Api::V1::UsersController do
         o = FactoryGirl.create(:ownership)
         user = o.creator
         bike = o.bike
-        serial_request = { 
+        serial_request = {
           request_type: 'serial_update_request',
           user_id: user.id,
           request_bike_id: bike.id,
@@ -99,22 +99,22 @@ describe Api::V1::UsersController do
         }
         set_current_user(user)
         expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
-        expect {
+        expect do
           post :send_request, serial_request
-        }.to change(EmailFeedbackNotificationWorker.jobs, :size).by(0)
+        end.to change(EmailFeedbackNotificationWorker.jobs, :size).by(0)
         expect(response.code).to eq('200')
         expect(bike.reload.serial_number).to eq('some new serial')
       end
     end
 
-    it "it untsvs a bike" do
+    it 'it untsvs a bike' do
       t = Time.now - 1.minute
       stolen_record = FactoryGirl.create(:stolen_record, tsved_at: t)
       o = FactoryGirl.create(:ownership, bike: stolen_record.bike)
       user = o.creator
       bike = o.bike
       bike.update_attribute :current_stolen_record_id, bike.find_current_stolen_record.id
-      serial_request = { 
+      serial_request = {
         request_type: 'serial_update_request',
         user_id: user.id,
         request_bike_id: bike.id,
@@ -131,18 +131,17 @@ describe Api::V1::UsersController do
       expect(stolen_record.tsved_at).to be_nil
     end
 
-
-    it "creates a new recovery request mail" do
+    it 'creates a new recovery request mail' do
       Sidekiq::Testing.inline! do
         # We don't test that this is being added to Sidekiq
-        # Because we're testing that sidekiq does what it 
+        # Because we're testing that sidekiq does what it
         # Needs to do here.
         o = FactoryGirl.create(:ownership)
         user = o.creator
         bike = o.bike
         stolen_record = FactoryGirl.create(:stolen_record, bike: bike)
         bike.update_attribute :stolen, true
-        recovery_request = { 
+        recovery_request = {
           request_type: 'bike_recovery',
           user_id: user.id,
           request_bike_id: bike.id,
@@ -167,7 +166,7 @@ describe Api::V1::UsersController do
         expect(stolen_record.can_share_recovery).to be_truthy
       end
     end
-      
+
     it "does not create a new serial request mailer if a user isn't present" do
       bike = FactoryGirl.create(:bike)
       message = { request_bike_id: bike.id, serial_update_serial: 'some update', request_reason: 'Some reason' }
@@ -176,16 +175,15 @@ describe Api::V1::UsersController do
       expect(response.code).to eq('403')
     end
 
-    it "does not create a new serial request mailer if wrong user user is present" do
+    it 'does not create a new serial request mailer if wrong user user is present' do
       o = FactoryGirl.create(:ownership)
       bike = o.bike
       user = FactoryGirl.create(:user)
       set_current_user(user)
       params = { request_bike_id: bike.id, serial_update_serial: 'some update', request_reason: 'Some reason' }
       post :send_request, params
-      # pp response 
+      # pp response
       expect(response.code).to eq('403')
     end
   end
-
 end

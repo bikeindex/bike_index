@@ -1,9 +1,9 @@
-require "spec_helper"
+require 'spec_helper'
 
 describe EmailFeedbackNotificationWorker do
   it { is_expected.to be_processed_in :notify }
 
-  it "sends an email" do
+  it 'sends an email' do
     feedback = FactoryGirl.create(:feedback)
     ActionMailer::Base.deliveries = []
     EmailFeedbackNotificationWorker.new.perform(feedback.id)
