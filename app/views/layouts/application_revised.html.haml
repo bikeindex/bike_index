@@ -93,7 +93,7 @@
           %li.primary-nav-item
             = active_link 'Community', '#', class_name: 'nav-link'
           %li.primary-nav-item
-            = active_link 'Search bikes', bikes_path, class_name: 'nav-link'
+            = active_link 'Search bikes', bikes_path, class_name: 'nav-link', match_controller: true
     = render 'layouts/revised_messages'
 
     - if current_page_skeleton

@@ -18,6 +18,7 @@ class window.BikeIndex
       bikes_create: BikeIndex.BikesNew
       bikes_edit: BikeIndex.BikesEdit
       bikes_update: BikeIndex.BikesEdit
+      bikes_show: BikeIndex.BikesShow
 
 
     window.pageScript = new pageClasses[body_id] if Object.keys(pageClasses).includes(body_id)

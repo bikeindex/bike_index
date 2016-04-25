@@ -1,0 +1,39 @@
+#bikes_show {
+  .bike-edit-overlay {
+    @include box-shadow(0 0 2px rgba(black,.2));
+    padding: $vertical-height;
+    position: fixed;
+    // position: -webkit-sticky;
+    // position: sticky;
+    bottom: 0;
+    width: 100%;
+    background: rgba($blue, .92  );
+    z-index: $zindex-navbar-fixed - 1;
+    p {
+      text-align: center;
+      margin: 0;
+      color: white;
+    }
+    .btn { margin-left: 20px; }
+  }
+
+  h1 {
+    .stolen {
+      display: block;
+      color: $red;
+      font-size: 26px;
+    }
+  }
+}
+
+// ad blocks, for now just here
+.ad468x60 {
+  // width: 468px;
+  height: 60px;
+  border: 1px solid $gray-lightish;
+}
+
+// Added via JS, to clear space if edit bike overlay is on
+.primary-footer .terms-and-stuff.bike-show-page-with-edit-overlay {
+  padding-bottom: 70px;
+}

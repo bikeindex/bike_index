@@ -54,11 +54,11 @@ class BikesController < ApplicationController
     @stolen_notification = StolenNotification.new if @bike.stolen
     respond_to do |format|
       format.html do
-        # if revised_layout_enabled?
-        #   render :show_revised, layout: 'application_revised'
-        # else
+        if revised_layout_enabled?
+          render :show_revised, layout: 'application_revised'
+        else
           render layout: 'application_updated'
-        # end
+        end
       end
       format.gif  { render qrcode: scanned_bike_url(@bike), level: :h, unit: 50 }
     end

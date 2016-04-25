@@ -35,7 +35,6 @@ describe InfoController do
   end
 
   describe 'revised views' do
-    let(:user) { FactoryGirl.create(:user) }
     pages = %w(about protect_your_bike where serials image_resources resources dev_and_design support_the_index terms vendor_terms support_the_index)
     context 'no user' do
       pages.each do |page|
@@ -51,6 +50,7 @@ describe InfoController do
       end
     end
     context 'signed in user' do
+      let(:user) { FactoryGirl.create(:user) }
       # Since we're rendering things, and these are important pages,
       # let's test with users as well
       before do

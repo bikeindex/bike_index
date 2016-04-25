@@ -24,53 +24,99 @@ describe BikesController do
   end
 
   describe 'show' do
-    describe 'showing' do
-      before do
-        ownership = FactoryGirl.create(:ownership)
-        get :show, id: ownership.bike.id
+    let(:ownership) { FactoryGirl.create(:ownership) }
+    let(:user) { ownership.creator }
+    let(:bike) { ownership.bike }
+    context 'legacy' do
+      context 'showing' do
+        it 'shows the bike' do
+          get :show, id: bike.id
+          expect(response.status).to eq(200)
+          expect(response).to render_template(:show)
+          expect(response).to render_with_layout('application_updated')
+          expect(assigns(:bike)).to be_decorated
+          expect(flash).to_not be_present
+        end
       end
-      it { is_expected.to respond_with(:success) }
-      it { is_expected.to render_template(:show) }
-      it { is_expected.not_to set_flash }
-      it { expect(assigns(:bike)).to be_decorated }
-    end
-
-    describe 'showing example' do
-      before do
-        ownership = FactoryGirl.create(:ownership)
-        ownership.bike.update_attributes(example: true)
-        get :show, id: ownership.bike.id
+      context 'example bike' do
+        it 'shows the bike' do
+          ownership.bike.update_attributes(example: true)
+          get :show, id: bike.id
+          expect(response).to render_template(:show)
+          expect(response).to render_with_layout('application_updated')
+          expect(assigns(:bike)).to be_decorated
+        end
       end
-      it { is_expected.to respond_with(:success) }
-      it { is_expected.to render_template(:show) }
-    end
-
-    describe 'hiding hidden bikes' do
-      before do
-        ownership = FactoryGirl.create(:ownership)
-        ownership.bike.update_attributes(hidden: true)
-        get :show, id: ownership.bike.id
+      context 'hidden bikes' do
+        context 'admin hidden (fake delete)' do
+          it 'redirects and sets the flash' do
+            ownership.bike.update_attributes(hidden: true)
+            get :show, id: bike.id
+            expect(response).to redirect_to(:root)
+            expect(flash[:error]).to be_present
+          end
+        end
+        context 'user hidden bike' do
+          before do
+            ownership.bike.update_attributes(marked_user_hidden: 'true')
+          end
+          context 'owner of bike viewing' do
+            it 'responds with success' do
+              set_current_user(user)
+              get :show, id: ownership.bike_id
+              expect(response.status).to eq(200)
+              expect(response).to render_template(:show)
+              expect(response).to render_with_layout('application_updated')
+              expect(assigns(:bike)).to be_decorated
+              expect(flash).to_not be_present
+            end
+          end
+          context 'Admin viewing' do
+            it 'responds with success' do
+              set_current_user(FactoryGirl.create(:admin))
+              get :show, id: ownership.bike_id
+              expect(response.status).to eq(200)
+              expect(response).to render_template(:show)
+              expect(response).to render_with_layout('application_updated')
+              expect(assigns(:bike)).to be_decorated
+              expect(flash).to_not be_present
+            end
+          end
+          context 'non-owner non-admin viewing' do
+            it 'redirects' do
+              set_current_user(FactoryGirl.create(:user))
+              get :show, id: bike.id
+              expect(response).to redirect_to(:root)
+              expect(flash[:error]).to be_present
+            end
+          end
+        end
       end
-      it { is_expected.to set_flash }
-      it { is_expected.to redirect_to root_url }
-    end
-
-    describe 'showing user-hidden bikes' do
-      it 'responds with success' do
-        user = FactoryGirl.create(:user)
-        ownership = FactoryGirl.create(:ownership, user: user, claimed: true)
-        ownership.bike.update_attributes(marked_user_hidden: 'true')
-        set_current_user(user)
-        get :show, id: ownership.bike_id
-        expect(response.code).to eq('200')
+      context 'too large of integer bike_id' do
+        it 'responds with not found' do
+          expect do
+            get :show, id: 57549641769762268311552
+          end.to raise_error(ActiveRecord::RecordNotFound)
+        end
       end
     end
-
-    describe 'too large of integer' do
-      it 'responds with not found' do
-        expect do
-          get :show, id: 57549641769762268311552
-        end.to raise_error(ActiveRecord::RecordNotFound)
+    context 'qr code gif' do
+      it 'renders' do
+        get :show, id: bike.id, format: :gif
+        expect(response.status).to eq(200)
+      end
+    end
+    context 'revised' do
+      context 'showing' do
+        it 'shows the bike' do
+          allow(controller).to receive(:revised_layout_enabled?) { true }
+          get :show, id: bike.id
+          expect(response.status).to eq(200)
+          expect(response).to render_template(:show_revised)
+          expect(response).to render_with_layout('application_revised')
+          expect(assigns(:bike)).to be_decorated
+          expect(flash).to_not be_present
+        end
       end
     end
   end
@@ -128,7 +174,7 @@ describe BikesController do
 
       it 'renders a new organization bike' do
         organization = FactoryGirl.create(:organization)
-        membership = FactoryGirl.create(:membership, user: user, organization: organization)
+        FactoryGirl.create(:membership, user: user, organization: organization)
         set_current_user(user)
         get :new
         expect(response.code).to eq('200')
@@ -150,6 +196,7 @@ describe BikesController do
           expect(assigns(:bike).stolen).to be_truthy
           b_param = assigns(:b_param)
           expect(b_param.revised_new?).to be_truthy
+          expect(response).to render_template(:new_revised)
           expect(response).to render_with_layout('application_revised')
         end
       end
@@ -171,6 +218,7 @@ describe BikesController do
             expect(assigns(:b_param)).to eq b_param
             expect(bike.is_a?(Bike)).to be_truthy
             bike_attrs.each { |k, v| expect(bike.send(k)).to eq(v) }
+            expect(response).to render_template(:new_revised)
             expect(response).to render_with_layout('application_revised')
           end
         end
@@ -181,6 +229,7 @@ describe BikesController do
             bike = assigns(:bike)
             expect(bike.is_a?(Bike)).to be_truthy
             expect(assigns(:b_param)).to_not eq b_param
+            expect(response).to render_template(:new_revised)
             expect(response).to render_with_layout('application_revised')
             expect(flash[:notice]).to match(/sorry/i)
           end
@@ -251,7 +300,7 @@ describe BikesController do
 
         it 'creates a new ownership and bike from an organization' do
           organization = FactoryGirl.create(:organization)
-          membership = FactoryGirl.create(:membership, user: @user, organization: organization)
+          FactoryGirl.create(:membership, user: @user, organization: organization)
           @bike[:creation_organization_id] = organization.id
           expect do
             post :create, bike: @bike
@@ -420,7 +469,6 @@ describe BikesController do
         set_current_user(user)
         get :edit, id: bike.id
         expect(response).to redirect_to bike_path(bike)
-        expect(flash).to be_present
         expect(flash[:error]).to be_present
       end
     end
