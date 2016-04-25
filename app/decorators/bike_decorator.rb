@@ -1,11 +1,14 @@
-class BikeDecorator < ApplicationDecorator 
+class BikeDecorator < ApplicationDecorator
   delegate_all
 
+  def should_show_other_bikes
+    object.current_owner_exists and object.owner.show_bikes
+  end
+
   def show_other_bikes
-    if object.current_owner_exists and object.owner.show_bikes
-      html = "<a href='/users/#{object.owner.username}'>View user's other bikes</a>" 
-      html.html_safe
-    end
+    return nil unless should_show_other_bikes
+    html = "<a href='/users/#{object.owner.username}'>View user's other bikes</a>"
+    html.html_safe
   end
 
   def bike_show_twitter_and_website

@@ -66,12 +66,13 @@ describe CustomerMailer do
 
   describe 'stolen_notification_email' do
     it 'renders email and update sent_dates' do
-      stolen_notification = FactoryGirl.create(:stolen_notification, message: 'Test Message')
+      stolen_notification = FactoryGirl.create(:stolen_notification, message: 'Test Message', reference_url: 'something.com')
       mail = CustomerMailer.stolen_notification_email(stolen_notification)
       expect(mail.subject).to eq(stolen_notification.default_subject)
       expect(mail.from.count).to eq(1)
       expect(mail.from.first).to eq('bryan@bikeindex.org')
       expect(mail.body.encoded).to match(stolen_notification.message)
+      expect(mail.body.encoded).to match(stolen_notification.reference_url)
       expect(stolen_notification.send_dates[0]).to eq(stolen_notification.updated_at.to_i)
       CustomerMailer.stolen_notification_email(stolen_notification)
       expect(stolen_notification.send_dates[1]).to be > stolen_notification.updated_at.to_i - 2

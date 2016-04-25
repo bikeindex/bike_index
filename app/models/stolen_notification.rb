@@ -1,5 +1,6 @@
 class StolenNotification < ActiveRecord::Base
   attr_accessible :subject,
+    :reference_url,
     :message,
     :sender,
     :receiver,

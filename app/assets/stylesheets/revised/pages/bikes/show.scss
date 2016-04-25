@@ -24,6 +24,40 @@
       font-size: 26px;
     }
   }
+  .social-share-bike {
+    @include clearfix;
+    padding-bottom: $vertical-height;
+    border-bottom: 1px solid $gray-light;
+    h4 {
+      margin: 6px 0 0;
+      float: left;
+    }
+  }
+  .contact-the-owner {
+    background: $gray-darker;
+    border-radius: $border-radius;
+    padding: $vertical-height;
+    margin-top: 2*$vertical-height;
+    p, h3 { padding: 0 10px; }
+    p { 
+      color: $gray-light;
+      margin-bottom: $vertical-height;
+    }
+    h3 { color: white; font-size: 21px; }
+    .send-message {
+      @include clearfix;
+      padding: $vertical-height 0;
+      .btn { float: right; }
+    }
+    .additional-field { margin-top: $vertical-height; }
+    .phoneable-by {
+      em { display: block; }
+      strong {
+        @extend .header-font;
+        color: white;
+      }
+    }
+  }
 }
 
 // ad blocks, for now just here

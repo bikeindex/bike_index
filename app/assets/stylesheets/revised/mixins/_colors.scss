@@ -5,6 +5,7 @@ $blue-dark: #2c3e50;
 $blue: #3498db;
 $blue-light: #92c8ec;
 
+$gray-darker: #333333;
 $gray-dark: #222;
 $gray: #666;
 $gray-light: #A4A4A4;
@@ -15,7 +16,7 @@ $gray-lighter: #f2f2f2;
 
 $body-font-color: $gray;
 $link-color: $blue;
-$header-font-color: #333333;
+$header-font-color: $gray-darker;
 
 $black-off: #111;
 

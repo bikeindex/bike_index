@@ -53,6 +53,9 @@
               Recovered 
             Stolen
         = @bike.title_u
+      - if @bike.should_show_other_bikes
+        %h4
+          = link_to "View user's other registrations", user_path(@bike.owner.username)
     .col-sm-4
       .ad-block.ad468x60
         %h4.text-xs-center
@@ -91,5 +94,38 @@
               = image_tag(@bike.stock_photo_url, alt: "#{@bike.type.titleize} photo", id: "i|0", data: {action: 'zoom', original: @bike.stock_photo_url})
 
     .col-sm-4
-      Social
-      Contact the owner if stolen
+      .social-share-bike
+        %h4
+          - if @bike.stolen
+            Spread the word!
+          - else
+            Share it!
+        = render '/shared/share_this'
+      .contact-the-owner
+        %p.preface
+          %em
+            Know something about this #{@bike.type}?
+        %h3
+          Contact the owner now
+
+        - if @bike.recovered
+          %p
+            Is this your bike? Send proof of ownership (such as the bike's serial number or a link to a photo of you with the bike)
+
+        = form_for @stolen_notification do |f|
+          = f.hidden_field :bike_id, value: @bike.id
+          = f.text_area :message, required: true, placeholder: "Contacting about an ad you found online? Include a link to the ad below", rows: 3, class: 'form-control'
+          = f.text_field :reference_url, placeholder: 'Link url', rows: 3, class: 'form-control additional-field'
+
+          .send-message
+            = f.submit 'Send message', class: 'btn btn-primary btn-lg'
+        - if @bike.phoneable_by(current_user)
+          %p.phoneable-by
+            %em
+              Or call
+            %strong
+              Owner's phone number:
+            
+            %a{ href: "tell:#{@stolen_record.phone}" }
+              = @stolen_record.phone
+
