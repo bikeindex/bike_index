@@ -42,7 +42,7 @@ class BikesController < ApplicationController
     @query = request.query_parameters()
     @url = request.original_url
     @selectize_items = search.selectize_items
-    render layout: (revised_layout_enabled? ? 'application_revised' : 'application_updated')
+    render layout: 'application_updated'
   end
 
   def show
@@ -53,7 +53,13 @@ class BikesController < ApplicationController
     @bike = @bike.decorate
     @stolen_notification = StolenNotification.new if @bike.stolen
     respond_to do |format|
-      format.html { render layout: (revised_layout_enabled? ? 'application_revised' : 'application_updated') }
+      format.html do
+        # if revised_layout_enabled?
+        #   render :show_revised, layout: 'application_revised'
+        # else
+          render layout: 'application_updated'
+        # end
+      end
       format.gif  { render qrcode: scanned_bike_url(@bike), level: :h, unit: 50 }
     end
   end
@@ -96,7 +102,7 @@ class BikesController < ApplicationController
 
   def new
     if revised_layout_enabled?
-      render_revised_new
+      new_revised
     else
       if current_user.present?
         @b_param = BParam.create(creator_id: current_user.id, params: params)
@@ -109,7 +115,7 @@ class BikesController < ApplicationController
     end
   end
 
-  def render_revised_new
+  def new_revised
     find_or_new_b_param
     # Let them know if they sent an invalid b_param token
     flash[:notice] = "Sorry! We couldn't find that bike" if @b_param.id.blank? && params[:b_param_token].present?
