@@ -359,7 +359,7 @@ class Bike < ActiveRecord::Base
 
   def cgroup_array
     # list of cgroups so that we can arrange them. Future feature.
-    return nil unless components.any?
+    return [] unless components.any?
     a = []
     components.each { |i| a << i.cgroup_id }
     a.uniq

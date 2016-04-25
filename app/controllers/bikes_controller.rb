@@ -24,7 +24,7 @@ class BikesController < ApplicationController
   def index
     params[:stolen] = true unless params[:stolen].present? || params[:non_stolen].present?
     if params[:proximity].present? && params[:proximity].strip.downcase == 'ip'
-      params[:proximity] = request.env["HTTP_X_FORWARDED_FOR"].split(',')[0]
+      params[:proximity] = request.env['HTTP_X_FORWARDED_FOR'].split(',')[0] if request.env['HTTP_X_FORWARDED_FOR']
       # Geocoder.search(request.env["HTTP_X_FORWARDED_FOR"].split(',')[0])
     end
     search = BikeSearcher.new(params)

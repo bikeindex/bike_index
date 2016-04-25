@@ -112,6 +112,8 @@ $grid-breakpoint-sm: 544px;
 $grid-breakpoint-md: 768px;
 $grid-breakpoint-lg: 992px;
 $grid-breakpoint-xl: 1200px;
+$grid-sizes: 'xs', 'sm', 'md', 'lg', 'xl';
+$grid-breakpoints: $grid-breakpoint-xs, $grid-breakpoint-sm, $grid-breakpoint-md, $grid-breakpoint-lg, $grid-breakpoint-xl;
 $row-side-padding: 0.9375rem;
 
 // Settings
@@ -136,6 +138,7 @@ $row-side-padding: 0.9375rem;
 @import "revised/sections/horizontal_lines";
 @import "revised/sections/legal";
 @import "revised/sections/sharing";
+@import "revised/sections/attr_list";
 @import "revised/sections/sign_in_up";
 @import "revised/sections/bike_show_photo";
 
@@ -170,6 +173,7 @@ $row-side-padding: 0.9375rem;
 html { background: $black-off; }
 body { min-height: 400px; }
 .currently-hidden { display: none; }
+.padded-row { margin-top: $vertical-height; }
 img { max-width: 100%; } // don't break random stuff images!
 
 

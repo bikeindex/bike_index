@@ -44,18 +44,75 @@
       margin-bottom: $vertical-height;
     }
     h3 { color: white; font-size: 21px; }
+    .additional-field { margin-top: $vertical-height; }
     .send-message {
       @include clearfix;
-      padding: $vertical-height 0;
+      margin-top: $vertical-height;
       .btn { float: right; }
     }
-    .additional-field { margin-top: $vertical-height; }
     .phoneable-by {
       em { display: block; }
       strong {
         @extend .header-font;
         color: white;
       }
+    }
+  }
+  .show-bike-details {
+    h3 { margin-top: 3*$vertical-height; }
+  }
+  #map_canvas {
+    width: 100%;
+    height: 400px;
+  }
+  .map-holder {
+    position: relative;
+    width: 100%;
+  }
+}
+// On small screens, use the tabbed interface
+@media (max-width: $grid-breakpoint-md - 1px) {
+  .nav-tabs.component-types {
+    @include make-col();
+    @include make-col-span(12);
+    border: none;
+    .nav-item {
+      margin: 0 0 0 -1px;
+      &:first-of-type { margin-left: 0; }
+      a {
+        border: 1px solid $gray-darker;
+        color: $gray-darker;
+        border-radius: $border-radius;
+        &:hover, &:active, &.active {
+          border: 1px solid $gray-darker;
+          color: white;
+          text-decoration: none;
+        }
+        &:hover { background: $gray; }
+        &:active, &.active { background: $gray-darker; }
+      }
+    }
+  }
+  .component-group-wrap {
+    @include make-col();
+    @include make-col-span(12);
+  }
+  .cgroup-name { display: none; }
+  .card { 
+    border: none; 
+    .card-block { padding: 2*$vertical-height 0 0; }
+  }
+}
+
+// // On medium screens and bigger, display all the components
+@media (min-width: $grid-breakpoint-md) {
+  .nav-tabs.component-types { display: none; }
+  .tab-content.component-group-wrap {
+    @include make-row();
+    .component-group {
+      display: flex;
+      @include make-col();
+      @include make-col-span(6);
     }
   }
 }

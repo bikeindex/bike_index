@@ -6,24 +6,24 @@ class ApplicationDecorator < Draper::Decorator
     PaginatingDecorator
   end
 
-  def ass_name(association)
+  def ass_name(association, extra = '')
     ass = object.send(association, name)
-    ass.name if ass.present?
+    [ass.name, extra].reject(&:blank?).join(' ') if ass.present?
   end
 
   def mnfg_name
-    if object.manufacturer.name == "Other" and object.manufacturer_other.present?
+    if object.manufacturer.name == 'Other' and object.manufacturer_other.present?
       object.manufacturer_other
     else
       object.manufacturer.name
     end
   end
 
-  def attr_list_item(desc = nil, title)
+  def attr_list_item(desc = nil, title, with_colon: false)
     return nil unless desc.present?
+    title = "#{title}:" if with_colon
     html = h.content_tag(:span, title, class: 'attr-title')
-    html = (h.content_tag(:li, html + desc))
-    html.html_safe
+    h.content_tag(:li, html + desc)
   end
 
 
