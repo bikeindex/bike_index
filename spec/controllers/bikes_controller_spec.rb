@@ -3,15 +3,47 @@ require 'spec_helper'
 describe BikesController do
   describe 'index' do
     context 'no subdomain' do
-      before do
-        get :index
+      context 'legacy' do
+        it 'renders' do
+          get :index
+          expect(response.status).to eq(200)
+          expect(response).to render_template(:index)
+          expect(response).to render_with_layout('application_updated')
+          expect(flash).to_not be_present
+          expect(assigns(:per_page)).to eq 10
+        end
       end
-      it { is_expected.to respond_with(:success) }
-      it { is_expected.to render_template(:index) }
-      it { is_expected.not_to set_flash }
-
-      it 'sets per_page correctly' do
-        expect(assigns(:per_page)).to eq 10
+      context 'revised' do
+        context 'no params' do
+          it 'renders' do
+            allow(controller).to receive(:revised_layout_enabled?) { true }
+            get :index
+            expect(response.status).to eq(200)
+            expect(response).to render_template(:index_revised)
+            expect(response).to render_with_layout('application_revised')
+            expect(flash).to_not be_present
+            expect(assigns(:per_page)).to eq 10
+            expect(assigns(:stolen)).to eq 'stolen'
+          end
+        end
+        context 'serial_param' do
+          it 'renders' do
+            manufacturer = FactoryGirl.create(:manufacturer)
+            color = FactoryGirl.create(:color)
+            get :index,
+                query: "c_#{color.id},s#serialzzzzzz#,m_#{manufacturer.id}",
+                stolen: '',
+                non_stolen: 'true'
+            expect(response.status).to eq(200)
+            target_selectize_items = [
+              manufacturer.autocomplete_result_hash,
+              color.autocomplete_result_hash,
+              { id: 'serial', search_id: 's#serialzzzzzz#', text: 'serialzzzzzz' }
+            ].as_json
+            expect(assigns(:selectize_items)).to eq target_selectize_items
+            expect(assigns(:stolen)).to eq 'non_stolen'
+          end
+        end
       end
     end
     context 'with subdomain' do

@@ -41,8 +41,13 @@ class BikesController < ApplicationController
     @query = params[:query]
     @query = request.query_parameters()
     @url = request.original_url
+    @stolen = search.stolenness
     @selectize_items = search.selectize_items
-    render layout: 'application_updated'
+    if revised_layout_enabled?
+      render :index_revised, layout: 'application_revised'
+    else
+      render layout: 'application_updated'
+    end
   end
 
   def show
