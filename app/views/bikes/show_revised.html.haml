@@ -101,7 +101,7 @@
             %h4.stock-photo
               Stock photo of a #{@bike.year} #{@bike.frame_model}
               %span Color may not match!
-            .current-photo
+            .current-photo#stock_photo_img
               = image_tag(@bike.stock_photo_url, alt: "#{@bike.type.titleize} photo", id: "i|0", data: {action: 'zoom', original: @bike.stock_photo_url})
 
     .col-md-4
