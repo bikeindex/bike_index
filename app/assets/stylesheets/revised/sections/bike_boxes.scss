@@ -1,0 +1,16 @@
+.bike-boxes {
+  margin-top: $vertical-height;
+  @include list-unstyled;
+  margin: 0;
+  width: 100%;
+  li {
+    &:nth-of-type(2n+1) { background: $gray-lighter; }
+    // .shown-image-block {
+    //   position: relative;
+    // }
+    img {
+      display: block;
+      width: 100%;
+    }
+  }
+}

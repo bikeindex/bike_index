@@ -94,6 +94,16 @@ class StolenRecord < ActiveRecord::Base
     a.compact.join(', ')
   end
 
+  def show_stolen_address
+    [
+      street,
+      city,
+      (state && state.abbreviation),
+      zipcode,
+      (country && country.name)
+    ].reject(&:blank?).join(', ')
+  end
+
   # unless Rails.env.test?
     geocoded_by :address
     after_validation :geocode, if: lambda { (self.city.present? || self.zipcode.present?) && self.country.present? }

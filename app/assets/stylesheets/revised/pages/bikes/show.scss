@@ -73,6 +73,10 @@
   .primary-footer .terms-and-stuff.bike-show-page-with-edit-overlay {
     padding-bottom: 70px;
   }
+
+  .bike-photos, .show-bike-details, .ad300x600, .components {
+    margin-top: $vertical-height;
+  }
 }
 
 // On small screens, use the tabbed interface for components

@@ -7,7 +7,7 @@
       .ad-block.ad468x60
         %h4
           468X60
-  .padded-row
+  .row
     .col-md-8
       = form_tag bikes_path, id: 'bike_search_form', class: 'bike-search-form', method: :get do
         - params[:query] = params[:query].gsub(/,?#,?/,'').gsub(/(\A,|,\z)/, '') if params[:query].present?
@@ -54,9 +54,7 @@
 
       - if @bikes.present?
         %ul.bike-boxes
-          = render partial: "/bikes/bike_u", collection: @bikes, locals: {target: "show" }
-
-        .container
+          = render partial: '/bikes/revised_bike', collection: @bikes, as: :bike, locals: { target: 'show' }
           .paginate-container-bottom
             = paginate @bikes
             
@@ -79,5 +77,5 @@
               #{params[:serial]}
 
           %ul.bike-boxes
-            = render partial: "/bikes/bike_u", collection: @secondary_bikes, locals: {target: "show" }
+            = render partial: '/bikes/revised_bike', collection: @secondary_bikes, locals: { target: 'show' }
 
