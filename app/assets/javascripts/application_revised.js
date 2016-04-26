@@ -17,6 +17,9 @@
 //= require pikaday
 //= require external_scripts/zoom.js
 
+// Legacy carousel. Can use if we need a carousel though
+//= require external_scripts/slick.js
+
 // Things that are required for File Upload:
 //= require external_scripts/jquery_sortable_0.9.13.js
 //= require external_scripts/jquery.ui.widget.js

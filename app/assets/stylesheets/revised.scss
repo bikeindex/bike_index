@@ -172,6 +172,12 @@ $row-side-padding: 0.9375rem;
 @import "revised/pages/news/index";
 @import "revised/pages/news/show";
 
+// Home styles
+@import "updated_styles/components/slick.scss";
+@import "revised/pages/home/home";
+@import "revised/pages/home/supporters";
+@import "revised/pages/home/testimonials";
+
 
 // LEGACY PAGES general styles - replace as soon as all pages have been restyled
 @import "revised/sections/legacy_content"; // general legacy content styles
@@ -181,8 +187,6 @@ body { min-height: 400px; }
 .currently-hidden { display: none; }
 img { max-width: 100%; } // don't break random stuff images!
 
-// Temporarily: 
-.profiler-results { display: none; }
 // 
 // External overrides
 // 
@@ -191,3 +195,9 @@ img { max-width: 100%; } // don't break random stuff images!
 .selectize-dropdown .active { background-color: lighten(#bebebe, 10%); }
 // Pickaday overrides
 .pika-button:hover { background: $blue; }
+
+// Slick - legacy from homepage
+@media (min-width: $grid-breakpoint-md) {
+  .slick-prev,
+  .slick-next { display: none; }
+}

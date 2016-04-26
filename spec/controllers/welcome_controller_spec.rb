@@ -2,22 +2,36 @@ require 'spec_helper'
 
 describe WelcomeController do
   describe 'index' do
-    it 'renders' do
-      get :index
-      expect(response.status).to eq(200)
-      expect(response).to render_template(:index)
-      expect(response).to render_with_layout('application_updated')
-      expect(flash).to_not be_present
+    context 'legacy' do
+      it 'renders' do
+        get :index
+        expect(response.status).to eq(200)
+        expect(response).to render_template('index')
+        expect(response).to render_with_layout('application_updated')
+        expect(flash).to_not be_present
+      end
+    end
+    context 'revised' do
+      it 'renders' do
+        allow(controller).to receive(:revised_layout_enabled?) { true }
+        get :index
+        expect(response.status).to eq(200)
+        expect(response).to render_template('index')
+        expect(response).to render_with_layout('application_revised')
+        expect(flash).to_not be_present
+      end
     end
   end
 
   describe 'goodbye' do
-    it 'renders' do
-      get :goodbye
-      expect(response.status).to eq(200)
-      expect(response).to render_template(:index)
-      expect(response).to render_with_layout('application_updated')
-      expect(flash).to_not be_present
+    context 'legacy' do
+      it 'renders' do
+        get :goodbye
+        expect(response.status).to eq(200)
+        expect(response).to render_template('goodbye')
+        expect(response).to render_with_layout('application')
+        expect(flash).to_not be_present
+      end
     end
   end
 

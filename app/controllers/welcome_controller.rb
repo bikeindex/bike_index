@@ -1,6 +1,6 @@
 class WelcomeController < ApplicationController
   def index
-    render action: 'index', layout: 'application_updated'
+    render action: 'index', layout: (revised_layout_enabled? ? 'application_revised' : 'application_updated')
   end
 
   def update_browser

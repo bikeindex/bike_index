@@ -12,6 +12,7 @@ class window.BikeIndex
   loadPageScript: (body_id) ->
     # All the per-page javascripts
     pageClasses =
+      welcome_index: BikeIndex.WelcomeIndex
       info_where: BikeIndex.InfoWhere
       info_support_the_index: BikeIndex.InfoSupportTheIndex
       bikes_new: BikeIndex.BikesNew
