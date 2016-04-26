@@ -39,9 +39,7 @@ describe WelcomeController do
     context 'user not present' do
       it 'redirects' do
         get :user_home
-        expect(response.status).to eq(200)
         expect(response).to redirect_to(new_user_url)
-        expect(flash).to be_present
       end
     end
 

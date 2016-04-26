@@ -142,10 +142,10 @@ $twelve-column:                  100%;
   width: 100%;
   text-align: center;
   .btn.binxbtn {
-    @extend .btn-primary;
     @extend .btn-lg;
-  //   font-family: $header-font;
-  //   font-size: 40px;
+    @include button-variant($green, $green, $green);
+    color: white !important;
+    font-size: 30px;
   }
 }
 
@@ -164,7 +164,7 @@ $twelve-column:                  100%;
   margin: 0 auto;
   overflow: hidden;
   min-height: 250px;
-  $time: 1.5s;
+  $time: 2.5s;
   img {
     transition: all ease-in-out $time;
     -webkit-transform: translate3d(0,0,0);
@@ -174,7 +174,7 @@ $twelve-column:                  100%;
     height: auto;
     &.spun {
       transition: all ease-out $time;
-      transform: rotate(30deg);
+      transform: rotate(90deg);
     }
   }
 }
@@ -197,18 +197,19 @@ $twelve-column:                  100%;
   text-align: center;
   h2 {
     // font-family: $body-font;
-    font-size: 44px;
+    // font-size: 44px;
   }
-  p, h3 {
-    margin: .5em auto 0;
+  h3 {
+    @extend .body-font;
     font-size: 22px;
-    // font-family: $body-font;
-    // font-weight: $body-font-weight;
+    text-align: center;
+    margin: 0 auto;
   }
   p {
     text-align: left;
+    font-size: 22px;
     margin-top: 1.25em;
-    font-weight: 200;
+    // font-weight: 200;
   }
 }
 
@@ -268,6 +269,7 @@ $twelve-column:                  100%;
       margin: 0 auto;
     }
     h2 {
+      font-size: 30px;
       text-align: center;
       margin: 0;
       padding: 20px 0 0;
