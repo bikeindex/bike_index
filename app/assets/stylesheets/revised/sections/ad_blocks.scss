@@ -1,0 +1,17 @@
+.ad-block {
+  background: $gray-lighter;
+  border: 1px solid $gray-lightish;
+  h4 { @extend .text-xs-center; } // To put size info in ad blocks as we're getting started
+}
+
+// ad blocks, for now just here
+.ad468x60 {
+  // width: 468px;
+  height: 60px;
+}
+
+.ad300x600 {
+  width: 300px;
+  height: 600px;
+  margin: 0 auto;
+}

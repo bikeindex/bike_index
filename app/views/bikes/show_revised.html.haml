@@ -43,6 +43,8 @@
         but it hasn't been claimed yet. You can update it
       = link_to  'Edit', edit_bike_path, class: 'btn btn-secondary'
 
+/ Caching should go here:
+/ - cache(@bike) do
 .container
   .row.first-row
     .col-md-8
@@ -67,9 +69,9 @@
           = link_to "View user's other registrations", user_path(@bike.owner.username)
     .col-md-4
       .ad-block.ad468x60
-        %h4.text-xs-center
+        %h4
           468X60
-  .row.padded-row
+  .padded-row
     / Bike Photo!
     .col-md-8
       .bike-photos
@@ -138,7 +140,7 @@
               %a{ href: "tell:#{@stolen_record.phone}" }
                 = @stolen_record.phone
 
-  .row.padded-row
+  .padded-row
     .col-md-8.show-bike-details
       %ul.attr-list.split-sm
         = @bike.attr_list_item(@bike.serial_display, 'Serial', with_colon: true)
@@ -183,8 +185,11 @@
             Description of incident
           %p
             = @stolen_record.theft_description
+    .ad-block.ad300x600
+      %h4
+        300x600
 
-  .row.components
+  .padded-row.components
     - cgroups = @bike.cgroup_array.map { |id| { name: Cgroup.find(id).name, id: id } }
     - if cgroups.any?
       %ul.nav.nav-tabs.component-types{ role: 'tablist' }

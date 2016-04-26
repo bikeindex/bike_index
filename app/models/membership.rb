@@ -3,7 +3,7 @@ class Membership < ActiveRecord::Base
   acts_as_paranoid
 
   belongs_to :organization
-  belongs_to :user
+  belongs_to :user, touch: true # So when we update memberships, it busts user cache
 
   validates_presence_of :role, message: 'How the hell did you manage to not choose a role? You have to choose one.'
   validates_presence_of :organization, message: "Sorry, organization doesn't exist"

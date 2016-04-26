@@ -69,8 +69,13 @@
     position: relative;
     width: 100%;
   }
+  // Added via JS, to clear space if edit bike overlay is on
+  .primary-footer .terms-and-stuff.bike-show-page-with-edit-overlay {
+    padding-bottom: 70px;
+  }
 }
-// On small screens, use the tabbed interface
+
+// On small screens, use the tabbed interface for components
 @media (max-width: $grid-breakpoint-md - 1px) {
   .nav-tabs.component-types {
     @include make-col();
@@ -113,18 +118,7 @@
       display: flex;
       @include make-col();
       @include make-col-span(6);
+      padding-top: $vertical-height;
     }
   }
-}
-
-// ad blocks, for now just here
-.ad468x60 {
-  // width: 468px;
-  height: 60px;
-  border: 1px solid $gray-lightish;
-}
-
-// Added via JS, to clear space if edit bike overlay is on
-.primary-footer .terms-and-stuff.bike-show-page-with-edit-overlay {
-  padding-bottom: 70px;
 }
