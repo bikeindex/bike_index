@@ -92,7 +92,9 @@ $modal-backdrop-opacity: 0.8;
 
 //
 // Other (non-bootstrap) external styles
-
+@import "updated_styles/components/zoom.scss";
+.zoom-overlay { z-index: $zindex-navbar-fixed + 99; }
+.zoom-img-wrap { z-index: $zindex-navbar-fixed + 100; }
 
 
 /*!
@@ -110,6 +112,8 @@ $grid-breakpoint-sm: 544px;
 $grid-breakpoint-md: 768px;
 $grid-breakpoint-lg: 992px;
 $grid-breakpoint-xl: 1200px;
+$grid-sizes: 'xs', 'sm', 'md', 'lg', 'xl';
+$grid-breakpoints: $grid-breakpoint-xs, $grid-breakpoint-sm, $grid-breakpoint-md, $grid-breakpoint-lg, $grid-breakpoint-xl;
 $row-side-padding: 0.9375rem;
 
 // Settings
@@ -133,18 +137,24 @@ $row-side-padding: 0.9375rem;
 @import "revised/sections/edit_bike_title";
 @import "revised/sections/horizontal_lines";
 @import "revised/sections/legal";
+@import "revised/sections/sharing";
+@import "revised/sections/attr_list";
 @import "revised/sections/sign_in_up";
+@import "revised/sections/bike_show_photo";
 
 // 
 // Page styles
 // 
-// Bike pages
+// Bike form pages
 @import "revised/pages/bikes/new";
 @import "revised/pages/bikes/edit_root";
 @import "revised/pages/bikes/edit_ownership";
 @import "revised/pages/bikes/edit_stolen";
 @import "revised/pages/bikes/edit_accessories";
 @import "revised/pages/bikes/edit_photos";
+
+// Bike show & search pages
+@import "revised/pages/bikes/show";
 
 // Info pages
 @import "revised/pages/info/where";
@@ -163,6 +173,7 @@ $row-side-padding: 0.9375rem;
 html { background: $black-off; }
 body { min-height: 400px; }
 .currently-hidden { display: none; }
+.padded-row { margin-top: $vertical-height; }
 img { max-width: 100%; } // don't break random stuff images!
 
 

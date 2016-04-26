@@ -24,7 +24,7 @@ class BikesController < ApplicationController
   def index
     params[:stolen] = true unless params[:stolen].present? || params[:non_stolen].present?
     if params[:proximity].present? && params[:proximity].strip.downcase == 'ip'
-      params[:proximity] = request.env["HTTP_X_FORWARDED_FOR"].split(',')[0]
+      params[:proximity] = request.env['HTTP_X_FORWARDED_FOR'].split(',')[0] if request.env['HTTP_X_FORWARDED_FOR']
       # Geocoder.search(request.env["HTTP_X_FORWARDED_FOR"].split(',')[0])
     end
     search = BikeSearcher.new(params)
@@ -54,11 +54,11 @@ class BikesController < ApplicationController
     @stolen_notification = StolenNotification.new if @bike.stolen
     respond_to do |format|
       format.html do
-        # if revised_layout_enabled?
-        #   render :show_revised, layout: 'application_revised'
-        # else
+        if revised_layout_enabled?
+          render :show_revised, layout: 'application_revised'
+        else
           render layout: 'application_updated'
-        # end
+        end
       end
       format.gif  { render qrcode: scanned_bike_url(@bike), level: :h, unit: 50 }
     end

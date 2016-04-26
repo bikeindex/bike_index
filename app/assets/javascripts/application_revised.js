@@ -15,9 +15,14 @@
 //= require headroom.js
 //= require headroom.js/jQuery.headroom.js
 //= require pikaday
+//= require external_scripts/zoom.js
+
+// Things that are required for File Upload:
 //= require external_scripts/jquery_sortable_0.9.13.js
 //= require external_scripts/jquery.ui.widget.js
 //= require external_scripts/jquery.iframe-transport.js
 //= require external_scripts/jquery.fileupload.js
+
+// Our actual scripts:
 //= require init.coffee
 //= require_tree ./revised

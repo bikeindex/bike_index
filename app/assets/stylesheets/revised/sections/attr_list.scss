@@ -1,0 +1,40 @@
+.attr-list {
+  @include clearfix;
+  list-style-type: none;
+  margin: 0; padding: 0;
+  position: relative;
+  li {
+    width: 100%;
+    padding: 0;
+    // &:nth-of-type(2n-1) { background: $gray; }
+    .attr-title {
+      font-weight: $strong-font-weight;
+      margin-right: .3em;
+    }
+  }
+  &.separate-lines {
+    .attr-title { display: block; } 
+  }
+}
+
+@each $size in $grid-sizes {
+  $i: index($grid-sizes, $size);
+  // Add a class of "split-$size" to get it to split at any width above that breakpoint
+  // eg .split-sm
+  @media (min-width: nth($grid-breakpoints, $i)) {
+    .attr-list.split-#{$size} {
+      @include make-row();
+      li {
+        @include make-col();
+        @include make-col-span(6);
+      }
+    }
+  }
+  // Add a class of "separate-lines-$size" to get it to split at any width below that breakpoint
+  // eg .separate-lines-xl
+  @media (max-width: nth($grid-breakpoints, $i)) {
+    .attr-list.seperate-lines-#{$size} {
+      li .attr-title { display: block; }
+    }
+  }
+}

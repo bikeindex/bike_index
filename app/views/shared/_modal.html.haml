@@ -2,13 +2,14 @@
 - id ||= ''
 - data_hash ||= {}
 .modal.fade{ id: id, data: data_hash }
-  .modal-dialog{role: 'document'}
+  .modal-dialog{ role: 'document' }
     .modal-content
       - if title
         .modal-header
           %h2.modal-title
             = title
-            %button.close{'aria-label' => 'Close', 'data-dismiss' => 'modal', type: 'button'}
-              %span{'aria-hidden' => 'true'} &times;
+            %button.close{ 'aria-label' => 'Close', 'data-dismiss' => 'modal', type: 'button' }
+              %span{ 'aria-hidden' => 'true' }
+                &times;
           %hr
       = modal_body

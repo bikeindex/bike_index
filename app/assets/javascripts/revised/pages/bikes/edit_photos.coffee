@@ -55,7 +55,7 @@ class BikeIndex.BikesEditPhotos extends BikeIndex
     url_target = $sortable_container.data('orderurl')
     sortable_list_items = $sortable_container.children('li')
     # This is a list comprehension for the list of all the sortable items, to make an array
-    array_of_photo_ids = ($(list_item).attr('id') for list_item in sortable_list_items)
+    array_of_photo_ids = ($(list_item).prop('id') for list_item in sortable_list_items)
     new_item_order = 
       list_of_photos: array_of_photo_ids
     # list_of_items is an array containing the ordered list of image_ids
@@ -65,7 +65,7 @@ class BikeIndex.BikesEditPhotos extends BikeIndex
   updateImagePrivateness: (e) ->
     $target = $(e.target)
     is_private = $target.prop('checked')
-    id = $target.parents('.edit-photo-display-list-item').attr('id')
+    id = $target.parents('.edit-photo-display-list-item').prop('id')
     url_target = "#{$('#public_images').data('imagesurl')}/#{id}/is_private"
     console.log url_target
     $.post(url_target, {is_private: is_private})

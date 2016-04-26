@@ -1,0 +1,130 @@
+#bikes_show {
+  .bike-edit-overlay {
+    @include box-shadow(0 0 2px rgba(black,.2));
+    padding: $vertical-height;
+    position: fixed;
+    // position: -webkit-sticky;
+    // position: sticky;
+    bottom: 0;
+    width: 100%;
+    background: rgba($blue, .92  );
+    z-index: $zindex-navbar-fixed - 1;
+    p {
+      text-align: center;
+      margin: 0;
+      color: white;
+    }
+    .btn { margin-left: 20px; }
+  }
+
+  h1 {
+    .stolen {
+      display: block;
+      color: $red;
+      font-size: 26px;
+    }
+  }
+  .social-share-bike {
+    @include clearfix;
+    padding-bottom: $vertical-height;
+    border-bottom: 1px solid $gray-light;
+    h4 {
+      margin: 6px 0 0;
+      float: left;
+    }
+  }
+  .contact-the-owner {
+    background: $gray-darker;
+    border-radius: $border-radius;
+    padding: $vertical-height;
+    margin-top: 2*$vertical-height;
+    p, h3 { padding: 0 10px; }
+    p { 
+      color: $gray-light;
+      margin-bottom: $vertical-height;
+    }
+    h3 { color: white; font-size: 21px; }
+    .additional-field { margin-top: $vertical-height; }
+    .send-message {
+      @include clearfix;
+      margin-top: $vertical-height;
+      .btn { float: right; }
+    }
+    .phoneable-by {
+      em { display: block; }
+      strong {
+        @extend .header-font;
+        color: white;
+      }
+    }
+  }
+  .show-bike-details {
+    h3 { margin-top: 3*$vertical-height; }
+  }
+  #map_canvas {
+    width: 100%;
+    height: 400px;
+  }
+  .map-holder {
+    position: relative;
+    width: 100%;
+  }
+}
+// On small screens, use the tabbed interface
+@media (max-width: $grid-breakpoint-md - 1px) {
+  .nav-tabs.component-types {
+    @include make-col();
+    @include make-col-span(12);
+    border: none;
+    .nav-item {
+      margin: 0 0 0 -1px;
+      &:first-of-type { margin-left: 0; }
+      a {
+        border: 1px solid $gray-darker;
+        color: $gray-darker;
+        border-radius: $border-radius;
+        &:hover, &:active, &.active {
+          border: 1px solid $gray-darker;
+          color: white;
+          text-decoration: none;
+        }
+        &:hover { background: $gray; }
+        &:active, &.active { background: $gray-darker; }
+      }
+    }
+  }
+  .component-group-wrap {
+    @include make-col();
+    @include make-col-span(12);
+  }
+  .cgroup-name { display: none; }
+  .card { 
+    border: none; 
+    .card-block { padding: 2*$vertical-height 0 0; }
+  }
+}
+
+// // On medium screens and bigger, display all the components
+@media (min-width: $grid-breakpoint-md) {
+  .nav-tabs.component-types { display: none; }
+  .tab-content.component-group-wrap {
+    @include make-row();
+    .component-group {
+      display: flex;
+      @include make-col();
+      @include make-col-span(6);
+    }
+  }
+}
+
+// ad blocks, for now just here
+.ad468x60 {
+  // width: 468px;
+  height: 60px;
+  border: 1px solid $gray-lightish;
+}
+
+// Added via JS, to clear space if edit bike overlay is on
+.primary-footer .terms-and-stuff.bike-show-page-with-edit-overlay {
+  padding-bottom: 70px;
+}

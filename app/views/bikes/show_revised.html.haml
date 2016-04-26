@@ -1,0 +1,224 @@
+- if current_user.present? and @bike.can_be_claimed_by(current_user)
+  - claim_bike_body = capture_haml do
+    .modal-body
+      %p
+        We're honored to have your #{@bike.type} on the Index.  
+      %p
+        Claim it so you can update your listing.
+    .modal-btn-footer
+      .row
+        .col-xs-6.col-xs-push-3
+          %a.btn.btn-success{ href: "/ownerships/#{@bike.current_ownership.id}" }
+            Claim #{@bike.type}
+
+  = render partial: '/shared/modal', locals: { title: "Your #{@bike.type}", id: 'claim-bike-modal', modal_body: claim_bike_body }
+- elsif @bike.owner == current_user
+  .bike-edit-overlay
+    - if @bike.user_hidden
+      %p
+        %strong
+          This bike is hidden.
+        
+        No one can see it but you
+    %p
+      - if @bike.current_owner_exists
+        - if @bike.recovered
+          Thank you for recovering this #{@bike.type}!
+        - elsif @bike.stolen
+          We're really bummed your #{@bike.type} was stolen.
+        - else
+          Whoah, this awesome #{@bike.type} is yours!
+
+        - if @bike.public_images.any?
+          Add some more information about it.
+        - else
+          - if @bike.stolen
+            Add a picture so people know what to look for!
+          - else
+            Add a picture of it, so everyone can admire its beauty!
+      - else
+        You sent this bike to
+        %em
+          = @bike.current_ownership.owner_email
+        but it hasn't been claimed yet. You can update it
+      = link_to  'Edit', edit_bike_path, class: 'btn btn-secondary'
+
+.container
+  .row.first-row
+    .col-md-8
+      %h1
+        - if @bike.stolen
+          %strong.stolen
+            - if @bike.recovered
+              Recovered 
+            Stolen
+        = @bike.title_u
+      - if @bike.stolen
+        %p
+          %strong
+            Last seen
+          = l @stolen_record.date_stolen, format: :dotted
+          %strong
+            at
+          = @stolen_record.show_stolen_address
+
+      - if @bike.should_show_other_bikes
+        %h4
+          = link_to "View user's other registrations", user_path(@bike.owner.username)
+    .col-md-4
+      .ad-block.ad468x60
+        %h4.text-xs-center
+          468X60
+  .row.padded-row
+    / Bike Photo!
+    .col-md-8
+      .bike-photos
+        - if @bike.public_images.any?
+          #selected-photo{ class: "image-holder #{"just1photo" if @bike.public_images.count == 1}" }
+            .current-photo{ id: "image#{@bike.public_images.first.id}"}
+              = image_tag(@bike.public_images.first.image_url(:large), alt: "#{@bike.type.titleize} photo", id: "i|#{@bike.public_images.first.listing_order}", data: { action: 'zoom', original: @bike.public_images.first.image_url })
+          - if @bike.public_images.count > 1
+            %span.thumbnail-shadow
+            %span.thumbnail-shadow-r
+            #thumbnail-photos.photo-list
+              %ul#thumbnails
+                - @bike.public_images.each_with_index do |public_image, index|
+                  / Make the first image current
+                  - thumb_class = index == 0 ? 'current-thumb' : ''
+                  %li
+                    %a.clickable-image{ class: thumb_class, data: { id: "image#{public_image.id}", img: public_image.image.url(:large), link: public_image.image.url } }
+                      = image_tag public_image.image.url(:small), alt: "#{public_image.name}", id: "i|#{public_image.listing_order}"
+            :plain
+              <script id="current-photo-template" type="x-tmpl-mustache">
+                <div id="{{id}}" style="display: none;">
+                  <img alt="{{alt}}" src="{{src}}" id="{{image_id}}" data-action="zoom" data-fullsize="{{fullsize}}" class="initially-hidden">
+                </div>
+              </script>
+        - elsif @bike.stock_photo_url.present?
+          #selected-photo.image-holder.just1photo
+            %h4.stock-photo
+              Stock photo of a #{@bike.year} #{@bike.frame_model}
+              %span Color may not match!
+            .current-photo
+              = image_tag(@bike.stock_photo_url, alt: "#{@bike.type.titleize} photo", id: "i|0", data: {action: 'zoom', original: @bike.stock_photo_url})
+
+    .col-md-4
+      .social-share-bike
+        %h4
+          - if @bike.stolen
+            Spread the word!
+          - else
+            Share it!
+        = render '/shared/share_this'
+      - if @bike.stolen
+        .contact-the-owner
+          %p.preface
+            %em
+              Know something about this #{@bike.type}?
+          %h3
+            Contact the owner now
+          - if @bike.recovered
+            %p
+              Is this your bike? Send proof of ownership (such as the bike's serial number or a link to a photo of you with the bike)
+
+          = form_for @stolen_notification do |f|
+            = f.hidden_field :bike_id, value: @bike.id
+            = f.text_area :message, required: true, placeholder: "Contacting about an ad you found online? Include a link to the ad below", rows: 3, class: 'form-control'
+            = f.text_field :reference_url, placeholder: 'Link url', rows: 3, class: 'form-control additional-field'
+
+            .send-message
+              = f.submit 'Send message', class: 'btn btn-primary btn-lg'
+          - if @bike.phoneable_by(current_user)
+            %p.phoneable-by
+              %em
+                Or call
+              %strong
+                Owner's phone number:
+              
+              %a{ href: "tell:#{@stolen_record.phone}" }
+                = @stolen_record.phone
+
+  .row.padded-row
+    .col-md-8.show-bike-details
+      %ul.attr-list.split-sm
+        = @bike.attr_list_item(@bike.serial_display, 'Serial', with_colon: true)
+        - unless @bike.type == 'bike'
+          = @bike.attr_list_item(@bike.type.titleize, 'Cycle type', with_colon: true)
+        = @bike.attr_list_item(@bike.mnfg_name, 'Manufacturer', with_colon: true)
+        = @bike.attr_list_item(@bike.frame_model, 'Model', with_colon: true)
+        = @bike.attr_list_item(@bike.year.to_s, 'Year', with_colon: true)
+        = @bike.attr_list_item(@bike.frame_colors.to_sentence, 'Primary colors', with_colon: true)
+        = @bike.attr_list_item(@bike.size_display, 'Frame size', with_colon: true)
+        - if @bike.front_wheel_size_id.present?
+          - front_tire_width = @bike.front_tire_narrow ? '(Narrow tire)' : '(Wide tire)'
+          - if @bike.front_wheel_size_id == @bike.rear_wheel_size_id
+            = @bike.attr_list_item(@bike.ass_name('front_wheel_size', front_tire_width), 'Wheel diameter', with_colon: true)
+          - else
+            = @bike.attr_list_item(@bike.ass_name('front_wheel_size', front_tire_width), 'Front wheel diameter', with_colon: true)
+            - rear_tire_width = @bike.rear_tire_narrow ? '(Narrow tire)' : '(Wide tire)'
+            = @bike.attr_list_item(@bike.ass_name('rear_wheel_size', rear_tire_width), 'Rear wheel diameter', with_colon: true)
+        = @bike.attr_list_item(@bike.ass_name('frame_material'), 'Frame Material', with_colon: true)
+        = @bike.attr_list_item(@bike.ass_name('handlebar_type'), 'Handlebar type', with_colon: true)
+      - if @bike.description.present?
+        %h3
+          Distinguishing features
+        %p
+          = @bike.description
+      - if @bike.stolen
+        %h3
+          Theft Details
+        .row
+          .col-md-8
+            = render 'stolen_map'
+          .col-md-4
+            %ul.attr-list.separate-lines
+              = @bike.attr_list_item(@stolen_record.show_stolen_address, 'Location')
+              = @bike.attr_list_item(@stolen_record.locking_description, 'Locking description')
+              = @bike.attr_list_item(@stolen_record.lock_defeat_description, 'Locking circumvented')
+              = @bike.attr_list_item((l @stolen_record.date_stolen, format: :dotted), 'Date stolen')
+              = @bike.attr_list_item(@stolen_record.police_report_number, 'Police report #')
+              = @bike.attr_list_item(@stolen_record.police_report_department, 'Department & city')
+        - if @stolen_record.theft_description.present?
+          %h3
+            Description of incident
+          %p
+            = @stolen_record.theft_description
+
+  .row.components
+    - cgroups = @bike.cgroup_array.map { |id| { name: Cgroup.find(id).name, id: id } }
+    - if cgroups.any?
+      %ul.nav.nav-tabs.component-types{ role: 'tablist' }
+        - cgroups.each_with_index do |cgroup, index|
+          %li.nav-item
+            - link_class = index == 0 ? 'active' : ''
+            %a.nav-link{ class: link_class, href: "#cgroup_#{cgroup[:id]}", data: { toggle: 'tab', role: 'tab' } }
+              = cgroup[:name]
+      .tab-content.component-group-wrap
+        - cgroups.each_with_index do |cgroup, index|
+          - tab_class = index == 0 ? 'active' : ''
+          .tab-pane.component-group{ id: "cgroup_#{cgroup[:id]}", class: tab_class }
+            .card
+              .card-block
+                %h3.cgroup-name
+                  = cgroup[:name]
+                %ul.attr-list
+                  - @components.each do |component|
+                    - next unless component.cgroup_id == cgroup[:id]
+                    %li
+                      %span.attr-title
+                        - if component.front && component.rear
+                          Front & rear
+                        - elsif component.front
+                          Front
+                        - elsif component.rear
+                          Rear
+                        - if component.component_type == "unknown"
+                          Other
+                        - else
+                          = component.component_type.titleize if component.component_type.present?
+                      = component.description
+                      - if component.year.present? ||  component.model_name.present? || component.manufacturer.present?
+                        #{component.model_name}
+                        = "#{component.year}" if component.year.present?
+                        - if component.manufacturer.present?
+                          (#{component.mnfg_name})
