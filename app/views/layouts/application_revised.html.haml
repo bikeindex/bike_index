@@ -7,7 +7,6 @@
     = stylesheet_link_tag 'revised', media: "all"
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
-    <script type="text/javascript">window.root_url = "#{ENV['BASE_URL']}";</script>
     = javascript_include_tag 'application_revised'
     <!--[if lt IE 9]><script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]--><!--[if lte IE 8]><script type="text/javascript">$(function() {$('body').prepend("<body class='welcome-page' id='body'><div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, the Bike Index (and the internet in general) is broken and ugly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>");});</script><![endif]-->
 
@@ -30,7 +29,8 @@
               %a.nav-link.settings-link#setting_submenu{ 'aria-haspopup' => "true", 'aria-expanded' => "false", data: { toggle: 'dropdown' } }
                 %span.settings-text
                   Settings
-                = image_tag '/assets/revised/settings.svg', title: 'Your settings'
+                :plain
+                  <svg id="settings-icon" data-name="Layer 13" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30.16 30"><defs><style>.cls-1{fill:none;stroke:#a4a4a4;stroke-miterlimit:10;}</style></defs><title>settings</title><circle class="cls-1" cx="10.68" cy="19.41" r="3.78"/><circle class="cls-1" cx="23.92" cy="6.17" r="1.89"/><path class="cls-1" d="M4900.95,1506.07a8.21,8.21,0,0,0-.18-1.71l2-1.15-2.52-4.37-1.95,1.15a6.91,6.91,0,0,0-2.92-1.72v-2.14h-5v2.14a7.28,7.28,0,0,0-3,1.72l-2-1.15-2.53,4.37,2,1.15a8.15,8.15,0,0,0,0,3.43l-2,1.14,2.52,4.37,2-1.15a7.26,7.26,0,0,0,3,1.72v2.29h5v-2.29a6.93,6.93,0,0,0,2.92-1.72l2,1.15,2.51-4.37-2-1.14A8.28,8.28,0,0,0,4900.95,1506.07Z" transform="translate(-4882.07 -1486.66)"/><path class="cls-1" d="M4910.4,1492.83a4.42,4.42,0,0,0-.12-1l1.25-.72-1.26-2.18-1.21.73a4.53,4.53,0,0,0-1.72-1v-1.45h-2.52v1.45a4.86,4.86,0,0,0-1.81,1l-1.28-.73-1.27,2.18,1.25,0.72a4.27,4.27,0,0,0,0,2l-1.26.72,1.26,2.19,1.3-.73a4.84,4.84,0,0,0,1.81,1v1.45h2.52v-1.45a4.51,4.51,0,0,0,1.72-1l1.23,0.73,1.25-2.19-1.26-.72A4.42,4.42,0,0,0,4910.4,1492.83Z" transform="translate(-4882.07 -1486.66)"/></svg>
               %ul.primary-submenu{ 'aria-labelledby' => '#setting_submenu' }
                 = active_link 'Register a new bike', new_bike_path, class_name: 'nav-link'
                 / Include personal bikes here if user has organizations

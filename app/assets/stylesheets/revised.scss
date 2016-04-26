@@ -116,8 +116,6 @@ $grid-sizes: 'xs', 'sm', 'md', 'lg', 'xl';
 $grid-breakpoints: $grid-breakpoint-xs, $grid-breakpoint-sm, $grid-breakpoint-md, $grid-breakpoint-lg, $grid-breakpoint-xl;
 $row-side-padding: 0.9375rem;
 
-.padded-row { @extend .row; margin-top: $vertical-height; }
-
 // Settings
 @import "revised/fonts";
 
@@ -142,8 +140,10 @@ $row-side-padding: 0.9375rem;
 @import "revised/sections/sharing";
 @import "revised/sections/attr_list";
 @import "revised/sections/sign_in_up";
-@import "revised/sections/bike_show_photo";
 @import "revised/sections/ad_blocks";
+@import "revised/sections/bike_show_photo";
+@import "revised/sections/bike_search_form";
+@import "revised/sections/bike_boxes";
 
 // 
 // Page styles

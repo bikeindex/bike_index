@@ -25,7 +25,6 @@ class BikesController < ApplicationController
     params[:stolen] = true unless params[:stolen].present? || params[:non_stolen].present?
     if params[:proximity].present? && params[:proximity].strip.downcase == 'ip'
       params[:proximity] = request.env['HTTP_X_FORWARDED_FOR'].split(',')[0] if request.env['HTTP_X_FORWARDED_FOR']
-      # Geocoder.search(request.env["HTTP_X_FORWARDED_FOR"].split(',')[0])
     end
     search = BikeSearcher.new(params)
     bikes = search.find_bikes
@@ -34,15 +33,19 @@ class BikesController < ApplicationController
     bikes = bikes.page(page).per(@per_page)
     if params[:serial].present? && page == 1
       secondary_bikes = search.fuzzy_find_serial
-      # secondary_bikes = search.find_bikes
       @secondary_bikes = secondary_bikes.decorate if secondary_bikes.present?
     end
     @bikes = bikes.decorate
     @query = params[:query]
     @query = request.query_parameters()
     @url = request.original_url
+    @stolenness = search.stolenness_type
     @selectize_items = search.selectize_items
-    render layout: 'application_updated'
+    if revised_layout_enabled?
+      render :index_revised, layout: 'application_revised'
+    else
+      render layout: 'application_updated'
+    end
   end
 
   def show

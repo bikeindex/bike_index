@@ -46,7 +46,7 @@
 / Caching should go here:
 / - cache(@bike) do
 .container
-  .row.first-row
+  .row
     .col-md-8
       %h1
         - if @bike.stolen
@@ -71,7 +71,7 @@
       .ad-block.ad468x60
         %h4
           468X60
-  .padded-row
+  .row
     / Bike Photo!
     .col-md-8
       .bike-photos
@@ -101,9 +101,92 @@
             %h4.stock-photo
               Stock photo of a #{@bike.year} #{@bike.frame_model}
               %span Color may not match!
-            .current-photo
+            .current-photo#stock_photo_img
               = image_tag(@bike.stock_photo_url, alt: "#{@bike.type.titleize} photo", id: "i|0", data: {action: 'zoom', original: @bike.stock_photo_url})
 
+      .show-bike-details
+        %ul.attr-list.split-sm
+          = @bike.attr_list_item(@bike.serial_display, 'Serial', with_colon: true)
+          - unless @bike.type == 'bike'
+            = @bike.attr_list_item(@bike.type.titleize, 'Cycle type', with_colon: true)
+          = @bike.attr_list_item(@bike.mnfg_name, 'Manufacturer', with_colon: true)
+          = @bike.attr_list_item(@bike.frame_model, 'Model', with_colon: true)
+          = @bike.attr_list_item(@bike.year.to_s, 'Year', with_colon: true)
+          = @bike.attr_list_item(@bike.frame_colors.to_sentence, 'Primary colors', with_colon: true)
+          = @bike.attr_list_item(@bike.size_display, 'Frame size', with_colon: true)
+          - if @bike.front_wheel_size_id.present?
+            - front_tire_width = @bike.front_tire_narrow ? '(Narrow tire)' : '(Wide tire)'
+            - if @bike.front_wheel_size_id == @bike.rear_wheel_size_id
+              = @bike.attr_list_item(@bike.ass_name('front_wheel_size', front_tire_width), 'Wheel diameter', with_colon: true)
+            - else
+              = @bike.attr_list_item(@bike.ass_name('front_wheel_size', front_tire_width), 'Front wheel diameter', with_colon: true)
+              - rear_tire_width = @bike.rear_tire_narrow ? '(Narrow tire)' : '(Wide tire)'
+              = @bike.attr_list_item(@bike.ass_name('rear_wheel_size', rear_tire_width), 'Rear wheel diameter', with_colon: true)
+          = @bike.attr_list_item(@bike.ass_name('frame_material'), 'Frame Material', with_colon: true)
+          = @bike.attr_list_item(@bike.ass_name('handlebar_type'), 'Handlebar type', with_colon: true)
+        - if @bike.description.present?
+          %h3
+            Distinguishing features
+          %p
+            = @bike.description
+        - if @bike.stolen
+          %h3
+            Theft Details
+          .row
+            .col-md-8
+              = render 'stolen_map'
+            .col-md-4
+              %ul.attr-list.separate-lines
+                = @bike.attr_list_item(@stolen_record.show_stolen_address, 'Location')
+                = @bike.attr_list_item(@stolen_record.locking_description, 'Locking description')
+                = @bike.attr_list_item(@stolen_record.lock_defeat_description, 'Locking circumvented')
+                = @bike.attr_list_item((l @stolen_record.date_stolen, format: :dotted), 'Date stolen')
+                = @bike.attr_list_item(@stolen_record.police_report_number, 'Police report #')
+                = @bike.attr_list_item(@stolen_record.police_report_department, 'Department & city')
+          - if @stolen_record.theft_description.present?
+            %h3
+              Description of incident
+            %p
+              = @stolen_record.theft_description
+
+      .components
+        - cgroups = @bike.cgroup_array.map { |id| { name: Cgroup.find(id).name, id: id } }
+        - if cgroups.any?
+          %ul.nav.nav-tabs.component-types{ role: 'tablist' }
+            - cgroups.each_with_index do |cgroup, index|
+              %li.nav-item
+                - link_class = index == 0 ? 'active' : ''
+                %a.nav-link{ class: link_class, href: "#cgroup_#{cgroup[:id]}", data: { toggle: 'tab', role: 'tab' } }
+                  = cgroup[:name]
+          .tab-content.component-group-wrap
+            - cgroups.each_with_index do |cgroup, index|
+              - tab_class = index == 0 ? 'active' : ''
+              .tab-pane.component-group{ id: "cgroup_#{cgroup[:id]}", class: tab_class }
+                .card
+                  .card-block
+                    %h3.cgroup-name
+                      = cgroup[:name]
+                    %ul.attr-list
+                      - @components.each do |component|
+                        - next unless component.cgroup_id == cgroup[:id]
+                        %li
+                          %span.attr-title
+                            - if component.front && component.rear
+                              Front & rear
+                            - elsif component.front
+                              Front
+                            - elsif component.rear
+                              Rear
+                            - if component.component_type == "unknown"
+                              Other
+                            - else
+                              = component.component_type.titleize if component.component_type.present?
+                          = component.description
+                          - if component.year.present? ||  component.model_name.present? || component.manufacturer.present?
+                            #{component.model_name}
+                            = "#{component.year}" if component.year.present?
+                            - if component.manufacturer.present?
+                              (#{component.mnfg_name})
     .col-md-4
       .social-share-bike
         %h4
@@ -139,91 +222,6 @@
               
               %a{ href: "tell:#{@stolen_record.phone}" }
                 = @stolen_record.phone
-
-  .padded-row
-    .col-md-8.show-bike-details
-      %ul.attr-list.split-sm
-        = @bike.attr_list_item(@bike.serial_display, 'Serial', with_colon: true)
-        - unless @bike.type == 'bike'
-          = @bike.attr_list_item(@bike.type.titleize, 'Cycle type', with_colon: true)
-        = @bike.attr_list_item(@bike.mnfg_name, 'Manufacturer', with_colon: true)
-        = @bike.attr_list_item(@bike.frame_model, 'Model', with_colon: true)
-        = @bike.attr_list_item(@bike.year.to_s, 'Year', with_colon: true)
-        = @bike.attr_list_item(@bike.frame_colors.to_sentence, 'Primary colors', with_colon: true)
-        = @bike.attr_list_item(@bike.size_display, 'Frame size', with_colon: true)
-        - if @bike.front_wheel_size_id.present?
-          - front_tire_width = @bike.front_tire_narrow ? '(Narrow tire)' : '(Wide tire)'
-          - if @bike.front_wheel_size_id == @bike.rear_wheel_size_id
-            = @bike.attr_list_item(@bike.ass_name('front_wheel_size', front_tire_width), 'Wheel diameter', with_colon: true)
-          - else
-            = @bike.attr_list_item(@bike.ass_name('front_wheel_size', front_tire_width), 'Front wheel diameter', with_colon: true)
-            - rear_tire_width = @bike.rear_tire_narrow ? '(Narrow tire)' : '(Wide tire)'
-            = @bike.attr_list_item(@bike.ass_name('rear_wheel_size', rear_tire_width), 'Rear wheel diameter', with_colon: true)
-        = @bike.attr_list_item(@bike.ass_name('frame_material'), 'Frame Material', with_colon: true)
-        = @bike.attr_list_item(@bike.ass_name('handlebar_type'), 'Handlebar type', with_colon: true)
-      - if @bike.description.present?
-        %h3
-          Distinguishing features
-        %p
-          = @bike.description
-      - if @bike.stolen
-        %h3
-          Theft Details
-        .row
-          .col-md-8
-            = render 'stolen_map'
-          .col-md-4
-            %ul.attr-list.separate-lines
-              = @bike.attr_list_item(@stolen_record.show_stolen_address, 'Location')
-              = @bike.attr_list_item(@stolen_record.locking_description, 'Locking description')
-              = @bike.attr_list_item(@stolen_record.lock_defeat_description, 'Locking circumvented')
-              = @bike.attr_list_item((l @stolen_record.date_stolen, format: :dotted), 'Date stolen')
-              = @bike.attr_list_item(@stolen_record.police_report_number, 'Police report #')
-              = @bike.attr_list_item(@stolen_record.police_report_department, 'Department & city')
-        - if @stolen_record.theft_description.present?
-          %h3
-            Description of incident
-          %p
-            = @stolen_record.theft_description
-    .ad-block.ad300x600
-      %h4
-        300x600
-
-  .padded-row.components
-    - cgroups = @bike.cgroup_array.map { |id| { name: Cgroup.find(id).name, id: id } }
-    - if cgroups.any?
-      %ul.nav.nav-tabs.component-types{ role: 'tablist' }
-        - cgroups.each_with_index do |cgroup, index|
-          %li.nav-item
-            - link_class = index == 0 ? 'active' : ''
-            %a.nav-link{ class: link_class, href: "#cgroup_#{cgroup[:id]}", data: { toggle: 'tab', role: 'tab' } }
-              = cgroup[:name]
-      .tab-content.component-group-wrap
-        - cgroups.each_with_index do |cgroup, index|
-          - tab_class = index == 0 ? 'active' : ''
-          .tab-pane.component-group{ id: "cgroup_#{cgroup[:id]}", class: tab_class }
-            .card
-              .card-block
-                %h3.cgroup-name
-                  = cgroup[:name]
-                %ul.attr-list
-                  - @components.each do |component|
-                    - next unless component.cgroup_id == cgroup[:id]
-                    %li
-                      %span.attr-title
-                        - if component.front && component.rear
-                          Front & rear
-                        - elsif component.front
-                          Front
-                        - elsif component.rear
-                          Rear
-                        - if component.component_type == "unknown"
-                          Other
-                        - else
-                          = component.component_type.titleize if component.component_type.present?
-                      = component.description
-                      - if component.year.present? ||  component.model_name.present? || component.manufacturer.present?
-                        #{component.model_name}
-                        = "#{component.year}" if component.year.present?
-                        - if component.manufacturer.present?
-                          (#{component.mnfg_name})
+      .ad-block.ad300x600
+        %h4
+          300x600

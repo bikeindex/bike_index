@@ -1,0 +1,81 @@
+.container
+  .row.first-row
+    .col-md-8
+      %h1
+        Search for bikes
+    .col-md-4
+      .ad-block.ad468x60
+        %h4
+          468X60
+  .row
+    .col-md-8
+      = form_tag bikes_path, id: 'bike_search_form', class: 'bike-search-form', method: :get do
+        - params[:query] = params[:query].gsub(/,?#,?/,'').gsub(/(\A,|,\z)/, '') if params[:query].present?
+        .query-field-wrap
+          = text_field_tag :query,                      |
+            strip_tags(params[:query]),                 |
+            placeholder: 'Search Bike Index',           |
+            class: 'form-control query-field',          |
+            data: { initial: @selectize_items.to_json }
+        .search-button-wrap
+          = button_tag(type: 'submit', class: 'searchit btn btn-primary') do
+            :plain
+              <svg id="search-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29"><defs><style>.cls-1,.cls-2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:2px;}.cls-2{stroke-linecap:round;}</style></defs><title>searcher</title><circle class="cls-1" cx="10.39" cy="10.39" r="9.39"/><line class="cls-2" x1="17.03" y1="17.03" x2="28" y2="28"/></svg>
+        .stolen-search-fields
+          = text_field_tag :proximity, params[:proximity], placeholder: 'Anywhere', class: 'form-control stolen-proximity'
+          %span
+            miles of
+          = number_field_tag :proximity_radius, params[:proximity_radius] || 100, placeholder: '100', min: 1, class: 'form-control stolen-radius'
+          %span
+            within
+          = hidden_field_tag :stolen, params[:stolen] || true
+          = hidden_field_tag :non_stolen, params[:non_stolen] || ''
+          = hidden_field_tag :non_proximity, params[:non_proximity] || ''
+
+      .search-type-tabs{ data: { query: request.original_url.split('bikes?').last } }
+        %ul.nav.nav-tabs{ role: 'tablist' }
+          %li.nav-item
+            %a#stolen_proximity_tab.nav-link{ href: '#', class: ('active' if @stolenness == 'stolen_proximity'), role: 'tab' }
+              Stolen within
+              %span#search_distance
+                X
+              miles of
+              %span#search_location
+                you
+              %span.count
+          %li.nav-item
+            %a#stolen_tab.nav-link{ href: '#', class: ('active' if @stolenness == 'stolen'), role: 'tab' }
+              Stolen anywhere
+              %span.count
+          %li.nav-item
+            %a#non_stolen_tab.nav-link{ href: '#', class: ('active' if @stolenness == 'non_stolen'), role: 'tab' }
+              Not marked stolen
+              %span.count
+
+      - if @bikes.present?
+        %ul.bike-boxes
+          = render partial: '/bikes/revised_bike', collection: @bikes, as: :bike, locals: { target: 'show' }
+          .paginate-container-bottom
+            = paginate @bikes
+            
+
+      - else
+        .container
+          %h1.no-results
+            - desc = { 'stolen_proximity' => 'nearby stolen bikes', 'non_stolen' => 'non-stolen bikes', 'stolen' => 'bikes stolen anywhere' }
+            No #{desc[@stolenness]}
+            - if @secondary_bikes.present?
+              exactly match that serial
+            - else
+              matched your search
+
+      - if @secondary_bikes.present?  
+        .container
+          %h2.secondary-bikes
+            Serial numbers close to
+            %em
+              #{params[:serial]}
+
+          %ul.bike-boxes
+            = render partial: '/bikes/revised_bike', collection: @secondary_bikes, locals: { target: 'show' }
+

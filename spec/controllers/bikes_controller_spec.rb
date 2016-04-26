@@ -3,15 +3,57 @@ require 'spec_helper'
 describe BikesController do
   describe 'index' do
     context 'no subdomain' do
-      before do
-        get :index
+      context 'legacy' do
+        it 'renders' do
+          get :index
+          expect(response.status).to eq(200)
+          expect(response).to render_template(:index)
+          expect(response).to render_with_layout('application_updated')
+          expect(flash).to_not be_present
+          expect(assigns(:per_page)).to eq 10
+        end
       end
-      it { is_expected.to respond_with(:success) }
-      it { is_expected.to render_template(:index) }
-      it { is_expected.not_to set_flash }
-
-      it 'sets per_page correctly' do
-        expect(assigns(:per_page)).to eq 10
+      context 'revised' do
+        context 'no params' do
+          it 'renders' do
+            allow(controller).to receive(:revised_layout_enabled?) { true }
+            get :index
+            expect(response.status).to eq(200)
+            expect(response).to render_template(:index_revised)
+            expect(response).to render_with_layout('application_revised')
+            expect(flash).to_not be_present
+            expect(assigns(:per_page)).to eq 10
+            expect(assigns(:stolenness)).to eq 'stolen'
+          end
+        end
+        context 'proximity' do
+          it 'renders' do
+            allow(controller).to receive(:revised_layout_enabled?) { true }
+            get :index, proximity: 'ip'
+            expect(response.status).to eq(200)
+            expect(flash).to_not be_present
+            expect(assigns(:per_page)).to eq 10
+            expect(assigns(:stolenness)).to eq 'stolen_proximity'
+          end
+        end
+        context 'serial_param' do
+          it 'renders' do
+            manufacturer = FactoryGirl.create(:manufacturer)
+            color = FactoryGirl.create(:color)
+            get :index,
+                query: "c_#{color.id},s#serialzzzzzz#,m_#{manufacturer.id}",
+                stolen: '',
+                non_stolen: 'true'
+            expect(response.status).to eq(200)
+            target_selectize_items = [
+              manufacturer.autocomplete_result_hash,
+              color.autocomplete_result_hash,
+              { id: 'serial', search_id: 's#serialzzzzzz#', text: 'serialzzzzzz' }
+            ].as_json
+            expect(assigns(:selectize_items)).to eq target_selectize_items
+            expect(assigns(:stolenness)).to eq 'non_stolen'
+          end
+        end
       end
     end
     context 'with subdomain' do
@@ -401,6 +443,7 @@ describe BikesController do
       end
       context 'no existing b_param' do
         it "creates a bike and doesn't create a b_param" do
+          wheel_size = FactoryGirl.create(:wheel_size)
           bike_params = {
             b_param_id_token: '',
             cycle_type_id: CycleType.bike.id.to_s,
@@ -415,6 +458,11 @@ describe BikesController do
             owner_email: 'something@stuff.com'
           }
           expect(BParam.all.count).to eq 0
+          bb_data = { bike: { rear_wheel_bsd: wheel_size.iso_bsd.to_s }, components: [] }
+          # We need to call clean_params on the BParam after bikebook update, so that
+          # the foreign keys are assigned correctly. This is how we test that we're 
+          # This is also where we're testing bikebook assignment
+          expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
           expect do
             post :create, bike: bike_params.as_json
           end.to change(Bike, :count).by(1)
@@ -439,6 +487,11 @@ describe BikesController do
             owner_email: 'something@stuff.com'
           }
           b_param = BParam.create(params: { bike: bike_params })
+          bb_data = { bike: { } }
+          # We need to call clean_params on the BParam after bikebook update, so that
+          # the foreign keys are assigned correctly. This is how we test that we're 
+          # This is also where we're testing bikebook assignment
+          expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
           expect do
             post :create, bike: { manufacturer_id: manufacturer.slug, b_param_id_token: b_param.id_token }
           end.to change(Bike, :count).by(1)
