@@ -5,7 +5,6 @@ body { padding-top: 8*$vertical-height; }
 }
 
 
-
 // Header nav
 .primary-header-nav {
   background: $primary-nav-background;
@@ -42,9 +41,7 @@ body { padding-top: 8*$vertical-height; }
     }
   }
   .hamburgler { font-family: courier; }
-  .settings-link {
-    img { display: none; }
-  }
+  .settings-link svg { display: none; }
 }
 
 // 
@@ -178,7 +175,7 @@ $mainmenu-open-zindex: 10;
         padding-top: .5*$vertical-height;
         padding-bottom: .5*$vertical-height;
         .settings-text { display: none; }
-        img {
+        svg {
           display: block;
           height: 2*$vertical-height;
           width: auto;

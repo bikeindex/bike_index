@@ -1,18 +1,18 @@
 class BikeIndex.BikeSearchBar extends BikeIndex
-  constructor: (target_selector = '#head-search-bikes #query') ->
+  constructor: (target_selector = '#bike_search_form #query') ->
     @initializeHeaderSearch($(target_selector))
 
-  updateIncludeSerialOption: ->
+  updateIncludeSerialOption: ($query_field) ->
     # Check if the header search includes the serial string match, set it on the window
-    window.includeSerialOption = !($('#head-search-bikes #query').val().match(/s(#|%23)[^(#|%23)]*(#|%23)/))
+    query_val = $query_field.val()
+    window.includeSerialOption = !(query_val.match(/s(#|%23)[^(#|%23)]*(#|%23)/))
 
-  initializeHeaderSearch: ($target) ->
-    initial_opts = if $target.data('initial') then $target.data('initial') else []
-    # initial_opts = $('#selectize_items').data('initial') if $('#selectize_items').data('initial')
+  initializeHeaderSearch: ($query_field) ->
+    initial_opts = if $query_field.data('initial') then $query_field.data('initial') else []
     per_page = 15
     renderOption = @renderOption
     updateIncludeSerialOption = @updateIncludeSerialOption
-    $target.selectize
+    $query_field.selectize
       plugins: ['restore_on_backspace', 'remove_button']
       create: true
       options:  initial_opts # So that they have words
@@ -61,7 +61,7 @@ class BikeIndex.BikeSearchBar extends BikeIndex
           "<div class='create'><span class='sch_'>Search all bikes for</span> <span class='label'>" + escape(data.input) + "</span>&hellip;</div>"
       onChange: (value) ->
         # On change doesn't cover everything, so run it all the time
-        updateIncludeSerialOption()
+        updateIncludeSerialOption($query_field)
         true
       onType: (str) ->
         for k in Object.keys(this.options)
@@ -72,13 +72,13 @@ class BikeIndex.BikeSearchBar extends BikeIndex
             delete this.options[k] if (k.length > str + 3) || str.length < 3
         true
       onItemAdd: (value, $item) ->
-        updateIncludeSerialOption()
+        updateIncludeSerialOption($query_field)
         true
       onItemRemove: (value) ->
-        updateIncludeSerialOption()
+        updateIncludeSerialOption($query_field)
         true
       onInitialize: ->
-        updateIncludeSerialOption()
+        updateIncludeSerialOption($query_field)
 
   renderOption: (item, escape) ->
     prefix = switch

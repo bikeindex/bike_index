@@ -1,139 +1,92 @@
-#bikes_show {
-  .bike-photos {
-    position: relative;
-    img {
-      display: block;
-      width: 100%;
-      height: auto;
+.bike-search-form {
+  @include make-row();
+  // Query field (main search field)
+  .query-field-wrap {
+    flex: 0 0 83.33333%;
+    padding-left: 0.9375rem;
+    // Space between search bar and button
+    padding-right: $vertical-height;
+  }
+  .query-field { width: 100%; }
+  .selectize-dropdown, .selectize-input { border-radius: $border-radius; }
+  // Selected items
+  .selectize-control.multi .selectize-input > div {
+    background: none;
+    border: 1px solid $blue;
+    padding-left: 4px;
+    line-height: 1.75;
+  }
+  .selectize-dropdown-content {
+    .sch_s { display: inline-block; }
+    .sch_m, .sch_ { color: #ccc; }
+    .sch_special { border-bottom: 1px solid #ddd; }
+    .sch_c {
+      color: #bbb;
+      display: inline-block;
     }
   }
-
-  .bike-photos .image-holder {
-    z-index: 1;
-    // overflow: hidden;
-    a { display: block; }
-    img {
-      transition: opacity ease-in-out .3s;
-      cursor: pointer;
-      opacity: 0;
-      margin: 0 auto;
-    }
-    .current-photo img {
-      transition: opacity ease-in 1s;
-      opacity: 1;
-    }
-    .current-photo .transitioning-photo, .transitioning-photo {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-    }
+  .search_span_s, .search_span_m {
+    color: #bbb;
+    margin-left: 0;
+    margin-right: 3px;
+    display: inline;
   }
-
-  $thumbnails-height: 120px;
-  .thumbnail-shadow, .thumbnail-shadow-r {
-    display: none;
-    position: absolute;
-    bottom: -2px;
-    height: $thumbnails-height+2px;
-    width: 10px;
-    z-index: 20;
+  .sclr {
+    border-radius: 3px;
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 1px solid white;
+    line-height: .8em;
+    margin: 0 6px 0 0;
+    font-size: .5em;
+    text-align: center;
+    padding-top: 1em;
   }
-
-  .overflown {
-    .thumbnail-shadow, .thumbnail-shadow-r { display: block; }
-    .photo-list ul { left: -2px; }
+  // Search button
+  .search-button-wrap {
+    flex: 0 0 16.66667%;
+    padding-right: 0.9375rem;
   }
-
-  .thumbnail-shadow {
-    left: 0;
-    box-shadow: inset 8px 0 6px -8px rgba($gray-lighter,.95);
-  }
-  .thumbnail-shadow-r {
-    right: 0;
-    box-shadow: inset -8px 0 6px -8px rgba($gray-lighter,.95);
-  }
-
-  .photo-list {
-    @include clearfix;  
-    border-radius: 0 0 $border-radius $border-radius;
-    margin-top: 10px;
-    clear: both;
-    position: relative;
-    height: $thumbnails-height;
-    background: $body-bg;
-    width: 100%;
-    margin: 0;
+  .searchit {
+    height: 44px;
     padding: 0;
-    overflow-y: hidden;
-    overflow-x: scroll;
-    z-index: 10;
-    ul {
-      list-style-type: none;
-      position: absolute;
-      left: 0; top: 0;
-      overflow: visible;
-      height: 100%;
-      margin: 0;
-      padding: 5px 0;
+    text-align: center;
+    width: 100%;
+    svg {
+      height: 80%;
+      margin-top: 5%;
+      display: inline-block;
+    }
+  }
+  // Location fields
+  .stolen-search-fields {
+    @include make-col();
+    @include make-col-span(12);
+    padding-top: .5em;
+    input, span {
+      display: block;
+      float: right;
+      padding: .25em .5em;
+    }
+    input {
+      background: $gray-lighter;
+      border-radius: $border-radius;
       border: none;
     }
-    li {
-      position: relative;
-      margin: 0;
-      float: left;
-      height: 100%;
-      width: 178px;
-      margin: 0 10px 5px 0;
-      &:last-of-type { margin-right: 0; border-right: none; }
-    }
-    a {
-      height: 100%; 
-      width: 100%;
-      overflow: hidden;
-      display: block;
-    }
-    img {
-      padding: 0;
-      width: 100%;
-      height: auto;
-    }
-    .clickable-image {
-      transition: all ease-in-out .2s;
-      cursor: pointer;
-      border-radius: $border-radius;
-      box-shadow: none;
-      position: relative;
-      padding: 0; margin: 0;
-      display: block;
-      border: 1px solid $gray-lightest;
-      &.current-thumb {
-        transition: all ease-in-out .2s;
-        border-color: $blue;
-        box-shadow: 0 0 2px rgba($blue, .8);
-      }
-    }
+    span { color: $gray-light; }
+    .stolen-radius { width: 4.2em; }
+    .stolen-proximity { width: 30%; }
   }
+}
 
-  .stock-photo {
-    position: absolute;
-    top: 0; left: 0;
-    padding: $vertical-height;
-    background: rgba($blue-dark,.85);
-    box-shadow: 0 0 2px rgba(black, .2);
-    border-radius: $border-radius;
-    border: 1px solid lighten($blue-dark, 10%);
-    border-left: none; border-right: none;
-    width: 100%;
-    font-size: 24px;
-    color: white;
-    text-align: center;
-    // font-family: $body-font;
-    strong { font-weight: 700; }
-    span { 
-      display: block;
-      color: rgba(white, .8);
-      font-style: italic;
+@media (max-width: 600px) {
+  .bike-search-form {
+    .selectize-dropdown-content {
+      .sch_s, .sch_m, .sch_ {
+        font-size: 14px;
+        span { display: none; }
+      }
     }
   }
 }

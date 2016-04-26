@@ -1,21 +1,11 @@
 class BikeIndex.BikesIndex extends BikeIndex
   constructor: ->
     new BikeIndex.BikeSearchBar
+    setSearchProximity()
 
   initializeEventListeners: ->
     pagespace = @
     
-    # $('#thumbnails .clickable-image').click (e) ->
-    #   pagespace.clickPhoto(e)
-    # # Rotate photos on arrow key presses
-    # $(document).keyup (e) ->
-    #   pagespace.rotatePhotosOnArrows(e)
-    # # If the window scrolls, load photos, so that there isn't a delay when clicking
-    # # on them - and so we don't load them unless there is interaction with the page
-    # $(window).scroll ->
-    #   pagespace.loadPhotos()
-    #   $(window).unbind('scroll')
-
   setSearchProximity: ->
     proximity = $('#proximity').val()
     unless proximity? and proximity.length > 0
