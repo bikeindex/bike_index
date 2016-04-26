@@ -165,6 +165,9 @@ $row-side-padding: 0.9375rem;
 @import "revised/pages/info/protect_your_bike";
 @import "revised/pages/payments/payments";
 
+// Support pages
+@import "revised/pages/support/faq";
+
 // News pages
 @import "revised/pages/news/index";
 @import "revised/pages/news/show";
@@ -178,7 +181,8 @@ body { min-height: 400px; }
 .currently-hidden { display: none; }
 img { max-width: 100%; } // don't break random stuff images!
 
-
+// Temporarily: 
+.profiler-results { display: none; }
 // 
 // External overrides
 // 

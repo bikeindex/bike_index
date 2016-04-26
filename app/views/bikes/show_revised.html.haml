@@ -133,8 +133,7 @@
           %h3
             Theft Details
           .row
-            .col-md-8
-              = render 'stolen_map'
+            = render 'stolen_map'
             .col-md-4
               %ul.attr-list.separate-lines
                 = @bike.attr_list_item(@stolen_record.show_stolen_address, 'Location')
@@ -149,44 +148,42 @@
             %p
               = @stolen_record.theft_description
 
-      .components
-        - cgroups = @bike.cgroup_array.map { |id| { name: Cgroup.find(id).name, id: id } }
-        - if cgroups.any?
-          %ul.nav.nav-tabs.component-types{ role: 'tablist' }
-            - cgroups.each_with_index do |cgroup, index|
-              %li.nav-item
-                - link_class = index == 0 ? 'active' : ''
-                %a.nav-link{ class: link_class, href: "#cgroup_#{cgroup[:id]}", data: { toggle: 'tab', role: 'tab' } }
-                  = cgroup[:name]
-          .tab-content.component-group-wrap
-            - cgroups.each_with_index do |cgroup, index|
-              - tab_class = index == 0 ? 'active' : ''
-              .tab-pane.component-group{ id: "cgroup_#{cgroup[:id]}", class: tab_class }
-                .card
-                  .card-block
-                    %h3.cgroup-name
-                      = cgroup[:name]
-                    %ul.attr-list
-                      - @components.each do |component|
-                        - next unless component.cgroup_id == cgroup[:id]
-                        %li
-                          %span.attr-title
-                            - if component.front && component.rear
-                              Front & rear
-                            - elsif component.front
-                              Front
-                            - elsif component.rear
-                              Rear
-                            - if component.component_type == "unknown"
-                              Other
-                            - else
-                              = component.component_type.titleize if component.component_type.present?
-                          = component.description
-                          - if component.year.present? ||  component.model_name.present? || component.manufacturer.present?
-                            #{component.model_name}
-                            = "#{component.year}" if component.year.present?
-                            - if component.manufacturer.present?
-                              (#{component.mnfg_name})
+    
+      - cgroups = @bike.cgroup_array.map { |id| { name: Cgroup.find(id).name, id: id } }
+      - if cgroups.any?
+        %ul.nav.nav-tabs.component-types{ role: 'tablist' }
+          - cgroups.each_with_index do |cgroup, index|
+            %li.nav-item
+              - link_class = index == 0 ? 'active' : ''
+              %a.nav-link{ class: link_class, href: "#cgroup_#{cgroup[:id]}", data: { toggle: 'tab', role: 'tab' } }
+                = cgroup[:name]
+        .tab-content.component-group-wrap
+          - cgroups.each_with_index do |cgroup, index|
+            - tab_class = index == 0 ? 'active' : ''
+            .tab-pane.component-group{ id: "cgroup_#{cgroup[:id]}", class: tab_class }
+              %h3.cgroup-name
+                = cgroup[:name]
+              %ul.attr-list
+                - @components.each do |component|
+                  - next unless component.cgroup_id == cgroup[:id]
+                  %li
+                    %span.attr-title
+                      - if component.front && component.rear
+                        Front & rear
+                      - elsif component.front
+                        Front
+                      - elsif component.rear
+                        Rear
+                      - if component.component_type == "unknown"
+                        Other
+                      - else
+                        = component.component_type.titleize if component.component_type.present?
+                    = component.description
+                    - if component.year.present? ||  component.model_name.present? || component.manufacturer.present?
+                      #{component.model_name}
+                      = "#{component.year}" if component.year.present?
+                      - if component.manufacturer.present?
+                        (#{component.mnfg_name})
     .col-md-4
       .social-share-bike
         %h4

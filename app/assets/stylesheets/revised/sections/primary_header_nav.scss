@@ -4,6 +4,9 @@ body { padding-top: 8*$vertical-height; }
   body { padding-top: 12*$vertical-height; }
 }
 
+$primary-logo-fullsize-height: 84px;
+$primary-logo-padding: .5*$vertical-height;
+$primary-logo-padding-mobile: $vertical-height;
 
 // Header nav
 .primary-header-nav {
@@ -15,7 +18,7 @@ body { padding-top: 8*$vertical-height; }
   .primary-logo {
     position: relative;
     float: left;
-    padding: $vertical-height 0;
+    padding: $primary-logo-padding 0;
     img {
       display: block;
       height: 44px;
@@ -54,6 +57,7 @@ $mainmenu-open-zindex: 10;
     transition: transform 200ms linear;
     &.headroom--pinned { transform: translate(0, 0%); }
     &.headroom--unpinned { transform: translate(0, -100%); }
+    .primary-logo { padding: $primary-logo-padding-mobile 0; }
     .hamburgler {
       float: right;
       position: relative;
@@ -208,9 +212,10 @@ $mainmenu-open-zindex: 10;
   // To prevent flashing on initial load, before JS arrives
   .primary-header-nav, .primary-header-nav.headroom--top, 
   .primary-header-nav.headroom--top.headroom--pinned {
-    .primary-logo img { height: 82px; }
+    .primary-logo img { height: $primary-logo-fullsize-height - 2*$primary-logo-padding; }
     .primary-nav-item {
-      padding: 2.66*$vertical-height 0 2*$vertical-height;
+      // nav-items are 34px tall.
+      padding: .5*($primary-logo-fullsize-height - 34px) 0 2*$vertical-height;
       a.active::after { bottom: 2*$vertical-height; }
     }
   }
