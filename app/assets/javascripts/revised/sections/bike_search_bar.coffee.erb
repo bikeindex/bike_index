@@ -1,6 +1,73 @@
 class BikeIndex.BikeSearchBar extends BikeIndex
   constructor: (target_selector = '#bike_search_form #query') ->
     @initializeHeaderSearch($(target_selector))
+    @setSearchProximity()
+    @initializeEventListeners()
+
+  initializeEventListeners: ->
+    pagespace = @
+    $('#stolen_proximity_tab').click (e) ->
+      pagespace.proximitySearch(e)
+    $('#stolen_tab').click (e) ->
+      pagespace.stolenSearch(e)
+    $('#non_stolen_tab').click (e) ->
+      pagespace.nonStolenSearch(e)
+    
+  setSearchProximity: ->
+    # This stuff will eventually get setup globally, for now it's here
+    proximity = $('#proximity').val()
+    unless proximity? and proximity.length > 0
+      proximity = localStorage.getItem('location')
+      proximity = 'ip' unless proximity? and proximity.length > 0
+      $('#proximity').val(proximity)
+    localStorage.setItem('location', proximity)
+    # set up search view if we're on bike search
+    @setSearchTabInfo(proximity)
+
+  setSearchTabInfo: (proximity) ->
+    $('#search_distance').text($('#proximity_radius').val())
+    $('#search_location').text(proximity)
+    pagespace = @
+    query = $('.search-type-tabs').attr('data-query')
+    $.ajax
+      type: 'GET'
+      url: "<%= ENV['BASE_URL'] %>/api/v2/bikes_search/count?#{query}"
+      success: (data) ->
+        pagespace.insertTabCounts(data)
+
+  displayedCountNumber: (number) ->
+    if number > 999
+      if number > 9999
+        number = '10k+'
+      else
+        number = "#{String(number).charAt(0)}k+"
+    "(#{number})"
+
+  insertTabCounts: (counts) ->
+    displayedCountNumber = @displayedCountNumber
+    $('#stolen_tab .count').text(displayedCountNumber(counts.stolen))
+    $('#stolen_proximity_tab .count').text(displayedCountNumber(counts.proximity))
+    $('#non_stolen_tab .count').text(displayedCountNumber(counts.non_stolen))
+
+  stolenSearch: (e) ->
+    e.preventDefault()
+    $('#stolen').val('true')
+    $('#non_stolen').val('')
+    $('#non_proximity').val('true')
+    $('#bike_search_form').submit()
+
+  nonStolenSearch: (e) ->
+    e.preventDefault()
+    $('#stolen').val('')
+    $('#non_stolen').val('true')
+    $('#bike_search_form').submit()
+
+  proximitySearch: (e) ->
+    e.preventDefault()
+    $('#stolen').val('true')
+    $('#non_stolen').val('')
+    $('#non_proximity').val('')
+    $('#bike_search_form').submit()
 
   updateIncludeSerialOption: ($query_field) ->
     # Check if the header search includes the serial string match, set it on the window

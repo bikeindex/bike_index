@@ -32,22 +32,10 @@
           = hidden_field_tag :non_stolen, params[:non_stolen] || ''
           = hidden_field_tag :non_proximity, params[:non_proximity] || ''
 
-
-
-    - if params[:stolen].present? && params[:stolen].to_s != 'false'
-      - if params[:non_proximity].present? && params[:non_proximity].to_s != 'false'
-        - active = 'stolen'
-      - else
-        - active = 'proximity'
-    - else
-      - active = 'non_stolen'
-    - url = request.original_url.split('bikes?').last
-    - url = "#{ENV['BASE_URL']}/api/v2/bikes_search/count?#{url}"
-    %nav#search_tabs.bikes-search-type-tabs{ data: {url: url }}
-      .container
-        %ul
-          %li
-            %a#proximity_tab{ href: '#', class: ('active' if active == 'proximity')}
+      .search-type-tabs{ data: { query: request.original_url.split('bikes?').last } }
+        %ul.nav.nav-tabs{ role: 'tablist' }
+          %li.nav-item
+            %a#stolen_proximity_tab.nav-link{ href: '#', class: ('active' if @stolenness == 'stolen_proximity'), role: 'tab' }
               Stolen within
               %span#search_distance
                 X
@@ -55,52 +43,41 @@
               %span#search_location
                 you
               %span.count
-          %li
-            %a#stolen_tab{ href: '#', class: ('active' if active == 'stolen') }
+          %li.nav-item
+            %a#stolen_tab.nav-link{ href: '#', class: ('active' if @stolenness == 'stolen'), role: 'tab' }
               Stolen anywhere
               %span.count
-          %li
-            %a#non_stolen_tab{ href: '#', class: ('active' if active == 'non_stolen') }
+          %li.nav-item
+            %a#non_stolen_tab.nav-link{ href: '#', class: ('active' if @stolenness == 'non_stolen'), role: 'tab' }
               Not marked stolen
               %span.count
-          / %li
-          /   %a.most-recent#stolen_most_recent{ href: '#' }
-          /     Most recent stolen bikes near you
-        .bottom-cover
-              
 
-    - if @bikes.present?
-
-      %ul.bike-boxes
-        = render partial: "/bikes/bike_u", collection: @bikes, locals: {target: "show" }
-
-      .container
-        .paginate-container-bottom
-          = paginate @bikes
-          
-
-    - else
-      .container
-        %h1.no-results
-          - if active == 'proximity'
-            - desc = "nearby stolen bikes"
-          - elsif active == 'non_stolen'
-            - desc = 'non-stolen bikes'
-          - elsif active == 'stolen'
-            - desc = 'bikes stolen anywhere'
-          No #{desc}
-          - if @secondary_bikes.present?
-            exactly match that serial
-          - else
-            matched your search
-
-    - if @secondary_bikes.present?  
-      .container
-        %h2.secondary-bikes
-          Serial numbers close to
-          %em
-            #{params[:serial]}
-
+      - if @bikes.present?
         %ul.bike-boxes
-          = render partial: "/bikes/bike_u", collection: @secondary_bikes, locals: {target: "show" }
+          = render partial: "/bikes/bike_u", collection: @bikes, locals: {target: "show" }
+
+        .container
+          .paginate-container-bottom
+            = paginate @bikes
+            
+
+      - else
+        .container
+          %h1.no-results
+            - desc = { 'stolen_proximity' => 'nearby stolen bikes', 'non_stolen' => 'non-stolen bikes', 'stolen' => 'bikes stolen anywhere' }
+            No #{desc[@stolenness]}
+            - if @secondary_bikes.present?
+              exactly match that serial
+            - else
+              matched your search
+
+      - if @secondary_bikes.present?  
+        .container
+          %h2.secondary-bikes
+            Serial numbers close to
+            %em
+              #{params[:serial]}
+
+          %ul.bike-boxes
+            = render partial: "/bikes/bike_u", collection: @secondary_bikes, locals: {target: "show" }
 
