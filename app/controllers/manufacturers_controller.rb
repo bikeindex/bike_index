@@ -1,6 +1,7 @@
 class ManufacturersController < ApplicationController
   layout 'content'
   before_filter :set_manufacturers_active_section
+  before_filter :set_revised_layout
 
   def index
     @manufacturers = Manufacturer.all
