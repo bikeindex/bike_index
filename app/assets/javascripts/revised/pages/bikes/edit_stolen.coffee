@@ -7,12 +7,11 @@ class BikeIndex.BikesEditStolen extends BikeIndex
       new BikeIndex.ToggleHiddenOther('.country-select-input', united_stated_id)
 
   initializeEventListeners: ->
-    pagespace = @
-    $('#mark-stolen-btn').click (e) ->
-      pagespace.markStolen(e)
-    $('#toggle-stolen form').submit (e) ->
+    $('#mark-stolen-btn').click (e) =>
+      @markStolen(e)
+    $('#toggle-stolen form').submit (e) =>
       e.preventDefault()
-      pagespace.markRecovered()
+      @markRecovered()
 
   initializeDateSelector: ->
     new Pikaday(

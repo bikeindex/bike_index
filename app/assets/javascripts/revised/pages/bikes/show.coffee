@@ -17,17 +17,16 @@ class BikeIndex.BikesShow extends BikeIndex
     @setIdealImageHeight() if $current_photo.length > 0
 
   initializeEventListeners: ->
-    pagespace = @
     # Update photo on click
-    $('#thumbnails .clickable-image').click (e) ->
-      pagespace.clickPhoto(e)
+    $('#thumbnails .clickable-image').click (e) =>
+      @clickPhoto(e)
     # Rotate photos on arrow key presses
-    $(document).keyup (e) ->
-      pagespace.rotatePhotosOnArrows(e)
-    # If the window scrolls, load photos, so that there isn't a delay when clicking
+    $(document).keyup (e) =>
+      @rotatePhotosOnArrows(e)
+    # If the window scrolls, load photos, so there isn't a delay when clicking
     # on them - and so we don't load them unless there is interaction with the page
-    $(window).scroll ->
-      pagespace.loadPhotos()
+    $(window).scroll =>
+      @loadPhotos()
       $(window).unbind('scroll')
 
   showBikeEditOverlay: ->

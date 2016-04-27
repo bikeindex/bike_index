@@ -28,7 +28,6 @@
       google.maps.event.addListener(marker, 'click', (function(marker, i) {
         return function() {
           infowindow.setContent($(marker.shopTarget).find('.map-window').html());
-          console.log(marker)
           infowindow.open(map, marker);
         }
       })(marker, i));

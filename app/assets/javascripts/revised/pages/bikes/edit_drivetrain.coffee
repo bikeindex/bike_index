@@ -5,13 +5,12 @@ class BikeIndex.BikesEditDrivetrain extends BikeIndex
     @setInitialGears()
 
   initializeEventListeners: ->
-    pagespace = @
-    $('.standard-diams select').change (e) ->
-      pagespace.updateDiamsFromStandardChange(e)
-    $('.drive-check').change (e) ->
-      pagespace.toggleDrivetrainChecks(e)
-    $('#edit_drivetrain select').change (e) ->
-      pagespace.updateDrivetrainValue(e)
+    $('.standard-diams select').change (e) =>
+      @updateDiamsFromStandardChange(e)
+    $('.drive-check').change (e) =>
+      @toggleDrivetrainChecks(e)
+    $('#edit_drivetrain select').change (e) =>
+      @updateDrivetrainValue(e)
 
   # 
   # Wheels

@@ -34,8 +34,9 @@ class Admin::OrganizationsController < Admin::BaseController
   end
 
   def update
+    # Needs to update approved before saving so set_locations_shown is applied on save
+    @organization.update_attribute :approved, params[:organization][:approved]
     if @organization.update_attributes(params[:organization])
-      @organization.update_attribute :approved, params[:organization][:approved]
       flash[:notice] = "Organization Saved!"
       redirect_to admin_organization_url(@organization)
     else

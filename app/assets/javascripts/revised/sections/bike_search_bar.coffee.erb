@@ -5,13 +5,12 @@ class BikeIndex.BikeSearchBar extends BikeIndex
     @initializeEventListeners()
 
   initializeEventListeners: ->
-    pagespace = @
-    $('#stolen_proximity_tab').click (e) ->
-      pagespace.proximitySearch(e)
-    $('#stolen_tab').click (e) ->
-      pagespace.stolenSearch(e)
-    $('#non_stolen_tab').click (e) ->
-      pagespace.nonStolenSearch(e)
+    $('#stolen_proximity_tab').click (e) =>
+      @proximitySearch(e)
+    $('#stolen_tab').click (e) =>
+      @stolenSearch(e)
+    $('#non_stolen_tab').click (e) =>
+      @nonStolenSearch(e)
     
   setSearchProximity: ->
     # This stuff will eventually get setup globally, for now it's here
@@ -27,13 +26,12 @@ class BikeIndex.BikeSearchBar extends BikeIndex
   setSearchTabInfo: (proximity) ->
     $('#search_distance').text($('#proximity_radius').val())
     $('#search_location').text(proximity)
-    pagespace = @
     query = $('.search-type-tabs').attr('data-query')
     $.ajax
       type: 'GET'
       url: "<%= ENV['BASE_URL'] %>/api/v2/bikes_search/count?#{query}"
-      success: (data) ->
-        pagespace.insertTabCounts(data)
+      success: (data) =>
+        @insertTabCounts(data)
 
   displayedCountNumber: (number) ->
     if number > 999

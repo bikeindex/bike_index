@@ -9,11 +9,10 @@ class BikeIndex.BikesEditAccessories extends BikeIndex
     new BikeIndex.ToggleHiddenOther('.component-ctype-input', ctype_other_val)
 
   initializeEventListeners: ->
-    pagespace = @
-    $('#form_well_wrap').on 'click', '.remove-part label', (e) ->
-      pagespace.removeComponent(e)
-    $('.add_fields').click (e) ->
-      pagespace.addComponent(e)
+    $('#form_well_wrap').on 'click', '.remove-part label', (e) =>
+      @removeComponent(e)
+    $('.add_fields').click (e) =>
+      @addComponent(e)
 
   removeComponent: (e) ->
     # We don't need to do anything except slide the input up, because the label is on it.

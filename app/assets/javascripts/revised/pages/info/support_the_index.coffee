@@ -3,11 +3,10 @@ class BikeIndex.InfoSupportTheIndex extends BikeIndex
     @initializeEventListeners()
 
   initializeEventListeners: ->
-    pagespace = @
-    $('#open_stripe_checkout_btn').click (e) ->
-      pagespace.openStripeForm(e)
-    $('.select-payment').click (e) ->
-      pagespace.selectPaymentOption(e)
+    $('#open_stripe_checkout_btn').click (e) =>
+      @openStripeForm(e)
+    $('.select-payment').click (e) =>
+      @selectPaymentOption(e)
 
   openStripeForm: (e) ->
     e.preventDefault()
