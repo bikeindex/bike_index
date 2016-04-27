@@ -102,6 +102,17 @@ describe ApplicationHelper do
         end
       end
     end
+    context 'feedbacks' do
+      before { allow(view).to receive(:controller_name) { 'feedbacks' } }
+      %w(index).each do |action|
+        context action do
+          it 'returns nil' do
+            allow(view).to receive(:action_name) { action }
+            expect(helper.current_page_skeleton).to eq 'content_skeleton'
+          end
+        end
+      end
+    end
   end
 
   describe 'content_page_type' do

@@ -23,8 +23,8 @@ module ApplicationHelper
       'edit_bike_skeleton' if %w(edit update).include?(action_name)
     when 'info'
       'content_skeleton' unless %w(terms vendor_terms privacy support_the_index).include?(action_name)
-    when 'news'
-      'content_skeleton'
+    when 'news' then 'content_skeleton'
+    when 'feedbacks' then 'content_skeleton'
     end
   end
 
