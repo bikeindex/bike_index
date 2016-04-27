@@ -17,9 +17,8 @@ class BikeIndex.BikesEdit extends BikeIndex
       when 'accessories' then new BikeIndex.BikesEditAccessories
 
   initializeEventListeners: ->
-    pagespace = @
-    $('.bike-edit-page-select select').change (e) ->
-      pagespace.updatePageLocation(this.value)
+    $('.bike-edit-page-select select').change (e) =>
+      @updatePageLocation(e.target.value)
 
   updatePageLocation: (url) ->
     window.location.href = url

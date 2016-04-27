@@ -5,19 +5,18 @@ class BikeIndex.BikesEditRoot extends BikeIndex
     @setFrameSize()
 
   initializeEventListeners: ->
-    pagespace = @
-    $('#bike_unknown_year').change (e) ->
-      pagespace.toggleUnknownYear()
-    $('#bike_year').change (e) ->
-      pagespace.updateYear()
-    $('#serial-correction form').submit (e) ->
+    $('#bike_unknown_year').change (e) =>
+      @toggleUnknownYear()
+    $('#bike_year').change (e) =>
+      @updateYear()
+    $('#serial-correction form').submit (e) =>
       e.preventDefault()
-      pagespace.requestSerialUpdate()
-    $('#manufacturer-correction form').submit (e) ->
+      @requestSerialUpdate()
+    $('#manufacturer-correction form').submit (e) =>
       e.preventDefault()
-      pagespace.requestManufacturerUpdate()
-    $('.frame-sizes .btn').click (e) ->
-      pagespace.updateFrameSize(e)
+      @requestManufacturerUpdate()
+    $('.frame-sizes .btn').click (e) =>
+      @updateFrameSize(e)
 
   updateYear: ->
     if $('#bike_year').val()

@@ -5,9 +5,8 @@ class BikeIndex.BikesEditPhotos extends BikeIndex
     @initializeImageUploads()
 
   initializeEventListeners: ->
-    pagespace = @
-    $('#public_images').on 'change', '.is_private_check', (e) ->
-      pagespace.updateImagePrivateness(e)
+    $('#public_images').on 'change', '.is_private_check', (e) =>
+      @updateImagePrivateness(e)
     $('.edit-bike-submit-wrapper .btn').click (e) ->
       e.preventDefault()
       location.reload(true)
@@ -67,5 +66,4 @@ class BikeIndex.BikesEditPhotos extends BikeIndex
     is_private = $target.prop('checked')
     id = $target.parents('.edit-photo-display-list-item').prop('id')
     url_target = "#{$('#public_images').data('imagesurl')}/#{id}/is_private"
-    console.log url_target
     $.post(url_target, {is_private: is_private})
