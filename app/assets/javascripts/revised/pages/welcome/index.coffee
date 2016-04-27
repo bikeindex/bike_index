@@ -7,7 +7,7 @@ class BikeIndex.WelcomeIndex extends BikeIndex
     h = $(window).height() - $('.wheel-holder').offset().top
     h = 400 if h > 400
     $('.wheel-holder').css('height', "#{h}px")
-    @spaceWheelHolder(true)
+    # @spaceWheelHolder(true)
     $('.testimonial-container').slick
       infinite: false
       lazyLoad: 'ondemand'
