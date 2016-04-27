@@ -463,7 +463,7 @@ GEM
       railties (~> 3.0)
     swagger-ui_rails (0.1.7)
     temple (0.7.6)
-    therubyracer (0.12.1)
+    therubyracer (0.12.2)
       libv8 (~> 3.16.14.0)
       ref
     thor (0.19.1)
