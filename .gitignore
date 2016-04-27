@@ -15,7 +15,7 @@ public/caches
 public/partner
 .vagrant
 *.rdb
-
+current_stolen_bikes.tsv
 spec/fixtures/tsv_creation/*.tsv
 spec/fixtures/tsv_creation/*.json
 
@@ -32,3 +32,4 @@ log/localeapp.yml
 # Ignore import files
 sm_import_*.json
 spec/fixtures/bikes/*.json
+manufacturer.tsv
