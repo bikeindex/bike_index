@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe ManufacturersController do
   describe 'index' do
-    context 'legacy' do 
+    context 'legacy' do
       it 'renders with content layout' do
         get :index
         expect(response.status).to eq(200)

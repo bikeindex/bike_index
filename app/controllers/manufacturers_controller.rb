@@ -16,7 +16,6 @@ class ManufacturersController < ApplicationController
   end
 
   def set_manufacturers_active_section
-    @active_section = "resources"
+    @active_section = 'resources'
   end
-
 end
