@@ -4,9 +4,8 @@ class BikeIndex.InfoWhere extends BikeIndex
     google.maps.event.addDomListener(window, 'load', @initializeMap)
 
   initializeEventListeners: ->
-    pagespace = @
-    $('a.where-shop-location').click (e) ->
-      pagespace.updateMapLocation(e)
+    $('a.where-shop-location').click (e) =>
+      @updateMapLocation(e)
   
   initializeMap: ->
     # Ideally we'll use the localstorage location information about the user 

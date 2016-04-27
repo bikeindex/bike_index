@@ -10,6 +10,14 @@
     %dl.dl-horizontal
       %dt Map
       %dd
+        - unless @organization.approved
+          %strong
+            Not Approved
+          %small
+            therefor hidden
+          %br
+          %em
+            Would be
         - if @organization.show_on_map
           Shown on map
         - else
