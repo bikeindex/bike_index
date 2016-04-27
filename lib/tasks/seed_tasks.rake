@@ -46,8 +46,7 @@ task seed_test_users_and_bikes: :environment do
       primary_frame_color_id: (rand(Color.count) + 1),
       handlebar_type_id: (rand(HandlebarType.count) + 1),
       creator: @user,
-      owner_email: @user.email,
-      verified: true
+      owner_email: @user.email
     )
     bike.serial_number = (0...10).map{(65+rand(26)).chr}.join
     bike.creation_organization_id = @org.id
