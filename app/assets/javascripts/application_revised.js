@@ -16,6 +16,8 @@
 //= require headroom.js/jQuery.headroom.js
 //= require pikaday
 //= require external_scripts/zoom.js
+//= require dataTables/jquery.dataTables
+//= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
 
 // Legacy carousel. Can use if we need a carousel though
 //= require external_scripts/slick.js

@@ -68,7 +68,7 @@ gem 'secure_headers'
 
 # Frontend
 gem 'backbone-on-rails', '~>0.9.10.0' 
-gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'
+gem 'jquery-datatables-rails', '~>3.4.0'
 gem 'chartkick' # Display charts
 gem 'groupdate'
 gem 'bootstrap', '~> 4.0.0.alpha3' # Bootstrap 4 - used for revised stylesheets

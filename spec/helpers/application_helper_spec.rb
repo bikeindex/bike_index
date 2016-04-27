@@ -114,7 +114,7 @@ describe ApplicationHelper do
       end
     end
     context 'manufacturers' do
-      before { allow(view).to receive(:controller_name) { 'manufacturers'} }
+      before { allow(view).to receive(:controller_name) { 'manufacturers' } }
       %w(index).each do |action|
         context action do
           it 'returns nil' do
