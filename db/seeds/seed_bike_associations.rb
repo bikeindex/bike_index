@@ -110,6 +110,8 @@ r_gear_types = [
   {name: '10', count: 10, internal: false, standard: true},
   {name: '11', count: 11, internal: false, standard: true},
   {name: '12', count: 12, internal: false, standard: true},
+  {name: '13', count: 13, internal: false, standard: true},
+  {name: '14', count: 14, internal: false, standard: true},
   {name: '1 internal', count: 1, internal: true, standard: false},
   {name: '2 internal', count: 2, internal: true, standard: false},
   {name: '3 internal', count: 3, internal: true, standard: false},
@@ -122,6 +124,8 @@ r_gear_types = [
   {name: '10 internal', count: 10, internal: true, standard: false},
   {name: '11 internal', count: 11, internal: true, standard: false},
   {name: '12 internal', count: 12, internal: true, standard: false},
+  {name: '13 internal', count: 13, internal: true, standard: false},
+  {name: '14 internal', count: 14, internal: true, standard: false},
   {name: 'Continuously variable', count: 0, internal: true, standard: true},
   {name: 'Fixed', count: 1, internal: false},
 ]
