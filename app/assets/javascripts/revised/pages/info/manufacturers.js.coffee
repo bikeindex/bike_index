@@ -1,6 +1,5 @@
 class BikeIndex.InfoManufacturers extends BikeIndex
   constructor: ->
-    console.log 'parttttt'
     @loadDataTable('#manufacturers-list')
 
   loadDataTable:(table_id) ->
