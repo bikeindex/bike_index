@@ -40,35 +40,39 @@ class BikeIndex.BikesShow extends BikeIndex
     window.current_photo_template = $('#current-photo-template').html()
     Mustache.parse(window.current_photo_template)
 
+    isVerticalLayout = @isVerticalLayout()
     # Pause for a moment before setting the thumbnail width, to give css and images
     # a chance to load
     setTimeout ( ->
       thumbnailsWidth = $('#thumbnails li').length * $('#thumbnails li:first').outerWidth(true)
-      $('#thumbnails').css('width', "#{thumbnailsWidth-10}px")
+      $('#thumbnails').css('width', "#{thumbnailsWidth-10}px") unless isVerticalLayout
       if thumbnailsWidth > $('#thumbnail-photos').width()
         $('.bike-photos').addClass('overflown')
      ) , 500
 
-  rotatePhotosOnArrows:(event) ->
+  isVerticalLayout: ->
+    $(window).width() > 768 # grid-breakpoint-md
+
+  rotatePhotosOnArrows: (event) ->
     if event.keyCode == 39
-        # Go forward
-        pos = parseInt($('#selected-photo .current-photo').data('pos'), 10)
-        pos = pos + 1
-        pos = 1 if pos > $('#thumbnail-photos').data('length')
-        @shiftToPhoto(pos)
+      # Go forward
+      pos = parseInt($('#selected-photo .current-photo').data('pos'), 10)
+      pos = pos + 1
+      pos = 1 if pos > $('#thumbnail-photos').data('length')
+      @shiftToPhoto(pos)
     else if event.keyCode == 37
-        # Go backward
-        pos = parseInt($('#selected-photo .current-photo').data('pos'), 10)
-        pos = pos - 1
-        pos = $('#thumbnail-photos').data('length') if pos <= 0
-        @shiftToPhoto(pos)
+      # Go backward
+      pos = parseInt($('#selected-photo .current-photo').data('pos'), 10)
+      pos = pos - 1
+      pos = $('#thumbnail-photos').data('length') if pos <= 0
+      @shiftToPhoto(pos)
 
   shiftToPhoto: (pos) ->
     target_photo_id = $("#selected-photo div[data-pos='#{pos}']").prop('id')
     $target_photo = $("#thumbnail-photos div[data-id='#{target_photo_id}']")
     @photoFadeOut(target_photo_id, $target_photo)
 
-  clickPhoto:(event) ->
+  clickPhoto: (event) ->
     event.preventDefault()
     $target_photo = $(event.target).parents('.clickable-image')
     target_photo_id = $target_photo.attr('data-id')
@@ -116,7 +120,15 @@ class BikeIndex.BikesShow extends BikeIndex
     @setIdealImageHeight(target_photo_id)
 
   setIdealImageHeight: (target_photo_id = null) ->
-    target_photo_id ||= $('#selected-photo .current-photo').prop('id')
-    # some images are too tall. Let's make em smaller
-    ideal_height = $(window).height() * 0.75
-    $("##{target_photo_id} img").css('max-height', "#{ideal_height}px").css('width', "auto")
+    if @isVerticalLayout()
+      $('.bike-photos')
+        .removeClass('horizontal-thumbnails')
+        .addClass('vertical-thumbnails')
+    else
+      $('.bike-photos')
+        .addClass('horizontal-thumbnails')
+        .removeClass('vertical-thumbnails')
+      target_photo_id ||= $('#selected-photo .current-photo').prop('id')
+      # some images are too tall. Let's make em smaller
+      ideal_height = $(window).height() * 0.75
+      $("##{target_photo_id} img").css('max-height', "#{ideal_height}px").css('width', "auto")

@@ -18,15 +18,15 @@
       opacity: 0;
       margin: 0 auto;
     }
-    .current-photo img {
+     img {
       transition: opacity ease-in 1s;
       opacity: 1;
     }
+    .current-photo { z-index: 10; }
     .current-photo .transitioning-photo, .transitioning-photo {
       position: absolute;
       top: 0;
       left: 0;
-      width: 100%;
     }
   }
   .stock-photo {
@@ -54,6 +54,8 @@
 
 .bike-photos.horizontal-thumbnails {
   $thumbnails-height: 120px;
+  $thumbnails-width: 178px;
+  .current-photo .transitioning-photo, .transitioning-photo { width: 100%; }
   .thumbnail-shadow, .thumbnail-shadow-r {
     display: none;
     position: absolute;
@@ -103,7 +105,7 @@
       margin: 0;
       float: left;
       height: 100%;
-      width: 178px;
+      width: $thumbnails-width;
       margin: 0 10px 5px 0;
       &:last-of-type { margin-right: 0; border-right: none; }
     }
@@ -138,87 +140,75 @@
 }
 
 
-// .bike-photos.horizontal-thumbnails
-//   $thumbnails-height: 120px;
-//   .thumbnail-shadow, .thumbnail-shadow-r {
-//     display: none;
-//     position: absolute;
-//     bottom: -2px;
-//     height: $thumbnails-height+2px;
-//     width: 10px;
-//     z-index: 20;
-//   }
-//   .overflown {
-//     .thumbnail-shadow, .thumbnail-shadow-r { display: block; }
-//     .photo-list ul { left: -2px; }
-//   }
-//   .thumbnail-shadow {
-//     left: 0;
-//     box-shadow: inset 8px 0 6px -8px rgba($gray-lighter,.95);
-//   }
-//   .thumbnail-shadow-r {
-//     right: 0;
-//     box-shadow: inset -8px 0 6px -8px rgba($gray-lighter,.95);
-//   }
-//   .photo-list {
-//     @include clearfix;  
-//     border-radius: 0 0 $border-radius $border-radius;
-//     margin-top: 10px;
-//     clear: both;
-//     position: relative;
-//     height: $thumbnails-height;
-//     background: $body-bg;
-//     width: 100%;
-//     margin: 0;
-//     padding: 0;
-//     overflow-y: hidden;
-//     overflow-x: scroll;
-//     z-index: 10;
-//     ul {
-//       list-style-type: none;
-//       position: absolute;
-//       left: 0; top: 0;
-//       overflow: visible;
-//       height: 100%;
-//       margin: 0;
-//       padding: 5px 0;
-//       border: none;
-//     }
-//     li {
-//       position: relative;
-//       margin: 0;
-//       float: left;
-//       height: 100%;
-//       width: 178px;
-//       margin: 0 10px 5px 0;
-//       &:last-of-type { margin-right: 0; border-right: none; }
-//     }
-//     a {
-//       height: 100%; 
-//       width: 100%;
-//       overflow: hidden;
-//       display: block;
-//     }
-//     img {
-//       padding: 0;
-//       width: 100%;
-//       height: auto;
-//     }
-//     .clickable-image {
-//       transition: all ease-in-out .2s;
-//       cursor: pointer;
-//       border-radius: $border-radius;
-//       box-shadow: none;
-//       position: relative;
-//       padding: 0; margin: 0;
-//       display: block;
-//       border: 1px solid $gray-lightest;
-//       overflow: hidden; // because they are square images, and we don't care
-//       &.current-thumb {
-//         transition: all ease-in-out .2s;
-//         border-color: $blue;
-//         box-shadow: 0 0 2px rgba($blue, .8);
-//       }
-//     }
-//   }
-// }
+.bike-photos.vertical-thumbnails {
+  $thumbnails-height: 120px;
+  $thumbnails-width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  #selected-photo.image-holder {
+    flex: 0 0 83%;
+    // position: relative;
+  }
+  .photo-list {
+    flex: 0 0 15%;
+    margin: 0 0 0 2%;
+    float: left;
+    border-radius: $border-radius;
+    position: relative;
+    background: $body-bg;
+
+    padding: 0;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    z-index: 10;
+    ul {
+      list-style-type: none;
+      position: absolute;
+      left: 0; top: 0;
+      overflow: visible;
+      height: 100%;
+      margin: 0;
+      padding: 5px 0;
+      border: none;
+    }
+    li {
+      position: relative;
+      margin: 0;
+      // float: left;
+
+
+      // height: 100%;
+      width: $thumbnails-width;
+      margin: $vertical-height 0 0;
+
+      &:first-of-type { margin-top: 0; }
+    }
+    a {
+      // height: 100%; 
+      // width: 100%;
+      overflow: hidden;
+      display: block;
+    }
+    img {
+      padding: 0;
+      width: 100%;
+      height: auto;
+    }
+    .clickable-image {
+      transition: all ease-in-out .2s;
+      cursor: pointer;
+      border-radius: $border-radius;
+      box-shadow: none;
+      position: relative;
+      padding: 0; margin: 0;
+      display: block;
+      border: 1px solid $gray-lightest;
+      overflow: hidden; // because they are square images, and we don't care
+      &.current-thumb {
+        transition: all ease-in-out .2s;
+        border-color: $blue;
+        box-shadow: 0 0 2px rgba($blue, .8);
+      }
+    }
+  }
+}
