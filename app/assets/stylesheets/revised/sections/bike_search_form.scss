@@ -1,5 +1,6 @@
 .bike-search-form {
   @include make-row();
+  // 
   // Query field (main search field)
   .query-field-wrap {
     flex: 0 0 83.33333%;
@@ -8,6 +9,11 @@
     padding-right: $vertical-height;
   }
   .query-field { width: 100%; }
+  // Selectize input - ensure height without items
+  .selectize-input {
+    min-height: 44px;
+    &.not-full > input { margin-top: 5px !important; } // Space placeholder correctly
+  }
   .selectize-dropdown, .selectize-input { border-radius: $border-radius; }
   // Selected items
   .selectize-control.multi .selectize-input > div {
