@@ -3,6 +3,7 @@
  * things from rails-assets
  *= require pikaday
  *= require selectize/selectize.bootstrap3.scss
+ *= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
  */
 
 /*!
@@ -95,7 +96,7 @@ $modal-backdrop-opacity: 0.8;
 @import "updated_styles/components/zoom.scss";
 .zoom-overlay { z-index: $zindex-navbar-fixed + 99; }
 .zoom-img-wrap { z-index: $zindex-navbar-fixed + 100; }
-
+@import "revised/sections/datatables";
 
 /*!
  * Bike Index styles
@@ -173,7 +174,7 @@ $row-side-padding: 0.9375rem;
 @import "revised/pages/news/show";
 
 // Home styles
-@import "updated_styles/components/slick.scss";
+@import "updated_styles/components/slick.scss"; // legacy carousel, delete when it's gone!
 @import "revised/pages/home/home";
 @import "revised/pages/home/supporters";
 @import "revised/pages/home/testimonials";
