@@ -1,0 +1,107 @@
+.pagination {
+  display: inline-block;
+  padding-left: 0;
+  margin-top: $vertical-height;
+  margin-bottom: $vertical-height;
+  @include border-radius();
+}
+
+.page-item {
+  display: inline; // Remove list-style and block-level defaults
+
+  &:first-child {
+    .page-link {
+      margin-left: 0;
+      @include border-left-radius($border-radius);
+    }
+  }
+  &:last-child {
+    .page-link {
+      @include border-right-radius($border-radius);
+    }
+  }
+
+  &.active .page-link {
+    @include plain-hover-focus {
+      z-index: 2;
+      color: white;
+      cursor: default;
+      background-color: $blue;
+      border-color: $blue;
+      padding: .5rem 0.75rem; // make it a bit taller
+      margin-top: -.1rem;
+    }
+  }
+
+  &.disabled .page-link {
+    @include plain-hover-focus {
+      color: white;
+      pointer-events: none;
+      cursor: $cursor-disabled;
+      background-color: $gray-darker;
+      border-color: $gray-darker;
+    }
+  }
+}
+
+.page-link {
+  position: relative;
+  float: left; // Collapse white-space
+  padding: .4rem .75rem;
+  margin-left: 3px;
+  color: white;
+  text-decoration: none;
+  background-color: $gray-darker;
+  border: $pagination-border-width solid $gray-darker;
+
+  @include hover-focus {
+    // color: $pagination-hover-color;
+    text-decoration: none;
+    background-color: $gray-dark;
+    border-color: $gray-dark;
+  }
+  &:active { background: 000; }
+}
+
+//
+// Sizing
+//
+
+.pagination-lg {
+  @include pagination-size($pagination-padding-y-lg, $pagination-padding-x-lg, $font-size-lg, $line-height-lg, $border-radius-lg);
+}
+
+.pagination-sm {
+  @include pagination-size($pagination-padding-y-sm, $pagination-padding-x-sm, $font-size-sm, $line-height-sm, $border-radius-sm);
+}
+
+
+// 
+// Should be applied to div.pagination when pagination selectors are for prior bootstrap versions
+@mixin legacy-pagination-override {
+  @extend .pagination;
+  li {
+    @extend .page-item;
+    a { @extend .page-link; }
+  }
+}
+
+
+// div.paginate-container - our own legacy paginate via kaminari
+.paginate-container {
+  display: flex;
+  flex: wrap;
+  justify-content: center;
+  .pagination { 
+    flex: 0 1 auto;
+    @include legacy-pagination-override;
+  }
+}
+
+// Datatables pagination
+// it uses outdated shit. Has to be overridden. It has to be overridden hard.
+.dataTables_wrapper {
+  .dataTables_paginate .pagination {
+    @include legacy-pagination-override;
+  }
+}

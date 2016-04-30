@@ -55,7 +55,7 @@
       - if @bikes.present?
         %ul.bike-boxes
           = render partial: '/bikes/revised_bike', collection: @bikes, as: :bike, locals: { target: 'show' }
-          .paginate-container-bottom
+          .paginate-container.paginate-container-bottom
             = paginate @bikes
             
 
