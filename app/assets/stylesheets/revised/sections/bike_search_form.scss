@@ -1,5 +1,6 @@
 .bike-search-form {
   @include make-row();
+  // 
   // Query field (main search field)
   .query-field-wrap {
     flex: 0 0 83.33333%;
@@ -8,6 +9,11 @@
     padding-right: $vertical-height;
   }
   .query-field { width: 100%; }
+  // Selectize input - ensure height without items
+  .selectize-input {
+    min-height: 44px;
+    &.not-full > input { margin-top: 5px !important; } // Space placeholder correctly
+  }
   .selectize-dropdown, .selectize-input { border-radius: $border-radius; }
   // Selected items
   .selectize-control.multi .selectize-input > div {
@@ -91,28 +97,25 @@
   }
 }
 
-.search-type-tabs {
-  @include make-row();
-  margin-top: 2*$vertical-height;
-  .nav.nav-tabs {
-    @include make-col();
-    @include make-col-span(12);
-    border: none;
-    .nav-item {
-      margin: 0 0 0 -1px;
-      &:first-of-type { margin-left: 0; }
-      a {
-        border: 1px solid $gray-darker;
-        color: $gray-darker;
-        border-radius: $border-radius;
-        &:hover, &:active, &.active {
-          border: 1px solid $gray-darker;
-          color: white;
-          text-decoration: none;
-        }
-        &:hover { background: $gray; }
-        &:active, &.active { background: $gray-darker; }
-      }
-    }
+// 
+// Nav search tabs
+.search-type-tabs .nav.nav-tabs {
+  @include binx-nav-tabs;
+  display: flex;
+  flex-wrap: wrap;
+  margin: 2*$vertical-height 0;
+  text-align: center;
+  li {
+    a { padding-left: 0; padding-right: 0; }
+    &.stolen-proximity { flex: 0 0 40%; } // location info takes up the most space
+    &.stolen-anywhere { flex: 0 0 27%; } 
+    &.not-stolen { flex: 0 0 33%; } // 'Not marked stolen' is longer than 'Stolen anywhere'
+  }
+}
+
+@media(max-width: $grid-breakpoint-lg) {
+  .search-type-tabs .nav.nav-tabs {
+    @include binx-nav-tabs-vertical; 
+    text-align: left;
   }
 }

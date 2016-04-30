@@ -1,0 +1,51 @@
+// Because there are times when we apply this via media queries, 
+// these are mixins instead of standard class-selector based styles
+
+// You still need to use the bootstrap classes to get nav-tabs
+// ul.nav.nav-tabs, li.nav-item, a.nav-link
+// Apply this mixin to the ul.nav.nav-tabs
+@mixin binx-nav-tabs {
+  border: none;
+  .nav-item {
+    margin: 0 0 0 -1px;
+    &:first-of-type { margin-left: 0; }
+    a {
+      border: 1px solid $gray-darker;
+      color: $gray-darker;
+      border-radius: $border-radius;
+      &:hover, &:active, &.active {
+        border: 1px solid $gray-darker;
+        color: white;
+        text-decoration: none;
+      }
+      &:hover { background: $gray; }
+      &:active, &.active { background: $gray-darker; }
+    }
+  }
+}
+
+// Generally for use on small screens. 
+// binx-nav-tabs needs to be included as well for this to function
+// Apply this mixin to the ul.nav.nav-tabs (most likely in a xs-screen media query)
+@mixin binx-nav-tabs-vertical {
+  display: block; // ensure we override flex if it's there
+  .nav-item {
+    width: 100%;
+    margin: -1px 0 0;
+    a {
+      width: 100%;
+      padding: .5*$vertical-height $vertical-height;
+    }
+  }
+}
+
+// You still need to use the bootstrap classes to get tab-content
+// .tab-content, .tab-pane
+// Apply this mixin to the .tab-content
+@mixin binx-nav-tab-content {
+  padding: $vertical-height;
+  border-radius: $border-radius $border-radius;
+  border: 1px solid $gray-darker;
+  border-top: none;
+  margin-bottom: $vertical-height;
+}

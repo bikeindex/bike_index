@@ -74,7 +74,7 @@
   .row
     / Bike Photo!
     .col-md-8
-      .bike-photos
+      .bike-photos.horizontal-thumbnails
         - if @bike.public_images.any?
           #selected-photo{ class: "image-holder #{"just1photo" if @bike.public_images.count == 1}" }
             .current-photo{ id: "image#{@bike.public_images.first.id}"}
@@ -85,8 +85,7 @@
             #thumbnail-photos.photo-list
               %ul#thumbnails
                 - @bike.public_images.each_with_index do |public_image, index|
-                  / Make the first image current
-                  - thumb_class = index == 0 ? 'current-thumb' : ''
+                  - thumb_class = index == 0 ? 'current-thumb' : '' # make the first image current
                   %li
                     %a.clickable-image{ class: thumb_class, data: { id: "image#{public_image.id}", img: public_image.image.url(:large), link: public_image.image.url } }
                       = image_tag public_image.image.url(:small), alt: "#{public_image.name}", id: "i|#{public_image.listing_order}"
@@ -98,9 +97,10 @@
               </script>
         - elsif @bike.stock_photo_url.present?
           #selected-photo.image-holder.just1photo
-            %h4.stock-photo
+            %h3.stock-photo
               Stock photo of a #{@bike.year} #{@bike.frame_model}
-              %span Color may not match!
+              %em
+                Color may not match!
             .current-photo#stock_photo_img
               = image_tag(@bike.stock_photo_url, alt: "#{@bike.type.titleize} photo", id: "i|0", data: {action: 'zoom', original: @bike.stock_photo_url})
 

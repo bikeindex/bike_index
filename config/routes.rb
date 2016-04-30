@@ -6,8 +6,6 @@ Bikeindex::Application.routes.draw do
     controllers authorized_applications: 'oauth/authorized_applications'
   end
 
-  get 'dashboard/show'
-
   match '/shop', to: redirect('https://bikeindex.myshopify.com'), as: :shop
   match '/discuss', to: redirect('https://discuss.bikeindex.org'), as: :discuss
   match 'discourse_authentication', to: 'discourse_authentication#index'

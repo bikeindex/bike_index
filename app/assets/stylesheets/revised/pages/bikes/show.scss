@@ -75,47 +75,16 @@
 @media (max-width: $grid-breakpoint-md - 1px) {
   #bikes_show {
     .map-holder { width: 100%; }
-    .nav-tabs.component-types {
-      border: none;
-      .nav-item {
-        margin: 0 0 0 -1px;
-        &:first-of-type { margin-left: 0; }
-        a {
-          border: 1px solid $gray-darker;
-          color: $gray-darker;
-          border-radius: $border-radius;
-          &:hover, &:active, &.active {
-            border: 1px solid $gray-darker;
-            color: white;
-            text-decoration: none;
-          }
-          &:hover { background: $gray; }
-          &:active, &.active { background: $gray-darker; }
-        }
-      }
-    }
-    .tab-content { 
-      padding: $vertical-height;
-      border-radius: $border-radius $border-radius;
-      border: 1px solid $gray-darker;
-      border-top: none;
-      margin-bottom: $vertical-height;
-    }
+    .nav-tabs.component-types { @include binx-nav-tabs; }
+    .tab-content { @include binx-nav-tab-content; }
     .cgroup-name { display: none; }
   }
 }
 
-// XS screen overrides
-@media (max-width: $grid-breakpoint-sm - 1px) {
+// XS screen overrides - instead of ($grid-breakpoint-sm - 1px), break it where it breaks
+@media (max-width: 576px) {
   #bikes_show {
-    .nav-tabs.component-types .nav-item {
-      width: 100%;
-      margin: -1px 0 0;
-      a {
-        width: 100%;
-        padding: .5*$vertical-height $vertical-height;
-      }
-    }
+    .nav-tabs.component-types { @include binx-nav-tabs-vertical; }
     .tab-content { border: none; }
   }
 }

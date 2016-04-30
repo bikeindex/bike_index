@@ -69,10 +69,10 @@ $border-radius-sm:       1px;
 @import "bootstrap/navbar";
 @import "bootstrap/card";
 @import "bootstrap/breadcrumb";
-@import "bootstrap/pagination";
+// @import "bootstrap/pagination"; // Overriden with our own
 // @import "bootstrap/tags";
 @import "bootstrap/jumbotron";
-// @import "bootstrap/alert";
+// @import "bootstrap/alert"; // Overriden with our own
 @import "bootstrap/progress";
 @import "bootstrap/media";
 @import "bootstrap/list-group";
@@ -94,9 +94,10 @@ $modal-backdrop-opacity: 0.8;
 //
 // Other (non-bootstrap) external styles
 @import "updated_styles/components/zoom.scss";
+$zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 .zoom-overlay { z-index: $zindex-navbar-fixed + 99; }
-.zoom-img-wrap { z-index: $zindex-navbar-fixed + 100; }
-@import "revised/sections/datatables";
+.zoom-img-wrap { z-index: $zoom-img-wrap-z-index; }
+
 
 /*!
  * Bike Index styles
@@ -128,12 +129,14 @@ $row-side-padding: 0.9375rem;
 // Bike Index mixins
 @import "revised/mixins/trash_can_icon";
 @import "revised/mixins/textoverflow";
+@import "revised/mixins/nav_tabs";
 
 // Shared styles
 @import "revised/sections/primary_header_nav";
 @import "revised/sections/primary_footer";
 @import "revised/sections/content_menu";
 @import "revised/sections/form_well";
+@import "revised/sections/pagination";
 @import "revised/sections/edit_bike_menu";
 @import "revised/sections/edit_bike_title";
 @import "revised/sections/horizontal_lines";
@@ -142,7 +145,6 @@ $row-side-padding: 0.9375rem;
 @import "revised/sections/attr_list";
 @import "revised/sections/sign_in_up";
 @import "revised/sections/ad_blocks";
-@import "revised/sections/bike_show_photo";
 @import "revised/sections/bike_search_form";
 @import "revised/sections/bike_boxes";
 
@@ -159,6 +161,7 @@ $row-side-padding: 0.9375rem;
 
 // Bike show & search pages
 @import "revised/pages/bikes/show";
+@import "revised/pages/bikes/show_photo"; // separated because it's a lot
 
 // Info pages
 @import "revised/pages/info/where";

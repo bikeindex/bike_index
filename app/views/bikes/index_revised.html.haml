@@ -34,7 +34,7 @@
 
       .search-type-tabs{ data: { query: request.original_url.split('bikes?').last } }
         %ul.nav.nav-tabs{ role: 'tablist' }
-          %li.nav-item
+          %li.nav-item.stolen-proximity
             %a#stolen_proximity_tab.nav-link{ href: '#', class: ('active' if @stolenness == 'stolen_proximity'), role: 'tab' }
               Stolen within
               %span#search_distance
@@ -43,11 +43,11 @@
               %span#search_location
                 you
               %span.count
-          %li.nav-item
+          %li.nav-item.stolen-anywhere
             %a#stolen_tab.nav-link{ href: '#', class: ('active' if @stolenness == 'stolen'), role: 'tab' }
               Stolen anywhere
               %span.count
-          %li.nav-item
+          %li.nav-item.not-stolen
             %a#non_stolen_tab.nav-link{ href: '#', class: ('active' if @stolenness == 'non_stolen'), role: 'tab' }
               Not marked stolen
               %span.count
@@ -55,7 +55,7 @@
       - if @bikes.present?
         %ul.bike-boxes
           = render partial: '/bikes/revised_bike', collection: @bikes, as: :bike, locals: { target: 'show' }
-          .paginate-container-bottom
+          .paginate-container.paginate-container-bottom
             = paginate @bikes
             
 

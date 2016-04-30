@@ -1,16 +1,37 @@
+$bike-box-bg: $gray-lighter;
 .bike-boxes {
   margin-top: $vertical-height;
   @include list-unstyled;
-  margin: 0;
   width: 100%;
-  li {
-    &:nth-of-type(2n+1) { background: $gray-lighter; }
-    // .shown-image-block {
-    //   position: relative;
-    // }
-    img {
-      display: block;
-      width: 100%;
+  .bike-box-item {
+    display: flex;
+    flex-wrap: wrap;
+    margin: $vertical-height 0 0 0; // Apply the background to just the width of the columns, not full row width
+    padding-top: 0;
+    padding-bottom: 0;
+    &:nth-of-type(2n+1) { background: $bike-box-bg; }
+  }
+  .bike-list-image {
+    flex: 0 0 25%;
+    img { display: block; }
+    .no-image {
+      padding: 2*$vertical-height;
+      background: $bike-box-bg;
+    }
+  }
+  .bike-information {
+    flex: 0 0 75%;
+    padding: $vertical-height 0.9375rem;
+  }
+  // .title-link { color: $body-font-color; } Design calls for this, but then where do you click?
+}
+
+@media (min-width: $grid-breakpoint-md) {
+  .bike-information {
+    @include make-row;
+    .attr-list { 
+      @include make-col();
+      @include make-col-span(6);
     }
   }
 }

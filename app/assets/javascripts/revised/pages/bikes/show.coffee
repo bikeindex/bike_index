@@ -42,33 +42,58 @@ class BikeIndex.BikesShow extends BikeIndex
 
     # Pause for a moment before setting the thumbnail width, to give css and images
     # a chance to load
-    setTimeout ( ->
-      thumbnailsWidth = $('#thumbnails li').length * $('#thumbnails li:first').outerWidth(true)
-      $('#thumbnails').css('width', "#{thumbnailsWidth-10}px")
-      if thumbnailsWidth > $('#thumbnail-photos').width()
+    setTimeout ( =>
+      @setThumbnailOverflow(@isVerticalLayout())
+    ), 500
+
+  isVerticalLayout: ->
+    $(window).width() > 768 # grid-breakpoint-md
+
+  setThumbnailOverflow: (is_vertical_layout) ->
+    if is_vertical_layout
+      $('#thumbnails').css('width', 'auto') # Remove hard-coded width, if it's there
+      thumbnails_height = $('#thumbnails li').length * $('#thumbnails li:first').outerHeight(true)
+      if thumbnails_height > $('#thumbnail-photos').height()
         $('.bike-photos').addClass('overflown')
-     ) , 500
+    else
+      thumbnails_width = $('#thumbnails li').length * $('#thumbnails li:first').outerWidth(true)
+      $('#thumbnails').css('width', "#{thumbnails_width}px")
+      if thumbnails_width > $('#thumbnail-photos').width()
+        $('.bike-photos').addClass('overflown')
 
-  rotatePhotosOnArrows:(event) ->
+  rotatePhotosOnArrows: (event) ->
     if event.keyCode == 39
-        # Go forward
-        pos = parseInt($('#selected-photo .current-photo').data('pos'), 10)
-        pos = pos + 1
-        pos = 1 if pos > $('#thumbnail-photos').data('length')
-        @shiftToPhoto(pos)
+      # Go forward
+      pos = parseInt($('#selected-photo .current-photo').data('pos'), 10)
+      pos = pos + 1
+      pos = 1 if pos > $('#thumbnail-photos').data('length')
+      @shiftToPhoto(pos, true)
     else if event.keyCode == 37
-        # Go backward
-        pos = parseInt($('#selected-photo .current-photo').data('pos'), 10)
-        pos = pos - 1
-        pos = $('#thumbnail-photos').data('length') if pos <= 0
-        @shiftToPhoto(pos)
+      # Go backward
+      pos = parseInt($('#selected-photo .current-photo').data('pos'), 10)
+      pos = pos - 1
+      pos = $('#thumbnail-photos').data('length') if pos <= 0
+      @shiftToPhoto(pos, true)
 
-  shiftToPhoto: (pos) ->
+  shiftToPhoto: (pos, scroll_to_thumb = false) ->
     target_photo_id = $("#selected-photo div[data-pos='#{pos}']").prop('id')
-    $target_photo = $("#thumbnail-photos div[data-id='#{target_photo_id}']")
+    $target_photo = $("#thumbnail-photos a[data-id='#{target_photo_id}']")
     @photoFadeOut(target_photo_id, $target_photo)
+    # Primarily, scrolling is setup to make things better for keyboard navigation
+    if scroll_to_thumb and $target_photo.offset() # Ensure we found the element before scrolling
+      $thumbs = $('#thumbnail-photos')
+      if @isVerticalLayout()
+        offset = $target_photo.offset().top - $thumbs.offset().top
+        $thumbs.animate
+          scrollTop: offset, 'fast'
+      else
+        # couldn't get this to work correctly :(
+        # Plus, this is on small screens, so probs no keyboard anyway
+        # offset = $target_photo.offset().left - $thumbs.scrollLeft()
+        # $thumbs.animate
+        #   scrollLeft: offset, 'fast'
 
-  clickPhoto:(event) ->
+  clickPhoto: (event) ->
     event.preventDefault()
     $target_photo = $(event.target).parents('.clickable-image')
     target_photo_id = $target_photo.attr('data-id')
@@ -114,6 +139,7 @@ class BikeIndex.BikesShow extends BikeIndex
     ), 900
 
     @setIdealImageHeight(target_photo_id)
+    @setThumbnailOverflow(@isVerticalLayout())
 
   setIdealImageHeight: (target_photo_id = null) ->
     target_photo_id ||= $('#selected-photo .current-photo').prop('id')

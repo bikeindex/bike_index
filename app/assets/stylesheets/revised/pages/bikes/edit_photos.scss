@@ -12,6 +12,7 @@
         min-height: 100px;
         position: relative;
         background: white;
+        z-index: 2; // > than .processing
       }
     }
     label.keep-private {
@@ -30,7 +31,7 @@
       width: 100%;
       text-align: center;
       color: $gray-light;
-      z-index: 0;
+      z-index: 1;
     }
     .trash-can-icon {
       @include trash-can-icon($gray-light, $link-color, white, 2*$vertical-height);
