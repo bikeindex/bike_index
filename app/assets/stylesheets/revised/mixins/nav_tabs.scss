@@ -1,5 +1,5 @@
 // Because there are times when we apply this via media queries, 
-// these are mixins instead of standard selectors
+// these are mixins instead of standard class-selector based styles
 
 // You still need to use the bootstrap classes to get nav-tabs
 // ul.nav.nav-tabs, li.nav-item, a.nav-link
@@ -28,6 +28,7 @@
 // binx-nav-tabs needs to be included as well for this to function
 // Apply this mixin to the ul.nav.nav-tabs (most likely in a xs-screen media query)
 @mixin binx-nav-tabs-vertical {
+  display: block; // ensure we override flex if it's there
   .nav-item {
     width: 100%;
     margin: -1px 0 0;

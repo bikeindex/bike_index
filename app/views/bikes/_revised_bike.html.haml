@@ -1,16 +1,16 @@
-%li.row
-  %a.bike-list-image.col-xs-3{ href: bike_url(bike) }
-    = bike.thumb_image 
-  / %a.bg-link{ href: bike.list_link_url(target) }
-  .col-xs-9
-    .bike-information
-      %ul.attr-list.split-sm
-        %li
+%li.bike-box-item
+  %a.bike-list-image{ href: bike_url(bike) }
+    = bike.revised_thumb_image
+  .bike-information
+    %ul.attr-list
+      %li
+        %a.title-link{ href: bike_url(bike) }
           %span.attr-title
             = [bike.year, bike.mnfg_name].reject(&:blank?).join(' ')
           = bike.frame_model
-        = bike.attr_list_item(bike.serial_display, 'Serial')
-        = bike.attr_list_item(bike.frame_colors.to_sentence, 'Primary colors')
-        - if bike.current_stolen_record.present?
-          = bike.attr_list_item(bike.current_stolen_record.show_stolen_address, 'Location')
-          = bike.attr_list_item((l bike.current_stolen_record.date_stolen, format: :dotted), 'Date stolen')
+      = bike.attr_list_item(bike.serial_display, 'Serial')
+      = bike.attr_list_item(bike.frame_colors.to_sentence, 'Primary colors')
+    - if bike.current_stolen_record.present?
+      %ul.attr-list
+        = bike.attr_list_item((l bike.current_stolen_record.date_stolen, format: :dotted), 'Date stolen')
+        = bike.attr_list_item(bike.short_address(bike.current_stolen_record), 'Location')
