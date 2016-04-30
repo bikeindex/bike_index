@@ -74,7 +74,7 @@
   .row
     / Bike Photo!
     .col-md-8
-      .bike-photos.vertical-thumbnails
+      .bike-photos.horizontal-thumbnails
         - if @bike.public_images.any?
           #selected-photo{ class: "image-holder #{"just1photo" if @bike.public_images.count == 1}" }
             .current-photo{ id: "image#{@bike.public_images.first.id}"}
@@ -97,9 +97,10 @@
               </script>
         - elsif @bike.stock_photo_url.present?
           #selected-photo.image-holder.just1photo
-            %h4.stock-photo
+            %h3.stock-photo
               Stock photo of a #{@bike.year} #{@bike.frame_model}
-              %span Color may not match!
+              %em
+                Color may not match!
             .current-photo#stock_photo_img
               = image_tag(@bike.stock_photo_url, alt: "#{@bike.type.titleize} photo", id: "i|0", data: {action: 'zoom', original: @bike.stock_photo_url})
 

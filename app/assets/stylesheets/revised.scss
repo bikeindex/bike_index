@@ -93,8 +93,9 @@ $modal-backdrop-opacity: 0.8;
 //
 // Other (non-bootstrap) external styles
 @import "updated_styles/components/zoom.scss";
+$zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 .zoom-overlay { z-index: $zindex-navbar-fixed + 99; }
-.zoom-img-wrap { z-index: $zindex-navbar-fixed + 100; }
+.zoom-img-wrap { z-index: $zoom-img-wrap-z-index; }
 
 
 /*!
@@ -142,7 +143,6 @@ $row-side-padding: 0.9375rem;
 @import "revised/sections/attr_list";
 @import "revised/sections/sign_in_up";
 @import "revised/sections/ad_blocks";
-@import "revised/sections/bike_show_photo";
 @import "revised/sections/bike_search_form";
 @import "revised/sections/bike_boxes";
 
@@ -159,6 +159,7 @@ $row-side-padding: 0.9375rem;
 
 // Bike show & search pages
 @import "revised/pages/bikes/show";
+@import "revised/pages/bikes/show_photo"; // separated because it's a lot
 
 // Info pages
 @import "revised/pages/info/where";
