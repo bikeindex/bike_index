@@ -25,6 +25,7 @@ module ApplicationHelper
       'content_skeleton' unless %w(terms vendor_terms privacy support_the_index).include?(action_name)
     when 'news' then 'content_skeleton'
     when 'feedbacks' then 'content_skeleton'
+    when 'manufacturers' then 'content_skeleton'
     end
   end
 
