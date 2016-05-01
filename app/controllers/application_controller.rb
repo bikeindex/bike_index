@@ -64,3 +64,6 @@ class ApplicationController < ActionController::Base
     end
   end
 end
+
+def testeBr
+  end
