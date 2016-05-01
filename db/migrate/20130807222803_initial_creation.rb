@@ -11,6 +11,7 @@ class InitialCreation < ActiveRecord::Migration
     end
 
     create_table "bike_token_invitations", force: true do |t|
+=begin
       t.text     "subject",          default: "Bike Index? Awesome!"
       t.text     "message",          default: "I just sent you a free bike registration."
       t.integer  "bike_token_count", default: 1
@@ -22,6 +23,7 @@ class InitialCreation < ActiveRecord::Migration
       t.boolean  "redeemed"
       t.datetime "created_at",                                                                null: false
       t.datetime "updated_at",                                                                null: false
+=end
     end
 
     create_table "bike_tokens", force: true do |t|
@@ -326,7 +328,7 @@ class InitialCreation < ActiveRecord::Migration
 
     create_table "stolen_notifications", force: true do |t|
       t.string   "subject"
-      t.text     "message"
+      #t.text     "message"
       t.integer  "sender_id"
       t.integer  "receiver_id"
       t.integer  "bike_id"
@@ -365,7 +367,7 @@ class InitialCreation < ActiveRecord::Migration
       t.text     "password"
       t.datetime "last_login"
       t.boolean  "superuser",                    default: false, null: false
-      t.text     "password_reset_token"
+     # t.text     "password_reset_token"
       t.datetime "created_at",                                      null: false
       t.datetime "updated_at",                                      null: false
       t.string   "password_digest"
@@ -391,7 +393,7 @@ class InitialCreation < ActiveRecord::Migration
       t.boolean  "can_invite"
     end
 
-    add_index "users", ["password_reset_token"], name: "index_users_on_password_reset_token"
+    #add_index "users", ["password_reset_token"], name: "index_users_on_password_reset_token"
 
     create_table "wheel_sizes", force: true do |t|
       t.string   "name"

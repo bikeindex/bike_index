@@ -1,13 +1,15 @@
 source 'https://rubygems.org'
-ruby '2.1.3'
+ruby '2.2.4'
 
 gem 'rails', '3.2.22'
 
-gem 'pg'
+#gem 'pg'
+#gem "postgres-pr"
 gem 'jquery-rails'
 gem 'bcrypt-ruby', '~> 3.0.0'
 gem 'active_model_serializers'
 gem 'aws-sdk', '~> 1.3.4'
+gem 'sqlite3'
 
 # Redis and redis dependents
 gem 'redis'
@@ -16,6 +18,9 @@ gem 'sidekiq-failures'
 gem 'sidekiq-unique-jobs'
 gem 'rollout' # Feature flags
 gem 'soulheart', '~> 0.2.6' # typeahead/autocomplete features
+gem 'test-unit', '~> 3.0'
+gem 'activerecord-postgresql-adapter'
+
 
 gem 'rack-contrib'
 gem 'geocoder'
@@ -30,7 +35,7 @@ gem 'pg_search'
 gem 'nokogiri'
 gem 'carrierwave', '~> 0.9.0'
 gem 'carrierwave_backgrounder'
-gem 'rmagick'
+#gem 'rmagick'
 gem 'mini_magick' # a smaller implementation of rmagick, required for rqrcode
 gem 'rqrcode-rails3'
 gem 'strong_parameters'
@@ -47,11 +52,11 @@ gem 'dalli'
 gem 'draper', require: false
 gem 'wkhtmltopdf-binary'
 gem 'wicked_pdf'
-gem 'eventmachine', '~> 1.0.3'
+#gem 'eventmachine', '~> 1.0.3'
 gem 'sitemap_generator'
 gem 'unicorn'
 gem 'unicorn-worker-killer'
-gem 'rake', '< 11' # Lock rake to remove validation errors
+gem 'rake' # Lock rake to remove validation errors
 
 # OAuth provider, Grape, associated parts of API V2
 gem 'doorkeeper',   '~> 2.0.1'
@@ -109,14 +114,15 @@ end
 group :development do
   gem 'rerun'
   gem 'guard'
-  gem 'guard-rspec', '~> 4.6.4'
+  #gem 'guard-rspec', '~> 4.6.4'
   gem 'guard-rubocop'
+  gem 'mysql2', '~> 0.3.18'
 end
 
 group :development, :test do
   gem 'rb-fsevent', '~> 0.9.1'
-  gem 'rspec', '~> 3.3.0'
-  gem 'rspec-rails', '~> 3.3.0'
+  #gem 'rspec', '~> 3.4.0'
+ # gem 'rspec-rails', '~> 3.3.0'
   gem 'shoulda-matchers', '~> 2.8.0'
   gem 'foreman'
   gem 'database_cleaner'
@@ -126,6 +132,6 @@ end
 group :test do
   gem 'factory_girl_rails', '~> 4.2.1'
   gem 'codeclimate-test-reporter', require: nil
-  gem 'rspec-sidekiq', '~> 2.2.0'
+ # gem 'rspec-sidekiq', '~> 2.2.0'
   gem 'pry'
 end

@@ -1,2738 +1,747 @@
---
--- PostgreSQL database dump
---
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SET check_function_bodies = false;
-SET client_min_messages = warning;
-
---
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
-
-
---
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
-
-
---
--- Name: fuzzystrmatch; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;
-
-
---
--- Name: EXTENSION fuzzystrmatch; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION fuzzystrmatch IS 'determine similarities and distance between strings';
-
-
-SET search_path = public, pg_catalog;
-
-SET default_tablespace = '';
-
-SET default_with_oids = false;
-
---
--- Name: ads; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE ads (
-    id integer NOT NULL,
-    title character varying(255),
-    body text,
-    image character varying(255),
-    target_url text,
-    organization_id integer,
-    live boolean DEFAULT false NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: ads_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE ads_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: ads_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE ads_id_seq OWNED BY ads.id;
-
-
---
--- Name: b_params; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE b_params (
-    id integer NOT NULL,
-    params text,
-    bike_title character varying(255),
-    creator_id integer,
-    created_bike_id integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    bike_errors text,
-    image character varying(255),
-    image_tmp character varying(255),
-    image_processed boolean DEFAULT true,
-    id_token text
-);
-
-
---
--- Name: b_params_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE b_params_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: b_params_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE b_params_id_seq OWNED BY b_params.id;
-
-
---
--- Name: bikes; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE bikes (
-    id integer NOT NULL,
-    name character varying(255),
-    cycle_type_id integer,
-    serial_number character varying(255) NOT NULL,
-    frame_model character varying(255),
-    manufacturer_id integer,
-    rear_tire_narrow boolean DEFAULT true,
-    frame_material_id integer,
-    number_of_seats integer,
-    propulsion_type_id integer,
-    creation_organization_id integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    stolen boolean DEFAULT false NOT NULL,
-    propulsion_type_other character varying(255),
-    manufacturer_other character varying(255),
-    zipcode character varying(255),
-    cached_data text,
-    description text,
-    owner_email text,
-    thumb_path character varying(255),
-    video_embed text,
-    year integer,
-    has_no_serial boolean DEFAULT false NOT NULL,
-    creator_id integer,
-    location_id integer,
-    front_tire_narrow boolean,
-    primary_frame_color_id integer,
-    secondary_frame_color_id integer,
-    tertiary_frame_color_id integer,
-    handlebar_type_id integer,
-    handlebar_type_other character varying(255),
-    front_wheel_size_id integer,
-    rear_wheel_size_id integer,
-    rear_gear_type_id integer,
-    front_gear_type_id integer,
-    cached_attributes text,
-    additional_registration character varying(255),
-    belt_drive boolean DEFAULT false NOT NULL,
-    coaster_brake boolean DEFAULT false NOT NULL,
-    frame_size character varying(255),
-    frame_size_unit character varying(255),
-    serial_normalized character varying(255),
-    pdf character varying(255),
-    card_id integer,
-    recovered boolean DEFAULT false NOT NULL,
-    paint_id integer,
-    registered_new boolean,
-    example boolean DEFAULT false NOT NULL,
-    creation_zipcode character varying(255),
-    creation_country_id integer,
-    country_id integer,
-    stock_photo_url character varying(255),
-    current_stolen_record_id integer,
-    listing_order integer,
-    approved_stolen boolean,
-    all_description text,
-    mnfg_name character varying(255),
-    hidden boolean DEFAULT false NOT NULL,
-    frame_size_number double precision,
-    updator_id integer,
-    is_for_sale boolean DEFAULT false NOT NULL,
-    made_without_serial boolean DEFAULT false NOT NULL
-);
-
-
---
--- Name: bikes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE bikes_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: bikes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE bikes_id_seq OWNED BY bikes.id;
-
-
---
--- Name: blogs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE blogs (
-    id integer NOT NULL,
-    title text,
-    title_slug character varying(255),
-    body text,
-    body_abbr text,
-    user_id integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    published_at timestamp without time zone,
-    tags character varying(255),
-    published boolean,
-    old_title_slug character varying(255),
-    description_abbr text,
-    is_listicle boolean DEFAULT false NOT NULL,
-    index_image character varying(255),
-    index_image_id integer,
-    index_image_lg character varying(255)
-);
-
-
---
--- Name: blogs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE blogs_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: blogs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE blogs_id_seq OWNED BY blogs.id;
-
-
---
--- Name: cgroups; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE cgroups (
-    id integer NOT NULL,
-    name character varying(255),
-    slug character varying(255),
-    description character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: cgroups_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE cgroups_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: cgroups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE cgroups_id_seq OWNED BY cgroups.id;
-
-
---
--- Name: colors; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE colors (
-    id integer NOT NULL,
-    name character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    priority integer,
-    display character varying(255)
-);
-
-
---
--- Name: colors_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE colors_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: colors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE colors_id_seq OWNED BY colors.id;
-
-
---
--- Name: components; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE components (
-    id integer NOT NULL,
-    model_name character varying(255),
-    year integer,
-    description text,
-    manufacturer_id integer,
-    ctype_id integer,
-    ctype_other character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    bike_id integer,
-    front boolean,
-    rear boolean,
-    manufacturer_other character varying(255),
-    serial_number character varying(255),
-    is_stock boolean DEFAULT false NOT NULL
-);
-
-
---
--- Name: components_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE components_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: components_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE components_id_seq OWNED BY components.id;
-
-
---
--- Name: countries; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE countries (
-    id integer NOT NULL,
-    name character varying(255),
-    iso character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: countries_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE countries_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: countries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE countries_id_seq OWNED BY countries.id;
-
-
---
--- Name: ctypes; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE ctypes (
-    id integer NOT NULL,
-    name character varying(255),
-    slug character varying(255),
-    secondary_name character varying(255),
-    image character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    has_multiple boolean DEFAULT false NOT NULL,
-    cgroup_id integer
-);
-
-
---
--- Name: ctypes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE ctypes_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: ctypes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE ctypes_id_seq OWNED BY ctypes.id;
-
-
---
--- Name: customer_contacts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE customer_contacts (
-    id integer NOT NULL,
-    user_id integer,
-    user_email character varying(255),
-    creator_id integer,
-    creator_email character varying(255),
-    title character varying(255),
-    contact_type character varying(255),
-    body text,
-    bike_id integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    info_hash text
-);
-
-
---
--- Name: customer_contacts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE customer_contacts_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: customer_contacts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE customer_contacts_id_seq OWNED BY customer_contacts.id;
-
-
---
--- Name: cycle_types; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE cycle_types (
-    id integer NOT NULL,
-    name character varying(255),
-    slug character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: cycle_types_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE cycle_types_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: cycle_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE cycle_types_id_seq OWNED BY cycle_types.id;
-
-
---
--- Name: duplicate_bike_groups; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE duplicate_bike_groups (
-    id integer NOT NULL,
-    ignore boolean DEFAULT false NOT NULL,
-    added_bike_at timestamp without time zone,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: duplicate_bike_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE duplicate_bike_groups_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: duplicate_bike_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE duplicate_bike_groups_id_seq OWNED BY duplicate_bike_groups.id;
-
-
---
--- Name: feedbacks; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE feedbacks (
-    id integer NOT NULL,
-    name character varying(255),
-    email character varying(255),
-    title character varying(255),
-    body text,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    feedback_type character varying(255),
-    feedback_hash text
-);
-
-
---
--- Name: feedbacks_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE feedbacks_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: feedbacks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE feedbacks_id_seq OWNED BY feedbacks.id;
-
-
---
--- Name: flavor_texts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE flavor_texts (
-    id integer NOT NULL,
-    message character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: flavor_texts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE flavor_texts_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: flavor_texts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE flavor_texts_id_seq OWNED BY flavor_texts.id;
-
-
---
--- Name: frame_materials; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE frame_materials (
-    id integer NOT NULL,
-    name character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    slug character varying(255)
-);
-
-
---
--- Name: frame_materials_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE frame_materials_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: frame_materials_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE frame_materials_id_seq OWNED BY frame_materials.id;
-
-
---
--- Name: front_gear_types; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE front_gear_types (
-    id integer NOT NULL,
-    name character varying(255),
-    count integer,
-    internal boolean DEFAULT false NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    standard boolean,
-    slug character varying(255)
-);
-
-
---
--- Name: front_gear_types_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE front_gear_types_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: front_gear_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE front_gear_types_id_seq OWNED BY front_gear_types.id;
-
-
---
--- Name: handlebar_types; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE handlebar_types (
-    id integer NOT NULL,
-    name character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    slug character varying(255)
-);
-
-
---
--- Name: handlebar_types_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE handlebar_types_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: handlebar_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE handlebar_types_id_seq OWNED BY handlebar_types.id;
-
-
---
--- Name: integrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE integrations (
-    id integer NOT NULL,
-    user_id integer,
-    access_token text,
-    provider_name character varying(255),
-    information text,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: integrations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE integrations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: integrations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE integrations_id_seq OWNED BY integrations.id;
-
-
---
--- Name: listicles; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE listicles (
-    id integer NOT NULL,
-    list_order integer,
-    body text,
-    blog_id integer,
-    image character varying(255),
-    title text,
-    body_html text,
-    image_width integer,
-    image_height integer,
-    image_credits text,
-    image_credits_html text,
-    crop_top_offset integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: listicles_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE listicles_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: listicles_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE listicles_id_seq OWNED BY listicles.id;
-
-
---
--- Name: locations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE locations (
-    id integer NOT NULL,
-    organization_id integer,
-    zipcode character varying(255),
-    city character varying(255),
-    street character varying(255),
-    phone character varying(255),
-    email character varying(255),
-    name character varying(255),
-    latitude double precision,
-    longitude double precision,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    deleted_at timestamp without time zone,
-    shown boolean DEFAULT false,
-    country_id integer,
-    state_id integer
-);
-
-
---
--- Name: locations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE locations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: locations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE locations_id_seq OWNED BY locations.id;
-
-
---
--- Name: lock_types; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE lock_types (
-    id integer NOT NULL,
-    name character varying(255),
-    slug character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: lock_types_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE lock_types_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: lock_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE lock_types_id_seq OWNED BY lock_types.id;
-
-
---
--- Name: locks; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE locks (
-    id integer NOT NULL,
-    lock_type_id integer DEFAULT 1,
-    has_key boolean DEFAULT true,
-    has_combination boolean,
-    combination character varying(255),
-    key_serial character varying(255),
-    manufacturer_id integer,
-    manufacturer_other character varying(255),
-    user_id integer,
-    lock_model character varying(255),
-    notes text,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: locks_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE locks_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: locks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE locks_id_seq OWNED BY locks.id;
-
-
---
--- Name: mail_snippets; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE mail_snippets (
-    id integer NOT NULL,
-    name character varying(255),
-    is_enabled boolean DEFAULT false NOT NULL,
-    is_location_triggered boolean DEFAULT false NOT NULL,
-    body text,
-    address character varying(255),
-    latitude double precision,
-    longitude double precision,
-    proximity_radius integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: mail_snippets_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE mail_snippets_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: mail_snippets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE mail_snippets_id_seq OWNED BY mail_snippets.id;
-
-
---
--- Name: manufacturers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE manufacturers (
-    id integer NOT NULL,
-    name character varying(255),
-    slug character varying(255),
-    website character varying(255),
-    frame_maker boolean,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    total_years_active character varying(255),
-    notes text,
-    open_year integer,
-    close_year integer,
-    logo character varying(255),
-    description text,
-    logo_source character varying(255)
-);
-
-
---
--- Name: manufacturers_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE manufacturers_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: manufacturers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE manufacturers_id_seq OWNED BY manufacturers.id;
-
-
---
--- Name: memberships; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE memberships (
-    id integer NOT NULL,
-    organization_id integer NOT NULL,
-    user_id integer,
-    role character varying(255) DEFAULT 'member'::character varying NOT NULL,
-    invited_email character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    deleted_at timestamp without time zone
-);
-
-
---
--- Name: memberships_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE memberships_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: memberships_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE memberships_id_seq OWNED BY memberships.id;
-
-
---
--- Name: normalized_serial_segments; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE normalized_serial_segments (
-    id integer NOT NULL,
-    segment character varying(255),
-    bike_id integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    duplicate_bike_group_id integer
-);
-
-
---
--- Name: normalized_serial_segments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE normalized_serial_segments_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: normalized_serial_segments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE normalized_serial_segments_id_seq OWNED BY normalized_serial_segments.id;
-
-
---
--- Name: oauth_access_grants; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE oauth_access_grants (
-    id integer NOT NULL,
-    resource_owner_id integer NOT NULL,
-    application_id integer NOT NULL,
-    token character varying(255) NOT NULL,
-    expires_in integer NOT NULL,
-    redirect_uri text NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    revoked_at timestamp without time zone,
-    scopes character varying(255)
-);
-
-
---
--- Name: oauth_access_grants_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE oauth_access_grants_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: oauth_access_grants_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE oauth_access_grants_id_seq OWNED BY oauth_access_grants.id;
-
-
---
--- Name: oauth_access_tokens; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE oauth_access_tokens (
-    id integer NOT NULL,
-    resource_owner_id integer,
-    application_id integer,
-    token character varying(255) NOT NULL,
-    refresh_token character varying(255),
-    expires_in integer,
-    revoked_at timestamp without time zone,
-    created_at timestamp without time zone NOT NULL,
-    scopes character varying(255)
-);
-
-
---
--- Name: oauth_access_tokens_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE oauth_access_tokens_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: oauth_access_tokens_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE oauth_access_tokens_id_seq OWNED BY oauth_access_tokens.id;
-
-
---
--- Name: oauth_applications; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE oauth_applications (
-    id integer NOT NULL,
-    name character varying(255) NOT NULL,
-    uid character varying(255) NOT NULL,
-    secret character varying(255) NOT NULL,
-    redirect_uri text NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    owner_id integer,
-    owner_type character varying(255),
-    is_internal boolean DEFAULT false NOT NULL,
-    can_send_stolen_notifications boolean DEFAULT false NOT NULL,
-    scopes character varying(255) DEFAULT ''::character varying NOT NULL
-);
-
-
---
--- Name: oauth_applications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE oauth_applications_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: oauth_applications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE oauth_applications_id_seq OWNED BY oauth_applications.id;
-
-
---
--- Name: organization_deals; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE organization_deals (
-    id integer NOT NULL,
-    organization_id integer,
-    deal_name character varying(255),
-    email character varying(255),
-    user_id character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: organization_deals_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE organization_deals_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: organization_deals_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE organization_deals_id_seq OWNED BY organization_deals.id;
-
-
---
--- Name: organization_invitations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE organization_invitations (
-    id integer NOT NULL,
-    invitee_email character varying(255),
-    invitee_name character varying(255),
-    invitee_id integer,
-    organization_id integer,
-    inviter_id integer,
-    redeemed boolean,
-    membership_role character varying(255) DEFAULT 'member'::character varying,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    deleted_at timestamp without time zone
-);
-
-
---
--- Name: organization_invitations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE organization_invitations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: organization_invitations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE organization_invitations_id_seq OWNED BY organization_invitations.id;
-
-
---
--- Name: organizations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE organizations (
-    id integer NOT NULL,
-    name character varying(255),
-    slug character varying(255) NOT NULL,
-    available_invitation_count integer DEFAULT 10,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    website character varying(255),
-    short_name character varying(255),
-    show_on_map boolean,
-    sent_invitation_count integer DEFAULT 0,
-    deleted_at timestamp without time zone,
-    is_suspended boolean DEFAULT false NOT NULL,
-    auto_user_id integer,
-    org_type character varying(255) DEFAULT 'shop'::character varying NOT NULL,
-    access_token character varying(255),
-    new_bike_notification text,
-    api_access_approved boolean DEFAULT false NOT NULL,
-    approved boolean DEFAULT false NOT NULL,
-    wants_to_be_shown boolean DEFAULT false NOT NULL,
-    use_additional_registration_field boolean DEFAULT false NOT NULL
-);
-
-
---
--- Name: organizations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE organizations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: organizations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE organizations_id_seq OWNED BY organizations.id;
-
-
---
--- Name: other_listings; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE other_listings (
-    id integer NOT NULL,
-    bike_id integer,
-    url character varying(255),
-    listing_type character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: other_listings_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE other_listings_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: other_listings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE other_listings_id_seq OWNED BY other_listings.id;
-
-
---
--- Name: ownerships; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE ownerships (
-    id integer NOT NULL,
-    bike_id integer,
-    user_id integer,
-    owner_email character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    creator_id integer,
-    current boolean DEFAULT false,
-    claimed boolean,
-    example boolean DEFAULT false NOT NULL,
-    send_email boolean DEFAULT true,
-    user_hidden boolean DEFAULT false NOT NULL
-);
-
-
---
--- Name: ownerships_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE ownerships_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: ownerships_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE ownerships_id_seq OWNED BY ownerships.id;
-
-
---
--- Name: paints; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE paints (
-    id integer NOT NULL,
-    name character varying(255),
-    color_id integer,
-    manufacturer_id integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    secondary_color_id integer,
-    tertiary_color_id integer,
-    bikes_count integer DEFAULT 0 NOT NULL
-);
-
-
---
--- Name: paints_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE paints_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: paints_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE paints_id_seq OWNED BY paints.id;
-
-
---
--- Name: payments; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE payments (
-    id integer NOT NULL,
-    user_id integer,
-    is_current boolean DEFAULT true,
-    is_recurring boolean DEFAULT false NOT NULL,
-    stripe_id character varying(255),
-    last_payment_date timestamp without time zone,
-    first_payment_date timestamp without time zone,
-    amount integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    email character varying(255)
-);
-
-
---
--- Name: payments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE payments_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: payments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE payments_id_seq OWNED BY payments.id;
-
-
---
--- Name: propulsion_types; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE propulsion_types (
-    id integer NOT NULL,
-    name character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    slug character varying(255)
-);
-
-
---
--- Name: propulsion_types_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE propulsion_types_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: propulsion_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE propulsion_types_id_seq OWNED BY propulsion_types.id;
-
-
---
--- Name: public_images; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE public_images (
-    id integer NOT NULL,
-    image character varying(255),
-    name character varying(255),
-    listing_order integer DEFAULT 0,
-    imageable_id integer,
-    imageable_type character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    is_private boolean DEFAULT false NOT NULL
-);
-
-
---
--- Name: public_images_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public_images_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: public_images_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public_images_id_seq OWNED BY public_images.id;
-
-
---
--- Name: rear_gear_types; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE rear_gear_types (
-    id integer NOT NULL,
-    name character varying(255),
-    count integer,
-    internal boolean DEFAULT false NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    standard boolean,
-    slug character varying(255)
-);
-
-
---
--- Name: rear_gear_types_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE rear_gear_types_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: rear_gear_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE rear_gear_types_id_seq OWNED BY rear_gear_types.id;
-
-
---
--- Name: recovery_displays; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE recovery_displays (
-    id integer NOT NULL,
-    stolen_record_id integer,
-    quote text,
-    quote_by character varying(255),
-    date_recovered timestamp without time zone,
-    link character varying(255),
-    image character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: recovery_displays_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE recovery_displays_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: recovery_displays_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE recovery_displays_id_seq OWNED BY recovery_displays.id;
-
-
---
--- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE schema_migrations (
-    version character varying(255) NOT NULL
-);
-
-
---
--- Name: states; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE states (
-    id integer NOT NULL,
-    name character varying(255),
-    abbreviation character varying(255),
-    country_id integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: states_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE states_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: states_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE states_id_seq OWNED BY states.id;
-
-
---
--- Name: stolen_notifications; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE stolen_notifications (
-    id integer NOT NULL,
-    subject character varying(255),
-    message text,
-    sender_id integer,
-    receiver_id integer,
-    bike_id integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    send_dates text,
-    receiver_email character varying(255),
-    oauth_application_id integer,
-    reference_url character varying(255)
-);
-
-
---
--- Name: stolen_notifications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE stolen_notifications_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: stolen_notifications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE stolen_notifications_id_seq OWNED BY stolen_notifications.id;
-
-
---
--- Name: stolen_records; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE stolen_records (
-    id integer NOT NULL,
-    zipcode character varying(255),
-    city character varying(255),
-    theft_description text,
-    "time" text,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    bike_id integer,
-    current boolean DEFAULT true,
-    street character varying(255),
-    latitude double precision,
-    longitude double precision,
-    date_stolen timestamp without time zone,
-    phone character varying(255),
-    phone_for_everyone boolean,
-    phone_for_users boolean DEFAULT true,
-    phone_for_shops boolean DEFAULT true,
-    phone_for_police boolean DEFAULT true,
-    police_report_number character varying(255),
-    locking_description character varying(255),
-    lock_defeat_description character varying(255),
-    country_id integer,
-    police_report_department character varying(255),
-    state_id integer,
-    creation_organization_id integer,
-    secondary_phone character varying(255),
-    approved boolean DEFAULT false NOT NULL,
-    receive_notifications boolean DEFAULT true,
-    proof_of_ownership boolean,
-    date_recovered timestamp without time zone,
-    recovered_description text,
-    index_helped_recovery boolean DEFAULT false NOT NULL,
-    can_share_recovery boolean DEFAULT false NOT NULL,
-    recovery_posted boolean DEFAULT false,
-    recovery_tweet text,
-    recovery_share text,
-    create_open311 boolean DEFAULT false NOT NULL,
-    tsved_at timestamp without time zone
-);
-
-
---
--- Name: stolen_records_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE stolen_records_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: stolen_records_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE stolen_records_id_seq OWNED BY stolen_records.id;
-
-
---
--- Name: users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE users (
-    id integer NOT NULL,
-    name character varying(255),
-    email character varying(255),
-    password text,
-    last_login timestamp without time zone,
-    superuser boolean DEFAULT false NOT NULL,
-    password_reset_token text,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    password_digest character varying(255),
-    banned boolean,
-    phone character varying(255),
-    zipcode character varying(255),
-    twitter character varying(255),
-    show_twitter boolean DEFAULT false NOT NULL,
-    website character varying(255),
-    show_website boolean DEFAULT false NOT NULL,
-    show_phone boolean DEFAULT true,
-    show_bikes boolean DEFAULT false NOT NULL,
-    username character varying(255),
-    has_stolen_bikes boolean,
-    avatar character varying(255),
-    description text,
-    title text,
-    terms_of_service boolean DEFAULT false NOT NULL,
-    vendor_terms_of_service boolean,
-    when_vendor_terms_of_service timestamp without time zone,
-    confirmed boolean,
-    confirmation_token character varying(255),
-    can_send_many_stolen_notifications boolean DEFAULT false NOT NULL,
-    auth_token character varying(255),
-    stripe_id character varying(255),
-    is_paid_member boolean DEFAULT false NOT NULL,
-    paid_membership_info text,
-    is_content_admin boolean DEFAULT false NOT NULL,
-    my_bikes_hash text,
-    is_emailable boolean DEFAULT false NOT NULL,
-    developer boolean DEFAULT false NOT NULL
-);
-
-
---
--- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE users_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE users_id_seq OWNED BY users.id;
-
-
---
--- Name: wheel_sizes; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE wheel_sizes (
-    id integer NOT NULL,
-    name character varying(255),
-    description character varying(255),
-    iso_bsd integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    priority integer
-);
-
-
---
--- Name: wheel_sizes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE wheel_sizes_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: wheel_sizes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE wheel_sizes_id_seq OWNED BY wheel_sizes.id;
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY ads ALTER COLUMN id SET DEFAULT nextval('ads_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY b_params ALTER COLUMN id SET DEFAULT nextval('b_params_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY bikes ALTER COLUMN id SET DEFAULT nextval('bikes_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY blogs ALTER COLUMN id SET DEFAULT nextval('blogs_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY cgroups ALTER COLUMN id SET DEFAULT nextval('cgroups_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY colors ALTER COLUMN id SET DEFAULT nextval('colors_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY components ALTER COLUMN id SET DEFAULT nextval('components_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY countries ALTER COLUMN id SET DEFAULT nextval('countries_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY ctypes ALTER COLUMN id SET DEFAULT nextval('ctypes_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY customer_contacts ALTER COLUMN id SET DEFAULT nextval('customer_contacts_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY cycle_types ALTER COLUMN id SET DEFAULT nextval('cycle_types_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY duplicate_bike_groups ALTER COLUMN id SET DEFAULT nextval('duplicate_bike_groups_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY feedbacks ALTER COLUMN id SET DEFAULT nextval('feedbacks_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY flavor_texts ALTER COLUMN id SET DEFAULT nextval('flavor_texts_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY frame_materials ALTER COLUMN id SET DEFAULT nextval('frame_materials_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY front_gear_types ALTER COLUMN id SET DEFAULT nextval('front_gear_types_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY handlebar_types ALTER COLUMN id SET DEFAULT nextval('handlebar_types_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY integrations ALTER COLUMN id SET DEFAULT nextval('integrations_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY listicles ALTER COLUMN id SET DEFAULT nextval('listicles_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY locations ALTER COLUMN id SET DEFAULT nextval('locations_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY lock_types ALTER COLUMN id SET DEFAULT nextval('lock_types_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY locks ALTER COLUMN id SET DEFAULT nextval('locks_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY mail_snippets ALTER COLUMN id SET DEFAULT nextval('mail_snippets_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY manufacturers ALTER COLUMN id SET DEFAULT nextval('manufacturers_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY memberships ALTER COLUMN id SET DEFAULT nextval('memberships_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY normalized_serial_segments ALTER COLUMN id SET DEFAULT nextval('normalized_serial_segments_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY oauth_access_grants ALTER COLUMN id SET DEFAULT nextval('oauth_access_grants_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY oauth_access_tokens ALTER COLUMN id SET DEFAULT nextval('oauth_access_tokens_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY oauth_applications ALTER COLUMN id SET DEFAULT nextval('oauth_applications_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY organization_deals ALTER COLUMN id SET DEFAULT nextval('organization_deals_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY organization_invitations ALTER COLUMN id SET DEFAULT nextval('organization_invitations_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY organizations ALTER COLUMN id SET DEFAULT nextval('organizations_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY other_listings ALTER COLUMN id SET DEFAULT nextval('other_listings_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY ownerships ALTER COLUMN id SET DEFAULT nextval('ownerships_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY paints ALTER COLUMN id SET DEFAULT nextval('paints_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY payments ALTER COLUMN id SET DEFAULT nextval('payments_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY propulsion_types ALTER COLUMN id SET DEFAULT nextval('propulsion_types_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public_images ALTER COLUMN id SET DEFAULT nextval('public_images_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY rear_gear_types ALTER COLUMN id SET DEFAULT nextval('rear_gear_types_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY recovery_displays ALTER COLUMN id SET DEFAULT nextval('recovery_displays_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY states ALTER COLUMN id SET DEFAULT nextval('states_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY stolen_notifications ALTER COLUMN id SET DEFAULT nextval('stolen_notifications_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY stolen_records ALTER COLUMN id SET DEFAULT nextval('stolen_records_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY wheel_sizes ALTER COLUMN id SET DEFAULT nextval('wheel_sizes_id_seq'::regclass);
-
-
---
--- Name: ads_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY ads
-    ADD CONSTRAINT ads_pkey PRIMARY KEY (id);
-
-
---
--- Name: b_params_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY b_params
-    ADD CONSTRAINT b_params_pkey PRIMARY KEY (id);
-
-
---
--- Name: bikes_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY bikes
-    ADD CONSTRAINT bikes_pkey PRIMARY KEY (id);
-
-
---
--- Name: blogs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY blogs
-    ADD CONSTRAINT blogs_pkey PRIMARY KEY (id);
-
-
---
--- Name: cgroups_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY cgroups
-    ADD CONSTRAINT cgroups_pkey PRIMARY KEY (id);
-
-
---
--- Name: colors_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY colors
-    ADD CONSTRAINT colors_pkey PRIMARY KEY (id);
-
-
---
--- Name: components_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY components
-    ADD CONSTRAINT components_pkey PRIMARY KEY (id);
-
-
---
--- Name: countries_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY countries
-    ADD CONSTRAINT countries_pkey PRIMARY KEY (id);
-
-
---
--- Name: ctypes_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY ctypes
-    ADD CONSTRAINT ctypes_pkey PRIMARY KEY (id);
-
-
---
--- Name: customer_contacts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY customer_contacts
-    ADD CONSTRAINT customer_contacts_pkey PRIMARY KEY (id);
-
-
---
--- Name: cycle_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY cycle_types
-    ADD CONSTRAINT cycle_types_pkey PRIMARY KEY (id);
-
-
---
--- Name: duplicate_bike_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY duplicate_bike_groups
-    ADD CONSTRAINT duplicate_bike_groups_pkey PRIMARY KEY (id);
-
-
---
--- Name: feedbacks_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY feedbacks
-    ADD CONSTRAINT feedbacks_pkey PRIMARY KEY (id);
-
-
---
--- Name: flavor_texts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY flavor_texts
-    ADD CONSTRAINT flavor_texts_pkey PRIMARY KEY (id);
-
-
---
--- Name: frame_materials_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY frame_materials
-    ADD CONSTRAINT frame_materials_pkey PRIMARY KEY (id);
-
-
---
--- Name: front_gear_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY front_gear_types
-    ADD CONSTRAINT front_gear_types_pkey PRIMARY KEY (id);
-
-
---
--- Name: handlebar_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY handlebar_types
-    ADD CONSTRAINT handlebar_types_pkey PRIMARY KEY (id);
-
-
---
--- Name: integrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY integrations
-    ADD CONSTRAINT integrations_pkey PRIMARY KEY (id);
-
-
---
--- Name: listicles_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY listicles
-    ADD CONSTRAINT listicles_pkey PRIMARY KEY (id);
-
-
---
--- Name: locations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY locations
-    ADD CONSTRAINT locations_pkey PRIMARY KEY (id);
-
-
---
--- Name: lock_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY lock_types
-    ADD CONSTRAINT lock_types_pkey PRIMARY KEY (id);
-
-
---
--- Name: locks_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY locks
-    ADD CONSTRAINT locks_pkey PRIMARY KEY (id);
-
-
---
--- Name: mail_snippets_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY mail_snippets
-    ADD CONSTRAINT mail_snippets_pkey PRIMARY KEY (id);
-
-
---
--- Name: manufacturers_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY manufacturers
-    ADD CONSTRAINT manufacturers_pkey PRIMARY KEY (id);
-
-
---
--- Name: memberships_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY memberships
-    ADD CONSTRAINT memberships_pkey PRIMARY KEY (id);
-
-
---
--- Name: normalized_serial_segments_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY normalized_serial_segments
-    ADD CONSTRAINT normalized_serial_segments_pkey PRIMARY KEY (id);
-
-
---
--- Name: oauth_access_grants_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY oauth_access_grants
-    ADD CONSTRAINT oauth_access_grants_pkey PRIMARY KEY (id);
-
-
---
--- Name: oauth_access_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY oauth_access_tokens
-    ADD CONSTRAINT oauth_access_tokens_pkey PRIMARY KEY (id);
-
-
---
--- Name: oauth_applications_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY oauth_applications
-    ADD CONSTRAINT oauth_applications_pkey PRIMARY KEY (id);
-
-
---
--- Name: organization_deals_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY organization_deals
-    ADD CONSTRAINT organization_deals_pkey PRIMARY KEY (id);
-
-
---
--- Name: organization_invitations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY organization_invitations
-    ADD CONSTRAINT organization_invitations_pkey PRIMARY KEY (id);
-
-
---
--- Name: organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY organizations
-    ADD CONSTRAINT organizations_pkey PRIMARY KEY (id);
-
-
---
--- Name: other_listings_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY other_listings
-    ADD CONSTRAINT other_listings_pkey PRIMARY KEY (id);
-
-
---
--- Name: ownerships_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY ownerships
-    ADD CONSTRAINT ownerships_pkey PRIMARY KEY (id);
-
-
---
--- Name: paints_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY paints
-    ADD CONSTRAINT paints_pkey PRIMARY KEY (id);
-
-
---
--- Name: payments_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY payments
-    ADD CONSTRAINT payments_pkey PRIMARY KEY (id);
-
-
---
--- Name: propulsion_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY propulsion_types
-    ADD CONSTRAINT propulsion_types_pkey PRIMARY KEY (id);
-
-
---
--- Name: public_images_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY public_images
-    ADD CONSTRAINT public_images_pkey PRIMARY KEY (id);
-
-
---
--- Name: rear_gear_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY rear_gear_types
-    ADD CONSTRAINT rear_gear_types_pkey PRIMARY KEY (id);
-
-
---
--- Name: recovery_displays_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY recovery_displays
-    ADD CONSTRAINT recovery_displays_pkey PRIMARY KEY (id);
-
-
---
--- Name: states_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY states
-    ADD CONSTRAINT states_pkey PRIMARY KEY (id);
-
-
---
--- Name: stolen_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY stolen_notifications
-    ADD CONSTRAINT stolen_notifications_pkey PRIMARY KEY (id);
-
-
---
--- Name: stolen_records_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY stolen_records
-    ADD CONSTRAINT stolen_records_pkey PRIMARY KEY (id);
-
-
---
--- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY users
-    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
-
-
---
--- Name: wheel_sizes_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY wheel_sizes
-    ADD CONSTRAINT wheel_sizes_pkey PRIMARY KEY (id);
-
-
---
--- Name: index_bikes_on_card_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_bikes_on_card_id ON bikes USING btree (card_id);
-
-
---
--- Name: index_bikes_on_current_stolen_record_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_bikes_on_current_stolen_record_id ON bikes USING btree (current_stolen_record_id);
-
-
---
--- Name: index_bikes_on_cycle_type_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_bikes_on_cycle_type_id ON bikes USING btree (cycle_type_id);
-
-
---
--- Name: index_bikes_on_manufacturer_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_bikes_on_manufacturer_id ON bikes USING btree (manufacturer_id);
-
-
---
--- Name: index_bikes_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_bikes_on_organization_id ON bikes USING btree (creation_organization_id);
-
-
---
--- Name: index_bikes_on_paint_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_bikes_on_paint_id ON bikes USING btree (paint_id);
-
-
---
--- Name: index_bikes_on_primary_frame_color_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_bikes_on_primary_frame_color_id ON bikes USING btree (primary_frame_color_id);
-
-
---
--- Name: index_bikes_on_secondary_frame_color_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_bikes_on_secondary_frame_color_id ON bikes USING btree (secondary_frame_color_id);
-
-
---
--- Name: index_bikes_on_tertiary_frame_color_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_bikes_on_tertiary_frame_color_id ON bikes USING btree (tertiary_frame_color_id);
-
-
---
--- Name: index_components_on_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_components_on_bike_id ON components USING btree (bike_id);
-
-
---
--- Name: index_components_on_manufacturer_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_components_on_manufacturer_id ON components USING btree (manufacturer_id);
-
-
---
--- Name: index_integrations_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_integrations_on_user_id ON integrations USING btree (user_id);
-
-
---
--- Name: index_locks_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_locks_on_user_id ON locks USING btree (user_id);
-
-
---
--- Name: index_memberships_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_memberships_on_organization_id ON memberships USING btree (organization_id);
-
-
---
--- Name: index_memberships_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_memberships_on_user_id ON memberships USING btree (user_id);
-
-
---
--- Name: index_normalized_serial_segments_on_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_normalized_serial_segments_on_bike_id ON normalized_serial_segments USING btree (bike_id);
-
-
---
--- Name: index_normalized_serial_segments_on_duplicate_bike_group_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_normalized_serial_segments_on_duplicate_bike_group_id ON normalized_serial_segments USING btree (duplicate_bike_group_id);
-
-
---
--- Name: index_oauth_access_grants_on_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_oauth_access_grants_on_token ON oauth_access_grants USING btree (token);
-
-
---
--- Name: index_oauth_access_tokens_on_refresh_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_oauth_access_tokens_on_refresh_token ON oauth_access_tokens USING btree (refresh_token);
-
-
---
--- Name: index_oauth_access_tokens_on_resource_owner_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_oauth_access_tokens_on_resource_owner_id ON oauth_access_tokens USING btree (resource_owner_id);
-
-
---
--- Name: index_oauth_access_tokens_on_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_oauth_access_tokens_on_token ON oauth_access_tokens USING btree (token);
-
-
---
--- Name: index_oauth_applications_on_owner_id_and_owner_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_oauth_applications_on_owner_id_and_owner_type ON oauth_applications USING btree (owner_id, owner_type);
-
-
---
--- Name: index_oauth_applications_on_uid; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_oauth_applications_on_uid ON oauth_applications USING btree (uid);
-
-
---
--- Name: index_organization_invitations_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_organization_invitations_on_organization_id ON organization_invitations USING btree (organization_id);
-
-
---
--- Name: index_organizations_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_organizations_on_slug ON organizations USING btree (slug);
-
-
---
--- Name: index_ownerships_on_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_ownerships_on_bike_id ON ownerships USING btree (bike_id);
-
-
---
--- Name: index_ownerships_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_ownerships_on_creator_id ON ownerships USING btree (creator_id);
-
-
---
--- Name: index_ownerships_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_ownerships_on_user_id ON ownerships USING btree (user_id);
-
-
---
--- Name: index_payments_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_payments_on_user_id ON payments USING btree (user_id);
-
-
---
--- Name: index_public_images_on_imageable_id_and_imageable_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_public_images_on_imageable_id_and_imageable_type ON public_images USING btree (imageable_id, imageable_type);
-
-
---
--- Name: index_recovery_displays_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_recovery_displays_on_stolen_record_id ON recovery_displays USING btree (stolen_record_id);
-
-
---
--- Name: index_states_on_country_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_states_on_country_id ON states USING btree (country_id);
-
-
---
--- Name: index_stolen_notifications_on_oauth_application_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_stolen_notifications_on_oauth_application_id ON stolen_notifications USING btree (oauth_application_id);
-
-
---
--- Name: index_stolen_records_on_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_stolen_records_on_bike_id ON stolen_records USING btree (bike_id);
-
-
---
--- Name: index_stolen_records_on_latitude_and_longitude; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_stolen_records_on_latitude_and_longitude ON stolen_records USING btree (latitude, longitude);
-
-
---
--- Name: index_users_on_password_reset_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_users_on_password_reset_token ON users USING btree (password_reset_token);
-
-
---
--- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (version);
-
-
---
--- PostgreSQL database dump complete
---
-
-SET search_path TO "$user",public;
+CREATE TABLE `ads` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `body` text COLLATE utf8_unicode_ci,
+  `image` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `target_url` text COLLATE utf8_unicode_ci,
+  `organization_id` int(11) DEFAULT NULL,
+  `live` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `b_params` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `params` text COLLATE utf8_unicode_ci,
+  `bike_title` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `creator_id` int(11) DEFAULT NULL,
+  `created_bike_id` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `bike_errors` text COLLATE utf8_unicode_ci,
+  `image` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `image_tmp` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `image_processed` tinyint(1) DEFAULT '1',
+  `id_token` text COLLATE utf8_unicode_ci,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `bikes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cycle_type_id` int(11) DEFAULT NULL,
+  `serial_number` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `frame_model` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `manufacturer_id` int(11) DEFAULT NULL,
+  `rear_tire_narrow` tinyint(1) DEFAULT '1',
+  `frame_material_id` int(11) DEFAULT NULL,
+  `number_of_seats` int(11) DEFAULT NULL,
+  `propulsion_type_id` int(11) DEFAULT NULL,
+  `creation_organization_id` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `stolen` tinyint(1) NOT NULL DEFAULT '0',
+  `propulsion_type_other` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `manufacturer_other` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `zipcode` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cached_data` text COLLATE utf8_unicode_ci,
+  `description` text COLLATE utf8_unicode_ci,
+  `owner_email` text COLLATE utf8_unicode_ci,
+  `thumb_path` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `video_embed` text COLLATE utf8_unicode_ci,
+  `year` int(11) DEFAULT NULL,
+  `has_no_serial` tinyint(1) NOT NULL DEFAULT '0',
+  `creator_id` int(11) DEFAULT NULL,
+  `location_id` int(11) DEFAULT NULL,
+  `front_tire_narrow` tinyint(1) DEFAULT NULL,
+  `primary_frame_color_id` int(11) DEFAULT NULL,
+  `secondary_frame_color_id` int(11) DEFAULT NULL,
+  `tertiary_frame_color_id` int(11) DEFAULT NULL,
+  `handlebar_type_id` int(11) DEFAULT NULL,
+  `handlebar_type_other` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `front_wheel_size_id` int(11) DEFAULT NULL,
+  `rear_wheel_size_id` int(11) DEFAULT NULL,
+  `rear_gear_type_id` int(11) DEFAULT NULL,
+  `front_gear_type_id` int(11) DEFAULT NULL,
+  `cached_attributes` text COLLATE utf8_unicode_ci,
+  `additional_registration` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `belt_drive` tinyint(1) NOT NULL DEFAULT '0',
+  `coaster_brake` tinyint(1) NOT NULL DEFAULT '0',
+  `frame_size` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `frame_size_unit` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `serial_normalized` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `pdf` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `card_id` int(11) DEFAULT NULL,
+  `recovered` tinyint(1) NOT NULL DEFAULT '0',
+  `paint_id` int(11) DEFAULT NULL,
+  `registered_new` tinyint(1) DEFAULT NULL,
+  `example` tinyint(1) NOT NULL DEFAULT '0',
+  `creation_zipcode` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `creation_country_id` int(11) DEFAULT NULL,
+  `country_id` int(11) DEFAULT NULL,
+  `stock_photo_url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `current_stolen_record_id` int(11) DEFAULT NULL,
+  `listing_order` int(11) DEFAULT NULL,
+  `approved_stolen` tinyint(1) DEFAULT NULL,
+  `all_description` text COLLATE utf8_unicode_ci,
+  `mnfg_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `hidden` tinyint(1) NOT NULL DEFAULT '0',
+  `frame_size_number` float DEFAULT NULL,
+  `updator_id` int(11) DEFAULT NULL,
+  `is_for_sale` tinyint(1) NOT NULL DEFAULT '0',
+  `made_without_serial` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `index_bikes_on_organization_id` (`creation_organization_id`),
+  KEY `index_bikes_on_primary_frame_color_id` (`primary_frame_color_id`),
+  KEY `index_bikes_on_secondary_frame_color_id` (`secondary_frame_color_id`),
+  KEY `index_bikes_on_tertiary_frame_color_id` (`tertiary_frame_color_id`),
+  KEY `index_bikes_on_manufacturer_id` (`manufacturer_id`),
+  KEY `index_bikes_on_current_stolen_record_id` (`current_stolen_record_id`),
+  KEY `index_bikes_on_cycle_type_id` (`cycle_type_id`),
+  KEY `index_bikes_on_card_id` (`card_id`),
+  KEY `index_bikes_on_paint_id` (`paint_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `blogs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` text COLLATE utf8_unicode_ci,
+  `title_slug` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `body` text COLLATE utf8_unicode_ci,
+  `body_abbr` text COLLATE utf8_unicode_ci,
+  `user_id` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `published_at` datetime DEFAULT NULL,
+  `tags` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `published` tinyint(1) DEFAULT NULL,
+  `old_title_slug` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `description_abbr` text COLLATE utf8_unicode_ci,
+  `is_listicle` tinyint(1) NOT NULL DEFAULT '0',
+  `index_image` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `index_image_id` int(11) DEFAULT NULL,
+  `index_image_lg` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `cgroups` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `slug` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `description` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `colors` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `priority` int(11) DEFAULT NULL,
+  `display` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `components` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `model_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `year` int(11) DEFAULT NULL,
+  `description` text COLLATE utf8_unicode_ci,
+  `manufacturer_id` int(11) DEFAULT NULL,
+  `ctype_id` int(11) DEFAULT NULL,
+  `ctype_other` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `bike_id` int(11) DEFAULT NULL,
+  `front` tinyint(1) DEFAULT NULL,
+  `rear` tinyint(1) DEFAULT NULL,
+  `manufacturer_other` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `serial_number` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `is_stock` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `index_components_on_bike_id` (`bike_id`),
+  KEY `index_components_on_manufacturer_id` (`manufacturer_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `countries` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `iso` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `ctypes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `slug` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `secondary_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `image` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `has_multiple` tinyint(1) NOT NULL DEFAULT '0',
+  `cgroup_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `customer_contacts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `user_email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `creator_id` int(11) DEFAULT NULL,
+  `creator_email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `title` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `contact_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `body` text COLLATE utf8_unicode_ci,
+  `bike_id` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `info_hash` text COLLATE utf8_unicode_ci,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `cycle_types` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `slug` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `duplicate_bike_groups` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `ignore` tinyint(1) NOT NULL DEFAULT '0',
+  `added_bike_at` datetime DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `feedbacks` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `title` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `body` text COLLATE utf8_unicode_ci,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `feedback_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `feedback_hash` text COLLATE utf8_unicode_ci,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `flavor_texts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `message` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `frame_materials` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `slug` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `front_gear_types` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `count` int(11) DEFAULT NULL,
+  `internal` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `standard` tinyint(1) DEFAULT NULL,
+  `slug` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `handlebar_types` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `slug` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `integrations` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `access_token` text COLLATE utf8_unicode_ci,
+  `provider_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `information` text COLLATE utf8_unicode_ci,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_integrations_on_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `listicles` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `list_order` int(11) DEFAULT NULL,
+  `body` text COLLATE utf8_unicode_ci,
+  `blog_id` int(11) DEFAULT NULL,
+  `image` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `title` text COLLATE utf8_unicode_ci,
+  `body_html` text COLLATE utf8_unicode_ci,
+  `image_width` int(11) DEFAULT NULL,
+  `image_height` int(11) DEFAULT NULL,
+  `image_credits` text COLLATE utf8_unicode_ci,
+  `image_credits_html` text COLLATE utf8_unicode_ci,
+  `crop_top_offset` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `locations` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `organization_id` int(11) DEFAULT NULL,
+  `zipcode` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `city` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `street` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `phone` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `latitude` float DEFAULT NULL,
+  `longitude` float DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `shown` tinyint(1) DEFAULT '0',
+  `country_id` int(11) DEFAULT NULL,
+  `state_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `lock_types` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `slug` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `locks` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `lock_type_id` int(11) DEFAULT '1',
+  `has_key` tinyint(1) DEFAULT '1',
+  `has_combination` tinyint(1) DEFAULT NULL,
+  `combination` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `key_serial` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `manufacturer_id` int(11) DEFAULT NULL,
+  `manufacturer_other` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `lock_model` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `notes` text COLLATE utf8_unicode_ci,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_locks_on_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `mail_snippets` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `is_enabled` tinyint(1) NOT NULL DEFAULT '0',
+  `is_location_triggered` tinyint(1) NOT NULL DEFAULT '0',
+  `body` text COLLATE utf8_unicode_ci,
+  `address` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `latitude` float DEFAULT NULL,
+  `longitude` float DEFAULT NULL,
+  `proximity_radius` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `manufacturers` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `slug` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `website` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `frame_maker` tinyint(1) DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `total_years_active` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `notes` text COLLATE utf8_unicode_ci,
+  `open_year` int(11) DEFAULT NULL,
+  `close_year` int(11) DEFAULT NULL,
+  `logo` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `description` text COLLATE utf8_unicode_ci,
+  `logo_source` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `memberships` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `organization_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `role` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'member',
+  `invited_email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_memberships_on_organization_id` (`organization_id`),
+  KEY `index_memberships_on_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `normalized_serial_segments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `segment` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bike_id` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `duplicate_bike_group_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_normalized_serial_segments_on_bike_id` (`bike_id`),
+  KEY `index_normalized_serial_segments_on_duplicate_bike_group_id` (`duplicate_bike_group_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `oauth_access_grants` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `resource_owner_id` int(11) NOT NULL,
+  `application_id` int(11) NOT NULL,
+  `token` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `expires_in` int(11) NOT NULL,
+  `redirect_uri` text COLLATE utf8_unicode_ci NOT NULL,
+  `created_at` datetime NOT NULL,
+  `revoked_at` datetime DEFAULT NULL,
+  `scopes` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `index_oauth_access_grants_on_token` (`token`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `oauth_access_tokens` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `resource_owner_id` int(11) DEFAULT NULL,
+  `application_id` int(11) DEFAULT NULL,
+  `token` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `refresh_token` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `expires_in` int(11) DEFAULT NULL,
+  `revoked_at` datetime DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `scopes` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `index_oauth_access_tokens_on_token` (`token`),
+  UNIQUE KEY `index_oauth_access_tokens_on_refresh_token` (`refresh_token`),
+  KEY `index_oauth_access_tokens_on_resource_owner_id` (`resource_owner_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `oauth_applications` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `uid` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `secret` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `redirect_uri` text COLLATE utf8_unicode_ci NOT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `owner_id` int(11) DEFAULT NULL,
+  `owner_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `is_internal` tinyint(1) NOT NULL DEFAULT '0',
+  `can_send_stolen_notifications` tinyint(1) NOT NULL DEFAULT '0',
+  `scopes` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `index_oauth_applications_on_uid` (`uid`),
+  KEY `index_oauth_applications_on_owner_id_and_owner_type` (`owner_id`,`owner_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `organization_deals` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `organization_id` int(11) DEFAULT NULL,
+  `deal_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `user_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `organization_invitations` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `invitee_email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `invitee_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `invitee_id` int(11) DEFAULT NULL,
+  `organization_id` int(11) DEFAULT NULL,
+  `inviter_id` int(11) DEFAULT NULL,
+  `redeemed` tinyint(1) DEFAULT NULL,
+  `membership_role` varchar(255) COLLATE utf8_unicode_ci DEFAULT 'member',
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_organization_invitations_on_organization_id` (`organization_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `organizations` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `slug` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `available_invitation_count` int(11) DEFAULT '10',
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `website` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `short_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `show_on_map` tinyint(1) DEFAULT NULL,
+  `sent_invitation_count` int(11) DEFAULT '0',
+  `deleted_at` datetime DEFAULT NULL,
+  `is_suspended` tinyint(1) NOT NULL DEFAULT '0',
+  `auto_user_id` int(11) DEFAULT NULL,
+  `org_type` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'shop',
+  `access_token` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `new_bike_notification` text COLLATE utf8_unicode_ci,
+  `api_access_approved` tinyint(1) NOT NULL DEFAULT '0',
+  `approved` tinyint(1) NOT NULL DEFAULT '0',
+  `wants_to_be_shown` tinyint(1) NOT NULL DEFAULT '0',
+  `use_additional_registration_field` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `index_organizations_on_slug` (`slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `other_listings` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `bike_id` int(11) DEFAULT NULL,
+  `url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `listing_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `ownerships` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `bike_id` int(11) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `owner_email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `creator_id` int(11) DEFAULT NULL,
+  `current` tinyint(1) DEFAULT '0',
+  `claimed` tinyint(1) DEFAULT NULL,
+  `example` tinyint(1) NOT NULL DEFAULT '0',
+  `send_email` tinyint(1) DEFAULT '1',
+  `user_hidden` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `index_ownerships_on_bike_id` (`bike_id`),
+  KEY `index_ownerships_on_user_id` (`user_id`),
+  KEY `index_ownerships_on_creator_id` (`creator_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `paints` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `color_id` int(11) DEFAULT NULL,
+  `manufacturer_id` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `secondary_color_id` int(11) DEFAULT NULL,
+  `tertiary_color_id` int(11) DEFAULT NULL,
+  `bikes_count` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `payments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `is_current` tinyint(1) DEFAULT '1',
+  `is_recurring` tinyint(1) NOT NULL DEFAULT '0',
+  `stripe_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `last_payment_date` datetime DEFAULT NULL,
+  `first_payment_date` datetime DEFAULT NULL,
+  `amount` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_payments_on_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `propulsion_types` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `slug` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `public_images` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `image` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `listing_order` int(11) DEFAULT '0',
+  `imageable_id` int(11) DEFAULT NULL,
+  `imageable_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `is_private` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `index_public_images_on_imageable_id_and_imageable_type` (`imageable_id`,`imageable_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `rear_gear_types` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `count` int(11) DEFAULT NULL,
+  `internal` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `standard` tinyint(1) DEFAULT NULL,
+  `slug` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `recovery_displays` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `stolen_record_id` int(11) DEFAULT NULL,
+  `quote` text COLLATE utf8_unicode_ci,
+  `quote_by` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `date_recovered` datetime DEFAULT NULL,
+  `link` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `image` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_recovery_displays_on_stolen_record_id` (`stolen_record_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `schema_migrations` (
+  `version` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  UNIQUE KEY `unique_schema_migrations` (`version`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `states` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `abbreviation` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `country_id` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_states_on_country_id` (`country_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `stolen_notifications` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `subject` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `sender_id` int(11) DEFAULT NULL,
+  `receiver_id` int(11) DEFAULT NULL,
+  `bike_id` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `send_dates` text COLLATE utf8_unicode_ci,
+  `receiver_email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `oauth_application_id` int(11) DEFAULT NULL,
+  `reference_url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_stolen_notifications_on_oauth_application_id` (`oauth_application_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `stolen_records` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `zipcode` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `city` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `theft_description` text COLLATE utf8_unicode_ci,
+  `time` text COLLATE utf8_unicode_ci,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `bike_id` int(11) DEFAULT NULL,
+  `current` tinyint(1) DEFAULT '1',
+  `street` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `latitude` float DEFAULT NULL,
+  `longitude` float DEFAULT NULL,
+  `date_stolen` datetime DEFAULT NULL,
+  `phone` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `phone_for_everyone` tinyint(1) DEFAULT NULL,
+  `phone_for_users` tinyint(1) DEFAULT '1',
+  `phone_for_shops` tinyint(1) DEFAULT '1',
+  `phone_for_police` tinyint(1) DEFAULT '1',
+  `police_report_number` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `locking_description` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `lock_defeat_description` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `country_id` int(11) DEFAULT NULL,
+  `police_report_department` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `state_id` int(11) DEFAULT NULL,
+  `creation_organization_id` int(11) DEFAULT NULL,
+  `secondary_phone` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `approved` tinyint(1) NOT NULL DEFAULT '0',
+  `receive_notifications` tinyint(1) DEFAULT '1',
+  `proof_of_ownership` tinyint(1) DEFAULT NULL,
+  `date_recovered` datetime DEFAULT NULL,
+  `recovered_description` text COLLATE utf8_unicode_ci,
+  `index_helped_recovery` tinyint(1) NOT NULL DEFAULT '0',
+  `can_share_recovery` tinyint(1) NOT NULL DEFAULT '0',
+  `recovery_posted` tinyint(1) DEFAULT '0',
+  `recovery_tweet` text COLLATE utf8_unicode_ci,
+  `recovery_share` text COLLATE utf8_unicode_ci,
+  `create_open311` tinyint(1) NOT NULL DEFAULT '0',
+  `tsved_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_stolen_records_on_bike_id` (`bike_id`),
+  KEY `index_stolen_records_on_latitude_and_longitude` (`latitude`,`longitude`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `password` text COLLATE utf8_unicode_ci,
+  `last_login` datetime DEFAULT NULL,
+  `superuser` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `password_digest` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `banned` tinyint(1) DEFAULT NULL,
+  `phone` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `zipcode` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `twitter` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `show_twitter` tinyint(1) NOT NULL DEFAULT '0',
+  `website` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `show_website` tinyint(1) NOT NULL DEFAULT '0',
+  `show_phone` tinyint(1) DEFAULT '1',
+  `show_bikes` tinyint(1) NOT NULL DEFAULT '0',
+  `username` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `has_stolen_bikes` tinyint(1) DEFAULT NULL,
+  `avatar` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `description` text COLLATE utf8_unicode_ci,
+  `title` text COLLATE utf8_unicode_ci,
+  `terms_of_service` tinyint(1) NOT NULL DEFAULT '0',
+  `vendor_terms_of_service` tinyint(1) DEFAULT NULL,
+  `when_vendor_terms_of_service` datetime DEFAULT NULL,
+  `confirmed` tinyint(1) DEFAULT NULL,
+  `confirmation_token` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `can_send_many_stolen_notifications` tinyint(1) NOT NULL DEFAULT '0',
+  `auth_token` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `stripe_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `is_paid_member` tinyint(1) NOT NULL DEFAULT '0',
+  `paid_membership_info` text COLLATE utf8_unicode_ci,
+  `is_content_admin` tinyint(1) NOT NULL DEFAULT '0',
+  `my_bikes_hash` text COLLATE utf8_unicode_ci,
+  `is_emailable` tinyint(1) NOT NULL DEFAULT '0',
+  `developer` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `wheel_sizes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `description` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `iso_bsd` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `priority` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO schema_migrations (version) VALUES ('20130807222803');
 
@@ -2994,10 +1003,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160317183354');
 
 INSERT INTO schema_migrations (version) VALUES ('20160320154610');
 
-INSERT INTO schema_migrations (version) VALUES ('20160406180845');
-
 INSERT INTO schema_migrations (version) VALUES ('20160406202125');
-
-INSERT INTO schema_migrations (version) VALUES ('20160408192902');
 
 INSERT INTO schema_migrations (version) VALUES ('20160425185052');
