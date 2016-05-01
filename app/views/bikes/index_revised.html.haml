@@ -1,8 +1,10 @@
+- stolenness_desc = { 'stolen_proximity' => 'nearby stolen', 'non_stolen' => 'non-stolen', 'stolen' => 'stolen' }
 .container
   .row.first-row
     .col-md-8
       %h1
-        Search for bikes
+        Search for #{stolenness_desc[@stolenness]}
+        
     .col-md-4
       .ad-block.ad468x60
         %h4
@@ -54,28 +56,25 @@
 
       - if @bikes.present?
         %ul.bike-boxes
-          = render partial: '/bikes/revised_bike', collection: @bikes, as: :bike, locals: { target: 'show' }
+          = render partial: '/bikes/revised_bike', collection: @bikes, as: :bike
           .paginate-container.paginate-container-bottom
             = paginate @bikes
             
 
       - else
-        .container
-          %h1.no-results
-            - desc = { 'stolen_proximity' => 'nearby stolen bikes', 'non_stolen' => 'non-stolen bikes', 'stolen' => 'bikes stolen anywhere' }
-            No #{desc[@stolenness]}
-            - if @secondary_bikes.present?
-              exactly match that serial
-            - else
-              matched your search
+        %h1.no-results
+          No #{stolenness_desc[@stolenness]} bikes
+          - if @secondary_bikes.present?
+            exactly match that serial
+          - else
+            matched your search
 
-      - if @secondary_bikes.present?  
-        .container
-          %h2.secondary-bikes
-            Serial numbers close to
-            %em
-              #{params[:serial]}
+      - if @secondary_bikes.present?
+        %h2.secondary-bikes
+          Serial numbers close to
+          %em
+            #{params[:serial]}
 
-          %ul.bike-boxes
-            = render partial: '/bikes/revised_bike', collection: @secondary_bikes, locals: { target: 'show' }
+        %ul.bike-boxes
+          = render partial: '/bikes/revised_bike', collection: @secondary_bikes, as: :bike
 

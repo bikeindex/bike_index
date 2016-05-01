@@ -6,8 +6,11 @@
       %li
         %a.title-link{ href: bike_url(bike) }
           %span.attr-title
+            - unless bike.type == 'bike'
+              = bike.type
             = [bike.year, bike.mnfg_name].reject(&:blank?).join(' ')
           = bike.frame_model
+      
       = bike.attr_list_item(bike.serial_display, 'Serial')
       = bike.attr_list_item(bike.frame_colors.to_sentence, 'Primary colors')
     - if bike.current_stolen_record.present?

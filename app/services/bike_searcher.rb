@@ -21,17 +21,13 @@ class BikeSearcher
   attr_accessor :params
 
   def interpreted_params(i_params)
-    query = i_params[:query]
+    query = (i_params[:query] || '').gsub('%23', '#') # ... ensure string so we can gsub it
     return i_params unless query.present?
     # serial segment looks like s#SERIAL#
-    serial_matcher = /
-      s(\#|%23)    # hash, either normal or encoded
-      [^(\#|%23)]* # any chars except hash
-      (\#|%23)     # final chars
-    /x
+    serial_matcher = /s#[^#]*#/i
     query.gsub!(serial_matcher) do |match|
       # Set the serial to the match, with the first part chopped and the last part chopped
-      i_params[:serial] = match.gsub(/\As(#|%23)/, '').gsub(/(#|%23)\z/, '')
+      i_params[:serial] = match.gsub(/\As#/, '').gsub(/#\z/, '')
       '' # remove it from query
     end
     i_params.merge(query: query)

@@ -54,6 +54,24 @@ describe BikesController do
             expect(assigns(:stolenness)).to eq 'non_stolen'
           end
         end
+        context 'problematic deserialization params' do
+          it 'renders and correctly deserializes serial' do
+            get :index,
+                utf8: '✓',
+                query: 's#R910860723#',
+                proximity: 'ip',
+                proximity_radius: '100',
+                stolen: 'true',
+                non_stolen: '',
+                non_proximity: ''
+            expect(response.status).to eq(200)
+            target_selectize_items = [
+              { id: 'serial', search_id: 's#R910860723#', text: 'R910860723' }
+            ].as_json
+            expect(assigns(:selectize_items)).to eq target_selectize_items
+            expect(assigns(:stolenness)).to eq 'stolen_proximity'
+          end
+        end
       end
     end
     context 'with subdomain' do
