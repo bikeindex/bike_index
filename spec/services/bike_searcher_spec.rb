@@ -2,11 +2,21 @@ require 'spec_helper'
 
 describe BikeSearcher do
   describe 'initialize' do
-    it 'deletes the serial gsub expression if it is present' do
-      params = { query: 'm_940%2Cs%23sdfc%23%2Cc_1' }
-      searcher = BikeSearcher.new(params)
-      expect(searcher.params[:serial]).to eq('sdfc')
-      expect(searcher.params[:query]).to eq('m_940%2C%2Cc_1')
+    context 'basic serial' do
+      it 'deletes the serial gsub expression if it is present' do
+        params = { query: 'm_940%2Cs%23sdfc%23%2Cc_1' }
+        searcher = BikeSearcher.new(params)
+        expect(searcher.params[:serial]).to eq('sdfc')
+        expect(searcher.params[:query]).to eq('m_940%2C%2Cc_1')
+      end
+    end
+    context 'troublesome 1' do
+      it 'deletes the serial gsub expression if it is present' do
+        params = { query: 's#R910860723#' }
+        searcher = BikeSearcher.new(params)
+        expect(searcher.params[:serial]).to eq('R910860723')
+        expect(searcher.params[:query]).to eq('')
+      end
     end
   end
 

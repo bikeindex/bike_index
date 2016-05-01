@@ -14,9 +14,9 @@ describe BikesController do
         end
       end
       context 'revised' do
+        before { allow(controller).to receive(:revised_layout_enabled?) { true } }
         context 'no params' do
           it 'renders' do
-            allow(controller).to receive(:revised_layout_enabled?) { true }
             get :index
             expect(response.status).to eq(200)
             expect(response).to render_template(:index_revised)
@@ -26,14 +26,31 @@ describe BikesController do
             expect(assigns(:stolenness)).to eq 'stolen'
           end
         end
+        context 'default parameters (in the HTML)' do
+          it 'renders stolen, non-proximity' do
+            get :index,
+                utf8: '✓',
+                query: '',
+                proximity: 'Chicago',
+                proximity_radius: '100',
+                stolen: 'true',
+                non_stolen: '',
+                non_proximity: true
+            expect(response.status).to eq(200)
+            expect(response).to render_with_layout('application_revised')
+            expect(flash).to_not be_present
+            expect(assigns(:per_page)).to eq 10
+            expect(assigns(:stolenness)).to eq 'stolen'
+          end
+        end
         context 'proximity' do
           it 'renders' do
-            allow(controller).to receive(:revised_layout_enabled?) { true }
             get :index, proximity: 'ip'
             expect(response.status).to eq(200)
             expect(flash).to_not be_present
             expect(assigns(:per_page)).to eq 10
             expect(assigns(:stolenness)).to eq 'stolen_proximity'
+            expect(response).to render_with_layout('application_revised')
           end
         end
         context 'serial_param' do
@@ -52,6 +69,26 @@ describe BikesController do
             ].as_json
             expect(assigns(:selectize_items)).to eq target_selectize_items
             expect(assigns(:stolenness)).to eq 'non_stolen'
+            expect(response).to render_with_layout('application_revised')
+          end
+        end
+        context 'problematic deserialization params' do
+          it 'renders and correctly deserializes serial' do
+            get :index,
+                utf8: '✓',
+                query: 's#R910860723#',
+                proximity: 'ip',
+                proximity_radius: '100',
+                stolen: 'true',
+                non_stolen: '',
+                non_proximity: ''
+            expect(response.status).to eq(200)
+            target_selectize_items = [
+              { id: 'serial', search_id: 's#R910860723#', text: 'R910860723' }
+            ].as_json
+            expect(assigns(:selectize_items)).to eq target_selectize_items
+            expect(assigns(:stolenness)).to eq 'stolen_proximity'
+            expect(response).to render_with_layout('application_revised')
           end
         end
       end
