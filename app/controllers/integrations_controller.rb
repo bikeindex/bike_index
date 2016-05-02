@@ -1,3 +1,11 @@
+=begin
+*****************************************************************
+* File: app/controllers/integrations_controller.rb 
+* Name: Class IntegrationsController 
+* 
+*****************************************************************
+=end
+
 class IntegrationsController < ApplicationController
   include Sessionable
  
