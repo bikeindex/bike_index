@@ -1,4 +1,6 @@
 class WelcomeController < ApplicationController
+  before_filter :set_revised_layout
+
   def index
     render action: 'index', layout: (revised_layout_enabled? ? 'application_revised' : 'application_updated')
   end
