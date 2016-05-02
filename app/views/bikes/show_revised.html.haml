@@ -209,8 +209,8 @@
           .collapse#new_stolen_message
             = form_for @stolen_notification do |f|
               = f.hidden_field :bike_id, value: @bike.id
-              = f.text_area :message, required: true, placeholder: "Contacting about an ad you found online? Include a link to the ad below", rows: 3, class: 'form-control'
-              = f.text_field :reference_url, placeholder: 'Link url', rows: 3, class: 'form-control additional-field'
+              = f.text_area :message, required: true, placeholder: "Where did you see this #{@bike.type}? If you're contacting about an ad you found online, include a link in the field below", rows: 6, class: 'form-control'
+              = f.text_field :reference_url, placeholder: 'Link url', class: 'form-control additional-field'
 
               .send-message
                 = f.submit 'Send message', class: 'btn btn-primary btn-lg'
