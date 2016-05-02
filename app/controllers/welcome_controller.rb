@@ -1,5 +1,4 @@
 class WelcomeController < ApplicationController
-
   def index
     render action: 'index', layout: (revised_layout_enabled? ? 'application_revised' : 'application_updated')
   end
@@ -9,8 +8,6 @@ class WelcomeController < ApplicationController
   end
 
   def goodbye
-    # render action: 'goodbye', layout: (revised_layout_enabled? ? 'application_revised' : 'application')
-    # redirect_to logout_url if current_user.present? 
     if current_user.present?
       redirect_to logout_url
     else

@@ -35,7 +35,7 @@ describe WelcomeController do
     end
     context 'revised' do
       it 'renders with revised_layout' do
-        allow(controller).to receive(:revised_layout_enabled) { true }
+        allow(controller).to receive(:revised_layout_enabled?) { true }
         get :goodbye
         expect(response.status).to eq(200)
         expect(response).to render_template('goodbye')
