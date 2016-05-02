@@ -198,18 +198,22 @@
             %em
               Know something about this #{@bike.type}?
           %h3
-            Contact the owner now
+            Contact the owner
           - if @bike.recovered
             %p
               Is this your bike? Send proof of ownership (such as the bike's serial number or a link to a photo of you with the bike)
+          #write_them_a_message.collapse.in
+            %a.btn.btn-primary.btn-lg{ href: '#new_stolen_message', 'aria-expanded' => 'false', 'aria-controls' => 'new_stolen_message', 'data-toggle' => 'collapse' }
+              Write them a message
 
-          = form_for @stolen_notification do |f|
-            = f.hidden_field :bike_id, value: @bike.id
-            = f.text_area :message, required: true, placeholder: "Contacting about an ad you found online? Include a link to the ad below", rows: 3, class: 'form-control'
-            = f.text_field :reference_url, placeholder: 'Link url', rows: 3, class: 'form-control additional-field'
+          .collapse#new_stolen_message
+            = form_for @stolen_notification do |f|
+              = f.hidden_field :bike_id, value: @bike.id
+              = f.text_area :message, required: true, placeholder: "Contacting about an ad you found online? Include a link to the ad below", rows: 3, class: 'form-control'
+              = f.text_field :reference_url, placeholder: 'Link url', rows: 3, class: 'form-control additional-field'
 
-            .send-message
-              = f.submit 'Send message', class: 'btn btn-primary btn-lg'
+              .send-message
+                = f.submit 'Send message', class: 'btn btn-primary btn-lg'
           - if @bike.phoneable_by(current_user)
             %p.phoneable-by
               %em
@@ -218,7 +222,7 @@
                 Owner's phone number:
               
               %a{ href: "tell:#{@stolen_record.phone}" }
-                = @stolen_record.phone
+                = @stolen_record.phone_display
       .ad-block.ad300x600
         %h4
           300x600

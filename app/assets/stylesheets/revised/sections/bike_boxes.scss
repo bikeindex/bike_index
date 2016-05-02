@@ -23,15 +23,22 @@ $bike-box-bg: $gray-lighter;
     flex: 0 0 75%;
     padding: $vertical-height 0.9375rem;
   }
-  // .title-link { color: $body-font-color; } Design calls for this, but then where do you click?
+  .title-link {
+    font-size: $body-font-size;
+    width: 100%;
+    margin: 0;
+    a { display: block; }
+  }
 }
 
 @media (min-width: $grid-breakpoint-md) {
   .bike-information {
-    @include make-row;
-    .attr-list { 
-      @include make-col();
-      @include make-col-span(6);
+    @include clearfix;
+    .attr-list {
+      width: 50%;
+      float: left;
+      &:first-of-type { padding-right: 0.9375rem; }
+      &:last-of-type { padding-left: 0.9375rem; }
     }
   }
 }

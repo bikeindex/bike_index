@@ -104,6 +104,13 @@ describe StolenRecord do
     end
   end
 
+  describe 'phone_display' do # from phoneifyerable
+    it 'has phone_display' do
+      stolen_record = StolenRecord.new(phone: '272 222-22222')
+      expect(stolen_record.phone_display).to eq '272.222.22222'
+    end
+  end
+
   describe 'titleize_city' do
     it 'it should titleize_city' do
       stolen_record = FactoryGirl.create(:stolen_record)
