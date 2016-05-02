@@ -14,6 +14,7 @@ class DocumentationController < ApplicationController
     redirect_to controller: :documentation, action: :api_v2
   end
 
+# What is api_v1 and api_2 ?
   def api_v1
     @root = ENV['BASE_URL']
     render layout: 'documentation'
@@ -28,6 +29,7 @@ class DocumentationController < ApplicationController
     render layout: false
   end
 
+  # Must discovery what's o2c 
   def o2c
     render layout: false
   end

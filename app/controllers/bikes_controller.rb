@@ -11,7 +11,6 @@ class OwnershipNotSavedError < StandardError
 end
 
 class BikeNotSavedError < StandardError
-end
 
 class BikeCreatorError < StandardError
 end
@@ -122,6 +121,7 @@ class BikesController < ApplicationController
     render layout: false
   end
 
+  # Must discovery what's b_param
   def new
     if revised_layout_enabled?
       new_revised
@@ -207,6 +207,7 @@ class BikesController < ApplicationController
     end
   end
 
+  # Here the user can you informations of his bike, it's not the update method
   def revised_create
     find_or_new_b_param
     if @b_param.created_bike.present?
@@ -219,7 +220,7 @@ class BikesController < ApplicationController
       @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
       redirect_to new_bike_url(b_param_token: @b_param.id_token)
     else
-      redirect_to edit_bike_url(@bike), notice: "Bike successfully added to the index!"
+      redirect_to edit_bike_url(@bike), notice: "Bike successfully update to the index!"
     end
   end
 
