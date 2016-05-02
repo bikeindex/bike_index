@@ -7,6 +7,7 @@
 =end
 
 class DocumentationController < ApplicationController
+  
   caches_page :api_v1
   
   def index

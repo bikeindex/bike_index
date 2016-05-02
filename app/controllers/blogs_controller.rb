@@ -1,6 +1,6 @@
 =begin
 *****************************************************************
-* File: app/controllers/bolgs_controller.rb 
+* File: app/controllers/blogs_controller.rb 
 * Name: Class BlogsController 
 * Some methods to redirect user to a specific page
 *****************************************************************
