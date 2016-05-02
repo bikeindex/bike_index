@@ -160,25 +160,40 @@ describe BikeDecorator do
   end
 
   describe 'serial_display' do
-    it 'returns do not know if stolen' do
-      bike = Bike.new(serial_number: 'absent')
-      allow(bike).to receive(:stolen).and_return(true)
-      decorator = BikeDecorator.new(bike)
-      expect(decorator.serial_display).to eq('Do not know')
+    context 'absent' do
+      context 'stolen' do
+        it 'unknown' do
+          bike = Bike.new(serial_number: 'absent')
+          allow(bike).to receive(:stolen).and_return(true)
+          decorator = BikeDecorator.new(bike)
+          expect(decorator.serial_display).to eq('Unknown')
+        end
+      end
+      context 'not stolen' do
+        it 'unknown' do
+          bike = Bike.new(serial_number: 'absent')
+          allow(bike).to receive(:stolen).and_return(false)
+          decorator = BikeDecorator.new(bike)
+          expect(decorator.serial_display).to eq('Unknown')
+        end
+      end
+      context 'made_without_serial' do
+        it 'Has no serial' do
+          bike = Bike.new(serial_number: 'absent', made_without_serial: true)
+          allow(bike).to receive(:stolen).and_return(false)
+          decorator = BikeDecorator.new(bike)
+          expect(decorator.serial_display).to eq('Has no serial')
+        end
+      end
     end
-
-    it 'returns has no serial if not stolen' do
-      bike = Bike.new(serial_number: 'absent')
-      allow(bike).to receive(:stolen).and_return(false)
-      decorator = BikeDecorator.new(bike)
-      expect(decorator.serial_display).to eq('Has no serial')
-    end
-    it 'returns hidden if recovered' do
-      bike = Bike.new(serial_number: 'asdf')
-      allow(bike).to receive(:stolen).and_return(false)
-      allow(bike).to receive(:recovered).and_return(true)
-      decorator = BikeDecorator.new(bike)
-      expect(decorator.serial_display).to eq('Hidden')
+    context 'recovered' do
+      it 'returns hidden' do
+        bike = Bike.new(serial_number: 'asdf')
+        allow(bike).to receive(:stolen).and_return(false)
+        allow(bike).to receive(:recovered).and_return(true)
+        decorator = BikeDecorator.new(bike)
+        expect(decorator.serial_display).to eq('Hidden')
+      end
     end
 
     it 'returns serial number' do
