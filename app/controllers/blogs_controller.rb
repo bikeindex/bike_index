@@ -1,3 +1,11 @@
+=begin
+*****************************************************************
+* File: app/controllers/bolgs_controller.rb 
+* Name: Class BlogsController 
+* Some methods to redirect user to a specific page
+*****************************************************************
+=end
+
 class BlogsController < ApplicationController
 
   def index

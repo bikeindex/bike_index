@@ -1,4 +1,13 @@
+=begin
+*****************************************************************
+* File: app/controllers/discouse_authentication_controller.rb 
+* Name: Class DiscourseAuthenticationController 
+* Some methods to do authentication
+*****************************************************************
+=end
+
 class DiscourseAuthenticationController < ApplicationController
+
   before_filter :authenticate_and_set_redirect
 
   def index
@@ -20,6 +29,8 @@ class DiscourseAuthenticationController < ApplicationController
     "#{ENV['DISCOURSE_URL']}/session/sso_login"
   end
 
+
+  # If user did not sign in yet, redirect user to login page 
   def authenticate_and_set_redirect
     session[:discourse_redirect] ||= request.query_string
     unless current_user.present?

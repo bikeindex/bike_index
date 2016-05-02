@@ -1,3 +1,11 @@
+=begin
+*****************************************************************
+* File: app/controllers/documentation_controller.rb 
+* Name: Class DocumentationController 
+* 
+*****************************************************************
+=end
+
 class DocumentationController < ApplicationController
   caches_page :api_v1
   

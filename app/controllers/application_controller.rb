@@ -1,14 +1,26 @@
+=begin
+*****************************************************************
+* File: app/controllers/application_controller.rb 
+* Name: Class ApplicationController 
+* Some methods to use the entire application
+*****************************************************************
+=end
+
 class ApplicationController < ActionController::Base
+  
   include AuthenticationHelper
   protect_from_forgery
   ensure_security_headers
+  
   helper_method :current_user, :current_organization, :user_root_url,
                 :remove_session, :revised_layout_enabled?
+  
   before_filter :enable_rack_profiler
 
   def enable_rack_profiler
     if current_user && current_user.developer?
       Rack::MiniProfiler.authorize_request unless Rails.env.test?
+    else
     end
   end
 
@@ -48,6 +60,7 @@ class ApplicationController < ActionController::Base
       end
     elsif session[:discourse_redirect]
       redirect_to discourse_authentication_url
+    else
     end
   end
 
@@ -61,6 +74,7 @@ class ApplicationController < ActionController::Base
       headers['Access-Control-Allow-Headers'] = '*'
       headers['Access-Control-Max-Age'] = '1728000'
       render text: '', content_type: 'text/plain'
+    else
     end
   end
 end
