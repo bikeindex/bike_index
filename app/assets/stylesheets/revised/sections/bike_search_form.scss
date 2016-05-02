@@ -105,8 +105,10 @@
   flex-wrap: wrap;
   margin: 2*$vertical-height 0;
   text-align: center;
+  font-size: 12px;
   li {
     a { padding-left: 0; padding-right: 0; }
+    a.active { font-weight: $strong-font-weight; }
     &.stolen-proximity { flex: 0 0 40%; } // location info takes up the most space
     &.stolen-anywhere { flex: 0 0 27%; } 
     &.not-stolen { flex: 0 0 33%; } // 'Not marked stolen' is longer than 'Stolen anywhere'

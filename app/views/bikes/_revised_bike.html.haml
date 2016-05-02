@@ -2,15 +2,14 @@
   %a.bike-list-image{ href: bike_url(bike) }
     = bike.revised_thumb_image
   .bike-information
+    %h5.title-link
+      %a{ href: bike_url(bike) }
+        %strong
+          - unless bike.type == 'bike'
+            = bike.type
+          = [bike.year, bike.mnfg_name].reject(&:blank?).join(' ')
+        #{bike.frame_model}
     %ul.attr-list
-      %li
-        %a.title-link{ href: bike_url(bike) }
-          %span.attr-title
-            - unless bike.type == 'bike'
-              = bike.type
-            = [bike.year, bike.mnfg_name].reject(&:blank?).join(' ')
-          = bike.frame_model
-      
       = bike.attr_list_item(bike.serial_display, 'Serial')
       = bike.attr_list_item(bike.frame_colors.to_sentence, 'Primary colors')
     - if bike.current_stolen_record.present?
