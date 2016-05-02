@@ -8,7 +8,11 @@ class WelcomeController < ApplicationController
   end
 
   def goodbye
-    redirect_to logout_url if current_user.present?
+    if current_user.present?
+      redirect_to logout_url
+    else
+      render action: 'goodbye', layout: (revised_layout_enabled? ? 'application_revised' : 'application')
+    end
   end
 
   def user_home

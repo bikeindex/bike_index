@@ -26,6 +26,8 @@ module ApplicationHelper
     when 'news' then 'content_skeleton'
     when 'feedbacks' then 'content_skeleton'
     when 'manufacturers' then 'content_skeleton'
+    when 'welcome' 
+      'content_skeleton' if %w(goodbye).include?(action_name)
     end
   end
 
