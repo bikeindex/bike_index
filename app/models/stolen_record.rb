@@ -1,5 +1,6 @@
 class StolenRecord < ActiveRecord::Base
   include ActiveModel::Dirty
+  include Phonifyerable
   attr_accessible :police_report_number,
     :police_report_department,
     :locking_description,

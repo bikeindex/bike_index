@@ -6,6 +6,10 @@ class BikeIndex.BikesShow extends BikeIndex
     # Show the "claim bike" modal if it's present
     $('#claim-bike-modal').modal('show') if document.getElementById('claim-bike-modal')
 
+    # Hide the message button after click
+    $('#write_them_a_message').click ->
+      $('#write_them_a_message').collapse('toggle')
+
     if document.getElementById('thumbnails')
       # There are only event listeners if there are thumbnails
       @initializeEventListeners()

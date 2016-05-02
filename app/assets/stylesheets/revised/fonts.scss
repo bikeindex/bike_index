@@ -110,17 +110,8 @@ h4 {
   line-height: 18px;
 }
 
-// WebKit, Blink, Edge
-::-webkit-input-placeholder { color: $gray-light; }
-// Mozilla Firefox 4 to 18
-:-moz-placeholder {
-   color: $gray-light;
-   opacity:  1;
+// Stop fucking prefixing. No italic if you need prefix.
+textarea[placeholder], input[placeholder] { 
+  color: $gray-light;
+  font-style: italic;
 }
-// Mozilla Firefox 19+
-::-moz-placeholder {
-   color: $gray-light;
-   opacity:  1;
-}
-// Internet Explorer 10-11
-:-ms-input-placeholder { color: $gray-light; }
