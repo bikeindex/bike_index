@@ -40,6 +40,7 @@ describe WelcomeController do
         expect(response.status).to eq(200)
         expect(response).to render_template('goodbye')
         expect(response).to render_with_layout('application_revised')
+        expect(flash).to_not be_present
       end
     end
   end

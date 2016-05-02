@@ -1,5 +1,4 @@
 class WelcomeController < ApplicationController
-  before_filter :set_revised_layout
 
   def index
     render action: 'index', layout: (revised_layout_enabled? ? 'application_revised' : 'application_updated')
@@ -10,7 +9,13 @@ class WelcomeController < ApplicationController
   end
 
   def goodbye
-    redirect_to logout_url if current_user.present?
+    # render action: 'goodbye', layout: (revised_layout_enabled? ? 'application_revised' : 'application')
+    # redirect_to logout_url if current_user.present? 
+    if current_user.present?
+      redirect_to logout_url
+    else
+      render action: 'goodbye', layout: (revised_layout_enabled? ? 'application_revised' : 'application')
+    end
   end
 
   def user_home
