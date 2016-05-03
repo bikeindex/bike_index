@@ -10,7 +10,7 @@ class OrganizationsController < ApplicationController
   def new
     session[:return_to] ||= new_organization_url unless current_user.present?
     prep_new_organization
-    render layout: 'content'
+    render layout: (revised_layout_enabled? ? 'application_revised' : 'content')
   end
 
   def lightspeed_integration
