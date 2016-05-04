@@ -32,7 +32,7 @@
 //= require external_scripts/jquery.iframe-transport.js
 //= require external_scripts/jquery.fileupload.js
 //= require dataTables/jquery.dataTables
-//= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
+//= require dataTables/bootstrap/2/jquery.dataTables.bootstrap
 //= require underscore
 //= require backbone
 //= require bike_index

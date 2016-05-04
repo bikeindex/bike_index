@@ -225,7 +225,7 @@ describe Bike do
       it 'does not explode' do
         user = User.new
         bike = Bike.new
-        expect(bike.can_be_claimed_by(user)).to be_false
+        expect(bike.can_be_claimed_by(user)).to be_falsey
       end
     end
   end

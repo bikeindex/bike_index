@@ -6,5 +6,5 @@ class BikeIndex.InfoManufacturers extends BikeIndex
     $(table_id).dataTable(
       "aaSorting": [ ]
       "aLengthMenu": [[5, 10, 50, 100, -1], [5, 10, 50, 100, "All"]]
-      "iDisplayLength": '5'
+      "iDisplayLength": 5
       )
