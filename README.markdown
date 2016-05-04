@@ -41,9 +41,9 @@ This explanation assumes you're familiar with developing Ruby on Rails applicati
 
   - [start](start) is a bash script. It starts redis in the background and runs foreman with the [dev procfile](Procfile_development). If you need/prefer something else, do that
 
-- Go to [localhost:3000](http://localhost:3000)
+- Go to [localhost:3001](http://localhost:3001)
 
-  - if you want to use [Pow](http://pow.cx/) (or some other setup that isn't through localhost:3000), change the appropriate values in [session_store.rb](config/initializers/session_store.rb) and [.env](.env).
+  - if you want to use [Pow](http://pow.cx/) (or some other setup that isn't through localhost:3001), change the appropriate values in [session_store.rb](config/initializers/session_store.rb) and [.env](.env).
 
 
 ## Testing
