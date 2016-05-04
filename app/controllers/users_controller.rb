@@ -90,7 +90,7 @@ class UsersController < ApplicationController
 
   def edit
     @user = current_user
-    render layout: (revised_layout_enabled? ? 'application_revised' : 'application')
+    render :edit_revised, layout: (revised_layout_enabled? ? 'application_revised' : 'application')
   end
 
   def update
