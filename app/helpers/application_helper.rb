@@ -33,6 +33,7 @@ module ApplicationHelper
     end
   end
 
+
   # For determining menu items to display on content skeleton
   def content_page_type
     if controller_name == 'info'
