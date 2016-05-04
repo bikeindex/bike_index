@@ -200,7 +200,7 @@ class Bike < ActiveRecord::Base
   end
 
   def can_be_claimed_by(u)
-    !current_owner_exists && current_ownership.user == u
+    !current_owner_exists && current_ownership && current_ownership.user == u
   end
 
   def user_hidden

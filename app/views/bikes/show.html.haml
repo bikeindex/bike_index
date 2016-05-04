@@ -26,7 +26,7 @@
           - else
             You should add a picture of it, so everyone can admire its beauty
         = link_to  "Edit", edit_bike_path, class: "btn btn-default"
-      - else
+      - elsif @bike.current_ownership.present?
         You sent this bike to
         %em
           = @bike.current_ownership.owner_email
