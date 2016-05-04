@@ -137,7 +137,18 @@ describe ApplicationHelper do
     end
     context 'organizations' do
       before { allow(view).to receive(:controller_name) { 'organizations' } }
-      %w(new).each do |action|
+      %w(new lightspeed_integration).each do |action|
+        context action do
+          it 'returns nil' do
+            allow(view).to receive(:action_name) { action }
+            expect(helper.current_page_skeleton).to eq 'content_skeleton'
+          end
+        end
+      end
+    end
+    context 'stolen' do
+      before { allow(view).to receive(:controller_name) { 'stolen' } }
+      %w(index).each do |action|
         context action do
           it 'returns nil' do
             allow(view).to receive(:action_name) { action }
