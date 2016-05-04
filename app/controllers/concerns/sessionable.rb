@@ -21,12 +21,12 @@ module Sessionable
   protected
 
   def cookie_options
-    c = {
+    cookie_help = {
       httponly: true,
       value: [@user.id, @user.auth_token]
     }
     # In development, secure: true breaks the cookie storage. Only add if production
-    Rails.env.production? ? c.merge({secure: true}) : c
+    Rails.env.production? ? cookie_help.merge({secure: true}) : cookie_help
   end
 
 end

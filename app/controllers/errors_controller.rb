@@ -1,3 +1,11 @@
+=begin
+*****************************************************************
+* File: app/controllers/errors_controller.rb 
+* Name: Class ErrorsController 
+* Set some errors methods
+*****************************************************************
+=end
+
 class ErrorsController < ApplicationController
   respond_to :html, :xml, :json
  

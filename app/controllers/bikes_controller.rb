@@ -1,8 +1,16 @@
+=begin
+*****************************************************************
+* File: app/controllers/bikes_controller.rb 
+* Name: Class BikesController 
+* Some methods to maneger the bike registration
+*****************************************************************
+=end
+
+
 class OwnershipNotSavedError < StandardError
 end
 
 class BikeNotSavedError < StandardError
-end
 
 class BikeCreatorError < StandardError
 end
@@ -14,6 +22,7 @@ class BikeTyperError < StandardError
 end
 
 class BikesController < ApplicationController
+  
   before_filter :find_bike, only: [:show, :edit, :update, :pdf]
   before_filter :ensure_user_allowed_to_edit, only: [:edit, :update, :pdf]
   before_filter :render_ad, only: [:index, :show]
@@ -21,11 +30,19 @@ class BikesController < ApplicationController
   before_filter :remove_subdomain, only: [:index]
   layout 'no_container'
 
+  # Name: index 
+  # Explication: whats is going to show at bike index page. First select stolen bikes 
+  # neer to user (ip), search command so user can check for specifc bike. Than select bikes 
+  # from anywhere to show.
+  # Params: Bike params, page params
+  # Return: List with stolen bikes
   def index
     params[:stolen] = true unless params[:stolen].present? || params[:non_stolen].present?
     if params[:proximity].present? && params[:proximity].strip.downcase == 'ip'
       params[:proximity] = request.env['HTTP_X_FORWARDED_FOR'].split(',')[0] if request.env['HTTP_X_FORWARDED_FOR']
+    else
     end
+    
     search = BikeSearcher.new(params)
     bikes = search.find_bikes
     page = params[:page] || 1
@@ -34,7 +51,9 @@ class BikesController < ApplicationController
     if params[:serial].present? && page == 1
       secondary_bikes = search.fuzzy_find_serial
       @secondary_bikes = secondary_bikes.decorate if secondary_bikes.present?
+    else
     end
+    
     @bikes = bikes.decorate
     @query = params[:query]
     @query = request.query_parameters()
@@ -48,11 +67,17 @@ class BikesController < ApplicationController
     end
   end
 
+  # Name: show
+  # Explication: show a list with all registrer bikes in website
+  # Params: bike params, stolen status
+  # Return: information about the stolen bikes according to the search of user
   def show
     @components = @bike.components.decorate
     if @bike.stolen and @bike.current_stolen_record.present?
       @stolen_record = @bike.current_stolen_record.decorate
+    else
     end
+    
     @bike = @bike.decorate
     @stolen_notification = StolenNotification.new if @bike.stolen
     respond_to do |format|
@@ -67,10 +92,13 @@ class BikesController < ApplicationController
     end
   end
 
+ # What is method pdf ? 
   def pdf
     if @bike.stolen and @bike.current_stolen_record.present?
       @stolen_record = @bike.current_stolen_record.decorate
+    else
     end
+    
     @bike = @bike.decorate
     filename = "Registration_" + @bike.updated_at.strftime("%m%d_%H%M")[0..-1]
     unless @bike.pdf.present? && @bike.pdf.file.filename == "#{filename}.pdf"
@@ -87,6 +115,10 @@ class BikesController < ApplicationController
     redirect_to @bike.pdf.url
   end
 
+  # Name: scanned
+  # Explication: scanned bike information to show to user
+  # Params: bike id
+  # Return: set al information about tha specific bike
   def scanned
     if params[:id]
       b = Bike.find(params[:id])
@@ -98,18 +130,27 @@ class BikesController < ApplicationController
     @card_id = params[:card_id]
   end
 
+  # Name: spokecard
+  # Explication: 
+  # Params: bike id
+  # Return:
   def spokecard
     @qrcode = "#{bike_url(Bike.find(params[:id]))}.gif"
     render layout: false
   end
 
+  # Name: new
+  # Explication: user can register a new bike  
+  # Params: id of creator, current_user id, 
+  # Return: if user logged in, create new bike, if not, redirect to sign up page
+  # Must discovery what's b_param
   def new
     if revised_layout_enabled?
       new_revised
     else
       if current_user.present?
-        @b_param = BParam.create(creator_id: current_user.id, params: params)
-        @b_param = BParam.create(creator_id: current_user.id, params: params)
+        @b_param = BParam.create(creator_id: current_user.id, params: params) # why he call this two times?
+        @b_param = BParam.create(creator_id: current_user.id, params: params) # again?
         @bike = BikeCreator.new(@b_param).new_bike
       else
         @user = User.new
@@ -118,6 +159,10 @@ class BikesController < ApplicationController
     end
   end
 
+  # Name: new_revised
+  # Explication: check if bike id was sent correctly
+  # Params: b_param id
+  # Return: if bike id not find, send a warning
   def new_revised
     find_or_new_b_param
     # Let them know if they sent an invalid b_param token
@@ -127,12 +172,18 @@ class BikesController < ApplicationController
     render :new_revised, layout: 'application_revised'
   end
 
+  # Name: create
+  # Explication: create a bike with many check's if that bike id belongs to same user id 
+  # Params: bike 
+  # Return: new bike created correctly
+  # This method is to big, must aplly "one function, one action"
   def create
     if params[:bike][:embeded]
       @b_param = BParam.from_id_token(params[:bike][:b_param_id_token])
       @bike = Bike.new
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@bike)
+      else
       end
       if params[:bike][:image].present?
         @b_param.image = params[:bike][:image]
@@ -140,6 +191,7 @@ class BikesController < ApplicationController
         @b_param.save
         ImageAssociatorWorker.perform_in(1.minutes)
         params[:bike].delete(:image)
+      else
       end
       @b_param.update_attributes(params: params)
       @bike = BikeCreator.new(@b_param).create_bike
@@ -171,21 +223,31 @@ class BikesController < ApplicationController
       end
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@b_param.created_bike) and return
+      else
       end
       @b_param.update_attributes(params: params)
       @bike = BikeCreator.new(@b_param).create_bike
       if @bike.errors.any?
         @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
         render action: :new, layout: 'no_header' and return
+      else
       end
       redirect_to edit_bike_url(@bike), notice: "Bike successfully added to the index!"
+    else
     end
   end
 
+  # Name: revised_create
+  # Explication: after create a new bike info user can revised the params 
+  # of new bike, and should confirm the info
+  # Params: b_param
+  # Return: user update the new bike, if everuthing it's ok he is redirect
+  # to the new bike url and recive a warning "Bike successfully update to the index!"
   def revised_create
     find_or_new_b_param
     if @b_param.created_bike.present?
       redirect_to edit_bike_url(@b_param.created_bike) and return
+    else
     end
     @b_param.clean_params(params)
     @bike = BikeCreator.new(@b_param).create_bike
@@ -193,7 +255,7 @@ class BikesController < ApplicationController
       @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
       redirect_to new_bike_url(b_param_token: @b_param.id_token)
     else
-      redirect_to edit_bike_url(@bike), notice: "Bike successfully added to the index!"
+      redirect_to edit_bike_url(@bike), notice: "Bike successfully update to the index!"
     end
   end
 
@@ -204,6 +266,7 @@ class BikesController < ApplicationController
       @edit_template = edit_templates[params[:page]].present? ? params[:page] : edit_templates.keys.first
       if @edit_template == 'photos'
         @private_images = PublicImage.unscoped.where(imageable_type: 'Bike').where(imageable_id: @bike.id).where(is_private: true)
+      else
       end
       render "edit_#{@edit_template}".to_sym, layout: 'application_revised'
     else
@@ -268,6 +331,7 @@ class BikesController < ApplicationController
         flash[:error] = "Bike deleted"
         redirect_to root_url and return
       end
+    else
     end
   end
 
@@ -294,6 +358,7 @@ class BikesController < ApplicationController
     if error.present? # Can't assign directly to flash here, sometimes kick out of edit because other flash error
       flash[:error] = error
       redirect_to bike_path(@bike) and return
+    else
     end
   end
 
