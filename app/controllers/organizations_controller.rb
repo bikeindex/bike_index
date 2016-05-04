@@ -5,7 +5,7 @@ class OrganizationsController < ApplicationController
   before_filter :require_admin, only: [:edit, :update, :destroy]
   before_filter :set_bparam, only: [:embed, :embed_extended]
   skip_before_filter :set_x_frame_options_header, only: [:embed, :embed_extended, :embed_create_success]
-  layout "organization"
+  layout 'organization'
 
   def new
     session[:return_to] ||= new_organization_url unless current_user.present?
@@ -17,7 +17,7 @@ class OrganizationsController < ApplicationController
     session[:return_to] = lightspeed_integration_url unless current_user.present?
     @stuff = session[:return_to]
     prep_new_organization
-    render layout: 'content'
+    render layout: (revised_layout_enabled? ? 'application_revised' : 'content')
   end
 
   def create
@@ -31,7 +31,7 @@ class OrganizationsController < ApplicationController
       membership = Membership.create(user_id: user.id, role: 'admin', organization_id: @organization.id)
       @organization.update_attribute :auto_user_id, user.id
       notify_admins('organization_created')
-      flash[:notice] = "Organization Created successfully!"
+      flash[:notice] = 'Organization Created successfully!'
       if current_user.present?
         redirect_to edit_organization_url(@organization) and return
       end
@@ -41,12 +41,12 @@ class OrganizationsController < ApplicationController
   end
   
   def edit
-    @bikes = Bike.where(creation_organization_id: @organization.id).order("created_at desc")
+    @bikes = Bike.where(creation_organization_id: @organization.id).order('created_at desc')
     @organization = @organization.decorate
   end
 
   def show
-    bikes = Bike.where(creation_organization_id: @organization.id).order("created_at desc")
+    bikes = Bike.where(creation_organization_id: @organization.id).order('created_at desc')
     page = params[:page] || 1
     per_page = params[:per_page] || 25
     bikes = bikes.page(page).per(per_page)
@@ -58,11 +58,11 @@ class OrganizationsController < ApplicationController
     @bike = BikeCreator.new(@b_param).new_bike
     @bike.owner_email = params[:email] if params[:email].present?
     if params[:non_stolen]
-      @non_stolen = true 
+      @non_stolen = true
     elsif params[:stolen_first]
       @stolen_first = true
     elsif params[:stolen]
-      @stolen = true 
+      @stolen = true
     end
     if params[:sf_safe].present?
       render action: :embed_sf_safe, layout: 'embed_layout'
@@ -75,7 +75,7 @@ class OrganizationsController < ApplicationController
     @bike = BikeCreator.new(@b_param).new_bike
     @bike.owner_email = 'info@lumberyardmtb.com' if @organization.slug == 'lumberyard'
     if params[:email].present?
-      @bike.owner_email = params[:email] 
+      @bike.owner_email = params[:email]
       @persist_email = true
     end
     if params[:sf_safe].present?
@@ -193,16 +193,16 @@ class OrganizationsController < ApplicationController
       feedback.feedback_type = 'organization_created'
     elsif type == 'organization_destroyed'
       feedback.body = "#{@organization.name} deleted their account"
-      feedback.title = "Organization deleted themselves"   
+      feedback.title = "Organization deleted themselves"
       feedback.feedback_type = 'organization_destroyed'
     else
       feedback.feedback_type = 'organization_map'
       if type == 'wants_shown'
         feedback.body = "#{@organization.name} wants to be shown"
-        feedback.title = "Organization wants to be shown"   
+        feedback.title = "Organization wants to be shown"
       else
         feedback.body = "#{@organization.name} wants to NOT be shown"
-        feedback.title = "Organization wants OFF map"  
+        feedback.title = "Organization wants OFF map"
       end
     end
     raise StandardError, "Couldn't notify admins" unless feedback.save
