@@ -125,7 +125,7 @@ describe ApplicationHelper do
       end
     end
     context 'welcome' do
-      before { allow(view).to receive(:controller_name) { 'welcome'} }
+      before { allow(view).to receive(:controller_name) { 'welcome' } }
       %w(goodbye).each do |action|
         context action do
           it 'returns nil' do
@@ -147,7 +147,7 @@ describe ApplicationHelper do
       end
     end
     context 'stolen' do
-      before { allow(view).to receive(:controller_name) { 'stolen'} }
+      before { allow(view).to receive(:controller_name) { 'stolen' } }
        %w(index).each do |action|
         context action do
           it 'returns nil' do
