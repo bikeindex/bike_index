@@ -125,7 +125,7 @@ describe ApplicationHelper do
       end
     end
     context 'welcome' do
-      before { allow(view).to receive(:controller_name) { 'welcome'} }
+      before { allow(view).to receive(:controller_name) { 'welcome' } }
       %w(goodbye).each do |action|
         context action do
           it 'returns nil' do
@@ -138,6 +138,17 @@ describe ApplicationHelper do
     context 'organizations' do
       before { allow(view).to receive(:controller_name) { 'organizations' } }
       %w(new).each do |action|
+        context action do
+          it 'returns nil' do
+            allow(view).to receive(:action_name) { action }
+            expect(helper.current_page_skeleton).to eq 'content_skeleton'
+          end
+        end
+      end
+    end
+    context 'stolen' do
+      before { allow(view).to receive(:controller_name) { 'stolen' } }
+       %w(index).each do |action|
         context action do
           it 'returns nil' do
             allow(view).to receive(:action_name) { action }

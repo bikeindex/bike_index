@@ -16,6 +16,23 @@ describe StolenController do
         expect(response).to redirect_to stolen_index_url(subdomain: false)
       end
     end
+    context 'legacy' do
+      it 'renders with application_updated layout' do
+        get :index
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:index)
+        expect(response).to render_with_layout('application_updated')
+      end
+    end
+    context 'revised' do
+      it 'renders with revised_layout' do
+        allow(controller).to receive(:revised_layout_enabled?) { true }
+        get :index
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:index)
+        expect(response).to render_with_layout('application_revised')
+      end
+    end
   end
 
   describe 'faq' do

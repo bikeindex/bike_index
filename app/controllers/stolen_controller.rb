@@ -4,6 +4,7 @@ class StolenController < ApplicationController
   
   def index
     @feedback = Feedback.new
+    render action: 'index', layout: (revised_layout_enabled? ? 'application_revised' : 'application_updated')
   end
 
   def current_tsv
@@ -16,7 +17,7 @@ class StolenController < ApplicationController
 
   def multi_serial_search
     render layout: 'multi_serial'
-  end
+  end 
 
   private
   def remove_subdomain
