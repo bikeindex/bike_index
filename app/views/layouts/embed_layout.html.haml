@@ -17,5 +17,17 @@
         %div{class: "alert-#{name == :notice ? "success" : "error"}"}
           %a.close{"data-dismiss" => "alert"} ×
           = content_tag :div, msg, id: "flash_#{name}" if msg.is_a?(String)
+
+      - if @b_param.bike_errors.present?
+        #alert-block
+          .alert.alert-error
+            %a.close{"data-dismiss" => "alert"} ×
+            %h4
+              Please fix the following 
+              = pluralize(@b_param.bike_errors.count, "error")
+            %ul
+              - @b_param.bike_errors.each do |msg|
+                %li
+                  = msg
           
     = yield
