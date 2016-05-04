@@ -34,7 +34,8 @@ class BikeCreator
     @b_param.params[:bike][:rear_tire_narrow] = bb_data[:bike][:rear_tire_narrow] if bb_data[:bike][:rear_tire_narrow].present?
     @b_param.params[:bike][:stock_photo_url] = bb_data[:bike][:stock_photo_url] if bb_data[:bike][:stock_photo_url].present?
     @b_param.params[:components] = bb_data[:components] && bb_data[:components].map { |c| c.merge(is_stock: true) }
-    @b_param.id.present? ? @b_param.save : @b_param.clean_params
+    @b_param.clean_params # if we just rely on the before_save filter, @b_param needs to be reloaded
+    @b_param.save if @b_param.id.present? 
     @b_param
   end
 
