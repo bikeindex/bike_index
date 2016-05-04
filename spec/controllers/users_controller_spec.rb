@@ -217,18 +217,18 @@ describe UsersController do
     it { is_expected.to respond_with(:success) }
     it { is_expected.to render_template(:edit) }
     context 'legacy' do
-      it 'renders with ________ layout' do
+      it 'renders with application layout' do
         get :edit
         expect(response.status).to eq(200)
         expect(response).to render_template(:edit)
-        expect(response).to render_with_layout('application_revised')
+        expect(response).to render_with_layout('application')
       end
     end
     context 'revised' do
       it 'renders with revised_layout' do
         allow(controller).to receive(:revised_layout_enabled?) { true }
         get :edit
-        expect(response.stutus).to eq(200)
+        expect(response.status).to eq(200)
         expect(response).to render_template(:edit)
         expect(response).to render_with_layout('application_revised')
       end
