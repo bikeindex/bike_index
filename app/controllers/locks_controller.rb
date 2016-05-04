@@ -1,4 +1,13 @@
+=begin
+*****************************************************************
+* File: app/controllers/locks_controller.rb 
+* Name: Class LocksController 
+* 
+*****************************************************************
+=end
+
 class LocksController < ApplicationController
+  
   before_filter :authenticate_user
 
   def index

@@ -9,17 +9,17 @@
 class BlogsController < ApplicationController
 
   # Name: index
-  # Explication:
+  # Explication: just a redirect method
   # Paramts:
-  # Return:
+  # Return: redirect user to new index of blogs page
   def index
     redirect_to news_index_url
   end
   
   # Name: show
-  # Explication:
+  # Explication: just a redirect method
   # Paramts:
-  # Return:
+  # Return: redirect user to new show of blogs page
   def show
     redirect_to news_url
   end

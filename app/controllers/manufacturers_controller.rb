@@ -1,4 +1,13 @@
+=begin
+*****************************************************************
+* File: app/controllers/manufacturers_controller.rb 
+* Name: Class ManufactrurersController 
+* Set user to new page content a tsv file about manufactures
+*****************************************************************
+=end
+
 class ManufacturersController < ApplicationController
+
   layout 'content'
   before_filter :set_manufacturers_active_section
   before_filter :set_revised_layout

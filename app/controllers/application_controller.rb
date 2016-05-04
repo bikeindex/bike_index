@@ -33,9 +33,9 @@ class ApplicationController < ActionController::Base
   end
 
   # Name: set_revised_layout
-  # Explication:
+  # Explication: just check if layout is already revised
   # Params:
-  # Return:
+  # Return: set a able layout revised
   def set_revised_layout
     self.class.layout 'application_revised' if revised_layout_enabled?
   end

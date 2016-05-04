@@ -7,6 +7,7 @@
 =end
 
 class InfoController < ApplicationController
+  
   layout 'content'
   # caches_page :about, :where, :roadmap, :security, :serials, :stolen_bikes, :privacy, :terms, :vendor_terms, :downloads, :resources, :spokecard
   before_filter :set_active_section
