@@ -23,13 +23,16 @@ module ApplicationHelper
       'edit_bike_skeleton' if %w(edit update).include?(action_name)
     when 'info'
       'content_skeleton' unless %w(terms vendor_terms privacy support_the_index).include?(action_name)
+    when 'welcome' 
+      'content_skeleton' if %w(goodbye).include?(action_name)
+    when 'organizations'
+      'content_skeleton' if %w(new).include?(action_name)
     when 'news' then 'content_skeleton'
     when 'feedbacks' then 'content_skeleton'
     when 'manufacturers' then 'content_skeleton'
-    when 'welcome' 
-      'content_skeleton' if %w(goodbye).include?(action_name)
     end
   end
+
 
   # For determining menu items to display on content skeleton
   def content_page_type

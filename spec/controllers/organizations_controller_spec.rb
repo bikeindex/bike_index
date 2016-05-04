@@ -9,6 +9,23 @@ describe OrganizationsController do
       it { is_expected.to respond_with(:success) }
       it { is_expected.to render_template(:new) }
     end
+    context 'legacy' do
+      it 'renders with content layout' do
+        get :new
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:new)
+        expect(response).to render_with_layout('content')
+      end
+    end
+    context 'revised' do
+      it 'renders with revised_layout' do
+        allow(controller).to receive(:revised_layout_enabled?) { true }
+        get :new
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:new)
+        expect(response).to render_with_layout('application_revised')
+      end
+    end
   end
 
   describe 'create' do
