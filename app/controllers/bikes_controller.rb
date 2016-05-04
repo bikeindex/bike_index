@@ -1,8 +1,16 @@
+=begin
+*****************************************************************
+* File: app/controllers/bikes_controller.rb 
+* Name: Class BikesController 
+* Some methods to maneger the bike registration
+*****************************************************************
+=end
+
+
 class OwnershipNotSavedError < StandardError
 end
 
 class BikeNotSavedError < StandardError
-end
 
 class BikeCreatorError < StandardError
 end
@@ -14,6 +22,7 @@ class BikeTyperError < StandardError
 end
 
 class BikesController < ApplicationController
+  
   before_filter :find_bike, only: [:show, :edit, :update, :pdf]
   before_filter :ensure_user_allowed_to_edit, only: [:edit, :update, :pdf]
   before_filter :render_ad, only: [:index, :show]
@@ -25,7 +34,9 @@ class BikesController < ApplicationController
     params[:stolen] = true unless params[:stolen].present? || params[:non_stolen].present?
     if params[:proximity].present? && params[:proximity].strip.downcase == 'ip'
       params[:proximity] = request.env['HTTP_X_FORWARDED_FOR'].split(',')[0] if request.env['HTTP_X_FORWARDED_FOR']
+    else
     end
+    
     search = BikeSearcher.new(params)
     bikes = search.find_bikes
     page = params[:page] || 1
@@ -34,7 +45,9 @@ class BikesController < ApplicationController
     if params[:serial].present? && page == 1
       secondary_bikes = search.fuzzy_find_serial
       @secondary_bikes = secondary_bikes.decorate if secondary_bikes.present?
+    else
     end
+    
     @bikes = bikes.decorate
     @query = params[:query]
     @query = request.query_parameters()
@@ -52,7 +65,9 @@ class BikesController < ApplicationController
     @components = @bike.components.decorate
     if @bike.stolen and @bike.current_stolen_record.present?
       @stolen_record = @bike.current_stolen_record.decorate
+    else
     end
+    
     @bike = @bike.decorate
     @stolen_notification = StolenNotification.new if @bike.stolen
     respond_to do |format|
@@ -67,10 +82,13 @@ class BikesController < ApplicationController
     end
   end
 
+ # What is method pdf ? 
   def pdf
     if @bike.stolen and @bike.current_stolen_record.present?
       @stolen_record = @bike.current_stolen_record.decorate
+    else
     end
+    
     @bike = @bike.decorate
     filename = "Registration_" + @bike.updated_at.strftime("%m%d_%H%M")[0..-1]
     unless @bike.pdf.present? && @bike.pdf.file.filename == "#{filename}.pdf"
@@ -103,6 +121,7 @@ class BikesController < ApplicationController
     render layout: false
   end
 
+  # Must discovery what's b_param
   def new
     if revised_layout_enabled?
       new_revised
@@ -127,12 +146,14 @@ class BikesController < ApplicationController
     render :new_revised, layout: 'application_revised'
   end
 
+  # This method is to big, must aplly "one function, one action"
   def create
     if params[:bike][:embeded]
       @b_param = BParam.from_id_token(params[:bike][:b_param_id_token])
       @bike = Bike.new
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@bike)
+      else
       end
       if params[:bike][:image].present?
         @b_param.image = params[:bike][:image]
@@ -140,6 +161,7 @@ class BikesController < ApplicationController
         @b_param.save
         ImageAssociatorWorker.perform_in(1.minutes)
         params[:bike].delete(:image)
+      else
       end
       @b_param.update_attributes(params: params)
       @bike = BikeCreator.new(@b_param).create_bike
@@ -171,21 +193,26 @@ class BikesController < ApplicationController
       end
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@b_param.created_bike) and return
+      else
       end
       @b_param.update_attributes(params: params)
       @bike = BikeCreator.new(@b_param).create_bike
       if @bike.errors.any?
         @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
         render action: :new, layout: 'no_header' and return
+      else
       end
       redirect_to edit_bike_url(@bike), notice: "Bike successfully added to the index!"
+    else
     end
   end
 
+  # Here the user can you informations of his bike, it's not the update method
   def revised_create
     find_or_new_b_param
     if @b_param.created_bike.present?
       redirect_to edit_bike_url(@b_param.created_bike) and return
+    else
     end
     @b_param.clean_params(params)
     @bike = BikeCreator.new(@b_param).create_bike
@@ -193,7 +220,7 @@ class BikesController < ApplicationController
       @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
       redirect_to new_bike_url(b_param_token: @b_param.id_token)
     else
-      redirect_to edit_bike_url(@bike), notice: "Bike successfully added to the index!"
+      redirect_to edit_bike_url(@bike), notice: "Bike successfully update to the index!"
     end
   end
 
@@ -204,6 +231,7 @@ class BikesController < ApplicationController
       @edit_template = edit_templates[params[:page]].present? ? params[:page] : edit_templates.keys.first
       if @edit_template == 'photos'
         @private_images = PublicImage.unscoped.where(imageable_type: 'Bike').where(imageable_id: @bike.id).where(is_private: true)
+      else
       end
       render "edit_#{@edit_template}".to_sym, layout: 'application_revised'
     else
@@ -268,6 +296,7 @@ class BikesController < ApplicationController
         flash[:error] = "Bike deleted"
         redirect_to root_url and return
       end
+    else
     end
   end
 
@@ -294,6 +323,7 @@ class BikesController < ApplicationController
     if error.present? # Can't assign directly to flash here, sometimes kick out of edit because other flash error
       flash[:error] = error
       redirect_to bike_path(@bike) and return
+    else
     end
   end
 
