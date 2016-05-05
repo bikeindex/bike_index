@@ -10,21 +10,21 @@
             %li
               = msg
 
-  %fieldset
+  %fieldset.col-sm-2
     %legend
       Edit Personal Information for 
       = @user.email
-    .form-horizontal
-      %p 
+    .form-group
+      %p
         Any use of your personal information is governed by the terms of our #{link_to "Privacy policy", privacy_url}. We do not sell, trade, or rent your personal information to third parties.
 
-      .form-group
-        %label.control-label{ for: "user_user_name" }
+      .form-group.row
+        %label.form-label.col-sm-1{ for: "user_user_name" }
           Name
         .controls
           = f.text_field :name
-      .form-group
-        %label.label-with-tip.control-label{ for: "user_zipcode" }
+      .form-group.row
+        %label.label-with-tip.control-label.col-sm-1{ for: "user_zipcode" }
           %p
             Zipcode
           / %span.formtip
@@ -33,22 +33,22 @@
           /     ?
         .controls
           = f.text_field :zipcode, placeholder: "Default search location"
-      .form-group
-        %label.control-label{ for: "user_Password" }
+      .form-group.row
+        %label.control-label.col-sm-1{ for: "user_Password" }
           Password
         .controls
           = f.password_field :password, placeholder: "Password"
-      .form-group
-        %label.control-label{ for: "user_password_confirmation" }
+      .form-group.row
+        %label.control-label.col-sm-1{ for: "user_password_confirmation" }
           Password Confirmation
         .controls
           = f.password_field :password_confirmation, placeholder: "Password confirmation"
-      .form-group
-        = f.label :current_password, class: "control-label"
+      .form-group.row
+        = f.label :current_password, class: "control-label col-sm-1"
         .controls
           = f.password_field :current_password, placeholder: "For password update"
-      .form-group.emailme-maybe
-        = f.label :is_emailable, class: "control-label" do 
+      .form-group.emailme-maybe.row
+        = f.label :is_emailable, class: "control-label col-sm-1" do 
           Get quarterly updates
         .controls
           = f.check_box :is_emailable
@@ -56,27 +56,27 @@
           
 
     .form-group.actions
-      = f.submit "Update information", class: 'button-green'
+      = f.submit "Update information", class: 'btn btn-success'
 
-  %fieldset
+  %fieldset.col-sm-2
     %legend
       Sharing settings
-    .form-group-horizontal.sharing-collapser{ data: {target: "#personal-page" } }
+    .form-group.sharing-collapser{ data: {target: "#personal-page" } }
       %p
         The Bike Index can create a page listing all your bikes that includes all the information you want to share. It's your personal page.
         = link_to "(preview page)", user_url(@user), target: "_blank"
       %p
         Would you like us to create this page for you?
-      .controls
-        %label.radio
+      .form-group
+        %label.radio-inline
           = f.radio_button :show_bikes, "true"
           Create page
-        %label.radio
+        %label.radio-inline
           = f.radio_button :show_bikes, "false"
           No, please don't create me a page
 
     #personal-page.collapse
-      .control-group.avatar-upload
+      .form-group.avatar-upload
         %label.control-label
           Profile avatar
         .controls
@@ -100,64 +100,64 @@
           .controls
             = f.text_area :description
 
-    .control-group.sharing-collapser{ data: {target: "#twitter-field" } }
+    .form-group.sharing-collapser{ data: {target: "#twitter-field" } }
       %label.control-label
         Show Twitter
       .controls.radio-controls
-        %label.radio
+        %label.radio-inline
           = f.radio_button :show_twitter, "true"
           Show Twitter
-        %label.radio
+        %label.radio-inline
           = f.radio_button :show_twitter, "false"
           No Twitter
     
     #twitter-field.collapse
-      .control-group.controls-appended
-        %label.control-label{ for: "user_twitter" }
+      .form-group.controls-appended
+        %label.form-label{ for: "user_twitter" }
           Twitter handle
         .controls.input-prepend
           %span.add-on
             @
           = f.text_field :twitter, placeholder: "Twitter handle"
 
-    .control-group.sharing-collapser{ data: {target: "#personal-field" } }
+    .form-group.sharing-collapser{ data: {target: "#personal-field" } }
       %label.control-label
         Show Personal Site
       .controls.radio-controls
-        %label.radio
+        %label.radio-inline
           = f.radio_button :show_website, "true"
           Show personal site
-        %label.radio
+        %label.radio-inline
           = f.radio_button :show_website, "false"
           No personal site
 
     #personal-field.collapse
-      .control-group.controls-appended
-        %label.control-label{ for: "user_website" }
+      .form-group.controls-appended
+        %label.form-label{ for: "user_website" }
           Personal Site URL
         .controls.input-prepend
           %span.add-on
             http&#58;&#47;&#47;
           = f.text_field :website, placeholder: "Enter site URL"
-    .control-group
-      %label.control-label{ for: "title" }
+    .form-group.row
+      %label.form-label.col-sm-1{ for: "title" }
         Additional Link
       .controls
         = f.text_field :my_bikes_link_target, value: @user.mb_link_target, placeholder: "http://example.com"
-    .control-group
-      %label.control-label{ for: "title" }
+    .form-group.row
+      %label.form-label.col-sm-1{ for: "title" }
         Title for link
       .controls
         = f.text_field :my_bikes_link_title, value: @user.mb_link_title, placeholder: "My awesome link"
 
-    .control-group#username_ref
+    .form-group#username_ref
       %p
         Your username is the URL for your sharing page and the bike embed form. Update it if you care about those things.
-      .padded
-        %label.control-label{ for: "username" }
+      .padded.row
+        %label.form-label.col-sm-1{ for: "username" }
           Username
         .controls
           = f.text_field :username
 
-    .control-group.actions
-      = f.submit "Update sharing", class: 'button-green'
+    .form-group.actions
+      = f.submit "Update sharing", class: 'btn btn-success'
