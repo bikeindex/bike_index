@@ -1,9 +1,8 @@
-- stolenness_desc = { 'stolen_proximity' => 'nearby stolen', 'non_stolen' => 'non-stolen', 'stolen' => 'stolen' }
 .container
   .row.first-row
     .col-md-8
       %h1
-        Search for #{stolenness_desc[@stolenness]} bikes
+        #{@user.display_name} bikes
         
     .col-md-4
       .ad-block.ad468x60
@@ -14,3 +13,5 @@
       - if @bikes.present?
         %ul.bike-boxes
           = render partial: '/bikes/revised_bike', collection: @bikes, as: :bike
+        .paginate-container.paginate-container-bottom
+          = paginate @bikes
