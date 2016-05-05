@@ -6,7 +6,7 @@ class UsersController < ApplicationController
   def new
     @user = User.new
     if current_user.present?
-      flash[:notice] = "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
+      flash[:success] = "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
       redirect_to user_home_url and return
     elsif revised_layout_enabled?
       render 'new_revised', layout: 'application_revised'
@@ -112,17 +112,19 @@ class UsersController < ApplicationController
         if params[:user][:terms_of_service] == '1'
           @user.terms_of_service = true
           @user.save
-          redirect_to user_home_url, notice: "Thanks! Now you can use the Bike Index" and return
+          flash[:success] = 'Thanks! Now you can use the Bike Index'
+          redirect_to user_home_url and return
         else
-          redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index" and return
+          flash[:notice] = 'You have to accept the Terms of Service if you would like to use Bike Index'
+          redirect_to accept_vendor_terms_url and return
         end
       elsif params[:user][:vendor_terms_of_service].present?
         if params[:user][:vendor_terms_of_service] == '1'
           @user.accept_vendor_terms_of_service
           if @user.memberships.any?
-            flash[:notice] = "Thanks! Now you can use Bike Index as #{@user.memberships.first.organization.name}"
+            flash[:success] = "Thanks! Now you can use Bike Index as #{@user.memberships.first.organization.name}"
           else
-            flash[:notice] = "Thanks for accepting the terms of service!"
+            flash[:success] = "Thanks for accepting the terms of service!"
           end
           redirect_to user_home_url and return
           # TODO: Redirect to the correct page, somehow this breaks things right now though.

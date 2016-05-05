@@ -31,7 +31,7 @@ class Oauth::ApplicationsController < Doorkeeper::ApplicationsController
 
   def ensure_app_owner!
     return true if @current_user.superuser? || @current_user.id == @application.owner_id
-    flash[:notice] = "That isn't your application"
+    flash[:error] = "That isn't your application"
     redirect_to oauth_applications_url and return
   end
 

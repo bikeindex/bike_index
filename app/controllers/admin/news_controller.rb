@@ -31,7 +31,7 @@ class Admin::NewsController < Admin::BaseController
       if @blog.listicles.present?
         @blog.listicles.pluck(:id).each { |id| ListicleImageSizeWorker.perform_in(1.minutes, id) }
       end
-      flash[:notice] = "Blog saved!"
+      flash[:success] = "Blog saved!"
       redirect_to edit_admin_news_url(@blog)
     else
       @users = User.blog_admin
@@ -48,7 +48,7 @@ class Admin::NewsController < Admin::BaseController
       is_listicle: false
     })
     if @blog.save
-      flash[:notice] = "Blog created!"
+      flash[:success] = "Blog created!"
       redirect_to edit_admin_news_url(@blog)
     else
       flash[:error] = "Blog error! #{@blog.errors.full_messages.to_sentence}"

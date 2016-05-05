@@ -98,10 +98,10 @@
   }
 }
 
-.alert-success, .alert-notice {
+.alert-success {
   @include binx-alert-variant($green, $green);
 }
-.alert-info {
+.alert-info, .alert-notice {
   @include binx-alert-variant($blue, $blue);
 }
 .alert-warning {

@@ -41,7 +41,7 @@ describe Admin::BikesController do
         delete :destroy, id: bike.id
       end.to change(Bike, :count).by(-1)
       expect(response).to redirect_to(:admin_bikes)
-      expect(flash[:notice]).to match(/deleted/i)
+      expect(flash[:success]).to match(/deleted/i)
       expect(AfterBikeSaveWorker).to have_enqueued_job(bike.id)
     end
   end

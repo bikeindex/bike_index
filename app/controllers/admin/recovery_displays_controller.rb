@@ -24,7 +24,7 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
   def update
     if @recovery_display.update_attributes(params[:recovery_display])
       clear_index_wrap_cache
-      flash[:notice] = "Recovery display saved!"
+      flash[:success] = 'Recovery display saved!'
       redirect_to admin_recovery_displays_url
     else
       render action: :edit
@@ -35,7 +35,7 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
     @recovery_display = RecoveryDisplay.create(params[:recovery_display])
     if @recovery_display.save
       clear_index_wrap_cache
-      flash[:notice] = "Recovery display created!"
+      flash[:success] = 'Recovery display created!'
       redirect_to admin_recovery_displays_url
     else
       render action: :new

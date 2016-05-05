@@ -18,7 +18,7 @@ class ApplicationController < ActionController::Base
 
   def handle_unverified_request
     remove_session
-    flash[:notice] = "CSRF invalid. If you weren't intentionally doing something dumb, please contact us"
+    flash[:error] = "CSRF invalid. If you weren't intentionally doing something dumb, please contact us"
     redirect_to goodbye_url
   end
 
@@ -41,7 +41,7 @@ class ApplicationController < ActionController::Base
       cookies[:return_to] = nil
       case target.downcase
       when 'password_reset'
-        flash[:notice] = "You've been logged in. Please reset your password"
+        flash[:success] = "You've been logged in. Please reset your password"
         render action: :update_password and return true
       when /\A#{ENV['BASE_URL']}/, /\A\//
         redirect_to(target) and return true

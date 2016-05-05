@@ -29,7 +29,7 @@ class Admin::PaintsController < Admin::BaseController
   def update
     if @paint.update_attributes(params[:paint])
       black_id = Color.find_by_name('Black').id
-      flash[:notice] = "Paint updated!"
+      flash[:success] = 'Paint updated!'
       if @paint.reload.color_id.present?
         bikes = @paint.bikes.where(primary_frame_color_id: black_id)
         bikes.each do |bike|
@@ -53,7 +53,7 @@ class Admin::PaintsController < Admin::BaseController
       flash[:error] = "Not allowed! Bikes use that paint! How the fuck did you delete that anyway?"
     else
       @paint.destroy
-      flash[:notice] = "Paint deleted!"
+      flash[:success] = 'Paint deleted!'
     end
     redirect_to admin_paints_url
   end
