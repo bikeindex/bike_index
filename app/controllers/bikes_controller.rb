@@ -122,7 +122,10 @@ class BikesController < ApplicationController
     # Let them know if they sent an invalid b_param token
     flash[:error] = "Sorry! We couldn't find that bike" if @b_param.id.blank? && params[:b_param_token].present?
     @bike ||= @b_param.bike_from_attrs(stolen: params[:stolen])
-    @stolen_record = @bike.stolen_records.build(@b_param.params['stolen_record'])
+    if @bike.stolen
+      @stolen_record = @bike.stolen_records.build(@b_param.params['stolen_record'])
+      @stolen_record.country_id ||= Country.united_states.id
+    end
     @page_errors = @b_param.bike_errors
     render :new_revised, layout: 'application_revised'
   end
