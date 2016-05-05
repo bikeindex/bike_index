@@ -121,7 +121,7 @@ class BikesController < ApplicationController
   def new_revised
     find_or_new_b_param
     # Let them know if they sent an invalid b_param token
-    flash[:notice] = "Sorry! We couldn't find that bike" if @b_param.id.blank? && params[:b_param_token].present?
+    flash[:error] = "Sorry! We couldn't find that bike" if @b_param.id.blank? && params[:b_param_token].present?
     @bike ||= @b_param.bike_from_attrs(stolen: params[:stolen])
     @page_errors = @b_param.bike_errors
     render :new_revised, layout: 'application_revised'
@@ -153,7 +153,7 @@ class BikesController < ApplicationController
         end
       else
         if params[:bike][:embeded_extended]
-          flash[:notice] = "Success! #{@bike.type} was sent to #{@bike.owner_email}."
+          flash[:success] = "Success! #{@bike.type} was sent to #{@bike.owner_email}."
           persisted_email = params[:persist_email] ? @bike.owner_email : nil
           redirect_to embed_extended_organization_url(@bike.creation_organization, email: persisted_email) and return
         else
@@ -228,7 +228,7 @@ class BikesController < ApplicationController
         render action: :edit and return
       end
     else
-      flash[:notice] = "Bike successfully updated!"
+      flash[:success] = "Bike successfully updated!"
       return if return_to_if_present
       if params[:edit_template].present?
         redirect_to edit_bike_url(@bike, page: params[:edit_template]), layout: 'no_header' and return

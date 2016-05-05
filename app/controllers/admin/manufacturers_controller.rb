@@ -20,8 +20,8 @@ class Admin::ManufacturersController < Admin::BaseController
 
   def update
     if @manufacturer.update_attributes(params[:manufacturer])
-      flash[:notice] = "Manufacturer Saved!"
-      expire_fragment "header_search"
+      flash[:success] = 'Manufacturer Saved!'
+      expire_fragment 'header_search'
       AutocompleteLoaderWorker.perform_async('load_manufacturers')
       redirect_to admin_manufacturer_url(@manufacturer)
     else
@@ -32,8 +32,8 @@ class Admin::ManufacturersController < Admin::BaseController
   def create
     @manufacturer = Manufacturer.create(params[:manufacturer])
     if @manufacturer.save
-      flash[:notice] = "Manufacturer Created!"
-      expire_fragment "header_search"
+      flash[:success] = 'Manufacturer Created!'
+      expire_fragment 'header_search'
       AutocompleteLoaderWorker.perform_async('load_manufacturers')
       redirect_to admin_manufacturer_url(@manufacturer)
     else
@@ -50,10 +50,10 @@ class Admin::ManufacturersController < Admin::BaseController
   def import
     if params[:file]
       Manufacturer.import(params[:file])
-      flash[:notice] = "Manufacturers imported"
+      flash[:success] = 'Manufacturers imported'
       redirect_to admin_manufacturers_url
     else
-      flash[:notice] = "You gotta choose a file to import!"
+      flash[:notice] = 'You gotta choose a file to import!'
       redirect_to admin_manufacturers_url
     end
   end

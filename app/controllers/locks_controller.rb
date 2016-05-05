@@ -21,7 +21,8 @@ class LocksController < ApplicationController
     if @lock.update_attributes(params[:lock])
       redirect_to locks_url
     else
-      render action: :edit, notice: "There was a problem!"
+      flash[:error] = 'There was a problem!'
+      render action: :edit
     end
   end
 
@@ -33,7 +34,7 @@ class LocksController < ApplicationController
     @lock = Lock.new(params[:lock])
     @lock.user = current_user
     if @lock.save 
-      flash[:notice] = "Lock created successfully!"
+      flash[:success] = "Lock created successfully!"
       redirect_to edit_lock_url(@lock)
     else
       render action: :new
@@ -43,14 +44,14 @@ class LocksController < ApplicationController
   def destroy
     @lock = find_lock
     @lock.destroy
-    redirect_to "/locks"
+    redirect_to '/locks'
   end
 
   protected
   def find_lock
     lock = Lock.find(params[:id])
     return lock if lock.user == current_user
-    flash[:notice] = "Whoops, that's not your lock!"
+    flash[:error] = "Whoops, that's not your lock!"
     redirect_to user_home_path and return
   end
 

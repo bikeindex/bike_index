@@ -51,7 +51,7 @@ class PublicImagesController < ApplicationController
     imageable_id = @public_image.imageable_id
     imageable_type = @public_image.imageable_type
     @public_image.destroy
-    flash[:notice] = 'Image was successfully deleted'
+    flash[:success] = 'Image was successfully deleted'
     if params[:page].present?
       redirect_to edit_bike_url(imageable_id, page: params[:page]) and return
     elsif imageable_type == 'Blog'

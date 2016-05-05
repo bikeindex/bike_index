@@ -310,7 +310,7 @@ describe BikesController do
             expect(assigns(:b_param)).to_not eq b_param
             expect(response).to render_template(:new_revised)
             expect(response).to render_with_layout('application_revised')
-            expect(flash[:notice]).to match(/sorry/i)
+            expect(flash[:error]).to match(/sorry/i)
           end
         end
       end

@@ -31,7 +31,7 @@ class OrganizationsController < ApplicationController
       membership = Membership.create(user_id: user.id, role: 'admin', organization_id: @organization.id)
       @organization.update_attribute :auto_user_id, user.id
       notify_admins('organization_created')
-      flash[:notice] = 'Organization Created successfully!'
+      flash[:success] = 'Organization Created successfully!'
       if current_user.present?
         redirect_to edit_organization_url(@organization) and return
       end
@@ -94,7 +94,7 @@ class OrganizationsController < ApplicationController
     if params[:organization][:lightspeed_cloud_api_key].present?
       api_key = params[:organization][:lightspeed_cloud_api_key]
       EmailLightspeedNotificationWorker.perform_async(@organization.id, api_key)
-      flash[:notice] = "Thanks for updating your LightSpeed API Key!"
+      flash[:success] = "Thanks for updating your LightSpeed API Key!"
       redirect_to organization_url(@organization) and return
       # @stolen_notification = StolenNotification.new(params[:stolen_notification])
     else

@@ -21,6 +21,9 @@ class BikeIndex.Alerts extends BikeIndex
     @fadeOutAlerts()
 
   fadeOutAlerts: ->
+    # Currently alerts have a fade out time of never - they all have seconds of 0
+    #  - But -
+    # We fade success alerts manually after 5 seconds, they don't provide actionable info
     if $('.primary-alert-block .alert').length > 0
       for alert in $('.primary-alert-block .in')
         $alert = $(alert)
@@ -28,6 +31,10 @@ class BikeIndex.Alerts extends BikeIndex
         if $alert.data('seconds') > 0
           $alert.removeClass('in')
           @fadeAlert($alert, $alert.attr('data-seconds'))
+        # fade out success alerts after 10 seconds
+        else if $alert.hasClass('alert-success')
+          $alert.removeClass('in')
+          @fadeAlert($alert, 5)
     else
       # There aren't any alerts, so remove the fixed position block
       $('.primary-alert-block').addClass('faded')

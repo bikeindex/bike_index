@@ -16,7 +16,7 @@ class Admin::AdsController < Admin::BaseController
 
   def update
     if @ad.update_attributes(params[:ad])
-      flash[:notice] = "Ad Saved!"
+      flash[:success] = "Ad Saved!"
       redirect_to admin_ad_url(@ad)
     else
       render action: :edit
@@ -30,7 +30,7 @@ class Admin::AdsController < Admin::BaseController
   def create
     @ad = Ad.create(params[:ad])
     if @ad.save
-      flash[:notice] = "Ad Created!"
+      flash[:success] = "Ad Created!"
       redirect_to edit_admin_ad_url(@ad)
     else
       render action: :new

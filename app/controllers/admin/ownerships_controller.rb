@@ -17,7 +17,7 @@ class Admin::OwnershipsController < Admin::BaseController
       end
     end
     if @ownership.update_attributes(params[:ownership])
-      flash[:notice] = "Ownership Saved!"
+      flash[:success] = "Ownership Saved!"
       redirect_to edit_admin_ownership_url(@ownership.id)
     else
       render action: :edit
