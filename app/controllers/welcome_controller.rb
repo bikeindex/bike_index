@@ -20,7 +20,11 @@ class WelcomeController < ApplicationController
       bikes = current_user.bikes
       @bikes = BikeDecorator.decorate_collection(bikes)
       @locks = LockDecorator.decorate_collection(current_user.locks)
-      render action: 'user_home', layout: 'no_container'
+      if revised_layout_enabled?
+        render :revised_user_home, layout: 'application_revised'
+      else
+        render action: 'user_home', layout: 'no_container'
+      end
     else
       redirect_to new_user_url
     end
