@@ -1,5 +1,5 @@
 %li.bike-box-item
-  %a.bike-list-image{ href: bike_url(bike) }
+  %a.bike-list-image{ href: bike_url(bike), class: ('hover-expand' if bike.thumb_path) }
     = bike.revised_thumb_image
   .bike-information
     %h5.title-link

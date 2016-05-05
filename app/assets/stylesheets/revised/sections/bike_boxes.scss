@@ -29,6 +29,26 @@ $bike-box-bg: $gray-lighter;
     margin: 0;
     a { display: block; }
   }
+  .hover-expand-block {
+    display: none;
+    position: absolute;
+    left: 0;
+    margin-top: -60%;
+    width: 60%;
+    text-align: center;
+    background: $gray-lightish;
+    border: 1px solid $gray;
+    padding: .5*$vertical-height;
+    z-index: $zindex-navbar-fixed - 1;
+    p { margin: 0; }
+    img {
+      display: block;
+      height: auto;
+      width: 100%;
+    }
+    &:hover { text-decoration: none; }
+  }
+  .img-expanded .hover-expand-block { display: block; }
 }
 
 @media (min-width: $grid-breakpoint-md) {
