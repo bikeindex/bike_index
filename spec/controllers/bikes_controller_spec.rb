@@ -478,36 +478,82 @@ describe BikesController do
         allow(controller).to receive(:revised_layout_enabled?) { true }
         set_current_user(user)
       end
-      context 'no existing b_param' do
-        it "creates a bike and doesn't create a b_param" do
-          wheel_size = FactoryGirl.create(:wheel_size)
-          bike_params = {
+      context 'no existing b_param and stolen' do
+        let(:wheel_size) { FactoryGirl.create(:wheel_size) }
+        let(:country) { Country.united_states }
+        let(:state) { FactoryGirl.create(:state, country: country) }
+        let(:bike_params) do
+          {
             b_param_id_token: '',
             cycle_type_id: CycleType.bike.id.to_s,
             serial_number: 'example serial',
-            manufacturer_id: manufacturer.slug,
             manufacturer_other: '',
             year: '2016',
             frame_model: 'Cool frame model',
             primary_frame_color_id: color.id.to_s,
             secondary_frame_color_id: '',
             tertiary_frame_color_id: '',
-            owner_email: 'something@stuff.com'
+            owner_email: 'something@stuff.com',
+            phone: '312.379.9513',
+            stolen: true
           }
+        end
+        let(:stolen_params) do
+          {
+            country_id: country.id, 
+            street: '2459 W Division St',
+            city: 'Chicago',
+            zipcode: '60622',
+            state_id: state.id
+          }
+        end
+        before do
           expect(BParam.all.count).to eq 0
-          bb_data = { bike: { rear_wheel_bsd: wheel_size.iso_bsd.to_s }, components: [] }
-          # We need to call clean_params on the BParam after bikebook update, so that
-          # the foreign keys are assigned correctly. This is how we test that we're 
-          # This is also where we're testing bikebook assignment
-          expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
-          expect do
-            post :create, bike: bike_params.as_json
-          end.to change(Bike, :count).by(1)
-          expect(BParam.all.count).to eq 0
-          bike = Bike.last
-          bike_params.delete(:manufacturer_id)
-          bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v }
-          expect(bike.manufacturer).to eq manufacturer
+        end
+        context 'successful creation' do
+          it "creates a bike and doesn't create a b_param" do
+            success_params = bike_params.merge(manufacturer_id: manufacturer.slug)
+            bb_data = { bike: { rear_wheel_bsd: wheel_size.iso_bsd.to_s }, components: [] }
+            # We need to call clean_params on the BParam after bikebook update, so that
+            # the foreign keys are assigned correctly. This is how we test that we're 
+            # This is also where we're testing bikebook assignment
+            expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
+            expect do
+              post :create, stolen: true, bike: success_params.as_json, stolen_record: stolen_params
+            end.to change(Bike, :count).by(1)
+            expect(flash[:success]).to be_present
+            expect(BParam.all.count).to eq 0
+            bike = Bike.last
+            bike_params.delete(:manufacturer_id)
+            bike_params.delete(:phone)
+            bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
+            expect(bike.manufacturer).to eq manufacturer
+            expect(bike.stolen).to be_truthy
+            user.reload
+            expect(user.phone).to eq '3123799513'
+            expect(bike.current_stolen_record.phone).to eq '3123799513'
+            stolen_record = bike.current_stolen_record
+            stolen_params.delete(:state_id) # this doesn't show up, don't care for now, shows up for real
+            stolen_params.each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
+          end
+        end
+        context 'failure' do
+          it 'assigns a bike and a stolen record with the attrs passed' do
+            expect do
+              post :create, stolen: true, bike: bike_params.as_json, stolen_record: stolen_params
+            end.to change(Bike, :count).by(0)
+            expect(BParam.all.count).to eq 1
+            bike = assigns(:bike)
+            bike_params.delete(:manufacturer_id)
+            bike_params.delete(:phone)
+            bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
+            expect(bike.stolen).to be_truthy
+            # we retain the stolen record attrs, it would be great to test that they are
+            # assigned correctly, but I don't know how - it needs to completely 
+            # render the new action
+            # stolen_record = assigns(:stolen_record)
+            # stolen_params.each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
+          end
         end
       end
       context 'existing b_param' do
@@ -532,6 +578,7 @@ describe BikesController do
           expect do
             post :create, bike: { manufacturer_id: manufacturer.slug, b_param_id_token: b_param.id_token }
           end.to change(Bike, :count).by(1)
+          expect(flash[:success]).to be_present
           bike = Bike.last
           b_param.reload
           expect(b_param.created_bike_id).to eq bike.id

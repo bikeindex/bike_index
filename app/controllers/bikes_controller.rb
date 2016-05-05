@@ -109,7 +109,6 @@ class BikesController < ApplicationController
     else
       if current_user.present?
         @b_param = BParam.create(creator_id: current_user.id, params: params)
-        @b_param = BParam.create(creator_id: current_user.id, params: params)
         @bike = BikeCreator.new(@b_param).new_bike
       else
         @user = User.new
@@ -123,6 +122,10 @@ class BikesController < ApplicationController
     # Let them know if they sent an invalid b_param token
     flash[:error] = "Sorry! We couldn't find that bike" if @b_param.id.blank? && params[:b_param_token].present?
     @bike ||= @b_param.bike_from_attrs(stolen: params[:stolen])
+    if @bike.stolen
+      @stolen_record = @bike.stolen_records.build(@b_param.params['stolen_record'])
+      @stolen_record.country_id ||= Country.united_states.id
+    end
     @page_errors = @b_param.bike_errors
     render :new_revised, layout: 'application_revised'
   end
@@ -178,7 +181,8 @@ class BikesController < ApplicationController
         @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
         render action: :new, layout: 'no_header' and return
       end
-      redirect_to edit_bike_url(@bike), notice: "Bike successfully added to the index!"
+      flash[:success] = 'Bike successfully added to the index!'
+      redirect_to edit_bike_url(@bike)
     end
   end
 
@@ -193,7 +197,8 @@ class BikesController < ApplicationController
       @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
       redirect_to new_bike_url(b_param_token: @b_param.id_token)
     else
-      redirect_to edit_bike_url(@bike), notice: "Bike successfully added to the index!"
+      flash[:success] = 'Bike successfully added to the index!'
+      redirect_to edit_bike_url(@bike)
     end
   end
 

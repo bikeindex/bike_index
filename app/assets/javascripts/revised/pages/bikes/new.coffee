@@ -5,6 +5,9 @@ class BikeIndex.BikesNew extends BikeIndex
     @initializeEventListeners()
     @updateSerial($('#bike_has_no_serial').prop('checked'))
     @otherManufacturerDisplay($('#bike_manufacturer_id').val())
+    if $('#stolen_record_us_id').length > 0
+      united_stated_id = $('#stolen_record_us_id').data('usid')
+      new BikeIndex.ToggleHiddenOther('.country-select-input', united_stated_id)
 
   initializeEventListeners: ->
     $('#bike_manufacturer_id').change (e) =>

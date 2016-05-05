@@ -3,7 +3,7 @@
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
       = render partial: '/bikes/edit_primary_menu'
-      .col-md-8.form-well#form_well_wrap{ data: { usid: Country.united_states.id } }
+      .col-md-8.form-well#form_well_wrap
         .form-wrap
           .edit-bike-form-header
             %h3
@@ -28,25 +28,7 @@
                 .form-well-input
                   = srecord.text_field :secondary_phone, class: 'form-control'
 
-              .related-fields
-                .form-group.row.fancy-select.unfancy
-                  %label.form-well-label
-                    Where was it stolen?
-                  .form-well-input
-                    = srecord.collection_select(:country_id, Country.all, :id, :name, { required: true, prompt: 'Choose country' }, { class: 'country-select-input form-control' } )
-                .form-group.row
-                  %label.form-well-label
-                  .form-well-input
-                    = srecord.text_field :street, required: true, placeholder: 'Address or intersection', class: 'form-control'
-                .form-group.row
-                  %label.form-well-label
-                  .form-well-input
-                    = srecord.text_field :city, required: true, placeholder: 'City', class: 'form-control'
-                - state_class = (srecord.object.country_id == Country.united_states.id) ? 'unhidden' : ''
-                .form-group.row.fancy-select-placeholder.unfancy.hidden-other{ class: state_class }
-                  %label.form-well-label
-                  .form-well-input
-                    = srecord.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: 'State' }, { class: 'form-control' })
+              = render partial: '/bikes/bike_fields/stolen_location', locals: { srecord: srecord }
 
               - unless @bike.recovered
                 .form-group.row.unnested-field.fancy-select-placeholder.unfancy

@@ -3,6 +3,8 @@ class BikeIndex.ToggleHiddenOther extends BikeIndex
     # Perhaps misguided sentiment that binding to a selector with an ID is better than just
     # via a class...
     form_well_id = $('.primary-edit-bike-form').prop('id')
+    form_well_id = $('body > form').prop('id') unless form_well_id # e.g. new bike page
+
     toggleOtherDisplay = @toggleOtherDisplay
 
     $("##{form_well_id}").on 'change', target_input_selector, (e) ->

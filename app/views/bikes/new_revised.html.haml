@@ -4,15 +4,18 @@
   %h1
     Enter #{@bike.type} details
 = form_for @bike, multipart: true do |f|
+  = f.hidden_field :b_param_id_token
+  - if @bike.location_id.present?
+    = f.hidden_field :location_id, value: @location.id
+  - if @bike.creation_organization_id.present?
+    = f.hidden_field :creation_organization_id
+  - if @bike.stolen?
+    = f.hidden_field :stolen, value: true
+    = hidden_field_tag :stolen, value: true
   .form-well-container.container
     .row
       .col-lg-8.col-lg-offset-2.form-well
         .form-wrap
-          = f.hidden_field :b_param_id_token
-          - if @bike.location_id.present?
-            = f.hidden_field :location_id, value: @location.id
-          - if @bike.creation_organization_id.present?
-            = f.hidden_field :creation_organization_id
           .form-group.row.unnested-field
             = f.label :cycle_type_id, 'This is a', class: 'form-well-label'
             .form-well-input.fancy-select.unfancy
@@ -68,6 +71,15 @@
           
           - classname = (@b_param.display_email? ? '' : 'no-divider-row')
           = render partial: '/bikes/bike_fields/revised_colors', locals: { f: f, classname: classname }
+
+          - if @bike.stolen
+            .form-group.row.unnested-field
+              = f.label :phone, class: 'form-well-label'
+              .form-well-input
+                = f.text_field :phone, required: true, value: current_user.phone, class: 'form-control'
+
+            = fields_for @stolen_record do |srecord|
+              = render partial: '/bikes/bike_fields/stolen_location', locals: { srecord: srecord }
 
           - if @b_param.display_email?
             .form-group.row.unnested-field.no-divider-row
