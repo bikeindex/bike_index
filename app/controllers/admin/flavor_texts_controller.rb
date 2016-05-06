@@ -3,7 +3,7 @@ class Admin::FlavorTextsController < Admin::BaseController
   def create
     @flavor_text = FlavorText.new(params[:flavor_text])
     if @flavor_text.save
-      flash[:notice] = "Flavor Created!"
+      flash[:success] = "Flavor Created!"
       redirect_to admin_root_url
     else
       redirect_to admin_root_url
@@ -13,9 +13,7 @@ class Admin::FlavorTextsController < Admin::BaseController
   def destroy
     @flavor_text = FlavorText.find(params[:id])
     @flavor_text.destroy
-    flash[:notice] = "Flavor destroyed"
+    flash[:success] = "Flavor destroyed"
     redirect_to admin_root_url
   end
-
-
 end

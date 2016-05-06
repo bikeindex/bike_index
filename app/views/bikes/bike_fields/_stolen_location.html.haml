@@ -1,0 +1,23 @@
+- state_class = (srecord.object.country_id == Country.united_states.id) ? 'unhidden' : ''
+.related-fields
+  .form-group.row.fancy-select.unfancy
+    %label.form-well-label
+      Where was it stolen?
+    .form-well-input#stolen_record_us_id{ data: { usid: Country.united_states.id } }
+      = srecord.collection_select(:country_id, Country.all, :id, :name, { required: true, prompt: 'Choose country' }, { class: 'country-select-input form-control' } )
+  .form-group.row
+    %label.form-well-label
+    .form-well-input
+      = srecord.text_field :street, required: true, placeholder: 'Address or intersection', class: 'form-control'
+  .form-group.row
+    %label.form-well-label
+    .form-well-input
+      = srecord.text_field :city, required: true, placeholder: 'City', class: 'form-control'
+  .form-group.row
+    %label.form-well-label
+    .form-well-input
+      = srecord.text_field :zipcode, placeholder: 'Zipcode', class: 'form-control'
+  .form-group.row.fancy-select-placeholder.unfancy.hidden-other{ class: state_class }
+    %label.form-well-label
+    .form-well-input
+      = srecord.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: 'State' }, { class: 'form-control' })

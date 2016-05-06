@@ -33,7 +33,7 @@ class Admin::BikesController < Admin::BaseController
       params[:bikes_selected].keys.each do |bid|
         Bike.find(bid).update_attributes(manufacturer_id: manufacturer_id, manufacturer_other: nil)
       end
-      flash[:notice] = 'Success. Bikes updated'
+      flash[:success] = 'Success. Bikes updated'
       redirect_to :back and return
     end
     flash[:notice] = 'Sorry, you need to add bikes and a manufacturer'
@@ -55,7 +55,7 @@ class Admin::BikesController < Admin::BaseController
     duplicate_bike_group = DuplicateBikeGroup.find(params[:id])
     duplicate_bike_group.ignore = !duplicate_bike_group.ignore
     duplicate_bike_group.save
-    flash[:notice] = "Successfully marked #{duplicate_bike_group.segment} #{duplicate_bike_group.ignore ? 'ignored' : 'Un-ignored'}"
+    flash[:success] = "Successfully marked #{duplicate_bike_group.segment} #{duplicate_bike_group.ignore ? 'ignored' : 'Un-ignored'}"
     redirect_to :back
   end
 
@@ -91,7 +91,7 @@ class Admin::BikesController < Admin::BaseController
     if @bike.update_attributes(params[:bike])
       @bike.create_normalized_serial_segments
       return if return_to_if_present
-      flash[:notice] = "Bike was successfully updated."
+      flash[:success] = "Bike was successfully updated."
       if @fast_attr_update.present? && @fast_attr_update
         redirect_to edit_admin_bike_url(@bike, fast_attr_update: true) and return
       else
@@ -107,7 +107,7 @@ class Admin::BikesController < Admin::BaseController
   def destroy_bike
     @bike.destroy
     AfterBikeSaveWorker.perform_async(@bike.id)
-    flash[:notice] = 'Bike deleted!'
+    flash[:success] = 'Bike deleted!'
     if params[:multi_delete]
       redirect_to admin_root_url
       # redirect_to admin_bikes_url(page: params[:multi_delete], multi_delete: 1)

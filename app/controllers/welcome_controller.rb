@@ -17,10 +17,18 @@ class WelcomeController < ApplicationController
 
   def user_home
     if current_user.present?
+      @user = current_user
       bikes = current_user.bikes
-      @bikes = BikeDecorator.decorate_collection(bikes)
+      page = params[:page] || 1
+      @per_page = params[:per_page] || 20
+      paginated_bikes = Kaminari.paginate_array(bikes).page(page).per(@per_page)
+      @bikes = BikeDecorator.decorate_collection(paginated_bikes)
       @locks = LockDecorator.decorate_collection(current_user.locks)
-      render action: 'user_home', layout: 'no_container'
+      if revised_layout_enabled?
+        render :revised_user_home, layout: 'application_revised'
+      else
+        render action: 'user_home', layout: 'no_container'
+      end
     else
       redirect_to new_user_url
     end

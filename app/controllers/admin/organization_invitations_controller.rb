@@ -23,7 +23,7 @@ class Admin::OrganizationInvitationsController < Admin::BaseController
 
   def update
     if @organization_invitation.update_attributes(params[:organization_invitation])
-      flash[:notice] = "Invitation Saved!"
+      flash[:success] = 'Invitation Saved!'
       redirect_to admin_organization_invitations_url
     else
       render action: :edit
@@ -37,13 +37,15 @@ class Admin::OrganizationInvitationsController < Admin::BaseController
     @organization = @organization_invitation.organization
     if @organization.available_invitation_count > 0
       if @organization_invitation.save
-        redirect_to admin_organization_url(@organization_invitation.organization.slug), notice: "#{@organization_invitation.invitee_email} was invited to #{@organization.name}!"
+        flash[:success] = "#{@organization_invitation.invitee_email} was invited to #{@organization.name}!"
+        redirect_to admin_organization_url(@organization_invitation.organization.slug)
       else
         flash[:error] = "Oh no! Error problem things! The invitation was not saved. Maybe we're missing some information?"
         redirect_to edit_admin_organization_invitation_url(@organization_invitation.organization.id)
       end
     else
-      redirect_to root_url, notice: "Oh no! This organization has no more invitations."
+      flash[:error] = 'Oh no! This organization has no more invitations. Email contact@bikeindex.org for help'
+      redirect_to root_url
     end
   end
 

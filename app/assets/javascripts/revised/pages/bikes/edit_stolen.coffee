@@ -3,7 +3,7 @@ class BikeIndex.BikesEditStolen extends BikeIndex
     @initializeEventListeners()
     if $('.date_stolen_input').length > 0
       @initializeDateSelector()
-      united_stated_id = $('#form_well_wrap').data('usid')
+      united_stated_id = $('#stolen_record_us_id').data('usid')
       new BikeIndex.ToggleHiddenOther('.country-select-input', united_stated_id)
 
   initializeEventListeners: ->

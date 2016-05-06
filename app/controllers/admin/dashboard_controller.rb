@@ -25,7 +25,7 @@ class Admin::DashboardController < Admin::BaseController
 
   def bust_z_cache
     Rails.cache.clear
-    flash[:notice] = "Z cash WAAAAAS busted!"
+    flash[:success] = "Z cash WAAAAAS busted!"
     redirect_to admin_root_url
   end
 
@@ -35,7 +35,7 @@ class Admin::DashboardController < Admin::BaseController
     # The example bikes for the API docs on production are created by Bike Index Administrators
     # This way we don't clear them when we clear the rest of the example bikes
     bikes.each { |b| b.destroy unless b.creation_organization_id == org.id }
-    flash[:notice] = "Example bikes cleared!"
+    flash[:success] = "Example bikes cleared!"
     redirect_to admin_root_url
   end
 

@@ -25,7 +25,7 @@ class Admin::RecoveriesController < Admin::BaseController
   def update
     @stolen_record = StolenRecord.unscoped.find(params[:id])
     if @stolen_record.update_attributes(params[:stolen_record])
-      flash[:notice] = "Recovery Saved!"
+      flash[:success] = 'Recovery Saved!'
       redirect_to admin_recoveries_url
     else
       raise StandardError
@@ -46,14 +46,15 @@ class Admin::RecoveriesController < Admin::BaseController
         end
       end
       if enqueued
-        flash[:notice] = "Recovery notifications enqueued. Recoveries marked 'can share' haven't been posted, because they need your loving caress."
+        flash[:success] = "Recovery notifications enqueued. Recoveries marked 'can share' haven't been posted, because they need your loving caress."
       else 
         flash[:error] = "No recoveries were selected (or only recoveries you need to caress were)"
       end
       redirect_to admin_recoveries_url
     else
       RecoveryNotifyWorker.perform_async(params[:id].to_i)
-      redirect_to admin_recoveries_url, notice: 'Recovery notification enqueued.'
+      flash[:success] = 'Recovery notification enqueued.'
+      redirect_to admin_recoveries_url
     end
   end
 

@@ -14,7 +14,7 @@ class Admin::CtypesController < Admin::BaseController
 
   def update
     if @ctype.update_attributes(params[:ctype])
-      flash[:notice] = "Component Type Saved!"
+      flash[:success] = 'Component Type Saved!'
       redirect_to admin_ctypes_url
     else
       render action: :edit
@@ -24,7 +24,7 @@ class Admin::CtypesController < Admin::BaseController
   def create
     @ctype = Ctype.create(params[:ctype])
     if @ctype.save
-      flash[:notice] = "Component type created!"
+      flash[:success] = 'Component type created!'
       redirect_to admin_ctypes_url
     else
       render action: :new
@@ -39,7 +39,7 @@ class Admin::CtypesController < Admin::BaseController
 
   def import
     Ctype.import(params[:file])
-    flash[:notice] = "Component types imported"
+    flash[:success] = 'Component types imported'
     redirect_to admin_ctypes_url
   end
 

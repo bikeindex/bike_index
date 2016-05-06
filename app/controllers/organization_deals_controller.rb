@@ -9,7 +9,7 @@ class OrganizationDealsController < ApplicationController
   def create
     @organization_deal = OrganizationDeal.new(params[:organization_deal])
     if @organization_deal.save
-      flash[:notice] = "Thank you! We will contact Kozy's and register your bike on the Index!"
+      flash[:notice] = "Thank you! We will contact the shop and register your bike on the Index!"
       redirect_to about_url
     else
       render action: :new

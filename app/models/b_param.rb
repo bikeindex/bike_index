@@ -198,6 +198,7 @@ class BParam < ActiveRecord::Base
   end
 
   def bike_from_attrs(stolen: nil)
+    stolen ||= params['bike'] && params['bike']['stolen']
     Bike.new safe_bike_attrs('stolen' => stolen)
   end
 
