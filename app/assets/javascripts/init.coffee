@@ -59,7 +59,8 @@ class window.BikeIndex
 
 updateSearchBikesHeaderLink = ->
   return true unless localStorage.getItem('location')
-
+  url = "/bikes?stolen=true&proximity=#{localStorage.getItem('location')}"
+  $('#search_bikes_header_link').attr('href', url)
 
 $(document).ready ->
   updateSearchBikesHeaderLink()

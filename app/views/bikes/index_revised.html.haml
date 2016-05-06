@@ -31,7 +31,7 @@
             within
           = hidden_field_tag :stolen, params[:stolen] || true
           = hidden_field_tag :non_stolen, params[:non_stolen] || ''
-          = hidden_field_tag :non_proximity, params[:non_proximity] || true
+          = hidden_field_tag :non_proximity, params[:non_proximity]
 
       .search-type-tabs{ data: { query: request.original_url.split('bikes?').last } }
         %ul.nav.nav-tabs{ role: 'tablist' }

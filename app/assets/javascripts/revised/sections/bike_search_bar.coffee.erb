@@ -16,7 +16,18 @@ class BikeIndex.BikeSearchBar extends BikeIndex
     # This stuff will eventually get setup globally, for now it's here
     proximity = $('#proximity').val()
     unless proximity? and proximity.length > 0
-      proximity = localStorage.getItem('location')
+      # If there is a search_location, it means this was an IP search and we need to set proximity
+      # it also means it's very unlikely that there is a localstorage location
+      if Array.isArray(window.search_location_geocoding) && window.search_location_geocoding[0]?
+        location_data = window.search_location_geocoding[0].data
+        # Maxmind (what we use in production for ip lookup)
+        # formats its results differently that google. This doesn't work in dev
+        # But it wouldn't work anyway because localhost
+        if Array.isArray(location_data)
+          proximity = "#{location_data[1]}, #{location_data[2]}"
+      else
+        proximity = localStorage.getItem('location')
+      # Then set the proximity from whatever we got
       $('#proximity').val(proximity)
     localStorage.setItem('location', proximity)
     # set up search view if we're on bike search

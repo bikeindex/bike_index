@@ -1,4 +1,5 @@
 .ad-block {
+  display: none;
   background: $gray-lighter;
   border: 1px solid $gray-lightish;
   h4 { @extend .text-xs-center; } // To put size info in ad blocks as we're getting started
