@@ -26,6 +26,6 @@ class WelcomeController < ApplicationController
   end
 
   def choose_registration
-    @user = User.new unless current_user.present?
+    redirect_to new_user_path and return unless current_user.present?
   end
 end

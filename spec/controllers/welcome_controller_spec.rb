@@ -21,6 +21,25 @@ describe WelcomeController do
     end
   end
 
+  describe 'choose registration' do
+    context 'user not present' do
+      it 'redirects' do
+        get :choose_registration
+        expect(response).to redirect_to(new_user_url)
+      end
+    end
+    context 'user present' do
+      it 'renders' do
+        user = FactoryGirl.create(:user)
+        set_current_user(user)
+        get :choose_registration
+        expect(response.status).to eq(200)
+        expect(response).to render_template('choose_registration')
+        expect(response).to render_with_layout('application_revised')
+      end
+    end
+  end
+
   describe 'user_home' do
     context 'user not present' do
       it 'redirects' do
