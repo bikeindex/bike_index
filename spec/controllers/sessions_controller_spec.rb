@@ -2,26 +2,13 @@ require 'spec_helper'
 
 describe SessionsController do
   describe 'new' do
-    context 'legacy' do
-      it 'renders and calls set_return_to' do
-        expect(controller).to receive(:set_return_to)
-        get :new
-        expect(response.code).to eq('200')
-        expect(response).to render_template('new')
-        expect(flash).to_not be_present
-        expect(response).to render_with_layout('application')
-      end
-    end
-    context 'revised' do
-      it 'renders and calls set_return_to' do
-        allow(controller).to receive(:revised_layout_enabled?) { true }
-        expect(controller).to receive(:set_return_to)
-        get :new
-        expect(response.code).to eq('200')
-        expect(response).to render_template('new_revised')
-        expect(flash).to_not be_present
-        expect(response).to render_with_layout('application_revised')
-      end
+    it 'renders and calls set_return_to' do
+      expect(controller).to receive(:set_return_to)
+      get :new
+      expect(response.code).to eq('200')
+      expect(response).to render_template('new')
+      expect(flash).to_not be_present
+      expect(response).to render_with_layout('application_revised')
     end
   end
 
@@ -93,7 +80,7 @@ describe SessionsController do
         post :create, session: {}
         expect(session[:user_id]).to be_nil
         expect(response).to render_template('new')
-        expect(response).to render_with_layout('application')
+        expect(response).to render_with_layout('application_revised')
       end
     end
 
@@ -103,14 +90,14 @@ describe SessionsController do
       post :create, session: {}
       expect(response).to render_template(:new)
       expect(cookies.signed[:auth]).to be_nil
-      expect(response).to render_with_layout('application')
+      expect(response).to render_with_layout('application_revised')
     end
 
     it 'does not log in the user when the user is not found' do
       post :create, session: { email: 'notThere@example.com' }
       expect(cookies.signed[:auth]).to be_nil
       expect(response).to render_template(:new)
-      expect(response).to render_with_layout('application')
+      expect(response).to render_with_layout('application_revised')
     end
   end
 end

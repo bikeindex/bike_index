@@ -1,6 +1,6 @@
 class WelcomeController < ApplicationController
+  layout 'application_revised'
   def index
-    render action: 'index', layout: (revised_layout_enabled? ? 'application_revised' : 'application_updated')
   end
 
   def update_browser
@@ -8,11 +8,7 @@ class WelcomeController < ApplicationController
   end
 
   def goodbye
-    if current_user.present?
-      redirect_to logout_url
-    else
-      render action: 'goodbye', layout: (revised_layout_enabled? ? 'application_revised' : 'application')
-    end
+    redirect_to logout_url and return if current_user.present?
   end
 
   def user_home
@@ -24,11 +20,6 @@ class WelcomeController < ApplicationController
       paginated_bikes = Kaminari.paginate_array(bikes).page(page).per(@per_page)
       @bikes = BikeDecorator.decorate_collection(paginated_bikes)
       @locks = LockDecorator.decorate_collection(current_user.locks)
-      if revised_layout_enabled?
-        render :revised_user_home, layout: 'application_revised'
-      else
-        render action: 'user_home', layout: 'no_container'
-      end
     else
       redirect_to new_user_url
     end

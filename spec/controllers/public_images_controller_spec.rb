@@ -2,19 +2,17 @@ require 'spec_helper'
 
 describe PublicImagesController do
   describe 'destroy' do
-    context 'legacy' do
-      context 'with owner' do
-        it 'allows the destroy of public_image' do
-          user = FactoryGirl.create(:user)
-          bike = FactoryGirl.create(:bike)
-          FactoryGirl.create(:ownership, bike: bike, creator: user, owner_email: user.email)
-          public_image = FactoryGirl.create(:public_image, imageable: bike)
-          expect(bike.reload.owner).to eq(user)
-          set_current_user(user)
-          expect do
-            delete :destroy, id: public_image.id
-          end.to change(PublicImage, :count).by(-1)
-        end
+    context 'with owner' do
+      it 'allows the destroy of public_image' do
+        user = FactoryGirl.create(:user)
+        bike = FactoryGirl.create(:bike)
+        FactoryGirl.create(:ownership, bike: bike, creator: user, owner_email: user.email)
+        public_image = FactoryGirl.create(:public_image, imageable: bike)
+        expect(bike.reload.owner).to eq(user)
+        set_current_user(user)
+        expect do
+          delete :destroy, id: public_image.id
+        end.to change(PublicImage, :count).by(-1)
       end
       context 'non owner' do
         it 'rejects the destroy' do
@@ -43,20 +41,18 @@ describe PublicImagesController do
         end
       end
     end
-    context 'revised' do
-      context 'with owner' do
-        it 'allows a the owner of a public_image to destroy the public_image' do
-          user = FactoryGirl.create(:user)
-          bike = FactoryGirl.create(:bike)
-          FactoryGirl.create(:ownership, bike: bike, creator: user, owner_email: user.email)
-          public_image = FactoryGirl.create(:public_image, imageable: bike)
-          expect(bike.reload.owner).to eq(user)
-          set_current_user(user)
-          expect do
-            delete :destroy, id: public_image.id, page: 'redirect_page'
-          end.to change(PublicImage, :count).by(-1)
-          expect(response).to redirect_to(edit_bike_path(bike, page: 'redirect_page'))
-        end
+    context 'with owner' do
+      it 'allows a the owner of a public_image to destroy the public_image' do
+        user = FactoryGirl.create(:user)
+        bike = FactoryGirl.create(:bike)
+        FactoryGirl.create(:ownership, bike: bike, creator: user, owner_email: user.email)
+        public_image = FactoryGirl.create(:public_image, imageable: bike)
+        expect(bike.reload.owner).to eq(user)
+        set_current_user(user)
+        expect do
+          delete :destroy, id: public_image.id, page: 'redirect_page'
+        end.to change(PublicImage, :count).by(-1)
+        expect(response).to redirect_to(edit_bike_path(bike, page: 'redirect_page'))
       end
     end
   end

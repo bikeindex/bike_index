@@ -6,8 +6,12 @@ module ApplicationHelper
 
   def current_page_active(link_path, match_controller: false)
     if match_controller
-      link_controller = Rails.application.routes.recognize_path(link_path)[:controller]
-      Rails.application.routes.recognize_path(request.url)[:controller] == link_controller
+      begin
+        link_controller = Rails.application.routes.recognize_path(link_path)[:controller]
+        Rails.application.routes.recognize_path(request.url)[:controller] == link_controller
+      rescue # This mainly fails in testing - but why not rescue always
+        return false
+      end
     else
       current_page?(link_path)
     end

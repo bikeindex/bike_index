@@ -8,45 +8,21 @@ describe PaymentsController do
       before do
         set_current_user(user)
       end
-      context 'legacy' do
-        it 'renders' do
-          get :new
-          expect(response.code).to eq('200')
-          expect(response).to render_template('new')
-          expect(response).to render_with_layout('application_updated')
-          expect(flash).to_not be_present
-        end
-      end
-      context 'revised' do
-        it 'renders' do
-          allow(controller).to receive(:revised_layout_enabled?) { true }
-          get :new
-          expect(response.code).to eq('200')
-          expect(response).to render_template('new')
-          expect(response).to render_with_layout('application_revised')
-          expect(flash).to_not be_present
-        end
+      it 'renders' do
+        get :new
+        expect(response.code).to eq('200')
+        expect(response).to render_template('new')
+        expect(response).to render_with_layout('application_revised')
+        expect(flash).to_not be_present
       end
     end
     context 'without user' do
-      context 'legacy' do
-        it 'renders' do
-          get :new
-          expect(response.code).to eq('200')
-          expect(response).to render_template('new')
-          expect(response).to render_with_layout('application_updated')
-          expect(flash).to_not be_present
-        end
-      end
-      context 'revised' do
-        it 'renders' do
-          allow(controller).to receive(:revised_layout_enabled?) { true }
-          get :new
-          expect(response.code).to eq('200')
-          expect(response).to render_template('new')
-          expect(response).to render_with_layout('application_revised')
-          expect(flash).to_not be_present
-        end
+      it 'renders' do
+        get :new
+        expect(response.code).to eq('200')
+        expect(response).to render_template('new')
+        expect(response).to render_with_layout('application_revised')
+        expect(flash).to_not be_present
       end
     end
   end
@@ -73,7 +49,6 @@ describe PaymentsController do
           stripe_email: user.email,
           stripe_amount: 4000
         }
-        allow(controller).to receive(:revised_layout_enabled?) { true }
         expect do
           post :create, opts
         end.to change(Payment, :count).by(1)
@@ -121,7 +96,7 @@ describe PaymentsController do
         expect do
           post :create, opts
         end.to change(Payment, :count).by(1)
-        expect(response).to render_with_layout('application_updated')
+        expect(response).to render_with_layout('application_revised')
         payment = Payment.last
         expect(payment.user_id).to eq(user.id)
         user.reload

@@ -27,7 +27,7 @@ class PublicImagesController < ApplicationController
       flash[:error] = "Whoops! We can't let you create that image."
       redirect_to @imageable
     end
-    render revised_layout_enabled? ? 'create_revised' : 'create'
+    render 'create_revised'
   end
 
   def edit

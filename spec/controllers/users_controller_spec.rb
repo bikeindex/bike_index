@@ -2,35 +2,21 @@ require 'spec_helper'
 
 describe UsersController do
   describe 'new' do
-    context 'legacy' do
-      context 'already signed in' do
-        it 'redirects and sets the flash' do
-          user = FactoryGirl.create(:user)
-          set_current_user(user)
-          get :new
-          expect(response).to redirect_to(:user_home)
-          expect(flash).to be_present
-          expect(response).to_not render_with_layout('application_revised')
-        end
-      end
-      context 'not signed in' do
-        it 'renders and calls set set_return_to' do
-          expect(controller).to receive(:set_return_to)
-          get :new
-          expect(response.code).to eq('200')
-          expect(response).to render_template('new')
-          expect(flash).to_not be_present
-          expect(response).to_not render_with_layout('application_revised')
-        end
+    context 'already signed in' do
+      it 'redirects and sets the flash' do
+        user = FactoryGirl.create(:user)
+        set_current_user(user)
+        get :new
+        expect(response).to redirect_to(:user_home)
+        expect(flash).to be_present
       end
     end
-    context 'revised' do
+    context 'not signed in' do
       it 'renders and calls set set_return_to' do
-        allow(controller).to receive(:revised_layout_enabled?) { true }
         expect(controller).to receive(:set_return_to)
         get :new
         expect(response.code).to eq('200')
-        expect(response).to render_template('new_revised')
+        expect(response).to render_template('new')
         expect(flash).to_not be_present
         expect(response).to render_with_layout('application_revised')
       end
@@ -189,49 +175,34 @@ describe UsersController do
   end
 
   describe 'accept_vendor_terms' do
-    before do
+    it 'renders' do
       user = FactoryGirl.create(:user)
       set_current_user(user)
       get :accept_vendor_terms
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:accept_vendor_terms)
+      expect(response).to render_with_layout('application_revised')
     end
-    it { is_expected.to respond_with(:success) }
-    it { is_expected.to render_template(:accept_vendor_terms) }
   end
 
   describe 'accept_terms' do
-    before do
+    it 'renders' do
       user = FactoryGirl.create(:user)
       set_current_user(user)
       get :accept_terms
+      expect(response).to render_template(:accept_terms)
+      expect(response).to render_with_layout('application_revised')
     end
-    it { is_expected.to respond_with(:success) }
-    it { is_expected.to render_template(:accept_terms) }
   end
 
   describe 'edit' do
-    before do
+    it 'renders with application_revised' do
       user = FactoryGirl.create(:user)
       set_current_user(user)
       get :edit
-    end
-    it { is_expected.to respond_with(:success) }
-    it { is_expected.to render_template(:edit) }
-    context 'legacy' do
-      it 'renders with application layout' do
-        get :edit
-        expect(response.status).to eq(200)
-        expect(response).to render_template(:edit)
-        expect(response).to render_with_layout('application')
-      end
-    end
-    context 'revised' do
-      it 'renders with revised_layout' do
-        allow(controller).to receive(:revised_layout_enabled?) { true }
-        get :edit
-        expect(response.status).to eq(200)
-        expect(response).to render_template(:edit)
-        expect(response).to render_with_layout('application_revised')
-      end
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:edit)
+      expect(response).to render_with_layout('application_revised')
     end
   end
 
