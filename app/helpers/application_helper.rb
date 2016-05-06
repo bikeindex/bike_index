@@ -1,7 +1,7 @@
 module ApplicationHelper
-  def active_link(link_text, link_path, match_controller: false, class_name: '')
+  def active_link(link_text, link_path, match_controller: false, class_name: '', id: '')
     class_name += ' active' if current_page_active(link_path, match_controller: match_controller)
-    link_to(raw(link_text), link_path, class: class_name).html_safe
+    link_to(raw(link_text), link_path, class: class_name, id: id).html_safe
   end
 
   def current_page_active(link_path, match_controller: false)

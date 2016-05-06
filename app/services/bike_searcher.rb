@@ -1,6 +1,7 @@
 class BikeSearcher
-  def initialize(creation_params = {})
-    @params = creation_params
+  def initialize(creation_params = {}, reverse_geocode = nil)
+    # override reverse_geocode if passed as params
+    @params = creation_params.merge(reverse_geocode: reverse_geocode)
     @bikes = Bike.scoped
     if @params[:search_type].present?
       if @params[:search_type] == 'serial'
@@ -18,7 +19,7 @@ class BikeSearcher
     end
   end
 
-  attr_accessor :params
+  attr_accessor :params, :location
 
   def interpreted_params(i_params)
     query = (i_params[:query] || '').gsub('%23', '#') # ... ensure string so we can gsub it
@@ -158,7 +159,8 @@ class BikeSearcher
       radius = @params[:proximity_radius].to_i
     end
     radius ||= 500
-    box = Geocoder::Calculations.bounding_box(@params[:proximity], radius)
+    @location = Geocoder.search(@params[:proximity]) if @params[:reverse_geocode]
+    box = Geocoder::Calculations.bounding_box((@location || @params[:proximity]), radius)
     unless box[0].nan?
       bike_ids = StolenRecord.where('id in (?)', stolen_ids).within_bounding_box(box).pluck(:bike_id)
       @bikes = @bikes.where('id in (?)', bike_ids)

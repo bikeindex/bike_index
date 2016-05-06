@@ -17,7 +17,6 @@ class BikeIndex.BikeSearchBar extends BikeIndex
     proximity = $('#proximity').val()
     unless proximity? and proximity.length > 0
       proximity = localStorage.getItem('location')
-      proximity = 'ip' unless proximity? and proximity.length > 0
       $('#proximity').val(proximity)
     localStorage.setItem('location', proximity)
     # set up search view if we're on bike search

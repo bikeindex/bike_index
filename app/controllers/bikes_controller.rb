@@ -24,10 +24,12 @@ class BikesController < ApplicationController
   def index
     params[:stolen] = true unless params[:stolen].present? || params[:non_stolen].present?
     if params[:proximity].present? && params[:proximity].strip.downcase == 'ip'
+      reverse_geocode = true
       params[:proximity] = request.env['HTTP_X_FORWARDED_FOR'].split(',')[0] if request.env['HTTP_X_FORWARDED_FOR']
     end
-    search = BikeSearcher.new(params)
+    search = BikeSearcher.new(params, reverse_geocode)
     bikes = search.find_bikes
+    @location = search.location
     page = params[:page] || 1
     @per_page = params[:per_page] || 10
     bikes = bikes.page(page).per(@per_page)
@@ -37,7 +39,7 @@ class BikesController < ApplicationController
     end
     @bikes = bikes.decorate
     @query = params[:query]
-    @query = request.query_parameters()
+    # @query = request.query_parameters()
     @url = request.original_url
     @stolenness = search.stolenness_type
     @selectize_items = search.selectize_items

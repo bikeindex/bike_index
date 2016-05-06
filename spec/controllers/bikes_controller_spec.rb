@@ -9,6 +9,7 @@ describe BikesController do
           expect(response.status).to eq(200)
           expect(response).to render_template(:index)
           expect(response).to render_with_layout('application_updated')
+          expect(assigns(:location)).to_not be_present
           expect(flash).to_not be_present
           expect(assigns(:per_page)).to eq 10
         end
@@ -22,6 +23,7 @@ describe BikesController do
             expect(response).to render_template(:index_revised)
             expect(response).to render_with_layout('application_revised')
             expect(flash).to_not be_present
+            expect(assigns(:location)).to_not be_present
             expect(assigns(:per_page)).to eq 10
             expect(assigns(:stolenness)).to eq 'stolen'
           end
@@ -38,17 +40,22 @@ describe BikesController do
                 non_proximity: true
             expect(response.status).to eq(200)
             expect(response).to render_with_layout('application_revised')
+            expect(assigns(:location)).to_not be_present
             expect(flash).to_not be_present
             expect(assigns(:per_page)).to eq 10
             expect(assigns(:stolenness)).to eq 'stolen'
           end
         end
         context 'proximity' do
-          it 'renders' do
-            get :index, proximity: 'ip'
+          it 'renders, assigns location via geocoder' do
+            # Without a matching current stolen record, it doesn't go whole way through proximity
+            FactoryGirl.create(:stolen_bike)
+            get :index, proximity: 'ip', stolen: true
             expect(response.status).to eq(200)
             expect(flash).to_not be_present
             expect(assigns(:per_page)).to eq 10
+            target_location = [ { data: default_location, cache_hit: nil } ].as_json # in spec_helper
+            expect(assigns(:location).as_json).to eq target_location
             expect(assigns(:stolenness)).to eq 'stolen_proximity'
             expect(response).to render_with_layout('application_revised')
           end
