@@ -4,7 +4,7 @@
       = render partial: '/bikes/edit_primary_menu'
       .col-md-8.form-well
         .form-wrap
-          .edit-bike-form-header
+          .form-well-form-header
             %h3
               Wheels
 
@@ -55,7 +55,7 @@
 
 
         .form-wrap.secondary-form-wrap#edit_drivetrain
-          .edit-bike-form-header
+          .form-well-form-header
             %h3
               Drivetrain
           - rear_fixed = RearGearType.fixed.id
@@ -64,15 +64,16 @@
           .form-group.row.unnested-field
             %label.form-well-label
               Drivetrain type
-            %label.checkbox-inline
-              %input#fixed_gear_check.checkbox.drive-check{ type: "checkbox", checked: fixed }
-              Fixed
-            %label.checkbox-inline.not-fixed
-              = f.check_box :coaster_brake
-              Coaster Brake
-            %label.checkbox-inline.not-fixed
-              = f.check_box :belt_drive
-              Belt Drive
+            .form-well-input
+              %label.checkbox-inline
+                %input#fixed_gear_check.checkbox.drive-check{ type: "checkbox", checked: fixed }
+                Fixed
+              %label.checkbox-inline.not-fixed
+                = f.check_box :coaster_brake
+                Coaster Brake
+              %label.checkbox-inline.not-fixed
+                = f.check_box :belt_drive
+                Belt Drive
 
           .related-fields.fancy-select.unfancy.not-fixed.no-divider-row
             .form-group.row

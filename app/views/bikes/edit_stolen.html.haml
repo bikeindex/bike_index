@@ -5,7 +5,7 @@
       = render partial: '/bikes/edit_primary_menu'
       .col-md-8.form-well#form_well_wrap
         .form-wrap
-          .edit-bike-form-header
+          .form-well-form-header
             %h3
               = @edit_templates[@edit_template]
           - if @bike.stolen and @bike.find_current_stolen_record.present?
@@ -40,10 +40,10 @@
                   .form-well-input
                     = srecord.select(:lock_defeat_description, StolenRecord.locking_defeat_description_select, prompt: '')
 
-              .form-group.row.unnested-field.fancy-select-placeholder.unfancy
+              .form-group.row.unnested-field
                 - description_label = @bike.recovered ? "How did you recovered the #{@bike.type}" : 'Description of the incident'
                 = srecord.label :theft_description, description_label, class:  'form-well-label'
-                .form-well-input
+                .form-well-input-large
                   = srecord.text_area :theft_description, rows: 3, class: 'form-control'
 
               .form-group.row.unnested-field
@@ -77,10 +77,10 @@
         / if stolen, we also add an exterior block for marking not stolen
         - if @bike.stolen and @bike.find_current_stolen_record.present?
           .form-wrap.secondary-form-wrap
-            .edit-bike-form-header
+            .form-well-form-header
               %h3
                 Recovered
-            .toggle-stolen.no-divider-row
+            .toggle-stolen.no-divider-row.full-width-button
               %a.btn.btn-success.btn-lg{data: { toggle: 'modal', target: '#toggle-stolen' } }
                 This #{@bike.type} has been returned!
 
