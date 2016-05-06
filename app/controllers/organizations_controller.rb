@@ -42,6 +42,8 @@ class OrganizationsController < ApplicationController
       flash[:notice] = "Organization Created successfully!"
       if current_user.present?
         redirect_to edit_organization_url(@organization) and return
+      else
+        #nothing to do
       end
     else
       render action: :new and return
@@ -67,10 +69,18 @@ class OrganizationsController < ApplicationController
     @bike.owner_email = params[:email] if params[:email].present?
     if params[:non_stolen]
       @non_stolen = true 
-    elsif params[:stolen_first]
+    else
+      #nothing to do
+    end      
+    if params[:stolen_first]
       @stolen_first = true
-    elsif params[:stolen]
+    else
+      #nothing to do
+    end    
+    if params[:stolen]
       @stolen = true 
+    else
+      #nothing to do
     end
     if params[:sf_safe].present?
       render action: :embed_sf_safe, layout: 'embed_layout'
@@ -85,6 +95,8 @@ class OrganizationsController < ApplicationController
     if params[:email].present?
       @bike.owner_email = params[:email] 
       @persist_email = true
+    else
+      #nothing to do
     end
     if params[:sf_safe].present?
       render action: :embed_sf_safe, layout: 'embed_layout'
@@ -109,8 +121,13 @@ class OrganizationsController < ApplicationController
       if @organization.update_attributes(allowed_attributes)
         if @organization.wants_to_be_shown && @organization.show_on_map == false
           notify_admins('wants_shown')
-        elsif @organization.wants_to_be_shown == false && @organization.show_on_map
+        else
+          #nothing to do
+        end
+        if @organization.wants_to_be_shown == false && @organization.show_on_map
           notify_admins('wants_not_shown')
+        else
+          #nothing to do  
         end
         # if Urlifyer.urlify(params[:organization][:website])
         #   @organization.website = websitey
@@ -148,6 +165,8 @@ class OrganizationsController < ApplicationController
     }
     if params[:organization][:locations_attributes].present?
       updates[:locations_attributes] = params[:organization][:locations_attributes]
+    else
+      #nothing to do
     end
     updates
   end
@@ -199,7 +218,10 @@ class OrganizationsController < ApplicationController
       feedback.body = "#{@organization.name} created an account"
       feedback.title = "New Organization created"
       feedback.feedback_type = 'organization_created'
-    elsif type == 'organization_destroyed'
+    else
+      #nothing to do
+    end  
+    if type == 'organization_destroyed'
       feedback.body = "#{@organization.name} deleted their account"
       feedback.title = "Organization deleted themselves"   
       feedback.feedback_type = 'organization_destroyed'

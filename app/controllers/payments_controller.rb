@@ -17,14 +17,21 @@ class PaymentsController < ApplicationController
 
   def create
     @amount = params[:stripe_amount]
-    @subscription = params[:stripe_subscription] if params[:stripe_subscription].present?
-    user = current_user || User.fuzzy_email_find(params[:stripe_email])
-    email = params[:stripe_email].strip.downcase
+    @subscription = params[:stripe_subscription] 
+    if params[:stripe_subscription].present?
+      user = current_user || User.fuzzy_email_find(params[:stripe_email])
+      email = params[:stripe_email].strip.downcase
+    else
+      #nothing to do
+    end    
     if user.present? && user.stripe_id.present?
       customer = Stripe::Customer.retrieve(user.stripe_id)
       customer.card = params[:stripe_token]
       customer.save
-    elsif user.present?
+    else
+      #nothing to do
+    end  
+    if user.present?
       customer = Stripe::Customer.create(
         email: email,
         card: params[:stripe_token]
@@ -36,10 +43,7 @@ class PaymentsController < ApplicationController
         customer.card = params[:stripe_token]
         customer.save
       else
-        customer = Stripe::Customer.create(
-          email: email,
-          card: params[:stripe_token]
-        )
+        customer = Stripe::Customer.create(email: email, card: params[:stripe_token])
       end
     end
     @customer_id = customer.id

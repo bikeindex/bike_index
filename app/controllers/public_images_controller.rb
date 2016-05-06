@@ -13,6 +13,8 @@ class PublicImagesController < ApplicationController
     @public_image = PublicImage.find(params[:id])
     if @public_image.present? && @public_image.imageable_type == 'Bike'
       @owner_viewing = true if @public_image.imageable.current_ownership.present? && @public_image.imageable.owner == current_user
+    else
+      #nothing to do  
     end
   end
 
@@ -23,19 +25,27 @@ class PublicImagesController < ApplicationController
       if @bike.owner == current_user
         @public_image.imageable = @bike
         @public_image.save
+      else
+        #nothing to do  
       end
       @imageable = @bike
-    elsif params[:blog_id].present?
-      @blog = Blog.find(params[:blog_id])
-      @public_image.imageable = @blog
-      @public_image.save
-      @imageable = @blog
-    end
-    unless @public_image.imageable.present?
+      if params[:blog_id].present?
+        @blog = Blog.find(params[:blog_id])
+        @public_image.imageable = @blog
+        @public_image.save
+        @imageable = @blog
+      else
+        #nothing to do
+      end
+    else
+      render revised_layout_enabled? ? 'create_revised' : 'create'
+    end  
+    if @public_image.imageable.present?
       flash[:error] = "Whoops! We can't let you create that image."
       redirect_to @imageable
+    else
+      #nothing to do
     end
-    render revised_layout_enabled? ? 'create_revised' : 'create'
   end
 
   def edit
@@ -62,7 +72,10 @@ class PublicImagesController < ApplicationController
     flash[:notice] = 'Image was successfully deleted'
     if params[:page].present?
       redirect_to edit_bike_url(imageable_id, page: params[:page]) and return
-    elsif imageable_type == 'Blog'
+    else
+      #nothing to do
+    end  
+    if imageable_type == 'Blog'
       redirect_to edit_admin_news_url(@imageable.title_slug) and return
     else
       redirect_to edit_bike_url(imageable_id)
@@ -78,6 +91,8 @@ class PublicImagesController < ApplicationController
         next unless last_image == index && image.imageable_type == 'Bike'
         Bike.unscoped.find(image.imageable_id).save
       end
+    else
+      #nothing to do  
     end
     render nothing: true
   end
@@ -87,16 +102,22 @@ class PublicImagesController < ApplicationController
   def current_user_image_owner(public_image)
     if public_image.imageable_type == 'Bike'
       Bike.unscoped.find(public_image.imageable_id).owner == current_user
-    elsif public_image.imageable_type == 'Blog'
+    else
+      #nothing to do
+    if public_image.imageable_type == 'Blog'
       current_user && current_user.admin_authorized(content)
+    else
+      #nothing to do
     end
   end
 
   def find_image_if_owned
     @public_image = PublicImage.unscoped.find(params[:id])
-    unless current_user_image_owner(@public_image)
+    if current_user_image_owner(@public_image)
       flash[:error] = "Sorry! You don't have permission to edit that image."
       redirect_to @public_image.imageable and return
+    else
+      #nothing to do
     end
   end
 end
