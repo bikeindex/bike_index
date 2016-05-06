@@ -1,3 +1,11 @@
+=begin
+*****************************************************************
+* File: app/controllers/news_controller.rb 
+* Name: Class NewsController 
+* Set some methods to news controllers
+*****************************************************************
+=end
+
 class NewsController < ApplicationController
   layout 'content'
   before_filter :set_blogs_active_section

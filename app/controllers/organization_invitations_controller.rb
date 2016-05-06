@@ -1,3 +1,11 @@
+=begin
+*****************************************************************
+* File: app/controllers/organization_invitations_controller.rb 
+* Name: Class OrganizationInvitationsController 
+* Set some methods to organization of organization invited.
+*****************************************************************
+=end
+
 class OrganizationInvitationsController < ApplicationController
   before_filter :authenticate_user
   before_filter :find_organization

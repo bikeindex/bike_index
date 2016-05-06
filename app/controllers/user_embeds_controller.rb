@@ -1,3 +1,11 @@
+=begin
+*****************************************************************
+* File: app/controllers/users_embeds_controller.rb 
+* Name: Class UsersEmbedsController 
+* Set some methods to manager userEmbeds
+*****************************************************************
+=end
+
 class UserEmbedsController < ApplicationController
   skip_before_filter :set_x_frame_options_header
   layout 'embed_user_layout'

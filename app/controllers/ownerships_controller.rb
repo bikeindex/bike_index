@@ -1,3 +1,11 @@
+=begin
+*****************************************************************
+* File: app/controllers/ownerships_controller.rb 
+* Name: Class OwnershipsController 
+* Set some methods to deal with ownership
+*****************************************************************
+=end
+
 class OwnershipsController < ApplicationController
   before_filter :find_ownership
   before_filter -> { authenticate_user(no_user_flash_msg) }

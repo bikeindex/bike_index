@@ -1,3 +1,11 @@
+=begin
+*****************************************************************
+* File: app/controllers/organization_deals_controller.rb 
+* Name: Class OrganizationDealsController 
+* Set some methods to deal with organization
+*****************************************************************
+=end
+
 class OrganizationDealsController < ApplicationController
 
   def new

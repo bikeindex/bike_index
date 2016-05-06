@@ -1,3 +1,11 @@
+=begin
+*****************************************************************
+* File: app/controllers/welcome_controller.rb 
+* Name: Class WelcomeController 
+* Set some methods to deal with the welcome of the users
+*****************************************************************
+=end
+
 class WelcomeController < ApplicationController
   def index
     render action: 'index', layout: (revised_layout_enabled? ? 'application_revised' : 'application_updated')

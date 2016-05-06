@@ -1,3 +1,11 @@
+=begin
+*********************************************************************
+* File: app/controllers/stolen_notifications_controller.rb 
+* Name: Class StolenNotificationsController 
+* Set some methods to deal with the notifications received of stolens 
+*********************************************************************
+=end
+
 class StolenNotificationsController < ApplicationController
   before_filter :authenticate_user
 

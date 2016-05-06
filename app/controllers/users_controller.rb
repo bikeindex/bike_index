@@ -1,3 +1,12 @@
+=begin
+*****************************************************************
+* File: app/controllers/users_controller.rb 
+* Name: Class UsersController 
+* Set some methods to deal with the profile of users
+*****************************************************************
+=end
+
+
 class UsersController < ApplicationController
   include Sessionable
   before_filter :authenticate_user, only: [:edit]

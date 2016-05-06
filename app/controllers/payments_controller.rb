@@ -1,3 +1,12 @@
+=begin
+*****************************************************************
+* File: app/controllers/payments_controller.rb 
+* Name: Class PaymentsController 
+* Set some methods to deal with payments
+*****************************************************************
+=end
+
+
 class PaymentsController < ApplicationController
   def revised_layout_if_enabled
     revised_layout_enabled? ? 'application_revised' : 'application_updated'

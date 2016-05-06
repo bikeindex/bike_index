@@ -1,3 +1,11 @@
+=begin
+*****************************************************************
+* File: app/controllers/public_images_controller.rb 
+* Name: Class PublicImagesController 
+* Set some methods to deal with images
+*****************************************************************
+=end
+
 class PublicImagesController < ApplicationController
   before_filter :find_image_if_owned, only: [:edit, :update, :destroy, :is_private]
 

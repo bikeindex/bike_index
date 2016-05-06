@@ -1,3 +1,11 @@
+=begin
+*****************************************************************
+* File: app/controllers/organizations_controller.rb 
+* Name: Class OrganizationsController 
+* Set some methods to controller the organization
+*****************************************************************
+=end
+
 class OrganizationsController < ApplicationController
   before_filter :authenticate_user, only: [:show, :edit, :update, :destroy]
   before_filter :find_organization, except: [:new, :lightspeed_integration, :create]

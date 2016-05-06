@@ -1,3 +1,12 @@
+=begin
+*****************************************************************
+* File: app/controllers/sessions_controller.rb 
+* Name: Class SessionsController 
+* Set some methods to deal with session
+*****************************************************************
+=end
+
+
 class SessionsController < ApplicationController
   include Sessionable
   before_filter :set_return_to, only: [:new]

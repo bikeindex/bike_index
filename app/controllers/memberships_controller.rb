@@ -1,3 +1,11 @@
+=begin
+*****************************************************************
+* File: app/controllers/memberships_controller.rb 
+* Name: Class MembershipsController 
+* Set methods edit, update, destroy and others to MemberShips
+*****************************************************************
+=end
+
 class MembershipsController < ApplicationController
   before_filter :authenticate_user
   before_filter :find_membership

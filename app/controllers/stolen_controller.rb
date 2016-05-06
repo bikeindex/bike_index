@@ -1,3 +1,11 @@
+=begin
+*****************************************************************
+* File: app/controllers/stolen_controller.rb 
+* Name: Class StolenController 
+* Set some methods to deal with stolen in bike
+*****************************************************************
+=end
+
 class StolenController < ApplicationController
   before_filter :remove_subdomain
   layout 'application_updated'
