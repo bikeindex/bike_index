@@ -57,12 +57,12 @@ class window.BikeIndex
       alert parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)))
 
 
-updateSearchBikesHeaderLink = ->
+window.updateSearchBikesHeaderLink = ->
   return true unless localStorage.getItem('location')
   url = "/bikes?stolen=true&proximity=#{localStorage.getItem('location')}"
   $('#search_bikes_header_link').attr('href', url)
 
 $(document).ready ->
-  updateSearchBikesHeaderLink()
+  window.updateSearchBikesHeaderLink()
   window.BikeIndexInit = new window.BikeIndex
   window.BikeIndexInit.pageLoad()
