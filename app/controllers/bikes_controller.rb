@@ -19,7 +19,7 @@ class BikesController < ApplicationController
   before_filter :render_ad, only: [:index, :show]
   before_filter :set_return_to, only: [:edit]
   before_filter :remove_subdomain, only: [:index]
-  layout 'no_container'
+  layout 'application_revised'
 
   def index
     params[:stolen] = true unless params[:stolen].present? || params[:non_stolen].present?
@@ -43,11 +43,6 @@ class BikesController < ApplicationController
     @url = request.original_url
     @stolenness = search.stolenness_type
     @selectize_items = search.selectize_items
-    if revised_layout_enabled?
-      render :index_revised, layout: 'application_revised'
-    else
-      render layout: 'application_updated'
-    end
   end
 
   def show
@@ -58,13 +53,7 @@ class BikesController < ApplicationController
     @bike = @bike.decorate
     @stolen_notification = StolenNotification.new if @bike.stolen
     respond_to do |format|
-      format.html do
-        if revised_layout_enabled?
-          render :show_revised, layout: 'application_revised'
-        else
-          render layout: 'application_updated'
-        end
-      end
+      format.html { render :show }
       format.gif  { render qrcode: scanned_bike_url(@bike), level: :h, unit: 50 }
     end
   end
@@ -106,30 +95,19 @@ class BikesController < ApplicationController
   end
 
   def new
-    if revised_layout_enabled?
-      new_revised
-    else
-      if current_user.present?
-        @b_param = BParam.create(creator_id: current_user.id, params: params)
-        @bike = BikeCreator.new(@b_param).new_bike
-      else
-        @user = User.new
-      end
-      render layout: 'no_header'
+    unless current_user.present?
+      flash[:error] = 'Whoops! You have to sign in to be able to register a bike'
+      redirect_to new_user_path and return
     end
-  end
-
-  def new_revised
     find_or_new_b_param
     # Let them know if they sent an invalid b_param token
     flash[:error] = "Sorry! We couldn't find that bike" if @b_param.id.blank? && params[:b_param_token].present?
-    @bike ||= @b_param.bike_from_attrs(stolen: params[:stolen])
+    @bike ||= @b_param.bike_from_attrs(stolen: params[:stolen], recovered: params[:recovered])
     if @bike.stolen
       @stolen_record = @bike.stolen_records.build(@b_param.params['stolen_record'])
       @stolen_record.country_id ||= Country.united_states.id
     end
     @page_errors = @b_param.bike_errors
-    render :new_revised, layout: 'application_revised'
   end
 
   def create
@@ -165,58 +143,30 @@ class BikesController < ApplicationController
           redirect_to controller: :organizations, action: :embed_create_success, id: @bike.creation_organization.slug, bike_id: @bike.id and return
         end
       end
-    elsif revised_layout_enabled?
-      revised_create
     else
-      @b_param = BParam.from_id_token(params[:bike][:b_param_id_token], "2014-12-31 18:00:00")
-      unless @b_param && @b_param.creator_id == current_user.id
-        @bike = Bike.new
-        flash[:error] = "Oops, that isn't your bike"
-        redirect_to action: :new, layout: 'no_header' and return
-      end
+      find_or_new_b_param
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@b_param.created_bike) and return
       end
-      @b_param.update_attributes(params: params)
+      @b_param.clean_params(params)
       @bike = BikeCreator.new(@b_param).create_bike
       if @bike.errors.any?
         @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
-        render action: :new, layout: 'no_header' and return
+        redirect_to new_bike_url(b_param_token: @b_param.id_token)
+      else
+        flash[:success] = 'Bike successfully added to the index!'
+        redirect_to edit_bike_url(@bike)
       end
-      flash[:success] = 'Bike successfully added to the index!'
-      redirect_to edit_bike_url(@bike)
     end
   end
-
-  def revised_create
-    find_or_new_b_param
-    if @b_param.created_bike.present?
-      redirect_to edit_bike_url(@b_param.created_bike) and return
-    end
-    @b_param.clean_params(params)
-    @bike = BikeCreator.new(@b_param).create_bike
-    if @bike.errors.any?
-      @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
-      redirect_to new_bike_url(b_param_token: @b_param.id_token)
-    else
-      flash[:success] = 'Bike successfully added to the index!'
-      redirect_to edit_bike_url(@bike)
-    end
-  end
-
 
   def edit
-    if revised_layout_enabled?
-      @page_errors = @bike.errors
-      @edit_template = edit_templates[params[:page]].present? ? params[:page] : edit_templates.keys.first
-      if @edit_template == 'photos'
-        @private_images = PublicImage.unscoped.where(imageable_type: 'Bike').where(imageable_id: @bike.id).where(is_private: true)
-      end
-      render "edit_#{@edit_template}".to_sym, layout: 'application_revised'
-    else
+    @page_errors = @bike.errors
+    @edit_template = edit_templates[params[:page]].present? ? params[:page] : edit_templates.keys.first
+    if @edit_template == 'photos'
       @private_images = PublicImage.unscoped.where(imageable_type: 'Bike').where(imageable_id: @bike.id).where(is_private: true)
-      @bike = @bike.decorate
     end
+    render "edit_#{@edit_template}".to_sym
   end
 
 
@@ -228,20 +178,11 @@ class BikesController < ApplicationController
     end
     @bike = @bike.decorate
     if @bike.errors.any? || flash[:error].present?
-      if revised_layout_enabled?
-        edit and return
-      else
-        flash[:error] ||= @bike.errors.full_messages
-        render action: :edit and return
-      end
+      edit and return
     else
       flash[:success] = "Bike successfully updated!"
       return if return_to_if_present
-      if params[:edit_template].present?
-        redirect_to edit_bike_url(@bike, page: params[:edit_template]), layout: 'no_header' and return
-      else
-        redirect_to edit_bike_url(@bike), layout: 'no_header' and return
-      end
+      redirect_to edit_bike_url(@bike, page: params[:edit_template]), layout: 'no_header' and return
     end
   end
 
