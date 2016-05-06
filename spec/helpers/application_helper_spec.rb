@@ -5,7 +5,7 @@ describe ApplicationHelper do
     context 'without a class' do
       it 'returns the link active if it ought to be' do
         allow(view).to receive(:current_page?).and_return(true)
-        generated = '<a href="http://bikeindex.org" class=" active">Bike Index about</a>'
+        generated = '<a href="http://bikeindex.org" class=" active" id="">Bike Index about</a>'
         expect(helper.active_link('Bike Index about', 'http://bikeindex.org')).to eq generated
       end
     end
@@ -13,7 +13,7 @@ describe ApplicationHelper do
       let(:request) { double('request', url: new_bike_url) }
       before { allow(helper).to receive(:request).and_return(request) }
       it 'returns the link active if it is a bikes page' do
-        generated = '<a href="' + new_bike_url + '" class="seeeeeeee active">Bike Index bikes page</a>'
+        generated = '<a href="' + new_bike_url + '" class="seeeeeeee active" id="">Bike Index bikes page</a>'
         result = helper.active_link('Bike Index bikes page', new_bike_url, match_controller: true, class_name: 'seeeeeeee')
         expect(result).to eq generated
       end
@@ -21,7 +21,7 @@ describe ApplicationHelper do
     context 'current with a class' do
       it 'returns the link active if it ought to be' do
         allow(view).to receive(:current_page?).and_return(true)
-        generated = '<a href="http://bikeindex.org" class="nav-party-link active">Bike Index about</a>'
+        generated = '<a href="http://bikeindex.org" class="nav-party-link active" id="">Bike Index about</a>'
         result = helper.active_link('Bike Index about', 'http://bikeindex.org', class_name: 'nav-party-link')
         expect(result).to eq generated
       end
@@ -29,7 +29,7 @@ describe ApplicationHelper do
     context 'organization_invitation' do
       it 'returns link, active if it ought to be' do
         allow(view).to receive(:controller_name).and_return('organization_invitations')
-        generated = '<a href="/invitations" class="">Invitations</a>'
+        generated = '<a href="/invitations" class="" id="">Invitations</a>'
         expect(helper.active_link('Invitations', '/invitations')).to eq(generated)
       end
     end

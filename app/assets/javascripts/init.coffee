@@ -50,16 +50,18 @@ class window.BikeIndex
 
   # We need to call this because of Flexbox
   # Edge is fine, but all versions of IE are broken, and we should tell peeps
-  msieversion = ->
+  msieversion: ->
     ua = window.navigator.userAgent
     msie = ua.indexOf('MSIE ')
     if msie > 0 or ! !navigator.userAgent.match(/Trident.*rv\:11\./)
       alert parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)))
-    else
-      alert 'otherbrowser'
-    false
+
+
+updateSearchBikesHeaderLink = ->
+  return true unless localStorage.getItem('location')
 
 
 $(document).ready ->
+  updateSearchBikesHeaderLink()
   window.BikeIndexInit = new window.BikeIndex
   window.BikeIndexInit.pageLoad()
