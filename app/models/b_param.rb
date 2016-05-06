@@ -185,7 +185,7 @@ class BParam < ActiveRecord::Base
   # To protect organization registration and other non-user-set options in revised setup,
   # Set the protected attrs separately from the params hash and merging over the passed params
   def self.find_or_new_from_token(toke = nil, user_id: nil, organization_id: nil)
-    b = without_bike.where(creator_id: user_id, id_token: toke).first if user_id.present?
+    b = where(creator_id: user_id, id_token: toke).first if user_id.present?
     b ||= without_bike.without_creator.where('created_at >= ?', Time.now - 1.month).where(id_token: toke).first
     b ||= BParam.new(creator_id: user_id, params: { revised_new: true }.as_json)
     b.creator_id ||= user_id
@@ -197,9 +197,9 @@ class BParam < ActiveRecord::Base
     b
   end
 
-  def bike_from_attrs(stolen: nil)
+  def bike_from_attrs(stolen: nil, recovered: nil)
     stolen ||= params['bike'] && params['bike']['stolen']
-    Bike.new safe_bike_attrs('stolen' => stolen)
+    Bike.new safe_bike_attrs({ stolen: stolen, recovered: recovered })
   end
 
   def safe_bike_attrs(param_overrides)

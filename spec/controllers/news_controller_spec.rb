@@ -7,7 +7,6 @@ describe NewsController do
         get :index
         expect(response.status).to eq(200)
         expect(response).to render_template('index')
-        expect(response).to render_with_layout('content')
       end
     end
 
@@ -19,7 +18,6 @@ describe NewsController do
           get :show, id: blog.title_slug
           expect(response.status).to eq(200)
           expect(response).to render_template('show')
-          expect(response).to render_with_layout('content')
         end
       end
       context 'old title slug' do
@@ -27,7 +25,6 @@ describe NewsController do
           get :show, id: blog.old_title_slug
           expect(response.status).to eq(200)
           expect(response).to render_template('show')
-          expect(response).to render_with_layout('content')
         end
       end
       context 'id' do
@@ -35,7 +32,6 @@ describe NewsController do
           get :show, id: blog.id
           expect(response.status).to eq(200)
           expect(response).to render_template('show')
-          expect(response).to render_with_layout('content')
         end
       end
     end
@@ -44,7 +40,6 @@ describe NewsController do
   context 'revised' do
     describe 'index' do
       it 'renders' do
-        allow(controller).to receive(:revised_layout_enabled?) { true }
         get :index
         expect(response.status).to eq(200)
         expect(response).to render_template('index')
@@ -56,7 +51,6 @@ describe NewsController do
       let(:user) { FactoryGirl.create(:user) }
       let(:blog) { Blog.create(title: 'foo title', body: 'ummmmm good', user_id: user.id, old_title_slug: 'an-older-title') }
       it 'renders' do
-        allow(controller).to receive(:revised_layout_enabled?) { true }
         get :show, id: blog.title_slug
         expect(response.status).to eq(200)
         expect(response).to render_template('show')

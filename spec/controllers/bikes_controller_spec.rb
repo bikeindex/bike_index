@@ -7,20 +7,17 @@ describe BikesController do
         it 'renders' do
           get :index
           expect(response.status).to eq(200)
-          expect(response).to render_template(:index)
-          expect(response).to render_with_layout('application_updated')
           expect(assigns(:location)).to_not be_present
           expect(flash).to_not be_present
           expect(assigns(:per_page)).to eq 10
         end
       end
       context 'revised' do
-        before { allow(controller).to receive(:revised_layout_enabled?) { true } }
         context 'no params' do
           it 'renders' do
             get :index
             expect(response.status).to eq(200)
-            expect(response).to render_template(:index_revised)
+            expect(response).to render_template(:index)
             expect(response).to render_with_layout('application_revised')
             expect(flash).to_not be_present
             expect(assigns(:location)).to_not be_present
@@ -119,7 +116,7 @@ describe BikesController do
           get :show, id: bike.id
           expect(response.status).to eq(200)
           expect(response).to render_template(:show)
-          expect(response).to render_with_layout('application_updated')
+          expect(response).to render_with_layout('application_revised')
           expect(assigns(:bike)).to be_decorated
           expect(flash).to_not be_present
         end
@@ -129,7 +126,7 @@ describe BikesController do
           ownership.bike.update_attributes(example: true)
           get :show, id: bike.id
           expect(response).to render_template(:show)
-          expect(response).to render_with_layout('application_updated')
+          expect(response).to render_with_layout('application_revised')
           expect(assigns(:bike)).to be_decorated
         end
       end
@@ -152,7 +149,7 @@ describe BikesController do
               get :show, id: ownership.bike_id
               expect(response.status).to eq(200)
               expect(response).to render_template(:show)
-              expect(response).to render_with_layout('application_updated')
+              expect(response).to render_with_layout('application_revised')
               expect(assigns(:bike)).to be_decorated
               expect(flash).to_not be_present
             end
@@ -163,7 +160,7 @@ describe BikesController do
               get :show, id: ownership.bike_id
               expect(response.status).to eq(200)
               expect(response).to render_template(:show)
-              expect(response).to render_with_layout('application_updated')
+              expect(response).to render_with_layout('application_revised')
               expect(assigns(:bike)).to be_decorated
               expect(flash).to_not be_present
             end
@@ -190,19 +187,6 @@ describe BikesController do
       it 'renders' do
         get :show, id: bike.id, format: :gif
         expect(response.status).to eq(200)
-      end
-    end
-    context 'revised' do
-      context 'showing' do
-        it 'shows the bike' do
-          allow(controller).to receive(:revised_layout_enabled?) { true }
-          get :show, id: bike.id
-          expect(response.status).to eq(200)
-          expect(response).to render_template(:show_revised)
-          expect(response).to render_with_layout('application_revised')
-          expect(assigns(:bike)).to be_decorated
-          expect(flash).to_not be_present
-        end
       end
     end
   end
@@ -239,10 +223,6 @@ describe BikesController do
         CycleType.bike
         PropulsionType.foot_pedal
       end
-      it "does not redirect to new user if a user isn't present" do
-        get :new, stolen: true
-        expect(response.code).to eq('200')
-      end
 
       it 'renders a new stolen bike' do
         set_current_user(user)
@@ -272,7 +252,6 @@ describe BikesController do
         # instantiate the required bike attrs... there is a better way to do this.
         CycleType.bike
         PropulsionType.foot_pedal
-        allow(controller).to receive(:revised_layout_enabled?) { true }
         set_current_user(user)
       end
       context 'stolen from params' do
@@ -282,7 +261,7 @@ describe BikesController do
           expect(assigns(:bike).stolen).to be_truthy
           b_param = assigns(:b_param)
           expect(b_param.revised_new?).to be_truthy
-          expect(response).to render_template(:new_revised)
+          expect(response).to render_template(:new)
           expect(response).to render_with_layout('application_revised')
         end
       end
@@ -304,7 +283,6 @@ describe BikesController do
             expect(assigns(:b_param)).to eq b_param
             expect(bike.is_a?(Bike)).to be_truthy
             bike_attrs.each { |k, v| expect(bike.send(k)).to eq(v) }
-            expect(response).to render_template(:new_revised)
             expect(response).to render_with_layout('application_revised')
           end
         end
@@ -315,7 +293,6 @@ describe BikesController do
             bike = assigns(:bike)
             expect(bike.is_a?(Bike)).to be_truthy
             expect(assigns(:b_param)).to_not eq b_param
-            expect(response).to render_template(:new_revised)
             expect(response).to render_with_layout('application_revised')
             expect(flash[:error]).to match(/sorry/i)
           end
@@ -349,28 +326,12 @@ describe BikesController do
           }
         end
 
-        it "renders new if b_param isn't owned by user" do
+        it "does not use the b_param if isn't owned by user" do
           user = FactoryGirl.create(:user)
           set_current_user(user)
           post :create, bike: @bike
-          # expect(response).to render_template('new.html.haml')
-          expect(flash[:error]).to eq("Oops, that isn't your bike")
-        end
-
-        it 'renders new if there is an error and update the b_params' do
-          bike = Bike.new(@bike)
-          bike.errors.add(:errory, 'something')
-          expect_any_instance_of(BikeCreator).to receive(:create_bike).and_return(bike)
-          post :create, bike: @bike
-          expect(@b_param.reload.bike_errors).not_to be_nil
-          expect(response).to render_template('new')
-        end
-
-        it 'redirects to the created bike if it exists' do
-          bike = FactoryGirl.create(:bike)
-          @b_param.update_attributes(created_bike_id: bike.id)
-          post :create, bike: { b_param_id_token: @b_param.id_token }
-          expect(response).to redirect_to(edit_bike_url(bike))
+          @b_param.reload
+          expect(@b_param.created_bike_id).to_not be_present
         end
 
         it 'creates a new stolen bike' do
@@ -482,7 +443,6 @@ describe BikesController do
       let(:manufacturer) { FactoryGirl.create(:manufacturer) }
       let(:color) { FactoryGirl.create(:color) }
       before do
-        allow(controller).to receive(:revised_layout_enabled?) { true }
         set_current_user(user)
       end
       context 'no existing b_param and stolen' do
@@ -564,34 +524,45 @@ describe BikesController do
         end
       end
       context 'existing b_param' do
-        it 'creates a bike' do
-          bike_params = {
-            cycle_type_id: CycleType.bike.id.to_s,
-            serial_number: 'example serial',
-            manufacturer_other: '',
-            year: '2016',
-            frame_model: 'Cool frame model',
-            primary_frame_color_id: color.id.to_s,
-            secondary_frame_color_id: '',
-            tertiary_frame_color_id: '',
-            owner_email: 'something@stuff.com'
-          }
-          b_param = BParam.create(params: { bike: bike_params })
-          bb_data = { bike: { } }
-          # We need to call clean_params on the BParam after bikebook update, so that
-          # the foreign keys are assigned correctly. This is how we test that we're 
-          # This is also where we're testing bikebook assignment
-          expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
-          expect do
-            post :create, bike: { manufacturer_id: manufacturer.slug, b_param_id_token: b_param.id_token }
-          end.to change(Bike, :count).by(1)
-          expect(flash[:success]).to be_present
-          bike = Bike.last
-          b_param.reload
-          expect(b_param.created_bike_id).to eq bike.id
-          bike_params.delete(:manufacturer_id)
-          bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v }
-          expect(bike.manufacturer).to eq manufacturer
+        context 'no bike' do
+          it 'creates a bike' do
+            bike_params = {
+              cycle_type_id: CycleType.bike.id.to_s,
+              serial_number: 'example serial',
+              manufacturer_other: '',
+              year: '2016',
+              frame_model: 'Cool frame model',
+              primary_frame_color_id: color.id.to_s,
+              secondary_frame_color_id: '',
+              tertiary_frame_color_id: '',
+              owner_email: 'something@stuff.com'
+            }
+            b_param = BParam.create(params: { bike: bike_params })
+            bb_data = { bike: { } }
+            # We need to call clean_params on the BParam after bikebook update, so that
+            # the foreign keys are assigned correctly. This is how we test that we're 
+            # This is also where we're testing bikebook assignment
+            expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
+            expect do
+              post :create, bike: { manufacturer_id: manufacturer.slug, b_param_id_token: b_param.id_token }
+            end.to change(Bike, :count).by(1)
+            expect(flash[:success]).to be_present
+            bike = Bike.last
+            b_param.reload
+            expect(b_param.created_bike_id).to eq bike.id
+            bike_params.delete(:manufacturer_id)
+            bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v }
+            expect(bike.manufacturer).to eq manufacturer
+          end
+        end
+        context 'created bike' do
+          it 'redirects to the bike' do
+            bike = FactoryGirl.create(:bike)
+            b_param = BParam.create(params: { bike: {} }, created_bike_id: bike.id, creator_id: user.id)
+            expect(b_param.created_bike).to be_present
+            post :create, bike: { b_param_id_token: b_param.id_token }
+            expect(response).to redirect_to(edit_bike_url(bike))
+          end
         end
       end
     end
@@ -619,21 +590,9 @@ describe BikesController do
     context 'user allowed to edit the bike' do
       let(:user) { ownership.creator }
 
-      context 'legacy' do
-        it 'responds with success' do
-          set_current_user(user)
-          get :edit, id: bike.id
-          expect(flash).to_not be_present
-          expect(response).to be_success
-          expect(assigns(:bike)).to be_decorated
-          expect(response).to render_template(:edit)
-        end
-      end
-
       context 'revised' do
         before do
           set_current_user(user)
-          allow(controller).to receive(:revised_layout_enabled?) { true }
         end
         context 'root' do
           context 'non-stolen bike' do
@@ -767,7 +726,6 @@ describe BikesController do
         # Also, that we can apply stolen changes to hidden bikes
         # And finally, that it redirects to the correct page
         it 'updates and returns to the right page' do
-          allow(controller).to receive(:revised_layout_enabled?) { true }
           stolen_record = FactoryGirl.create(:stolen_record, bike: bike, city: 'party')
           bike.stolen = true
           # bike.marked_user_hidden = true

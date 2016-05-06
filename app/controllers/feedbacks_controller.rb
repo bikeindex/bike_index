@@ -1,8 +1,7 @@
 class FeedbacksController < ApplicationController
-  layout 'content'
+  layout 'application_revised'
   before_filter :set_feedback_active_section
   before_filter :authenticate_user, only: [:new, :create]
-  before_filter :set_revised_layout
 
   def index
     @feedback = Feedback.new

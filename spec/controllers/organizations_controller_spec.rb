@@ -2,24 +2,17 @@ require 'spec_helper'
 
 describe OrganizationsController do
   describe 'new' do
-    describe 'it should render the page without current user' do
-      before do
-        get :new
-      end
-      it { is_expected.to respond_with(:success) }
-      it { is_expected.to render_template(:new) }
-    end
-    context 'legacy' do
-      it 'renders with content layout' do
+    context 'with out user' do
+      it 'renders' do
         get :new
         expect(response.status).to eq(200)
         expect(response).to render_template(:new)
-        expect(response).to render_with_layout('content')
+        expect(response).to render_with_layout('application_revised')
       end
     end
-    context 'revised' do
+    context 'with user' do
       it 'renders with revised_layout' do
-        allow(controller).to receive(:revised_layout_enabled?) { true }
+        set_current_user(FactoryGirl.create(:user))
         get :new
         expect(response.status).to eq(200)
         expect(response).to render_template(:new)
@@ -222,17 +215,8 @@ describe OrganizationsController do
   end
 
   describe 'lightspeed_integration' do
-    context 'legacy' do
-      it 'renders with content layout' do
-        get :lightspeed_integration
-        expect(response.status).to eq(200)
-        expect(response).to render_template(:lightspeed_integration)
-        expect(response).to render_with_layout('content')
-      end
-    end
     context 'revised' do
       it 'renders with revised_layout' do
-        allow(controller).to receive(:revised_layout_enabled?) { true }
         get :lightspeed_integration
         expect(response.status).to eq(200)
         expect(response).to render_template(:lightspeed_integration)

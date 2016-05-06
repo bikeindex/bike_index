@@ -1,163 +1,140 @@
-= form_for @user, html: { class: "form-horizontal form user-settings", id: "edit-user-form" } do |f|
-  - if @user.errors.any?
-    #alert-block
-      .alert.alert-error
-        %h4
-          Please fix the following 
-          = pluralize(@user.errors.count, "error")
-        %ul
-          - @user.errors.full_messages.each do |msg|
-            %li
-              = msg
+= form_for @user do |f|
+  .form-well-container.container
+    .row
+      .col-lg-8.col-lg-offset-2.form-well
+        .form-wrap
+          .form-well-form-header
+            %h3
+              Personal Information for 
+              = @user.display_name
+          .col-xs-12
+            %p
+              Any use of your personal information is governed by the terms of our #{link_to "Privacy policy", privacy_url}. We do not sell, trade, or rent your personal information to third parties.
+          .form-group.row.unnested-field
+            = f.label :name, class: 'form-well-label'
+            .form-well-input
+              = f.text_field :name, class: 'form-well-label', class: 'form-control'
+          .form-group.row.unnested-field
+            = f.label :zipcode, class: 'form-well-label'
+            .form-well-input
+              = f.text_field :zipcode, placeholder: 'Default search location', class: 'form-control'
+          .form-group.row.unnested-field
+            = f.label :password, class: 'form-well-label'
+            .form-well-input
+              = f.password_field :password, placeholder: 'Password', class: 'form-control'
+          .form-group.row.unnested-field
+            = f.label :password_confirmation, class: 'form-well-label'
+            .form-well-input
+              = f.password_field :password_confirmation, placeholder: 'Password confirmation', class: 'form-control'
+          .form-group.row.unnested-field
+            = f.label :current_password, class: 'form-well-label'
+            .form-well-input
+              = f.password_field :current_password, placeholder: 'For password update', class: 'form-control'
+          .form-group.row.unnested-field.full-width-section
+            %label
+              = f.check_box :is_emailable
+              Get quarterly updates
 
-  %fieldset
-    %legend
-      Edit Personal Information for 
-      = @user.email
-    .input-group
-      %p 
-        Any use of your personal information is governed by the terms of our #{link_to "Privacy policy", privacy_url}. We do not sell, trade, or rent your personal information to third parties.
+          .toggle-stolen.no-divider-row.full-width-button
+            = f.submit 'Update information', class: 'btn btn-success btn-lg'
 
-      .control-group
-        %label.control-label{ for: "user_user_name" }
-          Name
-        .controls
-          = f.text_field :name
-      .control-group
-        %label.label-with-tip.control-label{ for: "user_zipcode" }
-          %p
-            Zipcode
-          / %span.formtip
-          /   ?
-          /   %a.tooltip{ rel: "tooltip", :"data-placement" => "bottom", title: "If entered, closer bikes will appear first in search results." }
-          /     ?
-        .controls
-          = f.text_field :zipcode, placeholder: "Default search location"
-      .control-group
-        %label.control-label{ for: "user_Password" }
-          Password
-        .controls
-          = f.password_field :password, placeholder: "Password"
-      .control-group
-        %label.control-label{ for: "user_password_confirmation" }
-          Password Confirmation
-        .controls
-          = f.password_field :password_confirmation, placeholder: "Password confirmation"
-      .control-group
-        = f.label :current_password, class: "control-label"
-        .controls
-          = f.password_field :current_password, placeholder: "For password update"
-      .control-group.emailme-maybe
-        = f.label :is_emailable, class: "control-label" do 
-          Get quarterly updates
-        .controls
-          = f.check_box :is_emailable
-          
-          
+        .form-wrap.secondary-form-wrap
+          .form-well-form-header
+            %h3
+              Personal page settings
+          .col-xs-12
+            %p
+              The Bike Index can create a page listing all your bikes that includes all the information you want to share. It's your personal page.
+              = link_to '(preview page)', user_url(@user), target: '_blank'
+            .form-group.unnested-field.no-divider-row.row.sharing-collapser{ data: { target: '#personal-page' } }
+              %label.form-well-label
+                Create public page
+              .form-well-input
+                %label.radio-inline
+                  = f.radio_button :show_bikes, 'true'
+                  Create page
+                %label.radio-inline
+                  = f.radio_button :show_bikes, 'false'
+                  No, please don't create me a page
+            .related-fields#personal-page.collapse
+              .form-group.row
+                %label.form-well-label
+                  Profile avatar
+                .form-well-input
+                  - if @user.avatar? 
+                    = image_tag(@user.avatar_url(:thumb))
+                  - else
+                    %p
+                      No picture!
+                  %label.file 
+                    = f.file_field :avatar
+                    %span.file-custom
+                    = f.hidden_field :avatar_cache
 
-    .control-group.actions
-      = f.submit "Update information", class: 'button-green'
+              .form-group.row
+                = f.label :title, 'Page title', class:  'form-well-label'
+                .form-well-input
+                  = f.text_field :title, placeholder: "This user's bikes", class: 'form-control'
+              .form-group.row
+                = f.label :description, 'Page text', class:  'form-well-label'
+                .form-well-input-large
+                  = f.text_area :description, rows: 3, class: 'form-control'
 
-  %fieldset
-    %legend
-      Sharing settings
-    .control-group.sharing-collapser{ data: {target: "#personal-page" } }
-      %p
-        The Bike Index can create a page listing all your bikes that includes all the information you want to share. It's your personal page.
-        = link_to "(preview page)", user_url(@user), target: "_blank"
-      %p
-        Would you like us to create this page for you?
-      .controls
-        %label.radio
-          = f.radio_button :show_bikes, "true"
-          Create page
-        %label.radio
-          = f.radio_button :show_bikes, "false"
-          No, please don't create me a page
+          .toggle-stolen.no-divider-row.full-width-button
+            = f.submit 'Update information', class: 'btn btn-success btn-lg'
 
-    #personal-page.collapse
-      .control-group.avatar-upload
-        %label.control-label
-          Profile avatar
-        .controls
-          .avatar-img
-            - if @user.avatar? 
-              = image_tag(@user.avatar_url(:thumb))
-            - else
-              %p
-                No picture!
-          = f.file_field :avatar
-          = f.hidden_field :avatar_cache
+        .form-wrap.secondary-form-wrap
+          .form-well-form-header
+            %h3
+              Sharing settings
+          .related-fields
+            .form-group.row.sharing-collapser{ data: { target: '#twitter-field' } }
+              %label.form-well-label
+                Show Twitter
+              .form-well-input
+                %label.radio-inline
+                  = f.radio_button :show_twitter, 'true'
+                  Show Twitter
+                %label.radio-inline
+                  = f.radio_button :show_twitter, 'false'
+                  No Twitter
+            #twitter-field.form-group.row.collapse
+              = f.label :twitter, 'Twitter handle', class: 'form-well-label'
+              .form-well-input
+                = f.text_field :twitter, placeholder: 'Twitter handle', class: 'form-control'
 
-      %label.control-label{ for: "title" }
-        Title for personal page
-      .controls
-        = f.text_field :title, placeholder: "This user's bikes"
-      .description
-        %label.control-label{ for: 'description' }
-          Enter some information about yourself if you'd like
-        .description-input
-          .controls
-            = f.text_area :description
+            .form-group.row.sharing-collapser{ data: { target: '#personal-field' } }
+              %label.form-well-label
+                Show Personal Site
+              .form-well-input
+                %label.radio-inline
+                  = f.radio_button :show_website, 'true'
+                  Show personal website
+                %label.radio-inline
+                  = f.radio_button :show_website, 'false'
+                  No personal site
+            #personal-field.form-group.row.collapse
+              = f.label :website, 'Personal Site URL', class: 'form-well-label'
+              .form-well-input
+                = f.text_field :website, placeholder: 'example.com', class: 'form-control'
 
-    .control-group.sharing-collapser{ data: {target: "#twitter-field" } }
-      %label.control-label
-        Show Twitter
-      .controls.radio-controls
-        %label.radio
-          = f.radio_button :show_twitter, "true"
-          Show Twitter
-        %label.radio
-          = f.radio_button :show_twitter, "false"
-          No Twitter
-    
-    #twitter-field.collapse
-      .control-group.controls-appended
-        %label.control-label{ for: "user_twitter" }
-          Twitter handle
-        .controls.input-prepend
-          %span.add-on
-            @
-          = f.text_field :twitter, placeholder: "Twitter handle"
+          .related-fields
+            .form-group.row
+              = f.label :my_bikes_link_target, 'Additional Link', class: 'form-well-label'
+              .form-well-input
+                = f.text_field :my_bikes_link_target, value: @user.mb_link_target, placeholder: "http://example.com", class: 'form-control'
+            .form-group.row
+              = f.label :my_bikes_link_target, 'Title for link', class: 'form-well-label'
+              .form-well-input
+                = f.text_field :my_bikes_link_title, value: @user.mb_link_title, placeholder: 'My awesome link', class: 'form-control'
 
-    .control-group.sharing-collapser{ data: {target: "#personal-field" } }
-      %label.control-label
-        Show Personal Site
-      .controls.radio-controls
-        %label.radio
-          = f.radio_button :show_website, "true"
-          Show personal site
-        %label.radio
-          = f.radio_button :show_website, "false"
-          No personal site
+          .form-group.row.unnested-field
+            = f.label :username, class: 'form-well-label'
+            .form-well-input
+              = f.text_field :username, class: 'form-control'
+              .below-input-help
+                Your username is the URL for your sharing page and the bike embed form. Update it if you care about those things.
 
-    #personal-field.collapse
-      .control-group.controls-appended
-        %label.control-label{ for: "user_website" }
-          Personal Site URL
-        .controls.input-prepend
-          %span.add-on
-            http&#58;&#47;&#47;
-          = f.text_field :website, placeholder: "Enter site URL"
-    .control-group
-      %label.control-label{ for: "title" }
-        Additional Link
-      .controls
-        = f.text_field :my_bikes_link_target, value: @user.mb_link_target, placeholder: "http://example.com"
-    .control-group
-      %label.control-label{ for: "title" }
-        Title for link
-      .controls
-        = f.text_field :my_bikes_link_title, value: @user.mb_link_title, placeholder: "My awesome link"
 
-    .control-group#username_ref
-      %p
-        Your username is the URL for your sharing page and the bike embed form. Update it if you care about those things.
-      .padded
-        %label.control-label{ for: "username" }
-          Username
-        .controls
-          = f.text_field :username
-
-    .control-group.actions
-      = f.submit "Update sharing", class: 'button-green'
+          .toggle-stolen.no-divider-row.full-width-button
+            = f.submit 'Update information', class: 'btn btn-success btn-lg'

@@ -1,12 +1,11 @@
 class SessionsController < ApplicationController
   include Sessionable
+  layout 'application_revised'
   before_filter :set_return_to, only: [:new]
 
   def new
     if current_user.present?
       redirect_to user_home_url, notice: "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
-    elsif revised_layout_enabled?
-      render 'new_revised', layout: 'application_revised'
     end
   end
 

@@ -1,10 +1,9 @@
 class StolenController < ApplicationController
   before_filter :remove_subdomain
-  layout 'application_updated'
+  layout 'application_revised'
   
   def index
     @feedback = Feedback.new
-    render action: 'index', layout: (revised_layout_enabled? ? 'application_revised' : 'application_updated')
   end
 
   def current_tsv

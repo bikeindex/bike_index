@@ -1,4 +1,5 @@
 class UsersController < ApplicationController
+  layout 'application_revised'
   include Sessionable
   before_filter :authenticate_user, only: [:edit]
   before_filter :set_return_to, only: [:new]
@@ -8,8 +9,6 @@ class UsersController < ApplicationController
     if current_user.present?
       flash[:success] = "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
       redirect_to user_home_url and return
-    elsif revised_layout_enabled?
-      render 'new_revised', layout: 'application_revised'
     end
   end
 
@@ -91,7 +90,7 @@ class UsersController < ApplicationController
   def edit
     @user = current_user
     @page_errors = @user.errors
-    render :edit_revised, layout: 'application_revised' if revised_layout_enabled?
+    render :edit
   end
 
   def update

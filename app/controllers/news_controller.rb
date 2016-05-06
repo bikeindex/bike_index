@@ -1,7 +1,5 @@
 class NewsController < ApplicationController
-  layout 'content'
-  before_filter :set_blogs_active_section
-  before_filter :set_revised_layout
+  layout 'application_revised'
 
   def show
     @blog = Blog.find_by_title_slug(params[:id])
@@ -22,9 +20,5 @@ class NewsController < ApplicationController
 
   def index
     @blogs = Blog.published
-  end
-
-  def set_blogs_active_section
-    @active_section = "about"
   end
 end

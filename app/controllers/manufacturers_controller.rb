@@ -1,7 +1,5 @@
 class ManufacturersController < ApplicationController
-  layout 'content'
-  before_filter :set_manufacturers_active_section
-  before_filter :set_revised_layout
+  layout 'application_revised'
 
   def index
     @manufacturers = Manufacturer.all
@@ -13,9 +11,5 @@ class ManufacturersController < ApplicationController
 
   def tsv
     redirect_to 'https://files.bikeindex.org/uploads/tsvs/manufacturers.tsv'
-  end
-
-  def set_manufacturers_active_section
-    @active_section = 'resources'
   end
 end

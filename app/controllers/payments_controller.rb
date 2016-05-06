@@ -1,10 +1,7 @@
 class PaymentsController < ApplicationController
-  def revised_layout_if_enabled
-    revised_layout_enabled? ? 'application_revised' : 'application_updated'
-  end
+  layout 'application_revised'
 
   def new
-    render layout: revised_layout_if_enabled
   end
 
   def create
@@ -58,7 +55,6 @@ class PaymentsController < ApplicationController
     unless payment.save
       raise StandardError, "Unable to create a payment. #{payment.to_yaml}"
     end
-    render layout: revised_layout_if_enabled
   rescue Stripe::CardError => e
     flash[:error] = e.message
     redirect_to new_payment_path and return

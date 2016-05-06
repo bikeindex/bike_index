@@ -1,122 +1,127 @@
-- if current_user.present?
-  - if @b_param.bike_errors.present?
-    #alert-block
-      .alert.alert-error
-        %a.close{"data-dismiss" => "alert"} ×
-        %h4
-          Please fix the following 
-          = pluralize(@b_param.bike_errors.count, "error")
-        %ul
-          - @b_param.bike_errors.each do |msg|
-            %li
-              = msg
+- serial_help_content = "Every bike has a unique serial number, it's how they are identified. To learn more or see some examples, go to #{link_to 'our serial page', serials_url, target: '_blank' } <small>(opens in a separate window)</small>."
 
-  .new-bike-container{ class: "#{"stolen-add" if @bike.stolen}" }
-    = form_for @bike, html: { class: "receptacle form-horizontal" }, multipart: true do |f|
-      = f.hidden_field :cycle_type_id
-      = f.hidden_field :b_param_id_token
-      - if @bike.location_id.present?
-        = f.hidden_field :location_id, value: @location.id
-      - if @bike.creation_organization_id.present?
-        = f.hidden_field :creation_organization_id
-      .inner-recep
-        .adding-bike{ class: "#{"recovered-color" if @bike.recovered}" }
-          %h1
-            Add a
-            - if @bike.stolen
-              %span.stolen-color
-                stolen
-          .dropdown
-            %a.dropdown-toggle#cycletypeBtn{ href: "/", role: "button", data: { toggle: "dropdown", target:"#"} }
-              %span.craft-button
-                %strong#cycletype-text
-                  Bike
-                %span
-                  not adding a standard bike?
-                  %b.caret
-              %ul.dropdown-menu#select-cycletype{ role: "menu", :aria =>{ labelledby: "cycletypeBtn" } }
-                - CycleType.all.each do |type|
-                  %li
-                    %a.clickable{ id: "cycletype#{type.id}", data: {id: type.id}, class: ("long-title" if type.name.length > 8) }
-                      = type.name
-          %h2
-            - if @bike.recovered
-              %span.recovered-color
-                you have recovered
-            to the Index
+.form-well-header.container
+  %h1
+    Enter #{@bike.type} details
+= form_for @bike, multipart: true do |f|
+  = f.hidden_field :b_param_id_token
+  - if @bike.location_id.present?
+    = f.hidden_field :location_id, value: @location.id
+  - if @bike.creation_organization_id.present?
+    = f.hidden_field :creation_organization_id
+  - if @bike.stolen?
+    = f.hidden_field :stolen, value: true
+    = hidden_field_tag :stolen, value: true
+  
+  - if @bike.recovered
+    = f.hidden_field :recovered, value: true
+  .form-well-container.container
+    .row
+      .col-lg-8.col-lg-offset-2.form-well
+        .form-wrap
+          .form-group.row.unnested-field
+            = f.label :cycle_type_id, 'This is a', class: 'form-well-label'
+            .form-well-input.fancy-select.unfancy
+              = f.collection_select(:cycle_type_id, CycleType.all, :id, :name, required: true, class: 'form-control')
 
-        .new-bike-fields
-
-          = render partial: 'bikes/bike_fields/new_bike', locals: { f: f }
-
-          - if @bike.recovered
-            = f.hidden_field :recovered, value: true
-
-          - if @bike.stolen?
-            = f.hidden_field :stolen, value: true
-            = hidden_field_tag :stolen, value: true
-            .input-group
-              %a.bikeform-tip{role: "button", title: "Why do we want your phone number?", data: {toggle: "modal", target: "#phoneTip"} }
-                %span
+          .form-group.row.unnested-field
+            = f.label :serial_number, class: 'form-well-label'
+            .form-well-input
+              #serial-input
+                = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', placeholder: 'highly recommended', class: 'form-control'
+                %a.inline-input-help{ title: 'Serial help', data: { toggle: 'popover', content: serial_help_content } }
                   ?
-              .control-group
-                = f.label :phone, class: "control-label"
-                .controls
+              #made-without-serial-input
+                %label
+                  = f.check_box :made_without_serial
+                  Made without serial
+              .below-input-help#made-without-serial-help
+                .hidden-other
+                  %a{ data: { toggle: 'modal', target: '#made-without-serial-modal' } }
+                    This #{@bike.type} was made without a serial number
+            .right-input-help
+              %label
+                = f.check_box :has_no_serial, tabindex: -1
+                Missing serial
 
-                  = f.text_field :phone, required: "true", value: current_user.phone
-            .input-group
-              = fields_for :stolen_record do |builder|
-                #stolen-bike-location.control-group
-                  = builder.label :street, "Where was it stolen?", class: "control-label"
-                  #country_select_container.controls.special-select-single
-                    = builder.collection_select(:country_id, Country.all, :id, :name, prompt: "Choose country" )
-                    %p.other-value#us_country_id
-                      = Country.united_states.id
-                  .controls.extra-field
-                    = builder.text_field :street, placeholder: "Intersection or address"
-                  .controls.extra-field
-                    = builder.text_field :city, placeholder: "City"
-                  .controls.extra-field
-                    = builder.text_field :zipcode, placeholder: "Zipcode"
-                  #state-select.controls.extra-field.special-select-single
-                    = builder.collection_select(:state_id, State.all, :id, :name, include_blank: true, prompt: "State" )
-                  %span.form-info-addition.padded
-                    Address is public - use a nearby intersection instead of your home address
+          .related-fields
+            .form-group.row
+              = f.label :manufacturer_id, class: 'form-well-label'
+              .form-well-input
+                - initial = @bike.manufacturer && { id: @bike.manufacturer.id, text: @bike.manufacturer.name }.to_json
+                = f.text_field :manufacturer_id, value: @bike.manufacturer && @bike.manufacturer.name, class: 'form-control unfancy', data: { initial: initial }
+                %span.below-input-help
+                  Select 'Other' if manufacturer isn't listed
+            .form-group.hidden-other.row
+              = f.label :manufacturer_other, 'Other manufacturer', class: 'form-well-label'
+              .form-well-input
+                = f.text_field :manufacturer_other, class: 'form-control'
+
+          .form-group.row.fancy-select.unfancy.unnested-field
+            = f.label :year, 'Model year', class: 'form-well-label'
+            .form-well-input
+              - years = (1900..Time.now.year+1).to_a.reverse.map { |i| [i,i] }
+              = f.select :year, years, prompt: "Unsure or unknown", selected: Time.now.year
+            .right-input-help
+              %label
+                %input#bike_unknown_year{ type: 'checkbox', tabindex: -1 }
+                Unknown year
+
+          .form-group.row.unnested-field
+            = f.label :frame_model, class: 'form-well-label'
+            .form-well-input
+              = f.text_field :frame_model, class: 'form-control'
           
-          .input-group
-            %a.bikeform-tip{role: "button", title: "An explanation of the email field.", data: {toggle: "modal", target: "#emailTip"} }
-              %span
-                ?
-            .control-group
-              %label.control-label{ for: 'bike_owner_email' }
-                Owner email address
-              .controls
-                - o_email = current_user.email unless @bike.creation_organization
-                = f.email_field :owner_email, value: o_email
-          
-          .input-group.form-foot
-            = submit_tag "Register the bike", class: "button-green"
+          - classname = (@b_param.display_email? ? '' : 'no-divider-row')
+          = render partial: '/bikes/bike_fields/revised_colors', locals: { f: f, classname: classname }
 
-        / .new-bike-photo
-        /   %p
-        /     Upload a photo of the bike now (if you'd like)
+          - if @bike.stolen
+            .form-group.row.unnested-field
+              = f.label :phone, class: 'form-well-label'
+              .form-well-input
+                = f.text_field :phone, required: true, value: current_user.phone, class: 'form-control'
 
-        /     .filefield-button
-        /       Choose photo
-        /       = f.file_field :bike_image
-        /     #filepath
+            = fields_for @stolen_record do |srecord|
+              = render partial: '/bikes/bike_fields/stolen_location', locals: { srecord: srecord }
 
-  = render "/bikes/form_help/serial_tip"
-  = render "/bikes/form_help/frame_manufacturer_tip"
-  = render "/bikes/form_help/rear_wheel_tip"
-  = render "/bikes/form_help/color_tip"
-  = render "/bikes/form_help/handlebar_tip"
-  = render "/bikes/form_help/email_tip"      
-  = render "/bikes/form_help/phone_tip"
+          - if @b_param.display_email?
+            .form-group.row.unnested-field.no-divider-row
+              = f.label :owner_email, class: 'form-well-label'
+              .form-well-input
+                - email = @bike.owner_email || current_user && current_user.email
+                = f.email_field :owner_email, value: email, required: true, placeholder: 'required', class: 'form-control'
+      .new-bike-submit-wrapper
+        = submit_tag 'Register', class: 'btn btn-lg btn-primary'
 
+- modal_body = capture_haml do
+  .modal-body
+    %p
+      Very
+      %em
+        very
+      few bikes are made without serials. Unless this #{@bike.type}:
+    %ul
+      %li
+        Was made before 1970
+      %li.li-or
+        \- or -
+      %li
+        Is a handmade frame
+    %p
+      It probably has a serial number.
+    %p 
+      Read about #{link_to 'how to find your serial number', serials_url, target: '_blank' }
+      %small
+        (opens in a separate window)
+  .modal-btn-footer
+    .row
+      .col-xs-6
+        %button.btn.btn-secondary{'data-dismiss' => 'modal', type: 'button'}
+          Nevermind
+        I just don't know the serial
+      .col-xs-6
+        %button.btn.btn-danger#made-without-serial-button{type: 'button'}
+          I'm 100% sure
+        This #{@bike.type} was made without a serial
 
-- else
-  .content
-    .receptacle
-      .inner-recep
-        = render partial: "users/form"
+= render partial: '/shared/modal', locals: { title: 'Are you certain?', id: 'made-without-serial-modal', modal_body: modal_body }
