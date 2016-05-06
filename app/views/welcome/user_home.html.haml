@@ -80,23 +80,24 @@
         %h3
           Add some info
         .inner.last-item
-          .lock-group
-            .image-column
-              - if @bikes.last.stolen 
-                = image_tag 'https://abs.twimg.com/emoji/v1/72x72/1f622.png', alt: 'Crying, sad face'
-              - else
-                = image_tag 'https://abs.twimg.com/emoji/v1/72x72/1f60a.png', alt: 'Happy, Smiling face'
-            .col-xs-10
-              %p
-                - if @bikes.count > 0
-                  - if @bikes.last.stolen
-                    We're sorry your #{@bikes.last.type} was stolen, but hopefully, with everyone able to search for it, you'll get it back!
-                  - else
-                    Awesome! We're pumped you added a #{@bikes.last.type} to the Index.
+          - if @bikes.present?
+            .lock-group
+              .image-column
+                - if @bikes.last.stolen
+                  = image_tag 'https://abs.twimg.com/emoji/v1/72x72/1f622.png', alt: 'Crying, sad face'
                 - else
-                  %strong
-                    Welcome
-                  to the Bike Index. Thanks for signing up!
+                  = image_tag 'https://abs.twimg.com/emoji/v1/72x72/1f60a.png', alt: 'Happy, Smiling face'
+              .col-xs-10
+                %p
+                  - if @bikes.count > 0
+                    - if @bikes.last.stolen
+                      We're sorry your #{@bikes.last.type} was stolen, but hopefully, with everyone able to search for it, you'll get it back!
+                    - else
+                      Awesome! We're pumped you added a #{@bikes.last.type} to the Index.
+                  - else
+                    %strong
+                      Welcome
+                    to the Bike Index. Thanks for signing up!
 
           .lock-group
             .image-column
