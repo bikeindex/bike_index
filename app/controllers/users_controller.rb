@@ -6,7 +6,6 @@
 *****************************************************************
 =end
 
-
 class UsersController < ApplicationController
   include Sessionable
   before_filter :authenticate_user, only: [:edit]
@@ -17,8 +16,13 @@ class UsersController < ApplicationController
     if current_user.present?
       flash[:notice] = "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
       redirect_to user_home_url and return
-    elsif revised_layout_enabled?
+    else
+      #nothing to do
+    end
+    if revised_layout_enabled?
       render 'new_revised', layout: 'application_revised'
+    else
+      #nothing to do  
     end
   end
 
@@ -106,16 +110,25 @@ class UsersController < ApplicationController
     if params[:user][:password_reset_token].present?
       if @user.password_reset_token != params[:user][:password_reset_token]
         @user.errors.add(:base, "Doesn't match user's password reset token")
-      elsif @user.reset_token_time < (Time.now - 1.hours)
+      else
+        #nothing to do
+      end  
+      if @user.reset_token_time < (Time.now - 1.hours)
         @user.errors.add(:base, "Password reset token expired, try resetting password again")
+      else
+        #nothing to do
       end
-    elsif params[:user][:password].present?
-      unless @user.authenticate(params[:user][:current_password])
+      if params[:user][:password].present?
+        unless @user.authenticate(params[:user][:current_password])
         @user.errors.add(:base, "Current password doesn't match, it's required for updating your password")
-      end
+        end
+      else
+        #nothing to do
+      end    
+    else 
+      #nothing to do 
     end
-    if !@user.errors.any? && @user.
-      update_attributes(params[:user].except(:email, :password_reset_token))
+    if !@user.errors.any? && @user.update_attributes(params[:user].except(:email, :password_reset_token))
       AfterUserChangeWorker.perform_async(@user.id)
       if params[:user][:terms_of_service].present?
         if params[:user][:terms_of_service] == '1'
@@ -125,7 +138,10 @@ class UsersController < ApplicationController
         else
           redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index" and return
         end
-      elsif params[:user][:vendor_terms_of_service].present?
+      else
+        #nothing to do
+      end  
+      if params[:user][:vendor_terms_of_service].present? 
         if params[:user][:vendor_terms_of_service] == '1'
           @user.accept_vendor_terms_of_service
           if @user.memberships.any?
@@ -139,16 +155,20 @@ class UsersController < ApplicationController
         else
           redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index as through the organization" and return
         end
+      else
+        #nothing to do  
       end
       if params[:user][:password].present?
         @user.generate_auth_token
         @user.set_password_reset_token
         @user.reload
         default_session_set
+      else
+        redirect_to my_account_url, notice: 'Your information was successfully updated.' and return
       end
-      redirect_to my_account_url, notice: 'Your information was successfully updated.' and return
-    end
-    render action: :edit
+    else
+      render action: :edit
+    end    
   end
 
   def accept_terms

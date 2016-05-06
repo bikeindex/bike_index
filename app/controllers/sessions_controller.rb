@@ -6,7 +6,6 @@
 *****************************************************************
 =end
 
-
 class SessionsController < ApplicationController
   include Sessionable
   before_filter :set_return_to, only: [:new]

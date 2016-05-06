@@ -6,7 +6,6 @@
 *****************************************************************
 =end
 
-
 class PaymentsController < ApplicationController
   def revised_layout_if_enabled
     revised_layout_enabled? ? 'application_revised' : 'application_updated'
