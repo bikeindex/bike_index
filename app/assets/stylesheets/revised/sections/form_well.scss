@@ -88,11 +88,21 @@ $form-well-divider-color: #b2b2b2;
   }
   .form-group {
     clear: both;
-    .radio-inline, .checkbox-inline { 
-      padding-top: .5em;
+    .checkbox-inline { padding-top: .5em; }
+    .form-well-input .checkbox-inline { padding-top: 0; }
+    .radio-inline, .checkbox-inline {
       input[type="radio"], input[type="checkbox"] {
         margin-top: .6em;
       }
+    }
+  }
+  .row.collapse.in { display: flex; }
+  .full-width-button {
+    padding: 2*$vertical-height 0;
+    .btn {
+      display: block;
+      margin: 0 auto;
+      max-width: 450px;
     }
   }
   hr {

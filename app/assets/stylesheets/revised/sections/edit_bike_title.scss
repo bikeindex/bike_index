@@ -12,7 +12,7 @@
   }
 }
 
-.edit-bike-form-header {
+.form-well-form-header {
   display: none; // Hidden on sm screens, shown via mediaquery
   h3, h5 {
     padding: 0 $vertical-height;
@@ -21,7 +21,7 @@
 }
 
 @media (min-width: $grid-breakpoint-lg) {
-  .edit-bike-form-header {
+  .form-well-form-header {
     margin-top: -2*$vertical-height;
   }
 }
@@ -29,5 +29,5 @@
 // 
 // Medium screen styles
 @media (min-width: $grid-breakpoint-md) {
-  .edit-bike-form-header { display: block; }
+  .form-well-form-header { display: block; }
 }

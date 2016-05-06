@@ -90,7 +90,8 @@ class UsersController < ApplicationController
 
   def edit
     @user = current_user
-    render :edit_revised, layout: (revised_layout_enabled? ? 'application_revised' : 'application')
+    @page_errors = @user.errors
+    render :edit_revised, layout: 'application_revised' if revised_layout_enabled?
   end
 
   def update
