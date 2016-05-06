@@ -20,7 +20,7 @@ class BikeIndex.BikeSearchBar extends BikeIndex
       # Maxmind (what we use in production for ip lookup) formats results differently than google
       # This doesn't work in dev... but it wouldn't work anyway because localhost
       if Array.isArray(location_data)
-        proximity = "#{location_data[1]}, #{location_data[2]}"
+        proximity = "#{location_data[2]}, #{location_data[1]}"
         # Set the text box
         $('#proximity').val(proximity)
     # Set it from localstorage if we don't have it - so we don't override if it's already set
