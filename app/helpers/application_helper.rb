@@ -33,10 +33,8 @@ module ApplicationHelper
       'content_skeleton' if %w(new lightspeed_integration).include?(action_name)
     when 'user'
       'content_skeleton' if %w(edit).include?(action_name)
-    when 'news' then 'content_skeleton'
-    when 'feedbacks' then 'content_skeleton'
-    when 'manufacturers' then 'content_skeleton'
-    when 'stolen' then 'content_skeleton'
+    when 'news', 'feedbacks', 'manufacturers', 'stolen', 'errors'
+      'content_skeleton'
     end
   end
 

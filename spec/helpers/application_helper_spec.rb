@@ -168,6 +168,17 @@ describe ApplicationHelper do
         end
       end
     end
+    context 'errors' do
+      before { allow(view).to receive(:controller_name) { 'errors' } }
+      %w(bad_request not_found unprocessable_entity server_error unauthorized).each do |action|
+        context action do
+          it 'returns nil' do
+            allow(view).to receive(:action_name) { action }
+            expect(helper.current_page_skeleton).to eq 'content_skeleton'
+          end
+        end
+      end
+    end
   end
 
   describe 'content_page_type' do
