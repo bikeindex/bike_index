@@ -13,6 +13,7 @@ $bike-box-bg: $gray-lighter;
   }
   .bike-list-image {
     flex: 0 0 25%;
+    position: relative;
     img { display: block; }
     .no-image {
       padding: 2*$vertical-height;
@@ -29,12 +30,29 @@ $bike-box-bg: $gray-lighter;
     margin: 0;
     a { display: block; }
   }
+  .thumb-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #c2c2c2;
+    opacity: .8;
+    text-align: center;
+    h4 {
+      margin: 0;
+      color: white;
+    }
+    img { 
+      width: 50%;
+      max-width: 60px;
+      margin: $vertical-height auto;
+      display: block
+    }
+  }
   .hover-expand-block {
     display: none;
     position: absolute;
-    left: 0;
-    margin-top: -60%;
-    width: 60%;
+    left: 33.3333%; bottom: 33.3333%;
+    width: 300%;
     text-align: center;
     background: $gray-lightish;
     border: 1px solid $gray;
@@ -52,13 +70,26 @@ $bike-box-bg: $gray-lighter;
 }
 
 @media (min-width: $grid-breakpoint-md) {
-  .bike-information {
-    @include clearfix;
-    .attr-list {
-      width: 50%;
-      float: left;
-      &:first-of-type { padding-right: 0.9375rem; }
-      &:last-of-type { padding-left: 0.9375rem; }
+  .bike-boxes {
+    .hover-expand-block { width: 200%; }
+    .bike-information {
+      @include clearfix;
+      .attr-list {
+        width: 50%;
+        float: left;
+        .multi-attr-lists {
+          &:first-of-type { padding-right: 0.9375rem; }
+          &:last-of-type { padding-left: 0.9375rem; }
+        }
+      }
+    }
+  }
+}
+@media (min-width: $grid-breakpoint-xl) {
+  .bike-boxes {
+    .thumb-overlay {
+      padding-top: $vertical-height;
+      h4 { font-size: 21px; }
     }
   }
 }

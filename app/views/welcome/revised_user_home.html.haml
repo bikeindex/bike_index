@@ -10,11 +10,66 @@
           468X60
   .row
     .col-md-8
-      - if @bikes.present?
-        %ul.bike-boxes
-          = render partial: '/bikes/revised_bike', collection: @bikes, as: :bike
-        .paginate-container.paginate-container-bottom
-          = paginate @bikes
+      - locks_active = params[:active_tab] == 'locks'
+      %ul.user-items-nav.nav.nav-tabs{ role: 'tablist' }
+        %li.nav-item
+          %a.nav-link{ class: ('active' unless locks_active), href: '#bikes_tab_content', data: { toggle: 'tab', role: 'tab' } }
+            bikes
+        %li.nav-item
+          %a.nav-link{ class: ('active' if locks_active), href: '#locks_tab_content', data: { toggle: 'tab', role: 'tab' } }
+            locks
+      .user-items-content.tab-content
+        .tab-pane#bikes_tab_content{ class: ('active' unless locks_active) }
+          - if @bikes.present?
+            %ul.bike-boxes
+              - @bikes.each do |bike|
+                %li.bike-box-item
+                  %a.bike-list-image{ href: bike_url(bike), class: ('hover-expand' if bike.thumb_path) }
+                    - unless bike.thumb_path
+                      .thumb-overlay
+                        = image_tag '/assets/revised/photo_icon.svg'
+                        %h4
+                          Add a photo
+                    = bike.revised_thumb_image
+                  .bike-information.multi-attr-lists
+                    %h5.title-link
+                      - if bike.stolen
+                        %strong.stolen-color
+                          STOLEN
+                      %strong
+                        - unless bike.type == 'bike'
+                          = bike.type
+                        = [bike.year, bike.mnfg_name].reject(&:blank?).join(' ')
+                      #{bike.frame_model}
+                    %ul.attr-list
+                      = bike.attr_list_item(bike.serial_display, 'Serial')
+                      = bike.attr_list_item(bike.frame_colors.to_sentence, 'Primary colors')
+                      - if bike.current_stolen_record.present?
+                        = bike.attr_list_item((l bike.current_stolen_record.date_stolen, format: :dotted), 'Date stolen')
+                        = bike.attr_list_item(bike.short_address(bike.current_stolen_record), 'Location')
+                    %ul.attr-list
+                      %li
+                        = link_to 'Edit Bike', edit_bike_url(bike)
+                      %li
+                        = link_to 'Printable (pdf)', pdf_bike_url(bike)
+
+            .paginate-container.paginate-container-bottom
+              = paginate @bikes
+          - else
+            %h2
+              You have no registered bikes
+        .tab-pane#locks_tab_content{ class: ('active' if locks_active) }
+          - if @locks.present?
+            %ul.bike-boxes
+              - @locks.each do |lock|
+                %li.bike-box-items
+                  = lock.dl_list_item(link_to(lock.lock_type_name, lock_url(lock)), "Lock Type")
+                  = lock.dl_list_item(lock.mnfg_name, "Manufacturer")
+                  = lock.dl_from_attribute("key_serial")
+                  = lock.dl_from_attribute("combination")
+          - else
+            %h2
+              You have no registered locks
     .col-md-4
       .side-box
         %h3.first-item
