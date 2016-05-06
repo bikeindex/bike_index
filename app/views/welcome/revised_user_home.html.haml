@@ -15,3 +15,39 @@
           = render partial: '/bikes/revised_bike', collection: @bikes, as: :bike
         .paginate-container.paginate-container-bottom
           = paginate @bikes
+    .col-md-4
+      .side-box
+        %h3.first-item
+          Register new items
+        .inner
+          = link_to "Add a bike", choose_registration_path, class: "btn btn-primary btn-lg"
+          = link_to "Add a lock", new_lock_url, class: "btn btn-primary-offset btn-lg"
+        %h3
+          Add some info
+        .inner.last-item
+          .lock-group
+            .image-column
+              - if @bikes.last.stolen 
+                = image_tag 'https://abs.twimg.com/emoji/v1/72x72/1f622.png', alt: 'Crying, sad face'
+              - else
+                = image_tag 'https://abs.twimg.com/emoji/v1/72x72/1f60a.png', alt: 'Happy, Smiling face'
+            .col-xs-10
+              %p
+                - if @bikes.count > 0
+                  - if @bikes.last.stolen
+                    We're sorry your #{@bikes.last.type} was stolen, but hopefully, with everyone able to search for it, you'll get it back!
+                  - else
+                    Awesome! We're pumped you added a #{@bikes.last.type} to the Index.
+                - else
+                  %strong
+                    Welcome
+                  to the Bike Index. Thanks for signing up!
+
+          .lock-group
+            .image-column
+              = image_tag '/assets/revised/lock_icon.svg'
+            .col-xs-10
+              %p
+                %strong
+                  Tell us more about yourself.
+                = link_to "Update your profile", my_account_url

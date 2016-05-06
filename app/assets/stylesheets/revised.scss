@@ -147,6 +147,7 @@ $row-side-padding: 0.9375rem;
 @import "revised/sections/ad_blocks";
 @import "revised/sections/bike_search_form";
 @import "revised/sections/bike_boxes";
+@import "revised/sections/side_boxes";
 
 // 
 // Page styles
@@ -162,6 +163,9 @@ $row-side-padding: 0.9375rem;
 // Bike show & search pages
 @import "revised/pages/bikes/show";
 @import "revised/pages/bikes/show_photo"; // separated because it's a lot
+
+// User pages
+@import "revised/pages/user/home";
 
 // Info pages
 @import "revised/pages/info/where";

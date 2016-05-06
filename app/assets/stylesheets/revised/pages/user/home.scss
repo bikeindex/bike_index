@@ -1,0 +1,8 @@
+.lock-group {
+  @extend .row;
+  strong { display: block; }
+  .image-column {
+    @extend .col-xs-2;
+    padding-right: 0;
+  }
+}

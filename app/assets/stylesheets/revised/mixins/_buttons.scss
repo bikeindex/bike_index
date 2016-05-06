@@ -233,6 +233,9 @@ fieldset[disabled] a.btn {
 .btn-primary {
   @include button-variant($btn-primary-color, $btn-primary-bg, $btn-primary-border);
 }
+.btn-primary-offset {
+  @include button-variant($btn-primary-color, $blue-darkish, $blue-darkish);
+}
 .btn-secondary {
   @include button-variant($btn-secondary-color, $btn-secondary-bg, $btn-secondary-border);
 }
