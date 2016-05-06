@@ -2,6 +2,7 @@ $green: #2ecc71;
 $red: #e74c3c;
 
 $blue-dark: #2c3e50;
+$blue-darkish: #2980B9;
 $blue: #3498db;
 $blue-light: #92c8ec;
 
@@ -23,3 +24,5 @@ $black-off: #111;
 // Nav colors
 $primary-nav-background: $black-off;
 $primary-nav-text-color: $gray-light;
+
+.stolen-color { color: $red; }

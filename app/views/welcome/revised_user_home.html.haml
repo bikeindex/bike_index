@@ -1,0 +1,108 @@
+.container
+  .row.first-row
+    .col-md-8
+      %h1
+        #{@user.display_name} bikes
+        
+    .col-md-4
+      .ad-block.ad468x60
+        %h4
+          468X60
+  .row
+    .col-md-8
+      - locks_active = params[:active_tab] == 'locks'
+      %ul.user-items-nav.nav.nav-tabs{ role: 'tablist' }
+        %li.nav-item
+          %a.nav-link{ class: ('active' unless locks_active), href: '#bikes_tab_content', data: { toggle: 'tab', role: 'tab' } }
+            bikes
+        %li.nav-item
+          %a.nav-link{ class: ('active' if locks_active), href: '#locks_tab_content', data: { toggle: 'tab', role: 'tab' } }
+            locks
+      .user-items-content.tab-content
+        .tab-pane#bikes_tab_content{ class: ('active' unless locks_active) }
+          - if @bikes.present?
+            %ul.bike-boxes
+              - @bikes.each do |bike|
+                %li.bike-box-item
+                  %a.bike-list-image{ href: bike_url(bike), class: ('hover-expand' if bike.thumb_path) }
+                    - unless bike.thumb_path
+                      .thumb-overlay
+                        = image_tag '/assets/revised/photo_icon.svg'
+                        %h4
+                          Add a photo
+                    = bike.revised_thumb_image
+                  .bike-information.multi-attr-lists
+                    %h5.title-link
+                      - if bike.stolen
+                        %strong.stolen-color
+                          STOLEN
+                      %strong
+                        - unless bike.type == 'bike'
+                          = bike.type
+                        = [bike.year, bike.mnfg_name].reject(&:blank?).join(' ')
+                      #{bike.frame_model}
+                    %ul.attr-list
+                      = bike.attr_list_item(bike.serial_display, 'Serial')
+                      = bike.attr_list_item(bike.frame_colors.to_sentence, 'Primary colors')
+                      - if bike.current_stolen_record.present?
+                        = bike.attr_list_item((l bike.current_stolen_record.date_stolen, format: :dotted), 'Date stolen')
+                        = bike.attr_list_item(bike.short_address(bike.current_stolen_record), 'Location')
+                    %ul.attr-list
+                      %li
+                        = link_to 'Edit Bike', edit_bike_url(bike)
+                      %li
+                        = link_to 'Printable (pdf)', pdf_bike_url(bike)
+
+            .paginate-container.paginate-container-bottom
+              = paginate @bikes
+          - else
+            %h2
+              You have no registered bikes
+        .tab-pane#locks_tab_content{ class: ('active' if locks_active) }
+          - if @locks.present?
+            %ul.bike-boxes
+              - @locks.each do |lock|
+                %li.bike-box-items
+                  = lock.dl_list_item(link_to(lock.lock_type_name, lock_url(lock)), "Lock Type")
+                  = lock.dl_list_item(lock.mnfg_name, "Manufacturer")
+                  = lock.dl_from_attribute("key_serial")
+                  = lock.dl_from_attribute("combination")
+          - else
+            %h2
+              You have no registered locks
+    .col-md-4
+      .side-box
+        %h3.first-item
+          Register new items
+        .inner
+          = link_to "Add a bike", choose_registration_path, class: "btn btn-primary btn-lg"
+          = link_to "Add a lock", new_lock_url, class: "btn btn-primary-offset btn-lg"
+        %h3
+          Add some info
+        .inner.last-item
+          .lock-group
+            .image-column
+              - if @bikes.last.stolen 
+                = image_tag 'https://abs.twimg.com/emoji/v1/72x72/1f622.png', alt: 'Crying, sad face'
+              - else
+                = image_tag 'https://abs.twimg.com/emoji/v1/72x72/1f60a.png', alt: 'Happy, Smiling face'
+            .col-xs-10
+              %p
+                - if @bikes.count > 0
+                  - if @bikes.last.stolen
+                    We're sorry your #{@bikes.last.type} was stolen, but hopefully, with everyone able to search for it, you'll get it back!
+                  - else
+                    Awesome! We're pumped you added a #{@bikes.last.type} to the Index.
+                - else
+                  %strong
+                    Welcome
+                  to the Bike Index. Thanks for signing up!
+
+          .lock-group
+            .image-column
+              = image_tag '/assets/revised/lock_icon.svg'
+            .col-xs-10
+              %p
+                %strong
+                  Tell us more about yourself.
+                = link_to "Update your profile", my_account_url

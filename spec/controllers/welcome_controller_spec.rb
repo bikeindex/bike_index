@@ -54,14 +54,39 @@ describe WelcomeController do
     end
 
     context 'when user is present' do
-      it 'renders and user things are assigned' do
-        user = FactoryGirl.create(:user)
-        ownership = FactoryGirl.create(:ownership, user_id: user.id, current: true)
-        lock = FactoryGirl.create(:lock, user: user)
+      let(:user) { FactoryGirl.create(:user) }
+      let(:ownership) { FactoryGirl.create(:ownership, user_id: user.id, current: true) }
+      let(:bike) { ownership.bike }
+      let(:bike_2) { FactoryGirl.create(:bike) }
+      let(:lock) { FactoryGirl.create(:lock, user: user) }
+      before do
+        allow_any_instance_of(User).to receive(:bikes) { [bike, bike_2] }
+        allow_any_instance_of(User).to receive(:locks) { [lock] }
         set_current_user(user)
-        get :user_home
-        expect(assigns(:bikes).first).to eq(ownership.bike)
-        expect(assigns(:locks).first).to eq(lock)
+      end
+      context 'legacy' do
+        it 'renders and user things are assigned' do
+          get :user_home
+          expect(response.status).to eq(200)
+          expect(assigns(:per_page).to_s).to eq '20'
+          expect(response).to render_template('user_home')
+          expect(response).to render_with_layout('no_container')
+          expect(assigns(:bikes).first).to eq(bike)
+          expect(assigns(:locks).first).to eq(lock)
+        end
+      end
+      context 'revised_layout' do
+        it 'renders and user things are assigned' do
+          allow(controller).to receive(:revised_layout_enabled?) { true }
+          get :user_home, per_page: 1
+          expect(response.status).to eq(200)
+          expect(response).to render_template('revised_user_home')
+          expect(response).to render_with_layout('application_revised')
+          expect(assigns(:bikes).count).to eq 1
+          expect(assigns(:per_page).to_s).to eq '1'
+          expect(assigns(:bikes).first).to eq(bike)
+          expect(assigns(:locks).first).to eq(lock)
+        end
       end
     end
   end

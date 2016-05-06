@@ -22,6 +22,7 @@ class window.BikeIndex
       bikes_show: BikeIndex.BikesShow
       bikes_index: BikeIndex.BikesIndex
       manufacturers_index: BikeIndex.InfoManufacturers
+      welcome_user_home: BikeIndex.UserHome
 
     window.pageScript = new pageClasses[body_id] if Object.keys(pageClasses).includes(body_id)
 
