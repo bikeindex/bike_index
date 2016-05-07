@@ -30,12 +30,15 @@ class BikesController < ApplicationController
   before_filter :remove_subdomain, only: [:index]
   layout 'no_container'
 
-  # Name: index 
-  # Explication: whats is going to show at bike index page. First select stolen bikes 
-  # neer to user (ip), search command so user can check for specifc bike. Than select bikes 
-  # from anywhere to show.
-  # Params: Bike params, page params
-  # Return: List with stolen bikes
+=begin
+  Name: index 
+  Explication: whats is going to show at bike index page. First select stolen bikes 
+  neer to user (ip), search command so user can check for specifc bike. Than select bikes 
+  from anywhere to show.
+  Params: Bike params, page params
+  Return: List with stolen bikes 
+=end 
+  
   def index
     params[:stolen] = true unless params[:stolen].present? || params[:non_stolen].present?
     if params[:proximity].present? && params[:proximity].strip.downcase == 'ip'
@@ -67,10 +70,13 @@ class BikesController < ApplicationController
     end
   end
 
-  # Name: show
-  # Explication: show a list with all registrer bikes in website
-  # Params: bike params, stolen status
-  # Return: information about the stolen bikes according to the search of user
+=begin
+  Name: show
+  Explication: show a list with all registrer bikes in website
+  Params: bike params, stolen status
+  Return: information about the stolen bikes according to the search of user 
+=end
+  
   def show
     @components = @bike.components.decorate
     if @bike.stolen and @bike.current_stolen_record.present?
@@ -115,10 +121,13 @@ class BikesController < ApplicationController
     redirect_to @bike.pdf.url
   end
 
-  # Name: scanned
-  # Explication: scanned bike information to show to user
-  # Params: bike id
-  # Return: set al information about tha specific bike
+=begin
+  Name: scanned
+  Explication: scanned bike information to show to user
+  Params: bike id
+  Return: set al information about tha specific bike
+=end
+  
   def scanned
     if params[:id]
       b = Bike.find(params[:id])
@@ -130,20 +139,26 @@ class BikesController < ApplicationController
     @card_id = params[:card_id]
   end
 
-  # Name: spokecard
-  # Explication: 
-  # Params: bike id
-  # Return:
+=begin
+  Name: spokecard
+  Explication: 
+  Params: bike id
+  Return:
+=end
+  
   def spokecard
     @qrcode = "#{bike_url(Bike.find(params[:id]))}.gif"
     render layout: false
   end
 
-  # Name: new
-  # Explication: user can register a new bike  
-  # Params: id of creator, current_user id, 
-  # Return: if user logged in, create new bike, if not, redirect to sign up page
-  # Must discovery what's b_param
+=begin
+  Name: new
+  Explication: user can register a new bike  
+  Params: id of creator, current_user id, 
+  Return: if user logged in, create new bike, if not, redirect to sign up page
+  Must discovery what's b_param  
+=end
+  
   def new
     if revised_layout_enabled?
       new_revised
@@ -159,10 +174,13 @@ class BikesController < ApplicationController
     end
   end
 
-  # Name: new_revised
-  # Explication: check if bike id was sent correctly
-  # Params: b_param id
-  # Return: if bike id not find, send a warning
+=begin  
+  Name: new_revised
+  Explication: check if bike id was sent correctly
+  Params: b_param id
+  Return: if bike id not find, send a warning
+=end
+  
   def new_revised
     find_or_new_b_param
     # Let them know if they sent an invalid b_param token
@@ -172,11 +190,14 @@ class BikesController < ApplicationController
     render :new_revised, layout: 'application_revised'
   end
 
-  # Name: create
-  # Explication: create a bike with many check's if that bike id belongs to same user id 
-  # Params: bike 
-  # Return: new bike created correctly
-  # This method is to big, must aplly "one function, one action"
+=begin
+  Name: create
+  Explication: create a bike with many check's if that bike id belongs to same user id 
+  Params: bike 
+  Return: new bike created correctly
+  This method is to big, must aplly "one function, one action"  
+=end
+  
   def create
     if params[:bike][:embeded]
       @b_param = BParam.from_id_token(params[:bike][:b_param_id_token])
@@ -237,12 +258,15 @@ class BikesController < ApplicationController
     end
   end
 
-  # Name: revised_create
-  # Explication: after create a new bike info user can revised the params 
-  # of new bike, and should confirm the info
-  # Params: b_param
-  # Return: user update the new bike, if everuthing it's ok he is redirect
-  # to the new bike url and recive a warning "Bike successfully update to the index!"
+=begin
+  Name: revised_create
+  Explication: after create a new bike info user can revised the params 
+  of new bike, and should confirm the info
+  Params: b_param
+  Return: user update the new bike, if everuthing it's ok he is redirect
+  to the new bike url and recive a warning "Bike successfully update to the index!"  
+=end
+  
   def revised_create
     find_or_new_b_param
     if @b_param.created_bike.present?
