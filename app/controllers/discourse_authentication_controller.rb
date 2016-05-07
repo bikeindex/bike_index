@@ -10,12 +10,14 @@ class DiscourseAuthenticationController < ApplicationController
 
   before_filter :authenticate_and_set_redirect
 
+=begin
+  Name: index
+  Explication: define sigle sign on methods
+  Paramts: user params, email, name and id
+  Return: redirect user to discourser url 
+  remember that sso it's the abbreviation of Single Sign On
+=end
   
-  # Name: index
-  # Explication: define sigle sign on methods
-  # Paramts: user params, email, name and id
-  # Return: redirect user to discourser url 
-  # remember that sso it's the abbreviation of Single Sign On
   def index
     sso = SingleSignOn.parse(session[:discourse_redirect], discourse_secret)
     sso.email = current_user.email
@@ -27,23 +29,31 @@ class DiscourseAuthenticationController < ApplicationController
 
   private
 
-  # Name: discourse_secret
-  # Explication: 
+=begin
+  Name: discourse_secret
+  Explication: 
+=end
+  
   def discourse_secret
     ENV['DISCOURSE_SECRET']
   end
 
-  # Name: discourse_redirect_url
-  # Explication:
+=begin
+  Name: discourse_redirect_url
+  Explication:  
+=end
+  
   def discourse_redirect_url
     "#{ENV['DISCOURSE_URL']}/session/sso_login"
   end
 
-
-  # Name: show
-  # Explication: check if user is logged in 
-  # Paramts: current user present
-  # Return: redirect user to login page
+=begin
+  Name: show
+  Explication: check if user is logged in 
+  Paramts: current user present
+  Return: redirect user to login page  
+=end
+  
   def authenticate_and_set_redirect
     session[:discourse_redirect] ||= request.query_string
     unless current_user.present?

@@ -9,7 +9,11 @@
 class InfoController < ApplicationController
   
   layout 'content'
-  # caches_page :about, :where, :roadmap, :security, :serials, :stolen_bikes, :privacy, :terms, :vendor_terms, :downloads, :resources, :spokecard
+
+=begin
+  caches_page :about, :where, :roadmap, :security, :serials, :stolen_bikes, :privacy, :terms, :vendor_terms, :downloads, :resources, :spokecard
+=end 
+  
   before_filter :set_active_section
   before_filter :set_revised_layout
 

@@ -37,7 +37,6 @@ class MembershipsController < ApplicationController
     @membership = Membership.find(params[:id])
   end
 
-
 protected
 
   def find_membership
