@@ -50,6 +50,9 @@ describe Bike do
     it 'non_stolen scopes to only non_stolen bikes' do
       expect(Bike.non_stolen.to_sql).to eq(Bike.where(stolen: false).to_sql)
     end
+    it 'non_recovered scopes to only non_recovered bikes' do
+      expect(Bike.non_stolen.to_sql).to eq(Bike.where(recovered: false).to_sql)
+    end
   end
 
   describe 'recovered_records' do
