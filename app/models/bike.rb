@@ -133,6 +133,7 @@ class Bike < ActiveRecord::Base
   scope :stolen, -> { where(stolen: true) }
   scope :non_stolen, -> { where(stolen: false) }
   scope :with_serial, -> { where("serial_number != ?", "absent") }
+  scope :non_recovered, -> { where(recovered: false) }
 
   include PgSearch
   pg_search_scope :search, against: {

@@ -1,11 +1,15 @@
 class DocumentationController < ApplicationController
   caches_page :api_v1
-  
+
   def index
     redirect_to controller: :documentation, action: :api_v2
   end
 
   def api_v1
+    unless current_user && current_user.developer
+      flash[:notice] = 'API V1 is deprecated, please use our current API version'
+      redirect_to documentation_index_path and return
+    end
     @root = ENV['BASE_URL']
     render layout: 'documentation'
   end
@@ -29,5 +33,4 @@ class DocumentationController < ApplicationController
     @application = @access_grant.application if @access_grant.present?
     render layout: 'content'
   end
-
 end

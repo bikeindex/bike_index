@@ -32,6 +32,9 @@ FactoryGirl.define do
     factory :admin do
       superuser true
     end
+    factory :developer do
+      developer true
+    end
   end
 
   factory :cycle_type do
@@ -114,6 +117,9 @@ FactoryGirl.define do
       after(:create) do |bike|
         create(:stolen_record, bike: bike)
         bike.save # updates current_stolen_record
+      end
+      factory :recovered_bike do
+        recovered true
       end
     end
   end
