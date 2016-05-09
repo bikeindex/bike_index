@@ -14,5 +14,5 @@
       = bike.attr_list_item(bike.frame_colors.to_sentence, 'Primary colors')
     - if bike.current_stolen_record.present?
       %ul.attr-list
-        = bike.attr_list_item((l bike.current_stolen_record.date_stolen, format: :dotted), 'Date stolen')
+        = bike.attr_list_item((l bike.current_stolen_record.date_stolen, format: :dotted), "Date #{bike.recovered ? 'recovered' : 'stolen'}")
         = bike.attr_list_item(bike.short_address(bike.current_stolen_record), 'Location')

@@ -76,7 +76,10 @@
 // On small screens, use the tabbed interface for components
 @media (max-width: $grid-breakpoint-md - 1px) {
   #bikes_show {
-    .map-holder { width: 100%; }
+    .map-holder {
+      width: 100%;
+      pointer-events: none; // On small screens, prevent manipulation of map so that it can be scrolled past
+    }
     .nav-tabs.component-types { @include binx-nav-tabs; }
     .tab-content { @include binx-nav-tab-content; }
     .cgroup-name { display: none; }

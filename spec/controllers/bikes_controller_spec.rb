@@ -634,6 +634,27 @@ describe BikesController do
               expect(response).to render_template 'edit_stolen'
             end
           end
+          context 'recovered bike' do
+            it 'renders with recovered as first template, different description' do
+              edit_templates = {
+                stolen: 'Recovery details',
+                root: 'Bike Details',
+                photos: 'Photos',
+                drivetrain: 'Wheels + Drivetrain',
+                accessories: 'Accessories + Components',
+                ownership: 'Change Owner or Delete'
+              }.as_json
+              bike.update_attributes(stolen: true, recovered: true)
+              bike.reload
+              expect(bike.recovered).to be_truthy
+              get :edit, id: bike.id
+              expect(response).to render_with_layout 'application_revised'
+              expect(response).to be_success
+              expect(assigns(:edit_template)).to eq 'stolen'
+              expect(assigns(:edit_templates)).to eq edit_templates
+              expect(response).to render_template 'edit_stolen'
+            end
+          end
         end
         %w(root photos drivetrain accessories ownership stolen).each do |template|
           context template do

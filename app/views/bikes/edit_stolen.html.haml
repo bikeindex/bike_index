@@ -28,7 +28,7 @@
                 .form-well-input
                   = srecord.text_field :secondary_phone, class: 'form-control'
 
-              = render partial: '/bikes/bike_fields/stolen_location', locals: { srecord: srecord }
+              = render partial: '/bikes/bike_fields/stolen_location', locals: { srecord: srecord, stolen_type: stolen_type }
 
               - unless @bike.recovered
                 .form-group.row.unnested-field.fancy-select-placeholder.unfancy

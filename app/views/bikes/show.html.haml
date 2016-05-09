@@ -50,15 +50,18 @@
     .col-md-8
       %h1
         - if @bike.stolen
+          - stolen_type = @bike.recovered ? 'recovered' : 'stolen'
           %strong.stolen
-            - if @bike.recovered
-              Recovered 
+            = "Recovered" if @bike.recovered
             Stolen
         = @bike.title_u
       - if @bike.stolen && @stolen_record.present?
         %p
           %strong
-            Last seen
+            - if @bike.recovered
+              Recovered
+            - else
+              Last seen
           = l @stolen_record.date_stolen, format: :dotted
           %strong
             at
@@ -131,7 +134,7 @@
             = @bike.description
         - if @bike.stolen && @stolen_record.present?
           %h3
-            Theft Details
+            #{@bike.recovered ? 'Recovery' : 'Theft'} Details
           .row
             = render 'stolen_map'
             .col-md-4
@@ -139,7 +142,7 @@
                 = @bike.attr_list_item(@stolen_record.show_stolen_address, 'Location')
                 = @bike.attr_list_item(@stolen_record.locking_description, 'Locking description')
                 = @bike.attr_list_item(@stolen_record.lock_defeat_description, 'Locking circumvented')
-                = @bike.attr_list_item((l @stolen_record.date_stolen, format: :dotted), 'Date stolen')
+                = @bike.attr_list_item((l @stolen_record.date_stolen, format: :dotted), "Date #{stolen_type}") # stolen_type defined at start of document
                 = @bike.attr_list_item(@stolen_record.police_report_number, 'Police report #')
                 = @bike.attr_list_item(@stolen_record.police_report_department, 'Department & city')
           - if @stolen_record.theft_description.present?
