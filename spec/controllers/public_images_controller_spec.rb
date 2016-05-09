@@ -1,6 +1,51 @@
 require 'spec_helper'
 
 describe PublicImagesController do
+  describe 'create' do
+    context 'bike' do
+      let(:ownership) { FactoryGirl.create(:ownership) }
+      let(:bike) { ownership.bike }
+      let(:user) { ownership.creator }
+      context 'valid owner' do
+        it 'creates an image' do
+          set_current_user(user)
+          post :create, bike_id: bike.id, public_image: { name: 'cool name' }, format: :js
+          bike.reload
+          expect(bike.public_images.first.name).to eq 'cool name'
+        end
+      end
+      context 'no user' do
+        it 'does not create an image' do
+          expect do
+            post :create, bike_id: bike.id, public_image: { name: 'cool name' }, format: :js
+            expect(response.code).to eq('401')
+          end.to change(PublicImage, :count).by 0
+        end
+      end
+    end
+    context 'blog' do
+      let(:blog) { FactoryGirl.create(:blog) }
+      context 'admin authorized' do
+        it 'creates an image' do
+          user = FactoryGirl.create(:user)
+          user.update_attribute :is_content_admin, true
+          set_current_user(user)
+          post :create, blog_id: blog.id, public_image: { name: 'cool name' }, format: :js
+          blog.reload
+          expect(blog.public_images.first.name).to eq 'cool name'
+        end
+      end
+      context 'not admin' do
+        it 'does not create an image' do
+          set_current_user(FactoryGirl.create(:user))
+          expect do
+            post :create, blog_id: blog.id, public_image: { name: 'cool name' }, format: :js
+            expect(response.code).to eq('401')
+          end.to change(PublicImage, :count).by 0
+        end
+      end
+    end
+  end
   describe 'destroy' do
     context 'with owner' do
       it 'allows the destroy of public_image' do

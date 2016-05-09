@@ -1,5 +1,6 @@
 class PublicImagesController < ApplicationController
   before_filter :find_image_if_owned, only: [:edit, :update, :destroy, :is_private]
+  before_filter :ensure_authorized_to_create!, only: [:create]
 
   def show
     @public_image = PublicImage.find(params[:id])
@@ -11,23 +12,17 @@ class PublicImagesController < ApplicationController
   def create
     @public_image = PublicImage.new(params[:public_image])
     if params[:bike_id].present?
-      @bike = Bike.unscoped.find(params[:bike_id])
-      if @bike.owner == current_user
-        @public_image.imageable = @bike
-        @public_image.save
-      end
-      @imageable = @bike
+      @public_image.imageable = @bike
+      @public_image.save
+      render 'create_revised' and return
     elsif params[:blog_id].present?
       @blog = Blog.find(params[:blog_id])
       @public_image.imageable = @blog
       @public_image.save
-      @imageable = @blog
+      render 'create' and return
     end
-    unless @public_image.imageable.present?
-      flash[:error] = "Whoops! We can't let you create that image."
-      redirect_to @imageable
-    end
-    render 'create_revised'
+    flash[:error] = "Whoops! We can't let you create that image."
+    redirect_to @public_image.present? ? @public_image.imageable : user_root_url
   end
 
   def edit
@@ -75,6 +70,17 @@ class PublicImagesController < ApplicationController
   end
 
   protected
+
+  def ensure_authorized_to_create!
+    if params[:bike_id].present? # Ensure the 
+      @bike = Bike.unscoped.find(params[:bike_id])
+      return true if @bike.owner == current_user
+    end
+    # Otherwise, it's a blog image (or someone messing about), 
+    # so ensure the current user is admin authorized
+    return true if current_user && current_user.admin_authorized('any')
+    render json: { error: 'Access denied' }, status: 401 and return
+  end
 
   def current_user_image_owner(public_image)
     if public_image.imageable_type == 'Bike'
