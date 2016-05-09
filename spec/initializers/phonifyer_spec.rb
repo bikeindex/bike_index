@@ -28,5 +28,10 @@ describe Phonifyer do
         expect(Phonifyer.display('+91 8041505583')).to eq('+91 804.150.5583')
       end
     end
+    context 'nil' do
+      it "doesn't error" do
+        expect(Phonifyer.display(nil)).to eq(nil)
+      end
+    end
   end
 end

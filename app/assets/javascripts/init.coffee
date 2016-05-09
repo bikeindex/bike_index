@@ -24,6 +24,7 @@ class window.BikeIndex
       manufacturers_index: BikeIndex.InfoManufacturers
       users_edit: BikeIndex.UsersEdit
       welcome_user_home: BikeIndex.UserHome
+      welcome_choose_registration: BikeIndex.ChooseRegistration
 
     window.pageScript = new pageClasses[body_id] if Object.keys(pageClasses).includes(body_id)
 

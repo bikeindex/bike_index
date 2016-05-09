@@ -3,7 +3,7 @@
     %h1
       - if @bike.stolen and @bike.find_current_stolen_record.present?
         %span.text-danger
-          Stolen
+          = @bike.recovered ? 'recovered' : 'stolen'
       - else
         Edit
       = @bike.year

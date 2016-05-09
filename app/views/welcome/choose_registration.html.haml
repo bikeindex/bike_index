@@ -1,33 +1,33 @@
-- if current_user.present?
-  #choose-registration-type
-    .choose-links
-      %ul
-        - if current_user.memberships.any?
-          - current_user.memberships.each do |membership|
-            %li
-              %a.organization-choice.choose-type{data: {target: new_bike_url(creation_organization_id: membership.organization.id)}}
-                %span.add-selected
-                  &#10004
-                Add a bike through
-                %em
-                  = membership.organization.name
-        %li
-          %a.purchase-choice.choose-type{data: {target: new_bike_url}}
-            %span.add-selected
-              &#10004
-            Add your own bike
+.container
+  - if current_user.present?
+    .row.choose-registration-items
+      .choose-links.col-sm-6
+        %ul
+          - if current_user.memberships.any?
+            - current_user.memberships.each do |membership|
+              %li
+                %a.organization-choice.choose-type{data: {target: new_bike_url(creation_organization_id: membership.organization.id)}}
+                  %span.add-selected
+                    &#10004
+                  Add a bike through
+                  %em
+                    = membership.organization.name
+          %li
+            %a.purchase-choice.choose-type{data: {target: new_bike_url}}
+              %span.add-selected
+                &#10004
+              Add your own bike
 
-        %li
-          %a.choose-type{data: {target: new_bike_url(stolen: true)}}
-            %span.add-selected
-              &#10004
-            Add a stolen bike
-        %li
-          %a.choose-type{data: {target: new_bike_url(recovered: true)}}
-            %span.add-selected
-              &#10004
-            Add a stolen/found bike you've recovered
-
-      .add-bike-button
-        %a#add-bike.button-green{href: new_bike_url}
-          Enter bike data
+          %li
+            %a.choose-type{data: {target: new_bike_url(stolen: true)}}
+              %span.add-selected
+                &#10004
+              Add a stolen bike
+          %li
+            %a.choose-type{data: {target: new_bike_url(recovered: true)}}
+              %span.add-selected
+                &#10004
+              Add a stolen/found bike you've recovered
+      .col-sm-6.add-bike-column
+        %a#add-bike.btn.btn-success.btn-lg{href: new_bike_url}
+          Register bike

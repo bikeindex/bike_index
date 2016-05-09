@@ -36,7 +36,7 @@
             Add a picture so people know what to look for!
           - else
             Add a picture of it, so everyone can admire its beauty!
-      - else
+      - elsif @bike.current_ownership
         You sent this bike to
         %em
           = @bike.current_ownership.owner_email
@@ -55,7 +55,7 @@
               Recovered 
             Stolen
         = @bike.title_u
-      - if @bike.stolen
+      - if @bike.stolen && @stolen_record.present?
         %p
           %strong
             Last seen
@@ -129,7 +129,7 @@
             Distinguishing features
           %p
             = @bike.description
-        - if @bike.stolen
+        - if @bike.stolen && @stolen_record.present?
           %h3
             Theft Details
           .row
@@ -192,7 +192,7 @@
           - else
             Share it!
         = render '/shared/share_this'
-      - if @bike.stolen
+      - if @bike.stolen && @stolen_record.present?
         .contact-the-owner
           %p.preface
             %em
@@ -220,7 +220,6 @@
                 Or call
               %strong
                 Owner's phone number:
-              
               %a{ href: "tell:#{@stolen_record.phone}" }
                 = @stolen_record.phone_display
       .ad-block.ad300x600
