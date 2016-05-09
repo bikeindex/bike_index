@@ -126,8 +126,7 @@ class ApplicationController < ActionController::Base
   Return: If this is a preflight OPTIONS request, then short-circuit the
   request, return only the necessary headers and return an empty
   text/plain.
-=end
-  
+=end  
   def cors_preflight_check
     if request.method == :options
       headers['Access-Control-Allow-Origin'] = '*'
@@ -139,5 +138,20 @@ class ApplicationController < ActionController::Base
       #nothing to do
     end
   end
+
+=begin
+  Name: assert_message
+  Explication: redirect user to one page with assert message
+  Params: condition
+=end
+  def assert_message(condition)
+    if (condition)
+      # if condition pass the program keep runnig
+    else 
+      redirect_to assert_path
+      #server_exception = stop the program
+    end
+  end
+  
 end
 

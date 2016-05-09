@@ -1,5 +1,7 @@
 require 'soulheart/server'
 Bikeindex::Application.routes.draw do
+  get 'assert' => 'page#assert'
+
   use_doorkeeper do
     controllers applications: 'oauth/applications'
     controllers authorizations: 'oauth/authorizations'
