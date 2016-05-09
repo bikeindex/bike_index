@@ -185,7 +185,9 @@ CREATE TABLE bikes (
     frame_size_number double precision,
     updator_id integer,
     is_for_sale boolean DEFAULT false NOT NULL,
-    made_without_serial boolean DEFAULT false NOT NULL
+    made_without_serial boolean DEFAULT false NOT NULL,
+    stolen_lat double precision,
+    stolen_long double precision
 );
 
 
@@ -1696,6 +1698,40 @@ ALTER SEQUENCE stolen_records_id_seq OWNED BY stolen_records.id;
 
 
 --
+-- Name: user_emails; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE user_emails (
+    id integer NOT NULL,
+    email character varying(255),
+    user_id integer,
+    old_user_id integer,
+    confirmation_token text,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: user_emails_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE user_emails_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: user_emails_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE user_emails_id_seq OWNED BY user_emails.id;
+
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2099,6 +2135,13 @@ ALTER TABLE ONLY stolen_records ALTER COLUMN id SET DEFAULT nextval('stolen_reco
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY user_emails ALTER COLUMN id SET DEFAULT nextval('user_emails_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
 
 
@@ -2454,6 +2497,14 @@ ALTER TABLE ONLY stolen_records
 
 
 --
+-- Name: user_emails_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY user_emails
+    ADD CONSTRAINT user_emails_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2523,6 +2574,13 @@ CREATE INDEX index_bikes_on_primary_frame_color_id ON bikes USING btree (primary
 --
 
 CREATE INDEX index_bikes_on_secondary_frame_color_id ON bikes USING btree (secondary_frame_color_id);
+
+
+--
+-- Name: index_bikes_on_stolen_lat_and_stolen_long; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_bikes_on_stolen_lat_and_stolen_long ON bikes USING btree (stolen_lat, stolen_long);
 
 
 --
@@ -2712,6 +2770,13 @@ CREATE INDEX index_stolen_records_on_bike_id ON stolen_records USING btree (bike
 --
 
 CREATE INDEX index_stolen_records_on_latitude_and_longitude ON stolen_records USING btree (latitude, longitude);
+
+
+--
+-- Name: index_user_emails_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_user_emails_on_user_id ON user_emails USING btree (user_id);
 
 
 --
@@ -3000,6 +3065,8 @@ INSERT INTO schema_migrations (version) VALUES ('20160406202125');
 
 INSERT INTO schema_migrations (version) VALUES ('20160408192902');
 
-INSERT INTO schema_migrations (version) VALUES ('20160419161959');
-
 INSERT INTO schema_migrations (version) VALUES ('20160425185052');
+
+INSERT INTO schema_migrations (version) VALUES ('20160509110049');
+
+INSERT INTO schema_migrations (version) VALUES ('20160509120017');

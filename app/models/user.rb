@@ -76,7 +76,7 @@ class User < ActiveRecord::Base
   validates_format_of :password, with: /\A.*(?=.*[a-z]).*\Z/i, message: 'must contain at least one letter', on: :create
 
   validates :password, 
-    confirmation: true, 
+    confirmation: true,
     length: {within: 6..100},
     allow_blank: true,
     on: :update
@@ -85,14 +85,12 @@ class User < ActiveRecord::Base
   validates_presence_of :email
   validates_uniqueness_of :email, case_sensitive: false
 
-
   include PgSearch
-
   pg_search_scope :admin_search, against: {
     name: 'A',
     email: 'A'
     },
-    using: {tsearch: {dictionary: "english", prefix: true}}
+    using: { tsearch: { dictionary: 'english', prefix: true } }
 
   def self.admin_text_search(query)
     if query.present?
@@ -102,8 +100,19 @@ class User < ActiveRecord::Base
     end
   end
 
+  # validate :ensure_unique_email
+  def ensure_unique_email
+    return true unless self.class.fuzzy_email_find(email)
+    errors.add(:email, 'That email is already signed up on Bike Index.')
+  end
+
+  after_create :update_user_emails
+  def update_user_emails
+    UserEmail.create_user_email(self)
+  end
+
   def superuser?
-    superuser
+    superuser 
   end
 
   def content?
@@ -314,5 +323,4 @@ class User < ActiveRecord::Base
     generate_auth_token
     true
   end
-
 end
