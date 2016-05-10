@@ -185,7 +185,9 @@ CREATE TABLE bikes (
     frame_size_number double precision,
     updator_id integer,
     is_for_sale boolean DEFAULT false NOT NULL,
-    made_without_serial boolean DEFAULT false NOT NULL
+    made_without_serial boolean DEFAULT false NOT NULL,
+    stolen_lat double precision,
+    stolen_long double precision
 );
 
 
@@ -2526,6 +2528,13 @@ CREATE INDEX index_bikes_on_secondary_frame_color_id ON bikes USING btree (secon
 
 
 --
+-- Name: index_bikes_on_stolen_lat_and_stolen_long; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_bikes_on_stolen_lat_and_stolen_long ON bikes USING btree (stolen_lat, stolen_long);
+
+
+--
 -- Name: index_bikes_on_tertiary_frame_color_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -3000,6 +3009,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160406202125');
 
 INSERT INTO schema_migrations (version) VALUES ('20160408192902');
 
-INSERT INTO schema_migrations (version) VALUES ('20160419161959');
-
 INSERT INTO schema_migrations (version) VALUES ('20160425185052');
+
+INSERT INTO schema_migrations (version) VALUES ('20160509110049');

@@ -10,12 +10,25 @@ describe DocumentationController do
   end
 
   describe 'api_v1' do
-    it 'renders' do
-      FactoryGirl.create(:organization, name: 'Example organization') # Required because I'm an idiot
-      get :api_v1
-      expect(response.code).to eq('200')
-      expect(response).to render_template('api_v1')
-      expect(flash).to_not be_present
+    context 'developer user' do
+      it 'renders' do
+        user = FactoryGirl.create(:developer)
+        set_current_user(user)
+        FactoryGirl.create(:organization, name: 'Example organization') # Required because I'm an idiot
+        get :api_v1
+        expect(response.code).to eq('200')
+        expect(response).to render_template('api_v1')
+        expect(flash).to_not be_present
+      end
+    end
+    context 'user' do
+      it 'redirects to home, message API deprecated' do
+        user = FactoryGirl.create(:user)
+        set_current_user(user)
+        get :api_v1
+        expect(response).to redirect_to documentation_index_path
+        expect(flash[:notice]).to match 'deprecated'
+      end
     end
   end
 

@@ -50,6 +50,9 @@ describe Bike do
     it 'non_stolen scopes to only non_stolen bikes' do
       expect(Bike.non_stolen.to_sql).to eq(Bike.where(stolen: false).to_sql)
     end
+    it 'non_recovered scopes to only non_recovered bikes' do
+      expect(Bike.non_recovered.to_sql).to eq(Bike.where(recovered: false).to_sql)
+    end
   end
 
   describe 'recovered_records' do
@@ -472,7 +475,7 @@ describe Bike do
       bike = FactoryGirl.create(:bike)
       c = FactoryGirl.create(:component, bike: bike)
       bike.save
-      expect(bike.components_cache_string).to eq("#{c.ctype.name} ")
+      expect(bike.components_cache_string.to_s).to match(c.ctype.name)
     end
   end
 
@@ -491,18 +494,26 @@ describe Bike do
   end
 
   describe 'cache_stolen_attributes' do
-    it 'saves the stolen description to all description and set stolen_rec_id' do
-      stolen_record = FactoryGirl.create(:stolen_record, theft_description: 'some theft description')
-      bike = stolen_record.bike
-      bike.description = 'I love my bike'
-      bike.cache_stolen_attributes
-      expect(bike.all_description).to eq('I love my bike some theft description')
+    context 'current_stolen_record with lat and long' do 
+      it 'saves the stolen description to all description and set stolen_rec_id' do
+        stolen_record = FactoryGirl.create(:stolen_record, theft_description: 'some theft description', latitude: 40.7143528, longitude: -74.0059731)
+        bike = stolen_record.bike
+        bike.description = 'I love my bike'
+        bike.cache_stolen_attributes
+        expect(bike.all_description).to eq('I love my bike some theft description')
+        expect(bike.stolen_lat).to eq 40.7143528
+        expect(bike.stolen_long).to eq -74.0059731
+      end
     end
-    it 'grabs the desc and erase current_stolen_id' do
-      bike = Bike.new(current_stolen_record_id: 69, description: 'lalalala')
-      bike.cache_stolen_attributes
-      expect(bike.current_stolen_record_id).not_to be_present
-      expect(bike.all_description).to eq('lalalala')
+    context 'no current_stolen_record' do
+      it 'grabs the desc and erase current_stolen_id' do
+        bike = Bike.new(current_stolen_record_id: 69, description: 'lalalala', stolen_lat: 40.7143528, stolen_long: -74.0059731)
+        bike.cache_stolen_attributes
+        expect(bike.current_stolen_record_id).not_to be_present
+        expect(bike.all_description).to eq('lalalala')
+        expect(bike.stolen_lat).to eq nil
+        expect(bike.stolen_long).to eq nil
+      end
     end
   end
 
@@ -530,7 +541,7 @@ describe Bike do
                           frame_size: '56', frame_size_unit: 'ballsacks',
                           frame_model: 'Some model', handlebar_type_id: handlebar.id)
       b.cache_bike
-      expect(b.cached_data).to eq("#{b.manufacturer_name} Hand pedaled 1999 #{b.primary_frame_color.name} #{b.secondary_frame_color.name} #{b.tertiary_frame_color.name} #{material.name} 56ballsacks #{b.frame_model} #{b.rear_wheel_size.name} wheel  unicycle ")
+      expect(b.cached_data).to eq("#{b.manufacturer_name} Hand pedaled 1999 #{b.primary_frame_color.name} #{b.secondary_frame_color.name} #{b.tertiary_frame_color.name} #{material.name} 56ballsacks #{b.frame_model} #{b.rear_wheel_size.name} wheel unicycle")
       expect(b.current_stolen_record_id).to eq(s.id)
     end
     it 'has before_save_callback_method defined as a before_save callback' do

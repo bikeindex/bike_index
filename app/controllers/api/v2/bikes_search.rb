@@ -20,7 +20,7 @@ module API
         end
 
         def find_bikes
-          BikeSearcher.new(params).find_bikes
+          BikeSearcher.new(params.merge(api_search: true)).find_bikes
         end
 
         def set_proximity
@@ -123,7 +123,7 @@ module API
           requires :serial, type: String, desc: "Serial to search for"
         end
         get '/close_serials', root: 'bikes', each_serializer: BikeV2Serializer do
-          bikes = BikeSearcher.new(params).close_serials
+          bikes = BikeSearcher.new(params.merge(api_search: true)).close_serials
           paginate bikes
         end
 
