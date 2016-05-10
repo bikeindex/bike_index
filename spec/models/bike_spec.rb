@@ -51,7 +51,7 @@ describe Bike do
       expect(Bike.non_stolen.to_sql).to eq(Bike.where(stolen: false).to_sql)
     end
     it 'non_recovered scopes to only non_recovered bikes' do
-      expect(Bike.non_stolen.to_sql).to eq(Bike.where(recovered: false).to_sql)
+      expect(Bike.non_recovered.to_sql).to eq(Bike.where(recovered: false).to_sql)
     end
   end
 
@@ -541,7 +541,7 @@ describe Bike do
                           frame_size: '56', frame_size_unit: 'ballsacks',
                           frame_model: 'Some model', handlebar_type_id: handlebar.id)
       b.cache_bike
-      expect(b.cached_data).to eq("#{b.manufacturer_name} Hand pedaled 1999 #{b.primary_frame_color.name} #{b.secondary_frame_color.name} #{b.tertiary_frame_color.name} #{material.name} 56ballsacks #{b.frame_model} #{b.rear_wheel_size.name} wheel unicycle ")
+      expect(b.cached_data).to eq("#{b.manufacturer_name} Hand pedaled 1999 #{b.primary_frame_color.name} #{b.secondary_frame_color.name} #{b.tertiary_frame_color.name} #{material.name} 56ballsacks #{b.frame_model} #{b.rear_wheel_size.name} wheel unicycle")
       expect(b.current_stolen_record_id).to eq(s.id)
     end
     it 'has before_save_callback_method defined as a before_save callback' do
