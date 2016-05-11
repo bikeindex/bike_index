@@ -3,6 +3,7 @@ class BikeIndex.BikesEditRoot extends BikeIndex
     @initializeEventListeners()
     new BikeIndex.ManufacturersSelect('#manufacturer_update_manufacturer')
     @setFrameSize()
+    @updateYear()
 
   initializeEventListeners: ->
     $('#bike_unknown_year').change (e) =>
@@ -19,21 +20,20 @@ class BikeIndex.BikesEditRoot extends BikeIndex
       @updateFrameSize(e)
 
   updateYear: ->
-    if $('#bike_year').val()
-      if $('#bike_year').val().length == 0
-        $('#bike_year').selectize()[0].selectize.disable()
-        $('#bike_unknown_year').prop('checked', true)
-      else
-        $('#bike_unknown_year').prop('checked', false)
+    if $('#bike_year').val().length == 0
+      # $('#bike_year').selectize()[0].selectize.disable()
+      $('#bike_unknown_year').prop('checked', true)
+    else
+      $('#bike_unknown_year').prop('checked', false)
 
   toggleUnknownYear: ->
     year_select = $('#bike_year').selectize()[0].selectize
     if $('#bike_unknown_year').prop('checked')
       year_select.setValue('')
-      year_select.disable()
+      # year_select.disable()
     else
       year_select.setValue(new Date().getFullYear())
-      year_select.enable()
+      # year_select.enable()
 
   setFrameSize: ->
     unit = $('#bike_frame_size_unit').val()
