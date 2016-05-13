@@ -9,7 +9,7 @@ class BikeIndex.BikeSearchBar extends BikeIndex
       @proximitySearch(e)
     $('#stolen_tab').click (e) =>
       @stolenSearch(e)
-    $('#non_stolen_tab').click (e) =>
+    $('#nonStolen_tab').click (e) =>
       @nonStolenSearch(e)
     
   setSearchProximity: ->
@@ -45,25 +45,25 @@ class BikeIndex.BikeSearchBar extends BikeIndex
     displayedCountNumber = @displayedCountNumber
     $('#stolen_tab .count').text(displayedCountNumber(counts.stolen))
     $('#stolen_proximity_tab .count').text(displayedCountNumber(counts.proximity))
-    $('#non_stolen_tab .count').text(displayedCountNumber(counts.non_stolen))
+    $('#nonStolen_tab .count').text(displayedCountNumber(counts.nonStolen))
 
   stolenSearch: (e) ->
     e.preventDefault()
     $('#stolen').val('true')
-    $('#non_stolen').val('')
+    $('#nonStolen').val('')
     $('#non_proximity').val('true')
     $('#bike_search_form').submit()
 
   nonStolenSearch: (e) ->
     e.preventDefault()
     $('#stolen').val('')
-    $('#non_stolen').val('true')
+    $('#nonStolen').val('true')
     $('#bike_search_form').submit()
 
   proximitySearch: (e) ->
     e.preventDefault()
     $('#stolen').val('true')
-    $('#non_stolen').val('')
+    $('#nonStolen').val('')
     $('#non_proximity').val('')
     $('#bike_search_form').submit()
 

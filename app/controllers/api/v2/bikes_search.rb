@@ -37,7 +37,7 @@ module API
         desc "All bike search", {
           notes: <<-NOTE
             If you want to find any matching bike, use this endpoint.
-            You can not use location information here, since this includes non_stolen bikes (which don't have location information)
+            You can not use location information here, since this includes nonStolen bikes (which don't have location information)
           NOTE
         }
         paginate
@@ -75,8 +75,8 @@ module API
         params do
           use :search_bikes
         end
-        get '/non_stolen', root: 'bikes', each_serializer: BikeV2Serializer do 
-          params[:non_stolen] = true
+        get '/nonStolen', root: 'bikes', each_serializer: BikeV2Serializer do 
+          params[:nonStolen] = true
           { 'declared_params' => declared(params, include_missing: false) }
           paginate find_bikes
         end
@@ -90,7 +90,7 @@ module API
             {
               "proximity": 19,
               "stolen": 100, 
-              "non_stolen": 111
+              "nonStolen": 111
             }
             ```
             `proximity` is the count of matching stolen bikes within the proximity of your search. If no location was included, the location is determined via IP geolocation.

@@ -127,7 +127,7 @@ describe BikeSearcher do
 
   describe 'matching_stolenness' do
     before :each do
-      @non_stolen = FactoryGirl.create(:bike)
+      @nonStolen = FactoryGirl.create(:bike)
       @stolen = FactoryGirl.create(:bike, stolen: true)
     end
     it "selects only stolen bikes if non-stolen isn't selected" do
@@ -136,9 +136,9 @@ describe BikeSearcher do
       expect(result).to eq([@stolen])
     end
     it "selects only non-stolen bikes if stolen isn't selected" do
-      search = BikeSearcher.new(non_stolen: 'on')
+      search = BikeSearcher.new(nonStolen: 'on')
       result = search.matching_stolenness(Bike.scoped)
-      expect(result).to eq([@non_stolen])
+      expect(result).to eq([@nonStolen])
     end
     it 'returns all bikes' do
       search = BikeSearcher.new.matching_stolenness(Bike.scoped)

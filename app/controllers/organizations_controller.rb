@@ -67,13 +67,13 @@ class OrganizationsController < ApplicationController
   def embed
     @bike = BikeCreator.new(@bikeParam).new_bike
     @bike.owner_email = params[:email] if params[:email].present?
-    if params[:non_stolen]
-      @non_stolen = true 
+    if params[:nonStolen]
+      @nonStolen = true 
     else
       #nothing to do
     end      
-    if params[:stolen_first]
-      @stolen_first = true
+    if params[:stolenFirst]
+      @stolenFirst = true
     else
       #nothing to do
     end    
@@ -94,7 +94,7 @@ class OrganizationsController < ApplicationController
     @bike.owner_email = 'info@lumberyardmtb.com' if @organization.slug == 'lumberyard'
     if params[:email].present?
       @bike.owner_email = params[:email] 
-      @persist_email = true
+      @persistEmail = true
     else
       #nothing to do
     end

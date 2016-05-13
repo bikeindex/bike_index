@@ -5,9 +5,9 @@
   = f.hidden_field :creation_organization_id
   = f.hidden_field :embeded, value: true
   .input-group
-    - if @stolen || @stolen_first
+    - if @stolen || @stolenFirst
       %span#stolen_registration_first
-    - unless @stolen || @non_stolen
+    - unless @stolen || @nonStolen
       #registration-type-tabs
         %a.registration-type-tab{ href: '#', data: { stype: 'description' } }
           Registering a stolen bike. Click here to register a non-stolen bike

@@ -82,7 +82,7 @@ class BikeIndex.Views.Global extends Backbone.View
   insertTabCounts: (counts) ->
     $("#stolen_tab .count").text("(#{counts.stolen})")
     $("#proximity_tab .count").text("(#{counts.proximity})")
-    $("#non_stolen_tab .count").text("(#{counts.non_stolen})")
+    $("#nonStolen_tab .count").text("(#{counts.nonStolen})")
 
 
   updateIncludeSerialOption: ->

@@ -38,7 +38,7 @@ class BikesController < ApplicationController
   Return: List with stolen bikes 
 =end   
   def index
-    params[:stolen] = true unless params[:stolen].present? || params[:non_stolen].present?
+    params[:stolen] = true unless params[:stolen].present? || params[:nonStolen].present?
     if params[:proximity].present? && params[:proximity].strip.downcase == 'ip'
       params[:proximity] = request.env['HTTP_X_FORWARDED_FOR'].split(',')[0] if request.env['HTTP_X_FORWARDED_FOR']
     else
@@ -258,7 +258,7 @@ class BikesController < ApplicationController
       else
         if params[:bike][:embeded_extended]
           flash[:notice] = "Success! #{@bike.type} was sent to #{@bike.owner_email}."
-          persisted_email = params[:persist_email] ? @bike.owner_email : nil
+          persisted_email = params[:persistEmail] ? @bike.owner_email : nil
           redirect_to embed_extended_organization_url(@bike.creation_organization, email: persisted_email) and return
         else
           redirect_to controller: :organizations, action: :embed_create_success, id: @bike.creation_organization.slug, bike_id: @bike.id and return

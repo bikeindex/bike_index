@@ -43,7 +43,7 @@ describe BikesController do
             get :index,
                 query: "c_#{color.id},s#serialzzzzzz#,m_#{manufacturer.id}",
                 stolen: '',
-                non_stolen: 'true'
+                nonStolen: 'true'
             expect(response.status).to eq(200)
             target_selectizeItems = [
               manufacturer.autocomplete_result_hash,
@@ -51,7 +51,7 @@ describe BikesController do
               { id: 'serial', search_id: 's#serialzzzzzz#', text: 'serialzzzzzz' }
             ].as_json
             expect(assigns(:selectizeItems)).to eq target_selectizeItems
-            expect(assigns(:stolenness)).to eq 'non_stolen'
+            expect(assigns(:stolenness)).to eq 'nonStolen'
           end
         end
       end
@@ -409,7 +409,7 @@ describe BikesController do
       end
 
       describe 'extended embed submission with persisted email' do
-        it 'registers a bike and redirects with persist_email' do
+        it 'registers a bike and redirects with persistEmail' do
           organization = FactoryGirl.create(:organization)
           user = FactoryGirl.create(:user)
           FactoryGirl.create(:membership, user: user, organization: organization)
@@ -427,7 +427,7 @@ describe BikesController do
                    handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
                    owner_email: 'Flow@goodtimes.com'
           }
-          post :create, bike: bike, persist_email: true
+          post :create, bike: bike, persistEmail: true
           expect(response).to redirect_to(embed_extended_organization_url(organization, email: 'flow@goodtimes.com'))
         end
       end

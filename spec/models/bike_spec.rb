@@ -47,8 +47,8 @@ describe Bike do
     it 'scopes to only stolen bikes' do
       expect(Bike.stolen.to_sql).to eq(Bike.where(stolen: true).to_sql)
     end
-    it 'non_stolen scopes to only non_stolen bikes' do
-      expect(Bike.non_stolen.to_sql).to eq(Bike.where(stolen: false).to_sql)
+    it 'nonStolen scopes to only nonStolen bikes' do
+      expect(Bike.nonStolen.to_sql).to eq(Bike.where(stolen: false).to_sql)
     end
   end
 

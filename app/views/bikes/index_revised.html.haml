@@ -29,7 +29,7 @@
           %span
             within
           = hidden_field_tag :stolen, params[:stolen] || true
-          = hidden_field_tag :non_stolen, params[:non_stolen] || ''
+          = hidden_field_tag :nonStolen, params[:nonStolen] || ''
           = hidden_field_tag :non_proximity, params[:non_proximity] || ''
 
       .search-type-tabs{ data: { query: request.original_url.split('bikes?').last } }
@@ -48,7 +48,7 @@
               Stolen anywhere
               %span.count
           %li.nav-item.not-stolen
-            %a#non_stolen_tab.nav-link{ href: '#', class: ('active' if @stolenness == 'non_stolen'), role: 'tab' }
+            %a#nonStolen_tab.nav-link{ href: '#', class: ('active' if @stolenness == 'nonStolen'), role: 'tab' }
               Not marked stolen
               %span.count
 
@@ -62,7 +62,7 @@
       - else
         .container
           %h1.no-results
-            - desc = { 'stolen_proximity' => 'nearby stolen bikes', 'non_stolen' => 'non-stolen bikes', 'stolen' => 'bikes stolen anywhere' }
+            - desc = { 'stolen_proximity' => 'nearby stolen bikes', 'nonStolen' => 'non-stolen bikes', 'stolen' => 'bikes stolen anywhere' }
             No #{desc[@stolenness]}
             - if @secondaryBikes.present?
               exactly match that serial

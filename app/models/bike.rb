@@ -131,7 +131,7 @@ class Bike < ActiveRecord::Base
 
   default_scope { where(example: false).where(hidden: false).order("listing_order desc") }
   scope :stolen, -> { where(stolen: true) }
-  scope :non_stolen, -> { where(stolen: false) }
+  scope :nonStolen, -> { where(stolen: false) }
   scope :with_serial, -> { where("serial_number != ?", "absent") }
 
   include PgSearch

@@ -2,7 +2,7 @@
 *****************************************************************
 * File: app/controllers/documentation_controller.rb 
 * Name: Class DocumentationController 
-* 
+* Class that work with extern documentation mainly api
 *****************************************************************
 =end
 
