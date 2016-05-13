@@ -70,7 +70,7 @@ class UsersController < ApplicationController
         flash[:error] = "We're sorry, but that link is no longer valid."
         render action: :request_password_reset
       end
-    elsif params[:email].present?
+    if params[:email].present?
       @user = User.fuzzy_email_find(params[:email])
       if @user.present?
         @user.send_password_reset_email
@@ -80,7 +80,7 @@ class UsersController < ApplicationController
       end
     else
       redirect_to '/users/request_password_reset'
-    end
+    end  
   end
 
   def show
