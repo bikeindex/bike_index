@@ -39,7 +39,7 @@ describe Admin::DashboardController do
     before do
       user = FactoryGirl.create(:admin)
       set_current_user(user)
-      b_param = BParam.create(creator_id: user.id)
+      bikeParam = BParam.create(creator_id: user.id)
       get :invitations
     end
     it { is_expected.to respond_with(:success) }
@@ -53,7 +53,7 @@ describe Admin::DashboardController do
       FactoryGirl.create(:handlebar_type, slug: 'other')
       user = FactoryGirl.create(:admin)
       set_current_user(user)
-      b_param = BParam.create(creator_id: user.id)
+      bikeParam = BParam.create(creator_id: user.id)
       get :maintenance
     end
     it { is_expected.to respond_with(:success) }

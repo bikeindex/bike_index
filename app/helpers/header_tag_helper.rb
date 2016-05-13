@@ -21,7 +21,7 @@ protected
   end
   
   def title_tag_html(hash)
-    "<title lang='en'>#{(@page_title ? @page_title : hash[:title_tag][:title])}</title>\n"
+    "<title lang='en'>#{(@pageTitle ? @pageTitle : hash[:title_tag][:title])}</title>\n"
   end
 
   def set_social_hash(hash)
@@ -116,8 +116,8 @@ protected
       hash[:meta_tags][:description] = t "meta_descriptions.bikes_new_stolen"
     end
     if action_name == 'edit' || action_name == 'update'
-      if @edit_templates.present?
-        hash[:title_tag][:title] = "#{@edit_templates[@edit_template]} - #{@bike.title_string}"
+      if @editTemplates.present?
+        hash[:title_tag][:title] = "#{@editTemplates[@editTemplate]} - #{@bike.title_string}"
       else
         hash[:title_tag][:title] = "Edit #{@bike.title_string}"
       end

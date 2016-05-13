@@ -275,12 +275,12 @@ $max-content-width: 728px + $padding-right;
 
 //________________________
 //
-// Spokecard info page
+// spoke_card info page
 //
 //________________________
 
 
-.spokecard-bikes {
+.spoke_card-bikes {
   margin: 50px 0;
   // h4 {
   //   font-size: 22px;
@@ -289,30 +289,30 @@ $max-content-width: 728px + $padding-right;
   ul {
     margin: 0 0 0 25px;
   }
-  .url-spokecard {
+  .url-spoke_card {
     color: darken($grayMed, 5%);
     margin: 0 0 30px;
   }
 }
 
-.page-content .spokecard-demo, .page-content .spokecard-error {
+.page-content .spoke_card-demo, .page-content .spoke_card-error {
   margin-top: 30px;
   margin-bottom: 30px;
   display: block;
   padding-right: 0;
 }
-.spokecard-error {
+.spoke_card-error {
   border: 1px solid $grayLighter;
 }
 
 @media (min-width: 540px) {
-  .spokecard-demo { max-width: 500px; }
+  .spoke_card-demo { max-width: 500px; }
 }
 
-.content-sidebar .content-sections ul.spokecard-extension { display: none; }
+.content-sidebar .content-sections ul.spoke_card-extension { display: none; }
 
 @media (min-width: 780px) {
-  .content-sections .active-menu ul.spokecard-extension.on-spokecard-page {
+  .content-sections .active-menu ul.spoke_card-extension.on-spoke_card-page {
     display: block;
     li {
       margin-top: .1em;

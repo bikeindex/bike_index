@@ -3,61 +3,61 @@ require 'spec_helper'
 describe BikeCreatorAssociator do
   describe 'create_ownership' do
     it 'calls create ownership' do
-      b_param = BParam.new
+      bikeParam = BParam.new
       bike = Bike.new
-      allow(b_param).to receive(:params).and_return(bike: bike)
-      allow(b_param).to receive(:creator).and_return('creator')
+      allow(bikeParam).to receive(:params).and_return(bike: bike)
+      allow(bikeParam).to receive(:creator).and_return('creator')
       # OwnershipCreator.any_instance.should_receive(:initialize).with(bike: bike, creator: 'creator', send_email: true)
       expect_any_instance_of(OwnershipCreator).to receive(:create_ownership).and_return(true)
-      BikeCreatorAssociator.new(b_param).create_ownership(bike)
+      BikeCreatorAssociator.new(bikeParam).create_ownership(bike)
     end
-    it 'calls create ownership with send_email false if b_param has that' do
-      b_param = BParam.new
+    it 'calls create ownership with send_email false if bikeParam has that' do
+      bikeParam = BParam.new
       bike = Bike.new
-      allow(b_param).to receive(:params).and_return({ bike: { send_email: false } })
-      allow(b_param).to receive(:creator).and_return('creator')
+      allow(bikeParam).to receive(:params).and_return({ bike: { send_email: false } })
+      allow(bikeParam).to receive(:creator).and_return('creator')
       # OwnershipCreator.any_instance.should_receive(:initialize).with(bike: bike, creator: 'creator', send_email: false)
       expect_any_instance_of(OwnershipCreator).to receive(:create_ownership).and_return(true)
-      BikeCreatorAssociator.new(b_param).create_ownership(bike)
+      BikeCreatorAssociator.new(bikeParam).create_ownership(bike)
     end
   end
 
   describe 'create_components' do
     it 'calls create components' do
-      b_param = BParam.new
+      bikeParam = BParam.new
       bike = Bike.new
       expect_any_instance_of(ComponentCreator).to receive(:create_components_from_params).and_return(true)
-      BikeCreatorAssociator.new(b_param).create_components(bike)
+      BikeCreatorAssociator.new(bikeParam).create_components(bike)
     end
   end
 
   describe 'create_normalized_serial_segments' do
     it 'calls create components' do
-      b_param = BParam.new
+      bikeParam = BParam.new
       bike = Bike.new
       expect_any_instance_of(SerialNormalizer).to receive(:save_segments).and_return(true)
-      BikeCreatorAssociator.new(b_param).create_normalized_serial_segments(bike)
+      BikeCreatorAssociator.new(bikeParam).create_normalized_serial_segments(bike)
     end
   end
 
   describe 'create_stolenRecord' do
     it 'calls create stolen record and set_creation_organization' do
-      b_param = BParam.new
+      bikeParam = BParam.new
       bike = Bike.new
       allow(bike).to receive(:creation_organization).and_return(true)
       expect_any_instance_of(StolenRecordUpdator).to receive(:create_new_record).and_return(true)
       expect_any_instance_of(StolenRecordUpdator).to receive(:set_creation_organization).and_return(true)
-      BikeCreatorAssociator.new(b_param).create_stolenRecord(bike)
+      BikeCreatorAssociator.new(bikeParam).create_stolenRecord(bike)
     end
   end
 
   describe 'add_other_listings' do
     it 'calls create stolen record and set_creation_organization' do
-      b_param = BParam.new
+      bikeParam = BParam.new
       bike = FactoryGirl.create(:bike)
       urls = ['http://some_blog.com', 'http://some_thing.com']
-      allow(b_param).to receive(:params).and_return(bike: { other_listing_urls: urls })
-      BikeCreatorAssociator.new(b_param).add_other_listings(bike)
+      allow(bikeParam).to receive(:params).and_return(bike: { other_listing_urls: urls })
+      BikeCreatorAssociator.new(bikeParam).add_other_listings(bike)
       expect(bike.other_listings.reload.pluck(:url)).to eq(urls)
     end
   end
@@ -65,13 +65,13 @@ describe BikeCreatorAssociator do
   describe 'attach_photo' do
     it 'creates public images for the attached image' do
       bike = FactoryGirl.create(:bike)
-      b_param = FactoryGirl.create(:b_param)
+      bikeParam = FactoryGirl.create(:bikeParam)
       test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg')))
-      b_param.image = test_photo
-      b_param.save
-      expect(b_param.image).to be_present
-      b_param.params = p
-      BikeCreatorAssociator.new(b_param).attach_photo(bike)
+      bikeParam.image = test_photo
+      bikeParam.save
+      expect(bikeParam.image).to be_present
+      bikeParam.params = p
+      BikeCreatorAssociator.new(bikeParam).attach_photo(bike)
       expect(bike.publicImages.count).to eq(1)
     end
   end
@@ -79,10 +79,10 @@ describe BikeCreatorAssociator do
   # describe 'add_uploaded_image' do
   #   it "associates the public image" do
   #     bike = FactoryGirl.create(:bike)
-  #     b_param = FactoryGirl.create(:b_param)
-  #     b_param.params = {bike: {bike_image: File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg'))}}
-  #     b_param.save
-  #     BikeCreatorAssociator.new(b_param).add_uploaded_image(bike)
+  #     bikeParam = FactoryGirl.create(:bikeParam)
+  #     bikeParam.params = {bike: {bike_image: File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg'))}}
+  #     bikeParam.save
+  #     BikeCreatorAssociator.new(bikeParam).add_uploaded_image(bike)
   #     bike.reload.publicImages.count.should eq(1)
   #   end
   # end

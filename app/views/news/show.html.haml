@@ -13,10 +13,10 @@
         - else
           #{l @blog.published_at, format: :no_day_with_year}
 - if @blog.is_listicle  
-  - @blog.listicles.each_with_index do |list_item, i|
+  - @blog.listicles.each_with_index do |listItem, i|
     - unless i == 0
       %hr.listicle-separator
-    = listicle_html(list_item)
+    = listicle_html(listItem)
 
 
 - else

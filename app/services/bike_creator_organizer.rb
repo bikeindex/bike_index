@@ -1,6 +1,6 @@
 class BikeCreatorOrganizer
-  def initialize(b_param = nil, bike = nil)
-    @b_param = b_param
+  def initialize(bikeParam = nil, bike = nil)
+    @bikeParam = bikeParam
     @bike = bike 
   end
 
@@ -13,7 +13,7 @@ class BikeCreatorOrganizer
   end
 
   def organization_usable(organization)
-    unless @b_param.creator.is_member_of?(organization)
+    unless @bikeParam.creator.is_member_of?(organization)
       @bike.errors.add(:creation_organization, "You have to be part of #{organization.name} to add a bike through them")
       return false
     end
@@ -42,10 +42,10 @@ class BikeCreatorOrganizer
   end
 
   def check_organization
-    if @b_param.params[:creation_organization_id]
-      organize(@b_param.params[:creation_organization_id])
-    elsif @b_param.params[:bike].present? and @b_param.params[:bike][:creation_organization_id]
-      organize(@b_param.params[:bike][:creation_organization_id])
+    if @bikeParam.params[:creation_organization_id]
+      organize(@bikeParam.params[:creation_organization_id])
+    elsif @bikeParam.params[:bike].present? and @bikeParam.params[:bike][:creation_organization_id]
+      organize(@bikeParam.params[:bike][:creation_organization_id])
     else
       unorganize
     end

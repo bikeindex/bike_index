@@ -11,7 +11,7 @@ CREATE TABLE `ads` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-CREATE TABLE `b_params` (
+CREATE TABLE `bikeParams` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `params` text COLLATE utf8_unicode_ci,
   `bike_title` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -408,7 +408,7 @@ CREATE TABLE `normalized_serial_segments` (
   KEY `index_normalized_serial_segments_on_duplicate_bike_group_id` (`duplicate_bike_group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-CREATE TABLE `oauth_access_grants` (
+CREATE TABLE `oauth_accessGrants` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `resource_owner_id` int(11) NOT NULL,
   `application_id` int(11) NOT NULL,
@@ -419,7 +419,7 @@ CREATE TABLE `oauth_access_grants` (
   `revoked_at` datetime DEFAULT NULL,
   `scopes` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `index_oauth_access_grants_on_token` (`token`)
+  UNIQUE KEY `index_oauth_accessGrants_on_token` (`token`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `oauth_access_tokens` (

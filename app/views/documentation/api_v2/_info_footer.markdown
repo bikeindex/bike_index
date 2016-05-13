@@ -60,17 +60,17 @@ Since this is a POST Request, we use javascript to do it here. Adding a demonstr
       type: "POST",
       url: "<%= ENV['BASE_URL'] %>",
       data: {
-        "code": "@access_code",
+        "code": "@accessCode",
         "client_secret": "@applicationsecret}",
         "client_id": "@applicationuid}",
         "grant_type": "authorization_code",
         "redirect_uri": authorize_documentation_index_url
       },
       success: function(data, textStatus, jqXHR) {
-        $('#access_grant_response').text(JSON.stringify(data,undefined,2));
+        $('#accessGrant_response').text(JSON.stringify(data,undefined,2));
       },
       error: function(data, textStatus, jqXHR) {
-        $('#access_grant_response').text(JSON.stringify(data, void 0, 2));
+        $('#accessGrant_response').text(JSON.stringify(data, void 0, 2));
       }
     });
  -->

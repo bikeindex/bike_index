@@ -19,10 +19,10 @@ describe ApplicationDecorator do
     end
   end
 
-  describe 'dl_list_item' do
+  describe 'dl_listItem' do
     it "returns a dt and dd from what's passed attribute" do
       bike = Bike.new
-      dl_list = ApplicationDecorator.new(bike).dl_list_item('description', 'title')
+      dl_list = ApplicationDecorator.new(bike).dl_listItem('description', 'title')
       expect(dl_list).to eq('<dt>title</dt><dd>description</dd>')
     end
   end
@@ -38,7 +38,7 @@ describe ApplicationDecorator do
       bike = Bike.new
       decorator = ApplicationDecorator.new(bike)
       allow(decorator).to receive(:if_present).and_return('cereal')
-      expect(decorator).to receive(:dl_list_item).with('cereal', 'Serial Number')
+      expect(decorator).to receive(:dl_listItem).with('cereal', 'Serial Number')
       decorator.dl_from_attribute('serial_number')
     end
   end
@@ -50,7 +50,7 @@ describe ApplicationDecorator do
       allow(bike).to receive(:handlebar_type).and_return(handlebar_type)
       allow(handlebar_type).to receive(:name).and_return('Cookie')
       decorator = ApplicationDecorator.new(bike)
-      expect(decorator).to receive(:dl_list_item).with('Cookie', 'Handlebar Type')
+      expect(decorator).to receive(:dl_listItem).with('Cookie', 'Handlebar Type')
       decorator.dl_from_attribute_othered('handlebar_type')
     end
     it 'returns the other attribute dl' do
@@ -60,7 +60,7 @@ describe ApplicationDecorator do
       allow(bike).to receive(:handlebar_type_other).and_return('Another type')
       allow(handlebar_type).to receive(:name).and_return('Other style')
       decorator = ApplicationDecorator.new(bike)
-      expect(decorator).to receive(:dl_list_item).with('Another type', 'Handlebar Type')
+      expect(decorator).to receive(:dl_listItem).with('Another type', 'Handlebar Type')
       decorator.dl_from_attribute_othered('handlebar_type')
     end
   end

@@ -19,7 +19,7 @@ class ApplicationDecorator < Draper::Decorator
     end
   end
 
-  def attr_list_item(desc = nil, title, with_colon: false)
+  def attr_listItem(desc = nil, title, with_colon: false)
     return nil unless desc.present?
     title = "#{title}:" if with_colon
     html = h.content_tag(:span, title, class: 'attr-title')
@@ -27,7 +27,7 @@ class ApplicationDecorator < Draper::Decorator
   end
 
 
-  def dl_list_item(dd = nil, dt)
+  def dl_listItem(dd = nil, dt)
     return nil unless dd.present?
     html = h.content_tag(:dt, dt)
     html << h.content_tag(:dd, dd)
@@ -38,7 +38,7 @@ class ApplicationDecorator < Draper::Decorator
     description = if_present(attribute)
     return nil unless description
     title = attribute.titleize unless title.present?
-    self.dl_list_item(description, title)
+    self.dl_listItem(description, title)
   end
 
   def dl_from_attribute_othered(attribute, title = nil)
@@ -49,7 +49,7 @@ class ApplicationDecorator < Draper::Decorator
       description = other if other.present?
     end
     title = attribute.titleize unless title.present?
-    self.dl_list_item(description, title)
+    self.dl_listItem(description, title)
   end
 
   def if_present(attribute, action = nil)

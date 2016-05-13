@@ -52,9 +52,9 @@ class BikeIndex.BikesEditPhotos extends BikeIndex
 
   pushImageOrder: ($sortable_container) ->
     url_target = $sortable_container.data('orderurl')
-    sortable_list_items = $sortable_container.children('li')
+    sortable_listItems = $sortable_container.children('li')
     # This is a list comprehension for the list of all the sortable items, to make an array
-    array_of_photo_ids = ($(list_item).prop('id') for list_item in sortable_list_items)
+    array_of_photo_ids = ($(listItem).prop('id') for listItem in sortable_listItems)
     new_item_order = 
       list_of_photos: array_of_photo_ids
     # list_of_items is an array containing the ordered list of image_ids

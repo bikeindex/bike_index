@@ -55,7 +55,7 @@ class Bike < ActiveRecord::Base
     :creator_id,
     :image,
     :components_attributes,
-    :b_param_id,
+    :bikeParam_id,
     :cached_attributes,
     :embeded,
     :embeded_extended,
@@ -70,7 +70,7 @@ class Bike < ActiveRecord::Base
     :approved_stolen,
     :marked_user_hidden,
     :marked_user_unhidden,
-    :b_param_id_token,
+    :bikeParam_id_token,
     :is_for_sale
 
   mount_uploader :pdf, PdfUploader
@@ -104,7 +104,7 @@ class Bike < ActiveRecord::Base
   has_many :ownerships, dependent: :destroy
   has_many :publicImages, as: :imageable, dependent: :destroy
   has_many :components, dependent: :destroy
-  has_many :b_params, as: :created_bike
+  has_many :bikeParams, as: :created_bike
   has_many :duplicate_bike_groups, through: :normalized_serial_segments
 
   accepts_nested_attributes_for :stolenRecords
@@ -125,9 +125,9 @@ class Bike < ActiveRecord::Base
   # validates_inclusion_of :rear_tire_narrow, in: [true, false]
 
   attr_accessor :other_listing_urls, :date_stolen_input, :receive_notifications,
-    :phone, :image, :b_param_id, :embeded,
+    :phone, :image, :bikeParam_id, :embeded,
     :embeded_extended, :paint_name, :bike_image_cache, :send_email,
-    :marked_user_hidden, :marked_user_unhidden, :b_param_id_token
+    :marked_user_hidden, :marked_user_unhidden, :bikeParam_id_token
 
   default_scope { where(example: false).where(hidden: false).order("listing_order desc") }
   scope :stolen, -> { where(stolen: true) }

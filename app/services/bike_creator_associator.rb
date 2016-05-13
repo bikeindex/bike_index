@@ -1,25 +1,25 @@
 class BikeCreatorAssociator
-  def initialize(b_param = nil)
-    @b_param = b_param
+  def initialize(bikeParam = nil)
+    @bikeParam = bikeParam
   end
 
   def create_ownership(bike)
     send_email = true
-    send = @b_param.params[:bike][:send_email] 
+    send = @bikeParam.params[:bike][:send_email] 
     if send == false
       send_email = false
     elsif send.present? && send != true && send.to_s[/false/i]
       send_email = false
     end
-    OwnershipCreator.new(bike: bike, creator: @b_param.creator, send_email: send_email).create_ownership
+    OwnershipCreator.new(bike: bike, creator: @bikeParam.creator, send_email: send_email).create_ownership
   end
 
   def create_components(bike)
-    ComponentCreator.new(bike: bike, b_param: @b_param).create_components_from_params
+    ComponentCreator.new(bike: bike, bikeParam: @bikeParam).create_components_from_params
   end
 
   def create_stolenRecord(bike)
-    StolenRecordUpdator.new(bike: bike, user: @b_param.creator, b_param: @b_param.params).create_new_record
+    StolenRecordUpdator.new(bike: bike, user: @bikeParam.creator, bikeParam: @bikeParam.params).create_new_record
     StolenRecordUpdator.new(bike: bike).set_creation_organization if bike.creation_organization.present?
     bike.save
   end
@@ -29,23 +29,23 @@ class BikeCreatorAssociator
   end
 
   def attach_photo(bike)
-    return true unless @b_param.image.present?
-    publicImage = PublicImage.new(image: @b_param.image)
+    return true unless @bikeParam.image.present?
+    publicImage = PublicImage.new(image: @bikeParam.image)
     publicImage.imageable = bike
     publicImage.save
-    @b_param.update_attributes(image_processed: true)
+    @bikeParam.update_attributes(image_processed: true)
     bike.reload
   end
   
   def attach_photos(bike)
-    return nil unless @b_param.params[:photos].present?
-    photos = @b_param.params[:photos].uniq.take(7)
+    return nil unless @bikeParam.params[:photos].present?
+    photos = @bikeParam.params[:photos].uniq.take(7)
     photos.each { |p| PublicImage.create(imageable: bike, remote_image_url: p) }
   end
 
   def add_other_listings(bike)
-    return nil unless @b_param.params[:bike][:other_listing_urls].present?
-    urls = @b_param.params[:bike][:other_listing_urls]
+    return nil unless @bikeParam.params[:bike][:other_listing_urls].present?
+    urls = @bikeParam.params[:bike][:other_listing_urls]
     urls.each { |url| OtherListing.create(url: url, bike_id: bike.id) }
   end
 

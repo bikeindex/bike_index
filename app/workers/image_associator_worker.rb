@@ -4,9 +4,9 @@ class ImageAssociatorWorker
   sidekiq_options backtrace: true
     
   def perform
-    BParam.where(image_processed: false).where('image IS NOT NULL').each do |b_param|
-      next unless b_param.created_bike.present?
-      BikeCreatorAssociator.new(b_param).attach_photo(b_param.created_bike)
+    BParam.where(image_processed: false).where('image IS NOT NULL').each do |bikeParam|
+      next unless bikeParam.created_bike.present?
+      BikeCreatorAssociator.new(bikeParam).attach_photo(bikeParam.created_bike)
     end
   end
 

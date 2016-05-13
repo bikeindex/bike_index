@@ -11,10 +11,10 @@ class InfoController < ApplicationController
   layout 'content'
 
 =begin
-  caches_page :about, :where, :roadmap, :security, :serials, :stolen_bikes, :privacy, :terms, :vendor_terms, :downloads, :resources, :spokecard
+  caches_page :about, :where, :roadmap, :security, :serials, :stolen_bikes, :privacy, :terms, :vendor_terms, :downloads, :resources, :spoke_card
 =end 
   
-  before_filter :set_active_section
+  before_filter :set_activeSection
   before_filter :set_revised_layout
 
   def about
@@ -49,7 +49,7 @@ class InfoController < ApplicationController
   end
 
   def support_the_index
-    @page_title = 'Support the Bike Index'
+    @pageTitle = 'Support the Bike Index'
     render layout: (revised_layout_enabled? ? 'application_revised' : 'application_updated')
   end
 
@@ -66,12 +66,12 @@ class InfoController < ApplicationController
 
 protected
 
-  def set_active_section
+  def set_activeSection
     resources = %w(serials resources protect_your_bike image_resources)
     if resources.include? action_name
-      @active_section = 'resources'
+      @activeSection = 'resources'
     else
-      @active_section = 'about'
+      @activeSection = 'about'
     end
   end
 

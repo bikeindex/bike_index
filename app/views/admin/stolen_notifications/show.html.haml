@@ -13,10 +13,10 @@
 .well.padded
   .dl-holder
     %dl.dl-horizontal
-      = @stolenNotification.dl_list_item((link_to @bike.title_string, edit_admin_stolen_bike_url(@bike)), "Bike")
-      = @stolenNotification.dl_list_item(@stolenNotification.receiver_email, "Receiver email")
+      = @stolenNotification.dl_listItem((link_to @bike.title_string, edit_admin_stolen_bike_url(@bike)), "Bike")
+      = @stolenNotification.dl_listItem(@stolenNotification.receiver_email, "Receiver email")
       - if @bike.current_stolenRecord.present?
-        = @stolenNotification.dl_list_item(@bike.current_stolenRecord.phone, "Bike phone")
+        = @stolenNotification.dl_listItem(@bike.current_stolenRecord.phone, "Bike phone")
       %dt
         Sent #{@stolenNotification.send_dates.count} times
       %dd
@@ -36,10 +36,10 @@
             Has not been sent!
     %dl.dl-horizontal
       - if @stolenNotification.sender.name.present?
-        = @stolenNotification.dl_list_item((link_to @stolenNotification.sender.name, edit_admin_user_url(@stolenNotification.sender)), "Sender")
+        = @stolenNotification.dl_listItem((link_to @stolenNotification.sender.name, edit_admin_user_url(@stolenNotification.sender)), "Sender")
       - else
-        = @stolenNotification.dl_list_item((link_to @stolenNotification.sender.email, edit_admin_user_url(@stolenNotification.sender)), "Sender")
-      = @stolenNotification.dl_list_item(@stolenNotification.sender.sent_stolenNotifications.count, "User sent count")
+        = @stolenNotification.dl_listItem((link_to @stolenNotification.sender.email, edit_admin_user_url(@stolenNotification.sender)), "Sender")
+      = @stolenNotification.dl_listItem(@stolenNotification.sender.sent_stolenNotifications.count, "User sent count")
       
   %p.padded
     = @stolenNotification.message

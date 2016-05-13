@@ -1,16 +1,16 @@
 class BikeCreatorVerifier
-  def initialize(b_param = nil, bike = nil)
-    @b_param = b_param
+  def initialize(bikeParam = nil, bike = nil)
+    @bikeParam = bikeParam
     @bike = bike
   end
 
   def check_organization
-    @bike = BikeCreatorOrganizer.new(@b_param, @bike).organized_bike
+    @bike = BikeCreatorOrganizer.new(@bikeParam, @bike).organized_bike
   end
 
   def check_example
     example_org = Organization.find_by_name('Example organization')
-    @bike.creation_organization_id = example_org.id if @b_param.params && @b_param.params[:test]
+    @bike.creation_organization_id = example_org.id if @bikeParam.params && @bikeParam.params[:test]
     if @bike.creation_organization_id.present? && example_org.present?
       @bike.example = true if @bike.creation_organization_id == example_org.id
     else
@@ -20,7 +20,7 @@ class BikeCreatorVerifier
   end
 
   def add_phone
-    @bike.phone ||= @b_param.params[:stolenRecord][:phone] if @b_param.params && @b_param.params[:stolenRecord].present?
+    @bike.phone ||= @bikeParam.params[:stolenRecord][:phone] if @bikeParam.params && @bikeParam.params[:stolenRecord].present?
     if @bike.creation_organization.present? && @bike.creation_organization.locations.any?
       @bike.phone ||= @bike.creation_organization.locations.first.phone
     elsif @bike.creator.phone.present?
@@ -39,13 +39,13 @@ class BikeCreatorVerifier
   end
 
   def check_stolen_and_recovered
-    if @b_param.params[:stolen]
+    if @bikeParam.params[:stolen]
       stolenize
-    elsif @b_param.params[:bike].present? and @b_param.params[:bike][:stolen]
+    elsif @bikeParam.params[:bike].present? and @bikeParam.params[:bike][:stolen]
       stolenize
-    elsif @b_param.params[:recovered]
+    elsif @bikeParam.params[:recovered]
       recoverize
-    elsif @b_param.params[:bike].present? and @b_param.params[:bike][:recovered]
+    elsif @bikeParam.params[:bike].present? and @bikeParam.params[:bike][:recovered]
       recoverize
     end
   end

@@ -15,8 +15,8 @@ class BikeIndex.Views.Global extends Backbone.View
     @initializeHeaderSearch() if document.getElementById('head-search-bikes')
     @loadFancySelects()
     @setLightspeedMovie() if $('#lightspeed-tutorial-video').length > 0
-    if $('#what-spokecards-are').length > 0
-      $('.spokecard-extension').addClass('on-spokecard-page')
+    if $('#what-spoke_cards-are').length > 0
+      $('.spoke_card-extension').addClass('on-spoke_card-page')
     @intializeContent() if $('.content-nav').length > 0
     
   openNewWindow: (e) ->

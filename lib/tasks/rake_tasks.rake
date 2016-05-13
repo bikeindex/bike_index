@@ -9,7 +9,7 @@ task :slow_save => :environment do
   # end
 end
 
-task delete_expired_b_params: :environment do
+task delete_expired_bikeParams: :environment do
   BParam.pluck(:id).each { |id| RemoveExpiredBParamsWorker.perform_async(id) }
 end
 

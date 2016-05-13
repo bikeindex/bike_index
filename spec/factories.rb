@@ -84,7 +84,7 @@ FactoryGirl.define do
     name { FactoryGirl.generate(:unique_name) }
   end
 
-  factory :b_param do
+  factory :bikeParam do
     association :creator, factory: :user
   end
 

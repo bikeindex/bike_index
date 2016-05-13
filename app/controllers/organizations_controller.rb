@@ -65,7 +65,7 @@ class OrganizationsController < ApplicationController
   end
 
   def embed
-    @bike = BikeCreator.new(@b_param).new_bike
+    @bike = BikeCreator.new(@bikeParam).new_bike
     @bike.owner_email = params[:email] if params[:email].present?
     if params[:non_stolen]
       @non_stolen = true 
@@ -90,7 +90,7 @@ class OrganizationsController < ApplicationController
   end
 
   def embed_extended
-    @bike = BikeCreator.new(@b_param).new_bike
+    @bike = BikeCreator.new(@bikeParam).new_bike
     @bike.owner_email = 'info@lumberyardmtb.com' if @organization.slug == 'lumberyard'
     if params[:email].present?
       @bike.owner_email = params[:email] 
@@ -153,7 +153,7 @@ class OrganizationsController < ApplicationController
       @user = User.new
     end
     @organization = Organization.new
-    @active_section = "contact"
+    @activeSection = "contact"
   end
 
   def allowed_attributes
@@ -176,10 +176,10 @@ class OrganizationsController < ApplicationController
       flash[:error] = "We're sorry, that organization doesn't have a user set up to register bikes through. Email contact@bikeindex.org if this seems like an error."
       redirect_to root_url and return
     end
-    if params[:b_param_id_token].present?
-      @b_param = BParam.from_id_token(params[:b_param_id_token])
+    if params[:bikeParam_id_token].present?
+      @bikeParam = BParam.from_id_token(params[:bikeParam_id_token])
     else
-      @b_param = BParam.create(creator_id: @organization.auto_user.id, params: {creation_organization_id: @organization.id, embeded: true})
+      @bikeParam = BParam.create(creator_id: @organization.auto_user.id, params: {creation_organization_id: @organization.id, embeded: true})
     end
   end
 

@@ -151,8 +151,8 @@ describe ApplicationHelper do
   end
 
   describe 'content_nav_class' do
-    it 'returns active if the section is the active_section' do
-      @active_section = 'resources'
+    it 'returns active if the section is the activeSection' do
+      @activeSection = 'resources'
       expect(helper.content_nav_class('resources')).to eq('active-menu')
     end
   end

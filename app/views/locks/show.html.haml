@@ -12,8 +12,8 @@
 
 .dl-holder
   %dl.dl-horizontal
-    = @lock.dl_list_item(@lock.mnfg_name, "Manufacturer")
-    = @lock.dl_list_item(@lock.lock_type_name, "Lock Type")
+    = @lock.dl_listItem(@lock.mnfg_name, "Manufacturer")
+    = @lock.dl_listItem(@lock.lock_type_name, "Lock Type")
     = @lock.dl_from_attribute("key_serial")
     = @lock.dl_from_attribute("combination")
     = @lock.dl_from_attribute("lock_model")

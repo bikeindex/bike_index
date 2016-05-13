@@ -12,17 +12,17 @@
       %dl.dl-horizontal
         = @bike.dl_from_attribute('owner_email')
         - if @bike.owner.present?
-          = @bike.dl_list_item((link_to @bike.owner.email, edit_admin_user_url(@bike.owner)), 'Current Owner')
+          = @bike.dl_listItem((link_to @bike.owner.email, edit_admin_user_url(@bike.owner)), 'Current Owner')
         - else
           %strong
             Missing owner!
 
         - if @bike.current_stolenRecord.present?
-          = @bike.dl_list_item(@bike.current_stolenRecord.phone, 'Phone')
+          = @bike.dl_listItem(@bike.current_stolenRecord.phone, 'Phone')
       %dl.dl-horizontal
-        = @bike.dl_list_item(@bike.created_at.strftime('%m-%d-%Y'), 'Created')
+        = @bike.dl_listItem(@bike.created_at.strftime('%m-%d-%Y'), 'Created')
         - if @bike.creation_organization.present?
-          = @bike.dl_list_item(@bike.creation_organization.name, 'Creation org')
+          = @bike.dl_listItem(@bike.creation_organization.name, 'Creation org')
           = @bike.dl_from_attribute('cached_data')
     %hr
     = form_for [:admin, @bike], html: { class: 'form form-horizontal admin-bike-edit' } do |f|
@@ -73,7 +73,7 @@
               = f.text_field :manufacturer_other
           
           .control-group
-            = f.label :cardId, "Spokecard id", class: "control-label"
+            = f.label :cardId, "spoke_card id", class: "control-label"
             .controls
               = f.text_field :cardId
 

@@ -1,6 +1,6 @@
 class InitialCreation < ActiveRecord::Migration
   def up
-    create_table "b_params", force: true do |t|
+    create_table "bikeParams", force: true do |t|
       t.text     "params"
       t.string   "bike_title"
       t.integer  "creator_id"

@@ -6,7 +6,7 @@ class StolenRecordUpdator
     @bike = creation_params[:bike]
     @date_stolen = creation_params[:date_stolen_input]
     @user = creation_params[:user]
-    @b_param = creation_params[:b_param]
+    @bikeParam = creation_params[:bikeParam]
   end 
 
   def updated_phone
@@ -41,7 +41,7 @@ class StolenRecordUpdator
       if @date_stolen
         stolenRecord = @bike.reload.find_current_stolenRecord
         stolenRecord.update_attributes(date_stolen: create_date_from_string(@date_stolen))
-      elsif @b_param && @b_param[:stolenRecord].present?
+      elsif @bikeParam && @bikeParam[:stolenRecord].present?
         stolenRecord = @bike.reload.find_current_stolenRecord
         update_with_params(stolenRecord).save
       end
@@ -58,8 +58,8 @@ class StolenRecordUpdator
 
 
   def update_with_params(stolenRecord)
-    return stolenRecord unless @b_param.present? && @b_param[:stolenRecord].present?
-    sr = @b_param[:stolenRecord]
+    return stolenRecord unless @bikeParam.present? && @bikeParam[:stolenRecord].present?
+    sr = @bikeParam[:stolenRecord]
     stolenRecord.police_report_number, stolenRecord.police_report_department = [
       sr[:police_report_number], sr[:police_report_department] 
     ]

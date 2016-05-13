@@ -106,24 +106,24 @@
 
       .show-bike-details
         %ul.attr-list.split-sm
-          = @bike.attr_list_item(@bike.serial_display, 'Serial', with_colon: true)
+          = @bike.attr_listItem(@bike.serial_display, 'Serial', with_colon: true)
           - unless @bike.type == 'bike'
-            = @bike.attr_list_item(@bike.type.titleize, 'Cycle type', with_colon: true)
-          = @bike.attr_list_item(@bike.mnfg_name, 'Manufacturer', with_colon: true)
-          = @bike.attr_list_item(@bike.frame_model, 'Model', with_colon: true)
-          = @bike.attr_list_item(@bike.year.to_s, 'Year', with_colon: true)
-          = @bike.attr_list_item(@bike.frame_colors.to_sentence, 'Primary colors', with_colon: true)
-          = @bike.attr_list_item(@bike.size_display, 'Frame size', with_colon: true)
+            = @bike.attr_listItem(@bike.type.titleize, 'Cycle type', with_colon: true)
+          = @bike.attr_listItem(@bike.mnfg_name, 'Manufacturer', with_colon: true)
+          = @bike.attr_listItem(@bike.frame_model, 'Model', with_colon: true)
+          = @bike.attr_listItem(@bike.year.to_s, 'Year', with_colon: true)
+          = @bike.attr_listItem(@bike.frame_colors.to_sentence, 'Primary colors', with_colon: true)
+          = @bike.attr_listItem(@bike.size_display, 'Frame size', with_colon: true)
           - if @bike.front_wheel_size_id.present?
             - front_tire_width = @bike.front_tire_narrow ? '(Narrow tire)' : '(Wide tire)'
             - if @bike.front_wheel_size_id == @bike.rear_wheel_size_id
-              = @bike.attr_list_item(@bike.ass_name('front_wheel_size', front_tire_width), 'Wheel diameter', with_colon: true)
+              = @bike.attr_listItem(@bike.ass_name('front_wheel_size', front_tire_width), 'Wheel diameter', with_colon: true)
             - else
-              = @bike.attr_list_item(@bike.ass_name('front_wheel_size', front_tire_width), 'Front wheel diameter', with_colon: true)
+              = @bike.attr_listItem(@bike.ass_name('front_wheel_size', front_tire_width), 'Front wheel diameter', with_colon: true)
               - rear_tire_width = @bike.rear_tire_narrow ? '(Narrow tire)' : '(Wide tire)'
-              = @bike.attr_list_item(@bike.ass_name('rear_wheel_size', rear_tire_width), 'Rear wheel diameter', with_colon: true)
-          = @bike.attr_list_item(@bike.ass_name('frame_material'), 'Frame Material', with_colon: true)
-          = @bike.attr_list_item(@bike.ass_name('handlebar_type'), 'Handlebar type', with_colon: true)
+              = @bike.attr_listItem(@bike.ass_name('rear_wheel_size', rear_tire_width), 'Rear wheel diameter', with_colon: true)
+          = @bike.attr_listItem(@bike.ass_name('frame_material'), 'Frame Material', with_colon: true)
+          = @bike.attr_listItem(@bike.ass_name('handlebar_type'), 'Handlebar type', with_colon: true)
         - if @bike.description.present?
           %h3
             Distinguishing features
@@ -136,12 +136,12 @@
             = render 'stolen_map'
             .col-md-4
               %ul.attr-list.separate-lines
-                = @bike.attr_list_item(@stolenRecord.show_stolen_address, 'Location')
-                = @bike.attr_list_item(@stolenRecord.locking_description, 'Locking description')
-                = @bike.attr_list_item(@stolenRecord.lock_defeat_description, 'Locking circumvented')
-                = @bike.attr_list_item((l @stolenRecord.date_stolen, format: :dotted), 'Date stolen')
-                = @bike.attr_list_item(@stolenRecord.police_report_number, 'Police report #')
-                = @bike.attr_list_item(@stolenRecord.police_report_department, 'Department & city')
+                = @bike.attr_listItem(@stolenRecord.show_stolen_address, 'Location')
+                = @bike.attr_listItem(@stolenRecord.locking_description, 'Locking description')
+                = @bike.attr_listItem(@stolenRecord.lock_defeat_description, 'Locking circumvented')
+                = @bike.attr_listItem((l @stolenRecord.date_stolen, format: :dotted), 'Date stolen')
+                = @bike.attr_listItem(@stolenRecord.police_report_number, 'Police report #')
+                = @bike.attr_listItem(@stolenRecord.police_report_department, 'Department & city')
           - if @stolenRecord.theft_description.present?
             %h3
               Description of incident

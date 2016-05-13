@@ -82,10 +82,10 @@ Bikeindex::Application.routes.draw do
   end
 
   resources :bikes do
-    collection { get :scanned }
+    collection { get :scan }
     member do
-      get :spokecard
-      get :scanned
+      get :spoke_card
+      get :scan
       get :pdf
     end
   end
@@ -203,7 +203,7 @@ Bikeindex::Application.routes.draw do
     get page, controller: 'info', action: page
   end
 
-  %w(stolen_bikes roadmap security spokecard how_it_works).each { |p| match p, to: redirect('/resources') }
+  %w(stolen_bikes roadmap security spoke_card how_it_works).each { |p| match p, to: redirect('/resources') }
 
   # get 'sitemap.xml.gz' => redirect('https://files.bikeindex.org/sitemaps/sitemap_index.xml.gz')
   # Somehow the redirect drops the .gz extension, which ruins it so this redirect is handled by Cloudflare

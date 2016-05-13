@@ -9,9 +9,9 @@
     = render partial: "/bikes/bike", locals: {bike: @bike, target: "show" }
   .dl-holder
     %dl.dl-horizontal
-      = @bike.dl_list_item(@bike.created_at.strftime("%m-%d-%Y"), "Created")
+      = @bike.dl_listItem(@bike.created_at.strftime("%m-%d-%Y"), "Created")
       = @bike.dl_from_attribute("owner_email")
-      = @bike.dl_list_item(@bike.owner.email, "Current Owner")
+      = @bike.dl_listItem(@bike.owner.email, "Current Owner")
       = @bike.dl_from_attribute("cached_data")
   %hr
 

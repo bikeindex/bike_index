@@ -12,7 +12,7 @@
     = @manufacturer.dl_from_attribute("open_year")
     = @manufacturer.dl_from_attribute("close_year")
     - if @manufacturer.website.present?
-      = @manufacturer.dl_list_item(link_to(@manufacturer.website, @manufacturer.website), "Website")
+      = @manufacturer.dl_listItem(link_to(@manufacturer.website, @manufacturer.website), "Website")
     = @manufacturer.dl_from_attribute('description')
   %dl.dl-horizontal
     %dt

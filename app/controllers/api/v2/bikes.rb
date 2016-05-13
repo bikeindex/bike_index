@@ -135,13 +135,13 @@ module API
         end
         post '/', serializer: BikeV2ShowSerializer, root: 'bike' do
           declared_p = { "declared_params" => declared(params, include_missing: false) }
-          b_param = BParam.create(creator_id: creation_user_id, params: declared_p['declared_params'], api_v2: true)
-          ensure_required_stolen_attrs(b_param.params)
-          bike = BikeCreator.new(b_param).create_bike
-          if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
+          bikeParam = BParam.create(creator_id: creation_user_id, params: declared_p['declared_params'], api_v2: true)
+          ensure_required_stolen_attrs(bikeParam.params)
+          bike = BikeCreator.new(bikeParam).create_bike
+          if bikeParam.errors.blank? && bikeParam.bike_errors.blank? && bike.present? && bike.errors.blank?
             bike
           else
-            e = bike.present? ? bike.errors : b_param.errors
+            e = bike.present? ? bike.errors : bikeParam.errors
             error!(e.full_messages.to_sentence, 401)
           end
         end
@@ -173,7 +173,7 @@ module API
           hash = BParam.v2_params(declared_p['declared_params'])
           ensure_required_stolen_attrs(hash) if hash[:stolenRecord].present? && @bike.stolen != true
           begin
-            BikeUpdator.new(user: current_user, b_params: hash).update_available_attributes
+            BikeUpdator.new(user: current_user, bikeParams: hash).update_available_attributes
           rescue => e
             error!("Unable to update bike: #{e}", 401)
           end

@@ -31,13 +31,13 @@
         %dd
           %a{ href: "tell:#{@stolenRecord.secondary_phone}" }
             = @stolenRecord.display_phone(@stolenRecord.secondary_phone)
-    = @bike.dl_list_item(@stolenRecord.address, "Location")
-    = @bike.dl_list_item(@stolenRecord.locking_description, "Locking description")
-    = @bike.dl_list_item(@stolenRecord.lock_defeat_description, "Locking circumvented")
-    = @bike.dl_list_item(@stolenRecord.date_stolen.strftime("%m-%d-%Y"), "Date stolen")
-    = @bike.dl_list_item(@stolenRecord.theft_description, "Description")
-    = @bike.dl_list_item(@stolenRecord.police_report_number, "Police report #")
-    = @bike.dl_list_item(@stolenRecord.police_report_department, "Department & city")
+    = @bike.dl_listItem(@stolenRecord.address, "Location")
+    = @bike.dl_listItem(@stolenRecord.locking_description, "Locking description")
+    = @bike.dl_listItem(@stolenRecord.lock_defeat_description, "Locking circumvented")
+    = @bike.dl_listItem(@stolenRecord.date_stolen.strftime("%m-%d-%Y"), "Date stolen")
+    = @bike.dl_listItem(@stolenRecord.theft_description, "Description")
+    = @bike.dl_listItem(@stolenRecord.police_report_number, "Police report #")
+    = @bike.dl_listItem(@stolenRecord.police_report_department, "Department & city")
 
 .bike-show-stolen-contact#stolen_bike_owner_contact
   %h3

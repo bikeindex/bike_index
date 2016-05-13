@@ -22,7 +22,7 @@
       .feedbacks.padded
         .contact-info
           = f.hidden_field :name, value: "spoke card connect"
-          = f.hidden_field :feedback_type, value: 'spokecard'
+          = f.hidden_field :feedback_type, value: 'spoke_card'
           = f.email_field :email, required: true, placeholder: "Enter your email address", value: current_user ? current_user.email : ""
           = f.hidden_field :title, value: @cardId
         .contact-text

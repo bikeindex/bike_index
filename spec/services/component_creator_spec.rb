@@ -71,16 +71,16 @@ describe ComponentCreator do
 
   describe 'create_components_from_params' do
     it 'returns nil if there are no components' do
-      b_param = BParam.new
-      allow(b_param).to receive(:params).and_return(s: 'things')
-      component_creator = ComponentCreator.new(b_param: b_param)
+      bikeParam = BParam.new
+      allow(bikeParam).to receive(:params).and_return(s: 'things')
+      component_creator = ComponentCreator.new(bikeParam: bikeParam)
       expect(component_creator.create_components_from_params).to be_nil
     end
     it 'calls the necessary methods to create a component on each component' do
-      b_param = BParam.new
+      bikeParam = BParam.new
       components = [{ component_type: 'something' }, { component_type: 'something' }]
-      allow(b_param).to receive(:params).and_return(components: components)
-      component_creator = ComponentCreator.new(b_param: b_param)
+      allow(bikeParam).to receive(:params).and_return(components: components)
+      component_creator = ComponentCreator.new(bikeParam: bikeParam)
       expect(component_creator).to receive(:set_manufacturer_key).at_least(2).times.and_return(true)
       expect(component_creator).to receive(:set_component_type).at_least(2).times.and_return(true)
       expect(component_creator).to receive(:create_component).at_least(2).times.and_return(true)

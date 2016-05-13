@@ -35,7 +35,7 @@ class Admin::StolenBikesController < Admin::BaseController
   end
 
   def update
-    BikeUpdator.new(user: current_user, b_params: params).update_ownership
+    BikeUpdator.new(user: current_user, bikeParams: params).update_ownership
     @bike = @bike.decorate
     if @bike.update_attributes(params[:bike])
       SerialNormalizer.new({serial: @bike.serial_number}).save_segments(@bike.id)

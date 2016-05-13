@@ -8,7 +8,7 @@
 
 class NewsController < ApplicationController
   layout 'content'
-  before_filter :set_blogs_active_section
+  before_filter :set_blogs_activeSection
   before_filter :set_revised_layout
 
   def show
@@ -21,9 +21,9 @@ class NewsController < ApplicationController
     if @blog.is_listicle
       @page = params[:page].to_i 
       @page = 1 unless @page > 0
-      @list_item = @blog.listicles[@page-1]
-      @next_item = true unless @page >= @blog.listicles.count
-      @prev_item = true unless @page == 1
+      @listItem = @blog.listicles[@page-1]
+      @nextItem = true unless @page >= @blog.listicles.count
+      @prevItem = true unless @page == 1
     else
       #nothing to do
     end      
@@ -34,7 +34,7 @@ class NewsController < ApplicationController
     @blogs = Blog.published
   end
 
-  def set_blogs_active_section
-    @active_section = "about"
+  def set_blogs_activeSection
+    @activeSection = "about"
   end
 end

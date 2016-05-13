@@ -126,10 +126,10 @@ describe StolenRecordUpdator do
              city: 'Big town',
              zipcode: '60666'
       }
-      b_param = BParam.new
-      allow(b_param).to receive(:params).and_return(stolenRecord: sr)
+      bikeParam = BParam.new
+      allow(bikeParam).to receive(:params).and_return(stolenRecord: sr)
       stolenRecord = StolenRecord.new
-      updator = StolenRecordUpdator.new(b_param: b_param.params)
+      updator = StolenRecordUpdator.new(bikeParam: bikeParam.params)
       stolenRecord = updator.update_with_params(stolenRecord)
       expect(stolenRecord.police_report_number).to eq(sr[:police_report_number])
       expect(stolenRecord.police_report_department).to eq(sr[:police_report_department])
@@ -146,10 +146,10 @@ describe StolenRecordUpdator do
       sr = { state: state.abbreviation,
              country: country.iso
       }
-      b_param = BParam.new
-      allow(b_param).to receive(:params).and_return(stolenRecord: sr)
+      bikeParam = BParam.new
+      allow(bikeParam).to receive(:params).and_return(stolenRecord: sr)
       stolenRecord = StolenRecord.new
-      updator = StolenRecordUpdator.new(b_param: b_param.params)
+      updator = StolenRecordUpdator.new(bikeParam: bikeParam.params)
       stolenRecord = updator.update_with_params(stolenRecord)
       expect(stolenRecord.country).to eq(country)
       expect(stolenRecord.state).to eq(state)

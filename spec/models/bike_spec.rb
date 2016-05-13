@@ -21,7 +21,7 @@ describe Bike do
     it { is_expected.to belong_to :current_stolenRecord }
     it { is_expected.to belong_to :location }
     it { is_expected.to have_many :duplicate_bike_groups }
-    it { is_expected.to have_many :b_params }
+    it { is_expected.to have_many :bikeParams }
     it { is_expected.to have_many :stolenNotifications }
     it { is_expected.to have_many :stolenRecords }
     it { is_expected.to have_many :ownerships }

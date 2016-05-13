@@ -7,9 +7,9 @@
   .blist-primary-group
     .dl-holder
       %dl.dl-horizontal
-        = bike.dl_list_item(bike.serial_display, "Serial")  
+        = bike.dl_listItem(bike.serial_display, "Serial")  
         
-        = bike.dl_list_item(bike.frame_colors.to_sentence, "Colors")
+        = bike.dl_listItem(bike.frame_colors.to_sentence, "Colors")
         
   
         
@@ -20,9 +20,9 @@
         %dl.dl-horizontal
           - date_label = "Stolen"
           - date_label = "Recovered" if bike.recovered
-          = bike.dl_list_item(bike.current_stolenRecord.date_stolen.strftime("%m-%d-%Y"), date_label)
+          = bike.dl_listItem(bike.current_stolenRecord.date_stolen.strftime("%m-%d-%Y"), date_label)
         %dl.dl-horizontal
-          = bike.dl_list_item(bike.short_address(bike.current_stolenRecord), "From")
+          = bike.dl_listItem(bike.short_address(bike.current_stolenRecord), "From")
   - pdf ||= false
   - if pdf
     = link_to "Printable registration", pdf_bike_url(bike), class: 'printable-registration'

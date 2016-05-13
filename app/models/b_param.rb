@@ -1,4 +1,4 @@
-# b_param stands for Bike param
+# bikeParam stands for Bike param
 class BParam < ActiveRecord::Base
   attr_accessible :params,
                   :creator_id,
@@ -181,7 +181,7 @@ class BParam < ActiveRecord::Base
   end
 
   # Below here is revised setup, an attempt to make the process of upgrading rails easier
-  # by reducing reliance on attr_accessor, and also not creating b_params unless we need to
+  # by reducing reliance on attr_accessor, and also not creating bikeParams unless we need to
   # To protect organization registration and other non-user-set options in revised setup,
   # Set the protected attrs separately from the params hash and merging over the passed params
   def self.find_or_new_from_token(toke = nil, user_id: nil, organization_id: nil)
@@ -189,7 +189,7 @@ class BParam < ActiveRecord::Base
     b ||= without_bike.without_creator.where('created_at >= ?', Time.now - 1.month).where(id_token: toke).first
     b ||= BParam.new(creator_id: user_id, params: { revised_new: true }.as_json)
     b.creator_id ||= user_id
-    # If the org_id is present, add it to the params. Only save it if the b_param is created
+    # If the org_id is present, add it to the params. Only save it if the bikeParam is created
     if organization_id.present? && b.creation_organization_id != organization_id
       b.params = b.params.merge(bike: b.bike.merge(creation_organization_id: organization_id))
       b.update_attribute :params, b.params if b.id.present?
@@ -203,7 +203,7 @@ class BParam < ActiveRecord::Base
 
   def safe_bike_attrs(param_overrides)
     bike.merge(param_overrides).select { |k, v| self.class.assignable_attrs.include?(k.to_s) }
-        .merge(b_param_id: id,
+        .merge(bikeParam_id: id,
                creator_id: creator_id,
                cycle_type_id: cycle_type_id,
                creation_organization_id: params[:creation_organization_id])

@@ -8,7 +8,7 @@
     .row
       .col-lg-8.col-lg-offset-2.form-well
         .form-wrap
-          = f.hidden_field :b_param_id_token
+          = f.hidden_field :bikeParam_id_token
           - if @bike.location_id.present?
             = f.hidden_field :location_id, value: @location.id
           - if @bike.creation_organization_id.present?
@@ -66,10 +66,10 @@
             .form-well-input
               = f.text_field :frame_model, class: 'form-control'
           
-          - classname = (@b_param.display_email? ? '' : 'no-divider-row')
+          - classname = (@bikeParam.display_email? ? '' : 'no-divider-row')
           = render partial: '/bikes/bike_fields/revised_colors', locals: { f: f, classname: classname }
 
-          - if @b_param.display_email?
+          - if @bikeParam.display_email?
             .form-group.row.unnested-field.no-divider-row
               = f.label :owner_email, class: 'form-well-label'
               .form-well-input

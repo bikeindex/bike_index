@@ -55,28 +55,28 @@
       = render 'bikes/photo'
     
     %ul.attr-list
-      = @bike.attr_list_item(@bike.serial_display, 'Serial')
-      = @bike.attr_list_item(@bike.additional_registration, 'Additional Registration number')
+      = @bike.attr_listItem(@bike.serial_display, 'Serial')
+      = @bike.attr_listItem(@bike.additional_registration, 'Additional Registration number')
       - unless @bike.type == "bike"
-        = @bike.attr_list_item(@bike.type.titleize, "Cycle type")
-      = @bike.attr_list_item(@bike.mnfg_name, 'Manufacturer')
-      = @bike.attr_list_item(@bike.frame_model, 'Model')
-      = @bike.attr_list_item(@bike.year.to_s, 'Year')
+        = @bike.attr_listItem(@bike.type.titleize, "Cycle type")
+      = @bike.attr_listItem(@bike.mnfg_name, 'Manufacturer')
+      = @bike.attr_listItem(@bike.frame_model, 'Model')
+      = @bike.attr_listItem(@bike.year.to_s, 'Year')
       - if @bike.frame_size.present?
         - size = @bike.frame_size
         - if @bike.frame_size_unit.present?
           - if @bike.frame_size_unit.match('ordinal')
             - size = size.upcase
-        = @bike.attr_list_item(size, 'Frame size')
-      = @bike.attr_list_item(@bike.ass_name("frame_material"), 'Frame Material')
-      = @bike.attr_list_item(@bike.ass_name("handlebar_type"), 'Handlebar type')
+        = @bike.attr_listItem(size, 'Frame size')
+      = @bike.attr_listItem(@bike.ass_name("frame_material"), 'Frame Material')
+      = @bike.attr_listItem(@bike.ass_name("handlebar_type"), 'Handlebar type')
       - if @bike.front_wheel_size_id.present?
         - if @bike.front_wheel_size_id == @bike.rear_wheel_size_id
-          = @bike.attr_list_item(@bike.ass_name("front_wheel_size"), 'Wheel diameter')
+          = @bike.attr_listItem(@bike.ass_name("front_wheel_size"), 'Wheel diameter')
         - else
-          = @bike.attr_list_item(@bike.ass_name("front_wheel_size"), 'Front wheel diameter')
-          = @bike.attr_list_item(@bike.ass_name("rear_wheel_size"), 'Rear wheel diameter')
-      = @bike.attr_list_item(@bike.frame_colors.to_sentence, 'Primary colors')
+          = @bike.attr_listItem(@bike.ass_name("front_wheel_size"), 'Front wheel diameter')
+          = @bike.attr_listItem(@bike.ass_name("rear_wheel_size"), 'Rear wheel diameter')
+      = @bike.attr_listItem(@bike.frame_colors.to_sentence, 'Primary colors')
   .sharing-section.padded
     = render "/shared/share_this"
 

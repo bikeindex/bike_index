@@ -35,9 +35,9 @@ class DocumentationController < ApplicationController
   end
 
   def authorize
-    @access_code = params[:code]
-    @access_grant = Doorkeeper::AccessGrant.where(resource_owner_id: current_user.id, token: @access_code).last
-    @application = @access_grant.application if @access_grant.present?
+    @accessCode = params[:code]
+    @accessGrant = Doorkeeper::AccessGrant.where(resource_owner_id: current_user.id, token: @accessCode).last
+    @application = @accessGrant.application if @accessGrant.present?
     render layout: 'content'
   end
 
