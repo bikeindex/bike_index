@@ -125,8 +125,8 @@ protected
     if action_name == 'show'
       hash[:title_tag][:title] = "#{'Stolen ' if @bike.stolen }#{@bike.title_string}"
       hash[:meta_tags][:description] =  "#{@bike.frame_colors.to_sentence} #{@bike.title_string}, serial: #{@bike.serial_number}. #{@bike.stolen_string}#{@bike.description}"
-      if @bike.thumb_path.present? && @bike.public_images.present?
-        iurl = @bike.public_images.first.image_url
+      if @bike.thumb_path.present? && @bike.publicImages.present?
+        iurl = @bike.publicImages.first.image_url
       elsif @bike.stock_photo_url.present?
         iurl = @bike.stock_photo_url
       end
@@ -190,10 +190,10 @@ protected
         hash[:meta_tags][:"twitter:card"] = "summary_large_image"
         hash[:meta_tags][:"og:image"] = @blog.index_image_lg
         hash[:meta_tags][:"twitter:image"] = @blog.index_image_lg
-      elsif @blog.public_images.any?
+      elsif @blog.publicImages.any?
         hash[:meta_tags][:"twitter:card"] = "summary_large_image"
-        hash[:meta_tags][:"og:image"] = @blog.public_images.last.image_url 
-        hash[:meta_tags][:"twitter:image"] = @blog.public_images.last.image_url 
+        hash[:meta_tags][:"og:image"] = @blog.publicImages.last.image_url 
+        hash[:meta_tags][:"twitter:image"] = @blog.publicImages.last.image_url 
       end
     end
     hash

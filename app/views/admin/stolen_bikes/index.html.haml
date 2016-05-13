@@ -6,7 +6,7 @@
   - else
     = link_to 'Only unverified bikes', admin_stolen_bikes_url, class: "sharing-links"
 %h4
-  = link_to "View stolen notifications sent", admin_stolen_notifications_url
+  = link_to "View stolen notifications sent", admin_stolenNotifications_url
 
 %h4
   = Bike.where(stolen: true).count
@@ -56,14 +56,14 @@
           %td.not-tiny-screens
             = bike.title_string
           
-          - if bike.current_stolen_record.present?
+          - if bike.current_stolenRecord.present?
             %td.large-screens
-              = bike.current_stolen_record.theft_description
+              = bike.current_stolenRecord.theft_description
             %td
-              - if bike.current_stolen_record.address.present?
-                = bike.current_stolen_record.city
+              - if bike.current_stolenRecord.address.present?
+                = bike.current_stolenRecord.city
             %td
-              = "&#x2713;".html_safe if bike.current_stolen_record.approved
+              = "&#x2713;".html_safe if bike.current_stolenRecord.approved
           - else
             %td.large-screens
             %td

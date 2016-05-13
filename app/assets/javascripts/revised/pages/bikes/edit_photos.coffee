@@ -5,7 +5,7 @@ class BikeIndex.BikesEditPhotos extends BikeIndex
     @initializeImageUploads()
 
   initializeEventListeners: ->
-    $('#public_images').on 'change', '.is_private_check', (e) =>
+    $('#publicImages').on 'change', '.is_private_check', (e) =>
       @updateImagePrivateness(e)
     $('.edit-bike-submit-wrapper .btn').click (e) ->
       e.preventDefault()
@@ -15,15 +15,15 @@ class BikeIndex.BikesEditPhotos extends BikeIndex
     initializeSortablePhotos = @initializeSortablePhotos
     finished_upload_template = $('#image-upload-finished-template').html()
     Mustache.parse(finished_upload_template)
-    $('#new_public_image').fileupload
+    $('#new_publicImage').fileupload
       dataType: "script"
       add: (e, data) ->
         types = /(\.|\/)(gif|jpe?g|png|tiff?)$/i
         file = data.files[0]
-        $('#public_images').sortable('disable')
+        $('#publicImages').sortable('disable')
         if types.test(file.type) || types.test(file.name)
           data.context = $("<div class='upload'><p><em>#{file.name}</em></p><progress class='progress progress-info'>0%</progress></div>")
-          $('#new_public_image').append(data.context)
+          $('#new_publicImage').append(data.context)
           data.submit()
         else
           window.BikeIndexAlerts.add('error', "#{file.name} is not a gif, jpeg, or png image file")
@@ -40,7 +40,7 @@ class BikeIndex.BikesEditPhotos extends BikeIndex
           )
 
   initializeSortablePhotos: ->
-    $sortable_container = $('#public_images')
+    $sortable_container = $('#publicImages')
     $sortable_container.sortable('destroy') # In case we're reinitializing it
     pushImageOrder = @pushImageOrder
     $sortable_container.sortable
@@ -65,5 +65,5 @@ class BikeIndex.BikesEditPhotos extends BikeIndex
     $target = $(e.target)
     is_private = $target.prop('checked')
     id = $target.parents('.edit-photo-display-list-item').prop('id')
-    url_target = "#{$('#public_images').data('imagesurl')}/#{id}/is_private"
+    url_target = "#{$('#publicImages').data('imagesurl')}/#{id}/is_private"
     $.post(url_target, {is_private: is_private})

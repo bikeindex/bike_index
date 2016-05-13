@@ -1,8 +1,8 @@
 class BikeIndex.Views.AdminRecoveries extends Backbone.View
   events:
     'change #all_select':                     'allRecoverySelect'
-    'change #stolen_record_recovery_tweet':   'updateTweetLength'
-    'keydown #stolen_record_recovery_tweet': 'updateTweetLength'
+    'change #stolenRecord_recovery_tweet':   'updateTweetLength'
+    'keydown #stolenRecord_recovery_tweet': 'updateTweetLength'
     'click #use_image_for_display':          'useBikeImageForDisplay'
     
   initialize: ->
@@ -12,7 +12,7 @@ class BikeIndex.Views.AdminRecoveries extends Backbone.View
     $('.multipost_checkbox input').prop('checked', $('#all_select').prop('checked'))
 
   updateTweetLength: ->
-    length = $('#stolen_record_recovery_tweet').val().length
+    length = $('#stolenRecord_recovery_tweet').val().length
     max = $('#tweet-entry').attr('data-length')
     $('#tweet-length').text(max-length)
 

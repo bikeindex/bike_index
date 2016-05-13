@@ -133,7 +133,7 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
       rear_tire_narrow: false
       owner_email: "stolen_bike_owner@bikeindex.org"
 
-    stolen_record =
+    stolenRecord =
       date_stolen: "03-01-2013"
       theft_description: "This bike was stolen and that's no fair."
       country: "US"
@@ -149,7 +149,7 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
       type: "POST"
       data: 
         bike: stolen_bike
-        stolen_record: stolen_record
+        stolenRecord: stolenRecord
         organization_slug: $('#example_organization').attr('data-slug')
         access_token: $('#example_organization').attr('data-token')
       success: (data, textStatus, jqXHR) ->

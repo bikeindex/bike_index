@@ -26,9 +26,9 @@ describe ApplicationHelper do
         expect(result).to eq generated
       end
     end
-    context 'organization_invitation' do
+    context 'organizationInvitation' do
       it 'returns link, active if it ought to be' do
-        allow(view).to receive(:controller_name).and_return('organization_invitations')
+        allow(view).to receive(:controller_name).and_return('organizationInvitations')
         generated = '<a href="/invitations" class="">Invitations</a>'
         expect(helper.active_link('Invitations', '/invitations')).to eq(generated)
       end

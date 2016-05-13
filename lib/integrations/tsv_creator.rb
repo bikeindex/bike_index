@@ -85,25 +85,25 @@ class TsvCreator
     send_to_uploader(output)
   end
 
-  def create_stolen(blacklist=false, stolen_records: nil)
-    stolen_records ||= StolenRecord.approveds
+  def create_stolen(blacklist=false, stolenRecords: nil)
+    stolenRecords ||= StolenRecord.approveds
     filename = "#{@file_prefix}#{"approved_" if blacklist}current_stolen_bikes.tsv"
     out_file = File.join(Rails.root, filename)
     output = File.open(out_file, "w")
     output.puts stolen_header
-    stolen_records.includes(:bike).each do |sr|
+    stolenRecords.includes(:bike).each do |sr|
       output.puts sr.tsv_row if sr.tsv_row.present?
     end
     send_to_uploader(output)
   end
 
-  def create_stolen_with_reports(blacklist=false, stolen_records: nil)
-    stolen_records ||= StolenRecord.approveds_with_reports
+  def create_stolen_with_reports(blacklist=false, stolenRecords: nil)
+    stolenRecords ||= StolenRecord.approveds_with_reports
     filename = "#{@file_prefix}#{"approved_" if blacklist}current_stolen_with_reports.tsv"
     out_file = File.join(Rails.root, filename)
     output = File.open(out_file, "w")
     output.puts stolen_with_reports_header
-    stolen_records.joins(:bike).merge(Bike.with_serial).each do |sr|
+    stolenRecords.joins(:bike).merge(Bike.with_serial).each do |sr|
         next unless sr.police_report_number.present?
       output.puts sr.tsv_row(false) if sr.tsv_row.present?
     end
@@ -125,8 +125,8 @@ class TsvCreator
 
   def create_daily_tsvs
     @file_prefix = "#{@file_prefix}#{Time.now.strftime('%Y_%-m_%-d')}_"
-    create_stolen(true, stolen_records: StolenRecord.approveds.tsv_today)
-    create_stolen_with_reports(true, stolen_records: StolenRecord.approveds_with_reports.tsv_today)
+    create_stolen(true, stolenRecords: StolenRecord.approveds.tsv_today)
+    create_stolen_with_reports(true, stolenRecords: StolenRecord.approveds_with_reports.tsv_today)
     t = Time.now
     StolenRecord.tsv_today.map{ |sr| sr.update_attribute :tsved_at, t }
   end

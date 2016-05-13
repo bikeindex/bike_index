@@ -3,7 +3,7 @@ require 'spec_helper'
 describe RecoveryDisplay do
   describe 'validations' do
     it { is_expected.to validate_presence_of :quote }
-    it { is_expected.to belong_to :stolen_record }
+    it { is_expected.to belong_to :stolenRecord }
     # Before validation sets it, so test fails
     # it { should validate_presence_of :recovered_at }
   end
@@ -24,27 +24,27 @@ describe RecoveryDisplay do
     end
   end
 
-  describe 'from_stolen_record' do
+  describe 'from_stolenRecord' do
     it "doesn't break if stolen record isn't present" do
       recovery_display = RecoveryDisplay.new
-      recovery_display.from_stolen_record(69)
+      recovery_display.from_stolenRecord(69)
       expect(recovery_display.errors).not_to be_present
     end
     it 'sets attrs from stolen record' do
       t = Time.now
-      stolen_record = FactoryGirl.create(:stolen_record, date_recovered: t, recovered_description: 'stuff', current: false)
+      stolenRecord = FactoryGirl.create(:stolenRecord, date_recovered: t, recovered_description: 'stuff', current: false)
       recovery_display = RecoveryDisplay.new
-      recovery_display.from_stolen_record(stolen_record.id)
+      recovery_display.from_stolenRecord(stolenRecord.id)
       expect(recovery_display.quote).to eq('stuff')
       expect(recovery_display.date_recovered).to be > Time.now - 5.seconds
-      expect(recovery_display.stolen_record_id).to eq(stolen_record.id)
+      expect(recovery_display.stolenRecord_id).to eq(stolenRecord.id)
     end
     it 'sets name from stolen record' do
       user = FactoryGirl.create(:user, name: 'somebody special')
       ownership = FactoryGirl.create(:ownership, creator: user, user: user)
-      stolen_record = FactoryGirl.create(:stolen_record, bike: ownership.bike)
+      stolenRecord = FactoryGirl.create(:stolenRecord, bike: ownership.bike)
       recovery_display = RecoveryDisplay.new
-      recovery_display.from_stolen_record(stolen_record.id)
+      recovery_display.from_stolenRecord(stolenRecord.id)
       expect(recovery_display.quote_by).to eq('somebody special')
     end
   end

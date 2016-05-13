@@ -9,7 +9,7 @@ class Admin::DashboardController < Admin::BaseController
 
   def invitations
     @organizations = Organization.all 
-    @organization_invitation = OrganizationInvitation.new 
+    @organizationInvitation = OrganizationInvitation.new 
   end
 
   def maintenance

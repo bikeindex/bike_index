@@ -12,21 +12,21 @@ describe RecoveryNotifyWorker do
     # WE AREN'T ACTUALLY USING THIS ANYMORE
     # Sidekiq::Testing.inline! do
     bike = FactoryGirl.create(:stolen_bike)
-    stolen_record = bike.current_stolen_record
-    stolen_record.can_share_recovery = true
-    stolen_record.date_recovered = Time.now
-    stolen_record.recovered_description = 'Lorem ipsum'
-    stolen_record.index_helped_recovery = true
-    stolen_record.recovery_tweet = 'The BikeIndex is awesome and someone helped me find my bike!'
-    stolen_record.recovery_share = 'Some guy named Poopypants found my bike on Craigslist and posted on the BikeIndex and I called the police who checked out my BikeIndex page and went to the Craigslister and got my bike back'
-    stolen_record.current = false
-    stolen_record.save
+    stolenRecord = bike.current_stolenRecord
+    stolenRecord.can_share_recovery = true
+    stolenRecord.date_recovered = Time.now
+    stolenRecord.recovered_description = 'Lorem ipsum'
+    stolenRecord.index_helped_recovery = true
+    stolenRecord.recovery_tweet = 'The BikeIndex is awesome and someone helped me find my bike!'
+    stolenRecord.recovery_share = 'Some guy named Poopypants found my bike on Craigslist and posted on the BikeIndex and I called the police who checked out my BikeIndex page and went to the Craigslister and got my bike back'
+    stolenRecord.current = false
+    stolenRecord.save
     bike.save
     work = RecoveryNotifyWorker.new
-    work.perform(stolen_record.id)
-    expect(stolen_record.recovery_share).to be_present
-    expect(stolen_record.recovery_tweet).to be_present
-    # stolen_record.reload.recovery_posted.should be_true
+    work.perform(stolenRecord.id)
+    expect(stolenRecord.recovery_share).to be_present
+    expect(stolenRecord.recovery_tweet).to be_present
+    # stolenRecord.reload.recovery_posted.should be_true
   end
   # end
 end

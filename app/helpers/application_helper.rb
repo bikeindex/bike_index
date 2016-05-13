@@ -51,7 +51,7 @@ module ApplicationHelper
       elsif action_name == 'show' && link_text == 'Go hard'
         class_name = 'active'
       end
-    elsif controller_name == 'organization_invitations' && link_text == 'Invitations'
+    elsif controller_name == 'organizationInvitations' && link_text == 'Invitations'
       class_name = 'active'
     else
       class_name = controller_name == link_text.downcase.gsub(' ', '_') ? 'active' : ''

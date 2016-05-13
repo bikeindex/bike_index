@@ -61,17 +61,17 @@ class BParam < ActiveRecord::Base
     h[:bike][:creation_organization_id] = org.id if org.present?
     # Move un-nested params outside of bike
     [:test, :id, :components].each { |k| h[k] = h[:bike].delete k }
-    stolen = h[:bike].delete :stolen_record
+    stolen = h[:bike].delete :stolenRecord
     if stolen && stolen.delete_if { |k,v| v.blank? } && stolen.keys.any?
       h[:bike][:stolen] = true
-      h[:stolen_record] = stolen 
+      h[:stolenRecord] = stolen 
     end
     h
   end
 
   def set_foreign_keys
     return true unless params.present? && bike.present?
-    bike[:stolen] = true if params[:stolen_record].present?
+    bike[:stolen] = true if params[:stolenRecord].present?
     set_wheel_size_key unless bike[:rear_wheel_size_id].present?
     if bike[:manufacturer_id].present?
       params[:bike][:manufacturer_id] = Manufacturer.fuzzy_id(bike[:manufacturer_id])

@@ -85,7 +85,7 @@ describe MailerIntegration do
   describe 'template_config' do
     context 'existing template_config' do
       it 'returns the config hash' do
-        config = MailerIntegration.new.template_config('stolen_notification_email')
+        config = MailerIntegration.new.template_config('stolenNotification_email')
         expect(config.keys).to eq config_keys
       end
     end

@@ -14,12 +14,12 @@ describe Api::V1::NotificationsController do
 
     it 'sends an email if the authorization works' do
       expect(CustomerContact.count).to eq(0)
-      stolen_record = FactoryGirl.create(:stolen_record)
+      stolenRecord = FactoryGirl.create(:stolenRecord)
       options = {
         access_token: ENV['NOTIFICATIONS_API_KEY'],
         notification_hash: {
           notification_type: 'stolen_twitter_alerter',
-          bike_id: stolen_record.bike.id,
+          bike_id: stolenRecord.bike.id,
           tweet_id: 69,
           tweet_string: 'STOLEN - something special',
           tweet_account_screen_name: 'bikeindex',
@@ -34,21 +34,21 @@ describe Api::V1::NotificationsController do
       expect(response.code).to eq('200')
       expect(CustomerContact.count).to eq(1)
       customer_contact = CustomerContact.first
-      expect(customer_contact.info_hash[:bike_id].to_i).to eq(stolen_record.bike.id)
+      expect(customer_contact.info_hash[:bike_id].to_i).to eq(stolenRecord.bike.id)
       expect(customer_contact.info_hash[:tweet_string]).to eq('STOLEN - something special')
       expect(customer_contact.info_hash[:notification_type]).to eq('stolen_twitter_alerter')
     end
 
     it 'sends a recovered email if the authorization works' do
       expect(CustomerContact.count).to eq(0)
-      stolen_record = FactoryGirl.create(:stolen_record)
-      bike = stolen_record.bike
+      stolenRecord = FactoryGirl.create(:stolenRecord)
+      bike = stolenRecord.bike
       bike.update_attribute :recovered, true
       options = {
         access_token: ENV['NOTIFICATIONS_API_KEY'],
         notification_hash: {
           notification_type: 'stolen_twitter_alerter',
-          bike_id: stolen_record.bike.id,
+          bike_id: stolenRecord.bike.id,
           tweet_id: 69,
           tweet_string: 'FOUND - something special',
           tweet_account_screen_name: 'bikeindex',
@@ -63,7 +63,7 @@ describe Api::V1::NotificationsController do
       expect(response.code).to eq('200')
       expect(CustomerContact.count).to eq(1)
       customer_contact = CustomerContact.first
-      expect(customer_contact.info_hash[:bike_id].to_i).to eq(stolen_record.bike.id)
+      expect(customer_contact.info_hash[:bike_id].to_i).to eq(stolenRecord.bike.id)
       expect(customer_contact.info_hash[:tweet_string]).to eq('FOUND - something special')
       expect(customer_contact.title).to eq('We tweeted about the bike you recovered!')
       expect(customer_contact.info_hash[:notification_type]).to eq('stolen_twitter_alerter')

@@ -7,8 +7,8 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
 
   def new
     @recovery_display = RecoveryDisplay.new
-    if params[:stolen_record_id].present?
-      @recovery_display.from_stolen_record(params[:stolen_record_id])
+    if params[:stolenRecord_id].present?
+      @recovery_display.from_stolenRecord(params[:stolenRecord_id])
       @bike = @recovery_display.bike
     end
   end

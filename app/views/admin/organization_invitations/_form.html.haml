@@ -1,13 +1,13 @@
 .form.form-horizontal#chosen-container
-  = form_for [:admin, @organization_invitation] do |f|
-    - if @organization_invitation.errors.any?
+  = form_for [:admin, @organizationInvitation] do |f|
+    - if @organizationInvitation.errors.any?
       #alert-block
         .alert.alert-error
           %h4
             Please fix the following 
-            = pluralize(@organization_invitation.errors.count, "error")
+            = pluralize(@organizationInvitation.errors.count, "error")
           %ul
-            - @organization_invitation.errors.full_messages.each do |msg|
+            - @organizationInvitation.errors.full_messages.each do |msg|
               %li
                 = msg
     %h3
@@ -17,7 +17,7 @@
       %label.control-label
         Organization select
       .controls
-        = collection_select( :organization_invitation, :organization_id, @organizations, :id, :name, :required =>true, prompt: "Choose an organization")
+        = collection_select( :organizationInvitation, :organization_id, @organizations, :id, :name, :required =>true, prompt: "Choose an organization")
           
     .control-group.padded
       = f.label :invitee_email, "Email you're inviting", class: "control-label"

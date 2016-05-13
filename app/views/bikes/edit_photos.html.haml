@@ -11,9 +11,9 @@
           %h5.light-italic
             Drag the uploaded photos to rearrange the order in which they appear
 
-        %ul#public_images.row.edit-photo-display-list{ data: { orderurl: order_public_images_url, imagesurl: public_images_url } }
-          = render partial: '/public_images/revised_public_image', collection: @bike.public_images, as: :image
-          = render partial: '/public_images/revised_public_image', collection: @private_images, as: :image
+        %ul#publicImages.row.edit-photo-display-list{ data: { orderurl: order_publicImages_url, imagesurl: publicImages_url } }
+          = render partial: '/publicImages/revised_publicImage', collection: @bike.publicImages, as: :image
+          = render partial: '/publicImages/revised_publicImage', collection: @private_images, as: :image
 
         %hr
         = form_for PublicImage.new do |f|
@@ -26,7 +26,7 @@
                   Upload Photos 
                 button
               %label.file
-                = f.file_field :image, multiple: true, name: "public_image[image]"
+                = f.file_field :image, multiple: true, name: "publicImage[image]"
                 %span.file-custom
 / Mustache template for rendering post upload
 :plain

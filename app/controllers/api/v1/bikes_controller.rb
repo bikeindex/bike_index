@@ -91,7 +91,7 @@ module Api
         # Google app script doesn't support nested params -
         # So we're doing this.
         params[:bike] = JSON.parse params[:bike] if params[:bike].kind_of?(String)
-        params[:stolen_record] = JSON.parse params[:stolen_record] if params[:stolen_record].kind_of?(String)
+        params[:stolenRecord] = JSON.parse params[:stolenRecord] if params[:stolenRecord].kind_of?(String)
         params[:components] = JSON.parse params[:components] if params[:components].kind_of?(String)
         params
       end

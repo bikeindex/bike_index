@@ -22,8 +22,8 @@ class BikeIndex.Views.AdminBikesEdit extends Backbone.View
     $target = $(target)
     initial_opts = []
     initial_opts = [$target.data('initial')] if $target.data('initial')
-    per_page = 10
-    frame_mnfg_url = "#{window.root_url}/api/autocomplete?per_page=#{per_page}&categories=frame_mnfg&q="
+    perPage = 10
+    frame_mnfg_url = "#{window.root_url}/api/autocomplete?perPage=#{perPage}&categories=frame_mnfg&q="
     $target.selectize
       options: initial_opts
       selectOnTab: true
@@ -46,7 +46,7 @@ class BikeIndex.Views.AdminBikesEdit extends Backbone.View
           error: ->
             callback()
           success: (res) ->
-            callback res.matches.slice(0, per_page)
+            callback res.matches.slice(0, perPage)
 
   setFrameSize: ->
     unit = $('#bike_frame_size_unit').val()

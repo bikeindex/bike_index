@@ -27,7 +27,7 @@ describe BikeSearcher do
           { id: 'serial', search_id: 's#8xcvxcvcx#', text: '8xcvxcvcx' },
           { text: 'something+cool', search_id: 'something+cool' }
         ].as_json
-      result = searcher.selectize_items
+      result = searcher.selectizeItems
       expect(result).to eq target
       result.each { |t| expect(target.include?(t)).to be_truthy }
       target.each { |t| expect(result.include?(t)).to be_truthy }

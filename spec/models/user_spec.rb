@@ -14,10 +14,10 @@ describe User do
     it { is_expected.to have_many :integrations }
     it { is_expected.to have_many :created_ownerships }
     it { is_expected.to have_many :locks }
-    it { is_expected.to have_many :organization_invitations }
+    it { is_expected.to have_many :organizationInvitations }
     it { is_expected.to have_many :oauth_applications }
-    it { is_expected.to have_many :sent_stolen_notifications }
-    it { is_expected.to have_many :received_stolen_notifications }
+    it { is_expected.to have_many :sent_stolenNotifications }
+    it { is_expected.to have_many :received_stolenNotifications }
     it { is_expected.to serialize :paid_membership_info }
     it { is_expected.to serialize :my_bikes_hash }
     it { is_expected.to validate_presence_of :email }

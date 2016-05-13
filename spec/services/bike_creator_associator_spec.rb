@@ -40,14 +40,14 @@ describe BikeCreatorAssociator do
     end
   end
 
-  describe 'create_stolen_record' do
+  describe 'create_stolenRecord' do
     it 'calls create stolen record and set_creation_organization' do
       b_param = BParam.new
       bike = Bike.new
       allow(bike).to receive(:creation_organization).and_return(true)
       expect_any_instance_of(StolenRecordUpdator).to receive(:create_new_record).and_return(true)
       expect_any_instance_of(StolenRecordUpdator).to receive(:set_creation_organization).and_return(true)
-      BikeCreatorAssociator.new(b_param).create_stolen_record(bike)
+      BikeCreatorAssociator.new(b_param).create_stolenRecord(bike)
     end
   end
 
@@ -72,7 +72,7 @@ describe BikeCreatorAssociator do
       expect(b_param.image).to be_present
       b_param.params = p
       BikeCreatorAssociator.new(b_param).attach_photo(bike)
-      expect(bike.public_images.count).to eq(1)
+      expect(bike.publicImages.count).to eq(1)
     end
   end
 
@@ -83,7 +83,7 @@ describe BikeCreatorAssociator do
   #     b_param.params = {bike: {bike_image: File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg'))}}
   #     b_param.save
   #     BikeCreatorAssociator.new(b_param).add_uploaded_image(bike)
-  #     bike.reload.public_images.count.should eq(1)
+  #     bike.reload.publicImages.count.should eq(1)
   #   end
   # end
 
@@ -93,7 +93,7 @@ describe BikeCreatorAssociator do
       creator = BikeCreatorAssociator.new
       allow(bike).to receive(:stolen).and_return(true)
       expect(creator).to receive(:create_ownership).and_return(bike)
-      expect(creator).to receive(:create_stolen_record).and_return(bike)
+      expect(creator).to receive(:create_stolenRecord).and_return(bike)
       expect(creator).to receive(:create_components).and_return(bike)
       expect(creator).to receive(:create_normalized_serial_segments).and_return(bike)
       expect(creator).to receive(:attach_photo)
@@ -105,7 +105,7 @@ describe BikeCreatorAssociator do
       bike = Bike.new
       creator = BikeCreatorAssociator.new
       allow(bike).to receive(:stolen).and_return(true)
-      allow(bike).to receive(:create_stolen_record).and_raise(StolenRecordError, 'Gobledy gook')
+      allow(bike).to receive(:create_stolenRecord).and_raise(StolenRecordError, 'Gobledy gook')
       creator.associate(bike)
       expect(bike.errors.messages[:association_error]).not_to be_nil
     end

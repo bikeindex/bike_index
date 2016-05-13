@@ -27,7 +27,7 @@ class User < ActiveRecord::Base
     :show_bikes,
     :show_phone,
     :has_stolen_bikes,
-    :can_send_many_stolen_notifications,
+    :can_send_many_stolenNotifications,
     :my_bikes_link_target,
     :my_bikes_link_title,
     :is_emailable
@@ -54,11 +54,11 @@ class User < ActiveRecord::Base
   has_many :created_bicycles, class_name: 'Bike', inverse_of: :creator
   has_many :locks, dependent: :destroy
 
-  has_many :sent_stolen_notifications, class_name: 'StolenNotification', foreign_key: :sender_id
-  has_many :received_stolen_notifications, class_name: 'StolenNotification', foreign_key: :receiver_id
+  has_many :sent_stolenNotifications, class_name: 'StolenNotification', foreign_key: :sender_id
+  has_many :received_stolenNotifications, class_name: 'StolenNotification', foreign_key: :receiver_id
 
-  has_many :organization_invitations, class_name: 'OrganizationInvitation', inverse_of: :inviter
-  has_many :organization_invitations, class_name: 'OrganizationInvitation', inverse_of: :invitee
+  has_many :organizationInvitations, class_name: 'OrganizationInvitation', inverse_of: :inviter
+  has_many :organizationInvitations, class_name: 'OrganizationInvitation', inverse_of: :invitee
 
   before_create :generate_username_confirmation_and_auth
   serialize :paid_membership_info

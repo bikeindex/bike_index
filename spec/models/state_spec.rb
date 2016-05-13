@@ -3,7 +3,7 @@ require 'spec_helper'
 describe State do
   describe 'validations' do
     it { is_expected.to have_many :locations }
-    it { is_expected.to have_many :stolen_records }
+    it { is_expected.to have_many :stolenRecords }
     it { is_expected.to belong_to :country }
     it { is_expected.to validate_presence_of :country_id }
     it { is_expected.to validate_presence_of :name }

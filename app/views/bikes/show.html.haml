@@ -18,7 +18,7 @@
         - else
           Whoah, this awesome #{@bike.type} is yours!
 
-        - if @bike.public_images.any?
+        - if @bike.publicImages.any?
           Add some more information about it
         - else
           - if @bike.stolen
@@ -80,7 +80,7 @@
   .sharing-section.padded
     = render "/shared/share_this"
 
-  - if @bike.stolen && @stolen_record.present?
+  - if @bike.stolen && @stolenRecord.present?
     = render 'stolen_show_fields'
 
   - if @bike.description.present?

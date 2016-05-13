@@ -58,8 +58,8 @@ class OrganizationsController < ApplicationController
   def show
     bikes = Bike.where(creation_organization_id: @organization.id).order("created_at desc")
     page = params[:page] || 1
-    per_page = params[:per_page] || 25
-    bikes = bikes.page(page).per(per_page)
+    perPage = params[:perPage] || 25
+    bikes = bikes.page(page).per(perPage)
     @bikes = bikes.decorate
     @organization = @organization.decorate
   end
@@ -116,7 +116,7 @@ class OrganizationsController < ApplicationController
       EmailLightspeedNotificationWorker.perform_async(@organization.id, api_key)
       flash[:notice] = "Thanks for updating your LightSpeed API Key!"
       redirect_to organization_url(@organization) and return
-      # @stolen_notification = StolenNotification.new(params[:stolen_notification])
+      # @stolenNotification = StolenNotification.new(params[:stolenNotification])
     else
       if @organization.update_attributes(allowed_attributes)
         if @organization.wants_to_be_shown && @organization.show_on_map == false

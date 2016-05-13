@@ -65,7 +65,7 @@
 
                   = f.text_field :phone, required: "true", value: current_user.phone
             .input-group
-              = fields_for :stolen_record do |builder|
+              = fields_for :stolenRecord do |builder|
                 #stolen-bike-location.control-group
                   = builder.label :street, "Where was it stolen?", class: "control-label"
                   #country_select_container.controls.special-select-single

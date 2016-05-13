@@ -9,8 +9,8 @@ class Admin::RecoveriesController < Admin::BaseController
       recoveries = StolenRecord.displayable.includes(:bike).order("date_recovered desc")
     end
     page = params[:page] || 1
-    per_page = params[:per_page] || 50
-    @recoveries = recoveries.page(page).per(per_page)
+    perPage = params[:perPage] || 50
+    @recoveries = recoveries.page(page).per(perPage)
   end
 
   def show
@@ -23,8 +23,8 @@ class Admin::RecoveriesController < Admin::BaseController
   end
 
   def update
-    @stolen_record = StolenRecord.unscoped.find(params[:id])
-    if @stolen_record.update_attributes(params[:stolen_record])
+    @stolenRecord = StolenRecord.unscoped.find(params[:id])
+    if @stolenRecord.update_attributes(params[:stolenRecord])
       flash[:notice] = "Recovery Saved!"
       redirect_to admin_recoveries_url
     else

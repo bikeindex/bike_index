@@ -74,7 +74,7 @@ class BikeIndex.BikeSearchBar extends BikeIndex
 
   initializeHeaderSearch: ($query_field) ->
     initial_opts = if $query_field.data('initial') then $query_field.data('initial') else []
-    per_page = 15
+    perPage = 15
     renderOption = @renderOption
     updateIncludeSerialOption = @updateIncludeSerialOption
     $query_field.selectize
@@ -103,12 +103,12 @@ class BikeIndex.BikeSearchBar extends BikeIndex
       load: (query, callback) ->
         that = this
         $.ajax
-          url: "/api/autocomplete?per_page=#{per_page}&q=#{encodeURIComponent(query)}"
+          url: "/api/autocomplete?perPage=#{perPage}&q=#{encodeURIComponent(query)}"
           type: 'GET'
           error: ->
             callback()
           success: (res) ->
-            result = res.matches.slice(0, per_page)
+            result = res.matches.slice(0, perPage)
             # Only add serial option if they've entered more than 2 char
             if query.length > 2 && window.includeSerialOption
               result.push({ id: 'serial', search_id: "s##{query}#", text: "#{query}", search: query })

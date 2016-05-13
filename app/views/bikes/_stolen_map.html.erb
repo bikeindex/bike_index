@@ -9,7 +9,7 @@
 <script type="text/javascript">
   var map;
   function initialize() {
-    var center = new google.maps.LatLng(<%= @bike.current_stolen_record.latitude %>, <%= @bike.current_stolen_record.longitude %>);
+    var center = new google.maps.LatLng(<%= @bike.current_stolenRecord.latitude %>, <%= @bike.current_stolenRecord.longitude %>);
     var myOptions = {
       zoom: 13,
       center: center,

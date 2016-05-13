@@ -7,8 +7,8 @@ class BikeIndex.Views.AdminBlogsEdit extends Backbone.View
     
   initialize: ->
     @setElement($('#body'))
-    $('#public_image_image').attr('name', "public_image[image]")
-    @publicImageFileUpload() if $('#new_public_image').length > 0
+    $('#publicImage_image').attr('name', "publicImage[image]")
+    @publicImageFileUpload() if $('#new_publicImage').length > 0
     @listicleEdit() if $('#listicle_image').length > 0
     $('.edit_blog').areYouSure()
     
@@ -18,16 +18,16 @@ class BikeIndex.Views.AdminBlogsEdit extends Backbone.View
 
     
   publicImageFileUpload: ->
-    # runSortableImages = @sortableImages($('#public_images'))
-    $('#new_public_image').fileupload
+    # runSortableImages = @sortableImages($('#publicImages'))
+    $('#new_publicImage').fileupload
       dataType: "script"
       add: (e, data) ->
         types = /(\.|\/)(gif|jpe?g|png)$/i
         file = data.files[0]
-        $('#public_images').sortable('disable')
+        $('#publicImages').sortable('disable')
         if types.test(file.type) || types.test(file.name)
           data.context = $('<div class="upload"><p><em>' + file.name + '</em></p><div class="progress progress-striped active"><div class="bar" style="width: 0%"></div></div></div>')
-          $('#new_public_image').append(data.context)
+          $('#new_publicImage').append(data.context)
           data.submit()
         else
           alert("#{file.name} is not a gif, jpeg, or png image file")

@@ -51,7 +51,7 @@ describe UsersController do
         end
         it 'creates a confirmed user, log in, and send welcome if user has org invite' do
           expect_any_instance_of(CreateUserJobs).to receive(:send_welcome_email)
-          organization_invitation = FactoryGirl.create(:organization_invitation, invitee_email: 'poo@pile.com')
+          organizationInvitation = FactoryGirl.create(:organizationInvitation, invitee_email: 'poo@pile.com')
           post :create, user: FactoryGirl.attributes_for(:user, email: 'poo@pile.com')
           expect(User.from_auth(cookies.signed[:auth])).to eq(User.fuzzy_email_find('poo@pile.com'))
           expect(response).to redirect_to(user_home_url)

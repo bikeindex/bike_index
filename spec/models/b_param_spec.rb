@@ -38,13 +38,13 @@ describe BParam do
     end
     context 'existing and passed params' do
       it 'makes indifferent' do
-        b_param = BParam.new(params: { bike: { cool: 'lol' }, stolen_record: { something: 42 } })
-        merge_params = { bike: { owner_email: 'foo@example.com' }, stolen_record: { phone: '171-829-2625' } }
+        b_param = BParam.new(params: { bike: { cool: 'lol' }, stolenRecord: { something: 42 } })
+        merge_params = { bike: { owner_email: 'foo@example.com' }, stolenRecord: { phone: '171-829-2625' } }
         b_param.clean_params(merge_params)
         expect(b_param.params[:bike][:cool]).to eq('lol')
         expect(b_param.params[:bike][:owner_email]).to eq('foo@example.com')
-        expect(b_param.params[:stolen_record][:something]).to eq(42)
-        expect(b_param.params[:stolen_record][:phone]).to eq('171-829-2625')
+        expect(b_param.params[:stolenRecord][:something]).to eq(42)
+        expect(b_param.params[:stolenRecord][:phone]).to eq('171-829-2625')
       end
     end
     it 'has before_save_callback_method of clean_params' do
@@ -58,7 +58,7 @@ describe BParam do
         serial: 'something',
         manufacturer: 'something else',
         test: true,
-        stolen_record: {
+        stolenRecord: {
           date_stolen: '',
           phone: nil
         }
@@ -71,7 +71,7 @@ describe BParam do
       expect(k.keys.length).to eq(3)
       expect(b_param.params[:test]).to be_truthy
       expect(b_param.params[:stolen]).to be_falsey
-      expect(b_param.params[:stolen_record]).not_to be_present
+      expect(b_param.params[:stolenRecord]).not_to be_present
     end
     it 'gets the organization id' do
       org = FactoryGirl.create(:organization, name: 'Something')

@@ -28,20 +28,20 @@ describe BikeUpdator do
     end
   end
 
-  describe 'update_stolen_record' do
-    it 'calls update_stolen_record with the date_stolen_input if it exists' do
+  describe 'update_stolenRecord' do
+    it 'calls update_stolenRecord with the date_stolen_input if it exists' do
       FactoryGirl.create(:country, iso: 'US')
       bike = FactoryGirl.create(:bike, stolen: true)
       updator = BikeUpdator.new(b_params: { id: bike.id, bike: { date_stolen_input: '07-09-2000' } })
-      updator.update_stolen_record
-      csr = bike.find_current_stolen_record
+      updator.update_stolenRecord
+      csr = bike.find_current_stolenRecord
       expect(csr.date_stolen).to eq(DateTime.strptime('07-09-2000 06', '%m-%d-%Y %H'))
     end
     it "creates a stolen record if one doesn't exist" do
       FactoryGirl.create(:country, iso: 'US')
       bike = FactoryGirl.create(:bike)
-      BikeUpdator.new(b_params: { id: bike.id, bike: { stolen: true } }).update_stolen_record
-      expect(bike.stolen_records.count).not_to be_nil
+      BikeUpdator.new(b_params: { id: bike.id, bike: { stolen: true } }).update_stolenRecord
+      expect(bike.stolenRecords.count).not_to be_nil
     end
   end
 

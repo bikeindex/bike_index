@@ -1,10 +1,10 @@
 <section class="bibox-top">    
-  <%= link_to edit_bike_url(@public_image.imageable), class: "back" do %>
+  <%= link_to edit_bike_url(publicImage.imageable), class: "back" do %>
     <span>Back Arrow</span>Back to <em>Editing Bike</em>
   <% end %>
 
   <h2>
-    <% if current_user.email == @public_image.imageable.owner_email %>
+    <% if current_user.email == publicImage.imageable.owner_email %>
       <% end %>
   </h2>
   
@@ -19,6 +19,6 @@
   <div class="padded span6"> 
     <div class="well"><%= render 'form' %></div>
   </div>
-  <div class="padded span6"><%= link_to image_tag(@public_image.image_url(:medium)), @public_image.image_url, target: "_blank" %></div>
+  <div class="padded span6"><%= link_to image_tag(publicImage.image_url(:medium)), publicImage.image_url, target: "_blank" %></div>
 
 </div>

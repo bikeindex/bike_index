@@ -3,7 +3,7 @@ class Country < ActiveRecord::Base
   validates_presence_of :name
   validates_uniqueness_of :name
   validates_uniqueness_of :iso
-  has_many :stolen_records
+  has_many :stolenRecords
   has_many :locations
 
   def self.fuzzy_iso_find(n)

@@ -8,8 +8,8 @@ class Admin::PaintsController < Admin::BaseController
       paints = Paint.order("bikes_count DESC")
     end
     page = params[:page] || 1
-    per_page = params[:per_page] || 100
-    @paints = paints.includes(:color, :secondary_color, :tertiary_color).page(page).per(per_page)
+    perPage = params[:perPage] || 100
+    @paints = paints.includes(:color, :secondary_color, :tertiary_color).page(page).per(perPage)
   end
 
   # def new

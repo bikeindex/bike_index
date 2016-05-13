@@ -92,7 +92,7 @@ templates:
       - bike_manufacturer
       - bike_serial
       - bike_paint_string
-  - name: organization_invitation_email
+  - name: organizationInvitation_email
     subject: 'Join {{organization_name}} on the Bike Index'
     description: 'Sent when you are invited to be part of an organization'
     args:
@@ -100,13 +100,13 @@ templates:
       - inviter_display_name
       - new_user_url
       - organization_name
-  - name: stolen_notification_email
-    subject: '{{stolen_notification_display_subject}}'
+  - name: stolenNotification_email
+    subject: '{{stolenNotification_display_subject}}'
     description: 'Sent when someone contacts the owner of a stolen bike through the contact form on Bike Index'
     args:
       - sender_email
       - bike_url
       - bike_type
-      - stolen_notification_message
+      - stolenNotification_message
       - sender_display_name
-      - stolen_notification_display_subject
+      - stolenNotification_display_subject

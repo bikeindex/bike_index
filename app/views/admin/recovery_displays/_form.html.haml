@@ -10,8 +10,8 @@
             - @recovery_display.errors.full_messages.each do |msg|
               %li
                 = msg
-    - if @recovery_display.stolen_record_id.present?
-      = f.hidden_field :stolen_record_id, value: @recovery_display.stolen_record_id
+    - if @recovery_display.stolenRecord_id.present?
+      = f.hidden_field :stolenRecord_id, value: @recovery_display.stolenRecord_id
     .well.clearfix
       .span6
         .control-group
@@ -52,10 +52,10 @@
               = f.check_box :remove_image
         - elsif @bike.present? && @recovery_display.image.blank?
           .control-group.extra-field
-            - if @bike.public_images.present? || @bike.stock_photo_url.present?
-              - if @bike.public_images.present?
+            - if @bike.publicImages.present? || @bike.stock_photo_url.present?
+              - if @bike.publicImages.present?
                 - text = "has image"
-                - url = @bike.public_images.first.image_url
+                - url = @bike.publicImages.first.image_url
               - else
                 - text = "has stock image"
                 - url = @bike.stock_photo_url

@@ -10,7 +10,7 @@ describe BikesController do
           expect(response).to render_template(:index)
           expect(response).to render_with_layout('application_updated')
           expect(flash).to_not be_present
-          expect(assigns(:per_page)).to eq 10
+          expect(assigns(:perPage)).to eq 10
         end
       end
       context 'revised' do
@@ -22,7 +22,7 @@ describe BikesController do
             expect(response).to render_template(:index_revised)
             expect(response).to render_with_layout('application_revised')
             expect(flash).to_not be_present
-            expect(assigns(:per_page)).to eq 10
+            expect(assigns(:perPage)).to eq 10
             expect(assigns(:stolenness)).to eq 'stolen'
           end
         end
@@ -32,7 +32,7 @@ describe BikesController do
             get :index, proximity: 'ip'
             expect(response.status).to eq(200)
             expect(flash).to_not be_present
-            expect(assigns(:per_page)).to eq 10
+            expect(assigns(:perPage)).to eq 10
             expect(assigns(:stolenness)).to eq 'stolen_proximity'
           end
         end
@@ -45,12 +45,12 @@ describe BikesController do
                 stolen: '',
                 non_stolen: 'true'
             expect(response.status).to eq(200)
-            target_selectize_items = [
+            target_selectizeItems = [
               manufacturer.autocomplete_result_hash,
               color.autocomplete_result_hash,
               { id: 'serial', search_id: 's#serialzzzzzz#', text: 'serialzzzzzz' }
             ].as_json
-            expect(assigns(:selectize_items)).to eq target_selectize_items
+            expect(assigns(:selectizeItems)).to eq target_selectizeItems
             expect(assigns(:stolenness)).to eq 'non_stolen'
           end
         end
@@ -178,12 +178,12 @@ describe BikesController do
       expect(response).to redirect_to bike_url(bike)
     end
     it 'redirects to the proper page' do
-      bike = FactoryGirl.create(:bike, card_id: 2)
-      get :scanned, card_id: bike.card_id
+      bike = FactoryGirl.create(:bike, cardId: 2)
+      get :scanned, cardId: bike.cardId
       expect(response).to redirect_to bike_url(bike)
     end
     it "renders a page if there isn't a connection" do
-      get :scanned, card_id: 12
+      get :scanned, cardId: 12
       expect(response.code).to eq('200')
     end
   end
@@ -677,22 +677,22 @@ describe BikesController do
         # And finally, that it redirects to the correct page
         it 'updates and returns to the right page' do
           allow(controller).to receive(:revised_layout_enabled?) { true }
-          stolen_record = FactoryGirl.create(:stolen_record, bike: bike, city: 'party')
+          stolenRecord = FactoryGirl.create(:stolenRecord, bike: bike, city: 'party')
           bike.stolen = true
           # bike.marked_user_hidden = true
           bike.save
-          expect(stolen_record.date_stolen).to be_present
+          expect(stolenRecord.date_stolen).to be_present
           bike.reload
-          # bike.update_attributes(stolen: true, current_stolen_record_id: stolen_record.id)
+          # bike.update_attributes(stolen: true, current_stolenRecord_id: stolenRecord.id)
           bike.reload
-          expect(bike.find_current_stolen_record).to eq stolen_record
+          expect(bike.find_current_stolenRecord).to eq stolenRecord
           put :update,
               id: bike.id,
               edit_template: 'fancy_template',
               bike: {
                 stolen: true,
-                stolen_records_attributes: {
-                  stolen_record.id.to_s => {
+                stolenRecords_attributes: {
+                  stolenRecord.id.to_s => {
                     date_stolen_input: 'Mon Feb 22 2016',
                     phone: '9999999999',
                     street: '66666666 foo street'
@@ -705,16 +705,16 @@ describe BikesController do
           expect(bike.stolen).to be_truthy
           # expect(bike.hidden).to be_truthy
           # Stupid cheat because we're creating an extra record here for fuck all reason
-          current_stolen_record = bike.find_current_stolen_record
+          current_stolenRecord = bike.find_current_stolenRecord
 
-          # expect(bike.stolen_records.count).to eq 1
-          # stolen_record.reload
-          # expect(bike.find_current_stolen_record.id).to eq stolen_record.id
-          # stolen_record.reload
-          expect(current_stolen_record.phone).to eq '9999999999'
-          # expect(current_stolen_record.city).to eq 'party'
-          expect(current_stolen_record.street).to eq '66666666 foo street'
-          expect(current_stolen_record.date_stolen).to eq DateTime.strptime('02-22-2016 06', '%m-%d-%Y %H')
+          # expect(bike.stolenRecords.count).to eq 1
+          # stolenRecord.reload
+          # expect(bike.find_current_stolenRecord.id).to eq stolenRecord.id
+          # stolenRecord.reload
+          expect(current_stolenRecord.phone).to eq '9999999999'
+          # expect(current_stolenRecord.city).to eq 'party'
+          expect(current_stolenRecord.street).to eq '66666666 foo street'
+          expect(current_stolenRecord.date_stolen).to eq DateTime.strptime('02-22-2016 06', '%m-%d-%Y %H')
         end
       end
     end

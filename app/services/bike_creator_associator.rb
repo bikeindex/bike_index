@@ -18,7 +18,7 @@ class BikeCreatorAssociator
     ComponentCreator.new(bike: bike, b_param: @b_param).create_components_from_params
   end
 
-  def create_stolen_record(bike)
+  def create_stolenRecord(bike)
     StolenRecordUpdator.new(bike: bike, user: @b_param.creator, b_param: @b_param.params).create_new_record
     StolenRecordUpdator.new(bike: bike).set_creation_organization if bike.creation_organization.present?
     bike.save
@@ -30,9 +30,9 @@ class BikeCreatorAssociator
 
   def attach_photo(bike)
     return true unless @b_param.image.present?
-    public_image = PublicImage.new(image: @b_param.image)
-    public_image.imageable = bike
-    public_image.save
+    publicImage = PublicImage.new(image: @b_param.image)
+    publicImage.imageable = bike
+    publicImage.save
     @b_param.update_attributes(image_processed: true)
     bike.reload
   end
@@ -54,7 +54,7 @@ class BikeCreatorAssociator
       create_ownership(bike)
       create_components(bike)
       create_normalized_serial_segments(bike)
-      create_stolen_record(bike) if bike.stolen
+      create_stolenRecord(bike) if bike.stolen
       attach_photo(bike)
       attach_photos(bike)
       add_other_listings(bike)

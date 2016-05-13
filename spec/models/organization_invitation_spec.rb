@@ -12,16 +12,16 @@ describe OrganizationInvitation do
 
   describe 'create' do
     before :each do
-      @o = FactoryGirl.create(:organization_invitation)
+      @o = FactoryGirl.create(:organizationInvitation)
     end
 
-    it 'creates a valid organization_invitation' do
+    it 'creates a valid organizationInvitation' do
       expect(@o.valid?).to be_truthy
     end
 
     it 'assigns to user if the user exists' do
       @user = FactoryGirl.create(:user)
-      @o1 = FactoryGirl.create(:organization_invitation, invitee_email: @user.email)
+      @o1 = FactoryGirl.create(:organizationInvitation, invitee_email: @user.email)
       expect(@user.memberships.count).to eq(1)
       expect(@o1.redeemed).to be_truthy
     end
@@ -29,7 +29,7 @@ describe OrganizationInvitation do
 
   it 'enqueues an email job' do
     expect do
-      FactoryGirl.create(:organization_invitation)
+      FactoryGirl.create(:organizationInvitation)
     end.to change(EmailOrganizationInvitationWorker.jobs, :size).by(1)
   end
 
@@ -44,7 +44,7 @@ describe OrganizationInvitation do
   describe 'assign_to(user)' do
     before :each do
       @organization = FactoryGirl.create(:organization)
-      @o = FactoryGirl.create(:organization_invitation, organization: @organization, invitee_email: 'EMAIL@email.com')
+      @o = FactoryGirl.create(:organizationInvitation, organization: @organization, invitee_email: 'EMAIL@email.com')
       @user = FactoryGirl.create(:user, email: 'EMAIL@email.com')
     end
 
@@ -55,7 +55,7 @@ describe OrganizationInvitation do
 
     it "sets the user's name if the name is blank" do
       @user2 = FactoryGirl.create(:user, name: nil)
-      @o2 = FactoryGirl.create(:organization_invitation, organization: @organization, invitee_email: @user2.email, invitee_name: 'Biker Name')
+      @o2 = FactoryGirl.create(:organizationInvitation, organization: @organization, invitee_email: @user2.email, invitee_name: 'Biker Name')
       @o2.assign_to(@user2)
       expect(@user2.reload.name).to eq('Biker Name')
     end
@@ -86,7 +86,7 @@ describe OrganizationInvitation do
     end
 
     it 'creates a membership on assignment' do
-      @o2 = FactoryGirl.create(:organization_invitation, organization: @organization, invitee_email: 'George@gma.com')
+      @o2 = FactoryGirl.create(:organizationInvitation, organization: @organization, invitee_email: 'George@gma.com')
       @user2 = FactoryGirl.create(:user, email: 'george@gma.com')
       expect do
         @o2.assign_to(@user2)

@@ -1,5 +1,5 @@
 class AddIndexToStolenRecordsLatLong < ActiveRecord::Migration
   def change
-    add_index :stolen_records, [:latitude, :longitude]
+    add_index :stolenRecords, [:latitude, :longitude]
   end
 end

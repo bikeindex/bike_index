@@ -85,9 +85,9 @@ describe 'Selections API V2' do
     it 'responds on index with pagination' do
       wheel_size = FactoryGirl.create(:wheel_size)
       FactoryGirl.create(:wheel_size)
-      get '/api/v2/selections/wheel_sizes?per_page=1'
+      get '/api/v2/selections/wheel_sizes?perPage=1'
       expect(response.header['Total']).to eq('2')
-      pagination_link = '<http://www.example.com/api/v2/selections/wheel_sizes?page=2&per_page=1>; rel="last", <http://www.example.com/api/v2/selections/wheel_sizes?page=2&per_page=1>; rel="next"'
+      pagination_link = '<http://www.example.com/api/v2/selections/wheel_sizes?page=2&perPage=1>; rel="last", <http://www.example.com/api/v2/selections/wheel_sizes?page=2&perPage=1>; rel="next"'
       expect(response.header['Link']).to eq(pagination_link)
       expect(response.code).to eq('200')
       result = JSON.parse(response.body)['wheel_sizes'][0]

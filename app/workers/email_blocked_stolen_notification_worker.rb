@@ -3,9 +3,9 @@ class EmailBlockedStolenNotificationWorker
   sidekiq_options queue: 'notify'
   sidekiq_options backtrace: true
 
-  def perform(stolen_notification_id)
-    @stolen_notification = StolenNotification.find(stolen_notification_id)
-    AdminMailer.blocked_stolen_notification_email(@stolen_notification).deliver
+  def perform(stolenNotification_id)
+    @stolenNotification = StolenNotification.find(stolenNotification_id)
+    AdminMailer.blocked_stolenNotification_email(@stolenNotification).deliver
   end
 
 end

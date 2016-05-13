@@ -10,7 +10,7 @@
           = bike.frame_model
       = bike.attr_list_item(bike.serial_display, 'Serial')
       = bike.attr_list_item(bike.frame_colors.to_sentence, 'Primary colors')
-    - if bike.current_stolen_record.present?
+    - if bike.current_stolenRecord.present?
       %ul.attr-list
-        = bike.attr_list_item((l bike.current_stolen_record.date_stolen, format: :dotted), 'Date stolen')
-        = bike.attr_list_item(bike.short_address(bike.current_stolen_record), 'Location')
+        = bike.attr_list_item((l bike.current_stolenRecord.date_stolen, format: :dotted), 'Date stolen')
+        = bike.attr_list_item(bike.short_address(bike.current_stolenRecord), 'Location')

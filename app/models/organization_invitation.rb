@@ -51,8 +51,8 @@ class OrganizationInvitation < ActiveRecord::Base
     end
   end
 
-  after_create :update_organization_invitation_counts
-  def update_organization_invitation_counts
+  after_create :update_organizationInvitation_counts
+  def update_organizationInvitation_counts
     org = self.organization
     if org.available_invitation_count < 1
       org.available_invitation_count = 0

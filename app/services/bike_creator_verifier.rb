@@ -20,7 +20,7 @@ class BikeCreatorVerifier
   end
 
   def add_phone
-    @bike.phone ||= @b_param.params[:stolen_record][:phone] if @b_param.params && @b_param.params[:stolen_record].present?
+    @bike.phone ||= @b_param.params[:stolenRecord][:phone] if @b_param.params && @b_param.params[:stolenRecord].present?
     if @bike.creation_organization.present? && @bike.creation_organization.locations.any?
       @bike.phone ||= @bike.creation_organization.locations.first.phone
     elsif @bike.creator.phone.present?

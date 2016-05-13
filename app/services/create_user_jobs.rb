@@ -11,9 +11,9 @@ class CreateUserJobs
   end
 
   def associate_membership_invites
-    organization_invitations = OrganizationInvitation.where(["lower(invitee_email) = ?", @user.email.downcase.strip])
-    if organization_invitations.any?
-      organization_invitations.each { |i| i.assign_to(@user) }
+    organizationInvitations = OrganizationInvitation.where(["lower(invitee_email) = ?", @user.email.downcase.strip])
+    if organizationInvitations.any?
+      organizationInvitations.each { |i| i.assign_to(@user) }
       @user.confirm(@user.confirmation_token)
     end
   end

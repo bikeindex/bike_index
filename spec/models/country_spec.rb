@@ -5,7 +5,7 @@ describe Country do
     it { is_expected.to validate_presence_of :name }
     it { is_expected.to validate_uniqueness_of :iso }
     it { is_expected.to validate_uniqueness_of :iso }
-    it { is_expected.to have_many :stolen_records }
+    it { is_expected.to have_many :stolenRecords }
     it { is_expected.to have_many :locations }
   end
 

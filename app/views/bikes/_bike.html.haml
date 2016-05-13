@@ -14,15 +14,15 @@
   
         
 
-  - if bike.stolen and bike.current_stolen_record.present?
+  - if bike.stolen and bike.current_stolenRecord.present?
     .blist-stolen-info
       .dl-holder
         %dl.dl-horizontal
           - date_label = "Stolen"
           - date_label = "Recovered" if bike.recovered
-          = bike.dl_list_item(bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), date_label)
+          = bike.dl_list_item(bike.current_stolenRecord.date_stolen.strftime("%m-%d-%Y"), date_label)
         %dl.dl-horizontal
-          = bike.dl_list_item(bike.short_address(bike.current_stolen_record), "From")
+          = bike.dl_list_item(bike.short_address(bike.current_stolenRecord), "From")
   - pdf ||= false
   - if pdf
     = link_to "Printable registration", pdf_bike_url(bike), class: 'printable-registration'

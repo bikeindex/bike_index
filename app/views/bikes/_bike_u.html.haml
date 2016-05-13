@@ -23,21 +23,21 @@
                 Recovered/Found
               - else
                 STOLEN
-            - if bike_u.current_stolen_record.present?
+            - if bike_u.current_stolenRecord.present?
               %p
                 %span.attr-title
                   From
-                = bike_u.short_address(bike_u.current_stolen_record)
+                = bike_u.short_address(bike_u.current_stolenRecord)
               %p
                 %span.attr-title
                   Stolen on
-                = bike_u.current_stolen_record.date_stolen.strftime("%m-%d-%Y")
+                = bike_u.current_stolenRecord.date_stolen.strftime("%m-%d-%Y")
             
             /         - date_label = "Stolen"
             /         - date_label = "Recovered" 
-            /         = bike_u.dl_list_item(bike_u.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), date_label)
+            /         = bike_u.dl_list_item(bike_u.current_stolenRecord.date_stolen.strftime("%m-%d-%Y"), date_label)
             /       %dl.dl-horizontal
-            /         = bike_u.dl_list_item(bike_u.short_address(bike_u.current_stolen_record), "From")
+            /         = bike_u.dl_list_item(bike_u.short_address(bike_u.current_stolenRecord), "From")
 
       %a.image-holder{href: bike_url(bike_u) }
         

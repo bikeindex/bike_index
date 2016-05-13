@@ -6,7 +6,6 @@
 *****************************************************************
 =end
 
-
 class OwnershipNotSavedError < StandardError
 end
 
@@ -50,11 +49,11 @@ class BikesController < ApplicationController
     asssert_message(search.find_bikes nil)
     
     page = params[:page] || 1
-    @per_page = params[:per_page] || 10
-    bikes = bikes.page(page).per(@per_page)
+    @perPage = params[:perPage] || 10
+    bikes = bikes.page(page).per(@perPage)
     if params[:serial].present? && page == 1
-      secondary_bikes = search.fuzzy_find_serial
-      @secondary_bikes = secondary_bikes.decorate if secondary_bikes.present?
+      secondaryBikes = search.fuzzy_find_serial
+      @secondaryBikes = secondaryBikes.decorate if secondaryBikes.present?
     else
     end
     
@@ -63,7 +62,7 @@ class BikesController < ApplicationController
     @query = request.query_parameters()
     @url = request.original_url
     @stolenness = search.stolenness_type
-    @selectize_items = search.selectize_items
+    @selectizeItems = search.selectizeItems
     if revised_layout_enabled?
       render :index_revised, layout: 'application_revised'
     else
@@ -79,13 +78,13 @@ class BikesController < ApplicationController
 =end 
   def show
     @components = @bike.components.decorate
-    if @bike.stolen and @bike.current_stolen_record.present?
-      @stolen_record = @bike.current_stolen_record.decorate
+    if @bike.stolen and @bike.current_stolenRecord.present?
+      @stolenRecord = @bike.current_stolenRecord.decorate
     else
     end
     
     @bike = @bike.decorate
-    @stolen_notification = StolenNotification.new if @bike.stolen
+    @stolenNotification = StolenNotification.new if @bike.stolen
     respond_to do |format|
       format.html do
         if revised_layout_enabled?
@@ -100,8 +99,8 @@ class BikesController < ApplicationController
 
  # What is method pdf ? 
   def pdf
-    if @bike.stolen and @bike.current_stolen_record.present?
-      @stolen_record = @bike.current_stolen_record.decorate
+    if @bike.stolen and @bike.current_stolenRecord.present?
+      @stolenRecord = @bike.current_stolenRecord.decorate
     else
     end
     
@@ -133,12 +132,12 @@ class BikesController < ApplicationController
       assert(bike.find(params[:id]) == nil)
     
     else
-      b = Bike.find_by_card_id(params[:card_id])
-      assert(bike.find(params[:card_id]) == nil)
+      b = Bike.find_by_cardId(params[:cardId])
+      assert(bike.find(params[:cardId]) == nil)
     end
     redirect_to bike_url(b) if b.present?
     @feedback = Feedback.new
-    @card_id = params[:card_id]
+    @cardId = params[:cardId]
   end
 
 =begin

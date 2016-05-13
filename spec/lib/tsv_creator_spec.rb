@@ -37,15 +37,15 @@ describe TsvCreator do
 
   describe 'create_daily_tsvs' do
     it 'calls create_stolen and create_stolen_with_reports with scoped query' do
-      stolen_record = FactoryGirl.create(:stolen_record, current: true, tsved_at: nil)
+      stolenRecord = FactoryGirl.create(:stolenRecord, current: true, tsved_at: nil)
       tsv_creator = TsvCreator.new
-      expect(tsv_creator).to receive(:create_stolen_with_reports).with(true, stolen_records: StolenRecord.approveds_with_reports.tsv_today)
-      expect(tsv_creator).to receive(:create_stolen).with(true, stolen_records: StolenRecord.approveds.tsv_today)
+      expect(tsv_creator).to receive(:create_stolen_with_reports).with(true, stolenRecords: StolenRecord.approveds_with_reports.tsv_today)
+      expect(tsv_creator).to receive(:create_stolen).with(true, stolenRecords: StolenRecord.approveds.tsv_today)
 
       tsv_creator.create_daily_tsvs
       expect(tsv_creator.file_prefix).to eq("/spec/fixtures/tsv_creation/#{Time.now.year}_#{Time.now.month}_#{Time.now.day}_")
-      stolen_record.reload
-      expect(stolen_record.tsved_at).to be_present
+      stolenRecord.reload
+      expect(stolenRecord.tsved_at).to be_present
     end
   end
 end

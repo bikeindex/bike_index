@@ -14,10 +14,10 @@ describe Admin::StolenNotificationsController do
 
   describe 'show' do
     before do
-      stolen_notification = FactoryGirl.create(:stolen_notification)
+      stolenNotification = FactoryGirl.create(:stolenNotification)
       user = FactoryGirl.create(:admin)
       set_current_user(user)
-      get :show, id: stolen_notification.id
+      get :show, id: stolenNotification.id
     end
     it { is_expected.to respond_with(:success) }
     it { is_expected.to render_template(:show) }
@@ -29,11 +29,11 @@ describe Admin::StolenNotificationsController do
       Sidekiq::Worker.clear_all
       sender = FactoryGirl.create(:user)
       admin = FactoryGirl.create(:admin)
-      stolen_notification = FactoryGirl.create(:stolen_notification, sender: sender)
+      stolenNotification = FactoryGirl.create(:stolenNotification, sender: sender)
       # pp expect(EmailStolenNotificationWorker).to have_enqueued_job
       set_current_user(admin)
       expect do
-        get :resend, id: stolen_notification.id
+        get :resend, id: stolenNotification.id
       end.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
     end
 
@@ -41,24 +41,24 @@ describe Admin::StolenNotificationsController do
       Sidekiq::Worker.clear_all
       sender = FactoryGirl.create(:user)
       admin = FactoryGirl.create(:admin)
-      stolen_notification = FactoryGirl.create(:stolen_notification, sender: sender)
-      stolen_notification.update_attribute :send_dates, [69]
+      stolenNotification = FactoryGirl.create(:stolenNotification, sender: sender)
+      stolenNotification.update_attribute :send_dates, [69]
       set_current_user(admin)
       expect do
-        get :resend, id: stolen_notification.id
+        get :resend, id: stolenNotification.id
       end.to change(EmailStolenNotificationWorker.jobs, :size).by(0)
-      expect(response).to redirect_to(:admin_stolen_notification)
+      expect(response).to redirect_to(:admin_stolenNotification)
     end
 
     it 'resends if the stolen notification has already been sent if we say pretty please' do
       Sidekiq::Worker.clear_all
       sender = FactoryGirl.create(:user)
       admin = FactoryGirl.create(:admin)
-      stolen_notification = FactoryGirl.create(:stolen_notification, sender: sender)
-      stolen_notification.update_attribute :send_dates, [69]
+      stolenNotification = FactoryGirl.create(:stolenNotification, sender: sender)
+      stolenNotification.update_attribute :send_dates, [69]
       set_current_user(admin)
       expect do
-        get :resend, id: stolen_notification.id, pretty_please: true
+        get :resend, id: stolenNotification.id, pretty_please: true
       end.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
     end
   end

@@ -30,7 +30,7 @@ describe Admin::UsersController do
           superuser: true,
           developer: true,
           is_content_admin: true,
-          can_send_many_stolen_notifications: true,
+          can_send_many_stolenNotifications: true,
           banned: true
         }
         expect(user.reload.name).to eq('New Name')
@@ -38,7 +38,7 @@ describe Admin::UsersController do
         expect(user.confirmed).to be_truthy
         expect(user.superuser).to be_truthy
         expect(user.developer).to be_falsey
-        expect(user.can_send_many_stolen_notifications).to be_truthy
+        expect(user.can_send_many_stolenNotifications).to be_truthy
         expect(user.banned).to be_truthy
       end
     end
@@ -56,7 +56,7 @@ describe Admin::UsersController do
           email: user.email,
           superuser: false,
           is_content_admin: true,
-          can_send_many_stolen_notifications: true,
+          can_send_many_stolenNotifications: true,
           banned: true
         }
         user.reload

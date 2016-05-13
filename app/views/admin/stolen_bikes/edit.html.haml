@@ -31,9 +31,9 @@
   #chosen-container
     %ul.bike-boxes
       = render partial: "/bikes/bike", locals: {bike: @bike, target: "show" }
-    - if @stolen_record.present?
+    - if @stolenRecord.present?
       %p
-        = @stolen_record.theft_description
+        = @stolenRecord.theft_description
       .dl-holder
         %dl.dl-horizontal
           = @bike.dl_list_item(@bike.created_at.strftime("%m-%d-%Y"), "Created")
@@ -44,14 +44,14 @@
           %dt
             Callable by
           %dd
-            - if @stolen_record.phone_for_everyone
+            - if @stolenRecord.phone_for_everyone
               %strong
                 Everyone
             - else
-              = "Users" if @stolen_record.phone_for_users
-              = " Shops" if @stolen_record.phone_for_shops
-              = " Police" if @stolen_record.phone_for_police
-          - if @stolen_record.approved 
+              = "Users" if @stolenRecord.phone_for_users
+              = " Shops" if @stolenRecord.phone_for_shops
+              = " Police" if @stolenRecord.phone_for_police
+          - if @stolenRecord.approved 
             %h2
               Stolen bike approved
           - else
@@ -61,24 +61,24 @@
           %dt
             Stolen on
           %dd
-            = @stolen_record.date_stolen.strftime("%m-%d-%Y")
+            = @stolenRecord.date_stolen.strftime("%m-%d-%Y")
           %dt
             Address
           %dd
-            = @stolen_record.address
+            = @stolenRecord.address
           %dt
             Phone
           %dd
-            = @stolen_record.phone
-          = @bike.dl_list_item(@stolen_record.secondary_phone, "Secondary phone")
+            = @stolenRecord.phone
+          = @bike.dl_list_item(@stolenRecord.secondary_phone, "Secondary phone")
 
           %dt
             Police department
           %dd
-            = @stolen_record.police_report_department
+            = @stolenRecord.police_report_department
           %dt
             Police Report
-          = @stolen_record.police_report_number
+          = @stolenRecord.police_report_number
     - else
       %h1.padded
         Stolen record not created yet.
@@ -88,7 +88,7 @@
     %hr.padded
     = link_to "Standard edit page", edit_admin_bike_url(@bike)
     .clearfix
-      - @bike.public_images.each do |img|
+      - @bike.publicImages.each do |img|
         .pull-left
           = image_tag img.image_url(:small)
 - else

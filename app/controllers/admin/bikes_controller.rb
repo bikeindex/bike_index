@@ -12,8 +12,8 @@ class Admin::BikesController < Admin::BaseController
       bikes = bikes.order("created_at desc")
     end
     @page = params[:page] || 1
-    per_page = params[:per_page] || 100
-    bikes = bikes.page(@page).per(per_page)
+    perPage = params[:perPage] || 100
+    bikes = bikes.page(@page).per(perPage)
     @bikes = bikes.decorate
   end
 
@@ -22,8 +22,8 @@ class Admin::BikesController < Admin::BaseController
     bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.other_manufacturer.id)
     bikes = session[:missing_manufacturer_time_order] ? bikes.order('created_at desc') : bikes.order('manufacturer_other ASC')
     page = params[:page] || 1
-    per_page = params[:per_page] || 100
-    bikes = bikes.page(page).per(per_page)
+    perPage = params[:perPage] || 100
+    bikes = bikes.page(page).per(perPage)
     @bikes = bikes.decorate
   end
 
@@ -47,8 +47,8 @@ class Admin::BikesController < Admin::BaseController
       duplicate_groups = DuplicateBikeGroup.unignored.order("created_at desc")
     end
     @page = params[:page] || 1
-    per_page = params[:per_page] || 25
-    @duplicate_groups = duplicate_groups.page(@page).per(per_page)
+    perPage = params[:perPage] || 25
+    @duplicate_groups = duplicate_groups.page(@page).per(perPage)
   end
 
   def ignore_duplicate_toggle
@@ -86,7 +86,7 @@ class Admin::BikesController < Admin::BaseController
         index_helped_recovery: params[:mark_recovered_we_helped],
         can_share_recovery: params[:can_share_recovery]
       }
-      RecoveryUpdateWorker.perform_async(@bike.current_stolen_record.id, info)
+      RecoveryUpdateWorker.perform_async(@bike.current_stolenRecord.id, info)
     end
     if @bike.update_attributes(params[:bike])
       @bike.create_normalized_serial_segments

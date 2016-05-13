@@ -4,7 +4,7 @@ class SingleBikeSerializer < BikeSerializer
   has_many :components
 
   def images
-    object.public_images
+    object.publicImages
   end
 
 end

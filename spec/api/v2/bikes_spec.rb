@@ -144,7 +144,7 @@ describe 'Bikes API V2' do
       organization.save
       bike = @bike.merge(organization_slug: organization.slug)
       date_stolen = 1357192800
-      bike[:stolen_record] = {
+      bike[:stolenRecord] = {
         phone: '1234567890',
         date_stolen: date_stolen,
         theft_description: "This bike was stolen and that's no fair.",
@@ -166,13 +166,13 @@ describe 'Bikes API V2' do
       result = JSON.parse(response.body)['bike']
       expect(result['serial']).to eq(@bike[:serial])
       expect(result['manufacturer_name']).to eq(@bike[:manufacturer])
-      expect(result['stolen_record']['date_stolen']).to eq(date_stolen)
+      expect(result['stolenRecord']['date_stolen']).to eq(date_stolen)
       b = Bike.find(result['id'])
       expect(b.creation_organization).to eq(organization)
       expect(b.stolen).to be_truthy
-      expect(b.current_stolen_record_id).to be_present
-      expect(b.current_stolen_record.police_report_number).to eq(bike[:stolen_record][:police_report_number])
-      expect(b.current_stolen_record.phone).to eq('1234567890')
+      expect(b.current_stolenRecord_id).to be_present
+      expect(b.current_stolenRecord.police_report_number).to eq(bike[:stolenRecord][:police_report_number])
+      expect(b.current_stolenRecord.phone).to eq('1234567890')
     end
 
     it 'does not register a stolen bike unless attrs are present' do
@@ -269,7 +269,7 @@ describe 'Bikes API V2' do
       FactoryGirl.create(:country, iso: 'US')
       expect(@bike.year).to be_nil
       serial = @bike.serial_number
-      @params[:stolen_record] = {
+      @params[:stolenRecord] = {
         phone: '',
         city: 'Chicago'
       }
@@ -282,7 +282,7 @@ describe 'Bikes API V2' do
       FactoryGirl.create(:country, iso: 'US')
       expect(@bike.year).to be_nil
       serial = @bike.serial_number
-      @params[:stolen_record] = {
+      @params[:stolenRecord] = {
         city: 'Chicago',
         phone: '1234567890',
         police_report_number: '999999'
@@ -295,8 +295,8 @@ describe 'Bikes API V2' do
       expect(@bike.reload.year).to eq(@params[:year])
       expect(@bike.serial_number).to eq(serial)
       expect(@bike.stolen).to be_truthy
-      expect(@bike.current_stolen_record.date_stolen.to_i).to be > Time.now.to_i - 10
-      expect(@bike.current_stolen_record.police_report_number).to eq('999999')
+      expect(@bike.current_stolenRecord.date_stolen.to_i).to be > Time.now.to_i - 10
+      expect(@bike.current_stolenRecord.police_report_number).to eq('999999')
     end
 
     it 'updates a bike, adds and removes components' do
@@ -390,11 +390,11 @@ describe 'Bikes API V2' do
       bike = FactoryGirl.create(:ownership).bike
       file = File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg'))
       url = "/api/v2/bikes/#{bike.id}/image?access_token=#{@token.token}"
-      expect(bike.public_images.count).to eq(0)
+      expect(bike.publicImages.count).to eq(0)
       post url, file: Rack::Test::UploadedFile.new(file)
       expect(response.code).to eq('403')
       expect(response.headers['Content-Type'].match('json')).to be_present
-      expect(bike.reload.public_images.count).to eq(0)
+      expect(bike.reload.publicImages.count).to eq(0)
     end
 
     it 'errors on non whitelisted extensions' do
@@ -402,11 +402,11 @@ describe 'Bikes API V2' do
       bike = FactoryGirl.create(:ownership, creator_id: @user.id).bike
       file = File.open(File.join(Rails.root, 'spec', 'spec_helper.rb'))
       url = "/api/v2/bikes/#{bike.id}/image?access_token=#{@token.token}"
-      expect(bike.public_images.count).to eq(0)
+      expect(bike.publicImages.count).to eq(0)
       post url, file: Rack::Test::UploadedFile.new(file)
       expect(response.body.match(/not allowed to upload .?.rb/i)).to be_present
       expect(response.code).to eq('401')
-      expect(bike.reload.public_images.count).to eq(0)
+      expect(bike.reload.publicImages.count).to eq(0)
     end
 
     it 'posts an image' do
@@ -414,21 +414,21 @@ describe 'Bikes API V2' do
       bike = FactoryGirl.create(:ownership, creator_id: @user.id).bike
       file = File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg'))
       url = "/api/v2/bikes/#{bike.id}/image?access_token=#{@token.token}"
-      expect(bike.public_images.count).to eq(0)
+      expect(bike.publicImages.count).to eq(0)
       post url, file: Rack::Test::UploadedFile.new(file)
       expect(response.code).to eq('201')
       expect(response.headers['Content-Type'].match('json')).to be_present
-      expect(bike.reload.public_images.count).to eq(1)
+      expect(bike.reload.publicImages.count).to eq(1)
     end
   end
 
-  describe 'send_stolen_notification' do
+  describe 'send_stolenNotification' do
     before :each do
       create_doorkeeper_app(scopes: 'read_user')
       @bike = FactoryGirl.create(:ownership, creator_id: @user.id).bike
       @bike.update_attribute :stolen, true
       @params = { message: "Something I'm sending you" }
-      @url = "/api/v2/bikes/#{@bike.id}/send_stolen_notification?access_token=#{@token.token}"
+      @url = "/api/v2/bikes/#{@bike.id}/send_stolenNotification?access_token=#{@token.token}"
     end
 
     it 'fails to send a stolen notification without read_user' do

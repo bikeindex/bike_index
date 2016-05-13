@@ -52,11 +52,11 @@ describe CustomerMailer do
     end
   end
 
-  describe 'organization_invitation_email' do
+  describe 'organizationInvitation_email' do
     before :each do
       @organization = FactoryGirl.create(:organization)
-      @organization_invitation = FactoryGirl.create(:organization_invitation, organization: @organization)
-      @mail = CustomerMailer.organization_invitation_email(@organization_invitation)
+      @organizationInvitation = FactoryGirl.create(:organizationInvitation, organization: @organization)
+      @mail = CustomerMailer.organizationInvitation_email(@organizationInvitation)
     end
 
     it 'renders email' do
@@ -64,30 +64,30 @@ describe CustomerMailer do
     end
   end
 
-  describe 'stolen_notification_email' do
+  describe 'stolenNotification_email' do
     it 'renders email and update sent_dates' do
-      stolen_notification = FactoryGirl.create(:stolen_notification, message: 'Test Message', reference_url: 'something.com')
-      mail = CustomerMailer.stolen_notification_email(stolen_notification)
-      expect(mail.subject).to eq(stolen_notification.default_subject)
+      stolenNotification = FactoryGirl.create(:stolenNotification, message: 'Test Message', reference_url: 'something.com')
+      mail = CustomerMailer.stolenNotification_email(stolenNotification)
+      expect(mail.subject).to eq(stolenNotification.default_subject)
       expect(mail.from.count).to eq(1)
       expect(mail.from.first).to eq('bryan@bikeindex.org')
-      expect(mail.body.encoded).to match(stolen_notification.message)
-      expect(mail.body.encoded).to match(stolen_notification.reference_url)
-      expect(stolen_notification.send_dates[0]).to eq(stolen_notification.updated_at.to_i)
-      CustomerMailer.stolen_notification_email(stolen_notification)
-      expect(stolen_notification.send_dates[1]).to be > stolen_notification.updated_at.to_i - 2
+      expect(mail.body.encoded).to match(stolenNotification.message)
+      expect(mail.body.encoded).to match(stolenNotification.reference_url)
+      expect(stolenNotification.send_dates[0]).to eq(stolenNotification.updated_at.to_i)
+      CustomerMailer.stolenNotification_email(stolenNotification)
+      expect(stolenNotification.send_dates[1]).to be > stolenNotification.updated_at.to_i - 2
     end
   end
 
   describe 'admin_contact_stolen_email' do
     it 'renders email' do
-      stolen_record = FactoryGirl.create(:stolen_record)
+      stolenRecord = FactoryGirl.create(:stolenRecord)
       user = FactoryGirl.create(:admin)
-      customer_contact = CustomerContact.new(user_email: stolen_record.bike.owner_email,
+      customer_contact = CustomerContact.new(user_email: stolenRecord.bike.owner_email,
                                              creator_email: user.email,
                                              body: 'some message',
                                              contact_type: 'stolen_contact',
-                                             bike_id: stolen_record.bike.id,
+                                             bike_id: stolenRecord.bike.id,
                                              title: 'some title')
       customer_contact.save
       mail = CustomerMailer.admin_contact_stolen_email(customer_contact)
@@ -97,10 +97,10 @@ describe CustomerMailer do
   end
   describe 'stolen_bike_alert_email' do
     it 'renders email' do
-      stolen_record = FactoryGirl.create(:stolen_record)
+      stolenRecord = FactoryGirl.create(:stolenRecord)
       notification_hash = {
         notification_type: 'stolen_twitter_alerter',
-        bike_id: stolen_record.bike.id,
+        bike_id: stolenRecord.bike.id,
         tweet_id: 69,
         tweet_string: 'STOLEN - something special',
         tweet_account_screen_name: 'bikeindex',

@@ -9,36 +9,36 @@ describe StolenNotificationsController do
   end
   describe 'create' do
     describe 'success' do
-      let(:stolen_notification_attributes) do
-        stolen_notification = FactoryGirl.attributes_for(:stolen_notification)
-        stolen_notification[:bike_id] = @bike.id
-        stolen_notification
+      let(:stolenNotification_attributes) do
+        stolenNotification = FactoryGirl.attributes_for(:stolenNotification)
+        stolenNotification[:bike_id] = @bike.id
+        stolenNotification
       end
 
       it 'creates a Stolen Notification record' do
         set_current_user(@user)
         expect do
-          post :create, stolen_notification: stolen_notification_attributes
+          post :create, stolenNotification: stolenNotification_attributes
         end.to change(StolenNotification, :count).by(1)
       end
 
       it 'enqueues the stolen notification email job' do
         set_current_user(@user)
         expect do
-          post :create, stolen_notification: stolen_notification_attributes
+          post :create, stolenNotification: stolenNotification_attributes
         end.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
       end
     end
 
     describe 'failure' do
-      let(:stolen_notification_attributes) do
-        stolen_notification = FactoryGirl.attributes_for(:stolen_notification, receiver: nil, bike: @bike)
-        stolen_notification
+      let(:stolenNotification_attributes) do
+        stolenNotification = FactoryGirl.attributes_for(:stolenNotification, receiver: nil, bike: @bike)
+        stolenNotification
       end
 
       it 'does not work unless there is a user logged in' do
         expect do
-          post :create, stolen_notification: stolen_notification_attributes
+          post :create, stolenNotification: stolenNotification_attributes
         end.not_to change(StolenNotification, :count)
       end
     end

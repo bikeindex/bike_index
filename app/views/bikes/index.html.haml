@@ -1,5 +1,5 @@
 #bikes-search
-  %span#selectize_items{ data: { initial: @selectize_items.to_json } }
+  %span#selectizeItems{ data: { initial: @selectizeItems.to_json } }
 
 - if params[:stolen].present? && params[:stolen].to_s != 'false'
   - if params[:non_proximity].present? && params[:non_proximity].to_s != 'false'
@@ -56,12 +56,12 @@
       - elsif active == 'stolen'
         - desc = 'bikes stolen anywhere'
       No #{desc}
-      - if @secondary_bikes.present?
+      - if @secondaryBikes.present?
         exactly match that serial
       - else
         matched your search
 
-- if @secondary_bikes.present?  
+- if @secondaryBikes.present?  
   .container
     %h2.secondary-bikes
       Serial numbers close to
@@ -69,6 +69,6 @@
         #{params[:serial]}
 
     %ul.bike-boxes
-      = render partial: "/bikes/bike_u", collection: @secondary_bikes, locals: {target: "show" }
+      = render partial: "/bikes/bike_u", collection: @secondaryBikes, locals: {target: "show" }
 
 = render '/shared/bikes_footer_ad'

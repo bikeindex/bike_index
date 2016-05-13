@@ -32,14 +32,14 @@
     = @organization.available_invitation_count
     remaining #{"invitation".pluralize(current_organization.available_invitation_count)}.
     - if @organization.available_invitation_count > 0
-      = link_to "Send an invitation to a member of your organization", "/organizations/#{@organization.slug}/organization_invitations/new", class: "button-yellow"
+      = link_to "Send an invitation to a member of your organization", "/organizations/#{@organization.slug}/organizationInvitations/new", class: "button-yellow"
       
     
       
 
-  - if @organization.organization_invitations.unclaimed.count > 0
+  - if @organization.organizationInvitations.unclaimed.count > 0
     %h3.invitations-sent
-      #{ pluralize(@organization.organization_invitations.unclaimed.count, "invitations") } you sent haven't been claimed yet
+      #{ pluralize(@organization.organizationInvitations.unclaimed.count, "invitations") } you sent haven't been claimed yet
 
     %table.table.table-striped
       %thead
@@ -52,7 +52,7 @@
         %th
           Date sent
       %tbody
-        - @organization.organization_invitations.unclaimed.each do |org_invite| 
+        - @organization.organizationInvitations.unclaimed.each do |org_invite| 
           %tr
             %td.medium-screens
               - if org_invite.invitee_name

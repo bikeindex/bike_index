@@ -21,7 +21,7 @@ en:
     users_accept_terms: "Terms of use - Bike Index"
     users_accept_vendor_terms: "Organization terms - Bike Index"
     documentation_api_v1: "Bike Index API documentation"
-    organization_invitations_new: "New invitation"
+    organizationInvitations_new: "New invitation"
     payments_new: "Support the Index!"
     payments_create: "Thanks for your support!"
     sessions_new: "Log in"

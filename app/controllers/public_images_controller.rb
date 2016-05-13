@@ -1,6 +1,6 @@
 =begin
 *****************************************************************
-* File: app/controllers/public_images_controller.rb 
+* File: app/controllers/publicImages_controller.rb 
 * Name: Class PublicImagesController 
 * Set some methods to deal with images
 *****************************************************************
@@ -10,29 +10,29 @@ class PublicImagesController < ApplicationController
   before_filter :find_image_if_owned, only: [:edit, :update, :destroy, :is_private]
 
   def show
-    @public_image = PublicImage.find(params[:id])
-    if @public_image.present? && @public_image.imageable_type == 'Bike'
-      @owner_viewing = true if @public_image.imageable.current_ownership.present? && @public_image.imageable.owner == current_user
+    publicImage = PublicImage.find(params[:id])
+    if publicImage.present? && publicImage.imageable_type == 'Bike'
+      @owner_viewing = true if publicImage.imageable.current_ownership.present? && publicImage.imageable.owner == current_user
     else
       #nothing to do  
     end
   end
 
   def create
-    @public_image = PublicImage.new(params[:public_image])
+    publicImage = PublicImage.new(params[:publicImage])
     if params[:bike_id].present?
       @bike = Bike.unscoped.find(params[:bike_id])
       if @bike.owner == current_user
-        @public_image.imageable = @bike
-        @public_image.save
+        publicImage.imageable = @bike
+        publicImage.save
       else
         #nothing to do  
       end
       @imageable = @bike
       if params[:blog_id].present?
         @blog = Blog.find(params[:blog_id])
-        @public_image.imageable = @blog
-        @public_image.save
+        publicImage.imageable = @blog
+        publicImage.save
         @imageable = @blog
       else
         #nothing to do
@@ -40,7 +40,7 @@ class PublicImagesController < ApplicationController
     else
       render revised_layout_enabled? ? 'create_revised' : 'create'
     end  
-    if @public_image.imageable.present?
+    if publicImage.imageable.present?
       flash[:error] = "Whoops! We can't let you create that image."
       redirect_to @imageable
     else
@@ -52,23 +52,23 @@ class PublicImagesController < ApplicationController
   end
 
   def is_private
-    @public_image.update_attribute :is_private, params[:is_private]
+    publicImage.update_attribute :is_private, params[:is_private]
     render nothing: true
   end
 
   def update
-    if @public_image.update_attributes(params[:public_image])
-      redirect_to edit_bike_url(@public_image.imageable), notice: 'Image was successfully updated.'
+    if publicImage.update_attributes(params[:publicImage])
+      redirect_to edit_bike_url(publicImage.imageable), notice: 'Image was successfully updated.'
     else
       render :edit
     end
   end
 
   def destroy
-    @imageable = @public_image.imageable
-    imageable_id = @public_image.imageable_id
-    imageable_type = @public_image.imageable_type
-    @public_image.destroy
+    @imageable = publicImage.imageable
+    imageable_id = publicImage.imageable_id
+    imageable_type = publicImage.imageable_type
+    publicImage.destroy
     flash[:notice] = 'Image was successfully deleted'
     if params[:page].present?
       redirect_to edit_bike_url(imageable_id, page: params[:page]) and return
@@ -99,12 +99,12 @@ class PublicImagesController < ApplicationController
 
   protected
 
-  def current_user_image_owner(public_image)
-    if public_image.imageable_type == 'Bike'
-      Bike.unscoped.find(public_image.imageable_id).owner == current_user
+  def current_user_image_owner(publicImage)
+    if publicImage.imageable_type == 'Bike'
+      Bike.unscoped.find(publicImage.imageable_id).owner == current_user
     else
       #nothing to do
-    if public_image.imageable_type == 'Blog'
+    if publicImage.imageable_type == 'Blog'
       current_user && current_user.admin_authorized(content)
     else
       #nothing to do
@@ -112,10 +112,10 @@ class PublicImagesController < ApplicationController
   end
 
   def find_image_if_owned
-    @public_image = PublicImage.unscoped.find(params[:id])
-    if current_user_image_owner(@public_image)
+    publicImage = PublicImage.unscoped.find(params[:id])
+    if current_user_image_owner(publicImage)
       flash[:error] = "Sorry! You don't have permission to edit that image."
-      redirect_to @public_image.imageable and return
+      redirect_to publicImage.imageable and return
     else
       #nothing to do
     end

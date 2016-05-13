@@ -33,8 +33,8 @@ class AdminMailer < ActionMailer::Base
       end
   end
 
-  def blocked_stolen_notification_email(stolen_notification)
-    @stolen_notification = stolen_notification
+  def blocked_stolenNotification_email(stolenNotification)
+    @stolenNotification = stolenNotification
     mail(to: 'bryan@bikeindex.org', bcc: 'contact@bikeindex.org', subject: 'Stolen notification blocked!') do |format|
       format.text
       format.html { render layout: 'email' }

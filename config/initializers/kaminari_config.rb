@@ -1,4 +1,4 @@
 Kaminari.configure do |config|
-  config.default_per_page = 25
-  config.max_per_page = 100
+  config.default_perPage = 25
+  config.max_perPage = 100
 end

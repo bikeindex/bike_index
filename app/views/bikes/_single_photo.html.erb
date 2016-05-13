@@ -1,23 +1,23 @@
-<% if @bike.public_images.any? %>
-  <div class="image-holder <%= "just1photo" if @bike.public_images.count == 1 %>" id="selected-photo">
-    <%= link_to image_tag(@bike.public_images.first.image_url(:large), alt: "Bike photo", id: "i|#{@bike.public_images.first.listing_order}"), @bike.public_images.first.image_url, target: "_blank", class: "current-photo", id: "image#{ @bike.public_images.first.id}" %>
+<% if @bike.publicImages.any? %>
+  <div class="image-holder <%= "just1photo" if @bike.publicImages.count == 1 %>" id="selected-photo">
+    <%= link_to image_tag(@bike.publicImages.first.image_url(:large), alt: "Bike photo", id: "i|#{@bike.publicImages.first.listing_order}"), @bike.publicImages.first.image_url, target: "_blank", class: "current-photo", id: "image#{ @bike.publicImages.first.id}" %>
   </div>
-  <% if @bike.public_images.count > 1 %>
+  <% if @bike.publicImages.count > 1 %>
     <div id="thumbnail-photos" class="photo-list">
       <ul id="thumbnails">
         <% if @bike.video_embed_src.present? %>
           <li>
             <a href="#" class="clickable-image" data-link="<%= @bike.video_embed_src %>" data-id="video_embed">
               <%= image_tag ("/assets/video_play_button.png"), alt: "Bike Video", class: "video-overlay" %>
-              <%= image_tag @bike.public_images.first.image.url(:small) %>
+              <%= image_tag @bike.publicImages.first.image.url(:small) %>
             </a>
           </li>
         <% end %>
 
-        <% @bike.public_images.each do |public_image| %>
+        <% @bike.publicImages.each do |publicImage| %>
           <li>
-            <a href="#" class="clickable-image" data-img="<%= public_image.image.url(:large) %>" data-link="<%= public_image.image.url %>" data-id="image<%= public_image.id %>">
-              <%= image_tag public_image.image.url(:small), alt: "#{public_image.name}", id: "i|#{public_image.listing_order}" %>
+            <a href="#" class="clickable-image" data-img="<%= publicImage.image.url(:large) %>" data-link="<%= publicImage.image.url %>" data-id="image<%= publicImage.id %>">
+              <%= image_tag publicImage.image.url(:small), alt: "#{publicImage.name}", id: "i|#{publicImage.listing_order}" %>
             </a>
           </li>
         <% end %>

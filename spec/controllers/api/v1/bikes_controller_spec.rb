@@ -18,8 +18,8 @@ describe Api::V1::BikesController do
 
     xit 'should return an array of ids' do
       bike = FactoryGirl.create(:bike)
-      stole1 = FactoryGirl.create(:stolen_record)
-      stole2 = FactoryGirl.create(:stolen_record, approved: true)
+      stole1 = FactoryGirl.create(:stolenRecord)
+      stole2 = FactoryGirl.create(:stolenRecord, approved: true)
       organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:user)
       FactoryGirl.create(:membership, user: user, organization: organization)
@@ -123,7 +123,7 @@ describe Api::V1::BikesController do
       expect(component.year).to eq(1999)
       expect(component.manufacturer_id).to eq(manufacturer.id)
       expect(component.model_name).to eq('Richie rich')
-      expect(b.public_images.count).to eq(2)
+      expect(b.publicImages.count).to eq(2)
       expect(f_count).to eq(Feedback.count)
     end
 
@@ -148,7 +148,7 @@ describe Api::V1::BikesController do
       ]
       post :create, bike: bike, organization_slug: @organization.slug, access_token: @organization.access_token, photos: photos
       b = Bike.where(serial_number: '69 photo-test').first
-      expect(b.public_images.count).to eq(1)
+      expect(b.publicImages.count).to eq(1)
     end
 
     it 'creates a stolen record' do
@@ -167,7 +167,7 @@ describe Api::V1::BikesController do
                phone: '9999999',
                cycle_type_slug: 'bike'
       }
-      stolen_record = { date_stolen: '03-01-2013',
+      stolenRecord = { date_stolen: '03-01-2013',
                         theft_description: "This bike was stolen and that's no fair.",
                         country: 'US',
                         street: 'Cortland and Ashland',
@@ -180,11 +180,11 @@ describe Api::V1::BikesController do
       }
       expect_any_instance_of(OwnershipCreator).to receive(:send_notification_email)
       expect do
-        post :create, bike: bike, stolen_record: stolen_record, organization_slug: @organization.slug, access_token: @organization.access_token
+        post :create, bike: bike, stolenRecord: stolenRecord, organization_slug: @organization.slug, access_token: @organization.access_token
       end.to change(Ownership, :count).by(1)
       expect(response.code).to eq('200')
       b = Bike.unscoped.where(serial_number: '69 stolen bike').first
-      csr = b.find_current_stolen_record
+      csr = b.find_current_stolenRecord
       expect(csr.address).to be_present
       expect(csr.phone).to eq('9999999')
       expect(csr.date_stolen).to eq(DateTime.strptime('03-01-2013 06', '%m-%d-%Y %H'))
