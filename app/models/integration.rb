@@ -28,7 +28,7 @@ class Integration < ActiveRecord::Base
   def update_or_create_user(email:, name:)
     i_user = UserEmail.fuzzy_user_find(email)
     unless i_user.present? # Because it's okay if user is unconfirmed, we need to manually search
-      i_user = User.find(:first, conditions: ['lower(email) = ?', EmailNormalizer.new(email).normalized])
+      i_user = User.fuzzy_unconfirmed_primary_email_find(email)
     end
     if i_user.present?
       Integration.where(user_id: i_user.id).map(&:destroy)

@@ -177,6 +177,10 @@ class User < ActiveRecord::Base
     UserEmail.confirmed.fuzzy_user_find(email)
   end
 
+  def self.fuzzy_unconfirmed_primary_email_find(email)
+    find(:first, conditions: ['lower(email) = ?', EmailNormalizer.new(email).normalized])
+  end
+
   def self.fuzzy_id(n)
     u = self.fuzzy_email_find(n)
     return u.id if u.present?
