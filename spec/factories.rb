@@ -29,8 +29,10 @@ FactoryGirl.define do
     password 'testthisthing7$'
     password_confirmation 'testthisthing7$'
     terms_of_service true
-    after(:create) do |user|
-      user.confirm(user.confirmation_token)
+    factory :confirmed_user do
+      after(:create) do |user|
+        user.confirm(user.confirmation_token)
+      end
     end
     factory :admin do
       superuser true

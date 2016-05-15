@@ -30,20 +30,23 @@ describe UserEmail do
       end
     end
     context 'already existing' do
-      let(:user) { FactoryGirl.create(:user, email: 'cool@stuff.com') }
+      let(:user) { FactoryGirl.create(:confirmed_user, email: 'cool@stuff.com') }
       it 'creates a new user_email' do
         expect(user.confirmed).to be_truthy
         expect(user.user_emails.count).to eq 1
         user_email = user.user_emails.first
         expect do
-          result = UserEmail.create_confirmed_primary_email(user)
-        end.to change(UserEmail, :count).by 1
-        expect(result).to eq user_email
+          expect(UserEmail.create_confirmed_primary_email(user)).to eq user_email
+        end.to change(UserEmail, :count).by 0
       end
     end
   end
 
   describe 'fuzzy_user_id_find' do
+    let(:user) { FactoryGirl.create(:confirmed_user, email: 'mommy@stuff.com') }
+    before do
+      expect(user).to be_present
+    end
     context 'blank' do
       it 'returns nil' do
         expect(UserEmail.fuzzy_user_id_find(' ')).to be_nil
@@ -51,7 +54,6 @@ describe UserEmail do
     end
     context 'matching' do
       it 'returns the user' do
-        user = FactoryGirl.create(:user, email: 'mommy@stuff.com')
         expect(UserEmail.fuzzy_user_id_find('mommy@stUFF.com ')).to eq user.id
       end
     end
@@ -63,6 +65,10 @@ describe UserEmail do
   end
 
   describe 'fuzzy_user_find' do
+    let(:user) { FactoryGirl.create(:confirmed_user, email: 'mommy@stuff.com') }
+    before do
+      expect(user).to be_present
+    end
     context 'blank' do
       it 'returns nil' do
         expect(UserEmail.fuzzy_user_find(' ')).to be_nil
@@ -70,7 +76,6 @@ describe UserEmail do
     end
     context 'matching' do
       it 'returns the user' do
-        user = FactoryGirl.create(:user, email: 'mommy@stuff.com')
         expect(UserEmail.fuzzy_user_find('mommy@stUFF.com ')).to eq user
       end
     end
