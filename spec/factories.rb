@@ -27,9 +27,11 @@ FactoryGirl.define do
     name
     email { generate(:unique_email) }
     password 'testthisthing7$'
-    confirmed true
     password_confirmation 'testthisthing7$'
     terms_of_service true
+    after(:create) do |user|
+      user.confirm(user.confirmation_token)
+    end
     factory :admin do
       superuser true
     end

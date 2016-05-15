@@ -69,7 +69,7 @@ describe User do
     end
 
     describe 'confirm' do
-      let(:user) { FactoryGirl.create(:user) }
+      let(:user) { User.new(FactoryGirl.attributes_for(:user)) }
 
       it 'requires confirmation' do
         expect(user.confirmed).to be_falsey
@@ -208,7 +208,7 @@ describe User do
 
   describe 'generate_username_confirmation_and_auth' do
     it 'generates the required tokens' do
-      user = FactoryGirl.create(:user)
+      user = User.new(FactoryGirl.attributes_for(:user))
       expect(user.auth_token).to be_present
       expect(user.username).to be_present
       expect(user.confirmation_token).to be_present
@@ -340,5 +340,9 @@ describe User do
       # pp user
       expect(user.userlink).to eq('https://twitter.com/bikeindex')
     end
+  end
+
+  describe 'additional user_email tests' do
+    it 'can not set a unconfirmed email to the primary email'
   end
 end

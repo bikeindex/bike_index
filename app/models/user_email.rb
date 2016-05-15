@@ -12,12 +12,9 @@ class UserEmail < ActiveRecord::Base
     self.email = EmailNormalizer.new(email).normalized
   end
 
-  def self.create_for_user(user, email: nil)
-    create_attrs = { user_id: user.id, email: (email || user.email) }
-    if create_attrs[:email] != user.email || !user.confirmed
-      create_attrs[:confirmation_token] = Digest::MD5.hexdigest "#{SecureRandom.hex(10)}-#{DateTime.now}"
-    end
-    create(create_attrs)
+  def self.create_confirmed_primary_email(user)
+    return false unless user.confirmed
+    where(user_id: user.id, email: user.email).first_or_create
   end
 
   def self.fuzzy_find(str)

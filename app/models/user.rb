@@ -107,11 +107,6 @@ class User < ActiveRecord::Base
     errors.add(:email, 'That email is already signed up on Bike Index.')
   end
 
-  after_create :update_user_emails
-  def update_user_emails
-    UserEmail.create_for_user(self)
-  end
-
   def superuser?
     superuser 
   end
@@ -164,6 +159,7 @@ class User < ActiveRecord::Base
       self.confirmation_token = nil
       self.confirmed = true
       self.save
+      UserEmail.create_confirmed_primary_email(self)
     end
   end
   
@@ -314,7 +310,7 @@ class User < ActiveRecord::Base
       username = SecureRandom.urlsafe_base64
     end while User.where(username: username).exists?
     self.username = username
-    if !self.confirmed
+    if !confirmed
       self.confirmation_token = (Digest::MD5.hexdigest "#{SecureRandom.hex(10)}-#{DateTime.now.to_s}")
     end
     generate_auth_token

@@ -17,30 +17,28 @@ describe UserEmail do
     end
   end
 
-  describe 'create_for_user' do
-    let(:user) { User.new(email: 'cool@stuff.com') }
-    context 'not passing email' do
-      context 'confirmed user' do
-        it 'creates a new user_email' do
-          user.confirmed = true
-          user.id = 4444
-          user_email = UserEmail.create_for_user(user)
-          expect(user_email.confirmed).to be_truthy
-          expect(user_email.email).to eq 'cool@stuff.com'
-          expect(user_email.valid?).to be_truthy
-        end
+  describe 'create_confirmed_primary_email' do
+    context 'confirmed user' do
+      let(:user) { User.new(email: 'cool@stuff.com') }
+      it 'creates a new user_email' do
+        user.confirmed = true
+        user.id = 4444
+        user_email = UserEmail.create_confirmed_primary_email(user)
+        expect(user_email.confirmed).to be_truthy
+        expect(user_email.email).to eq 'cool@stuff.com'
+        expect(user_email.valid?).to be_truthy
       end
     end
-    context 'not passing email' do
-      context 'confirmed user' do
-        it 'creates a new user_email' do
-          user.confirmed = true
-          user.id = 4444
-          user_email = UserEmail.create_for_user(user, email: 'foo@cool.com')
-          expect(user_email.confirmed).to be_falsey
-          expect(user_email.email).to eq 'foo@cool.com'
-          expect(user_email.valid?).to be_truthy
-        end
+    context 'already existing' do
+      let(:user) { FactoryGirl.create(:user, email: 'cool@stuff.com') }
+      it 'creates a new user_email' do
+        expect(user.confirmed).to be_truthy
+        expect(user.user_emails.count).to eq 1
+        user_email = user.user_emails.first
+        expect do
+          result = UserEmail.create_confirmed_primary_email(user)
+        end.to change(UserEmail, :count).by 1
+        expect(result).to eq user_email
       end
     end
   end
