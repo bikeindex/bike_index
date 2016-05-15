@@ -1,5 +1,6 @@
 class BikeIndex.BikesShow extends BikeIndex
   constructor: ->
+    window.bike_photos_loaded = false
     if $('.bike-edit-overlay').length > 0
       @showBikeEditOverlay()
 
@@ -82,20 +83,25 @@ class BikeIndex.BikesShow extends BikeIndex
   shiftToPhoto: (pos, scroll_to_thumb = false) ->
     target_photo_id = $("#selected-photo div[data-pos='#{pos}']").prop('id')
     $target_photo = $("#thumbnail-photos a[data-id='#{target_photo_id}']")
-    @photoFadeOut(target_photo_id, $target_photo)
-    # Primarily, scrolling is setup to make things better for keyboard navigation
-    if scroll_to_thumb and $target_photo.offset() # Ensure we found the element before scrolling
-      $thumbs = $('#thumbnail-photos')
-      if @isVerticalLayout()
-        offset = $target_photo.offset().top - $thumbs.offset().top
-        $thumbs.animate
-          scrollTop: offset, 'fast'
-      else
-        # couldn't get this to work correctly :(
-        # Plus, this is on small screens, so probs no keyboard anyway
-        # offset = $target_photo.offset().left - $thumbs.scrollLeft()
-        # $thumbs.animate
-        #   scrollLeft: offset, 'fast'
+    if target_photo_id
+      @photoFadeOut(target_photo_id, $target_photo)
+      # Primarily, scrolling is setup to make things better for keyboard navigation
+      if scroll_to_thumb and $target_photo.offset() # Ensure we found the element before scrolling
+        $thumbs = $('#thumbnail-photos')
+        if @isVerticalLayout()
+          offset = $target_photo.offset().top - $thumbs.offset().top
+          $thumbs.animate
+            scrollTop: offset, 'fast'
+        else
+          # couldn't get this to work correctly :(
+          # Plus, this is on small screens, so probs no keyboard anyway
+          # offset = $target_photo.offset().left - $thumbs.scrollLeft()
+          # $thumbs.animate
+          #   scrollLeft: offset, 'fast'
+    else
+      # We can't find the photos, prolly because they aren't loaded.
+      # So load them. Then do nothing or else stuff breaks
+      @loadPhotos()
 
   clickPhoto: (event) ->
     event.preventDefault()
@@ -117,22 +123,24 @@ class BikeIndex.BikesShow extends BikeIndex
     $('#selected-photo').append(Mustache.render(window.current_photo_template, attrs))
 
   loadPhotos: ->
-    $('#thumbnail-photos').data('length', 0)
+    return true if window.bike_photos_loaded
     return true unless $('#thumbnail-photos li').length > 0
-    $('#thumbnail-photos').data('length',$('#thumbnail-photos li').length)
+    $('#thumbnail-photos').data('length', $('#thumbnail-photos li').length)
     for li, index in $('#thumbnail-photos li')
       $target_photo = $(li).find('.clickable-image')
       target_photo_id = $target_photo.attr('data-id')
       @injectPhoto(target_photo_id, $target_photo) unless $("##{target_photo_id}").length > 0
       i = index + 1
       $("##{target_photo_id}").attr('data-pos', i)
+    window.bike_photos_loaded = true
 
 
   photoFadeIn: (target_photo_id, $target_photo) ->
-    if $("##{target_photo_id}").length > 0
-      $("##{target_photo_id}, ##{target_photo_id} img").css('display', 'block')
-    else
+    unless $("##{target_photo_id}").length > 0
+      console.log 'late to the party', target_photo_id, $target_photo
       @injectPhoto(target_photo_id, $target_photo)
+      @loadPhotos() # Since photos haven't loaded yet, load them
+    $("##{target_photo_id}, ##{target_photo_id} img").css('display', 'block')
     $("##{target_photo_id}").addClass('current-photo').removeClass('transitioning-photo')
     $("#thumbnail-photos a").removeClass('current-thumb')
     $("#thumbnail-photos a[data-id='#{target_photo_id}']").addClass('current-thumb')
