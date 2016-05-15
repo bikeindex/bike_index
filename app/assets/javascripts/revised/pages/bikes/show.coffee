@@ -106,7 +106,6 @@ class BikeIndex.BikesShow extends BikeIndex
   photoFadeOut: (target_photo_id, $target_photo) ->
     $('#selected-photo .current-photo').addClass('transitioning-photo').removeClass('current-photo')
     @photoFadeIn(target_photo_id, $target_photo)
-    return false # stop chain
 
   injectPhoto: (target_photo_id, $target_photo) ->
     attrs =

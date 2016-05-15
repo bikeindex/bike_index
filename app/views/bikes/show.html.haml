@@ -110,6 +110,8 @@
       .show-bike-details
         %ul.attr-list.split-sm
           = @bike.attr_list_item(@bike.serial_display, 'Serial', with_colon: true)
+          - unless @bike.recovered
+            = @bike.attr_list_item(@bike.additional_registration, 'Other serial/registration', with_colon: true)
           - unless @bike.type == 'bike'
             = @bike.attr_list_item(@bike.type.titleize, 'Cycle type', with_colon: true)
           = @bike.attr_list_item(@bike.mnfg_name, 'Manufacturer', with_colon: true)
