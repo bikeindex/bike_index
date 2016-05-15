@@ -53,6 +53,7 @@ class User < ActiveRecord::Base
   has_many :created_ownerships, class_name: 'Ownership', inverse_of: :creator
   has_many :created_bicycles, class_name: 'Bike', inverse_of: :creator
   has_many :locks, dependent: :destroy
+  has_many :user_emails
 
   has_many :sent_stolen_notifications, class_name: 'StolenNotification', foreign_key: :sender_id
   has_many :received_stolen_notifications, class_name: 'StolenNotification', foreign_key: :receiver_id
@@ -108,7 +109,7 @@ class User < ActiveRecord::Base
 
   after_create :update_user_emails
   def update_user_emails
-    UserEmail.create_user_email(self)
+    UserEmail.create_for_user(self)
   end
 
   def superuser?
@@ -177,11 +178,7 @@ class User < ActiveRecord::Base
   end
   
   def self.fuzzy_email_find(email)
-    if !email.blank?
-      self.find(:first, conditions: [ "lower(email) = ?", email.downcase.strip ])
-    else
-      nil
-    end
+    UserEmail.confirmed.fuzzy_user_find(email)
   end
 
   def self.fuzzy_id(n)
@@ -287,7 +284,7 @@ class User < ActiveRecord::Base
 
   def userlink
     if show_bikes
-      "/users/#{username}" 
+      "/users/#{username}"
     elsif twitter.present?
       "https://twitter.com/#{twitter}"
     else

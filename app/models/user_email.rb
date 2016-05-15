@@ -7,6 +7,11 @@ class UserEmail < ActiveRecord::Base
   scope :confirmed, -> { where('confirmation_token IS NULL') }
   scope :unconfirmed, -> { where('confirmation_token IS NOT NULL') }
 
+  before_validation :normalize_email
+  def normalize_email
+    self.email = EmailNormalizer.new(email).normalized
+  end
+
   def self.create_for_user(user, email: nil)
     create_attrs = { user_id: user.id, email: (email || user.email) }
     if create_attrs[:email] != user.email || !user.confirmed
@@ -15,16 +20,19 @@ class UserEmail < ActiveRecord::Base
     create(create_attrs)
   end
 
-  def self.fuzzy_user_id_find(n)
-    return nil if n.blank?
-    u = find(:first, conditions: ['lower(email) = ?', email.downcase.strip])
-    u && u.user_id
+  def self.fuzzy_find(str)
+    return nil if str.blank?
+    find(:first, conditions: ['lower(email) = ?', EmailNormalizer.new(str).normalized])
   end
 
-  def self.fuzzy_find(n)
-    u = fuzzy_user_id_find(n)
-    return nil unless u
-    User.find(u)
+  def self.fuzzy_user_id_find(str)
+    ue = fuzzy_find(str)
+    ue && ue.user_id
+  end
+
+  def self.fuzzy_user_find(str)
+    ue = fuzzy_find(str)
+    ue && ue.user
   end
 
   def confirmed
