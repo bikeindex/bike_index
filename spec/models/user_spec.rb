@@ -318,7 +318,7 @@ describe User do
   describe 'subscriptions' do
     it 'returns the payment if payment is subscription' do
       user = FactoryGirl.create(:user)
-      payment = Payment.create(is_recurring: true, user_id: user)
+      Payment.create(is_recurring: true, user_id: user)
       expect(user.subscriptions).to eq(user.payments.where(is_recurring: true))
     end
   end
@@ -337,25 +337,32 @@ describe User do
     end
   end
 
-  describe 'additional user_email tests' do
-    it 'can not set a unconfirmed email to the primary email' do
+  describe 'primary_user_email' do
+    it 'can not set a unconfirmed email to the primary email'
   end
 
   describe 'additional_emails=' do
     let(:user) { FactoryGirl.create(:confirmed_user) }
     before do
-      expect(user.user_emails).count to eq 1
+      expect(user.user_emails.count).to eq 1
     end
     context 'blank' do
       it 'does nothing' do
-        user.additional_emails = ' '
-        expect{ user.save }.to change(UserEmail, :count).by 0
+        expect do
+          user.additional_emails = ' '
+          user.save
+        end.to change(UserEmail, :count).by 0
+        expect(UserEmail.where(user_id: user.id).count).to eq 1
       end
     end
     context 'a single email' do
       it 'adds the email' do
-        user.additional_emails = 'stuffthings@oooooooooh.com'
-        expect{ user.save }.to change(UserEmail, :count).by 1
+        expect do
+          user.additional_emails = 'stuffthings@oooooooooh.com'
+          user.save
+        end.to change(UserEmail, :count).by 1
+        user.reload
+        expect(user.user_emails.confirmed.count).to eq 1
         expect(user.user_emails.unconfirmed.count).to eq 1
         expect(user.user_emails.unconfirmed.first.email).to eq 'stuffthings@oooooooooh.com'
       end
@@ -363,13 +370,21 @@ describe User do
     context 'list with repeats' do
       it 'adds the non-duped emails' do
         user.additional_emails = 'stuffthings@oooooooooh.com,another_email@cool.com'
-        expect{ user.save }.to change(UserEmail, :count).by 2
-        second_confirmed = user.user_emails.where(email: 'stuffthings@oooooooooh.com').first
+        user.save
+        user.reload
+        # pp user.user_emails
+        # pp UserEmail.all
+        expect(UserEmail.unconfirmed.where(user_id: user.id).count).to eq 2
+        second_confirmed = UserEmail.where(user_id: user.id, email: 'stuffthings@oooooooooh.com').first
         second_confirmed.confirm(second_confirmed.confirmation_token)
+        user.reload
         expect(user.user_emails.confirmed.count).to eq 2
         expect(user.user_emails.unconfirmed.count).to eq 1
-        user.additional_emails = ' andAnother@cool.com,stuffthings@oooooooooh.com,another_email@cool.com,lols@stuff.com'
-        expect{ user.save }.to change(UserEmail, :count).by 2
+        expect do
+          user.additional_emails = ' andAnother@cool.com,stuffthings@oooooooooh.com,another_email@cool.com,lols@stuff.com'
+          user.save
+        end.to change(UserEmail, :count).by 2
+        user.reload
         expect(user.user_emails.confirmed.count).to eq 2
         expect(user.user_emails.where(email: 'andanother@cool.com').count).to eq 1
       end

@@ -6,7 +6,7 @@ class User < ActiveRecord::Base
 
   attr_accessible :name,
     :username,
-    :email,
+    :email, # Also maybe a all_emails field for searching...
     :password,
     :password_confirmation,
     :current_password,

@@ -1,7 +1,7 @@
 class UserEmail < ActiveRecord::Base
   attr_accessible :email, :user_id, :old_user_id, :confirmation_token
-  belongs_to :user
-  belongs_to :old_user, class_name: 'User'
+  belongs_to :user, touch: true
+  belongs_to :old_user, class_name: 'User', touch: true
   validates_presence_of :user_id, :email
 
   scope :confirmed, -> { where('confirmation_token IS NULL') }
@@ -18,10 +18,13 @@ class UserEmail < ActiveRecord::Base
   end
 
   def self.add_emails_for_user_id(user_id, email_list)
-    email_list.each do |email|
-      next if where(user_id: user, email: email).present?
+    email_list.to_s.split(',').reject(&:blank?).each do |str|
+      email = EmailNormalizer.new(str).normalized
+      next if where(user_id: user_id, email: email).present?
       ue = self.new(user_id: user_id, email: email)
       ue.generate_confirmation
+      ue.save
+      # pp ue
       ue.send_confirmation_email
     end
   end
@@ -53,11 +56,15 @@ class UserEmail < ActiveRecord::Base
     created_at > Time.zone.now - 2.hours
   end
 
-  def send_confirmation_email
-    AdditinoalEmailConfirmationWorker.perform_async(user_id) unless confirmed
+  def confirm(token)
+    if token == confirmation_token
+      update_attribute :confirmation_token, nil
+    end
   end
 
-  protected
+  def send_confirmation_email
+    AdditionalEmailConfirmationWorker.perform_async(id) unless confirmed
+  end
 
   def generate_confirmation
     self.update_attribute :confirmation_token, (Digest::MD5.hexdigest "#{SecureRandom.hex(10)}-#{DateTime.now.to_s}")
