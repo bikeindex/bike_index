@@ -27,7 +27,7 @@ module Api
             feedback.name = (current_user.name.present? && current_user.name) || 'no name'
             feedback.feedback_hash = { bike_id: bike_id }
             if params[:serial_update_serial].present?
-              bike.current_stolen_record.update_attribute :tsved_at, nil if bike.current_stolen_record.present?
+              bike.current_stolenRecord.update_attribute :tsved_at, nil if bike.current_stolenRecord.present?
               feedback.feedback_hash[:new_serial] = params[:serial_update_serial]
               feedback.feedback_hash[:old_serial] = bike.serial_number
               bike.serial_number = params[:serial_update_serial]
@@ -45,19 +45,19 @@ module Api
                 feedback.feedback_hash[:new_manufacturer] = bike.manufacturer.name
               end
             elsif feedback_type.match('bike_recovery')
-              if bike.current_stolen_record.present?
-                stolen_record_id = params[:mark_recovered_stolen_record_id]
-                unless stolen_record_id.present?
-                  stolen_record_id = bike.current_stolen_record_id
+              if bike.current_stolenRecord.present?
+                stolenRecord_id = params[:mark_recovered_stolenRecord_id]
+                unless stolenRecord_id.present?
+                  stolenRecord_id = bike.current_stolenRecord_id
                 end
-                RecoveryUpdateWorker.perform_async(stolen_record_id, params)
+                RecoveryUpdateWorker.perform_async(stolenRecord_id, params)
                 if params[:index_helped_recovery].present?
                   feedback.feedback_hash[:index_helped_recovery] = params[:index_helped_recovery]
                 end
                 if params[:can_share_recovery].present?
                   feedback.feedback_hash[:can_share_recovery] = params[:can_share_recovery]
                 else
-                  RecoveryNotifyWorker.perform_in(1.minutes, bike.current_stolen_record.id)
+                  RecoveryNotifyWorker.perform_in(1.minutes, bike.current_stolenRecord.id)
                 end
               end
             end

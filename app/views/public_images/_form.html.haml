@@ -1,13 +1,13 @@
-= form_for @public_image do |f|
-  - if @public_image.errors.any?
+= form_for publicImage do |f|
+  - if publicImage.errors.any?
     #alert-block
       .alert-error
         %a.close{ herf: "#", data: {dismiss: "alert"}}
           x
         %h4
-          #{pluralize(@public_image.errors.count, "Error")} prevented photo from saving
+          #{pluralize(publicImage.errors.count, "Error")} prevented photo from saving
         %ul
-          - @public_image.errors.full_messages.each do |msg|
+          - publicImage.errors.full_messages.each do |msg|
             %li
               = msg
 
@@ -30,4 +30,4 @@
                 = f.check_box :is_private
     .bibox-btn.padded
       = f.submit "Save image", class: "button-green"
-      = link_to 'Cancel Update', edit_bike_url(@public_image.imageable), class: "button-red"
+      = link_to 'Cancel Update', edit_bike_url(publicImage.imageable), class: "button-red"

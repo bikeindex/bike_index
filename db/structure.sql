@@ -11,7 +11,7 @@ CREATE TABLE `ads` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-CREATE TABLE `b_params` (
+CREATE TABLE `bikeParams` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `params` text COLLATE utf8_unicode_ci,
   `bike_title` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -72,7 +72,7 @@ CREATE TABLE `bikes` (
   `frame_size_unit` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `serial_normalized` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `pdf` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `card_id` int(11) DEFAULT NULL,
+  `cardId` int(11) DEFAULT NULL,
   `recovered` tinyint(1) NOT NULL DEFAULT '0',
   `paint_id` int(11) DEFAULT NULL,
   `registered_new` tinyint(1) DEFAULT NULL,
@@ -81,7 +81,7 @@ CREATE TABLE `bikes` (
   `creation_country_id` int(11) DEFAULT NULL,
   `country_id` int(11) DEFAULT NULL,
   `stock_photo_url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `current_stolen_record_id` int(11) DEFAULT NULL,
+  `current_stolenRecord_id` int(11) DEFAULT NULL,
   `listing_order` int(11) DEFAULT NULL,
   `approved_stolen` tinyint(1) DEFAULT NULL,
   `all_description` text COLLATE utf8_unicode_ci,
@@ -97,9 +97,9 @@ CREATE TABLE `bikes` (
   KEY `index_bikes_on_secondary_frame_color_id` (`secondary_frame_color_id`),
   KEY `index_bikes_on_tertiary_frame_color_id` (`tertiary_frame_color_id`),
   KEY `index_bikes_on_manufacturer_id` (`manufacturer_id`),
-  KEY `index_bikes_on_current_stolen_record_id` (`current_stolen_record_id`),
+  KEY `index_bikes_on_current_stolenRecord_id` (`current_stolenRecord_id`),
   KEY `index_bikes_on_cycle_type_id` (`cycle_type_id`),
-  KEY `index_bikes_on_card_id` (`card_id`),
+  KEY `index_bikes_on_cardId` (`cardId`),
   KEY `index_bikes_on_paint_id` (`paint_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -408,7 +408,7 @@ CREATE TABLE `normalized_serial_segments` (
   KEY `index_normalized_serial_segments_on_duplicate_bike_group_id` (`duplicate_bike_group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-CREATE TABLE `oauth_access_grants` (
+CREATE TABLE `oauth_accessGrants` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `resource_owner_id` int(11) NOT NULL,
   `application_id` int(11) NOT NULL,
@@ -419,7 +419,7 @@ CREATE TABLE `oauth_access_grants` (
   `revoked_at` datetime DEFAULT NULL,
   `scopes` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `index_oauth_access_grants_on_token` (`token`)
+  UNIQUE KEY `index_oauth_accessGrants_on_token` (`token`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `oauth_access_tokens` (
@@ -449,14 +449,14 @@ CREATE TABLE `oauth_applications` (
   `owner_id` int(11) DEFAULT NULL,
   `owner_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `is_internal` tinyint(1) NOT NULL DEFAULT '0',
-  `can_send_stolen_notifications` tinyint(1) NOT NULL DEFAULT '0',
+  `can_send_stolenNotifications` tinyint(1) NOT NULL DEFAULT '0',
   `scopes` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_oauth_applications_on_uid` (`uid`),
   KEY `index_oauth_applications_on_owner_id_and_owner_type` (`owner_id`,`owner_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-CREATE TABLE `organization_deals` (
+CREATE TABLE `organizationDeals` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `organization_id` int(11) DEFAULT NULL,
   `deal_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -467,7 +467,7 @@ CREATE TABLE `organization_deals` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-CREATE TABLE `organization_invitations` (
+CREATE TABLE `organizationInvitations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `invitee_email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `invitee_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -480,7 +480,7 @@ CREATE TABLE `organization_invitations` (
   `updated_at` datetime NOT NULL,
   `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `index_organization_invitations_on_organization_id` (`organization_id`)
+  KEY `index_organizationInvitations_on_organization_id` (`organization_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `organizations` (
@@ -575,7 +575,7 @@ CREATE TABLE `propulsion_types` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-CREATE TABLE `public_images` (
+CREATE TABLE `publicImages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `image` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -586,7 +586,7 @@ CREATE TABLE `public_images` (
   `updated_at` datetime NOT NULL,
   `is_private` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  KEY `index_public_images_on_imageable_id_and_imageable_type` (`imageable_id`,`imageable_type`)
+  KEY `index_publicImages_on_imageable_id_and_imageable_type` (`imageable_id`,`imageable_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `rear_gear_types` (
@@ -603,7 +603,7 @@ CREATE TABLE `rear_gear_types` (
 
 CREATE TABLE `recovery_displays` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `stolen_record_id` int(11) DEFAULT NULL,
+  `stolenRecord_id` int(11) DEFAULT NULL,
   `quote` text COLLATE utf8_unicode_ci,
   `quote_by` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `date_recovered` datetime DEFAULT NULL,
@@ -612,7 +612,7 @@ CREATE TABLE `recovery_displays` (
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `index_recovery_displays_on_stolen_record_id` (`stolen_record_id`)
+  KEY `index_recovery_displays_on_stolenRecord_id` (`stolenRecord_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `schema_migrations` (
@@ -631,7 +631,7 @@ CREATE TABLE `states` (
   KEY `index_states_on_country_id` (`country_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-CREATE TABLE `stolen_notifications` (
+CREATE TABLE `stolenNotifications` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `subject` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `sender_id` int(11) DEFAULT NULL,
@@ -644,10 +644,10 @@ CREATE TABLE `stolen_notifications` (
   `oauth_application_id` int(11) DEFAULT NULL,
   `reference_url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `index_stolen_notifications_on_oauth_application_id` (`oauth_application_id`)
+  KEY `index_stolenNotifications_on_oauth_application_id` (`oauth_application_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-CREATE TABLE `stolen_records` (
+CREATE TABLE `stolenRecords` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `zipcode` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `city` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -687,8 +687,8 @@ CREATE TABLE `stolen_records` (
   `create_open311` tinyint(1) NOT NULL DEFAULT '0',
   `tsved_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `index_stolen_records_on_bike_id` (`bike_id`),
-  KEY `index_stolen_records_on_latitude_and_longitude` (`latitude`,`longitude`)
+  KEY `index_stolenRecords_on_bike_id` (`bike_id`),
+  KEY `index_stolenRecords_on_latitude_and_longitude` (`latitude`,`longitude`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `users` (
@@ -720,7 +720,7 @@ CREATE TABLE `users` (
   `when_vendor_terms_of_service` datetime DEFAULT NULL,
   `confirmed` tinyint(1) DEFAULT NULL,
   `confirmation_token` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `can_send_many_stolen_notifications` tinyint(1) NOT NULL DEFAULT '0',
+  `can_send_many_stolenNotifications` tinyint(1) NOT NULL DEFAULT '0',
   `auth_token` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `stripe_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `is_paid_member` tinyint(1) NOT NULL DEFAULT '0',

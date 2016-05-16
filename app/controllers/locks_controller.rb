@@ -2,7 +2,7 @@
 *****************************************************************
 * File: app/controllers/locks_controller.rb 
 * Name: Class LocksController 
-* 
+* Class to lock bike at case stolen 
 *****************************************************************
 =end
 
@@ -62,6 +62,5 @@ class LocksController < ApplicationController
     flash[:notice] = "Whoops, that's not your lock!"
     redirect_to user_home_path and return
   end
-
 
 end

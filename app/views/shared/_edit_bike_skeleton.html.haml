@@ -1,7 +1,7 @@
-.form-well-header.container{ data: { template: @edit_template } }
+.form-well-header.container{ data: { template: @editTemplate } }
   .edit-bike-header
     %h1
-      - if @bike.stolen and @bike.find_current_stolen_record.present?
+      - if @bike.stolen and @bike.find_current_stolenRecord.present?
         %span.text-danger
           Stolen
       - else

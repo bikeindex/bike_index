@@ -9,7 +9,7 @@ class BikeIndex.BikeSearchBar extends BikeIndex
       @proximitySearch(e)
     $('#stolen_tab').click (e) =>
       @stolenSearch(e)
-    $('#non_stolen_tab').click (e) =>
+    $('#nonStolen_tab').click (e) =>
       @nonStolenSearch(e)
     
   setSearchProximity: ->
@@ -45,25 +45,25 @@ class BikeIndex.BikeSearchBar extends BikeIndex
     displayedCountNumber = @displayedCountNumber
     $('#stolen_tab .count').text(displayedCountNumber(counts.stolen))
     $('#stolen_proximity_tab .count').text(displayedCountNumber(counts.proximity))
-    $('#non_stolen_tab .count').text(displayedCountNumber(counts.non_stolen))
+    $('#nonStolen_tab .count').text(displayedCountNumber(counts.nonStolen))
 
   stolenSearch: (e) ->
     e.preventDefault()
     $('#stolen').val('true')
-    $('#non_stolen').val('')
+    $('#nonStolen').val('')
     $('#non_proximity').val('true')
     $('#bike_search_form').submit()
 
   nonStolenSearch: (e) ->
     e.preventDefault()
     $('#stolen').val('')
-    $('#non_stolen').val('true')
+    $('#nonStolen').val('true')
     $('#bike_search_form').submit()
 
   proximitySearch: (e) ->
     e.preventDefault()
     $('#stolen').val('true')
-    $('#non_stolen').val('')
+    $('#nonStolen').val('')
     $('#non_proximity').val('')
     $('#bike_search_form').submit()
 
@@ -74,7 +74,7 @@ class BikeIndex.BikeSearchBar extends BikeIndex
 
   initializeHeaderSearch: ($query_field) ->
     initial_opts = if $query_field.data('initial') then $query_field.data('initial') else []
-    per_page = 15
+    perPage = 15
     renderOption = @renderOption
     updateIncludeSerialOption = @updateIncludeSerialOption
     $query_field.selectize
@@ -103,12 +103,12 @@ class BikeIndex.BikeSearchBar extends BikeIndex
       load: (query, callback) ->
         that = this
         $.ajax
-          url: "/api/autocomplete?per_page=#{per_page}&q=#{encodeURIComponent(query)}"
+          url: "/api/autocomplete?perPage=#{perPage}&q=#{encodeURIComponent(query)}"
           type: 'GET'
           error: ->
             callback()
           success: (res) ->
-            result = res.matches.slice(0, per_page)
+            result = res.matches.slice(0, perPage)
             # Only add serial option if they've entered more than 2 char
             if query.length > 2 && window.includeSerialOption
               result.push({ id: 'serial', search_id: "s##{query}#", text: "#{query}", search: query })

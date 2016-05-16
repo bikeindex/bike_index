@@ -6,7 +6,7 @@ class StolenRecordUpdator
     @bike = creation_params[:bike]
     @date_stolen = creation_params[:date_stolen_input]
     @user = creation_params[:user]
-    @b_param = creation_params[:b_param]
+    @bikeParam = creation_params[:bikeParam]
   end 
 
   def updated_phone
@@ -20,14 +20,14 @@ class StolenRecordUpdator
   end
 
   def mark_records_not_current
-    stolen_records = StolenRecord.unscoped.where(bike_id: @bike.id)
-    if stolen_records.any?
-      stolen_records.each do |s|
+    stolenRecords = StolenRecord.unscoped.where(bike_id: @bike.id)
+    if stolenRecords.any?
+      stolenRecords.each do |s|
         s.current = false
         s.save
       end
     end
-    @bike.update_attribute :current_stolen_record_id, nil
+    @bike.update_attribute :current_stolenRecord_id, nil
   end
 
   def create_date_from_string(date_string)
@@ -37,13 +37,13 @@ class StolenRecordUpdator
 
   def update_records
     if @bike.stolen
-      create_new_record unless @bike.find_current_stolen_record.present?
+      create_new_record unless @bike.find_current_stolenRecord.present?
       if @date_stolen
-        stolen_record = @bike.reload.find_current_stolen_record
-        stolen_record.update_attributes(date_stolen: create_date_from_string(@date_stolen))
-      elsif @b_param && @b_param[:stolen_record].present?
-        stolen_record = @bike.reload.find_current_stolen_record
-        update_with_params(stolen_record).save
+        stolenRecord = @bike.reload.find_current_stolenRecord
+        stolenRecord.update_attributes(date_stolen: create_date_from_string(@date_stolen))
+      elsif @bikeParam && @bikeParam[:stolenRecord].present?
+        stolenRecord = @bike.reload.find_current_stolenRecord
+        update_with_params(stolenRecord).save
       end
     else
       @bike.update_attributes(recovered: false) if @bike.recovered == true
@@ -52,47 +52,47 @@ class StolenRecordUpdator
   end
 
   def set_creation_organization
-    csr = @bike.reload.find_current_stolen_record
+    csr = @bike.reload.find_current_stolenRecord
     csr.update_attributes(creation_organization_id: @bike.creation_organization_id)
   end
 
 
-  def update_with_params(stolen_record)
-    return stolen_record unless @b_param.present? && @b_param[:stolen_record].present?
-    sr = @b_param[:stolen_record]
-    stolen_record.police_report_number, stolen_record.police_report_department = [
+  def update_with_params(stolenRecord)
+    return stolenRecord unless @bikeParam.present? && @bikeParam[:stolenRecord].present?
+    sr = @bikeParam[:stolenRecord]
+    stolenRecord.police_report_number, stolenRecord.police_report_department = [
       sr[:police_report_number], sr[:police_report_department] 
     ]
-    stolen_record.theft_description, stolen_record.street, stolen_record.city, stolen_record.zipcode = [
+    stolenRecord.theft_description, stolenRecord.street, stolenRecord.city, stolenRecord.zipcode = [
       sr[:theft_description], sr[:street], sr[:city], sr[:zipcode]
     ]
-    stolen_record.date_stolen = create_date_from_string(sr[:date_stolen]) if sr[:date_stolen].present?
+    stolenRecord.date_stolen = create_date_from_string(sr[:date_stolen]) if sr[:date_stolen].present?
     if sr[:country].present?
       country = Country.fuzzy_iso_find(sr[:country])
-      stolen_record.country_id = country.id if country.present?
+      stolenRecord.country_id = country.id if country.present?
     end
-    stolen_record.state_id = State.fuzzy_abbr_find(sr[:state]).id if sr[:state].present?
+    stolenRecord.state_id = State.fuzzy_abbr_find(sr[:state]).id if sr[:state].present?
     if sr[:phone_no_show]
-    	stolen_record.phone_for_everyone = false
-    	stolen_record.phone_for_users = false
-    	stolen_record.phone_for_shops = false
-    	stolen_record.phone_for_police = false
+    	stolenRecord.phone_for_everyone = false
+    	stolenRecord.phone_for_users = false
+    	stolenRecord.phone_for_shops = false
+    	stolenRecord.phone_for_police = false
     end
-    stolen_record.locking_description = sr[:locking_description]
-    stolen_record.lock_defeat_description = sr[:lock_defeat_description]
-    stolen_record
+    stolenRecord.locking_description = sr[:locking_description]
+    stolenRecord.lock_defeat_description = sr[:lock_defeat_description]
+    stolenRecord
   end
 
   def create_new_record
     mark_records_not_current
-    new_stolen_record = StolenRecord.new(bike: @bike, current: true, date_stolen: Time.now)
+    new_stolenRecord = StolenRecord.new(bike: @bike, current: true, date_stolen: Time.now)
     if updated_phone.present?
-      new_stolen_record.phone = updated_phone
+      new_stolenRecord.phone = updated_phone
     end
-    new_stolen_record.country_id = Country.united_states.id rescue (raise StolenRecordError, "US isn't instantiated - Stolen Record updater error")
-    stolen_record = update_with_params(new_stolen_record)
-    if stolen_record.save
-      @bike.reload.update_attribute :current_stolen_record_id, stolen_record.id
+    new_stolenRecord.country_id = Country.united_states.id rescue (raise StolenRecordError, "US isn't instantiated - Stolen Record updater error")
+    stolenRecord = update_with_params(new_stolenRecord)
+    if stolenRecord.save
+      @bike.reload.update_attribute :current_stolenRecord_id, stolenRecord.id
       return true
     end
     raise StolenRecordError, "Awww shucks! We failed to mark this bike as stolen. Try again?"

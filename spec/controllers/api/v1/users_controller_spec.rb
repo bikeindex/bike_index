@@ -109,11 +109,11 @@ describe Api::V1::UsersController do
 
     it 'it untsvs a bike' do
       t = Time.now - 1.minute
-      stolen_record = FactoryGirl.create(:stolen_record, tsved_at: t)
-      o = FactoryGirl.create(:ownership, bike: stolen_record.bike)
+      stolenRecord = FactoryGirl.create(:stolenRecord, tsved_at: t)
+      o = FactoryGirl.create(:ownership, bike: stolenRecord.bike)
       user = o.creator
       bike = o.bike
-      bike.update_attribute :current_stolen_record_id, bike.find_current_stolen_record.id
+      bike.update_attribute :current_stolenRecord_id, bike.find_current_stolenRecord.id
       serial_request = {
         request_type: 'serial_update_request',
         user_id: user.id,
@@ -127,8 +127,8 @@ describe Api::V1::UsersController do
       expect(response.code).to eq('200')
       bike.reload
       expect(bike.serial_number).to eq('some new serial')
-      stolen_record.reload
-      expect(stolen_record.tsved_at).to be_nil
+      stolenRecord.reload
+      expect(stolenRecord.tsved_at).to be_nil
     end
 
     it 'creates a new recovery request mail' do
@@ -139,7 +139,7 @@ describe Api::V1::UsersController do
         o = FactoryGirl.create(:ownership)
         user = o.creator
         bike = o.bike
-        stolen_record = FactoryGirl.create(:stolen_record, bike: bike)
+        stolenRecord = FactoryGirl.create(:stolenRecord, bike: bike)
         bike.update_attribute :stolen, true
         recovery_request = {
           request_type: 'bike_recovery',
@@ -148,22 +148,22 @@ describe Api::V1::UsersController do
           request_reason: 'Some reason',
           index_helped_recovery: 'true',
           can_share_recovery: 'true',
-          mark_recovered_stolen_record_id: stolen_record.id
+          mark_recovered_stolenRecord_id: stolenRecord.id
         }
         set_current_user(user)
-        bike.reload.update_attributes(stolen: false, current_stolen_record_id: nil)
+        bike.reload.update_attributes(stolen: false, current_stolenRecord_id: nil)
         bike.reload
         post :send_request, recovery_request.as_json
         expect(response.code).to eq('200')
         expect(flash[:error]).not_to be_present
         expect(bike.reload.stolen).to be_falsey
         # ALSO MAKE SURE IT RECOVERY NOTIFIES
-        expect(stolen_record.reload.current).to be_falsey
-        expect(stolen_record.bike).to eq(bike)
-        expect(stolen_record.date_recovered).to be_present
-        expect(stolen_record.recovery_posted).to be_falsey
-        expect(stolen_record.index_helped_recovery).to be_truthy
-        expect(stolen_record.can_share_recovery).to be_truthy
+        expect(stolenRecord.reload.current).to be_falsey
+        expect(stolenRecord.bike).to eq(bike)
+        expect(stolenRecord.date_recovered).to be_present
+        expect(stolenRecord.recovery_posted).to be_falsey
+        expect(stolenRecord.index_helped_recovery).to be_truthy
+        expect(stolenRecord.can_share_recovery).to be_truthy
       end
     end
 

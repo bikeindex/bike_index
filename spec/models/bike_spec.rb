@@ -18,17 +18,17 @@ describe Bike do
     it { is_expected.to belong_to :creator }
     it { is_expected.to belong_to :updator }
     it { is_expected.to belong_to :creation_organization }
-    it { is_expected.to belong_to :current_stolen_record }
+    it { is_expected.to belong_to :current_stolenRecord }
     it { is_expected.to belong_to :location }
     it { is_expected.to have_many :duplicate_bike_groups }
-    it { is_expected.to have_many :b_params }
-    it { is_expected.to have_many :stolen_notifications }
-    it { is_expected.to have_many :stolen_records }
+    it { is_expected.to have_many :bikeParams }
+    it { is_expected.to have_many :stolenNotifications }
+    it { is_expected.to have_many :stolenRecords }
     it { is_expected.to have_many :ownerships }
-    it { is_expected.to have_many :public_images }
+    it { is_expected.to have_many :publicImages }
     it { is_expected.to have_many :components }
     it { is_expected.to have_many :other_listings }
-    it { is_expected.to accept_nested_attributes_for :stolen_records }
+    it { is_expected.to accept_nested_attributes_for :stolenRecords }
     it { is_expected.to accept_nested_attributes_for :components }
     it { is_expected.to validate_presence_of :cycle_type_id }
     it { is_expected.to validate_presence_of :propulsion_type_id }
@@ -47,8 +47,8 @@ describe Bike do
     it 'scopes to only stolen bikes' do
       expect(Bike.stolen.to_sql).to eq(Bike.where(stolen: true).to_sql)
     end
-    it 'non_stolen scopes to only non_stolen bikes' do
-      expect(Bike.non_stolen.to_sql).to eq(Bike.where(stolen: false).to_sql)
+    it 'nonStolen scopes to only nonStolen bikes' do
+      expect(Bike.nonStolen.to_sql).to eq(Bike.where(stolen: false).to_sql)
     end
   end
 
@@ -57,8 +57,8 @@ describe Bike do
       o = FactoryGirl.create(:ownership)
       user = o.creator
       bike = o.bike
-      recovered_2 = FactoryGirl.create(:stolen_record, bike: bike, current: false)
-      recovered_1 = FactoryGirl.create(:stolen_record, bike: bike, current: false, date_stolen: (Time.now - 1.day))
+      recovered_2 = FactoryGirl.create(:stolenRecord, bike: bike, current: false)
+      recovered_1 = FactoryGirl.create(:stolenRecord, bike: bike, current: false, date_stolen: (Time.now - 1.day))
       expect(bike.reload.recovered_records.first).to eq(recovered_2)
     end
   end
@@ -271,22 +271,22 @@ describe Bike do
     end
   end
 
-  describe 'find_current_stolen_record' do
+  describe 'find_current_stolenRecord' do
     it 'returns the last current stolen record if bike is stolen' do
       @bike = Bike.new
-      first_stolen_record = StolenRecord.new
-      second_stolen_record = StolenRecord.new
-      allow(first_stolen_record).to receive(:current).and_return(true)
-      allow(second_stolen_record).to receive(:current).and_return(true)
+      first_stolenRecord = StolenRecord.new
+      second_stolenRecord = StolenRecord.new
+      allow(first_stolenRecord).to receive(:current).and_return(true)
+      allow(second_stolenRecord).to receive(:current).and_return(true)
       allow(@bike).to receive(:stolen).and_return(true)
-      allow(@bike).to receive(:stolen_records).and_return([first_stolen_record, second_stolen_record])
-      expect(@bike.find_current_stolen_record).to eq(second_stolen_record)
+      allow(@bike).to receive(:stolenRecords).and_return([first_stolenRecord, second_stolenRecord])
+      expect(@bike.find_current_stolenRecord).to eq(second_stolenRecord)
     end
 
     it "is false if the bike isn't stolen" do
       @bike = Bike.new
       allow(@bike).to receive(:stolen).and_return(false)
-      expect(@bike.find_current_stolen_record).to be_falsey
+      expect(@bike.find_current_stolenRecord).to be_falsey
     end
   end
 
@@ -450,7 +450,7 @@ describe Bike do
   describe 'cache_photo' do
     it 'caches the photo' do
       bike = FactoryGirl.create(:bike)
-      image = FactoryGirl.create(:public_image, imageable: bike)
+      image = FactoryGirl.create(:publicImage, imageable: bike)
       bike.reload
       bike.cache_photo
       expect(bike.thumb_path).not_to be_nil
@@ -482,29 +482,29 @@ describe Bike do
 
   describe 'cache_stolen_attributes' do
     it 'saves the stolen description to all description and set stolen_rec_id' do
-      stolen_record = FactoryGirl.create(:stolen_record, theft_description: 'some theft description')
-      bike = stolen_record.bike
+      stolenRecord = FactoryGirl.create(:stolenRecord, theft_description: 'some theft description')
+      bike = stolenRecord.bike
       bike.description = 'I love my bike'
       bike.cache_stolen_attributes
       expect(bike.all_description).to eq('I love my bike some theft description')
     end
     it 'grabs the desc and erase current_stolen_id' do
-      bike = Bike.new(current_stolen_record_id: 69, description: 'lalalala')
+      bike = Bike.new(current_stolenRecord_id: 69, description: 'lalalala')
       bike.cache_stolen_attributes
-      expect(bike.current_stolen_record_id).not_to be_present
+      expect(bike.current_stolenRecord_id).not_to be_present
       expect(bike.all_description).to eq('lalalala')
     end
   end
 
   describe 'cache_bike' do
     it 'calls cache photo and cache component and erase stolen_rec_id' do
-      bike = FactoryGirl.create(:bike, current_stolen_record_id: 69)
+      bike = FactoryGirl.create(:bike, current_stolenRecord_id: 69)
       expect(bike).to receive(:cache_photo)
       expect(bike).to receive(:cache_stolen_attributes)
       expect(bike).to receive(:cache_attributes)
       expect(bike).to receive(:components_cache_string)
       bike.cache_bike
-      expect(bike.current_stolen_record_id).to be_nil
+      expect(bike.current_stolenRecord_id).to be_nil
     end
     it 'caches all the bike parts' do
       type = FactoryGirl.create(:cycle_type, name: 'Unicycle')
@@ -512,7 +512,7 @@ describe Bike do
       material = FactoryGirl.create(:frame_material)
       propulsion = FactoryGirl.create(:propulsion_type, name: 'Hand pedaled')
       b = FactoryGirl.create(:bike, cycle_type: type, propulsion_type_id: propulsion.id)
-      s = FactoryGirl.create(:stolen_record, bike: b)
+      s = FactoryGirl.create(:stolenRecord, bike: b)
       b.update_attributes(year: 1999, frame_material_id: material.id,
                           secondary_frame_color_id: b.primary_frame_color_id,
                           tertiary_frame_color_id: b.primary_frame_color_id,
@@ -521,7 +521,7 @@ describe Bike do
                           frame_model: 'Some model', handlebar_type_id: handlebar.id)
       b.cache_bike
       expect(b.cached_data).to eq("#{b.manufacturer_name} Hand pedaled 1999 #{b.primary_frame_color.name} #{b.secondary_frame_color.name} #{b.tertiary_frame_color.name} #{material.name} 56ballsacks #{b.frame_model} #{b.rear_wheel_size.name} wheel  unicycle ")
-      expect(b.current_stolen_record_id).to eq(s.id)
+      expect(b.current_stolenRecord_id).to eq(s.id)
     end
     it 'has before_save_callback_method defined as a before_save callback' do
       expect(Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:cache_bike)).to eq(true)
@@ -568,10 +568,10 @@ describe Bike do
     it 'is the current stolen record date stolen * 1000' do
       bike = Bike.new
       allow(bike).to receive(:stolen).and_return(true)
-      stolen_record = StolenRecord.new
+      stolenRecord = StolenRecord.new
       yesterday = Time.now - 1.days
-      allow(stolen_record).to receive(:date_stolen).and_return(yesterday)
-      allow(bike).to receive(:current_stolen_record).and_return(stolen_record)
+      allow(stolenRecord).to receive(:date_stolen).and_return(yesterday)
+      allow(bike).to receive(:current_stolenRecord).and_return(stolenRecord)
       lo = bike.get_listing_order
       expect(lo).to eq(yesterday.to_time.to_i)
     end
@@ -586,12 +586,12 @@ describe Bike do
     end
 
     it 'does not get out of integer errors' do
-      stolen_record = FactoryGirl.create(:stolen_record)
-      bike = stolen_record.bike
+      stolenRecord = FactoryGirl.create(:stolenRecord)
+      bike = stolenRecord.bike
       digits = (Time.now.year - 1).to_s[2, 3] # last two digits of last year
       problem_date = Date.strptime("#{Time.now.month + 1}-22-00#{digits}", '%m-%d-%Y')
       bike.update_attribute :stolen, true
-      stolen_record.update_attribute :date_stolen, problem_date
+      stolenRecord.update_attribute :date_stolen, problem_date
       bike.update_attribute :listing_order, bike.get_listing_order
       expect(bike.listing_order).to be > (Time.now - 1.year).to_time.to_i
     end

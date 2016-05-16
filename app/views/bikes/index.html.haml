@@ -1,5 +1,5 @@
 #bikes-search
-  %span#selectize_items{ data: { initial: @selectize_items.to_json } }
+  %span#selectizeItems{ data: { initial: @selectizeItems.to_json } }
 
 - if params[:stolen].present? && params[:stolen].to_s != 'false'
   - if params[:non_proximity].present? && params[:non_proximity].to_s != 'false'
@@ -7,7 +7,7 @@
   - else
     - active = 'proximity'
 - else
-  - active = 'non_stolen'
+  - active = 'nonStolen'
 - url = request.original_url.split('bikes?').last
 - url = "#{ENV['BASE_URL']}/api/v2/bikes_search/count?#{url}"
 %nav#search_tabs.bikes-search-type-tabs{ data: {url: url }}
@@ -27,7 +27,7 @@
           Stolen anywhere
           %span.count
       %li
-        %a#non_stolen_tab{ href: '#', class: ('active' if active == 'non_stolen') }
+        %a#nonStolen_tab{ href: '#', class: ('active' if active == 'nonStolen') }
           Not marked stolen
           %span.count
       / %li
@@ -51,17 +51,17 @@
     %h1.no-results
       - if active == 'proximity'
         - desc = "nearby stolen bikes"
-      - elsif active == 'non_stolen'
+      - elsif active == 'nonStolen'
         - desc = 'non-stolen bikes'
       - elsif active == 'stolen'
         - desc = 'bikes stolen anywhere'
       No #{desc}
-      - if @secondary_bikes.present?
+      - if @secondaryBikes.present?
         exactly match that serial
       - else
         matched your search
 
-- if @secondary_bikes.present?  
+- if @secondaryBikes.present?  
   .container
     %h2.secondary-bikes
       Serial numbers close to
@@ -69,6 +69,6 @@
         #{params[:serial]}
 
     %ul.bike-boxes
-      = render partial: "/bikes/bike_u", collection: @secondary_bikes, locals: {target: "show" }
+      = render partial: "/bikes/bike_u", collection: @secondaryBikes, locals: {target: "show" }
 
 = render '/shared/bikes_footer_ad'

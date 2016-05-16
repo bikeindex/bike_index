@@ -22,11 +22,11 @@
     - if @bike.manufacturer.logo && @bike.manufacturer.logo.url != "https://files.bikeindex.org/blank.png"
       .mnfg-logo
         %img{ src: @bike.manufacturer.logo }
-    - if @bike.public_images.present?
+    - if @bike.publicImages.present?
       - if Rails.env.development?
-        %img.bike-photo{ src: root_url + @bike.public_images.first.image_url }
+        %img.bike-photo{ src: root_url + @bike.publicImages.first.image_url }
       - else
-        %img.bike-photo{ src: @bike.public_images.first.image_url }
+        %img.bike-photo{ src: @bike.publicImages.first.image_url }
     - elsif @bike.stock_photo_url.present?
       %img.bike-photo{ src: @bike.stock_photo_url }
     %h1
@@ -35,13 +35,13 @@
           Stolen
       = @bike.title
 
-  - if @stolen_record.present?
+  - if @stolenRecord.present?
     .stolen-container
-      - if @stolen_record.theft_description.present?
+      - if @stolenRecord.theft_description.present?
         %p
           %em
             Description of theft
-          = @stolen_record.theft_description.truncate(300)
+          = @stolenRecord.theft_description.truncate(300)
       .bike-details
         %table.table.table-striped
           %tbody
@@ -49,35 +49,35 @@
               %td.td-title
                 Date Stolen
               %td
-                = @stolen_record.date_stolen.strftime("%m-%d-%Y")
+                = @stolenRecord.date_stolen.strftime("%m-%d-%Y")
             %tr
               %td.td-title
                 Location
               %td
-                = @stolen_record.address
+                = @stolenRecord.address
 
       .bike-details
         %table.table.table-striped
           %tbody
-            - if @stolen_record.phone.present?
+            - if @stolenRecord.phone.present?
               %tr
                 %td.td-title
                   Owner phone
                 %td
-                  %a.phone-number-link{ href: "tell:#{@stolen_record.phone}" }
-                    = @stolen_record.display_phone
-            - if @stolen_record.police_report_number.present?
+                  %a.phone-number-link{ href: "tell:#{@stolenRecord.phone}" }
+                    = @stolenRecord.display_phone
+            - if @stolenRecord.police_report_number.present?
               %tr
                 %td.td-title
                   Police report
                 %td
-                  = @stolen_record.police_report_number
-            - if @stolen_record.police_report_department.present?
+                  = @stolenRecord.police_report_number
+            - if @stolenRecord.police_report_department.present?
               %tr
                 %td.td-title
                   Department
                 %td
-                  = @stolen_record.police_report_department
+                  = @stolenRecord.police_report_department
   - if @bike.description.present?
     .description
       %p
@@ -117,7 +117,7 @@
                 Model
               %td
                 = @bike.frame_model
-          - unless @bike.stolen and @stolen_record.present?
+          - unless @bike.stolen and @stolenRecord.present?
             - if @bike.frame_size.present?
               %tr
                 %td.td-title
@@ -136,7 +136,7 @@
                 = 'Color'.pluralize(@bike.frame_colors.count)
               %td
                 = @bike.frame_colors.to_sentence
-          - unless @bike.stolen and @stolen_record.present?
+          - unless @bike.stolen and @stolenRecord.present?
             - if @bike.front_gear_type.present?
               %tr
                 %td.td-title
@@ -159,7 +159,7 @@
 
 
     .bike-details
-      - unless @bike.stolen and @stolen_record.present?
+      - unless @bike.stolen and @stolenRecord.present?
         %table.table.table-striped
           %tbody
             %tr

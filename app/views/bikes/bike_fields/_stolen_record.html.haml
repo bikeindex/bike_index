@@ -46,7 +46,7 @@
       = bike.label :date_stolen_input, "When was it #{stolen_type}?", class: "control-label"
       .controls
         #stolen_date
-          = bike.text_field :date_stolen_input, value: @bike.find_current_stolen_record.date_stolen.strftime("%m-%d-%Y"), required: true, data: { :'date-format' => "mm-dd-yyyy" }
+          = bike.text_field :date_stolen_input, value: @bike.find_current_stolenRecord.date_stolen.strftime("%m-%d-%Y"), required: true, data: { :'date-format' => "mm-dd-yyyy" }
     / .span6.input-tip
     /   .tip-title
     /     %h2 When was this bike stolen

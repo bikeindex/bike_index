@@ -17,7 +17,6 @@ class ApplicationController < ActionController::Base
   Need to call some authentication helper, 
   but not all, so declare helper_method with some of then    
 =end
-  
   helper_method :current_user, :current_organization, :user_root_url,
                 :remove_session, :revised_layout_enabled?
   
@@ -30,7 +29,6 @@ class ApplicationController < ActionController::Base
   Params: user_parms
   Return: send able the authorize request
 =end
-  
   def enable_rack_profiler
     if current_user && current_user.developer?
       Rack::MiniProfiler.authorize_request unless Rails.env.test?
@@ -44,8 +42,7 @@ class ApplicationController < ActionController::Base
   Explication: just check if layout is already revised
   Params: none
   Return: set a able layout revised
-=end
-  
+=end 
   def set_revised_layout
     self.class.layout 'application_revised' if revised_layout_enabled?
   end
@@ -55,8 +52,7 @@ class ApplicationController < ActionController::Base
   Explication: Method to validate te request CSRF 
   Params: none
   Return: Warning to user, tell him that he's doing somethig wrong
-=end
-  
+=end 
   def handle_unverified_request
     remove_session
     flash[:notice] = "CSRF invalid. If you weren't intentionally doing something dumb, please contact us"
@@ -69,7 +65,6 @@ class ApplicationController < ActionController::Base
   Params: none
   Return: 1728000
 =end
-  
   def cors_set_access_control_headers
     headers['Access-Control-Allow-Origin'] = '*'
     headers['Access-Control-Allow-Methods'] = 'POST, PUT, GET, OPTIONS'
@@ -84,7 +79,6 @@ class ApplicationController < ActionController::Base
   Params: return_to (see this method params)
   Return: return session, if params are ok (present)
 =end
-  
   def set_return_to
     session[:return_to] = params[:return_to] if params[:return_to].present?
   end
@@ -96,7 +90,6 @@ class ApplicationController < ActionController::Base
   Params: user password
   Return: permission to user change his password
 =end
-  
   def return_to_if_present
     if session[:return_to].present? || cookies[:return_to].present?
       target = session[:return_to] || cookies[:return_to]

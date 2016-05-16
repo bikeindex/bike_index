@@ -19,9 +19,9 @@ class BikeV2ShowSerializer < BikeV2Serializer
     :front_gear_type_slug,
     :rear_gear_type_slug
 
-  has_one :stolen_record
+  has_one :stolenRecord
 
-  has_many :public_images, :components
+  has_many :publicImages, :components
   
   def type_of_cycle
     object.cycle_type.name
@@ -47,9 +47,9 @@ class BikeV2ShowSerializer < BikeV2Serializer
     object.updated_at.to_i
   end
 
-  def stolen_record
-    if object.current_stolen_record.present?
-      StolenRecordV2Serializer.new(object.current_stolen_record, scope: scope, root: false, event: object)
+  def stolenRecord
+    if object.current_stolenRecord.present?
+      StolenRecordV2Serializer.new(object.current_stolenRecord, scope: scope, root: false, event: object)
     end
   end
 

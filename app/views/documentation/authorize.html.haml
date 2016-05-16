@@ -23,11 +23,11 @@
   %p.padded
     %strong
       Access code:
-    = @access_code
+    = @accessCode
   %p.padded
     %strong
       Access code converted into a token at this url:
-  - url = oauth_token_url(code: @access_code, client_secret: @application.secret, client_id: @application.uid, grant_type: 'authorization_code', redirect_uri: authorize_documentation_index_url)
+  - url = oauth_token_url(code: @accessCode, client_secret: @application.secret, client_id: @application.uid, grant_type: 'authorization_code', redirect_uri: authorize_documentation_index_url)
   %article
     %pre
       = link_to url, url, method: :post
@@ -43,20 +43,20 @@
             type: "POST",
             url: "#{oauth_token_url}",
             data: {
-              "code": "#{@access_code}",
+              "code": "#{@accessCode}",
               "client_secret": "#{@application.secret}",
               "client_id": "#{@application.uid}",
               "grant_type": "authorization_code",
               "redirect_uri": #{authorize_documentation_index_url}
             },
             success: function(data, textStatus, jqXHR) {
-              $('#access_grant_response').text(JSON.stringify(data,undefined,2));
+              $('#accessGrant_response').text(JSON.stringify(data,undefined,2));
             },
             error: function(data, textStatus, jqXHR) {
-              $('#access_grant_response').text(JSON.stringify(data, void 0, 2));
+              $('#accessGrant_response').text(JSON.stringify(data, void 0, 2));
             }
           });
-  - if @access_grant.revoked_at.present?
+  - if @accessGrant.revoked_at.present?
     %h3
       Success!
     %p
@@ -74,7 +74,7 @@
     %p
       %strong
         Access token response
-    %pre#access_grant_response
+    %pre#accessGrant_response
 
   %hr
   %p.padded
@@ -84,7 +84,7 @@
       type: "POST",
       url: "#{oauth_token_url}",
       data: {
-        "code": "#{@access_code}",
+        "code": "#{@accessCode}",
         "client_secret": "#{@application.secret}",
         "client_id": "#{@application.uid}",
         "grant_type": "authorization_code",
@@ -92,11 +92,11 @@
       },
       success: function(data, textStatus, jqXHR) {
         auth_info = data;
-        $('#access_grant_response').text(JSON.stringify(data,undefined,2));
+        $('#accessGrant_response').text(JSON.stringify(data,undefined,2));
         $('.documentation_url').attr("href", "#{api_v2_documentation_index_url}?access_token=" + data.access_token);
       },
       error: function(data, textStatus, jqXHR) {
-        $('#access_grant_response').text(JSON.stringify(data, undefined, 2));
+        $('#accessGrant_response').text(JSON.stringify(data, undefined, 2));
       }
     });
     
@@ -109,7 +109,7 @@
   %h3
     You submitted the access code:
     %code
-      = @access_code
+      = @accessCode
   %p
     Maybe you're playing around? Maybe that isn't your access token?
   %p

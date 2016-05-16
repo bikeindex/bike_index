@@ -75,19 +75,19 @@ describe Blog do
   describe 'set_index_image' do
     it 'sets the public image for a blog' do
       blog = FactoryGirl.create(:blog)
-      public_image = FactoryGirl.create(:public_image, imageable: blog)
+      publicImage = FactoryGirl.create(:publicImage, imageable: blog)
       blog.reload # Reload so it knows about association
       blog.set_index_image
-      expect(blog.index_image_id).to eq(public_image.id)
+      expect(blog.index_image_id).to eq(publicImage.id)
     end
 
     it "doesn't break if image doesn't exist" do
       blog = FactoryGirl.create(:blog)
-      public_image = FactoryGirl.create(:public_image, imageable: blog)
+      publicImage = FactoryGirl.create(:publicImage, imageable: blog)
       blog.reload # Reload so it knows about association
       blog.index_image_id = 3399
       blog.set_index_image
-      expect(blog.index_image_id).to eq(public_image.id)
+      expect(blog.index_image_id).to eq(publicImage.id)
     end
 
     it 'has before_save_callback_method defined for set_index_image' do

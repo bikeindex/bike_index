@@ -66,15 +66,15 @@ describe AdminMailer do
     end
   end
 
-  describe 'blocked_stolen_notification_email' do
+  describe 'blocked_stolenNotification_email' do
     before :each do
-      @stolen_notification = FactoryGirl.create(:stolen_notification, message: 'Test Message', subject: 'Test subject')
-      @mail = AdminMailer.blocked_stolen_notification_email(@stolen_notification)
+      @stolenNotification = FactoryGirl.create(:stolenNotification, message: 'Test Message', subject: 'Test subject')
+      @mail = AdminMailer.blocked_stolenNotification_email(@stolenNotification)
     end
 
     it 'renders email' do
       expect(@mail.subject[/blocked/i].present?).to be_truthy
-      expect(@mail.body.encoded).to match(@stolen_notification.message)
+      expect(@mail.body.encoded).to match(@stolenNotification.message)
     end
   end
 end

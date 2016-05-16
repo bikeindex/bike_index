@@ -2,30 +2,30 @@ class Admin::StolenNotificationsController < Admin::BaseController
   before_filter :find_notification, only: [:show, :resend]
 
   def index
-    stolen_notifications = StolenNotification.order("created_at desc").includes(:bike)
+    stolenNotifications = StolenNotification.order("created_at desc").includes(:bike)
     page = params[:page] || 1
-    per_page = params[:per_page] || 100
-    @stolen_notifications = stolen_notifications.page(page).per(per_page)
+    perPage = params[:perPage] || 100
+    @stolenNotifications = stolenNotifications.page(page).per(perPage)
   end
 
   def resend
-    if @stolen_notification.send_dates.count == 0 or params[:pretty_please]
-      EmailStolenNotificationWorker.perform_async(@stolen_notification.id)
+    if @stolenNotification.send_dates.count == 0 or params[:pretty_please]
+      EmailStolenNotificationWorker.perform_async(@stolenNotification.id)
       flash[:notice] = "Notification resent!"
-      redirect_to admin_stolen_notifications_url
+      redirect_to admin_stolenNotifications_url
     else
       flash[:notice] = "Notification has already been resent! If you actually want to resend, click the button on this page"
-      redirect_to admin_stolen_notification_url(@stolen_notification)
+      redirect_to admin_stolenNotification_url(@stolenNotification)
     end
   end
 
   def show
-    @bike = @stolen_notification.bike
-    @stolen_notification = @stolen_notification.decorate
+    @bike = @stolenNotification.bike
+    @stolenNotification = @stolenNotification.decorate
   end
 
   def find_notification
-    @stolen_notification = StolenNotification.find(params[:id])
+    @stolenNotification = StolenNotification.find(params[:id])
   end
 
 end

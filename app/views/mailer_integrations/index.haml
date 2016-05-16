@@ -5,10 +5,10 @@
       Mailer templates
     %p
       View the file that defines this table #{link_to 'on github', "#{github_base_url}config/mailer_integration_templates.yml"}.
-      - if @show_substitution_values
+      - if @showSubstitutionValues
         = link_to "hide substitution values", mailer_integrations_path
       - else
-        = link_to "view substitution values", mailer_integrations_path(show_substitution_values: true)
+        = link_to "view substitution values", mailer_integrations_path(showSubstitutionValues: true)
 .container-fluid
   .padded
   %table.table.table-bordered.table-striped.table-hover
@@ -18,7 +18,7 @@
           Template name, when sent
         %th
           email subject line
-        - if @show_substitution_values
+        - if @showSubstitutionValues
           %th
             Substitution values
     %tbody
@@ -32,7 +32,7 @@
               = template['description']
           %td
             = template['subject']
-          - if @show_substitution_values
+          - if @showSubstitutionValues
             %td
               - if template['args']
                 = template['args'].join(', ')

@@ -4,9 +4,9 @@ describe EmailBlockedStolenNotificationWorker do
   it { is_expected.to be_processed_in :notify }
 
   it 'sends an email' do
-    stolen_notification = FactoryGirl.create(:stolen_notification)
+    stolenNotification = FactoryGirl.create(:stolenNotification)
     ActionMailer::Base.deliveries = []
-    EmailBlockedStolenNotificationWorker.new.perform(stolen_notification.id)
+    EmailBlockedStolenNotificationWorker.new.perform(stolenNotification.id)
     expect(ActionMailer::Base.deliveries.empty?).to be_falsey
   end
 end

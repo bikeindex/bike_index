@@ -1,13 +1,13 @@
 #stolen_fields_store
 #root_url.hidden{data: { url: ENV['BASE_URL'] }}
 = form_for @bike, multipart: true do |f|
-  = f.hidden_field :b_param_id_token
+  = f.hidden_field :bikeParam_id_token
   = f.hidden_field :creation_organization_id
   = f.hidden_field :embeded, value: true
   .input-group
-    - if @stolen || @stolen_first
+    - if @stolen || @stolenFirst
       %span#stolen_registration_first
-    - unless @stolen || @non_stolen
+    - unless @stolen || @nonStolen
       #registration-type-tabs
         %a.registration-type-tab{ href: '#', data: { stype: 'description' } }
           Registering a stolen bike. Click here to register a non-stolen bike
@@ -87,7 +87,7 @@
   #stolen_fields_container
     #stolen_fields
       = f.hidden_field :stolen, value: true
-      = fields_for :stolen_record do |builder|
+      = fields_for :stolenRecord do |builder|
         = builder.hidden_field :phone_no_show, value: true
         .input-group
           .control-group
@@ -165,7 +165,7 @@
           = f.text_field :phone
   .input-group.optional-group.form-photo-group
   
-    - if @b_param.image.present? or @b_param.image_tmp.present?
+    - if @bikeParam.image.present? or @bikeParam.image_tmp.present?
       %strong
         Image has been uploaded
     - else

@@ -1,5 +1,5 @@
 class RecoveryDisplay < ActiveRecord::Base
-  attr_accessible :stolen_record_id,
+  attr_accessible :stolenRecord_id,
     :quote,
     :quote_by,
     :date_recovered,
@@ -12,7 +12,7 @@ class RecoveryDisplay < ActiveRecord::Base
   validates_presence_of :quote, :date_recovered
   mount_uploader :image, CircularImageUploader
   process_in_background :image, CarrierWaveProcessWorker
-  belongs_to :stolen_record
+  belongs_to :stolenRecord
 
   default_scope { order("date_recovered desc") }
 
@@ -26,18 +26,18 @@ class RecoveryDisplay < ActiveRecord::Base
     self.date_recovered = Time.now unless date_recovered.present?
   end
 
-  def from_stolen_record(sr_id)
+  def from_stolenRecord(sr_id)
     sr = StolenRecord.unscoped.where(id: sr_id).first
     return true unless sr.present?
-    self.stolen_record_id = sr_id
+    self.stolenRecord_id = sr_id
     self.date_recovered = sr.date_recovered
     self.quote = sr.recovered_description
     self.quote_by = sr.bike.current_ownership && sr.bike.owner && sr.bike.owner.name
   end
 
   def bike
-    return nil unless stolen_record_id.present?
-    StolenRecord.unscoped.find(stolen_record_id).bike
+    return nil unless stolenRecord_id.present?
+    StolenRecord.unscoped.find(stolenRecord_id).bike
   end
 
 end

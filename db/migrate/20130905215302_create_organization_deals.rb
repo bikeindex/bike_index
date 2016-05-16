@@ -1,6 +1,6 @@
 class CreateOrganizationDeals < ActiveRecord::Migration
   def change
-    create_table :organization_deals do |t|
+    create_table :organizationDeals do |t|
       t.integer :organization_id
       t.string :deal_name 
       t.string :email

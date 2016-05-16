@@ -18,13 +18,13 @@ class MailSnippet < ActiveRecord::Base
   def self.matching_opts(opts)
     return nil unless opts[:mailer_method].match("ownership_invitation_email")
     bike = opts[:bike]
-    return nil unless bike.stolen && bike.current_stolen_record.present?
-    stolen_record = bike.current_stolen_record
-    return nil unless stolen_record.latitude.present? && stolen_record.longitude.present?
+    return nil unless bike.stolen && bike.current_stolenRecord.present?
+    stolenRecord = bike.current_stolenRecord
+    return nil unless stolenRecord.latitude.present? && stolenRecord.longitude.present?
     match = nil
     self.enabled.where(is_location_triggered: true).each do |snippet|
 
-      distance = snippet.distance_to(stolen_record)
+      distance = snippet.distance_to(stolenRecord)
       match = snippet if distance <= snippet.proximity_radius
     end
     match

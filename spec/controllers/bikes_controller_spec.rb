@@ -10,7 +10,7 @@ describe BikesController do
           expect(response).to render_template(:index)
           expect(response).to render_with_layout('application_updated')
           expect(flash).to_not be_present
-          expect(assigns(:per_page)).to eq 10
+          expect(assigns(:perPage)).to eq 10
         end
       end
       context 'revised' do
@@ -22,7 +22,7 @@ describe BikesController do
             expect(response).to render_template(:index_revised)
             expect(response).to render_with_layout('application_revised')
             expect(flash).to_not be_present
-            expect(assigns(:per_page)).to eq 10
+            expect(assigns(:perPage)).to eq 10
             expect(assigns(:stolenness)).to eq 'stolen'
           end
         end
@@ -32,7 +32,7 @@ describe BikesController do
             get :index, proximity: 'ip'
             expect(response.status).to eq(200)
             expect(flash).to_not be_present
-            expect(assigns(:per_page)).to eq 10
+            expect(assigns(:perPage)).to eq 10
             expect(assigns(:stolenness)).to eq 'stolen_proximity'
           end
         end
@@ -43,15 +43,15 @@ describe BikesController do
             get :index,
                 query: "c_#{color.id},s#serialzzzzzz#,m_#{manufacturer.id}",
                 stolen: '',
-                non_stolen: 'true'
+                nonStolen: 'true'
             expect(response.status).to eq(200)
-            target_selectize_items = [
+            target_selectizeItems = [
               manufacturer.autocomplete_result_hash,
               color.autocomplete_result_hash,
               { id: 'serial', search_id: 's#serialzzzzzz#', text: 'serialzzzzzz' }
             ].as_json
-            expect(assigns(:selectize_items)).to eq target_selectize_items
-            expect(assigns(:stolenness)).to eq 'non_stolen'
+            expect(assigns(:selectizeItems)).to eq target_selectizeItems
+            expect(assigns(:stolenness)).to eq 'nonStolen'
           end
         end
       end
@@ -163,27 +163,27 @@ describe BikesController do
     end
   end
 
-  describe 'spokecard' do
+  describe 'spoke_card' do
     it 'renders the page from bike id' do
       bike = FactoryGirl.create(:bike)
-      get :spokecard, id: bike.id
+      get :spoke_card, id: bike.id
       expect(response.code).to eq('200')
     end
   end
 
-  describe 'scanned' do
+  describe 'scan' do
     it 'renders the page from bike id' do
       bike = FactoryGirl.create(:bike)
-      get :scanned, id: bike.id
+      get :scan, id: bike.id
       expect(response).to redirect_to bike_url(bike)
     end
     it 'redirects to the proper page' do
-      bike = FactoryGirl.create(:bike, card_id: 2)
-      get :scanned, card_id: bike.card_id
+      bike = FactoryGirl.create(:bike, cardId: 2)
+      get :scan, cardId: bike.cardId
       expect(response).to redirect_to bike_url(bike)
     end
     it "renders a page if there isn't a connection" do
-      get :scanned, card_id: 12
+      get :scan, cardId: 12
       expect(response.code).to eq('200')
     end
   end
@@ -236,16 +236,16 @@ describe BikesController do
           get :new, stolen: true
           expect(response.code).to eq('200')
           expect(assigns(:bike).stolen).to be_truthy
-          b_param = assigns(:b_param)
-          expect(b_param.revised_new?).to be_truthy
+          bikeParam = assigns(:bikeParam)
+          expect(bikeParam.revised_new?).to be_truthy
           expect(response).to render_template(:new_revised)
           expect(response).to render_with_layout('application_revised')
         end
       end
 
-      context 'bike through b_param' do
-        context 'valid b_param' do
-          it 'renders the bike from b_param' do
+      context 'bike through bikeParam' do
+        context 'valid bikeParam' do
+          it 'renders the bike from bikeParam' do
             manufacturer = FactoryGirl.create(:manufacturer)
             color = FactoryGirl.create(:color)
             bike_attrs = {
@@ -253,24 +253,24 @@ describe BikesController do
               primary_frame_color_id: color.id,
               owner_email: 'something@stuff.com'
             }
-            b_param = BParam.create(params: { bike: bike_attrs.merge(revised_new: true) })
-            expect(b_param.id_token).to be_present
-            get :new, b_param_token: b_param.id_token
+            bikeParam = BParam.create(params: { bike: bike_attrs.merge(revised_new: true) })
+            expect(bikeParam.id_token).to be_present
+            get :new, bikeParam_token: bikeParam.id_token
             bike = assigns(:bike)
-            expect(assigns(:b_param)).to eq b_param
+            expect(assigns(:bikeParam)).to eq bikeParam
             expect(bike.is_a?(Bike)).to be_truthy
             bike_attrs.each { |k, v| expect(bike.send(k)).to eq(v) }
             expect(response).to render_template(:new_revised)
             expect(response).to render_with_layout('application_revised')
           end
         end
-        context 'invalid b_param' do
+        context 'invalid bikeParam' do
           it 'renders a new bike, has a flash message' do
-            b_param = BParam.create(creator_id: FactoryGirl.create(:user).id)
-            get :new, b_param_token: b_param.id_token
+            bikeParam = BParam.create(creator_id: FactoryGirl.create(:user).id)
+            get :new, bikeParam_token: bikeParam.id_token
             bike = assigns(:bike)
             expect(bike.is_a?(Bike)).to be_truthy
-            expect(assigns(:b_param)).to_not eq b_param
+            expect(assigns(:bikeParam)).to_not eq bikeParam
             expect(response).to render_template(:new_revised)
             expect(response).to render_with_layout('application_revised')
             expect(flash[:notice]).to match(/sorry/i)
@@ -290,11 +290,11 @@ describe BikesController do
       describe 'web interface submission' do
         before :each do
           @user = FactoryGirl.create(:user)
-          @b_param = FactoryGirl.create(:b_param, creator: @user)
+          @bikeParam = FactoryGirl.create(:bikeParam, creator: @user)
           manufacturer = FactoryGirl.create(:manufacturer)
           set_current_user(@user)
           @bike = { serial_number: '1234567890',
-                    b_param_id_token: @b_param.id_token,
+                    bikeParam_id_token: @bikeParam.id_token,
                     cycle_type_id: FactoryGirl.create(:cycle_type).id,
                     manufacturer_id: manufacturer.id,
                     rear_tire_narrow: 'true',
@@ -305,7 +305,7 @@ describe BikesController do
           }
         end
 
-        it "renders new if b_param isn't owned by user" do
+        it "renders new if bikeParam isn't owned by user" do
           user = FactoryGirl.create(:user)
           set_current_user(user)
           post :create, bike: @bike
@@ -313,19 +313,19 @@ describe BikesController do
           expect(flash[:error]).to eq("Oops, that isn't your bike")
         end
 
-        it 'renders new if there is an error and update the b_params' do
+        it 'renders new if there is an error and update the bikeParams' do
           bike = Bike.new(@bike)
           bike.errors.add(:errory, 'something')
           expect_any_instance_of(BikeCreator).to receive(:create_bike).and_return(bike)
           post :create, bike: @bike
-          expect(@b_param.reload.bike_errors).not_to be_nil
+          expect(@bikeParam.reload.bike_errors).not_to be_nil
           expect(response).to render_template('new')
         end
 
         it 'redirects to the created bike if it exists' do
           bike = FactoryGirl.create(:bike)
-          @b_param.update_attributes(created_bike_id: bike.id)
-          post :create, bike: { b_param_id_token: @b_param.id_token }
+          @bikeParam.update_attributes(created_bike_id: bike.id)
+          post :create, bike: { bikeParam_id_token: @bikeParam.id_token }
           expect(response).to redirect_to(edit_bike_url(bike))
         end
 
@@ -335,8 +335,8 @@ describe BikesController do
           expect do
             post :create, stolen: 'true', bike: @bike
           end.to change(StolenRecord, :count).by(1)
-          expect(@b_param.reload.created_bike_id).not_to be_nil
-          expect(@b_param.reload.bike_errors).to be_nil
+          expect(@bikeParam.reload.created_bike_id).not_to be_nil
+          expect(@bikeParam.reload.bike_errors).to be_nil
           expect(@user.reload.phone).to eq('3123799513')
         end
 
@@ -358,9 +358,9 @@ describe BikesController do
           FactoryGirl.create(:membership, user: user, organization: organization)
           organization.save
           manufacturer = FactoryGirl.create(:manufacturer)
-          b_param = BParam.create(creator_id: organization.auto_user.id, params: { creation_organization_id: organization.id, embeded: true })
+          bikeParam = BParam.create(creator_id: organization.auto_user.id, params: { creation_organization_id: organization.id, embeded: true })
           bike = { serial_number: '69',
-                   b_param_id_token: b_param.id_token,
+                   bikeParam_id_token: bikeParam.id_token,
                    creation_organization_id: organization.id,
                    embeded: true,
                    additional_registration: 'Testly secondary',
@@ -387,11 +387,11 @@ describe BikesController do
             FactoryGirl.create(:membership, user: user, organization: organization)
             organization.save
             manufacturer = FactoryGirl.create(:manufacturer)
-            b_param = BParam.create(creator_id: organization.auto_user.id, params: { creation_organization_id: organization.id, embeded: true })
+            bikeParam = BParam.create(creator_id: organization.auto_user.id, params: { creation_organization_id: organization.id, embeded: true })
             test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg')))
             expect_any_instance_of(ImageAssociatorWorker).to receive(:perform).and_return(true)
             bike = { serial_number: '69',
-                     b_param_id_token: b_param.id_token,
+                     bikeParam_id_token: bikeParam.id_token,
                      creation_organization_id: organization.id,
                      embeded: true,
                      embeded_extended: true,
@@ -409,15 +409,15 @@ describe BikesController do
       end
 
       describe 'extended embed submission with persisted email' do
-        it 'registers a bike and redirects with persist_email' do
+        it 'registers a bike and redirects with persistEmail' do
           organization = FactoryGirl.create(:organization)
           user = FactoryGirl.create(:user)
           FactoryGirl.create(:membership, user: user, organization: organization)
           organization.save
           manufacturer = FactoryGirl.create(:manufacturer)
-          b_param = BParam.create(creator_id: organization.auto_user.id, params: { creation_organization_id: organization.id, embeded: true })
+          bikeParam = BParam.create(creator_id: organization.auto_user.id, params: { creation_organization_id: organization.id, embeded: true })
           bike = { serial_number: '69',
-                   b_param_id_token: b_param.id_token,
+                   bikeParam_id_token: bikeParam.id_token,
                    creation_organization_id: organization.id,
                    embeded: true,
                    embeded_extended: true,
@@ -427,7 +427,7 @@ describe BikesController do
                    handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
                    owner_email: 'Flow@goodtimes.com'
           }
-          post :create, bike: bike, persist_email: true
+          post :create, bike: bike, persistEmail: true
           expect(response).to redirect_to(embed_extended_organization_url(organization, email: 'flow@goodtimes.com'))
         end
       end
@@ -441,11 +441,11 @@ describe BikesController do
         allow(controller).to receive(:revised_layout_enabled?) { true }
         set_current_user(user)
       end
-      context 'no existing b_param' do
-        it "creates a bike and doesn't create a b_param" do
+      context 'no existing bikeParam' do
+        it "creates a bike and doesn't create a bikeParam" do
           wheel_size = FactoryGirl.create(:wheel_size)
           bike_params = {
-            b_param_id_token: '',
+            bikeParam_id_token: '',
             cycle_type_id: CycleType.bike.id.to_s,
             serial_number: 'example serial',
             manufacturer_id: manufacturer.slug,
@@ -473,7 +473,7 @@ describe BikesController do
           expect(bike.manufacturer).to eq manufacturer
         end
       end
-      context 'existing b_param' do
+      context 'existing bikeParam' do
         it 'creates a bike' do
           bike_params = {
             cycle_type_id: CycleType.bike.id.to_s,
@@ -486,18 +486,18 @@ describe BikesController do
             tertiary_frame_color_id: '',
             owner_email: 'something@stuff.com'
           }
-          b_param = BParam.create(params: { bike: bike_params })
+          bikeParam = BParam.create(params: { bike: bike_params })
           bb_data = { bike: { } }
           # We need to call clean_params on the BParam after bikebook update, so that
           # the foreign keys are assigned correctly. This is how we test that we're 
           # This is also where we're testing bikebook assignment
           expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
           expect do
-            post :create, bike: { manufacturer_id: manufacturer.slug, b_param_id_token: b_param.id_token }
+            post :create, bike: { manufacturer_id: manufacturer.slug, bikeParam_id_token: bikeParam.id_token }
           end.to change(Bike, :count).by(1)
           bike = Bike.last
-          b_param.reload
-          expect(b_param.created_bike_id).to eq bike.id
+          bikeParam.reload
+          expect(bikeParam.created_bike_id).to eq bike.id
           bike_params.delete(:manufacturer_id)
           bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v }
           expect(bike.manufacturer).to eq manufacturer
@@ -547,7 +547,7 @@ describe BikesController do
         context 'root' do
           context 'non-stolen bike' do
             it 'renders the bike_details template' do
-              edit_templates = {
+              editTemplates = {
                 root: 'Bike Details',
                 photos: 'Photos',
                 drivetrain: 'Wheels + Drivetrain',
@@ -558,14 +558,14 @@ describe BikesController do
               get :edit, id: bike.id
               expect(response).to render_with_layout 'application_revised'
               expect(response).to be_success
-              expect(assigns(:edit_template)).to eq 'root'
-              expect(assigns(:edit_templates)).to eq edit_templates
+              expect(assigns(:editTemplate)).to eq 'root'
+              expect(assigns(:editTemplates)).to eq editTemplates
               expect(response).to render_template 'edit_root'
             end
           end
           context 'stolen bike' do
             it 'renders with stolen as first template, different description' do
-              edit_templates = {
+              editTemplates = {
                 stolen: 'Theft details',
                 root: 'Bike Details',
                 photos: 'Photos',
@@ -579,8 +579,8 @@ describe BikesController do
               get :edit, id: bike.id
               expect(response).to render_with_layout 'application_revised'
               expect(response).to be_success
-              expect(assigns(:edit_template)).to eq 'stolen'
-              expect(assigns(:edit_templates)).to eq edit_templates
+              expect(assigns(:editTemplate)).to eq 'stolen'
+              expect(assigns(:editTemplates)).to eq editTemplates
               expect(response).to render_template 'edit_stolen'
             end
           end
@@ -592,7 +592,7 @@ describe BikesController do
               expect(response).to render_with_layout('application_revised')
               expect(response).to be_success
               expect(response).to render_template("edit_#{template}")
-              expect(assigns(:edit_template)).to eq(template)
+              expect(assigns(:editTemplate)).to eq(template)
               expect(assigns(:private_images)).to eq([]) if template == 'photos'
             end
           end
@@ -677,22 +677,22 @@ describe BikesController do
         # And finally, that it redirects to the correct page
         it 'updates and returns to the right page' do
           allow(controller).to receive(:revised_layout_enabled?) { true }
-          stolen_record = FactoryGirl.create(:stolen_record, bike: bike, city: 'party')
+          stolenRecord = FactoryGirl.create(:stolenRecord, bike: bike, city: 'party')
           bike.stolen = true
           # bike.marked_user_hidden = true
           bike.save
-          expect(stolen_record.date_stolen).to be_present
+          expect(stolenRecord.date_stolen).to be_present
           bike.reload
-          # bike.update_attributes(stolen: true, current_stolen_record_id: stolen_record.id)
+          # bike.update_attributes(stolen: true, current_stolenRecord_id: stolenRecord.id)
           bike.reload
-          expect(bike.find_current_stolen_record).to eq stolen_record
+          expect(bike.find_current_stolenRecord).to eq stolenRecord
           put :update,
               id: bike.id,
-              edit_template: 'fancy_template',
+              editTemplate: 'fancy_template',
               bike: {
                 stolen: true,
-                stolen_records_attributes: {
-                  stolen_record.id.to_s => {
+                stolenRecords_attributes: {
+                  stolenRecord.id.to_s => {
                     date_stolen_input: 'Mon Feb 22 2016',
                     phone: '9999999999',
                     street: '66666666 foo street'
@@ -705,16 +705,16 @@ describe BikesController do
           expect(bike.stolen).to be_truthy
           # expect(bike.hidden).to be_truthy
           # Stupid cheat because we're creating an extra record here for fuck all reason
-          current_stolen_record = bike.find_current_stolen_record
+          current_stolenRecord = bike.find_current_stolenRecord
 
-          # expect(bike.stolen_records.count).to eq 1
-          # stolen_record.reload
-          # expect(bike.find_current_stolen_record.id).to eq stolen_record.id
-          # stolen_record.reload
-          expect(current_stolen_record.phone).to eq '9999999999'
-          # expect(current_stolen_record.city).to eq 'party'
-          expect(current_stolen_record.street).to eq '66666666 foo street'
-          expect(current_stolen_record.date_stolen).to eq DateTime.strptime('02-22-2016 06', '%m-%d-%Y %H')
+          # expect(bike.stolenRecords.count).to eq 1
+          # stolenRecord.reload
+          # expect(bike.find_current_stolenRecord.id).to eq stolenRecord.id
+          # stolenRecord.reload
+          expect(current_stolenRecord.phone).to eq '9999999999'
+          # expect(current_stolenRecord.city).to eq 'party'
+          expect(current_stolenRecord.street).to eq '66666666 foo street'
+          expect(current_stolenRecord.date_stolen).to eq DateTime.strptime('02-22-2016 06', '%m-%d-%Y %H')
         end
       end
     end

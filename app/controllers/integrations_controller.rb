@@ -2,7 +2,8 @@
 *****************************************************************
 * File: app/controllers/integrations_controller.rb 
 * Name: Class IntegrationsController 
-* 
+* Class that contain methods to integration between session
+* and authentication
 *****************************************************************
 =end
 

@@ -11,8 +11,8 @@ describe MailSnippet do
       mail_snippet = FactoryGirl.create(:mail_snippet)
       country = FactoryGirl.create(:country, iso: 'US')
       bike = FactoryGirl.create(:bike, stolen: true)
-      stolen_record = FactoryGirl.create(:stolen_record, bike: bike, city: 'New York', country_id: country.id)
-      bike.update_attribute :current_stolen_record_id, stolen_record.id
+      stolenRecord = FactoryGirl.create(:stolenRecord, bike: bike, city: 'New York', country_id: country.id)
+      bike.update_attribute :current_stolenRecord_id, stolenRecord.id
       result = MailSnippet.matching_opts(bike: bike, mailer_method: 'ownership_invitation_email')
       expect(result).to eq(mail_snippet)
     end

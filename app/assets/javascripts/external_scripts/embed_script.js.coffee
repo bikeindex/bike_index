@@ -1,6 +1,6 @@
 initializeFrameMaker = (target) ->
-  per_page = 10
-  frame_mnfg_url = "#{window.root_url}/api/autocomplete?per_page=#{per_page}&categories=frame_mnfg&q="
+  perPage = 10
+  frame_mnfg_url = "#{window.root_url}/api/autocomplete?perPage=#{perPage}&categories=frame_mnfg&q="
   $(target).selectize
     plugins: ['restore_on_backspace']
     # preload: true
@@ -16,7 +16,7 @@ initializeFrameMaker = (target) ->
         error: ->
           callback()
         success: (res) ->
-          callback res.matches.slice(0, per_page)
+          callback res.matches.slice(0, perPage)
   $(target).on "change", (e) ->
     slug = $(target).val()
     otherManufacturerDisplay(slug)
@@ -55,13 +55,13 @@ getModelList = (mnfg_name='absent') ->
 toggleRegistrationType = ->
   $('#registration-type-tabs a').toggleClass('current-type')
   if $('#registration-type-tabs a.current-type').hasClass('stolen')
-    $('#stolen_record_phone').attr('required', false)
+    $('#stolenRecord_phone').attr('required', false)
     $('#stolen_fields_container').slideUp 'medium', ->
       $('#stolen_fields').appendTo('#stolen_fields_store')
     # $('.has-no-serial .stolen').fadeOut 'fast', ->
       $('#optional-phone').slideUp() if $('#optional-phone').length > 0
   else
-    $('#stolen_record_phone').attr('required', true)
+    $('#stolenRecord_phone').attr('required', true)
     $('#stolen_fields').appendTo('#stolen_fields_container')
     # $('#stolen_fields_containter').html($('#stolen_fields').html())
     $('#stolen_fields_container').slideDown()
@@ -127,7 +127,7 @@ $(document).ready ->
   window.root_url = $('#root_url').attr('data-url')
   initializeFrameMaker("#bike_manufacturer_id")
   otherManufacturerDisplay($("#bike_manufacturer_id").val())
-  $('#stolen_record_phone').attr('required', false)
+  $('#stolenRecord_phone').attr('required', false)
 
   $('#bike_has_no_serial').change (e) ->
     updateSerial(e)
@@ -156,6 +156,6 @@ $(document).ready ->
       $('#bike_stolen').val(1)
     toggleRegistrationType()
 
-  $('#stolen_record_date_stolen_input').datepicker('format: mm-dd-yyy')
+  $('#stolenRecord_date_stolen_input').datepicker('format: mm-dd-yyy')
   $('#stolen_fields').appendTo('#stolen_fields_store')
   toggleRegistrationType() if $('#stolen_registration_first').length > 0

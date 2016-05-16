@@ -1,19 +1,19 @@
 / No bike form here because we're only dealing with photos.
 / The save button actually just triggers a page reload via js
-.form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
+.form-well-container.container{ class: "edit-bike-page-#{@editTemplate}" }
   .row
     = render partial: '/bikes/edit_primary_menu'
     .col-md-8.form-well
       .form-wrap
         .edit-bike-form-header
           %h3
-            = @edit_templates[@edit_template]
+            = @editTemplates[@editTemplate]
           %h5.light-italic
             Drag the uploaded photos to rearrange the order in which they appear
 
-        %ul#public_images.row.edit-photo-display-list{ data: { orderurl: order_public_images_url, imagesurl: public_images_url } }
-          = render partial: '/public_images/revised_public_image', collection: @bike.public_images, as: :image
-          = render partial: '/public_images/revised_public_image', collection: @private_images, as: :image
+        %ul#publicImages.row.edit-photo-display-list{ data: { orderurl: order_publicImages_url, imagesurl: publicImages_url } }
+          = render partial: '/publicImages/revised_publicImage', collection: @bike.publicImages, as: :image
+          = render partial: '/publicImages/revised_publicImage', collection: @private_images, as: :image
 
         %hr
         = form_for PublicImage.new do |f|
@@ -26,7 +26,7 @@
                   Upload Photos 
                 button
               %label.file
-                = f.file_field :image, multiple: true, name: "public_image[image]"
+                = f.file_field :image, multiple: true, name: "publicImage[image]"
                 %span.file-custom
 / Mustache template for rendering post upload
 :plain

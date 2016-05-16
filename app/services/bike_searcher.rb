@@ -45,7 +45,7 @@ class BikeSearcher
       .gsub(/%2C/i, ',') # unencode commas
   end
 
-  def selectize_items
+  def selectizeItems
     items = []
     if @params[:manufacturer_id].present?
       items << Manufacturer.find(@params[:manufacturer_id]).autocomplete_result_hash
@@ -64,9 +64,9 @@ class BikeSearcher
   end
 
   def stolenness
-    return nil unless @params[:non_stolen].present? || @params[:stolen].present?
+    return nil unless @params[:nonStolen].present? || @params[:stolen].present?
     return 'stolen' if @params[:stolen].present? && @params[:stolen]
-    return 'non_stolen' if @params[:non_stolen].present? && @params[:non_stolen]
+    return 'nonStolen' if @params[:nonStolen].present? && @params[:nonStolen]
   end
 
   def is_proximity
@@ -82,7 +82,7 @@ class BikeSearcher
 
   def matching_stolenness(bikes)
     return @bikes unless stolenness.present?
-    @bikes = (stolenness == 'stolen') ? bikes.stolen : bikes.non_stolen
+    @bikes = (stolenness == 'stolen') ? bikes.stolen : bikes.nonStolen
   end
 
   def parsed_attributes
@@ -156,7 +156,7 @@ class BikeSearcher
 
   def by_proximity
     return unless is_proximity
-    stolen_ids = @bikes.pluck(:current_stolen_record_id)
+    stolen_ids = @bikes.pluck(:current_stolenRecord_id)
     return unless stolen_ids.present?
     if @params[:proximity_radius].present? && @params[:proximity_radius].to_i > 1
       radius = @params[:proximity_radius].to_i
@@ -173,16 +173,16 @@ class BikeSearcher
   def by_date
     return unless stolenness == 'stolen'
     return @bikes unless @params[:stolen_before].present? || @params[:stolen_after].present?
-    stolen_records = StolenRecord.where('id in (?)', @bikes.pluck(:current_stolen_record_id))
+    stolenRecords = StolenRecord.where('id in (?)', @bikes.pluck(:current_stolenRecord_id))
     if @params[:stolen_before].present?
       before = Time.at(@params[:stolen_before]).utc.to_datetime
-      stolen_records = stolen_records.where("date_stolen <= ?", before)
+      stolenRecords = stolenRecords.where("date_stolen <= ?", before)
     end
     if @params[:stolen_after].present?
       after = Time.at(@params[:stolen_after]).utc.to_datetime
-      stolen_records = stolen_records.where("date_stolen >= ?", after)
+      stolenRecords = stolenRecords.where("date_stolen >= ?", after)
     end
-    @bikes = @bikes.where('id in (?)', stolen_records.pluck(:bike_id))
+    @bikes = @bikes.where('id in (?)', stolenRecords.pluck(:bike_id))
   end
 
   def find_bikes
@@ -199,13 +199,13 @@ class BikeSearcher
   end
 
   def find_bike_counts
-    @params[:non_stolen] = false
+    @params[:nonStolen] = false
     @params[:non_proximity] = false
     @bikes = matching_serial
     matching_manufacturer(@bikes)
     matching_colors(@bikes)
     matching_query(@bikes)
-    result = { non_stolen: @bikes.non_stolen.count }
+    result = { nonStolen: @bikes.nonStolen.count }
     if @params[:serial].present?
       result[:close_serials] = fuzzy_find_serial.count
     end

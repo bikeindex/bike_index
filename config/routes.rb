@@ -19,7 +19,7 @@ Bikeindex::Application.routes.draw do
       get :embed_create_success
     end
     resources :memberships, only: [:edit, :update, :destroy]
-    resources :organization_invitations, only: [:new, :create]
+    resources :organizationInvitations, only: [:new, :create]
   end
 
   match '/', to: redirect(:root_url, subdomain: false), constraints: { subdomain: 'stolen' }
@@ -47,7 +47,7 @@ Bikeindex::Application.routes.draw do
   resources :ownerships, only: [:show]
   resources :memberships, only: [:update, :destroy]
 
-  resources :stolen_notifications, only: [:create, :new]
+  resources :stolenNotifications, only: [:create, :new]
 
   resources :feedbacks, only: [:create]
   match 'vendor_signup', to: redirect('/organizations/new')
@@ -74,7 +74,7 @@ Bikeindex::Application.routes.draw do
   resources :blogs, only: [:show, :index]
   match 'blog', to: redirect('/news')
 
-  resources :public_images, only: [:create, :show, :edit, :update, :destroy] do
+  resources :publicImages, only: [:create, :show, :edit, :update, :destroy] do
     collection do
       post :order
     end
@@ -82,10 +82,10 @@ Bikeindex::Application.routes.draw do
   end
 
   resources :bikes do
-    collection { get :scanned }
+    collection { get :scan }
     member do
-      get :spokecard
-      get :scanned
+      get :spoke_card
+      get :scan
       get :pdf
     end
   end
@@ -108,7 +108,7 @@ Bikeindex::Application.routes.draw do
     match 'tsvs', to: 'dashboard#tsvs'
     match 'bust_z_cache', to: 'dashboard#bust_z_cache'
     match 'destroy_example_bikes', to: 'dashboard#destroy_example_bikes'
-    resources :memberships, :organizations, :organization_invitations,
+    resources :memberships, :organizations, :organizationInvitations,
               :paints, :ads, :recovery_displays, :mail_snippets
     resources :flavor_texts, only: [:destroy, :create]
     resources :stolen_bikes do
@@ -118,7 +118,7 @@ Bikeindex::Application.routes.draw do
     resources :recoveries do
       collection { post :approve }
     end
-    resources :stolen_notifications do
+    resources :stolenNotifications do
       member { get :resend }
     end
     resources :graphs, only: [:index] do
@@ -194,7 +194,7 @@ Bikeindex::Application.routes.draw do
   end
   match 'manufacturers_tsv', to: 'manufacturers#tsv'
 
-  resources :organization_deals, only: [:create, :new]
+  resources :organizationDeals, only: [:create, :new]
   resource :integrations, only: [:create]
   match '/auth/:provider/callback', to: 'integrations#create'
 
@@ -203,7 +203,7 @@ Bikeindex::Application.routes.draw do
     get page, controller: 'info', action: page
   end
 
-  %w(stolen_bikes roadmap security spokecard how_it_works).each { |p| match p, to: redirect('/resources') }
+  %w(stolen_bikes roadmap security spoke_card how_it_works).each { |p| match p, to: redirect('/resources') }
 
   # get 'sitemap.xml.gz' => redirect('https://files.bikeindex.org/sitemaps/sitemap_index.xml.gz')
   # Somehow the redirect drops the .gz extension, which ruins it so this redirect is handled by Cloudflare

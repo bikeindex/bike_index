@@ -15,8 +15,8 @@ describe Admin::FailedBikesController do
     before do
       user = FactoryGirl.create(:admin)
       set_current_user(user)
-      b_param = BParam.create(creator_id: user.id)
-      get :show, id: b_param.id
+      bikeParam = BParam.create(creator_id: user.id)
+      get :show, id: bikeParam.id
     end
     it { is_expected.to respond_with(:success) }
     it { is_expected.to render_template(:show) }

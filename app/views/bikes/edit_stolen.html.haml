@@ -1,17 +1,17 @@
 = form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do |f|
   = f.hidden_field :stolen
-  .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
+  .form-well-container.container{ class: "edit-bike-page-#{@editTemplate}" }
     .row
       = render partial: '/bikes/edit_primary_menu'
       .col-md-8.form-well#form_well_wrap{ data: { usid: Country.united_states.id } }
         .form-wrap
           .edit-bike-form-header
             %h3
-              = @edit_templates[@edit_template]
-          - if @bike.stolen and @bike.find_current_stolen_record.present?
+              = @editTemplates[@editTemplate]
+          - if @bike.stolen and @bike.find_current_stolenRecord.present?
             / Helper text display
             - stolen_type = @bike.recovered ? 'recovered' : 'stolen'
-            = f.fields_for :stolen_records do |srecord|
+            = f.fields_for :stolenRecords do |srecord|
               - next unless srecord.object.current # Because they may have multiple stolen records
               .form-group.row.unnested-field
                 = srecord.label :date_stolen_input, "When was it #{stolen_type}", class: 'form-well-label'
@@ -93,7 +93,7 @@
                 This #{@bike.type} is stolen or missing!
 
         / if stolen, we also add an exterior block for marking not stolen
-        - if @bike.stolen and @bike.find_current_stolen_record.present?
+        - if @bike.stolen and @bike.find_current_stolenRecord.present?
           .form-wrap.secondary-form-wrap
             .edit-bike-form-header
               %h3
@@ -102,7 +102,7 @@
               %a.btn.btn-success.btn-lg{data: { toggle: 'modal', target: '#toggle-stolen' } }
                 This #{@bike.type} has been returned!
 
-- if @bike.stolen and @bike.find_current_stolen_record.present?
+- if @bike.stolen and @bike.find_current_stolenRecord.present?
   - modal_title = "We're so glad you got your #{@bike.type} back!"
   - alert_body = capture_haml do
     %p
@@ -114,7 +114,7 @@
       = render partial: '/shared/alert', locals: { body: alert_body, title: 'Not enough information!', class_names: 'currently-hidden' }
       = form_tag  do |t|
         = hidden_field_tag :mark_recovered_bike_id, @bike.id
-        = hidden_field_tag :mark_recovered_stolen_record_id, (@bike.current_stolen_record_id if @bike.current_stolen_record_id.present?)
+        = hidden_field_tag :mark_recovered_stolenRecord_id, (@bike.current_stolenRecord_id if @bike.current_stolenRecord_id.present?)
         .form-group
           %label{ for: :mark_recovered_reason }
             How did you get it back?

@@ -1,8 +1,9 @@
+
 =begin
 *****************************************************************
 * File: app/models/b_params.rb 
 * Name: Class Ad 
-* Some informon some atributs and some associations
+* Some information about atributs and associations
 *****************************************************************
 =end
 
@@ -71,17 +72,17 @@ class BParam < ActiveRecord::Base
     h[:bike][:creation_organization_id] = org.id if org.present?
     # Move un-nested params outside of bike
     [:test, :id, :components].each { |k| h[k] = h[:bike].delete k }
-    stolen = h[:bike].delete :stolen_record
+    stolen = h[:bike].delete :stolenRecord
     if stolen && stolen.delete_if { |k,v| v.blank? } && stolen.keys.any?
       h[:bike][:stolen] = true
-      h[:stolen_record] = stolen 
+      h[:stolenRecord] = stolen 
     end
     h
   end
 
   def set_foreign_keys
     return true unless params.present? && bike.present?
-    bike[:stolen] = true if params[:stolen_record].present?
+    bike[:stolen] = true if params[:stolenRecord].present?
     set_wheel_size_key unless bike[:rear_wheel_size_id].present?
     if bike[:manufacturer_id].present?
       params[:bike][:manufacturer_id] = Manufacturer.fuzzy_id(bike[:manufacturer_id])
@@ -191,7 +192,7 @@ class BParam < ActiveRecord::Base
   end
 
   # Below here is revised setup, an attempt to make the process of upgrading rails easier
-  # by reducing reliance on attr_accessor, and also not creating b_params unless we need to
+  # by reducing reliance on attr_accessor, and also not creating bikeParams unless we need to
   # To protect organization registration and other non-user-set options in revised setup,
   # Set the protected attrs separately from the params hash and merging over the passed params
   def self.find_or_new_from_token(toke = nil, user_id: nil, organization_id: nil)
@@ -199,7 +200,7 @@ class BParam < ActiveRecord::Base
     b ||= without_bike.without_creator.where('created_at >= ?', Time.now - 1.month).where(id_token: toke).first
     b ||= BParam.new(creator_id: user_id, params: { revised_new: true }.as_json)
     b.creator_id ||= user_id
-    # If the org_id is present, add it to the params. Only save it if the b_param is created
+    # If the org_id is present, add it to the params. Only save it if the bikeParam is created
     if organization_id.present? && b.creation_organization_id != organization_id
       b.params = b.params.merge(bike: b.bike.merge(creation_organization_id: organization_id))
       b.update_attribute :params, b.params if b.id.present?
@@ -213,7 +214,7 @@ class BParam < ActiveRecord::Base
 
   def safe_bike_attrs(param_overrides)
     bike.merge(param_overrides).select { |k, v| self.class.assignable_attrs.include?(k.to_s) }
-        .merge(b_param_id: id,
+        .merge(bikeParam_id: id,
                creator_id: creator_id,
                cycle_type_id: cycle_type_id,
                creation_organization_id: params[:creation_organization_id])

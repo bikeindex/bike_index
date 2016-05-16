@@ -17,7 +17,7 @@ describe Admin::RecoveriesController do
       Sidekiq::Testing.fake!
       user = FactoryGirl.create(:admin)
       set_current_user(user)
-      recovery = FactoryGirl.create(:stolen_record)
+      recovery = FactoryGirl.create(:stolenRecord)
       expect do
         post :approve, id: recovery.id
       end.to change(RecoveryNotifyWorker.jobs, :size).by(1)

@@ -625,9 +625,9 @@
     bottom: 0;
   }
 }
-// .add-bike-photos .public_image { height: 130px; }
+// .add-bike-photos .publicImage { height: 130px; }
 .input-group.form-head.bike-photo-add-head { border-bottom: none; }
-.public_image {
+.publicImage {
   @include border-radius(2px);
   background: $searchBackground;
   // user-select prevents the contents of your
@@ -688,7 +688,7 @@
 // This class is unique to html5sortable for
 // the placeholder that's shown while in motion
 .sortable-placeholder {
-  @extend .public_image;
+  @extend .publicImage;
   border: 3px dashed #CCC;
   height: 125px;
 }
@@ -710,7 +710,7 @@
   p { @include text-overflow(); }
 }
 
-#new_public_image {
+#new_publicImage {
   @include clearfix;
   // padding: 20px;
   margin: 0;
@@ -725,7 +725,7 @@
   }
 }
 
-#public_images, .private_images {
+#publicImages, .private_images {
   @include clearfix;
   clear: both;
   list-style-type: none;

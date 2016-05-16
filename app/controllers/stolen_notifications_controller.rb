@@ -1,6 +1,6 @@
 =begin
 *********************************************************************
-* File: app/controllers/stolen_notifications_controller.rb 
+* File: app/controllers/stolenNotifications_controller.rb 
 * Name: Class StolenNotificationsController 
 * Set some methods to deal with the notifications received of stolens 
 *********************************************************************
@@ -10,14 +10,14 @@ class StolenNotificationsController < ApplicationController
   before_filter :authenticate_user
 
   def new
-    @stolen_notification = StolenNotification.new
+    @stolenNotification = StolenNotification.new
   end
 
   def create
-    @stolen_notification = StolenNotification.new(params[:stolen_notification])
-    @stolen_notification.sender = current_user
-    @bike = @stolen_notification.bike
-    if @stolen_notification.save
+    @stolenNotification = StolenNotification.new(params[:stolenNotification])
+    @stolenNotification.sender = current_user
+    @bike = @stolenNotification.bike
+    if @stolenNotification.save
       flash[:notice] = "Thanks for looking out!" 
       redirect_to @bike
     else

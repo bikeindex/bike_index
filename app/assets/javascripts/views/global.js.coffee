@@ -15,8 +15,8 @@ class BikeIndex.Views.Global extends Backbone.View
     @initializeHeaderSearch() if document.getElementById('head-search-bikes')
     @loadFancySelects()
     @setLightspeedMovie() if $('#lightspeed-tutorial-video').length > 0
-    if $('#what-spokecards-are').length > 0
-      $('.spokecard-extension').addClass('on-spokecard-page')
+    if $('#what-spoke_cards-are').length > 0
+      $('.spoke_card-extension').addClass('on-spoke_card-page')
     @intializeContent() if $('.content-nav').length > 0
     
   openNewWindow: (e) ->
@@ -82,7 +82,7 @@ class BikeIndex.Views.Global extends Backbone.View
   insertTabCounts: (counts) ->
     $("#stolen_tab .count").text("(#{counts.stolen})")
     $("#proximity_tab .count").text("(#{counts.proximity})")
-    $("#non_stolen_tab .count").text("(#{counts.non_stolen})")
+    $("#nonStolen_tab .count").text("(#{counts.nonStolen})")
 
 
   updateIncludeSerialOption: ->
@@ -92,8 +92,8 @@ class BikeIndex.Views.Global extends Backbone.View
   initializeHeaderSearch: ->
     @setSearchProximity() # Call here, since we only want to call if search exists
     initial_opts = []
-    initial_opts = $('#selectize_items').data('initial') if $('#selectize_items').data('initial')
-    per_page = 15
+    initial_opts = $('#selectizeItems').data('initial') if $('#selectizeItems').data('initial')
+    perPage = 15
     renderOption = @renderOption
     updateIncludeSerialOption = @updateIncludeSerialOption
     $('#head-search-bikes #query').selectize
@@ -122,12 +122,12 @@ class BikeIndex.Views.Global extends Backbone.View
       load: (query, callback) ->
         that = this
         $.ajax
-          url: "/api/autocomplete?per_page=#{per_page}&q=#{encodeURIComponent(query)}"
+          url: "/api/autocomplete?perPage=#{perPage}&q=#{encodeURIComponent(query)}"
           type: 'GET'
           error: ->
             callback()
           success: (res) ->
-            result = res.matches.slice(0, per_page)
+            result = res.matches.slice(0, perPage)
             # Only add serial option if they've entered more than 2 char
             if query.length > 2 && window.includeSerialOption
               result.push({ id: 'serial', search_id: "s##{query}#", text: "#{query}", search: query })

@@ -9,7 +9,7 @@
 class FeedbacksController < ApplicationController
   
   layout 'content'
-  before_filter :set_feedback_active_section
+  before_filter :set_feedback_activeSection
   
   # Only logged in users will recive this feadback messages
   before_filter :authenticate_user, only: [:new, :create]
@@ -28,9 +28,9 @@ class FeedbacksController < ApplicationController
   def create
     @feedback = Feedback.new(params[:feedback])
     if @feedback.save
-      if @feedback.feedback_type == 'spokecard'
+      if @feedback.feedback_type == 'spoke_card'
         flash[:notice] = "Thanks! We'll tell you as soon as we link your bike."
-        redirect_to spokecard_path and return
+        redirect_to spoke_card_path and return
       elsif @feedback.feedback_type == 'shop_submission'
         flash[:notice] = "Thanks! We'll set up the shop and give you a call."
         redirect_to where_path and return
@@ -46,7 +46,7 @@ class FeedbacksController < ApplicationController
     end
   end
 
-  def set_feedback_active_section
-    @active_section = 'contact'
+  def set_feedback_activeSection
+    @activeSection = 'contact'
   end
 end

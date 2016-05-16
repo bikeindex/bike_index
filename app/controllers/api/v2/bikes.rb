@@ -22,7 +22,7 @@ module API
           optional :no_notify, type: Boolean, desc: "On create or ownership change, don't notify the new owner."
           optional :is_for_sale, type: Boolean
           
-          optional :stolen_record, type: Hash do
+          optional :stolenRecord, type: Hash do
             optional :phone, type: String, desc: "Owner's phone number, **required to create stolen**"
             optional :city, type: String, desc: "City where stolen <br> **required to create stolen**"
             optional :country, type: String, values: COUNTRY_ISOS, desc: "Country the bike was stolen"
@@ -82,7 +82,7 @@ module API
         def ensure_required_stolen_attrs(hash)
           return true unless hash[:bike][:stolen]
           [:phone, :city].each do |k|
-            error!("Could not create stolen record: missing #{k.to_s}", 401) unless hash[:stolen_record][k].present?
+            error!("Could not create stolen record: missing #{k.to_s}", 401) unless hash[:stolenRecord][k].present?
           end
         end
 
@@ -135,13 +135,13 @@ module API
         end
         post '/', serializer: BikeV2ShowSerializer, root: 'bike' do
           declared_p = { "declared_params" => declared(params, include_missing: false) }
-          b_param = BParam.create(creator_id: creation_user_id, params: declared_p['declared_params'], api_v2: true)
-          ensure_required_stolen_attrs(b_param.params)
-          bike = BikeCreator.new(b_param).create_bike
-          if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
+          bikeParam = BParam.create(creator_id: creation_user_id, params: declared_p['declared_params'], api_v2: true)
+          ensure_required_stolen_attrs(bikeParam.params)
+          bike = BikeCreator.new(bikeParam).create_bike
+          if bikeParam.errors.blank? && bikeParam.bike_errors.blank? && bike.present? && bike.errors.blank?
             bike
           else
-            e = bike.present? ? bike.errors : b_param.errors
+            e = bike.present? ? bike.errors : bikeParam.errors
             error!(e.full_messages.to_sentence, 401)
           end
         end
@@ -171,9 +171,9 @@ module API
           find_bike
           authorize_bike_for_user
           hash = BParam.v2_params(declared_p['declared_params'])
-          ensure_required_stolen_attrs(hash) if hash[:stolen_record].present? && @bike.stolen != true
+          ensure_required_stolen_attrs(hash) if hash[:stolenRecord].present? && @bike.stolen != true
           begin
-            BikeUpdator.new(user: current_user, b_params: hash).update_available_attributes
+            BikeUpdator.new(user: current_user, bikeParams: hash).update_available_attributes
           rescue => e
             error!("Unable to update bike: #{e}", 401)
           end
@@ -202,11 +202,11 @@ module API
           declared_p = { "declared_params" => declared(params, include_missing: false) }
           find_bike
           authorize_bike_for_user
-          public_image = PublicImage.new(imageable: @bike, image: params[:file])
-          if public_image.save
-            public_image
+          publicImage = PublicImage.new(imageable: @bike, image: params[:file])
+          if publicImage.save
+            publicImage
           else
-            error!(public_image.errors.full_messages.to_sentence, 401)
+            error!(publicImage.errors.full_messages.to_sentence, 401)
           end
         end
 
@@ -229,7 +229,7 @@ module API
           requires :id, type: Integer, desc: "Bike ID. **MUST BE A STOLEN BIKE**"
           requires :message, type: String, desc: "The message you are sending to the owner"
         end
-        post ':id/send_stolen_notification', serializer: StolenNotificationSerializer  do 
+        post ':id/send_stolenNotification', serializer: StolenNotificationSerializer  do 
           find_bike
           error!("Bike is not stolen", 400) unless @bike.present? && @bike.stolen
           # Unless application is authorized....

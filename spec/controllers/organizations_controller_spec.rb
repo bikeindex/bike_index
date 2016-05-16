@@ -189,7 +189,7 @@ describe OrganizationsController do
       expect(response.code).to eq('200')
       expect(response).to render_template(:embed)
       expect(response.headers['X-Frame-Options']).not_to be_present
-      expect(assigns(:persist_email)).to be_truthy
+      expect(assigns(:persistEmail)).to be_truthy
     end
   end
 

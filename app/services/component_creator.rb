@@ -4,7 +4,7 @@ end
 class ComponentCreator
   def initialize(creation_params = {})
     @bike = creation_params[:bike]
-    @b_param = creation_params[:b_param]
+    @bikeParam = creation_params[:bikeParam]
   end
 
   def set_manufacturer_key(component)
@@ -62,7 +62,7 @@ class ComponentCreator
   end
 
   def update_components_from_params
-    @b_param[:components].each_with_index do |comp, index|
+    @bikeParam[:components].each_with_index do |comp, index|
       if comp[:id].present?
         component = @bike.components.find(comp[:id])
         (component.destroy && next) if comp[:destroy]
@@ -76,13 +76,13 @@ class ComponentCreator
   end
 
   def create_components_from_params
-    if @b_param.present? && @b_param.params.present? && @b_param.params[:components].present?
-      c_length = (0...@b_param.params[:components].count).to_a
+    if @bikeParam.present? && @bikeParam.params.present? && @bikeParam.params[:components].present?
+      c_length = (0...@bikeParam.params[:components].count).to_a
       c_length.each do |c_number|
-        if @b_param.params[:components].kind_of?(Array)
-          component = @b_param.params[:components][c_number]
+        if @bikeParam.params[:components].kind_of?(Array)
+          component = @bikeParam.params[:components][c_number]
         else
-          component = @b_param.params[:components][c_number.to_s]
+          component = @bikeParam.params[:components][c_number.to_s]
         end
         component = set_manufacturer_key(component)
         component = set_component_type(component)

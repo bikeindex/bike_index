@@ -6,7 +6,7 @@
 @import "includes/bootstrap/_mixins.scss";
 @import "includes/bootstrap/_reset.scss";
 
-.spokecard-wrap {
+.spoke_card-wrap {
   position: relative;
   margin: 100px auto;
   width: 600px;
@@ -40,7 +40,7 @@
   }
 }
 
-.spokecard-background {
+.spoke_card-background {
   display: block;
   position: absolute;
   left: 0; top: 0;

@@ -4,7 +4,7 @@
       New recovery
     - if @bike.present?
       %p
-        for #{link_to @bike.title_string.strip, edit_admin_bike_url(@bike)}, #{link_to "recovery", edit_admin_recovery_url(@recovery_display.stolen_record_id)}
+        for #{link_to @bike.title_string.strip, edit_admin_bike_url(@bike)}, #{link_to "recovery", edit_admin_recovery_url(@recovery_display.stolenRecord_id)}
 
   .row-fluid
     = render partial: "form"

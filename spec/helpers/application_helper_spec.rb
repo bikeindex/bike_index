@@ -26,9 +26,9 @@ describe ApplicationHelper do
         expect(result).to eq generated
       end
     end
-    context 'organization_invitation' do
+    context 'organizationInvitation' do
       it 'returns link, active if it ought to be' do
-        allow(view).to receive(:controller_name).and_return('organization_invitations')
+        allow(view).to receive(:controller_name).and_return('organizationInvitations')
         generated = '<a href="/invitations" class="">Invitations</a>'
         expect(helper.active_link('Invitations', '/invitations')).to eq(generated)
       end
@@ -151,8 +151,8 @@ describe ApplicationHelper do
   end
 
   describe 'content_nav_class' do
-    it 'returns active if the section is the active_section' do
-      @active_section = 'resources'
+    it 'returns active if the section is the activeSection' do
+      @activeSection = 'resources'
       expect(helper.content_nav_class('resources')).to eq('active-menu')
     end
   end

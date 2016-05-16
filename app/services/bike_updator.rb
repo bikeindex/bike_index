@@ -7,7 +7,7 @@ end
 class BikeUpdator
   def initialize(creation_params = {})
     @user = creation_params[:user] 
-    @bike_params = creation_params[:b_params]
+    @bike_params = creation_params[:bikeParams]
     @bike = creation_params[:bike] || find_bike
     @current_ownership = creation_params[:current_ownership]
     @currently_stolen = @bike.stolen
@@ -47,16 +47,16 @@ class BikeUpdator
   end
 
   def update_api_components
-    ComponentCreator.new(bike: @bike, b_param: @bike_params).update_components_from_params
+    ComponentCreator.new(bike: @bike, bikeParam: @bike_params).update_components_from_params
   end
 
-  def update_stolen_record
+  def update_stolenRecord
     @bike.reload
     if @bike_params[:bike] && @bike_params[:bike][:date_stolen_input]
       StolenRecordUpdator.new(bike: @bike, date_stolen_input: @bike_params[:bike][:date_stolen_input]).update_records
     else
-      if @bike_params[:stolen_record].present?
-        StolenRecordUpdator.new(bike: @bike, b_param: @bike_params).update_records
+      if @bike_params[:stolenRecord].present?
+        StolenRecordUpdator.new(bike: @bike, bikeParam: @bike_params).update_records
         @bike.reload
       elsif @currently_stolen != @bike.stolen
         StolenRecordUpdator.new(bike: @bike).update_records
@@ -86,7 +86,7 @@ class BikeUpdator
     set_protected_attributes
     update_ownership
     update_api_components if @bike_params[:components].present?
-    update_stolen_record if @bike.update_attributes(@bike_params[:bike])
+    update_stolenRecord if @bike.update_attributes(@bike_params[:bike])
     if @bike.present?
       ListingOrderWorker.perform_async(@bike.id) # run immediately
       ListingOrderWorker.perform_in(60.seconds, @bike.id) # also later in case uploads or something.

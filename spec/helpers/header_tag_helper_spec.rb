@@ -23,7 +23,7 @@ describe HeaderTagHelper do
       end
     end
     context 'from override' do
-      before { controller.instance_variable_set(:@page_title, 'OVERRIDE - Fancy Page title') }
+      before { controller.instance_variable_set(:@pageTitle, 'OVERRIDE - Fancy Page title') }
       it 'returns the override' do
         header_hash = {
           title_tag: { title: 'Foo 69 69' },

@@ -63,15 +63,15 @@ module Api
         params = de_string_params
         raise StandardError unless params[:bike].present?
         params[:bike][:creation_organization_id] = @organization.id
-        @b_param = BParam.create(creator_id: @organization.auto_user.id, params: params)
-        bike = BikeCreator.new(@b_param).create_bike
-        if @b_param.errors.blank? && @b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
+        @bikeParam = BParam.create(creator_id: @organization.auto_user.id, params: params)
+        bike = BikeCreator.new(@bikeParam).create_bike
+        if @bikeParam.errors.blank? && @bikeParam.bike_errors.blank? && bike.present? && bike.errors.blank?
           render json: {bike: { web_url: bike_url(bike), api_url: api_v1_bike_url(bike)}} and return
         else
           if bike.present?
             e = bike.errors.full_messages.to_sentence
           else
-            e = @b_param.errors.full_messages.to_sentence
+            e = @bikeParam.errors.full_messages.to_sentence
           end
           Feedback.create(email: 'contact@bikeindex.org', name: 'Error mailer', title: 'API Bike Creation error!', body: e)
           render json: e, status: :unprocessable_entity and return
@@ -91,7 +91,7 @@ module Api
         # Google app script doesn't support nested params -
         # So we're doing this.
         params[:bike] = JSON.parse params[:bike] if params[:bike].kind_of?(String)
-        params[:stolen_record] = JSON.parse params[:stolen_record] if params[:stolen_record].kind_of?(String)
+        params[:stolenRecord] = JSON.parse params[:stolenRecord] if params[:stolenRecord].kind_of?(String)
         params[:components] = JSON.parse params[:components] if params[:components].kind_of?(String)
         params
       end

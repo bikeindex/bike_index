@@ -42,13 +42,13 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     $('.bikeedit-form-grab').areYouSure()
     $('.select_unattached').removeClass('select_unattached')
 
-    if $('#new_public_image').length > 0
+    if $('#new_publicImage').length > 0
       # we need to rename the damn field or it breaks
-      $('#public_image_image').attr('name', "public_image[image]")
+      $('#publicImage_image').attr('name', "publicImage[image]")
       @publicImageFileUpload()
 
-    if $('#public_images').length > 0
-      @sortableImages($('#public_images'))
+    if $('#publicImages').length > 0
+      @sortableImages($('#publicImages'))
 
     @updateYear()
 
@@ -61,16 +61,16 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     )
 
   publicImageFileUpload: ->
-    # runSortableImages = @sortableImages($('#public_images'))
-    $('#new_public_image').fileupload
+    # runSortableImages = @sortableImages($('#publicImages'))
+    $('#new_publicImage').fileupload
       dataType: "script"
       add: (e, data) ->
         types = /(\.|\/)(gif|jpe?g|png|tiff?)$/i
         file = data.files[0]
-        $('#public_images').sortable('disable')
+        $('#publicImages').sortable('disable')
         if types.test(file.type) || types.test(file.name)
           data.context = $('<div class="upload"><p><em>' + file.name + '</em></p><div class="progress progress-striped active"><div class="bar" style="width: 0%"></div></div></div>')
-          $('#new_public_image').append(data.context)
+          $('#new_publicImage').append(data.context)
           data.submit()
         else
           alert("#{file.name} is not a gif, jpeg, or png image file")
@@ -79,7 +79,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
           progress = parseInt(data.loaded / data.total * 95, 10) # Multiply by 95, so that it doesn't look done, since progress doesn't work.
           data.context.find('.bar').css('width', progress + '%')
       done: (e, data) ->
-        $('#public_images').sortable()
+        $('#publicImages').sortable()
         file = data.files[0]
         $.each(data.files, (index, file) ->
           data.context.addClass('finished_upload').html("""
@@ -99,9 +99,9 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
 
   pushImageOrder: ( sortable_container ) ->
     urlTarget = sortable_container.data('order-url')
-    sortable_list_items = sortable_container.children('li')
+    sortable_listItems = sortable_container.children('li')
     # This is a list comprehension for the list of all the sortable items, to make an array
-    array_of_photo_ids = ($(list_item).attr('id') for list_item in sortable_list_items)
+    array_of_photo_ids = ($(listItem).attr('id') for listItem in sortable_listItems)
     new_item_order = 
       list_of_photos: array_of_photo_ids
     # list_of_items is an array containing the ordered list of image_ids
@@ -302,8 +302,8 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
   setComponentManufacturer: (target, url="default") ->
     target = $(target)
     target.parents('.controls').removeClass('select_unattached')
-    per_page = 10
-    mnfg_url = "#{window.root_url}/api/autocomplete?per_page=#{per_page}&categories=frame_mnfg+mnfg&q="
+    perPage = 10
+    mnfg_url = "#{window.root_url}/api/autocomplete?perPage=#{perPage}&categories=frame_mnfg+mnfg&q="
     target.selectize
       preload: false
       create: false
@@ -323,7 +323,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
           error: ->
             callback()
           success: (res) ->
-            callback res.matches.slice(0, per_page)
+            callback res.matches.slice(0, perPage)
 
     existing_name = target.parents('.controls').attr('data-initialname')
     if existing_name
@@ -454,7 +454,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
         $('#bike_unknown_year').prop('checked', false)
 
   checkIfPhoneBlank: (e) ->
-    phone_input = $('#bike_stolen_records_attributes_0_phone')
+    phone_input = $('#bike_stolenRecords_attributes_0_phone')
     if phone_input.length > 0
       unless phone_input.val().length > 0
         BikeIndex.alertMessage('error', 'Phone number required', "<p>A phone number is required for stolen listings. We want to be able to contact you if your bike is found!</p><p>Your phone number will be private unless you choose to show it in <em>Show phone number to</em></p>")
@@ -513,8 +513,8 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       $('#submit-manufacturer-error').slideDown('fast')
 
   initializeManufacturerUpdate: ->
-    per_page = 10
-    frame_mnfg_url = "#{window.root_url}/api/autocomplete?per_page=#{per_page}&categories=frame_mnfg&q="
+    perPage = 10
+    frame_mnfg_url = "#{window.root_url}/api/autocomplete?perPage=#{perPage}&categories=frame_mnfg&q="
     $('#manufacturer_update_manufacturer').selectize
       plugins: ['restore_on_backspace']
       preload: true
@@ -535,7 +535,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
           error: ->
             callback()
           success: (res) ->
-            callback res.matches.slice(0, per_page)
+            callback res.matches.slice(0, perPage)
         
 
   requestBikeDelete: (e) ->

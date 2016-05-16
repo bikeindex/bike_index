@@ -19,7 +19,7 @@ describe CreateUserJobs do
 
   describe 'associate_membership_invites' do
     it 'assigns any organization invitations that match the user email, and mark user confirmed if invited' do
-      organization_invitation = FactoryGirl.create(:organization_invitation, invitee_email: 'owNER1@a.com')
+      organizationInvitation = FactoryGirl.create(:organizationInvitation, invitee_email: 'owNER1@a.com')
       user = FactoryGirl.create(:user, email: 'owner1@A.COM')
       CreateUserJobs.new(user: user).associate_membership_invites
       expect(user.reload.memberships.count).to eq(1)

@@ -1,7 +1,7 @@
 #root_url.hidden{data: { url: ENV['BASE_URL'] }}
 = form_for @bike, multipart: true do |f|
-  = hidden_field_tag :persist_email, @persist_email
-  = f.hidden_field :b_param_id_token
+  = hidden_field_tag :persistEmail, @persistEmail
+  = f.hidden_field :bikeParam_id_token
   = f.hidden_field :creation_organization_id
   = f.hidden_field :embeded, value: true
   = f.hidden_field :embeded_extended, value: true
@@ -104,7 +104,7 @@
         = f.text_area :description, rows: 3, placeholder: "Any extra words?"
   .input-group.form-foot
     .control-group.form-photo-group
-      - if @b_param.image.present? or @b_param.image_tmp.present?
+      - if @bikeParam.image.present? or @bikeParam.image_tmp.present?
         %strong
           Image has been uploaded
       - else

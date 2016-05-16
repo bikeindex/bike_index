@@ -3,10 +3,10 @@ class RecoveryUpdateWorker
   sidekiq_options queue: 'updates'
   sidekiq_options backtrace: true
     
-  def perform(stolen_record_id, info)
-    stolen_record = StolenRecord.unscoped.find(stolen_record_id)
-    stolen_record.add_recovery_information(ActiveSupport::HashWithIndifferentAccess.new(info))
-    stolen_record.save
+  def perform(stolenRecord_id, info)
+    stolenRecord = StolenRecord.unscoped.find(stolenRecord_id)
+    stolenRecord.add_recovery_information(ActiveSupport::HashWithIndifferentAccess.new(info))
+    stolenRecord.save
   end
 
 end

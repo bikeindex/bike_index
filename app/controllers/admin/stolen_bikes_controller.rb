@@ -12,13 +12,13 @@ class Admin::StolenBikesController < Admin::BaseController
       @verified_only = true
     end
     page = params[:page] || 1
-    per_page = params[:per_page] || 50
-    bikes = bikes.page(page).per(per_page)
+    perPage = params[:perPage] || 50
+    bikes = bikes.page(page).per(perPage)
     @bikes = bikes.decorate
   end
 
   def approve
-    @bike.current_stolen_record.update_attribute :approved, true
+    @bike.current_stolenRecord.update_attribute :approved, true
     @bike.update_attribute :approved_stolen, true
     ApproveStolenListingWorker.perform_async(@bike.id)
     redirect_to edit_admin_stolen_bike_url(@bike), notice: 'Bike was approved.'
@@ -29,13 +29,13 @@ class Admin::StolenBikesController < Admin::BaseController
   end
 
   def edit
-    @stolen_record = @bike.current_stolen_record
+    @stolenRecord = @bike.current_stolenRecord
     @customer_contact = CustomerContact.new(user_email: @bike.owner_email)
     @bike = @bike.decorate
   end
 
   def update
-    BikeUpdator.new(user: current_user, b_params: params).update_ownership
+    BikeUpdator.new(user: current_user, bikeParams: params).update_ownership
     @bike = @bike.decorate
     if @bike.update_attributes(params[:bike])
       SerialNormalizer.new({serial: @bike.serial_number}).save_segments(@bike.id)

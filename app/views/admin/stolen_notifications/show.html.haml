@@ -4,25 +4,25 @@
 %h4
   Created
   
-  - if @stolen_notification.created_at.today?
-    Today at #{@stolen_notification.created_at.strftime("%-I %p")}
-  - elsif Date.yesterday().beginning_of_day() <= @stolen_notification.created_at          
-    Yesterday at #{@stolen_notification.created_at.strftime("%-I %p")}
+  - if @stolenNotification.created_at.today?
+    Today at #{@stolenNotification.created_at.strftime("%-I %p")}
+  - elsif Date.yesterday().beginning_of_day() <= @stolenNotification.created_at          
+    Yesterday at #{@stolenNotification.created_at.strftime("%-I %p")}
   - else
-    = @stolen_notification.created_at.strftime("%-m.%-d.%Y")
+    = @stolenNotification.created_at.strftime("%-m.%-d.%Y")
 .well.padded
   .dl-holder
     %dl.dl-horizontal
-      = @stolen_notification.dl_list_item((link_to @bike.title_string, edit_admin_stolen_bike_url(@bike)), "Bike")
-      = @stolen_notification.dl_list_item(@stolen_notification.receiver_email, "Receiver email")
-      - if @bike.current_stolen_record.present?
-        = @stolen_notification.dl_list_item(@bike.current_stolen_record.phone, "Bike phone")
+      = @stolenNotification.dl_listItem((link_to @bike.title_string, edit_admin_stolen_bike_url(@bike)), "Bike")
+      = @stolenNotification.dl_listItem(@stolenNotification.receiver_email, "Receiver email")
+      - if @bike.current_stolenRecord.present?
+        = @stolenNotification.dl_listItem(@bike.current_stolenRecord.phone, "Bike phone")
       %dt
-        Sent #{@stolen_notification.send_dates.count} times
+        Sent #{@stolenNotification.send_dates.count} times
       %dd
-        - if @stolen_notification.send_dates.any?
+        - if @stolenNotification.send_dates.any?
           
-          - @stolen_notification.send_dates.each do |stamp|
+          - @stolenNotification.send_dates.each do |stamp|
             %p
               - send_date = Time.at(stamp).to_datetime
               - if send_date.today?
@@ -35,16 +35,16 @@
           %strong
             Has not been sent!
     %dl.dl-horizontal
-      - if @stolen_notification.sender.name.present?
-        = @stolen_notification.dl_list_item((link_to @stolen_notification.sender.name, edit_admin_user_url(@stolen_notification.sender)), "Sender")
+      - if @stolenNotification.sender.name.present?
+        = @stolenNotification.dl_listItem((link_to @stolenNotification.sender.name, edit_admin_user_url(@stolenNotification.sender)), "Sender")
       - else
-        = @stolen_notification.dl_list_item((link_to @stolen_notification.sender.email, edit_admin_user_url(@stolen_notification.sender)), "Sender")
-      = @stolen_notification.dl_list_item(@stolen_notification.sender.sent_stolen_notifications.count, "User sent count")
+        = @stolenNotification.dl_listItem((link_to @stolenNotification.sender.email, edit_admin_user_url(@stolenNotification.sender)), "Sender")
+      = @stolenNotification.dl_listItem(@stolenNotification.sender.sent_stolenNotifications.count, "User sent count")
       
   %p.padded
-    = @stolen_notification.message
+    = @stolenNotification.message
       
 
 
     
-= link_to "resend", resend_admin_stolen_notification_url(@stolen_notification, pretty_please: true), class: 'button-green'
+= link_to "resend", resend_admin_stolenNotification_url(@stolenNotification, pretty_please: true), class: 'button-green'

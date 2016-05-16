@@ -1,5 +1,5 @@
 class AddCardIdToBikes < ActiveRecord::Migration
   def change
-    add_column :bikes, :card_id, :integer
+    add_column :bikes, :cardId, :integer
   end
 end

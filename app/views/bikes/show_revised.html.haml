@@ -29,7 +29,7 @@
         - else
           Whoah, this awesome #{@bike.type} is yours!
 
-        - if @bike.public_images.any?
+        - if @bike.publicImages.any?
           Add some more information about it.
         - else
           - if @bike.stolen
@@ -59,10 +59,10 @@
         %p
           %strong
             Last seen
-          = l @stolen_record.date_stolen, format: :dotted
+          = l @stolenRecord.date_stolen, format: :dotted
           %strong
             at
-          = @stolen_record.show_stolen_address
+          = @stolenRecord.show_stolen_address
 
       - if @bike.should_show_other_bikes
         %h4
@@ -75,20 +75,20 @@
     / Bike Photo!
     .col-md-8
       .bike-photos.horizontal-thumbnails
-        - if @bike.public_images.any?
-          #selected-photo{ class: "image-holder #{"just1photo" if @bike.public_images.count == 1}" }
-            .current-photo{ id: "image#{@bike.public_images.first.id}"}
-              = image_tag(@bike.public_images.first.image_url(:large), alt: "#{@bike.type.titleize} photo", id: "i|#{@bike.public_images.first.listing_order}", data: { action: 'zoom', original: @bike.public_images.first.image_url })
-          - if @bike.public_images.count > 1
+        - if @bike.publicImages.any?
+          #selected-photo{ class: "image-holder #{"just1photo" if @bike.publicImages.count == 1}" }
+            .current-photo{ id: "image#{@bike.publicImages.first.id}"}
+              = image_tag(@bike.publicImages.first.image_url(:large), alt: "#{@bike.type.titleize} photo", id: "i|#{@bike.publicImages.first.listing_order}", data: { action: 'zoom', original: @bike.publicImages.first.image_url })
+          - if @bike.publicImages.count > 1
             %span.thumbnail-shadow
             %span.thumbnail-shadow-r
             #thumbnail-photos.photo-list
               %ul#thumbnails
-                - @bike.public_images.each_with_index do |public_image, index|
+                - @bike.publicImages.each_with_index do |publicImage, index|
                   - thumb_class = index == 0 ? 'current-thumb' : '' # make the first image current
                   %li
-                    %a.clickable-image{ class: thumb_class, data: { id: "image#{public_image.id}", img: public_image.image.url(:large), link: public_image.image.url } }
-                      = image_tag public_image.image.url(:small), alt: "#{public_image.name}", id: "i|#{public_image.listing_order}"
+                    %a.clickable-image{ class: thumb_class, data: { id: "image#{publicImage.id}", img: publicImage.image.url(:large), link: publicImage.image.url } }
+                      = image_tag publicImage.image.url(:small), alt: "#{publicImage.name}", id: "i|#{publicImage.listing_order}"
             :plain
               <script id="current-photo-template" type="x-tmpl-mustache">
                 <div id="{{id}}" style="display: none;">
@@ -106,24 +106,24 @@
 
       .show-bike-details
         %ul.attr-list.split-sm
-          = @bike.attr_list_item(@bike.serial_display, 'Serial', with_colon: true)
+          = @bike.attr_listItem(@bike.serial_display, 'Serial', with_colon: true)
           - unless @bike.type == 'bike'
-            = @bike.attr_list_item(@bike.type.titleize, 'Cycle type', with_colon: true)
-          = @bike.attr_list_item(@bike.mnfg_name, 'Manufacturer', with_colon: true)
-          = @bike.attr_list_item(@bike.frame_model, 'Model', with_colon: true)
-          = @bike.attr_list_item(@bike.year.to_s, 'Year', with_colon: true)
-          = @bike.attr_list_item(@bike.frame_colors.to_sentence, 'Primary colors', with_colon: true)
-          = @bike.attr_list_item(@bike.size_display, 'Frame size', with_colon: true)
+            = @bike.attr_listItem(@bike.type.titleize, 'Cycle type', with_colon: true)
+          = @bike.attr_listItem(@bike.mnfg_name, 'Manufacturer', with_colon: true)
+          = @bike.attr_listItem(@bike.frame_model, 'Model', with_colon: true)
+          = @bike.attr_listItem(@bike.year.to_s, 'Year', with_colon: true)
+          = @bike.attr_listItem(@bike.frame_colors.to_sentence, 'Primary colors', with_colon: true)
+          = @bike.attr_listItem(@bike.size_display, 'Frame size', with_colon: true)
           - if @bike.front_wheel_size_id.present?
             - front_tire_width = @bike.front_tire_narrow ? '(Narrow tire)' : '(Wide tire)'
             - if @bike.front_wheel_size_id == @bike.rear_wheel_size_id
-              = @bike.attr_list_item(@bike.ass_name('front_wheel_size', front_tire_width), 'Wheel diameter', with_colon: true)
+              = @bike.attr_listItem(@bike.ass_name('front_wheel_size', front_tire_width), 'Wheel diameter', with_colon: true)
             - else
-              = @bike.attr_list_item(@bike.ass_name('front_wheel_size', front_tire_width), 'Front wheel diameter', with_colon: true)
+              = @bike.attr_listItem(@bike.ass_name('front_wheel_size', front_tire_width), 'Front wheel diameter', with_colon: true)
               - rear_tire_width = @bike.rear_tire_narrow ? '(Narrow tire)' : '(Wide tire)'
-              = @bike.attr_list_item(@bike.ass_name('rear_wheel_size', rear_tire_width), 'Rear wheel diameter', with_colon: true)
-          = @bike.attr_list_item(@bike.ass_name('frame_material'), 'Frame Material', with_colon: true)
-          = @bike.attr_list_item(@bike.ass_name('handlebar_type'), 'Handlebar type', with_colon: true)
+              = @bike.attr_listItem(@bike.ass_name('rear_wheel_size', rear_tire_width), 'Rear wheel diameter', with_colon: true)
+          = @bike.attr_listItem(@bike.ass_name('frame_material'), 'Frame Material', with_colon: true)
+          = @bike.attr_listItem(@bike.ass_name('handlebar_type'), 'Handlebar type', with_colon: true)
         - if @bike.description.present?
           %h3
             Distinguishing features
@@ -136,17 +136,17 @@
             = render 'stolen_map'
             .col-md-4
               %ul.attr-list.separate-lines
-                = @bike.attr_list_item(@stolen_record.show_stolen_address, 'Location')
-                = @bike.attr_list_item(@stolen_record.locking_description, 'Locking description')
-                = @bike.attr_list_item(@stolen_record.lock_defeat_description, 'Locking circumvented')
-                = @bike.attr_list_item((l @stolen_record.date_stolen, format: :dotted), 'Date stolen')
-                = @bike.attr_list_item(@stolen_record.police_report_number, 'Police report #')
-                = @bike.attr_list_item(@stolen_record.police_report_department, 'Department & city')
-          - if @stolen_record.theft_description.present?
+                = @bike.attr_listItem(@stolenRecord.show_stolen_address, 'Location')
+                = @bike.attr_listItem(@stolenRecord.locking_description, 'Locking description')
+                = @bike.attr_listItem(@stolenRecord.lock_defeat_description, 'Locking circumvented')
+                = @bike.attr_listItem((l @stolenRecord.date_stolen, format: :dotted), 'Date stolen')
+                = @bike.attr_listItem(@stolenRecord.police_report_number, 'Police report #')
+                = @bike.attr_listItem(@stolenRecord.police_report_department, 'Department & city')
+          - if @stolenRecord.theft_description.present?
             %h3
               Description of incident
             %p
-              = @stolen_record.theft_description
+              = @stolenRecord.theft_description
 
     
       - cgroups = @bike.cgroup_array.map { |id| { name: Cgroup.find(id).name, id: id } }
@@ -203,7 +203,7 @@
             %p
               Is this your bike? Send proof of ownership (such as the bike's serial number or a link to a photo of you with the bike)
 
-          = form_for @stolen_notification do |f|
+          = form_for @stolenNotification do |f|
             = f.hidden_field :bike_id, value: @bike.id
             = f.text_area :message, required: true, placeholder: "Contacting about an ad you found online? Include a link to the ad below", rows: 3, class: 'form-control'
             = f.text_field :reference_url, placeholder: 'Link url', rows: 3, class: 'form-control additional-field'
@@ -217,8 +217,8 @@
               %strong
                 Owner's phone number:
               
-              %a{ href: "tell:#{@stolen_record.phone}" }
-                = @stolen_record.phone
+              %a{ href: "tell:#{@stolenRecord.phone}" }
+                = @stolenRecord.phone
       .ad-block.ad300x600
         %h4
           300x600

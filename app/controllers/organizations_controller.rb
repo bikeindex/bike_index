@@ -58,22 +58,22 @@ class OrganizationsController < ApplicationController
   def show
     bikes = Bike.where(creation_organization_id: @organization.id).order("created_at desc")
     page = params[:page] || 1
-    per_page = params[:per_page] || 25
-    bikes = bikes.page(page).per(per_page)
+    perPage = params[:perPage] || 25
+    bikes = bikes.page(page).per(perPage)
     @bikes = bikes.decorate
     @organization = @organization.decorate
   end
 
   def embed
-    @bike = BikeCreator.new(@b_param).new_bike
+    @bike = BikeCreator.new(@bikeParam).new_bike
     @bike.owner_email = params[:email] if params[:email].present?
-    if params[:non_stolen]
-      @non_stolen = true 
+    if params[:nonStolen]
+      @nonStolen = true 
     else
       #nothing to do
     end      
-    if params[:stolen_first]
-      @stolen_first = true
+    if params[:stolenFirst]
+      @stolenFirst = true
     else
       #nothing to do
     end    
@@ -90,11 +90,11 @@ class OrganizationsController < ApplicationController
   end
 
   def embed_extended
-    @bike = BikeCreator.new(@b_param).new_bike
+    @bike = BikeCreator.new(@bikeParam).new_bike
     @bike.owner_email = 'info@lumberyardmtb.com' if @organization.slug == 'lumberyard'
     if params[:email].present?
       @bike.owner_email = params[:email] 
-      @persist_email = true
+      @persistEmail = true
     else
       #nothing to do
     end
@@ -116,7 +116,7 @@ class OrganizationsController < ApplicationController
       EmailLightspeedNotificationWorker.perform_async(@organization.id, api_key)
       flash[:notice] = "Thanks for updating your LightSpeed API Key!"
       redirect_to organization_url(@organization) and return
-      # @stolen_notification = StolenNotification.new(params[:stolen_notification])
+      # @stolenNotification = StolenNotification.new(params[:stolenNotification])
     else
       if @organization.update_attributes(allowed_attributes)
         if @organization.wants_to_be_shown && @organization.show_on_map == false
@@ -153,7 +153,7 @@ class OrganizationsController < ApplicationController
       @user = User.new
     end
     @organization = Organization.new
-    @active_section = "contact"
+    @activeSection = "contact"
   end
 
   def allowed_attributes
@@ -176,10 +176,10 @@ class OrganizationsController < ApplicationController
       flash[:error] = "We're sorry, that organization doesn't have a user set up to register bikes through. Email contact@bikeindex.org if this seems like an error."
       redirect_to root_url and return
     end
-    if params[:b_param_id_token].present?
-      @b_param = BParam.from_id_token(params[:b_param_id_token])
+    if params[:bikeParam_id_token].present?
+      @bikeParam = BParam.from_id_token(params[:bikeParam_id_token])
     else
-      @b_param = BParam.create(creator_id: @organization.auto_user.id, params: {creation_organization_id: @organization.id, embeded: true})
+      @bikeParam = BParam.create(creator_id: @organization.auto_user.id, params: {creation_organization_id: @organization.id, embeded: true})
     end
   end
 

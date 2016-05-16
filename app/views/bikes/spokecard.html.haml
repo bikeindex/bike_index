@@ -7,7 +7,7 @@
     %meta{name: "description", content: "Spoke card a bike." }
     %title= content_for?(:title) ? yield(:title) : "Bike Index"
     <link rel="shortcut icon" href="/fav.ico" />
-    = stylesheet_link_tag "spokecard", media: "all"
+    = stylesheet_link_tag "spoke_card", media: "all"
     = csrf_meta_tags
     <!-- Pulled from https://code.google.com/p/html5shiv/ -->
     <!--[if lt IE 9]>
@@ -15,24 +15,24 @@
     <![endif]-->
 
 %body
-  .spokecard-wrap
+  .spoke_card-wrap
     %span.tleft
     %span.bleft
     %span.tright
     %span.bright
 
-    = image_tag "/assets/spokecard_front.svg", alt: "Spokecard front", title: "GO FAST", class: "spokecard-background"
+    = image_tag "/assets/spoke_card_front.svg", alt: "spoke_card front", title: "GO FAST", class: "spoke_card-background"
     
     .qr-code-f
       %img{ src: @qrcode, alt: "This bike's qrcode" }
 
-  .spokecard-wrap
+  .spoke_card-wrap
     %span.tleft
     %span.bleft
     %span.tright
     %span.bright
 
-    = image_tag "/assets/spokecard_back.svg", alt: "Spokecard back", title: "GO FAST", class: "spokecard-background"
+    = image_tag "/assets/spoke_card_back.svg", alt: "spoke_card back", title: "GO FAST", class: "spoke_card-background"
 
     .qr-code-b
       %img{ src: @qrcode, alt: "This bike's qrcode" }

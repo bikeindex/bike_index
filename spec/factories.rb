@@ -84,7 +84,7 @@ FactoryGirl.define do
     name { FactoryGirl.generate(:unique_name) }
   end
 
-  factory :b_param do
+  factory :bikeParam do
     association :creator, factory: :user
   end
 
@@ -112,8 +112,8 @@ FactoryGirl.define do
     factory :stolen_bike do
       stolen true
       after(:create) do |bike|
-        create(:stolen_record, bike: bike)
-        bike.save # updates current_stolen_record
+        create(:stolenRecord, bike: bike)
+        bike.save # updates current_stolenRecord
       end
     end
   end
@@ -180,7 +180,7 @@ FactoryGirl.define do
     association :lock_type
   end
 
-  factory :organization_invitation do
+  factory :organizationInvitation do
     association :inviter, factory: :user
     association :organization
     invitee_email 'mike@test.com'
@@ -194,7 +194,7 @@ FactoryGirl.define do
     access_token '12345teststststs'
   end
 
-  factory :public_image do |u|
+  factory :publicImage do |u|
     u.image { File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg')) }
     association :imageable, factory: :bike
   end
@@ -212,14 +212,14 @@ FactoryGirl.define do
     name 'Bobby Joe'
   end
 
-  factory :stolen_notification do
+  factory :stolenNotification do
     association :sender, factory: :user
     association :receiver, factory: :user
     association :bike
     message 'This is a test email.'
   end
 
-  factory :stolen_record do
+  factory :stolenRecord do
     bike
     date_stolen Time.now
   end

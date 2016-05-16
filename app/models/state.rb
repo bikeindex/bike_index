@@ -5,7 +5,7 @@ class State < ActiveRecord::Base
 
   belongs_to :country
   has_many :locations
-  has_many :stolen_records
+  has_many :stolenRecords
 
   default_scope { order(:name) }
 

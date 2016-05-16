@@ -1,12 +1,12 @@
 = form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do |f|
-  .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
+  .form-well-container.container{ class: "edit-bike-page-#{@editTemplate}" }
     .row
       = render partial: '/bikes/edit_primary_menu'
       .col-md-8.form-well
         .form-wrap
           .edit-bike-form-header
             %h3
-              = @edit_templates[@edit_template]
+              = @editTemplates[@editTemplate]
 
 
           .related-fields

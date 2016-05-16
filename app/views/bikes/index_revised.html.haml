@@ -16,7 +16,7 @@
             strip_tags(params[:query]),                 |
             placeholder: 'Search Bike Index',           |
             class: 'form-control query-field',          |
-            data: { initial: @selectize_items.to_json }
+            data: { initial: @selectizeItems.to_json }
         .search-button-wrap
           = button_tag(type: 'submit', class: 'searchit btn btn-primary') do
             :plain
@@ -29,7 +29,7 @@
           %span
             within
           = hidden_field_tag :stolen, params[:stolen] || true
-          = hidden_field_tag :non_stolen, params[:non_stolen] || ''
+          = hidden_field_tag :nonStolen, params[:nonStolen] || ''
           = hidden_field_tag :non_proximity, params[:non_proximity] || ''
 
       .search-type-tabs{ data: { query: request.original_url.split('bikes?').last } }
@@ -48,7 +48,7 @@
               Stolen anywhere
               %span.count
           %li.nav-item.not-stolen
-            %a#non_stolen_tab.nav-link{ href: '#', class: ('active' if @stolenness == 'non_stolen'), role: 'tab' }
+            %a#nonStolen_tab.nav-link{ href: '#', class: ('active' if @stolenness == 'nonStolen'), role: 'tab' }
               Not marked stolen
               %span.count
 
@@ -62,14 +62,14 @@
       - else
         .container
           %h1.no-results
-            - desc = { 'stolen_proximity' => 'nearby stolen bikes', 'non_stolen' => 'non-stolen bikes', 'stolen' => 'bikes stolen anywhere' }
+            - desc = { 'stolen_proximity' => 'nearby stolen bikes', 'nonStolen' => 'non-stolen bikes', 'stolen' => 'bikes stolen anywhere' }
             No #{desc[@stolenness]}
-            - if @secondary_bikes.present?
+            - if @secondaryBikes.present?
               exactly match that serial
             - else
               matched your search
 
-      - if @secondary_bikes.present?  
+      - if @secondaryBikes.present?  
         .container
           %h2.secondary-bikes
             Serial numbers close to
@@ -77,5 +77,5 @@
               #{params[:serial]}
 
           %ul.bike-boxes
-            = render partial: '/bikes/revised_bike', collection: @secondary_bikes, locals: { target: 'show' }
+            = render partial: '/bikes/revised_bike', collection: @secondaryBikes, locals: { target: 'show' }
 

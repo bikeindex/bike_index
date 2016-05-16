@@ -9,7 +9,7 @@
       - if @blog.is_listicle
         - images = @blog.listicles.map(&:image_url)
       - else
-        - images = @blog.public_images.map(&:image_url)
+        - images = @blog.publicImages.map(&:image_url)
       - images.each do |i| 
         %br
         = link_to i, i
@@ -110,11 +110,11 @@
   - unless @blog.is_listicle
     .well
       .add-blog-photos
-        %ul#public_images{ :"data-order-url" => order_public_images_url }
-          - if @blog.public_images
-            = render partial: "/public_images/public_image", collection: @blog.public_images, as: :public_image
+        %ul#publicImages{ :"data-order-url" => order_publicImages_url }
+          - if @blog.publicImages
+            = render partial: "/publicImages/publicImage", collection: @blog.publicImages, as: :publicImage
         %section
-          = render "public_images/new_blog_form"
+          = render "publicImages/new_blog_form"
 
   .alert.alert-info
     %p

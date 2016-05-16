@@ -14,7 +14,7 @@ class MailerIntegrationsController < ApplicationController
   end
 
   def index
-    @show_substitution_values = params[:show_substitution_values]
+    @showSubstitutionValues = params[:showSubstitutionValues]
     render layout: 'application_updated'
   end
 end

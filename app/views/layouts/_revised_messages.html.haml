@@ -2,11 +2,11 @@
   - flash.each do |name, msg|
     = render partial: '/shared/alert', locals: { body: msg, type: name }
 
-  - if @page_errors.present? # Primarily used for form object errors
-    - title = "Please fix the following #{pluralize(@page_errors.count, 'error')}"
+  - if @pageErrors.present? # Primarily used for form object errors
+    - title = "Please fix the following #{pluralize(@pageErrors.count, 'error')}"
     - error_body = capture_haml do
       %ul
-        - @page_errors.each do |msg|
+        - @pageErrors.each do |msg|
           %li
             = msg
     = render partial: '/shared/alert', locals: { body: error_body, title: title }

@@ -1,6 +1,6 @@
 class InitialCreation < ActiveRecord::Migration
   def up
-    create_table "b_params", force: true do |t|
+    create_table "bikeParams", force: true do |t|
       t.text     "params"
       t.string   "bike_title"
       t.integer  "creator_id"
@@ -258,7 +258,7 @@ class InitialCreation < ActiveRecord::Migration
     add_index "memberships", ["organization_id"], name: "index_memberships_on_organization_id"
     add_index "memberships", ["user_id"], name: "index_memberships_on_user_id"
 
-    create_table "organization_invitations", force: true do |t|
+    create_table "organizationInvitations", force: true do |t|
       t.string   "invitee_email"
       t.string   "invitee_name"
       t.integer  "invitee_id"
@@ -306,7 +306,7 @@ class InitialCreation < ActiveRecord::Migration
       t.datetime "updated_at", null: false
     end
 
-    create_table "public_images", force: true do |t|
+    create_table "publicImages", force: true do |t|
       t.string   "image"
       t.string   "name"
       t.integer  "listing_order",  default: 0
@@ -316,7 +316,7 @@ class InitialCreation < ActiveRecord::Migration
       t.datetime "updated_at",                    null: false
     end
 
-    add_index "public_images", ["imageable_id", "imageable_type"], name: "index_public_images_on_imageable_id_and_imageable_type"
+    add_index "publicImages", ["imageable_id", "imageable_type"], name: "index_publicImages_on_imageable_id_and_imageable_type"
 
     create_table "rear_gear_types", force: true do |t|
       t.string   "name"
@@ -326,7 +326,7 @@ class InitialCreation < ActiveRecord::Migration
       t.datetime "updated_at",                    null: false
     end
 
-    create_table "stolen_notifications", force: true do |t|
+    create_table "stolenNotifications", force: true do |t|
       t.string   "subject"
       #t.text     "message"
       t.integer  "sender_id"
@@ -336,7 +336,7 @@ class InitialCreation < ActiveRecord::Migration
       t.datetime "updated_at",  null: false
     end
 
-    create_table "stolen_records", force: true do |t|
+    create_table "stolenRecords", force: true do |t|
       t.boolean  "police_report_filed"
       t.text     "police_report_information"
       t.integer  "zipcode"

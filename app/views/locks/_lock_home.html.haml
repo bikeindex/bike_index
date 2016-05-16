@@ -14,8 +14,8 @@
             %img{ src: "/assets/locks/#{lock.lock_type.slug}.jpg", alt: lock.lock_type.name} 
         .blist-primary-group
           %dl.dl-horizontal
-            = lock.dl_list_item(link_to(lock.lock_type_name, lock_url(lock)), "Lock Type")
-            = lock.dl_list_item(lock.mnfg_name, "Manufacturer")
+            = lock.dl_listItem(link_to(lock.lock_type_name, lock_url(lock)), "Lock Type")
+            = lock.dl_listItem(lock.mnfg_name, "Manufacturer")
             = lock.dl_from_attribute("key_serial")
             = lock.dl_from_attribute("combination")
         

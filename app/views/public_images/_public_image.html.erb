@@ -1,18 +1,18 @@
-<li class="public_image" id="<%= public_image.id %>">
+<li class="publicImage" id="<%= publicImage.id %>">
   <div class='processing'>... processing</div>
-  <%= image_tag(public_image.image_url(:small)) if public_image.image? %>
-  <div class="name"><%= public_image.name.truncate(18) %></div>
+  <%= image_tag(publicImage.image_url(:small)) if publicImage.image? %>
+  <div class="name"><%= publicImage.name.truncate(18) %></div>
   <div class="actions">
-    <% if public_image.imageable_type == "Bike" %>
-      <%= link_to "Edit", edit_public_image_path(public_image), class: "photo-edit" %>
-      <%= link_to "Delete", public_image_url(public_image, return_url: edit_bike_url(@bike)), method: :delete, class: "photo-remove" %>
+    <% if publicImage.imageable_type == "Bike" %>
+      <%= link_to "Edit", edit_publicImage_path(publicImage), class: "photo-edit" %>
+      <%= link_to "Delete", publicImage_url(publicImage, return_url: edit_bike_url(@bike)), method: :delete, class: "photo-remove" %>
     <% else %>
-      <textarea class="code-to-enter">&lt;img class="post-image" src="<%= public_image.image_url(:large) %>" alt="ENTER YOUR TEXT HERE"&gt;</textarea>
+      <textarea class="code-to-enter">&lt;img class="post-image" src="<%= publicImage.image_url(:large) %>" alt="ENTER YOUR TEXT HERE"&gt;</textarea>
       <p>
         <span>Copy the above text and paste it where you'd like it to appear in the post.</span>
-        <%= link_to "Delete image", public_image_url(public_image, return_url: edit_admin_news_url(@blog)), method: :delete, class: "photo-remove" %>
+        <%= link_to "Delete image", publicImage_url(publicImage, return_url: edit_admin_news_url(@blog)), method: :delete, class: "photo-remove" %>
       </p>
     <% end %>
   </div>
-  <div class="index-image-select"><input type="radio" name="index_image_id" value="<%= public_image.id %>" class="index_image_<%= public_image.id %>"></div>
+  <div class="index-image-select"><input type="radio" name="index_image_id" value="<%= publicImage.id %>" class="index_image_<%= publicImage.id %>"></div>
 </li>

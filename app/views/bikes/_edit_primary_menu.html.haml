@@ -1,8 +1,8 @@
 %nav.primary-edit-bike-menu
   %ul
-    - @edit_templates.each do |template, description|
+    - @editTemplates.each do |template, description|
       %li
-        - classname = @edit_template == template ? 'active' : ''
+        - classname = @editTemplate == template ? 'active' : ''
         %a{ href: edit_bike_path(page: template), class: classname }
           %h4
             = description
@@ -11,9 +11,9 @@
       You are editing
     // ignore this select in dirty forms
     %select.dirtyignore
-      - @edit_templates.each do |template, description|
-        %option{ selected: (@edit_template == template), value: edit_bike_path(page: template) }
+      - @editTemplates.each do |template, description|
+        %option{ selected: (@editTemplate == template), value: edit_bike_path(page: template) }
           = description 
   .edit-bike-submit-wrapper
-    = hidden_field_tag :edit_template, @edit_template
+    = hidden_field_tag :editTemplate, @editTemplate
     = submit_tag 'Save changes', class: 'btn btn-lg btn-primary'

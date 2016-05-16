@@ -5,9 +5,9 @@ describe Organization do
     # it { should validate_uniqueness_of :slug }
     it { is_expected.to validate_presence_of :name }
     it { is_expected.to have_many :memberships }
-    it { is_expected.to have_many :organization_deals }
+    it { is_expected.to have_many :organizationDeals }
     it { is_expected.to have_many :users }
-    it { is_expected.to have_many :organization_invitations }
+    it { is_expected.to have_many :organizationInvitations }
     it { is_expected.to have_many :locations }
     it { is_expected.to have_many :bikes }
     it { is_expected.to belong_to :auto_user }

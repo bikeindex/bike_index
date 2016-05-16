@@ -38,15 +38,15 @@
           %span.subheading-text
             Drag the uploaded photos to rearrange the order in which they display.
       .add-bike-photos
-        %ul#public_images{ :"data-order-url" => order_public_images_url }
-          - if @bike.public_images
-            = render partial: "/public_images/public_image", collection: @bike.public_images, as: :public_image
+        %ul#publicImages{ :"data-order-url" => order_publicImages_url }
+          - if @bike.publicImages
+            = render partial: "/publicImages/publicImage", collection: @bike.publicImages, as: :publicImage
         .private-images
           - if @private_images.present?
             %h2
               Private images
-            %ul.private_images{ :"data-order-url" => order_public_images_url }
-              = render partial: "/public_images/public_image", collection: @private_images, as: :public_image
+            %ul.private_images{ :"data-order-url" => order_publicImages_url }
+              = render partial: "/publicImages/publicImage", collection: @private_images, as: :publicImage
           %p.small
             Adding something you'd like to be private (e.g. a receipt)?
             / %br
@@ -57,9 +57,9 @@
             %strong
               "do not display"
             and save it.
-        - if @bike.public_images.length < 49
+        - if @bike.publicImages.length < 49
           %section
-            = render "public_images/new_form"
+            = render "publicImages/new_form"
 
         - else
           %section
@@ -109,10 +109,10 @@
           %li.save
             = submit_tag "Save changes", class: "button-green submit-bike-update"
 
-      - if @bike.stolen and @bike.find_current_stolen_record.present?
-        = f.fields_for :stolen_records do |builder|
+      - if @bike.stolen and @bike.find_current_stolenRecord.present?
+        = f.fields_for :stolenRecords do |builder|
           - if builder.object.current
-            = render partial: 'bikes/bike_fields/stolen_record', locals: { f: builder, bike: f }
+            = render partial: 'bikes/bike_fields/stolenRecord', locals: { f: builder, bike: f }
           - else
             / Don't put anything
           

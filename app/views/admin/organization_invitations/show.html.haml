@@ -19,7 +19,7 @@
     remaining #{"invitation".pluralize(current_organization.available_invitation_count)}.
   %hr
 
-- if @organization.organization_invitations.any?
+- if @organization.organizationInvitations.any?
   %section.full-screen-table
     %table.table.table-striped
       %thead
@@ -40,10 +40,10 @@
             Redeemed
 
       %tbody
-        - @organization_invitations.each do |org_invite|
+        - @organizationInvitations.each do |org_invite|
           %tr
             %td
-              = link_to org_invite.id, admin_organization_invitation_url(org_invite.id)
+              = link_to org_invite.id, admin_organizationInvitation_url(org_invite.id)
             %td.large-screens
               = org_invite.created_at.strftime("%-I %p on %-m/%-d/%Y ")
             %td.medium-screens
@@ -61,4 +61,4 @@
 
 - if @organization.available_invitation_count > 0
   .well.span6.padded
-    = render partial: "/admin/organization_invitations/form"
+    = render partial: "/admin/organizationInvitations/form"

@@ -27,7 +27,7 @@ class Bike < ActiveRecord::Base
     :thumb_path,
     :name,
     :stolen,
-    :current_stolen_record_id,
+    :current_stolenRecord_id,
     :recovered,
     :frame_material_id,
     :frame_model,
@@ -57,7 +57,7 @@ class Bike < ActiveRecord::Base
     :front_gear_type_id,
     :description,
     :owner_email,
-    :stolen_records_attributes,
+    :stolenRecords_attributes,
     :date_stolen_input,
     :receive_notifications,
     :phone,
@@ -65,13 +65,13 @@ class Bike < ActiveRecord::Base
     :creator_id,
     :image,
     :components_attributes,
-    :b_param_id,
+    :bikeParam_id,
     :cached_attributes,
     :embeded,
     :embeded_extended,
     :example,
     :hidden,
-    :card_id,
+    :cardId,
     :stock_photo_url,
     :pdf,
     :send_email,
@@ -80,7 +80,7 @@ class Bike < ActiveRecord::Base
     :approved_stolen,
     :marked_user_hidden,
     :marked_user_unhidden,
-    :b_param_id_token,
+    :bikeParam_id_token,
     :is_for_sale
 
   mount_uploader :pdf, PdfUploader
@@ -106,19 +106,19 @@ class Bike < ActiveRecord::Base
   belongs_to :invoice
   belongs_to :creation_organization, class_name: "Organization"
   belongs_to :location
-  belongs_to :current_stolen_record, class_name: "StolenRecord"
+  belongs_to :current_stolenRecord, class_name: "StolenRecord"
 
-  has_many :stolen_notifications, dependent: :destroy
-  has_many :stolen_records, dependent: :destroy
+  has_many :stolenNotifications, dependent: :destroy
+  has_many :stolenRecords, dependent: :destroy
   has_many :other_listings
   has_many :normalized_serial_segments
   has_many :ownerships, dependent: :destroy
-  has_many :public_images, as: :imageable, dependent: :destroy
+  has_many :publicImages, as: :imageable, dependent: :destroy
   has_many :components, dependent: :destroy
-  has_many :b_params, as: :created_bike
+  has_many :bikeParams, as: :created_bike
   has_many :duplicate_bike_groups, through: :normalized_serial_segments
 
-  accepts_nested_attributes_for :stolen_records
+  accepts_nested_attributes_for :stolenRecords
   accepts_nested_attributes_for :components, allow_destroy: true
 
   validates_presence_of :serial_number
@@ -130,19 +130,19 @@ class Bike < ActiveRecord::Base
   validates_presence_of :creator
   validates_presence_of :manufacturer_id
 
-  validates_uniqueness_of :card_id, allow_nil: true
+  validates_uniqueness_of :cardId, allow_nil: true
   validates_presence_of :primary_frame_color_id
   # validates_presence_of :rear_wheel_size_id
   # validates_inclusion_of :rear_tire_narrow, in: [true, false]
 
   attr_accessor :other_listing_urls, :date_stolen_input, :receive_notifications,
-    :phone, :image, :b_param_id, :embeded,
+    :phone, :image, :bikeParam_id, :embeded,
     :embeded_extended, :paint_name, :bike_image_cache, :send_email,
-    :marked_user_hidden, :marked_user_unhidden, :b_param_id_token
+    :marked_user_hidden, :marked_user_unhidden, :bikeParam_id_token
 
   default_scope { where(example: false).where(hidden: false).order("listing_order desc") }
   scope :stolen, -> { where(stolen: true) }
-  scope :non_stolen, -> { where(stolen: false) }
+  scope :nonStolen, -> { where(stolen: false) }
   scope :with_serial, -> { where("serial_number != ?", "absent") }
 
   include PgSearch
@@ -184,9 +184,9 @@ class Bike < ActiveRecord::Base
   end
 
   def get_listing_order
-    return current_stolen_record.date_stolen.to_time.to_i.abs if stolen && current_stolen_record.present?
+    return current_stolenRecord.date_stolen.to_time.to_i.abs if stolen && current_stolenRecord.present?
     t = updated_at.to_time.to_i/10000
-    t = t/100 unless stock_photo_url.present? or public_images.present?
+    t = t/100 unless stock_photo_url.present? or publicImages.present?
     t
   end
 
@@ -231,8 +231,8 @@ class Bike < ActiveRecord::Base
     false
   end
 
-  def find_current_stolen_record
-    self.stolen_records.last if self.stolen_records.any?
+  def find_current_stolenRecord
+    self.stolenRecords.last if self.stolenRecords.any?
   end
 
   def recovered_records
@@ -377,8 +377,8 @@ class Bike < ActiveRecord::Base
   end
 
   def cache_photo
-    if self.public_images.any?
-      self.thumb_path = self.public_images.first.image_url(:small)
+    if self.publicImages.any?
+      self.thumb_path = self.publicImages.first.image_url(:small)
     end
   end
 
@@ -407,12 +407,12 @@ class Bike < ActiveRecord::Base
 
   def cache_stolen_attributes
     d = description
-    csr = find_current_stolen_record
+    csr = find_current_stolenRecord
     if csr.present?
-      self.current_stolen_record_id = csr.id
+      self.current_stolenRecord_id = csr.id
       d = "#{d} #{csr.theft_description}"
     else
-      self.current_stolen_record_id = nil
+      self.current_stolenRecord_id = nil
     end
     self.all_description = d
   end

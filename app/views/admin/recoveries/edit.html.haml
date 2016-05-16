@@ -9,9 +9,9 @@
   = render partial: "/bikes/bike", locals: {bike: @bike, target: "show" }
 .dl-holder
   %dl.dl-horizontal
-    = @bike.dl_list_item(@bike.created_at.strftime("%m-%d-%Y"), "Created")
+    = @bike.dl_listItem(@bike.created_at.strftime("%m-%d-%Y"), "Created")
     = @bike.dl_from_attribute("owner_email")
-    = @bike.dl_list_item(@bike.owner.email, "Current Owner")
+    = @bike.dl_listItem(@bike.owner.email, "Current Owner")
     = @bike.dl_from_attribute("cached_data")
     %dt
       Location
@@ -22,7 +22,7 @@
       - if @recovery.recovery_display.present?
         = link_to "Recovery displayed", edit_admin_recovery_display_url(@recovery.recovery_display)
       - else
-        = link_to 'Display recovery', new_admin_recovery_display_url(stolen_record_id: @recovery.id), class: 'button-blue padded'        
+        = link_to 'Display recovery', new_admin_recovery_display_url(stolenRecord_id: @recovery.id), class: 'button-blue padded'        
         - if @recovery.recovery_posted
           Recovery posted
 

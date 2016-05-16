@@ -1,10 +1,10 @@
 class BikeCreatorBuilder
-  def initialize(b_param = nil)
-    @b_param = b_param
+  def initialize(bikeParam = nil)
+    @bikeParam = bikeParam
   end
 
   def verified_bike(bike)
-    BikeCreatorVerifier.new(@b_param, bike).verify
+    BikeCreatorVerifier.new(@bikeParam, bike).verify
   end
 
   def add_front_wheel_size(bike)
@@ -25,10 +25,10 @@ class BikeCreatorBuilder
   end
 
   def new_bike
-    bike = Bike.new(@b_param.bike)
-    bike.b_param_id = @b_param.id
-    bike.b_param_id_token = @b_param.id_token
-    bike.creator_id = @b_param.creator_id 
+    bike = Bike.new(@bikeParam.bike)
+    bike.bikeParam_id = @bikeParam.id
+    bike.bikeParam_id_token = @bikeParam.id_token
+    bike.creator_id = @bikeParam.creator_id 
     bike.updator_id = bike.creator_id
     bike
   end
@@ -40,7 +40,7 @@ class BikeCreatorBuilder
   end
 
   def build
-    return @b_param.created_bike if @b_param.created_bike.present?
+    return @bikeParam.created_bike if @bikeParam.created_bike.present?
     bike = build_new
     add_front_wheel_size(bike)
     bike

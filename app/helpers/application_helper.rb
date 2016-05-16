@@ -51,7 +51,7 @@ module ApplicationHelper
       elsif action_name == 'show' && link_text == 'Go hard'
         class_name = 'active'
       end
-    elsif controller_name == 'organization_invitations' && link_text == 'Invitations'
+    elsif controller_name == 'organizationInvitations' && link_text == 'Invitations'
       class_name = 'active'
     else
       class_name = controller_name == link_text.downcase.gsub(' ', '_') ? 'active' : ''
@@ -60,7 +60,7 @@ module ApplicationHelper
   end
 
   def content_nav_class(section)
-    'active-menu' if section == @active_section
+    'active-menu' if section == @activeSection
   end
 
   def link_to_add_fields(name, f, association)
@@ -91,17 +91,17 @@ module ApplicationHelper
     link_to(text.html_safe, '#', class: 'add_fields', data: { id: id, fields: fields.gsub("\n", '') })
   end
 
-  def listicle_html(list_item)
-    c = content_tag(:h2, list_item.title, class: 'list-item-title')
-    if list_item.image_credits.present?
-      c = content_tag(:div, list_item.image_credits_html.html_safe,
+  def listicle_html(listItem)
+    c = content_tag(:h2, listItem.title, class: 'list-item-title')
+    if listItem.image_credits.present?
+      c = content_tag(:div, listItem.image_credits_html.html_safe,
         class: 'listicle-image-credit') << c
     end
-    if list_item.image.present?
-      c = image_tag(list_item.image_url(:large)) << c
+    if listItem.image.present?
+      c = image_tag(listItem.image_url(:large)) << c
     end
     c = content_tag :article, c
-    c << content_tag(:article, list_item.body_html.html_safe) if list_item.body_html.present?
+    c << content_tag(:article, listItem.body_html.html_safe) if listItem.body_html.present?
     c
   end
 

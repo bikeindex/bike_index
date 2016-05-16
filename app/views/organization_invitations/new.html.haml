@@ -1,15 +1,15 @@
 %h1
   Send invitation
 
-= form_for [@organization, @organization_invitation], html: { class: "form-horizontal padded" } do |f|
-  - if @organization_invitation.errors.any?
+= form_for [@organization, @organizationInvitation], html: { class: "form-horizontal padded" } do |f|
+  - if @organizationInvitation.errors.any?
     #alert-block
       .alert.alert-error
         %h4
           Please fix the following 
-          = pluralize(@organization_invitation.errors.count, "error")
+          = pluralize(@organizationInvitation.errors.count, "error")
         %ul
-          - @organization_invitation.errors.full_messages.each do |msg|
+          - @organizationInvitation.errors.full_messages.each do |msg|
             %li
               = msg
     

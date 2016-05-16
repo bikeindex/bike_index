@@ -29,7 +29,7 @@ class BikeSerializer < ActiveModel::Serializer
     :frame_material,
     :front_gear_type,
     :rear_gear_type,
-    :stolen_record
+    :stolenRecord
 
   def type_of_cycle
     object.cycle_type.name
@@ -55,13 +55,13 @@ class BikeSerializer < ActiveModel::Serializer
     object.updated_at
   end
 
-  def stolen_record
-    object.current_stolen_record if object.current_stolen_record.present?
+  def stolenRecord
+    object.current_stolenRecord if object.current_stolenRecord.present?
   end
 
   def photo
-    if object.public_images.present?
-      object.public_images.first.image_url(:large)
+    if object.publicImages.present?
+      object.publicImages.first.image_url(:large)
     elsif object.stock_photo_url.present?
       object.stock_photo_url
     else
@@ -70,8 +70,8 @@ class BikeSerializer < ActiveModel::Serializer
   end
 
   def thumb
-    if object.public_images.present?
-      object.public_images.first.image_url(:small)
+    if object.publicImages.present?
+      object.publicImages.first.image_url(:small)
     elsif object.stock_photo_url.present?
       small = object.stock_photo_url.split('/')
       ext = "/small_" + small.pop

@@ -27,7 +27,7 @@ class Blog < ActiveRecord::Base
   validates_uniqueness_of :title_slug, message: "somehow that overlaps with another title! Sorrys."
 
   belongs_to :user
-  has_many :public_images, as: :imageable, dependent: :destroy
+  has_many :publicImages, as: :imageable, dependent: :destroy
 
   scope :published, -> { where(published: true) }
   scope :listicle_blogs, -> { where(is_listicle: true) }
@@ -111,16 +111,16 @@ class Blog < ActiveRecord::Base
       elsif is_listicle
         li = listicles.find(index_image_id)
       else
-        pi = public_images.find(index_image_id)
+        pi = publicImages.find(index_image_id)
       end
     else
       if is_listicle && listicles.present? && listicles.first.image.present?
         li = listicles.first
         # self.index_image = listicles.first.image_url(:medium)
         self.index_image_id = li.id
-      elsif public_images.present?
-        pi = public_images.last
-        self.index_image_id = public_images.last.id
+      elsif publicImages.present?
+        pi = publicImages.last
+        self.index_image_id = publicImages.last.id
       end
     end
     if li.present?
