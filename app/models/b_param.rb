@@ -1,5 +1,14 @@
-# b_param stands for Bike param
+=begin
+*****************************************************************
+* File: app/models/b_params.rb 
+* Name: Class Ad 
+* Some informon some atributs and some associations
+*****************************************************************
+=end
+
 class BParam < ActiveRecord::Base
+
+# b_param stands for Bike param
   attr_accessible :params,
                   :creator_id,
                   :bike_title,
@@ -17,6 +26,7 @@ class BParam < ActiveRecord::Base
   serialize :params
   serialize :bike_errors
 
+  #associations
   belongs_to :created_bike, class_name: "Bike"
   belongs_to :creator, class_name: "User"
 

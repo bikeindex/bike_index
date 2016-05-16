@@ -1,6 +1,16 @@
+=begin
+*****************************************************************
+* File: app/models/bike.rb 
+* Name: Class Vike 
+* 
+*****************************************************************
+=end
+
 class Bike < ActiveRecord::Base
   include ActiveModel::Dirty
   include ActionView::Helpers::SanitizeHelper
+  
+  #Atributs to register bike
   attr_accessible :registered_new, # Was this bike registered at point of sale?
     :cycle_type_id,
     :manufacturer_id,
@@ -76,6 +86,7 @@ class Bike < ActiveRecord::Base
   mount_uploader :pdf, PdfUploader
   process_in_background :pdf, CarrierWaveProcessWorker
 
+  #associations of bike
   belongs_to :manufacturer
   serialize(:cached_attributes, Array)
   belongs_to :primary_frame_color, class_name: "Color"

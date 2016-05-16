@@ -1,3 +1,11 @@
+=begin
+*****************************************************************
+* File: app/models/cgroup.rb 
+* Name: Class Cgroup
+* 
+*****************************************************************
+=end
+
 class Cgroup < ActiveRecord::Base
   # Note: Cgroup is short for component_group
   attr_accessible :name, :slug, :description

@@ -1,8 +1,21 @@
+=begin
+*****************************************************************
+* File: app/models/bike.rb 
+* Name: Class Bike 
+*****************************************************************
+=end
+
 class Color < ActiveRecord::Base
   include AutocompleteHashable
+ 
+  #atributs of color
   attr_accessible :name, :priority, :display
+ 
+  #validates of color
   validates_presence_of :name, :priority
   validates_uniqueness_of :name
+  
+  #associataions of bike
   has_many :bikes
   has_many :paints
 
