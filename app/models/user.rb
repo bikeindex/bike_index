@@ -30,10 +30,11 @@ class User < ActiveRecord::Base
     :can_send_many_stolen_notifications,
     :my_bikes_link_target,
     :my_bikes_link_title,
-    :is_emailable
+    :is_emailable,
+    :additional_emails
 
-
-  attr_accessor :my_bikes_link_target, :my_bikes_link_title, :current_password
+  attr_accessor :my_bikes_link_target, :my_bikes_link_title,
+                :current_password
   # stripe_id, is_paid_member, paid_membership_info
 
   mount_uploader :avatar, AvatarUploader
@@ -70,15 +71,15 @@ class User < ActiveRecord::Base
     username
   end
 
-  validates :password, 
-    presence: true, 
-    length: {within: 6..100},
+  validates :password,
+    presence: true,
+    length: { within: 6..100 },
     on: :create
   validates_format_of :password, with: /\A.*(?=.*[a-z]).*\Z/i, message: 'must contain at least one letter', on: :create
 
   validates :password, 
     confirmation: true,
-    length: {within: 6..100},
+    length: { within: 6..100 },
     allow_blank: true,
     on: :update
   validates_format_of :password, with: /\A.*(?=.*[a-z]).*\Z/i, message: 'must contain at least one letter', on: :update, allow_blank: true
@@ -88,8 +89,8 @@ class User < ActiveRecord::Base
 
   include PgSearch
   pg_search_scope :admin_search, against: {
-    name: 'A',
-    email: 'A'
+      name: 'A',
+      email: 'A'
     },
     using: { tsearch: { dictionary: 'english', prefix: true } }
 
@@ -101,7 +102,11 @@ class User < ActiveRecord::Base
     end
   end
 
-  # validate :ensure_unique_email
+  # def additional_emails=(value)
+    
+  # end
+
+  validate :ensure_unique_email
   def ensure_unique_email
     return true unless self.class.fuzzy_email_find(email)
     errors.add(:email, 'That email is already signed up on Bike Index.')
@@ -202,7 +207,7 @@ class User < ActiveRecord::Base
 
   def is_admin_of?(organization)
     m = Membership.where(user_id: id, organization_id: organization.id).first
-    m.present? && m.role == "admin"
+    m.present? && m.role == 'admin'
   end
   
   def has_membership?
@@ -258,7 +263,7 @@ class User < ActiveRecord::Base
   def set_urls
     self.title = strip_tags(title) if title.present?
     if website
-      self.website = Urlifyer.urlify(self.website)
+      self.website = Urlifyer.urlify(website)
     end
     mbh = my_bikes_hash || {}
     mbh[:link_target] = Urlifyer.urlify(my_bikes_link_target) if my_bikes_link_target.present?

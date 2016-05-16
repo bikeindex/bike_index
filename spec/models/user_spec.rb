@@ -27,7 +27,7 @@ describe User do
 
   describe 'create user_email' do
     it 'creates a user_email on create' do
-      user = FactoryGirl.create(:user)
+      user = FactoryGirl.create(:confirmed_user)
       expect(user.user_emails.count).to eq 1
       expect(user.email).to eq user.user_emails.first.email
     end
@@ -69,7 +69,7 @@ describe User do
     end
 
     describe 'confirm' do
-      let(:user) { User.new(FactoryGirl.attributes_for(:user)) }
+      let(:user) { FactoryGirl.create(:user) }
 
       it 'requires confirmation' do
         expect(user.confirmed).to be_falsey
@@ -154,13 +154,8 @@ describe User do
 
   describe 'fuzzy_email_find' do
     it "finds users by email address when the case doesn't match" do
-      @user = FactoryGirl.create(:user, email: 'ned@foo.com')
+      @user = FactoryGirl.create(:confirmed_user, email: 'ned@foo.com')
       expect(User.fuzzy_email_find('NeD@fOO.coM')).to eq(@user)
-    end
-
-    it 'finds users by user_emails' do
-      user = FactoryGirl.create(:user)
-      expect(user.user_emails.count).to eq 1
     end
   end
 
@@ -208,7 +203,7 @@ describe User do
 
   describe 'generate_username_confirmation_and_auth' do
     it 'generates the required tokens' do
-      user = User.new(FactoryGirl.attributes_for(:user))
+      user = FactoryGirl.create(:user)
       expect(user.auth_token).to be_present
       expect(user.username).to be_present
       expect(user.confirmation_token).to be_present
