@@ -33,8 +33,7 @@ class User < ActiveRecord::Base
     :is_emailable,
     :additional_emails
 
-  attr_accessor :my_bikes_link_target, :my_bikes_link_title,
-                :current_password
+  attr_accessor :my_bikes_link_target, :my_bikes_link_title, :current_password
   # stripe_id, is_paid_member, paid_membership_info
 
   mount_uploader :avatar, AvatarUploader
@@ -102,9 +101,9 @@ class User < ActiveRecord::Base
     end
   end
 
-  # def additional_emails=(value)
-    
-  # end
+  def additional_emails=(value)
+    UserEmail.add_emails_for_user_id(id, value)
+  end
 
   validate :ensure_unique_email
   def ensure_unique_email

@@ -1,18 +1,4 @@
 .edit-bike-page-root {
-  .serial-and-manufacturer-input {
-    @include make-col();
-    @extend .form-control-static;
-    font-weight: $strong-font-weight;
-  }
-  .submit-correction-block {
-    @include make-col();
-    font-style: italic;
-    a {
-      color: $body-font-color;
-      cursor: pointer;
-      &:hover, &:active, &.active { color: $link-color; }
-    }
-  }
   .frame-sizes {
     .btn {
       transition: all .1s linear;
@@ -31,18 +17,6 @@
       position: absolute;
       top: 0;
       transition: top .1s linear;
-    }
-  }
-}
-
-@media (max-width: $grid-breakpoint-md - 1px) {
-  .edit-bike-page-root {
-    // label is 4 columns
-    .serial-and-manufacturer-input { @include make-col-span(8); }
-    .submit-correction-block {
-      @include make-col-span(12);
-      margin-top: -.75em;
-      padding-bottom: .5em; 
     }
   }
 }
@@ -68,13 +42,5 @@
 @media (min-width: $grid-breakpoint-sm) {
   .edit-bike-page-root {
     .frame-sizes .frame-size-units.ex-size { top: 50px; }
-  }
-}
-
-@media (min-width: $grid-breakpoint-md) {
-  .edit-bike-page-root {
-    // label is 3 columns
-    .serial-and-manufacturer-input { @include make-col-span(3); }
-    .submit-correction-block { @include make-col-span(6); }
   }
 }

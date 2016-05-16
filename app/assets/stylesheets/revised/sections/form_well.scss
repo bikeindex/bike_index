@@ -14,6 +14,21 @@ $form-well-divider-color: #b2b2b2;
 
 .form-well {
   .form-wrap { padding: 2*$vertical-height 0 4*$vertical-height; }
+  .form-well-input-static {
+    @include make-col();
+    @extend .form-control-static;
+    font-weight: $strong-font-weight;
+  }
+  .form-well-input-static-full-width { @extend .form-well-input-static; }
+  .static-right-input-help {
+    @include make-col();
+    font-style: italic;
+    a {
+      color: $body-font-color;
+      cursor: pointer;
+      &:hover, &:active, &.active { color: $link-color; }
+    }
+  }
   .below-input-help {
     @extend small;
     display: block;
@@ -155,6 +170,16 @@ $form-well-divider-color: #b2b2b2;
     background: $form-well-background;
     .form-well { width: 100%; }
   }
+  .form-well { // This is the selector we put everything under, don't overpower
+    // label is 4 columns
+    .form-well-input-static { @include make-col-span(8); }
+    .form-well-input-static-full-width { @include make-col-span(8); }
+    .static-right-input-help {
+      @include make-col-span(12);
+      margin-top: -.75em;
+      padding-bottom: .5em; 
+    }
+  }
 }
 
 @media (min-width: $grid-breakpoint-md) and (max-width: $grid-breakpoint-lg - 1px) {
@@ -183,6 +208,15 @@ $form-well-divider-color: #b2b2b2;
   .form-wrap .row {
     margin-left: 0;
     margin-right: 0;
+  }
+  .form-well {
+    // label is 3 columns
+    .form-well-input-static { @include make-col-span(3); }
+    .form-well-input-static-full-width { @include make-col-span(9); }
+    .static-right-input-help { 
+      @include make-col-span(6);
+      padding-top: .3em;
+    }
   }
 }
 

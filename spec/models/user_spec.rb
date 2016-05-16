@@ -338,6 +338,41 @@ describe User do
   end
 
   describe 'additional user_email tests' do
-    it 'can not set a unconfirmed email to the primary email'
+    it 'can not set a unconfirmed email to the primary email' do
+  end
+
+  describe 'additional_emails=' do
+    let(:user) { FactoryGirl.create(:confirmed_user) }
+    before do
+      expect(user.user_emails).count to eq 1
+    end
+    context 'blank' do
+      it 'does nothing' do
+        user.additional_emails = ' '
+        expect{ user.save }.to change(UserEmail, :count).by 0
+      end
+    end
+    context 'a single email' do
+      it 'adds the email' do
+        user.additional_emails = 'stuffthings@oooooooooh.com'
+        expect{ user.save }.to change(UserEmail, :count).by 1
+        expect(user.user_emails.unconfirmed.count).to eq 1
+        expect(user.user_emails.unconfirmed.first.email).to eq 'stuffthings@oooooooooh.com'
+      end
+    end
+    context 'list with repeats' do
+      it 'adds the non-duped emails' do
+        user.additional_emails = 'stuffthings@oooooooooh.com,another_email@cool.com'
+        expect{ user.save }.to change(UserEmail, :count).by 2
+        second_confirmed = user.user_emails.where(email: 'stuffthings@oooooooooh.com').first
+        second_confirmed.confirm(second_confirmed.confirmation_token)
+        expect(user.user_emails.confirmed.count).to eq 2
+        expect(user.user_emails.unconfirmed.count).to eq 1
+        user.additional_emails = ' andAnother@cool.com,stuffthings@oooooooooh.com,another_email@cool.com,lols@stuff.com'
+        expect{ user.save }.to change(UserEmail, :count).by 2
+        expect(user.user_emails.confirmed.count).to eq 2
+        expect(user.user_emails.where(email: 'andanother@cool.com').count).to eq 1
+      end
+    end
   end
 end

@@ -17,14 +17,14 @@ class UserEmail < ActiveRecord::Base
     where(user_id: user.id, email: user.email).first_or_create
   end
 
-  # def self.find_or_create_additional_emails(user_id, email_list)
-  #   email_list.each do |email|
-  #     next if where(user_id: user, email: email).present?
-  #     ue = self.new(user_id: user_id, email: email)
-  #     ue.generate_confirmation
-  #     ue.send_confirmation_email
-  #   end
-  # end
+  def self.add_emails_for_user_id(user_id, email_list)
+    email_list.each do |email|
+      next if where(user_id: user, email: email).present?
+      ue = self.new(user_id: user_id, email: email)
+      ue.generate_confirmation
+      ue.send_confirmation_email
+    end
+  end
 
   def self.fuzzy_find(str)
     return nil if str.blank?
