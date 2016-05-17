@@ -15,8 +15,8 @@ class Ownership < ActiveRecord::Base
   validates_presence_of :creator_id
   validates_presence_of :bike_id
 
-  belongs_to :bike
-  belongs_to :user
+  belongs_to :bike, touch: true
+  belongs_to :user, touch: true
   belongs_to :creator, class_name: 'User'
 
   default_scope { order(:created_at) }

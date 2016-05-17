@@ -7,7 +7,7 @@ class PaymentsController < ApplicationController
   def create
     @amount = params[:stripe_amount]
     @subscription = params[:stripe_subscription] if params[:stripe_subscription].present?
-    user = current_user || User.fuzzy_email_find(params[:stripe_email])
+    user = current_user || User.fuzzy_confirmed_or_unconfirmed_email_find(params[:stripe_email])
     email = params[:stripe_email].strip.downcase
     if user.present? && user.stripe_id.present?
       customer = Stripe::Customer.retrieve(user.stripe_id)

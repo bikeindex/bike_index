@@ -31,10 +31,6 @@ describe UsersController do
             post :create, user: FactoryGirl.attributes_for(:user)
           end.to change(User, :count).by(1)
         end
-        it 'calls create_user_jobs' do
-          expect_any_instance_of(CreateUserJobs).to receive(:do_jobs)
-          post :create, user: FactoryGirl.attributes_for(:user)
-        end
         it 'creates a confirmed user, log in, and send welcome if user has org invite' do
           expect_any_instance_of(CreateUserJobs).to receive(:send_welcome_email)
           organization_invitation = FactoryGirl.create(:organization_invitation, invitee_email: 'poo@pile.com')
@@ -139,6 +135,13 @@ describe UsersController do
     it 'does not log in if the token is present and valid' do
       post :password_reset, token: 'Not Actually a token'
       expect(response).to render_template :request_password_reset
+    end
+
+    it 'enqueues a password reset email job' do
+      @user = FactoryGirl.create(:confirmed_user, email: 'something@boo.com')
+      expect do
+        post :password_reset, email: @user.email
+      end.to change(EmailResetPasswordWorker.jobs, :size).by(1)
     end
 
     it 'enqueues a password reset email job' do

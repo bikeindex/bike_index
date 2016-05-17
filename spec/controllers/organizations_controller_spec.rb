@@ -80,8 +80,8 @@ describe OrganizationsController do
 
   describe 'update' do
     it 'updates some fields, send a message about maps' do
-      user = FactoryGirl.create(:user)
-      user2 = FactoryGirl.create(:user)
+      user = FactoryGirl.create(:confirmed_user)
+      user2 = FactoryGirl.create(:confirmed_user)
       org = { available_invitation_count: '10',
               sent_invitation_count: '1',
               is_suspended: false,

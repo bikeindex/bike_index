@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe Ownership do
   describe 'validations' do
-    it { is_expected.to belong_to :bike }
-    it { is_expected.to belong_to :user }
+    it { is_expected.to belong_to(:bike).touch true }
+    it { is_expected.to belong_to(:user).touch true }
     it { is_expected.to belong_to :creator }
     it { is_expected.to validate_presence_of :creator_id }
     it { is_expected.to validate_presence_of :bike_id }

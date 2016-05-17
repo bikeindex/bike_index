@@ -139,7 +139,7 @@ FactoryGirl.define do
 
   factory :ownership do
     association :bike, factory: :bike
-    association :creator, factory: :user
+    association :creator, factory: :confirmed_user
     current true
     sequence(:owner_email) { |n| "owner#{n}@example.com" }
     factory :organization_ownership do

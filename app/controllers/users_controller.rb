@@ -15,7 +15,6 @@ class UsersController < ApplicationController
   def create
     @user = User.new(params[:user])
     if @user.save
-      CreateUserJobs.new(user: @user).do_jobs
       sign_in_and_redirect if @user.confirmed
     else
       render action: :new
@@ -57,7 +56,7 @@ class UsersController < ApplicationController
         render action: :request_password_reset
       end
     elsif params[:email].present?
-      @user = User.fuzzy_email_find(params[:email])
+      @user = User.fuzzy_confirmed_or_unconfirmed_email_find(params[:email])
       if @user.present?
         @user.send_password_reset_email
       else

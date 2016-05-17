@@ -26,10 +26,7 @@ class Integration < ActiveRecord::Base
   end
 
   def update_or_create_user(email:, name:)
-    i_user = UserEmail.fuzzy_user_find(email)
-    unless i_user.present? # Because it's okay if user is unconfirmed, we need to manually search
-      i_user = User.fuzzy_unconfirmed_primary_email_find(email)
-    end
+    i_user = User.fuzzy_confirmed_or_unconfirmed_email_find(email)
     if i_user.present?
       Integration.where(user_id: i_user.id).map(&:destroy)
       i_user.update_attribute :name, name unless i_user.name.present?
@@ -45,7 +42,6 @@ class Integration < ActiveRecord::Base
     i_user = User.new(email: email, name: name, password: pword, password_confirmation: pword)
     if i_user.save
       i_user.confirm(i_user.confirmation_token)
-      CreateUserJobs.new(user: i_user).do_jobs
     else
       raise IntegrationAssociationError, 'Oh shit something in sign on integration broke'
     end

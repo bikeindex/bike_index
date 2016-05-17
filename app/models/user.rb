@@ -62,6 +62,7 @@ class User < ActiveRecord::Base
   has_many :organization_invitations, class_name: 'OrganizationInvitation', inverse_of: :invitee
 
   before_create :generate_username_confirmation_and_auth
+  after_create :perform_create_jobs
   serialize :paid_membership_info
   serialize :my_bikes_hash
 
@@ -109,6 +110,10 @@ class User < ActiveRecord::Base
   def ensure_unique_email
     return true unless self.class.fuzzy_email_find(email)
     errors.add(:email, 'That email is already signed up on Bike Index.')
+  end
+
+  def perform_create_jobs
+    CreateUserJobs.new(self).perform_create_jobs
   end
 
   def superuser?
@@ -163,7 +168,7 @@ class User < ActiveRecord::Base
       self.confirmation_token = nil
       self.confirmed = true
       self.save
-      UserEmail.create_confirmed_primary_email(self)
+      CreateUserJobs.new(self).perform_confirmed_jobs
     end
   end
   
@@ -183,6 +188,10 @@ class User < ActiveRecord::Base
 
   def self.fuzzy_unconfirmed_primary_email_find(email)
     find(:first, conditions: ['lower(email) = ?', EmailNormalizer.new(email).normalized])
+  end
+
+  def self.fuzzy_confirmed_or_unconfirmed_email_find(email)
+    fuzzy_email_find(email) || fuzzy_unconfirmed_primary_email_find(email)
   end
 
   def self.fuzzy_id(n)
