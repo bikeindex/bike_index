@@ -33,9 +33,9 @@ FactoryGirl.define do
       after(:create) do |user|
         user.confirm(user.confirmation_token)
       end
-    end
-    factory :admin do
-      superuser true
+      factory :admin do
+        superuser true
+      end
     end
   end
 
