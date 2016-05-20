@@ -23,7 +23,8 @@ describe CreateUserJobs do
       # Rather than stubbing stuff out
       organization_invitation = FactoryGirl.create(:organization_invitation, invitee_email: 'owNER1@a.com')
       user = FactoryGirl.create(:user, email: 'owner1@A.COM')
-      expect(user.reload.memberships.count).to eq 1
+      user.reload
+      expect(user.memberships.count).to eq 1
       expect(user.confirmed).to be_truthy
     end
   end
