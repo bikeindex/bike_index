@@ -95,6 +95,7 @@ describe CustomerMailer do
       expect(mail.body.encoded).to match('some message')
     end
   end
+
   describe 'stolen_bike_alert_email' do
     it 'renders email' do
       stolen_record = FactoryGirl.create(:stolen_record)
@@ -111,6 +112,14 @@ describe CustomerMailer do
       }
       customer_contact = FactoryGirl.create(:customer_contact, info_hash: notification_hash)
       mail = CustomerMailer.stolen_bike_alert_email(customer_contact)
+    end
+  end
+
+  describe 'additional_email_confirmation' do
+    it 'renders email' do
+      user_email = FactoryGirl.create(:user_email)
+      mail = CustomerMailer.additional_email_confirmation(user_email)
+      expect(mail.subject).to match(/confirm/i)
     end
   end
 end

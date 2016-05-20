@@ -1,13 +1,13 @@
 require 'spec_helper'
 
 describe UserEmailsController do
-  describe 'resend_confirmation' do
-    let(:user_email) { FactoryGirl.create(:user_email, confirmation_token: 'somethinglol') }
-    let(:user) { user_email.user }
-    before do
-      expect(user_email.confirmed).to be_falsey
-    end
+  let(:user_email) { FactoryGirl.create(:user_email, confirmation_token: 'sometoken-or-something') }
+  let(:user) { user_email.user }
+  before do
+    expect(user_email.confirmed).to be_falsey
+  end
 
+  describe 'resend_confirmation' do
     context 'user who has user_email' do
       it 'enqueues a job to send an additional email confirmation' do
         set_current_user(user)
@@ -39,12 +39,6 @@ describe UserEmailsController do
   end
 
   describe 'confirm' do
-    let(:user_email) { FactoryGirl.create(:user_email, confirmation_token: 'sometoken-or-something') }
-    let(:user) { user_email.user }
-    before do
-      expect(user_email.confirmed).to be_falsey
-    end
-
     context "user's user email" do
       before do
         set_current_user(user)
@@ -100,12 +94,6 @@ describe UserEmailsController do
 
 
   describe 'destroy' do
-    let(:user_email) { FactoryGirl.create(:user_email, confirmation_token: 'sometoken-or-something') }
-    let(:user) { user_email.user }
-    before do
-      expect(user_email.confirmed).to be_falsey
-    end
-
     context "user's user email" do
       before do
         set_current_user(user)
@@ -149,12 +137,6 @@ describe UserEmailsController do
   end
 
   describe 'make_primary' do
-    let(:user_email) { FactoryGirl.create(:user_email, confirmation_token: 'sometoken-or-something') }
-    let(:user) { user_email.user }
-    before do
-      expect(user_email.confirmed).to be_falsey
-    end
-
     context "user's user email" do
       before do
         set_current_user(user)
@@ -171,8 +153,10 @@ describe UserEmailsController do
       context 'confirmed' do
         it 'sets flash success and makes primary' do
           user_email.confirm(user_email.confirmation_token)
+          expect(user.user_emails.confirmed.count).to eq 2
           post :make_primary, id: user_email.id
           user_email.reload
+          user.reload
           expect(user_email.primary).to be_truthy
           expect(user_email.confirmed).to be_truthy
           expect(user.email).to eq user_email.email
