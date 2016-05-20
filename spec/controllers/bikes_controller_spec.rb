@@ -789,7 +789,7 @@ describe BikesController do
       end
     end
     context 'owner present (who is allowed to edit)' do
-      let(:user) { FactoryGirl.create(:user) }
+      let(:user) { FactoryGirl.create(:confirmed_user) }
       let(:ownership) { FactoryGirl.create(:ownership, owner_email: user.email) }
       let(:bike) { ownership.bike }
       before do

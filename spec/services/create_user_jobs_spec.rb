@@ -75,7 +75,6 @@ describe CreateUserJobs do
       allow(user).to receive(:confirmed).and_return(true)
       expect(UserEmail).to receive(:create_confirmed_primary_email).with(user).and_return(true)
       expect(create_user_jobs).to receive(:associate_ownerships).and_return(true)
-      expect(create_user_jobs).to receive(:associate_membership_invites).and_return(true)
       create_user_jobs.perform_confirmed_jobs
     end
   end

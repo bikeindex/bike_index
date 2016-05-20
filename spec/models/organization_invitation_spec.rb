@@ -58,7 +58,7 @@ describe OrganizationInvitation do
     end
 
     it "sets the user's name if the name is blank" do
-      @user2 = FactoryGirl.create(:user, name: nil)
+      @user2 = FactoryGirl.create(:confirmed_user, name: nil)
       @o2 = FactoryGirl.create(:organization_invitation, organization: @organization, invitee_email: @user2.email, invitee_name: 'Biker Name')
       expect(@user2.reload.name).to eq('Biker Name')
     end
@@ -70,10 +70,11 @@ describe OrganizationInvitation do
     end
 
     it 'does not let users have more than one membership to a single organization' do
-      FactoryGirl.create(:membership, organization: @organization, user: @user)
-      # pp @user.organizations
+      @user.reload
+      @o.reload
+      expect(@user.memberships.count).to eq 1
       @o.assign_to(@user)
-      expect(@user.memberships.count).to eq(1)
+      expect(@user.memberships.count).to eq 1
     end
 
     it 'lets users have multiple memberships to different organizations' do

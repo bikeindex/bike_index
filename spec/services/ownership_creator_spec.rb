@@ -3,7 +3,7 @@ require 'spec_helper'
 describe OwnershipCreator do
   describe 'owner_id' do
     it 'finds the user' do
-      user = FactoryGirl.create(:user, email: 'foo@email.com')
+      user = FactoryGirl.create(:confirmed_user, email: 'foo@email.com')
       create_ownership = OwnershipCreator.new
       allow(create_ownership).to receive(:find_owner_email).and_return('foo@email.com')
       expect(create_ownership.owner_id).to eq(user.id)
