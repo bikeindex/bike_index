@@ -24,7 +24,6 @@ class UserEmail < ActiveRecord::Base
       ue = self.new(user_id: user_id, email: email)
       ue.generate_confirmation
       ue.save
-      # pp ue
       ue.send_confirmation_email
     end
   end
@@ -59,6 +58,8 @@ class UserEmail < ActiveRecord::Base
   def confirm(token)
     if token == confirmation_token
       update_attribute :confirmation_token, nil
+      MergeAdditionalEmailWorker.perform_async(id)
+      return true
     end
   end
 

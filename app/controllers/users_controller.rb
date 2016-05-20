@@ -105,8 +105,7 @@ class UsersController < ApplicationController
         @user.errors.add(:base, "Current password doesn't match, it's required for updating your password")
       end
     end
-    if !@user.errors.any? && @user.
-      update_attributes(params[:user].except(:email, :password_reset_token))
+    if !@user.errors.any? && @user.update_attributes(params[:user].except(:email, :password_reset_token))
       AfterUserChangeWorker.perform_async(@user.id)
       if params[:user][:terms_of_service].present?
         if params[:user][:terms_of_service] == '1'

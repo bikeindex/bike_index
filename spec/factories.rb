@@ -40,7 +40,7 @@ FactoryGirl.define do
   end
 
   factory :user_email do
-    association :user
+    association :user, factory: :confirmed_user
     email { generate(:unique_email) }
   end
 
