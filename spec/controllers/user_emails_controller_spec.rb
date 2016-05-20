@@ -84,7 +84,7 @@ describe UserEmailsController do
         expect do
           get :confirm, id: user_email.id, confirmation_token: user_email.confirmation_token
         end.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
-        expect(flash[:info]).to match(/not your/)
+        expect(flash[:error]).to match(/not your/)
       end
     end
 
@@ -93,7 +93,7 @@ describe UserEmailsController do
         expect do
           get :confirm, id: user_email.id, confirmation_token: user_email.confirmation_token
         end.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
-        expect(flash[:info]).to match(/not your/)
+        expect(flash[:error]).to match(/not your/)
       end
     end
   end
@@ -134,7 +134,7 @@ describe UserEmailsController do
         expect do
           delete :destroy, id: user_email.id
         end.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
-        expect(flash[:info]).to match(/not your/)
+        expect(flash[:error]).to match(/not your/)
       end
     end
 
@@ -143,7 +143,69 @@ describe UserEmailsController do
         expect do
           delete :destroy, id: user_email.id
         end.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
-        expect(flash[:info]).to match(/not your/)
+        expect(flash[:error]).to match(/not your/)
+      end
+    end
+  end
+
+  describe 'make_primary' do
+    let(:user_email) { FactoryGirl.create(:user_email, confirmation_token: 'sometoken-or-something') }
+    let(:user) { user_email.user }
+    before do
+      expect(user_email.confirmed).to be_falsey
+    end
+
+    context "user's user email" do
+      before do
+        set_current_user(user)
+      end
+      context 'unconfirmed' do
+        it 'does not make primary' do
+          post :make_primary, id: user_email.id
+          user_email.reload
+          expect(user_email.primary).to be_falsey
+          expect(user_email.confirmed).to be_falsey
+          expect(flash[:info]).to be_present
+        end
+      end
+      context 'confirmed' do
+        it 'sets flash success and makes primary' do
+          user_email.confirm(user_email.confirmation_token)
+          post :make_primary, id: user_email.id
+          user_email.reload
+          expect(user_email.primary).to be_truthy
+          expect(user_email.confirmed).to be_truthy
+          expect(user.email).to eq user_email.email
+          expect(flash[:success]).to be_present
+        end
+      end
+      context 'confirmed and primary' do
+        it 'user_email remains primary' do
+          user_email.confirm(user_email.confirmation_token)
+          user_email.make_primary
+          post :make_primary, id: user_email.id
+          user_email.reload
+          expect(user_email.primary).to be_truthy
+        end
+      end
+    end
+
+    context "not user's user_email" do
+      it 'does not enqueue a job and sets the flash' do
+        set_current_user(FactoryGirl.create(:confirmed_user))
+        post :make_primary, id: user_email.id
+        user_email.reload
+        expect(user_email.primary).to be_falsey
+        expect(flash[:error]).to match(/not your/)
+      end
+    end
+
+    context 'no user, no email_id' do
+      it 'does not enqueue a job and sets the flash (and does not break)' do
+        post :make_primary, id: user_email.id
+        user_email.reload
+        expect(user_email.primary).to be_falsey
+        expect(flash[:error]).to match(/not your/)
       end
     end
   end

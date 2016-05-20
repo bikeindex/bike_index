@@ -66,6 +66,18 @@ describe User do
         expect(@user.valid?).to be_falsey
         expect(@user.errors.messages[:password].include?('must contain at least one letter')).to be_truthy
       end
+
+      it "doesn't let unconfirmed users have the same password" do
+        existing_user = FactoryGirl.create(:user, email: @user.email)
+        expect(@user.valid?).to be_falsey
+        expect(@user.errors.messages[:email]).to be_present
+      end
+
+      it "doesn't let confirmed users have the same password" do
+        existing_user = FactoryGirl.create(:confirmed_user, email: @user.email)
+        expect(@user.valid?).to be_falsey
+        expect(@user.errors.messages[:email]).to be_present
+      end
     end
 
     describe 'confirm' do
@@ -77,6 +89,7 @@ describe User do
       end
 
       it 'confirms users' do
+        expect(user.confirmed).to be_falsey
         expect(user.confirm(user.confirmation_token)).to be_truthy
         expect(user.confirmed).to be_truthy
         expect(user.confirmation_token).to be_nil

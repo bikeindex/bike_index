@@ -166,6 +166,7 @@ $row-side-padding: 0.9375rem;
 
 // User pages
 @import "revised/pages/user/home";
+@import "revised/pages/user/edit"; // my_account page
 
 // Error pages
 @import "revised/pages/errors";

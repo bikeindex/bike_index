@@ -140,6 +140,7 @@ class UsersController < ApplicationController
       end
       redirect_to my_account_url, notice: 'Your information was successfully updated.' and return
     end
+    @page_errors = @user.errors.full_messages
     render action: :edit
   end
 

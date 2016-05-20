@@ -71,6 +71,7 @@ Bikeindex::Application.routes.draw do
     member do
       post 'resend_confirmation'
       get 'confirm'
+      post 'make_primary'
     end
   end
   resources :news, only: [:show, :index]

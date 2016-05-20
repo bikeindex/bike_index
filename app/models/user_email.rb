@@ -51,8 +51,21 @@ class UserEmail < ActiveRecord::Base
     !confirmed
   end
 
+  def primary
+    confirmed && user.email == email
+  end
+
   def expired
     created_at > Time.zone.now - 2.hours
+  end
+
+  def make_primary
+    return false unless confirmed && !primary
+    if user.user_emails.where(email: user.email).present?
+      # Ensure we aren't somehow deleting an email
+      # because it doesn't have a user_email associated with it
+      user.update_attribute :email, email
+    end
   end
 
   def confirm(token)

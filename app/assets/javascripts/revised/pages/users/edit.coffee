@@ -1,7 +1,7 @@
 class BikeIndex.UsersEdit extends BikeIndex
   constructor: ->
     # Important! We can't instantiate FormWell because
-    # optional form blocks don't do what they do everywhere else on email add
+    # optional form blocks don't do what they do everywhere else (in email add)
     $personal_fields = $('.sharing-collapser')
     for field in $personal_fields
       $field = $(field)

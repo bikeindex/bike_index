@@ -108,7 +108,8 @@ class User < ActiveRecord::Base
 
   validate :ensure_unique_email
   def ensure_unique_email
-    return true unless self.class.fuzzy_email_find(email)
+    return true unless self.class.fuzzy_confirmed_or_unconfirmed_email_find(email)
+    return true if id.present? # Because existing users shouldn't see this error
     errors.add(:email, 'That email is already signed up on Bike Index.')
   end
 
@@ -169,6 +170,7 @@ class User < ActiveRecord::Base
       self.confirmed = true
       self.save
       CreateUserJobs.new(self).perform_confirmed_jobs
+      true
     end
   end
   
