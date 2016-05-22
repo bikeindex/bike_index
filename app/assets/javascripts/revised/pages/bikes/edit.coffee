@@ -1,6 +1,6 @@
 class BikeIndex.BikesEdit extends BikeIndex
   constructor: ->
-    # new BikeIndex.FormWell
+    new BikeIndex.FormWell
     @initializeEventListeners()
 
     # Initialize dirty forms. Add class 'dirtyignore' to fields to ignore them

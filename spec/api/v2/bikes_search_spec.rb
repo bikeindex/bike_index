@@ -5,6 +5,7 @@ describe 'Bikes API V2' do
     before :each do
       @bike = FactoryGirl.create(:bike)
       FactoryGirl.create(:bike)
+      FactoryGirl.create(:recovered_bike)
     end
     it 'all bikes (root) search works' do
       get '/api/v2/bikes_search?per_page=1', format: :json

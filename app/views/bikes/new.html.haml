@@ -61,7 +61,7 @@
             = f.label :year, 'Model year', class: 'form-well-label'
             .form-well-input
               - years = (1900..Time.now.year+1).to_a.reverse.map { |i| [i,i] }
-              = f.select :year, years, prompt: "Unsure or unknown", selected: Time.now.year
+              = f.select :year, years, prompt: "Unsure or unknown", selected: @bike.year || Time.now.year
             .right-input-help
               %label
                 %input#bike_unknown_year{ type: 'checkbox', tabindex: -1 }

@@ -25,11 +25,11 @@
                 %a{ data: { toggle: 'modal', target: '#manufacturer-correction' } }
                   Submit Manufacturer Correction
 
-          .form-group.row.fancy-select.unfancy.unnested-field
+          .form-group.row.fancy-select-placeholder.unfancy.unnested-field
             = f.label :year, 'Model year', class: 'form-well-label'
             .form-well-input
               - years = (1900..Time.now.year+1).to_a.reverse.map { |i| [i,i] }
-              = f.select :year, years, prompt: "Unsure or unknown", selected: Time.now.year
+              = f.select :year, years, prompt: 'Unsure or unknown', allow_blank: true
             .right-input-help
               %label
                 %input#bike_unknown_year{ type: 'checkbox', tabindex: -1 }
@@ -88,7 +88,7 @@
               = f.text_area :description, rows: 3, class: 'form-control', placeholder: 'Tell us about your bike!'
 
           .form-group.row.unnested-field
-            = f.label :additional_registration, class: 'form-well-label'
+            = f.label :additional_registration, 'Other serial or registration number', class: 'form-well-label'
             .form-well-input
               = f.text_field :additional_registration, class: 'form-control'
 

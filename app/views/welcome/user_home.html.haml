@@ -24,7 +24,8 @@
             %ul.bike-boxes
               - @bikes.each do |bike|
                 %li.bike-box-item
-                  %a.bike-list-image{ href: bike_url(bike), class: ('hover-expand' if bike.thumb_path) }
+                  - image_link = bike.thumb_path ? bike_url(bike) : edit_bike_url(bike, page: 'photos')
+                  %a.bike-list-image{ href: image_link, class: ('hover-expand' if bike.thumb_path) }
                     - unless bike.thumb_path
                       .thumb-overlay
                         = image_tag '/assets/revised/photo_icon.svg'

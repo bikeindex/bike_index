@@ -46,9 +46,12 @@ class Bike < ActiveRecord::Base
     :rear_gear_type_id,
     :front_gear_type_id,
     :description,
+    :all_description, # shouldn't be mass-assigned
     :owner_email,
     :stolen_records_attributes,
     :date_stolen_input,
+    :stolen_lat, # shouldn't be mass-assigned
+    :stolen_long, # shouldn't be mass-assigned
     :receive_notifications,
     :phone,
     :creator,
@@ -133,6 +136,7 @@ class Bike < ActiveRecord::Base
   scope :stolen, -> { where(stolen: true) }
   scope :non_stolen, -> { where(stolen: false) }
   scope :with_serial, -> { where("serial_number != ?", "absent") }
+  scope :non_recovered, -> { where(recovered: false) }
 
   include PgSearch
   pg_search_scope :search, against: {
@@ -372,15 +376,13 @@ class Bike < ActiveRecord::Base
   end
 
   def components_cache_string
-    string = ""
-    components.all.each do |c|
-      if c.ctype.present? && c.ctype.name.present?
-        string += "#{c.year} " if c.manufacturer
-        string += "#{c.manufacturer.name} " if c.manufacturer
-        string += "#{c.component_type} "
-      end
+    components.all.map.each do |c|
+      [
+        c.year,
+        (c.manufacturer && c.manufacturer.name),
+        c.component_type
+      ] if c.ctype.present? && c.ctype.name.present?
     end
-    string
   end
 
   def cache_attributes
@@ -395,15 +397,13 @@ class Bike < ActiveRecord::Base
   end
 
   def cache_stolen_attributes
-    d = description
     csr = find_current_stolen_record
-    if csr.present?
-      self.current_stolen_record_id = csr.id
-      d = "#{d} #{csr.theft_description}"
-    else
-      self.current_stolen_record_id = nil
-    end
-    self.all_description = d
+    self.attributes = {
+      current_stolen_record_id: csr && csr.id,
+      all_description: [description, csr && csr.theft_description].reject(&:blank?).join(' '),
+      stolen_lat: csr && csr.latitude,
+      stolen_long: csr && csr.longitude
+    }
   end
 
   before_save :cache_bike
@@ -411,22 +411,21 @@ class Bike < ActiveRecord::Base
     cache_stolen_attributes
     cache_photo
     cache_attributes
-    c = ""
-    c += "#{manufacturer_name} "
-    c += "#{propulsion_type.name} " unless propulsion_type.name == "Foot pedal"
-    c += "#{year} " if year
-    c += "#{primary_frame_color.name} " if primary_frame_color
-    c += "#{secondary_frame_color.name} " if secondary_frame_color
-    c += "#{tertiary_frame_color.name} " if tertiary_frame_color
-    c += "#{frame_material.name} " if frame_material
-    c += "#{frame_size} " if frame_size
-    c += "#{frame_model} " if frame_model
-    c += "#{rear_wheel_size.name} wheel " if rear_wheel_size
-    c += "#{front_wheel_size.name} wheel " if front_wheel_size && front_wheel_size != rear_wheel_size
-    c += "#{additional_registration} "
-    c += "#{type} " unless self.type == "bike"
-    c += components_cache_string if components_cache_string
-    self.cached_data = c
+    self.cached_data = [
+      manufacturer_name,
+      (propulsion_type.name == 'Foot pedal' ? nil : propulsion_type.name),
+      year,
+      (primary_frame_color && primary_frame_color.name),
+      (secondary_frame_color && secondary_frame_color.name),
+      (tertiary_frame_color && tertiary_frame_color.name),
+      (frame_material && frame_material.name),
+      frame_size,
+      frame_model,
+      (rear_wheel_size && "#{rear_wheel_size.name} wheel"),
+      (front_wheel_size && front_wheel_size != rear_wheel_size ? "#{front_wheel_size.name} wheel" : nil),
+      additional_registration,
+      (type == 'bike' ? nil : type),
+      components_cache_string
+    ].flatten.reject(&:blank?).join(' ')
   end
-
 end
