@@ -11,13 +11,18 @@ describe MergeAdditionalEmailWorker do
     let(:organization_invitation) { FactoryGirl.create(:organization_invitation, invitee_email: "#{email.upcase} ") }
 
     context 'existing user account' do
-      let(:organization) { organization_invitation.organization }
       let(:bike) { FactoryGirl.create(:bike, creator_id: old_user.id) }
       let(:old_user) { FactoryGirl.create(:confirmed_user, email: email) }
       let(:pre_created_ownership) { FactoryGirl.create(:ownership, creator_id: old_user.id) }
       let(:old_user_ownership) { FactoryGirl.create(:ownership, owner_email: email) }
+
+      let(:organization) { organization_invitation.organization }
       let(:second_organization) { FactoryGirl.create(:organization, auto_user_id: old_user.id) }
       let(:membership) { FactoryGirl.create(:membership, user: old_user, organization: second_organization) }
+      let(:third_organization) { FactoryGirl.create(:organization, auto_user_id: old_user.id) }
+      let(:old_membership) { FactoryGirl.create(:membership, user: old_user, organization: third_organization) }
+      let(:new_membership) { FactoryGirl.create(:membership, user: user, organization: third_organization) }
+
       let(:integration) { FactoryGirl.create(:integration, user: old_user, information: { 'info' => { 'email' => email, name: 'blargh' } }) }
       let(:lock) { FactoryGirl.create(:lock, user: old_user) }
       let(:payment) { FactoryGirl.create(:payment, user: old_user) }
@@ -32,6 +37,8 @@ describe MergeAdditionalEmailWorker do
         old_user_ownership.mark_claimed
         expect(old_user.ownerships.first).to eq old_user_ownership
         expect(membership.user).to eq old_user
+        expect(old_membership.user).to eq old_user
+        expect(new_membership.user).to eq user
         expect(old_user.organizations.include?(second_organization)).to be_truthy
         expect(old_user.organizations.include?(organization)).to be_truthy
         oauth_application.update_attribute :owner_id, old_user.id
@@ -46,7 +53,7 @@ describe MergeAdditionalEmailWorker do
 
       it 'merges bikes and memberships and deletes user' do
         user.reload
-        expect(user.memberships.count).to eq 0
+        expect(user.memberships.count).to eq 1
         expect(user.ownerships.count).to eq 0
         MergeAdditionalEmailWorker.new.perform(user_email.id)
         user.reload
@@ -62,12 +69,15 @@ describe MergeAdditionalEmailWorker do
         customer_contact.reload
         stolen_notification.reload
         bike.reload
+        new_membership.reload
         expect(user_email.old_user_id).to eq old_user.id
-        expect(User.where(id: old_user.id)).to_not be_present
+        expect(User.where(id: old_user.id)).to_not be_present # Deleted user
+        expect(Membership.where(id: old_membership.id)).to_not be_present # Deleted extra memberships
 
         expect(user.ownerships.count).to eq 2
-        expect(user.memberships.count).to eq 2
+        expect(user.memberships.count).to eq 3
         expect(membership.user).to eq user
+        expect(new_membership.user).to eq user
         expect(second_organization.auto_user).to eq user
         expect(ownership.user).to eq user
         expect(old_user_ownership.user).to eq user
