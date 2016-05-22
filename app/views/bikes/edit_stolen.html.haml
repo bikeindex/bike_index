@@ -70,7 +70,7 @@
                 .full-width-checkbox-help
                   e.g. if we tweet about or see someone searching for its serial number
           - else
-            .toggle-stolen.no-divider-row
+            .no-divider-row
               %a.btn.btn-danger.btn-lg{data: { toggle: 'modal', target: '#toggle-stolen' } }
                 This #{@bike.type} is stolen or missing!
 
@@ -80,7 +80,7 @@
             .form-well-form-header
               %h3
                 Recovered
-            .toggle-stolen.no-divider-row.full-width-button
+            .no-divider-row.full-width-button
               %a.btn.btn-success.btn-lg{data: { toggle: 'modal', target: '#toggle-stolen' } }
                 This #{@bike.type} has been returned!
 

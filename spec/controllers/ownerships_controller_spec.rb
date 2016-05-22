@@ -21,7 +21,7 @@ describe OwnershipsController do
 
     describe 'user present' do
       before :each do
-        @user = FactoryGirl.create(:user)
+        @user = FactoryGirl.create(:confirmed_user)
         @ownership = FactoryGirl.create(:ownership)
         set_current_user(@user)
       end

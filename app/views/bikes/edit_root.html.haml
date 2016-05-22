@@ -12,17 +12,17 @@
           .related-fields
             .form-group.row
               = f.label :serial_number, class: 'form-well-label'
-              %p.serial-and-manufacturer-input
+              %p.form-well-input-static
                 = @bike.serial_number
-              .submit-correction-block
-                %a{data: { toggle: 'modal', target: '#serial-correction' } }
+              .static-right-input-help
+                %a{ data: { toggle: 'modal', target: '#serial-correction' } }
                   Submit serial correction
             .form-group.row
               = f.label :manufacturer, class: 'form-well-label'
-              %p.serial-and-manufacturer-input
+              %p.form-well-input-static
                 = @bike.manufacturer_name
-              .submit-correction-block
-                %a{data: { toggle: 'modal', target: '#manufacturer-correction' } }
+              .static-right-input-help
+                %a{ data: { toggle: 'modal', target: '#manufacturer-correction' } }
                   Submit Manufacturer Correction
 
           .form-group.row.fancy-select-placeholder.unfancy.unnested-field

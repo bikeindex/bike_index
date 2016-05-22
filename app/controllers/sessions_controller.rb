@@ -24,11 +24,11 @@ class SessionsController < ApplicationController
           end
           render :new
         end
-      else
-        # Email address is not confirmed
-        flash.now.alert = 'You must confirm your email address to continue'
-        render :new
       end
+    elsif User.fuzzy_unconfirmed_primary_email_find(params[:session][:email]).present?
+      # Email address is not confirmed
+      flash.now.alert = 'You must confirm your email address to continue'
+      render :new
     else
       # Email address is not in the DB
       flash.now.alert = 'Invalid email/password'

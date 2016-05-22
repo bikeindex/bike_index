@@ -9,6 +9,12 @@ task :slow_save => :environment do
   # end
 end
 
+task :add_confirmed_email => :environment do
+  User.find_in_batches(batch_size: 500) do |b|
+    b.each { |u| UserEmail.create_confirmed_primary_email(u) }
+  end
+end
+
 task delete_expired_b_params: :environment do
   BParam.pluck(:id).each { |id| RemoveExpiredBParamsWorker.perform_async(id) }
 end

@@ -29,12 +29,22 @@ FactoryGirl.define do
     password 'testthisthing7$'
     password_confirmation 'testthisthing7$'
     terms_of_service true
-    factory :admin do
-      superuser true
+    factory :confirmed_user do
+      after(:create) do |user|
+        user.confirm(user.confirmation_token)
+      end
+      factory :admin do
+        superuser true
+      end
     end
     factory :developer do
       developer true
     end
+  end
+
+  factory :user_email do
+    association :user, factory: :confirmed_user
+    email { generate(:unique_email) }
   end
 
   factory :cycle_type do
@@ -135,7 +145,7 @@ FactoryGirl.define do
 
   factory :ownership do
     association :bike, factory: :bike
-    association :creator, factory: :user
+    association :creator, factory: :confirmed_user
     current true
     sequence(:owner_email) { |n| "owner#{n}@example.com" }
     factory :organization_ownership do

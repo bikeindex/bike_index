@@ -1,20 +1,21 @@
 class CreateUserJobs
-  def initialize(creation_params = nil)
-    @user = creation_params ? creation_params[:user] : nil
+  def initialize(user, email = nil)
+    @user = user
+    @email = email || @user.email
   end
 
   def associate_ownerships
-    ownerships = Ownership.where(["lower(owner_email) = ?", @user.email.downcase.strip])
+    ownerships = Ownership.where(owner_email: @email)
     if ownerships.any?
       ownerships.each { |i| i.update_attributes(user_id: @user.id) }
     end
   end
 
-  def associate_membership_invites
-    organization_invitations = OrganizationInvitation.where(["lower(invitee_email) = ?", @user.email.downcase.strip])
+  def associate_membership_invites(without_confirm: false)
+    organization_invitations = OrganizationInvitation.where(invitee_email: @email)
     if organization_invitations.any?
       organization_invitations.each { |i| i.assign_to(@user) }
-      @user.confirm(@user.confirmation_token)
+      @user.confirm(@user.confirmation_token) unless without_confirm
     end
   end
 
@@ -26,15 +27,23 @@ class CreateUserJobs
     EmailConfirmationWorker.perform_async(@user.id)
   end
 
-  def do_jobs
-    associate_ownerships
-    associate_membership_invites
-
-    if @user.confirmed 
+  def perform_create_jobs
+    associate_membership_invites # This may confirm the user. We auto-confirm users that belong to orgs
+    if @user.confirmed
       send_welcome_email
+      perform_confirmed_jobs
     else
       send_confirmation_email
     end
   end
 
+  def perform_confirmed_jobs
+    UserEmail.create_confirmed_primary_email(@user)
+    associate_ownerships
+  end
+
+  def perform_associations
+    associate_ownerships
+    associate_membership_invites(without_confirm: true)
+  end
 end

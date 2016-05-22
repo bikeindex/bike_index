@@ -35,7 +35,7 @@
                   %p
                     We strongly recommend keeping your #{@bike.type} visible, but you can hide this #{@bike.type} if you prefer. Even though we don't think it's a good idea.
                   - btn_type = @bike.user_hidden ? 'btn-success' : 'btn-danger'
-                  %a.btn.btn-lg#hide_bike_toggle{role: 'button', class: btn_type}
+                  %a.btn.btn-lg#hide_bike_toggle{role: 'button', class: btn_type }
                     #{hide_toggle} #{@bike.type}
 
           %hr

@@ -67,7 +67,13 @@ Bikeindex::Application.routes.draw do
   get :accept_vendor_terms, to: 'users#accept_vendor_terms'
   get :accept_terms, to: 'users#accept_terms'
   resources :user_embeds, only: [:show]
-
+  resources :user_emails, only: [:destroy] do
+    member do
+      post 'resend_confirmation'
+      get 'confirm'
+      post 'make_primary'
+    end
+  end
   resources :news, only: [:show, :index]
   resources :blogs, only: [:show, :index]
   match 'blog', to: redirect('/news')

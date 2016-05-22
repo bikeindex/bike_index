@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe User do
   describe 'validations' do
+    it { is_expected.to have_many :user_emails }
     it { is_expected.to have_many :payments }
     it { is_expected.to have_many :subscriptions }
     it { is_expected.to have_many :memberships }
@@ -21,7 +22,15 @@ describe User do
     it { is_expected.to serialize :paid_membership_info }
     it { is_expected.to serialize :my_bikes_hash }
     it { is_expected.to validate_presence_of :email }
-    it { is_expected.to validate_uniqueness_of :email }
+    # it { is_expected.to validate_uniqueness_of :email }
+  end
+
+  describe 'create user_email' do
+    it 'creates a user_email on create' do
+      user = FactoryGirl.create(:confirmed_user)
+      expect(user.user_emails.count).to eq 1
+      expect(user.email).to eq user.user_emails.first.email
+    end
   end
 
   describe 'validate' do
@@ -57,34 +66,45 @@ describe User do
         expect(@user.valid?).to be_falsey
         expect(@user.errors.messages[:password].include?('must contain at least one letter')).to be_truthy
       end
+
+      it "doesn't let unconfirmed users have the same password" do
+        existing_user = FactoryGirl.create(:user, email: @user.email)
+        expect(@user.valid?).to be_falsey
+        expect(@user.errors.messages[:email]).to be_present
+      end
+
+      it "doesn't let confirmed users have the same password" do
+        existing_user = FactoryGirl.create(:confirmed_user, email: @user.email)
+        expect(@user.valid?).to be_falsey
+        expect(@user.errors.messages[:email]).to be_present
+      end
     end
 
     describe 'confirm' do
-      before :each do
-        @user = FactoryGirl.create(:user)
-      end
+      let(:user) { FactoryGirl.create(:user) }
 
       it 'requires confirmation' do
-        expect(@user.confirmed).to be_falsey
-        expect(@user.confirmation_token).not_to be_nil
+        expect(user.confirmed).to be_falsey
+        expect(user.confirmation_token).not_to be_nil
       end
 
       it 'confirms users' do
-        expect(@user.confirm(@user.confirmation_token)).to be_truthy
-        expect(@user.confirmed).to be_truthy
-        expect(@user.confirmation_token).to be_nil
+        expect(user.confirmed).to be_falsey
+        expect(user.confirm(user.confirmation_token)).to be_truthy
+        expect(user.confirmed).to be_truthy
+        expect(user.confirmation_token).to be_nil
       end
 
       it 'fails to confirm users' do
-        expect(@user.confirm('wtfmate')).to be_falsey
-        expect(@user.confirmed).to be_falsey
-        expect(@user.confirmation_token).not_to be_nil
+        expect(user.confirm('wtfmate')).to be_falsey
+        expect(user.confirmed).to be_falsey
+        expect(user.confirmation_token).not_to be_nil
       end
 
       it 'is bannable' do
-        @user.banned = true
-        @user.save
-        expect(@user.authenticate('testme21')).to eq(false)
+        user.banned = true
+        user.save
+        expect(user.authenticate('testme21')).to eq(false)
       end
     end
 
@@ -147,7 +167,7 @@ describe User do
 
   describe 'fuzzy_email_find' do
     it "finds users by email address when the case doesn't match" do
-      @user = FactoryGirl.create(:user, email: 'ned@foo.com')
+      @user = FactoryGirl.create(:confirmed_user, email: 'ned@foo.com')
       expect(User.fuzzy_email_find('NeD@fOO.coM')).to eq(@user)
     end
   end
@@ -311,7 +331,7 @@ describe User do
   describe 'subscriptions' do
     it 'returns the payment if payment is subscription' do
       user = FactoryGirl.create(:user)
-      payment = Payment.create(is_recurring: true, user_id: user)
+      Payment.create(is_recurring: true, user_id: user)
       expect(user.subscriptions).to eq(user.payments.where(is_recurring: true))
     end
   end
@@ -327,6 +347,60 @@ describe User do
       user = User.new(show_bikes: false, username: 'coolstuff', twitter: 'bikeindex')
       # pp user
       expect(user.userlink).to eq('https://twitter.com/bikeindex')
+    end
+  end
+
+  describe 'primary_user_email' do
+    it 'can not set a unconfirmed email to the primary email'
+  end
+
+  describe 'additional_emails=' do
+    let(:user) { FactoryGirl.create(:confirmed_user) }
+    before do
+      expect(user.user_emails.count).to eq 1
+    end
+    context 'blank' do
+      it 'does nothing' do
+        expect do
+          user.additional_emails = ' '
+          user.save
+        end.to change(UserEmail, :count).by 0
+        expect(UserEmail.where(user_id: user.id).count).to eq 1
+      end
+    end
+    context 'a single email' do
+      it 'adds the email' do
+        expect do
+          user.additional_emails = 'stuffthings@oooooooooh.com'
+          user.save
+        end.to change(UserEmail, :count).by 1
+        user.reload
+        expect(user.user_emails.confirmed.count).to eq 1
+        expect(user.user_emails.unconfirmed.count).to eq 1
+        expect(user.user_emails.unconfirmed.first.email).to eq 'stuffthings@oooooooooh.com'
+      end
+    end
+    context 'list with repeats' do
+      it 'adds the non-duped emails' do
+        user.additional_emails = 'stuffthings@oooooooooh.com,another_email@cool.com'
+        user.save
+        user.reload
+        # pp user.user_emails
+        # pp UserEmail.all
+        expect(UserEmail.unconfirmed.where(user_id: user.id).count).to eq 2
+        second_confirmed = UserEmail.where(user_id: user.id, email: 'stuffthings@oooooooooh.com').first
+        second_confirmed.confirm(second_confirmed.confirmation_token)
+        user.reload
+        expect(user.user_emails.confirmed.count).to eq 2
+        expect(user.user_emails.unconfirmed.count).to eq 1
+        expect do
+          user.additional_emails = ' andAnother@cool.com,stuffthings@oooooooooh.com,another_email@cool.com,lols@stuff.com'
+          user.save
+        end.to change(UserEmail, :count).by 2
+        user.reload
+        expect(user.user_emails.confirmed.count).to eq 2
+        expect(user.user_emails.where(email: 'andanother@cool.com').count).to eq 1
+      end
     end
   end
 end

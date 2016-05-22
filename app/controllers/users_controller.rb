@@ -15,7 +15,6 @@ class UsersController < ApplicationController
   def create
     @user = User.new(params[:user])
     if @user.save
-      CreateUserJobs.new(user: @user).do_jobs
       sign_in_and_redirect if @user.confirmed
     else
       render action: :new
@@ -57,7 +56,7 @@ class UsersController < ApplicationController
         render action: :request_password_reset
       end
     elsif params[:email].present?
-      @user = User.fuzzy_email_find(params[:email])
+      @user = User.fuzzy_confirmed_or_unconfirmed_email_find(params[:email])
       if @user.present?
         @user.send_password_reset_email
       else
@@ -106,8 +105,7 @@ class UsersController < ApplicationController
         @user.errors.add(:base, "Current password doesn't match, it's required for updating your password")
       end
     end
-    if !@user.errors.any? && @user.
-      update_attributes(params[:user].except(:email, :password_reset_token))
+    if !@user.errors.any? && @user.update_attributes(params[:user].except(:email, :password_reset_token))
       AfterUserChangeWorker.perform_async(@user.id)
       if params[:user][:terms_of_service].present?
         if params[:user][:terms_of_service] == '1'
@@ -142,6 +140,7 @@ class UsersController < ApplicationController
       end
       redirect_to my_account_url, notice: 'Your information was successfully updated.' and return
     end
+    @page_errors = @user.errors.full_messages
     render action: :edit
   end
 

@@ -20,7 +20,7 @@ describe OrganizationInvitation do
     end
 
     it 'assigns to user if the user exists' do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryGirl.create(:confirmed_user)
       @o1 = FactoryGirl.create(:organization_invitation, invitee_email: @user.email)
       expect(@user.memberships.count).to eq(1)
       expect(@o1.redeemed).to be_truthy
@@ -45,18 +45,21 @@ describe OrganizationInvitation do
     before :each do
       @organization = FactoryGirl.create(:organization)
       @o = FactoryGirl.create(:organization_invitation, organization: @organization, invitee_email: 'EMAIL@email.com')
-      @user = FactoryGirl.create(:user, email: 'EMAIL@email.com')
+      @user = FactoryGirl.create(:confirmed_user, email: 'EMAIL@email.com')
+      @o.reload
+      @user.reload
     end
-
-    it 'sets the user if the email does match' do
-      @o.assign_to(@user)
+    # These are performed automatically as part of create_user_jobs, but we still want to test
+    it 'sets the user if the email matches and redeems' do
+      @o.reload
+      # @o.assign_to(@user)
       expect(@o.invitee.id).to eq(@user.id)
+      expect(@o.redeemed).to be_truthy
     end
 
     it "sets the user's name if the name is blank" do
-      @user2 = FactoryGirl.create(:user, name: nil)
+      @user2 = FactoryGirl.create(:confirmed_user, name: nil)
       @o2 = FactoryGirl.create(:organization_invitation, organization: @organization, invitee_email: @user2.email, invitee_name: 'Biker Name')
-      @o2.assign_to(@user2)
       expect(@user2.reload.name).to eq('Biker Name')
     end
 
@@ -66,31 +69,18 @@ describe OrganizationInvitation do
       expect(@user.memberships.count).to eq(1)
     end
 
-    it 'redeems the invitation' do
-      @o.assign_to(@user)
-      expect(@o.redeemed).to be_truthy
-    end
-
     it 'does not let users have more than one membership to a single organization' do
-      FactoryGirl.create(:membership, organization: @organization, user: @user)
-      # pp @user.organizations
+      @user.reload
+      @o.reload
+      expect(@user.memberships.count).to eq 1
       @o.assign_to(@user)
-      expect(@user.memberships.count).to eq(1)
+      expect(@user.memberships.count).to eq 1
     end
 
     it 'lets users have multiple memberships to different organizations' do
       @organization2 = FactoryGirl.create(:organization)
       FactoryGirl.create(:membership, organization: @organization2, user: @user)
-      @o.assign_to(@user)
       expect(@user.memberships.count).to eq(2)
-    end
-
-    it 'creates a membership on assignment' do
-      @o2 = FactoryGirl.create(:organization_invitation, organization: @organization, invitee_email: 'George@gma.com')
-      @user2 = FactoryGirl.create(:user, email: 'george@gma.com')
-      expect do
-        @o2.assign_to(@user2)
-      end.to change(Membership, :count).by(1)
     end
   end
 end

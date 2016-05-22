@@ -103,4 +103,12 @@ class CustomerMailer < ActionMailer::Base
     stolen_notification.update_attribute :send_dates, stolen_notification.send_dates << Time.now.to_i
   end
 
+  def additional_email_confirmation(user_email)
+    @user_email = user_email
+    @user = @user_email.user
+    mail(to: "#{@user_email.email}", from: "seth@bikeindex.org", subject: 'Confirm your additional email') do |format|
+      format.text
+      format.html { render layout: 'email'}
+    end
+  end
 end
