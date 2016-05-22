@@ -95,8 +95,8 @@ describe MergeAdditionalEmailWorker do
     end
 
     context 'existing multi-user-account' do
-      it 'merges all the accounts. It does not create multiple memberships for one org' do
-      end
+      it 'merges all the accounts. It does not create multiple memberships for one org'
+      # It would be nice to test this... future todo
     end
 
     context 'no existing user account' do
