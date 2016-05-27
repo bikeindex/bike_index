@@ -32,5 +32,7 @@ class WelcomeController < ApplicationController
 
   def choose_registration
     @user = User.new unless current_user.present?
+    assert_object_is_not_null(@user)
+    return @user
   end
 end

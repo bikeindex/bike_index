@@ -13,6 +13,8 @@ class UsersController < ApplicationController
   
   def new
     @user = User.new
+    assert_object_is_not_null(@user)
+    assert_message(@user.kind_of?(User))
     if current_user.present?
       flash[:notice] = "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
       redirect_to user_home_url and return
@@ -28,6 +30,8 @@ class UsersController < ApplicationController
 
   def create
     @user = User.new(params[:user])
+    assert_object_is_not_null(@user)
+    assert_message(@user.kind_of?(User))
     if @user.save
       CreateUserJobs.new(user: @user).do_jobs
       sign_in_and_redirect if @user.confirmed
@@ -39,6 +43,7 @@ class UsersController < ApplicationController
   def confirm
     begin
       @user = User.find(params[:id])
+      assert_object_is_not_null(@user)
       if @user.confirmed?
         redirect_to new_session_url, notice: "Your user account is already confirmed. Please log in"
       else
@@ -58,11 +63,16 @@ class UsersController < ApplicationController
 
   def update_password
     @user = current_user
+    assert_object_is_not_null(@user)
+    assert_message(@user.kind_of?(User))
+    return @user
   end
 
   def password_reset
     if params[:token].present?
       @user = User.find_by_password_reset_token(params[:token])
+      assert_object_is_not_null(@user)
+      assert_message(@user.kind_of?(User))
       if @user.present?
         session[:return_to] = 'password_reset'
         sign_in_and_redirect
@@ -90,6 +100,7 @@ class UsersController < ApplicationController
     end
     @owner = user
     @user = user.decorate
+    assert_object_is_not_null(@user)
     if user == current_user
       # Render the site
     else
@@ -103,10 +114,15 @@ class UsersController < ApplicationController
 
   def edit
     @user = current_user
+    assert_object_is_not_null(@user)
+    assert_message(@user.kind_of?(current_user))
+    return @user
   end
 
   def update
     @user = current_user
+    assert_object_is_not_null(@user)
+    assert_message(@user.kind_of?(current_user))
     if params[:user][:password_reset_token].present?
       if @user.password_reset_token != params[:user][:password_reset_token]
         @user.errors.add(:base, "Doesn't match user's password reset token")
@@ -174,6 +190,9 @@ class UsersController < ApplicationController
   def accept_terms
     if current_user.present?
       @user = current_user
+      assert_object_is_not_null(@user)
+      assert_message(@user.kind_of?(current_user))
+      return @user
     else
       redirect_to terms_url
     end
@@ -182,6 +201,9 @@ class UsersController < ApplicationController
   def accept_vendor_terms
     if current_user.present?
       @user = current_user
+      assert_object_is_not_null(@user)
+      assert_message(@user.kind_of?(current_user))
+      return @user
     else
       redirect_to vendor_terms_url
     end
