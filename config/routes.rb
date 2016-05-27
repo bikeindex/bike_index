@@ -65,10 +65,12 @@ Bikeindex::Application.routes.draw do
       get 'update_password'
     end
   end
+  get '/assert_error_null' => 'application#assert_error_null'
   get :my_account, to: 'users#edit', as: :my_account
   get :accept_vendor_terms, to: 'users#accept_vendor_terms'
   get :accept_terms, to: 'users#accept_terms'
   resources :user_embeds, only: [:show]
+
 
   resources :news, only: [:show, :index]
   resources :blogs, only: [:show, :index]

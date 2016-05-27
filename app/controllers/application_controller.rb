@@ -10,6 +10,7 @@ class ApplicationController < ActionController::Base
   
   # Must use AuthenticationHelper in this class so included in
   include AuthenticationHelper
+  include AssertHelper
   protect_from_forgery
   ensure_security_headers
   
