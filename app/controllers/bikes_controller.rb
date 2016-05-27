@@ -46,7 +46,7 @@ class BikesController < ApplicationController
     
     search = BikeSearcher.new(params)
     bikes = search.find_bikes
-    asssert_message(search.find_bikes nil)
+    assert_message(search.find_bikes nil)
     
     page = params[:page] || 1
     @perPage = params[:perPage] || 10
