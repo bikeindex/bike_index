@@ -74,6 +74,7 @@ class OrganizationsController < ApplicationController
 
   def embed
     @bike = BikeCreator.new(@bikeParam).new_bike
+    assert_object_is_not_null(@bike)
     @bike.owner_email = params[:email] if params[:email].present?
     if params[:nonStolen]
       @nonStolen = true 
@@ -99,6 +100,7 @@ class OrganizationsController < ApplicationController
 
   def embed_extended
     @bike = BikeCreator.new(@bikeParam).new_bike
+    assert_object_is_not_null(@bike)
     @bike.owner_email = 'info@lumberyardmtb.com' if @organization.slug == 'lumberyard'
     if params[:email].present?
       @bike.owner_email = params[:email] 
@@ -115,6 +117,7 @@ class OrganizationsController < ApplicationController
 
   def embed_create_success
     @bike = Bike.find(params[:bike_id]).decorate
+    assert_object_is_not_null(@bike)
     render layout: 'embed_layout'
   end
 
@@ -161,6 +164,8 @@ class OrganizationsController < ApplicationController
       @user = User.new
     end
     @organization = Organization.new
+    assert_object_is_not_null(@organization)
+    assert_message(@organization.kind_of?(Organization))
     @activeSection = "contact"
   end
 

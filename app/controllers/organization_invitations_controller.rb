@@ -15,10 +15,15 @@ class OrganizationInvitationsController < ApplicationController
   
   def new
     @organizationInvitation = OrganizationInvitation.new
+    assert_object_is_not_null(@organizationInvitation)
+    assert_message(@organizationInvitation.kind_of?(OrganizationInvitation))
+    return @organizationInvitation
   end
 
   def create
     @organization = current_organization
+    assert_object_is_not_null(@organization)
+    assert_message(@organization.kind_of?(current_organization))
     if @organization.available_invitation_count > 0
       @organizationInvitation = OrganizationInvitation.new(invitee_email: params[:organizationInvitation][:invitee_email], invitee_name: params[:organizationInvitation][:invitee_name], organization: @organization, inviter: current_user, membership_role: params[:organizationInvitation][:membership_role])
       @organizationInvitation.inviter = current_user
@@ -35,6 +40,8 @@ class OrganizationInvitationsController < ApplicationController
 
   def find_organization
     @organization = Organization.find_by_slug(params[:organization_id])
+    assert_object_is_not_null(@organization)
+    return @organization
   end
 
   def require_admin
