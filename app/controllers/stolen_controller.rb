@@ -12,6 +12,9 @@ class StolenController < ApplicationController
   
   def index
     @feedback = Feedback.new
+    assert_object_is_not_null(@feedback)
+    assert_message(@feedback.kind_of?(Feedback))
+    return @feedback
   end
 
   def current_tsv

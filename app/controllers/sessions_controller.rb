@@ -25,6 +25,7 @@ class SessionsController < ApplicationController
 
   def create
     @user = User.fuzzy_email_find(params[:session][:email])
+    assert_object_is_not_null(@user)
     if @user.present?
       if @user.confirmed?
         if @user.authenticate(params[:session][:password])

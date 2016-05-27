@@ -11,10 +11,15 @@ class StolenNotificationsController < ApplicationController
 
   def new
     @stolenNotification = StolenNotification.new
+    assert_object_is_not_null(@stolenNotification)
+    assert_message(@stolenNotification.kind_of?(StolenNotification))
+    return @stolenNotification
   end
 
   def create
     @stolenNotification = StolenNotification.new(params[:stolenNotification])
+    assert_message(@stolenNotification.kind_of?(StolenNotification))
+    assert_object_is_not_null(@stolenNotification)
     @stolenNotification.sender = current_user
     @bike = @stolenNotification.bike
     if @stolenNotification.save
