@@ -23,6 +23,7 @@ class PublicImagesController < ApplicationController
     publicImage = PublicImage.new(params[:publicImage])
     if params[:bike_id].present?
       @bike = Bike.unscoped.find(params[:bike_id])
+      assert_object_is_not_null(@bike)
       if @bike.owner == current_user
         publicImage.imageable = @bike
         publicImage.save
@@ -32,6 +33,7 @@ class PublicImagesController < ApplicationController
       @imageable = @bike
       if params[:blog_id].present?
         @blog = Blog.find(params[:blog_id])
+        assert_object_is_not_null(@blog)
         publicImage.imageable = @blog
         publicImage.save
         @imageable = @blog
@@ -67,6 +69,7 @@ class PublicImagesController < ApplicationController
 
   def destroy
     @imageable = publicImage.imageable
+    assert_object_is_not_null(@imageable)
     imageable_id = publicImage.imageable_id
     imageable_type = publicImage.imageable_type
     publicImage.destroy

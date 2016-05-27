@@ -37,6 +37,8 @@ class OrganizationsController < ApplicationController
     )
     if @organization.save
       membership = Membership.create(user_id: user.id, role: 'admin', organization_id: @organization.id)
+      assert_object_is_not_null(@organization)
+      assert_message(@organization.kind_of?(Organization))
       @organization.update_attribute :auto_user_id, user.id
       notify_admins('organization_created')
       flash[:notice] = "Organization Created successfully!"
@@ -52,7 +54,10 @@ class OrganizationsController < ApplicationController
   
   def edit
     @bikes = Bike.where(creation_organization_id: @organization.id).order("created_at desc")
+    assert_object_is_not_null(@bikes)
     @organization = @organization.decorate
+    assert_object_is_not_null(@organization)
+    return @organization
   end
 
   def show
@@ -62,6 +67,9 @@ class OrganizationsController < ApplicationController
     bikes = bikes.page(page).per(perPage)
     @bikes = bikes.decorate
     @organization = @organization.decorate
+    assert_object_is_not_null(@bikes)
+    assert_object_is_not_null(@organization)
+    return @organization
   end
 
   def embed

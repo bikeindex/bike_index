@@ -17,7 +17,9 @@ class PaymentsController < ApplicationController
 
   def create
     @amount = params[:stripe_amount]
-    @subscription = params[:stripe_subscription] 
+    assert_object_is_not_null(@amount)
+    @subscription = params[:stripe_subscription]
+    assert_object_is_not_null(@subscription) 
     if params[:stripe_subscription].present?
       user = current_user || User.fuzzy_email_find(params[:stripe_email])
       email = params[:stripe_email].strip.downcase
