@@ -10,6 +10,12 @@ class UserEmbedsController < ApplicationController
   skip_before_filter :set_x_frame_options_header
   layout 'embed_user_layout'
 
+=begin
+  Name: show
+  Explication: method to identify user and to show the most new bike added.  
+  Params: user's id and text to show message: "most recent indexed bike" 
+  Return: most recent indexed bike 
+=end
   def show
     @text = params[:text]
     user = User.find_by_username(params[:id])

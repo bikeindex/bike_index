@@ -9,6 +9,12 @@
 class StolenNotificationsController < ApplicationController
   before_filter :authenticate_user
 
+=begin
+  Name: new
+  Explication: method used to instance a new stolen notification about bike 
+  Params: none 
+  Return: a new instance of stolen notification 
+=end
   def new
     @stolenNotification = StolenNotification.new
     assert_object_is_not_null(@stolenNotification)
@@ -16,6 +22,12 @@ class StolenNotificationsController < ApplicationController
     return @stolenNotification
   end
 
+=begin
+  Name: create
+  Explication: method used to create the new instance about stolen notification bike 
+  Params: stolen notification about bike 
+  Return: stolen notification bike or redirect to @bike or render @bike
+=end
   def create
     @stolenNotification = StolenNotification.new(params[:stolenNotification])
     assert_message(@stolenNotification.kind_of?(StolenNotification))
