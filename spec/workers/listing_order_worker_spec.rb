@@ -4,7 +4,7 @@ describe ListingOrderWorker do
   it { is_expected.to be_processed_in :updates }
 
   it 'enqueues listing ordering job' do
-    ListingOrderWorker.perform_async
+    ListingOrderWorker.perform_asynchronous
     expect(ListingOrderWorker).to have_enqueued_job
   end
 

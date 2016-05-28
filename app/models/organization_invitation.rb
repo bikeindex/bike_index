@@ -27,7 +27,7 @@ class OrganizationInvitation < ActiveRecord::Base
 
   after_create :enqueue_notification_job
   def enqueue_notification_job
-    EmailOrganizationInvitationWorker.perform_async(id)
+    EmailOrganizationInvitationWorker.perform_asynchronous(id)
   end
 
   after_create :if_user_exists_assign

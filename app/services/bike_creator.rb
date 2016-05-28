@@ -81,7 +81,7 @@ class BikeCreator
     @bike = create_associations(bike)
     validate_record(@bike)
     if @bike.present?
-      ListingOrderWorker.perform_async(@bike.id)
+      ListingOrderWorker.perform_asynchronous(@bike.id)
       ListingOrderWorker.perform_in(10.seconds, @bike.id)
     end
     @bike

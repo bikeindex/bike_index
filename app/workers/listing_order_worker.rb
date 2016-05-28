@@ -7,7 +7,7 @@ class ListingOrderWorker
     bike = Bike.unscoped.where(id: bike_id).first
     if bike.present? && bike.listing_order != bike.get_listing_order
       bike.update_attribute :listing_order, bike.get_listing_order
-      AfterBikeSaveWorker.perform_async(bike_id)
+      AfterBikeSaveWorker.perform_asynchronous(bike_id)
     end
   end
 

@@ -14,7 +14,6 @@ class PageController < ApplicationController
   Explication: simple assert page with no layout
   Return: render layout 	
 =end  
-
   def assert
   	render layout: false
   end

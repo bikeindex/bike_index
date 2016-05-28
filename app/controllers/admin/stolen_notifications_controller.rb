@@ -10,7 +10,7 @@ class Admin::StolenNotificationsController < Admin::BaseController
 
   def resend
     if @stolenNotification.send_dates.count == 0 or params[:pretty_please]
-      EmailStolenNotificationWorker.perform_async(@stolenNotification.id)
+      EmailStolenNotificationWorker.perform_asynchronous(@stolenNotification.id)
       flash[:notice] = "Notification resent!"
       redirect_to admin_stolenNotifications_url
     else

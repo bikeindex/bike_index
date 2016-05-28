@@ -25,7 +25,9 @@ class OrganizationInvitationsController < ApplicationController
     assert_object_is_not_null(@organization)
     assert_message(@organization.kind_of?(current_organization))
     if @organization.available_invitation_count > 0
-      @organizationInvitation = OrganizationInvitation.new(invitee_email: params[:organizationInvitation][:invitee_email], invitee_name: params[:organizationInvitation][:invitee_name], organization: @organization, inviter: current_user, membership_role: params[:organizationInvitation][:membership_role])
+      @organizationInvitation = OrganizationInvitation.new(invitee_email: 
+      params[:organizationInvitation][:invitee_email], invitee_name:
+      params[:organizationInvitation][:invitee_name], organization: @organization, inviter: current_user,              membership_role: params[:organizationInvitation][:membership_role])
       @organizationInvitation.inviter = current_user
       if @organizationInvitation.save
         redirect_to edit_organization_url(@organization), notice: "#{@organizationInvitation.invitee_email} was invited to #{@organization.name}!"

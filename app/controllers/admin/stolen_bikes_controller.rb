@@ -20,7 +20,7 @@ class Admin::StolenBikesController < Admin::BaseController
   def approve
     @bike.current_stolenRecord.update_attribute :approved, true
     @bike.update_attribute :approved_stolen, true
-    ApproveStolenListingWorker.perform_async(@bike.id)
+    ApproveStolenListingWorker.perform_asynchronous(@bike.id)
     redirect_to edit_admin_stolen_bike_url(@bike), notice: 'Bike was approved.'
   end
 

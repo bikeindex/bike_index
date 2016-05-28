@@ -86,7 +86,7 @@ class Admin::BikesController < Admin::BaseController
         index_helped_recovery: params[:mark_recovered_we_helped],
         can_share_recovery: params[:can_share_recovery]
       }
-      RecoveryUpdateWorker.perform_async(@bike.current_stolenRecord.id, info)
+      RecoveryUpdateWorker.perform_asynchronous(@bike.current_stolenRecord.id, info)
     end
     if @bike.update_attributes(params[:bike])
       @bike.create_normalized_serial_segments
@@ -106,7 +106,7 @@ class Admin::BikesController < Admin::BaseController
 
   def destroy_bike
     @bike.destroy
-    AfterBikeSaveWorker.perform_async(@bike.id)
+    AfterBikeSaveWorker.perform_asynchronous(@bike.id)
     flash[:notice] = 'Bike deleted!'
     if params[:multi_delete]
       redirect_to admin_root_url

@@ -5,7 +5,7 @@ describe ApproveStolenListingWorker do
 
   it 'enqueues another awesome job' do
     bike = FactoryGirl.create(:bike)
-    ApproveStolenListingWorker.perform_async(bike.id)
+    ApproveStolenListingWorker.perform_asynchronous(bike.id)
     expect(ApproveStolenListingWorker).to have_enqueued_job(bike.id)
   end
 

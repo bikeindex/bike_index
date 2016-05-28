@@ -4,7 +4,7 @@ describe UnusedOwnershipRemovalWorker do
   it { is_expected.to be_processed_in :afterwards }
 
   it 'enqueues listing ordering job' do
-    UnusedOwnershipRemovalWorker.perform_async
+    UnusedOwnershipRemovalWorker.perform_asynchronous
     expect(UnusedOwnershipRemovalWorker).to have_enqueued_job
   end
 

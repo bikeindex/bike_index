@@ -9,10 +9,10 @@ class Feedback < ActiveRecord::Base
   validates_presence_of :body, :email, :title
   serialize :feedback_hash
 
-  after_create :notify_admins
-  def notify_admins
+  after_create :notify_administrators
+  def notify_administrators
     return true if no_notification_types.include?(feedback_type)
-    EmailFeedbackNotificationWorker.perform_async(id)
+    EmailFeedbackNotificationWorker.perform_asynchronous(id)
   end
 
   def no_notification_types

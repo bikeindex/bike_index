@@ -50,7 +50,7 @@ module Api
                 unless stolenRecord_id.present?
                   stolenRecord_id = bike.current_stolenRecord_id
                 end
-                RecoveryUpdateWorker.perform_async(stolenRecord_id, params)
+                RecoveryUpdateWorker.perform_asynchronous(stolenRecord_id, params)
                 if params[:index_helped_recovery].present?
                   feedback.feedback_hash[:index_helped_recovery] = params[:index_helped_recovery]
                 end

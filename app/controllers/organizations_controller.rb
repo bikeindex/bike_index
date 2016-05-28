@@ -11,20 +11,20 @@ class OrganizationsController < ApplicationController
   before_filter :find_organization, except: [:new, :lightspeed_integration, :create]
   before_filter :require_membership, only: [:show, :edit, :update, :destroy]
   before_filter :require_admin, only: [:edit, :update, :destroy]
-  before_filter :set_bparam, only: [:embed, :embed_extended]
+  before_filter :set_parameter, only: [:embed, :embed_extended]
   skip_before_filter :set_x_frame_options_header, only: [:embed, :embed_extended, :embed_create_success]
   layout "organization"
 
   def new
     session[:return_to] ||= new_organization_url unless current_user.present?
-    prep_new_organization
+    prepare_new_organization
     render layout: 'content'
   end
 
   def lightspeed_integration
     session[:return_to] = lightspeed_integration_url unless current_user.present?
     @stuff = session[:return_to]
-    prep_new_organization
+    prepare_new_organization
     render layout: 'content'
   end
 
@@ -33,14 +33,14 @@ class OrganizationsController < ApplicationController
     @organization = Organization.new(
       name: params[:organization][:name].strip,
       website: params[:organization][:website],
-      org_type: params[:organization][:org_type]
+      organization_type: params[:organization][:organization_type]
     )
     if @organization.save
       membership = Membership.create(user_id: user.id, role: 'admin', organization_id: @organization.id)
       assert_object_is_not_null(@organization)
       assert_message(@organization.kind_of?(Organization))
       @organization.update_attribute :auto_user_id, user.id
-      notify_admins('organization_created')
+      notify_administrators('organization_created')
       flash[:notice] = "Organization Created successfully!"
       if current_user.present?
         redirect_to edit_organization_url(@organization) and return
@@ -91,8 +91,8 @@ class OrganizationsController < ApplicationController
     else
       #nothing to do
     end
-    if params[:sf_safe].present?
-      render action: :embed_sf_safe, layout: 'embed_layout'
+    if params[:bike_safe].present?
+      render action: :embed_bike_safe, layout: 'embed_layout'
     else
       render layout: 'embed_layout'
     end
@@ -108,8 +108,8 @@ class OrganizationsController < ApplicationController
     else
       #nothing to do
     end
-    if params[:sf_safe].present?
-      render action: :embed_sf_safe, layout: 'embed_layout'
+    if params[:bike_safe].present?
+      render action: :embed_bike_safe, layout: 'embed_layout'
     else
       render layout: 'embed_layout'
     end
@@ -124,19 +124,19 @@ class OrganizationsController < ApplicationController
   def update
     if params[:organization][:lightspeed_cloud_api_key].present?
       api_key = params[:organization][:lightspeed_cloud_api_key]
-      EmailLightspeedNotificationWorker.perform_async(@organization.id, api_key)
+      EmailLightspeedNotificationWorker.perform_asynchronous(@organization.id, api_key)
       flash[:notice] = "Thanks for updating your LightSpeed API Key!"
       redirect_to organization_url(@organization) and return
       # @stolenNotification = StolenNotification.new(params[:stolenNotification])
     else
       if @organization.update_attributes(allowed_attributes)
         if @organization.wants_to_be_shown && @organization.show_on_map == false
-          notify_admins('wants_shown')
+          notify_administrators('wants_shown')
         else
           #nothing to do
         end
         if @organization.wants_to_be_shown == false && @organization.show_on_map
-          notify_admins('wants_not_shown')
+          notify_administrators('wants_not_shown')
         else
           #nothing to do  
         end
@@ -152,14 +152,14 @@ class OrganizationsController < ApplicationController
   end
 
   def destroy
-    notify_admins(organization_destroyed)
+    notify_administrators(organization_destroyed)
     @organization.destroy
     redirect_to root_url
   end
 
   protected
 
-  def prep_new_organization
+  def prepare_new_organization
     unless current_user.present?
       @user = User.new
     end
@@ -174,7 +174,7 @@ class OrganizationsController < ApplicationController
       name: params[:organization][:name],
       website: params[:organization][:website],
       wants_to_be_shown: params[:organization][:wants_to_be_shown],
-      org_type: params[:organization][:org_type]
+      organization_type: params[:organization][:organization_type]
     }
     if params[:organization][:locations_attributes].present?
       updates[:locations_attributes] = params[:organization][:locations_attributes]
@@ -184,7 +184,7 @@ class OrganizationsController < ApplicationController
     updates
   end
 
-  def set_bparam
+  def set_parameter
     unless @organization.auto_user.present?
       flash[:error] = "We're sorry, that organization doesn't have a user set up to register bikes through. Email contact@bikeindex.org if this seems like an error."
       redirect_to root_url and return
@@ -192,7 +192,8 @@ class OrganizationsController < ApplicationController
     if params[:bikeParam_id_token].present?
       @bikeParam = BParam.from_id_token(params[:bikeParam_id_token])
     else
-      @bikeParam = BParam.create(creator_id: @organization.auto_user.id, params: {creation_organization_id: @organization.id, embeded: true})
+      @bikeParam = BParam.create(creator_id: @organization.auto_user.id, params: {creation_organization_id: 
+        @organization.id, embeded: true})
     end
   end
 
@@ -224,7 +225,7 @@ class OrganizationsController < ApplicationController
     end
   end
   
-  def notify_admins(type)
+  def notify_administrators(type)
     feedback = Feedback.new(email: current_user.email,
       feedback_hash: { organization_id: @organization.id })
     if type == 'organization_created'

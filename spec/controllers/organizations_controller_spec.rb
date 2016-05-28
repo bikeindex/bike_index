@@ -18,7 +18,7 @@ describe OrganizationsController do
       set_current_user(user)
       org_attrs = {
         name: 'a new org',
-        org_type: 'shop',
+        organization_type: 'shop',
         api_access_approved: 'true',
         approved: 'true'
       }
@@ -40,7 +40,7 @@ describe OrganizationsController do
       org_attrs = {
         name: '<script>alert(document.cookie)</script>',
         website: '<script>alert(document.cookie)</script>',
-        org_type: 'shop',
+        organization_type: 'shop',
         api_access_approved: 'true',
         approved: 'true'
       }
@@ -57,7 +57,7 @@ describe OrganizationsController do
         set_current_user(user)
         org_attrs = {
           name: 'a new org',
-          org_type: 'shop',
+          organization_type: 'shop',
           api_access_approved: 'true',
           approved: 'true'
         }
@@ -98,7 +98,7 @@ describe OrganizationsController do
                      new_bike_notification: 'things8',
                      website: 'http://www.drseuss.org',
                      name: 'some new name',
-                     org_type: 'shop',
+                     organization_type: 'shop',
                      wants_to_be_shown: true
       }
       put :update, id: organization.slug, organization: org_update
@@ -106,7 +106,7 @@ describe OrganizationsController do
       expect(organization.reload.name).to eq('some new name')
       expect(organization.website).to eq('http://www.drseuss.org')
       org.keys.each do |k|
-        unless k == :wants_to_be_shown || k == :org_type
+        unless k == :wants_to_be_shown || k == :organization_type
 
           expect(organization.send(k).to_s).to eq((org[k]).to_s)
         end

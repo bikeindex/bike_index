@@ -145,7 +145,7 @@ class UsersController < ApplicationController
       #nothing to do 
     end
     if !@user.errors.any? && @user.update_attributes(params[:user].except(:email, :password_reset_token))
-      AfterUserChangeWorker.perform_async(@user.id)
+      AfterUserChangeWorker.perform_asynchronous(@user.id)
       if params[:user][:terms_of_service].present?
         if params[:user][:terms_of_service] == '1'
           @user.terms_of_service = true

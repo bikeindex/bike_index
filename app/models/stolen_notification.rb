@@ -29,9 +29,9 @@ class StolenNotification < ActiveRecord::Base
   after_create :notify_receiver
   def notify_receiver
     if sender.sent_stolenNotifications.count < 2 or sender.can_send_many_stolenNotifications
-      EmailStolenNotificationWorker.perform_async(id)
+      EmailStolenNotificationWorker.perform_asynchronous(id)
     else
-      EmailBlockedStolenNotificationWorker.perform_async(id)
+      EmailBlockedStolenNotificationWorker.perform_asynchronous(id)
     end
   end
 

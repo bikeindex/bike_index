@@ -8,7 +8,7 @@ class Organization < ActiveRecord::Base
     :website,
     :show_on_map,
     :is_suspended,
-    :org_type,
+    :organization_type,
     :locations_attributes,
     :embedable_user_email,
     :auto_user_id,
@@ -40,11 +40,11 @@ class Organization < ActiveRecord::Base
   default_scope { order(:name) }
 
   scope :shown_on_map, -> { where(show_on_map: true, approved: true) }
-  scope :shop, -> { where(org_type: 'shop') }
-  scope :police, -> { where(org_type: 'police') }
-  scope :advocacy, -> { where(org_type: 'advocacy') }
-  scope :college, -> { where(org_type: 'college') }
-  scope :manufacturer, -> { where(org_type: 'manufacturer') }
+  scope :shop, -> { where(organization_type: 'shop') }
+  scope :police, -> { where(organization_type: 'police') }
+  scope :advocacy, -> { where(organization_type: 'advocacy') }
+  scope :college, -> { where(organization_type: 'college') }
+  scope :manufacturer, -> { where(organization_type: 'manufacturer') }
 
   def to_param
     slug

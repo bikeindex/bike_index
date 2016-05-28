@@ -4,7 +4,7 @@ describe RecoveryUpdateWorker do
   it { is_expected.to be_processed_in :updates }
 
   it 'enqueues another awesome job' do
-    RecoveryUpdateWorker.perform_async
+    RecoveryUpdateWorker.perform_asynchronous
     expect(RecoveryUpdateWorker).to have_enqueued_job
   end
 
@@ -21,7 +21,7 @@ describe RecoveryUpdateWorker do
         index_helped_recovery: 'true',
         can_share_recovery: 'false'
       }
-      RecoveryUpdateWorker.perform_async(stolenRecord.id, recovery_request.as_json)
+      RecoveryUpdateWorker.perform_asynchronous(stolenRecord.id, recovery_request.as_json)
       expect(bike.current_stolenRecord).not_to be_present
       expect(stolenRecord.reload.date_recovered).to be_present
       expect(stolenRecord.index_helped_recovery).to be_truthy

@@ -29,5 +29,4 @@ class OrganizationDealsController < ApplicationController
     end
   end
 
-
 end

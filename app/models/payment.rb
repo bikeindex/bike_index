@@ -22,7 +22,7 @@ class Payment < ActiveRecord::Base
 
   after_create :send_invoice_email
   def send_invoice_email
-    EmailInvoiceWorker.perform_async(id)
+    EmailInvoiceWorker.perform_asynchronous(id)
   end
 
 end

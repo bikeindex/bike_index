@@ -145,7 +145,7 @@ class User < ActiveRecord::Base
   def send_password_reset_email
     unless reset_token_time > Time.now - 2.minutes
       set_password_reset_token
-      EmailResetPasswordWorker.perform_async(id)
+      EmailResetPasswordWorker.perform_asynchronous(id)
     end
   end
 

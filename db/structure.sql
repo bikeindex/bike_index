@@ -497,7 +497,7 @@ CREATE TABLE `organizations` (
   `deleted_at` datetime DEFAULT NULL,
   `is_suspended` tinyint(1) NOT NULL DEFAULT '0',
   `auto_user_id` int(11) DEFAULT NULL,
-  `org_type` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'shop',
+  `organization_type` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'shop',
   `access_token` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `new_bike_notification` text COLLATE utf8_unicode_ci,
   `api_access_approved` tinyint(1) NOT NULL DEFAULT '0',

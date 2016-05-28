@@ -5,7 +5,7 @@ describe ListicleImageSizeWorker do
   it { is_expected.to be_unique }
 
   it 'enqueues another awesome job' do
-    ListicleImageSizeWorker.perform_async
+    ListicleImageSizeWorker.perform_asynchronous
     expect(ListicleImageSizeWorker).to have_enqueued_job
   end
 end

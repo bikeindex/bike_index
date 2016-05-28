@@ -19,11 +19,11 @@ class CreateUserJobs
   end
 
   def send_welcome_email
-    EmailWelcomeWorker.perform_async(@user.id)
+    EmailWelcomeWorker.perform_asynchronous(@user.id)
   end
 
   def send_confirmation_email
-    EmailConfirmationWorker.perform_async(@user.id)
+    EmailConfirmationWorker.perform_asynchronous(@user.id)
   end
 
   def do_jobs

@@ -4,7 +4,7 @@ describe BikeBookUpdateWorker do
   it { is_expected.to be_processed_in :updates }
 
   it 'enqueues listing ordering job' do
-    BikeBookUpdateWorker.perform_async
+    BikeBookUpdateWorker.perform_asynchronous
     expect(BikeBookUpdateWorker).to have_enqueued_job
   end
 

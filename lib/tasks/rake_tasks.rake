@@ -4,38 +4,38 @@ task :slow_save => :environment do
   end
 
   # Bike.where("thumb_path IS NOT NULL").find_in_batches(batch_size: 150) do |b|
-  #   b.each { |i| AfterBikeSaveWorker.perform_async(i.id) }
+  #   b.each { |i| AfterBikeSaveWorker.perform_asynchronous(i.id) }
   #   sleep(50)
   # end
 end
 
 task delete_expired_bikeParams: :environment do
-  BParam.pluck(:id).each { |id| RemoveExpiredBParamsWorker.perform_async(id) }
+  BParam.pluck(:id).each { |id| RemoveExpiredBParamsWorker.perform_asynchronous(id) }
 end
 
 desc 'Create frame_makers and push to redis'
 task :sm_import_manufacturers => :environment do
-  AutocompleteLoaderWorker.perform_async('load_manufacturers')
+  AutocompleteLoaderWorker.perform_asynchronous('load_manufacturers')
 end
 
 desc 'Create frame_makers and push to redis'
 task :remove_unused_ownerships => :environment do
-  Ownership.pluck(:id).each { |id| UnusedOwnershipRemovalWorker.perform_async(id) }
+  Ownership.pluck(:id).each { |id| UnusedOwnershipRemovalWorker.perform_asynchronous(id) }
 end
 
 desc 'cache all stolen response'
 task :cache_all_stolen => :environment do
-  CacheAllStolenWorker.perform_async
+  CacheAllStolenWorker.perform_asynchronous
 end
 
 desc 'Remove expired file caches'
 task :remove_expired_file_caches => :environment do
-  RemoveExpiredFileCacheWorker.perform_async
+  RemoveExpiredFileCacheWorker.perform_asynchronous
 end
 
 desc 'remove unused'
 task :cache_all_stolen => :environment do
-  CacheAllStolenWorker.perform_async
+  CacheAllStolenWorker.perform_asynchronous
 end
 
 desc 'Create stolen tsv'

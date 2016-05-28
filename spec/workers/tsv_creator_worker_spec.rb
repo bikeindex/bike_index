@@ -4,7 +4,7 @@ describe TsvCreatorWorker do
   it { is_expected.to be_processed_in :carrierwave }
 
   it 'enqueues another awesome job' do
-    TsvCreatorWorker.perform_async
+    TsvCreatorWorker.perform_asynchronous
     expect(TsvCreatorWorker).to have_enqueued_job
   end
 

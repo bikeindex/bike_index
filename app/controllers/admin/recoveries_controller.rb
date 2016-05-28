@@ -40,7 +40,7 @@ class Admin::RecoveriesController < Admin::BaseController
         params[:recovery_selected].keys.each do |rid|
           recovery = StolenRecord.unscoped.find(rid)
           unless recovery.recovery_posted && recovery.can_share_recovery == false
-            RecoveryNotifyWorker.perform_async(rid.to_i)
+            RecoveryNotifyWorker.perform_asynchronous(rid.to_i)
             enqueued = true
           end
         end
@@ -52,7 +52,7 @@ class Admin::RecoveriesController < Admin::BaseController
       end
       redirect_to admin_recoveries_url
     else
-      RecoveryNotifyWorker.perform_async(params[:id].to_i)
+      RecoveryNotifyWorker.perform_asynchronous(params[:id].to_i)
       redirect_to admin_recoveries_url, notice: 'Recovery notification enqueued.'
     end
   end
