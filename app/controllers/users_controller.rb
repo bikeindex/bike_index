@@ -10,7 +10,13 @@ class UsersController < ApplicationController
   include Sessionable
   before_filter :authenticate_user, only: [:edit]
   before_filter :set_return_to, only: [:new]
-  
+
+=begin
+  Name: new
+  Explication: method to create a new user 
+  Params: create a new user
+  Return: redirect to home or render new revise or nothing
+=end  
   def new
     @user = User.new
     assert_object_is_not_null(@user)
@@ -28,6 +34,12 @@ class UsersController < ApplicationController
     end
   end
 
+=begin
+  Name: create
+  Explication: create a new instance of user 
+  Params: receive user created in action new
+  Return: sign in or render new template to create user
+=end
   def create
     @user = User.new(params[:user])
     assert_object_is_not_null(@user)
@@ -40,6 +52,12 @@ class UsersController < ApplicationController
     end
   end
 
+=begin
+  Name: confirm
+  Explication: method to confirm if user search is the same 
+  Params: specific user by id and code which confirm the user
+  Return: redirect to new session or sign in or render confirm error bad token or render confirm error 404
+=end
   def confirm
     begin
       @user = User.find(params[:id])
@@ -58,9 +76,21 @@ class UsersController < ApplicationController
     end
   end
 
+=begin
+  Name: request_password_reset 
+  Explication: none 
+  Params: none
+  Return: nothing
+=end
   def request_password_reset
   end
 
+=begin
+  Name: update_password
+  Explication: method to update password of the current user  
+  Params: none
+  Return: current user
+=end
   def update_password
     @user = current_user
     assert_object_is_not_null(@user)
@@ -68,6 +98,12 @@ class UsersController < ApplicationController
     return @user
   end
 
+=begin
+  Name: password_reset
+  Explication: method used to password reset user 
+  Params: simbol token and specific user find by email
+  Return: sign in or render action request password reset or user reset datas
+=end
   def password_reset
     if params[:token].present?
       @user = User.find_by_password_reset_token(params[:token])
@@ -93,6 +129,12 @@ class UsersController < ApplicationController
     end  
   end
 
+=begin
+  Name: show
+  Explication: method used to find user and to show information 
+  Params: user's id
+  Return: not found or redirect to user home
+=end
   def show
     user = User.find_by_username(params[:id])
     unless user 
@@ -112,6 +154,12 @@ class UsersController < ApplicationController
     @bikes = BikeDecorator.decorate_collection(bikes)
   end
 
+=begin
+  Name: edit
+  Explication: method used to edit the profile current user  
+  Params: none
+  Return: @user 
+=end
   def edit
     @user = current_user
     assert_object_is_not_null(@user)
@@ -119,6 +167,12 @@ class UsersController < ApplicationController
     return @user
   end
 
+=begin
+  Name: update
+  Explication:  method which basically update the user datas
+  Params: receive the user datas, as: password, email and current user; 
+  Return: errors with some this message: "Doesn't match user's password reset token", "Password reset token expired, try resetting password again", "Current password doesn't match, it's required for updating your password" or nothing to to or some others possibility: redirect_to user_home_url or redirect_to my_account_url or redirect_to accept_vendor_terms_url.
+=end
   def update
     @user = current_user
     assert_object_is_not_null(@user)
@@ -187,6 +241,12 @@ class UsersController < ApplicationController
     end    
   end
 
+=begin
+  Name: accept_terms
+  Explication: verify if user is present to accept terms of contract  
+  Params: none
+  Return: @user or redirect to terms page 
+=end
   def accept_terms
     if current_user.present?
       @user = current_user
@@ -198,6 +258,12 @@ class UsersController < ApplicationController
     end
   end
 
+=begin
+  Name: accept_vendor_terms
+  Explication: verify if user is present to accept vendor terms of contract  
+  Params: none
+  Return: @user or redirect to vendor terms page 
+=end
   def accept_vendor_terms
     if current_user.present?
       @user = current_user
@@ -208,4 +274,5 @@ class UsersController < ApplicationController
       redirect_to vendor_terms_url
     end
   end
+
 end
