@@ -10,6 +10,12 @@ class SessionsController < ApplicationController
   include Sessionable
   before_filter :set_return_to, only: [:new]
 
+=begin
+  Name: new
+  Explication: verify if user is present, case yes redirect to user home and it can layout enable   
+  Params: none
+  Return: redirect to user home or render new revised or nothing
+=end
   def new
     if current_user.present?
       redirect_to user_home_url, notice: "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
@@ -23,6 +29,12 @@ class SessionsController < ApplicationController
     end
   end
 
+=begin
+  Name: create
+  Explication: create a new session to user to do the manage in public images  
+  Params: session and email of the current user
+  Return: display message: "We're sorry, but it appears that your account has been locked. If you are unsure as to the reasons for this, please contact us" or render new template or display message: 'You must confirm your email address to continue' or message: 'Invalid email/password'  
+=end
   def create
     @user = User.fuzzy_email_find(params[:session][:email])
     assert_object_is_not_null(@user)
@@ -52,6 +64,12 @@ class SessionsController < ApplicationController
     end  
   end
 
+=begin
+  Name: destroy
+  Explication: method used basically to remove session of the current user   
+  Params: location of the bike desire
+  Return: redirect to new user or nothing  
+=end
   def destroy
     remove_session
     if params[:redirect_location].present?

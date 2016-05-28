@@ -9,6 +9,12 @@
 class PublicImagesController < ApplicationController
   before_filter :find_image_if_owned, only: [:edit, :update, :destroy, :is_private]
 
+=begin
+  Name: show
+  Explication: method used to search and to display the specific public image desired.  
+  Params: image's id
+  Return: public image specific desired
+=end
   def show
     publicImage = PublicImage.find(params[:id])
     if publicImage.present? && publicImage.imageable_type == 'Bike'
@@ -19,6 +25,12 @@ class PublicImagesController < ApplicationController
     end
   end
 
+=begin
+  Name: create
+  Explication: method used to creation of a new public image.   
+  Params: bike's id and params to create public image 
+  Return: public image saved or nothing or to display the error message: "Whoops! We can't let you create that image" or render again layout to creation  
+=end
   def create
     publicImage = PublicImage.new(params[:publicImage])
     if params[:bike_id].present?
@@ -51,14 +63,32 @@ class PublicImagesController < ApplicationController
     end
   end
 
+=begin
+  Name: edi
+  Explication: empty method    
+  Params: none
+  Return: nothing
+=end
   def edit
   end
 
+=begin
+  Name: is_private
+  Explication: method used to update attributes presents in public images  
+  Params: params is the own method name
+  Return: nothing render
+=end
   def is_private
     publicImage.update_attribute :is_private, params[:is_private]
     render nothing: true
   end
 
+=begin
+  Name: update
+  Explication: method used to update attributes presents in public images and redirect if necessary  
+  Params: params is the own method name
+  Return: render edit page or redirect to edit bike page
+=end
   def update
     if publicImage.update_attributes(params[:publicImage])
       redirect_to edit_bike_url(publicImage.imageable), notice: 'Image was successfully updated.'
@@ -67,6 +97,12 @@ class PublicImagesController < ApplicationController
     end
   end
 
+=begin
+  Name: destroy
+  Explication: method used to delete the image of the bike desired  
+  Params: page related with the bikes
+  Return: message: 'Image was successfully deleted' or redirect to edit bike or redirect to edit admin news
+=end
   def destroy
     @imageable = publicImage.imageable
     assert_object_is_not_null(@imageable)
@@ -86,6 +122,12 @@ class PublicImagesController < ApplicationController
     end
   end
 
+=begin
+  Name: order
+  Explication: method used to add a photo in the stolen bike  
+  Params: list with all bike's photo
+  Return: nothing render or bike's image
+=end
   def order
     if params[:list_of_photos]
       last_image = params[:list_of_photos].count
@@ -103,6 +145,12 @@ class PublicImagesController < ApplicationController
 
   protected
 
+=begin
+  Name: current_user_image_owner
+  Explication: method user to associate the bike to your owner  
+  Params: public image of the bike
+  Return: bike or nothing or current user
+=end
   def current_user_image_owner(publicImage)
     if publicImage.imageable_type == 'Bike'
       Bike.unscoped.find(publicImage.imageable_id).owner == current_user
@@ -115,6 +163,12 @@ class PublicImagesController < ApplicationController
     end
   end
 
+=begin
+  Name: find_image_if_owned
+  Explication: method used to associate a image the owner  
+  Params: public image's id
+  Return: redirect to public image or nothing
+=end
   def find_image_if_owned
     publicImage = PublicImage.unscoped.find(params[:id])
     if current_user_image_owner(publicImage)
