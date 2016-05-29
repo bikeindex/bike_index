@@ -9,6 +9,9 @@ gem 'bcrypt-ruby', '~> 3.0.0'
 gem 'active_model_serializers'
 gem 'aws-sdk', '~> 1.3.4'
 
+# Speed
+gem 'fast_blank', '~> 1.0'
+
 # Redis and redis dependents
 gem 'redis'
 gem 'sidekiq', '~> 4.1.1' # Background processing

@@ -87,7 +87,7 @@ $mainmenu-open-zindex: 10;
       }
     }
     .primary-main-menu { 
-      display: block;
+      display: none;
       background: $primary-nav-background;
       position: fixed;
       right: 0;
@@ -121,7 +121,9 @@ $mainmenu-open-zindex: 10;
       z-index: $mainmenu-open-zindex - 1;
     }
   }
-  // 
+  // So that mobile browsers don't show it all the time, like assholes
+  .primary-header-nav.enabled .primary-main-menu { display: block; }
+  //
   // Mobile menu visible
   body.menu-in { overflow: hidden; }
   .primary-header-nav.menu-in {
