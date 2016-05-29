@@ -12,7 +12,13 @@ class OrganizationInvitationsController < ApplicationController
   before_filter :require_admin
 
   layout "organization"
-  
+
+=begin
+  Name: new
+  Params: none
+  Explication: create a new instance for organization invitation
+  Return: @organizationInvitation 
+=end  
   def new
     @organizationInvitation = OrganizationInvitation.new
     assert_object_is_not_null(@organizationInvitation)
@@ -20,6 +26,12 @@ class OrganizationInvitationsController < ApplicationController
     return @organizationInvitation
   end
 
+=begin
+  Name: create
+  Params: receive the parameters about the organization invitation. They are: invitee_email, organizationInvitation, invitee_name e membership_role.
+  Explication: method used to do invitee and store information about new organization in databases.
+  Return: current user or current organization or redirect to edit organization or redirect to new organization invitation  
+=end
   def create
     @organization = current_organization
     assert_object_is_not_null(@organization)
@@ -40,12 +52,24 @@ class OrganizationInvitationsController < ApplicationController
     end
   end
 
+=begin
+  Name: find_organization
+  Params: organization's id
+  Explication: method used to find the specific organization by id
+  Return: @organization 
+=end
   def find_organization
     @organization = Organization.find_by_slug(params[:organization_id])
     assert_object_is_not_null(@organization)
     return @organization
   end
 
+=begin
+  Name: require_admin
+  Params: receive the organization which will be verified if current user is your administrator
+  Explication: method used to verify if current user is organization administrator 
+  Return: nothing 
+=end
   def require_admin
     unless current_user.is_admin_of?(@organization)
       flash[:error] = "You gotta be an organization administrator to do that!"
