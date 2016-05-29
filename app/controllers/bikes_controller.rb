@@ -78,6 +78,7 @@ class BikesController < ApplicationController
 =end 
   def show
     @components = @bike.components.decorate
+    assert_object_is_not_null(@components)
     if @bike.stolen and @bike.current_stolenRecord.present?
       @stolenRecord = @bike.current_stolenRecord.decorate
     else
@@ -105,8 +106,9 @@ class BikesController < ApplicationController
     end
     
     @bike = @bike.decorate
+    assert_object_is_not_null(@bike)
     filename = "Registration_" + @bike.updated_at.strftime("%m%d_%H%M")[0..-1]
-    unless @bike.pdf.present? && @bike.pdf.file.filename == "#{filename}.pdf"
+    unless ( @bike.pdf.present? && @bike.pdf.file.filename == "#{filename}.pdf" )
       pdf = render_to_string pdf: filename, template: 'bikes/pdf'
       save_path = "#{Rails.root}/tmp/#{filename}.pdf"
       File.open(save_path, 'wb') do |file|
@@ -198,6 +200,7 @@ class BikesController < ApplicationController
   def create
     if params[:bike][:embeded]
       @bikeParam = BParam.from_id_token(params[:bike][:bikeParam_id_token])
+      assert_object_is_not_null(@bikeParam)
       @bike = Bike.new
 
       create_bike_success
@@ -205,7 +208,19 @@ class BikesController < ApplicationController
     elsif revised_layout_enabled?
       revised_create
     else
-      @bikeParam = BParam.from_id_token(params[:bike][:bikeParam_id_token], "2014-12-31 18:00:00")
+      create_condition
+    end
+  end
+
+
+=begin
+  Name: create_condition
+  Explication: condition to simplify the create method
+  Params: @bikeParam 
+  Return: result of conditions
+=end 
+  def create_condition
+    @bikeParam = BParam.from_id_token(params[:bike][:bikeParam_id_token], "2014-12-31 18:00:00")
       unless @bikeParam && @bikeParam.creator_id == current_user.id
         @bike = Bike.new
         flash[:error] = "Oops, that isn't your bike"
@@ -223,8 +238,8 @@ class BikesController < ApplicationController
       else
       end
       redirect_to edit_bike_url(@bike), notice: "Bike successfully added to the index!"
-    end
   end
+
 
 =begin
   Name: create_bike_success
