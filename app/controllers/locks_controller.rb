@@ -12,6 +12,8 @@ class LocksController < ApplicationController
 
   def index
     @user = current_user
+    assert_message(@user.kind_of?(User))
+    assert_object_is_not_null(@user)
     @locks = LockDecorator.decorate_collection(@user.locks)
   end
 
@@ -22,10 +24,14 @@ class LocksController < ApplicationController
 
   def edit
     @lock = find_lock
+    assert_message(@lock.kind_of?(Lock))
+    assert_object_is_not_null(@lock)
   end
   
   def update
     @lock = find_lock
+    assert_message(@lock.kind_of?(Lock))
+    assert_object_is_not_null(@lock)
     @lock.user = current_user
     if @lock.update_attributes(params[:lock])
       redirect_to locks_url

@@ -10,6 +10,8 @@ class DocumentationController < ApplicationController
   
   caches_page :api_v1
   
+
+  #Return: redirect to controller documentation 
   def index
     redirect_to controller: :documentation, action: :api_v2
   end
@@ -34,8 +36,15 @@ class DocumentationController < ApplicationController
     render layout: false
   end
 
+
+=begin
+  Explication: manipulation of condition of atuhorize method 
+  Paramts: code
+  Return: redirect to content layout  
+=end
   def authorize
     @accessCode = params[:code]
+    assert_object_is_not_null(@accesCode)
     @accessGrant = Doorkeeper::AccessGrant.where(resource_owner_id: current_user.id, token: @accessCode).last
     @application = @accessGrant.application if @accessGrant.present?
     render layout: 'content'
