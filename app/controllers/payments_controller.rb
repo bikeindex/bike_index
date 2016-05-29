@@ -7,14 +7,33 @@
 =end
 
 class PaymentsController < ApplicationController
+
+=begin
+  Name: revised_layout_if_enabled
+  Explication: method used to enable layout  
+  Params: none 
+  Return: revised_layout_enabled? ? 'application_revised' : 'application_updated'
+=end  
   def revised_layout_if_enabled
     revised_layout_enabled? ? 'application_revised' : 'application_updated'
   end
 
+=begin
+  Name: new 
+  Explication: method used to render layout   
+  Params: none
+  Return: render layout: revised_layout_if_enabled 
+=end
   def new
     render layout: revised_layout_if_enabled
   end
 
+=begin
+  Name: create
+  Explication: method used to verify if the user is present, case yes create the bill to payments  
+  Params: stripe amount, stripe subscription, stripe email, stripe token, stripe id, email, card, stripe plan 
+  Return: save customer or email or user update attributes or customer save
+=end
   def create
     @amount = params[:stripe_amount]
     assert_object_is_not_null(@amount)
@@ -77,4 +96,5 @@ class PaymentsController < ApplicationController
     flash[:error] = e.message
     redirect_to new_payment_path and return
   end
+
 end
