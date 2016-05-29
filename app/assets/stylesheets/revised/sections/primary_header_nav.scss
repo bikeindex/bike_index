@@ -1,7 +1,7 @@
 // Padding to deal with header nav
-body { padding-top: 8*$vertical-height; }
+body, .organized-left-menu { padding-top: 8*$vertical-height; }
 @media (min-width: $grid-breakpoint-lg) {
-  body { padding-top: 12*$vertical-height; }
+  body, .organized-left-menu { padding-top: 12*$vertical-height; }
 }
 
 $primary-logo-fullsize-height: 84px;

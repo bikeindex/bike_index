@@ -1,0 +1,46 @@
+$organized-menu-bg: $gray-lighter;
+
+.organized-body {
+  // @include clearfix;
+  position: relative;
+  .primary-footer { position: relative; } // To make it go over the menu
+  .organized-left-menu {
+    background: $organized-menu-bg;
+    width: 15%; height: 100%;
+    position: absolute;
+    top: 0;
+    ul { @include list-unstyled; }
+    .organized-mainmenu {
+      margin-top: -40px;
+      a, .menu-item {
+        width: 100%;
+        display: block;
+        padding: $vertical-height;
+        color: $header-font-color;
+        text-decoration: none;
+        // &.first-item { border-top: none; }
+      }
+      a:hover {
+        text-decoration: none;
+        font-weight: $strong-font-weight;
+      }
+      li { border-top: 1px solid $gray-lightish; }
+      // &>li:first-of-type { border-top: none; }
+    }
+    .organized-submenu .menu-item { padding-left: 2*$vertical-height; }
+    .active {
+      background: $blue;
+      color: white;
+    }
+  }
+  .organized-wrap { 
+    width: 100%;
+    padding-left: 15%;
+    min-height: 400px;
+  }
+  // .organized-mainmenu {}
+  // .container.organized-main-container {
+  //   float: right;
+  //   width: 85%;
+  // }
+}

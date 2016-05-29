@@ -22,14 +22,15 @@ module ApplicationHelper
   #  - a valid partial file in views/shared
   #  - nil - which just calls yield directly
   def current_page_skeleton
+    return 'organized_skeleton' if sub_module_name == 'organized_'
     case controller_name
     when 'bikes'
-      'edit_bike_skeleton' if %w(edit update).include?(action_name)
+      return 'edit_bike_skeleton' if %w(edit update).include?(action_name)
     when 'info'
       'content_skeleton' unless %w(terms vendor_terms privacy support_the_index).include?(action_name)
     when 'welcome'
       'content_skeleton' if %w(goodbye).include?(action_name)
-    when 'organizations'
+    when 'organized_skeleton'
       'content_skeleton' if %w(new lightspeed_integration).include?(action_name)
     when 'user'
       'content_skeleton' if %w(edit).include?(action_name)
@@ -119,7 +120,7 @@ module ApplicationHelper
     "#{sub_module_name}#{controller_name}_#{action_name}"
   end
 
-  private
+  # private
 
   def sub_module_name
     controller.class.parent.name == 'Object' ? '' : "#{controller.class.parent.name.downcase}_"

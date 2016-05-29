@@ -403,4 +403,78 @@ describe User do
       end
     end
   end
+
+  describe 'is_member_of?' do
+    let(:organization) { FactoryGirl.create(:organization) }
+    context 'admin of organization' do
+      let(:user) { FactoryGirl.create(:organization_admin, organization: organization) }
+      it 'returns true' do
+        expect(user.is_member_of?(organization)).to be_truthy
+      end
+    end
+    context 'member of organization' do
+      let(:user) { FactoryGirl.create(:organization_member, organization: organization) }
+      it 'returns true' do
+        expect(user.is_member_of?(organization)).to be_truthy
+      end
+    end
+    context 'superadmin' do
+      let(:user) { FactoryGirl.create(:admin) }
+      it 'returns true' do
+        expect(user.is_member_of?(organization)).to be_truthy
+      end
+    end
+    context 'incorrect searching' do
+      let(:user) { FactoryGirl.create(:organization_admin, organization: organization) }
+      context 'non-member' do
+        let(:other_organization) { FactoryGirl.create(:organization) }
+        it 'returns false' do
+          expect(other_organization).to be_present
+          expect(user.is_member_of?(other_organization)).to be_falsey
+        end
+      end
+      context 'no organization' do
+        it 'returns false' do
+          expect(user.is_member_of?(nil)).to be_falsey
+        end
+      end
+    end
+  end
+
+  describe 'is_admin_of?' do
+    let(:organization) { FactoryGirl.create(:organization) }
+    context 'admin of organization' do
+      let(:user) { FactoryGirl.create(:organization_admin, organization: organization) }
+      it 'returns true' do
+        expect(user.is_admin_of?(organization)).to be_truthy
+      end
+    end
+    context 'member of organization' do
+      let(:user) { FactoryGirl.create(:organization_member, organization: organization) }
+      it 'returns true' do
+        expect(user.is_admin_of?(organization)).to be_falsey
+      end
+    end
+    context 'superadmin' do
+      let(:user) { FactoryGirl.create(:admin) }
+      it 'returns true' do
+        expect(user.is_admin_of?(organization)).to be_truthy
+      end
+    end
+    context 'incorrect searching' do
+      let(:user) { FactoryGirl.create(:organization_admin, organization: organization) }
+      context 'non-member' do
+        let(:other_organization) { FactoryGirl.create(:organization) }
+        it 'returns false' do
+          expect(other_organization).to be_present
+          expect(user.is_admin_of?(other_organization)).to be_falsey
+        end
+      end
+      context 'no organization' do
+        it 'returns false' do
+          expect(user.is_admin_of?(nil)).to be_falsey
+        end
+      end
+    end
+  end
 end

@@ -17,10 +17,14 @@ class Organization < ActiveRecord::Base
     :new_bike_notification,
     :lightspeed_cloud_api_key,
     :use_additional_registration_field,
-    :wants_to_be_shown
+    :wants_to_be_shown,
+    :avatar,
+    :avatar_cache
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key
   acts_as_paranoid
+
+  mount_uploader :avatar, AvatarUploader
 
   has_many :memberships, dependent: :destroy
   has_many :organization_deals, dependent: :destroy
@@ -45,6 +49,16 @@ class Organization < ActiveRecord::Base
   scope :advocacy, -> { where(org_type: 'advocacy') }
   scope :college, -> { where(org_type: 'college') }
   scope :manufacturer, -> { where(org_type: 'manufacturer') }
+  scope :paid, -> { where(is_paid: true) }
+
+  def self.friendly_find(n)
+    return nil unless n.present?
+    integer_slug?(n) ? find(n) : find_by_slug(Slugifyer.slugify(n))
+  end
+
+  def self.integer_slug?(n)
+    n.is_a?(Integer) || n.match(/\A\d*\z/).present?
+  end
 
   def to_param
     slug
@@ -55,7 +69,7 @@ class Organization < ActiveRecord::Base
     self.name = strip_tags(name)
     self.name = "Stop messing about" unless name[/\d|\w/].present?
     self.website = Urlifyer.urlify(website) if website.present?
-    self.short_name = name unless short_name.present?
+    self.short_name = (short_name || name).truncate(30)
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, '')
     # If the organization exists, don't invalidate because of it's own slug
     orgs = id.present? ? Organization.where('id != ?', id) : Organization.scoped
@@ -93,11 +107,6 @@ class Organization < ActiveRecord::Base
 
   def suspended?
     is_suspended?
-  end
-
-  before_save :truncate_short_name
-  def truncate_short_name
-    self.short_name = self.short_name.truncate(30)
   end
 
   before_save :set_access_token

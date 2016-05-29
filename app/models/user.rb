@@ -209,15 +209,13 @@ class User < ActiveRecord::Base
   end
 
   def is_member_of?(organization)
-    if organization.present?
-      m = Membership.where(user_id: id, organization_id: organization.id)
-      m.present?
-    end
+    return false unless organization.present?
+    Membership.where(user_id: id, organization_id: organization.id).present? || superuser?
   end
 
   def is_admin_of?(organization)
-    m = Membership.where(user_id: id, organization_id: organization.id).first
-    m.present? && m.role == 'admin'
+    return false unless organization.present?
+    Membership.where(user_id: id, organization_id: organization.id, role: 'admin').present? || superuser?
   end
   
   def has_membership?
