@@ -15,12 +15,24 @@ class OrganizationsController < ApplicationController
   skip_before_filter :set_x_frame_options_header, only: [:embed, :embed_extended, :embed_create_success]
   layout "organization"
 
+=begin
+  Name: new
+  Params: none
+  Explication: method used to create and prepare a new session for organization
+  Return: render layout 'content'  
+=end
   def new
     session[:return_to] ||= new_organization_url unless current_user.present?
     prepare_new_organization
     render layout: 'content'
   end
 
+=begin
+  Name: lightspeed_integration
+  Params: none
+  Explication: method used to assign lightspeed integration for stuff, case user isn't present 
+  Return: render layout: 'content'  
+=end
   def lightspeed_integration
     session[:return_to] = lightspeed_integration_url unless current_user.present?
     @stuff = session[:return_to]
@@ -28,6 +40,12 @@ class OrganizationsController < ApplicationController
     render layout: 'content'
   end
 
+=begin
+  Name: create
+  Params: It receive sereval parameters about the organization to create a new. They are: name, website, organization type, user id and administrator role 
+  Explication: method used to create a new instance of organization with all yours attributes
+  Return: parameters organization or message: "Organization Created successfully!" or redirect to edit organization or render action new or nothing to do.   
+=end
   def create
     user = current_user
     @organization = Organization.new(
@@ -51,7 +69,13 @@ class OrganizationsController < ApplicationController
       render action: :new and return
     end
   end
-  
+
+=begin
+  Name: edit
+  Params: organization's id
+  Explication: method used to edit characteristic organization if necessary
+  Return: @organization  
+=end  
   def edit
     @bikes = Bike.where(creation_organization_id: @organization.id).order("created_at desc")
     assert_object_is_not_null(@bikes)
@@ -60,6 +84,12 @@ class OrganizationsController < ApplicationController
     return @organization
   end
 
+=begin
+  Name: show
+  Params: organization's id
+  Explication: method used to display information about organization and also configure as display in page
+  Return: @organization  
+=end
   def show
     bikes = Bike.where(creation_organization_id: @organization.id).order("created_at desc")
     page = params[:page] || 1
@@ -72,6 +102,12 @@ class OrganizationsController < ApplicationController
     return @organization
   end
 
+=begin
+  Name: embed
+  Params: receive characteristics bike, your attributes and email owner 
+  Explication: method used to embed if specific bike is stolen or non stolen 
+  Return: bike owner email or true or render action: :embed_bike_safe or render layout: 'embed_layout' or nothing to do  
+=end
   def embed
     @bike = BikeCreator.new(@bikeParam).new_bike
     assert_object_is_not_null(@bike)
@@ -98,6 +134,12 @@ class OrganizationsController < ApplicationController
     end
   end
 
+=begin
+  Name: embed_extended
+  Params: receive characteristics bike, your attributes and email owner. 
+  Explication: method used to embed if specific bike has safe or not 
+  Return: bike owner email or true or nothing to do or render action: embed_bike_safe and layout: 'embed_layout'   
+=end
   def embed_extended
     @bike = BikeCreator.new(@bikeParam).new_bike
     assert_object_is_not_null(@bike)
@@ -115,12 +157,24 @@ class OrganizationsController < ApplicationController
     end
   end
 
+=begin
+  Name: embed_create_success
+  Params: bike's id
+  Explication: method used to search specific bike and render layout: 'embed layout' 
+  Return: render layout: 'embed_layout'   
+=end
   def embed_create_success
     @bike = Bike.find(params[:bike_id]).decorate
     assert_object_is_not_null(@bike)
     render layout: 'embed_layout'
   end
 
+=begin
+  Name: update
+  Params: params about organization, yours characteristics and api lightspeed cloud 
+  Explication: method used to update attributes about organization and to display message of the administrator case be necessary
+  Return: nothing or notify administrators('wants_shown') or redirect to edit organization or render action: edit   
+=end
   def update
     if params[:organization][:lightspeed_cloud_api_key].present?
       api_key = params[:organization][:lightspeed_cloud_api_key]
@@ -151,6 +205,12 @@ class OrganizationsController < ApplicationController
     end
   end
 
+=begin
+  Name: destroy
+  Params: organization which whether desire destroyed
+  Explication: method used to delete organization of the databases
+  Return: redirect to root page  
+=end
   def destroy
     notify_administrators(organization_destroyed)
     @organization.destroy
@@ -159,6 +219,12 @@ class OrganizationsController < ApplicationController
 
   protected
 
+=begin
+  Name: prepare_new_organization
+  Params: none
+  Explication: method used to create a new user unless is present and create a new organization
+  Return: new user or "contact"   
+=end
   def prepare_new_organization
     unless current_user.present?
       @user = User.new
@@ -169,6 +235,12 @@ class OrganizationsController < ApplicationController
     @activeSection = "contact"
   end
 
+=begin
+  Name: allowed_attributes
+  Params: all parameters about organizational: organization, name, website, wants to be shown, organization type, organization type and locations attributes.
+  Explication: method used to allow to update organization attributes case be desired
+  Return: updated organization attributes  
+=end
   def allowed_attributes
     updates = {
       name: params[:organization][:name],
@@ -184,6 +256,12 @@ class OrganizationsController < ApplicationController
     updates
   end
 
+=begin
+  Name: set_parameter
+  Params: token for bike's attributes and organization's id 
+  Explication: method used to verify if the organization has auto user or not. And also set some parameters. 
+  Return: redirect_to root or @bikeParam or @organization.id   
+=end
   def set_parameter
     unless @organization.auto_user.present?
       flash[:error] = "We're sorry, that organization doesn't have a user set up to register bikes through. Email contact@bikeindex.org if this seems like an error."
@@ -197,6 +275,12 @@ class OrganizationsController < ApplicationController
     end
   end
 
+=begin
+  Name: find_organization
+  Params: organization's id
+  Explication: method used to search a specific organization in database.
+  Return: @organization or nothing  
+=end
   def find_organization
     if params[:id].match(/\A\d*\z/).present?
       @organization = Organization.find(params[:id])
@@ -209,6 +293,12 @@ class OrganizationsController < ApplicationController
     end
   end
 
+=begin
+  Name: require_membership
+  Params: receive the organization which will be verified
+  Explication: method used to verify if the user is member of organization otherwise redirect to user home
+  Return: true or nothing  
+=end
   def require_membership
     if current_user.is_member_of?(@organization)
       true
@@ -218,13 +308,25 @@ class OrganizationsController < ApplicationController
     end
   end
 
+=begin
+  Name: require_admin
+  Params: receive the organization which will be verified
+  Explication: method used to verify if current user is the organization administrator 
+  Return: redirect_to user_home or nothing   
+=end
   def require_admin
     unless current_user.is_admin_of?(@organization)
       flash[:error] = "You gotta be an organization administrator to do that!"
       redirect_to user_home_url and return
     end
   end
-  
+
+=begin
+  Name: notify_administrators
+  Params: receive the organization's id which will be verified and your type
+  Explication: method used to assign notification fields to user in the website
+  Return: field feedback in question or nothing to do or error message: "Couldn't notify admins"   
+=end  
   def notify_administrators(type)
     feedback = Feedback.new(email: current_user.email,
       feedback_hash: { organization_id: @organization.id })
