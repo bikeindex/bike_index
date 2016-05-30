@@ -31,7 +31,9 @@ wheel_sizes = [
   { name: '26 x 1.25, x 1.375', iso_bsd: 599, priority: 4, description: '26 x 1.25, x 1.375 (Rare)' },
   { name: '700 C', iso_bsd: 622, priority: 1, description: '700 C, 29in mountain bikes (Standard size)' },
   { name: '27in', iso_bsd: 630, priority: 1, description: '27in (Standard size)' },
-  { name: '28 x 1 1/2, 700 B', iso_bsd: 635, priority: 4, description: '28 x 1 1/2, 700 B (Rare)' }
+  { name: '28 x 1 1/2, 700 B', iso_bsd: 635, priority: 4, description: '28 x 1 1/2, 700 B (Rare)' },
+  { name: '32in', iso_bsd: 686, priority: 4, description: '32in, Unicycle size (Rare)' }
+  { name: '36in', iso_bsd: 787, priority: 4, description: '36in, Unicycle size (Rare)' }
 ]
 wheel_sizes.each do |wheel_size|
   wheel_size = WheelSize.create!(name: wheel_size[:name], priority: wheel_size[:priority], description: wheel_size[:description], iso_bsd: wheel_size[:iso_bsd])
