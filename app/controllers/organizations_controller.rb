@@ -55,7 +55,9 @@ class OrganizationsController < ApplicationController
     )
     if @organization.save
       membership = Membership.create(user_id: user.id, role: 'admin', organization_id: @organization.id)
+      # method assert used to debug, checking if the condition is always true for the program to continue running.
       assert_object_is_not_null(@organization)
+      # method assert used to debug, checking if the condition is always true for the program to continue running.
       assert_message(@organization.kind_of?(Organization))
       @organization.update_attribute :auto_user_id, user.id
       notify_administrators('organization_created')
@@ -78,8 +80,10 @@ class OrganizationsController < ApplicationController
 =end  
   def edit
     @bikes = Bike.where(creation_organization_id: @organization.id).order("created_at desc")
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@bikes)
     @organization = @organization.decorate
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@organization)
     return @organization
   end
@@ -97,7 +101,9 @@ class OrganizationsController < ApplicationController
     bikes = bikes.page(page).per(perPage)
     @bikes = bikes.decorate
     @organization = @organization.decorate
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@bikes)
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@organization)
     return @organization
   end
@@ -110,6 +116,7 @@ class OrganizationsController < ApplicationController
 =end
   def embed
     @bike = BikeCreator.new(@bikeParam).new_bike
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@bike)
     @bike.owner_email = params[:email] if params[:email].present?
     if params[:nonStolen]
@@ -142,6 +149,7 @@ class OrganizationsController < ApplicationController
 =end
   def embed_extended
     @bike = BikeCreator.new(@bikeParam).new_bike
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@bike)
     @bike.owner_email = 'info@lumberyardmtb.com' if @organization.slug == 'lumberyard'
     if params[:email].present?
@@ -165,6 +173,7 @@ class OrganizationsController < ApplicationController
 =end
   def embed_create_success
     @bike = Bike.find(params[:bike_id]).decorate
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@bike)
     render layout: 'embed_layout'
   end
@@ -230,7 +239,9 @@ class OrganizationsController < ApplicationController
       @user = User.new
     end
     @organization = Organization.new
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@organization)
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_message(@organization.kind_of?(Organization))
     @activeSection = "contact"
   end

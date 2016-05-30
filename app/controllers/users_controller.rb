@@ -19,7 +19,9 @@ class UsersController < ApplicationController
 =end  
   def new
     @user = User.new
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@user)
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_message(@user.kind_of?(User))
     if current_user.present?
       flash[:notice] = "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
@@ -42,7 +44,9 @@ class UsersController < ApplicationController
 =end
   def create
     @user = User.new(params[:user])
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@user)
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_message(@user.kind_of?(User))
     if @user.save
       CreateUserJobs.new(user: @user).do_jobs
@@ -61,6 +65,7 @@ class UsersController < ApplicationController
   def confirm
     begin
       @user = User.find(params[:id])
+      # method assert used to debug, checking if the condition is always true for the program to continue running.
       assert_object_is_not_null(@user)
       if @user.confirmed?
         redirect_to new_session_url, notice: "Your user account is already confirmed. Please log in"
@@ -93,7 +98,9 @@ class UsersController < ApplicationController
 =end
   def update_password
     @user = current_user
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@user)
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_message(@user.kind_of?(User))
     return @user
   end
@@ -107,7 +114,9 @@ class UsersController < ApplicationController
   def password_reset
     if params[:token].present?
       @user = User.find_by_password_reset_token(params[:token])
+      # method assert used to debug, checking if the condition is always true for the program to continue running.
       assert_object_is_not_null(@user)
+      # method assert used to debug, checking if the condition is always true for the program to continue running.
       assert_message(@user.kind_of?(User))
       if @user.present?
         session[:return_to] = 'password_reset'
@@ -142,6 +151,7 @@ class UsersController < ApplicationController
     end
     @owner = user
     @user = user.decorate
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@user)
     if user == current_user
       # Render the site
@@ -162,7 +172,9 @@ class UsersController < ApplicationController
 =end
   def edit
     @user = current_user
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@user)
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_message(@user.kind_of?(current_user))
     return @user
   end
@@ -175,7 +187,9 @@ class UsersController < ApplicationController
 =end
   def update
     @user = current_user
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@user)
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_message(@user.kind_of?(current_user))
     if params[:user][:password_reset_token].present?
       if @user.password_reset_token != params[:user][:password_reset_token]
@@ -250,7 +264,9 @@ class UsersController < ApplicationController
   def accept_terms
     if current_user.present?
       @user = current_user
+      # method assert used to debug, checking if the condition is always true for the program to continue running.
       assert_object_is_not_null(@user)
+      # method assert used to debug, checking if the condition is always true for the program to continue running.
       assert_message(@user.kind_of?(current_user))
       return @user
     else
@@ -267,7 +283,9 @@ class UsersController < ApplicationController
   def accept_vendor_terms
     if current_user.present?
       @user = current_user
+      # method assert used to debug, checking if the condition is always true for the program to continue running.
       assert_object_is_not_null(@user)
+      # method assert used to debug, checking if the condition is always true for the program to continue running.
       assert_message(@user.kind_of?(current_user))
       return @user
     else

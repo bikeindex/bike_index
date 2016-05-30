@@ -63,6 +63,7 @@ class WelcomeController < ApplicationController
 =end
   def choose_registration
     @user = User.new unless current_user.present?
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@user)
     return @user
   end

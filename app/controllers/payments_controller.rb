@@ -36,8 +36,10 @@ class PaymentsController < ApplicationController
 =end
   def create
     @amount = params[:stripe_amount]
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@amount)
     @subscription = params[:stripe_subscription]
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@subscription) 
     if params[:stripe_subscription].present?
       user = current_user || User.fuzzy_email_find(params[:stripe_email])

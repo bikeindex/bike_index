@@ -21,7 +21,9 @@ class OrganizationInvitationsController < ApplicationController
 =end  
   def new
     @organizationInvitation = OrganizationInvitation.new
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@organizationInvitation)
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_message(@organizationInvitation.kind_of?(OrganizationInvitation))
     return @organizationInvitation
   end
@@ -34,7 +36,9 @@ class OrganizationInvitationsController < ApplicationController
 =end
   def create
     @organization = current_organization
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@organization)
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_message(@organization.kind_of?(current_organization))
     if @organization.available_invitation_count > 0
       @organizationInvitation = OrganizationInvitation.new(invitee_email: 
@@ -60,6 +64,7 @@ class OrganizationInvitationsController < ApplicationController
 =end
   def find_organization
     @organization = Organization.find_by_slug(params[:organization_id])
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@organization)
     return @organization
   end

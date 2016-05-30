@@ -37,6 +37,7 @@ class SessionsController < ApplicationController
 =end
   def create
     @user = User.fuzzy_email_find(params[:session][:email])
+    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@user)
     if @user.present?
       if @user.confirmed?
