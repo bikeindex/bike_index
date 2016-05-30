@@ -1,13 +1,24 @@
 # This file initializes scripts for the application
 class window.BikeIndex
-  pageLoad: ->
+  loadFancySelects: ->
+    $('.unfancy.fancy-select select').selectize
+      create: false
+      plugins: ['restore_on_backspace']
+    $('.unfancy.fancy-select-placeholder select').selectize # When empty options are allowed
+      create: false
+      plugins: ['restore_on_backspace', 'selectable_placeholder']
+    # Remove them so we don't initialize twice
+    $('.unfancy.fancy-select, .unfancy.fancy-select-placeholder').removeClass('unfancy')
+
+class BikeIndex.Init extends BikeIndex
+  constructor: ->
     new BikeIndex.NavHeader
     @loadFancySelects()
     @initializeNoTabLinks()
     window.BikeIndexAlerts = new BikeIndex.Alerts
     # Put this last, so if it fails, we still have some functionality
     @loadPageScript(document.getElementsByTagName('body')[0].id)
-    
+
 
   loadPageScript: (body_id) ->
     # All the per-page javascripts
@@ -25,18 +36,8 @@ class window.BikeIndex
       users_edit: BikeIndex.UsersEdit
       welcome_user_home: BikeIndex.UserHome
       welcome_choose_registration: BikeIndex.ChooseRegistration
-
+      stolen_index: BikeIndex.LegacyStolenIndex
     window.pageScript = new pageClasses[body_id] if Object.keys(pageClasses).includes(body_id)
-
-  loadFancySelects: ->
-    $('.unfancy.fancy-select select').selectize
-      create: false
-      plugins: ['restore_on_backspace']
-    $('.unfancy.fancy-select-placeholder select').selectize # When empty options are allowed
-      create: false
-      plugins: ['restore_on_backspace', 'selectable_placeholder']
-    # Remove them so we don't initialize twice
-    $('.unfancy.fancy-select, .unfancy.fancy-select-placeholder').removeClass('unfancy')
 
   initializeNoTabLinks: ->
     # So in forms we can provide help without breaking tab index
@@ -48,6 +49,7 @@ class window.BikeIndex
         window.location = local
       else
         window.open(local, '_blank')
+
 
   # We need to call this because of Flexbox
   # Edge is fine, but all versions of IE are broken, and we should tell peeps
@@ -65,5 +67,4 @@ window.updateSearchBikesHeaderLink = ->
 
 $(document).ready ->
   window.updateSearchBikesHeaderLink()
-  window.BikeIndexInit = new window.BikeIndex
-  window.BikeIndexInit.pageLoad()
+  new BikeIndex.Init

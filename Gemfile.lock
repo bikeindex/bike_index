@@ -134,6 +134,7 @@ GEM
       railties (>= 3.0.0)
     faraday (0.9.0)
       multipart-post (>= 1.2, < 3)
+    fast_blank (1.0.0)
     fast_stack (0.1.0)
       rake
       rake-compiler
@@ -524,6 +525,7 @@ DEPENDENCIES
   draper
   eventmachine (~> 1.0.3)
   factory_girl_rails (~> 4.2.1)
+  fast_blank (~> 1.0)
   flamegraph
   fog
   foreman

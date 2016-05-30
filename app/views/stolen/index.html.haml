@@ -88,20 +88,20 @@
           #binx_stolen_widget{ data: { location: 'ip', height: '350px' } }
           <script src="https://binx-widget.herokuapp.com/include.js"></script>
                 
-    %section
-      .container
-        = render '/stolen/stickers'
+    / %section
+    /   .container
+    /     = render '/stolen/stickers'
 
     %section
-      .container
-        %h3
-          #{link_to "Donation is also always appreciated", support_the_index_path}
-        %p
-          If stickers aren't your thing, a 
-          %strong
-            donation is also always appreciated.
-          Every single penny you donate goes towards recovering more bikes.
-        .padded
+      / .container
+      /   %h3
+      /     #{link_to "Donation is also always appreciated", support_the_index_path}
+      /   %p
+      /     If stickers aren't your thing, a 
+      /     %strong
+      /       donation is also always appreciated.
+      /     Every single penny you donate goes towards recovering more bikes.
+      /   .padded
     .container
 
       .alert.alert-info.stolen-bike-merge-alert
