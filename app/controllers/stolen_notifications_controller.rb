@@ -7,6 +7,8 @@
 =end
 
 class StolenNotificationsController < ApplicationController
+
+  # The passed filters will be appended to the filter_chain and will execute before the action on this controller is performed
   before_filter :authenticate_user
 
 =begin

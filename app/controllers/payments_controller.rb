@@ -40,7 +40,8 @@ class PaymentsController < ApplicationController
     assert_object_is_not_null(@amount)
     @subscription = params[:stripe_subscription]
     # method assert used to debug, checking if the condition is always true for the program to continue running.
-    assert_object_is_not_null(@subscription) 
+    assert_object_is_not_null(@subscription)
+    # Policies for user registration and thus verify possible forms of payment. 
     if params[:stripe_subscription].present?
       user = current_user || User.fuzzy_email_find(params[:stripe_email])
       email = params[:stripe_email].strip.downcase
@@ -74,6 +75,7 @@ class PaymentsController < ApplicationController
       charge = customer.subscriptions.create(plan: params[:stripe_plan])
       charge_time = charge.current_period_start
     else
+      # create the categories to attributes in stripe
       charge = Stripe::Charge.create(
         customer:     @customer_id,
         amount:       @amount,
@@ -82,6 +84,7 @@ class PaymentsController < ApplicationController
       )
       charge_time = charge.created
     end
+    # Create a new payment with its attributes
     payment = Payment.new(
       user_id: (user.id if user.present?),
       email: email,
@@ -89,14 +92,18 @@ class PaymentsController < ApplicationController
       stripe_id: charge.id,
       first_payment_date: Time.at(charge_time).utc.to_datetime,
       amount: @amount)
-    payment.is_recurring = true if @subscription
-    unless payment.save
-      raise StandardError, "Unable to create a payment. #{payment.to_yaml}"
+    payment.is_recurring = true 
+    if @subscription
+      unless payment.save
+        raise StandardError, "Unable to create a payment. #{payment.to_yaml}"
+    else
+      # nothing to do    
     end
     render layout: revised_layout_if_enabled
-  rescue Stripe::CardError => e
-    flash[:error] = e.message
-    redirect_to new_payment_path and return
+    # exception handling to check the error, if any, and display on the screen the message
+    rescue Stripe::CardError => e
+      flash[:error] = e.message
+      redirect_to new_payment_path and return
   end
 
 end

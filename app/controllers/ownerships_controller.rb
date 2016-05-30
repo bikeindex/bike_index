@@ -7,6 +7,8 @@
 =end
 
 class OwnershipsController < ApplicationController
+
+  # The passed filters will be appended to the filter_chain and will execute before the action on this controller is performed
   before_filter :find_ownership
   before_filter -> { authenticate_user(no_user_flash_msg) }
 
@@ -17,6 +19,7 @@ class OwnershipsController < ApplicationController
   Return: redirect to edit bike or redirect to bike url   
 =end
   def show
+    # Create a method with the objective of showing the bicycles which were not identified the owner.
     bike = Bike.unscoped.find(@ownership.bike_id)
     if @ownership.can_be_claimed_by(current_user)
       if @ownership.current
@@ -40,6 +43,7 @@ class OwnershipsController < ApplicationController
   Return: 4 types possible messages: "#{@ownership.bike.type}" or "The owner of this #{type} already has an account on the Bike Index. Sign in to claim it!" or "Create an account to claim that #{type}! Use the email you used when registering it and you will be able to claim it after signing up!" or "Sorry, unable to find that bike".   
 =end
   def no_user_flash_msg
+    # Condition to see if the owner and their respective bike are present.
     if @ownership && @ownership.bike.present?
       type = "#{@ownership.bike.type}"
       if @ownership.user.present?

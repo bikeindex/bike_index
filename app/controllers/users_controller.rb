@@ -7,7 +7,11 @@
 =end
 
 class UsersController < ApplicationController
+  
+  # Include methods presents in sessionable helper 
   include Sessionable
+
+  # The passed filters will be appended to the filter_chain and will execute before the action on this controller is performed
   before_filter :authenticate_user, only: [:edit]
   before_filter :set_return_to, only: [:new]
 
@@ -23,6 +27,7 @@ class UsersController < ApplicationController
     assert_object_is_not_null(@user)
     # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_message(@user.kind_of?(User))
+    # Condition that verify if user is logged
     if current_user.present?
       flash[:notice] = "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
       redirect_to user_home_url and return
@@ -50,7 +55,11 @@ class UsersController < ApplicationController
     assert_message(@user.kind_of?(User))
     if @user.save
       CreateUserJobs.new(user: @user).do_jobs
-      sign_in_and_redirect if @user.confirmed
+      if @user.confirmed
+        sign_in_and_redirect
+      else
+        #nothing to do    
+      end    
     else
       render action: :new
     end
@@ -67,6 +76,7 @@ class UsersController < ApplicationController
       @user = User.find(params[:id])
       # method assert used to debug, checking if the condition is always true for the program to continue running.
       assert_object_is_not_null(@user)
+      # Conditional used to verify if user account is already confirmed
       if @user.confirmed?
         redirect_to new_session_url, notice: "Your user account is already confirmed. Please log in"
       else
@@ -76,6 +86,7 @@ class UsersController < ApplicationController
           render :confirm_error_bad_token
         end
       end
+    # exception handling to check the error, if any, and display on the screen the message   
     rescue ActiveRecord::RecordNotFound
       render :confirm_error_404
     end
@@ -112,12 +123,14 @@ class UsersController < ApplicationController
   Return: sign in or render action request password reset or user reset datas
 =end
   def password_reset
+    # Conditional that verify if user is logged, with goal of password reset.
     if params[:token].present?
       @user = User.find_by_password_reset_token(params[:token])
       # method assert used to debug, checking if the condition is always true for the program to continue running.
       assert_object_is_not_null(@user)
       # method assert used to debug, checking if the condition is always true for the program to continue running.
       assert_message(@user.kind_of?(User))
+      # Conditional that verify if user is logged
       if @user.present?
         session[:return_to] = 'password_reset'
         sign_in_and_redirect
@@ -125,6 +138,7 @@ class UsersController < ApplicationController
         flash[:error] = "We're sorry, but that link is no longer valid."
         render action: :request_password_reset
       end
+    # Conditional used to verify if email there is in system  
     if params[:email].present?
       @user = User.fuzzy_email_find(params[:email])
       if @user.present?
@@ -147,6 +161,7 @@ class UsersController < ApplicationController
   def show
     user = User.find_by_username(params[:id])
     unless user 
+      #  If user isn't found, raise exception. 
       raise ActionController::RoutingError.new('Not Found')
     end
     @owner = user
@@ -156,6 +171,7 @@ class UsersController < ApplicationController
     if user == current_user
       # Render the site
     else
+      # Conditional that verify if user's bike is visible (public) or private
       unless @user.show_bikes
         redirect_to user_home_url, notice: "Sorry, that user isn't sharing their bikes" and return
       end
@@ -191,6 +207,7 @@ class UsersController < ApplicationController
     assert_object_is_not_null(@user)
     # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_message(@user.kind_of?(current_user))
+    # Conditional that verify if user there have password
     if params[:user][:password_reset_token].present?
       if @user.password_reset_token != params[:user][:password_reset_token]
         @user.errors.add(:base, "Doesn't match user's password reset token")
@@ -202,9 +219,11 @@ class UsersController < ApplicationController
       else
         #nothing to do
       end
+      # Conditional that verify if user there have password
       if params[:user][:password].present?
+        # Condition that verify if old password match with current password
         unless @user.authenticate(params[:user][:current_password])
-        @user.errors.add(:base, "Current password doesn't match, it's required for updating your password")
+          @user.errors.add(:base, "Current password doesn't match, it's required for updating your password")
         end
       else
         #nothing to do
@@ -214,17 +233,20 @@ class UsersController < ApplicationController
     end
     if !@user.errors.any? && @user.update_attributes(params[:user].except(:email, :password_reset_token))
       AfterUserChangeWorker.perform_asynchronous(@user.id)
+      #Conditional that verify if user already accept the Terms of Service
       if params[:user][:terms_of_service].present?
         if params[:user][:terms_of_service] == '1'
           @user.terms_of_service = true
           @user.save
           redirect_to user_home_url, notice: "Thanks! Now you can use the Bike Index" and return
         else
+          # redirect to page accept vendor terms, case user desire use Bike Index
           redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index" and return
         end
       else
         #nothing to do
-      end  
+      end
+      #Conditional that verify if user already accept the vendor Terms of Service  
       if params[:user][:vendor_terms_of_service].present? 
         if params[:user][:vendor_terms_of_service] == '1'
           @user.accept_vendor_terms_of_service
@@ -237,17 +259,21 @@ class UsersController < ApplicationController
           # TODO: Redirect to the correct page, somehow this breaks things right now though.
           # redirect_to organization_home and return
         else
+          # redirect to page accept vendor terms, case organization desire use Bike Index
           redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index as through the organization" and return
         end
       else
         #nothing to do  
       end
+      # Conditional that verify if user has a password
       if params[:user][:password].present?
+        #update user datas
         @user.generate_auth_token
         @user.set_password_reset_token
         @user.reload
         default_session_set
       else
+        # redirect to user account with information updated
         redirect_to my_account_url, notice: 'Your information was successfully updated.' and return
       end
     else
@@ -281,6 +307,7 @@ class UsersController < ApplicationController
   Return: @user or redirect to vendor terms page 
 =end
   def accept_vendor_terms
+    # Conditional that verify if user is logged
     if current_user.present?
       @user = current_user
       # method assert used to debug, checking if the condition is always true for the program to continue running.
@@ -289,6 +316,7 @@ class UsersController < ApplicationController
       assert_message(@user.kind_of?(current_user))
       return @user
     else
+      # redirect to page accept vendor terms, case desire use Bike Index 
       redirect_to vendor_terms_url
     end
   end

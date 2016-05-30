@@ -7,7 +7,10 @@
 =end
 
 class SessionsController < ApplicationController
+  
   include Sessionable
+
+  # The passed filters will be appended to the filter_chain and will execute before the action on this controller is performed
   before_filter :set_return_to, only: [:new]
 
 =begin
@@ -17,6 +20,7 @@ class SessionsController < ApplicationController
   Return: redirect to user home or render new revised or nothing
 =end
   def new
+    #Conditional to verify if user is logged
     if current_user.present?
       redirect_to user_home_url, notice: "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
     else
@@ -39,6 +43,7 @@ class SessionsController < ApplicationController
     @user = User.fuzzy_email_find(params[:session][:email])
     # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@user)
+    #Conditional to verify if user is logged
     if @user.present?
       if @user.confirmed?
         if @user.authenticate(params[:session][:password])
@@ -72,6 +77,7 @@ class SessionsController < ApplicationController
   Return: redirect to new user or nothing  
 =end
   def destroy
+    # method used to destroy session, so user is logged out
     remove_session
     if params[:redirect_location].present?
       if params[:redirect_location].match('new_user')

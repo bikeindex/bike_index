@@ -7,6 +7,8 @@
 =end
 
 class OrganizationInvitationsController < ApplicationController
+
+  # The passed filters will be appended to the filter_chain and will execute before the action on this controller is performed
   before_filter :authenticate_user
   before_filter :find_organization
   before_filter :require_admin
@@ -40,6 +42,7 @@ class OrganizationInvitationsController < ApplicationController
     assert_object_is_not_null(@organization)
     # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_message(@organization.kind_of?(current_organization))
+    # condition to check the amount of invited organizations
     if @organization.available_invitation_count > 0
       @organizationInvitation = OrganizationInvitation.new(invitee_email: 
       params[:organizationInvitation][:invitee_email], invitee_name:
@@ -76,6 +79,7 @@ class OrganizationInvitationsController < ApplicationController
   Return: nothing 
 =end
   def require_admin
+    #Condition that checks whether the user is the organization administrator
     unless current_user.is_admin_of?(@organization)
       flash[:error] = "You gotta be an organization administrator to do that!"
       redirect_to user_home_url and return

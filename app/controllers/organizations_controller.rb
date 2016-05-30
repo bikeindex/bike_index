@@ -7,6 +7,8 @@
 =end
 
 class OrganizationsController < ApplicationController
+
+  # The passed filters will be appended to the filter_chain and will execute before the action on this controller is performed
   before_filter :authenticate_user, only: [:show, :edit, :update, :destroy]
   before_filter :find_organization, except: [:new, :lightspeed_integration, :create]
   before_filter :require_membership, only: [:show, :edit, :update, :destroy]
@@ -22,6 +24,7 @@ class OrganizationsController < ApplicationController
   Return: render layout 'content'  
 =end
   def new
+    # Create a new session for the organization if the user is not present
     session[:return_to] ||= new_organization_url unless current_user.present?
     prepare_new_organization
     render layout: 'content'
@@ -34,6 +37,7 @@ class OrganizationsController < ApplicationController
   Return: render layout: 'content'  
 =end
   def lightspeed_integration
+    # Integra things present in the organization if the user is not present
     session[:return_to] = lightspeed_integration_url unless current_user.present?
     @stuff = session[:return_to]
     prepare_new_organization
@@ -48,6 +52,7 @@ class OrganizationsController < ApplicationController
 =end
   def create
     user = current_user
+    # Create a new organization with the desired parameters
     @organization = Organization.new(
       name: params[:organization][:name].strip,
       website: params[:organization][:website],
@@ -60,6 +65,7 @@ class OrganizationsController < ApplicationController
       # method assert used to debug, checking if the condition is always true for the program to continue running.
       assert_message(@organization.kind_of?(Organization))
       @organization.update_attribute :auto_user_id, user.id
+      # an administrator notification is issued that the organization has been successfully created, in order of creation.
       notify_administrators('organization_created')
       flash[:notice] = "Organization Created successfully!"
       if current_user.present?
@@ -98,6 +104,7 @@ class OrganizationsController < ApplicationController
     bikes = Bike.where(creation_organization_id: @organization.id).order("created_at desc")
     page = params[:page] || 1
     perPage = params[:perPage] || 25
+    # method to set the display format of bicycles on page
     bikes = bikes.page(page).per(perPage)
     @bikes = bikes.decorate
     @organization = @organization.decorate
@@ -118,27 +125,32 @@ class OrganizationsController < ApplicationController
     @bike = BikeCreator.new(@bikeParam).new_bike
     # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@bike)
-    @bike.owner_email = params[:email] if params[:email].present?
-    if params[:nonStolen]
-      @nonStolen = true 
+    # associate the bike owner with your email
+    @bike.owner_email = params[:email] 
+    if params[:email].present?
+      if params[:nonStolen]
+        @nonStolen = true 
+      else
+        #nothing to do
+      end      
+      if params[:stolenFirst]
+        @stolenFirst = true
+      else
+        #nothing to do
+      end    
+      if params[:stolen]
+        @stolen = true 
+      else
+        #nothing to do
+      end
+      if params[:bike_safe].present?
+        render action: :embed_bike_safe, layout: 'embed_layout'
+      else
+        render layout: 'embed_layout'
+      end
     else
-      #nothing to do
-    end      
-    if params[:stolenFirst]
-      @stolenFirst = true
-    else
-      #nothing to do
+      # nothing to do
     end    
-    if params[:stolen]
-      @stolen = true 
-    else
-      #nothing to do
-    end
-    if params[:bike_safe].present?
-      render action: :embed_bike_safe, layout: 'embed_layout'
-    else
-      render layout: 'embed_layout'
-    end
   end
 
 =begin
@@ -151,18 +163,23 @@ class OrganizationsController < ApplicationController
     @bike = BikeCreator.new(@bikeParam).new_bike
     # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@bike)
-    @bike.owner_email = 'info@lumberyardmtb.com' if @organization.slug == 'lumberyard'
-    if params[:email].present?
-      @bike.owner_email = params[:email] 
-      @persistEmail = true
+    # associate the bike owner with your email
+    @bike.owner_email = 'info@lumberyardmtb.com'
+    if @organization.slug == 'lumberyard'
+      if params[:email].present?
+        @bike.owner_email = params[:email] 
+        @persistEmail = true
+      else
+        #nothing to do
+      end
+      if params[:bike_safe].present?
+        render action: :embed_bike_safe, layout: 'embed_layout'
+      else
+        render layout: 'embed_layout'
+      end
     else
-      #nothing to do
-    end
-    if params[:bike_safe].present?
-      render action: :embed_bike_safe, layout: 'embed_layout'
-    else
-      render layout: 'embed_layout'
-    end
+      # nothing to do
+    end  
   end
 
 =begin
@@ -185,6 +202,7 @@ class OrganizationsController < ApplicationController
   Return: nothing or notify administrators('wants_shown') or redirect to edit organization or render action: edit   
 =end
   def update
+    # Verifies if the API is in the project
     if params[:organization][:lightspeed_cloud_api_key].present?
       api_key = params[:organization][:lightspeed_cloud_api_key]
       EmailLightspeedNotificationWorker.perform_asynchronous(@organization.id, api_key)
@@ -221,6 +239,7 @@ class OrganizationsController < ApplicationController
   Return: redirect to root page  
 =end
   def destroy
+    # Displaying a message that the organization has been deleted and then redirects to the main page
     notify_administrators(organization_destroyed)
     @organization.destroy
     redirect_to root_url
@@ -253,6 +272,7 @@ class OrganizationsController < ApplicationController
   Return: updated organization attributes  
 =end
   def allowed_attributes
+    # Attributes that an organization contains
     updates = {
       name: params[:organization][:name],
       website: params[:organization][:website],
@@ -274,6 +294,7 @@ class OrganizationsController < ApplicationController
   Return: redirect_to root or @bikeParam or @organization.id   
 =end
   def set_parameter
+    # If the organization does not have a user, displays the error message and redirect to the main page.
     unless @organization.auto_user.present?
       flash[:error] = "We're sorry, that organization doesn't have a user set up to register bikes through. Email contact@bikeindex.org if this seems like an error."
       redirect_to root_url and return
@@ -298,6 +319,7 @@ class OrganizationsController < ApplicationController
     else
       @organization = Organization.find_by_slug(params[:id])
     end
+    # If the organization does isn't present, displays the error message and redirect to the main page.
     unless @organization.present?
       flash[:error] = "We're sorry, that organization isn't on Bike Index yet. Email contact@bikeindex.org if this seems like an error."
       redirect_to root_url and return
@@ -326,6 +348,7 @@ class OrganizationsController < ApplicationController
   Return: redirect_to user_home or nothing   
 =end
   def require_admin
+    # unless it has the same sense that if not
     unless current_user.is_admin_of?(@organization)
       flash[:error] = "You gotta be an organization administrator to do that!"
       redirect_to user_home_url and return
@@ -339,6 +362,7 @@ class OrganizationsController < ApplicationController
   Return: field feedback in question or nothing to do or error message: "Couldn't notify admins"   
 =end  
   def notify_administrators(type)
+    #Create an object so that the administrator can send notification messages to the user.
     feedback = Feedback.new(email: current_user.email,
       feedback_hash: { organization_id: @organization.id })
     if type == 'organization_created'

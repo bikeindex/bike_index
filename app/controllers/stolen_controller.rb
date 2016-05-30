@@ -7,6 +7,8 @@
 =end
 
 class StolenController < ApplicationController
+
+  # The passed filters will be appended to the filter_chain and will execute before the action on this controller is performed
   before_filter :remove_subdomain
   layout 'application_updated'
 

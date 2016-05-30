@@ -7,6 +7,8 @@
 =end
 
 class PublicImagesController < ApplicationController
+
+  # The passed filters will be appended to the filter_chain and will execute before the action on this controller is performed
   before_filter :find_image_if_owned, only: [:edit, :update, :destroy, :is_private]
 
 =begin
@@ -17,6 +19,7 @@ class PublicImagesController < ApplicationController
 =end
   def show
     publicImage = PublicImage.find(params[:id])
+    # method used to verify if ownership is present and to show information him
     if publicImage.present? && publicImage.imageable_type == 'Bike'
       @owner_viewing = true if publicImage.imageable.current_ownership.present? 
       && publicImage.imageable.owner == current_user
@@ -66,7 +69,7 @@ class PublicImagesController < ApplicationController
   end
 
 =begin
-  Name: edi
+  Name: edit
   Explication: empty method    
   Params: none
   Return: nothing
@@ -109,7 +112,9 @@ class PublicImagesController < ApplicationController
     @imageable = publicImage.imageable
     # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@imageable)
+    # method used to search a specific image and deleted
     imageable_id = publicImage.imageable_id
+    #Verified present in the type image 
     imageable_type = publicImage.imageable_type
     publicImage.destroy
     flash[:notice] = 'Image was successfully deleted'
@@ -134,12 +139,17 @@ class PublicImagesController < ApplicationController
   def order
     if params[:list_of_photos]
       last_image = params[:list_of_photos].count
+      # Loop to search id and index of the public image
       params[:list_of_photos].each_with_index do |id, index|
         image = PublicImage.unscoped.find(id)
-        image.update_attribute :listing_order, index+1 if current_user_image_owner(image)
-        next unless last_image == index && image.imageable_type == 'Bike'
-        Bike.unscoped.find(image.imageable_id).save
-      end
+        image.update_attribute :listing_order, index+1
+        if current_user_image_owner(image)
+          next unless last_image == index && image.imageable_type == 'Bike'
+                 Bike.unscoped.find(image.imageable_id).save
+               end
+        else
+          #nothing to do  
+        end
     else
       #nothing to do  
     end
@@ -155,6 +165,7 @@ class PublicImagesController < ApplicationController
   Return: bike or nothing or current user
 =end
   def current_user_image_owner(publicImage)
+    #Conditional to assign the current user the bike's image
     if publicImage.imageable_type == 'Bike'
       Bike.unscoped.find(publicImage.imageable_id).owner == current_user
     else
@@ -174,6 +185,7 @@ class PublicImagesController < ApplicationController
 =end
   def find_image_if_owned
     publicImage = PublicImage.unscoped.find(params[:id])
+    #Conditional to verify if the user is ownership bike because just owner can edit bike public image
     if current_user_image_owner(publicImage)
       flash[:error] = "Sorry! You don't have permission to edit that image."
       redirect_to publicImage.imageable and return

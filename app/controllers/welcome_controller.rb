@@ -35,7 +35,12 @@ class WelcomeController < ApplicationController
   Return: logout or null
 =end
   def goodbye
-    redirect_to logout_url if current_user.present?
+    # Verify if user is logged and logout user
+    if current_user.present?
+      redirect_to logout_url
+    else
+      # nothing to do
+    end      
   end
 
 =begin
@@ -45,6 +50,7 @@ class WelcomeController < ApplicationController
   Return: action user_home or new_user_url
 =end
   def user_home
+    #verified if user is logged and do decorator with bikes and collections
     if current_user.present?
       bikes = current_user.bikes
       @bikes = BikeDecorator.decorate_collection(bikes)
