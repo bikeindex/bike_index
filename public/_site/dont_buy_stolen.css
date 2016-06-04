@@ -51,10 +51,10 @@ html, body {
   font-size: 38pt;
   color: white;
   text-align: left;
-  max-height: 100px; }
+  max-height: 88px; }
   .section-header p {
     font-family: 'KlinicSlab';
-    margin: 10px 30px 10px; }
+    margin: 8px 30px 8px; }
 
 .section-footer {
   background: #3C97D3;
@@ -73,13 +73,19 @@ html, body {
   text-align: left; }
   .section-middle h3 {
     font-weight: bold;
+    font-size: 16pt;
     letter-spacing: 1px; }
   .section-middle li {
     list-style-type: none; }
+    .section-middle li img {
+      margin-left: 50px; }
 
 .section-subtext {
-  font-size: 16pt;
-  text-align: left; }
+  font-size: 24pt;
+  text-align: left;
+  padding: 20px;
+  line-height: 35px;
+  letter-spacing: 1px; }
 
 .section-image {
   width: 120px;

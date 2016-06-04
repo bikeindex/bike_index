@@ -82,10 +82,10 @@ html, body {
   font-size: 38pt;
   color: white;
   text-align: left;
-  max-height: 100px;
+  max-height: 88px;
   p {
     font-family: 'KlinicSlab';
-    margin: 10px 30px 10px;
+    margin: 8px 30px 8px;
   }
 }
 
@@ -109,16 +109,23 @@ html, body {
   text-align: left;
   h3 {
     font-weight: bold;
+    font-size: 16pt;
     letter-spacing: 1px;
   }
   li {
     list-style-type: none;
+    img {
+      margin-left: 50px;
+    }
   }
 }
 
 .section-subtext {
-  font-size: 16pt;
+  font-size: 24pt;
   text-align: left;
+  padding: 20px;
+  line-height: 35px;
+  letter-spacing: 1px;
 }
 
 .section-image {

@@ -1,0 +1,86 @@
+---
+  - 
+    header: "Check the Ad"
+    header-subtext: "Here are several red flags to watch out for when looking at ads online:"
+    footer: "You should always check a bike’s details with the stolen bike reports at stolen.bikeindex.org."
+    image-captions: 
+      - 
+        image: "some-image.txt"
+        caption-header: "THE PRICE IS TOO GOOD TO BE TRUE."
+        subtext: "Stolen bikes are often wildly udnerpriced for a “quick sell.”"
+      - 
+        image: "some-image.txt"
+        caption-header: "STOCK PHOTOS ARE SUSPECT."
+        subtext: "Unless there is an actual photo of the bike for sale, beware."
+      - 
+        image: "some-image.txt"
+        caption-header: "SHORT ADS LACKING KEY INFO."
+        subtext: "Beware! Ads like “slick track bike $300” are suspicious and are usually written to avoid identification."
+    image-captions-2: 
+      - 
+        image: "some-image.txt"
+        caption-header: "OVERLY ANONYMOUS SELLERS."
+        subtext: "Sellers who *really* go out of their way to remain anonymous - no name, no email, no phone number - are suspect. Some anonymity is OK, but a total lack of ID is usually a red flag."
+      - 
+        image: "some-image.txt"
+        caption-header: "THE WORSE THE GRAMMAR AND SPELLING IN AN AD, THE MORE SUSPICIOUS YOU SHOULD BE."
+        subtext: "Ads with bad spelling and grammar usually mean it’s a dodgy seller."
+      - 
+        image: "some-image.txt"
+        caption-header: "IF THEY SELL A LOT OF BIKES, OR THEIR STORIES ARE CONTRIVED AND CONTRADICTORY, BEWARE."
+        subtext: "Sellers whose stories simply don’t add up should be avoided at all costs."
+  - 
+    header: "Check the Seller"
+    header-subtext: "It pays to do your homework on the seller, too. Here are some steps you can take to determine a seller’s legitimacy:"
+    footer: "You can report noncooperative or questionable sellers to badsellers@bikeindex.org. We crowdsource our reports to help people make better informed - and safer - online purchases"
+    image-captions: 
+      - 
+        image: "some-image.txt"
+        caption-header: "CHECK SELLER’S INFO."
+        subtext: "If you can’t find a name, number, email, or sales history on your seller, be wary. Again, excessive reluctance to provide you with info usually means a seller is hiding something."
+      - 
+        image: "some-image.txt"
+        caption-header: "LOTS OF BIKES FOR SALE?"
+        subtext: "Use common sense: if they sell lots of underpriced bikes from inside a storage unit or an alley, be extra cautious."
+      - 
+        image: "some-image.txt"
+        caption-header: "MEETING PLACE."
+        subtext: "For your own safety, be sure to schedule any real-life meetings near a local police department. At the very least, don’t go alone, and meet in a well lit and crowded public meeting place."
+  - 
+    header: "Check the Serial"
+    header-subtext: "Checking a bike’s serial number with BikeIndex.org is the single most important step you can take when examining a bike."
+    footer: "It only takes a few seconds to check a bike’s serial number at stolen.bikeindex.org - or by tweeting it to our Twitterbot @isitstolen"
+    image-captions: 
+      - 
+        image: "some-image.txt"
+        caption-header: "CHECK THE SERIAL NUMBER."
+        subtext: "To see if a serial has been reported stolen, enter it at stolen.bikeindex.org or tweet it to @isitstolen."
+      - 
+        image: "some-image.txt"
+        caption-header: "SELLER CAN’T OR WON’T GIVE SERIAL."
+        subtext: "If the seller refuses to give you the serial - or even let you look for one - walk away. Please also report them to badsellers@bikeindex.org"
+      - 
+        image: "some-image.txt"
+        caption-header: "A FILED-OFF OR HIDDEN SERIAL."
+        subtext: "If the serial number has been filed off or covered up, it’s probably a stolen bike. Please don’t buy it, and report it to badsellers@bikeindex.org"
+  - 
+    header: "Check the Bike"
+    header-subtext: "When examining the bike, be on the lookout for any of these red flags:"
+    footer: "REMEMBER: Thieves often misreport bike details in ads, and will mix and match seats, saddles, wheels, and grip tape to hide a stolen bike’s origin. Again, you can always report questionable sellers with suspect bikes to badsellers@bikeindex.org"
+    image-captions: 
+      - 
+        image: "some-image.txt"
+        caption-header: "BIKE DOESN’T MATCH AD"
+        subtext: "Thieves will try to “bait and switch” bikes - or misreport details like size and color - so look for differences from what was advertised."
+      - 
+        image: "some-image.txt"
+        caption-header: "SCRATCHES ON FRAME"
+        subtext: "Look for telltale scratches or dents where a lock was forced open or cut off."
+      - 
+        image: "some-image.txt"
+        caption-header: "MISMATCHED PARTS"
+        subtext: "Thieves often mix and match parts to avoid detection. If it feels like a “frankenbike,” beware."
+      - 
+        image: "some-image.txt"
+        caption-header: "MISMATCHED BIKE"
+        subtext: "Use your common sense: If the seller is clueless about the bike they are selling - or they are selling a bike that obviously doesn’t match their height or size - they’re likely selling a stolen bike."
