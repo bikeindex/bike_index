@@ -3,9 +3,9 @@
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
       = render partial: '/bikes/edit_primary_menu'
-      .col-md-8.form-well
+      .col-md-8.form-well#form_well_wrap
         .form-wrap
-          .edit-bike-form-header
+          .form-well-form-header
             %h3
               = @edit_templates[@edit_template]
           - if @bike.stolen and @bike.find_current_stolen_record.present?
@@ -14,9 +14,9 @@
             = f.fields_for :stolen_records do |srecord|
               - next unless srecord.object.current # Because they may have multiple stolen records
               .form-group.row.unnested-field
-                = f.label :date_stolen_input, "When was it #{stolen_type}", class: 'form-well-label'
+                = srecord.label :date_stolen_input, "When was it #{stolen_type}", class: 'form-well-label'
                 .form-well-input
-                  = f.text_field :date_stolen_input, required: true, class: 'form-control'
+                  = srecord.text_field :date_stolen_input, required: true, class: 'form-control date_stolen_input', value: srecord.object.formatted_date
 
               .form-group.row.unnested-field
                 = srecord.label :phone, class: 'form-well-label'
@@ -28,24 +28,7 @@
                 .form-well-input
                   = srecord.text_field :secondary_phone, class: 'form-control'
 
-              .related-fields.row
-                .form-group.fancy-select.unfancy
-                  %label.form-well-label
-                    Where was it stolen?
-                  .form-well-input
-                    = srecord.collection_select(:country_id, Country.all, :id, :name, required: true, prompt: 'Choose country')
-                .form-group
-                  %label.form-well-label
-                  .form-well-input
-                    = srecord.text_field :street, required: true, placeholder: 'Address or intersection', class: 'form-control'
-                .form-group
-                  %label.form-well-label
-                  .form-well-input
-                    = srecord.text_field :city, required: true, placeholder: 'City', class: 'form-control'
-                .form-group.fancy-select-placeholder.unfancy
-                  %label.form-well-label
-                  .form-well-input
-                    = srecord.collection_select(:state_id, State.all, :id, :name, include_blank: true, prompt: 'State')
+              = render partial: '/bikes/bike_fields/stolen_location', locals: { srecord: srecord, stolen_type: stolen_type }
 
               - unless @bike.recovered
                 .form-group.row.unnested-field.fancy-select-placeholder.unfancy
@@ -57,10 +40,10 @@
                   .form-well-input
                     = srecord.select(:lock_defeat_description, StolenRecord.locking_defeat_description_select, prompt: '')
 
-              .form-group.row.unnested-field.fancy-select-placeholder.unfancy
+              .form-group.row.unnested-field
                 - description_label = @bike.recovered ? "How did you recovered the #{@bike.type}" : 'Description of the incident'
                 = srecord.label :theft_description, description_label, class:  'form-well-label'
-                .form-well-input
+                .form-well-input-large
                   = srecord.text_area :theft_description, rows: 3, class: 'form-control'
 
               .form-group.row.unnested-field
@@ -87,17 +70,17 @@
                 .full-width-checkbox-help
                   e.g. if we tweet about or see someone searching for its serial number
           - else
-            .toggle-stolen.no-divider-row
+            .no-divider-row
               %a.btn.btn-danger.btn-lg{data: { toggle: 'modal', target: '#toggle-stolen' } }
                 This #{@bike.type} is stolen or missing!
 
         / if stolen, we also add an exterior block for marking not stolen
         - if @bike.stolen and @bike.find_current_stolen_record.present?
           .form-wrap.secondary-form-wrap
-            .edit-bike-form-header
+            .form-well-form-header
               %h3
                 Recovered
-            .toggle-stolen.no-divider-row
+            .no-divider-row.full-width-button
               %a.btn.btn-success.btn-lg{data: { toggle: 'modal', target: '#toggle-stolen' } }
                 This #{@bike.type} has been returned!
 
@@ -127,11 +110,12 @@
             %input#mark_recovered_can_share_recovery{ type: 'checkbox' }
             Can we share your story?
         .modal-btn-footer
-          .col-xs-6.col-xs-push-6
-            = submit_tag 'Mark recovered', class: 'btn btn-success'
-          .col-xs-6.col-xs-pull-6
-            %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
-              Nevermind
+          .row
+            .col-xs-6.col-xs-push-6
+              = submit_tag 'Mark recovered', class: 'btn btn-success'
+            .col-xs-6.col-xs-pull-6
+              %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
+                Nevermind
               
 
 - else
@@ -141,12 +125,13 @@
       %p
         Is your #{@bike.type} actually missing or stolen?
     .modal-btn-footer
-      .col-xs-6
-        %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
-          Nevermind
-      .col-xs-6
-        %button.btn.btn-danger#mark-stolen-btn{ type: 'button' }
-          Yes, it is!
+      .row
+        .col-xs-6
+          %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
+            Nevermind
+        .col-xs-6
+          %button.btn.btn-danger#mark-stolen-btn{ type: 'button' }
+            Yes, it is!
 
 / Only one modal if stolen, only one (different) modal if not stolen
 = render partial: '/shared/modal', locals: { title: modal_title, id: 'toggle-stolen', modal_body: modal_body }

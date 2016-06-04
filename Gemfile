@@ -9,6 +9,9 @@ gem 'bcrypt-ruby', '~> 3.0.0'
 gem 'active_model_serializers'
 gem 'aws-sdk', '~> 1.3.4'
 
+# Speed
+gem 'fast_blank', '~> 1.0'
+
 # Redis and redis dependents
 gem 'redis'
 gem 'sidekiq', '~> 4.1.1' # Background processing
@@ -68,7 +71,7 @@ gem 'secure_headers'
 
 # Frontend
 gem 'backbone-on-rails', '~>0.9.10.0' 
-gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'
+gem 'jquery-datatables-rails', '~>3.4.0'
 gem 'chartkick' # Display charts
 gem 'groupdate'
 gem 'bootstrap', '~> 4.0.0.alpha3' # Bootstrap 4 - used for revised stylesheets
@@ -83,17 +86,21 @@ gem 'rack-mini-profiler', require: false # If you can't see it you can't make it
 
 gem 'bundler', '>= 1.8.4' # required for rails-assets.org - JS and CSS assets
 source 'https://rails-assets.org' do # JS land is crazy, so lock everything
+  gem 'rails-assets-lodash', '~> 4.9.0'
   gem 'rails-assets-tether', '~> 1.1.0'
   gem 'rails-assets-mustache', '~> 2.2.1'
-  gem 'rails-assets-jquery.dirtyforms', '~> 2.0.0'
+  gem 'rails-assets-jquery.dirtyforms', '~> 2.0.0' # Alert on attempts to leave with dirt on forms
   gem 'rails-assets-selectize', '~> 0.12.1' # Manually configured scss
   gem 'rails-assets-headroom.js', '~> 0.7.0' # Would prefer 0.8 but it isn't on rails-assets yet
-  gem 'rails-assets-pikaday', '~> 1.4.0'
-  gem 'rails-assets-moment', '~> 2.12.0'
-  gem 'rails-assets-jquery-file-upload', '~> 9.12.1'
-  gem 'rails-assets-Stickyfill', '~> 1.1.3'
+  gem 'rails-assets-pikaday', '~> 1.4.0' # Datepicker
+  gem 'rails-assets-Stickyfill', '~> 1.1.3' # Affix bike edit menu
+  # Sortable breaks assets:precompile, so it's included manually
+  # gem 'rails-assets-jquery-sortable', '~> 0.9.12' # Sort photo order
 end
 
+group :production do
+  gem 'honeybadger', '~> 2.0'
+end
 
 group :assets do
   gem 'sass-rails',   '~> 3.2.6'
@@ -103,31 +110,25 @@ group :assets do
 end
 
 group :development do
-  # gem 'ruby_gntp' # For linux
   gem 'rerun'
-  gem 'growl'
   gem 'guard'
-  gem 'guard-rspec', '~> 4.2.10'
+  gem 'guard-rspec', '~> 4.6.4'
   gem 'guard-rubocop'
-  gem 'bullet'
-  gem 'should_clean'
-  gem 'brakeman', :require => false
 end
 
 group :development, :test do
   gem 'rb-fsevent', '~> 0.9.1'
-  gem 'rspec-rails'
+  gem 'rspec', '~> 3.3.0'
+  gem 'rspec-rails', '~> 3.3.0'
+  gem 'shoulda-matchers', '~> 2.8.0'
   gem 'foreman'
   gem 'database_cleaner'
-  gem 'json_spec'
   gem 'dotenv-rails'
 end
 
 group :test do
-  gem 'factory_girl_rails'
-  gem 'simplecov', require: false
+  gem 'factory_girl_rails', '~> 4.2.1'
   gem 'codeclimate-test-reporter', require: nil
-  gem 'rspec-sidekiq'
-  gem 'shoulda-matchers'
+  gem 'rspec-sidekiq', '~> 2.2.0'
   gem 'pry'
 end

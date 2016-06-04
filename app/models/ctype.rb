@@ -30,6 +30,10 @@ class Ctype < ActiveRecord::Base
   def self.other
     where(name: 'other', has_multiple: false, cgroup_id: Cgroup.additional_parts.id).first_or_create
   end
+
+  def self.unknown
+    where(name: 'unknown', has_multiple: false, cgroup_id: Cgroup.additional_parts.id).first_or_create
+  end
   
   def self.import(file)
     CSV.foreach(file.path, headers: true) do |row|

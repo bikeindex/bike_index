@@ -1,0 +1,125 @@
+#news_show {
+  .post-image {
+    max-width: 100%;
+    max-height: 75%;
+    display: block;
+    margin: 0 auto;
+  }
+
+  .post-image-bordered {
+    @extend .post-image;
+    @include box-shadow(0 0 1px rgba(black,.4));
+  }
+
+  .post-image-padded {
+    @extend .post-image;
+    padding: 20px 0;
+  }
+
+
+  .blog-pad {
+    clear: both;
+    display: block;
+    position: relative;
+    width: 100%;
+    padding: 30px 0 0; 
+  }
+
+  .blog-index .post-image { display: none; }
+
+  .blog-subhead {
+    font-weight: normal;
+    font-size: 22px;
+    margin-top: -.7em;
+    margin-bottom: 1.5em;
+  }
+
+  .padded-clear { 
+    padding-top: 30px;
+    clear: both;
+  }
+
+  .post-image-float-40 {
+    float:left;
+    max-width: 40%;
+    margin: 0 2% 1em 0;
+  }
+
+  .beside-float-40 {
+    float: left;
+    max-width: 58%;
+  }
+
+  .post-image-right-40 {
+    float: right;
+    max-width: 40%;
+    margin: 1em 0 0 1em;
+  }
+
+  .page-content {
+    blockquote {
+      background: $gray-lighter;
+      border-left: 10px solid #ccc;
+      margin: 1.5em 10px 0;
+      padding: 0.5em 10px;
+      quotes: "\201C""\201D""\2018""\2019";
+      &.beside-float-40 { margin: 0; }
+    }
+    blockquote:before {
+      color: #ccc;
+      content: open-quote;
+      font-size: 3em;
+      vertical-align: -.4em;
+      line-height: 0.1em;
+      margin-right: 0.25em;
+    }
+    
+    blockquote:after {
+      content: close-quote;
+      color: $gray-lighter;
+      font-size: 4px;
+    }
+
+    blockquote p { display: inline; }
+    
+
+    .blockquote-cite {
+      text-align: right;
+      padding: .5em 10px 1em 0;
+      color: $gray;
+      font-weight: 200;
+    }
+  }
+
+
+  //________________________
+  //
+  // Listicles!
+  //
+  //________________________
+
+  .listicle-image-credit {
+    text-align: right;
+    font-size: .8em;
+  }
+
+  // .list-item-title {
+  //   font-family: $headerFont;
+  //   font-size: $standardFontSize*1.2;
+  // }
+
+  .list-nav-wrap {
+    @include clearfix;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto; 
+    a {
+      @extend .btn;
+      @extend .btn-primary;
+      width: 45%;
+      padding: 1em .25em;
+    }
+    .prev { float: left; }
+    .next { float: right; }
+  }
+}

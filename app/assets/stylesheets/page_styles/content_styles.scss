@@ -545,36 +545,3 @@ ul.state-list {
     padding: 10px 10px 0;
   }
 }
-
-
-
-
-
-
-//________________________
-//
-// Individual blog styles
-//
-//________________________
-
-
-.terms-evaluation {
-  padding-top: 40px;
-  padding-bottom: 40px;
-  p {
-    font-size: .8em;
-    margin-bottom: 8px;
-  }
-
-  .badge {
-    i { background-image: url("/assets/glyphicons-halflings-white.png"); }
-    margin-right: .25em;
-    padding: 1px 2px 2px;
-  }
-  .badge-warning {
-    background: #D66F2C;
-  }
-  .badge-success {
-    background: #79B752;
-  }
-}

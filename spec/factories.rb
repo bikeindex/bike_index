@@ -25,13 +25,26 @@ FactoryGirl.define do
 
   factory :user do
     name
-    email { generate(:unique_email)}
-    password "testthisthing7$"
-    password_confirmation "testthisthing7$"
+    email { generate(:unique_email) }
+    password 'testthisthing7$'
+    password_confirmation 'testthisthing7$'
     terms_of_service true
-    factory :admin do
-      superuser true
+    factory :confirmed_user do
+      after(:create) do |user|
+        user.confirm(user.confirmation_token)
+      end
+      factory :admin do
+        superuser true
+      end
     end
+    factory :developer do
+      developer true
+    end
+  end
+
+  factory :user_email do
+    association :user, factory: :confirmed_user
+    email { generate(:unique_email) }
   end
 
   factory :cycle_type do
@@ -105,7 +118,7 @@ FactoryGirl.define do
     association :propulsion_type
     association :primary_frame_color, factory: :color
     rear_tire_narrow true
-    sequence(:owner_email) {|n| "bike_owner#{n}@example.com"}
+    sequence(:owner_email) { |n| "bike_owner#{n}@example.com" }
     factory :organization_bike do
       association :creation_organization, factory: :organization
     end
@@ -115,6 +128,9 @@ FactoryGirl.define do
         create(:stolen_record, bike: bike)
         bike.save # updates current_stolen_record
       end
+      factory :recovered_bike do
+        recovered true
+      end
     end
   end
 
@@ -123,16 +139,16 @@ FactoryGirl.define do
   end
 
   factory :ctype do
-    sequence(:name) {|n| "Component type#{n}"}
+    sequence(:name) { |n| "Component type#{n}" }
     association :cgroup
   end
 
   factory :ownership do
     association :bike, factory: :bike
-    association :creator, factory: :user
+    association :creator, factory: :confirmed_user
     current true
-    sequence(:owner_email) {|n| "owner#{n}@example.com"}
-    factory :organization_ownership do 
+    sequence(:owner_email) { |n| "owner#{n}@example.com" }
+    factory :organization_ownership do
       association :bike, factory: :organization_bike
     end
   end
@@ -144,7 +160,7 @@ FactoryGirl.define do
 
   factory :organization do
     name
-    sequence(:short_name) {|n| "short_name#{n}"}
+    sequence(:short_name) { |n| "short_name#{n}" }
     slug
     available_invitation_count 5
   end
@@ -161,13 +177,13 @@ FactoryGirl.define do
 
   factory :country do
     name
-    sequence(:iso) {|n| "D#{n}"}
+    sequence(:iso) { |n| "D#{n}" }
   end
 
   factory :state do
     name
     association :country
-    sequence(:abbreviation) {|n| "Q#{n}"}
+    sequence(:abbreviation) { |n| "Q#{n}" }
   end
 
   factory :lock_type do
@@ -183,15 +199,15 @@ FactoryGirl.define do
   factory :organization_invitation do
     association :inviter, factory: :user
     association :organization
-    invitee_email "mike@test.com"
+    invitee_email 'mike@test.com'
   end
 
   factory :membership do
-    role "member"
+    role 'member'
   end
 
   factory :integration do
-    access_token "12345teststststs"
+    access_token '12345teststststs'
   end
 
   factory :public_image do |u|
@@ -199,10 +215,10 @@ FactoryGirl.define do
     association :imageable, factory: :bike
   end
 
-  factory :blog do 
+  factory :blog do
     user
-    body "Some sweet blog content that everyone loves"
-    sequence(:title) {|n| "Blog title #{n}"}
+    body 'Some sweet blog content that everyone loves'
+    sequence(:title) { |n| "Blog title #{n}" }
   end
 
   factory :feedback do
@@ -234,13 +250,12 @@ FactoryGirl.define do
     contact_type 'stolen_message'
   end
 
-  factory :mail_snippet do 
+  factory :mail_snippet do
     name
     is_enabled true
     is_location_triggered true
     proximity_radius 100
-    address "New York, NY"
-    body "<p>Foo</p>"
+    address 'New York, NY'
+    body '<p>Foo</p>'
   end
-
 end

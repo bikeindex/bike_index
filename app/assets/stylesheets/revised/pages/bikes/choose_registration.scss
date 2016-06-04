@@ -1,0 +1,39 @@
+#welcome_choose_registration {
+  $choose-reg-font-size: 20px;
+  .choose-registration-items { align-items: center; }
+  .choose-links ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    a {
+      transition: border .15s linear;
+      cursor: pointer;
+      border: 1px solid transparent;
+      padding: 10px 20px;
+      display: block;
+      font-size: $choose-reg-font-size;
+      &:hover { text-decoration: none; }
+    }
+    .add-selected { display: none; }
+    .current-choice {
+      border: 1px dashed $gray;
+      .add-selected {
+        font-family: courier;
+        float: right;
+        display: block;
+        font-size: .8em;
+      }
+    }
+  }
+  .btn { 
+    font-size: $choose-reg-font-size;
+    width: 100%;
+    display: block;
+  }
+}
+
+@media (max-width: $grid-breakpoint-sm - 1px) {
+  #welcome_choose_registration {
+    .add-bike-column { width: 100%; margin: $vertical-height 0; }
+  }
+}

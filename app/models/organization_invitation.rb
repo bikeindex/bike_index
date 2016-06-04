@@ -40,7 +40,7 @@ class OrganizationInvitation < ActiveRecord::Base
 
   before_save :normalize_email
   def normalize_email
-    self.invitee_email.downcase.strip!
+    self.invitee_email = EmailNormalizer.new(invitee_email).normalized
   end
 
   def name_for_inviter
@@ -53,7 +53,7 @@ class OrganizationInvitation < ActiveRecord::Base
 
   after_create :update_organization_invitation_counts
   def update_organization_invitation_counts
-    org = self.organization
+    org = organization
     if org.available_invitation_count < 1
       org.available_invitation_count = 0
     else
@@ -65,30 +65,23 @@ class OrganizationInvitation < ActiveRecord::Base
 
   def create_membership
     membership = Membership.new
-    membership.organization = self.organization
-    membership.user = self.invitee
-    membership.role = self.membership_role
+    membership.organization = organization
+    membership.user = invitee
+    membership.role = membership_role
     membership.save!
   end
 
   def assign_to(user)
-    unless self.redeemed
-      if user.memberships && user.organizations.include?(self.organization)
-        # TODO: This way we don't generate repeat memberships accidentally. There should be some sort of alert.
-        return false
-      else
-        self.invitee_id = user.id
-        self.redeemed = true
-        self.save!
-        if self.invitee_name
-          unless user.name.present?
-            user.name = self.invitee_name
-            user.save
-          end
-        end
-        self.create_membership
-      end
+    return false if redeemed
+    # This way we don't generate repeat memberships accidentally. There should be some sort of alert.
+    return false if user.memberships && user.organizations.include?(organization)
+    self.invitee_id = user.id
+    self.redeemed = true
+    save!
+    if invitee_name
+      user.update_attribute :name, invitee_name unless user.name.present?
     end
+    create_membership
   end
 
 end

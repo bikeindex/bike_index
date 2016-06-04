@@ -1,1 +1,54 @@
-= render partial: "users/form"
+.sign-in-up
+  .sign-in-up-header.container
+    .row
+      %h1
+        = t("sign_in_up.#{controller_name}_h1")
+  .container
+    .sign-in-up-wrap
+      .row
+        .oauth-providers
+          %a.facebook-login{ href: '/auth/facebook' }
+            %span.oauth-logo-block
+              = image_tag '/assets/revised/facebook_login.svg'
+            %span.oauth-text-block
+              #{t("sign_in_up.#{controller_name}_oauth_text_block")} Facebook
+            
+          %a.strava-login{ href: '/auth/strava' }
+            %span.oauth-logo-block
+              = image_tag '/assets/revised/strava_login.svg'
+            %span.oauth-text-block
+              #{t("sign_in_up.#{controller_name}_oauth_text_block")} Strava
+        .sign-in-up-or
+          %h3
+            Or
+        .main-form
+          %h3.sign-in-up-main-form-header
+            = t("sign_in_up.#{controller_name}_main_form_action")
+            %small
+              already have an account? #{ link_to 'log in', new_session_path }
+          = form_for @user do |f|
+            .form-group
+              = f.label :email, class: 'sr-only'
+              = f.email_field :email, placeholder: 'email', class: 'form-control'
+            .form-group
+              = f.label :name, class: 'sr-only'
+              = f.text_field :name, placeholder: 'name', class: 'form-control'
+            .form-group
+              = f.label :password, class: 'sr-only'
+              = f.password_field :password, placeholder: 'password', class: 'form-control'
+
+            .checkbox
+              %label
+                = f.check_box :terms_of_service
+                I agree to the Bike Index 
+                %a.no-tab{ data: { target: terms_url } }
+                  terms and conditions
+            .checkbox
+              %label
+                = f.check_box :is_emailable
+                Get the Bike Index's Newsletter
+
+            = f.submit t("sign_in_up.#{controller_name}_main_form_action"), class: 'btn btn-primary btn-lg'
+
+          %p
+            = link_to t('sign_in_up.forgot_password'), '/users/request_password_reset'

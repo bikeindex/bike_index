@@ -15,7 +15,7 @@ class Admin::MailSnippetsController < Admin::BaseController
 
   def update
     if @mail_snippet.update_attributes(params[:mail_snippet])
-      flash[:notice] = "Snippet Saved!"
+      flash[:success] = 'Snippet Saved!'
       redirect_to edit_admin_mail_snippet_url(@mail_snippet)
     else
       render action: :edit
@@ -29,7 +29,7 @@ class Admin::MailSnippetsController < Admin::BaseController
   def create
     @mail_snippet = MailSnippet.create(params[:mail_snippet])
     if @mail_snippet.save
-      flash[:notice] = "Snippet Created!"
+      flash[:success] = 'Snippet Created!'
       redirect_to edit_admin_mail_snippet_url(@mail_snippet)
     else
       render action: :new

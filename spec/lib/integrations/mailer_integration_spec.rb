@@ -4,7 +4,7 @@ describe MailerIntegration do
   let(:config_keys) { %w(name subject description args) }
   describe 'template_dir' do
     it 'returns the expected rails path' do
-      expect(MailerIntegration.templates_path.is_a?(Pathname)).to be_true
+      expect(MailerIntegration.templates_path.is_a?(Pathname)).to be_truthy
       expect(MailerIntegration.templates_path.to_s).to match(/app.views.mailer_integration/)
     end
   end
@@ -16,7 +16,7 @@ describe MailerIntegration do
         expect(template.keys).to eq config_keys
       end
       expect(template_names.count).to eq 10
-      expect(template_names.include?('welcome_email')).to be_true
+      expect(template_names.include?('welcome_email')).to be_truthy
     end
   end
 

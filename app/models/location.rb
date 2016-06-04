@@ -25,6 +25,12 @@ class Location < ActiveRecord::Base
   scope :shown, -> { where(shown: true) }
   # scope :international, where("country_id IS NOT #{Country.united_states.id}")
 
+  before_save :shown_from_organization
+  def shown_from_organization
+    self.shown = organization && organization.allowed_show
+    true
+  end
+
   def address
     return nil unless self.country
     a = []

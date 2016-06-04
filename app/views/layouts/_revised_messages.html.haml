@@ -1,3 +1,8 @@
+/ Note: 
+/   We primarily use 3 flash types - success, error, and notice
+/   success - No actionable info. Basically, Bike Index did what you asked. Auto faded
+/   error   - Messages because you did something wrong. Not faded
+/   notice  - Messages that don't fit in the above categories. Not faded, may have actionable info
 .primary-alert-block
   - flash.each do |name, msg|
     = render partial: '/shared/alert', locals: { body: msg, type: name }

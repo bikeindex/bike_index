@@ -1,10 +1,36 @@
-= form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do |f|
-  .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
-    .row
-      = render partial: '/bikes/edit_primary_menu'
-      .col-md-8.form-well
-        .form-wrap
-          .edit-bike-form-header
-            %h3
-              = @edit_templates[@edit_template]
+/ No bike form here because we're only dealing with photos.
+/ The save button actually just triggers a page reload via js
+.form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
+  .row
+    = render partial: '/bikes/edit_primary_menu'
+    .col-md-8.form-well
+      .form-wrap
+        .form-well-form-header
+          %h3
+            = @edit_templates[@edit_template]
+          %h5.light-italic
+            Drag the uploaded photos to rearrange the order in which they appear
 
+        %ul#public_images.row.edit-photo-display-list{ data: { orderurl: order_public_images_url, imagesurl: public_images_url } }
+          = render partial: '/public_images/revised_public_image', collection: @bike.public_images, as: :image
+          = render partial: '/public_images/revised_public_image', collection: @private_images, as: :image
+
+        %hr
+        = form_for PublicImage.new do |f|
+          .row.edit-photo-upload
+            = hidden_field_tag :bike_id, @bike.id
+            .col-xs-12
+              %h5.light-italic
+                Drag and drop files here or use the
+                %strong
+                  Upload Photos 
+                button
+              %label.file
+                = f.file_field :image, multiple: true, name: "public_image[image]"
+                %span.file-custom
+/ Mustache template for rendering post upload
+:plain
+  <script id="image-upload-finished-template" type="x-tmpl-mustache">
+    <p><em>{{file.name}}</em></p>
+    <h5 class="text-info text-xs-right">Finished uploading</h5>
+  </script>

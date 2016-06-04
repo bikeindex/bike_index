@@ -6,10 +6,8 @@ Bikeindex::Application.routes.draw do
     controllers authorized_applications: 'oauth/authorized_applications'
   end
 
-  get 'dashboard/show'
-
   match '/shop', to: redirect('https://bikeindex.myshopify.com'), as: :shop
-  match '/discuss', to: redirect(ENV['DISCOURSE_URL']), as: :discuss
+  match '/discuss', to: redirect('https://discuss.bikeindex.org'), as: :discuss
   match 'discourse_authentication', to: 'discourse_authentication#index'
 
   resources :organizations do
@@ -22,7 +20,7 @@ Bikeindex::Application.routes.draw do
     resources :organization_invitations, only: [:new, :create]
   end
 
-  match '/' => 'stolen#index', constraints: { subdomain: 'stolen' }
+  match '/', to: redirect(:root_url, subdomain: false), constraints: { subdomain: 'stolen' }
 
   root to: 'welcome#index'
 
@@ -69,7 +67,13 @@ Bikeindex::Application.routes.draw do
   get :accept_vendor_terms, to: 'users#accept_vendor_terms'
   get :accept_terms, to: 'users#accept_terms'
   resources :user_embeds, only: [:show]
-
+  resources :user_emails, only: [:destroy] do
+    member do
+      post 'resend_confirmation'
+      get 'confirm'
+      post 'make_primary'
+    end
+  end
   resources :news, only: [:show, :index]
   resources :blogs, only: [:show, :index]
   match 'blog', to: redirect('/news')
@@ -78,6 +82,7 @@ Bikeindex::Application.routes.draw do
     collection do
       post :order
     end
+    member { post :is_private }
   end
 
   resources :bikes do

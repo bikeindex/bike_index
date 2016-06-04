@@ -1,5 +1,5 @@
 img[data-action="zoom"] {
-  cursor: pointer;
+  cursor: zoom-in;
   cursor: -webkit-zoom-in;
   cursor: -moz-zoom-in;
 }
@@ -12,7 +12,7 @@ img[data-action="zoom"] {
           transition: all 300ms;
 }
 img.zoom-img {
-  cursor: pointer;
+  cursor: zoom-out;
   cursor: -webkit-zoom-out;
   cursor: -moz-zoom-out;
 }

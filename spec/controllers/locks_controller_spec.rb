@@ -10,7 +10,7 @@ describe LocksController do
     end
   end
 
-  describe :index do
+  describe 'index' do
     it 'renders' do
       get :index
       expect(response.code).to eq('200')
@@ -19,7 +19,7 @@ describe LocksController do
     end
   end
 
-  describe :show do
+  describe 'show' do
     it 'renders' do
       lock = FactoryGirl.create(:lock, user: user)
       get :show, id: lock.id
@@ -29,7 +29,7 @@ describe LocksController do
     end
   end
 
-  describe :new do
+  describe 'new' do
     it 'renders' do
       get :new
       expect(response.code).to eq('200')
@@ -37,7 +37,7 @@ describe LocksController do
     end
   end
 
-  describe :edit do
+  describe 'edit' do
     context 'not lock owner' do
       it 'redirects to user_home' do
         lock = FactoryGirl.create(:lock)

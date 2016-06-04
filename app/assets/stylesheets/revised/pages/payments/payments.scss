@@ -16,6 +16,8 @@
   }
   #open_stripe_checkout_btn {
     @extend .btn-primary;
+    @extend .btn-lg;
+    max-width: 400px;
   }
 }
 

@@ -1,20 +1,18 @@
 require 'spec_helper'
 
 describe ManufacturersController do
-
-  describe :index do 
-    before do 
+  describe 'index' do
+    it 'renders with revised_layout' do
       get :index
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:index)
+      expect(response).to render_with_layout('application_revised')
     end
-    it { should respond_with(:success) }
-    it { should render_template(:index) }
   end
-
-  describe :tsv do 
-    before do 
+  describe 'tsv' do
+    before do
       get :tsv
     end
-    it { should respond_with(:redirect) }
+    it { is_expected.to respond_with(:redirect) }
   end
-
 end

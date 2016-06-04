@@ -2,6 +2,11 @@
 
 <hr>
 <p><%= @stolen_notification.message %></p>
+<% if @stolen_notification.reference_url.present? %>
+  <p>
+    link: <a href="<%= @stolen_notification.reference_url %>"><%= @stolen_notification.reference_url %></a>
+  </p>
+<% end %>
 <% if @stolen_notification.sender.name.present? %>
   <p style="color: #ccc; margin: 2em 0 2em 1em;"><%= @stolen_notification.sender.name %></p>
 <% end %>

@@ -28,7 +28,6 @@ class Admin::UsersController < Admin::BaseController
   def update
     @user.name = params[:user][:name]
     @user.email = params[:user][:email]
-    @user.confirmed = params[:user][:confirmed]
     @user.superuser = params[:user][:superuser]
     @user.developer = params[:user][:developer] if current_user.developer
     @user.is_content_admin = params[:user][:is_content_admin]
@@ -36,6 +35,7 @@ class Admin::UsersController < Admin::BaseController
     @user.username = params[:user][:username]
     @user.can_send_many_stolen_notifications = params[:user][:can_send_many_stolen_notifications]
     if @user.save
+      @user.confirm(@user.confirmation_token) if params[:user][:confirmed]
       redirect_to admin_users_url, notice: 'User Updated'
     else
       bikes = @user.bikes

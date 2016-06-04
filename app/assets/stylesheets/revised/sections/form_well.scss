@@ -1,5 +1,6 @@
 $form-well-background: $gray-lighter;
-$form-well-border-color: #e4e4e4;
+$form-well-border-color: $gray-lightish;
+$form-well-divider-color: #b2b2b2;
 
 .form-circle-item { // Mixin for help blocks
   padding: .5em .25em;
@@ -13,6 +14,21 @@ $form-well-border-color: #e4e4e4;
 
 .form-well {
   .form-wrap { padding: 2*$vertical-height 0 4*$vertical-height; }
+  .form-well-input-static {
+    @include make-col();
+    @extend .form-control-static;
+    font-weight: $strong-font-weight;
+  }
+  .form-well-input-static-full-width { @extend .form-well-input-static; }
+  .static-right-input-help {
+    @include make-col();
+    font-style: italic;
+    a {
+      color: $body-font-color;
+      cursor: pointer;
+      &:hover, &:active, &.active { color: $link-color; }
+    }
+  }
   .below-input-help {
     @extend small;
     display: block;
@@ -42,11 +58,11 @@ $form-well-border-color: #e4e4e4;
   }
   .hidden-other {
     margin-top: 0;
-    padding-top: .5*$vertical-height;
     display: none;
     &.unhidden {
       margin-bottom: 1.5rem;
-      display: block;
+      display: flex !important;
+      flex-wrap: wrap;
     }
   }
   .inline-input-help {
@@ -73,18 +89,35 @@ $form-well-border-color: #e4e4e4;
   .form-well-label, .form-well-input, .form-well-input-large, .right-input-help {
     @include make-col(); 
   }
-  .related-fields { padding-bottom: $vertical-height; }
+  .related-fields {
+    .form-group {
+      padding-top: .5*$vertical-height;
+      margin-bottom: 0;
+      &:first-of-type { padding-top: 0; }
+    }
+    padding-bottom: 1.5*$vertical-height;
+  }
   .full-width-section { // pad the sides so that it fits the row.
     padding-left: $row-side-padding;
     padding-right: $row-side-padding;
   }
   .form-group {
     clear: both;
-    .radio-inline, .checkbox-inline { 
-      padding-top: .5em;
+    .checkbox-inline { padding-top: .5em; }
+    .form-well-input .checkbox-inline { padding-top: 0; }
+    .radio-inline, .checkbox-inline {
       input[type="radio"], input[type="checkbox"] {
         margin-top: .6em;
       }
+    }
+  }
+  .row.collapse.in { display: flex; }
+  .full-width-button {
+    padding: 2*$vertical-height 0;
+    .btn {
+      display: block;
+      margin: 0 auto;
+      max-width: 450px;
     }
   }
   hr {
@@ -112,7 +145,7 @@ $form-well-border-color: #e4e4e4;
       display: block;
       width: 90%;
       margin: 0 0 2*$vertical-height 10%;
-      border-bottom: 1px #b2b2b2 solid;
+      border-bottom: 1px $form-well-divider-color solid;
       padding-top: $vertical-height;
     }
     .no-divider-row::after { display: none; }
@@ -135,6 +168,17 @@ $form-well-border-color: #e4e4e4;
   .form-well-container.container {
     max-width: 100%;
     background: $form-well-background;
+    .form-well { width: 100%; }
+  }
+  .form-well { // This is the selector we put everything under, don't overpower
+    // label is 4 columns
+    .form-well-input-static { @include make-col-span(8); }
+    .form-well-input-static-full-width { @include make-col-span(8); }
+    .static-right-input-help {
+      @include make-col-span(12);
+      margin-top: -.75em;
+      padding-bottom: .5em; 
+    }
   }
 }
 
@@ -150,11 +194,37 @@ $form-well-border-color: #e4e4e4;
     padding-left: 2*$row-side-padding;
     padding-right: 2*$row-side-padding;
   }
+  // because we have to use floats instead of flex with sticky (affixing edit menu)
+  .form-well-container.container > .row {
+    display: block;
+    @include clearfix;
+    .col-md-8.form-well {
+      display: block;
+      float: right;
+      width: 66.66667%;
+    }
+  }
+  // To properly space the sides of the containers
+  .form-wrap .row {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .form-well {
+    // label is 3 columns
+    .form-well-input-static { @include make-col-span(3); }
+    .form-well-input-static-full-width { @include make-col-span(9); }
+    .static-right-input-help { 
+      @include make-col-span(6);
+      padding-top: .3em;
+    }
+  }
 }
 
 //
 // Everything but large screens
 @media (max-width: $grid-breakpoint-lg - 1px) {
+  // Cover up the margin beneath
+  .form-well-container.container { margin-bottom: - $primary-footer-top-margin; }
   // Remove some padding between the forms
   .form-well {
     .form-wrap.secondary-form-wrap {

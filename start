@@ -1,0 +1,3 @@
+#!/bin/bash
+redis-server &
+bundle exec foreman start -f Procfile_development

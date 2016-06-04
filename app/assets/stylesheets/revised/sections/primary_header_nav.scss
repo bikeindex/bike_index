@@ -4,7 +4,9 @@ body { padding-top: 8*$vertical-height; }
   body { padding-top: 12*$vertical-height; }
 }
 
-
+$primary-logo-fullsize-height: 84px;
+$primary-logo-padding: .5*$vertical-height;
+$primary-logo-padding-mobile: $vertical-height;
 
 // Header nav
 .primary-header-nav {
@@ -16,7 +18,7 @@ body { padding-top: 8*$vertical-height; }
   .primary-logo {
     position: relative;
     float: left;
-    padding: $vertical-height 0;
+    padding: $primary-logo-padding 0;
     img {
       display: block;
       height: 44px;
@@ -42,9 +44,7 @@ body { padding-top: 8*$vertical-height; }
     }
   }
   .hamburgler { font-family: courier; }
-  .settings-link {
-    img { display: none; }
-  }
+  .settings-link svg { display: none; }
 }
 
 // 
@@ -57,6 +57,7 @@ $mainmenu-open-zindex: 10;
     transition: transform 200ms linear;
     &.headroom--pinned { transform: translate(0, 0%); }
     &.headroom--unpinned { transform: translate(0, -100%); }
+    .primary-logo { padding: $primary-logo-padding-mobile 0; }
     .hamburgler {
       float: right;
       position: relative;
@@ -74,15 +75,19 @@ $mainmenu-open-zindex: 10;
           color: #fff;
           text-decoration: none;
         }
+        &:active { }
         &:active, &.active {
           color: #fff;
           text-decoration: none;
-          transform: rotate(45deg)
+        }
+        &:active, &.active:active { transform: rotate(45deg) }
+        &.active { 
+          transform: rotate(90deg)
         }
       }
     }
     .primary-main-menu { 
-      display: block;
+      display: none;
       background: $primary-nav-background;
       position: fixed;
       right: 0;
@@ -116,7 +121,9 @@ $mainmenu-open-zindex: 10;
       z-index: $mainmenu-open-zindex - 1;
     }
   }
-  // 
+  // So that mobile browsers don't show it all the time, like assholes
+  .primary-header-nav.enabled .primary-main-menu { display: block; }
+  //
   // Mobile menu visible
   body.menu-in { overflow: hidden; }
   .primary-header-nav.menu-in {
@@ -145,7 +152,7 @@ $mainmenu-open-zindex: 10;
       padding: $vertical-height 0 0;
       transition: padding 200ms linear;
       a {
-        padding: $vertical-height 0.5*$grid-gutter-width;
+        padding: 8px 0.5*$grid-gutter-width;
         &.active, &:active { text-decoration: none; }
       }
       // Only apply to primary nav items, not submenus
@@ -161,7 +168,7 @@ $mainmenu-open-zindex: 10;
       }
       // On large screens, the signup link is a button
       .signup-link {
-        border-radius: $border-radius;
+        border-radius: 4px;
         border: 1px solid $link-color;
         transition: background .05s linear;
         &:hover {
@@ -174,7 +181,7 @@ $mainmenu-open-zindex: 10;
         padding-top: .5*$vertical-height;
         padding-bottom: .5*$vertical-height;
         .settings-text { display: none; }
-        img {
+        svg {
           display: block;
           height: 2*$vertical-height;
           width: auto;
@@ -207,9 +214,10 @@ $mainmenu-open-zindex: 10;
   // To prevent flashing on initial load, before JS arrives
   .primary-header-nav, .primary-header-nav.headroom--top, 
   .primary-header-nav.headroom--top.headroom--pinned {
-    .primary-logo img { height: 82px; }
+    .primary-logo img { height: $primary-logo-fullsize-height - 2*$primary-logo-padding; }
     .primary-nav-item {
-      padding: 2.66*$vertical-height 0 2*$vertical-height;
+      // nav-items are 34px tall.
+      padding: .5*($primary-logo-fullsize-height - 34px) 0 2*$vertical-height;
       a.active::after { bottom: 2*$vertical-height; }
     }
   }

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe RemoveExpiredFileCacheWorker do
-  it { should be_processed_in :carrierwave }
+  it { is_expected.to be_processed_in :carrierwave }
 
   describe 'perform' do
     it 'removes expired files' do

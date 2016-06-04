@@ -7,7 +7,7 @@ class OwnershipsController < ApplicationController
     if @ownership.can_be_claimed_by(current_user)
       if @ownership.current
         @ownership.mark_claimed
-        flash[:notice] = "Looks like this is your #{bike.type}! Good work, you just claimed it."
+        flash[:success] = "Looks like this is your #{bike.type}! Good work, you just claimed it."
         redirect_to edit_bike_url(bike)
       else
         flash[:error] = "That used to be your #{bike.type} but isn't anymore! Contact us if this doesn't make sense."

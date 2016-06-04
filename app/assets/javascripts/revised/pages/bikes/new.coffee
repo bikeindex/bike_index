@@ -5,23 +5,25 @@ class BikeIndex.BikesNew extends BikeIndex
     @initializeEventListeners()
     @updateSerial($('#bike_has_no_serial').prop('checked'))
     @otherManufacturerDisplay($('#bike_manufacturer_id').val())
+    if $('#stolen_record_us_id').length > 0
+      united_stated_id = $('#stolen_record_us_id').data('usid')
+      new BikeIndex.ToggleHiddenOther('.country-select-input', united_stated_id)
 
   initializeEventListeners: ->
-    pagespace = @
-    $('#bike_manufacturer_id').change (e) ->
+    $('#bike_manufacturer_id').change (e) =>
       current_val = e.target.value
-      pagespace.otherManufacturerDisplay(current_val)
-      pagespace.getModelList(current_val)
-    $('#bike_unknown_year').change (e) ->
-      pagespace.toggleUnknownYear()
-    $('#bike_year').change (e) ->
-      pagespace.updateYear()
-    $('#bike_has_no_serial').change (e) ->
-      pagespace.updateSerial($('#bike_has_no_serial').prop('checked'))
-    $('#made-without-serial-button').click (e) ->
-      pagespace.madeWithoutSerial(true)
-    $('#bike_made_without_serial').change (e) -> # Only ever called when visible, so it's time to close
-      pagespace.updateSerial(true)
+      @otherManufacturerDisplay(current_val)
+      @getModelList(current_val)
+    $('#bike_unknown_year').change (e) =>
+      @toggleUnknownYear()
+    $('#bike_year').change (e) =>
+      @updateYear()
+    $('#bike_has_no_serial').change (e) =>
+      @updateSerial($('#bike_has_no_serial').prop('checked'))
+    $('#made-without-serial-button').click (e) =>
+      @madeWithoutSerial(true)
+    $('#bike_made_without_serial').change (e) => # Only ever called when visible, so it's time to close
+      @updateSerial(true)
 
   updateSerial: (serial_absent) ->
     @madeWithoutSerial()
@@ -53,9 +55,8 @@ class BikeIndex.BikesNew extends BikeIndex
       hidden_other.removeClass('unhidden').slideUp()
 
   getModelList: (mnfg_name = '') ->
-    pagespace = @
     if mnfg_name == 'absent' || mnfg_name.length < 1
-      pagespace.setModelTypeahead()
+      @setModelTypeahead()
     else
       year = parseInt($('#bike_year').val(),10)
       # could be bikebook.io - but then we'd have to pay for SSL...
@@ -64,10 +65,10 @@ class BikeIndex.BikesNew extends BikeIndex
       $.ajax
         type: "GET"
         url: url
-        success: (data, textStatus, jqXHR) ->
-          pagespace.setModelTypeahead(data)
-        error: ->
-          pagespace.setModelTypeahead()
+        success: (data, textStatus, jqXHR) =>
+          @setModelTypeahead(data)
+        error: =>
+          @setModelTypeahead()
 
   setModelTypeahead: (data=[]) ->
     $('#bike_frame_model').selectize()[0].selectize.destroy()

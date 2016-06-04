@@ -28,7 +28,7 @@ module AuthenticationHelper
   end
 
   def revised_layout_enabled?
-    current_user && $rollout.active?(:revised_view, current_user)
+    (current_user && $rollout.active?(:revised_view, current_user)) || (params && params[:revised_layout])
   end
 
   protected
@@ -70,11 +70,5 @@ module AuthenticationHelper
 
   def current_organization
     @organization ||= Organization.find_by_slug(request.subdomain)
-  end
-
-  def set_current_organization
-    if Subdomain.matches?(request)
-      @organzation = Organization.find_by_slug(request.subdomain)
-    end
   end
 end

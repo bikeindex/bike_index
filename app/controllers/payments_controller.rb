@@ -1,16 +1,13 @@
 class PaymentsController < ApplicationController
-  def revised_layout_if_enabled
-    revised_layout_enabled? ? 'application_revised' : 'application_updated'
-  end
+  layout 'application_revised'
 
   def new
-    render layout: revised_layout_if_enabled
   end
 
   def create
     @amount = params[:stripe_amount]
     @subscription = params[:stripe_subscription] if params[:stripe_subscription].present?
-    user = current_user || User.fuzzy_email_find(params[:stripe_email])
+    user = current_user || User.fuzzy_confirmed_or_unconfirmed_email_find(params[:stripe_email])
     email = params[:stripe_email].strip.downcase
     if user.present? && user.stripe_id.present?
       customer = Stripe::Customer.retrieve(user.stripe_id)
@@ -58,7 +55,6 @@ class PaymentsController < ApplicationController
     unless payment.save
       raise StandardError, "Unable to create a payment. #{payment.to_yaml}"
     end
-    render layout: revised_layout_if_enabled
   rescue Stripe::CardError => e
     flash[:error] = e.message
     redirect_to new_payment_path and return

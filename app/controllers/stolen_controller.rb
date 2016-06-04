@@ -1,6 +1,6 @@
 class StolenController < ApplicationController
   before_filter :remove_subdomain
-  layout 'application_updated'
+  layout 'application_revised'
   
   def index
     @feedback = Feedback.new
@@ -16,7 +16,7 @@ class StolenController < ApplicationController
 
   def multi_serial_search
     render layout: 'multi_serial'
-  end
+  end 
 
   private
   def remove_subdomain

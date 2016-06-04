@@ -3,12 +3,11 @@ class BikeIndex.BikesEditOwnership extends BikeIndex
     @initializeEventListeners()
 
   initializeEventListeners: ->
-    pagespace = @
-    $('#hide_bike_toggle').click (e) ->
-      pagespace.toggleHidden(e)
-    $('#request-delete form').submit (e) ->
+    $('#hide_bike_toggle').click (e) =>
+      @toggleHidden(e)
+    $('#request-delete form').submit (e) =>
       e.preventDefault()
-      pagespace.requestDelete()
+      @requestDelete()
 
   toggleHidden: (e) ->
     e.preventDefault()

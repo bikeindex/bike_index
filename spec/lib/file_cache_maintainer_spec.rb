@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe FileCacheMaintainer do
-  describe :cached_all_stolen do
+  describe 'cached_all_stolen' do
     it 'returns the most recent all_stolen' do
       FileCacheMaintainer.update_file_info('1456863086_all_stolen_cache.json', 1456863086)
       t = Time.now.to_i
@@ -17,7 +17,7 @@ describe FileCacheMaintainer do
     end
   end
 
-  describe :blacklist_ids do
+  describe 'blacklist_ids' do
     it 'gets and sets the ids' do
       FileCacheMaintainer.reset_blacklist_ids([1, 1, 2, 4, 'https://bikeindex.org/admin/bikes/6'])
       expect(FileCacheMaintainer.blacklist).to eq %w(1 2 4 6)
@@ -28,11 +28,11 @@ describe FileCacheMaintainer do
     end
   end
 
-  describe :blacklist_include do
+  describe 'blacklist_include' do
     it 'checks if blacklist includes something' do
       FileCacheMaintainer.reset_blacklist_ids([1010101, 2, 4, 6])
-      expect(FileCacheMaintainer.blacklist_include?('http://bikeindex.org/bikes/1010101/edit')).to be_true
-      expect(FileCacheMaintainer.blacklist_include?(7)).to be_false
+      expect(FileCacheMaintainer.blacklist_include?('http://bikeindex.org/bikes/1010101/edit')).to be_truthy
+      expect(FileCacheMaintainer.blacklist_include?(7)).to be_falsey
     end
   end
 
@@ -42,7 +42,7 @@ describe FileCacheMaintainer do
       FileCacheMaintainer.reset_file_info('current_stolen_bikes.tsv', t)
       tsv = FileCacheMaintainer.files[0]
       expect(tsv[:updated_at]).to eq(t.to_i.to_s)
-      expect(tsv[:daily]).to be_false
+      expect(tsv[:daily]).to be_falsey
       expect(tsv['path']).to eq('current_stolen_bikes.tsv')
       expect(tsv['description']).to eq('Stolen')
     end

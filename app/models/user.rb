@@ -6,7 +6,7 @@ class User < ActiveRecord::Base
 
   attr_accessible :name,
     :username,
-    :email,
+    :email, # Also maybe a all_emails field for searching...
     :password,
     :password_confirmation,
     :current_password,
@@ -30,8 +30,8 @@ class User < ActiveRecord::Base
     :can_send_many_stolen_notifications,
     :my_bikes_link_target,
     :my_bikes_link_title,
-    :is_emailable
-
+    :is_emailable,
+    :additional_emails
 
   attr_accessor :my_bikes_link_target, :my_bikes_link_title, :current_password
   # stripe_id, is_paid_member, paid_membership_info
@@ -50,9 +50,10 @@ class User < ActiveRecord::Base
   has_many :oauth_applications, class_name: 'Doorkeeper::Application', as: :owner
 
   has_many :integrations, dependent: :destroy
-  has_many :created_ownerships, class_name: 'Ownership', inverse_of: :creator
-  has_many :created_bicycles, class_name: 'Bike', inverse_of: :creator
+  has_many :created_ownerships, class_name: 'Ownership', inverse_of: :creator, foreign_key: :creator_id
+  has_many :created_bikes, class_name: 'Bike', inverse_of: :creator, foreign_key: :creator_id
   has_many :locks, dependent: :destroy
+  has_many :user_emails
 
   has_many :sent_stolen_notifications, class_name: 'StolenNotification', foreign_key: :sender_id
   has_many :received_stolen_notifications, class_name: 'StolenNotification', foreign_key: :receiver_id
@@ -61,6 +62,7 @@ class User < ActiveRecord::Base
   has_many :organization_invitations, class_name: 'OrganizationInvitation', inverse_of: :invitee
 
   before_create :generate_username_confirmation_and_auth
+  after_create :perform_create_jobs
   serialize :paid_membership_info
   serialize :my_bikes_hash
 
@@ -69,15 +71,15 @@ class User < ActiveRecord::Base
     username
   end
 
-  validates :password, 
-    presence: true, 
-    length: {within: 6..100},
+  validates :password,
+    presence: true,
+    length: { within: 6..100 },
     on: :create
   validates_format_of :password, with: /\A.*(?=.*[a-z]).*\Z/i, message: 'must contain at least one letter', on: :create
 
   validates :password, 
-    confirmation: true, 
-    length: {within: 6..100},
+    confirmation: true,
+    length: { within: 6..100 },
     allow_blank: true,
     on: :update
   validates_format_of :password, with: /\A.*(?=.*[a-z]).*\Z/i, message: 'must contain at least one letter', on: :update, allow_blank: true
@@ -85,14 +87,12 @@ class User < ActiveRecord::Base
   validates_presence_of :email
   validates_uniqueness_of :email, case_sensitive: false
 
-
   include PgSearch
-
   pg_search_scope :admin_search, against: {
-    name: 'A',
-    email: 'A'
+      name: 'A',
+      email: 'A'
     },
-    using: {tsearch: {dictionary: "english", prefix: true}}
+    using: { tsearch: { dictionary: 'english', prefix: true } }
 
   def self.admin_text_search(query)
     if query.present?
@@ -102,8 +102,23 @@ class User < ActiveRecord::Base
     end
   end
 
+  def additional_emails=(value)
+    UserEmail.add_emails_for_user_id(id, value)
+  end
+
+  validate :ensure_unique_email
+  def ensure_unique_email
+    return true unless self.class.fuzzy_confirmed_or_unconfirmed_email_find(email)
+    return true if id.present? # Because existing users shouldn't see this error
+    errors.add(:email, 'That email is already signed up on Bike Index.')
+  end
+
+  def perform_create_jobs
+    CreateUserJobs.new(self).perform_create_jobs
+  end
+
   def superuser?
-    superuser
+    superuser 
   end
 
   def content?
@@ -154,6 +169,8 @@ class User < ActiveRecord::Base
       self.confirmation_token = nil
       self.confirmed = true
       self.save
+      CreateUserJobs.new(self).perform_confirmed_jobs
+      true
     end
   end
   
@@ -168,11 +185,15 @@ class User < ActiveRecord::Base
   end
   
   def self.fuzzy_email_find(email)
-    if !email.blank?
-      self.find(:first, conditions: [ "lower(email) = ?", email.downcase.strip ])
-    else
-      nil
-    end
+    UserEmail.confirmed.fuzzy_user_find(email)
+  end
+
+  def self.fuzzy_unconfirmed_primary_email_find(email)
+    find(:first, conditions: ['lower(email) = ?', EmailNormalizer.new(email).normalized])
+  end
+
+  def self.fuzzy_confirmed_or_unconfirmed_email_find(email)
+    fuzzy_email_find(email) || fuzzy_unconfirmed_primary_email_find(email)
   end
 
   def self.fuzzy_id(n)
@@ -196,7 +217,7 @@ class User < ActiveRecord::Base
 
   def is_admin_of?(organization)
     m = Membership.where(user_id: id, organization_id: organization.id).first
-    m.present? && m.role == "admin"
+    m.present? && m.role == 'admin'
   end
   
   def has_membership?
@@ -252,7 +273,7 @@ class User < ActiveRecord::Base
   def set_urls
     self.title = strip_tags(title) if title.present?
     if website
-      self.website = Urlifyer.urlify(self.website)
+      self.website = Urlifyer.urlify(website)
     end
     mbh = my_bikes_hash || {}
     mbh[:link_target] = Urlifyer.urlify(my_bikes_link_target) if my_bikes_link_target.present?
@@ -278,7 +299,7 @@ class User < ActiveRecord::Base
 
   def userlink
     if show_bikes
-      "/users/#{username}" 
+      "/users/#{username}"
     elsif twitter.present?
       "https://twitter.com/#{twitter}"
     else
@@ -308,11 +329,10 @@ class User < ActiveRecord::Base
       username = SecureRandom.urlsafe_base64
     end while User.where(username: username).exists?
     self.username = username
-    if !self.confirmed
+    if !confirmed
       self.confirmation_token = (Digest::MD5.hexdigest "#{SecureRandom.hex(10)}-#{DateTime.now.to_s}")
     end
     generate_auth_token
     true
   end
-
 end

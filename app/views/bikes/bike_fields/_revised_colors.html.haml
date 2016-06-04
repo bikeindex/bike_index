@@ -2,8 +2,8 @@
 - primary_color_help_content = "The color of the frame and fork&mdash;not the wheels, cranks, or anything else. You can put a more detailed description in paint description (once you've registered), <em>this</em> is to get a general color to make searching easier"
 - display_secondary_color = @bike.secondary_frame_color_id.present?
 - display_tertiary_color = @bike.tertiary_frame_color_id.present?
-.related-fields.row{ class: classname }
-  .form-group
+.related-fields{ class: classname }
+  .form-group.row
     = f.label :primary_frame_color, class: 'form-well-label'
     .form-well-input.fancy-select.unfancy
       = f.collection_select(:primary_frame_color_id, Color.all, :id, :name, required: true, prompt: 'Choose color' )
@@ -18,7 +18,7 @@
         %span.context-display-help
           &ndash;
         Remove color
-  #secondary-color.form-group.hidden-other{ class: ('unhidden' if display_secondary_color) }
+  #secondary-color.form-group.row.hidden-other{ class: ('unhidden' if display_secondary_color) }
     = f.label :secondary_frame_color, class: 'form-well-label'
     .form-well-input.fancy-select.unfancy
       = f.collection_select(:secondary_frame_color_id, Color.all, :id, :name, prompt: 'Choose color' )
@@ -31,7 +31,7 @@
         %span.context-display-help
           &ndash;
         Remove color
-  #tertiary-color.form-group.hidden-other{ class: ('unhidden' if display_tertiary_color) }
+  #tertiary-color.form-group.row.hidden-other{ class: ('unhidden' if display_tertiary_color) }
     = f.label :tertiary_frame_color, class: 'form-well-label'
     .form-well-input.fancy-select.unfancy
       = f.collection_select(:tertiary_frame_color_id, Color.all, :id, :name, prompt: 'Choose color' )

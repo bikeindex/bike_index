@@ -1,13 +1,17 @@
 module ApplicationHelper
-  def active_link(link_text, link_path, match_controller: false, class_name: '')
+  def active_link(link_text, link_path, match_controller: false, class_name: '', id: '')
     class_name += ' active' if current_page_active(link_path, match_controller: match_controller)
-    link_to(raw(link_text), link_path, class: class_name).html_safe
+    link_to(raw(link_text), link_path, class: class_name, id: id).html_safe
   end
 
   def current_page_active(link_path, match_controller: false)
     if match_controller
-      link_controller = Rails.application.routes.recognize_path(link_path)[:controller]
-      Rails.application.routes.recognize_path(request.url)[:controller] == link_controller
+      begin
+        link_controller = Rails.application.routes.recognize_path(link_path)[:controller]
+        Rails.application.routes.recognize_path(request.url)[:controller] == link_controller
+      rescue # This mainly fails in testing - but why not rescue always
+        return false
+      end
     else
       current_page?(link_path)
     end
@@ -23,6 +27,14 @@ module ApplicationHelper
       'edit_bike_skeleton' if %w(edit update).include?(action_name)
     when 'info'
       'content_skeleton' unless %w(terms vendor_terms privacy support_the_index).include?(action_name)
+    when 'welcome'
+      'content_skeleton' if %w(goodbye).include?(action_name)
+    when 'organizations'
+      'content_skeleton' if %w(new lightspeed_integration).include?(action_name)
+    when 'user'
+      'content_skeleton' if %w(edit).include?(action_name)
+    when 'news', 'feedbacks', 'manufacturers', 'stolen', 'errors'
+      'content_skeleton'
     end
   end
 
@@ -78,11 +90,11 @@ module ApplicationHelper
     link_to(name, '#', class: 'add_fields button-blue', data: { id: id, fields: fields.gsub("\n", '') })
   end
 
-  def revised_link_to_add_components(name, f, association, component_scope)
+  def revised_link_to_add_components(name, f, association)
     new_object = f.object.send(association).klass.new
     id = new_object.object_id
     fields = f.fields_for(association, new_object, child_index: id) do |builder|
-      render('/bikes/bike_fields/revised_component_fields', f: builder, component_group: component_scope)
+      render('/bikes/bike_fields/revised_component_fields', f: builder, ctype_id: Ctype.unknown.id)
     end
     text = "<span class='context-display-help'>+</span>#{name}"
     link_to(text.html_safe, '#', class: 'add_fields', data: { id: id, fields: fields.gsub("\n", '') })

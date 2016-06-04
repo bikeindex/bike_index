@@ -1,4 +1,5 @@
 class UsersController < ApplicationController
+  layout 'application_revised'
   include Sessionable
   before_filter :authenticate_user, only: [:edit]
   before_filter :set_return_to, only: [:new]
@@ -6,7 +7,7 @@ class UsersController < ApplicationController
   def new
     @user = User.new
     if current_user.present?
-      flash[:notice] = "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
+      flash[:success] = "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
       redirect_to user_home_url and return
     end
   end
@@ -14,7 +15,6 @@ class UsersController < ApplicationController
   def create
     @user = User.new(params[:user])
     if @user.save
-      CreateUserJobs.new(user: @user).do_jobs
       sign_in_and_redirect if @user.confirmed
     else
       render action: :new
@@ -56,7 +56,7 @@ class UsersController < ApplicationController
         render action: :request_password_reset
       end
     elsif params[:email].present?
-      @user = User.fuzzy_email_find(params[:email])
+      @user = User.fuzzy_confirmed_or_unconfirmed_email_find(params[:email])
       if @user.present?
         @user.send_password_reset_email
       else
@@ -88,6 +88,8 @@ class UsersController < ApplicationController
 
   def edit
     @user = current_user
+    @page_errors = @user.errors
+    render :edit
   end
 
   def update
@@ -103,24 +105,25 @@ class UsersController < ApplicationController
         @user.errors.add(:base, "Current password doesn't match, it's required for updating your password")
       end
     end
-    if !@user.errors.any? && @user.
-      update_attributes(params[:user].except(:email, :password_reset_token))
+    if !@user.errors.any? && @user.update_attributes(params[:user].except(:email, :password_reset_token))
       AfterUserChangeWorker.perform_async(@user.id)
       if params[:user][:terms_of_service].present?
         if params[:user][:terms_of_service] == '1'
           @user.terms_of_service = true
           @user.save
-          redirect_to user_home_url, notice: "Thanks! Now you can use the Bike Index" and return
+          flash[:success] = 'Thanks! Now you can use the Bike Index'
+          redirect_to user_home_url and return
         else
-          redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index" and return
+          flash[:notice] = 'You have to accept the Terms of Service if you would like to use Bike Index'
+          redirect_to accept_vendor_terms_url and return
         end
       elsif params[:user][:vendor_terms_of_service].present?
         if params[:user][:vendor_terms_of_service] == '1'
           @user.accept_vendor_terms_of_service
           if @user.memberships.any?
-            flash[:notice] = "Thanks! Now you can use Bike Index as #{@user.memberships.first.organization.name}"
+            flash[:success] = "Thanks! Now you can use Bike Index as #{@user.memberships.first.organization.name}"
           else
-            flash[:notice] = "Thanks for accepting the terms of service!"
+            flash[:success] = "Thanks for accepting the terms of service!"
           end
           redirect_to user_home_url and return
           # TODO: Redirect to the correct page, somehow this breaks things right now though.
@@ -137,6 +140,7 @@ class UsersController < ApplicationController
       end
       redirect_to my_account_url, notice: 'Your information was successfully updated.' and return
     end
+    @page_errors = @user.errors.full_messages
     render action: :edit
   end
 

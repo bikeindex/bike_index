@@ -10,10 +10,10 @@ class StolenNotificationsController < ApplicationController
     @stolen_notification.sender = current_user
     @bike = @stolen_notification.bike
     if @stolen_notification.save
-      flash[:notice] = "Thanks for looking out!" 
+      flash[:success] = "Thanks for looking out!" 
       redirect_to @bike
     else
-      flash[:notice] = "Crap! We couldn't send your notification. Please try again."
+      flash[:error] = "Crap! We couldn't send your notification. Please try again."
       render @bike
     end
   end

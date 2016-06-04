@@ -1,11 +1,14 @@
-class BikeDecorator < ApplicationDecorator 
+class BikeDecorator < ApplicationDecorator
   delegate_all
 
+  def should_show_other_bikes
+    object.current_owner_exists and object.owner.show_bikes
+  end
+
   def show_other_bikes
-    if object.current_owner_exists and object.owner.show_bikes
-      html = "<a href='/users/#{object.owner.username}'>View user's other bikes</a>" 
-      html.html_safe
-    end
+    return nil unless should_show_other_bikes
+    html = "<a href='/users/#{object.owner.username}'>View user's other bikes</a>"
+    html.html_safe
   end
 
   def bike_show_twitter_and_website
@@ -53,7 +56,7 @@ class BikeDecorator < ApplicationDecorator
     "wide"
   end
 
-  def seat_tube_display
+  def size_display
     return nil unless object.frame_size
     if object.frame_size_unit == "ordinal"
       "#{object.frame_size.upcase}"
@@ -79,7 +82,19 @@ class BikeDecorator < ApplicationDecorator
       h.image_tag(small.join('/') + ext, alt: title_string)
     else
       # h.image_tag("/assets/bike_photo_placeholder.png", alt: title) + h.content_tag(:span, "no image")
-    end    
+    end
+  end
+
+  def revised_thumb_image
+    if object.thumb_path
+      h.image_tag(object.thumb_path, alt: title_string)
+    elsif object.stock_photo_url.present?
+      small = object.stock_photo_url.split('/')
+      ext = "/small_" + small.pop
+      h.image_tag(small.join('/') + ext, alt: title_string)
+    else
+      h.image_tag('/assets/revised/bike_photo_placeholder.svg', alt: title, title: 'No image', class: 'no-image')
+    end
   end
 
   def list_image(target = nil)
@@ -93,7 +108,7 @@ class BikeDecorator < ApplicationDecorator
   def serial_display
     return "Hidden" if object.recovered
     if object.serial.match('absent')
-      object.stolen ? 'Do not know' : 'Has no serial'
+      object.made_without_serial ? 'Has no serial' : 'Unknown'
     else
       object.serial
     end

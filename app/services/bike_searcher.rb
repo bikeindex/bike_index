@@ -1,7 +1,8 @@
 class BikeSearcher
-  def initialize(creation_params = {})
-    @params = creation_params
-    @bikes = Bike.scoped
+  def initialize(creation_params = {}, reverse_geocode = nil)
+    # override reverse_geocode if passed as params
+    @params = creation_params.merge(reverse_geocode: reverse_geocode)
+    @bikes = params[:api_search] ? Bike.non_recovered : Bike.scoped
     if @params[:search_type].present?
       if @params[:search_type] == 'serial'
         @params[:serial] = @params[:query_typed]
@@ -18,20 +19,16 @@ class BikeSearcher
     end
   end
 
-  attr_accessor :params
+  attr_accessor :params, :location
 
   def interpreted_params(i_params)
-    query = i_params[:query]
+    query = (i_params[:query] || '').gsub('%23', '#') # ... ensure string so we can gsub it
     return i_params unless query.present?
     # serial segment looks like s#SERIAL#
-    serial_matcher = /
-      s(\#|%23)    # hash, either normal or encoded
-      [^(\#|%23)]* # any chars except hash
-      (\#|%23)     # final chars
-    /x
+    serial_matcher = /s#[^#]*#/i
     query.gsub!(serial_matcher) do |match|
       # Set the serial to the match, with the first part chopped and the last part chopped
-      i_params[:serial] = match.gsub(/\As(#|%23)/, '').gsub(/(#|%23)\z/, '')
+      i_params[:serial] = match.gsub(/\As#/, '').gsub(/#\z/, '')
       '' # remove it from query
     end
     i_params.merge(query: query)
@@ -64,22 +61,25 @@ class BikeSearcher
   end
 
   def stolenness
-    if @params[:non_stolen].present? || @params[:stolen].present?
-      if @params[:stolen].present? && @params[:stolen]
-        "stolen"
-      elsif @params[:non_stolen].present? && @params[:non_stolen]
-        "non_stolen"
-      end
-    end
+    return nil unless @params[:non_stolen].present? || @params[:stolen].present?
+    return 'stolen' if @params[:stolen].present? && @params[:stolen]
+    return 'non_stolen' if @params[:non_stolen].present? && @params[:non_stolen]
+  end
+
+  def is_proximity
+    return false if @params[:non_proximity] && @params[:non_proximity].present?
+    params[:proximity].present?
+  end
+
+  def stolenness_type
+    return 'all' unless stolenness.present?
+    return 'stolen_proximity' if stolenness == 'stolen' && is_proximity
+    stolenness
   end
 
   def matching_stolenness(bikes)
-    if stolenness == 'stolen'
-      @bikes = bikes.stolen 
-    elsif stolenness == 'non_stolen'
-      @bikes = bikes.non_stolen 
-    end
-    @bikes
+    return @bikes unless stolenness.present?
+    @bikes = (stolenness == 'stolen') ? bikes.stolen : bikes.non_stolen
   end
 
   def parsed_attributes
@@ -129,7 +129,7 @@ class BikeSearcher
     end
     if @color_ids.present?
       @color_ids.compact.each do |c_id|
-        @bikes = bikes.where("primary_frame_color_id = ? OR secondary_frame_color_id = ? OR tertiary_frame_color_id = ?", c_id, c_id, c_id)
+        @bikes = bikes.where('primary_frame_color_id = ? OR secondary_frame_color_id = ? OR tertiary_frame_color_id = ?', c_id, c_id, c_id)
       end
     end
     @bikes
@@ -138,7 +138,7 @@ class BikeSearcher
   def fuzzy_find_serial_ids(bike_ids=[])
     @normer.normalized_segments.each do |seg|
       next unless seg.length > 3
-      bike_ids += NormalizedSerialSegment.where("LEVENSHTEIN(segment, ?) < 3", seg).map(&:bike_id)
+      bike_ids += NormalizedSerialSegment.where('LEVENSHTEIN(segment, ?) < 3', seg).map(&:bike_id)
     end
     bike_ids
   end
@@ -152,15 +152,15 @@ class BikeSearcher
   end    
 
   def by_proximity
-    return nil unless stolenness == 'stolen'
-    return nil if @params[:non_proximity] && @params[:non_proximity].present?
+    return unless is_proximity
     stolen_ids = @bikes.pluck(:current_stolen_record_id)
-    return nil unless stolen_ids.present?
+    return unless stolen_ids.present?
     if @params[:proximity_radius].present? && @params[:proximity_radius].to_i > 1
       radius = @params[:proximity_radius].to_i
     end
     radius ||= 500
-    box = Geocoder::Calculations.bounding_box(@params[:proximity], radius)
+    @location = Geocoder.search(@params[:proximity]) if @params[:reverse_geocode]
+    box = Geocoder::Calculations.bounding_box((@location || @params[:proximity]), radius)
     unless box[0].nan?
       bike_ids = StolenRecord.where('id in (?)', stolen_ids).within_bounding_box(box).pluck(:bike_id)
       @bikes = @bikes.where('id in (?)', bike_ids)
@@ -169,7 +169,7 @@ class BikeSearcher
   end
 
   def by_date
-    return nil unless stolenness == 'stolen'
+    return unless stolenness == 'stolen'
     return @bikes unless @params[:stolen_before].present? || @params[:stolen_after].present?
     stolen_records = StolenRecord.where('id in (?)', @bikes.pluck(:current_stolen_record_id))
     if @params[:stolen_before].present?
@@ -181,7 +181,6 @@ class BikeSearcher
       stolen_records = stolen_records.where("date_stolen >= ?", after)
     end
     @bikes = @bikes.where('id in (?)', stolen_records.pluck(:bike_id))
-    # @bikes
   end
 
   def find_bikes
@@ -215,7 +214,7 @@ class BikeSearcher
     result[:stolen] = @bikes.count
     
     by_proximity
-    result.merge({proximity: @bikes.count})
+    result.merge(proximity: @bikes.count)
   end
 
   def close_serials
@@ -225,5 +224,4 @@ class BikeSearcher
     by_proximity
     @bikes
   end
-
 end

@@ -1,0 +1,112 @@
+.edit-bike-page-photos {
+  .edit-photo-display-list {
+    @include list-unstyled;
+    .edit-photo-display-wrap {
+      padding: 0 .5*$vertical-height;
+      background: white;
+      border: 1px solid $form-well-border-color;
+      img {
+        display: block;
+        width: 100%;
+        height: auto;
+        min-height: 100px;
+        position: relative;
+        background: white;
+        z-index: 2; // > than .processing
+      }
+    }
+    label.keep-private {
+      width: 100%;
+      text-align: right;
+      font-style: italic;
+      cursor: pointer;
+      font-size: 11px;
+      color: $gray-light;
+      margin-bottom: 0;
+      input { margin-left: .5em; }
+    }
+    .processing {
+      position: absolute;
+      left: 0; top: 50%;
+      width: 100%;
+      text-align: center;
+      color: $gray-light;
+      z-index: 1;
+    }
+    .trash-can-icon {
+      @include trash-can-icon($gray-light, $link-color, white, 2*$vertical-height);
+      display: inline-block;
+    }
+    .photo-remove {
+      display: block;
+      width: 100%;
+      text-align: center;
+      margin-top: .5*$vertical-height;
+      // Hovering anywhere on the link colors the trash-can-icon
+      &:hover, &:active, &.active {
+        .hover-colorize { background-color: $link-color; }
+      }
+    }
+  }
+  .edit-photo-upload {
+    padding-top: 2*$vertical-height;
+    label.file {
+      float: right;
+    }
+    .file-custom {
+      &::before {
+        content: "Upload Photos";
+        font-size: $btn-font-size;
+        font-family: $header-font-family;
+        font-weight: 400;
+        font-style: normal;
+        text-transform: uppercase;
+        color: white;
+        background: $green;
+        border-color: $green;
+      }
+    }
+  }
+
+  .edit-photo-display-list-item {
+    margin-top: $vertical-height;
+    position: relative;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: move;
+  }
+
+  // This class is unique to html5sortable for
+  // the placeholder that's shown while in motion
+  .placeholder {
+    @extend .edit-photo-display-list-item;
+    height: 280px;
+    border: 3px dashed #CCC;
+  }
+
+  // Actual item that is in the air, being dragged by you
+  .dragged {
+    position: absolute;
+    opacity: 0.5;
+    z-index: 2000;
+    transform: rotate(-15deg);
+  }
+
+  .upload {
+    border: 1px solid $form-well-border-color;
+    border-radius: $border-radius;
+    background: white;
+    width: 80%;
+    margin: 10px 10% 0;
+    padding: $vertical-height .5*$vertical-height;
+    .progress, .alert-success { margin-bottom: 0;}
+    p {
+      @include textoverflow;
+      margin-bottom: .5*$vertical-height;
+    }
+  }
+}

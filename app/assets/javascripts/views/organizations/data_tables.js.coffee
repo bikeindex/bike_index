@@ -16,9 +16,7 @@ class BikeIndex.Views.DataTables extends Backbone.View
       $('#admin-bikes-index').dataTable
         aaSorting: [ ]
         aLengthMenu: [[25, 50, 100, 200, -1], [25, 50, 100, 200, "All"]]
-        iDisplayLength: '-1'
-        sDom: "<'hidden'<'span6'l><'span6'f>r>t<'hidden'<'span6'i><'span6'p>>"
-        sPaginationType: "bootstrap"
+        iDisplayLength: -1
       
 
 
@@ -26,15 +24,13 @@ class BikeIndex.Views.DataTables extends Backbone.View
     $(table_id).dataTable
       aaSorting: [ ]
       aLengthMenu: [[25, 50, 100, 200, -1], [25, 50, 100, 200, "All"]]
-      iDisplayLength: '50'
-      sDom: "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-      sPaginationType: "bootstrap"
+      iDisplayLength: 50
+
       
 
   loadShortDataTable:(table_id) ->
     $(table_id).dataTable
       aaSorting: [ ]
       aLengthMenu: [[25, 50, -1], [25, 50, "All"]]
-      iDisplayLength: '25'
-      sDom: "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-      sPaginationType: "bootstrap"
+      iDisplayLength: 25
+

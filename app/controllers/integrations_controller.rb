@@ -16,7 +16,7 @@ class IntegrationsController < ApplicationController
 
   def integrations_controller_creation_error
     provider_name = request.env['omniauth.auth']['provider']
-    flash[:notice] = "There was a problem authenticating you with #{provider_name}. Please try To sign in a different way."
+    flash[:error] = "There was a problem authenticating you with #{provider_name}. Please try To sign in a different way."
     redirect_to new_session_url and return
   end
 end

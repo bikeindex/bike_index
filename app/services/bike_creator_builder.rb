@@ -8,7 +8,7 @@ class BikeCreatorBuilder
   end
 
   def add_front_wheel_size(bike)
-    if bike.rear_wheel_size_id.present? and bike.cycle_type_id == CycleType.find_by_slug("bike").id
+    if bike.rear_wheel_size_id.present? and bike.cycle_type_id == CycleType.bike.id
       bike.front_wheel_size_id = bike.rear_wheel_size_id
       bike.front_tire_narrow = bike.rear_tire_narrow
     end
@@ -16,10 +16,10 @@ class BikeCreatorBuilder
 
   def add_required_attributes(bike)
     unless bike.cycle_type_id.present?
-      bike.cycle_type_id = CycleType.find_by_slug("bike").id 
+      bike.cycle_type_id = CycleType.bike.id 
     end
     unless bike.propulsion_type_id.present?
-      bike.propulsion_type_id = PropulsionType.find_by_name("Foot pedal").id 
+      bike.propulsion_type_id = PropulsionType.foot_pedal.id
     end    
     bike 
   end

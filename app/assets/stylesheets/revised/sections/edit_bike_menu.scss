@@ -51,7 +51,7 @@ $active-bike-edit-border-width: 2px;
       border: none;
       font-size: 15px;
       line-height: 1em;
-      padding: 1.25em 1.75rem .6em .75em;
+      padding: 1.25em 1.75rem .55em .75em;
     }
     .menu-select-overlay {
       @extend small;
@@ -87,15 +87,12 @@ $active-bike-edit-border-width: 2px;
 // Medium and up screen styles
 @media (min-width: $grid-breakpoint-md) {
   .primary-edit-bike-menu {
+    float: left;
+    width: 33.33333%;
     position: -webkit-sticky;
     position: sticky;
     top: 8*$vertical-height; // Same as the padding top for body in primary_header_nav
-    margin-top: -8*$vertical-height;
-    ul {
-
-      display: block;
-      
-    }
+    ul { display: block; }
     .edit-bike-submit-wrapper { padding-top: 1em; }
   }
   // Hide with media query so as not to override selectize
@@ -105,7 +102,8 @@ $active-bike-edit-border-width: 2px;
 // XL screens - smaller menu, offset it
 @media (min-width: $grid-breakpoint-xl) {
   .primary-edit-bike-menu {
-    @include make-col-span(3);
+    // because we have to use floats instead of flex with sticky (affixing)
+    width: 25%;
     margin-right: 8.3333%; // 1 col margin - Manually set the offset via margin
   }
 }

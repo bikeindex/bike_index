@@ -1,4 +1,4 @@
-%nav.col-sm-4.primary-edit-bike-menu
+%nav.primary-edit-bike-menu
   %ul
     - @edit_templates.each do |template, description|
       %li
@@ -9,10 +9,11 @@
   .bike-edit-page-select
     %span.menu-select-overlay
       You are editing
-    %select
+    // ignore this select in dirty forms
+    %select.dirtyignore
       - @edit_templates.each do |template, description|
         %option{ selected: (@edit_template == template), value: edit_bike_path(page: template) }
-          = description
+          = description 
   .edit-bike-submit-wrapper
     = hidden_field_tag :edit_template, @edit_template
     = submit_tag 'Save changes', class: 'btn btn-lg btn-primary'

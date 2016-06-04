@@ -1,12 +1,22 @@
-- cache 'info_where_page' do 
+- cache("where/shown-#{@organizations.count}-#{@organizations.maximum(:updated_at)}") do
+  / Cache these queries
+  - @states = State.includes(:locations).all
+  - @countries = Country.where('iso != ?', 'US').includes(:locations)
+  / Set the locations on the window for the partial
+  - locations = []
+  - @organizations.shop.each do |organization|
+    - next unless organization.org_type == 'shop'
+    - organization.locations.each_with_index do |location, index|
+      - locations << [ "#shop#{location.org_location_id}", location.latitude, location.longitude]
+  :javascript
+    window.shop_locations = #{locations};
   %h1#where-bike-index
     Bike Index partners
     %small
       = link_to 'Sign up your organization', new_organization_path
-
   %article
     .map-of-shops
-      = render "/shared/shops_map"
+      = render '/shared/shops_map'
   %h3.padded
     US Partner organizations
 
@@ -55,8 +65,6 @@
     %h3.padded
       International Partner organizations
 
-
-
     - @countries.each do |country|
       - next unless country.locations.where(shown: true).any?
       %p.state-name
@@ -98,10 +106,6 @@
                     .map-telephone
                       %a{ href: "tel:#{ location.phone }" }
                         = number_to_phone(location.phone)
-
-
-      
-
 
 
   %hr.where-add-shops

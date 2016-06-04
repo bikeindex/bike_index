@@ -1,13 +1,12 @@
-require "spec_helper"
+require 'spec_helper'
 
 describe EmailOrganizationInvitationWorker do
-  it { should be_processed_in :notify }
+  it { is_expected.to be_processed_in :notify }
 
-
-  it "sends an email" do
+  it 'sends an email' do
     organization_invitation = FactoryGirl.create(:organization_invitation)
     ActionMailer::Base.deliveries = []
     EmailOrganizationInvitationWorker.new.perform(organization_invitation.id)
-    ActionMailer::Base.deliveries.should_not be_empty
+    expect(ActionMailer::Base.deliveries).not_to be_empty
   end
 end

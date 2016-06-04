@@ -1,12 +1,12 @@
+- @ctype_other_id = Ctype.other.id
+- @manufacturer_other_id = Manufacturer.other_manufacturer.id
 = form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do |f|
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
       = render partial: '/bikes/edit_primary_menu'
-      - @ctype_other_id = Ctype.other.id
-      - @manufacturer_other_id = Manufacturer.other_manufacturer.id
       .col-md-8.form-well#form_well_wrap{ data: { ctypeother: @ctype_other_id, manufacturerother: @manufacturer_other_id } }
         .form-wrap
-          .edit-bike-form-header
+          .form-well-form-header
             %h3
               = @edit_templates[@edit_template]
           .form-group.row.unnested-field.no-divider-row
@@ -19,4 +19,4 @@
               = render '/bikes/bike_fields/revised_component_fields', f: builder
             %hr
             .add-additional-components-block.no-divider-row
-              = revised_link_to_add_components 'Add a component', f, :components, 'Frame and fork'
+              = revised_link_to_add_components 'Add a component', f, :components

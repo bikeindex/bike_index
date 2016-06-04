@@ -1,0 +1,21 @@
+.side-box {
+  background: black;
+  color: white;
+  padding: $vertical-height;
+  .inner {
+    background: white;
+    color: $body-font-color;
+    padding: $vertical-height;
+    margin: 2*$vertical-height 0;
+    .btn {
+      display: block;
+      &:not(:first-child) { margin-top: $vertical-height; }
+    }
+  }
+  h3 {
+    color: white;
+    margin: 2*$vertical-height 0;
+  }
+  .first-item { margin-top: $vertical-height; }
+  .last-item { margin-bottom: 0; }
+}

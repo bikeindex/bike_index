@@ -1,0 +1,18 @@
+#welcome_user_home {
+  .lock-group {
+    @extend .row;
+    strong { display: block; }
+    .image-column {
+      @extend .col-xs-2;
+      padding-right: 0;
+    }
+  }
+  .user-items-nav {
+    @include binx-nav-tabs;
+    margin: 0 0 2*$vertical-height;
+    .nav-item {
+      width: 50%;
+      text-align: center;
+    }
+  }
+}

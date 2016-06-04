@@ -180,10 +180,7 @@ $slick-opacity-not-active: .25 !default;
         opacity: 0;
     }
 }
-@media (min-width: $m-breakpoint) {
-  .slick-prev,
-  .slick-next { display: none; }
-}
+
 .slick-prev:before, .slick-next:before {
     font-family: $slick-font-family;
     font-size: 40px;

@@ -1,0 +1,83 @@
+
+.bike-background {
+  &.scrolled { background: url("/assets/updated/home/bikes_mosaic_small.jpg") fixed; } 
+  width: 100%;
+  // 1200 x 480
+}
+
+@media (min-width: 1200px) {
+  .bike-background.scrolled { background: url("/assets/updated/home/bikes_mosaic_large.jpg") fixed; }
+}
+
+.bike-background.scrolled .supporters { display: block; }
+
+.supporters {
+  display: none;
+  box-shadow: inset 0 0 2px rgba(black,.6);
+  position: relative;
+  min-height: 15em;
+  padding: 40px 0 4em;
+  h2 {
+    font-size: 30px;
+    margin: .75em 0;
+    // margin: 1em 0;
+    text-shadow: 1px 1px 2px rgba(black,.3);
+    color: white;
+  }
+  .horizontal-list {
+    li {
+      width: 32.8%;
+      margin-left: 0.2%;
+      padding: 15px;
+      &:first-of-type { margin-left: 0; }
+      a { display: block; width: 100%;}
+      img { width: 100%; }
+    }
+  }
+}
+
+.and-many-more {
+  bottom: 0;
+  left: 3%;
+  width: 94%;
+  font-size: 18px;
+  color: #fff;
+  text-align: right;
+  margin: 0;
+  padding: 1.5em 0 .25em;
+  a {
+    font-weight: 400;
+    color: #cae4f6;
+    &:hover { color: $link-color; }
+  }
+}
+
+@media (min-width: 625px) {
+  .supporters {
+    padding-bottom: 5em;
+    h2 { font-size: 40px; }
+    .horizontal-list li {
+      width: 16.46%;
+      padding: 0;
+    }
+    .five-supporters li:first-of-type { margin-left: 8.23%; }
+  }
+}
+
+@media (min-width: 700px) {
+  .supporters .and-many-more {
+    font-size: 28px;
+  }
+}
+
+@media (min-width: 1000px) {
+  .supporters h2 {
+    font-size: 50px;
+  }
+}
+
+@media (min-width: 1300px) {
+  .supporters h2 { margin-left: -5%; }
+}
+
+

@@ -1,0 +1,5 @@
+<% if @public_image.new_record? %>
+  window.BikeIndexAlerts.add("error", "Failed to upload public_image: #{j @public_image.errors.full_messages.join(', ').html_safe}");
+<% else %>
+ $("#public_images").append("<%= j(render partial: '/public_images/revised_public_image', locals: { image: @public_image }) %>");
+<% end %>

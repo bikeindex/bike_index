@@ -1,5 +1,6 @@
 class StolenRecord < ActiveRecord::Base
   include ActiveModel::Dirty
+  include Phonifyerable
   attr_accessible :police_report_number,
     :police_report_department,
     :locking_description,
@@ -32,8 +33,10 @@ class StolenRecord < ActiveRecord::Base
     :recovery_share, # We edit this in the admin panel
     :recovery_tweet, # We edit this in the admin panel
     :recovery_posted,
-    :tsved_at
+    :tsved_at,
+    :date_stolen_input # now putting this in here, on revised, because less stupid
 
+  attr_accessor :date_stolen_input
 
   belongs_to :bike
   has_one :current_bike, class_name: 'Bike', foreign_key: :current_stolen_record_id
@@ -58,6 +61,23 @@ class StolenRecord < ActiveRecord::Base
     recovery_posted: false
   )}
 
+  def self.revised_date_format
+    '%a %b %d %Y'
+  end
+
+  before_validation :date_from_date_stolen_input
+  def date_from_date_stolen_input
+    if date_stolen_input.present?
+      self.date_stolen = DateTime.strptime("#{date_stolen_input} 06", "#{self.class.revised_date_format} %H")
+    else
+      true
+    end
+  end
+
+  def formatted_date
+    date_stolen && date_stolen.strftime(self.class.revised_date_format)
+  end
+
   def address
     return nil unless self.country
     a = []
@@ -73,6 +93,16 @@ class StolenRecord < ActiveRecord::Base
     a << zipcode if zipcode.present?
     a << country.iso if country.present? && country.iso != 'US'
     a.compact.join(', ')
+  end
+
+  def show_stolen_address
+    [
+      street,
+      city,
+      (state && state.abbreviation),
+      zipcode,
+      (country && country.name)
+    ].reject(&:blank?).join(', ')
   end
 
   # unless Rails.env.test?

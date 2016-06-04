@@ -9,9 +9,10 @@ task :slow_save => :environment do
   # end
 end
 
-task :start do
-  system 'redis-server &'
-  exec 'bundle exec foreman start -f Procfile_development'
+task :add_confirmed_email => :environment do
+  User.find_in_batches(batch_size: 500) do |b|
+    b.each { |u| UserEmail.create_confirmed_primary_email(u) }
+  end
 end
 
 task delete_expired_b_params: :environment do

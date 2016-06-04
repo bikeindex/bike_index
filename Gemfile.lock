@@ -1,12 +1,4 @@
 GIT
-  remote: git://github.com/rweng/jquery-datatables-rails.git
-  revision: 788a7b24caf8fe58a5493aa3f6a065879a9f752a
-  specs:
-    jquery-datatables-rails (1.12.2)
-      jquery-rails
-      sass-rails
-
-GIT
   remote: https://github.com/jrhe/grape-active_model_serializers
   revision: ca9c8faaa99727300ff21419aa20471ac27eed42
   specs:
@@ -82,20 +74,7 @@ GEM
     bootstrap (4.0.0.alpha3)
       autoprefixer-rails (>= 6.0.3)
       sass (>= 3.4.19)
-    brakeman (3.0.2)
-      erubis (~> 2.6)
-      fastercsv (~> 1.5)
-      haml (>= 3.0, < 5.0)
-      highline (~> 1.6.20)
-      multi_json (~> 1.2)
-      ruby2ruby (~> 2.1.1)
-      ruby_parser (~> 3.6.2)
-      sass (~> 3.0)
-      terminal-table (~> 1.4)
     builder (3.0.4)
-    bullet (4.8.0)
-      activesupport
-      uniform_notifier (>= 1.4.0)
     carrierwave (0.9.0)
       activemodel (>= 3.2.0)
       activesupport (>= 3.2.0)
@@ -132,11 +111,11 @@ GEM
     dotenv (1.0.2)
     dotenv-rails (1.0.2)
       dotenv (= 1.0.2)
-    draper (1.3.0)
+    draper (2.1.0)
       actionpack (>= 3.0)
       activemodel (>= 3.0)
       activesupport (>= 3.0)
-      request_store (~> 1.0.3)
+      request_store (~> 1.0)
     eco (1.0.0)
       coffee-script
       eco-source
@@ -148,17 +127,17 @@ GEM
     eventmachine (1.0.3)
     excon (0.14.3)
     execjs (2.6.0)
-    factory_girl (4.4.0)
+    factory_girl (4.2.0)
       activesupport (>= 3.0.0)
-    factory_girl_rails (4.4.1)
-      factory_girl (~> 4.4.0)
+    factory_girl_rails (4.2.1)
+      factory_girl (~> 4.2.0)
       railties (>= 3.0.0)
     faraday (0.9.0)
       multipart-post (>= 1.2, < 3)
+    fast_blank (1.0.0)
     fast_stack (0.1.0)
       rake
       rake-compiler
-    fastercsv (1.5.5)
     ffi (1.9.10)
     flamegraph (0.1.0)
       fast_stack
@@ -195,7 +174,6 @@ GEM
       grape-entity
     groupdate (2.2.1)
       activesupport (>= 3)
-    growl (1.0.3)
     guard (2.13.0)
       formatador (>= 0.2.4)
       listen (>= 2.7, <= 4.0)
@@ -205,9 +183,11 @@ GEM
       pry (>= 0.9.12)
       shellany (~> 0.0)
       thor (>= 0.18.1)
-    guard-rspec (4.2.10)
+    guard-compat (1.2.1)
+    guard-rspec (4.6.5)
       guard (~> 2.1)
-      rspec (>= 2.14, < 4.0)
+      guard-compat (~> 1.1)
+      rspec (>= 2.99.0, < 4.0)
     guard-rubocop (1.2.0)
       guard (~> 2.0)
       rubocop (~> 0.20)
@@ -224,10 +204,10 @@ GEM
       tilt
     hashie (3.4.1)
     high_voltage (2.1.0)
-    highline (1.6.21)
     hike (1.2.3)
     hiredis (0.6.1)
     hitimes (1.2.3)
+    honeybadger (2.5.3)
     http (0.9.8)
       addressable (~> 2.3)
       http-cookie (~> 1.0)
@@ -243,13 +223,15 @@ GEM
     i18n (0.7.0)
     ice_nine (0.11.1)
     journey (1.0.4)
+    jquery-datatables-rails (3.4.0)
+      actionpack (>= 3.1)
+      jquery-rails
+      railties (>= 3.1)
+      sass-rails
     jquery-rails (3.1.3)
       railties (>= 3.0, < 5.0)
       thor (>= 0.14, < 2.0)
     json (1.8.3)
-    json_spec (1.1.4)
-      multi_json (~> 1.0)
-      rspec (>= 2.0, < 4.0)
     jwt (0.1.11)
       multi_json (>= 1.5)
     kaminari (0.16.1)
@@ -350,20 +332,12 @@ GEM
       bundler (~> 1.0)
       railties (= 3.2.22)
     rails-assets-Stickyfill (1.1.3)
-    rails-assets-blueimp-canvas-to-blob (3.3.0)
-    rails-assets-blueimp-load-image (2.6.1)
-    rails-assets-blueimp-tmpl (3.4.0)
     rails-assets-headroom.js (0.7.0)
     rails-assets-jquery (2.2.3)
-    rails-assets-jquery-file-upload (9.12.1)
-      rails-assets-blueimp-canvas-to-blob (>= 2.1.1)
-      rails-assets-blueimp-load-image (>= 1.13.0)
-      rails-assets-blueimp-tmpl (>= 2.5.4)
-      rails-assets-jquery (>= 1.6)
     rails-assets-jquery.dirtyforms (2.0.0)
       rails-assets-jquery (>= 1.4.2)
+    rails-assets-lodash (4.9.0)
     rails-assets-microplugin (0.0.3)
-    rails-assets-moment (2.12.0)
     rails-assets-mustache (2.2.1)
     rails-assets-pikaday (1.4.0)
     rails-assets-selectize (0.12.1)
@@ -392,7 +366,7 @@ GEM
       json (~> 1.4)
     redis (3.2.2)
     ref (1.0.5)
-    request_store (1.0.5)
+    request_store (1.3.1)
     rerun (0.10.0)
       listen (~> 2.7, >= 2.7.3)
     rest-client (1.8.0)
@@ -404,25 +378,30 @@ GEM
     rqrcode (0.4.2)
     rqrcode-rails3 (0.1.7)
       rqrcode (>= 0.4.2)
-    rspec (2.14.1)
-      rspec-core (~> 2.14.0)
-      rspec-expectations (~> 2.14.0)
-      rspec-mocks (~> 2.14.0)
-    rspec-core (2.14.8)
-    rspec-expectations (2.14.5)
-      diff-lcs (>= 1.1.3, < 2.0)
-    rspec-mocks (2.14.6)
-    rspec-rails (2.14.2)
-      actionpack (>= 3.0)
-      activemodel (>= 3.0)
-      activesupport (>= 3.0)
-      railties (>= 3.0)
-      rspec-core (~> 2.14.0)
-      rspec-expectations (~> 2.14.0)
-      rspec-mocks (~> 2.14.0)
-    rspec-sidekiq (1.0.0)
-      rspec (>= 2.0.0)
+    rspec (3.3.0)
+      rspec-core (~> 3.3.0)
+      rspec-expectations (~> 3.3.0)
+      rspec-mocks (~> 3.3.0)
+    rspec-core (3.3.2)
+      rspec-support (~> 3.3.0)
+    rspec-expectations (3.3.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.3.0)
+    rspec-mocks (3.3.2)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.3.0)
+    rspec-rails (3.3.3)
+      actionpack (>= 3.0, < 4.3)
+      activesupport (>= 3.0, < 4.3)
+      railties (>= 3.0, < 4.3)
+      rspec-core (~> 3.3.0)
+      rspec-expectations (~> 3.3.0)
+      rspec-mocks (~> 3.3.0)
+      rspec-support (~> 3.3.0)
+    rspec-sidekiq (2.2.0)
+      rspec (~> 3.0, >= 3.0.0)
       sidekiq (>= 2.4.0)
+    rspec-support (3.3.0)
     rubocop (0.37.2)
       parser (>= 2.3.0.4, < 3.0)
       powerpack (~> 0.1)
@@ -431,21 +410,14 @@ GEM
       unicode-display_width (~> 0.3)
     ruby-hmac (0.4.0)
     ruby-progressbar (1.7.5)
-    ruby2ruby (2.1.3)
-      ruby_parser (~> 3.1)
-      sexp_processor (~> 4.0)
-    ruby_parser (3.6.5)
-      sexp_processor (~> 4.1)
     sass (3.4.22)
     sass-rails (3.2.6)
       railties (~> 3.2.0)
       sass (>= 3.1.10)
       tilt (~> 1.3)
     secure_headers (2.0.1)
-    sexp_processor (4.5.0)
     shellany (0.0.1)
-    should_clean (0.0.3)
-    shoulda-matchers (2.6.0)
+    shoulda-matchers (2.8.0)
       activesupport (>= 3.0.0)
     sidekiq (4.1.1)
       concurrent-ruby (~> 1.0)
@@ -489,8 +461,7 @@ GEM
       railties (~> 3.0)
     swagger-ui_rails (0.1.7)
     temple (0.7.6)
-    terminal-table (1.4.5)
-    therubyracer (0.12.1)
+    therubyracer (0.12.2)
       libv8 (~> 3.16.14.0)
       ref
     thor (0.19.1)
@@ -515,7 +486,6 @@ GEM
       raindrops (~> 0.7)
     unicorn-worker-killer (0.4.2)
       unicorn (~> 4)
-    uniform_notifier (1.4.0)
     uuidtools (2.1.4)
     vegas (0.1.11)
       rack (>= 1.0.0)
@@ -542,8 +512,6 @@ DEPENDENCIES
   backbone-on-rails (~> 0.9.10.0)
   bcrypt-ruby (~> 3.0.0)
   bootstrap (~> 4.0.0.alpha3)
-  brakeman
-  bullet
   bundler (>= 1.8.4)
   carrierwave (~> 0.9.0)
   carrierwave_backgrounder
@@ -556,7 +524,8 @@ DEPENDENCIES
   dotenv-rails
   draper
   eventmachine (~> 1.0.3)
-  factory_girl_rails
+  factory_girl_rails (~> 4.2.1)
+  fast_blank (~> 1.0)
   flamegraph
   fog
   foreman
@@ -565,18 +534,17 @@ DEPENDENCIES
   grape-active_model_serializers!
   grape-swagger
   groupdate
-  growl
   guard
-  guard-rspec (~> 4.2.10)
+  guard-rspec (~> 4.6.4)
   guard-rubocop
   haml-rails
   hamlit
   high_voltage
+  honeybadger (~> 2.0)
   i18n
   journey (~> 1.0.3)
-  jquery-datatables-rails!
+  jquery-datatables-rails (~> 3.4.0)
   jquery-rails
-  json_spec
   kaminari
   kramdown
   libv8 (~> 3.16.14.7)
@@ -596,9 +564,8 @@ DEPENDENCIES
   rails (= 3.2.22)
   rails-assets-Stickyfill (~> 1.1.3)!
   rails-assets-headroom.js (~> 0.7.0)!
-  rails-assets-jquery-file-upload (~> 9.12.1)!
   rails-assets-jquery.dirtyforms (~> 2.0.0)!
-  rails-assets-moment (~> 2.12.0)!
+  rails-assets-lodash (~> 4.9.0)!
   rails-assets-mustache (~> 2.2.1)!
   rails-assets-pikaday (~> 1.4.0)!
   rails-assets-selectize (~> 0.12.1)!
@@ -611,16 +578,15 @@ DEPENDENCIES
   rmagick
   rollout
   rqrcode-rails3
-  rspec-rails
-  rspec-sidekiq
+  rspec (~> 3.3.0)
+  rspec-rails (~> 3.3.0)
+  rspec-sidekiq (~> 2.2.0)
   sass-rails (~> 3.2.6)
   secure_headers
-  should_clean
-  shoulda-matchers
+  shoulda-matchers (~> 2.8.0)
   sidekiq (~> 4.1.1)
   sidekiq-failures
   sidekiq-unique-jobs
-  simplecov
   sitemap_generator
   soulheart (~> 0.2.6)
   sparkpost
@@ -637,4 +603,4 @@ DEPENDENCIES
   wkhtmltopdf-binary
 
 BUNDLED WITH
-   1.11.2
+   1.12.0.rc.4
