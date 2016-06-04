@@ -7,4 +7,7 @@ class CycleType < ActiveRecord::Base
 
   has_many :bikes
 
+  def self.bike
+    CycleType.first_or_create(name: 'Bike', slug: 'bike')
+  end
 end

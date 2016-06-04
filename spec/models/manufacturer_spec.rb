@@ -11,6 +11,23 @@ describe Manufacturer do
     it { should have_many :paints }
   end
 
+  describe :ensure_non_blocking_name do
+    before { FactoryGirl.create(:color, name: 'Purple') }
+    context 'name same as a color' do
+      it 'adds an error' do
+        manufacturer = FactoryGirl.build(:manufacturer, name: ' pURple ')
+        manufacturer.valid?
+        expect(manufacturer.errors.full_messages.to_s).to match 'same as a color'
+      end
+    end
+    context 'name includes a color' do
+      it 'adds no error' do
+        manufacturer = FactoryGirl.build(:manufacturer, name: 'Purple bikes')
+        manufacturer.valid?
+        expect(manufacturer.errors.count).to eq 0
+      end
+    end
+  end
 
   describe :fuzzy_name_find do
     it "finds manufacturers by their slug" do

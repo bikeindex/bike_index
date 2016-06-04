@@ -1,92 +1,100 @@
-= form_for [:admin, @customer_contact], html: { class: "form form-horizontal admin-bike-edit" } do |f|
-  - if @customer_contact.errors.any?
-    #alert-block
-      .alert.alert-error
-        %a.close{"data-dismiss" => "alert"} ×
-        %h4
-          Please fix the following 
-          = pluralize(@customer_contact.errors.count, "error")
-        %ul
-          - @customer_contact.errors.full_messages.each do |msg|
-            %li 
-              = msg  
-  .feedbacks
-    %h4
-      Send bike owner an email
-    .contact-info
-      .contact-first-row
-        = f.email_field :creator_email, value: current_user.email
-        = f.email_field :user_email, value: @bike.owner_email
-      = f.text_field :title, value: "Your stolen #{@bike.title_string}"
-      = f.hidden_field :contact_type, value: 'stolen_contact'
-      = f.hidden_field :creator_id, value: current_user.id
-      = f.hidden_field :bike_id, value: @bike.id
-    .contact-text
-      = f.text_area :body, placeholder: "You can write HTML in here. There will be a link to the #{@bike.type} included automatically.", rows: 7   
-    .feedback-actions.control-group.padded
-      = f.submit 'Send it!', class: 'button-green pull-right'
-  
+- if @customer_contact.present?
+  = form_for [:admin, @customer_contact], html: { class: "form form-horizontal admin-bike-edit" } do |f|
+    - if @customer_contact.errors.any?
+      #alert-block
+        .alert.alert-error
+          %a.close{"data-dismiss" => "alert"} ×
+          %h4
+            Please fix the following 
+            = pluralize(@customer_contact.errors.count, "error")
+          %ul
+            - @customer_contact.errors.full_messages.each do |msg|
+              %li 
+                = msg  
+    .feedbacks
+      %h4
+        Send bike owner an email
+      .contact-info
+        .contact-first-row
+          = f.email_field :creator_email, value: current_user.email
+          = f.email_field :user_email, value: @bike.owner_email
+        = f.text_field :title, value: "Your stolen #{@bike.title_string}"
+        = f.hidden_field :contact_type, value: 'stolen_contact'
+        = f.hidden_field :creator_id, value: current_user.id
+        = f.hidden_field :bike_id, value: @bike.id
+      .contact-text
+        = f.text_area :body, placeholder: "You can write HTML in here. There will be a link to the #{@bike.type} included automatically.", rows: 7   
+      .feedback-actions.control-group.padded
+        = f.submit 'Send it!', class: 'button-green pull-right'
+    
 
-#chosen-container
-  %ul.bike-boxes
-    = render partial: "/bikes/bike", locals: {bike: @bike, target: "show" }
-  - if @stolen_record.present?
-    %p
-      = @stolen_record.theft_description
-    .dl-holder
-      %dl.dl-horizontal
-        = @bike.dl_list_item(@bike.created_at.strftime("%m-%d-%Y"), "Created")
-        = @bike.dl_from_attribute("owner_email")
-        = @bike.dl_list_item(@bike.owner.email, "Current Owner")
-        - if @bike.creation_organization_id.present?
-          = @bike.dl_list_item(@bike.creation_organization.name, "Creation Organization")
-        %dt
-          Callable by
-        %dd
-          - if @stolen_record.phone_for_everyone
-            %strong
-              Everyone
+  #chosen-container
+    %ul.bike-boxes
+      = render partial: "/bikes/bike", locals: {bike: @bike, target: "show" }
+    - if @stolen_record.present?
+      %p
+        = @stolen_record.theft_description
+      .dl-holder
+        %dl.dl-horizontal
+          = @bike.dl_list_item(@bike.created_at.strftime("%m-%d-%Y"), "Created")
+          = @bike.dl_from_attribute("owner_email")
+          = @bike.dl_list_item(@bike.owner.email, "Current Owner")
+          - if @bike.creation_organization_id.present?
+            = @bike.dl_list_item(@bike.creation_organization.name, "Creation Organization")
+          %dt
+            Callable by
+          %dd
+            - if @stolen_record.phone_for_everyone
+              %strong
+                Everyone
+            - else
+              = "Users" if @stolen_record.phone_for_users
+              = " Shops" if @stolen_record.phone_for_shops
+              = " Police" if @stolen_record.phone_for_police
+          - if @stolen_record.approved 
+            %h2
+              Stolen bike approved
           - else
-            = "Users" if @stolen_record.phone_for_users
-            = " Shops" if @stolen_record.phone_for_shops
-            = " Police" if @stolen_record.phone_for_police
-        - if @stolen_record.approved 
-          %h2
-            Stolen bike approved
-        - else
-          = link_to 'Approve listing', approve_admin_stolen_bike_url(@bike), method: :post, confirm: "Approving will:\n\n- Send out a tweet\n- The #{@bike.type} will be posted to any pertinent blogs.\n- It can NOT be effectively reversed\n", class: 'button-blue padded'
-      %dl.dl-horizontal
-      
-        %dt
-          Stolen on
-        %dd
-          = @stolen_record.date_stolen.strftime("%m-%d-%Y")
-        %dt
-          Address
-        %dd
-          = @stolen_record.address
-        %dt
-          Phone
-        %dd
-          = @stolen_record.phone
-        = @bike.dl_list_item(@stolen_record.secondary_phone, "Secondary phone")
+            = link_to 'Approve listing', approve_admin_stolen_bike_url(@bike), method: :post, confirm: "Approving will:\n\n- Send out a tweet\n- The #{@bike.type} will be posted to any pertinent blogs.\n- It can NOT be effectively reversed\n", class: 'button-blue padded'
+        %dl.dl-horizontal
+        
+          %dt
+            Stolen on
+          %dd
+            = @stolen_record.date_stolen.strftime("%m-%d-%Y")
+          %dt
+            Address
+          %dd
+            = @stolen_record.address
+          %dt
+            Phone
+          %dd
+            = @stolen_record.phone
+          = @bike.dl_list_item(@stolen_record.secondary_phone, "Secondary phone")
 
-        %dt
-          Police department
-        %dd
-          = @stolen_record.police_report_department
-        %dt
-          Police Report
-        = @stolen_record.police_report_number
-  - else
-    %h1.padded
-      Stolen record not created yet.
-    %p
-      Wait a minute or two and it will be here!
+          %dt
+            Police department
+          %dd
+            = @stolen_record.police_report_department
+          %dt
+            Police Report
+          = @stolen_record.police_report_number
+    - else
+      %h1.padded
+        Stolen record not created yet.
+      %p
+        Wait a minute or two and it will be here!
 
-  %hr.padded
-  = link_to "Standard edit page", edit_admin_bike_url(@bike)
-  .clearfix
-    - @bike.public_images.each do |img|
-      .pull-left
-        = image_tag img.image_url(:small)
+    %hr.padded
+    = link_to "Standard edit page", edit_admin_bike_url(@bike)
+    .clearfix
+      - @bike.public_images.each do |img|
+        .pull-left
+          = image_tag img.image_url(:small)
+- else
+  %h1
+    Something is broken on this page
+  %h2
+    This bike doesn't have an owner
+  %p
+    Talk to a developer

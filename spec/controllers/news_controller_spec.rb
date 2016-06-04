@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe NewsController do
-
   describe :index do
     before do 
       get :index
@@ -41,5 +40,4 @@ describe NewsController do
     it { should respond_with(:success) }
     it { should render_template(:show) }
   end
-
 end

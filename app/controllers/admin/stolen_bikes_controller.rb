@@ -24,12 +24,6 @@ class Admin::StolenBikesController < Admin::BaseController
     redirect_to edit_admin_stolen_bike_url(@bike), notice: 'Bike was approved.'
   end
 
-  def destroy
-    @bike.destroy
-    flash[:notice] = "Bike deleted!"
-    redirect_to admin_bikes_url
-  end
-
   def show
     redirect_to edit_admin_stolen_bike_url
   end

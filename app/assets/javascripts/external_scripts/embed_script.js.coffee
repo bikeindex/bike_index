@@ -3,7 +3,7 @@ initializeFrameMaker = (target) ->
   frame_mnfg_url = "#{window.root_url}/api/autocomplete?per_page=#{per_page}&categories=frame_mnfg&q="
   $(target).selectize
     plugins: ['restore_on_backspace']
-    preload: true
+    # preload: true
     create: false
     maxItems: 1
     valueField: 'slug'

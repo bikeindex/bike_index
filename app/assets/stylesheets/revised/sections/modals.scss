@@ -1,0 +1,58 @@
+// 
+// Unlike bootstrap buttons styles, we're leaving the standard modal code
+// and extending here
+
+.modal-header {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.modal-footer { 
+  border-top: none;
+  padding-top: 0;
+}
+
+.modal-btn-footer {
+  @extend .modal-footer;
+  text-align: center;
+  .btn {
+    display: block;
+    width: 100%;
+    padding-top: 1em;
+    padding-bottom: 1em;
+  }
+}
+
+.modal {
+  .close {
+    font-size: inherit;
+    font-family: sans-serif;
+    font-weight: 100;
+    color: $gray;
+  }
+}
+
+// 
+// DirtyForm dialog box. Make it look like modal btn footer without having to actually
+// modify the stuff in jquery.dirtyforms.dialogs.bootstrap.min.js
+#dirty-dialog {
+  .modal-footer {
+    padding-left: 2*0.9375rem;
+    padding-right: 0.9375rem;
+  }
+  .btn {
+    display: block;
+    width: 50%;
+    padding-top: 1em;
+    padding-bottom: 1em;
+  }
+  .btn-danger {
+    margin: 0;
+    float: right;
+  }
+  .btn-default {
+    @extend .btn-secondary;
+    float: left;
+    margin-left: -0.9375rem;
+  }
+}

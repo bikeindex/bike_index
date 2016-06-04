@@ -1,0 +1,148 @@
+/*
+ * Revised manifest file
+ * things from rails-assets
+ *= require pikaday
+ *= require selectize/selectize.bootstrap3.scss
+ */
+
+/*!
+ * Bootstrap v4.0.0-alpha.2 (http://getbootstrap.com)
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ */
+
+// Core variables and mixins
+@import "bootstrap/variables";
+
+// 
+// Overrides
+$border-radius:          1px;
+$border-radius-lg:       1px;
+$border-radius-sm:       1px;
+@import "revised/mixins/colors";
+
+// 
+// More bootstrap
+@import "bootstrap/mixins";
+
+// Reset and dependencies
+@import "bootstrap/normalize";
+@import "bootstrap/print";
+
+// Core CSS
+@import "bootstrap/reboot";
+// @import "bootstrap/type";
+@import "bootstrap/images";
+@import "bootstrap/code";
+@import "bootstrap/grid";
+@import "bootstrap/tables";
+@import "bootstrap/forms";
+// @import "bootstrap/buttons"; // Override buttons with our own buttons
+
+// Components
+@import "bootstrap/animation";
+@import "bootstrap/dropdown";
+@import "bootstrap/button-group";
+@import "bootstrap/input-group";
+@import "bootstrap/custom-forms";
+@import "bootstrap/nav";
+@import "bootstrap/navbar";
+@import "bootstrap/card";
+@import "bootstrap/breadcrumb";
+@import "bootstrap/pagination";
+// @import "bootstrap/tags";
+@import "bootstrap/jumbotron";
+// @import "bootstrap/alert";
+@import "bootstrap/progress";
+@import "bootstrap/media";
+@import "bootstrap/list-group";
+@import "bootstrap/responsive-embed";
+@import "bootstrap/close";
+
+// Components w/ JavaScript
+$modal-backdrop-bg: $blue-dark;
+$modal-backdrop-opacity: 0.8;
+@import "bootstrap/modal";
+@import "bootstrap/tooltip";
+@import "bootstrap/popover";
+@import "bootstrap/carousel";
+
+// Utility classes
+@import "bootstrap/utilities";
+
+
+//
+// Other (non-bootstrap) external styles
+
+
+
+/*!
+ * Bike Index styles
+ * for revised style in 2016
+ */
+
+// Because Mike Oleon is obsessed with the imperial system
+// or something wack like that
+$vertical-height: 12px;
+
+// To make grid breakpoints variables for now
+$grid-breakpoint-xs: 0;
+$grid-breakpoint-sm: 544px;
+$grid-breakpoint-md: 768px;
+$grid-breakpoint-lg: 992px;
+$grid-breakpoint-xl: 1200px;
+$row-side-padding: 0.9375rem;
+
+// Settings
+@import "revised/fonts";
+
+// Bootstrap overrides
+@import "revised/mixins/buttons";
+@import "revised/sections/modals";
+@import "revised/sections/alerts";
+
+// Bike Index mixins
+@import "revised/mixins/trash_can_icon";
+
+// Shared styles
+@import "revised/sections/primary_header_nav";
+@import "revised/sections/primary_footer";
+@import "revised/sections/content_menu";
+@import "revised/sections/form_well";
+@import "revised/sections/edit_bike_menu";
+@import "revised/sections/edit_bike_title";
+@import "revised/sections/horizontal_lines";
+@import "revised/sections/legal";
+
+// 
+// Page styles
+// 
+// Bike pages
+@import "revised/pages/bikes/new";
+@import "revised/pages/bikes/edit_root";
+@import "revised/pages/bikes/edit_ownership";
+@import "revised/pages/bikes/edit_stolen";
+@import "revised/pages/bikes/edit_accessories";
+@import "revised/pages/info/where";
+@import "revised/pages/info/about";
+@import "revised/pages/info/protect_your_bike";
+@import "revised/pages/payments/payments";
+
+
+// LEGACY PAGES general styles - replace as soon as all pages have been restyled
+@import "revised/sections/legacy_content"; // general legacy content styles
+
+html { background: $black-off; }
+body { min-height: 400px; }
+.currently-hidden { display: none; }
+img { max-width: 100%; } // don't break random stuff images!
+
+
+// 
+// External overrides
+// 
+// Bike Index selectize overrides
+.selectize-dropdown [data-selectable] .highlight { background: rgba($blue, 0.2); }
+.selectize-dropdown .active { background-color: lighten(#bebebe, 10%); }
+// Pickaday overrides
+.pika-button:hover { background: $blue; }

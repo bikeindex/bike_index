@@ -23,7 +23,7 @@ class Location < ActiveRecord::Base
 
   scope :by_state, -> { order(:state_id) }
   scope :shown, -> { where(shown: true) }
-  # scope :international, where("country_id IS NOT #{Country.find_by_iso("US").id}")
+  # scope :international, where("country_id IS NOT #{Country.united_states.id}")
 
   def address
     return nil unless self.country

@@ -1,85 +1,72 @@
 require 'spec_helper'
 
 describe InfoController do
-  describe :about do
-    before do
-      get :about
+  describe 'non-updated views' do
+    %w(about protect_your_bike where serials image_resources resources dev_and_design).each do |page|
+      context page do
+        it 'renders with content layout' do
+          get page.to_sym
+          expect(response.status).to eq(200)
+          expect(response).to render_template(page.to_sym)
+          expect(response).to render_with_layout('content')
+        end
+      end
     end
-    it { should respond_with(:success) }
-    it { should render_template(:about) }
+    %w(support_the_index).each do |page|
+      context page do
+        it 'renders with application_updated and overriden title' do
+          get page.to_sym
+          expect(response.status).to eq(200)
+          expect(response).to render_template(page.to_sym)
+          expect(response).to render_with_layout('application_updated')
+        end
+      end
+    end
+    %w(privacy terms vendor_terms).each do |page|
+      context "#{page} renders" do
+        it 'renders with legal' do
+          get page.to_sym
+          expect(response.status).to eq(200)
+          expect(response).to render_template(page.to_sym)
+          expect(response).to render_with_layout('legal')
+        end
+      end
+    end
   end
 
-  describe :protect_your_bike do
-    before do
-      get :protect_your_bike
+  describe 'revised views' do
+    let(:user) { FactoryGirl.create(:user) }
+    pages = %w(about protect_your_bike where serials image_resources resources dev_and_design support_the_index terms vendor_terms support_the_index)
+    context 'no user' do
+      pages.each do |page|
+        context "#{page} with revised_layout enabled" do
+          it 'renders with revised_layout' do
+            allow(controller).to receive(:revised_layout_enabled?) { true }
+            get page.to_sym
+            expect(response.status).to eq(200)
+            expect(response).to render_template(page.to_sym)
+            expect(response).to render_with_layout('application_revised')
+          end
+        end
+      end
     end
-    it { should respond_with(:success) }
-    it { should render_template(:protect_your_bike) }
-  end
-
-  describe :where do
-    before do
-      FactoryGirl.create(:country, iso: "US")
-      get :where
+    context 'signed in user' do
+      # Since we're rendering things, and these are important pages,
+      # let's test with users as well
+      before do
+        set_current_user(user)
+      end
+      pages.each do |page|
+        context "#{page} with revised_layout enabled" do
+          it 'renders with revised_layout' do
+            allow(controller).to receive(:revised_layout_enabled?) { true }
+            get page.to_sym
+            expect(response.status).to eq(200)
+            expect(response).to render_template(page.to_sym)
+            expect(response).to render_with_layout('application_revised')
+          end
+        end
+      end
     end
-    it { should respond_with(:success) }
-    it { should render_template(:where) }
   end
-
-  describe :serials do
-    before do
-      get :serials
-    end
-    it { should respond_with(:success) }
-    it { should render_template(:serials) }
-  end
-
-  describe :image_resources do
-    before do
-      get :image_resources
-    end
-    it { should respond_with(:success) }
-    it { should render_template(:image_resources) }
-  end
-
-  describe :privacy do
-    before do
-      get :privacy
-    end
-    it { should respond_with(:success) }
-    it { should render_template(:privacy) }
-  end
-
-  describe :terms do
-    before do
-      get :terms
-    end
-    it { should respond_with(:success) }
-    it { should render_template(:terms) }
-  end
-
-  describe :vendor_terms do
-    before do
-      get :vendor_terms
-    end
-    it { should respond_with(:success) }
-    it { should render_template(:vendor_terms) }
-  end
-
-  describe :resources do
-    before do
-      get :resources
-    end
-    it { should respond_with(:success) }
-    it { should render_template(:resources) }
-  end
-
-  describe :support_the_index do
-    before do
-      get :support_the_index
-    end
-    it { should respond_with(:success) }
-    it { should render_template(:support_the_index) }
-  end
-
 end

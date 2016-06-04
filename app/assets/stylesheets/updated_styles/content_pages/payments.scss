@@ -55,6 +55,18 @@
     }
   }
 }
+.container.payments-page .payment-types-list.just-one {
+  li {
+    min-width: 50%;
+    margin: 0 auto;
+    display: block;
+    float: none;
+    a {
+      @include binx-button($gray-lighter, $gray-lightest, lighten($gray-light, 2%), rgba($text-color,.9), .015em);
+      .donation input { background: #fff; color: $text-color; }
+    }
+  }
+}
 
 @media (min-width: $m-breakpoint+1) {
   .payments-page {

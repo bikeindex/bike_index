@@ -14,4 +14,8 @@ class Cgroup < ActiveRecord::Base
     self.slug = Slugifyer.slugify(self.name)
   end
 
+  def self.additional_parts
+    where(name: 'Additional parts').first_or_create
+  end
+
 end

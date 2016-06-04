@@ -14,6 +14,10 @@ task :start do
   exec 'bundle exec foreman start -f Procfile_development'
 end
 
+task delete_expired_b_params: :environment do
+  BParam.pluck(:id).each { |id| RemoveExpiredBParamsWorker.perform_async(id) }
+end
+
 desc 'Create frame_makers and push to redis'
 task :sm_import_manufacturers => :environment do
   AutocompleteLoaderWorker.perform_async('load_manufacturers')

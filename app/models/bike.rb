@@ -8,6 +8,7 @@ class Bike < ActiveRecord::Base
     :serial_number,
     :serial_normalized,
     :has_no_serial,
+    :made_without_serial, # GUARANTEE there was no serial 
     :additional_registration,
     :creation_organization_id,
     :location_id,
@@ -353,7 +354,7 @@ class Bike < ActiveRecord::Base
 
   def type
     # Small helper because we call this a lot
-    self.cycle_type.name.downcase
+    cycle_type.name.downcase
   end
 
   def cgroup_array
