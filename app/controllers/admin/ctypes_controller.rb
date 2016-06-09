@@ -1,3 +1,11 @@
+=begin
+*****************************************************************
+* File: app/controllers/admin/ctypes_controller.rb
+* Name: Class Admin::CtypesController
+* CRUD of Ctype controller
+*****************************************************************
+=end
+
 class Admin::CtypesController < Admin::BaseController
   before_filter :find_ctypes, only: [:edit, :update, :destroy]  
 

@@ -1,3 +1,11 @@
+=begin
+*****************************************************************
+* File: app/controllers/admin/ads_controller.rb
+* Name: Class Admin::AdsController
+* CRUD of admin
+*****************************************************************
+=end
+
 class Admin::AdsController < Admin::BaseController
   before_filter :find_ad, except: [:index, :new, :create]
   before_filter :find_organizations, only: [:new, :edit]

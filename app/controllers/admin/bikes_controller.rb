@@ -1,3 +1,11 @@
+=begin
+*****************************************************************
+* File: app/controllers/admin/bikes_controller.rb
+* Name: Class BikeNotSavedError
+* CRUD of abike admin controller
+*****************************************************************
+=end
+
 class BikeNotSavedError < StandardError
 end
 

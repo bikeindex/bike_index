@@ -1,3 +1,11 @@
+=begin
+*****************************************************************
+* File: app/controllers/admin/customer_contacts_controller.rb
+* Name: Class Admin::CustomerContactsController
+* Just the create method
+*****************************************************************
+=end
+
 class Admin::CustomerContactsController < Admin::BaseController
   
   def create

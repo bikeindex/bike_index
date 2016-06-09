@@ -1,3 +1,11 @@
+=begin
+*****************************************************************
+* File: app/controllers/admin/dashboard_controller.rb
+* Name: Class Admin::DashboardController
+* methods for this class
+*****************************************************************
+=end
+
 class Admin::DashboardController < Admin::BaseController
   def index
     @bikes = Bike.unscoped.includes(:creation_organization, :cycle_type, :manufacturer, :paint).order('created_at desc').limit(10)
