@@ -17,7 +17,9 @@
 
 		<!-- Header  -->
 	    <div class="row main-header">
-			<div class="col-md-2"><div class="section-image"></div></div>
+			<div class="col-md-2">
+				<img src="apple-touch-icon.png" />
+			</div>
 			<div class="col-md-4">
 				<p class="top-line">How NOT to</p>
 				<p class="bottom-line">buy a stolen</p>
@@ -32,10 +34,10 @@
 		<!-- Beginning section -->
 		<div class="row">
 			<div class="col-md-2">&nbsp;</div>
-			<div class="col-md-2"><div class="section-image"></div></div>
-			<div class="col-md-2"><div class="section-image"></div></div>
-			<div class="col-md-2"><div class="section-image"></div></div>
-			<div class="col-md-2"><div class="section-image"></div></div>
+			<div class="col-md-2 section-icon"><img src="images/section-1-icon.svg"></div>
+			<div class="col-md-2 section-icon"><img src="images/section-2-icon.svg"></div>
+			<div class="col-md-2 section-icon"><img src="images/section-3-icon.svg"></div>
+			<div class="col-md-2 section-icon"><img src="images/section-4-icon.svg"></div>
 			<div class="col-md-2">&nbsp;</div>
 		</div>
 		<div class="row">
@@ -48,7 +50,7 @@
 
 		<!-- Templated sections -->
 		{% for section in site.data.sections %}
-			{% include dont_buy_stolen_section.html section-data=section %}
+			{% include dont_buy_stolen_section.html section-data=section index=forloop.index %}
 		{% endfor %}
 
 		<!-- Ending section -->
@@ -58,17 +60,18 @@
 				<p>BikeIndex.org is a free, open source bicycle registration database run by people who love their bikes - and hate bike thieves. Through BikeIndex.org, our tools, and our partnerships across the world, we make stolen bikes harder to sell and easier to recover. All for free!</p>
 			</div>
 		</div>
-		<div class="row">
-			<div class="col-md-3">&nbsp;</div>
-			<div class="col-md-3">
-				<div class="section-image"></div>
+		<div class="row end-icons">
+			<div class="col-md-4">&nbsp;</div>
+			<div class="col-md-2">
+				<img src="/images/simple-icon.svg" />
 			</div>
-			<div class="col-md-3">
-				<div class="section-image"></div>
+			<div class="col-md-2">
+				<img src="/images/secure-icon.svg" />
 			</div>
-			<div class="col-md-3">
-				<div class="section-image"></div>
+			<div class="col-md-2">
+				<img src="/images/free-icon.svg" />
 			</div>
+			<div class="col-md-2">&nbsp;</div>
 		</div>
 
 		<!-- Footer -->

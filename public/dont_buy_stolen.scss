@@ -69,6 +69,32 @@ html, body {
   margin-top: 20px;
 }
 
+.header-icon {
+  img {
+    width: 190%;
+    height: 190%;
+    margin-top: -20px;
+    margin-left: -60px;
+  }
+}
+
+.section-icon {
+  img {
+    width: 190%;
+    height: 190%;
+    margin-left: -80px;
+  }
+}
+
+.section-subtext {
+  img {
+    width: 190%;
+    height: 190%;
+    margin-top: -100px;
+    margin-left: -30px;
+  }
+}
+
 .upper-section-text {
   font-size: 18pt;
   font-weight: bold;
@@ -96,11 +122,18 @@ html, body {
   text-align: left;
   border-top: 15px solid darkgray;
   span, p {
-    margin: 20px;
+    margin-top: 30px;
     letter-spacing: 1px;
   }
   b {
     font-family: 'KlinicSlab';
+  }
+  img {
+    width: 200%;
+    height: 200%;
+    margin-top: -80px;
+    margin-left: -60px;
+    margin-bottom: -80px;
   }
 }
 
@@ -115,13 +148,17 @@ html, body {
   li {
     list-style-type: none;
     img {
-      margin-left: 50px;
+      width: 90%;
+      height: 90%;
+      margin-top: -80px;
+      margin-bottom: -100px;
     }
   }
 }
 
 .section-subtext {
   font-size: 24pt;
+  font-weight: bold;
   text-align: left;
   padding: 20px;
   line-height: 35px;
@@ -141,6 +178,16 @@ html, body {
       overflow-y: auto;
       overflow-x: auto;
     }
+}
+
+.end-icons {
+  img {
+      width: 90%;
+      height: 90%;
+      margin-top: -40px;
+      margin-left: -100px;
+      margin-right: -60px;
+  }
 }
 
 @media (min-width: 1100px) {

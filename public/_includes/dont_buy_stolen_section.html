@@ -1,15 +1,15 @@
 <div class="row">
 	<div class="col-md-12">
 		<div class="row section-header">
-			<div class="col-md-2">
-				<div class="section-image header-image"></div>
+			<div class="col-md-2 header-icon">
+				<img src="/images/section-{{ include.index }}-icon.svg" />
 			</div>
 			<div class="col-md-10">
 				<p>{{ include.section-data.header }}</p>
 			</div>
 		</div>
 		<div class="row section-subtext">
-			<div class="col-md-2"><span class="glyphicon glyphicon-flag" aria-hidden="true"></span></div>
+			<div class="col-md-2"><img src="/images/red-flag.svg" /></div>
 			<div class="col-md-8">
 				<p>{{ include.section-data.header-subtext }}</p>
 			</div>
@@ -22,7 +22,7 @@
 	{% for image in include.section-data.image-captions %}
 		<div class="col-md-4">
 			<li>
-				<img src="http://vignette1.wikia.nocookie.net/ultradragonball/images/5/5e/Tumblr_lwizcpFo3q1qjrs4wo6_250.gif" />
+				<img src="/images/section-{{ include.index }}-bullet-{{ forloop.index }}.svg" />
 				<h3>{{ image.caption-header }}</h3>
 				<p>{{ image.subtext }}</p>
 			</li>
@@ -33,9 +33,10 @@
 <div class="row section-middle">
 	<ul>
 	{% for image in include.section-data.image-captions-2 %}
+		{% assign subindex = forloop.index | plus: 3 %}
 		<div class="col-md-4">
 			<li>
-				<img src="http://vignette1.wikia.nocookie.net/ultradragonball/images/5/5e/Tumblr_lwizcpFo3q1qjrs4wo6_250.gif" />
+				<img src="/images/section-{{ include.index }}-bullet-{{ subindex }}.svg" />
 				<h3>{{ image.caption-header }}</h3>
 				<p>{{ image.subtext }}</p>
 			</li>
@@ -44,8 +45,7 @@
 	</ul>
 </div>
 <div class="row section-footer">
-	<div class="col-md-1">&nbsp;</div>
-	<div class="col-md-1"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span></div>
+	<div class="col-md-2"><img src="/images/footer-exclaimation.svg" /></div>
 	<div class="col-md-10">
 		<p><b>REMEMBER:</b> {{ include.section-data.footer }}</p>
 	</div>
