@@ -1,0 +1,6 @@
+.organized-form {
+  .org-form-label {
+    @extend .col-sm-4;
+    text-align: right;
+  }
+}

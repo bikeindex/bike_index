@@ -221,6 +221,10 @@ FactoryGirl.define do
 
   factory :membership do
     role 'member'
+    factory :existing_membership do
+      association :user
+      association :organization
+    end
   end
 
   factory :integration do

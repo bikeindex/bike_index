@@ -191,6 +191,10 @@ $row-side-padding: 0.9375rem;
 @import "revised/pages/home/supporters";
 @import "revised/pages/home/testimonials";
 
+// Organized pages
+@import "revised/pages/organized/forms";
+@import "revised/pages/organized/header";
+@import "revised/pages/organized/tables";
 
 // LEGACY PAGES general styles - replace as soon as all pages have been restyled
 @import "revised/sections/legacy_content"; // general legacy content styles

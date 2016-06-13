@@ -16,7 +16,7 @@ class OrganizationInvitation < ActiveRecord::Base
 
   acts_as_paranoid
 
-  validates_presence_of :inviter, :organization, :invitee_email, :membership_role
+  validates_presence_of :inviter, :organization_id, :invitee_email, :membership_role
 
   belongs_to :organization
   belongs_to :inviter, class_name: 'User', foreign_key: :inviter_id

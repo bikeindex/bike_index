@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Organized::ManagementController, type: :controller do
+describe Organized::ManageController, type: :controller do
   context 'logged_in_as_organization_admin' do
     include_context :logged_in_as_organization_admin
     describe 'index' do

@@ -12,14 +12,19 @@
           = active_link 'Continuous upload', embed_extended_organization_path(current_organization), class_name: 'nav-link'
     %li
       %span.menu-item.first-item
+        Users
+      %ul.organized-submenu
+        %li
+          = active_link 'Users', embed_extended_organization_path(current_organization), class_name: 'nav-link'
+      %span.menu-item.first-item
         Manage
       %ul.organized-submenu
         %li
           = active_link 'Users', embed_extended_organization_path(current_organization), class_name: 'nav-link'
         %li
           = active_link 'Display', embed_extended_organization_path(current_organization), class_name: 'nav-link'
-        %li
-          = active_link 'Emails', embed_extended_organization_path(current_organization), class_name: 'nav-link'
+        / %li
+        /   = active_link 'Emails', embed_extended_organization_path(current_organization), class_name: 'nav-link'
     %li
       = active_link 'Dev resources', organization_path(current_organization), class_name: 'nav-link'
 

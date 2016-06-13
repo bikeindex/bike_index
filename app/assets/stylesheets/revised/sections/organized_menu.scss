@@ -36,7 +36,7 @@ $organized-menu-bg: $gray-lighter;
   .organized-wrap { 
     width: 100%;
     padding-left: 15%;
-    min-height: 400px;
+    min-height: 500px;
   }
   // .organized-mainmenu {}
   // .container.organized-main-container {
@@ -44,3 +44,11 @@ $organized-menu-bg: $gray-lighter;
   //   width: 85%;
   // }
 }
+
+// @media (min-width: $grid-breakpoint-lg) {
+//   .organized-body {
+//     .organized-wrap {
+//       min-
+//     }
+//   }
+// }

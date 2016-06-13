@@ -2,6 +2,7 @@ module Organized
   class BaseController < ApplicationController
     before_filter :ensure_current_organization!
     before_filter :ensure_member!
+    layout 'application_revised'
 
     def current_organization
       @current_organization ||= Organization.friendly_find(params[:organization_id])
