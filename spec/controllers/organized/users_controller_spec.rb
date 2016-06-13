@@ -100,11 +100,12 @@ describe Organized::UsersController, type: :controller do
       context 'organization_invitation' do
         let(:organization_invitation) { FactoryGirl.create(:organization_invitation, organization: organization, inviter: user) }
         it 'destroys' do
+          expect(organization_invitation).to be_present
           count = organization.available_invitation_count
           expect do
             delete :destroy, organization_id: organization.to_param,
-                         id: organization_invitation.id
-          end.to change(OrganizationInvitation, :count).by(1)
+                         id: organization_invitation.id, is_invitation: true
+          end.to change(OrganizationInvitation, :count).by(-1)
           organization.reload
           expect(organization.available_invitation_count).to eq(count + 1)
         end
@@ -113,10 +114,11 @@ describe Organized::UsersController, type: :controller do
         context 'other valid membership' do
           let(:membership) { FactoryGirl.create(:existing_membership, organization: organization, role: 'member') }
           it 'destroys the membership' do
+            expect(membership).to be_present
             count = organization.available_invitation_count
             expect do
-              put :destroy, organization_id: organization.to_param, id: membership.id
-            end.to change(OrganizationInvitation, :count).by(1)
+              delete :destroy, organization_id: organization.to_param, id: membership.id
+            end.to change(Membership, :count).by(-1)
             organization.reload
             expect(organization.available_invitation_count).to eq(count + 1)
 
@@ -127,8 +129,8 @@ describe Organized::UsersController, type: :controller do
           it 'does not destroy' do
             count = organization.available_invitation_count
             expect do
-              put :destroy, organization_id: organization.to_param, id: membership.id
-            end.to change(OrganizationInvitation, :count).by(0)
+              delete :destroy, organization_id: organization.to_param, id: membership.id
+            end.to change(Membership, :count).by(0)
             organization.reload
             expect(organization.available_invitation_count).to eq count
           end

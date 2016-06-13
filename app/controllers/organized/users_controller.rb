@@ -40,6 +40,8 @@ module Organized
         @membership.destroy
         flash[:success] = 'Deleted user from your organization'
       end
+      new_invites_count = current_organization.available_invitation_count + 1
+      current_organization.update_attribute :available_invitation_count, new_invites_count
       redirect_to organization_users_path(organization_id: current_organization.id)
     end
 
