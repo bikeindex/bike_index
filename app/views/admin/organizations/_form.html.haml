@@ -69,6 +69,14 @@
 
   .control-group.padded
     .control-label
+      = f.label :lock_show_on_map, 'Lock shown on map'
+      %small.less-strong
+        Restrict org from updating show on map above (e.g. they're known bad actors)
+    .controls
+      = f.check_box :lock_show_on_map
+
+  .control-group.padded
+    .control-label
       = f.label :api_access_approved
     .controls
       = f.check_box :api_access_approved

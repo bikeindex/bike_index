@@ -5,7 +5,7 @@
       = @name
   %p.text-xs-right
     - id = (@organization_invitation || @membership).id
-    = link_to 'remove from organization', organization_user_path(id: id, organization_id: current_organization.id, is_invitation: @is_invitation), method: :delete, confirm: "Are you sure you want to remove #{@name} from #{current_organization.name}? (They will still be to use their personal account)", class: 'btn btn-danger'
+    = link_to 'remove from organization', organization_user_path(id: id, organization_id: current_organization.to_param, is_invitation: @is_invitation), method: :delete, confirm: "Are you sure you want to remove #{@name} from #{current_organization.name}? (They will still be to use their personal account)", class: 'btn btn-danger'
   - if @is_invitation
     %p
       Invited

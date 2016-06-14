@@ -1,0 +1,120 @@
+/ = form_for @organization do |f|
+/   .container
+/     .padded.row  
+/       .well.span6
+/         .form.form-horizontal.padded.form-horizontal-collapse
+/           - if @organization.errors.any?
+/             #alert-block
+/               .alert.alert-error
+/                 %h4
+/                   Please fix the following
+/                   = pluralize(@organization.errors.count, "error")
+/                 %ul
+/                   - @organization.errors.full_messages.each do |msg|
+/                     %li
+/                       = msg
+/           .control-group.padded
+/             .control-label
+/               = f.label :name
+/             .controls
+/               = f.text_field :name
+
+/           .control-group
+/             .control-label
+/               = f.label :website
+/             .controls
+/               = f.text_field :website
+/             - emails = @organization.users.pluck(:email)
+/             - emails << ENV['AUTO_ORG_MEMBER'] unless emails.any?
+/             .control-group.chosen-select
+/               .control-label
+/                 = f.label :embedable_user_email
+/               .controls
+/                 = f.select :embedable_user_email, emails, prompt: "Select email", selected: @embedable_email
+/               .controls.extra-field
+/                 .less-strong
+/                   - if @organization.memberships.count == 0
+/                     You can use #{ENV['AUTO_ORG_MEMBER']} if 
+/                     %br
+/                     there are no members of the organization
+/           .control-group
+/             .control-label
+/               %label{ for: 'organization_wants_to_be_shown'}
+/                 Show on
+/                 %a{ href: where_url, target: '_blank' }
+/                   map
+/             .controls
+/               = f.check_box :wants_to_be_shown
+
+/           .control-group
+/             .control-label
+/               %label
+/                 Organization type
+/             .controls.radio-controls
+/               %label.radio
+/                 = f.radio_button :org_type, "shop"
+/                 Bike shop
+/               %label.radio
+/                 = f.radio_button :org_type, "advocacy"
+/                 Advocacy group
+/               %label.radio
+/                 = f.radio_button :org_type, "police"
+/                 Police department
+/               %label.radio
+/                 = f.radio_button :org_type, "college"
+/                 College
+/               %label.radio
+/                 = f.radio_button :org_type, "manufacturer"
+/                 Manufacturer
+
+/           / .control-group.padded.clearfix
+/           /   = f.submit 'Update', class: 'button-green'
+/       .span6
+/         .nested-form
+/           %p
+/             %strong
+/               = pluralize(@organization.locations.count, "Location")
+/           %p#us-country-code.other-value
+/             = Country.united_states.id
+/           %fieldset
+/             / .horizontal-form-list
+/             .form-horizontal.form-horizontal-collapse
+/               = f.fields_for :locations do |builder|
+/                 = render 'location_fields', f: builder
+/               = link_to_add_fields "Add a location", f, :locations
+/   %section.organization-update-block.padded
+/     / .control-group.actions.padded
+/     = f.submit "Update #{@organization.name}", class: 'button-green'
+
+
+/ - if @organization.locations.any?
+/   - if @organization.locations.count > 1
+/     %h3.padded
+/       = pluralize(@organization.locations.count, "Location")
+/   - @organization.locations.each do |location|
+
+/     - location = location.decorate
+    
+/     - if location.name
+/       %p
+/         Name: 
+/         = location.name
+
+/     - if location.phone
+/       %p
+/         Phone: 
+/         = location.display_phone
+
+/     - if location.street
+/       %p
+/         Street address: 
+/         = location.street
+
+- unless current_organization.is_paid
+  %hr.padded
+  .delete-organization.padded
+    %p
+      %a.collapsed{ href: '#', data: { toggle: 'collapse', target: '#delete-organization' } }
+        I would like to terminate my account with the Bike Index
+    #delete-organization.collapse
+      = link_to 'Delete organization', organization_manage_path(id: current_organization.id, organization_id: current_organization.to_param), method: :delete, confirm: "Are you positive you want to remove #{current_organization.name} from Bike Index?", class: 'btn btn-danger'

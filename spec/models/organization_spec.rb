@@ -63,7 +63,7 @@ describe Organization do
         organization.reload
       end
       it 'sets the locations shown to be org shown on save' do
-        expect(organization.allowed_show).to be_truthy
+        expect(organization.show_on_map).to be_truthy
         organization.set_locations_shown
         expect(location.reload.shown).to be_truthy
       end
@@ -72,7 +72,7 @@ describe Organization do
       it 'sets not shown' do
         expect(organization.show_on_map).to be_truthy
         organization.set_locations_shown
-        expect(location.reload.shown).to be_falsey
+        expect(location.reload.shown).to be_truthy
       end
     end
     it 'has before_save_callback_method defined for set_locations_shown' do
@@ -84,14 +84,14 @@ describe Organization do
     it 'sets the embedable user' do
       organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:confirmed_user, email: 'embed@org.com')
-      membership = FactoryGirl.create(:membership, organization: organization, user: user)
+      FactoryGirl.create(:membership, organization: organization, user: user)
       organization.embedable_user_email = 'embed@org.com'
       organization.save
       expect(organization.reload.auto_user_id).to eq(user.id)
     end
     it 'does not set the embedable user if user is not a member' do
       organization = FactoryGirl.create(:organization)
-      user = FactoryGirl.create(:confirmed_user, email: 'no_embed@org.com')
+      FactoryGirl.create(:confirmed_user, email: 'no_embed@org.com')
       organization.embedable_user_email = 'no_embed@org.com'
       organization.save
       expect(organization.reload.auto_user_id).to be_nil
@@ -106,7 +106,7 @@ describe Organization do
     it "sets the embedable user if it isn't set and the org has members" do
       organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:confirmed_user)
-      membership = FactoryGirl.create(:membership, user: user, organization: organization)
+      FactoryGirl.create(:membership, user: user, organization: organization)
       organization.save
       expect(organization.reload.auto_user_id).not_to be_nil
     end

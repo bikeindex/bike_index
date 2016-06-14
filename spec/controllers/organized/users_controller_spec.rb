@@ -63,6 +63,8 @@ describe Organized::UsersController, type: :controller do
                          id: organization_invitation.id,
                          is_invitation: true, organization_invitation: organization_invitation_params
           end.to change(OrganizationInvitation, :count).by(0)
+          expect(response).to redirect_to organization_users_path(organization_id: organization.to_param)
+          expect(flash[:success]).to be_present
           organization_invitation.reload
           expect(organization_invitation.membership_role).to eq 'admin'
           expect(organization_invitation.inviter).to eq user
@@ -77,6 +79,8 @@ describe Organized::UsersController, type: :controller do
             og_user = membership.user
             put :update, organization_id: organization.to_param, id: membership.id,
                          membership: membership_params
+            expect(response).to redirect_to organization_users_path(organization_id: organization.to_param)
+            expect(flash[:success]).to be_present
             membership.reload
             expect(membership.role).to eq 'admin'
             expect(membership.user).to eq og_user
@@ -87,6 +91,7 @@ describe Organized::UsersController, type: :controller do
           it 'does not update the membership' do
             put :update, organization_id: organization.to_param, id: membership.id,
                          membership: { role: 'member' }
+            expect(response).to redirect_to organization_users_path(organization_id: organization.to_param)
             expect(flash[:error]).to be_present
             membership.reload
             expect(membership.role).to eq 'admin'
@@ -106,6 +111,8 @@ describe Organized::UsersController, type: :controller do
             delete :destroy, organization_id: organization.to_param,
                              id: organization_invitation.id, is_invitation: true
           end.to change(OrganizationInvitation, :count).by(-1)
+          expect(response).to redirect_to organization_users_path(organization_id: organization.to_param)
+          expect(flash[:success]).to be_present
           organization.reload
           expect(organization.available_invitation_count).to eq(count + 1)
         end
@@ -119,6 +126,8 @@ describe Organized::UsersController, type: :controller do
             expect do
               delete :destroy, organization_id: organization.to_param, id: membership.id
             end.to change(Membership, :count).by(-1)
+            expect(response).to redirect_to organization_users_path(organization_id: organization.to_param)
+            expect(flash[:success]).to be_present
             organization.reload
             expect(organization.available_invitation_count).to eq(count + 1)
           end
@@ -130,6 +139,8 @@ describe Organized::UsersController, type: :controller do
             expect do
               delete :destroy, organization_id: organization.to_param, id: membership.id
             end.to change(Membership, :count).by(0)
+            expect(response).to redirect_to organization_users_path(organization_id: organization.to_param)
+            expect(flash[:error]).to be_present
             organization.reload
             expect(organization.available_invitation_count).to eq count
           end
@@ -152,6 +163,8 @@ describe Organized::UsersController, type: :controller do
             put :create, organization_id: organization.to_param,
                          organization_invitation: organization_invitation_params
           end.to change(OrganizationInvitation, :count).by(1)
+          expect(response).to redirect_to organization_users_path(organization_id: organization.to_param)
+          expect(flash[:success]).to be_present
           organization.reload
           expect(organization.available_invitation_count).to eq 4
           organization_invitation = OrganizationInvitation.last
@@ -168,6 +181,8 @@ describe Organized::UsersController, type: :controller do
           expect do
             put :create, organization_id: organization.to_param, organization_invitation: organization_invitation_params
           end.to change(OrganizationInvitation, :count).by(0)
+          expect(response).to redirect_to organization_users_path(organization_id: organization.to_param)
+          expect(flash[:error]).to be_present
         end
       end
     end

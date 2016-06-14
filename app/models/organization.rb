@@ -17,7 +17,7 @@ class Organization < ActiveRecord::Base
     :new_bike_notification,
     :lightspeed_cloud_api_key,
     :use_additional_registration_field,
-    :wants_to_be_shown,
+    :lock_show_on_map,
     :avatar,
     :avatar_cache
 
@@ -82,27 +82,23 @@ class Organization < ActiveRecord::Base
 
   before_save :set_auto_user
   def set_auto_user
-    if self.embedable_user_email.present?
+    if embedable_user_email.present?
       u = User.fuzzy_email_find(embedable_user_email)
       self.auto_user_id = u.id if u.is_member_of?(self)
       if auto_user_id.blank? && embedable_user_email == ENV['AUTO_ORG_MEMBER']
         Membership.create(user_id: u.id, organization_id: id, role: 'member')
         self.auto_user_id = u.id
       end
-    elsif self.auto_user_id.blank?
-      return nil unless self.users.any?
-      self.auto_user_id = self.users.first.id
+    elsif auto_user_id.blank?
+      return nil unless users.any?
+      self.auto_user_id = users.first.id
     end
-  end
-
-  def allowed_show
-    show_on_map && approved
   end
 
   before_save :set_locations_shown
   def set_locations_shown
     # Locations set themselves on save
-    locations.each { |l| l.save unless l.shown == allowed_show }
+    locations.each { |l| l.save unless l.shown == show_on_map }
   end
 
   def suspended?

@@ -16,8 +16,6 @@ Bikeindex::Application.routes.draw do
       get :embed_extended
       get :embed_create_success
     end
-    # resources :memberships, only: [:edit, :update, :destroy]
-    # resources :organization_invitations, only: [:new, :create]
     # resources :bikes, except: [:destroy]
   end
 
@@ -226,17 +224,13 @@ Bikeindex::Application.routes.draw do
   # prepends a :organization_id/ to every nested URL.
   # Down here so that it doesn't override any other routes
   resources :organizations, only: [], path: '', module: 'organized' do
-    get '/', to: 'organizations#bikes#index', as: :root
-    resources :bikes, except: [:destroy, :edit, :update, :show]
-    resources :manage, only: [:index, :update]
+    # get '/', to: 'organizations#bikes#index', as: :root
+    resources :bikes, only: [:index, :show]
+    # Below are admin controllers, inherit from Organized::AdminController not BaseController
+    resources :manage, only: [:index, :update, :destroy] do
+      collection { get :dev }
+    end
     resources :users, except: [:show]
     resources :email
-    # member do
-    #   get :embed
-    #   get :embed_extended
-    #   get :embed_create_success
-    # end
-    # resources :memberships, only: [:edit, :update, :destroy]
-    # resources :organization_invitations, only: [:new, :create]
   end
 end

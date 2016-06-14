@@ -1,0 +1,52 @@
+.organized-page-header
+  %h1
+    #{current_organization.name} development resources
+  %p
+    We're adding features here! Check back soon.
+
+/ .tutorials
+/   %h3
+/     Tutorials
+/   %a{href: "http://youtu.be/o2qqHhTWhLQ"}
+/     = image_tag("/assets/org_add_bike_screencast_screenshot.png")
+/   %a{href: "http://youtu.be/rCj6Gkndm1k"}
+/     = image_tag("/assets/org_manage_screencast_screenshot.png")
+
+.row
+  - if current_organization.org_type == 'shop' && current_organization.access_token.present?
+    .col-md-6
+      .card.card-block
+        %h3.card-title
+          Lightspeed Retail Integration
+        %p.card-text
+          We provide an integration to automatically register the bikes you sell if you are using Lightspeed (#{ link_to 'read more', lightspeed_integration_path }).
+
+        %a.card-link{ href: "https://posintegration.bikeindex.org/organizations/connect?id=#{current_organization.slug}&access_token=#{current_organization.access_token}"}
+          Point of Sales Integration
+
+  - if current_organization.api_access_approved
+    .col-md-6
+      .card.card-block
+        %h3.card-title
+          API Access
+        .card-text
+          %dl
+            %dt
+              Organization slug
+            %dd
+              = current_organization.slug
+            %dt
+              API Access token
+            %dd
+              = current_organization.access_token
+            %dt
+              API registration user
+            %dd
+              - if current_organization.auto_user.present?
+                = current_organization.auto_user.email
+              - else
+                %span
+                  No user set!
+                Contact us at
+                = link_to 'support@bikeindex.org', 'mailto:support@bikeindex.org'
+                to get set up for API access.

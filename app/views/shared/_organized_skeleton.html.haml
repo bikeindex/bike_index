@@ -12,21 +12,16 @@
           = active_link 'Continuous upload', embed_extended_organization_path(current_organization), class_name: 'nav-link'
     %li
       %span.menu-item.first-item
-        Users
-      %ul.organized-submenu
-        %li
-          = active_link 'Users', embed_extended_organization_path(current_organization), class_name: 'nav-link'
-      %span.menu-item.first-item
         Manage
       %ul.organized-submenu
         %li
-          = active_link 'Users', embed_extended_organization_path(current_organization), class_name: 'nav-link'
+          = active_link 'Users', organization_users_path(organization_id: current_organization.to_param), class_name: 'nav-link'
         %li
-          = active_link 'Display', embed_extended_organization_path(current_organization), class_name: 'nav-link'
+          = active_link 'Organization', organization_manage_index_path(organization_id: current_organization.to_param), class_name: 'nav-link'
         / %li
-        /   = active_link 'Emails', embed_extended_organization_path(current_organization), class_name: 'nav-link'
-    %li
-      = active_link 'Dev resources', organization_path(current_organization), class_name: 'nav-link'
+        /   = active_link 'Emails', organization_emails_path(organization_id: current_organization.to_param), class_name: 'nav-link'
+        %li
+          = active_link 'Dev resources', dev_organization_manage_index_path(organization_id: current_organization.to_param), class_name: 'nav-link'
 
 .organized-wrap
   .container

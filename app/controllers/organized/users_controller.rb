@@ -1,10 +1,7 @@
 module Organized
-  class UsersController < Organized::BaseController
-    layout 'application_revised'
-    before_filter :ensure_admin!
+  class UsersController < Organized::AdminController
     before_filter :find_invitation_or_membership, only: [:edit, :update, :destroy]
     before_filter :reject_self_updates, only: [:update, :destroy]
-    skip_before_filter :ensure_member!
 
     def index
       @organization_invitations = current_organization.organization_invitations.unclaimed
@@ -66,7 +63,7 @@ module Organized
     private
 
     def current_index_path
-      organization_users_path(organization_id: current_organization.id)
+      organization_users_path(organization_id: current_organization.to_param)
     end
 
     def find_invitation_or_membership
