@@ -48,18 +48,20 @@ describe Organized::UsersController, type: :controller do
     describe 'update' do
       context 'organization_invitation' do
         let(:organization_invitation) { FactoryGirl.create(:organization_invitation, organization: organization, inviter: user) }
+        let(:organization_invitation_params) do
+          {
+            membership_role: 'admin',
+            name: 'something',
+            inviter_id: 333,
+            invitee_email: 'new_bike_email@bike_shop.com'
+          }
+        end
         it 'updates name and role, ignores email' do
           og_email = organization_invitation.invitee_email
           expect do
             put :update, organization_id: organization.to_param,
                          id: organization_invitation.id,
-                         is_invitation: true,
-                         organization_invitation: {
-                           membership_role: 'admin',
-                           name: 'something',
-                           inviter_id: 333,
-                           invitee_email: 'new_bike_email@bike_shop.com'
-                         }
+                         is_invitation: true, organization_invitation: organization_invitation_params
           end.to change(OrganizationInvitation, :count).by(0)
           organization_invitation.reload
           expect(organization_invitation.membership_role).to eq 'admin'
@@ -70,13 +72,11 @@ describe Organized::UsersController, type: :controller do
       context 'membership' do
         context 'other valid membership' do
           let(:membership) { FactoryGirl.create(:existing_membership, organization: organization, role: 'member') }
+          let(:membership_params) { { role: 'admin', user_id: 333 } }
           it 'updates the role' do
             og_user = membership.user
             put :update, organization_id: organization.to_param, id: membership.id,
-                         membership: {
-                           role: 'admin',
-                           user_id: 333
-                         }
+                         membership: membership_params
             membership.reload
             expect(membership.role).to eq 'admin'
             expect(membership.user).to eq og_user
@@ -104,7 +104,7 @@ describe Organized::UsersController, type: :controller do
           count = organization.available_invitation_count
           expect do
             delete :destroy, organization_id: organization.to_param,
-                         id: organization_invitation.id, is_invitation: true
+                             id: organization_invitation.id, is_invitation: true
           end.to change(OrganizationInvitation, :count).by(-1)
           organization.reload
           expect(organization.available_invitation_count).to eq(count + 1)
@@ -121,7 +121,6 @@ describe Organized::UsersController, type: :controller do
             end.to change(Membership, :count).by(-1)
             organization.reload
             expect(organization.available_invitation_count).to eq(count + 1)
-
           end
         end
         context 'marking self member' do
@@ -139,16 +138,19 @@ describe Organized::UsersController, type: :controller do
     end
 
     describe 'create' do
+      let(:organization_invitation_params) do
+        {
+          membership_role: 'member',
+          invitee_name: 'cool',
+          invitee_email: 'bike_email@bike_shop.com'
+        }
+      end
       context 'available invitations' do
         it 'creates organization_invitation, reduces invitation tokens by 1' do
           expect(organization.available_invitation_count).to eq 5
           expect do
             put :create, organization_id: organization.to_param,
-                         organization_invitation: {
-                           membership_role: 'member',
-                           invitee_name: 'cool',
-                           invitee_email: 'bike_email@bike_shop.com'
-                         }
+                         organization_invitation: organization_invitation_params
           end.to change(OrganizationInvitation, :count).by(1)
           organization.reload
           expect(organization.available_invitation_count).to eq 4
@@ -164,10 +166,7 @@ describe Organized::UsersController, type: :controller do
         it 'does not create a new organization_invitation' do
           organization.update_attributes(available_invitation_count: 0)
           expect do
-            put :create, organization_id: organization.to_param, organization_invitation: {
-              membership_role: 'member',
-              invitee_email: 'bike_email@bike_shop.com'
-            }
+            put :create, organization_id: organization.to_param, organization_invitation: organization_invitation_params
           end.to change(OrganizationInvitation, :count).by(0)
         end
       end

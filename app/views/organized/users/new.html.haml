@@ -4,9 +4,8 @@
   %p
     You have invited
     %strong
-      #{ pluralize(current_organization.sent_invitation_count, 'user') }
-      #{current_organization.sent_invitation_count} users,
-  %p
+      #{ pluralize(current_organization.sent_invitation_count, 'user') },
+    %br
     And can add
     %strong
       #{current_organization.available_invitation_count} more.
