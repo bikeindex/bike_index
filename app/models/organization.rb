@@ -30,7 +30,7 @@ class Organization < ActiveRecord::Base
   has_many :organization_deals, dependent: :destroy
   has_many :users, through: :memberships
   has_many :organization_invitations, dependent: :destroy
-  belongs_to :auto_user, class_name: "User"
+  belongs_to :auto_user, class_name: 'User'
 
   has_many :bikes, foreign_key: 'creation_organization_id'
 
@@ -80,11 +80,17 @@ class Organization < ActiveRecord::Base
     self.slug = new_slug
   end
 
+  def ensure_auto_user
+    return true if auto_user.present?
+    self.embedable_user_email = users.first && users.first.email || ENV['AUTO_ORG_MEMBER']
+    save
+  end
+
   before_save :set_auto_user
   def set_auto_user
     if embedable_user_email.present?
       u = User.fuzzy_email_find(embedable_user_email)
-      self.auto_user_id = u.id if u.is_member_of?(self)
+      self.auto_user_id = u.id if u && u.is_member_of?(self)
       if auto_user_id.blank? && embedable_user_email == ENV['AUTO_ORG_MEMBER']
         Membership.create(user_id: u.id, organization_id: id, role: 'member')
         self.auto_user_id = u.id
@@ -95,10 +101,14 @@ class Organization < ActiveRecord::Base
     end
   end
 
+  def allowed_show
+    show_on_map && approved
+  end
+
   before_save :set_locations_shown
   def set_locations_shown
     # Locations set themselves on save
-    locations.each { |l| l.save unless l.shown == show_on_map }
+    locations.each { |l| l.save unless l.shown == allowed_show }
   end
 
   def suspended?

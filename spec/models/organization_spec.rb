@@ -63,16 +63,16 @@ describe Organization do
         organization.reload
       end
       it 'sets the locations shown to be org shown on save' do
-        expect(organization.show_on_map).to be_truthy
+        expect(organization.allowed_show).to be_truthy
         organization.set_locations_shown
         expect(location.reload.shown).to be_truthy
       end
     end
     context 'not approved' do
       it 'sets not shown' do
-        expect(organization.show_on_map).to be_truthy
+        expect(organization.allowed_show).to be_falsey
         organization.set_locations_shown
-        expect(location.reload.shown).to be_truthy
+        expect(location.reload.shown).to be_falsey
       end
     end
     it 'has before_save_callback_method defined for set_locations_shown' do
@@ -109,6 +109,33 @@ describe Organization do
       FactoryGirl.create(:membership, user: user, organization: organization)
       organization.save
       expect(organization.reload.auto_user_id).not_to be_nil
+    end
+  end
+
+  describe 'ensure_auto_user' do
+    let(:organization) { FactoryGirl.create(:organization) }
+    context 'existing members' do
+      let(:member) { FactoryGirl.create(:organization_member, organization: organization) }
+      before do
+        expect(member).to be_present
+      end
+      it 'sets the first user' do
+        organization.ensure_auto_user
+        organization.reload
+        expect(organization.auto_user).to eq member
+      end
+    end
+    context 'no members' do
+      let(:auto_user) { FactoryGirl.create(:confirmed_user, email: ENV['AUTO_ORG_MEMBER']) }
+      before do
+        expect(organization).to be_present
+        expect(auto_user).to be_present
+      end
+      it 'sets the AUTO_ORG_MEMBER' do
+        organization.ensure_auto_user
+        organization.reload
+        expect(organization.auto_user).to eq auto_user
+      end
     end
   end
 

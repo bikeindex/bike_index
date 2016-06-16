@@ -1,6 +1,14 @@
 .organized-form {
+  .checkbox input { margin-top: .6em; }
   .org-form-label {
     @extend .col-sm-4;
     text-align: right;
+  }
+  .below-input-help {
+    @extend small;
+    display: block;
+    line-height: 1.5em;
+    padding-bottom: .5em;
+    color: $gray-light;
   }
 }

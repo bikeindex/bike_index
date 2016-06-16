@@ -27,7 +27,7 @@ class Location < ActiveRecord::Base
 
   before_save :shown_from_organization
   def shown_from_organization
-    self.shown = organization && organization.show_on_map
+    self.shown = organization && organization.allowed_show
     true
   end
 

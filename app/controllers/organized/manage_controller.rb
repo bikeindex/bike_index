@@ -2,6 +2,7 @@ module Organized
   class ManageController < Organized::AdminController
     before_filter :assign_organization, only: [:index, :update]
     def index
+      @organization.ensure_auto_user
     end
 
     def update
@@ -47,12 +48,16 @@ module Organized
         website: o_params[:website],
         org_type: o_params[:org_type],
         embedable_user_email: o_params[:embedable_user_email],
-        locations_attributes: locations_attributes(o_params[:locations_attributes]),
-      }.merge(show_on_map(o_params))
+      }.merge(optional_attributes(o_params))
+    end
+
+    def optional_attributes(o_params)
+      locations_attributes(o_params[:locations_attributes])
+        .merge(show_on_map(o_params))
     end
 
     def locations_attributes(locations_params)
-      locations_params
+      locations_params.present? ? locations_params : {}
     end
 
     def show_on_map(o_params)
