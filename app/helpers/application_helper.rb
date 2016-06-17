@@ -25,7 +25,7 @@ module ApplicationHelper
     return 'organized_skeleton' if sub_module_name == 'organized_'
     case controller_name
     when 'bikes'
-      return 'edit_bike_skeleton' if %w(edit update).include?(action_name)
+      'edit_bike_skeleton' if %w(edit update).include?(action_name)
     when 'info'
       'content_skeleton' unless %w(terms vendor_terms privacy support_the_index).include?(action_name)
     when 'welcome'
@@ -128,8 +128,6 @@ module ApplicationHelper
   def body_id
     "#{sub_module_name}#{controller_name}_#{action_name}"
   end
-
-  # private
 
   def sub_module_name
     controller.class.parent.name == 'Object' ? '' : "#{controller.class.parent.name.downcase}_"

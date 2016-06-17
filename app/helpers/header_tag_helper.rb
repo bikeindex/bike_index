@@ -148,9 +148,6 @@ protected
     hash = default_hash
     title = auto_title
     hash[:title_tag][:title] = title
-    # title = t "meta_title.#{controller_name}_#{action_name}", default: 'Blank'
-    # title = auto_title if title == 'Blank'
-    # hash[:meta_tags][:description] = t "meta_descriptions.#{controller_name}_#{action_name}", default: "#{title} on the Bike Index"
     hash
   end
 
