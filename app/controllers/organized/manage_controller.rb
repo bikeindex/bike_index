@@ -9,13 +9,10 @@ module Organized
     end
 
     def update
-      if params[:locations_page]
-        @organization.update_attributes(update_locations_params)
-        flash[:success] = "#{current_organization.name} locations updated successfully"
-        redirect_to locations_organization_manage_index_path(organization_id: current_organization.to_param)
-      elsif @organization.update_attributes(update_organization_params)
+      if @organization.update_attributes(update_organization_params)
         flash[:success] = "#{current_organization.name} updated successfully"
-        redirect_to current_index_path
+        redirect_path = params[:locations_page] ? locations_organization_manage_index_path(organization_id: current_organization.to_param) : current_index_path
+        redirect_to redirect_path
       else
         @page_errors = @organization.errors
         flash[:error] = "We're sorry, we had trouble updating #{current_organization.name}"
@@ -49,32 +46,33 @@ module Organized
     end
 
     def update_organization_params
-      o_params = params[:organization]
-      {
-        name: o_params[:name],
-        website: o_params[:website],
-        org_type: o_params[:org_type],
-        embedable_user_email: o_params[:embedable_user_email],
-      }.merge(paid_attributes(o_params))
+      params[:organization].slice(:name, :website, :org_type, :embedable_user_email)
+                           .merge(additional_attributes(params[:organization]))
     end
 
-    def update_locations_params
-      o_params = params[:organization]
-      show_on_map(o_params)
-        .merge(locations_attributes(o_params[:locations_attributes]))
+    def additional_attributes(o_params)
+      show_on_map(o_params).merge(paid_attributes(o_params))
+                           .merge(locations_attributes(o_params[:locations_attributes]))
     end
 
-    def locations_attributes(locations_params)
-      locations_params.present? ? locations_params : {}
+    def locations_attributes(locations_attributes)
+      return {} unless locations_attributes.present?
+      locations_attributes.each { |k, hash| locations_attributes[k] = permitted_locations_attrs(hash) }
+      { locations_attributes: locations_attributes }
     end
 
     def show_on_map(o_params)
-      current_organization.lock_show_on_map ? {} : { show_on_map: o_params[:show_on_map] }
+      current_organization.lock_show_on_map ? {} : o_params.slice(:show_on_map)
     end
 
     def paid_attributes(o_params)
       return {} unless current_organization.is_paid
-      { avatar: o_params[:avatar] }
+      o_params.slice(:avatar)
+    end
+
+    def permitted_locations_attrs(hash)
+      hash.slice(:name, :zipcode, :city, :state_id, :country_id, :street, :phone, :email, :id)
+          .merge(organization_id: current_organization.id)
     end
 
     def notify_admins(type)

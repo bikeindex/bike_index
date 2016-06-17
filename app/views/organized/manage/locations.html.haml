@@ -16,6 +16,9 @@
           %em
             = @organization.name
           on #{ link_to 'map', where_path, target: '_blank' }
+  .form-group.row
+    .col-sm-4.col-sm-push-4
+      = revised_link_to_add_fields 'Add location', f, :locations, class_name: 'btn btn-secondary btn-lg'
 
   - default_country = @organization.locations.first && @organization.locations.first.country && @organization.locations.first.country.id || Country.united_states.id
   - default_name = @organization.name
@@ -23,5 +26,6 @@
     = f.fields_for :locations do |builder|
       = render 'location_fields', f: builder
     %span#fieldsetend
-  %p.text-xs-center.add-locations
-    = revised_link_to_add_fields 'Add a location', f, :locations, class_name: 'btn btn-primary btn-lg'
+  .form-group.row
+    .col-sm-4.col-sm-push-4
+      = f.submit 'Save', class: 'btn btn-success btn-lg'

@@ -53,7 +53,7 @@ describe Organized::ManageController, type: :controller do
         let(:user_2) { FactoryGirl.create(:organization_member, organization: organization) }
         let(:update_attributes) do
           {
-            slug: 'short_name',
+            # slug: 'short_name',
             slug: 'cool name and stuffffff',
             available_invitation_count: '20',
             sent_invitation_count: '0',
@@ -107,7 +107,7 @@ describe Organized::ManageController, type: :controller do
             org_type: 'shop',
             locations_attributes: {
               '0' => {
-                created_at: location_1.created_at.to_f.to_s,
+                id: location_1.id,
                 name: 'First shop',
                 zipcode: '2222222',
                 city: 'First city',
@@ -121,7 +121,7 @@ describe Organized::ManageController, type: :controller do
                 organization_id: 844,
                 shown: false
               },
-              '1' => {
+              Time.zone.now.to_i.to_s => {
                 created_at: Time.zone.now.to_f.to_s,
                 name: 'Second shop',
                 zipcode: '12243444',
@@ -144,19 +144,31 @@ describe Organized::ManageController, type: :controller do
           expect(organization.show_on_map).to be_falsey
           expect(organization.lock_show_on_map).to be_falsey
         end
-        xit 'updates and adds the locations and shows on map' do
-          # expect do
+        it 'updates and adds the locations and shows on map' do
+          expect do
             put :update, organization_id: organization.to_param, organization: update_attributes
-          # end.to change(Location, :count).by(1)
+          end.to change(Location, :count).by(1)
           organization.reload
           expect(organization.show_on_map).to be_truthy
           # Existing location is updated
           location_1.reload
           expect(location_1.organization).to eq organization
-          update_attributes[:locations_attributes]['1'].except(:latitude, :longitude, :organization_id, :shown, :created_at).each do |k, v|
+          update_attributes[:locations_attributes]['0'].except(:latitude, :longitude, :organization_id, :shown, :created_at).each do |k, v|
             expect(location_1.send(k)).to eq v
           end
-          update_attributes[:locations_attributes]['1'].only(:latitude, :longitude, :organization_id, :shown).each do |k, v|
+          # ensure we are not permitting crazy assignment for first location
+          update_attributes[:locations_attributes]['0'].slice(:latitude, :longitude, :organization_id, :shown).each do |k, v|
+            expect(location_1.send(k)).to_not eq v
+          end
+
+          # second location
+          location_2 = organization.locations.last
+          key = update_attributes[:locations_attributes].keys.last
+          update_attributes[:locations_attributes][key].except(:latitude, :longitude, :organization_id, :shown, :created_at).each do |k, v|
+            expect(location_2.send(k)).to eq v
+          end
+          # ensure we are not permitting crazy assignment for created location
+          update_attributes[:locations_attributes][key].slice(:latitude, :longitude, :organization_id, :shown).each do |k, v|
             expect(location_1.send(k)).to_not eq v
           end
         end
