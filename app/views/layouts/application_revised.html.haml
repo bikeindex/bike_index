@@ -25,23 +25,6 @@
         %ul.primary-main-menu
           - if current_user.present?
             - memberships = current_user.memberships.includes(:organization)
-            - memberships.each do |membership|
-              - organization = membership.organization
-              %li.primary-nav-item
-                %a.nav-link{ id: "#{organization.slug}_submenu", 'aria-haspopup' => "true", 'aria-expanded' => "false", data: { toggle: 'dropdown' } }
-                  = organization.short_name
-                %ul.primary-submenu{ 'aria-labelledby' => "##{organization.slug}_submenu" }
-                  %li
-                    = active_link 'EZ Registration form', embed_extended_organization_path(organization), class_name: 'nav-link'
-                  %li
-                    = active_link "#{organization.short_name} bikes", organization_path(organization), class_name: 'nav-link'
-                  - if membership.admin?
-                    %li
-                      = active_link 'Manage Members', edit_organization_path(organization), class_name: 'nav-link'
-                    %li
-                      = active_link "Manage #{organization.short_name} settings", edit_organization_path(organization), class_name: 'nav-link'
-                  %li
-                    = active_link 'Dev resources', organization_path(organization), class_name: 'nav-link'
             %li.primary-nav-item
               %a.nav-link.settings-link#setting_submenu{ 'aria-haspopup' => "true", 'aria-expanded' => "false", data: { toggle: 'dropdown' } }
                 %span.settings-text
@@ -61,6 +44,26 @@
               / If the user is in an organization, bikes are in their settings button
               %li.primary-nav-item
                 = active_link 'Your bikes', user_home_path, class_name: 'nav-link'
+            - memberships.each do |membership|
+              - organization = membership.organization
+              %li.primary-nav-item
+                %a.nav-link{ id: "#{organization.slug}_submenu", 'aria-haspopup' => "true", 'aria-expanded' => "false", data: { toggle: 'dropdown' } }
+                  = organization.short_name
+                %ul.primary-submenu{ 'aria-labelledby' => "##{organization.slug}_submenu" }
+                  %li
+                    - bike_link_title = (organization.is_paid ? 'Search' : 'List') + ' bikes'
+                    = active_link bike_link_title, organization_bikes_path(organization_id: organization.to_param), class_name: 'nav-link'
+                  %li
+                    = active_link 'Add a bike', new_organization_bike_path(current_organization), class_name: 'nav-link'
+                  - if membership.admin?
+                    %li
+                      = active_link 'Users', organization_users_path(organization_id: current_organization.to_param), class_name: 'nav-link', match_controller: true
+                    %li
+                      = active_link 'Settings', organization_manage_index_path(organization_id: current_organization.to_param), class_name: 'nav-link'
+                    %li
+                      = active_link 'Location settings', locations_organization_manage_index_path(organization_id: current_organization.to_param), class_name: 'nav-link'
+                  %li
+                    = active_link 'Dev resources', dev_organization_manage_index_path(organization_id: current_organization.to_param), class_name: 'nav-link'
             - if current_user.admin_authorized('any')
               %li.primary-nav-item
                 = active_link 'Admin', user_root_url, class_name: 'nav-link'

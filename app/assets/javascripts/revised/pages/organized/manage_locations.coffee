@@ -23,7 +23,6 @@ class BikeIndex.OrganizedManageLocations extends BikeIndex
 
 
   setDefaultCountryAndName: ->
-    console.log 'stufffffff'
     for country in $locations_fieldsets.find('.location-country-select select')
       $country = $(country)
       return true if $country.val().length > 0

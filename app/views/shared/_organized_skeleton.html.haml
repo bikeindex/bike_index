@@ -13,13 +13,10 @@
         %span.menu-item.top-level{ class: ('active' if bikes_active) }
           Bikes
         %ul.organized-submenu
-          - if current_organization.is_paid
-            %li
-              = active_link 'Search', embed_extended_organization_path(current_organization), class_name: 'nav-link'
           %li
-            = active_link 'Add', embed_extended_organization_path(current_organization), class_name: 'nav-link'
+            = active_link (current_organization.is_paid ? 'Search' : 'List'), organization_bikes_path(organization_id: current_organization.to_param), class_name: 'nav-link'
           %li
-            = active_link 'Continuous upload', embed_extended_organization_path(current_organization), class_name: 'nav-link'
+            = active_link 'Add a bike', new_organization_bike_path(current_organization), class_name: 'nav-link'
       %li
         - manage_active = %w(users manage emails).include?(controller_name)
         %span.menu-item.top-level{ class: ('active' if manage_active) }

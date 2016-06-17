@@ -4,4 +4,4 @@ class BikeIndex.Organized extends BikeIndex
 
   setOrganizedWrapHeight: ->
     min_px = $('.organized-menu-wrapper').outerHeight()
-    $('.organized-wrap').css('min-height', "#{min_px}px")
+    $('.organized-wrap').css('min-height', "#{min_px + 20}px")
