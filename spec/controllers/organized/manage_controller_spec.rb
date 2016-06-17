@@ -23,6 +23,16 @@ describe Organized::ManageController, type: :controller do
       end
     end
 
+    describe 'locations' do
+      it 'renders' do
+        get :locations, organization_id: organization.to_param
+        expect(response.status).to eq(200)
+        expect(response).to render_template :locations
+        expect(response).to render_with_layout('application_revised')
+        expect(assigns(:current_organization)).to eq organization
+      end
+    end
+
     describe 'update' do
       context 'dissallowed attributes' do
         let(:org_attributes) do

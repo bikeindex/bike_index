@@ -29,13 +29,6 @@ $form-well-divider-color: #b2b2b2;
       &:hover, &:active, &.active { color: $link-color; }
     }
   }
-  .below-input-help {
-    @extend small;
-    display: block;
-    line-height: 1.5em;
-    padding-bottom: .5em;
-    color: $gray-light;
-  }
   .full-width-checkbox-help {
     @extend .below-input-help;
     margin: -1em 0 0 17px;

@@ -1,12 +1,19 @@
 module Organized
   class ManageController < Organized::AdminController
-    before_filter :assign_organization, only: [:index, :update]
+    before_filter :assign_organization, only: [:index, :update, :locations]
     def index
       @organization.ensure_auto_user
     end
 
+    def locations
+    end
+
     def update
-      if @organization.update_attributes(update_organization_params)
+      if params[:locations_page]
+        @organization.update_attributes(update_locations_params)
+        flash[:success] = "#{current_organization.name} locations updated successfully"
+        redirect_to locations_organization_manage_index_path(organization_id: current_organization.to_param)
+      elsif @organization.update_attributes(update_organization_params)
         flash[:success] = "#{current_organization.name} updated successfully"
         redirect_to current_index_path
       else
@@ -48,12 +55,13 @@ module Organized
         website: o_params[:website],
         org_type: o_params[:org_type],
         embedable_user_email: o_params[:embedable_user_email],
-      }.merge(optional_attributes(o_params))
+      }.merge(paid_attributes(o_params))
     end
 
-    def optional_attributes(o_params)
-      locations_attributes(o_params[:locations_attributes])
-        .merge(show_on_map(o_params))
+    def update_locations_params
+      o_params = params[:organization]
+      show_on_map(o_params)
+        .merge(locations_attributes(o_params[:locations_attributes]))
     end
 
     def locations_attributes(locations_params)
@@ -62,6 +70,11 @@ module Organized
 
     def show_on_map(o_params)
       current_organization.lock_show_on_map ? {} : { show_on_map: o_params[:show_on_map] }
+    end
+
+    def paid_attributes(o_params)
+      return {} unless current_organization.is_paid
+      { avatar: o_params[:avatar] }
     end
 
     def notify_admins(type)

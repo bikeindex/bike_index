@@ -1,34 +1,29 @@
-%fieldset
-  .control-group
-    = f.label :name, "Name", class: "control-label"
-    .controls.location-name-field
-      = f.text_field :name
+.col-md-6
+  %fieldset.card
+    .card-block
+      .row
+        .col-sm-6
+          .form-group
+            = f.label :name, 'Location name'
+            = f.text_field :name, placeholder: 'Name', class: 'form-control location-name-field'
+        .col-sm-6
+          .form-group
+            = f.label :phone, 'Phone number'
+            = f.text_field :phone, class: 'form-control'
 
-  .control-group
-    = f.label :phone, "Phone number", class: "control-label"
-    .controls
-      = f.text_field :phone
+      .form-group.address-group
+        = f.label :street, 'Address'
+        = f.text_field :street, placeholder: 'Street', class: 'form-control'
+        = f.text_field :city, placeholder: 'City', class: 'form-control'
+        .row.countrystatezip
+          .col-sm-4.location-country-select.fancy-select.unfancy
+            = f.collection_select(:country_id, Country.all, :id, :name, prompt: 'Choose country')
+          .col-sm-4.fancy-select.unfancy
+            = f.collection_select(:state_id, State.all, :id, :name, prompt: 'State', include_blank: true )
+          .col-sm-4
+            = f.text_field :zipcode, placeholder: 'Zipcode', class: 'form-control'
 
-  / .control-group
-  /   = f.label :email, "Shop's email (only if you want)", class: "control-label"
-  /   .controls
-  /     = f.text_field :email
-  
-  .control-group.chosen-select
-    = f.label :country_id, "Address", class: "control-label"
-    .controls
-      = f.text_field :street, placeholder: "Street"
-    .controls.extra-field
-      = f.text_field :city, placeholder: "City"
-    .controls.extra-field
-      = f.collection_select(:state_id, State.all, :id, :name, prompt: "State", include_blank: true )
-    .controls.extra-field
-      = f.text_field :zipcode, placeholder: "Zipcode"
-    .controls.extra-field.chosen-select.country_select_container
-      = f.collection_select(:country_id, Country.all, :id, :name, prompt: "Choose country" )
+      .remove-control
+        = f.check_box :_destroy
+        = f.label :_destroy, "Remove", class: "remove_fields"
 
-  .remove-control
-    = f.check_box :_destroy
-    = f.label :_destroy, "Remove", class: "remove_fields"
-  
-  %hr

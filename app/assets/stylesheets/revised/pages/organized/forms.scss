@@ -4,11 +4,18 @@
     @extend .col-sm-4;
     text-align: right;
   }
-  .below-input-help {
-    @extend small;
-    display: block;
-    line-height: 1.5em;
-    padding-bottom: .5em;
-    color: $gray-light;
+
+  .locations-fieldset-wrapper {
+    @extend .row;
+    fieldset { display: flex; }
+    .address-group {
+      .selectize-control, input { margin-top: .5em; }
+    }
+    .countrystatezip {
+      // @include media-breakpoint-up(sm) {
+        .col-sm-4:first-of-type { padding-right: 0; }
+        .col-sm-4:last-of-type { padding-left: 0; }
+      // }
+    }
   }
 }

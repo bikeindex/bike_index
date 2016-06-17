@@ -139,6 +139,23 @@ describe Organization do
     end
   end
 
+  describe 'display_avatar' do
+    context 'unpaid' do
+      it 'does not display' do
+        organization = Organization.new(is_paid: false)
+        allow(organization).to receive(:avatar) { 'a pretty picture' }
+        expect(organization.display_avatar).to be_falsey
+      end
+    end
+    context 'paid' do
+      it 'displays' do
+        organization = Organization.new(is_paid: true)
+        allow(organization).to receive(:avatar) { 'a pretty picture' }
+        expect(organization.display_avatar).to be_truthy
+      end
+    end
+  end
+
   describe 'clear_map_cache' do
     it 'has before_save_callback_method defined for clear clear_map_cache' do
       expect(Organization._save_callbacks.select { |cb| cb.kind.eql?(:after) }.map(&:raw_filter).include?(:clear_map_cache)).to eq(true)

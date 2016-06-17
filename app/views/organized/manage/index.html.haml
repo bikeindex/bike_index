@@ -1,6 +1,5 @@
 .organized-page-header
   %h1
-    Manage
     %em
       = @organization.name
     settings
@@ -22,7 +21,7 @@
     .col-sm-4
       = f.select :embedable_user_email, @organization.users.pluck(:email), prompt: 'Select email', selected: (@organization.auto_user && @organization.auto_user.email)
       %span.below-input-help
-        Email that registrations through #{@organization.name} will be from
+        Email address that registrations through #{@organization.name} will be sent from
 
   .form-group.row
     %label.org-form-label
@@ -54,14 +53,21 @@
     .col-sm-4
       = f.text_field :website, class: 'form-control'
 
-  .form-group.row
-    %label.org-form-label
-      Partner list
-    .col-sm-4
-      .checkbox
-        %label
-          = f.check_box :show_on_map
-          Show #{@organization.name} on #{ link_to 'map', where_path, target: '_blank' }
+  - if current_organization.is_paid
+    .form-group.row
+      %label.org-form-label
+        Organization logo
+      .col-sm-4
+        / .form-well-input
+        - if @organization.avatar? 
+          = image_tag(@organization.avatar_url(:thumb))
+        - else
+          %p
+            No picture!
+        %label.file 
+          = f.file_field :avatar
+          %span.file-custom
+          = f.hidden_field :avatar_cache
 
   .form-group.row
     .col-sm-4.col-sm-push-4

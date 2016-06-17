@@ -228,9 +228,12 @@ Bikeindex::Application.routes.draw do
     resources :bikes, only: [:index, :show]
     # Below are admin controllers, inherit from Organized::AdminController not BaseController
     resources :manage, only: [:index, :update, :destroy] do
-      collection { get :dev }
+      collection do
+        get :dev
+        get :locations
+      end
     end
     resources :users, except: [:show]
-    resources :email
+    resources :emails
   end
 end

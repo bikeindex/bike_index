@@ -105,6 +105,10 @@ class Organization < ActiveRecord::Base
     show_on_map && approved
   end
 
+  def display_avatar
+    is_paid && avatar.present?
+  end
+
   before_save :set_locations_shown
   def set_locations_shown
     # Locations set themselves on save
