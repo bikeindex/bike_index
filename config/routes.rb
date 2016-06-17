@@ -16,7 +16,6 @@ Bikeindex::Application.routes.draw do
       get :embed_extended
       get :embed_create_success
     end
-    # resources :bikes, except: [:destroy]
   end
 
   match '/', to: redirect(:root_url, subdomain: false), constraints: { subdomain: 'stolen' }
