@@ -27,7 +27,7 @@ class OrganizationsController < ApplicationController
       notify_admins('organization_created')
       flash[:success] = 'Organization Created successfully!'
       if current_user.present?
-        redirect_to edit_organization_url(@organization) and return
+        redirect_to organization_manage_index_path(organization_id: @organization.to_param)
       end
     else
       render action: :new and return

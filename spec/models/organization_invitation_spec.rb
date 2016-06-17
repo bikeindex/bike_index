@@ -5,7 +5,6 @@ describe OrganizationInvitation do
     it { is_expected.to belong_to :inviter }
     it { is_expected.to belong_to :invitee }
     it { is_expected.to validate_presence_of :invitee_email }
-    it { is_expected.to validate_presence_of :organization }
     it { is_expected.to validate_presence_of :inviter }
     it { is_expected.to validate_presence_of :membership_role }
   end

@@ -223,7 +223,7 @@ Bikeindex::Application.routes.draw do
   # No actions are defined here, this `resources` declaration
   # prepends a :organization_id/ to every nested URL.
   # Down here so that it doesn't override any other routes
-  resources :organizations, only: [], path: '', module: 'organized' do
+  resources :organizations, only: [], path: 'o', module: 'organized' do
     get '/', to: 'organizations#bikes#index', as: :root
     resources :bikes, only: [:index, :new, :show]
     # Below are admin controllers, inherit from Organized::AdminController not BaseController

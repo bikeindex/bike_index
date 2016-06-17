@@ -147,10 +147,25 @@ describe ApplicationHelper do
       end
     end
     context 'organization subrouting' do
-      context 'management' do
-        let(:controller) { Organized::ManagementController.new }
-        it 'returns organized' do
-          allow(view).to receive(:controller).and_return(controller)
+      before { allow(view).to receive(:sub_module_name) { 'organized_' } }
+      context 'manage' do
+        before { allow(view).to receive(:controller_name) { 'manage' } }
+        it 'returns organized for index' do
+          allow(view).to receive(:action_name) { 'index' }
+          expect(helper.current_page_skeleton).to eq 'organized_skeleton'
+        end
+      end
+      context 'bikes' do
+        before { allow(view).to receive(:controller_name) { 'bikes' } }
+        it 'returns organized for index' do
+          allow(view).to receive(:action_name) { 'index' }
+          expect(helper.current_page_skeleton).to eq 'organized_skeleton'
+        end
+      end
+      context 'users' do
+        before { allow(view).to receive(:controller_name) { 'users' } }
+        it 'returns organized for index' do
+          allow(view).to receive(:action_name) { 'index' }
           expect(helper.current_page_skeleton).to eq 'organized_skeleton'
         end
       end

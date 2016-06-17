@@ -35,7 +35,7 @@ describe OrganizationsController do
       post :create, organization: org_attrs
       expect(Organization.count).to eq(1)
       organization = Organization.where(name: 'a new org').first
-      expect(response).to redirect_to edit_organization_url(organization)
+      expect(response).to redirect_to organization_manage_index_path(organization_id: organization.to_param)
       expect(organization.approved).to be_falsey
       expect(organization.api_access_approved).to be_falsey
       expect(organization.auto_user_id).to eq(user.id)

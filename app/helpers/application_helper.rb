@@ -30,7 +30,7 @@ module ApplicationHelper
       'content_skeleton' unless %w(terms vendor_terms privacy support_the_index).include?(action_name)
     when 'welcome'
       'content_skeleton' if %w(goodbye).include?(action_name)
-    when 'organized_skeleton'
+    when 'organizations'
       'content_skeleton' if %w(new lightspeed_integration).include?(action_name)
     when 'user'
       'content_skeleton' if %w(edit).include?(action_name)
