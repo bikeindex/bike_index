@@ -54,16 +54,16 @@
                     - bike_link_title = (organization.is_paid ? 'Search' : 'List') + ' bikes'
                     = active_link bike_link_title, organization_bikes_path(organization_id: organization.to_param), class_name: 'nav-link'
                   %li
-                    = active_link 'Add a bike', new_organization_bike_path(current_organization), class_name: 'nav-link'
+                    = active_link 'Add a bike', new_organization_bike_path(organization), class_name: 'nav-link'
                   - if membership.admin?
                     %li
-                      = active_link 'Users', organization_users_path(organization_id: current_organization.to_param), class_name: 'nav-link', match_controller: true
+                      = active_link 'Users', organization_users_path(organization_id: organization.to_param), class_name: 'nav-link', match_controller: true
                     %li
-                      = active_link 'Settings', organization_manage_index_path(organization_id: current_organization.to_param), class_name: 'nav-link'
+                      = active_link 'Settings', organization_manage_index_path(organization_id: organization.to_param), class_name: 'nav-link'
                     %li
-                      = active_link 'Location settings', locations_organization_manage_index_path(organization_id: current_organization.to_param), class_name: 'nav-link'
+                      = active_link 'Location settings', locations_organization_manage_index_path(organization_id: organization.to_param), class_name: 'nav-link'
                   %li
-                    = active_link 'Dev resources', dev_organization_manage_index_path(organization_id: current_organization.to_param), class_name: 'nav-link'
+                    = active_link 'Dev resources', dev_organization_manage_index_path(organization_id: organization.to_param), class_name: 'nav-link'
             - if current_user.admin_authorized('any')
               %li.primary-nav-item
                 = active_link 'Admin', user_root_url, class_name: 'nav-link'
