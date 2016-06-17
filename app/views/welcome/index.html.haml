@@ -52,7 +52,7 @@
         or #{link_to "register your bike now", choose_registration_path}.
       %h3
         So far we've <strong>registered #{number_with_delimiter(Bike.count)} bikes</strong> and <strong>recovered #{number_with_delimiter(StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count)}</strong> stolen bikes.
-- cache 'root_home' do 
+- cache 'root_home_1' do 
   .info-blocks
     .container
       %article
@@ -115,7 +115,7 @@
           %li
             %a{href: "http://www.activetrans.org/", target: "_blank"}
               = image_tag "/assets/supporters/active_trans1.png", alt: "Active Transportation Alliance logo", title: "Active Transportation Alliance"
-        %ul.horizontal-list.five-supporters
+        %ul.horizontal-list
           %li
             %a{href: "http://www.seattle.gov/police/", target: "_blank"}
               = image_tag "/assets/supporters/seattlepd.png", alt: "Seattle police"
@@ -131,6 +131,9 @@
           %li
             %a{href: "https://www.portlandoregon.gov/police/66825", target: "_blank"}
               = image_tag "/assets/supporters/pbttf.png", alt: "Portland Bike Theft Task Force", title: "Portland Bike Theft Task Force"
+          %li
+            %a{href: "https://www.portlandoregon.gov/police/66825", target: "_blank"}
+              = image_tag "/assets/supporters/bendpd.png", alt: "Bend Oregon Police Department", title: "Bend Oregon Police Department"
           
           
       
