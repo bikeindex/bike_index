@@ -149,6 +149,9 @@ $row-side-padding: 0.9375rem;
 @import "revised/sections/bike_search_form";
 @import "revised/sections/bike_boxes";
 @import "revised/sections/side_boxes";
+// Shared organized styles
+@import "revised/pages/organized/forms";
+@import "revised/pages/organized/header";
 @import "revised/sections/organized_menu"; // left hand organized menu
 
 // 
@@ -191,11 +194,6 @@ $row-side-padding: 0.9375rem;
 @import "revised/pages/home/home";
 @import "revised/pages/home/supporters";
 @import "revised/pages/home/testimonials";
-
-// Organized pages
-@import "revised/pages/organized/forms";
-@import "revised/pages/organized/header";
-@import "revised/pages/organized/tables";
 
 // LEGACY PAGES general styles - replace as soon as all pages have been restyled
 @import "revised/sections/legacy_content"; // general legacy content styles
