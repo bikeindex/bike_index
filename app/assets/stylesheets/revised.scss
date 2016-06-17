@@ -115,7 +115,7 @@ $grid-breakpoint-md: 768px;
 $grid-breakpoint-lg: 992px;
 $grid-breakpoint-xl: 1200px;
 $grid-sizes: 'xs', 'sm', 'md', 'lg', 'xl';
-$grid-breakpoints: $grid-breakpoint-xs, $grid-breakpoint-sm, $grid-breakpoint-md, $grid-breakpoint-lg, $grid-breakpoint-xl;
+$grid-breakpoints-var: $grid-breakpoint-xs, $grid-breakpoint-sm, $grid-breakpoint-md, $grid-breakpoint-lg, $grid-breakpoint-xl;
 $row-side-padding: 0.9375rem;
 
 // Settings

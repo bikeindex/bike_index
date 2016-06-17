@@ -21,7 +21,7 @@
   $i: index($grid-sizes, $size);
   // Add a class of "split-$size" to get it to split at any width above that breakpoint
   // eg .split-sm
-  @media (min-width: nth($grid-breakpoints, $i)) {
+  @media (min-width: nth($grid-breakpoints-var, $i)) {
     .attr-list.split-#{$size} {
       @include make-row();
       li {

@@ -12,10 +12,10 @@
       .selectize-control, input { margin-top: .5em; }
     }
     .countrystatezip {
-      // @include media-breakpoint-up(sm) {
+      @include media-breakpoint-up(sm) {
         .col-sm-4:first-of-type { padding-right: 0; }
         .col-sm-4:last-of-type { padding-left: 0; }
-      // }
+      }
     }
   }
 }

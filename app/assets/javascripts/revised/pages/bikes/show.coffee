@@ -35,8 +35,8 @@ class BikeIndex.BikesShow extends BikeIndex
       $(window).unbind('scroll')
 
   showBikeEditOverlay: ->
-    # Affix the edit menu to the page
-    $('.bike-edit-overlay').Stickyfill()
+    # Affix the edit menu to the page - broken in chrome, so we're using position fixed
+    # $('.bike-edit-overlay').Stickyfill()
     # Add class to footer so it's still visible
     $('.primary-footer .terms-and-stuff').addClass('bike-show-page-with-edit-overlay')
 
