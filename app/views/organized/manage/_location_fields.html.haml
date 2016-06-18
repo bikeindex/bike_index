@@ -1,0 +1,29 @@
+.col-md-6
+  %fieldset.card
+    .card-block
+      .row
+        .col-sm-6
+          .form-group
+            = f.label :name, 'Location name'
+            = f.text_field :name, placeholder: 'Name', required: true, class: 'form-control location-name-field'
+        .col-sm-6
+          .form-group
+            = f.label :phone, 'Phone number'
+            = f.text_field :phone, class: 'form-control'
+
+      .form-group.address-group
+        = f.label :street, 'Address'
+        = f.text_field :street, placeholder: 'Street', class: 'form-control'
+        = f.text_field :city, required: true, placeholder: 'City', class: 'form-control'
+        .row.countrystatezip
+          .col-sm-4.location-country-select.fancy-select.unfancy
+            = f.collection_select(:country_id, Country.all, :id, :name, prompt: 'Choose country')
+          .col-sm-4.fancy-select.unfancy
+            = f.collection_select(:state_id, State.all, :id, :name, prompt: 'State', include_blank: true )
+          .col-sm-4
+            = f.text_field :zipcode, placeholder: 'Zipcode', class: 'form-control'
+
+      .remove-control
+        = f.check_box :_destroy
+        = f.label :_destroy, 'Remove', class: 'remove_fields'
+

@@ -16,8 +16,6 @@ Bikeindex::Application.routes.draw do
       get :embed_extended
       get :embed_create_success
     end
-    resources :memberships, only: [:edit, :update, :destroy]
-    resources :organization_invitations, only: [:new, :create]
   end
 
   match '/', to: redirect(:root_url, subdomain: false), constraints: { subdomain: 'stolen' }
@@ -220,4 +218,21 @@ Bikeindex::Application.routes.draw do
   match '/500', to: 'errors#server_error'
 
   mount Sidekiq::Web => '/sidekiq', constraints: AdminRestriction
+
+  # No actions are defined here, this `resources` declaration
+  # prepends a :organization_id/ to every nested URL.
+  # Down here so that it doesn't override any other routes
+  resources :organizations, only: [], path: 'o', module: 'organized' do
+    get '/', to: 'organizations#bikes#index', as: :root
+    resources :bikes, only: [:index, :new, :show]
+    # Below are admin controllers, inherit from Organized::AdminController not BaseController
+    resources :manage, only: [:index, :update, :destroy] do
+      collection do
+        get :dev
+        get :locations
+      end
+    end
+    resources :users, except: [:show]
+    resources :emails
+  end
 end

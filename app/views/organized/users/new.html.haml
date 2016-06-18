@@ -1,0 +1,41 @@
+.organized-page-header
+  %h1
+    Invite user
+  %p
+    You have invited
+    %strong
+      #{ pluralize(current_organization.sent_invitation_count, 'user') },
+    %br
+    And can add
+    %strong
+      #{current_organization.available_invitation_count} more.
+
+= form_for @organization_invitation, { as: :organization_invitation, url: organization_users_path(organization_id: current_organization.to_param), action: 'create', html: { class: 'organized-form' } } do |f|
+
+  .form-group.row
+    = f.label :invitee_email, "Email you're inviting", class: 'org-form-label'
+    .col-sm-4
+      = f.email_field :invitee_email, required: true, class: 'form-control'
+
+  .form-group.row
+    = f.label :invitee_name, 'Name', class: 'control-label', class: 'org-form-label'
+    .col-sm-4
+      = f.text_field :invitee_name, required: true, class: 'form-control'
+
+  .form-group.row
+    %label.org-form-label
+      Membership type
+    .col-sm-4
+      .radio
+        %label
+          = f.radio_button :membership_role, Membership.membership_types.first
+          Admin of organization
+      .radio
+        %label
+          = f.radio_button :membership_role, Membership.membership_types.second
+          Member of organization
+
+  .form-group.row      
+    .col-sm-4.col-sm-push-4
+      = f.submit 'Send invitation', class: 'btn btn-success btn-lg'
+

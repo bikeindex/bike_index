@@ -1,5 +1,5 @@
 class BikeIndex.NavHeader extends BikeIndex
-  headroomOptions: 
+  headroomOptions:
     offset: 48
 
   constructor: ->

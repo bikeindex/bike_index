@@ -13,7 +13,7 @@
     - if content_page_type == 'news'
       = auto_discovery_link_tag(:atom, news_index_url(format: "atom"), { title: 'Bike Index news atom feed' })
 
-  %body{ id: body_id }
+  %body{ id: body_id, class: ('organized-body' if current_page_skeleton == 'organized_skeleton') }
     %nav.primary-header-nav
       .container
         %a.primary-logo{ href: user_root_url }
@@ -44,11 +44,6 @@
               / If the user is in an organization, bikes are in their settings button
               %li.primary-nav-item
                 = active_link 'Your bikes', user_home_path, class_name: 'nav-link'
-            - if current_user.admin_authorized('any')
-              %li.primary-nav-item
-                = active_link 'Admin', user_root_url, class_name: 'nav-link'
-            /
-            / Organization submenus
             - memberships.each do |membership|
               - organization = membership.organization
               %li.primary-nav-item
@@ -56,16 +51,22 @@
                   = organization.short_name
                 %ul.primary-submenu{ 'aria-labelledby' => "##{organization.slug}_submenu" }
                   %li
-                    = active_link 'EZ Registration form', embed_extended_organization_path(organization), class_name: 'nav-link'
+                    - bike_link_title = (organization.is_paid ? 'Search' : 'List') + ' bikes'
+                    = active_link bike_link_title, organization_bikes_path(organization_id: organization.to_param), class_name: 'nav-link'
                   %li
-                    = active_link "#{organization.short_name} bikes", organization_path(organization), class_name: 'nav-link'
+                    = active_link 'Add a bike', new_organization_bike_path(organization), class_name: 'nav-link'
                   - if membership.admin?
                     %li
-                      = active_link 'Manage Members', edit_organization_path(organization), class_name: 'nav-link'
+                      = active_link 'Users', organization_users_path(organization_id: organization.to_param), class_name: 'nav-link', match_controller: true
                     %li
-                      = active_link "Manage #{organization.short_name} settings", edit_organization_path(organization), class_name: 'nav-link'
+                      = active_link 'Settings', organization_manage_index_path(organization_id: organization.to_param), class_name: 'nav-link'
+                    %li
+                      = active_link 'Location settings', locations_organization_manage_index_path(organization_id: organization.to_param), class_name: 'nav-link'
                   %li
-                    = active_link 'Dev resources', organization_path(organization), class_name: 'nav-link'
+                    = active_link 'Dev resources', dev_organization_manage_index_path(organization_id: organization.to_param), class_name: 'nav-link'
+            - if current_user.admin_authorized('any')
+              %li.primary-nav-item
+                = active_link 'Admin', user_root_url, class_name: 'nav-link'
           - else
             %li.primary-nav-item
               = active_link 'Sign up', new_user_url, class_name: 'nav-link signup-link'

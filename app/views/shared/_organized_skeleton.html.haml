@@ -1,0 +1,39 @@
+%nav.organized-left-menu
+  .organized-menu-wrapper
+    %header
+      - if current_organization.display_avatar
+        = image_tag current_organization.avatar.url(:medium)
+      %h5
+        = current_organization.name
+        %br
+        Admin panel
+    %ul.organized-mainmenu
+      %li
+        - bikes_active = %w(bikes).include?(controller_name)
+        %span.menu-item.top-level{ class: ('active' if bikes_active) }
+          Bikes
+        %ul.organized-submenu
+          %li
+            = active_link (current_organization.is_paid ? 'Search' : 'List'), organization_bikes_path(organization_id: current_organization.to_param), class_name: 'nav-link'
+          %li
+            = active_link 'Add a bike', new_organization_bike_path(current_organization), class_name: 'nav-link'
+      %li
+        - manage_active = %w(users manage emails).include?(controller_name)
+        %span.menu-item.top-level{ class: ('active' if manage_active) }
+          Manage
+        %ul.organized-submenu
+          %li
+            = active_link 'Users', organization_users_path(organization_id: current_organization.to_param), class_name: 'nav-link', match_controller: true
+          %li
+            = active_link 'Organization', organization_manage_index_path(organization_id: current_organization.to_param), class_name: 'nav-link'
+          %li
+            = active_link 'Locations', locations_organization_manage_index_path(organization_id: current_organization.to_param), class_name: 'nav-link'
+          / - if current_organization.is_paid
+          /   %li
+          /     = active_link 'Emails', organization_emails_path(organization_id: current_organization.to_param), class_name: 'nav-link', match_controller: true
+        %li
+          = active_link 'Dev resources', dev_organization_manage_index_path(organization_id: current_organization.to_param), class_name: 'nav-link'
+
+.organized-wrap
+  .container
+    = yield

@@ -84,7 +84,7 @@ describe ApplicationHelper do
       before { allow(view).to receive(:controller_name) { 'news' } }
       %w(index show).each do |action|
         context action do
-          it 'returns nil' do
+          it 'returns content_skeleton' do
             allow(view).to receive(:action_name) { action }
             expect(helper.current_page_skeleton).to eq 'content_skeleton'
           end
@@ -106,7 +106,7 @@ describe ApplicationHelper do
       before { allow(view).to receive(:controller_name) { 'feedbacks' } }
       %w(index).each do |action|
         context action do
-          it 'returns nil' do
+          it 'returns content_skeleton' do
             allow(view).to receive(:action_name) { action }
             expect(helper.current_page_skeleton).to eq 'content_skeleton'
           end
@@ -128,7 +128,7 @@ describe ApplicationHelper do
       before { allow(view).to receive(:controller_name) { 'welcome' } }
       %w(goodbye).each do |action|
         context action do
-          it 'returns nil' do
+          it 'returns content_skeleton' do
             allow(view).to receive(:action_name) { action }
             expect(helper.current_page_skeleton).to eq 'content_skeleton'
           end
@@ -139,10 +139,34 @@ describe ApplicationHelper do
       before { allow(view).to receive(:controller_name) { 'organizations' } }
       %w(new lightspeed_integration).each do |action|
         context action do
-          it 'returns nil' do
+          it 'returns content_skeleton' do
             allow(view).to receive(:action_name) { action }
             expect(helper.current_page_skeleton).to eq 'content_skeleton'
           end
+        end
+      end
+    end
+    context 'organization subrouting' do
+      before { allow(view).to receive(:sub_module_name) { 'organized_' } }
+      context 'manage' do
+        before { allow(view).to receive(:controller_name) { 'manage' } }
+        it 'returns organized for index' do
+          allow(view).to receive(:action_name) { 'index' }
+          expect(helper.current_page_skeleton).to eq 'organized_skeleton'
+        end
+      end
+      context 'bikes' do
+        before { allow(view).to receive(:controller_name) { 'bikes' } }
+        it 'returns organized for index' do
+          allow(view).to receive(:action_name) { 'index' }
+          expect(helper.current_page_skeleton).to eq 'organized_skeleton'
+        end
+      end
+      context 'users' do
+        before { allow(view).to receive(:controller_name) { 'users' } }
+        it 'returns organized for index' do
+          allow(view).to receive(:action_name) { 'index' }
+          expect(helper.current_page_skeleton).to eq 'organized_skeleton'
         end
       end
     end
@@ -150,7 +174,7 @@ describe ApplicationHelper do
       before { allow(view).to receive(:controller_name) { 'stolen' } }
       %w(index).each do |action|
         context action do
-          it 'returns nil' do
+          it 'returns content_skeleton' do
             allow(view).to receive(:action_name) { action }
             expect(helper.current_page_skeleton).to eq 'content_skeleton'
           end
@@ -161,7 +185,7 @@ describe ApplicationHelper do
       before { allow(view).to receive(:controller_name) { 'user' } }
       %w(edit).each do |action|
         context action do
-          it 'returns nil' do
+          it 'returns content_skeleton' do
             allow(view).to receive(:action_name) { action }
             expect(helper.current_page_skeleton).to eq 'content_skeleton'
           end
@@ -172,7 +196,7 @@ describe ApplicationHelper do
       before { allow(view).to receive(:controller_name) { 'errors' } }
       %w(bad_request not_found unprocessable_entity server_error unauthorized).each do |action|
         context action do
-          it 'returns nil' do
+          it 'returns content_skeleton' do
             allow(view).to receive(:action_name) { action }
             expect(helper.current_page_skeleton).to eq 'content_skeleton'
           end

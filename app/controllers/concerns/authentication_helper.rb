@@ -68,7 +68,7 @@ module AuthenticationHelper
     end
   end
 
-  def current_organization
-    @organization ||= Organization.find_by_slug(request.subdomain)
-  end
+  # def current_organization
+  #   @organization ||= Organization.find_by_slug(request.subdomain)
+  # end
 end

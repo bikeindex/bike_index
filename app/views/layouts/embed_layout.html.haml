@@ -1,10 +1,10 @@
 !!!
 %html
   %head
-    %meta{charset: "utf-8"}
-    %meta{"http-equiv" => "X-UA-Compatible", content: "IE=edge,chrome=1"}
-    %meta{name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=1"}
-    %meta{name: "description", content: "Embedable form, add a bike through #{@organization.name}." }
+    %meta{charset: 'utf-8'}
+    %meta{'http-equiv' => 'X-UA-Compatible', content: 'IE=edge,chrome=1'}
+    %meta{name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1'}
+    %meta{name: 'description', content: "Embedable form, add a bike through #{@organization.name}." }
     %title
       Register a bike through #{@organization.name}
     = stylesheet_link_tag "embed_styles", media: "all"
@@ -14,8 +14,8 @@
   %body#bi_embed
     #alert-block
       - flash.each do |name, msg|
-        %div{class: "alert-#{name == :notice ? "success" : "error"}"}
-          %a.close{"data-dismiss" => "alert"} ×
+        %div{class: "alert-#{name}"}
+          %a.close{'data-dismiss' => 'alert'} ×
           = content_tag :div, msg, id: "flash_#{name}" if msg.is_a?(String)
 
       - if @b_param && @b_param.bike_errors.present?

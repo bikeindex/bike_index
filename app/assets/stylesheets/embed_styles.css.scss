@@ -272,10 +272,18 @@ a {
   // background-color: $warningBackground;
   // border: 1px solid $warningBorder;
   // color: $warningText;
-  background-color: darken($warningBackground, 2%);
-  border: 1px solid darken($warningBorder, 7%);
-  color: darken($warningText, 20%);
+  &.alert-error {
+    background-color: darken($warningBackground, 2%);
+    border: 1px solid darken($warningBorder, 7%);
+    color: darken($warningText, 20%);
+  }
+  &.alert-success {
+    background-color: darken($blue, 2%);
+    border: 1px solid darken($blue-lighter, 7%);
+    color: $blueDarker;
+  }
 }
+
 .alert h4 {
   margin: 0 0 .5em;
 }

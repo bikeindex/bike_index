@@ -1,0 +1,78 @@
+$organized-menu-bg: $gray-lighter;
+.organized-left-menu { display: none; }
+@media(min-width: $grid-breakpoint-md) {
+  .organized-body {
+    // @include clearfix;
+    position: relative;
+    .primary-footer { position: relative; } // To make it go over the menu
+    .organized-left-menu {
+      background: $organized-menu-bg;
+      width: 15%; height: 100%;
+      position: absolute;
+      top: 0;
+      display: block;
+      header {
+        margin-top: -2*$vertical-height;
+        padding: $vertical-height;
+        img {
+          width: 70%;
+          max-width: 150px;
+          height: auto;
+          margin: 0 auto $vertical-height;
+          display: block;
+        }
+      }
+      ul { @include list-unstyled; }
+      .organized-mainmenu {
+        // margin-top: -40px;
+        a, .menu-item {
+          width: 100%;
+          display: block;
+          padding: $vertical-height;
+          color: $header-font-color;
+          text-decoration: none;
+          // &.first-item { border-top: none; }
+        }
+        a:hover {
+          text-decoration: none;
+          font-weight: $strong-font-weight;
+        }
+        li { border-top: 1px solid $gray-lightish; }
+        // &>li:first-of-type { border-top: none; }
+      }
+      .top-level.active {
+        background: $blue;
+        color: white;
+        position: relative;
+        &:hover {
+          font-weight: $normal-font-weight;
+          cursor: default;
+        }
+        &:before {
+          content: '';
+          display: block;
+          height:0; width:0;
+          right: 0; top: 50%;
+          margin-top: -$vertical-height;
+          border-top: $vertical-height solid transparent;
+          border-bottom: $vertical-height solid transparent; 
+          border-right: $vertical-height solid white;
+          position: absolute;
+        }
+      }
+      .organized-submenu {
+        li { padding-left: 2*$vertical-height; }
+        .active { font-weight: $strong-font-weight; }
+      }
+    }
+    .organized-wrap {
+      width: 100%;
+      padding-left: 15%;
+    }
+    // .organized-mainmenu {}
+    // .container.organized-main-container {
+    //   float: right;
+    //   width: 85%;
+    // }
+  }
+}

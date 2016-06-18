@@ -1,0 +1,31 @@
+.organized-page-header
+  %h1
+    %em
+      = @organization.name
+    location settings
+= form_for @organization, { url: organization_manage_path(id: @organization.id, organization_id: @organization.to_param), action: 'update', html: { class: 'organized-form' } } do |f|
+  = hidden_field_tag :locations_page, true
+  .form-group.row
+    %label.org-form-label
+      Bike Index partners
+    .col-sm-4
+      .checkbox
+        %label
+          = f.check_box :show_on_map
+          Display
+          %em
+            = @organization.name
+          on #{ link_to 'map', where_path, target: '_blank' }
+  .form-group.row
+    .col-sm-4.col-sm-push-4
+      = revised_link_to_add_fields 'Add location', f, :locations, class_name: 'btn btn-secondary btn-lg'
+
+  - default_country = @organization.locations.first && @organization.locations.first.country && @organization.locations.first.country.id || Country.united_states.id
+  - default_name = @organization.name
+  .locations-fieldset-wrapper#locations_fieldsets{ data: { country: default_country, name: default_name } }
+    = f.fields_for :locations do |builder|
+      = render 'location_fields', f: builder
+    %span#fieldsetend
+  .form-group.row
+    .col-sm-4.col-sm-push-4
+      = f.submit 'Save', class: 'btn btn-success btn-lg'

@@ -70,7 +70,7 @@ describe Organization do
     end
     context 'not approved' do
       it 'sets not shown' do
-        expect(organization.show_on_map).to be_truthy
+        expect(organization.allowed_show).to be_falsey
         organization.set_locations_shown
         expect(location.reload.shown).to be_falsey
       end
@@ -84,14 +84,14 @@ describe Organization do
     it 'sets the embedable user' do
       organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:confirmed_user, email: 'embed@org.com')
-      membership = FactoryGirl.create(:membership, organization: organization, user: user)
+      FactoryGirl.create(:membership, organization: organization, user: user)
       organization.embedable_user_email = 'embed@org.com'
       organization.save
       expect(organization.reload.auto_user_id).to eq(user.id)
     end
     it 'does not set the embedable user if user is not a member' do
       organization = FactoryGirl.create(:organization)
-      user = FactoryGirl.create(:confirmed_user, email: 'no_embed@org.com')
+      FactoryGirl.create(:confirmed_user, email: 'no_embed@org.com')
       organization.embedable_user_email = 'no_embed@org.com'
       organization.save
       expect(organization.reload.auto_user_id).to be_nil
@@ -106,9 +106,53 @@ describe Organization do
     it "sets the embedable user if it isn't set and the org has members" do
       organization = FactoryGirl.create(:organization)
       user = FactoryGirl.create(:confirmed_user)
-      membership = FactoryGirl.create(:membership, user: user, organization: organization)
+      FactoryGirl.create(:membership, user: user, organization: organization)
       organization.save
       expect(organization.reload.auto_user_id).not_to be_nil
+    end
+  end
+
+  describe 'ensure_auto_user' do
+    let(:organization) { FactoryGirl.create(:organization) }
+    context 'existing members' do
+      let(:member) { FactoryGirl.create(:organization_member, organization: organization) }
+      before do
+        expect(member).to be_present
+      end
+      it 'sets the first user' do
+        organization.ensure_auto_user
+        organization.reload
+        expect(organization.auto_user).to eq member
+      end
+    end
+    context 'no members' do
+      let(:auto_user) { FactoryGirl.create(:confirmed_user, email: ENV['AUTO_ORG_MEMBER']) }
+      before do
+        expect(organization).to be_present
+        expect(auto_user).to be_present
+      end
+      it 'sets the AUTO_ORG_MEMBER' do
+        organization.ensure_auto_user
+        organization.reload
+        expect(organization.auto_user).to eq auto_user
+      end
+    end
+  end
+
+  describe 'display_avatar' do
+    context 'unpaid' do
+      it 'does not display' do
+        organization = Organization.new(is_paid: false)
+        allow(organization).to receive(:avatar) { 'a pretty picture' }
+        expect(organization.display_avatar).to be_falsey
+      end
+    end
+    context 'paid' do
+      it 'displays' do
+        organization = Organization.new(is_paid: true)
+        allow(organization).to receive(:avatar) { 'a pretty picture' }
+        expect(organization.display_avatar).to be_truthy
+      end
     end
   end
 

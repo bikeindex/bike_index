@@ -1,0 +1,84 @@
+.organized-page-header
+  %h1
+    %em
+      = @organization.name
+    settings
+= form_for @organization, { url: organization_manage_path(id: @organization.id, organization_id: @organization.to_param), action: 'update', html: { class: 'organized-form' } } do |f|
+
+  .form-group.row
+    = f.label :name, 'Name', class: 'control-label', class: 'org-form-label'
+    .col-sm-4
+      = f.text_field :name, required: true, class: 'form-control'
+
+  .form-group.row
+    = f.label :short_name, 'Abbreviation', class: 'control-label', class: 'org-form-label'
+    .col-sm-4
+      = f.text_field :short_name, class: 'form-control'
+
+  .form-group.row.fancy-select.unfancy
+    = f.label :embedable_user_email, class: 'control-label', class: 'org-form-label' do
+      Registration email
+    .col-sm-4
+      = f.select :embedable_user_email, @organization.users.pluck(:email), prompt: 'Select email', selected: (@organization.auto_user && @organization.auto_user.email)
+      %span.below-input-help
+        Email address that registrations through #{@organization.name} will be sent from
+
+  .form-group.row
+    %label.org-form-label
+      Organization type
+    .col-sm-4
+      .radio
+        %label
+          = f.radio_button :org_type, 'shop'
+          Bike shop
+      .radio
+        %label
+          = f.radio_button :org_type, 'advocacy'
+          Advocacy group
+      .radio
+        %label
+          = f.radio_button :org_type, 'police'
+          Police department
+      .radio
+        %label
+          = f.radio_button :org_type, 'college'
+          College
+      .radio
+        %label
+          = f.radio_button :org_type, 'manufacturer'
+          Manufacturer
+
+  .form-group.row
+    = f.label :website, class: 'control-label', class: 'org-form-label'
+    .col-sm-4
+      = f.text_field :website, class: 'form-control'
+
+  - if current_organization.is_paid
+    .form-group.row
+      %label.org-form-label
+        Organization logo
+      .col-sm-4
+        / .form-well-input
+        - if @organization.avatar? 
+          = image_tag(@organization.avatar_url(:thumb))
+        - else
+          %p
+            No picture!
+        %label.file 
+          = f.file_field :avatar
+          %span.file-custom
+          = f.hidden_field :avatar_cache
+
+  .form-group.row
+    .col-sm-4.col-sm-push-4
+      = f.submit 'Update', class: 'btn btn-success btn-lg'
+
+
+- unless current_organization.is_paid
+  %hr.delete-organization-section
+  %p.text-md-center
+    %a.collapsed{ href: '#', data: { toggle: 'collapse', target: '#delete-organization' } }
+      I would like to terminate my account with the Bike Index
+  #delete-organization.collapse
+    .text-md-center
+      = link_to 'Delete organization', organization_manage_path(id: current_organization.id, organization_id: current_organization.to_param), method: :delete, confirm: "Are you positive you want to remove #{current_organization.name} from Bike Index?", class: 'btn btn-danger'

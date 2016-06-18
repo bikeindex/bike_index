@@ -1,0 +1,37 @@
+.organized-page-header
+  %h1
+    All 
+    %em
+      = current_organization.name
+    bikes
+  %p
+    %strong
+      #{ pluralize(@bikes_count, 'bike') }
+    registered
+
+.organized-bikes-table
+  %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
+    %thead.small-header
+      %tr
+        %th Date added
+        %th Manufacturer
+        %th Model
+        %th Color
+        %th Sent to
+        / %th View PDF
+    %tbody
+      - @bikes.each do |bike|
+        %tr
+          %td
+            = l bike.created_at, format: :short_with_hour
+          %td
+            = link_to bike.mnfg_name, bike_path(bike)
+          %td
+            = bike.frame_model
+          %td
+            = bike.frame_colors.to_sentence
+          %td
+            = bike.owner_email
+          / %td
+.paginate-container.paginate-container-bottom
+  = paginate @bikes

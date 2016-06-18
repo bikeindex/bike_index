@@ -17,16 +17,20 @@ class Organization < ActiveRecord::Base
     :new_bike_notification,
     :lightspeed_cloud_api_key,
     :use_additional_registration_field,
-    :wants_to_be_shown
+    :lock_show_on_map,
+    :avatar,
+    :avatar_cache
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key
   acts_as_paranoid
+
+  mount_uploader :avatar, AvatarUploader
 
   has_many :memberships, dependent: :destroy
   has_many :organization_deals, dependent: :destroy
   has_many :users, through: :memberships
   has_many :organization_invitations, dependent: :destroy
-  belongs_to :auto_user, class_name: "User"
+  belongs_to :auto_user, class_name: 'User'
 
   has_many :bikes, foreign_key: 'creation_organization_id'
 
@@ -45,6 +49,16 @@ class Organization < ActiveRecord::Base
   scope :advocacy, -> { where(org_type: 'advocacy') }
   scope :college, -> { where(org_type: 'college') }
   scope :manufacturer, -> { where(org_type: 'manufacturer') }
+  scope :paid, -> { where(is_paid: true) }
+
+  def self.friendly_find(n)
+    return nil unless n.present?
+    integer_slug?(n) ? find(n) : find_by_slug(Slugifyer.slugify(n))
+  end
+
+  def self.integer_slug?(n)
+    n.is_a?(Integer) || n.match(/\A\d*\z/).present?
+  end
 
   def to_param
     slug
@@ -55,7 +69,7 @@ class Organization < ActiveRecord::Base
     self.name = strip_tags(name)
     self.name = "Stop messing about" unless name[/\d|\w/].present?
     self.website = Urlifyer.urlify(website) if website.present?
-    self.short_name = name unless short_name.present?
+    self.short_name = (short_name || name).truncate(30)
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, '')
     # If the organization exists, don't invalidate because of it's own slug
     orgs = id.present? ? Organization.where('id != ?', id) : Organization.scoped
@@ -66,23 +80,33 @@ class Organization < ActiveRecord::Base
     self.slug = new_slug
   end
 
+  def ensure_auto_user
+    return true if auto_user.present?
+    self.embedable_user_email = users.first && users.first.email || ENV['AUTO_ORG_MEMBER']
+    save
+  end
+
   before_save :set_auto_user
   def set_auto_user
-    if self.embedable_user_email.present?
+    if embedable_user_email.present?
       u = User.fuzzy_email_find(embedable_user_email)
-      self.auto_user_id = u.id if u.is_member_of?(self)
+      self.auto_user_id = u.id if u && u.is_member_of?(self)
       if auto_user_id.blank? && embedable_user_email == ENV['AUTO_ORG_MEMBER']
         Membership.create(user_id: u.id, organization_id: id, role: 'member')
         self.auto_user_id = u.id
       end
-    elsif self.auto_user_id.blank?
-      return nil unless self.users.any?
-      self.auto_user_id = self.users.first.id
+    elsif auto_user_id.blank?
+      return nil unless users.any?
+      self.auto_user_id = users.first.id
     end
   end
 
   def allowed_show
     show_on_map && approved
+  end
+
+  def display_avatar
+    is_paid && avatar.present?
   end
 
   before_save :set_locations_shown
@@ -93,11 +117,6 @@ class Organization < ActiveRecord::Base
 
   def suspended?
     is_suspended?
-  end
-
-  before_save :truncate_short_name
-  def truncate_short_name
-    self.short_name = self.short_name.truncate(30)
   end
 
   before_save :set_access_token

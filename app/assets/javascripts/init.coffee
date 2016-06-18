@@ -18,7 +18,8 @@ class BikeIndex.Init extends BikeIndex
     window.BikeIndexAlerts = new BikeIndex.Alerts
     # Put this last, so if it fails, we still have some functionality
     @loadPageScript(document.getElementsByTagName('body')[0].id)
-
+    # Initialize the js for the organized menu pages
+    new BikeIndex.Organized if $('.organized-body').length > 0
 
   loadPageScript: (body_id) ->
     # All the per-page javascripts
@@ -37,6 +38,7 @@ class BikeIndex.Init extends BikeIndex
       welcome_user_home: BikeIndex.UserHome
       welcome_choose_registration: BikeIndex.ChooseRegistration
       stolen_index: BikeIndex.LegacyStolenIndex
+      organized_manage_locations: BikeIndex.OrganizedManageLocations
     window.pageScript = new pageClasses[body_id] if Object.keys(pageClasses).includes(body_id)
 
   initializeNoTabLinks: ->

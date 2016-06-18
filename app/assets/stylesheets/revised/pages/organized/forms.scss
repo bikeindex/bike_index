@@ -1,0 +1,37 @@
+.organized-form {
+  .checkbox input { margin-top: .6em; }
+  .org-form-label {
+    @extend .col-sm-4;
+    text-align: right;
+  }
+
+  .locations-fieldset-wrapper {
+    @extend .row;
+    fieldset { display: flex; }
+    .address-group {
+      label { margin-bottom: 0; }
+      .selectize-control, input { margin-top: .5em; }
+    }
+    .countrystatezip {
+      @include media-breakpoint-up(sm) {
+        .col-sm-4:first-of-type { padding-right: 0; }
+        .col-sm-4:last-of-type { padding-left: 0; }
+      }
+    }
+  }
+  .remove-control {
+    input { display: none; }
+    label { 
+      display: block;
+      text-align: right;
+      float: right;
+      width: auto;
+      color: $link-color;
+      cursor: pointer;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+}

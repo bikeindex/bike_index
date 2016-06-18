@@ -12,8 +12,10 @@ module HeaderTagHelper
 protected
 
   def set_header_tag_hash
-    special_meta_tags = ['bikes', 'welcome', 'news', 'users', 'manufacturers', 'organizations']
-    if special_meta_tags.include? controller_name
+    special_meta_tags = %w(bikes welcome news users manufacturers organizations)
+    if sub_module_name == 'organized_'
+      self.send(:organizations_header_tags)
+    elsif special_meta_tags.include? controller_name
       self.send("#{controller_name}_header_tags")
     else
       current_page_auto_hash
@@ -54,28 +56,28 @@ protected
   end
 
   def default_hash
-    base_description = t "meta_descriptions.welcome_index"
+    base_description = t 'meta_descriptions.welcome_index'
     tags = {
-      title_tag: { title: "Bike Index" },
+      title_tag: { title: 'Bike Index' },
       meta_tags: {
-        charset:           "utf-8",
-        :"X-UA-Compatible" => "IE=edge,chrome=1", 
-        viewport:          "width=device-width, initial-scale=1, maximum-scale=1",
+        charset:           'utf-8',
+        :'X-UA-Compatible' => 'IE=edge,chrome=1', 
+        viewport:          'width=device-width, initial-scale=1, maximum-scale=1',
         description:       base_description,
-        :"og:url"          => "#{request.url}",
-        :"og:image"        => "#{root_url}assets/logos/bw_transparent.png",
-        :"og:site_name"    => "Bike Index",
-        :"twitter:card"    => "summary",
-        :"twitter:creator" => "@bikeindex",
-        :"twitter:site"    => "@bikeindex"
+        :'og:url'          => "#{request.url}",
+        :'og:image'        => "#{root_url}assets/logos/bw_transparent.png",
+        :'og:site_name'    => 'Bike Index',
+        :'twitter:card'    => 'summary',
+        :'twitter:creator' => '@bikeindex',
+        :'twitter:site'    => '@bikeindex'
       }
     }
   end
 
   def current_page_auto_hash
     hash = default_hash
-    title = t "meta_title.#{controller_name}_#{action_name}", default: "Blank"
-    title = auto_title if title == "Blank"
+    title = t "meta_title.#{controller_name}_#{action_name}", default: 'Blank'
+    title = auto_title if title == 'Blank'
     hash[:title_tag][:title] = title
     hash[:meta_tags][:description] = t "meta_descriptions.#{controller_name}_#{action_name}", default: "#{title} on the Bike Index"
     hash
@@ -99,12 +101,12 @@ protected
   def welcome_header_tags
     hash = current_page_auto_hash
     if action_name == 'user_home' 
-      hash[:title_tag][:title] = "Your bikes"
+      hash[:title_tag][:title] = 'Your bikes'
       hash[:title_tag][:title] = strip_tags(current_user.name) if current_user.name.present?
     end
     if action_name == 'choose_registration'
-      hash[:title_tag][:title] = t "meta_title.bikes_new"
-      hash[:meta_tags][:description] = t "meta_title.bikes_new"
+      hash[:title_tag][:title] = t 'meta_title.bikes_new'
+      hash[:meta_tags][:description] = t 'meta_title.bikes_new'
     end
     hash
   end
@@ -112,8 +114,8 @@ protected
   def bikes_header_tags
     hash = current_page_auto_hash
     if (action_name == 'new' || action_name == 'create') && current_user.present? && @bike.stolen
-      hash[:title_tag][:title] = t "meta_title.bikes_new_stolen"
-      hash[:meta_tags][:description] = t "meta_descriptions.bikes_new_stolen"
+      hash[:title_tag][:title] = t 'meta_title.bikes_new_stolen'
+      hash[:meta_tags][:description] = t 'meta_descriptions.bikes_new_stolen'
     end
     if action_name == 'edit' || action_name == 'update'
       if @edit_templates.present?
@@ -143,14 +145,9 @@ protected
   end
 
   def organizations_header_tags
-    hash = current_page_auto_hash
-    if action_name == 'show'
-      hash[:title_tag][:title] = @organization.name
-    elsif action_name == 'edit'
-      hash[:title_tag][:title] = "Manage #{@organization.name}"
-    elsif action_name == "embed_extended"
-      hash[:title_tag][:title] = "Add a bike through #{@organization.name}"
-    end
+    hash = default_hash
+    title = auto_title
+    hash[:title_tag][:title] = title
     hash
   end
 

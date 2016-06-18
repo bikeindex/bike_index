@@ -1,5 +1,6 @@
 $body-font-family: 'Open Sans', sans-serif;
 $header-font-family: 'Montserrat', sans-serif;;
+$normal-font-weight: 400;
 $strong-font-weight: 700;
 $light-italic-weight: 300;
 
@@ -14,7 +15,7 @@ $btn-font-size:15px;
 // body font style
 .body-font {
   font-family: $body-font-family;
-  font-weight: 400;
+  font-weight: $normal-font-weight;
   font-style: normal;
   font-size: $body-font-size;
   line-height: 2em;
@@ -63,7 +64,7 @@ h5 {
 
 .header-font {
   font-family: $header-font-family;
-  font-weight: 400;
+  font-weight: $normal-font-weight;
   font-style: normal;
   text-transform: uppercase;
   strong { font-weight: $strong-font-weight; }

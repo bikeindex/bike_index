@@ -1,0 +1,10 @@
+.below-input-help {
+  @extend small;
+  display: block;
+  line-height: 1.5em;
+  padding-bottom: .5em;
+  color: $gray-light;
+}
+
+// Make selectize inputs the same size as form inputs
+.form-group .selectize-control .selectize-input { padding: 0.475rem 0.75rem; }

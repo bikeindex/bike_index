@@ -115,7 +115,7 @@ $grid-breakpoint-md: 768px;
 $grid-breakpoint-lg: 992px;
 $grid-breakpoint-xl: 1200px;
 $grid-sizes: 'xs', 'sm', 'md', 'lg', 'xl';
-$grid-breakpoints: $grid-breakpoint-xs, $grid-breakpoint-sm, $grid-breakpoint-md, $grid-breakpoint-lg, $grid-breakpoint-xl;
+$grid-breakpoints-var: $grid-breakpoint-xs, $grid-breakpoint-sm, $grid-breakpoint-md, $grid-breakpoint-lg, $grid-breakpoint-xl;
 $row-side-padding: 0.9375rem;
 
 // Settings
@@ -125,6 +125,7 @@ $row-side-padding: 0.9375rem;
 @import "revised/mixins/buttons";
 @import "revised/sections/modals";
 @import "revised/sections/alerts";
+@import "revised/sections/forms";
 
 // Bike Index mixins
 @import "revised/mixins/trash_can_icon";
@@ -148,6 +149,10 @@ $row-side-padding: 0.9375rem;
 @import "revised/sections/bike_search_form";
 @import "revised/sections/bike_boxes";
 @import "revised/sections/side_boxes";
+// Shared organized styles
+@import "revised/pages/organized/forms";
+@import "revised/pages/organized/header";
+@import "revised/sections/organized_menu"; // left hand organized menu
 
 // 
 // Page styles
@@ -190,15 +195,14 @@ $row-side-padding: 0.9375rem;
 @import "revised/pages/home/supporters";
 @import "revised/pages/home/testimonials";
 
-
 // LEGACY PAGES general styles - replace as soon as all pages have been restyled
 @import "revised/sections/legacy_content"; // general legacy content styles
 @import "revised/pages/legacy_stolen"; // legacy stolen page - including multi-serial search
 
 html { background: $black-off; }
-body { min-height: 400px; }
 .currently-hidden { display: none; }
 img { max-width: 100%; } // don't break random stuff images!
+body { min-height: 400px; }
 
 // 
 // External overrides

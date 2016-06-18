@@ -1242,8 +1242,10 @@ CREATE TABLE organizations (
     new_bike_notification text,
     api_access_approved boolean DEFAULT false NOT NULL,
     approved boolean DEFAULT false NOT NULL,
-    wants_to_be_shown boolean DEFAULT false NOT NULL,
-    use_additional_registration_field boolean DEFAULT false NOT NULL
+    use_additional_registration_field boolean DEFAULT false NOT NULL,
+    avatar character varying(255),
+    is_paid boolean DEFAULT false NOT NULL,
+    lock_show_on_map boolean DEFAULT false NOT NULL
 );
 
 
@@ -3070,3 +3072,7 @@ INSERT INTO schema_migrations (version) VALUES ('20160425185052');
 INSERT INTO schema_migrations (version) VALUES ('20160509110049');
 
 INSERT INTO schema_migrations (version) VALUES ('20160509120017');
+
+INSERT INTO schema_migrations (version) VALUES ('20160529093040');
+
+INSERT INTO schema_migrations (version) VALUES ('20160614112308');

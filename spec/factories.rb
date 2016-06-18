@@ -36,9 +36,26 @@ FactoryGirl.define do
       factory :admin do
         superuser true
       end
-    end
-    factory :developer do
-      developer true
+      factory :developer do
+        developer true
+      end
+      factory :organized_user do
+        # This factory should not be used directly, it's here to wrap organization
+        # Use `organization_member` or `organization_admin`
+        ignore do
+          organization { FactoryGirl.create(:organization) }
+        end
+        factory :organization_member do
+          after(:create) do |user, evaluator|
+            FactoryGirl.create(:membership, user: user, organization: evaluator.organization)
+          end
+        end
+        factory :organization_admin do
+          after(:create) do |user, evaluator|
+            FactoryGirl.create(:membership, user: user, organization: evaluator.organization, role: 'admin')
+          end
+        end
+      end
     end
   end
 
@@ -204,6 +221,10 @@ FactoryGirl.define do
 
   factory :membership do
     role 'member'
+    factory :existing_membership do
+      association :user
+      association :organization
+    end
   end
 
   factory :integration do
