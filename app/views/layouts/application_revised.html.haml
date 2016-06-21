@@ -62,8 +62,8 @@
                       = active_link 'Settings', organization_manage_index_path(organization_id: organization.to_param), class_name: 'nav-link'
                     %li
                       = active_link 'Location settings', locations_organization_manage_index_path(organization_id: organization.to_param), class_name: 'nav-link'
-                  %li
-                    = active_link 'Dev resources', dev_organization_manage_index_path(organization_id: organization.to_param), class_name: 'nav-link'
+                    %li
+                      = active_link 'Dev resources', dev_organization_manage_index_path(organization_id: organization.to_param), class_name: 'nav-link'
             - if current_user.admin_authorized('any')
               %li.primary-nav-item
                 = active_link 'Admin', user_root_url, class_name: 'nav-link'
