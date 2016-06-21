@@ -29,11 +29,11 @@
               = active_link 'Organization', organization_manage_index_path(organization_id: current_organization.to_param), class_name: 'nav-link'
             %li
               = active_link 'Locations', locations_organization_manage_index_path(organization_id: current_organization.to_param), class_name: 'nav-link'
-            / - if current_organization.is_paid
-            /   %li
-            /     = active_link 'Emails', organization_emails_path(organization_id: current_organization.to_param), class_name: 'nav-link', match_controller: true
-          %li
-            = active_link 'Dev resources', dev_organization_manage_index_path(organization_id: current_organization.to_param), class_name: 'nav-link'
+              / - if current_organization.is_paid
+              /   %li
+              /     = active_link 'Emails', organization_emails_path(organization_id: current_organization.to_param), class_name: 'nav-link', match_controller: true
+              %li
+                = active_link 'Dev resources', dev_organization_manage_index_path(organization_id: current_organization.to_param), class_name: 'nav-link'
 
 .organized-wrap
   .container
