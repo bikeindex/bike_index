@@ -1,6 +1,42 @@
 require 'spec_helper'
 
 describe Organized::ManageController, type: :controller do
+  context 'logged_in_as_organization_member' do
+    include_context :logged_in_as_organization_member
+    describe 'index' do
+      it 'redirects' do
+        get :index, organization_id: organization.to_param
+        expect(response.location).to match(organization_bikes_path(organization_id: organization.to_param))
+        expect(flash[:error]).to be_present
+      end
+    end
+
+    describe 'dev' do
+      it 'redirects' do
+        get :dev, organization_id: organization.to_param
+        expect(response.location).to match(organization_bikes_path(organization_id: organization.to_param))
+        expect(flash[:error]).to be_present
+      end
+    end
+
+    describe 'locations' do
+      it 'redirects' do
+        get :locations, organization_id: organization.to_param
+        expect(response.location).to match(organization_bikes_path(organization_id: organization.to_param))
+        expect(flash[:error]).to be_present
+      end
+    end
+
+    describe 'standard organization' do
+      it 'does not destroy' do
+        expect do
+          delete :destroy, id: organization.id, organization_id: organization.to_param
+        end.to change(Organization, :count).by(0)
+        expect(response.location).to match(organization_bikes_path(organization_id: organization.to_param))
+        expect(flash[:error]).to be_present
+      end
+    end
+  end
   context 'logged_in_as_organization_admin' do
     include_context :logged_in_as_organization_admin
     describe 'index' do

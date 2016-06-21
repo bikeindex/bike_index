@@ -1,6 +1,50 @@
 require 'spec_helper'
 
 describe Organized::UsersController, type: :controller do
+  context 'logged_in_as_organization_member' do
+    include_context :logged_in_as_organization_member
+    describe 'index' do
+      it 'redirects' do
+        get :index, organization_id: organization.to_param
+        expect(response.location).to match(organization_bikes_path(organization_id: organization.to_param))
+        expect(flash[:error]).to be_present
+      end
+    end
+
+    describe 'new' do
+      it 'redirects' do
+        get :new, organization_id: organization.to_param
+        expect(response.location).to match(organization_bikes_path(organization_id: organization.to_param))
+        expect(flash[:error]).to be_present
+      end
+    end
+
+    describe 'update' do
+      context 'organization_invitation' do
+        let(:organization_invitation) { FactoryGirl.create(:organization_invitation, organization: organization, inviter: user) }
+        let(:organization_invitation_params) do
+          {
+            membership_role: 'admin',
+            name: 'something',
+            inviter_id: 333,
+            invitee_email: 'new_bike_email@bike_shop.com'
+          }
+        end
+        it 'does not update' do
+          organization_invitation.invitee_email
+          expect do
+            put :update, organization_id: organization.to_param,
+                         id: organization_invitation.id,
+                         is_invitation: true, organization_invitation: organization_invitation_params
+          end.to change(OrganizationInvitation, :count).by(0)
+          expect(response.location).to match(organization_bikes_path(organization_id: organization.to_param))
+          expect(flash[:error]).to be_present
+          organization_invitation.reload
+          expect(organization_invitation.membership_role).to eq 'member'
+        end
+      end
+    end
+  end
   context 'logged_in_as_organization_admin' do
     include_context :logged_in_as_organization_admin
     describe 'index' do
@@ -67,6 +111,7 @@ describe Organized::UsersController, type: :controller do
           expect(flash[:success]).to be_present
           organization_invitation.reload
           expect(organization_invitation.membership_role).to eq 'admin'
+          expect(organization_invitation.invitee_name).to eq 'something'
           expect(organization_invitation.inviter).to eq user
           expect(organization_invitation.invitee_email).to eq og_email
         end

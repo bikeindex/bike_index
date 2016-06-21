@@ -17,7 +17,7 @@ module Organized
     def ensure_admin!
       return true if current_user && current_user.is_admin_of?(current_organization)
       flash[:error] = 'You have to be an organization administrator to do that!'
-      redirect_to user_home_url and return
+      redirect_to organization_bikes_path(organization_id: current_organization.to_param) and return
     end
 
     private
