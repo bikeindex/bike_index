@@ -158,7 +158,7 @@ class BikeSearcher
     if @params[:proximity_radius].present? && @params[:proximity_radius].to_i > 1
       radius = @params[:proximity_radius].to_i
     end
-    radius ||= 500
+    radius ||= 100
     @location = Geocoder.search(@params[:proximity]) if @params[:reverse_geocode]
     box = Geocoder::Calculations.bounding_box((@location || @params[:proximity]), radius)
     unless box[0].nan?
