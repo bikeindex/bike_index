@@ -14,6 +14,7 @@ class BikeIndex.BikeSearchBar extends BikeIndex
     
   setSearchProximity: ->
     proximity = $('#proximity').val()
+    proximity = if proximity? then proximity.replace(/^\s*|\s*$/g, '') else ''
     # If there is a search_location, it means this was an IP search and we need to set proximity
     if Array.isArray(window.search_location_geocoding) && window.search_location_geocoding[0]?
       location_data = window.search_location_geocoding[0].data
@@ -23,12 +24,15 @@ class BikeIndex.BikeSearchBar extends BikeIndex
         proximity = "#{location_data[2]}, #{location_data[1]}"
         # Set the text box
         $('#proximity').val(proximity)
-    # Set it from localstorage if we don't have it - so we don't override if it's already set
-    unless proximity? and proximity.length > 0
+    # Store proximity in localStorage if it's there, otherwise -
+    # Set from localStorage - so we don't override if it's already set
+    # updateSearchBikesHeaderLink is called first, this is guaranteed to be something
+    if proximity? and proximity.length > 0
+      localStorage.setItem('location', proximity)
+    else
       proximity = localStorage.getItem('location')
       # Then set the proximity from whatever we got
       $('#proximity').val(proximity)
-    localStorage.setItem('location', proximity)
     # set up search view if we're on bike search
     @setSearchTabInfo(proximity)
     # Set the header link
