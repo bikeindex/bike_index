@@ -44,17 +44,33 @@ describe BikesController do
           end
         end
         context 'proximity' do
-          it 'renders, assigns location via geocoder' do
-            # Without a matching current stolen record, it doesn't go whole way through proximity
-            FactoryGirl.create(:stolen_bike)
-            get :index, proximity: 'ip', stolen: true
-            expect(response.status).to eq(200)
-            expect(flash).to_not be_present
-            expect(assigns(:per_page)).to eq 10
-            target_location = [ { data: default_location, cache_hit: nil } ].as_json # in spec_helper
-            expect(assigns(:location).as_json).to eq target_location
-            expect(assigns(:stolenness)).to eq 'stolen_proximity'
-            expect(response).to render_with_layout('application_revised')
+          context 'proximity of "ip"' do
+            it 'renders, assigns location via geocoder' do
+              # Without a matching current stolen record, it doesn't go whole way through proximity
+              FactoryGirl.create(:stolen_bike)
+              get :index, proximity: 'ip', stolen: true
+              expect(response.status).to eq(200)
+              expect(flash).to_not be_present
+              expect(assigns(:per_page)).to eq 10
+              target_location = [ { data: default_location, cache_hit: nil } ].as_json # in spec_helper
+              expect(assigns(:location).as_json).to eq target_location
+              expect(assigns(:stolenness)).to eq 'stolen_proximity'
+              expect(response).to render_with_layout('application_revised')
+            end
+          end
+          context 'proximity of "you"' do
+            it 'renders, assigns location via geocoder' do
+              # Without a matching current stolen record, it doesn't go whole way through proximity
+              FactoryGirl.create(:stolen_bike)
+              get :index, proximity: 'you', stolen: true
+              expect(response.status).to eq(200)
+              expect(flash).to_not be_present
+              expect(assigns(:per_page)).to eq 10
+              target_location = [ { data: default_location, cache_hit: nil } ].as_json # in spec_helper
+              expect(assigns(:location).as_json).to eq target_location
+              expect(assigns(:stolenness)).to eq 'stolen_proximity'
+              expect(response).to render_with_layout('application_revised')
+            end
           end
         end
         context 'serial_param' do

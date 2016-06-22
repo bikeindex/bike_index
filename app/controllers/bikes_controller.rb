@@ -23,11 +23,7 @@ class BikesController < ApplicationController
 
   def index
     params[:stolen] = true unless params[:stolen].present? || params[:non_stolen].present?
-    if params[:proximity].present? && params[:proximity].strip.downcase == 'ip'
-      reverse_geocode = true
-      params[:proximity] = request.env['HTTP_X_FORWARDED_FOR'].split(',')[0] if request.env['HTTP_X_FORWARDED_FOR']
-    end
-    search = BikeSearcher.new(params, reverse_geocode)
+    search = BikeSearcher.new(params, is_ip_proximity_search)
     bikes = search.find_bikes
     @location = search.location
     page = params[:page] || 1
@@ -205,6 +201,15 @@ class BikesController < ApplicationController
   end
 
   protected
+
+  def is_ip_proximity_search
+    return false unless params[:proximity].present?
+    proximity = params[:proximity].strip.downcase
+    return false unless proximity == 'ip' || proximity == 'you'
+    # Set the ip from forwarded for, to take care of reverse proxy and cloudflare ips
+    params[:proximity] = request.env['HTTP_X_FORWARDED_FOR'].split(',')[0] if request.env['HTTP_X_FORWARDED_FOR']
+    true
+  end
 
   def find_bike
     begin
