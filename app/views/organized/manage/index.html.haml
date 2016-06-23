@@ -54,19 +54,19 @@
       = f.text_field :website, class: 'form-control'
 
   - if current_organization.is_paid
-    .form-group.row
+    .form-group.row.avatar-upload-wrapper
       %label.org-form-label
         Organization logo
       .col-sm-4
-        / .form-well-input
         - if @organization.avatar? 
           = image_tag(@organization.avatar_url(:thumb))
-        - else
-          %p
-            No picture!
-        %label.file 
-          = f.file_field :avatar
+        / - else
+        /   %p
+        /     No picture!
+        %label.file
+          = f.file_field :avatar, class: 'avatar-upload-field'
           %span.file-custom
+            %span.file-upload-text Choose file...
           = f.hidden_field :avatar_cache
 
   .form-group.row

@@ -15,6 +15,13 @@ class BikeIndex.UsersEdit extends BikeIndex
 
     @initializeAdditionalEmails()
 
+
+    $('.avatar-upload-field').change (event) ->
+      name = event.target.files[0].name
+      $(event.target).parent().find('.file-upload-text').text(name)
+      # tmppath = URL.createObjectURL(event.target.files[0])
+      # $('.replaced-img').fadeIn('fast').attr 'src', URL.createObjectURL(event.target.files[0])
+
   initializeAdditionalEmails: ->
     add_email_template = $('#additional-email-template').html()
     Mustache.parse(add_email_template)

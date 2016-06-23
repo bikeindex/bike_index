@@ -6,5 +6,25 @@
   color: $gray-light;
 }
 
+.avatar-upload-wrapper {
+  img { padding-bottom: $vertical-height; }
+  label.file { display: block; }
+  .file-custom {
+    .file-upload-text { color: $gray-light; }
+    &::after { content: ''; }
+    &::before {
+      content: "Upload Photo";
+      font-size: $btn-font-size;
+      font-family: $header-font-family;
+      font-weight: 400;
+      font-style: normal;
+      text-transform: uppercase;
+      color: white;
+      background: $green;
+      border-color: $green;
+    }
+  }
+}
+
 // Make selectize inputs the same size as form inputs
 .form-group .selectize-control .selectize-input { padding: 0.475rem 0.75rem; }

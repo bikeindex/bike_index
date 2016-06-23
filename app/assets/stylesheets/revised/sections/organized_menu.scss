@@ -14,6 +14,7 @@ $organized-menu-bg: $gray-lighter;
       header {
         margin-top: -2*$vertical-height;
         padding: $vertical-height;
+        h3 { font-size: 18px; }
         img {
           width: 70%;
           max-width: 150px;
@@ -24,21 +25,29 @@ $organized-menu-bg: $gray-lighter;
       }
       ul { @include list-unstyled; }
       .organized-mainmenu {
-        // margin-top: -40px;
         a, .menu-item {
           width: 100%;
           display: block;
-          padding: $vertical-height;
+          padding: 0.5*$vertical-height $vertical-height;
           color: $header-font-color;
           text-decoration: none;
-          // &.first-item { border-top: none; }
+          border-bottom: 1px solid #e4e4e4;
         }
         a:hover {
           text-decoration: none;
           font-weight: $strong-font-weight;
         }
-        li { border-top: 1px solid $gray-lightish; }
-        // &>li:first-of-type { border-top: none; }
+      }
+      .top-level { border-top: 1px solid #e4e4e4; }
+      // the last item of submenus does not have a border on the bottom, because
+      // the top level item has a full width border
+      .organized-submenu li:last-of-type a { border-bottom: none; }
+      // The last item of the last submenu or the last item of the last menu
+      // Has a bottom border
+      .organized-mainmenu>li:last-of-type {
+        &>a, .organized-submenu li:last-of-type a {
+          border-bottom: 1px solid #e4e4e4; 
+        }
       }
       .top-level.active {
         background: $blue;

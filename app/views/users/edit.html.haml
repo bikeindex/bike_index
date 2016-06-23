@@ -126,18 +126,18 @@
                   = f.radio_button :show_bikes, 'false'
                   No, please don't create me a page
             .related-fields#personal-page.collapse
-              .form-group.row
+              .form-group.row.avatar-upload-wrapper
                 %label.form-well-label
                   Profile avatar
                 .form-well-input
                   - if @user.avatar? 
                     = image_tag(@user.avatar_url(:thumb))
-                  - else
-                    %p
-                      No picture!
-                  %label.file 
-                    = f.file_field :avatar
+                  %img.replaced-img
+                  %label.file
+                    = f.file_field :avatar, class: 'avatar-upload-field'
                     %span.file-custom
+                      %span.file-upload-text
+                        Choose file...
                     = f.hidden_field :avatar_cache
 
               .form-group.row

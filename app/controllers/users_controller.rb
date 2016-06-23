@@ -138,7 +138,8 @@ class UsersController < ApplicationController
         @user.reload
         default_session_set
       end
-      redirect_to my_account_url, notice: 'Your information was successfully updated.' and return
+      flash[:success] = 'Your information was successfully updated.'
+      redirect_to my_account_url and return
     end
     @page_errors = @user.errors.full_messages
     render action: :edit

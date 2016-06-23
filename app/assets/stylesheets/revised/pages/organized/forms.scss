@@ -4,7 +4,10 @@
     @extend .col-sm-4;
     text-align: right;
   }
-
+  .locations-where-and-add {
+    padding-bottom: $vertical-height;
+    .btn { margin-top: -6px; }
+  }
   .locations-fieldset-wrapper {
     @extend .row;
     fieldset { display: flex; }

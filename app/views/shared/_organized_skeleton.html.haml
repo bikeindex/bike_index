@@ -3,7 +3,7 @@
     %header
       - if current_organization.display_avatar
         = image_tag current_organization.avatar.url(:medium)
-      %h5
+      %h3
         = current_organization.name
         %br
         Admin panel
