@@ -18,13 +18,10 @@ class OrganizationDealsController < ApplicationController
     @organizationDeal = OrganizationDeal.new
     # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@organizationDeal)
-    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_message(@organizationDeal.kind_of?(OrganizationDeal))
     @organization = Organization.find(params[:organization_id])
-    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@organization)
     @name = params[:deal_name]
-    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@name)
     return @name
   end
@@ -39,7 +36,6 @@ class OrganizationDealsController < ApplicationController
     @organizationDeal = OrganizationDeal.new(params[:organizationDeal])
     # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@organizationDeal)
-    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_message(@organizationDeal.kind_of?(OrganizationDeal))
     if @organizationDeal.save
       flash[:notice] = "Thank you! We will contact Kozy's and register your bike on the Index!"

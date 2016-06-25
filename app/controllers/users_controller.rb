@@ -25,7 +25,6 @@ class UsersController < ApplicationController
     @user = User.new
     # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@user)
-    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_message(@user.kind_of?(User))
     # Condition that verify if user is logged
     if current_user.present?
@@ -51,7 +50,6 @@ class UsersController < ApplicationController
     @user = User.new(params[:user])
     # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@user)
-    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_message(@user.kind_of?(User))
     if @user.save
       CreateUserJobs.new(user: @user).do_jobs
@@ -111,7 +109,6 @@ class UsersController < ApplicationController
     @user = current_user
     # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@user)
-    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_message(@user.kind_of?(User))
     return @user
   end
@@ -128,7 +125,6 @@ class UsersController < ApplicationController
       @user = User.find_by_password_reset_token(params[:token])
       # method assert used to debug, checking if the condition is always true for the program to continue running.
       assert_object_is_not_null(@user)
-      # method assert used to debug, checking if the condition is always true for the program to continue running.
       assert_message(@user.kind_of?(User))
       # Conditional that verify if user is logged
       if @user.present?
@@ -190,7 +186,6 @@ class UsersController < ApplicationController
     @user = current_user
     # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@user)
-    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_message(@user.kind_of?(current_user))
     return @user
   end
@@ -205,7 +200,6 @@ class UsersController < ApplicationController
     @user = current_user
     # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@user)
-    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_message(@user.kind_of?(current_user))
     # Conditional that verify if user there have password
     if params[:user][:password_reset_token].present?
@@ -292,7 +286,6 @@ class UsersController < ApplicationController
       @user = current_user
       # method assert used to debug, checking if the condition is always true for the program to continue running.
       assert_object_is_not_null(@user)
-      # method assert used to debug, checking if the condition is always true for the program to continue running.
       assert_message(@user.kind_of?(current_user))
       return @user
     else
@@ -312,7 +305,6 @@ class UsersController < ApplicationController
       @user = current_user
       # method assert used to debug, checking if the condition is always true for the program to continue running.
       assert_object_is_not_null(@user)
-      # method assert used to debug, checking if the condition is always true for the program to continue running.
       assert_message(@user.kind_of?(current_user))
       return @user
     else

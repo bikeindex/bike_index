@@ -39,7 +39,6 @@ class PaymentsController < ApplicationController
     # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@amount)
     @subscription = params[:stripe_subscription]
-    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@subscription)
     # Policies for user registration and thus verify possible forms of payment. 
     if params[:stripe_subscription].present?

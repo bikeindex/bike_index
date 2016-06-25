@@ -62,7 +62,6 @@ class OrganizationsController < ApplicationController
       membership = Membership.create(user_id: user.id, role: 'admin', organization_id: @organization.id)
       # method assert used to debug, checking if the condition is always true for the program to continue running.
       assert_object_is_not_null(@organization)
-      # method assert used to debug, checking if the condition is always true for the program to continue running.
       assert_message(@organization.kind_of?(Organization))
       @organization.update_attribute :auto_user_id, user.id
       # an administrator notification is issued that the organization has been successfully created, in order of creation.
@@ -89,7 +88,6 @@ class OrganizationsController < ApplicationController
     # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@bikes)
     @organization = @organization.decorate
-    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@organization)
     return @organization
   end
@@ -108,7 +106,6 @@ class OrganizationsController < ApplicationController
     bikes = bikes.page(page).per(perPage)
     @bikes = bikes.decorate
     @organization = @organization.decorate
-    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@bikes)
     # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@organization)
@@ -260,7 +257,6 @@ class OrganizationsController < ApplicationController
     @organization = Organization.new
     # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@organization)
-    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_message(@organization.kind_of?(Organization))
     @activeSection = "contact"
   end

@@ -22,7 +22,6 @@ class StolenController < ApplicationController
     @feedback = Feedback.new
     # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@feedback)
-    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_message(@feedback.kind_of?(Feedback))
     return @feedback
   end

@@ -49,7 +49,6 @@ class PublicImagesController < ApplicationController
       @imageable = @bike
       if params[:blog_id].present?
         @blog = Blog.find(params[:blog_id])
-        # method assert used to debug, checking if the condition is always true for the program to continue running.
         assert_object_is_not_null(@blog)
         publicImage.imageable = @blog
         publicImage.save
@@ -110,7 +109,6 @@ class PublicImagesController < ApplicationController
 =end
   def destroy
     @imageable = publicImage.imageable
-    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@imageable)
     # method used to search a specific image and deleted
     imageable_id = publicImage.imageable_id

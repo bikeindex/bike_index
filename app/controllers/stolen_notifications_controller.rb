@@ -21,7 +21,6 @@ class StolenNotificationsController < ApplicationController
     @stolenNotification = StolenNotification.new
     # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@stolenNotification)
-    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_message(@stolenNotification.kind_of?(StolenNotification))
     return @stolenNotification
   end
@@ -36,7 +35,6 @@ class StolenNotificationsController < ApplicationController
     @stolenNotification = StolenNotification.new(params[:stolenNotification])
     # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_message(@stolenNotification.kind_of?(StolenNotification))
-    # method assert used to debug, checking if the condition is always true for the program to continue running.
     assert_object_is_not_null(@stolenNotification)
     @stolenNotification.sender = current_user
     @bike = @stolenNotification.bike
