@@ -1,11 +1,18 @@
 - cache 'root_head_wrap' do # Expired in recovery_displays_controller
   - @recovery_displays = RecoveryDisplay.limit(10)
   .container.home-header#home_headies
+    %a 
+      Language:
+      %br
+      = link_to_unless_current "English", locale: "en" 
+      %br
+      = link_to_unless_current "Portuguese", locale: "pt-br"
+
     %h1
       %a.home_header_link{href: choose_registration_path }
-      Bike Registration
+      = t "title.indexTitle"
       %span
-        that Works
+        = t "title.subIndexTitle"
     .testimonial-container
       %h2.visuallyhidden
         Testimonials:
@@ -34,7 +41,7 @@
                 
     .wheeled
       %span.register-container
-        = link_to "Register a bike", choose_registration_path, class: "btn binxbtn binxbtn-lg"
+        = link_to t("button.register"), choose_registration_path, class: "btn binxbtn binxbtn-lg"
       %span.wheel-holder
         = image_tag "/assets/updated/home/wheel_white.png", alt: "(spinning wheel graphic)", id: 'wheeled_wheel', role: 'presentation', :"aria-hidden" => "true"
 - cache('root_bike_count', expires_in: 5.minutes) do

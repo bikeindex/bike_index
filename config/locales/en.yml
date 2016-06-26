@@ -1,4 +1,7 @@
 en:
+  title:
+    indexTitle: Bike registration
+    subIndexTitle: That Works
   meta_title:
     welcome_index: "Bike Index - Bike registration that works"
     welcome_goodbye: "Logged out"

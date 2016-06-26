@@ -1,5 +1,10 @@
----
-pt-BR:
+pt-br:
+  title:
+    indexTitle: Registro de Bicicleta
+    subIndexTitle: Que funciona!
+  button:
+    register: Registre sua Bicicleta
+
   activerecord:
     errors:
       messages:

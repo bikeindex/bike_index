@@ -13,6 +13,7 @@ class ApplicationController < ActionController::Base
   include AssertHelper
   protect_from_forgery
   ensure_security_headers
+  before_filter :set_locale
   
 =begin
   Need to call some authentication helper, 
@@ -146,6 +147,15 @@ class ApplicationController < ActionController::Base
       #server_exception = stop the program
     end
   end
+
+  private
+    def set_locale
+      I18n.locale = params[:locale] if params[:locale].present?
+    end
+
+    def default_url_options(options = {})
+      {locale: I18n.locale}
+    end
   
 end
 
