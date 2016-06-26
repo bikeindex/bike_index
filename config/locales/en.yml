@@ -1,5 +1,39 @@
 en:
 
+  info: 
+    serials:
+      title: Serial numbers
+      intro: All bikes
+      intro2: all have unique serial numbers.
+
+      words:
+        word1: maybe
+
+      texts:
+        text1: "Most bicycles have their serial number engraved beneath their bottom bracket, 
+                but sometimes serial numbers are found in other places. Here are some examples of where 
+                and what to look for:"
+        text2: The bottom bracket (where serial numbers are typically located) is circled.
+        text3: A serial number on the underside of a bottom bracket.
+        text4: "Another serial number beneath the bottom bracket, aligned parallel to the frame."
+        text5: Some Schwinn bicycles have the unique identifying number on their head tube (which 
+               is on the front of the bike).
+        text6: A serial number located on a rear drop out. Some BMX bikes and a few Schwinn 
+               bicycles place the serial on the rear dropout.  On older Schwinns there are 
+               numbers stamped on both the drive side and non-drive side rear dropouts; the 
+               one on the non-drive side dropout is the serial number.
+        text7: Some bikes have multiple serial numbers.
+        text8: When adding a bike to the Index, it's best to enter all the groups of numbers and 
+               letters separated by spaces.
+        text9: Hopefully you can find the serial number on the bicycle you're looking at,
+        text10: if you're having trouble.
+        text11: Okay, fine, so 
+        text12: there are a few bikes without serial numbers, but this is rare and typical only 
+                on hand made bikes or really old bicycles.
+        text13: In this picture
+        text14: is a manufacturer number and not a serial number. However, to make bikes as easy as 
+                possible to find, we'd love it if you entered all numbers you encounter.
+
   layouts:
     navbar:
       search: Search Bike Index

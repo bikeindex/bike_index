@@ -1,70 +1,70 @@
 %h1
-  Serial numbers
+  = t "info.serials.title"
 %p#fnref-all-bikes-serials
-  All bikes 
+  = t "info.serials.intro"
   %sup
     %a.footnote-ref{ href: "#fn-all-bikes-serials" }
       1
-  all have unique serial numbers.
+  = t "info.serials.intro2"
 
 %p
-  Most bicycles have their serial number engraved beneath their bottom bracket, but sometimes serial numbers are found in other places. Here are some examples of where and what to look for:
+  = t "info.serials.texts.text1"
 
 
 %ul.serial-pictures
   %li
     = link_to image_tag("/assets/serials/serial_bb.jpg", alt: "Bike with bottom bracket circled"), "/assets/serials/serial_bb.jpg", class: "serial-image"
     %p
-      The bottom bracket (where serial numbers are typically located) is circled.
+      = t "info.serials.texts.text2"
   %li
     = link_to image_tag("/assets/serials/serial_peters.jpg", alt: "Standard serial number"), "/assets/serials/serial_peters.jpg", class: "serial-image"
     %p
-      A serial number on the underside of a bottom bracket.
+      = t "info.serials.texts.text3"
   %li
     = link_to image_tag("/assets/serials/serial_fixie.jpg", alt: "Another standard serial number. Sometime to be replaced with a serial number covered up by routing."), "/assets/serials/serial_fixie.jpg", class: "serial-image"
     %p
-      Another serial number beneath the bottom bracket, aligned parallel to the frame.
+      = t "info.serials.texts.text4"
   %li
     = link_to image_tag("/assets/serials/serial_headtube.jpg", alt: "Schwinn Serial."), "/assets/serials/serial_headtube.jpg", class: "serial-image"
     %p
-      Some Schwinn bicycles have the unique identifying number on their head tube (which is on the front of the bike).
+      = t "info.serials.texts.text5"
   
   %li
     = link_to image_tag("/assets/serials/serial_pinsch.jpg", alt: "Doberman dropout serial number"), "/assets/serials/serial_pinsch.jpg", class: "serial-image"
     %p
-      A serial number located on a rear drop out. Some BMX bikes and a few Schwinn bicycles place the serial on the rear dropout.  On older Schwinns there are numbers stamped on both the drive side and non-drive side rear dropouts; the one on the non-drive side dropout is the serial number.
+      = t "info.serials.texts.text6"
 
 
   %li#fnref-all-bikes-serials
     = link_to image_tag("/assets/serials/serial_look.jpg", alt: "Look serial number"), "/assets/serials/serial_look.jpg", class: "serial-image"
     %p
-      Some bikes have multiple serial numbers.
+      = t "info.serials.texts.text7"
       %sup
         %a.footnote-ref{ href: "#fn-second-serial-number" }
           2
-      When adding a bike to the Index, it's best to enter all the groups of numbers and letters separated by spaces.
+      = t "info.serials.texts.text8"
 
 %p
-  Hopefully you can find the serial number on the bicycle you're looking at,
+  = t "info.serials.texts.text9"
   / # = link_to 'Check out the forum', discuss_url
   email #{link_to 'contact@bikeindex.org', 'mailto:contact@bikeindex.org'}
-  if you're having trouble.
+  = t "info.serials.texts.text10"
 
 = render '/shared/content_footer_ad'
 
 .footnotes
   %ol
     %li#fn-all-bikes-serials
-      Okay, fine, so 
+      = t "info.serials.texts.text11" 
       %em
-        maybe
-      there are a few bikes without serial numbers, but this is rare and typical only on hand made bikes or really old bicycles.
+        = t "info.serials.words.word1"
+      = t "info.serials.texts.text12"
       %a.footnote-back-link{ href: "#fnref-all-bikes-serials", title: "Jump back to footnote 1 in the text."}
         &#8617;
     %li#fn-second-serial-number
-      In this picture
+      = t "info.serials.texts.text13"
       %em
         200910427-2A
-      is a manufacturer number and not a serial number. However, to make bikes as easy as possible to find, we'd love it if you entered all numbers you encounter.
+      = t "info.serials.texts.text14"
       %a.footnote-back-link{ href: "#fnref-second-serial-number", title: "Jump back to footnote 2 in the text."}
         &#8617;    
