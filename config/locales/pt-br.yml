@@ -3,17 +3,22 @@ pt-br:
     title:
       indexTitle: Registro de Bicicleta
       subIndexTitle: Que funciona!
+    
     button:
       language:
         english: Inglês
         portuguese: Português
       register: Registre sua Bicicleta
+    
     phrases:
-      phrase0: Idioma
+      phrase0: "Idioma:"
       phrase1: Ajude-nos a lutar contra o roubo de bicicletas. Registre sua bicicleta
       phrase2: O processo é simples, seguro e gratuito.
       phrase3: registre sua bicicleta agora mesmo
-      phrase4: Como funciona
+      phrase4: "Como funciona:"
+      phrase5: ... e muito mais
+      phrase6: Veja a lista completa aqui
+    
     texts:
       text1: O Bike Index faz com que as bicicletas roubadas sejam mais difícies de vender
               e mais fácies de recuperar pois quando você precisar de informações sobre a bicicleta,
@@ -23,6 +28,15 @@ pt-br:
       text3: Nos ajudamos quem compra ou vende bicicletas usadas fornecendo uma maneira fácil 
               de verificar se a bicicleta é roubada.
       text4: Bike Index é um serviço gratuito para lojistas e proprietários individuais.
+      text5: É simples, nos fornecemos uma maneira fácil e eficiente para armazenar e atualizar dados 
+             relevantes sobre sua bicicleta.
+      text6: Caso você tenha a má sorte de ter sua bicicleta roubada, você pode usufruir do poder
+             da nossa rede para recupera-la. Com o registro do Bike Index as informações necessárias 
+             para ajuda-lo a recuperar sua bicicleta ficam acessíveis a todos, como os responsáveis 
+             por cumprir a lei, lojistas, revendedores, compradores etc. 
+      text7: O Bike Index é o serviço mais usado no mundo quando se trata de registro de bicicletas.
+             A cada dia nossa equipe se esforça ainda mais para melhorar esse recurso e lutar contra 
+             o roubo de bicicletas.
 
     words:
       word1: Saiba mais ou
@@ -35,6 +49,7 @@ pt-br:
       word8: Simples
       word9: Segurança
       word10: Sem custo
+      word11: "Usado por:"
 
   activerecord:
     errors:

@@ -97,13 +97,13 @@
   .how-it-works#how_it_works
     .container
       %h2
-        How it works
+        = t "welcome.phrases.phrase4"
       %p
-        It's simple: we offer an easy and efficient way to store and update important identifying information about your bike.
+        = t "welcome.texts.text5"
       %p
-        In the unfortunate event that your bike is stolen, you can harness the power of our network to help get it back. Registering with Bike Index ensures that law enforcement, bike shops, individuals, and everyone in between has the information they need to help reunite you with your bike.
+        = t "welcome.texts.text6"
       %p
-        Bike Index is the most widely used bicycle registration service in the world. We strive to be the best resource in the fight against bicycle theft.
+        = t "welcome.texts.text7"
 
       %p
         / Have any questions? Join the discussion #{link_to 'here', 'https://discuss.bikeindex.org'}.
@@ -113,7 +113,7 @@
     .supporters
       .container
         %h2
-          Used by:
+          = t "welcome.words.word11"
         %ul.horizontal-list
           %li
             %a{href: "http://www.peopleforbikes.org/", target: "_blank"}
@@ -153,4 +153,5 @@
           
       
       %p.and-many-more
-        \... and many more. #{link_to "View the complete list here", where_path}
+        = t "welcome.phrases.phrase5"
+        #{link_to t("welcome.phrases.phrase6"), where_path}
