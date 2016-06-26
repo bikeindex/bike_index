@@ -1,4 +1,14 @@
 pt-br:
+
+  layouts:
+    navbar:
+      search: Buscar no Bike Index
+      link: Ver bicicletas roubadas perto de você
+      login: Entrar
+      signup: Cadastrar
+      about: Sobre
+      news: Novidades
+
   welcome:
     title:
       indexTitle: Registro de Bicicleta

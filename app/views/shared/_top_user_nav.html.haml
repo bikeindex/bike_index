@@ -17,10 +17,10 @@
     - else
       %li.first-link
         %a{href: new_session_url }
-          Log in
+          = t "layouts.navbar.login"
       %li
         %a{ href: new_user_url }
-          Sign up
+          = t "layouts.navbar.signup"
           
     / %li
     /   %a{ href: '#' }
@@ -28,8 +28,8 @@
 
     %li
       %a.low-priority{ href: about_url }
-        About
+        = t "layouts.navbar.about"
 
     %li
       %a.low-priority{ href: news_index_url }
-        News
+        = t "layouts.navbar.news"

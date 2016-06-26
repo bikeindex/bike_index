@@ -36,13 +36,13 @@
             - params[:query] = params[:query].gsub(/,?#,?/,'').gsub(/(\A,|,\z)/, '') if params[:query].present?
             = text_field_tag :query,                  |
               strip_tags(params[:query]),             |
-              placeholder: "Search Bike Index",       |
+              placeholder: t("layouts.navbar.search"),       |
               class: "search-text-field form-control"
             = button_tag(type: "submit", class: "searchit btn") do
               = image_tag '/assets/updated/search_white.svg', alt: "Search graphic"
             .stolen-search-link
               %a#most_recent_stolen_bikes{href: '#'}
-                View recent stolen bikes near you
+                = t "layouts.navbar.link"
 
             .stolen-search-fields
               = text_field_tag :proximity, params[:proximity], placeholder: 'Anywhere', class: 'form-control stolen-proximity'

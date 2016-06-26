@@ -1,4 +1,13 @@
 en:
+
+  layouts:
+    navbar:
+      search: Search Bike Index
+      link: View recent stolen bikes near you
+      login: Log in
+      signup: Sing up
+      about: About
+      news: News
   welcome:
     title:
       indexTitle: Bike registration
