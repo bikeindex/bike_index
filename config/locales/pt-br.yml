@@ -1,9 +1,40 @@
 pt-br:
-  title:
-    indexTitle: Registro de Bicicleta
-    subIndexTitle: Que funciona!
-  button:
-    register: Registre sua Bicicleta
+  welcome:
+    title:
+      indexTitle: Registro de Bicicleta
+      subIndexTitle: Que funciona!
+    button:
+      language:
+        english: Inglês
+        portuguese: Português
+      register: Registre sua Bicicleta
+    phrases:
+      phrase0: Idioma
+      phrase1: Ajude-nos a lutar contra o roubo de bicicletas. Registre sua bicicleta
+      phrase2: O processo é simples, seguro e gratuito.
+      phrase3: registre sua bicicleta agora mesmo
+      phrase4: Como funciona
+    texts:
+      text1: O Bike Index faz com que as bicicletas roubadas sejam mais difícies de vender
+              e mais fácies de recuperar pois quando você precisar de informações sobre a bicicleta,
+              elas estaram lá.
+      text2: Todas as informações importantes sobre sua bicicleta estaram em um lugar, assim você 
+              pode consulta-las sempre que necessário.
+      text3: Nos ajudamos quem compra ou vende bicicletas usadas fornecendo uma maneira fácil 
+              de verificar se a bicicleta é roubada.
+      text4: Bike Index é um serviço gratuito para lojistas e proprietários individuais.
+
+    words:
+      word1: Saiba mais ou
+      word2: Até agora nos
+      word3: registramos
+      word4: bicicletas
+      word5: e 
+      word6: recuperamos
+      word7: bicicletas roubadas.
+      word8: Simples
+      word9: Segurança
+      word10: Sem custo
 
   activerecord:
     errors:

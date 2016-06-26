@@ -2,17 +2,17 @@
   - @recovery_displays = RecoveryDisplay.limit(10)
   .container.home-header#home_headies
     %a 
-      Language:
+      = t "welcome.phrases.phrase0"
       %br
-      = link_to_unless_current "English", locale: "en" 
+      = link_to_unless_current t("welcome.button.language.english"), locale: "en" 
       %br
-      = link_to_unless_current "Portuguese", locale: "pt-br"
+      = link_to_unless_current t("welcome.button.language.portuguese"), locale: "pt-br"
 
     %h1
       %a.home_header_link{href: choose_registration_path }
-      = t "title.indexTitle"
+      = t "welcome.title.indexTitle"
       %span
-        = t "title.subIndexTitle"
+        = t "welcome.title.subIndexTitle"
     .testimonial-container
       %h2.visuallyhidden
         Testimonials:
@@ -41,47 +41,58 @@
                 
     .wheeled
       %span.register-container
-        = link_to t("button.register"), choose_registration_path, class: "btn binxbtn binxbtn-lg"
+        = link_to t("welcome.button.register"), choose_registration_path, class: "btn binxbtn binxbtn-lg"
       %span.wheel-holder
         = image_tag "/assets/updated/home/wheel_white.png", alt: "(spinning wheel graphic)", id: 'wheeled_wheel', role: 'presentation', :"aria-hidden" => "true"
 - cache('root_bike_count', expires_in: 5.minutes) do
   .home-subhead
     .container
       %h2
-        Help us fight bicycle theft&mdash;register your bike.
+        = t "welcome.phrases.phrase1"
       
       %h3
-        The Bike Index makes stolen bikes harder to sell and easier to recover by making sure important information about your bike is there when you need it the most.
+        = t "welcome.texts.text1"
       %h3
-        The process is simple, secure, and free. 
+        = t "welcome.phrases.phrase2"
         %a.scroll-to-ref{ href: "#how_it_works" }
-          Learn more
-        or #{link_to "register your bike now", choose_registration_path}.
+        = t "welcome.words.word1"
+        #{link_to t("welcome.phrases.phrase3"), choose_registration_path}.
       %h3
-        So far we've <strong>registered #{number_with_delimiter(Bike.count)} bikes</strong> and <strong>recovered #{number_with_delimiter(StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count)}</strong> stolen bikes.
+        = t "welcome.words.word2"
+        <strong> 
+        = t "welcome.words.word3" 
+        #{number_with_delimiter(Bike.count)} 
+        = t "welcome.words.word4"
+        </strong> 
+        = t "welcome.words.word5" 
+        <strong>
+        = t "welcome.words.word6"
+        #{number_with_delimiter(StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count)}</strong> 
+        = t "welcome.words.word7"
+
 - cache 'root_home' do 
   .info-blocks
     .container
       %article
         = image_tag "/assets/updated/info_blocks/online.svg"
         %h2
-          Simple
+          = t "welcome.words.word8"
         %p
-          We keep all the important information about your bike in one place so it's there when you need it the most. 
+          = t "welcome.texts.text2" 
 
       %article
         = image_tag "/assets/updated/info_blocks/secured.svg"
         %h2
-          Secure
+          = t "welcome.words.word9"
         %p
-          We help used bike sellers and buyers by providing an easy way to verify that a bicycle isn’t stolen.
+          = t "welcome.texts.text3"
 
       %article
         = image_tag "/assets/updated/info_blocks/free.svg"
         %h2
-          Free
+          = t "welcome.words.word10"
         %p
-          Bike Index is a free service for bike shops and individuals.
+          = t "welcome.texts.text4"
 
   .how-it-works#how_it_works
     .container

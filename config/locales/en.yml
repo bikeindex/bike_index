@@ -1,7 +1,37 @@
 en:
-  title:
-    indexTitle: Bike registration
-    subIndexTitle: That Works
+  welcome:
+    title:
+      indexTitle: Bike registration
+      subIndexTitle: That Works
+    button:
+      language:
+        english: English
+        portuguese: Portuguese
+      register: Register Bike
+    phrases:
+        phrase0: Language
+        phrase1: Help us fight bicycle theft. Register your bike.
+        phrase2: The process is simple, secure, and free. 
+        phrase3: register your bike now
+        phrase4: How it works
+    texts:
+      text1: The Bike Index makes stolen bikes harder to sell and easier to recover 
+              by making sure important information about your bike is there when you need it the most.
+      text2: We keep all the important information about your bike in one place so it's there when you need it the most. 
+      text3: We help used bike sellers and buyers by providing an easy way to verify that a bicycle isn’t stolen.
+      text4: Bike Index is a free service for bike shops and individuals.
+    words:
+      word1: Learn more or
+      word2: So for we've
+      word3: registered
+      word4: bikes
+      word5: and 
+      word6: recovered
+      word7: stolen bikes.
+      word8: Simple
+      word9: Secure
+      word10: Free
+
   meta_title:
     welcome_index: "Bike Index - Bike registration that works"
     welcome_goodbye: "Logged out"
