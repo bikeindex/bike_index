@@ -1,5 +1,41 @@
 pt-br:
 
+  info: 
+    serials:
+      title: Números de série
+      intro: Todas as bicicletas
+      intro2: possuem um número de série único.
+
+      words:
+        word1: talvez
+
+      texts:
+        text1: "A maioria das das bicicletas possuem seu número de série gravado no suporte do pedal 
+                (pedaleiro) mas em alguns casos o número de série pode ser encontrado em outros lugares. 
+                Abaixo estão listados alguns exemplos de onde encontrar o número de série de uma bicicleta:"
+        text2: O suporte do pedal (pedaleiro), onde normalmente os números de série estão localizados, 
+               está circulado.
+        text3: Um número de série no lado de baixo do suporte do pedal (pedaleiro).
+        text4: Outro número de série no pedaleiro, agora alinhado parelelamente com o quadro.
+        text5: "Algumas bicicletas Schwinn tem o número de série na ligação entre o quadro e o guidon
+               (telescópio da bicicleta)."
+        text6: Um número de série localizado no encaixe da roda traseira. Algumas bicicletas BMX
+               e algumas Schwinn colocam o número de série nessa parte da bicicleta. Nos modelos
+               Schwinns mais velhos o número de série também pode ser encontrado em outras posições
+               do encaixe traseiro da roda.
+        text7: Algumas bicicletas possuem vários números de série.
+        text8: Quando você registra uma bicicleta no Bike Index é importante informar todos os números
+               e série separados por espaços.
+        text9: Esperamos que você consiga encontrar o número de série da bicicleta que você está procurando 
+        text10: caso você tenha alguma dúvida sobre seu número de série.
+        text11: Okay, tudo bem, então
+        text12: existem algumas bicicletas que não possuem número de série, porém isso é muito raro,
+                 e quando acontece quase sempre são bicicletas muito velhas ou feitas 100% manualmente
+        text13: Nesta imagem
+        text14: é um número de fabricação e não um número de série, porém para ajudar ainda mais quem
+                procura pela sua biicleta roubada é muito importante que você informe todos os números que
+                 você encontrou na bicicleta.
+
   layouts:
     navbar:
       search: Buscar no Bike Index
