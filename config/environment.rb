@@ -1,7 +1,5 @@
-# Load the rails application
+# Load the Rails application.
 require File.expand_path('../application', __FILE__)
 
-# Initialize the rails application
-Bikeindex::Application.initialize!
-
-Haml::Template.options[:ugly] = true
+# Initialize the Rails application.
+Rails.application.initialize!
