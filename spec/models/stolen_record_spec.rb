@@ -18,7 +18,7 @@ describe StolenRecord do
 
   describe 'scopes' do
     it 'default scopes to current' do
-      expect(StolenRecord.scoped.to_sql).to eq(StolenRecord.where(current: true).to_sql)
+      expect(StolenRecord.all.to_sql).to eq(StolenRecord.where(current: true).to_sql)
     end
     it 'scopes approveds' do
       expect(StolenRecord.approveds.to_sql).to eq(StolenRecord.where(current: true).where(approved: true).to_sql)
@@ -61,7 +61,7 @@ describe StolenRecord do
 
   describe 'scopes' do
     it 'only includes current records' do
-      expect(StolenRecord.scoped.to_sql).to eq(StolenRecord.where(current: true).to_sql)
+      expect(StolenRecord.all.to_sql).to eq(StolenRecord.where(current: true).to_sql)
     end
 
     it 'only includes non-current in recovered' do

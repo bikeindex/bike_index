@@ -42,7 +42,7 @@ describe Bike do
 
   describe 'scopes' do
     it 'default scopes to created_at desc' do
-      expect(Bike.scoped.to_sql).to eq(Bike.where(example: false).where(hidden: false).order('listing_order desc').to_sql)
+      expect(Bike.all.to_sql).to eq(Bike.where(example: false).where(hidden: false).order('listing_order desc').to_sql)
     end
     it 'scopes to only stolen bikes' do
       expect(Bike.stolen.to_sql).to eq(Bike.where(stolen: true).to_sql)
