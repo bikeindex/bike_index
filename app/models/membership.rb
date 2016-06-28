@@ -1,7 +1,6 @@
 class Membership < ActiveRecord::Base
   MEMBERSHIP_TYPES = %w(admin member).freeze
   attr_accessible :organization_id, :role, :user_id
-  acts_as_paranoid
 
   belongs_to :organization
   belongs_to :user, touch: true # So when we update memberships, it busts user cache

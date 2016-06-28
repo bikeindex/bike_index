@@ -13,8 +13,6 @@ class Location < ActiveRecord::Base
     :longitude,
     :shown
 
-
-  acts_as_paranoid
   belongs_to :organization
   belongs_to :country
   belongs_to :state
