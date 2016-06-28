@@ -22,7 +22,6 @@ class Organization < ActiveRecord::Base
     :avatar_cache
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key
-  acts_as_paranoid
 
   mount_uploader :avatar, AvatarUploader
 

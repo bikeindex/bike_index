@@ -14,8 +14,6 @@ class OrganizationInvitation < ActiveRecord::Base
   # We are making people fill in names. That way, everyone who is at an
   # organization has a name in the email they send when creating bikes
 
-  acts_as_paranoid
-
   validates_presence_of :inviter, :organization_id, :invitee_email, :membership_role
 
   belongs_to :organization

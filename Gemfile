@@ -1,13 +1,20 @@
 source 'https://rubygems.org'
-ruby '2.1.3'
-
-gem 'rails', '3.2.22'
+ruby '2.2.4'
+# Old gems:
+# gem 'rails', '3.2.22'
+# gem 'acts_as_paranoid' # Removed because we aren't really using it
+# gem 'rake', '< 11' # OLD V - # Locked to remove validation errors
+# gem 'eventmachine', '~> 1.0.3' # OLD V
+# gem 'jquery-datatables-rails', '~>3.4.0' # DISABLED OLD V - SHOULD BE RE
+# gem 'unicorn'
+# gem 'unicorn-worker-killer'
+gem 'rails', '4.2.6'
 
 gem 'pg'
 gem 'jquery-rails'
 gem 'bcrypt-ruby', '~> 3.0.0'
 gem 'active_model_serializers'
-gem 'aws-sdk', '~> 1.3.4'
+gem 'aws-sdk', '~> 1.33'
 
 # Speed
 gem 'fast_blank', '~> 1.0'
@@ -21,8 +28,9 @@ gem 'rollout' # Feature flags
 gem 'soulheart', '~> 0.2.6' # typeahead/autocomplete features
 
 gem 'rack-contrib'
+gem 'puma' # Use Puma as the app server
 gem 'geocoder'
-gem 'money-rails', '~> 0.5.0'
+gem 'money-rails'
 gem 'i18n'
 gem 'hamlit'
 gem 'haml-rails'
@@ -31,16 +39,14 @@ gem 'kramdown'
 gem 'kaminari' # pagination
 gem 'pg_search'
 gem 'nokogiri'
-gem 'carrierwave', '~> 0.9.0'
+gem 'carrierwave'
 gem 'carrierwave_backgrounder'
 gem 'rmagick'
 gem 'mini_magick' # a smaller implementation of rmagick, required for rqrcode
 gem 'rqrcode-rails3'
-gem 'strong_parameters'
 gem 'libv8', '~> 3.16.14.7'
 gem 'rb-readline', '~> 0.5.0'
 gem 'stripe', git: 'https://github.com/stripe/stripe-ruby'
-gem 'acts_as_paranoid', '~>0.4.0'
 gem 'high_voltage'
 gem 'omniauth-facebook'
 gem 'omniauth-strava'
@@ -50,14 +56,15 @@ gem 'dalli'
 gem 'draper', require: false
 gem 'wkhtmltopdf-binary'
 gem 'wicked_pdf'
-gem 'eventmachine', '~> 1.0.3'
+gem 'eventmachine'
+gem 'httparty'
 gem 'sitemap_generator'
-gem 'unicorn'
-gem 'unicorn-worker-killer'
-gem 'rake', '< 11' # Lock rake to remove validation errors
+
+gem 'rake'
+gem 'sparkpost' # ruby client for email
 
 # OAuth provider, Grape, associated parts of API V2
-gem 'doorkeeper',   '~> 2.0.1'
+gem 'doorkeeper'
 gem 'wine_bouncer'
 gem 'grape'
 gem 'grape-active_model_serializers', git: 'https://github.com/jrhe/grape-active_model_serializers'
@@ -71,11 +78,13 @@ gem 'secure_headers'
 
 # Frontend
 gem 'backbone-on-rails', '~>0.9.10.0' 
-gem 'jquery-datatables-rails', '~>3.4.0'
 gem 'chartkick' # Display charts
 gem 'groupdate'
 gem 'bootstrap', '~> 4.0.0.alpha3' # Bootstrap 4 - used for revised stylesheets
-gem 'sparkpost' # ruby client for email
+gem 'sass-rails'
+gem 'coffee-rails'
+gem 'therubyracer'
+gem 'uglifier'
 
 # Show performance metrics
 gem 'stackprof', require: false
@@ -102,16 +111,10 @@ group :production do
   gem 'honeybadger', '~> 2.0'
 end
 
-group :assets do
-  gem 'sass-rails',   '~> 3.2.6'
-  gem 'coffee-rails', '~> 3.2.2'
-  gem 'therubyracer', '~> 0.12.1' , platforms: :ruby
-  gem 'uglifier', '~> 2.7.2'
-end
-
 group :development do
+  gem 'test-unit', '~> 3.0'
   gem 'rerun'
-  gem 'guard'
+  gem 'guard', '2.13.0'
   gem 'guard-rspec', '~> 4.6.4'
   gem 'guard-rubocop'
 end
@@ -127,8 +130,8 @@ group :development, :test do
 end
 
 group :test do
-  gem 'factory_girl_rails', '~> 4.2.1'
+  gem 'factory_girl_rails'
   gem 'codeclimate-test-reporter', require: nil
-  gem 'rspec-sidekiq', '~> 2.2.0'
+  gem 'rspec-sidekiq'
   gem 'pry'
 end

@@ -47,7 +47,7 @@ module API
         params :components_attrs do 
           optional :manufacturer, type: String, desc: "Manufacturer name or ID"
           # [Manufacturer name or ID](api_v2#!/manufacturers/GET_version_manufacturers_format)
-          optional :component_type, type: String, desc: 'Type of component', values: CTYPE_NAMES, desc: 'Type - case sensitive match'
+          optional :component_type, type: String, desc: 'Type of component', values: CTYPE_NAMES
           optional :model, type: String, desc: "Component model"
           optional :year, type: Integer, desc: "Component year"
           optional :description, type: String, desc: "Component description"
