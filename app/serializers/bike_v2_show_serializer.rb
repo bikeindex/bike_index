@@ -21,7 +21,8 @@ class BikeV2ShowSerializer < BikeV2Serializer
 
   has_one :stolen_record
 
-  has_many :public_images, :components
+  has_many :public_images
+  has_many :components
   
   def type_of_cycle
     object.cycle_type.name

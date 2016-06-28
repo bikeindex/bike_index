@@ -6,9 +6,9 @@ Bikeindex::Application.routes.draw do
     controllers authorized_applications: 'oauth/authorized_applications'
   end
 
-  match '/shop', to: redirect('https://bikeindex.myshopify.com'), as: :shop
-  match '/discuss', to: redirect('https://discuss.bikeindex.org'), as: :discuss
-  match 'discourse_authentication', to: 'discourse_authentication#index'
+  get '/shop', to: redirect('https://bikeindex.myshopify.com'), as: :shop
+  get '/discuss', to: redirect('https://discuss.bikeindex.org'), as: :discuss
+  get 'discourse_authentication', to: 'discourse_authentication#index'
 
   resources :organizations do
     member do
@@ -18,17 +18,16 @@ Bikeindex::Application.routes.draw do
     end
   end
 
-  match '/', to: redirect(:root_url, subdomain: false), constraints: { subdomain: 'stolen' }
-
+  get '/', to: redirect(:root_url, subdomain: false), constraints: { subdomain: 'stolen' }
   root to: 'welcome#index'
 
-  match 'update_browser', to: 'welcome#update_browser'
-  match 'user_home', to: 'welcome#user_home'
-  match 'choose_registration', to: 'welcome#choose_registration'
-  match 'goodbye', to: 'welcome#goodbye'
+  get 'update_browser', to: 'welcome#update_browser'
+  get 'user_home', to: 'welcome#user_home'
+  get 'choose_registration', to: 'welcome#choose_registration'
+  get 'goodbye', to: 'welcome#goodbye'
 
   resource :session, only: [:new, :create, :destroy]
-  match 'logout', to: 'sessions#destroy'
+  get 'logout', to: 'sessions#destroy'
 
   resources :payments
   resources :documentation, only: [:index] do
@@ -46,11 +45,11 @@ Bikeindex::Application.routes.draw do
   resources :stolen_notifications, only: [:create, :new]
 
   resources :feedbacks, only: [:create]
-  match 'vendor_signup', to: redirect('/organizations/new')
-  match 'lightspeed_integration', to: 'organizations#lightspeed_integration'
-  match 'help', to: 'feedbacks#index'
-  match 'feedbacks/new', to: redirect('/help')
-  %w(support contact contact_us).each { |p| match p, to: redirect('/help') }
+  get 'vendor_signup', to: redirect('/organizations/new')
+  get 'lightspeed_integration', to: 'organizations#lightspeed_integration'
+  get 'help', to: 'feedbacks#index'
+  get 'feedbacks/new', to: redirect('/help')
+  %w(support contact contact_us).each { |p| get p, to: redirect('/help') }
 
   resources :users, only: [:new, :create, :show, :edit, :update] do
     collection do
@@ -74,7 +73,7 @@ Bikeindex::Application.routes.draw do
   end
   resources :news, only: [:show, :index]
   resources :blogs, only: [:show, :index]
-  match 'blog', to: redirect('/news')
+  get 'blog', to: redirect('/news')
 
   resources :public_images, only: [:create, :show, :edit, :update, :destroy] do
     collection do
@@ -104,12 +103,12 @@ Bikeindex::Application.routes.draw do
       end
       member { get :get_destroy }
     end
-    match 'invitations', to: 'dashboard#invitations'
-    match 'maintenance', to: 'dashboard#maintenance'
+    get 'invitations', to: 'dashboard#invitations'
+    get 'maintenance', to: 'dashboard#maintenance'
     put 'update_tsv_blacklist', to: 'dashboard#update_tsv_blacklist'
-    match 'tsvs', to: 'dashboard#tsvs'
-    match 'bust_z_cache', to: 'dashboard#bust_z_cache'
-    match 'destroy_example_bikes', to: 'dashboard#destroy_example_bikes'
+    get 'tsvs', to: 'dashboard#tsvs'
+    get 'bust_z_cache', to: 'dashboard#bust_z_cache'
+    get 'destroy_example_bikes', to: 'dashboard#destroy_example_bikes'
     resources :memberships, :organizations, :organization_invitations,
               :paints, :ads, :recovery_displays, :mail_snippets
     resources :flavor_texts, only: [:destroy, :create]
@@ -132,9 +131,9 @@ Bikeindex::Application.routes.draw do
     end
     resources :failed_bikes, only: [:index, :show]
     resources :ownerships, only: [:edit, :update]
-    match 'recover_organization', to: 'organizations#recover'
-    match 'show_deleted_organizations', to: 'organizations#show_deleted'
-    match 'blog', to: redirect('/news')
+    get 'recover_organization', to: 'organizations#recover'
+    get 'show_deleted_organizations', to: 'organizations#show_deleted'
+    get 'blog', to: redirect('/news')
     resources :news do
       collection do
         get :listicle_image_edit
@@ -150,7 +149,7 @@ Bikeindex::Application.routes.draw do
   end
 
   namespace :api, defaults: { format: 'json' } do
-    match '/', to: redirect('/documentation')
+    get '/', to: redirect('/documentation')
     namespace :v1 do
       resources :bikes, only: [:index, :show, :create] do
         collection do
@@ -176,8 +175,8 @@ Bikeindex::Application.routes.draw do
           post 'send_request'
         end
       end
-      match 'not_found', to: 'api_v1#not_found'
-      match '*a', to: 'api_v1#not_found'
+      get 'not_found', to: 'api_v1#not_found'
+      get '*a', to: 'api_v1#not_found'
     end
     mount Soulheart::Server, at: '/autocomplete'
   end
@@ -194,28 +193,28 @@ Bikeindex::Application.routes.draw do
   resources :manufacturers, only: [:index] do
     collection { get 'tsv' }
   end
-  match 'manufacturers_tsv', to: 'manufacturers#tsv'
+  get 'manufacturers_tsv', to: 'manufacturers#tsv'
 
   resources :organization_deals, only: [:create, :new]
   resource :integrations, only: [:create]
-  match '/auth/:provider/callback', to: 'integrations#create'
+  get '/auth/:provider/callback', to: 'integrations#create'
 
   %w(support_the_index support_the_bike_index protect_your_bike privacy terms serials
      about where vendor_terms resources image_resources how_not_to_buy_stolen dev_and_design).each do |page|
     get page, controller: 'info', action: page
   end
 
-  %w(stolen_bikes roadmap security spokecard how_it_works).each { |p| match p, to: redirect('/resources') }
+  %w(stolen_bikes roadmap security spokecard how_it_works).each { |p| get p, to: redirect('/resources') }
 
   # get 'sitemap.xml.gz' => redirect('https://files.bikeindex.org/sitemaps/sitemap_index.xml.gz')
   # Somehow the redirect drops the .gz extension, which ruins it so this redirect is handled by Cloudflare
   # get 'sitemaps/(*all)' => redirect('https://files.bikeindex.org/sitemaps/%{all}')
 
-  match '/400', to: 'errors#bad_request'
-  match '/401', to: 'errors#unauthorized'
-  match '/404', to: 'errors#not_found'
-  match '/422', to: 'errors#unprocessable_entity'
-  match '/500', to: 'errors#server_error'
+  get '/400', to: 'errors#bad_request'
+  get '/401', to: 'errors#unauthorized'
+  get '/404', to: 'errors#not_found'
+  get '/422', to: 'errors#unprocessable_entity'
+  get '/500', to: 'errors#server_error'
 
   mount Sidekiq::Web => '/sidekiq', constraints: AdminRestriction
 
