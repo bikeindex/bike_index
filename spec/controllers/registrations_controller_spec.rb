@@ -45,7 +45,7 @@ describe RegistrationsController do
           expect(response.status).to eq(200)
           expect(response).to render_template(:new)
           expect(flash).to_not be_present
-          # Since we're creating these in line, actually test the rendered bodyy
+          # Since we're creating these in line, actually test the rendered body
           body = response.body
           # Owner email
           owner_email_input = body[/id..b_param_owner_email[^v]*value=.[^\"]*/i]
@@ -58,6 +58,39 @@ describe RegistrationsController do
           expect(creator_organization_id[/\d*\z/]).to eq organization.id.to_s
         end
       end
+    end
+  end
+  describe 'create' do
+    context 'no organization' do
+      context 'no user' do
+        it 'renders' do
+          get :new, stolen: true
+          expect(response).to render_template(:create)
+        end
+      end
+      context 'with user' do
+        it 'renders' do
+          set_current_user(user)
+          get :new
+          expect(response).to render_template(:create)
+          expect(flash).to_not be_present
+        end
+      end
+    end
+    # context 'with organization' do
+    #   context 'no user' do
+    #     it 'renders' do
+    #       get :new, organization_id: organization.to_param
+    #       expect(response).to render_template(:create)
+    #     end
+    #   end
+    #   context 'with user' do
+    #     it 'renders' do
+    #       set_current_user(user)
+    #       get :new, organization_id: organization.id
+    #       expect(response).to render_template(:create)
+    #     end
+    #   end
     end
   end
 end
