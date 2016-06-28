@@ -1,13 +1,14 @@
 source 'https://rubygems.org'
-ruby '2.1.3'
+ruby '2.2.2'
 
 gem 'rails', '3.2.22'
+# gem 'rails', '4.2.6'
 
 gem 'pg'
 gem 'jquery-rails'
 gem 'bcrypt-ruby', '~> 3.0.0'
 gem 'active_model_serializers'
-gem 'aws-sdk', '~> 1.3.4'
+gem 'aws-sdk', '~> 1.33'
 
 # Speed
 gem 'fast_blank', '~> 1.0'
@@ -50,14 +51,17 @@ gem 'dalli'
 gem 'draper', require: false
 gem 'wkhtmltopdf-binary'
 gem 'wicked_pdf'
-gem 'eventmachine', '~> 1.0.3'
+gem 'eventmachine'
+gem 'httparty'
+# gem 'eventmachine', '~> 1.0.3' # OLD V
 gem 'sitemap_generator'
 gem 'unicorn'
 gem 'unicorn-worker-killer'
-gem 'rake', '< 11' # Lock rake to remove validation errors
+# gem 'rake', '< 11' # OLD V - # Locked to remove validation errors
+gem 'rake'
 
 # OAuth provider, Grape, associated parts of API V2
-gem 'doorkeeper',   '~> 2.0.1'
+gem 'doorkeeper'
 gem 'wine_bouncer'
 gem 'grape'
 gem 'grape-active_model_serializers', git: 'https://github.com/jrhe/grape-active_model_serializers'
@@ -110,6 +114,7 @@ group :assets do
 end
 
 group :development do
+  gem 'test-unit', '~> 3.0'
   gem 'rerun'
   gem 'guard'
   gem 'guard-rspec', '~> 4.6.4'
