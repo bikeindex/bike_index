@@ -180,6 +180,9 @@ FactoryGirl.define do
     sequence(:short_name) { |n| "short_name#{n}" }
     slug
     available_invitation_count 5
+    factory :organization_with_auto_user do
+      association :auto_user, factory: :organization_member
+    end
   end
 
   factory :location do

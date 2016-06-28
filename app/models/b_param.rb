@@ -7,14 +7,18 @@ class BParam < ActiveRecord::Base
                   :bike_errors,
                   :image,
                   :image_processed, 
-                  :api_v2
+                  :api_v2,
+                  :stolen, # for the new registration flow
+                  :creation_organization_id, # new registration flow
+                  :owner_email, # new registration flow
+                  :manufacturer
 
   attr_accessor :api_v2
 
   mount_uploader :image, ImageUploader
   store_in_background :image, CarrierWaveStoreWorker
 
-  serialize :params
+  # serialize :params
   serialize :bike_errors
 
   belongs_to :created_bike, class_name: "Bike"
@@ -25,6 +29,42 @@ class BParam < ActiveRecord::Base
   scope :without_creator, -> { where('creator_id IS NULL') }
 
   before_create :generate_id_token
+
+  # Crazy new shit
+  def manufacturer_id=(val)
+    params[:bike][:manufacturer_id] = val
+  end
+
+  def creation_organization_id=(val)
+    params[:bike][:creation_organization_id] = val
+  end
+
+  def owner_email=(val)
+    params[:bike][:owner_email] = val
+  end
+
+  def stolen=(val)
+    params[:bike][:stolen] = val
+  end
+
+
+  def primary_frame_color_id=(val)
+    params[:bike][:primary_frame_color_id] = val
+  end
+  def secondary_frame_color_id=(val)
+    params[:bike][:secondary_frame_color_id] = val
+  end
+  def tertiary_frame_color_id=(val)
+    params[:bike][:tertiary_frame_color_id] = val
+  end
+
+  def primary_frame_color_id; bike[:primary_frame_color_id] end
+  def secondary_frame_color_id; bike[:secondary_frame_color_id] end
+  def tertiary_frame_color_id; bike[:tertiary_frame_color_id] end
+  def manufacturer_id; bike[:manufacturer_id] end
+  def stolen; bike[:stolen] end
+
+  def manufacturer; bike[:manufacturer_id] && Manufacturer.find(bike[:manufacturer_id]) end
 
   # Right now this is a partial update. It's improved from where it was, but it still uses the BikeCreator
   # code for protection. Ideally, we would use the revised merge code to ensure we aren't letting users
@@ -50,7 +90,7 @@ class BParam < ActiveRecord::Base
   end
 
   def bike
-    (params[:bike] || {}).with_indifferent_access
+    (params && params[:bike] || {}).with_indifferent_access
   end
 
   def self.v2_params(hash)
@@ -61,10 +101,10 @@ class BParam < ActiveRecord::Base
     h[:bike][:creation_organization_id] = org.id if org.present?
     # Move un-nested params outside of bike
     [:test, :id, :components].each { |k| h[k] = h[:bike].delete k }
-    stolen = h[:bike].delete :stolen_record
-    if stolen && stolen.delete_if { |k,v| v.blank? } && stolen.keys.any?
+    stolen_attrs = h[:bike].delete :stolen_record
+    if stolen_attrs && stolen_attrs.delete_if { |k,v| v.blank? } && stolen_attrs.keys.any?
       h[:bike][:stolen] = true
-      h[:stolen_record] = stolen 
+      h[:stolen_record] = stolen_attrs
     end
     h
   end
@@ -197,9 +237,9 @@ class BParam < ActiveRecord::Base
     b
   end
 
-  def bike_from_attrs(stolen: nil, recovered: nil)
-    stolen ||= params['bike'] && params['bike']['stolen']
-    Bike.new safe_bike_attrs({ stolen: stolen, recovered: recovered })
+  def bike_from_attrs(is_stolen: nil, recovered: nil)
+    is_stolen ||= params['bike'] && params['bike']['stolen']
+    Bike.new safe_bike_attrs({ stolen: is_stolen, recovered: recovered })
   end
 
   def safe_bike_attrs(param_overrides)
@@ -225,11 +265,11 @@ class BParam < ActiveRecord::Base
   end
 
   def creation_organization_id
-    bike[:creation_organization_id]
+    bike && bike[:creation_organization_id]
   end
 
   def owner_email
-    bike[:owner_email]
+    bike && bike[:owner_email]
   end
 
   def display_email? # For revised form. If there aren't errors and there is an email, then we don't need to show

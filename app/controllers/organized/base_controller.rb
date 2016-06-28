@@ -4,10 +4,6 @@ module Organized
     before_filter :ensure_member!
     layout 'application_revised'
 
-    def current_organization
-      @current_organization ||= Organization.friendly_find(params[:organization_id])
-    end
-
     def ensure_member!
       return true if current_user && current_user.is_member_of?(current_organization)
       flash[:error] = "You're not a member of that organization!"

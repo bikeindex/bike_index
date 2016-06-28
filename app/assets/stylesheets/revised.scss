@@ -154,16 +154,18 @@ $row-side-padding: 0.9375rem;
 @import "revised/pages/organized/header";
 @import "revised/sections/organized_menu"; // left hand organized menu
 
-// 
+//
 // Page styles
-// 
+//
 // Bike form pages
 @import "revised/pages/bikes/new";
 @import "revised/pages/bikes/edit_root";
 @import "revised/pages/bikes/edit_ownership";
 @import "revised/pages/bikes/edit_accessories";
 @import "revised/pages/bikes/edit_photos";
+// Bike registration page styles
 @import "revised/pages/bikes/choose_registration";
+@import "revised/pages/bikes/new_registration";
 
 // Bike show & search pages
 @import "revised/pages/bikes/show";

@@ -6,6 +6,10 @@ class ApplicationController < ActionController::Base
                 :remove_session, :revised_layout_enabled?
   before_filter :enable_rack_profiler
 
+  def current_organization
+    @current_organization ||= Organization.friendly_find(params[:organization_id])
+  end
+
   def enable_rack_profiler
     if current_user && current_user.developer?
       Rack::MiniProfiler.authorize_request unless Rails.env.test?
