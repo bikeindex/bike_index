@@ -1,10 +1,7 @@
 class MailSnippet < ActiveRecord::Base
-  attr_accessible :name,
-    :body,
-    :is_enabled,
-    :is_location_triggered,
-    :address,
-    :proximity_radius
+  def self.old_attr_accessible
+    %w(name body is_enabled is_location_triggered address proximity_radius)
+  end
 
   validates_presence_of :name
 

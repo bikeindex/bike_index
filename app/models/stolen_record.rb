@@ -1,40 +1,17 @@
 class StolenRecord < ActiveRecord::Base
   include ActiveModel::Dirty
   include Phonifyerable
-  attr_accessible :police_report_number,
-    :police_report_department,
-    :locking_description,
-    :lock_defeat_description,
-    :date_stolen,
-    :bike,
-    :creation_organization_id,
-    :country_id,
-    :state_id,
-    :street,
-    :zipcode,
-    :city,
-    :latitude,
-    :longitude,
-    :theft_description,
-    :current,
-    :phone,
-    :secondary_phone,
-    :phone_for_everyone,
-    :phone_for_users,
-    :phone_for_shops,
-    :phone_for_police,
-    :receive_notifications,
-    :proof_of_ownership,
-    :approved,
-    :date_recovered,
-    :recovered_description,
-    :index_helped_recovery,
-    :can_share_recovery,
-    :recovery_share, # We edit this in the admin panel
-    :recovery_tweet, # We edit this in the admin panel
-    :recovery_posted,
-    :tsved_at,
-    :date_stolen_input # now putting this in here, on revised, because less stupid
+  def self.old_attr_accessible
+    # recovery_share, # We edit this in the admin panel
+    # recovery_tweet, # We edit this in the admin panel
+    # date_stolen_input # now putting this in here, on revised, because less stupid
+    %w(police_report_number police_report_department locking_description lock_defeat_description
+       date_stolen bike creation_organization_id country_id state_id street zipcode city latitude
+       longitude theft_description current phone secondary_phone phone_for_everyone
+       phone_for_users phone_for_shops phone_for_police receive_notifications proof_of_ownership
+       approved date_recovered recovered_description index_helped_recovery can_share_recovery
+       recovery_posted tsved_at)
+ end
 
   attr_accessor :date_stolen_input
 

@@ -1,5 +1,7 @@
 class FlavorText < ActiveRecord::Base
-  attr_accessible :message
+  def self.old_attr_accessible
+    %w(message)
+  end
   
   validates_presence_of :message
 

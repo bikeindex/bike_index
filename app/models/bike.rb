@@ -1,80 +1,24 @@
 class Bike < ActiveRecord::Base
   include ActiveModel::Dirty
   include ActionView::Helpers::SanitizeHelper
-  attr_accessible :registered_new, # Was this bike registered at point of sale?
-    :cycle_type_id,
-    :manufacturer_id,
-    :manufacturer_other,
-    :serial_number,
-    :serial_normalized,
-    :has_no_serial,
-    :made_without_serial, # GUARANTEE there was no serial 
-    :additional_registration,
-    :creation_organization_id,
-    :location_id,
-    :manufacturer,
-    :year,
-    :thumb_path,
-    :name,
-    :stolen,
-    :current_stolen_record_id,
-    :recovered,
-    :frame_material_id,
-    :frame_model,
-    :handlebar_type_id,
-    :handlebar_type_other,
-    :frame_size,
-    :frame_size_number,
-    :frame_size_unit,
-    :rear_tire_narrow,
-    :front_wheel_size_id,
-    :rear_wheel_size_id,
-    :front_tire_narrow,
-    :number_of_seats,
-    :primary_frame_color_id,
-    :secondary_frame_color_id,
-    :tertiary_frame_color_id,
-    :paint_id,
-    :paint_name,
-    :propulsion_type_id,
-    :propulsion_type_other,
-    :zipcode,
-    :country_id,
-    :creation_zipcode,
-    :belt_drive,
-    :coaster_brake,
-    :rear_gear_type_id,
-    :front_gear_type_id,
-    :description,
-    :all_description, # shouldn't be mass-assigned
-    :owner_email,
-    :stolen_records_attributes,
-    :date_stolen_input,
-    :stolen_lat, # shouldn't be mass-assigned
-    :stolen_long, # shouldn't be mass-assigned
-    :receive_notifications,
-    :phone,
-    :creator,
-    :creator_id,
-    :image,
-    :components_attributes,
-    :b_param_id,
-    :cached_attributes,
-    :embeded,
-    :embeded_extended,
-    :example,
-    :hidden,
-    :card_id,
-    :stock_photo_url,
-    :pdf,
-    :send_email,
-    :other_listing_urls,
-    :listing_order,
-    :approved_stolen,
-    :marked_user_hidden,
-    :marked_user_unhidden,
-    :b_param_id_token,
-    :is_for_sale
+  def self.old_attr_accessible
+    # registered_new - Was this bike registered at point of sale?
+    # made_without_serial - GUARANTEE there was no serial
+    %(registered_new cycle_type_id manufacturer_id manufacturer_other serial_number 
+      serial_normalized has_no_serial made_without_serial additional_registration
+      creation_organization_id location_id manufacturer year thumb_path name stolen
+      current_stolen_record_id recovered frame_material_id frame_model
+      handlebar_type_id handlebar_type_other frame_size frame_size_number
+      frame_size_unit rear_tire_narrow front_wheel_size_id rear_wheel_size_id
+      front_tire_narrow number_of_seats primary_frame_color_id secondary_frame_color_id
+      tertiary_frame_color_id paint_id paint_name propulsion_type_id propulsion_type_other
+      zipcode country_id creation_zipcode belt_drive coaster_brake rear_gear_type_id
+      front_gear_type_id description owner_email stolen_records_attributes date_stolen_input
+      receive_notifications phone creator creator_id image components_attributes b_param_id
+      cached_attributes embeded embeded_extended example hidden card_id stock_photo_url
+      pdf send_email other_listing_urls listing_order approved_stolen marked_user_hidden
+      marked_user_unhidden b_param_id_token is_for_sale)
+  end
 
   mount_uploader :pdf, PdfUploader
   process_in_background :pdf, CarrierWaveProcessWorker

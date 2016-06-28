@@ -1,16 +1,9 @@
 class Manufacturer < ActiveRecord::Base
   include AutocompleteHashable
-  attr_accessible :name,
-    :slug,
-    :website,
-    :frame_maker,
-    :open_year,
-    :close_year,
-    :logo,
-    :remote_logo_url,
-    :logo_cache,
-    :logo_source,
-    :description
+  def self.old_attr_accessible
+    %w(name slug website frame_maker open_year close_year logo remote_logo_url
+       logo_cache logo_source description)
+  end
 
   validates_presence_of :name
   validates_uniqueness_of :name

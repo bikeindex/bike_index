@@ -1,6 +1,8 @@
 class Color < ActiveRecord::Base
   include AutocompleteHashable
-  attr_accessible :name, :priority, :display
+  def self.old_attr_accessible
+    %w(name priority display)
+  end
   validates_presence_of :name, :priority
   validates_uniqueness_of :name
   has_many :bikes

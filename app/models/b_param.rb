@@ -1,13 +1,8 @@
 # b_param stands for Bike param
 class BParam < ActiveRecord::Base
-  attr_accessible :params,
-                  :creator_id,
-                  :bike_title,
-                  :created_bike_id,
-                  :bike_errors,
-                  :image,
-                  :image_processed, 
-                  :api_v2
+  def self.old_attr_accessible 
+    %w(params creator_id bike_title created_bike_id bike_errors image image_processed api_v2)
+  end
 
   attr_accessor :api_v2
 

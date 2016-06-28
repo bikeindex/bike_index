@@ -1,5 +1,7 @@
 class Country < ActiveRecord::Base
-  attr_accessible :name, :iso
+  def self.old_attr_accessible
+    %w(name iso)
+  end
   validates_presence_of :name
   validates_uniqueness_of :name
   validates_uniqueness_of :iso
