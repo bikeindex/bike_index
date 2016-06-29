@@ -1,106 +1,107 @@
-%h1#documentation_head{ data: {production: (1 if Rails.env.production?)}}
-  Bike Index API V1
-%p
-  This is the documentation for the Bike Index JSON API v1
+- cache 'documentation_v1' do
+  %h1#documentation_head{ data: {production: (1 if Rails.env.production?)}}
+    Bike Index API V1
+  %p
+    This is the documentation for the Bike Index JSON API v1
 
-%article
-  .alert
-    We're updating our API&mdash;this version will continue to exist indefinitely, but it will probably get slower. Check out #{link_to "the v2 documentation", api_v2_documentation_index_url} and give us feedback!
+  %article
+    .alert
+      We're updating our API&mdash;this version will continue to exist indefinitely, but it will probably get slower. Check out #{link_to "the v2 documentation", api_v2_documentation_index_url} and give us feedback!
 
-%p
-  The Bike Index API supports Cross-Origin Resource Sharing (CORS). The CORS spec allows web applications to make cross domain AJAX calls without using workarounds such as JSONP.
-%p
-  For more information about CORS, read #{link_to "this blog post", "http://www.nczonline.net/blog/2010/05/25/cross-domain-ajax-with-cross-origin-resource-sharing/"}, or #{link_to "the spec", "http://www.w3.org/TR/access-control/#simple-cross-origin-request-and-actual-r"}.
+  %p
+    The Bike Index API supports Cross-Origin Resource Sharing (CORS). The CORS spec allows web applications to make cross domain AJAX calls without using workarounds such as JSONP.
+  %p
+    For more information about CORS, read #{link_to "this blog post", "http://www.nczonline.net/blog/2010/05/25/cross-domain-ajax-with-cross-origin-resource-sharing/"}, or #{link_to "the spec", "http://www.w3.org/TR/access-control/#simple-cross-origin-request-and-actual-r"}.
 
-%p
-  As always, all code is available in our github repo, #{link_to "bike_index", "https://github.com/bikeindex/bike_index"}. You can also read the code for #{link_to "this documentation page","https://github.com/bikeindex/bike_index/blob/master/app/views/documentation/api_v1.html.haml"} there.
-%p
-  If you're having any trouble, please contact us at #{link_to "support@bikeindex.org", "mailto:support@bikeindex.org"}.
+  %p
+    As always, all code is available in our github repo, #{link_to "bike_index", "https://github.com/bikeindex/bike_index"}. You can also read the code for #{link_to "this documentation page","https://github.com/bikeindex/bike_index/blob/master/app/views/documentation/api_v1.html.haml"} there.
+  %p
+    If you're having any trouble, please contact us at #{link_to "support@bikeindex.org", "mailto:support@bikeindex.org"}.
 
-%article
-  .alert.alert-info
-    The example requests on this page are designed to be used. Open up a browser console, copy the code in and play around!
-
-
-%hr
-
-%h2#manufacturers_ref
-  Manufacturers 
-  %span.github-link
-    #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/manufacturers_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/manufacturers_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/manufacturer_serializer.rb"} on Github
-
-= render partial: "/documentation/api_v1/manufacturers"
-
-%hr
-
-%h2#search_bikes_ref
-  Searching bikes
-  %span.github-link
-    #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/bikes_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/bikes_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/bike_serializer.rb"} on Github
-
-= render partial: "/documentation/api_v1/bikes_search"
-
-%hr
-
-%h2#add_bikes_ref
-  Adding bikes
-  %span.github-link
-    #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/bikes_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/bikes_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/bike_serializer.rb"} on Github
-
-= render partial: "/documentation/api_v1/bikes_add"
+  %article
+    .alert.alert-info
+      The example requests on this page are designed to be used. Open up a browser console, copy the code in and play around!
 
 
-%hr
+  %hr
 
-%h2#bike_attributes_ref
-  Bike Associations
+  %h2#manufacturers_ref
+    Manufacturers 
+    %span.github-link
+      #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/manufacturers_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/manufacturers_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/manufacturer_serializer.rb"} on Github
 
-%p
-  The Bike Index makes searching for and finding bikes easier by using standardized attributes to catalog them.
+  = render partial: "/documentation/api_v1/manufacturers"
 
-%h3#wheel_sizes_ref
-  Wheel Sizes
-  %span.github-link
-    #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/wheel_sizes_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/wheel_sizes_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/wheel_size_serializer.rb"} on Github
+  %hr
 
-= render partial: "/documentation/api_v1/wheel_sizes"
+  %h2#search_bikes_ref
+    Searching bikes
+    %span.github-link
+      #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/bikes_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/bikes_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/bike_serializer.rb"} on Github
 
-%h3#cycle_types_ref
-  Cycle Types
-  %span.github-link
-    #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/cycle_types_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/cycle_types_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/cycle_type_serializer.rb"} on Github
+  = render partial: "/documentation/api_v1/bikes_search"
 
-= render partial: "/documentation/api_v1/cycle_types"
+  %hr
 
-%h3#frame_materials_ref
-  Frame materials
-  %span.github-link
-    #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/frame_materials_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/frame_materials_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/frame_material_serializer.rb"} on Github
+  %h2#add_bikes_ref
+    Adding bikes
+    %span.github-link
+      #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/bikes_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/bikes_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/bike_serializer.rb"} on Github
 
-= render partial: "/documentation/api_v1/frame_materials"
-
-%h3#handlebar_types_ref
-  Handlebar type
-  %span.github-link
-    #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/handlebar_types_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/handlebar_types_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/handlebar_type_serializer.rb"} on Github
-
-= render partial: "/documentation/api_v1/handlebar_types"
+  = render partial: "/documentation/api_v1/bikes_add"
 
 
-%h3#component_types_ref
-  Component type
-  %span.github-link
-    #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/component_types_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/component_types_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/ctype_serializer.rb"} on Github
+  %hr
 
-= render partial: "/documentation/api_v1/component_types"
+  %h2#bike_attributes_ref
+    Bike Associations
+
+  %p
+    The Bike Index makes searching for and finding bikes easier by using standardized attributes to catalog them.
+
+  %h3#wheel_sizes_ref
+    Wheel Sizes
+    %span.github-link
+      #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/wheel_sizes_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/wheel_sizes_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/wheel_size_serializer.rb"} on Github
+
+  = render partial: "/documentation/api_v1/wheel_sizes"
+
+  %h3#cycle_types_ref
+    Cycle Types
+    %span.github-link
+      #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/cycle_types_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/cycle_types_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/cycle_type_serializer.rb"} on Github
+
+  = render partial: "/documentation/api_v1/cycle_types"
+
+  %h3#frame_materials_ref
+    Frame materials
+    %span.github-link
+      #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/frame_materials_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/frame_materials_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/frame_material_serializer.rb"} on Github
+
+  = render partial: "/documentation/api_v1/frame_materials"
+
+  %h3#handlebar_types_ref
+    Handlebar type
+    %span.github-link
+      #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/handlebar_types_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/handlebar_types_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/handlebar_type_serializer.rb"} on Github
+
+  = render partial: "/documentation/api_v1/handlebar_types"
 
 
-%hr
+  %h3#component_types_ref
+    Component type
+    %span.github-link
+      #{link_to "controller", "https://github.com/bikeindex/bike_index/blob/master/app/controllers/api/v1/component_types_controller.rb"}, #{link_to "tests", "https://github.com/bikeindex/bike_index/blob/master/spec/controllers/api/v1/component_types_controller_spec.rb"} & #{link_to "serializer", "https://github.com/bikeindex/bike_index/blob/master/app/serializers/ctype_serializer.rb"} on Github
 
-%h2#errors
-  Errors
-%p 
-  Bike Index uses conventional HTTP response codes to indicate success or failure of an API request.
-%p
-  Codes in the 2xx range indicate success, codes in the 4xx range indicate an error that resulted from the provided information (e.g. a required parameter was missing), and codes in the 5xx range indicate an error with our servers.
-  
+  = render partial: "/documentation/api_v1/component_types"
+
+
+  %hr
+
+  %h2#errors
+    Errors
+  %p 
+    Bike Index uses conventional HTTP response codes to indicate success or failure of an API request.
+  %p
+    Codes in the 2xx range indicate success, codes in the 4xx range indicate an error that resulted from the provided information (e.g. a required parameter was missing), and codes in the 5xx range indicate an error with our servers.
+    
