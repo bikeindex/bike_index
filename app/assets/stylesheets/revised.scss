@@ -93,7 +93,7 @@ $modal-backdrop-opacity: 0.8;
 
 //
 // Other (non-bootstrap) external styles
-@import "updated_styles/components/zoom.scss";
+@import "legacy_includes/zoom.scss";
 $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 .zoom-overlay { z-index: $zindex-navbar-fixed + 99; }
 .zoom-img-wrap { z-index: $zoom-img-wrap-z-index; }

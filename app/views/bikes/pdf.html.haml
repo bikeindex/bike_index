@@ -155,7 +155,7 @@
                     - if hubs.where(rear: true)
                       - r_hub = hubs.where(rear: true).first
                       - if r_hub.present?
-                        (#{r_hub.model_name} by #{r_hub.manufacturer_name})
+                        (#{r_hub.cmodel_name} by #{r_hub.manufacturer_name})
 
 
     .bike-details
@@ -189,7 +189,7 @@
                   Saddle
                 %td
                   - seat = @bike.components.where(ctype_id: Ctype.find_by_name('saddle').id).first
-                  = seat.model_name if seat.model_name.present?
+                  = seat.cmodel_name if seat.cmodel_name.present?
                   - if seat.manufacturer.present?
                     by
                     = seat.manufacturer.name
