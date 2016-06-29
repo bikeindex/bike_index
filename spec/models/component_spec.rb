@@ -77,7 +77,7 @@ describe Component do
       component = FactoryGirl.create(:component, is_stock: true)
       expect(component.is_stock).to be_truthy
       component.setting_is_stock = true
-      component.model_name = 'New mode'
+      component.cmodel_name = 'New mode'
       component.set_is_stock
       expect(component.is_stock).to be_truthy
     end

@@ -17,7 +17,7 @@ class Component < ActiveRecord::Base
     :rear,
     :front_or_rear
     
-  attr_accessor :front_or_rear, :mnfg_name, :setting_is_stock
+  attr_accessor :front_or_rear, :mnfg_name, :setting_is_stock, :model_name
 
   belongs_to :manufacturer
   belongs_to :ctype
@@ -85,6 +85,4 @@ class Component < ActiveRecord::Base
     return true unless mnfg_name.present?
     self.manufacturer_id = Manufacturer.fuzzy_id(mnfg_name)
   end
-
-
 end
