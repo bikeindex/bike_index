@@ -326,7 +326,7 @@ ALTER SEQUENCE colors_id_seq OWNED BY colors.id;
 
 CREATE TABLE components (
     id integer NOT NULL,
-    model_name character varying(255),
+    cmodel_name character varying(255),
     year integer,
     description text,
     manufacturer_id integer,
@@ -3078,3 +3078,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160509120017');
 INSERT INTO schema_migrations (version) VALUES ('20160529093040');
 
 INSERT INTO schema_migrations (version) VALUES ('20160614112308');
+
+INSERT INTO schema_migrations (version) VALUES ('20160629152210');
+

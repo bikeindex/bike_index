@@ -1,25 +1,6 @@
 class Bike < ActiveRecord::Base
   include ActiveModel::Dirty
   include ActionView::Helpers::SanitizeHelper
-  def self.old_attr_accessible
-    # registered_new - Was this bike registered at point of sale?
-    # made_without_serial - GUARANTEE there was no serial
-    %(registered_new cycle_type_id manufacturer_id manufacturer_other serial_number 
-      serial_normalized has_no_serial made_without_serial additional_registration
-      creation_organization_id location_id manufacturer year thumb_path name stolen
-      current_stolen_record_id recovered frame_material_id frame_model
-      handlebar_type_id handlebar_type_other frame_size frame_size_number
-      frame_size_unit rear_tire_narrow front_wheel_size_id rear_wheel_size_id
-      front_tire_narrow number_of_seats primary_frame_color_id secondary_frame_color_id
-      tertiary_frame_color_id paint_id paint_name propulsion_type_id propulsion_type_other
-      zipcode country_id creation_zipcode belt_drive coaster_brake rear_gear_type_id
-      front_gear_type_id description owner_email stolen_records_attributes date_stolen_input
-      receive_notifications phone creator creator_id image components_attributes b_param_id
-      cached_attributes embeded embeded_extended example hidden card_id stock_photo_url
-      pdf send_email other_listing_urls listing_order approved_stolen marked_user_hidden
-      marked_user_unhidden b_param_id_token is_for_sale)
-  end
-
   mount_uploader :pdf, PdfUploader
   process_in_background :pdf, CarrierWaveProcessWorker
 
@@ -95,29 +76,42 @@ class Bike < ActiveRecord::Base
     associated_against: {ownerships: :owner_email, creator: :email},
     using: {tsearch: {dictionary: "english", prefix: true}}
 
-  def self.text_search(query)
-    if query.present?
-      search(query)
-    else
-      scoped
+  class << self
+    def old_attr_accessible
+      # registered_new - Was this bike registered at point of sale?
+      # made_without_serial - GUARANTEE there was no serial
+      %(registered_new cycle_type_id manufacturer_id manufacturer_other serial_number 
+        serial_normalized has_no_serial made_without_serial additional_registration
+        creation_organization_id location_id manufacturer year thumb_path name stolen
+        current_stolen_record_id recovered frame_material_id frame_model
+        handlebar_type_id handlebar_type_other frame_size frame_size_number
+        frame_size_unit rear_tire_narrow front_wheel_size_id rear_wheel_size_id
+        front_tire_narrow number_of_seats primary_frame_color_id secondary_frame_color_id
+        tertiary_frame_color_id paint_id paint_name propulsion_type_id propulsion_type_other
+        zipcode country_id creation_zipcode belt_drive coaster_brake rear_gear_type_id
+        front_gear_type_id description owner_email stolen_records_attributes date_stolen_input
+        receive_notifications phone creator creator_id image components_attributes b_param_id
+        cached_attributes embeded embeded_extended example hidden card_id stock_photo_url
+        pdf send_email other_listing_urls listing_order approved_stolen marked_user_hidden
+        marked_user_unhidden b_param_id_token is_for_sale)
     end
-  end
+    
+    def text_search(query)
+      query.present? ? search(query) : all
+    end
 
-  def self.admin_text_search(query)
-    if query.present?
-      admin_search(query)
-    else
-      scoped
+    def admin_text_search(query)
+      query.present? ? admin_search(query) : all
     end
-  end
 
-  def self.attr_cache_search(query)
-    return scoped unless query.present? and query.is_a? Array
-    a = []
-    self.find_each do |b|
-      a << b.id if (query - b.cached_attributes).empty?
+    def attr_cache_search(query)
+      return scoped unless query.present? and query.is_a? Array
+      a = []
+      self.find_each do |b|
+        a << b.id if (query - b.cached_attributes).empty?
+      end
+      self.where(id: a)
     end
-    self.where(id: a)
   end
 
   def get_listing_order

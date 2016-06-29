@@ -5,7 +5,7 @@ module Api
       before_filter :authenticate_organization, only: [:create, :stolen_ids]
       skip_before_filter  :verify_authenticity_token
       after_filter :cors_set_access_control_headers
-      caches_action :search_tags
+      # caches_action :search_tags
       # serialization_scope nil
 
       def search_tags

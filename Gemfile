@@ -11,7 +11,7 @@ gem 'rails', '4.2.6'
 
 gem 'pg'
 gem 'jquery-rails'
-gem 'bcrypt-ruby', '~> 3.0.0'
+gem 'bcrypt', '~> 3.1.7'
 gem 'active_model_serializers', '~> 0.9.3'
 gem 'aws-sdk', '~> 1.33'
 
@@ -60,7 +60,6 @@ gem 'httparty'
 gem 'sitemap_generator'
 gem 'paranoia'
 
-gem 'rake'
 gem 'sparkpost' # ruby client for email
 
 # OAuth provider, Grape, associated parts of API V2
@@ -74,7 +73,7 @@ gem 'api-pagination'
 
 # Secure things
 gem 'rack-throttle'
-gem 'secure_headers'
+gem 'secure_headers', require: 'secure_headers'
 
 # Frontend
 gem 'backbone-on-rails', '~>0.9.10.0' 
@@ -92,6 +91,8 @@ gem 'memory_profiler', require: false
 gem 'flamegraph', require: false
 gem 'rack-mini-profiler', require: false # If you can't see it you can't make it better
 
+
+gem 'responders', '~> 2.0' # required because of class level respond_to blocks (API v1)
 
 gem 'bundler', '>= 1.8.4' # required for rails-assets.org - JS and CSS assets
 source 'https://rails-assets.org' do # JS land is crazy, so lock everything

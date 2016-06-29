@@ -42,7 +42,7 @@ describe Bike do
 
   describe 'scopes' do
     it 'default scopes to created_at desc' do
-      expect(Bike.all.to_sql).to eq(Bike.where(example: false).where(hidden: false).order('listing_order desc').to_sql)
+      expect(Bike.all.to_sql).to eq(Bike.unscoped.where(example: false, hidden: false).order('listing_order desc').to_sql)
     end
     it 'scopes to only stolen bikes' do
       expect(Bike.stolen.to_sql).to eq(Bike.where(stolen: true).to_sql)
@@ -99,14 +99,14 @@ describe Bike do
       query = ["1c#{bike.primary_frame_color_id}"]
       result = Bike.attr_cache_search(query)
       expect(result.first).to eq(bike)
-      expect(result.class).to eq(ActiveRecord::Relation)
+      expect(result.class).to eq(Bike::ActiveRecord_Relation)
     end
     it 'finds bikes by wheel size' do
       bike = FactoryGirl.create(:bike)
       query = ["1w#{bike.rear_wheel_size_id}"]
       result = Bike.attr_cache_search(query)
       expect(result.first).to eq(bike)
-      expect(result.class).to eq(ActiveRecord::Relation)
+      expect(result.class).to eq(Bike::ActiveRecord_Relation)
     end
   end
 

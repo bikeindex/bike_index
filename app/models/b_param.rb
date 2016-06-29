@@ -83,22 +83,22 @@ class BParam < ActiveRecord::Base
 
   def set_cycle_type_key
     if bike[:cycle_type_name].present?
-      ct = CycleType.find(:first, conditions: [ "lower(name) = ?", bike[:cycle_type_name].downcase.strip ])
+      ct = CycleType.where('lower(name) = ?', bike[:cycle_type_name].downcase.strip).first
     else
-      ct = CycleType.find(:first, conditions: [ "slug = ?", bike[:cycle_type_slug].downcase.strip ])
+      ct = CycleType.where('slug = ?', bike[:cycle_type_slug].downcase.strip).first
     end
     params[:bike][:cycle_type_id] = ct.id if ct.present?
     params[:bike].delete(:cycle_type_slug) || params[:bike].delete(:cycle_type_name)
   end
 
   def set_frame_material_key
-    fm = FrameMaterial.find(:first, conditions: [ "slug = ?", bike[:frame_material_slug].downcase.strip ])
+    fm = FrameMaterial.where("slug = ?", bike[:frame_material_slug].downcase.strip).first
     params[:bike][:frame_material_id] = fm.id if fm.present?
     params[:bike].delete(:frame_material_slug)
   end
 
   def set_handlebar_type_key
-    ht = HandlebarType.find(:first, conditions: [ "slug = ?", bike[:handlebar_type_slug].downcase.strip ])
+    ht = HandlebarType.where("slug = ?", bike[:handlebar_type_slug].downcase.strip).first
     params[:bike][:handlebar_type_id] = ht.id if ht.present?
     params[:bike].delete(:handlebar_type_slug)
   end

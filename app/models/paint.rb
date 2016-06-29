@@ -17,11 +17,7 @@ class Paint < ActiveRecord::Base
   before_save { |p| p.name = p.name.downcase.strip }
 
   def self.fuzzy_name_find(n)
-    if !n.blank?
-      self.find(:first, conditions: [ "lower(name) = ?", n.downcase.strip ])
-    else
-      nil
-    end
+    n && where('lower(name) = ?', n.downcase.strip).first
   end
 
   before_create :associate_colors

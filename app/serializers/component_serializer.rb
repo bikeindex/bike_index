@@ -9,4 +9,8 @@ class ComponentSerializer < ActiveModel::Serializer
     :manufacturer_name,
     :model_name,
     :year
+
+  def model_name
+    object.cmodel_name
+  end
 end
