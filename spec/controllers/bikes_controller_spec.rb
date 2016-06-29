@@ -800,7 +800,7 @@ describe BikesController do
           expect(current_stolen_record.phone).to eq '9999999999'
           # expect(current_stolen_record.city).to eq 'party'
           expect(current_stolen_record.street).to eq '66666666 foo street'
-          expect(current_stolen_record.date_stolen).to eq DateTime.strptime('02-22-2016 06', '%m-%d-%Y %H')
+          expect(current_stolen_record.date_stolen).to be_within(1.second).of DateTime.strptime('02-22-2016 06', '%m-%d-%Y %H')
         end
       end
     end

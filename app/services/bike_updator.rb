@@ -55,7 +55,7 @@ class BikeUpdator
     if @bike_params[:bike] && @bike_params[:bike][:date_stolen_input]
       StolenRecordUpdator.new(bike: @bike, date_stolen_input: @bike_params[:bike][:date_stolen_input]).update_records
     else
-      if @bike_params[:stolen_record].present?
+      if @bike_params[:stolen_record] || @bike_params[:bike][:stolen_records_attributes]
         StolenRecordUpdator.new(bike: @bike, b_param: @bike_params).update_records
         @bike.reload
       elsif @currently_stolen != @bike.stolen
@@ -86,7 +86,7 @@ class BikeUpdator
     set_protected_attributes
     update_ownership
     update_api_components if @bike_params[:components].present?
-    update_stolen_record if @bike.update_attributes(@bike_params[:bike])
+    update_stolen_record if @bike.update_attributes(@bike_params[:bike].except(:stolen_records_attributes))
     if @bike.present?
       ListingOrderWorker.perform_async(@bike.id) # run immediately
       ListingOrderWorker.perform_in(60.seconds, @bike.id) # also later in case uploads or something.

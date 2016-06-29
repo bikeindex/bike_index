@@ -6,7 +6,7 @@ class StolenRecord < ActiveRecord::Base
     # recovery_tweet, # We edit this in the admin panel
     # date_stolen_input # now putting this in here, on revised, because less stupid
     %w(police_report_number police_report_department locking_description lock_defeat_description
-       date_stolen bike creation_organization_id country_id state_id street zipcode city latitude
+       date_stolen date_stolen_input bike creation_organization_id country_id state_id street zipcode city latitude
        longitude theft_description current phone secondary_phone phone_for_everyone
        phone_for_users phone_for_shops phone_for_police receive_notifications proof_of_ownership
        approved date_recovered recovered_description index_helped_recovery can_share_recovery
@@ -22,7 +22,7 @@ class StolenRecord < ActiveRecord::Base
   belongs_to :state
   belongs_to :creation_organization, class_name: "Organization"
 
-  validates_presence_of :bike, :date_stolen
+  validates_presence_of :bike
 
   default_scope { where(current: true) }
   scope :approveds, -> { where(approved: true) }
