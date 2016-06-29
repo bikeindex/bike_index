@@ -190,7 +190,7 @@ $row-side-padding: 0.9375rem;
 @import "revised/pages/news/show";
 
 // Home styles
-@import "updated_styles/components/slick.scss"; // legacy carousel, delete when it's gone!
+@import "legacy_includes/slick.scss"; // legacy carousel, delete when it's gone!
 @import "revised/pages/home/home";
 @import "revised/pages/home/supporters";
 @import "revised/pages/home/testimonials";
