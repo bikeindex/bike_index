@@ -1,12 +1,12 @@
-@import "includes/selectize_bootstrap3.scss";
+@import "legacy_includes/selectize_bootstrap3.scss";
 .control-group .selectize-control { width: 210px; }
-@import "application_styles/_colors.scss";
-@import "includes/bootstrap/_variables.scss";
-@import "includes/bootstrap/_mixins.scss";
-@import "includes/bootstrap/component-animations.scss";
-@import "includes/bootstrap/dropdowns.scss";
-@import "includes/embed_form_styles.scss";
-@import "includes/datepicker.scss";
+@import "legacy_includes/_colors.scss";
+@import "legacy_includes/_variables.scss";
+@import "legacy_includes/_mixins.scss";
+@import "legacy_includes/component-animations.scss";
+@import "legacy_includes/dropdowns.scss";
+@import "legacy_includes/embed_form_styles.scss";
+@import "legacy_includes/datepicker.scss";
 $newStolenColor: #D25627;
 
 #bi_embed {
