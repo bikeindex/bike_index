@@ -3,7 +3,7 @@
   - other_mnfg_show = (f.object.manufacturer_id == @manufacturer_other_id) ? 'unhidden' : ''
   - ctype_id = f.object.ctype_id
   - other_ctype_show = ctype_id == @ctype_other_id ? 'unhidden' : ''
-  - other_model_show = (f.object.model_name.present?) ? 'unhidden' : ''
+  - other_model_show = (f.object.cmodel_name.present?) ? 'unhidden' : ''
   .right-input-help.remove-part
     = f.label :_destroy do
       %span.context-display-help
@@ -49,9 +49,9 @@
 
   .related-fields
     .form-group.row
-      = f.label :model_name, 'Model', class: 'form-well-label'
+      = f.label :cmodel_name, 'Model', class: 'form-well-label'
       .form-well-input.form-well-input.component_model
-        = f.text_field :model_name, class: 'form-control'
+        = f.text_field :cmodel_name, class: 'form-control'
     .form-group.row.hidden-other{ class: other_model_show }
       = f.label :year, 'Model Year', class: 'form-well-label'
       .form-well-input

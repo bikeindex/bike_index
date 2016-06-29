@@ -1,6 +1,6 @@
 class Component < ActiveRecord::Base
   include ActiveModel::Dirty
-  attr_accessible :model_name,
+  attr_accessible :cmodel_name,
     :year,
     :ctype,
     :ctype_id,
@@ -74,7 +74,7 @@ class Component < ActiveRecord::Base
   before_save :set_is_stock
   def set_is_stock
     return true if setting_is_stock
-    if id.present? && is_stock && description_changed? || model_name_changed?
+    if id.present? && is_stock && description_changed? || cmodel_name_changed?
       self.is_stock = false
     end
     true

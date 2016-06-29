@@ -69,7 +69,7 @@ describe Component do
     it 'sets not stock if model_name changed' do
       component = FactoryGirl.create(:component, is_stock: true)
       expect(component.is_stock).to be_truthy
-      component.model_name = 'New mode'
+      component.cmodel_name = 'New mode'
       component.set_is_stock
       expect(component.is_stock).to be_falsey
     end
