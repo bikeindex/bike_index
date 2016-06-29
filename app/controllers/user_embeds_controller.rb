@@ -12,5 +12,4 @@ class UserEmbedsController < ApplicationController
     end
     @bikes = BikeDecorator.decorate_collection(bikes)
   end
-
 end

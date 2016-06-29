@@ -33,7 +33,8 @@ gem 'i18n'
 gem 'hamlit'
 gem 'haml-rails'
 gem 'journey', '~> 1.0.3'
-gem 'kramdown'
+gem 'kramdown' # Markdown
+gem 'redcarpet' # Something to do with swagger? Guess we needed another markdown parser
 gem 'kaminari' # pagination
 gem 'pg_search'
 gem 'nokogiri'

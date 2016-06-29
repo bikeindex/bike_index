@@ -7,7 +7,7 @@ class OrganizationDealsController < ApplicationController
   end
 
   def create
-    @organization_deal = OrganizationDeal.new(params[:organization_deal])
+    @organization_deal = OrganizationDeal.new(permitted_parameters)
     if @organization_deal.save
       flash[:notice] = "Thank you! We will contact the shop and register your bike on the Index!"
       redirect_to about_url
@@ -16,5 +16,9 @@ class OrganizationDealsController < ApplicationController
     end
   end
 
+  private
 
+  def permitted_parameters
+    params.require(:organization_deal).permit(OrganizationDeal.old_attr_accessible)
+  end
 end

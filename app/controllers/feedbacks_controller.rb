@@ -11,7 +11,7 @@ class FeedbacksController < ApplicationController
   end
 
   def create
-    @feedback = Feedback.new(params[:feedback])
+    @feedback = Feedback.new(permitted_parameters)
     if @feedback.save
       if @feedback.feedback_type == 'spokecard'
         flash[:notice] = "Thanks! We'll tell you as soon as we link your bike."
@@ -32,5 +32,11 @@ class FeedbacksController < ApplicationController
 
   def set_feedback_active_section
     @active_section = 'contact'
+  end
+
+  protected
+
+  def permitted_parameters
+    params.require(:feedback).permit(Feedback.old_attr_accessible)
   end
 end

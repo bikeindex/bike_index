@@ -10,6 +10,7 @@ class SessionsController < ApplicationController
   end
 
   def create
+    pp params[:session]
     @user = User.fuzzy_email_find(params[:session][:email])
     if @user.present?
       if @user.confirmed?
@@ -45,6 +46,4 @@ class SessionsController < ApplicationController
     end
     redirect_to goodbye_url(subdomain: false), notice: 'Logged out!'
   end
-
-
 end
