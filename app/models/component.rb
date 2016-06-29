@@ -4,8 +4,11 @@ class Component < ActiveRecord::Base
     %w(cmodel_name year ctype ctype_id ctype_other manufacturer manufacturer_id mnfg_name
        manufacturer_other description bike_id bike serial_number front rear front_or_rear)
   end
-    
-  attr_accessor :front_or_rear, :mnfg_name, :setting_is_stock, :model_name
+
+  attr_accessor :front_or_rear, :mnfg_name, :setting_is_stock
+  def model_name=(val)
+    self.cmodel_name = val
+  end
 
   belongs_to :manufacturer
   belongs_to :ctype
