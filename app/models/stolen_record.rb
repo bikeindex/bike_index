@@ -10,7 +10,7 @@ class StolenRecord < ActiveRecord::Base
        longitude theft_description current phone secondary_phone phone_for_everyone
        phone_for_users phone_for_shops phone_for_police receive_notifications proof_of_ownership
        approved date_recovered recovered_description index_helped_recovery can_share_recovery
-       recovery_posted tsved_at)
+       recovery_posted tsved_at).map(&:to_sym).freeze
  end
 
   attr_accessor :date_stolen_input

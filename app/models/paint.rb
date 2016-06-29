@@ -1,6 +1,6 @@
 class Paint < ActiveRecord::Base
   def self.old_attr_accessible
-    %w(name color_id secondary_color_id tertiary_color_id manufacturer_id)
+    %w(name color_id secondary_color_id tertiary_color_id manufacturer_id).map(&:to_sym).freeze
   end
 
   validates_presence_of :name

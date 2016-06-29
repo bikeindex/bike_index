@@ -1,7 +1,7 @@
 class Ownership < ActiveRecord::Base
   def self.old_attr_accessible
     # :user_id # is the owner
-    %w(owner_email bike_id creator_id current user_id claimed example user_hidden send_email)
+    %w(owner_email bike_id creator_id current user_id claimed example user_hidden send_email).map(&:to_sym).freeze
   end
 
   attr_accessor :creator_email, :user_email

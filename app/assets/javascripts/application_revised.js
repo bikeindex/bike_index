@@ -12,8 +12,8 @@
 //= require Stickyfill
 //= require selectize/standalone/selectize.js
 //= require external_scripts/selectize_placeholder_plugin.js
-//= require headroom.js
-//= require headroom.js/jQuery.headroom.js
+//= require external_scripts/headroom
+//= require external_scripts/jQuery.headroom
 //= require pikaday
 //= require external_scripts/zoom.js
 //= require dataTables/jquery.dataTables

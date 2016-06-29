@@ -103,7 +103,6 @@ source 'https://rails-assets.org' do # JS land is crazy, so lock everything
   gem 'rails-assets-mustache', '~> 2.2.1'
   gem 'rails-assets-jquery.dirtyforms', '~> 2.0.0' # Alert on attempts to leave with dirt on forms
   gem 'rails-assets-selectize', '~> 0.12.1' # Manually configured scss
-  gem 'rails-assets-headroom.js', '~> 0.7.0' # Would prefer 0.8 but it isn't on rails-assets yet
   gem 'rails-assets-pikaday', '~> 1.4.0' # Datepicker
   gem 'rails-assets-Stickyfill', '~> 1.1.3' # Affix bike edit menu
   # Sortable breaks assets:precompile, so it's included manually

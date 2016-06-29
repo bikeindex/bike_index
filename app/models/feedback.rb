@@ -1,6 +1,6 @@
 class Feedback < ActiveRecord::Base
   def self.old_attr_accessible
-    %w(body email name title feedback_type feedback_hash)
+    %w(body email name title feedback_type feedback_hash).map(&:to_sym).freeze
   end
 
   validates_presence_of :body, :email, :title

@@ -1,6 +1,6 @@
 class PublicImage < ActiveRecord::Base
   def self.old_attr_accessible
-    %w(image name imageable listing_order remote_image_url is_private)
+    %w(image name imageable listing_order remote_image_url is_private).map(&:to_sym).freeze
   end
 
   mount_uploader :image, ImageUploader

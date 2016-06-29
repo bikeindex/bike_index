@@ -1,6 +1,6 @@
 class Country < ActiveRecord::Base
   def self.old_attr_accessible
-    %w(name iso)
+    %w(name iso).map(&:to_sym).freeze
   end
   validates_presence_of :name
   validates_uniqueness_of :name

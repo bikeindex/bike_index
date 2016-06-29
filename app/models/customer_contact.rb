@@ -1,6 +1,6 @@
 class CustomerContact < ActiveRecord::Base
   def self.old_attr_accessible
-    %w(title body user_id user_email creator_email creator_id contact_type bike_id info_hash)
+    %w(title body user_id user_email creator_email creator_id contact_type bike_id info_hash).map(&:to_sym).freeze
   end
 
   validates_presence_of :title

@@ -2,7 +2,7 @@ class Ctype < ActiveRecord::Base
   # Note: Ctype is short for component_type.
   # The name had to be shortened because of join table key length
   def self.old_attr_accessible
-    %w(name slug secondary_name image image_cache cgroup_id cgroup has_multiple cgroup_name)
+    %w(name slug secondary_name image image_cache cgroup_id cgroup has_multiple cgroup_name).map(&:to_sym).freeze
   end
 
   attr_accessor :cgroup_name

@@ -25,7 +25,7 @@ class Manufacturer < ActiveRecord::Base
   class << self
     def old_attr_accessible
     %w(name slug website frame_maker open_year close_year logo remote_logo_url
-       logo_cache logo_source description)
+       logo_cache logo_source description).map(&:to_sym).freeze
     end
 
     def fuzzy_name_find(n)

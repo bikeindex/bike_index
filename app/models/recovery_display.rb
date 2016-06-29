@@ -1,7 +1,7 @@
 class RecoveryDisplay < ActiveRecord::Base
   def self.old_attr_accessible
     %w(stolen_record_id quote quote_by date_recovered link image remote_image_url
-       date_input remove_image)
+       date_input remove_image).map(&:to_sym).freeze
   end
 
   validates_presence_of :quote, :date_recovered

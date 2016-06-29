@@ -1,7 +1,7 @@
 class Cgroup < ActiveRecord::Base
   # Note: Cgroup is short for component_group
   def self.old_attr_accessible
-    %w(name slug description)
+    %w(name slug description).map(&:to_sym).freeze
   end
 
   validates_presence_of :name

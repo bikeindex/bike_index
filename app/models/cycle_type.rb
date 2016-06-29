@@ -1,7 +1,7 @@
 class CycleType < ActiveRecord::Base
   # Defines things like unicycles and recumbent
   def self.old_attr_accessible
-    %w(name slug)
+    %w(name slug).map(&:to_sym).freeze
   end
 
   validates_presence_of :name, :slug

@@ -1,6 +1,6 @@
 class OtherListing < ActiveRecord::Base
   def self.old_attr_accessible
-    %w(bike_id url listing_type)
+    %w(bike_id url listing_type).map(&:to_sym).freeze
   end
 
   belongs_to :bike

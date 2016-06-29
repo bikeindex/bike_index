@@ -1,7 +1,7 @@
 class StolenNotification < ActiveRecord::Base
   def self.old_attr_accessible
     %w(subject reference_url message sender receiver bike_id bike receiver_email
-       send_dates application_id)
+       send_dates application_id).map(&:to_sym).freeze
   end
 
   belongs_to :bike

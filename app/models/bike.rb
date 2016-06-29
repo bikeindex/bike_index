@@ -93,7 +93,7 @@ class Bike < ActiveRecord::Base
         receive_notifications phone creator creator_id image components_attributes b_param_id
         cached_attributes embeded embeded_extended example hidden card_id stock_photo_url
         pdf send_email other_listing_urls listing_order approved_stolen marked_user_hidden
-        marked_user_unhidden b_param_id_token is_for_sale)
+        marked_user_unhidden b_param_id_token is_for_sale).map(&:to_sym).freeze
     end
     
     def text_search(query)

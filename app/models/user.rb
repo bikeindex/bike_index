@@ -10,7 +10,7 @@ class User < ActiveRecord::Base
        vendor_terms_of_service when_vendor_terms_of_service phone zipcode title my_bikes_hash
        avatar avatar_cache description twitter show_twitter website show_website show_bikes
        show_phone has_stolen_bikes can_send_many_stolen_notifications my_bikes_link_target
-       my_bikes_link_title is_emailable additional_emails)
+       my_bikes_link_title is_emailable additional_emails).map(&:to_sym).freeze
  end
 
   attr_accessor :my_bikes_link_target, :my_bikes_link_title, :current_password
