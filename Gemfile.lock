@@ -349,6 +349,11 @@ GEM
     inflecto (0.0.2)
     ipaddress (0.8.3)
     journey (1.0.4)
+    jquery-datatables-rails (3.4.0)
+      actionpack (>= 3.1)
+      jquery-rails
+      railties (>= 3.1)
+      sass-rails
     jquery-rails (4.1.1)
       rails-dom-testing (>= 1, < 3)
       railties (>= 4.2.0)
@@ -593,7 +598,7 @@ GEM
     sprockets (3.6.2)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
-    sprockets-rails (3.1.0)
+    sprockets-rails (3.0.4)
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
@@ -674,6 +679,7 @@ DEPENDENCIES
   httparty
   i18n
   journey (~> 1.0.3)
+  jquery-datatables-rails (~> 3.4.0)
   jquery-rails
   kaminari
   kramdown
@@ -713,7 +719,6 @@ DEPENDENCIES
   rspec (~> 3.3.0)
   rspec-rails (~> 3.3.0)
   rspec-sidekiq
-  sass-rails
   secure_headers
   shoulda-matchers (~> 2.8.0)
   sidekiq (~> 4.1.1)
@@ -722,6 +727,7 @@ DEPENDENCIES
   sitemap_generator
   soulheart (~> 0.2.6)
   sparkpost
+  sprockets-rails (~> 3.0.4)
   stackprof
   stripe!
   swagger-ui_rails

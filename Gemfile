@@ -4,7 +4,6 @@ ruby '2.2.3'
 # gem 'rails', '3.2.22'
 # gem 'rake', '< 11' # OLD V - # Locked to remove validation errors
 # gem 'eventmachine', '~> 1.0.3' # OLD V
-# gem 'jquery-datatables-rails', '~>3.4.0' # DISABLED OLD V - SHOULD BE RE
 # gem 'unicorn'
 # gem 'unicorn-worker-killer'
 gem 'rails', '4.2.6'
@@ -80,10 +79,13 @@ gem 'backbone-on-rails', '~>0.9.10.0'
 gem 'chartkick' # Display charts
 gem 'groupdate'
 gem 'bootstrap', '~> 4.0.0.alpha3' # Bootstrap 4 - used for revised stylesheets
-gem 'sass-rails'
+
+gem 'sprockets-rails', '~> 3.0.4'
+# gem 'sass-rails'
 gem 'coffee-rails'
 gem 'therubyracer'
 gem 'uglifier'
+gem 'jquery-datatables-rails', '~>3.4.0'
 
 # Show performance metrics
 gem 'stackprof', require: false

@@ -1,5 +1,5 @@
 class DocumentationController < ApplicationController
-  caches_page :api_v1
+  # caches_page :api_v1
 
   def index
     redirect_to controller: :documentation, action: :api_v2
