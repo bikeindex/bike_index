@@ -1,4 +1,5 @@
 class ErrorsController < ApplicationController
+  respond_to :html, :xml, :json
   layout 'application_revised'
  
   def bad_request
