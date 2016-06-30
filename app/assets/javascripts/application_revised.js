@@ -1,7 +1,7 @@
 // Using bootstrap 4.0 - it's a gem, so it isn't through rails-assets.
 //
 // require self
-//= require jquery
+//= require jquery2
 //= require jquery_ujs
 //= require lodash
 //= require tether

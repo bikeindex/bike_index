@@ -73,7 +73,7 @@ gem 'api-pagination'
 
 # Secure things
 gem 'rack-throttle'
-gem 'secure_headers', require: 'secure_headers'
+gem 'secure_headers', '~> 2.5.0'
 
 # Frontend
 gem 'backbone-on-rails', '~>0.9.10.0' 
