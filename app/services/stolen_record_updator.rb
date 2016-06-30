@@ -36,7 +36,7 @@ class StolenRecordUpdator
   end
 
   def create_date_from_input(date_formatted)
-    DateTime.strptime("#{date_formatted} 06", '%A %b %d %Y %H')
+    DateTime.strptime("#{date_formatted} 06", StolenRecord.revised_date_format_hour)
   end
 
   def update_records

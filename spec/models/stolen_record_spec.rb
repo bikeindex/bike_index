@@ -3,7 +3,6 @@ require 'spec_helper'
 describe StolenRecord do
   describe 'validations' do
     it { is_expected.to validate_presence_of :bike }
-    it { is_expected.to validate_presence_of :date_stolen }
     it { is_expected.to belong_to :bike }
     it { is_expected.to have_one :recovery_display }
     it { is_expected.to belong_to :country }
@@ -49,6 +48,29 @@ describe StolenRecord do
   end
 
   it 'only allows one current stolen record per bike'
+
+  describe 'date_present' do
+    let(:bike) { Bike.new }
+    context 'both date_stolen and date_stolen_input absent' do
+      it 'adds an error' do
+        stolen_record = StolenRecord.new(bike: bike)
+        expect(stolen_record.valid?).to be_falsey
+        expect(stolen_record.errors.full_messages.to_s).to match 'date stolen'
+      end
+    end
+    context 'date_stolen present' do
+      it 'is valid' do
+        stolen_record = StolenRecord.new(bike: bike, date_stolen: Date.yesterday)
+        expect(stolen_record.valid?).to be_truthy
+      end
+    end
+    context 'date_stolen_input present' do
+      it 'is valid' do
+        stolen_record = StolenRecord.new(bike: bike, date_stolen_input: 'Mon Feb 22 2016')
+        expect(stolen_record.valid?).to be_truthy
+      end
+    end
+  end
 
   describe 'address' do
     it 'creates an address' do

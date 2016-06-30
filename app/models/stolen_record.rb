@@ -23,6 +23,12 @@ class StolenRecord < ActiveRecord::Base
   belongs_to :creation_organization, class_name: "Organization"
 
   validates_presence_of :bike
+  validate :date_present
+  def date_present
+    unless date_stolen.present? || date_stolen_input.present?
+      errors.add :base, 'You need to include the date stolen'
+    end
+  end
 
   default_scope { where(current: true) }
   scope :approveds, -> { where(approved: true) }
@@ -42,10 +48,14 @@ class StolenRecord < ActiveRecord::Base
     '%a %b %d %Y'
   end
 
+  def self.revised_date_format_hour
+    "#{revised_date_format} %H"
+  end
+
   before_validation :date_from_date_stolen_input
   def date_from_date_stolen_input
     if date_stolen_input.present?
-      self.date_stolen = DateTime.strptime("#{date_stolen_input} 06", "#{self.class.revised_date_format} %H")
+      self.date_stolen = DateTime.strptime("#{date_stolen_input} 06", self.class.revised_date_format_hour)
     else
       true
     end

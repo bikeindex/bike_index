@@ -103,7 +103,7 @@ describe OrganizationsController do
       FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
       get :embed_extended, id: organization.slug, email: 'something@example.com'
       expect(response.code).to eq('200')
-      expect(response).to render_template(:embed)
+      expect(response).to render_template(:embed_extended)
       expect(response.headers['X-Frame-Options']).not_to be_present
       expect(assigns(:persist_email)).to be_truthy
     end
