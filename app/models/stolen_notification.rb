@@ -43,4 +43,7 @@ class StolenNotification < ActiveRecord::Base
     subject || default_subject
   end
 
+  def send_dates_parsed
+    send_dates && JSON.parse(send_dates) || []
+  end
 end
