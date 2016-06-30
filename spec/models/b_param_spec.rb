@@ -65,10 +65,10 @@ describe BParam do
       }
       b_param = BParam.new(params: p, api_v2: true)
       b_param.massage_if_v2
-      k = b_param.params[:bike]
-      expect(k.keys.include?(:serial_number)).to be_truthy
-      expect(k.keys.include?(:manufacturer)).to be_truthy
-      expect(k.keys.length).to eq(3)
+      new_params = b_param.bike
+      expect(new_params.keys.include?('serial_number')).to be_truthy
+      expect(new_params.keys.include?('manufacturer')).to be_truthy
+      expect(new_params.keys.length).to eq(3)
       expect(b_param.params[:test]).to be_truthy
       expect(b_param.params[:stolen]).to be_falsey
       expect(b_param.params[:stolen_record]).not_to be_present

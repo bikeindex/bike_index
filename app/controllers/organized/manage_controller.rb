@@ -9,7 +9,7 @@ module Organized
     end
 
     def update
-      if @organization.update_attributes(permitted_params)
+      if @organization.update_attributes(permitted_parameters)
         flash[:success] = "#{current_organization.name} updated successfully"
         redirect_path = params[:locations_page] ? locations_organization_manage_index_path(organization_id: current_organization.to_param) : current_index_path
         redirect_to redirect_path
@@ -45,7 +45,7 @@ module Organized
       organization_manage_index_path(organization_id: current_organization.to_param)
     end
 
-    def permitted_params
+    def permitted_parameters
       params.require(:organization).permit(:name, :website, :org_type, show_on_map_if_permitted,
                                            :embedable_user_email, paid_attributes,
                                            locations_attributes: permitted_locations_params)

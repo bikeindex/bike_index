@@ -62,7 +62,8 @@ describe Bike do
       bike = o.bike
       recovered_2 = FactoryGirl.create(:stolen_record, bike: bike, current: false)
       recovered_1 = FactoryGirl.create(:stolen_record, bike: bike, current: false, date_stolen: (Time.now - 1.day))
-      expect(bike.reload.recovered_records.first).to eq(recovered_2)
+      bike.reload
+      expect(bike.recovered_records.first).to eq(recovered_2)
     end
   end
 
@@ -494,7 +495,7 @@ describe Bike do
   end
 
   describe 'cache_stolen_attributes' do
-    context 'current_stolen_record with lat and long' do 
+    context 'current_stolen_record with lat and long' do
       it 'saves the stolen description to all description and set stolen_rec_id' do
         stolen_record = FactoryGirl.create(:stolen_record, theft_description: 'some theft description', latitude: 40.7143528, longitude: -74.0059731)
         bike = stolen_record.bike

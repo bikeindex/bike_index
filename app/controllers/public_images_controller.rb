@@ -10,7 +10,7 @@ class PublicImagesController < ApplicationController
   end
 
   def create
-    @public_image = PublicImage.new(permitted_params)
+    @public_image = PublicImage.new(permitted_parameters)
     if params[:bike_id].present?
       @public_image.imageable = @bike
       @public_image.save
@@ -34,7 +34,7 @@ class PublicImagesController < ApplicationController
   end
 
   def update
-    if @public_image.update_attributes(permitted_params)
+    if @public_image.update_attributes(permitted_parameters)
       redirect_to edit_bike_url(@public_image.imageable), notice: 'Image was successfully updated.'
     else
       render :edit
@@ -90,7 +90,7 @@ class PublicImagesController < ApplicationController
     end
   end
 
-  def permitted_params
+  def permitted_parameters
     params.require(:public_image).permit(PublicImage.old_attr_accessible)
   end
 

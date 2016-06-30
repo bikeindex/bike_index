@@ -1,7 +1,7 @@
 class Admin::FlavorTextsController < Admin::BaseController
 
   def create
-    @flavor_text = FlavorText.new(permitted_params)
+    @flavor_text = FlavorText.new(permitted_parameters)
     if @flavor_text.save
       flash[:success] = "Flavor Created!"
       redirect_to admin_root_url

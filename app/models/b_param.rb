@@ -1,9 +1,5 @@
 # b_param stands for Bike param
 class BParam < ActiveRecord::Base
-  # def self.old_attr_accessible 
-  #   %w(params creator_id bike_title created_bike_id bike_errors image image_processed api_v2).map(&:to_sym).freeze
-  # end
-
   attr_accessor :api_v2
 
   mount_uploader :image, ImageUploader
