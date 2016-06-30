@@ -62,8 +62,10 @@ describe Bike do
       bike = o.bike
       recovered_2 = FactoryGirl.create(:stolen_record, bike: bike, current: false)
       recovered_1 = FactoryGirl.create(:stolen_record, bike: bike, current: false, date_stolen: (Time.now - 1.day))
-      Bike.find(bike.id).recovered_records
-      expect(Bike.find(bike.id).recovered_records.first).to eq(recovered_2)
+      reloaded_bike = Bike.find(bike.id)
+      pp reloaded_bike.recovered_records
+      expect(reloaded_bike.recovered_records.count).to eq 2
+      expect(reloaded_bike.recovered_records.first).to eq(recovered_2)
     end
   end
 
