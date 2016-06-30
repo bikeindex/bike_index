@@ -52,7 +52,7 @@ describe Admin::BikesController do
         expect_any_instance_of(BikeUpdator).to receive(:update_ownership)
         expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
         bike = FactoryGirl.create(:bike)
-        put :update, id: bike.id
+        put :update, id: bike.id, bike: { serial: 'new thing and stuff' }
         expect(response).to redirect_to(:edit_admin_bike)
         expect(flash).to be_present
       end

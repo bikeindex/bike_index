@@ -65,9 +65,9 @@ gem 'sparkpost' # ruby client for email
 # OAuth provider, Grape, associated parts of API V2
 gem 'doorkeeper'
 gem 'wine_bouncer'
-gem 'grape'
+gem 'grape', '~> 0.13.0'
 gem 'grape-active_model_serializers', git: 'https://github.com/jrhe/grape-active_model_serializers'
-gem 'grape-swagger'
+gem 'grape-swagger', '~> 0.10.4'
 gem 'swagger-ui_rails'
 gem 'api-pagination'
 

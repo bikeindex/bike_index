@@ -35,9 +35,9 @@ class Admin::StolenBikesController < Admin::BaseController
   end
 
   def update
-    BikeUpdator.new(user: current_user, b_params: params).update_ownership
+    BikeUpdator.new(user: current_user, bike: @bike, b_params: { bike: permitted_parameters }).update_ownership
     @bike = @bike.decorate
-    if @bike.update_attributes(params[:bike])
+    if @bike.update_attributes(permitted_parameters)
       SerialNormalizer.new({serial: @bike.serial_number}).save_segments(@bike.id)
       redirect_to edit_admin_stolen_bike_url(@bike), notice: 'Bike was successfully updated.'
     else
@@ -46,6 +46,10 @@ class Admin::StolenBikesController < Admin::BaseController
   end
 
   protected
+
+  def permitted_parameters
+    params.require(:bike).permit(Bike.old_attr_accessible)
+  end
 
   def find_bike
     @bike = Bike.unscoped.find(params[:id])

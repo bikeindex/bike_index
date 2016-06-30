@@ -19,7 +19,7 @@ class Admin::ManufacturersController < Admin::BaseController
   end
 
   def update
-    if @manufacturer.update_attributes(params[:manufacturer])
+    if @manufacturer.update_attributes(permitted_parameters)
       flash[:success] = 'Manufacturer Saved!'
       expire_fragment 'header_search'
       AutocompleteLoaderWorker.perform_async('load_manufacturers')
@@ -30,7 +30,7 @@ class Admin::ManufacturersController < Admin::BaseController
   end
 
   def create
-    @manufacturer = Manufacturer.create(params[:manufacturer])
+    @manufacturer = Manufacturer.create(permitted_parameters)
     if @manufacturer.save
       flash[:success] = 'Manufacturer Created!'
       expire_fragment 'header_search'
@@ -59,6 +59,10 @@ class Admin::ManufacturersController < Admin::BaseController
   end
 
   protected
+
+  def permitted_parameters
+    params.require(:manufacturer).permit(Manufacturer.old_attr_accessible)
+  end
 
   def find_manufacturer
     @manufacturer = Manufacturer.find_by_slug(params[:id])

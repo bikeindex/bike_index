@@ -32,7 +32,7 @@ describe Admin::StolenBikesController do
         expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
         ownership = FactoryGirl.create(:ownership)
         bike = ownership.bike
-        put :update, id: bike.id
+        put :update, id: bike.id, bike: { serial_number: 'stuff' }
         expect(response).to redirect_to(:edit_admin_stolen_bike)
         expect(flash).to be_present
       end

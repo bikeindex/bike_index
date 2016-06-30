@@ -49,7 +49,7 @@ class BParam < ActiveRecord::Base
   end
 
   def self.v2_params(hash)
-    h = { bike: hash }
+    h = { bike: hash.with_indifferent_access }
     h[:bike][:serial_number] = h[:bike].delete :serial
     h[:bike][:send_email] = !(h[:bike].delete :no_notify)
     org = Organization.find_by_slug(h[:bike].delete :organization_slug)

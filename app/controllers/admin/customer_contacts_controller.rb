@@ -1,7 +1,7 @@
 class Admin::CustomerContactsController < Admin::BaseController
   
   def create
-    @customer_contact = CustomerContact.new(params[:customer_contact])
+    @customer_contact = CustomerContact.new(permitted_parameters)
     if @customer_contact.save
       flash[:success] = "Email sent successfully!"
       EmailAdminContactStolenWorker.perform_async(@customer_contact.id)
@@ -12,4 +12,9 @@ class Admin::CustomerContactsController < Admin::BaseController
     end
   end
 
+  private
+
+  def permitted_parameters
+    params.require(:customer_contact).permit(CustomerContact.old_attr_accessible)
+  end
 end
