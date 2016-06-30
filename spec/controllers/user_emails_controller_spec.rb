@@ -31,7 +31,7 @@ describe UserEmailsController do
     context 'no user, no email_id' do
       it 'does not enqueue a job and sets the flash (and does not break)' do
         expect do
-          post :resend_confirmation
+          post :resend_confirmation, id: 33333
         end.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
         expect(flash[:error]).to match(/not your/)
       end
