@@ -1608,7 +1608,6 @@ CREATE TABLE stolen_notifications (
     bike_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    send_dates_backup text,
     receiver_email character varying(255),
     oauth_application_id integer,
     reference_url character varying(255),
@@ -3083,3 +3082,5 @@ INSERT INTO schema_migrations (version) VALUES ('20160614112308');
 INSERT INTO schema_migrations (version) VALUES ('20160629152210');
 
 INSERT INTO schema_migrations (version) VALUES ('20160630161603');
+
+INSERT INTO schema_migrations (version) VALUES ('20160630175602');

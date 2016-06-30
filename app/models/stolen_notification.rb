@@ -13,7 +13,6 @@ class StolenNotification < ActiveRecord::Base
   belongs_to :bike
   belongs_to :sender, class_name: 'User', foreign_key: :sender_id
   belongs_to :receiver, class_name: 'User', foreign_key: :receiver_id
-  serialize :send_dates_backup
 
   validates_presence_of :sender, :bike, :message
 
@@ -43,7 +42,8 @@ class StolenNotification < ActiveRecord::Base
     subject || default_subject
   end
 
-  def send_dates_parsed
-    send_dates && JSON.parse(send_dates) || []
+  def send_dates_parsed # Required for compatibility with rails 3 & 4
+    return [] unless send_dates
+    send_dates.is_a?(String) ? JSON.parse(send_dates) : send_dates
   end
 end
