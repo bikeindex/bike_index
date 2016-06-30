@@ -13,7 +13,7 @@ class StolenNotification < ActiveRecord::Base
   belongs_to :bike
   belongs_to :sender, class_name: 'User', foreign_key: :sender_id
   belongs_to :receiver, class_name: 'User', foreign_key: :receiver_id
-  serialize :send_dates
+  serialize :send_dates_backup
 
   validates_presence_of :sender, :bike, :message
 
@@ -23,7 +23,7 @@ class StolenNotification < ActiveRecord::Base
       self.receiver_email = self.bike.owner_email
       self.receiver = self.bike.owner
     end
-    self.send_dates = []
+    self.send_dates = [].to_json
   end
 
   after_create :notify_receiver

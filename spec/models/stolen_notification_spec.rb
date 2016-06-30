@@ -8,7 +8,6 @@ describe StolenNotification do
     it { is_expected.to validate_presence_of :sender }
     it { is_expected.to validate_presence_of :bike }
     it { is_expected.to validate_presence_of :message }
-    it { is_expected.to serialize :send_dates }
   end
 
   describe 'create' do
@@ -18,19 +17,19 @@ describe StolenNotification do
         FactoryGirl.create(:stolen_notification, sender: user)
       end.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
       stolen_notification = StolenNotification.where(sender_id: user.id).first
-      expect(stolen_notification.send_dates).to eq([])
+      expect(stolen_notification.send_dates).to eq('[]')
       expect do
-        stolen_notification2 = FactoryGirl.create(:stolen_notification, sender: user)
+        FactoryGirl.create(:stolen_notification, sender: user)
       end.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
     end
     it "does not enqueue an StolenNotificationEmailJob if user doesn't have permission" do
       user = FactoryGirl.create(:user)
       expect do
-        stolen_notification = FactoryGirl.create(:stolen_notification, sender: user)
+        FactoryGirl.create(:stolen_notification, sender: user)
       end.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
 
       expect do
-        stolen_notification2 = FactoryGirl.create(:stolen_notification, sender: user)
+        FactoryGirl.create(:stolen_notification, sender: user)
       end.to change(EmailBlockedStolenNotificationWorker.jobs, :size).by(1)
     end
   end
