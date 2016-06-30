@@ -11,6 +11,12 @@ describe Manufacturer do
     it { is_expected.to have_many :paints }
   end
 
+  describe 'default_scope is alphabetized' do
+    it 'default scopes to created_at desc' do
+      expect(Manufacturer.all.to_sql).to eq(Manufacturer.unscoped.order(:name).to_sql)
+    end
+  end
+
   describe 'ensure_non_blocking_name' do
     before { FactoryGirl.create(:color, name: 'Purple') }
     context 'name same as a color' do

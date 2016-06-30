@@ -39,7 +39,7 @@ class Manufacturer < ActiveRecord::Base
     end
 
     def fuzzy_id_or_name_find(n)
-      if n.kind_of?(Integer) || n.match(/\A\d*\z/).present?
+      if n.is_a?(Integer) || n.match(/\A\d*\z/).present?
         Manufacturer.where(id: n).first
       else
         Manufacturer.fuzzy_name_find(n)
@@ -57,20 +57,20 @@ class Manufacturer < ActiveRecord::Base
     end
 
     def import(file)
-      CSV.foreach(file.path, headers: true) do |row|
-        manufacturer = find_by_name(row["name"]) || new
-        manufacturer.attributes = row.to_hash.slice(*old_attr_accessible)
-        unless manufacturer.save
-          puts "\n\n\n    #{row} \n\n"
-        end
+      CSV.foreach(file.path, headers: true, header_converters: :symbol) do |row|
+        mnfg = find_by_name(row[:name]) || new
+        mnfg.attributes = row.to_hash.slice(*old_attr_accessible)
+        next if mnfg.save
+        puts "\n#{row} \n"
+        fail mnfg.errors.full_messages.to_sentence
       end
     end
 
     def to_csv
       CSV.generate do |csv|
         csv << column_names
-        all.each do |manufacturer|
-          csv << manufacturer.attributes.values_at(*column_names)
+        all.each do |mnfg|
+          csv << mnfg.attributes.values_at(*column_names)
         end
       end
     end
