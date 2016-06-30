@@ -3,11 +3,10 @@ require 'spec_helper'
 describe Api::V1::ManufacturersController do
   describe 'index' do
     it 'loads the request' do
-      expect(Manufacturer.count).to eq 0
       m = FactoryGirl.create(:manufacturer)
       get :index, format: :json
       expect(response.code).to eq('200')
-      expect(JSON.parse(response.body)['manufacturers'][0]['name']).to eq(m.name)
+      expect(JSON.parse(response.body)['manufacturers'].last['name']).to eq(m.name)
       expect(response.headers['Access-Control-Allow-Origin']).to eq('*')
       expect(response.headers['Access-Control-Allow-Methods']).to eq('POST, PUT, GET, OPTIONS')
       expect(response.headers['Access-Control-Request-Method']).to eq('*')

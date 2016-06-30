@@ -34,7 +34,7 @@ describe SessionsController do
         it 'authenticates' do
           expect(@user).to receive(:authenticate).and_return(true)
           request.env['HTTP_REFERER'] = user_home_url
-          post :create, session: {}
+          post :create, session: { password: 'would be correct' }
           expect(cookies.signed[:auth][1]).to eq(@user.auth_token)
           expect(response).to redirect_to user_home_url
         end
@@ -43,7 +43,7 @@ describe SessionsController do
           @user.update_attribute :is_content_admin, true
           expect(@user).to receive(:authenticate).and_return(true)
           request.env['HTTP_REFERER'] = user_home_url
-          post :create, session: {}
+          post :create, session: { password: 'would be correct' }
           expect(cookies.signed[:auth][1]).to eq(@user.auth_token)
           expect(response).to redirect_to admin_news_index_url
         end
@@ -51,7 +51,7 @@ describe SessionsController do
         it "redirects to discourse_authentication url if it's a valid oauth url" do
           expect(@user).to receive(:authenticate).and_return(true)
           session[:discourse_redirect] = 'sso=foo&sig=bar'
-          post :create, session: session
+          post :create, session: { hmmm: 'yeah' }
           expect(User.from_auth(cookies.signed[:auth])).to eq(@user)
           expect(response).to redirect_to discourse_authentication_url
         end
@@ -59,7 +59,7 @@ describe SessionsController do
         it "redirects to return_to if it's a valid oauth url" do
           expect(@user).to receive(:authenticate).and_return(true)
           session[:return_to] = oauth_authorization_url(cool_thing: true)
-          post :create, session: session
+          post :create, session: { stuff: 'lololol' }
           expect(User.from_auth(cookies.signed[:auth])).to eq(@user)
           expect(session[:return_to]).to be_nil
           expect(response).to redirect_to oauth_authorization_url(cool_thing: true)
@@ -68,7 +68,7 @@ describe SessionsController do
         it "doesn't redirect and clears the session if not a valid oauth url" do
           expect(@user).to receive(:authenticate).and_return(true)
           session[:return_to] = "http://testhost.com/bad_place?f=#{oauth_authorization_url(cool_thing: true)}"
-          post :create, session: session
+          post :create, session: { thing: 'asdfasdf' }
           expect(User.from_auth(cookies.signed[:auth])).to eq(@user)
           expect(session[:return_to]).to be_nil
           expect(response).to redirect_to user_home_url
@@ -77,7 +77,7 @@ describe SessionsController do
 
       it 'does not authenticate the user when user authentication fails' do
         expect(@user).to receive(:authenticate).and_return(false)
-        post :create, session: {}
+        post :create, session: { password: 'something incorrect' }
         expect(session[:user_id]).to be_nil
         expect(response).to render_template('new')
         expect(response).to render_with_layout('application_revised')
@@ -87,7 +87,7 @@ describe SessionsController do
     it 'does not log in unconfirmed users' do
       user = FactoryGirl.create(:user, confirmed: true)
       expect(User).to receive(:fuzzy_email_find).and_return(user)
-      post :create, session: {}
+      post :create, session: { email: user.email }
       expect(response).to render_template(:new)
       expect(cookies.signed[:auth]).to be_nil
       expect(response).to render_with_layout('application_revised')
