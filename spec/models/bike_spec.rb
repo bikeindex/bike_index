@@ -63,6 +63,7 @@ describe Bike do
       recovered_2 = FactoryGirl.create(:stolen_record, bike: bike, current: false)
       recovered_1 = FactoryGirl.create(:stolen_record, bike: bike, current: false, date_stolen: (Time.now - 1.day))
       bike.reload
+      pp bike.recovered_records
       expect(bike.recovered_records.first).to eq(recovered_2)
     end
   end

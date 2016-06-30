@@ -54,8 +54,8 @@ describe FileCacheMaintainer do
       FileCacheMaintainer.update_file_info("https://files.bikeindex.org/uploads/tsvs/#{Time.now.strftime('%Y_%-m_%-d')}_approved_current_stolen_bikes.tsv")
       FileCacheMaintainer.update_file_info("https://files.bikeindex.org/uploads/tsvs/#{Time.now.strftime('%Y_%-m_%-d')}_current_stolen_bikes.tsv")
 
-      expect(FileCacheMaintainer.files[1][:filename]).to eq('approved_current_stolen_bikes.tsv')
-      expect(FileCacheMaintainer.files[0][:filename]).to eq('current_stolen_bikes.tsv')
+      expect(FileCacheMaintainer.files[0][:filename]).to eq('approved_current_stolen_bikes.tsv')
+      expect(FileCacheMaintainer.files[1][:filename]).to eq('current_stolen_bikes.tsv')
       expect(FileCacheMaintainer.files[2][:filename]).to eq("#{Time.now.strftime('%Y_%-m_%-d')}_current_stolen_bikes.tsv")
       expect(FileCacheMaintainer.files[3][:filename]).to eq("#{Time.now.strftime('%Y_%-m_%-d')}_approved_current_stolen_bikes.tsv")
     end
