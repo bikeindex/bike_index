@@ -42,7 +42,7 @@ describe Admin::StolenNotificationsController do
       sender = FactoryGirl.create(:user)
       admin = FactoryGirl.create(:admin)
       stolen_notification = FactoryGirl.create(:stolen_notification, sender: sender)
-      stolen_notification.update_attribute :send_dates, [69]
+      stolen_notification.update_attribute :send_dates, [69].to_json
       set_current_user(admin)
       expect do
         get :resend, id: stolen_notification.id
@@ -55,7 +55,7 @@ describe Admin::StolenNotificationsController do
       sender = FactoryGirl.create(:user)
       admin = FactoryGirl.create(:admin)
       stolen_notification = FactoryGirl.create(:stolen_notification, sender: sender)
-      stolen_notification.update_attribute :send_dates, [69]
+      stolen_notification.update_attribute :send_dates, [69].to_json
       set_current_user(admin)
       expect do
         get :resend, id: stolen_notification.id, pretty_please: true

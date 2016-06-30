@@ -100,7 +100,10 @@ class CustomerMailer < ActionMailer::Base
       format.text
       format.html { render layout: 'email'}
     end
-    stolen_notification.update_attribute :send_dates, stolen_notification.send_dates << Time.now.to_i
+    dates = stolen_notification.send_dates || []
+    dates = JSON.parse(dates) unless dates.is_a?(Array)
+    dates << Time.now.to_i
+    stolen_notification.update_attribute :send_dates, dates.to_json
   end
 
   def additional_email_confirmation(user_email)

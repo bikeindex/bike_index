@@ -73,9 +73,9 @@ describe CustomerMailer do
       expect(mail.from.first).to eq('bryan@bikeindex.org')
       expect(mail.body.encoded).to match(stolen_notification.message)
       expect(mail.body.encoded).to match(stolen_notification.reference_url)
-      expect(stolen_notification.send_dates[0]).to eq(stolen_notification.updated_at.to_i)
+      expect(JSON.parse(stolen_notification.send_dates)[0]).to eq(stolen_notification.updated_at.to_i)
       CustomerMailer.stolen_notification_email(stolen_notification)
-      expect(stolen_notification.send_dates[1]).to be > stolen_notification.updated_at.to_i - 2
+      expect(JSON.parse(stolen_notification.send_dates)[1]).to be > stolen_notification.updated_at.to_i - 2
     end
   end
 
