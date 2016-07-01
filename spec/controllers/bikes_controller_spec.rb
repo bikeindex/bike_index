@@ -359,6 +359,8 @@ describe BikesController do
           expect(@b_param.reload.created_bike_id).not_to be_nil
           expect(@b_param.reload.bike_errors).to be_nil
           expect(@user.reload.phone).to eq('3123799513')
+          # We're accepting iframed form submissions at this endpoint, allow it
+          expect(response.headers['X-Frame-Options']).not_to be_present
         end
 
         it 'creates a new ownership and bike from an organization' do
