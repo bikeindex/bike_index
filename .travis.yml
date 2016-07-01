@@ -3,8 +3,6 @@ services:
   - redis
 addons:
   postgresql: '9.4'
-rvm:
-  - 2.2.3
 before_install:
    - gem install bundler -v 1.9.10
 script:

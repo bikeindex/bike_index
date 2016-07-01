@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-ruby '2.2.3'
+ruby '2.2.5'
 # Old gems:
 # gem 'rails', '3.2.22'
 # gem 'rake', '< 11' # OLD V - # Locked to remove validation errors
