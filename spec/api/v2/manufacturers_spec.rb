@@ -44,7 +44,7 @@ describe 'Manufacturers API V2' do
       get '/api/v2/manufacturers/awesome'
       result = response.body
       expect(response.code).to eq('200')
-      expect(JSON.parse(result)['manufacturer']['id']).to eq(@manufacturer.id)
+      expect(JSON.parse(result)['manufacturer']['id']).to eq(manufacturer.id)
     end
   end
 

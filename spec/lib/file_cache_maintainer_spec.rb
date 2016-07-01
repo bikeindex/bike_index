@@ -47,17 +47,19 @@ describe FileCacheMaintainer do
       expect(tsv['description']).to eq('Stolen')
     end
 
-    it 'returns the way we want' do
+    it 'returns the way we want - dailys after non daily' do
       t = Time.now
       FileCacheMaintainer.reset_file_info('https://files.bikeindex.org/uploads/tsvs/approved_current_stolen_bikes.tsv', t)
       FileCacheMaintainer.update_file_info('https://files.bikeindex.org/uploads/tsvs/current_stolen_bikes.tsv')
       FileCacheMaintainer.update_file_info("https://files.bikeindex.org/uploads/tsvs/#{Time.now.strftime('%Y_%-m_%-d')}_approved_current_stolen_bikes.tsv")
       FileCacheMaintainer.update_file_info("https://files.bikeindex.org/uploads/tsvs/#{Time.now.strftime('%Y_%-m_%-d')}_current_stolen_bikes.tsv")
-
-      expect(FileCacheMaintainer.files[0][:filename]).to eq('current_stolen_bikes.tsv')
-      expect(FileCacheMaintainer.files[1][:filename]).to eq('approved_current_stolen_bikes.tsv')
-      expect(FileCacheMaintainer.files[2][:filename]).to eq("#{Time.now.strftime('%Y_%-m_%-d')}_current_stolen_bikes.tsv")
-      expect(FileCacheMaintainer.files[3][:filename]).to eq("#{Time.now.strftime('%Y_%-m_%-d')}_approved_current_stolen_bikes.tsv")
+      FileCacheMaintainer.files.each_with_index do |file, index|
+        if index < 2
+          expect(['approved_current_stolen_bikes.tsv', 'current_stolen_bikes.tsv'].include?(file[:filename])).to be_truthy
+        else
+          expect(["#{Time.now.strftime('%Y_%-m_%-d')}_approved_current_stolen_bikes.tsv", "#{Time.now.strftime('%Y_%-m_%-d')}_current_stolen_bikes.tsv"].include?(file[:filename])).to be_truthy
+        end
+      end
     end
   end
 

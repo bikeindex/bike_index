@@ -9,7 +9,7 @@ module Organized
     end
 
     def update
-      if @organization.update_attributes(update_organization_params)
+      if @organization.update_attributes(permitted_parameters)
         flash[:success] = "#{current_organization.name} updated successfully"
         redirect_path = params[:locations_page] ? locations_organization_manage_index_path(organization_id: current_organization.to_param) : current_index_path
         redirect_to redirect_path
@@ -45,34 +45,22 @@ module Organized
       organization_manage_index_path(organization_id: current_organization.to_param)
     end
 
-    def update_organization_params
-      params[:organization].slice(:name, :website, :org_type, :embedable_user_email)
-                           .merge(additional_attributes(params[:organization]))
+    def permitted_parameters
+      params.require(:organization).permit(:name, :website, :org_type, show_on_map_if_permitted,
+                                           :embedable_user_email, paid_attributes,
+                                           locations_attributes: permitted_locations_params)
     end
 
-    def additional_attributes(o_params)
-      show_on_map(o_params).merge(paid_attributes(o_params))
-                           .merge(locations_attributes(o_params[:locations_attributes]))
+    def show_on_map_if_permitted
+      current_organization.lock_show_on_map ? [] : [:show_on_map]
     end
 
-    def locations_attributes(locations_attributes)
-      return {} unless locations_attributes.present?
-      locations_attributes.each { |k, hash| locations_attributes[k] = permitted_locations_attrs(hash) }
-      { locations_attributes: locations_attributes }
+    def paid_attributes
+      current_organization.is_paid ? [:avatar] : []
     end
 
-    def show_on_map(o_params)
-      current_organization.lock_show_on_map ? {} : o_params.slice(:show_on_map)
-    end
-
-    def paid_attributes(o_params)
-      return {} unless current_organization.is_paid
-      o_params.slice(:avatar)
-    end
-
-    def permitted_locations_attrs(hash)
-      hash.slice(:name, :zipcode, :city, :state_id, :country_id, :street, :phone, :email, :id)
-          .merge(organization_id: current_organization.id)
+    def permitted_locations_params
+      [:name, :zipcode, :city, :state_id, :country_id, :street, :phone, :email, :id]
     end
 
     def notify_admins(type)

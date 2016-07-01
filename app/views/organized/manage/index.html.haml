@@ -6,17 +6,17 @@
 = form_for @organization, { url: organization_manage_path(id: @organization.id, organization_id: @organization.to_param), action: 'update', html: { class: 'organized-form' } } do |f|
 
   .form-group.row
-    = f.label :name, 'Name', class: 'control-label', class: 'org-form-label'
+    = f.label :name, 'Name', class: 'org-form-label'
     .col-sm-4
       = f.text_field :name, required: true, class: 'form-control'
 
   .form-group.row
-    = f.label :short_name, 'Abbreviation', class: 'control-label', class: 'org-form-label'
+    = f.label :short_name, 'Abbreviation', class: 'org-form-label'
     .col-sm-4
       = f.text_field :short_name, class: 'form-control'
 
   .form-group.row.fancy-select.unfancy
-    = f.label :embedable_user_email, class: 'control-label', class: 'org-form-label' do
+    = f.label :embedable_user_email, class: 'org-form-label' do
       Registration email
     .col-sm-4
       = f.select :embedable_user_email, @organization.users.pluck(:email), prompt: 'Select email', selected: (@organization.auto_user && @organization.auto_user.email)
@@ -49,7 +49,7 @@
           Manufacturer
 
   .form-group.row
-    = f.label :website, class: 'control-label', class: 'org-form-label'
+    = f.label :website, class: 'org-form-label'
     .col-sm-4
       = f.text_field :website, class: 'form-control'
 

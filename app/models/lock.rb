@@ -1,14 +1,8 @@
 class Lock < ActiveRecord::Base
-  attr_accessible :lock_type_id,
-    :has_key,
-    :has_combination,
-    :combination,
-    :key_serial,
-    :manufacturer_id,
-    :manufacturer_other,
-    :user,
-    :lock_model,
-    :notes
+  def self.old_attr_accessible
+    %w(lock_type_id has_key has_combination combination key_serial manufacturer_id
+       manufacturer_other user lock_model notes).map(&:to_sym).freeze
+  end
 
   belongs_to :manufacturer
   belongs_to :lock_type

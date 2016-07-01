@@ -28,7 +28,7 @@ describe BikeCreator do
       expect(b_param.params[:components].count { |c| !c[:is_stock] }).to eq(0)
       expect(b_param.bike[:description]).not_to eq('Input description')
       expect(b_param.bike[:serial_number]).to eq('Some serial')
-      expect(b_param.bike[:primary_frame_color_id]).to eq(1)
+      expect(b_param.bike[:primary_frame_color_id]).to eq(color.id)
     end
   end
 

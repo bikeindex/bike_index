@@ -1,19 +1,12 @@
 class StolenNotification < ActiveRecord::Base
-  attr_accessible :subject,
-    :reference_url,
-    :message,
-    :sender,
-    :receiver,
-    :bike_id,
-    :bike,
-    :receiver_email,
-    :send_dates,
-    :application_id
+  def self.old_attr_accessible
+    %w(subject reference_url message sender receiver bike_id bike receiver_email
+       send_dates application_id).map(&:to_sym).freeze
+  end
 
   belongs_to :bike
   belongs_to :sender, class_name: 'User', foreign_key: :sender_id
   belongs_to :receiver, class_name: 'User', foreign_key: :receiver_id
-  serialize :send_dates
 
   validates_presence_of :sender, :bike, :message
 
@@ -23,7 +16,7 @@ class StolenNotification < ActiveRecord::Base
       self.receiver_email = self.bike.owner_email
       self.receiver = self.bike.owner
     end
-    self.send_dates = []
+    self.send_dates = [].to_json
   end
 
   after_create :notify_receiver
@@ -43,4 +36,8 @@ class StolenNotification < ActiveRecord::Base
     subject || default_subject
   end
 
+  def send_dates_parsed # Required for compatibility with rails 3 & 4
+    return [] unless send_dates
+    send_dates.is_a?(String) ? JSON.parse(send_dates) : send_dates
+  end
 end

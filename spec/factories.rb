@@ -42,7 +42,7 @@ FactoryGirl.define do
       factory :organized_user do
         # This factory should not be used directly, it's here to wrap organization
         # Use `organization_member` or `organization_admin`
-        ignore do
+        transient do
           organization { FactoryGirl.create(:organization) }
         end
         factory :organization_member do

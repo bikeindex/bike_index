@@ -45,6 +45,6 @@ class MergeAdditionalEmailWorker
 
   def find_old_user(email, user_id)
     User.fuzzy_unconfirmed_primary_email_find(email) ||
-      UserEmail.where('user_id != ?', user_id).find(:first, conditions: ['lower(email) = ?', email])
+      UserEmail.where('user_id != ?', user_id).where(email: email).first
   end
 end

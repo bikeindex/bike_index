@@ -78,7 +78,7 @@ class Admin::BikesController < Admin::BaseController
 
   def update
     @fast_attr_update = params.delete(:fast_attr_update)
-    BikeUpdator.new(user: current_user, b_params: params).update_ownership
+    BikeUpdator.new(user: current_user, bike: @bike, b_params: { bike: permitted_parameters }).update_ownership
     @bike = @bike.decorate
     if params[:mark_recovered_reason].present?
       info = {
@@ -88,7 +88,7 @@ class Admin::BikesController < Admin::BaseController
       }
       RecoveryUpdateWorker.perform_async(@bike.current_stolen_record.id, info)
     end
-    if @bike.update_attributes(params[:bike])
+    if @bike.update_attributes(permitted_parameters)
       @bike.create_normalized_serial_segments
       return if return_to_if_present
       flash[:success] = "Bike was successfully updated."
@@ -103,6 +103,10 @@ class Admin::BikesController < Admin::BaseController
   end
 
   protected
+
+  def permitted_parameters
+    params.require(:bike).permit(Bike.old_attr_accessible)
+  end
 
   def destroy_bike
     @bike.destroy

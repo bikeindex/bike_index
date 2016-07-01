@@ -83,7 +83,7 @@ describe 'Bikes API V2' do
       CacheAllStolenWorker.new.perform
       cached_all_stolen = FileCacheMaintainer.cached_all_stolen
       expect(cached_all_stolen['updated_at'].to_i).to be >= t
-      get 'api/v2/bikes_search/all_stolen', format: :json
+      get '/api/v2/bikes_search/all_stolen', format: :json
       result = JSON.parse(response.body)
       expect(response.header['Last-Modified']).to eq Time.at(cached_all_stolen['updated_at'].to_i).httpdate
       expect(result).to eq(JSON.parse(File.read(cached_all_stolen['path'])))

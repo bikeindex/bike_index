@@ -1,6 +1,8 @@
 class Color < ActiveRecord::Base
   include AutocompleteHashable
-  attr_accessible :name, :priority, :display
+  def self.old_attr_accessible
+    %w(name priority display).map(&:to_sym).freeze
+  end
   validates_presence_of :name, :priority
   validates_uniqueness_of :name
   has_many :bikes
@@ -10,7 +12,7 @@ class Color < ActiveRecord::Base
   scope :commonness, -> { order('priority ASC, name ASC') }
 
   def self.fuzzy_name_find(n)
-    find(:first, conditions: ['lower(name) = ?', n.downcase.strip]) unless n.blank?
+    n && where('lower(name) = ?', n.downcase.strip).first
   end
 
   def autocomplete_hash

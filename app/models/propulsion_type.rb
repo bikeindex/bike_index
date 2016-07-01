@@ -1,5 +1,7 @@
 class PropulsionType < ActiveRecord::Base
-  attr_accessible :name
+  def self.old_attr_accessible
+    %w(name).map(&:to_sym).freeze
+  end
   validates_presence_of :name
   validates_uniqueness_of :name
   has_many :bikes

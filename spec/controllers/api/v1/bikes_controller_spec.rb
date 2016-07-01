@@ -122,7 +122,7 @@ describe Api::V1::BikesController do
       expect(component.ctype.slug).to eq('headset')
       expect(component.year).to eq(1999)
       expect(component.manufacturer_id).to eq(manufacturer.id)
-      expect(component.model_name).to eq('Richie rich')
+      expect(component.cmodel_name).to eq('Richie rich')
       expect(b.public_images.count).to eq(2)
       expect(f_count).to eq(Feedback.count)
     end

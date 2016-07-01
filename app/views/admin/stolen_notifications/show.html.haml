@@ -18,11 +18,11 @@
       - if @bike.current_stolen_record.present?
         = @stolen_notification.dl_list_item(@bike.current_stolen_record.phone, "Bike phone")
       %dt
-        Sent #{@stolen_notification.send_dates.count} times
+        Sent #{@stolen_notification.send_dates_parsed.count} times
       %dd
-        - if @stolen_notification.send_dates.any?
+        - if @stolen_notification.send_dates_parsed.any?
           
-          - @stolen_notification.send_dates.each do |stamp|
+          - @stolen_notification.send_dates_parsed.each do |stamp|
             %p
               - send_date = Time.at(stamp).to_datetime
               - if send_date.today?

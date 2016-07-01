@@ -1,5 +1,7 @@
 class RearGearType < ActiveRecord::Base
-  attr_accessible :name, :count, :internal, :standard
+  def self.old_attr_accessible
+    %w(name count internal standard).map(&:to_sym).freeze
+  end
   validates_presence_of :name, :count
   validates_uniqueness_of :name
   has_many :bikes

@@ -85,7 +85,7 @@ class CustomerMailer < ActionMailer::Base
   def organization_invitation_email(organization_invitation)
     @organization_invitation = organization_invitation
     @organization = organization_invitation.organization
-    @inviter = User.find(organization_invitation.inviter)
+    @inviter = User.find(organization_invitation.inviter_id)
     @new_user = false
     @new_user = true unless User.fuzzy_email_find(@organization_invitation.invitee_email)
     mail(to: @organization_invitation.invitee_email, subject: "Join #{@organization.name} on the Bike Index") do |format|
@@ -100,7 +100,10 @@ class CustomerMailer < ActionMailer::Base
       format.text
       format.html { render layout: 'email'}
     end
-    stolen_notification.update_attribute :send_dates, stolen_notification.send_dates << Time.now.to_i
+    dates = stolen_notification.send_dates || []
+    dates = JSON.parse(dates) unless dates.is_a?(Array)
+    dates << Time.now.to_i
+    stolen_notification.update_attribute :send_dates, dates.to_json
   end
 
   def additional_email_confirmation(user_email)

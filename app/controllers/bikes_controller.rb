@@ -120,7 +120,7 @@ class BikesController < ApplicationController
         ImageAssociatorWorker.perform_in(1.minutes)
         params[:bike].delete(:image)
       end
-      @b_param.update_attributes(params: params)
+      @b_param.update_attributes(params: permitted_bparams)
       @bike = BikeCreator.new(@b_param).create_bike
       if @bike.errors.any?
         @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
@@ -144,7 +144,7 @@ class BikesController < ApplicationController
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@b_param.created_bike) and return
       end
-      @b_param.clean_params(params)
+      @b_param.clean_params(permitted_bparams)
       @bike = BikeCreator.new(@b_param).create_bike
       if @bike.errors.any?
         @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
@@ -168,15 +168,16 @@ class BikesController < ApplicationController
 
   def update
     begin
-      @bike = BikeUpdator.new(user: current_user, bike: @bike, b_params: params, current_ownership: @current_ownership).update_available_attributes
+      @bike = BikeUpdator.new(user: current_user, bike: @bike, b_params: permitted_bike_params, current_ownership: @current_ownership).update_available_attributes
     rescue => e
       flash[:error] = e.message
     end
     @bike = @bike.decorate
     if @bike.errors.any? || flash[:error].present?
+      pp flash[:error]
       edit and return
     else
-      flash[:success] = "Bike successfully updated!"
+      flash[:success] = 'Bike successfully updated!'
       return if return_to_if_present
       redirect_to edit_bike_url(@bike, page: params[:edit_template]), layout: 'no_header' and return
     end
@@ -257,5 +258,13 @@ class BikesController < ApplicationController
 
   def remove_subdomain
     redirect_to bikes_url(subdomain: false) if request.subdomain.present?
+  end
+
+  def permitted_bike_params
+    { bike: params.require(:bike).permit(Bike.old_attr_accessible) }
+  end
+
+  def permitted_bparams # still manually managing permission of params, skip for now
+    params.as_json
   end
 end

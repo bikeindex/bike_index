@@ -6,11 +6,11 @@ class StolenNotificationsController < ApplicationController
   end
 
   def create
-    @stolen_notification = StolenNotification.new(params[:stolen_notification])
+    @stolen_notification = StolenNotification.new(permitted_parameters)
     @stolen_notification.sender = current_user
     @bike = @stolen_notification.bike
     if @stolen_notification.save
-      flash[:success] = "Thanks for looking out!" 
+      flash[:success] = 'Thanks for looking out!'
       redirect_to @bike
     else
       flash[:error] = "Crap! We couldn't send your notification. Please try again."
@@ -18,4 +18,9 @@ class StolenNotificationsController < ApplicationController
     end
   end
 
+  private
+
+  def permitted_parameters
+    params.require(:stolen_notification).permit(StolenNotification.old_attr_accessible)
+  end
 end

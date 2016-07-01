@@ -1,40 +1,17 @@
 class StolenRecord < ActiveRecord::Base
   include ActiveModel::Dirty
   include Phonifyerable
-  attr_accessible :police_report_number,
-    :police_report_department,
-    :locking_description,
-    :lock_defeat_description,
-    :date_stolen,
-    :bike,
-    :creation_organization_id,
-    :country_id,
-    :state_id,
-    :street,
-    :zipcode,
-    :city,
-    :latitude,
-    :longitude,
-    :theft_description,
-    :current,
-    :phone,
-    :secondary_phone,
-    :phone_for_everyone,
-    :phone_for_users,
-    :phone_for_shops,
-    :phone_for_police,
-    :receive_notifications,
-    :proof_of_ownership,
-    :approved,
-    :date_recovered,
-    :recovered_description,
-    :index_helped_recovery,
-    :can_share_recovery,
-    :recovery_share, # We edit this in the admin panel
-    :recovery_tweet, # We edit this in the admin panel
-    :recovery_posted,
-    :tsved_at,
-    :date_stolen_input # now putting this in here, on revised, because less stupid
+  def self.old_attr_accessible
+    # recovery_share, # We edit this in the admin panel
+    # recovery_tweet, # We edit this in the admin panel
+    # date_stolen_input # now putting this in here, on revised, because less stupid
+    %w(police_report_number police_report_department locking_description lock_defeat_description
+       date_stolen date_stolen_input bike creation_organization_id country_id state_id street zipcode city latitude
+       longitude theft_description current phone secondary_phone phone_for_everyone
+       phone_for_users phone_for_shops phone_for_police receive_notifications proof_of_ownership
+       approved date_recovered recovered_description index_helped_recovery can_share_recovery
+       recovery_posted tsved_at).map(&:to_sym).freeze
+ end
 
   attr_accessor :date_stolen_input
 
@@ -45,7 +22,13 @@ class StolenRecord < ActiveRecord::Base
   belongs_to :state
   belongs_to :creation_organization, class_name: "Organization"
 
-  validates_presence_of :bike, :date_stolen
+  validates_presence_of :bike
+  validate :date_present
+  def date_present
+    unless date_stolen.present? || date_stolen_input.present?
+      errors.add :base, 'You need to include the date stolen'
+    end
+  end
 
   default_scope { where(current: true) }
   scope :approveds, -> { where(approved: true) }
@@ -65,10 +48,14 @@ class StolenRecord < ActiveRecord::Base
     '%a %b %d %Y'
   end
 
+  def self.revised_date_format_hour
+    "#{revised_date_format} %H"
+  end
+
   before_validation :date_from_date_stolen_input
   def date_from_date_stolen_input
     if date_stolen_input.present?
-      self.date_stolen = DateTime.strptime("#{date_stolen_input} 06", "#{self.class.revised_date_format} %H")
+      self.date_stolen = DateTime.strptime("#{date_stolen_input} 06", self.class.revised_date_format_hour)
     else
       true
     end

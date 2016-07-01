@@ -32,8 +32,6 @@ class BikeV2Serializer < ActiveModel::Serializer
       small = object.stock_photo_url.split('/')
       ext = "/small_" + small.pop
       small.join('/') + ext
-    else
-      nil
     end
   end
 
@@ -42,8 +40,6 @@ class BikeV2Serializer < ActiveModel::Serializer
       object.public_images.first.image_url(:large)
     elsif object.stock_photo_url.present?
       object.stock_photo_url
-    else
-      nil
     end
   end
 

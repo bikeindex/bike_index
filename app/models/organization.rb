@@ -1,25 +1,12 @@
 class Organization < ActiveRecord::Base
   include ActionView::Helpers::SanitizeHelper
-  attr_accessible :available_invitation_count,
-    :sent_invitation_count,
-    :name,
-    :short_name,
-    :slug,
-    :website,
-    :show_on_map,
-    :is_suspended,
-    :org_type,
-    :locations_attributes,
-    :embedable_user_email,
-    :auto_user_id,
-    :api_access_approved,
-    :access_token,
-    :new_bike_notification,
-    :lightspeed_cloud_api_key,
-    :use_additional_registration_field,
-    :lock_show_on_map,
-    :avatar,
-    :avatar_cache
+  def self.old_attr_accessible
+    %w(available_invitation_count sent_invitation_count name short_name slug website
+       show_on_map is_suspended org_type locations_attributes embedable_user_email
+       auto_user_id api_access_approved access_token new_bike_notification
+       lightspeed_cloud_api_key use_additional_registration_field lock_show_on_map
+       avatar avatar_cache).map(&:to_sym).freeze
+  end
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key
   acts_as_paranoid
@@ -72,7 +59,7 @@ class Organization < ActiveRecord::Base
     self.short_name = (short_name || name).truncate(30)
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, '')
     # If the organization exists, don't invalidate because of it's own slug
-    orgs = id.present? ? Organization.where('id != ?', id) : Organization.scoped
+    orgs = id.present? ? Organization.where('id != ?', id) : Organization.all
     while orgs.where(slug: new_slug).exists?
       i = i.present? ? i + 1 : 2
       new_slug = "#{new_slug}-#{i}"

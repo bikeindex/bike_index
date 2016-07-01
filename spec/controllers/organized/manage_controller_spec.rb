@@ -115,7 +115,7 @@ describe Organized::ManageController, type: :controller do
           organization.update_attributes(org_attributes)
         end
         it 'updates, sends message about maps' do
-          put :update, organization_id: organization.to_param, organization: update_attributes
+          put :update, organization_id: organization.to_param, id: organization.to_param, organization: update_attributes
           expect(response).to redirect_to organization_manage_index_path(organization_id: organization.to_param)
           expect(flash[:success]).to be_present
           organization.reload
@@ -182,7 +182,7 @@ describe Organized::ManageController, type: :controller do
         end
         it 'updates and adds the locations and shows on map' do
           expect do
-            put :update, organization_id: organization.to_param, organization: update_attributes
+            put :update, organization_id: organization.to_param,  id: organization.to_param, organization: update_attributes
           end.to change(Location, :count).by(1)
           organization.reload
           expect(organization.show_on_map).to be_truthy

@@ -1,3 +1,5 @@
 #!/bin/bash
+touch log/development.log
+> log/development.log
 redis-server &
 bundle exec foreman start -f Procfile_development

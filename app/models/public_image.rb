@@ -1,10 +1,7 @@
 class PublicImage < ActiveRecord::Base
-  attr_accessible :image,
-    :name,
-    :imageable,
-    :listing_order,
-    :remote_image_url,
-    :is_private
+  def self.old_attr_accessible
+    %w(image name imageable listing_order remote_image_url is_private).map(&:to_sym).freeze
+  end
 
   mount_uploader :image, ImageUploader
   # process_in_background :image, CarrierWaveProcessWorker

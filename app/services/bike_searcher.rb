@@ -2,7 +2,7 @@ class BikeSearcher
   def initialize(creation_params = {}, reverse_geocode = nil)
     # override reverse_geocode if passed as params
     @params = creation_params.merge(reverse_geocode: reverse_geocode)
-    @bikes = params[:api_search] ? Bike.non_recovered : Bike.scoped
+    @bikes = params[:api_search] ? Bike.non_recovered : Bike.all
     if @params[:search_type].present?
       if @params[:search_type] == 'serial'
         @params[:serial] = @params[:query_typed]

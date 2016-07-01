@@ -22,7 +22,7 @@ class Admin::OrganizationInvitationsController < Admin::BaseController
   end
 
   def update
-    if @organization_invitation.update_attributes(params[:organization_invitation])
+    if @organization_invitation.update_attributes(permitted_parameters)
       flash[:success] = 'Invitation Saved!'
       redirect_to admin_organization_invitations_url
     else
@@ -31,7 +31,7 @@ class Admin::OrganizationInvitationsController < Admin::BaseController
   end
 
   def create
-    @organization_invitation = OrganizationInvitation.new(params[:organization_invitation])
+    @organization_invitation = OrganizationInvitation.new(permitted_parameters)
     @organization_invitation.inviter = current_user
     
     @organization = @organization_invitation.organization
@@ -54,12 +54,13 @@ class Admin::OrganizationInvitationsController < Admin::BaseController
     redirect_to admin_memberships_url
   end
 
-
-
   protected
+
+  def permitted_parameters
+    params.require(:organization_invitation).permit(OrganizationInvitation.old_attr_accessible)
+  end
 
   def find_organization_invitation
     @organization_invitation = OrganizationInvitation.find(params[:id])
   end
-
 end

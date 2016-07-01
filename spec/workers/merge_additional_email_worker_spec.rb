@@ -4,7 +4,7 @@ describe MergeAdditionalEmailWorker do
   it { is_expected.to be_processed_in :updates }
 
   context 'confirmed' do
-    let(:email) { 'foo@barexample.com' }
+    let(:email) { 'FOO@barexample.com' }
     let(:ownership) { FactoryGirl.create(:ownership, owner_email: email) }
     let(:user_email) { FactoryGirl.create(:user_email, email: email) }
     let(:user) { user_email.user }

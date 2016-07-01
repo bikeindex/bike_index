@@ -1,81 +1,6 @@
 class Bike < ActiveRecord::Base
   include ActiveModel::Dirty
   include ActionView::Helpers::SanitizeHelper
-  attr_accessible :registered_new, # Was this bike registered at point of sale?
-    :cycle_type_id,
-    :manufacturer_id,
-    :manufacturer_other,
-    :serial_number,
-    :serial_normalized,
-    :has_no_serial,
-    :made_without_serial, # GUARANTEE there was no serial 
-    :additional_registration,
-    :creation_organization_id,
-    :location_id,
-    :manufacturer,
-    :year,
-    :thumb_path,
-    :name,
-    :stolen,
-    :current_stolen_record_id,
-    :recovered,
-    :frame_material_id,
-    :frame_model,
-    :handlebar_type_id,
-    :handlebar_type_other,
-    :frame_size,
-    :frame_size_number,
-    :frame_size_unit,
-    :rear_tire_narrow,
-    :front_wheel_size_id,
-    :rear_wheel_size_id,
-    :front_tire_narrow,
-    :number_of_seats,
-    :primary_frame_color_id,
-    :secondary_frame_color_id,
-    :tertiary_frame_color_id,
-    :paint_id,
-    :paint_name,
-    :propulsion_type_id,
-    :propulsion_type_other,
-    :zipcode,
-    :country_id,
-    :creation_zipcode,
-    :belt_drive,
-    :coaster_brake,
-    :rear_gear_type_id,
-    :front_gear_type_id,
-    :description,
-    :all_description, # shouldn't be mass-assigned
-    :owner_email,
-    :stolen_records_attributes,
-    :date_stolen_input,
-    :stolen_lat, # shouldn't be mass-assigned
-    :stolen_long, # shouldn't be mass-assigned
-    :receive_notifications,
-    :phone,
-    :creator,
-    :creator_id,
-    :image,
-    :components_attributes,
-    :b_param_id,
-    :cached_attributes,
-    :embeded,
-    :embeded_extended,
-    :example,
-    :hidden,
-    :card_id,
-    :stock_photo_url,
-    :pdf,
-    :send_email,
-    :other_listing_urls,
-    :listing_order,
-    :approved_stolen,
-    :marked_user_hidden,
-    :marked_user_unhidden,
-    :b_param_id_token,
-    :is_for_sale
-
   mount_uploader :pdf, PdfUploader
   process_in_background :pdf, CarrierWaveProcessWorker
 
@@ -109,6 +34,7 @@ class Bike < ActiveRecord::Base
   has_many :components, dependent: :destroy
   has_many :b_params, as: :created_bike
   has_many :duplicate_bike_groups, through: :normalized_serial_segments
+  has_many :recovered_records, -> { recovered }, class_name: 'StolenRecord'
 
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :components, allow_destroy: true
@@ -151,29 +77,42 @@ class Bike < ActiveRecord::Base
     associated_against: {ownerships: :owner_email, creator: :email},
     using: {tsearch: {dictionary: "english", prefix: true}}
 
-  def self.text_search(query)
-    if query.present?
-      search(query)
-    else
-      scoped
+  class << self
+    def old_attr_accessible
+      # registered_new - Was this bike registered at point of sale?
+      # made_without_serial - GUARANTEE there was no serial
+      (%w(registered_new cycle_type_id manufacturer_id manufacturer_other serial_number 
+        serial_normalized has_no_serial made_without_serial additional_registration
+        creation_organization_id location_id manufacturer year thumb_path name stolen
+        current_stolen_record_id recovered frame_material_id frame_model number_of_seats
+        handlebar_type_id handlebar_type_other frame_size frame_size_number frame_size_unit
+        rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow 
+        primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
+        propulsion_type_id propulsion_type_other zipcode country_id creation_zipcode belt_drive
+        coaster_brake rear_gear_type_id front_gear_type_id description owner_email
+        date_stolen_input receive_notifications phone creator creator_id image
+        components_attributes b_param_id cached_attributes embeded embeded_extended example hidden
+        card_id stock_photo_url pdf send_email other_listing_urls listing_order approved_stolen
+        marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale
+        ).map(&:to_sym) + [stolen_records_attributes: StolenRecord.old_attr_accessible]).freeze
     end
-  end
+    
+    def text_search(query)
+      query.present? ? search(query) : all
+    end
 
-  def self.admin_text_search(query)
-    if query.present?
-      admin_search(query)
-    else
-      scoped
+    def admin_text_search(query)
+      query.present? ? admin_search(query) : all
     end
-  end
 
-  def self.attr_cache_search(query)
-    return scoped unless query.present? and query.is_a? Array
-    a = []
-    self.find_each do |b|
-      a << b.id if (query - b.cached_attributes).empty?
+    def attr_cache_search(query)
+      return scoped unless query.present? and query.is_a? Array
+      a = []
+      self.find_each do |b|
+        a << b.id if (query - b.cached_attributes).empty?
+      end
+      self.where(id: a)
     end
-    self.where(id: a)
   end
 
   def get_listing_order
@@ -226,10 +165,6 @@ class Bike < ActiveRecord::Base
 
   def find_current_stolen_record
     self.stolen_records.last if self.stolen_records.any?
-  end
-
-  def recovered_records
-    StolenRecord.recovered.where(id: self.id)
   end
 
   def title_string

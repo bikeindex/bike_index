@@ -5,7 +5,7 @@ class EmailBlockedStolenNotificationWorker
 
   def perform(stolen_notification_id)
     @stolen_notification = StolenNotification.find(stolen_notification_id)
-    AdminMailer.blocked_stolen_notification_email(@stolen_notification).deliver
+    AdminMailer.blocked_stolen_notification_email(@stolen_notification).deliver_now
   end
 
 end

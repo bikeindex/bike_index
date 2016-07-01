@@ -35,6 +35,7 @@ module AuthenticationHelper
 
   def remove_session
     cookies.delete(:auth)
+    
   end
 
   def current_user

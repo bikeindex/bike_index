@@ -1,21 +1,10 @@
 class Blog < ActiveRecord::Base
   include ActionView::Helpers::TextHelper
-  attr_accessible :title,
-    :body,
-    :user_id,
-    :published_at,
-    :post_date,
-    :post_now,
-    :tags,
-    :published,
-    :old_title_slug,
-    :description_abbr,
-    :update_title,
-    :is_listicle,
-    :listicles_attributes,
-    :user_email,
-    :index_image_id,
-    :index_image
+  def self.old_attr_accessibl 
+    %w(title body user_id published_at post_date post_now tags published old_title_slug
+       description_abbr update_title is_listicle listicles_attributes user_email 
+       index_image_id index_image).map(&:to_sym).freeze
+ end
 
   has_many :listicles, dependent: :destroy
   accepts_nested_attributes_for :listicles, allow_destroy: true

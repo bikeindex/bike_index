@@ -42,7 +42,7 @@ describe Bike do
 
   describe 'scopes' do
     it 'default scopes to created_at desc' do
-      expect(Bike.scoped.to_sql).to eq(Bike.where(example: false).where(hidden: false).order('listing_order desc').to_sql)
+      expect(Bike.all.to_sql).to eq(Bike.unscoped.where(example: false, hidden: false).order('listing_order desc').to_sql)
     end
     it 'scopes to only stolen bikes' do
       expect(Bike.stolen.to_sql).to eq(Bike.where(stolen: true).to_sql)
@@ -57,12 +57,8 @@ describe Bike do
 
   describe 'recovered_records' do
     it 'default scopes to created_at desc' do
-      o = FactoryGirl.create(:ownership)
-      user = o.creator
-      bike = o.bike
-      recovered_2 = FactoryGirl.create(:stolen_record, bike: bike, current: false)
-      recovered_1 = FactoryGirl.create(:stolen_record, bike: bike, current: false, date_stolen: (Time.now - 1.day))
-      expect(bike.reload.recovered_records.first).to eq(recovered_2)
+      bike = FactoryGirl.create(:bike)
+      expect(bike.recovered_records.to_sql).to eq(StolenRecord.unscoped.where(bike_id: bike.id, current: false).order('date_recovered desc').to_sql)
     end
   end
 
@@ -99,14 +95,14 @@ describe Bike do
       query = ["1c#{bike.primary_frame_color_id}"]
       result = Bike.attr_cache_search(query)
       expect(result.first).to eq(bike)
-      expect(result.class).to eq(ActiveRecord::Relation)
+      expect(result.class).to eq(Bike::ActiveRecord_Relation)
     end
     it 'finds bikes by wheel size' do
       bike = FactoryGirl.create(:bike)
       query = ["1w#{bike.rear_wheel_size_id}"]
       result = Bike.attr_cache_search(query)
       expect(result.first).to eq(bike)
-      expect(result.class).to eq(ActiveRecord::Relation)
+      expect(result.class).to eq(Bike::ActiveRecord_Relation)
     end
   end
 
@@ -494,7 +490,7 @@ describe Bike do
   end
 
   describe 'cache_stolen_attributes' do
-    context 'current_stolen_record with lat and long' do 
+    context 'current_stolen_record with lat and long' do
       it 'saves the stolen description to all description and set stolen_rec_id' do
         stolen_record = FactoryGirl.create(:stolen_record, theft_description: 'some theft description', latitude: 40.7143528, longitude: -74.0059731)
         bike = stolen_record.bike

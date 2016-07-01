@@ -27,8 +27,8 @@ describe BikeSearcher do
       color_2 = FactoryGirl.create(:color)
       params = { query: "c_#{color_1.id},c_#{color_2.id}%2Cm_#{manufacturer.id}%2Csomething+cool%2Cs%238xcvxcvcx%23" }
       searcher = BikeSearcher.new(params)
-      searcher.matching_manufacturer(Bike.scoped)
-      searcher.matching_colors(Bike.scoped)
+      searcher.matching_manufacturer(Bike.all)
+      searcher.matching_colors(Bike.all)
       opts =
         target = [
           manufacturer.autocomplete_result_hash,
@@ -89,21 +89,21 @@ describe BikeSearcher do
       bike = FactoryGirl.create(:bike, manufacturer: manufacturer)
       bike2 = FactoryGirl.create(:bike)
       search = BikeSearcher.new(manufacturer: 'Special', query: '')
-      expect(search.matching_manufacturer(Bike.scoped).first).to eq(bike)
-      expect(search.matching_manufacturer(Bike.scoped).pluck(:id).include?(bike2.id)).to be_falsey
+      expect(search.matching_manufacturer(Bike.all).first).to eq(bike)
+      expect(search.matching_manufacturer(Bike.all).pluck(:id).include?(bike2.id)).to be_falsey
     end
 
     it "does not return any bikes if we can't find the manufacturer" do
       manufacturer = FactoryGirl.create(:manufacturer, name: 'Special bikes co.')
       bike = FactoryGirl.create(:bike, manufacturer: manufacturer)
       search = BikeSearcher.new(manufacturer: '69696969', query: '')
-      expect(search.matching_manufacturer(Bike.scoped).count).to eq(0)
+      expect(search.matching_manufacturer(Bike.all).count).to eq(0)
     end
 
     it 'finds matching bikes' do
       bike = FactoryGirl.create(:bike)
       search = BikeSearcher.new(manufacturer_id: bike.manufacturer_id, query: 'something')
-      expect(search.matching_manufacturer(Bike.scoped).first).to eq(bike)
+      expect(search.matching_manufacturer(Bike.all).first).to eq(bike)
     end
   end
 
@@ -112,7 +112,7 @@ describe BikeSearcher do
       color = FactoryGirl.create(:color)
       bike = FactoryGirl.create(:bike, tertiary_frame_color_id: color.id)
       FactoryGirl.create(:bike)
-      search = BikeSearcher.new(colors: "something, #{color.name}").matching_colors(Bike.scoped)
+      search = BikeSearcher.new(colors: "something, #{color.name}").matching_colors(Bike.all)
       expect(search.count).to eq(1)
       expect(search.first).to eq(bike)
     end
@@ -142,24 +142,24 @@ describe BikeSearcher do
     end
     it "selects only stolen bikes if non-stolen isn't selected" do
       search = BikeSearcher.new(stolen: 'on')
-      result = search.matching_stolenness(Bike.scoped)
+      result = search.matching_stolenness(Bike.all)
       expect(result).to eq([@stolen])
     end
     it "selects only non-stolen bikes if stolen isn't selected" do
       search = BikeSearcher.new(non_stolen: 'on')
-      result = search.matching_stolenness(Bike.scoped)
+      result = search.matching_stolenness(Bike.all)
       expect(result).to eq([@non_stolen])
     end
     it 'returns all bikes' do
-      search = BikeSearcher.new.matching_stolenness(Bike.scoped)
-      expect(search).to eq(Bike.scoped)
+      search = BikeSearcher.new.matching_stolenness(Bike.all)
+      expect(search).to eq(Bike.all)
     end
   end
 
   describe 'matching_query' do
     it 'selects bikes matching the attribute' do
       search = BikeSearcher.new(query: 'something')
-      bikes = Bike.scoped
+      bikes = Bike.all
       expect(bikes).to receive(:text_search).and_return('booger')
       expect(search.matching_query(bikes)).to eq('booger')
     end

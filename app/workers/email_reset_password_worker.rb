@@ -5,6 +5,6 @@ class EmailResetPasswordWorker
 
   def perform(user_id)
     user = User.find(user_id)
-    CustomerMailer.password_reset_email(user).deliver
+    CustomerMailer.password_reset_email(user).deliver_now
   end
 end

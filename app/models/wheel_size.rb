@@ -1,5 +1,8 @@
 class WheelSize < ActiveRecord::Base
-  attr_accessible :name, :priority, :description, :iso_bsd
+  def old_attr_accessible 
+    %w(name priority description iso_bsd).map(&:to_sym).freeze
+  end
+
   validates_presence_of :name, :priority, :description, :iso_bsd
   validates_uniqueness_of :description, :iso_bsd
   has_many :bikes

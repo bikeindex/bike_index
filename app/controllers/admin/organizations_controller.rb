@@ -35,8 +35,7 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def update
     # Needs to update approved before saving so set_locations_shown is applied on save
-    @organization.update_attribute :approved, params[:organization][:approved]
-    if @organization.update_attributes(params[:organization])
+    if @organization.update_attributes(permitted_parameters)
       flash[:success] = 'Organization Saved!'
       redirect_to admin_organization_url(@organization)
     else
@@ -45,7 +44,7 @@ class Admin::OrganizationsController < Admin::BaseController
   end
 
   def create
-    @organization = Organization.new(params[:organization])
+    @organization = Organization.new(permitted_parameters)
     @organization.approved = true
     if @organization.save
       flash[:success] = 'Organization Created!'
@@ -61,6 +60,10 @@ class Admin::OrganizationsController < Admin::BaseController
   end
 
   protected
+
+  def permitted_parameters
+    params.require(:organization).permit(Organization.old_attr_accessible + [:approved])
+  end
 
   def find_organization
     @organization = Organization.find_by_slug(params[:id])

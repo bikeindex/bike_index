@@ -1,10 +1,7 @@
 class Feedback < ActiveRecord::Base
-  attr_accessible :body,
-    :email,
-    :name,
-    :title,
-    :feedback_type,
-    :feedback_hash
+  def self.old_attr_accessible
+    %w(body email name title feedback_type feedback_hash).map(&:to_sym).freeze
+  end
 
   validates_presence_of :body, :email, :title
   serialize :feedback_hash

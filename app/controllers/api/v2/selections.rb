@@ -7,42 +7,42 @@ module API
 
         desc "Frame colors"
         get '/colors', root: 'colors' do
-          Color.scoped
+          Color.all
         end
 
         desc "Types of components"
         get '/component_types', each_serializer: CtypeSerializer, root: 'component_types' do 
-          Ctype.scoped
+          Ctype.all
         end
 
         desc "Types of cycles"
         get '/cycle_types', root: 'cycle_types' do
-          CycleType.scoped
+          CycleType.all
         end
 
         desc "Frame materials"
         get '/frame_materials', root: 'frame_materials' do
-          FrameMaterial.scoped
+          FrameMaterial.all
         end
 
         desc "Front gear types"
         get '/front_gear_types', root: 'front_gear_types' do
-          FrontGearType.scoped
+          FrontGearType.all
         end
 
         desc "Rear gear types"
         get '/rear_gear_types', root: 'rear_gear_types' do
-          RearGearType.scoped
+          RearGearType.all
         end
 
         desc "Handlebars"
         get '/handlebar_types', root: 'handlebar_types' do
-          HandlebarType.scoped
+          HandlebarType.all
         end
 
         desc "Propulsion types"
         get '/propulsion_types', root: 'propulsion_types' do
-          PropulsionType.scoped
+          PropulsionType.all
         end
         
         desc "Wheel sizes (paginated)", {

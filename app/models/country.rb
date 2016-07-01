@@ -1,5 +1,7 @@
 class Country < ActiveRecord::Base
-  attr_accessible :name, :iso
+  def self.old_attr_accessible
+    %w(name iso).map(&:to_sym).freeze
+  end
   validates_presence_of :name
   validates_uniqueness_of :name
   validates_uniqueness_of :iso
@@ -8,11 +10,7 @@ class Country < ActiveRecord::Base
 
   def self.fuzzy_iso_find(n)
     n = 'us' if n.match(/usa/i)
-    if !n.blank?
-      self.find(:first, conditions: [ "lower(iso) = ?", n.downcase.strip ])
-    else
-      nil
-    end
+    n && where('lower(iso) = ?', n.downcase.strip).first
   end
 
 

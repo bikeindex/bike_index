@@ -1,5 +1,7 @@
 class OrganizationDeal < ActiveRecord::Base
-  attr_accessible :organization_id, :deal_name, :email, :user_id
+  def self.old_attr_accessible
+    %w(organization_id deal_name email user_id).map(&:to_sym).freeze
+  end
 
   belongs_to :organization
   belongs_to :user 
