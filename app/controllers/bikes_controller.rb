@@ -19,6 +19,7 @@ class BikesController < ApplicationController
   before_filter :render_ad, only: [:index, :show]
   before_filter :set_return_to, only: [:edit]
   before_filter :remove_subdomain, only: [:index]
+  skip_before_filter :set_x_frame_options_header, only: [:create]
   layout 'application_revised'
 
   def index
