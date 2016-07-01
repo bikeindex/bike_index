@@ -359,8 +359,6 @@ describe BikesController do
           expect(@b_param.reload.created_bike_id).not_to be_nil
           expect(@b_param.reload.bike_errors).to be_nil
           expect(@user.reload.phone).to eq('3123799513')
-          # We're accepting iframed form submissions at this endpoint, allow it
-          expect(response.headers['X-Frame-Options']).not_to be_present
         end
 
         it 'creates a new ownership and bike from an organization' do
@@ -374,7 +372,15 @@ describe BikesController do
         end
       end
 
-      describe 'embeded submission' do
+      describe 'embeded submission without CSRF token' do
+        # Skip CSRF protection on create to allow iframes for safari, because of below issue:
+        #   http://stackoverflow.com/questions/31429589/rail-ajax-and-iframe-in-safari
+        before do
+          ActionController::Base.allow_forgery_protection = true
+        end
+        after do
+          ActionController::Base.allow_forgery_protection = false
+        end
         it 'creates a new ownership and bike from an organization' do
           organization = FactoryGirl.create(:organization)
           user = FactoryGirl.create(:user)
@@ -399,6 +405,8 @@ describe BikesController do
           bike = Bike.last
           expect(bike.creation_organization_id).to eq(organization.id)
           expect(bike.additional_registration).to eq('Testly secondary')
+          # We're accepting iframed form submissions at this endpoint, allow it
+          expect(response.headers['X-Frame-Options']).not_to be_present
         end
       end
 

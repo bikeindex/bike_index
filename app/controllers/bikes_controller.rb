@@ -20,6 +20,7 @@ class BikesController < ApplicationController
   before_filter :set_return_to, only: [:edit]
   before_filter :remove_subdomain, only: [:index]
   skip_before_filter :set_x_frame_options_header, only: [:create]
+  skip_before_filter :verify_authenticity_token, only: [:create]
   layout 'application_revised'
 
   def index
@@ -141,6 +142,7 @@ class BikesController < ApplicationController
         end
       end
     else
+      verify_authenticity_token
       find_or_new_b_param
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@b_param.created_bike) and return
