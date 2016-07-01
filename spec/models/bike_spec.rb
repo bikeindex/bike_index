@@ -57,15 +57,8 @@ describe Bike do
 
   describe 'recovered_records' do
     it 'default scopes to created_at desc' do
-      o = FactoryGirl.create(:ownership)
-      user = o.creator
-      bike = o.bike
-      recovered_2 = FactoryGirl.create(:stolen_record, bike: bike, current: false)
-      recovered_1 = FactoryGirl.create(:stolen_record, bike: bike, current: false, date_stolen: (Time.now - 1.day))
-      reloaded_bike = Bike.find(bike.id)
-      pp reloaded_bike.recovered_records
-      expect(reloaded_bike.recovered_records.count).to eq 2
-      expect(reloaded_bike.recovered_records.first).to eq(recovered_2)
+      bike = FactoryGirl.create(:bike)
+      expect(bike.recovered_records.to_sql).to eq(StolenRecord.unscoped.where(bike_id: bike.id, current: false).order('date_recovered desc').to_sql)
     end
   end
 

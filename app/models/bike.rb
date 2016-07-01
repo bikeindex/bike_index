@@ -34,6 +34,7 @@ class Bike < ActiveRecord::Base
   has_many :components, dependent: :destroy
   has_many :b_params, as: :created_bike
   has_many :duplicate_bike_groups, through: :normalized_serial_segments
+  has_many :recovered_records, -> { recovered }, class_name: 'StolenRecord'
 
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :components, allow_destroy: true
@@ -164,10 +165,6 @@ class Bike < ActiveRecord::Base
 
   def find_current_stolen_record
     self.stolen_records.last if self.stolen_records.any?
-  end
-
-  def recovered_records
-    StolenRecord.recovered.where(id: self.id)
   end
 
   def title_string
