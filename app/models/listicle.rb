@@ -1,15 +1,8 @@
 class Listicle < ActiveRecord::Base
-  attr_accessible :list_order,
-    :body,
-    :blog_id,
-    :image,
-    :title,
-    :body_html,
-    :image_width,
-    :image_height,
-    :image_credits,
-    :image_credits_html,
-    :crop_top_offset
+  def self.old_attr_accessible
+    %w(list_order body blog_id image title body_html image_width image_height
+       image_credits image_credits_html crop_top_offset).map(&:to_sym).freeze
+  end
 
   belongs_to :blog 
   mount_uploader :image, ListicleImageUploader

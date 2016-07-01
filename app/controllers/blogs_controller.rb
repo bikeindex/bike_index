@@ -7,5 +7,4 @@ class BlogsController < ApplicationController
   def show
     redirect_to news_url
   end
-
 end

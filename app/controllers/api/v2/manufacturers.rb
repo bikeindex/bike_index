@@ -7,7 +7,7 @@ module API
         desc "All the manufacturers with pagination"
         paginate
         get '/' do
-          paginate Manufacturer.scoped
+          paginate Manufacturer.all
         end
       
         desc "Manufacturer matching ID or name", {

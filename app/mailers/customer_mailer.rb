@@ -85,7 +85,7 @@ class CustomerMailer < ActionMailer::Base
   def organization_invitation_email(organization_invitation)
     @organization_invitation = organization_invitation
     @organization = organization_invitation.organization
-    @inviter = User.find(organization_invitation.inviter)
+    @inviter = User.find(organization_invitation.inviter_id)
     @new_user = false
     @new_user = true unless User.fuzzy_email_find(@organization_invitation.invitee_email)
     mail(to: @organization_invitation.invitee_email, subject: "Join #{@organization.name} on the Bike Index") do |format|

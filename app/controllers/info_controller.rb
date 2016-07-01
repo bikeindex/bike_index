@@ -4,7 +4,7 @@ class InfoController < ApplicationController
 
   def about
   end
-  
+
   def where
     @organizations = Organization.shown_on_map
   end

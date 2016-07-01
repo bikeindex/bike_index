@@ -47,7 +47,7 @@ module API
         params :components_attrs do 
           optional :manufacturer, type: String, desc: "Manufacturer name or ID"
           # [Manufacturer name or ID](api_v2#!/manufacturers/GET_version_manufacturers_format)
-          optional :component_type, type: String, desc: 'Type of component', values: CTYPE_NAMES, desc: 'Type - case sensitive match'
+          optional :component_type, type: String, desc: 'Type of component', values: CTYPE_NAMES
           optional :model, type: String, desc: "Component model"
           optional :year, type: Integer, desc: "Component year"
           optional :description, type: String, desc: "Component description"
@@ -85,7 +85,6 @@ module API
             error!("Could not create stolen record: missing #{k.to_s}", 401) unless hash[:stolen_record][k].present?
           end
         end
-
       end
 
       resource :bikes do
@@ -170,10 +169,10 @@ module API
           declared_p = { "declared_params" => declared(params, include_missing: false) }
           find_bike
           authorize_bike_for_user
-          hash = BParam.v2_params(declared_p['declared_params'])
+          hash = BParam.v2_params(declared_p['declared_params'].as_json)
           ensure_required_stolen_attrs(hash) if hash[:stolen_record].present? && @bike.stolen != true
           begin
-            BikeUpdator.new(user: current_user, b_params: hash).update_available_attributes
+            BikeUpdator.new(user: current_user, bike: @bike, b_params: hash).update_available_attributes
           rescue => e
             error!("Unable to update bike: #{e}", 401)
           end
@@ -194,7 +193,7 @@ module API
 
           NOTE
         }
-        params  do 
+        params  do
           requires :id, type: Integer, desc: "Bike ID"
           requires :file, :type => Rack::Multipart::UploadedFile, :desc => "Attachment."
         end

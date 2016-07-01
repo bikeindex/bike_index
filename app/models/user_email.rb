@@ -1,5 +1,7 @@
 class UserEmail < ActiveRecord::Base
-  attr_accessible :email, :user_id, :old_user_id, :confirmation_token
+  def self.old_attr_accessible
+    %w(email user_id old_user_id confirmation_token).map(&:to_sym).freeze
+  end
   belongs_to :user, touch: true
   belongs_to :old_user, class_name: 'User', touch: true
   validates_presence_of :user_id, :email
@@ -30,7 +32,7 @@ class UserEmail < ActiveRecord::Base
 
   def self.fuzzy_find(str)
     return nil if str.blank?
-    find(:first, conditions: ['lower(email) = ?', EmailNormalizer.new(str).normalized])
+    find_by_email(EmailNormalizer.new(str).normalized)
   end
 
   def self.fuzzy_user_id_find(str)

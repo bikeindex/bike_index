@@ -1,23 +1,10 @@
 class Component < ActiveRecord::Base
   include ActiveModel::Dirty
-  attr_accessible :model_name,
-    :cmodel_name,
-    :year,
-    :ctype,
-    :ctype_id,
-    :ctype_other,
-    :manufacturer,
-    :manufacturer_id,
-    :mnfg_name,
-    :manufacturer_other,
-    :description,
-    :bike_id,
-    :bike,
-    :serial_number,
-    :front,
-    :rear,
-    :front_or_rear
-    
+  def self.old_attr_accessible
+    %w(cmodel_name year ctype ctype_id ctype_other manufacturer manufacturer_id mnfg_name
+       manufacturer_other description bike_id bike serial_number front rear front_or_rear).map(&:to_sym).freeze
+  end
+
   attr_accessor :front_or_rear, :mnfg_name, :setting_is_stock
   def model_name=(val)
     self.cmodel_name = val

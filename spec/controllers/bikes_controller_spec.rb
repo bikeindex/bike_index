@@ -779,7 +779,7 @@ describe BikesController do
                 stolen: true,
                 stolen_records_attributes: {
                   stolen_record.id.to_s => {
-                    date_stolen_input: 'Mon Feb 22 2016',
+                    date_stolen_input: 'Mon Feb 8 2016',
                     phone: '9999999999',
                     street: '66666666 foo street'
                   }
@@ -800,7 +800,7 @@ describe BikesController do
           expect(current_stolen_record.phone).to eq '9999999999'
           # expect(current_stolen_record.city).to eq 'party'
           expect(current_stolen_record.street).to eq '66666666 foo street'
-          expect(current_stolen_record.date_stolen).to eq DateTime.strptime('02-22-2016 06', '%m-%d-%Y %H')
+          expect(current_stolen_record.date_stolen).to be_within(1.second).of DateTime.strptime('02-08-2016 06', '%m-%d-%Y %H')
         end
       end
     end

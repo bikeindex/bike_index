@@ -7,6 +7,6 @@ class EmailOwnershipInvitationWorker
     ownership = Ownership.find(ownership_id)
     ownership.bike.save
     ownership.reload
-    CustomerMailer.ownership_invitation_email(ownership).deliver
+    CustomerMailer.ownership_invitation_email(ownership).deliver_now
   end
 end

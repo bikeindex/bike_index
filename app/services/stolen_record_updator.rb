@@ -35,13 +35,17 @@ class StolenRecordUpdator
     DateTime.strptime("#{date_string} 06", '%m-%d-%Y %H')
   end
 
+  def create_date_from_input(date_formatted)
+    DateTime.strptime("#{date_formatted} 06", StolenRecord.revised_date_format_hour)
+  end
+
   def update_records
     if @bike.stolen
       create_new_record unless @bike.find_current_stolen_record.present?
       if @date_stolen
         stolen_record = @bike.reload.find_current_stolen_record
         stolen_record.update_attributes(date_stolen: create_date_from_string(@date_stolen))
-      elsif @b_param && @b_param[:stolen_record].present?
+      elsif @b_param && (@b_param[:stolen_record] || @b_param[:bike][:stolen_records_attributes])
         stolen_record = @bike.reload.find_current_stolen_record
         update_with_params(stolen_record).save
       end
@@ -58,28 +62,35 @@ class StolenRecordUpdator
 
 
   def update_with_params(stolen_record)
+    @b_param[:stolen_record] = @b_param[:bike][:stolen_records_attributes][stolen_record.id.to_s].with_indifferent_access if @b_param && @b_param[:bike] && @b_param[:bike][:stolen_records_attributes]
     return stolen_record unless @b_param.present? && @b_param[:stolen_record].present?
     sr = @b_param[:stolen_record]
-    stolen_record.police_report_number, stolen_record.police_report_department = [
-      sr[:police_report_number], sr[:police_report_department] 
-    ]
-    stolen_record.theft_description, stolen_record.street, stolen_record.city, stolen_record.zipcode = [
-      sr[:theft_description], sr[:street], sr[:city], sr[:zipcode]
-    ]
-    stolen_record.date_stolen = create_date_from_string(sr[:date_stolen]) if sr[:date_stolen].present?
+    stolen_record.attributes = {
+      police_report_number: sr[:police_report_number],
+      police_report_department: sr[:police_report_department],
+      theft_description: sr[:theft_description],
+      street: sr[:street],
+      city: sr[:city],
+      zipcode: sr[:zipcode],
+      locking_description: sr[:locking_description],
+      lock_defeat_description: sr[:lock_defeat_description]
+    }
+    stolen_record.phone = sr[:phone] if sr[:phone]
+    stolen_record.date_stolen = create_date_from_string(sr[:date_stolen]) if sr[:date_stolen]
+    stolen_record.date_stolen = create_date_from_input(sr[:date_stolen_input]) if sr[:date_stolen_input]
     if sr[:country].present?
       country = Country.fuzzy_iso_find(sr[:country])
       stolen_record.country_id = country.id if country.present?
     end
     stolen_record.state_id = State.fuzzy_abbr_find(sr[:state]).id if sr[:state].present?
     if sr[:phone_no_show]
-    	stolen_record.phone_for_everyone = false
-    	stolen_record.phone_for_users = false
-    	stolen_record.phone_for_shops = false
-    	stolen_record.phone_for_police = false
+    	stolen_record.attributes = {
+        phone_for_everyone: false,
+      	phone_for_users: false,
+      	phone_for_shops: false,
+      	phone_for_police: false
+      }
     end
-    stolen_record.locking_description = sr[:locking_description]
-    stolen_record.lock_defeat_description = sr[:lock_defeat_description]
     stolen_record
   end
 

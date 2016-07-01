@@ -3,7 +3,6 @@ require 'spec_helper'
 describe StolenRecord do
   describe 'validations' do
     it { is_expected.to validate_presence_of :bike }
-    it { is_expected.to validate_presence_of :date_stolen }
     it { is_expected.to belong_to :bike }
     it { is_expected.to have_one :recovery_display }
     it { is_expected.to belong_to :country }
@@ -18,18 +17,18 @@ describe StolenRecord do
 
   describe 'scopes' do
     it 'default scopes to current' do
-      expect(StolenRecord.scoped.to_sql).to eq(StolenRecord.where(current: true).to_sql)
+      expect(StolenRecord.all.to_sql).to eq(StolenRecord.unscoped.where(current: true).to_sql)
     end
     it 'scopes approveds' do
-      expect(StolenRecord.approveds.to_sql).to eq(StolenRecord.where(current: true).where(approved: true).to_sql)
+      expect(StolenRecord.approveds.to_sql).to eq(StolenRecord.unscoped.where(current: true).where(approved: true).to_sql)
     end
     it 'scopes approveds_with_reports' do
-      expect(StolenRecord.approveds_with_reports.to_sql).to eq(StolenRecord.where(current: true).where(approved: true)
+      expect(StolenRecord.approveds_with_reports.to_sql).to eq(StolenRecord.unscoped.where(current: true).where(approved: true)
         .where('police_report_number IS NOT NULL').where('police_report_department IS NOT NULL').to_sql)
     end
 
     it 'scopes not_tsved' do
-      expect(StolenRecord.not_tsved.to_sql).to eq(StolenRecord.where(current: true).where('tsved_at IS NULL').to_sql)
+      expect(StolenRecord.not_tsved.to_sql).to eq(StolenRecord.unscoped.where(current: true).where('tsved_at IS NULL').to_sql)
     end
     it 'scopes recovered' do
       expect(StolenRecord.recovered.to_sql).to eq(StolenRecord.unscoped.where(current: false).order('date_recovered desc').to_sql)
@@ -50,6 +49,29 @@ describe StolenRecord do
 
   it 'only allows one current stolen record per bike'
 
+  describe 'date_present' do
+    let(:bike) { Bike.new }
+    context 'both date_stolen and date_stolen_input absent' do
+      it 'adds an error' do
+        stolen_record = StolenRecord.new(bike: bike)
+        expect(stolen_record.valid?).to be_falsey
+        expect(stolen_record.errors.full_messages.to_s).to match 'date stolen'
+      end
+    end
+    context 'date_stolen present' do
+      it 'is valid' do
+        stolen_record = StolenRecord.new(bike: bike, date_stolen: Date.yesterday)
+        expect(stolen_record.valid?).to be_truthy
+      end
+    end
+    context 'date_stolen_input present' do
+      it 'is valid' do
+        stolen_record = StolenRecord.new(bike: bike, date_stolen_input: 'Mon Feb 22 2016')
+        expect(stolen_record.valid?).to be_truthy
+      end
+    end
+  end
+
   describe 'address' do
     it 'creates an address' do
       c = Country.create(name: 'Neverland', iso: 'XXX')
@@ -61,15 +83,15 @@ describe StolenRecord do
 
   describe 'scopes' do
     it 'only includes current records' do
-      expect(StolenRecord.scoped.to_sql).to eq(StolenRecord.where(current: true).to_sql)
+      expect(StolenRecord.all.to_sql).to eq(StolenRecord.unscoped.where(current: true).to_sql)
     end
 
     it 'only includes non-current in recovered' do
-      expect(StolenRecord.recovered.to_sql).to eq(StolenRecord.where(current: false).order('date_recovered desc').to_sql)
+      expect(StolenRecord.recovered.to_sql).to eq(StolenRecord.unscoped.where(current: false).order('date_recovered desc').to_sql)
     end
 
     it 'only includes sharable unapproved in recovery_waiting_share_approval' do
-      expect(StolenRecord.recovery_unposted.to_sql).to eq(StolenRecord.where(current: false, recovery_posted: false).to_sql)
+      expect(StolenRecord.recovery_unposted.to_sql).to eq(StolenRecord.unscoped.where(current: false, recovery_posted: false).to_sql)
     end
   end
 

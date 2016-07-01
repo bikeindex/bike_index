@@ -4,9 +4,8 @@ class PartnerUploader < CarrierWave::Uploader::Base
   include ::CarrierWave::Backgrounder::Delay
   include CarrierWave::MiniMagick
 
-  # Include the Sprockets helpers for Rails 3.1+ asset pipeline compatibility:
-  include Sprockets::Helpers::RailsHelper
-  include Sprockets::Helpers::IsolatedHelper
+  # include Sprockets::Helpers::RailsHelper # Deprecated. Should be removed
+  # include Sprockets::Helpers::IsolatedHelper # Deprecated. Should be removed
  
   if Rails.env.test?
     storage :file

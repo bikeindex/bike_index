@@ -1,14 +1,8 @@
 class StolenNotification < ActiveRecord::Base
-  attr_accessible :subject,
-    :reference_url,
-    :message,
-    :sender,
-    :receiver,
-    :bike_id,
-    :bike,
-    :receiver_email,
-    :send_dates,
-    :application_id
+  def self.old_attr_accessible
+    %w(subject reference_url message sender receiver bike_id bike receiver_email
+       send_dates application_id).map(&:to_sym).freeze
+  end
 
   belongs_to :bike
   belongs_to :sender, class_name: 'User', foreign_key: :sender_id

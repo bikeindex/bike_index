@@ -1,14 +1,5 @@
 # b_param stands for Bike param
 class BParam < ActiveRecord::Base
-  attr_accessible :params,
-                  :creator_id,
-                  :bike_title,
-                  :created_bike_id,
-                  :bike_errors,
-                  :image,
-                  :image_processed, 
-                  :api_v2
-
   attr_accessor :api_v2
 
   mount_uploader :image, ImageUploader
@@ -54,7 +45,7 @@ class BParam < ActiveRecord::Base
   end
 
   def self.v2_params(hash)
-    h = { bike: hash }
+    h = { bike: hash.with_indifferent_access }
     h[:bike][:serial_number] = h[:bike].delete :serial
     h[:bike][:send_email] = !(h[:bike].delete :no_notify)
     org = Organization.find_by_slug(h[:bike].delete :organization_slug)
@@ -88,22 +79,22 @@ class BParam < ActiveRecord::Base
 
   def set_cycle_type_key
     if bike[:cycle_type_name].present?
-      ct = CycleType.find(:first, conditions: [ "lower(name) = ?", bike[:cycle_type_name].downcase.strip ])
+      ct = CycleType.where('lower(name) = ?', bike[:cycle_type_name].downcase.strip).first
     else
-      ct = CycleType.find(:first, conditions: [ "slug = ?", bike[:cycle_type_slug].downcase.strip ])
+      ct = CycleType.where('slug = ?', bike[:cycle_type_slug].downcase.strip).first
     end
     params[:bike][:cycle_type_id] = ct.id if ct.present?
     params[:bike].delete(:cycle_type_slug) || params[:bike].delete(:cycle_type_name)
   end
 
   def set_frame_material_key
-    fm = FrameMaterial.find(:first, conditions: [ "slug = ?", bike[:frame_material_slug].downcase.strip ])
+    fm = FrameMaterial.where("slug = ?", bike[:frame_material_slug].downcase.strip).first
     params[:bike][:frame_material_id] = fm.id if fm.present?
     params[:bike].delete(:frame_material_slug)
   end
 
   def set_handlebar_type_key
-    ht = HandlebarType.find(:first, conditions: [ "slug = ?", bike[:handlebar_type_slug].downcase.strip ])
+    ht = HandlebarType.where("slug = ?", bike[:handlebar_type_slug].downcase.strip).first
     params[:bike][:handlebar_type_id] = ht.id if ht.present?
     params[:bike].delete(:handlebar_type_slug)
   end

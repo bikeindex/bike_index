@@ -1,15 +1,9 @@
 class Ctype < ActiveRecord::Base
   # Note: Ctype is short for component_type.
   # The name had to be shortened because of join table key length
-  attr_accessible :name,
-    :slug,
-    :secondary_name,
-    :image,
-    :image_cache,
-    :cgroup_id,
-    :cgroup,
-    :has_multiple,
-    :cgroup_name
+  def self.old_attr_accessible
+    %w(name slug secondary_name image image_cache cgroup_id cgroup has_multiple cgroup_name).map(&:to_sym).freeze
+  end
 
   attr_accessor :cgroup_name
 
@@ -35,14 +29,6 @@ class Ctype < ActiveRecord::Base
     where(name: 'unknown', has_multiple: false, cgroup_id: Cgroup.additional_parts.id).first_or_create
   end
   
-  def self.import(file)
-    CSV.foreach(file.path, headers: true) do |row|
-      component_group = find_by_name(row["name"]) || new
-      component_group.attributes = row.to_hash.slice(*accessible_attributes)
-      component_group.save!
-    end
-  end
-
   before_create :set_cgroup_from_name
   def set_cgroup_from_name
     if self.cgroup_name.present?
@@ -58,12 +44,6 @@ class Ctype < ActiveRecord::Base
   end
 
   def self.fuzzy_name_find(n)
-    if !n.blank?
-      n = Slugifyer.slugify(n)
-      found = self.find(:first, conditions: [ "slug = ?", n ])
-      return found if found.present?
-    end
-    nil
+    n && find_by_slug(Slugifyer.slugify(n))
   end
-
 end

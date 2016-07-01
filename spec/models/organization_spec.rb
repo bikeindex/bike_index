@@ -34,9 +34,9 @@ describe Organization do
       org = Organization.new(name: '<script>alert(document.cookie)</script>',
                              website: '<script>alert(document.cookie)</script>')
       org.set_and_clean_attributes
-      expect(org.name).to eq('alert(document.cookie)')
+      expect(org.name).to match(/stop messing about/i)
       expect(org.website).to eq('http://<script>alert(document.cookie)</script>')
-      expect(org.short_name).to eq('alert(document.cookie)')
+      expect(org.short_name).to match(/stop messing about/i)
     end
 
     it "protects from name collisions, without erroring because of it's own slug" do

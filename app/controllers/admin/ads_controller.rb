@@ -15,7 +15,7 @@ class Admin::AdsController < Admin::BaseController
   end
 
   def update
-    if @ad.update_attributes(params[:ad])
+    if @ad.update_attributes(permitted_parameters)
       flash[:success] = "Ad Saved!"
       redirect_to admin_ad_url(@ad)
     else
@@ -28,7 +28,7 @@ class Admin::AdsController < Admin::BaseController
   end
 
   def create
-    @ad = Ad.create(params[:ad])
+    @ad = Ad.create(permitted_parameters)
     if @ad.save
       flash[:success] = "Ad Created!"
       redirect_to edit_admin_ad_url(@ad)
@@ -39,6 +39,10 @@ class Admin::AdsController < Admin::BaseController
 
 
   protected
+
+  def permitted_parameters
+    params.require(:ad).permit(Ad.old_attr_accessible)
+  end
 
   def find_ad
     @ad = Ad.find(params[:id])

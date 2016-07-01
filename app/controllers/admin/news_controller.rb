@@ -26,7 +26,7 @@ class Admin::NewsController < Admin::BaseController
     body = "blog"
     title = params[:blog][:title]
     body = params[:blog][:body]
-    if @blog.update_attributes(params[:blog])
+    if @blog.update_attributes(permitted_parameters)
       @blog.reload
       if @blog.listicles.present?
         @blog.listicles.pluck(:id).each { |id| ListicleImageSizeWorker.perform_in(1.minutes, id) }
@@ -62,6 +62,10 @@ class Admin::NewsController < Admin::BaseController
   end
 
   protected
+
+  def permitted_parameters
+    params.require(:blog).permit(Blog.old_attr_accessible)
+  end
 
   def set_dignified_name
     @dignified_name = "short form creative non-fiction"

@@ -1,6 +1,8 @@
 class Membership < ActiveRecord::Base
   MEMBERSHIP_TYPES = %w(admin member).freeze
-  attr_accessible :organization_id, :role, :user_id
+  def self.old_attr_accessible
+    %w(organization_id role user_id).map(&:to_sym).freeze
+  end
   acts_as_paranoid
 
   belongs_to :organization

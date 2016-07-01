@@ -1,9 +1,7 @@
 class Paint < ActiveRecord::Base
-  attr_accessible :name,
-    :color_id,
-    :secondary_color_id,
-    :tertiary_color_id,
-    :manufacturer_id
+  def self.old_attr_accessible
+    %w(name color_id secondary_color_id tertiary_color_id manufacturer_id).map(&:to_sym).freeze
+  end
 
   validates_presence_of :name
   validates_uniqueness_of :name
@@ -19,11 +17,7 @@ class Paint < ActiveRecord::Base
   before_save { |p| p.name = p.name.downcase.strip }
 
   def self.fuzzy_name_find(n)
-    if !n.blank?
-      self.find(:first, conditions: [ "lower(name) = ?", n.downcase.strip ])
-    else
-      nil
-    end
+    n && where('lower(name) = ?', n.downcase.strip).first
   end
 
   before_create :associate_colors

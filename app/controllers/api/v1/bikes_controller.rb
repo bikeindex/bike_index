@@ -5,7 +5,7 @@ module Api
       before_filter :authenticate_organization, only: [:create, :stolen_ids]
       skip_before_filter  :verify_authenticity_token
       after_filter :cors_set_access_control_headers
-      caches_action :search_tags
+      # caches_action :search_tags
       # serialization_scope nil
 
       def search_tags
@@ -63,7 +63,7 @@ module Api
         params = de_string_params
         raise StandardError unless params[:bike].present?
         params[:bike][:creation_organization_id] = @organization.id
-        @b_param = BParam.create(creator_id: @organization.auto_user.id, params: params)
+        @b_param = BParam.create(creator_id: @organization.auto_user.id, params: permitted_b_params)
         bike = BikeCreator.new(@b_param).create_bike
         if @b_param.errors.blank? && @b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
           render json: {bike: { web_url: bike_url(bike), api_url: api_v1_bike_url(bike)}} and return
@@ -94,6 +94,10 @@ module Api
         params[:stolen_record] = JSON.parse params[:stolen_record] if params[:stolen_record].kind_of?(String)
         params[:components] = JSON.parse params[:components] if params[:components].kind_of?(String)
         params
+      end
+
+      def permitted_b_params
+        params.as_json
       end
     end
 

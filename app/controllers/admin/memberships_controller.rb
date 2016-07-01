@@ -20,7 +20,7 @@ class Admin::MembershipsController < Admin::BaseController
   end
 
   def update
-    if @membership.update_attributes(params[:membership])
+    if @membership.update_attributes(permitted_parameters)
       flash[:success] = "Membership Saved!"
       redirect_to admin_membership_url(@membership)
     else
@@ -52,6 +52,10 @@ class Admin::MembershipsController < Admin::BaseController
   end
 
   protected
+
+  def permitted_parameters
+    params.require(:membership).permit(Membership.old_attr_accessible)
+  end
 
   def find_membership
     @membership = Membership.find(params[:id])

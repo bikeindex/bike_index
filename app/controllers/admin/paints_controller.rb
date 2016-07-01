@@ -27,7 +27,7 @@ class Admin::PaintsController < Admin::BaseController
   end
 
   def update
-    if @paint.update_attributes(params[:paint])
+    if @paint.update_attributes(permitted_parameters)
       black_id = Color.find_by_name('Black').id
       flash[:success] = 'Paint updated!'
       if @paint.reload.color_id.present?
@@ -59,6 +59,10 @@ class Admin::PaintsController < Admin::BaseController
   end
 
   protected
+
+  def permitted_parameters
+    params.require(:paint).permit(Paint.old_attr_accessible)
+  end
 
   def find_paint
     @paint = Paint.find(params[:id])

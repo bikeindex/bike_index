@@ -5,9 +5,8 @@ class PdfUploader < CarrierWave::Uploader::Base
   include CarrierWave::MimeTypes
 
   process :set_content_type
-  # Include the Sprockets helpers for Rails 3.1+ asset pipeline compatibility:
-  include Sprockets::Helpers::RailsHelper
-  include Sprockets::Helpers::IsolatedHelper
+  # include Sprockets::Helpers::RailsHelper # Deprecated. Should be removed
+  # include Sprockets::Helpers::IsolatedHelper # Deprecated. Should be removed
 
   if Rails.env.test?
     storage :file

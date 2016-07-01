@@ -15,23 +15,23 @@ describe InfoController do
         end
       end
     end
-    # context 'signed in user' do
-    #   let(:user) { FactoryGirl.create(:user) }
-    #   # Since we're rendering things, and these are important pages,
-    #   # let's test with users as well
-    #   before do
-    #     set_current_user(user)
-    #   end
-    #   pages.each do |page|
-    #     context "#{page} with revised_layout enabled" do
-    #       it 'renders with revised_layout' do
-    #         get page.to_sym
-    #         expect(response.status).to eq(200)
-    #         expect(response).to render_template(page.to_sym)
-    #         expect(response).to render_with_layout('application_revised')
-    #       end
-    #     end
-    #   end
-    # end
+    context 'signed in user' do
+      let(:user) { FactoryGirl.create(:user) }
+      # Since we're rendering things, and these are important pages,
+      # let's test with users as well
+      before do
+        set_current_user(user)
+      end
+      pages.each do |page|
+        context "#{page} with revised_layout enabled" do
+          it 'renders with revised_layout' do
+            get page.to_sym
+            expect(response.status).to eq(200)
+            expect(response).to render_template(page.to_sym)
+            expect(response).to render_with_layout('application_revised')
+          end
+        end
+      end
+    end
   end
 end

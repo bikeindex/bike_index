@@ -2,25 +2,26 @@ require 'spec_helper'
 
 describe Admin::FlavorTextsController do
   describe 'destroy' do
-    before do
+    it 'destroys' do
       text = FlavorText.create(message: 'lulz')
       user = FactoryGirl.create(:admin)
       set_current_user(user)
-      delete :destroy, id: text.id
+      expect do
+        delete :destroy, id: text.id
+      end.to change(FlavorText, :count).by(-1)
     end
-    it { is_expected.to redirect_to(:admin_root) }
-    it { is_expected.to set_flash }
   end
 
   describe 'update' do
     describe 'success' do
-      before do
+      it 'updates' do
         user = FactoryGirl.create(:admin)
         set_current_user(user)
         post :create, flavor_text: { message: 'lulz' }
+        expect(response).to redirect_to(:admin_root)
+        expect(flash).to be_present
+        expect(FlavorText.last.message).to eq 'lulz'
       end
-      it { is_expected.to redirect_to(:admin_root) }
-      it { is_expected.to set_flash }
     end
   end
 end

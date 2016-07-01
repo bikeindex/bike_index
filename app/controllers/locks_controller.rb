@@ -18,7 +18,7 @@ class LocksController < ApplicationController
   def update
     @lock = find_lock
     @lock.user = current_user
-    if @lock.update_attributes(params[:lock])
+    if @lock.update_attributes(permitted_parameters)
       redirect_to locks_url
     else
       flash[:error] = 'There was a problem!'
@@ -31,7 +31,7 @@ class LocksController < ApplicationController
   end
 
   def create
-    @lock = Lock.new(params[:lock])
+    @lock = Lock.new(permitted_parameters)
     @lock.user = current_user
     if @lock.save 
       flash[:success] = "Lock created successfully!"
@@ -47,7 +47,8 @@ class LocksController < ApplicationController
     redirect_to '/locks'
   end
 
-  protected
+  private
+
   def find_lock
     lock = Lock.find(params[:id])
     return lock if lock.user == current_user
@@ -55,5 +56,7 @@ class LocksController < ApplicationController
     redirect_to user_home_path and return
   end
 
-
+  def permitted_parameters
+    params.require(:lock).permit(Lock.old_attr_accessible)
+  end
 end

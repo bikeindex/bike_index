@@ -1,10 +1,17 @@
 class ApplicationController < ActionController::Base
   include AuthenticationHelper
   protect_from_forgery
-  ensure_security_headers
   helper_method :current_user, :current_organization, :user_root_url,
                 :remove_session, :revised_layout_enabled?
   before_filter :enable_rack_profiler
+
+  ensure_security_headers(csp: false,
+    hsts: { max_age: 20.years.to_i, include_subdomains: false },
+    x_frame_options: 'SAMEORIGIN',
+    x_content_type_options: 'nosniff',
+    x_xss_protection: false,
+    x_download_options: false,
+    x_permitted_cross_domain_policies: false)
 
   def enable_rack_profiler
     if current_user && current_user.developer?

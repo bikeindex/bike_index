@@ -1,5 +1,7 @@
 class OtherListing < ActiveRecord::Base
-  attr_accessible :bike_id, :url, :listing_type
+  def self.old_attr_accessible
+    %w(bike_id url listing_type).map(&:to_sym).freeze
+  end
 
   belongs_to :bike
   validates_presence_of :bike_id

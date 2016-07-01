@@ -5,7 +5,7 @@ class EmailInvoiceWorker
 
   def perform(id)
     @payment = Payment.find(id)
-    CustomerMailer.invoice_email(@payment).deliver
+    CustomerMailer.invoice_email(@payment).deliver_now
   end
 
 end

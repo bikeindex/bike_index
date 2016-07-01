@@ -13,7 +13,7 @@ class Admin::CtypesController < Admin::BaseController
   end
 
   def update
-    if @ctype.update_attributes(params[:ctype])
+    if @ctype.update_attributes(permitted_parameters)
       flash[:success] = 'Component Type Saved!'
       redirect_to admin_ctypes_url
     else
@@ -22,7 +22,7 @@ class Admin::CtypesController < Admin::BaseController
   end
 
   def create
-    @ctype = Ctype.create(params[:ctype])
+    @ctype = Ctype.create(permitted_parameters)
     if @ctype.save
       flash[:success] = 'Component type created!'
       redirect_to admin_ctypes_url
@@ -44,6 +44,10 @@ class Admin::CtypesController < Admin::BaseController
   end
 
   protected
+
+  def permitted_parameters
+    params.require(:ctype).permit(Ctype.old_attr_accessible)
+  end
 
   def find_ctypes
     @ctype = Ctype.find_by_slug(params[:id])

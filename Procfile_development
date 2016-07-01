@@ -1,2 +1,3 @@
-web: bundle exec unicorn_rails -p 3001
+web: bundle exec puma -p 3001
+log: tail -f log/development.log
 hard_worker: bundle exec rerun --background --dir app,db,lib --pattern '{**/*.rb}' -- bundle exec sidekiq -q carrierwave -q updates -q stolen -q notify -q email -q afterwards

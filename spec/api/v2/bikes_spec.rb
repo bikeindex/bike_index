@@ -261,8 +261,8 @@ describe 'Bikes API V2' do
       @token.update_attribute :scopes, 'public'
       put @url, @params.to_json, JSON_CONTENT
       expect(response.code).to eq('403')
-      expect(response.body.match(/oauth/i)).to be_present
-      expect(response.body.match(/permissions/i)).to be_present
+      expect(response.body).to match(/oauth/i)
+      expect(response.body).to match(/permission/i)
     end
 
     it "fails to update bike if required stolen attrs aren't present" do
@@ -435,9 +435,9 @@ describe 'Bikes API V2' do
       @token.update_attribute :scopes, 'public'
       post @url, @params.to_json, JSON_CONTENT
       expect(response.code).to eq('403')
-      expect(response.body.match('OAuth')).to be_present
-      expect(response.body.match('permissions')).to be_present
-      expect(response.body.match('is not stolen')).not_to be_present
+      expect(response.body).to match('OAuth')
+      expect(response.body).to match(/permission/i)
+      expect(response.body).to_not match('is not stolen')
     end
 
     it "fails if the bike isn't stolen" do

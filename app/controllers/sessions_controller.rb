@@ -10,10 +10,10 @@ class SessionsController < ApplicationController
   end
 
   def create
-    @user = User.fuzzy_email_find(params[:session][:email])
+    @user = User.fuzzy_email_find(permitted_parameters[:email])
     if @user.present?
       if @user.confirmed?
-        if @user.authenticate(params[:session][:password])
+        if @user.authenticate(permitted_parameters[:password])
           sign_in_and_redirect
         else
           # User couldn't authenticate, so password is invalid
@@ -25,7 +25,7 @@ class SessionsController < ApplicationController
           render :new
         end
       end
-    elsif User.fuzzy_unconfirmed_primary_email_find(params[:session][:email]).present?
+    elsif User.fuzzy_unconfirmed_primary_email_find(permitted_parameters[:email]).present?
       # Email address is not confirmed
       flash.now.alert = 'You must confirm your email address to continue'
       render :new
@@ -46,5 +46,9 @@ class SessionsController < ApplicationController
     redirect_to goodbye_url(subdomain: false), notice: 'Logged out!'
   end
 
+  private
 
+  def permitted_parameters
+    params.require(:session).permit(:password, :email)
+  end
 end

@@ -17,7 +17,7 @@ describe StolenNotification do
         FactoryGirl.create(:stolen_notification, sender: user)
       end.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
       stolen_notification = StolenNotification.where(sender_id: user.id).first
-      expect(stolen_notification.send_dates).to eq('[]')
+      expect(stolen_notification.send_dates).to eq([])
       expect do
         FactoryGirl.create(:stolen_notification, sender: user)
       end.to change(EmailStolenNotificationWorker.jobs, :size).by(1)

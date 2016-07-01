@@ -4,34 +4,14 @@ class User < ActiveRecord::Base
 
   has_secure_password
 
-  attr_accessible :name,
-    :username,
-    :email, # Also maybe a all_emails field for searching...
-    :password,
-    :password_confirmation,
-    :current_password,
-    :terms_of_service,
-    :vendor_terms_of_service,
-    :when_vendor_terms_of_service,
-    :phone,
-    :zipcode,
-    :title,
-    :my_bikes_hash,
-    :avatar,
-    :avatar_cache,
-    :description,
-    :twitter,
-    :show_twitter,
-    :website,
-    :show_website,
-    :show_bikes,
-    :show_phone,
-    :has_stolen_bikes,
-    :can_send_many_stolen_notifications,
-    :my_bikes_link_target,
-    :my_bikes_link_title,
-    :is_emailable,
-    :additional_emails
+  def self.old_attr_accessible
+    # :email, # Also maybe a all_emails field for searching.. 
+    %w(name username email password password_confirmation current_password terms_of_service
+       vendor_terms_of_service when_vendor_terms_of_service phone zipcode title my_bikes_hash
+       avatar avatar_cache description twitter show_twitter website show_website show_bikes
+       show_phone has_stolen_bikes can_send_many_stolen_notifications my_bikes_link_target
+       my_bikes_link_title is_emailable additional_emails).map(&:to_sym).freeze
+ end
 
   attr_accessor :my_bikes_link_target, :my_bikes_link_title, :current_password
   # stripe_id, is_paid_member, paid_membership_info
@@ -39,12 +19,12 @@ class User < ActiveRecord::Base
   mount_uploader :avatar, AvatarUploader
 
   has_many :payments
-  has_many :subscriptions, class_name: "Payment", conditions: Proc.new { payments.where(is_recurring: true) }
+  has_many :subscriptions, -> { subscription }, class_name: 'Payment'
   has_many :memberships, dependent: :destroy
   has_many :organization_embeds, class_name: 'Organization', foreign_key: :auto_user_id
   has_many :organizations, through: :memberships
   has_many :ownerships, dependent: :destroy
-  has_many :current_ownerships, class_name: 'Ownership', foreign_key: :user_id, conditions: {current: true}
+  has_many :current_ownerships, -> { current }, class_name: 'Ownership'
   has_many :owned_bikes, through: :ownerships, source: :bike
   has_many :currently_owned_bikes, through: :current_ownerships, source: :bike
   has_many :oauth_applications, class_name: 'Doorkeeper::Application', as: :owner
@@ -189,7 +169,7 @@ class User < ActiveRecord::Base
   end
 
   def self.fuzzy_unconfirmed_primary_email_find(email)
-    find(:first, conditions: ['lower(email) = ?', EmailNormalizer.new(email).normalized])
+    find_by_email(EmailNormalizer.new(email).normalized)
   end
 
   def self.fuzzy_confirmed_or_unconfirmed_email_find(email)
@@ -198,14 +178,12 @@ class User < ActiveRecord::Base
 
   def self.fuzzy_id(n)
     u = self.fuzzy_email_find(n)
-    return u.id if u.present?
+    u && u.id
   end
 
   def role(organization)
     m = Membership.where(user_id: id, organization_id: organization.id).first
-    if m.present?
-      return m.role
-    end
+    m && m.role
   end
 
   def is_member_of?(organization)

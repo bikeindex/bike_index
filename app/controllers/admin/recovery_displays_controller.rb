@@ -22,7 +22,7 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
   end
 
   def update
-    if @recovery_display.update_attributes(params[:recovery_display])
+    if @recovery_display.update_attributes(permitted_parameters)
       clear_index_wrap_cache
       flash[:success] = 'Recovery display saved!'
       redirect_to admin_recovery_displays_url
@@ -32,7 +32,7 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
   end
 
   def create
-    @recovery_display = RecoveryDisplay.create(params[:recovery_display])
+    @recovery_display = RecoveryDisplay.create(permitted_parameters)
     if @recovery_display.save
       clear_index_wrap_cache
       flash[:success] = 'Recovery display created!'
@@ -48,6 +48,10 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
   end
 
   protected
+
+  def permitted_parameters
+    params.require(:recovery_display).permit(RecoveryDisplay.old_attr_accessible)
+  end
 
   def clear_index_wrap_cache
     expire_fragment 'root_head_wrap'
