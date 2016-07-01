@@ -574,9 +574,6 @@ GEM
       redis (~> 3.2, >= 3.2.1)
     sidekiq-failures (0.4.5)
       sidekiq (>= 2.16.0)
-    sidekiq-unique-jobs (4.0.17)
-      sidekiq (>= 2.6)
-      thor
     simplecov (0.11.2)
       docile (~> 1.1.0)
       json (~> 1.8)
@@ -726,7 +723,6 @@ DEPENDENCIES
   shoulda-matchers (~> 2.8.0)
   sidekiq (~> 4.1.1)
   sidekiq-failures
-  sidekiq-unique-jobs
   sitemap_generator
   soulheart (~> 0.2.6)
   sparkpost

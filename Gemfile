@@ -21,7 +21,6 @@ gem 'fast_blank', '~> 1.0'
 gem 'redis'
 gem 'sidekiq', '~> 4.1.1' # Background processing
 gem 'sidekiq-failures'
-gem 'sidekiq-unique-jobs'
 gem 'rollout' # Feature flags
 gem 'soulheart', '~> 0.2.6' # typeahead/autocomplete features
 
