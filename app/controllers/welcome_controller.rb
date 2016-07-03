@@ -1,5 +1,6 @@
 class WelcomeController < ApplicationController
   layout 'application_revised'
+  skip_before_filter :set_x_frame_options_header, only: [:goodbye]
   def index
   end
 

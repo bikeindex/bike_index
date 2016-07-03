@@ -18,6 +18,9 @@ describe WelcomeController do
       expect(response).to render_template('goodbye')
       expect(response).to render_with_layout('application_revised')
       expect(flash).to_not be_present
+      # If there is a failure, the user may be logged out - and it will display an error message.
+      # The error message is useful - particularly in embeds, which are iframed, so allow it
+      expect(response.headers['X-Frame-Options']).not_to be_present
     end
   end
 
