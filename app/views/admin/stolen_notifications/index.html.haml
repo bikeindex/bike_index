@@ -43,10 +43,10 @@
           %td
             = stolen_notification.message.truncate(120)
           %td.not-tiny-screens
-            - if stolen_notification.send_dates.count == 1
+            - if stolen_notification.send_dates_parsed.count == 1
               = "&#x2713;".html_safe
             - else
-              = stolen_notification.send_dates.count
+              = stolen_notification.send_dates_parsed.count
 
   .paginate-container
     = paginate @stolen_notifications
