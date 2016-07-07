@@ -43,7 +43,6 @@ gem 'rmagick'
 gem 'mini_magick' # a smaller implementation of rmagick, required for rqrcode
 gem 'rqrcode-rails3'
 gem 'libv8', '~> 3.16.14.7'
-gem 'rb-readline', '~> 0.5.0'
 gem 'stripe', git: 'https://github.com/stripe/stripe-ruby'
 gem 'high_voltage'
 gem 'omniauth-facebook'

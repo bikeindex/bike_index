@@ -498,7 +498,6 @@ GEM
     rb-fsevent (0.9.7)
     rb-inotify (0.9.7)
       ffi (>= 0.5.0)
-    rb-readline (0.5.3)
     rbvmomi (1.8.2)
       builder
       nokogiri (>= 1.4.1)
@@ -708,7 +707,6 @@ DEPENDENCIES
   rails-assets-selectize (~> 0.12.1)!
   rails-assets-tether (~> 1.1.0)!
   rb-fsevent (~> 0.9.1)
-  rb-readline (~> 0.5.0)
   redcarpet
   redis
   rerun
