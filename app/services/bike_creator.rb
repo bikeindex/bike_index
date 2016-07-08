@@ -8,32 +8,32 @@ class BikeCreator
   end
 
   def add_bike_book_data
-    return nil unless @b_param.present? && @b_param.params.present? && @b_param.params[:bike].present?
-    return nil unless @b_param.bike[:manufacturer_id].present?
-    return nil unless @b_param.bike[:frame_model].present?
-    return nil unless @b_param.bike[:year].present?
+    return nil unless @b_param.present? && @b_param.params.present? && @b_param.params['bike'].present?
+    return nil unless @b_param.bike['manufacturer_id'].present?
+    return nil unless @b_param.bike['frame_model'].present?
+    return nil unless @b_param.bike['year'].present?
     bike = {
-      manufacturer: Manufacturer.find(@b_param.bike[:manufacturer_id]).name,
-      year: @b_param.bike[:year],
-      frame_model: @b_param.bike[:frame_model]
+      manufacturer: Manufacturer.find(@b_param.bike['manufacturer_id']).name,
+      year: @b_param.bike['year'],
+      frame_model: @b_param.bike['frame_model']
     }
     bb_data = BikeBookIntegration.new.get_model(bike)
-    return true unless bb_data.present?
-    @b_param.params[:bike][:cycle_type] = bb_data[:bike][:cycle_type] if bb_data[:bike][:cycle_type].present?
-    if bb_data[:bike][:paint_description].present?
-      @b_param.params[:bike][:paint_name] = bb_data[:bike][:paint_description] unless @b_param.params[:bike][:paint_name].present?
+    return true unless bb_data && bb_data['bike'].present?
+    @b_param.params['bike']['cycle_type'] = bb_data['bike']['cycle_type'] if bb_data['bike'] && bb_data['bike']['cycle_type'].present?
+    if bb_data['bike']['paint_description'].present?
+      @b_param.params['bike']['paint_name'] = bb_data['bike']['paint_description'] unless @b_param.params['bike']['paint_name'].present?
     end
-    if bb_data[:bike][:description].present?
-      if @b_param.params[:bike][:description].present?
-        @b_param.params[:bike][:description] += " #{bb_data[:bike][:description]}"
+    if bb_data['bike']['description'].present?
+      if @b_param.params['bike']['description'].present?
+        @b_param.params['bike']['description'] += " #{bb_data['bike']['description']}"
       else
-        @b_param.params[:bike][:description] = bb_data[:bike][:description]
+        @b_param.params['bike']['description'] = bb_data['bike']['description']
       end
     end
-    @b_param.params[:bike][:rear_wheel_bsd] = bb_data[:bike][:rear_wheel_bsd] if bb_data[:bike][:rear_wheel_bsd].present?
-    @b_param.params[:bike][:rear_tire_narrow] = bb_data[:bike][:rear_tire_narrow] if bb_data[:bike][:rear_tire_narrow].present?
-    @b_param.params[:bike][:stock_photo_url] = bb_data[:bike][:stock_photo_url] if bb_data[:bike][:stock_photo_url].present?
-    @b_param.params[:components] = bb_data[:components] && bb_data[:components].map { |c| c.merge(is_stock: true) }
+    @b_param.params['bike']['rear_wheel_bsd'] = bb_data['bike']['rear_wheel_bsd'] if bb_data['bike']['rear_wheel_bsd'].present?
+    @b_param.params['bike']['rear_tire_narrow'] = bb_data['bike']['rear_tire_narrow'] if bb_data['bike']['rear_tire_narrow'].present?
+    @b_param.params['bike']['stock_photo_url'] = bb_data['bike']['stock_photo_url'] if bb_data['bike']['stock_photo_url'].present?
+    @b_param.params['components'] = bb_data['components'] && bb_data['components'].map { |c| c.merge('is_stock' => true) }
     @b_param.clean_params # if we just rely on the before_save filter, @b_param needs to be reloaded
     @b_param.save if @b_param.id.present? 
     @b_param

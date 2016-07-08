@@ -3,7 +3,6 @@ require 'spec_helper'
 describe BikeCreator do
   describe 'include_bike_book' do
     it "returns the bike if stuff isn't present" do
-      bike = Bike.new
       creator = BikeCreator.new
       expect(creator.add_bike_book_data).to be_nil
     end
@@ -23,12 +22,12 @@ describe BikeCreator do
 
       b_param.reload
       # pp b_param.params
-      expect(b_param.params[:components].count).to be > 5
-      expect(b_param.params[:components].count { |c| c[:is_stock] }).to be > 5
-      expect(b_param.params[:components].count { |c| !c[:is_stock] }).to eq(0)
-      expect(b_param.bike[:description]).not_to eq('Input description')
-      expect(b_param.bike[:serial_number]).to eq('Some serial')
-      expect(b_param.bike[:primary_frame_color_id]).to eq(color.id)
+      expect(b_param.params['components'].count).to be > 5
+      expect(b_param.params['components'].count { |c| c['is_stock'] }).to be > 5
+      expect(b_param.params['components'].count { |c| !c['is_stock'] }).to eq(0)
+      expect(b_param.bike['description']).not_to eq('Input description')
+      expect(b_param.bike['serial_number']).to eq('Some serial')
+      expect(b_param.bike['primary_frame_color_id']).to eq(color.id)
     end
   end
 

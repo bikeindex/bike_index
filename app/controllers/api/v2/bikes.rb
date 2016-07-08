@@ -80,9 +80,9 @@ module API
         end
 
         def ensure_required_stolen_attrs(hash)
-          return true unless hash[:bike][:stolen]
-          [:phone, :city].each do |k|
-            error!("Could not create stolen record: missing #{k.to_s}", 401) unless hash[:stolen_record][k].present?
+          return true unless hash['bike']['stolen']
+          %w(phone city).each do |k|
+            error!("Could not create stolen record: missing #{k}", 401) unless hash['stolen_record'][k].present?
           end
         end
       end

@@ -34,13 +34,14 @@ describe 'Bikes API V2' do
       FactoryGirl.create(:wheel_size, iso_bsd: 559)
       FactoryGirl.create(:cycle_type, slug: 'bike')
       FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
-      @bike = { serial: '69 non-example',
-                manufacturer: manufacturer.name,
-                rear_tire_narrow: 'true',
-                rear_wheel_bsd: '559',
-                color: color.name,
-                year: '1969',
-                owner_email: 'fun_times@examples.com'
+      @bike = { 
+        serial: '69 non-example',
+        manufacturer: manufacturer.name,
+        rear_tire_narrow: 'true',
+        rear_wheel_bsd: '559',
+        color: color.name,
+        year: '1969',
+        owner_email: 'fun_times@examples.com'
       }
     end
 

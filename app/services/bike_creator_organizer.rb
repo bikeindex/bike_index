@@ -42,10 +42,10 @@ class BikeCreatorOrganizer
   end
 
   def check_organization
-    if @b_param.params[:creation_organization_id]
-      organize(@b_param.params[:creation_organization_id])
-    elsif @b_param.params[:bike].present? and @b_param.params[:bike][:creation_organization_id]
-      organize(@b_param.params[:bike][:creation_organization_id])
+    if @b_param.params['creation_organization_id']
+      organize(@b_param.params['creation_organization_id'])
+    elsif @b_param.params['bike'].present? and @b_param.params['bike']['creation_organization_id']
+      organize(@b_param.params['bike']['creation_organization_id'])
     else
       unorganize
     end

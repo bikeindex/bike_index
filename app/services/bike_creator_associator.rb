@@ -5,7 +5,7 @@ class BikeCreatorAssociator
 
   def create_ownership(bike)
     send_email = true
-    send = @b_param.params[:bike][:send_email] 
+    send = @b_param.params['bike']['send_email'] 
     if send == false
       send_email = false
     elsif send.present? && send != true && send.to_s[/false/i]
@@ -38,14 +38,14 @@ class BikeCreatorAssociator
   end
   
   def attach_photos(bike)
-    return nil unless @b_param.params[:photos].present?
-    photos = @b_param.params[:photos].uniq.take(7)
+    return nil unless @b_param.params['photos'].present?
+    photos = @b_param.params['photos'].uniq.take(7)
     photos.each { |p| PublicImage.create(imageable: bike, remote_image_url: p) }
   end
 
   def add_other_listings(bike)
-    return nil unless @b_param.params[:bike][:other_listing_urls].present?
-    urls = @b_param.params[:bike][:other_listing_urls]
+    return nil unless @b_param.params['bike']['other_listing_urls'].present?
+    urls = @b_param.params['bike']['other_listing_urls']
     urls.each { |url| OtherListing.create(url: url, bike_id: bike.id) }
   end
 
