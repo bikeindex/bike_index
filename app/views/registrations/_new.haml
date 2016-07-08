@@ -3,12 +3,6 @@
 - owner_email ||= current_user && current_user.email || creator && creator.email
 - stolen ||= false
 - @b_param ||= BParam.new(creation_organization_id: organization && organization.id, creator_id: creator && creator.id, owner_email: owner_email, stolen: stolen)
-- creation_organization_id = organization && organization.id || nil
-
-/ - pp @b_param
-/ - pp organization
-/ - pp @b_param.creation_organization_id
-/ - pp ''
 
 = form_for @b_param, { url: registrations_path, action: 'create', html: { class: 'organized-form' } } do |f|
   .form-group.row
@@ -20,5 +14,5 @@
       Select 'Other' if manufacturer isn't listed
   = render partial: '/bikes/bike_fields/revised_colors', locals: { f: f, bike: @b_param }
 
-  = f.hidden_field :creation_organization_id, value: creation_organization_id
+  = f.hidden_field :creation_organization_id
   = f.hidden_field :creator_id
