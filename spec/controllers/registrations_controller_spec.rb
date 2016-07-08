@@ -48,35 +48,38 @@ describe RegistrationsController do
           # Since we're creating these in line, actually test the rendered body
           body = response.body
           # Owner email
-          owner_email_input = body[/id..b_param_owner_email[^v]*value=.[^\"]*/i]
-          expect(owner_email_input[/[^\"]*\z/]).to eq user.email
+          owner_email_input = body[/value=.*id..b_param_owner_email*/i]
+          email_value = owner_email_input.gsub(/value=./,'').match(/\A[^\"]*/)[0]
+          expect(email_value).to eq user.email
           # Creator
-          creator_input = body[/.input id..b_param_creator_id..[^v]*value=.\d*/i]
-          expect(creator_input[/\d*\z/]).to eq organization.auto_user_id.to_s
+          creator_input = body[/value=.*id..b_param_creator_id..*.\d*/i]
+          creator_value = creator_input.gsub(/value=./,'').match(/\A[^\"]*/)[0]
+          expect(creator_value).to eq organization.auto_user_id.to_s
           # creation_organization
-          creator_organization_id = body[/.input id..b_param_creation_organization_id..[^v]*value=.\d*/i]
-          expect(creator_organization_id[/\d*\z/]).to eq organization.id.to_s
+          creator_organization_input = body[/value=.*id..b_param_creation_organization_id/i]
+          creator_organization_value = creator_organization_input.gsub(/value=./,'').match(/\A[^\"]*/)[0]
+          expect(creator_organization_value).to eq organization.id.to_s
         end
       end
     end
   end
   describe 'create' do
-    context 'no organization' do
-      context 'no user' do
-        it 'renders' do
-          get :new, stolen: true
-          expect(response).to render_template(:create)
-        end
-      end
-      context 'with user' do
-        it 'renders' do
-          set_current_user(user)
-          get :new
-          expect(response).to render_template(:create)
-          expect(flash).to_not be_present
-        end
-      end
-    end
+    # context 'no organization' do
+    #   context 'no user' do
+    #     it 'renders' do
+    #       get :new, stolen: true
+    #       expect(response).to render_template(:create)
+    #     end
+    #   end
+    #   context 'with user' do
+    #     it 'renders' do
+    #       set_current_user(user)
+    #       get :new
+    #       expect(response).to render_template(:create)
+    #       expect(flash).to_not be_present
+    #     end
+    #   end
+    # end
     # context 'with organization' do
     #   context 'no user' do
     #     it 'renders' do
@@ -91,6 +94,6 @@ describe RegistrationsController do
     #       expect(response).to render_template(:create)
     #     end
     #   end
-    end
+    # end
   end
 end

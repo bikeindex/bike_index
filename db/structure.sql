@@ -85,7 +85,7 @@ ALTER SEQUENCE ads_id_seq OWNED BY ads.id;
 
 CREATE TABLE b_params (
     id integer NOT NULL,
-    params text,
+    old_params text,
     bike_title character varying(255),
     creator_id integer,
     created_bike_id integer,
@@ -95,7 +95,8 @@ CREATE TABLE b_params (
     image character varying(255),
     image_tmp character varying(255),
     image_processed boolean DEFAULT true,
-    id_token text
+    id_token text,
+    params json DEFAULT '{"bike":{}}'::json
 );
 
 
@@ -3079,9 +3080,13 @@ INSERT INTO schema_migrations (version) VALUES ('20160529093040');
 
 INSERT INTO schema_migrations (version) VALUES ('20160614112308');
 
+INSERT INTO schema_migrations (version) VALUES ('20160628175006');
+
 INSERT INTO schema_migrations (version) VALUES ('20160629152210');
 
 INSERT INTO schema_migrations (version) VALUES ('20160630161603');
 
 INSERT INTO schema_migrations (version) VALUES ('20160630175602');
+
+INSERT INTO schema_migrations (version) VALUES ('20160631175602');
 

@@ -1,7 +1,8 @@
 - classname ||= ''
+- bike ||= @bike
 - primary_color_help_content = "The color of the frame and fork&mdash;not the wheels, cranks, or anything else. You can put a more detailed description in paint description (once you've registered), <em>this</em> is to get a general color to make searching easier"
-- display_secondary_color = @bike.secondary_frame_color_id.present?
-- display_tertiary_color = @bike.tertiary_frame_color_id.present?
+- display_secondary_color = bike.secondary_frame_color_id.present?
+- display_tertiary_color = bike.tertiary_frame_color_id.present?
 .related-fields{ class: classname }
   .form-group.row
     = f.label :primary_frame_color, class: 'form-well-label'

@@ -22,30 +22,29 @@ class BParam < ActiveRecord::Base
 
   # Crazy new shit
   def manufacturer_id=(val)
-    params[:bike][:manufacturer_id] = val
+    params['bike']['manufacturer_id'] = val
   end
 
   def creation_organization_id=(val)
-    params[:bike][:creation_organization_id] = val
+    params['bike']['creation_organization_id'] = val
   end
 
   def owner_email=(val)
-    params[:bike][:owner_email] = val
+    params['bike']['owner_email'] = val
   end
 
   def stolen=(val)
-    params[:bike][:stolen] = val
+    params['bike']['stolen'] = val
   end
-
 
   def primary_frame_color_id=(val)
-    params[:bike][:primary_frame_color_id] = val
+    params['bike']['primary_frame_color_id'] = val
   end
   def secondary_frame_color_id=(val)
-    params[:bike][:secondary_frame_color_id] = val
+    params['bike']['secondary_frame_color_id'] = val
   end
   def tertiary_frame_color_id=(val)
-    params[:bike][:tertiary_frame_color_id] = val
+    params['bike']['tertiary_frame_color_id'] = val
   end
 
   def primary_frame_color_id; bike[:primary_frame_color_id] end
