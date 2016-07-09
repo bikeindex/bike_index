@@ -7,7 +7,7 @@ describe BikeCreatorBuilder do
       b_param = BParam.new
       allow(b_param).to receive(:id).and_return(9)
       allow(b_param).to receive(:creator_id).and_return(6)
-      allow(b_param).to receive(:params).and_return(bike: { serial_number: 'AAAA' })
+      allow(b_param).to receive(:params).and_return({ bike: { serial_number: 'AAAA' } }.as_json)
       bike = BikeCreatorBuilder.new(b_param).new_bike
       expect(bike.serial_number).to eq('AAAA')
       expect(bike.updator_id).to eq(6)

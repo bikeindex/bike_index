@@ -337,7 +337,6 @@ describe 'Bikes API V2' do
       expect do
         put @url, @params.to_json, JSON_CONTENT
       end.to change(Ownership, :count).by(0)
-      # pp response.body
       expect(response.code).to eq('200')
       @bike.reload
       @bike.components.reload

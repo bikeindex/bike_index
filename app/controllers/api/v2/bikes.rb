@@ -170,7 +170,7 @@ module API
           find_bike
           authorize_bike_for_user
           hash = BParam.v2_params(declared_p['declared_params'].as_json)
-          ensure_required_stolen_attrs(hash) if hash[:stolen_record].present? && @bike.stolen != true
+          ensure_required_stolen_attrs(hash) if hash['stolen_record'].present? && @bike.stolen != true
           begin
             BikeUpdator.new(user: current_user, bike: @bike, b_params: hash).update_available_attributes
           rescue => e

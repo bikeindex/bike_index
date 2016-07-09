@@ -15,7 +15,7 @@ class BikeUpdator
 
   def find_bike
     begin
-      return Bike.unscoped.find(@bike_params[:id])
+      return Bike.unscoped.find(@bike_params['id'])
     rescue
       raise BikeUpdatorError, "Oh no! We couldn't find that bike"
     end
@@ -29,7 +29,7 @@ class BikeUpdator
         @bike_params['bike'].delete('owner_email')
       else
         opts = {
-          owner_email: @bike_params[:bike][:owner_email],
+          owner_email: @bike_params['bike']['owner_email'],
           bike: @bike,
           creator: @user,
           send_email: true
@@ -52,7 +52,7 @@ class BikeUpdator
 
   def update_stolen_record
     @bike.reload
-    if @bike_params['bike'] && @bike_params['bike'][:date_stolen_input]
+    if @bike_params['bike'] && @bike_params['bike']['date_stolen_input']
       StolenRecordUpdator.new(bike: @bike, date_stolen_input: @bike_params['bike']['date_stolen_input']).update_records
     else
       if @bike_params['stolen_record'] || @bike_params['bike']['stolen_records_attributes']

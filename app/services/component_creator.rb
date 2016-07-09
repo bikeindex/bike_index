@@ -62,16 +62,16 @@ class ComponentCreator
   end
 
   def update_components_from_params
-    @b_param[:components].each_with_index do |comp, index|
-      if comp[:id].present?
-        component = @bike.components.find(comp[:id])
-        (component.destroy && next) if comp[:destroy]
+    @b_param['components'].each_with_index do |comp, index|
+      if comp['id'].present?
+        component = @bike.components.find(comp['id'])
+        (component.destroy && next) if comp['destroy']
       else
         component = @bike.components.new
       end
       comp = set_manufacturer_key(comp)
       comp = set_component_type(comp)
-      component.update_attributes whitelist_attributes(comp)
+      component.update_attributes whitelist_attributes(comp.with_indifferent_access)
     end
   end
 
