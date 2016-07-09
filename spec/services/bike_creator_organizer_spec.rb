@@ -107,7 +107,7 @@ describe BikeCreatorOrganizer do
     it "calls organize with the organization id if if it's in the params" do
       bike = Bike.new
       b_param = BParam.new
-      allow(b_param).to receive(:params).and_return(creation_organization_id: 69)
+      allow(b_param).to receive(:params).and_return({ creation_organization_id: 69 }.as_json)
       creator = BikeCreatorOrganizer.new(b_param, bike)
       expect(creator).to receive(:organize).with(69).and_return(true)
       creator.check_organization
@@ -116,7 +116,7 @@ describe BikeCreatorOrganizer do
     it "calls organize with the org if it's in the bike params" do
       bike = Bike.new
       b_param = BParam.new
-      allow(b_param).to receive(:params).and_return(bike: { creation_organization_id: 69 })
+      allow(b_param).to receive(:params).and_return({ bike: { creation_organization_id: 69 } }.as_json)
       creator = BikeCreatorOrganizer.new(b_param, bike)
       expect(creator).to receive(:organize).with(69)
       creator.check_organization

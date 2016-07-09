@@ -168,13 +168,12 @@ class BikesController < ApplicationController
 
   def update
     begin
-      @bike = BikeUpdator.new(user: current_user, bike: @bike, b_params: permitted_bike_params, current_ownership: @current_ownership).update_available_attributes
+      @bike = BikeUpdator.new(user: current_user, bike: @bike, b_params: permitted_bike_params.as_json, current_ownership: @current_ownership).update_available_attributes
     rescue => e
       flash[:error] = e.message
     end
     @bike = @bike.decorate
     if @bike.errors.any? || flash[:error].present?
-      pp flash[:error]
       edit and return
     else
       flash[:success] = 'Bike successfully updated!'
