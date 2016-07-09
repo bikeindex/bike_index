@@ -1,9 +1,36 @@
+// Input help
 .below-input-help {
   @extend small;
   display: block;
   line-height: 1.5em;
   padding-bottom: .5em;
   color: $gray-light;
+}
+
+a.optional-form-block {
+  cursor: pointer;
+  color: $gray;
+  &:hover { 
+    color: $link-color;
+    text-decoration: none;
+    .context-display-help { color: $link-color; }
+  }
+}
+
+.context-display-help {
+  @extend .form-circle-item;
+  display: inline-block;
+  background: #fff;
+  border: 1px solid $form-well-border-color;
+}
+.hidden-other {
+  margin-top: 0;
+  display: none;
+  &.unhidden {
+    margin-bottom: 1.5rem;
+    display: flex !important;
+    flex-wrap: wrap;
+  }
 }
 
 .avatar-upload-wrapper {

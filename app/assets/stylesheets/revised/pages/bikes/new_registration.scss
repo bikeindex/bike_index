@@ -1,0 +1,13 @@
+.registration-widget {
+  max-width: 500px;
+  padding: $vertical-height 2*$vertical-height;
+  border: 1px solid #ccc;
+  .below-input-help { padding-bottom: 0; }
+  .fancy-select .selectize-control { width: 100%; }
+  .submit-wrapper {
+    display: block;
+    margin: 0 auto;
+    padding-left: 3*$vertical-height;
+    padding-right: 3*$vertical-height;
+  }
+}

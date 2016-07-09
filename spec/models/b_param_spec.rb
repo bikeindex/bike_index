@@ -82,6 +82,15 @@ describe BParam do
     end
   end
 
+  describe 'bike_from_attrs' do
+    it 'is stolen if it is stolen (ignore passed parameter)' do
+      b_param = BParam.new
+      b_param.stolen = true
+      bike = b_param.bike_from_attrs(is_stolen: false)
+      expect(bike.stolen).to be_truthy
+    end
+  end
+
   describe 'set_foreign_keys' do
     it 'calls set_foreign_keys' do
       bike = {

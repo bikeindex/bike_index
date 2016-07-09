@@ -24,6 +24,7 @@ class RegistrationsController < ApplicationController
                                     :owner_email,
                                     :creation_organization_id,
                                     :creator_id,
+                                    :stolen,
                                     :primary_frame_color_id,
                                     :secondary_frame_color_id,
                                     :tertiary_frame_color_id)

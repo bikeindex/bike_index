@@ -75,6 +75,7 @@ describe RegistrationsController do
         it 'does not create a bparam, rerenders new with all assigned values' do
           attrs = {
             manufacturer_id: manufacturer.id,
+            stolen: true,
             creator_id: 21,
             primary_frame_color_id: color.id,
             secondary_frame_color_id: 12,

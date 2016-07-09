@@ -13,7 +13,9 @@ $gray-light: #A4A4A4;
 $gray-lightish: #e4e4e4; // border on things that are gray-lighter
 $gray-lighter: #f2f2f2;
 
-
+$form-well-background: $gray-lighter;
+$form-well-border-color: $gray-lightish;
+$form-well-divider-color: #b2b2b2;
 
 $body-font-color: $gray;
 $link-color: $blue;
