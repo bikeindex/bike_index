@@ -5,7 +5,7 @@ describe BikeCreatorAssociator do
     it 'calls create ownership' do
       b_param = BParam.new
       bike = Bike.new
-      allow(b_param).to receive(:params).and_return(bike: bike)
+      allow(b_param).to receive(:params).and_return({ bike: bike }.as_json)
       allow(b_param).to receive(:creator).and_return('creator')
       # OwnershipCreator.any_instance.should_receive(:initialize).with(bike: bike, creator: 'creator', send_email: true)
       expect_any_instance_of(OwnershipCreator).to receive(:create_ownership).and_return(true)
@@ -14,7 +14,7 @@ describe BikeCreatorAssociator do
     it 'calls create ownership with send_email false if b_param has that' do
       b_param = BParam.new
       bike = Bike.new
-      allow(b_param).to receive(:params).and_return({ bike: { send_email: false } })
+      allow(b_param).to receive(:params).and_return({ bike: { send_email: false } }.as_json)
       allow(b_param).to receive(:creator).and_return('creator')
       # OwnershipCreator.any_instance.should_receive(:initialize).with(bike: bike, creator: 'creator', send_email: false)
       expect_any_instance_of(OwnershipCreator).to receive(:create_ownership).and_return(true)
@@ -56,7 +56,7 @@ describe BikeCreatorAssociator do
       b_param = BParam.new
       bike = FactoryGirl.create(:bike)
       urls = ['http://some_blog.com', 'http://some_thing.com']
-      allow(b_param).to receive(:params).and_return(bike: { other_listing_urls: urls })
+      allow(b_param).to receive(:params).and_return({ bike: { other_listing_urls: urls } }.as_json)
       BikeCreatorAssociator.new(b_param).add_other_listings(bike)
       expect(bike.other_listings.reload.pluck(:url)).to eq(urls)
     end
