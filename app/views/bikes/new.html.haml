@@ -83,13 +83,13 @@
 
             = fields_for @stolen_record do |srecord|
               = render partial: '/bikes/bike_fields/stolen_location', locals: { srecord: srecord }
-
-          - if @b_param.display_email?
-            .form-group.row.unnested-field.no-divider-row
-              = f.label :owner_email, class: 'form-well-label'
-              .form-well-input
-                - email = @bike.owner_email || current_user && current_user.email
-                = f.email_field :owner_email, value: email, required: true, placeholder: 'required', class: 'form-control'
+          / Commenting out for now, more trouble than it's worth
+          / # - if @b_param.display_email?
+          .form-group.row.unnested-field.no-divider-row
+            = f.label :owner_email, class: 'form-well-label'
+            .form-well-input
+              - email = @bike.owner_email || current_user && current_user.email
+              = f.email_field :owner_email, value: email, required: true, placeholder: 'required', class: 'form-control'
       .new-bike-submit-wrapper
         = submit_tag 'Register', class: 'btn btn-lg btn-primary'
 
