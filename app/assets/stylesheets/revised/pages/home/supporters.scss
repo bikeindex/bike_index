@@ -1,12 +1,12 @@
 
 .bike-background {
-  &.scrolled { background: url("updated/home/bikes_mosaic_small.jpg") fixed; } 
+  &.scrolled { background: image-url("updated/home/bikes_mosaic_small.jpg") fixed; } 
   width: 100%;
   // 1200 x 480
 }
 
 @media (min-width: 1200px) {
-  .bike-background.scrolled { background: url("updated/home/bikes_mosaic_large.jpg") fixed; }
+  .bike-background.scrolled { background: image-url("updated/home/bikes_mosaic_large.jpg") fixed; }
 }
 
 .bike-background.scrolled .supporters { display: block; }
