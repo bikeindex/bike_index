@@ -190,7 +190,7 @@ class BParam < ActiveRecord::Base
 
   def bike_from_attrs(stolen: nil, recovered: nil)
     stolen ||= params['bike'] && params['bike']['stolen']
-    Bike.new safe_bike_attrs({ stolen: stolen, recovered: recovered })
+    Bike.new safe_bike_attrs({ stolen: stolen, recovered: recovered }).as_json
   end
 
   def safe_bike_attrs(param_overrides)
