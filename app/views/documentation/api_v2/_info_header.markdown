@@ -67,5 +67,5 @@ The Bike Index uses OAuth2. <a href="#applications_list" class="scroll-link">Cre
 
 Endpoints with Red Stars (<span class="accstr">*</span>) require an access token to use.
 
-<!-- <img alt="example of a protected endpoint" src="/assets/updated/documentation/protected_endpoint.png" class="protected-endpoint-img"> -->
+<!-- <img alt="example of a protected endpoint" src="updated/documentation/protected_endpoint.png" class="protected-endpoint-img"> -->
 

@@ -36,7 +36,7 @@
         = form_tag bikes_path, method: :get do 
           = text_field_tag :serial, params[:serial], placeholder: 'Bike serial number', class: 'faq-search-search-field'
           = button_tag(type: "submit", class: "searchit") do
-            = image_tag '/assets/stolen/search.svg'        
+            = image_tag 'stolen/search.svg'        
         %p
           If there are any bikes with similar serial numbers, particularly if just the last few numbers are different &mdash; your bike is most likely that make and model.
       
@@ -50,12 +50,12 @@
           Bike registration is permanent, it's free to transfer bikes.
         %p.steps
           Go to the edit page for the bike and click on the link at the bottom
-        = image_tag "/assets/home/transfer_shot1.png", alt: "Click to reveal the transfer fields", class: "demo-screen"
+        = image_tag "home/transfer_shot1.png", alt: "Click to reveal the transfer fields", class: "demo-screen"
         %p.steps
           This will reveal the owner's email. Enter in the new owners email and click 
           %em
             Send Bike.
-        = image_tag "/assets/home/transfer_shot2.png", alt: "Click to reveal the transfer fields", class: "demo-screen"
+        = image_tag "home/transfer_shot2.png", alt: "Click to reveal the transfer fields", class: "demo-screen"
 
       %dt.collapse-faq
         %a.collapsed{ href: "#how-vendor", data: { toggle: "collapse"} }

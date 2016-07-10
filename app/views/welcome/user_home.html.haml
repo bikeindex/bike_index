@@ -28,7 +28,7 @@
                   %a.bike-list-image{ href: image_link, class: ('hover-expand' if bike.thumb_path) }
                     - unless bike.thumb_path
                       .thumb-overlay
-                        = image_tag '/assets/revised/photo_icon.svg'
+                        = image_tag 'revised/photo_icon.svg'
                         %h4
                           Add a photo
                     = bike.revised_thumb_image
@@ -102,7 +102,7 @@
 
           .lock-group
             .image-column
-              = image_tag '/assets/revised/lock_icon.svg'
+              = image_tag 'revised/lock_icon.svg'
             .col-xs-10
               %p
                 %strong
