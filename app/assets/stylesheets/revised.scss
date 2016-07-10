@@ -210,9 +210,13 @@ body { min-height: 400px; }
 // 
 // External overrides
 // 
+
 // Bike Index selectize overrides
 .selectize-dropdown [data-selectable] .highlight { background: rgba($blue, 0.2); }
 .selectize-dropdown .active { background-color: lighten(#bebebe, 10%); }
+// Make selectize inputs the same size as form inputs
+.form-group .selectize-control .selectize-input { padding: 0.475rem 0.75rem; }
+
 // Pickaday overrides
 .pika-button:hover { background: $blue; }
 

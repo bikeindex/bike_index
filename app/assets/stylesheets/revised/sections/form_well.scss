@@ -51,7 +51,7 @@
     line-height: 1.2em;
     padding-top: 0.65rem;
   }
-  .form-well-label, .form-well-input, .form-well-input-large {
+  .form-well-label, .form-well-input, .form-well-input-large, .right-input-help {
     @include make-col(); 
   }
   .related-fields {
