@@ -46,7 +46,7 @@
 
 - elsif @feedback.feedback_type == 'bike_recovery'
   %h1{ :style => "font-weight: 400px;" }
-    A #{bike.type} has been recovered
+    A #{@feedback.bike.type} has been recovered
   %p
     How the bike was recovered
     = @feedback.body
