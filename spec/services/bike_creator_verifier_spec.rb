@@ -99,7 +99,7 @@ describe BikeCreatorVerifier do
     it 'calls stolenize if there is a stolen attribute included' do
       bike = Bike.new
       b_param = BParam.new
-      allow(b_param).to receive(:params).and_return(bike: { stolen: true })
+      allow(b_param).to receive(:params).and_return({ bike: { stolen: true } }.as_json)
       creator = BikeCreatorVerifier.new(b_param, bike)
       expect(creator).to receive(:stolenize).and_return(true)
       creator.check_stolen_and_recovered
@@ -115,7 +115,7 @@ describe BikeCreatorVerifier do
     it 'calls recoverize if there is a recovered attribute included' do
       bike = Bike.new
       b_param = BParam.new
-      allow(b_param).to receive(:params).and_return(bike: { recovered: true })
+      allow(b_param).to receive(:params).and_return({ bike: { recovered: true } }.as_json)
       creator = BikeCreatorVerifier.new(b_param, bike)
       expect(creator).to receive(:recoverize).and_return(true)
       creator.check_stolen_and_recovered

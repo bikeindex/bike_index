@@ -25,26 +25,26 @@ describe BParam do
         expect(b_param).to receive(:set_foreign_keys)
         expect(b_param).to receive(:massage_if_v2)
         expect(b_param).to receive(:clean_errors)
-        b_param.clean_params(bike: { cool: 'lol' })
+        b_param.clean_params(bike: { cool: 'lol' }.as_json)
         expect(b_param.params['bike']['cool']).to eq('lol') # indifferent access
       end
     end
     context 'not passed params' do
       it 'makes indifferent' do
-        b_param = BParam.new(params: { bike: { cool: 'lol' } })
+        b_param = BParam.new(params: { bike: { cool: 'lol' } }.as_json)
         b_param.clean_params
         expect(b_param.params['bike']['cool']).to eq('lol')
       end
     end
     context 'existing and passed params' do
       it 'makes indifferent' do
-        b_param = BParam.new(params: { bike: { cool: 'lol' }, stolen_record: { something: 42 } })
-        merge_params = { bike: { owner_email: 'foo@example.com' }, stolen_record: { phone: '171-829-2625' } }
+        b_param = BParam.new(params: { bike: { cool: 'lol' }, stolen_record: { something: 42 } }.as_json)
+        merge_params = { bike: { owner_email: 'foo@example.com' }, stolen_record: { phone: '171-829-2625' } }.as_json
         b_param.clean_params(merge_params)
-        expect(b_param.params[:bike][:cool]).to eq('lol')
-        expect(b_param.params[:bike][:owner_email]).to eq('foo@example.com')
-        expect(b_param.params[:stolen_record][:something]).to eq(42)
-        expect(b_param.params[:stolen_record][:phone]).to eq('171-829-2625')
+        expect(b_param.params['bike']['cool']).to eq('lol')
+        expect(b_param.params['bike']['owner_email']).to eq('foo@example.com')
+        expect(b_param.params['stolen_record']['something']).to eq(42)
+        expect(b_param.params['stolen_record']['phone']).to eq('171-829-2625')
       end
     end
     it 'has before_save_callback_method of clean_params' do
@@ -62,23 +62,32 @@ describe BParam do
           date_stolen: '',
           phone: nil
         }
-      }
+      }.as_json
       b_param = BParam.new(params: p, api_v2: true)
       b_param.massage_if_v2
       new_params = b_param.bike
       expect(new_params.keys.include?('serial_number')).to be_truthy
       expect(new_params.keys.include?('manufacturer')).to be_truthy
       expect(new_params.keys.length).to eq(3)
-      expect(b_param.params[:test]).to be_truthy
-      expect(b_param.params[:stolen]).to be_falsey
-      expect(b_param.params[:stolen_record]).not_to be_present
+      expect(b_param.params['test']).to be_truthy
+      expect(b_param.params['stolen']).to be_falsey
+      expect(b_param.params['stolen_record']).not_to be_present
     end
     it 'gets the organization id' do
       org = FactoryGirl.create(:organization, name: 'Something')
       p = { organization_slug: org.slug }
       b_param = BParam.new(params: p, api_v2: true)
       b_param.massage_if_v2
-      expect(b_param.bike[:creation_organization_id]).to eq(org.id)
+      expect(b_param.bike['creation_organization_id']).to eq(org.id)
+    end
+  end
+
+  describe 'bike_from_attrs' do
+    it 'is stolen if it is stolen (ignore passed parameter)' do
+      b_param = BParam.new
+      b_param.stolen = true
+      bike = b_param.bike_from_attrs(is_stolen: false)
+      expect(bike.stolen).to be_truthy
     end
   end
 
@@ -90,7 +99,7 @@ describe BParam do
         cycle_type_slug: 'entirely',
         rear_gear_type_slug: 'gears awesome',
         front_gear_type_slug: 'cool gears'
-      }
+      }.as_json
       b_param = BParam.new(params: { bike: bike })
       expect(b_param).to receive(:set_manufacturer_key).and_return(true)
       expect(b_param).to receive(:set_color_key).and_return(true)
@@ -119,7 +128,7 @@ describe BParam do
       bike = { rear_wheel_bsd: ws.iso_bsd }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_wheel_size_key
-      expect(b_param.bike[:rear_wheel_size_id]).to eq(ws.id)
+      expect(b_param.bike['rear_wheel_size_id']).to eq(ws.id)
     end
   end
 
@@ -129,8 +138,8 @@ describe BParam do
       bike = { serial_number: 'gobble gobble', cycle_type_slug: ' booP ' }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_cycle_type_key
-      expect(b_param.bike[:cycle_type_id]).to eq(ct.id)
-      expect(b_param.bike[:cycle_type_slug].present?).to be_falsey
+      expect(b_param.bike['cycle_type_id']).to eq(ct.id)
+      expect(b_param.bike['cycle_type_slug'].present?).to be_falsey
     end
   end
 
@@ -140,8 +149,8 @@ describe BParam do
       bike = { serial_number: 'gobble gobble', frame_material_slug: ' gooP ' }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_frame_material_key
-      expect(b_param.bike[:frame_material_slug].present?).to be_falsey
-      expect(b_param.bike[:frame_material_id]).to eq(fm.id)
+      expect(b_param.bike['frame_material_slug'].present?).to be_falsey
+      expect(b_param.bike['frame_material_id']).to eq(fm.id)
     end
   end
 
@@ -151,8 +160,8 @@ describe BParam do
       bike = { serial_number: 'gobble gobble', handlebar_type_slug: ' gooPie ' }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_handlebar_type_key
-      expect(b_param.bike[:handlebar_type_slug].present?).to be_falsey
-      expect(b_param.bike[:handlebar_type_id]).to eq(ht.id)
+      expect(b_param.bike['handlebar_type_slug'].present?).to be_falsey
+      expect(b_param.bike['handlebar_type_id']).to eq(ht.id)
     end
   end
 
@@ -162,17 +171,17 @@ describe BParam do
       bike = { manufacturer: 'gobble gobble' }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_manufacturer_key
-      expect(b_param.bike[:manufacturer]).not_to be_present
-      expect(b_param.bike[:manufacturer_id]).to eq(m.id)
-      expect(b_param.bike[:manufacturer_other]).to eq('Gobble Gobble')
+      expect(b_param.bike['manufacturer']).not_to be_present
+      expect(b_param.bike['manufacturer_id']).to eq(m.id)
+      expect(b_param.bike['manufacturer_other']).to eq('Gobble Gobble')
     end
     it 'looks through book slug' do
       m = FactoryGirl.create(:manufacturer, name: 'Something Cycles')
       bike = { manufacturer: 'something' }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_manufacturer_key
-      expect(b_param.bike[:manufacturer]).not_to be_present
-      expect(b_param.bike[:manufacturer_id]).to eq(m.id)
+      expect(b_param.bike['manufacturer']).not_to be_present
+      expect(b_param.bike['manufacturer_id']).to eq(m.id)
     end
   end
 
@@ -182,16 +191,16 @@ describe BParam do
       bike = { rear_gear_type_slug: gear.slug }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_rear_gear_type_slug
-      expect(b_param.params[:bike][:rear_gear_type_slug]).not_to be_present
-      expect(b_param.params[:bike][:rear_gear_type_id]).to eq(gear.id)
+      expect(b_param.params['bike']['rear_gear_type_slug']).not_to be_present
+      expect(b_param.params['bike']['rear_gear_type_id']).to eq(gear.id)
     end
     it 'sets the front gear slug' do
       gear = FactoryGirl.create(:front_gear_type)
       bike = { front_gear_type_slug: gear.slug }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_front_gear_type_slug
-      expect(b_param.params[:bike][:front_gear_type_slug]).not_to be_present
-      expect(b_param.params[:bike][:front_gear_type_id]).to eq(gear.id)
+      expect(b_param.params['bike']['front_gear_type_slug']).not_to be_present
+      expect(b_param.params['bike']['front_gear_type_id']).to eq(gear.id)
     end
   end
 
@@ -201,8 +210,8 @@ describe BParam do
       bike = { color: color.name }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_color_key
-      expect(b_param.params[:bike][:color]).not_to be_present
-      expect(b_param.params[:bike][:primary_frame_color_id]).to eq(color.id)
+      expect(b_param.params['bike']['color']).not_to be_present
+      expect(b_param.params['bike']['primary_frame_color_id']).to eq(color.id)
     end
     it "set_paint_keys if it isn't a color" do
       bike = { color: 'Goop' }
@@ -219,8 +228,8 @@ describe BParam do
       paint = FactoryGirl.create(:paint, name: 'pinkly butter', color_id: color.id)
       b_param = BParam.new(params: { bike: { color: paint.name } })
       b_param.set_paint_key(paint.name)
-      expect(b_param.bike[:paint_id]).to eq(paint.id)
-      expect(b_param.bike[:primary_frame_color_id]).to eq(color.id)
+      expect(b_param.bike['paint_id']).to eq(paint.id)
+      expect(b_param.bike['primary_frame_color_id']).to eq(color.id)
     end
 
     it "creates a paint and set the color to black if we don't know the color" do
@@ -229,8 +238,8 @@ describe BParam do
       expect do
         b_param.set_paint_key('Paint 69')
       end.to change(Paint, :count).by(1)
-      expect(b_param.bike[:paint_id]).to eq(Paint.find_by_name('paint 69').id)
-      expect(b_param.bike[:primary_frame_color_id]).to eq(black.id)
+      expect(b_param.bike['paint_id']).to eq(Paint.find_by_name('paint 69').id)
+      expect(b_param.bike['primary_frame_color_id']).to eq(black.id)
     end
 
     it "associates the manufacturer with the paint if it's a new bike" do

@@ -80,9 +80,9 @@ module API
         end
 
         def ensure_required_stolen_attrs(hash)
-          return true unless hash[:bike][:stolen]
-          [:phone, :city].each do |k|
-            error!("Could not create stolen record: missing #{k.to_s}", 401) unless hash[:stolen_record][k].present?
+          return true unless hash['bike']['stolen']
+          %w(phone city).each do |k|
+            error!("Could not create stolen record: missing #{k}", 401) unless hash['stolen_record'][k].present?
           end
         end
       end
@@ -170,7 +170,7 @@ module API
           find_bike
           authorize_bike_for_user
           hash = BParam.v2_params(declared_p['declared_params'].as_json)
-          ensure_required_stolen_attrs(hash) if hash[:stolen_record].present? && @bike.stolen != true
+          ensure_required_stolen_attrs(hash) if hash['stolen_record'].present? && @bike.stolen != true
           begin
             BikeUpdator.new(user: current_user, bike: @bike, b_params: hash).update_available_attributes
           rescue => e

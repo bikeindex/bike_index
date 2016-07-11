@@ -1,3 +1,6 @@
+// 
+// Input helpers
+// 
 .below-input-help {
   @extend small;
   display: block;
@@ -6,6 +9,36 @@
   color: $gray-light;
 }
 
+a.optional-form-block {
+  cursor: pointer;
+  color: $gray;
+  &:hover { 
+    color: $link-color;
+    text-decoration: none;
+    .context-display-help { color: $link-color; }
+  }
+}
+
+.context-display-help {
+  @extend .form-circle-item;
+  display: inline-block;
+  background: #fff;
+  border: 1px solid $form-well-border-color;
+}
+
+.hidden-other {
+  margin-top: 0;
+  display: none;
+  &.unhidden {
+    margin-bottom: 1.5rem;
+    display: flex !important;
+    flex-wrap: wrap;
+  }
+}
+
+// 
+// Avatar uploader
+// 
 .avatar-upload-wrapper {
   img { padding-bottom: $vertical-height; }
   label.file { display: block; }
@@ -25,6 +58,3 @@
     }
   }
 }
-
-// Make selectize inputs the same size as form inputs
-.form-group .selectize-control .selectize-input { padding: 0.475rem 0.75rem; }

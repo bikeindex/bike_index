@@ -1,7 +1,3 @@
-$form-well-background: $gray-lighter;
-$form-well-border-color: $gray-lightish;
-$form-well-divider-color: #b2b2b2;
-
 .form-circle-item { // Mixin for help blocks
   padding: .5em .25em;
   border-radius: 1em;
@@ -34,30 +30,6 @@ $form-well-divider-color: #b2b2b2;
     margin: -1em 0 0 17px;
   }
   .selectize-control { line-height: 0; } // label isn't lined up
-  a.optional-form-block {
-    cursor: pointer;
-    color: $gray;
-    &:hover { 
-      color: $link-color;
-      text-decoration: none;
-      .context-display-help { color: $link-color; }
-    }
-  }
-  .context-display-help {
-    @extend .form-circle-item;
-    display: inline-block;
-    background: #fff;
-    border: 1px solid $form-well-border-color;
-  }
-  .hidden-other {
-    margin-top: 0;
-    display: none;
-    &.unhidden {
-      margin-bottom: 1.5rem;
-      display: flex !important;
-      flex-wrap: wrap;
-    }
-  }
   .inline-input-help {
     @extend .form-circle-item;
     display: block;

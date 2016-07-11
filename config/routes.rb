@@ -82,6 +82,7 @@ Bikeindex::Application.routes.draw do
     member { post :is_private }
   end
 
+  resources :registrations, only: [:new, :create, :edit, :update]
   resources :bikes do
     collection { get :scanned }
     member do

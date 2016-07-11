@@ -15,7 +15,7 @@ class BikeUpdator
 
   def find_bike
     begin
-      return Bike.unscoped.find(@bike_params[:id])
+      return Bike.unscoped.find(@bike_params['id'])
     rescue
       raise BikeUpdatorError, "Oh no! We couldn't find that bike"
     end
@@ -23,19 +23,19 @@ class BikeUpdator
 
   def update_ownership
     @bike.update_attribute :updator_id, @user.id if @user.present? && @bike.updator_id != @user.id
-    if @bike_params[:bike] && @bike_params[:bike][:owner_email] &&
-      @bike.owner_email != @bike_params[:bike][:owner_email]
-      if @bike_params[:bike][:owner_email].blank?
-        @bike_params[:bike].delete(:owner_email)
+    if @bike_params['bike'] && @bike_params['bike']['owner_email'] &&
+      @bike.owner_email != @bike_params['bike']['owner_email']
+      if @bike_params['bike']['owner_email'].blank?
+        @bike_params['bike'].delete('owner_email')
       else
         opts = {
-          owner_email: @bike_params[:bike][:owner_email],
+          owner_email: @bike_params['bike']['owner_email'],
           bike: @bike,
           creator: @user,
           send_email: true
         }
         OwnershipCreator.new(opts).create_ownership
-        @bike_params[:bike][:is_for_sale] = false
+        @bike_params['bike']['is_for_sale'] = false
       end
     end
   end
@@ -52,10 +52,10 @@ class BikeUpdator
 
   def update_stolen_record
     @bike.reload
-    if @bike_params[:bike] && @bike_params[:bike][:date_stolen_input]
-      StolenRecordUpdator.new(bike: @bike, date_stolen_input: @bike_params[:bike][:date_stolen_input]).update_records
+    if @bike_params['bike'] && @bike_params['bike']['date_stolen_input']
+      StolenRecordUpdator.new(bike: @bike, date_stolen_input: @bike_params['bike']['date_stolen_input']).update_records
     else
-      if @bike_params[:stolen_record] || @bike_params[:bike][:stolen_records_attributes]
+      if @bike_params['stolen_record'] || @bike_params['bike']['stolen_records_attributes']
         StolenRecordUpdator.new(bike: @bike, b_param: @bike_params).update_records
         @bike.reload
       elsif @currently_stolen != @bike.stolen
@@ -65,13 +65,13 @@ class BikeUpdator
   end
 
   def set_protected_attributes
-    @bike_params[:bike][:serial_number] = @bike.serial_number
-    @bike_params[:bike][:manufacturer_id] = @bike.manufacturer_id
-    @bike_params[:bike][:manufacturer_other] = @bike.manufacturer_other
-    @bike_params[:bike][:creation_organization_id] = @bike.creation_organization_id
-    @bike_params[:bike][:creator] = @bike.creator
-    @bike_params[:bike][:example] = @bike.example
-    @bike_params[:bike][:hidden] = @bike.hidden
+    @bike_params['bike']['serial_number'] = @bike.serial_number
+    @bike_params['bike']['manufacturer_id'] = @bike.manufacturer_id
+    @bike_params['bike']['manufacturer_other'] = @bike.manufacturer_other
+    @bike_params['bike']['creation_organization_id'] = @bike.creation_organization_id
+    @bike_params['bike']['creator'] = @bike.creator
+    @bike_params['bike']['example'] = @bike.example
+    @bike_params['bike']['hidden'] = @bike.hidden
   end
 
   def remove_blank_components
@@ -85,8 +85,8 @@ class BikeUpdator
     ensure_ownership!
     set_protected_attributes
     update_ownership
-    update_api_components if @bike_params[:components].present?
-    update_stolen_record if @bike.update_attributes(@bike_params[:bike].except(:stolen_records_attributes))
+    update_api_components if @bike_params['components'].present?
+    update_stolen_record if @bike.update_attributes(@bike_params['bike'].except('stolen_records_attributes'))
     if @bike.present?
       ListingOrderWorker.perform_async(@bike.id) # run immediately
       ListingOrderWorker.perform_in(60.seconds, @bike.id) # also later in case uploads or something.

@@ -127,7 +127,7 @@ describe StolenRecordUpdator do
              zipcode: '60666'
       }
       b_param = BParam.new
-      allow(b_param).to receive(:params).and_return(stolen_record: sr)
+      allow(b_param).to receive(:params).and_return({ stolen_record: sr }.as_json)
       stolen_record = StolenRecord.new
       updator = StolenRecordUpdator.new(b_param: b_param.params)
       stolen_record = updator.update_with_params(stolen_record)
@@ -147,7 +147,7 @@ describe StolenRecordUpdator do
              country: country.iso
       }
       b_param = BParam.new
-      allow(b_param).to receive(:params).and_return(stolen_record: sr)
+      allow(b_param).to receive(:params).and_return({ stolen_record: sr }.as_json)
       stolen_record = StolenRecord.new
       updator = StolenRecordUpdator.new(b_param: b_param.params)
       stolen_record = updator.update_with_params(stolen_record)

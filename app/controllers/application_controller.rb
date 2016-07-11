@@ -13,6 +13,10 @@ class ApplicationController < ActionController::Base
     x_download_options: false,
     x_permitted_cross_domain_policies: false)
 
+  def current_organization
+    @current_organization ||= Organization.friendly_find(params[:organization_id])
+  end
+
   def enable_rack_profiler
     if current_user && current_user.developer?
       Rack::MiniProfiler.authorize_request unless Rails.env.test?
@@ -33,8 +37,12 @@ class ApplicationController < ActionController::Base
     headers['Access-Control-Max-Age'] = "1728000"
   end
 
-  def set_return_to
+  def store_return_to
     session[:return_to] = params[:return_to] if params[:return_to].present?
+  end
+
+  def set_return_to(return_path)
+    session[:return_to] = return_path
   end
 
   def return_to_if_present

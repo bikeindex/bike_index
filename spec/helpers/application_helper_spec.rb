@@ -55,6 +55,17 @@ describe ApplicationHelper do
         end
       end
     end
+    context 'bikes' do
+      before { allow(view).to receive(:controller_name) { 'registrations' } }
+      %w(new create edit).each do |action|
+        context action do
+          it 'returns nil' do
+            allow(view).to receive(:action_name) { action }
+            expect(helper.current_page_skeleton).to eq 'content_skeleton'
+          end
+        end
+      end
+    end
     context 'info' do
       before { allow(view).to receive(:controller_name) { 'info' } }
       %w(about protect_your_bike where serials image_resources resources dev_and_design).each do |action|

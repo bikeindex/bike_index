@@ -2,7 +2,7 @@ class UsersController < ApplicationController
   layout 'application_revised'
   include Sessionable
   before_filter :authenticate_user, only: [:edit]
-  before_filter :set_return_to, only: [:new]
+  before_filter :store_return_to, only: [:new]
   
   def new
     @user = User.new

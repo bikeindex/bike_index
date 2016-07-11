@@ -17,7 +17,7 @@ class BikesController < ApplicationController
   before_filter :find_bike, only: [:show, :edit, :update, :pdf]
   before_filter :ensure_user_allowed_to_edit, only: [:edit, :update, :pdf]
   before_filter :render_ad, only: [:index, :show]
-  before_filter :set_return_to, only: [:edit]
+  before_filter :store_return_to, only: [:edit]
   before_filter :remove_subdomain, only: [:index]
   layout 'application_revised'
 
@@ -92,13 +92,14 @@ class BikesController < ApplicationController
 
   def new
     unless current_user.present?
-      flash[:error] = 'Whoops! You have to sign in to be able to register a bike'
+      set_return_to(new_bike_path(b_param_token: params[:b_param_token], stolen: params[:stolen]))
+      flash[:info] = 'You have to sign in to register a bike'
       redirect_to new_user_path and return
     end
     find_or_new_b_param
     # Let them know if they sent an invalid b_param token
     flash[:error] = "Sorry! We couldn't find that bike" if @b_param.id.blank? && params[:b_param_token].present?
-    @bike ||= @b_param.bike_from_attrs(stolen: params[:stolen], recovered: params[:recovered])
+    @bike ||= @b_param.bike_from_attrs(is_stolen: params[:stolen], recovered: params[:recovered])
     if @bike.stolen
       @stolen_record = @bike.stolen_records.build(@b_param.params['stolen_record'])
       @stolen_record.country_id ||= Country.united_states.id
@@ -168,13 +169,12 @@ class BikesController < ApplicationController
 
   def update
     begin
-      @bike = BikeUpdator.new(user: current_user, bike: @bike, b_params: permitted_bike_params, current_ownership: @current_ownership).update_available_attributes
+      @bike = BikeUpdator.new(user: current_user, bike: @bike, b_params: permitted_bike_params.as_json, current_ownership: @current_ownership).update_available_attributes
     rescue => e
       flash[:error] = e.message
     end
     @bike = @bike.decorate
     if @bike.errors.any? || flash[:error].present?
-      pp flash[:error]
       edit and return
     else
       flash[:success] = 'Bike successfully updated!'

@@ -79,7 +79,7 @@ describe ComponentCreator do
     it 'calls the necessary methods to create a component on each component' do
       b_param = BParam.new
       components = [{ component_type: 'something' }, { component_type: 'something' }]
-      allow(b_param).to receive(:params).and_return(components: components)
+      allow(b_param).to receive(:params).and_return({ components: components }.as_json)
       component_creator = ComponentCreator.new(b_param: b_param)
       expect(component_creator).to receive(:set_manufacturer_key).at_least(2).times.and_return(true)
       expect(component_creator).to receive(:set_component_type).at_least(2).times.and_return(true)

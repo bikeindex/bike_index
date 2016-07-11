@@ -263,6 +263,16 @@ describe BikesController do
       end
     end
 
+    context 'not signed in' do
+      it 'sets redirect_to' do
+        get :new, stolen: true, b_param_token: 'cool-token-thing'
+        expect(response).to redirect_to new_user_url
+        # expect(Rack::Utils.parse_query(session[:discourse_redirect])).to eq(discourse_params)
+        expect(flash[:info]).to be_present
+        expect(session[:return_to]).to eq new_bike_path(stolen: true, b_param_token: 'cool-token-thing')
+      end
+    end
+
     context 'revised layout' do
       before do
         # instantiate the required bike attrs... there is a better way to do this.
@@ -292,7 +302,7 @@ describe BikesController do
               primary_frame_color_id: color.id,
               owner_email: 'something@stuff.com'
             }
-            b_param = BParam.create(params: { bike: bike_attrs.merge(revised_new: true) })
+            b_param = BParam.create(params: { bike: bike_attrs.merge('revised_new' => true) })
             expect(b_param.id_token).to be_present
             get :new, b_param_token: b_param.id_token
             bike = assigns(:bike)
@@ -330,15 +340,16 @@ describe BikesController do
           @b_param = FactoryGirl.create(:b_param, creator: @user)
           manufacturer = FactoryGirl.create(:manufacturer)
           set_current_user(@user)
-          @bike = { serial_number: '1234567890',
-                    b_param_id_token: @b_param.id_token,
-                    cycle_type_id: FactoryGirl.create(:cycle_type).id,
-                    manufacturer_id: manufacturer.id,
-                    rear_tire_narrow: 'true',
-                    rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
-                    primary_frame_color_id: FactoryGirl.create(:color).id,
-                    handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
-                    owner_email: @user.email
+          @bike = { 
+            serial_number: '1234567890',
+            b_param_id_token: @b_param.id_token,
+            cycle_type_id: FactoryGirl.create(:cycle_type).id,
+            manufacturer_id: manufacturer.id,
+            rear_tire_narrow: 'true',
+            rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
+            primary_frame_color_id: FactoryGirl.create(:color).id,
+            handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
+            owner_email: @user.email
           }
         end
 
@@ -496,7 +507,7 @@ describe BikesController do
         context 'successful creation' do
           it "creates a bike and doesn't create a b_param" do
             success_params = bike_params.merge(manufacturer_id: manufacturer.slug)
-            bb_data = { bike: { rear_wheel_bsd: wheel_size.iso_bsd.to_s }, components: [] }
+            bb_data = { bike: { rear_wheel_bsd: wheel_size.iso_bsd.to_s }, components: [] }.as_json
             # We need to call clean_params on the BParam after bikebook update, so that
             # the foreign keys are assigned correctly. This is how we test that we're 
             # This is also where we're testing bikebook assignment
@@ -552,8 +563,8 @@ describe BikesController do
               secondary_frame_color_id: '',
               tertiary_frame_color_id: '',
               owner_email: 'something@stuff.com'
-            }
-            b_param = BParam.create(params: { bike: bike_params })
+            }.as_json
+            b_param = BParam.create(params: { 'bike' => bike_params })
             bb_data = { bike: { } }
             # We need to call clean_params on the BParam after bikebook update, so that
             # the foreign keys are assigned correctly. This is how we test that we're 

@@ -62,27 +62,26 @@ class ComponentCreator
   end
 
   def update_components_from_params
-    @b_param[:components].each_with_index do |comp, index|
-      if comp[:id].present?
-        component = @bike.components.find(comp[:id])
-        (component.destroy && next) if comp[:destroy]
+    @b_param['components'].each_with_index do |comp, index|
+      if comp['id'].present?
+        component = @bike.components.find(comp['id'])
+        (component.destroy && next) if comp['destroy']
       else
         component = @bike.components.new
       end
       comp = set_manufacturer_key(comp)
       comp = set_component_type(comp)
-      component.update_attributes whitelist_attributes(comp)
+      component.update_attributes whitelist_attributes(comp.with_indifferent_access)
     end
   end
 
   def create_components_from_params
-    if @b_param.present? && @b_param.params.present? && @b_param.params[:components].present?
-      c_length = (0...@b_param.params[:components].count).to_a
-      c_length.each do |c_number|
-        if @b_param.params[:components].kind_of?(Array)
-          component = @b_param.params[:components][c_number]
+    if @b_param.present? && @b_param.params.present? && @b_param.params['components'].present?
+      (0...@b_param.params['components'].count).to_a.each do |c_number|
+        if @b_param.params['components'].kind_of?(Array)
+          component = @b_param.params['components'][c_number].with_indifferent_access
         else
-          component = @b_param.params[:components][c_number.to_s]
+          component = @b_param.params['components'][c_number.to_s].with_indifferent_access
         end
         component = set_manufacturer_key(component)
         component = set_component_type(component)

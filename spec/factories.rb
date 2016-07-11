@@ -23,42 +23,6 @@ FactoryGirl.define do
     "#{n}0"
   end
 
-  factory :user do
-    name
-    email { generate(:unique_email) }
-    password 'testthisthing7$'
-    password_confirmation 'testthisthing7$'
-    terms_of_service true
-    factory :confirmed_user do
-      after(:create) do |user|
-        user.confirm(user.confirmation_token)
-      end
-      factory :admin do
-        superuser true
-      end
-      factory :developer do
-        developer true
-      end
-      factory :organized_user do
-        # This factory should not be used directly, it's here to wrap organization
-        # Use `organization_member` or `organization_admin`
-        transient do
-          organization { FactoryGirl.create(:organization) }
-        end
-        factory :organization_member do
-          after(:create) do |user, evaluator|
-            FactoryGirl.create(:membership, user: user, organization: evaluator.organization)
-          end
-        end
-        factory :organization_admin do
-          after(:create) do |user, evaluator|
-            FactoryGirl.create(:membership, user: user, organization: evaluator.organization, role: 'admin')
-          end
-        end
-      end
-    end
-  end
-
   factory :user_email do
     association :user, factory: :confirmed_user
     email { generate(:unique_email) }
@@ -112,10 +76,6 @@ FactoryGirl.define do
 
   factory :paint do
     name { FactoryGirl.generate(:unique_name) }
-  end
-
-  factory :b_param do
-    association :creator, factory: :user
   end
 
   factory :payment do
@@ -180,6 +140,9 @@ FactoryGirl.define do
     sequence(:short_name) { |n| "short_name#{n}" }
     slug
     available_invitation_count 5
+    factory :organization_with_auto_user do
+      association :auto_user, factory: :organization_member
+    end
   end
 
   factory :location do

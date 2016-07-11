@@ -12,8 +12,8 @@ describe UsersController do
       end
     end
     context 'not signed in' do
-      it 'renders and calls set set_return_to' do
-        expect(controller).to receive(:set_return_to)
+      it 'renders and calls set store_return_to' do
+        expect(controller).to receive(:store_return_to)
         get :new
         expect(response.code).to eq('200')
         expect(response).to render_template('new')
