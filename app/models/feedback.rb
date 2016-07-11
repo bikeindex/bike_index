@@ -16,4 +16,7 @@ class Feedback < ActiveRecord::Base
     ['manufacturer_update_request', 'serial_update_request']
   end
 
+  def bike
+    feedback_hash && feedback_hash[:bike_id] && Bike.unscoped.find(feedback_hash[:bike_id])
+  end
 end
