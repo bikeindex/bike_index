@@ -6,9 +6,11 @@ class OrganizedMailer < ActionMailer::Base
           parts_order: ['text/calendar', 'text/plain', 'text/html', 'text/enriched']
 
   def partial_registration_email(b_param)
-    @b_param = b_param
+    @vars = {
+      b_param_token: b_param.id_token
+    }
     @send_to = b_param.owner_email
-    @organization = @b_param.creation_organization
+    @organization = b_param.creation_organization
     title = 'Finish your Bike Index registration!'
     mail('Reply-To' => reply_to, to: @send_to, subject: title) do |format|
       format.text
