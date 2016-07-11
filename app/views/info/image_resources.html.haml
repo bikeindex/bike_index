@@ -4,30 +4,38 @@
 
 %ul.serial-pictures
   %li
+    %a.serial-image.blackbg{ href: image_path('resources/logo_bordered.svg') }
+      = image_tag('resources/logo_bordered.svg', alt: 'Basic logo')
+    %p
+      Logo with blue shield and white text (#{link_to 'svg', image_path('resources/logo_bordered.svg') }, #{link_to 'png', image_path('resources/logo_bordered.png') })
+      %br
+      %small.less-strong
+        Black background shown here for visibility
+  %li
     %a.serial-image{ href: image_path('resources/logo_striped.svg') }
-      = image_tag('resources/logo_striped_short.svg', alt: "Basic logo")        
+      = image_tag('resources/logo_striped_short.svg', alt: 'Logo with stripes')
     %p
       Striped logo (#{link_to 'svg', image_path('resources/logo_striped.svg') }, #{link_to 'png', image_path('resources/logo_striped.png') })
   %li
     %a.serial-image{ href: image_path('resources/logo.svg') }
-      = image_tag('resources/logo.svg', alt: "Basic logo")        
+      = image_tag('resources/logo.svg', alt: 'Single color logo')
     %p
       Basic logo (#{link_to 'svg', image_path('resources/logo.svg') }, #{link_to 'png', image_path('resources/logo.png') })
   
   %li
     %a.serial-image.blackbg{ href: image_path('resources/logo_white.svg') }
-      = image_tag('resources/logo_white.svg', alt: "Basic logo in white")
+      = image_tag('resources/logo_white.svg', alt: 'Single color logo in white')
     %p
       Basic logo in white (#{link_to 'svg', image_path('resources/logo_white.svg') }, #{link_to 'png', image_path('resources/logo_white.png') })
       %br
-      %span.less-strong
+      %small.less-strong
         image has no background, shown here with black for visibility
 
   %li
     %a.serial-image.blackbg{ href: image_path('resources/logo_backgrounded.svg') }
-      = image_tag('resources/logo_backgrounded.svg', alt: "Logo with background cutout")
+      = image_tag('resources/logo_backgrounded.svg', alt: 'Logo with background cutout')
     %p
       Logo with background cutout (#{link_to 'svg', image_path('resources/logo_backgrounded.svg') }, #{link_to 'png', image_path('resources/logo_backgrounded.png') })
       %br
-      %span.less-strong
+      %small.less-strong
         Black background shown here for visibility
