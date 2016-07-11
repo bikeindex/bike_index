@@ -181,9 +181,9 @@ describe ApplicationHelper do
         end
       end
     end
-    context 'user' do
-      before { allow(view).to receive(:controller_name) { 'user' } }
-      %w(edit).each do |action|
+    context 'users' do
+      before { allow(view).to receive(:controller_name) { 'users' } }
+      %w(create).each do |action|
         context action do
           it 'returns content_skeleton' do
             allow(view).to receive(:action_name) { action }
