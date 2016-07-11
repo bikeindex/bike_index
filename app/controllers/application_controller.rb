@@ -37,8 +37,12 @@ class ApplicationController < ActionController::Base
     headers['Access-Control-Max-Age'] = "1728000"
   end
 
-  def set_return_to
+  def store_return_to
     session[:return_to] = params[:return_to] if params[:return_to].present?
+  end
+
+  def set_return_to(return_path)
+    session[:return_to] = return_path
   end
 
   def return_to_if_present

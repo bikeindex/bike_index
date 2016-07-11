@@ -263,6 +263,16 @@ describe BikesController do
       end
     end
 
+    context 'not signed in' do
+      it 'sets redirect_to' do
+        get :new, stolen: true, b_param_token: 'cool-token-thing'
+        expect(response).to redirect_to new_user_url
+        # expect(Rack::Utils.parse_query(session[:discourse_redirect])).to eq(discourse_params)
+        expect(flash[:info]).to be_present
+        expect(session[:return_to]).to eq new_bike_path(stolen: true, b_param_token: 'cool-token-thing')
+      end
+    end
+
     context 'revised layout' do
       before do
         # instantiate the required bike attrs... there is a better way to do this.

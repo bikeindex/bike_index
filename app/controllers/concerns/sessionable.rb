@@ -28,5 +28,4 @@ module Sessionable
     # In development, secure: true breaks the cookie storage. Only add if production
     Rails.env.production? ? c.merge({secure: true}) : c
   end
-
 end

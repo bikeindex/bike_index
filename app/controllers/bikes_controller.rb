@@ -17,7 +17,7 @@ class BikesController < ApplicationController
   before_filter :find_bike, only: [:show, :edit, :update, :pdf]
   before_filter :ensure_user_allowed_to_edit, only: [:edit, :update, :pdf]
   before_filter :render_ad, only: [:index, :show]
-  before_filter :set_return_to, only: [:edit]
+  before_filter :store_return_to, only: [:edit]
   before_filter :remove_subdomain, only: [:index]
   layout 'application_revised'
 
@@ -92,7 +92,8 @@ class BikesController < ApplicationController
 
   def new
     unless current_user.present?
-      flash[:error] = 'Whoops! You have to sign in to be able to register a bike'
+      set_return_to(new_bike_path(b_param_token: params[:b_param_token], stolen: params[:stolen]))
+      flash[:info] = 'You have to sign in to register a bike'
       redirect_to new_user_path and return
     end
     find_or_new_b_param
