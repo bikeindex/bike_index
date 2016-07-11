@@ -50,8 +50,6 @@ class Bike < ActiveRecord::Base
 
   validates_uniqueness_of :card_id, allow_nil: true
   validates_presence_of :primary_frame_color_id
-  # validates_presence_of :rear_wheel_size_id
-  # validates_inclusion_of :rear_tire_narrow, in: [true, false]
 
   attr_accessor :other_listing_urls, :date_stolen_input, :receive_notifications,
     :phone, :image, :b_param_id, :embeded,
@@ -89,7 +87,7 @@ class Bike < ActiveRecord::Base
         rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow 
         primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
         propulsion_type_id propulsion_type_other zipcode country_id creation_zipcode belt_drive
-        coaster_brake rear_gear_type_id front_gear_type_id description owner_email
+        coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
         date_stolen_input receive_notifications phone creator creator_id image
         components_attributes b_param_id cached_attributes embeded embeded_extended example hidden
         card_id stock_photo_url pdf send_email other_listing_urls listing_order approved_stolen
