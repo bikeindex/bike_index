@@ -9,13 +9,13 @@
         .oauth-providers
           %a.facebook-login{ href: '/auth/facebook' }
             %span.oauth-logo-block
-              = image_tag '/assets/revised/facebook_login.svg'
+              = image_tag 'revised/facebook_login.svg'
             %span.oauth-text-block
               #{t("sign_in_up.#{controller_name}_oauth_text_block")} Facebook
             
           %a.strava-login{ href: '/auth/strava' }
             %span.oauth-logo-block
-              = image_tag '/assets/revised/strava_login.svg'
+              = image_tag 'revised/strava_login.svg'
             %span.oauth-text-block
               #{t("sign_in_up.#{controller_name}_oauth_text_block")} Strava
         .sign-in-up-or

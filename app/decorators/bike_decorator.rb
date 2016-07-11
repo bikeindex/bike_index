@@ -81,7 +81,7 @@ class BikeDecorator < ApplicationDecorator
       ext = "/small_" + small.pop
       h.image_tag(small.join('/') + ext, alt: title_string)
     else
-      # h.image_tag("/assets/bike_photo_placeholder.png", alt: title) + h.content_tag(:span, "no image")
+      # h.image_tag("bike_photo_placeholder.png", alt: title) + h.content_tag(:span, "no image")
     end
   end
 
@@ -93,7 +93,7 @@ class BikeDecorator < ApplicationDecorator
       ext = "/small_" + small.pop
       h.image_tag(small.join('/') + ext, alt: title_string)
     else
-      h.image_tag('/assets/revised/bike_photo_placeholder.svg', alt: title, title: 'No image', class: 'no-image')
+      h.image_tag('revised/bike_photo_placeholder.svg', alt: title, title: 'No image', class: 'no-image')
     end
   end
 

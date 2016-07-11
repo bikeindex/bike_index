@@ -54,6 +54,21 @@ describe AdminMailer do
     end
   end
 
+  context 'user_hidden bike' do
+    let(:ownership) { FactoryGirl.create(:ownership, user_hidden: true) }
+    let(:bike) { ownership.bike }
+    let(:feedback) { FactoryGirl.create(:feedback, feedback_hash: { bike_id: bike.id }, feedback_type: 'bike_delete_request') }
+    it "doesn't explode" do
+      bike.update_attribute :hidden, true
+      bike.reload
+      expect(bike.user_hidden).to be_truthy
+      mail = AdminMailer.feedback_notification_email(feedback)
+      expect(mail.subject).to eq('New Feedback Submitted')
+      expect(mail.to).to eq(['contact@bikeindex.org'])
+      expect(mail.reply_to).to eq([feedback.email])
+    end
+  end
+
   describe 'no_admins_notification_email' do
     before :each do
       @organization = FactoryGirl.create(:organization)

@@ -23,8 +23,8 @@ wheel_sizes = [
   { name: '24 x 1 1/8, 24 x 1 3/8 (E.5), 600 A', iso_bsd: 540, priority: 4, description: '24 x 1 1/8, 24 x 1 3/8 (E.5), 600 A (Rare)' },
   { name: '24 x 1 1/4, 24 x 1 3/8 (S-5)', iso_bsd: 547, priority: 4, description: '24 x 1 1/4, 24 x 1 3/8, Schwinn Juvenile (Rare)' },
   { name: '26in', iso_bsd: 559, priority: 1, description: '26in (Standard size)' },
-  { name: '650 C', iso_bsd: 571, priority: 3, description: 'Schwinn Cruisers, Tri- and Time-trial bikes (uncommon)' },
-  { name: '650 B', iso_bsd: 584, priority: 1, description: '27.5 mountain bikes, smaller road bikes (Standard size)' },  
+  { name: '650 C', iso_bsd: 571, priority: 3, description: '650 C, Schwinn Cruisers, Tri- and Time-trial bikes (uncommon)' },
+  { name: '650 B', iso_bsd: 584, priority: 1, description: '650 B, 27.5 mountain bikes, smaller road bikes (Standard size)' },
   { name: '700 D', iso_bsd: 587, priority: 4, description: '700 D GT size (Rare)' },
   { name: '26 x 1 3/8', iso_bsd: 590, priority: 3, description: '26 x 1 3/8 English 3-speeds, older department-store 10 speeds (Uncommon)' },
   { name: '26 x 1 3/8', iso_bsd: 597, priority: 2, description: '26 x 1 3/8 (Older Schwinns, S-6) (Common)' },
@@ -32,7 +32,7 @@ wheel_sizes = [
   { name: '700 C', iso_bsd: 622, priority: 1, description: '700 C, 29in mountain bikes (Standard size)' },
   { name: '27in', iso_bsd: 630, priority: 1, description: '27in (Standard size)' },
   { name: '28 x 1 1/2, 700 B', iso_bsd: 635, priority: 4, description: '28 x 1 1/2, 700 B (Rare)' },
-  { name: '32in', iso_bsd: 686, priority: 4, description: '32in, Unicycle size (Rare)' }
+  { name: '32in', iso_bsd: 686, priority: 4, description: '32in, Unicycle size (Rare)' },
   { name: '36in', iso_bsd: 787, priority: 4, description: '36in, Unicycle size (Rare)' }
 ]
 wheel_sizes.each do |wheel_size|

@@ -55,11 +55,11 @@ class BikeIndex.Init extends BikeIndex
 
   # We need to call this because of Flexbox
   # Edge is fine, but all versions of IE are broken, and we should tell peeps
-  msieversion: ->
-    ua = window.navigator.userAgent
-    msie = ua.indexOf('MSIE ')
-    if msie > 0 or ! !navigator.userAgent.match(/Trident.*rv\:11\./)
-      alert parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)))
+  # msieversion: ->
+  #   ua = window.navigator.userAgent
+  #   msie = ua.indexOf('MSIE ')
+  #   if msie > 0 or ! !navigator.userAgent.match(/Trident.*rv\:11\./)
+  #     alert parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)))
 
 
 window.updateSearchBikesHeaderLink = ->

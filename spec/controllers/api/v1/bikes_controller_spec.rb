@@ -75,15 +75,27 @@ describe Api::V1::BikesController do
       FactoryGirl.create(:wheel_size, iso_bsd: 559)
       FactoryGirl.create(:ctype, name: 'wheel')
       FactoryGirl.create(:ctype, name: 'headset')
+      rear_gear_type = FactoryGirl.create(:rear_gear_type)
+      front_gear_type = FactoryGirl.create(:front_gear_type)
+      handlebar_type = FactoryGirl.create(:handlebar_type)
       f_count = Feedback.count
-      bike = { serial_number: '69 non-example',
-               manufacturer_id: manufacturer.id,
-               rear_tire_narrow: 'true',
-               rear_wheel_bsd: '559',
-               color: FactoryGirl.create(:color).name,
-               example: true,
-               year: '1969',
-               owner_email: 'fun_times@examples.com'
+      bike_attrs = {
+        serial_number: '69 non-example',
+        manufacturer_id: manufacturer.id,
+        rear_tire_narrow: 'true',
+        rear_wheel_bsd: '559',
+        color: FactoryGirl.create(:color).name,
+        example: true,
+        year: '1969',
+        owner_email: 'fun_times@examples.com',
+        frame_model: "Tricruiser Tricycle",
+        send_email: true,
+        frame_size: '56cm',
+        frame_size_unit: nil,
+        rear_gear_type_slug: rear_gear_type.slug,
+        front_gear_type_slug: front_gear_type.slug,
+        handlebar_type_slug: handlebar_type.slug,
+        registered_new: true
       }
       components = [
         {
@@ -108,23 +120,35 @@ describe Api::V1::BikesController do
       ]
       expect_any_instance_of(OwnershipCreator).to receive(:send_notification_email)
       expect do
-        post :create, bike: bike, organization_slug: @organization.slug, access_token: @organization.access_token, components: components, photos: photos
+        post :create, bike: bike_attrs, organization_slug: @organization.slug,
+             access_token: @organization.access_token, components: components, photos: photos
       end.to change(Ownership, :count).by(1)
       expect(response.code).to eq('200')
-      b = Bike.where(serial_number: '69 non-example').first
-      expect(b.example).to be_falsey
-      expect(b.creation_organization_id).to eq(@organization.id)
-      expect(b.year).to eq(1969)
-      expect(b.components.count).to eq(3)
-      component = b.components[2]
+      bike = Bike.where(serial_number: '69 non-example').first
+      expect(bike.example).to be_falsey
+      expect(bike.creation_organization_id).to eq(@organization.id)
+      expect(bike.year).to eq(1969)
+      expect(bike.components.count).to eq(3)
+      component = bike.components[2]
       expect(component.serial_number).to eq('69')
       expect(component.description).to eq('yeah yay!')
       expect(component.ctype.slug).to eq('headset')
       expect(component.year).to eq(1999)
       expect(component.manufacturer_id).to eq(manufacturer.id)
       expect(component.cmodel_name).to eq('Richie rich')
-      expect(b.public_images.count).to eq(2)
+      expect(bike.public_images.count).to eq(2)
       expect(f_count).to eq(Feedback.count)
+      skipped = %w(send_email frame_size_unit rear_wheel_bsd color example rear_gear_type_slug front_gear_type_slug handlebar_type_slug)
+      bike_attrs.except(*skipped.map(&:to_sym)).each do |attr_name, value|
+        pp attr_name unless bike.send(attr_name).to_s == value.to_s
+        expect(bike.send(attr_name).to_s).to eq value.to_s
+      end
+      expect(bike.frame_size_unit).to eq 'cm'
+      expect(bike.rear_wheel_size.iso_bsd).to eq bike_attrs[:rear_wheel_bsd].to_i
+      expect(bike.primary_frame_color.name).to eq bike_attrs[:color]
+      expect(bike.rear_gear_type.slug).to eq bike_attrs[:rear_gear_type_slug]
+      expect(bike.front_gear_type.slug).to eq bike_attrs[:front_gear_type_slug]
+      expect(bike.handlebar_type.slug).to eq bike_attrs[:handlebar_type_slug]
     end
 
     it 'creates a photos even if one fails' do

@@ -442,9 +442,8 @@ $multserial-textheight: 8em;
   #ms_form_section, #ms_search_section { display: none; }
 
   .multi-search-toggle {
-    // font-size: 20px;
-
-    margin: 0 0 1em;
+    font-size: 18px;
+    margin: 0 0 40px;
     a {
       text-decoration: none;
       color: $blue-light;

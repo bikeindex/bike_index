@@ -1611,7 +1611,7 @@ CREATE TABLE stolen_notifications (
     updated_at timestamp without time zone NOT NULL,
     receiver_email character varying(255),
     oauth_application_id integer,
-    reference_url character varying(255),
+    reference_url text,
     send_dates json
 );
 
@@ -3089,4 +3089,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160630161603');
 INSERT INTO schema_migrations (version) VALUES ('20160630175602');
 
 INSERT INTO schema_migrations (version) VALUES ('20160631175602');
+
+INSERT INTO schema_migrations (version) VALUES ('20160711183247');
 
