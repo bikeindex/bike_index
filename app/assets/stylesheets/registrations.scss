@@ -193,10 +193,10 @@ $row-side-padding: 0.9375rem;
 // @import "revised/sections/legacy_content"; // general legacy content styles
 // @import "revised/pages/legacy_stolen"; // legacy stolen page - including multi-serial search
 
-html { background: #fff; }
+html { background: none; }
 .currently-hidden { display: none; }
 img { max-width: 100%; } // don't break random stuff images!
-body { background: #fff; }
+body { background: none; }
 
 // 
 // External overrides

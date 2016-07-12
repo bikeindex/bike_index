@@ -1,7 +1,8 @@
 #binx_registration_widget {
+  margin: 0 auto;
   position: relative;
   border-radius: $border-radius;
-  max-width: 500px;
+  max-width: 500px; // also set in the layout on the HTML element
   border: 1px solid $gray-lightish;
   background: $gray-lighter;
   h2 {

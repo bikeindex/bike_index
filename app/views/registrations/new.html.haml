@@ -1,4 +1,3 @@
-
 = form_for @b_param, { url: registrations_path, action: 'create' } do |f|
   .form-group
     = f.email_field :owner_email, required: true, value: @owner_email, placeholder: 'Your email', class: 'form-control'
