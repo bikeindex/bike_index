@@ -8,8 +8,8 @@
     %title Protect your bike today
     = csrf_meta_tags
     - unless @skip_assets
-      = javascript_include_tag 'registrations'
       = stylesheet_link_tag 'registrations', media: 'all'
+      = javascript_include_tag 'registrations'
   %body
     .registration-widget#binx_registration_widget
       %header.reg-header

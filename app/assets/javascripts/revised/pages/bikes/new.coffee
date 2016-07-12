@@ -4,7 +4,6 @@ class BikeIndex.BikesNew extends BikeIndex
     new BikeIndex.FormWell
     @initializeEventListeners()
     @updateSerial($('#bike_has_no_serial').prop('checked'))
-    console.log $('#bike_manufacturer_id').val()
     @otherManufacturerDisplay($('#bike_manufacturer_id').val())
     if $('#stolen_record_us_id').length > 0
       united_stated_id = $('#stolen_record_us_id').data('usid')

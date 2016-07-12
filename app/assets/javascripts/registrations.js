@@ -2,6 +2,7 @@
 // require self
 //= require jquery2
 //= require jquery_ujs
+//= require tether
 //= require bootstrap
 //= require selectize/standalone/selectize.js
 //= require external_scripts/selectize_placeholder_plugin.js
