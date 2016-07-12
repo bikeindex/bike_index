@@ -10,7 +10,6 @@ header.reg-header {
   background: image-url('revised/spokebg.png');
   background-size: cover;
   padding: $vertical-height 0;
-  text-align: center;
   background-position: center center;
   .reg-header-logo {
     display: block;
@@ -19,7 +18,6 @@ header.reg-header {
     margin: 0 auto;
   }
   h2 {
-    font-size: 30px;
     color: $reversed-font-color;
     margin: $vertical-height 0;
   }
@@ -31,6 +29,11 @@ header.reg-header {
 }
 
 .registration-widget {
+  h2 {
+    font-size: 30px;
+    margin: $vertical-height 0 1.5*$vertical-height;
+  }
+  p, h2 { text-align: center; }
   position: relative;
   border-radius: $border-radius;
   max-width: 500px;
@@ -38,6 +41,7 @@ header.reg-header {
   background: $gray-lighter;
   .registration-widget-body {
     padding: 2*$vertical-height;
+    p { padding: 0 10%; }
   }
   .below-input-help { padding-bottom: 0; }
   .fancy-select .selectize-control { width: 100%; }

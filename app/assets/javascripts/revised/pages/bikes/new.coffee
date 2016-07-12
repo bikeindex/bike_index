@@ -4,6 +4,7 @@ class BikeIndex.BikesNew extends BikeIndex
     new BikeIndex.FormWell
     @initializeEventListeners()
     @updateSerial($('#bike_has_no_serial').prop('checked'))
+    console.log $('#bike_manufacturer_id').val()
     @otherManufacturerDisplay($('#bike_manufacturer_id').val())
     if $('#stolen_record_us_id').length > 0
       united_stated_id = $('#stolen_record_us_id').data('usid')
@@ -48,7 +49,7 @@ class BikeIndex.BikesNew extends BikeIndex
 
   otherManufacturerDisplay: (slug) ->
     hidden_other = $('#bike_manufacturer_id').parents('.related-fields').find('.hidden-other')
-    if slug == 'other' # show the bugger!
+    if slug == 'other' or slug == 'Other' # show the bugger!
       hidden_other.slideDown().addClass('unhidden')
     else if hidden_other.hasClass('unhidden') # Hide it!
       hidden_other.find('input').val('')
