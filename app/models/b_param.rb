@@ -56,6 +56,54 @@ class BParam < ActiveRecord::Base
   def manufacturer; bike['manufacturer_id'] && Manufacturer.find(bike['manufacturer_id']) end
   def creation_organization; Organization.friendly_find(creation_organization_id) end
 
+  class << self
+    def v2_params(hash)
+      h = { 'bike' => hash.with_indifferent_access }
+      h['bike']['serial_number'] = h['bike'].delete 'serial'
+      h['bike']['send_email'] = !(h['bike'].delete 'no_notify')
+      org = Organization.find_by_slug(h['bike'].delete 'organization_slug')
+      h['bike']['creation_organization_id'] = org.id if org.present?
+      # Move un-nested params outside of bike
+      %w(test id components).each { |k| h[k] = h['bike'].delete k }
+      stolen_attrs = h['bike'].delete 'stolen_record'
+      if stolen_attrs && stolen_attrs.delete_if { |k,v| v.blank? } && stolen_attrs.keys.any?
+        h['bike']['stolen'] = true
+        h['stolen_record'] = stolen_attrs
+      end
+      h
+    end
+
+    def from_id_token(toke, after = nil)
+      return nil unless toke.present?
+      after ||= Time.now - 1.days
+      where('created_at >= ?', after).where(id_token: toke).first
+    end
+
+    def find_or_new_from_token(toke = nil, user_id: nil, organization_id: nil)
+      b = where(creator_id: user_id, id_token: toke).first if user_id.present?
+      b ||= without_bike.without_creator.where('created_at >= ?', Time.now - 1.month).where(id_token: toke).first
+      b ||= BParam.new(creator_id: user_id, params: { revised_new: true }.as_json)
+      b.creator_id ||= user_id
+      # If the org_id is present, add it to the params. Only save it if the b_param is created
+      if organization_id.present? && b.creation_organization_id != organization_id
+        b.params = b.params.merge(bike: b.bike.merge(creation_organization_id: organization_id))
+        b.update_attribute :params, b.params if b.id.present?
+      end
+      b
+    end
+
+    def assignable_attrs
+      %w(manufacturer_id manufacturer_other frame_model year owner_email
+         stolen recovered serial_number has_no_serial made_without_serial
+         primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id)
+    end
+
+    def skipped_bike_attrs # Attrs that need to be skipped on bike assignment
+      %w(cycle_type_slug cycle_type_name rear_gear_type_slug front_gear_type_slug
+         handlebar_type_slug frame_material_slug)
+    end
+  end
+
   # Right now this is a partial update. It's improved from where it was, but it still uses the BikeCreator
   # code for protection. Ideally, we would use the revised merge code to ensure we aren't letting users
   # write illegal things to the bikes
@@ -81,22 +129,6 @@ class BParam < ActiveRecord::Base
 
   def bike
     (params && params['bike'] || {}).with_indifferent_access
-  end
-
-  def self.v2_params(hash)
-    h = { 'bike' => hash.with_indifferent_access }
-    h['bike']['serial_number'] = h['bike'].delete 'serial'
-    h['bike']['send_email'] = !(h['bike'].delete 'no_notify')
-    org = Organization.find_by_slug(h['bike'].delete 'organization_slug')
-    h['bike']['creation_organization_id'] = org.id if org.present?
-    # Move un-nested params outside of bike
-    %w(test id components).each { |k| h[k] = h['bike'].delete k }
-    stolen_attrs = h['bike'].delete 'stolen_record'
-    if stolen_attrs && stolen_attrs.delete_if { |k,v| v.blank? } && stolen_attrs.keys.any?
-      h['bike']['stolen'] = true
-      h['stolen_record'] = stolen_attrs
-    end
-    h
   end
 
   def set_foreign_keys
@@ -200,12 +232,6 @@ class BParam < ActiveRecord::Base
     end
   end
 
-  def self.from_id_token(toke, after = nil)
-    return nil unless toke.present?
-    after ||= Time.now - 1.days
-    where('created_at >= ?', after).where(id_token: toke).first
-  end
-
   def generate_id_token
     self.id_token ||= generate_unique_token
   end
@@ -214,19 +240,7 @@ class BParam < ActiveRecord::Base
   # by reducing reliance on attr_accessor, and also not creating b_params unless we need to
   # To protect organization registration and other non-user-set options in revised setup,
   # Set the protected attrs separately from the params hash and merging over the passed params
-  def self.find_or_new_from_token(toke = nil, user_id: nil, organization_id: nil)
-    b = where(creator_id: user_id, id_token: toke).first if user_id.present?
-    b ||= without_bike.without_creator.where('created_at >= ?', Time.now - 1.month).where(id_token: toke).first
-    b ||= BParam.new(creator_id: user_id, params: { revised_new: true }.as_json)
-    b.creator_id ||= user_id
-    # If the org_id is present, add it to the params. Only save it if the b_param is created
-    if organization_id.present? && b.creation_organization_id != organization_id
-      b.params = b.params.merge(bike: b.bike.merge(creation_organization_id: organization_id))
-      b.update_attribute :params, b.params if b.id.present?
-    end
-    b
-  end
-
+  # Now that we're on rails 4, this is just a giant headache.
   def bike_from_attrs(is_stolen: nil, recovered: nil)
     is_stolen = params['bike']['stolen'] if params['bike'] && params['bike'].keys.include?('stolen')
     Bike.new safe_bike_attrs({ 'stolen' => is_stolen, 'recovered' => recovered }).as_json
@@ -238,12 +252,6 @@ class BParam < ActiveRecord::Base
                'creator_id' => creator_id,
                'cycle_type_id' => cycle_type_id,
                'creation_organization_id' => params['creation_organization_id'])
-  end
-
-  def self.assignable_attrs
-    %w(manufacturer_id manufacturer_other frame_model year owner_email
-       stolen recovered serial_number has_no_serial made_without_serial
-       primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id)
   end
 
   def cycle_type_id
