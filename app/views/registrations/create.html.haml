@@ -1,17 +1,15 @@
-.registration-widget#binx_registration_widget
-  = render 'reg_header'
-  .registration-widget-body
-    %h2
-      - if @b_param.stolen
-        We got this.
-      - else
-        Radicool!
-    %p
-      We sent an email to:
-      %strong #{@b_param.owner_email}
-    %p
-      In it, you'll find instructions on how to complete the registration of your bike
 
-    - if @b_param.stolen
-      %p
-        We'll do our best to help you get it back
+%h2
+  - if @b_param.stolen
+    We got this.
+  - else
+    Radicool!
+%p
+  We sent an email to:
+  %strong #{@b_param.owner_email}
+%p
+  In it, you'll find instructions on how to complete the registration of your bike
+
+- if @b_param.stolen
+  %p
+    We'll do our best to help you get it back
