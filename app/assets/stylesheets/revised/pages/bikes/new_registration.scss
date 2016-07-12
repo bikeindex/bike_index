@@ -1,13 +1,49 @@
+// Protect your bike today dbdbdb bold 20, header
+// register on the bike index ffff, 15
+// radcool, regular 30, header
+// body 18
+
+header.reg-header {
+  border-radius: $border-radius $border-radius 0 0;
+  display: block;
+  position: relative;
+  background: image-url('revised/spokebg.png');
+  background-size: cover;
+  padding: $vertical-height 0;
+  text-align: center;
+  background-position: center center;
+  .reg-header-logo {
+    display: block;
+    width: 15%;
+    height: auto;
+    margin: 0 auto;
+  }
+  h2 {
+    font-size: 30px;
+    color: $reversed-font-color;
+    margin: $vertical-height 0;
+  }
+  p {
+    margin: 0;
+    color: #fff;
+    em { color: $blue; }
+  }
+}
+
 .registration-widget {
+  position: relative;
+  border-radius: $border-radius;
   max-width: 500px;
-  padding: $vertical-height 2*$vertical-height;
-  border: 1px solid #ccc;
+  border: 1px solid $gray-lightish;
+  background: $gray-lighter;
+  .registration-widget-body {
+    padding: 2*$vertical-height;
+  }
   .below-input-help { padding-bottom: 0; }
   .fancy-select .selectize-control { width: 100%; }
-  .submit-wrapper {
+  .submit-wrapper .btn {
     display: block;
-    margin: 0 auto;
-    padding-left: 3*$vertical-height;
-    padding-right: 3*$vertical-height;
+    margin: 0;
+    width: 100%;
   }
 }
