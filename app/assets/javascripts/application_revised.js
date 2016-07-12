@@ -30,6 +30,5 @@
 //= require external_scripts/jquery.fileupload.js
 
 // Our actual scripts:
-//= require base_bike_index.coffee
 //= require init.coffee
 //= require_tree ./revised

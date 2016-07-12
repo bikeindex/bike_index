@@ -23,7 +23,7 @@ class BikeIndex.BikesEditAccessories extends BikeIndex
   fancySelectForManufacturers: ->
     toggleOtherDisplay = @toggleOtherDisplay
     for m in $('.component-manufacturer-input.unfancy')
-      new BikeIndex.ManufacturersSelect(m, false)
+      new window.ManufacturersSelect(m, false)
 
   addComponent: (e) ->
     e.preventDefault()

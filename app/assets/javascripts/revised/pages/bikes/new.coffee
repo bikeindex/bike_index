@@ -1,6 +1,6 @@
 class BikeIndex.BikesNew extends BikeIndex
   constructor: ->
-    new BikeIndex.ManufacturersSelect('#bike_manufacturer_id')
+    new window.ManufacturersSelect('#bike_manufacturer_id')
     new BikeIndex.FormWell
     @initializeEventListeners()
     @updateSerial($('#bike_has_no_serial').prop('checked'))

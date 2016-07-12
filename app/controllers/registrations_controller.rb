@@ -1,5 +1,6 @@
 class RegistrationsController < ApplicationController
-  layout 'application_revised'
+  skip_before_filter :set_x_frame_options_header
+  layout false
 
   def new # Attributes assigned in the partial, but can be overridden so it can be used anywhere
   end
@@ -27,6 +28,4 @@ class RegistrationsController < ApplicationController
                                     :secondary_frame_color_id,
                                     :tertiary_frame_color_id)
   end
-
-
 end

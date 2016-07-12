@@ -1,6 +1,16 @@
 // 
 // Input helpers
 // 
+.form-circle-item { // Mixin for help blocks
+  padding: .5em .25em;
+  border-radius: 1em;
+  line-height: 0;
+  cursor: pointer;
+  color: $gray;
+  font-size: 125%;
+  text-decoration: none;
+}
+
 .below-input-help {
   @extend small;
   display: block;

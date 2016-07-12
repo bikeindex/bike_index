@@ -1,3 +1,15 @@
+# All the classes inherit from this
+class window.BikeIndex
+  loadFancySelects: ->
+    $('.unfancy.fancy-select select').selectize
+      create: false
+      plugins: ['restore_on_backspace']
+    $('.unfancy.fancy-select-placeholder select').selectize # When empty options are allowed
+      create: false
+      plugins: ['restore_on_backspace', 'selectable_placeholder']
+    # Remove them so we don't initialize twice
+    $('.unfancy.fancy-select, .unfancy.fancy-select-placeholder').removeClass('unfancy')
+
 # This file initializes scripts for the application
 class BikeIndex.Init extends BikeIndex
   constructor: ->
@@ -64,4 +76,4 @@ $(document).ready ->
   window.updateSearchBikesHeaderLink()
   new BikeIndex.Init
   if document.getElementById('binx_registration_widget')
-    new BikeIndex.ManufacturersSelect('#binx_registration_widget #b_param_manufacturer_id')
+    new window.ManufacturersSelect('#binx_registration_widget #b_param_manufacturer_id')

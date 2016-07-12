@@ -30,6 +30,7 @@ describe RegistrationsController do
           creator_input = response.body[/value=.*id..b_param_creator_id..*.\d*/i]
           creator_value = creator_input.gsub(/value=./, '').match(/\A[^\"]*/)[0]
           expect(creator_value).to eq user.id.to_s
+          expect(response.headers['X-Frame-Options']).not_to be_present
         end
       end
     end
@@ -40,6 +41,7 @@ describe RegistrationsController do
           expect(response.status).to eq(200)
           expect(response).to render_template(:new)
           expect(flash).to_not be_present
+          expect(response.headers['X-Frame-Options']).not_to be_present
         end
       end
       context 'with user' do
@@ -49,6 +51,7 @@ describe RegistrationsController do
           expect(response.status).to eq(200)
           expect(response).to render_template(:new)
           expect(flash).to_not be_present
+          expect(response.headers['X-Frame-Options']).not_to be_present
           # Since we're creating these in line, actually test the rendered body
           body = response.body
           # Owner email
@@ -101,6 +104,7 @@ describe RegistrationsController do
           b_param = BParam.last
           expect(b_param.owner_email).to eq 'something@stuff.com'
           expect(EmailPartialRegistrationWorker).to have_enqueued_job(b_param.id)
+          expect(response.headers['X-Frame-Options']).not_to be_present
         end
       end
       context 'all values set' do
@@ -117,6 +121,7 @@ describe RegistrationsController do
           post :create, b_param: attrs
           expect(response).to render_template(:create)
           b_param = BParam.last
+          expect(response.headers['X-Frame-Options']).not_to be_present
           attrs.each do |key, value|
             expect(b_param.send(key).to_s).to eq value.to_s
           end
