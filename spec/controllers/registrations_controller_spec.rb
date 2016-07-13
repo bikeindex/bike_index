@@ -13,10 +13,14 @@ describe RegistrationsController do
     context 'no organization' do
       context 'no user' do
         it 'renders' do
-          get :new, stolen: true
+          get :new, stolen: true, skip_assets: true
           expect(response.status).to eq(200)
           expect(response).to render_template(:new)
           expect(flash).to_not be_present
+          expect(assigns(:stolen)).to be_truthy
+          expect(assigns(:skip_assets)).to be_truthy
+          expect(assigns(:creator)).to be_nil
+          expect(assigns(:owner_email)).to be_nil
         end
       end
       context 'with user' do
@@ -26,10 +30,15 @@ describe RegistrationsController do
           expect(response.status).to eq(200)
           expect(response).to render_template(:new)
           expect(flash).to_not be_present
+          expect(assigns(:stolen)).to be_falsey
+          expect(assigns(:skip_assets)).to be_falsey
+          expect(assigns(:creator)).to eq user
+          expect(assigns(:owner_email)).to eq user.email
           # Creator is user
           creator_input = response.body[/value=.*id..b_param_creator_id..*.\d*/i]
           creator_value = creator_input.gsub(/value=./, '').match(/\A[^\"]*/)[0]
           expect(creator_value).to eq user.id.to_s
+          expect(response.headers['X-Frame-Options']).not_to be_present
         end
       end
     end
@@ -40,15 +49,21 @@ describe RegistrationsController do
           expect(response.status).to eq(200)
           expect(response).to render_template(:new)
           expect(flash).to_not be_present
+          expect(response.headers['X-Frame-Options']).not_to be_present
+          expect(assigns(:stolen)).to be_falsey
+          expect(assigns(:skip_assets)).to be_falsey
+          expect(assigns(:organization)).to eq organization
+          expect(assigns(:creator)).to eq auto_user
         end
       end
       context 'with user' do
-        it 'renders' do
+        it 'renders, testing variables' do
           set_current_user(user)
-          get :new, organization_id: organization.id
+          get :new, organization_id: organization.id, stolen: true, skip_assets: true
           expect(response.status).to eq(200)
           expect(response).to render_template(:new)
           expect(flash).to_not be_present
+          expect(response.headers['X-Frame-Options']).not_to be_present
           # Since we're creating these in line, actually test the rendered body
           body = response.body
           # Owner email
@@ -63,6 +78,12 @@ describe RegistrationsController do
           creator_organization_input = body[/value=.*id..b_param_creation_organization_id/i]
           creator_organization_value = creator_organization_input.gsub(/value=./, '').match(/\A[^\"]*/)[0]
           expect(creator_organization_value).to eq organization.id.to_s
+
+          expect(assigns(:stolen)).to be_truthy
+          expect(assigns(:skip_assets)).to be_truthy
+          expect(assigns(:organization)).to eq organization
+          expect(assigns(:creator)).to eq auto_user
+          expect(assigns(:owner_email)).to eq user.email
         end
       end
     end
@@ -101,6 +122,7 @@ describe RegistrationsController do
           b_param = BParam.last
           expect(b_param.owner_email).to eq 'something@stuff.com'
           expect(EmailPartialRegistrationWorker).to have_enqueued_job(b_param.id)
+          expect(response.headers['X-Frame-Options']).not_to be_present
         end
       end
       context 'all values set' do
@@ -117,6 +139,7 @@ describe RegistrationsController do
           post :create, b_param: attrs
           expect(response).to render_template(:create)
           b_param = BParam.last
+          expect(response.headers['X-Frame-Options']).not_to be_present
           attrs.each do |key, value|
             expect(b_param.send(key).to_s).to eq value.to_s
           end

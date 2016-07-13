@@ -1,6 +1,6 @@
 class BikeIndex.BikesNew extends BikeIndex
   constructor: ->
-    new BikeIndex.ManufacturersSelect('#bike_manufacturer_id')
+    new window.ManufacturersSelect('#bike_manufacturer_id')
     new BikeIndex.FormWell
     @initializeEventListeners()
     @updateSerial($('#bike_has_no_serial').prop('checked'))
@@ -48,7 +48,7 @@ class BikeIndex.BikesNew extends BikeIndex
 
   otherManufacturerDisplay: (slug) ->
     hidden_other = $('#bike_manufacturer_id').parents('.related-fields').find('.hidden-other')
-    if slug == 'other' # show the bugger!
+    if slug == 'other' or slug == 'Other' # show the bugger!
       hidden_other.slideDown().addClass('unhidden')
     else if hidden_other.hasClass('unhidden') # Hide it!
       hidden_other.find('input').val('')

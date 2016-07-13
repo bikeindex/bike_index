@@ -51,7 +51,7 @@
                 - initial = @bike.manufacturer && { id: @bike.manufacturer.id, text: @bike.manufacturer.name }.to_json
                 = f.text_field :manufacturer_id, value: @bike.manufacturer && @bike.manufacturer.name, class: 'form-control unfancy', data: { initial: initial }
                 %span.below-input-help
-                  Select 'Other' if manufacturer isn't listed
+                  Select 'Other' if manufacturer doesn't show up when entered
             .form-group.hidden-other.row
               = f.label :manufacturer_other, 'Other manufacturer', class: 'form-well-label'
               .form-well-input

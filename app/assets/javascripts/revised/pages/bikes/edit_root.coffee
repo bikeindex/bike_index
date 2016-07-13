@@ -1,7 +1,7 @@
 class BikeIndex.BikesEditRoot extends BikeIndex
   constructor: ->
     @initializeEventListeners()
-    new BikeIndex.ManufacturersSelect('#manufacturer_update_manufacturer')
+    new window.ManufacturersSelect('#manufacturer_update_manufacturer')
     @setFrameSize()
     @updateYear()
 

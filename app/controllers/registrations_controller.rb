@@ -1,9 +1,17 @@
 class RegistrationsController < ApplicationController
-  # before_filter :find_b_param, only: [:edit, :update]
-  # before_filter :ensure_user_allowed_to_edit, only: [:edit, :update]
-  layout 'application_revised'
+  skip_before_filter :set_x_frame_options_header
+  layout 'reg_embed'
 
   def new # Attributes assigned in the partial, but can be overridden so it can be used anywhere
+    @skip_assets = params[:skip_assets]
+    @organization = current_organization
+    @creator = @organization && @organization.auto_user || current_user
+    @owner_email = current_user && current_user.email || @creator && @creator.email
+    @stolen = params[:stolen]
+    @b_param ||= BParam.new(creation_organization_id: @organization && @organization.id,
+                            creator_id: @creator && @creator.id,
+                            owner_email: @owner_email,
+                            stolen: @stolen)
   end
 
   def create
@@ -29,6 +37,4 @@ class RegistrationsController < ApplicationController
                                     :secondary_frame_color_id,
                                     :tertiary_frame_color_id)
   end
-
-
 end
