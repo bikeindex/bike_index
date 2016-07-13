@@ -113,7 +113,7 @@ describe RegistrationsController do
           expect do
             post :create, b_param: attrs
           end.to change(BParam, :count).by 0
-          expect(response).to render_template(:create)
+          expect(response).to render_template(:new)
           b_param = assigns(:b_param)
           attrs.each do |key, value|
             expect(b_param.send(key).to_s).to eq value.to_s
