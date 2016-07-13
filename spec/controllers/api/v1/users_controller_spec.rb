@@ -151,12 +151,14 @@ describe Api::V1::UsersController do
           mark_recovered_stolen_record_id: stolen_record.id
         }
         set_current_user(user)
-        bike.reload.update_attributes(stolen: false, current_stolen_record_id: nil)
+        # bike.reload.update_attributes(stolen: false, current_stolen_record_id: nil)
         bike.reload
+        expect(bike.find_current_stolen_record.id).to eq stolen_record.id
         post :send_request, recovery_request.as_json
         expect(response.code).to eq('200')
         expect(flash[:error]).not_to be_present
-        expect(bike.reload.stolen).to be_falsey
+        bike.reload
+        expect(bike.stolen).to be_falsey
         # ALSO MAKE SURE IT RECOVERY NOTIFIES
         expect(stolen_record.reload.current).to be_falsey
         expect(stolen_record.bike).to eq(bike)
