@@ -773,62 +773,69 @@ describe BikesController do
         # Firstly, new stolen update code paths
         # Also, that we can apply stolen changes to hidden bikes
         # And finally, that it redirects to the correct page
-        it 'updates and returns to the right page' do
-          state = FactoryGirl.create(:state)
-          country = state.country
-          stolen_record = FactoryGirl.create(:stolen_record, bike: bike, city: 'party')
-          bike.stolen = true
-          # bike.marked_user_hidden = true
-          bike.save
-          expect(stolen_record.date_stolen).to be_present
-          expect(stolen_record.proof_of_ownership).to be_falsey
-          expect(stolen_record.receive_notifications).to be_truthy
-          bike.reload
-          # bike.update_attributes(stolen: true, current_stolen_record_id: stolen_record.id)
-          bike.reload
-          expect(bike.find_current_stolen_record).to eq stolen_record
-          stolen_attrs = {
-            date_stolen_input: 'Mon Feb 8 2016',
-            phone: '9999999999',
-            street: '66666666 foo street',
-            country_id: country.id,
-            city: 'Chicago',
-            zipcode: '60647',
-            state_id: state.id,
-            locking_description: 'Some description',
-            lock_defeat_description: 'It was cuttttt',
-            theft_description: 'Someone stole it and stuff',
-            police_report_number: '#444444',
-            police_report_department: 'department of party',
-            secondary_phone: '8888888888',
-            proof_of_ownership: 1,
-            receive_notifications: 0
-          }
-          bike_attrs = {
-            stolen: true,
-            stolen_records_attributes: {
-              "#{stolen_record.id}" => stolen_attrs
+        context 'stolen update' do
+          it 'updates and returns to the right page' do
+            state = FactoryGirl.create(:state)
+            country = state.country
+            stolen_record = FactoryGirl.create(:stolen_record, bike: bike, city: 'party')
+            bike.stolen = true
+            # bike.marked_user_hidden = true
+            bike.save
+            expect(stolen_record.date_stolen).to be_present
+            expect(stolen_record.proof_of_ownership).to be_falsey
+            expect(stolen_record.receive_notifications).to be_truthy
+            bike.reload
+            # bike.update_attributes(stolen: true, current_stolen_record_id: stolen_record.id)
+            bike.reload
+            expect(bike.find_current_stolen_record).to eq stolen_record
+            stolen_attrs = {
+              date_stolen_input: 'Mon Feb 8 2016',
+              phone: '9999999999',
+              street: '66666666 foo street',
+              country_id: country.id,
+              city: 'Chicago',
+              zipcode: '60647',
+              state_id: state.id,
+              locking_description: 'Some description',
+              lock_defeat_description: 'It was cuttttt',
+              theft_description: 'Someone stole it and stuff',
+              police_report_number: '#444444',
+              police_report_department: 'department of party',
+              secondary_phone: '8888888888',
+              proof_of_ownership: 1,
+              receive_notifications: 0
             }
-          }
-          put :update, id: bike.id, bike: bike_attrs, edit_template: 'fancy_template'
-          expect(flash[:error]).to_not be_present
-          expect(response).to redirect_to edit_bike_url(page: 'fancy_template')
-          bike.reload
-          expect(bike.stolen).to be_truthy
-          # expect(bike.hidden).to be_truthy
-          # Stupid cheat because we're creating an extra record here for fuck all reason
-          current_stolen_record = bike.find_current_stolen_record
-          expect(bike.stolen_records.count).to eq 1
-          expect(bike.find_current_stolen_record.id).to eq stolen_record.id
-          # stolen_record.reload
-          expect(bike.find_current_stolen_record.id).to eq stolen_record.id
-          expect(current_stolen_record.date_stolen).to be_within(1.second).of DateTime.strptime('02-08-2016 06', '%m-%d-%Y %H')
-          expect(current_stolen_record.proof_of_ownership).to be_truthy
-          expect(current_stolen_record.receive_notifications).to be_falsey
-          skipped_attrs = %w(proof_of_ownership receive_notifications date_stolen_input).map(&:to_sym)
-          stolen_attrs.except(*skipped_attrs).each do |key, value|
-            pp key unless current_stolen_record.send(key) == value
-            expect(current_stolen_record.send(key)).to eq value
+            bike_attrs = {
+              stolen: true,
+              stolen_records_attributes: {
+                '0' => stolen_attrs
+              }
+            }
+            put :update, id: bike.id, bike: bike_attrs, edit_template: 'fancy_template'
+            expect(flash[:error]).to_not be_present
+            expect(response).to redirect_to edit_bike_url(page: 'fancy_template')
+            bike.reload
+            expect(bike.stolen).to be_truthy
+            # expect(bike.hidden).to be_truthy
+            # Stupid cheat because we're creating an extra record here for fuck all reason
+            current_stolen_record = bike.find_current_stolen_record
+            expect(bike.stolen_records.count).to eq 1
+            expect(bike.find_current_stolen_record.id).to eq stolen_record.id
+            # stolen_record.reload
+            expect(bike.find_current_stolen_record.id).to eq stolen_record.id
+            expect(current_stolen_record.date_stolen).to be_within(1.second).of DateTime.strptime('02-08-2016 06', '%m-%d-%Y %H')
+            expect(current_stolen_record.proof_of_ownership).to be_truthy
+            expect(current_stolen_record.receive_notifications).to be_falsey
+            skipped_attrs = %w(proof_of_ownership receive_notifications date_stolen_input).map(&:to_sym)
+            stolen_attrs.except(*skipped_attrs).each do |key, value|
+              pp key unless current_stolen_record.send(key) == value
+              expect(current_stolen_record.send(key)).to eq value
+            end
+          end
+          context 'recovered bike' do
+            it 'marks the bike recovered' do
+              
+            end
           end
         end
       end

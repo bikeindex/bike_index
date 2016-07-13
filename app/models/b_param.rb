@@ -1,9 +1,6 @@
 # b_param stands for Bike param
 class BParam < ActiveRecord::Base
   attr_accessor :api_v2
-  # :stolen, # for the new registration flow
-  # :creation_organization_id, # new registration flow
-  # :owner_email, # new registration flow
 
   mount_uploader :image, ImageUploader
   store_in_background :image, CarrierWaveStoreWorker

@@ -63,10 +63,13 @@ class StolenRecordUpdator
 
 
   def update_with_params(stolen_record)
-    @b_param['stolen_record'] = @b_param['bike']['stolen_records_attributes'][stolen_record.id.to_s] if @b_param && @b_param['bike'] && @b_param['bike']['stolen_records_attributes']
-    return stolen_record unless @b_param.present? && @b_param['stolen_record'].present?
+    return stolen_record unless @b_param.present?
     sr = @b_param['stolen_record']
-    stolen_record.attributes = permitted_attributes
+    if @b_param['bike'] && @b_param['bike']['stolen_records_attributes'] && @b_param['bike']['stolen_records_attributes'].values.first.is_a?(Hash)
+      @b_param['bike']['stolen_records_attributes'].each { |k, v| sr = v if v.present? }
+    end
+    return stolen_record unless sr.present?
+    stolen_record.attributes = permitted_attributes(sr)
     stolen_record.date_stolen = create_date_from_string(sr['date_stolen']) if sr['date_stolen']
     stolen_record.date_stolen = create_date_from_input(sr['date_stolen_input']) if sr['date_stolen_input']
     if sr['country'].present?
@@ -100,8 +103,8 @@ class StolenRecordUpdator
     raise StolenRecordError, "Awww shucks! We failed to mark this bike as stolen. Try again?"
   end
 
-  def permitted_attributes
-    ActionController::Parameters.new(@b_param['stolen_record']).permit(*permitted_params)
+  def permitted_attributes(params)
+    ActionController::Parameters.new(params).permit(*permitted_params)
   end
 
   private
