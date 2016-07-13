@@ -6,6 +6,10 @@
  *= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
  */
 
+// TODO: import a manifest for assets here.
+// import the same manifest in general stylesheet,
+// *the html and body elements are different here and on general sheet*
+
 /*!
  * Bootstrap v4.0.0-alpha.2 (http://getbootstrap.com)
  * Copyright 2011-2016 Twitter, Inc.
@@ -157,7 +161,6 @@ $row-side-padding: 0.9375rem;
 
 // // Bike registration page styles
 // @import "revised/pages/bikes/choose_registration";
-@import "revised/pages/bikes/new_registration";
 
 // Bike show & search pages
 // @import "revised/pages/bikes/show";
@@ -193,10 +196,10 @@ $row-side-padding: 0.9375rem;
 // @import "revised/sections/legacy_content"; // general legacy content styles
 // @import "revised/pages/legacy_stolen"; // legacy stolen page - including multi-serial search
 
-html { background: none; }
-.currently-hidden { display: none; }
+// html { background: $black-off; }
+// .currently-hidden { display: none; }
 img { max-width: 100%; } // don't break random stuff images!
-body { background: none; }
+// body { min-height: 400px; }
 
 // 
 // External overrides
@@ -216,3 +219,60 @@ body { background: none; }
 //   .slick-prev,
 //   .slick-next { display: none; }
 // }
+
+
+// ------------------------------
+// 
+
+// 
+// REGISTRATION FORM SPECIFIC STYLES
+// 
+#binx_registration_widget {
+  margin: 0 auto;
+  position: relative;
+  border-radius: $border-radius;
+  width: 100%; // max width set on body element in reg embed
+  border: 1px solid $gray-lightish;
+  background: $gray-lighter;
+  h2 {
+    font-size: 30px;
+    margin: $vertical-height 0 1.5*$vertical-height;
+  }
+  p, h2 { text-align: center; }
+  header.reg-header {
+    border-radius: $border-radius $border-radius 0 0;
+    display: block;
+    position: relative;
+    background: image-url('revised/spokebg.png');
+    background-size: cover;
+    padding: $vertical-height 0;
+    background-position: center center;
+    .reg-header-logo {
+      display: block;
+      width: 15%;
+      height: auto;
+      margin: 0 auto;
+    }
+    h2 {
+      color: $reversed-font-color;
+      margin: $vertical-height 0;
+    }
+    p {
+      margin: 0;
+      color: #fff;
+      em { color: $blue; }
+    }
+  }
+  .registration-widget-body {
+    padding: 2*$vertical-height;
+    p { padding: 0 10%; }
+  }
+  input[type='email'], select, .form-control { width: 100%; }
+  .below-input-help { padding-bottom: 0; }
+  .fancy-select .selectize-control { width: 100%; }
+  .submit-wrapper .btn {
+    display: block;
+    margin: 0;
+    width: 100%;
+  }
+}

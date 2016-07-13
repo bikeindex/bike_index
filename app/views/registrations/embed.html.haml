@@ -1,0 +1,20 @@
+= form_for @b_param, { url: registrations_path, action: 'create' } do |f|
+  .form-group
+    = f.email_field :owner_email, required: true, value: @owner_email, placeholder: 'Your email', class: 'form-control'
+  .form-group
+    - initial_mnfg = @b_param.manufacturer && { id: @b_param.manufacturer.id, text: @b_param.manufacturer.name }.to_json
+    = f.text_field :manufacturer_id, value: @b_param.manufacturer && @b_param.manufacturer.name, class: 'form-control unfancy', placeholder: 'Bike manufacturer', data: { initial: initial_mnfg }
+    %span.below-input-help
+      Select 'Other' if manufacturer doesn't show up when entered
+  .form-group.fancy-select.unfancy
+    = f.collection_select(:primary_frame_color_id, Color.all, :id, :name, required: true, prompt: 'Primary frame color', class: 'form-control')
+
+  = f.hidden_field :creation_organization_id
+  = f.hidden_field :creator_id
+  .form-group
+    %label
+      = f.check_box :stolen
+      This bike is either missing or stolen
+
+  .submit-wrapper
+    = submit_tag 'Register', class: 'btn btn-lg btn-primary'

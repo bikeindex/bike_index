@@ -1,5 +1,5 @@
 !!!
-%html
+%html{ style: 'background: none;'}
   %head
     %meta{charset: 'utf-8'}
     %meta{'http-equiv' => 'X-UA-Compatible', content: 'IE=edge,chrome=1'}
@@ -7,10 +7,9 @@
     %meta{name: 'description', content: 'Embedable Bike Index registration form. Register your bike for free, right now' }
     %title Protect your bike today
     = csrf_meta_tags
-    - unless @skip_assets
-      = stylesheet_link_tag 'registrations', media: 'all'
-      = javascript_include_tag 'registrations'
-  %body{ style: 'max-width: 500px' }
+    = stylesheet_link_tag 'registrations', media: 'all'
+    = javascript_include_tag 'registrations'
+  %body{ style: 'background: none; max-width: 500px; margin: 0 auto;' }
     .registration-widget#binx_registration_widget
       %header.reg-header
         = image_tag 'revised/logo.svg', class: 'reg-header-logo'

@@ -1,9 +1,12 @@
 class RegistrationsController < ApplicationController
-  skip_before_filter :set_x_frame_options_header
+  skip_before_filter :set_x_frame_options_header, except: [:new]
   layout 'reg_embed'
 
-  def new # Attributes assigned in the partial, but can be overridden so it can be used anywhere
-    @skip_assets = params[:skip_assets]
+  def new
+    render layout: 'application_revised'
+  end
+
+  def embed # Attributes assigned in the partial, but can be overridden so it can be used anywhere
     @organization = current_organization
     @creator = @organization && @organization.auto_user || current_user
     @owner_email = current_user && current_user.email || @creator && @creator.email

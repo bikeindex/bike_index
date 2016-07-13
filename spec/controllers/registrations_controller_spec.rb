@@ -10,15 +10,25 @@ describe RegistrationsController do
   let(:organization) { auto_user.organizations.first }
 
   describe 'new' do
+    it 'renders with the embeded form, no xframing' do
+      set_current_user(user)
+      get :new, organization_id: organization.id, stolen: true
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:new)
+      expect(response).to render_with_layout('application_revised')
+      expect(flash).to_not be_present
+      expect(response.headers['X-Frame-Options']).to be_present
+    end
+  end
+  describe 'embed' do
     context 'no organization' do
       context 'no user' do
         it 'renders' do
-          get :new, stolen: true, skip_assets: true
+          get :embed, stolen: true
           expect(response.status).to eq(200)
-          expect(response).to render_template(:new)
+          expect(response).to render_template(:embed)
           expect(flash).to_not be_present
           expect(assigns(:stolen)).to be_truthy
-          expect(assigns(:skip_assets)).to be_truthy
           expect(assigns(:creator)).to be_nil
           expect(assigns(:owner_email)).to be_nil
         end
@@ -26,12 +36,11 @@ describe RegistrationsController do
       context 'with user' do
         it 'renders, sets creator to user' do
           set_current_user(user)
-          get :new
+          get :embed
           expect(response.status).to eq(200)
-          expect(response).to render_template(:new)
+          expect(response).to render_template(:embed)
           expect(flash).to_not be_present
           expect(assigns(:stolen)).to be_falsey
-          expect(assigns(:skip_assets)).to be_falsey
           expect(assigns(:creator)).to eq user
           expect(assigns(:owner_email)).to eq user.email
           # Creator is user
@@ -45,13 +54,12 @@ describe RegistrationsController do
     context 'with organization' do
       context 'no user' do
         it 'renders' do
-          get :new, organization_id: organization.to_param
+          get :embed, organization_id: organization.to_param
           expect(response.status).to eq(200)
-          expect(response).to render_template(:new)
+          expect(response).to render_template(:embed)
           expect(flash).to_not be_present
           expect(response.headers['X-Frame-Options']).not_to be_present
           expect(assigns(:stolen)).to be_falsey
-          expect(assigns(:skip_assets)).to be_falsey
           expect(assigns(:organization)).to eq organization
           expect(assigns(:creator)).to eq auto_user
         end
@@ -59,9 +67,9 @@ describe RegistrationsController do
       context 'with user' do
         it 'renders, testing variables' do
           set_current_user(user)
-          get :new, organization_id: organization.id, stolen: true, skip_assets: true
+          get :embed, organization_id: organization.id, stolen: true
           expect(response.status).to eq(200)
-          expect(response).to render_template(:new)
+          expect(response).to render_template(:embed)
           expect(flash).to_not be_present
           expect(response.headers['X-Frame-Options']).not_to be_present
           # Since we're creating these in line, actually test the rendered body
@@ -80,7 +88,6 @@ describe RegistrationsController do
           expect(creator_organization_value).to eq organization.id.to_s
 
           expect(assigns(:stolen)).to be_truthy
-          expect(assigns(:skip_assets)).to be_truthy
           expect(assigns(:organization)).to eq organization
           expect(assigns(:creator)).to eq auto_user
           expect(assigns(:owner_email)).to eq user.email
@@ -106,7 +113,7 @@ describe RegistrationsController do
           expect do
             post :create, b_param: attrs
           end.to change(BParam, :count).by 0
-          expect(response).to render_template(:new)
+          expect(response).to render_template(:create)
           b_param = assigns(:b_param)
           attrs.each do |key, value|
             expect(b_param.send(key).to_s).to eq value.to_s
