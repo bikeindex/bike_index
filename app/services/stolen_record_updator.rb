@@ -42,11 +42,12 @@ class StolenRecordUpdator
   def update_records
     if @bike.stolen
       create_new_record unless @bike.find_current_stolen_record.present?
+      @bike.reload
       if @date_stolen
-        stolen_record = @bike.reload.find_current_stolen_record
+        stolen_record = @bike.find_current_stolen_record
         stolen_record.update_attributes(date_stolen: create_date_from_string(@date_stolen))
       elsif @b_param && (@b_param['stolen_record'] || @b_param['bike']['stolen_records_attributes'])
-        stolen_record = @bike.reload.find_current_stolen_record
+        stolen_record = @bike.find_current_stolen_record
         update_with_params(stolen_record).save
       end
     else
@@ -65,17 +66,7 @@ class StolenRecordUpdator
     @b_param['stolen_record'] = @b_param['bike']['stolen_records_attributes'][stolen_record.id.to_s] if @b_param && @b_param['bike'] && @b_param['bike']['stolen_records_attributes']
     return stolen_record unless @b_param.present? && @b_param['stolen_record'].present?
     sr = @b_param['stolen_record']
-    stolen_record.attributes = {
-      police_report_number: sr['police_report_number'],
-      police_report_department: sr['police_report_department'],
-      theft_description: sr['theft_description'],
-      street: sr['street'],
-      city: sr['city'],
-      zipcode: sr['zipcode'],
-      locking_description: sr['locking_description'],
-      lock_defeat_description: sr['lock_defeat_description']
-    }
-    stolen_record.phone = sr['phone'] if sr['phone']
+    stolen_record.attributes = permitted_attributes
     stolen_record.date_stolen = create_date_from_string(sr['date_stolen']) if sr['date_stolen']
     stolen_record.date_stolen = create_date_from_input(sr['date_stolen_input']) if sr['date_stolen_input']
     if sr['country'].present?
@@ -107,5 +98,18 @@ class StolenRecordUpdator
       return true
     end
     raise StolenRecordError, "Awww shucks! We failed to mark this bike as stolen. Try again?"
+  end
+
+  def permitted_attributes
+    ActionController::Parameters.new(@b_param['stolen_record']).permit(*permitted_params)
+  end
+
+  private
+
+  def permitted_params
+    %w(phone secondary_phone street city zipcode country_id state_id
+       police_report_number police_report_department
+       theft_description locking_description lock_defeat_description
+       proof_of_ownership receive_notifications)
   end
 end
