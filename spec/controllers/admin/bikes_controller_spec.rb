@@ -51,10 +51,28 @@ describe Admin::BikesController do
       it 'updates the bike and calls update_ownership and serial_normalizer' do
         expect_any_instance_of(BikeUpdator).to receive(:update_ownership)
         expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
-        bike = FactoryGirl.create(:bike)
-        put :update, id: bike.id, bike: { serial: 'new thing and stuff' }
+        bike = FactoryGirl.create(:stolen_bike)
+        stolen_record = bike.find_current_stolen_record
+        expect(stolen_record).to be_present
+        expect(stolen_record.is_a?(StolenRecord)).to be_truthy
+        bike_attributes = {
+          serial_number: 'new thing and stuff',
+          stolen_records_attributes: {
+            "0"=> {
+              street: 'Cortland and Ashland',
+              city: 'Chicago'
+            }
+          }
+        }
+        put :update, id: bike.id, bike: bike_attributes
+        expect(flash[:success]).to be_present
         expect(response).to redirect_to(:edit_admin_bike)
-        expect(flash).to be_present
+        bike.reload
+        expect(bike.serial_number).to eq bike_attributes[:serial_number]
+        expect(bike.find_current_stolen_record.id).to eq stolen_record.id
+        stolen_record.reload
+        expect(stolen_record.street).to eq 'Cortland and Ashland'
+        expect(stolen_record.city).to eq 'Chicago'
       end
     end
 

@@ -88,7 +88,7 @@ class Admin::BikesController < Admin::BaseController
       }
       RecoveryUpdateWorker.perform_async(@bike.current_stolen_record.id, info)
     end
-    if @bike.update_attributes(permitted_parameters)
+    if @bike.update_attributes(permitted_parameters.except(:stolen_records_attributes))
       @bike.create_normalized_serial_segments
       return if return_to_if_present
       flash[:success] = "Bike was successfully updated."
