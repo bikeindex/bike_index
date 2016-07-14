@@ -18,4 +18,18 @@ describe WheelSize do
       expect(wheel_size.popularity).to eq('Rare')
     end
   end
+
+  describe 'find_id_by_iso_bsd' do
+    context 'string iso_bsd' do
+      it 'returns the id' do
+        wheel_size = FactoryGirl.create(:wheel_size, iso_bsd: 622)
+        expect(WheelSize.id_for_bsd("\n622 ")).to eq wheel_size.id
+      end
+    end
+    context 'unknown number' do
+      it 'returns nil' do
+        expect(WheelSize.id_for_bsd('6220')).to be_nil
+      end
+    end
+  end
 end

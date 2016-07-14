@@ -45,6 +45,9 @@ describe Api::V1::BikesController do
     before do
       FactoryGirl.create(:cycle_type, slug: 'bike')
       FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
+      FactoryGirl.create(:wheel_size, iso_bsd: 559)
+      FactoryGirl.create(:ctype, name: 'wheel')
+      FactoryGirl.create(:ctype, name: 'headset')
     end
     context 'pos_integrator rear_gear_type_slug error' do
       let(:auto_user) { FactoryGirl.create(:organization_auto_user) }
@@ -121,9 +124,6 @@ describe Api::V1::BikesController do
 
       it 'creates a record and reset example' do
         manufacturer = FactoryGirl.create(:manufacturer)
-        FactoryGirl.create(:wheel_size, iso_bsd: 559)
-        FactoryGirl.create(:ctype, name: 'wheel')
-        FactoryGirl.create(:ctype, name: 'headset')
         rear_gear_type = FactoryGirl.create(:rear_gear_type)
         front_gear_type = FactoryGirl.create(:front_gear_type)
         handlebar_type = FactoryGirl.create(:handlebar_type)
@@ -132,7 +132,7 @@ describe Api::V1::BikesController do
           serial_number: '69 non-example',
           manufacturer_id: manufacturer.id,
           rear_tire_narrow: 'true',
-          rear_wheel_bsd: '559',
+          rear_wheel_bsd: 559,
           color: FactoryGirl.create(:color).name,
           example: true,
           year: '1969',
@@ -193,7 +193,7 @@ describe Api::V1::BikesController do
           expect(bike.send(attr_name).to_s).to eq value.to_s
         end
         expect(bike.frame_size_unit).to eq 'cm'
-        expect(bike.rear_wheel_size.iso_bsd).to eq bike_attrs[:rear_wheel_bsd].to_i
+        expect(bike.rear_wheel_size.iso_bsd).to eq bike_attrs[:rear_wheel_bsd]
         expect(bike.primary_frame_color.name).to eq bike_attrs[:color]
         expect(bike.rear_gear_type.slug).to eq bike_attrs[:rear_gear_type_slug]
         expect(bike.front_gear_type.slug).to eq bike_attrs[:front_gear_type_slug]
@@ -202,26 +202,25 @@ describe Api::V1::BikesController do
 
       it 'creates a photos even if one fails' do
         manufacturer = FactoryGirl.create(:manufacturer)
-        FactoryGirl.create(:wheel_size, iso_bsd: 559)
-        FactoryGirl.create(:ctype, name: 'wheel')
-        FactoryGirl.create(:ctype, name: 'headset')
         f_count = Feedback.count
-        bike = { serial_number: '69 photo-test',
-                 manufacturer_id: manufacturer.id,
-                 rear_tire_narrow: 'true',
-                 rear_wheel_bsd: '559',
-                 color: FactoryGirl.create(:color).name,
-                 example: true,
-                 year: '1969',
-                 owner_email: 'fun_times@examples.com'
+        bike_attrs = {
+          serial_number: '69 photo-test',
+          manufacturer_id: manufacturer.id,
+          rear_tire_narrow: 'true',
+          rear_wheel_bsd: '559',
+          color: FactoryGirl.create(:color).name,
+          example: true,
+          year: '1969',
+          owner_email: 'fun_times@examples.com'
         }
         photos = [
           'http://i.imgur.com/lybYl1l.jpg',
           'http://bikeindex.org/not_actually_a_thing_404_and_shit'
         ]
-        post :create, bike: bike, organization_slug: @organization.slug, access_token: @organization.access_token, photos: photos
-        b = Bike.where(serial_number: '69 photo-test').first
-        expect(b.public_images.count).to eq(1)
+        post :create, bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, photos: photos
+        bike = Bike.where(serial_number: '69 photo-test').first
+        expect(bike.public_images.count).to eq(1)
+        expect(bike.rear_wheel_size.iso_bsd).to eq 559
       end
 
       it 'creates a stolen record' do
@@ -230,34 +229,37 @@ describe Api::V1::BikesController do
         FactoryGirl.create(:country, iso: 'US')
         FactoryGirl.create(:state, abbreviation: 'Palace')
         # ListingOrderWorker.any_instance.should_receive(:perform).and_return(true)
-        bike = { serial_number: '69 stolen bike',
-                 manufacturer_id: manufacturer.id,
-                 rear_tire_narrow: 'true',
-                 rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
-                 primary_frame_color_id: FactoryGirl.create(:color).id,
-                 owner_email: 'fun_times@examples.com',
-                 stolen: 'true',
-                 phone: '9999999',
-                 cycle_type_slug: 'bike'
+        bike_attrs = { 
+          serial_number: '69 stolen bike',
+          manufacturer_id: manufacturer.id,
+          rear_tire_narrow: 'true',
+          rear_wheel_size: 559,
+          primary_frame_color_id: FactoryGirl.create(:color).id,
+          owner_email: 'fun_times@examples.com',
+          stolen: 'true',
+          phone: '9999999',
+          cycle_type_slug: 'bike'
         }
-        stolen_record = { date_stolen: '03-01-2013',
-                          theft_description: "This bike was stolen and that's no fair.",
-                          country: 'US',
-                          street: 'Cortland and Ashland',
-                          zipcode: '60622',
-                          state: 'Palace',
-                          police_report_number: '99999999',
-                          police_report_department: 'Chicago',
-                          locking_description: 'some locking description',
-                          lock_defeat_description: 'broken in some crazy way'
+        stolen_record = { 
+          date_stolen: '03-01-2013',
+          theft_description: "This bike was stolen and that's no fair.",
+          country: 'US',
+          street: 'Cortland and Ashland',
+          zipcode: '60622',
+          state: 'Palace',
+          police_report_number: '99999999',
+          police_report_department: 'Chicago',
+          locking_description: 'some locking description',
+          lock_defeat_description: 'broken in some crazy way'
         }
         expect_any_instance_of(OwnershipCreator).to receive(:send_notification_email)
         expect do
-          post :create, bike: bike, stolen_record: stolen_record, organization_slug: @organization.slug, access_token: @organization.access_token
+          post :create, bike: bike_attrs, stolen_record: stolen_record, organization_slug: @organization.slug, access_token: @organization.access_token
         end.to change(Ownership, :count).by(1)
         expect(response.code).to eq('200')
-        b = Bike.unscoped.where(serial_number: '69 stolen bike').first
-        csr = b.find_current_stolen_record
+        bike = Bike.unscoped.where(serial_number: '69 stolen bike').first
+        expect(bike.rear_wheel_size.iso_bsd).to eq 559
+        csr = bike.find_current_stolen_record
         expect(csr.address).to be_present
         expect(csr.phone).to eq('9999999')
         expect(csr.date_stolen).to eq(DateTime.strptime('03-01-2013 06', '%m-%d-%Y %H'))
@@ -272,44 +274,43 @@ describe Api::V1::BikesController do
         FactoryGirl.create(:membership, user: user, organization: org)
         manufacturer = FactoryGirl.create(:manufacturer)
         org.save
-        bike = { serial_number: '69 example bikez',
-                 cycle_type_id: FactoryGirl.create(:cycle_type, slug: 'gluey').id,
-                 manufacturer_id: manufacturer.id,
-                 rear_tire_narrow: 'true',
-                 rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
-                 color: 'grazeen',
-                 handlebar_type_slug: FactoryGirl.create(:handlebar_type, slug: 'foo').slug,
-                 frame_material_slug: FactoryGirl.create(:frame_material, slug: 'whatevah').slug,
-                 description: 'something else',
-                 owner_email: 'fun_times@examples.com'
+        bike_attrs = {
+          serial_number: '69 example bikez',
+          cycle_type_id: FactoryGirl.create(:cycle_type, slug: 'gluey').id,
+          manufacturer_id: manufacturer.id,
+          rear_tire_narrow: 'true',
+          rear_wheel_size: 559,
+          color: 'grazeen',
+          handlebar_type_slug: FactoryGirl.create(:handlebar_type, slug: 'foo').slug,
+          frame_material_slug: FactoryGirl.create(:frame_material, slug: 'whatevah').slug,
+          description: 'something else',
+          owner_email: 'fun_times@examples.com'
         }
-
         expect do
           expect do
-            post :create, bike: bike, organization_slug: org.slug, access_token: org.access_token
+            post :create, bike: bike_attrs, organization_slug: org.slug, access_token: org.access_token
           end.to change(Ownership, :count).by(1)
         end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
         expect(response.code).to eq('200')
-        b = Bike.unscoped.where(serial_number: '69 example bikez').first
-        expect(b.example).to be_truthy
-        expect(b.paint.name).to eq('grazeen')
-        expect(b.description).to eq('something else')
-        expect(b.frame_material.slug).to eq('whatevah')
-        expect(b.handlebar_type.slug).to eq('foo')
+        bike = Bike.unscoped.where(serial_number: '69 example bikez').first
+        expect(bike.example).to be_truthy
+        expect(bike.rear_wheel_size.iso_bsd).to eq 559
+        expect(bike.paint.name).to eq('grazeen')
+        expect(bike.description).to eq('something else')
+        expect(bike.frame_material.slug).to eq('whatevah')
+        expect(bike.handlebar_type.slug).to eq('foo')
       end
 
       it 'creates a record even if the post is a string' do
         manufacturer = FactoryGirl.create(:manufacturer)
-        FactoryGirl.create(:wheel_size, iso_bsd: 559)
-        FactoryGirl.create(:ctype, slug: 'wheel')
-        FactoryGirl.create(:ctype, slug: 'headset')
         f_count = Feedback.count
-        bike = { serial_number: '69 string',
-                 manufacturer_id: manufacturer.id,
-                 rear_tire_narrow: 'true',
-                 rear_wheel_bsd: '559',
-                 color: FactoryGirl.create(:color).name,
-                 owner_email: 'jsoned@examples.com'
+        bike = {
+          serial_number: '69 string',
+          manufacturer_id: manufacturer.id,
+          rear_tire_narrow: 'true',
+          rear_wheel_bsd: '559',
+          color: FactoryGirl.create(:color).name,
+          owner_email: 'jsoned@examples.com'
         }
         options = { bike: bike.to_json, organization_slug: @organization.slug, access_token: @organization.access_token }
         expect do
@@ -320,17 +321,15 @@ describe Api::V1::BikesController do
 
       it 'does not send an ownership email if it has no_email set' do
         manufacturer = FactoryGirl.create(:manufacturer)
-        FactoryGirl.create(:wheel_size, iso_bsd: 559)
-        FactoryGirl.create(:ctype, slug: 'wheel')
-        FactoryGirl.create(:ctype, slug: 'headset')
         f_count = Feedback.count
-        bike = { serial_number: '69 string',
-                 manufacturer_id: manufacturer.id,
-                 rear_tire_narrow: 'true',
-                 rear_wheel_bsd: '559',
-                 color: FactoryGirl.create(:color).name,
-                 owner_email: 'jsoned@examples.com',
-                 send_email: 'false'
+        bike = { 
+          serial_number: '69 string',
+          manufacturer_id: manufacturer.id,
+          rear_tire_narrow: 'true',
+          rear_wheel_bsd: '559',
+          color: FactoryGirl.create(:color).name,
+          owner_email: 'jsoned@examples.com',
+          send_email: 'false'
         }
         options = { bike: bike.to_json, organization_slug: @organization.slug, access_token: @organization.access_token }
         expect do

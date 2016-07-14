@@ -131,7 +131,7 @@ class BParam < ActiveRecord::Base
   def set_foreign_keys
     return true unless params.present? && bike.present?
     bike['stolen'] = true if params['stolen_record'].present?
-    set_wheel_size_key unless bike['rear_wheel_size_id'].present?
+    set_wheel_size_key
     if bike['manufacturer_id'].present?
       params['bike']['manufacturer_id'] = Manufacturer.fuzzy_id(bike['manufacturer_id'])
     else
@@ -168,11 +168,17 @@ class BParam < ActiveRecord::Base
   end
 
   def set_wheel_size_key
-    if bike['rear_wheel_bsd'].present?
-      ct = WheelSize.find_by_iso_bsd(bike['rear_wheel_bsd'])
-      params['bike']['rear_wheel_size_id'] = ct.id if ct.present?
-      params['bike'].delete('rear_wheel_bsd')
+    if bike.keys.include?('rear_wheel_bsd')
+      key = '_wheel_bsd'
+    elsif bike['rear_wheel_size'].present?
+      key = '_wheel_size'
+    else
+      return nil
     end
+    rbsd = params['bike'].delete("rear#{key}")
+    fbsd = params['bike'].delete("front#{key}")
+    params['bike']['rear_wheel_size_id'] = WheelSize.id_for_bsd(rbsd)
+    params['bike']['front_wheel_size_id'] = WheelSize.id_for_bsd(fbsd)
   end
 
   def set_manufacturer_key

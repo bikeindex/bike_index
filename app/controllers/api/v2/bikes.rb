@@ -5,10 +5,10 @@ module API
 
       helpers do
         params :bike_attrs do
-          optional :rear_wheel_bsd, type: Integer, desc: "rear_wheel_bsd"
-          optional :rear_tire_narrow, type: Boolean, desc: "boolean. Is it a skinny tire?"
-          optional :rear_wheel_bsd, type: String, desc: "Copies `rear_wheel_bsd` if not set"
-          optional :rear_tire_narrow, type: Boolean, desc: "Copies `rear_tire_narrow` if not set"
+          optional :rear_wheel_bsd, type: Integer, desc: "Rear wheel iso bsd (has to be one of the `selections`)"
+          optional :rear_tire_narrow, type: Boolean, desc: "Boolean. Is it a skinny tire?"
+          optional :front_wheel_bsd, type: String, desc: "Copies `rear_wheel_bsd` if not set"
+          optional :front_tire_narrow, type: Boolean, desc: "Copies `rear_tire_narrow` if not set"
           optional :frame_model, type: String, desc: "What frame model?"
           optional :year, type: Integer, desc: "What year was the frame made?"
           optional :description, type: String, desc: "General description"

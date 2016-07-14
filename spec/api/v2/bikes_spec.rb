@@ -181,45 +181,68 @@ describe 'Bikes API V2' do
   end
 
   describe 'create v2_accessor' do
+    let(:manufacturer) { FactoryGirl.create(:manufacturer) }
+    let(:color) { FactoryGirl.create(:color) }
     before :each do
       create_doorkeeper_app(with_v2_accessor: true)
-      manufacturer = FactoryGirl.create(:manufacturer)
-      color = FactoryGirl.create(:color)
       FactoryGirl.create(:wheel_size, iso_bsd: 559)
       FactoryGirl.create(:cycle_type, slug: 'bike')
       FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
       @organization = FactoryGirl.create(:organization)
-      @bike = { serial: '69 non-example',
-                manufacturer: manufacturer.name,
-                rear_tire_narrow: 'true',
-                rear_wheel_bsd: '559',
-                color: color.name,
-                year: '1969',
-                owner_email: 'fun_times@examples.com',
-                organization_slug: @organization.slug
+      @bike_attrs = { 
+        serial: '69 non-example',
+        manufacturer: manufacturer.name,
+        rear_tire_narrow: 'true',
+        rear_wheel_bsd: '559',
+        color: color.name,
+        year: '1969',
+        owner_email: 'fun_times@examples.com',
+        organization_slug: @organization.slug
       }
+      @tokenized_url = "/api/v2/bikes?access_token=#{@accessor_token.token}"
+    end
+
+    it 'also sets front wheel bsd' do
+      FactoryGirl.create(:membership, user: @user, organization: @organization, role: 'admin')
+      @organization.save
+      wheel_size_2 = FactoryGirl.create(:wheel_size, iso_bsd: 622)
+      additional_attrs = {
+        front_wheel_bsd: 622,
+        front_tire_narrow: false
+      }
+      post @tokenized_url, @bike_attrs.merge(additional_attrs).to_json, JSON_CONTENT
+      result = JSON.parse(response.body)['bike']
+      expect(response.code).to eq('201')
+      bike = Bike.find(result['id'])
+      expect(bike.primary_frame_color).to eq color
+      expect(bike.creator).to eq(@user)
+      expect(bike.rear_wheel_size.iso_bsd).to eq 559
+      expect(bike.front_wheel_size).to eq wheel_size_2
+      expect(bike.rear_tire_narrow).to be_truthy
+      expect(bike.front_tire_narrow).to be_falsey
     end
 
     it 'creates a bike for organization with v2_accessor' do
       FactoryGirl.create(:membership, user: @user, organization: @organization, role: 'admin')
       @organization.save
-      post "/api/v2/bikes?access_token=#{@accessor_token.token}",
-           @bike.to_json,
-           JSON_CONTENT
+      post @tokenized_url, @bike_attrs.to_json, JSON_CONTENT
       result = JSON.parse(response.body)['bike']
       expect(response.code).to eq('201')
-      b = Bike.find(result['id'])
-      expect(b.creation_organization).to eq(@organization)
-      expect(b.creator).to eq(@user)
+      bike = Bike.find(result['id'])
+      expect(bike.creation_organization).to eq(@organization)
+      expect(bike.creator).to eq(@user)
+      expect(bike.secondary_frame_color).to be_nil
+      expect(bike.rear_wheel_size.iso_bsd).to eq 559
+      expect(bike.front_wheel_size.iso_bsd).to eq 559
+      expect(bike.rear_tire_narrow).to be_truthy
+      expect(bike.front_tire_narrow).to be_truthy
     end
 
     it "doesn't create a bike without an organization with v2_accessor" do
       FactoryGirl.create(:membership, user: @user, organization: @organization, role: 'admin')
       @organization.save
-      @bike.delete(:organization_slug)
-      post "/api/v2/bikes?access_token=#{@accessor_token.token}",
-           @bike.to_json,
-           JSON_CONTENT
+      @bike_attrs.delete(:organization_slug)
+      post @tokenized_url, @bike_attrs.to_json, JSON_CONTENT
       result = JSON.parse(response.body)
 
       expect(response.code).to eq('403')
@@ -229,9 +252,7 @@ describe 'Bikes API V2' do
 
     it "fails to create a bike if the app owner isn't a member of the organization" do
       expect(@user.has_membership?).to be_falsey
-      post "/api/v2/bikes?access_token=#{@accessor_token.token}",
-           @bike.to_json,
-           JSON_CONTENT
+      post @tokenized_url, @bike_attrs.to_json, JSON_CONTENT
       result = JSON.parse(response.body)
       expect(response.code).to eq('403')
       result = JSON.parse(response.body)

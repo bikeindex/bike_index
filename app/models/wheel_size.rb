@@ -10,8 +10,8 @@ class WheelSize < ActiveRecord::Base
   default_scope { order(:iso_bsd) }
   scope :commonness, -> { order("priority ASC, iso_bsd DESC") }
 
-  def self.find_id_by_bsd(bsd)
-    ws = where(iso_bsd: bsd).first
+  def self.id_for_bsd(bsd)
+    ws = where(iso_bsd: bsd.to_i).first
     ws && ws.id
   end
 

@@ -19,21 +19,21 @@
                     %select.form-control.dirtyignore
                       %option{ value: '' }
                         Choose diameter
-                      %option{ value: WheelSize.find_id_by_bsd(622) }
+                      %option{ value: WheelSize.id_for_bsd(622) }
                         700c (includes 29ers)
-                      %option{ value: WheelSize.find_id_by_bsd(584) }
+                      %option{ value: WheelSize.id_for_bsd(584) }
                         650b
-                      %option{ value: WheelSize.find_id_by_bsd(630) }
+                      %option{ value: WheelSize.id_for_bsd(630) }
                         27in
-                      %option{ value: WheelSize.find_id_by_bsd(559) }
+                      %option{ value: WheelSize.id_for_bsd(559) }
                         26in
-                      %option{ value: WheelSize.find_id_by_bsd(406) }
+                      %option{ value: WheelSize.id_for_bsd(406) }
                         20in
-                      %option{ value: WheelSize.find_id_by_bsd(355) }
+                      %option{ value: WheelSize.id_for_bsd(355) }
                         18in
-                      %option{ value: WheelSize.find_id_by_bsd(305) }
+                      %option{ value: WheelSize.id_for_bsd(305) }
                         16in
-                      %option{ value: WheelSize.find_id_by_bsd(203) }
+                      %option{ value: WheelSize.id_for_bsd(203) }
                         12in
                   .all-diams.currently-hidden{ id: "#{side}_all" }
                     = f.collection_select("#{side}_wheel_size_id".to_sym, WheelSize.all , :id, :select_value, prompt: 'All diameters')
