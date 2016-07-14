@@ -65,7 +65,7 @@ class Admin::OrganizationsController < Admin::BaseController
   protected
 
   def permitted_parameters
-    params.require(:organization).permit(Organization.old_attr_accessible + [:approved])
+    params.require(:organization).permit(Organization.old_attr_accessible + [:approved, :landing_html])
   end
 
   def find_organization

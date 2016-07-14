@@ -31,4 +31,14 @@ describe Admin::OrganizationsController, type: :controller do
       end
     end
   end
+
+  describe 'organization update' do
+    it 'updates the organization' do
+      org_attrs = { name: 'new name thing stuff', landing_html: '<p>html</p>' }
+      put :update, id: organization.to_param, organization: org_attrs
+      organization.reload
+      expect(organization.name).to eq org_attrs[:name]
+      expect(organization.landing_html).to eq org_attrs[:landing_html]
+    end
+  end
 end

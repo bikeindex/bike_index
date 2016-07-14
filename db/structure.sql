@@ -1246,7 +1246,8 @@ CREATE TABLE organizations (
     use_additional_registration_field boolean DEFAULT false NOT NULL,
     avatar character varying(255),
     is_paid boolean DEFAULT false NOT NULL,
-    lock_show_on_map boolean DEFAULT false NOT NULL
+    lock_show_on_map boolean DEFAULT false NOT NULL,
+    landing_html text
 );
 
 
@@ -3091,4 +3092,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160630175602');
 INSERT INTO schema_migrations (version) VALUES ('20160631175602');
 
 INSERT INTO schema_migrations (version) VALUES ('20160711183247');
+
+INSERT INTO schema_migrations (version) VALUES ('20160714182030');
 
