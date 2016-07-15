@@ -1,8 +1,10 @@
 class RegistrationsController < ApplicationController
   skip_before_filter :set_x_frame_options_header, except: [:new]
+  before_filter :simple_header
   layout 'reg_embed'
 
   def new
+    @stolen = params[:stolen] # Passed into embed form
     render layout: 'application_revised'
   end
 
@@ -10,7 +12,7 @@ class RegistrationsController < ApplicationController
     @organization = current_organization
     @creator = @organization && @organization.auto_user || current_user
     @owner_email = current_user && current_user.email || @creator && @creator.email
-    @stolen = params[:stolen]
+    @stolen = params[:stolen] ? 1 : 0
     @b_param ||= BParam.new(creation_organization_id: @organization && @organization.id,
                             creator_id: @creator && @creator.id,
                             owner_email: @owner_email,
@@ -29,6 +31,10 @@ class RegistrationsController < ApplicationController
   end
 
   private
+
+  def simple_header
+    @simple_header ||= params[:simple_header]
+  end
 
   def permitted_params
     params.require(:b_param).permit(:manufacturer_id,
