@@ -24,6 +24,9 @@ class Organization < ActiveRecord::Base
   has_many :locations, dependent: :destroy
   accepts_nested_attributes_for :locations, allow_destroy: true
 
+  # For organization landing
+  has_many :public_images, as: :imageable, dependent: :destroy
+
   validates_presence_of :name
 
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact admin@bikeindex.org"

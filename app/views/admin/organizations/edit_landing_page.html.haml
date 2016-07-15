@@ -20,4 +20,11 @@
       = f.submit 'Save', class: 'button-green pull-right'
     // Because somewhere, there is overflow hidden and it cuts off the bottom of the save button
     .padded
+  .well
+    .add-blog-photos
+      %ul#public_images{ :"data-order-url" => order_public_images_url }
+        - if @organization.public_images
+          = render partial: "/public_images/public_image", collection: @organization.public_images, as: :public_image
+      %section
+        = render partial: "public_images/admin_new_form", locals: { imageable_type: 'Organization' }
 .padded

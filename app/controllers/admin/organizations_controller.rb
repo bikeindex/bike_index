@@ -31,9 +31,7 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def edit
     @embedable_email = @organization.auto_user.email if @organization.auto_user
-    if params[:landing_page]
-      render 'edit_landing_page'
-    end
+    render 'edit_landing_page' if params[:landing_page]
   end
 
   def update
