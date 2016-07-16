@@ -1,6 +1,10 @@
 <%= form_for PublicImage.new do |f| %>
-  <div class="photo-upload-fields">    
-    <%= hidden_field_tag :bike_id, @bike.id %>
+  <div class="photo-upload-fields">
+    <% if imageable_type == 'Blog' %>
+      <%= hidden_field_tag :blog_id, @blog.id %>
+    <% elsif imageable_type == 'Organization' %>
+      <%= hidden_field_tag :organization_id, @organization.id %>
+    <% end %>
     <div class="upload-buttons">
       <div class="multifilefield-button">
         Upload photos

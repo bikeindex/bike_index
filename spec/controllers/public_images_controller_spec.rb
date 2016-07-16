@@ -27,8 +27,7 @@ describe PublicImagesController do
       let(:blog) { FactoryGirl.create(:blog) }
       context 'admin authorized' do
         it 'creates an image' do
-          user = FactoryGirl.create(:user)
-          user.update_attribute :is_content_admin, true
+          user = FactoryGirl.create(:content_admin)
           set_current_user(user)
           post :create, blog_id: blog.id, public_image: { name: 'cool name' }, format: :js
           blog.reload
@@ -40,6 +39,27 @@ describe PublicImagesController do
           set_current_user(FactoryGirl.create(:user))
           expect do
             post :create, blog_id: blog.id, public_image: { name: 'cool name' }, format: :js
+            expect(response.code).to eq('401')
+          end.to change(PublicImage, :count).by 0
+        end
+      end
+    end
+    context 'organization' do
+      let(:organization) { FactoryGirl.create(:organization) }
+      context 'admin authorized' do
+        it 'creates an image' do
+          user = FactoryGirl.create(:content_admin)
+          set_current_user(user)
+          post :create, organization_id: organization.to_param, public_image: { name: 'cool name' }, format: :js
+          organization.reload
+          expect(organization.public_images.first.name).to eq 'cool name'
+        end
+      end
+      context 'not admin' do
+        it 'does not create an image' do
+          set_current_user(FactoryGirl.create(:user))
+          expect do
+            post :create, organization_id: organization.to_param, public_image: { name: 'cool name' }, format: :js
             expect(response.code).to eq('401')
           end.to change(PublicImage, :count).by 0
         end

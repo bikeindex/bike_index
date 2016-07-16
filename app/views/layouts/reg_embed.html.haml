@@ -9,15 +9,20 @@
     = csrf_meta_tags
     = stylesheet_link_tag 'registrations', media: 'all'
     = javascript_include_tag 'registrations'
-  %body{ style: 'background: none; max-width: 500px; margin: 0 auto;' }
+  %body{ style: 'background: none; width: 100%; max-width: 500px; margin: 0 auto;' }
     .registration-widget#binx_registration_widget
-      %header.reg-header
-        = image_tag 'revised/logo.svg', class: 'reg-header-logo'
-        %h2
-          Protect your bike today
-        %p
-          Register on the Bike Index.
-          %em
-            It's free.
+      - if @simple_header
+        %header
+          %h3
+            Register your bike
+      - else
+        %header.reg-header
+          = image_tag 'revised/logo.svg', class: 'reg-header-logo'
+          %h2
+            Protect your bike today
+          %p
+            Register on the Bike Index.
+            %em
+              It's free.
       .registration-widget-body
         = yield

@@ -1,0 +1,2 @@
+- cache(["org_landing_#{current_organization.to_param}", current_organization.updated_at]) do
+  = current_organization.landing_html && current_organization.landing_html.html_safe

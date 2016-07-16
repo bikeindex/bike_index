@@ -1,0 +1,57 @@
+$org-color: #e03a3e;
+// Organization landing pages padding (so there can be a background)
+#organized_manage_landing, #landing_pages_show {
+  padding-top: 0;
+  background: black;
+  background-size: cover;
+  background-position: center center;
+  .primary-footer { margin-top: 0; }
+  h1 {
+    text-align: center;
+  }
+  .org-landing-wrapper {
+    padding-top:  10*$vertical-height;
+    background: #fff;
+    padding-bottom: 4*$vertical-height;
+  }
+}
+@media (min-width: $grid-breakpoint-lg) {
+  #landing_pages_show { 
+    padding-top: 0;
+    .org-landing-wrapper { padding-top: 14*$vertical-height; }
+  }
+}
+
+// Organization landing pages base styles
+.org-landing-icon-list {
+  @include list-unstyled;
+  margin: 0;
+  li {
+    @extend .row;
+    margin-top: 2*$vertical-height;
+      &:first-of-type { margin-top: 0; }
+    h3 { margin-bottom: $vertical-height; }
+    img {
+      display: block;
+      width: 100%;
+      margin: 0 auto;
+    }
+  }
+}
+
+// 
+.org-landing-tips-list {
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-bottom: .5*$vertical-height solid $org-color;
+    margin: 0 0 $vertical-height;
+  }
+  ul {
+    @include list-unstyled;
+    margin: 0;
+    display: block;
+    a { color: $body-font-color; }
+  }
+}

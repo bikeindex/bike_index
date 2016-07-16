@@ -15,9 +15,13 @@ class PublicImagesController < ApplicationController
       @public_image.imageable = @bike
       @public_image.save
       render 'create_revised' and return
-    elsif params[:blog_id].present?
-      @blog = Blog.find(params[:blog_id])
-      @public_image.imageable = @blog
+    else
+      if params[:blog_id].present?
+        @blog = Blog.find(params[:blog_id])
+        @public_image.imageable = @blog
+      else
+        @public_image.imageable = current_organization
+      end
       @public_image.save
       render 'create' and return
     end
@@ -76,7 +80,7 @@ class PublicImagesController < ApplicationController
       @bike = Bike.unscoped.find(params[:bike_id])
       return true if @bike.owner == current_user
     end
-    # Otherwise, it's a blog image (or someone messing about), 
+    # Otherwise, it's a blog image or an organization image (or someone messing about),
     # so ensure the current user is admin authorized
     return true if current_user && current_user.admin_authorized('any')
     render json: { error: 'Access denied' }, status: 401 and return

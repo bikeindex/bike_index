@@ -36,7 +36,16 @@ describe ApplicationHelper do
   end
 
   describe 'current_page_skeleton' do
-    context 'bikes' do
+    describe 'landing_pages controller' do
+      before { allow(view).to receive(:controller_name) { 'landing_pages' } }
+      context 'show (organization landing page)' do
+        it 'returns nil' do
+          allow(view).to receive(:action_name) { 'show' }
+          expect(helper.current_page_skeleton).to be_nil
+        end
+      end
+    end
+    describe 'bikes controller' do
       before { allow(view).to receive(:controller_name) { 'bikes' } }
       %w(new create).each do |action|
         context action do
@@ -55,7 +64,7 @@ describe ApplicationHelper do
         end
       end
     end
-    context 'registrations' do
+    describe 'registrations controller' do
       before { allow(view).to receive(:controller_name) { 'registrations' } }
       %w(new).each do |action|
         context action do
@@ -66,7 +75,7 @@ describe ApplicationHelper do
         end
       end
     end
-    context 'info' do
+    describe 'info controller' do
       before { allow(view).to receive(:controller_name) { 'info' } }
       %w(about protect_your_bike where serials image_resources resources dev_and_design).each do |action|
         context action do
@@ -91,7 +100,7 @@ describe ApplicationHelper do
         end
       end
     end
-    context 'news' do
+    describe 'news controller' do
       before { allow(view).to receive(:controller_name) { 'news' } }
       %w(index show).each do |action|
         context action do
@@ -102,7 +111,7 @@ describe ApplicationHelper do
         end
       end
     end
-    context 'payments' do
+    describe 'payments controller' do
       before { allow(view).to receive(:controller_name) { 'payments' } }
       %w(new create).each do |action|
         context action do
@@ -113,7 +122,7 @@ describe ApplicationHelper do
         end
       end
     end
-    context 'feedbacks' do
+    describe 'feedbacks controller' do
       before { allow(view).to receive(:controller_name) { 'feedbacks' } }
       %w(index).each do |action|
         context action do
@@ -124,7 +133,7 @@ describe ApplicationHelper do
         end
       end
     end
-    context 'manufacturers' do
+    describe 'manufacturers controller' do
       before { allow(view).to receive(:controller_name) { 'manufacturers' } }
       %w(index).each do |action|
         context action do
@@ -135,7 +144,7 @@ describe ApplicationHelper do
         end
       end
     end
-    context 'welcome' do
+    describe 'welcome controller' do
       before { allow(view).to receive(:controller_name) { 'welcome' } }
       %w(goodbye).each do |action|
         context action do
@@ -146,7 +155,7 @@ describe ApplicationHelper do
         end
       end
     end
-    context 'organizations' do
+    describe 'organizations controller' do
       before { allow(view).to receive(:controller_name) { 'organizations' } }
       %w(new lightspeed_integration).each do |action|
         context action do
@@ -157,7 +166,7 @@ describe ApplicationHelper do
         end
       end
     end
-    context 'organization subrouting' do
+    describe 'organized subrouting' do
       before { allow(view).to receive(:sub_module_name) { 'organized_' } }
       context 'manage' do
         before { allow(view).to receive(:controller_name) { 'manage' } }
@@ -181,7 +190,7 @@ describe ApplicationHelper do
         end
       end
     end
-    context 'stolen' do
+    describe 'stolen controller' do
       before { allow(view).to receive(:controller_name) { 'stolen' } }
       %w(index).each do |action|
         context action do
@@ -192,7 +201,7 @@ describe ApplicationHelper do
         end
       end
     end
-    context 'users' do
+    describe 'users controller' do
       before { allow(view).to receive(:controller_name) { 'users' } }
       %w(create).each do |action|
         context action do
@@ -203,7 +212,7 @@ describe ApplicationHelper do
         end
       end
     end
-    context 'errors' do
+    describe 'errors controller' do
       before { allow(view).to receive(:controller_name) { 'errors' } }
       %w(bad_request not_found unprocessable_entity server_error unauthorized).each do |action|
         context action do

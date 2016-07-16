@@ -239,14 +239,19 @@ img { max-width: 100%; } // don't break random stuff images!
     margin: $vertical-height 0 1.5*$vertical-height;
   }
   p, h2 { text-align: center; }
-  header.reg-header {
+  header {
     border-radius: $border-radius $border-radius 0 0;
     display: block;
+    background: $gray-dark;
     position: relative;
+    padding: $vertical-height;
+    h3 { color: #fff; margin: 0; }
+  }
+  header.reg-header {
     background: image-url('revised/spokebg.png');
     background-size: cover;
-    padding: $vertical-height 0;
     background-position: center center;
+    padding: $vertical-height 0;
     .reg-header-logo {
       display: block;
       width: 15%;

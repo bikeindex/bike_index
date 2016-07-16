@@ -78,7 +78,9 @@ class Admin::BikesController < Admin::BaseController
 
   def update
     @fast_attr_update = params.delete(:fast_attr_update)
-    BikeUpdator.new(user: current_user, bike: @bike, b_params: { bike: permitted_parameters }).update_ownership
+    updator = BikeUpdator.new(user: current_user, bike: @bike, b_params: { bike: permitted_parameters }.as_json)
+    updator.update_ownership
+    updator.update_stolen_record
     @bike = @bike.decorate
     if params[:mark_recovered_reason].present?
       info = {

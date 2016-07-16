@@ -21,6 +21,11 @@ Bikeindex::Application.routes.draw do
   get '/', to: redirect(:root_url, subdomain: false), constraints: { subdomain: 'stolen' }
   root to: 'welcome#index'
 
+  # Organization landing pages, space delineated list of the org slugs
+  ENV['LANDING_PAGE_ORG_SLUGS'].split(' ').freeze.each do |slug|
+    get slug, to: 'landing_pages#show', organization_id: slug
+  end
+
   get 'update_browser', to: 'welcome#update_browser'
   get 'user_home', to: 'welcome#user_home'
   get 'choose_registration', to: 'welcome#choose_registration'
@@ -202,12 +207,13 @@ Bikeindex::Application.routes.draw do
   resource :integrations, only: [:create]
   get '/auth/:provider/callback', to: 'integrations#create'
 
-  %w(support_the_index support_the_bike_index protect_your_bike privacy terms serials
-     about where vendor_terms resources image_resources how_not_to_buy_stolen dev_and_design).each do |page|
+  %w(support_the_index support_the_bike_index protect_your_bike privacy terms
+     serials about where vendor_terms resources image_resources
+     how_not_to_buy_stolen dev_and_design).freeze.each do |page|
     get page, controller: 'info', action: page
   end
 
-  %w(stolen_bikes roadmap security spokecard how_it_works).each { |p| get p, to: redirect('/resources') }
+  %w(stolen_bikes roadmap security spokecard how_it_works).freeze.each { |p| get p, to: redirect('/resources') }
 
   # get 'sitemap.xml.gz' => redirect('https://files.bikeindex.org/sitemaps/sitemap_index.xml.gz')
   # Somehow the redirect drops the .gz extension, which ruins it so this redirect is handled by Cloudflare
@@ -225,7 +231,8 @@ Bikeindex::Application.routes.draw do
   # prepends a :organization_id/ to every nested URL.
   # Down here so that it doesn't override any other routes
   resources :organizations, only: [], path: 'o', module: 'organized' do
-    get '/', to: 'organizations#bikes#index', as: :root
+    get '/', to: 'bikes#index', as: :root
+    get 'landing', to: 'manage#landing'
     resources :bikes, only: [:index, :new, :show]
     # Below are admin controllers, inherit from Organized::AdminController not BaseController
     resources :manage, only: [:index, :update, :destroy] do

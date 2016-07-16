@@ -114,7 +114,7 @@
           - if @blog.public_images
             = render partial: "/public_images/public_image", collection: @blog.public_images, as: :public_image
         %section
-          = render "public_images/new_blog_form"
+          = render partial: "public_images/admin_new_form", locals: { imageable_type: 'Blog' }
 
   .alert.alert-info
     %p

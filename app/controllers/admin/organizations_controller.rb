@@ -31,6 +31,7 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def edit
     @embedable_email = @organization.auto_user.email if @organization.auto_user
+    render 'edit_landing_page' if params[:landing_page]
   end
 
   def update
@@ -62,7 +63,7 @@ class Admin::OrganizationsController < Admin::BaseController
   protected
 
   def permitted_parameters
-    params.require(:organization).permit(Organization.old_attr_accessible + [:approved])
+    params.require(:organization).permit(Organization.old_attr_accessible + [:approved, :landing_html])
   end
 
   def find_organization

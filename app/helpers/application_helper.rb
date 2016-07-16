@@ -22,7 +22,7 @@ module ApplicationHelper
   #  - a valid partial file in views/shared
   #  - nil - which just calls yield directly
   def current_page_skeleton
-    return 'organized_skeleton' if sub_module_name == 'organized_'
+    return 'organized_skeleton' if sub_module_name == 'organized_' && action_name != 'landing'
     case controller_name
     when 'bikes'
       'edit_bike_skeleton' if %w(edit update).include?(action_name)
