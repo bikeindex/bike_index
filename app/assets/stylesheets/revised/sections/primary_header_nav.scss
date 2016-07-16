@@ -1,4 +1,5 @@
-// Padding to deal with header nav
+// Padding to deal with header nav.
+// Also set in the landing/organizations scss
 body, .organized-left-menu { padding-top: 8*$vertical-height; }
 @media (min-width: $grid-breakpoint-lg) {
   body, .organized-left-menu { padding-top: 12*$vertical-height; }

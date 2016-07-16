@@ -49,6 +49,15 @@ describe Organized::ManageController, type: :controller do
       end
     end
 
+    describe 'landing' do
+      it 'renders' do
+        get :landing, organization_id: organization.to_param
+        expect(response.status).to eq(200)
+        expect(response).to render_with_layout('application_revised')
+        expect(assigns(:current_organization)).to eq organization
+      end
+    end
+
     describe 'dev' do
       it 'renders' do
         get :dev, organization_id: organization.to_param

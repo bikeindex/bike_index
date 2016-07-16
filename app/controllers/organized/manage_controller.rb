@@ -35,6 +35,10 @@ module Organized
       redirect_to user_root_url
     end
 
+    def landing
+      render '/landing_pages/show'
+    end
+
     private
 
     def assign_organization
