@@ -701,15 +701,14 @@ describe BikesController do
 
   describe 'update' do
     context 'user is present but is not allowed to edit' do
-      before do
+      it 'does not update and redirects' do
         ownership = FactoryGirl.create(:ownership)
         user = FactoryGirl.create(:user)
         set_current_user(user)
         put :update, id: ownership.bike.id, bike: { serial_number: '69' }
+        expect(response).to redirect_to bike_url(ownership.bike)
+        expect(flash[:error]).to be_present
       end
-      it { is_expected.to respond_with(:redirect) }
-      it { is_expected.to redirect_to(bike_url) }
-      it { is_expected.to set_flash }
     end
 
     context 'creator present (who is allowed to edit)' do
@@ -728,13 +727,46 @@ describe BikesController do
           expect(bike.description).to eq('69')
         end
 
-        it 'updates the bike' do
-          put :update, id: bike.id, bike: { description: '69', marked_user_hidden: '0' }
+        it 'updates the bike and components' do
+          component_1 = FactoryGirl.create(:component, bike: bike)
+          handlebar_type_id = FactoryGirl.create(:handlebar_type).id
+          ctype_id = component_1.ctype_id
+          bike.reload
+          component_2_attrs = {
+            _destroy: '0',
+            ctype_id: ctype_id,
+            description: 'sdfsdfsdf',
+            manufacturer_id: bike.manufacturer_id.to_s,
+            manufacturer_other: 'stuffffffff',
+            cmodel_name: 'asdfasdf',
+            year: '1995',
+            serial_number: "simple_serial"
+          }
+          bike_attrs = {
+            description: '69',
+            handlebar_type_id: handlebar_type_id,
+            components_attributes: {
+              '0' => {
+                '_destroy' => '1',
+                id: component_1.id.to_s
+              },
+              "#{Time.zone.now.to_i}" => component_2_attrs
+            }
+          }
+          put :update, id: bike.id, bike: bike_attrs
           bike.reload
           expect(bike.description).to eq('69')
           expect(response).to redirect_to edit_bike_url(bike)
+          expect(bike.handlebar_type_id).to eq handlebar_type_id
           expect(assigns(:bike)).to be_decorated
           expect(bike.hidden).to be_falsey
+
+          expect(bike.components.count).to eq 1
+          expect(bike.components.where(id: component_1.id).any?).to be_falsey
+          component_2 = bike.components.first
+          component_2_attrs.except(:_destroy).each do |key, value|
+            expect(component_2.send(key).to_s).to eq value.to_s
+          end
         end
 
         it 'marks the bike unhidden' do

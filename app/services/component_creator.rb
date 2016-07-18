@@ -65,7 +65,7 @@ class ComponentCreator
     @b_param['components'].each_with_index do |comp, index|
       if comp['id'].present?
         component = @bike.components.find(comp['id'])
-        (component.destroy && next) if comp['destroy']
+        (component.destroy && next) if comp['destroy'] || comp['_destroy'] == '1'
       else
         component = @bike.components.new
       end
