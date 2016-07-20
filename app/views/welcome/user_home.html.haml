@@ -4,10 +4,8 @@
       %h1
         #{@user.display_name} bikes
         
-    .col-md-4
-      .ad-block.ad468x60
-        %h4
-          468X60
+    .col-md-4.ad-col
+      .ad-block#top468x60
   .row
     .col-md-8
       - locks_active = params[:active_tab] == 'locks'
@@ -108,3 +106,4 @@
                 %strong
                   Tell us more about yourself.
                 = link_to "Update your profile", my_account_url
+      .ad-block#right300x600

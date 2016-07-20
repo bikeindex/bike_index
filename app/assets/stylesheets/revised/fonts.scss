@@ -6,7 +6,9 @@ $light-italic-weight: 300;
 
 $body-font-size: 15px;
 $h1-font-size: 42px;
+$h1-font-size-md: 30px;
 $h2-font-size: 36px;
+$h2-font-size-md: 30px;
 $h3-font-size: 24px;
 $h4-font-size: 12px;
 $h5-font-size: 18px;
@@ -84,6 +86,7 @@ h1 {
   letter-spacing: -1px;
   font-size: $h1-font-size;
   line-height: 1.12em;
+  @include media-breakpoint-down(md) { font-size: $h1-font-size-md; }
 }
 
 h2 {
@@ -92,6 +95,7 @@ h2 {
   color: $header-font-color;
   font-size: $h2-font-size;
   line-height: 1em;
+  @include media-breakpoint-down(md) { font-size: $h2-font-size-md; }
 }
 
 h3 {

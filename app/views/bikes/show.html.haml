@@ -70,10 +70,8 @@
       - if @bike.should_show_other_bikes
         %h4
           = link_to "View user's other registrations", user_path(@bike.owner.username)
-    .col-md-4
-      .ad-block.ad468x60
-        %h4
-          468X60
+    .col-md-4.ad-col
+      .ad-block#top468x60
   .row
     / Bike Photo!
     .col-md-8
@@ -227,6 +225,4 @@
                 Owner's phone number:
               %a{ href: "tell:#{@stolen_record.phone}" }
                 = @stolen_record.phone_display
-      .ad-block.ad300x600
-        %h4
-          300x600
+      .ad-block#right300x600

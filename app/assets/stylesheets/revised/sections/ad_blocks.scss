@@ -1,18 +1,43 @@
-.ad-block {
-  display: none;
-  background: $gray-lighter;
-  border: 1px solid $gray-lightish;
-  h4 { @extend .text-xs-center; } // To put size info in ad blocks as we're getting started
-}
-
-// ad blocks, for now just here
 .ad468x60 {
-  // width: 468px;
-  height: 60px;
+  img {
+    max-width: 468px;
+    height: auto;
+  }
 }
 
 .ad300x600 {
-  width: 300px;
-  height: 600px;
-  margin: 0 auto;
+  img {
+    max-width: 300px;
+    height: auto;
+  }
+}
+
+.ad-col { @include media-breakpoint-down(md) { width: 100%; } }
+
+.ad-block {
+  display: none;
+  .testing-block {
+    background: $gray-lighter;
+    border: 1px solid $gray-lightish;
+    h4 { @extend .text-xs-center; }
+  }
+  &.rendered-ad {
+    display: block;
+    a, img {
+      display: block;
+      width: 100%;
+      margin: 0 auto;
+    }
+  }
+  &#top468x60 {
+    @extend .ad468x60;
+    @include media-breakpoint-down(md) {
+      display: none; // At least for now...
+      margin-bottom: $vertical-height;
+    }
+  }
+  &#right300x600 {
+    @extend .ad300x600;
+    margin-top: $vertical-height;
+  }
 }

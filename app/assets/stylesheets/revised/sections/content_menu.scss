@@ -16,8 +16,6 @@ $horizontal-content-menu-padding: $vertical-height;
       }
     }
   }
+  @include media-breakpoint-down(md) { width: 100%; }
+  @include media-breakpoint-down(lg) { padding-top: 3*$vertical-height; }
 }
-@media(max-width: $grid-breakpoint-lg) {
-  .primary-content-menu { padding-top: 3*$vertical-height; }
-}
-

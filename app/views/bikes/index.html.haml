@@ -4,10 +4,8 @@
     .col-md-8
       %h1
         Search for #{stolenness_desc[@stolenness]} bikes
-    .col-md-4
-      .ad-block.ad468x60
-        %h4
-          468X60
+    .col-md-4.ad-col
+      .ad-block#top468x60
   .row
     .col-md-8
       = form_tag bikes_path, id: 'bike_search_form', class: 'bike-search-form', method: :get do
@@ -52,7 +50,8 @@
             %a#non_stolen_tab.nav-link{ href: '#', class: ('active' if @stolenness == 'non_stolen'), role: 'tab' }
               Not marked stolen
               %span.count
-
+  .row
+    .col-md-8
       - if @bikes.present?
         %ul.bike-boxes
           = render partial: '/bikes/revised_bike', collection: @bikes, as: :bike
@@ -76,6 +75,8 @@
 
         %ul.bike-boxes
           = render partial: '/bikes/revised_bike', collection: @secondary_bikes, as: :bike
+    .col-md-4.ad-col
+      .ad-block#right300x600
 
 - if @location.present?
   :javascript
