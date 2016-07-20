@@ -16,7 +16,7 @@ class BikeIndex.Init extends BikeIndex
     new BikeIndex.NavHeader
     @loadFancySelects()
     @initializeNoTabLinks()
-    window.BikeIndexAlerts = new BikeIndex.Alerts
+    window.BikeIndexAlerts = new window.Alerts
     # Put this last, so if it fails, we still have some functionality
     @loadPageScript(document.getElementsByTagName('body')[0].id)
     # Initialize the js for the organized menu pages
@@ -77,3 +77,4 @@ $(document).ready ->
   new BikeIndex.Init
   if document.getElementById('binx_registration_widget')
     new window.ManufacturersSelect('#binx_registration_widget #b_param_manufacturer_id')
+  new window.AdDisplayer

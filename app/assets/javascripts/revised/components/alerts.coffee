@@ -1,4 +1,4 @@
-class BikeIndex.Alerts extends BikeIndex
+class @Alerts
   constructor: ->
     @fadeOutAlerts()
     @displayStoredAlerts()
@@ -64,6 +64,3 @@ class BikeIndex.Alerts extends BikeIndex
       alert = JSON.parse stored_alert
       @displayAlert(alert.alert_type, alert.alert_body)
       localStorage.removeItem 'stored_alert'
-
-
-    
