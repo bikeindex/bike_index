@@ -15,6 +15,7 @@
               %li
                 = msg
     = form_for [:admin, @organization] do |f|
+      = hidden_field_tag :landing_page, true
       .blog-field
         = f.text_area :landing_html, placeholder: 'Landing page (html)', rows: 20
       = f.submit 'Save', class: 'button-green pull-right'
