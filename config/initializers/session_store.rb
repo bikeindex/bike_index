@@ -1,7 +1,3 @@
-if Rails.env.production?
-  domain = ".bikeindex.org"
-else
-  domain = "localhost"
-end
+domain = Rails.env.production? ? 'bikeindex.org' : 'localhost'
 
 Bikeindex::Application.config.session_store :cookie_store, key: '_bikeindex_session', domain: domain
