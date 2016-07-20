@@ -3,7 +3,7 @@ require 'spec_helper'
 describe 'organizations routing' do
   describe 'landing_pages' do
     it 'routes root to ' do
-      expect(ENV['LANDING_PAGE_ORG_SLUGS']).to match 'university'
+      expect(LandingPages::ORGANIZATIONS).to include('university')
       expect(get: '/university').to route_to(
         controller: 'landing_pages',
         organization_id: 'university',

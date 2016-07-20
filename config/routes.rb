@@ -21,8 +21,7 @@ Bikeindex::Application.routes.draw do
   get '/', to: redirect(:root_url, subdomain: false), constraints: { subdomain: 'stolen' }
   root to: 'welcome#index'
 
-  # Organization landing pages, space delineated list of the org slugs
-  ENV['LANDING_PAGE_ORG_SLUGS'].split(' ').freeze.each do |slug|
+  LandingPages::ORGANIZATIONS.each do |slug|
     get slug, to: 'landing_pages#show', organization_id: slug
   end
 
@@ -232,7 +231,7 @@ Bikeindex::Application.routes.draw do
   # Down here so that it doesn't override any other routes
   resources :organizations, only: [], path: 'o', module: 'organized' do
     get '/', to: 'bikes#index', as: :root
-    get 'landing', to: 'manage#landing'
+    get 'landing', to: 'manage#landing', as: :landing
     resources :bikes, only: [:index, :new, :show]
     # Below are admin controllers, inherit from Organized::AdminController not BaseController
     resources :manage, only: [:index, :update, :destroy] do
