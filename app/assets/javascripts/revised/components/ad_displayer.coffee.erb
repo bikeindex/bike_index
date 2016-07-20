@@ -8,7 +8,7 @@ class @AdDisplayer
       @getAd(id) if document.getElementById(id)
 
   getAd: (unit) ->
-    url = "http://classic.avantlink.com/api.php?affiliate_id=156890&module=AdSearch&output=html&website_id=195774&include_ad_group_ids=#{ad_units[unit]}"
+    url = "https://classic.avantlink.com/api.php?affiliate_id=156890&module=AdSearch&output=html&website_id=195774&include_ad_group_ids=#{ad_units[unit]}"
     link_pattern = /\<a.*/ig # Match lines that are links
     $.ajax
       type: 'GET'
