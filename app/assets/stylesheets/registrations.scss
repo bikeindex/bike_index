@@ -279,5 +279,10 @@ img { max-width: 100%; } // don't break random stuff images!
     display: block;
     margin: 0;
     width: 100%;
+    border: none;
+  }
+  // Per organization settings
+  &.umd {
+    .submit-wrapper .btn { background: rgb(214,35,48); }
   }
 }

@@ -2,9 +2,9 @@ $org-color: #e03a3e;
 // Organization landing pages padding (so there can be a background)
 #organized_manage_landing, #landing_pages_show {
   padding-top: 0;
-  background: black;
-  background-size: cover;
-  background-position: center center;
+  background-size: 100% auto;
+  background-position: center top;
+  background-repeat: no-repeat;
   .primary-footer { margin-top: 0; }
   h1 {
     text-align: center;

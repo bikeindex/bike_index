@@ -16,7 +16,7 @@
                 = msg
     = form_for [:admin, @organization] do |f|
       .blog-field
-        = f.text_area :landing_html, placeholder: 'Landing page (html)'
+        = f.text_area :landing_html, placeholder: 'Landing page (html)', rows: 20
       = f.submit 'Save', class: 'button-green pull-right'
     // Because somewhere, there is overflow hidden and it cuts off the bottom of the save button
     .padded
