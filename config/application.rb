@@ -9,6 +9,8 @@ Bundler.require(*Rails.groups)
 
 module Bikeindex
   class Application < Rails::Application
+    # Use our custom error pages
+    config.exceptions_app = self.routes
     require 'draper'
     Draper::Railtie.initializers.delete_if {|initializer| initializer.name == 'draper.setup_active_model_serializers' }
     # Settings in config/environments/* take precedence over those specified here.

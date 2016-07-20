@@ -1,11 +1,5 @@
 source 'https://rubygems.org'
 ruby '2.2.5'
-# Old gems:
-# gem 'rails', '3.2.22'
-# gem 'rake', '< 11' # OLD V - # Locked to remove validation errors
-# gem 'eventmachine', '~> 1.0.3' # OLD V
-# gem 'unicorn'
-# gem 'unicorn-worker-killer'
 gem 'rails', '4.2.6'
 
 gem 'pg'
