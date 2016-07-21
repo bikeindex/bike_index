@@ -1,4 +1,4 @@
-- cache 'manufacturers_index' do 
+- cache(['manufacturers_index', @manufacturers.maximum(:updated_at)]) do
   %h1
     Manufacturers we know about
 

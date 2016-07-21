@@ -1,4 +1,4 @@
-- cache 'root_head_wrap' do # Expired in recovery_displays_controller
+- cache 'root_head_wrap', skip_digest: true do # Expired in recovery_displays_controller
   - @recovery_displays = RecoveryDisplay.limit(10)
   .container.home-header#home_headies
     %h1
@@ -52,7 +52,7 @@
         or #{link_to "register your bike now", choose_registration_path}.
       %h3
         So far we've <strong>registered #{number_with_delimiter(Bike.count)} bikes</strong> and <strong>recovered #{number_with_delimiter(StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count)}</strong> stolen bikes.
-- cache 'root_home_1' do 
+- cache 'root_home_1' do
   .info-blocks
     .container
       %article

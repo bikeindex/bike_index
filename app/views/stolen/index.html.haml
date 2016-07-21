@@ -10,7 +10,7 @@
     %h3
       We've <strong>registered #{number_with_delimiter(Bike.count)} bikes</strong> and <strong>recovered #{number_with_delimiter(StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count)}</strong> stolen bikes.
     %h3
-      - cache 'stolen_home_organizations' do 
+      - cache('stolen_home_organizations', expires_in: 1.day) do
         So far we have <strong>#{Organization.count} partner bike shops, police departments, </strong> and <strong>bike advocacy organizations</strong>.
 .container
   %h4.multi-search-toggle
