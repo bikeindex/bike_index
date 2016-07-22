@@ -1,32 +1,30 @@
 # Seed the database with test things!
 # Note: you have to seed the users first, or else the bikes don't have anywhere to go.
 
-desc "Seed test users & 50 text bikes for user@example on first organization"
+desc 'Seed test users & 50 text bikes for user@example on first organization'
 task seed_test_users_and_bikes: :environment do 
-  user = User.create(name: "admin", email: "admin@example.com", password: "please12", password_confirmation: "please12", terms_of_service: true)
-  user.confirmed = true 
-  user.superuser = true 
-  user.save
-  user = User.create(name: "member", email: "member@example.com", password: "please12", password_confirmation: "please12", terms_of_service: true)
-  user.confirmed = true 
-  user.save
-  user = User.create(name: "user", email: "user@example.com", password: "please12", password_confirmation: "please12", terms_of_service: true)
-  user.confirmed = true 
-  user.save
-  user = User.create(name: "Api Accessor", email: "api@example.com", password: "please12", password_confirmation: "please12", terms_of_service: true)
-  user.confirmed = true
-  user.save
-  user = User.create(name: "Example user", email: "example_user@bikeindex.org", password: "please12", password_confirmation: "please12", terms_of_service: true)
-  user.confirmed = true 
-  user.save
 
-  org = Organization.create(name: "Ikes Bike's", website: "", short_name: "Ikes", show_on_map: true)
+  user_attrs = {
+    admin: {name: 'admin', email: 'admin@example.com', password: 'please12', password_confirmation: 'please12', terms_of_service: true, superuser: true},
+    member: {name: 'member', email: 'member@example.com', password: 'please12', password_confirmation: 'please12', terms_of_service: true},
+    user: {name: 'user', email: 'user@example.com', password: 'please12', password_confirmation: 'please12', terms_of_service: true},
+    api_accessor: {name: 'Api Accessor', email: 'api@example.com', password: 'please12', password_confirmation: 'please12', terms_of_service: true},
+    example_user: {name: 'Example user', email: 'example_user@bikeindex.org', password: 'please12', password_confirmation: 'please12', terms_of_service: true}
+  }
+
+  user_attrs.values.each do |attributes|
+    new_user = User.create attributes
+    new_user.confirm(new_user.confirmation_token)
+    new_user.save
+  end
+
+  org = Organization.create(name: "Ikes Bike's", website: '', short_name: 'Ikes', show_on_map: true)
   org.save
-  membership = Membership.create(organization_id: org.id, user_id: User.find_by_email("member@example.com").id, role: "admin")
+  membership = Membership.create(organization_id: org.id, user_id: User.find_by_email('member@example.com').id, role: 'admin')
   membership.save
-  org = Organization.create(name: "Example organization", website: "", short_name: "Example org", show_on_map: false, access_token: "7fb1c38526e57a98ec57760aa7f84992")
+  org = Organization.create(name: 'Example organization', website: '', short_name: 'Example org', show_on_map: false, access_token: '7fb1c38526e57a98ec57760aa7f84992')
   org.save
-  membership = Membership.create(organization_id: org.id, user_id: User.find_by_email("example_user@bikeindex.org").id, role: "member")
+  membership = Membership.create(organization_id: org.id, user_id: User.find_by_email('example_user@bikeindex.org').id, role: 'member')
   membership.save
   org.save
   puts "Users added successfully\n"
