@@ -18,6 +18,7 @@ group :red_green_refactor, halt_on_fail: true do
     watch(%r{^spec/(.+)\.rb$})
     watch(%r{^config/(.+)\.rb$})
     watch(%r{^lib/(.+)\.rb$})
+    watch(%r{^lib/(.+)\.rake$})
     watch(%r{^db/(.+)\.rb$})
     watch(%r{(?:.+/)?\.rubocop\.yml$}) { |m| File.dirname(m[0]) }
   end
