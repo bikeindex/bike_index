@@ -164,7 +164,8 @@ describe Organized::ManageController, type: :controller do
                 latitude: 22_222,
                 longitude: 11_111,
                 organization_id: 844,
-                shown: false
+                shown: false,
+                _destroy: 0
               },
               Time.zone.now.to_i.to_s => {
                 created_at: Time.zone.now.to_f.to_s,
@@ -189,32 +190,44 @@ describe Organized::ManageController, type: :controller do
           expect(organization.show_on_map).to be_falsey
           expect(organization.lock_show_on_map).to be_falsey
         end
-        it 'updates and adds the locations and shows on map' do
-          expect do
-            put :update, organization_id: organization.to_param,  id: organization.to_param, organization: update_attributes
-          end.to change(Location, :count).by(1)
-          organization.reload
-          expect(organization.show_on_map).to be_truthy
-          # Existing location is updated
-          location_1.reload
-          expect(location_1.organization).to eq organization
-          update_attributes[:locations_attributes]['0'].except(:latitude, :longitude, :organization_id, :shown, :created_at).each do |k, v|
-            expect(location_1.send(k)).to eq v
-          end
-          # ensure we are not permitting crazy assignment for first location
-          update_attributes[:locations_attributes]['0'].slice(:latitude, :longitude, :organization_id, :shown).each do |k, v|
-            expect(location_1.send(k)).to_not eq v
-          end
+        context 'update' do
+          it 'updates and adds the locations and shows on map' do
+            expect do
+              put :update, organization_id: organization.to_param, id: organization.to_param, organization: update_attributes
+            end.to change(Location, :count).by 1
+            organization.reload
+            expect(organization.show_on_map).to be_truthy
+            # Existing location is updated
+            location_1.reload
+            expect(location_1.organization).to eq organization
+            update_attributes[:locations_attributes]['0'].except(:latitude, :longitude, :organization_id, :shown, :created_at, :_destroy).each do |k, v|
+              expect(location_1.send(k)).to eq v
+            end
+            # ensure we are not permitting crazy assignment for first location
+            update_attributes[:locations_attributes]['0'].slice(:latitude, :longitude, :organization_id, :shown).each do |k, v|
+              expect(location_1.send(k)).to_not eq v
+            end
 
-          # second location
-          location_2 = organization.locations.last
-          key = update_attributes[:locations_attributes].keys.last
-          update_attributes[:locations_attributes][key].except(:latitude, :longitude, :organization_id, :shown, :created_at).each do |k, v|
-            expect(location_2.send(k)).to eq v
+            # second location
+            location_2 = organization.locations.last
+            key = update_attributes[:locations_attributes].keys.last
+            update_attributes[:locations_attributes][key].except(:latitude, :longitude, :organization_id, :shown, :created_at).each do |k, v|
+              expect(location_2.send(k)).to eq v
+            end
+            # ensure we are not permitting crazy assignment for created location
+            update_attributes[:locations_attributes][key].slice(:latitude, :longitude, :organization_id, :shown).each do |k, v|
+              expect(location_1.send(k)).to_not eq v
+            end
           end
-          # ensure we are not permitting crazy assignment for created location
-          update_attributes[:locations_attributes][key].slice(:latitude, :longitude, :organization_id, :shown).each do |k, v|
-            expect(location_1.send(k)).to_not eq v
+        end
+        context 'remove' do
+          it 'removes the location' do
+            # update_attributes = update_attributes.dup
+            update_attributes[:locations_attributes]['0'][:_destroy] = 1
+            expect do
+              put :update, organization_id: organization.to_param, id: organization.to_param, organization: update_attributes
+            end.to change(Location, :count).by 0
+            expect(Location.where(id: location_1.id).count).to eq 0
           end
         end
       end

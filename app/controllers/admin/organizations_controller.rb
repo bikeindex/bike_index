@@ -67,7 +67,19 @@ class Admin::OrganizationsController < Admin::BaseController
   protected
 
   def permitted_parameters
-    params.require(:organization).permit(Organization.old_attr_accessible + [:approved, :landing_html])
+    params.require(:organization).permit(permitted_organization_params)
+  end
+
+  def permitted_organization_params
+    (%w(available_invitation_count sent_invitation_count name short_name slug website
+       show_on_map is_suspended org_type embedable_user_email auto_user_id lock_show_on_map
+       api_access_approved access_token new_bike_notification avatar avatar_cache
+       lightspeed_cloud_api_key use_additional_registration_field approved landing_html
+      ).map(&:to_sym) + [locations_attributes: permitted_locations_params]).freeze
+  end
+
+  def permitted_locations_params
+    %w(name zipcode city state_id _destroy id country_id street phone email shown).map(&:to_sym)
   end
 
   def find_organization

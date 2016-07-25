@@ -1,8 +1,4 @@
 class Location < ActiveRecord::Base
-  def self.old_attr_accessible
-    %w(name organization_id organization zipcode city state_id
-       country_id street phone email latitude longitude shown).map(&:to_sym).freeze
-  end  
   acts_as_paranoid
   belongs_to :organization
   belongs_to :country

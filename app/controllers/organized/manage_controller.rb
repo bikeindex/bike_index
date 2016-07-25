@@ -64,7 +64,7 @@ module Organized
     end
 
     def permitted_locations_params
-      [:name, :zipcode, :city, :state_id, :country_id, :street, :phone, :email, :id]
+      %w(name zipcode city state_id country_id street phone email id _destroy)
     end
 
     def notify_admins(type)
