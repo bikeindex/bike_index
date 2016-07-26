@@ -153,10 +153,9 @@ describe UsersController do
   end
 
   describe 'show' do
-    xit "404s if the user doesn't exist" do
-      # I have no idea why this fails. It works really, but not in tests!
+    it "404s if the user doesn't exist" do
       expect do
-        get :edit, id: 'fake_user'
+        get :show, id: 'fake_user extra stuff'
       end.to raise_error(ActionController::RoutingError)
     end
 
@@ -174,6 +173,8 @@ describe UsersController do
       @user.save
       get :show, id: @user.username
       expect(response).to render_template :show
+      expect(assigns(:per_page)).to eq 9
+      expect(assigns(:page)).to eq 1
     end
   end
 
