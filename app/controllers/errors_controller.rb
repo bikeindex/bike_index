@@ -1,5 +1,6 @@
 class ErrorsController < ApplicationController
-  respond_to :html, :xml, :json
+  respond_to :html, :json
+  before_filter :set_permitted_format
   layout 'application_revised'
 
   def bad_request
@@ -20,5 +21,11 @@ class ErrorsController < ApplicationController
 
   def unauthorized
     render status: 401
+  end
+
+  private
+
+  def set_permitted_format
+    request.format = 'html' unless request.format == 'json'
   end
 end
