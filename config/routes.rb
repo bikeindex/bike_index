@@ -218,11 +218,11 @@ Bikeindex::Application.routes.draw do
   # Somehow the redirect drops the .gz extension, which ruins it so this redirect is handled by Cloudflare
   # get 'sitemaps/(*all)' => redirect('https://files.bikeindex.org/sitemaps/%{all}')
 
-  get '/400', to: 'errors#bad_request'
-  get '/401', to: 'errors#unauthorized'
-  get '/404', to: 'errors#not_found'
-  get '/422', to: 'errors#unprocessable_entity'
-  get '/500', to: 'errors#server_error'
+  get '/400', to: 'errors#bad_request', via: :all
+  get '/401', to: 'errors#unauthorized', via: :all
+  get '/404', to: 'errors#not_found', via: :all
+  get '/422', to: 'errors#unprocessable_entity', via: :all
+  get '/500', to: 'errors#server_error', via: :all
 
   mount Sidekiq::Web => '/sidekiq', constraints: AdminRestriction
 

@@ -2,6 +2,7 @@ class FeedbacksController < ApplicationController
   layout 'application_revised'
   before_filter :set_feedback_active_section
   before_filter :authenticate_user, only: [:new, :create]
+  before_filter :set_permitted_format
 
   def index
     @feedback = Feedback.new
@@ -38,5 +39,9 @@ class FeedbacksController < ApplicationController
 
   def permitted_parameters
     params.require(:feedback).permit(Feedback.old_attr_accessible)
+  end
+
+  def set_permitted_format
+    request.format = 'html'
   end
 end

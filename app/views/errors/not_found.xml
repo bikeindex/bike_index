@@ -1,4 +1,0 @@
-<error-page>
-   <exception-type>404</exception-type>
-   <location>/404</location>
-</error-page>
