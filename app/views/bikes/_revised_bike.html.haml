@@ -1,6 +1,6 @@
 %li.bike-box-item
   %a.bike-list-image{ href: bike_url(bike), class: ('hover-expand' if bike.thumb_path) }
-    = bike.revised_thumb_image
+    = bike.thumb_image
   .bike-information{ class: ('multi-attr-lists' if bike.current_stolen_record.present?) }
     %h5.title-link
       %a{ href: bike_url(bike) }
