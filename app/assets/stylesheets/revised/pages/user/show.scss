@@ -1,6 +1,19 @@
 #users_show {
-  .delete-email {
-    margin-left: 2em;
-    color: $gray-light;
+  img.users-show-avatar { border-radius: 50%; }
+  .container > .row { margin-top: $vertical-height; }
+  .shared-bikes-row {
+    max-width: 940px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .card {
+    flex: 1 0 30%;
+    max-width: 30%;
+  }
+  .card-title {
+    padding: 10px 10px 0px 10px;
+  }
+  .card-title h4 a {
+    @extend .body-font;
   }
 }
