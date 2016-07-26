@@ -245,7 +245,11 @@ img { max-width: 100%; } // don't break random stuff images!
     background: $gray-dark;
     position: relative;
     padding: $vertical-height;
-    h3 { color: #fff; margin: 0; }
+    h3 {
+      color: #fff;
+      margin: 0;
+      text-align: center;
+    }
   }
   header.reg-header {
     background: image-url('revised/spokebg.png');
@@ -269,8 +273,12 @@ img { max-width: 100%; } // don't break random stuff images!
     }
   }
   .registration-widget-body {
-    padding: 2*$vertical-height;
+    padding: 22px 2*$vertical-height 21px;
     p { padding: 0 10%; }
+  }
+  .registration-widget-body > form {
+    max-width: 337px;
+    margin: 0 auto;
   }
   input[type='email'], select, .form-control { width: 100%; }
   .below-input-help { padding-bottom: 0; }
@@ -283,6 +291,6 @@ img { max-width: 100%; } // don't break random stuff images!
   }
   // Per organization settings
   &.umd {
-    .submit-wrapper .btn { background: rgb(214,35,48); }
+    .submit-wrapper .btn { background: #e03a3e; }
   }
 }
