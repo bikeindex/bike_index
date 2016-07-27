@@ -39,11 +39,25 @@ describe NewsController do
 
   context 'revised' do
     describe 'index' do
-      it 'renders' do
-        get :index
-        expect(response.status).to eq(200)
-        expect(response).to render_template('index')
-        expect(response).to render_with_layout('application_revised')
+      context 'html' do
+        it 'renders' do
+          get :index
+          expect(response.status).to eq(200)
+          expect(response).to render_template('index')
+          expect(response).to render_with_layout('application_revised')
+        end
+      end
+      context 'xml' do
+        it 'redirects to atom' do
+          get :index, format: :xml
+          expect(response).to redirect_to(news_index_path(format: 'atom'))
+        end
+      end
+      context 'atom' do
+        it 'renders' do
+          get :index, format: :atom
+          expect(response.status).to eq(200)
+        end
       end
     end
 

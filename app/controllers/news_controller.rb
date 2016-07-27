@@ -20,5 +20,6 @@ class NewsController < ApplicationController
 
   def index
     @blogs = Blog.published
+    redirect_to news_index_url(format: 'atom') if request.format == 'xml'
   end
 end
