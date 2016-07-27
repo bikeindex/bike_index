@@ -28,11 +28,8 @@ class Ctype < ActiveRecord::Base
 
     def friendly_find(n)
       return nil if n.blank?
-      if n.is_a?(Integer) || n.match(/\A\d*\z/).present?
-        where(id: n).first
-      else
-        find_by_slug(Slugifyer.slugify(n))
-      end
+      return where(id: n).first if n.is_a?(Integer) || n.match(/\A\d*\z/).present?
+      find_by_slug(Slugifyer.slugify(n))
     end
   end
 

@@ -1,4 +1,5 @@
 class Paint < ActiveRecord::Base
+  include FriendlyNameFindable
   def self.old_attr_accessible
     %w(name color_id secondary_color_id tertiary_color_id manufacturer_id).map(&:to_sym).freeze
   end
@@ -12,18 +13,9 @@ class Paint < ActiveRecord::Base
   belongs_to :secondary_color, class_name: 'Color'
   belongs_to :tertiary_color, class_name: 'Color'
 
-  scope :official, -> { where("manufacturer_id IS NOT NULL") }
+  scope :official, -> { where('manufacturer_id IS NOT NULL') }
 
   before_save { |p| p.name = p.name.downcase.strip }
-
-  def self.friendly_find(n)
-    return nil if n.blank?
-    if n.is_a?(Integer) || n.match(/\A\d*\z/).present?
-      where(id: n).first
-    else
-      where('lower(name) = ?', n.downcase.strip).first
-    end
-  end
 
   before_create :associate_colors
   def associate_colors
@@ -49,15 +41,14 @@ class Paint < ActiveRecord::Base
     # RAL colors. See wikipedia table for rough groupings. Many of the reds are pink, greys are brown, etc. by whatever
     paint_str.gsub!(/ral\s?([1-8])\d{3}/) {
       case Regexp.last_match[1].to_i
-      when 1 then "yellow"
-      when 2 then "orange"
-      when 3 then "red"
-      when 4 then "purple"
-      when 5 then "blue"
-      when 6 then "green"
-      when 7 then "silver"
-      when 8 then "brown"
-      #when 9 then "" This is white or black or gray
+      when 1 then 'yellow'
+      when 2 then 'orange'
+      when 3 then 'red'
+      when 4 then 'purple'
+      when 5 then 'blue'
+      when 6 then 'green'
+      when 7 then 'silver'
+      when 8 then 'brown'
       end
     }
 
@@ -95,7 +86,7 @@ class Paint < ActiveRecord::Base
     paint_str.gsub!(/bronze/, 'yellow')
     paint_str.gsub!(/mustard/, 'yellow')
     paint_str.gsub!(/golde?n?/, 'yellow')
-    paint_str.gsub!(/(\A|\s)crcl(\s|\Z)/, ' silver ') #bad abbreviation of charcoal
+    paint_str.gsub!(/(\A|\s)crcl(\s|\Z)/, ' silver ') # bad abbreviation of charcoal
     paint_str.gsub!(/gunmetal/, 'silver')
     paint_str.gsub!(/char(coa?l)?/, 'silver')
     paint_str.gsub!(/graphite/, 'silver')
@@ -105,8 +96,7 @@ class Paint < ActiveRecord::Base
     paint_str.gsub!(/sli?ve?r?/, 'silver')
     paint_str.gsub!(/quicksilver/, 'silver')
     paint_str.gsub!(/gr(a|e)y/, ' silver ')
-    paint_str.gsub!(/burgu?a?ndy/, "red")
+    paint_str.gsub!(/burgu?a?ndy/, 'red')
     paint_str
   end
-
 end
