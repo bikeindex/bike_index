@@ -52,7 +52,7 @@ describe BikesController do
               expect(response.status).to eq(200)
               expect(flash).to_not be_present
               expect(assigns(:per_page)).to eq 10
-              target_location = [ { data: default_location, cache_hit: nil } ].as_json # in spec_helper
+              target_location = [{ data: default_location, cache_hit: nil }].as_json # in spec_helper
               expect(assigns(:location).as_json).to eq target_location
               expect(assigns(:stolenness)).to eq 'stolen_proximity'
               expect(response).to render_with_layout('application_revised')
@@ -66,7 +66,7 @@ describe BikesController do
               expect(response.status).to eq(200)
               expect(flash).to_not be_present
               expect(assigns(:per_page)).to eq 10
-              target_location = [ { data: default_location, cache_hit: nil } ].as_json # in spec_helper
+              target_location = [{ data: default_location, cache_hit: nil }].as_json # in spec_helper
               expect(assigns(:location).as_json).to eq target_location
               expect(assigns(:stolenness)).to eq 'stolen_proximity'
               expect(response).to render_with_layout('application_revised')
@@ -340,7 +340,7 @@ describe BikesController do
           @b_param = FactoryGirl.create(:b_param, creator: @user)
           manufacturer = FactoryGirl.create(:manufacturer)
           set_current_user(@user)
-          @bike = { 
+          @bike_params = {
             serial_number: '1234567890',
             b_param_id_token: @b_param.id_token,
             cycle_type_id: FactoryGirl.create(:cycle_type).id,
@@ -356,16 +356,16 @@ describe BikesController do
         it "does not use the b_param if isn't owned by user" do
           user = FactoryGirl.create(:user)
           set_current_user(user)
-          post :create, bike: @bike
+          post :create, bike: @bike_params
           @b_param.reload
           expect(@b_param.created_bike_id).to_not be_present
         end
 
         it 'creates a new stolen bike' do
           FactoryGirl.create(:country, iso: 'US')
-          @bike[:phone] = '312.379.9513'
+          @bike_params[:phone] = '312.379.9513'
           expect do
-            post :create, stolen: 'true', bike: @bike
+            post :create, stolen: 'true', bike: @bike_params
           end.to change(StolenRecord, :count).by(1)
           expect(@b_param.reload.created_bike_id).not_to be_nil
           expect(@b_param.reload.bike_errors).to be_nil
@@ -375,9 +375,9 @@ describe BikesController do
         it 'creates a new ownership and bike from an organization' do
           organization = FactoryGirl.create(:organization)
           FactoryGirl.create(:membership, user: @user, organization: organization)
-          @bike[:creation_organization_id] = organization.id
+          @bike_params[:creation_organization_id] = organization.id
           expect do
-            post :create, bike: @bike
+            post :create, bike: @bike_params
           end.to change(Ownership, :count).by(1)
           expect(Bike.last.creation_organization_id).to eq(organization.id)
         end
@@ -391,23 +391,26 @@ describe BikesController do
           organization.save
           manufacturer = FactoryGirl.create(:manufacturer)
           b_param = BParam.create(creator_id: organization.auto_user.id, params: { creation_organization_id: organization.id, embeded: true })
-          bike = { serial_number: '69',
-                   b_param_id_token: b_param.id_token,
-                   creation_organization_id: organization.id,
-                   embeded: true,
-                   additional_registration: 'Testly secondary',
-                   cycle_type_id: FactoryGirl.create(:cycle_type).id,
-                   manufacturer_id: manufacturer.id,
-                   primary_frame_color_id: FactoryGirl.create(:color).id,
-                   handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
-                   owner_email: 'Flow@goodtimes.com'
+          bike_params = {
+            serial_number: '69',
+            b_param_id_token: b_param.id_token,
+            creation_organization_id: organization.id,
+            embeded: true,
+            additional_registration: 'Testly secondary',
+            cycle_type_id: FactoryGirl.create(:cycle_type).id,
+            manufacturer_id: manufacturer.name,
+            manufacturer_other: '',
+            primary_frame_color_id: FactoryGirl.create(:color).id,
+            handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
+            owner_email: 'Flow@goodtimes.com'
           }
           expect do
-            post :create, bike: bike
+            post :create, bike: bike_params
           end.to change(Ownership, :count).by(1)
           bike = Bike.last
           expect(bike.creation_organization_id).to eq(organization.id)
           expect(bike.additional_registration).to eq('Testly secondary')
+          expect(bike.manufacturer).to eq manufacturer
         end
       end
 
@@ -422,19 +425,20 @@ describe BikesController do
             b_param = BParam.create(creator_id: organization.auto_user.id, params: { creation_organization_id: organization.id, embeded: true })
             test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg')))
             expect_any_instance_of(ImageAssociatorWorker).to receive(:perform).and_return(true)
-            bike = { serial_number: '69',
-                     b_param_id_token: b_param.id_token,
-                     creation_organization_id: organization.id,
-                     embeded: true,
-                     embeded_extended: true,
-                     cycle_type_id: FactoryGirl.create(:cycle_type).id,
-                     manufacturer_id: manufacturer.id,
-                     primary_frame_color_id: FactoryGirl.create(:color).id,
-                     handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
-                     owner_email: 'Flow@goodtimes.com',
-                     image: test_photo
+            bike_params = {
+              serial_number: '69',
+              b_param_id_token: b_param.id_token,
+              creation_organization_id: organization.id,
+              embeded: true,
+              embeded_extended: true,
+              cycle_type_id: FactoryGirl.create(:cycle_type).id,
+              manufacturer_id: manufacturer.id,
+              primary_frame_color_id: FactoryGirl.create(:color).id,
+              handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
+              owner_email: 'Flow@goodtimes.com',
+              image: test_photo
             }
-            post :create, bike: bike
+            post :create, bike: bike_params
             expect(response).to redirect_to(embed_extended_organization_url(organization))
           end
         end
@@ -448,18 +452,19 @@ describe BikesController do
           organization.save
           manufacturer = FactoryGirl.create(:manufacturer)
           b_param = BParam.create(creator_id: organization.auto_user.id, params: { creation_organization_id: organization.id, embeded: true })
-          bike = { serial_number: '69',
-                   b_param_id_token: b_param.id_token,
-                   creation_organization_id: organization.id,
-                   embeded: true,
-                   embeded_extended: true,
-                   cycle_type_id: FactoryGirl.create(:cycle_type).id,
-                   manufacturer_id: manufacturer.id,
-                   primary_frame_color_id: FactoryGirl.create(:color).id,
-                   handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
-                   owner_email: 'Flow@goodtimes.com'
+          bike_params = {
+            serial_number: '69',
+            b_param_id_token: b_param.id_token,
+            creation_organization_id: organization.id,
+            embeded: true,
+            embeded_extended: true,
+            cycle_type_id: FactoryGirl.create(:cycle_type).id,
+            manufacturer_id: manufacturer.id,
+            primary_frame_color_id: FactoryGirl.create(:color).id,
+            handlebar_type_id: FactoryGirl.create(:handlebar_type).id,
+            owner_email: 'Flow@goodtimes.com'
           }
-          post :create, bike: bike, persist_email: true
+          post :create, bike: bike_params, persist_email: true
           expect(response).to redirect_to(embed_extended_organization_url(organization, email: 'flow@goodtimes.com'))
         end
       end
@@ -494,7 +499,7 @@ describe BikesController do
         end
         let(:stolen_params) do
           {
-            country_id: country.id, 
+            country_id: country.id,
             street: '2459 W Division St',
             city: 'Chicago',
             zipcode: '60622',
@@ -509,7 +514,7 @@ describe BikesController do
             success_params = bike_params.merge(manufacturer_id: manufacturer.slug)
             bb_data = { bike: { rear_wheel_bsd: wheel_size.iso_bsd.to_s }, components: [] }.as_json
             # We need to call clean_params on the BParam after bikebook update, so that
-            # the foreign keys are assigned correctly. This is how we test that we're 
+            # the foreign keys are assigned correctly. This is how we test that we're
             # This is also where we're testing bikebook assignment
             expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
             expect do
@@ -543,7 +548,7 @@ describe BikesController do
             bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
             expect(bike.stolen).to be_truthy
             # we retain the stolen record attrs, it would be great to test that they are
-            # assigned correctly, but I don't know how - it needs to completely 
+            # assigned correctly, but I don't know how - it needs to completely
             # render the new action
             # stolen_record = assigns(:stolen_record)
             # stolen_params.each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
@@ -565,9 +570,9 @@ describe BikesController do
               owner_email: 'something@stuff.com'
             }.as_json
             b_param = BParam.create(params: { 'bike' => bike_params })
-            bb_data = { bike: { } }
+            bb_data = { bike: {} }
             # We need to call clean_params on the BParam after bikebook update, so that
-            # the foreign keys are assigned correctly. This is how we test that we're 
+            # the foreign keys are assigned correctly. This is how we test that we're
             # This is also where we're testing bikebook assignment
             expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
             expect do
@@ -740,7 +745,7 @@ describe BikesController do
             manufacturer_other: 'stuffffffff',
             cmodel_name: 'asdfasdf',
             year: '1995',
-            serial_number: "simple_serial"
+            serial_number: 'simple_serial'
           }
           bike_attrs = {
             description: '69',
@@ -750,7 +755,7 @@ describe BikesController do
                 '_destroy' => '1',
                 id: component_1.id.to_s
               },
-              "#{Time.zone.now.to_i}" => component_2_attrs
+              Time.zone.now.to_i.to_s => component_2_attrs
             }
           }
           put :update, id: bike.id, bike: bike_attrs
@@ -865,9 +870,7 @@ describe BikesController do
             end
           end
           context 'recovered bike' do
-            it 'marks the bike recovered' do
-              
-            end
+            it 'marks the bike recovered'
           end
         end
       end
