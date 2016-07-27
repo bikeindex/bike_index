@@ -100,17 +100,3 @@
     }
   }
 }
-
-.feedbacks {
-  .contact-info, .contact-text {
-    input, textarea {
-      @extend .form-control;
-      margin-top: .5*$vertical-height;
-    }
-  }
-  .button-green {
-    @extend .btn;
-    @extend .btn-primary;
-    margin-top: .5*$vertical-height;
-  }
-}

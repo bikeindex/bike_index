@@ -11,6 +11,7 @@
     - title = "Please fix the following #{pluralize(@page_errors.count, 'error')}"
     - error_body = capture_haml do
       %ul
+        - @page_errors = @page_errors.full_messages if @page_errors.is_a?(ActiveModel::Errors)
         - @page_errors.each do |msg|
           %li
             = msg

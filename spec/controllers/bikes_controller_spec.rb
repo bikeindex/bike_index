@@ -593,7 +593,7 @@ describe BikesController do
             b_param = BParam.create(params: { bike: {} }, created_bike_id: bike.id, creator_id: user.id)
             expect(b_param.created_bike).to be_present
             post :create, bike: { b_param_id_token: b_param.id_token }
-            expect(response).to redirect_to(edit_bike_url(bike))
+            expect(response).to redirect_to(edit_bike_url(bike.id))
           end
         end
       end

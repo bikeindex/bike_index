@@ -48,7 +48,7 @@ Bikeindex::Application.routes.draw do
 
   resources :stolen_notifications, only: [:create, :new]
 
-  resources :feedbacks, only: [:create]
+  resources :feedbacks, only: [:index, :create]
   get 'vendor_signup', to: redirect('/organizations/new')
   get 'lightspeed_integration', to: 'organizations#lightspeed_integration'
   get 'help', to: 'feedbacks#index'

@@ -1,24 +1,16 @@
 = form_for @feedback do |f|
-  - if @feedback.errors.any?
-    #alert-block
-      .alert.alert-error
-        %a.close{"data-dismiss" => "alert"} ×
-        %h4
-          Please fix the following 
-          = pluralize(@feedback.errors.count, "error")
-        %ul
-          - @feedback.errors.full_messages.each do |msg|
-            %li 
-              = msg  
-
-  .feedbacks
-    .contact-info
-      .contact-first-row
-        = f.text_field :name, placeholder: "Name", value: current_user ? current_user.name : ""
-        = f.email_field :email, placeholder: "Email address", value: current_user ? current_user.email : ""
-      = f.text_field :title, placeholder: "Subject"
-    .contact-text
-      = f.text_area :body, placeholder: "Your message goes here", rows: 7   
-    .feedback-actions.control-group
-      = f.submit 'Send it!', class: 'button-green pull-right'
+  .row.form-group
+    .col-sm-6
+      = f.email_field :email, placeholder: "Email address", value: current_user ? current_user.email : "", class: 'form-control'
+    .col-sm-6
+      = f.text_field :name, placeholder: 'Name', value: current_user ? current_user.name : '', class: 'form-control'
   
+  .row.form-group
+    .col-sm-12
+      = f.text_field :title, placeholder: 'Subject', class: 'form-control'
+  .row.form-group
+    .col-sm-12
+      = f.text_area :body, placeholder: 'Your message', rows: 7, class: 'form-control'
+  .row.form-group
+    .col-sm-12
+      = f.submit 'Send it!', class: 'btn btn-primary'

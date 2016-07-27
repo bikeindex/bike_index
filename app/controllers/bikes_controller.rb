@@ -110,9 +110,8 @@ class BikesController < ApplicationController
   def create
     if params[:bike][:embeded]
       @b_param = BParam.from_id_token(params[:bike][:b_param_id_token])
-      @bike = Bike.new
       if @b_param.created_bike.present?
-        redirect_to edit_bike_url(@bike)
+        redirect_to edit_bike_url(@b_param.created_bike)
       end
       if params[:bike][:image].present?
         @b_param.image = params[:bike][:image]
