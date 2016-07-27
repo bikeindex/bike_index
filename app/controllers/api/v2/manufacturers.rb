@@ -19,7 +19,7 @@ module API
           requires :id, type: String, desc: 'Manufacturer id or slug'
         end
         get ':id', serializer: ManufacturerV2ShowSerializer do 
-          manufacturer = Manufacturer.fuzzy_id_or_name_find(params[:id])
+          manufacturer = Manufacturer.friendly_find(params[:id])
           unless manufacturer.present?
             msg = "Unable to find manufacturer with name or id: #{params[:id]}"
             raise ActiveRecord::RecordNotFound, msg

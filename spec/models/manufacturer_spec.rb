@@ -35,14 +35,14 @@ describe Manufacturer do
     end
   end
 
-  describe 'fuzzy_name_find' do
+  describe 'friendly_find' do
     it 'finds manufacturers by their slug' do
       mnfg = FactoryGirl.create(:manufacturer, name: 'Poopy PANTERS')
-      expect(Manufacturer.fuzzy_name_find('poopy panters')).to eq(mnfg)
+      expect(Manufacturer.friendly_find('poopy panters')).to eq(mnfg)
     end
     it "removes Accell (because it's widespread mnfg)" do
       mnfg = FactoryGirl.create(:manufacturer, name: 'Poopy PANTERS')
-      expect(Manufacturer.fuzzy_id_or_name_find('poopy panters Accell')).to eq(mnfg)
+      expect(Manufacturer.friendly_find('poopy panters Accell')).to eq(mnfg)
     end
   end
 
@@ -120,14 +120,14 @@ describe Manufacturer do
     end
   end
 
-  describe 'fuzzy_id' do
+  describe 'friendly_id_find' do
     it 'gets id from name' do
       manufacturer = FactoryGirl.create(:manufacturer)
-      result = Manufacturer.fuzzy_id(manufacturer.name)
+      result = Manufacturer.friendly_id_find(manufacturer.name)
       expect(result).to eq(manufacturer.id)
     end
     it 'fails with nil' do
-      result = Manufacturer.fuzzy_id('some stuff')
+      result = Manufacturer.friendly_id_find('some stuff')
       expect(result).to be_nil
     end
   end

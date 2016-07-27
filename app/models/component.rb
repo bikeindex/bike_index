@@ -74,6 +74,6 @@ class Component < ActiveRecord::Base
   before_validation :set_manufacturer
   def set_manufacturer
     return true unless mnfg_name.present?
-    self.manufacturer_id = Manufacturer.fuzzy_id(mnfg_name)
+    self.manufacturer_id = Manufacturer.friendly_id_find(mnfg_name)
   end
 end

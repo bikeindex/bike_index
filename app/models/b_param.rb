@@ -133,7 +133,7 @@ class BParam < ActiveRecord::Base
     bike['stolen'] = true if params['stolen_record'].present?
     set_wheel_size_key
     if bike['manufacturer_id'].present?
-      params['bike']['manufacturer_id'] = Manufacturer.fuzzy_id(bike['manufacturer_id'])
+      params['bike']['manufacturer_id'] = Manufacturer.friendly_id_find(bike['manufacturer_id'])
     else
       set_manufacturer_key
     end
@@ -184,7 +184,7 @@ class BParam < ActiveRecord::Base
   def set_manufacturer_key
     m_name = bike['manufacturer'] if bike.present?
     return false unless m_name.present?
-    manufacturer = Manufacturer.fuzzy_name_find(m_name)
+    manufacturer = Manufacturer.friendly_find(m_name)
     unless manufacturer.present?
       manufacturer = Manufacturer.find_by_name('Other')
       params['bike']['manufacturer_other'] = m_name.titleize if m_name.present?
@@ -205,7 +205,7 @@ class BParam < ActiveRecord::Base
 
   def set_color_key
     paint = params['bike']['color']
-    color = Color.fuzzy_name_find(paint.strip) if paint.present?
+    color = Color.friendly_find(paint.strip) if paint.present?
     if color.present?
       params['bike']['primary_frame_color_id'] = color.id
     else
@@ -216,7 +216,7 @@ class BParam < ActiveRecord::Base
 
   def set_paint_key(paint_entry)
     return nil unless paint_entry.present?
-    paint = Paint.fuzzy_name_find(paint_entry)
+    paint = Paint.friendly_find(paint_entry)
     if paint.present?
       params['bike']['paint_id'] = paint.id
     else

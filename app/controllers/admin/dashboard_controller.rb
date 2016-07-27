@@ -15,7 +15,7 @@ class Admin::DashboardController < Admin::BaseController
   def maintenance
     # @bikes here because this is the only one we're using the standard admin bikes table
     @bikes = Bike.unscoped.order("created_at desc").where(example: true).limit(10)
-    mnfg_other = Manufacturer.fuzzy_name_find("Other")
+    mnfg_other = Manufacturer.friendly_find("Other")
     @component_mnfgs = Component.where(manufacturer_id: mnfg_other.id)
     @bike_mnfgs = Bike.where(manufacturer_id: mnfg_other.id)
     @component_types = Component.where(ctype_id: Ctype.find_by_name("other").id )

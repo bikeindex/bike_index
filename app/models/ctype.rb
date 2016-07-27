@@ -17,16 +17,27 @@ class Ctype < ActiveRecord::Base
 
   has_many :components
 
+  class << self
+    def other
+      where(name: 'other', has_multiple: false, cgroup_id: Cgroup.additional_parts.id).first_or_create
+    end
+
+    def unknown
+      where(name: 'unknown', has_multiple: false, cgroup_id: Cgroup.additional_parts.id).first_or_create
+    end
+
+    def friendly_find(n)
+      return nil if n.blank?
+      if n.is_a?(Integer) || n.match(/\A\d*\z/).present?
+        where(id: n).first
+      else
+        find_by_slug(Slugifyer.slugify(n))
+      end
+    end
+  end
+
   def to_param
     slug
-  end
-
-  def self.other
-    where(name: 'other', has_multiple: false, cgroup_id: Cgroup.additional_parts.id).first_or_create
-  end
-
-  def self.unknown
-    where(name: 'unknown', has_multiple: false, cgroup_id: Cgroup.additional_parts.id).first_or_create
   end
   
   before_create :set_cgroup_from_name
@@ -41,9 +52,5 @@ class Ctype < ActiveRecord::Base
     # We don't care about updating the slug, since this information will rarely
     # if ever change, and the slug can always stay the same.
     self.slug = Slugifyer.slugify(name)
-  end
-
-  def self.fuzzy_name_find(n)
-    n && find_by_slug(Slugifyer.slugify(n))
   end
 end

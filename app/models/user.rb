@@ -176,7 +176,7 @@ class User < ActiveRecord::Base
     fuzzy_email_find(email) || fuzzy_unconfirmed_primary_email_find(email)
   end
 
-  def self.fuzzy_id(n)
+  def self.friendly_id_find(n)
     u = self.fuzzy_email_find(n)
     u && u.id
   end

@@ -39,7 +39,7 @@ module Api
                 feedback.feedback_hash[:old_manufacturer] += " (#{bike.manufacturer_other})"
                 bike.manufacturer_other = nil
               end
-              bike.manufacturer_id = Manufacturer.fuzzy_id(params[:manufacturer_update_manufacturer])
+              bike.manufacturer_id = Manufacturer.friendly_id_find(params[:manufacturer_update_manufacturer])
               if bike.manufacturer_id.present?
                 bike.save
                 feedback.feedback_hash[:new_manufacturer] = bike.manufacturer.name

@@ -11,8 +11,13 @@ class Color < ActiveRecord::Base
   default_scope { order(:name) }
   scope :commonness, -> { order('priority ASC, name ASC') }
 
-  def self.fuzzy_name_find(n)
-    n && where('lower(name) = ?', n.downcase.strip).first
+  def self.friendly_find(n)
+    return nil if n.blank?
+    if n.is_a?(Integer) || n.match(/\A\d*\z/).present?
+      where(id: n).first
+    else
+      where('lower(name) = ?', n.downcase.strip).first
+    end
   end
 
   def autocomplete_hash

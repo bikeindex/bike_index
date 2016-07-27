@@ -10,7 +10,7 @@ class ComponentCreator
   def set_manufacturer_key(component)
     if component[:manufacturer]
       m_name = component[:manufacturer]
-      manufacturer = Manufacturer.fuzzy_name_find(m_name)
+      manufacturer = Manufacturer.friendly_find(m_name)
       unless manufacturer.present?
         manufacturer = Manufacturer.find_by_name("Other")
         component[:manufacturer_other] = m_name.titleize if m_name.present?
@@ -18,7 +18,7 @@ class ComponentCreator
       component[:manufacturer_id] = manufacturer.id if manufacturer.present?
       component.delete(:manufacturer)
     elsif component[:manufacturer_id]
-      component[:manufacturer_id] = Manufacturer.fuzzy_id(component[:manufacturer_id])
+      component[:manufacturer_id] = Manufacturer.friendly_id_find(component[:manufacturer_id])
     end
     component
   end

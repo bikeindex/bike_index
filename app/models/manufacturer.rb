@@ -28,27 +28,23 @@ class Manufacturer < ActiveRecord::Base
        logo_cache logo_source description).map(&:to_sym).freeze
     end
 
-    def fuzzy_name_find(n)
+    def friendly_find(n)
       return nil if n.blank?
-      ns = Slugifyer.manufacturer(n)
-      find_by_slug(ns) || find_by_slug(fill_stripped(ns))
+      if n.is_a?(Integer) || n.match(/\A\d*\z/).present?
+        where(id: n).first
+      else
+        ns = Slugifyer.manufacturer(n)
+        find_by_slug(ns) || find_by_slug(fill_stripped(ns))
+      end
+    end
+
+    def friendly_id_find(n)
+      m = friendly_find(n)
+      m && m.id
     end
 
     def other_manufacturer
       where(name: 'Other', frame_maker: true).first_or_create
-    end
-
-    def fuzzy_id_or_name_find(n)
-      if n.is_a?(Integer) || n.match(/\A\d*\z/).present?
-        Manufacturer.where(id: n).first
-      else
-        Manufacturer.fuzzy_name_find(n)
-      end
-    end
-
-    def fuzzy_id(n)
-      m = fuzzy_id_or_name_find(n)
-      return m.id if m.present?
     end
 
     def fill_stripped(n)

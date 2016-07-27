@@ -105,7 +105,7 @@ class BikeSearcher
 
   def matching_manufacturer(bikes)
     if @params[:manufacturer].present?
-      manufacturer = Manufacturer.fuzzy_id_or_name_find(@params[:manufacturer])
+      manufacturer = Manufacturer.friendly_find(@params[:manufacturer])
       if manufacturer.present?
         @params[:manufacturer_id] = manufacturer.id 
       else
@@ -122,7 +122,7 @@ class BikeSearcher
   def matching_colors(bikes)
     if @params[:colors].present?
       @color_ids = @params[:colors].split(',')
-        .collect{ |c| Color.fuzzy_name_find(c).id if Color.fuzzy_name_find(c) }
+        .collect{ |c| Color.friendly_find(c).id if Color.friendly_find(c) }
     elsif @params[:query] && @params[:query].match(/(,?c_\d+)/)
       @color_ids = @params[:query].scan(/(,?c_\d+)/).flatten
         .map{ |c| c.gsub(/(,?c_)/,'') }

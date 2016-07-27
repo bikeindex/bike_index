@@ -18,10 +18,10 @@ describe Paint do
     end
   end
 
-  describe 'fuzzy_name_find' do
+  describe 'friendly_find' do
     it "finds users by email address when the case doesn't match" do
       paint = FactoryGirl.create(:paint, name: 'Poopy PAiNTERS')
-      expect(Paint.fuzzy_name_find('poopy painters')).to eq(paint)
+      expect(Paint.friendly_find('poopy painters')).to eq(paint)
     end
   end
 

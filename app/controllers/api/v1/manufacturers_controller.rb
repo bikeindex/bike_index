@@ -10,7 +10,7 @@ module Api
           if params[:query].strip == "frame_makers"
             Manufacturer.frames
           else
-            manufacturers = Manufacturer.fuzzy_name_find(params[:query].to_s)
+            manufacturers = Manufacturer.friendly_find(params[:query].to_s)
           end
         end
         if params[:just_names] && manufacturers.count > 1

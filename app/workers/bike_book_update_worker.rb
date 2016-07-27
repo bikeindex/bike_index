@@ -10,7 +10,7 @@ class BikeBookUpdateWorker
 
       if bb_data.present?
         bb_data['components'].each do |bb_comp|
-          ctype = Ctype.fuzzy_name_find(bb_comp.delete 'component_type')
+          ctype = Ctype.friendly_find(bb_comp.delete 'component_type')
           component = bike.components.where(ctype_id: ctype.id).first
           if component.present? 
             next unless component.description == bb_comp['description']

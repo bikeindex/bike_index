@@ -290,9 +290,9 @@ describe User do
     end
   end
 
-  describe 'fuzzy_id' do
+  describe 'friendly_id_find' do
     it 'fails with nil' do
-      result = User.fuzzy_id('some stuff')
+      result = User.friendly_id_find('some stuff')
       expect(result).to be_nil
     end
   end

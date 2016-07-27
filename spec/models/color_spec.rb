@@ -8,10 +8,10 @@ describe Color do
     it { is_expected.to have_many :paints }
   end
 
-  describe 'fuzzy_name_find' do
+  describe 'friendly_find' do
     it "finds users by email address when the case doesn't match" do
       color = FactoryGirl.create(:color, name: 'Poopy PANTERS')
-      expect(Color.fuzzy_name_find('poopy panters')).to eq(color)
+      expect(Color.friendly_find('poopy panters')).to eq(color)
     end
   end
 
