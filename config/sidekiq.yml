@@ -1,4 +1,6 @@
 ---
+production:
+  :concurrency: 10
 :queues:
   - afterwards # Lowest priority, general things, non-user-facing
   - [carrierwave, 2] # Also includes file_caching/tsv creation
