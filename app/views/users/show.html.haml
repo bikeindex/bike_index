@@ -3,11 +3,11 @@
     .row
       .col-md-6
         .row
-          .col-md-3
+          .col-xs-3
             - if @user.avatar
               - unless @user.avatar.url(:medium) == 'https://files.bikeindex.org/blank.png'
                 = image_tag @user.avatar.url(:medium), class: 'users-show-avatar'
-          .col-md-9
+          .col-xs-3
             %header.with-subtitle
             %h2
               - if @user.title.present?
@@ -29,7 +29,7 @@
       .sharing-section.col-md-4
         = render '/shared/share_this'
     .row.shared-bikes-row
-      .col-md-12
+      .col-xs-12
         - if @bikes.any?
           .card-deck-wrapper
             .card-deck

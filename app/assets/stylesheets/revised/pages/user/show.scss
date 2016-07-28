@@ -7,8 +7,24 @@
     margin-right: auto;
   }
   .card {
-    flex: 1 0 30%;
-    max-width: 30%;
+    @include media-breakpoint-up(sm) {
+      flex: 1 0 30%;
+      max-width: 30%;
+    }
+    @include media-breakpoint-down(sm) {
+      flex: 1 0 40%;
+      max-width: 50%;
+      margin-right: .625rem;
+      margin-left: .625rem;
+    }
+  }
+  .card-deck {
+    @include media-breakpoint-down(sm) {
+      display: flex;
+      flex-flow: row wrap;
+      margin-left: -0.9375rem;
+      margin-right: -0.9375rem;
+    }
   }
   .card-title {
     margin: 0;

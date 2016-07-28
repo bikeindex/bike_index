@@ -75,9 +75,7 @@ class UsersController < ApplicationController
     end
     @owner = user
     @user = user.decorate
-    if user == current_user
-      # Render the site
-    elsif !@user.show_bikes
+    unless user == current_user || @user.show_bikes
       redirect_to user_home_url, notice: "Sorry, that user isn't sharing their bikes" and return
     end
     @page = params[:page] || 1
