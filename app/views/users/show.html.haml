@@ -3,11 +3,11 @@
     .row
       .col-md-6
         .row
-          .col-sm-3
+          .col-md-3
             - if @user.avatar
               - unless @user.avatar.url(:medium) == 'https://files.bikeindex.org/blank.png'
                 = image_tag @user.avatar.url(:medium), class: 'users-show-avatar'
-          .col-sm-9
+          .col-md-9
             %header.with-subtitle
             %h2
               - if @user.title.present?
@@ -22,24 +22,28 @@
       .row
         .col-md-12
           .description
-            = @user.description    
+            = @user.description
     .row
       .col-md-8
         %h3 Bikes
       .sharing-section.col-md-4
         = render '/shared/share_this'
     .row.shared-bikes-row
-      - if @bikes.any?
-        .card-deck-wrapper
-          .card-deck
-            - @bikes.each do |bike|
-              .card
-                %a.bike-list-image{ href: bike_url(bike) }
-                  = bike.thumb_image
-                .card-title
-                  %h4
-                    = link_to bike.title_string, bike.list_link_url(bike)
-      - else
-        .col-md-12
+      .col-md-12
+        - if @bikes.any?
+          .card-deck-wrapper
+            .card-deck
+              - @bikes.each do |bike|
+                .card
+                  %a.bike-list-image{ href: bike_url(bike) }
+                    = bike.thumb_image
+                  .card-title
+                    %h4
+                      = link_to bike.title_string, bike.list_link_url(bike)
+          .row.paginate-container-row
+            .col-md-12
+              .paginate-container.paginate-container-bottom
+                = paginate @bikes
+        - else
           %h2
             This user has no bikes yet!

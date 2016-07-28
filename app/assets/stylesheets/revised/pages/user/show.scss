@@ -11,9 +11,16 @@
     max-width: 30%;
   }
   .card-title {
-    padding: 10px 10px 0px 10px;
+    margin: 0;
+    padding: 10px;
   }
+  .card-title h4 { margin: 0; }
   .card-title h4 a {
     @extend .body-font;
+    line-height: 1.2;
+  }
+  .paginate-container-row {
+    margin-left: auto;
+    margin-right: auto;
   }
 }

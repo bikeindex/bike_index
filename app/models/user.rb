@@ -209,7 +209,7 @@ class User < ActiveRecord::Base
   end
 
   def bikes(user_hidden=true)
-    Bike.unscoped.find(bike_ids(user_hidden))
+    Bike.unscoped.where(id: bike_ids(user_hidden))
   end
 
   def bike_ids(user_hidden=true)

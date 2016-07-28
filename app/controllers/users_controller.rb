@@ -75,16 +75,14 @@ class UsersController < ApplicationController
     end
     @owner = user
     @user = user.decorate
-    page = params[:page] || 1
-    @per_page = params[:per_page] || 9
     if user == current_user
       # Render the site
-    else
-      unless @user.show_bikes
-        redirect_to user_home_url, notice: "Sorry, that user isn't sharing their bikes" and return
-      end
+    elsif !@user.show_bikes
+      redirect_to user_home_url, notice: "Sorry, that user isn't sharing their bikes" and return
     end
-    bikes = user.bikes(true)
+    @page = params[:page] || 1
+    @per_page = params[:per_page] || 9
+    bikes = user.bikes(true).page(@page).per(@per_page)
     @bikes = BikeDecorator.decorate_collection(bikes)
   end
 
