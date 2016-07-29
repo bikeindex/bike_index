@@ -1,0 +1,42 @@
+#users_show {
+  img.users-show-avatar { border-radius: 50%; }
+  .container > .row { margin-top: $vertical-height; }
+  .shared-bikes-row {
+    max-width: 940px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .card {
+    @include media-breakpoint-up(sm) {
+      flex: 1 0 30%;
+      max-width: 30%;
+    }
+    @include media-breakpoint-down(sm) {
+      flex: 1 0 40%;
+      max-width: 50%;
+      margin-right: .625rem;
+      margin-left: .625rem;
+    }
+  }
+  .card-deck {
+    @include media-breakpoint-down(sm) {
+      display: flex;
+      flex-flow: row wrap;
+      margin-left: -0.9375rem;
+      margin-right: -0.9375rem;
+    }
+  }
+  .card-title {
+    margin: 0;
+    padding: 10px;
+  }
+  .card-title h4 { margin: 0; }
+  .card-title h4 a {
+    @extend .body-font;
+    line-height: 1.2;
+  }
+  .paginate-container-row {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}

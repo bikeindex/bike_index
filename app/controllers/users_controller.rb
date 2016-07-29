@@ -70,19 +70,17 @@ class UsersController < ApplicationController
 
   def show
     user = User.find_by_username(params[:id])
-    unless user 
+    unless user
       raise ActionController::RoutingError.new('Not Found')
     end
     @owner = user
     @user = user.decorate
-    if user == current_user
-      # Render the site
-    else
-      unless @user.show_bikes
-        redirect_to user_home_url, notice: "Sorry, that user isn't sharing their bikes" and return
-      end
+    unless user == current_user || @user.show_bikes
+      redirect_to user_home_url, notice: "Sorry, that user isn't sharing their bikes" and return
     end
-    bikes = user.bikes(true)
+    @page = params[:page] || 1
+    @per_page = params[:per_page] || 9
+    bikes = user.bikes(true).page(@page).per(@per_page)
     @bikes = BikeDecorator.decorate_collection(bikes)
   end
 

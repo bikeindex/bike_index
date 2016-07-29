@@ -132,13 +132,26 @@ describe BikeDecorator do
   end
 
   describe 'thumb_image' do
-    it 'returns the thumb path if one exists' do
-      bike = Bike.new
-      allow(bike).to receive(:thumb_path).and_return('pathy')
-      decorator = BikeDecorator.new(bike)
-      allow(decorator).to receive(:title_string).and_return('Title')
-      expect(decorator.thumb_image).to eq('<img alt="Title" src="/images/pathy" />')
+    context 'bike photo exists' do
+      it 'returns the thumb path if one exists' do
+        bike = Bike.new
+        allow(bike).to receive(:thumb_path).and_return('pathy')
+        decorator = BikeDecorator.new(bike)
+        allow(decorator).to receive(:title_string).and_return('Title')
+        expect(decorator.thumb_image).to eq('<img alt="Title" src="/images/pathy" />')
+      end
     end
+    context 'bike photo does not exist' do
+      it 'returns the bike placeholder path' do
+        bike = Bike.new
+        decorator = BikeDecorator.new(bike)
+        allow(decorator).to receive(:title_string).and_return('Title')
+        html = decorator.thumb_image
+        expect(html).to match("alt=\"Title\"")
+        expect(html).to match('title=\"No image\"')
+        expect(html).to match(/revised.bike_photo_placeholder.*\.svg/)
+      end
+    end 
   end
 
   describe 'list_image' do
