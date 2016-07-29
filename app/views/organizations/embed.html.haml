@@ -5,7 +5,7 @@
   = f.hidden_field :creation_organization_id
   = f.hidden_field :embeded, value: true
   .input-group
-    - if @stolen || @stolen_first
+    - if @stolen
       %span#stolen_registration_first
     - unless @stolen || @non_stolen
       #registration-type-tabs
@@ -87,7 +87,7 @@
   #stolen_fields_container
     #stolen_fields
       = f.hidden_field :stolen, value: true
-      = fields_for :stolen_record do |builder|
+      = fields_for @stolen_record do |builder|
         = builder.hidden_field :phone_no_show, value: true
         .input-group
           .control-group
@@ -99,13 +99,12 @@
             = builder.label :date_stolen_input, "When was it stolen?", class: "control-label"
             .controls
               #stolen_date
-
-                = builder.text_field :date_stolen_input, value: Time.now.strftime("%m-%d-%Y"), required: true, data: { :'date-format' => "mm-dd-yyyy" }
+                = builder.text_field :date_stolen_input, value: @stolen_record.date_stolen.strftime('%m-%d-%Y'), required: true, data: { :'date-format' => 'mm-dd-yyyy' }
         #stolen-bike-location.input-group
           .control-group.special-select-single
-            = builder.label :street, "Where was it stolen?", class: "control-label"
+            = builder.label :street, 'Where was it stolen?', class: 'control-label'
             #country_select_container.controls.special-select-single
-              = builder.collection_select(:country_id, Country.all, :id, :name, prompt: "Choose country", selected: Country.united_states.id )
+              = builder.collection_select(:country_id, Country.all, :id, :name, prompt: 'Choose country')
           .control-group.extra-group.special-select-single
             .controls
               = builder.text_field :street, placeholder: "Intersection or address"

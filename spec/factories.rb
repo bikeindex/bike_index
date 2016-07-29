@@ -141,7 +141,10 @@ FactoryGirl.define do
     slug
     available_invitation_count 5
     factory :organization_with_auto_user do
-      association :auto_user, factory: :organization_member
+      association :auto_user, factory: :user
+      after(:create) do |organization|
+        FactoryGirl.create(:membership, user: organization.auto_user, organization: organization)
+      end
     end
   end
 

@@ -41,11 +41,25 @@ describe StolenRecordUpdator do
   end
 
   describe 'create_date_from_string' do
-    it 'correctly translates a date string to a date_time' do
-      date_time = DateTime.strptime('07-09-2000 06', '%m-%d-%Y %H')
-      bike = Bike.new
-      u = StolenRecordUpdator.new(bike: bike)
-      expect(u.create_date_from_string('07-09-2000')).to eq(date_time)
+    let(:updator) { StolenRecordUpdator.new(bike: Bike.new) }
+    context 'date_time' do
+      it 'correctly translates a date string to a date_time' do
+        date_time = DateTime.strptime('07-09-2000 06', '%m-%d-%Y %H')
+        expect(updator.create_date_from_string('07-09-2000')).to eq(date_time)
+      end
+    end
+    context 'timestamp' do
+      it 'correctly translates a date string to a date_time' do
+        date_time = Time.zone.now
+        expect(updator.create_date_from_string(date_time.to_i.to_s)).to be_within(1.second).of(date_time)
+      end
+    end
+    context 'revised date time version' do
+      it 'correctly translates a date string to a date_time' do
+        date_string = 'Sun Feb 7 2016'
+        date_time = DateTime.strptime("#{date_string} 06", '%a %b %d %Y %H')
+        expect(updator.create_date_from_string(date_string)).to eq(date_time)
+      end
     end
   end
 
@@ -104,8 +118,9 @@ describe StolenRecordUpdator do
       organization = FactoryGirl.create(:organization)
       bike = FactoryGirl.create(:bike, creation_organization_id: organization.id)
       stolen_record = FactoryGirl.create(:stolen_record, bike: bike)
-      updated = StolenRecordUpdator.new(bike: bike).set_creation_organization
-      expect(stolen_record.reload.creation_organization).to eq(organization)
+      StolenRecordUpdator.new(bike: bike).set_creation_organization
+      stolen_record.reload
+      expect(stolen_record.creation_organization).to eq(organization)
     end
   end
 
@@ -117,14 +132,15 @@ describe StolenRecordUpdator do
     end
 
     it 'sets the data that is submitted' do
-      sr = { phone: '2123123',
-             date_stolen: Time.now.beginning_of_day.strftime('%m-%d-%Y'),
-             police_report_number: 'XXX',
-             police_report_department: 'highway 69',
-             theft_description: 'blah blah blah',
-             street: 'some address',
-             city: 'Big town',
-             zipcode: '60666'
+      sr = {
+        phone: '2123123',
+        date_stolen: Time.now.beginning_of_day.strftime('%m-%d-%Y'),
+        police_report_number: 'XXX',
+        police_report_department: 'highway 69',
+        theft_description: 'blah blah blah',
+        street: 'some address',
+        city: 'Big town',
+        zipcode: '60666'
       }
       b_param = BParam.new
       allow(b_param).to receive(:params).and_return({ stolen_record: sr }.as_json)
@@ -143,8 +159,9 @@ describe StolenRecordUpdator do
     it "creates the associations that it's suppose to" do
       country = FactoryGirl.create(:country)
       state = FactoryGirl.create(:state, country: country)
-      sr = { state: state.abbreviation,
-             country: country.iso
+      sr = {
+        state: state.abbreviation,
+        country: country.iso
       }
       b_param = BParam.new
       allow(b_param).to receive(:params).and_return({ stolen_record: sr }.as_json)

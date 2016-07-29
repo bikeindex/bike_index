@@ -32,11 +32,14 @@ class StolenRecordUpdator
 
   def create_date_from_string(date_string)
     return Time.at(date_string) if date_string.kind_of?(Integer)
-    DateTime.strptime("#{date_string} 06", '%m-%d-%Y %H')
-  end
-
-  def create_date_from_input(date_formatted)
-    DateTime.strptime("#{date_formatted} 06", StolenRecord.revised_date_format_hour)
+    case date_string.strip
+    when /^\d*\z/ # it's only numbers, so it's a timestamp
+      Time.at(date_string.to_i)
+    when /^\d\d?.\d\d?.\d+\z/ # it's MM-DD-YYYY
+      DateTime.strptime("#{date_string} 06", '%m-%d-%Y %H')
+    else # it had better be the revised date format!
+      DateTime.strptime("#{date_string} 06", StolenRecord.revised_date_format_hour)
+    end
   end
 
   def update_records
@@ -71,7 +74,7 @@ class StolenRecordUpdator
     return stolen_record unless sr.present?
     stolen_record.attributes = permitted_attributes(sr)
     stolen_record.date_stolen = create_date_from_string(sr['date_stolen']) if sr['date_stolen']
-    stolen_record.date_stolen = create_date_from_input(sr['date_stolen_input']) if sr['date_stolen_input']
+    stolen_record.date_stolen = create_date_from_string(sr['date_stolen_input']) if sr['date_stolen_input']
     if sr['country'].present?
       country = Country.fuzzy_iso_find(sr['country'])
       stolen_record.country_id = country.id if country.present?

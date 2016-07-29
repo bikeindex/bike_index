@@ -26,7 +26,7 @@ class BikeCreatorOrganizer
 
   def find_organization(organization_id)
     begin 
-      organization = Organization.find(organization_id)
+      organization = Organization.friendly_find(organization_id)
     rescue ActiveRecord::RecordNotFound
       @bike.errors.add(:creation_organization, "Uh oh, we couldn't find that organization. Try again?")
       return nil

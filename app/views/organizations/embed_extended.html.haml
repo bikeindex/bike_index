@@ -17,10 +17,7 @@
     .has-no-serial.optional-block
       %label
         = f.check_box :has_no_serial, tabindex: -1 
-        - if @bike.stolen?
-          Unknown
-        - else
-          Has no serial
+        Has no serial
 
   .input-group.with-additional-block
     .control-group.select-jsonified
