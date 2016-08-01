@@ -36,6 +36,7 @@ describe ListingOrderWorker do
     it 'does not update the listing order or enqueue afterbikesave' do
       bike = FactoryGirl.create(:bike)
       bike.update_attribute :listing_order, bike.get_listing_order
+      expect_any_instance_of(Bike).to receive(:save)
       ListingOrderWorker.new.perform(bike.id)
       expect(AfterBikeSaveWorker).to_not have_enqueued_job(bike.id)
     end
