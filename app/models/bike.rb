@@ -304,8 +304,8 @@ class Bike < ActiveRecord::Base
   end
 
   def cache_photo
-    if self.public_images.any?
-      self.thumb_path = self.public_images.first.image_url(:small)
+    if public_images.any?
+      self.thumb_path = public_images.first.image_url(:small)
     end
   end
 

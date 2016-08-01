@@ -12,6 +12,7 @@ describe PublicImagesController do
           post :create, bike_id: bike.id, public_image: { name: 'cool name' }, format: :js
           bike.reload
           expect(bike.public_images.first.name).to eq 'cool name'
+          expect(ListingOrderWorker).to have_enqueued_job(bike.id)
         end
       end
       context 'no user' do
@@ -158,6 +159,7 @@ describe PublicImagesController do
           put :update, id: public_image.id, public_image: { name: 'Food' }
           expect(response).to redirect_to(edit_bike_url(bike))
           expect(public_image.reload.name).to eq('Food')
+          # ensure enqueueing after this
         end
       end
       context 'not owner' do
@@ -187,6 +189,7 @@ describe PublicImagesController do
           post :is_private, id: public_image.id, is_private: 'true'
           public_image.reload
           expect(public_image.is_private).to be_truthy
+          expect(ListingOrderWorker).to have_enqueued_job(bike.id)
         end
       end
       context 'is_private false' do
@@ -198,6 +201,7 @@ describe PublicImagesController do
           post :is_private, id: public_image.id, is_private: false
           public_image.reload
           expect(public_image.is_private).to be_falsey
+          expect(ListingOrderWorker).to have_enqueued_job(bike.id)
         end
       end
     end
@@ -240,6 +244,7 @@ describe PublicImagesController do
       expect(public_image_2.listing_order).to eq 4
       expect(public_image_1.listing_order).to eq 2
       expect(public_image_other.listing_order).to eq 0
+      expect(ListingOrderWorker).to have_enqueued_job(bike.id)
     end
   end
 end
