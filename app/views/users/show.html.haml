@@ -39,7 +39,10 @@
                     = bike.thumb_image
                     - if bike.stolen
                       %span.personal-page-stolen-tag
-                        stolen!
+                        - if bike.recovered
+                          Recovered
+                        - else
+                          Stolen!
                   .card-title
                     %h4
                       = link_to bike.title_string, bike.list_link_url(bike)

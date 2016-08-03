@@ -27,7 +27,7 @@ class BikeIndex.BikesEditStolen extends BikeIndex
   recoveredRequestCallback: (message, success) ->
     if success
       msg = "Thanks for telling us! We're so glad you got your bike back!"
-      $('#bike_stolen').prop('checked', '')
+      $('#bike_stolen').prop('checked', '0')
       window.BikeIndexAlerts.add('success', msg, window.pageScript.submitBikeEditForm)
     else
       msg = "Oh no! Something went wrong and we couldn't mark your bike recovered."

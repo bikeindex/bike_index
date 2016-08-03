@@ -131,17 +131,13 @@ describe Api::V1::UsersController do
       expect(stolen_record.tsved_at).to be_nil
     end
 
-    it 'creates a new recovery request mail' do
-      Sidekiq::Testing.inline! do
-        # We don't test that this is being added to Sidekiq
-        # Because we're testing that sidekiq does what it
-        # Needs to do here.
-        o = FactoryGirl.create(:ownership)
-        user = o.creator
-        bike = o.bike
-        stolen_record = FactoryGirl.create(:stolen_record, bike: bike)
-        bike.update_attribute :stolen, true
-        recovery_request = {
+    describe 'recovery' do
+      let(:ownership) { FactoryGirl.create(:ownership) }
+      let(:user) { ownership.creator }
+      let(:bike) { ownership.bike }
+      let(:stolen_record) { FactoryGirl.create(:stolen_record, bike: bike) }
+      let(:recovery_request) do
+        {
           request_type: 'bike_recovery',
           user_id: user.id,
           request_bike_id: bike.id,
@@ -150,17 +146,24 @@ describe Api::V1::UsersController do
           can_share_recovery: 'true',
           mark_recovered_stolen_record_id: stolen_record.id
         }
-        set_current_user(user)
-        # bike.reload.update_attributes(stolen: false, current_stolen_record_id: nil)
+      end
+
+      before do
+        expect([stolen_record, bike].size).to eq 2
+        bike.update_attribute :stolen, true
         bike.reload
         expect(bike.find_current_stolen_record.id).to eq stolen_record.id
+        set_current_user(user)
+      end
+
+      it 'recovers the bike' do
         post :send_request, recovery_request.as_json
         expect(response.code).to eq('200')
-        expect(flash[:error]).not_to be_present
         bike.reload
+        stolen_record.reload
         expect(bike.stolen).to be_falsey
         # ALSO MAKE SURE IT RECOVERY NOTIFIES
-        expect(stolen_record.reload.current).to be_falsey
+        expect(stolen_record.current).to be_falsey
         expect(stolen_record.bike).to eq(bike)
         expect(stolen_record.date_recovered).to be_present
         expect(stolen_record.recovery_posted).to be_falsey

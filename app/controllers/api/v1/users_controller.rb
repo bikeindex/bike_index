@@ -50,15 +50,14 @@ module Api
                 unless stolen_record_id.present?
                   stolen_record_id = bike.current_stolen_record_id
                 end
-                RecoveryUpdateWorker.perform_async(stolen_record_id, params)
                 if params[:index_helped_recovery].present?
                   feedback.feedback_hash[:index_helped_recovery] = params[:index_helped_recovery]
                 end
                 if params[:can_share_recovery].present?
                   feedback.feedback_hash[:can_share_recovery] = params[:can_share_recovery]
-                else
-                  RecoveryNotifyWorker.perform_in(1.minutes, bike.current_stolen_record.id)
                 end
+                # We don't want to delay processing on this, it creates problems
+                RecoveryUpdateWorker.new.perform(stolen_record_id, params)
               end
             end
             feedback.save

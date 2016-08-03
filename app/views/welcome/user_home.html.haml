@@ -34,7 +34,10 @@
                     %h5.title-link
                       - if bike.stolen
                         %strong.stolen-color
-                          STOLEN
+                          - if bike.recovered
+                            RECOVERED
+                          - else
+                            STOLEN
                       %strong
                         - unless bike.type == 'bike'
                           = bike.type
@@ -44,7 +47,7 @@
                       = bike.attr_list_item(bike.serial_display, 'Serial')
                       = bike.attr_list_item(bike.frame_colors.to_sentence, 'Primary colors')
                       - if bike.current_stolen_record.present?
-                        = bike.attr_list_item((l bike.current_stolen_record.date_stolen, format: :dotted), 'Date stolen')
+                        = bike.attr_list_item((l bike.current_stolen_record.date_stolen, format: :dotted), "Date #{bike.recovered ? 'recovered' : 'stolen'}")
                         = bike.attr_list_item(bike.short_address(bike.current_stolen_record), 'Location')
                     %ul.attr-list
                       %li
