@@ -19,7 +19,8 @@ gem 'rollout' # Feature flags
 gem 'soulheart', '~> 0.2.6' # typeahead/autocomplete features
 
 gem 'rack-contrib'
-gem 'puma' # Use Puma as the app server
+gem 'unicorn' # Use Puma as the app server
+gem 'unicorn-worker-killer'
 gem 'geocoder'
 gem 'money-rails'
 gem 'i18n'
