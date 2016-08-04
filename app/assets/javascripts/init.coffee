@@ -21,6 +21,8 @@ class BikeIndex.Init extends BikeIndex
     @loadPageScript(document.getElementsByTagName('body')[0].id)
     # Initialize the js for the organized menu pages
     new BikeIndex.Organized if $('.organized-body').length > 0
+    # Init the email check handler
+    new BikeIndex.UserEmail if document.getElementById('user_email')
 
   loadPageScript: (body_id) ->
     # All the per-page javascripts
