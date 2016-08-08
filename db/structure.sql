@@ -144,7 +144,7 @@ CREATE TABLE bikes (
     cached_data text,
     description text,
     owner_email text,
-    thumb_path character varying(255),
+    thumb_path text,
     video_embed text,
     year integer,
     has_no_serial boolean DEFAULT false NOT NULL,
@@ -3094,4 +3094,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160631175602');
 INSERT INTO schema_migrations (version) VALUES ('20160711183247');
 
 INSERT INTO schema_migrations (version) VALUES ('20160714182030');
+
+INSERT INTO schema_migrations (version) VALUES ('20160808133129');
 
