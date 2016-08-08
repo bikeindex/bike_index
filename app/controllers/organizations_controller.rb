@@ -40,7 +40,7 @@ class OrganizationsController < ApplicationController
     @stolen_record = built_stolen_record
     if params[:non_stolen]
       @non_stolen = true
-    elsif @bike.stolen || params[:stolen] || params[:stolen_first]
+    elsif @bike.stolen || params[:stolen_first]
       @stolen = true
     end
     if params[:sf_safe].present?
@@ -88,20 +88,30 @@ class OrganizationsController < ApplicationController
     if params[:b_param_id_token].present?
       @b_param = BParam.from_id_token(params[:b_param_id_token])
     else
-      @b_param = BParam.create(creator_id: @organization.auto_user.id, params: {creation_organization_id: @organization.id, embeded: true})
+      hash = {
+        creation_organization_id: @organization.id,
+        embeded: true,
+        bike: { stolen: params[:stolen] }
+      }
+      @b_param = BParam.create(creator_id: @organization.auto_user.id, params: hash)
     end
   end
 
   def built_stolen_record
     if @b_param.params && @b_param.params['stolen_record'].present?
       stolen_attrs = @b_param.params['stolen_record'].except('phone_no_show', 'date_stolen_input')
-      date_stolen = @b_param.params['stolen_record']['date_stolen_input']
-      date_stolen = date_stolen.present? ? DateTime.strptime("#{date_stolen} 06", '%m-%d-%Y %H') : Time.zone.now
+      date_stolen = built_stolen_record_date(@b_param.params['stolen_record']['date_stolen_input'])
       stolen_attrs.merge!(date_stolen: date_stolen)
     else
       stolen_attrs = { country_id: Country.united_states.id, date_stolen: Date.today }
     end
     @bike.stolen_records.build(stolen_attrs)
+  end
+
+  def built_stolen_record_date(str)
+    DateTime.strptime("#{str} 06", '%m-%d-%Y %H') if str.present?
+    rescue ArgumentError
+    Time.zone.now
   end
 
   def find_organization

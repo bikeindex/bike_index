@@ -78,45 +78,75 @@ describe OrganizationsController do
     end
   end
 
-  describe 'embed' do
-    it 'renders embed without xframe block' do
-      organization = FactoryGirl.create(:organization)
-      user = FactoryGirl.create(:user)
-      membership = FactoryGirl.create(:membership, user: user, organization: organization)
-      organization.save
+  describe 'legacy embeds' do
+    let(:organization) { FactoryGirl.create(:organization_with_auto_user) }
+    before do
       FactoryGirl.create(:cycle_type, slug: 'bike')
       FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
-      get :embed, id: organization.slug
-      expect(response.code).to eq('200')
-      expect(response).to render_template(:embed)
-      expect(response.headers['X-Frame-Options']).not_to be_present
     end
-  end
-
-  describe 'embed_extended' do
-    it 'renders embed without xframe block' do
-      organization = FactoryGirl.create(:organization)
-      user = FactoryGirl.create(:user)
-      membership = FactoryGirl.create(:membership, user: user, organization: organization)
-      organization.save
-      FactoryGirl.create(:cycle_type, slug: 'bike')
-      FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
-      get :embed_extended, id: organization.slug, email: 'something@example.com'
-      expect(response.code).to eq('200')
-      expect(response).to render_template(:embed_extended)
-      expect(response.headers['X-Frame-Options']).not_to be_present
-      expect(assigns(:persist_email)).to be_truthy
+    context 'non-stolen' do
+      it 'renders embed without xframe block' do
+        get :embed, id: organization.slug
+        expect(response.code).to eq('200')
+        expect(response).to render_template(:embed)
+        expect(response.headers['X-Frame-Options']).not_to be_present
+        expect(assigns(:stolen)).to be_falsey
+        bike = assigns(:bike)
+        expect(bike.stolen).to be_falsey
+        expect(assigns(:stolen_record).date_stolen.to_date).to eq Date.today
+      end
     end
-  end
-
-  describe 'embed' do
-    it 'renders embed without xframe block' do
-      organization = FactoryGirl.create(:organization)
-      bike = FactoryGirl.create(:bike)
-      get :embed_create_success, id: organization.slug, bike_id: bike.id
-      expect(response.code).to eq('200')
-      expect(response).to render_template(:embed_create_success)
-      expect(response.headers['X-Frame-Options']).not_to be_present
+    context 'stolen' do
+      it 'renders embed without xframe block' do
+        get :embed, id: organization.slug, stolen: 1
+        expect(response.code).to eq('200')
+        expect(response).to render_template(:embed)
+        expect(response.headers['X-Frame-Options']).not_to be_present
+        expect(assigns(:stolen)).to be_truthy
+        bike = assigns(:bike)
+        expect(bike.stolen).to be_truthy
+        expect(assigns(:stolen_record).date_stolen.to_date).to eq Date.today
+      end
+    end
+    context 'embed_extended' do
+      it 'renders embed without xframe block, not stolen' do
+        get :embed_extended, id: organization.slug, email: 'something@example.com'
+        expect(response.code).to eq('200')
+        expect(response).to render_template(:embed_extended)
+        expect(response.headers['X-Frame-Options']).not_to be_present
+        expect(assigns(:persist_email)).to be_truthy
+        bike = assigns(:bike)
+        expect(bike.stolen).to be_falsey
+      end
+    end
+    context 'crazy b_param data' do
+      let(:b_param_attrs) do
+        {
+          bike: {
+            stolen: 'true',
+            owner_email: 'someemail@stuff.com',
+            creation_organization_id: organization.id.to_s
+          },
+          stolen_record: {
+            phone_no_show: 'true',
+            phone: '7183839292',
+            date_stolen_input: 'not stolen yet'
+          }
+        }
+      end
+      let(:b_param) { FactoryGirl.create(:b_param, params: b_param_attrs) }
+      it 'renders' do
+        expect(b_param).to be_present
+        get :embed, id: organization.slug, b_param_id_token: b_param.id_token
+        expect(response.code).to eq('200')
+        expect(response).to render_template(:embed)
+        expect(response.headers['X-Frame-Options']).not_to be_present
+        expect(assigns(:stolen)).to be_truthy
+        bike = assigns(:bike)
+        expect(bike.stolen).to be_truthy
+        expect(bike.owner_email).to eq(b_param_attrs[:bike][:owner_email])
+        expect(bike.stolen_records.first.date_stolen.to_date).to eq Date.today
+      end
     end
   end
 
