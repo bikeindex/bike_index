@@ -6,7 +6,7 @@ class Admin::ManufacturersController < Admin::BaseController
   end
 
   def show
-    manufacturer = Manufacturer.find_by_slug(params[:id])
+    manufacturer = Manufacturer.friendly_find(params[:id])
     raise ActionController::RoutingError.new('Not Found') unless manufacturer.present?
     @manufacturer = manufacturer.decorate
   end
@@ -65,7 +65,7 @@ class Admin::ManufacturersController < Admin::BaseController
   end
 
   def find_manufacturer
-    @manufacturer = Manufacturer.find_by_slug(params[:id])
+    @manufacturer = Manufacturer.friendly_find(params[:id])
     raise ActionController::RoutingError.new('Not Found') unless @manufacturer.present?
   end
 end

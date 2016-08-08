@@ -57,7 +57,7 @@ module API
 
         def creation_user_id
           if current_user.id == ENV['V2_ACCESSOR_ID'].to_i
-            org = params[:organization_slug].present? && Organization.find_by_slug(params[:organization_slug])
+            org = params[:organization_slug].present? && Organization.friendly_find(params[:organization_slug])
             if org && current_token.application.owner && current_token.application.owner.is_admin_of?(org)
               return org.auto_user_id
             end

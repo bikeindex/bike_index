@@ -41,11 +41,7 @@ class Component < ActiveRecord::Base
   end
 
   def cgroup_id
-    if ctype.present?
-      self.ctype.cgroup_id
-    else
-      Cgroup.find_by_slug('additional-parts').id
-    end
+    ctype.present? ? self.ctype.cgroup_id : Cgroup.additional_parts.id
   end
 
   def component_group

@@ -105,11 +105,7 @@ class OrganizationsController < ApplicationController
   end
 
   def find_organization
-    if params[:id].match(/\A\d*\z/).present?
-      @organization = Organization.find(params[:id])
-    else
-      @organization = Organization.find_by_slug(params[:id])
-    end
+    @organization = Organization.friendly_find(params[:id])
     return @organization if @organization.present?
     flash[:error] = "We're sorry, that organization isn't on Bike Index yet. Email contact@bikeindex.org if this seems like an error."
     redirect_to root_url and return

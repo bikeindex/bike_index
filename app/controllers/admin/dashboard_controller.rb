@@ -14,23 +14,23 @@ class Admin::DashboardController < Admin::BaseController
 
   def maintenance
     # @bikes here because this is the only one we're using the standard admin bikes table
-    @bikes = Bike.unscoped.order("created_at desc").where(example: true).limit(10)
-    mnfg_other = Manufacturer.friendly_find("Other")
-    @component_mnfgs = Component.where(manufacturer_id: mnfg_other.id)
-    @bike_mnfgs = Bike.where(manufacturer_id: mnfg_other.id)
-    @component_types = Component.where(ctype_id: Ctype.find_by_name("other").id )
-    @handlebar_types = Bike.where(handlebar_type_id: HandlebarType.find_by_slug("other").id )
-    @paint = Paint.where("color_id IS NULL")
+    @bikes = Bike.unscoped.order('created_at desc').where(example: true).limit(10)
+    mnfg_other_id = Manufacturer.other_manufacturer.id
+    @component_mnfgs = Component.where(manufacturer_id: mnfg_other_id)
+    @bike_mnfgs = Bike.where(manufacturer_id: mnfg_other_id)
+    @component_types = Component.where(ctype_id: Ctype.other.id)
+    @handlebar_types = Bike.where(handlebar_type_id: HandlebarType.other.id)
+    @paint = Paint.where('color_id IS NULL')
   end
 
   def bust_z_cache
     Rails.cache.clear
-    flash[:success] = "Z cash WAAAAAS busted!"
+    flash[:success] = 'Z cash WAAAAAS busted!'
     redirect_to admin_root_url
   end
 
   def destroy_example_bikes
-    org = Organization.find_by_slug('bikeindex')
+    org = Organization.friendly_find('bikeindex')
     bikes = Bike.unscoped.where(example: true)
     # The example bikes for the API docs on production are created by Bike Index Administrators
     # This way we don't clear them when we clear the rest of the example bikes

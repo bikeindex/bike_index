@@ -79,7 +79,7 @@ module Api
       end
    
       def authenticate_organization
-        organization = Organization.find_by_slug(params[:organization_slug])
+        organization = Organization.friendly_find(params[:organization_slug])
         if organization.present? && organization.access_token == params[:access_token]
           @organization = organization
         else

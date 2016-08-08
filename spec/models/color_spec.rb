@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe Color do
+  it_behaves_like 'friendly_name_findable'
   describe 'validations' do
     it { is_expected.to validate_presence_of :name }
     it { is_expected.to validate_presence_of :priority }

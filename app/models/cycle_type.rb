@@ -1,5 +1,6 @@
 class CycleType < ActiveRecord::Base
   # Defines things like unicycles and recumbent
+  include FriendlySlugFindable
   def self.old_attr_accessible
     %w(name slug).map(&:to_sym).freeze
   end

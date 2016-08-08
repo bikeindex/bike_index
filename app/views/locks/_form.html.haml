@@ -11,11 +11,11 @@
             = msg
 
             
-- ulock_type = LockType.find_by_slug('u-lock')
-- chain_type = LockType.find_by_slug('chain-with-lock')
-- cable_type = LockType.find_by_slug('cable')
-- skewer_type = LockType.find_by_slug('locking-skewer')
-- other_type = LockType.find_by_slug('other-style')
+- ulock_type = LockType.friendly_find('u-lock')
+- chain_type = LockType.friendly_find('chain-with-lock')
+- cable_type = LockType.friendly_find('cable')
+- skewer_type = LockType.friendly_find('locking-skewer')
+- other_type = LockType.friendly_find('other-style')
 
 .lock-types-select
   .lock-type-title

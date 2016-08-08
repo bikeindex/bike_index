@@ -58,7 +58,7 @@ class BParam < ActiveRecord::Base
       h = { 'bike' => hash.with_indifferent_access }
       h['bike']['serial_number'] = h['bike'].delete 'serial'
       h['bike']['send_email'] = !(h['bike'].delete 'no_notify')
-      org = Organization.find_by_slug(h['bike'].delete 'organization_slug')
+      org = Organization.friendly_find(h['bike'].delete 'organization_slug')
       h['bike']['creation_organization_id'] = org.id if org.present?
       # Move un-nested params outside of bike
       %w(test id components).each { |k| h[k] = h['bike'].delete k }
@@ -147,22 +147,22 @@ class BParam < ActiveRecord::Base
 
   def set_cycle_type_key
     if bike['cycle_type_name'].present?
-      ct = CycleType.where('lower(name) = ?', bike['cycle_type_name'].downcase.strip).first
+      ct = CycleType.friendly_find(bike['cycle_type_name'])
     else
-      ct = CycleType.where('slug = ?', bike['cycle_type_slug'].downcase.strip).first
+      ct = CycleType.friendly_find(bike['cycle_type_slug'])
     end
     params['bike']['cycle_type_id'] = ct.id if ct.present?
     params['bike'].delete('cycle_type_slug') || params['bike'].delete('cycle_type_name')
   end
 
   def set_frame_material_key
-    fm = FrameMaterial.where("slug = ?", bike['frame_material_slug'].downcase.strip).first
+    fm = FrameMaterial.friendly_find(bike['frame_material_slug'].downcase.strip)
     params['bike']['frame_material_id'] = fm.id if fm.present?
     params['bike'].delete('frame_material_slug')
   end
 
   def set_handlebar_type_key
-    ht = HandlebarType.where("slug = ?", bike['handlebar_type_slug'].downcase.strip).first
+    ht = HandlebarType.friendly_find(bike['handlebar_type_slug'])
     params['bike']['handlebar_type_id'] = ht.id if ht.present?
     params['bike'].delete('handlebar_type_slug')
   end

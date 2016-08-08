@@ -26,11 +26,11 @@ class ComponentCreator
   def set_component_type(component)
     name = component[:component_type]
     return component unless name.present?
-    ctype = Ctype.find_by_slug(Slugifyer.slugify(name.strip))
+    ctype = Ctype.friendly_find(name)
     if ctype.present?
       component[:ctype_id] = ctype.id
     else
-      component[:ctype_id] = Ctype.find_by_slug('unknown').id
+      component[:ctype_id] = Ctype.unknown.id
       component[:ctype_other] = name 
     end
     component.delete :component_type

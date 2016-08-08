@@ -68,8 +68,4 @@ module AuthenticationHelper
       redirect_to user_root_url
     end
   end
-
-  # def current_organization
-  #   @organization ||= Organization.find_by_slug(request.subdomain)
-  # end
 end

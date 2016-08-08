@@ -36,28 +36,28 @@ describe Admin::DashboardController do
   end
 
   describe 'invitations' do
-    before do
+    it 'renders' do
       user = FactoryGirl.create(:admin)
       set_current_user(user)
-      b_param = BParam.create(creator_id: user.id)
+      BParam.create(creator_id: user.id)
       get :invitations
+      expect(response.code).to eq '200'
+      expect(response).to render_template(:invitations)
     end
-    it { is_expected.to respond_with(:success) }
-    it { is_expected.to render_template(:invitations) }
   end
 
   describe 'maintenance' do
-    before do
+    it 'renders' do
       FactoryGirl.create(:manufacturer, name: 'other')
       FactoryGirl.create(:ctype, name: 'other')
       FactoryGirl.create(:handlebar_type, slug: 'other')
       user = FactoryGirl.create(:admin)
       set_current_user(user)
-      b_param = BParam.create(creator_id: user.id)
+      BParam.create(creator_id: user.id)
       get :maintenance
+      expect(response.code).to eq '200'
+      expect(response).to render_template(:maintenance)
     end
-    it { is_expected.to respond_with(:success) }
-    it { is_expected.to render_template(:maintenance) }
   end
 
   describe 'tsvs' do
@@ -66,7 +66,7 @@ describe Admin::DashboardController do
       set_current_user(user)
       t = Time.now
       FileCacheMaintainer.reset_file_info('current_stolen_bikes.tsv', t)
-      tsvs = [{ filename: 'current_stolen_bikes.tsv', updated_at: t.to_i.to_s, description: 'Approved Stolen bikes' }]
+      # tsvs = [{ filename: 'current_stolen_bikes.tsv', updated_at: t.to_i.to_s, description: 'Approved Stolen bikes' }]
       blacklist = %w(1010101 2 4 6)
       FileCacheMaintainer.reset_blacklist_ids(blacklist)
       get :tsvs
