@@ -1,0 +1,89 @@
+.form-wrap
+  .form-well-form-header
+    %h3
+      Sharing and Personal page settings
+  
+  .related-fields
+    .form-group.row.sharing-collapser{ data: { target: '#twitter-field' } }
+      %label.form-well-label
+        Show Twitter
+      .form-well-input
+        %label.radio-inline
+          = f.radio_button :show_twitter, 'true'
+          Show Twitter
+        %label.radio-inline
+          = f.radio_button :show_twitter, 'false'
+          No Twitter
+    #twitter-field.form-group.row.collapse
+      = f.label :twitter, 'Twitter handle', class: 'form-well-label'
+      .form-well-input
+        = f.text_field :twitter, placeholder: 'Twitter handle', class: 'form-control'
+
+    .form-group.row.sharing-collapser{ data: { target: '#personal-field' } }
+      %label.form-well-label
+        Show Personal Site
+      .form-well-input
+        %label.radio-inline
+          = f.radio_button :show_website, 'true'
+          Show personal website
+        %label.radio-inline
+          = f.radio_button :show_website, 'false'
+          No personal site
+    #personal-field.form-group.row.collapse
+      = f.label :website, 'Personal Site URL', class: 'form-well-label'
+      .form-well-input
+        = f.text_field :website, placeholder: 'example.com', class: 'form-control'
+
+  .related-fields
+    .form-group.row
+      = f.label :my_bikes_link_target, 'Additional Link', class: 'form-well-label'
+      .form-well-input
+        = f.text_field :my_bikes_link_target, value: @user.mb_link_target, placeholder: "http://example.com", class: 'form-control'
+    .form-group.row
+      = f.label :my_bikes_link_target, 'Title for link', class: 'form-well-label'
+      .form-well-input
+        = f.text_field :my_bikes_link_title, value: @user.mb_link_title, placeholder: 'My awesome link', class: 'form-control'
+
+  .form-group.row.unnested-field
+    = f.label :username, class: 'form-well-label'
+    .form-well-input
+      = f.text_field :username, class: 'form-control'
+      .below-input-help
+        Your username is the URL for your sharing page and the bike embed form. Update it if you care about those things.
+  %hr
+  .col-xs-12
+    %p
+      The Bike Index can create a page listing all your bikes that includes all the information you want to share. It's your personal page.
+      = link_to '(preview page)', user_url(@user), target: '_blank'
+    .form-group.unnested-field.no-divider-row.row.sharing-collapser{ data: { target: '#personal-page' } }
+      %label.form-well-label
+        Create public page
+      .form-well-input
+        %label.radio-inline
+          = f.radio_button :show_bikes, 'true'
+          Create page
+        %label.radio-inline
+          = f.radio_button :show_bikes, 'false'
+          No, please don't create me a page
+    .related-fields#personal-page.collapse
+      .form-group.row.avatar-upload-wrapper
+        %label.form-well-label
+          Profile avatar
+        .form-well-input
+          - if @user.avatar? 
+            = image_tag(@user.avatar_url(:thumb))
+          %img.replaced-img
+          %label.file
+            = f.file_field :avatar, class: 'avatar-upload-field'
+            %span.file-custom
+              %span.file-upload-text Choose file...
+            = f.hidden_field :avatar_cache
+
+      .form-group.row
+        = f.label :title, 'Page title', class:  'form-well-label'
+        .form-well-input
+          = f.text_field :title, placeholder: "This user's bikes", class: 'form-control'
+      .form-group.row
+        = f.label :description, 'Page text', class:  'form-well-label'
+        .form-well-input-large
+          = f.text_area :description, rows: 6, class: 'form-control'

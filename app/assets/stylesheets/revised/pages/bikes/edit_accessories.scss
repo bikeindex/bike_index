@@ -1,28 +1,11 @@
 .edit-bike-page-accessories {
-  .add-additional-components-block {
-    // max-width: 300px;
-    margin: 0 auto;
-    display: block;
-    padding-top: 2*$vertical-height;
-    a {
-      display: block;
-      text-align: center;
-      cursor: pointer;
-      color: $body-font-color;
-      &:hover, &:active, &.active {
-        color: $link-color;
-        text-decoration: none;
-      }
-    }
-  }
   // Separate the components
   .additional-component { border-top: 1px $form-well-divider-color solid; }
   // Separator for components that are added to the page with js
-  .add-additional-components-block .additional-component {
+  .add-additional-fields-block .additional-component {
     border-top: none;
     border-bottom: 1px $form-well-divider-color solid;
   }
-  .add_fields { margin-top: $vertical-height; }
   .remove-part {
     float: right;
     label {

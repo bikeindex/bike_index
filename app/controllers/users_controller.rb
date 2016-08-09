@@ -88,7 +88,6 @@ class UsersController < ApplicationController
     @user = current_user
     @page_errors = @user.errors
     @edit_template = edit_templates[params[:page]].present? ? params[:page] : edit_templates.keys.first
-    render "edit_#{@edit_template}".to_sym
   end
 
   def update
