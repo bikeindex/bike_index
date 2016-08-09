@@ -87,11 +87,7 @@ class Manufacturer < ActiveRecord::Base
 
   def set_website_and_logo_source
     self.website = website.present? ? Urlifyer.urlify(website) : nil
-    if logo.present?
-      self.logo_source ||= 'manual'
-    else
-      self.logo_source = nil
-    end
+    self.logo_source = logo.present? ? 'manual' : nil
     true
   end
 

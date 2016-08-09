@@ -1,14 +1,13 @@
 class Admin::ManufacturersController < Admin::BaseController
-  before_filter :find_manufacturer, only: [:edit, :update, :destroy]
+  before_filter :find_manufacturer, only: [:edit, :update, :destroy, :show]
 
   def index
     @manufacturers = Manufacturer.all
   end
 
   def show
-    manufacturer = Manufacturer.friendly_find(params[:id])
-    raise ActionController::RoutingError.new('Not Found') unless manufacturer.present?
-    @manufacturer = manufacturer.decorate
+    raise ActionController::RoutingError.new('Not Found') unless @manufacturer.present?
+    @manufacturer = @manufacturer.decorate
   end
 
   def new
