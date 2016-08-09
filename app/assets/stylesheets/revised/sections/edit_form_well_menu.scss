@@ -1,6 +1,6 @@
 $active-bike-edit-border-width: 2px;
 
-.primary-edit-bike-menu {
+.primary-edit-form-well-menu {
   z-index: 1;
   ul { 
     display: none;
@@ -32,13 +32,13 @@ $active-bike-edit-border-width: 2px;
       }
     }
   }
-  .edit-bike-submit-wrapper {
+  .edit-form-well-submit-wrapper {
     .btn {
       font-size: 15px;
       width: 100%;
     }
   }
-  .bike-edit-page-select {
+  .form-well-edit-page-select {
     float: left;
     width: 50%;
     select {
@@ -67,15 +67,15 @@ $active-bike-edit-border-width: 2px;
 // Small screen styles
 @media (max-width: $grid-breakpoint-md - 1px) {
   // Menu fixed to bottom of the screen
-  .primary-edit-bike-menu {
+  .primary-edit-form-well-menu {
     z-index: $zindex-navbar-fixed + 1;
     padding: 0;
     position: fixed;
     width: 100%;
     bottom: 0; left: 0;
     box-shadow: 0 -1px 2px rgba(black, .2);
-    .bike-edit-page-select { display: block; }
-    .edit-bike-submit-wrapper {
+    .form-well-edit-page-select { display: block; }
+    .edit-form-well-submit-wrapper {
       width: 50%;
       float: left;
       .btn { border-radius: 0; border: none; }
@@ -86,22 +86,22 @@ $active-bike-edit-border-width: 2px;
 // 
 // Medium and up screen styles
 @media (min-width: $grid-breakpoint-md) {
-  .primary-edit-bike-menu {
+  .primary-edit-form-well-menu {
     float: left;
     width: 33.33333%;
     position: -webkit-sticky;
     position: sticky;
     top: 8*$vertical-height; // Same as the padding top for body in primary_header_nav
     ul { display: block; }
-    .edit-bike-submit-wrapper { padding-top: 1em; }
+    .edit-form-well-submit-wrapper { padding-top: 1em; }
   }
   // Hide with media query so as not to override selectize
-  .bike-edit-page-select { display: none; }
+  .form-well-edit-page-select { display: none; }
 }
 
 // XL screens - smaller menu, offset it
 @media (min-width: $grid-breakpoint-xl) {
-  .primary-edit-bike-menu {
+  .primary-edit-form-well-menu {
     // because we have to use floats instead of flex with sticky (affixing)
     width: 25%;
     margin-right: 8.3333%; // 1 col margin - Manually set the offset via margin

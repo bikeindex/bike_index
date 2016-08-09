@@ -4,7 +4,7 @@
 = form_for @user, multipart: true, html: { class: 'primary-edit-bike-form' } do |f|
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      %nav.primary-edit-bike-menu
+      %nav.primary-edit-form-well-menu
         %ul
           - @edit_templates.each do |template, description|
             %li
@@ -13,15 +13,15 @@
                 %h4
                   = description
 
-        / .bike-edit-page-select
-        /   %span.menu-select-overlay
-        /     You are editing
-        /   // ignore this select in dirty forms
-        /   %select.dirtyignore
-        /     - @edit_templates.each do |template, description|
-        /       %option{ selected: (@edit_template == template), value: edit_bike_path(page: template) }
-        /         = description 
-        .edit-bike-submit-wrapper
+        .form-well-edit-page-select
+          %span.menu-select-overlay
+            You are editing
+          // ignore this select in dirty forms
+          %select.dirtyignore
+            - @edit_templates.each do |template, description|
+              %option{ selected: (@edit_template == template), value: my_account_path(page: template) }
+                = description
+        .edit-form-well-submit-wrapper
           = hidden_field_tag :edit_template, @edit_template
           = submit_tag 'Save changes', class: 'btn btn-lg btn-primary'
 
