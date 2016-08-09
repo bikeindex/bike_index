@@ -87,7 +87,7 @@ class Manufacturer < ActiveRecord::Base
 
   def set_website_and_logo_source
     self.website = website.present? ? Urlifyer.urlify(website) : nil
-    self.logo_source = logo.present? ? (logo || 'manual') : nil
+    self.logo_source = logo.present? ? (logo_source || 'manual') : nil
     true
   end
 
@@ -107,7 +107,7 @@ class Manufacturer < ActiveRecord::Base
       text: name,
       category: autocomplete_hash_category,
       priority: autocomplete_hash_priority,
-      data: { 
+      data: {
         slug: slug,
         priority: autocomplete_hash_priority,
         search_id: "m_#{id}"
