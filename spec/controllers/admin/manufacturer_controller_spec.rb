@@ -6,8 +6,8 @@ describe Admin::ManufacturersController, type: :controller do
 
   let(:permitted_attributes) do
     {
-      name: 'new name',
-      slug: 'new_name',
+      name: 'new name and things',
+      slug: 'new_name_and_things',
       website: 'http://stuff.com',
       frame_maker: true,
       open_year: 1992,
@@ -53,12 +53,16 @@ describe Admin::ManufacturersController, type: :controller do
     it 'updates available attributes' do
       put :update, id: subject.to_param, manufacturer: permitted_attributes
       subject.reload
-      permitted_attributes.each { |attribute, val| expect(subject.send(attribute)).to eq val }
+      permitted_attributes.each do |attribute, val|
+        pp attribute unless subject.send(attribute) == val
+        expect(subject.send(attribute)).to eq val
+      end
     end
   end
 
   describe 'create' do
     it 'creates with available attributes' do
+      expect(Manufacturer.where(name: 'new name and things').count).to eq 0
       expect do
         post :create, manufacturer: permitted_attributes
       end.to change(Manufacturer, :count).by 1

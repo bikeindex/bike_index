@@ -82,7 +82,7 @@ class Manufacturer < ActiveRecord::Base
 
   before_save :set_slug, :set_website_and_logo_source
   def set_slug
-    self.slug = Slugifyer.manufacturer(self.name)
+    self.slug = Slugifyer.manufacturer(name)
   end
 
   def set_website_and_logo_source
