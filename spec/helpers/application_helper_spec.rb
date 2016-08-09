@@ -211,6 +211,12 @@ describe ApplicationHelper do
           end
         end
       end
+      context 'edit action' do
+        it 'returns edit_user_skeleton' do
+          allow(view).to receive(:action_name) { 'edit' }
+          expect(helper.current_page_skeleton).to eq 'edit_user_skeleton'
+        end
+      end
     end
     describe 'errors controller' do
       before { allow(view).to receive(:controller_name) { 'errors' } }

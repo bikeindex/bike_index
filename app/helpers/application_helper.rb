@@ -33,7 +33,11 @@ module ApplicationHelper
     when 'organizations'
       'content_skeleton' if %w(new lightspeed_integration).include?(action_name)
     when 'users'
-      'content_skeleton' if %w(create).include?(action_name)
+      if action_name == 'create'
+        'content_skeleton'
+      elsif action_name == 'edit'
+        'edit_user_skeleton'
+      end
     when *%w(news feedbacks manufacturers stolen errors registrations)
       'content_skeleton'
     end

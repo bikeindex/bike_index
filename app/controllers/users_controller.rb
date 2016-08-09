@@ -87,7 +87,8 @@ class UsersController < ApplicationController
   def edit
     @user = current_user
     @page_errors = @user.errors
-    render :edit
+    @edit_template = edit_templates[params[:page]].present? ? params[:page] : edit_templates.keys.first
+    render "edit_#{@edit_template}".to_sym
   end
 
   def update
@@ -96,7 +97,7 @@ class UsersController < ApplicationController
       if @user.password_reset_token != params[:user][:password_reset_token]
         @user.errors.add(:base, "Doesn't match user's password reset token")
       elsif @user.reset_token_time < (Time.now - 1.hours)
-        @user.errors.add(:base, "Password reset token expired, try resetting password again")
+        @user.errors.add(:base, 'Password reset token expired, try resetting password again')
       end
     elsif params[:user][:password].present?
       unless @user.authenticate(params[:user][:current_password])
@@ -121,13 +122,13 @@ class UsersController < ApplicationController
           if @user.memberships.any?
             flash[:success] = "Thanks! Now you can use Bike Index as #{@user.memberships.first.organization.name}"
           else
-            flash[:success] = "Thanks for accepting the terms of service!"
+            flash[:success] = 'Thanks for accepting the terms of service!'
           end
           redirect_to user_home_url and return
           # TODO: Redirect to the correct page, somehow this breaks things right now though.
           # redirect_to organization_home and return
         else
-          redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index as through the organization" and return
+          redirect_to accept_vendor_terms_url, notice: 'You have to accept the Terms of Service if you would like to use Bike Index as through the organization' and return
         end
       end
       if params[:user][:password].present?
@@ -163,5 +164,13 @@ class UsersController < ApplicationController
 
   def permitted_parameters
     params.require(:user).permit(User.old_attr_accessible)
+  end
+
+  def edit_templates
+    @edit_templates ||= {
+      root: 'User Settings',
+      password: 'Password',
+      sharing: 'Sharing and Personal Page'
+    }.as_json
   end
 end
