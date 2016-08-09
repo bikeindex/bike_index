@@ -1,4 +1,4 @@
-<% if @creation_org.present? && @creation_org.new_bike_notification.present? %>
+-<% if @creation_org.present? && @creation_org.new_bike_notification.present? %>
   <%= @creation_org.new_bike_notification.html_safe %>
 <% else %>
 
@@ -50,7 +50,7 @@
 <% end # end of the creation_org notification %>
 
 
-<% bike_image = "https://www.bikeindex.org/assets/bike_photo_placeholder.png" %>
+<% bike_image = 'https://files.bikeindex.org/bike_photo_placeholder.svg' %>
 <% bike_image = @bike.stock_photo_url if @bike.stock_photo_url.present? %>
 <% bike_image = @bike.thumb_path if @bike.thumb_path %>
 
