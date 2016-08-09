@@ -205,6 +205,7 @@ Bikeindex::Application.routes.draw do
   resources :organization_deals, only: [:create, :new]
   resource :integrations, only: [:create]
   get '/auth/:provider/callback', to: 'integrations#create'
+  get '/auth/failure', to: 'integrations#integrations_controller_creation_error'
 
   %w(support_the_index support_the_bike_index protect_your_bike privacy terms
      serials about where vendor_terms resources image_resources

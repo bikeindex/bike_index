@@ -15,8 +15,12 @@ class IntegrationsController < ApplicationController
   end
 
   def integrations_controller_creation_error
-    provider_name = request.env['omniauth.auth']['provider']
-    flash[:error] = "There was a problem authenticating you with #{provider_name}. Please try To sign in a different way."
-    redirect_to new_session_url and return
+    provider_name = request.env['omniauth.auth'] && request.env['omniauth.auth']['provider']
+    provider_name ||= params[:strategy]
+    msg = "There was a problem authenticating you with #{provider_name}"
+    msg += " (#{params[:message]})" if params[:message].present?
+    msg += ". Please sign in a different way or email us at contact@bikeindex.org"
+    flash[:error] = msg
+    redirect_to new_session_path and return
   end
 end
