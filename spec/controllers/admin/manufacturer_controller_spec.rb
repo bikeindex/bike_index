@@ -66,7 +66,7 @@ describe Admin::ManufacturersController, type: :controller do
       expect do
         post :create, manufacturer: permitted_attributes
       end.to change(Manufacturer, :count).by 1
-      target = Manufacturer.last
+      target = Manufacturer.where(name: 'new name and things').first
       permitted_attributes.each { |attribute, val| expect(target.send(attribute)).to eq val }
     end
   end
