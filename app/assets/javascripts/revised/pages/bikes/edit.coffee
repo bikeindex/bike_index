@@ -6,7 +6,7 @@ class BikeIndex.BikesEdit extends BikeIndex
     # Initialize dirty forms. Add class 'dirtyignore' to fields to ignore them
     $('form.primary-edit-bike-form').dirtyForms()
     # Affix the edit menu to the page
-    $('.primary-edit-bike-menu').Stickyfill()
+    $('.primary-edit-form-well-menu').Stickyfill()
     # Get the template name, call page specific Scripts if we have them
     switch $('.form-well-header.container').attr('data-template')
       when 'root' then new BikeIndex.BikesEditRoot
@@ -17,7 +17,7 @@ class BikeIndex.BikesEdit extends BikeIndex
       when 'accessories' then new BikeIndex.BikesEditAccessories
 
   initializeEventListeners: ->
-    $('.bike-edit-page-select select').change (e) =>
+    $('.form-well-edit-page-select select').change (e) =>
       @updatePageLocation(e.target.value)
 
   updatePageLocation: (url) ->

@@ -1,208 +1,29 @@
-= form_for @user do |f|
-  .form-well-container.container
+.form-well-header.container{ data: { template: @edit_template } }
+  .edit-bike-header
+
+= form_for @user, multipart: true, html: { class: 'primary-edit-bike-form' } do |f|
+  .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      .col-lg-8.col-lg-offset-2.form-well
-        .form-wrap
-          .form-well-form-header
-            %h3
-              Personal Information for 
-              = @user.display_name
-          .col-xs-12
-            %p
-              Any use of your personal information is governed by the terms of our #{link_to "Privacy policy", privacy_url}. We do not sell, trade, or rent your personal information to third parties.
-          .form-group.row.unnested-field
-            = f.label :name, class: 'form-well-label'
-            .form-well-input
-              = f.text_field :name, class: 'form-control'
-          .form-group.row.unnested-field
-            = f.label :zipcode, class: 'form-well-label'
-            .form-well-input
-              = f.text_field :zipcode, placeholder: 'Default search location', class: 'form-control'
-          .form-group.row.unnested-field
-            = f.label :password, class: 'form-well-label'
-            .form-well-input
-              = f.password_field :password, placeholder: 'Password', class: 'form-control'
-          .form-group.row.unnested-field
-            = f.label :password_confirmation, class: 'form-well-label'
-            .form-well-input
-              = f.password_field :password_confirmation, placeholder: 'Password confirmation', class: 'form-control'
-          .form-group.row.unnested-field
-            = f.label :current_password, class: 'form-well-label'
-            .form-well-input
-              = f.password_field :current_password, placeholder: 'For password update', class: 'form-control'
-          .form-group.row.unnested-field.full-width-section
-            %label
-              = f.check_box :is_emailable
-              Get quarterly updates
+      %nav.primary-edit-form-well-menu
+        %ul
+          - @edit_templates.each do |template, description|
+            %li
+              - classname = @edit_template == template ? 'active' : ''
+              %a{ href: my_account_path(page: template), class: classname }
+                %h4
+                  = description
 
-          .no-divider-row.full-width-button
-            = f.submit 'Update information', class: 'btn btn-success btn-lg'
+        .form-well-edit-page-select
+          %span.menu-select-overlay
+            You are editing
+          // ignore this select in dirty forms
+          %select.dirtyignore
+            - @edit_templates.each do |template, description|
+              %option{ selected: (@edit_template == template), value: my_account_path(page: template) }
+                = description
+        .edit-form-well-submit-wrapper
+          = hidden_field_tag :page, @edit_template
+          = submit_tag 'Save changes', class: 'btn btn-lg btn-primary'
 
-        - if current_user.developer
-          .form-wrap.secondary-form-wrap
-            .form-well-form-header
-              %h3
-                Account emails
-            .col-xs-12
-              %p
-                Have multiple emails? Consolidate them into one account here
-            .form-group.row.unnested-field
-              = f.label :email, 'Primary email', class: 'form-well-label'
-              %p.form-well-input-static-full-width
-                = @user.email
-                %span.below-input-help
-                  This is the email we send notifications to
-
-            - if @user.user_emails.count > 1
-              - if @user.user_emails.confirmed.count > 1
-                .related-fields
-                  - labeled = false
-                  - @user.user_emails.confirmed.each do |user_email|
-                    - next if user_email.email == @user.email
-                    .form-group.row
-                      %label.form-well-label
-                        - unless labeled
-                          Confirmed emails
-                          - labeled = true
-                      %p.form-well-input-static
-                        = user_email.email
-                      .static-right-input-help
-                        = link_to 'Make primary email',make_primary_user_email_path(user_email.id), method: :post
-              - if @user.user_emails.unconfirmed.count > 0
-                .related-fields
-                  - labeled = false
-                  - @user.user_emails.unconfirmed.each do |user_email|
-                    .form-group.row
-                      %label.form-well-label
-                        - unless labeled
-                          Unconfirmed emails
-                          - labeled = true
-                      %p.form-well-input-static
-                        = user_email.email
-                      .static-right-input-help
-                        = link_to 'Resend confirmation email',resend_confirmation_user_email_path(user_email.id), method: :post
-                        = link_to 'Remove email', user_email_path(user_email.id), method: :delete, class: 'optional-form-block delete-email'
-
-            .related-fields#additional_email_fields
-              = f.hidden_field :additional_emails, value: nil
-              :plain
-                <script id="additional-email-template" type="x-tmpl-mustache">
-                  <div class='form-group row collapse'>
-                    <label class='form-well-label'>Additional email</label>
-                    <div class='form-well-input'>
-                      <input class='form-control add-email-field' type='email'>
-                    </div>
-                    <div class="right-input-help">
-                      <a class="optional-form-block remove-add-email">
-                        <span class="context-display-help">&ndash;</span>
-                        Remove email
-                      </a>
-                    </div>
-                  </div>
-                </script>
-            .full-width-button
-              %a.btn.btn-lg.btn-primary#add_additional_email{ href: '#', role: 'button' }
-                Add additional email
-
-            .no-divider-row.full-width-button
-              = f.submit 'Update information', class: 'btn btn-success btn-lg'
-
-        .form-wrap.secondary-form-wrap
-          .form-well-form-header
-            %h3
-              Personal page settings
-          .col-xs-12
-            %p
-              The Bike Index can create a page listing all your bikes that includes all the information you want to share. It's your personal page.
-              = link_to '(preview page)', user_url(@user), target: '_blank'
-            .form-group.unnested-field.no-divider-row.row.sharing-collapser{ data: { target: '#personal-page' } }
-              %label.form-well-label
-                Create public page
-              .form-well-input
-                %label.radio-inline
-                  = f.radio_button :show_bikes, 'true'
-                  Create page
-                %label.radio-inline
-                  = f.radio_button :show_bikes, 'false'
-                  No, please don't create me a page
-            .related-fields#personal-page.collapse
-              .form-group.row.avatar-upload-wrapper
-                %label.form-well-label
-                  Profile avatar
-                .form-well-input
-                  - if @user.avatar? 
-                    = image_tag(@user.avatar_url(:thumb))
-                  %img.replaced-img
-                  %label.file
-                    = f.file_field :avatar, class: 'avatar-upload-field'
-                    %span.file-custom
-                      %span.file-upload-text Choose file...
-                    = f.hidden_field :avatar_cache
-
-              .form-group.row
-                = f.label :title, 'Page title', class:  'form-well-label'
-                .form-well-input
-                  = f.text_field :title, placeholder: "This user's bikes", class: 'form-control'
-              .form-group.row
-                = f.label :description, 'Page text', class:  'form-well-label'
-                .form-well-input-large
-                  = f.text_area :description, rows: 3, class: 'form-control'
-
-          .no-divider-row.full-width-button
-            = f.submit 'Update information', class: 'btn btn-success btn-lg'
-
-        .form-wrap.secondary-form-wrap
-          .form-well-form-header
-            %h3
-              Sharing settings
-          .related-fields
-            .form-group.row.sharing-collapser{ data: { target: '#twitter-field' } }
-              %label.form-well-label
-                Show Twitter
-              .form-well-input
-                %label.radio-inline
-                  = f.radio_button :show_twitter, 'true'
-                  Show Twitter
-                %label.radio-inline
-                  = f.radio_button :show_twitter, 'false'
-                  No Twitter
-            #twitter-field.form-group.row.collapse
-              = f.label :twitter, 'Twitter handle', class: 'form-well-label'
-              .form-well-input
-                = f.text_field :twitter, placeholder: 'Twitter handle', class: 'form-control'
-
-            .form-group.row.sharing-collapser{ data: { target: '#personal-field' } }
-              %label.form-well-label
-                Show Personal Site
-              .form-well-input
-                %label.radio-inline
-                  = f.radio_button :show_website, 'true'
-                  Show personal website
-                %label.radio-inline
-                  = f.radio_button :show_website, 'false'
-                  No personal site
-            #personal-field.form-group.row.collapse
-              = f.label :website, 'Personal Site URL', class: 'form-well-label'
-              .form-well-input
-                = f.text_field :website, placeholder: 'example.com', class: 'form-control'
-
-          .related-fields
-            .form-group.row
-              = f.label :my_bikes_link_target, 'Additional Link', class: 'form-well-label'
-              .form-well-input
-                = f.text_field :my_bikes_link_target, value: @user.mb_link_target, placeholder: "http://example.com", class: 'form-control'
-            .form-group.row
-              = f.label :my_bikes_link_target, 'Title for link', class: 'form-well-label'
-              .form-well-input
-                = f.text_field :my_bikes_link_title, value: @user.mb_link_title, placeholder: 'My awesome link', class: 'form-control'
-
-          .form-group.row.unnested-field
-            = f.label :username, class: 'form-well-label'
-            .form-well-input
-              = f.text_field :username, class: 'form-control'
-              .below-input-help
-                Your username is the URL for your sharing page and the bike embed form. Update it if you care about those things.
-
-
-          .no-divider-row.full-width-button
-            = f.submit 'Update information', class: 'btn btn-success btn-lg'
+      .col-md-8.form-well
+        = render partial: "edit_#{@edit_template}", locals: { f: f }

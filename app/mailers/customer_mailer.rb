@@ -55,7 +55,7 @@ class CustomerMailer < ActionMailer::Base
 
   def password_reset_email(user)
     @user = user
-    @url = "#{root_url}users/password_reset?token=#{user.password_reset_token}"
+    @url = "#{ENV['BASE_URL']}/users/password_reset?token=#{user.password_reset_token}"
     mail(to: user.email, subject: "Instructions to reset your password") do |format|
       format.text
       format.html { render layout: 'email' }
