@@ -1,3 +1,5 @@
+<!-- bike_display_background and bike_display_text_color will be set locally in the template -->
+
 <div class="bike-display" style="position: relative;width: 96%;height: 150px;padding: 10px 2%;background: {{bike_display_background}};border: 1px solid #ddd;max-width: 450px;margin: 30px auto 0;clear: both;">
   <div class="image-holder" style="width: 33%;float: left;position: relative;">
     <a href="{{bike_url}}">
@@ -8,6 +10,9 @@
       <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Make</span> {{bike_manufacturer}}</p>
       <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Serial</span> {{bike_serial}}</p>
       <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Color</span>{{bike_paint_string}}</p>
+      <% if bike_new_pos_registration %>
+        <span style="color: #999;font-size: .9em">(We may not have the correct color. Claim your bike and update it if necessary!)</span>
+      <% end %>
     </p>
   </div>
 </div>
