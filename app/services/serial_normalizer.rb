@@ -1,7 +1,6 @@
 class SerialNormalizerError < StandardError
 end
 
-
 class SerialNormalizer
   def initialize(creation_params = {})
     @bike_id = creation_params[:bike_id]
@@ -46,5 +45,4 @@ class SerialNormalizer
       NormalizedSerialSegment.create(bike_id: bike_id, segment: seg)
     end
   end
-
 end

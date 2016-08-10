@@ -19,7 +19,7 @@ class CustomerContact < ActiveRecord::Base
 
   before_save :normalize_email_and_find_user
   def normalize_email_and_find_user
-    self.user_email = EmailNormalizer.new(user_email).normalized
+    self.user_email = EmailNormalizer.normalize(user_email)
     user = User.fuzzy_email_find(user_email)
     user ||= User.fuzzy_unconfirmed_primary_email_find(user_email)
     self.user = user if user

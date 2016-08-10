@@ -11,7 +11,7 @@ class UserEmail < ActiveRecord::Base
 
   before_validation :normalize_email
   def normalize_email
-    self.email = EmailNormalizer.new(email).normalized
+    self.email = EmailNormalizer.normalize(email)
   end
 
   def self.create_confirmed_primary_email(user)
@@ -21,7 +21,7 @@ class UserEmail < ActiveRecord::Base
 
   def self.add_emails_for_user_id(user_id, email_list)
     email_list.to_s.split(',').reject(&:blank?).each do |str|
-      email = EmailNormalizer.new(str).normalized
+      email = EmailNormalizer.normalize(str)
       next if where(user_id: user_id, email: email).present?
       ue = self.new(user_id: user_id, email: email)
       ue.generate_confirmation
@@ -32,7 +32,7 @@ class UserEmail < ActiveRecord::Base
 
   def self.fuzzy_find(str)
     return nil if str.blank?
-    find_by_email(EmailNormalizer.new(str).normalized)
+    find_by_email(EmailNormalizer.normalize(str))
   end
 
   def self.fuzzy_user_id_find(str)

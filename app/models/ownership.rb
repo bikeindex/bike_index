@@ -19,7 +19,7 @@ class Ownership < ActiveRecord::Base
 
   before_save :normalize_email
   def normalize_email
-    self.owner_email = EmailNormalizer.new(owner_email).normalized
+    self.owner_email = EmailNormalizer.normalize(owner_email)
   end
 
   def name_for_creator

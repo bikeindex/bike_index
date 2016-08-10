@@ -35,7 +35,7 @@ class OrganizationInvitation < ActiveRecord::Base
 
   before_save :normalize_email
   def normalize_email
-    self.invitee_email = EmailNormalizer.new(invitee_email).normalized
+    self.invitee_email = EmailNormalizer.normalize(invitee_email)
   end
 
   def name_for_inviter

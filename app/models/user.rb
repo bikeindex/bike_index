@@ -169,7 +169,7 @@ class User < ActiveRecord::Base
   end
 
   def self.fuzzy_unconfirmed_primary_email_find(email)
-    find_by_email(EmailNormalizer.new(email).normalized)
+    find_by_email(EmailNormalizer.normalize(email))
   end
 
   def self.fuzzy_confirmed_or_unconfirmed_email_find(email)
@@ -270,7 +270,7 @@ class User < ActiveRecord::Base
   def normalize_attributes
     self.phone = Phonifyer.phonify(phone) if phone 
     self.username = Slugifyer.slugify(username) if username
-    self.email = EmailNormalizer.new(email).normalized
+    self.email = EmailNormalizer.normalize(email)
   end
 
   def userlink
