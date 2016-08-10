@@ -9,8 +9,7 @@ describe EmailNormalizer do
     end
     context 'nil' do
       it "doesn't break on nil" do
-        normalizer = EmailNormalizer.normalize().to eq ''
-        expect(normalizer.normalized).to eq('')
+        expect(EmailNormalizer.normalize()).to eq('')
       end
     end
   end
