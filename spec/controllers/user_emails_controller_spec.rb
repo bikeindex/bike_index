@@ -24,7 +24,7 @@ describe UserEmailsController do
         expect do
           post :resend_confirmation, id: user_email.id
         end.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
-        expect(flash[:error]).to match(/not your/)
+        expect(flash[:error]).to match(/signed in with primary email/)
       end
     end
 
@@ -33,7 +33,7 @@ describe UserEmailsController do
         expect do
           post :resend_confirmation, id: 33333
         end.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
-        expect(flash[:error]).to match(/not your/)
+        expect(flash[:error]).to match(/signed in with primary email/)
       end
     end
   end
@@ -78,7 +78,7 @@ describe UserEmailsController do
         expect do
           get :confirm, id: user_email.id, confirmation_token: user_email.confirmation_token
         end.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
-        expect(flash[:error]).to match(/not your/)
+        expect(flash[:error]).to match(/signed in with primary email/)
       end
     end
 
@@ -87,7 +87,7 @@ describe UserEmailsController do
         expect do
           get :confirm, id: user_email.id, confirmation_token: user_email.confirmation_token
         end.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
-        expect(flash[:error]).to match(/not your/)
+        expect(flash[:error]).to match(/signed in with primary email/)
       end
     end
   end
@@ -122,7 +122,7 @@ describe UserEmailsController do
         expect do
           delete :destroy, id: user_email.id
         end.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
-        expect(flash[:error]).to match(/not your/)
+        expect(flash[:error]).to match(/signed in with primary email/)
       end
     end
 
@@ -131,7 +131,7 @@ describe UserEmailsController do
         expect do
           delete :destroy, id: user_email.id
         end.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
-        expect(flash[:error]).to match(/not your/)
+        expect(flash[:error]).to match(/signed in with primary email/)
       end
     end
   end
@@ -180,7 +180,7 @@ describe UserEmailsController do
         post :make_primary, id: user_email.id
         user_email.reload
         expect(user_email.primary).to be_falsey
-        expect(flash[:error]).to match(/not your/)
+        expect(flash[:error]).to match(/signed in with primary email/)
       end
     end
 
@@ -189,7 +189,7 @@ describe UserEmailsController do
         post :make_primary, id: user_email.id
         user_email.reload
         expect(user_email.primary).to be_falsey
-        expect(flash[:error]).to match(/not your/)
+        expect(flash[:error]).to match(/signed in with primary email/)
       end
     end
   end

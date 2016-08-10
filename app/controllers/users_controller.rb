@@ -3,6 +3,7 @@ class UsersController < ApplicationController
   include Sessionable
   before_filter :authenticate_user, only: [:edit]
   before_filter :store_return_to, only: [:new]
+  before_filter :assign_edit_template, only: [:edit, :update]
   
   def new
     @user = User.new
@@ -87,7 +88,6 @@ class UsersController < ApplicationController
   def edit
     @user = current_user
     @page_errors = @user.errors
-    @edit_template = edit_templates[params[:page]].present? ? params[:page] : edit_templates.keys.first
   end
 
   def update
@@ -103,7 +103,7 @@ class UsersController < ApplicationController
         @user.errors.add(:base, "Current password doesn't match, it's required for updating your password")
       end
     end
-    if !@user.errors.any? && @user.update_attributes(permitted_parameters.except(:email, :password_reset_token))
+    if !@user.errors.any? && @user.update_attributes(permitted_update_parameters)
       AfterUserChangeWorker.perform_async(@user.id)
       if params[:user][:terms_of_service].present?
         if params[:user][:terms_of_service] == '1'
@@ -137,7 +137,7 @@ class UsersController < ApplicationController
         default_session_set
       end
       flash[:success] = 'Your information was successfully updated.'
-      redirect_to my_account_url and return
+      redirect_to my_account_url(page: params[:page]) and return
     end
     @page_errors = @user.errors.full_messages
     render action: :edit
@@ -165,11 +165,23 @@ class UsersController < ApplicationController
     params.require(:user).permit(User.old_attr_accessible)
   end
 
+  def permitted_update_parameters
+    pparams = permitted_parameters.except(:email, :password_reset_token)
+    if pparams.keys.include?('username')
+      pparams.delete('username') unless pparams['username'].present?
+    end
+    pparams
+  end
+
   def edit_templates
     @edit_templates ||= {
       root: 'User Settings',
       password: 'Password',
       sharing: 'Sharing and Personal Page'
     }.as_json
+  end
+
+  def assign_edit_template
+    @edit_template = edit_templates[params[:page]].present? ? params[:page] : edit_templates.keys.first
   end
 end

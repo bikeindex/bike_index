@@ -22,7 +22,7 @@
               %option{ selected: (@edit_template == template), value: my_account_path(page: template) }
                 = description
         .edit-form-well-submit-wrapper
-          = hidden_field_tag :edit_template, @edit_template
+          = hidden_field_tag :page, @edit_template
           = submit_tag 'Save changes', class: 'btn btn-lg btn-primary'
 
       .col-md-8.form-well

@@ -207,7 +207,7 @@ describe UsersController do
         expect(response).to be_success
         expect(response).to render_with_layout('application_revised')
         expect(assigns(:edit_template)).to eq('root')
-        expect(response).to render_template('edit_root')
+        expect(response).to render_template('edit')
       end
     end
     context 'application_revised layout' do
@@ -218,7 +218,7 @@ describe UsersController do
             expect(response).to be_success
             expect(response).to render_with_layout('application_revised')
             expect(assigns(:edit_template)).to eq(template)
-            expect(response).to render_template("edit_#{template}")
+            expect(response).to render_template(partial: "_edit_#{template}")
           end
         end
       end
@@ -226,6 +226,18 @@ describe UsersController do
   end
 
   describe 'update' do
+    context 'nil username' do
+      it "doesn't update username" do
+        user = FactoryGirl.create(:user) 
+        user.update_attribute :username, 'something'
+        set_current_user(user)
+        post :update, id: user.username, user: { username: ' ', name: 'tim' }, page: 'sharing'
+        expect(assigns(:edit_template)).to eq('sharing')
+        user.reload
+        expect(user.username).to eq('something')
+      end
+    end
+
     it "doesn't update user if current password not present" do
       user = FactoryGirl.create(:user, terms_of_service: false, password: 'old_pass', password_confirmation: 'old_pass')
       set_current_user(user)
