@@ -38,7 +38,7 @@
 </div>
 <p style="margin: 50px 0 0; padding: 20px 0 0; font-weight: 400; color: #95A5A5; text-align: center;">This email is about the <%= stolen_word %> <%= @biketype %> registered on the Bike Index on <%= @bike.created_at.strftime("%m.%d.%y") %></p>
 
-<% bike_image = 'https://files.bikeindex.org/bike_photo_placeholder.svg' %>
+<% bike_image = 'https://files.bikeindex.org/email_assets/bike_photo_placeholder.png' %>
 <% bike_image = @customer_contact.bike.stock_photo_url if @customer_contact.bike.stock_photo_url.present? %>
 <% bike_image = @customer_contact.bike.thumb_path if @customer_contact.bike.thumb_path %>
 
