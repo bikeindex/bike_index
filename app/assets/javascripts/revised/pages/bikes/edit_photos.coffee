@@ -7,7 +7,7 @@ class BikeIndex.BikesEditPhotos extends BikeIndex
   initializeEventListeners: ->
     $('#public_images').on 'change', '.is_private_check', (e) =>
       @updateImagePrivateness(e)
-    $('.edit-bike-submit-wrapper .btn').click (e) ->
+    $('.edit-form-well-submit-wrapper .btn').click (e) ->
       e.preventDefault()
       location.reload(true)
 

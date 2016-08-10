@@ -42,7 +42,7 @@ class UserEmailsController < ApplicationController
 
   def ensure_user_email_ownership
     unless current_user && current_user.user_emails.pluck(:id).include?(params[:id].to_i)
-      flash[:error] = "That's not your additional email! Email contact@bikeindex.org if this doesn't make sense."
+      flash[:error] = "You must be signed in with primary email! Email contact@bikeindex.org if this doesn't make sense."
       redirect_to user_root_url and return
     end
     @user_email = current_user.user_emails.find(params[:id])

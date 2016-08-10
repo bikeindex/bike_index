@@ -200,17 +200,44 @@ describe UsersController do
   end
 
   describe 'edit' do
-    it 'renders with application_revised' do
-      user = FactoryGirl.create(:user)
-      set_current_user(user)
-      get :edit
-      expect(response.status).to eq(200)
-      expect(response).to render_template(:edit)
-      expect(response).to render_with_layout('application_revised')
+    include_context :logged_in_as_user 
+    context 'no page given' do
+      it 'renders root' do
+        get :edit
+        expect(response).to be_success
+        expect(response).to render_with_layout('application_revised')
+        expect(assigns(:edit_template)).to eq('root')
+        expect(response).to render_template('edit')
+      end
+    end
+    context 'application_revised layout' do
+      %w(root password sharing).each do |template|
+        context template do
+          it 'renders the template' do
+            get :edit, page: template
+            expect(response).to be_success
+            expect(response).to render_with_layout('application_revised')
+            expect(assigns(:edit_template)).to eq(template)
+            expect(response).to render_template(partial: "_edit_#{template}")
+          end
+        end
+      end
     end
   end
 
   describe 'update' do
+    context 'nil username' do
+      it "doesn't update username" do
+        user = FactoryGirl.create(:user) 
+        user.update_attribute :username, 'something'
+        set_current_user(user)
+        post :update, id: user.username, user: { username: ' ', name: 'tim' }, page: 'sharing'
+        expect(assigns(:edit_template)).to eq('sharing')
+        user.reload
+        expect(user.username).to eq('something')
+      end
+    end
+
     it "doesn't update user if current password not present" do
       user = FactoryGirl.create(:user, terms_of_service: false, password: 'old_pass', password_confirmation: 'old_pass')
       set_current_user(user)

@@ -3,6 +3,7 @@ class UsersController < ApplicationController
   include Sessionable
   before_filter :authenticate_user, only: [:edit]
   before_filter :store_return_to, only: [:new]
+  before_filter :assign_edit_template, only: [:edit, :update]
   
   def new
     @user = User.new
@@ -87,7 +88,6 @@ class UsersController < ApplicationController
   def edit
     @user = current_user
     @page_errors = @user.errors
-    render :edit
   end
 
   def update
@@ -96,14 +96,14 @@ class UsersController < ApplicationController
       if @user.password_reset_token != params[:user][:password_reset_token]
         @user.errors.add(:base, "Doesn't match user's password reset token")
       elsif @user.reset_token_time < (Time.now - 1.hours)
-        @user.errors.add(:base, "Password reset token expired, try resetting password again")
+        @user.errors.add(:base, 'Password reset token expired, try resetting password again')
       end
     elsif params[:user][:password].present?
       unless @user.authenticate(params[:user][:current_password])
         @user.errors.add(:base, "Current password doesn't match, it's required for updating your password")
       end
     end
-    if !@user.errors.any? && @user.update_attributes(permitted_parameters.except(:email, :password_reset_token))
+    if !@user.errors.any? && @user.update_attributes(permitted_update_parameters)
       AfterUserChangeWorker.perform_async(@user.id)
       if params[:user][:terms_of_service].present?
         if params[:user][:terms_of_service] == '1'
@@ -121,13 +121,13 @@ class UsersController < ApplicationController
           if @user.memberships.any?
             flash[:success] = "Thanks! Now you can use Bike Index as #{@user.memberships.first.organization.name}"
           else
-            flash[:success] = "Thanks for accepting the terms of service!"
+            flash[:success] = 'Thanks for accepting the terms of service!'
           end
           redirect_to user_home_url and return
           # TODO: Redirect to the correct page, somehow this breaks things right now though.
           # redirect_to organization_home and return
         else
-          redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index as through the organization" and return
+          redirect_to accept_vendor_terms_url, notice: 'You have to accept the Terms of Service if you would like to use Bike Index as through the organization' and return
         end
       end
       if params[:user][:password].present?
@@ -137,7 +137,7 @@ class UsersController < ApplicationController
         default_session_set
       end
       flash[:success] = 'Your information was successfully updated.'
-      redirect_to my_account_url and return
+      redirect_to my_account_url(page: params[:page]) and return
     end
     @page_errors = @user.errors.full_messages
     render action: :edit
@@ -163,5 +163,25 @@ class UsersController < ApplicationController
 
   def permitted_parameters
     params.require(:user).permit(User.old_attr_accessible)
+  end
+
+  def permitted_update_parameters
+    pparams = permitted_parameters.except(:email, :password_reset_token)
+    if pparams.keys.include?('username')
+      pparams.delete('username') unless pparams['username'].present?
+    end
+    pparams
+  end
+
+  def edit_templates
+    @edit_templates ||= {
+      root: 'User Settings',
+      password: 'Password',
+      sharing: 'Sharing and Personal Page'
+    }.as_json
+  end
+
+  def assign_edit_template
+    @edit_template = edit_templates[params[:page]].present? ? params[:page] : edit_templates.keys.first
   end
 end
