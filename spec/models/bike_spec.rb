@@ -410,11 +410,11 @@ describe Bike do
 
     context 'unconfirmed secondary email' do
       it 'sets owner email to primary email' do
-        user_email = FactoryGirl.create(:user_email, confirmation_token: 123456789)
+        user_email = FactoryGirl.create(:user_email, confirmation_token: '123456789')
         user = user_email.user
-        expect(user_email.unconfirmed).to eq true
-        bike = FactoryGirl.build(:bike, owner_email: user_email.email)
+        expect(user_email.unconfirmed).to be_truthy
         expect(user.email).to_not eq user_email.email
+        bike = FactoryGirl.build(:bike, owner_email: user_email.email)
         expect(bike.owner_email).to eq user_email.email
         bike.normalize_attributes
         expect(bike.owner_email).to eq user_email.email
