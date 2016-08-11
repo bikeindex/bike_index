@@ -14,7 +14,7 @@ class OrganizedMailer < ActionMailer::Base
     title = 'Finish your Bike Index registration!'
     mail('Reply-To' => reply_to, to: @send_to, subject: title) do |format|
       format.text
-      format.html { render layout: 'revised_email' }
+      format.html { render layout: 'email_revised' }
     end
   end
 

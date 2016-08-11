@@ -12,7 +12,7 @@ module Bikeindex
     # Use our custom error pages
     config.exceptions_app = self.routes
     require 'draper'
-    Draper::Railtie.initializers.delete_if {|initializer| initializer.name == 'draper.setup_active_model_serializers' }
+    Draper::Railtie.initializers.delete_if { |initializer| initializer.name == 'draper.setup_active_model_serializers' }
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
@@ -36,14 +36,14 @@ module Bikeindex
     config.active_record.raise_in_transactional_callbacks = true
 
     # Throttle stuff
-    config.middleware.use Rack::Throttle::Minute, :max => ENV['MIN_MAX_RATE'].to_i, :cache => Redis.new, :key_prefix => :throttle
+    config.middleware.use Rack::Throttle::Minute, max: ENV['MIN_MAX_RATE'].to_i, cache: Redis.new, key_prefix: :throttle
 
     config.to_prepare do
       Doorkeeper::ApplicationsController.layout 'doorkeeper'
       Doorkeeper::AuthorizationsController.layout 'doorkeeper'
       Doorkeeper::AuthorizedApplicationsController.layout 'doorkeeper'
     end
-    
+
     config.generators do |g|
       g.test_framework :rspec
     end

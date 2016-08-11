@@ -111,13 +111,14 @@ Bikeindex::Application.routes.draw do
       member { get :get_destroy }
     end
     get 'invitations', to: 'dashboard#invitations'
+    get 'mailer_previews', to: 'dashboard#mailer_previews'
     get 'maintenance', to: 'dashboard#maintenance'
     put 'update_tsv_blacklist', to: 'dashboard#update_tsv_blacklist'
     get 'tsvs', to: 'dashboard#tsvs'
     get 'bust_z_cache', to: 'dashboard#bust_z_cache'
     get 'destroy_example_bikes', to: 'dashboard#destroy_example_bikes'
     resources :memberships, :organizations, :organization_invitations,
-              :paints, :ads, :recovery_displays, :mail_snippets, :mailer_previews
+              :paints, :ads, :recovery_displays, :mail_snippets
     resources :flavor_texts, only: [:destroy, :create]
     resources :stolen_bikes do
       member { post :approve }

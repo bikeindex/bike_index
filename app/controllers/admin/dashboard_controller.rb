@@ -50,4 +50,7 @@ class Admin::DashboardController < Admin::BaseController
     redirect_to admin_tsvs_path
   end
 
+  def mailer_previews
+    @show_substitution_values = params[:show_substitution_values]
+  end
 end
