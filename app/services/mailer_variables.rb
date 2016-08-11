@@ -22,7 +22,7 @@ class MailerVariables
   end
 
   def bike_display_hash(bike)
-    thumb_url = bike.thumb_path || bike.stock_photo_url || 'https://files.bikeindex.org/bike_photo_placeholder.svg'
+    thumb_url = bike.thumb_path || bike.stock_photo_url || 'https://files.bikeindex.org/email_assets/bike_photo_placeholder.png'
     {
       is_new_registration: (bike.ownerships.count < 2),
       bike_type: bike.type,

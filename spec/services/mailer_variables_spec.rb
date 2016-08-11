@@ -42,7 +42,7 @@ describe MailerVariables do
           is_recovered_bike: false,
           is_stolen_bike: false,
           bike_url: "#{ENV['BASE_URL']}/ownerships/#{ownership.id}",
-          bike_thumb_url: 'https://files.bikeindex.org/bike_photo_placeholder.svg',
+          bike_thumb_url: 'https://files.bikeindex.org/email_assets/bike_photo_placeholder.png',
           bike_manufacturer: bike.manufacturer_name,
           bike_serial: bike.serial,
           bike_paint_string: bike.primary_frame_color.name
@@ -82,7 +82,7 @@ describe MailerVariables do
             is_stolen_bike: true,
             is_new_registration: true,
             bike_url: "#{ENV['BASE_URL']}/bikes/#{bike.id}",
-            bike_thumb_url: 'https://files.bikeindex.org/bike_photo_placeholder.svg',
+            bike_thumb_url: 'https://files.bikeindex.org/email_assets/bike_photo_placeholder.png',
             bike_manufacturer: bike.manufacturer_name,
             bike_serial: bike.serial,
             bike_paint_string: bike.primary_frame_color.name

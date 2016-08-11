@@ -117,7 +117,7 @@ Bikeindex::Application.routes.draw do
     get 'bust_z_cache', to: 'dashboard#bust_z_cache'
     get 'destroy_example_bikes', to: 'dashboard#destroy_example_bikes'
     resources :memberships, :organizations, :organization_invitations,
-              :paints, :ads, :recovery_displays, :mail_snippets
+              :paints, :ads, :recovery_displays, :mail_snippets, :mailer_previews
     resources :flavor_texts, only: [:destroy, :create]
     resources :stolen_bikes do
       member { post :approve }
@@ -194,8 +194,6 @@ Bikeindex::Application.routes.draw do
       get 'current_tsv'
     end
   end
-
-  resources :mailer_integrations, only: [:show, :index]
 
   resources :manufacturers, only: [:index] do
     collection { get 'tsv' }

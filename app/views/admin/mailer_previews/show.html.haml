@@ -1,0 +1,10 @@
+%h2{ style: 'padding: 20px 10px 0;' }
+  Preview of <code>#{params[:id]}</code>
+  %small{ style: 'float: right;' }
+    = link_to 'All templates', admin_mailer_previews_path
+
+- @vars = { b_param_token: 'asdfasdfasdf' }
+
+%hr
+
+= render(file: "/organized_mailer/#{params[:id]}", layout: 'layouts/email_revised')

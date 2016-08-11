@@ -1,10 +1,10 @@
-class EmailAdminContactStolenWorker
+class EmailDelivererWorker
   include Sidekiq::Worker
   sidekiq_options queue: 'notify'
   sidekiq_options backtrace: true
 
-  def perform(customer_contact_id)
-    customer_contact = CustomerContact.find(customer_contact_id)
-    CustomerMailer.admin_contact_stolen_email(customer_contact).deliver_now
+  def perform(mailer_method, args = {})
+    vars = MailerVariables.new(mailer_method).var_hash(args)
+    MailerIntegration.mailer_class(mailer_method).send(mailer_method, vars).deliver_now
   end
 end

@@ -1,12 +1,13 @@
 require 'spec_helper'
 
-describe MailerIntegrationsController do
+describe Admin::MailerPreviewsController do
+  include_context :logged_in_as_super_admin
   describe 'index' do
-    before do
-      get :index
+    it 'renders' do
+        get :index
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:index)
     end
-    it { is_expected.to respond_with(:success) }
-    it { is_expected.to render_template(:index) }
   end
 
   describe 'show' do
@@ -20,11 +21,11 @@ describe MailerIntegrationsController do
 
     MailerIntegration.templates_config.map { |t| t['name'] }.each do |template_name|
       context template_name do
-        before do
+        xit 'renders' do
           get :show, id: template_name
+          expect(response.status).to eq(200)
+          expect(response).to render_template(template_name)
         end
-        it { is_expected.to respond_with(:success) }
-        it { is_expected.to render_template(template_name) }
       end
     end
   end
