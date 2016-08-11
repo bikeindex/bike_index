@@ -1,22 +1,19 @@
-%section.content
-  .receptacle
-    .inner-recep.legal-content
-      :markdown
-        #{render partial: "/info/terms_text"}
+.container
+  %section.content
+    .receptacle
+      .inner-recep.legal-content
+        :markdown
+          #{render partial: '/info/terms_text'}
 
-.accept-vendor-terms
+  .accept-vendor-terms
 
-  = form_for @user, html: { class: "form" } do |f|
-    
-    .form-horizontal
-      .control-group
-        %label{ for: 'user_terms_of_service' }
-          .control-label
-            = f.check_box :terms_of_service
-          .controls
-            I agree to the Bike Index 
-            %strong
-              Terms of Service
-    .agree-action
-      .control-group
-        = f.submit "Submit", class: 'button-blue'
+    = form_for @user, html: { class: 'form' } do |f|
+
+      .form-group
+        %label{ for: 'user_terms_of_service', class: 'center-accept-terms-text' }
+          = f.check_box :terms_of_service
+          I agree to the Bike Index
+          %strong
+            Terms of Service
+      .agree-action
+        = f.submit "Submit", class: 'btn btn-primary btn-lg center-accept-terms-button'
