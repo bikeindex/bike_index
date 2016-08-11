@@ -1,6 +1,6 @@
 class WelcomeController < ApplicationController
   layout 'application_revised'
-  before_filter :authenticate_user_for_user_home, only: [:user_home]
+  before_filter :authenticate_user_for_welcome_controller, only: [:user_home, :choose_registration]
 
   def index
   end
@@ -23,12 +23,11 @@ class WelcomeController < ApplicationController
   end
 
   def choose_registration
-    redirect_to new_user_path and return unless current_user.present?
   end
 
   private
 
-  def authenticate_user_for_user_home
+  def authenticate_user_for_welcome_controller
     authenticate_user('Please create an account', flash_type: :info)
   end
 end

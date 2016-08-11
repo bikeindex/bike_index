@@ -249,6 +249,7 @@ class BikesController < ApplicationController
       flash[:error] = error
       redirect_to bike_path(@bike) and return
     end
+    authenticate_user('Please create an account', flash_type: :info)
   end
 
   def render_ad
