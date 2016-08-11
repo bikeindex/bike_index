@@ -1,0 +1,49 @@
+- if @vars[:new_user]
+  %h2{:style => "font-size: 30px;font-weight: 400;"}
+    Welcome to the Bike Index
+  %p
+    Good thinking! We’re glad you’ve joined, you smarty pants.
+
+- if @bike.recovered
+  %h1{:style => "font-weight: 400;"}
+    Thank you for adding this #{@bike.type} you found to the index!
+- elsif @bike.stolen
+  %h1{:style => "font-weight: 400;"}
+    #{@bike.type} thieves are jerks.
+  %h2{:style => "font-weight: 400;"}
+    We're sorry your #{@bike.type} was stolen.
+- else
+  %h1{:style => "font-weight: 400;"}
+  Congrats on adding your #{@bike.type} to the index!
+
+%hr{:style => "margin: 40px 0 30px;"}
+
+%p
+  - if @vars[:registered_by_owner]
+    You added a
+  - else
+    %strong
+      <pre>creator_display_name</pre>
+
+  - if @vars[:new_registration]
+    added a
+  - else
+    sent you a
+
+  #{bike_stolenness_display}#{@bike.type} to the Bike Index
+  - unless @vars[:registered_by_owner]
+    for you
+  \.
+= render partial: '/shared/email_bike_display'
+%div
+  {{if is_recovered_bike}}
+  %p Hopefully you find the owner soon. Give us a heads up when you do!
+  {{else if is_stolen_bike}}
+  %p Hopefully you find the #{@bike.type} soon. Give us a heads up when you do!
+  {{else}}
+  %a.button{:href => "{{bike_url}}", :style => "text-decoration: none;-webkit-border-radius: 3px;-moz-border-radius: 3px;border-radius: 3px;-webkit-box-shadow: 1px 1px 2px rgba(0,0,0,0.4);-moz-box-shadow: 1px 1px 2px rgba(0,0,0,0.4);box-shadow: 1px 1px 2px rgba(0,0,0,0.4);display: block;padding: .5em 1em;margin: 1.5em auto;width: 250px;max-width: 100%;font-size: 2em;background: #27ae60;border: 1px solid #229955;color: white;text-align: center;"}
+    Claim the #{@bike.type}
+  %p.explanation{:style => "text-align: center;color: #555;"} Sign up or sign in to BikeIndex.org to claim your #{@bike.type} and edit it, upload photos and make sure you never lose track of your trusty steed!
+  {{end}}
+= render partial: 'mailer_integrations/protect_your_bike'
+= render partial: 'mailer_integrations/standard_bottom'
