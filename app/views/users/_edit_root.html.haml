@@ -21,67 +21,66 @@
       = f.check_box :is_emailable
       Get quarterly updates
 
-  - if current_user.developer
-    .col-xs-12
-      %p
-        Have multiple emails? Consolidate them into one account here
-    .form-group.row.unnested-field
-      = f.label :email, 'Primary email', class: 'form-well-label'
-      %p.form-well-input-static-full-width
-        = @user.email
-        %span.below-input-help
-          This is the email we send notifications to
+  .col-xs-12
+    %p
+      Have multiple emails? Consolidate them into one account here
+  .form-group.row.unnested-field
+    = f.label :email, 'Primary email', class: 'form-well-label'
+    %p.form-well-input-static-full-width
+      = @user.email
+      %span.below-input-help
+        This is the email we send notifications to
 
-    - if @user.user_emails.count > 1
-      - if @user.user_emails.confirmed.count > 1
-        .related-fields
-          - labeled = false
-          - @user.user_emails.confirmed.each do |user_email|
-            - next if user_email.email == @user.email
-            .form-group.row
-              %label.form-well-label
-                - unless labeled
-                  Confirmed emails
-                  - labeled = true
-              %p.form-well-input-static
-                = user_email.email
-              .static-right-input-help
-                = link_to 'Make primary email',make_primary_user_email_path(user_email.id), method: :post
-      - if @user.user_emails.unconfirmed.count > 0
-        .related-fields
-          - labeled = false
-          - @user.user_emails.unconfirmed.each do |user_email|
-            .form-group.row
-              %label.form-well-label
-                - unless labeled
-                  Unconfirmed emails
-                  - labeled = true
-              %p.form-well-input-static
-                = user_email.email
-              .static-right-input-help
-                = link_to 'Resend confirmation email',resend_confirmation_user_email_path(user_email.id), method: :post
-                = link_to 'Remove email', user_email_path(user_email.id), method: :delete, class: 'optional-form-block delete-email'
+  - if @user.user_emails.count > 1
+    - if @user.user_emails.confirmed.count > 1
+      .related-fields
+        - labeled = false
+        - @user.user_emails.confirmed.each do |user_email|
+          - next if user_email.email == @user.email
+          .form-group.row
+            %label.form-well-label
+              - unless labeled
+                Confirmed emails
+                - labeled = true
+            %p.form-well-input-static
+              = user_email.email
+            .static-right-input-help
+              = link_to 'Make primary email',make_primary_user_email_path(user_email.id), method: :post
+    - if @user.user_emails.unconfirmed.count > 0
+      .related-fields
+        - labeled = false
+        - @user.user_emails.unconfirmed.each do |user_email|
+          .form-group.row
+            %label.form-well-label
+              - unless labeled
+                Unconfirmed emails
+                - labeled = true
+            %p.form-well-input-static
+              = user_email.email
+            .static-right-input-help
+              = link_to 'Resend confirmation email',resend_confirmation_user_email_path(user_email.id), method: :post
+              = link_to 'Remove email', user_email_path(user_email.id), method: :delete, class: 'optional-form-block delete-email'
 
-    .related-fields#additional_email_fields
-      = f.hidden_field :additional_emails, value: nil
-      :plain
-        <script id="additional-email-template" type="x-tmpl-mustache">
-          <div class='form-group row collapse'>
-            <label class='form-well-label'>Additional email</label>
-            <div class='form-well-input'>
-              <input class='form-control add-email-field' type='email'>
-            </div>
-            <div class="right-input-help">
-              <a class="optional-form-block remove-add-email">
-                <span class="context-display-help">&ndash;</span>
-                Remove email
-              </a>
-            </div>
+  .related-fields#additional_email_fields
+    = f.hidden_field :additional_emails, value: nil
+    :plain
+      <script id="additional-email-template" type="x-tmpl-mustache">
+        <div class='form-group row collapse'>
+          <label class='form-well-label'>Additional email</label>
+          <div class='form-well-input'>
+            <input class='form-control add-email-field' type='email'>
           </div>
-        </script>
+          <div class="right-input-help">
+            <a class="optional-form-block remove-add-email">
+              <span class="context-display-help">&ndash;</span>
+              Remove email
+            </a>
+          </div>
+        </div>
+      </script>
 
-    .add-additional-fields-block.no-divider-row
-      %a.add_fields#add_additional_email{ href: '#', role: 'button' }
-        %span.context-display-help
-          +
-        Add additional email
+  .add-additional-fields-block.no-divider-row
+    %a.add_fields#add_additional_email{ href: '#', role: 'button' }
+      %span.context-display-help
+        +
+      Add additional email

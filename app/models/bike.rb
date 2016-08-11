@@ -216,7 +216,12 @@ class Bike < ActiveRecord::Base
   def normalize_attributes
     self.serial_number = 'absent' if serial_number.blank? || serial_number.strip.downcase == 'unknown'
     self.serial_normalized = SerialNormalizer.new({serial: serial_number}).normalized
-    self.owner_email = EmailNormalizer.normalize(owner_email)
+    if User.fuzzy_email_find(owner_email)
+      # pp User.fuzzy_email_find(owner_email)
+      self.owner_email = User.fuzzy_email_find(owner_email).email
+    else
+      self.owner_email = EmailNormalizer.normalize(owner_email)
+    end
     true
   end
 
