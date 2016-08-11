@@ -395,6 +395,31 @@ describe Bike do
     it 'has before_save_callback_method defined' do
       expect(Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:normalize_attributes)).to eq(true)
     end
+
+    context 'confirmed secondary email' do
+      it 'sets email to the primary email' do
+        user_email = FactoryGirl.create(:user_email)
+        user = user_email.user
+        bike = FactoryGirl.build(:bike, owner_email: user_email.email)
+        expect(user.email).to_not eq user_email.email
+        expect(bike.owner_email).to eq user_email.email
+        bike.normalize_attributes
+        expect(bike.owner_email).to eq user.email
+      end
+    end
+
+    context 'unconfirmed secondary email' do
+      it 'sets owner email to primary email' do
+        user_email = FactoryGirl.create(:user_email, confirmation_token: '123456789')
+        user = user_email.user
+        expect(user_email.unconfirmed).to be_truthy
+        expect(user.email).to_not eq user_email.email
+        bike = FactoryGirl.build(:bike, owner_email: user_email.email)
+        expect(bike.owner_email).to eq user_email.email
+        bike.normalize_attributes
+        expect(bike.owner_email).to eq user_email.email
+      end
+    end
   end
 
   describe 'serial' do

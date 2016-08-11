@@ -137,18 +137,34 @@ describe UsersController do
       expect(response).to render_template :request_password_reset
     end
 
-    it 'enqueues a password reset email job' do
-      @user = FactoryGirl.create(:confirmed_user, email: 'something@boo.com')
-      expect do
-        post :password_reset, email: @user.email
-      end.to change(EmailResetPasswordWorker.jobs, :size).by(1)
+    context 'confirmed user' do
+      it 'enqueues a password reset email job' do
+        user = FactoryGirl.create(:confirmed_user, email: 'something@boo.com')
+        expect do
+          post :password_reset, email: user.email
+        end.to change(EmailResetPasswordWorker.jobs, :size).by(1)
+      end
     end
 
-    it 'enqueues a password reset email job' do
-      @user = FactoryGirl.create(:user, email: 'ned@foo.com')
-      expect do
-        post :password_reset, email: @user.email
-      end.to change(EmailResetPasswordWorker.jobs, :size).by(1)
+    context 'confirmed user secondary email' do
+      it 'enqueues a password reset email job' do
+        user_email = FactoryGirl.create(:user_email)
+        user = user_email.user
+        expect(user.email).to_not eq user_email.email
+        expect do
+          post :password_reset, email: user_email.email
+        end.to change(EmailResetPasswordWorker.jobs, :size).by(1)
+        expect(EmailResetPasswordWorker).to have_enqueued_job(user.id)
+      end
+    end
+
+    context 'unconfirmed user' do
+      it 'enqueues a password reset email job' do
+        user = FactoryGirl.create(:user, email: 'ned@foo.com')
+        expect do
+          post :password_reset, email: user.email
+        end.to change(EmailResetPasswordWorker.jobs, :size).by(1)
+      end
     end
   end
 
