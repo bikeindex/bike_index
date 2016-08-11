@@ -1,0 +1,87 @@
+@import "revised/mixins/colors";
+@import "revised/vars";
+
+$font-size: 16px;
+$header-height: 82px;
+
+#outlook a{ padding:0; } /* Force Outlook to provide a "view in browser" button. */
+
+body {
+  width:100% !important; /* Force Hotmail to display emails at full width */
+  -webkit-text-size-adjust:none; /* Prevent Webkit platforms from changing default text sizes. */
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  font-family: sans-serif;
+  color: $gray;
+  font-size: $font-size;
+  line-height: 2em;
+  a {
+    color: $link-color;
+    text-decoration: none;
+    &:hover, &:active, &.active {
+      text-decoration: underline;
+      color: $link-color;
+    }
+  }
+}
+h1, h2, h3 { color: $gray-darker; }
+h1, h2, h3, h4, h5 {
+  line-height: 2em; margin: 0;
+  font-family: sans-serif;
+}
+h1 { font-weight: 200; }
+
+.binx-wrapper {
+  width: 100%;
+  position: relative;
+  max-width: 700px;
+  margin: 20px auto 0;
+}
+
+.binx-header {
+  height: $header-height;
+  width: 100%;
+  background: $gray-darker;
+  img {
+    display: block;
+    margin: .5*$vertical-height $vertical-height 0 0;
+    float: right;
+    height: $header-height - $vertical-height;
+    max-height: $header-height - $vertical-height;
+    width: auto;
+  }
+}
+
+.binx-body, .binx-pstscpt {
+  padding: 2*$vertical-height;
+}
+
+.binx-pstscpt {
+  h4 {
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1.2em;
+  }
+  span {
+    font-family: Verdana, sans-serif;
+    font-size: 30px;
+    &:nth-of-type(1) { color: red; }
+    &:nth-of-type(2) { color: yellow; }
+    &:nth-of-type(3) { color: green; }
+    &:nth-of-type(4) { color: blue; }
+    &:nth-of-type(5) { color: purple; }
+  }
+}
+
+$foot-padding: .5*($header-height - $font-size);
+.binx-footer {
+  background: $gray-darker;
+  padding: $foot-padding;
+  h5 {
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.2em;
+    width: 100%;
+  }
+}

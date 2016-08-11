@@ -69,16 +69,15 @@ gem 'rack-throttle'
 gem 'secure_headers', '~> 2.5.0'
 
 # Frontend
-gem 'backbone-on-rails', '~>0.9.10.0' 
-gem 'chartkick' # Display charts
-gem 'groupdate'
-gem 'bootstrap', '~> 4.0.0.alpha3' # Bootstrap 4 - used for revised stylesheets
-
 gem 'sprockets-rails', '~> 3.0.4'
-# gem 'sass-rails'
 gem 'coffee-rails'
 gem 'therubyracer'
 gem 'uglifier'
+gem 'premailer-rails' # Inline styles for email
+gem 'backbone-on-rails', '~>0.9.10.0' # Legacy js
+gem 'chartkick' # Display charts
+gem 'groupdate' # Required for charts
+gem 'bootstrap', '~> 4.0.0.alpha3' # Bootstrap 4 - used for revised stylesheets
 gem 'jquery-datatables-rails', '~>3.4.0'
 
 # Show performance metrics
@@ -86,7 +85,6 @@ gem 'stackprof', require: false
 gem 'memory_profiler', require: false
 gem 'flamegraph', require: false
 gem 'rack-mini-profiler', require: false # If you can't see it you can't make it better
-
 
 gem 'responders', '~> 2.0' # required because of class level respond_to blocks (API v1)
 

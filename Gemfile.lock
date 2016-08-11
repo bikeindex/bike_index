@@ -104,6 +104,8 @@ GEM
     coffee-script-source (1.10.0)
     concurrent-ruby (1.0.2)
     connection_pool (2.2.0)
+    css_parser (1.4.5)
+      addressable
     dalli (2.7.6)
     database_cleaner (1.5.3)
     descendants_tracker (0.0.4)
@@ -336,6 +338,7 @@ GEM
       haml (~> 4.0.0)
       nokogiri (~> 1.6.0)
       ruby_parser (~> 3.5)
+    htmlentities (4.3.4)
     http (0.9.8)
       addressable (~> 2.3)
       http-cookie (~> 1.0)
@@ -436,6 +439,12 @@ GEM
     pkg-config (1.1.7)
     power_assert (0.3.0)
     powerpack (0.1.1)
+    premailer (1.8.7)
+      css_parser (>= 1.4.5)
+      htmlentities (>= 4.0.0)
+    premailer-rails (1.9.4)
+      actionmailer (>= 3, < 6)
+      premailer (~> 1.7, >= 1.7.9)
     pry (0.10.3)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -701,6 +710,7 @@ DEPENDENCIES
   paranoia
   pg
   pg_search
+  premailer-rails
   pry
   rack-contrib
   rack-mini-profiler
