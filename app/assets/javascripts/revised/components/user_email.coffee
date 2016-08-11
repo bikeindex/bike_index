@@ -9,7 +9,6 @@ class BikeIndex.UserEmail extends BikeIndex
 			email: $user_email.val()
 			suggested: (result) ->
 				return result.full
-			empty: () -> return false
 		result = @checkUserEmail(checkObj)
 		@appendMessage(result)
 
@@ -17,16 +16,20 @@ class BikeIndex.UserEmail extends BikeIndex
 
 	appendMessage: (result) ->
 		if result
-			message = "Did you mean #{result} ?"
-			$resultParagraph = "<p id='user_email_message'>" + message + "</p>"
-			$("#user_email").after($resultParagraph)
+			$user_email = $('#user_email')
+			$user_email.parent().addClass('has-warning')
+			message = "Did you mean <ins>#{result}</ins> ?"
+			$resultParagraph = "<small id='user_email_message'>" + message + "</small>"
+			$user_email.after($resultParagraph)
 			@appendMessageEvent(result)
 		return false
 
 	appendMessageEvent: (new_value) ->
 		$resultParagraph = $("#user_email_message")
 		$resultParagraph.click () => 
-			$("#user_email").val(new_value)
+			$user_email = $('#user_email')
+			$user_email.val(new_value)
+									.parent().removeClass('has-warning')
 			$resultParagraph.remove()
 
 
