@@ -1,0 +1,59 @@
+- sentence_prefix = "#{ @bike.stolen && @bike.recovered  ? 'recovered/found ' : 'stolen ' }#{ @bike.type } to the Bike Index#{ ' for you' unless @vars[:registered_by_owner] }:"
+- if @vars[:registered_by_owner]
+  You added a #{ sentence_prefix }
+- else
+  = @creation_org.present? ? @creation_org.name : @ownership.creator.display_name
+  - if @vars[:new_registration]
+    added a #{ sentence_prefix }
+  - else
+    sent you a #{ sentence_prefix }
+
+
+- bike_url = ownership_url(@ownership)
+
+\---------------------------------------------------------------
+
+Make: #{ @bike.manufacturer_name }
+
+Serial: #{ @bike.serial_number }
+
+Color#{ 's' if @bike.frame_colors.count > 1 }: #{ @bike.frame_colors.to_sentence }
+
+- if @bike.stolen
+  - stolen_record = @bike.current_stolen_record
+  #{ @bike.recovered ? 'Found:' : 'Stolen from:' }#{ stolen_record.show_stolen_address }
+
+  Date: #{ l stolen_record.date_stolen, format: :dotted }
+
+- if (@bike.ownerships.count == 1 && @bike.registered_new)
+  Color may be incorrect. Claim your bike and update it if necessary!
+
+\---------------------------------------------------------------
+
+- if @bike.stolen
+  - if @bike.recovered
+    Hopefully you find the owner soon.
+  - else 
+    Hopefully you find the #{ @bike.type } soon.
+  
+  Give us a heads up when you do (#{ edit_bike_url(@bike) })
+
+- unless @ownership.claimed
+  Claim the #{ @bike.type } at this URL: #{ bike_url }
+
+  Sign up on BikeIndex.org to claim your #{ @bike.type }
+
+  Edit it, upload photos and make sure you never lose track of your trusty steed!
+
+- unless @bike.recovered
+  \---------------------------------------------------------------
+
+  Protect your bike by following these locking guidelines.
+
+  \- *Use a U-Lock.* Cable locks should never be used as a primary means of locking a bike in a city.
+
+  \- Secure both wheels - either with two U-locks, or one U-lock and one heavy duty cable.
+
+  \- Before locking, check that what you are locking to can't be easily removed.
+  
+  Read more here: #{ protect_your_bike_url }

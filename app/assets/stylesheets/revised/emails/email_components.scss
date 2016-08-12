@@ -1,0 +1,29 @@
+.binx-button {
+  margin: $vertical-height auto;
+  color: #fff;
+  background: $blue;
+  text-transform: uppercase;
+  font-size: 20px;
+  padding: $vertical-height 0;
+  width: 300px;
+  display: block;
+  text-align: center;
+  max-width: 100%;
+}
+
+.locking-demonstration {
+  border: solid $vertical-height $email-light-bg;
+  width: 100%;
+  margin: 2*$vertical-height 0 0;
+  position: relative;
+  img {
+    display: block;
+    width: 80%;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+}
+.locking-demonstration-list li {
+  line-height: 1.5em;
+  margin-top: .5*$vertical-height;
+}

@@ -21,10 +21,6 @@ class StolenRecordV2Serializer < ActiveModel::Serializer
   end
 
   def location
-    a = [object.city]
-    a << object.state.abbreviation if object.state.present?
-    a << object.zipcode if object.zipcode.present?
-    a << object.country.iso if object.country.present? && object.country.iso != 'US'
-    a.compact.join(', ')
+    object.address_short
   end
 end

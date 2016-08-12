@@ -17,17 +17,16 @@ class OrganizedMailer < ActionMailer::Base
 
   def finished_registration(ownership, bike: nil)
     @ownership = ownership
-    @bike = bike || @ownership.bike
+    @send_to = @ownership.owner_email
+    @bike = bike || Bike.unscoped.find(@ownership.bike_id)
     @vars = {
       new_bike: (@bike.ownerships.count == 1),
-      new_pos_registration: (@bike.registered_new && @bike.ownerships.count == 1),
       new_user: User.fuzzy_email_find(@ownership.owner_email).present?,
       registered_by_owner: (ownership.user.present? && @bike.creator_id == ownership.user_id),
     }
     @organization = @bike.creation_organization if @bike.creation_organization.present? && @vars[:new_bike]
-    # add_snippet({bike: @bike})
-    subject = t("organized_mailer.finished_registration.#{'stolen_' if @bike.stolen}subject", organization_name: nil)
-    mail(to: @ownership.owner_email, subject: subject) do |format|
+    subject = t("organized_mailer.finished#{'_stolen' if @bike.stolen}_registration.subject", organization_name: nil)
+    mail(to: @send_to, subject: subject) do |format|
       format.text
       format.html { render layout: 'email_revised' }
     end
