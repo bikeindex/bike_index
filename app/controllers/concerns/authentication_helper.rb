@@ -1,13 +1,13 @@
 module AuthenticationHelper
   extend ActiveSupport::Concern
 
-  def authenticate_user(msg = 'Sorry, you have to log in')
+  def authenticate_user(msg = 'Sorry, you have to log in', flash_type: :error)
     if current_user.present?
       unless current_user.terms_of_service
         redirect_to accept_terms_url(subdomain: false) and return
       end
     else
-      flash[:error] = msg
+      flash[flash_type] = msg
       if msg.match(/create an account/i).present?
         redirect_to new_user_url(subdomain: false) and return
       else
@@ -35,7 +35,7 @@ module AuthenticationHelper
 
   def remove_session
     cookies.delete(:auth)
-    
+
   end
 
   def current_user

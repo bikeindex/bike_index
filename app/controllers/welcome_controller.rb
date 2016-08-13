@@ -1,5 +1,7 @@
 class WelcomeController < ApplicationController
   layout 'application_revised'
+  before_filter :authenticate_user_for_welcome_controller, only: [:user_home, :choose_registration]
+
   def index
   end
 
@@ -12,20 +14,20 @@ class WelcomeController < ApplicationController
   end
 
   def user_home
-    if current_user.present?
-      @user = current_user
-      bikes = current_user.bikes
-      page = params[:page] || 1
-      @per_page = params[:per_page] || 20
-      paginated_bikes = Kaminari.paginate_array(bikes).page(page).per(@per_page)
-      @bikes = BikeDecorator.decorate_collection(paginated_bikes)
-      @locks = LockDecorator.decorate_collection(current_user.locks)
-    else
-      redirect_to new_user_url
-    end
+    bikes = current_user.bikes
+    page = params[:page] || 1
+    @per_page = params[:per_page] || 20
+    paginated_bikes = Kaminari.paginate_array(bikes).page(page).per(@per_page)
+    @bikes = BikeDecorator.decorate_collection(paginated_bikes)
+    @locks = LockDecorator.decorate_collection(current_user.locks)
   end
 
   def choose_registration
-    redirect_to new_user_path and return unless current_user.present?
+  end
+
+  private
+
+  def authenticate_user_for_welcome_controller
+    authenticate_user('Please create an account', flash_type: :info)
   end
 end
