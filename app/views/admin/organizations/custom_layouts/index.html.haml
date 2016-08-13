@@ -1,26 +1,38 @@
 %header.with-subtitle.padded
   %h1
-    Edit #{@organization.name} custom layouts
+    Edit #{ link_to @organization.name, edit_admin_organization_path(@organization) } custom layouts
   %p
-    = link_to 'Custom layouts versioning', ENV['CUSTOM_CODE_SOURCE']
+    = link_to 'Custom layouts version history', ENV['CUSTOM_CODE_SOURCE']
 %section
   .dl-holder.padded
     %dl.dl-horizontal
       %dt Paid
       %dd
         = @organization.is_paid
-      %dt 
+      %dt
         Landing page #{ link_to 'on', 'https://github.com/bikeindex/bike_index/blob/master/config/landing_pages.rb'}
       %dd
         = LandingPages::ORGANIZATIONS.include?(@organization.slug)
-
+        \|
+        %small
+          Landing page  #{ link_to 'viewable here', organization_landing_path(organization_id: @organization.to_param) }, even if "off"
 %section.full-screen-table
   %table.table.table-striped
+    %thead
+      %th
+        Link to edit
+      %th
+        Has content
     %tbody
-      - MailSnippet.organization_mail_snippets.each do |snippet_type, snippet_title|
+      %tr
+        %td
+          = link_to 'Landing page', edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: 'landing_page')
+        %td
+          = @organization.landing_html.present?
+      - MailSnippet.organization_snippet_types.each do |snippet_name, snippet_description|
         %tr
           %td
-            = snippet_title
+            = link_to snippet_description, edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: 'mail_snippets')
           %td
-            = @organization.mail_snippets.where(snippet_type: snippet_type).any?
+            = @organization.mail_snippets.where(name: snippet_name).any?
 

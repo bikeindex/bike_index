@@ -3,12 +3,14 @@ require 'spec_helper'
 describe MailSnippet do
   describe 'validations' do
     it { is_expected.to validate_presence_of :name }
+    it { is_expected.to belong_to :organization }
+    it { is_expected.to validate_uniqueness_of(:organization_id).scoped_to(:name) }
   end
 
   describe 'matching_opts' do
     it 'finds an enabled snippet in the proximity' do
       # Creating far too many objects here. Need to reduce that...
-      mail_snippet = FactoryGirl.create(:mail_snippet)
+      mail_snippet = FactoryGirl.create(:location_triggered_mail_snippet)
       country = FactoryGirl.create(:country, iso: 'US')
       bike = FactoryGirl.create(:bike, stolen: true)
       stolen_record = FactoryGirl.create(:stolen_record, bike: bike, city: 'New York', country_id: country.id)

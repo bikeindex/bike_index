@@ -7,7 +7,7 @@ class Organization < ActiveRecord::Base
   mount_uploader :avatar, AvatarUploader
 
   has_many :memberships, dependent: :destroy
-  has_many :organization_email_blocks
+  has_many :mail_snippets
   has_many :organization_deals, dependent: :destroy
   has_many :users, through: :memberships
   has_many :organization_invitations, dependent: :destroy

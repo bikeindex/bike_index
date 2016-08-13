@@ -1,12 +1,11 @@
 class Admin::Organizations::CustomLayoutsController < Admin::BaseController
-  before_filter :define_edit_layout_pages
   before_filter :find_and_authorize_organization
 
   def index
   end
 
   def edit
-    edit_template = @edit_layout_pages.include?(params[:id]) ? params[:id] : @edit_layout_pages.first
+    edit_template = edit_layout_pages.include?(params[:id]) ? params[:id] : edit_layout_pages.first
     render "edit_#{edit_template}"
   end
 
@@ -42,8 +41,8 @@ class Admin::Organizations::CustomLayoutsController < Admin::BaseController
     %w(name zipcode city state_id _destroy id country_id street phone email shown).map(&:to_sym)
   end
 
-  def define_edit_layout_pages
-    @edit_layout_pages ||= %w(landing mail_snippets)
+  def edit_layout_pages
+    @edit_layout_pages ||= %w(landing_page mail_snippets)
   end
 
   def find_and_authorize_organization

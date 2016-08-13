@@ -905,7 +905,8 @@ CREATE TABLE mail_snippets (
     longitude double precision,
     proximity_radius integer,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    organization_id integer
 );
 
 
@@ -1180,39 +1181,6 @@ CREATE SEQUENCE organization_deals_id_seq
 --
 
 ALTER SEQUENCE organization_deals_id_seq OWNED BY organization_deals.id;
-
-
---
--- Name: organization_email_blocks; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE organization_email_blocks (
-    id integer NOT NULL,
-    organization_id integer,
-    block_type character varying,
-    body text,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: organization_email_blocks_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE organization_email_blocks_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: organization_email_blocks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE organization_email_blocks_id_seq OWNED BY organization_email_blocks.id;
 
 
 --
@@ -2081,13 +2049,6 @@ ALTER TABLE ONLY organization_deals ALTER COLUMN id SET DEFAULT nextval('organiz
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY organization_email_blocks ALTER COLUMN id SET DEFAULT nextval('organization_email_blocks_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
 ALTER TABLE ONLY organization_invitations ALTER COLUMN id SET DEFAULT nextval('organization_invitations_id_seq'::regclass);
 
 
@@ -2437,14 +2398,6 @@ ALTER TABLE ONLY organization_deals
 
 
 --
--- Name: organization_email_blocks_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY organization_email_blocks
-    ADD CONSTRAINT organization_email_blocks_pkey PRIMARY KEY (id);
-
-
---
 -- Name: organization_invitations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2668,6 +2621,13 @@ CREATE INDEX index_integrations_on_user_id ON integrations USING btree (user_id)
 --
 
 CREATE INDEX index_locks_on_user_id ON locks USING btree (user_id);
+
+
+--
+-- Name: index_mail_snippets_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_mail_snippets_on_organization_id ON mail_snippets USING btree (organization_id);
 
 
 --
@@ -3145,5 +3105,5 @@ INSERT INTO schema_migrations (version) VALUES ('20160714182030');
 
 INSERT INTO schema_migrations (version) VALUES ('20160808133129');
 
-INSERT INTO schema_migrations (version) VALUES ('20160812195513');
+INSERT INTO schema_migrations (version) VALUES ('20160813191639');
 
