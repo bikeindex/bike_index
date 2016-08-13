@@ -13,19 +13,10 @@ describe Admin::OrganizationsController, type: :controller do
   end
 
   describe 'edit' do
-    context 'standard' do
-      it 'renders' do
-        get :edit, id: organization.to_param
-        expect(response.status).to eq(200)
-        expect(response).to render_template(:edit)
-      end
-    end
-    context 'landing page' do
-      it 'renders' do
-        get :edit, id: organization.to_param, landing_page: 1
-        expect(response.status).to eq(200)
-        expect(response).to render_template(:edit_landing_page)
-      end
+    it 'renders' do
+      get :edit, id: organization.to_param
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:edit)
     end
   end
 
@@ -36,7 +27,6 @@ describe Admin::OrganizationsController, type: :controller do
     let(:update_attributes) do
       {
         name: 'new name thing stuff',
-        landing_html: '<p>html</p>',
         show_on_map: true,
         org_type: 'shop',
         locations_attributes: {
@@ -81,7 +71,6 @@ describe Admin::OrganizationsController, type: :controller do
       end.to change(Location, :count).by 1
       organization.reload
       expect(organization.name).to eq update_attributes[:name]
-      expect(organization.landing_html).to eq update_attributes[:landing_html]
       # Existing location is updated
       location_1.reload
       expect(location_1.organization).to eq organization

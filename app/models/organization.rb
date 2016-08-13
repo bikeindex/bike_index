@@ -12,6 +12,7 @@ class Organization < ActiveRecord::Base
   has_many :users, through: :memberships
   has_many :organization_invitations, dependent: :destroy
   belongs_to :auto_user, class_name: 'User'
+  accepts_nested_attributes_for :mail_snippets
 
   has_many :bikes, foreign_key: 'creation_organization_id'
 

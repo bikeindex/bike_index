@@ -31,18 +31,13 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def edit
     @embedable_email = @organization.auto_user.email if @organization.auto_user
-    render 'edit_landing_page' if params[:landing_page]
   end
 
   def update
     # Needs to update approved before saving so set_locations_shown is applied on save
     if @organization.update_attributes(permitted_parameters)
       flash[:success] = 'Organization Saved!'
-      if params[:landing_page]
-        redirect_to edit_admin_organization_url(@organization, landing_page: true)
-      else
-        redirect_to admin_organization_url(@organization)
-      end
+      redirect_to admin_organization_url(@organization)
     else
       render action: :edit
     end
@@ -74,7 +69,7 @@ class Admin::OrganizationsController < Admin::BaseController
     (%w(available_invitation_count sent_invitation_count name short_name slug website
        show_on_map is_suspended org_type embedable_user_email auto_user_id lock_show_on_map
        api_access_approved access_token new_bike_notification avatar avatar_cache
-       lightspeed_cloud_api_key use_additional_registration_field approved landing_html
+       lightspeed_cloud_api_key use_additional_registration_field approved
       ).map(&:to_sym) + [locations_attributes: permitted_locations_params]).freeze
   end
 
