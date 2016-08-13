@@ -1,0 +1,24 @@
+.form.form-horizontal
+  - if @organization.errors.any?
+    #alert-block
+      .alert.alert-error
+        %h4
+          Please fix the following 
+          = pluralize(@organization.errors.count, "error")
+        %ul
+          - @organization.errors.full_messages.each do |msg|
+            %li
+              = msg
+  = form_for @organization, { as: :organization, url: admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id]), action: 'update' } do |f|
+    .blog-field
+      = f.text_area :landing_html, placeholder: 'Landing page (html)', rows: 20
+    = f.submit 'Save', class: 'button-green pull-right'
+  // Because somewhere, there is overflow hidden and it cuts off the bottom of the save button
+  .padded
+.well
+  .add-blog-photos
+    %ul#public_images{ :"data-order-url" => order_public_images_url }
+      - if @organization.public_images
+        = render partial: '/public_images/public_image', collection: @organization.public_images, as: :public_image, locals: { skip_order: true }
+    %section
+      = render partial: 'public_images/admin_new_form', locals: { imageable_type: 'Organization' }

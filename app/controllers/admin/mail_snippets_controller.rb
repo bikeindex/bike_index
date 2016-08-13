@@ -2,7 +2,7 @@ class Admin::MailSnippetsController < Admin::BaseController
   before_filter :find_snippet, except: [:index, :new, :create]
   
   def index
-    @mail_snippets = MailSnippet.all
+    @mail_snippets = MailSnippet.without_organizations
   end
 
   def show
@@ -40,10 +40,11 @@ class Admin::MailSnippetsController < Admin::BaseController
   protected
 
   def permitted_parameters
-    params.require(:mail_snippet).permit(MailSnippet.old_attr_accessible)
+    params.require(:mail_snippet).permit(:name, :body, :is_enabled, :address,
+                                         :is_location_triggered, :proximity_radius)
   end
 
   def find_snippet
-    @mail_snippet = MailSnippet.find(params[:id])
+    @mail_snippet = MailSnippet.without_organizations.find(params[:id])
   end
 end

@@ -74,12 +74,12 @@ class StolenRecord < ActiveRecord::Base
     (a+[zipcode, country.name]).compact.join(', ')
   end
 
-  def address_short
-    a = [city]
-    a << state.abbreviation if state.present?
-    a << zipcode if zipcode.present?
-    a << country.iso if country.present? && country.iso != 'US'
-    a.compact.join(', ')
+  def address_short # Doesn't include street
+    [
+      city,
+      (state && state.abbreviation),
+      zipcode,
+    ].reject(&:blank?).join(',')
   end
 
   def show_stolen_address
@@ -88,7 +88,7 @@ class StolenRecord < ActiveRecord::Base
       city,
       (state && state.abbreviation),
       zipcode,
-      (country && country.name)
+      (country && country.iso unless country.iso == 'US')
     ].reject(&:blank?).join(', ')
   end
 

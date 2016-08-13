@@ -7,5 +7,5 @@ Rails.application.config.assets.precompile += %w(
   graphs.js embed.js embed_user.js documentation_v2.js application_revised.js
   spokecard.css embed_styles.css embed_user_styles.css registration_pdf.css
   updated_styles.css documentation_v2.css revised.css og_application.css
-  registrations.js registrations.css
+  registrations.js registrations.css email.css
 )

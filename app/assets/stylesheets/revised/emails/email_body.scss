@@ -1,0 +1,46 @@
+
+#outlook a{ padding:0; } /* Force Outlook to provide a "view in browser" button. */
+
+body {
+  width:100% !important; /* Force Hotmail to display emails at full width */
+  -webkit-text-size-adjust:none; /* Prevent Webkit platforms from changing default text sizes. */
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  font-family: sans-serif;
+  color: $gray;
+  font-size: $font-size;
+  line-height: 2em;
+  a {
+    color: $link-color;
+    text-decoration: none;
+    &:hover, &:active, &.active {
+      text-decoration: underline;
+      color: $link-color;
+    }
+  }
+}
+
+h1, h2, h3, h4, h5 {
+  line-height: 1.2em;
+  margin: 0;
+  font-family: sans-serif;
+}
+
+h1, h2, h3 {
+  color: $gray-darker;
+  text-transform: uppercase;
+}
+
+h1 { font-weight: 200; }
+
+hr {
+  display: block;
+  margin: 2*$vertical-height 0;
+  border: none;
+  border-top: 1px inset $gray-light;
+}
+
+.center-text { text-align: center; }
+
+.less-strong { color: $gray-light; }

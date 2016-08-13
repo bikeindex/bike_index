@@ -905,7 +905,8 @@ CREATE TABLE mail_snippets (
     longitude double precision,
     proximity_radius integer,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    organization_id integer
 );
 
 
@@ -2623,6 +2624,13 @@ CREATE INDEX index_locks_on_user_id ON locks USING btree (user_id);
 
 
 --
+-- Name: index_mail_snippets_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_mail_snippets_on_organization_id ON mail_snippets USING btree (organization_id);
+
+
+--
 -- Name: index_memberships_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -3096,4 +3104,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160711183247');
 INSERT INTO schema_migrations (version) VALUES ('20160714182030');
 
 INSERT INTO schema_migrations (version) VALUES ('20160808133129');
+
+INSERT INTO schema_migrations (version) VALUES ('20160813191639');
 

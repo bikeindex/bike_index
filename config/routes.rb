@@ -116,8 +116,14 @@ Bikeindex::Application.routes.draw do
     get 'tsvs', to: 'dashboard#tsvs'
     get 'bust_z_cache', to: 'dashboard#bust_z_cache'
     get 'destroy_example_bikes', to: 'dashboard#destroy_example_bikes'
-    resources :memberships, :organizations, :organization_invitations,
+    resources :memberships, :organization_invitations,
               :paints, :ads, :recovery_displays, :mail_snippets
+    resources :organizations do
+      resources :custom_layouts, only: [:index, :edit, :update], controller: 'organizations/custom_layouts'
+    end
+    get 'recover_organization', to: 'organizations#recover'
+    get 'show_deleted_organizations', to: 'organizations#show_deleted'
+
     resources :flavor_texts, only: [:destroy, :create]
     resources :stolen_bikes do
       member { post :approve }
@@ -138,8 +144,6 @@ Bikeindex::Application.routes.draw do
     end
     resources :failed_bikes, only: [:index, :show]
     resources :ownerships, only: [:edit, :update]
-    get 'recover_organization', to: 'organizations#recover'
-    get 'show_deleted_organizations', to: 'organizations#show_deleted'
     get 'blog', to: redirect('/news')
     resources :news do
       collection do
@@ -194,8 +198,6 @@ Bikeindex::Application.routes.draw do
       get 'current_tsv'
     end
   end
-
-  resources :mailer_integrations, only: [:show, :index]
 
   resources :manufacturers, only: [:index] do
     collection { get 'tsv' }

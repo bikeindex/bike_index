@@ -1,10 +1,9 @@
 require 'spec_helper'
 
 describe Admin::PaintsController do
+  include_context :logged_in_as_super_admin
   describe 'index' do
     it 'renders' do
-      user = FactoryGirl.create(:admin)
-      set_current_user(user)
       get :index
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
@@ -13,8 +12,6 @@ describe Admin::PaintsController do
 
   describe 'edit' do
     it 'renders' do
-      user = FactoryGirl.create(:admin)
-      set_current_user(user)
       paint = FactoryGirl.create(:paint)
       get :edit, id: paint.id
       expect(response.status).to eq(200)

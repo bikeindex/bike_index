@@ -1,0 +1,8 @@
+en:
+  organized_mailer:
+    partial_registration:
+      subject: 'Finish your Bike Index registration!'
+    finished_stolen_registration:
+      subject: 'Your stolen bike'
+    finished_registration:
+      subject: 'Claim your bike on BikeIndex.org!'

@@ -1,0 +1,41 @@
+%header.with-subtitle.padded
+  %h1
+    Edit #{ link_to @organization.name, admin_organization_path(@organization) } custom layouts
+  %p
+    = link_to 'Custom layouts version history', ENV['CUSTOM_CODE_SOURCE']
+%section
+  .dl-holder.padded
+    %dl.dl-horizontal
+      %dt Paid
+      %dd
+        = @organization.is_paid
+          
+%section.full-screen-table
+  %table.table.table-striped.table-bordered
+    %thead
+      %th
+        Link to edit
+      %th
+        Has content
+      %th
+        Enabled
+    %tbody
+      %tr
+        %td
+          = link_to 'Landing page', edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: 'landing_page')
+          %small.less-strong
+            page  #{ link_to 'previewable here', organization_landing_path(organization_id: @organization.to_param) }, even if "off"
+        %td
+          = @organization.landing_html.present?
+        %td
+          = link_to LandingPages::ORGANIZATIONS.include?(@organization.slug), 'https://github.com/bikeindex/bike_index/blob/master/config/landing_pages.rb'
+      - MailSnippet.organization_snippets.each do |snippet_name, snippet_description|
+        - snippet = @organization.mail_snippets.where(name: snippet_name).first
+        %tr
+          %td
+            = link_to snippet_description, edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: snippet_name)
+          %td
+            = "&#x2713;".html_safe if snippet && snippet.body.present?
+          %td
+            = "&#x2713;".html_safe if snippet && snippet.is_enabled
+

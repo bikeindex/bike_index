@@ -1,0 +1,52 @@
+.bike-display {
+  position: relative;
+  width: 96%;
+  margin: $vertical-height auto 2*$vertical-height;
+  padding: $vertical-height;
+  border: 1px solid $gray-light;
+  clear: both;
+  .clearbikedisplay {
+    width: 100%;
+    clear: both;
+    float: none;
+  }
+  .image-holder {
+    margin: 0;
+    float: left;
+    width: 35%;
+    position: relative;
+    padding: 0;
+    a {
+      display: block;
+      position: relative;
+    }
+    img {
+      width: 100%;
+      display: block;
+      margin: 0 auto;
+      height: auto;
+    }
+    &.placeholder {
+      background: $email-light-bg;
+      a { padding: $vertical-height 0; }
+      img { width: 70%; }
+    }
+  }
+  .info-holder {
+    float: left;
+    margin: 0 0 0 7%;
+    padding: 0;
+    width: 58%;
+    list-style-type: none;
+    display: block;
+    li {
+      margin: .5*$vertical-height 0 0 0;
+      padding: 0 0 0 0;
+      text-indent: -5%;
+      display: block;
+      list-style: none;
+      line-height: 1.5em;
+      &:first-of-type { margin-top: 0; }
+    }
+  }
+}

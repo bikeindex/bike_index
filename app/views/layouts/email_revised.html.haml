@@ -1,0 +1,24 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %title= content_for?(:title) ? yield(:title) : "Bike Index"
+    = stylesheet_link_tag 'email'
+  %body
+    .binx-wrapper
+      .binx-header
+        %img{:src => 'https://files.bikeindex.org/email_assets/logo.png' }
+      .binx-body
+        = yield
+      .binx-pstscpt
+        .hearts
+          %span &#9829;
+          %span &#9829;
+          %span &#9829;
+          %span &#9829;
+          %span &#9829;
+        %h4 The Bike Index Team
+
+      .binx-footer
+        %h5
+          #{Time.zone.now.year} &copy; Bike Index. Help prevent bike theft, #{ link_to 'make a donation.', support_the_index_url }

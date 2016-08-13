@@ -48,19 +48,37 @@ describe PublicImagesController do
     context 'organization' do
       let(:organization) { FactoryGirl.create(:organization) }
       context 'admin authorized' do
+        include_context :logged_in_as_super_admin
         it 'creates an image' do
-          user = FactoryGirl.create(:content_admin)
-          set_current_user(user)
           post :create, organization_id: organization.to_param, public_image: { name: 'cool name' }, format: :js
           organization.reload
           expect(organization.public_images.first.name).to eq 'cool name'
         end
       end
       context 'not admin' do
+        include_context :logged_in_as_user
         it 'does not create an image' do
-          set_current_user(FactoryGirl.create(:user))
           expect do
             post :create, organization_id: organization.to_param, public_image: { name: 'cool name' }, format: :js
+            expect(response.code).to eq('401')
+          end.to change(PublicImage, :count).by 0
+        end
+      end
+    end
+    context 'mail_snippet' do
+      let(:mail_snippet) { FactoryGirl.create(:mail_snippet) }
+      context 'admin authorized' do
+        include_context :logged_in_as_super_admin
+        it 'creates an image' do
+          post :create, mail_snippet_id: mail_snippet.to_param, public_image: { name: 'cool name' }, format: :js
+          mail_snippet.reload
+          expect(mail_snippet.public_images.first.name).to eq 'cool name'
+        end
+      end
+      context 'not signed in' do
+        it 'does not create an image' do
+          expect do
+            post :create, organization_id: mail_snippet.to_param, public_image: { name: 'cool name' }, format: :js
             expect(response.code).to eq('401')
           end.to change(PublicImage, :count).by 0
         end

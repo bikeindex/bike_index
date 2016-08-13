@@ -1,0 +1,14 @@
+@import "revised/mixins/colors";
+@import "revised/vars";
+
+$font-size: 16px;
+$header-height: 82px;
+$email-light-bg: #ddd;
+
+//
+// Email specific styles
+//
+@import "revised/emails/email_body";
+@import "revised/emails/email_sections";
+@import "revised/emails/email_components";
+@import "revised/emails/email_bike_display";

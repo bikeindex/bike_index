@@ -627,6 +627,7 @@ describe BikesController do
             end.to change(Bike, :count).by(1)
             expect(flash[:success]).to be_present
             bike = Bike.last
+            expect(bike.creator_id).to eq user.id
             b_param.reload
             expect(b_param.created_bike_id).to eq bike.id
             bike_params.delete(:manufacturer_id)
