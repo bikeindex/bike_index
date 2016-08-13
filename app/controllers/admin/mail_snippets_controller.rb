@@ -40,8 +40,8 @@ class Admin::MailSnippetsController < Admin::BaseController
   protected
 
   def permitted_parameters
-    params.require(:mail_snippet)
-      .permit(%w(name body is_enabled is_location_triggered address proximity_radius).map(&:to_sym))
+    params.require(:mail_snippet).permit(:name, :body, :is_enabled, :address,
+                                         :is_location_triggered, :proximity_radius)
   end
 
   def find_snippet
