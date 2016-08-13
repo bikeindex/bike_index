@@ -1,0 +1,26 @@
+%header.with-subtitle.padded
+  %h1
+    Edit #{@organization.name} custom layouts
+  %p
+    = link_to 'Custom layouts versioning', ENV['CUSTOM_CODE_SOURCE']
+%section
+  .dl-holder.padded
+    %dl.dl-horizontal
+      %dt Paid
+      %dd
+        = @organization.is_paid
+      %dt 
+        Landing page #{ link_to 'on', 'https://github.com/bikeindex/bike_index/blob/master/config/landing_pages.rb'}
+      %dd
+        = LandingPages::ORGANIZATIONS.include?(@organization.slug)
+
+%section.full-screen-table
+  %table.table.table-striped
+    %tbody
+      - MailSnippet.organization_mail_snippets.each do |snippet_type, snippet_title|
+        %tr
+          %td
+            = snippet_title
+          %td
+            = @organization.mail_snippets.where(snippet_type: snippet_type).any?
+

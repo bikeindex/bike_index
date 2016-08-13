@@ -4,6 +4,9 @@
     = @organization.name
   %p
     = link_to "Edit organization", edit_admin_organization_url(@organization)
+  - if current_user.developer
+    %p.pull-right
+      = link_to 'edit custom layouts', admin_organization_custom_layouts_path(organization_id: @organization.to_param)
 
 %section
   .dl-holder.padded
