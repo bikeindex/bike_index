@@ -79,14 +79,6 @@ describe Admin::DashboardController do
       end
     end
 
-    describe 'mailer_previews' do
-      it 'renders' do
-        get :mailer_previews
-        expect(response.code).to eq '200'
-        expect(response).to render_template(:mailer_previews)
-      end
-    end
-
     describe 'update_tsv_blacklist' do
       it 'renders and updates' do
         user = FactoryGirl.create(:admin)
