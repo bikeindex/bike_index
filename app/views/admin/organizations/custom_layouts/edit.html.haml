@@ -1,0 +1,14 @@
+%header.with-subtitle#blog-edit
+  %h1
+    = link_to "#{@organization.name} custom layouts", admin_organization_custom_layouts_path(@organization)
+    - if (@edit_template == 'landing_page')
+      Landing page
+    - else
+      %strong
+        = @edit_template.titleize
+      email snippet
+
+
+.blog-entry-fields
+  = render (@edit_template == 'landing_page') ? 'landing_page' : 'mail_snippet'
+.padded

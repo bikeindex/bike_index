@@ -20,6 +20,8 @@ class PublicImagesController < ApplicationController
       if params[:blog_id].present?
         @blog = Blog.find(params[:blog_id])
         @public_image.imageable = @blog
+      elsif params[:mail_snippet_id]
+        @public_image.imageable = MailSnippet.find(params[:mail_snippet_id])
       else
         @public_image.imageable = current_organization
       end
@@ -64,7 +66,7 @@ class PublicImagesController < ApplicationController
 
   def order
     if params[:list_of_photos]
-      last_image = params[:list_of_photos].count
+      # last_image = params[:list_of_photos].count
       params[:list_of_photos].each_with_index do |id, index|
         image = PublicImage.unscoped.find(id)
         image.update_attribute :listing_order, index + 1 if current_user_image_owner(image)

@@ -19,4 +19,16 @@ describe MailSnippet do
       expect(result).to eq(mail_snippet)
     end
   end
+
+  describe 'disable_if_blank' do
+    it 'has before_save_callback_method defined for clean_frame_size' do
+      expect(MailSnippet._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:disable_if_blank)).to eq(true)
+    end
+    it 'sets unenabled if body is blank' do
+      mail_snippet = MailSnippet.new(is_enabled: true, body: nil)
+      expect(mail_snippet.is_enabled).to be_truthy
+      mail_snippet.disable_if_blank
+      expect(mail_snippet.is_enabled).to be_falsey
+    end
+  end
 end
