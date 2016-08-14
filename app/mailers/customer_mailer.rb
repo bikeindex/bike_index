@@ -62,26 +62,6 @@ class CustomerMailer < ActionMailer::Base
     end
   end
 
-  def ownership_invitation_email(ownership)
-    @ownership = ownership
-    @bike = @ownership.bike
-    @new_pos_registration = true if @bike.registered_new && @bike.ownerships.count == 1
-    @biketype = CycleType.find(@bike.cycle_type_id).name.downcase
-    @new_bike = @bike.ownerships.count == 1
-    @new_user = true unless User.fuzzy_email_find(@ownership.owner_email)
-    @creation_org = @bike.creation_organization if @bike.creation_organization.present? && @new_bike
-    if @bike.stolen
-      subject = "Your stolen bike"
-    else
-      subject = "Claim your bike on BikeIndex.org!"
-    end
-    add_snippet({bike: @bike})
-    mail(to: @ownership.owner_email, subject: subject) do |format|
-      format.text
-      format.html { render layout: 'email'}
-    end
-  end
-
   def organization_invitation_email(organization_invitation)
     @organization_invitation = organization_invitation
     @organization = organization_invitation.organization

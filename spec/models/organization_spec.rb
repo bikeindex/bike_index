@@ -162,4 +162,30 @@ describe Organization do
       expect(Organization._save_callbacks.select { |cb| cb.kind.eql?(:after) }.map(&:raw_filter).include?(:clear_map_cache)).to eq(true)
     end
   end
+
+  describe 'mail_snippet_body' do
+    let(:organization) { FactoryGirl.create(:organization) }
+    before do
+      expect([organization, mail_snippet].size).to eq 2
+      expect(organization.mail_snippets).to be_present
+    end
+    context 'not included snippet type' do
+      let(:mail_snippet) { FactoryGirl.create(:organization_mail_snippet, organization: organization, name: 'fool') }
+      it 'returns nil for not-allowed snippet type' do
+        expect(organization.mail_snippet_body('fool')).to be nil
+      end
+    end
+    context 'non-enabled snippet type' do
+      let(:mail_snippet) { FactoryGirl.create(:organization_mail_snippet, organization: organization, is_enabled: false) }
+      it 'returns nil for not-enabled snippet' do
+        expect(organization.mail_snippet_body(mail_snippet.name)).to be nil
+      end
+    end
+    context 'enabled snippet' do
+      let(:mail_snippet) { FactoryGirl.create(:organization_mail_snippet, organization: organization, name: 'security') }
+      it 'returns nil for not-enabled snippet' do
+        expect(organization.mail_snippet_body(mail_snippet.name)).to eq mail_snippet.body
+      end
+    end
+  end
 end

@@ -9,7 +9,7 @@ FactoryGirl.define do
       address 'New York, NY'
     end
     factory :organization_mail_snippet do
-      name MailSnippet.organization_snippet_types.first
+      sequence(:name) { |n| MailSnippet.organization_snippet_types[MailSnippet.organization_snippet_types.count%n] }
       association :organization
     end
   end

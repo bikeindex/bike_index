@@ -2,19 +2,23 @@
   %h2{ style: 'margin-bottom: 12px;' }
     Welcome to the Bike Index
 
-- if @bike.recovered
-  %h1
-    Thanks for adding this #{ @bike.type } you found to the index!
-- elsif @bike.stolen
-  %h1
-    #{ @bike.type } thieves are jerks.
-  %p
-    We're sorry your #{ @bike.type } was stolen.
-- else
-  %h1
-    Congrats on adding your #{ @bike.type } to the index!
+- if @organization && @organization.mail_snippet_body('welcome').present?
+  = @organization.mail_snippet_body('welcome').html_safe
 
-%hr.binx-seperator
+- else
+  - if @bike.recovered
+    %h1
+      Thanks for adding this #{ @bike.type } you found to the index!
+  - elsif @bike.stolen
+    %h1
+      #{ @bike.type } thieves are jerks.
+    %p
+      We're sorry your #{ @bike.type } was stolen.
+  - else
+    %h1
+      Congrats on adding your #{ @bike.type } to the index!
+
+  %hr
 
 %p
   - if @vars[:registered_by_owner]
@@ -72,7 +76,7 @@
       %li
         %em.less-strong
           Color may be incorrect. Please update it if necessary!
-  .clearbikedisplay
+  .clearstuffdiv
 
 - if @bike.stolen
   %p
@@ -91,26 +95,28 @@
       and edit it, upload photos and add any information that will help people identify your missing bike.
     - else
       and edit it, upload photos and make sure you never lose track of your trusty steed!
+- if @organization && @organization.mail_snippet_body('security').present?
+  = @organization.mail_snippet_body('security').html_safe
+- else
+  - unless @bike.recovered
+    %hr
 
-- unless @bike.recovered
-  %hr
-
-  %h2
-    Protect your bike by following these locking guidelines.
-  %ul.locking-demonstration-list
-    %li
-      %strong
-        Use a U-Lock.
-      Cable locks should never be used as a primary means of locking a bike in a city.
-    %li
-      Secure both wheels - either with two U-locks, or one U-lock and one heavy duty cable.
-    %li
-      Before locking, check that what you are locking to can't be easily removed.
-  %p
-    Read more about #{ link_to 'protecting your bike here', protect_your_bike_url }
-  .locking-demonstration
-    %img{ alt: 'Correctly locking a bike', src: 'https://files.bikeindex.org/email_assets/locking.gif', title: 'Pink Power U-Locks are a registered trademark of Bike Index, Inc' }
-  %p.center-text
-    %em
-      A correctly locked bike. The frame is locked to the bike rack and both wheels are secured.
+    %h2
+      Protect your bike by following these locking guidelines.
+    %ul.locking-demonstration-list
+      %li
+        %strong
+          Use a U-Lock.
+        Cable locks should never be used as a primary means of locking a bike in a city.
+      %li
+        Secure both wheels - either with two U-locks, or one U-lock and one heavy duty cable.
+      %li
+        Before locking, check that what you are locking to can't be easily removed.
+    %p
+      Read more about #{ link_to 'protecting your bike here', protect_your_bike_url }
+    .locking-demonstration
+      %img{ alt: 'Correctly locking a bike', src: 'https://files.bikeindex.org/email_assets/locking.gif', title: 'Pink Power U-Locks are a registered trademark of Bike Index, Inc' }
+    %p.center-text
+      %em
+        A correctly locked bike. The frame is locked to the bike rack and both wheels are secured.
 
