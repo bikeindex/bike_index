@@ -274,10 +274,11 @@ describe BParam do
     let(:expire_b_param) { b_param.update_attribute :created_at, Time.zone.now - 5.weeks }
     context 'with user_id passed' do
       context 'without token' do
-        it 'returns a new b_param' do
+        it 'returns a new b_param, with creator of user_id' do
           result = BParam.find_or_new_from_token(nil, user_id: user.id)
           expect(result.is_a?(BParam)).to be_truthy
           expect(result.id).to be_nil
+          expect(result.creator_id).to eq user.id
         end
       end
       context 'existing token' do

@@ -8,15 +8,7 @@ class BikeCreatorOrganizer
     @bike.creation_organization_id = nil
   end
 
-  def use_organization(organization)
-    @bike.creation_organization_id = organization.id
-  end
-
   def organization_usable(organization)
-    unless @b_param.creator.is_member_of?(organization)
-      @bike.errors.add(:creation_organization, "You have to be part of #{organization.name} to add a bike through them")
-      return false
-    end
     if organization.is_suspended
       @bike.errors.add(:creation_organization, "Oh no! #{organization.name} is currently suspended. Contact us if this is a surprise.")
       return false
@@ -36,8 +28,9 @@ class BikeCreatorOrganizer
 
   def organize(organization_id)
     organization = find_organization(organization_id)
-    if organization.present?
-      use_organization(organization) if organization_usable(organization)
+    if organization.present? && organization_usable(organization)
+      @bike.creation_organization_id = organization.id
+      @bike.creator_id ||= organization.auto_user_id
     end
   end
 

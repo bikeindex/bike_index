@@ -8,8 +8,8 @@ class BParam < ActiveRecord::Base
   # serialize :params
   serialize :bike_errors
 
-  belongs_to :created_bike, class_name: "Bike"
-  belongs_to :creator, class_name: "User"
+  belongs_to :created_bike, class_name: 'Bike'
+  belongs_to :creator, class_name: 'User'
 
   scope :with_bike, -> { where('created_bike_id IS NOT NULL') }
   scope :without_bike, -> { where('created_bike_id IS NULL') }
@@ -50,7 +50,7 @@ class BParam < ActiveRecord::Base
   def manufacturer_id; bike['manufacturer_id'] end
   def stolen; bike['stolen'] end
 
-  def manufacturer; bike['manufacturer_id'] && Manufacturer.find(bike['manufacturer_id']) end
+  def manufacturer; bike['manufacturer_id'] && Manufacturer.friendly_find(bike['manufacturer_id']) end
   def creation_organization; Organization.friendly_find(creation_organization_id) end
 
   class << self
@@ -72,14 +72,20 @@ class BParam < ActiveRecord::Base
 
     def find_or_new_from_token(toke = nil, user_id: nil, organization_id: nil)
       b = where(creator_id: user_id, id_token: toke).first if user_id.present?
-      b ||= without_bike.without_creator.where('created_at >= ?', Time.now - 1.month).where(id_token: toke).first
+      b ||= with_organization_or_no_creator(toke)
       b ||= BParam.new(creator_id: user_id, params: { revised_new: true }.as_json)
+      b.creator_id ||= user_id
       # If the org_id is present, add it to the params. Only save it if the b_param is created
       if organization_id.present? && b.creation_organization_id != organization_id
         b.params = b.params.merge(bike: b.bike.merge(creation_organization_id: organization_id))
         b.update_attribute :params, b.params if b.id.present?
       end
       b
+    end
+
+    def with_organization_or_no_creator(toke) # Because organization embed bikes might not match the creator
+      without_bike.where('created_at >= ?', Time.now - 1.month).where(id_token: toke)
+        .detect { |b| b.creator_id.blank? || b.creation_organization_id.present? || b.params['creation_organization_id'].present? }
     end
 
     def assignable_attrs

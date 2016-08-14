@@ -19,7 +19,6 @@ class BikesController < ApplicationController
   before_filter :render_ad, only: [:index, :show]
   before_filter :store_return_to, only: [:edit]
   before_filter :remove_subdomain, only: [:index]
-  before_filter :find_or_new_b_param, only: [:new, :create]
   layout 'application_revised'
 
   def index
@@ -97,6 +96,7 @@ class BikesController < ApplicationController
       flash[:info] = 'You have to sign in to register a bike'
       redirect_to new_user_path and return
     end
+    find_or_new_b_param
     # Let them know if they sent an invalid b_param token
     flash[:error] = "Sorry! We couldn't find that bike" if @b_param.id.blank? && params[:b_param_token].present?
     @bike ||= @b_param.bike_from_attrs(is_stolen: params[:stolen], recovered: params[:recovered])
@@ -108,6 +108,7 @@ class BikesController < ApplicationController
   end
 
   def create
+    find_or_new_b_param
     if params[:bike][:embeded]
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@b_param.created_bike)
@@ -217,7 +218,7 @@ class BikesController < ApplicationController
     end
     if @bike.hidden
       unless current_user.present? && @bike.visible_by(current_user)
-        flash[:error] = "Bike deleted"
+        flash[:error] = 'Bike deleted'
         redirect_to root_url and return
       end
     end
