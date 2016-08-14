@@ -264,27 +264,6 @@ describe BParam do
     end
   end
 
-  describe 'from_id_token' do
-    it 'gets from a token' do
-      b_param = FactoryGirl.create(:b_param)
-      expect(BParam.from_id_token(b_param.id_token)).to eq(b_param)
-    end
-
-    it "doesn't get an old token" do
-      b_param = FactoryGirl.create(:b_param)
-      b_param.update_attribute :created_at, Time.now - 2.days
-      b_param.reload
-      expect(BParam.from_id_token(b_param.id_token)).to be_nil
-    end
-
-    it 'gets with time passed in' do
-      b_param = FactoryGirl.create(:b_param)
-      b_param.update_attribute :created_at, Time.now - 2.days
-      b_param.reload
-      expect(BParam.from_id_token(b_param.id_token, '1969-12-31 18:00:00')).to eq(b_param)
-    end
-  end
-
   #
   # Revised attrs
   describe 'find_or_new_from_token' do
@@ -292,13 +271,14 @@ describe BParam do
     #
     # Because for now we aren't updating the factory, use this let for b_params factory
     let(:b_param) { BParam.create }
-    let(:expire_b_param) { b_param.update_attribute :created_at, Time.zone.now - 1.year }
+    let(:expire_b_param) { b_param.update_attribute :created_at, Time.zone.now - 5.weeks }
     context 'with user_id passed' do
       context 'without token' do
-        it 'returns a new b_param' do
+        it 'returns a new b_param, with creator of user_id' do
           result = BParam.find_or_new_from_token(nil, user_id: user.id)
           expect(result.is_a?(BParam)).to be_truthy
           expect(result.id).to be_nil
+          expect(result.creator_id).to eq user.id
         end
       end
       context 'existing token' do
@@ -320,10 +300,9 @@ describe BParam do
           end
         end
         context 'with no creator' do
-          it 'returns the b_param, with creator of user_id' do
+          it 'returns the b_param' do
             result = BParam.find_or_new_from_token(b_param.id_token, user_id: user.id)
             expect(result.id).to eq b_param.id
-            expect(result.creator_id).to eq user.id
           end
           context 'with expired b_param' do
             it 'fails' do

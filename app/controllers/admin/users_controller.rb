@@ -15,6 +15,7 @@ class Admin::UsersController < Admin::BaseController
     else 
       users = User.order("created_at desc")
     end
+    @user_count = users.count
     page = params[:page] || 1
     per_page = params[:per_page] || 25
     @users = users.page(page).per(per_page)

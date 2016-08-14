@@ -10,11 +10,9 @@ class RegistrationsController < ApplicationController
 
   def embed # Attributes assigned in the partial, but can be overridden so it can be used anywhere
     @organization = current_organization
-    @creator = @organization && @organization.auto_user || current_user
-    @owner_email = current_user && current_user.email || @creator && @creator.email
+    @owner_email = current_user && current_user.email
     @stolen = params[:stolen] ? 1 : 0
     @b_param ||= BParam.new(creation_organization_id: @organization && @organization.id,
-                            creator_id: @creator && @creator.id,
                             owner_email: @owner_email,
                             stolen: @stolen)
   end
@@ -40,7 +38,6 @@ class RegistrationsController < ApplicationController
     params.require(:b_param).permit(:manufacturer_id,
                                     :owner_email,
                                     :creation_organization_id,
-                                    :creator_id,
                                     :stolen,
                                     :primary_frame_color_id,
                                     :secondary_frame_color_id,

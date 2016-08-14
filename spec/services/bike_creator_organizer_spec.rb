@@ -11,18 +11,6 @@ describe BikeCreatorOrganizer do
     end
   end
 
-  describe 'use_organization' do
-    it 'marks the bike organized' do
-      bike = Bike.new
-      b_param = BParam.new(params: { stolen: false })
-      organization = Organization.new
-      allow(organization).to receive(:id).and_return(2)
-      creator = BikeCreatorOrganizer.new(b_param, bike)
-      creator.use_organization(organization)
-      expect(bike.creation_organization_id).to eq(2)
-    end
-  end
-
   describe 'organize' do
     it "finds the organization and call use organization if it's usable" do
       bike = Bike.new
@@ -32,8 +20,18 @@ describe BikeCreatorOrganizer do
       creator = BikeCreatorOrganizer.new(b_param, bike)
       expect(creator).to receive(:find_organization).and_return(organization)
       expect(creator).to receive(:organization_usable).with(organization).and_return(true)
-      expect(creator).to receive(:use_organization).with(organization).and_return(organization)
       creator.organize(2)
+    end
+    it 'adds the auto_user_id if bike missing it' do
+      bike = Bike.new
+      b_param = BParam.new
+      organization = Organization.new(auto_user_id: 22)
+      allow(organization).to receive(:id).and_return(2)
+      creator = BikeCreatorOrganizer.new(b_param, bike)
+      expect(creator).to receive(:find_organization).and_return(organization)
+      expect(creator).to receive(:organization_usable).with(organization).and_return(true)
+      creator.organize(2)
+      expect(bike.creator_id).to eq 22
     end
   end
 
@@ -55,26 +53,12 @@ describe BikeCreatorOrganizer do
   end
 
   describe 'organization_usable' do
-    it "adds an error if the creator doesn't have a membership to the organization" do
-      bike = Bike.new
-      b_param = BParam.new
-      user = User.new
-      organization = Organization.new
-      allow(organization).to receive(:is_suspended).and_return(false)
-      allow(organization).to receive(:name).and_return('Ballsy')
-      allow(b_param).to receive(:creator).and_return(user)
-      allow(user).to receive(:is_member_of?).and_return(false)
-      creator = BikeCreatorOrganizer.new(b_param, bike)
-      expect(creator.organization_usable(organization)).to be_falsey
-      expect(bike.errors[:creation_organization]).not_to be_nil
-    end
     it 'adds an error if the organization is suspended is used' do
       bike = Bike.new
       b_param = BParam.new
       user = User.new
       organization = Organization.new
       allow(b_param).to receive(:creator).and_return(user)
-      allow(user).to receive(:is_member_of?).and_return(true)
       allow(organization).to receive(:name).and_return('Ballsy')
       allow(organization).to receive(:is_suspended).and_return(true)
       creator = BikeCreatorOrganizer.new(b_param, bike)

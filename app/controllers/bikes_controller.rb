@@ -108,8 +108,8 @@ class BikesController < ApplicationController
   end
 
   def create
+    find_or_new_b_param
     if params[:bike][:embeded]
-      @b_param = BParam.from_id_token(params[:bike][:b_param_id_token])
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@b_param.created_bike)
       end
@@ -140,7 +140,6 @@ class BikesController < ApplicationController
         end
       end
     else
-      find_or_new_b_param
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@b_param.created_bike) and return
       end
@@ -219,7 +218,7 @@ class BikesController < ApplicationController
     end
     if @bike.hidden
       unless current_user.present? && @bike.visible_by(current_user)
-        flash[:error] = "Bike deleted"
+        flash[:error] = 'Bike deleted'
         redirect_to root_url and return
       end
     end
@@ -228,7 +227,7 @@ class BikesController < ApplicationController
   def find_or_new_b_param
     token = params[:b_param_token]
     token ||= params[:bike] && params[:bike][:b_param_id_token]
-    @b_param = BParam.find_or_new_from_token(token, user_id: current_user.id)
+    @b_param = BParam.find_or_new_from_token(token, user_id: current_user && current_user.id)
   end
 
   def ensure_user_allowed_to_edit

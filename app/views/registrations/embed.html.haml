@@ -10,7 +10,6 @@
     = f.collection_select(:primary_frame_color_id, Color.all, :id, :name, required: true, prompt: 'Primary frame color', class: 'form-control')
 
   = f.hidden_field :creation_organization_id
-  = f.hidden_field :creator_id
   .form-group
     %label
       = f.check_box :stolen

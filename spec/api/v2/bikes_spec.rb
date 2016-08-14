@@ -125,17 +125,6 @@ describe 'Bikes API V2' do
       expect(bike.is_for_sale).to be_falsey
     end
 
-    it "fails to create a bike if the user isn't a member of the organization" do
-      org = FactoryGirl.create(:organization, name: 'Something')
-      bike = @bike.merge(organization_slug: org.slug)
-      post "/api/v2/bikes?access_token=#{@token.token}",
-           bike.to_json,
-           JSON_CONTENT
-      expect(response.code).to eq('401')
-      result = JSON.parse(response.body)
-      expect(result['error'].is_a?(String)).to be_truthy
-    end
-
     it 'creates a stolen bike through an organization and uses the passed phone' do
       organization = FactoryGirl.create(:organization)
       @user.update_attribute :phone, '0987654321'

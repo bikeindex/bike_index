@@ -34,19 +34,15 @@ describe RegistrationsController do
         end
       end
       context 'with user' do
-        it 'renders, sets creator to user' do
+        it 'renders does not set creator' do
           set_current_user(user)
           get :embed
           expect(response.status).to eq(200)
           expect(response).to render_template(:embed)
           expect(flash).to_not be_present
           expect(assigns(:stolen)).to eq 0
-          expect(assigns(:creator)).to eq user
+          expect(assigns(:creator)).to be_nil
           expect(assigns(:owner_email)).to eq user.email
-          # Creator is user
-          creator_input = response.body[/value=.*id..b_param_creator_id..*.\d*/i]
-          creator_value = creator_input.gsub(/value=./, '').match(/\A[^\"]*/)[0]
-          expect(creator_value).to eq user.id.to_s
           expect(response.headers['X-Frame-Options']).not_to be_present
         end
       end
@@ -61,7 +57,7 @@ describe RegistrationsController do
           expect(response.headers['X-Frame-Options']).not_to be_present
           expect(assigns(:stolen)).to eq 0
           expect(assigns(:organization)).to eq organization
-          expect(assigns(:creator)).to eq auto_user
+          expect(assigns(:creator)).to be_nil
           expect(assigns(:simple_header)).to be_truthy
         end
       end
@@ -79,10 +75,6 @@ describe RegistrationsController do
           owner_email_input = body[/value=.*id..b_param_owner_email*/i]
           email_value = owner_email_input.gsub(/value=./, '').match(/\A[^\"]*/)[0]
           expect(email_value).to eq user.email
-          # Creator
-          creator_input = body[/value=.*id..b_param_creator_id..*.\d*/i]
-          creator_value = creator_input.gsub(/value=./, '').match(/\A[^\"]*/)[0]
-          expect(creator_value).to eq organization.auto_user_id.to_s
           # creation_organization
           creator_organization_input = body[/value=.*id..b_param_creation_organization_id/i]
           creator_organization_value = creator_organization_input.gsub(/value=./, '').match(/\A[^\"]*/)[0]
@@ -91,7 +83,7 @@ describe RegistrationsController do
           expect(assigns(:simple_header)).to be_falsey
           expect(assigns(:stolen)).to be_truthy
           expect(assigns(:organization)).to eq organization
-          expect(assigns(:creator)).to eq auto_user
+          expect(assigns(:creator)).to be_nil
           expect(assigns(:owner_email)).to eq user.email
         end
       end
@@ -118,9 +110,10 @@ describe RegistrationsController do
           expect(response).to render_template(:new)
           expect(assigns(:simple_header)).to be_truthy
           b_param = assigns(:b_param)
-          attrs.each do |key, value|
+          attrs.except(:creator_id).each do |key, value|
             expect(b_param.send(key).to_s).to eq value.to_s
           end
+          expect(b_param.creator_id).to be_nil
         end
       end
     end
@@ -144,8 +137,7 @@ describe RegistrationsController do
             secondary_frame_color_id: color.id,
             tertiary_frame_color_id: 222,
             owner_email: 'ks78xxxxxx@stuff.com',
-            creation_organization_id: 21,
-            creator_id: 333
+            creation_organization_id: 21
           }
           post :create, b_param: attrs
           expect(response).to render_template(:create)
