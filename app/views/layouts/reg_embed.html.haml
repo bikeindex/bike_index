@@ -11,7 +11,10 @@
     = javascript_include_tag 'registrations'
   %body{ style: 'background: none; width: 100%; max-width: 500px; margin: 0 auto;' }
     .registration-widget#binx_registration_widget{ class: params[:organization_id] }
-      - if @simple_header
+      - if action_name == 'create'
+        %header.reg-header
+          = image_tag 'revised/logo.svg', class: 'reg-header-logo'
+      - elsif @simple_header
         %header
           %h3
             Register your bike
