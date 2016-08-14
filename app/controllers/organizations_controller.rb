@@ -86,7 +86,7 @@ class OrganizationsController < ApplicationController
       redirect_to root_url and return
     end
     if params[:b_param_id_token].present?
-      @b_param = BParam.from_id_token(params[:b_param_id_token])
+      @b_param = BParam.find_or_new_from_token(params[:b_param_id_token])
     else
       hash = {
         creation_organization_id: @organization.id,

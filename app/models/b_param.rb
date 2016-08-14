@@ -70,17 +70,10 @@ class BParam < ActiveRecord::Base
       h
     end
 
-    def from_id_token(toke, after = nil)
-      return nil unless toke.present?
-      after ||= Time.now - 1.days
-      where('created_at >= ?', after).where(id_token: toke).first
-    end
-
     def find_or_new_from_token(toke = nil, user_id: nil, organization_id: nil)
       b = where(creator_id: user_id, id_token: toke).first if user_id.present?
       b ||= without_bike.without_creator.where('created_at >= ?', Time.now - 1.month).where(id_token: toke).first
       b ||= BParam.new(creator_id: user_id, params: { revised_new: true }.as_json)
-      b.creator_id ||= user_id
       # If the org_id is present, add it to the params. Only save it if the b_param is created
       if organization_id.present? && b.creation_organization_id != organization_id
         b.params = b.params.merge(bike: b.bike.merge(creation_organization_id: organization_id))

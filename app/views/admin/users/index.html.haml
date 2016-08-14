@@ -8,8 +8,9 @@
       = submit_tag "Search", name: "search", class: "button-blue"
 
   %h4
-    = number_with_delimiter(User.all.count)
-    users have signed up so far!
+    #{number_with_delimiter(@user_count)} users
+    = params[:user_query].present? ? 'matching query' : 'have signed up'
+
 .pull-right
   #{link_to "Superusers", admin_users_path(superusers: true)}|#{link_to "content admins", admin_users_path(content_admins: true)}
 - if @users.present?

@@ -19,6 +19,7 @@ class BikesController < ApplicationController
   before_filter :render_ad, only: [:index, :show]
   before_filter :store_return_to, only: [:edit]
   before_filter :remove_subdomain, only: [:index]
+  before_filter :find_or_new_b_param, only: [:new, :create]
   layout 'application_revised'
 
   def index
@@ -96,7 +97,6 @@ class BikesController < ApplicationController
       flash[:info] = 'You have to sign in to register a bike'
       redirect_to new_user_path and return
     end
-    find_or_new_b_param
     # Let them know if they sent an invalid b_param token
     flash[:error] = "Sorry! We couldn't find that bike" if @b_param.id.blank? && params[:b_param_token].present?
     @bike ||= @b_param.bike_from_attrs(is_stolen: params[:stolen], recovered: params[:recovered])
@@ -109,7 +109,6 @@ class BikesController < ApplicationController
 
   def create
     if params[:bike][:embeded]
-      @b_param = BParam.from_id_token(params[:bike][:b_param_id_token])
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@b_param.created_bike)
       end
@@ -140,7 +139,6 @@ class BikesController < ApplicationController
         end
       end
     else
-      find_or_new_b_param
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@b_param.created_bike) and return
       end
@@ -228,7 +226,7 @@ class BikesController < ApplicationController
   def find_or_new_b_param
     token = params[:b_param_token]
     token ||= params[:bike] && params[:bike][:b_param_id_token]
-    @b_param = BParam.find_or_new_from_token(token, user_id: current_user.id)
+    @b_param = BParam.find_or_new_from_token(token, user_id: current_user && current_user.id)
   end
 
   def ensure_user_allowed_to_edit
