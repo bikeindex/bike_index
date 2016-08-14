@@ -182,7 +182,7 @@ describe Organization do
       end
     end
     context 'enabled snippet' do
-      let(:mail_snippet) { FactoryGirl.create(:organization_mail_snippet, organization: organization) }
+      let(:mail_snippet) { FactoryGirl.create(:organization_mail_snippet, organization: organization, name: 'security') }
       it 'returns nil for not-enabled snippet' do
         expect(organization.mail_snippet_body(mail_snippet.name)).to eq mail_snippet.body
       end
