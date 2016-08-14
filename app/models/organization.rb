@@ -49,6 +49,12 @@ class Organization < ActiveRecord::Base
     slug
   end
 
+  def mail_snippet_body(type)
+    return nil unless MailSnippet.organization_snippet_types.include?(type)
+    snippet = mail_snippets.enabled.where(name: type).first
+    snippet && snippet.body
+  end
+
   before_save :set_and_clean_attributes
   def set_and_clean_attributes
     self.name = strip_tags(name)
@@ -119,5 +125,4 @@ class Organization < ActiveRecord::Base
       self.access_token = SecureRandom.hex
     end while self.class.exists?(access_token: access_token)
   end
-
 end
