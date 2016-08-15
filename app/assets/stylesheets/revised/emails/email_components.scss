@@ -23,28 +23,20 @@
     margin: 0 auto;
   }
 }
-.locking-demonstration-list li {
-  line-height: 1.5em;
-  margin-top: .5*$vertical-height;
+
+.binx-bulleted-list {
+  display: block;
+  list-style-type: disc;
+  margin: 1em 0;
+  padding: 0 0 0 40px;
+  li {
+    line-height: 1.5em;
+    margin-top: .5*$vertical-height;
+  }
 }
 
 .clearstuffdiv {
   width: 100%;
   clear: both;
   float: none;
-}
-
-.organized-partnership-header {
-  text-align: center;
-  p {
-    color: #000;
-    font-style: italic;
-    margin: 0;
-  }
-  img {
-    display: inline-block;
-    margin-left: 2*$vertical-height;
-    max-width: 60%;
-    vertical-align: middle;
-  }
 }

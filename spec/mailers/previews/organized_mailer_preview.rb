@@ -6,24 +6,25 @@ class OrganizedMailerPreview < ActionMailer::Preview
   end
 
   def finished_registration
-    render_finished_registration(Bike.last)
+    render_finished_registration(Bike.unscoped)
   end
 
   def finished_registration_organization
-    render_finished_registration(Bike.where.not(creation_organization_id: nil).first)
+    render_finished_registration(Bike.where.not(creation_organization_id: nil))
   end
 
   def finished_registration_stolen
-    render_finished_registration(Bike.stolen.last)
+    render_finished_registration(Bike.stolen)
   end
 
   def finished_registration_recovered
-    render_finished_registration(Bike.where(recovered: true).last)
+    render_finished_registration(Bike.where(recovered: true))
   end
 
   private
 
-  def render_finished_registration(bike)
-    OrganizedMailer.finished_registration(bike.current_ownership, bike: bike)
+  def render_finished_registration(bikes)
+    bike = bikes.order(:created_at).last
+    OrganizedMailer.finished_registration(bike.current_ownership)
   end
 end

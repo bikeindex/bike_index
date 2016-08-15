@@ -18,8 +18,6 @@
     %h1
       Congrats on adding your #{ @bike.type } to the index!
 
-  %hr
-
 %p
   - if @vars[:registered_by_owner]
     You added a
@@ -33,7 +31,7 @@
       sent you a
   - if @bike.stolen? || @bike.recovered
     = @bike.recovered ? 'recovered/found ' : 'stolen '
-  #{ @bike.type } to the Bike Index#{ ' for you' unless @vars[:registered_by_owner] }:
+  #{ @bike.type } on the Bike Index#{ ' for you' unless @vars[:registered_by_owner] }:
 
 - unless @ownership.claimed
   %h2
@@ -95,6 +93,7 @@
       and edit it, upload photos and add any information that will help people identify your missing bike.
     - else
       and edit it, upload photos and make sure you never lose track of your trusty steed!
+
 - if @organization && @organization.mail_snippet_body('security').present?
   = @organization.mail_snippet_body('security').html_safe
 - else
@@ -103,7 +102,7 @@
 
     %h2
       Protect your bike by following these locking guidelines.
-    %ul.locking-demonstration-list
+    %ul.binx-bulleted-list
       %li
         %strong
           Use a U-Lock.

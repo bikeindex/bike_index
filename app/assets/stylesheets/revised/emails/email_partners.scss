@@ -1,0 +1,20 @@
+.organized-partnership-header {
+  text-align: center;
+  p {
+    color: #000;
+    font-style: italic;
+    margin: 0;
+  }
+  img {
+    display: inline-block;
+    margin-left: 2*$vertical-height;
+    max-width: 60%;
+    vertical-align: middle;
+  }
+}
+
+.organized-partnership-main {
+  padding: 2*$vertical-height $vertical-height;
+  border: 1px solid $gray;
+  margin: 2*$vertical-height 0;
+}
