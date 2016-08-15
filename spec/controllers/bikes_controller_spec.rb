@@ -293,20 +293,26 @@ describe BikesController do
           end
         end
         context 'partial registration by organization' do
+          let(:organization) { FactoryGirl.create(:organization_with_auto_user) }
+          let(:organized_bike_attrs) { bike_attrs.merge(creation_organization_id: organization.id) }
           it 'renders for the user (even though a different creator)' do
-            b_param = BParam.create(params: { bike: bike_attrs.merge('revised_new' => true) })
+            b_param = BParam.create(params: { bike: organized_bike_attrs.merge('revised_new' => true) })
             expect(b_param.id_token).to be_present
             get :new, b_param_token: b_param.id_token
             bike = assigns(:bike)
             expect(assigns(:b_param)).to eq b_param
             expect(bike.is_a?(Bike)).to be_truthy
-            bike_attrs.each { |k, v| expect(bike.send(k)).to eq(v) }
+            organized_bike_attrs.each do |k, v|
+              pp k unless bike.send(k) == v
+              expect(bike.send(k)).to eq(v)
+            end
             expect(response).to render_with_layout('application_revised')
           end
         end
         context 'invalid b_param' do
           it 'renders a new bike, has a flash message' do
             b_param = BParam.create(creator_id: FactoryGirl.create(:user).id)
+            expect(b_param.id_token).to be_present
             get :new, b_param_token: b_param.id_token
             bike = assigns(:bike)
             expect(bike.is_a?(Bike)).to be_truthy

@@ -89,7 +89,7 @@ class BParam < ActiveRecord::Base
     end
 
     def assignable_attrs
-      %w(manufacturer_id manufacturer_other frame_model year owner_email
+      %w(manufacturer_id manufacturer_other frame_model year owner_email creation_organization_id
          stolen recovered serial_number has_no_serial made_without_serial
          primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id)
     end
@@ -252,8 +252,7 @@ class BParam < ActiveRecord::Base
     bike.merge(param_overrides).select { |k, v| self.class.assignable_attrs.include?(k.to_s) }
         .merge('b_param_id' => id,
                'creator_id' => creator_id,
-               'cycle_type_id' => cycle_type_id,
-               'creation_organization_id' => params['creation_organization_id'])
+               'cycle_type_id' => cycle_type_id)
   end
 
   def cycle_type_id

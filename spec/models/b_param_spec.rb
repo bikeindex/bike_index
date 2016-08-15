@@ -398,7 +398,7 @@ describe BParam do
           creator_id: 777,
           b_param_id: 122,
           cycle_type_id: CycleType.bike.id,
-          creation_organization_id: nil
+          creation_organization_id: 888
         }.with_indifferent_access
         expect(b_param.safe_bike_attrs(stolen: true).with_indifferent_access).to eq(target)
       end
