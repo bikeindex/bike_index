@@ -28,7 +28,7 @@ class BikeIndex.BikesEditStolen extends BikeIndex
     if success
       msg = "Thanks for telling us! We're so glad you got your bike back!"
       $('#bike_stolen').prop('checked', '0')
-      window.BikeIndexAlerts.add('success', msg, window.pageScript.submitBikeEditForm)
+      window.BikeIndexAlerts.add('success', msg, window.location.reload())
     else
       msg = "Oh no! Something went wrong and we couldn't mark your bike recovered."
       window.BikeIndexAlerts.add('error', msg)
@@ -40,7 +40,7 @@ class BikeIndex.BikesEditStolen extends BikeIndex
     did_we_help = $('#mark_recovered_we_helped').prop('checked')
     can_share_recovery = $('#mark_recovered_can_share_recovery').prop('checked')
     if reason.length > 0 && bike_id.length > 0
-      data = 
+      data =
         request_type: 'bike_recovery'
         request_bike_id: bike_id
         request_reason: reason

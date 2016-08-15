@@ -132,10 +132,10 @@ describe Api::V1::UsersController do
     end
 
     describe 'recovery' do
-      let(:ownership) { FactoryGirl.create(:ownership) }
+      let(:bike) { FactoryGirl.create(:stolen_bike) }
+      let(:stolen_record) { bike.current_stolen_record }
+      let(:ownership) { FactoryGirl.create(:ownership, bike: bike) }
       let(:user) { ownership.creator }
-      let(:bike) { ownership.bike }
-      let(:stolen_record) { FactoryGirl.create(:stolen_record, bike: bike) }
       let(:recovery_request) do
         {
           request_type: 'bike_recovery',
@@ -149,9 +149,6 @@ describe Api::V1::UsersController do
       end
 
       before do
-        expect([stolen_record, bike].size).to eq 2
-        bike.update_attribute :stolen, true
-        bike.reload
         expect(bike.find_current_stolen_record.id).to eq stolen_record.id
         set_current_user(user)
       end

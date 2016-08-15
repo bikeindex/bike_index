@@ -7,7 +7,7 @@ module Api
           root: false
         }
       end
-      
+
       def current
         if current_user.present?
           respond_with current_user
@@ -45,36 +45,41 @@ module Api
                 feedback.feedback_hash[:new_manufacturer] = bike.manufacturer.name
               end
             elsif feedback_type.match('bike_recovery')
-              if bike.current_stolen_record.present?
-                stolen_record_id = params[:mark_recovered_stolen_record_id]
-                unless stolen_record_id.present?
-                  stolen_record_id = bike.current_stolen_record_id
-                end
-                if params[:index_helped_recovery].present?
-                  feedback.feedback_hash[:index_helped_recovery] = params[:index_helped_recovery]
-                end
-                if params[:can_share_recovery].present?
-                  feedback.feedback_hash[:can_share_recovery] = params[:can_share_recovery]
-                end
-                # We don't want to delay processing on this, it creates problems
-                RecoveryUpdateWorker.new.perform(stolen_record_id, params)
-              end
+              recover_bike(bike, feedback)
             end
             feedback.save
             success = {success: 'submitted request'}
             render json: success and return
           end
-        end        
+        end
         message = {errors: {not_allowed: 'nuh-uh'}}
         render json: message, status: 403
       end
-      
+
       def bust_cache!
         response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
         response.headers["Pragma"] = "no-cache"
         response.headers["Expires"] = "#{1.year.ago}"
       end
 
+      private
+
+      def recover_bike(bike, feedback)
+        if bike.current_stolen_record.present?
+          stolen_record_id = params[:mark_recovered_stolen_record_id]
+          unless stolen_record_id.present?
+            stolen_record_id = bike.current_stolen_record_id
+          end
+          if params[:index_helped_recovery].present?
+            feedback.feedback_hash[:index_helped_recovery] = params[:index_helped_recovery]
+          end
+          if params[:can_share_recovery].present?
+            feedback.feedback_hash[:can_share_recovery] = params[:can_share_recovery]
+          end
+          # We don't want to delay processing on this, it creates problems
+          StolenRecordRecoverer.new.update(stolen_record_id, params)
+        end
+      end
     end
   end
-end 
+end
