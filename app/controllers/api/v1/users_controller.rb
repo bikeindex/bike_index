@@ -7,7 +7,7 @@ module Api
           root: false
         }
       end
-      
+
       def current
         if current_user.present?
           respond_with current_user
@@ -57,18 +57,18 @@ module Api
                   feedback.feedback_hash[:can_share_recovery] = params[:can_share_recovery]
                 end
                 # We don't want to delay processing on this, it creates problems
-                RecoveryUpdateWorker.new.perform(stolen_record_id, params)
+                StolenRecordRecoverer.new.update(stolen_record_id, params)
               end
             end
             feedback.save
             success = {success: 'submitted request'}
             render json: success and return
           end
-        end        
+        end
         message = {errors: {not_allowed: 'nuh-uh'}}
         render json: message, status: 403
       end
-      
+
       def bust_cache!
         response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
         response.headers["Pragma"] = "no-cache"
@@ -77,4 +77,4 @@ module Api
 
     end
   end
-end 
+end
