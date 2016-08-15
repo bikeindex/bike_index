@@ -11,26 +11,26 @@
       %li
         .blist-image-holder
           %a{href: "/locks/#{lock.id}"}
-            %img{ src: "locks/#{lock.lock_type.slug}.jpg", alt: lock.lock_type.name} 
+            = image_tag("locks/#{lock.lock_type.slug}.jpg")
         .blist-primary-group
           %dl.dl-horizontal
             = lock.dl_list_item(link_to(lock.lock_type_name, lock_url(lock)), "Lock Type")
             = lock.dl_list_item(lock.mnfg_name, "Manufacturer")
             = lock.dl_from_attribute("key_serial")
             = lock.dl_from_attribute("combination")
-        
+
 - else
   %h2
     Save information about your bike lock!
   %p
     Lock keys often have serial numbers, so you can order replacements if you lose the keys.
   %p
-    If you want, you can 
+    If you want, you can
     %strong
       save the serial numbers of your keys
     on the Bike Index&mdash;so you won't be out of luck if you lose them.
   %p
-    You can also 
+    You can also
     %strong
       record your lock combinations.
   %p

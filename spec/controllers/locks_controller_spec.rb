@@ -17,6 +17,16 @@ describe LocksController do
       expect(response).to render_template('index')
       expect(assigns(:locks)).to be_decorated
     end
+    context 'revised' do
+      it 'renders with revised_layout' do
+        allow(controller).to receive(:revised_layout_enabled?) { true }
+        get :index
+        expect(response.status).to eq(200)
+        expect(response).to render_template('index')
+        expect(response).to render_with_layout('application_revised')
+        expect(flash).to_not be_present
+      end
+    end
   end
 
   describe 'show' do
@@ -51,6 +61,31 @@ describe LocksController do
         get :edit, id: lock.id
         expect(response.code).to eq('200')
         expect(response).to render_template('edit')
+      end
+    end
+  end
+
+  describe 'create' do
+    include_context :logged_in_as_user
+    let(:manufacturer) { FactoryGirl.create(:manufacturer) }
+    let(:lock_type) { FactoryGirl.create(:lock) }
+    context 'success' do
+      it 'redirects you to user_home locks table' do
+        lock_params = {
+          lock_type_id: lock_type.id,
+          manufacturer_id: manufacturer.id,
+          manufacturer_other: '',
+          has_key: '1',
+          has_combination: '0',
+          key_serial: '321',
+          combination: ''
+        }
+        post :create, lock: lock_params
+        user.reload
+        lock = user.locks.first
+        expect(response).to redirect_to user_home_path(active_tab: 'locks')
+        expect(user.locks.count).to eq 1
+        expect(lock.key_serial).to eq lock_params[:key_serial]
       end
     end
   end

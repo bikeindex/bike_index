@@ -1,4 +1,5 @@
 class LocksController < ApplicationController
+  layout 'application_revised'
   before_filter :authenticate_user
 
   def index
@@ -7,14 +8,14 @@ class LocksController < ApplicationController
   end
 
   def show
-    lock = find_lock 
+    lock = find_lock
     @lock = LockDecorator.new(lock)
   end
 
   def edit
     @lock = find_lock
   end
-  
+
   def update
     @lock = find_lock
     @lock.user = current_user
@@ -28,14 +29,16 @@ class LocksController < ApplicationController
 
   def new
     @lock = Lock.new
+
   end
 
   def create
     @lock = Lock.new(permitted_parameters)
     @lock.user = current_user
-    if @lock.save 
+    if @lock.save
       flash[:success] = "Lock created successfully!"
-      redirect_to edit_lock_url(@lock)
+      redirect_to user_home_path(active_tab: 'locks')
+      # redirect_to edit_lock_url(@lock)
     else
       render action: :new
     end
