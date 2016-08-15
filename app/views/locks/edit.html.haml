@@ -2,8 +2,7 @@
   %h1
     Edit the lock
   %p
-    %a{ href: "/locks" }
-      back to viewing all locks
+    = link_to('back to viewing all locks', user_home_path(active_tab: 'locks'))
 
 
 = form_for @lock, html: { class: "form-horizontal" } do |f|

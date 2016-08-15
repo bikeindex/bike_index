@@ -38,7 +38,6 @@ class LocksController < ApplicationController
     if @lock.save
       flash[:success] = "Lock created successfully!"
       redirect_to user_home_path(active_tab: 'locks')
-      # redirect_to edit_lock_url(@lock)
     else
       render action: :new
     end
