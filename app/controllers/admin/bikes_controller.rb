@@ -8,7 +8,7 @@ class Admin::BikesController < Admin::BaseController
     bikes = Bike.unscoped.includes(:creation_organization, :cycle_type, :manufacturer, :paint, :primary_frame_color, :secondary_frame_color, :tertiary_frame_color)
     if params[:email]
       bikes = bikes.admin_text_search(params[:email])
-    else 
+    else
       bikes = bikes.order("created_at desc")
     end
     @page = params[:page] || 1
@@ -88,7 +88,7 @@ class Admin::BikesController < Admin::BaseController
         index_helped_recovery: params[:mark_recovered_we_helped],
         can_share_recovery: params[:can_share_recovery]
       }
-      RecoveryUpdateWorker.perform_async(@bike.current_stolen_record.id, info)
+      StolenRecordRecoverer.new.update(@bike.current_stolen_record.id, info)
     end
     if @bike.update_attributes(permitted_parameters.except(:stolen_records_attributes))
       @bike.create_normalized_serial_segments

@@ -44,19 +44,19 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: ads; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: ads; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE ads (
     id integer NOT NULL,
-    title character varying,
+    title character varying(255),
     body text,
-    image character varying,
+    image character varying(255),
     target_url text,
     organization_id integer,
     live boolean DEFAULT false NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -80,20 +80,20 @@ ALTER SEQUENCE ads_id_seq OWNED BY ads.id;
 
 
 --
--- Name: b_params; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: b_params; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE b_params (
     id integer NOT NULL,
     old_params text,
-    bike_title character varying,
+    bike_title character varying(255),
     creator_id integer,
     created_bike_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     bike_errors text,
-    image character varying,
-    image_tmp character varying,
+    image character varying(255),
+    image_tmp character varying(255),
     image_processed boolean DEFAULT true,
     id_token text,
     params json DEFAULT '{"bike":{}}'::json
@@ -120,15 +120,15 @@ ALTER SEQUENCE b_params_id_seq OWNED BY b_params.id;
 
 
 --
--- Name: bikes; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: bikes; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE bikes (
     id integer NOT NULL,
-    name character varying,
+    name character varying(255),
     cycle_type_id integer,
-    serial_number character varying NOT NULL,
-    frame_model character varying,
+    serial_number character varying(255) NOT NULL,
+    frame_model character varying(255),
     manufacturer_id integer,
     rear_tire_narrow boolean DEFAULT true,
     frame_material_id integer,
@@ -138,13 +138,13 @@ CREATE TABLE bikes (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     stolen boolean DEFAULT false NOT NULL,
-    propulsion_type_other character varying,
-    manufacturer_other character varying,
-    zipcode character varying,
+    propulsion_type_other character varying(255),
+    manufacturer_other character varying(255),
+    zipcode character varying(255),
     cached_data text,
     description text,
     owner_email text,
-    thumb_path character varying,
+    thumb_path text,
     video_embed text,
     year integer,
     has_no_serial boolean DEFAULT false NOT NULL,
@@ -155,33 +155,33 @@ CREATE TABLE bikes (
     secondary_frame_color_id integer,
     tertiary_frame_color_id integer,
     handlebar_type_id integer,
-    handlebar_type_other character varying,
+    handlebar_type_other character varying(255),
     front_wheel_size_id integer,
     rear_wheel_size_id integer,
     rear_gear_type_id integer,
     front_gear_type_id integer,
     cached_attributes text,
-    additional_registration character varying,
+    additional_registration character varying(255),
     belt_drive boolean DEFAULT false NOT NULL,
     coaster_brake boolean DEFAULT false NOT NULL,
-    frame_size character varying,
-    frame_size_unit character varying,
-    serial_normalized character varying,
-    pdf character varying,
+    frame_size character varying(255),
+    frame_size_unit character varying(255),
+    serial_normalized character varying(255),
+    pdf character varying(255),
     card_id integer,
     recovered boolean DEFAULT false NOT NULL,
     paint_id integer,
     registered_new boolean,
     example boolean DEFAULT false NOT NULL,
-    creation_zipcode character varying,
+    creation_zipcode character varying(255),
     creation_country_id integer,
     country_id integer,
-    stock_photo_url character varying,
+    stock_photo_url character varying(255),
     current_stolen_record_id integer,
     listing_order integer,
     approved_stolen boolean,
     all_description text,
-    mnfg_name character varying,
+    mnfg_name character varying(255),
     hidden boolean DEFAULT false NOT NULL,
     frame_size_number double precision,
     updator_id integer,
@@ -212,27 +212,27 @@ ALTER SEQUENCE bikes_id_seq OWNED BY bikes.id;
 
 
 --
--- Name: blogs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: blogs; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE blogs (
     id integer NOT NULL,
     title text,
-    title_slug character varying,
+    title_slug character varying(255),
     body text,
     body_abbr text,
     user_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     published_at timestamp without time zone,
-    tags character varying,
+    tags character varying(255),
     published boolean,
-    old_title_slug character varying,
+    old_title_slug character varying(255),
     description_abbr text,
     is_listicle boolean DEFAULT false NOT NULL,
-    index_image character varying,
+    index_image character varying(255),
     index_image_id integer,
-    index_image_lg character varying
+    index_image_lg character varying(255)
 );
 
 
@@ -256,14 +256,14 @@ ALTER SEQUENCE blogs_id_seq OWNED BY blogs.id;
 
 
 --
--- Name: cgroups; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: cgroups; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE cgroups (
     id integer NOT NULL,
-    name character varying,
-    slug character varying,
-    description character varying,
+    name character varying(255),
+    slug character varying(255),
+    description character varying(255),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -289,16 +289,16 @@ ALTER SEQUENCE cgroups_id_seq OWNED BY cgroups.id;
 
 
 --
--- Name: colors; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: colors; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE colors (
     id integer NOT NULL,
-    name character varying,
+    name character varying(255),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     priority integer,
-    display character varying
+    display character varying(255)
 );
 
 
@@ -322,24 +322,24 @@ ALTER SEQUENCE colors_id_seq OWNED BY colors.id;
 
 
 --
--- Name: components; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: components; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE components (
     id integer NOT NULL,
-    cmodel_name character varying,
+    cmodel_name character varying(255),
     year integer,
     description text,
     manufacturer_id integer,
     ctype_id integer,
-    ctype_other character varying,
+    ctype_other character varying(255),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     bike_id integer,
     front boolean,
     rear boolean,
-    manufacturer_other character varying,
-    serial_number character varying,
+    manufacturer_other character varying(255),
+    serial_number character varying(255),
     is_stock boolean DEFAULT false NOT NULL
 );
 
@@ -364,15 +364,15 @@ ALTER SEQUENCE components_id_seq OWNED BY components.id;
 
 
 --
--- Name: countries; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: countries; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE countries (
     id integer NOT NULL,
-    name character varying,
-    iso character varying,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    name character varying(255),
+    iso character varying(255),
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -396,15 +396,15 @@ ALTER SEQUENCE countries_id_seq OWNED BY countries.id;
 
 
 --
--- Name: ctypes; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: ctypes; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE ctypes (
     id integer NOT NULL,
-    name character varying,
-    slug character varying,
-    secondary_name character varying,
-    image character varying,
+    name character varying(255),
+    slug character varying(255),
+    secondary_name character varying(255),
+    image character varying(255),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     has_multiple boolean DEFAULT false NOT NULL,
@@ -432,21 +432,21 @@ ALTER SEQUENCE ctypes_id_seq OWNED BY ctypes.id;
 
 
 --
--- Name: customer_contacts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: customer_contacts; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE customer_contacts (
     id integer NOT NULL,
     user_id integer,
-    user_email character varying,
+    user_email character varying(255),
     creator_id integer,
-    creator_email character varying,
-    title character varying,
-    contact_type character varying,
+    creator_email character varying(255),
+    title character varying(255),
+    contact_type character varying(255),
     body text,
     bike_id integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
     info_hash text
 );
 
@@ -471,13 +471,13 @@ ALTER SEQUENCE customer_contacts_id_seq OWNED BY customer_contacts.id;
 
 
 --
--- Name: cycle_types; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: cycle_types; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE cycle_types (
     id integer NOT NULL,
-    name character varying,
-    slug character varying,
+    name character varying(255),
+    slug character varying(255),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -503,15 +503,15 @@ ALTER SEQUENCE cycle_types_id_seq OWNED BY cycle_types.id;
 
 
 --
--- Name: duplicate_bike_groups; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: duplicate_bike_groups; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE duplicate_bike_groups (
     id integer NOT NULL,
     ignore boolean DEFAULT false NOT NULL,
     added_bike_at timestamp without time zone,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -535,18 +535,18 @@ ALTER SEQUENCE duplicate_bike_groups_id_seq OWNED BY duplicate_bike_groups.id;
 
 
 --
--- Name: feedbacks; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: feedbacks; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE feedbacks (
     id integer NOT NULL,
-    name character varying,
-    email character varying,
-    title character varying,
+    name character varying(255),
+    email character varying(255),
+    title character varying(255),
     body text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    feedback_type character varying,
+    feedback_type character varying(255),
     feedback_hash text
 );
 
@@ -571,12 +571,12 @@ ALTER SEQUENCE feedbacks_id_seq OWNED BY feedbacks.id;
 
 
 --
--- Name: flavor_texts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: flavor_texts; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE flavor_texts (
     id integer NOT NULL,
-    message character varying,
+    message character varying(255),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -602,15 +602,15 @@ ALTER SEQUENCE flavor_texts_id_seq OWNED BY flavor_texts.id;
 
 
 --
--- Name: frame_materials; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: frame_materials; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE frame_materials (
     id integer NOT NULL,
-    name character varying,
+    name character varying(255),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    slug character varying
+    slug character varying(255)
 );
 
 
@@ -634,18 +634,18 @@ ALTER SEQUENCE frame_materials_id_seq OWNED BY frame_materials.id;
 
 
 --
--- Name: front_gear_types; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: front_gear_types; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE front_gear_types (
     id integer NOT NULL,
-    name character varying,
+    name character varying(255),
     count integer,
     internal boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     standard boolean,
-    slug character varying
+    slug character varying(255)
 );
 
 
@@ -669,15 +669,15 @@ ALTER SEQUENCE front_gear_types_id_seq OWNED BY front_gear_types.id;
 
 
 --
--- Name: handlebar_types; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: handlebar_types; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE handlebar_types (
     id integer NOT NULL,
-    name character varying,
+    name character varying(255),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    slug character varying
+    slug character varying(255)
 );
 
 
@@ -701,14 +701,14 @@ ALTER SEQUENCE handlebar_types_id_seq OWNED BY handlebar_types.id;
 
 
 --
--- Name: integrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: integrations; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE integrations (
     id integer NOT NULL,
     user_id integer,
     access_token text,
-    provider_name character varying,
+    provider_name character varying(255),
     information text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
@@ -735,7 +735,7 @@ ALTER SEQUENCE integrations_id_seq OWNED BY integrations.id;
 
 
 --
--- Name: listicles; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: listicles; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE listicles (
@@ -743,7 +743,7 @@ CREATE TABLE listicles (
     list_order integer,
     body text,
     blog_id integer,
-    image character varying,
+    image character varying(255),
     title text,
     body_html text,
     image_width integer,
@@ -751,8 +751,8 @@ CREATE TABLE listicles (
     image_credits text,
     image_credits_html text,
     crop_top_offset integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -776,18 +776,18 @@ ALTER SEQUENCE listicles_id_seq OWNED BY listicles.id;
 
 
 --
--- Name: locations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: locations; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE locations (
     id integer NOT NULL,
     organization_id integer,
-    zipcode character varying,
-    city character varying,
-    street character varying,
-    phone character varying,
-    email character varying,
-    name character varying,
+    zipcode character varying(255),
+    city character varying(255),
+    street character varying(255),
+    phone character varying(255),
+    email character varying(255),
+    name character varying(255),
     latitude double precision,
     longitude double precision,
     created_at timestamp without time zone NOT NULL,
@@ -819,13 +819,13 @@ ALTER SEQUENCE locations_id_seq OWNED BY locations.id;
 
 
 --
--- Name: lock_types; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: lock_types; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE lock_types (
     id integer NOT NULL,
-    name character varying,
-    slug character varying,
+    name character varying(255),
+    slug character varying(255),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -851,7 +851,7 @@ ALTER SEQUENCE lock_types_id_seq OWNED BY lock_types.id;
 
 
 --
--- Name: locks; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: locks; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE locks (
@@ -859,12 +859,12 @@ CREATE TABLE locks (
     lock_type_id integer DEFAULT 1,
     has_key boolean DEFAULT true,
     has_combination boolean,
-    combination character varying,
-    key_serial character varying,
+    combination character varying(255),
+    key_serial character varying(255),
     manufacturer_id integer,
-    manufacturer_other character varying,
+    manufacturer_other character varying(255),
     user_id integer,
-    lock_model character varying,
+    lock_model character varying(255),
     notes text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
@@ -891,21 +891,21 @@ ALTER SEQUENCE locks_id_seq OWNED BY locks.id;
 
 
 --
--- Name: mail_snippets; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: mail_snippets; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE mail_snippets (
     id integer NOT NULL,
-    name character varying,
+    name character varying(255),
     is_enabled boolean DEFAULT false NOT NULL,
     is_location_triggered boolean DEFAULT false NOT NULL,
     body text,
-    address character varying,
+    address character varying(255),
     latitude double precision,
     longitude double precision,
     proximity_radius integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
     organization_id integer
 );
 
@@ -930,24 +930,24 @@ ALTER SEQUENCE mail_snippets_id_seq OWNED BY mail_snippets.id;
 
 
 --
--- Name: manufacturers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: manufacturers; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE manufacturers (
     id integer NOT NULL,
-    name character varying,
-    slug character varying,
-    website character varying,
+    name character varying(255),
+    slug character varying(255),
+    website character varying(255),
     frame_maker boolean,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    total_years_active character varying,
+    total_years_active character varying(255),
     notes text,
     open_year integer,
     close_year integer,
-    logo character varying,
+    logo character varying(255),
     description text,
-    logo_source character varying
+    logo_source character varying(255)
 );
 
 
@@ -971,15 +971,15 @@ ALTER SEQUENCE manufacturers_id_seq OWNED BY manufacturers.id;
 
 
 --
--- Name: memberships; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: memberships; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE memberships (
     id integer NOT NULL,
     organization_id integer NOT NULL,
     user_id integer,
-    role character varying DEFAULT 'member'::character varying NOT NULL,
-    invited_email character varying,
+    role character varying(255) DEFAULT 'member'::character varying NOT NULL,
+    invited_email character varying(255),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     deleted_at timestamp without time zone
@@ -1006,15 +1006,15 @@ ALTER SEQUENCE memberships_id_seq OWNED BY memberships.id;
 
 
 --
--- Name: normalized_serial_segments; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: normalized_serial_segments; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE normalized_serial_segments (
     id integer NOT NULL,
-    segment character varying,
+    segment character varying(255),
     bike_id integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
     duplicate_bike_group_id integer
 );
 
@@ -1039,19 +1039,19 @@ ALTER SEQUENCE normalized_serial_segments_id_seq OWNED BY normalized_serial_segm
 
 
 --
--- Name: oauth_access_grants; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: oauth_access_grants; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE oauth_access_grants (
     id integer NOT NULL,
     resource_owner_id integer NOT NULL,
     application_id integer NOT NULL,
-    token character varying NOT NULL,
+    token character varying(255) NOT NULL,
     expires_in integer NOT NULL,
     redirect_uri text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     revoked_at timestamp without time zone,
-    scopes character varying
+    scopes character varying(255)
 );
 
 
@@ -1075,19 +1075,19 @@ ALTER SEQUENCE oauth_access_grants_id_seq OWNED BY oauth_access_grants.id;
 
 
 --
--- Name: oauth_access_tokens; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: oauth_access_tokens; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE oauth_access_tokens (
     id integer NOT NULL,
     resource_owner_id integer,
     application_id integer,
-    token character varying NOT NULL,
-    refresh_token character varying,
+    token character varying(255) NOT NULL,
+    refresh_token character varying(255),
     expires_in integer,
     revoked_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
-    scopes character varying
+    scopes character varying(255)
 );
 
 
@@ -1111,22 +1111,22 @@ ALTER SEQUENCE oauth_access_tokens_id_seq OWNED BY oauth_access_tokens.id;
 
 
 --
--- Name: oauth_applications; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: oauth_applications; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE oauth_applications (
     id integer NOT NULL,
-    name character varying NOT NULL,
-    uid character varying NOT NULL,
-    secret character varying NOT NULL,
+    name character varying(255) NOT NULL,
+    uid character varying(255) NOT NULL,
+    secret character varying(255) NOT NULL,
     redirect_uri text NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
     owner_id integer,
-    owner_type character varying,
+    owner_type character varying(255),
     is_internal boolean DEFAULT false NOT NULL,
     can_send_stolen_notifications boolean DEFAULT false NOT NULL,
-    scopes character varying DEFAULT ''::character varying NOT NULL
+    scopes character varying(255) DEFAULT ''::character varying NOT NULL
 );
 
 
@@ -1150,17 +1150,17 @@ ALTER SEQUENCE oauth_applications_id_seq OWNED BY oauth_applications.id;
 
 
 --
--- Name: organization_deals; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: organization_deals; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE organization_deals (
     id integer NOT NULL,
     organization_id integer,
-    deal_name character varying,
-    email character varying,
-    user_id character varying,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    deal_name character varying(255),
+    email character varying(255),
+    user_id character varying(255),
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -1184,18 +1184,18 @@ ALTER SEQUENCE organization_deals_id_seq OWNED BY organization_deals.id;
 
 
 --
--- Name: organization_invitations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: organization_invitations; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE organization_invitations (
     id integer NOT NULL,
-    invitee_email character varying,
-    invitee_name character varying,
+    invitee_email character varying(255),
+    invitee_name character varying(255),
     invitee_id integer,
     organization_id integer,
     inviter_id integer,
     redeemed boolean,
-    membership_role character varying DEFAULT 'member'::character varying,
+    membership_role character varying(255) DEFAULT 'member'::character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     deleted_at timestamp without time zone
@@ -1222,30 +1222,30 @@ ALTER SEQUENCE organization_invitations_id_seq OWNED BY organization_invitations
 
 
 --
--- Name: organizations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: organizations; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE organizations (
     id integer NOT NULL,
-    name character varying,
-    slug character varying NOT NULL,
+    name character varying(255),
+    slug character varying(255) NOT NULL,
     available_invitation_count integer DEFAULT 10,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    website character varying,
-    short_name character varying,
+    website character varying(255),
+    short_name character varying(255),
     show_on_map boolean,
     sent_invitation_count integer DEFAULT 0,
     deleted_at timestamp without time zone,
     is_suspended boolean DEFAULT false NOT NULL,
     auto_user_id integer,
-    org_type character varying DEFAULT 'shop'::character varying NOT NULL,
-    access_token character varying,
+    org_type character varying(255) DEFAULT 'shop'::character varying NOT NULL,
+    access_token character varying(255),
     new_bike_notification text,
     api_access_approved boolean DEFAULT false NOT NULL,
     approved boolean DEFAULT false NOT NULL,
     use_additional_registration_field boolean DEFAULT false NOT NULL,
-    avatar character varying,
+    avatar character varying(255),
     is_paid boolean DEFAULT false NOT NULL,
     lock_show_on_map boolean DEFAULT false NOT NULL,
     landing_html text
@@ -1272,16 +1272,16 @@ ALTER SEQUENCE organizations_id_seq OWNED BY organizations.id;
 
 
 --
--- Name: other_listings; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: other_listings; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE other_listings (
     id integer NOT NULL,
     bike_id integer,
-    url character varying,
-    listing_type character varying,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    url character varying(255),
+    listing_type character varying(255),
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -1305,14 +1305,14 @@ ALTER SEQUENCE other_listings_id_seq OWNED BY other_listings.id;
 
 
 --
--- Name: ownerships; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: ownerships; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE ownerships (
     id integer NOT NULL,
     bike_id integer,
     user_id integer,
-    owner_email character varying,
+    owner_email character varying(255),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     creator_id integer,
@@ -1344,16 +1344,16 @@ ALTER SEQUENCE ownerships_id_seq OWNED BY ownerships.id;
 
 
 --
--- Name: paints; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: paints; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE paints (
     id integer NOT NULL,
-    name character varying,
+    name character varying(255),
     color_id integer,
     manufacturer_id integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
     secondary_color_id integer,
     tertiary_color_id integer,
     bikes_count integer DEFAULT 0 NOT NULL
@@ -1380,7 +1380,7 @@ ALTER SEQUENCE paints_id_seq OWNED BY paints.id;
 
 
 --
--- Name: payments; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: payments; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE payments (
@@ -1388,13 +1388,13 @@ CREATE TABLE payments (
     user_id integer,
     is_current boolean DEFAULT true,
     is_recurring boolean DEFAULT false NOT NULL,
-    stripe_id character varying,
+    stripe_id character varying(255),
     last_payment_date timestamp without time zone,
     first_payment_date timestamp without time zone,
     amount integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    email character varying
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    email character varying(255)
 );
 
 
@@ -1418,15 +1418,15 @@ ALTER SEQUENCE payments_id_seq OWNED BY payments.id;
 
 
 --
--- Name: propulsion_types; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: propulsion_types; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE propulsion_types (
     id integer NOT NULL,
-    name character varying,
+    name character varying(255),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    slug character varying
+    slug character varying(255)
 );
 
 
@@ -1450,16 +1450,16 @@ ALTER SEQUENCE propulsion_types_id_seq OWNED BY propulsion_types.id;
 
 
 --
--- Name: public_images; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: public_images; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE public_images (
     id integer NOT NULL,
-    image character varying,
-    name character varying,
+    image character varying(255),
+    name character varying(255),
     listing_order integer DEFAULT 0,
     imageable_id integer,
-    imageable_type character varying,
+    imageable_type character varying(255),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     is_private boolean DEFAULT false NOT NULL
@@ -1486,18 +1486,18 @@ ALTER SEQUENCE public_images_id_seq OWNED BY public_images.id;
 
 
 --
--- Name: rear_gear_types; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: rear_gear_types; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE rear_gear_types (
     id integer NOT NULL,
-    name character varying,
+    name character varying(255),
     count integer,
     internal boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     standard boolean,
-    slug character varying
+    slug character varying(255)
 );
 
 
@@ -1521,19 +1521,19 @@ ALTER SEQUENCE rear_gear_types_id_seq OWNED BY rear_gear_types.id;
 
 
 --
--- Name: recovery_displays; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: recovery_displays; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE recovery_displays (
     id integer NOT NULL,
     stolen_record_id integer,
     quote text,
-    quote_by character varying,
+    quote_by character varying(255),
     date_recovered timestamp without time zone,
-    link character varying,
-    image character varying,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    link character varying(255),
+    image character varying(255),
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -1557,25 +1557,25 @@ ALTER SEQUENCE recovery_displays_id_seq OWNED BY recovery_displays.id;
 
 
 --
--- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE schema_migrations (
-    version character varying NOT NULL
+    version character varying(255) NOT NULL
 );
 
 
 --
--- Name: states; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: states; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE states (
     id integer NOT NULL,
-    name character varying,
-    abbreviation character varying,
+    name character varying(255),
+    abbreviation character varying(255),
     country_id integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -1599,19 +1599,19 @@ ALTER SEQUENCE states_id_seq OWNED BY states.id;
 
 
 --
--- Name: stolen_notifications; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: stolen_notifications; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE stolen_notifications (
     id integer NOT NULL,
-    subject character varying,
+    subject character varying(255),
     message text,
     sender_id integer,
     receiver_id integer,
     bike_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    receiver_email character varying,
+    receiver_email character varying(255),
     oauth_application_id integer,
     reference_url text,
     send_dates json
@@ -1638,36 +1638,36 @@ ALTER SEQUENCE stolen_notifications_id_seq OWNED BY stolen_notifications.id;
 
 
 --
--- Name: stolen_records; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: stolen_records; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE stolen_records (
     id integer NOT NULL,
-    zipcode character varying,
-    city character varying,
+    zipcode character varying(255),
+    city character varying(255),
     theft_description text,
     "time" text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     bike_id integer,
     current boolean DEFAULT true,
-    street character varying,
+    street character varying(255),
     latitude double precision,
     longitude double precision,
     date_stolen timestamp without time zone,
-    phone character varying,
+    phone character varying(255),
     phone_for_everyone boolean,
     phone_for_users boolean DEFAULT true,
     phone_for_shops boolean DEFAULT true,
     phone_for_police boolean DEFAULT true,
-    police_report_number character varying,
-    locking_description character varying,
-    lock_defeat_description character varying,
+    police_report_number character varying(255),
+    locking_description character varying(255),
+    lock_defeat_description character varying(255),
     country_id integer,
-    police_report_department character varying,
+    police_report_department character varying(255),
     state_id integer,
     creation_organization_id integer,
-    secondary_phone character varying,
+    secondary_phone character varying(255),
     approved boolean DEFAULT false NOT NULL,
     receive_notifications boolean DEFAULT true,
     proof_of_ownership boolean,
@@ -1703,17 +1703,17 @@ ALTER SEQUENCE stolen_records_id_seq OWNED BY stolen_records.id;
 
 
 --
--- Name: user_emails; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_emails; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE user_emails (
     id integer NOT NULL,
-    email character varying,
+    email character varying(255),
     user_id integer,
     old_user_id integer,
     confirmation_token text,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -1737,42 +1737,42 @@ ALTER SEQUENCE user_emails_id_seq OWNED BY user_emails.id;
 
 
 --
--- Name: users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: users; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE users (
     id integer NOT NULL,
-    name character varying,
-    email character varying,
+    name character varying(255),
+    email character varying(255),
     password text,
     last_login timestamp without time zone,
     superuser boolean DEFAULT false NOT NULL,
     password_reset_token text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    password_digest character varying,
+    password_digest character varying(255),
     banned boolean,
-    phone character varying,
-    zipcode character varying,
-    twitter character varying,
+    phone character varying(255),
+    zipcode character varying(255),
+    twitter character varying(255),
     show_twitter boolean DEFAULT false NOT NULL,
-    website character varying,
+    website character varying(255),
     show_website boolean DEFAULT false NOT NULL,
     show_phone boolean DEFAULT true,
     show_bikes boolean DEFAULT false NOT NULL,
-    username character varying,
+    username character varying(255),
     has_stolen_bikes boolean,
-    avatar character varying,
+    avatar character varying(255),
     description text,
     title text,
     terms_of_service boolean DEFAULT false NOT NULL,
     vendor_terms_of_service boolean,
     when_vendor_terms_of_service timestamp without time zone,
     confirmed boolean,
-    confirmation_token character varying,
+    confirmation_token character varying(255),
     can_send_many_stolen_notifications boolean DEFAULT false NOT NULL,
-    auth_token character varying,
-    stripe_id character varying,
+    auth_token character varying(255),
+    stripe_id character varying(255),
     is_paid_member boolean DEFAULT false NOT NULL,
     paid_membership_info text,
     is_content_admin boolean DEFAULT false NOT NULL,
@@ -1802,13 +1802,13 @@ ALTER SEQUENCE users_id_seq OWNED BY users.id;
 
 
 --
--- Name: wheel_sizes; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: wheel_sizes; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE TABLE wheel_sizes (
     id integer NOT NULL,
-    name character varying,
-    description character varying,
+    name character varying(255),
+    description character varying(255),
     iso_bsd integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -2158,7 +2158,7 @@ ALTER TABLE ONLY wheel_sizes ALTER COLUMN id SET DEFAULT nextval('wheel_sizes_id
 
 
 --
--- Name: ads_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: ads_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY ads
@@ -2166,7 +2166,7 @@ ALTER TABLE ONLY ads
 
 
 --
--- Name: b_params_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: b_params_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY b_params
@@ -2174,7 +2174,7 @@ ALTER TABLE ONLY b_params
 
 
 --
--- Name: bikes_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: bikes_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY bikes
@@ -2182,7 +2182,7 @@ ALTER TABLE ONLY bikes
 
 
 --
--- Name: blogs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: blogs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY blogs
@@ -2190,7 +2190,7 @@ ALTER TABLE ONLY blogs
 
 
 --
--- Name: cgroups_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: cgroups_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY cgroups
@@ -2198,7 +2198,7 @@ ALTER TABLE ONLY cgroups
 
 
 --
--- Name: colors_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: colors_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY colors
@@ -2206,7 +2206,7 @@ ALTER TABLE ONLY colors
 
 
 --
--- Name: components_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: components_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY components
@@ -2214,7 +2214,7 @@ ALTER TABLE ONLY components
 
 
 --
--- Name: countries_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: countries_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY countries
@@ -2222,7 +2222,7 @@ ALTER TABLE ONLY countries
 
 
 --
--- Name: ctypes_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: ctypes_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY ctypes
@@ -2230,7 +2230,7 @@ ALTER TABLE ONLY ctypes
 
 
 --
--- Name: customer_contacts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: customer_contacts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY customer_contacts
@@ -2238,7 +2238,7 @@ ALTER TABLE ONLY customer_contacts
 
 
 --
--- Name: cycle_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: cycle_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY cycle_types
@@ -2246,7 +2246,7 @@ ALTER TABLE ONLY cycle_types
 
 
 --
--- Name: duplicate_bike_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: duplicate_bike_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY duplicate_bike_groups
@@ -2254,7 +2254,7 @@ ALTER TABLE ONLY duplicate_bike_groups
 
 
 --
--- Name: feedbacks_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: feedbacks_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY feedbacks
@@ -2262,7 +2262,7 @@ ALTER TABLE ONLY feedbacks
 
 
 --
--- Name: flavor_texts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: flavor_texts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY flavor_texts
@@ -2270,7 +2270,7 @@ ALTER TABLE ONLY flavor_texts
 
 
 --
--- Name: frame_materials_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: frame_materials_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY frame_materials
@@ -2278,7 +2278,7 @@ ALTER TABLE ONLY frame_materials
 
 
 --
--- Name: front_gear_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: front_gear_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY front_gear_types
@@ -2286,7 +2286,7 @@ ALTER TABLE ONLY front_gear_types
 
 
 --
--- Name: handlebar_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: handlebar_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY handlebar_types
@@ -2294,7 +2294,7 @@ ALTER TABLE ONLY handlebar_types
 
 
 --
--- Name: integrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: integrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY integrations
@@ -2302,7 +2302,7 @@ ALTER TABLE ONLY integrations
 
 
 --
--- Name: listicles_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: listicles_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY listicles
@@ -2310,7 +2310,7 @@ ALTER TABLE ONLY listicles
 
 
 --
--- Name: locations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: locations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY locations
@@ -2318,7 +2318,7 @@ ALTER TABLE ONLY locations
 
 
 --
--- Name: lock_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: lock_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY lock_types
@@ -2326,7 +2326,7 @@ ALTER TABLE ONLY lock_types
 
 
 --
--- Name: locks_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: locks_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY locks
@@ -2334,7 +2334,7 @@ ALTER TABLE ONLY locks
 
 
 --
--- Name: mail_snippets_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: mail_snippets_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY mail_snippets
@@ -2342,7 +2342,7 @@ ALTER TABLE ONLY mail_snippets
 
 
 --
--- Name: manufacturers_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: manufacturers_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY manufacturers
@@ -2350,7 +2350,7 @@ ALTER TABLE ONLY manufacturers
 
 
 --
--- Name: memberships_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: memberships_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY memberships
@@ -2358,7 +2358,7 @@ ALTER TABLE ONLY memberships
 
 
 --
--- Name: normalized_serial_segments_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: normalized_serial_segments_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY normalized_serial_segments
@@ -2366,7 +2366,7 @@ ALTER TABLE ONLY normalized_serial_segments
 
 
 --
--- Name: oauth_access_grants_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: oauth_access_grants_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY oauth_access_grants
@@ -2374,7 +2374,7 @@ ALTER TABLE ONLY oauth_access_grants
 
 
 --
--- Name: oauth_access_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: oauth_access_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY oauth_access_tokens
@@ -2382,7 +2382,7 @@ ALTER TABLE ONLY oauth_access_tokens
 
 
 --
--- Name: oauth_applications_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: oauth_applications_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY oauth_applications
@@ -2390,7 +2390,7 @@ ALTER TABLE ONLY oauth_applications
 
 
 --
--- Name: organization_deals_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: organization_deals_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY organization_deals
@@ -2398,7 +2398,7 @@ ALTER TABLE ONLY organization_deals
 
 
 --
--- Name: organization_invitations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: organization_invitations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY organization_invitations
@@ -2406,7 +2406,7 @@ ALTER TABLE ONLY organization_invitations
 
 
 --
--- Name: organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY organizations
@@ -2414,7 +2414,7 @@ ALTER TABLE ONLY organizations
 
 
 --
--- Name: other_listings_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: other_listings_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY other_listings
@@ -2422,7 +2422,7 @@ ALTER TABLE ONLY other_listings
 
 
 --
--- Name: ownerships_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: ownerships_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY ownerships
@@ -2430,7 +2430,7 @@ ALTER TABLE ONLY ownerships
 
 
 --
--- Name: paints_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: paints_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY paints
@@ -2438,7 +2438,7 @@ ALTER TABLE ONLY paints
 
 
 --
--- Name: payments_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: payments_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY payments
@@ -2446,7 +2446,7 @@ ALTER TABLE ONLY payments
 
 
 --
--- Name: propulsion_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: propulsion_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY propulsion_types
@@ -2454,7 +2454,7 @@ ALTER TABLE ONLY propulsion_types
 
 
 --
--- Name: public_images_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: public_images_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY public_images
@@ -2462,7 +2462,7 @@ ALTER TABLE ONLY public_images
 
 
 --
--- Name: rear_gear_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: rear_gear_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY rear_gear_types
@@ -2470,7 +2470,7 @@ ALTER TABLE ONLY rear_gear_types
 
 
 --
--- Name: recovery_displays_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: recovery_displays_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY recovery_displays
@@ -2478,7 +2478,7 @@ ALTER TABLE ONLY recovery_displays
 
 
 --
--- Name: states_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: states_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY states
@@ -2486,7 +2486,7 @@ ALTER TABLE ONLY states
 
 
 --
--- Name: stolen_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: stolen_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY stolen_notifications
@@ -2494,7 +2494,7 @@ ALTER TABLE ONLY stolen_notifications
 
 
 --
--- Name: stolen_records_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: stolen_records_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY stolen_records
@@ -2502,7 +2502,7 @@ ALTER TABLE ONLY stolen_records
 
 
 --
--- Name: user_emails_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_emails_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY user_emails
@@ -2510,7 +2510,7 @@ ALTER TABLE ONLY user_emails
 
 
 --
--- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY users
@@ -2518,7 +2518,7 @@ ALTER TABLE ONLY users
 
 
 --
--- Name: wheel_sizes_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: wheel_sizes_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
 
 ALTER TABLE ONLY wheel_sizes
@@ -2526,280 +2526,280 @@ ALTER TABLE ONLY wheel_sizes
 
 
 --
--- Name: index_bikes_on_card_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_bikes_on_card_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_bikes_on_card_id ON bikes USING btree (card_id);
 
 
 --
--- Name: index_bikes_on_current_stolen_record_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_bikes_on_current_stolen_record_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_bikes_on_current_stolen_record_id ON bikes USING btree (current_stolen_record_id);
 
 
 --
--- Name: index_bikes_on_cycle_type_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_bikes_on_cycle_type_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_bikes_on_cycle_type_id ON bikes USING btree (cycle_type_id);
 
 
 --
--- Name: index_bikes_on_manufacturer_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_bikes_on_manufacturer_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_bikes_on_manufacturer_id ON bikes USING btree (manufacturer_id);
 
 
 --
--- Name: index_bikes_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_bikes_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_bikes_on_organization_id ON bikes USING btree (creation_organization_id);
 
 
 --
--- Name: index_bikes_on_paint_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_bikes_on_paint_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_bikes_on_paint_id ON bikes USING btree (paint_id);
 
 
 --
--- Name: index_bikes_on_primary_frame_color_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_bikes_on_primary_frame_color_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_bikes_on_primary_frame_color_id ON bikes USING btree (primary_frame_color_id);
 
 
 --
--- Name: index_bikes_on_secondary_frame_color_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_bikes_on_secondary_frame_color_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_bikes_on_secondary_frame_color_id ON bikes USING btree (secondary_frame_color_id);
 
 
 --
--- Name: index_bikes_on_stolen_lat_and_stolen_long; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_bikes_on_stolen_lat_and_stolen_long; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_bikes_on_stolen_lat_and_stolen_long ON bikes USING btree (stolen_lat, stolen_long);
 
 
 --
--- Name: index_bikes_on_tertiary_frame_color_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_bikes_on_tertiary_frame_color_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_bikes_on_tertiary_frame_color_id ON bikes USING btree (tertiary_frame_color_id);
 
 
 --
--- Name: index_components_on_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_components_on_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_components_on_bike_id ON components USING btree (bike_id);
 
 
 --
--- Name: index_components_on_manufacturer_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_components_on_manufacturer_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_components_on_manufacturer_id ON components USING btree (manufacturer_id);
 
 
 --
--- Name: index_integrations_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_integrations_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_integrations_on_user_id ON integrations USING btree (user_id);
 
 
 --
--- Name: index_locks_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_locks_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_locks_on_user_id ON locks USING btree (user_id);
 
 
 --
--- Name: index_mail_snippets_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_mail_snippets_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_mail_snippets_on_organization_id ON mail_snippets USING btree (organization_id);
 
 
 --
--- Name: index_memberships_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_memberships_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_memberships_on_organization_id ON memberships USING btree (organization_id);
 
 
 --
--- Name: index_memberships_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_memberships_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_memberships_on_user_id ON memberships USING btree (user_id);
 
 
 --
--- Name: index_normalized_serial_segments_on_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_normalized_serial_segments_on_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_normalized_serial_segments_on_bike_id ON normalized_serial_segments USING btree (bike_id);
 
 
 --
--- Name: index_normalized_serial_segments_on_duplicate_bike_group_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_normalized_serial_segments_on_duplicate_bike_group_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_normalized_serial_segments_on_duplicate_bike_group_id ON normalized_serial_segments USING btree (duplicate_bike_group_id);
 
 
 --
--- Name: index_oauth_access_grants_on_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_oauth_access_grants_on_token; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE UNIQUE INDEX index_oauth_access_grants_on_token ON oauth_access_grants USING btree (token);
 
 
 --
--- Name: index_oauth_access_tokens_on_refresh_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_oauth_access_tokens_on_refresh_token; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE UNIQUE INDEX index_oauth_access_tokens_on_refresh_token ON oauth_access_tokens USING btree (refresh_token);
 
 
 --
--- Name: index_oauth_access_tokens_on_resource_owner_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_oauth_access_tokens_on_resource_owner_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_oauth_access_tokens_on_resource_owner_id ON oauth_access_tokens USING btree (resource_owner_id);
 
 
 --
--- Name: index_oauth_access_tokens_on_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_oauth_access_tokens_on_token; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE UNIQUE INDEX index_oauth_access_tokens_on_token ON oauth_access_tokens USING btree (token);
 
 
 --
--- Name: index_oauth_applications_on_owner_id_and_owner_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_oauth_applications_on_owner_id_and_owner_type; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_oauth_applications_on_owner_id_and_owner_type ON oauth_applications USING btree (owner_id, owner_type);
 
 
 --
--- Name: index_oauth_applications_on_uid; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_oauth_applications_on_uid; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE UNIQUE INDEX index_oauth_applications_on_uid ON oauth_applications USING btree (uid);
 
 
 --
--- Name: index_organization_invitations_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_organization_invitations_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_organization_invitations_on_organization_id ON organization_invitations USING btree (organization_id);
 
 
 --
--- Name: index_organizations_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_organizations_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE UNIQUE INDEX index_organizations_on_slug ON organizations USING btree (slug);
 
 
 --
--- Name: index_ownerships_on_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_ownerships_on_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_ownerships_on_bike_id ON ownerships USING btree (bike_id);
 
 
 --
--- Name: index_ownerships_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_ownerships_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_ownerships_on_creator_id ON ownerships USING btree (creator_id);
 
 
 --
--- Name: index_ownerships_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_ownerships_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_ownerships_on_user_id ON ownerships USING btree (user_id);
 
 
 --
--- Name: index_payments_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_payments_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_payments_on_user_id ON payments USING btree (user_id);
 
 
 --
--- Name: index_public_images_on_imageable_id_and_imageable_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_public_images_on_imageable_id_and_imageable_type; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_public_images_on_imageable_id_and_imageable_type ON public_images USING btree (imageable_id, imageable_type);
 
 
 --
--- Name: index_recovery_displays_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_recovery_displays_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_recovery_displays_on_stolen_record_id ON recovery_displays USING btree (stolen_record_id);
 
 
 --
--- Name: index_states_on_country_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_states_on_country_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_states_on_country_id ON states USING btree (country_id);
 
 
 --
--- Name: index_stolen_notifications_on_oauth_application_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_stolen_notifications_on_oauth_application_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_stolen_notifications_on_oauth_application_id ON stolen_notifications USING btree (oauth_application_id);
 
 
 --
--- Name: index_stolen_records_on_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_stolen_records_on_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_stolen_records_on_bike_id ON stolen_records USING btree (bike_id);
 
 
 --
--- Name: index_stolen_records_on_latitude_and_longitude; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_stolen_records_on_latitude_and_longitude; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_stolen_records_on_latitude_and_longitude ON stolen_records USING btree (latitude, longitude);
 
 
 --
--- Name: index_user_emails_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_emails_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_user_emails_on_user_id ON user_emails USING btree (user_id);
 
 
 --
--- Name: index_users_on_password_reset_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_users_on_password_reset_token; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE INDEX index_users_on_password_reset_token ON users USING btree (password_reset_token);
 
 
 --
--- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
 CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (version);

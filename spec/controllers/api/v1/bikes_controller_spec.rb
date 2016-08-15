@@ -229,7 +229,7 @@ describe Api::V1::BikesController do
         FactoryGirl.create(:country, iso: 'US')
         FactoryGirl.create(:state, abbreviation: 'Palace')
         # ListingOrderWorker.any_instance.should_receive(:perform).and_return(true)
-        bike_attrs = { 
+        bike_attrs = {
           serial_number: '69 stolen bike',
           manufacturer_id: manufacturer.id,
           rear_tire_narrow: 'true',
@@ -240,7 +240,7 @@ describe Api::V1::BikesController do
           phone: '9999999',
           cycle_type_slug: 'bike'
         }
-        stolen_record = { 
+        stolen_record = {
           date_stolen: '03-01-2013',
           theft_description: "This bike was stolen and that's no fair.",
           country: 'US',
@@ -322,7 +322,7 @@ describe Api::V1::BikesController do
       it 'does not send an ownership email if it has no_email set' do
         manufacturer = FactoryGirl.create(:manufacturer)
         f_count = Feedback.count
-        bike = { 
+        bike = {
           serial_number: '69 string',
           manufacturer_id: manufacturer.id,
           rear_tire_narrow: 'true',

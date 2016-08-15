@@ -79,19 +79,25 @@ describe Admin::BikesController do
     context 'fast_attr_update' do
       it 'marks a stolen bike recovered and passes attr update through' do
         bike = FactoryGirl.create(:stolen_bike)
+        stolen_record = bike.current_stolen_record
         bike.reload
         expect(bike.stolen).to be_truthy
         opts = {
           id: bike.id,
           mark_recovered_reason: 'I recovered it',
-          index_helped_recovery: true,
+          mark_recovered_we_helped: true,
           can_share_recovery: 1,
           fast_attr_update: true,
           bike: { stolen: 0 }
         }
-        expect do
-          put :update, opts
-        end.to change(RecoveryUpdateWorker.jobs, :size).by(1)
+        put :update, opts
+        bike.reload
+        stolen_record.reload
+        expect(bike.stolen).to be_falsey
+        expect(bike.current_stolen_record).not_to be_present
+        expect(stolen_record.reload.date_recovered).to be_within(1.second).of Time.now
+        expect(stolen_record.index_helped_recovery).to be_truthy
+        expect(stolen_record.can_share_recovery).to be_truthy
         expect(assigns(:fast_attr_update)).to be_truthy
         bike.reload
         expect(bike.stolen).to be_falsey
