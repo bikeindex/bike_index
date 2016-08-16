@@ -3,19 +3,20 @@
     .alert.alert-error
       %a.close{"data-dismiss" => "alert"} ×
       %h4
-        Please fix the following 
+        Please fix the following
         = pluralize(@lock.errors.count, "error")
       %ul
         - @lock.errors.full_messages.each do |msg|
-          %li 
+          %li
             = msg
 
-            
+
 - ulock_type = LockType.friendly_find('u-lock')
 - chain_type = LockType.friendly_find('chain-with-lock')
 - cable_type = LockType.friendly_find('cable')
 - skewer_type = LockType.friendly_find('locking-skewer')
 - other_type = LockType.friendly_find('other-style')
+
 
 .lock-types-select
   .lock-type-title
@@ -44,7 +45,7 @@
       = image_tag "locks/cable.jpg"
   .lock-type
     %div
-      
+
       %input{ id: "locky_#{skewer_type.id}", type: "radio", name: "lock_types_select", data: {value: skewer_type.id}}
     %label{ for: "locky_#{skewer_type.id}" }
       %span
@@ -57,7 +58,7 @@
       %span
         Other lock style
       = image_tag "locks/other-style.jpg"
-  
+
   = f.hidden_field :lock_type_id
 
 .input-field#chosen-container
@@ -77,7 +78,7 @@
     .control-label
       = f.label :has_key
     .controls
-      = f.check_box :has_key     
+      = f.check_box :has_key
   .release-type
     .control-label
       = f.label :has_combination

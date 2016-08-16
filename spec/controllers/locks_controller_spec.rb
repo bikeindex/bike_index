@@ -10,35 +10,6 @@ describe LocksController do
     end
   end
 
-  describe 'index' do
-    it 'renders' do
-      get :index
-      expect(response.code).to eq('200')
-      expect(response).to render_template('index')
-      expect(assigns(:locks)).to be_decorated
-    end
-    context 'revised' do
-      it 'renders with revised_layout' do
-        allow(controller).to receive(:revised_layout_enabled?) { true }
-        get :index
-        expect(response.status).to eq(200)
-        expect(response).to render_template('index')
-        expect(response).to render_with_layout('application_revised')
-        expect(flash).to_not be_present
-      end
-    end
-  end
-
-  describe 'show' do
-    it 'renders' do
-      lock = FactoryGirl.create(:lock, user: user)
-      get :show, id: lock.id
-      expect(response.code).to eq('200')
-      expect(response).to render_template('show')
-      expect(assigns(:lock)).to be_decorated
-    end
-  end
-
   describe 'new' do
     it 'renders' do
       get :new
@@ -51,7 +22,10 @@ describe LocksController do
     context 'not lock owner' do
       it 'redirects to user_home' do
         lock = FactoryGirl.create(:lock)
-        get :show, id: lock.id
+        get :edit, id: lock.id
+
+        # changed get from :show to :edit, correct?
+
         expect(response).to redirect_to(:user_home)
       end
     end
@@ -68,7 +42,8 @@ describe LocksController do
   describe 'create' do
     include_context :logged_in_as_user
     let(:manufacturer) { FactoryGirl.create(:manufacturer) }
-    let(:lock_type) { FactoryGirl.create(:lock) }
+    let(:lock_type) { FactoryGirl.create(:lock_type) }
+    let(:lock) { FactoryGirl.create(:lock) } # needed?
     context 'success' do
       it 'redirects you to user_home locks table' do
         lock_params = {
@@ -80,6 +55,8 @@ describe LocksController do
           key_serial: '321',
           combination: ''
         }
+        pp lock_type.id
+        pp '**'
         post :create, lock: lock_params
         user.reload
         lock = user.locks.first

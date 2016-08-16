@@ -39,6 +39,7 @@ class LocksController < ApplicationController
       flash[:success] = "Lock created successfully!"
       redirect_to user_home_path(active_tab: 'locks')
     else
+      pp @lock.errors.full_messages
       render action: :new
     end
   end
