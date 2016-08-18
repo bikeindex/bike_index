@@ -36,8 +36,6 @@ module ApplicationHelper
       'content_skeleton' if %w(create request_password_reset).include?(action_name)
     when *%w(news feedbacks manufacturers stolen errors registrations)
       'content_skeleton'
-    when 'locks'
-      'content_skeleton' if %w(index show).include?(action_name)
     end
   end
 
