@@ -4,6 +4,7 @@ class BikeIndex.ToggleHiddenOther extends BikeIndex
     # via a class...
     form_well_id = $('.primary-edit-bike-form').prop('id')
     form_well_id = $('body > form').prop('id') unless form_well_id # e.g. new bike page
+    form_well_id = $("#{target_input_selector}").parents('form').prop('id') unless form_well_id # e.g. new bike page
 
     toggleOtherDisplay = @toggleOtherDisplay
 

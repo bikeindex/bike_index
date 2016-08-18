@@ -10,109 +10,78 @@
           %li
             = msg
 
-
 - ulock_type = LockType.friendly_find('u-lock')
 - chain_type = LockType.friendly_find('chain-with-lock')
 - cable_type = LockType.friendly_find('cable')
 - skewer_type = LockType.friendly_find('locking-skewer')
 - other_type = LockType.friendly_find('other-style')
-
+- lock_types = [ulock_type, chain_type, cable_type, skewer_type, other_type]
 
 .lock-types-select
   .lock-type-title
     %label
       Lock type
-  .lock-type
-    %div
-      %input{ id: "locky_#{ulock_type.id}", type: "radio", name: "lock_types_select", data: {value: ulock_type.id}}
-    %label{ for: "locky_#{ulock_type.id}" }
-      %span
-        U-lock
-      = image_tag "locks/u-lock.jpg"
-  .lock-type
-    %div
-      %input{ id: "locky_#{chain_type.id}", type: "radio", name: "lock_types_select", data: {value: chain_type.id}}
-    %label{ for: "locky_#{chain_type.id}" }
-      %span
-        Chain
-      = image_tag "locks/chain-with-lock.jpg"
-  .lock-type
-    %div
-      %input{ id: "locky_#{cable_type.id}", type: "radio", name: "lock_types_select", data: {value: cable_type.id}}
-    %label{ for: "locky_#{cable_type.id}" }
-      %span
-        Cable lock
-      = image_tag "locks/cable.jpg"
-  .lock-type
-    %div
 
-      %input{ id: "locky_#{skewer_type.id}", type: "radio", name: "lock_types_select", data: {value: skewer_type.id}}
-    %label{ for: "locky_#{skewer_type.id}" }
-      %span
-        Locking skewers
-      = image_tag "locks/locking-skewer.jpg"
-  .lock-type
-    %div
-      %input{ id: "locky_#{other_type.id}", type: "radio", name: "lock_types_select", data: {value: other_type.id}}
-    %label{ for: "locky_#{other_type.id}" }
-      %span
-        Other lock style
-      = image_tag "locks/other-style.jpg"
+  - lock_types.each do |lock|
+    .lock-type
+      %div
+        %input{ id: "locky_#{lock.id}", type: "radio", name: "lock_types_select", data: { value: lock.id } }
+      %label{ for: "locky_#{lock.id}" }
+        %span
+          = lock.name
+        = image_tag "locks/#{lock.slug}.jpg"
 
   = f.hidden_field :lock_type_id
 
-.input-field#chosen-container
-  .manufacturer-select.control-group.chosen-select
-    = f.label :manufacturer_id, class: "control-label"
-    .controls
-      = collection_select( :lock, :manufacturer_id, Manufacturer.all, :id, :name, :required =>true, prompt: "Choose manufacturer")
-  %p.other-value
-    = Manufacturer.other_manufacturer.id
-  .hidden-other.control-group
-    = f.label :manufacturer_other, "Other lock manufacturer", class: "control-label"
+
+
+.related-fields
+  .form-group.unfancy.fancy-select.manufacturer-select{ data: { otherid: Manufacturer.other_manufacturer.id } }
+    = f.label :manufacturer_id, class: "form-label"
+    = f.collection_select(:manufacturer_id, Manufacturer.all, :id, :name, { required: true, prompt: "Choose manufacturer" }, class: 'form-control')
+  .hidden-other.form-group
+    = f.label :manufacturer_other, "Other lock manufacturer", class: "form-label"
     .controls
       = f.text_field :manufacturer_other
 
-.release-types.control-group.checkboxes
-  .release-type
-    .control-label
-      = f.label :has_key
-    .controls
-      = f.check_box :has_key
-  .release-type
-    .control-label
-      = f.label :has_combination
-    .controls
-      = f.check_box :has_combination
+.form-check
+  %label.form-check-label
+    = f.check_box :has_key, class: "form-check-input"
+    Has key
 
+.form-check
+  %label.form-check-label
+    = f.check_box :has_combination, class: "form-check-input"
+    Has combination
 
-#serial-group.control-group.initially-hidden
-  .control-label
+#serial-group.form-group.initially-hidden
+  .form-label
     = f.label :key_serial
   .controls
     = f.text_field :key_serial
 
-  .lock-pictures
-    %h2
-      Examples of serial numbers found on different types of bike lock keys
-    %section
-      %a.lock-picture{ data: { target: image_path('locks/krypto_small_key.jpg') } }
-        = image_tag('locks/krypto_small_key.jpg', alt: "Small kryptonite key")
-      %p
-        Small Kryptonite key
-    %section
-      %a.lock-picture{ data: { target: image_path('locks/krypto_large_key.jpg') } }
-        = image_tag('locks/krypto_large_key.jpg', alt: "Large kryptonite key")
-      %p
-        Large Kryptonite key
-    %section
-      %a.lock-picture{ data: { target: image_path('locks/pinhead_key.jpg') } }
-        = image_tag('locks/pinhead_key.jpg', alt: "Pinhead key")
-      %p
-        Pinhead locking skewer key
+  .card.lock-pictures
+    .card-block
+      %h3.card-title
+        Examples of serial numbers found on different types of bike lock keys
+      %section
+        %a.lock-picture{ data: { target: image_path('locks/krypto_small_key.jpg') } }
+          = image_tag('locks/krypto_small_key.jpg', alt: "Small kryptonite key")
+        %p
+          Small Kryptonite key
+      %section
+        %a.lock-picture{ data: { target: image_path('locks/krypto_large_key.jpg') } }
+          = image_tag('locks/krypto_large_key.jpg', alt: "Large kryptonite key")
+        %p
+          Large Kryptonite key
+      %section
+        %a.lock-picture{ data: { target: image_path('locks/pinhead_key.jpg') } }
+          = image_tag('locks/pinhead_key.jpg', alt: "Pinhead key")
+        %p
+          Pinhead locking skewer key
 
-#combination.control-group.initially-hidden
-  .control-label
+#combination.form-group.initially-hidden
+  .form-label
     = f.label :combination
   .controls
     = f.text_field :combination

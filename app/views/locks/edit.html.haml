@@ -10,17 +10,17 @@
     #lock-form
       = render partial: "locks/form", locals: { f: f }
 
-      .control-group
-        .control-label
+      .form-group
+        .form-label
           = f.label :lock_model
         .controls
           = f.text_field :lock_model
 
-      .control-group.lock-notes
-        %label.control-label{ for: 'notes' }
+      .form-group.lock-notes
+        %label.form-label{ for: 'notes' }
           Additional notes
         .controls
           = f.text_area :notes, toolbar: 'Basic', class: 'ckeditor'
 
-      .control-group.submit-button
+      .form-group.submit-button
         = submit_tag "Update the lock!", class: "btn btn-success btn-lg"
