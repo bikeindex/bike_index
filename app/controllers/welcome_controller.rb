@@ -23,15 +23,6 @@ class WelcomeController < ApplicationController
     @locks = LockDecorator.decorate_collection(current_user.locks)
   end
 
-    # @variable that is first display whether bikes or locks
-    # in locks controller, after add lock, send you to user home w/ first display locks
-    # and should function first displaying locks
-    # make locks into table > look at manufacturers page
-    # make locks edit/new page use the revised view
-    # remove show and it's link. add edit link
-
-  # add old styles, translations search for classes
-  # add photo to lock table?
   def choose_registration
   end
 

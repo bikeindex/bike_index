@@ -8,31 +8,12 @@
   @extend .bike-boxes;
 }
 
-
 #lock-form {
   padding: 50px 0 100px;
-  // max-width: 600px;
-  // margin: 0 auto;
-
   .control-group {
     margin-bottom: 0;
     padding: 1em;
   }
-  // .release-types {
-  //   @include clearfix;
-  //   width: 100%;
-
-  //   .controls {
-  //     margin-left: 120px;
-  //   }
-  //   .control-label {
-  //     width: 100px;
-  //   }
-  // }
-  // .release-type {
-  //   width: 200px;
-  //   float: left;
-  // }
   .submit-button {
     margin-top: 20px;
     max-width: 780px;
@@ -45,18 +26,14 @@
   }
 }
 
-
 @media (min-width: 450px) {
   #lock-form .release-types {
     padding-left: 1.4em;
   }
 }
 
-
 .lock-types-select {
   @include clearfix;
-  // position: relative;
-  // padding: 0 0 40px;
 }
 .lock-type-title { display: none; }
 .lock-type {
@@ -87,7 +64,6 @@
     width: 160px;
     height: 100%;
     padding: 0 22px 40px 0;
-    // margin-left: 1em;
     display: block;
     label { text-align: right; cursor: default;}
   }
@@ -99,7 +75,6 @@
     div { input { display: block; margin: 0 auto;}}
   }
 }
-
 
 .lock-pictures {
   @extend .alert;
