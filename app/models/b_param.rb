@@ -31,7 +31,7 @@ class BParam < ActiveRecord::Base
   end
 
   def stolen=(val)
-    params['bike']['stolen'] = val
+    params['bike']['stolen'] = ActiveRecord::Type::Boolean.new.type_cast_from_database(val)
   end
 
   def primary_frame_color_id=(val)
