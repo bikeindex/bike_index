@@ -10,7 +10,7 @@ class LocksController < ApplicationController
     if @lock.update_attributes(permitted_parameters)
       render action: :edit
     else
-      flash[:error] = 'There was a problem!'
+      @page_errors = @lock.errors
       render action: :edit
     end
   end
@@ -25,6 +25,7 @@ class LocksController < ApplicationController
       flash[:success] = 'Lock created successfully!'
       redirect_to user_home_path(active_tab: 'locks')
     else
+      @page_errors = @lock.errors
       render action: :new
     end
   end
