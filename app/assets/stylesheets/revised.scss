@@ -15,14 +15,14 @@
 // Core variables and mixins
 @import "bootstrap/variables";
 $enable-flex: true; // Flexbox!!
-// 
+//
 // Overrides
 $border-radius:          1px;
 $border-radius-lg:       1px;
 $border-radius-sm:       1px;
 @import "revised/mixins/colors";
 
-// 
+//
 // More bootstrap
 @import "bootstrap/mixins";
 
@@ -176,6 +176,9 @@ $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 // Support pages
 @import "revised/pages/support/faq";
 
+// Locks pages
+@import "revised/pages/locks/lock_styles";
+
 // News pages
 @import "revised/pages/news/index";
 @import "revised/pages/news/show";
@@ -198,9 +201,9 @@ html { background: $black-off; }
 img { max-width: 100%; } // don't break random stuff images!
 body { min-height: 400px; }
 
-// 
+//
 // External overrides
-// 
+//
 
 // Bike Index selectize overrides
 .selectize-dropdown [data-selectable] .highlight { background: rgba($blue, 0.2); }

@@ -97,7 +97,7 @@ Bikeindex::Application.routes.draw do
       get :pdf
     end
   end
-  resources :locks
+  resources :locks, except: [:show, :index]
 
   namespace :admin do
     root to: 'dashboard#index'

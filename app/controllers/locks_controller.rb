@@ -1,27 +1,16 @@
 class LocksController < ApplicationController
+  layout 'application_revised'
   before_filter :authenticate_user
-
-  def index
-    @user = current_user
-    @locks = LockDecorator.decorate_collection(@user.locks)
-  end
-
-  def show
-    lock = find_lock 
-    @lock = LockDecorator.new(lock)
-  end
+  before_filter :find_lock, only: [:edit, :update, :destroy]
 
   def edit
-    @lock = find_lock
   end
-  
+
   def update
-    @lock = find_lock
-    @lock.user = current_user
     if @lock.update_attributes(permitted_parameters)
-      redirect_to locks_url
+      render action: :edit
     else
-      flash[:error] = 'There was a problem!'
+      @page_errors = @lock.errors
       render action: :edit
     end
   end
@@ -31,32 +20,32 @@ class LocksController < ApplicationController
   end
 
   def create
-    @lock = Lock.new(permitted_parameters)
-    @lock.user = current_user
-    if @lock.save 
-      flash[:success] = "Lock created successfully!"
-      redirect_to edit_lock_url(@lock)
+    @lock = current_user.locks.build(permitted_parameters)
+    if @lock.save
+      flash[:success] = 'Lock created successfully!'
+      redirect_to user_home_path(active_tab: 'locks')
     else
+      @page_errors = @lock.errors
       render action: :new
     end
   end
 
   def destroy
-    @lock = find_lock
     @lock.destroy
-    redirect_to '/locks'
+    redirect_to user_home_path(active_tab: 'locks')
   end
 
   private
 
   def find_lock
-    lock = Lock.find(params[:id])
-    return lock if lock.user == current_user
-    flash[:error] = "Whoops, that's not your lock!"
-    redirect_to user_home_path and return
+    @lock = current_user.locks.where(id: params[:id]).first
+    unless @lock.present?
+      flash[:error] = "Whoops, that's not your lock!"
+      redirect_to user_home_path and return
+    end
   end
 
   def permitted_parameters
-    params.require(:lock).permit(Lock.old_attr_accessible)
+    params.require(:lock).permit(:lock_type_id, :has_key, :has_combination, :combination, :key_serial, :manufacturer_id, :manufacturer_other, :lock_model, :notes)
   end
 end

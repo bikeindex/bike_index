@@ -8,16 +8,15 @@
       .ad-block#top468x60
   .row
     .col-md-8
-      - locks_active = params[:active_tab] == 'locks'
       %ul.user-items-nav.nav.nav-tabs{ role: 'tablist' }
         %li.nav-item
-          %a.nav-link{ class: ('active' unless locks_active), href: '#bikes_tab_content', data: { toggle: 'tab', role: 'tab' } }
+          %a.nav-link{ class: ('active' unless @locks_active_tab), href: '#bikes_tab_content', data: { toggle: 'tab', role: 'tab' } }
             bikes
         %li.nav-item
-          %a.nav-link{ class: ('active' if locks_active), href: '#locks_tab_content', data: { toggle: 'tab', role: 'tab' } }
+          %a.nav-link{ class: ('active' if @locks_active_tab), href: '#locks_tab_content', data: { toggle: 'tab', role: 'tab' } }
             locks
       .user-items-content.tab-content
-        .tab-pane#bikes_tab_content{ class: ('active' unless locks_active) }
+        .tab-pane#bikes_tab_content{ class: ('active' unless @locks_active_tab) }
           - if @bikes.present?
             %ul.bike-boxes
               - @bikes.each do |bike|
@@ -60,15 +59,30 @@
           - else
             %h2
               You have no registered bikes
-        .tab-pane#locks_tab_content{ class: ('active' if locks_active) }
+        .tab-pane#locks_tab_content{ class: ('active' if @locks_active_tab) }
           - if @locks.present?
-            %ul.bike-boxes
-              - @locks.each do |lock|
-                %li.bike-box-items
-                  = lock.dl_list_item(link_to(lock.lock_type_name, lock_url(lock)), "Lock Type")
-                  = lock.dl_list_item(lock.mnfg_name, "Manufacturer")
-                  = lock.dl_from_attribute("key_serial")
-                  = lock.dl_from_attribute("combination")
+            %table.table.table-striped.table-bordered
+              %thead
+                %th
+                  Lock Type
+                %th
+                  Manufacturer
+                %th
+                  Key Serial
+                %th
+                  Combination
+              %tbody
+                - @locks.each do |lock|
+                  %tr
+                    %td
+                      = lock.lock_type_name
+                      = link_to('Edit', edit_lock_url(lock))
+                    %td
+                      = lock.mnfg_name
+                    %td
+                      = lock.key_serial
+                    %td
+                      = lock.combination
           - else
             %h2
               You have no registered locks

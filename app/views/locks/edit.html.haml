@@ -1,26 +1,10 @@
-%header.with-subtitle
-  %h1
-    Edit the lock
-  %p
-    %a{ href: "/locks" }
-      back to viewing all locks
+.container
+  %header.with-subtitle
+    %h1
+      Edit the lock
+    %p
+      = link_to('back to viewing all locks', user_home_path(active_tab: 'locks'))
 
 
-= form_for @lock, html: { class: "form-horizontal" } do |f|
-  #lock-form
-    = render partial: "locks/form", locals: { f: f }
+  = render partial: "form"
 
-    .control-group
-      .control-label
-        = f.label :lock_model
-      .controls
-        = f.text_field :lock_model
-
-    .control-group.lock-notes
-      %label.control-label{ for: 'notes' }
-        Additional notes
-      .controls
-        = f.text_area :notes, toolbar: 'Basic', class: 'ckeditor'
-
-    .control-group.submit-button
-      = submit_tag "Update the lock!", class: "button-green"
