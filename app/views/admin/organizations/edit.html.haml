@@ -42,4 +42,4 @@
           Show new bike notification
 
 .actions.padded
-  = link_to "Manage organization invitations", admin_organization_invitation_url(@organization.id), class: "button-yellow"
+  = link_to "Manage organization invitations", admin_organization_invitation_url(organization_id: @organization.to_param), class: "button-yellow"

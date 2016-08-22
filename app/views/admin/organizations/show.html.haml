@@ -40,7 +40,7 @@
     %dl.dl-horizontal
       = @organization.dl_list_item(@organization.users.count, "Users")
       = @organization.dl_list_item(@organization.sent_invitation_count, "Sent invites")
-      = @organization.dl_list_item(link_to(@organization.available_invitation_count, admin_organization_invitation_url(@organization.id)), link_to("Remaining invites", admin_organization_invitation_url(@organization.id)))
+      = @organization.dl_list_item(link_to(@organization.available_invitation_count, admin_organization_invitation_url(organization_id: @organization.to_param)), link_to("Remaining invites", admin_organization_invitation_url(organization_id: @organization.to_param)))
       = @organization.dl_from_attribute("website")
       %dt Paid
       %dd
@@ -136,6 +136,6 @@
               = location.street
 
 .actions.padded
-  = link_to "Manage organization invitations", admin_organization_invitation_url(@organization.id), class: "button-yellow"
+  = link_to "Manage organization invitations", admin_organization_invitation_url(organization_id: @organization.to_param), class: "button-yellow"
   = link_to "Edit", edit_admin_organization_url(@organization), class: "button-green"
   = link_to "Delete #{@organization.name}!", admin_organization_url(@organization), method: :delete, confirm: "Are you sure?", class: "button-red"

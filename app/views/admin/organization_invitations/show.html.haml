@@ -43,7 +43,7 @@
         - @organization_invitations.each do |org_invite|
           %tr
             %td
-              = link_to org_invite.id, admin_organization_invitation_url(org_invite.id)
+              = link_to org_invite.id, admin_organization_invitation_url(org_invite.id, organization_id: @organization.to_param)
             %td.large-screens
               = org_invite.created_at.strftime("%-I %p on %-m/%-d/%Y ")
             %td.medium-screens

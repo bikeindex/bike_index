@@ -236,6 +236,7 @@ img { max-width: 100%; } // don't break random stuff images!
       color: #fff;
       margin: 0;
       text-align: center;
+      font-size: 21px;
     }
   }
   header.reg-header {
@@ -263,12 +264,9 @@ img { max-width: 100%; } // don't break random stuff images!
     padding: 22px 2*$vertical-height 21px;
     p { padding: 0 10%; }
   }
-  .registration-widget-body > form {
-    max-width: 337px;
-    margin: 0 auto;
-  }
+  .registration-widget-body > form { margin: 0 auto; }
   input[type='email'], select, .form-control { width: 100%; }
-  .below-input-help { padding-bottom: 0; }
+  .below-input-help { padding: 0 6px; }
   .fancy-select .selectize-control { width: 100%; }
   .submit-wrapper .btn {
     display: block;
