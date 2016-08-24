@@ -24,11 +24,10 @@
       = f.label :username, class: "control-label"
       .controls
         = f.text_field :username
-    - unless @user.confirmed
-      .control-group
-        = f.label :confirmed, class: "control-label"
-        .controls
-          = f.check_box :confirmed
+    .control-group
+      = f.label :confirmed, class: "control-label"
+      .controls
+        = f.check_box :confirmed, disabled: @user.confirmed
     .control-group
       = f.label :superuser, class: "control-label"
       .controls

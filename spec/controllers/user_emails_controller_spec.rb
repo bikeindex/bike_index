@@ -92,7 +92,6 @@ describe UserEmailsController do
     end
   end
 
-
   describe 'destroy' do
     context "user's user email" do
       before do
@@ -103,6 +102,19 @@ describe UserEmailsController do
           delete :destroy, id: user_email.id
           expect(UserEmail.where(id: user_email.id)).to_not be_present
           expect(flash[:success]).to be_present
+        end
+      end
+      context 'only has email' do
+        it 'sets flash info and does not delete the email' do
+          user_email.destroy
+          user.user_emails.each { |ue| ue.update_attribute :confirmation_token, 'stuff' }
+          expect(user.user_emails.count).to eq 1
+          expect(user.user_emails.confirmed.count).to eq 0
+          delete :destroy, id: user.user_emails.first.id
+          user.reload
+          expect(user.user_emails.confirmed.count).to eq 0
+          expect(user.user_emails.count).to eq 1
+          expect(flash[:info]).to be_present
         end
       end
       context 'confirmed' do

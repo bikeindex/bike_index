@@ -169,7 +169,7 @@ describe User do
   describe 'fuzzy_email_find' do
     it "finds users by email address when the case doesn't match" do
       @user = FactoryGirl.create(:confirmed_user, email: 'ned@foo.com')
-      expect(User.fuzzy_email_find('NeD@fOO.coM')).to eq(@user)
+      expect(User.fuzzy_email_find('NeD@fOO.coM ')).to eq(@user)
     end
   end
 

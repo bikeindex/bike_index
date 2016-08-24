@@ -45,6 +45,8 @@ class User < ActiveRecord::Base
   after_create :perform_create_jobs
   serialize :paid_membership_info
   serialize :my_bikes_hash
+  scope :confirmed, -> { where(confirmed: true) }
+  scope :unconfirmed, -> { where.not(confirmed: true) }
 
   validates_uniqueness_of :username, case_sensitive: false
   def to_param
@@ -169,7 +171,7 @@ class User < ActiveRecord::Base
   end
 
   def self.fuzzy_unconfirmed_primary_email_find(email)
-    find_by_email(EmailNormalizer.normalize(email))
+    unconfirmed.find_by_email(EmailNormalizer.normalize(email))
   end
 
   def self.fuzzy_confirmed_or_unconfirmed_email_find(email)

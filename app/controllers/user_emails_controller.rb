@@ -31,8 +31,10 @@ class UserEmailsController < ApplicationController
   def destroy
     if @user_email.confirmed
       flash[:info] = "#{@user_email.email} is confirmed and can't be removed. Email contact@bikeindex.org for help."
+    elsif @user_email.user.user_emails.count < 2
+      flash[:info] = "#{@user_email.email} is your only confirmed email and can't be removed. Email contact@bikeindex.org for help."
     else
-      flash[:success] = "#{@user_email.email} remove."
+      flash[:success] = "#{@user_email.email} removed."
       @user_email.destroy
     end
     redirect_to my_account_path
