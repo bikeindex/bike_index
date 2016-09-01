@@ -31,7 +31,7 @@
             = truncate(recovery_display.quote, length: 70)
           %td.large-screens
             = recovery_display.quote_by
-          %td
+          %td.table-cell-check
             = "&#x2713;".html_safe if recovery_display.image?
-          %td.large-screens
+          %td.large-screens.table-cell-check
             = "&#x2713;".html_safe if recovery_display.stolen_record_id.present?
