@@ -22,6 +22,8 @@
         %th
           Email
         %th.medium-screens
+          Secondary Emails
+        %th.medium-screens
           Created
         %th.large-screens
           Name
@@ -32,7 +34,7 @@
         %th.large-screens
           Admin?
         %th.large-screens
-          Management
+          Confirmed
       %tbody
         - @users.each do |user|
           %tr
@@ -41,6 +43,9 @@
                 = link_to user.email, edit_admin_user_url(user)
                 %span.less-strong-right
                   = user.id
+            %td.medium-screens
+              %small.less-strong
+                = user.secondary_emails.join(', ')
             %td.medium-screens
               - if user.created_at.today?
                 %span.hidden
@@ -66,8 +71,9 @@
             %td.large-screens
               = "super" if user.superuser?
               = "content" if user.content?
-            %td.large-screens
-              #{link_to 'Edit', edit_admin_user_url(user)}
+            %td.large-screens.table-cell-check
+              = "&#x2713;".html_safe if user.confirmed
+
   .paginate-container
     = paginate @users
 - else

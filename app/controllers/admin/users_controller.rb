@@ -2,23 +2,23 @@ class Admin::UsersController < Admin::BaseController
   before_filter :find_user, only: [:show, :edit, :update, :destroy]
 
   def index
-    if params[:user_query]
-      # if params[:email]
-      users = User.admin_text_search(params[:user_query])
-      # users = User.where('email LIKE ?', params[:user_query]).all
-      # users += User.where('name LIKE ?', params[:user_query]).all
-      # @users = users
-    elsif params[:superusers]
-      users = User.where(superuser: true)
-    elsif params[:content_admins]
-      users = User.where(is_content_admin: true)
-    else 
-      users = User.order("created_at desc")
-    end
-    @user_count = users.count
     page = params[:page] || 1
     per_page = params[:per_page] || 25
-    @users = users.page(page).per(per_page)
+    if params[:user_query].present?
+      users = User.admin_text_search(params[:user_query])
+      @users = Kaminari.paginate_array(users).page(page).per(per_page)
+    else
+      if params[:superusers]
+        users = User.where(superuser: true)
+      elsif params[:content_admins]
+        users = User.where(is_content_admin: true)
+      else 
+        users = User.order("created_at desc")
+      end
+      @users = users.page(page).per(per_page)
+    end
+    @user_count = users.count
+    
   end
 
   def edit
