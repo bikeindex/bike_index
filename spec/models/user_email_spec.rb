@@ -85,6 +85,4 @@ describe UserEmail do
       end
     end
   end
-
-  
 end

@@ -15,6 +15,6 @@ class Admin::CustomerContactsController < Admin::BaseController
   private
 
   def permitted_parameters
-    params.require(:customer_contact).permit(CustomerContact.old_attr_accessible)
+    params.require(:customer_contact).permit(:creator_email, :user_email, :title, :contact_type, :creator_id, :bike_id, :body)
   end
 end

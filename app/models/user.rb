@@ -45,6 +45,8 @@ class User < ActiveRecord::Base
   after_create :perform_create_jobs
   serialize :paid_membership_info
   serialize :my_bikes_hash
+  scope :confirmed, -> { where(confirmed: true) }
+  scope :unconfirmed, -> { where(confirmed: false) }
 
   validates_uniqueness_of :username, case_sensitive: false
   def to_param
@@ -67,23 +69,37 @@ class User < ActiveRecord::Base
   validates_presence_of :email
   validates_uniqueness_of :email, case_sensitive: false
 
-  include PgSearch
-  pg_search_scope :admin_search, against: {
-      name: 'A',
-      email: 'A'
-    },
-    using: { tsearch: { dictionary: 'english', prefix: true } }
+  class << self
+    def fuzzy_email_find(email)
+      UserEmail.confirmed.fuzzy_user_find(email)
+    end
 
-  def self.admin_text_search(query)
-    if query.present?
-      admin_search(query)
-    else
-      scoped
+    def fuzzy_unconfirmed_primary_email_find(email)
+      unconfirmed.find_by_email(EmailNormalizer.normalize(email))
+    end
+
+    def fuzzy_confirmed_or_unconfirmed_email_find(email)
+      fuzzy_email_find(email) || fuzzy_unconfirmed_primary_email_find(email)
+    end
+
+    def friendly_id_find(n)
+      u = self.fuzzy_email_find(n)
+      u && u.id
+    end
+
+    def admin_text_search(n)
+      search_str = "%#{n.strip}%"
+      (where("name ILIKE ? OR email ILIKE ?", search_str, search_str) +
+        joins(:user_emails).where("user_emails.email ILIKE ?", search_str)).uniq
     end
   end
 
   def additional_emails=(value)
     UserEmail.add_emails_for_user_id(id, value)
+  end
+
+  def secondary_emails
+    user_emails.where.not(email: email).pluck(:email)
   end
 
   validate :ensure_unique_email
@@ -162,23 +178,6 @@ class User < ActiveRecord::Base
     else
       return false
     end
-  end
-  
-  def self.fuzzy_email_find(email)
-    UserEmail.confirmed.fuzzy_user_find(email)
-  end
-
-  def self.fuzzy_unconfirmed_primary_email_find(email)
-    find_by_email(EmailNormalizer.normalize(email))
-  end
-
-  def self.fuzzy_confirmed_or_unconfirmed_email_find(email)
-    fuzzy_email_find(email) || fuzzy_unconfirmed_primary_email_find(email)
-  end
-
-  def self.friendly_id_find(n)
-    u = self.fuzzy_email_find(n)
-    u && u.id
   end
 
   def role(organization)

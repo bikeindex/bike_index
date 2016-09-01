@@ -235,13 +235,16 @@ class BikesController < ApplicationController
     type = @bike && @bike.type || 'bike'
     if current_user.present?
       unless @current_ownership && @current_ownership.owner == current_user
+        if @bike.can_be_claimed_by(current_user)
+          redirect_to ownership_path(@bike.current_ownership) and return
+        end
         error = "Oh no! It looks like you don't own that #{type}."
       end
     else
       if @current_ownership && @bike.current_ownership.claimed
         error = "Whoops! You have to sign in to be able to edit that #{type}."
       else
-        error = "That #{type} hasn't been claimed yet. If it's your {type} sign up and you'll be able to edit it!"
+        error = "That #{type} hasn't been claimed yet. If it's your #{type} sign up and you'll be able to edit it!"
       end
     end
     if error.present? # Can't assign directly to flash here, sometimes kick out of edit because other flash error

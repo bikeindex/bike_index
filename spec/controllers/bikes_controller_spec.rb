@@ -643,6 +643,16 @@ describe BikesController do
         expect(flash[:error]).to be_present
       end
     end
+
+    context "when the right user is present but hasn't claimed the bike" do
+      it 'redirects and sets the flash' do
+        user = FactoryGirl.create(:user)
+        ownership.update_attribute :user_id, user.id
+        set_current_user(user)
+        get :edit, id: bike.id
+        expect(response).to redirect_to ownership_path(bike.current_ownership.id)
+      end
+    end
     context 'user allowed to edit the bike' do
       let(:user) { ownership.creator }
 

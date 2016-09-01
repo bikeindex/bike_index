@@ -114,14 +114,6 @@ describe User do
         expect(@user.valid?).to be_truthy
       end
 
-      # Disabled in upgrade to rails 4 - I don't think this tests what it should be testing
-      # it 'does not require a password on update' do
-      #   @user.save
-      #   @user.password = nil
-      #   @user.password_confirmation = nil
-      #   expect(@user.valid?).to be_truthy
-      # end
-
       it 'requires password and confirmation to match' do
         @user.password_confirmation = 'wtf'
         expect(@user.valid?).to be_falsey
@@ -166,10 +158,64 @@ describe User do
     end
   end
 
-  describe 'fuzzy_email_find' do
-    it "finds users by email address when the case doesn't match" do
-      @user = FactoryGirl.create(:confirmed_user, email: 'ned@foo.com')
-      expect(User.fuzzy_email_find('NeD@fOO.coM')).to eq(@user)
+  describe 'fuzzy finds' do
+    before do
+      expect(user).to be_present
+    end
+    describe 'fuzzy_email_find and ' do
+      let(:user) { FactoryGirl.create(:confirmed_user, email: 'ned@foo.com') }
+      it "finds users by email address when the case doesn't match" do
+        expect(User.fuzzy_email_find('NeD@fOO.cOM ')).to eq(user)
+        expect(User.fuzzy_confirmed_or_unconfirmed_email_find('NeD@fOO.cOM ')).to eq(user)
+      end
+    end
+    describe 'fuzzy_unconfirmed_primary_email_find' do
+      let(:user) { FactoryGirl.create(:user, email: 'ned@foo.com') }
+      it 'finds user' do
+        expect(user.confirmed).to be_falsey
+        expect(User.fuzzy_unconfirmed_primary_email_find(' NeD@fOO.com ')).to eq(user)
+        expect(User.fuzzy_confirmed_or_unconfirmed_email_find(' NeD@fOO.com ')).to eq(user)
+      end
+    end
+  end
+
+  describe 'admin text search' do
+    before do
+      expect(user).to be_present
+    end
+    context 'unconfirmed user partial match' do
+      let(:user) { FactoryGirl.create(:user, email: 'sample-stuff@e.us') }
+      it 'finds users' do
+        expect(user.confirmed).to be_falsey
+        expect(User.admin_text_search('sample-stuff ')).to eq([user])
+      end
+    end
+    context 'secondary email partial match' do
+      let(:user_email) do
+        FactoryGirl.create(:user_email, 
+                           email: 'urrg@second.org',
+                           user: FactoryGirl.create(:user, name: 'FeconDDD'))
+      end
+      let(:user) { user_email.user }
+      it 'finds users, deduping' do
+        expect(User.admin_text_search('econd')).to eq([user])
+      end
+    end
+    context 'partial match for name' do
+      let(:user) { FactoryGirl.create(:user, name: 'XYLoPHONE') }
+      it 'finds user' do
+        User.admin_text_search('ylop')
+        expect(User.admin_text_search('ylop')).to eq([user])
+      end
+    end
+  end
+
+  describe 'secondary_emails' do
+    let(:user) { FactoryGirl.create(:confirmed_user, email: 'cool@stuff.com') }
+    let(:user_email) { FactoryGirl.create(:user_email, user: user) }
+    it 'lists the non-primary emails' do
+      expect(user_email).to be_present
+      expect(user.secondary_emails).to eq([user_email.email])
     end
   end
 

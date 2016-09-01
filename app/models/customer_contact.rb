@@ -1,8 +1,4 @@
 class CustomerContact < ActiveRecord::Base
-  def self.old_attr_accessible
-    %w(title body user_id user_email creator_email creator_id contact_type bike_id info_hash).map(&:to_sym).freeze
-  end
-
   validates_presence_of :title
   validates_presence_of :body
   validates_presence_of :contact_type
@@ -20,9 +16,7 @@ class CustomerContact < ActiveRecord::Base
   before_save :normalize_email_and_find_user
   def normalize_email_and_find_user
     self.user_email = EmailNormalizer.normalize(user_email)
-    user = User.fuzzy_email_find(user_email)
-    user ||= User.fuzzy_unconfirmed_primary_email_find(user_email)
-    self.user = user if user
+    self.user ||= User.fuzzy_confirmed_or_unconfirmed_email_find(user_email)
     true
   end
 
