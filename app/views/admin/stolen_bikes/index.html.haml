@@ -62,7 +62,7 @@
             %td
               - if bike.current_stolen_record.address.present?
                 = bike.current_stolen_record.city
-            %td
+            %td.table-cell-check
               = "&#x2713;".html_safe if bike.current_stolen_record.approved
           - else
             %td.large-screens

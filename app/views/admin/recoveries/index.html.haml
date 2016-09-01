@@ -79,13 +79,13 @@
             %td.large-screens
               - if recovery.address.present?
                 = recovery.city
-            %td
+            %td.table-cell-check
               / Posted
               / = "&#x2713;".html_safe if recovery.recovery_posted
               = "&#x2713;".html_safe if recovery.index_helped_recovery
-            %td
+            %td.table-cell-check
               = "&#x2713;".html_safe if recovery.can_share_recovery
-            %td
+            %td.table-cell-check
               - if recovery.recovery_display.present?
                 = link_to "&#x2713;".html_safe, edit_admin_recovery_display_url(recovery.recovery_display)
           

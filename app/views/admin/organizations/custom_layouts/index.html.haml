@@ -34,8 +34,8 @@
         %tr
           %td
             = link_to snippet_description, edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: snippet_name)
-          %td
+          %td.table-cell-check
             = "&#x2713;".html_safe if snippet && snippet.body.present?
-          %td
+          %td.table-cell-check
             = "&#x2713;".html_safe if snippet && snippet.is_enabled
 

@@ -42,7 +42,7 @@
               = stolen_notification.bike.title_string
           %td
             = stolen_notification.message.truncate(120)
-          %td.not-tiny-screens
+          %td.not-tiny-screens.table-cell-check
             - if stolen_notification.send_dates_parsed.count == 1
               = "&#x2713;".html_safe
             - else
