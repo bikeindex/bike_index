@@ -8,3 +8,5 @@
 
   = render partial: "form"
 
+  .form-group.destroy-button
+    = button_to 'Delete this lock', { action: 'destroy', id: @lock}, method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger btn-lg '

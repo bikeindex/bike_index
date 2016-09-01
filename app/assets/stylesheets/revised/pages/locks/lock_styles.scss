@@ -21,6 +21,13 @@
       float: right;
     }
   }
+  .destroy-button {
+    margin-top: 20px;
+    max-width: 780px;
+    .btn {
+      float: left;
+    }
+  }
   .lock-notes {
     max-width: 780px;
   }
