@@ -236,7 +236,7 @@ class BikesController < ApplicationController
     if current_user.present?
       unless @current_ownership && @current_ownership.owner == current_user
         if @bike.can_be_claimed_by(current_user)
-          redirect_to ownership_path(@bike) and return
+          redirect_to ownership_path(@bike.current_ownership) and return
         end
         error = "Oh no! It looks like you don't own that #{type}."
       end
