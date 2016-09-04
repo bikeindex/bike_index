@@ -42,6 +42,7 @@ class BikeIndex.Init extends BikeIndex
       organized_manage_locations: BikeIndex.OrganizedManageLocations
       locks_new: BikeIndex.LocksForm
       locks_edit: BikeIndex.LocksForm
+      locks_create: BikeIndex.LocksForm
     window.pageScript = new pageClasses[body_id] if Object.keys(pageClasses).includes(body_id)
 
   initializeNoTabLinks: ->

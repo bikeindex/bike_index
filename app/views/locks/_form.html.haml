@@ -50,7 +50,7 @@
             = f.text_field :key_serial, class: 'form-control'
         .form-group.submit-button
           - action_name = @lock.id.present? ? 'Update' : 'Add'
-          = submit_tag "#{action_name} the lock!", class: "btn btn-success btn-lg"
+          = submit_tag "#{action_name} the lock!", class: 'btn btn-success btn-lg'
 
       .col-md-6
         #combination.form-group.initially-hidden
