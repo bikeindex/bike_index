@@ -8,19 +8,15 @@ class BikeCreatorBuilder
   end
 
   def add_front_wheel_size(bike)
-    return true unless bike.rear_wheel_size_id.present? && bike.cycle_type_id == CycleType.bike.id
+    return true unless bike.rear_wheel_size_id.present?
     return true if bike.front_wheel_size_id.present?
     bike.front_wheel_size_id = bike.rear_wheel_size_id
     bike.front_tire_narrow = bike.rear_tire_narrow
   end
 
   def add_required_attributes(bike)
-    unless bike.cycle_type_id.present?
-      bike.cycle_type_id = CycleType.bike.id 
-    end
-    unless bike.propulsion_type_id.present?
-      bike.propulsion_type_id = PropulsionType.foot_pedal.id
-    end    
+    bike.cycle_type_id ||= CycleType.bike.id 
+    bike.propulsion_type_id ||= PropulsionType.foot_pedal.id
     bike 
   end
 
@@ -28,7 +24,7 @@ class BikeCreatorBuilder
     bike = Bike.new(@b_param.bike.except(*BParam.skipped_bike_attrs))
     bike.b_param_id = @b_param.id
     bike.b_param_id_token = @b_param.id_token
-    bike.creator_id = @b_param.creator_id 
+    bike.creator_id = @b_param.creator_id
     bike.updator_id = bike.creator_id
     bike
   end
