@@ -120,14 +120,15 @@
 
   - else
     %h2
-      Add a location to the search section at the top of the page to see stats about that location
+      %em
+        Add a location to the search section at the top of the page to see stats about that location
     - if params[:location].present?
       %h4
         The location and proximity you entered weren't useable. Try again.
 
 - else
   = javascript_include_tag "//www.google.com/jsapi", "chartkick" 
-  / = javascript_include_tag "path/to/highcharts.js", "chartkick"
+
 
   %section
     %h1
@@ -157,22 +158,3 @@
       Bikes since 2007
 
     = line_chart bikes_admin_graphs_path(dates: 'since_start')
-
-  / # = pie_chart({"Football" => 10, "Basketball" => 5})
-
-  / = line_chart users_admin_graphs_path
-
-
-  / %table.table.table-striped.table-bordered
-  /   %tbody
-  /     - ["users","bikes","organizations"].each do |graph_type|
-  /       %tr
-  /         %td
-  /           = graph_type.humanize
-  /         %td
-  /           = link_to "Since start", admin_graph_url("#{graph_type}")
-  /     %tr
-  /       %td
-  /         This week in review
-  /       %td
-  /         = link_to "Past week", review_admin_graphs_url
