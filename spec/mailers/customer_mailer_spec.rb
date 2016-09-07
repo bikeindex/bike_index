@@ -34,18 +34,6 @@ describe CustomerMailer do
     end
   end
 
-  describe 'organization_invitation_email' do
-    before :each do
-      @organization = FactoryGirl.create(:organization)
-      @organization_invitation = FactoryGirl.create(:organization_invitation, organization: @organization)
-      @mail = CustomerMailer.organization_invitation_email(@organization_invitation)
-    end
-
-    it 'renders email' do
-      expect(@mail.subject).to eq("Join #{@organization.name} on the Bike Index")
-    end
-  end
-
   describe 'stolen_notification_email' do
     it 'renders email and update sent_dates' do
       stolen_notification = FactoryGirl.create(:stolen_notification, message: 'Test Message', reference_url: 'something.com')

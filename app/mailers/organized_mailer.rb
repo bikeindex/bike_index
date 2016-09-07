@@ -1,42 +1,57 @@
 # Every email in here has the potential to be owned by an organization -
 # but they aren't necessarily
 class OrganizedMailer < ActionMailer::Base
-  default from: '"Bike Index" <contact@bikeindex.org>',
+  CONTACT_BIKEINDEX = '"Bike Index" <contact@bikeindex.org>'.freeze
+  default from: CONTACT_BIKEINDEX,
           content_type: 'multipart/alternative',
           parts_order: ['text/calendar', 'text/plain', 'text/html', 'text/enriched']
 
   def partial_registration(b_param)
     @b_param = b_param
-    @send_to = @b_param.owner_email
     @organization = @b_param.creation_organization
-    mail('Reply-To' => reply_to, to: @send_to) do |format|
+    mail('Reply-To' => reply_to, to: @b_param.owner_email, subject: default_i18n_subject(default_subject_vars)) do |format|
       format.text
       format.html { render layout: 'email_revised' }
     end
   end
 
-  def finished_registration(ownership, bike: nil)
+  def finished_registration(ownership)
     @ownership = ownership
-    @send_to = @ownership.owner_email
-    @bike = bike || Bike.unscoped.find(@ownership.bike_id)
+    @bike = Bike.unscoped.find(@ownership.bike_id)
     @vars = {
       new_bike: (@bike.ownerships.count == 1),
       new_user: User.fuzzy_email_find(@ownership.owner_email).present?,
-      registered_by_owner: (ownership.user.present? && @bike.creator_id == ownership.user_id),
+      registered_by_owner: (@ownership.user.present? && @bike.creator_id == @ownership.user_id)
     }
     @organization = @bike.creation_organization if @bike.creation_organization.present? && @vars[:new_bike]
-    subject = t("organized_mailer.finished#{'_stolen' if @bike.stolen}_registration.subject", organization_name: nil)
-    mail(to: @send_to, subject: subject) do |format|
+    subject = t("organized_mailer.finished#{'_stolen' if @bike.stolen}_registration.subject", default_subject_vars)
+    mail('Reply-To' => reply_to, to: @ownership.owner_email, subject: subject) do |format|
       format.text
       format.html { render layout: 'email_revised' }
     end
   end
 
-  # default_i18n_subject(user: user.name))
+  def organization_invitation(organization_invitation)
+    @organization_invitation = organization_invitation
+    @organization = @organization_invitation.organization
+    @inviter = @organization_invitation.inviter
+    @new_user = User.fuzzy_email_find(@organization_invitation.invitee_email).present?
+    mail('Reply-To' => reply_to, to: @organization_invitation.invitee_email, subject: default_i18n_subject(default_subject_vars)) do |format|
+      format.text
+      format.html { render layout: 'email_revised' }
+    end
+  end
 
   private
 
+  def default_subject_vars
+    {
+      organization_name: @organization && @organization.short_name,
+      bike_type: @bike && @bike.type
+    }
+  end
+
   def reply_to
-    @organization && @organization.auto_user.present? ? @organization.auto_user.email : @send_to
+    @organization && @organization.auto_user.present? ? @organization.auto_user.email : CONTACT_BIKEINDEX
   end
 end
