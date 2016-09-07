@@ -1,6 +1,6 @@
 - if @vars[:new_user]
   %h2{ style: 'margin-bottom: 12px;' }
-    Welcome to the Bike Index
+    Welcome to Bike Index
 
 - if @organization && @organization.mail_snippet_body('welcome').present?
   = @organization.mail_snippet_body('welcome').html_safe
@@ -8,7 +8,7 @@
 - else
   - if @bike.recovered
     %h1
-      Thanks for adding this #{ @bike.type } you found to the index!
+      Thanks for adding this #{ @bike.type } you found to Bike Index
   - elsif @bike.stolen
     %h1
       #{ @bike.type } thieves are jerks.
@@ -16,7 +16,7 @@
       We're sorry your #{ @bike.type } was stolen.
   - else
     %h1
-      Congrats on adding your #{ @bike.type } to the index!
+      Congrats on registering your #{ @bike.type } with Bike Index #{ "and #{@organization.short_name}" if @organization }
 
 %p
   - if @vars[:registered_by_owner]
@@ -31,7 +31,7 @@
       sent you a
   - if @bike.stolen? || @bike.recovered
     = @bike.recovered ? 'recovered/found ' : 'stolen '
-  #{ @bike.type } on the Bike Index#{ ' for you' unless @vars[:registered_by_owner] }:
+  #{ @bike.type } on Bike Index#{ ' for you' unless @vars[:registered_by_owner] }:
 
 - unless @ownership.claimed
   %h2
