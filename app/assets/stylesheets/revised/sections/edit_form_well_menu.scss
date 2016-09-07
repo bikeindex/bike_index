@@ -27,7 +27,7 @@ $active-bike-edit-border-width: 2px;
         h4 {
           border-left: $active-bike-edit-border-width solid $blue;
           font-weight: $strong-font-weight;
-          color: $header-font-color;
+          color: $header-font-nocolor;
         }
       }
     }
@@ -46,7 +46,7 @@ $active-bike-edit-border-width: 2px;
       font-family: $header-font-family;
       font-weight: $strong-font-weight;
       text-transform: uppercase;
-      color: $header-font-color;
+      color: $header-font-nocolor;
       border-radius: 0;
       border: none;
       font-size: 15px;
