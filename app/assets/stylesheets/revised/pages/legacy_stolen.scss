@@ -405,11 +405,6 @@ $multserial-textheight: 8em;
 
 @media (min-width: 800px) {
   #stolen_index {
-    .multiserial-results div {
-      width: 48%;
-      float: left;
-      margin-right: 4%;
-    }
     .multiserial-fuzzy-box a {
       span { display: inline-block; }
       .ms-short-fuzzy { display: none; }
