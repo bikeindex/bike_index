@@ -21,6 +21,10 @@ class OrganizedMailerPreview < ActionMailer::Preview
     render_finished_registration(Bike.where(recovered: true))
   end
 
+  def organization_invitation
+    OrganizedMailer.organization_invitation(OrganizationInvitation.last)
+  end
+
   private
 
   def render_finished_registration(bikes)

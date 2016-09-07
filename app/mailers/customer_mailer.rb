@@ -62,18 +62,6 @@ class CustomerMailer < ActionMailer::Base
     end
   end
 
-  def organization_invitation_email(organization_invitation)
-    @organization_invitation = organization_invitation
-    @organization = organization_invitation.organization
-    @inviter = User.find(organization_invitation.inviter_id)
-    @new_user = false
-    @new_user = true unless User.fuzzy_email_find(@organization_invitation.invitee_email)
-    mail(to: @organization_invitation.invitee_email, subject: "Join #{@organization.name} on the Bike Index") do |format|
-      format.text
-      format.html { render layout: 'email'}
-    end
-  end
-
   def stolen_notification_email(stolen_notification)  
     @stolen_notification = stolen_notification
     mail(to: "#{@stolen_notification.receiver_email}, bryan@bikeindex.org", from: "bryan@bikeindex.org", subject: @stolen_notification.display_subject) do |format|

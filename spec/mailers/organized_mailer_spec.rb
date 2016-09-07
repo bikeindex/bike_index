@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe OrganizedMailer do
+  let(:organization) { FactoryGirl.create(:organization_with_auto_user) }
   let(:header_mail_snippet) do
     FactoryGirl.create(:organization_mail_snippet,
                        name: 'header',
@@ -66,7 +67,6 @@ describe OrganizedMailer do
       end
     end
     context 'organized snippets' do
-      let(:organization) { FactoryGirl.create(:organization_with_auto_user, short_name: 'Suite College') }
       let(:welcome_mail_snippet) do
         FactoryGirl.create(:organization_mail_snippet,
                            name: 'welcome',
@@ -89,7 +89,7 @@ describe OrganizedMailer do
       context 'new non-stolen bike' do
         let(:bike) { FactoryGirl.create(:organization_bike, creation_organization: organization) }
         it 'renders email and includes the snippets' do
-          expect(mail.subject).to eq('Confirm your Suite College Bike Index registration')
+          expect(mail.subject).to eq("Confirm your #{organization.short_name} Bike Index registration")
           expect(mail.body.encoded).to match header_mail_snippet.body
           expect(mail.body.encoded).to match welcome_mail_snippet.body
           expect(mail.body.encoded).to match security_mail_snippet.body
@@ -102,7 +102,7 @@ describe OrganizedMailer do
           expect(mail.body.encoded).to match header_mail_snippet.body
           expect(mail.body.encoded).to match welcome_mail_snippet.body
           expect(mail.body.encoded).to match security_mail_snippet.body
-          expect(mail.subject).to eq("Confirm your Suite College stolen #{bike.type} on Bike Index")
+          expect(mail.subject).to eq("Confirm your #{organization.short_name} stolen #{bike.type} on Bike Index")
           expect(mail.reply_to).to eq([organization.auto_user.email])
         end
       end
@@ -123,6 +123,19 @@ describe OrganizedMailer do
           expect(mail.reply_to).to eq(['contact@bikeindex.org'])
         end
       end
+    end
+  end
+
+  describe 'organization_invitation' do
+    let(:organization_invitation) { FactoryGirl.create(:organization_invitation, organization: organization) }
+    let(:mail) { OrganizedMailer.organization_invitation(organization_invitation) }
+    before do
+      expect(header_mail_snippet).to be_present
+    end
+    it 'renders email' do
+      expect(mail.body.encoded).to match header_mail_snippet.body
+      expect(mail.subject).to eq("Join #{organization.short_name} on Bike Index")
+      expect(mail.reply_to).to eq([organization.auto_user.email])
     end
   end
 end

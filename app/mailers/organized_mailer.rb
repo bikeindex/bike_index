@@ -31,6 +31,17 @@ class OrganizedMailer < ActionMailer::Base
     end
   end
 
+  def organization_invitation(organization_invitation)
+    @organization_invitation = organization_invitation
+    @organization = @organization_invitation.organization
+    @inviter = @organization_invitation.inviter
+    @new_user = User.fuzzy_email_find(@organization_invitation.invitee_email).present?
+    mail('Reply-To' => reply_to, to: @organization_invitation.invitee_email, subject: default_i18n_subject(default_subject_vars)) do |format|
+      format.text
+      format.html { render layout: 'email_revised' }
+    end
+  end
+
   private
 
   def default_subject_vars

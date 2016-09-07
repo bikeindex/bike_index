@@ -6,3 +6,5 @@ en:
       subject: 'Confirm your %{organization_name} stolen %{bike_type} on Bike Index'
     finished_registration:
       subject: 'Confirm your %{organization_name} Bike Index registration'
+    organization_invitation:
+      subject: 'Join %{organization_name} on Bike Index'
