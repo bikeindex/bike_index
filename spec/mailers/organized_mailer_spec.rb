@@ -37,10 +37,10 @@ describe OrganizedMailer do
   end
 
   describe 'finished_registration' do
+    let(:mail) { OrganizedMailer.finished_registration(ownership) }
     context 'passed new ownership' do
       let(:ownership) { FactoryGirl.create(:ownership) }
       it 'renders email' do
-        mail = OrganizedMailer.finished_registration(ownership)
         expect(mail.subject).to match 'Confirm your Bike Index registration'
       end
     end
@@ -52,7 +52,6 @@ describe OrganizedMailer do
         let(:bike) { FactoryGirl.create(:bike, owner_email: 'someotheremail@stuff.com', creator_id: user.id) }
         it 'renders email' do
           expect(ownership_1).to be_present
-          mail = OrganizedMailer.finished_registration(ownership)
           expect(mail.subject).to eq('Confirm your Bike Index registration')
           expect(mail.reply_to).to eq(['contact@bikeindex.org'])
         end
@@ -61,7 +60,6 @@ describe OrganizedMailer do
         let(:cycle_type) { FactoryGirl.create(:cycle_type, name: 'sweet cycle type') }
         let(:bike) { FactoryGirl.create(:stolen_bike, cycle_type: cycle_type) }
         it 'renders email with the stolen title' do
-          mail = OrganizedMailer.finished_registration(ownership)
           expect(mail.subject).to eq("Confirm your stolen #{cycle_type.name} on Bike Index")
           expect(mail.reply_to).to eq(['contact@bikeindex.org'])
         end
@@ -81,9 +79,7 @@ describe OrganizedMailer do
                            organization: organization,
                            body: '<p>SECURITYXSNIPPET</p>')
       end
-
       let(:ownership) { FactoryGirl.create(:ownership, bike: bike) }
-      let(:mail) { OrganizedMailer.finished_registration(ownership) }
 
       before do
         expect([header_mail_snippet, welcome_mail_snippet, security_mail_snippet]).to be_present
@@ -110,8 +106,22 @@ describe OrganizedMailer do
           expect(mail.reply_to).to eq([organization.auto_user.email])
         end
       end
-      context 'non-new non-stolen' do
-        it "renders email and doesn't include the snippets"
+      context 'non-new (pre-existing ownership)' do
+        let(:bike) { FactoryGirl.create(:bike, creation_organization: organization) }
+        let(:pre_existing_ownership) { FactoryGirl.create(:ownership, bike: bike, created_at: Time.now - 1.minute) }
+        before do
+          expect(pre_existing_ownership).to be_present
+        end
+        it "renders email and doesn't include the snippets or org name" do
+          expect(bike.ownerships.count).to eq 2
+          expect(bike.ownerships.first).to eq pre_existing_ownership
+          expect(bike.current_ownership).to eq ownership
+          expect(mail.body.encoded).to_not match header_mail_snippet.body
+          expect(mail.body.encoded).to_not match welcome_mail_snippet.body
+          expect(mail.body.encoded).to_not match security_mail_snippet.body
+          expect(mail.subject).to eq('Confirm your Bike Index registration')
+          expect(mail.reply_to).to eq(['contact@bikeindex.org'])
+        end
       end
     end
   end
