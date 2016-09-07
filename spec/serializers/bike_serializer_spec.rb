@@ -7,7 +7,7 @@ describe BikeSerializer do
     let(:public_image) { FactoryGirl.create(:public_image, imageable_type: 'Bike', imageable_id: bike.id) }
     subject { BikeSerializer.new(bike) }
 
-    it { expect(subject.manufacturer_name).to eq(bike.manufacturer_name) }
+    it { expect(subject.manufacturer_name).to eq(bike.mnfg_name) }
     it { expect(subject.manufacturer_id).to eq(bike.manufacturer_id) }
     it { expect(subject.stolen).to eq(bike.stolen) }
     it { expect(subject.type_of_cycle).to eq(bike.cycle_type.name) }

@@ -50,11 +50,10 @@ class Component < ActiveRecord::Base
   end
 
   def manufacturer_name
-    return nil unless manufacturer
     if manufacturer.name == "Other" && manufacturer_other.present?
-      return manufacturer_other
+      manufacturer_other
     else
-      return manufacturer.name 
+      manufacturer && manufacturer.name
     end
   end
 
