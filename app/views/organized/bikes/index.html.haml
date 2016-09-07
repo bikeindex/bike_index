@@ -9,14 +9,11 @@
       #{ pluralize(@bikes_count, 'bike') }
     registered
 
-  %h2
-    A SUBheader and stuff
-
 .organized-bikes-table
   %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
     %thead.small-header
       %tr
-        %th Date added
+        %th.date-added Date added
         %th Manufacturer
         %th Model
         %th Color
@@ -26,7 +23,7 @@
       - @bikes.each do |bike|
         %tr
           %td
-            = l bike.created_at, format: :short_with_hour
+            = l bike.created_at, format: :dotted
           %td
             = link_to bike.mnfg_name, bike_path(bike)
           %td

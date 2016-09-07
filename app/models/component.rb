@@ -50,7 +50,7 @@ class Component < ActiveRecord::Base
   end
 
   def manufacturer_name
-    if manufacturer.name == "Other" && manufacturer_other.present?
+    if manufacturer && manufacturer.name == 'Other' && manufacturer_other.present?
       manufacturer_other
     else
       manufacturer && manufacturer.name
