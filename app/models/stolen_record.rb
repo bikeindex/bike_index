@@ -88,7 +88,7 @@ class StolenRecord < ActiveRecord::Base
       city,
       (state && state.abbreviation),
       zipcode,
-      (country && country.iso unless country.iso == 'US')
+      (country && country.iso unless country && country.iso == 'US')
     ].reject(&:blank?).join(', ')
   end
 
