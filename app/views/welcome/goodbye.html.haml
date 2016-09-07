@@ -1,15 +1,24 @@
-.bike-theft-profit
-  .receptacle.overfloating
-    .inner-recep
-      .fight-theft-image
-        = image_tag "home/hacksaw-man.svg", alt: "Fight bike theft", title: "A brigand stealing a trusty steed"
-      .theft-profit-block
-        %h3
-          Sorry to see you go!
-        %h4
-          Come back soon!
-              
-.receptacle
-  .inner-recep  
-    .home-sharing-section
-      = render "/shared/home_share"
+.sign-out
+  %h1
+    You've been logged out
+  %h3
+    Come back soon!
+
+  :plain
+    <div class="sharing-buttons">
+      <div class="twitter-follow-button">
+        <a href="https://twitter.com/BikeIndex" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @BikeIndex</a>
+        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+      </div>
+
+      <div class="fb-like" data-href="http://facebook.com/bikeindex" data-send="false" data-layout="button_count" data-width="450" data-font='verdana' data-show-faces="false"></div>
+    </div>
+
+    <div id="fb-root"></div>
+    <script async>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=223376277803071";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
