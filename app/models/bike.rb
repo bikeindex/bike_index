@@ -168,7 +168,7 @@ class Bike < ActiveRecord::Base
   def title_string
     t = [year, mnfg_name, frame_model].join(' ')
     t += " #{type}" if type != "bike"
-    strip_tags(t.gsub(/\s+/,' ')).strip
+    Rails::Html::FullSanitizer.new.sanitize(t.gsub(/\s+/,' ')).strip
   end
 
   def video_embed_src
