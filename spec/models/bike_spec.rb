@@ -299,14 +299,15 @@ describe Bike do
     end
   end
 
-  describe 'manufacturer_name' do
+  describe 'set_mnfg_name' do
     it 'returns the value of manufacturer_other if manufacturer is other' do
       bike = Bike.new
       other_manufacturer = Manufacturer.new
       allow(other_manufacturer).to receive(:name).and_return('Other')
       allow(bike).to receive(:manufacturer).and_return(other_manufacturer)
       allow(bike).to receive(:manufacturer_other).and_return('Other manufacturer name')
-      expect(bike.manufacturer_name).to eq('Other manufacturer name')
+      bike.set_mnfg_name
+      expect(bike.mnfg_name).to eq('Other manufacturer name')
     end
 
     it "returns the name of the manufacturer if it isn't other" do
@@ -314,7 +315,8 @@ describe Bike do
       manufacturer = Manufacturer.new
       allow(manufacturer).to receive(:name).and_return('Mnfg name')
       allow(bike).to receive(:manufacturer).and_return(manufacturer)
-      expect(bike.manufacturer_name).to eq('Mnfg name')
+      bike.set_mnfg_name
+      expect(bike.mnfg_name).to eq('Mnfg name')
     end
 
     it 'returns Just SE Bikes' do
@@ -322,7 +324,8 @@ describe Bike do
       manufacturer = Manufacturer.new
       allow(manufacturer).to receive(:name).and_return('SE Racing (S E Bikes)')
       allow(bike).to receive(:manufacturer).and_return(manufacturer)
-      expect(bike.manufacturer_name).to eq('SE Racing')
+      bike.set_mnfg_name
+      expect(bike.mnfg_name).to eq('SE Racing')
     end
   end
 
@@ -562,7 +565,7 @@ describe Bike do
                           frame_size: '56', frame_size_unit: 'ballsacks',
                           frame_model: 'Some model', handlebar_type_id: handlebar.id)
       b.cache_bike
-      expect(b.cached_data).to eq("#{b.manufacturer_name} Hand pedaled 1999 #{b.primary_frame_color.name} #{b.secondary_frame_color.name} #{b.tertiary_frame_color.name} #{material.name} 56ballsacks #{b.frame_model} #{b.rear_wheel_size.name} wheel unicycle")
+      expect(b.cached_data).to eq("#{b.mnfg_name} Hand pedaled 1999 #{b.primary_frame_color.name} #{b.secondary_frame_color.name} #{b.tertiary_frame_color.name} #{material.name} 56ballsacks #{b.frame_model} #{b.rear_wheel_size.name} wheel unicycle")
       expect(b.current_stolen_record_id).to eq(s.id)
     end
     it 'has before_save_callback_method defined as a before_save callback' do
@@ -642,7 +645,7 @@ describe Bike do
   describe 'title_string' do
     it 'escapes correctly' do
       bike = Bike.new(frame_model: '</title><svg/onload=alert(document.cookie)>')
-      allow(bike).to receive(:manufacturer_name).and_return('baller')
+      allow(bike).to receive(:mnfg_name).and_return('baller')
       allow(bike).to receive(:type).and_return('bike')
       expect(bike.title_string).not_to match('</title><svg/onload=alert(document.cookie)>')
       expect(bike.title_string.length).to be > 5

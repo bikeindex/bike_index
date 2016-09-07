@@ -185,8 +185,7 @@
                     - if component.year.present? ||  component.cmodel_name.present? || component.manufacturer.present?
                       #{component.cmodel_name}
                       = "#{component.year}" if component.year.present?
-                      - if component.manufacturer.present?
-                        (#{component.mnfg_name})
+                      (#{component.manufacturer_name})
     .col-md-4
       .social-share-bike
         %h4

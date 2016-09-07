@@ -43,7 +43,7 @@
       %td.large-screens
         .less-strong-hold
           %strong
-            = bike.manufacturer_name
+            = bike.mnfg_name
           = [bike.year, bike.frame_model].join(' ')
           = "(#{bike.type})" unless bike.type == 'bike'
           - if bike.paint.present? && bike.paint.color_id.blank?

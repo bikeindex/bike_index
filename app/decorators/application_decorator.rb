@@ -11,14 +11,6 @@ class ApplicationDecorator < Draper::Decorator
     [ass.name, extra].reject(&:blank?).join(' ') if ass.present?
   end
 
-  def mnfg_name
-    if object.manufacturer.name == 'Other' and object.manufacturer_other.present?
-      object.manufacturer_other
-    else
-      object.manufacturer.name
-    end
-  end
-
   def attr_list_item(desc = nil, title, with_colon: false)
     return nil unless desc.present?
     title = "#{title}:" if with_colon

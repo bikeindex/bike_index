@@ -1,6 +1,5 @@
 class Bike < ActiveRecord::Base
   include ActiveModel::Dirty
-  include ActionView::Helpers::SanitizeHelper
   mount_uploader :pdf, PdfUploader
   process_in_background :pdf, CarrierWaveProcessWorker
 
@@ -167,17 +166,9 @@ class Bike < ActiveRecord::Base
   end
 
   def title_string
-    t = [year, manufacturer_name, frame_model].join(' ')
+    t = [year, mnfg_name, frame_model].join(' ')
     t += " #{type}" if type != "bike"
-    strip_tags(t.gsub(/\s+/,' ')).strip
-  end
-
-  def manufacturer_name
-    if manufacturer.name == "Other" && self.manufacturer_other.present?
-      manufacturer_other
-    else
-      manufacturer.name.gsub(/\s?\([^\)]*\)/i,'')
-    end
+    Rails::Html::FullSanitizer.new.sanitize(t.gsub(/\s+/,' ')).strip
   end
 
   def video_embed_src
@@ -192,12 +183,12 @@ class Bike < ActiveRecord::Base
 
   before_save :set_mnfg_name
   def set_mnfg_name
-    if manufacturer.name == "Other" && manufacturer_other.present?
-      name = ActionController::Base.helpers.strip_tags(manufacturer_other)
+    if manufacturer.name == 'Other' && manufacturer_other.present?
+      name = Rails::Html::FullSanitizer.new.sanitize(manufacturer_other)
     else
       name = manufacturer.name.gsub(/\s?\([^\)]*\)/i,'')
     end
-    self.mnfg_name = name.strip
+    self.mnfg_name = name.strip.truncate(60)
   end
 
   before_save :set_user_hidden
@@ -351,7 +342,7 @@ class Bike < ActiveRecord::Base
     cache_photo
     cache_attributes
     self.cached_data = [
-      manufacturer_name,
+      mnfg_name,
       (propulsion_type.name == 'Foot pedal' ? nil : propulsion_type.name),
       year,
       (primary_frame_color && primary_frame_color.name),

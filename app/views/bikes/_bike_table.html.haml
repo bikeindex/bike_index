@@ -34,7 +34,7 @@
                 = link_to "pdf", pdf_bike_url(bike), class: 'less-strong-right'
               
           %td
-            = link_to bike.manufacturer_name, bike.list_link_url(target)
+            = link_to bike.mnfg_name, bike.list_link_url(target)
           %td.large-screens
             = bike.frame_model if bike.frame_model.present?
           %td.large-screens
