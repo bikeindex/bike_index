@@ -1,4 +1,4 @@
-# Preview emails at http://localhost:3000/rails/mailers/organized_mailer
+# Preview emails at http://localhost:3001/rails/mailers/organized_mailer
 class OrganizedMailerPreview < ActionMailer::Preview
   def partial_registration
     b_param = BParam.order(:created_at).last
@@ -19,6 +19,10 @@ class OrganizedMailerPreview < ActionMailer::Preview
 
   def finished_registration_recovered
     render_finished_registration(Bike.where(recovered: true))
+  end
+
+  def organization_invitation
+    OrganizedMailer.organization_invitation(OrganizationInvitation.last)
   end
 
   private

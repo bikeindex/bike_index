@@ -5,10 +5,10 @@ $strong-font-weight: 700;
 $light-italic-weight: 300;
 
 $body-font-size: 15px;
-$h1-font-size: 42px;
+$h1-font-size: 36px;
 $h1-font-size-md: 30px;
-$h2-font-size: 36px;
-$h2-font-size-md: 30px;
+$h2-font-size: 30px;
+$h2-font-size-md: 28px;
 $h3-font-size: 24px;
 $h4-font-size: 12px;
 $h5-font-size: 18px;
@@ -69,6 +69,7 @@ h5 {
   font-weight: $normal-font-weight;
   font-style: normal;
   text-transform: uppercase;
+  color: $header-font-color;
   strong { font-weight: $strong-font-weight; }
   a {
     color: $link-color;
@@ -82,7 +83,6 @@ h5 {
 h1 {
   @extend .header-font;
   margin: 0 0 2*$vertical-height;
-  color: $header-font-color;
   letter-spacing: -1px;
   font-size: $h1-font-size;
   line-height: 1.12em;
@@ -92,7 +92,6 @@ h1 {
 h2 {
   @extend .header-font;
   margin: 0 0 2*$vertical-height;
-  color: $header-font-color;
   font-size: $h2-font-size;
   line-height: 1em;
   @include media-breakpoint-down(md) { font-size: $h2-font-size-md; }
@@ -101,7 +100,6 @@ h2 {
 h3 {
   @extend .header-font;
   margin: 0 0 2*$vertical-height;
-  color: $header-font-color;
   font-size: $h3-font-size;
   line-height: 1em;
 }
@@ -110,7 +108,6 @@ h3 {
 h4 {
   @extend .header-font;
   margin: 0 0 2*$vertical-height;
-  color: $header-font-color;
   font-size: $h4-font-size;
   line-height: 18px;
 }

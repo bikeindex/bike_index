@@ -38,14 +38,6 @@ class OrganizationInvitation < ActiveRecord::Base
     self.invitee_email = EmailNormalizer.normalize(invitee_email)
   end
 
-  def name_for_inviter
-    if self.inviter.name.present?
-      self.inviter.name
-    else
-      self.inviter.email
-    end
-  end
-
   after_create :update_organization_invitation_counts
   def update_organization_invitation_counts
     org = organization

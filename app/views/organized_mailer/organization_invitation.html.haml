@@ -1,0 +1,8 @@
+%h1
+  Hello #{@organization_invitation.invitee_name},
+- if @is_new_user
+  %h2
+    Welcome to Bike Index
+%p #{@inviter.display_name} has indicated that you are a member of #{@organization.name}.
+
+= link_to "Join #{@organization.short_name}", new_user_url, class: 'binx-button'
