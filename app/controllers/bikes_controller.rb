@@ -34,7 +34,7 @@ class BikesController < ApplicationController
       @secondary_bikes = secondary_bikes.decorate if secondary_bikes.present?
     end
     @bikes = bikes.decorate
-    @query = params[:query]
+    # @query = params[:query]
     # @query = request.query_parameters()
     @url = request.original_url
     @stolenness = search.stolenness_type

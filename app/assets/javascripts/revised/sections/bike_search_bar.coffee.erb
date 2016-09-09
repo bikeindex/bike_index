@@ -88,90 +88,60 @@ class BikeIndex.BikeSearchBar extends BikeIndex
     window.includeSerialOption = !(query_val.match(/s(#|%23)[^(#|%23)]*(#|%23)/))
 
   initializeHeaderSearch: ($query_field) ->
-    initial_opts = if $query_field.data('initial') then $query_field.data('initial') else []
     per_page = 15
-    renderOption = @renderOption
-    updateIncludeSerialOption = @updateIncludeSerialOption
-    $query_field.selectize
-      plugins: ['restore_on_backspace', 'remove_button']
-      create: true
-      options:  initial_opts # So that they have words
-      items: _.map(initial_opts, 'search_id')
-      persist: false # Don't show items the users has entered after deleting them
-      valueField: 'search_id'
-      preload: true
-      labelField: 'text'
-      searchField: 'text'
-      loadThrottle: 150
-      score: (search) ->
-        score = this.getScoreFunction(search)
-        return (item) ->
-          if item.id == 'serial'
-            # Only show serial query that is the same as the query we've entered
-            if search == item.search && search.length > 2
-              return 0.0001
-            else
-              return 0
-          else
-            score(item) * (1 + Math.min(item.priority / 100, 1))
-      sortField: 'priority'
-      load: (query, callback) ->
-        that = this
-        $.ajax
-          url: "/api/autocomplete?per_page=#{per_page}&q=#{encodeURIComponent(query)}"
-          type: 'GET'
-          error: ->
-            callback()
-          success: (res) ->
-            result = res.matches.slice(0, per_page)
-            # Only add serial option if they've entered more than 2 char
-            if query.length > 2 && window.includeSerialOption
-              result.push({ id: 'serial', search_id: "s##{query}#", text: "#{query}", search: query })
-            callback result
-      render:
-        option: (item, escape) ->
-          renderOption(item, escape)
-        item: (item, escape) ->
-          if item.id == 'serial'
-            "<div><span class='search_span_s'>serial</span> #{item.text}</div>"
-          else  
-            "<div> #{item.text}</div>"
-        option_create: (data, escape) ->
-          # For some reason, without &hellip; at the end of this it breaks
-          "<div class='create'><span class='sch_'>Search all bikes for</span> <span class='label'>" + escape(data.input) + "</span>&hellip;</div>"
-      onChange: (value) ->
-        # On change doesn't cover everything, so run it all the time
-        updateIncludeSerialOption($query_field)
-        true
-      onType: (str) ->
-        for k in Object.keys(this.options)
-          # If they are serial ids
-          if k.match /^s\#/ 
-            # if the serials are longer than the current str, delete them
-            # Also delete them if we're down to 2 chars
-            delete this.options[k] if (k.length > str + 3) || str.length < 3
-        true
-      onItemAdd: (value, $item) ->
-        updateIncludeSerialOption($query_field)
-        true
-      onItemRemove: (value) ->
-        updateIncludeSerialOption($query_field)
-        true
-      onInitialize: ->
-        updateIncludeSerialOption($query_field)
+    initial_opts = if $query_field.data('initial') then $query_field.data('initial') else []
+    formatSearchText = @formatSearchText # custom formatter
+    $desc_search = $query_field.select2
+      allowClear: true
+      tags: true
+      multiple: true
+      openOnEnter: false
+      tokenSeparators: [',']
+      placeholder: $query_field.attr('placeholder') # Pull placeholder from HTML
+      dropdownParent: $('.bike-search-form') # Append to search for for easier css access
+      templateResult: formatSearchText # let custom formatter work
+      escapeMarkup: (markup) -> markup # Allow our
+      ajax:
+        url: '/api/autocomplete'
+        dataType: 'json'
+        delay: 150
+        data: (params) ->
+          q: params.term
+          page: params.page
+          per_page: per_page
+        processResults: (data, page) ->
+          results: data.matches
+          pagination:
+            # If exactly per_page matches there's likely at another page
+            more: data.matches.length == per_page
+        cache: true
 
-  renderOption: (item, escape) ->
+    # Submit on enter. Requires select2 be appended to bike-search form (as it is)
+    window.bike_search_submit = true
+    $('.bike-search-form .select2-selection').on 'keyup', (e) ->
+      # Only trigger submit if enter pressed twice in a row, or if no keys have
+      # been pressed (i.e. you selected something with the mouse)
+      return window.bike_search_submit = false unless e.keyCode == 13
+      if window.bike_search_submit
+        $desc_search.select2('close') # Because form is submitted, hide select box
+        $('#bike_search_form').submit()
+      else
+        window.bike_search_submit = true
+
+
+  formatSearchText: (item) ->
+    return item.text if item.loading
     prefix = switch
       when item.category == 'colors'
-        p = "<span class='sch_'>Bikes that are </span>"
+        p = "<span class=\'sch_\'>Bikes that are </span>"
         if item.display
-          p + "<span class='sclr' style='background: #{item.display};'></span>"
+          p + "<span class=\'sclr\' style=\'background: #{item.display};\'></span>"
         else
-          p + "<span class='sclr'>stckrs</span>"
+          p + "<span class=\'sclr\'>stckrs</span>"
       when item.category == 'mnfg' || item.category == 'frame_mnfg'
-        "<span class='sch_'>Bikes made by</span>"
-      when item.id == 'serial' # because we set this item up in the success callback
-        "<span class='sch_'>Find serial</span>"
+        "<span class=\'sch_\'>Bikes made by</span>"
+      # when item.id == 'serial' # because we set this item up in the success callback
+      #   "<span class='sch_'>Find serial</span>"
       else
-        'entered'
-    "<div>#{prefix} <span class='label'>" + escape(item.text) + '</span></div>'
+        'Search for'
+    "#{prefix} <span class=\'label\'>" + item.text + '</span>'

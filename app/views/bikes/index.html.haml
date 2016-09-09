@@ -11,11 +11,15 @@
       = form_tag bikes_path, id: 'bike_search_form', class: 'bike-search-form', method: :get do
         - params[:query] = params[:query].gsub(/,?#,?/,'').gsub(/(\A,|,\z)/, '') if params[:query].present?
         .query-field-wrap
-          = text_field_tag :query,                      |
+          = select_tag :query,                          |
             strip_tags(params[:query]),                 |
-            placeholder: 'Search Bike Index',           |
+            placeholder: 'Search bike descriptions',    |
             class: 'form-control query-field',          |
+            multiple: true,                             |
             data: { initial: @selectize_items.to_json }
+          = text_field_tag :serial, params[:serial],    |
+            placeholder: 'Search for serial number',    |
+            class: 'form-control query-field'
         .search-button-wrap
           = button_tag(type: 'submit', class: 'searchit btn btn-primary') do
             :plain
@@ -60,15 +64,11 @@
             
 
       - else
-        %h1.no-results
-          No #{stolenness_desc[@stolenness]} bikes
-          - if @secondary_bikes.present?
-            exactly match that serial
-          - else
-            matched your search
+        %h3.no-exact-results
+          No #{stolenness_desc[@stolenness]} bikes matched your search
 
       - if @secondary_bikes.present?
-        %h2.secondary-bikes
+        %h2
           Serial numbers close to
           %em
             #{params[:serial]}
