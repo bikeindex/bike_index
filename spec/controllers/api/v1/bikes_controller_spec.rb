@@ -299,7 +299,7 @@ describe Api::V1::BikesController do
         expect(response.code).to eq('200')
         bike = Bike.unscoped.where(serial_number: '69 example bikez').first
         expect(bike.creation_state.origin).to eq 'api_v1'
-        expect(bike.creation_state.organization).to eq @organization
+        expect(bike.creation_state.organization).to eq org
         expect(bike.example).to be_truthy
         expect(bike.rear_wheel_size.iso_bsd).to eq 559
         expect(bike.paint.name).to eq('grazeen')

@@ -7,7 +7,7 @@ class CreationState < ActiveRecord::Base
   validates_presence_of :origin, unless: :organization_id?
 
   def self.origins
-    %w(embed embed_extended partial_embed api_v1 api_v2).freeze
+    %w(embed embed_extended embed_partial api_v1 api_v2).freeze
   end
 
   before_validation :ensure_allowed_origin

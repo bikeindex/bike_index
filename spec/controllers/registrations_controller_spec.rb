@@ -114,6 +114,7 @@ describe RegistrationsController do
             expect(b_param.send(key).to_s).to eq value.to_s
           end
           expect(b_param.creator_id).to be_nil
+          expect(b_param.origin).to eq 'embed_partial'
         end
       end
     end
@@ -124,6 +125,7 @@ describe RegistrationsController do
           expect(response).to render_template(:create)
           b_param = BParam.last
           expect(b_param.owner_email).to eq 'something@stuff.com'
+          expect(b_param.origin).to eq 'embed_partial'
           expect(EmailPartialRegistrationWorker).to have_enqueued_job(b_param.id)
           expect(response.headers['X-Frame-Options']).not_to be_present
           expect(assigns(:simple_header)).to be_truthy
@@ -146,6 +148,7 @@ describe RegistrationsController do
           attrs.each do |key, value|
             expect(b_param.send(key).to_s).to eq value.to_s
           end
+          expect(b_param.origin).to eq 'embed_partial'
           expect(EmailPartialRegistrationWorker).to have_enqueued_job(b_param.id)
         end
       end

@@ -115,12 +115,12 @@ class BikesController < ApplicationController
       end
       if params[:bike][:image].present?
         @b_param.image = params[:bike][:image]
-        @b_param.image_processed = false
-        @b_param.save
+        @b_param.image_processed = false # Don't need to save because update below
         ImageAssociatorWorker.perform_in(1.minutes)
         params[:bike].delete(:image)
       end
-      @b_param.update_attributes(params: permitted_bparams)
+      @b_param.update_attributes(params: permitted_bparams,
+                                 origin: (params[:bike][:embeded_extended] ? 'embed_extended' : 'embed'))
       @bike = BikeCreator.new(@b_param).create_bike
       if @bike.errors.any?
         @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
