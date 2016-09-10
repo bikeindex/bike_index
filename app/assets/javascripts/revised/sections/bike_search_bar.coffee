@@ -44,7 +44,8 @@ class BikeIndex.BikeSearchBar extends BikeIndex
     query = $('.search-type-tabs').attr('data-query')
     $.ajax
       type: 'GET'
-      url: "<%= ENV['BASE_URL'] %>/api/v2/bikes_search/count?#{query}"
+      url: "/api/v2/bikes_search/count?#{query}"
+      # url: "<%= ENV['BASE_URL'] %>/api/v2/bikes_search/count?#{query}"
       success: (data) =>
         @insertTabCounts(data)
 
@@ -110,7 +111,12 @@ class BikeIndex.BikeSearchBar extends BikeIndex
           page: params.page
           per_page: per_page
         processResults: (data, page) ->
-          results: data.matches
+          results: _.map(data.matches, (item) ->
+            id: item.search_id
+            text: item.text
+            category: item.category
+            display: item.display
+          )
           pagination:
             # If exactly per_page matches there's likely at another page
             more: data.matches.length == per_page
@@ -119,8 +125,11 @@ class BikeIndex.BikeSearchBar extends BikeIndex
     # Submit on enter. Requires select2 be appended to bike-search form (as it is)
     window.bike_search_submit = true
     $('.bike-search-form .select2-selection').on 'keyup', (e) ->
-      # Only trigger submit if enter pressed twice in a row, or if no keys have
-      # been pressed (i.e. you selected something with the mouse)
+      # Only trigger submit on enter if:
+      #  - Enter key pressed last (13) 
+      #  - Escape key pressed last (27)
+      #  - no keys have been pressed (selected with the mouse, instantiated true)
+      return window.bike_search_submit = true if e.keyCode == 27
       return window.bike_search_submit = false unless e.keyCode == 13
       if window.bike_search_submit
         $desc_search.select2('close') # Because form is submitted, hide select box
@@ -140,8 +149,6 @@ class BikeIndex.BikeSearchBar extends BikeIndex
           p + "<span class=\'sclr\'>stckrs</span>"
       when item.category == 'mnfg' || item.category == 'frame_mnfg'
         "<span class=\'sch_\'>Bikes made by</span>"
-      # when item.id == 'serial' # because we set this item up in the success callback
-      #   "<span class='sch_'>Find serial</span>"
       else
         'Search for'
     "#{prefix} <span class=\'label\'>" + item.text + '</span>'
