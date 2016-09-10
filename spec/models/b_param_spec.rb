@@ -63,7 +63,7 @@ describe BParam do
           phone: nil
         }
       }.as_json
-      b_param = BParam.new(params: p, api_v2: true)
+      b_param = BParam.new(params: p, origin: 'api_v2')
       b_param.massage_if_v2
       new_params = b_param.bike
       expect(new_params.keys.include?('serial_number')).to be_truthy
@@ -76,7 +76,7 @@ describe BParam do
     it 'gets the organization id' do
       org = FactoryGirl.create(:organization, name: 'Something')
       p = { organization_slug: org.slug }
-      b_param = BParam.new(params: p, api_v2: true)
+      b_param = BParam.new(params: p, origin: 'api_v2')
       b_param.massage_if_v2
       expect(b_param.bike['creation_organization_id']).to eq(org.id)
     end
