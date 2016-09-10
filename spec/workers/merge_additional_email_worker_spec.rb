@@ -74,6 +74,7 @@ describe MergeAdditionalEmailWorker do
         expect(User.where(id: old_user.id)).to_not be_present # Deleted user
         expect(Membership.where(id: old_membership.id)).to_not be_present # Deleted extra memberships
 
+        expect(user_email.user).to eq user
         expect(user.ownerships.count).to eq 2
         expect(user.memberships.count).to eq 3
         expect(membership.user).to eq user

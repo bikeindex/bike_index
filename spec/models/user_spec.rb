@@ -162,19 +162,32 @@ describe User do
     before do
       expect(user).to be_present
     end
-    describe 'fuzzy_email_find and ' do
+    context 'confirmed user' do
       let(:user) { FactoryGirl.create(:confirmed_user, email: 'ned@foo.com') }
-      it "finds users by email address when the case doesn't match" do
-        expect(User.fuzzy_email_find('NeD@fOO.cOM ')).to eq(user)
-        expect(User.fuzzy_confirmed_or_unconfirmed_email_find('NeD@fOO.cOM ')).to eq(user)
+      context 'primary email' do
+        it "finds users by email address when the case doesn't match" do
+          expect(User.fuzzy_email_find('NeD@fOO.cOM ')).to eq(user)
+          expect(User.fuzzy_confirmed_or_unconfirmed_email_find('NeD@fOO.cOM ')).to eq user
+        end
+      end
+      context 'secondary email' do
+        let(:email) { 'another@foo.com' }
+        let(:secondary_email) { FactoryGirl.create(:user_email, user: user, email: email) }
+        it 'finds users by secondary email' do
+          expect(secondary_email.confirmed).to be_truthy
+          expect(secondary_email.user).to eq user
+          expect(user.secondary_emails.include?(email)).to be_truthy
+          expect(User.fuzzy_email_find(email)).to eq user
+          expect(User.fuzzy_confirmed_or_unconfirmed_email_find(email)).to eq user
+        end
       end
     end
     describe 'fuzzy_unconfirmed_primary_email_find' do
       let(:user) { FactoryGirl.create(:user, email: 'ned@foo.com') }
       it 'finds user' do
         expect(user.confirmed).to be_falsey
-        expect(User.fuzzy_unconfirmed_primary_email_find(' NeD@fOO.com ')).to eq(user)
-        expect(User.fuzzy_confirmed_or_unconfirmed_email_find(' NeD@fOO.com ')).to eq(user)
+        expect(User.fuzzy_unconfirmed_primary_email_find(' NeD@fOO.com ')).to eq user
+        expect(User.fuzzy_confirmed_or_unconfirmed_email_find(' NeD@fOO.com ')).to eq user
       end
     end
   end
@@ -192,7 +205,7 @@ describe User do
     end
     context 'secondary email partial match' do
       let(:user_email) do
-        FactoryGirl.create(:user_email, 
+        FactoryGirl.create(:user_email,
                            email: 'urrg@second.org',
                            user: FactoryGirl.create(:user, name: 'FeconDDD'))
       end
