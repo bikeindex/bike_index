@@ -27,7 +27,7 @@
     .row
       .col-md-6
         .related-fields
-          .form-group.unfancy.fancy-select.manufacturer-select{ data: { otherid: Manufacturer.other_manufacturer.id } }
+          .form-group.unfancy.fancy-select.manufacturer-select{ data: { otherid: Manufacturer.other.id } }
             = f.label :manufacturer_id, class: "form-label"
             = f.collection_select(:manufacturer_id, Manufacturer.all, :id, :name, { required: true, prompt: "Choose manufacturer" }, class: 'form-control')
           .hidden-other.form-group

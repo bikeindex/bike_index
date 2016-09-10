@@ -444,16 +444,19 @@ describe BikesController do
             expect(bike.owner_email).to eq bike_params[:owner_email].downcase
             expect(bike.creation_state.origin).to eq 'embed_extended'
             expect(bike.creation_state.organization).to eq organization
+            expect(bike.manufacturer).to eq manufacturer
           end
         end
       end
       context 'with persisted email' do
         it 'registers a bike and redirects with persist_email' do
-          post :create, bike: bike_params, persist_email: true
+          post :create, bike: bike_params.merge(manufacturer_id: 'A crazy different thing'), persist_email: true
           expect(response).to redirect_to(embed_extended_organization_url(organization, email: 'flow@goodtimes.com'))
           bike = Bike.last
           expect(bike.creation_state.origin).to eq 'embed_extended'
           expect(bike.creation_state.organization).to eq organization
+          expect(bike.manufacturer).to eq Manufacturer.other
+          expect(bike.manufacturer_other).to eq 'A crazy different thing'
         end
       end
     end

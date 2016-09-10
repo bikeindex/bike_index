@@ -48,8 +48,8 @@ class BParam < ActiveRecord::Base
   def manufacturer_id; bike['manufacturer_id'] end
   def stolen; bike['stolen'] end
 
-  def manufacturer; bike['manufacturer_id'] && Manufacturer.friendly_find(bike['manufacturer_id']) end
   def creation_organization; Organization.friendly_find(creation_organization_id) end
+  def manufacturer; bike['manufacturer_id'] && Manufacturer.friendly_find(bike['manufacturer_id']) end
 
   class << self
     def v2_params(hash)
@@ -129,10 +129,11 @@ class BParam < ActiveRecord::Base
     return true unless params.present? && bike.present?
     bike['stolen'] = true if params['stolen_record'].present?
     set_wheel_size_key
+    set_manufacturer_key
     if bike['manufacturer_id'].present?
       params['bike']['manufacturer_id'] = Manufacturer.friendly_id_find(bike['manufacturer_id'])
     else
-      set_manufacturer_key
+      
     end
     set_color_key unless bike['primary_frame_color_id'].present?
     set_cycle_type_key if bike['cycle_type_slug'].present? || bike['cycle_type_name'].present?
@@ -179,15 +180,16 @@ class BParam < ActiveRecord::Base
   end
 
   def set_manufacturer_key
-    m_name = bike['manufacturer'] if bike.present?
-    return false unless m_name.present?
-    manufacturer = Manufacturer.friendly_find(m_name)
-    unless manufacturer.present?
-      manufacturer = Manufacturer.find_by_name('Other')
-      params['bike']['manufacturer_other'] = m_name.titleize if m_name.present?
+    return false unless bike.present?
+    m = params['bike'].delete('manufacturer')
+    m = params['bike'].delete('manufacturer_id') unless m.present?
+    return nil unless m.present?
+    b_manufacturer = Manufacturer.friendly_find(m)
+    unless b_manufacturer.present?
+      b_manufacturer = Manufacturer.other
+      params['bike']['manufacturer_other'] = m
     end
-    params['bike']['manufacturer_id'] = manufacturer.id if manufacturer.present?
-    params['bike'].delete('manufacturer')
+    params['bike']['manufacturer_id'] = b_manufacturer.id
   end
 
   def set_rear_gear_type_slug

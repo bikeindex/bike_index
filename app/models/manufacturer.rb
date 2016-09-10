@@ -43,7 +43,7 @@ class Manufacturer < ActiveRecord::Base
       m && m.id
     end
 
-    def other_manufacturer
+    def other
       where(name: 'Other', frame_maker: true).first_or_create
     end
 
