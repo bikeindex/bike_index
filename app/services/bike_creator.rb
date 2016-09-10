@@ -60,11 +60,6 @@ class BikeCreator
     @bike
   end
 
-  # def associate_picture_with_params
-  #   # I think this might be required, check it
-  #   # BikeCreatorAssociator.new(@b_param).associate_picture(@b_param)
-  # end
-
   def validate_record(bike)
     if bike.errors.present?
       clear_bike(bike)

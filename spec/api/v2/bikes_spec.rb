@@ -230,7 +230,7 @@ describe 'Bikes API V2' do
       expect(bike.rear_tire_narrow).to be_truthy
       expect(bike.front_tire_narrow).to be_truthy
       expect(bike.creation_state.origin).to eq 'api_v2'
-      expect(bike.creation_state.organization).to eq organization
+      expect(bike.creation_state.organization).to eq @organization
     end
 
     it "doesn't create a bike without an organization with v2_accessor" do
