@@ -19,7 +19,7 @@ class Admin::BikesController < Admin::BaseController
 
   def missing_manufacturer
     session[:missing_manufacturer_time_order] = params[:time_ordered] if params[:time_ordered].present?
-    bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.other_manufacturer.id)
+    bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.other.id)
     bikes = session[:missing_manufacturer_time_order] ? bikes.order('created_at desc') : bikes.order('manufacturer_other ASC')
     page = params[:page] || 1
     per_page = params[:per_page] || 100

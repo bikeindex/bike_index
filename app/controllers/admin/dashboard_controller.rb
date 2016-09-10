@@ -15,7 +15,7 @@ class Admin::DashboardController < Admin::BaseController
   def maintenance
     # @bikes here because this is the only one we're using the standard admin bikes table
     @bikes = Bike.unscoped.order('created_at desc').where(example: true).limit(10)
-    mnfg_other_id = Manufacturer.other_manufacturer.id
+    mnfg_other_id = Manufacturer.other.id
     @component_mnfgs = Component.where(manufacturer_id: mnfg_other_id)
     @bike_mnfgs = Bike.where(manufacturer_id: mnfg_other_id)
     @component_types = Component.where(ctype_id: Ctype.other.id)
