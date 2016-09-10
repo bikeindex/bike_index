@@ -1,7 +1,5 @@
 # b_param stands for Bike param
 class BParam < ActiveRecord::Base
-  attr_accessor :api_v2
-
   mount_uploader :image, ImageUploader
   store_in_background :image, CarrierWaveStoreWorker
 
@@ -119,7 +117,7 @@ class BParam < ActiveRecord::Base
   end
 
   def massage_if_v2
-    self.params = self.class.v2_params(params) if api_v2
+    self.params = self.class.v2_params(params) if origin == 'api_v2'
     true
   end
 

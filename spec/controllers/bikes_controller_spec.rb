@@ -359,6 +359,8 @@ describe BikesController do
             post :create, bike: bike_params
           end.to change(Ownership, :count).by 1
           bike = Bike.last
+          expect(bike.creation_state.origin).to eq 'embed'
+          expect(bike.creation_state.organization).to eq organization
           testable_bike_params.each do |k, v|
             pp k unless bike.send(k).to_s == v.to_s
             expect(bike.send(k).to_s).to eq v.to_s
@@ -384,6 +386,8 @@ describe BikesController do
               post :create, bike: bike_params.merge(stolen: true), stolen_record: stolen_params
             end.to change(Ownership, :count).by 1
             bike = Bike.last
+            expect(bike.creation_state.origin).to eq 'embed'
+            expect(bike.creation_state.organization).to eq organization
             testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
             stolen_record = bike.current_stolen_record
             stolen_params.except(:date_stolen_input).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
@@ -436,7 +440,10 @@ describe BikesController do
             expect_any_instance_of(ImageAssociatorWorker).to receive(:perform).and_return(true)
             post :create, bike: bike_params.merge(image: test_photo)
             expect(response).to redirect_to(embed_extended_organization_url(organization))
-            expect(Bike.last.owner_email).to eq bike_params[:owner_email].downcase
+            bike = Bike.last
+            expect(bike.owner_email).to eq bike_params[:owner_email].downcase
+            expect(bike.creation_state.origin).to eq 'embed_extended'
+            expect(bike.creation_state.organization).to eq organization
           end
         end
       end
@@ -444,6 +451,9 @@ describe BikesController do
         it 'registers a bike and redirects with persist_email' do
           post :create, bike: bike_params, persist_email: true
           expect(response).to redirect_to(embed_extended_organization_url(organization, email: 'flow@goodtimes.com'))
+          bike = Bike.last
+          expect(bike.creation_state.origin).to eq 'embed_extended'
+          expect(bike.creation_state.organization).to eq organization
         end
       end
     end
@@ -592,7 +602,7 @@ describe BikesController do
               tertiary_frame_color_id: '',
               owner_email: 'something@stuff.com'
             }.as_json
-            b_param = BParam.create(params: { 'bike' => bike_params })
+            b_param = BParam.create(params: { 'bike' => bike_params }, origin: 'embed_partial')
             bb_data = { bike: {} }
             # We need to call clean_params on the BParam after bikebook update, so that
             # the foreign keys are assigned correctly. This is how we test that we're
@@ -609,6 +619,7 @@ describe BikesController do
             bike_params.delete(:manufacturer_id)
             bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v }
             expect(bike.manufacturer).to eq manufacturer
+            expect(bike.creation_state.origin).to eq 'embed_partial'
           end
         end
         context 'created bike' do

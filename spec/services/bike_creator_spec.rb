@@ -104,7 +104,7 @@ describe BikeCreator do
 
   describe 'save_bike' do
     Sidekiq::Testing.inline! do
-      it 'creates a bike with the parameters it is passed and return it' do
+      it 'creates a bike with the parameters it is passed and returns it' do
         propulsion_type = FactoryGirl.create(:propulsion_type)
         cycle_type = FactoryGirl.create(:cycle_type)
         organization = FactoryGirl.create(:organization)
@@ -113,7 +113,7 @@ describe BikeCreator do
         color = FactoryGirl.create(:color)
         handlebar_type = FactoryGirl.create(:handlebar_type)
         wheel_size = FactoryGirl.create(:wheel_size)
-        b_param = BParam.new
+        b_param = BParam.new(origin: 'api_v1')
         creator = BikeCreator.new(b_param)
         bike = Bike.new
         allow(bike).to receive(:id).and_return(69)
@@ -132,7 +132,7 @@ describe BikeCreator do
           'creator' => user
         )
         expect do
-          creator.save_bike(new_bike)
+          saved_bike = creator.save_bike(new_bike)
         end.to change(Bike, :count).by(1)
       end
     end

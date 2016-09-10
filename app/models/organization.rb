@@ -11,6 +11,7 @@ class Organization < ActiveRecord::Base
   has_many :organization_deals, dependent: :destroy
   has_many :users, through: :memberships
   has_many :organization_invitations, dependent: :destroy
+  has_many :creation_states
   belongs_to :auto_user, class_name: 'User'
   accepts_nested_attributes_for :mail_snippets
 

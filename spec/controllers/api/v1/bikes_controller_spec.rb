@@ -16,7 +16,7 @@ describe Api::V1::BikesController do
       expect(response.code).to eq('401')
     end
 
-    xit 'should return an array of ids' do
+    it 'should return an array of ids' do
       bike = FactoryGirl.create(:bike)
       stole1 = FactoryGirl.create(:stolen_record)
       stole2 = FactoryGirl.create(:stolen_record, approved: true)
@@ -24,7 +24,7 @@ describe Api::V1::BikesController do
       user = FactoryGirl.create(:user)
       FactoryGirl.create(:membership, user: user, organization: organization)
       options = { stolen: true, organization_slug: organization.slug, access_token: organization.access_token }
-      get :stolen_ids, options, format: :json
+      get :stolen_ids, options.as_json
       expect(response.code).to eq('200')
       # pp response
       bikes = JSON.parse(response.body)
@@ -178,8 +178,9 @@ describe Api::V1::BikesController do
         expect(bike.creation_organization_id).to eq(@organization.id)
         expect(bike.year).to eq(1969)
         expect(bike.components.count).to eq(3)
-        component = bike.components[2]
-        expect(component.serial_number).to eq('69')
+        expect(bike.creation_state.origin).to eq 'api_v1'
+        expect(bike.creation_state.organization).to eq @organization
+        component = bike.components.where(serial_number: '69').first
         expect(component.description).to eq('yeah yay!')
         expect(component.ctype.slug).to eq('headset')
         expect(component.year).to eq(1999)
@@ -220,6 +221,8 @@ describe Api::V1::BikesController do
         post :create, bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, photos: photos
         bike = Bike.where(serial_number: '69 photo-test').first
         expect(bike.public_images.count).to eq(1)
+        expect(bike.creation_state.origin).to eq 'api_v1'
+        expect(bike.creation_state.organization).to eq @organization
         expect(bike.rear_wheel_size.iso_bsd).to eq 559
       end
 
@@ -258,6 +261,8 @@ describe Api::V1::BikesController do
         end.to change(Ownership, :count).by(1)
         expect(response.code).to eq('200')
         bike = Bike.unscoped.where(serial_number: '69 stolen bike').first
+        expect(bike.creation_state.origin).to eq 'api_v1'
+        expect(bike.creation_state.organization).to eq @organization
         expect(bike.rear_wheel_size.iso_bsd).to eq 559
         csr = bike.find_current_stolen_record
         expect(csr.address).to be_present
@@ -293,6 +298,8 @@ describe Api::V1::BikesController do
         end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
         expect(response.code).to eq('200')
         bike = Bike.unscoped.where(serial_number: '69 example bikez').first
+        expect(bike.creation_state.origin).to eq 'api_v1'
+        expect(bike.creation_state.organization).to eq org
         expect(bike.example).to be_truthy
         expect(bike.rear_wheel_size.iso_bsd).to eq 559
         expect(bike.paint.name).to eq('grazeen')
@@ -304,7 +311,7 @@ describe Api::V1::BikesController do
       it 'creates a record even if the post is a string' do
         manufacturer = FactoryGirl.create(:manufacturer)
         f_count = Feedback.count
-        bike = {
+        bike_attrs = {
           serial_number: '69 string',
           manufacturer_id: manufacturer.id,
           rear_tire_narrow: 'true',
@@ -312,11 +319,14 @@ describe Api::V1::BikesController do
           color: FactoryGirl.create(:color).name,
           owner_email: 'jsoned@examples.com'
         }
-        options = { bike: bike.to_json, organization_slug: @organization.slug, access_token: @organization.access_token }
+        options = { bike: bike_attrs.to_json, organization_slug: @organization.slug, access_token: @organization.access_token }
         expect do
           post :create, options
         end.to change(Ownership, :count).by(1)
         expect(response.code).to eq('200')
+        bike = Bike.unscoped.where(serial_number: '69 string').first
+        expect(bike.creation_state.origin).to eq 'api_v1'
+        expect(bike.creation_state.organization).to eq @organization
       end
 
       it 'does not send an ownership email if it has no_email set' do
@@ -338,6 +348,9 @@ describe Api::V1::BikesController do
           end.to change(Ownership, :count).by(1)
         end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
         expect(response.code).to eq('200')
+        bike = Bike.unscoped.where(serial_number: '69 string').first
+        expect(bike.creation_state.origin).to eq 'api_v1'
+        expect(bike.creation_state.organization).to eq @organization
       end
     end
   end

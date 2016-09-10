@@ -91,6 +91,7 @@ describe 'Bikes API V2' do
       expect(result['serial']).to eq(@bike[:serial])
       expect(result['manufacturer_name']).to eq(@bike[:manufacturer])
       bike = Bike.find(result['id'])
+      expect(bike.creation_state.origin).to eq 'api_v2'
       expect(bike.example).to be_falsey
       expect(bike.is_for_sale).to be_truthy
       expect(bike.components.count).to eq(3)
@@ -121,6 +122,7 @@ describe 'Bikes API V2' do
       expect(result['serial']).to eq(@bike[:serial])
       expect(result['manufacturer_name']).to eq(@bike[:manufacturer])
       bike = Bike.unscoped.find(result['id'])
+      expect(bike.creation_state.origin).to eq 'api_v2'
       expect(bike.example).to be_truthy
       expect(bike.is_for_sale).to be_falsey
     end
@@ -159,6 +161,8 @@ describe 'Bikes API V2' do
       expect(result['stolen_record']['date_stolen']).to eq(date_stolen)
       b = Bike.find(result['id'])
       expect(b.creation_organization).to eq(organization)
+      expect(b.creation_state.origin).to eq 'api_v2'
+      expect(b.creation_state.organization).to eq organization
       expect(b.stolen).to be_truthy
       expect(b.current_stolen_record_id).to be_present
       expect(b.current_stolen_record.police_report_number).to eq(bike[:stolen_record][:police_report_number])
@@ -225,6 +229,8 @@ describe 'Bikes API V2' do
       expect(bike.front_wheel_size.iso_bsd).to eq 559
       expect(bike.rear_tire_narrow).to be_truthy
       expect(bike.front_tire_narrow).to be_truthy
+      expect(bike.creation_state.origin).to eq 'api_v2'
+      expect(bike.creation_state.organization).to eq @organization
     end
 
     it "doesn't create a bike without an organization with v2_accessor" do

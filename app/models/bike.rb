@@ -24,6 +24,7 @@ class Bike < ActiveRecord::Base
   belongs_to :location
   belongs_to :current_stolen_record, class_name: "StolenRecord"
 
+  has_one :creation_state
   has_many :stolen_notifications, dependent: :destroy
   has_many :stolen_records, dependent: :destroy
   has_many :other_listings

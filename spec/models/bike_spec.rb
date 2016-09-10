@@ -20,6 +20,7 @@ describe Bike do
     it { is_expected.to belong_to :creation_organization }
     it { is_expected.to belong_to :current_stolen_record }
     it { is_expected.to belong_to :location }
+    it { is_expected.to have_one :creation_state }
     it { is_expected.to have_many :duplicate_bike_groups }
     it { is_expected.to have_many :b_params }
     it { is_expected.to have_many :stolen_notifications }

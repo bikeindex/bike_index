@@ -42,5 +42,6 @@ class RegistrationsController < ApplicationController
                                     :primary_frame_color_id,
                                     :secondary_frame_color_id,
                                     :tertiary_frame_color_id)
+          .merge(origin: 'embed_partial')
   end
 end

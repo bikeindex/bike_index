@@ -46,7 +46,7 @@ module Api
           since_date = Time.at(params[:updated_since].to_i).utc.to_datetime
           stolen = stolen.where("updated_at >= ?", since_date)
         end
-        respond_with stolen.pluck(:bike_id)
+        render json: stolen.pluck(:bike_id).to_json
       end
 
       def close_serials
@@ -63,7 +63,7 @@ module Api
         params = de_string_params
         raise StandardError unless params[:bike].present?
         params[:bike][:creation_organization_id] = @organization.id
-        @b_param = BParam.create(creator_id: @organization.auto_user.id, params: permitted_b_params)
+        @b_param = BParam.create(creator_id: @organization.auto_user.id, params: permitted_b_params, origin: 'api_v1')
         bike = BikeCreator.new(@b_param).create_bike
         if @b_param.errors.blank? && @b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
           render json: {bike: { web_url: bike_url(bike), api_url: api_v1_bike_url(bike)}} and return

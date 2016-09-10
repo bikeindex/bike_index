@@ -60,11 +60,6 @@ class BikeCreator
     @bike
   end
 
-  # def associate_picture_with_params
-  #   # I think this might be required, check it
-  #   # BikeCreatorAssociator.new(@b_param).associate_picture(@b_param)
-  # end
-
   def validate_record(bike)
     if bike.errors.present?
       clear_bike(bike)
@@ -82,6 +77,7 @@ class BikeCreator
     @bike = create_associations(bike)
     validate_record(@bike)
     if @bike.present?
+      @bike.create_creation_state(origin: @b_param.origin, organization_id: @bike.creation_organization_id)
       ListingOrderWorker.perform_async(@bike.id)
       ListingOrderWorker.perform_in(10.seconds, @bike.id)
     end

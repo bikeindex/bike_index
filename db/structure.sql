@@ -96,7 +96,8 @@ CREATE TABLE b_params (
     image_tmp character varying(255),
     image_processed boolean DEFAULT true,
     id_token text,
-    params json DEFAULT '{"bike":{}}'::json
+    params json DEFAULT '{"bike":{}}'::json,
+    origin character varying
 );
 
 
@@ -393,6 +394,40 @@ CREATE SEQUENCE countries_id_seq
 --
 
 ALTER SEQUENCE countries_id_seq OWNED BY countries.id;
+
+
+--
+-- Name: creation_states; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE creation_states (
+    id integer NOT NULL,
+    bike_id integer,
+    organization_id integer,
+    origin character varying,
+    is_bulk boolean,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: creation_states_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE creation_states_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: creation_states_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE creation_states_id_seq OWNED BY creation_states.id;
 
 
 --
@@ -1895,6 +1930,13 @@ ALTER TABLE ONLY countries ALTER COLUMN id SET DEFAULT nextval('countries_id_seq
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY creation_states ALTER COLUMN id SET DEFAULT nextval('creation_states_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY ctypes ALTER COLUMN id SET DEFAULT nextval('ctypes_id_seq'::regclass);
 
 
@@ -2219,6 +2261,14 @@ ALTER TABLE ONLY components
 
 ALTER TABLE ONLY countries
     ADD CONSTRAINT countries_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: creation_states_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY creation_states
+    ADD CONSTRAINT creation_states_pkey PRIMARY KEY (id);
 
 
 --
@@ -2607,6 +2657,20 @@ CREATE INDEX index_components_on_bike_id ON components USING btree (bike_id);
 --
 
 CREATE INDEX index_components_on_manufacturer_id ON components USING btree (manufacturer_id);
+
+
+--
+-- Name: index_creation_states_on_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_creation_states_on_bike_id ON creation_states USING btree (bike_id);
+
+
+--
+-- Name: index_creation_states_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_creation_states_on_organization_id ON creation_states USING btree (organization_id);
 
 
 --
@@ -3104,4 +3168,8 @@ INSERT INTO schema_migrations (version) VALUES ('20160808133129');
 INSERT INTO schema_migrations (version) VALUES ('20160813191639');
 
 INSERT INTO schema_migrations (version) VALUES ('20160901175004');
+
+INSERT INTO schema_migrations (version) VALUES ('20160910174549');
+
+INSERT INTO schema_migrations (version) VALUES ('20160910184053');
 
