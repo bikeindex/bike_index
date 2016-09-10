@@ -41,7 +41,7 @@ class Integration < ActiveRecord::Base
     if i_user.save
       i_user.confirm(i_user.confirmation_token)
     else
-      raise IntegrationAssociationError, 'Oh shit something in sign on integration broke'
+      raise IntegrationAssociationError, "#{provider_name} Integration fail: #{i_user.errors.full_messages}"
     end
     i_user
   end
