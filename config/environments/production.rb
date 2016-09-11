@@ -1,5 +1,14 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
+  # Use lograge for logging to production
+  config.lograge.enabled = true
+  config.log_level = :info
+  config.lograge.formatter = Lograge::Formatters::Logstash.new # Use logstash format
+  config.lograge.custom_options = lambda do |event|
+    exceptions = %w(controller action format id)
+    { params: event.payload[:params].except(*exceptions) } # Log params
+  end
+  # Log times where people pass non-whitelisted params
   config.action_controller.action_on_unpermitted_parameters :log
 
   # Code is not reloaded between requests.
@@ -46,16 +55,6 @@ Rails.application.configure do
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   config.force_ssl = true
-
-  # Use the lowest log level to ensure availability of diagnostic information
-  # when problems arise.
-  config.log_level = :info
-
-  # Prepend all log lines with the following tags.
-  # config.log_tags = [ :subdomain, :uuid ]
-
-  # Use a different logger for distributed setups.
-  # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
 
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store

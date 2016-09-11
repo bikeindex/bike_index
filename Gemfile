@@ -85,6 +85,8 @@ gem 'stackprof', require: false
 gem 'memory_profiler', require: false
 gem 'flamegraph', require: false
 gem 'rack-mini-profiler', require: false # If you can't see it you can't make it better
+gem 'lograge' # Structure log data, put it in single lines to improve the functionality
+gem 'logstash-event' # Use logstash format for logging data
 
 gem 'responders', '~> 2.0' # required because of class level respond_to blocks (API v1)
 
