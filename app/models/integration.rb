@@ -16,9 +16,7 @@ class Integration < ActiveRecord::Base
   before_create :associate_with_user
   def associate_with_user
     self.provider_name ||= information['provider']
-    if provider_name == 'facebook'
-      update_or_create_user(email: information['info']['email'], name: information['info']['name'])
-    elsif provider_name == 'strava'
+    if provider_name == 'facebook' || provider_name == 'strava'
       update_or_create_user(email: information['info']['email'], name: information['info']['name'])
     end
   end

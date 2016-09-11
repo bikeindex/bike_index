@@ -84,5 +84,13 @@ describe UserEmail do
         expect(UserEmail.fuzzy_user_find('something@fooooOO.edu')).to be_nil
       end
     end
+    context 'secondary email' do
+      let(:secondary_email) { FactoryGirl.create(:user_email, user: user, email: '2@dddd') }
+      it 'returns the user' do
+        expect(secondary_email.user).to eq user
+        expect(secondary_email.confirmed).to be_truthy
+        expect(UserEmail.fuzzy_user_find('2@dddd')).to eq user
+      end
+    end
   end
 end

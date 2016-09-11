@@ -130,11 +130,6 @@ class BParam < ActiveRecord::Base
     bike['stolen'] = true if params['stolen_record'].present?
     set_wheel_size_key
     set_manufacturer_key
-    if bike['manufacturer_id'].present?
-      params['bike']['manufacturer_id'] = Manufacturer.friendly_id_find(bike['manufacturer_id'])
-    else
-      
-    end
     set_color_key unless bike['primary_frame_color_id'].present?
     set_cycle_type_key if bike['cycle_type_slug'].present? || bike['cycle_type_name'].present?
     set_rear_gear_type_slug if bike['rear_gear_type_slug'].present?

@@ -23,11 +23,6 @@ FactoryGirl.define do
     "#{n}0"
   end
 
-  factory :user_email do
-    association :user, factory: :confirmed_user
-    email { generate(:unique_email) }
-  end
-
   factory :cycle_type do
     name { FactoryGirl.generate(:unique_name) }
     slug { FactoryGirl.generate(:unique_name) }
