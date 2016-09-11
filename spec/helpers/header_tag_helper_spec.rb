@@ -70,6 +70,7 @@ describe HeaderTagHelper do
       expect(hash[:title_tag][:title]).to eq('Bike Index')
       expect(hash[:meta_tags][:description]).not_to be_nil
       expect(hash[:meta_tags][:charset]).not_to be_empty
+      expect(hash[:meta_tags][:'og:image']).to eq '/bike_index.png'
     end
   end
   describe 'set_header_tag_hash' do

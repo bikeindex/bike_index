@@ -5,9 +5,12 @@ Rails.application.configure do
   config.log_level = :info
   config.lograge.formatter = Lograge::Formatters::Logstash.new # Use logstash format
   config.lograge.custom_options = lambda do |event|
-    exceptions = %w(controller action format id)
-    { params: event.payload[:params].except(*exceptions) } # Log params
+    {
+      remote_ip: event.payload[:ip],
+      params: event.payload[:params].except('controller', 'action', 'format', 'id')
+    }
   end
+
   # Log times where people pass non-whitelisted params
   config.action_controller.action_on_unpermitted_parameters :log
 
@@ -23,8 +26,7 @@ Rails.application.configure do
   # Full error reports are disabled and caching is turned on.
   config.consider_all_requests_local       = false
   config.action_controller.perform_caching = true
-  config.cache_store = :dalli_store,
-    { namespace: Bikeindex, expires_in: 0, compress: true }
+  config.cache_store = :dalli_store, { namespace: Bikeindex, expires_in: 0, compress: true }
 
   # Enable Rack::Cache to put a simple HTTP cache in front of your application
   # Add `rack-cache` to your Gemfile before enabling this.
@@ -73,12 +75,9 @@ Rails.application.configure do
   # Send deprecation notices to registered listeners.
   config.active_support.deprecation = :notify
 
-  # Use default logging formatter so that PID and timestamp are not suppressed.
-  config.log_formatter = ::Logger::Formatter.new
-
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  config.action_mailer.default_url_options = { protocol: 'https', host: "bikeindex.org" }
+  config.action_mailer.default_url_options = { protocol: 'https', host: 'bikeindex.org' }
   config.action_mailer.delivery_method = :smtp
 end

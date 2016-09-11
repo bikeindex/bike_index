@@ -23,6 +23,11 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def append_info_to_payload(payload)
+    super
+    payload[:ip] = request.headers['CF-Connecting-IP']
+  end
+
   def handle_unverified_request
     remove_session
     flash[:error] = "CSRF invalid. If you weren't intentionally doing something dumb, please contact us"
