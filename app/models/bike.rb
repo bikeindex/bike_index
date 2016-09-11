@@ -281,10 +281,11 @@ class Bike < ActiveRecord::Base
   end
 
   def frame_colors
-    c = [primary_frame_color.name]
-    c << secondary_frame_color.name if secondary_frame_color
-    c << tertiary_frame_color.name if tertiary_frame_color
-    c
+    [
+      primary_frame_color && primary_frame_color.name,
+      secondary_frame_color && secondary_frame_color.name,
+      tertiary_frame_color && tertiary_frame_color.name
+    ].compact
   end
 
   def type

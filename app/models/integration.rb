@@ -8,12 +8,13 @@ class Integration < ActiveRecord::Base
 
   validates_presence_of :access_token
   validates_presence_of :information
+  validates_presence_of :user_id
 
   serialize :information, JSON
 
   belongs_to :user
 
-  before_create :associate_with_user
+  before_validation :associate_with_user
   def associate_with_user
     self.provider_name ||= information['provider']
     if provider_name == 'facebook' || provider_name == 'strava'
@@ -39,7 +40,7 @@ class Integration < ActiveRecord::Base
     if i_user.save
       i_user.confirm(i_user.confirmation_token)
     else
-      raise IntegrationAssociationError, "#{provider_name} Integration fail: #{i_user.errors.full_messages}"
+      self.errors.add :user_errors, i_user.user.errors
     end
     i_user
   end

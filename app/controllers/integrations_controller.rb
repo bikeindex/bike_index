@@ -18,7 +18,6 @@ class IntegrationsController < ApplicationController
     provider_name = request.env['omniauth.auth'] && request.env['omniauth.auth']['provider']
     provider_name ||= params[:strategy]
     msg = "There was a problem authenticating you with #{provider_name}"
-    msg += " (#{params[:message]})" if params[:message].present?
     msg += ". Please sign in a different way or email us at contact@bikeindex.org"
     flash[:error] = msg
     redirect_to new_session_path and return

@@ -33,5 +33,6 @@
           %td
             = bike.owner_email
           / %td
-.paginate-container.paginate-container-bottom
-  = paginate @bikes
+- unless current_organization.is_paid
+  .paginate-container.paginate-container-bottom
+    = paginate @bikes
