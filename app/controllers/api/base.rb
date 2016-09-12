@@ -3,6 +3,7 @@ module API
     require 'grape_logging'
     use GrapeLogging::Middleware::RequestLogger, instrumentation_key: 'grape_key',
                                                  include: [GrapeLogging::Loggers::Response.new,
+                                                           GrapeLogging::Loggers::CloudflareIp.new,
                                                            GrapeLogging::Loggers::FilterParameters.new]
     mount API::V2::Root
 
