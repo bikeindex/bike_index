@@ -75,7 +75,7 @@ class User < ActiveRecord::Base
     end
 
     def fuzzy_unconfirmed_primary_email_find(email)
-      unconfirmed.find_by_email(EmailNormalizer.normalize(email))
+      find_by_email(EmailNormalizer.normalize(email))
     end
 
     def fuzzy_confirmed_or_unconfirmed_email_find(email)
