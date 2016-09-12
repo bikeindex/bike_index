@@ -101,11 +101,11 @@ source 'https://rails-assets.org' do # JS land is crazy, so lock everything
   # gem 'rails-assets-jquery-sortable', '~> 0.9.12' # Sort photo order
 end
 
+gem 'grape_logging' # Grape logging. Also how we pass it to lograge. Always used, not just in Prod
 group :production do
   gem 'honeybadger', '~> 2.0' # Error monitoring
   gem 'lograge' # Structure log data, put it in single lines to improve the functionality
   gem 'logstash-event' # Use logstash format for logging data
-  gem 'grape_logging' # Grape logging. Also how we pass it to lograge
 end
 
 group :development do
