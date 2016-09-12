@@ -162,7 +162,6 @@ FactoryGirl.define do
 
   factory :integration do
     access_token '12345teststststs'
-    association :user
   end
 
   factory :public_image do |u|

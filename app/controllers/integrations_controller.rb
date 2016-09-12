@@ -6,7 +6,8 @@ class IntegrationsController < ApplicationController
     @integration.access_token = request.env['omniauth.auth']['credentials']['token']
     @integration.provider_name = request.env['omniauth.auth']['provider']
     @integration.information = request.env['omniauth.auth']
-    if @integration.save
+    @integration.associate_with_user
+    if @integration.save && @integration.user.present?
       @user = @integration.user
       sign_in_and_redirect
     else

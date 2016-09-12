@@ -20,7 +20,7 @@ describe Integration do
 
       it 'marks the user confirmed but not mark the terms of service agreed' do
         user = FactoryGirl.create(:user, email: 'foo.user@gmail.com', confirmed: false, terms_of_service: false)
-        integration = Integration.create(access_token: 'stuff', information: info)
+        integration = FactoryGirl.create(:integration, information: info)
         expect(integration.user).to eq(user)
         expect(integration.user.confirmed).to be_truthy
         expect(integration.user.terms_of_service).to be_falsey
@@ -28,8 +28,8 @@ describe Integration do
 
       it 'creates a user, associate it if the emails match and run new user tasks' do
         expect do
-          allow_any_instance_of(CreateUserJobs).to receive(:perform_create_jobs).and_return(true)
-          Integration.create(access_token: 'stuff', information: info)
+          expect_any_instance_of(CreateUserJobs).to receive(:perform_create_jobs).and_return(true)
+          FactoryGirl.create(:integration, information: info)
         end.to change(User, :count).by 1
       end
 
@@ -61,7 +61,7 @@ describe Integration do
       it 'creates a user, associate it if the emails match and run new user tasks' do
         expect do
           expect_any_instance_of(CreateUserJobs).to receive(:perform_create_jobs).and_return(true)
-          Integration.create(access_token: 'stuff', information: info)
+          FactoryGirl.create(:integration, information: info)
         end.to change(User, :count).by 1
       end
 

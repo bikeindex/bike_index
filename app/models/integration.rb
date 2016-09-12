@@ -8,13 +8,12 @@ class Integration < ActiveRecord::Base
 
   validates_presence_of :access_token
   validates_presence_of :information
-  validates_presence_of :user_id
 
   serialize :information, JSON
 
   belongs_to :user
 
-  before_validation :associate_with_user
+  before_create :associate_with_user
   def associate_with_user
     self.provider_name ||= information['provider']
     if provider_name == 'facebook' || provider_name == 'strava'
