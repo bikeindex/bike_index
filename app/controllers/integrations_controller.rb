@@ -1,6 +1,5 @@
 class IntegrationsController < ApplicationController
   include Sessionable
-  before_filter :store_return_to
   before_filter :skip_if_signed_in
 
   def create
