@@ -4,7 +4,11 @@ module Organized
       @bikes_count = current_organization.bikes.count
       page = params[:page] || 1
       @per_page = params[:per_page] || 25
-      @bikes = current_organization.bikes.order('created_at desc').page(page).per(@per_page)
+      if current_organization.is_paid
+        @bikes = current_organization.bikes.order('created_at desc')
+      else
+        @bikes = current_organization.bikes.order('created_at desc').page(page).per(@per_page)
+      end
     end
 
     def new

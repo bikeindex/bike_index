@@ -61,6 +61,8 @@ class ApplicationController < ActionController::Base
         render action: :update_password and return true
       when /\A#{ENV['BASE_URL']}/, /\A\//
         redirect_to(target) and return true
+      when 'https://facebook.com/bikeindex'
+        redirect_to(target) and return true
       end
     elsif session[:discourse_redirect]
       redirect_to discourse_authentication_url

@@ -10,7 +10,8 @@ module Sessionable
     end
 
     unless return_to_if_present
-      redirect_to user_root_url, notice: "Logged in!" and return
+      flash[:success] = 'Logged in!'
+      redirect_to user_root_url and return
     end
   end
 

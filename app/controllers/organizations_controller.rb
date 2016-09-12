@@ -103,7 +103,7 @@ class OrganizationsController < ApplicationController
       date_stolen = built_stolen_record_date(@b_param.params['stolen_record']['date_stolen_input'])
       stolen_attrs.merge!(date_stolen: date_stolen)
     else
-      stolen_attrs = { country_id: Country.united_states.id, date_stolen: Date.today }
+      stolen_attrs = { country_id: Country.united_states.id, date_stolen: Time.zone.now }
     end
     @bike.stolen_records.build(stolen_attrs)
   end
