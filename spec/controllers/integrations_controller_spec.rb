@@ -27,10 +27,9 @@ describe IntegrationsController do
         it 'skips' do
           expect do
             get :create, access_token: '123456', expires_in: '3920',
-                         token_type: 'Bearer', return_to: '/facebook',
-                         refresh_token: '1/xEoDL4iW3cxlI7yDbSRFYNG01kVKM2C-259HOF2aQbI'
+                         token_type: 'Bearer', refresh_token: '1/xEoDL4iW3cxlI7yDbSRFYNG01kVKM2C-259HOF2aQbI'
           end.to change(Integration, :count).by 0
-          expect(response).to redirect_to 'https://facebook.com/bikeindex'
+          expect(response).to redirect_to(user_home_url)
         end
       end
 
@@ -40,13 +39,6 @@ describe IntegrationsController do
                        token_type: 'Bearer', refresh_token: '1/xEoDL4iW3cxlI7yDbSRFYNG01kVKM2C-259HOF2aQbI'
           expect(response).to redirect_to(user_home_url)
         end.to change(Integration, :count).by 1
-      end
-
-      it 'uses the redirect' do
-        get :create, access_token: '123456', expires_in: '3920',
-                     token_type: 'Bearer', return_to: '/facebook',
-                     refresh_token: '1/xEoDL4iW3cxlI7yDbSRFYNG01kVKM2C-259HOF2aQbI'
-        expect(response).to redirect_to 'https://facebook.com/bikeindex'
       end
     end
   end
