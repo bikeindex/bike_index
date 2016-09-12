@@ -1,6 +1,9 @@
 module API
   module V2
-    class Root < Dispatch
+    class Root < API::Base
+      require 'grape_logging'
+      logger.formatter = GrapeLogging::Formatters::Default.new
+      use GrapeLogging::Middleware::RequestLogger, { logger: logger }
       format :json
       version 'v2'
       default_error_formatter :json
