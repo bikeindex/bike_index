@@ -65,6 +65,24 @@ describe SessionsController do
           expect(response).to redirect_to oauth_authorization_url(cool_thing: true)
         end
 
+        it 'redirects to facebook.com/bikeindex' do
+          expect(@user).to receive(:authenticate).and_return(true)
+          session[:return_to] = 'https://facebook.com/bikeindex'
+          post :create, session: { thing: 'asdfasdf' }
+          expect(User.from_auth(cookies.signed[:auth])).to eq(@user)
+          expect(session[:return_to]).to be_nil
+          expect(response).to redirect_to 'https://facebook.com/bikeindex'
+        end
+
+        it 'does not redirect to random to facebook page' do
+          expect(@user).to receive(:authenticate).and_return(true)
+          session[:return_to] = 'https://facebook.com/bikeindex-mean-place'
+          post :create, session: { thing: 'asdfasdf' }
+          expect(User.from_auth(cookies.signed[:auth])).to eq(@user)
+          expect(session[:return_to]).to be_nil
+          expect(response).to redirect_to user_home_url
+        end
+
         it "doesn't redirect and clears the session if not a valid oauth url" do
           expect(@user).to receive(:authenticate).and_return(true)
           session[:return_to] = "http://testhost.com/bad_place?f=#{oauth_authorization_url(cool_thing: true)}"
