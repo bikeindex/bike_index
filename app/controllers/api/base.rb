@@ -4,7 +4,7 @@ module GrapeLogging
   module Loggers
     class BinxLogger < GrapeLogging::Loggers::Base
       def parameters(request, _)
-        { ip: request.env['CF-Connecting-IP'] }
+        { remote_ip: request.env['HTTP_CF_CONNECTING_IP'], format: 'json' }
       end
     end
   end
@@ -18,7 +18,7 @@ module API
     mount API::V2::Root
 
     def self.respond_to_error(e)
-      logger.error e unless Rails.env.test?
+      logger.error e unless Rails.env.test? # Breaks tests...
       eclass = e.class.to_s
       message = "OAuth error: #{e.to_s}" if eclass.match('WineBouncer::Errors')
       status = case 
