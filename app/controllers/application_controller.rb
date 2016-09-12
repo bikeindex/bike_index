@@ -6,7 +6,7 @@ class ApplicationController < ActionController::Base
   before_filter :enable_rack_profiler
 
   ensure_security_headers(csp: false,
-    hsts: { max_age: 20.years.to_i, include_subdomains: false },
+    hsts: "max-age=#{20.years.to_i}",
     x_frame_options: 'SAMEORIGIN',
     x_content_type_options: 'nosniff',
     x_xss_protection: false,
@@ -59,13 +59,13 @@ class ApplicationController < ActionController::Base
       when 'password_reset'
         flash[:success] = "You've been logged in. Please reset your password"
         render action: :update_password and return true
-      when /\A#{ENV['BASE_URL']}/, /\A\//
+      when /\A#{ENV['BASE_URL']}/, /\A\// # Either starting with our URL or /
         redirect_to(target) and return true
       when 'https://facebook.com/bikeindex'
         redirect_to(target) and return true
       end
     elsif session[:discourse_redirect]
-      redirect_to discourse_authentication_url
+      redirect_to discourse_authentication_url and return true
     end
   end
 

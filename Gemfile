@@ -58,7 +58,7 @@ gem 'sparkpost' # ruby client for email
 # OAuth provider, Grape, associated parts of API V2
 gem 'doorkeeper'
 gem 'wine_bouncer'
-gem 'grape', '~> 0.13.0'
+gem 'grape', '~> 0.14.0'
 gem 'grape-active_model_serializers', git: 'https://github.com/jrhe/grape-active_model_serializers'
 gem 'grape-swagger', '~> 0.10.4'
 gem 'swagger-ui_rails'
@@ -105,6 +105,7 @@ group :production do
   gem 'honeybadger', '~> 2.0' # Error monitoring
   gem 'lograge' # Structure log data, put it in single lines to improve the functionality
   gem 'logstash-event' # Use logstash format for logging data
+  gem 'grape_logging' # Grape logging. Also how we pass it to lograge
 end
 
 group :development do
