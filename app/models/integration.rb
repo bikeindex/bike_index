@@ -39,7 +39,6 @@ class Integration < ActiveRecord::Base
     if i_user.save
       i_user.confirm(i_user.confirmation_token)
     else
-      raise StandardError, i_user.errors.full_messages
       self.errors.add :user_errors, i_user.errors
     end
     i_user

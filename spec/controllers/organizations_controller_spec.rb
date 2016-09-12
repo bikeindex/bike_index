@@ -145,7 +145,7 @@ describe OrganizationsController do
         bike = assigns(:bike)
         expect(bike.stolen).to be_truthy
         expect(bike.owner_email).to eq(b_param_attrs[:bike][:owner_email])
-        expect(bike.stolen_records.first.date_stolen.to_date).to eq Time.zone.now.to_date
+        expect(bike.stolen_records.first.date_stolen).to be_within(1.second).of Time.now
       end
     end
   end

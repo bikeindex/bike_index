@@ -74,7 +74,7 @@ describe SessionsController do
           expect(response).to redirect_to 'https://facebook.com/bikeindex'
         end
 
-        it 'does not redirect to random to facebook page' do
+        it 'does not redirect to a random facebook page' do
           expect(@user).to receive(:authenticate).and_return(true)
           session[:return_to] = 'https://facebook.com/bikeindex-mean-place'
           post :create, session: { thing: 'asdfasdf' }
