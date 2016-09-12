@@ -391,7 +391,7 @@ describe BikesController do
             testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
             stolen_record = bike.current_stolen_record
             stolen_params.except(:date_stolen_input).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
-            expect(stolen_record.date_stolen.to_date).to eq Date.today
+            expect(stolen_record.date_stolen.to_date).to eq Time.zone.now.to_date
           end
         end
         context 'invalid' do

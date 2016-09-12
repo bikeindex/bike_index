@@ -1,6 +1,9 @@
+// Outside of the main block to avoid overriding header and footer styles
+.landing-page-wrap {
+  h1, h2, h3, h4, h5, h6 { color: $header-font-nocolor; }
+}
 // Organization landing pages padding (so there can be a background)
 #organized_manage_landing, #landing_pages_show {
-  h1, h2, h3, h4, h5, h6 { color: $header-font-nocolor; }
   padding-top: 0;
   background-size: 100% auto;
   background-position: center top;
