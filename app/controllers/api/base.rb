@@ -1,9 +1,19 @@
+require 'grape_logging'
+
+module GrapeLogging
+  module Loggers
+    class BinxLogger < GrapeLogging::Loggers::Base
+      def parameters(request, _)
+        { ip: request.env['CF-Connecting-IP'] }
+      end
+    end
+  end
+end
+
 module API
   class Base < Grape::API
-    require 'grape_logging'
     use GrapeLogging::Middleware::RequestLogger, instrumentation_key: 'grape_key',
-                                                 include: [GrapeLogging::Loggers::Response.new,
-                                                           GrapeLogging::Loggers::CloudflareIp.new,
+                                                 include: [GrapeLogging::Loggers::BinxLogger.new,
                                                            GrapeLogging::Loggers::FilterParameters.new]
     mount API::V2::Root
 
