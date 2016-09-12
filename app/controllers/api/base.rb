@@ -18,7 +18,7 @@ module API
     mount API::V2::Root
 
     def self.respond_to_error(e)
-      logger.error e
+      logger.error e unless Rails.env.test?
       eclass = e.class.to_s
       message = "OAuth error: #{e.to_s}" if eclass.match('WineBouncer::Errors')
       status = case 
