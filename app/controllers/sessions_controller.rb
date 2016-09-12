@@ -2,11 +2,9 @@ class SessionsController < ApplicationController
   include Sessionable
   layout 'application_revised'
   before_filter :store_return_to, only: [:new]
+  before_filter :skip_if_signed_in, only: [:new]
 
   def new
-    if current_user.present?
-      redirect_to user_home_url, notice: "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
-    end
   end
 
   def create

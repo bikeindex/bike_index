@@ -39,7 +39,7 @@ class Integration < ActiveRecord::Base
     if i_user.save
       i_user.confirm(i_user.confirmation_token)
     else
-      self.errors.add :user_errors, i_user.errors
+      errors.add :user_errors, i_user.errors
     end
     i_user
   end
