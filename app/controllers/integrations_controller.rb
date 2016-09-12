@@ -1,5 +1,6 @@
 class IntegrationsController < ApplicationController
   include Sessionable
+  before_filter :store_return_to
  
   def create
     @integration = Integration.new
