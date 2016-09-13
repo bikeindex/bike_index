@@ -405,9 +405,11 @@ CREATE TABLE creation_states (
     bike_id integer,
     organization_id integer,
     origin character varying,
-    is_bulk boolean,
+    is_bulk boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    is_pos boolean DEFAULT false NOT NULL,
+    is_new boolean DEFAULT false NOT NULL
 );
 
 
@@ -3172,4 +3174,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160901175004');
 INSERT INTO schema_migrations (version) VALUES ('20160910174549');
 
 INSERT INTO schema_migrations (version) VALUES ('20160910184053');
+
+INSERT INTO schema_migrations (version) VALUES ('20160913155615');
 

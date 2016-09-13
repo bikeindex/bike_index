@@ -77,7 +77,7 @@ class BikeCreator
     @bike = create_associations(bike)
     validate_record(@bike)
     if @bike.present?
-      @bike.create_creation_state(origin: @b_param.origin, organization_id: @bike.creation_organization_id)
+      @bike.create_creation_state(creation_state_attributes)
       ListingOrderWorker.perform_async(@bike.id)
       ListingOrderWorker.perform_in(10.seconds, @bike.id)
     end
@@ -94,5 +94,17 @@ class BikeCreator
     @bike = build_bike
     return @bike if @bike.errors.present?
     save_bike(@bike)
+  end
+
+  private
+
+  def creation_state_attributes
+    {
+      is_bulk: @b_param.is_bulk,
+      is_pos: @b_param.is_pos,
+      is_new: @b_param.is_new,
+      origin: @b_param.origin,
+      organization_id: @bike.creation_organization_id
+    }
   end
 end

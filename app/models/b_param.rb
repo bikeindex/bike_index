@@ -47,13 +47,16 @@ class BParam < ActiveRecord::Base
   def tertiary_frame_color_id; bike['tertiary_frame_color_id'] end
   def manufacturer_id; bike['manufacturer_id'] end
   def stolen; bike['stolen'] end
+  def is_pos; bike['is_pos'] || false end
+  def is_new; bike['is_new'] || false end
+  def is_bulk; bike['is_bulk'] || false end
 
   def creation_organization; Organization.friendly_find(creation_organization_id) end
   def manufacturer; bike['manufacturer_id'] && Manufacturer.friendly_find(bike['manufacturer_id']) end
 
   class << self
     def v2_params(hash)
-      h = { 'bike' => hash.with_indifferent_access }
+      h = hash['bike'].present? ? hash : { 'bike' => hash.with_indifferent_access }
       h['bike']['serial_number'] = h['bike'].delete 'serial'
       h['bike']['send_email'] = !(h['bike'].delete 'no_notify')
       org = Organization.friendly_find(h['bike'].delete 'organization_slug')
@@ -94,7 +97,7 @@ class BParam < ActiveRecord::Base
 
     def skipped_bike_attrs # Attrs that need to be skipped on bike assignment
       %w(cycle_type_slug cycle_type_name rear_gear_type_slug front_gear_type_slug
-         handlebar_type_slug frame_material_slug)
+         handlebar_type_slug frame_material_slug is_bulk is_new is_pos)
     end
   end
 
@@ -215,7 +218,7 @@ class BParam < ActiveRecord::Base
       params['bike']['paint_id'] = paint.id
     else
       paint = Paint.new(name: paint_entry)
-      paint.manufacturer_id = bike['manufacturer_id'] if bike['registered_new']
+      paint.manufacturer_id = bike['manufacturer_id'] if is_pos
       paint.save
       params['bike']['paint_id'] = paint.id
       params['bike']['paint_name'] = paint.name
