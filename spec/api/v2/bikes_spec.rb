@@ -177,6 +177,18 @@ describe 'Bikes API V2' do
     end
 
     it 'does not register a stolen bike unless attrs are present' do
+      bike_attrs[:stolen_record] = {
+        phone: '',
+        theft_description: "This bike was stolen and that's no fair.",
+        city: 'Chicago'
+      }
+      expect do
+        post "/api/v2/bikes?access_token=#{@token.token}",
+             bike_attrs.to_json,
+             JSON_CONTENT
+      end.to change(Ownership, :count).by 0
+      result = JSON.parse(response.body)
+      expect(result['error']).to be_present
     end
   end
 
