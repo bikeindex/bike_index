@@ -289,7 +289,7 @@ describe BParam do
     it "associates the manufacturer with the paint if it's a new bike" do
       FactoryGirl.create(:color, name: 'Black')
       m = FactoryGirl.create(:manufacturer)
-      bike = { registered_new: true, manufacturer_id: m.id }
+      bike = { is_pos: true, manufacturer_id: m.id }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_paint_key('paint 69')
       p = Paint.find_by_name('paint 69')

@@ -77,9 +77,8 @@ class Bike < ActiveRecord::Base
 
   class << self
     def old_attr_accessible
-      # registered_new - Was this bike registered at point of sale?
       # made_without_serial - GUARANTEE there was no serial
-      (%w(registered_new cycle_type_id manufacturer_id manufacturer_other serial_number 
+      (%w(cycle_type_id manufacturer_id manufacturer_other serial_number 
         serial_normalized has_no_serial made_without_serial additional_registration
         creation_organization_id location_id manufacturer year thumb_path name stolen
         current_stolen_record_id recovered frame_material_id frame_model number_of_seats

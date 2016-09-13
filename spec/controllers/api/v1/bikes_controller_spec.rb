@@ -74,7 +74,9 @@ describe Api::V1::BikesController do
             handlebar_type_slug: nil,
             frame_material_slug: nil,
             description: 'Diverge Elite DSW (58)',
-            registered_new: true
+            is_pos: true,
+            is_new: true,
+            is_bulk: true
           }
         }
       end
@@ -93,6 +95,10 @@ describe Api::V1::BikesController do
         expect(bike.frame_size_unit).to eq 'cm'
         expect(bike.primary_frame_color).to eq black
         expect(bike.paint_description).to eq 'Black/Red'
+        creation_state = bike.creation_state
+        expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([true, true, true])
+        expect(creation_state.organization).to eq organization
+        expect(creation_state.origin).to eq 'api_v1'
       end
     end
     context 'legacy tests' do
@@ -178,7 +184,6 @@ describe Api::V1::BikesController do
         expect(bike.creation_organization_id).to eq(@organization.id)
         expect(bike.year).to eq(1969)
         expect(bike.components.count).to eq(3)
-        expect(bike.creation_state.origin).to eq 'api_v1'
         expect(bike.creation_state.organization).to eq @organization
         component = bike.components.where(serial_number: '69').first
         expect(component.description).to eq('yeah yay!')
@@ -199,6 +204,10 @@ describe Api::V1::BikesController do
         expect(bike.rear_gear_type.slug).to eq bike_attrs[:rear_gear_type_slug]
         expect(bike.front_gear_type.slug).to eq bike_attrs[:front_gear_type_slug]
         expect(bike.handlebar_type.slug).to eq bike_attrs[:handlebar_type_slug]
+        creation_state = bike.creation_state
+        expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([false, false, false])
+        expect(creation_state.organization).to eq @organization
+        expect(creation_state.origin).to eq 'api_v1'
       end
 
       it 'creates a photos even if one fails' do
