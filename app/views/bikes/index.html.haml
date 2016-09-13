@@ -6,6 +6,7 @@
         Search for #{stolenness_desc[@stolenness]} bikes
     .col-md-4.ad-col
       .ad-block#top468x60
+        
   .row
     .col-md-8
       = form_tag bikes_path, id: 'bike_search_form', class: 'bike-search-form', method: :get do
@@ -77,7 +78,11 @@
           = render partial: '/bikes/revised_bike', collection: @secondary_bikes, as: :bike
     .col-md-4.ad-col
       .ad-block#right300x600
+        :plain
+
 
 - if @location.present?
   :javascript
     window.search_location_geocoding = #{@location.to_json};
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
