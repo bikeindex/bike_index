@@ -172,7 +172,7 @@ class StolenRecord < ActiveRecord::Base
     b = self.bike
     return '' unless b.present?
     row = ""
-    row << tsv_col(b.manufacturer_name)
+    row << tsv_col(b.mnfg_name)
     row << "\t"
     row << tsv_col(b.frame_model)
     row << "\t"

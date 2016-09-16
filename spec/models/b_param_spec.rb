@@ -63,7 +63,7 @@ describe BParam do
           phone: nil
         }
       }.as_json
-      b_param = BParam.new(params: p, api_v2: true)
+      b_param = BParam.new(params: p, origin: 'api_v2')
       b_param.massage_if_v2
       new_params = b_param.bike
       expect(new_params.keys.include?('serial_number')).to be_truthy
@@ -76,7 +76,7 @@ describe BParam do
     it 'gets the organization id' do
       org = FactoryGirl.create(:organization, name: 'Something')
       p = { organization_slug: org.slug }
-      b_param = BParam.new(params: p, api_v2: true)
+      b_param = BParam.new(params: p, origin: 'api_v2')
       b_param.massage_if_v2
       expect(b_param.bike['creation_organization_id']).to eq(org.id)
     end
@@ -166,22 +166,66 @@ describe BParam do
   end
 
   describe 'set_manufacturer_key' do
-    it 'adds other manufacturer name and set the set the foreign keys' do
-      m = FactoryGirl.create(:manufacturer, name: 'Other')
-      bike = { manufacturer: 'gobble gobble' }
-      b_param = BParam.new(params: { bike: bike })
-      b_param.set_manufacturer_key
-      expect(b_param.bike['manufacturer']).not_to be_present
-      expect(b_param.bike['manufacturer_id']).to eq(m.id)
-      expect(b_param.bike['manufacturer_other']).to eq('Gobble Gobble')
+    context 'attr set on manufacturer_id' do
+      context 'other' do
+        it 'adds other manufacturer name and set the set the foreign keys' do
+          bike = { manufacturer_id: 'lololol' }
+          b_param = BParam.new(params: { bike: bike })
+          b_param.set_manufacturer_key
+          expect(b_param.bike['manufacturer']).not_to be_present
+          expect(b_param.bike['manufacturer_id']).to eq(Manufacturer.other.id)
+          expect(b_param.bike['manufacturer_other']).to eq('lololol')
+        end
+      end
+      context 'existing manufacturer' do
+        let(:manufacturer) { FactoryGirl.create(:manufacturer) }
+        context 'manufacturer name' do
+          it 'uses manufacturer' do
+            bike = { manufacturer_id: manufacturer.id }
+            b_param = BParam.new(params: { bike: bike })
+            b_param.set_manufacturer_key
+            expect(b_param.bike['manufacturer_id']).to eq(manufacturer.id)
+          end
+        end
+        context 'manufacturer id' do
+          it 'sets the manufacturer' do
+            bike = { manufacturer_id: manufacturer.id }
+            b_param = BParam.new(params: { bike:  bike })
+            b_param.set_manufacturer_key
+            expect(b_param.bike['manufacturer_id']).to eq(manufacturer.id)
+          end
+        end
+      end
+      context 'no manufacturer or manufacturer_id' do
+        it 'does not set anything' do
+          bike = { manufacturer_id: ' ' }
+          b_param = BParam.new(params: { bike:  bike })
+          b_param.set_manufacturer_key
+          expect(b_param.bike['manufacturer_id']).to be_nil
+        end
+      end
     end
-    it 'looks through book slug' do
-      m = FactoryGirl.create(:manufacturer, name: 'Something Cycles')
-      bike = { manufacturer: 'something' }
-      b_param = BParam.new(params: { bike: bike })
-      b_param.set_manufacturer_key
-      expect(b_param.bike['manufacturer']).not_to be_present
-      expect(b_param.bike['manufacturer_id']).to eq(m.id)
+    context 'attr set on manufacturer' do
+      context 'other manufacturer' do
+        it 'adds other manufacturer name and set the set the foreign keys' do
+          bike = { manufacturer: 'gobble gobble' }
+          b_param = BParam.new(params: { bike: bike })
+          b_param.set_manufacturer_key
+          expect(b_param.bike['manufacturer']).not_to be_present
+          expect(b_param.bike['manufacturer_id']).to eq(Manufacturer.other.id)
+          expect(b_param.bike['manufacturer_other']).to eq('gobble gobble')
+        end
+      end
+      context 'existing manufacturer' do
+        it 'looks through book slug' do
+          manufacturer = FactoryGirl.create(:manufacturer, name: 'Something Cycles')
+          bike = { manufacturer: 'something' }
+          b_param = BParam.new(params: { bike: bike })
+          b_param.set_manufacturer_key
+          expect(b_param.bike['manufacturer']).not_to be_present
+          expect(b_param.bike['manufacturer_id']).to eq(manufacturer.id)
+        end
+      end
     end
   end
 
@@ -245,7 +289,7 @@ describe BParam do
     it "associates the manufacturer with the paint if it's a new bike" do
       FactoryGirl.create(:color, name: 'Black')
       m = FactoryGirl.create(:manufacturer)
-      bike = { registered_new: true, manufacturer_id: m.id }
+      bike = { is_pos: true, manufacturer_id: m.id }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_paint_key('paint 69')
       p = Paint.find_by_name('paint 69')

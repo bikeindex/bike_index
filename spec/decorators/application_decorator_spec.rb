@@ -1,24 +1,6 @@
 require 'spec_helper'
 
 describe ApplicationDecorator do
-  describe 'mnfg_name' do
-    it 'returns the manufacturer other name if present' do
-      manufacturer = Manufacturer.new
-      lock = Lock.new
-      allow(manufacturer).to receive(:name).and_return('Other')
-      allow(lock).to receive(:manufacturer).and_return(manufacturer)
-      allow(lock).to receive(:manufacturer_other).and_return('Other name')
-      expect(ApplicationDecorator.new(lock).mnfg_name).to eq('Other name')
-    end
-    it 'returns the manufacturer name' do
-      manufacturer = Manufacturer.new
-      lock = Lock.new
-      allow(manufacturer).to receive(:name).and_return('Another')
-      allow(lock).to receive(:manufacturer).and_return(manufacturer)
-      expect(ApplicationDecorator.new(lock).mnfg_name).to eq('Another')
-    end
-  end
-
   describe 'dl_list_item' do
     it "returns a dt and dd from what's passed attribute" do
       bike = Bike.new

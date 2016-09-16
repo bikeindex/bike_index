@@ -1,5 +1,12 @@
 module Sessionable
   extend ActiveSupport::Concern
+  def skip_if_signed_in
+    return nil unless current_user.present?
+    unless return_to_if_present
+      flash[:success] = "You're already signed in!"
+      redirect_to user_home_url and return
+    end
+  end
 
   def sign_in_and_redirect
     session[:last_seen] = Time.now
@@ -8,9 +15,9 @@ module Sessionable
     else
       default_session_set
     end
-
     unless return_to_if_present
-      redirect_to user_root_url, notice: "Logged in!" and return
+      flash[:success] = 'Logged in!'
+      redirect_to user_root_url and return
     end
   end
 
@@ -26,6 +33,6 @@ module Sessionable
       value: [@user.id, @user.auth_token]
     }
     # In development, secure: true breaks the cookie storage. Only add if production
-    Rails.env.production? ? c.merge({secure: true}) : c
+    Rails.env.production? ? c.merge(secure: true) : c
   end
 end

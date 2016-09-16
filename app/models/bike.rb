@@ -1,6 +1,5 @@
 class Bike < ActiveRecord::Base
   include ActiveModel::Dirty
-  include ActionView::Helpers::SanitizeHelper
   mount_uploader :pdf, PdfUploader
   process_in_background :pdf, CarrierWaveProcessWorker
 
@@ -25,6 +24,7 @@ class Bike < ActiveRecord::Base
   belongs_to :location
   belongs_to :current_stolen_record, class_name: "StolenRecord"
 
+  has_one :creation_state
   has_many :stolen_notifications, dependent: :destroy
   has_many :stolen_records, dependent: :destroy
   has_many :other_listings
@@ -77,9 +77,8 @@ class Bike < ActiveRecord::Base
 
   class << self
     def old_attr_accessible
-      # registered_new - Was this bike registered at point of sale?
       # made_without_serial - GUARANTEE there was no serial
-      (%w(registered_new cycle_type_id manufacturer_id manufacturer_other serial_number 
+      (%w(cycle_type_id manufacturer_id manufacturer_other serial_number 
         serial_normalized has_no_serial made_without_serial additional_registration
         creation_organization_id location_id manufacturer year thumb_path name stolen
         current_stolen_record_id recovered frame_material_id frame_model number_of_seats
@@ -167,17 +166,9 @@ class Bike < ActiveRecord::Base
   end
 
   def title_string
-    t = [year, manufacturer_name, frame_model].join(' ')
+    t = [year, mnfg_name, frame_model].join(' ')
     t += " #{type}" if type != "bike"
-    strip_tags(t.gsub(/\s+/,' ')).strip
-  end
-
-  def manufacturer_name
-    if manufacturer.name == "Other" && self.manufacturer_other.present?
-      manufacturer_other
-    else
-      manufacturer.name.gsub(/\s?\([^\)]*\)/i,'')
-    end
+    Rails::Html::FullSanitizer.new.sanitize(t.gsub(/\s+/,' ')).strip
   end
 
   def video_embed_src
@@ -192,12 +183,12 @@ class Bike < ActiveRecord::Base
 
   before_save :set_mnfg_name
   def set_mnfg_name
-    if manufacturer.name == "Other" && manufacturer_other.present?
-      name = ActionController::Base.helpers.strip_tags(manufacturer_other)
+    if manufacturer.name == 'Other' && manufacturer_other.present?
+      name = Rails::Html::FullSanitizer.new.sanitize(manufacturer_other)
     else
       name = manufacturer.name.gsub(/\s?\([^\)]*\)/i,'')
     end
-    self.mnfg_name = name.strip
+    self.mnfg_name = name.strip.truncate(60)
   end
 
   before_save :set_user_hidden
@@ -289,10 +280,11 @@ class Bike < ActiveRecord::Base
   end
 
   def frame_colors
-    c = [primary_frame_color.name]
-    c << secondary_frame_color.name if secondary_frame_color
-    c << tertiary_frame_color.name if tertiary_frame_color
-    c
+    [
+      primary_frame_color && primary_frame_color.name,
+      secondary_frame_color && secondary_frame_color.name,
+      tertiary_frame_color && tertiary_frame_color.name
+    ].compact
   end
 
   def type
@@ -351,7 +343,7 @@ class Bike < ActiveRecord::Base
     cache_photo
     cache_attributes
     self.cached_data = [
-      manufacturer_name,
+      mnfg_name,
       (propulsion_type.name == 'Foot pedal' ? nil : propulsion_type.name),
       year,
       (primary_frame_color && primary_frame_color.name),
