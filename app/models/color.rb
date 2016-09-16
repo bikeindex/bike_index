@@ -21,9 +21,13 @@ class Color < ActiveRecord::Base
       data: {
         priority: 1000,
         display: display,
-        search_id: "c_#{id}"
+        search_id: search_id
       }
     }.as_json
+  end
+
+  def search_id
+    "c_#{id}"
   end
 
   def update_display_format

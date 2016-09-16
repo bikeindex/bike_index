@@ -1,5 +1,5 @@
 class BikeIndex.BikeSearchBar extends BikeIndex
-  constructor: (target_selector = '#bike_search_form #query') ->
+  constructor: (target_selector = '#bikes_search_form #query_items') ->
     @initializeHeaderSearch($(target_selector))
     @setSearchProximity()
     @initializeEventListeners()
@@ -28,9 +28,12 @@ class BikeIndex.BikeSearchBar extends BikeIndex
     # Set from localStorage - so we don't override if it's already set
     # updateSearchBikesHeaderLink is called first, this is guaranteed to be something
     if proximity? and proximity.length > 0
-      localStorage.setItem('location', proximity)
+      # don't save location if user entered set 'Anywhere'
+      localStorage.setItem('location', proximity) unless proximity.match(/anywhere/i)
     else
       proximity = localStorage.getItem('location')
+      # Make location 'you' if location is anywhere, so user isn't stuck unable to use proximity
+      proximity = 'you' if proximity.match(/anywhere/i)
       # Then set the proximity from whatever we got
       $('#proximity').val(proximity)
     # set up search view if we're on bike search
@@ -68,20 +71,20 @@ class BikeIndex.BikeSearchBar extends BikeIndex
     $('#stolen').val('true')
     $('#non_stolen').val('')
     $('#non_proximity').val('true')
-    $('#bike_search_form').submit()
+    $('#bikes_search_form').submit()
 
   nonStolenSearch: (e) ->
     e.preventDefault()
     $('#stolen').val('')
     $('#non_stolen').val('true')
-    $('#bike_search_form').submit()
+    $('#bikes_search_form').submit()
 
   proximitySearch: (e) ->
     e.preventDefault()
     $('#stolen').val('true')
     $('#non_stolen').val('')
     $('#non_proximity').val('')
-    $('#bike_search_form').submit()
+    $('#bikes_search_form').submit()
 
   updateIncludeSerialOption: ($query_field) ->
     # Check if the header search includes the serial string match, set it on the window
@@ -99,7 +102,7 @@ class BikeIndex.BikeSearchBar extends BikeIndex
       openOnEnter: false
       tokenSeparators: [',']
       placeholder: $query_field.attr('placeholder') # Pull placeholder from HTML
-      dropdownParent: $('.bike-search-form') # Append to search for for easier css access
+      dropdownParent: $('.bikes-search-form') # Append to search for for easier css access
       templateResult: formatSearchText # let custom formatter work
       escapeMarkup: (markup) -> markup # Allow our
       ajax:
@@ -123,8 +126,8 @@ class BikeIndex.BikeSearchBar extends BikeIndex
         cache: true
 
     # Submit on enter. Requires select2 be appended to bike-search form (as it is)
-    window.bike_search_submit = true
-    $('.bike-search-form .select2-selection').on 'keyup', (e) ->
+    # window.bike_search_submit = true
+    $('.bikes-search-form .select2-selection').on 'keyup', (e) ->
       # Only trigger submit on enter if:
       #  - Enter key pressed last (13) 
       #  - Escape key pressed last (27)
@@ -133,10 +136,9 @@ class BikeIndex.BikeSearchBar extends BikeIndex
       return window.bike_search_submit = false unless e.keyCode == 13
       if window.bike_search_submit
         $desc_search.select2('close') # Because form is submitted, hide select box
-        $('#bike_search_form').submit()
+        $('#bikes_search_form').submit()
       else
         window.bike_search_submit = true
-
 
   formatSearchText: (item) ->
     return item.text if item.loading

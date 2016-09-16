@@ -1,5 +1,6 @@
 class Bike < ActiveRecord::Base
   include ActiveModel::Dirty
+  include BikeSearchable
   mount_uploader :pdf, PdfUploader
   process_in_background :pdf, CarrierWaveProcessWorker
 
@@ -39,6 +40,8 @@ class Bike < ActiveRecord::Base
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :components, allow_destroy: true
 
+  geocoded_by nil, latitude: :stolen_lat, longitude: :stolen_long
+
   validates_presence_of :serial_number
   # Serial numbers aren't guaranteed to be unique across manufacturers.
   # But we do want to prevent the same bike being registered multiple times...
@@ -63,17 +66,16 @@ class Bike < ActiveRecord::Base
   scope :non_recovered, -> { where(recovered: false) }
 
   include PgSearch
-  pg_search_scope :search, against: {
-    serial_number: 'A',
-    cached_data:   'B',
-    all_description:   'C'
-  },
-  using: {tsearch: {dictionary: "english", prefix: true}}
+  pg_search_scope :pg_search, against: {
+      serial_number: 'A',
+      cached_data:   'B',
+      all_description:   'C'
+    }, using: { tsearch: { dictionary: "english", prefix: true } }
 
   pg_search_scope :admin_search,
     against: { owner_email: 'A' },
-    associated_against: {ownerships: :owner_email, creator: :email},
-    using: {tsearch: {dictionary: "english", prefix: true}}
+    associated_against: { ownerships: :owner_email, creator: :email },
+    using: { tsearch: { dictionary: "english", prefix: true } }
 
   class << self
     def old_attr_accessible
@@ -96,7 +98,7 @@ class Bike < ActiveRecord::Base
     end
     
     def text_search(query)
-      query.present? ? search(query) : all
+      query.present? ? pg_search(query) : all
     end
 
     def admin_text_search(query)

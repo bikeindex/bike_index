@@ -24,8 +24,8 @@ class Manufacturer < ActiveRecord::Base
 
   class << self
     def old_attr_accessible
-    %w(name slug website frame_maker open_year close_year logo remote_logo_url
-       logo_cache logo_source description).map(&:to_sym).freeze
+      %w(name slug website frame_maker open_year close_year logo remote_logo_url
+         logo_cache logo_source description).map(&:to_sym).freeze
     end
 
     def friendly_find(n)
@@ -48,7 +48,7 @@ class Manufacturer < ActiveRecord::Base
     end
 
     def fill_stripped(n)
-      n.gsub!(/accell/i,'') if n.match(/accell/i).present?
+      n.gsub!(/accell/i, '') if n.match(/accell/i).present?
       Slugifyer.manufacturer(n)
     end
 
@@ -97,7 +97,7 @@ class Manufacturer < ActiveRecord::Base
 
   def autocomplete_hash_priority
     return 0 unless (bikes.count + components.count) > 0
-    pop = (2*bikes.count + components.count) / 20 + 10
+    pop = (2 * bikes.count + components.count) / 20 + 10
     pop > 100 ? 100 : pop
   end
 
@@ -110,8 +110,12 @@ class Manufacturer < ActiveRecord::Base
       data: {
         slug: slug,
         priority: autocomplete_hash_priority,
-        search_id: "m_#{id}"
+        search_id: search_id
       }
     }.as_json
+  end
+
+  def search_id
+    "m_#{id}"
   end
 end

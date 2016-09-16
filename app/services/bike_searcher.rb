@@ -10,7 +10,7 @@ class BikeSearcher
         @params[:query] = @params[:query_typed]
       end
     end
-    # @params = interpreted_params(@params)
+    @params = interpreted_params(@params)
     if @params[:serial].present?
       if @params[:query].present?
         @params[:query] = @params[:query].gsub(/,?#,?/,'')
@@ -21,18 +21,18 @@ class BikeSearcher
 
   attr_accessor :params, :location
 
-  # def interpreted_params(i_params)
-  #   query = (i_params[:query] || '').gsub('%23', '#') # ... ensure string so we can gsub it
-  #   return i_params unless query.present?
-  #   # serial segment looks like s#SERIAL#
-  #   serial_matcher = /s#[^#]*#/i
-  #   query.gsub!(serial_matcher) do |match|
-  #     # Set the serial to the match, with the first part chopped and the last part chopped
-  #     i_params[:serial] = match.gsub(/\As#/, '').gsub(/#\z/, '')
-  #     '' # remove it from query
-  #   end
-  #   i_params.merge(query: query)
-  # end
+  def interpreted_params(i_params)
+    query = (i_params[:query] || '').gsub('%23', '#') # ... ensure string so we can gsub it
+    return i_params unless query.present?
+    # serial segment looks like s#SERIAL#
+    serial_matcher = /s#[^#]*#/i
+    query.gsub!(serial_matcher) do |match|
+      # Set the serial to the match, with the first part chopped and the last part chopped
+      i_params[:serial] = match.gsub(/\As#/, '').gsub(/#\z/, '')
+      '' # remove it from query
+    end
+    i_params.merge(query: query)
+  end
 
   # Remove the encoding tricks we use with selectize
   def stripped_query

@@ -1,4 +1,4 @@
-.bike-search-form {
+.bikes-search-form {
   @include make-row();
   // 
   // Query field (main search field)
@@ -74,7 +74,7 @@
 }
 
 @media (max-width: 600px) {
-  .bike-search-form {
+  .bikes-search-form {
     .selectize-dropdown-content {
       .sch_s, .sch_m, .sch_ {
         font-size: 14px;

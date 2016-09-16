@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe BikesController do
   describe 'index' do
+    include_context :geocoder_default_location
     context 'no subdomain' do
       context 'legacy' do
         it 'renders' do

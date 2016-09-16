@@ -44,6 +44,9 @@ class StolenRecord < ActiveRecord::Base
     recovery_posted: false
   )}
 
+  geocoded_by :address
+  after_validation :geocode, if: lambda { (self.city.present? || self.zipcode.present?) && self.country.present? }
+
   def self.revised_date_format
     '%a %b %d %Y'
   end
@@ -92,14 +95,9 @@ class StolenRecord < ActiveRecord::Base
     ].reject(&:blank?).join(', ')
   end
 
-  # unless Rails.env.test?
-    geocoded_by :address
-    after_validation :geocode, if: lambda { (self.city.present? || self.zipcode.present?) && self.country.present? }
-  # end
-
   def self.locking_description
-    ["U-lock", "Two U-locks", "U-lock and cable", "Chain with padlock",
-      "Cable lock", "Heavy duty bicycle security chain", "Not locked", "Other"]
+    ['U-lock', 'Two U-locks', 'U-lock and cable', 'Chain with padlock',
+      'Cable lock', 'Heavy duty bicycle security chain', 'Not locked', 'Other'].freeze
   end
   def self.locking_description_select
     lds = locking_description

@@ -94,18 +94,3 @@ OmniAuth.config.mock_auth[:facebook] = OmniAuth::AuthHash.new('provider' => 'fac
                                                                   'updated_time' => '2012-08-06T23:32:31+0000'
                                                                 }
                                                               })
-
-Geocoder.configure(lookup: :test)
-def default_location
-  {
-    'latitude'     => 40.7143528,
-    'longitude'    => -74.0059731,
-    'address'      => 'New York, NY, USA',
-    'state'        => 'New York',
-    'state_code'   => 'NY',
-    'country'      => 'United States',
-    'country_code' => 'US'
-  }
-end
-Geocoder::Lookup::Test.set_default_stub([default_location])
-

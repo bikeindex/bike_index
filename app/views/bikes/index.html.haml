@@ -9,11 +9,11 @@
         
   .row
     .col-md-8
-      = form_tag bikes_path, id: 'bike_search_form', class: 'bike-search-form', method: :get do
-        - params[:query] = params[:query].gsub(/,?#,?/,'').gsub(/(\A,|,\z)/, '') if params[:query].present?
+      = form_tag bikes_path, id: 'bikes_search_form', class: 'bikes-search-form', method: :get do
+        / - params[:query] = params[:query].gsub(/,?#,?/,'').gsub(/(\A,|,\z)/, '') if params[:query].present?
         .query-field-wrap
-          = select_tag :select_items,                          |
-            strip_tags(params[:select_items]),                 |
+          = select_tag :query_items,                    |
+            strip_tags(params[:select_items]),          |
             placeholder: 'Search bike descriptions',    |
             class: 'form-control query-field',          |
             multiple: true,                             |
@@ -29,7 +29,7 @@
           = text_field_tag :proximity, params[:proximity], placeholder: 'Anywhere', class: 'form-control stolen-proximity'
           %span
             miles of
-          = number_field_tag :proximity_radius, params[:proximity_radius] || 100, placeholder: '100', min: 1, class: 'form-control stolen-radius'
+          = number_field_tag :distance, params[:distance] || 100, placeholder: '100', min: 1, class: 'form-control stolen-radius'
           %span
             within
           = hidden_field_tag :stolen, params[:stolen] || true
