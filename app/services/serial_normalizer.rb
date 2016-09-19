@@ -8,7 +8,7 @@ class SerialNormalizer
   end
 
   def normalized
-    return 'absent' if @serial == 'ABSENT'
+    return [] if @serial == 'ABSENT'
     normed = @serial.upcase
     serial_substitutions.each do |key, value|
       normed.gsub!(/[#{key}]/, value)
@@ -18,7 +18,6 @@ class SerialNormalizer
   end
 
   def normalized_segments
-    return [] if @serial == 'absent'
     normalized.split(' ').reject(&:empty?).uniq
   end
 
@@ -29,13 +28,6 @@ class SerialNormalizer
     normalized_segments.each do |seg|
       NormalizedSerialSegment.create(bike_id: bike_id, segment: seg)
     end
-  end
-
-  def to_h
-    {
-      normalized: normalized,
-      normalized_segments: normalized_segments
-    }
   end
 
   private
