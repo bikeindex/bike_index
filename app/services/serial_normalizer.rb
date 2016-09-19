@@ -8,7 +8,7 @@ class SerialNormalizer
   end
 
   def normalized
-    return [] if @serial == 'ABSENT'
+    return 'absent' unless @serial && @serial == 'ABSENT'
     normed = @serial.upcase
     serial_substitutions.each do |key, value|
       normed.gsub!(/[#{key}]/, value)
@@ -18,6 +18,7 @@ class SerialNormalizer
   end
 
   def normalized_segments
+    return [] if @serial == 'ABSENT'
     normalized.split(' ').reject(&:empty?).uniq
   end
 

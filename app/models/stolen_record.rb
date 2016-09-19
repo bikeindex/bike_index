@@ -100,32 +100,22 @@ class StolenRecord < ActiveRecord::Base
       'Cable lock', 'Heavy duty bicycle security chain', 'Not locked', 'Other'].freeze
   end
   def self.locking_description_select
-    lds = locking_description
-    select_params = []
-    lds.each do |l|
-      select_params << [l,l]
-    end
-    select_params
+    locking_description.map { |l| [l, l] }
   end
 
   def self.locking_defeat_description
     [
-      "Lock was cut, and left at the scene.",
-      "Lock was opened, and left unharmed at the scene.",
-      "Lock is missing, along with the bike.",
-      "Object that bike was locked to was broken, removed, or otherwise compromised.",
-      "Other situation, please describe below.",
-      "Bike was not locked"
+      'Lock was cut, and left at the scene.',
+      'Lock was opened, and left unharmed at the scene.',
+      'Lock is missing, along with the bike.',
+      'Object that bike was locked to was broken, removed, or otherwise compromised.',
+      'Other situation, please describe below.',
+      'Bike was not locked'
     ]
   end
 
   def self.locking_defeat_description_select
-    ldds = locking_defeat_description
-    select_params = []
-    ldds.each do |l|
-      select_params << [l,l]
-    end
-    select_params
+    locking_defeat_description.map { |l| [l, l] }
   end
 
   before_save :set_phone, :fix_date, :titleize_city, :update_tsved_at
