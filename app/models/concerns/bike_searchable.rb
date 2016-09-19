@@ -1,15 +1,16 @@
 module BikeSearchable
   extend ActiveSupport::Concern
   module ClassMethods
-    def search(query_params, interpreted_params = nil)
-      interpreted_p ||= searchable_interpreted_params(query_params)
-      matches = self
-      matches = matches.search_matching_serial(interpreted_p[:serial]) if interpreted_p[:serial]
-      matches = matches.search_matching_stolenness(interpreted_p) if interpreted_p[:stolenness]
-      matches = matches.where(manufacturer_id: interpreted_p[:manufacturer_ids]) if interpreted_p[:manufacturer_ids]
-      # Because each color can be in any potential spot, search using OR for each color
-      interpreted_p[:color_ids] && interpreted_p[:color_ids].each { |c| matches = matches.search_matching_color_ids(c) }
-      matches
+    def search(interpreted_params)
+      matches = interpreted_params[:serial] ? matches.search_matching_serial(interpreted_params[:serial]) : self
+      non_serial_matches(interpreted_params, matches)
+    end
+
+    def search_close_serials(interpreted_params)
+      return nil unless interpreted_params[:serial]
+      exact_match_ids = search(interpreted_params).pluck(:id)
+      non_serial_matches(interpreted_params, where.not(id: exact_match_ids))
+        .search_matching_serials(interpreted_params)
     end
 
     def selected_query_items(query_params)
@@ -22,11 +23,22 @@ module BikeSearchable
     end
 
     def searchable_interpreted_params(query_params)
-      (query_params[:serial].present? ? { serial: query_params[:serial] } : {}) # serial if present
+      normalized_serial = SerialNormalizer.new(serial: query_params[:serial]) if query_params[:serial].present?
+      (normalized_serial ? { normalized_serial: normalized_serial }  : {}) # serial if present
         .merge(searchable_query_items_query(query_params)) # query if present
         .merge(searchable_query_items_manufacturer_ids(query_params)) # manufacturer if present
         .merge(searchable_query_items_color_ids(query_params)) # color if present
         .merge(searchable_query_stolenness(query_params))
+    end
+
+    # Private (internal only) methods below here
+
+    def non_serial_matches(interpreted_params, matches)
+      matches = matches.search_matching_stolenness(interpreted_params) if interpreted_params[:stolenness]
+      matches = matches.where(manufacturer_id: interpreted_params[:manufacturer_ids]) if interpreted_params[:manufacturer_ids]
+      # Because each color can be in any potential spot, search using OR for each color
+      interpreted_params[:color_ids] && interpreted_params[:color_ids].each { |c| matches = matches.search_matching_color_ids(c) }
+      matches
     end
 
     def searchable_query_items_query(query_params)
@@ -70,8 +82,8 @@ module BikeSearchable
         .or(arel_table[:tertiary_frame_color_id].eq(color_ids)))
     end
 
-    def search_matching_serial(serial)
-      where('serial_normalized @@ ?', SerialNormalizer.new(serial: serial).normalized)
+    def search_matching_serial(serial, normalized_serial)
+      where('serial_normalized @@ ?', .normalized)
     end
 
     def search_matching_stolenness(interpreted_params)
@@ -83,5 +95,7 @@ module BikeSearchable
       end
       where(stolen: true)
     end
+
+    def search_matching_close_serials()
   end
 end

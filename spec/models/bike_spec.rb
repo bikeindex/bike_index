@@ -659,6 +659,7 @@ describe Bike do
     let(:manufacturer) { FactoryGirl.create(:manufacturer) }
     let(:color) { FactoryGirl.create(:color) }
     let(:multi_query_items) { [manufacturer.search_id, color.search_id, 'some other string', 'another string'] }
+    let(:interpreted_params) { Bike.searchable_interpreted_params(query_params) }
 
     describe 'interpreted_query_items' do
       context 'with multiple query_items strings' do
@@ -706,7 +707,7 @@ describe Bike do
       end
       context 'with nil query items' do
         let(:query_params) { { serial: 'some serial', query_items: nil } }
-        let(:target) { { serial: 'some serial' } }
+        let(:target) { { serial: SerialNormalizer.new(serial: 'some serial') } }
         it 'parses serial'  do
           expect(Bike.searchable_interpreted_params(query_params)).to eq target
         end
@@ -796,19 +797,19 @@ describe Bike do
         context 'single color' do
           let(:query_params) { { color_ids: [color.id] } }
           it 'matches bikes with the given color' do
-            expect(Bike.search(query_params).pluck(:id)).to eq([bike_1.id, bike_2.id, bike_3.id])
+            expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike_1.id, bike_2.id, bike_3.id])
           end
         end
         context 'second color' do
           let(:query_params) { { color_ids: [color.id, bike_2.primary_frame_color.id] } }
           it 'matches just the bike with both colors' do
-            expect(Bike.search(query_params).pluck(:id)).to eq([bike_2.id])
+            expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike_2.id])
           end
         end
         context 'and manufacturer_ids' do
           let(:query_params) { { color_ids: [color.id], manufacturer_ids: manufacturer.id } }
           it 'matches just the bike with the matching manufacturer' do
-            expect(Bike.search(query_params).pluck(:id)).to eq([bike_3.id])
+            expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike_3.id])
           end
         end
       end
@@ -821,13 +822,13 @@ describe Bike do
           context 'full homoglyph match' do
             let(:query_params) { { serial: 'STood ffer' } }
             it 'finds matching bikes' do
-              expect(Bike.search(query_params).pluck(:id)).to eq([bike.id])
+              expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike.id])
             end
           end
           context 'partial homoglyph match' do
             let(:query_params) { { serial: 'ST0oD' } }
             it 'finds matching bikes' do
-              expect(Bike.search(query_params).pluck(:id)).to eq([bike.id])
+              expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike.id])
             end
           end
         end
@@ -835,7 +836,7 @@ describe Bike do
           let(:bike) { FactoryGirl.create(:bike, serial_number: 'K10DY00047-bkd') }
           let(:query_params) { { serial: 'bkd-K1oDYooo47' } }
           it 'fulls text search' do
-            expect(Bike.search(query_params).pluck(:id)).to eq([bike.id])
+            expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike.id])
           end
         end
       end
@@ -846,7 +847,7 @@ describe Bike do
           expect(bike).to be_present
         end
         it 'selects matching the query' do
-          expect(Bike.search(query_params).pluck(:id)).to eq([bike.id])
+          expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike.id])
         end
       end
       context 'stolenness' do
@@ -859,19 +860,19 @@ describe Bike do
           context 'stolen_search' do
             let(:query_params) { { stolenness: 'stolen' } }
             it 'only stolen bikes' do
-              expect(Bike.search(query_params).pluck(:id)).to eq([stolen_bike.id])
+              expect(Bike.search(interpreted_params).pluck(:id)).to eq([stolen_bike.id])
             end
           end
           context 'non_stolen search' do
             let(:query_params) { { stolenness: 'non' } }
             it 'only non_stolen' do
-              expect(Bike.search(query_params).pluck(:id)).to eq([non_stolen_bike.id])
+              expect(Bike.search(interpreted_params).pluck(:id)).to eq([non_stolen_bike.id])
             end
           end
           context 'neither set' do
             let(:query_params) { { stolenness: '' } }
             it 'returns all bikes' do
-              expect(Bike.search(query_params).pluck(:id)).to eq([stolen_bike.id, non_stolen_bike.id])
+              expect(Bike.search(interpreted_params).pluck(:id)).to eq([stolen_bike.id, non_stolen_bike.id])
             end
           end
         end
@@ -891,21 +892,50 @@ describe Bike do
           end
           it 'finds the bike where we want it to be' do
             expect(Geocoder::Calculations).to receive(:bounding_box) { [39.989124784445764, -74.96065051723293, 41.43644261555424, -73.05123208276707] }
-            expect(Bike.search(query_params).pluck(:id)).to eq([bike_1.id])
+            expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike_1.id])
           end
         end
       end
     end
     describe 'search_with_fuzzy_serial' do
-      context 'exact serial' do
-        it 'does not return'
+      let(:stolen_bike) { FactoryGirl.create(:bike, serial_number: 'O|ILSZB-111JJJG8', manufacturer: manufacturer) }
+      let(:non_stolen_bike) { FactoryGirl.create(:bike, serial_number: 'O|ILSZB-111JJJJJ') }
+      before do
+        expect([non_stolen_bike, stolen_bike].size).to eq 2
       end
-      context 'close serial' do
-        it 'returns matching'
+      context 'no serial param' do
+        let(:query_params) { { query_items: [manufacturer.search_id], stolenness: 'non' } }
+        it 'returns nil' do
+          expect(Bike.search_close_serials(interpreted_params)).to be_nil
+        end
       end
-      context 'close serial with another search param' do
-        it 'returns matching'
+      context 'exact normalized serial' do
+        let(:query_params) { { serial: '011I528-111JJJJJ' } }
+        xit 'matches only non-exact' do
+          expect(Bike.search_close_serials(interpreted_params).pluck(:id)).to eq([stolen_bike.id])
+        end
       end
+      context 'close serial with stolenness' do
+        let(:query_params) { { serial: '011I528-111JJJk', stolenness: 'non' } }
+        xit 'returns matching stolenness' do
+          expect(Bike.search_close_serials(interpreted_params)).to eq([non_stolen_bike.id])
+        end
+      end
+      context 'close serial with query items' do
+        let(:query_params) { { serial: '011I528-111JJJk', query_items: [manufacturer.search_id] } }
+        xit 'returns matching' do
+          expect(Bike.search_close_serials(interpreted_params)).to eq([stolen_bike.id])
+        end
+      end
+      # it 'finds matching serial segments' do
+      #   bike = FactoryGirl.create(:bike, serial_number: 'st00d-fferd')
+      #   bike.create_normalized_serial_segments
+      #   bike.normalized_serial_segments
+      #   search = BikeSearcher.new(serial: 'fferds')
+      #   result = search.fuzzy_find_serial
+      #   expect(result.first).to eq(bike)
+      #   expect(result.count).to eq(1)
+      # end
     end
   end
 end
