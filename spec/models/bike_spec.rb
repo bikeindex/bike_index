@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Bike do
-
   describe 'validations' do
     it { is_expected.to belong_to :manufacturer }
     it { is_expected.to belong_to :primary_frame_color }
@@ -347,16 +346,16 @@ describe Bike do
     end
 
     it 'returns just the url of the video from a youtube iframe' do
-      youtube_share = '''
+      youtube_share = '
           <iframe width="560" height="315" src="//www.youtube.com/embed/Sv3xVOs7_No" frameborder="0" allowfullscreen></iframe>
-        '''
+        '
       @bike = Bike.new
       allow(@bike).to receive(:video_embed).and_return(youtube_share)
       expect(@bike.video_embed_src).to eq('//www.youtube.com/embed/Sv3xVOs7_No')
     end
 
     it 'returns just the url of the video from a vimeo iframe' do
-      vimeo_share = '''<iframe src="http://player.vimeo.com/video/13094257" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe><p><a href="http://vimeo.com/13094257">Fixed Gear Kuala Lumpur, RatsKL Putrajaya</a> from <a href="http://vimeo.com/user3635109">irmanhilmi</a> on <a href="http://vimeo.com">Vimeo</a>.</p>'''
+      vimeo_share = '<iframe src="http://player.vimeo.com/video/13094257" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe><p><a href="http://vimeo.com/13094257">Fixed Gear Kuala Lumpur, RatsKL Putrajaya</a> from <a href="http://vimeo.com/user3635109">irmanhilmi</a> on <a href="http://vimeo.com">Vimeo</a>.</p>'
       @bike = Bike.new
       allow(@bike).to receive(:video_embed).and_return(vimeo_share)
       expect(@bike.video_embed_src).to eq('http://player.vimeo.com/video/13094257')
@@ -447,7 +446,7 @@ describe Bike do
 
     it 'returns the bikes in the default scope pattern if there is no query' do
       bike = FactoryGirl.create(:bike, description: 'Phil wood hub')
-      bike2 = FactoryGirl.create(:bike)
+      FactoryGirl.create(:bike)
       bikes = Bike.text_search('')
       expect(bikes.first).to eq(bike)
     end
@@ -489,7 +488,7 @@ describe Bike do
   describe 'cache_photo' do
     it 'caches the photo' do
       bike = FactoryGirl.create(:bike)
-      image = FactoryGirl.create(:public_image, imageable: bike)
+      FactoryGirl.create(:public_image, imageable: bike)
       bike.reload
       bike.cache_photo
       expect(bike.thumb_path).not_to be_nil
@@ -527,8 +526,8 @@ describe Bike do
         bike.description = 'I love my bike'
         bike.cache_stolen_attributes
         expect(bike.all_description).to eq('I love my bike some theft description')
-        expect(bike.stolen_lat).to eq 40.7143528
-        expect(bike.stolen_long).to eq -74.0059731
+        expect(bike.stolen_lat).to eq(40.7143528)
+        expect(bike.stolen_long).to eq(-74.0059731)
       end
     end
     context 'no current_stolen_record' do
@@ -651,291 +650,6 @@ describe Bike do
       allow(bike).to receive(:type).and_return('bike')
       expect(bike.title_string).not_to match('</title><svg/onload=alert(document.cookie)>')
       expect(bike.title_string.length).to be > 5
-    end
-  end
-
-  context 'searching' do
-    let(:geocoded_location) { [{ data: default_location, cache_hit: nil }].as_json } # in spec_helper
-    let(:manufacturer) { FactoryGirl.create(:manufacturer) }
-    let(:color) { FactoryGirl.create(:color) }
-    let(:multi_query_items) { [manufacturer.search_id, color.search_id, 'some other string', 'another string'] }
-    let(:interpreted_params) { Bike.searchable_interpreted_params(query_params) }
-
-    describe 'interpreted_query_items' do
-      context 'with multiple query_items strings' do
-        let(:query_params) { { serial: nil, query_items: multi_query_items } }
-        let(:target) do
-          {
-            manufacturer_ids: [manufacturer.id],
-            color_ids: [color.id],
-            query: 'some other string another string'
-          }
-        end
-        context 'with query_params' do
-          it 'parses search_ids for manufacturers and colors'  do
-            expect(Bike.searchable_interpreted_params(query_params)).to eq target
-          end
-        end
-        context 'with passed ids' do
-          it 'uses the passed ids' do
-            expect(Bike.searchable_interpreted_params(target)).to eq target
-          end
-        end
-      end
-      context 'multiple manufacturer_ids and color_ids' do
-        let(:manufacturer_2) { FactoryGirl.create(:manufacturer) }
-        let(:color_2) { FactoryGirl.create(:color) }
-        let(:query_items) { multi_query_items + [manufacturer_2.search_id, color_2.search_id] }
-        let(:query_params) { { query_items: query_items } }
-        let(:target) do
-          {
-            manufacturer_ids: [manufacturer.id, manufacturer_2.id],
-            color_ids: [color.id, color_2.id],
-            query: 'some other string another string'
-          }
-        end
-        it 'returns returns them all' do
-          expect(Bike.searchable_interpreted_params(query_params)).to eq target
-        end
-      end
-      context 'just query in query_items' do
-        let(:query_params) { { query_items: ['something'] } }
-        let(:target) { { query: 'something' } }
-        it 'returns just query' do
-          expect(Bike.searchable_interpreted_params(query_params)).to eq target
-        end
-      end
-      context 'with nil query items' do
-        let(:query_params) { { serial: 'some serial', query_items: nil } }
-        let(:target) { { serial: SerialNormalizer.new(serial: 'some serial') } }
-        it 'parses serial'  do
-          expect(Bike.searchable_interpreted_params(query_params)).to eq target
-        end
-      end
-      context 'stolenness proximity'  do
-        include_context :geocoder_default_location
-        context 'with a proximity radius less than 1' do
-          let(:query_params) { { stolenness: 'proximity', proximity: 'these parts', distance: '-1' } }
-          let(:target) { { stolenness: 'proximity', location: 'these parts', distance: 100 } }
-          it 'returns location and distance of 100' do
-            expect(Bike.searchable_interpreted_params(query_params)).to eq target
-          end
-        end
-        context 'proximity of anywhere' do
-          let(:query_params) { { stolenness: 'proximity', proximity: 'anywhere', distance: 100 } }
-          let(:target) { { stolenness: 'stolen' } }
-          it 'returns a non-proximity search' do
-            expect(Bike.searchable_interpreted_params(query_params)).to eq target
-          end
-        end
-        context 'proximity of empty string' do
-          let(:query_params) { { stolenness: 'proximity', proximity: '     ', distance: 100 } }
-          let(:target) { { stolenness: 'stolen' } }
-          it 'returns a non-proximity search' do
-            expect(Bike.searchable_interpreted_params(query_params)).to eq target
-          end
-        end
-        %w(ip you).each do |ip_string|
-          context "Reverse geocode IP lookup for proximity: '#{ip_string}'" do
-            let(:query_params) { { stolenness: 'proximity', proximity: ip_string, distance: '7 ' } }
-            it 'returns the location and the distance' do
-              result = Bike.searchable_interpreted_params(query_params)
-              expect(result[:distance]).to eq 7
-              expect(result[:stolenness]).to eq 'proximity'
-              expect(result[:location].as_json).to eq geocoded_location.as_json
-            end
-          end
-        end
-      end
-    end
-
-    describe 'query_items' do
-      context 'functioning query' do
-        let(:query_params) { { serial: nil, query_items: multi_query_items } }
-        let(:target) do
-          [
-            'some other string another string',
-            manufacturer.autocomplete_result_hash,
-            color.autocomplete_result_hash
-          ]
-        end
-        it 'returns the query items hashes (for display in HTML)' do
-          expect(Bike.selected_query_items(query_params)).to eq target
-        end
-      end
-      context 'unknown manufacturers and colors query' do
-        # Instead of erroring, just skip the unknown manufacturers
-        let(:query_params) { { serial: 'XXX8c8c', query_items: ['m_1000', 'c_999', 'special handlebars'] } }
-        let(:target) { ['special handlebars'] }
-        it 'returns the query items without erroring' do
-          expect(Bike.selected_query_items(query_params)).to eq target
-        end
-      end
-    end
-
-    describe 'search' do
-      context 'color_ids of primary, secondary and tertiary' do
-        let(:bike_1) { FactoryGirl.create(:bike, primary_frame_color: color) }
-        let(:bike_2) { FactoryGirl.create(:bike, secondary_frame_color: color) }
-        let(:bike_3) { FactoryGirl.create(:bike, tertiary_frame_color: color, manufacturer: manufacturer) }
-        let(:all_color_ids) do
-          [
-            bike_1.primary_frame_color_id,
-            bike_2.primary_frame_color_id,
-            bike_3.primary_frame_color_id,
-            bike_1.secondary_frame_color_id,
-            bike_2.secondary_frame_color_id,
-            bike_3.secondary_frame_color_id,
-            bike_1.tertiary_frame_color_id,
-            bike_2.tertiary_frame_color_id,
-            bike_3.tertiary_frame_color_id,
-          ]
-        end
-        before do
-          expect(all_color_ids.count(color.id)).to eq 3 # Each bike has color only once
-        end
-        context 'single color' do
-          let(:query_params) { { color_ids: [color.id] } }
-          it 'matches bikes with the given color' do
-            expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike_1.id, bike_2.id, bike_3.id])
-          end
-        end
-        context 'second color' do
-          let(:query_params) { { color_ids: [color.id, bike_2.primary_frame_color.id] } }
-          it 'matches just the bike with both colors' do
-            expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike_2.id])
-          end
-        end
-        context 'and manufacturer_ids' do
-          let(:query_params) { { color_ids: [color.id], manufacturer_ids: manufacturer.id } }
-          it 'matches just the bike with the matching manufacturer' do
-            expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike_3.id])
-          end
-        end
-      end
-      context 'serial' do
-        before do
-          expect(bike).to be_present
-        end
-        context 'stood-ffer' do
-          let(:bike) { FactoryGirl.create(:bike, serial_number: 'st00d-ffer') }
-          context 'full homoglyph match' do
-            let(:query_params) { { serial: 'STood ffer' } }
-            it 'finds matching bikes' do
-              expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike.id])
-            end
-          end
-          context 'partial homoglyph match' do
-            let(:query_params) { { serial: 'ST0oD' } }
-            it 'finds matching bikes' do
-              expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike.id])
-            end
-          end
-        end
-        context 'reversed serial' do
-          let(:bike) { FactoryGirl.create(:bike, serial_number: 'K10DY00047-bkd') }
-          let(:query_params) { { serial: 'bkd-K1oDYooo47' } }
-          it 'fulls text search' do
-            expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike.id])
-          end
-        end
-      end
-      context 'query' do
-        let(:bike) { FactoryGirl.create(:bike, description: 'Booger') }
-        let(:query_params) { { query: 'booger' } }
-        before do
-          expect(bike).to be_present
-        end
-        it 'selects matching the query' do
-          expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike.id])
-        end
-      end
-      context 'stolenness' do
-        context 'non-proximity' do
-          let(:stolen_bike) { FactoryGirl.create(:stolen_bike) }
-          let(:non_stolen_bike) { FactoryGirl.create(:bike) }
-          before do
-            expect([stolen_bike, non_stolen_bike].size).to eq 2
-          end
-          context 'stolen_search' do
-            let(:query_params) { { stolenness: 'stolen' } }
-            it 'only stolen bikes' do
-              expect(Bike.search(interpreted_params).pluck(:id)).to eq([stolen_bike.id])
-            end
-          end
-          context 'non_stolen search' do
-            let(:query_params) { { stolenness: 'non' } }
-            it 'only non_stolen' do
-              expect(Bike.search(interpreted_params).pluck(:id)).to eq([non_stolen_bike.id])
-            end
-          end
-          context 'neither set' do
-            let(:query_params) { { stolenness: '' } }
-            it 'returns all bikes' do
-              expect(Bike.search(interpreted_params).pluck(:id)).to eq([stolen_bike.id, non_stolen_bike.id])
-            end
-          end
-        end
-        context 'proximity' do
-          include_context :geocoder_default_location
-          let(:stolen_record_1) { FactoryGirl.create(:stolen_record, latitude: default_location[:latitude], longitude: default_location[:longitude]) }
-          let(:bike_1) { stolen_record_1.bike }
-          let(:stolen_record_2) { FactoryGirl.create(:stolen_record, latitude: 41.8961603, longitude: -87.677215) }
-          let(:bike_2) { stolen_record_2.bike }
-          let(:query_params) { { stolenness: 'proximity', proximity: 'New York, NY', distance: 200 } }
-          before do
-            bike_1.update_attribute :stolen, true
-            bike_2.update_attribute :stolen, true
-            bike_1.reload && bike_2.reload
-            expect(bike_1.stolen_lat).to be_present
-            expect(bike_2.stolen_lat).to_not eq stolen_record_1[:latitude]
-          end
-          it 'finds the bike where we want it to be' do
-            expect(Geocoder::Calculations).to receive(:bounding_box) { [39.989124784445764, -74.96065051723293, 41.43644261555424, -73.05123208276707] }
-            expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike_1.id])
-          end
-        end
-      end
-    end
-    describe 'search_with_fuzzy_serial' do
-      let(:stolen_bike) { FactoryGirl.create(:bike, serial_number: 'O|ILSZB-111JJJG8', manufacturer: manufacturer) }
-      let(:non_stolen_bike) { FactoryGirl.create(:bike, serial_number: 'O|ILSZB-111JJJJJ') }
-      before do
-        expect([non_stolen_bike, stolen_bike].size).to eq 2
-      end
-      context 'no serial param' do
-        let(:query_params) { { query_items: [manufacturer.search_id], stolenness: 'non' } }
-        it 'returns nil' do
-          expect(Bike.search_close_serials(interpreted_params)).to be_nil
-        end
-      end
-      context 'exact normalized serial' do
-        let(:query_params) { { serial: '011I528-111JJJJJ' } }
-        xit 'matches only non-exact' do
-          expect(Bike.search_close_serials(interpreted_params).pluck(:id)).to eq([stolen_bike.id])
-        end
-      end
-      context 'close serial with stolenness' do
-        let(:query_params) { { serial: '011I528-111JJJk', stolenness: 'non' } }
-        xit 'returns matching stolenness' do
-          expect(Bike.search_close_serials(interpreted_params)).to eq([non_stolen_bike.id])
-        end
-      end
-      context 'close serial with query items' do
-        let(:query_params) { { serial: '011I528-111JJJk', query_items: [manufacturer.search_id] } }
-        xit 'returns matching' do
-          expect(Bike.search_close_serials(interpreted_params)).to eq([stolen_bike.id])
-        end
-      end
-      # it 'finds matching serial segments' do
-      #   bike = FactoryGirl.create(:bike, serial_number: 'st00d-fferd')
-      #   bike.create_normalized_serial_segments
-      #   bike.normalized_serial_segments
-      #   search = BikeSearcher.new(serial: 'fferds')
-      #   result = search.fuzzy_find_serial
-      #   expect(result.first).to eq(bike)
-      #   expect(result.count).to eq(1)
-      # end
     end
   end
 end

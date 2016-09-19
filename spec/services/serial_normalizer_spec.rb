@@ -27,7 +27,7 @@ describe SerialNormalizer do
     end
     it 'returns nil if serial is absent' do
       segments = SerialNormalizer.new(serial: 'absent').normalized_segments
-      expect(segments).to be_nil
+      expect(segments).to eq([])
     end
   end
 
