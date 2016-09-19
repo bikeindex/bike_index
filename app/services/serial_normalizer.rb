@@ -8,8 +8,8 @@ class SerialNormalizer
   end
 
   def normalized
-    return 'absent' unless @serial && @serial == 'ABSENT'
-    normed = @serial.upcase
+    return 'absent' if @serial.blank? || @serial == 'ABSENT'
+    normed = @serial.dup
     serial_substitutions.each do |key, value|
       normed.gsub!(/[#{key}]/, value)
       normed.gsub!(/[^\w]|[_]/, ' ') # turn all non letter/numbers into spaces
@@ -18,7 +18,7 @@ class SerialNormalizer
   end
 
   def normalized_segments
-    return [] if @serial == 'ABSENT'
+    return [] if normalized == 'absent'
     normalized.split(' ').reject(&:empty?).uniq
   end
 
