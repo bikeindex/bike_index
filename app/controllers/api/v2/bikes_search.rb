@@ -84,7 +84,7 @@ module API
 
         desc 'Count of bikes matching search', {
           notes: <<-NOTE
-            Include all the options you would pass in in your search. This will respond with a hash of the number of bikes matching your search for each type:
+            Include all the options you would pass in your search. This will respond with a hash of the number of bikes matching your search for each type:
 
             ```javascript
             {
