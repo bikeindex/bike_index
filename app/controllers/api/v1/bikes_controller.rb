@@ -46,7 +46,7 @@ module Api
           since_date = Time.at(params[:updated_since].to_i).utc.to_datetime
           stolen = stolen.where("updated_at >= ?", since_date)
         end
-        render json: stolen.pluck(:bike_id).to_json
+        render json: { bikes: stolen.pluck(:bike_id) }
       end
 
       def close_serials
