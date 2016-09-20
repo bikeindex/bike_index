@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe Bike do
+  it_behaves_like 'bike_searchable'
   describe 'validations' do
     it { is_expected.to belong_to :manufacturer }
     it { is_expected.to belong_to :primary_frame_color }
