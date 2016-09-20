@@ -1,6 +1,6 @@
 module API
   module V2
-    class Bikes < API::V2::Root
+    class Bikes < API::Base
       include API::V2::Defaults
 
       helpers do

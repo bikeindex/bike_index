@@ -1,6 +1,6 @@
 module API
   module V3
-    class Root < API::Base
+    class RootV3 < API::Base
       format :json
       version 'v3'
       default_error_formatter :json

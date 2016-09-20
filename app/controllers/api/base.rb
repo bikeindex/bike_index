@@ -15,8 +15,8 @@ module API
     use GrapeLogging::Middleware::RequestLogger, instrumentation_key: 'grape_key',
                                                  include: [GrapeLogging::Loggers::BinxLogger.new,
                                                            GrapeLogging::Loggers::FilterParameters.new]
-    mount API::V2::Root
-    mount API::V3::Root
+    mount API::V3::RootV3
+    mount API::V2::RootV2
 
     def self.respond_to_error(e)
       logger.error e unless Rails.env.test? # Breaks tests...

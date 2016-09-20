@@ -1,6 +1,6 @@
 module API
   module V2
-    class Me < API::V2::Root
+    class Me < API::Base
       include API::V2::Defaults
 
       resource :me, desc: "Operations about the current user" do

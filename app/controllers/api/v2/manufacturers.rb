@@ -1,6 +1,6 @@
 module API
   module V2
-    class Manufacturers < API::V2::Root
+    class Manufacturers < API::Base
       include API::V2::Defaults
 
       resource :manufacturers, desc: "Accepted manufacturers" do

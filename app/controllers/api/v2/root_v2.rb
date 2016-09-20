@@ -1,8 +1,8 @@
 module API
   module V2
-    class Root < API::Base
+    class RootV2 < API::Base
       format :json
-      version 'v2'
+      version %w(v3 v2)
       default_error_formatter :json
       content_type :json, 'application/json'
       use ::WineBouncer::OAuth2
