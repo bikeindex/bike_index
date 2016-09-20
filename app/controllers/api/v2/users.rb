@@ -1,6 +1,6 @@
 module API
   module V2
-    class Users < API::V2::Root
+    class Users < API::Base
       include API::V2::Defaults
 
       resource :users do

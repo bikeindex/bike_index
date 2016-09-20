@@ -1,8 +1,4 @@
 class @AdDisplayer
-  ad_units =
-    top468x60: 13407
-    right300x600: 13403
-
   constructor: ->
     for id in Object.keys(ad_units)
       @getAd(id) if document.getElementById(id)
@@ -11,20 +7,3 @@ class @AdDisplayer
     ad_body = '<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8140931939249510" data-ad-slot="7159478183" data-ad-format="auto"></ins>'
     $("##{unit}").html(ad_body).addClass('rendered-ad')
     (adsbygoogle = window.adsbygoogle || []).push({})
-
-    # url = "https://classic.avantlink.com/api.php?affiliate_id=156890&module=AdSearch&output=html&website_id=195774&include_ad_group_ids=#{ad_units[unit]}"
-    # link_pattern = /\<a.*/ig # Match lines that are links
-    # $.ajax
-    #   type: 'GET'
-    #   url: url
-    #   success: (data, textStatus, jqXHR) ->
-    #     links = data.match(link_pattern)
-    #     # Select a random link from the list
-    #     ad = links[Math.floor(Math.random() * links.length)]
-    #     # pull out just the link and image source (wouldn't it be nice if they offered JSON?!)
-    #     href = ad.match(/href=.[^\"|\']*./i)
-    #     src = ad.match(/src=.[^\"|\']*./i)
-    #     render_html = "<a #{href}><img #{src}></a>"
-    #     $("##{unit}").html(render_html).addClass('rendered-ad')
-    #   error: (data, textStatus, jqXHR) ->
-    #     console.log data
