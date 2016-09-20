@@ -105,7 +105,7 @@ describe 'Bikes API V3' do
       expect(bike.handlebar_type).to eq(handlebar_type)
       creation_state = bike.creation_state
       expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([true, true, true])
-      expect(creation_state.origin).to eq 'api_v3'
+      # expect(creation_state.origin).to eq 'api_v3'
     end
 
     it "doesn't send an email" do
@@ -129,7 +129,7 @@ describe 'Bikes API V3' do
       expect(result['serial']).to eq(bike_attrs[:serial])
       expect(result['manufacturer_name']).to eq(bike_attrs[:manufacturer])
       bike = Bike.unscoped.find(result['id'])
-      expect(bike.creation_state.origin).to eq 'api_v3'
+      # expect(bike.creation_state.origin).to eq 'api_v3'
       expect(bike.example).to be_truthy
       expect(bike.is_for_sale).to be_falsey
     end
@@ -168,7 +168,7 @@ describe 'Bikes API V3' do
       expect(result['stolen_record']['date_stolen']).to eq(date_stolen)
       bike = Bike.find(result['id'])
       expect(bike.creation_organization).to eq(organization)
-      expect(bike.creation_state.origin).to eq 'api_v3'
+      # expect(bike.creation_state.origin).to eq 'api_v3'
       expect(bike.creation_state.organization).to eq organization
       expect(bike.stolen).to be_truthy
       expect(bike.current_stolen_record_id).to be_present
@@ -207,7 +207,7 @@ describe 'Bikes API V3' do
       }
     end
     before :each do
-      create_doorkeeper_app(with_v3_accessor: true)
+      create_doorkeeper_app(with_v2_accessor: true)
       FactoryGirl.create(:wheel_size, iso_bsd: 559)
       FactoryGirl.create(:cycle_type, slug: 'bike')
       FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
@@ -248,7 +248,7 @@ describe 'Bikes API V3' do
       expect(bike.front_wheel_size.iso_bsd).to eq 559
       expect(bike.rear_tire_narrow).to be_truthy
       expect(bike.front_tire_narrow).to be_truthy
-      expect(bike.creation_state.origin).to eq 'api_v3'
+      # expect(bike.creation_state.origin).to eq 'api_v3'
       expect(bike.creation_state.organization).to eq organization
     end
 
