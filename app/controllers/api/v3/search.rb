@@ -8,7 +8,7 @@ module API
           optional :colors, type: Array
           optional :location, type: String, desc: 'Location for proximity search', default: 'IP'
           optional :distance, type: String, desc: 'Distance in miles from `location` for proximity search', default: 10
-          optional :stolenness, type: String, values: %w(non stolen proximity all), default: 'all'
+          optional :stolenness, type: String, values: %w(non stolen proximity all), default: 'stolen'
           optional :query_items, type: Array
         end
         params :search do
@@ -16,7 +16,7 @@ module API
           use :non_serial_search_params
         end
 
-        def ip_address
+        def forwarded_ip_address
           request.env['HTTP_X_FORWARDED_FOR'].split(',')[0] if request.env['HTTP_X_FORWARDED_FOR']
         end
       end
@@ -49,7 +49,7 @@ module API
         end
         get '/count', root: 'bikes', each_serializer: BikeV2Serializer do
           # { 'declared_params' => declared(params, include_missing: false) }
-          interpreted_params = Bike.searchable_interpreted_params(params.merge(stolenness: 'proximity'), ip: ip_address)
+          interpreted_params = Bike.searchable_interpreted_params(params.merge(stolenness: 'proximity'), ip: forwarded_ip_address)
           {
             proximity: Bike.search(interpreted_params).count,
             stolen: Bike.search(interpreted_params.merge(stolenness: 'stolen')).count,

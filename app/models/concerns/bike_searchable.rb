@@ -8,7 +8,7 @@ module BikeSearchable
     #   query: full text search string. Overrides query_items if passed explicitly
     #   colors: array of colors, friendly found, faster if integers. Overrides query_items if passed explicitly
     #   manufacturer: friendly found, faster if integer. Overrides query_items if passed explicitly.
-    #   stolenness: nil, 'non', 'stolen', 'proximity'
+    #   stolenness: can be 'all', 'non', 'stolen', 'proximity'. Defaults to 'stolen'
     #   location: location for proximity search. Only for stolenness == 'proximity'. 'ip'/'you' uses IP geocoding and returns location object
     #   distance: distance in miles for matches. Only for stolenness == 'proximity'
     def searchable_interpreted_params(query_params, ip:)
@@ -26,19 +26,21 @@ module BikeSearchable
     end
 
     def search_close_serials(interpreted_params)
-      return Bike.where(id: nil) unless interpreted_params[:normalized_serial]
+      return nil unless interpreted_params[:normalized_serial]
       exact_match_ids = search(interpreted_params).pluck(:id)
       non_serial_matches(interpreted_params, where.not(id: exact_match_ids))
         .search_matching_close_serials(interpreted_params[:normalized_serial])
     end
 
-    def selected_query_items(interpreted_params) # the initial options for the main select search input
+    # the initial options for the main select search input
+    def selected_query_items_options(interpreted_params)
       # Ignore manufacturer_id and color_ids we don't have
-      [interpreted_params[:query]] +
-        interpreted_params[:manufacturer_id].map { |id| Manufacturer.friendly_find(id) }
-        .compact.map(&:autocomplete_result_hash) +
-        interpreted_params[:color_ids].map { |id| Color.friendly_find(id) }
-        .compact.map(&:autocomplete_result_hash)
+      items = interpreted_params[:query] && [interpreted_params[:query]] || []
+      items += [interpreted_params[:manufacturer_id]].flatten.map { |id| Manufacturer.friendly_find(id) }
+                 .compact.map(&:autocomplete_result_hash) if interpreted_params[:manufacturer_id]
+      items += interpreted_params[:color_ids].map { |id| Color.friendly_find(id) }
+                 .compact.map(&:autocomplete_result_hash) if interpreted_params[:color_ids]
+      items.flatten.compact
     end
 
     # Private (internal only) methods below here, as defined at the start
@@ -58,14 +60,13 @@ module BikeSearchable
     end
 
     def searchable_query_items_manufacturer_id(query_params)
-      # Even though we're expecting a singular manufacturer, we need to deal with arrays because
-      # of how the multi-select search works
+      # we expect a singular manufacturer but deal with arrays because the multi-select search
       manufacturer_id = extracted_query_items_manufacturer_id(query_params)
       if manufacturer_id && !manufacturer_id.is_a?(Integer)
         manufacturer_id = [manufacturer_id].flatten.map do |m_id|
           next m_id.to_i if m_id.is_a?(Integer) || m_id.strip =~ /\A\d*\z/
           Manufacturer.friendly_id_find(m_id)
-        end
+        end.compact
         manufacturer_id = manufacturer_id.first if manufacturer_id.count == 1
       end
       manufacturer_id ? { manufacturer_id: manufacturer_id } : {}
@@ -83,9 +84,11 @@ module BikeSearchable
     end
 
     def searchable_query_stolenness(query_params, ip)
-      return {} unless query_params[:stolenness].present? && query_params[:stolenness] != 'all'
-      return { stolenness: 'non' } if query_params[:stolenness] == 'non'
-      extracted_searchable_proximity_hash(query_params, ip) || { stolenness: 'stolen' }
+      if query_params[:stolenness] && %w(all non).include?(query_params[:stolenness])
+        query_params[:stolenness] == 'non' ? { stolenness: 'non' } : {}
+      else
+        extracted_searchable_proximity_hash(query_params, ip) || { stolenness: 'stolen' }
+      end
     end
 
     def extracted_query_items_manufacturer_id(query_params)

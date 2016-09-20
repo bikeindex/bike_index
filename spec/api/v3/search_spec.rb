@@ -9,7 +9,7 @@ describe 'Search API V3' do
       it 'returns an error message' do
         get '/api/v3/search/count', stolenness: 'something else', format: :json
         result = JSON.parse(response.body)
-        expect(result['error']).to match /stolenness/i
+        expect(result['error']).to match(/stolenness/i)
         expect(response.status).to eq(400)
       end
     end

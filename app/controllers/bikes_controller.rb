@@ -22,23 +22,26 @@ class BikesController < ApplicationController
   layout 'application_revised'
 
   def index
-    params[:stolen] = true unless params[:stolen].present? || params[:non_stolen].present?
-    search = BikeSearcher.new(params, is_ip_proximity_search)
-    bikes = search.find_bikes
-    @location = search.location
+    @interpreted_params = Bike.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
+    # search = BikeSearcher.new(params, is_ip_proximity_search)
+    # bikes = search.find_bikes
+    # @location = search.location
     page = params[:page] || 1
     @per_page = params[:per_page] || 10
-    bikes = bikes.page(page).per(@per_page)
-    if params[:serial].present? && page == 1
-      secondary_bikes = search.fuzzy_find_serial
-      @secondary_bikes = secondary_bikes.decorate if secondary_bikes.present?
-    end
-    @bikes = bikes.decorate
+    @bikes = Bike.search(@interpreted_params).page(page).per(@per_page).decorate
+    @close_serial_bikes = Bike.search_close_serials(@interpreted_params)
+    @close_serial_bikes = @close_serial_bikes.limit(10) if @close_serial_bikes
+    # if params[:serial].present? && page == 1
+    #   secondary_bikes = search.fuzzy_find_serial
+    #   @secondary_bikes = secondary_bikes.decorate if secondary_bikes.present?
+    # end
+    # @bikes = bikes.decorate
+    @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
     # @query = params[:query]
     # @query = request.query_parameters()
     @url = request.original_url
-    @stolenness = search.stolenness_type
-    @selectize_items = search.selectize_items
+    # @stolenness = search.stolenness_type
+    # @selectize_items = search.selectize_items
   end
 
   def show
@@ -201,13 +204,9 @@ class BikesController < ApplicationController
 
   protected
 
-  def is_ip_proximity_search
-    return false unless params[:proximity].present?
-    proximity = params[:proximity].strip.downcase
-    return false unless proximity == 'ip' || proximity == 'you'
-    # Set the ip from forwarded for, to take care of reverse proxy and cloudflare ips
-    params[:proximity] = request.env['HTTP_X_FORWARDED_FOR'].split(',')[0] if request.env['HTTP_X_FORWARDED_FOR']
-    true
+  def permitted_search_params
+    params.permit(:query, :manufacturer, :colors, :location, :distance,
+                  :stolenness, :query_items, :serial)
   end
 
   def find_bike

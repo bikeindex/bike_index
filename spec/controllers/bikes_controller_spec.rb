@@ -3,123 +3,128 @@ require 'spec_helper'
 describe BikesController do
   describe 'index' do
     include_context :geocoder_default_location
-    context 'no subdomain' do
-      context 'legacy' do
-        it 'renders' do
-          get :index
-          expect(response.status).to eq(200)
-          expect(assigns(:location)).to_not be_present
-          expect(flash).to_not be_present
-          expect(assigns(:per_page)).to eq 10
-        end
-      end
-      context 'revised' do
-        context 'no params' do
-          it 'renders' do
-            get :index
-            expect(response.status).to eq(200)
-            expect(response).to render_template(:index)
-            expect(response).to render_with_layout('application_revised')
-            expect(flash).to_not be_present
-            expect(assigns(:location)).to_not be_present
-            expect(assigns(:per_page)).to eq 10
-            expect(assigns(:stolenness)).to eq 'stolen'
-          end
-        end
-        context 'default parameters (in the HTML)' do
-          it 'renders stolen, non-proximity' do
-            get :index,
-                utf8: '✓',
-                query: '',
-                proximity: 'Chicago',
-                proximity_radius: '100',
-                stolen: 'true',
-                non_stolen: '',
-                non_proximity: true
-            expect(response.status).to eq(200)
-            expect(response).to render_with_layout('application_revised')
-            expect(assigns(:location)).to_not be_present
-            expect(flash).to_not be_present
-            expect(assigns(:per_page)).to eq 10
-            expect(assigns(:stolenness)).to eq 'stolen'
-          end
-        end
-        context 'proximity' do
-          context 'proximity of "ip"' do
-            it 'renders, assigns location via geocoder' do
-              # Without a matching current stolen record, it doesn't go whole way through proximity
-              FactoryGirl.create(:stolen_bike)
-              get :index, proximity: 'ip', stolen: true
-              expect(response.status).to eq(200)
-              expect(flash).to_not be_present
-              expect(assigns(:per_page)).to eq 10
-              target_location = [{ data: default_location, cache_hit: nil }].as_json # in spec_helper
-              expect(assigns(:location).as_json).to eq target_location
-              expect(assigns(:stolenness)).to eq 'stolen_proximity'
-              expect(response).to render_with_layout('application_revised')
-            end
-          end
-          context 'proximity of "you"' do
-            it 'renders, assigns location via geocoder' do
-              # Without a matching current stolen record, it doesn't go whole way through proximity
-              FactoryGirl.create(:stolen_bike)
-              get :index, proximity: 'you', stolen: true
-              expect(response.status).to eq(200)
-              expect(flash).to_not be_present
-              expect(assigns(:per_page)).to eq 10
-              target_location = [{ data: default_location, cache_hit: nil }].as_json # in spec_helper
-              expect(assigns(:location).as_json).to eq target_location
-              expect(assigns(:stolenness)).to eq 'stolen_proximity'
-              expect(response).to render_with_layout('application_revised')
-            end
-          end
-        end
-        context 'serial_param' do
-          it 'renders' do
-            manufacturer = FactoryGirl.create(:manufacturer)
-            color = FactoryGirl.create(:color)
-            get :index,
-                query: "c_#{color.id},s#serialzzzzzz#,m_#{manufacturer.id}",
-                stolen: '',
-                non_stolen: 'true'
-            expect(response.status).to eq(200)
-            target_selectize_items = [
-              manufacturer.autocomplete_result_hash,
-              color.autocomplete_result_hash,
-              { id: 'serial', search_id: 's#serialzzzzzz#', text: 'serialzzzzzz' }
-            ].as_json
-            expect(assigns(:selectize_items)).to eq target_selectize_items
-            expect(assigns(:stolenness)).to eq 'non_stolen'
-            expect(response).to render_with_layout('application_revised')
-          end
-        end
-        context 'problematic deserialization params' do
-          it 'renders and correctly deserializes serial' do
-            get :index,
-                utf8: '✓',
-                query: 's#R910860723#',
-                proximity: 'ip',
-                proximity_radius: '100',
-                stolen: 'true',
-                non_stolen: '',
-                non_proximity: ''
-            expect(response.status).to eq(200)
-            target_selectize_items = [
-              { id: 'serial', search_id: 's#R910860723#', text: 'R910860723' }
-            ].as_json
-            expect(assigns(:selectize_items)).to eq target_selectize_items
-            expect(assigns(:stolenness)).to eq 'stolen_proximity'
-            expect(response).to render_with_layout('application_revised')
-          end
-        end
-      end
-    end
+    let(:stolen_bike) { FactoryGirl.create(:stolen_bike, latitude: default_location[:latitude], longitude: default_location[:longitude]) }
+    let(:serial) { '1234567890' }
+    let(:stolen_bike_2) { FactoryGirl.create(:stolen_bike) }
+    let(:non_stolen_bike) { FactoryGirl.create(:bike, serial_number: '1234567890') }
+    let(:ip_address) { '127.0.0.1' }
+    let(:target_interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: ip_address) }
     context 'with subdomain' do
       it 'redirects to no subdomain' do
         @request.host = 'stolen.example.com'
         get :index
         expect(response).to redirect_to bikes_url(subdomain: false)
       end
+    end
+    describe 'assignment' do
+      before do
+        expect([non_stolen_bike, stolen_bike, stolen_bike_2].size).to eq 3
+      end
+      context 'no params' do
+        it 'assigns defaults, stolenness: stolen' do
+          get :index
+          expect(response.status).to eq(200)
+          expect(response).to render_template(:index)
+          expect(response).to render_with_layout('application_revised')
+          expect(flash).to_not be_present
+          expect(assigns(:per_page)).to eq 10
+          expect(assigns(:interpreted_params)).to eq({ stolenness: 'stolen' })
+          expect(assigns(:selected_query_items_options)).to eq([])
+          expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id, stolen_bike_2.id])
+        end
+      end
+      context 'query_items and serial search' do
+        let(:manufacturer) { non_stolen_bike.manufacturer }
+        let(:color) { non_stolen_bike.primary_frame_color }
+        let(:query_params) { { serial: "#{serial}0d", query_items: [color.search_id, manufacturer.search_id], stolenness: 'non' } }
+        let(:target_selected_query_items_options) { Bike.selected_query_items_options(target_interpreted_params) }
+        it 'assigns passed parameters, assigns close_serial_bikes' do
+          get :index, query_params
+          expect(assigns(:interpreted_params)).to eq target_interpreted_params
+          expect(assigns(:selected_query_items_options)).to eq target_selected_query_items_options
+          expect(assigns(:bikes).map(&:id)).to eq([])
+          expect(assigns(:close_serial_bikes).map(&:id)).to eq([non_stolen_bike.id])
+        end
+      end
+      context 'ip proximity' do
+        let(:query_params) { { location: 'you', stolenness: 'proximity' } }
+
+        it 'assigns passed parameters and close_serials' do
+          expect(Geocoder).to receive(:search) { production_ip_search_result }
+          get :index, query_params
+          expect(assigns(:selected_query_items_options)).to eq target_interpreted_params
+          expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id])
+        end
+      end
+      #   context 'proximity' do
+      #     context 'proximity of "ip"' do
+      #       it 'renders, assigns location via geocoder' do
+      #         # Without a matching current stolen record, it doesn't go whole way through proximity
+      #         FactoryGirl.create(:stolen_bike)
+      #         get :index, proximity: 'ip', stolen: true
+      #         expect(response.status).to eq(200)
+      #         expect(flash).to_not be_present
+      #         expect(assigns(:per_page)).to eq 10
+      #         target_location = [{ data: default_location, cache_hit: nil }].as_json # in spec_helper
+      #         expect(assigns(:location).as_json).to eq target_location
+      #         expect(assigns(:stolenness)).to eq 'stolen_proximity'
+      #         expect(response).to render_with_layout('application_revised')
+      #       end
+      #     end
+      #     context 'proximity of "you"' do
+      #       it 'renders, assigns location via geocoder' do
+      #         # Without a matching current stolen record, it doesn't go whole way through proximity
+      #         FactoryGirl.create(:stolen_bike)
+      #         get :index, proximity: 'you', stolen: true
+      #         expect(response.status).to eq(200)
+      #         expect(flash).to_not be_present
+      #         expect(assigns(:per_page)).to eq 10
+      #         target_location = [{ data: default_location, cache_hit: nil }].as_json # in spec_helper
+      #         expect(assigns(:location).as_json).to eq target_location
+      #         expect(assigns(:stolenness)).to eq 'stolen_proximity'
+      #         expect(response).to render_with_layout('application_revised')
+      #       end
+      #     end
+      #   end
+      #   context 'serial_param' do
+      #     it 'renders' do
+      #       manufacturer = FactoryGirl.create(:manufacturer)
+      #       color = FactoryGirl.create(:color)
+      #       get :index,
+      #           query: "c_#{color.id},s#serialzzzzzz#,m_#{manufacturer.id}",
+      #           stolen: '',
+      #           non_stolen: 'true'
+      #       expect(response.status).to eq(200)
+      #       target_selectize_items = [
+      #         manufacturer.autocomplete_result_hash,
+      #         color.autocomplete_result_hash,
+      #         { id: 'serial', search_id: 's#serialzzzzzz#', text: 'serialzzzzzz' }
+      #       ].as_json
+      #       expect(assigns(:selectize_items)).to eq target_selectize_items
+      #       expect(assigns(:stolenness)).to eq 'non_stolen'
+      #       expect(response).to render_with_layout('application_revised')
+      #     end
+      #   end
+      #   context 'problematic deserialization params' do
+      #     it 'renders and correctly deserializes serial' do
+      #       get :index,
+      #           utf8: '✓',
+      #           query: 's#R910860723#',
+      #           proximity: 'ip',
+      #           proximity_radius: '100',
+      #           stolen: 'true',
+      #           non_stolen: '',
+      #           non_proximity: ''
+      #       expect(response.status).to eq(200)
+      #       target_selectize_items = [
+      #         { id: 'serial', search_id: 's#R910860723#', text: 'R910860723' }
+      #       ].as_json
+      #       expect(assigns(:selectize_items)).to eq target_selectize_items
+      #       expect(assigns(:stolenness)).to eq 'stolen_proximity'
+      #       expect(response).to render_with_layout('application_revised')
+      #     end
+      #   end
+      # end
     end
   end
 

@@ -10,6 +10,14 @@ shared_context :geocoder_default_location do
       country_code: 'US'
     }
   end
+  let(:production_ip_search_result) do
+    [
+      {
+        data: ['US', 'NY', 'New York', default_location[:latitude].to_s, default_location[:longitude].to_s],
+        cache_hit: true
+      }
+    ]
+  end
   before do
     Geocoder.configure(lookup: :test)
     Geocoder::Lookup::Test.set_default_stub([default_location.as_json])

@@ -2,7 +2,7 @@ class ApplicationController < ActionController::Base
   include AuthenticationHelper
   protect_from_forgery
   helper_method :current_user, :current_organization, :user_root_url,
-                :remove_session, :revised_layout_enabled?
+                :remove_session, :revised_layout_enabled?, :forwarded_ip_address
   before_filter :enable_rack_profiler
 
   ensure_security_headers(csp: false,
@@ -21,6 +21,10 @@ class ApplicationController < ActionController::Base
     if current_user && current_user.developer?
       Rack::MiniProfiler.authorize_request unless Rails.env.test?
     end
+  end
+
+  def forwarded_ip_address
+    request.env['HTTP_X_FORWARDED_FOR'].split(',')[0] if request.env['HTTP_X_FORWARDED_FOR']
   end
 
   def append_info_to_payload(payload)
