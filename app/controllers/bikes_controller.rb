@@ -23,25 +23,12 @@ class BikesController < ApplicationController
 
   def index
     @interpreted_params = Bike.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
-    # search = BikeSearcher.new(params, is_ip_proximity_search)
-    # bikes = search.find_bikes
-    # @location = search.location
     page = params[:page] || 1
     @per_page = params[:per_page] || 10
     @bikes = Bike.search(@interpreted_params).page(page).per(@per_page).decorate
     @close_serial_bikes = Bike.search_close_serials(@interpreted_params)
     @close_serial_bikes = @close_serial_bikes.limit(10) if @close_serial_bikes
-    # if params[:serial].present? && page == 1
-    #   secondary_bikes = search.fuzzy_find_serial
-    #   @secondary_bikes = secondary_bikes.decorate if secondary_bikes.present?
-    # end
-    # @bikes = bikes.decorate
     @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
-    # @query = params[:query]
-    # @query = request.query_parameters()
-    @url = request.original_url
-    # @stolenness = search.stolenness_type
-    # @selectize_items = search.selectize_items
   end
 
   def show
@@ -205,8 +192,8 @@ class BikesController < ApplicationController
   protected
 
   def permitted_search_params
-    params.permit(:query, :manufacturer, :colors, :location, :distance,
-                  :stolenness, :query_items, :serial)
+    params.permit(:query, :manufacturer, :location, :distance, :serial, :stolenness,
+                  :query_items => [], :colors => [])
   end
 
   def find_bike

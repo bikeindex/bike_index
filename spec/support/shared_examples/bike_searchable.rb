@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 RSpec.shared_examples 'bike_searchable' do
-  let(:geocoded_location) { [{ data: default_location, cache_hit: nil }].as_json } # in spec_helper
   let(:manufacturer) { FactoryGirl.create(:manufacturer) }
   let(:color) { FactoryGirl.create(:color) }
   let(:multi_query_items) { [manufacturer.search_id, color.search_id, 'some other string', 'another string'] }
@@ -10,16 +9,16 @@ RSpec.shared_examples 'bike_searchable' do
 
   describe 'searchable_interpreted_params' do
     context 'multiple query_items strings' do
-      let(:query_params) { { serial: nil, query_items: multi_query_items } }
       let(:target) do
         {
-          manufacturer_id: manufacturer.id,
-          color_ids: [color.id],
+          manufacturer: manufacturer.id,
+          colors: [color.id],
           query: 'some other string another string',
           stolenness: 'stolen'
         }
       end
       context 'with query_params' do
+        let(:query_params) { { serial: nil, query_items: multi_query_items } }
         it 'parses search_ids for manufacturers and colors' do
           expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
         end
@@ -36,15 +35,16 @@ RSpec.shared_examples 'bike_searchable' do
       let(:color_2) { FactoryGirl.create(:color) }
       let(:target) do
         {
-          manufacturer_id: [manufacturer.id, manufacturer_2.id],
-          color_ids: [color.id, color_2.id],
-          query: 'some other string another string'
+          manufacturer: [manufacturer.id, manufacturer_2.id],
+          colors: [color.id, color_2.id],
+          query: 'some other string another string',
+          stolenness: 'all'
         }
       end
       context 'integer ids in query_items' do
         let(:query_items) { multi_query_items + [manufacturer_2.search_id, color_2.search_id] }
         let(:query_params) { { query_items: query_items, stolenness: 'all' } }
-        it 'returns returns them all' do
+        it 'returns them all' do
           expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
         end
       end
@@ -58,21 +58,31 @@ RSpec.shared_examples 'bike_searchable' do
             stolenness: 'all'
           }
         end
-        it 'finds the explicit ids and query' do
-          expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
+        context 'first pass' do
+          it 'finds the explicit ids and query' do
+            expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
+          end
+        end
+        context 'parsing interpreted_params' do
+          let(:query_params) { target.merge(serial: 'PPPPXXX') }
+          it 'returns itself without calling the db' do
+            expect(Manufacturer).to_not receive(:friendly_find)
+            expect(Color).to_not receive(:friendly_find)
+            expect(Bike.searchable_interpreted_params(interpreted_params, ip: ip_address)).to eq interpreted_params
+          end
         end
       end
     end
     context 'just query in query_items' do
-      let(:query_params) { { query_items: ['something'], stolenness: 'all' } }
-      let(:target) { { query: 'something' } }
+      let(:query_params) { { query_items: ['something'], stolenness: 'stolen' } }
+      let(:target) { { query: 'something', stolenness: 'stolen' } }
       it 'returns just query' do
         expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
       end
     end
     context 'with nil query items' do
-      let(:query_params) { { serial: 'some serial', query_items: nil, stolenness: 'all' } }
-      let(:target) { { normalized_serial: SerialNormalizer.new(serial: 'some serial').normalized } }
+      let(:query_params) { { serial: 'some serial', query_items: nil, stolenness: 'non' } }
+      let(:target) { { serial: SerialNormalizer.new(serial: 'some serial').normalized, stolenness: 'non' } }
       it 'parses serial' do
         expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
       end
@@ -101,37 +111,50 @@ RSpec.shared_examples 'bike_searchable' do
       end
       context 'all' do
         let(:query_params) { { stolenness: 'all' } }
-        let(:target) { {} }
+        let(:target) { query_params }
         it 'parses serial' do
           expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
         end
       end
       context 'proximity' do
-        context 'with a proximity radius less than 1' do
+        include_context :geocoder_default_location
+        context 'ignored locations' do
+          context 'proximity of anywhere' do
+            let(:query_params) { { stolenness: 'proximity', location: 'anywhere', distance: 100 } }
+            let(:target) { { stolenness: 'stolen' } }
+            it 'returns a non-proximity search' do
+              expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
+            end
+          end
+          context 'proximity of empty string' do
+            let(:query_params) { { stolenness: 'proximity', location: '     ', distance: 100 } }
+            let(:target) { { stolenness: 'stolen' } }
+            it 'returns a non-proximity search' do
+              expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
+            end
+          end
+        end
+        context 'input location' do
           let(:query_params) { { stolenness: 'proximity', location: 'these parts', distance: '-1' } }
-          let(:target) { { stolenness: 'proximity', location: 'these parts', distance: 100 } }
-          it 'returns location and distance of 100' do
-            expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
+          context 'with a proximity radius less 0' do
+            let(:target) { { stolenness: 'proximity', location: 'these parts', distance: 100, bounding_box: bounding_box } }
+            it 'returns location and distance of 100' do
+              expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
+            end
           end
-        end
-        context 'proximity of anywhere' do
-          let(:query_params) { { stolenness: 'proximity', location: 'anywhere', distance: 100 } }
-          let(:target) { { stolenness: 'stolen' } }
-          it 'returns a non-proximity search' do
-            expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
-          end
-        end
-        context 'proximity of empty string' do
-          let(:query_params) { { stolenness: 'proximity', location: '     ', distance: 100 } }
-          let(:target) { { stolenness: 'stolen' } }
-          it 'returns a non-proximity search' do
-            expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
+          context 'with a broken bounding box' do
+            let(:nan) { 0.0 / 0 }
+            let(:bounding_box) { [nan, nan, nan, nan] } # Override bounding box stub in geocoder_default_location
+            let(:target) { { stolenness: 'stolen' } }
+            it 'returns a non-proximity search' do
+              expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
+            end
           end
         end
         %w(ip you).each do |ip_string|
           context "Reverse geocode IP lookup for location: '#{ip_string}'" do
-            let(:query_params) { { stolenness: 'proximity', location: ip_string, distance: '7 ' } }
-            let(:target) { { stolenness: 'proximity', distance: 7, location: 'STUBBED response' } }
+            let(:query_params) { { stolenness: 'proximity', location: ip_string, distance: 'twelve ' } }
+            let(:target) { { stolenness: 'proximity', distance: 100, location: 'STUBBED response', bounding_box: bounding_box } }
             it 'returns the location and the distance' do
               expect(Geocoder).to receive(:search).with(ip_address) { 'STUBBED response' }
               expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
@@ -150,10 +173,15 @@ RSpec.shared_examples 'bike_searchable' do
   end
 
   describe 'selected_query_items_options' do
-    let(:query_params) { { stolenness: 'all' } }
-    context 'empty query' do
-      it 'returns an empty array' do
-        expect(Bike.selected_query_items_options(interpreted_params)).to eq([])
+    let(:query_params) { { stolenness: 'all', query: '', query_items: [] } }
+    context 'empty' do
+      context 'empty params' do
+        it 'returns an empty array'
+      end
+      context 'blank values' do
+        it 'returns an empty array' do
+          expect(Bike.selected_query_items_options(interpreted_params)).to eq([])
+        end
       end
     end
     context 'functioning query' do
@@ -293,7 +321,6 @@ RSpec.shared_examples 'bike_searchable' do
           expect(bike_2.stolen_lat).to_not eq stolen_record_1[:latitude]
         end
         it 'finds the bike where we want it to be' do
-          expect(Geocoder::Calculations).to receive(:bounding_box) { [39.989124784445764, -74.96065051723293, 41.43644261555424, -73.05123208276707] }
           expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike_1.id])
         end
       end

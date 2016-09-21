@@ -11,13 +11,13 @@ class BikeIndex.BikeSearchBar extends BikeIndex
       @stolenSearch(e)
     $('#non_stolen_tab').click (e) =>
       @nonStolenSearch(e)
-    
+
   setSearchProximity: ->
     proximity = $('#proximity').val()
     proximity = if proximity? then proximity.replace(/^\s*|\s*$/g, '') else ''
     # If there is a search_location, it means this was an IP search and we need to set proximity
-    if Array.isArray(window.search_location_geocoding) && window.search_location_geocoding[0]?
-      location_data = window.search_location_geocoding[0].data
+    if Array.isArray(window.interpreted_params.location) && window.interpreted_params.location[0]?
+      location_data = window.interpreted_params.location[0].data
       # Maxmind (what we use in production for ip lookup) formats results differently than google
       # This doesn't work in dev... but it wouldn't work anyway because localhost
       if Array.isArray(location_data)
@@ -42,7 +42,7 @@ class BikeIndex.BikeSearchBar extends BikeIndex
     window.updateSearchBikesHeaderLink()
 
   setSearchTabInfo: (proximity) ->
-    $('#search_distance').text($('#proximity_radius').val())
+    $('#search_distance').text($('#distance').val())
     $('#search_location').text(proximity)
     query = $('.search-type-tabs').attr('data-query')
     $.ajax
@@ -94,7 +94,10 @@ class BikeIndex.BikeSearchBar extends BikeIndex
   initializeHeaderSearch: ($query_field) ->
     per_page = 15
     initial_opts = if $query_field.data('initial') then $query_field.data('initial') else []
-    formatSearchText = @formatSearchText # custom formatter
+    processedResults = @processedResults # Custom data processor
+    formatSearchText = @formatSearchText # Custom formatter
+    console.log processedResults(initial_opts)
+    # return true
     $desc_search = $query_field.select2
       allowClear: true
       tags: true
@@ -104,6 +107,7 @@ class BikeIndex.BikeSearchBar extends BikeIndex
       placeholder: $query_field.attr('placeholder') # Pull placeholder from HTML
       dropdownParent: $('.bikes-search-form') # Append to search for for easier css access
       templateResult: formatSearchText # let custom formatter work
+      data: processedResults(initial_opts)
       escapeMarkup: (markup) -> markup # Allow our
       ajax:
         url: '/api/autocomplete'
@@ -114,12 +118,7 @@ class BikeIndex.BikeSearchBar extends BikeIndex
           page: params.page
           per_page: per_page
         processResults: (data, page) ->
-          results: _.map(data.matches, (item) ->
-            id: item.search_id
-            text: item.text
-            category: item.category
-            display: item.display
-          )
+          results: processedResults(data.matches)
           pagination:
             # If exactly per_page matches there's likely at another page
             more: data.matches.length == per_page
@@ -139,6 +138,15 @@ class BikeIndex.BikeSearchBar extends BikeIndex
         $('#bikes_search_form').submit()
       else
         window.bike_search_submit = true
+
+  processedResults: (items) ->
+    _.map(items, (item) ->
+      return { id: item } if typeof item is 'string'
+      id: item.search_id
+      text: item.text
+      category: item.category
+      display: item.display
+    )
 
   formatSearchText: (item) ->
     return item.text if item.loading
