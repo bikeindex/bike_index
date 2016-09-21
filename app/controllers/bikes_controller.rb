@@ -23,11 +23,13 @@ class BikesController < ApplicationController
 
   def index
     @interpreted_params = Bike.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
-    page = params[:page] || 1
-    @per_page = params[:per_page] || 10
-    @bikes = Bike.search(@interpreted_params).page(page).per(@per_page).decorate
-    @close_serial_bikes = Bike.search_close_serials(@interpreted_params)
-    @close_serial_bikes = @close_serial_bikes.limit(10) if @close_serial_bikes
+    if params[:stolenness] == 'proximity' && @interpreted_params[:stolenness] != 'proximity'
+      flash[:info] = "Sorry, we don't know the location #{params[:location]}. Please enter something else to search nearby stolen bikes"
+    end
+    @bikes = Bike.search(@interpreted_params).page(params[:page] || 1).per(params[:per_page] || 10).decorate
+    if @interpreted_params[:serial]
+      @close_serials = Bike.search_close_serials(@interpreted_params).limit(10).decorate
+    end
     @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
   end
 

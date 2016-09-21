@@ -73,9 +73,9 @@ RSpec.shared_examples 'bike_searchable' do
         end
       end
     end
-    context 'just query in query_items' do
-      let(:query_params) { { query_items: ['something'], stolenness: 'stolen' } }
-      let(:target) { { query: 'something', stolenness: 'stolen' } }
+    context 'no query in query_items' do
+      let(:query_params) { { query_items: [''], stolenness: 'stolen' } }
+      let(:target) { { stolenness: 'stolen' } }
       it 'returns just query' do
         expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
       end

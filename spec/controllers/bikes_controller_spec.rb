@@ -49,13 +49,25 @@ describe BikesController do
       end
       context 'ip proximity' do
         let(:query_params) { { location: 'you', distance: 1, stolenness: 'proximity' } }
-        it 'assigns passed parameters and close_serials' do
-          expect_any_instance_of(BikesController).to receive(:forwarded_ip_address) { ip_address }
-          allow(Geocoder).to receive(:search) { production_ip_search_result }
-          get :index, query_params
-          expect(response.status).to eq 200
-          expect(assigns(:interpreted_params)).to eq target_interpreted_params
-          expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id])
+        context 'found location' do
+          it 'assigns passed parameters and close_serials' do
+            expect_any_instance_of(BikesController).to receive(:forwarded_ip_address) { ip_address }
+            allow(Geocoder).to receive(:search) { production_ip_search_result }
+            get :index, query_params
+            expect(response.status).to eq 200
+            expect(assigns(:interpreted_params)).to eq target_interpreted_params
+            expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id])
+          end
+        end
+        context 'unknown location' do
+          let(:bounding_box) { [66.00, -84.22, 67.000, (0.0 / 0)] } # Override bounding box stub in geocoder_default_location
+          it 'includes a flash[:info] for unknown location, renders non-proximity' do
+            get :index, query_params
+            expect(response.status).to eq 200
+            expect(flash[:info]).to match(/location/)
+            expect(query_params[:stolenness]).to eq 'proximity'
+            expect(assigns(:interpreted_params)[:stolenness]).to eq 'stolen'
+          end
         end
       end
       context 'passed all permitted params' do

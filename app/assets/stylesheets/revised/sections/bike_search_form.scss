@@ -96,9 +96,9 @@
   li {
     a { padding-left: 0; padding-right: 0; }
     a.active { font-weight: $strong-font-weight; }
-    &.stolen-proximity { flex: 0 0 40%; } // location info takes up the most space
-    &.stolen-anywhere { flex: 0 0 27%; } 
-    &.not-stolen { flex: 0 0 33%; } // 'Not marked stolen' is longer than 'Stolen anywhere'
+    &#stolenness_tab_proximity { flex: 0 0 40%; } // location info takes up the most space
+    &#stolenness_tab_stolen { flex: 0 0 27%; } 
+    &#stolenness_tab_non { flex: 0 0 33%; } // 'Not marked stolen' is longer than 'Stolen anywhere'
   }
 }
 
