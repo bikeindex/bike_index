@@ -28,8 +28,8 @@ module BikeSearchable
 
     def search_close_serials(interpreted_params)
       return nil unless interpreted_params[:serial]
-      exact_match_ids = search(interpreted_params).pluck(:id)
-      where.not(id: exact_match_ids)
+      # Skip the exact match ids
+      where.not(id: search(interpreted_params).pluck(:id))
         .non_serial_matches(interpreted_params)
         .search_matching_close_serials(interpreted_params[:serial])
     end
@@ -53,11 +53,10 @@ module BikeSearchable
     # Private (internal only) methods below here, as defined at the start
 
     def non_serial_matches(interpreted_params)
-      manufacturers_where = interpreted_params[:manufacturer] ? { manufacturer_id: interpreted_params[:manufacturer] } : {}
       # For each of the of the colors, call searching_matching_color_ids with the color_id on the previous ;)
       (interpreted_params[:colors] || [nil]).reduce(self) { |matches, c_id| matches.search_matching_color_ids(c_id) }
         .search_matching_stolenness(interpreted_params)
-        .where(manufacturers_where)
+        .where(interpreted_params[:manufacturer] ? { manufacturer_id: interpreted_params[:manufacturer] } : {})
     end
 
 
