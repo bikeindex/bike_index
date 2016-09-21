@@ -1,5 +1,6 @@
 class @AdDisplayer
   constructor: ->
+    return true
     for id in Object.keys(ad_units)
       @getAd(id) if document.getElementById(id)
 
