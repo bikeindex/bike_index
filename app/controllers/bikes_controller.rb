@@ -36,6 +36,7 @@ class BikesController < ApplicationController
   def show
     @components = @bike.components.decorate
     if @bike.stolen and @bike.current_stolen_record.present?
+      @contact_owner_open = current_user && params[:contact_owner].present? # Show contact owner box on load
       @stolen_record = @bike.current_stolen_record.decorate
     end
     @bike = @bike.decorate

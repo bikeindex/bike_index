@@ -204,11 +204,12 @@
           - if @bike.recovered
             %p
               Is this your bike? Send proof of ownership (such as the bike's serial number or a link to a photo of you with the bike)
-          #write_them_a_message.collapse.in
-            %a.btn.btn-primary.btn-lg{ href: '#new_stolen_message', 'aria-expanded' => 'false', 'aria-controls' => 'new_stolen_message', 'data-toggle' => 'collapse' }
+          - redirect = new_session_url(return_to: "/bikes/#{@bike.id}?contact_owner=true") unless current_user.present?
+          #write_them_a_message.collapse{ class: ('in' unless @contact_owner_open), data: { redirect: redirect } }
+            %a.btn.btn-primary.btn-lg{ href: '#new_stolen_message', 'aria-controls' => 'new_stolen_message', 'data-toggle' => 'collapse' }
               Write them a message
 
-          .collapse#new_stolen_message
+          .collapse#new_stolen_message{ class: ('in' if @contact_owner_open) }
             = form_for @stolen_notification do |f|
               = f.hidden_field :bike_id, value: @bike.id
               = f.text_area :message, required: true, placeholder: "Where did you see this #{@bike.type}? If you're contacting about an ad you found online, include a link in the field below", rows: 6, class: 'form-control'

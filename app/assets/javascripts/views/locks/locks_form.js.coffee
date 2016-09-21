@@ -43,7 +43,6 @@ class BikeIndex.Views.LocksForm extends Backbone.View
     
 
   updateLockFields: ->
-    console.log('lololol')
     if $('input[name="lock[has_key]"]:checked').length > 0
       $('#serial-group').addClass('visibled').slideDown('fast')
     else

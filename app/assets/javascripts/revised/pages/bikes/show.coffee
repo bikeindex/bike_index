@@ -8,8 +8,13 @@ class BikeIndex.BikesShow extends BikeIndex
     $('#claim-bike-modal').modal('show') if document.getElementById('claim-bike-modal')
 
     # Hide the message button after click
-    $('#write_them_a_message').click ->
-      $('#write_them_a_message').collapse('toggle')
+    $('#write_them_a_message').click (e) ->
+      $target = $(e.target).parents('#write_them_a_message')
+      if $target.data('redirect')
+        window.location = $target.data('redirect')
+        return false
+      else
+        $('#write_them_a_message').collapse('toggle')
 
     if document.getElementById('thumbnails')
       # There are only event listeners if there are thumbnails
@@ -137,7 +142,7 @@ class BikeIndex.BikesShow extends BikeIndex
 
   photoFadeIn: (target_photo_id, $target_photo) ->
     unless $("##{target_photo_id}").length > 0
-      console.log 'late to the party', target_photo_id, $target_photo
+      # console.log 'late to the party', target_photo_id, $target_photo
       @injectPhoto(target_photo_id, $target_photo)
       @loadPhotos() # Since photos haven't loaded yet, load them
     $("##{target_photo_id}, ##{target_photo_id} img").css('display', 'block')
