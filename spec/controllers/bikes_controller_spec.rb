@@ -27,7 +27,6 @@ describe BikesController do
           expect(response).to render_template(:index)
           expect(response).to render_with_layout('application_revised')
           expect(flash).to_not be_present
-          expect(assigns(:per_page)).to eq 10
           expect(assigns(:interpreted_params)).to eq(stolenness: 'stolen')
           expect(assigns(:selected_query_items_options)).to eq([])
           expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id, stolen_bike_2.id])
@@ -38,13 +37,13 @@ describe BikesController do
         let(:color) { non_stolen_bike.primary_frame_color }
         let(:query_params) { { serial: "#{serial}0d", query_items: [color.search_id, manufacturer.search_id], stolenness: 'non' } }
         let(:target_selected_query_items_options) { Bike.selected_query_items_options(target_interpreted_params) }
-        it 'assigns passed parameters, assigns close_serial_bikes' do
+        it 'assigns passed parameters, assigns close_serials' do
           get :index, query_params
           expect(response.status).to eq 200
           expect(assigns(:interpreted_params)).to eq target_interpreted_params
           expect(assigns(:selected_query_items_options)).to eq target_selected_query_items_options
           expect(assigns(:bikes).map(&:id)).to eq([])
-          expect(assigns(:close_serial_bikes).map(&:id)).to eq([non_stolen_bike.id])
+          expect(assigns(:close_serials).map(&:id)).to eq([non_stolen_bike.id])
         end
       end
       context 'ip proximity' do
