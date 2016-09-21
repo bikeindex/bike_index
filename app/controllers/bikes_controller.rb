@@ -195,8 +195,7 @@ class BikesController < ApplicationController
   protected
 
   def permitted_search_params
-    params.permit(:query, :manufacturer, :location, :distance, :serial, :stolenness,
-                  :query_items => [], :colors => [])
+    params.permit(*Bike.permitted_search_params)
   end
 
   def find_bike

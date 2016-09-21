@@ -1,18 +1,18 @@
 class BikeIndex.BikeSearchBar extends BikeIndex
   constructor: (target_selector = '#bikes_search_form #query_items') ->
     @initializeHeaderSearch($(target_selector))
-    @setSearchProximity()
+    $location = $('#location')
+    @setSearchProximity($location) if $location.length > 0
     @initializeEventListeners()
 
   initializeEventListeners: ->
     $('#stolenness_tabs a').click (e) =>
-      tab = $(event.target).parents('li')
-      console.log tab.attr('data-stolenness')
+      tab = $(e.target).parents('li')
       $('#stolenness').val(tab.attr('data-stolenness'))
       $('#bikes_search_form').submit()
 
-  setSearchProximity: ->
-    location = $('#location').val()
+  setSearchProximity: ($location) ->
+    location = $location.val()
     location = if location? then location.replace(/^\s*|\s*$/g, '') else ''
     # If there is a search_location, it means this was an IP search and we need to set location
     if window.interpreted_params.location && Array.isArray(window.interpreted_params.location) && window.interpreted_params.location[0]?
@@ -34,7 +34,7 @@ class BikeIndex.BikeSearchBar extends BikeIndex
       # Make location 'you' if location is anywhere, so user isn't stuck and unable to use location
       location = 'you' if location.match(/anywhere/i)
       # Then set the location from whatever we got
-      $('#location').val(location)
+      $location.val(location)
     # Then set up search view and the top menu link
     @setSearchTabInfo(location)
     window.updateSearchBikesHeaderLink()
@@ -42,10 +42,12 @@ class BikeIndex.BikeSearchBar extends BikeIndex
   setSearchTabInfo: (location) ->
     $('#search_distance').text($('#distance').val())
     $('#search_location').text(location)
-    query = $('.search-type-tabs').attr('data-query')
+    search_data = _.merge(window.interpreted_params, { location: location })
+    console.log search_data
     $.ajax
       type: 'GET'
-      url: "/api/v3/search/count?#{query}"
+      url: '/api/v3/search/count'
+      data: search_data
       success: (data) =>
         @insertTabCounts(data)
 

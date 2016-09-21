@@ -35,7 +35,7 @@
             within
           = hidden_field_tag :stolenness, params[:stolenness]
       - unless params[:stolenness] == 'all'
-        .search-type-tabs{ data: { query: request.original_url.split('bikes?').last } }
+        .search-type-tabs
           %ul#stolenness_tabs.nav.nav-tabs{ role: 'tablist' }
             %li#stolenness_tab_proximity.nav-item{ data: { stolenness: 'proximity' } }
               %a.nav-link{ href: '#', class: ('active' if @interpreted_params[:stolenness] == 'proximity'), role: 'tab' }

@@ -1,5 +1,9 @@
-.organized-bikes-table {
-  table.table {
-    .date-added { width: 7em; }
+#organized_bikes_index {
+  .organized-bikes-table {
+    border-top: 1px solid $gray-light;
+    padding-top: $vertical-height;
+    table.table {
+      .date-added { width: 7em; }
+    }
   }
 }

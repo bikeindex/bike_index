@@ -22,14 +22,15 @@ module BikeSearchable
     end
 
     def search(interpreted_params)
-      matches = search_matching_serial(interpreted_params)
-      non_serial_matches(interpreted_params, matches)
+      search_matching_serial(interpreted_params)
+        .non_serial_matches(interpreted_params)
     end
 
     def search_close_serials(interpreted_params)
       return nil unless interpreted_params[:serial]
-      exact_match_ids = search(interpreted_params).pluck(:id)
-      non_serial_matches(interpreted_params, where.not(id: exact_match_ids))
+      # Skip the exact match ids
+      where.not(id: search(interpreted_params).pluck(:id))
+        .non_serial_matches(interpreted_params)
         .search_matching_close_serials(interpreted_params[:serial])
     end
 
@@ -45,15 +46,19 @@ module BikeSearchable
       items.flatten.compact
     end
 
+    def permitted_search_params
+      [:query, :manufacturer, :location, :distance, :serial, :stolenness, :query_items => [], :colors => []].freeze
+    end
+
     # Private (internal only) methods below here, as defined at the start
 
-    def non_serial_matches(interpreted_params, matches)
-      matches = matches.search_matching_stolenness(interpreted_params) if interpreted_params[:stolenness] != 'all'
-      matches = matches.where(manufacturer_id: interpreted_params[:manufacturer]) if interpreted_params[:manufacturer]
-      # Because each color can be in any potential spot, search using OR for each color
-      interpreted_params[:colors] && interpreted_params[:colors].each { |c| matches = matches.search_matching_color_ids(c) }
-      matches
+    def non_serial_matches(interpreted_params)
+      # For each of the of the colors, call searching_matching_color_ids with the color_id on the previous ;)
+      (interpreted_params[:colors] || [nil]).reduce(self) { |matches, c_id| matches.search_matching_color_ids(c_id) }
+        .search_matching_stolenness(interpreted_params)
+        .where(interpreted_params[:manufacturer] ? { manufacturer_id: interpreted_params[:manufacturer] } : {})
     end
+
 
     def searchable_query_items_query(query_params)
       return { query: query_params[:query] } if query_params[:query].present?
@@ -127,23 +132,30 @@ module BikeSearchable
     end
 
     # Actual searcher methods
+    # The searcher methods return where({}) so they can be chained together even if they don't modify anything
 
     def search_matching_color_ids(color_id)
-      where(arel_table[:primary_frame_color_id].eq(color_id)
-        .or(arel_table[:secondary_frame_color_id].eq(color_id))
-        .or(arel_table[:tertiary_frame_color_id].eq(color_id)))
+      return where({}) unless color_id # So we can chain this if we don't have any colors
+      where('primary_frame_color_id=? OR secondary_frame_color_id=? OR tertiary_frame_color_id =?', color_id, color_id, color_id)
     end
 
     def search_matching_serial(interpreted_params)
-      return self unless interpreted_params[:serial]
+      return where({}) unless interpreted_params[:serial]
       # Note: @@ is postgres fulltext search
       where('serial_normalized @@ ?', interpreted_params[:serial])
     end
 
     def search_matching_stolenness(interpreted_params)
-      return where(stolen: false) if interpreted_params[:stolenness] == 'non'
-      return where(stolen: true) unless interpreted_params[:stolenness] == 'proximity'
-      where(stolen: true).within_bounding_box(interpreted_params[:bounding_box])
+      case interpreted_params[:stolenness]
+      when 'all'
+        where({})
+      when 'non'
+        where(stolen: false)
+      when 'proximity'
+        where(stolen: true).within_bounding_box(interpreted_params[:bounding_box])
+      else
+        where(stolen: true)
+      end
     end
 
     def search_matching_close_serials(serial)
