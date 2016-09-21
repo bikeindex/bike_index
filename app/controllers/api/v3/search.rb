@@ -8,7 +8,7 @@ module API
           optional :colors, type: Array
           optional :location, type: String, desc: 'Location for proximity search', default: 'IP'
           optional :distance, type: String, desc: 'Distance in miles from `location` for proximity search', default: 10
-          optional :stolenness, type: String, values: %w(non stolen proximity all), default: 'stolen'
+          optional :stolenness, type: String, values: %w(non stolen proximity all) + [''], default: 'stolen'
           optional :query_items, type: Array
         end
         params :search do
@@ -28,13 +28,12 @@ module API
             - `location` is ignored unless `stolenness` is 'proximity'
             - If `location` is 'IP' (the default), the location is determined via geolocation of your IP address.
 
-
             Include all the options passed in your search. This will respond with a hash of the number of bikes matching your search for each type:
 
             ```javascript
             {
               "proximity": 19,
-              "stolen": 100, 
+              "stolen": 100,
               "non": 111
             }
             ```
@@ -48,7 +47,6 @@ module API
           use :search
         end
         get '/count', root: 'bikes', each_serializer: BikeV2Serializer do
-          # { 'declared_params' => declared(params, include_missing: false) }
           interpreted_params = Bike.searchable_interpreted_params(params.merge(stolenness: 'proximity'), ip: forwarded_ip_address)
           {
             proximity: Bike.search(interpreted_params).count,

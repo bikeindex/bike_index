@@ -40,5 +40,12 @@ describe 'Search API V3' do
         expect(response.status).to eq(200)
       end
     end
+    context 'nil params' do
+      it 'succeeds' do
+        get '/api/v3/search/count', { stolenness: '', query_items: [], serial: '' }, format: :json
+        result = JSON.parse(response.body)
+        expect(response.status).to eq(200)
+      end
+    end
   end
 end
