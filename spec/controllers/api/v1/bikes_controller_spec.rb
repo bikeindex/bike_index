@@ -27,7 +27,7 @@ describe Api::V1::BikesController do
       get :stolen_ids, options.as_json
       expect(response.code).to eq('200')
       # pp response
-      bikes = JSON.parse(response.body)
+      bikes = JSON.parse(response.body)['bikes']
       expect(bikes.count).to eq(1)
       expect(bikes.first).to eq(stole2.bike.id)
     end
