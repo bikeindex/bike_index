@@ -325,17 +325,21 @@ RSpec.shared_examples 'bike_searchable' do
         end
       end
     end
-    context 'organization bike' do
-      let(:bike_1) { FactoryGirl.create(:bike, primary_frame_color: color) }
-      let(:bike_2) { FactoryGirl.create(:organization_bike, secondary_frame_color: color) }
-      let(:organization) { bike_2.creation_organization }
-      let(:query_params) { { colors: [color.id], stolenness: 'all' } }
-      before do
-        expect([bike_1, bike_2].size).to eq 2
-        expect(organization.bikes.pluck(:id)).to eq([bike_2.id])
-      end
-      it 'only finds bikes in the organization' do
-        expect(organization.bikes.search(interpreted_params).pluck(:id)).to eq([bike_2.id])
+    describe 'search' do
+      context 'organization bike' do
+        let(:interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: 'd') }
+
+        let(:bike_1) { FactoryGirl.create(:bike) }
+        let(:bike_2) { FactoryGirl.create(:organization_bike) }
+        let(:organization) { bike_2.creation_organization }
+        let(:query_params) { { stolenness: 'all' } }
+        before do
+          expect([bike_1, bike_2].size).to eq 2
+          expect(organization.bikes.pluck(:id)).to eq([bike_2.id])
+        end
+        it 'only finds bikes in the organization' do
+          expect(organization.bikes.search(interpreted_params).pluck(:id)).to eq([bike_2.id])
+        end
       end
     end
   end

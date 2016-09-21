@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 describe Organized::BikesController, type: :controller do
+  let(:non_organization_bike) { FactoryGirl.create(:bike) }
+  before do
+    expect(non_organization_bike).to be_present
+  end
   context 'logged_in_as_organization_admin' do
     include_context :logged_in_as_organization_admin
     describe 'index' do
@@ -56,6 +60,7 @@ describe Organized::BikesController, type: :controller do
             expect(response).to render_template :search
             expect(assigns(:current_organization)).to eq organization
             expect(assigns(:search_query_present)).to be_truthy
+            expect(assigns(:bike).pluck(:id).include?(non_organization_bike.id)).to be_falsey
           end
         end
         context 'without params' do
@@ -66,6 +71,7 @@ describe Organized::BikesController, type: :controller do
             expect(assigns(:interpreted_params)[:stolenness]).to eq 'all'
             expect(assigns(:current_organization)).to eq organization
             expect(assigns(:search_query_present)).to be_falsey
+            expect(assigns(:bike).pluck(:id).include?(non_organization_bike.id)).to be_falsey
           end
         end
       end
@@ -80,6 +86,7 @@ describe Organized::BikesController, type: :controller do
           expect(response).to render_template :index
           expect(response).to render_with_layout('application_revised')
           expect(assigns(:current_organization)).to eq organization
+          expect(assigns(:bike).pluck(:id).include?(non_organization_bike.id)).to be_falsey
         end
       end
     end
