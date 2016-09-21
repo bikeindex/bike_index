@@ -16,10 +16,18 @@ FactoryGirl.define do
       association :creation_organization, factory: :organization
     end
     factory :stolen_bike do
+      transient do
+        latitude { 40.7143528 }
+        longitude { -74.0059731 }
+      end
       stolen true
-      after(:create) do |bike|
-        create(:stolen_record, bike: bike)
+      after(:create) do |bike, evaluator|
+        create(:stolen_record,
+               bike: bike,
+               latitude: evaluator.latitude,
+               longitude: evaluator.longitude)
         bike.save # updates current_stolen_record
+        bike.reload
       end
       factory :recovered_bike do
         recovered true

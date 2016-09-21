@@ -17,6 +17,7 @@ class Slugifyer
   end
 
   def self.manufacturer(string)
+    return nil unless string
     book_slug(string.gsub(/\sco(\.|mpany)/i, ' ')
         .gsub(/\s(frame)?works/i, ' ').gsub(/\([^\)]*\)/i, ''))
   end

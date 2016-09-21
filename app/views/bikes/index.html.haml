@@ -1,56 +1,59 @@
-- stolenness_desc = { 'stolen_proximity' => 'nearby stolen', 'non_stolen' => 'non-stolen', 'stolen' => 'stolen' }
+- stolenness_desc = { 'proximity' => 'nearby stolen', 'non' => 'non-stolen', 'stolen' => 'stolen', 'all' => 'all' }[@interpreted_params[:stolenness]]
+
 .container
   .row.first-row
     .col-md-8
       %h1
-        Search for #{stolenness_desc[@stolenness]} bikes
+        Search for #{stolenness_desc} bikes
     .col-md-4.ad-col
       .ad-block#top468x60
         
   .row
     .col-md-8
-      = form_tag bikes_path, id: 'bike_search_form', class: 'bike-search-form', method: :get do
-        - params[:query] = params[:query].gsub(/,?#,?/,'').gsub(/(\A,|,\z)/, '') if params[:query].present?
+      = form_tag bikes_path, id: 'bikes_search_form', class: 'bikes-search-form', method: :get do
         .query-field-wrap
-          = text_field_tag :query,                      |
-            strip_tags(params[:query]),                 |
-            placeholder: 'Search Bike Index',           |
-            class: 'form-control query-field',          |
-            data: { initial: @selectize_items.to_json }
+          - opt_vals = @selected_query_items_options.map { |i| i.is_a?(String) ? [i, i] : [i['text'], i['search_id']]  }
+          = select_tag :query_items,                                      |
+            options_for_select(opt_vals, selected: opt_vals.map(&:last)), |
+            placeholder: 'Search bike descriptions',                      |
+            class: 'form-control query-field',                            |
+            multiple: true
+
+          = text_field_tag :serial, params[:serial],    |
+            placeholder: 'Search for serial number',    |
+            class: 'form-control query-field'
         .search-button-wrap
           = button_tag(type: 'submit', class: 'searchit btn btn-primary') do
             :plain
               <svg id="search-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29"><defs><style>.cls-1,.cls-2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:2px;}.cls-2{stroke-linecap:round;}</style></defs><title>searcher</title><circle class="cls-1" cx="10.39" cy="10.39" r="9.39"/><line class="cls-2" x1="17.03" y1="17.03" x2="28" y2="28"/></svg>
-        .stolen-search-fields{ class: ('currently-hidden' unless @stolenness == 'stolen_proximity') }
-          = text_field_tag :proximity, params[:proximity], placeholder: 'Anywhere', class: 'form-control stolen-proximity'
+        .stolen-search-fields{ class: ('currently-hidden' unless params[:stolenness] == 'proximity') }
+          = text_field_tag :location, params[:location], placeholder: 'Anywhere', class: 'form-control stolen-proximity'
           %span
             miles of
-          = number_field_tag :proximity_radius, params[:proximity_radius] || 100, placeholder: '100', min: 1, class: 'form-control stolen-radius'
+          = number_field_tag :distance, @interpreted_params[:distance] || 100, placeholder: '100', min: 1, class: 'form-control stolen-radius'
           %span
             within
-          = hidden_field_tag :stolen, params[:stolen] || true
-          = hidden_field_tag :non_stolen, params[:non_stolen] || ''
-          = hidden_field_tag :non_proximity, params[:non_proximity]
-
-      .search-type-tabs{ data: { query: request.original_url.split('bikes?').last } }
-        %ul.nav.nav-tabs{ role: 'tablist' }
-          %li.nav-item.stolen-proximity
-            %a#stolen_proximity_tab.nav-link{ href: '#', class: ('active' if @stolenness == 'stolen_proximity'), role: 'tab' }
-              Stolen within
-              %span#search_distance
-                X
-              miles of
-              %span#search_location
-                you
-              %span.count
-          %li.nav-item.stolen-anywhere
-            %a#stolen_tab.nav-link{ href: '#', class: ('active' if @stolenness == 'stolen'), role: 'tab' }
-              Stolen anywhere
-              %span.count
-          %li.nav-item.not-stolen
-            %a#non_stolen_tab.nav-link{ href: '#', class: ('active' if @stolenness == 'non_stolen'), role: 'tab' }
-              Not marked stolen
-              %span.count
+          = hidden_field_tag :stolenness, params[:stolenness]
+      - unless params[:stolenness] == 'all'
+        .search-type-tabs{ data: { query: request.original_url.split('bikes?').last } }
+          %ul#stolenness_tabs.nav.nav-tabs{ role: 'tablist' }
+            %li#stolenness_tab_proximity.nav-item{ data: { stolenness: 'proximity' } }
+              %a.nav-link{ href: '#', class: ('active' if @interpreted_params[:stolenness] == 'proximity'), role: 'tab' }
+                Stolen within
+                %span#search_distance
+                  X
+                miles of
+                %span#search_location
+                  you
+                %span.count
+            %li#stolenness_tab_stolen.nav-item{ data: { stolenness: 'stolen' } }
+              %a.nav-link{ href: '#', class: ('active' if @interpreted_params[:stolenness] == 'stolen'), role: 'tab' }
+                Stolen anywhere
+                %span.count
+            %li#stolenness_tab_non.nav-item{ data: { stolenness: 'non' } }
+              %a.nav-link{ href: '#', class: ('active' if @interpreted_params[:stolenness] == 'non'), role: 'tab' }
+                Not marked stolen
+                %span.count
   .row
     .col-md-8
       - if @bikes.present?
@@ -58,29 +61,23 @@
           = render partial: '/bikes/revised_bike', collection: @bikes, as: :bike
         .paginate-container.paginate-container-bottom
           = paginate @bikes
-            
 
       - else
-        %h1.no-results
-          No #{stolenness_desc[@stolenness]} bikes
-          - if @secondary_bikes.present?
-            exactly match that serial
-          - else
-            matched your search
+        %h3.no-exact-results
+          No #{stolenness_desc} bikes matched your search
 
-      - if @secondary_bikes.present?
-        %h2.secondary-bikes
-          Serial numbers close to
+      - if @close_serials.present?
+        %h3.secondary-matches
+          #{stolenness_desc} with serial numbers close to
           %em
             #{params[:serial]}
 
         %ul.bike-boxes
-          = render partial: '/bikes/revised_bike', collection: @secondary_bikes, as: :bike
+          = render partial: '/bikes/revised_bike', collection: @close_serials, as: :bike
     .col-md-4.ad-col
       .ad-block#right300x600
 
-- if @location.present?
-  :javascript
-    window.search_location_geocoding = #{@location.to_json};
+:javascript
+  window.interpreted_params = #{@interpreted_params.to_json};
 
 <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>

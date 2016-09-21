@@ -1,4 +1,4 @@
-.bike-search-form {
+.bikes-search-form {
   @include make-row();
   // 
   // Query field (main search field)
@@ -9,20 +9,9 @@
     padding-right: $vertical-height;
   }
   .query-field { width: 100%; }
-  // Selectize input - ensure height without items
-  .selectize-input {
-    min-height: 44px;
-    &.not-full > input { margin-top: 5px !important; } // Space placeholder correctly
-  }
-  .selectize-dropdown, .selectize-input { border-radius: $border-radius; }
-  // Selected items
-  .selectize-control.multi .selectize-input > div {
-    background: none;
-    border: 1px solid $blue;
-    padding-left: 4px;
-    line-height: 1.75;
-  }
-  .selectize-dropdown-content {
+  .select2-container { margin-bottom: 0.5*$vertical-height; }
+
+  .select2-results__options {
     .sch_s { display: inline-block; }
     .sch_m, .sch_ { color: #ccc; }
     .sch_special { border-bottom: 1px solid #ddd; }
@@ -30,37 +19,35 @@
       color: #bbb;
       display: inline-block;
     }
+    .sclr {
+      border-radius: 3px;
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border: 1px solid white;
+      line-height: .8em;
+      margin: 0 6px -6px;
+      font-size: .5em;
+      text-align: center;
+      padding-top: 1em;
+    }
   }
-  .search_span_s, .search_span_m {
-    color: #bbb;
-    margin-left: 0;
-    margin-right: 3px;
-    display: inline;
-  }
-  .sclr {
-    border-radius: 3px;
-    display: inline-block;
-    width: 24px;
-    height: 24px;
-    border: 1px solid white;
-    line-height: .8em;
-    margin: 0 6px 0 0;
-    font-size: .5em;
-    text-align: center;
-    padding-top: 1em;
-  }
+
   // Search button
   .search-button-wrap {
     flex: 0 0 16.66667%;
     padding-right: 0.9375rem;
   }
   .searchit {
-    height: 44px;
+    height: 100%;
+    position: relative;
+    min-height: 6.6666*$vertical-height;
     padding: 0;
     text-align: center;
     width: 100%;
     svg {
-      height: 80%;
+      height: auto;
+      width: 50%;
       margin-top: 5%;
       display: inline-block;
     }
@@ -87,7 +74,7 @@
 }
 
 @media (max-width: 600px) {
-  .bike-search-form {
+  .bikes-search-form {
     .selectize-dropdown-content {
       .sch_s, .sch_m, .sch_ {
         font-size: 14px;
@@ -109,9 +96,9 @@
   li {
     a { padding-left: 0; padding-right: 0; }
     a.active { font-weight: $strong-font-weight; }
-    &.stolen-proximity { flex: 0 0 40%; } // location info takes up the most space
-    &.stolen-anywhere { flex: 0 0 27%; } 
-    &.not-stolen { flex: 0 0 33%; } // 'Not marked stolen' is longer than 'Stolen anywhere'
+    &#stolenness_tab_proximity { flex: 0 0 40%; } // location info takes up the most space
+    &#stolenness_tab_stolen { flex: 0 0 27%; } 
+    &#stolenness_tab_non { flex: 0 0 33%; } // 'Not marked stolen' is longer than 'Stolen anywhere'
   }
 }
 

@@ -2,6 +2,7 @@
  * Revised manifest file
  * things from rails-assets
  *= require pikaday
+ *= require select2
  *= require selectize/selectize.bootstrap3.scss
  *= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
  */
@@ -113,6 +114,7 @@ $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 @import "revised/sections/modals";
 @import "revised/sections/alerts";
 @import "revised/sections/forms";
+@import "revised/sections/custom_selects";
 
 // Bike Index mixins
 @import "revised/mixins/trash_can_icon";
@@ -158,6 +160,7 @@ $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 @import "revised/pages/bikes/choose_registration";
 
 // Bike show & search pages
+@import "revised/pages/bikes/index";
 @import "revised/pages/bikes/show";
 @import "revised/pages/bikes/show_photo"; // separated because it's a lot
 
@@ -206,12 +209,6 @@ body { min-height: 400px; }
 //
 // External overrides
 //
-
-// Bike Index selectize overrides
-.selectize-dropdown [data-selectable] .highlight { background: rgba($blue, 0.2); }
-.selectize-dropdown .active { background-color: lighten(#bebebe, 10%); }
-// Make selectize inputs the same size as form inputs
-.form-group .selectize-control .selectize-input { padding: 0.475rem 0.75rem; }
 
 // Pickaday overrides
 .pika-button:hover { background: $blue; }

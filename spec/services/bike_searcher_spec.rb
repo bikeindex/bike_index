@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe BikeSearcher do
   describe 'initialize' do
-    context 'basic serial' do
+    context 'basic serial array' do
       it 'deletes the serial gsub expression if it is present' do
         params = { query: 'm_940%2Cs%23sdfc%23%2Cc_1' }
         searcher = BikeSearcher.new(params)

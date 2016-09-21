@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe Bike do
+  it_behaves_like 'bike_searchable'
   describe 'validations' do
     it { is_expected.to belong_to :manufacturer }
     it { is_expected.to belong_to :primary_frame_color }
@@ -346,16 +347,16 @@ describe Bike do
     end
 
     it 'returns just the url of the video from a youtube iframe' do
-      youtube_share = '''
+      youtube_share = '
           <iframe width="560" height="315" src="//www.youtube.com/embed/Sv3xVOs7_No" frameborder="0" allowfullscreen></iframe>
-        '''
+        '
       @bike = Bike.new
       allow(@bike).to receive(:video_embed).and_return(youtube_share)
       expect(@bike.video_embed_src).to eq('//www.youtube.com/embed/Sv3xVOs7_No')
     end
 
     it 'returns just the url of the video from a vimeo iframe' do
-      vimeo_share = '''<iframe src="http://player.vimeo.com/video/13094257" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe><p><a href="http://vimeo.com/13094257">Fixed Gear Kuala Lumpur, RatsKL Putrajaya</a> from <a href="http://vimeo.com/user3635109">irmanhilmi</a> on <a href="http://vimeo.com">Vimeo</a>.</p>'''
+      vimeo_share = '<iframe src="http://player.vimeo.com/video/13094257" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe><p><a href="http://vimeo.com/13094257">Fixed Gear Kuala Lumpur, RatsKL Putrajaya</a> from <a href="http://vimeo.com/user3635109">irmanhilmi</a> on <a href="http://vimeo.com">Vimeo</a>.</p>'
       @bike = Bike.new
       allow(@bike).to receive(:video_embed).and_return(vimeo_share)
       expect(@bike.video_embed_src).to eq('http://player.vimeo.com/video/13094257')
@@ -446,7 +447,7 @@ describe Bike do
 
     it 'returns the bikes in the default scope pattern if there is no query' do
       bike = FactoryGirl.create(:bike, description: 'Phil wood hub')
-      bike2 = FactoryGirl.create(:bike)
+      FactoryGirl.create(:bike)
       bikes = Bike.text_search('')
       expect(bikes.first).to eq(bike)
     end
@@ -488,7 +489,7 @@ describe Bike do
   describe 'cache_photo' do
     it 'caches the photo' do
       bike = FactoryGirl.create(:bike)
-      image = FactoryGirl.create(:public_image, imageable: bike)
+      FactoryGirl.create(:public_image, imageable: bike)
       bike.reload
       bike.cache_photo
       expect(bike.thumb_path).not_to be_nil
@@ -526,8 +527,8 @@ describe Bike do
         bike.description = 'I love my bike'
         bike.cache_stolen_attributes
         expect(bike.all_description).to eq('I love my bike some theft description')
-        expect(bike.stolen_lat).to eq 40.7143528
-        expect(bike.stolen_long).to eq -74.0059731
+        expect(bike.stolen_lat).to eq(40.7143528)
+        expect(bike.stolen_long).to eq(-74.0059731)
       end
     end
     context 'no current_stolen_record' do

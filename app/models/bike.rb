@@ -1,5 +1,6 @@
 class Bike < ActiveRecord::Base
   include ActiveModel::Dirty
+  include BikeSearchable
   mount_uploader :pdf, PdfUploader
   process_in_background :pdf, CarrierWaveProcessWorker
 
@@ -39,6 +40,9 @@ class Bike < ActiveRecord::Base
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :components, allow_destroy: true
 
+  geocoded_by nil, latitude: :stolen_lat, longitude: :stolen_long
+  after_validation :geocode, if: lambda { |o| false } # Never geocode, it's from stolen_record
+
   validates_presence_of :serial_number
   # Serial numbers aren't guaranteed to be unique across manufacturers.
   # But we do want to prevent the same bike being registered multiple times...
@@ -63,17 +67,16 @@ class Bike < ActiveRecord::Base
   scope :non_recovered, -> { where(recovered: false) }
 
   include PgSearch
-  pg_search_scope :search, against: {
-    serial_number: 'A',
-    cached_data:   'B',
-    all_description:   'C'
-  },
-  using: {tsearch: {dictionary: "english", prefix: true}}
+  pg_search_scope :pg_search, against: {
+      serial_number: 'A',
+      cached_data:   'B',
+      all_description:   'C'
+    }, using: { tsearch: { dictionary: "english", prefix: true } }
 
   pg_search_scope :admin_search,
     against: { owner_email: 'A' },
-    associated_against: {ownerships: :owner_email, creator: :email},
-    using: {tsearch: {dictionary: "english", prefix: true}}
+    associated_against: { ownerships: :owner_email, creator: :email },
+    using: { tsearch: { dictionary: "english", prefix: true } }
 
   class << self
     def old_attr_accessible
@@ -96,7 +99,7 @@ class Bike < ActiveRecord::Base
     end
     
     def text_search(query)
-      query.present? ? search(query) : all
+      query.present? ? pg_search(query) : all
     end
 
     def admin_text_search(query)
@@ -106,10 +109,10 @@ class Bike < ActiveRecord::Base
     def attr_cache_search(query)
       return scoped unless query.present? and query.is_a? Array
       a = []
-      self.find_each do |b|
+      find_each do |b|
         a << b.id if (query - b.cached_attributes).empty?
       end
-      self.where(id: a)
+      where(id: a)
     end
   end
 
@@ -162,7 +165,7 @@ class Bike < ActiveRecord::Base
   end
 
   def find_current_stolen_record
-    self.stolen_records.last if self.stolen_records.any?
+    stolen_records.last if stolen_records.any?
   end
 
   def title_string
@@ -206,7 +209,7 @@ class Bike < ActiveRecord::Base
   before_save :normalize_attributes
   def normalize_attributes
     self.serial_number = 'absent' if serial_number.blank? || serial_number.strip.downcase == 'unknown'
-    self.serial_normalized = SerialNormalizer.new({serial: serial_number}).normalized
+    self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
     if User.fuzzy_email_find(owner_email)
       # pp User.fuzzy_email_find(owner_email)
       self.owner_email = User.fuzzy_email_find(owner_email).email
@@ -261,7 +264,7 @@ class Bike < ActiveRecord::Base
   end
 
   def serial
-    serial_number unless self.recovered
+    serial_number unless recovered
   end
 
   before_save :set_paints
@@ -276,7 +279,7 @@ class Bike < ActiveRecord::Base
   end
 
   def paint_description
-    paint.name.titleize if self.paint.present?
+    paint.name.titleize if paint.present?
   end
 
   def frame_colors
