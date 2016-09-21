@@ -325,6 +325,19 @@ RSpec.shared_examples 'bike_searchable' do
         end
       end
     end
+    context 'organization bike' do
+      let(:bike_1) { FactoryGirl.create(:bike, primary_frame_color: color) }
+      let(:bike_2) { FactoryGirl.create(:organization_bike, secondary_frame_color: color) }
+      let(:organization) { bike_2.creation_organization }
+      let(:query_params) { { colors: [color.id], stolenness: 'all' } }
+      before do
+        expect([bike_1, bike_2].size).to eq 2
+        expect(organization.bikes.pluck(:id)).to eq([bike_2.id])
+      end
+      it 'only finds bikes in the organization' do
+        expect(organization.bikes.search(interpreted_params).pluck(:id)).to eq([bike_2.id])
+      end
+    end
   end
 
   describe 'search_close_serials' do
@@ -355,6 +368,17 @@ RSpec.shared_examples 'bike_searchable' do
       let(:query_params) { { serial: '011I528-111JJJk', query_items: [manufacturer.search_id], stolenness: 'all' } }
       it 'returns matching' do
         expect(Bike.search_close_serials(interpreted_params).pluck(:id)).to eq([stolen_bike.id])
+      end
+    end
+    context 'close serial on organization bikes' do
+      let(:organization) { FactoryGirl.create(:organization) }
+      let(:query_params) { { serial: '011I528-111JJJk', stolenness: 'all' } }
+      before do
+        stolen_bike.update_attribute :creation_organization_id, organization.id
+        expect(organization.bikes.pluck(:id)).to eq([stolen_bike.id])
+      end
+      it 'returns matching stolenness' do
+        expect(organization.bikes.search_close_serials(interpreted_params).pluck(:id)).to eq([stolen_bike.id])
       end
     end
   end

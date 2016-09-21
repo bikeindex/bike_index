@@ -45,6 +45,10 @@ module BikeSearchable
       items.flatten.compact
     end
 
+    def permitted_search_params
+      [:query, :manufacturer, :location, :distance, :serial, :stolenness, :query_items => [], :colors => []].freeze
+    end
+
     # Private (internal only) methods below here, as defined at the start
 
     def non_serial_matches(interpreted_params, matches)

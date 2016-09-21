@@ -48,6 +48,7 @@
     svg {
       height: auto;
       width: 50%;
+      max-width: 60px; // so it doesn't break organization search
       margin-top: 5%;
       display: inline-block;
     }
