@@ -3,10 +3,11 @@ class BikeIndex.BikeSearchBar extends BikeIndex
     @initializeHeaderSearch($(target_selector))
     $location = $('#location')
     @setSearchProximity($location) if $location.length > 0
+    @initializeEventListeners()
 
   initializeEventListeners: ->
     $('#stolenness_tabs a').click (e) =>
-      tab = $(event.target).parents('li')
+      tab = $(e.target).parents('li')
       $('#stolenness').val(tab.attr('data-stolenness'))
       $('#bikes_search_form').submit()
 
@@ -41,10 +42,12 @@ class BikeIndex.BikeSearchBar extends BikeIndex
   setSearchTabInfo: (location) ->
     $('#search_distance').text($('#distance').val())
     $('#search_location').text(location)
-    query = $('.search-type-tabs').attr('data-query')
+    search_data = _.merge(window.interpreted_params, { location: location })
+    console.log search_data
     $.ajax
       type: 'GET'
-      url: "/api/v3/search/count?#{query}"
+      url: '/api/v3/search/count'
+      data: search_data
       success: (data) =>
         @insertTabCounts(data)
 
