@@ -132,6 +132,7 @@ module BikeSearchable
     end
 
     # Actual searcher methods
+    # The searcher methods return where({}) so they can be chained together even if they don't modify anything
 
     def search_matching_color_ids(color_id)
       return where({}) unless color_id # So we can chain this if we don't have any colors
