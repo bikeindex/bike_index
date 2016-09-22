@@ -54,7 +54,9 @@ describe SerialNormalizer do
       SerialNormalizer.new(serial: 'another + : THING').save_segments(bike.id)
       segments = NormalizedSerialSegment.where(bike_id: bike.id)
       expect(segments.count).to eq(2)
-      expect(segments[1].segment).to eq('AN0THER')
+      seg_strings = segments.map(&:segment)
+      expect(seg_strings.include?('AN0THER')).to be_truthy
+      expect(seg_strings.include?('TH1NG')).to be_truthy
     end
 
     it 'does not make any if the bike is an example bike' do
