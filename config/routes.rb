@@ -137,6 +137,7 @@ Bikeindex::Application.routes.draw do
     end
     resources :graphs, only: [:index] do
       collection do
+        get :tables
         get :bikes
         get :users
         get :stolen_locations
