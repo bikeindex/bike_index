@@ -1,10 +1,9 @@
 class Admin::GraphsController < Admin::BaseController
   def index
-    # @graph_type = 'bikes'
-    # range = date_range("2013-01-18 21:03:08")
-    # @xaxis = month_list(range).to_json
-    # @values1 = range_values(range, "bikes_value").to_json
-    # @values2 = range_values(range, "stolen_bike_value").to_json
+    redirect_to tables_admin_graphs_path if params[:tables]
+  end
+
+  def tables
   end
 
   def users
@@ -13,31 +12,22 @@ class Admin::GraphsController < Admin::BaseController
 
   def bikes
     bikes = Bike.unscoped
-    
-    if params[:dates].present?
-      if params[:dates] == 'past_year'
-        range = 1.year.ago.midnight..Time.now
-      elsif params[:dates] == 'since_start'
-        range = Time.zone.parse('2007-01-01 1:00')..Time.now
-      end
-      bgraph = [
-        { name: 'Registrations', data: bikes.group_by_month(:created_at, range: range).count },
-        { name: 'Stolen', data: bikes.where(stolen: true).group_by_month(:created_at, range: range).count }
-      ]
+    case params[:start_at]
+    when 'past_year'
+      range = 1.year.ago.midnight..Time.now
     else
-      range = 1.weeks.ago.midnight..Time.now
-      bgraph = [
-        { name: 'Registrations', data: Bike.unscoped.group_by_day(:created_at, range: range).count },
-        { name: 'Stolen', data: Bike.unscoped.where(stolen: true).group_by_day(:created_at, range: range).count }
-      ]
-      render json: bgraph and return
+      range ||= bike_index_start..Time.now
     end
-    render json: bgraph
+    bgraph = [
+      { name: 'Registrations', data: bikes.group_by_month(:created_at, range: range).count },
+      { name: 'Stolen', data: bikes.where(stolen: true).group_by_month(:created_at, range: range).count }
+    ]
+    render json: bgraph.chart_json
   end
 
   def show
     @graph_type = params[:id]
-    range = date_range("2013-01-18 21:03:08")
+    range = date_range('2013-01-18 21:03:08')
     @xaxis = month_list(range).to_json
     @values1 = range_values(range, "#{params[:id]}_value").to_json
     if params[:id] == 'bikes'
@@ -61,7 +51,11 @@ class Admin::GraphsController < Admin::BaseController
     @xaxis = xaxis.to_json
   end
 
-protected
+  protected
+
+  def bike_index_start
+    Time.zone.parse('2007-01-01 1:00')
+  end
 
   def date_range(start_date)
     date_from  = Date.parse(start_date)
@@ -97,6 +91,4 @@ protected
   def organizations_value(date)
     Organization.where(["created_at < ?", date.end_of_month.end_of_day]).count
   end
-
-
 end

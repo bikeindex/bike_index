@@ -1,160 +1,23 @@
-- if params[:tables]
-  .special-search-field-container
-    .special-search-field
-      = form_tag admin_graphs_path, method: :get do
-        = text_field_tag :location, params[:location], placeholder: 'Location'
-        = text_field_tag :location_radius, params[:location_radius], placeholder: 'Proximity in miles'
-        = hidden_field_tag :tables, true
-        = submit_tag 'Load', name: 'search', class: 'button-blue'
-  - years = Array(2013..Time.now.year)
-  - dates = years.map { |y| Date.civil(y, 6, 6) }
-  - yday = Time.zone.now.yday
-  - days_left = Time.zone.now.end_of_year.yday - yday
+= javascript_include_tag "//www.google.com/jsapi", "chartkick" 
 
+%section.padded
+  %h1
+    Bike Index graphs
+    %small
+      = link_to 'View tables', tables_admin_graphs_path
+
+%section
   %h2
-    Records everywhere
-  %p
-    The
-    %span.less-strong
-      data in this color
-    is (simplified, not accounting for seasonalness) projections for the end of the current year
+    Users
+  = line_chart users_admin_graphs_path
 
-  %table.table.table-striped.table-bordered
-    %thead
-      %th
-      %th Stolen in year
-      %th Total stolen by eoy
-      %th Recovered in year
-      %th Stolen & non, in year
-      %th Total Stolen & non by eoy
-      %th Users in year
-    %tbody
-      - years.each_with_index do |year, index|
-        / - cache("admin_table_count_#{year}", expires_in: 1.hour) do
-        - date = dates[index]
-        %tr
-          %td
-            = year
-          %td
-            / Because of data import from SBR - after, we want created_at,it's more reliable
-            / because we automatically take it, also, people reporting previous thefts, etc
-            - if [2013, 2014].include?(year)
-              = StolenRecord.unscoped.where(date_stolen: date.all_year).count
-            - else
-              = count = StolenRecord.unscoped.where(created_at: date.all_year).count
-              - if year == Time.zone.now.year
-                %span.less-strong
-                  = s_project = count + (BigDecimal.new(count) / yday * days_left).to_i
-          %td
-            = count = StolenRecord.unscoped.where('created_at < ?', date.end_of_year).count
-            - if year == Time.zone.now.year
-              %span.less-strong
-                = s_project + count
-          %td
-            = count = StolenRecord.unscoped.where(date_recovered: date.all_year).count
-            - if year == Time.zone.now.year
-              %span.less-strong
-                = count + (BigDecimal.new(count) / yday * days_left).to_i
-          %td
-            = count = Bike.unscoped.where(created_at: date.all_year).count
-            - if year == Time.zone.now.year
-              %span.less-strong
-                = a_project = count + (BigDecimal.new(count) / yday * days_left).to_i
-          %td
-            = count = Bike.unscoped.where('created_at < ?', date.all_year.last).count
-            - if year == Time.zone.now.year
-              %span.less-strong
-                = a_project + count
-          %td
-            = count = User.unscoped.where(created_at: date.all_year).count
-            - if year == Time.zone.now.year
-              %span.less-strong
-                = count + (BigDecimal.new(count) / yday * days_left).to_i
-  .padded
-  .padded
-  - location_radius = params[:location_radius].present? ? params[:location_radius].to_i : 100
-  - box = params[:location].present? && Geocoder::Calculations.bounding_box(params[:location], location_radius)
-  - if box && !box[0].nan?
-    %h2.padded
-      Records in
-      %strong
-        = params[:location]
-    %table.table.table-striped.table-bordered
-      %thead
-        %th
-        %th Stolen in year
-        %th Total stolen by eoy
-        %th Recovered in year
-        %th Stolen & non, in year
-        %th Total Stolen & non by eoy
-        %th Users in year
-      %tbody
-        - years.each_with_index do |year, index|
-          - date = dates[index]
-          %tr
-            %td
-              = year
-            %td
-              / Because of data import from SBR - after, we want created_at,it's more reliable
-              / because we automatically take it, also, people reporting previous thefts, etc
-              - if [2013, 2014].include?(year)
-                = StolenRecord.unscoped.where(date_stolen: date.all_year).within_bounding_box(box).count
-              - else
-                = count = StolenRecord.unscoped.where(created_at: date.all_year).within_bounding_box(box).count
-                - if year == Time.zone.now.year
-                  %span.less-strong
-                    = s_project = count + (BigDecimal.new(count) / yday * days_left).to_i
-            %td
-              = count = StolenRecord.unscoped.where('created_at < ?', date.end_of_year).within_bounding_box(box).count
-              - if year == Time.zone.now.year
-                %span.less-strong
-                  = s_project + count
-            %td
-              = count = StolenRecord.unscoped.where(date_recovered: date.all_year).within_bounding_box(box).count
-              - if year == Time.zone.now.year
-                %span.less-strong
-                  = count + (BigDecimal.new(count) / yday * days_left).to_i
-            %td
-            %td
-            %td
+%section
+  %h2
+    Bikes past year
+  = line_chart bikes_admin_graphs_path(start_at: 'past_year')
 
-  - else
-    %h2
-      %em
-        Add a location to the search section at the top of the page to see stats about that location
-    - if params[:location].present?
-      %h4
-        The location and proximity you entered weren't useable. Try again.
+%section
+  %h2
+    Bikes since start
 
-- else
-  = javascript_include_tag "//www.google.com/jsapi", "chartkick" 
-
-
-  %section
-    %h1
-      Bike Index graphs
-
-  %section
-    %h2
-      Users
-    = line_chart users_admin_graphs_path
-
-  %section
-    %h2
-      Bikes past week
-    - range = 1.weeks.ago.midnight..Time.now
-    - bgraph = [ { name: 'Registrations', data: Bike.unscoped.group_by_day(:created_at, range: range).count }, { name: 'Stolen', data: Bike.unscoped.where(stolen: true).group_by_day(:created_at, range: range).count }]
-
-    = line_chart bikes_admin_graphs_path
-
-  %section
-    %h2
-      Bikes past year
-
-    = line_chart bikes_admin_graphs_path(dates: 'past_year')
-
-  %section
-    %h2
-      Bikes since 2007
-
-    = line_chart bikes_admin_graphs_path(dates: 'since_start')
+  = line_chart bikes_admin_graphs_path
