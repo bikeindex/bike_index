@@ -135,7 +135,7 @@ CREATE TABLE bikes (
     frame_material_id integer,
     number_of_seats integer,
     propulsion_type_id integer,
-    deprecated_creation_organization_id integer,
+    creation_organization_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     stolen boolean DEFAULT false NOT NULL,
@@ -149,7 +149,7 @@ CREATE TABLE bikes (
     video_embed text,
     year integer,
     has_no_serial boolean DEFAULT false NOT NULL,
-    deprecated_creator_id integer,
+    creator_id integer,
     deprecated_location_id integer,
     front_tire_narrow boolean,
     primary_frame_color_id integer,
@@ -171,7 +171,7 @@ CREATE TABLE bikes (
     card_id integer,
     recovered boolean DEFAULT false NOT NULL,
     paint_id integer,
-    deprecated_registered_new boolean,
+    registered_new boolean,
     example boolean DEFAULT false NOT NULL,
     country_id integer,
     stock_photo_url character varying(255),
@@ -400,7 +400,7 @@ ALTER SEQUENCE countries_id_seq OWNED BY countries.id;
 
 CREATE TABLE creation_states (
     id integer NOT NULL,
-    deprecated_bike_id integer,
+    bike_id integer,
     organization_id integer,
     origin character varying,
     is_bulk boolean DEFAULT false NOT NULL,
@@ -2615,7 +2615,7 @@ CREATE INDEX index_bikes_on_manufacturer_id ON bikes USING btree (manufacturer_i
 -- Name: index_bikes_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_bikes_on_organization_id ON bikes USING btree (deprecated_creation_organization_id);
+CREATE INDEX index_bikes_on_organization_id ON bikes USING btree (creation_organization_id);
 
 
 --
@@ -2668,17 +2668,17 @@ CREATE INDEX index_components_on_manufacturer_id ON components USING btree (manu
 
 
 --
+-- Name: index_creation_states_on_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_creation_states_on_bike_id ON creation_states USING btree (bike_id);
+
+
+--
 -- Name: index_creation_states_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_creation_states_on_creator_id ON creation_states USING btree (creator_id);
-
-
---
--- Name: index_creation_states_on_deprecated_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_creation_states_on_deprecated_bike_id ON creation_states USING btree (deprecated_bike_id);
 
 
 --

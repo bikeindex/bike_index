@@ -25,10 +25,12 @@ class Bike < ActiveRecord::Base
 
   # has_many :bike_organizations, dependent: :destroy
   # has_many :organizations, through: :bike_organizations
+  belongs_to :creator
+  belongs_to :creation_organization
 
   belongs_to :creation_state, dependent: :destroy
-  delegate :creator, to: :creation_state
-  has_one :creation_organization, through: :creation_state, source: :organization
+  delegate :creation_state_creator, to: :creation_state, source: :creator
+  has_one :creation_state_creation_organization, through: :creation_state, source: :organization
   has_many :stolen_notifications, dependent: :destroy
   has_many :stolen_records, dependent: :destroy
   has_many :other_listings

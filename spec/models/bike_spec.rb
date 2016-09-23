@@ -21,8 +21,8 @@ describe Bike do
     # it { is_expected.to have_many :bike_organizations }
     # it { is_expected.to have_many(:organizations).through(:bike_organizations) }
     it { is_expected.to belong_to :creation_state }
-    it { is_expected.to delegate_method(:creator).to(:creation_state) }
-    it { is_expected.to have_one(:creation_organization).through(:creation_state) }
+    it { is_expected.to delegate_method(:creation_state_creator).to(:creation_state) }
+    it { is_expected.to have_one(:creation_state_creation_organization).through(:creation_state) }
     it { is_expected.to belong_to :current_stolen_record }
     it { is_expected.to have_many :duplicate_bike_groups }
     it { is_expected.to have_many :b_params }
@@ -35,6 +35,7 @@ describe Bike do
     it { is_expected.to accept_nested_attributes_for :stolen_records }
     it { is_expected.to accept_nested_attributes_for :components }
     it { is_expected.to validate_presence_of :creation_state_id }
+    it { is_expected.to validate_presence_of :creator_id }
     it { is_expected.to validate_presence_of :cycle_type_id }
     it { is_expected.to validate_presence_of :propulsion_type_id }
     it { is_expected.to validate_presence_of :serial_number }
@@ -650,25 +651,6 @@ describe Bike do
         expect(bike.validate_organization_id('some org')).to be_falsey
         expect(bike.errors[:organization].to_s).to match(/not found/)
         expect(bike.errors[:organization].to_s).to match(/some org/)
-      end
-    end
-  end
-
-  describe 'BikeBuildable' do
-    describe 'create_creation' do
-      let(:bike) { Bike.new() }
-      describe 'valid' do
-        let(:b_param) { FactoryGirl.create(:b_param_with_creation_organization, origin: 'api_v2') }
-        let(:organization) { b_param.organization }
-        let(:creator) { b_param.creator }
-        let(:creation_state) { bike.creation_state_for(b_param) }
-        it 'creates creation' do
-          expect(bike.creation_state_id).to eq creation_state.id
-          expect(creation_state.origin).to eq 'api_v2'
-          expect(creation_state.creator).to eq creator
-          expect(creation_state.organization).to eq organization
-          expect(bike.errors.any?).to be_falsey
-        end
       end
     end
   end
