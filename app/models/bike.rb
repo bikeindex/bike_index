@@ -21,9 +21,8 @@ class Bike < ActiveRecord::Base
   belongs_to :invoice
   belongs_to :location
   belongs_to :current_stolen_record, class_name: 'StolenRecord'
-
   belongs_to :creator, class_name: 'User' # to be deprecated and removed
-  belongs_to :creation_organization, class_name: "Organization" # to be deprecated and removed
+  belongs_to :creation_organization, class_name: 'Organization' # to be deprecated and removed
 
   # has_many :bike_organizations, dependent: :destroy
   # has_many :organizations, through: :bike_organizations
@@ -62,10 +61,10 @@ class Bike < ActiveRecord::Base
     :embeded_extended, :paint_name, :bike_image_cache, :send_email,
     :marked_user_hidden, :marked_user_unhidden, :b_param_id_token
 
-  default_scope { where(example: false).where(hidden: false).order("listing_order desc") }
+  default_scope { where(example: false).where(hidden: false).order('listing_order desc') }
   scope :stolen, -> { where(stolen: true) }
   scope :non_stolen, -> { where(stolen: false) }
-  scope :with_serial, -> { where("serial_number != ?", "absent") }
+  scope :with_serial, -> { where('serial_number != ?', 'absent') }
   scope :non_recovered, -> { where(recovered: false) }
 
   include PgSearch
@@ -73,12 +72,12 @@ class Bike < ActiveRecord::Base
       serial_number: 'A',
       cached_data:   'B',
       all_description:   'C'
-    }, using: { tsearch: { dictionary: "english", prefix: true } }
+    }, using: { tsearch: { dictionary: 'english', prefix: true } }
 
   pg_search_scope :admin_search,
     against: { owner_email: 'A' },
     associated_against: { ownerships: :owner_email, creator: :email },
-    using: { tsearch: { dictionary: "english", prefix: true } }
+    using: { tsearch: { dictionary: 'english', prefix: true } }
 
   class << self
     def old_attr_accessible
@@ -295,10 +294,7 @@ class Bike < ActiveRecord::Base
   end
 
   def cgroup_array # list of cgroups so that we can arrange them
-    return [] unless components.any?
-    a = []
-    components.each { |i| a << i.cgroup_id }
-    a.uniq
+    components.map(&:cgroup_id).uniq
   end
 
   def cache_photo
