@@ -23,11 +23,11 @@ class Bike < ActiveRecord::Base
   belongs_to :location
   belongs_to :current_stolen_record, class_name: 'StolenRecord'
 
+  belongs_to :creator, class_name: 'User' # to be deprecated and removed
+  belongs_to :creation_organization, class_name: "Organization" # to be deprecated and removed
+
   # has_many :bike_organizations, dependent: :destroy
   # has_many :organizations, through: :bike_organizations
-  belongs_to :creator
-  belongs_to :creation_organization
-
   belongs_to :creation_state, dependent: :destroy
   delegate :creation_state_creator, to: :creation_state, source: :creator
   has_one :creation_state_creation_organization, through: :creation_state, source: :organization
@@ -51,7 +51,7 @@ class Bike < ActiveRecord::Base
   validates_presence_of :serial_number
   validates_presence_of :propulsion_type_id
   validates_presence_of :cycle_type_id
-  validates_presence_of :creator_id
+  validates_presence_of :creator
   # validates_presence_of :creation_state_id
   validates_presence_of :manufacturer_id
 
@@ -86,7 +86,7 @@ class Bike < ActiveRecord::Base
       # made_without_serial - GUARANTEE there was no serial
       (%w(cycle_type_id manufacturer_id manufacturer_other serial_number 
         serial_normalized has_no_serial made_without_serial additional_registration
-        manufacturer year thumb_path name stolen
+        creation_organization_id manufacturer year thumb_path name stolen
         current_stolen_record_id recovered frame_material_id frame_model number_of_seats
         handlebar_type_id handlebar_type_other frame_size frame_size_number frame_size_unit
         rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow 

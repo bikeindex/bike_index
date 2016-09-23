@@ -2,9 +2,9 @@
 # ... But this factory allows creating bikes without ownerships
 FactoryGirl.define do
   factory :bike do
-    transient do
+    # transient do # will be transient once we drop the deprecated creation attributes
       creator { FactoryGirl.create(:user) }
-    end
+    # end
     serial_number
     manufacturer { FactoryGirl.create(:manufacturer) }
     sequence(:owner_email) { |n| "bike_owner#{n}@example.com" }

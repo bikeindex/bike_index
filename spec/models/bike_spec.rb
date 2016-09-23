@@ -34,8 +34,8 @@ describe Bike do
     it { is_expected.to have_many :other_listings }
     it { is_expected.to accept_nested_attributes_for :stolen_records }
     it { is_expected.to accept_nested_attributes_for :components }
-    it { is_expected.to validate_presence_of :creation_state_id }
-    it { is_expected.to validate_presence_of :creator_id }
+    # it { is_expected.to validate_presence_of :creation_state_id }
+    it { is_expected.to validate_presence_of :creator }
     it { is_expected.to validate_presence_of :cycle_type_id }
     it { is_expected.to validate_presence_of :propulsion_type_id }
     it { is_expected.to validate_presence_of :serial_number }
