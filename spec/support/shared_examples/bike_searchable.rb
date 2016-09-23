@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.shared_examples 'bike_searchable' do
-  let(:manufacturer) { FactoryGirl.create(:manufacturer) }
+let(:manufacturer) { FactoryGirl.create(:manufacturer) }
   let(:color) { FactoryGirl.create(:color) }
   let(:multi_query_items) { [manufacturer.search_id, color.search_id, 'some other string', 'another string'] }
   let(:ip_address) { '127.0.0.1' }
@@ -276,9 +276,10 @@ RSpec.shared_examples 'bike_searchable' do
     end
     context 'query' do
       let(:bike) { FactoryGirl.create(:bike, description: 'Booger') }
+      let(:bike_2) { FactoryGirl.create(:bike) }
       let(:query_params) { { query: 'booger', stolenness: 'all' } }
       before do
-        expect(bike).to be_present
+        expect([bike, bike_2].size).to eq 2
       end
       it 'selects matching the query' do
         expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike.id])
@@ -325,7 +326,7 @@ RSpec.shared_examples 'bike_searchable' do
         end
       end
     end
-    describe 'search' do
+    describe 'scoped bike' do
       context 'organization bike' do
         let(:interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: 'd') }
 
