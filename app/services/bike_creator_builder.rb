@@ -41,5 +41,4 @@ class BikeCreatorBuilder
     add_front_wheel_size(bike)
     bike
   end
-
 end

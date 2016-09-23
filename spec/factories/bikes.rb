@@ -8,7 +8,7 @@ FactoryGirl.define do
     serial_number
     manufacturer { FactoryGirl.create(:manufacturer) }
     sequence(:owner_email) { |n| "bike_owner#{n}@example.com" }
-    creation { FactoryGirl.create(:creation, creator: creator) }
+    creation_state { FactoryGirl.create(:creation_state, creator: creator) }
     primary_frame_color { Color.black }
     cycle_type { CycleType.bike }
     propulsion_type { PropulsionType.foot_pedal }
@@ -17,7 +17,7 @@ FactoryGirl.define do
       transient do
         organization { FactoryGirl.create(:organization) }
       end
-      creation { FactoryGirl.create(:creation, creator: creator, organization: organization) }
+      creation_state { FactoryGirl.create(:creation_state, creator: creator, organization: organization) }
     end
 
     factory :stolen_bike do

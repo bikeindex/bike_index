@@ -1,16 +1,7 @@
 class OwnershipNotSavedError < StandardError
 end
 
-class BikeNotSavedError < StandardError
-end
-
-class BikeCreatorError < StandardError
-end
-
 class BikeUpdatorError < StandardError
-end
-
-class BikeTyperError < StandardError
 end
 
 class BikesController < ApplicationController

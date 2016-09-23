@@ -11,8 +11,8 @@ class Organization < ActiveRecord::Base
   has_many :organization_deals, dependent: :destroy
   has_many :users, through: :memberships
   has_many :organization_invitations, dependent: :destroy
-  has_many :creations
-  has_many :created_bikes, through: :creations, source: :bike
+  has_many :creation_states
+  has_many :created_bikes, through: :creation_states, source: :bike
   belongs_to :auto_user, class_name: 'User'
   accepts_nested_attributes_for :mail_snippets
 

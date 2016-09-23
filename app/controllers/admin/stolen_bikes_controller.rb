@@ -1,6 +1,3 @@
-class BikeNotSavedError < StandardError
-end
-
 class Admin::StolenBikesController < Admin::BaseController
   before_filter :find_bike, only: [:edit, :destroy, :approve, :update]
 

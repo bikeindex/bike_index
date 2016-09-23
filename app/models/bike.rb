@@ -1,6 +1,7 @@
 class Bike < ActiveRecord::Base
   include ActiveModel::Dirty
   include BikeSearchable
+  include BikeBuildable
   mount_uploader :pdf, PdfUploader
   process_in_background :pdf, CarrierWaveProcessWorker
 
@@ -25,9 +26,9 @@ class Bike < ActiveRecord::Base
   # has_many :bike_organizations, dependent: :destroy
   # has_many :organizations, through: :bike_organizations
 
-  belongs_to :creation, dependent: :destroy
-  delegate :creator, to: :creation
-  has_one :creation_organization, through: :creation, source: :organization
+  belongs_to :creation_state, dependent: :destroy
+  delegate :creator, to: :creation_state
+  has_one :creation_organization, through: :creation_state, source: :organization
   has_many :stolen_notifications, dependent: :destroy
   has_many :stolen_records, dependent: :destroy
   has_many :other_listings
@@ -48,7 +49,7 @@ class Bike < ActiveRecord::Base
   validates_presence_of :serial_number
   validates_presence_of :propulsion_type_id
   validates_presence_of :cycle_type_id
-  validates_presence_of :creation_id
+  validates_presence_of :creation_state_id
   validates_presence_of :manufacturer_id
 
   validates_uniqueness_of :card_id, allow_nil: true
@@ -57,7 +58,7 @@ class Bike < ActiveRecord::Base
   attr_accessor :other_listing_urls, :date_stolen_input, :receive_notifications,
     :phone, :image, :b_param_id, :embeded,
     :embeded_extended, :paint_name, :bike_image_cache, :send_email,
-    :marked_user_hidden, :marked_user_unhidden, :b_param_id_token
+    :marked_user_hidden, :marked_user_unhidden, :b_param_id_token, :creator_id
 
   default_scope { where(example: false).where(hidden: false).order("listing_order desc") }
   scope :stolen, -> { where(stolen: true) }
@@ -82,7 +83,7 @@ class Bike < ActiveRecord::Base
       # made_without_serial - GUARANTEE there was no serial
       (%w(cycle_type_id manufacturer_id manufacturer_other serial_number 
         serial_normalized has_no_serial made_without_serial additional_registration
-        creation_organization_id location_id manufacturer year thumb_path name stolen
+        manufacturer year thumb_path name stolen
         current_stolen_record_id recovered frame_material_id frame_model number_of_seats
         handlebar_type_id handlebar_type_other frame_size frame_size_number frame_size_unit
         rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow 
@@ -172,6 +173,14 @@ class Bike < ActiveRecord::Base
         src[0].value
       end
     end
+  end
+
+  def validate_organization_id(organization_id)
+    organization = Organization.friendly_find(organization_id)
+    return true if organization && !organization.suspended?
+    msg = organization ? "suspended and can't be used" : 'not found'
+    errors.add(:organization, "#{organization_id} is #{msg}")
+    false
   end
 
   before_save :set_mnfg_name
@@ -306,17 +315,6 @@ class Bike < ActiveRecord::Base
     end
   end
 
-  def cache_attributes
-    ca = []
-    ca << "#{primary_frame_color.priority}c#{primary_frame_color_id}" if primary_frame_color_id
-    ca << "#{secondary_frame_color.priority}c#{secondary_frame_color_id}" if secondary_frame_color_id
-    ca << "#{tertiary_frame_color.priority}c#{tertiary_frame_color_id}" if tertiary_frame_color_id
-    ca << "h#{handlebar_type_id}" if handlebar_type
-    ca << "#{rear_wheel_size.priority}w#{rear_wheel_size_id}" if rear_wheel_size_id
-    ca << "#{front_wheel_size.priority}w#{front_wheel_size_id}" if front_wheel_size_id && front_wheel_size != rear_wheel_size
-    self.cached_attributes = ca
-  end
-
   def cache_stolen_attributes
     csr = find_current_stolen_record
     self.attributes = {
@@ -331,7 +329,6 @@ class Bike < ActiveRecord::Base
   def cache_bike
     cache_stolen_attributes
     cache_photo
-    cache_attributes
     self.cached_data = [
       mnfg_name,
       (propulsion_type.name == 'Foot pedal' ? nil : propulsion_type.name),

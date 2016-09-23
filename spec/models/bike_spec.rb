@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe Bike do
   it_behaves_like 'bike_searchable'
+  it_behaves_like 'bike_buildable'
   describe 'validations' do
     it { is_expected.to belong_to :manufacturer }
     it { is_expected.to belong_to :primary_frame_color }
@@ -19,11 +20,10 @@ describe Bike do
     it { is_expected.to belong_to :updator }
     # it { is_expected.to have_many :bike_organizations }
     # it { is_expected.to have_many(:organizations).through(:bike_organizations) }
-    it { is_expected.to belong_to :creation }
-    it { is_expected.to delegate_method(:creator).to(:creation) }
-    it { is_expected.to have_one(:creation_organization).through(:creation) }
+    it { is_expected.to belong_to :creation_state }
+    it { is_expected.to delegate_method(:creator).to(:creation_state) }
+    it { is_expected.to have_one(:creation_organization).through(:creation_state) }
     it { is_expected.to belong_to :current_stolen_record }
-    it { is_expected.to belong_to :location }
     it { is_expected.to have_many :duplicate_bike_groups }
     it { is_expected.to have_many :b_params }
     it { is_expected.to have_many :stolen_notifications }
@@ -34,7 +34,7 @@ describe Bike do
     it { is_expected.to have_many :other_listings }
     it { is_expected.to accept_nested_attributes_for :stolen_records }
     it { is_expected.to accept_nested_attributes_for :components }
-    it { is_expected.to validate_presence_of :creation_id }
+    it { is_expected.to validate_presence_of :creation_state_id }
     it { is_expected.to validate_presence_of :cycle_type_id }
     it { is_expected.to validate_presence_of :propulsion_type_id }
     it { is_expected.to validate_presence_of :serial_number }
@@ -517,7 +517,6 @@ describe Bike do
       bike = FactoryGirl.create(:bike, current_stolen_record_id: 69)
       expect(bike).to receive(:cache_photo)
       expect(bike).to receive(:cache_stolen_attributes)
-      expect(bike).to receive(:cache_attributes)
       expect(bike).to receive(:components_cache_string)
       bike.cache_bike
       expect(bike.current_stolen_record_id).to be_nil
@@ -621,6 +620,56 @@ describe Bike do
       allow(bike).to receive(:type).and_return('bike')
       expect(bike.title_string).not_to match('</title><svg/onload=alert(document.cookie)>')
       expect(bike.title_string.length).to be > 5
+    end
+  end
+
+  describe 'validate_organization_id' do
+    let(:bike) { Bike.new }
+    context 'valid organization' do
+      let(:organization) { FactoryGirl.create(:organization) }
+      context 'slug' do
+        it 'returns true' do
+          expect(bike.validate_organization_id(organization.slug)).to be_truthy
+        end
+      end
+      context 'id' do
+        it 'returns true' do
+          expect(bike.validate_organization_id(organization.id)).to be_truthy
+        end
+      end
+    end
+    context 'suspended organization' do
+      let(:organization) { FactoryGirl.create(:organization, is_suspended: true) }
+      it 'adds an error to the bike' do
+        expect(bike.validate_organization_id(organization.id)).to be_falsey
+        expect(bike.errors[:organization].to_s).to match(/suspended/)
+      end
+    end
+    context 'unable to find organization' do
+      it 'adds an error to the bike' do
+        expect(bike.validate_organization_id('some org')).to be_falsey
+        expect(bike.errors[:organization].to_s).to match(/not found/)
+        expect(bike.errors[:organization].to_s).to match(/some org/)
+      end
+    end
+  end
+
+  describe 'BikeBuildable' do
+    describe 'create_creation' do
+      let(:bike) { Bike.new() }
+      describe 'valid' do
+        let(:b_param) { FactoryGirl.create(:b_param_with_creation_organization, origin: 'api_v2') }
+        let(:organization) { b_param.organization }
+        let(:creator) { b_param.creator }
+        let(:creation_state) { bike.creation_state_for(b_param) }
+        it 'creates creation' do
+          expect(bike.creation_state_id).to eq creation_state.id
+          expect(creation_state.origin).to eq 'api_v2'
+          expect(creation_state.creator).to eq creator
+          expect(creation_state.organization).to eq organization
+          expect(bike.errors.any?).to be_falsey
+        end
+      end
     end
   end
 end

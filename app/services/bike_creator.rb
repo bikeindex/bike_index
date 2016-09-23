@@ -1,6 +1,3 @@
-class BikeCreatorError < StandardError
-end
-
 class BikeCreator
   def initialize(b_param = nil)
     @b_param = b_param
@@ -10,12 +7,11 @@ class BikeCreator
   def add_bike_book_data
     return nil unless @b_param && @b_param.bike.present? && @b_param.manufacturer_id.present?
     return nil unless @b_param.bike['frame_model'].present? && @b_param.bike['year'].present?
-    bike = {
+    bb_data = BikeBookIntegration.new.get_model({
       manufacturer: Manufacturer.find(@b_param.bike['manufacturer_id']).name,
       year: @b_param.bike['year'],
       frame_model: @b_param.bike['frame_model']
-    }
-    bb_data = BikeBookIntegration.new.get_model(bike)
+    })
     return true unless bb_data && bb_data['bike'].present?
     @b_param.params['bike']['cycle_type'] = bb_data['bike']['cycle_type'] if bb_data['bike'] && bb_data['bike']['cycle_type'].present?
     if bb_data['bike']['paint_description'].present?

@@ -135,7 +135,7 @@ CREATE TABLE bikes (
     frame_material_id integer,
     number_of_seats integer,
     propulsion_type_id integer,
-    creation_organization_id integer,
+    deprecated_creation_organization_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     stolen boolean DEFAULT false NOT NULL,
@@ -149,8 +149,8 @@ CREATE TABLE bikes (
     video_embed text,
     year integer,
     has_no_serial boolean DEFAULT false NOT NULL,
-    creator_id integer,
-    location_id integer,
+    deprecated_creator_id integer,
+    deprecated_location_id integer,
     front_tire_narrow boolean,
     primary_frame_color_id integer,
     secondary_frame_color_id integer,
@@ -171,7 +171,7 @@ CREATE TABLE bikes (
     card_id integer,
     recovered boolean DEFAULT false NOT NULL,
     paint_id integer,
-    registered_new boolean,
+    deprecated_registered_new boolean,
     example boolean DEFAULT false NOT NULL,
     country_id integer,
     stock_photo_url character varying(255),
@@ -187,10 +187,7 @@ CREATE TABLE bikes (
     made_without_serial boolean DEFAULT false NOT NULL,
     stolen_lat double precision,
     stolen_long double precision,
-    cached_attributes character varying,
-    creation_country_id character varying,
-    creation_zipcode character varying,
-    creation_id integer
+    creation_state_id integer
 );
 
 
@@ -398,12 +395,12 @@ ALTER SEQUENCE countries_id_seq OWNED BY countries.id;
 
 
 --
--- Name: creations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: creation_states; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE creations (
+CREATE TABLE creation_states (
     id integer NOT NULL,
-    bike_id integer,
+    deprecated_bike_id integer,
     organization_id integer,
     origin character varying,
     is_bulk boolean DEFAULT false NOT NULL,
@@ -411,16 +408,15 @@ CREATE TABLE creations (
     updated_at timestamp without time zone NOT NULL,
     is_pos boolean DEFAULT false NOT NULL,
     is_new boolean DEFAULT false NOT NULL,
-    location_id integer,
     creator_id integer
 );
 
 
 --
--- Name: creations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: creation_states_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE creations_id_seq
+CREATE SEQUENCE creation_states_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -429,10 +425,10 @@ CREATE SEQUENCE creations_id_seq
 
 
 --
--- Name: creations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: creation_states_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE creations_id_seq OWNED BY creations.id;
+ALTER SEQUENCE creation_states_id_seq OWNED BY creation_states.id;
 
 
 --
@@ -1935,7 +1931,7 @@ ALTER TABLE ONLY countries ALTER COLUMN id SET DEFAULT nextval('countries_id_seq
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY creations ALTER COLUMN id SET DEFAULT nextval('creations_id_seq'::regclass);
+ALTER TABLE ONLY creation_states ALTER COLUMN id SET DEFAULT nextval('creation_states_id_seq'::regclass);
 
 
 --
@@ -2269,11 +2265,11 @@ ALTER TABLE ONLY countries
 
 
 --
--- Name: creations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: creation_states_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
-ALTER TABLE ONLY creations
-    ADD CONSTRAINT creations_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY creation_states
+    ADD CONSTRAINT creation_states_pkey PRIMARY KEY (id);
 
 
 --
@@ -2588,17 +2584,10 @@ CREATE INDEX index_bikes_on_card_id ON bikes USING btree (card_id);
 
 
 --
--- Name: index_bikes_on_creation_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_bikes_on_creation_state_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_bikes_on_creation_id ON bikes USING btree (creation_id);
-
-
---
--- Name: index_bikes_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_bikes_on_creator_id ON bikes USING btree (creator_id);
+CREATE INDEX index_bikes_on_creation_state_id ON bikes USING btree (creation_state_id);
 
 
 --
@@ -2626,7 +2615,7 @@ CREATE INDEX index_bikes_on_manufacturer_id ON bikes USING btree (manufacturer_i
 -- Name: index_bikes_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_bikes_on_organization_id ON bikes USING btree (creation_organization_id);
+CREATE INDEX index_bikes_on_organization_id ON bikes USING btree (deprecated_creation_organization_id);
 
 
 --
@@ -2679,24 +2668,24 @@ CREATE INDEX index_components_on_manufacturer_id ON components USING btree (manu
 
 
 --
--- Name: index_creations_on_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_creation_states_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_creations_on_bike_id ON creations USING btree (bike_id);
-
-
---
--- Name: index_creations_on_location_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_creations_on_location_id ON creations USING btree (location_id);
+CREATE INDEX index_creation_states_on_creator_id ON creation_states USING btree (creator_id);
 
 
 --
--- Name: index_creations_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_creation_states_on_deprecated_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_creations_on_organization_id ON creations USING btree (organization_id);
+CREATE INDEX index_creation_states_on_deprecated_bike_id ON creation_states USING btree (deprecated_bike_id);
+
+
+--
+-- Name: index_creation_states_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_creation_states_on_organization_id ON creation_states USING btree (organization_id);
 
 
 --
@@ -3202,4 +3191,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160910184053');
 INSERT INTO schema_migrations (version) VALUES ('20160913155615');
 
 INSERT INTO schema_migrations (version) VALUES ('20160923144458');
+
+INSERT INTO schema_migrations (version) VALUES ('20160923180542');
 

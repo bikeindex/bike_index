@@ -329,8 +329,8 @@ describe BikesController do
             post :create, bike: bike_params
           end.to change(Ownership, :count).by 1
           bike = Bike.last
-          expect(bike.creation.origin).to eq 'embed'
-          expect(bike.creation.organization).to eq organization
+          expect(bike.creation_state.origin).to eq 'embed'
+          expect(bike.creation_state.organization).to eq organization
           testable_bike_params.each do |k, v|
             pp k unless bike.send(k).to_s == v.to_s
             expect(bike.send(k).to_s).to eq v.to_s
@@ -356,8 +356,8 @@ describe BikesController do
               post :create, bike: bike_params.merge(stolen: true), stolen_record: stolen_params
             end.to change(Ownership, :count).by 1
             bike = Bike.last
-            expect(bike.creation.origin).to eq 'embed'
-            expect(bike.creation.organization).to eq organization
+            expect(bike.creation_state.origin).to eq 'embed'
+            expect(bike.creation_state.organization).to eq organization
             testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
             stolen_record = bike.current_stolen_record
             stolen_params.except(:date_stolen_input).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
@@ -412,8 +412,8 @@ describe BikesController do
             expect(response).to redirect_to(embed_extended_organization_url(organization))
             bike = Bike.last
             expect(bike.owner_email).to eq bike_params[:owner_email].downcase
-            expect(bike.creation.origin).to eq 'embed_extended'
-            expect(bike.creation.organization).to eq organization
+            expect(bike.creation_state.origin).to eq 'embed_extended'
+            expect(bike.creation_state.organization).to eq organization
             expect(bike.manufacturer).to eq manufacturer
           end
         end
@@ -423,8 +423,8 @@ describe BikesController do
           post :create, bike: bike_params.merge(manufacturer_id: 'A crazy different thing'), persist_email: true
           expect(response).to redirect_to(embed_extended_organization_url(organization, email: 'flow@goodtimes.com'))
           bike = Bike.last
-          expect(bike.creation.origin).to eq 'embed_extended'
-          expect(bike.creation.organization).to eq organization
+          expect(bike.creation_state.origin).to eq 'embed_extended'
+          expect(bike.creation_state.organization).to eq organization
           expect(bike.manufacturer).to eq Manufacturer.other
           expect(bike.manufacturer_other).to eq 'A crazy different thing'
         end
@@ -592,7 +592,7 @@ describe BikesController do
             bike_params.delete(:manufacturer_id)
             bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v }
             expect(bike.manufacturer).to eq manufacturer
-            expect(bike.creation.origin).to eq 'embed_partial'
+            expect(bike.creation_state.origin).to eq 'embed_partial'
           end
         end
         context 'created bike' do

@@ -378,7 +378,7 @@ RSpec.shared_examples 'bike_searchable' do
       let(:organization) { FactoryGirl.create(:organization) }
       let(:query_params) { { serial: '011I528-111JJJk', stolenness: 'all' } }
       before do
-        stolen_bike.creation.update_attribute :organization_id, organization.id
+        stolen_bike.creation_state.update_attribute :organization_id, organization.id
         expect(organization.created_bikes.pluck(:id)).to eq([stolen_bike.id])
       end
       it 'returns matching stolenness' do

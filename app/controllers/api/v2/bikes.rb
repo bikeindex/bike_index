@@ -66,7 +66,7 @@ module API
           current_user.id
         end
 
-        def creation_params
+        def creation_state_params
           {
             is_bulk: params[:is_bulk],
             is_pos: params[:is_pos],
@@ -141,7 +141,7 @@ module API
           end
         end
         post '/', serializer: BikeV2ShowSerializer, root: 'bike' do
-          declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_params) }
+          declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
           b_param = BParam.create(creator_id: creation_user_id, params: declared_p['declared_params'], origin: 'api_v2')
           ensure_required_stolen_attrs(b_param.params)
           bike = BikeCreator.new(b_param).create_bike
