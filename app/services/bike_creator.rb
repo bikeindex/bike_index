@@ -8,10 +8,8 @@ class BikeCreator
   end
 
   def add_bike_book_data
-    return nil unless @b_param.present? && @b_param.params.present? && @b_param.params['bike'].present?
-    return nil unless @b_param.bike['manufacturer_id'].present?
-    return nil unless @b_param.bike['frame_model'].present?
-    return nil unless @b_param.bike['year'].present?
+    return nil unless @b_param && @b_param.bike.present? && @b_param.manufacturer_id.present?
+    return nil unless @b_param.bike['frame_model'].present? && @b_param.bike['year'].present?
     bike = {
       manufacturer: Manufacturer.find(@b_param.bike['manufacturer_id']).name,
       year: @b_param.bike['year'],
@@ -77,7 +75,7 @@ class BikeCreator
     @bike = create_associations(bike)
     validate_record(@bike)
     if @bike.present?
-      @bike.create_creation_state(creation_state_attributes)
+      @bike.create_creation(creation_attributes)
       ListingOrderWorker.perform_async(@bike.id)
       ListingOrderWorker.perform_in(10.seconds, @bike.id)
     end
@@ -98,7 +96,7 @@ class BikeCreator
 
   private
 
-  def creation_state_attributes
+  def creation_attributes
     {
       is_bulk: @b_param.is_bulk,
       is_pos: @b_param.is_pos,

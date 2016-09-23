@@ -1,10 +1,7 @@
-class SerialNormalizerError < StandardError
-end
-
 class SerialNormalizer
-  def initialize(creation_params = {})
-    @serial = creation_params[:serial] && creation_params[:serial].strip.upcase
-    @bike_id = creation_params[:bike_id]
+  def initialize(serial: nil, bike_id: nil)
+    @serial = serial && serial.strip.upcase
+    @bike_id = bike_id
   end
 
   def normalized

@@ -1,6 +1,6 @@
 class Location < ActiveRecord::Base
   acts_as_paranoid
-  belongs_to :organization
+  belongs_to :organization  # Locations are organization locations
   belongs_to :country
   belongs_to :state
   validates_presence_of :name, :organization_id, :city, :country_id

@@ -8,8 +8,9 @@ class HandlebarType < ActiveRecord::Base
     def other
       where(name: 'Not handlebars', slug: 'other').first_or_create
     end
-    def old_attr_accessible
-      %w(name slug).map(&:to_sym).freeze
+
+    def flat
+      where(name: 'Flat or riser', slug: 'flat').first_or_create
     end
   end
 end

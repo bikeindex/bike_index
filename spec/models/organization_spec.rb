@@ -9,7 +9,9 @@ describe Organization do
     it { is_expected.to have_many :mail_snippets }
     it { is_expected.to have_many :users }
     it { is_expected.to have_many :organization_invitations }
-    it { is_expected.to have_many :creation_states }
+    it { is_expected.to have_many :creations }
+    it { is_expected.to have_many(:created_bikes).through(:creations) }
+
     it { is_expected.to have_many :locations }
     it { is_expected.to have_many :bikes }
     it { is_expected.to belong_to :auto_user }

@@ -42,6 +42,7 @@ class BParam < ActiveRecord::Base
     params['bike']['tertiary_frame_color_id'] = val
   end
 
+  def bike; (params && params['bike'] || {}).with_indifferent_access end
   def primary_frame_color_id; bike['primary_frame_color_id'] end
   def secondary_frame_color_id; bike['secondary_frame_color_id'] end
   def tertiary_frame_color_id; bike['tertiary_frame_color_id'] end
@@ -122,10 +123,6 @@ class BParam < ActiveRecord::Base
   def massage_if_v2
     self.params = self.class.v2_params(params) if origin == 'api_v2'
     true
-  end
-
-  def bike
-    (params && params['bike'] || {}).with_indifferent_access
   end
 
   def set_foreign_keys

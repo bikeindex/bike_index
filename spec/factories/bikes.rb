@@ -1,20 +1,25 @@
+# Warning: BikeCreator forces every bike to have an ownership
+# ... But this factory allows creating bikes without ownerships
 FactoryGirl.define do
   factory :bike do
-    # Warning: the bikes controller forces every bike to have an ownership
-    # But this factory allows creating bikes without ownerships.
-    serial_number
-    association :cycle_type
-    association :manufacturer, factory: :manufacturer
-    association :creator, factory: :user
-    association :rear_wheel_size, factory: :wheel_size
-    # association :handlebar_type
-    association :propulsion_type
-    association :primary_frame_color, factory: :color
-    rear_tire_narrow true
-    sequence(:owner_email) { |n| "bike_owner#{n}@example.com" }
-    factory :organization_bike do
-      association :creation_organization, factory: :organization
+    transient do
+      creator { FactoryGirl.create(:user) }
     end
+    serial_number
+    manufacturer { FactoryGirl.create(:manufacturer) }
+    sequence(:owner_email) { |n| "bike_owner#{n}@example.com" }
+    creation { FactoryGirl.create(:creation, creator: creator) }
+    primary_frame_color { Color.black }
+    cycle_type { CycleType.bike }
+    propulsion_type { PropulsionType.foot_pedal }
+
+    factory :creation_organization_bike do
+      transient do
+        organization { FactoryGirl.create(:organization) }
+      end
+      creation { FactoryGirl.create(:creation, creator: creator, organization: organization) }
+    end
+
     factory :stolen_bike do
       transient do
         latitude { 40.7143528 }

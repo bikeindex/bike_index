@@ -95,10 +95,10 @@ describe Api::V1::BikesController do
         expect(bike.frame_size_unit).to eq 'cm'
         expect(bike.primary_frame_color).to eq black
         expect(bike.paint_description).to eq 'Black/Red'
-        creation_state = bike.creation_state
-        expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([true, true, true])
-        expect(creation_state.organization).to eq organization
-        expect(creation_state.origin).to eq 'api_v1'
+        creation = bike.creation
+        expect([creation.is_pos, creation.is_new, creation.is_bulk]).to eq([true, true, true])
+        expect(creation.organization).to eq organization
+        expect(creation.origin).to eq 'api_v1'
       end
     end
     context 'legacy tests' do
@@ -184,7 +184,7 @@ describe Api::V1::BikesController do
         expect(bike.creation_organization_id).to eq(@organization.id)
         expect(bike.year).to eq(1969)
         expect(bike.components.count).to eq(3)
-        expect(bike.creation_state.organization).to eq @organization
+        expect(bike.creation.organization).to eq @organization
         component = bike.components.where(serial_number: '69').first
         expect(component.description).to eq('yeah yay!')
         expect(component.ctype.slug).to eq('headset')
@@ -204,10 +204,10 @@ describe Api::V1::BikesController do
         expect(bike.rear_gear_type.slug).to eq bike_attrs[:rear_gear_type_slug]
         expect(bike.front_gear_type.slug).to eq bike_attrs[:front_gear_type_slug]
         expect(bike.handlebar_type.slug).to eq bike_attrs[:handlebar_type_slug]
-        creation_state = bike.creation_state
-        expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([false, false, false])
-        expect(creation_state.organization).to eq @organization
-        expect(creation_state.origin).to eq 'api_v1'
+        creation = bike.creation
+        expect([creation.is_pos, creation.is_new, creation.is_bulk]).to eq([false, false, false])
+        expect(creation.organization).to eq @organization
+        expect(creation.origin).to eq 'api_v1'
       end
 
       it 'creates a photos even if one fails' do
@@ -230,8 +230,8 @@ describe Api::V1::BikesController do
         post :create, bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, photos: photos
         bike = Bike.where(serial_number: '69 photo-test').first
         expect(bike.public_images.count).to eq(1)
-        expect(bike.creation_state.origin).to eq 'api_v1'
-        expect(bike.creation_state.organization).to eq @organization
+        expect(bike.creation.origin).to eq 'api_v1'
+        expect(bike.creation.organization).to eq @organization
         expect(bike.rear_wheel_size.iso_bsd).to eq 559
       end
 
@@ -270,8 +270,8 @@ describe Api::V1::BikesController do
         end.to change(Ownership, :count).by(1)
         expect(response.code).to eq('200')
         bike = Bike.unscoped.where(serial_number: '69 stolen bike').first
-        expect(bike.creation_state.origin).to eq 'api_v1'
-        expect(bike.creation_state.organization).to eq @organization
+        expect(bike.creation.origin).to eq 'api_v1'
+        expect(bike.creation.organization).to eq @organization
         expect(bike.rear_wheel_size.iso_bsd).to eq 559
         csr = bike.find_current_stolen_record
         expect(csr.address).to be_present
@@ -307,8 +307,8 @@ describe Api::V1::BikesController do
         end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
         expect(response.code).to eq('200')
         bike = Bike.unscoped.where(serial_number: '69 example bikez').first
-        expect(bike.creation_state.origin).to eq 'api_v1'
-        expect(bike.creation_state.organization).to eq org
+        expect(bike.creation.origin).to eq 'api_v1'
+        expect(bike.creation.organization).to eq org
         expect(bike.example).to be_truthy
         expect(bike.rear_wheel_size.iso_bsd).to eq 559
         expect(bike.paint.name).to eq('grazeen')
@@ -334,8 +334,8 @@ describe Api::V1::BikesController do
         end.to change(Ownership, :count).by(1)
         expect(response.code).to eq('200')
         bike = Bike.unscoped.where(serial_number: '69 string').first
-        expect(bike.creation_state.origin).to eq 'api_v1'
-        expect(bike.creation_state.organization).to eq @organization
+        expect(bike.creation.origin).to eq 'api_v1'
+        expect(bike.creation.organization).to eq @organization
       end
 
       it 'does not send an ownership email if it has no_email set' do
@@ -358,8 +358,8 @@ describe Api::V1::BikesController do
         end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
         expect(response.code).to eq('200')
         bike = Bike.unscoped.where(serial_number: '69 string').first
-        expect(bike.creation_state.origin).to eq 'api_v1'
-        expect(bike.creation_state.organization).to eq @organization
+        expect(bike.creation.origin).to eq 'api_v1'
+        expect(bike.creation.organization).to eq @organization
       end
     end
   end

@@ -5,27 +5,29 @@ class Bike < ActiveRecord::Base
   process_in_background :pdf, CarrierWaveProcessWorker
 
   belongs_to :manufacturer
-  serialize(:cached_attributes, Array)
-  belongs_to :primary_frame_color, class_name: "Color"
-  belongs_to :secondary_frame_color, class_name: "Color"
-  belongs_to :tertiary_frame_color, class_name: "Color"
+  belongs_to :primary_frame_color, class_name: 'Color'
+  belongs_to :secondary_frame_color, class_name: 'Color'
+  belongs_to :tertiary_frame_color, class_name: 'Color'
   belongs_to :handlebar_type
-  belongs_to :rear_wheel_size, class_name: "WheelSize"
-  belongs_to :front_wheel_size, class_name: "WheelSize"
+  belongs_to :rear_wheel_size, class_name: 'WheelSize'
+  belongs_to :front_wheel_size, class_name: 'WheelSize'
   belongs_to :rear_gear_type
   belongs_to :front_gear_type
   belongs_to :frame_material
   belongs_to :propulsion_type
   belongs_to :cycle_type
   belongs_to :paint, counter_cache: true
-  belongs_to :creator, class_name: "User"
-  belongs_to :updator, class_name: "User"
+  belongs_to :updator, class_name: 'User'
   belongs_to :invoice
-  belongs_to :creation_organization, class_name: "Organization"
   belongs_to :location
-  belongs_to :current_stolen_record, class_name: "StolenRecord"
+  belongs_to :current_stolen_record, class_name: 'StolenRecord'
 
-  has_one :creation_state
+  # has_many :bike_organizations, dependent: :destroy
+  # has_many :organizations, through: :bike_organizations
+
+  belongs_to :creation, dependent: :destroy
+  delegate :creator, to: :creation
+  has_one :creation_organization, through: :creation, source: :organization
   has_many :stolen_notifications, dependent: :destroy
   has_many :stolen_records, dependent: :destroy
   has_many :other_listings
@@ -44,12 +46,9 @@ class Bike < ActiveRecord::Base
   after_validation :geocode, if: lambda { |o| false } # Never geocode, it's from stolen_record
 
   validates_presence_of :serial_number
-  # Serial numbers aren't guaranteed to be unique across manufacturers.
-  # But we do want to prevent the same bike being registered multiple times...
-  # validates_uniqueness_of :serial_number, message: "has already been taken. If you believe that this message is an error, contact us!"
   validates_presence_of :propulsion_type_id
   validates_presence_of :cycle_type_id
-  validates_presence_of :creator
+  validates_presence_of :creation_id
   validates_presence_of :manufacturer_id
 
   validates_uniqueness_of :card_id, allow_nil: true
@@ -88,10 +87,10 @@ class Bike < ActiveRecord::Base
         handlebar_type_id handlebar_type_other frame_size frame_size_number frame_size_unit
         rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow 
         primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
-        propulsion_type_id propulsion_type_other zipcode country_id creation_zipcode belt_drive
+        propulsion_type_id propulsion_type_other zipcode country_id belt_drive
         coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
         date_stolen_input receive_notifications phone creator creator_id image
-        components_attributes b_param_id cached_attributes embeded embeded_extended example hidden
+        components_attributes b_param_id embeded embeded_extended example hidden
         card_id stock_photo_url pdf send_email other_listing_urls listing_order approved_stolen
         marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale
         ).map(&:to_sym) + [stolen_records_attributes: StolenRecord.old_attr_accessible,
@@ -104,15 +103,6 @@ class Bike < ActiveRecord::Base
 
     def admin_text_search(query)
       query.present? ? admin_search(query) : all
-    end
-
-    def attr_cache_search(query)
-      return scoped unless query.present? and query.is_a? Array
-      a = []
-      find_each do |b|
-        a << b.id if (query - b.cached_attributes).empty?
-      end
-      where(id: a)
     end
   end
 
@@ -187,11 +177,11 @@ class Bike < ActiveRecord::Base
   before_save :set_mnfg_name
   def set_mnfg_name
     if manufacturer.name == 'Other' && manufacturer_other.present?
-      name = Rails::Html::FullSanitizer.new.sanitize(manufacturer_other)
+      n = Rails::Html::FullSanitizer.new.sanitize(manufacturer_other)
     else
-      name = manufacturer.name.gsub(/\s?\([^\)]*\)/i,'')
+      n = manufacturer.name.gsub(/\s?\([^\)]*\)/i,'')
     end
-    self.mnfg_name = name.strip.truncate(60)
+    self.mnfg_name = n.strip.truncate(60)
   end
 
   before_save :set_user_hidden
@@ -211,7 +201,6 @@ class Bike < ActiveRecord::Base
     self.serial_number = 'absent' if serial_number.blank? || serial_number.strip.downcase == 'unknown'
     self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
     if User.fuzzy_email_find(owner_email)
-      # pp User.fuzzy_email_find(owner_email)
       self.owner_email = User.fuzzy_email_find(owner_email).email
     else
       self.owner_email = EmailNormalizer.normalize(owner_email)
@@ -220,7 +209,7 @@ class Bike < ActiveRecord::Base
   end
 
   def create_normalized_serial_segments
-    SerialNormalizer.new({serial: serial_number}).save_segments(id)
+    SerialNormalizer.new(serial: serial_number).save_segments(id)
   end
 
   before_save :clean_frame_size
@@ -290,13 +279,11 @@ class Bike < ActiveRecord::Base
     ].compact
   end
 
-  def type
-    # Small helper because we call this a lot
+  def type # Small helper because we call this a lot
     cycle_type.name.downcase
   end
 
-  def cgroup_array
-    # list of cgroups so that we can arrange them. Future feature.
+  def cgroup_array # list of cgroups so that we can arrange them
     return [] unless components.any?
     a = []
     components.each { |i| a << i.cgroup_id }

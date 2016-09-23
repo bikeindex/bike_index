@@ -209,8 +209,8 @@ RSpec.shared_examples 'bike_searchable' do
 
   describe 'search' do
     context 'color_ids of primary, secondary and tertiary' do
-      let(:bike_1) { FactoryGirl.create(:bike, primary_frame_color: color) }
-      let(:bike_2) { FactoryGirl.create(:bike, secondary_frame_color: color) }
+      let(:bike_1) { FactoryGirl.create(:bike, primary_frame_color_id: color.id) }
+      let(:bike_2) { FactoryGirl.create(:bike, primary_frame_color: FactoryGirl.create(:color), secondary_frame_color: color) }
       let(:bike_3) { FactoryGirl.create(:bike, tertiary_frame_color: color, manufacturer: manufacturer) }
       let(:all_color_ids) do
         [
@@ -330,15 +330,15 @@ RSpec.shared_examples 'bike_searchable' do
         let(:interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: 'd') }
 
         let(:bike_1) { FactoryGirl.create(:bike) }
-        let(:bike_2) { FactoryGirl.create(:organization_bike) }
+        let(:bike_2) { FactoryGirl.create(:creation_organization_bike) }
         let(:organization) { bike_2.creation_organization }
         let(:query_params) { { stolenness: 'all' } }
         before do
           expect([bike_1, bike_2].size).to eq 2
-          expect(organization.bikes.pluck(:id)).to eq([bike_2.id])
+          expect(organization.created_bikes.pluck(:id)).to eq([bike_2.id])
         end
         it 'only finds bikes in the organization' do
-          expect(organization.bikes.search(interpreted_params).pluck(:id)).to eq([bike_2.id])
+          expect(organization.created_bikes.search(interpreted_params).pluck(:id)).to eq([bike_2.id])
         end
       end
     end
@@ -378,11 +378,11 @@ RSpec.shared_examples 'bike_searchable' do
       let(:organization) { FactoryGirl.create(:organization) }
       let(:query_params) { { serial: '011I528-111JJJk', stolenness: 'all' } }
       before do
-        stolen_bike.update_attribute :creation_organization_id, organization.id
-        expect(organization.bikes.pluck(:id)).to eq([stolen_bike.id])
+        stolen_bike.creation.update_attribute :organization_id, organization.id
+        expect(organization.created_bikes.pluck(:id)).to eq([stolen_bike.id])
       end
       it 'returns matching stolenness' do
-        expect(organization.bikes.search_close_serials(interpreted_params).pluck(:id)).to eq([stolen_bike.id])
+        expect(organization.created_bikes.search_close_serials(interpreted_params).pluck(:id)).to eq([stolen_bike.id])
       end
     end
   end

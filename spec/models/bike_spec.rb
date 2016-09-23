@@ -16,12 +16,14 @@ describe Bike do
     it { is_expected.to belong_to :propulsion_type }
     it { is_expected.to belong_to :paint }
     it { is_expected.to belong_to :cycle_type }
-    it { is_expected.to belong_to :creator }
     it { is_expected.to belong_to :updator }
-    it { is_expected.to belong_to :creation_organization }
+    # it { is_expected.to have_many :bike_organizations }
+    # it { is_expected.to have_many(:organizations).through(:bike_organizations) }
+    it { is_expected.to belong_to :creation }
+    it { is_expected.to delegate_method(:creator).to(:creation) }
+    it { is_expected.to have_one(:creation_organization).through(:creation) }
     it { is_expected.to belong_to :current_stolen_record }
     it { is_expected.to belong_to :location }
-    it { is_expected.to have_one :creation_state }
     it { is_expected.to have_many :duplicate_bike_groups }
     it { is_expected.to have_many :b_params }
     it { is_expected.to have_many :stolen_notifications }
@@ -32,14 +34,12 @@ describe Bike do
     it { is_expected.to have_many :other_listings }
     it { is_expected.to accept_nested_attributes_for :stolen_records }
     it { is_expected.to accept_nested_attributes_for :components }
+    it { is_expected.to validate_presence_of :creation_id }
     it { is_expected.to validate_presence_of :cycle_type_id }
     it { is_expected.to validate_presence_of :propulsion_type_id }
-    it { is_expected.to validate_presence_of :creator }
     it { is_expected.to validate_presence_of :serial_number }
     it { is_expected.to validate_presence_of :manufacturer_id }
-    # it { should validate_presence_of :rear_wheel_size_id }
     it { is_expected.to validate_presence_of :primary_frame_color_id }
-    it { is_expected.to serialize :cached_attributes }
   end
 
   describe 'scopes' do
@@ -88,23 +88,6 @@ describe Bike do
     it 'is visible if not hidden' do
       bike = Bike.new
       expect(bike.visible_by).to be_truthy
-    end
-  end
-
-  describe 'attr_cache_search' do
-    it 'finds bikes by attr cache' do
-      bike = FactoryGirl.create(:bike)
-      query = ["1c#{bike.primary_frame_color_id}"]
-      result = Bike.attr_cache_search(query)
-      expect(result.first).to eq(bike)
-      expect(result.class).to eq(Bike::ActiveRecord_Relation)
-    end
-    it 'finds bikes by wheel size' do
-      bike = FactoryGirl.create(:bike)
-      query = ["1w#{bike.rear_wheel_size_id}"]
-      result = Bike.attr_cache_search(query)
-      expect(result.first).to eq(bike)
-      expect(result.class).to eq(Bike::ActiveRecord_Relation)
     end
   end
 
@@ -504,21 +487,7 @@ describe Bike do
       expect(bike.components_cache_string.to_s).to match(c.ctype.name)
     end
   end
-
-  describe 'cache_attributes' do
-    it 'caches the colors handlebar_type and wheel_size' do
-      color = FactoryGirl.create(:color)
-      handlebar = FactoryGirl.create(:handlebar_type)
-      wheel = FactoryGirl.create(:wheel_size)
-      bike = FactoryGirl.create(:bike, secondary_frame_color: color, handlebar_type: handlebar, front_wheel_size: wheel)
-      expect(bike.cached_attributes[0]).to eq("1c#{bike.primary_frame_color_id}")
-      expect(bike.cached_attributes[1]).to eq("1c#{color.id}")
-      expect(bike.cached_attributes[2]).to eq("h#{handlebar.id}")
-      expect(bike.cached_attributes[3]).to eq("1w#{bike.rear_wheel_size_id}")
-      expect(bike.cached_attributes[4]).to eq("1w#{wheel.id}")
-    end
-  end
-
+  
   describe 'cache_stolen_attributes' do
     context 'current_stolen_record with lat and long' do
       it 'saves the stolen description to all description and set stolen_rec_id' do
@@ -558,17 +527,18 @@ describe Bike do
       handlebar = FactoryGirl.create(:handlebar_type)
       material = FactoryGirl.create(:frame_material)
       propulsion = FactoryGirl.create(:propulsion_type, name: 'Hand pedaled')
-      b = FactoryGirl.create(:bike, cycle_type: type, propulsion_type_id: propulsion.id)
-      s = FactoryGirl.create(:stolen_record, bike: b)
-      b.update_attributes(year: 1999, frame_material_id: material.id,
-                          secondary_frame_color_id: b.primary_frame_color_id,
-                          tertiary_frame_color_id: b.primary_frame_color_id,
-                          stolen: true,
-                          frame_size: '56', frame_size_unit: 'ballsacks',
-                          frame_model: 'Some model', handlebar_type_id: handlebar.id)
-      b.cache_bike
-      expect(b.cached_data).to eq("#{b.mnfg_name} Hand pedaled 1999 #{b.primary_frame_color.name} #{b.secondary_frame_color.name} #{b.tertiary_frame_color.name} #{material.name} 56ballsacks #{b.frame_model} #{b.rear_wheel_size.name} wheel unicycle")
-      expect(b.current_stolen_record_id).to eq(s.id)
+      wheel_size = FactoryGirl.create(:wheel_size)
+      bike = FactoryGirl.create(:bike, cycle_type: type, propulsion_type_id: propulsion.id, rear_wheel_size: wheel_size)
+      stolen_record = FactoryGirl.create(:stolen_record, bike: bike)
+      bike.update_attributes(year: 1999, frame_material_id: material.id,
+                             secondary_frame_color_id: bike.primary_frame_color_id,
+                             tertiary_frame_color_id: bike.primary_frame_color_id,
+                             stolen: true,
+                             frame_size: '56', frame_size_unit: 'ballsacks',
+                             frame_model: 'Some model', handlebar_type_id: handlebar.id)
+      bike.cache_bike
+      expect(bike.cached_data).to eq("#{bike.mnfg_name} Hand pedaled 1999 #{bike.primary_frame_color.name} #{bike.secondary_frame_color.name} #{bike.tertiary_frame_color.name} #{material.name} 56ballsacks #{bike.frame_model} #{wheel_size.name} wheel unicycle")
+      expect(bike.current_stolen_record_id).to eq(stolen_record.id)
     end
     it 'has before_save_callback_method defined as a before_save callback' do
       expect(Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:cache_bike)).to eq(true)
