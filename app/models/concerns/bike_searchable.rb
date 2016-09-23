@@ -56,6 +56,7 @@ module BikeSearchable
       # For each of the of the colors, call searching_matching_color_ids with the color_id on the previous ;)
       (interpreted_params[:colors] || [nil]).reduce(self) { |matches, c_id| matches.search_matching_color_ids(c_id) }
         .search_matching_stolenness(interpreted_params)
+        .search_matching_query(interpreted_params[:query])
         .where(interpreted_params[:manufacturer] ? { manufacturer_id: interpreted_params[:manufacturer] } : {})
     end
 
@@ -132,15 +133,19 @@ module BikeSearchable
     end
 
     # Actual searcher methods
-    # The searcher methods return where({}) so they can be chained together even if they don't modify anything
+    # The searcher methods return `all` so they can be chained together even if they don't modify anything
 
     def search_matching_color_ids(color_id)
-      return where({}) unless color_id # So we can chain this if we don't have any colors
+      return all unless color_id # So we can chain this if we don't have any colors
       where('primary_frame_color_id=? OR secondary_frame_color_id=? OR tertiary_frame_color_id =?', color_id, color_id, color_id)
     end
 
+    def search_matching_query(query)
+      query && pg_search(query) || all
+    end
+
     def search_matching_serial(interpreted_params)
-      return where({}) unless interpreted_params[:serial]
+      return all unless interpreted_params[:serial]
       # Note: @@ is postgres fulltext search
       where('serial_normalized @@ ?', interpreted_params[:serial])
     end
@@ -148,7 +153,7 @@ module BikeSearchable
     def search_matching_stolenness(interpreted_params)
       case interpreted_params[:stolenness]
       when 'all'
-        where({})
+        all
       when 'non'
         where(stolen: false)
       when 'proximity'
