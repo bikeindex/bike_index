@@ -11,11 +11,6 @@ module API
         API::Base.respond_to_error(e)
       end
       mount API::V3::Search
-      mount API::V2::Bikes
-      mount API::V2::Me
-      mount API::V2::Users
-      mount API::V2::Manufacturers
-      mount API::V2::Selections
       add_swagger_documentation base_path: '/api',
                                 api_version: 'v3',
                                 hide_format: true, # don't show .json
