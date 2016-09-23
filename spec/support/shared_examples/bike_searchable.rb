@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.shared_examples 'bike_searchable' do
-let(:manufacturer) { FactoryGirl.create(:manufacturer) }
+  let(:manufacturer) { FactoryGirl.create(:manufacturer) }
   let(:color) { FactoryGirl.create(:color) }
   let(:multi_query_items) { [manufacturer.search_id, color.search_id, 'some other string', 'another string'] }
   let(:ip_address) { '127.0.0.1' }
