@@ -5,12 +5,10 @@
     Bike Index graphs
     %small
       = link_to 'View tables', tables_admin_graphs_path
+
 %section
   %h2 Users past week
   = line_chart User.group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.now).count
-%section
-  %h2 Users since start
-  = line_chart users_admin_graphs_path
 
 %section
   %h2
