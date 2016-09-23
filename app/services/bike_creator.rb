@@ -71,7 +71,7 @@ class BikeCreator
     @bike = create_associations(bike)
     validate_record(@bike)
     if @bike.present?
-      @bike.create_creation(creation_attributes)
+      @bike.create_creation_state(creation_attributes)
       ListingOrderWorker.perform_async(@bike.id)
       ListingOrderWorker.perform_in(10.seconds, @bike.id)
     end
@@ -98,6 +98,7 @@ class BikeCreator
       is_pos: @b_param.is_pos,
       is_new: @b_param.is_new,
       origin: @b_param.origin,
+      creator_id: @b_param.creator_id,
       organization_id: @bike.creation_organization_id
     }
   end

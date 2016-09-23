@@ -90,6 +90,7 @@ describe 'Bikes API V2' do
         post "/api/v2/bikes?access_token=#{@token.token}",
              bike_attrs.to_json,
              JSON_CONTENT
+        pp JSON.parse(response.body)
       end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
       expect(response.code).to eq('201')
       result = JSON.parse(response.body)['bike']

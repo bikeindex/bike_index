@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe Bike do
   it_behaves_like 'bike_searchable'
-  it_behaves_like 'bike_buildable'
   describe 'validations' do
     it { is_expected.to belong_to :manufacturer }
     it { is_expected.to belong_to :primary_frame_color }
@@ -20,7 +19,7 @@ describe Bike do
     it { is_expected.to belong_to :updator }
     # it { is_expected.to have_many :bike_organizations }
     # it { is_expected.to have_many(:organizations).through(:bike_organizations) }
-    it { is_expected.to belong_to :creation_state }
+    it { is_expected.to have_one :creation_state }
     it { is_expected.to delegate_method(:creation_state_creator).to(:creation_state) }
     it { is_expected.to have_one(:creation_state_creation_organization).through(:creation_state) }
     it { is_expected.to belong_to :current_stolen_record }

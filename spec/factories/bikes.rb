@@ -3,12 +3,13 @@
 FactoryGirl.define do
   factory :bike do
     # transient do # will be transient once we drop the deprecated creation attributes
-      creator { FactoryGirl.create(:user) }
+    #  creator { FactoryGirl.create(:user) }
     # end
+    # creation_state { FactoryGirl.create(:creation_state, creator: creator) }
+    association :creator, factory: :user
     serial_number
     manufacturer { FactoryGirl.create(:manufacturer) }
     sequence(:owner_email) { |n| "bike_owner#{n}@example.com" }
-    creation_state { FactoryGirl.create(:creation_state, creator: creator) }
     primary_frame_color { Color.black }
     cycle_type { CycleType.bike }
     propulsion_type { PropulsionType.foot_pedal }

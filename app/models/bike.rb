@@ -1,7 +1,6 @@
 class Bike < ActiveRecord::Base
   include ActiveModel::Dirty
   include BikeSearchable
-  include BikeBuildable
   mount_uploader :pdf, PdfUploader
   process_in_background :pdf, CarrierWaveProcessWorker
 
@@ -28,9 +27,9 @@ class Bike < ActiveRecord::Base
 
   # has_many :bike_organizations, dependent: :destroy
   # has_many :organizations, through: :bike_organizations
-  belongs_to :creation_state, dependent: :destroy
-  delegate :creation_state_creator, to: :creation_state, source: :creator
-  has_one :creation_state_creation_organization, through: :creation_state, source: :organization
+  has_one :creation_state, dependent: :destroy
+  # delegate :creator, to: :creation_state, source: :creator
+  # has_one :creation_organization, through: :creation_state, source: :organization
   has_many :stolen_notifications, dependent: :destroy
   has_many :stolen_records, dependent: :destroy
   has_many :other_listings
@@ -61,7 +60,7 @@ class Bike < ActiveRecord::Base
   attr_accessor :other_listing_urls, :date_stolen_input, :receive_notifications,
     :phone, :image, :b_param_id, :embeded,
     :embeded_extended, :paint_name, :bike_image_cache, :send_email,
-    :marked_user_hidden, :marked_user_unhidden, :b_param_id_token, :creator_id
+    :marked_user_hidden, :marked_user_unhidden, :b_param_id_token
 
   default_scope { where(example: false).where(hidden: false).order("listing_order desc") }
   scope :stolen, -> { where(stolen: true) }

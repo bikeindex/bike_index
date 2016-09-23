@@ -1,5 +1,5 @@
 class CreationState < ActiveRecord::Base
-  has_one :bike
+  belongs_to :bike
   belongs_to :organization
   belongs_to :creator, class_name: 'User'
   validates :creator_id, presence: true
