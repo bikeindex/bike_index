@@ -6,7 +6,7 @@ class AddCreationStateAttributesAndRemoveUnusedBikeAttributes < ActiveRecord::Mi
     add_column :creation_states, :creator_id, :integer
     add_index :creation_states, :creator_id
     # Just remove these, we aren't using them
-    rename_column :bikes, :location_id, :deprecated_location_id
+    remove_column :bikes, :location_id, :string
     remove_column :bikes, :creation_zipcode, :string
     remove_column :bikes, :creation_country_id, :string
     remove_column :bikes, :cached_attributes, :string
