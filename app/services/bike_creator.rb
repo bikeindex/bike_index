@@ -72,8 +72,7 @@ class BikeCreator
     validate_record(@bike)
     if @bike.present?
       @bike.create_creation_state(creation_attributes)
-      ListingOrderWorker.perform_async(@bike.id)
-      ListingOrderWorker.perform_in(10.seconds, @bike.id)
+      AfterBikeSaveWorker.perform_async(@bike.id)
     end
     @bike
   end

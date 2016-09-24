@@ -147,7 +147,7 @@ describe BikeCreator do
         expect(creator).to receive(:validate_record).and_return(bike)
         expect do
           creator.save_bike(bike)
-        end.to change(ListingOrderWorker.jobs, :size).by(2)
+        end.to change(AfterBikeSave.jobs, :size).by(1)
       end
     end
   end
@@ -168,7 +168,6 @@ describe BikeCreator do
         creator = BikeCreator.new(b_param)
         expect(creator).to receive(:add_bike_book_data).at_least(1).times.and_return(nil)
         expect(creator).to receive(:build_bike).at_least(1).times.and_return(bike)
-        # ListingOrderWorker.any_instance.should_receive(:perform).and_return(true)
         expect(bike).to receive(:save).and_return(true)
         creator.create_bike
       end

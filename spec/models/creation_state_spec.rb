@@ -5,7 +5,6 @@ RSpec.describe CreationState, type: :model do
     it { is_expected.to belong_to :bike }
     it { is_expected.to belong_to :creator }
     it { is_expected.to belong_to :organization }
-    it { is_expected.to validate_presence_of :creator_id }
   end
 
   describe 'origin' do
@@ -27,6 +26,43 @@ RSpec.describe CreationState, type: :model do
     it 'has a before_save callback for ensure_permitted_origin' do
       expect(CreationState._validation_callbacks.select { |cb| cb.kind.eql?(:before) }
         .map(&:raw_filter).include?(:ensure_permitted_origin)).to be_truthy
+    end
+  end
+
+  describe 'create_bike_organization' do
+    let(:bike) { FactoryGirl.create(:bike) }
+    let(:organization) { FactoryGirl.create(:organization) }
+    context 'no organization' do
+      let(:creation_state) { FactoryGirl.create(:creation_state, bike: bike) }
+      it 'returns true' do
+        expect do
+          creation_state.create_bike_organization
+        end.to change(BikeOrganization, :count).by 0
+      end
+    end
+    context 'with organization' do
+      let(:creation_state) { FactoryGirl.create(:creation_state, bike: bike) }
+      it 'creates the bike_organization' do
+        creation_state.organization = organization
+        expect do
+          creation_state.create_bike_organization
+        end.to change(BikeOrganization, :count).by 1
+        expect(bike.bike_organizations.first.organization).to eq organization
+      end
+    end
+    context 'already existing bike_organization' do
+      let(:creation_state) { FactoryGirl.create(:creation_state, bike: bike) }
+      it 'does not error or duplicate' do
+        FactoryGirl.create(:bike_organization, bike: bike, organization: organization)
+        creation_state.organization = organization
+        expect do
+          creation_state.create_bike_organization
+        end.to change(BikeOrganization, :count).by 0
+      end
+    end
+    it 'has an after_create callback' do
+      expect(CreationState._create_callbacks.select { |cb| cb.kind.eql?(:after) }
+        .map(&:raw_filter).include?(:create_bike_organization)).to eq(true)
     end
   end
 end

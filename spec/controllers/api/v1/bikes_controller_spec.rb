@@ -243,7 +243,6 @@ describe Api::V1::BikesController do
         @organization.users.first.update_attribute :phone, '123-456-6969'
         FactoryGirl.create(:country, iso: 'US')
         FactoryGirl.create(:state, abbreviation: 'Palace')
-        # ListingOrderWorker.any_instance.should_receive(:perform).and_return(true)
         bike_attrs = {
           serial_number: '69 stolen bike',
           manufacturer_id: manufacturer.id,

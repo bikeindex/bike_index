@@ -14,13 +14,6 @@ FactoryGirl.define do
     cycle_type { CycleType.bike }
     propulsion_type { PropulsionType.foot_pedal }
 
-    factory :creation_organization_bike do
-      transient do
-        organization { FactoryGirl.create(:organization) }
-      end
-      creation_state { FactoryGirl.create(:creation_state, creator: creator, organization: organization) }
-    end
-
     factory :stolen_bike do
       transient do
         latitude { 40.7143528 }
@@ -37,6 +30,21 @@ FactoryGirl.define do
       end
       factory :recovered_bike do
         recovered true
+      end
+    end
+  end
+
+  factory :organized_bikes do # don't use this factory exactly, it's used to wrap all the organized bikes
+    transient do
+      organization { FactoryGirl.create(:organization) }
+    end
+    factory :creation_organization_bike do
+      creation_state { FactoryGirl.create(:creation_state, creator: creator, organization: organization) }
+    end
+
+    factory :organization_bike do
+      after(:create) do |bike, evaluator|
+        FactoryGirl.create(:bike_organization, bike: bike, organization: evaluator.organization)
       end
     end
   end

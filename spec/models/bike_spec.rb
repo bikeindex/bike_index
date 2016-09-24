@@ -471,12 +471,21 @@ describe Bike do
   end
 
   describe 'cache_photo' do
-    it 'caches the photo' do
-      bike = FactoryGirl.create(:bike)
-      FactoryGirl.create(:public_image, imageable: bike)
-      bike.reload
-      bike.cache_photo
-      expect(bike.thumb_path).not_to be_nil
+    context 'existing photo' do
+      it 'caches the photo' do
+        bike = FactoryGirl.create(:bike)
+        FactoryGirl.create(:public_image, imageable: bike)
+        bike.reload
+        bike.cache_photo
+        expect(bike.thumb_path).not_to be_nil
+      end
+    end
+    context 'no photo' do
+      it 'removes existing cache if inaccurate' do
+        bike = Bike.new(thumb_path: 'some url')
+        bike.cache_photo
+        expect(bike.thumb_path).to be_nil
+      end
     end
   end
 

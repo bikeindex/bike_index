@@ -1,5 +1,6 @@
 class AddCreationStateAttributesAndRemoveUnusedBikeAttributes < ActiveRecord::Migration
   def change
+    add_column :bikes, :cached_cycle_type, :string
     # Associate bikes with creation state
     add_reference :bikes, :creation_state, index: true
     # Associate creator in creation states 

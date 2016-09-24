@@ -162,6 +162,6 @@ describe BikeUpdator do
     expect(update_bike).to receive(:update_ownership).and_return(true)
     expect do
       update_bike.update_available_attributes
-    end.to change(ListingOrderWorker.jobs, :size).by(2)
+    end.to change(AfterBikeSaveWorker.jobs, :size).by(1)
   end
 end

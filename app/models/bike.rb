@@ -24,8 +24,8 @@ class Bike < ActiveRecord::Base
   belongs_to :creator, class_name: 'User' # to be deprecated and removed
   belongs_to :creation_organization, class_name: 'Organization' # to be deprecated and removed
 
-  # has_many :bike_organizations, dependent: :destroy
-  # has_many :organizations, through: :bike_organizations
+  has_many :bike_organizations, dependent: :destroy
+  has_many :organizations, through: :bike_organizations
   has_one :creation_state, dependent: :destroy
   # delegate :creator, to: :creation_state, source: :creator
   # has_one :creation_organization, through: :creation_state, source: :organization
@@ -298,9 +298,7 @@ class Bike < ActiveRecord::Base
   end
 
   def cache_photo
-    if public_images.any?
-      self.thumb_path = public_images.first.image_url(:small)
-    end
+    self.thumb_path = public_images && public_images.first && public_images.first.image_url(:small)
   end
 
   def components_cache_string
