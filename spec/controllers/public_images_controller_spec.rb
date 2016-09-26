@@ -250,7 +250,7 @@ describe PublicImagesController do
       expect(public_image_other.listing_order).to eq 0
       expect(public_image_3.listing_order).to eq 3
       expect(public_image_2.listing_order).to eq 2
-      expect(public_image_1.listing_order).to eq 1
+      expect(public_image_1.listing_order).to be < 2
       list_order = [public_image_3.id, public_image_1.id, public_image_other.id, public_image_2.id]
       set_current_user(user)
       post :order, list_of_photos: list_order.map(&:to_s)

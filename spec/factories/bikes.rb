@@ -40,7 +40,7 @@ FactoryGirl.define do
       factory :creation_organization_bike do
         creation_organization_id { organization.id }
         after(:create) do |bike, evaluator|
-          create(:creation_state, creator: creator, organization: evaluator.organization, bike: bike)
+          create(:creation_state, creator: bike.creator, organization: evaluator.organization, bike: bike)
           bike.save
           bike.reload
         end

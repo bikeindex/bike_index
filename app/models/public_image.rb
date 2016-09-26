@@ -5,14 +5,12 @@ class PublicImage < ActiveRecord::Base
 
   mount_uploader :image, ImageUploader
   # process_in_background :image, CarrierWaveProcessWorker
-
   belongs_to :imageable, polymorphic: true
 
   default_scope { where(is_private: false).order(:listing_order) }
-
-  after_create :set_order
   scope :bikes, -> { where(imageable_type: 'Bike') }
 
+  after_create :set_order
   def set_order
     self.listing_order = imageable.public_images.length unless listing_order && listing_order > 0
   end

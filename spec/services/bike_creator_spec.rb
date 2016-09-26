@@ -147,7 +147,7 @@ describe BikeCreator do
         expect(creator).to receive(:validate_record).and_return(bike)
         expect do
           creator.save_bike(bike)
-        end.to change(AfterBikeSave.jobs, :size).by(1)
+        end.to change(AfterBikeSaveWorker.jobs, :size).by(1)
       end
     end
   end

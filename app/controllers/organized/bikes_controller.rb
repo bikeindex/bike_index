@@ -7,7 +7,7 @@ module Organized
         search
       else
         @bikes_count = organization_bikes.count
-        @bikes = current_organization.bikes.order('created_at desc').page(@page).per(@per_page)
+        @bikes = organization_bikes.page(@page).per(@per_page)
       end
     end
 
@@ -36,7 +36,7 @@ module Organized
     end
 
     def organization_bikes
-      current_organization.bikes.order('created_at desc')
+      current_organization.bikes.order('bikes.created_at desc')
     end
 
     def current_index_path
