@@ -2,11 +2,12 @@ class CreateCreationStatesWorker
   include Sidekiq::Worker
   sidekiq_options queue: 'afterwards', backtrace: true, retry: false
 
-  def perform(offset)
-    current = offset - 1
-    while current < offset + 101
-      current += 1
+  def perform(offset, finish_at = nil)
+    current = offset
+    finish_at ||= offset + 101
+    while current < finish_at
       bike = Bike.unscoped.where(id: current).first
+      current += 1
       next unless bike.present?
       creation_state = CreationState.where(bike_id: bike.id).first
       creation_state ||= CreationState.new(bike_id: bike.id)

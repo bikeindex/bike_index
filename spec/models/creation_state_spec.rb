@@ -71,7 +71,7 @@ RSpec.describe CreationState, type: :model do
       creation_state = FactoryGirl.create(:creation_state)
       bike = creation_state.bike
       bike.reload
-      expect(bike.creation_state_id).to eq creation_state.bike_id
+      expect(bike.creation_state_id).to eq creation_state.id
     end
     it 'has an after_save callback' do
       expect(CreationState._save_callbacks.select { |cb| cb.kind.eql?(:after) }
