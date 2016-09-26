@@ -49,13 +49,3 @@ task :download_manufacturer_logos => :environment do
     GetManufacturerLogoWorker.perform_in((5*index).seconds, id)
   end
 end
-
-
-desc 'create creation states'
-task :create_creation_states => :environment do
-  Bike.find_each do |b|
-    creation_state = CreationState.where(bike_id: b.id).first_or_create
-    creation_state.is_new ||= bike.registered_new
-    creation_state.update_attributes(creator_id: b.creator_id, organization_id: b.creation_organization_id)
-  end
-end

@@ -116,7 +116,7 @@ describe BikeCreator do
         b_param = BParam.new(origin: 'api_v1')
         creator = BikeCreator.new(b_param)
         bike = Bike.new
-        allow(bike).to receive(:id).and_return(69)
+        # allow(bike).to receive(:id).and_return(69)
         expect(creator).to receive(:create_associations).and_return(bike)
         expect(creator).to receive(:validate_record).and_return(bike)
         new_bike = Bike.new(

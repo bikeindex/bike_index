@@ -70,7 +70,7 @@ class BikeCreator
     bike.save
     @bike = create_associations(bike)
     validate_record(@bike)
-    if @bike.present?
+    if @bike.present? && @bike.id.present?
       @bike.create_creation_state(creation_state_attributes)
       AfterBikeSaveWorker.perform_async(@bike.id)
     end
