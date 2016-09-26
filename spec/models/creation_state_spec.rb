@@ -65,4 +65,17 @@ RSpec.describe CreationState, type: :model do
         .map(&:raw_filter).include?(:create_bike_organization)).to eq(true)
     end
   end
+
+  context 'set_reflexive_association' do
+    it 'sets the creation_state_id on bike' do
+      creation_state = FactoryGirl.create(:creation_state)
+      bike = creation_state.bike
+      bike.reload
+      expect(bike.creation_state_id).to eq creation_state.bike_id
+    end
+    it 'has an after_save callback' do
+      expect(CreationState._save_callbacks.select { |cb| cb.kind.eql?(:after) }
+        .map(&:raw_filter).include?(:set_reflexive_association)).to eq(true)
+    end
+  end
 end

@@ -64,7 +64,6 @@ class PublicImagesController < ApplicationController
 
   def order
     if params[:list_of_photos]
-      # last_image = params[:list_of_photos].count
       params[:list_of_photos].each_with_index do |id, index|
         image = PublicImage.unscoped.find(id)
         image.update_attribute :listing_order, index + 1 if current_user_image_owner(image)

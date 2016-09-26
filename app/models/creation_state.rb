@@ -18,4 +18,9 @@ class CreationState < ActiveRecord::Base
     return true unless organization.present?
     BikeOrganization.where(bike_id: bike_id, organization_id: organization_id).first_or_create
   end
+
+  after_save :set_reflexive_association
+  def set_reflexive_association # Just for the time being, to make migration easier
+    bike.update_attribute :creation_state_id, id unless bike.creation_state_id == id
+  end
 end
