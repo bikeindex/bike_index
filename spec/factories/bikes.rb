@@ -32,19 +32,24 @@ FactoryGirl.define do
         recovered true
       end
     end
-  end
 
-  factory :organized_bikes do # don't use this factory exactly, it's used to wrap all the organized bikes
-    transient do
-      organization { FactoryGirl.create(:organization) }
-    end
-    factory :creation_organization_bike do
-      creation_state { FactoryGirl.create(:creation_state, creator: creator, organization: organization) }
-    end
+    factory :organized_bikes do # don't use this factory exactly, it's used to wrap all the organized bikes
+      transient do
+        organization { FactoryGirl.create(:organization) }
+      end
+      factory :creation_organization_bike do
+        creation_organization_id { organization.id }
+        after(:create) do |bike, evaluator|
+          create(:creation_state, creator: creator, organization: evaluator.organization, bike: bike)
+          bike.save
+          bike.reload
+        end
+      end
 
-    factory :organization_bike do
-      after(:create) do |bike, evaluator|
-        FactoryGirl.create(:bike_organization, bike: bike, organization: evaluator.organization)
+      factory :organization_bike do
+        after(:create) do |bike, evaluator|
+          FactoryGirl.create(:bike_organization, bike: bike, organization: evaluator.organization)
+        end
       end
     end
   end

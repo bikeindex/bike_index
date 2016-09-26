@@ -218,7 +218,6 @@ CREATE TABLE bikes (
     made_without_serial boolean DEFAULT false NOT NULL,
     stolen_lat double precision,
     stolen_long double precision,
-    cached_cycle_type character varying,
     creation_state_id integer
 );
 

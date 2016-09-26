@@ -290,7 +290,7 @@ class Bike < ActiveRecord::Base
   end
 
   def type # Small helper because we call this a lot
-    cycle_type.name.downcase
+    cycle_type && cycle_type.name.downcase
   end
 
   def cgroup_array # list of cgroups so that we can arrange them

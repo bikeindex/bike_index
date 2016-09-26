@@ -71,7 +71,7 @@ class BikeCreator
     @bike = create_associations(bike)
     validate_record(@bike)
     if @bike.present?
-      @bike.create_creation_state(creation_attributes)
+      @bike.create_creation_state(creation_state_attributes)
       AfterBikeSaveWorker.perform_async(@bike.id)
     end
     @bike
@@ -91,7 +91,7 @@ class BikeCreator
 
   private
 
-  def creation_attributes
+  def creation_state_attributes
     {
       is_bulk: @b_param.is_bulk,
       is_pos: @b_param.is_pos,

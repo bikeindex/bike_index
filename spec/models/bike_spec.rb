@@ -167,7 +167,8 @@ describe Bike do
     end
 
     it 'has before_save_callback_method defined for clean_frame_size' do
-      expect(Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:clean_frame_size)).to eq(true)
+      expect(Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }
+        .map(&:raw_filter).include?(:clean_frame_size)).to eq(true)
     end
   end
 
