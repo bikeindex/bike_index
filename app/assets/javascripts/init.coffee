@@ -37,6 +37,8 @@ class BikeIndex.Init extends BikeIndex
       organized_bikes_index: BikeIndex.BikesIndex
       manufacturers_index: BikeIndex.InfoManufacturers
       users_edit: BikeIndex.UsersEdit
+      users_new: BikeIndex.UsersNew
+      users_create: BikeIndex.UsersNew
       welcome_user_home: BikeIndex.UserHome
       welcome_choose_registration: BikeIndex.ChooseRegistration
       stolen_index: BikeIndex.LegacyStolenIndex
@@ -82,3 +84,4 @@ $(document).ready ->
   if document.getElementById('binx_registration_widget')
     new window.ManufacturersSelect('#binx_registration_widget #b_param_manufacturer_id')
   new window.AdDisplayer
+  

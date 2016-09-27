@@ -98,6 +98,7 @@ source 'https://rails-assets.org' do # JS land is crazy, so lock everything
   gem 'rails-assets-select2', '~> 4.0.3' # Use select2 for a few things, it's a bit better sometimes
   gem 'rails-assets-pikaday', '~> 1.4.0' # Datepicker
   gem 'rails-assets-Stickyfill', '~> 1.1.3' # Affix bike edit menu
+  gem 'rails-assets-mailcheck', '~> 1.1.2' # Check for common email errors
   # Sortable breaks assets:precompile, so it's included manually
   # gem 'rails-assets-jquery-sortable', '~> 0.9.12' # Sort photo order
 end

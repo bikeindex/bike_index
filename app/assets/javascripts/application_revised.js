@@ -16,6 +16,7 @@
 //= require external_scripts/headroom
 //= require external_scripts/jQuery.headroom
 //= require pikaday
+//= require mailcheck
 //= require external_scripts/zoom.js
 //= require dataTables/jquery.dataTables
 //= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
