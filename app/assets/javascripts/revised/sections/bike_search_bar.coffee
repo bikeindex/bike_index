@@ -43,7 +43,6 @@ class BikeIndex.BikeSearchBar extends BikeIndex
     $('#search_distance').text($('#distance').val())
     $('#search_location').text(location)
     search_data = _.merge(window.interpreted_params, { location: location })
-    console.log search_data
     $.ajax
       type: 'GET'
       url: '/api/v3/search/count'
