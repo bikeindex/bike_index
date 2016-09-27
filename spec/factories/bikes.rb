@@ -37,8 +37,8 @@ FactoryGirl.define do
       transient do
         organization { FactoryGirl.create(:organization) }
       end
+      creation_organization_id { organization.id }
       factory :creation_organization_bike do
-        creation_organization_id { organization.id }
         after(:create) do |bike, evaluator|
           create(:creation_state, creator: bike.creator, organization: evaluator.organization, bike: bike)
           bike.save
