@@ -20,6 +20,7 @@
 //= require external_scripts/zoom.js
 //= require dataTables/jquery.dataTables
 //= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
+//= require external_scripts/mailcheck.js 
 
 // Legacy carousel. Used on homepage. 
 // Can use if we need a carousel, though would be nice to use rails-assets version instead 
