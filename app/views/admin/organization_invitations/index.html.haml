@@ -1,6 +1,6 @@
 %header.with-subtitle
   %h1 Manage Organization Invitations
-  = link_to 'Send an invitation', new_admin_organization_invitation_url, class: "button-green sharing-links"
+  = link_to 'Send an invitation', new_admin_organization_invitation_url(organization_id: current_organization.to_param), class: "button-green sharing-links"
 
 
   
@@ -29,7 +29,7 @@
       - @organization_invitations.each do |org_invite|
         %tr
           %td
-            = link_to org_invite.id, edit_admin_organization_invitation_url(org_invite.id)
+            = link_to org_invite.id, edit_admin_organization_invitation_url(org_invite.id, organization_id: current_organization.to_param)
           %td.large-screens
             = org_invite.created_at.strftime("%-I %p on %-m/%-d/%Y ")
           %td.medium-screens

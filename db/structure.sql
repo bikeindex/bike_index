@@ -96,7 +96,8 @@ CREATE TABLE b_params (
     image_tmp character varying(255),
     image_processed boolean DEFAULT true,
     id_token text,
-    params json DEFAULT '{"bike":{}}'::json
+    params json DEFAULT '{"bike":{}}'::json,
+    origin character varying
 );
 
 
@@ -117,6 +118,38 @@ CREATE SEQUENCE b_params_id_seq
 --
 
 ALTER SEQUENCE b_params_id_seq OWNED BY b_params.id;
+
+
+--
+-- Name: bike_organizations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE bike_organizations (
+    id integer NOT NULL,
+    bike_id integer,
+    organization_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: bike_organizations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE bike_organizations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: bike_organizations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE bike_organizations_id_seq OWNED BY bike_organizations.id;
 
 
 --
@@ -144,12 +177,11 @@ CREATE TABLE bikes (
     cached_data text,
     description text,
     owner_email text,
-    thumb_path character varying(255),
+    thumb_path text,
     video_embed text,
     year integer,
     has_no_serial boolean DEFAULT false NOT NULL,
     creator_id integer,
-    location_id integer,
     front_tire_narrow boolean,
     primary_frame_color_id integer,
     secondary_frame_color_id integer,
@@ -160,7 +192,6 @@ CREATE TABLE bikes (
     rear_wheel_size_id integer,
     rear_gear_type_id integer,
     front_gear_type_id integer,
-    cached_attributes text,
     additional_registration character varying(255),
     belt_drive boolean DEFAULT false NOT NULL,
     coaster_brake boolean DEFAULT false NOT NULL,
@@ -173,8 +204,6 @@ CREATE TABLE bikes (
     paint_id integer,
     registered_new boolean,
     example boolean DEFAULT false NOT NULL,
-    creation_zipcode character varying(255),
-    creation_country_id integer,
     country_id integer,
     stock_photo_url character varying(255),
     current_stolen_record_id integer,
@@ -188,7 +217,8 @@ CREATE TABLE bikes (
     is_for_sale boolean DEFAULT false NOT NULL,
     made_without_serial boolean DEFAULT false NOT NULL,
     stolen_lat double precision,
-    stolen_long double precision
+    stolen_long double precision,
+    creation_state_id integer
 );
 
 
@@ -393,6 +423,43 @@ CREATE SEQUENCE countries_id_seq
 --
 
 ALTER SEQUENCE countries_id_seq OWNED BY countries.id;
+
+
+--
+-- Name: creation_states; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE creation_states (
+    id integer NOT NULL,
+    bike_id integer,
+    organization_id integer,
+    origin character varying,
+    is_bulk boolean DEFAULT false NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    is_pos boolean DEFAULT false NOT NULL,
+    is_new boolean DEFAULT false NOT NULL,
+    creator_id integer
+);
+
+
+--
+-- Name: creation_states_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE creation_states_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: creation_states_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE creation_states_id_seq OWNED BY creation_states.id;
 
 
 --
@@ -905,7 +972,8 @@ CREATE TABLE mail_snippets (
     longitude double precision,
     proximity_radius integer,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    organization_id integer
 );
 
 
@@ -1767,7 +1835,7 @@ CREATE TABLE users (
     terms_of_service boolean DEFAULT false NOT NULL,
     vendor_terms_of_service boolean,
     when_vendor_terms_of_service timestamp without time zone,
-    confirmed boolean,
+    confirmed boolean DEFAULT false NOT NULL,
     confirmation_token character varying(255),
     can_send_many_stolen_notifications boolean DEFAULT false NOT NULL,
     auth_token character varying(255),
@@ -1852,6 +1920,13 @@ ALTER TABLE ONLY b_params ALTER COLUMN id SET DEFAULT nextval('b_params_id_seq':
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY bike_organizations ALTER COLUMN id SET DEFAULT nextval('bike_organizations_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY bikes ALTER COLUMN id SET DEFAULT nextval('bikes_id_seq'::regclass);
 
 
@@ -1888,6 +1963,13 @@ ALTER TABLE ONLY components ALTER COLUMN id SET DEFAULT nextval('components_id_s
 --
 
 ALTER TABLE ONLY countries ALTER COLUMN id SET DEFAULT nextval('countries_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY creation_states ALTER COLUMN id SET DEFAULT nextval('creation_states_id_seq'::regclass);
 
 
 --
@@ -2173,6 +2255,14 @@ ALTER TABLE ONLY b_params
 
 
 --
+-- Name: bike_organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY bike_organizations
+    ADD CONSTRAINT bike_organizations_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: bikes_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2218,6 +2308,14 @@ ALTER TABLE ONLY components
 
 ALTER TABLE ONLY countries
     ADD CONSTRAINT countries_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: creation_states_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY creation_states
+    ADD CONSTRAINT creation_states_pkey PRIMARY KEY (id);
 
 
 --
@@ -2525,10 +2623,31 @@ ALTER TABLE ONLY wheel_sizes
 
 
 --
+-- Name: index_bike_organizations_on_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_bike_organizations_on_bike_id ON bike_organizations USING btree (bike_id);
+
+
+--
+-- Name: index_bike_organizations_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_bike_organizations_on_organization_id ON bike_organizations USING btree (organization_id);
+
+
+--
 -- Name: index_bikes_on_card_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_bikes_on_card_id ON bikes USING btree (card_id);
+
+
+--
+-- Name: index_bikes_on_creation_state_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_bikes_on_creation_state_id ON bikes USING btree (creation_state_id);
 
 
 --
@@ -2609,6 +2728,27 @@ CREATE INDEX index_components_on_manufacturer_id ON components USING btree (manu
 
 
 --
+-- Name: index_creation_states_on_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_creation_states_on_bike_id ON creation_states USING btree (bike_id);
+
+
+--
+-- Name: index_creation_states_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_creation_states_on_creator_id ON creation_states USING btree (creator_id);
+
+
+--
+-- Name: index_creation_states_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_creation_states_on_organization_id ON creation_states USING btree (organization_id);
+
+
+--
 -- Name: index_integrations_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2620,6 +2760,13 @@ CREATE INDEX index_integrations_on_user_id ON integrations USING btree (user_id)
 --
 
 CREATE INDEX index_locks_on_user_id ON locks USING btree (user_id);
+
+
+--
+-- Name: index_mail_snippets_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_mail_snippets_on_organization_id ON mail_snippets USING btree (organization_id);
 
 
 --
@@ -3069,8 +3216,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160406202125');
 
 INSERT INTO schema_migrations (version) VALUES ('20160408192902');
 
-INSERT INTO schema_migrations (version) VALUES ('20160419161959');
-
 INSERT INTO schema_migrations (version) VALUES ('20160425185052');
 
 INSERT INTO schema_migrations (version) VALUES ('20160509110049');
@@ -3080,8 +3225,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160509120017');
 INSERT INTO schema_migrations (version) VALUES ('20160529093040');
 
 INSERT INTO schema_migrations (version) VALUES ('20160614112308');
-
-INSERT INTO schema_migrations (version) VALUES ('20160628175006');
 
 INSERT INTO schema_migrations (version) VALUES ('20160629152210');
 
@@ -3094,4 +3237,20 @@ INSERT INTO schema_migrations (version) VALUES ('20160631175602');
 INSERT INTO schema_migrations (version) VALUES ('20160711183247');
 
 INSERT INTO schema_migrations (version) VALUES ('20160714182030');
+
+INSERT INTO schema_migrations (version) VALUES ('20160808133129');
+
+INSERT INTO schema_migrations (version) VALUES ('20160813191639');
+
+INSERT INTO schema_migrations (version) VALUES ('20160901175004');
+
+INSERT INTO schema_migrations (version) VALUES ('20160910174549');
+
+INSERT INTO schema_migrations (version) VALUES ('20160910184053');
+
+INSERT INTO schema_migrations (version) VALUES ('20160913155615');
+
+INSERT INTO schema_migrations (version) VALUES ('20160923180542');
+
+INSERT INTO schema_migrations (version) VALUES ('20160923215650');
 

@@ -1,0 +1,56 @@
+.organized-page-header
+  - unless @search_query_present
+    %p
+      #{current_organization.name} has
+      %strong
+        #{ pluralize(@bikes_count, 'bike') }
+      registered bikes
+
+  = form_tag organization_bikes_path(organization_id: current_organization.to_param), id: 'bikes_search_form', class: 'bikes-search-form', method: :get do
+    .query-field-wrap
+      - opt_vals = @selected_query_items_options.map { |i| i.is_a?(String) ? [i, i] : [i['text'], i['search_id']]  }
+      = select_tag :query_items,                                      |
+        options_for_select(opt_vals, selected: opt_vals.map(&:last)), |
+        placeholder: 'Search bike descriptions',                      |
+        class: 'form-control query-field',                            |
+        multiple: true
+
+      = text_field_tag :serial, params[:serial],    |
+        placeholder: 'Search for serial number',    |
+        class: 'form-control query-field'
+    .search-button-wrap
+      = button_tag(type: 'submit', class: 'searchit btn btn-primary') do
+        :plain
+          <svg id="search-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29"><defs><style>.cls-1,.cls-2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:2px;}.cls-2{stroke-linecap:round;}</style></defs><title>searcher</title><circle class="cls-1" cx="10.39" cy="10.39" r="9.39"/><line class="cls-2" x1="17.03" y1="17.03" x2="28" y2="28"/></svg>
+      = hidden_field_tag :stolenness, params[:all]
+
+.organized-bikes-table
+  - if @search_query_present
+    %p
+      #{ pluralize(@bikes_count, 'bike') } matching bikes
+
+  %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
+    %thead.small-header
+      %tr
+        %th.date-added Date added
+        %th Manufacturer
+        %th Model
+        %th Color
+        %th Sent to
+        / %th View PDF
+    %tbody
+      - @bikes.each do |bike|
+        %tr
+          %td
+            = l bike.created_at, format: :dotted
+          %td
+            = link_to bike.mnfg_name, bike_path(bike)
+          %td
+            = bike.frame_model
+          %td
+            = bike.frame_colors.to_sentence
+          %td
+            = bike.owner_email
+          / %td
+.paginate-container.paginate-container-bottom
+  = paginate @bikes

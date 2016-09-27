@@ -41,10 +41,9 @@ describe ComponentCreator do
       expect(component[:component_type]).not_to be_present
     end
     it "creates a new component type if we don't recognize it" do
-      ctype = FactoryGirl.create(:ctype, name: 'Unknown')
       c = { component_type: 'Hubs' }
       component = ComponentCreator.new.set_component_type(c)
-      expect(component[:ctype_id]).to eq(ctype.id)
+      expect(component[:ctype_id]).to eq(Ctype.unknown.id)
       expect(component[:ctype_other]).to eq('Hubs')
       expect(component[:component_type]).not_to be_present
     end

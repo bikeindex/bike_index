@@ -1,5 +1,17 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
+  # Use lograge for logging to production
+  config.lograge.enabled = true
+  config.log_level = :info
+  config.lograge.formatter = Lograge::Formatters::Logstash.new # Use logstash format
+  config.lograge.custom_options = lambda do |event|
+    {
+      remote_ip: event.payload[:ip],
+      params: event.payload[:params].except('controller', 'action', 'format', 'id')
+    }
+  end
+
+  # Log times where people pass non-whitelisted params
   config.action_controller.action_on_unpermitted_parameters :log
 
   # Code is not reloaded between requests.
@@ -14,8 +26,7 @@ Rails.application.configure do
   # Full error reports are disabled and caching is turned on.
   config.consider_all_requests_local       = false
   config.action_controller.perform_caching = true
-  config.cache_store = :dalli_store,
-    { namespace: Bikeindex, expires_in: 0, compress: true }
+  config.cache_store = :dalli_store, { namespace: Bikeindex, expires_in: 0, compress: true }
 
   # Enable Rack::Cache to put a simple HTTP cache in front of your application
   # Add `rack-cache` to your Gemfile before enabling this.
@@ -47,16 +58,6 @@ Rails.application.configure do
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   config.force_ssl = true
 
-  # Use the lowest log level to ensure availability of diagnostic information
-  # when problems arise.
-  config.log_level = :debug
-
-  # Prepend all log lines with the following tags.
-  # config.log_tags = [ :subdomain, :uuid ]
-
-  # Use a different logger for distributed setups.
-  # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
-
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
 
@@ -74,12 +75,9 @@ Rails.application.configure do
   # Send deprecation notices to registered listeners.
   config.active_support.deprecation = :notify
 
-  # Use default logging formatter so that PID and timestamp are not suppressed.
-  config.log_formatter = ::Logger::Formatter.new
-
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  config.action_mailer.default_url_options = { protocol: 'https', host: "bikeindex.org" }
+  config.action_mailer.default_url_options = { protocol: 'https', host: 'bikeindex.org' }
   config.action_mailer.delivery_method = :smtp
 end

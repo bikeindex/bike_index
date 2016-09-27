@@ -7,12 +7,15 @@ class BikeIndex.BikeBoxes extends BikeIndex
     window.hoverExpandBlockTemplate = @hoverExpandBlockTemplate()
     Mustache.parse(window.hoverExpandBlockTemplate)
 
-    $('a.hover-expand').hover (->
-      $target = $(this)
-      hoverExpand($target)
-      $target.addClass 'img-expanded'
-    ), ->
-      $(this).removeClass 'img-expanded'
+    # Disable preview images on touch devices
+    # iOS opens the preview windows and you can't close them
+    unless 'ontouchstart' of document.documentElement
+      $('a.hover-expand').hover (->
+        $target = $(this)
+        hoverExpand($target)
+        $target.addClass 'img-expanded'
+      ), ->
+        $(this).removeClass 'img-expanded'
 
   hoverExpand: ($target) ->
     return true if $target.find('.hover-expand-block').length > 0

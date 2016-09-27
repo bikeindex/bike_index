@@ -1,24 +1,35 @@
 require 'spec_helper'
 
 describe Admin::MailSnippetsController do
+  include_context :logged_in_as_super_admin
+
   describe 'index' do
-    before do
-      user = FactoryGirl.create(:admin)
-      set_current_user(user)
+    it 'renders without_organizations mail_snippets' do
+      FactoryGirl.create(:organization_mail_snippet)
+      mail_snippet = FactoryGirl.create(:mail_snippet)
       get :index
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:index)
+      expect(assigns(:mail_snippets)).to eq([mail_snippet])
     end
-    it { is_expected.to respond_with(:success) }
-    it { is_expected.to render_template(:index) }
   end
 
   describe 'edit' do
-    before do
-      user = FactoryGirl.create(:admin)
-      set_current_user(user)
-      snippet = FactoryGirl.create(:mail_snippet)
-      get :edit, id: snippet.id
+    context 'organization_mail_snippet' do
+      let(:mail_snippet) { FactoryGirl.create(:organization_mail_snippet) }
+      it 'redirects' do
+        expect do
+          get :edit, id: mail_snippet.id
+        end.to raise_error(ActiveRecord::RecordNotFound)
+      end
     end
-    it { is_expected.to respond_with(:success) }
-    it { is_expected.to render_template(:edit) }
+    context 'non organized' do
+      let(:mail_snippet) { FactoryGirl.create(:mail_snippet) }
+      it 'renders' do
+        get :edit, id: mail_snippet.id
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:edit)
+      end
+    end
   end
 end

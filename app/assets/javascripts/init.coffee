@@ -36,12 +36,16 @@ class BikeIndex.Init extends BikeIndex
       bikes_update: BikeIndex.BikesEdit
       bikes_show: BikeIndex.BikesShow
       bikes_index: BikeIndex.BikesIndex
+      organized_bikes_index: BikeIndex.BikesIndex
       manufacturers_index: BikeIndex.InfoManufacturers
       users_edit: BikeIndex.UsersEdit
       welcome_user_home: BikeIndex.UserHome
       welcome_choose_registration: BikeIndex.ChooseRegistration
       stolen_index: BikeIndex.LegacyStolenIndex
       organized_manage_locations: BikeIndex.OrganizedManageLocations
+      locks_new: BikeIndex.LocksForm
+      locks_edit: BikeIndex.LocksForm
+      locks_create: BikeIndex.LocksForm
     window.pageScript = new pageClasses[body_id] if Object.keys(pageClasses).includes(body_id)
 
   initializeNoTabLinks: ->

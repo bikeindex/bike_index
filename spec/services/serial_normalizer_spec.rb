@@ -17,6 +17,9 @@ describe SerialNormalizer do
       result = SerialNormalizer.new(serial: serial).normalized
       expect(result).to eq('38675971596')
     end
+    it 'returns absent unless present' do
+      expect(SerialNormalizer.new(serial: ' ').normalized).to eq 'absent'
+    end
   end
 
   describe 'normalized_segments' do
@@ -27,7 +30,7 @@ describe SerialNormalizer do
     end
     it 'returns nil if serial is absent' do
       segments = SerialNormalizer.new(serial: 'absent').normalized_segments
-      expect(segments).to be_nil
+      expect(segments).to eq([])
     end
   end
 
@@ -51,7 +54,9 @@ describe SerialNormalizer do
       SerialNormalizer.new(serial: 'another + : THING').save_segments(bike.id)
       segments = NormalizedSerialSegment.where(bike_id: bike.id)
       expect(segments.count).to eq(2)
-      expect(segments[1].segment).to eq('AN0THER')
+      seg_strings = segments.map(&:segment)
+      expect(seg_strings.include?('AN0THER')).to be_truthy
+      expect(seg_strings.include?('TH1NG')).to be_truthy
     end
 
     it 'does not make any if the bike is an example bike' do

@@ -19,7 +19,8 @@ gem 'rollout' # Feature flags
 gem 'soulheart', '~> 0.2.6' # typeahead/autocomplete features
 
 gem 'rack-contrib'
-gem 'puma' # Use Puma as the app server
+gem 'unicorn' # Use Puma as the app server
+gem 'unicorn-worker-killer'
 gem 'geocoder'
 gem 'money-rails'
 gem 'i18n'
@@ -57,7 +58,7 @@ gem 'sparkpost' # ruby client for email
 # OAuth provider, Grape, associated parts of API V2
 gem 'doorkeeper'
 gem 'wine_bouncer'
-gem 'grape', '~> 0.13.0'
+gem 'grape', '~> 0.14.0'
 gem 'grape-active_model_serializers', git: 'https://github.com/jrhe/grape-active_model_serializers'
 gem 'grape-swagger', '~> 0.10.4'
 gem 'swagger-ui_rails'
@@ -68,16 +69,15 @@ gem 'rack-throttle'
 gem 'secure_headers', '~> 2.5.0'
 
 # Frontend
-gem 'backbone-on-rails', '~>0.9.10.0' 
-gem 'chartkick' # Display charts
-gem 'groupdate'
-gem 'bootstrap', '~> 4.0.0.alpha3' # Bootstrap 4 - used for revised stylesheets
-
 gem 'sprockets-rails', '~> 3.0.4'
-# gem 'sass-rails'
 gem 'coffee-rails'
 gem 'therubyracer'
 gem 'uglifier'
+gem 'premailer-rails' # Inline styles for email
+gem 'backbone-on-rails', '~>0.9.10.0' # Legacy js
+gem 'chartkick' # Display charts
+gem 'groupdate' # Required for charts
+gem 'bootstrap', '~> 4.0.0.alpha3' # Bootstrap 4 - used for revised stylesheets
 gem 'jquery-datatables-rails', '~>3.4.0'
 
 # Show performance metrics
@@ -85,7 +85,6 @@ gem 'stackprof', require: false
 gem 'memory_profiler', require: false
 gem 'flamegraph', require: false
 gem 'rack-mini-profiler', require: false # If you can't see it you can't make it better
-
 
 gem 'responders', '~> 2.0' # required because of class level respond_to blocks (API v1)
 
@@ -96,14 +95,18 @@ source 'https://rails-assets.org' do # JS land is crazy, so lock everything
   gem 'rails-assets-mustache', '~> 2.2.1'
   gem 'rails-assets-jquery.dirtyforms', '~> 2.0.0' # Alert on attempts to leave with dirt on forms
   gem 'rails-assets-selectize', '~> 0.12.1' # Manually configured scss
+  gem 'rails-assets-select2', '~> 4.0.3' # Use select2 for a few things, it's a bit better sometimes
   gem 'rails-assets-pikaday', '~> 1.4.0' # Datepicker
   gem 'rails-assets-Stickyfill', '~> 1.1.3' # Affix bike edit menu
   # Sortable breaks assets:precompile, so it's included manually
   # gem 'rails-assets-jquery-sortable', '~> 0.9.12' # Sort photo order
 end
 
+gem 'grape_logging' # Grape logging. Also how we pass it to lograge. Always used, not just in Prod
 group :production do
-  gem 'honeybadger', '~> 2.0'
+  gem 'honeybadger', '~> 2.0' # Error monitoring
+  gem 'lograge' # Structure log data, put it in single lines to improve the functionality
+  gem 'logstash-event' # Use logstash format for logging data
 end
 
 group :development do

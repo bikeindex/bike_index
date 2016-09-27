@@ -58,19 +58,19 @@ protected
   def default_hash
     base_description = t 'meta_descriptions.welcome_index'
     tags = {
-      title_tag: { title: 'Bike Index' },
       meta_tags: {
         charset:           'utf-8',
         :'X-UA-Compatible' => 'IE=edge,chrome=1', 
         viewport:          'width=device-width, initial-scale=1, maximum-scale=1',
         description:       base_description,
         :'og:url'          => "#{request.url}",
-        :'og:image'        => "#{root_url}assets/logos/bw_transparent.png",
+        :'og:image'        => '/bike_index.png',
         :'og:site_name'    => 'Bike Index',
         :'twitter:card'    => 'summary',
         :'twitter:creator' => '@bikeindex',
         :'twitter:site'    => '@bikeindex'
-      }
+      },
+      title_tag: { title: 'Bike Index' }
     }
   end
 

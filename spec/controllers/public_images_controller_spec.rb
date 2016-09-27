@@ -12,7 +12,7 @@ describe PublicImagesController do
           post :create, bike_id: bike.id, public_image: { name: 'cool name' }, format: :js
           bike.reload
           expect(bike.public_images.first.name).to eq 'cool name'
-          expect(ListingOrderWorker).to have_enqueued_job(bike.id)
+          expect(AfterBikeSaveWorker).to have_enqueued_job(bike.id)
         end
       end
       context 'no user' do
@@ -48,19 +48,37 @@ describe PublicImagesController do
     context 'organization' do
       let(:organization) { FactoryGirl.create(:organization) }
       context 'admin authorized' do
+        include_context :logged_in_as_super_admin
         it 'creates an image' do
-          user = FactoryGirl.create(:content_admin)
-          set_current_user(user)
           post :create, organization_id: organization.to_param, public_image: { name: 'cool name' }, format: :js
           organization.reload
           expect(organization.public_images.first.name).to eq 'cool name'
         end
       end
       context 'not admin' do
+        include_context :logged_in_as_user
         it 'does not create an image' do
-          set_current_user(FactoryGirl.create(:user))
           expect do
             post :create, organization_id: organization.to_param, public_image: { name: 'cool name' }, format: :js
+            expect(response.code).to eq('401')
+          end.to change(PublicImage, :count).by 0
+        end
+      end
+    end
+    context 'mail_snippet' do
+      let(:mail_snippet) { FactoryGirl.create(:mail_snippet) }
+      context 'admin authorized' do
+        include_context :logged_in_as_super_admin
+        it 'creates an image' do
+          post :create, mail_snippet_id: mail_snippet.to_param, public_image: { name: 'cool name' }, format: :js
+          mail_snippet.reload
+          expect(mail_snippet.public_images.first.name).to eq 'cool name'
+        end
+      end
+      context 'not signed in' do
+        it 'does not create an image' do
+          expect do
+            post :create, organization_id: mail_snippet.to_param, public_image: { name: 'cool name' }, format: :js
             expect(response.code).to eq('401')
           end.to change(PublicImage, :count).by 0
         end
@@ -189,7 +207,7 @@ describe PublicImagesController do
           post :is_private, id: public_image.id, is_private: 'true'
           public_image.reload
           expect(public_image.is_private).to be_truthy
-          expect(ListingOrderWorker).to have_enqueued_job(bike.id)
+          expect(AfterBikeSaveWorker).to have_enqueued_job(bike.id)
         end
       end
       context 'is_private false' do
@@ -201,7 +219,7 @@ describe PublicImagesController do
           post :is_private, id: public_image.id, is_private: false
           public_image.reload
           expect(public_image.is_private).to be_falsey
-          expect(ListingOrderWorker).to have_enqueued_job(bike.id)
+          expect(AfterBikeSaveWorker).to have_enqueued_job(bike.id)
         end
       end
     end
@@ -232,7 +250,7 @@ describe PublicImagesController do
       expect(public_image_other.listing_order).to eq 0
       expect(public_image_3.listing_order).to eq 3
       expect(public_image_2.listing_order).to eq 2
-      expect(public_image_1.listing_order).to eq 1
+      expect(public_image_1.listing_order).to be < 2
       list_order = [public_image_3.id, public_image_1.id, public_image_other.id, public_image_2.id]
       set_current_user(user)
       post :order, list_of_photos: list_order.map(&:to_s)
@@ -244,7 +262,7 @@ describe PublicImagesController do
       expect(public_image_2.listing_order).to eq 4
       expect(public_image_1.listing_order).to eq 2
       expect(public_image_other.listing_order).to eq 0
-      expect(ListingOrderWorker).to have_enqueued_job(bike.id)
+      expect(AfterBikeSaveWorker).to have_enqueued_job(bike.id)
     end
   end
 end

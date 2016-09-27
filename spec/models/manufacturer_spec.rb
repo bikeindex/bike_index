@@ -1,10 +1,11 @@
 require 'spec_helper'
 
 describe Manufacturer do
+  it_behaves_like 'autocomplete_hashable'
   describe 'validations' do
     it { is_expected.to validate_presence_of :name }
     it { is_expected.to validate_uniqueness_of :name }
-    xit { is_expected.to validate_uniqueness_of :slug }
+    it { is_expected.to validate_uniqueness_of :slug }
     it { is_expected.to have_many :bikes }
     it { is_expected.to have_many :locks }
     it { is_expected.to have_many :components }

@@ -24,7 +24,7 @@ describe UserEmailsController do
         expect do
           post :resend_confirmation, id: user_email.id
         end.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
-        expect(flash[:error]).to match(/not your/)
+        expect(flash[:error]).to match(/signed in with primary email/)
       end
     end
 
@@ -33,7 +33,7 @@ describe UserEmailsController do
         expect do
           post :resend_confirmation, id: 33333
         end.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
-        expect(flash[:error]).to match(/not your/)
+        expect(flash[:error]).to match(/signed in with primary email/)
       end
     end
   end
@@ -78,7 +78,7 @@ describe UserEmailsController do
         expect do
           get :confirm, id: user_email.id, confirmation_token: user_email.confirmation_token
         end.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
-        expect(flash[:error]).to match(/not your/)
+        expect(flash[:error]).to match(/signed in with primary email/)
       end
     end
 
@@ -87,11 +87,10 @@ describe UserEmailsController do
         expect do
           get :confirm, id: user_email.id, confirmation_token: user_email.confirmation_token
         end.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
-        expect(flash[:error]).to match(/not your/)
+        expect(flash[:error]).to match(/signed in with primary email/)
       end
     end
   end
-
 
   describe 'destroy' do
     context "user's user email" do
@@ -103,6 +102,19 @@ describe UserEmailsController do
           delete :destroy, id: user_email.id
           expect(UserEmail.where(id: user_email.id)).to_not be_present
           expect(flash[:success]).to be_present
+        end
+      end
+      context 'only has email' do
+        it 'sets flash info and does not delete the email' do
+          user_email.destroy
+          user.user_emails.each { |ue| ue.update_attribute :confirmation_token, 'stuff' }
+          expect(user.user_emails.count).to eq 1
+          expect(user.user_emails.confirmed.count).to eq 0
+          delete :destroy, id: user.user_emails.first.id
+          user.reload
+          expect(user.user_emails.confirmed.count).to eq 0
+          expect(user.user_emails.count).to eq 1
+          expect(flash[:info]).to be_present
         end
       end
       context 'confirmed' do
@@ -122,7 +134,7 @@ describe UserEmailsController do
         expect do
           delete :destroy, id: user_email.id
         end.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
-        expect(flash[:error]).to match(/not your/)
+        expect(flash[:error]).to match(/signed in with primary email/)
       end
     end
 
@@ -131,7 +143,7 @@ describe UserEmailsController do
         expect do
           delete :destroy, id: user_email.id
         end.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
-        expect(flash[:error]).to match(/not your/)
+        expect(flash[:error]).to match(/signed in with primary email/)
       end
     end
   end
@@ -180,7 +192,7 @@ describe UserEmailsController do
         post :make_primary, id: user_email.id
         user_email.reload
         expect(user_email.primary).to be_falsey
-        expect(flash[:error]).to match(/not your/)
+        expect(flash[:error]).to match(/signed in with primary email/)
       end
     end
 
@@ -189,7 +201,7 @@ describe UserEmailsController do
         post :make_primary, id: user_email.id
         user_email.reload
         expect(user_email.primary).to be_falsey
-        expect(flash[:error]).to match(/not your/)
+        expect(flash[:error]).to match(/signed in with primary email/)
       end
     end
   end

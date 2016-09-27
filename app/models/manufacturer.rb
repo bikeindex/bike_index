@@ -24,8 +24,8 @@ class Manufacturer < ActiveRecord::Base
 
   class << self
     def old_attr_accessible
-    %w(name slug website frame_maker open_year close_year logo remote_logo_url
-       logo_cache logo_source description).map(&:to_sym).freeze
+      %w(name slug website frame_maker open_year close_year logo remote_logo_url
+         logo_cache logo_source description).map(&:to_sym).freeze
     end
 
     def friendly_find(n)
@@ -43,12 +43,12 @@ class Manufacturer < ActiveRecord::Base
       m && m.id
     end
 
-    def other_manufacturer
+    def other
       where(name: 'Other', frame_maker: true).first_or_create
     end
 
     def fill_stripped(n)
-      n.gsub!(/accell/i,'') if n.match(/accell/i).present?
+      n.gsub!(/accell/i, '') if n.match(/accell/i).present?
       Slugifyer.manufacturer(n)
     end
 
@@ -82,16 +82,12 @@ class Manufacturer < ActiveRecord::Base
 
   before_save :set_slug, :set_website_and_logo_source
   def set_slug
-    self.slug = Slugifyer.manufacturer(self.name)
+    self.slug = Slugifyer.manufacturer(name)
   end
 
   def set_website_and_logo_source
     self.website = website.present? ? Urlifyer.urlify(website) : nil
-    if logo.present?
-      self.logo_source ||= 'manual'
-    else
-      self.logo_source = nil
-    end
+    self.logo_source = logo.present? ? (logo_source || 'manual') : nil
     true
   end
 
@@ -101,7 +97,7 @@ class Manufacturer < ActiveRecord::Base
 
   def autocomplete_hash_priority
     return 0 unless (bikes.count + components.count) > 0
-    pop = (2*bikes.count + components.count) / 20 + 10
+    pop = (2 * bikes.count + components.count) / 20 + 10
     pop > 100 ? 100 : pop
   end
 
@@ -111,11 +107,15 @@ class Manufacturer < ActiveRecord::Base
       text: name,
       category: autocomplete_hash_category,
       priority: autocomplete_hash_priority,
-      data: { 
+      data: {
         slug: slug,
         priority: autocomplete_hash_priority,
-        search_id: "m_#{id}"
+        search_id: search_id
       }
     }.as_json
+  end
+
+  def search_id
+    "m_#{id}"
   end
 end

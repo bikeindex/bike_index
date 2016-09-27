@@ -1,10 +1,8 @@
-%header.with-subtitle
-  %h1
-    Save information about one of your locks
+.container
+  %header.with-subtitle
+    %h1
+      Save information about one of your locks
 
-= form_for @lock, html: { class: "form-horizontal" } do |f|
-  #lock-form
-    = render partial: "locks/form", locals: { f: f }
+  = render partial: "form"
 
-    .control-group.submit-button
-      = submit_tag "Add the lock!", class: "button-green"
+

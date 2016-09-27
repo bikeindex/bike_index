@@ -1,6 +1,3 @@
-class BikeCreatorError < StandardError
-end
-
 class BikeCreator
   def initialize(b_param = nil)
     @b_param = b_param
@@ -8,16 +5,13 @@ class BikeCreator
   end
 
   def add_bike_book_data
-    return nil unless @b_param.present? && @b_param.params.present? && @b_param.params['bike'].present?
-    return nil unless @b_param.bike['manufacturer_id'].present?
-    return nil unless @b_param.bike['frame_model'].present?
-    return nil unless @b_param.bike['year'].present?
-    bike = {
+    return nil unless @b_param && @b_param.bike.present? && @b_param.manufacturer_id.present?
+    return nil unless @b_param.bike['frame_model'].present? && @b_param.bike['year'].present?
+    bb_data = BikeBookIntegration.new.get_model({
       manufacturer: Manufacturer.find(@b_param.bike['manufacturer_id']).name,
       year: @b_param.bike['year'],
       frame_model: @b_param.bike['frame_model']
-    }
-    bb_data = BikeBookIntegration.new.get_model(bike)
+    })
     return true unless bb_data && bb_data['bike'].present?
     @b_param.params['bike']['cycle_type'] = bb_data['bike']['cycle_type'] if bb_data['bike'] && bb_data['bike']['cycle_type'].present?
     if bb_data['bike']['paint_description'].present?
@@ -60,11 +54,6 @@ class BikeCreator
     @bike
   end
 
-  # def associate_picture_with_params
-  #   # I think this might be required, check it
-  #   # BikeCreatorAssociator.new(@b_param).associate_picture(@b_param)
-  # end
-
   def validate_record(bike)
     if bike.errors.present?
       clear_bike(bike)
@@ -81,9 +70,9 @@ class BikeCreator
     bike.save
     @bike = create_associations(bike)
     validate_record(@bike)
-    if @bike.present?
-      ListingOrderWorker.perform_async(@bike.id)
-      ListingOrderWorker.perform_in(10.seconds, @bike.id)
+    if @bike.present? && @bike.id.present?
+      @bike.create_creation_state(creation_state_attributes)
+      AfterBikeSaveWorker.perform_async(@bike.id)
     end
     @bike
   end
@@ -98,5 +87,18 @@ class BikeCreator
     @bike = build_bike
     return @bike if @bike.errors.present?
     save_bike(@bike)
+  end
+
+  private
+
+  def creation_state_attributes
+    {
+      is_bulk: @b_param.is_bulk,
+      is_pos: @b_param.is_pos,
+      is_new: @b_param.is_new,
+      origin: @b_param.origin,
+      creator_id: @b_param.creator_id,
+      organization_id: @bike.creation_organization_id
+    }
   end
 end

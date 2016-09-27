@@ -1,50 +1,27 @@
 = javascript_include_tag "//www.google.com/jsapi", "chartkick" 
-/ = javascript_include_tag "path/to/highcharts.js", "chartkick"
 
-%section
+%section.padded
   %h1
     Bike Index graphs
+    %small
+      = link_to 'View tables', tables_admin_graphs_path
+
+%section
+  %h2 Users past week
+  = line_chart User.group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.now).count
 
 %section
   %h2
-    Users
+    Users since start
   = line_chart users_admin_graphs_path
 
 %section
   %h2
-    Bikes past week
-  - range = 1.weeks.ago.midnight..Time.now
-  - bgraph = [ { name: 'Registrations', data: Bike.unscoped.group_by_day(:created_at, range: range).count }, { name: 'Stolen', data: Bike.unscoped.where(stolen: true).group_by_day(:created_at, range: range).count }]
+    Bikes past year
+  = line_chart bikes_admin_graphs_path(start_at: 'past_year')
+
+%section
+  %h2
+    Bikes since start
 
   = line_chart bikes_admin_graphs_path
-
-%section
-  %h2
-    Bikes past year
-
-  = line_chart bikes_admin_graphs_path(dates: 'past_year')
-
-%section
-  %h2
-    Bikes since 2007
-
-  = line_chart bikes_admin_graphs_path(dates: 'since_start')
-
-/ # = pie_chart({"Football" => 10, "Basketball" => 5})
-
-/ = line_chart users_admin_graphs_path
-
-
-/ %table.table.table-striped.table-bordered
-/   %tbody
-/     - ["users","bikes","organizations"].each do |graph_type|
-/       %tr
-/         %td
-/           = graph_type.humanize
-/         %td
-/           = link_to "Since start", admin_graph_url("#{graph_type}")
-/     %tr
-/       %td
-/         This week in review
-/       %td
-/         = link_to "Past week", review_admin_graphs_url

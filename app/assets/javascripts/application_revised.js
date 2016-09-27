@@ -10,6 +10,7 @@
 //= require jquery.dirtyforms/plugins/jquery.dirtyforms.dialogs.bootstrap.min.js
 //= require mustache
 //= require Stickyfill
+//= require select2/select2.full.js
 //= require selectize/standalone/selectize.js
 //= require external_scripts/selectize_placeholder_plugin.js
 //= require external_scripts/headroom

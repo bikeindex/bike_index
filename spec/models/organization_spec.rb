@@ -6,10 +6,15 @@ describe Organization do
     it { is_expected.to validate_presence_of :name }
     it { is_expected.to have_many :memberships }
     it { is_expected.to have_many :organization_deals }
+    it { is_expected.to have_many :mail_snippets }
     it { is_expected.to have_many :users }
     it { is_expected.to have_many :organization_invitations }
+    it { is_expected.to have_many(:bike_organizations) }
+    # it { is_expected.to have_many(:bikes).through(:bike_organizations) }
+    it { is_expected.to have_many :creation_states }
+    it { is_expected.to have_many(:created_bikes).through(:creation_states) }
+
     it { is_expected.to have_many :locations }
-    it { is_expected.to have_many :bikes }
     it { is_expected.to belong_to :auto_user }
   end
 
@@ -159,6 +164,32 @@ describe Organization do
   describe 'clear_map_cache' do
     it 'has before_save_callback_method defined for clear clear_map_cache' do
       expect(Organization._save_callbacks.select { |cb| cb.kind.eql?(:after) }.map(&:raw_filter).include?(:clear_map_cache)).to eq(true)
+    end
+  end
+
+  describe 'mail_snippet_body' do
+    let(:organization) { FactoryGirl.create(:organization) }
+    before do
+      expect([organization, mail_snippet].size).to eq 2
+      expect(organization.mail_snippets).to be_present
+    end
+    context 'not included snippet type' do
+      let(:mail_snippet) { FactoryGirl.create(:organization_mail_snippet, organization: organization, name: 'fool') }
+      it 'returns nil for not-allowed snippet type' do
+        expect(organization.mail_snippet_body('fool')).to be nil
+      end
+    end
+    context 'non-enabled snippet type' do
+      let(:mail_snippet) { FactoryGirl.create(:organization_mail_snippet, organization: organization, is_enabled: false) }
+      it 'returns nil for not-enabled snippet' do
+        expect(organization.mail_snippet_body(mail_snippet.name)).to be nil
+      end
+    end
+    context 'enabled snippet' do
+      let(:mail_snippet) { FactoryGirl.create(:organization_mail_snippet, organization: organization, name: 'security') }
+      it 'returns nil for not-enabled snippet' do
+        expect(organization.mail_snippet_body(mail_snippet.name)).to eq mail_snippet.body
+      end
     end
   end
 end

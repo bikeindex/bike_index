@@ -2,13 +2,21 @@ require 'spec_helper'
 
 describe SessionsController do
   describe 'new' do
-    it 'renders and calls store_return_to' do
-      expect(controller).to receive(:store_return_to)
-      get :new
-      expect(response.code).to eq('200')
-      expect(response).to render_template('new')
-      expect(flash).to_not be_present
-      expect(response).to render_with_layout('application_revised')
+    context 'calls required things' do
+      it 'renders and calls store_return_to' do
+        expect(controller).to receive(:store_return_to)
+        get :new
+        expect(response.code).to eq('200')
+        expect(response).to render_template('new')
+        expect(flash).to_not be_present
+        expect(response).to render_with_layout('application_revised')
+      end
+    end
+    context 'setting return_to' do
+      it 'actually sets it' do
+        get :new, return_to: '/bikes/12?contact_owner=true'
+        expect(session[:return_to]).to eq '/bikes/12?contact_owner=true'
+      end
     end
   end
 
@@ -63,6 +71,24 @@ describe SessionsController do
           expect(User.from_auth(cookies.signed[:auth])).to eq(@user)
           expect(session[:return_to]).to be_nil
           expect(response).to redirect_to oauth_authorization_url(cool_thing: true)
+        end
+
+        it 'redirects to facebook.com/bikeindex' do
+          expect(@user).to receive(:authenticate).and_return(true)
+          session[:return_to] = 'https://facebook.com/bikeindex'
+          post :create, session: { thing: 'asdfasdf' }
+          expect(User.from_auth(cookies.signed[:auth])).to eq(@user)
+          expect(session[:return_to]).to be_nil
+          expect(response).to redirect_to 'https://facebook.com/bikeindex'
+        end
+
+        it 'does not redirect to a random facebook page' do
+          expect(@user).to receive(:authenticate).and_return(true)
+          session[:return_to] = 'https://facebook.com/bikeindex-mean-place'
+          post :create, session: { thing: 'asdfasdf' }
+          expect(User.from_auth(cookies.signed[:auth])).to eq(@user)
+          expect(session[:return_to]).to be_nil
+          expect(response).to redirect_to user_home_url
         end
 
         it "doesn't redirect and clears the session if not a valid oauth url" do

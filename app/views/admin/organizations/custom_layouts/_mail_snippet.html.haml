@@ -1,0 +1,38 @@
+.form.form-horizontal
+  - if @organization.errors.any?
+    #alert-block
+      .alert.alert-error
+        %h4
+          Please fix the following 
+          = pluralize(@organization.errors.count, "error")
+        %ul
+          - @organization.errors.full_messages.each do |msg|
+            %li
+              = msg
+  = form_for @organization, { as: :organization, url: admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id]), action: 'update' } do |f|
+    = f.fields_for :mail_snippets do |snippet|
+      - snippet_name = snippet.object.name
+      - next unless snippet_name == @edit_template
+      - snippet_description = MailSnippet.organization_snippets[snippet.object.name.to_sym]
+      .blog-field
+        = snippet.label :body, "#{snippet.object.name.titleize} snippet"
+        = snippet.text_area :body, placeholder: snippet_description, rows: 10
+      .control-group
+        %label
+          = snippet.check_box :is_enabled
+          Enable
+          %strong
+            #{@edit_template.titleize} snippet
+          %em
+            only possible if there is content
+
+    = f.submit 'Save', class: 'button-green pull-right'
+  .padded
+
+.well
+  .add-blog-photos
+    %ul#public_images{ :"data-order-url" => order_public_images_url }
+      - if @mail_snippet.public_images
+        = render partial: '/public_images/public_image', collection: @mail_snippet.public_images, as: :public_image, locals: { skip_order: true }
+    %section
+      = render partial: 'public_images/admin_new_form', locals: { imageable_type: 'MailSnippet' }

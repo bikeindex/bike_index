@@ -1,6 +1,6 @@
 module API
   module V2
-    class Bikes < API::V2::Root
+    class Bikes < API::Base
       include API::V2::Defaults
 
       helpers do
@@ -57,13 +57,21 @@ module API
 
         def creation_user_id
           if current_user.id == ENV['V2_ACCESSOR_ID'].to_i
-            org = params[:organization_slug].present? && Organization.find_by_slug(params[:organization_slug])
+            org = params[:organization_slug].present? && Organization.friendly_find(params[:organization_slug])
             if org && current_token.application.owner && current_token.application.owner.is_admin_of?(org)
               return org.auto_user_id
             end
             error!("Permanent tokens can only be used to create bikes for organizations your are an admin of", 403)
           end  
           current_user.id
+        end
+
+        def creation_state_params
+          {
+            is_bulk: params[:is_bulk],
+            is_pos: params[:is_pos],
+            is_new: params[:is_new]
+          }
         end
 
         def find_bike
@@ -133,8 +141,8 @@ module API
           end
         end
         post '/', serializer: BikeV2ShowSerializer, root: 'bike' do
-          declared_p = { "declared_params" => declared(params, include_missing: false) }
-          b_param = BParam.create(creator_id: creation_user_id, params: declared_p['declared_params'], api_v2: true)
+          declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
+          b_param = BParam.create(creator_id: creation_user_id, params: declared_p['declared_params'], origin: 'api_v2')
           ensure_required_stolen_attrs(b_param.params)
           bike = BikeCreator.new(b_param).create_bike
           if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?

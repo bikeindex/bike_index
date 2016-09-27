@@ -23,7 +23,7 @@
         %tr
           %td
             = link_to manufacturer.name, admin_manufacturer_url(manufacturer)
-          %td
+          %td.table-cell-check
             = "&#x2713;".html_safe if manufacturer.frame_maker
           %td.large-screens
             - if manufacturer.website

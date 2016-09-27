@@ -1,15 +1,5 @@
 require 'spec_helper'
 describe CustomerMailer do
-  describe 'including_snippet' do
-    it 'includes the snippet' do
-      @ownership = FactoryGirl.create(:ownership)
-      mail_snippet = MailSnippet.new(body: '<h1>LOLS</h1>')
-      expect(MailSnippet).to receive(:matching_opts).and_return(mail_snippet)
-      @mail = CustomerMailer.ownership_invitation_email(@ownership)
-      expect(@mail.body.encoded).to match(mail_snippet.body)
-    end
-  end
-
   describe 'welcome_email' do
     before :each do
       @user = FactoryGirl.create(:user)
@@ -41,26 +31,6 @@ describe CustomerMailer do
     it 'renders email' do
       expect(@mail.subject).to eq('Instructions to reset your password')
       expect(@mail.body.encoded).to match('reset')
-    end
-  end
-
-  describe 'ownership_invitation_email' do
-    it 'renders email' do
-      @ownership = FactoryGirl.create(:ownership)
-      @mail = CustomerMailer.ownership_invitation_email(@ownership)
-      expect(@mail.subject).to eq('Claim your bike on BikeIndex.org!')
-    end
-  end
-
-  describe 'organization_invitation_email' do
-    before :each do
-      @organization = FactoryGirl.create(:organization)
-      @organization_invitation = FactoryGirl.create(:organization_invitation, organization: @organization)
-      @mail = CustomerMailer.organization_invitation_email(@organization_invitation)
-    end
-
-    it 'renders email' do
-      expect(@mail.subject).to eq("Join #{@organization.name} on the Bike Index")
     end
   end
 

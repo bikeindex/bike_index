@@ -1,16 +1,7 @@
 class OwnershipNotSavedError < StandardError
 end
 
-class BikeNotSavedError < StandardError
-end
-
-class BikeCreatorError < StandardError
-end
-
 class BikeUpdatorError < StandardError
-end
-
-class BikeTyperError < StandardError
 end
 
 class BikesController < ApplicationController
@@ -22,28 +13,21 @@ class BikesController < ApplicationController
   layout 'application_revised'
 
   def index
-    params[:stolen] = true unless params[:stolen].present? || params[:non_stolen].present?
-    search = BikeSearcher.new(params, is_ip_proximity_search)
-    bikes = search.find_bikes
-    @location = search.location
-    page = params[:page] || 1
-    @per_page = params[:per_page] || 10
-    bikes = bikes.page(page).per(@per_page)
-    if params[:serial].present? && page == 1
-      secondary_bikes = search.fuzzy_find_serial
-      @secondary_bikes = secondary_bikes.decorate if secondary_bikes.present?
+    @interpreted_params = Bike.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
+    if params[:stolenness] == 'proximity' && @interpreted_params[:stolenness] != 'proximity'
+      flash[:info] = "Sorry, we don't know the location #{params[:location]}. Please enter something else to search nearby stolen bikes"
     end
-    @bikes = bikes.decorate
-    @query = params[:query]
-    # @query = request.query_parameters()
-    @url = request.original_url
-    @stolenness = search.stolenness_type
-    @selectize_items = search.selectize_items
+    @bikes = Bike.search(@interpreted_params).page(params[:page] || 1).per(params[:per_page] || 10).decorate
+    if @interpreted_params[:serial]
+      @close_serials = Bike.search_close_serials(@interpreted_params).limit(10).decorate
+    end
+    @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
   end
 
   def show
     @components = @bike.components.decorate
     if @bike.stolen and @bike.current_stolen_record.present?
+      @contact_owner_open = current_user && params[:contact_owner].present? # Show contact owner box on load
       @stolen_record = @bike.current_stolen_record.decorate
     end
     @bike = @bike.decorate
@@ -108,19 +92,19 @@ class BikesController < ApplicationController
   end
 
   def create
+    find_or_new_b_param
     if params[:bike][:embeded]
-      @b_param = BParam.from_id_token(params[:bike][:b_param_id_token])
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@b_param.created_bike)
       end
       if params[:bike][:image].present?
         @b_param.image = params[:bike][:image]
-        @b_param.image_processed = false
-        @b_param.save
+        @b_param.image_processed = false # Don't need to save because update below
         ImageAssociatorWorker.perform_in(1.minutes)
         params[:bike].delete(:image)
       end
-      @b_param.update_attributes(params: permitted_bparams)
+      @b_param.update_attributes(params: permitted_bparams,
+                                 origin: (params[:bike][:embeded_extended] ? 'embed_extended' : 'embed'))
       @bike = BikeCreator.new(@b_param).create_bike
       if @bike.errors.any?
         @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
@@ -140,7 +124,6 @@ class BikesController < ApplicationController
         end
       end
     else
-      find_or_new_b_param
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@b_param.created_bike) and return
       end
@@ -202,13 +185,8 @@ class BikesController < ApplicationController
 
   protected
 
-  def is_ip_proximity_search
-    return false unless params[:proximity].present?
-    proximity = params[:proximity].strip.downcase
-    return false unless proximity == 'ip' || proximity == 'you'
-    # Set the ip from forwarded for, to take care of reverse proxy and cloudflare ips
-    params[:proximity] = request.env['HTTP_X_FORWARDED_FOR'].split(',')[0] if request.env['HTTP_X_FORWARDED_FOR']
-    true
+  def permitted_search_params
+    params.permit(*Bike.permitted_search_params)
   end
 
   def find_bike
@@ -219,7 +197,7 @@ class BikesController < ApplicationController
     end
     if @bike.hidden
       unless current_user.present? && @bike.visible_by(current_user)
-        flash[:error] = "Bike deleted"
+        flash[:error] = 'Bike deleted'
         redirect_to root_url and return
       end
     end
@@ -228,7 +206,7 @@ class BikesController < ApplicationController
   def find_or_new_b_param
     token = params[:b_param_token]
     token ||= params[:bike] && params[:bike][:b_param_id_token]
-    @b_param = BParam.find_or_new_from_token(token, user_id: current_user.id)
+    @b_param = BParam.find_or_new_from_token(token, user_id: current_user && current_user.id)
   end
 
   def ensure_user_allowed_to_edit
@@ -236,19 +214,23 @@ class BikesController < ApplicationController
     type = @bike && @bike.type || 'bike'
     if current_user.present?
       unless @current_ownership && @current_ownership.owner == current_user
+        if @bike.can_be_claimed_by(current_user)
+          redirect_to ownership_path(@bike.current_ownership) and return
+        end
         error = "Oh no! It looks like you don't own that #{type}."
       end
     else
       if @current_ownership && @bike.current_ownership.claimed
         error = "Whoops! You have to sign in to be able to edit that #{type}."
       else
-        error = "That #{type} hasn't been claimed yet. If it's your {type} sign up and you'll be able to edit it!"
+        error = "That #{type} hasn't been claimed yet. If it's your #{type} sign up and you'll be able to edit it!"
       end
     end
     if error.present? # Can't assign directly to flash here, sometimes kick out of edit because other flash error
       flash[:error] = error
       redirect_to bike_path(@bike) and return
     end
+    authenticate_user('Please create an account', flash_type: :info)
   end
 
   def render_ad

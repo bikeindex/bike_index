@@ -43,7 +43,7 @@ module Bikeindex
       Doorkeeper::AuthorizationsController.layout 'doorkeeper'
       Doorkeeper::AuthorizedApplicationsController.layout 'doorkeeper'
     end
-    
+
     config.generators do |g|
       g.test_framework :rspec
     end

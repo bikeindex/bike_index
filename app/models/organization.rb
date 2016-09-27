@@ -7,12 +7,17 @@ class Organization < ActiveRecord::Base
   mount_uploader :avatar, AvatarUploader
 
   has_many :memberships, dependent: :destroy
+  has_many :mail_snippets
   has_many :organization_deals, dependent: :destroy
   has_many :users, through: :memberships
   has_many :organization_invitations, dependent: :destroy
-  belongs_to :auto_user, class_name: 'User'
-
+  has_many :bike_organizations
+  # has_many :bikes, through: :bike_organizations
   has_many :bikes, foreign_key: 'creation_organization_id'
+  has_many :creation_states
+  has_many :created_bikes, through: :creation_states, source: :bike
+  belongs_to :auto_user, class_name: 'User'
+  accepts_nested_attributes_for :mail_snippets
 
   has_many :locations, dependent: :destroy
   accepts_nested_attributes_for :locations, allow_destroy: true
@@ -45,6 +50,12 @@ class Organization < ActiveRecord::Base
 
   def to_param
     slug
+  end
+
+  def mail_snippet_body(type)
+    return nil unless MailSnippet.organization_snippet_types.include?(type)
+    snippet = mail_snippets.enabled.where(name: type).first
+    snippet && snippet.body
   end
 
   before_save :set_and_clean_attributes
@@ -117,5 +128,4 @@ class Organization < ActiveRecord::Base
       self.access_token = SecureRandom.hex
     end while self.class.exists?(access_token: access_token)
   end
-
 end

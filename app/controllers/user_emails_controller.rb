@@ -31,8 +31,10 @@ class UserEmailsController < ApplicationController
   def destroy
     if @user_email.confirmed
       flash[:info] = "#{@user_email.email} is confirmed and can't be removed. Email contact@bikeindex.org for help."
+    elsif @user_email.user.user_emails.count < 2
+      flash[:info] = "#{@user_email.email} is your only confirmed email and can't be removed. Email contact@bikeindex.org for help."
     else
-      flash[:success] = "#{@user_email.email} remove."
+      flash[:success] = "#{@user_email.email} removed."
       @user_email.destroy
     end
     redirect_to my_account_path
@@ -42,7 +44,7 @@ class UserEmailsController < ApplicationController
 
   def ensure_user_email_ownership
     unless current_user && current_user.user_emails.pluck(:id).include?(params[:id].to_i)
-      flash[:error] = "That's not your additional email! Email contact@bikeindex.org if this doesn't make sense."
+      flash[:error] = "You must be signed in with primary email! Email contact@bikeindex.org if this doesn't make sense."
       redirect_to user_root_url and return
     end
     @user_email = current_user.user_emails.find(params[:id])

@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe Bike do
+  it_behaves_like 'bike_searchable'
   describe 'validations' do
     it { is_expected.to belong_to :manufacturer }
     it { is_expected.to belong_to :primary_frame_color }
@@ -15,11 +16,14 @@ describe Bike do
     it { is_expected.to belong_to :propulsion_type }
     it { is_expected.to belong_to :paint }
     it { is_expected.to belong_to :cycle_type }
-    it { is_expected.to belong_to :creator }
     it { is_expected.to belong_to :updator }
+    it { is_expected.to have_many :bike_organizations }
+    it { is_expected.to have_many(:organizations).through(:bike_organizations) }
+    it { is_expected.to have_one :creation_state }
     it { is_expected.to belong_to :creation_organization }
+    # it { is_expected.to delegate_method(:creator).to(:creation_state) }
+    # it { is_expected.to have_one(:creation_organization).through(:creation_state) }
     it { is_expected.to belong_to :current_stolen_record }
-    it { is_expected.to belong_to :location }
     it { is_expected.to have_many :duplicate_bike_groups }
     it { is_expected.to have_many :b_params }
     it { is_expected.to have_many :stolen_notifications }
@@ -30,14 +34,13 @@ describe Bike do
     it { is_expected.to have_many :other_listings }
     it { is_expected.to accept_nested_attributes_for :stolen_records }
     it { is_expected.to accept_nested_attributes_for :components }
+    # it { is_expected.to validate_presence_of :creation_state_id }
+    it { is_expected.to validate_presence_of :creator }
     it { is_expected.to validate_presence_of :cycle_type_id }
     it { is_expected.to validate_presence_of :propulsion_type_id }
-    it { is_expected.to validate_presence_of :creator }
     it { is_expected.to validate_presence_of :serial_number }
     it { is_expected.to validate_presence_of :manufacturer_id }
-    # it { should validate_presence_of :rear_wheel_size_id }
     it { is_expected.to validate_presence_of :primary_frame_color_id }
-    it { is_expected.to serialize :cached_attributes }
   end
 
   describe 'scopes' do
@@ -86,23 +89,6 @@ describe Bike do
     it 'is visible if not hidden' do
       bike = Bike.new
       expect(bike.visible_by).to be_truthy
-    end
-  end
-
-  describe 'attr_cache_search' do
-    it 'finds bikes by attr cache' do
-      bike = FactoryGirl.create(:bike)
-      query = ["1c#{bike.primary_frame_color_id}"]
-      result = Bike.attr_cache_search(query)
-      expect(result.first).to eq(bike)
-      expect(result.class).to eq(Bike::ActiveRecord_Relation)
-    end
-    it 'finds bikes by wheel size' do
-      bike = FactoryGirl.create(:bike)
-      query = ["1w#{bike.rear_wheel_size_id}"]
-      result = Bike.attr_cache_search(query)
-      expect(result.first).to eq(bike)
-      expect(result.class).to eq(Bike::ActiveRecord_Relation)
     end
   end
 
@@ -181,7 +167,8 @@ describe Bike do
     end
 
     it 'has before_save_callback_method defined for clean_frame_size' do
-      expect(Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:clean_frame_size)).to eq(true)
+      expect(Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }
+        .map(&:raw_filter).include?(:clean_frame_size)).to eq(true)
     end
   end
 
@@ -299,14 +286,15 @@ describe Bike do
     end
   end
 
-  describe 'manufacturer_name' do
+  describe 'set_mnfg_name' do
     it 'returns the value of manufacturer_other if manufacturer is other' do
       bike = Bike.new
       other_manufacturer = Manufacturer.new
       allow(other_manufacturer).to receive(:name).and_return('Other')
       allow(bike).to receive(:manufacturer).and_return(other_manufacturer)
       allow(bike).to receive(:manufacturer_other).and_return('Other manufacturer name')
-      expect(bike.manufacturer_name).to eq('Other manufacturer name')
+      bike.set_mnfg_name
+      expect(bike.mnfg_name).to eq('Other manufacturer name')
     end
 
     it "returns the name of the manufacturer if it isn't other" do
@@ -314,7 +302,8 @@ describe Bike do
       manufacturer = Manufacturer.new
       allow(manufacturer).to receive(:name).and_return('Mnfg name')
       allow(bike).to receive(:manufacturer).and_return(manufacturer)
-      expect(bike.manufacturer_name).to eq('Mnfg name')
+      bike.set_mnfg_name
+      expect(bike.mnfg_name).to eq('Mnfg name')
     end
 
     it 'returns Just SE Bikes' do
@@ -322,7 +311,8 @@ describe Bike do
       manufacturer = Manufacturer.new
       allow(manufacturer).to receive(:name).and_return('SE Racing (S E Bikes)')
       allow(bike).to receive(:manufacturer).and_return(manufacturer)
-      expect(bike.manufacturer_name).to eq('SE Racing')
+      bike.set_mnfg_name
+      expect(bike.mnfg_name).to eq('SE Racing')
     end
   end
 
@@ -342,16 +332,16 @@ describe Bike do
     end
 
     it 'returns just the url of the video from a youtube iframe' do
-      youtube_share = '''
+      youtube_share = '
           <iframe width="560" height="315" src="//www.youtube.com/embed/Sv3xVOs7_No" frameborder="0" allowfullscreen></iframe>
-        '''
+        '
       @bike = Bike.new
       allow(@bike).to receive(:video_embed).and_return(youtube_share)
       expect(@bike.video_embed_src).to eq('//www.youtube.com/embed/Sv3xVOs7_No')
     end
 
     it 'returns just the url of the video from a vimeo iframe' do
-      vimeo_share = '''<iframe src="http://player.vimeo.com/video/13094257" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe><p><a href="http://vimeo.com/13094257">Fixed Gear Kuala Lumpur, RatsKL Putrajaya</a> from <a href="http://vimeo.com/user3635109">irmanhilmi</a> on <a href="http://vimeo.com">Vimeo</a>.</p>'''
+      vimeo_share = '<iframe src="http://player.vimeo.com/video/13094257" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe><p><a href="http://vimeo.com/13094257">Fixed Gear Kuala Lumpur, RatsKL Putrajaya</a> from <a href="http://vimeo.com/user3635109">irmanhilmi</a> on <a href="http://vimeo.com">Vimeo</a>.</p>'
       @bike = Bike.new
       allow(@bike).to receive(:video_embed).and_return(vimeo_share)
       expect(@bike.video_embed_src).to eq('http://player.vimeo.com/video/13094257')
@@ -395,6 +385,31 @@ describe Bike do
     it 'has before_save_callback_method defined' do
       expect(Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:normalize_attributes)).to eq(true)
     end
+
+    context 'confirmed secondary email' do
+      it 'sets email to the primary email' do
+        user_email = FactoryGirl.create(:user_email)
+        user = user_email.user
+        bike = FactoryGirl.build(:bike, owner_email: user_email.email)
+        expect(user.email).to_not eq user_email.email
+        expect(bike.owner_email).to eq user_email.email
+        bike.normalize_attributes
+        expect(bike.owner_email).to eq user.email
+      end
+    end
+
+    context 'unconfirmed secondary email' do
+      it 'sets owner email to primary email' do
+        user_email = FactoryGirl.create(:user_email, confirmation_token: '123456789')
+        user = user_email.user
+        expect(user_email.unconfirmed).to be_truthy
+        expect(user.email).to_not eq user_email.email
+        bike = FactoryGirl.build(:bike, owner_email: user_email.email)
+        expect(bike.owner_email).to eq user_email.email
+        bike.normalize_attributes
+        expect(bike.owner_email).to eq user_email.email
+      end
+    end
   end
 
   describe 'serial' do
@@ -417,7 +432,7 @@ describe Bike do
 
     it 'returns the bikes in the default scope pattern if there is no query' do
       bike = FactoryGirl.create(:bike, description: 'Phil wood hub')
-      bike2 = FactoryGirl.create(:bike)
+      FactoryGirl.create(:bike)
       bikes = Bike.text_search('')
       expect(bikes.first).to eq(bike)
     end
@@ -457,12 +472,21 @@ describe Bike do
   end
 
   describe 'cache_photo' do
-    it 'caches the photo' do
-      bike = FactoryGirl.create(:bike)
-      image = FactoryGirl.create(:public_image, imageable: bike)
-      bike.reload
-      bike.cache_photo
-      expect(bike.thumb_path).not_to be_nil
+    context 'existing photo' do
+      it 'caches the photo' do
+        bike = FactoryGirl.create(:bike)
+        FactoryGirl.create(:public_image, imageable: bike)
+        bike.reload
+        bike.cache_photo
+        expect(bike.thumb_path).not_to be_nil
+      end
+    end
+    context 'no photo' do
+      it 'removes existing cache if inaccurate' do
+        bike = Bike.new(thumb_path: 'some url')
+        bike.cache_photo
+        expect(bike.thumb_path).to be_nil
+      end
     end
   end
 
@@ -474,21 +498,7 @@ describe Bike do
       expect(bike.components_cache_string.to_s).to match(c.ctype.name)
     end
   end
-
-  describe 'cache_attributes' do
-    it 'caches the colors handlebar_type and wheel_size' do
-      color = FactoryGirl.create(:color)
-      handlebar = FactoryGirl.create(:handlebar_type)
-      wheel = FactoryGirl.create(:wheel_size)
-      bike = FactoryGirl.create(:bike, secondary_frame_color: color, handlebar_type: handlebar, front_wheel_size: wheel)
-      expect(bike.cached_attributes[0]).to eq("1c#{bike.primary_frame_color_id}")
-      expect(bike.cached_attributes[1]).to eq("1c#{color.id}")
-      expect(bike.cached_attributes[2]).to eq("h#{handlebar.id}")
-      expect(bike.cached_attributes[3]).to eq("1w#{bike.rear_wheel_size_id}")
-      expect(bike.cached_attributes[4]).to eq("1w#{wheel.id}")
-    end
-  end
-
+  
   describe 'cache_stolen_attributes' do
     context 'current_stolen_record with lat and long' do
       it 'saves the stolen description to all description and set stolen_rec_id' do
@@ -497,8 +507,8 @@ describe Bike do
         bike.description = 'I love my bike'
         bike.cache_stolen_attributes
         expect(bike.all_description).to eq('I love my bike some theft description')
-        expect(bike.stolen_lat).to eq 40.7143528
-        expect(bike.stolen_long).to eq -74.0059731
+        expect(bike.stolen_lat).to eq(40.7143528)
+        expect(bike.stolen_long).to eq(-74.0059731)
       end
     end
     context 'no current_stolen_record' do
@@ -518,7 +528,6 @@ describe Bike do
       bike = FactoryGirl.create(:bike, current_stolen_record_id: 69)
       expect(bike).to receive(:cache_photo)
       expect(bike).to receive(:cache_stolen_attributes)
-      expect(bike).to receive(:cache_attributes)
       expect(bike).to receive(:components_cache_string)
       bike.cache_bike
       expect(bike.current_stolen_record_id).to be_nil
@@ -528,17 +537,18 @@ describe Bike do
       handlebar = FactoryGirl.create(:handlebar_type)
       material = FactoryGirl.create(:frame_material)
       propulsion = FactoryGirl.create(:propulsion_type, name: 'Hand pedaled')
-      b = FactoryGirl.create(:bike, cycle_type: type, propulsion_type_id: propulsion.id)
-      s = FactoryGirl.create(:stolen_record, bike: b)
-      b.update_attributes(year: 1999, frame_material_id: material.id,
-                          secondary_frame_color_id: b.primary_frame_color_id,
-                          tertiary_frame_color_id: b.primary_frame_color_id,
-                          stolen: true,
-                          frame_size: '56', frame_size_unit: 'ballsacks',
-                          frame_model: 'Some model', handlebar_type_id: handlebar.id)
-      b.cache_bike
-      expect(b.cached_data).to eq("#{b.manufacturer_name} Hand pedaled 1999 #{b.primary_frame_color.name} #{b.secondary_frame_color.name} #{b.tertiary_frame_color.name} #{material.name} 56ballsacks #{b.frame_model} #{b.rear_wheel_size.name} wheel unicycle")
-      expect(b.current_stolen_record_id).to eq(s.id)
+      wheel_size = FactoryGirl.create(:wheel_size)
+      bike = FactoryGirl.create(:bike, cycle_type: type, propulsion_type_id: propulsion.id, rear_wheel_size: wheel_size)
+      stolen_record = FactoryGirl.create(:stolen_record, bike: bike)
+      bike.update_attributes(year: 1999, frame_material_id: material.id,
+                             secondary_frame_color_id: bike.primary_frame_color_id,
+                             tertiary_frame_color_id: bike.primary_frame_color_id,
+                             stolen: true,
+                             frame_size: '56', frame_size_unit: 'ballsacks',
+                             frame_model: 'Some model', handlebar_type_id: handlebar.id)
+      bike.cache_bike
+      expect(bike.cached_data).to eq("#{bike.mnfg_name} Hand pedaled 1999 #{bike.primary_frame_color.name} #{bike.secondary_frame_color.name} #{bike.tertiary_frame_color.name} #{material.name} 56ballsacks #{bike.frame_model} #{wheel_size.name} wheel unicycle")
+      expect(bike.current_stolen_record_id).to eq(stolen_record.id)
     end
     it 'has before_save_callback_method defined as a before_save callback' do
       expect(Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:cache_bike)).to eq(true)
@@ -617,10 +627,41 @@ describe Bike do
   describe 'title_string' do
     it 'escapes correctly' do
       bike = Bike.new(frame_model: '</title><svg/onload=alert(document.cookie)>')
-      allow(bike).to receive(:manufacturer_name).and_return('baller')
+      allow(bike).to receive(:mnfg_name).and_return('baller')
       allow(bike).to receive(:type).and_return('bike')
       expect(bike.title_string).not_to match('</title><svg/onload=alert(document.cookie)>')
       expect(bike.title_string.length).to be > 5
+    end
+  end
+
+  describe 'validate_organization_id' do
+    let(:bike) { Bike.new }
+    context 'valid organization' do
+      let(:organization) { FactoryGirl.create(:organization) }
+      context 'slug' do
+        it 'returns true' do
+          expect(bike.validate_organization_id(organization.slug)).to be_truthy
+        end
+      end
+      context 'id' do
+        it 'returns true' do
+          expect(bike.validate_organization_id(organization.id)).to be_truthy
+        end
+      end
+    end
+    context 'suspended organization' do
+      let(:organization) { FactoryGirl.create(:organization, is_suspended: true) }
+      it 'adds an error to the bike' do
+        expect(bike.validate_organization_id(organization.id)).to be_falsey
+        expect(bike.errors[:organization].to_s).to match(/suspended/)
+      end
+    end
+    context 'unable to find organization' do
+      it 'adds an error to the bike' do
+        expect(bike.validate_organization_id('some org')).to be_falsey
+        expect(bike.errors[:organization].to_s).to match(/not found/)
+        expect(bike.errors[:organization].to_s).to match(/some org/)
+      end
     end
   end
 end

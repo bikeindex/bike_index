@@ -13,7 +13,7 @@
   %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
     %thead.small-header
       %tr
-        %th Date added
+        %th.date-added Date added
         %th Manufacturer
         %th Model
         %th Color
@@ -23,7 +23,7 @@
       - @bikes.each do |bike|
         %tr
           %td
-            = l bike.created_at, format: :short_with_hour
+            = l bike.created_at, format: :dotted
           %td
             = link_to bike.mnfg_name, bike_path(bike)
           %td
@@ -33,5 +33,6 @@
           %td
             = bike.owner_email
           / %td
-.paginate-container.paginate-container-bottom
-  = paginate @bikes
+- unless current_organization.is_paid
+  .paginate-container.paginate-container-bottom
+    = paginate @bikes

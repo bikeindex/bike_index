@@ -33,7 +33,11 @@ class BikeSerializer < ActiveModel::Serializer
 
   def type_of_cycle
     object.cycle_type.name
-  end  
+  end
+
+  def manufacturer_name
+    object.mnfg_name
+  end
   
   def url
     "#{ENV['BASE_URL']}/bikes/#{object.id}"

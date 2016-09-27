@@ -44,6 +44,9 @@ class StolenRecord < ActiveRecord::Base
     recovery_posted: false
   )}
 
+  geocoded_by :address
+  after_validation :geocode, if: lambda { (self.city.present? || self.zipcode.present?) && self.country.present? }
+
   def self.revised_date_format
     '%a %b %d %Y'
   end
@@ -74,12 +77,12 @@ class StolenRecord < ActiveRecord::Base
     (a+[zipcode, country.name]).compact.join(', ')
   end
 
-  def address_short
-    a = [city]
-    a << state.abbreviation if state.present?
-    a << zipcode if zipcode.present?
-    a << country.iso if country.present? && country.iso != 'US'
-    a.compact.join(', ')
+  def address_short # Doesn't include street
+    [
+      city,
+      (state && state.abbreviation),
+      zipcode,
+    ].reject(&:blank?).join(',')
   end
 
   def show_stolen_address
@@ -88,46 +91,31 @@ class StolenRecord < ActiveRecord::Base
       city,
       (state && state.abbreviation),
       zipcode,
-      (country && country.name)
+      (country && country.iso unless country && country.iso == 'US')
     ].reject(&:blank?).join(', ')
   end
 
-  # unless Rails.env.test?
-    geocoded_by :address
-    after_validation :geocode, if: lambda { (self.city.present? || self.zipcode.present?) && self.country.present? }
-  # end
-
   def self.locking_description
-    ["U-lock", "Two U-locks", "U-lock and cable", "Chain with padlock",
-      "Cable lock", "Heavy duty bicycle security chain", "Not locked", "Other"]
+    ['U-lock', 'Two U-locks', 'U-lock and cable', 'Chain with padlock',
+      'Cable lock', 'Heavy duty bicycle security chain', 'Not locked', 'Other'].freeze
   end
   def self.locking_description_select
-    lds = locking_description
-    select_params = []
-    lds.each do |l|
-      select_params << [l,l]
-    end
-    select_params
+    locking_description.map { |l| [l, l] }
   end
 
   def self.locking_defeat_description
     [
-      "Lock was cut, and left at the scene.",
-      "Lock was opened, and left unharmed at the scene.",
-      "Lock is missing, along with the bike.",
-      "Object that bike was locked to was broken, removed, or otherwise compromised.",
-      "Other situation, please describe below.",
-      "Bike was not locked"
+      'Lock was cut, and left at the scene.',
+      'Lock was opened, and left unharmed at the scene.',
+      'Lock is missing, along with the bike.',
+      'Object that bike was locked to was broken, removed, or otherwise compromised.',
+      'Other situation, please describe below.',
+      'Bike was not locked'
     ]
   end
 
   def self.locking_defeat_description_select
-    ldds = locking_defeat_description
-    select_params = []
-    ldds.each do |l|
-      select_params << [l,l]
-    end
-    select_params
+    locking_defeat_description.map { |l| [l, l] }
   end
 
   before_save :set_phone, :fix_date, :titleize_city, :update_tsved_at
@@ -172,7 +160,7 @@ class StolenRecord < ActiveRecord::Base
     b = self.bike
     return '' unless b.present?
     row = ""
-    row << tsv_col(b.manufacturer_name)
+    row << tsv_col(b.mnfg_name)
     row << "\t"
     row << tsv_col(b.frame_model)
     row << "\t"

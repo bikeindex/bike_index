@@ -104,7 +104,7 @@ describe BikeCreator do
 
   describe 'save_bike' do
     Sidekiq::Testing.inline! do
-      it 'creates a bike with the parameters it is passed and return it' do
+      it 'creates a bike with the parameters it is passed and returns it' do
         propulsion_type = FactoryGirl.create(:propulsion_type)
         cycle_type = FactoryGirl.create(:cycle_type)
         organization = FactoryGirl.create(:organization)
@@ -113,10 +113,10 @@ describe BikeCreator do
         color = FactoryGirl.create(:color)
         handlebar_type = FactoryGirl.create(:handlebar_type)
         wheel_size = FactoryGirl.create(:wheel_size)
-        b_param = BParam.new
+        b_param = BParam.new(origin: 'api_v1')
         creator = BikeCreator.new(b_param)
         bike = Bike.new
-        allow(bike).to receive(:id).and_return(69)
+        # allow(bike).to receive(:id).and_return(69)
         expect(creator).to receive(:create_associations).and_return(bike)
         expect(creator).to receive(:validate_record).and_return(bike)
         new_bike = Bike.new(
@@ -132,7 +132,7 @@ describe BikeCreator do
           'creator' => user
         )
         expect do
-          creator.save_bike(new_bike)
+          saved_bike = creator.save_bike(new_bike)
         end.to change(Bike, :count).by(1)
       end
     end
@@ -147,7 +147,7 @@ describe BikeCreator do
         expect(creator).to receive(:validate_record).and_return(bike)
         expect do
           creator.save_bike(bike)
-        end.to change(ListingOrderWorker.jobs, :size).by(2)
+        end.to change(AfterBikeSaveWorker.jobs, :size).by(1)
       end
     end
   end
@@ -168,7 +168,6 @@ describe BikeCreator do
         creator = BikeCreator.new(b_param)
         expect(creator).to receive(:add_bike_book_data).at_least(1).times.and_return(nil)
         expect(creator).to receive(:build_bike).at_least(1).times.and_return(bike)
-        # ListingOrderWorker.any_instance.should_receive(:perform).and_return(true)
         expect(bike).to receive(:save).and_return(true)
         creator.create_bike
       end

@@ -4,11 +4,12 @@ group :red_green_refactor, halt_on_fail: true do
     watch(%r{^lib/(.+)\.rb$})     { |m| "spec/lib/#{m[1]}_spec.rb" }
     watch('spec/spec_helper.rb')  { "spec" }
     watch(%r{^app/controllers/api/v2/(.+)\.rb$})        { |m| "spec/api/v2/#{m[1]}_spec.rb"}
+    watch(%r{^app/controllers/api/v3/(.+)\.rb$})        { |m| "spec/api/v3/#{m[1]}_spec.rb"}
 
     watch(%r{^app/(.+)\.rb$})                           { |m| "spec/#{m[1]}_spec.rb" }
     watch(%r{^app/(.*)(\.erb|\.haml)$})                 { |m| "spec/#{m[1]}#{m[2]}_spec.rb" }
     watch(%r{^app/controllers/(.+)_(controller)\.rb$})  { |m| ["spec/#{m[2]}s/#{m[1]}_#{m[2]}_spec.rb", "spec/acceptance/#{m[1]}_spec.rb"] }
-    watch(%r{^spec/support/(.+)\.rb$})                  { "spec" }
+    # watch(%r{^spec/support/(.+)\.rb$})                  { "spec" } # Stop running all specs on shared_example update
     watch('config/routes.rb')                           { "spec/routing" }
     watch('app/controllers/application_controller.rb')  { "spec/controllers" }
   end

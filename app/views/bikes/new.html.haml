@@ -5,8 +5,6 @@
     Enter #{@bike.type} details
 = form_for @bike, multipart: true do |f|
   = f.hidden_field :b_param_id_token
-  - if @bike.location_id.present?
-    = f.hidden_field :location_id, value: @location.id
   - if @bike.creation_organization_id.present?
     = f.hidden_field :creation_organization_id
   - if @bike.stolen?

@@ -1,0 +1,30 @@
+// 
+// Bike Index selectize & select2 overrides
+// 
+
+.selectize-dropdown [data-selectable] .highlight {
+  background: rgba($blue, 0.2);
+}
+
+// Selectize styles
+.selectize-dropdown .active { background-color: lighten(#bebebe, 10%); }
+// Make selectize inputs the same size as form inputs
+.form-group .selectize-control .selectize-input { padding: 0.475rem 0.75rem; }
+
+
+// Select2 styles
+// Right now, select2 is only used on bikes search, these styles
+// make the field on bikes search appear the same as other fields
+.select2-container .select2-selection--multiple {
+  @extend .form-control;
+  padding-bottom: 0;
+}
+.select2-dropdown, .select2-container--default.select2-container--focus .select2-selection--multiple {
+  border-color: #66afe9;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice,
+.select2-container .select2-search--inline .select2-search__field { 
+  margin-top: 0;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__rendered { padding: 0; }
+

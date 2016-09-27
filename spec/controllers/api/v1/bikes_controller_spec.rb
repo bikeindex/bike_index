@@ -16,7 +16,7 @@ describe Api::V1::BikesController do
       expect(response.code).to eq('401')
     end
 
-    xit 'should return an array of ids' do
+    it 'should return an array of ids' do
       bike = FactoryGirl.create(:bike)
       stole1 = FactoryGirl.create(:stolen_record)
       stole2 = FactoryGirl.create(:stolen_record, approved: true)
@@ -24,10 +24,9 @@ describe Api::V1::BikesController do
       user = FactoryGirl.create(:user)
       FactoryGirl.create(:membership, user: user, organization: organization)
       options = { stolen: true, organization_slug: organization.slug, access_token: organization.access_token }
-      get :stolen_ids, options, format: :json
+      get :stolen_ids, options.as_json
       expect(response.code).to eq('200')
-      # pp response
-      bikes = JSON.parse(response.body)
+      bikes = JSON.parse(response.body)['bikes']
       expect(bikes.count).to eq(1)
       expect(bikes.first).to eq(stole2.bike.id)
     end
@@ -43,8 +42,6 @@ describe Api::V1::BikesController do
 
   describe 'create' do
     before do
-      FactoryGirl.create(:cycle_type, slug: 'bike')
-      FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
       FactoryGirl.create(:wheel_size, iso_bsd: 559)
       FactoryGirl.create(:ctype, name: 'wheel')
       FactoryGirl.create(:ctype, name: 'headset')
@@ -74,7 +71,9 @@ describe Api::V1::BikesController do
             handlebar_type_slug: nil,
             frame_material_slug: nil,
             description: 'Diverge Elite DSW (58)',
-            registered_new: true
+            is_pos: true,
+            is_new: true,
+            is_bulk: true
           }
         }
       end
@@ -93,6 +92,11 @@ describe Api::V1::BikesController do
         expect(bike.frame_size_unit).to eq 'cm'
         expect(bike.primary_frame_color).to eq black
         expect(bike.paint_description).to eq 'Black/Red'
+        creation_state = bike.creation_state
+        expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([true, true, true])
+        expect(creation_state.organization).to eq organization
+        expect(creation_state.creator).to eq bike.creator
+        expect(creation_state.origin).to eq 'api_v1'
       end
     end
     context 'legacy tests' do
@@ -178,8 +182,8 @@ describe Api::V1::BikesController do
         expect(bike.creation_organization_id).to eq(@organization.id)
         expect(bike.year).to eq(1969)
         expect(bike.components.count).to eq(3)
-        component = bike.components[2]
-        expect(component.serial_number).to eq('69')
+        expect(bike.creation_state.organization).to eq @organization
+        component = bike.components.where(serial_number: '69').first
         expect(component.description).to eq('yeah yay!')
         expect(component.ctype.slug).to eq('headset')
         expect(component.year).to eq(1999)
@@ -198,6 +202,11 @@ describe Api::V1::BikesController do
         expect(bike.rear_gear_type.slug).to eq bike_attrs[:rear_gear_type_slug]
         expect(bike.front_gear_type.slug).to eq bike_attrs[:front_gear_type_slug]
         expect(bike.handlebar_type.slug).to eq bike_attrs[:handlebar_type_slug]
+        creation_state = bike.creation_state
+        expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([false, false, false])
+        expect(creation_state.organization).to eq @organization
+        expect(creation_state.creator).to eq bike.creator
+        expect(creation_state.origin).to eq 'api_v1'
       end
 
       it 'creates a photos even if one fails' do
@@ -220,6 +229,9 @@ describe Api::V1::BikesController do
         post :create, bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, photos: photos
         bike = Bike.where(serial_number: '69 photo-test').first
         expect(bike.public_images.count).to eq(1)
+        expect(bike.creation_state.origin).to eq 'api_v1'
+        expect(bike.creation_state.creator).to eq bike.creator
+        expect(bike.creation_state.organization).to eq @organization
         expect(bike.rear_wheel_size.iso_bsd).to eq 559
       end
 
@@ -228,8 +240,7 @@ describe Api::V1::BikesController do
         @organization.users.first.update_attribute :phone, '123-456-6969'
         FactoryGirl.create(:country, iso: 'US')
         FactoryGirl.create(:state, abbreviation: 'Palace')
-        # ListingOrderWorker.any_instance.should_receive(:perform).and_return(true)
-        bike_attrs = { 
+        bike_attrs = {
           serial_number: '69 stolen bike',
           manufacturer_id: manufacturer.id,
           rear_tire_narrow: 'true',
@@ -240,7 +251,7 @@ describe Api::V1::BikesController do
           phone: '9999999',
           cycle_type_slug: 'bike'
         }
-        stolen_record = { 
+        stolen_record = {
           date_stolen: '03-01-2013',
           theft_description: "This bike was stolen and that's no fair.",
           country: 'US',
@@ -258,6 +269,9 @@ describe Api::V1::BikesController do
         end.to change(Ownership, :count).by(1)
         expect(response.code).to eq('200')
         bike = Bike.unscoped.where(serial_number: '69 stolen bike').first
+        expect(bike.creation_state.origin).to eq 'api_v1'
+        expect(bike.creation_state.creator).to eq bike.creator
+        expect(bike.creation_state.organization).to eq @organization
         expect(bike.rear_wheel_size.iso_bsd).to eq 559
         csr = bike.find_current_stolen_record
         expect(csr.address).to be_present
@@ -293,6 +307,8 @@ describe Api::V1::BikesController do
         end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
         expect(response.code).to eq('200')
         bike = Bike.unscoped.where(serial_number: '69 example bikez').first
+        expect(bike.creation_state.origin).to eq 'api_v1'
+        expect(bike.creation_state.organization).to eq org
         expect(bike.example).to be_truthy
         expect(bike.rear_wheel_size.iso_bsd).to eq 559
         expect(bike.paint.name).to eq('grazeen')
@@ -304,7 +320,7 @@ describe Api::V1::BikesController do
       it 'creates a record even if the post is a string' do
         manufacturer = FactoryGirl.create(:manufacturer)
         f_count = Feedback.count
-        bike = {
+        bike_attrs = {
           serial_number: '69 string',
           manufacturer_id: manufacturer.id,
           rear_tire_narrow: 'true',
@@ -312,17 +328,20 @@ describe Api::V1::BikesController do
           color: FactoryGirl.create(:color).name,
           owner_email: 'jsoned@examples.com'
         }
-        options = { bike: bike.to_json, organization_slug: @organization.slug, access_token: @organization.access_token }
+        options = { bike: bike_attrs.to_json, organization_slug: @organization.slug, access_token: @organization.access_token }
         expect do
           post :create, options
         end.to change(Ownership, :count).by(1)
         expect(response.code).to eq('200')
+        bike = Bike.unscoped.where(serial_number: '69 string').first
+        expect(bike.creation_state.origin).to eq 'api_v1'
+        expect(bike.creation_state.organization).to eq @organization
       end
 
       it 'does not send an ownership email if it has no_email set' do
         manufacturer = FactoryGirl.create(:manufacturer)
         f_count = Feedback.count
-        bike = { 
+        bike = {
           serial_number: '69 string',
           manufacturer_id: manufacturer.id,
           rear_tire_narrow: 'true',
@@ -338,6 +357,9 @@ describe Api::V1::BikesController do
           end.to change(Ownership, :count).by(1)
         end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
         expect(response.code).to eq('200')
+        bike = Bike.unscoped.where(serial_number: '69 string').first
+        expect(bike.creation_state.origin).to eq 'api_v1'
+        expect(bike.creation_state.organization).to eq @organization
       end
     end
   end

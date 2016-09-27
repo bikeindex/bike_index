@@ -10,6 +10,9 @@
     %strong
       #{current_organization.available_invitation_count} more.
     = link_to 'Invite another user', new_organization_user_path(organization_id: current_organization.to_param)
+  %p
+    - if current_organization.auto_user.present?
+      Emails are currently sent from <em>current_organization.auto_user.email</em>. #{ link_to 'Update email', organization_manage_index_path(organization_id: current_organization.to_param) }
 
 .organized-table
   %table.table.table-striped.table-bordered
@@ -20,7 +23,7 @@
         Email
       %th
         Date added
-      / %th.medium-screens
+      / %th
       /   Total indexed
     %tbody
       - @memberships.each do |membership|
@@ -45,3 +48,5 @@
             %br
             %small
               invited #{l organization_invitation.created_at, format: :short_with_year}
+          %td
+          / %td

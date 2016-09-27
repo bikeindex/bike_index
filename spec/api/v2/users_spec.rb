@@ -5,7 +5,6 @@ describe 'Users API V2' do
     it 'Sends correct error code when no user present' do
       get '/api/v2/users/current'
       expect(response.response_code).to eq(401)
-      # response.body[/unauthorized/i].should be_present
     end
   end
 

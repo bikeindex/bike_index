@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Color do
+  it_behaves_like 'friendly_name_findable'
+  it_behaves_like 'autocomplete_hashable'
   describe 'validations' do
     it { is_expected.to validate_presence_of :name }
     it { is_expected.to validate_presence_of :priority }
@@ -40,6 +42,22 @@ describe Color do
         color.reload
         color.update_display_format
         expect(color.display).to be_nil
+      end
+    end
+  end
+
+  describe 'black' do
+    context 'not-existing' do
+      it 'creates it on first pass' do
+        expect { Color.black }.to change(Color, :count).by(1)
+      end
+    end
+    context 'existing' do
+      before do
+        Color.black
+      end
+      it 'does not create' do
+        expect { Color.black }.to change(PropulsionType, :count).by(0)
       end
     end
   end

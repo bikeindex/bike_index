@@ -97,7 +97,7 @@ Bikeindex::Application.routes.draw do
       get :pdf
     end
   end
-  resources :locks
+  resources :locks, except: [:show, :index]
 
   namespace :admin do
     root to: 'dashboard#index'
@@ -116,8 +116,14 @@ Bikeindex::Application.routes.draw do
     get 'tsvs', to: 'dashboard#tsvs'
     get 'bust_z_cache', to: 'dashboard#bust_z_cache'
     get 'destroy_example_bikes', to: 'dashboard#destroy_example_bikes'
-    resources :memberships, :organizations, :organization_invitations,
+    resources :memberships, :organization_invitations,
               :paints, :ads, :recovery_displays, :mail_snippets
+    resources :organizations do
+      resources :custom_layouts, only: [:index, :edit, :update], controller: 'organizations/custom_layouts'
+    end
+    get 'recover_organization', to: 'organizations#recover'
+    get 'show_deleted_organizations', to: 'organizations#show_deleted'
+
     resources :flavor_texts, only: [:destroy, :create]
     resources :stolen_bikes do
       member { post :approve }
@@ -131,6 +137,7 @@ Bikeindex::Application.routes.draw do
     end
     resources :graphs, only: [:index] do
       collection do
+        get :tables
         get :bikes
         get :users
         get :stolen_locations
@@ -138,8 +145,6 @@ Bikeindex::Application.routes.draw do
     end
     resources :failed_bikes, only: [:index, :show]
     resources :ownerships, only: [:edit, :update]
-    get 'recover_organization', to: 'organizations#recover'
-    get 'show_deleted_organizations', to: 'organizations#show_deleted'
     get 'blog', to: redirect('/news')
     resources :news do
       collection do
@@ -195,8 +200,6 @@ Bikeindex::Application.routes.draw do
     end
   end
 
-  resources :mailer_integrations, only: [:show, :index]
-
   resources :manufacturers, only: [:index] do
     collection { get 'tsv' }
   end
@@ -205,6 +208,7 @@ Bikeindex::Application.routes.draw do
   resources :organization_deals, only: [:create, :new]
   resource :integrations, only: [:create]
   get '/auth/:provider/callback', to: 'integrations#create'
+  get '/auth/failure', to: 'integrations#integrations_controller_creation_error'
 
   %w(support_the_index support_the_bike_index protect_your_bike privacy terms
      serials about where vendor_terms resources image_resources
@@ -243,4 +247,6 @@ Bikeindex::Application.routes.draw do
     resources :users, except: [:show]
     resources :emails
   end
+
+  get '*unmatched_route', to: 'errors#not_found' # So it is handled by lograge
 end

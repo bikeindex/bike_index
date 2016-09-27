@@ -1,4 +1,5 @@
 class Admin::OrganizationInvitationsController < Admin::BaseController
+  before_filter :find_organization
   before_filter :find_organization_invitation, only: [:edit, :update, :destroy]
   
   def index
@@ -11,7 +12,6 @@ class Admin::OrganizationInvitationsController < Admin::BaseController
   end
 
   def show
-    @organization = Organization.find(params[:id])
     @organizations = Organization.all
     @organization_invitations = OrganizationInvitation.where(organization_id: @organization.id)
     @organization_invitation = OrganizationInvitation.new(organization_id: @organization.id)
@@ -41,7 +41,7 @@ class Admin::OrganizationInvitationsController < Admin::BaseController
         redirect_to admin_organization_url(@organization_invitation.organization.slug)
       else
         flash[:error] = "Oh no! Error problem things! The invitation was not saved. Maybe we're missing some information?"
-        redirect_to edit_admin_organization_invitation_url(@organization_invitation.organization.id)
+        redirect_to edit_admin_organization_invitation_url(@organization_invitation.id, organization_id: @organization_invitation.organization.to_param)
       end
     else
       flash[:error] = 'Oh no! This organization has no more invitations. Email contact@bikeindex.org for help'
@@ -55,6 +55,10 @@ class Admin::OrganizationInvitationsController < Admin::BaseController
   end
 
   protected
+
+  def find_organization
+    @organization = current_organization
+  end
 
   def permitted_parameters
     params.require(:organization_invitation).permit(OrganizationInvitation.old_attr_accessible)

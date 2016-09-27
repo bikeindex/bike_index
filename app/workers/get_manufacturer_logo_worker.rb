@@ -15,5 +15,4 @@ class GetManufacturerLogoWorker
     manufacturer.logo_source = 'Clearbit'
     manufacturer.save
   end
-
 end

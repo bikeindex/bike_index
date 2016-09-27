@@ -1,10 +1,8 @@
 require 'spec_helper'
 
 describe LockType do
+  it_behaves_like 'friendly_slug_findable'
   describe 'validations' do
-    before do
-      @lock_type = LockType.create(name: 'something')
-    end
     it { is_expected.to validate_presence_of :name }
     it { is_expected.to validate_uniqueness_of :name }
     it { is_expected.to validate_uniqueness_of :slug }

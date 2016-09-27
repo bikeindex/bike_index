@@ -63,7 +63,7 @@ describe BParam do
           phone: nil
         }
       }.as_json
-      b_param = BParam.new(params: p, api_v2: true)
+      b_param = BParam.new(params: p, origin: 'api_v2')
       b_param.massage_if_v2
       new_params = b_param.bike
       expect(new_params.keys.include?('serial_number')).to be_truthy
@@ -76,7 +76,7 @@ describe BParam do
     it 'gets the organization id' do
       org = FactoryGirl.create(:organization, name: 'Something')
       p = { organization_slug: org.slug }
-      b_param = BParam.new(params: p, api_v2: true)
+      b_param = BParam.new(params: p, origin: 'api_v2')
       b_param.massage_if_v2
       expect(b_param.bike['creation_organization_id']).to eq(org.id)
     end
@@ -166,22 +166,66 @@ describe BParam do
   end
 
   describe 'set_manufacturer_key' do
-    it 'adds other manufacturer name and set the set the foreign keys' do
-      m = FactoryGirl.create(:manufacturer, name: 'Other')
-      bike = { manufacturer: 'gobble gobble' }
-      b_param = BParam.new(params: { bike: bike })
-      b_param.set_manufacturer_key
-      expect(b_param.bike['manufacturer']).not_to be_present
-      expect(b_param.bike['manufacturer_id']).to eq(m.id)
-      expect(b_param.bike['manufacturer_other']).to eq('Gobble Gobble')
+    context 'attr set on manufacturer_id' do
+      context 'other' do
+        it 'adds other manufacturer name and set the set the foreign keys' do
+          bike = { manufacturer_id: 'lololol' }
+          b_param = BParam.new(params: { bike: bike })
+          b_param.set_manufacturer_key
+          expect(b_param.bike['manufacturer']).not_to be_present
+          expect(b_param.bike['manufacturer_id']).to eq(Manufacturer.other.id)
+          expect(b_param.bike['manufacturer_other']).to eq('lololol')
+        end
+      end
+      context 'existing manufacturer' do
+        let(:manufacturer) { FactoryGirl.create(:manufacturer) }
+        context 'manufacturer name' do
+          it 'uses manufacturer' do
+            bike = { manufacturer_id: manufacturer.id }
+            b_param = BParam.new(params: { bike: bike })
+            b_param.set_manufacturer_key
+            expect(b_param.bike['manufacturer_id']).to eq(manufacturer.id)
+          end
+        end
+        context 'manufacturer id' do
+          it 'sets the manufacturer' do
+            bike = { manufacturer_id: manufacturer.id }
+            b_param = BParam.new(params: { bike:  bike })
+            b_param.set_manufacturer_key
+            expect(b_param.bike['manufacturer_id']).to eq(manufacturer.id)
+          end
+        end
+      end
+      context 'no manufacturer or manufacturer_id' do
+        it 'does not set anything' do
+          bike = { manufacturer_id: ' ' }
+          b_param = BParam.new(params: { bike:  bike })
+          b_param.set_manufacturer_key
+          expect(b_param.bike['manufacturer_id']).to be_nil
+        end
+      end
     end
-    it 'looks through book slug' do
-      m = FactoryGirl.create(:manufacturer, name: 'Something Cycles')
-      bike = { manufacturer: 'something' }
-      b_param = BParam.new(params: { bike: bike })
-      b_param.set_manufacturer_key
-      expect(b_param.bike['manufacturer']).not_to be_present
-      expect(b_param.bike['manufacturer_id']).to eq(m.id)
+    context 'attr set on manufacturer' do
+      context 'other manufacturer' do
+        it 'adds other manufacturer name and set the set the foreign keys' do
+          bike = { manufacturer: 'gobble gobble' }
+          b_param = BParam.new(params: { bike: bike })
+          b_param.set_manufacturer_key
+          expect(b_param.bike['manufacturer']).not_to be_present
+          expect(b_param.bike['manufacturer_id']).to eq(Manufacturer.other.id)
+          expect(b_param.bike['manufacturer_other']).to eq('gobble gobble')
+        end
+      end
+      context 'existing manufacturer' do
+        it 'looks through book slug' do
+          manufacturer = FactoryGirl.create(:manufacturer, name: 'Something Cycles')
+          bike = { manufacturer: 'something' }
+          b_param = BParam.new(params: { bike: bike })
+          b_param.set_manufacturer_key
+          expect(b_param.bike['manufacturer']).not_to be_present
+          expect(b_param.bike['manufacturer_id']).to eq(manufacturer.id)
+        end
+      end
     end
   end
 
@@ -245,7 +289,7 @@ describe BParam do
     it "associates the manufacturer with the paint if it's a new bike" do
       FactoryGirl.create(:color, name: 'Black')
       m = FactoryGirl.create(:manufacturer)
-      bike = { registered_new: true, manufacturer_id: m.id }
+      bike = { is_pos: true, manufacturer_id: m.id }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_paint_key('paint 69')
       p = Paint.find_by_name('paint 69')
@@ -264,27 +308,6 @@ describe BParam do
     end
   end
 
-  describe 'from_id_token' do
-    it 'gets from a token' do
-      b_param = FactoryGirl.create(:b_param)
-      expect(BParam.from_id_token(b_param.id_token)).to eq(b_param)
-    end
-
-    it "doesn't get an old token" do
-      b_param = FactoryGirl.create(:b_param)
-      b_param.update_attribute :created_at, Time.now - 2.days
-      b_param.reload
-      expect(BParam.from_id_token(b_param.id_token)).to be_nil
-    end
-
-    it 'gets with time passed in' do
-      b_param = FactoryGirl.create(:b_param)
-      b_param.update_attribute :created_at, Time.now - 2.days
-      b_param.reload
-      expect(BParam.from_id_token(b_param.id_token, '1969-12-31 18:00:00')).to eq(b_param)
-    end
-  end
-
   #
   # Revised attrs
   describe 'find_or_new_from_token' do
@@ -292,13 +315,14 @@ describe BParam do
     #
     # Because for now we aren't updating the factory, use this let for b_params factory
     let(:b_param) { BParam.create }
-    let(:expire_b_param) { b_param.update_attribute :created_at, Time.zone.now - 1.year }
+    let(:expire_b_param) { b_param.update_attribute :created_at, Time.zone.now - 5.weeks }
     context 'with user_id passed' do
       context 'without token' do
-        it 'returns a new b_param' do
+        it 'returns a new b_param, with creator of user_id' do
           result = BParam.find_or_new_from_token(nil, user_id: user.id)
           expect(result.is_a?(BParam)).to be_truthy
           expect(result.id).to be_nil
+          expect(result.creator_id).to eq user.id
         end
       end
       context 'existing token' do
@@ -320,10 +344,9 @@ describe BParam do
           end
         end
         context 'with no creator' do
-          it 'returns the b_param, with creator of user_id' do
+          it 'returns the b_param' do
             result = BParam.find_or_new_from_token(b_param.id_token, user_id: user.id)
             expect(result.id).to eq b_param.id
-            expect(result.creator_id).to eq user.id
           end
           context 'with expired b_param' do
             it 'fails' do
@@ -419,7 +442,7 @@ describe BParam do
           creator_id: 777,
           b_param_id: 122,
           cycle_type_id: CycleType.bike.id,
-          creation_organization_id: nil
+          creation_organization_id: 888
         }.with_indifferent_access
         expect(b_param.safe_bike_attrs(stolen: true).with_indifferent_access).to eq(target)
       end

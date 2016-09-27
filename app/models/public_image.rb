@@ -5,23 +5,21 @@ class PublicImage < ActiveRecord::Base
 
   mount_uploader :image, ImageUploader
   # process_in_background :image, CarrierWaveProcessWorker
-
   belongs_to :imageable, polymorphic: true
 
   default_scope { where(is_private: false).order(:listing_order) }
+  scope :bikes, -> { where(imageable_type: 'Bike') }
 
   after_create :set_order
-  scope :bikes, -> { where(imageable_type: "Bike") }
-
   def set_order
-    self.listing_order = self.imageable.public_images.length unless listing_order && listing_order > 0
+    self.listing_order = imageable.public_images.length unless listing_order && listing_order > 0
   end
 
   def default_name
-    if imageable_type == "Bike"
+    if imageable_type == 'Bike'
       self.name = "#{imageable.title_string} #{imageable.frame_colors.to_sentence}"
-    else
-      self.name ||= File.basename(image.filename, '.*').titleize if image
+    elsif image
+      self.name ||= File.basename(image.filename, '.*').titleize
     end
   end
 
@@ -30,4 +28,9 @@ class PublicImage < ActiveRecord::Base
     self.name = (name || default_name).truncate(100)
   end
 
+  after_save :update_bike_listing_order
+  def update_bike_listing_order
+    return true unless imageable_type == 'Bike'
+    AfterBikeSaveWorker.perform_async(imageable_id)
+  end
 end

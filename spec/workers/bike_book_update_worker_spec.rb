@@ -33,11 +33,11 @@ describe BikeBookUpdateWorker do
      'saddle',
      'seatpost'].each { |name| FactoryGirl.create(:ctype, name: name) }
     component1 = FactoryGirl.create(:component,
-                                    bike: bike, ctype_id: Ctype.find_by_slug('fork').id,
+                                    bike: bike, ctype_id: Ctype.friendly_find('fork').id,
                                     description: 'SE straight Leg Hi-Ten w/ Fender Mounts & Wide Tire Clearance')
     expect(component1.is_stock).to be_falsey
     component2 = FactoryGirl.create(:component,
-                                    bike: bike, ctype_id: Ctype.find_by_slug('crankset').id,
+                                    bike: bike, ctype_id: Ctype.friendly_find('crankset').id,
                                     description: 'Sweet cranks')
     BikeBookUpdateWorker.new.perform(bike.id)
     bike.reload
