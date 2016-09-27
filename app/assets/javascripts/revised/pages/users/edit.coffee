@@ -35,10 +35,13 @@ class BikeIndex.UsersEdit extends BikeIndex
   initializeAdditionalEmails: ->
     add_email_template = $('#additional-email-template').html()
     Mustache.parse(add_email_template)
-
+    num = 0
     $('#add_additional_email').click (e) ->
+      num += 1
       e.preventDefault()
-      $('#additional_email_fields').append(Mustache.render(add_email_template))
+      $('#additional_email_fields').append(Mustache.render(add_email_template, { num: num }))
+      ('#additional_email_fields .add-email-field')
+      new window.CheckEmail("#additional_email_field_#{num}")
       $('#additional_email_fields .collapse').collapse('show')
 
     $('#additional_email_fields').on 'change', '.add-email-field', (e) =>

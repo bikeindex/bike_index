@@ -1,5 +1,6 @@
 class BikeIndex.BikesEditOwnership extends BikeIndex
   constructor: ->
+    new window.CheckEmail('#bike_owner_email')
     @initializeEventListeners()
 
   initializeEventListeners: ->
