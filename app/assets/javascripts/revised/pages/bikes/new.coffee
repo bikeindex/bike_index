@@ -2,6 +2,7 @@ class BikeIndex.BikesNew extends BikeIndex
   constructor: ->
     new window.ManufacturersSelect('#bike_manufacturer_id')
     new BikeIndex.FormWell
+    new window.CheckEmail('#bike_owner_email')
     @initializeEventListeners()
     @updateSerial($('#bike_has_no_serial').prop('checked'))
     @otherManufacturerDisplay($('#bike_manufacturer_id').val())

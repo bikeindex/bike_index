@@ -9,6 +9,14 @@
 @import "legacy_includes/datepicker.scss";
 $newStolenColor: #D25627;
 
+#email_check_message {
+  font-size: .8em;
+  color: #f0ad4e;
+  cursor: pointer;
+  display: none;
+  padding: 0 6px 1.5em;
+}
+
 #bi_embed {
   font-family: $sansFontFamily;
   max-width: 800px;
