@@ -21,8 +21,6 @@ class BikeIndex.Init extends BikeIndex
     @loadPageScript(document.getElementsByTagName('body')[0].id)
     # Initialize the js for the organized menu pages
     new BikeIndex.Organized if $('.organized-body').length > 0
-    # Init the email check handler
-    new BikeIndex.UserEmail if document.getElementById('user_email')
 
   loadPageScript: (body_id) ->
     # All the per-page javascripts
@@ -39,6 +37,8 @@ class BikeIndex.Init extends BikeIndex
       organized_bikes_index: BikeIndex.BikesIndex
       manufacturers_index: BikeIndex.InfoManufacturers
       users_edit: BikeIndex.UsersEdit
+      users_new: BikeIndex.UsersNew
+      users_create: BikeIndex.UsersNew
       welcome_user_home: BikeIndex.UserHome
       welcome_choose_registration: BikeIndex.ChooseRegistration
       stolen_index: BikeIndex.LegacyStolenIndex

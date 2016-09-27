@@ -46,6 +46,14 @@ a.optional-form-block {
   }
 }
 
+#email_check_message {
+  cursor: pointer;
+  @extend .form-control-feedback;
+  display: none;
+  padding: 0 0.75rem;
+  // @extend .text-muted;
+}
+
 // 
 // Avatar uploader
 // 
