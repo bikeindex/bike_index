@@ -42,15 +42,18 @@
       - @bikes.each do |bike|
         %tr
           %td
-            = l bike.created_at, format: :dotted
+            = link_to l(bike.created_at, format: :dotted), bike_path(bike)
           %td
-            = link_to bike.mnfg_name, bike_path(bike)
+            = bike.mnfg_name
           %td
             = bike.frame_model
           %td
             = bike.frame_colors.to_sentence
           %td
             = bike.owner_email
+            / - if bike.origin
+            /   %small.less-string
+            /     = bike.origin
           / %td
 .paginate-container.paginate-container-bottom
   = paginate @bikes

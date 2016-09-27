@@ -65,4 +65,7 @@
           - if bike.is_pos
             %span.less-strong-right
               pos
+          - elsif bike.origin
+            %span.less-strong-right
+              = bike.origin
         
