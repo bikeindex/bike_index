@@ -55,6 +55,7 @@ describe UsersController do
         it 'renders new' do
           post :create, user: user_attributes
           expect(response).to render_template('new')
+          expect(assigns(:page_errors)).to be_present
         end
       end
     end

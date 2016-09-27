@@ -1,18 +1,19 @@
-%li.bike-box-item
-  %a.bike-list-image{ href: bike_url(bike), class: ('hover-expand' if bike.thumb_path) }
-    = bike.thumb_image
-  .bike-information{ class: ('multi-attr-lists' if bike.current_stolen_record.present?) }
-    %h5.title-link
-      %a{ href: bike_url(bike) }
-        %strong
-          - unless bike.type == 'bike'
-            = bike.type
-          = [bike.year, bike.mnfg_name].reject(&:blank?).join(' ')
-        #{bike.frame_model}
-    %ul.attr-list
-      = bike.attr_list_item(bike.serial_display, 'Serial')
-      = bike.attr_list_item(bike.frame_colors.to_sentence, 'Primary colors')
-    - if bike.current_stolen_record.present?
+- cache(bike) do
+  %li.bike-box-item
+    %a.bike-list-image{ href: bike_url(bike), class: ('hover-expand' if bike.thumb_path) }
+      = bike.thumb_image
+    .bike-information{ class: ('multi-attr-lists' if bike.current_stolen_record.present?) }
+      %h5.title-link
+        %a{ href: bike_url(bike) }
+          %strong
+            - unless bike.type == 'bike'
+              = bike.type
+            = [bike.year, bike.mnfg_name].reject(&:blank?).join(' ')
+          #{bike.frame_model}
       %ul.attr-list
-        = bike.attr_list_item((l bike.current_stolen_record.date_stolen, format: :dotted), "Date #{bike.recovered ? 'recovered' : 'stolen'}")
-        = bike.attr_list_item(bike.short_address(bike.current_stolen_record), 'Location')
+        = bike.attr_list_item(bike.serial_display, 'Serial')
+        = bike.attr_list_item(bike.frame_colors.to_sentence, 'Primary colors')
+      - if bike.current_stolen_record.present?
+        %ul.attr-list
+          = bike.attr_list_item((l bike.current_stolen_record.date_stolen, format: :dotted), "Date #{bike.recovered ? 'recovered' : 'stolen'}")
+          = bike.attr_list_item(bike.short_address(bike.current_stolen_record), 'Location')
