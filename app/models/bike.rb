@@ -27,6 +27,8 @@ class Bike < ActiveRecord::Base
   has_many :bike_organizations, dependent: :destroy
   has_many :organizations, through: :bike_organizations
   has_one :creation_state, dependent: :destroy
+  delegate :is_pos, to: :creation_state
+  delegate :is_bulk, to: :creation_state
   # delegate :creator, to: :creation_state, source: :creator
   # has_one :creation_organization, through: :creation_state, source: :organization
   has_many :stolen_notifications, dependent: :destroy

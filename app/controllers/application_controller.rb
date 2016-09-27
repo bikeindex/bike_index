@@ -33,9 +33,8 @@ class ApplicationController < ActionController::Base
   end
 
   def handle_unverified_request
-    remove_session
     flash[:error] = "CSRF invalid. If you weren't intentionally doing something dumb, please contact us"
-    redirect_to goodbye_url
+    redirect_to user_root_url
   end
 
   def cors_set_access_control_headers

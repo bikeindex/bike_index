@@ -17,7 +17,10 @@
 
           %li.expand_t.yes_user.hidden
             %a#your_settings_n_stuff{href: "#you"}
-              You
+              - if current_user.present?
+                = current_user.email
+              - else
+                You
           %li.super_user.hidden
             = link_to 'Superuser home', admin_root_path, class: "follow-link"
         

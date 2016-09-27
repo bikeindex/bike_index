@@ -116,7 +116,7 @@
           = @bike.attr_list_item(@bike.frame_model, 'Model', with_colon: true)
           = @bike.attr_list_item(@bike.year.to_s, 'Year', with_colon: true)
           = @bike.attr_list_item(@bike.frame_colors.to_sentence, 'Primary colors', with_colon: true)
-          = @bike.attr_list_item(@bike.size_display, 'Frame size', with_colon: true)
+          = @bike.attr_list_item(@bike.frame_size, 'Frame size', with_colon: true)
           - if @bike.front_wheel_size_id.present?
             - front_tire_width = @bike.front_tire_narrow ? '(Narrow tire)' : '(Wide tire)'
             - if @bike.front_wheel_size_id == @bike.rear_wheel_size_id
