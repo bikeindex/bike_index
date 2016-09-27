@@ -36,7 +36,7 @@ module Organized
     end
 
     def organization_bikes
-      current_organization.bikes.order('bikes.created_at desc')
+      current_organization.bikes.reorder('bikes.created_at desc')
     end
 
     def current_index_path
