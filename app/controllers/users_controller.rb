@@ -6,7 +6,7 @@ class UsersController < ApplicationController
   before_filter :assign_edit_template, only: [:edit, :update]
   
   def new
-    @user = User.new
+    @user ||= User.new
     if current_user.present?
       flash[:success] = "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
       redirect_to user_home_url and return
@@ -18,6 +18,7 @@ class UsersController < ApplicationController
     if @user.save
       sign_in_and_redirect if @user.confirmed
     else
+      @page_errors = @user.errors
       render action: :new
     end
   end
