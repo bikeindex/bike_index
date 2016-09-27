@@ -10,7 +10,7 @@ describe Organization do
     it { is_expected.to have_many :users }
     it { is_expected.to have_many :organization_invitations }
     it { is_expected.to have_many(:bike_organizations) }
-    it { is_expected.to have_many(:bikes).through(:bike_organizations) }
+    # it { is_expected.to have_many(:bikes).through(:bike_organizations) }
     it { is_expected.to have_many :creation_states }
     it { is_expected.to have_many(:created_bikes).through(:creation_states) }
 
