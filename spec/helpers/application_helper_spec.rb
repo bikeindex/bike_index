@@ -203,7 +203,7 @@ describe ApplicationHelper do
     end
     describe 'users controller' do
       before { allow(view).to receive(:controller_name) { 'users' } }
-      %w(create).each do |action|
+      %w(request_password_reset).each do |action|
         context action do
           it 'returns content_skeleton' do
             allow(view).to receive(:action_name) { action }
