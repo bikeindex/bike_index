@@ -45,4 +45,20 @@ describe Color do
       end
     end
   end
+
+  describe 'black' do
+    context 'not-existing' do
+      it 'creates it on first pass' do
+        expect { Color.black }.to change(Color, :count).by(1)
+      end
+    end
+    context 'existing' do
+      before do
+        Color.black
+      end
+      it 'does not create' do
+        expect { Color.black }.to change(PropulsionType, :count).by(0)
+      end
+    end
+  end
 end

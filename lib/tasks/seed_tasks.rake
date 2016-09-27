@@ -58,7 +58,7 @@ task seed_test_users_and_bikes: :environment do
       puts "\n Bike error \n #{bike.errors.messages}"
     end
   end
-  Bike.pluck(:id).each { |b| ListingOrderWorker.perform_async(b) }
+  Bike.pluck(:id).each { |b| AfterBikeSaveWorker.perform_async(b) }
   AutocompleteLoader.new.reset
 end
 

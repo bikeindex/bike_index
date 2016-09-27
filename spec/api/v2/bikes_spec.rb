@@ -106,6 +106,7 @@ describe 'Bikes API V2' do
       creation_state = bike.creation_state
       expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([true, true, true])
       expect(creation_state.origin).to eq 'api_v2'
+      expect(creation_state.creator).to eq bike.creator
     end
 
     it "doesn't send an email" do
@@ -130,6 +131,7 @@ describe 'Bikes API V2' do
       expect(result['manufacturer_name']).to eq(bike_attrs[:manufacturer])
       bike = Bike.unscoped.find(result['id'])
       expect(bike.creation_state.origin).to eq 'api_v2'
+      expect(bike.creation_state.creator).to eq bike.creator
       expect(bike.example).to be_truthy
       expect(bike.is_for_sale).to be_falsey
     end
@@ -170,6 +172,7 @@ describe 'Bikes API V2' do
       expect(bike.creation_organization).to eq(organization)
       expect(bike.creation_state.origin).to eq 'api_v2'
       expect(bike.creation_state.organization).to eq organization
+      expect(bike.creation_state.creator).to eq bike.creator
       expect(bike.stolen).to be_truthy
       expect(bike.current_stolen_record_id).to be_present
       expect(bike.current_stolen_record.police_report_number).to eq(bike_attrs[:stolen_record][:police_report_number])
@@ -250,6 +253,7 @@ describe 'Bikes API V2' do
       expect(bike.front_tire_narrow).to be_truthy
       expect(bike.creation_state.origin).to eq 'api_v2'
       expect(bike.creation_state.organization).to eq organization
+      expect(bike.creation_state.creator).to eq bike.creator
     end
 
     it "doesn't create a bike without an organization with v2_accessor" do
@@ -338,7 +342,7 @@ describe 'Bikes API V2' do
       headsets = FactoryGirl.create(:ctype, name: 'Headset')
       comp = FactoryGirl.create(:component, bike: bike, ctype: headsets)
       comp2 = FactoryGirl.create(:component, bike: bike, ctype: wheels)
-      not_urs = FactoryGirl.create(:component)
+      FactoryGirl.create(:component)
       # pp comp2
       bike.reload
       expect(bike.components.count).to eq(2)

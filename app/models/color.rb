@@ -1,9 +1,6 @@
 class Color < ActiveRecord::Base
   include AutocompleteHashable
   include FriendlyNameFindable
-  def self.old_attr_accessible
-    %w(name priority display).map(&:to_sym).freeze
-  end
   validates_presence_of :name, :priority
   validates_uniqueness_of :name
   has_many :bikes
@@ -11,6 +8,10 @@ class Color < ActiveRecord::Base
 
   default_scope { order(:name) }
   scope :commonness, -> { order('priority ASC, name ASC') }
+
+  def self.black
+    where(name: 'Black', priority: 1, display: '#000').first_or_create
+  end
 
   def autocomplete_hash
     {

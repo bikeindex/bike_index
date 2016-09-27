@@ -14,7 +14,6 @@ class PublicImagesController < ApplicationController
     if params[:bike_id].present?
       @public_image.imageable = @bike
       @public_image.save
-      update_listing_order(@public_image)
       render 'create_revised' and return
     else
       if params[:blog_id].present?
@@ -37,7 +36,6 @@ class PublicImagesController < ApplicationController
 
   def is_private
     @public_image.update_attribute :is_private, params[:is_private]
-    update_listing_order(@public_image)
     render nothing: true
   end
 
@@ -66,11 +64,9 @@ class PublicImagesController < ApplicationController
 
   def order
     if params[:list_of_photos]
-      # last_image = params[:list_of_photos].count
       params[:list_of_photos].each_with_index do |id, index|
         image = PublicImage.unscoped.find(id)
         image.update_attribute :listing_order, index + 1 if current_user_image_owner(image)
-        update_listing_order(image)
       end
     end
     render nothing: true
@@ -87,12 +83,6 @@ class PublicImagesController < ApplicationController
     # so ensure the current user is admin authorized
     return true if current_user && current_user.admin_authorized('any')
     render json: { error: 'Access denied' }, status: 401 and return
-  end
-
-  def update_listing_order(public_image)
-    if public_image.imageable_type == 'Bike'
-      ListingOrderWorker.perform_async(public_image.imageable_id)
-    end
   end
 
   def current_user_image_owner(public_image)

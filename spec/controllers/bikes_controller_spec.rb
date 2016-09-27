@@ -331,6 +331,7 @@ describe BikesController do
           bike = Bike.last
           expect(bike.creation_state.origin).to eq 'embed'
           expect(bike.creation_state.organization).to eq organization
+          expect(bike.creation_state.creator).to eq bike.creator
           testable_bike_params.each do |k, v|
             pp k unless bike.send(k).to_s == v.to_s
             expect(bike.send(k).to_s).to eq v.to_s
@@ -358,6 +359,7 @@ describe BikesController do
             bike = Bike.last
             expect(bike.creation_state.origin).to eq 'embed'
             expect(bike.creation_state.organization).to eq organization
+            expect(bike.creation_state.creator).to eq bike.creator
             testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
             stolen_record = bike.current_stolen_record
             stolen_params.except(:date_stolen_input).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
@@ -414,6 +416,7 @@ describe BikesController do
             expect(bike.owner_email).to eq bike_params[:owner_email].downcase
             expect(bike.creation_state.origin).to eq 'embed_extended'
             expect(bike.creation_state.organization).to eq organization
+            expect(bike.creation_state.creator).to eq bike.creator
             expect(bike.manufacturer).to eq manufacturer
           end
         end
@@ -425,6 +428,7 @@ describe BikesController do
           bike = Bike.last
           expect(bike.creation_state.origin).to eq 'embed_extended'
           expect(bike.creation_state.organization).to eq organization
+          expect(bike.creation_state.creator).to eq bike.creator
           expect(bike.manufacturer).to eq Manufacturer.other
           expect(bike.manufacturer_other).to eq 'A crazy different thing'
         end
@@ -593,6 +597,7 @@ describe BikesController do
             bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v }
             expect(bike.manufacturer).to eq manufacturer
             expect(bike.creation_state.origin).to eq 'embed_partial'
+            expect(bike.creation_state.creator).to eq bike.creator
           end
         end
         context 'created bike' do

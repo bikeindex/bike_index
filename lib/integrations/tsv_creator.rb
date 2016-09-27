@@ -58,9 +58,9 @@ class TsvCreator
 
   def create_org_count(organization, start_date=nil)
     start_date ||= Time.now.beginning_of_year
-    obikes = organization.bikes.where("created_at >= ?", start_date)
-    out_file = File.join(Rails.root,"#{@file_prefix}org_count_bikes.tsv")
-    output = File.open(out_file, "w")
+    obikes = organization.bikes.where('bikes.created_at >= ?', start_date)
+    out_file = File.join(Rails.root, "#{@file_prefix}org_count_bikes.tsv")
+    output = File.open(out_file, 'w')
     output.puts org_counts_header
     obikes.each { |b| output.puts org_count_row(b) }
     send_to_uploader(output)

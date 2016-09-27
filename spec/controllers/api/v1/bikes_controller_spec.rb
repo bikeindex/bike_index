@@ -26,7 +26,6 @@ describe Api::V1::BikesController do
       options = { stolen: true, organization_slug: organization.slug, access_token: organization.access_token }
       get :stolen_ids, options.as_json
       expect(response.code).to eq('200')
-      # pp response
       bikes = JSON.parse(response.body)['bikes']
       expect(bikes.count).to eq(1)
       expect(bikes.first).to eq(stole2.bike.id)
@@ -43,8 +42,6 @@ describe Api::V1::BikesController do
 
   describe 'create' do
     before do
-      FactoryGirl.create(:cycle_type, slug: 'bike')
-      FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
       FactoryGirl.create(:wheel_size, iso_bsd: 559)
       FactoryGirl.create(:ctype, name: 'wheel')
       FactoryGirl.create(:ctype, name: 'headset')
@@ -98,6 +95,7 @@ describe Api::V1::BikesController do
         creation_state = bike.creation_state
         expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([true, true, true])
         expect(creation_state.organization).to eq organization
+        expect(creation_state.creator).to eq bike.creator
         expect(creation_state.origin).to eq 'api_v1'
       end
     end
@@ -207,6 +205,7 @@ describe Api::V1::BikesController do
         creation_state = bike.creation_state
         expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([false, false, false])
         expect(creation_state.organization).to eq @organization
+        expect(creation_state.creator).to eq bike.creator
         expect(creation_state.origin).to eq 'api_v1'
       end
 
@@ -231,6 +230,7 @@ describe Api::V1::BikesController do
         bike = Bike.where(serial_number: '69 photo-test').first
         expect(bike.public_images.count).to eq(1)
         expect(bike.creation_state.origin).to eq 'api_v1'
+        expect(bike.creation_state.creator).to eq bike.creator
         expect(bike.creation_state.organization).to eq @organization
         expect(bike.rear_wheel_size.iso_bsd).to eq 559
       end
@@ -240,7 +240,6 @@ describe Api::V1::BikesController do
         @organization.users.first.update_attribute :phone, '123-456-6969'
         FactoryGirl.create(:country, iso: 'US')
         FactoryGirl.create(:state, abbreviation: 'Palace')
-        # ListingOrderWorker.any_instance.should_receive(:perform).and_return(true)
         bike_attrs = {
           serial_number: '69 stolen bike',
           manufacturer_id: manufacturer.id,
@@ -271,6 +270,7 @@ describe Api::V1::BikesController do
         expect(response.code).to eq('200')
         bike = Bike.unscoped.where(serial_number: '69 stolen bike').first
         expect(bike.creation_state.origin).to eq 'api_v1'
+        expect(bike.creation_state.creator).to eq bike.creator
         expect(bike.creation_state.organization).to eq @organization
         expect(bike.rear_wheel_size.iso_bsd).to eq 559
         csr = bike.find_current_stolen_record

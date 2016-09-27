@@ -1,11 +1,11 @@
 class FrameMaterial < ActiveRecord::Base
   include FriendlySlugFindable
-  def self.old_attr_accessible
-    %w(name slug).map(&:to_sym).freeze
-  end
   validates_presence_of :name, :slug
   validates_uniqueness_of :name, :slug
   has_many :bikes
+  default_scope { order(:name) }
 
-  default_scope { order("created_at desc") }
+  def self.steel
+    where(name: 'Steel', slug: 'steel').first_or_create
+  end
 end

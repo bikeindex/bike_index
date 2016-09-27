@@ -12,7 +12,7 @@ describe PublicImagesController do
           post :create, bike_id: bike.id, public_image: { name: 'cool name' }, format: :js
           bike.reload
           expect(bike.public_images.first.name).to eq 'cool name'
-          expect(ListingOrderWorker).to have_enqueued_job(bike.id)
+          expect(AfterBikeSaveWorker).to have_enqueued_job(bike.id)
         end
       end
       context 'no user' do
@@ -207,7 +207,7 @@ describe PublicImagesController do
           post :is_private, id: public_image.id, is_private: 'true'
           public_image.reload
           expect(public_image.is_private).to be_truthy
-          expect(ListingOrderWorker).to have_enqueued_job(bike.id)
+          expect(AfterBikeSaveWorker).to have_enqueued_job(bike.id)
         end
       end
       context 'is_private false' do
@@ -219,7 +219,7 @@ describe PublicImagesController do
           post :is_private, id: public_image.id, is_private: false
           public_image.reload
           expect(public_image.is_private).to be_falsey
-          expect(ListingOrderWorker).to have_enqueued_job(bike.id)
+          expect(AfterBikeSaveWorker).to have_enqueued_job(bike.id)
         end
       end
     end
@@ -250,7 +250,7 @@ describe PublicImagesController do
       expect(public_image_other.listing_order).to eq 0
       expect(public_image_3.listing_order).to eq 3
       expect(public_image_2.listing_order).to eq 2
-      expect(public_image_1.listing_order).to eq 1
+      expect(public_image_1.listing_order).to be < 2
       list_order = [public_image_3.id, public_image_1.id, public_image_other.id, public_image_2.id]
       set_current_user(user)
       post :order, list_of_photos: list_order.map(&:to_s)
@@ -262,7 +262,7 @@ describe PublicImagesController do
       expect(public_image_2.listing_order).to eq 4
       expect(public_image_1.listing_order).to eq 2
       expect(public_image_other.listing_order).to eq 0
-      expect(ListingOrderWorker).to have_enqueued_job(bike.id)
+      expect(AfterBikeSaveWorker).to have_enqueued_job(bike.id)
     end
   end
 end

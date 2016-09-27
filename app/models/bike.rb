@@ -5,27 +5,30 @@ class Bike < ActiveRecord::Base
   process_in_background :pdf, CarrierWaveProcessWorker
 
   belongs_to :manufacturer
-  serialize(:cached_attributes, Array)
-  belongs_to :primary_frame_color, class_name: "Color"
-  belongs_to :secondary_frame_color, class_name: "Color"
-  belongs_to :tertiary_frame_color, class_name: "Color"
+  belongs_to :primary_frame_color, class_name: 'Color'
+  belongs_to :secondary_frame_color, class_name: 'Color'
+  belongs_to :tertiary_frame_color, class_name: 'Color'
   belongs_to :handlebar_type
-  belongs_to :rear_wheel_size, class_name: "WheelSize"
-  belongs_to :front_wheel_size, class_name: "WheelSize"
+  belongs_to :rear_wheel_size, class_name: 'WheelSize'
+  belongs_to :front_wheel_size, class_name: 'WheelSize'
   belongs_to :rear_gear_type
   belongs_to :front_gear_type
   belongs_to :frame_material
   belongs_to :propulsion_type
   belongs_to :cycle_type
   belongs_to :paint, counter_cache: true
-  belongs_to :creator, class_name: "User"
-  belongs_to :updator, class_name: "User"
+  belongs_to :updator, class_name: 'User'
   belongs_to :invoice
-  belongs_to :creation_organization, class_name: "Organization"
   belongs_to :location
-  belongs_to :current_stolen_record, class_name: "StolenRecord"
+  belongs_to :current_stolen_record, class_name: 'StolenRecord'
+  belongs_to :creator, class_name: 'User' # to be deprecated and removed
+  belongs_to :creation_organization, class_name: 'Organization' # to be deprecated and removed
 
-  has_one :creation_state
+  has_many :bike_organizations, dependent: :destroy
+  has_many :organizations, through: :bike_organizations
+  has_one :creation_state, dependent: :destroy
+  # delegate :creator, to: :creation_state, source: :creator
+  # has_one :creation_organization, through: :creation_state, source: :organization
   has_many :stolen_notifications, dependent: :destroy
   has_many :stolen_records, dependent: :destroy
   has_many :other_listings
@@ -44,12 +47,10 @@ class Bike < ActiveRecord::Base
   after_validation :geocode, if: lambda { |o| false } # Never geocode, it's from stolen_record
 
   validates_presence_of :serial_number
-  # Serial numbers aren't guaranteed to be unique across manufacturers.
-  # But we do want to prevent the same bike being registered multiple times...
-  # validates_uniqueness_of :serial_number, message: "has already been taken. If you believe that this message is an error, contact us!"
   validates_presence_of :propulsion_type_id
   validates_presence_of :cycle_type_id
   validates_presence_of :creator
+  # validates_presence_of :creation_state_id
   validates_presence_of :manufacturer_id
 
   validates_uniqueness_of :card_id, allow_nil: true
@@ -60,10 +61,10 @@ class Bike < ActiveRecord::Base
     :embeded_extended, :paint_name, :bike_image_cache, :send_email,
     :marked_user_hidden, :marked_user_unhidden, :b_param_id_token
 
-  default_scope { where(example: false).where(hidden: false).order("listing_order desc") }
+  default_scope { where(example: false).where(hidden: false).order('listing_order desc') }
   scope :stolen, -> { where(stolen: true) }
   scope :non_stolen, -> { where(stolen: false) }
-  scope :with_serial, -> { where("serial_number != ?", "absent") }
+  scope :with_serial, -> { where('serial_number != ?', 'absent') }
   scope :non_recovered, -> { where(recovered: false) }
 
   include PgSearch
@@ -71,27 +72,27 @@ class Bike < ActiveRecord::Base
       serial_number: 'A',
       cached_data:   'B',
       all_description:   'C'
-    }, using: { tsearch: { dictionary: "english", prefix: true } }
+    }, using: { tsearch: { dictionary: 'english', prefix: true } }
 
   pg_search_scope :admin_search,
     against: { owner_email: 'A' },
     associated_against: { ownerships: :owner_email, creator: :email },
-    using: { tsearch: { dictionary: "english", prefix: true } }
+    using: { tsearch: { dictionary: 'english', prefix: true } }
 
   class << self
     def old_attr_accessible
       # made_without_serial - GUARANTEE there was no serial
       (%w(cycle_type_id manufacturer_id manufacturer_other serial_number 
         serial_normalized has_no_serial made_without_serial additional_registration
-        creation_organization_id location_id manufacturer year thumb_path name stolen
+        creation_organization_id manufacturer year thumb_path name stolen
         current_stolen_record_id recovered frame_material_id frame_model number_of_seats
         handlebar_type_id handlebar_type_other frame_size frame_size_number frame_size_unit
         rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow 
         primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
-        propulsion_type_id propulsion_type_other zipcode country_id creation_zipcode belt_drive
+        propulsion_type_id propulsion_type_other zipcode country_id belt_drive
         coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
         date_stolen_input receive_notifications phone creator creator_id image
-        components_attributes b_param_id cached_attributes embeded embeded_extended example hidden
+        components_attributes b_param_id embeded embeded_extended example hidden
         card_id stock_photo_url pdf send_email other_listing_urls listing_order approved_stolen
         marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale
         ).map(&:to_sym) + [stolen_records_attributes: StolenRecord.old_attr_accessible,
@@ -104,15 +105,6 @@ class Bike < ActiveRecord::Base
 
     def admin_text_search(query)
       query.present? ? admin_search(query) : all
-    end
-
-    def attr_cache_search(query)
-      return scoped unless query.present? and query.is_a? Array
-      a = []
-      find_each do |b|
-        a << b.id if (query - b.cached_attributes).empty?
-      end
-      where(id: a)
     end
   end
 
@@ -184,14 +176,22 @@ class Bike < ActiveRecord::Base
     end
   end
 
+  def validate_organization_id(organization_id)
+    organization = Organization.friendly_find(organization_id)
+    return true if organization && !organization.suspended?
+    msg = organization ? "suspended and can't be used" : 'not found'
+    errors.add(:organization, "#{organization_id} is #{msg}")
+    false
+  end
+
   before_save :set_mnfg_name
   def set_mnfg_name
     if manufacturer.name == 'Other' && manufacturer_other.present?
-      name = Rails::Html::FullSanitizer.new.sanitize(manufacturer_other)
+      n = Rails::Html::FullSanitizer.new.sanitize(manufacturer_other)
     else
-      name = manufacturer.name.gsub(/\s?\([^\)]*\)/i,'')
+      n = manufacturer.name.gsub(/\s?\([^\)]*\)/i,'')
     end
-    self.mnfg_name = name.strip.truncate(60)
+    self.mnfg_name = n.strip.truncate(60)
   end
 
   before_save :set_user_hidden
@@ -211,7 +211,6 @@ class Bike < ActiveRecord::Base
     self.serial_number = 'absent' if serial_number.blank? || serial_number.strip.downcase == 'unknown'
     self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
     if User.fuzzy_email_find(owner_email)
-      # pp User.fuzzy_email_find(owner_email)
       self.owner_email = User.fuzzy_email_find(owner_email).email
     else
       self.owner_email = EmailNormalizer.normalize(owner_email)
@@ -220,7 +219,7 @@ class Bike < ActiveRecord::Base
   end
 
   def create_normalized_serial_segments
-    SerialNormalizer.new({serial: serial_number}).save_segments(id)
+    SerialNormalizer.new(serial: serial_number).save_segments(id)
   end
 
   before_save :clean_frame_size
@@ -290,23 +289,16 @@ class Bike < ActiveRecord::Base
     ].compact
   end
 
-  def type
-    # Small helper because we call this a lot
-    cycle_type.name.downcase
+  def type # Small helper because we call this a lot
+    cycle_type && cycle_type.name.downcase
   end
 
-  def cgroup_array
-    # list of cgroups so that we can arrange them. Future feature.
-    return [] unless components.any?
-    a = []
-    components.each { |i| a << i.cgroup_id }
-    a.uniq
+  def cgroup_array # list of cgroups so that we can arrange them
+    components.map(&:cgroup_id).uniq
   end
 
   def cache_photo
-    if public_images.any?
-      self.thumb_path = public_images.first.image_url(:small)
-    end
+    self.thumb_path = public_images && public_images.first && public_images.first.image_url(:small)
   end
 
   def components_cache_string
@@ -317,17 +309,6 @@ class Bike < ActiveRecord::Base
         c.component_type
       ] if c.ctype.present? && c.ctype.name.present?
     end
-  end
-
-  def cache_attributes
-    ca = []
-    ca << "#{primary_frame_color.priority}c#{primary_frame_color_id}" if primary_frame_color_id
-    ca << "#{secondary_frame_color.priority}c#{secondary_frame_color_id}" if secondary_frame_color_id
-    ca << "#{tertiary_frame_color.priority}c#{tertiary_frame_color_id}" if tertiary_frame_color_id
-    ca << "h#{handlebar_type_id}" if handlebar_type
-    ca << "#{rear_wheel_size.priority}w#{rear_wheel_size_id}" if rear_wheel_size_id
-    ca << "#{front_wheel_size.priority}w#{front_wheel_size_id}" if front_wheel_size_id && front_wheel_size != rear_wheel_size
-    self.cached_attributes = ca
   end
 
   def cache_stolen_attributes
@@ -344,7 +325,6 @@ class Bike < ActiveRecord::Base
   def cache_bike
     cache_stolen_attributes
     cache_photo
-    cache_attributes
     self.cached_data = [
       mnfg_name,
       (propulsion_type.name == 'Foot pedal' ? nil : propulsion_type.name),

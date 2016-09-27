@@ -173,12 +173,15 @@ RSpec.shared_examples 'bike_searchable' do
   end
 
   describe 'selected_query_items_options' do
-    let(:query_params) { { stolenness: 'all', query: '', query_items: [] } }
     context 'empty' do
+      let(:query_params) { {} }
       context 'empty params' do
-        it 'returns an empty array'
+        it 'returns an empty array' do
+          expect(Bike.selected_query_items_options(interpreted_params)).to eq([])
+        end
       end
       context 'blank values' do
+        let(:query_params) { { stolenness: 'all', query: '', query_items: [] } }
         it 'returns an empty array' do
           expect(Bike.selected_query_items_options(interpreted_params)).to eq([])
         end
@@ -206,11 +209,11 @@ RSpec.shared_examples 'bike_searchable' do
       end
     end
   end
-
   describe 'search' do
     context 'color_ids of primary, secondary and tertiary' do
+      let(:color_2) { FactoryGirl.create(:color) }
       let(:bike_1) { FactoryGirl.create(:bike, primary_frame_color: color) }
-      let(:bike_2) { FactoryGirl.create(:bike, secondary_frame_color: color) }
+      let(:bike_2) { FactoryGirl.create(:bike, secondary_frame_color: color, tertiary_frame_color: color_2) }
       let(:bike_3) { FactoryGirl.create(:bike, tertiary_frame_color: color, manufacturer: manufacturer) }
       let(:all_color_ids) do
         [
@@ -235,7 +238,7 @@ RSpec.shared_examples 'bike_searchable' do
         end
       end
       context 'second color' do
-        let(:query_params) { { colors: [color.id, bike_2.primary_frame_color.id], stolenness: 'all' } }
+        let(:query_params) { { colors: [color.id, color_2.id], stolenness: 'all' } }
         it 'matches just the bike with both colors' do
           expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike_2.id])
         end
@@ -332,7 +335,7 @@ RSpec.shared_examples 'bike_searchable' do
 
         let(:bike_1) { FactoryGirl.create(:bike) }
         let(:bike_2) { FactoryGirl.create(:organization_bike) }
-        let(:organization) { bike_2.creation_organization }
+        let(:organization) { bike_2.organizations.first }
         let(:query_params) { { stolenness: 'all' } }
         before do
           expect([bike_1, bike_2].size).to eq 2
@@ -379,6 +382,7 @@ RSpec.shared_examples 'bike_searchable' do
       let(:organization) { FactoryGirl.create(:organization) }
       let(:query_params) { { serial: '011I528-111JJJk', stolenness: 'all' } }
       before do
+        FactoryGirl.create(:bike_organization, bike: stolen_bike, organization: organization)
         stolen_bike.update_attribute :creation_organization_id, organization.id
         expect(organization.bikes.pluck(:id)).to eq([stolen_bike.id])
       end

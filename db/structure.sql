@@ -121,6 +121,38 @@ ALTER SEQUENCE b_params_id_seq OWNED BY b_params.id;
 
 
 --
+-- Name: bike_organizations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE bike_organizations (
+    id integer NOT NULL,
+    bike_id integer,
+    organization_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: bike_organizations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE bike_organizations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: bike_organizations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE bike_organizations_id_seq OWNED BY bike_organizations.id;
+
+
+--
 -- Name: bikes; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -150,7 +182,6 @@ CREATE TABLE bikes (
     year integer,
     has_no_serial boolean DEFAULT false NOT NULL,
     creator_id integer,
-    location_id integer,
     front_tire_narrow boolean,
     primary_frame_color_id integer,
     secondary_frame_color_id integer,
@@ -161,7 +192,6 @@ CREATE TABLE bikes (
     rear_wheel_size_id integer,
     rear_gear_type_id integer,
     front_gear_type_id integer,
-    cached_attributes text,
     additional_registration character varying(255),
     belt_drive boolean DEFAULT false NOT NULL,
     coaster_brake boolean DEFAULT false NOT NULL,
@@ -174,8 +204,6 @@ CREATE TABLE bikes (
     paint_id integer,
     registered_new boolean,
     example boolean DEFAULT false NOT NULL,
-    creation_zipcode character varying(255),
-    creation_country_id integer,
     country_id integer,
     stock_photo_url character varying(255),
     current_stolen_record_id integer,
@@ -189,7 +217,8 @@ CREATE TABLE bikes (
     is_for_sale boolean DEFAULT false NOT NULL,
     made_without_serial boolean DEFAULT false NOT NULL,
     stolen_lat double precision,
-    stolen_long double precision
+    stolen_long double precision,
+    creation_state_id integer
 );
 
 
@@ -409,7 +438,8 @@ CREATE TABLE creation_states (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     is_pos boolean DEFAULT false NOT NULL,
-    is_new boolean DEFAULT false NOT NULL
+    is_new boolean DEFAULT false NOT NULL,
+    creator_id integer
 );
 
 
@@ -1890,6 +1920,13 @@ ALTER TABLE ONLY b_params ALTER COLUMN id SET DEFAULT nextval('b_params_id_seq':
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY bike_organizations ALTER COLUMN id SET DEFAULT nextval('bike_organizations_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY bikes ALTER COLUMN id SET DEFAULT nextval('bikes_id_seq'::regclass);
 
 
@@ -2215,6 +2252,14 @@ ALTER TABLE ONLY ads
 
 ALTER TABLE ONLY b_params
     ADD CONSTRAINT b_params_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bike_organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY bike_organizations
+    ADD CONSTRAINT bike_organizations_pkey PRIMARY KEY (id);
 
 
 --
@@ -2578,10 +2623,31 @@ ALTER TABLE ONLY wheel_sizes
 
 
 --
+-- Name: index_bike_organizations_on_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_bike_organizations_on_bike_id ON bike_organizations USING btree (bike_id);
+
+
+--
+-- Name: index_bike_organizations_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_bike_organizations_on_organization_id ON bike_organizations USING btree (organization_id);
+
+
+--
 -- Name: index_bikes_on_card_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_bikes_on_card_id ON bikes USING btree (card_id);
+
+
+--
+-- Name: index_bikes_on_creation_state_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_bikes_on_creation_state_id ON bikes USING btree (creation_state_id);
 
 
 --
@@ -2666,6 +2732,13 @@ CREATE INDEX index_components_on_manufacturer_id ON components USING btree (manu
 --
 
 CREATE INDEX index_creation_states_on_bike_id ON creation_states USING btree (bike_id);
+
+
+--
+-- Name: index_creation_states_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_creation_states_on_creator_id ON creation_states USING btree (creator_id);
 
 
 --
@@ -3176,4 +3249,8 @@ INSERT INTO schema_migrations (version) VALUES ('20160910174549');
 INSERT INTO schema_migrations (version) VALUES ('20160910184053');
 
 INSERT INTO schema_migrations (version) VALUES ('20160913155615');
+
+INSERT INTO schema_migrations (version) VALUES ('20160923180542');
+
+INSERT INTO schema_migrations (version) VALUES ('20160923215650');
 

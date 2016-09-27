@@ -13,8 +13,11 @@ describe UserEmbedsController do
     end
 
     it "renders the most recent bikes with images if it doesn't find the user" do
-      FactoryGirl.create(:bike)
-      bike = FactoryGirl.create(:bike, thumb_path: 'sblah')
+      public_image = FactoryGirl.create(:public_image)
+      bike = public_image.imageable
+      allow_any_instance_of(Bike).to receive(:public_images) { [public_image] }
+      bike.save && bike.reload
+      expect(bike.thumb_path).to be_present
       get :show, id: 'NOT A USER'
       expect(response.code).to eq('200')
       expect(assigns(:bikes).count).to eq(1)
