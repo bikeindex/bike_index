@@ -218,3 +218,5 @@ body { min-height: 400px; }
   .slick-prev,
   .slick-next { display: none; }
 }
+
+#old-browser-warning{width:100%;background:#f8f8f8;border-bottom:1px solid #cacaca;z-index:9999;padding:10px;position:fixed;top:0;left:0;text-align:center}#old-browser-warning h4{color:#c0392b}
