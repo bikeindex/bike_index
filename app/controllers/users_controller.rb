@@ -178,7 +178,7 @@ class UsersController < ApplicationController
     @edit_templates ||= {
       root: 'User Settings',
       password: 'Password',
-      sharing: 'Sharing and Personal Page'
+      sharing: 'Sharing + Personal Page'
     }.as_json
   end
 

@@ -179,8 +179,8 @@ class Bike < ActiveRecord::Base
     end
   end
 
-  def validate_organization_id(organization_id)
-    organization = Organization.friendly_find(organization_id)
+  def validate_organization_id(organization_id = nil, organization: nil)
+    organization ||= Organization.friendly_find(organization_id)
     return true if organization && !organization.suspended?
     msg = organization ? "suspended and can't be used" : 'not found'
     errors.add(:organization, "#{organization_id} is #{msg}")

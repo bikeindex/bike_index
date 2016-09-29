@@ -5,11 +5,13 @@
     @extend .form-control-static;
     font-weight: $strong-font-weight;
     line-height: 1.5; // to match the height of inputs
+    padding-left: 1.6875rem; // static padding: 0.9375 + input padding: 0.75
+    padding-right: 1.6875rem;
   }
   .form-well-input-static-full-width { @extend .form-well-input-static; }
   .right-input-help.right-text-help {
     font-style: italic;
-    line-height: 1.5em;
+    line-height: 1.2;
     a {
       color: $body-font-color;
       cursor: pointer;

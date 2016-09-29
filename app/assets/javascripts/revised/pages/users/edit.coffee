@@ -40,7 +40,6 @@ class BikeIndex.UsersEdit extends BikeIndex
       num += 1
       e.preventDefault()
       $('#additional_email_fields').append(Mustache.render(add_email_template, { num: num }))
-      ('#additional_email_fields .add-email-field')
       new window.CheckEmail("#additional_email_field_#{num}")
       $('#additional_email_fields .collapse').collapse('show')
 

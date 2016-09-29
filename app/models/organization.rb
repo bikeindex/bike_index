@@ -38,6 +38,7 @@ class Organization < ActiveRecord::Base
   scope :college, -> { where(org_type: 'college') }
   scope :manufacturer, -> { where(org_type: 'manufacturer') }
   scope :paid, -> { where(is_paid: true) }
+  scope :valid, -> { where(is_suspended: false) }
 
   def self.friendly_find(n)
     return nil unless n.present?
