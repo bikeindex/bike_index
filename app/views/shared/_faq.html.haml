@@ -1,3 +1,17 @@
+:javascript
+  var anchor, idx, url, $target;
+  url = window.location.href;
+  idx = url.indexOf('#');
+  if (idx !== -1) {
+    anchor = url.substring(idx + 1);
+    $(document).ready(function() {
+      $target = $("#" + anchor);
+      $target.collapse('show');
+      $('body').animate({ scrollTop: $target.offset().top - 120 }, 'fast');
+    });
+  }
+
+
 %article
   .faq-block#main-faq-block
     %h3
