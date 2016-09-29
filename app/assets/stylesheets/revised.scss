@@ -219,4 +219,15 @@ body { min-height: 400px; }
   .slick-next { display: none; }
 }
 
-#old-browser-warning{width:100%;background:#f8f8f8;border-bottom:1px solid #cacaca;z-index:9999;padding:10px;position:fixed;top:0;left:0;text-align:center}#old-browser-warning h4{color:#c0392b}
+#old-browser-warning {
+  width: 100%;
+  background: $gray-lighter;
+  border-top: 1px solid $gray-light;
+  z-index: 9999;
+  padding: $vertical-height;
+  position: fixed;
+  bottom: 0; left: 0;
+  text-align: center;
+  p { margin: 0; }
+  h4 { color: $red; margin: 0 0 $vertical-height; }
+}

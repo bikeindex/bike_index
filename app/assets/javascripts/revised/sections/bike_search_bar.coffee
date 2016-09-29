@@ -65,6 +65,8 @@ class BikeIndex.BikeSearchBar extends BikeIndex
 
   initializeHeaderSearch: ($query_field) ->
     per_page = 15
+    $('.query-field-wrap').removeClass('nojs')
+    $('.query-field#query').remove() # remove it so it doesn't interfere with query_items
     initial_opts = if $query_field.data('initial') then $query_field.data('initial') else []
     processedResults = @processedResults # Custom data processor
     formatSearchText = @formatSearchText # Custom formatter

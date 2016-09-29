@@ -11,21 +11,7 @@
   .row
     .col-md-8
       = form_tag bikes_path, id: 'bikes_search_form', class: 'bikes-search-form', method: :get do
-        .query-field-wrap
-          - opt_vals = @selected_query_items_options.map { |i| i.is_a?(String) ? [i, i] : [i['text'], i['search_id']]  }
-          = select_tag :query_items,                                      |
-            options_for_select(opt_vals, selected: opt_vals.map(&:last)), |
-            placeholder: 'Search bike descriptions',                      |
-            class: 'form-control query-field',                            |
-            multiple: true
-
-          = text_field_tag :serial, params[:serial],    |
-            placeholder: 'Search for serial number',    |
-            class: 'form-control query-field'
-        .search-button-wrap
-          = button_tag(type: 'submit', class: 'searchit btn btn-primary') do
-            :plain
-              <svg id="search-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29"><defs><style>.cls-1,.cls-2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:2px;}.cls-2{stroke-linecap:round;}</style></defs><title>searcher</title><circle class="cls-1" cx="10.39" cy="10.39" r="9.39"/><line class="cls-2" x1="17.03" y1="17.03" x2="28" y2="28"/></svg>
+        = render partial: '/shared/search_inputs'
         .stolen-search-fields{ class: ('currently-hidden' unless params[:stolenness] == 'proximity') }
           = text_field_tag :location, params[:location], placeholder: 'Anywhere', class: 'form-control stolen-proximity'
           %span

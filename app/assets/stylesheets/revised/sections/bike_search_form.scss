@@ -8,8 +8,11 @@
     // Space between search bar and button
     padding-right: $vertical-height;
   }
-  .query-field { width: 100%; }
-  .select2-container { margin-bottom: 0.5*$vertical-height; }
+  .query-field { 
+    width: 100%;
+    &#serial { margin-top: 0.5*$vertical-height; }
+  }
+  .select2-container { margin-bottom: 0; }
 
   .select2-results__options {
     .sch_s { display: inline-block; }
@@ -72,6 +75,9 @@
     .stolen-radius { width: 4.2em; }
     .stolen-proximity { width: 30%; }
   }
+  // Hide things by default - so that our search is more functional 
+  // when JS isn't working
+  .nojs #query_items { display: none; }
 }
 
 @media (max-width: 600px) {

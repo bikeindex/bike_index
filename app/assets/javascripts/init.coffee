@@ -60,14 +60,16 @@ class BikeIndex.Init extends BikeIndex
         window.open(local, '_blank')
 
 
-  # We need to call this because of Flexbox
-  # Edge is fine, but all versions of IE are broken, and we should tell peeps
-  # msieversion: ->
-  #   ua = window.navigator.userAgent
-  #   msie = ua.indexOf('MSIE ')
-  #   if msie > 0 or ! !navigator.userAgent.match(/Trident.*rv\:11\./)
-  #     alert parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)))
-
+# Check if the browser supports Flexbox
+warnIfUnsupportedBrowser = ->
+  d = document.documentElement.style
+  unless 'flexWrap' of d or 'WebkitFlexWrap' of d or 'msFlexWrap' of d
+    if $('#old-browser-warning').length < 1
+      if navigator.appName == 'Microsoft Internet Explorer' or ! !(navigator.userAgent.match(/Trident/) or navigator.userAgent.match(/rv 11/)) or $.browser and $.browser.msie == 1
+          header = 'Your browser (Internet Explorer) is is not supported'
+      else
+        header = 'Your browser is out of date!'
+      $('body').prepend "<div id='old-browser-warning'><h4>#{header}</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>"
 
 window.updateSearchBikesHeaderLink = ->
   location = localStorage.getItem('location')
@@ -84,4 +86,4 @@ $(document).ready ->
   if document.getElementById('binx_registration_widget')
     new window.ManufacturersSelect('#binx_registration_widget #b_param_manufacturer_id')
   new window.AdDisplayer
-  
+  warnIfUnsupportedBrowser()
