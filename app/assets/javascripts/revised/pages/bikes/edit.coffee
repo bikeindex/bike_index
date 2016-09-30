@@ -15,6 +15,7 @@ class BikeIndex.BikesEdit extends BikeIndex
       when 'stolen' then new BikeIndex.BikesEditStolen
       when 'photos' then new BikeIndex.BikesEditPhotos
       when 'accessories' then new BikeIndex.BikesEditAccessories
+      when 'remove' then new BikeIndex.BikesEditRemove
 
   initializeEventListeners: ->
     $('.form-well-edit-page-select select').change (e) =>
