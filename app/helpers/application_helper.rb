@@ -22,7 +22,7 @@ module ApplicationHelper
   #  - a valid partial file in views/shared
   #  - nil - which just calls yield directly
   def current_page_skeleton
-    return 'organized_skeleton' if sub_module_name == 'organized_' && action_name != 'landing'
+    return 'organized_skeleton' if controller_namespace == 'organized' && action_name != 'landing'
     case controller_name
     when 'bikes'
       'edit_bike_skeleton' if %w(edit update).include?(action_name)
@@ -122,14 +122,5 @@ module ApplicationHelper
     c = content_tag :article, c
     c << content_tag(:article, list_item.body_html.html_safe) if list_item.body_html.present?
     c
-  end
-
-  # For application_revised.js init scoping
-  def body_id
-    "#{sub_module_name}#{controller_name}_#{action_name}"
-  end
-
-  def sub_module_name
-    controller.class.parent.name == 'Object' ? '' : "#{controller.class.parent.name.downcase}_"
   end
 end

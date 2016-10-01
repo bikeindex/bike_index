@@ -3,11 +3,7 @@ module HeaderTagHelper
     # header_tag_hash = set_header_tag_hash
     # tags_hash = set_social_hash(header_tag_hash)
     # title_tag_html(tags_hash)
-    # [
-    #   title_tags,
-    #   author_tag_html,
-    #   meta_tags
-    # ].compact.join("\n").html_safe
+    main_header_tags.compact.join("\n").html_safe
   end
 
   # Everything below here is an internal method
@@ -19,43 +15,27 @@ module HeaderTagHelper
     send("#{controller_name}_header_tags")
   end
 
+  def page_title=(val)
+    @page_title = strip_tags(val).strip
+  end
+
+  def page_description=(val)
+    @page_description = strip_tags(val).strip
+  end
+
   def page_title
-    @page_title ||= strip_tags(auto_title)
+    @page_title || self.page_title = auto_title
   end
 
   def page_description
-    @page_description ||= strip_tags(auto_description)
-  end
-
-  def translation_title
-    t "meta_title.#{controller_name}_#{action_name}", default: ''
-  end
-
-  def translation_description
-    t "meta_descriptions.#{controller_name}_#{action_name}", default: ''
+    @page_description || self.page_description = auto_description
   end
 
   def auto_title
     return translation_title if translation_title.present?
-    case action_name
-    when 'index'
-      controller_name.humanize
-    when 'new', 'edit', 'show', 'create'
-      "#{auto_action_name_title} #{controller_name.humanize.singularize.downcase}"
-    else
-      action_name.humanize
-    end
+    [auto_namespace_title, auto_controller_and_action_title].compact.join(' ')
   end
-
-  def auto_action_name_title
-    {
-      new: 'New',
-      edit: 'Edit',
-      show: 'View',
-      create: 'Created'
-    }.as_json.freeze[action_name]
-  end
-
+  
   def auto_description
     return translation_description if translation_description.present?
     'The best bike registry: Simple, secure and free.'
@@ -208,4 +188,46 @@ module HeaderTagHelper
   #   hash
   # end
 
+  private
+
+  def translation_args
+    return { default: '' } unless controller_namespace == 'organized'
+    { default: '', organization: current_organization.short_name }
+  end
+
+  def translation_title
+    t "meta_title.#{page_id}", translation_args
+  end
+
+  def translation_description
+    t "meta_descriptions.#{page_id}", translation_args
+  end
+
+  def auto_controller_and_action_title
+    case action_name
+    when 'index'
+      controller_name.humanize
+    when 'new', 'edit', 'show', 'create'
+      "#{auto_action_name_title} #{controller_name.humanize.singularize.downcase}"
+    else
+      action_name.humanize
+    end
+  end
+
+  def auto_namespace_title
+    if controller_namespace == 'admin'
+      'Admin |'
+    elsif controller_namespace == 'organized'
+      current_organization.short_name
+    end
+  end
+
+  def auto_action_name_title
+    {
+      new: 'New',
+      edit: 'Edit',
+      show: 'View',
+      create: 'Created'
+    }.as_json.freeze[action_name]
+  end
 end

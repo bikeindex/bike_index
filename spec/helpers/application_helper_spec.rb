@@ -36,6 +36,8 @@ describe ApplicationHelper do
   end
 
   describe 'current_page_skeleton' do
+    before { allow(view).to receive(:controller_namespace) { controller_namespace } }
+    let(:controller_namespace) { nil }
     describe 'landing_pages controller' do
       before { allow(view).to receive(:controller_name) { 'landing_pages' } }
       context 'show (organization landing page)' do
@@ -167,7 +169,7 @@ describe ApplicationHelper do
       end
     end
     describe 'organized subrouting' do
-      before { allow(view).to receive(:sub_module_name) { 'organized_' } }
+      let(:controller_namespace) { 'organized' }
       context 'manage' do
         before { allow(view).to receive(:controller_name) { 'manage' } }
         it 'returns organized for index' do
@@ -267,25 +269,6 @@ describe ApplicationHelper do
       target << "\n"
       target << '</article>'
       expect(html).to eq(target)
-    end
-  end
-
-  describe 'body_id' do
-    context 'admin bikes index' do
-      it 'returns admin_users_controller index_action' do
-        controller = Admin::StolenBikesController.new
-        expect(view).to receive(:controller).at_least(:once).and_return(controller)
-        allow(view).to receive(:action_name).and_return('index')
-        expect(helper.body_id).to eq('admin_stolen_bikes_index')
-      end
-    end
-    context 'normal bikes show' do
-      it 'returns bikes_controller show_action' do
-        controller = BikesController.new
-        expect(view).to receive(:controller).at_least(:once).and_return(controller)
-        allow(view).to receive(:action_name).and_return('show')
-        expect(helper.body_id).to eq('bikes_show')
-      end
     end
   end
 end

@@ -1,8 +1,8 @@
 class ApplicationController < ActionController::Base
   include AuthenticationHelper
   protect_from_forgery
-  helper_method :current_user, :current_organization, :user_root_url,
-                :remove_session, :revised_layout_enabled?, :forwarded_ip_address
+  helper_method :current_user, :current_organization, :user_root_url, :controller_namespace,
+                :page_id, :remove_session, :revised_layout_enabled?, :forwarded_ip_address
   before_filter :enable_rack_profiler
 
   ensure_security_headers(csp: false,
@@ -12,6 +12,14 @@ class ApplicationController < ActionController::Base
     x_xss_protection: false,
     x_download_options: false,
     x_permitted_cross_domain_policies: false)
+
+  def page_id
+    @page_id ||= [controller_namespace, controller_name, action_name].compact.join('_')
+  end
+
+  def controller_namespace
+    @controller_namespace ||= (self.class.parent.name != 'Object') ? self.class.parent.name.downcase : nil
+  end
 
   def current_organization
     @current_organization ||= Organization.friendly_find(params[:organization_id])

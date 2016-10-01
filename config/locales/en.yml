@@ -33,6 +33,7 @@ en:
     tech: "Technology for fighting bike theft"
     stolen_howworks: "How it works"
     stolen_merging: "Stolen bike registry"
+    organized_landing_show: "%{organization} Bike Registration"
   meta_descriptions:
     welcome_index: "The best bike registry: Simple, secure and free."
     info_about: "Why we made the Bike Index and who we are"

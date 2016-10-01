@@ -12,6 +12,7 @@ describe Admin::BikesController do
       expect(response.code).to eq('200')
       expect(response).to render_template('index')
       expect(flash).to_not be_present
+      expect(assigns(:page_id)).to eq 'admin_bikes_index'
     end
   end
 

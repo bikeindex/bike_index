@@ -5,7 +5,26 @@ describe HeaderTagHelper do
     allow(view).to receive(:controller_name) { controller_name }
     allow(view).to receive(:action_name) { action_name }
     allow(view).to receive(:request_url) { '' }
+    # These two methods are defined in application controller
+    allow(view).to receive(:controller_namespace) { controller_namespace }
+    allow(view).to receive(:page_id) { [controller_namespace, controller_name, action_name].compact.join('_') }
   end
+  let(:controller_namespace) { nil }
+
+  describe 'page_title=' do
+    it 'sets page_title with strip_tags' do
+      helper.page_title = '<script>alert();</script> title <em>stuff</em>'
+      expect(helper.page_title).to eq 'title stuff'
+    end
+  end
+
+  describe 'page_description=' do
+    it 'sets page_description with strip_tags' do
+      helper.page_description = '<script>alert();</script> description <em>stuff</em>'
+      expect(helper.page_description).to eq 'description stuff'
+    end
+  end
+
   describe 'auto_title' do
     context 'Assigned title from translation (users new)' do
       let(:controller_name) { 'users' }
@@ -52,6 +71,37 @@ describe HeaderTagHelper do
       let(:action_name) { 'lightspeed_integration' }
       it 'returns the weird action name humanized' do
         expect(helper.auto_title).to eq 'Lightspeed integration'
+      end
+    end
+    context 'admin namespace' do
+      let(:controller_namespace) { 'admin' }
+      describe 'bikes' do
+        let(:controller_name) { 'bikes' }
+        let(:action_name) { 'index' }
+        it 'returns prepended title' do
+          expect(helper.auto_title).to eq 'Admin | Bikes'
+        end
+      end
+    end
+    context 'organized namespace' do
+      let(:controller_namespace) { 'organized' }
+      let(:organization) { FactoryGirl.build(:organization, short_name: 'Sweet Bike Org') }
+      before do
+        allow(view).to receive(:current_organization) { organization }
+      end
+      describe 'bikes' do
+        let(:controller_name) { 'bikes' }
+        let(:action_name) { 'index' }
+        it 'returns title prepended with org name' do
+          expect(helper.auto_title).to eq 'Sweet Bike Org Bikes'
+        end
+      end
+      describe 'landing' do
+        let(:controller_name) { 'landing' }
+        let(:action_name) { 'show' }
+        it 'returns translation title' do
+          expect(helper.auto_title).to eq 'Sweet Bike Org Bike Registration'
+        end
       end
     end
   end
@@ -118,7 +168,7 @@ describe HeaderTagHelper do
     end
   end
 
-  describe 'main_tags' do
+  describe 'main_header_tags' do
     let(:title) { 'A really, really sweet title' }
     let(:description) { 'Some lame description' }
     let(:target) do
