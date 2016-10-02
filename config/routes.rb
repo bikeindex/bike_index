@@ -7,7 +7,7 @@ Bikeindex::Application.routes.draw do
   end
 
   get '/shop', to: redirect('https://bikeindex.myshopify.com'), as: :shop
-  get '/store', to: redirect('https://bikeindex.myshopify.com'), as: :shop
+  get '/store', to: redirect('https://bikeindex.myshopify.com'), as: :store
   get '/discuss', to: redirect('https://discuss.bikeindex.org'), as: :discuss
   get 'discourse_authentication', to: 'discourse_authentication#index'
 
