@@ -139,8 +139,8 @@ describe HeaderTagHelper do
 
   describe 'social_meta_tags' do
     let(:meta_keys) do
-      ['og:description', 'twitter:description', 'og:title', 'twitter:title', 'og:url',
-       'og:image', 'og:site_name', 'twitter:card', 'twitter:creator', 'twitter:site']
+      ['og:description', 'twitter:description', 'og:title', 'twitter:title', 'og:url', 'og:image',
+       'og:site_name', 'twitter:card', 'fb:app_id', 'twitter:creator', 'twitter:site']
     end
     describe 'default_social_meta_hash' do
       let(:title_keys) { ['og:title', 'twitter:title'] }

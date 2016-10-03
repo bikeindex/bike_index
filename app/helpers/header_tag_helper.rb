@@ -52,6 +52,7 @@ module HeaderTagHelper
       'og:image'            => page_image,
       'twitter:image'       => page_image,
       'og:site_name'        => 'Bike Index',
+      'fb:app_id'           => '223376277803071',
       'twitter:card'        => (page_image == DEFAULT_IMAGE ? 'summary' : 'summary_large_image'),
       'twitter:creator'     => '@bikeindex',
       'twitter:site'        => '@bikeindex'
