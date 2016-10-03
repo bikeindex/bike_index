@@ -1,33 +1,36 @@
 require 'spec_helper'
 
 describe RegistrationsController do
-  before do
-    CycleType.bike
-    PropulsionType.foot_pedal
-  end
   let(:user) { FactoryGirl.create(:user) }
   let(:auto_user) { FactoryGirl.create(:organization_auto_user) }
   let(:organization) { auto_user.organizations.first }
-
+  let(:renders_embed_without_xframe) do
+    expect(response.status).to eq(200)
+    expect(response).to render_with_layout('reg_embed')
+    expect(response.headers['X-Frame-Options']).not_to be_present
+    expect(flash).to_not be_present
+  end
   describe 'new' do
     it 'renders with the embeded form, no xframing' do
       set_current_user(user)
       get :new, organization_id: organization.id, stolen: true
-      expect(response.status).to eq(200)
       expect(response).to render_template(:new)
+      expect(response.status).to eq(200)
       expect(response).to render_with_layout('application_revised')
-      expect(flash).to_not be_present
       expect(response.headers['X-Frame-Options']).to be_present
+      expect(flash).to_not be_present
     end
   end
   describe 'embed' do
+    let(:expect_it_to_render_correctly) do
+      renders_embed_without_xframe
+      expect(response).to render_template(:embed)
+    end
     context 'no organization' do
       context 'no user' do
         it 'renders' do
           get :embed, stolen: true
-          expect(response.status).to eq(200)
-          expect(response).to render_template(:embed)
-          expect(flash).to_not be_present
+          expect_it_to_render_correctly
           expect(assigns(:stolen)).to be_truthy
           expect(assigns(:creator)).to be_nil
           expect(assigns(:owner_email)).to be_nil
@@ -37,13 +40,10 @@ describe RegistrationsController do
         it 'renders does not set creator' do
           set_current_user(user)
           get :embed
-          expect(response.status).to eq(200)
-          expect(response).to render_template(:embed)
-          expect(flash).to_not be_present
+          expect_it_to_render_correctly
           expect(assigns(:stolen)).to eq 0
           expect(assigns(:creator)).to be_nil
           expect(assigns(:owner_email)).to eq user.email
-          expect(response.headers['X-Frame-Options']).not_to be_present
         end
       end
     end
@@ -51,10 +51,7 @@ describe RegistrationsController do
       context 'no user' do
         it 'renders' do
           get :embed, organization_id: organization.to_param, simple_header: true
-          expect(response.status).to eq(200)
-          expect(response).to render_template(:embed)
-          expect(flash).to_not be_present
-          expect(response.headers['X-Frame-Options']).not_to be_present
+          expect_it_to_render_correctly
           expect(assigns(:stolen)).to eq 0
           expect(assigns(:organization)).to eq organization
           expect(assigns(:creator)).to be_nil
@@ -65,10 +62,7 @@ describe RegistrationsController do
         it 'renders, testing variables' do
           set_current_user(user)
           get :embed, organization_id: organization.id, stolen: true
-          expect(response.status).to eq(200)
-          expect(response).to render_template(:embed)
-          expect(flash).to_not be_present
-          expect(response.headers['X-Frame-Options']).not_to be_present
+          expect_it_to_render_correctly
           # Since we're creating these in line, actually test the rendered body
           body = response.body
           # Owner email
@@ -107,7 +101,8 @@ describe RegistrationsController do
           expect do
             post :create, simple_header: true, b_param: attrs
           end.to change(BParam, :count).by 0
-          expect(response).to render_template(:new)
+          renders_embed_without_xframe
+          expect(response).to render_template(:new) # Because it redirects since unsuccessful
           expect(assigns(:simple_header)).to be_truthy
           b_param = assigns(:b_param)
           attrs.except(:creator_id).each do |key, value|
@@ -119,15 +114,18 @@ describe RegistrationsController do
       end
     end
     context 'valid creation' do
+      let(:expect_it_to_render_correctly) do
+        renders_embed_without_xframe
+        expect(response).to render_template(:create)
+      end
       context 'nothing except email set' do
         it 'creates a new bparam and renders' do
           post :create, b_param: { owner_email: 'something@stuff.com' }, simple_header: true
-          expect(response).to render_template(:create)
+          expect_it_to_render_correctly
           b_param = BParam.last
           expect(b_param.owner_email).to eq 'something@stuff.com'
           expect(b_param.origin).to eq 'embed_partial'
           expect(EmailPartialRegistrationWorker).to have_enqueued_job(b_param.id)
-          expect(response.headers['X-Frame-Options']).not_to be_present
           expect(assigns(:simple_header)).to be_truthy
         end
       end
@@ -142,9 +140,8 @@ describe RegistrationsController do
             creation_organization_id: 21
           }
           post :create, b_param: attrs
-          expect(response).to render_template(:create)
+          expect_it_to_render_correctly
           b_param = BParam.last
-          expect(response.headers['X-Frame-Options']).not_to be_present
           attrs.each do |key, value|
             expect(b_param.send(key).to_s).to eq value.to_s
           end

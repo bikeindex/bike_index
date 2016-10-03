@@ -169,6 +169,15 @@ class Bike < ActiveRecord::Base
     Rails::Html::FullSanitizer.new.sanitize(t.gsub(/\s+/,' ')).strip
   end
 
+  def stolen_string
+    return nil unless stolen and current_stolen_record.present?
+    [
+      'Stolen ',
+      current_stolen_record.date_stolen && current_stolen_record.date_stolen.strftime("%m-%d-%Y"),
+      current_stolen_record.address && "from #{current_stolen_record.address}. "
+    ].compact.join(' ')
+  end
+
   def video_embed_src
     if video_embed.present?
       code = Nokogiri::HTML(video_embed)

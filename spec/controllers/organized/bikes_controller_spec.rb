@@ -14,6 +14,7 @@ describe Organized::BikesController, type: :controller do
         expect(response).to render_template :index
         expect(response).to render_with_layout('application_revised')
         expect(assigns(:current_organization)).to eq organization
+        expect(assigns(:page_id)).to eq 'organized_bikes_index'
       end
     end
 

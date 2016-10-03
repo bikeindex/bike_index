@@ -102,19 +102,6 @@ FactoryGirl.define do
     association :ctype
   end
 
-  factory :organization do
-    name
-    sequence(:short_name) { |n| "short_name#{n}" }
-    slug
-    available_invitation_count 5
-    factory :organization_with_auto_user do
-      association :auto_user, factory: :user
-      after(:create) do |organization|
-        FactoryGirl.create(:membership, user: organization.auto_user, organization: organization)
-      end
-    end
-  end
-
   factory :location do
     name
     association :organization

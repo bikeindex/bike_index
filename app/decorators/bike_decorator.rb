@@ -32,14 +32,6 @@ class BikeDecorator < ApplicationDecorator
     t.html_safe
   end
 
-  def stolen_string
-    return nil unless object.stolen and object.current_stolen_record.present?
-    s = "Stolen "
-    s += "#{object.current_stolen_record.date_stolen.strftime("%m-%d-%Y")}. " if object.current_stolen_record.date_stolen.present?
-    s += "from #{object.current_stolen_record.address}. " if object.current_stolen_record.address.present?
-    s
-  end
-
   def phoneable_by(user = nil)
     return nil unless object.current_stolen_record.present?
     return true if object.current_stolen_record.phone_for_everyone
