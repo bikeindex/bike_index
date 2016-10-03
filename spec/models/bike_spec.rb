@@ -498,7 +498,7 @@ describe Bike do
       expect(bike.components_cache_string.to_s).to match(c.ctype.name)
     end
   end
-  
+
   describe 'cache_stolen_attributes' do
     context 'current_stolen_record with lat and long' do
       it 'saves the stolen description to all description and set stolen_rec_id' do
@@ -634,33 +634,59 @@ describe Bike do
     end
   end
 
-  describe 'validate_organization_id' do
+  describe 'validated_organization_id' do
     let(:bike) { Bike.new }
     context 'valid organization' do
       let(:organization) { FactoryGirl.create(:organization) }
       context 'slug' do
         it 'returns true' do
-          expect(bike.validate_organization_id(organization.slug)).to be_truthy
+          expect(bike.validated_organization_id(organization.slug)).to eq organization.id
         end
       end
       context 'id' do
         it 'returns true' do
-          expect(bike.validate_organization_id(organization.id)).to be_truthy
+          expect(bike.validated_organization_id(organization.id)).to eq organization.id
         end
       end
     end
     context 'suspended organization' do
       let(:organization) { FactoryGirl.create(:organization, is_suspended: true) }
       it 'adds an error to the bike' do
-        expect(bike.validate_organization_id(organization.id)).to be_falsey
-        expect(bike.errors[:organization].to_s).to match(/suspended/)
+        expect(bike.validated_organization_id(organization.id)).to be_nil
       end
     end
     context 'unable to find organization' do
       it 'adds an error to the bike' do
-        expect(bike.validate_organization_id('some org')).to be_falsey
+        expect(bike.validated_organization_id('some org')).to be_nil
         expect(bike.errors[:organization].to_s).to match(/not found/)
         expect(bike.errors[:organization].to_s).to match(/some org/)
+      end
+    end
+  end
+
+  describe 'assignment of bike_organization_ids' do
+    let(:bike) { FactoryGirl.create(:organization_bike) }
+    let(:organization) { bike.organizations.first }
+    let(:organization_2) { FactoryGirl.create(:organization) }
+    before { expect(bike.bike_organization_ids).to eq([organization.id]) }
+    context 'no organization_ids' do
+      it 'removes bike organizations' do
+        expect(bike.bike_organization_ids).to eq([organization.id])
+        bike.bike_organization_ids = ''
+        expect(bike.bike_organization_ids).to eq([])
+      end
+    end
+    context 'invalid organization_id' do
+      let(:organization_invalid) { FactoryGirl.create(:organization, is_suspended: true) }
+      it 'adds valid organization but not invalid one' do
+        bike.bike_organization_ids = [organization.id, organization_2.id, organization_invalid.id]
+        expect(bike.bike_organization_ids).to eq([organization.id, organization_2.id])
+      end
+    end
+    context 'different organization' do
+      it 'adds organization and removes existing' do
+        bike.bike_organization_ids = "#{organization_2.id}, "
+        expect(bike.bike_organization_ids).to eq([organization_2.id])
       end
     end
   end

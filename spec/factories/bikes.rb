@@ -50,7 +50,8 @@ FactoryGirl.define do
       factory :organization_bike do
         after(:create) do |bike, evaluator|
           # FactoryGirl.create(:bike_organization, bike: bike, organization: evaluator.organization)
-          FactoryGirl.create(:bike_organization, bike: bike, organization: bike.creation_organization)
+          create(:creation_state, creator: bike.creator, organization: bike.creation_organization, bike: bike)
+          bike.reload
         end
       end
     end

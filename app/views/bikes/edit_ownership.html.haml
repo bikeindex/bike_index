@@ -30,7 +30,7 @@
             window.organizations = #{Organization.valid.map { |organization| { name: organization.name, id: organization.id } }.to_json };
           .related-fields#additional_organization_fields
             .form-group.row.unnested-field
-              = f.hidden_field :bike_organization_ids, value: @bike.bike_organizations.pluck(:organization_id).join(',')
+              = f.hidden_field :bike_organization_ids, value: @bike.bike_organization_ids.join(',')
             :plain
               <script id="additional-organization-template" type="x-tmpl-mustache">
                 <div class='form-group row collapse'>
