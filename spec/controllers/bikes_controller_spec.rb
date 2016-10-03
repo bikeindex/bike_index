@@ -30,6 +30,7 @@ describe BikesController do
           expect(assigns(:interpreted_params)).to eq(stolenness: 'stolen')
           expect(assigns(:selected_query_items_options)).to eq([])
           expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id, stolen_bike_2.id])
+          expect(assigns(:page_id)).to eq 'bikes_index'
         end
       end
       context 'query_items and serial search' do

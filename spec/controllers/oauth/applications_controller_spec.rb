@@ -2,13 +2,22 @@ require 'spec_helper'
 
 describe Oauth::ApplicationsController do
   describe 'index' do
-    before do
-      user = FactoryGirl.create(:user)
-      set_current_user(user)
-      get :index
+    context 'current user present' do
+      it 'renders' do
+        user = FactoryGirl.create(:user)
+        set_current_user(user)
+        get :index
+        expect(response.status).to eq 200
+        expect(response).to render_template(:index)
+      end
     end
-    it { is_expected.to respond_with(:success) }
-    it { is_expected.to render_template(:index) }
+    context 'no current user present' do
+      it 'redirects' do
+        get :index
+        expect(response).to redirect_to new_session_url
+        expect(flash[:error]).to be_present
+      end
+    end
   end
 
   describe 'create' do
