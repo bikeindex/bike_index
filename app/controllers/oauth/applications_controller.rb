@@ -1,11 +1,7 @@
 module Oauth
   class ApplicationsController < Doorkeeper::ApplicationsController
-    include AuthenticationHelper
     include ControllerHelpers
-    helper_method :current_user, :current_organization, :user_root_url, :controller_namespace,
-                  :page_id, :remove_session, :revised_layout_enabled?, :forwarded_ip_address
     before_filter :authenticate_user
-    before_filter :set_current_user_instance
     before_filter :ensure_app_owner!, except: [:index, :new, :create]
 
     def index
@@ -27,9 +23,6 @@ module Oauth
     end
 
     private
-    def set_current_user_instance
-      @current_user = current_user
-    end
 
     def ensure_app_owner!
       return true if @current_user.superuser? || @current_user.id == @application.owner_id

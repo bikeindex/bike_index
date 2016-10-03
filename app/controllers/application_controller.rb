@@ -1,11 +1,6 @@
 class ApplicationController < ActionController::Base
-  include AuthenticationHelper
   include ControllerHelpers
   protect_from_forgery
-  before_filter :enable_rack_profiler
-
-  helper_method :current_user, :current_organization, :user_root_url, :controller_namespace,
-                :page_id, :remove_session, :revised_layout_enabled?, :forwarded_ip_address
 
   ensure_security_headers(csp: false,
     hsts: "max-age=#{20.years.to_i}",
@@ -14,12 +9,6 @@ class ApplicationController < ActionController::Base
     x_xss_protection: false,
     x_download_options: false,
     x_permitted_cross_domain_policies: false)
-
-  def enable_rack_profiler
-    if current_user && current_user.developer?
-      Rack::MiniProfiler.authorize_request unless Rails.env.test?
-    end
-  end
 
   def forwarded_ip_address
     request.env['HTTP_X_FORWARDED_FOR'].split(',')[0] if request.env['HTTP_X_FORWARDED_FOR']

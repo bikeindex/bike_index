@@ -1,6 +1,5 @@
+# This isn't a concern so it can be included in the controller_helpers concern
 module AuthenticationHelper
-  extend ActiveSupport::Concern
-
   def authenticate_user(msg = 'Sorry, you have to log in', flash_type: :error)
     if current_user.present?
       unless current_user.terms_of_service

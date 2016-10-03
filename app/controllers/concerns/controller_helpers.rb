@@ -1,7 +1,20 @@
-# This is a concern so its methods can be included in controllers
-# that don't inherit from ApplicationController
+# This is a concern so it can be included in controllers that don't inherit
+# from ApplicationController - e.g. Doorkeeper controllers
 module ControllerHelpers
   extend ActiveSupport::Concern
+  include AuthenticationHelper
+
+  included do
+    helper_method :current_user, :current_organization, :user_root_url, :controller_namespace,
+                :page_id, :remove_session, :revised_layout_enabled?, :forwarded_ip_address
+    before_filter :enable_rack_profiler
+  end
+
+  def enable_rack_profiler
+    if current_user && current_user.developer?
+      Rack::MiniProfiler.authorize_request unless Rails.env.test?
+    end
+  end
 
   def page_id
     @page_id ||= [controller_namespace, controller_name, action_name].compact.join('_')
