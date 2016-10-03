@@ -1,4 +1,4 @@
-module oauth
+module Oauth
   class AuthorizationsController < Doorkeeper::AuthorizationsController
     include ControllerHelpers
     before_filter :authenticate_user
