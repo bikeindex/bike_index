@@ -1,6 +1,5 @@
 .organized-page-header
   %h1
-    All 
     %em
       = current_organization.name
     bikes
@@ -34,7 +33,10 @@
           %td
             = bike.frame_colors.to_sentence
           %td
-            = bike.owner_email
+            = bike.first_owner_email
+            - unless bike.owner_email == bike.first_owner_email
+              %small.less-strong
+                sent to a new owner
           / %td
 - unless current_organization.is_paid
   .paginate-container.paginate-container-bottom

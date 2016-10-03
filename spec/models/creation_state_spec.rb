@@ -9,7 +9,7 @@ RSpec.describe CreationState, type: :model do
 
   describe 'origin' do
     context 'unknown origin' do
-      it 'ignores an unknown origin and does not save' do
+      it 'ignores an unknown origin' do
         creation_state = CreationState.new(origin: 'SOMEwhere', bike_id: 2)
         creation_state.ensure_permitted_origin
         expect(creation_state.origin).to be_nil

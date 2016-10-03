@@ -3,63 +3,69 @@
     .row
       = render partial: '/bikes/edit_primary_menu'
       .col-md-8.form-well
-        .form-wrap
+        .form-wrap#edit_bike_organizations
           .form-well-form-header
             %h3
-              #{@edit_templates[@edit_template]} #{@bike.type}
+              Groups / Organizations
+          .col-xs-12
+            %p
+              Are you part of a school? Want to bolster a local advocacy organization? Add the organization here.
 
+          - if @bike.bike_organizations.any?
+            .related-fields
+              - @bike.bike_organizations.each do |bike_organization|
+                .form-group.row
+                  %label.form-well-label
+                    - if bike_organization.organization == @bike.creation_organization
+                      Creation organization
+                  %p.form-well-input-static.bike_organization_static_input{ data: { orgid: bike_organization.organization_id } }
+                    = bike_organization.organization.name
+                  .right-input-help
+                    %a.optional-form-block.remove-organization{ href: '#' }
+                      %span.context-display-help
+                        &ndash;
+                      Remove
+
+          :javascript
+            window.organizations = #{Organization.valid.map { |organization| { name: organization.name, id: organization.id } }.to_json };
+          .related-fields#additional_organization_fields
+            .form-group.row.unnested-field
+              = f.hidden_field :bike_organization_ids, value: @bike.bike_organization_ids.join(',')
+            :plain
+              <script id="additional-organization-template" type="x-tmpl-mustache">
+                <div class='form-group row collapse'>
+                  <label class='form-well-label'></label>
+                  <div class='form-well-input fancy-select-placeholder unfancy'>
+                    <select class="form-control bike_organization_input">
+                      <option value="" disabled selected>Choose organization</option>
+                      {{ #organizations }}
+                        <option value="{{ id }}">{{ name }}</option>
+                      {{ /organizations }}
+                    </select>
+                  </div>
+                  <div class="right-input-help">
+                    <a class="optional-form-block remove-organization">
+                      <span class="context-display-help">&ndash;</span>
+                      Remove
+                    </a>
+                  </div>
+                </div>
+              </script>
+          .add-additional-fields-block.no-divider-row
+            %a.add_fields#add_additional_organization{ href: '#', role: 'button' }
+              %span.context-display-help
+                +
+              Add an organization
+
+        .form-wrap.secondary-form-wrap
+          .form-well-form-header
+            %h3
+              Ownership
+          .col-xs-12
+            %p
+              Sell, trade or give away this #{@bike.type}?
+              Enter the new owner's email to transfer the registration.
           .form-group.row.unnested-field.no-divider-row
             = f.label :owner_email, class: 'form-well-label'
             .form-well-input
               = f.email_field :owner_email, required: true, class: 'form-control'
-
-          %hr
-          
-          .related-fields.hide-this-bike.no-divider-row
-            .form-group.row
-              - hide_toggle = @bike.user_hidden ? 'Un-hide' : 'Hide'
-              .hide-this-bike-link
-                %a.collapsed{ href: '#hide_bike_toggle_group', data: { toggle: 'collapse' } }
-                  #{hide_toggle} this #{@bike.type}
-              .collapse#hide_bike_toggle_group
-                - if @bike.user_hidden
-                  = f.hidden_field :marked_user_unhidden
-                - else
-                  = f.hidden_field :marked_user_hidden
-                .hide-explanation
-                  %p
-                    %strong
-                      Keeping your bike public is the best way to help recover stolen bikes and deter theft.
-                  %p
-                    You can read more about why this is important to us in our #{link_to "FAQs", support_path(anchor: 'public-serials')}.
-                  %p
-                    We strongly recommend keeping your #{@bike.type} visible, but you can hide this #{@bike.type} if you prefer. Even though we don't think it's a good idea.
-                  - btn_type = @bike.user_hidden ? 'btn-success' : 'btn-danger'
-                  %a.btn.btn-lg#hide_bike_toggle{role: 'button', class: btn_type }
-                    #{hide_toggle} #{@bike.type}
-
-          %hr
-
-          .delete-from-index.no-divider-row
-            %a{data: { toggle: 'modal', target: '#request-delete' } }
-              = render '/shared/trash_icon'
-              Delete this #{@bike.type} from the Bike Index
-
-
-- modal_body = capture_haml do
-  = form_tag do |t|
-    .modal-body
-      = render partial: '/shared/alert', locals: { body: "Please fill in the reason for the #{@bike.type} deletion", title: 'We want to know why!', class_names: 'currently-hidden' }
-      = hidden_field_tag :bike_delete_bike_id, @bike.id
-      .form-group
-        %label{ for: :bike_delete_reason }
-          Reason for deletion
-        = text_area_tag :bike_delete_reason, '', class: 'form-control'
-    .modal-btn-footer
-      .row
-        .col-xs-6.col-xs-push-6
-          = submit_tag 'Delete bike', class: 'btn btn-danger'
-        .col-xs-6.col-xs-pull-6
-          %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
-            Nevermind
-= render partial: '/shared/modal', locals: { title: "Are you sure you want to delete this #{@bike.type}?", id: 'request-delete', modal_body: modal_body }

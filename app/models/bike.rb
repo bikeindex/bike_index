@@ -97,7 +97,7 @@ class Bike < ActiveRecord::Base
         date_stolen_input receive_notifications phone creator creator_id image
         components_attributes b_param_id embeded embeded_extended example hidden
         card_id stock_photo_url pdf send_email other_listing_urls listing_order approved_stolen
-        marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale
+        marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids
         ).map(&:to_sym) + [stolen_records_attributes: StolenRecord.old_attr_accessible,
             components_attributes: Component.old_attr_accessible]).freeze
     end
@@ -188,12 +188,25 @@ class Bike < ActiveRecord::Base
     end
   end
 
-  def validate_organization_id(organization_id)
+  def bike_organization_ids
+    bike_organizations.pluck(:organization_id)
+  end
+
+  def bike_organization_ids=(val)
+    org_ids = (val.is_a?(Array) ? val : val.split(',').map(&:strip))
+              .map { |id| validated_organization_id(id) }.compact
+    org_ids.each { |id| bike_organizations.where(organization_id: id).first_or_create }
+    bike_organizations.each { |bo| bo.destroy unless org_ids.include?(bo.organization_id) }
+    true
+  end
+
+  def validated_organization_id(organization_id)
+    return nil unless organization_id.present?
     organization = Organization.friendly_find(organization_id)
-    return true if organization && !organization.suspended?
+    return organization.id if organization && !organization.suspended?
     msg = organization ? "suspended and can't be used" : 'not found'
     errors.add(:organization, "#{organization_id} is #{msg}")
-    false
+    nil
   end
 
   before_save :set_mnfg_name

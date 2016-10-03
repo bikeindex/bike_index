@@ -14,14 +14,14 @@
               = f.label :serial_number, class: 'form-well-label'
               %p.form-well-input-static
                 = @bike.serial_number
-              .static-right-input-help
+              .right-input-help.right-text-help
                 %a{ data: { toggle: 'modal', target: '#serial-correction' } }
                   Submit serial correction
             .form-group.row
               = f.label :manufacturer, class: 'form-well-label'
               %p.form-well-input-static
                 = @bike.mnfg_name
-              .static-right-input-help
+              .right-input-help.right-text-help
                 %a{ data: { toggle: 'modal', target: '#manufacturer-correction' } }
                   Submit Manufacturer Correction
 
@@ -72,10 +72,10 @@
                 = f.hidden_field :frame_size
                 = f.number_field :frame_size_number, class: 'form-control'
 
-          .form-group.row.unnested-field
-            = f.label :paint_name, 'Paint description', class: 'form-well-label'
-            .form-well-input
-              = f.text_field :paint_name, class: 'form-control'
+          / .form-group.row.unnested-field
+          /   = f.label :paint_name, 'Paint description', class: 'form-well-label'
+          /   .form-well-input
+          /     = f.text_field :paint_name, class: 'form-control'
 
           .form-group.row.unnested-field
             = f.label :name, 'Bike Name', class: 'form-well-label'

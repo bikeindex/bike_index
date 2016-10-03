@@ -172,7 +172,8 @@ class BikesController < ApplicationController
       photos: 'Photos',
       drivetrain: 'Wheels + Drivetrain',
       accessories: 'Accessories + Components',
-      ownership: 'Change Owner or Delete',
+      ownership: 'Groups + Ownership',
+      remove: 'Hide or Delete',
       stolen: (@bike.stolen ? "#{stolen_type} details" : 'Report Stolen or Missing')
     }
     # To make stolen the first key if bike is stolen. using as_json for string keys instead of sym

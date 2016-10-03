@@ -617,14 +617,28 @@ describe BikesController do
   describe 'edit' do
     let(:ownership) { FactoryGirl.create(:ownership) }
     let(:bike) { ownership.bike }
-    context 'when there is no user' do
+    let(:edit_templates) do
+      {
+        root: 'Bike Details',
+        photos: 'Photos',
+        drivetrain: 'Wheels + Drivetrain',
+        accessories: 'Accessories + Components',
+        ownership: 'Groups + Ownership',
+        remove: 'Hide or Delete'
+      }
+    end
+    let(:non_stolen_edit_templates) { edit_templates.merge(stolen: 'Report Stolen or Missing') }
+    let(:stolen_edit_templates) { { stolen: 'Theft details' }.merge(edit_templates) }
+    let(:recovery_edit_templates) { { stolen: 'Recovery details' }.merge(edit_templates) }
+
+    context 'no user' do
       it 'redirects and sets the flash' do
         get :edit, id: bike.id
         expect(response).to redirect_to bike_path(bike)
         expect(flash[:error]).to be_present
       end
     end
-    context "when a user is present but isn't allowed to edit the bike" do
+    context "user present but isn't allowed to edit the bike" do
       it 'redirects and sets the flash' do
         user = FactoryGirl.create(:user)
         set_current_user(user)
@@ -633,9 +647,8 @@ describe BikesController do
         expect(flash[:error]).to be_present
       end
     end
-
-    context "when the right user is present but hasn't claimed the bike" do
-      it 'redirects and sets the flash' do
+    context "user present but hasn't claimed the bike" do
+      it 'redirects to claim' do
         user = FactoryGirl.create(:user)
         ownership.update_attribute :user_id, user.id
         set_current_user(user)
@@ -653,32 +666,16 @@ describe BikesController do
         context 'root' do
           context 'non-stolen bike' do
             it 'renders the bike_details template' do
-              edit_templates = {
-                root: 'Bike Details',
-                photos: 'Photos',
-                drivetrain: 'Wheels + Drivetrain',
-                accessories: 'Accessories + Components',
-                ownership: 'Change Owner or Delete',
-                stolen: 'Report Stolen or Missing'
-              }.as_json
               get :edit, id: bike.id
               expect(response).to render_with_layout 'application_revised'
               expect(response).to be_success
               expect(assigns(:edit_template)).to eq 'root'
-              expect(assigns(:edit_templates)).to eq edit_templates
+              expect(assigns(:edit_templates)).to eq non_stolen_edit_templates.as_json
               expect(response).to render_template 'edit_root'
             end
           end
           context 'stolen bike' do
             it 'renders with stolen as first template, different description' do
-              edit_templates = {
-                stolen: 'Theft details',
-                root: 'Bike Details',
-                photos: 'Photos',
-                drivetrain: 'Wheels + Drivetrain',
-                accessories: 'Accessories + Components',
-                ownership: 'Change Owner or Delete'
-              }.as_json
               bike.update_attribute :stolen, true
               bike.reload
               expect(bike.stolen).to be_truthy
@@ -686,20 +683,12 @@ describe BikesController do
               expect(response).to render_with_layout 'application_revised'
               expect(response).to be_success
               expect(assigns(:edit_template)).to eq 'stolen'
-              expect(assigns(:edit_templates)).to eq edit_templates
+              expect(assigns(:edit_templates)).to eq stolen_edit_templates.as_json
               expect(response).to render_template 'edit_stolen'
             end
           end
           context 'recovered bike' do
             it 'renders with recovered as first template, different description' do
-              edit_templates = {
-                stolen: 'Recovery details',
-                root: 'Bike Details',
-                photos: 'Photos',
-                drivetrain: 'Wheels + Drivetrain',
-                accessories: 'Accessories + Components',
-                ownership: 'Change Owner or Delete'
-              }.as_json
               bike.update_attributes(stolen: true, recovered: true)
               bike.reload
               expect(bike.recovered).to be_truthy
@@ -707,12 +696,16 @@ describe BikesController do
               expect(response).to render_with_layout 'application_revised'
               expect(response).to be_success
               expect(assigns(:edit_template)).to eq 'stolen'
-              expect(assigns(:edit_templates)).to eq edit_templates
+              expect(assigns(:edit_templates)).to eq recovery_edit_templates.as_json
               expect(response).to render_template 'edit_stolen'
             end
           end
         end
-        %w(root photos drivetrain accessories ownership stolen).each do |template|
+        # Grab all the template keys from the controller so we can test that we render all of them
+        # Both to ensure we get all of them and because we can't use the let block
+        bc = BikesController.new
+        bc.instance_variable_set(:@bike, Bike.new)
+        bc.edit_templates_hash.keys.map(&:to_s).each do |template|
           context template do
             it 'renders the template' do
               get :edit, id: bike.id, page: template
@@ -749,11 +742,17 @@ describe BikesController do
       end
       context 'legacy' do
         it 'allows you to edit an example bike' do
-          ownership.bike.update_attributes(example: true)
+          # Also test that we don't don't blank bike_organizations
+          # if bike_organization_ids aren't passed
+          organization = FactoryGirl.create(:organization)
+          ownership.bike.update_attributes(example: true, bike_organization_ids: [organization.id])
+          bike.reload
+          expect(bike.bike_organization_ids).to eq([organization.id])
           put :update, id: bike.id, bike: { description: '69' }
           expect(response).to redirect_to edit_bike_url(bike)
           bike.reload
           expect(bike.description).to eq('69')
+          expect(bike.bike_organization_ids).to eq([organization.id])
         end
 
         it 'updates the bike and components' do
@@ -835,21 +834,11 @@ describe BikesController do
         # Also, that we can apply stolen changes to hidden bikes
         # And finally, that it redirects to the correct page
         context 'stolen update' do
-          it 'updates and returns to the right page' do
-            state = FactoryGirl.create(:state)
-            country = state.country
-            stolen_record = FactoryGirl.create(:stolen_record, bike: bike, city: 'party')
-            bike.stolen = true
-            # bike.marked_user_hidden = true
-            bike.save
-            expect(stolen_record.date_stolen).to be_present
-            expect(stolen_record.proof_of_ownership).to be_falsey
-            expect(stolen_record.receive_notifications).to be_truthy
-            bike.reload
-            # bike.update_attributes(stolen: true, current_stolen_record_id: stolen_record.id)
-            bike.reload
-            expect(bike.find_current_stolen_record).to eq stolen_record
-            stolen_attrs = {
+          let(:state) { FactoryGirl.create(:state) }
+          let(:country) { state.country }
+          let(:stolen_record) { FactoryGirl.create(:stolen_record, bike: bike, city: 'party') }
+          let(:stolen_attrs) do
+            {
               date_stolen_input: 'Mon Feb 8 2016',
               phone: '9999999999',
               street: '66666666 foo street',
@@ -866,12 +855,28 @@ describe BikesController do
               proof_of_ownership: 1,
               receive_notifications: 0
             }
-            bike_attrs = {
+          end
+          let(:bike_attrs) do
+            {
               stolen: true,
               stolen_records_attributes: {
                 '0' => stolen_attrs
               }
             }
+          end
+          let(:skipped_attrs) { %w(proof_of_ownership receive_notifications date_stolen_input).map(&:to_sym) }
+          it 'updates and returns to the right page' do
+            bike.update_attribute :stolen, true
+            bike.reload
+            expect(bike.stolen).to be_truthy
+            # bike.save
+            expect(stolen_record.date_stolen).to be_present
+            expect(stolen_record.proof_of_ownership).to be_falsey
+            expect(stolen_record.receive_notifications).to be_truthy
+            # bike.reload
+            # bike.update_attributes(stolen: true, current_stolen_record_id: stolen_record.id)
+            bike.reload
+            expect(bike.find_current_stolen_record).to eq stolen_record
             put :update, id: bike.id, bike: bike_attrs, edit_template: 'fancy_template'
             expect(flash[:error]).to_not be_present
             expect(response).to redirect_to edit_bike_url(page: 'fancy_template')
@@ -887,7 +892,6 @@ describe BikesController do
             expect(current_stolen_record.date_stolen).to be_within(1.second).of DateTime.strptime('02-08-2016 06', '%m-%d-%Y %H')
             expect(current_stolen_record.proof_of_ownership).to be_truthy
             expect(current_stolen_record.receive_notifications).to be_falsey
-            skipped_attrs = %w(proof_of_ownership receive_notifications date_stolen_input).map(&:to_sym)
             stolen_attrs.except(*skipped_attrs).each do |key, value|
               pp key unless current_stolen_record.send(key) == value
               expect(current_stolen_record.send(key)).to eq value
@@ -900,21 +904,51 @@ describe BikesController do
       end
     end
     context 'owner present (who is allowed to edit)' do
+      let(:color) { FactoryGirl.create(:color) }
       let(:user) { FactoryGirl.create(:confirmed_user) }
-      let(:ownership) { FactoryGirl.create(:ownership, owner_email: user.email) }
+      let(:ownership) { FactoryGirl.create(:organization_ownership, owner_email: user.email) }
       let(:bike) { ownership.bike }
+      let(:organization) { bike.organizations.first }
+      let(:organization_2) { FactoryGirl.create(:organization) }
+      let(:allowed_attributes) do
+        {
+          description: '69 description',
+          marked_user_hidden: '0',
+          primary_frame_color_id: color.id,
+          secondary_frame_color_id: color.id,
+          tertiary_frame_color_id: Color.black.id,
+          handlebar_type_id: HandlebarType.flat.id,
+          coaster_brake: true,
+          belt_drive: true,
+          front_gear_type_id: FactoryGirl.create(:front_gear_type).id,
+          rear_gear_type_id: FactoryGirl.create(:rear_gear_type).id,
+          owner_email: 'new_email@stuff.com',
+          year: 1993,
+          frame_model: 'A sweet model named things',
+          frame_material_id: FrameMaterial.steel.id,
+          frame_size: '56cm',
+          name: 'a sweet name for a bike',
+          additional_registration: 'some weird other number',
+          bike_organization_ids: "#{organization_2.id}, #{organization.id}"
+        }
+      end
+      let(:skipped_attrs) { %w(marked_user_hidden bike_organization_ids).map(&:to_sym) }
       before do
         ownership.mark_claimed
         set_current_user(user)
         expect(ownership.owner).to eq user
       end
-      it 'updates the bike' do
-        put :update, id: bike.id, bike: { description: '69', marked_user_hidden: '0' }
-        bike.reload
-        expect(bike.description).to eq('69')
+      it 'updates the bike with the allowed_attributes' do
+        put :update, id: bike.id, bike: allowed_attributes
         expect(response).to redirect_to edit_bike_url(bike)
         expect(assigns(:bike)).to be_decorated
+        bike.reload
         expect(bike.hidden).to be_falsey
+        allowed_attributes.except(*skipped_attrs).each do |key, value|
+          pp value, key unless bike.send(key) == value
+          expect(bike.send(key)).to eq value
+        end
+        expect(bike.bike_organization_ids).to eq([organization.id, organization_2.id])
       end
     end
   end

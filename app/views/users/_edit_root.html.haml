@@ -44,8 +44,8 @@
                 - labeled = true
             %p.form-well-input-static
               = user_email.email
-            .static-right-input-help
-              = link_to 'Make primary email',make_primary_user_email_path(user_email.id), method: :post
+            .right-input-help.right-text-help
+              = link_to 'Make primary email', make_primary_user_email_path(user_email.id), method: :post
     - if @user.user_emails.unconfirmed.count > 0
       .related-fields
         - labeled = false
@@ -57,8 +57,8 @@
                 - labeled = true
             %p.form-well-input-static
               = user_email.email
-            .static-right-input-help
-              = link_to 'Resend confirmation email',resend_confirmation_user_email_path(user_email.id), method: :post
+            .right-input-help.right-text-help
+              = link_to 'Resend confirmation email', resend_confirmation_user_email_path(user_email.id), method: :post
               = link_to 'Remove email', user_email_path(user_email.id), method: :delete, class: 'optional-form-block delete-email'
 
   .related-fields#additional_email_fields

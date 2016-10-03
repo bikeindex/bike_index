@@ -4,11 +4,14 @@
     @include make-col();
     @extend .form-control-static;
     font-weight: $strong-font-weight;
+    line-height: 1.5; // to match the height of inputs
+    padding-left: 1.6875rem; // static padding: 0.9375 + input padding: 0.75
+    padding-right: 1.6875rem;
   }
   .form-well-input-static-full-width { @extend .form-well-input-static; }
-  .static-right-input-help {
-    @include make-col();
+  .right-input-help.right-text-help {
     font-style: italic;
+    line-height: 1.2;
     a {
       color: $body-font-color;
       cursor: pointer;
@@ -112,8 +115,8 @@
 // Small screens and larger
 @media (min-width: $grid-breakpoint-sm) {
   .form-well {
-    .form-well-input { @include make-col-span(6); }
-    .form-well-input-large { @include make-col-span(8); }
+    .form-well-input, .form-well-input-static { @include make-col-span(6); }
+    .form-well-input-large, .form-well-input-static-full-width { @include make-col-span(8); }
     .form-well-label { @include make-col-span(3); }
     .right-input-help { @include make-col-span(3); }
   }
@@ -125,22 +128,16 @@
     background: $form-well-background;
     .form-well { width: 100%; }
   }
-  .form-well { // This is the selector we put everything under, don't overpower
-    // label is 4 columns
-    .form-well-input-static { @include make-col-span(8); }
-    .form-well-input-static-full-width { @include make-col-span(8); }
-    .static-right-input-help {
-      @include make-col-span(12);
-      margin-top: -.75em;
-      padding-bottom: .5em; 
-    }
-  }
+  // This is the selector we put everything under, don't overpower by including in
+  // .form-well-container.container above - that's for a special case
+  // .form-well { }
 }
 
 @media (min-width: $grid-breakpoint-md) and (max-width: $grid-breakpoint-lg - 1px) {
   .form-well {
     background: $form-well-background;
     border: 1px solid $form-well-border-color;
+    // label is 3 columns.
   }
 }
 
@@ -164,15 +161,6 @@
     margin-left: 0;
     margin-right: 0;
   }
-  .form-well {
-    // label is 3 columns
-    .form-well-input-static { @include make-col-span(3); }
-    .form-well-input-static-full-width { @include make-col-span(9); }
-    .static-right-input-help { 
-      @include make-col-span(6);
-      padding-top: .3em;
-    }
-  }
 }
 
 //
@@ -193,16 +181,21 @@
 // Large screen styles
 @media (min-width: $grid-breakpoint-lg) {
   .form-well { border: none; background: none; }
-  .form-well .form-wrap {
-    background: $form-well-background;
-    border: 1px solid $form-well-border-color;
-    padding-top: 4*$vertical-height;
-    width: 100%;
-    position: relative;
-    .form-control-label { text-align: right; }
-    // Add some space between the forms
-    &.secondary-form-wrap {
-      margin-top: 3*$vertical-height;
+  .form-well {
+    .form-wrap {
+      background: $form-well-background;
+      border: 1px solid $form-well-border-color;
+      padding-top: 4*$vertical-height;
+      width: 100%;
+      position: relative;
+      .form-control-label { text-align: right; }
+      // Add some space between the forms
+      &.secondary-form-wrap {
+        margin-top: 3*$vertical-height;
+      }
     }
+    // label is 3 columns
+    .form-well-input-static { @include make-col-span(6); }
+    .form-well-input-static-full-width { @include make-col-span(9); }
   }
 }
