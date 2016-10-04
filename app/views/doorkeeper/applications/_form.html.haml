@@ -22,6 +22,6 @@
       %p
         Include <code>#{authorize_documentation_index_url}</code> if you would like to be able to add new tokens #{link_to "from the documentation", api_v2_documentation_index_url, tabindex: -1}.
   .form-group
-    .col-sm-offset-2.col-sm-10
+    .offset-sm-2.col-sm-10
       = f.submit 'Submit', class: "btn binxbtn-primary"
       = link_to "Cancel", oauth_applications_path, :class => "btn binxbtn-default"

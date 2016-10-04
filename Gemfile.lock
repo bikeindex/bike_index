@@ -59,7 +59,7 @@ GEM
     api-pagination (4.3.0)
     arel (6.0.3)
     ast (2.3.0)
-    autoprefixer-rails (6.3.6.2)
+    autoprefixer-rails (6.5.0.2)
       execjs
     aws-sdk (1.66.0)
       aws-sdk-v1 (= 1.66.0)
@@ -76,7 +76,7 @@ GEM
       jquery-rails
       rails (>= 3.1)
     bcrypt (3.1.11)
-    bootstrap (4.0.0.alpha3)
+    bootstrap (4.0.0.alpha4)
       autoprefixer-rails (>= 6.0.3)
       sass (>= 3.4.19)
     builder (3.2.2)

@@ -42,7 +42,8 @@ $active-bike-edit-border-width: 2px;
     float: left;
     width: 50%;
     select {
-      @extend .c-select; width: 100%;
+      // @extend .c-select; // This style no longer exists...?
+      width: 100%;
       font-family: $header-font-family;
       font-weight: $strong-font-weight;
       text-transform: uppercase;

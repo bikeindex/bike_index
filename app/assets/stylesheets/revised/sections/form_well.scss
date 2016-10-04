@@ -1,7 +1,7 @@
 .form-well {
   .form-wrap { padding: 2*$vertical-height 0 4*$vertical-height; }
   .form-well-input-static {
-    @include make-col();
+    @include make-col-ready();
     @extend .form-control-static;
     font-weight: $strong-font-weight;
     line-height: 1.5; // to match the height of inputs
@@ -45,7 +45,7 @@
     padding-top: 0.65rem;
   }
   .form-well-label, .form-well-input, .form-well-input-large, .right-input-help {
-    @include make-col(); 
+    @include make-col-ready(); 
   }
   .related-fields {
     .form-group {
@@ -88,13 +88,13 @@
 // XS screens
 @media (max-width: $grid-breakpoint-sm - 1px) {
   .form-well {
-    .form-well-input { @include make-col-span(8); }
-    .form-well-label { @include make-col-span(4); }
-    .form-well-input-large, .form-well-label-large-input { @include make-col-span(12); }
+    .form-well-input { @include make-col(8); }
+    .form-well-label { @include make-col(4); }
+    .form-well-input-large, .form-well-label-large-input { @include make-col(12); }
     .form-well-label-large-input { padding-top: 0; }
     .right-input-help {
       @include make-col-offset(4);
-      @include make-col-span(8);
+      @include make-col(8);
       margin-top: -.5em;
       label { padding-top: .5em; } // To pad checkboxes a bit
     }
@@ -115,10 +115,10 @@
 // Small screens and larger
 @media (min-width: $grid-breakpoint-sm) {
   .form-well {
-    .form-well-input, .form-well-input-static { @include make-col-span(6); }
-    .form-well-input-large, .form-well-input-static-full-width { @include make-col-span(8); }
-    .form-well-label { @include make-col-span(3); }
-    .right-input-help { @include make-col-span(3); }
+    .form-well-input, .form-well-input-static { @include make-col(6); }
+    .form-well-input-large, .form-well-input-static-full-width { @include make-col(8); }
+    .form-well-label { @include make-col(3); }
+    .right-input-help { @include make-col(3); }
   }
 }
 
@@ -195,7 +195,8 @@
       }
     }
     // label is 3 columns
-    .form-well-input-static { @include make-col-span(6); }
-    .form-well-input-static-full-width { @include make-col-span(9); }
+
+    .form-well-input-static { @include make-col(6); }
+    .form-well-input-static-full-width { @include make-col(9); }
   }
 }

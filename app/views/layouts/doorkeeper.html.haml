@@ -2,40 +2,26 @@
 %html.doorkeeper
   %head
     = header_tags
-    <link rel="shortcut icon" href="/fav.ico" />
-    = stylesheet_link_tag "updated_styles", media: "all"
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400,300,600' rel='stylesheet' type='text/css'>
-    = javascript_include_tag "application"
-    <!-- Pulled from https://code.google.com/p/html5shiv/ -->
-    <!--[if lt IE 9]>
-    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <!--[if lte IE 8]>
-    <script type="text/javascript">$(function() {$('body').prepend("<body class='welcome-page' id='body'><div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, the Bike Index (and the internet in general) is broken and ugly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>");});</script>
-    <![endif]-->
-    
-  %body
-    = render 'layouts/messages'
-    .bodywrap
-      %header.global-header
-        .container.bikes-nav
-          .small-header
-            %a.top-logo{ href: root_url }
-              %span.stripey
-              = image_tag "updated/home/logo.svg", class: 'logo', alt: "Logo with dark background"
-            %a#expand_user.hamburglar{ href: '#' }
-              = image_tag "updated/hamburglar.svg"
-          - if @current_user.present?
-            = render 'shared/top_user_nav'
+    = stylesheet_link_tag 'revised', media: 'all'
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+    = javascript_include_tag 'application'
+    <!--[if IE]>$('body').prepend("<div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>")<![endif]-->
 
-      .bcontainer.doorkeeper-container
-        - if @current_user && @current_user.superuser && @application.present? && @application.owner.present?
-          Application by
-          %strong
-            = @application.owner.display_name
-        - if controller_name.match('application') && action_name != 'index'
-          = link_to "Your applications", oauth_applications_url, class: 'pull-right'
-        = yield
-      
-      
-      
+  %body{ id: page_id, class: ('organized-body' if current_page_skeleton == 'organized_skeleton') }
+    %nav.primary-header-nav
+      .container
+        %a.primary-logo{ href: user_root_url }
+          = image_tag 'revised/logo.svg', class: 'primary-nav', alt: 'Bike Index home'
+    = render 'layouts/revised_messages'
+    .doorkeeper-container
+      - if @current_user && @current_user.superuser && @application.present? && @application.owner.present?
+        Application by
+        %strong
+          = @application.owner.display_name
+      - if controller_name.match('application') && action_name != 'index'
+        = link_to 'Your applications', oauth_applications_url, class: 'pull-right'
+
+      = yield
+
+    = render 'shared/footer_revised'

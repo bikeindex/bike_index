@@ -1,30 +1,75 @@
-%header.page-header{:role => "banner"}
-  %h1 Authorize required
-%main.authorize-application-section{:role => "main"}
-  %p.h4
-    Hey #{@current_user.name || @current_user.email},
-    %br
-    Would you like to authorize
-    %strong.text-info= @pre_auth.client.name
-    to use your account?
-  - if @pre_auth.scopes
-    #oauth-permissions
-      %p This application will be able to:
-      %ul.text-info
-        - @pre_auth.scopes.each do |scope|
-          %li= t scope, scope: [:doorkeeper, :scopes]
-  .actions.margined
-    = form_tag oauth_authorization_path, method: :post do
-      = hidden_field_tag :client_id, @pre_auth.client.uid
-      = hidden_field_tag :redirect_uri, @pre_auth.redirect_uri
-      = hidden_field_tag :state, @pre_auth.state
-      = hidden_field_tag :response_type, @pre_auth.response_type
-      = hidden_field_tag :scope, @pre_auth.scope
-      = submit_tag "Authorize", class: "btn binxbtn binxbtn-lg btn-block"
-    = form_tag oauth_authorization_path, method: :delete do
-      = hidden_field_tag :client_id, @pre_auth.client.uid
-      = hidden_field_tag :redirect_uri, @pre_auth.redirect_uri
-      = hidden_field_tag :state, @pre_auth.state
-      = hidden_field_tag :response_type, @pre_auth.response_type
-      = hidden_field_tag :scope, @pre_auth.scope
-      = submit_tag "Deny", class: "btn binxbtn-danger binxbtn-lg btn-block"
+.row
+  .col-md-8.offset-md-2
+    %header.page-header{ role: 'banner' }
+      %h1 Authorization required
+    .card.authorize-application-section{ role: 'main' }
+      .card-block
+        %h3.card-title
+          Hello #{@current_user.display_name},
+        %p
+          Would you like to authorize
+          %strong.text-info
+            = @pre_auth.client.name
+          to use your account?
+        %p
+          This application will be able to:
+          %ul
+            - if @pre_auth.scopes.any?
+              - @pre_auth.scopes.each do |scope|
+                %li
+                  = t scope, scope: [:doorkeeper, :scopes]
+
+            - else
+              %li
+                View public information about you
+
+        .row
+          .col-xs-6
+            = form_tag oauth_authorization_path, method: :post do
+              = hidden_field_tag :client_id, @pre_auth.client.uid
+              = hidden_field_tag :redirect_uri, @pre_auth.redirect_uri
+              = hidden_field_tag :state, @pre_auth.state
+              = hidden_field_tag :response_type, @pre_auth.response_type
+              = hidden_field_tag :scope, @pre_auth.scope
+              = submit_tag 'Authorize', class: 'btn btn-primary btn-lg'
+          .col-xs-6
+            = form_tag oauth_authorization_path, method: :delete do
+              = hidden_field_tag :client_id, @pre_auth.client.uid
+              = hidden_field_tag :redirect_uri, @pre_auth.redirect_uri
+              = hidden_field_tag :state, @pre_auth.state
+              = hidden_field_tag :response_type, @pre_auth.response_type
+              = hidden_field_tag :scope, @pre_auth.scope
+              = submit_tag 'Deny', class: 'btn btn-secondary btn-lg'
+  
+- unless params[:redirect_uri][/\Ahttps:/]
+  - modal_body = capture_haml do
+    .modal-body
+      %p
+        This application isn't connecting to the Bike Index in a secure way - it will share your authorization information with anyone who is watching.
+      %p
+        It's
+        %strong
+          Strongly
+        recommended that you cancel this authorization.
+    .modal-btn-footer
+      .row
+        .col-xs-8.offset-sm-2
+          %button.btn.btn-primary{ type: 'button' }
+            Cancel authorization
+      .insecure-continuing-explanation
+        %hr    
+        %p.less-strong
+          %small
+            If you're aware of the risks and still want to authorize this application you can close this modal.
+            %br
+            This 
+            %em
+              only makes sense
+            if you're testing an application or something similar.
+
+  / Heads up: The title for this modal is css styled by its id
+  = render partial: '/shared/modal', locals: { title: 'Insecure Authorization!', id: 'insecure-authorization-modal', modal_body: modal_body }
+
+  / Show the modal!
+  :javascript
+    $(document).ready(function() {$('#insecure-authorization-modal').modal('show') });

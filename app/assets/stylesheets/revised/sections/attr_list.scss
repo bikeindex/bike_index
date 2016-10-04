@@ -25,8 +25,8 @@
     .attr-list.split-#{$size} {
       @include make-row();
       li {
-        @include make-col();
-        @include make-col-span(6);
+        @include make-col-ready();
+        @include make-col(6);
       }
     }
   }

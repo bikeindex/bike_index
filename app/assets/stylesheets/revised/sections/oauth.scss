@@ -1,0 +1,19 @@
+.doorkeeper-container {
+  @extend .container;
+  .binxbtn { @extend .btn-primary; }
+  .binxbtn-danger { @extend .btn-default; }
+  .bnxbtn-lg { @extend .btn-lg; }
+
+  // Application authorization pages
+  .authorize-application-section {
+    &.card { border-color: $gray-light; }
+    .btn {
+      display: block;
+      width: 100%;
+    }
+  }
+  #insecure-authorization-modal {
+    .modal-title { @extend .text-danger; }
+    .insecure-continuing-explanation hr { margin-top: 5*$vertical-height; }
+  }
+}
