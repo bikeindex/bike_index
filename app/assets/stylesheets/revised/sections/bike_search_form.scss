@@ -58,8 +58,8 @@
   }
   // Location fields
   .stolen-search-fields {
-    @include make-col();
-    @include make-col-span(12);
+    @include make-col-ready();
+    @include make-col(12);
     padding-top: .5em;
     input, span {
       display: block;

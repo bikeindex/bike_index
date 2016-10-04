@@ -103,8 +103,8 @@
       .component-group {
         display: block;
         // width: 100%;
-        @include make-col();
-        @include make-col-span(12);
+        @include make-col-ready();
+        @include make-col(12);
         padding-top: $vertical-height;
         h3 { margin: 24px 0 12px; }
       }

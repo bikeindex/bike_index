@@ -19,7 +19,7 @@ $sign-in-up-form-bg: $gray-lighter;
     }
   }
   .sign-in-up-or, .oauth-providers {
-    @include make-col();
+    @include make-col-ready();
     margin-top: auto;
     margin-bottom: auto;
   }
@@ -70,7 +70,7 @@ $sign-in-up-form-bg: $gray-lighter;
     }
   }
   .main-form {
-    @include make-col();
+    @include make-col-ready();
     .checkbox input[type="checkbox"] { margin-top: .65rem; }
     a, h3.sign-in-up-main-form-header a {
       color: $body-font-color;
@@ -101,7 +101,7 @@ $sign-in-up-form-bg: $gray-lighter;
       padding: 2*$vertical-height 0.9375rem;
     }
     .oauth-providers, .main-form { 
-      @include make-col-span(12);
+      @include make-col(12);
     }
   }
 }
@@ -114,10 +114,10 @@ $sign-in-up-form-bg: $gray-lighter;
       display: block;
       width: 0; // Or else it overflows and breaks everything
       @include make-col-push(1);
-      @include make-col-span(1);
+      @include make-col(1);
     }
     .oauth-providers {
-      @include make-col-span(5);
+      @include make-col(5);
       @include make-col-push(7);
     }
     .sign-in-up-main-form-header { padding: 0; }
@@ -144,7 +144,7 @@ $sign-in-up-form-bg: $gray-lighter;
 @media (min-width: $grid-breakpoint-md) and (max-width: $grid-breakpoint-xl - 1px) {
   .sign-in-up {
     .main-form {
-      @include make-col-span(6);
+      @include make-col(6);
       @include make-col-pull(6);
     }
   }
@@ -154,10 +154,10 @@ $sign-in-up-form-bg: $gray-lighter;
 // XL screen styles
 @media (min-width: $grid-breakpoint-xl) {
   .sign-in-up {
-    .oauth-providers { @include make-col-span(4); }
+    .oauth-providers { @include make-col(4); }
     .sign-in-up-or { @include make-col-push(2); }
     .main-form {
-      @include make-col-span(5);
+      @include make-col(5);
       @include make-col-pull(4);
     }
   }

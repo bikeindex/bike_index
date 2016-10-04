@@ -11,7 +11,6 @@
       }
     }
     .ordinal-sizes .btn { max-width: 20%; } // Ensure buttons never overflow onto a second line
-    .right-input-help { float: right; }
     .frame-size-units {
       min-width: 6.5em;
       position: absolute;
@@ -24,23 +23,21 @@
 @media (max-width: $grid-breakpoint-sm - 1px) {
   .edit-bike-page-root {
     .frame-sizes {
-      .right-input-help {
-        // @include make-col-span(3);
-        // @include make-col-offset(0);
-        flex: 0 0 66.6667%;
-      }
+      .right-input-help { flex: 0 0 66.6667%; }
       .frame-size-units {
         top: 15px;
         right: 0.9375rem;
       }
       &.unexpanded-unit-size { padding-bottom: 6*$vertical-height; }
     }
-    .frame-size-other .form-well-input { @include make-col-span(5); }
+    .frame-size-other .form-well-input { @include make-col(5); }
   }
 }
 
 @media (min-width: $grid-breakpoint-sm) {
   .edit-bike-page-root {
-    .frame-sizes .frame-size-units.ex-size { top: 50px; }
+    .frame-sizes {
+      .right-input-help { position: relative; }
+    }
   }
 }

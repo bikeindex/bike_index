@@ -55,11 +55,11 @@
       margin-top: 2*$vertical-height;
       // &:first-of-type { margin-top: 0; }
       .org-landing-icon-list-icon {
-        @include make-col-span(2);
+        @include make-col(2);
       }
-      .org-landing-icon-list-icon, .org-landing-icon-list-text { @include make-col(); }
-      .org-landing-icon-list-icon { @include make-col-span(2); }
-      .org-landing-icon-list-text { @include make-col-span(10); }
+      .org-landing-icon-list-icon, .org-landing-icon-list-text { @include make-col-ready(); }
+      .org-landing-icon-list-icon { @include make-col(2); }
+      .org-landing-icon-list-text { @include make-col(10); }
     }
   }
   @include media-breakpoint-down(md) {
