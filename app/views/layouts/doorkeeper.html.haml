@@ -14,21 +14,6 @@
         %a.primary-logo{ href: user_root_url }
           = image_tag 'revised/logo.svg', class: 'primary-nav', alt: 'Bike Index home'
     = render 'layouts/revised_messages'
-      
-    / %body
-    /   = render 'layouts/messages'
-    /   .bodywrap
-    /     %header.global-header
-    /       .container.bikes-nav
-    /         .small-header
-    /           %a.top-logo{ href: root_url }
-    /             %span.stripey
-    /             = image_tag "updated/home/logo.svg", class: 'logo', alt: "Logo with dark background"
-    /           %a#expand_user.hamburglar{ href: '#' }
-    /             = image_tag "updated/hamburglar.svg"
-    /         - if @current_user.present?
-    /           = render 'shared/top_user_nav'
-
     .doorkeeper-container
       - if @current_user && @current_user.superuser && @application.present? && @application.owner.present?
         Application by
@@ -36,6 +21,7 @@
           = @application.owner.display_name
       - if controller_name.match('application') && action_name != 'index'
         = link_to 'Your applications', oauth_applications_url, class: 'pull-right'
+
       = yield
 
     = render 'shared/footer_revised'
