@@ -54,13 +54,17 @@ class BikeIndex.Payments extends BikeIndex
         $('#stripe_email').val(token.email)
         $('#stripe_form').submit()
     )
+    if $stripe_form.data('type') == 'Pay'
+      description = 'Payment to Bike Index'
+    else
+      description = 'Donate to Bike Index'
 
     $('#stripe_amount').val(amount_cents)
     handler.open
       name: 'Bike Index'
-      description: 'Donate to Bike Index'
+      description: description
       amount: amount_cents
       email: $stripe_form.attr('data-email')
       allowRememberMe: false
-      panelLabel: 'Donate'
+      panelLabel: $stripe_form.data('type')
     return

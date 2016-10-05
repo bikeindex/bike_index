@@ -1,23 +1,39 @@
+- initial_amount = params[:amount] && params[:amount].to_i
+/ if there is a payment set, make it clear what is going on
 .container-fluid
   .row.donate-block
     .col-xs-12
-      %h3 Donate today
+      %h3
+        - if params[:payment]
+          Pay Bike Index
+        - else
+          Donate today
     .select-amount
-      %p
-        Select an amount
-      - numbers = [5, 10, 15, 25, 50, 100, 250]
+      
+      - unless params[:payment]
+        %p Select an amount
       %form#bikeindex-stripe-initial-form
         %ul.row.amount-list
-          - numbers.each do |amount|
-            %li.col-xs-4
-              %a.btn.btn-secondary{ data: { amount: amount } }
-                #{ amount }$
-          %li.col-xs-8
-            %input#arbitrary-amount.form-control{ type: 'number', min: '0', placeholder: 'Other amount', step: 0.01 }
+          - if params[:payment] # If payment, have one non-arbitrary button
+            %li.col-xs-6.offset-sm-3
+              %a.btn.btn-secondary.active{ data: { amount: initial_amount } }
+                #{ initial_amount }$
+          - else
+            - numbers = [5, 10, 15, 25, 50, 100, 250]
+            - numbers.each do |amount|
+              %li.col-xs-4
+                %a.btn.btn-secondary{ data: { amount: amount } }
+                  #{ amount }$
+            %li.col-xs-8
+              .input-group
+                .input-group-addon
+                  $
+                %input#arbitrary-amount.form-control{ type: 'number', min: '0', placeholder: 'Other amount', step: 0.01, value: initial_amount, class: ('active' if initial_amount) }
         .next-step
           = submit_tag 'next  >', class: 'btn btn-primary'
   <script src="https://checkout.stripe.com/checkout.js"></script>
-  - stripe_form_hash = { id: 'stripe_form', data: { key: ENV['STRIPE_PUBLISHABLE_KEY'],  email: current_user && current_user.email } }
+  - payment_type = params[:payment] ? 'Pay' : 'Donate'
+  - stripe_form_hash = { id: 'stripe_form', data: { key: ENV['STRIPE_PUBLISHABLE_KEY'],  email: current_user && current_user.email, type:  payment_type } }
   = form_tag payments_path, stripe_form_hash do
     = hidden_field_tag :stripe_token
     = hidden_field_tag :stripe_amount 
