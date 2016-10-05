@@ -16,10 +16,7 @@ $payments-page-breakpoint: 'sm';
       background-size: cover;
       background-position: center center;
     }
-    .primary-footer { margin-top: 0; } // Use donate block padding instead
   }
-  // @include media-breakpoint-up('md') { padding-bottom: $primary-footer-top-margin; }
-
   .payments-logo-line {
     width: 100%;
     a {
@@ -48,7 +45,6 @@ $payments-page-breakpoint: 'sm';
     }
     p {
       font-size: 24px;
-      // font-weight: $strong-font-weight;
       line-height: 1.25;
       margin-bottom: 0;
     }
