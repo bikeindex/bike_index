@@ -3,12 +3,36 @@ class BikeIndex.InfoSupportTheIndex extends BikeIndex
     @initializeEventListeners()
 
   initializeEventListeners: ->
-    $('#open_stripe_checkout_btn').click (e) =>
-      @openStripeForm(e)
-    $('.select-payment').click (e) =>
+    $('#bikeindex-stripe-initial-form').submit (e) =>
+      @openStripeForm()
+      return false
+    $('.amount-list a').click (e) =>
+      @selectPaymentOption(e)
+    $('.amount-list input').focus (e) =>
       @selectPaymentOption(e)
 
-  openStripeForm: (e) ->
+  # Returns null if there isn't a valid value selected
+  getAmountSelected: (alert) ->
+    unless $('.amount-list .active').length > 0
+      window.BikeIndexAlerts.add('info', 'Please select or enter an amount')
+      return null
+    $active = $('.amount-list .active')
+    # Return the button amount if an arbitrary amount isn't entered
+    return $active.data('amount') unless $active.attr('id') == 'arbitrary-amount'
+    amount = parseFloat($active.val())
+    # Return the entered amount if it's greater than 0
+    return amount if amount > 0
+    window.BikeIndexAlerts.add('info', 'Please enter a number')
+    null
+
+  openStripeForm: ->
+    amount = @getAmountSelected()
+    return true unless amount
+    # Remove alerts if they're around - because we've got a value now!
+    $('.primary-alert-block .alert').remove()
+    console.log amount
+
+  oldOpenStripeForm: (e) ->
     e.preventDefault()
     selected_opt = $('.payment-types-list .active')
     root = $('#stripe_form')
@@ -16,8 +40,8 @@ class BikeIndex.InfoSupportTheIndex extends BikeIndex
     # You can access the token ID with `token.id`
 
     handler = StripeCheckout.configure(
-      key: root.attr("data-key")
-      image: "/assets/logos/logo_w_bg.png"
+      key: root.attr('data-key')
+      image: '/apple_touch_icon.png'
       token: (token) ->
         $('#stripe_token').val(token.id)
         $('#stripe_email').val(token.email)
@@ -45,6 +69,9 @@ class BikeIndex.InfoSupportTheIndex extends BikeIndex
 
 
   selectPaymentOption: (e) ->
+    $target = $(e.target)
     e.preventDefault()
-    $('.payment-types-list a').addClass('unselected').removeClass('active')
-    $(e.target).parents('li').find('.select-payment').removeClass('unselected').addClass('active')
+    $('.amount-list .active').removeClass('active')
+    $target.addClass('active')
+    
+

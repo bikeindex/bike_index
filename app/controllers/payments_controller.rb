@@ -1,5 +1,5 @@
 class PaymentsController < ApplicationController
-  layout 'application_revised'
+  layout 'payments_layout'
 
   def new
   end

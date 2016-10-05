@@ -16,6 +16,7 @@
 // Core variables and mixins
 @import "bootstrap/variables";
 $enable-flex: true; // Flexbox!!
+$half-gutter: $grid-gutter-width / 2;
 //
 // Overrides
 $border-radius:          1px;
