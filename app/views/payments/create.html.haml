@@ -1,10 +1,11 @@
-.container.payments-page
-  %h1
-    Thank you for supporting the Bike Index!
-
-  %p
-    Your donation of $#{@amount.to_i/100.00} just saved the bikes.
-  %p.padded
-    XOXO,
-    %br
-    Bike Index team
+.container-fluid
+  .row.donate-block
+    .col-xs-12
+      %h3 Thank you for supporting the Bike Index!
+    .select-amount
+      %p
+        Your donation of $#{@amount.to_i/100.00} just saved the bikes.
+      %p.padded
+        XOXO,
+        %br
+        Bike Index team

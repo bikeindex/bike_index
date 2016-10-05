@@ -10,7 +10,11 @@ describe InfoController do
             get page.to_sym
             expect(response.status).to eq(200)
             expect(response).to render_template(page.to_sym)
-            expect(response).to render_with_layout('application_revised')
+            if page == 'support_the_index'
+              expect(response).to render_with_layout('payments_layout')
+            else
+              expect(response).to render_with_layout('application_revised')
+            end
           end
         end
       end
@@ -28,7 +32,11 @@ describe InfoController do
             get page.to_sym
             expect(response.status).to eq(200)
             expect(response).to render_template(page.to_sym)
-            expect(response).to render_with_layout('application_revised')
+            if page == 'support_the_index'
+              expect(response).to render_with_layout('payments_layout')
+            else
+              expect(response).to render_with_layout('application_revised')
+            end
           end
         end
       end

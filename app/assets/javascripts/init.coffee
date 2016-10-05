@@ -28,6 +28,7 @@ class BikeIndex.Init extends BikeIndex
       welcome_index: BikeIndex.WelcomeIndex
       info_where: BikeIndex.InfoWhere
       info_support_the_index: BikeIndex.InfoSupportTheIndex
+      payments_new: BikeIndex.InfoSupportTheIndex
       bikes_new: BikeIndex.BikesNew
       bikes_create: BikeIndex.BikesNew
       bikes_edit: BikeIndex.BikesEdit

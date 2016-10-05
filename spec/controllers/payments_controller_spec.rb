@@ -12,7 +12,7 @@ describe PaymentsController do
         get :new
         expect(response.code).to eq('200')
         expect(response).to render_template('new')
-        expect(response).to render_with_layout('application_revised')
+        expect(response).to render_with_layout('payments_layout')
         expect(flash).to_not be_present
       end
     end
@@ -21,7 +21,7 @@ describe PaymentsController do
         get :new
         expect(response.code).to eq('200')
         expect(response).to render_template('new')
-        expect(response).to render_with_layout('application_revised')
+        expect(response).to render_with_layout('payments_layout')
         expect(flash).to_not be_present
       end
     end
@@ -52,7 +52,7 @@ describe PaymentsController do
         expect do
           post :create, opts
         end.to change(Payment, :count).by(1)
-        expect(response).to render_with_layout('application_revised')
+        expect(response).to render_with_layout('payments_layout')
         payment = Payment.last
         expect(payment.user_id).to eq(user.id)
         user.reload
@@ -96,7 +96,7 @@ describe PaymentsController do
         expect do
           post :create, opts
         end.to change(Payment, :count).by(1)
-        expect(response).to render_with_layout('application_revised')
+        expect(response).to render_with_layout('payments_layout')
         payment = Payment.last
         expect(payment.user_id).to eq(user.id)
         user.reload

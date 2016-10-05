@@ -32,6 +32,7 @@ class InfoController < ApplicationController
 
   def support_the_index
     @page_title = 'Support the Bike Index'
+    render layout: 'payments_layout'
   end
 
   def support_the_bike_index

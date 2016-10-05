@@ -1,111 +1,105 @@
-// Legacy payments styles
-// 
-// Every payment page (form and create) is wrapped in cpayments-page class
-// ... so forgoing using page ids here, for now
-
-.payments-page {
-  h2 { @extend h5; }
-  form {
-    .binxbtn {
-      @extend .btn;
-      margin: 0 auto;
-      display: block;
-      font-size: 20px;
-      max-width: 200px;
+$payments-page-breakpoint: 'sm';
+.payments-layout-body {
+  @include media-breakpoint-up($payments-page-breakpoint) {
+    height: 100%;
+    background: image-url('revised/donate_bg.jpg');
+    background-size: cover;
+    background-position: center center;
+    padding-top: 6.5 * $vertical-height;
+  }
+  @include media-breakpoint-down($payments-page-breakpoint) {
+    padding-top: 0;
+    background: none;
+    .payments-top-container {
+      padding-top: 2 * $vertical-height;
+      background: image-url('revised/donate_bg.jpg');
+      background-size: cover;
+      background-position: center center;
     }
   }
-  #open_stripe_checkout_btn {
-    @extend .btn-primary;
-    @extend .btn-lg;
-    max-width: 400px;
-  }
-}
-
-.payment-types-list {
-  @include clearfix;
-  position: relative;
-  list-style-type: none;
-  margin: 0; 
-  padding: 30px 0;
-  li {
-    display: block;
-    float: left;
-    position: relative;
-    p {
-      @extend .body-font;
-      line-height: 1.5em;
-      margin: 0;
-    }
+  .payments-logo-line {
+    width: 100%;
     a {
-      @extend .btn;
-      white-space: normal;
-      @include transition(all ease-out .1s);
+      display: block;
+      width: 6 * $vertical-height;
+      @include media-breakpoint-up($payments-page-breakpoint) { margin: 0 auto; }
+    }
+    svg {
       display: block;
       width: 100%;
-      padding: $vertical-height .5em 0;
+      height: auto;
     }
-    .unselected {
-      @extend .btn-secondary;
+  }
+  header.payments-header {
+    color: white;
+    text-align: center;
+    padding-bottom: 3 * $vertical-height;
+    h1, p {
+      color: inherit;
+      margin-top: 3 * $vertical-height;
     }
-    .active {
-      @extend .btn-success;
-      text-decoration: none;
-      p { color: $gray-lightest; }
-      hr { border-bottom: 1px solid rgba(white,.15); } 
-      .donation input { background: #67B2E4; color: white; }
+    h1 {
+      font-size: 48px;
+      @include media-breakpoint-down(sm) { font-size: 36px; }
+      @include media-breakpoint-down(xs) { font-size: 28px; }
     }
+    p {
+      font-size: 24px;
+      line-height: 1.25;
+      margin-bottom: 0;
+    }
+  }
+
+  .donate-block {
+    background: $gray-darker;
+    text-align: center;
+    padding-bottom: $primary-footer-top-margin;
     h3 {
-      @extend h4;
+      font-size: 25px;
+      color: white;
       margin: 0;
-      font-size: 14px;
+      padding: 2*$vertical-height $half-gutter;
     }
-    hr {
-      margin: 1em 0;
-      border: none;
-      border-top: 1px solid rgba(black,.1);
-      border-bottom: 1px solid rgba(white,.8);
+    .select-amount {
+      background: #efefef;
+      width: 100%;
+      padding: 2*$vertical-height $half-gutter;
+      @include media-breakpoint-down($payments-page-breakpoint) {
+        border-radius: 1px;
+      }
     }
-    .perks { min-height: 7em; }
-    .donation {
-      min-height: 3em;
-      padding: 0 1em;
-      text-align: center;
-      input { width: 100%; text-align: center; background: $gray-lightest; }
+    p { margin: 0; }
+    .amount-list {
+      @include list-unstyled;
+      li { margin-top: 2 * $vertical-height; }
+      a {
+        font-family: $header-font-family;
+        font-size: 18px;
+        display: block;
+        width: 100%;
+        border-radius: .25rem;
+      }
+      .active { border-color: $blue; }
     }
-  }
-}
-.container.payments-page .payment-types-list.just-one {
-  li {
-    min-width: 50%;
-    margin: 0 auto;
-    display: block;
-    float: none;
-    a {
-      @extend .btn;
-      @extend .btn-secondary;
-      .donation input { background: #fff; color: $body-font-color; }
-    }
-  }
-}
 
-@media (min-width: $grid-breakpoint-md) {
-   .payment-types-list {
-    li {
-      margin: 0 0 0 1%;
-      width: 19%;
-      &:first-of-type { margin-left: 0; }
-     }
-  }
-}
-
-@media (max-width: $grid-breakpoint-md - 1px) {
-  .payment-types-list {
-    li {
-      margin: 20px 0 0 2%;
-      width: 47%;
-      // &:first-of-type { margin-left: 0; }
-      &:nth-of-type(5) { margin-left: 26%; }
-      // &:first-of-type { margin-left: 10%; }
+    .next-step {
+      margin-top: 2 * $vertical-height;
+      .btn {
+        border-radius: .25rem;
+        width: auto;
+        display: block;
+        margin: 0 auto;
+      }
+    }
+    @include media-breakpoint-down($payments-page-breakpoint) {
+      padding-left: 12px;
+      padding-right: 12px;
+    }
+    @include media-breakpoint-up('md') {
+      padding-bottom: 0;
+      max-width: 525px;
+      border-radius: 1px;
+      margin: 0 auto;
     }
   }
 }

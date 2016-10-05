@@ -3,48 +3,63 @@ class BikeIndex.InfoSupportTheIndex extends BikeIndex
     @initializeEventListeners()
 
   initializeEventListeners: ->
-    $('#open_stripe_checkout_btn').click (e) =>
-      @openStripeForm(e)
-    $('.select-payment').click (e) =>
+    $('#bikeindex-stripe-initial-form').submit (e) =>
+      @submitDonation()
+      return false
+    $('.amount-list a').click (e) =>
+      @selectPaymentOption(e)
+    $('.amount-list input').focus (e) =>
       @selectPaymentOption(e)
 
-  openStripeForm: (e) ->
+  # Returns null if there isn't a valid value selected
+  getAmountSelected: ->
+    unless $('.amount-list .active').length > 0
+      window.BikeIndexAlerts.add('info', 'Please select or enter an amount')
+      return null
+    $active = $('.amount-list .active')
+    # Return the button amount if an arbitrary amount isn't entered
+    return $active.data('amount') unless $active.attr('id') == 'arbitrary-amount'
+    amount = parseFloat($active.val())
+    # Return the entered amount if it's greater than 0
+    return amount if amount > 0
+    window.BikeIndexAlerts.add('info', 'Please enter a number')
+    null
+
+  selectPaymentOption: (e) ->
+    $target = $(e.target)
     e.preventDefault()
-    selected_opt = $('.payment-types-list .active')
-    root = $('#stripe_form')
+    $('.amount-list .active').removeClass('active')
+    $target.addClass('active')
+
+  submitDonation: ->
+    amount = @getAmountSelected()
+    return true unless amount
+    # Remove alerts if they're around - because we've got a value now!
+    $('.primary-alert-block .alert').remove()
+    is_arbitrary = $('.amount-list input.active').length > 0
+    @openStripeForm(is_arbitrary, amount)
+
+  openStripeForm: (is_arbitrary, amount) ->
+    amount_cents = amount * 100
+    $stripe_form = $('#stripe_form')
+    # Checkout integration custom: https://stripe.com/docs/checkout#integration-custom
     # Use the token to create the charge with a server-side script.
     # You can access the token ID with `token.id`
-
     handler = StripeCheckout.configure(
-      key: root.attr("data-key")
-      image: "/assets/logos/logo_w_bg.png"
+      key: $stripe_form.attr('data-key')
+      image: '/apple_touch_icon.png'
       token: (token) ->
         $('#stripe_token').val(token.id)
         $('#stripe_email').val(token.email)
         $('#stripe_form').submit()
     )
 
-    if selected_opt.attr('data-arbitrary') > 0
-      amount = selected_opt.find('input').val() * 100
-      desc = "charge $#{amount/100.00}"
-    else
-      amount = selected_opt.attr('data-amount')
-      desc = selected_opt.find('h3').text()
-
-    $('#stripe_amount').val(amount)
-    $('#stripe_subscription').val(selected_opt.attr('data-subscription'))
-    $('#stripe_plan').val(selected_opt.attr('data-plan'))
+    $('#stripe_amount').val(amount_cents)
     handler.open
       name: 'Bike Index'
-      description: desc
-      amount: amount
-      email: root.attr('data-email')
+      description: 'Donate to Bike Index'
+      amount: amount_cents
+      email: $stripe_form.attr('data-email')
       allowRememberMe: false
-      panelLabel: selected_opt.attr('data-label')
+      panelLabel: 'Donate'
     return
-
-
-  selectPaymentOption: (e) ->
-    e.preventDefault()
-    $('.payment-types-list a').addClass('unselected').removeClass('active')
-    $(e.target).parents('li').find('.select-payment').removeClass('unselected').addClass('active')
