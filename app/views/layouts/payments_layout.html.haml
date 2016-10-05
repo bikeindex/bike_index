@@ -17,7 +17,7 @@
       %header.payments-header
         %h1
           Until Every bike is safe
-        - unless action_name == 'create' || params[:payment]
+        - unless action_name == 'create' || @is_payment
           %p
             Be a bike saver.
             %br
