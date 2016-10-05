@@ -1,5 +1,6 @@
-class BikeIndex.InfoSupportTheIndex extends BikeIndex
+class BikeIndex.Payments extends BikeIndex
   constructor: ->
+    $('body').css('height', "#{$(window).height()}px")
     @initializeEventListeners()
 
   initializeEventListeners: ->
