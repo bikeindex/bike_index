@@ -16,13 +16,10 @@
             %input#arbitrary-amount.form-control{ type: 'number', min: '0', placeholder: 'Other amount', step: 0.01 }
         .next-step
           = submit_tag 'next  >', class: 'btn btn-primary'
-
-  - stripe_form_hash = { id: 'stripe_form', data: { key: "#{ENV['STRIPE_PUBLISHABLE_KEY']}" } }
-  - stripe_form_hash[:data][:email] = "#{current_user.email}" if current_user.present?
-  = form_tag payments_path, stripe_form_hash do 
-    <script src="https://checkout.stripe.com/checkout.js"></script>
+  <script src="https://checkout.stripe.com/checkout.js"></script>
+  - stripe_form_hash = { id: 'stripe_form', data: { key: ENV['STRIPE_PUBLISHABLE_KEY'],  email: current_user && current_user.email } }
+  = form_tag payments_path, stripe_form_hash do
     = hidden_field_tag :stripe_token
-    = hidden_field_tag :stripe_amount
+    = hidden_field_tag :stripe_amount 
     = hidden_field_tag :stripe_email
-    = hidden_field_tag :stripe_subscription
-    = hidden_field_tag :stripe_plan
+    
