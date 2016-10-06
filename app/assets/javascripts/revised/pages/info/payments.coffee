@@ -1,6 +1,8 @@
 class BikeIndex.Payments extends BikeIndex
   constructor: ->
-    $('body').css('height', "#{$(window).height()}px")
+    # Make the body at least as tall as the window
+    unless $('body').outerHeight() > $(window).height()
+      $('body').css('height', "#{$(window).height()}px")
     @initializeEventListeners()
 
   initializeEventListeners: ->

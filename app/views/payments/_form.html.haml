@@ -1,5 +1,5 @@
 - @initial_amount = params[:amount] && params[:amount].to_i
-- @is_payment = params[:payment] || params[:make_payment]
+- @is_payment = @initial_amount.present?
 / if there is a payment set, make it clear what is going on
 .container-fluid
   .row.donate-block
