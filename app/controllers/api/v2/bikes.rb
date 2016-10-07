@@ -79,12 +79,8 @@ module API
         end
 
         def authorize_bike_for_user(addendum='')
-          return true if @bike.owner == current_user
-          if @bike.current_ownership.can_be_claimed_by(current_user)
-            @bike.current_ownership.mark_claimed
-            return true
-          end  
-          error!("You do not own that #{@bike.type}#{addendum}", 403) 
+          return true if @bike.authorize_bike_for_user!(current_user)
+          error!("You do not own that #{@bike.type}#{addendum}", 403)
         end
 
         def ensure_required_stolen_attrs(hash)
