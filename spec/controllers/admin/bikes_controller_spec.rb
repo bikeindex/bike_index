@@ -59,7 +59,7 @@ describe Admin::BikesController do
         expect(stolen_record.is_a?(StolenRecord)).to be_truthy
         bike_attributes = {
           serial_number: 'new thing and stuff',
-          bike_organization_ids: ['', organization.id.to_s]
+          bike_organization_ids: ['', organization.id.to_s],
           stolen_records_attributes: {
             "0"=> {
               street: 'Cortland and Ashland',
