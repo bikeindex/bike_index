@@ -142,6 +142,17 @@ class Bike < ActiveRecord::Base
     !current_owner_exists && current_ownership && current_ownership.user == u
   end
 
+  def authorize_bike_for_user!(u)
+    return true if u == owner
+    return false if u.blank? || current_ownership.claimed
+    if can_be_claimed_by(u)
+      current_ownership.mark_claimed
+      return true
+    end
+    return false unless ownerships.count == 1 && creation_organization.present?
+    u.is_member_of?(creation_organization)
+  end
+
   def user_hidden
     hidden && current_ownership && current_ownership.user_hidden
   end

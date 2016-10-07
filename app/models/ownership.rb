@@ -44,7 +44,7 @@ class Ownership < ActiveRecord::Base
     self.claimed = true
     u = User.fuzzy_email_find(owner_email)
     self.user_id = u.id if u.present? && user_id.blank?
-    self.save
+    save
   end
 
   def can_be_claimed_by(u)
