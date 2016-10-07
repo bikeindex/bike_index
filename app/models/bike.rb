@@ -139,7 +139,8 @@ class Bike < ActiveRecord::Base
   end
 
   def can_be_claimed_by(u)
-    !current_owner_exists && current_ownership && current_ownership.user == u
+    return false if current_owner_exists || current_ownership.blank?
+    current_ownership.user == u || current_ownership.can_be_claimed_by(u)
   end
 
   def authorize_bike_for_user!(u)
