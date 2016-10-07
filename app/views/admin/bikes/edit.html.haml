@@ -94,11 +94,6 @@
             = f.label :primary_frame_color_id, class: "control-label"
             .controls
               = collection_select(:bike, :primary_frame_color_id, Color.all, :id, :name, required: true, prompt: "Choose color" )
-          / Disabled for performance reasons 
-          / .control-group.chosen-select
-          /   = f.label :creator_id, class: "control-label"
-          /   .controls
-          /     = collection_select( :bike, :creator_id, User.all, :id, :email, :required =>true, prompt: "Choose creator")
           - organizations = Organization.all
           .control-group.chosen-select
             = f.label :creation_organization_id, class: "control-label"
