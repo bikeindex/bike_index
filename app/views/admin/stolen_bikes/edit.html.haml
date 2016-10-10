@@ -38,7 +38,7 @@
         %dl.dl-horizontal
           = @bike.dl_list_item(@bike.created_at.strftime("%m-%d-%Y"), "Created")
           = @bike.dl_from_attribute("owner_email")
-          = @bike.dl_list_item(@bike.owner.email, "Current Owner")
+          = @bike.dl_list_item(@bike.owner && @bike.owner.email, "Current Owner")
           - if @bike.creation_organization_id.present?
             = @bike.dl_list_item(@bike.creation_organization.name, "Creation Organization")
           %dt
