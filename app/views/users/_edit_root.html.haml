@@ -24,7 +24,7 @@
   .col-xs-12
     %p
       Have multiple emails? Consolidate them into one account here
-  .form-group.row.unnested-field
+  .form-group.row.unnested-field.no-divider-row
     = f.label :email, 'Primary email', class: 'form-well-label'
     %p.form-well-input-static-full-width
       = @user.email
@@ -33,7 +33,7 @@
 
   - if @user.user_emails.count > 1
     - if @user.user_emails.confirmed.count > 1
-      .related-fields
+      .related-fields.no-divider-row
         - labeled = false
         - @user.user_emails.confirmed.each do |user_email|
           - next if user_email.email == @user.email

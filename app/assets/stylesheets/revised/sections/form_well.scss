@@ -97,6 +97,7 @@
       @include make-col(8);
       margin-top: -.5em;
       label { padding-top: .5em; } // To pad checkboxes a bit
+      text-align: right;
     }
     .unnested-field::after, .related-fields::after {
       content: '';

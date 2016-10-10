@@ -12,12 +12,22 @@
               Are you part of a school? Want to bolster a local advocacy organization? Add the organization here.
 
           - if @bike.bike_organizations.any?
-            .related-fields
-              - @bike.bike_organizations.each do |bike_organization|
+            .related-fields.no-divider-row
+              - if @bike.bike_organizations.where(organization_id: @bike.creation_organization_id)
                 .form-group.row
                   %label.form-well-label
-                    - if bike_organization.organization == @bike.creation_organization
-                      Creation organization
+                    Creation organization
+                  %p.form-well-input-static.bike_organization_static_input{ data: { orgid: @bike.creation_organization_id } }
+                    = @bike.creation_organization.name
+                  .right-input-help
+                    %a.optional-form-block.remove-organization{ href: '#' }
+                      %span.context-display-help
+                        &ndash;
+                      Remove
+              - @bike.bike_organizations.each do |bike_organization|
+                - next if bike_organization.organization == @bike.creation_organization
+                .form-group.row
+                  %label.form-well-label
                   %p.form-well-input-static.bike_organization_static_input{ data: { orgid: bike_organization.organization_id } }
                     = bike_organization.organization.name
                   .right-input-help
@@ -29,7 +39,7 @@
           :javascript
             window.organizations = #{Organization.valid.map { |organization| { name: organization.name, id: organization.id } }.to_json };
           .related-fields#additional_organization_fields
-            .form-group.row.unnested-field
+            .form-group.row.unnested-field.no-divider-row
               = f.hidden_field :bike_organization_ids, value: @bike.bike_organization_ids.join(',')
             :plain
               <script id="additional-organization-template" type="x-tmpl-mustache">
