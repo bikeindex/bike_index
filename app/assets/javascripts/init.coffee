@@ -72,6 +72,15 @@ warnIfUnsupportedBrowser = ->
         header = 'Your browser is out of date!'
       $('body').prepend "<div id='old-browser-warning'><h4>#{header}</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>"
 
+enableEscapeForModals = ->
+  $('.modal').on 'show.bs.modal', ->
+    $(window).on 'keyup', (e) ->
+      return unless e.keyCode == 27 # Escape key
+      $('.modal').modal('hide')
+  # Remove keyup trigger, clean up after yourself
+  $('.modal').on 'hide.bs.modal', ->
+    $(window).off 'keyup'
+
 window.updateSearchBikesHeaderLink = ->
   location = localStorage.getItem('location')
   if location?
@@ -88,3 +97,4 @@ $(document).ready ->
     new window.ManufacturersSelect('#binx_registration_widget #b_param_manufacturer_id')
   new window.AdDisplayer
   warnIfUnsupportedBrowser()
+  enableEscapeForModals()

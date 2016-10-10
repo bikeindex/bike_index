@@ -32,4 +32,9 @@
     text-align: center;
     .btn { min-width: 33.33%; }
   }
+  .new-bike-submit-wrapper {
+    @include media-breakpoint-down(lg) {
+      padding-bottom: $primary-footer-top-margin;
+    }
+  }
 }

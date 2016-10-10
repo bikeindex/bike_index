@@ -1,15 +1,8 @@
 class BikeIndex.UsersEdit extends BikeIndex
   constructor: ->
-    # Initialize dirty forms. Add class 'dirtyignore' to fields to ignore them
-    $('form.primary-edit-bike-form').dirtyForms()
-    # Affix the edit menu to the page
-    $('.primary-edit-form-well-menu').Stickyfill()
-    # Change user edit page partial
-    $('.form-well-edit-page-select select').change (e) =>
-      window.location.href = e.target.value
-
     # Important! We can't instantiate FormWell because
     # optional form blocks don't do what they do everywhere else (in email add)
+    new FormWellMenu
 
     @initializePersonalSharing() if $('.sharing-collapser').length > 0
     @initializeAdditionalEmails() if $('#additional-email-template').length > 0

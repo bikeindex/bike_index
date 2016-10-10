@@ -101,10 +101,16 @@
     .unnested-field::after, .related-fields::after {
       content: '';
       display: block;
-      width: 90%;
-      margin: 0 0 2*$vertical-height 10%;
+      margin: 0 15px 2*$vertical-height 10%;
       border-bottom: 1px $form-well-divider-color solid;
       padding-top: $vertical-height;
+    }
+    // .related-fields::after aren't the same width as unnessted-fields because they aren't rows
+    // This is a fairly good approximation of their differences is widths - a few px off tho
+    .related-fields::after { width: 90%; }
+    .unnested-field::after {
+      width: 87.5%;
+      margin-left: 12.5%;
     }
     .no-divider-row::after { display: none; }
     hr { margin-top: 5*$vertical-height } // It isn't cleared correctly on small screens

@@ -15,8 +15,11 @@
   border-color: $border;
   @include box-shadow($btn-box-shadow);
 
+  &:not([href]):not([tabindex]) { color: $color; } // Stop inheriting body color if no href!
+
   @include hover {
     color: $color;
+    &:not([href]):not([tabindex]) { color: $color; }
     background-color: $active-background;
         border-color: $active-border;
   }
@@ -24,6 +27,7 @@
   &:focus,
   &.focus {
     color: $color;
+    &:not([href]):not([tabindex]) { color: $color; }
     background-color: $active-background;
         border-color: $active-border;
   }
@@ -32,6 +36,7 @@
   &.active,
   .open > &.dropdown-toggle {
     color: $color;
+    &:not([href]):not([tabindex]) { color: $color; }
     background-color: $active-background;
         border-color: $active-border;
     // Remove the gradient for the pressed/active state
@@ -42,6 +47,7 @@
     &:focus,
     &.focus {
       color: $color;
+      &:not([href]):not([tabindex]) { color: $color; }
       background-color: darken($background, 17%);
           border-color: darken($border, 25%);
     }
@@ -66,9 +72,10 @@
   background-image: none;
   background-color: transparent;
   border-color: $color;
-
+  &:not([href]):not([tabindex]) { color: $color; } // Stop inheriting body color if no href!
   @include hover {
     color: #fff;
+    &:not([href]):not([tabindex]) { color: #fff; }
     background-color: $color;
         border-color: $color;
   }
@@ -76,6 +83,7 @@
   &:focus,
   &.focus {
     color: #fff;
+    &:not([href]):not([tabindex]) { color: #fff; }
     background-color: $color;
         border-color: $color;
   }
@@ -84,6 +92,7 @@
   &.active,
   .open > &.dropdown-toggle {
     color: #fff;
+    &:not([href]):not([tabindex]) { color: #fff; }
     background-color: $color;
         border-color: $color;
 
@@ -91,6 +100,7 @@
     &:focus,
     &.focus {
       color: #fff;
+      &:not([href]):not([tabindex]) { color: #fff; }
       background-color: darken($color, 17%);
           border-color: darken($color, 25%);
     }

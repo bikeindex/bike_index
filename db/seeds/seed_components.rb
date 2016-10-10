@@ -51,7 +51,7 @@ ctypes = [
   { name: "crankset", has_multiple: false, cgroup_id: Cgroup.find_by_name('Drivetrain and brakes').id },
   { name: "pedals", has_multiple: false, cgroup_id: Cgroup.find_by_name('Drivetrain and brakes').id },
   { name: "computer", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id },
-  { name: "pegs", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id },
+  { name: "pegs", has_multiple: true, cgroup_id: Cgroup.find_by_name("Additional parts").id },
   { name: "toe clips", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id },
   { name: "grips/tape", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id },
   { name: "seatpost clamp", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id },

@@ -1,8 +1,5 @@
-.form-well-header.container{ data: { template: @edit_template } }
-  .edit-bike-header
-
-= form_for @user, multipart: true, html: { class: 'primary-edit-bike-form' } do |f|
-  .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
+= form_for @user, multipart: true, html: { class: 'primary-edit-user-form' } do |f|
+  .form-well-container.container
     .row
       %nav.primary-edit-form-well-menu
         %ul

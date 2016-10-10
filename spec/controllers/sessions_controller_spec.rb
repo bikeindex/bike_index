@@ -110,13 +110,26 @@ describe SessionsController do
       end
     end
 
-    it 'does not log in unconfirmed users' do
-      user = FactoryGirl.create(:user, confirmed: true)
-      expect(User).to receive(:fuzzy_email_find).and_return(user)
-      post :create, session: { email: user.email }
-      expect(response).to render_template(:new)
-      expect(cookies.signed[:auth]).to be_nil
-      expect(response).to render_with_layout('application_revised')
+    context 'unconfirmed' do
+      let(:user) { FactoryGirl.create(:user, confirmed: false) }
+      it 'does not log in unconfirmed users' do
+        post :create, session: { email: user.email }
+        expect(response).to render_template(:new)
+        expect(flash[:error]).to be_present
+        expect(cookies.signed[:auth]).to be_nil
+        expect(response).to render_with_layout('application_revised')
+      end
+      context 'with confirmed user_email' do
+        it 'does not log them in either' do
+          user_email = FactoryGirl.create(:user_email, user: user)
+          expect(user_email.confirmed).to be_truthy
+          post :create, session: { email: user_email.email }
+          expect(response).to render_template(:new)
+          expect(flash[:error]).to be_present
+          expect(cookies.signed[:auth]).to be_nil
+          expect(response).to render_with_layout('application_revised')
+        end
+      end
     end
 
     it 'does not log in the user when the user is not found' do

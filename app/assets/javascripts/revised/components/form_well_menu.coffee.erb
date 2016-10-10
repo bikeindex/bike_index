@@ -1,0 +1,16 @@
+# Separate from FormWell because it isn't used on BikesNew
+# Deals with both dirty forms and the page template 
+class @FormWellMenu
+  constructor: ->
+    # Initialize dirty forms. Add class 'dirtyignore' to fields to ignore them
+    $('form.primary-edit-bike-form, form.primary-edit-user-form').dirtyForms()
+
+    # Only instantiate Stickyfill if window is larger than the breakpoint for switching
+    # to the select menu on the bottom - Stickyfill doesn't do a good job with that
+    if $(window).width() > 767 # bootstrap md breakpoint
+      # Affix the edit menu to the page
+      $('.primary-edit-form-well-menu').Stickyfill()
+
+    # Change edit page partial on select change
+    $('.form-well-edit-page-select select').change (e) =>
+      window.location.href = e.target.value
