@@ -71,6 +71,10 @@
             = f.label :card_id, "Spokecard id", class: "control-label"
             .controls
               = f.text_field :card_id
+          .control-group
+            = f.label :hidden, "Hidden (fake delete)", class: "control-label"
+            .controls
+              = f.check_box :hidden
 
         .bike-fields
           .control-group
@@ -89,16 +93,17 @@
           .control-group.chosen-select
             = f.label :primary_frame_color_id, class: "control-label"
             .controls
-              = collection_select( :bike, :primary_frame_color_id, Color.all, :id, :name, required: true, prompt: "Choose color" )
-          / Disabled for performance reasons 
-          / .control-group.chosen-select
-          /   = f.label :creator_id, class: "control-label"
-          /   .controls
-          /     = collection_select( :bike, :creator_id, User.all, :id, :email, :required =>true, prompt: "Choose creator")
+              = collection_select(:bike, :primary_frame_color_id, Color.all, :id, :name, required: true, prompt: "Choose color" )
+          - organizations = Organization.all
           .control-group.chosen-select
             = f.label :creation_organization_id, class: "control-label"
             .controls
-              = collection_select( :bike, :creation_organization_id, Organization.all, :id, :name, prompt: "Choose organization")
+              = collection_select(:bike, :creation_organization_id, organizations, :id, :name, prompt: "Choose organization")
+          .control-group.chosen-select
+            = f.label :bike_organization_ids, 'Current orgs', class: 'control-label'
+            .controls
+              = f.collection_select(:bike_organization_ids, organizations, :id, :name, { include_blank: true, prompt: '' }, { multiple: true })
+
           .control-group
             = f.label :description, class: "control-label"
             .controls
@@ -107,10 +112,6 @@
             = f.label :owner_email, class: "control-label"
             .controls
               = f.text_field :owner_email, :required =>true
-          .control-group
-            = f.label :hidden, "Hidden (fake delete)", class: "control-label"
-            .controls
-              = f.check_box :hidden
           
       .actions
         .control-group

@@ -216,6 +216,79 @@ describe Bike do
     end
   end
 
+  describe 'authorize_bike_for_user!' do
+    let(:bike) { ownership.bike }
+    let(:creator) { ownership.creator }
+    let(:user) { FactoryGirl.create(:user) }
+    let(:bike) { ownership.bike }
+    context 'un-organized' do
+      let(:ownership) { FactoryGirl.create(:ownership) }
+      context 'no user' do
+        it 'returns false' do
+          expect(bike.authorize_bike_for_user!(nil)).to be_falsey
+        end
+      end
+      context 'unauthorized' do
+        it 'returns false' do
+          expect(bike.authorize_bike_for_user!(user)).to be_falsey
+        end
+      end
+      context 'creator' do
+        it 'returns true' do
+          expect(bike.authorize_bike_for_user!(creator)).to be_truthy
+        end
+      end
+      context 'current owner' do
+        it 'returns true'
+      end
+      context 'can_be_claimed_by' do
+        let(:ownership) { FactoryGirl.create(:ownership, user: user) }
+        it 'marks claimed and returns true' do
+          expect(ownership.claimed).to be_falsey
+          expect(ownership.owner).to eq creator
+          expect(bike.authorize_bike_for_user!(user)).to be_truthy
+          ownership.reload
+          expect(ownership.owner).to eq user
+          expect(bike.ownerships.count).to eq 1
+        end
+      end
+    end
+    context 'creation organization' do
+      let(:ownership) { FactoryGirl.create(:organization_ownership) }
+      let(:organization) { bike.creation_organization }
+      let(:member) { FactoryGirl.create(:organization_member, organization: organization ) }
+      before { expect(bike.creation_organization).to eq member.organizations.first }
+      context 'unclaimed' do
+        context 'member of organization' do
+          it 'returns true' do
+            expect(bike.authorize_bike_for_user!(member)).to be_truthy
+          end
+        end
+        context 'non-member' do
+          it 'returns false' do
+            expect(bike.authorize_bike_for_user!(user)).to be_falsey
+          end
+        end
+      end
+      context 'claimed' do
+        let(:ownership) { FactoryGirl.create(:organization_ownership, user: user, claimed: true) }
+        it 'returns false' do
+          expect(bike.owner).to eq user
+          expect(bike.authorize_bike_for_user!(member)).to be_falsey
+        end
+
+      end
+      context 'more than one ownership' do
+        let!(:ownership_2) { FactoryGirl.create(:organization_ownership, bike: bike, creator: user) }
+        it 'returns false' do
+          bike.reload
+          expect(bike.owner).to eq user
+          expect(bike.authorize_bike_for_user!(member)).to be_falsey
+        end
+      end
+    end
+  end
+
   describe 'user_hidden' do
     it 'is true if bike is hidden and ownership is user hidden' do
       bike = Bike.new(hidden: true)

@@ -213,18 +213,14 @@ class BikesController < ApplicationController
   def ensure_user_allowed_to_edit
     @current_ownership = @bike.current_ownership
     type = @bike && @bike.type || 'bike'
+    return true if @bike.authorize_bike_for_user!(current_user)
     if current_user.present?
-      unless @current_ownership && @current_ownership.owner == current_user
-        if @bike.can_be_claimed_by(current_user)
-          redirect_to ownership_path(@bike.current_ownership) and return
-        end
-        error = "Oh no! It looks like you don't own that #{type}."
-      end
+      error = "Oh no! It looks like you don't own that #{type}."
     else
       if @current_ownership && @bike.current_ownership.claimed
         error = "Whoops! You have to sign in to be able to edit that #{type}."
       else
-        error = "That #{type} hasn't been claimed yet. If it's your #{type} sign up and you'll be able to edit it!"
+        error = "That #{type} hasn't been claimed yet. If it's your #{type}, sign up and you'll be able to edit it!"
       end
     end
     if error.present? # Can't assign directly to flash here, sometimes kick out of edit because other flash error

@@ -49,6 +49,7 @@ describe Admin::BikesController do
 
   describe 'update' do
     context 'success' do
+      let(:organization) { FactoryGirl.create(:organization) }
       it 'updates the bike and calls update_ownership and serial_normalizer' do
         expect_any_instance_of(BikeUpdator).to receive(:update_ownership)
         expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
@@ -58,6 +59,7 @@ describe Admin::BikesController do
         expect(stolen_record.is_a?(StolenRecord)).to be_truthy
         bike_attributes = {
           serial_number: 'new thing and stuff',
+          bike_organization_ids: ['', organization.id.to_s],
           stolen_records_attributes: {
             "0"=> {
               street: 'Cortland and Ashland',
@@ -74,6 +76,7 @@ describe Admin::BikesController do
         stolen_record.reload
         expect(stolen_record.street).to eq 'Cortland and Ashland'
         expect(stolen_record.city).to eq 'Chicago'
+        expect(bike.bike_organization_ids).to eq([organization.id])
       end
     end
 

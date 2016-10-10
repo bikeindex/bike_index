@@ -638,31 +638,45 @@ describe BikesController do
         expect(flash[:error]).to be_present
       end
     end
-    context "user present but isn't allowed to edit the bike" do
-      it 'redirects and sets the flash' do
-        user = FactoryGirl.create(:user)
-        set_current_user(user)
-        get :edit, id: bike.id
-        expect(response).to redirect_to bike_path(bike)
-        expect(flash[:error]).to be_present
+    context 'user present' do
+      let(:user) { FactoryGirl.create(:user) }
+      before { set_current_user(user) }
+      context "user present but isn't allowed to edit the bike" do
+        it 'redirects and sets the flash' do
+          user = FactoryGirl.create(:user)
+          get :edit, id: bike.id
+          expect(response).to redirect_to bike_path(bike)
+          expect(flash[:error]).to be_present
+        end
       end
-    end
-    context "user present but hasn't claimed the bike" do
-      it 'redirects to claim' do
-        user = FactoryGirl.create(:user)
-        ownership.update_attribute :user_id, user.id
-        set_current_user(user)
-        get :edit, id: bike.id
-        expect(response).to redirect_to ownership_path(bike.current_ownership.id)
+      context "user present but hasn't claimed the bike" do
+        it 'claims and renders' do
+          ownership.update_attribute :user_id, user.id
+          expect(bike.owner).to_not eq user
+          get :edit, id: bike.id
+          bike.reload
+          expect(bike.owner).to eq user
+          expect(response).to be_success
+          expect(assigns(:edit_template)).to eq 'root'
+        end
+      end
+      context 'not-creator but member of creation_organization' do
+        let(:ownership) { FactoryGirl.create(:organization_ownership) }
+        let(:organization) { bike.creation_organization }
+        let(:user) { FactoryGirl.create(:organization_member, organization: organization ) }
+        it 'renders' do
+          expect(bike.owner).to_not eq user
+          expect(bike.creation_organization).to eq user.organizations.first
+          get :edit, id: bike.id
+          expect(response).to be_success
+          expect(assigns(:edit_template)).to eq 'root'
+        end
       end
     end
     context 'user allowed to edit the bike' do
       let(:user) { ownership.creator }
-
       context 'revised' do
-        before do
-          set_current_user(user)
-        end
+        before { set_current_user(user) }
         context 'root' do
           context 'non-stolen bike' do
             it 'renders the bike_details template' do
