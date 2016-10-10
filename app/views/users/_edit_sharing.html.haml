@@ -55,7 +55,7 @@
     %p
       The Bike Index can create a page listing all your bikes that includes all the information you want to share. It's your personal page.
       = link_to '(preview page)', user_url(@user), target: '_blank'
-    .form-group.unnested-field.no-divider-row.row.sharing-collapser{ data: { target: '#personal-page' } }
+    .form-group.unnested-field.row.sharing-collapser{ data: { target: '#personal-page' } }
       %label.form-well-label
         Create public page
       .form-well-input
@@ -65,7 +65,7 @@
         %label.radio-inline
           = f.radio_button :show_bikes, 'false'
           No, please don't create me a page
-    .related-fields#personal-page.collapse
+    .related-fields#personal-page.collapse.no-divider-row
       .form-group.row.avatar-upload-wrapper
         %label.form-well-label
           Profile avatar

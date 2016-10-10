@@ -80,7 +80,6 @@ enableEscapeForModals = ->
   # Remove keyup trigger, clean up after yourself
   $('.modal').on 'hide.bs.modal', ->
     $(window).off 'keyup'
-    console.log 'party'
 
 window.updateSearchBikesHeaderLink = ->
   location = localStorage.getItem('location')
