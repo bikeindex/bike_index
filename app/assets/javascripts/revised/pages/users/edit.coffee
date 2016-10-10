@@ -1,7 +1,7 @@
 class BikeIndex.UsersEdit extends BikeIndex
   constructor: ->
     # Initialize dirty forms. Add class 'dirtyignore' to fields to ignore them
-    $('form.primary-edit-bike-form').dirtyForms()
+    $('form.primary-edit-user-form').dirtyForms()
     # Affix the edit menu to the page
     $('.primary-edit-form-well-menu').Stickyfill()
     # Change user edit page partial
