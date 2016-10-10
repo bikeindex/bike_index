@@ -15,7 +15,7 @@ class BikesController < ApplicationController
   def index
     @interpreted_params = Bike.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
     if params[:stolenness] == 'proximity' && @interpreted_params[:stolenness] != 'proximity'
-      flash[:info] = "Sorry, we don't know the location #{params[:location]}. Please enter something else to search nearby stolen bikes"
+      flash[:info] = "Sorry, we don't know the location \"#{params[:location]}\". Please try a different location to search nearby stolen bikes"
     end
     @bikes = Bike.search(@interpreted_params).page(params[:page] || 1).per(params[:per_page] || 10).decorate
     if @interpreted_params[:serial]
