@@ -2,7 +2,7 @@
 
 ## OAuth2 - Authentication on the Bike Index
 
-The Bike Index uses OAuth2. The following or 
+The Bike Index uses OAuth2. 
 
 <a class="ref" id="ref_plugins">
 
@@ -28,7 +28,7 @@ The Authorization flow enables long lived access through refresh tokens (instead
 
 The Client-side flow is good for client-side javascript apps. Here's an article on [Client-side flow in OAuth2](http://labs.hybris.com/2012/06/05/oauth2-the-implicit-flow-aka-as-the-client-side-flow/).
 
-*There may be rate limiting on the future for non-authenticated requests - so if you have an access token, consider using it for everything.*
+*There will be rate limiting on the future for non-authenticated requests - so if you have an access token, consider using it for everything.*
 
 <a class="ref" id="ref_applications_authorized">
 
@@ -40,7 +40,9 @@ Review the applications you've authorized at [/oauth/authorized_applications](/o
 
 ###Sending your access tokens in requests
 
-By default we authenticate you with HTTP Basic authentication scheme. If the basic auth is not found in the authorization header, then it falls back to post parameters (all authenticated requests in this documentation put the access token in the parameters).
+By default we authenticate you with HTTP Basic authentication scheme. If the basic auth is not found in the authorization header, then it falls back to post parameters. We recommend putting the authentication information in the header.
+
+All the authenticated requests in this documentation put the access token in the parameters for clarity
 
 
 <a class="ref" id="ref_refresh_tokens">
@@ -53,7 +55,6 @@ When your access token expires, you can get a new one by making a POST request w
 
     POST <%= ENV['BASE_URL'] %>/oauth/token?grant_type=refresh_token&client_id={app_id}&refresh_token={refresh_token}
 
-Since this is a POST Request, we use javascript to do it here. Adding a demonstration for this soon...
 
 <!-- 
     $.ajax({

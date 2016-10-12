@@ -29,7 +29,7 @@ $ ->
       window.authorizations.add "access_token", new ApiKeyAuthorization("access_token", key, "query")
     return
   
-  url = "#{window.base_url}/api/v2/swagger_doc"
+  url = window.swagger_url
   window.swaggerUi = new SwaggerUi(
     url: url
     dom_id: "swagger-ui-container"

@@ -9,7 +9,7 @@ module API
           optional :location, type: String, desc: 'Location for proximity search', default: 'IP'
           optional :distance, type: String, desc: 'Distance in miles from `location` for proximity search', default: 10
           optional :stolenness, type: String, values: %w(non stolen proximity all) + [''], default: 'stolen'
-          optional :query_items, type: Array
+          optional :query_items, type: Array, desc: 'Our Fancy select query items, may change without notice', documentation: { hidden: true }
         end
         params :search do
           optional :serial, type: String, desc: 'Serial, homoglyph matched'

@@ -499,6 +499,7 @@ GEM
       rails-assets-sifter (~> 0.4.0)
     rails-assets-sifter (0.4.5)
     rails-assets-tether (1.1.1)
+    rails-assets-waypoints (3.1.1)
     rails-deprecated_sanitizer (1.0.3)
       activesupport (>= 4.2.0.alpha)
     rails-dom-testing (1.0.7)
@@ -737,6 +738,7 @@ DEPENDENCIES
   rails-assets-select2 (~> 4.0.3)!
   rails-assets-selectize (~> 0.12.1)!
   rails-assets-tether (~> 1.1.0)!
+  rails-assets-waypoints (~> 3.1.1)!
   rb-fsevent (~> 0.9.1)
   redcarpet
   redis
