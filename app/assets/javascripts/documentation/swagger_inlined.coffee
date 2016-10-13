@@ -53,14 +53,11 @@ $ ->
       $("pre code").each (i, e) ->
         hljs.highlightBlock e
         return
-      # Hide the query_items parameters because people shouldn't use them
-      $('td:contains(query_items)').parents('tr').hide()
 
-      return
+      $('td:contains(query_items)').parents('tr').hide()
 
     onFailure: (data) ->
       log "Unable to Load SwaggerUI"
-      return
 
     docExpansion: "list"
     sorter: "alpha"

@@ -2,4 +2,4 @@
 //= require external_scripts/headroom
 //= require external_scripts/jQuery.headroom
 //= require waypoints/jquery.waypoints.js
-//= require documentation/swagger_v2
+//= require documentation/swagger_inlined
