@@ -20,8 +20,8 @@ module API
           Bike.searchable_interpreted_params(params, ip: forwarded_ip_address)
         end
 
-        def serialized_paginated_bikes_results
-          ActiveModel::ArraySerializer.new(paginate(Bike.search(interpreted_params)),
+        def serialized_bikes_results(paginated_bikes)
+          ActiveModel::ArraySerializer.new(paginated_bikes,
                                            each_serializer: BikeV2Serializer, root: 'bikes')
         end
 
@@ -30,7 +30,7 @@ module API
         end
       end
       resource :search, desc: 'Searching for bikes' do
-        desc 'Count of bikes matching search', {
+        desc 'Search for bikes', {
           notes: <<-NOTE
             - `stolenness` is the sort of bikes to match. `all`: every bike, `non`: only not-stolen, `stolen`: all stolen, `proximity`: only within `distance` of included `location`.
 
@@ -45,12 +45,29 @@ module API
           optional :per_page, type: Integer, default: 25, desc: 'Bikes per page (max 100)'
         end
         get '/' do
-          serialized_paginated_bikes_results
+          serialized_bikes_results(paginate Bike.search(interpreted_params))
+        end
+
+        desc 'Search close serials', {
+          notes: <<-NOTE
+            This endpoint accepts the same parameters as the root `/search` endpoint.
+
+            It returns matches that are off of the submitted `serial` by less than 3 characters.
+          NOTE
+        }
+        paginate
+        params do
+          requires :serial, type: String, desc: 'Serial, homoglyph matched'
+          use :non_serial_search_params
+          optional :per_page, type: Integer, default: 25, desc: 'Bikes per page (max 100)'
+        end
+        get '/close_serials' do
+          serialized_bikes_results(paginate Bike.search_close_serials(interpreted_params))
         end
 
         desc 'Count of bikes matching search', {
           notes: <<-NOTE
-            Include all the options passed in your search, this endpoint accepts the same parameters as the root `/search` endpoint.
+            Include all the options passed in your search. This endpoint accepts the same parameters as the root `/search` endpoint.
 
             Responds with a hash of the total number of bikes matching your search for each type.
 

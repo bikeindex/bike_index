@@ -4,7 +4,6 @@ describe 'Search API V3' do
   # For the time being, only count is implemented
   let(:manufacturer) { FactoryGirl.create(:manufacturer) }
   let(:color) { FactoryGirl.create(:color) }
-  let(:target_interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: nil) }
   describe '/' do
     let!(:bike) { FactoryGirl.create(:stolen_bike, manufacturer: manufacturer) }
     let!(:bike_2) { FactoryGirl.create(:stolen_bike, manufacturer: manufacturer) }
@@ -16,6 +15,19 @@ describe 'Search API V3' do
         expect(response.header['Link'].match('page=2&per_page=1&query_items')).to be_present
         result = JSON.parse(response.body)
         expect(result['bikes'][0]['id']).to eq bike_2.id
+      end
+    end
+  end
+  describe '/close_serials' do
+    let!(:bike) { FactoryGirl.create(:bike, manufacturer: manufacturer, serial_number: 'something') }
+    let(:query_params) { { serial: 'somethind', stolenness: 'non' } }
+    let(:target_interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: nil) }
+    context 'with per_page' do
+      it 'returns matching bikes, defaults to stolen' do
+        get '/api/v3/search/close_serials', query_params, format: :json
+        result = JSON.parse(response.body)
+        expect(result['bikes'][0]['id']).to eq bike.id
+        expect(response.header['Total']).to eq('1')
       end
     end
   end

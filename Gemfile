@@ -59,7 +59,7 @@ gem 'sparkpost' # ruby client for email
 gem 'doorkeeper'
 gem 'wine_bouncer'
 gem 'grape', '~> 0.14.0'
-gem 'grape-active_model_serializers', git: 'https://github.com/jrhe/grape-active_model_serializers'
+gem 'grape-active_model_serializers', '~> 1.4.0'
 gem 'grape-swagger', '~> 0.10.4'
 gem 'swagger-ui_rails'
 gem 'api-pagination'
