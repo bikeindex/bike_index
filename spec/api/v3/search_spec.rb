@@ -4,7 +4,22 @@ describe 'Search API V3' do
   # For the time being, only count is implemented
   let(:manufacturer) { FactoryGirl.create(:manufacturer) }
   let(:color) { FactoryGirl.create(:color) }
-  describe 'count' do
+  let(:target_interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: nil) }
+  describe '/' do
+    let!(:bike) { FactoryGirl.create(:stolen_bike, manufacturer: manufacturer) }
+    let!(:bike_2) { FactoryGirl.create(:stolen_bike, manufacturer: manufacturer) }
+    let(:query_params) { { query_items: [manufacturer.search_id] } }
+    context 'with per_page' do
+      it 'returns matching bikes, defaults to stolen' do
+        get '/api/v3/search', query_params.merge(per_page: 1), format: :json
+        expect(response.header['Total']).to eq('2')
+        expect(response.header['Link'].match('page=2&per_page=1&query_items')).to be_present
+        result = JSON.parse(response.body)
+        expect(result['bikes'][0]['id']).to eq bike_2.id
+      end
+    end
+  end
+  describe '/count' do
     context 'incorrect stolenness value' do
       it 'returns an error message' do
         get '/api/v3/search/count', stolenness: 'something else', format: :json
@@ -43,23 +58,18 @@ describe 'Search API V3' do
     context 'nil params' do
       it 'succeeds' do
         get '/api/v3/search/count', { stolenness: '', query_items: [], serial: '' }, format: :json
-        result = JSON.parse(response.body)
+        # JSON.parse(response.body)
         expect(response.status).to eq(200)
       end
     end
     context 'with query items' do
-      let(:bike) { FactoryGirl.create(:bike) }
-      let(:bike_2) { FactoryGirl.create(:bike) }
-      let(:manufacturer) { bike.manufacturer }
-      let(:color) { bike.primary_frame_color }
-      let(:target_interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: ip_address) }
-      let(:query_params) { { query_items: [color.search_id, manufacturer.search_id] } }
+      let!(:bike) { FactoryGirl.create(:bike, manufacturer: manufacturer) }
+      let!(:bike_2) { FactoryGirl.create(:bike) }
+      let(:query_params) { { query_items: [manufacturer.search_id] } }
       it 'succeeds' do
-        pp target_interpreted_params
-        get '/api/v3/search/count', { stolenness: '', query_items: [], serial: '' }, format: :json
+        get '/api/v3/search/count', query_params, format: :json
         result = JSON.parse(response.body)
-        pp result
-        expect(result['bikes']).to eq bike
+        expect(result['non']).to eq 1
         expect(response.status).to eq(200)
       end
     end

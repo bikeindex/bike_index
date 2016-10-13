@@ -9,11 +9,20 @@ module API
           optional :location, type: String, desc: 'Location for proximity search', default: 'IP'
           optional :distance, type: String, desc: 'Distance in miles from `location` for proximity search', default: 10
           optional :stolenness, type: String, values: %w(non stolen proximity all) + [''], default: 'stolen'
-          optional :query_items, type: Array, desc: 'Our Fancy select query items, may change without notice', documentation: { hidden: true }
+          optional :query_items, type: Array, desc: 'Our Fancy select query items, DO NOT USE, may change without notice', documentation: { hidden: true }
         end
         params :search do
           optional :serial, type: String, desc: 'Serial, homoglyph matched'
           use :non_serial_search_params
+        end
+
+        def interpreted_params
+          Bike.searchable_interpreted_params(params, ip: forwarded_ip_address)
+        end
+
+        def serialized_paginated_bikes_results
+          ActiveModel::ArraySerializer.new(paginate(Bike.search(interpreted_params)),
+                                           each_serializer: BikeV2Serializer, root: 'bikes')
         end
 
         def forwarded_ip_address
@@ -23,12 +32,29 @@ module API
       resource :search, desc: 'Searching for bikes' do
         desc 'Count of bikes matching search', {
           notes: <<-NOTE
-            - `stolenness` is the sort of bikes to match. `all`: everything, `non`: only not-stolen, `stolen`: all stolen, `proximity`: only within `distance` of `location`.
-            - `query_items` is the special formatted array used by our fancy select on the frontend. It's included here so you can use the same parameters for HTML and API. You probably don't want to use it.
-            - `location` is ignored unless `stolenness` is 'proximity'
-            - If `location` is 'IP' (the default), the location is determined via geolocation of your IP address.
+            - `stolenness` is the sort of bikes to match. `all`: every bike, `non`: only not-stolen, `stolen`: all stolen, `proximity`: only within `distance` of included `location`.
 
-            Include all the options passed in your search. This will respond with a hash of the number of bikes matching your search for each type:
+            - `location` is ignored unless `stolenness` is 'proximity'
+
+            - If `location` is 'IP' (the default), the location is determined via geolocation of your IP address.
+          NOTE
+        }
+        paginate
+        params do
+          use :search
+          optional :per_page, type: Integer, default: 25, desc: 'Bikes per page (max 100)'
+        end
+        get '/' do
+          serialized_paginated_bikes_results
+        end
+
+        desc 'Count of bikes matching search', {
+          notes: <<-NOTE
+            Include all the options passed in your search, this endpoint accepts the same parameters as the root `/search` endpoint.
+
+            Responds with a hash of the total number of bikes matching your search for each type.
+
+            `proximity` is the count of matching stolen bikes within the proximity of your search.
 
             ```javascript
             {
@@ -38,20 +64,18 @@ module API
             }
             ```
 
-            `proximity` is the count of matching stolen bikes within the proximity of your search.
-
-            *the `stolen` paramater is ignored, but allowed here for consistency*
+            *The `stolenness` paramater is ignored but allowed here for consistency*
           NOTE
         }
         params do
           use :search
         end
-        get '/count', root: 'bikes', each_serializer: BikeV2Serializer do
-          interpreted_params = Bike.searchable_interpreted_params(params.merge(stolenness: 'proximity'), ip: forwarded_ip_address)
+        get '/count' do
+          count_interpreted_params = Bike.searchable_interpreted_params(params.merge(stolenness: 'proximity'), ip: forwarded_ip_address)
           {
-            proximity: Bike.search(interpreted_params).count,
-            stolen: Bike.search(interpreted_params.merge(stolenness: 'stolen')).count,
-            non: Bike.search(interpreted_params.merge(stolenness: 'non')).count
+            proximity: Bike.search(count_interpreted_params).count,
+            stolen: Bike.search(count_interpreted_params.merge(stolenness: 'stolen')).count,
+            non: Bike.search(count_interpreted_params.merge(stolenness: 'non')).count
           }
         end
       end

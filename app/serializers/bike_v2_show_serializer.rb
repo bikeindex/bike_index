@@ -77,7 +77,4 @@ class BikeV2ShowSerializer < BikeV2Serializer
   def rear_gear_type_slug
     object.rear_gear_type && object.rear_gear_type.slug
   end
-
-
-
 end
