@@ -4,8 +4,8 @@ describe 'Manufacturers API V2' do
   describe 'root' do
     it 'responds on index with pagination' do
       manufacturer = FactoryGirl.create(:manufacturer)
-      FactoryGirl.create(:manufacturer)
-      FactoryGirl.create(:manufacturer) unless Manufacturer.count == 2
+      FactoryGirl.create(:manufacturer) unless Manufacturer.count >= 2
+      FactoryGirl.create(:manufacturer) unless Manufacturer.count >= 2
       get '/api/v2/manufacturers?per_page=1'
       expect(response.header['Total']).to eq('2')
       pagination_link = '<http://www.example.com/api/v2/manufacturers?page=2&per_page=1>; rel="last", <http://www.example.com/api/v2/manufacturers?page=2&per_page=1>; rel="next"'
