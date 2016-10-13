@@ -2,7 +2,7 @@ The Bike Index is open source. You can [view the source code on GitHub](https://
 
 If you encounter any errors here (or anywhere on the Bike Index), please [submit an issue on GitHub](https://github.com/bikeindex/bike_index/issues/new).
 
-If you have questions contact [seth@bikeindex.org](mailto:seth@bikeindex.org").
+If you have questions contact [admin@bikeindex.org](mailto:admin@bikeindex.org").
 
 This documentation displays the port number in the demo requests - e.g. [bikeindex.org:**443**/api/v2/bikes_search](https://bikeindex.org/api/v2/bikes_search). While this works, it's unnecessary. You can remove the `:443` - e.g. bikeindex.org/api/v2/bikes_search.
 

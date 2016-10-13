@@ -1,7 +1,7 @@
 class DocumentationController < ApplicationController
   before_filter :render_swagger_for_page, only: [:api_v3, :api_v2]
   def index
-    redirect_to controller: :documentation, action: :api_v2
+    redirect_to controller: :documentation, action: :api_v3
   end
 
   def api_v1
@@ -36,7 +36,7 @@ class DocumentationController < ApplicationController
     if current_user.present?
       @applications = current_user.oauth_applications
     else
-      cookies[:return_to] = api_v2_documentation_index_url
+      cookies[:return_to] = api_v3_documentation_index_url
     end
     render layout: false
   end

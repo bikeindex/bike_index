@@ -7,7 +7,7 @@ The Bike Index is open source. You can [view the source code on GitHub](https://
 
 If you encounter any errors here (or anywhere on the Bike Index), please [submit an issue on GitHub](https://github.com/bikeindex/bike_index/issues/new).
 
-If you have questions contact [seth@bikeindex.org](mailto:seth@bikeindex.org").
+If you have questions contact [admin@bikeindex.org](mailto:admin@bikeindex.org").
 
 This documentation displays the port number in the demo requests - e.g. [bikeindex.org:**443**/api/v3/bikes_search](https://bikeindex.org/api/v3/bikes_search). While this works, it's unnecessary. You can remove the `:443` - e.g. bikeindex.org/api/v3/bikes_search.
 
@@ -66,6 +66,8 @@ Bike Index API V3 displays everything in <a href="https://en.wikipedia.org/wiki/
 The Bike Index uses OAuth2. <a href="#applications_list" class="scroll-link">Create an application</a> and use an access token for any requests that need authorization.
 
 Endpoints with Red Stars (<span class="accstr">*</span>) require an access token to use.
+
+There is increased rate limiting for non-authenticated requests - including an access token in all requests (even when not required) is a good idea.
 
 <!-- <img alt="example of a protected endpoint" src="updated/documentation/protected_endpoint.png" class="protected-endpoint-img"> -->
 

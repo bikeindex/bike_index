@@ -48,23 +48,6 @@ module API
           serialized_bikes_results(paginate Bike.search(interpreted_params))
         end
 
-        desc 'Search close serials', {
-          notes: <<-NOTE
-            This endpoint accepts the same parameters as the root `/search` endpoint.
-
-            It returns matches that are off of the submitted `serial` by less than 3 characters.
-          NOTE
-        }
-        paginate
-        params do
-          requires :serial, type: String, desc: 'Serial, homoglyph matched'
-          use :non_serial_search_params
-          optional :per_page, type: Integer, default: 25, desc: 'Bikes per page (max 100)'
-        end
-        get '/close_serials' do
-          serialized_bikes_results(paginate Bike.search_close_serials(interpreted_params))
-        end
-
         desc 'Count of bikes matching search', {
           notes: <<-NOTE
             Include all the options passed in your search. This endpoint accepts the same parameters as the root `/search` endpoint.
@@ -94,6 +77,23 @@ module API
             stolen: Bike.search(count_interpreted_params.merge(stolenness: 'stolen')).count,
             non: Bike.search(count_interpreted_params.merge(stolenness: 'non')).count
           }
+        end
+
+        desc 'Search close serials', {
+          notes: <<-NOTE
+            This endpoint accepts the same parameters as the root `/search` endpoint.
+
+            It returns matches that are off of the submitted `serial` by less than 3 characters.
+          NOTE
+        }
+        paginate
+        params do
+          requires :serial, type: String, desc: 'Serial, homoglyph matched'
+          use :non_serial_search_params
+          optional :per_page, type: Integer, default: 25, desc: 'Bikes per page (max 100)'
+        end
+        get '/close_serials' do
+          serialized_bikes_results(paginate Bike.search_close_serials(interpreted_params))
         end
       end
     end

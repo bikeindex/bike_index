@@ -2,33 +2,37 @@ module API
   module V2
     class Me < API::Base
       include API::V2::Defaults
-
       resource :me, desc: "Operations about the current user" do
         helpers do 
           def user_info
+            return {} unless current_scopes.include?('read_user')
             {
-              username: current_user.username,
-              name: current_user.name,
-              email: current_user.email, 
-              twitter: (current_user.twitter if current_user.show_twitter),
-              image: (current_user.avatar_url if current_user.show_bikes)
+              user: {
+                username: current_user.username,
+                name: current_user.name,
+                email: current_user.email, 
+                twitter: (current_user.twitter if current_user.show_twitter),
+                image: (current_user.avatar_url if current_user.show_bikes)
+              }
             }
           end
           
           def bike_ids
-            current_user.bike_ids
+            current_scopes.include?('read_bikes') ? { bike_ids: current_user.bike_ids } : {}
+          end
+
+          def serialized_membership(membership)
+            {
+              organization_name: membership.organization.name,
+              organization_slug: membership.organization.slug, 
+              organization_access_token: membership.organization.access_token,
+              user_is_organization_admin: (true ? membership.role == 'admin' : false)
+            }
           end
 
           def organization_memberships
-            return [] unless current_user.memberships.any?
-            current_user.memberships.map{ |membership| 
-              {
-                organization_name: membership.organization.name,
-                organization_slug: membership.organization.slug, 
-                organization_access_token: membership.organization.access_token,
-                user_is_organization_admin: (true ? membership.role == 'admin' : false)
-              }
-            }
+            return {} unless current_scopes.include?('read_organization_membership')
+            { memberships: current_user.memberships.map { |m| serialized_membership(m) } }
           end
         end
 
@@ -44,13 +48,7 @@ module API
           NOTE
         }
         get '/' do
-          result = {
-            id: current_user.id.to_s
-          }
-          result[:user] = user_info if current_scopes.include?('read_user')
-          result[:bike_ids] = bike_ids if current_scopes.include?('read_bikes')
-          result[:memberships] = organization_memberships if current_scopes.include?('read_organization_membership')
-          result
+          { id: current_user.id.to_s }.merge(user_info).merge(bike_ids).merge(organization_memberships)
         end
 
         desc "Current user's bikes<span class='accstr'>*</span>", {
@@ -65,7 +63,6 @@ module API
         get '/bikes', each_serializer: BikeV2Serializer, root: 'bikes' do
           current_user.bikes
         end
-      
       end
     end
   end
