@@ -1,6 +1,7 @@
 class DocumentationController < ApplicationController
+  before_filter :render_swagger_for_page, only: [:api_v3, :api_v2]
   def index
-    redirect_to controller: :documentation, action: :api_v2
+    redirect_to controller: :documentation, action: :api_v3
   end
 
   def api_v1
@@ -13,12 +14,9 @@ class DocumentationController < ApplicationController
   end
 
   def api_v2
-    if current_user.present?
-      @applications = current_user.oauth_applications
-    else
-      cookies[:return_to] = api_v2_documentation_index_url
-    end
-    render layout: false
+  end
+
+  def api_v3
   end
 
   def o2c
@@ -30,5 +28,16 @@ class DocumentationController < ApplicationController
     @access_grant = Doorkeeper::AccessGrant.where(resource_owner_id: current_user.id, token: @access_code).last
     @application = @access_grant.application if @access_grant.present?
     render layout: 'content'
+  end
+
+  private
+
+  def render_swagger_for_page
+    if current_user.present?
+      @applications = current_user.oauth_applications
+    else
+      cookies[:return_to] = api_v3_documentation_index_url
+    end
+    render layout: false
   end
 end

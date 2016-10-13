@@ -1,12 +1,4 @@
 GIT
-  remote: https://github.com/jrhe/grape-active_model_serializers
-  revision: fcec84dc923423b5b5150c8f3ffecbfc78493543
-  specs:
-    grape-active_model_serializers (1.4.0)
-      active_model_serializers (>= 0.9.0)
-      grape
-
-GIT
   remote: https://github.com/stripe/stripe-ruby
   revision: f2aa8c1e584916bd82c23c1f3065230cf2e3833d
   specs:
@@ -293,6 +285,9 @@ GEM
       rack-accept
       rack-mount
       virtus (>= 1.0.0)
+    grape-active_model_serializers (1.4.0)
+      active_model_serializers (>= 0.9.0)
+      grape
     grape-entity (0.4.8)
       activesupport
       multi_json (>= 1.3.2)
@@ -512,6 +507,7 @@ GEM
       rails-assets-sifter (~> 0.4.0)
     rails-assets-sifter (0.4.5)
     rails-assets-tether (1.1.1)
+    rails-assets-waypoints (3.1.1)
     rails-deprecated_sanitizer (1.0.3)
       activesupport (>= 4.2.0.alpha)
     rails-dom-testing (1.0.7)
@@ -704,7 +700,7 @@ DEPENDENCIES
   foreman
   geocoder
   grape (~> 0.14.0)
-  grape-active_model_serializers!
+  grape-active_model_serializers (~> 1.4.0)
   grape-swagger (~> 0.10.4)
   grape_logging
   groupdate
@@ -751,6 +747,7 @@ DEPENDENCIES
   rails-assets-select2 (~> 4.0.3)!
   rails-assets-selectize (~> 0.12.1)!
   rails-assets-tether (~> 1.1.0)!
+  rails-assets-waypoints (~> 3.1.1)!
   rb-fsevent (~> 0.9.1)
   redcarpet
   redis

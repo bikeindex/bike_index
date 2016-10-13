@@ -4,7 +4,7 @@ describe DocumentationController do
   describe 'index' do
     it 'redirects to current api documentation' do
       get :index
-      expect(response).to redirect_to('/documentation/api_v2')
+      expect(response).to redirect_to('/documentation/api_v3')
       expect(flash).to_not be_present
     end
   end
@@ -37,6 +37,15 @@ describe DocumentationController do
       get :api_v2
       expect(response.code).to eq('200')
       expect(response).to render_template('api_v2')
+      expect(flash).to_not be_present
+    end
+  end
+
+  describe 'api_v3' do
+    it 'renders' do
+      get :api_v3
+      expect(response.code).to eq('200')
+      expect(response).to render_template('api_v3')
       expect(flash).to_not be_present
     end
   end

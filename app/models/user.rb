@@ -114,7 +114,7 @@ class User < ActiveRecord::Base
   end
 
   def superuser?
-    superuser 
+    superuser
   end
 
   def content?

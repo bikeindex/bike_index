@@ -25,7 +25,7 @@
           = render 'delete_form', application: application
 .container
   %h3.padded
-    Documentation on API V2 is available at #{link_to "documentation/api_v2", api_v2_documentation_index_url}
+    Documentation on the API is available at #{link_to "documentation", documentation_index_url}
 
 - if current_user.superuser?
   = render 'admin_applications'

@@ -2,15 +2,16 @@
 %html
   %head
     = header_tags
-    <link rel="shortcut icon" href="/fav.ico" />
-    = stylesheet_link_tag "documentation_v2", media: "all"
-    = stylesheet_link_tag 'og_application', media: "all"
-    - api_version = 'v2'
+    <link rel='shortcut icon' href='/fav.ico' />
+    = stylesheet_link_tag 'documentation_v2', media: 'all'
+    = stylesheet_link_tag 'og_application', media: 'all'
+
+    - api_version = 'v3'
     :javascript
       window.swagger_url = "#{ENV['BASE_URL']}/api/#{api_version}/swagger_doc";
-    = stylesheet_link_tag "updated_styles", media: "all"
+    = stylesheet_link_tag "updated_styles", media: 'all'
     <link href='https://fonts.googleapis.com/css?family=Anonymous+Pro:400,400italic,700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
-    = javascript_include_tag "documentation_v2"
+    = javascript_include_tag 'documentation_v3'
     
   %body.swagger-section
     / { data: { spy: 'scroll', target: '.docs-section-list'}}
@@ -24,9 +25,6 @@
               = image_tag "updated/home/logo.svg", class: 'logo'
           %form#api_selector.form
             .api-header-group.api-header-url
-              / %label{ for: 'baseUrl' }
-              /   Swagger doc url
-              / %input#input_baseUrl.form-control{:name => "baseUrl", :placeholder => "https://bikeindex.org/api/v2", :type => "text"}
             .api-header-group.api-header-key
               %label{ for: 'baseUrl' }
                 Access token
@@ -35,7 +33,7 @@
               Explore
     %nav.docs-section-list#navmenu-fixed
       %a#m_ref_title{ href: "#ref_title" }
-        Bike Index API V2
+        Bike Index API V3
       %ul
         %li
           %a#m_ref_introduction{ href: "#ref_introduction" }
@@ -62,8 +60,8 @@
         Endpoints
       %ul
         %li
-          %a#m_resource_bikes_search{ href: "#resource_bikes_search" }
-            Bikes search
+          %a#m_resource_bikes_search{ href: "#resource_search" }
+            Bike search
         %li
           %a#m_resource_bikes{ href: "#resource_bikes" }
             Bikes
@@ -102,21 +100,13 @@
 
     .container-fluid
       .api-info-header
-        <a class="ref" id="ref_title"></a>
-        %h1 Bike Index API V2
-
-        .alert.alert-info{ style: 'margin-top: 30px;' }
-          %h4
-            Bike Index API V2 is deprecated
-          %p{ style: 'padding-left: 0;' }
-            Please use #{ link_to 'the current version of the API', documentation_index_path } instead.
 
         :markdown
-          #{render "documentation/api_v2/info_header"}
+          #{render "documentation/api_v3/info_header"}
       
       .start-of-swagger-ui
         %h2
-          Bike Index API V2 endpoints
+          Bike Index API V3 endpoints
           <a id="ref_endpoints"></a>
 
     #message-bar.swagger-ui-wrap &nbsp;
@@ -151,6 +141,6 @@
         .form-group
           %label.control-label{ for: 'input_baseUrl' }
             Swagger doc url
-          %input#input_baseUrl.form-control{:name => "baseUrl", :placeholder => "https://bikeindex.org/api/v2", :type => "text"}
+          %input#input_baseUrl.form-control{:name => "baseUrl", :placeholder => "https://bikeindex.org/api/v3", :type => "text"}
 
     = render 'shared/footer_updated'

@@ -1,10 +1,15 @@
-The Bike Index is open source. You can [view the source code on GitHub](https://github.com/bikeindex/bike_index)&mdash;the API is in [app/controllers/api/v2](https://github.com/bikeindex/bike_index/tree/master/app/controllers/api/v2) and the tests for it are in [spec/api/v2](https://github.com/bikeindex/bike_index/tree/master/spec/api/v2).
+<a class="ref" id="ref_title">
+
+#Bike Index API V3
+  
+
+The Bike Index is open source. You can [view the source code on GitHub](https://github.com/bikeindex/bike_index)&mdash;the API is in [app/controllers/api/v3](https://github.com/bikeindex/bike_index/tree/master/app/controllers/api/v3) and the tests for it are in [spec/api/v3](https://github.com/bikeindex/bike_index/tree/master/spec/api/v3).
 
 If you encounter any errors here (or anywhere on the Bike Index), please [submit an issue on GitHub](https://github.com/bikeindex/bike_index/issues/new).
 
 If you have questions contact [admin@bikeindex.org](mailto:admin@bikeindex.org").
 
-This documentation displays the port number in the demo requests - e.g. [bikeindex.org:**443**/api/v2/bikes_search](https://bikeindex.org/api/v2/bikes_search). While this works, it's unnecessary. You can remove the `:443` - e.g. bikeindex.org/api/v2/bikes_search.
+This documentation displays the port number in the demo requests - e.g. [bikeindex.org:**443**/api/v3/bikes_search](https://bikeindex.org/api/v3/bikes_search). While this works, it's unnecessary. You can remove the `:443` - e.g. bikeindex.org/api/v3/bikes_search.
 
 *This documentation isn't tested or supported in IE, we recommend you use a different browser*
 
@@ -52,7 +57,7 @@ The HTML pages of the Bike Index follow the same pattern as the API - the url fo
   
 ###Time
 
-Bike Index API V2 displays everything in <a href="https://en.wikipedia.org/wiki/Unix_time" target="_blank">UTC unix timestamps</a> (integers). All time parameters you send need to use timestamps as well.
+Bike Index API V3 displays everything in <a href="https://en.wikipedia.org/wiki/Unix_time" target="_blank">UTC unix timestamps</a> (integers). All time parameters you send need to use timestamps as well.
 
 <a class="ref" id="ref_authentication">
   
@@ -61,6 +66,8 @@ Bike Index API V2 displays everything in <a href="https://en.wikipedia.org/wiki/
 The Bike Index uses OAuth2. <a href="#applications_list" class="scroll-link">Create an application</a> and use an access token for any requests that need authorization.
 
 Endpoints with Red Stars (<span class="accstr">*</span>) require an access token to use.
+
+There is increased rate limiting for non-authenticated requests - including an access token in all requests (even when not required) is a good idea.
 
 <!-- <img alt="example of a protected endpoint" src="updated/documentation/protected_endpoint.png" class="protected-endpoint-img"> -->
 

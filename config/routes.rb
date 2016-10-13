@@ -39,6 +39,7 @@ Bikeindex::Application.routes.draw do
     collection do
       get :api_v1
       get :api_v2
+      get :api_v3
       get :o2c
       get :authorize
     end
