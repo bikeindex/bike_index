@@ -1,6 +1,7 @@
 // Legacy content styles that apply to multiple legacy content pages
 .legacy-content-wrap {
   .footnotes, .padded { padding-top: 2*$vertical-height; }
+  .footnote-back-link { font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; }
   .fancy-bullets {
     position: relative;
     list-style-type: none;
