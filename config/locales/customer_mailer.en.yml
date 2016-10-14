@@ -1,0 +1,12 @@
+en:
+  customer_mailer:
+    welcome_email:
+      subject: Welcome to the Bike Index!
+    confirmation_email:
+      subject: Welcome to the Bike Index!
+    invoice_email:
+      subject: Thank you for supporting the Bike Index!
+    password_reset_email:
+      subject: Instructions to reset your password
+    additional_email_confirmation:
+      subject: Confirm your additional email

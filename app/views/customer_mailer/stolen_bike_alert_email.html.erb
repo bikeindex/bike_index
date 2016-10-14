@@ -28,7 +28,7 @@
   </p>
 <% end %>
 
-<h2 style="font-weight: 400; text-align: center; padding-top: .5em; margin-top: 2em; border-top: 1px solid #dfe3ee;font-size: 30px;">Next Steps</h2>
+<h2 style="font-weight: 400; text-align: center; padding-top: .5em; margin: 1em 0;font-size: 30px;">Next Steps</h2>
 <div class="wrap" style="border: 1px solid #dfe3ee;border-radius: 4px;padding: 10px 5px;background: #f7f7f7; margin-bottom: 10px;">
   <h2 style="font-family: helvetica;font-size: 28px;text-align: center;margin: .5em 0 .7em; font-weight: 400;">Spread the word!</h2>
   <a href="http://www.facebook.com/share.php?u=<%= bike_url(@bike) %>" style="display: block;background: #dfe3ee;position: relative;border-radius: 4px;font-family: helvetica;height: 50px;">
@@ -38,18 +38,5 @@
 </div>
 <p style="margin: 50px 0 0; padding: 20px 0 0; font-weight: 400; color: #95A5A5; text-align: center;">This email is about the <%= stolen_word %> <%= @biketype %> registered on the Bike Index on <%= @bike.created_at.strftime("%m.%d.%y") %></p>
 
-<% bike_image = 'https://files.bikeindex.org/email_assets/bike_photo_placeholder.png' %>
-<% bike_image = @customer_contact.bike.stock_photo_url if @customer_contact.bike.stock_photo_url.present? %>
-<% bike_image = @customer_contact.bike.thumb_path if @customer_contact.bike.thumb_path %>
+<%= render partial: '/shared/email_bike_box' %>
 
-<div class="bike-display" style="position: relative;width: 96%;height: 150px;padding: 10px 2%;background: #bf2f2f;border: 1px solid #ddd;max-width: 450px;margin: 30px auto 0;clear: both;">
-  <div class="image-holder" style="width: 33%;float: left;position: relative;">
-    <a href="<%= bike_url(@customer_contact.bike) %>">
-     <img src="<%= bike_image %>" style="width: auto;max-width: 100%;max-height: 150px;border: 1px solid #ddd;">
-  </div>
-  <div class="bike-info" style="position: relative;width: 63%;margin-left: 3%;float: left;padding-top: 30px; <%= 'color: white;' if @customer_contact.bike.stolen %>">
-    <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Make</span> <%= @customer_contact.bike.mnfg_name  %></p>
-    <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Serial</span> <%= @customer_contact.bike.serial_number %></p>
-    <p style="margin: 0;padding: 0;line-height: 1.2em;"><span style="display: inline-block;color: #999;width: 55px;">Color</span><% if @customer_contact.bike.paint.present? %><%= @customer_contact.bike.paint.name %><% else %><%= @customer_contact.bike.primary_frame_color.name %><% end %></p>
-  </div>
-</div>
