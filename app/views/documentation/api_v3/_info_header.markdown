@@ -67,7 +67,7 @@ The Bike Index uses OAuth2. <a href="#applications_list" class="scroll-link">Cre
 
 Endpoints with Red Stars (<span class="accstr">*</span>) require an access token to use.
 
-There is increased rate limiting for non-authenticated requests - including an access token in all requests (even when not required) is a good idea.
+There is increased rate limiting for unauthenticated requests - including an access token in all requests (even when not required) is a good idea.
 
 <!-- <img alt="example of a protected endpoint" src="updated/documentation/protected_endpoint.png" class="protected-endpoint-img"> -->
 

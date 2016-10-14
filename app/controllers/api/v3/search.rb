@@ -36,6 +36,7 @@ module API
 
             - `location` is ignored unless `stolenness` is 'proximity'
 
+            `location` can be an address, zipcode, city, or latitude,longitude. e.g. `210 NW 11th Ave, Portland, OR`, `60647`, `Chicago, IL`, or `45.521728,-122.67326`
             - If `location` is 'IP' (the default), the location is determined via geolocation of your IP address.
           NOTE
         }
@@ -83,7 +84,7 @@ module API
           notes: <<-NOTE
             This endpoint accepts the same parameters as the root `/search` endpoint.
 
-            It returns matches that are off of the submitted `serial` by less than 3 characters.
+            It returns matches that are off of the submitted `serial` by less than 3 characters (postgres levenshtein, if you're curious).
           NOTE
         }
         paginate
