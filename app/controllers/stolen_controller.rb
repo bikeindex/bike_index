@@ -1,4 +1,5 @@
 class StolenController < ApplicationController
+  before_filter :set_permitted_format, only: [:index]
   before_filter :remove_subdomain
   layout 'application_revised'
 
@@ -19,6 +20,10 @@ class StolenController < ApplicationController
   end
 
   private
+
+  def set_permitted_format
+    request.format = 'html'
+  end
 
   def remove_subdomain
     redirect_to stolen_index_url(subdomain: false) if request.subdomain.present?

@@ -196,9 +196,9 @@ describe ApplicationHelper do
       before { allow(view).to receive(:controller_name) { 'stolen' } }
       %w(index).each do |action|
         context action do
-          it 'returns content_skeleton' do
+          it 'returns nil' do
             allow(view).to receive(:action_name) { action }
-            expect(helper.current_page_skeleton).to eq 'content_skeleton'
+            expect(helper.current_page_skeleton).to be_nil
           end
         end
       end

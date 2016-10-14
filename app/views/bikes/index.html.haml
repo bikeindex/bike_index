@@ -10,7 +10,7 @@
         
   .row
     .col-md-8
-      = form_tag bikes_path, id: 'bikes_search_form', class: 'bikes-search-form', method: :get do
+      = form_tag bikes_path, id: 'bikes_search_form', class: 'bikes-search-form', enforce_utf8: false, method: :get do
         = render partial: '/shared/search_inputs'
         .stolen-search-fields{ class: ('currently-hidden' unless params[:stolenness] == 'proximity') }
           = text_field_tag :location, params[:location], placeholder: 'Anywhere', class: 'form-control stolen-proximity'

@@ -34,7 +34,7 @@ module ApplicationHelper
       'content_skeleton' if %w(new lightspeed_integration).include?(action_name)
     when 'users'
       'content_skeleton' if %w(request_password_reset).include?(action_name)
-    when *%w(news feedbacks manufacturers stolen errors registrations)
+    when *%w(news feedbacks manufacturers errors registrations)
       'content_skeleton'
     end
   end
