@@ -46,6 +46,7 @@ describe CustomerMailer do
   end
 
   describe 'stolen_bike_alert_email' do
+    let!(:ownership) { FactoryGirl.create(:ownership, bike: stolen_record.bike) }
     let(:stolen_record) { FactoryGirl.create(:stolen_record) }
     let(:notification_hash) do
       {
@@ -60,7 +61,7 @@ describe CustomerMailer do
         retweet_screen_names: %w(someother_screename and_another)
       }
     end
-    let(:customer_contact) { FactoryGirl.create(:customer_contact, info_hash: notification_hash, title: 'CUSTOM CUSTOMER contact Title') }
+    let(:customer_contact) { FactoryGirl.create(:customer_contact, info_hash: notification_hash, title: 'CUSTOM CUSTOMER contact Title', bike: stolen_record.bike) }
     it 'renders email' do
       mail = CustomerMailer.stolen_bike_alert_email(customer_contact)
       expect(mail.to).to eq([customer_contact.user_email])
@@ -69,6 +70,7 @@ describe CustomerMailer do
   end
 
   describe 'admin_contact_stolen_email' do
+    let!(:ownership) { FactoryGirl.create(:ownership, bike: stolen_record.bike) }
     let(:stolen_record) { FactoryGirl.create(:stolen_record) }
     let(:user) { FactoryGirl.create(:admin, email: 'something@stuff.com') }
     let(:customer_contact) do
@@ -88,7 +90,9 @@ describe CustomerMailer do
   end
 
   describe 'stolen_notification_email' do
-    let(:stolen_notification) { FactoryGirl.create(:stolen_notification, message: 'Test Message', reference_url: 'something.com') }
+    let(:stolen_record) { FactoryGirl.create(:stolen_record) }
+    let!(:ownership) { FactoryGirl.create(:ownership, bike: stolen_record.bike) }
+    let(:stolen_notification) { FactoryGirl.create(:stolen_notification, message: 'Test Message', reference_url: 'something.com', bike: stolen_record.bike) }
     it 'renders email and update sent_dates' do
       mail = CustomerMailer.stolen_notification_email(stolen_notification)
       expect(mail.subject).to eq(stolen_notification.default_subject)
