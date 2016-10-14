@@ -1,0 +1,23 @@
+- @bike = @stolen_notification.bike
+
+.stolen-notification-from
+  %p
+    #{@stolen_notification.sender.email} sent you a message about your #{link_to "stolen #{@bike.type}", bike_url(@bike)}!
+
+%p
+  = @stolen_notification.message
+
+- if @stolen_notification.reference_url.present?
+  %p
+    link: #{link_to @stolen_notification.reference_url, @stolen_notification.reference_url}
+
+- if @stolen_notification.sender.name.present?
+  %p{ style: 'color: #ccc; margin: 2em 0 2em 1em;' }
+    = @stolen_notification.sender.name
+
+%hr{ style: 'margin: 40px 0;' }
+
+%p.less-strong.center-text
+  This email is about the #{@bike.type} registered on the Bike Index on #{@bike.created_at.strftime('%m.%d.%y')}
+
+= render partial: '/shared/email_bike_box'

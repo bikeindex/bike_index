@@ -250,5 +250,5 @@ Bikeindex::Application.routes.draw do
     resources :emails
   end
 
-  get '*unmatched_route', to: 'errors#not_found' # So it is handled by lograge
+  get '*unmatched_route', to: 'errors#not_found' if Rails.env.production? # Handle 404s with lograge
 end

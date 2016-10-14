@@ -1,4 +1,4 @@
-# Preview emails at http://localhost:3001/rails/mailers/organized_mailer
+# Preview emails at /rails/mailers/organized_mailer
 class OrganizedMailerPreview < ActionMailer::Preview
   def partial_registration
     b_param = BParam.order(:created_at).last

@@ -5,14 +5,12 @@ class OrganizedMailer < ActionMailer::Base
   default from: CONTACT_BIKEINDEX,
           content_type: 'multipart/alternative',
           parts_order: ['text/calendar', 'text/plain', 'text/html', 'text/enriched']
+  layout 'email'
 
   def partial_registration(b_param)
     @b_param = b_param
     @organization = @b_param.creation_organization
-    mail('Reply-To' => reply_to, to: @b_param.owner_email, subject: default_i18n_subject(default_subject_vars)) do |format|
-      format.text
-      format.html { render layout: 'email_revised' }
-    end
+    mail('Reply-To' => reply_to, to: @b_param.owner_email, subject: default_i18n_subject(default_subject_vars))
   end
 
   def finished_registration(ownership)
@@ -25,10 +23,7 @@ class OrganizedMailer < ActionMailer::Base
     }
     @organization = @bike.creation_organization if @bike.creation_organization.present? && @vars[:new_bike]
     subject = t("organized_mailer.finished#{'_stolen' if @bike.stolen}_registration.subject", default_subject_vars)
-    mail('Reply-To' => reply_to, to: @ownership.owner_email, subject: subject) do |format|
-      format.text
-      format.html { render layout: 'email_revised' }
-    end
+    mail('Reply-To' => reply_to, to: @ownership.owner_email, subject: subject)
   end
 
   def organization_invitation(organization_invitation)
@@ -36,10 +31,7 @@ class OrganizedMailer < ActionMailer::Base
     @organization = @organization_invitation.organization
     @inviter = @organization_invitation.inviter
     @new_user = User.fuzzy_email_find(@organization_invitation.invitee_email).present?
-    mail('Reply-To' => reply_to, to: @organization_invitation.invitee_email, subject: default_i18n_subject(default_subject_vars)) do |format|
-      format.text
-      format.html { render layout: 'email_revised' }
-    end
+    mail('Reply-To' => reply_to, to: @organization_invitation.invitee_email, subject: default_i18n_subject(default_subject_vars))
   end
 
   private

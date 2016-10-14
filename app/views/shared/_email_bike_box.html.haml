@@ -1,0 +1,38 @@
+- @ownership ||= @bike.current_ownership
+- bike_url = ownership_url(@ownership)
+- thumb_url = @bike.thumb_path || @bike.stock_photo_url
+- unless thumb_url.present?
+  - thumbclass = 'placeholder'
+  - thumb_url = 'https://files.bikeindex.org/email_assets/bike_photo_placeholder.png'
+.bike-display
+  .image-holder{ class: thumbclass }
+    %a{ href:  bike_url }
+      %img{ src: thumb_url }
+  %ul.info-holder
+    %li
+      %strong
+        Make:
+      = @bike.mnfg_name
+    %li
+      %strong
+        Serial:
+      = @bike.serial_number
+    %li
+      %strong
+        Color#{ 's' if @bike.frame_colors.count > 1 }:
+      = @bike.frame_colors.to_sentence
+    - if @bike.stolen
+      - stolen_record = @bike.current_stolen_record
+      %li
+        %strong
+          = @bike.recovered ? 'Found:' : 'Stolen from:'
+        = stolen_record.show_stolen_address
+      %li
+        %strong
+          Date:
+        = l stolen_record.date_stolen, format: :dotted
+    - if (@bike.ownerships.count == 1 && @bike.registered_new)
+      %li
+        %em.less-strong
+          Color may be incorrect. Please update it if necessary!
+  .clearstuffdiv

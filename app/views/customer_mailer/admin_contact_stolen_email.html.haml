@@ -1,0 +1,10 @@
+= @customer_contact.body.html_safe
+
+- @bike = @customer_contact.bike
+
+%hr{ style: 'margin: 40px 0;' }
+
+%p.less-strong.center-text
+  This email is about the #{@bike.type} registered on the Bike Index on #{@bike.created_at.strftime('%m.%d.%y')}
+
+= render partial: '/shared/email_bike_box'

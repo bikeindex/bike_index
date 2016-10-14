@@ -13,3 +13,11 @@ $email-light-bg: #ddd;
 @import "revised/emails/email_components";
 @import "revised/emails/email_bike_display";
 @import "revised/emails/email_partners";
+
+.stolen-notification-from {
+  background: $gray-lighter;
+  border: 1px solid $gray-lightish;
+  padding: 0 1em;
+  text-align: center;
+  font-style: italic;
+}

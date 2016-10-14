@@ -9,9 +9,9 @@ describe OrganizedMailer do
                        body: '<p>HEADERXSNIPPET</p>')
   end
   describe 'partial_registration' do
-    context 'stolen' do
+    context 'without organization' do
       let(:b_param) { FactoryGirl.create(:b_param_stolen) }
-      it 'renders, with reply to for the organization' do
+      it 'stolen renders, with reply to for the organization' do
         expect(b_param.owner_email).to be_present
         mail = OrganizedMailer.partial_registration(b_param)
         expect(mail.subject).to eq('Finish your Bike Index registration!')

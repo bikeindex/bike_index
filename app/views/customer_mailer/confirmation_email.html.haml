@@ -1,0 +1,12 @@
+%h1
+  Welcome to the Bike Index
+%p
+  Good thinking! We’re glad you’ve joined.
+
+%p{ style: 'margin-bottom: 2em;' }
+  Please confirm your email address.
+
+= link_to 'Verify email', confirm_users_url(id: @user.id, code: @user.confirmation_token), class: 'binx-button'
+
+%p.less-strong.center-text
+  Click the <em>Verify email</em> button to finish signing up for BikeIndex.org!

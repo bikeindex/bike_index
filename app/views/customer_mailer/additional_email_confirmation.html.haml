@@ -1,0 +1,15 @@
+%h2.center-text
+  Please confirm your additional email
+
+%p.center-text{ style: 'margin-bottom: 3em;' }
+  #{@user.display_name} would like to merge this email into their account (#{@user.email}).
+
+= link_to 'Verify email', confirm_user_email_url(id: @user_email.id, confirmation_token: @user_email.confirmation_token), class: 'binx-button'
+
+%p.center-text.less-strong
+  Click the <em>Verify email</em> button to merge these accounts on BikeIndex.org!
+
+%hr
+
+%p.center-text
+  If you didn't request this merge please reply to this email and tell us.

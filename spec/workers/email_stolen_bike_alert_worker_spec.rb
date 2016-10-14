@@ -6,6 +6,7 @@ describe EmailStolenBikeAlertWorker do
   describe 'perform' do
     it 'sends an email' do
       stolen_record = FactoryGirl.create(:stolen_record)
+      FactoryGirl.create(:ownership, bike: stolen_record.bike)
       info_hash = {
         notification_type: 'stolen_twitter_alerter',
         bike_id: stolen_record.bike.id,

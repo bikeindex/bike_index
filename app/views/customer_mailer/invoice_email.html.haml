@@ -1,0 +1,12 @@
+%h1
+  Thank you so much!
+
+%p
+  We really appreciate your support of Bike Index!
+
+- if @payment.is_recurring
+  %p
+    That you for signing up to be a member of Bike Index. We'll send you invoices every month to this email address
+
+%p
+  Your donation of <%= @payment.amount.to_i/100.00 %> really will help us rescue more bikes.
