@@ -1,34 +1,22 @@
 # Preview emails at /rails/mailers/admin_mailer
 class AdminMailerPreview < ActionMailer::Preview
-  def partial_registration
-    b_param = BParam.order(:created_at).last
-    OrganizedMailer.partial_registration(b_param)
+  def feedback_notification_email
+    feedback = Feedback.last
+    AdminMailer.feedback_notification_email(feedback)
   end
 
-  def finished_registration
-    render_finished_registration(Bike.unscoped)
+  def no_admins_notification_email
+    organization = Organization.last
+    AdminMailer.no_admins_notification_email(organization)
   end
 
-  def finished_registration_organization
-    render_finished_registration(Bike.where.not(creation_organization_id: nil))
+  def blocked_stolen_notification_email
+    stolen_notification = StolenNotification.last
+    AdminMailer.blocked_stolen_notification_email(stolen_notification)
   end
 
-  def finished_registration_stolen
-    render_finished_registration(Bike.stolen)
-  end
-
-  def finished_registration_recovered
-    render_finished_registration(Bike.where(recovered: true))
-  end
-
-  def organization_invitation
-    OrganizedMailer.organization_invitation(OrganizationInvitation.last)
-  end
-
-  private
-
-  def render_finished_registration(bikes)
-    bike = bikes.order(:created_at).last
-    OrganizedMailer.finished_registration(bike.current_ownership)
+  def lightspeed_notification_email
+    organization = Organization.last
+    AdminMailer.lightspeed_notification_email(organization, 'asdfasdf')
   end
 end
