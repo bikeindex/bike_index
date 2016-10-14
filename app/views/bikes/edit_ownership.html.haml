@@ -13,7 +13,7 @@
 
           - if @bike.bike_organizations.any?
             .related-fields.no-divider-row
-              - if @bike.bike_organizations.where(organization_id: @bike.creation_organization_id)
+              - if @bike.bike_organizations.where(organization_id: @bike.creation_organization_id) && @bike.creation_organization
                 .form-group.row
                   %label.form-well-label
                     Creation organization
