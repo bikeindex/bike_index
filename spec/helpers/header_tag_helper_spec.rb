@@ -204,14 +204,16 @@ describe HeaderTagHelper do
   end
 
   describe 'landing_pages_header_tags' do
-    let(:action_name) { 'show' }
     let(:controller_name) { 'landing_pages' }
-    let(:organization) { FactoryGirl.build(:organization, name: 'Sweet University') }
-    it 'sets the page title' do
-      allow(view).to receive(:current_organization) { organization }
-      helper.landing_pages_header_tags
-      expect(helper.page_title).to eq 'Sweet University Bike Registration'
-      expect(helper.page_description).to eq 'Register your bicycle with Sweet University - powered by Bike Index'
+    context 'show (organization landing page)' do
+      let(:action_name) { 'show' }
+      let(:organization) { FactoryGirl.build(:organization, name: 'Sweet University') }
+      it 'sets the page title' do
+        allow(view).to receive(:current_organization) { organization }
+        helper.landing_pages_header_tags
+        expect(helper.page_title).to eq 'Sweet University Bike Registration'
+        expect(helper.page_description).to eq 'Register your bicycle with Sweet University - powered by Bike Index'
+      end
     end
   end
 

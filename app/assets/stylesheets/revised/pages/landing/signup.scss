@@ -1,0 +1,100 @@
+.landing-page-body {
+  padding-top: 0;
+  .primary-footer { margin-top: 0; }
+}
+
+.signup-landing-page {
+  .banner-header {
+    padding-top: 24*$vertical-height;
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-image: image-url('landing_pages/header_bg.jpg');
+    h1, h2, h3 { color: white; }
+    h2, h3 {
+      font-family: $body-font-family;
+      font-weight: $normal-font-weight;
+      text-transform: none;
+      font-style: normal;
+      font-size: 21px;
+    }
+    .ribbon {
+      margin-top: 12 * $vertical-height;
+      background: $gray-darker;
+      h2 {
+        font-size: 24px;
+        margin: 0;
+        padding: 2 * $vertical-height 0;
+      }
+    }
+  }
+  .landing-why-col, .landing-signup-col { @include make-col-ready(); }
+  .landing-why-col {
+    @include make-col(8);
+    margin-top: 5 * $vertical-height;
+  }
+  .landing-signup-col {
+    @include make-col(4);
+    background: $gray-darker;
+    margin-top: -8.5 * $vertical-height;
+    padding-top: 2.5 * $vertical-height;
+    header {
+      background: $gray;
+      padding: 2 * $vertical-height 0 ;
+      color: white;
+      text-align: center;
+      font-size: 30px;
+      line-height: 1;
+    }
+    .btn { width: 100%; margin-top: 3 * $vertical-height; }
+    .trusted-by {
+      margin-top: 3 * $vertical-height;
+      padding: $vertical-height;
+      background: white;
+      ul { @include list-unstyled; }
+      li {
+        img {
+          display: inline-block;
+          width: 16.66666%;
+          height: auto;
+        }
+      }
+    }
+  }
+  .banner-footer {
+    padding: 12 * $vertical-height 0 11 * $vertical-height;
+    background-color: $blue-dark;
+    background-image: image-url('landing_pages/footer_rings.svg');
+    .footer-overlay {
+      display: block;
+      position: absolute;
+      z-index: 1;
+      width: 100%;
+      height: auto;
+    }
+    ul {
+      @include list-unstyled;
+      @include make-row;
+      li {
+        @include make-col-ready();
+        @include make-col(3);
+        .landing-group-card {
+          background: white;
+          padding: 2 * $vertical-height;
+        }
+        img {
+          display: block;
+          width: 60%;
+          margin: 0 auto;
+        }
+        h4 {
+          margin: 2 * $vertical-height 0;
+          text-align: center;
+          color: $gray-darker;
+        }
+        p { color: $gray-light; text-align: center; }
+        .btn { width: 100%; }
+      }
+    }
+  }
+}

@@ -7,8 +7,7 @@
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
     = javascript_include_tag 'application_revised'
     <!--[if IE]>$('body').prepend("<div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>")<![endif]-->
-
-  %body{ id: page_id, class: ('organized-body' if current_page_skeleton == 'organized_skeleton') }
+  %body{ id: page_id, class:  body_class }
     %nav.primary-header-nav
       .container
         %a.primary-logo{ href: user_root_url }

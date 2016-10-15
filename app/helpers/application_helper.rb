@@ -48,6 +48,14 @@ module ApplicationHelper
     end
   end
 
+  def body_class
+    if controller_name == 'landing_pages'
+      'landing-page-body'
+    elsif current_page_skeleton == 'organized_skeleton'
+      'organized-body'
+    end
+  end
+
   def current_link(link_text, link_path, class: '') # Revised layout link
     class_name = current_page?(link_path) ? 'active' : ''
     class_name = 'active' if link_path.match(news_index_path) && controller_name == 'news'
