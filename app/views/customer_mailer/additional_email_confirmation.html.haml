@@ -1,5 +1,9 @@
 %h2.center-text
   Please confirm your additional email
+  %br
+  %small
+    %em
+      = @user_email.email
 
 %p.center-text{ style: 'margin-bottom: 3em;' }
   #{@user.display_name} would like to merge this email into their account (#{@user.email}).
