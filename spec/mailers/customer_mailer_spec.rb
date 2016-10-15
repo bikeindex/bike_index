@@ -103,7 +103,6 @@ describe CustomerMailer do
     it 'renders email and update sent_dates' do
       mail = CustomerMailer.stolen_notification_email(stolen_notification)
       expect(mail.subject).to eq(stolen_notification.default_subject)
-      expect(mail.from).to eq(['contact@bikeindex.org'])
       expect(mail.from.count).to eq(1)
       expect(mail.from.first).to eq('bryan@bikeindex.org')
       expect(mail.body.encoded).to match(stolen_notification.message)

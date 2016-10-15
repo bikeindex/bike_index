@@ -310,7 +310,10 @@ RSpec.shared_examples 'bike_searchable' do
         context 'all' do
           let(:query_params) { { stolenness: 'all' } }
           it 'returns all bikes' do
-            expect(Bike.search(interpreted_params).pluck(:id)).to eq([stolen_bike.id, non_stolen_bike.id])
+            ids = Bike.search(interpreted_params).pluck(:id)
+            expect(ids.count).to eq 2
+            expect(ids.include?(stolen_bike.id)).to be_truthy
+            expect(ids.include?(non_stolen_bike.id)).to be_truthy
           end
         end
       end
