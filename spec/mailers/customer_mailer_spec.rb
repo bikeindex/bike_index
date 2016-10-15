@@ -7,6 +7,7 @@ describe CustomerMailer do
     it 'renders an email' do
       mail = CustomerMailer.welcome_email(user)
       expect(mail.subject).to eq('Welcome to the Bike Index!')
+      expect(mail.from).to eq(['contact@bikeindex.org'])
       expect(mail.to).to eq([user.email])
     end
   end
@@ -16,6 +17,7 @@ describe CustomerMailer do
       mail = CustomerMailer.confirmation_email(user)
       expect(mail.subject).to eq('Welcome to the Bike Index!')
       expect(mail.to).to eq([user.email])
+      expect(mail.from).to eq(['contact@bikeindex.org'])
     end
   end
 
@@ -24,6 +26,7 @@ describe CustomerMailer do
       user.set_password_reset_token
       mail = CustomerMailer.password_reset_email(user)
       expect(mail.subject).to eq('Instructions to reset your password')
+      expect(mail.from).to eq(['contact@bikeindex.org'])
       expect(mail.body.encoded).to match(user.password_reset_token)
     end
   end
@@ -33,6 +36,7 @@ describe CustomerMailer do
     it 'renders email' do
       mail = CustomerMailer.additional_email_confirmation(user_email)
       expect(mail.subject).to match(/confirm/i)
+      expect(mail.from).to eq(['contact@bikeindex.org'])
     end
   end
 
@@ -42,6 +46,7 @@ describe CustomerMailer do
       mail = CustomerMailer.invoice_email(payment)
       expect(mail.subject).to eq('Thank you for supporting the Bike Index!')
       expect(mail.to).to eq([user.email])
+      expect(mail.from).to eq(['contact@bikeindex.org'])
     end
   end
 
@@ -66,6 +71,7 @@ describe CustomerMailer do
       mail = CustomerMailer.stolen_bike_alert_email(customer_contact)
       expect(mail.to).to eq([customer_contact.user_email])
       expect(mail.subject).to eq 'CUSTOM CUSTOMER contact Title'
+      expect(mail.from).to eq(['contact@bikeindex.org'])
     end
   end
 
@@ -86,6 +92,7 @@ describe CustomerMailer do
       expect(mail.subject).to eq('some title')
       expect(mail.body.encoded).to match('some message')
       expect(mail.reply_to).to eq(['something@stuff.com'])
+      expect(mail.from).to eq(['contact@bikeindex.org'])
     end
   end
 
@@ -96,6 +103,7 @@ describe CustomerMailer do
     it 'renders email and update sent_dates' do
       mail = CustomerMailer.stolen_notification_email(stolen_notification)
       expect(mail.subject).to eq(stolen_notification.default_subject)
+      expect(mail.from).to eq(['contact@bikeindex.org'])
       expect(mail.from.count).to eq(1)
       expect(mail.from.first).to eq('bryan@bikeindex.org')
       expect(mail.body.encoded).to match(stolen_notification.message)

@@ -1,5 +1,6 @@
 class CustomerMailer < ActionMailer::Base
-  default from: '\"Bike Index\" <contact@bikeindex.org>',
+  CONTACT_BIKEINDEX = '"Bike Index" <contact@bikeindex.org>'.freeze
+  default from: CONTACT_BIKEINDEX,
           content_type: 'multipart/alternative',
           parts_order: ['text/calendar', 'text/plain', 'text/html', 'text/enriched']
   layout 'email'
