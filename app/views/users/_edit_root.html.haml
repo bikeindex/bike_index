@@ -47,7 +47,7 @@
             .right-input-help.right-text-help
               = link_to 'Make primary email', make_primary_user_email_path(user_email.id), method: :post
     - if @user.user_emails.unconfirmed.count > 0
-      .related-fields
+      .related-fields.no-divider-row
         - labeled = false
         - @user.user_emails.unconfirmed.each do |user_email|
           .form-group.row
@@ -58,8 +58,8 @@
             %p.form-well-input-static
               = user_email.email
             .right-input-help.right-text-help
-              = link_to 'Resend confirmation email', resend_confirmation_user_email_path(user_email.id), method: :post
-              = link_to 'Remove email', user_email_path(user_email.id), method: :delete, class: 'optional-form-block delete-email'
+              = link_to 'Resend confirmation', resend_confirmation_user_email_path(user_email.id), method: :post
+              = link_to 'Remove email', user_email_path(user_email.id), method: :delete, class: 'delete-email'
 
   .related-fields#additional_email_fields
     = f.hidden_field :additional_emails, value: nil

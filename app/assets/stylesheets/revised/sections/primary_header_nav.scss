@@ -102,12 +102,17 @@ $mainmenu-open-zindex: 10;
       padding: 2*$vertical-height 0 100px;
     }
     .primary-nav-item {
+      a.primary-nav-link-with-submenu { // headers of lists aren't links on small screens
+        cursor: default;
+        &:hover, &:active { background: $primary-nav-background; color: $primary-nav-text-color; }
+      }
       a {
         padding: $vertical-height 2*$vertical-height;
         &:active, &.active {
           background: $gray-light;
           text-decoration: none;
         }
+
       }
     }
     .primary-submenu { padding-left: 12px; }

@@ -21,7 +21,7 @@
           - if current_user.present?
             - memberships = current_user.memberships.includes(:organization)
             %li.primary-nav-item
-              %a.nav-link.settings-link#setting_submenu{ 'aria-haspopup' => "true", 'aria-expanded' => "false", data: { toggle: 'dropdown' } }
+              %a.nav-link.settings-link.primary-nav-link-with-submenu#setting_submenu{ 'aria-haspopup' => "true", 'aria-expanded' => "false", data: { toggle: 'dropdown' } }
                 %span.settings-text
                   Settings
                 :plain
@@ -42,7 +42,7 @@
             - memberships.each do |membership|
               - organization = membership.organization
               %li.primary-nav-item
-                %a.nav-link{ id: "#{organization.slug}_submenu", 'aria-haspopup' => "true", 'aria-expanded' => "false", data: { toggle: 'dropdown' } }
+                %a.nav-link.primary-nav-link-with-submenu{ id: "#{organization.slug}_submenu", 'aria-haspopup' => "true", 'aria-expanded' => "false", data: { toggle: 'dropdown' } }
                   = organization.short_name
                 %ul.primary-submenu{ 'aria-labelledby' => "##{organization.slug}_submenu" }
                   %li

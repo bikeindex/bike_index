@@ -44,7 +44,7 @@
       .form-well-input
         = f.text_field :my_bikes_link_title, value: @user.mb_link_title, placeholder: 'My awesome link', class: 'form-control'
 
-  .form-group.row.unnested-field
+  .form-group.row.unnested-field.no-divider-row
     = f.label :username, class: 'form-well-label'
     .form-well-input
       = f.text_field :username, class: 'form-control'
