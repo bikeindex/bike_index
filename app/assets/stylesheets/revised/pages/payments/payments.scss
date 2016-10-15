@@ -5,7 +5,7 @@ $payments-page-breakpoint: 'sm';
     background: image-url('revised/donate_bg.jpg');
     background-size: cover;
     background-position: center center;
-    padding-top: 6.5 * $vertical-height;
+    padding-top: 36px;
   }
   @include media-breakpoint-down($payments-page-breakpoint) {
     padding-top: 0;
@@ -37,19 +37,19 @@ $payments-page-breakpoint: 'sm';
   header.payments-header {
     color: white;
     text-align: center;
-    h1, p {
-      color: inherit;
-      margin-top: 3 * $vertical-height;
-    }
+    h1, p { color: inherit; }
     h1 {
       font-size: 48px;
+      margin: 27px 0 0;
+      line-height: 1;
       @include media-breakpoint-down(sm) { font-size: 36px; }
       @include media-breakpoint-down(xs) { font-size: 28px; }
     }
     p {
       font-size: 24px;
       line-height: 1.25;
-      margin-bottom: 0;
+      margin: 8px 0 0;
+      span { @include media-breakpoint-down('xs') { display: block; } }
     }
   }
 
