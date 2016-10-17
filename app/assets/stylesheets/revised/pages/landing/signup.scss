@@ -19,37 +19,53 @@
       font-size: 21px;
     }
     .ribbon {
-      margin-top: 12 * $vertical-height;
+      margin-top: 12*$vertical-height;
       background: $gray-darker;
       h2 {
         font-size: 24px;
         margin: 0;
-        padding: 2 * $vertical-height 0;
+        padding: 2*$vertical-height 0;
       }
     }
   }
+
   .landing-why-col, .landing-signup-col { @include make-col-ready(); }
   .landing-why-col {
     @include make-col(8);
-    margin-top: 5 * $vertical-height;
+    margin-top: 2*$vertical-height;
+    img {
+      display: block;
+      margin-top: 3*$vertical-height;
+    }
+    h3 { margin-top: 3*$vertical-height; }
   }
+
+  $contact-us-gutter: 30px;
   .landing-signup-col {
     @include make-col(4);
-    background: $gray-darker;
-    margin-top: -8.5 * $vertical-height;
-    padding-top: 2.5 * $vertical-height;
+    margin-top: -8.5*$vertical-height;
+    padding: 0;
+    .signup-col-wrap {
+      padding: 2.5*$vertical-height $contact-us-gutter;
+      background: $gray-darker;
+      border-radius: $border-radius $border-radius 0 0;
+      &:last-of-type {
+        padding: 0 0.5*$contact-us-gutter 0.5*$contact-us-gutter;
+        border-radius: 0 0 $border-radius $border-radius;
+      }
+    }
     header {
       background: $gray;
-      padding: 2 * $vertical-height 0 ;
+      padding: 2*$vertical-height 0 ;
       color: white;
       text-align: center;
       font-size: 30px;
       line-height: 1;
+      margin-bottom: 2*$vertical-height;
     }
-    .btn { width: 100%; margin-top: 3 * $vertical-height; }
+    .btn { width: 100%; margin-top: 3*$vertical-height; }
     .trusted-by {
-      margin-top: 3 * $vertical-height;
-      padding: $vertical-height;
+      padding: 2.5*$vertical-height 0.5*$contact-us-gutter 12px;
       background: white;
       ul { @include list-unstyled; }
       li {
@@ -61,8 +77,10 @@
       }
     }
   }
+
   .banner-footer {
-    padding: 12 * $vertical-height 0 11 * $vertical-height;
+    margin-top: 5*$vertical-height;
+    padding: 12*$vertical-height 0 11*$vertical-height;
     background-color: $blue-dark;
     background-image: image-url('landing_pages/footer_rings.svg');
     .footer-overlay {
@@ -80,7 +98,7 @@
         @include make-col(3);
         .landing-group-card {
           background: white;
-          padding: 2 * $vertical-height;
+          padding: 2*$vertical-height;
         }
         img {
           display: block;
@@ -88,11 +106,15 @@
           margin: 0 auto;
         }
         h4 {
-          margin: 2 * $vertical-height 0;
+          margin: 2*$vertical-height 0;
           text-align: center;
           color: $gray-darker;
         }
-        p { color: $gray-light; text-align: center; }
+        p {
+          color: $gray-light;
+          text-align: center;
+          min-height: 4em;
+        }
         .btn { width: 100%; }
       }
     }
