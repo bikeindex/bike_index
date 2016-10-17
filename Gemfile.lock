@@ -616,12 +616,11 @@ GEM
       builder
     sixarm_ruby_unaccent (1.1.1)
     slop (3.6.0)
-    soulheart (0.2.6)
-      hiredis (~> 0.4, >= 0.4.5)
+    soulheart (0.3.0)
       multi_json (~> 1.11, >= 1.11.2)
       redis (~> 3.0, >= 3.0.5)
-      sinatra (~> 1.4, >= 1.4.4)
-      vegas (~> 0.1, >= 0.1.0)
+      sinatra (>= 1.4.4)
+      vegas (>= 0.1.0)
     sparkpost (0.1.4)
       http (= 0.9.8)
     sprockets (3.6.3)
@@ -711,6 +710,7 @@ DEPENDENCIES
   haml-rails
   hamlit
   high_voltage
+  hiredis (~> 0.6.0)
   honeybadger (~> 2.0)
   httparty
   i18n
@@ -751,7 +751,7 @@ DEPENDENCIES
   rails-assets-waypoints (~> 3.1.1)!
   rb-fsevent (~> 0.9.1)
   redcarpet
-  redis
+  redis (>= 3.2.0)
   rerun
   responders (~> 2.0)
   rmagick
@@ -765,7 +765,7 @@ DEPENDENCIES
   sidekiq
   sidekiq-failures
   sitemap_generator
-  soulheart (~> 0.2.6)
+  soulheart (~> 0.3.0)
   sparkpost
   sprockets-rails (~> 3.0.4)
   stackprof

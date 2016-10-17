@@ -12,11 +12,12 @@ gem 'aws-sdk', '~> 1.33'
 gem 'fast_blank', '~> 1.0'
 
 # Redis and redis dependents
-gem 'redis'
+gem 'hiredis', '~> 0.6.0'
+gem 'redis', '>= 3.2.0', require: ['redis', 'redis/connection/hiredis']
 gem 'sidekiq' # Background processing
 gem 'sidekiq-failures'
 gem 'rollout' # Feature flags
-gem 'soulheart', '~> 0.2.6' # typeahead/autocomplete features
+gem 'soulheart', '~> 0.3.0'
 
 gem 'rack-contrib'
 gem 'unicorn' # Use Puma as the app server
