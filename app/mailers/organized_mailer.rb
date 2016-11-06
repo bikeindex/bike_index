@@ -22,7 +22,7 @@ class OrganizedMailer < ActionMailer::Base
       registered_by_owner: (@ownership.user.present? && @bike.creator_id == @ownership.user_id)
     }
     @organization = @bike.creation_organization if @bike.creation_organization.present? && @vars[:new_bike]
-    subject = t("organized_mailer.finished#{'_stolen' if @bike.stolen}_registration.subject", default_subject_vars)
+    subject = t("organized_mailer.finished#{finished_registration_type}_registration.subject", default_subject_vars)
     mail('Reply-To' => reply_to, to: @ownership.owner_email, subject: subject)
   end
 
@@ -36,10 +36,15 @@ class OrganizedMailer < ActionMailer::Base
 
   private
 
+  def finished_registration_type
+    return '_stolen' if @bike.stolen
+    @ownership.claimed ? '_owned' : ''
+  end
+
   def default_subject_vars
     {
-      organization_name: @organization && @organization.short_name,
-      bike_type: @bike && @bike.type
+      organization_name: @organization && "#{@organization.short_name} ",
+      bike_type: @bike && "#{@bike.type} "
     }
   end
 
