@@ -58,6 +58,7 @@ describe OrganizedMailer do
         end
       end
       context 'claimed registration (e.g. self_made)' do
+        let(:bike) { FactoryGirl.create(:bike, creator_id: user.id) }
         it 'renders email' do
           ownership.update_attribute :claimed, true
           ownership.reload

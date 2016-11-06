@@ -43,8 +43,8 @@ class OrganizedMailer < ActionMailer::Base
 
   def default_subject_vars
     {
-      organization_name: @organization && @organization.short_name,
-      bike_type: @bike && @bike.type
+      organization_name: @organization && "#{@organization.short_name} ",
+      bike_type: @bike && "#{@bike.type} "
     }
   end
 
