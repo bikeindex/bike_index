@@ -14,28 +14,39 @@
   - if @search_query_present
     %p
       #{ pluralize(@bikes_count, 'bike') } matching bikes
-
   %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
     %thead.small-header
       %tr
         %th.date-added Date added
-        %th Manufacturer
-        %th Model
-        %th Color
-        %th Sent to
+        %th.hidden-xs-down Manufacturer
+        %th.hidden-xs-down Model
+        %th.hidden-xs-down Color
+        %th
+          %small.hidden-sm-up
+            mnfg, model,
+            %span.less-strong
+              color
+            %br
+          Sent to
         / %th View PDF
     %tbody
       - @bikes.each do |bike|
         %tr
           %td
             = link_to l(bike.created_at, format: :dotted), bike_path(bike)
-          %td
+          %td.hidden-xs-down
             = bike.mnfg_name
-          %td
+          %td.hidden-xs-down
             = bike.frame_model
-          %td
+          %td.hidden-xs-down
             = bike.frame_colors.to_sentence
           %td
+            %small.hidden-sm-up
+              = bike.mnfg_name
+              = ", #{bike.frame_model}" if bike.frame_model.present?
+              %span.less-strong
+                = bike.frame_colors.to_sentence
+              %br
             = bike.owner_email
             - if bike.origin
               %small.less-string
