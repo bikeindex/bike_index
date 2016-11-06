@@ -32,12 +32,13 @@ module API
       resource :search, desc: 'Searching for bikes' do
         desc 'Search for bikes', {
           notes: <<-NOTE
-            - `stolenness` is the sort of bikes to match. `all`: every bike, `non`: only not-stolen, `stolen`: all stolen, `proximity`: only within `distance` of included `location`.
+            `stolenness` is the sort of bikes to match. "**all**": every bike, "**non**": only not-stolen, "**stolen**": all stolen, "**proximity**": only within `distance` of included `location`.
 
-            - `location` is ignored unless `stolenness` is 'proximity'
+            `location` is ignored unless `stolenness` is "**proximity**"
 
-            `location` can be an address, zipcode, city, or latitude,longitude. e.g. `210 NW 11th Ave, Portland, OR`, `60647`, `Chicago, IL`, or `45.521728,-122.67326`
-            - If `location` is 'IP' (the default), the location is determined via geolocation of your IP address.
+            `location` can be an address, zipcode, city, or latitude,longitude. e.g. "**210 NW 11th Ave, Portland, OR**", "**60647**", "**Chicago, IL**", or "**45.521728,-122.67326**"
+            
+            If `location` is "**IP**" (the default), the location is determined via geolocation of your IP address.
           NOTE
         }
         paginate
