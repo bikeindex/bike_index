@@ -57,6 +57,15 @@ describe OrganizedMailer do
           expect(mail.reply_to).to eq(['contact@bikeindex.org'])
         end
       end
+      context 'claimed registration (e.g. self_made)' do
+        it 'renders email' do
+          ownership.update_attribute :claimed, true
+          ownership.reload
+          expect(ownership.claimed).to be_truthy
+          expect(mail.subject).to eq('Bike Index registration successful')
+          expect(mail.reply_to).to eq(['contact@bikeindex.org'])
+        end
+      end
       context 'stolen' do
         let(:cycle_type) { FactoryGirl.create(:cycle_type, name: 'sweet cycle type') }
         let(:bike) { FactoryGirl.create(:stolen_bike, cycle_type: cycle_type) }
