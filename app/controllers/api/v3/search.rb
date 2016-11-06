@@ -32,7 +32,7 @@ module API
       resource :search, desc: 'Searching for bikes' do
         desc 'Search for bikes', {
           notes: <<-NOTE
-            `stolenness` is the sort of bikes to match. "**all**": every bike, "**non**": only not-stolen, "**stolen**": all stolen, "**proximity**": only within `distance` of included `location`.
+            `stolenness` is the sort of bikes to match. "**all**": every bike, "**non**": only not-stolen, "**stolen**": all stolen, "**proximity**": only stolen within `distance` of included `location`.
 
             `location` is ignored unless `stolenness` is "**proximity**"
 
