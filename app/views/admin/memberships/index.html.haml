@@ -39,6 +39,6 @@
           %td
             = membership.user.email
           %td
-            = membership.organization.name
+            = link_to membership.organization.name, admin_organization_path(membership.organization)
           %td.large-screens
             #{link_to 'Edit', edit_admin_membership_url(membership)}
