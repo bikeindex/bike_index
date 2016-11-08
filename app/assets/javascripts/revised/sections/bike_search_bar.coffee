@@ -28,7 +28,9 @@ class BikeIndex.BikeSearchBar extends BikeIndex
     # updateSearchBikesHeaderLink is called first, this is guaranteed to be something
     if location? and location.length > 0
       # Don't save location if user entered 'Anywhere'
-      localStorage.setItem('location', location) unless location.match(/anywhere/i)
+      unless location.match(/anywhere/i)
+        localStorage.setItem('location', location)
+        localStorage.setItem('distance', $('#distance').val())
     else
       location = localStorage.getItem('location')
       # Make location 'you' if location is anywhere, so user isn't stuck and unable to use location

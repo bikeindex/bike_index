@@ -48,7 +48,6 @@ GEM
       thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
     addressable (2.4.0)
-    aggregate (0.2.2)
     api-pagination (4.3.0)
     arel (6.0.3)
     ast (2.3.0)
@@ -328,7 +327,6 @@ GEM
       thor
       tilt
     hashie (3.4.4)
-    hetchy (1.0.0)
     high_voltage (3.0.0)
     hiredis (0.6.1)
     honeybadger (2.6.0)
@@ -371,17 +369,6 @@ GEM
       activesupport (>= 3.0.0)
     kgio (2.10.0)
     kramdown (1.11.1)
-    librato-metrics (1.6.1)
-      aggregate (~> 0.2.2)
-      faraday (~> 0.7)
-      multi_json
-    librato-rack (1.0.1)
-      hetchy (~> 1.0)
-      librato-metrics (~> 1.6)
-    librato-rails (1.4.1)
-      activesupport (>= 3.0)
-      librato-rack (~> 1.0.1)
-      railties (>= 3.0)
     libv8 (3.16.14.15)
     listen (3.1.5)
       rb-fsevent (~> 0.9, >= 0.9.4)
@@ -719,7 +706,6 @@ DEPENDENCIES
   jquery-rails
   kaminari
   kramdown
-  librato-rails
   libv8 (~> 3.16.14.7)
   lograge
   logstash-event

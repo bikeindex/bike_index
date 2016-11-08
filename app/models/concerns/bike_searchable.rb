@@ -95,6 +95,7 @@ module BikeSearchable
       if query_params[:stolenness] && %w(all non).include?(query_params[:stolenness])
         { stolenness: query_params[:stolenness] }
       else
+        pp extracted_searchable_proximity_hash(query_params, ip) || { stolenness: 'stolen' }
         extracted_searchable_proximity_hash(query_params, ip) || { stolenness: 'stolen' }
       end
     end

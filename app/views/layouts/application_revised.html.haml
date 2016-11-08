@@ -89,7 +89,7 @@
           / %li.primary-nav-item
           /   = active_link 'Community', '/discuss', class_name: 'nav-link'
           %li.primary-nav-item
-            = active_link 'Search bikes', bikes_path(proximity: 'ip', stolen: true), class_name: 'nav-link', id: 'search_bikes_header_link', match_controller: true
+            = active_link 'Search bikes', bikes_path(location: 'ip', stolenness: 'proximity'), class_name: 'nav-link', id: 'search_bikes_header_link', match_controller: true
     = render 'layouts/revised_messages'
 
     - if current_page_skeleton
