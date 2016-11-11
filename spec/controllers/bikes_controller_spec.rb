@@ -349,7 +349,7 @@ describe BikesController do
             city: 'Chicago',
             zipcode: '60622',
             state_id: state.id,
-            date_stolen_input: Date.today.strftime('%m-%d-%Y')
+            date_stolen_input: Time.now.to_date.strftime('%m-%d-%Y')
           }
         end
         context 'valid' do
@@ -364,7 +364,7 @@ describe BikesController do
             testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
             stolen_record = bike.current_stolen_record
             stolen_params.except(:date_stolen_input).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
-            expect(stolen_record.date_stolen.to_date).to eq Date.today
+            expect(stolen_record.date_stolen.to_date).to eq Time.now.to_date
           end
         end
         context 'invalid' do
@@ -643,7 +643,7 @@ describe BikesController do
       before { set_current_user(user) }
       context "user present but isn't allowed to edit the bike" do
         it 'redirects and sets the flash' do
-          user = FactoryGirl.create(:user)
+          FactoryGirl.create(:user)
           get :edit, id: bike.id
           expect(response).to redirect_to bike_path(bike)
           expect(flash[:error]).to be_present

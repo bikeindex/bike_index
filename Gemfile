@@ -114,11 +114,8 @@ group :production do
 end
 
 group :development do
-  gem 'test-unit', '~> 3.0'
+  # gem 'test-unit', '~> 3.0'
   gem 'rerun'
-  gem 'guard', '2.13.0'
-  gem 'guard-rspec', '~> 4.6.4'
-  gem 'guard-rubocop'
 end
 
 group :development, :test do
@@ -136,4 +133,7 @@ group :test do
   gem 'codeclimate-test-reporter', require: nil
   gem 'rspec-sidekiq'
   gem 'pry'
+  gem 'guard', '~> 2.13.0', require: false
+  gem 'guard-rspec', '~> 4.6.4', require: false
+  gem 'guard-rubocop', require: false
 end

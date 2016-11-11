@@ -439,7 +439,6 @@ GEM
       activesupport (>= 3.1)
       arel
     pkg-config (1.1.7)
-    power_assert (0.3.0)
     powerpack (0.1.1)
     premailer (1.8.7)
       css_parser (>= 1.4.5)
@@ -620,8 +619,6 @@ GEM
     stackprof (0.2.9)
     swagger-ui_rails (0.1.7)
     temple (0.7.7)
-    test-unit (3.2.0)
-      power_assert
     therubyracer (0.12.2)
       libv8 (~> 3.16.14.0)
       ref
@@ -691,7 +688,7 @@ DEPENDENCIES
   grape-swagger (~> 0.10.4)
   grape_logging
   groupdate
-  guard (= 2.13.0)
+  guard (~> 2.13.0)
   guard-rspec (~> 4.6.4)
   guard-rubocop
   haml-rails
@@ -757,7 +754,6 @@ DEPENDENCIES
   stackprof
   stripe!
   swagger-ui_rails
-  test-unit (~> 3.0)
   therubyracer
   uglifier
   unicorn
