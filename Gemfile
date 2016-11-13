@@ -126,6 +126,7 @@ group :development, :test do
   gem 'foreman'
   gem 'database_cleaner'
   gem 'dotenv-rails'
+  gem 'rack-livereload'
 end
 
 group :test do
@@ -136,4 +137,5 @@ group :test do
   gem 'guard', '~> 2.13.0', require: false
   gem 'guard-rspec', '~> 4.6.4', require: false
   gem 'guard-rubocop', require: false
+  gem 'guard-livereload', require: false
 end
