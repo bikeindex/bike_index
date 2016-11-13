@@ -1,0 +1,9 @@
+= javascript_include_tag "//www.google.com/jsapi", "chartkick"
+
+- cache('bike_chart', expires_in: 1.hour) do
+  - merge = DateTime.strptime('07-01-2014 0', '%m-%d-%Y %H')
+  - post_merge = Bike.unscoped.where(example: false).where(hidden: false).where('created_at > ?', merge).group_by_month(:created_at).count
+  - sum = Bike.unscoped.where(example: false).where(hidden: false).where('created_at < ?', merge).count
+  - result = post_merge.to_a.sort{|x,y| x[0] <=> y[0]}.map { |x,y| { x => (sum += y)} }.reduce({}, :merge)
+
+  = line_chart result

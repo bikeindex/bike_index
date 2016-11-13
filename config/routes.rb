@@ -30,6 +30,7 @@ Bikeindex::Application.routes.draw do
   get 'user_home', to: 'welcome#user_home'
   get 'choose_registration', to: 'welcome#choose_registration'
   get 'goodbye', to: 'welcome#goodbye'
+  get 'creation_graph', to: 'welcome#creation_graph'
 
   resource :session, only: [:new, :create, :destroy]
   get 'logout', to: 'sessions#destroy'

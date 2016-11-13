@@ -1,8 +1,13 @@
 class WelcomeController < ApplicationController
   layout 'application_revised'
   before_filter :authenticate_user_for_welcome_controller, only: [:user_home, :choose_registration]
+  skip_before_filter :set_x_frame_options_header, only: [:creation_graph]
 
   def index
+  end
+
+  def creation_graph
+    render layout: false
   end
 
   def update_browser
