@@ -354,6 +354,7 @@ describe BikesController do
         end
         context 'valid' do
           it 'creates a new ownership and bike from an organization' do
+            pp stolen_params[:date_stolen_input]
             expect do
               post :create, bike: bike_params.merge(stolen: true), stolen_record: stolen_params
             end.to change(Ownership, :count).by 1
@@ -663,7 +664,7 @@ describe BikesController do
       context 'not-creator but member of creation_organization' do
         let(:ownership) { FactoryGirl.create(:organization_ownership) }
         let(:organization) { bike.creation_organization }
-        let(:user) { FactoryGirl.create(:organization_member, organization: organization ) }
+        let(:user) { FactoryGirl.create(:organization_member, organization: organization) }
         it 'renders' do
           expect(bike.owner).to_not eq user
           expect(bike.creation_organization).to eq user.organizations.first

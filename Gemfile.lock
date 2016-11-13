@@ -123,6 +123,9 @@ GEM
       execjs
     eco-source (1.1.0.rc.1)
     ejs (1.1.1)
+    em-websocket (0.5.1)
+      eventmachine (>= 0.12.9)
+      http_parser.rb (~> 0.6.0)
     equalizer (0.0.11)
     erubis (2.7.0)
     eventmachine (1.2.0.1)
@@ -307,6 +310,11 @@ GEM
       shellany (~> 0.0)
       thor (>= 0.18.1)
     guard-compat (1.2.1)
+    guard-livereload (2.5.2)
+      em-websocket (~> 0.5)
+      guard (~> 2.8)
+      guard-compat (~> 1.0)
+      multi_json (~> 1.8)
     guard-rspec (4.6.5)
       guard (~> 2.1)
       guard-compat (~> 1.1)
@@ -456,6 +464,8 @@ GEM
     rack-contrib (1.4.0)
       git-version-bump (~> 0.15)
       rack (~> 1.4)
+    rack-livereload (0.3.16)
+      rack
     rack-mini-profiler (0.10.1)
       rack (>= 1.2.0)
     rack-mount (0.8.3)
@@ -689,6 +699,7 @@ DEPENDENCIES
   grape_logging
   groupdate
   guard (~> 2.13.0)
+  guard-livereload
   guard-rspec (~> 4.6.4)
   guard-rubocop
   haml-rails
@@ -719,6 +730,7 @@ DEPENDENCIES
   premailer-rails
   pry
   rack-contrib
+  rack-livereload
   rack-mini-profiler
   rack-throttle
   rails (= 4.2.7)
