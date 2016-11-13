@@ -11,6 +11,14 @@ describe WelcomeController do
     end
   end
 
+  describe 'bike_creation_graph' do
+    it 'renders embed without xframe block' do
+      get :bike_creation_graph
+      expect(response.code).to eq('200')
+      expect(response.headers['X-Frame-Options']).not_to be_present
+    end
+  end
+
   describe 'goodbye' do
     it 'renders' do
       get :goodbye
