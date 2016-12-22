@@ -349,11 +349,12 @@ describe BikesController do
             city: 'Chicago',
             zipcode: '60622',
             state_id: state.id,
-            date_stolen_input: Date.today.strftime('%m-%d-%Y')
+            date_stolen_input: Time.now.to_date.strftime('%m-%d-%Y')
           }
         end
         context 'valid' do
           it 'creates a new ownership and bike from an organization' do
+            # pp stolen_params[:date_stolen_input]
             expect do
               post :create, bike: bike_params.merge(stolen: true), stolen_record: stolen_params
             end.to change(Ownership, :count).by 1
@@ -364,7 +365,7 @@ describe BikesController do
             testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
             stolen_record = bike.current_stolen_record
             stolen_params.except(:date_stolen_input).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
-            expect(stolen_record.date_stolen.to_date).to eq Date.today
+            expect(stolen_record.date_stolen.to_date).to eq Time.now.to_date
           end
         end
         context 'invalid' do
@@ -643,7 +644,7 @@ describe BikesController do
       before { set_current_user(user) }
       context "user present but isn't allowed to edit the bike" do
         it 'redirects and sets the flash' do
-          user = FactoryGirl.create(:user)
+          FactoryGirl.create(:user)
           get :edit, id: bike.id
           expect(response).to redirect_to bike_path(bike)
           expect(flash[:error]).to be_present
@@ -663,7 +664,7 @@ describe BikesController do
       context 'not-creator but member of creation_organization' do
         let(:ownership) { FactoryGirl.create(:organization_ownership) }
         let(:organization) { bike.creation_organization }
-        let(:user) { FactoryGirl.create(:organization_member, organization: organization ) }
+        let(:user) { FactoryGirl.create(:organization_member, organization: organization) }
         it 'renders' do
           expect(bike.owner).to_not eq user
           expect(bike.creation_organization).to eq user.organizations.first

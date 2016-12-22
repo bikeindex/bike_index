@@ -9,7 +9,7 @@ If you encounter any errors here (or anywhere on the Bike Index), please [submit
 
 If you have questions contact [admin@bikeindex.org](mailto:admin@bikeindex.org").
 
-This documentation displays the port number in the demo requests - e.g. [bikeindex.org:**443**/api/v3/bikes_search](https://bikeindex.org/api/v3/bikes_search). While this works, it's unnecessary. You can remove the `:443` - e.g. bikeindex.org/api/v3/bikes_search.
+This documentation displays the port number in the demo requests - e.g. [bikeindex.org:**443**/api/v3/search](https://bikeindex.org/api/v3/search). While this works, it's unnecessary. You can remove the `:443` - e.g. bikeindex.org/api/v3/search.
 
 *This documentation isn't tested or supported in IE, we recommend you use a different browser*
 

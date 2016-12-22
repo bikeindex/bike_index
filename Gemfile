@@ -110,15 +110,12 @@ group :production do
   gem 'honeybadger', '~> 2.0' # Error monitoring
   gem 'lograge' # Structure log data, put it in single lines to improve the functionality
   gem 'logstash-event' # Use logstash format for logging data
-  gem 'librato-rails' # Monitoring and display
+  # gem 'librato-rails' # Monitoring and display
 end
 
 group :development do
-  gem 'test-unit', '~> 3.0'
+  # gem 'test-unit', '~> 3.0'
   gem 'rerun'
-  gem 'guard', '2.13.0'
-  gem 'guard-rspec', '~> 4.6.4'
-  gem 'guard-rubocop'
 end
 
 group :development, :test do
@@ -129,6 +126,7 @@ group :development, :test do
   gem 'foreman'
   gem 'database_cleaner'
   gem 'dotenv-rails'
+  gem 'rack-livereload'
 end
 
 group :test do
@@ -136,4 +134,8 @@ group :test do
   gem 'codeclimate-test-reporter', require: nil
   gem 'rspec-sidekiq'
   gem 'pry'
+  gem 'guard', '~> 2.13.0', require: false
+  gem 'guard-rspec', '~> 4.6.4', require: false
+  gem 'guard-rubocop', require: false
+  gem 'guard-livereload', require: false
 end

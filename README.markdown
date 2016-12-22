@@ -58,6 +58,7 @@ We use [RSpec](https://github.com/rspec/rspec) and [Guard](https://github.com/gu
 CREATE EXTENSION fuzzystrmatch;
 ```
 
+- If you're working on frontend development, you can use [Guard::LiveReload](https://github.com/guard/guard-livereload) to reload the frontend as you work with `bundle exec guard -G Guardfile_frontend`
 
 ## Bug tracker
 

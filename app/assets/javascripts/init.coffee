@@ -87,7 +87,15 @@ window.updateSearchBikesHeaderLink = ->
     location = location.replace(/^\s*|\s*$/g, '')
     location = 'you' if location.length < 1 or location == 'null'
     localStorage.setItem('location', location)
-  url = "/bikes?stolen=true&proximity=#{location}"
+  distance = localStorage.getItem('distance')
+  if distance?
+    distance = parseInt(distance, 10)
+    if isNaN(distance)
+      distance = null
+    else
+      localStorage.setItem('distance', distance)
+  distance ||= 100
+  url = "/bikes?stolenness=proximity&location=#{location}&distance=#{distance}"
   $('#search_bikes_header_link').attr('href', url)
 
 $(document).ready ->
