@@ -66,7 +66,7 @@ class BikeIndex.Payments extends BikeIndex
       name: 'Bike Index'
       description: description
       amount: amount_cents
-      email: $stripe_form.attr('data-email')
+      email: $stripe_form.data('email')
       allowRememberMe: false
       panelLabel: $stripe_form.data('type')
     return
