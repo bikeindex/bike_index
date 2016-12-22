@@ -20,4 +20,7 @@ class Payment < ActiveRecord::Base
     EmailInvoiceWorker.perform_async(id)
   end
 
+  def is_donation
+    !is_payment
+  end
 end

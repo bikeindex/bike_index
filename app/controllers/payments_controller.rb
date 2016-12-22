@@ -5,7 +5,7 @@ class PaymentsController < ApplicationController
   end
 
   def create
-    @amount = params[:stripe_amount]
+    amount = params[:stripe_amount]
     @subscription = params[:stripe_subscription] if params[:stripe_subscription].present?
     user = current_user || User.fuzzy_confirmed_or_unconfirmed_email_find(params[:stripe_email])
     email = params[:stripe_email].strip.downcase
@@ -38,21 +38,23 @@ class PaymentsController < ApplicationController
     else
       charge = Stripe::Charge.create(
         customer:     @customer_id,
-        amount:       @amount,
+        amount:       amount,
         description:  'Bike Index customer',
         currency:     'usd'
       )
       charge_time = charge.created
     end
-    payment = Payment.new(
+    @payment = Payment.new(
       user_id: (user.id if user.present?),
       email: email,
       is_current: true,
       stripe_id: charge.id,
       first_payment_date: Time.at(charge_time).utc.to_datetime,
-      amount: @amount)
-    payment.is_recurring = true if @subscription
-    unless payment.save
+      amount: amount,
+      is_payment: params[:is_payment]?
+    )
+    @payment.is_recurring = true if @subscription
+    unless @payment.save
       raise StandardError, "Unable to create a payment. #{payment.to_yaml}"
     end
   rescue Stripe::CardError => e
