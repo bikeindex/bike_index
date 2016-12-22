@@ -40,13 +40,13 @@
             .checkbox
               %label
                 = f.check_box :terms_of_service
-                I agree to the Bike Index 
+                I agree to Bike Index 
                 %a.no-tab{ data: { target: terms_url } }
                   terms and conditions
             .checkbox
               %label
                 = f.check_box :is_emailable
-                Get the Bike Index's Newsletter
+                Get Bike Index's Newsletter
 
             = f.submit t("sign_in_up.#{controller_name}_main_form_action"), class: 'btn btn-primary btn-lg'
 

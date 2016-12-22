@@ -1,4 +1,4 @@
-- sentence_prefix = "#{ @bike.stolen && @bike.recovered  ? 'recovered/found ' : 'stolen ' }#{ @bike.type } to the Bike Index#{ ' for you' unless @vars[:registered_by_owner] }:"
+- sentence_prefix = "#{ @bike.stolen && @bike.recovered  ? 'recovered/found ' : 'stolen ' }#{ @bike.type } to Bike Index#{ ' for you' unless @vars[:registered_by_owner] }:"
 - if @vars[:registered_by_owner]
   You added a #{ sentence_prefix }
 - else

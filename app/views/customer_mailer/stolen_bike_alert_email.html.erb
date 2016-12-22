@@ -36,7 +36,7 @@
     <span class="text" style="display: block;text-align: center;margin-top: .5em;line-height: 1.2em;padding: 1em 1em 0;">Share on Facebook - so everyone knows to watch out for your <%= @bike.type %>!</span>
   </a>
 </div>
-<p style="margin: 50px 0 0; padding: 20px 0 0; font-weight: 400; color: #95A5A5; text-align: center;">This email is about the <%= stolen_word %> <%= @biketype %> registered on the Bike Index on <%= @bike.created_at.strftime("%m.%d.%y") %></p>
+<p style="margin: 50px 0 0; padding: 20px 0 0; font-weight: 400; color: #95A5A5; text-align: center;">This email is about the <%= stolen_word %> <%= @biketype %> registered on Bike Index on <%= @bike.created_at.strftime("%m.%d.%y") %></p>
 
 <%= render partial: '/shared/email_bike_box' %>
 

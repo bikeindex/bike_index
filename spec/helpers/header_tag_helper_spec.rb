@@ -122,7 +122,7 @@ describe HeaderTagHelper do
     context 'existing meta description translation' do
       let(:controller_name) { 'manufacturers' }
       let(:action_name) { 'index' }
-      let(:target) { 'Bicycle related manufacturers listed on the Bike Index - all the brands you know and then some.' }
+      let(:target) { 'Bicycle related manufacturers listed on Bike Index - all the brands you know and then some.' }
       it 'returns the translation' do
         expect(helper.auto_description).to eq target
       end
@@ -239,7 +239,7 @@ describe HeaderTagHelper do
       it 'sets the page title' do
         helper.welcome_header_tags
         expect(helper.page_title).to eq 'Register a bike!'
-        expect(helper.page_description).to eq 'Register a bike on the Bike Index quickly, easily and for free. Create a permanent verified record of your bike to protect it.'
+        expect(helper.page_description).to eq 'Register a bike on Bike Index quickly, easily and for free. Create a permanent verified record of your bike to protect it.'
       end
     end
   end
@@ -256,7 +256,7 @@ describe HeaderTagHelper do
         @user = user
         helper.users_header_tags
         expect(helper.page_title).to eq "John's bikes"
-        expect(helper.page_description).to eq "John's bikes on the Bike Index"
+        expect(helper.page_description).to eq "John's bikes on Bike Index"
         expect(helper.page_image).to eq 'http://something.com'
       end
     end

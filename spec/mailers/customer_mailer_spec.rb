@@ -6,7 +6,7 @@ describe CustomerMailer do
   describe 'welcome_email' do
     it 'renders an email' do
       mail = CustomerMailer.welcome_email(user)
-      expect(mail.subject).to eq('Welcome to the Bike Index!')
+      expect(mail.subject).to eq('Welcome to Bike Index!')
       expect(mail.from).to eq(['contact@bikeindex.org'])
       expect(mail.to).to eq([user.email])
     end
@@ -15,7 +15,7 @@ describe CustomerMailer do
   describe 'confirmation_email' do
     it 'renders email' do
       mail = CustomerMailer.confirmation_email(user)
-      expect(mail.subject).to eq('Welcome to the Bike Index!')
+      expect(mail.subject).to eq('Welcome to Bike Index!')
       expect(mail.to).to eq([user.email])
       expect(mail.from).to eq(['contact@bikeindex.org'])
     end
@@ -44,7 +44,7 @@ describe CustomerMailer do
     let(:payment) { FactoryGirl.create(:payment, user: user) }
     it 'renders email' do
       mail = CustomerMailer.invoice_email(payment)
-      expect(mail.subject).to eq('Thank you for supporting the Bike Index!')
+      expect(mail.subject).to eq('Thank you for supporting Bike Index!')
       expect(mail.to).to eq([user.email])
       expect(mail.from).to eq(['contact@bikeindex.org'])
     end

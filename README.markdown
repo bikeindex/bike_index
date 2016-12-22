@@ -25,7 +25,7 @@ We're an open source project. Take a gander through our code, report bugs, or do
 - Requires 1gb of ram (or at least more than 512mb)
 
 
-## Running the Bike Index locally
+## Running Bike Index locally
 
 This explanation assumes you're familiar with developing Ruby on Rails applications.
 
