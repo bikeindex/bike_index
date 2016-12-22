@@ -1,8 +1,4 @@
 class Payment < ActiveRecord::Base
-  def self.old_attr_accessible
-    %w(user_id email is_current is_recurring stripe_id last_payment_date first_payment_date amount).map(&:to_sym).freeze
-  end
-
   belongs_to :user
   validates_presence_of :email
 
