@@ -30,3 +30,6 @@ log/localeapp.yml
 sm_import_*.json
 spec/fixtures/bikes/*.json
 manufacturer.tsv
+
+# RubyMIne
+.idea/*
