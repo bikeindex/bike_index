@@ -10,7 +10,7 @@ Doorkeeper.configure do
   # This block will be called to check whether the resource owner is authenticated or not.
   resource_owner_authenticator do
     @user ||= User.from_auth(cookies.signed[:auth])
-    unless @user
+    if @user.blank? || !@user.terms_of_service
       session[:return_to] = request.fullpath
       redirect_to(new_session_url)
     end

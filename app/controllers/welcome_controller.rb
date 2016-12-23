@@ -20,13 +20,16 @@ class WelcomeController < ApplicationController
   end
 
   def user_home
-    bikes = current_user.bikes
-    page = params[:page] || 1
-    @locks_active_tab = params[:active_tab] == 'locks'
-    @per_page = params[:per_page] || 20
-    paginated_bikes = Kaminari.paginate_array(bikes).page(page).per(@per_page)
-    @bikes = BikeDecorator.decorate_collection(paginated_bikes)
-    @locks = LockDecorator.decorate_collection(current_user.locks)
+
+    unless return_to_if_present
+      bikes = current_user.bikes
+      page = params[:page] || 1
+      @locks_active_tab = params[:active_tab] == 'locks'
+      @per_page = params[:per_page] || 20
+      paginated_bikes = Kaminari.paginate_array(bikes).page(page).per(@per_page)
+      @bikes = BikeDecorator.decorate_collection(paginated_bikes)
+      @locks = LockDecorator.decorate_collection(current_user.locks)
+    end
   end
 
   def choose_registration
