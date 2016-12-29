@@ -23,4 +23,9 @@
             %span
               Support Bike Index today.
     = yield
-  
+    
+    :javascript
+      /** Make the body at least as tall as the window, so background scales */
+      $(function() {
+        $('body').css('min-height', ($(window).height()) + "px");
+      });

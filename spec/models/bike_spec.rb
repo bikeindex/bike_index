@@ -693,7 +693,7 @@ describe Bike do
       bike.update_attribute :stolen, true
       stolen_record.update_attribute :date_stolen, problem_date
       bike.update_attribute :listing_order, bike.get_listing_order
-      expect(bike.listing_order).to be > (Time.now - 1.year).to_time.to_i
+      expect(bike.listing_order).to be > (Time.now - 13.months).to_time.to_i
     end
   end
 

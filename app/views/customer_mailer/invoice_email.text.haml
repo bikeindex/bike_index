@@ -1,6 +1,8 @@
 * Thank you so much for supporting the Bike Index *
-
-Your donation of $#{@payment.amount.to_i/100.00} just saved the bikes.
+- if @payment.is_donation
+  Your donation of $#{@payment.amount.to_i/100.00} just saved the bikes.
+- else
+  Your payment of #{@payment.amount.to_i/100.00} has been received.
 
 Thanks,
 Bike Index Management

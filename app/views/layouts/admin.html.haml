@@ -47,6 +47,9 @@
             /   = admin_nav_link "Recoveries", admin_recoveries_url
             %li
               = admin_nav_link "Recovery displays", admin_recovery_displays_url
+            - if Rails.env.development?
+              %li
+                Mailers: #{admin_nav_link "organized", '/rails/mailers/organized_mailer'}, #{admin_nav_link "admin", '/rails/mailers/admin_mailer'}, #{admin_nav_link "customer", '/rails/mailers/customer_mailer'}
         - elsif current_user.is_content_admin?
           %h2.new-title 
             = admin_nav_link "Go hard", admin_news_index_url
