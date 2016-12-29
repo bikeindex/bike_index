@@ -3,9 +3,13 @@
     .col-xs-12
       %h3 Thank you for supporting Bike Index!
     .select-amount
-      %p
-        Your donation of $#{@amount.to_i/100.00} just saved the bikes.
-      %p.padded
-        XOXO,
-        %br
-        Bike Index team
+      - if @payment.is_donation
+        %p
+          Your donation of $#{@payment.amount.to_i/100.00} just saved the bikes.
+        %p.padded
+          XOXO,
+          %br
+          Bike Index team
+      - else
+        %p
+          We received your payment of $#{@payment.amount.to_i/100.00}

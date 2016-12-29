@@ -41,12 +41,25 @@ describe CustomerMailer do
   end
 
   describe 'invoice_email' do
-    let(:payment) { FactoryGirl.create(:payment, user: user) }
-    it 'renders email' do
-      mail = CustomerMailer.invoice_email(payment)
-      expect(mail.subject).to eq('Thank you for supporting Bike Index!')
-      expect(mail.to).to eq([user.email])
-      expect(mail.from).to eq(['contact@bikeindex.org'])
+    context 'donation' do
+      let(:payment) { FactoryGirl.create(:payment, user: user) }
+      it 'renders email' do
+        mail = CustomerMailer.invoice_email(payment)
+        expect(mail.subject).to eq('Thank you for supporting Bike Index!')
+        expect(mail.to).to eq([user.email])
+        expect(mail.from).to eq(['contact@bikeindex.org'])
+        expect(mail.body.encoded).to match 'donation of'
+      end
+    end
+    context 'payment' do
+      let(:payment) { FactoryGirl.create(:payment, user: user, is_payment: true) }
+      it 'renders email' do
+        mail = CustomerMailer.invoice_email(payment)
+        expect(mail.subject).to eq('Thank you for supporting Bike Index!')
+        expect(mail.to).to eq([user.email])
+        expect(mail.from).to eq(['contact@bikeindex.org'])
+        expect(mail.body.encoded).to_not match 'donation of'
+      end
     end
   end
 
