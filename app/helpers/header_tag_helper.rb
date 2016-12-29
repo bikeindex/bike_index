@@ -126,7 +126,7 @@ module HeaderTagHelper
     if action_name == 'show'
       if @user.title.present?
         self.page_title = @user.title
-        self.page_description = "#{@user.title} on the Bike Index"
+        self.page_description = "#{@user.title} on Bike Index"
       end
       if @user.avatar && @user.avatar.url != 'https://files.bikeindex.org/blank.png'
         self.page_image = @user.avatar.url

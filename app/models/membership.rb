@@ -10,7 +10,7 @@ class Membership < ActiveRecord::Base
 
   validates_presence_of :role, message: 'How the hell did you manage to not choose a role? You have to choose one.'
   validates_presence_of :organization, message: "Sorry, organization doesn't exist"
-  validates_presence_of :user, message: "We're sorry, that user hasn't yet signed up for the Bike Index. Please ask them to before adding them to your organization"
+  validates_presence_of :user, message: "We're sorry, that user hasn't yet signed up for Bike Index. Please ask them to before adding them to your organization"
 
   def self.membership_types
     MEMBERSHIP_TYPES

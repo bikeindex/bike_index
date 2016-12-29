@@ -1,9 +1,9 @@
 en:
   sign_in_up:
-    sessions_h1: Get on the Bike Index
+    sessions_h1: Get on Bike Index
     sessions_oauth_text_block: Sign in using
     sessions_main_form_action: Log in
     forgot_password: Forgot your password?
-    users_h1: Get on the Bike Index
+    users_h1: Get on Bike Index
     users_oauth_text_block: Sign up using
     users_main_form_action: Sign up

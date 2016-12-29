@@ -78,7 +78,7 @@
   %hr.delete-organization-section
   %p.text-md-center
     %a.collapsed{ href: '#', data: { toggle: 'collapse', target: '#delete-organization' } }
-      I would like to terminate my account with the Bike Index
+      I would like to terminate my account with Bike Index
   #delete-organization.collapse
     .text-md-center
       = link_to 'Delete organization', organization_manage_path(id: current_organization.id, organization_id: current_organization.to_param), method: :delete, confirm: "Are you positive you want to remove #{current_organization.name} from Bike Index?", class: 'btn btn-danger'

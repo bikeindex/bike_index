@@ -1,6 +1,6 @@
 <a class="ref" id="ref_oauth">
 
-## OAuth2 - Authentication on the Bike Index
+## OAuth2 - Authentication on Bike Index
 
 The Bike Index uses OAuth2. 
 
@@ -17,7 +17,7 @@ The Bike Index uses OAuth2.
 
 ###OAuth Flows
 
-There are two supported ways of authenticating with the Bike Index through OAuth2:
+There are two supported ways of authenticating with Bike Index through OAuth2:
 
 1. **Authorization flow**, also called Explicit grant flow. If you create a token on this page, this what the token is created with.
 

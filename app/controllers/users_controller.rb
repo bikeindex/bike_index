@@ -110,7 +110,7 @@ class UsersController < ApplicationController
         if params[:user][:terms_of_service] == '1'
           @user.terms_of_service = true
           @user.save
-          flash[:success] = 'Thanks! Now you can use the Bike Index'
+          flash[:success] = 'Thanks! Now you can use Bike Index'
           redirect_to user_home_url and return
         else
           flash[:notice] = 'You have to accept the Terms of Service if you would like to use Bike Index'
