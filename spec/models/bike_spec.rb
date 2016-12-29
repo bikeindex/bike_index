@@ -689,7 +689,7 @@ describe Bike do
       stolen_record = FactoryGirl.create(:stolen_record)
       bike = stolen_record.bike
       digits = (Time.now.year - 1).to_s[2, 3] # last two digits of last year
-      problem_date = Date.strptime("#{Time.now.month + 1}-22-00#{digits}", '%m-%d-%Y')
+      problem_date = Date.strptime("#{Time.now.month}-22-00#{digits}", '%m-%d-%Y')
       bike.update_attribute :stolen, true
       stolen_record.update_attribute :date_stolen, problem_date
       bike.update_attribute :listing_order, bike.get_listing_order
