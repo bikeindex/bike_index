@@ -29,6 +29,33 @@ RSpec.describe CreationState, type: :model do
     end
   end
 
+  describe 'creation_description' do
+    context 'bulk' do
+      let(:creation_state) { CreationState.new(is_bulk: true, origin: 'api_v12') }
+      it 'returns bulk reg' do
+        expect(creation_state.creation_description).to eq 'bulk reg'
+      end
+    end
+    context 'pos' do
+      let(:creation_state) { CreationState.new(is_pos: true, origin: 'embed_extended') }
+      it 'returns pos reg' do
+        expect(creation_state.creation_description).to eq 'pos'
+      end
+    end
+    context 'embed_extended' do
+      let(:creation_state) { CreationState.new(origin: 'embed_extended') }
+      it 'returns pos reg' do
+        expect(creation_state.creation_description).to eq 'embed extended'
+      end
+    end
+    context 'nil' do
+      let(:creation_state) { CreationState.new(organization_id: 1, creator_id: 1) }
+      it 'returns nil' do
+        expect(creation_state.creation_description).to be_nil
+      end
+    end
+  end
+
   describe 'create_bike_organization' do
     let(:bike) { FactoryGirl.create(:bike) }
     let(:organization) { FactoryGirl.create(:organization) }

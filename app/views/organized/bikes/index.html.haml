@@ -27,16 +27,15 @@
             = bike.mnfg_name
           %td
             = bike.frame_model
-            - if bike.origin
-              %small.less-string
-                = bike.origin
           %td
             = bike.frame_colors.to_sentence
           %td
             = bike.first_owner_email
-            - unless bike.owner_email == bike.first_owner_email
-              %small.less-strong
-                sent to a new owner
+            %small.less-strong
+              - if bike.creation_description
+                = bike.creation_description
+              - unless bike.owner_email == bike.first_owner_email
+                (sent to a new owner)
           / %td
 - unless current_organization.is_paid
   .paginate-container.paginate-container-bottom

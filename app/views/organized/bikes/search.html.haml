@@ -48,9 +48,9 @@
                 = bike.frame_colors.to_sentence
               %br
             = bike.owner_email
-            - if bike.origin
+            - if bike.creation_description
               %small.less-string
-                = bike.origin
+                = bike.creation_description
           / %td
 .paginate-container.paginate-container-bottom
   = paginate @bikes
