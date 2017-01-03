@@ -20,6 +20,7 @@ describe Bike do
     it { is_expected.to have_many :bike_organizations }
     it { is_expected.to have_many(:organizations).through(:bike_organizations) }
     it { is_expected.to have_one :creation_state }
+    it { is_expected.to delegate_method(:creation_description).to(:creation_state) }
     it { is_expected.to belong_to :creation_organization }
     # it { is_expected.to delegate_method(:creator).to(:creation_state) }
     # it { is_expected.to have_one(:creation_organization).through(:creation_state) }

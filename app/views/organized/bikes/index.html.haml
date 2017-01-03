@@ -27,9 +27,9 @@
             = bike.mnfg_name
           %td
             = bike.frame_model
-            - if bike.origin
-              %small.less-string
-                = bike.origin
+            - if bike.creation_description
+              %small.less-strong
+                = bike.creation_description
           %td
             = bike.frame_colors.to_sentence
           %td
