@@ -8,9 +8,9 @@ class CreationState < ActiveRecord::Base
   end
 
   def creation_description
-    return 'pos' if 'is_pos'
-    return 'bulk' if 'is_bulk'
-    return origin.humanize.downcase if origin
+    return 'pos' if is_pos
+    return 'bulk reg' if is_bulk
+    return "#{origin.humanize.downcase}" if origin
   end
 
   before_validation :ensure_permitted_origin

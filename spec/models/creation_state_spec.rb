@@ -39,7 +39,7 @@ RSpec.describe CreationState, type: :model do
     context 'pos' do
       let(:creation_state) { CreationState.new(is_pos: true, origin: 'embed_extended') }
       it 'returns pos reg' do
-        expect(creation_state.creation_description).to eq 'pos reg'
+        expect(creation_state.creation_description).to eq 'pos'
       end
     end
     context 'embed_extended' do
@@ -49,7 +49,7 @@ RSpec.describe CreationState, type: :model do
       end
     end
     context 'nil' do
-      let(:creation_state) { CreationState.new(creation_organization_id: 1, creator_id: 1) }
+      let(:creation_state) { CreationState.new(organization_id: 1, creator_id: 1) }
       it 'returns nil' do
         expect(creation_state.creation_description).to be_nil
       end
