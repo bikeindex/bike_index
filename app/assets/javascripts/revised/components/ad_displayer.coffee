@@ -6,7 +6,6 @@ class @AdDisplayer
       @getAd(id) if document.getElementById(id)
 
   getAd: (unit) ->
-    console.log unit
     ad_body = '<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8140931939249510" data-ad-slot="7159478183" data-ad-format="auto"></ins>'
     $("##{unit}").html(ad_body).addClass('rendered-ad')
     (adsbygoogle = window.adsbygoogle || []).push({})

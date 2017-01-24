@@ -31,13 +31,12 @@ class PaymentsController < ApplicationController
         )
       end
     end
-    @customer_id = customer.id
     if subscription
       charge = customer.subscriptions.create(plan: params[:stripe_plan])
       charge_time = charge.current_period_start
     else
       charge = Stripe::Charge.create(
-        customer:     @customer_id,
+        customer:     customer.id,
         amount:       amount,
         description:  'Bike Index customer',
         currency:     'usd'
