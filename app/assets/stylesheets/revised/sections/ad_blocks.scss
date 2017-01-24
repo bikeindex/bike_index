@@ -1,19 +1,16 @@
 .ad468x60 {
   height: 60px;
-  img { max-width: 468px; }
 }
 
 .ad300x600 {
-  img {
-    max-width: 300px;
-    height: auto;
-  }
+  height: 600px;
 }
 
 .ad-col { @include media-breakpoint-down(md) { width: 100%; } }
 
 .ad-block {
   display: none;
+  width: 100%;
   .testing-block {
     background: $gray-lighter;
     border: 1px solid $gray-lightish;
