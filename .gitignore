@@ -22,6 +22,10 @@ spec/fixtures/tsv_creation/*.json
 .ruby-version
 .powenv
 
+# Ignore Chef stuff
+Cheffile.lock
+cookbooks/*
+
 # Ignore localeapp
 .localeapp
 log/localeapp.yml
