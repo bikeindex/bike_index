@@ -60,6 +60,26 @@ CREATE EXTENSION fuzzystrmatch;
 
 - If you're working on frontend development, you can use [Guard::LiveReload](https://github.com/guard/guard-livereload) to reload the frontend as you work with `bundle exec guard -G Guardfile_frontend`
 
+## Vagrant development box
+
+For your convenience, this repository includes both a Cheffile and Vagrantfile which are used to automatically set up and configure a virtual local (Xenial) development environment with all of the required dependencies preinstalled and configured (via Chef, because Ruby) for anyone wishing to contribute without needing to set everything up beforehand. This explanation assumes you're somewhat familiar with Vagrant/VirtualBox, Chef, automation, et al.
+
+### Dependencies/Requirements
+- A computer that supports hardware virtualization (Intel VT-x/AMD-V)
+
+- Vagrant
+
+- VirtualBox
+
+- At least 1.5GB of free memory
+
+- `vagrant plugin install vagrant-vbguest` & `vagrant plugin install vagrant-librarian-chef-nochef`. This only needs done once. Read https://gorails.com/guides/using-vagrant-for-rails-development for more info
+
+Run `vagrant up` to start the virtual machine, then `vagrant ssh` and `cd /vagrant`, which will point to the root of this repository on your host machine. Port 3001 is forwarded locally for testing. Be warned, it will take around a half hour or longer (depending on your internet connection) on first run to download additional Vagrant/Chef dependencies and to provision the dev environment. You may observe some informational warning messages during the initial setup which you can safely ignore. `vagrant halt` to shutdown the VM. Subsequent startups will take considerably less time after the initial run.
+
+### Troubleshooting
+If the initial setup fails for any reason, try `vagrant reload && vagrant provision` and see if the provision command completes without error. Please try to troubleshoot/google issues as much as possible before filing an issue. Be sure to include all relevant stdout messages and errors.
+
 ## Bug tracker
 
 Have a bug or a feature request? [Open a new issue](https://github.com/bikeindex/bike_index/issues/new).
