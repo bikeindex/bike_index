@@ -51,24 +51,24 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				global: "2.2.5",
 				gems: {
 					"2.2.5" => [
-					 { name:	"bundler" }
+					 { name: "bundler" }
 					]
 				}
 			}]
 		},
 		system: {
-			:packages	=>	{
-				:install	=>	["pkg-config libmagickcore-dev libmagickwand-dev redis-server"]
+			:packages => {
+				:install => ["pkg-config libmagickcore-dev libmagickwand-dev redis-server"]
 			}
 		},
 		postgresql: {
-			:version	=>	"9.4",
-			:apt_distribution	=>	"xenial",
-			:pg_hba	=>	[{
+			:version => "9.4",
+			:apt_distribution => "xenial",
+			:pg_hba	=> [{
 				:comment => "# Add vagrant role",
 				:type => 'local', :db => 'all', :user => 'vagrant', :addr => nil, :method => 'trust'
 			}],
-			:users	=> [{
+			:users => [{
 				"username": "vagrant",
 				"password": "vagrant",
 				"superuser": true,
@@ -79,8 +79,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				"login": true
 			}]
 		},
-		"build-essential"	=>	{
-			"compiletime"	=>	true
+		"build-essential" => {
+			"compiletime" => true
 		}
 	}
   end
