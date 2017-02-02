@@ -21,7 +21,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Configurate the virtual machine to use 1.5GB of RAM
   config.vm.provider :virtualbox do |vb|
-    vb.customize ["modifyvm", :id, "--memory", "1536"]
+	  vb.customize ["modifyvm", :id, "--memory", "1536"]
   end
 
   # Forward the Rails server default port to the host
@@ -31,16 +31,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision :chef_solo do |chef|
     chef.cookbooks_path = ["cookbooks", "site-cookbooks"]
 
-    chef.add_recipe "apt"
+	chef.add_recipe "apt"
 	chef.add_recipe "build-essential"
 	chef.add_recipe "system::install_packages"
-    chef.add_recipe "ruby_build"
-    chef.add_recipe "ruby_rbenv::user"
-    chef.add_recipe "ruby_rbenv::user_install"
-    chef.add_recipe "vim"
-    chef.add_recipe "postgresql::server"
-    chef.add_recipe "postgresql::client"
-    chef.add_recipe "postgresql::setup_users"
+	chef.add_recipe "ruby_build"
+	chef.add_recipe "ruby_rbenv::user"
+	chef.add_recipe "ruby_rbenv::user_install"
+	chef.add_recipe "vim"
+   	chef.add_recipe "postgresql::server"
+   	chef.add_recipe "postgresql::client"
+   	chef.add_recipe "postgresql::setup_users"
 
     # Install Ruby 2.2.5 and Bundler
     chef.json = {
@@ -58,17 +58,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		},
 		system: {
 			:packages	=>	{
-				:install =>	["pkg-config libmagickcore-dev libmagickwand-dev redis-server"]
+				:install	=>	["pkg-config libmagickcore-dev libmagickwand-dev redis-server"]
 			}
 		},
 		postgresql: {
-			:version			=>	"9.4",
+			:version	=>	"9.4",
 			:apt_distribution	=>	"xenial",
-			:pg_hba				=> [{
+			:pg_hba	=>	[{
 				:comment => "# Add vagrant role",
 				:type => 'local', :db => 'all', :user => 'vagrant', :addr => nil, :method => 'trust'
 			}],
-			:users				=> [{
+			:users	=> [{
 				"username": "vagrant",
 				"password": "vagrant",
 				"superuser": true,
@@ -79,8 +79,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 				"login": true
 			}]
 		},
-		"build-essential" => {
-			"compiletime" => true
+		"build-essential"	=>	{
+			"compiletime"	=>	true
 		}
 	}
   end
