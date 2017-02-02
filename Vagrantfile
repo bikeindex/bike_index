@@ -3,6 +3,18 @@
 
 VAGRANTFILE_API_VERSION = "2"
 
+required_plugins = %w(vagrant-vbguest vagrant-librarian-chef-nochef)
+
+plugins_to_install = required_plugins.select { |plugin| not Vagrant.has_plugin? plugin }
+if not plugins_to_install.empty?
+  puts "Installing required plugins: #{plugins_to_install.join(' ')}"
+  if system "vagrant plugin install #{plugins_to_install.join(' ')}"
+    exec "vagrant #{ARGV.join(' ')}"
+  else
+    abort "Installation of one or more plugins has failed. Aborting. Please read the Bike Index README."
+  end
+end
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Use David Warkentin's Ubuntu 16.04 Xenial Xerus 64-bit as our operating system (https://bugs.launchpad.net/cloud-images/+bug/1569237/comments/33)
   config.vm.box = "v0rtex/xenial64"

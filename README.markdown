@@ -73,8 +73,6 @@ For your convenience, this repository includes both a Cheffile and Vagrantfile w
 
 - At least 1.5GB of free memory
 
-- `vagrant plugin install vagrant-vbguest` & `vagrant plugin install vagrant-librarian-chef-nochef`. This only needs done once. Read https://gorails.com/guides/using-vagrant-for-rails-development for more info
-
 Run `vagrant up` to start the virtual machine, then `vagrant ssh` and `cd /vagrant`, which will point to the root of this repository on your host machine. Port 3001 is forwarded locally for testing. Be warned, it will take around a half hour or longer (depending on your internet connection) on first run to download additional Vagrant/Chef dependencies and to provision the dev environment. You may observe some informational warning messages during the initial setup which you can safely ignore. `vagrant halt` to shutdown the VM. Subsequent startups will take considerably less time after the initial run.
 
 ### Troubleshooting
