@@ -58,7 +58,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		},
 		system: {
 			:packages => {
-				:install => ["pkg-config libmagickcore-dev libmagickwand-dev redis-server"]
+				:install => ["pkg-config libmagickcore-dev libmagickwand-dev libpq-dev redis-server"]
 			}
 		},
 		postgresql: {
