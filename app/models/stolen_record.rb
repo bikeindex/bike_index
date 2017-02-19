@@ -156,10 +156,13 @@ class StolenRecord < ActiveRecord::Base
     col
   end
 
-  def tsv_row(with_article=true)
+  def tsv_row(with_article=true, with_stolen_locations: false)
     b = self.bike
     return '' unless b.present?
     row = ""
+    if with_stolen_locations
+      row << "#{tsv_col(city)}\t#{tsv_col(state && state.abbreviation)}\t"
+    end
     row << tsv_col(b.mnfg_name)
     row << "\t"
     row << tsv_col(b.frame_model)
