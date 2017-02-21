@@ -35,4 +35,13 @@
     @extend .ad300x600;
     margin-top: $vertical-height;
   }
+  h3 {
+    font-size: 21px;
+    margin: 0 0 0.5*$vertical-height;
+    &, a { color: $gray-light; }
+  }
+}
+
+.additional-ad-space { // For pages with content blocks on the right
+  margin-bottom: 3 * $vertical-height;
 }
