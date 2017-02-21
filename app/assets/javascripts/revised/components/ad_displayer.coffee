@@ -8,7 +8,7 @@ class @AdDisplayer
 
   photoAd: (unit) ->
     ad_body = '<h3><a href="https://bikeindex.org/news/iota---a-tiny-tracker-with-huge-potential">Bike Index Approved:</a></h3>' +
-      '<a href="http://iotatracker.refr.cc/bikeindex"><img src="/ads/iota-square.jpg" alt="Iota Tracker"></a>'
+      "<a href=\"http://iotatracker.refr.cc/bikeindex\" onclick=\"trackOutboundLink('http://iotatracker.refr.cc/bikeindex'); return false;\"><img src=\"/ads/iota-square.jpg\" alt=\"Iota Tracker\"></a>"
     $('.content-nav-group:last').addClass('additional-ad-space')
     $("##{unit}").html(ad_body).addClass('rendered-ad photo-ad')
 
