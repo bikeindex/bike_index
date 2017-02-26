@@ -1,25 +1,26 @@
 %h1
   About Bike Index
 
-%p
-  Cofounded by Seth Herr and Bryan Hance in 2014, Bike Index is the nation’s largest and most successful bicycle registration and recovery service with over 100,000 catalogued bikes, 75,000 registered riders, 320 community partners and 3,200 confirmed recoveries to date. 
+- cache('about_counts', expires_in: 24.hours) do
+  %p
+    Cofounded by Seth Herr and Bryan Hance in 2013, Bike Index is a #{link_to '501(c)(3) nonprofit', 'https://bikeindex.org/news/bike-index--now-a-nonprofit'}.
+  %p
+    Bike Index is the most widely used and successful bicycle registration service in the world, with over #{number_with_precision(Bike.count.round(-3), precision: 0, delimiter: ',')} cataloged bikes, #{number_with_precision(Organization.count.round(-1), precision: 0, delimiter: ',')} community partners and tens of thousands of daily searches.
 
 %p
-  Seth, a bike mechanic, conceived Bike Index as a universal bicycle registry for his customers and the cyclists of Chicago. 
+  Seth built Bike Index because, when he was a bike mechanic, he wanted to be able to register his customers' bikes. Bryan developed and ran a community driven bicycle recovery service (StolenBikeRegistry.com) that successfully recovered bikes from the first week it was created in 2004.
 
 %p
-  Bryan, creator of StolenBikeRegistry.com, developed a bicycle recovery resource leveraging community-driven tools and engagement to produce successful claims dating back to 2004.
-
-%p
-  Merging the two services in 2014, Seth and Bryan created a system that is the culmination of over 20 years of combined experience creating modern, innovative platforms designed to equip the cycling community with the necessary tools to secure their equipment against theft. 
+  Merging the two services in 2014, Seth and Bryan created the universal bike registration service they both dreamed of&mdash;a database used and searched by individuals, bike shops, police departments and other apps. A bike registry that gives everyone the ability to register and recover bicycles.
 
 %p
   Simple. Efficient. Effective.
 
 %p
-  Bike Index. It’s bike registration that works.
+  %strong
+    Bike registration that works.
 
-%h2
+%h2{ style: "margin-top: 60px;" }
   The team
 
 %ul.about-people
