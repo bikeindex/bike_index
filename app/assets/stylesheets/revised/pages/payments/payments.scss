@@ -94,6 +94,14 @@ $payments-page-breakpoint: 'sm';
         margin: 0 auto;
       }
     }
+    .nfp-info {
+      margin: 18px 0 -12px;
+      color: $less-strong-font-color;
+      a {
+        color: $less-strong-font-color;
+        text-decoration: underline;
+      }
+    }
     @include media-breakpoint-down($payments-page-breakpoint) {
       padding-left: 12px;
       padding-right: 12px;

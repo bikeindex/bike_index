@@ -32,6 +32,10 @@
                 %input#arbitrary-amount.form-control{ type: 'number', min: '0', placeholder: 'Other amount', step: 0.01, value: @initial_amount, class: ('active' if @initial_amount) }
         .next-step
           = submit_tag 'next  >', class: 'btn btn-primary'
+
+      %p.nfp-info
+        Bike Index is a #{ link_to '501(c)(3) nonprofit', 'https://bikeindex.org/news/bike-index--now-a-nonprofit' }.
+
   <script src="https://checkout.stripe.com/checkout.js"></script>
   - payment_type = @is_payment ? 'Pay' : 'Donate'
   - stripe_form_hash = { id: 'stripe_form', data: { key: ENV['STRIPE_PUBLISHABLE_KEY'],  email: current_user && current_user.email, type:  payment_type } }
