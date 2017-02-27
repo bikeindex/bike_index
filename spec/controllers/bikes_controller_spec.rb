@@ -349,11 +349,12 @@ describe BikesController do
             city: 'Chicago',
             zipcode: '60622',
             state_id: state.id,
-            date_stolen_input: Time.now.to_date.strftime('%m-%d-%Y')
+            date_stolen_input: "#{Time.now.month}-#{Time.now.day}-#{Time.now.year}"
           }
         end
         context 'valid' do
           it 'creates a new ownership and bike from an organization' do
+            pp Time.now.to_date.strftime('%m-%d-%Y')
             pp stolen_params[:date_stolen_input]
             pp Time.now.to_date
             expect do
