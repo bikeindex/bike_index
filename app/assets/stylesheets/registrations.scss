@@ -274,8 +274,12 @@ img { max-width: 100%; } // don't break random stuff images!
     width: 100%;
     border: none;
   }
+
   // Per organization settings
   &.umd {
     .submit-wrapper .btn { background: #e03a3e; }
+  }
+  &.uw {
+    .submit-wrapper .btn { background: #4b2e83; }
   }
 }
