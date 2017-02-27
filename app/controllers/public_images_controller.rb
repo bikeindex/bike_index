@@ -89,7 +89,7 @@ class PublicImagesController < ApplicationController
     if public_image.imageable_type == 'Bike'
       Bike.unscoped.find(public_image.imageable_id).owner == current_user
     elsif public_image.imageable_type == 'Blog'
-      current_user && current_user.admin_authorized(content)
+      current_user && current_user.admin_authorized('content')
     end
   end
 

@@ -8,7 +8,7 @@
       <textarea class="code-to-enter">&lt;img class="post-image" src="<%= public_image.image_url %>" alt="ENTER YOUR TEXT HERE"&gt;</textarea>
       <p><span>Copy the above text and paste it where you'd like it to appear</span></p>
     <% else %>
-      <textarea class="code-to-enter">&lt;img class="post-image" src="<%= public_image.image_url(:large) %>" alt="ENTER YOUR TEXT HERE"&gt;</textarea>
+      <textarea class="code-to-enter">&lt;img class="post-image" src="<%= public_image.image_url %>" alt="ENTER YOUR TEXT HERE"&gt;</textarea>
       <p>
         <span>Copy the above text and paste it where you'd like it to appear in the post</span>
         <%= link_to "Delete image", public_image_url(public_image, return_url: edit_admin_news_url(@blog)), method: :delete, class: "photo-remove" %>

@@ -349,23 +349,43 @@ describe BikesController do
             city: 'Chicago',
             zipcode: '60622',
             state_id: state.id,
-            date_stolen_input: Time.now.to_date.strftime('%m-%d-%Y')
+            date_stolen_input: "#{Time.now.month}-#{Time.now.day}-#{Time.now.year}"
           }
         end
         context 'valid' do
-          it 'creates a new ownership and bike from an organization' do
-            pp stolen_params[:date_stolen_input]
-            expect do
-              post :create, bike: bike_params.merge(stolen: true), stolen_record: stolen_params
-            end.to change(Ownership, :count).by 1
-            bike = Bike.last
-            expect(bike.creation_state.origin).to eq 'embed'
-            expect(bike.creation_state.organization).to eq organization
-            expect(bike.creation_state.creator).to eq bike.creator
-            testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
-            stolen_record = bike.current_stolen_record
-            stolen_params.except(:date_stolen_input).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
-            expect(stolen_record.date_stolen.to_date).to eq Time.now.to_date
+          context 'with old style date input' do
+            it 'creates a new ownership and bike from an organization' do
+              expect do
+                post :create, bike: bike_params.merge(stolen: true), stolen_record: stolen_params
+              end.to change(Ownership, :count).by 1
+              bike = Bike.last
+              expect(bike.creation_state.origin).to eq 'embed'
+              expect(bike.creation_state.organization).to eq organization
+              expect(bike.creation_state.creator).to eq bike.creator
+              testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
+              stolen_record = bike.current_stolen_record
+              stolen_params.except(:date_stolen_input).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
+              pp stolen_record.date_stolen
+              expect(stolen_record.date_stolen.to_date).to eq Time.now.to_date
+            end
+          end
+          context 'new date input' do
+            let(:date_stolen_input) { Time.now.to_date.strftime(StolenRecord.revised_date_format) }
+            let(:alt_stolen_params) { stolen_params.merge(date_stolen_input: date_stolen_input) }
+            it 'creates a new ownership and bike from an organization' do
+              expect do
+                post :create, bike: bike_params.merge(stolen: true), stolen_record: alt_stolen_params
+              end.to change(Ownership, :count).by 1
+              bike = Bike.last
+              expect(bike.creation_state.origin).to eq 'embed'
+              expect(bike.creation_state.organization).to eq organization
+              expect(bike.creation_state.creator).to eq bike.creator
+              testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
+              stolen_record = bike.current_stolen_record
+              stolen_params.except(:date_stolen_input).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
+              pp stolen_record.date_stolen
+              expect(stolen_record.date_stolen.to_date).to eq Time.now.to_date
+            end
           end
         end
         context 'invalid' do
@@ -868,7 +888,8 @@ describe BikesController do
               police_report_department: 'department of party',
               secondary_phone: '8888888888',
               proof_of_ownership: 1,
-              receive_notifications: 0
+              receive_notifications: 0,
+              estimated_value: '1200'
             }
           end
           let(:bike_attrs) do
@@ -879,7 +900,7 @@ describe BikesController do
               }
             }
           end
-          let(:skipped_attrs) { %w(proof_of_ownership receive_notifications date_stolen_input).map(&:to_sym) }
+          let(:skipped_attrs) { %w(proof_of_ownership receive_notifications date_stolen_input estimated_value).map(&:to_sym) }
           it 'updates and returns to the right page' do
             bike.update_attribute :stolen, true
             bike.reload
@@ -907,6 +928,7 @@ describe BikesController do
             expect(current_stolen_record.date_stolen).to be_within(1.second).of DateTime.strptime('02-08-2016 06', '%m-%d-%Y %H')
             expect(current_stolen_record.proof_of_ownership).to be_truthy
             expect(current_stolen_record.receive_notifications).to be_falsey
+            expect(current_stolen_record.estimated_value).to eq 1200
             stolen_attrs.except(*skipped_attrs).each do |key, value|
               pp key unless current_stolen_record.send(key) == value
               expect(current_stolen_record.send(key)).to eq value
