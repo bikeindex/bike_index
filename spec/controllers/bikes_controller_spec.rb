@@ -353,21 +353,41 @@ describe BikesController do
           }
         end
         context 'valid' do
-          it 'creates a new ownership and bike from an organization' do
-            pp Time.now.to_date.strftime('%m-%d-%Y')
-            pp stolen_params[:date_stolen_input]
-            pp Time.now.to_date
-            expect do
-              post :create, bike: bike_params.merge(stolen: true), stolen_record: stolen_params
-            end.to change(Ownership, :count).by 1
-            bike = Bike.last
-            expect(bike.creation_state.origin).to eq 'embed'
-            expect(bike.creation_state.organization).to eq organization
-            expect(bike.creation_state.creator).to eq bike.creator
-            testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
-            stolen_record = bike.current_stolen_record
-            stolen_params.except(:date_stolen_input).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
-            expect(stolen_record.date_stolen.to_date).to eq Time.now.to_date
+          context 'with old style date input' do
+            it 'creates a new ownership and bike from an organization' do
+              pp Time.now.to_date.strftime('%m-%d-%Y')
+              pp stolen_params[:date_stolen_input]
+              pp StolenRecordUpdator.new.create_date_from_string(stolen_params[:date_stolen_input])
+              pp Time.now.to_date
+              expect do
+                post :create, bike: bike_params.merge(stolen: true), stolen_record: stolen_params
+              end.to change(Ownership, :count).by 1
+              bike = Bike.last
+              expect(bike.creation_state.origin).to eq 'embed'
+              expect(bike.creation_state.organization).to eq organization
+              expect(bike.creation_state.creator).to eq bike.creator
+              testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
+              stolen_record = bike.current_stolen_record
+              stolen_params.except(:date_stolen_input).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
+              expect(stolen_record.date_stolen.to_date).to eq Time.now.to_date
+            end
+          end
+          context 'new date input' do
+            let(:date_stolen_input) { Time.now.to_date.strftime(StolenRecord.revised_date_format) }
+            let(:alt_stolen_params) { stolen_params.merge(date_stolen_input: date_stolen_input) }
+            it 'creates a new ownership and bike from an organization' do
+              expect do
+                post :create, bike: bike_params.merge(stolen: true), stolen_record: alt_stolen_params
+              end.to change(Ownership, :count).by 1
+              bike = Bike.last
+              expect(bike.creation_state.origin).to eq 'embed'
+              expect(bike.creation_state.organization).to eq organization
+              expect(bike.creation_state.creator).to eq bike.creator
+              testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
+              stolen_record = bike.current_stolen_record
+              stolen_params.except(:date_stolen_input).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
+              expect(stolen_record.date_stolen.to_date).to eq Time.now.to_date
+            end
           end
         end
         context 'invalid' do
