@@ -10,6 +10,9 @@ SitemapGenerator::Sitemap.create do
     paths = ['about']
     paths.each { |i| add "/#{i}", priority: 0.9 }
   end
+  group(filename: :organizations) do
+    LandingPages::ORGANIZATIONS.each { |i| add "/o/#{i}", priority: 0.9 }
+  end
 
   group(filename: :news) do
     add '/blogs', priority: 0.9, changefreq: 'daily'
