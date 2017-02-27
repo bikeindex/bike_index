@@ -355,6 +355,7 @@ describe BikesController do
         context 'valid' do
           it 'creates a new ownership and bike from an organization' do
             pp stolen_params[:date_stolen_input]
+            pp Time.now.to_date
             expect do
               post :create, bike: bike_params.merge(stolen: true), stolen_record: stolen_params
             end.to change(Ownership, :count).by 1
