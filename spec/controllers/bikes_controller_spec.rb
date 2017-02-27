@@ -892,7 +892,8 @@ describe BikesController do
               police_report_department: 'department of party',
               secondary_phone: '8888888888',
               proof_of_ownership: 1,
-              receive_notifications: 0
+              receive_notifications: 0,
+              estimated_value: '1200'
             }
           end
           let(:bike_attrs) do
@@ -903,7 +904,7 @@ describe BikesController do
               }
             }
           end
-          let(:skipped_attrs) { %w(proof_of_ownership receive_notifications date_stolen_input).map(&:to_sym) }
+          let(:skipped_attrs) { %w(proof_of_ownership receive_notifications date_stolen_input estimated_value).map(&:to_sym) }
           it 'updates and returns to the right page' do
             bike.update_attribute :stolen, true
             bike.reload
@@ -931,6 +932,7 @@ describe BikesController do
             expect(current_stolen_record.date_stolen).to be_within(1.second).of DateTime.strptime('02-08-2016 06', '%m-%d-%Y %H')
             expect(current_stolen_record.proof_of_ownership).to be_truthy
             expect(current_stolen_record.receive_notifications).to be_falsey
+            expect(current_stolen_record.estimated_value).to eq 1200
             stolen_attrs.except(*skipped_attrs).each do |key, value|
               pp key unless current_stolen_record.send(key) == value
               expect(current_stolen_record.send(key)).to eq value

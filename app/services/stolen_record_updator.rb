@@ -36,7 +36,6 @@ class StolenRecordUpdator
     when /^\d*\z/ # it's only numbers, so it's a timestamp
       Time.at(date_string.to_i)
     when /^\d\d?.\d\d?.\d+\z/ # it's MM-DD-YYYY
-      pp "lol wat #{DateTime.strptime("#{date_string} 06", '%m-%d-%Y %H')}"
       DateTime.strptime("#{date_string} 06", '%m-%d-%Y %H')
     else # it had better be the revised date format!
       DateTime.strptime("#{date_string} 06", StolenRecord.revised_date_format_hour)
@@ -115,7 +114,7 @@ class StolenRecordUpdator
 
   def permitted_params
     %w(phone secondary_phone street city zipcode country_id state_id
-       police_report_number police_report_department
+       police_report_number police_report_department estimated_value
        theft_description locking_description lock_defeat_description
        proof_of_ownership receive_notifications)
   end

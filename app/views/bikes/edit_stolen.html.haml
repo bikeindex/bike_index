@@ -30,6 +30,12 @@
 
               = render partial: '/bikes/bike_fields/stolen_location', locals: { srecord: srecord, stolen_type: stolen_type }
 
+              .form-group.row.unnested-field
+                = srecord.label :estimated_value, class: 'form-well-label'
+                .form-well-input
+                  = srecord.number_field :estimated_value, min: '1', class: 'form-control'
+
+
               - unless @bike.recovered
                 .form-group.row.unnested-field.fancy-select-placeholder.unfancy
                   = srecord.label :locking_description, class:  'form-well-label'
