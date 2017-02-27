@@ -32,10 +32,11 @@ class StolenRecordUpdator
 
   def create_date_from_string(date_string)
     return Time.at(date_string) if date_string.kind_of?(Integer)
-    case date_string.strip
+    case date_string.to_s.strip
     when /^\d*\z/ # it's only numbers, so it's a timestamp
       Time.at(date_string.to_i)
     when /^\d\d?.\d\d?.\d+\z/ # it's MM-DD-YYYY
+      pp "lol wat #{DateTime.strptime("#{date_string} 06", '%m-%d-%Y %H')}"
       DateTime.strptime("#{date_string} 06", '%m-%d-%Y %H')
     else # it had better be the revised date format!
       DateTime.strptime("#{date_string} 06", StolenRecord.revised_date_format_hour)
