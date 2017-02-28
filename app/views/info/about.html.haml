@@ -1,23 +1,61 @@
 %h1
   About Bike Index
 
-%p
-  Cofounded by Seth Herr and Bryan Hance in 2014, Bike Index is the nation’s largest and most successful bicycle registration and recovery service with over 100,000 catalogued bikes, 75,000 registered riders, 320 community partners and 3,200 confirmed recoveries to date. 
+- cache('about_counts', expires_in: 24.hours) do
+  %p
+    Cofounded by Seth Herr and Bryan Hance in 2013, Bike Index is a #{link_to '501(c)(3) nonprofit', 'https://bikeindex.org/news/bike-index--now-a-nonprofit'}.
+  %p
+    It is the most widely used and successful bicycle registration service in the world with over #{number_with_precision(Bike.count.round(-3), precision: 0, delimiter: ',')} cataloged bikes, #{number_with_precision(Organization.count.round(-1), precision: 0, delimiter: ',')} community partners and tens of thousands of daily searches.
 
 %p
-  Seth, a bike mechanic, conceived Bike Index as a universal bicycle registry for his customers and the cyclists of Chicago. 
+  Seth built Bike Index when he was a bike mechanic because he wanted to be able to register bikes for his customers. Bryan developed and ran a community driven bicycle recovery service (StolenBikeRegistry.com) that recovered bikes from the first week it was created in 2004.
 
 %p
-  Bryan, creator of StolenBikeRegistry.com, developed a bicycle recovery resource leveraging community-driven tools and engagement to produce successful claims dating back to 2004.
-
-%p
-  Merging the two services in 2014, Seth and Bryan created a system that is the culmination of over 20 years of combined experience creating modern, innovative platforms designed to equip the cycling community with the necessary tools to secure their equipment against theft. 
+  Merging the two services Seth and Bryan created the universal bike registration service they both dreamed of&mdash;a database used and searched by individuals, bike shops, police departments and other apps. A bike registry that gives everyone the ability to register and recover bicycles.
 
 %p
   Simple. Efficient. Effective.
 
 %p
-  Bike Index. It’s bike registration that works.
+  %strong
+    Bike registration that works.
+
+.about-social
+  %ul
+    %li
+      %a.footer-facebook{ href: 'https://facebook.com/bikeindex', alt: 'Bike Index Facebook' }
+        :plain
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40.09 40.09">
+            <g>
+              <path class="svgpath" d="M2987.81,2564.42a20,20,0,1,1,20-20A20.07,20.07,0,0,1,2987.81,2564.42Zm0-38.57a18.52,18.52,0,1,0,18.52,18.52A18.54,18.54,0,0,0,2987.81,2525.85Z" transform="translate(-2967.76 -2524.33)"/>
+              <path class="svgpath" d="M2997,2552.31a1,1,0,0,1-1,1h-4.75v-7.22h2.42l0.36-2.81h-2.79v-1.8a1.17,1.17,0,0,1,1.39-1.37h1.49v-2.52a19.91,19.91,0,0,0-2.17-.11,3.39,3.39,0,0,0-3.62,3.72v2.08h-2.43v2.81h2.43v7.22h-8.93a1,1,0,0,1-1-1v-16.59a1,1,0,0,1,1-1H2996a1,1,0,0,1,1,1v16.59Z" transform="translate(-2967.76 -2524.33)"/>
+            </g>
+          </svg>
+        %span.social-link-text
+          Facebook
+
+    %li
+      %a{ href: 'https://twitter.com/BikeIndex', alt: 'Bike Index Twitter' }
+        :plain
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40.09 40.09">
+            <g>
+              <path class="svgpath" d="M2806.61,2590.64a7.69,7.69,0,0,1-2.48,1,3.85,3.85,0,0,0-2.85-1.26,4,4,0,0,0-3.9,4,4.08,4.08,0,0,0,.1.91,11,11,0,0,1-8-4.18,4.07,4.07,0,0,0-.53,2,4,4,0,0,0,1.74,3.33,3.83,3.83,0,0,1-1.77-.5v0a4,4,0,0,0,3.13,3.92,3.72,3.72,0,0,1-1,.14,3.79,3.79,0,0,1-.73-0.07,3.92,3.92,0,0,0,3.65,2.78,7.71,7.71,0,0,1-4.85,1.71,7.81,7.81,0,0,1-.93-0.05,10.87,10.87,0,0,0,6,1.8c7.18,0,11.1-6.1,11.1-11.39,0-.17,0-0.35,0-0.52a8,8,0,0,0,1.95-2.07,7.62,7.62,0,0,1-2.24.63A4,4,0,0,0,2806.61,2590.64Z" transform="translate(-2777.81 -2578.33)"/>
+              <path class="svgpath" d="M2797.85,2618.42a20,20,0,1,1,20-20A20.07,20.07,0,0,1,2797.85,2618.42Zm0-38.57a18.52,18.52,0,1,0,18.52,18.52A18.54,18.54,0,0,0,2797.85,2579.85Z" transform="translate(-2777.81 -2578.33)"/>
+            </g>
+          </svg>
+        %span.social-link-text
+          Twitter
+    %li
+      %a{ href:  'https://instagram.com/bikeindex', alt: 'Bike Index Instagram' }
+        :plain
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40.09 40.09">
+            <g>
+              <path class="svgpath" d="M2868.16,2589H2854a2.21,2.21,0,0,0-2.21,2.21v14.2a2.21,2.21,0,0,0,2.21,2.21h14.19a2.21,2.21,0,0,0,2.21-2.21v-14.2A2.21,2.21,0,0,0,2868.16,2589Zm-3,2.91a0.58,0.58,0,0,1,.58-0.58h1.75a0.58,0.58,0,0,1,.58.58v1.75a0.58,0.58,0,0,1-.58.58h-1.75a0.58,0.58,0,0,1-.58-0.58v-1.75Zm-4.05,2.85a3.57,3.57,0,1,1-3.58,3.57A3.58,3.58,0,0,1,2861.09,2594.78Zm7.54,10.53a0.58,0.58,0,0,1-.58.58h-14a0.58,0.58,0,0,1-.58-0.58v-8.73h2.33a3.55,3.55,0,0,0-.41,1.77,5.66,5.66,0,0,0,11.33,0,3,3,0,0,0-.45-1.77h2.33v8.73Z" transform="translate(-2840.54 -2578.33)"/>
+              <path class="svgpath" d="M2860.58,2618.42a20,20,0,1,1,20-20A20.07,20.07,0,0,1,2860.58,2618.42Zm0-38.57a18.52,18.52,0,1,0,18.52,18.52A18.54,18.54,0,0,0,2860.58,2579.85Z" transform="translate(-2840.54 -2578.33)"/>
+            </g>
+          </svg>
+        %span.social-link-text
+          Instagram
 
 %h2
   The team
@@ -34,22 +72,22 @@
       = image_tag "who/bryan-hance.jpg", alt: 'Bryan Hance'
       %strong
         Bryan Hance
-      created StolenBicycleRegistry.com in 2005 because 5 of his bikes were stolen in 9 years. The first week it was live he recovered a bike - and realized recovering bikes was really fun. He lives in Portland and recovers lots of bikes.
+      created StolenBicycleRegistry.com in 2005 because 5 of his bikes were stolen in 9 years&mdash;and realized recovering bikes was really fun. He lives in Portland and recovers lots of bikes.
   %li
     %p
       = image_tag "who/laura-nash.jpg", alt: 'Laura Nash'
       %strong
         Laura Nash
-      handles our #{link_to "Twitter", "https://twitter.com/BikeIndex"} and #{link_to "Facebook", "http://facebook.com/bikeindex"} accounts, contacts people about their stolen bikes and reviews stolen listings.
+      handles our #{link_to 'Twitter', 'https://twitter.com/BikeIndex'} and #{link_to 'Facebook', 'http://facebook.com/bikeindex'} accounts, contacts people about their stolen bikes and reviews stolen listings.
   %li
     %p
-      = image_tag "who/michael-catano.jpg", alt: 'Michael Catano'
+      = image_tag 'who/michael-catano.jpg', alt: 'Michael Catano'
       %strong
         Michael Catano
-      is in charge of making sure the words read gooder. In his spare time he builds fancy bicycle frames under the name #{link_to "Humble Frameworks", "http://www.humbleframeworks.cc/"} and hangs out with his cats.
+      is in charge of making sure the words read gooder. In his spare time he builds fancy bicycle frames under the name #{link_to 'Humble Frameworks', 'http://www.humbleframeworks.cc/'} and hangs out with his cats.
   %li
     %p
-      = image_tag "who/mike-oleon.jpg", alt: 'Mike Oleon'
+      = image_tag 'who/mike-oleon.jpg', alt: 'Mike Oleon'
       %strong
         Mike Oleon
       does the graphic design and illustration for the Index. If anything looks good, it's probably his fault.
