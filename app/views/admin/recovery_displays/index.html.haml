@@ -35,3 +35,6 @@
             = "&#x2713;".html_safe if recovery_display.image?
           %td.large-screens.table-cell-check
             = "&#x2713;".html_safe if recovery_display.stolen_record_id.present?
+
+:javascript
+  $(document).ready(function() {$('.full-screen-table').parents('.receptacle').css('max-width', '100%');});

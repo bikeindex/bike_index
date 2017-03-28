@@ -29,10 +29,10 @@
     /     = submit_tag 'Post checked recoveries', class: 'button-blue pull-right'
     %table.table.table-striped.table-bordered
       %thead
-        - unless @posted
-          %th
-            %input#all_select{ type: 'checkbox' }
-        %th
+        / - unless @posted
+        /   %th
+        /     %input#all_select{ type: 'checkbox' }
+        %th.date-recovered-cell
           Date recovered
         %th.medium-screens
           Bike
@@ -40,20 +40,20 @@
           Recovery info
         %th.large-screens
           Location
-        %th
-          Helped
-        %th
-          Shareable
-        %th
-          Display
+        %th.sm-cell
+          H<span class="sm-cell-hide">elped</span>
+        %th.sm-cell
+          S<span class="sm-cell-hide">hareable</span>
+        %th.sm-cell
+          D<span class="sm-cell-hide">isplay</span>
 
 
       %tbody
         - @recoveries.each do |recovery|
           %tr
-            - unless @posted
-              %td.multipost_checkbox
-                = check_box_tag "recovery_selected[#{recovery.id}]", recovery.id
+            / - unless @posted
+            /   %td.multipost_checkbox
+            /     = check_box_tag "recovery_selected[#{recovery.id}]", recovery.id
 
             %td
               %a{href: edit_admin_recovery_url(recovery.id) }
@@ -79,15 +79,28 @@
             %td.large-screens
               - if recovery.address.present?
                 = recovery.city
-            %td.table-cell-check
+            %td.table-cell-check.sm-cell
               / Posted
               / = "&#x2713;".html_safe if recovery.recovery_posted
               = "&#x2713;".html_safe if recovery.index_helped_recovery
-            %td.table-cell-check
+            %td.table-cell-check.sm-cell
               = "&#x2713;".html_safe if recovery.can_share_recovery
-            %td.table-cell-check
+            %td.table-cell-check.sm-cell
               - if recovery.recovery_display.present?
                 = link_to "&#x2713;".html_safe, edit_admin_recovery_display_url(recovery.recovery_display)
           
   .paginate-container
     = paginate @recoveries
+:scss
+  @media (max-width: 700px) {
+    .full-screen-table {
+      table {
+        table-layout: fixed;
+        .date-recovered-cell { width: 6em; }
+        .sm-cell { width: 2em; }
+        .sm-cell-hide { display: none; }
+      }
+    }
+  }
+:javascript
+  $(document).ready(function() {$('.full-screen-table').parents('.receptacle').css('max-width', '100%');});

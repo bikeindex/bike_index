@@ -57,24 +57,24 @@
   .padded
     %p
       = @recovery.recovered_description
-  .control-group.recovery-input-field
-    = f.label :recovery_share, "Story to share",   class: "control-label"
-    .controls
-      = f.text_area :recovery_share
-  / tweets - 140 chars, - 23 for URL
-  - tweet_length = 140 - 23
-  - if @bike.thumb_image.present?
-    / Minus 23 if bike has an image
-    - tweet_length = tweet_length - 23
-  .control-group#tweet-entry.recovery-input-field{ data: {length: tweet_length } }
-    = f.label :recovery_tweet, class: "control-label"
-    .controls
-      = f.text_area :recovery_tweet
-    %span#tweet-length
-      = tweet_length
+  / .control-group.recovery-input-field
+  /   = f.label :recovery_share, "Story to share",   class: "control-label"
+  /   .controls
+  /     = f.text_area :recovery_share
+  / / tweets - 140 chars, - 23 for URL
+  / - tweet_length = 140 - 23
+  / - if @bike.thumb_image.present?
+  /   / Minus 23 if bike has an image
+  /   - tweet_length = tweet_length - 23
+  / .control-group#tweet-entry.recovery-input-field{ data: {length: tweet_length } }
+  /   = f.label :recovery_tweet, class: "control-label"
+  /   .controls
+  /     = f.text_area :recovery_tweet
+  /   %span#tweet-length
+  /     = tweet_length
 
 
-  .actions
-    .control-group
-      = submit_tag "Update the recovery", class: "button-green"
-      
+  / .actions
+  /   .control-group
+  /     = submit_tag "Update the recovery", class: "button-green"
+  /     
