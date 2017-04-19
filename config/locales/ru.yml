@@ -1,0 +1,105 @@
+ru:
+  meta_title:
+    welcome_index: "Bike Index - Регистрация велосипедов, которая работает"
+    welcome_goodbye: "До свидания!"
+    bikes_index: "Результаты поиска"
+    bikes_new: "Регистрация велосипеда!"
+    bikes_new_stolen: "Регистрация украденного велосипеда"
+    feedbacks_vendor_signup: "Регистрация магазина - Bike Index"
+    feedbacks_new: "Связаться с Bike Index"
+    feedbacks_index: "Помочь с Bike Index"
+    blogs_index: "Bike Index Блог"
+    info_about: "Bike Index - Регистрация велосипедов, которая работает"
+    info_spokecard: "Spoke cards - Bike Index"
+    info_stolen_bikes: "Реагирование на кражу"
+    info_serials: "Серийные номера велосипедов"
+    manufacturers_index: "Производители велосипедов"
+    users_new: "Регистрация - Bike Index"
+    users_confirm: "Подтвердите ваш email - Bike Index"
+    users_request_password_reset: "Сброс пароля - Bike Index"
+    users_password_reset: "Пароль сброшен - Bike Index"
+    users_accept_terms: "Условия использования - Bike Index"
+    users_accept_vendor_terms: "Условия организации - Bike Index"
+    documentation_api_v1: "Bike Index API документация"
+    organization_invitations_new: "Новое приглашение"
+    payments_new: "Помочь Bike Index!"
+    payments_create: "Спасибо за вашу помощь!"
+    sessions_new: "Войти"
+    sessions_create: "Войти"
+    stolen_index: "Реестр велосипедов"
+    info_where: "Партнеры Bike Index"
+    links: "Ссылки"
+    about: "FAQ"
+    tech: "Технологии борьбы к кражей велосипедов"
+    stolen_howworks: "Как это работает"
+    stolen_merging: "Реестр краденных велосипедов"
+  meta_descriptions:
+    welcome_index: "Лучший реестр велосипедов: Просто, безопасно and бесплатно."
+    info_about: "Почему мы делаем Bike Index и кто мы такие"
+    info_resources: "Bike Index ресурсы и полезные утилиты"
+    info_stolen_bikes: "Что делать если ваш велосипед украден - следующие шаги рекомендуемые Bike Index."
+    info_serials: "Что такое серийные номера - и где найти их."
+    info_spokecard: "The Bike Index offers spoke cards that link to each bike on the Index with a QR code. Learn about how they work and how to create your own."
+    info_where: "Организации, использующие реестр для поиска и регистрации велосипедов."
+    info_protect_your_bike: "Предотвращение кражи велосипедов. Рекомендации и лучшие практики для защиты вашего велосипеда от воров."
+    manufacturers_index: "Связанные с велосипедами производители размещнные на Bike Index - все велосипедные бренды которые вы знаете и ещё некоторые."
+    bikes_index: "Поиск велосипедов по реестру Bike Index"
+    bikes_new_stolen: "Регистрация украденного велосипеда в реестре Bike Index быстро, просто и бесплатно."
+    bikes_new: "Регистрация велосипеда в индексе Bike Index быстро, просто и бесплатно. Создай запись о своём велосипеде и защити его."
+    feedbacks_vendor_signup: "Зарегистрируйтесь в Bike Index для того чтобы позволить своим потребителям регистрировать велосипед быстро, просто и бесплатно."
+    feedbacks_new: "Связаться с Bike Index. Ваши слова - наша муза, шепот которых звучит в наших ушах."
+    feedbacks_index: "Помочь Bike Index. Часто отвечаемые вопросы и некоторые другие."
+    blogs_index: "Прочитать Bike Index новости. Также, периодически, публикуются магические заклинания."
+    users_new: "Зарегистрироваться в Bike Index"
+    documentation_api_v1: "API Version 1 документация и любовь"
+    documentation_api_v2: "Bike Index API v2 документация. Авторизуйтесь с помощью OAuth2, используя JSON, являющийся RESTful и являющийся довольно прикольным"
+    sessions_new: "Войти в Bike Index"
+    sessions_create: "Войти в Bike Index"
+    stolen_index: "Bike Index помогает вернуть украденный велосипед"
+    stolen_merging: "StolenBicycleRegistry.com объединился с Bike Index в 2014 чтобы стать крупнейшим открытым реестром велосипедов в мире"
+  doorkeeper:
+    scopes:
+      public: "Authenticate with you, view public information"
+  time:
+    formats:
+      standard_display: "%A, %B %d"
+      short_with_year: "%a, %B %d %Y"
+      no_day_with_year: "%B %d %Y"
+      blog: "%m_%d_%Y"
+      dotted: "%m.%d.%Y"
+      short_with_hour: "%m.%d.%y - %l%P"
+  errors: &errors
+    format: ! '%{attribute} %{message}'
+    messages:
+      accepted: must be accepted
+      blank: can't be blank
+      confirmation: doesn't match confirmation
+      empty: can't be empty
+      equal_to: must be equal to %{count}
+      even: must be even
+      exclusion: is reserved
+      greater_than: must be greater than %{count}
+      greater_than_or_equal_to: must be greater than or equal to %{count}
+      inclusion: is not included in the list
+      invalid: is invalid
+      less_than: must be less than %{count}
+      less_than_or_equal_to: must be less than or equal to %{count}
+      not_a_number: is not a number
+      not_an_integer: must be an integer
+      odd: must be odd
+      record_invalid: ! 'Validation failed: %{errors}'
+      taken: has already been taken
+      too_long:
+        one: is too long (maximum is 1 character)
+        other: is too long (maximum is %{count} characters)
+      too_short:
+        one: is too short (minimum is 1 character)
+        other: is too short (minimum is %{count} characters)
+      wrong_length:
+        one: is the wrong length (should be 1 character)
+        other: is the wrong length (should be %{count} characters)
+    template:
+      body: ! 'There were problems with the following fields:'
+      header:
+        one: 1 error prohibited this %{model} from being saved
+        other: ! '%{count} errors prohibited this %{model} from being saved'
