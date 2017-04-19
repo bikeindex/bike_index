@@ -32,7 +32,9 @@
 
               .form-group.row.unnested-field
                 = srecord.label :estimated_value, class: 'form-well-label'
-                .form-well-input
+                .form-well-input.input-group{ style: 'max-height: 2.5rem;'}
+                  .input-group-addon
+                    $
                   = srecord.number_field :estimated_value, min: '1', class: 'form-control'
 
 
