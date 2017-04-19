@@ -70,6 +70,9 @@
                   %span.less-strong-right
                     = link_to recovery.bike_id, edit_admin_bike_url(recovery.bike)
                   = recovery.bike.title_string
+                  - if recovery.estimated_value.present?
+                    %small.less-strong
+                      $#{recovery.estimated_value}
                 
             %td
               - if recovery.recovered_description.present?
