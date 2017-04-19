@@ -78,7 +78,12 @@
             = @stolen_record.police_report_department
           %dt
             Police Report
-          = @stolen_record.police_report_number
+          %dd
+            = @stolen_record.police_report_number
+          %dt
+            Estimated $
+          %dd
+            = @stolen_record.estimated_value
     - else
       %h1.padded
         Stolen record not created yet.
