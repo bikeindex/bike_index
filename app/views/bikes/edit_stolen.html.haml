@@ -58,6 +58,8 @@
                 = srecord.label :police_report_number, 'Police report #', class: 'form-well-label'
                 .form-well-input
                   = srecord.text_field :police_report_number, class: 'form-control'
+                  %span.below-input-help
+                    Without a valid report number, your bike won't be included in partner searches by <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">LeadsOnline</a>
               .form-group.row.unnested-field.no-divider-row
                 = srecord.label :police_report_department, 'Department & city', class: 'form-well-label'
                 .form-well-input
