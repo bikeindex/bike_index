@@ -2,12 +2,17 @@
 -- PostgreSQL database dump
 --
 
+-- Dumped from database version 9.6.2
+-- Dumped by pg_dump version 9.6.2
+
 SET statement_timeout = 0;
 SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
+SET row_security = off;
 
 --
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
@@ -44,7 +49,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: ads; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: ads; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE ads (
@@ -80,7 +85,7 @@ ALTER SEQUENCE ads_id_seq OWNED BY ads.id;
 
 
 --
--- Name: b_params; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: b_params; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE b_params (
@@ -121,7 +126,7 @@ ALTER SEQUENCE b_params_id_seq OWNED BY b_params.id;
 
 
 --
--- Name: bike_organizations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: bike_organizations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE bike_organizations (
@@ -153,7 +158,7 @@ ALTER SEQUENCE bike_organizations_id_seq OWNED BY bike_organizations.id;
 
 
 --
--- Name: bikes; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: bikes; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE bikes (
@@ -242,7 +247,7 @@ ALTER SEQUENCE bikes_id_seq OWNED BY bikes.id;
 
 
 --
--- Name: blogs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: blogs; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE blogs (
@@ -286,7 +291,7 @@ ALTER SEQUENCE blogs_id_seq OWNED BY blogs.id;
 
 
 --
--- Name: cgroups; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: cgroups; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE cgroups (
@@ -319,7 +324,7 @@ ALTER SEQUENCE cgroups_id_seq OWNED BY cgroups.id;
 
 
 --
--- Name: colors; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: colors; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE colors (
@@ -352,7 +357,7 @@ ALTER SEQUENCE colors_id_seq OWNED BY colors.id;
 
 
 --
--- Name: components; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: components; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE components (
@@ -394,7 +399,7 @@ ALTER SEQUENCE components_id_seq OWNED BY components.id;
 
 
 --
--- Name: countries; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: countries; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE countries (
@@ -426,7 +431,7 @@ ALTER SEQUENCE countries_id_seq OWNED BY countries.id;
 
 
 --
--- Name: creation_states; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: creation_states; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE creation_states (
@@ -463,7 +468,7 @@ ALTER SEQUENCE creation_states_id_seq OWNED BY creation_states.id;
 
 
 --
--- Name: ctypes; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: ctypes; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE ctypes (
@@ -499,7 +504,7 @@ ALTER SEQUENCE ctypes_id_seq OWNED BY ctypes.id;
 
 
 --
--- Name: customer_contacts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: customer_contacts; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE customer_contacts (
@@ -538,7 +543,7 @@ ALTER SEQUENCE customer_contacts_id_seq OWNED BY customer_contacts.id;
 
 
 --
--- Name: cycle_types; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: cycle_types; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE cycle_types (
@@ -570,7 +575,7 @@ ALTER SEQUENCE cycle_types_id_seq OWNED BY cycle_types.id;
 
 
 --
--- Name: duplicate_bike_groups; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: duplicate_bike_groups; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE duplicate_bike_groups (
@@ -602,7 +607,7 @@ ALTER SEQUENCE duplicate_bike_groups_id_seq OWNED BY duplicate_bike_groups.id;
 
 
 --
--- Name: feedbacks; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: feedbacks; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE feedbacks (
@@ -638,7 +643,7 @@ ALTER SEQUENCE feedbacks_id_seq OWNED BY feedbacks.id;
 
 
 --
--- Name: flavor_texts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: flavor_texts; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE flavor_texts (
@@ -669,7 +674,7 @@ ALTER SEQUENCE flavor_texts_id_seq OWNED BY flavor_texts.id;
 
 
 --
--- Name: frame_materials; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: frame_materials; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE frame_materials (
@@ -701,7 +706,7 @@ ALTER SEQUENCE frame_materials_id_seq OWNED BY frame_materials.id;
 
 
 --
--- Name: front_gear_types; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: front_gear_types; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE front_gear_types (
@@ -736,7 +741,7 @@ ALTER SEQUENCE front_gear_types_id_seq OWNED BY front_gear_types.id;
 
 
 --
--- Name: handlebar_types; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: handlebar_types; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE handlebar_types (
@@ -768,7 +773,7 @@ ALTER SEQUENCE handlebar_types_id_seq OWNED BY handlebar_types.id;
 
 
 --
--- Name: integrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: integrations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE integrations (
@@ -802,7 +807,7 @@ ALTER SEQUENCE integrations_id_seq OWNED BY integrations.id;
 
 
 --
--- Name: listicles; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: listicles; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE listicles (
@@ -843,7 +848,7 @@ ALTER SEQUENCE listicles_id_seq OWNED BY listicles.id;
 
 
 --
--- Name: locations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: locations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE locations (
@@ -886,7 +891,7 @@ ALTER SEQUENCE locations_id_seq OWNED BY locations.id;
 
 
 --
--- Name: lock_types; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: lock_types; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE lock_types (
@@ -918,7 +923,7 @@ ALTER SEQUENCE lock_types_id_seq OWNED BY lock_types.id;
 
 
 --
--- Name: locks; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: locks; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE locks (
@@ -958,7 +963,7 @@ ALTER SEQUENCE locks_id_seq OWNED BY locks.id;
 
 
 --
--- Name: mail_snippets; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: mail_snippets; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE mail_snippets (
@@ -997,7 +1002,7 @@ ALTER SEQUENCE mail_snippets_id_seq OWNED BY mail_snippets.id;
 
 
 --
--- Name: manufacturers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: manufacturers; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE manufacturers (
@@ -1038,7 +1043,7 @@ ALTER SEQUENCE manufacturers_id_seq OWNED BY manufacturers.id;
 
 
 --
--- Name: memberships; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: memberships; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE memberships (
@@ -1073,7 +1078,7 @@ ALTER SEQUENCE memberships_id_seq OWNED BY memberships.id;
 
 
 --
--- Name: normalized_serial_segments; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: normalized_serial_segments; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE normalized_serial_segments (
@@ -1106,7 +1111,7 @@ ALTER SEQUENCE normalized_serial_segments_id_seq OWNED BY normalized_serial_segm
 
 
 --
--- Name: oauth_access_grants; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: oauth_access_grants; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE oauth_access_grants (
@@ -1142,7 +1147,7 @@ ALTER SEQUENCE oauth_access_grants_id_seq OWNED BY oauth_access_grants.id;
 
 
 --
--- Name: oauth_access_tokens; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: oauth_access_tokens; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE oauth_access_tokens (
@@ -1178,7 +1183,7 @@ ALTER SEQUENCE oauth_access_tokens_id_seq OWNED BY oauth_access_tokens.id;
 
 
 --
--- Name: oauth_applications; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: oauth_applications; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE oauth_applications (
@@ -1217,7 +1222,7 @@ ALTER SEQUENCE oauth_applications_id_seq OWNED BY oauth_applications.id;
 
 
 --
--- Name: organization_deals; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: organization_deals; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE organization_deals (
@@ -1251,7 +1256,7 @@ ALTER SEQUENCE organization_deals_id_seq OWNED BY organization_deals.id;
 
 
 --
--- Name: organization_invitations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: organization_invitations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE organization_invitations (
@@ -1289,7 +1294,7 @@ ALTER SEQUENCE organization_invitations_id_seq OWNED BY organization_invitations
 
 
 --
--- Name: organizations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: organizations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE organizations (
@@ -1310,7 +1315,7 @@ CREATE TABLE organizations (
     access_token character varying,
     new_bike_notification text,
     api_access_approved boolean DEFAULT false NOT NULL,
-    approved boolean DEFAULT false NOT NULL,
+    approved boolean DEFAULT true,
     use_additional_registration_field boolean DEFAULT false NOT NULL,
     avatar character varying,
     is_paid boolean DEFAULT false NOT NULL,
@@ -1339,7 +1344,7 @@ ALTER SEQUENCE organizations_id_seq OWNED BY organizations.id;
 
 
 --
--- Name: other_listings; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: other_listings; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE other_listings (
@@ -1372,7 +1377,7 @@ ALTER SEQUENCE other_listings_id_seq OWNED BY other_listings.id;
 
 
 --
--- Name: ownerships; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: ownerships; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE ownerships (
@@ -1411,7 +1416,7 @@ ALTER SEQUENCE ownerships_id_seq OWNED BY ownerships.id;
 
 
 --
--- Name: paints; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: paints; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE paints (
@@ -1447,7 +1452,7 @@ ALTER SEQUENCE paints_id_seq OWNED BY paints.id;
 
 
 --
--- Name: payments; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: payments; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE payments (
@@ -1486,7 +1491,7 @@ ALTER SEQUENCE payments_id_seq OWNED BY payments.id;
 
 
 --
--- Name: propulsion_types; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: propulsion_types; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE propulsion_types (
@@ -1518,7 +1523,7 @@ ALTER SEQUENCE propulsion_types_id_seq OWNED BY propulsion_types.id;
 
 
 --
--- Name: public_images; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: public_images; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public_images (
@@ -1554,7 +1559,7 @@ ALTER SEQUENCE public_images_id_seq OWNED BY public_images.id;
 
 
 --
--- Name: rear_gear_types; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: rear_gear_types; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE rear_gear_types (
@@ -1589,7 +1594,7 @@ ALTER SEQUENCE rear_gear_types_id_seq OWNED BY rear_gear_types.id;
 
 
 --
--- Name: recovery_displays; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: recovery_displays; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE recovery_displays (
@@ -1625,7 +1630,7 @@ ALTER SEQUENCE recovery_displays_id_seq OWNED BY recovery_displays.id;
 
 
 --
--- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE schema_migrations (
@@ -1634,7 +1639,7 @@ CREATE TABLE schema_migrations (
 
 
 --
--- Name: states; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: states; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE states (
@@ -1667,7 +1672,7 @@ ALTER SEQUENCE states_id_seq OWNED BY states.id;
 
 
 --
--- Name: stolen_notifications; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: stolen_notifications; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE stolen_notifications (
@@ -1706,7 +1711,7 @@ ALTER SEQUENCE stolen_notifications_id_seq OWNED BY stolen_notifications.id;
 
 
 --
--- Name: stolen_records; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: stolen_records; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE stolen_records (
@@ -1772,7 +1777,7 @@ ALTER SEQUENCE stolen_records_id_seq OWNED BY stolen_records.id;
 
 
 --
--- Name: user_emails; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_emails; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE user_emails (
@@ -1806,7 +1811,7 @@ ALTER SEQUENCE user_emails_id_seq OWNED BY user_emails.id;
 
 
 --
--- Name: users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE users (
@@ -1871,7 +1876,7 @@ ALTER SEQUENCE users_id_seq OWNED BY users.id;
 
 
 --
--- Name: wheel_sizes; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: wheel_sizes; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE wheel_sizes (
@@ -1905,343 +1910,343 @@ ALTER SEQUENCE wheel_sizes_id_seq OWNED BY wheel_sizes.id;
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: ads id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY ads ALTER COLUMN id SET DEFAULT nextval('ads_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: b_params id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY b_params ALTER COLUMN id SET DEFAULT nextval('b_params_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: bike_organizations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY bike_organizations ALTER COLUMN id SET DEFAULT nextval('bike_organizations_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: bikes id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY bikes ALTER COLUMN id SET DEFAULT nextval('bikes_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: blogs id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY blogs ALTER COLUMN id SET DEFAULT nextval('blogs_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: cgroups id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY cgroups ALTER COLUMN id SET DEFAULT nextval('cgroups_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: colors id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY colors ALTER COLUMN id SET DEFAULT nextval('colors_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: components id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY components ALTER COLUMN id SET DEFAULT nextval('components_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: countries id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY countries ALTER COLUMN id SET DEFAULT nextval('countries_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: creation_states id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY creation_states ALTER COLUMN id SET DEFAULT nextval('creation_states_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: ctypes id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY ctypes ALTER COLUMN id SET DEFAULT nextval('ctypes_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: customer_contacts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY customer_contacts ALTER COLUMN id SET DEFAULT nextval('customer_contacts_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: cycle_types id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY cycle_types ALTER COLUMN id SET DEFAULT nextval('cycle_types_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: duplicate_bike_groups id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY duplicate_bike_groups ALTER COLUMN id SET DEFAULT nextval('duplicate_bike_groups_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: feedbacks id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY feedbacks ALTER COLUMN id SET DEFAULT nextval('feedbacks_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: flavor_texts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY flavor_texts ALTER COLUMN id SET DEFAULT nextval('flavor_texts_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: frame_materials id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY frame_materials ALTER COLUMN id SET DEFAULT nextval('frame_materials_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: front_gear_types id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY front_gear_types ALTER COLUMN id SET DEFAULT nextval('front_gear_types_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: handlebar_types id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY handlebar_types ALTER COLUMN id SET DEFAULT nextval('handlebar_types_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: integrations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY integrations ALTER COLUMN id SET DEFAULT nextval('integrations_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: listicles id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY listicles ALTER COLUMN id SET DEFAULT nextval('listicles_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: locations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY locations ALTER COLUMN id SET DEFAULT nextval('locations_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: lock_types id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY lock_types ALTER COLUMN id SET DEFAULT nextval('lock_types_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: locks id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY locks ALTER COLUMN id SET DEFAULT nextval('locks_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: mail_snippets id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY mail_snippets ALTER COLUMN id SET DEFAULT nextval('mail_snippets_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: manufacturers id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY manufacturers ALTER COLUMN id SET DEFAULT nextval('manufacturers_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: memberships id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY memberships ALTER COLUMN id SET DEFAULT nextval('memberships_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: normalized_serial_segments id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY normalized_serial_segments ALTER COLUMN id SET DEFAULT nextval('normalized_serial_segments_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: oauth_access_grants id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY oauth_access_grants ALTER COLUMN id SET DEFAULT nextval('oauth_access_grants_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: oauth_access_tokens id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY oauth_access_tokens ALTER COLUMN id SET DEFAULT nextval('oauth_access_tokens_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: oauth_applications id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY oauth_applications ALTER COLUMN id SET DEFAULT nextval('oauth_applications_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: organization_deals id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY organization_deals ALTER COLUMN id SET DEFAULT nextval('organization_deals_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: organization_invitations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY organization_invitations ALTER COLUMN id SET DEFAULT nextval('organization_invitations_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: organizations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY organizations ALTER COLUMN id SET DEFAULT nextval('organizations_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: other_listings id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY other_listings ALTER COLUMN id SET DEFAULT nextval('other_listings_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: ownerships id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY ownerships ALTER COLUMN id SET DEFAULT nextval('ownerships_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: paints id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY paints ALTER COLUMN id SET DEFAULT nextval('paints_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: payments id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY payments ALTER COLUMN id SET DEFAULT nextval('payments_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: propulsion_types id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY propulsion_types ALTER COLUMN id SET DEFAULT nextval('propulsion_types_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: public_images id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public_images ALTER COLUMN id SET DEFAULT nextval('public_images_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: rear_gear_types id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY rear_gear_types ALTER COLUMN id SET DEFAULT nextval('rear_gear_types_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: recovery_displays id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY recovery_displays ALTER COLUMN id SET DEFAULT nextval('recovery_displays_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: states id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY states ALTER COLUMN id SET DEFAULT nextval('states_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: stolen_notifications id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stolen_notifications ALTER COLUMN id SET DEFAULT nextval('stolen_notifications_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: stolen_records id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stolen_records ALTER COLUMN id SET DEFAULT nextval('stolen_records_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_emails id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_emails ALTER COLUMN id SET DEFAULT nextval('user_emails_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: wheel_sizes id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY wheel_sizes ALTER COLUMN id SET DEFAULT nextval('wheel_sizes_id_seq'::regclass);
 
 
 --
--- Name: ads_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: ads ads_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY ads
@@ -2249,7 +2254,7 @@ ALTER TABLE ONLY ads
 
 
 --
--- Name: b_params_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: b_params b_params_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY b_params
@@ -2257,7 +2262,7 @@ ALTER TABLE ONLY b_params
 
 
 --
--- Name: bike_organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: bike_organizations bike_organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY bike_organizations
@@ -2265,7 +2270,7 @@ ALTER TABLE ONLY bike_organizations
 
 
 --
--- Name: bikes_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: bikes bikes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY bikes
@@ -2273,7 +2278,7 @@ ALTER TABLE ONLY bikes
 
 
 --
--- Name: blogs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: blogs blogs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY blogs
@@ -2281,7 +2286,7 @@ ALTER TABLE ONLY blogs
 
 
 --
--- Name: cgroups_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: cgroups cgroups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY cgroups
@@ -2289,7 +2294,7 @@ ALTER TABLE ONLY cgroups
 
 
 --
--- Name: colors_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: colors colors_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY colors
@@ -2297,7 +2302,7 @@ ALTER TABLE ONLY colors
 
 
 --
--- Name: components_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: components components_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY components
@@ -2305,7 +2310,7 @@ ALTER TABLE ONLY components
 
 
 --
--- Name: countries_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: countries countries_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY countries
@@ -2313,7 +2318,7 @@ ALTER TABLE ONLY countries
 
 
 --
--- Name: creation_states_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: creation_states creation_states_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY creation_states
@@ -2321,7 +2326,7 @@ ALTER TABLE ONLY creation_states
 
 
 --
--- Name: ctypes_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: ctypes ctypes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY ctypes
@@ -2329,7 +2334,7 @@ ALTER TABLE ONLY ctypes
 
 
 --
--- Name: customer_contacts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: customer_contacts customer_contacts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY customer_contacts
@@ -2337,7 +2342,7 @@ ALTER TABLE ONLY customer_contacts
 
 
 --
--- Name: cycle_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: cycle_types cycle_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY cycle_types
@@ -2345,7 +2350,7 @@ ALTER TABLE ONLY cycle_types
 
 
 --
--- Name: duplicate_bike_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: duplicate_bike_groups duplicate_bike_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY duplicate_bike_groups
@@ -2353,7 +2358,7 @@ ALTER TABLE ONLY duplicate_bike_groups
 
 
 --
--- Name: feedbacks_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: feedbacks feedbacks_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY feedbacks
@@ -2361,7 +2366,7 @@ ALTER TABLE ONLY feedbacks
 
 
 --
--- Name: flavor_texts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: flavor_texts flavor_texts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY flavor_texts
@@ -2369,7 +2374,7 @@ ALTER TABLE ONLY flavor_texts
 
 
 --
--- Name: frame_materials_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: frame_materials frame_materials_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY frame_materials
@@ -2377,7 +2382,7 @@ ALTER TABLE ONLY frame_materials
 
 
 --
--- Name: front_gear_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: front_gear_types front_gear_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY front_gear_types
@@ -2385,7 +2390,7 @@ ALTER TABLE ONLY front_gear_types
 
 
 --
--- Name: handlebar_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: handlebar_types handlebar_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY handlebar_types
@@ -2393,7 +2398,7 @@ ALTER TABLE ONLY handlebar_types
 
 
 --
--- Name: integrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: integrations integrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY integrations
@@ -2401,7 +2406,7 @@ ALTER TABLE ONLY integrations
 
 
 --
--- Name: listicles_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: listicles listicles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY listicles
@@ -2409,7 +2414,7 @@ ALTER TABLE ONLY listicles
 
 
 --
--- Name: locations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: locations locations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY locations
@@ -2417,7 +2422,7 @@ ALTER TABLE ONLY locations
 
 
 --
--- Name: lock_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: lock_types lock_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY lock_types
@@ -2425,7 +2430,7 @@ ALTER TABLE ONLY lock_types
 
 
 --
--- Name: locks_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: locks locks_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY locks
@@ -2433,7 +2438,7 @@ ALTER TABLE ONLY locks
 
 
 --
--- Name: mail_snippets_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: mail_snippets mail_snippets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY mail_snippets
@@ -2441,7 +2446,7 @@ ALTER TABLE ONLY mail_snippets
 
 
 --
--- Name: manufacturers_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: manufacturers manufacturers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY manufacturers
@@ -2449,7 +2454,7 @@ ALTER TABLE ONLY manufacturers
 
 
 --
--- Name: memberships_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: memberships memberships_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY memberships
@@ -2457,7 +2462,7 @@ ALTER TABLE ONLY memberships
 
 
 --
--- Name: normalized_serial_segments_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: normalized_serial_segments normalized_serial_segments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY normalized_serial_segments
@@ -2465,7 +2470,7 @@ ALTER TABLE ONLY normalized_serial_segments
 
 
 --
--- Name: oauth_access_grants_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: oauth_access_grants oauth_access_grants_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY oauth_access_grants
@@ -2473,7 +2478,7 @@ ALTER TABLE ONLY oauth_access_grants
 
 
 --
--- Name: oauth_access_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: oauth_access_tokens oauth_access_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY oauth_access_tokens
@@ -2481,7 +2486,7 @@ ALTER TABLE ONLY oauth_access_tokens
 
 
 --
--- Name: oauth_applications_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: oauth_applications oauth_applications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY oauth_applications
@@ -2489,7 +2494,7 @@ ALTER TABLE ONLY oauth_applications
 
 
 --
--- Name: organization_deals_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: organization_deals organization_deals_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY organization_deals
@@ -2497,7 +2502,7 @@ ALTER TABLE ONLY organization_deals
 
 
 --
--- Name: organization_invitations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: organization_invitations organization_invitations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY organization_invitations
@@ -2505,7 +2510,7 @@ ALTER TABLE ONLY organization_invitations
 
 
 --
--- Name: organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: organizations organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY organizations
@@ -2513,7 +2518,7 @@ ALTER TABLE ONLY organizations
 
 
 --
--- Name: other_listings_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: other_listings other_listings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY other_listings
@@ -2521,7 +2526,7 @@ ALTER TABLE ONLY other_listings
 
 
 --
--- Name: ownerships_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: ownerships ownerships_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY ownerships
@@ -2529,7 +2534,7 @@ ALTER TABLE ONLY ownerships
 
 
 --
--- Name: paints_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: paints paints_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY paints
@@ -2537,7 +2542,7 @@ ALTER TABLE ONLY paints
 
 
 --
--- Name: payments_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: payments payments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY payments
@@ -2545,7 +2550,7 @@ ALTER TABLE ONLY payments
 
 
 --
--- Name: propulsion_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: propulsion_types propulsion_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY propulsion_types
@@ -2553,7 +2558,7 @@ ALTER TABLE ONLY propulsion_types
 
 
 --
--- Name: public_images_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: public_images public_images_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public_images
@@ -2561,7 +2566,7 @@ ALTER TABLE ONLY public_images
 
 
 --
--- Name: rear_gear_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: rear_gear_types rear_gear_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY rear_gear_types
@@ -2569,7 +2574,7 @@ ALTER TABLE ONLY rear_gear_types
 
 
 --
--- Name: recovery_displays_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: recovery_displays recovery_displays_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY recovery_displays
@@ -2577,7 +2582,7 @@ ALTER TABLE ONLY recovery_displays
 
 
 --
--- Name: states_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: states states_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY states
@@ -2585,7 +2590,7 @@ ALTER TABLE ONLY states
 
 
 --
--- Name: stolen_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: stolen_notifications stolen_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stolen_notifications
@@ -2593,7 +2598,7 @@ ALTER TABLE ONLY stolen_notifications
 
 
 --
--- Name: stolen_records_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: stolen_records stolen_records_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stolen_records
@@ -2601,7 +2606,7 @@ ALTER TABLE ONLY stolen_records
 
 
 --
--- Name: user_emails_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_emails user_emails_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_emails
@@ -2609,7 +2614,7 @@ ALTER TABLE ONLY user_emails
 
 
 --
--- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY users
@@ -2617,7 +2622,7 @@ ALTER TABLE ONLY users
 
 
 --
--- Name: wheel_sizes_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: wheel_sizes wheel_sizes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY wheel_sizes
@@ -2625,322 +2630,322 @@ ALTER TABLE ONLY wheel_sizes
 
 
 --
--- Name: index_bike_organizations_on_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_bike_organizations_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_bike_organizations_on_bike_id ON bike_organizations USING btree (bike_id);
 
 
 --
--- Name: index_bike_organizations_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_bike_organizations_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_bike_organizations_on_organization_id ON bike_organizations USING btree (organization_id);
 
 
 --
--- Name: index_bikes_on_card_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_bikes_on_card_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_bikes_on_card_id ON bikes USING btree (card_id);
 
 
 --
--- Name: index_bikes_on_creation_state_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_bikes_on_creation_state_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_bikes_on_creation_state_id ON bikes USING btree (creation_state_id);
 
 
 --
--- Name: index_bikes_on_current_stolen_record_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_bikes_on_current_stolen_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_bikes_on_current_stolen_record_id ON bikes USING btree (current_stolen_record_id);
 
 
 --
--- Name: index_bikes_on_cycle_type_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_bikes_on_cycle_type_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_bikes_on_cycle_type_id ON bikes USING btree (cycle_type_id);
 
 
 --
--- Name: index_bikes_on_manufacturer_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_bikes_on_manufacturer_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_bikes_on_manufacturer_id ON bikes USING btree (manufacturer_id);
 
 
 --
--- Name: index_bikes_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_bikes_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_bikes_on_organization_id ON bikes USING btree (creation_organization_id);
 
 
 --
--- Name: index_bikes_on_paint_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_bikes_on_paint_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_bikes_on_paint_id ON bikes USING btree (paint_id);
 
 
 --
--- Name: index_bikes_on_primary_frame_color_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_bikes_on_primary_frame_color_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_bikes_on_primary_frame_color_id ON bikes USING btree (primary_frame_color_id);
 
 
 --
--- Name: index_bikes_on_secondary_frame_color_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_bikes_on_secondary_frame_color_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_bikes_on_secondary_frame_color_id ON bikes USING btree (secondary_frame_color_id);
 
 
 --
--- Name: index_bikes_on_stolen_lat_and_stolen_long; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_bikes_on_stolen_lat_and_stolen_long; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_bikes_on_stolen_lat_and_stolen_long ON bikes USING btree (stolen_lat, stolen_long);
 
 
 --
--- Name: index_bikes_on_tertiary_frame_color_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_bikes_on_tertiary_frame_color_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_bikes_on_tertiary_frame_color_id ON bikes USING btree (tertiary_frame_color_id);
 
 
 --
--- Name: index_components_on_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_components_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_components_on_bike_id ON components USING btree (bike_id);
 
 
 --
--- Name: index_components_on_manufacturer_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_components_on_manufacturer_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_components_on_manufacturer_id ON components USING btree (manufacturer_id);
 
 
 --
--- Name: index_creation_states_on_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_creation_states_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_creation_states_on_bike_id ON creation_states USING btree (bike_id);
 
 
 --
--- Name: index_creation_states_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_creation_states_on_creator_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_creation_states_on_creator_id ON creation_states USING btree (creator_id);
 
 
 --
--- Name: index_creation_states_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_creation_states_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_creation_states_on_organization_id ON creation_states USING btree (organization_id);
 
 
 --
--- Name: index_integrations_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_integrations_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_integrations_on_user_id ON integrations USING btree (user_id);
 
 
 --
--- Name: index_locks_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_locks_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_locks_on_user_id ON locks USING btree (user_id);
 
 
 --
--- Name: index_mail_snippets_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_mail_snippets_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_mail_snippets_on_organization_id ON mail_snippets USING btree (organization_id);
 
 
 --
--- Name: index_memberships_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_memberships_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_memberships_on_organization_id ON memberships USING btree (organization_id);
 
 
 --
--- Name: index_memberships_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_memberships_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_memberships_on_user_id ON memberships USING btree (user_id);
 
 
 --
--- Name: index_normalized_serial_segments_on_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_normalized_serial_segments_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_normalized_serial_segments_on_bike_id ON normalized_serial_segments USING btree (bike_id);
 
 
 --
--- Name: index_normalized_serial_segments_on_duplicate_bike_group_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_normalized_serial_segments_on_duplicate_bike_group_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_normalized_serial_segments_on_duplicate_bike_group_id ON normalized_serial_segments USING btree (duplicate_bike_group_id);
 
 
 --
--- Name: index_oauth_access_grants_on_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_oauth_access_grants_on_token; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_oauth_access_grants_on_token ON oauth_access_grants USING btree (token);
 
 
 --
--- Name: index_oauth_access_tokens_on_refresh_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_oauth_access_tokens_on_refresh_token; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_oauth_access_tokens_on_refresh_token ON oauth_access_tokens USING btree (refresh_token);
 
 
 --
--- Name: index_oauth_access_tokens_on_resource_owner_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_oauth_access_tokens_on_resource_owner_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_oauth_access_tokens_on_resource_owner_id ON oauth_access_tokens USING btree (resource_owner_id);
 
 
 --
--- Name: index_oauth_access_tokens_on_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_oauth_access_tokens_on_token; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_oauth_access_tokens_on_token ON oauth_access_tokens USING btree (token);
 
 
 --
--- Name: index_oauth_applications_on_owner_id_and_owner_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_oauth_applications_on_owner_id_and_owner_type; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_oauth_applications_on_owner_id_and_owner_type ON oauth_applications USING btree (owner_id, owner_type);
 
 
 --
--- Name: index_oauth_applications_on_uid; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_oauth_applications_on_uid; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_oauth_applications_on_uid ON oauth_applications USING btree (uid);
 
 
 --
--- Name: index_organization_invitations_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_organization_invitations_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_organization_invitations_on_organization_id ON organization_invitations USING btree (organization_id);
 
 
 --
--- Name: index_organizations_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_organizations_on_slug; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_organizations_on_slug ON organizations USING btree (slug);
 
 
 --
--- Name: index_ownerships_on_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_ownerships_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_ownerships_on_bike_id ON ownerships USING btree (bike_id);
 
 
 --
--- Name: index_ownerships_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_ownerships_on_creator_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_ownerships_on_creator_id ON ownerships USING btree (creator_id);
 
 
 --
--- Name: index_ownerships_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_ownerships_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_ownerships_on_user_id ON ownerships USING btree (user_id);
 
 
 --
--- Name: index_payments_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_payments_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_payments_on_user_id ON payments USING btree (user_id);
 
 
 --
--- Name: index_public_images_on_imageable_id_and_imageable_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_public_images_on_imageable_id_and_imageable_type; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_public_images_on_imageable_id_and_imageable_type ON public_images USING btree (imageable_id, imageable_type);
 
 
 --
--- Name: index_recovery_displays_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_recovery_displays_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_recovery_displays_on_stolen_record_id ON recovery_displays USING btree (stolen_record_id);
 
 
 --
--- Name: index_states_on_country_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_states_on_country_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_states_on_country_id ON states USING btree (country_id);
 
 
 --
--- Name: index_stolen_notifications_on_oauth_application_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_stolen_notifications_on_oauth_application_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_stolen_notifications_on_oauth_application_id ON stolen_notifications USING btree (oauth_application_id);
 
 
 --
--- Name: index_stolen_records_on_bike_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_stolen_records_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_stolen_records_on_bike_id ON stolen_records USING btree (bike_id);
 
 
 --
--- Name: index_stolen_records_on_latitude_and_longitude; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_stolen_records_on_latitude_and_longitude; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_stolen_records_on_latitude_and_longitude ON stolen_records USING btree (latitude, longitude);
 
 
 --
--- Name: index_user_emails_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_emails_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_emails_on_user_id ON user_emails USING btree (user_id);
 
 
 --
--- Name: index_users_on_password_reset_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_users_on_password_reset_token; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_users_on_password_reset_token ON users USING btree (password_reset_token);
 
 
 --
--- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (version);
@@ -2950,7 +2955,7 @@ CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (v
 -- PostgreSQL database dump complete
 --
 
-SET search_path TO "$user",public;
+SET search_path TO "$user", public;
 
 INSERT INTO schema_migrations (version) VALUES ('20130807222803');
 
@@ -3259,4 +3264,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160923215650');
 INSERT INTO schema_migrations (version) VALUES ('20161222154603');
 
 INSERT INTO schema_migrations (version) VALUES ('20170227012150');
+
+INSERT INTO schema_migrations (version) VALUES ('20170503024611');
 
