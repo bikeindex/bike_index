@@ -60,13 +60,9 @@ describe Organization do
 
   describe 'set_locations_shown' do
     let(:country) { FactoryGirl.create(:country) }
-    let(:organization) { FactoryGirl.create(:organization, show_on_map: true) }
+    let(:organization) { FactoryGirl.create(:organization, show_on_map: true, approved: true) }
     let(:location) { Location.create(country_id: country.id, city: 'Chicago', name: 'stuff', organization_id: organization.id, shown: true) }
     context 'organization approved' do
-      before do
-        organization.update_attribute :approved, true
-        organization.reload
-      end
       it 'sets the locations shown to be org shown on save' do
         expect(organization.allowed_show).to be_truthy
         organization.set_locations_shown
@@ -75,6 +71,8 @@ describe Organization do
     end
     context 'not approved' do
       it 'sets not shown' do
+        organization.update_attribute :approved, false
+        organization.reload
         expect(organization.allowed_show).to be_falsey
         organization.set_locations_shown
         expect(location.reload.shown).to be_falsey

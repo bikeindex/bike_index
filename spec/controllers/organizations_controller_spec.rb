@@ -30,13 +30,13 @@ describe OrganizationsController do
         name: 'a new org',
         org_type: 'shop',
         api_access_approved: 'true',
-        approved: 'true'
+        approved: 'false'
       }
       post :create, organization: org_attrs
       expect(Organization.count).to eq(1)
       organization = Organization.where(name: 'a new org').first
       expect(response).to redirect_to organization_manage_index_path(organization_id: organization.to_param)
-      expect(organization.approved).to be_falsey
+      expect(organization.approved).to be_truthy
       expect(organization.api_access_approved).to be_falsey
       expect(organization.auto_user_id).to eq(user.id)
       expect(organization.memberships.count).to eq(1)
@@ -51,8 +51,7 @@ describe OrganizationsController do
         name: '<script>alert(document.cookie)</script>',
         website: '<script>alert(document.cookie)</script>',
         org_type: 'shop',
-        api_access_approved: 'true',
-        approved: 'true'
+        api_access_approved: 'true'
       }
       post :create, organization: org_attrs
       expect(Organization.count).to eq(1)
@@ -68,8 +67,7 @@ describe OrganizationsController do
         org_attrs = {
           name: 'a new org',
           org_type: 'shop',
-          api_access_approved: 'true',
-          approved: 'true'
+          api_access_approved: 'true'
         }
         ActionMailer::Base.deliveries = []
         post :create, organization: org_attrs

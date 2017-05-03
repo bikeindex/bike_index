@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Admin::OrganizationsController, type: :controller do
-  let(:organization) { FactoryGirl.create(:organization) }
+  let(:organization) { FactoryGirl.create(:organization, approved: false) }
   include_context :logged_in_as_super_admin
 
   describe 'index' do
