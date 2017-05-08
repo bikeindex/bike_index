@@ -80,7 +80,7 @@ describe Api::V1::BikesController do
       before do
         expect([black, red, manufacturer].size).to eq 3
       end
-      it 'creates a bike' do
+      it 'creates a bike and does not duplicate' do
         expect do
           post :create, bike_hash.as_json, headers: { 'Content-Type' => 'application/json' }
         end.to change(Ownership, :count).by(1)
@@ -97,6 +97,10 @@ describe Api::V1::BikesController do
         expect(creation_state.organization).to eq organization
         expect(creation_state.creator).to eq bike.creator
         expect(creation_state.origin).to eq 'api_v1'
+        expect do
+          updated_hash = bike_hash.merge(bike: bike_hash[:bike].merge(no_duplicate: true))
+          post :create, updated_hash.as_json, headers: { 'Content-Type' => 'application/json' }
+        end.to change(Ownership, :count).by 0
       end
     end
     context 'legacy tests' do
