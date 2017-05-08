@@ -70,7 +70,8 @@ module API
           {
             is_bulk: params[:is_bulk],
             is_pos: params[:is_pos],
-            is_new: params[:is_new]
+            is_new: params[:is_new],
+            no_duplicate: params[:no_duplicate]
           }
         end
 
