@@ -43,8 +43,8 @@ describe 'Bikes API V3' do
     before :each do
       create_doorkeeper_app(scopes: 'read_bikes write_bikes')
       FactoryGirl.create(:wheel_size, iso_bsd: 559)
-      FactoryGirl.create(:cycle_type, slug: 'bike')
-      FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
+      CycleType.bike
+      PropulsionType.foot_pedal
     end
 
     it 'responds with 401' do
@@ -209,29 +209,23 @@ describe 'Bikes API V3' do
     before :each do
       create_doorkeeper_app(with_v2_accessor: true)
       FactoryGirl.create(:wheel_size, iso_bsd: 559)
-      FactoryGirl.create(:cycle_type, slug: 'bike')
-      FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
+      CycleType.bike
+      PropulsionType.foot_pedal
       @tokenized_url = "/api/v3/bikes?access_token=#{@accessor_token.token}"
     end
 
-    it 'also sets front wheel bsd' do
+    it 'returns existing bike if no_duplicate set' do
       FactoryGirl.create(:membership, user: @user, organization: organization, role: 'admin')
       organization.save
-      wheel_size_2 = FactoryGirl.create(:wheel_size, iso_bsd: 622)
-      additional_attrs = {
-        front_wheel_bsd: 622,
-        front_tire_narrow: false
-      }
-      post @tokenized_url, bike_attrs.merge(additional_attrs).to_json, JSON_CONTENT
+      bike = FactoryGirl.create(:bike, serial_number: bike_attrs[:serial], owner_email: bike_attrs[:owner_email])
+      ownership = FactoryGirl.create(:ownership, bike: bike, owner_email: bike_attrs[:owner_email])
+      expect(ownership.claimed).to be_falsey
+      expect do
+        post @tokenized_url, bike_attrs.merge(no_duplicate: true).to_json, JSON_CONTENT
+      end.to change(Bike, :count).by(0)
       result = JSON.parse(response.body)['bike']
       expect(response.code).to eq('201')
-      bike = Bike.find(result['id'])
-      expect(bike.primary_frame_color).to eq color
-      expect(bike.creator).to eq(@user)
-      expect(bike.rear_wheel_size.iso_bsd).to eq 559
-      expect(bike.front_wheel_size).to eq wheel_size_2
-      expect(bike.rear_tire_narrow).to be_truthy
-      expect(bike.front_tire_narrow).to be_falsey
+      expect(result['id']).to eq bike.id
     end
 
     it 'creates a bike for organization with v3_accessor' do

@@ -51,6 +51,7 @@ class BParam < ActiveRecord::Base
   def is_pos; bike['is_pos'] || false end
   def is_new; bike['is_new'] || false end
   def is_bulk; bike['is_bulk'] || false end
+  def no_duplicate; bike['no_duplicate'] || false end
 
   def creation_organization; Organization.friendly_find(creation_organization_id) end
   def manufacturer; bike['manufacturer_id'] && Manufacturer.friendly_find(bike['manufacturer_id']) end
@@ -98,7 +99,7 @@ class BParam < ActiveRecord::Base
 
     def skipped_bike_attrs # Attrs that need to be skipped on bike assignment
       %w(cycle_type_slug cycle_type_name rear_gear_type_slug front_gear_type_slug
-         handlebar_type_slug frame_material_slug is_bulk is_new is_pos)
+         handlebar_type_slug frame_material_slug is_bulk is_new is_pos no_duplicate)
     end
   end
 
@@ -227,6 +228,13 @@ class BParam < ActiveRecord::Base
         params['bike']['primary_frame_color_id'] = Color.find_by_name('Black').id
       end
     end
+  end
+
+  def find_duplicate_bike(bike)
+    return true unless no_duplicate
+    dupe = Bike.where(serial_number: bike.serial_number, owner_email: bike.owner_email)
+      .where.not(id: bike.id).unscoped.order(:created_at).first
+    self.created_bike_id = dupe.id if dupe.present?
   end
 
   def generate_id_token
