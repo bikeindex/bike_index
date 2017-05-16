@@ -29,7 +29,7 @@ describe AdminMailer do
       @feedback.update_attributes(feedback_type: 'bike_recovery')
       mail = AdminMailer.feedback_notification_email(@feedback)
       expect(mail.subject).to eq('New Feedback Submitted')
-      expect(mail.to).to eq(['contact@bikeindex.org', 'bryan@bikeindex.org', 'alex@bikeindex.org'])
+      expect(mail.to).to eq(['contact@bikeindex.org', 'bryan@bikeindex.org', 'lily@bikeindex.org'])
       expect(mail.reply_to).to eq([@feedback.email])
     end
     it 'sends a stolen_information email' do
