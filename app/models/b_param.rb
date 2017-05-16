@@ -231,10 +231,11 @@ class BParam < ActiveRecord::Base
   end
 
   def find_duplicate_bike(bike)
-    return true unless no_duplicate
+    return nil unless no_duplicate
     dupe = Bike.where(serial_number: bike.serial_number, owner_email: bike.owner_email)
-      .where.not(id: bike.id).unscoped.order(:created_at).first
-    self.created_bike_id = dupe.id if dupe.present?
+            .where.not(id: bike.id).order(:created_at).first
+    return nil unless dupe.present?
+    self.update_attribute :created_bike_id, dupe.id
   end
 
   def generate_id_token

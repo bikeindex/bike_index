@@ -195,7 +195,7 @@ describe 'Bikes API V3' do
   describe 'create v3_accessor' do
     let(:organization) { FactoryGirl.create(:organization) }
     let(:bike_attrs) do
-      { 
+      {
         serial: '69 non-example',
         manufacturer: manufacturer.name,
         rear_tire_narrow: 'true',
@@ -214,48 +214,69 @@ describe 'Bikes API V3' do
       @tokenized_url = "/api/v3/bikes?access_token=#{@accessor_token.token}"
     end
 
-    it 'returns existing bike if no_duplicate set' do
-      FactoryGirl.create(:membership, user: @user, organization: organization, role: 'admin')
-      organization.save
-      bike = FactoryGirl.create(:bike, serial_number: bike_attrs[:serial], owner_email: bike_attrs[:owner_email])
-      ownership = FactoryGirl.create(:ownership, bike: bike, owner_email: bike_attrs[:owner_email])
-      expect(ownership.claimed).to be_falsey
-      expect do
-        post @tokenized_url, bike_attrs.merge(no_duplicate: true).to_json, JSON_CONTENT
-      end.to change(Bike, :count).by(0)
-      result = JSON.parse(response.body)['bike']
-      expect(response.code).to eq('201')
-      expect(result['id']).to eq bike.id
-    end
+    context 'with membership' do
+      before do
+        FactoryGirl.create(:membership, user: @user, organization: organization, role: 'admin')
+        organization.save
+        ActionMailer::Base.deliveries = []
+      end
 
-    it 'creates a bike for organization with v3_accessor' do
-      FactoryGirl.create(:membership, user: @user, organization: organization, role: 'admin')
-      organization.save
-      post @tokenized_url, bike_attrs.to_json, JSON_CONTENT
-      result = JSON.parse(response.body)['bike']
-      expect(response.code).to eq('201')
-      bike = Bike.find(result['id'])
-      expect(bike.creation_organization).to eq(organization)
-      expect(bike.creator).to eq(@user)
-      expect(bike.secondary_frame_color).to be_nil
-      expect(bike.rear_wheel_size.iso_bsd).to eq 559
-      expect(bike.front_wheel_size.iso_bsd).to eq 559
-      expect(bike.rear_tire_narrow).to be_truthy
-      expect(bike.front_tire_narrow).to be_truthy
-      # expect(bike.creation_state.origin).to eq 'api_v3'
-      expect(bike.creation_state.organization).to eq organization
-    end
+      context 'duplicated serial' do
+        let(:bike) { FactoryGirl.create(:bike, serial_number: bike_attrs[:serial], owner_email: email) }
+        let(:ownership) { FactoryGirl.create(:ownership, bike: bike, owner_email: email) }
 
-    it "doesn't create a bike without an organization with v3_accessor" do
-      FactoryGirl.create(:membership, user: @user, organization: organization, role: 'admin')
-      organization.save
-      bike_attrs.delete(:organization_slug)
-      post @tokenized_url, bike_attrs.to_json, JSON_CONTENT
-      result = JSON.parse(response.body)
+        context 'matching email' do
+          let(:email) { bike_attrs[:owner_email] }
+          it 'returns existing bike if no_duplicate set' do
+            expect(ownership.claimed).to be_falsey
+            expect do
+              post @tokenized_url, bike_attrs.merge(no_duplicate: true).to_json, JSON_CONTENT
+            end.to change(Bike, :count).by 0
+            result = JSON.parse(response.body)['bike']
 
-      expect(response.code).to eq('403')
-      result = JSON.parse(response.body)
-      expect(result['error'].is_a?(String)).to be_truthy
+            expect(response.code).to eq('201')
+            expect(result['id']).to eq bike.id
+            EmailOwnershipInvitationWorker.drain
+            expect(ActionMailer::Base.deliveries).to be_empty
+          end
+        end
+
+        context 'non-matching email' do
+          let(:email) { 'another_email@example.com' }
+          it 'creates a bike for organization with v3_accessor' do
+            expect(ownership.claimed).to be_falsey
+            expect do
+              post @tokenized_url, bike_attrs.to_json, JSON_CONTENT
+            end.to change(Bike, :count).by 1
+            result = JSON.parse(response.body)['bike']
+
+            expect(response.code).to eq('201')
+            bike = Bike.find(result['id'])
+            expect(bike.creation_organization).to eq(organization)
+            expect(bike.creator).to eq(@user)
+            expect(bike.secondary_frame_color).to be_nil
+            expect(bike.rear_wheel_size.iso_bsd).to eq 559
+            expect(bike.front_wheel_size.iso_bsd).to eq 559
+            expect(bike.rear_tire_narrow).to be_truthy
+            expect(bike.front_tire_narrow).to be_truthy
+            # expect(bike.creation_state.origin).to eq 'api_v3'
+            expect(bike.creation_state.organization).to eq organization
+            EmailOwnershipInvitationWorker.drain
+            expect(ActionMailer::Base.deliveries).to_not be_empty
+          end
+        end
+      end
+
+      it "doesn't create a bike without an organization with v3_accessor" do
+        post @tokenized_url, bike_attrs.except(:organization_slug).to_json, JSON_CONTENT
+        result = JSON.parse(response.body)
+
+        expect(response.code).to eq('403')
+        result = JSON.parse(response.body)
+        expect(result['error'].is_a?(String)).to be_truthy
+        EmailOwnershipInvitationWorker.drain
+        expect(ActionMailer::Base.deliveries).to be_empty
+      end
     end
 
     it "fails to create a bike if the app owner isn't a member of the organization" do
