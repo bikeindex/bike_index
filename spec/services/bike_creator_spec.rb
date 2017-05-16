@@ -126,6 +126,7 @@ describe BikeCreator do
           expect do
             BikeCreator.new(b_param).validate_record(new_bike)
           end.to change(Ownership, :count).by -1
+          b_param.reload
           expect(b_param.created_bike_id).to eq existing_bike.id
           expect(Bike.where(id: new_bike.id)).to_not be_present
         end
@@ -139,6 +140,7 @@ describe BikeCreator do
           expect do
             BikeCreator.new(b_param).validate_record(new_bike)
           end.to change(Ownership, :count).by 0
+          b_param.reload
           expect(b_param.created_bike_id).to eq new_bike.id
         end
       end

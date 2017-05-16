@@ -235,7 +235,7 @@ class BParam < ActiveRecord::Base
     dupe = Bike.where(serial_number: bike.serial_number, owner_email: bike.owner_email)
             .where.not(id: bike.id).order(:created_at).first
     return nil unless dupe.present?
-    self.created_bike_id = dupe.id
+    self.update_attribute :created_bike_id, dupe.id
   end
 
   def generate_id_token
