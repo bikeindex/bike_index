@@ -59,7 +59,7 @@ class BikeCreator
     if bike.errors.present?
       clear_bike(bike)
     elsif @b_param.created_bike.present?
-      bike.destroy
+      clear_bike(bike)
       @bike = @b_param.created_bike
     elsif @b_param.id.present? # Only update b_param if it exists
       @b_param.update_attributes(created_bike_id: bike.id, bike_errors: nil)
