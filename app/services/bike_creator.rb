@@ -55,10 +55,9 @@ class BikeCreator
   end
 
   def validate_record(bike)
+    return clear_bike(bike) if bike.errors.present?
     @b_param.find_duplicate_bike(bike) if @b_param.no_duplicate
-    if bike.errors.present?
-      clear_bike(bike)
-    elsif @b_param.created_bike.present?
+    if @b_param.created_bike.present?
       clear_bike(bike)
       @bike = @b_param.created_bike
     elsif @b_param.id.present? # Only update b_param if it exists

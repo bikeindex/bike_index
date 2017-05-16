@@ -195,7 +195,7 @@ describe 'Bikes API V3' do
   describe 'create v3_accessor' do
     let(:organization) { FactoryGirl.create(:organization) }
     let(:bike_attrs) do
-      { 
+      {
         serial: '69 non-example',
         manufacturer: manufacturer.name,
         rear_tire_narrow: 'true',
