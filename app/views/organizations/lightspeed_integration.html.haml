@@ -2,12 +2,6 @@
   %h1
     How to: Lightspeed Retail and Bike Index Integration
   %article
-    .alert.alert-info
-      %h3.padded
-        Our integration is recommended by Lightspeed
-        %br
-        %small
-          You can find us under "Great tools for bicycle retailers" on #{link_to "Lightspeed's add-on page", "http://www.lightspeedpos.com/retail/addons/"}
     .padded
 
     %p
@@ -19,25 +13,15 @@
 
     - if current_user.present? && current_user.memberships.present?
       %p
-        This video will show you how to connect your shop to Lightspeed Retail:
+        All you have to do is go to #{ link_to 'posintegration.bikeindex.org', 'https://posintegration.bikeindex.org' }, where you'll be asked to authorize Bike Index to access your Lightspeed Account.
     - else
       %p
         The first step is to create an account for yourself and your shop - you can do that <a href="#add_organization" class="scroll-to-ref">at the bottom of this page</a>
       %p
-        Once you have a Bike Index account set up for your shop the following video will show you how to connect it to Lightspeed Retail.
+        Once you have a Bike Index account set up for your shop, you can connect the integration at #{ link_to 'posintegration.bikeindex.org', 'https://posintegration.bikeindex.org' }
 
-
-        
-
-    #lightspeed-tutorial-video
-
-  %article.padded
     %p
       Once your Lightspeed Retail account is connected to your Bike Index account with automatic registration turned on, a listing on Bike Index will be automatically created for every bicycle you sell. All you need to do is add the customer's email address and the bicycle's serial number during a normal Lightspeed Retail checkout.
-
-    / 
-    / Should have another video of selling a bike
-    / 
 
   %article.padded
     %p
