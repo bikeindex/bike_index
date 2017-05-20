@@ -45,6 +45,16 @@ Rails.application.configure do
   # Raises helpful error messages.
   config.assets.raise_runtime_errors = true
 
+  config.lograge.enabled = true
+  config.log_level = :info
+  config.lograge.formatter = Lograge::Formatters::Logstash.new # Use logstash format
+  config.lograge.custom_options = lambda do |event|
+    {
+      remote_ip: event.payload[:ip],
+      params: event.payload[:params].except('controller', 'action', 'format', 'id')
+    }
+  end
+
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 
