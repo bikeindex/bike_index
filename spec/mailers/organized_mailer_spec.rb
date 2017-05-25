@@ -53,7 +53,7 @@ describe OrganizedMailer do
         let(:bike) { FactoryGirl.create(:bike, owner_email: 'someotheremail@stuff.com', creator_id: user.id) }
         it 'renders email' do
           expect(ownership_1).to be_present
-          expect(mail.subject).to eq('Confirm your Bike Index registration')
+          expect(mail.subject).to eq('New Bike Index registration successful')
           expect(mail.reply_to).to eq(['contact@bikeindex.org'])
         end
       end
