@@ -53,6 +53,7 @@ end
 # Seed the handlebar types
 handlebar_types = [
   { name: 'Flat or riser', slug: 'flat' },
+  { name: 'Cruiser', slug: 'cruiser' },
   { name: 'Drop', slug: 'drop' },
   { name: 'Forward facing', slug: 'forward' },
   { name: 'Rear facing', slug: 'rearward' },
