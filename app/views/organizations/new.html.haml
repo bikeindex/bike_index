@@ -19,11 +19,9 @@
         Are you a bike shop? 
       %h1
         A biking organization?
-    .bike-shop-image
-      = image_tag "bike-shop.png", alt: "Bike shop"
   %article
     %p
-      The Bike Index gives you the ability to quickly and easily register bikes for your customers or members &mdash; <strong>for free</strong>.
+      The Bike Index gives you the ability to quickly and easily register bikes for your customers or members.
     %p
       How it works: 
 
@@ -59,9 +57,16 @@
   %hr.padded
 
   %h2.padded
+    Lightspeed Integration
+  %article
+    %p
+      Are you a bike shop that uses Lightspeed? We have an integration that will register every bike you sell, automatically, for free - #{ link_to 'Lightspeed Integration information', lightspeed_integration_path }.
+
+  %h2.padded
     Batch registration
   %article
     %p
       If you have a spreadsheets of serial numbers or want to set up batch uploading in some other way, #{link_to "contact us", "mailto:seth@bikeindex.org"}.
+
 
 = render '/shared/content_footer_ad'
