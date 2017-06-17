@@ -1,11 +1,12 @@
-.signup-landing-page
+- landing_page_target = 'school'
+.signup-landing-page{ class: "signup-landing-page-#{landing_page_target}" }
   %header.banner-header
     .container
       .banner.row
-        .col-xs-1
-          = render '/landing_pages/icons/header_advocacy_svg'
-        .col-xs-11
-          %h1 Bike Index for Schools
+        .icon-wrapper
+          = render "/landing_pages/icons/header_#{landing_page_target}_svg"
+        .col-xs-7
+          %h1 Bike Index for <br> Universities
           %h3 With bicycle theft a growing problem across campuses everywhere, students’ bikes can be difficult to protect without help.
     .ribbon
       .container

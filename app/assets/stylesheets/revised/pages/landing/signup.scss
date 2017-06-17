@@ -3,19 +3,36 @@
   .primary-footer { margin-top: 0; }
 }
 
+$landing-page-targets: 'shop', 'school', 'advocacy', 'law';
+@each $target in $landing-page-targets {
+  .signup-landing-page-#{$target} {
+    .banner-header {
+      background-image: image-url('landing_pages/header_bg_#{$target}.jpg');
+    }
+  }
+}
+
 .signup-landing-page {
   svg {
-    // SVG icon colors
+    // SVG icon colors. Manually added to svgs, replacing .cls- classes
     .svgicon-border { fill: #3498db; }
     .svgicon-bg { fill: #34495e; }
     .svgicon-body { fill: #fff; }
   }
   .banner-header {
     padding-top: 24*$vertical-height;
-    background-size: cover;
+    background-size: auto 100%;
     background-position: center top;
     background-repeat: no-repeat;
-    background-image: image-url('landing_pages/header_bg.jpg');
+    .icon-wrapper {
+      position: relative;
+      width: 100%;
+      // There is a 1/6 overhang to the left (8.33333/6 ~ 1.33333)
+      flex: 0 0 9.66666%;
+      max-width: 9.66666%;
+      margin-left: -1.3333%;
+    }
+    h1 { line-height: 1.4em; }
     h1, h2, h3 { color: white; }
     h2, h3 {
       font-family: $body-font-family;
@@ -23,6 +40,7 @@
       text-transform: none;
       font-style: normal;
       font-size: 21px;
+      line-height: 1.6em;
     }
     .ribbon {
       margin-top: 12*$vertical-height;
