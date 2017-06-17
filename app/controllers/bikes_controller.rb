@@ -161,7 +161,7 @@ class BikesController < ApplicationController
     else
       flash[:success] = 'Bike successfully updated!'
       return if return_to_if_present
-      redirect_to edit_bike_url(@bike, page: params[:edit_template]), layout: 'no_header' and return
+      redirect_to edit_bike_url(@bike, page: params[:edit_template]) and return
     end
   end
 

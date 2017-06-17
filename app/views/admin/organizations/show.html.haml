@@ -55,6 +55,10 @@
             no landing page
         - else
           false
+      %dt
+        Created at
+      %dd
+        = l @organization.created_at, format: :dotted
 
 
     - if @organization.is_suspended

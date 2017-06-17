@@ -7,6 +7,12 @@ class CreationState < ActiveRecord::Base
     %w(embed embed_extended embed_partial api_v1 api_v2).freeze
   end
 
+  def creation_description
+    return 'pos' if is_pos
+    return 'bulk reg' if is_bulk
+    return "#{origin.humanize.downcase}" if origin
+  end
+
   before_validation :ensure_permitted_origin
   def ensure_permitted_origin
     self.origin = nil unless self.class.origins.include?(origin)

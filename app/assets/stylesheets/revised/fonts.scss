@@ -112,7 +112,7 @@ h4 {
   line-height: 18px;
 }
 
-.less-strong { color: $gray-light; }
+.less-strong { color: $less-strong-font-color; }
 
 // Stop fucking prefixing. - textarea[placeholder], input[placeholder]
 // This breaks things in chrome though, it never stops being placeholder

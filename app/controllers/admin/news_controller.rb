@@ -34,7 +34,6 @@ class Admin::NewsController < Admin::BaseController
       flash[:success] = "Blog saved!"
       redirect_to edit_admin_news_url(@blog)
     else
-      @users = User.blog_admin
       render action: :edit
     end
   end

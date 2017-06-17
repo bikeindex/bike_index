@@ -1,8 +1,5 @@
 class BikeIndex.Payments extends BikeIndex
   constructor: ->
-    # Make the body at least as tall as the window
-    unless $('body').outerHeight() > $(window).height()
-      $('body').css('height', "#{$(window).height()}px")
     @initializeEventListeners()
 
   initializeEventListeners: ->
@@ -66,7 +63,7 @@ class BikeIndex.Payments extends BikeIndex
       name: 'Bike Index'
       description: description
       amount: amount_cents
-      email: $stripe_form.attr('data-email')
+      email: $stripe_form.data('email')
       allowRememberMe: false
       panelLabel: $stripe_form.data('type')
     return

@@ -1,5 +1,4 @@
 <div class="map-holder col-md-8">
-
   <div id="map_canvas" ></div>
 </div>
 
@@ -29,5 +28,7 @@
     };
     cityCircle = new google.maps.Circle(circleOptions);
   }
-  google.maps.event.addDomListener(window, 'load', initialize);
+  $(document).ready(function() {
+    google.maps.event.addDomListener(window, 'load', initialize);
+  });
 </script>

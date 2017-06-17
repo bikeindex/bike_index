@@ -136,10 +136,16 @@ RSpec.shared_examples 'bike_searchable' do
         end
         context 'input location' do
           let(:query_params) { { stolenness: 'proximity', location: 'these parts', distance: '-1' } }
-          context 'with a proximity radius less 0' do
+          context 'with a distance less 0' do
             let(:target) { { stolenness: 'proximity', location: 'these parts', distance: 100, bounding_box: bounding_box } }
             it 'returns location and distance of 100' do
               expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
+            end
+          end
+          context 'with no distance' do
+            let(:target) { { stolenness: 'proximity', location: 'these parts', distance: 100, bounding_box: bounding_box } }
+            it 'returns location and distance of 100' do
+              expect(Bike.searchable_interpreted_params(query_params.except(:distance), ip: ip_address)).to eq target
             end
           end
           context 'with a broken bounding box' do

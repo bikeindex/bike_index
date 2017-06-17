@@ -145,6 +145,11 @@
                   = f.label :theft_description, "theft description", class: "control-label"
                   .controls
                     = s.text_field :theft_description, placeholder: "description"
+              .bike-fields
+                .control-group
+                  = f.label :estimated_value, "Estimated value", class: "control-label"
+                  .controls
+                    = s.number_field :estimated_value
             - else
               / Don't put anything
               / Because there might be more stolen records and it breaks without

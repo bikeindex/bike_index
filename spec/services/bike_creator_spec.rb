@@ -100,6 +100,51 @@ describe BikeCreator do
       expect(b_param).to receive(:update_attributes).with(created_bike_id: 69, bike_errors: nil)
       BikeCreator.new(b_param).validate_record(bike)
     end
+    describe 'no_duplicate' do
+      let(:existing_bike) { FactoryGirl.create(:bike, serial_number: 'some serial number', owner_email: email) }
+      let(:new_bike) { FactoryGirl.create(:bike, serial_number: 'some serial number', owner_email: new_email) }
+      let!(:ownerships) do
+        FactoryGirl.create(:ownership, bike: existing_bike, owner_email: email)
+        FactoryGirl.create(:ownership, bike: new_bike, owner_email: new_email)
+      end
+      let(:params) do
+        {
+          bike: {
+            serial_number: 'some serial number',
+            owner_email: new_email,
+            no_duplicate: true
+          }
+        }
+      end
+      let(:b_param) { FactoryGirl.create(:b_param, creator: existing_bike.current_ownership.creator, params: params ) }
+      context 'same email' do
+        let(:email) { 'something@gmail.com' }
+        let(:new_email) { 'Something@GMAIL.com' }
+        it 'finds a duplicate' do
+          expect(b_param.no_duplicate).to be_truthy
+          expect(b_param.find_duplicate_bike(new_bike)).to be_truthy
+          expect do
+            BikeCreator.new(b_param).validate_record(new_bike)
+          end.to change(Ownership, :count).by -1
+          b_param.reload
+          expect(b_param.created_bike_id).to eq existing_bike.id
+          expect(Bike.where(id: new_bike.id)).to_not be_present
+        end
+      end
+      context 'different email' do
+        let(:email) { 'something@gmail.com' }
+        let(:new_email) { 'newsomething@gmail.com' }
+        it 'does not find a non-duplicate' do
+          expect(b_param.no_duplicate).to be_truthy
+          expect(b_param.find_duplicate_bike(new_bike)).to be_falsey
+          expect do
+            BikeCreator.new(b_param).validate_record(new_bike)
+          end.to change(Ownership, :count).by 0
+          b_param.reload
+          expect(b_param.created_bike_id).to eq new_bike.id
+        end
+      end
+    end
   end
 
   describe 'save_bike' do

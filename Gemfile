@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 ruby '2.2.5'
-gem 'rails', '4.2.7'
+gem 'rails', '4.2.8'
 
 gem 'pg'
 gem 'jquery-rails'
@@ -12,11 +12,12 @@ gem 'aws-sdk', '~> 1.33'
 gem 'fast_blank', '~> 1.0'
 
 # Redis and redis dependents
-gem 'redis'
+gem 'hiredis', '~> 0.6.0'
+gem 'redis', '>= 3.2.0', require: ['redis', 'redis/connection/hiredis']
 gem 'sidekiq' # Background processing
 gem 'sidekiq-failures'
 gem 'rollout' # Feature flags
-gem 'soulheart', '~> 0.2.6' # typeahead/autocomplete features
+gem 'soulheart', '~> 0.3.0'
 
 gem 'rack-contrib'
 gem 'unicorn' # Use Puma as the app server
@@ -87,6 +88,7 @@ gem 'flamegraph', require: false
 gem 'rack-mini-profiler', require: false # If you can't see it you can't make it better
 
 gem 'responders', '~> 2.0' # required because of class level respond_to blocks (API v1)
+gem 'thor', '0.19.1' # Locking it; http://stackoverflow.com/questions/40986923/meaning-of-expected-string-default-value-for-on-ruby-on-rails
 
 gem 'bundler', '>= 1.8.4' # required for rails-assets.org - JS and CSS assets
 source 'https://rails-assets.org' do # JS land is crazy, so lock everything
@@ -105,19 +107,16 @@ source 'https://rails-assets.org' do # JS land is crazy, so lock everything
 end
 
 gem 'grape_logging' # Grape logging. Also how we pass it to lograge. Always used, not just in Prod
+gem 'lograge' # Structure log data, put it in single lines to improve the functionality
+gem 'logstash-event' # Use logstash format for logging data
 group :production do
   gem 'honeybadger', '~> 2.0' # Error monitoring
-  gem 'lograge' # Structure log data, put it in single lines to improve the functionality
-  gem 'logstash-event' # Use logstash format for logging data
-  gem 'librato-rails' # Monitoring and display
+  # gem 'librato-rails' # Monitoring and display
 end
 
 group :development do
-  gem 'test-unit', '~> 3.0'
+  # gem 'test-unit', '~> 3.0'
   gem 'rerun'
-  gem 'guard', '2.13.0'
-  gem 'guard-rspec', '~> 4.6.4'
-  gem 'guard-rubocop'
 end
 
 group :development, :test do
@@ -128,6 +127,7 @@ group :development, :test do
   gem 'foreman'
   gem 'database_cleaner'
   gem 'dotenv-rails'
+  gem 'rack-livereload'
 end
 
 group :test do
@@ -135,4 +135,8 @@ group :test do
   gem 'codeclimate-test-reporter', require: nil
   gem 'rspec-sidekiq'
   gem 'pry'
+  gem 'guard', '~> 2.13.0', require: false
+  gem 'guard-rspec', '~> 4.6.4', require: false
+  gem 'guard-rubocop', require: false
+  gem 'guard-livereload', require: false
 end

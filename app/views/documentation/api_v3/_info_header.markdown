@@ -5,11 +5,11 @@
 
 The Bike Index is open source. You can [view the source code on GitHub](https://github.com/bikeindex/bike_index)&mdash;the API is in [app/controllers/api/v3](https://github.com/bikeindex/bike_index/tree/master/app/controllers/api/v3) and the tests for it are in [spec/api/v3](https://github.com/bikeindex/bike_index/tree/master/spec/api/v3).
 
-If you encounter any errors here (or anywhere on the Bike Index), please [submit an issue on GitHub](https://github.com/bikeindex/bike_index/issues/new).
+If you encounter any errors here (or anywhere on Bike Index), please [submit an issue on GitHub](https://github.com/bikeindex/bike_index/issues/new).
 
 If you have questions contact [admin@bikeindex.org](mailto:admin@bikeindex.org").
 
-This documentation displays the port number in the demo requests - e.g. [bikeindex.org:**443**/api/v3/bikes_search](https://bikeindex.org/api/v3/bikes_search). While this works, it's unnecessary. You can remove the `:443` - e.g. bikeindex.org/api/v3/bikes_search.
+This documentation displays the port number in the demo requests - e.g. [bikeindex.org:**443**/api/v3/search](https://bikeindex.org/api/v3/search). While this works, it's unnecessary. You can remove the `:443` - e.g. bikeindex.org/api/v3/search.
 
 *This documentation isn't tested or supported in IE, we recommend you use a different browser*
 
@@ -50,7 +50,7 @@ You can view <a href="#selections_GET_version_selections_cycle_types_format_get_
   
 ###Bike URLs
 
-The HTML pages of the Bike Index follow the same pattern as the API - the url for a bike is https://bikeindex.org/bikes/{bike_id}.
+The HTML pages of Bike Index follow the same pattern as the API - the url for a bike is https://bikeindex.org/bikes/{bike_id}.
 
 
 <a class="ref" id="ref_time">

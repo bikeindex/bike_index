@@ -21,7 +21,7 @@ class TsvCreator
   end
 
   def stolen_with_reports_header
-    "Make\tModel\tSerial\tDescription\tDateOfTheft\tCaseNumber\tLEName\tLEContact\tComments\n"
+    "StolenCity\tStolenState\tMake\tModel\tSerial\tDescription\tDateOfTheft\tCaseNumber\tLEName\tLEContact\tComments\n"
   end
 
   def org_counts_header
@@ -103,9 +103,10 @@ class TsvCreator
     out_file = File.join(Rails.root, filename)
     output = File.open(out_file, "w")
     output.puts stolen_with_reports_header
-    stolen_records.joins(:bike).merge(Bike.with_serial).each do |sr|
+    stolen_records.joins(:bike, :state).merge(Bike.with_serial).each do |sr|
         next unless sr.police_report_number.present?
-      output.puts sr.tsv_row(false) if sr.tsv_row.present?
+      row = sr.tsv_row(false, with_stolen_locations: true)
+      output.puts row if row.present?
     end
     send_to_uploader(output)
   end

@@ -26,6 +26,20 @@ Bikeindex::Application.routes.draw do
     get slug, to: 'landing_pages#show', organization_id: slug
   end
 
+  %w(for_law_enforcement for_schools).freeze.each do |page|
+    get page, controller: 'landing_pages', action: page
+  end
+
+  %w(update_browser user_home choose_registration goodbye bike_creation_graph).freeze.each do |page|
+    get page, controller: 'welcome', action: page
+  end
+
+  get 'update_browser', to: 'welcome#update_browser'
+  get 'user_home', to: 'welcome#user_home'
+  get 'choose_registration', to: 'welcome#choose_registration'
+  get 'goodbye', to: 'welcome#goodbye'
+  get 'bike_creation_graph', to: 'welcome#bike_creation_graph'
+
   resource :session, only: [:new, :create, :destroy]
   get 'logout', to: 'sessions#destroy'
 
@@ -206,14 +220,6 @@ Bikeindex::Application.routes.draw do
   resource :integrations, only: [:create]
   get '/auth/:provider/callback', to: 'integrations#create'
   get '/auth/failure', to: 'integrations#integrations_controller_creation_error'
-
-  %w(for_law_enforcement for_schools).freeze.each do |page|
-    get page, controller: 'landing_pages', action: page
-  end
-
-  %w(update_browser user_home choose_registration goodbye).freeze.each do |page|
-    get page, controller: 'welcome', action: page
-  end
 
   %w(support_the_index support_the_bike_index protect_your_bike privacy terms
      serials about where vendor_terms resources image_resources

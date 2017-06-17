@@ -23,7 +23,7 @@ class OwnershipsController < ApplicationController
     if @ownership && @ownership.bike.present?
       type = "#{@ownership.bike.type}"
       if @ownership.user.present?
-        "The owner of this #{type} already has an account on the Bike Index. Sign in to claim it!"
+        "The owner of this #{type} already has an account on Bike Index. Sign in to claim it!"
       else
         "Create an account to claim that #{type}! Use the email you used when registering it and you will be able to claim it after signing up!"
       end

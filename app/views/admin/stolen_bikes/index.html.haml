@@ -23,7 +23,7 @@
   %table.table.table-striped.table-bordered
     %thead
       %th
-        Date indexed
+        Stolen record created
       %th.not-tiny-screens
         Bike info
       %th.large-screens
@@ -36,6 +36,7 @@
 
     %tbody
       - @bikes.each do |bike|
+        - current_stolen_record = bike.current_stolen_record
         %tr
           %td
             .less-strong-hold
@@ -45,25 +46,31 @@
                     = bike.id
                 - else
                   = bike.id
-              %a{href: edit_admin_stolen_bike_url(bike) }
-
-                - if bike.created_at.today?
-                  Today at #{bike.created_at.strftime("%-I %p")}
-                - elsif Date.yesterday().beginning_of_day() <= bike.created_at
-                  Yesterday at #{bike.created_at.strftime("%-I %p")}
-                - else
-                  = bike.created_at.strftime("%-m.%-d.%Y")
+              %small
+                %a{href: edit_admin_stolen_bike_url(bike) }
+                  - created_date = current_stolen_record ? current_stolen_record.created_at : bike.created_at
+                  - if created_date.today?
+                    Today at #{created_date.strftime("%-I %p")}
+                  - elsif Date.yesterday().beginning_of_day() <= created_date
+                    Yesterday at #{created_date.strftime("%-I %p")}
+                  - else
+                    = created_date.strftime("%-m.%-d.%Y")
           %td.not-tiny-screens
             = bike.title_string
+
+            - if current_stolen_record && current_stolen_record.estimated_value.present?
+              %br
+              %small.less-strong
+                $#{current_stolen_record.estimated_value}
           
-          - if bike.current_stolen_record.present?
+          - if current_stolen_record.present?
             %td.large-screens
-              = bike.current_stolen_record.theft_description
+              = current_stolen_record.theft_description
             %td
-              - if bike.current_stolen_record.address.present?
-                = bike.current_stolen_record.city
+              - if current_stolen_record.address.present?
+                = current_stolen_record.city
             %td.table-cell-check
-              = "&#x2713;".html_safe if bike.current_stolen_record.approved
+              = "&#x2713;".html_safe if current_stolen_record.approved
           - else
             %td.large-screens
             %td

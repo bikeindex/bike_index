@@ -1,4 +1,43 @@
+$initial-about-social-color: $gray-light;
+$hover-about-social-color: lighten($gray-light, 15%);
 #info_about {
+  .about-social {
+    @include clearfix;
+    margin: 24px 0 60px;
+    ul {
+      @include list-unstyled;
+      margin: 0;
+      text-align: center;
+    }
+    li {
+      display: block;
+      float: left;
+      width: 8*$vertical-height;
+    }
+    svg {
+      display: inline-block;
+      max-height: 6*$vertical-height;
+    }
+    span.social-link-text {
+      display: block;
+      margin-top: -.5em;
+      color: $initial-about-social-color;
+    }
+    .svgpath, span.social-link-text {
+      fill: $initial-about-social-color;
+      transition: all .05s linear;
+    }
+    a {
+      display: block;
+      position: relative;
+      &:hover, &:active {
+        text-decoration: none;
+        color: $hover-about-social-color;
+        .svgpath { fill: $hover-about-social-color; }
+      }
+    }
+
+  }
   .about-people {
     @include list-unstyled;
     list-style-type: none;
