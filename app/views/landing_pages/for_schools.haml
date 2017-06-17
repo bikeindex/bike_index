@@ -31,27 +31,25 @@
         %p
           Bike Index has generated 3,200+ successful recoveries, and with Bike Index’s assistance your campus staff and security will have the support they need to help us—and your school—generate a lot more. 
 
+      .next-steps-col
+        .next-steps-wrap
+          %header
+            Talk to us today
+          = form_for Organization.new, html: { class: 'organized-form' } do |f|
+            .form-group
+              = f.label :name, 'Organization name', class: 'form-label'
+              = f.text_field :name, required: true, class: 'form-control'
 
-      .landing-signup-col
-        .signup-col-wrap
-          .contact-us-today
-            %header
-              Talk to us today
-            = form_for Organization.new, html: { class: 'organized-form' } do |f|
-              .form-group
-                = f.label :name, 'Organization name', class: 'form-label'
-                = f.text_field :name, required: true, class: 'form-control'
+            .form-group
+              = f.label :website, class: 'form-label'
+              = f.text_field :website, class: 'form-control'
+            .form-group
+              = f.label :website, class: 'form-label'
+              = f.text_field :website, class: 'form-control'
 
-              .form-group
-                = f.label :website, class: 'form-label'
-                = f.text_field :website, class: 'form-control'
-              .form-group
-                = f.label :website, class: 'form-label'
-                = f.text_field :website, class: 'form-control'
-
-              %a.btn.btn-primary.btn-lg
-                Get in touch
-        .signup-col-wrap
+            %a.btn.btn-primary.btn-lg
+              Get in touch
+        .next-steps-wrap
           .trusted-by
             %h3
               Trusted by top universities and police departments
