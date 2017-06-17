@@ -147,6 +147,7 @@ Bikeindex::Application.routes.draw do
       end
     end
     resources :failed_bikes, only: [:index, :show]
+    resources :feedbacks, only: [:index, :show]
     resources :ownerships, only: [:edit, :update]
     get 'blog', to: redirect('/news')
     resources :news do
