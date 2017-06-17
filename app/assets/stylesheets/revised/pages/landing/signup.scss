@@ -79,10 +79,28 @@
   }
 
   .banner-footer {
-    margin-top: 5*$vertical-height;
-    padding: 12*$vertical-height 0 11*$vertical-height;
     background-color: $blue-dark;
-    background-image: image-url('landing_pages/footer_rings.svg');
+    margin-top: 5*$vertical-height;
+    position: relative;
+    padding: 12*$vertical-height 0 11*$vertical-height;
+    overflow: hidden;
+    .chainring-bg {
+      display: block;
+      width: 45vw;
+      height: 45vw;
+      position: absolute;
+      z-index: 0;
+      background-image: image-url('landing_pages/chainring_bg.svg');
+      background-size: cover;
+      &:first-of-type {
+        left: -10vw;
+        bottom: -15vw;
+      }
+      &:last-of-type {
+        right: -10vw;
+        top: -10vw;
+      }
+    }
     .footer-overlay {
       display: block;
       position: absolute;
