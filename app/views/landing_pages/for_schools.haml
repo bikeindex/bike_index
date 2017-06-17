@@ -3,7 +3,7 @@
     .container
       .banner.row
         .col-xs-1
-          = image_tag 'landing_pages/circle_bike.svg'
+          = render '/landing_pages/icons/header_advocacy_svg'
         .col-xs-11
           %h1 Bike Index for Schools
           %h3 With bicycle theft a growing problem across campuses everywhere, students’ bikes can be difficult to protect without help.
@@ -23,7 +23,7 @@
 
         %h3 Join Our Growing Network
         %p
-          As a Bike Index partner, you and your students will have access to a national network of almost 100,000 catalogued bikes—the largest of its kind—as well as a network of over 75,000 registered riders and 250+ partners in local law enforcement, bike organizations, pawnshops and retail businesses. All participating in a coordinated, community-driven effort dedicated to recovering lost or stolen bikes.
+          As a Bike Index partner, you and your students will have access to a national network of almost 100,000 catalogued bikes—the largest of its kind—as well as a network of over 75,000 registered riders and 250+ partners in local law enforcement, bike organizations, pawnshops and retail businesses. All participating in a coordinated, community-driven effort dedicated to recovering lost or stolen bikes.2
 
         = image_tag 'landing_pages/body_placeholder.jpg'
 
@@ -70,4 +70,4 @@
               %li
                 = image_tag 'landing_pages/used_by.png'
                 %span A police Department
-  = render '/landing_pages/footer/banner'
+  = render 'footer'

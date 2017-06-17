@@ -4,6 +4,12 @@
 }
 
 .signup-landing-page {
+  svg {
+    // SVG icon colors
+    .svgicon-border { fill: #3498db; }
+    .svgicon-bg { fill: #34495e; }
+    .svgicon-body { fill: #fff; }
+  }
   .banner-header {
     padding-top: 24*$vertical-height;
     background-size: cover;
