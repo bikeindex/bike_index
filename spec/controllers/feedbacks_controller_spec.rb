@@ -36,6 +36,27 @@ describe FeedbacksController do
         expect(flash[:success]).to be_present
         feedback = Feedback.last
         feedback_attrs.each { |k, v| expect(feedback.send(k)).to eq(v) }
+        expect(feedback.user).to eq user
+      end
+    end
+
+    context 'feedback with generated title' do
+      it 'creates a feedback' do
+        request.env['HTTP_REFERER'] = 'http://localhost:3000/partyyyyy'
+        expect do
+          post :create, feedback: {
+            name: 'Cool School',
+            feedback_type: 'lead_for_school',
+            email: 'example@example.com',
+            body: 'ffff'
+          }
+        end.to change(EmailFeedbackNotificationWorker.jobs, :size).by(1)
+        expect(response).to redirect_to 'http://localhost:3000/partyyyyy'
+        expect(flash[:success]).to be_present
+        feedback = Feedback.last
+        expect(feedback.title).to eq 'New School lead: Cool School'
+        expect(feedback.email).to eq 'example@example.com'
+        expect(feedback.body).to eq 'ffff'
       end
     end
 

@@ -619,7 +619,8 @@ CREATE TABLE feedbacks (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     feedback_type character varying,
-    feedback_hash text
+    feedback_hash text,
+    user_id integer
 );
 
 
@@ -2756,6 +2757,13 @@ CREATE INDEX index_creation_states_on_organization_id ON creation_states USING b
 
 
 --
+-- Name: index_feedbacks_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_feedbacks_on_user_id ON feedbacks USING btree (user_id);
+
+
+--
 -- Name: index_integrations_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3266,4 +3274,6 @@ INSERT INTO schema_migrations (version) VALUES ('20161222154603');
 INSERT INTO schema_migrations (version) VALUES ('20170227012150');
 
 INSERT INTO schema_migrations (version) VALUES ('20170503024611');
+
+INSERT INTO schema_migrations (version) VALUES ('20170617222902');
 
