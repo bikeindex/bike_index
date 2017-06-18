@@ -17,18 +17,19 @@ class Admin::FeedbacksController < Admin::BaseController
   end
 
   def graphs
-    if params[:start_at] == 'past_year'
-      feedback_counts = Feedback.where("created_at >= ?", Time.now - 1.year)
-                        .group_by_week(:created_at).count
-    elsif params[:start_at] == 'all_time'
-      feedback_counts = Feedback.group_by_month(:created_at).count
-    elsif params[:start_at] == 'past_week'
-      feedback_counts = Feedback.where("created_at >= ?", Time.now - 1.week)
-                        .group_by_hour(:created_at).count
-    else
-      feedback_counts = Feedback.where("created_at >= ?", Time.now - 1.month)
-                        .group_by_day(:created_at).count
-    end
-    render json: feedback_counts
+    render json:
+      case params[:start_at]
+      when 'past_year'
+        Feedback.where('created_at >= ?', Time.now - 1.year)
+          .group_by_week(:created_at).count
+      when 'all_time'
+        Feedback.group_by_month(:created_at).count
+      when 'past_week'
+        Feedback.where('created_at >= ?', Time.now - 1.week)
+          .group_by_hour(:created_at).count
+      else
+        Feedback.where('created_at >= ?', Time.now - 1.month)
+          .group_by_day(:created_at).count
+      end
   end
 end
