@@ -1,8 +1,7 @@
 class FeedbacksController < ApplicationController
   layout 'application_revised'
   before_filter :set_feedback_active_section
-  # Skipping this - at least for now
-  # before_filter :authenticate_user, only: [:create]
+  # before_filter :authenticate_user, only: [:create] # provisionally off
   before_filter :set_permitted_format
 
   def index
