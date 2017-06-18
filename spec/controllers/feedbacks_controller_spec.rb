@@ -28,15 +28,18 @@ describe FeedbacksController do
 
     context 'valid feedback' do
       it 'creates a feedback message' do
+        expect(user.name).to be_present
         set_current_user(user)
         expect do
-          post :create, feedback: feedback_attrs
+          post :create, feedback: feedback_attrs.except(:email, :name)
         end.to change(EmailFeedbackNotificationWorker.jobs, :size).by(1)
         expect(response).to redirect_to help_path
         expect(flash[:success]).to be_present
         feedback = Feedback.last
-        feedback_attrs.each { |k, v| expect(feedback.send(k)).to eq(v) }
+        feedback_attrs.except(:email, :name).each { |k, v| expect(feedback.send(k)).to eq(v) }
         expect(feedback.user).to eq user
+        expect(feedback.email).to eq user.email
+        expect(feedback.name).to eq user.name
       end
     end
 

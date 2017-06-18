@@ -2,7 +2,7 @@ class Feedback < ActiveRecord::Base
   validates_presence_of :body, :email, :title
   serialize :feedback_hash
   belongs_to :user
-  before_validation :generate_title
+  before_validation :generate_title, :set_user_attrs
 
   after_create :notify_admins
   def notify_admins
@@ -21,6 +21,12 @@ class Feedback < ActiveRecord::Base
   def generate_title
     return true if title.present? || lead_type.blank?
     self.title = "New #{lead_type} lead: #{name}"
+  end
+
+  def set_user_attrs
+    return true unless user.present?
+    self.name ||= user.name
+    self.email ||= user.email
   end
 
   def lead_type
