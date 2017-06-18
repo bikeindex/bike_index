@@ -1,9 +1,11 @@
 = form_for @feedback do |f|
-  .row.form-group
-    .col-sm-6
-      = f.email_field :email, placeholder: "Email address", value: current_user ? current_user.email : "", class: 'form-control'
-    .col-sm-6
-      = f.text_field :name, placeholder: 'Name', value: current_user ? current_user.name : '', class: 'form-control'
+  - unless current_user.present? && current_user.name.present?
+    .row.form-group
+      - unless current_user.present?
+        .col-sm-6
+          = f.email_field :email, placeholder: "Email address", value: current_user ? current_user.email : "", class: 'form-control'
+      .col-sm-6
+        = f.text_field :name, placeholder: 'Name', value: current_user ? current_user.name : '', class: 'form-control'
   
   .row.form-group
     .col-sm-12

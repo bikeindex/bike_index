@@ -28,6 +28,8 @@
         %tr
           %td
             = link_to organization.name, admin_organization_url(organization)
+            %small.less-strong.large-screens
+              = organization.org_type
           %td.medium-screens
             %span.hidden
               = organization.created_at.to_i

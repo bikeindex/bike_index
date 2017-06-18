@@ -3,7 +3,10 @@
     Serial update notification
   %p
     From
-    = @feedback.email
+    - if @feedback.user_id
+      = link_to @feedback.email, edit_admin_user_url(@feedback.user)
+    - else
+      = @feedback.email
   %p
     Reason for update:
     = @feedback.body
@@ -20,7 +23,10 @@
     Manufacturer update notification
   %p
     From
-    = @feedback.email
+    - if @feedback.user_id
+      = link_to @feedback.email, edit_admin_user_url(@feedback.user)
+    - else
+      = @feedback.email
   %p
     Reason for update:
     = @feedback.body
@@ -37,7 +43,10 @@
     Bike delete request
   %p
     From
-    = @feedback.email
+    - if @feedback.user_id
+      = link_to @feedback.email, edit_admin_user_url(@feedback.user)
+    - else
+      = @feedback.email
   %p
     Reason for delete:
     = @feedback.body
@@ -65,6 +74,19 @@
   %p
     = link_to edit_admin_bike_url(@feedback.bike), edit_admin_bike_url(@feedback.bike)
 
+- elsif @feedback.lead_type.present?
+  %p
+    From:
+    - if @feedback.user_id
+      = link_to @feedback.email, edit_admin_user_url(@feedback.user)
+    - else
+      = @feedback.email
+  %p
+    %strong
+      Lead for #{@feedback.lead_type}: #{@feedback.name}
+  %p
+    = @feedback.body
+  
 - elsif @feedback.feedback_type.present? && @feedback.feedback_type.match(/organization_/i)
   - organization = Organization.find(@feedback.feedback_hash[:organization_id])
   %h1
@@ -77,12 +99,16 @@
 
 - else
   %p
-    From: 
-    = @feedback.email
+    From:
+    - if @feedback.user_id
+      = link_to @feedback.email, edit_admin_user_url(@feedback.user)
+    - else
+      = @feedback.email
 
-  %p
-    = @feedback.name
-    says,
+  - if @feedback.name.present?
+    %p
+      = @feedback.name
+      says,
 
   %p
     = @feedback.body
