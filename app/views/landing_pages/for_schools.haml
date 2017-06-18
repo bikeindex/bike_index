@@ -1,3 +1,5 @@
+%h1
+  = action_name
 - landing_page_target = 'school'
 .signup-landing-page{ class: "signup-landing-page-#{landing_page_target}" }
   %header.banner-header
@@ -35,20 +37,9 @@
         .next-steps-wrap
           %header
             Talk to us today
-          = form_for Organization.new, html: { class: 'organized-form' } do |f|
-            .form-group
-              = f.label :name, 'Organization name', class: 'form-label'
-              = f.text_field :name, required: true, class: 'form-control'
-
-            .form-group
-              = f.label :website, class: 'form-label'
-              = f.text_field :website, class: 'form-control'
-            .form-group
-              = f.label :website, class: 'form-label'
-              = f.text_field :website, class: 'form-control'
-
-            %a.btn.btn-primary.btn-lg
-              Get in touch
+          = render partial: '/landing_pages/next_steps_contact', locals: { landing_page_target: landing_page_target }
+          / %a.btn.btn-primary.btn-lg
+          /   Get in touch
         .next-steps-wrap
           .trusted-by
             %h3
@@ -69,4 +60,4 @@
               %li
                 = image_tag 'landing_pages/used_by.png'
                 %span A police Department
-  = render 'footer'
+  = render '/landing_pages/footer'
