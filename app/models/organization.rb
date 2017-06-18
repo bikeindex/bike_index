@@ -35,7 +35,7 @@ class Organization < ActiveRecord::Base
   scope :shop, -> { where(org_type: 'shop') }
   scope :police, -> { where(org_type: 'police') }
   scope :advocacy, -> { where(org_type: 'advocacy') }
-  scope :college, -> { where(org_type: 'college') }
+  scope :school, -> { where(org_type: 'school') }
   scope :manufacturer, -> { where(org_type: 'manufacturer') }
   scope :paid, -> { where(is_paid: true) }
   scope :valid, -> { where(is_suspended: false) }
