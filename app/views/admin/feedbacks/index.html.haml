@@ -47,7 +47,8 @@
             - else
               = link_to feedback.email, admin_users_path(user_query: feedback.email)
           %td
-            = link_to feedback.feedback_type, admin_feedbacks_path(type: feedback.feedback_type)
+            - feedback_type = feedback.feedback_type || 'msg'
+            = link_to feedback_type, admin_feedbacks_path(type: feedback_type)
           %td.medium-screens
             = feedback.name
           %td.large-screens

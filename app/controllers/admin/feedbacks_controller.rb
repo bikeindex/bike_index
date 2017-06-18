@@ -1,7 +1,8 @@
 class Admin::FeedbacksController < Admin::BaseController
   def index
     if params[:type].present?
-      feedbacks = Feedback.where(feedback_type: params[:type]).order(created_at: :desc)
+      type = params[:type] == 'msg' ? nil : params[:type]
+      feedbacks = Feedback.where(feedback_type: type).order(created_at: :desc)
       @matching_count = feedbacks.count
     else
       feedbacks = Feedback.order(created_at: :desc)
