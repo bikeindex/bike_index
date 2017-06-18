@@ -58,9 +58,11 @@
   = paginate @feedbacks
 
 = javascript_include_tag "//www.google.com/jsapi", "chartkick" 
-= line_chart graphs_admin_feedbacks_path(start_at: params[:start_at])
+%pre
+  = params.to_yaml
+= line_chart graphs_admin_feedbacks_path(params.merge(start_at: params[:start_at]))
 %p{ style: "text-align: center;" }
   - %w(all_time past_year past_month past_week).each do |start_at|
     \-
-    = link_to start_at.humanize, admin_feedbacks_path(start_at: start_at)
+    = link_to start_at.humanize, admin_feedbacks_path(params.merge(start_at: start_at))
   \-
