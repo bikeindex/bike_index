@@ -9,7 +9,6 @@
       \- #{@matching_count}
     #{params[:type]}
 
-
 .paginate-container
   = paginate @feedbacks
 %section.full-screen-table
@@ -56,3 +55,11 @@
         
 .paginate-container
   = paginate @feedbacks
+
+= javascript_include_tag "//www.google.com/jsapi", "chartkick" 
+= line_chart graphs_admin_feedbacks_path(start_at: params[:start_at])
+%p{ style: "text-align: center;" }
+  - %w(all_time past_year past_month past_week).each do |start_at|
+    \-
+    = link_to start_at.humanize, admin_feedbacks_path(start_at: start_at)
+  \-

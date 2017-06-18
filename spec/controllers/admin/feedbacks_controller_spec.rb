@@ -19,4 +19,14 @@ describe Admin::FeedbacksController, type: :controller do
       expect(response).to render_template(:show)
     end
   end
+
+  describe 'graphs' do
+    it 'returns json' do
+      expect(subject).to be_present
+      get :graphs
+      expect(response.status).to eq(200)
+      result = JSON.parse(response.body)
+      expect(result.keys.count).to be > 0
+    end
+  end
 end
