@@ -2,13 +2,13 @@ require 'spec_helper'
 
 describe Admin::RecoveriesController do
   describe 'index' do
-    before do
+    it 'renders' do
       user = FactoryGirl.create(:admin)
       set_current_user(user)
       get :index
+      expect(response).to be_success
+      expect(response).to render_template(:index)
+      expect(flash).to_not be_present
     end
-    it { is_expected.to respond_with(:success) }
-    it { is_expected.to render_template(:index) }
-    it { is_expected.not_to set_flash }
   end
 end

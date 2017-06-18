@@ -1,0 +1,7 @@
+%header
+  %h3
+    = link_to 'View all tweets', admin_tweets_url
+
+= render partial: '/landing_pages/tweet', locals: { tweet_id: @tweet.id }
+%pre
+  = @tweet.twitter_response.to_yaml

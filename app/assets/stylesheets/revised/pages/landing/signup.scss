@@ -21,6 +21,7 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law';
   }
 }
 
+
 .signup-landing-page {
   .banner-header {
     padding-top: 24*$vertical-height;
@@ -60,20 +61,31 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law';
 .signup-landing-page {
   .landing-why-col, .next-steps-col { @include make-col-ready(); }
   .landing-why-col {
-    @include make-col(8);
     margin-top: 2*$vertical-height;
-    img {
-      display: block;
-      margin-top: 3*$vertical-height;
+    @include media-breakpoint-down(lg) {
+      @include make-col(8);
     }
+    @include media-breakpoint-up(lg) {
+      @include make-col(7);
+    }
+
     h3 { margin-top: 3*$vertical-height; }
+    .landing-page-tweet {
+      margin-top: 3*$vertical-height;
+      img {
+        // display: block;
+      }
+    }
   }
 
   $contact-us-gutter: 30px;
   .next-steps-col {
-    @include make-col(4);
     margin-top: -8.5*$vertical-height;
     padding: 0;
+    @include make-col(4);
+    @include media-breakpoint-up(lg) {
+      @include make-col-offset(1);
+    }
     .next-steps-wrap {
       padding: 2.5*$vertical-height $contact-us-gutter;
       background: $gray-darker;

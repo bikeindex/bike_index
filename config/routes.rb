@@ -159,6 +159,7 @@ Bikeindex::Application.routes.draw do
       collection { get :graphs }
     end
     resources :ownerships, only: [:edit, :update]
+    resources :tweets
     get 'blog', to: redirect('/news')
     resources :news do
       collection do

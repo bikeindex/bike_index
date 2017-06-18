@@ -1,0 +1,32 @@
+%header.with-subtitle
+  %h1
+    New Tweet
+  %p
+    = link_to 'View all tweets', admin_tweets_url
+
+.row-fluid
+  .span8.padded.well
+    .form.form-horizontal
+      = form_for [:admin, @tweet], url: { action: 'create', controller: 'tweets' } do |f|
+        - if @tweet.errors.any?
+          #alert-block
+            .alert.alert-error
+              %h4
+                Please fix the following 
+                = pluralize(@tweet.errors.count, 'error')
+              %ul
+                - @tweet.errors.full_messages.each do |msg|
+                  %li
+                    = msg
+        
+        %p
+          Get the twitter ID from the URL of the tweet. It's the final number at the end of the url
+        %p
+          e.g. for <code>https://twitter.com/stolenbikereg/status/874644243737751553</code> - 874644243737751553
+        .control-group.padded
+          = f.label :twitter_id, 'Twitter id', class: 'control-label'
+          .controls
+            = f.text_field :twitter_id
+
+        .padded
+          = f.submit 'Create tweet!', class: 'button-green pull-right'
