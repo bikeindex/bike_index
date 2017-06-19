@@ -53,4 +53,12 @@ class Tweet < ActiveRecord::Base
   def tweetor_name
     trh['user'] && trh['user']['name']
   end
+
+  def tweetor_link
+    "https://twitter.com/#{tweetor}"
+  end
+
+  def tweet_link
+    "https://twitter.com/#{tweetor}/status/#{twitter_id}"
+  end
 end

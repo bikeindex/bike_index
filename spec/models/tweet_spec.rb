@@ -7,22 +7,22 @@ RSpec.describe Tweet, type: :model do
     it { should validate_presence_of :twitter_id }
   end
 
-  describe 'find' do
+  describe 'friendly_find' do
     let!(:tweet) { FactoryGirl.create(:tweet) }
     let(:twitter_id) { tweet.twitter_id }
     context 'twitter_id' do
       it 'finds the tweet' do
-        expect(Tweet.find(twitter_id)).to eq tweet
+        expect(Tweet.friendly_find(twitter_id)).to eq tweet
       end
     end
     context 'our id' do
       it 'finds the tweet' do
-        expect(Tweet.find(tweet.id)).to eq tweet
+        expect(Tweet.friendly_find(tweet.id)).to eq tweet
       end
     end
     context 'not found' do
       it 'does not error' do
-        expect(Tweet.find(1111111)).to be_nil
+        expect(Tweet.friendly_find(1111111)).to be_nil
       end
     end
   end
