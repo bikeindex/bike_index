@@ -1,9 +1,11 @@
 class Tweet < ActiveRecord::Base
   validates_presence_of :twitter_id
   has_many :public_images, as: :imageable, dependent: :destroy
+  mount_uploader :image, ImageUploader
+  process_in_background :image, CarrierWaveProcessWorker
   before_save :set_body_from_response
 
-  def self.find(id)
+  def self.friendly_find(id)
     return nil unless id.present?
     id = id.to_s
     if id.length > 7
@@ -23,8 +25,8 @@ class Tweet < ActiveRecord::Base
     end
   end
 
-  def image?
-    public_images.any?
+  def to_param
+    twitter_id
   end
 
   def set_body_from_response

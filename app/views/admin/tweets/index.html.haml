@@ -4,12 +4,14 @@
   %p
     = link_to 'new tweet', new_admin_tweet_path
 %h4
-  = Tweet.count
+  #{Tweet.count} tweets stored
 %section.full-screen-table
   %table.table.table-striped.table-bordered
     %thead
       %th
         Created
+      %th.large-screens
+        Twitter id
       %th
         By
       %th
@@ -32,11 +34,14 @@
               %span.hidden
                 = tweet.created_at.strftime("%-m.%-d.%Y %-H.%M")
               - created_text = "#{tweet.created_at.strftime("%-m/%-d/%Y at %-I %p")}"
-            = link_to created_text, admin_tweet_path(tweet)
+            = link_to created_text, admin_tweet_path(tweet.twitter_id)
+          %td.large-screens
+            %small.less-strong
+              = tweet.twitter_id
           %td
-            twitter user
+            = tweet.tweetor
           %td
-            text
+            = strip_tags(tweet.body_html)
           %td
             = "&#x2713;".html_safe if tweet.image?
     

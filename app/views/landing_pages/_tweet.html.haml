@@ -1,0 +1,5 @@
+- tweet_id ||= nil # ensure we don't explode when not passed key thing
+- if tweet_id.present?
+  - tweet = Tweet.friendly_find(tweet_id)
+  .landing-page-tweet
+    = image_tag tweet.image

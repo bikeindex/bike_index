@@ -12,6 +12,12 @@ class Admin::TweetsController < Admin::BaseController
   end
 
   def update
+    if @tweet.update_attributes(permitted_parameters)
+      flash[:notice] = 'Tweet saved!'
+      redirect_to edit_admin_tweet_url
+    else
+      render action: :edit
+    end
   end
 
   def new
@@ -31,11 +37,11 @@ class Admin::TweetsController < Admin::BaseController
   private
 
   def permitted_parameters
-    params.require(:tweet).permit(:twitter_id, :body_html)
+    params.require(:tweet).permit(:twitter_id, :body_html, :image, :remote_image_url, :remove_image)
   end
 
   def find_tweet
-    @tweet = Tweet.find(params[:id])
+    @tweet ||= Tweet.friendly_find(params[:id])
   end
 
   def fetch_twitter_response(tweet_id)

@@ -4,6 +4,7 @@ class CreateTweets < ActiveRecord::Migration
       t.string :twitter_id
       t.json :twitter_response
       t.text :body_html
+      t.string :image
 
       t.timestamps null: false
     end
