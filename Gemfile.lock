@@ -596,6 +596,7 @@ GEM
       redis (~> 3.2, >= 3.2.1)
     sidekiq-failures (0.4.5)
       sidekiq (>= 2.16.0)
+    simple_oauth (0.3.1)
     simplecov (0.11.2)
       docile (~> 1.1.0)
       json (~> 1.8)
@@ -633,6 +634,10 @@ GEM
     thread_safe (0.3.6)
     tilt (2.0.5)
     trollop (2.1.2)
+    twitter (4.8.1)
+      faraday (~> 0.8, < 0.10)
+      multi_json (~> 1.0)
+      simple_oauth (~> 0.2)
     tzinfo (1.2.3)
       thread_safe (~> 0.1)
     uglifier (3.0.0)
@@ -765,6 +770,7 @@ DEPENDENCIES
   swagger-ui_rails
   therubyracer
   thor (= 0.19.1)
+  twitter
   uglifier
   unicorn
   unicorn-worker-killer
