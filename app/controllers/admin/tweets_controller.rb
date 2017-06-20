@@ -37,7 +37,8 @@ class Admin::TweetsController < Admin::BaseController
   private
 
   def permitted_parameters
-    params.require(:tweet).permit(:twitter_id, :body_html, :image, :remote_image_url, :remove_image)
+    params.require(:tweet).permit(:twitter_id, :body_html, :image, :alignment,
+                                  :remote_image_url, :remove_image)
   end
 
   def find_tweet

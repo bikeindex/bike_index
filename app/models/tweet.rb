@@ -4,6 +4,7 @@ class Tweet < ActiveRecord::Base
   mount_uploader :image, ImageUploader
   process_in_background :image, CarrierWaveProcessWorker
   before_save :set_body_from_response
+  before_validation :ensure_valid_alignment
 
   def self.friendly_find(id)
     return nil unless id.present?
@@ -27,6 +28,13 @@ class Tweet < ActiveRecord::Base
 
   def to_param
     twitter_id
+  end
+
+  def ensure_valid_alignment
+    valid_alignments = %w(top-left top-right bottom-left bottom-right)
+    self.alignment ||= valid_alignments.first
+    return true if valid_alignments.include?(alignment)
+    self.errors[:base] << "#{alignment} is not one of valid alignments: #{valid_alignments}"
   end
 
   def set_body_from_response

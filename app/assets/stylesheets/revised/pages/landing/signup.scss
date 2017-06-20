@@ -19,6 +19,82 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law';
     .svgicon-bg { fill: #34495e; }
     .svgicon-body { fill: #fff; }
   }
+  .landing-page-tweet {
+    $tweet-link-color: #3498DC;
+    $tweet-black: #2C2C2C;
+    margin-top: 3*$vertical-height;
+    position: relative;
+    .tweet-display {
+      position: absolute;
+      display: block;
+      width: 350px;
+      max-width: 94%;
+      background: #fff;
+      border: 2px solid $tweet-black;
+      box-shadow: 0 0 5px rgba(0,0,0,.3);
+      padding: 6px 12px 12px;
+      &.tweet-align-top-left {
+        left: 2.5%; top: 2.5%;
+      }
+      &.tweet-align-top-right {
+        right: 2.5%; top: 2.5%;
+      }
+      &.tweet-align-bottom-left {
+        left: 2.5%; bottom: 5%;
+      }
+      &.tweet-align-bottom-right {
+        right: 2.5%; bottom: 5%;
+      }
+    }
+    .tweetor-header {
+      display: block;
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      color: $tweet-black;
+      line-height: 1em;
+      .tweetor-name {
+        display: inline-block;
+        font-weight: bold;
+        margin-top: 3px;
+        font-size: 90%;
+      }
+      .tweetor-handle {
+        color: #8B9DA8;
+        font-size: 75%;
+      }
+      &:hover {
+        text-decoration: none;
+        .tweetor-name {
+          color: $tweet-link-color;
+          text-decoration: underline;
+        }
+      }
+      img {
+        display: block;
+        float: left;
+        width: 36px;
+        margin-right: 7px;
+      }
+    }
+    .tweet-body {
+      clear: both;
+      position: relative;
+      z-index: 1;
+      margin-top: 12px;
+      color: $tweet-black;
+      font-size: 90%;
+      line-height: 1.2em;
+      a { color: $tweet-link-color; }
+    }
+    a.body-link {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      top: 0; left: 0;
+    }
+  }
 }
 
 
@@ -70,70 +146,6 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law';
     }
 
     h3 { margin-top: 3*$vertical-height; }
-    .landing-page-tweet {
-      $tweet-link-color: #3498DC;
-      $tweet-black: #2C2C2C;
-      margin-top: 3*$vertical-height;
-      position: relative;
-      .tweet-display {
-        position: absolute;
-        left: 2.5%;
-        top: 2.5%;
-        display: block;
-        width: 350px;
-        max-width: 100%;
-        background: #fff;
-        border: 2px solid $tweet-black;
-        box-shadow: 0 0 5px rgba(0,0,0,.3);
-        padding: 6px 12px 20px;
-      }
-      .tweetor-header {
-        display: block;
-        position: relative;
-        z-index: 1;
-        width: 100%;
-        color: $tweet-black;
-        line-height: 1.2em;
-        .tweetor-name {
-          display: inline-block;
-          font-weight: bold;
-          margin-top: 7px;
-          font-size: 110%;
-        }
-        .tweetor-handle {
-          color: #8B9DA8;
-          font-size: 90%;
-        }
-        &:hover {
-          text-decoration: none;
-          .tweetor-name {
-            color: $tweet-link-color;
-            text-decoration: underline;
-          }
-        }
-        img {
-          display: block;
-          float: left;
-          margin-right: 7px;
-        }
-      }
-      .tweet-body {
-        clear: both;
-        position: relative;
-        z-index: 1;
-        margin-top: 1em;
-        color: $tweet-black;
-        line-height: 1.2em;
-        a { color: $tweet-link-color; }
-      }
-      a.body-link {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        z-index: 0;
-        top: 0; left: 0;
-      }
-    }
   }
 
   $contact-us-gutter: 30px;

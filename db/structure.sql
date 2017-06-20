@@ -1787,6 +1787,7 @@ CREATE TABLE tweets (
     twitter_response json,
     body_html text,
     image character varying,
+    alignment character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );

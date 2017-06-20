@@ -27,6 +27,12 @@ RSpec.describe Tweet, type: :model do
     end
   end
 
+  describe 'ensure_valid_alignment' do
+    it 'adds an error if alignment invalid' do
+      expect(Tweet.new(twitter_id: 111, alignment: 'weird').valid?).to be_falsey
+    end
+  end
+
   describe 'auto_link_mentions' do
     it 'auto links mentioned folk' do
       input = 'Portland Patrol officer Baxter assists in another #biketheft recovery today in Old Town! Great looking out and using @stolenbikereg 👍'

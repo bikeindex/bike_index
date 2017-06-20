@@ -51,6 +51,21 @@
             .controls
               = f.check_box :remove_image
     .row-fluid
+      .controls.radio-controls
+        <em>Tweet alignment in image:</em>
+        %label.radio
+          = f.radio_button :alignment, 'top-left'
+          top left
+        %label.radio
+          = f.radio_button :alignment, 'top-right'
+          top right
+        %label.radio
+          = f.radio_button :alignment, 'bottom-left'
+          bottom left
+        %label.radio
+          = f.radio_button :alignment, 'bottom-right'
+          bottom right
+    .row-fluid
       .span12
         = f.submit 'Save', class: 'button-green pull-right'
 
