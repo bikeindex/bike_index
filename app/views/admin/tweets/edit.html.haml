@@ -60,11 +60,12 @@
   Landing page rendering:
 = stylesheet_link_tag 'revised', media: 'all'
 
+.padded.cleafix
+
 .signup-landing-page
   .container
     .row
       .landing-why-col
-
         = render partial: '/landing_pages/tweet', locals: { tweet_id: @tweet.id }
 
 .padded
