@@ -95,25 +95,42 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law';
       top: 0; left: 0;
     }
   }
+  .trusted-by {
+    ul { @include list-unstyled; }
+    li {
+      img {
+        display: inline-block;
+        width: 16.66666%;
+        height: auto;
+      }
+    }
+  }
 }
 
 
 .signup-landing-page {
   .banner-header {
-    padding-top: 24*$vertical-height;
+    padding-top: 6*$vertical-height;
+    padding-bottom: 12*$vertical-height;
     background-size: auto 100%;
     background-position: center top;
     background-repeat: no-repeat;
     .icon-wrapper {
-      position: relative;
       width: 100%;
-      // There is a 1/6 overhang to the left (8.33333/6 ~ 1.33333)
-      flex: 0 0 9.66666%;
-      max-width: 9.66666%;
-      margin-left: -1.3333%;
+      margin: 0;
+      clear: both;
+      svg, img { width: 25%; display: block; margin: 0 auto; }
+    }
+    .banner-text {
+      @include make-col-ready();
+      @include make-col(12);
+      margin-top: 2*$vertical-height;
+    }
+    h1, h2, h3 {
+      color: white;
+      text-align: center;
     }
     h1 { line-height: 1.4em; }
-    h1, h2, h3 { color: white; }
     h2, h3 {
       font-family: $body-font-family;
       font-weight: $normal-font-weight;
@@ -122,13 +139,32 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law';
       font-size: 21px;
       line-height: 1.6em;
     }
-    .ribbon {
-      margin-top: 12*$vertical-height;
-      background: $gray-darker;
-      h2 {
-        font-size: 24px;
-        margin: 0;
-        padding: 2*$vertical-height 0;
+    .ribbon { display: none; }
+
+    @include media-breakpoint-up(md) {
+      padding-top: 24*$vertical-height;
+      padding-bottom: 0;
+      .icon-wrapper {
+        // There is a 1/6 overhang to the left (8.33333/6 ~ 1.33333)
+        flex: 0 0 9.66666%;
+        max-width: 9.66666%;
+        margin-left: -1.3333%;
+        svg, img { width: 100%; }
+      }
+      .banner-text {
+        @include make-col(7);
+        margin-top: 0;
+      }
+      h1, h2, h3 { text-align: left; }
+      .ribbon {
+        display: block;
+        margin-top: 12*$vertical-height;
+        background: $gray-darker;
+        h2 {
+          font-size: 24px;
+          margin: 0;
+          padding: 2*$vertical-height 0;
+        }
       }
     }
   }
@@ -136,10 +172,18 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law';
 
 .signup-landing-page {
   .landing-why-col, .next-steps-col { @include make-col-ready(); }
+  .main-body-row {
+    @include media-breakpoint-down(md) {
+      flex-direction: column-reverse;
+    }
+  }
   .landing-why-col {
     margin-top: 2*$vertical-height;
     @include media-breakpoint-down(lg) {
       @include make-col(8);
+    }
+    @include media-breakpoint-down(md) {
+      @include make-col(12);
     }
     @include media-breakpoint-up(lg) {
       @include make-col(7);
@@ -151,8 +195,13 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law';
   $contact-us-gutter: 30px;
   .next-steps-col {
     margin-top: -8.5*$vertical-height;
-    padding: 0;
     @include make-col(4);
+    @include media-breakpoint-down(md) {
+      @include make-col(12);
+    }
+    @include media-breakpoint-up(md) {
+      padding: 0;
+    }
     @include media-breakpoint-up(lg) {
       @include make-col-offset(1);
     }
@@ -179,14 +228,26 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law';
     .trusted-by {
       padding: 2.5*$vertical-height 0.5*$contact-us-gutter 12px;
       background: white;
-      ul { @include list-unstyled; }
-      li {
-        img {
-          display: inline-block;
-          width: 16.66666%;
-          height: auto;
-        }
-      }
+      @include media-breakpoint-down(md) { display: none; }
+    }
+  }
+}
+
+.signup-landing-page {
+  .mobile-bottom {
+    display: none;
+    margin-top: 2*$vertical-height;
+    .contact-internal-link {
+      display: block;
+      width: 20em;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+    .trusted-by {
+      margin-top: 4*$vertical-height;
+    }
+    @include media-breakpoint-down(md) {
+      display: block;
     }
   }
 }
