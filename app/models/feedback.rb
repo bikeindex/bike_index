@@ -3,6 +3,7 @@ class Feedback < ActiveRecord::Base
   serialize :feedback_hash
   belongs_to :user
   before_validation :generate_title, :set_user_attrs
+  attr_accessor :additional # spam block attribute
 
   after_create :notify_admins
   def notify_admins

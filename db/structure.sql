@@ -1778,6 +1778,41 @@ ALTER SEQUENCE stolen_records_id_seq OWNED BY stolen_records.id;
 
 
 --
+-- Name: tweets; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE tweets (
+    id integer NOT NULL,
+    twitter_id character varying,
+    twitter_response json,
+    body_html text,
+    image character varying,
+    alignment character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: tweets_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE tweets_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: tweets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE tweets_id_seq OWNED BY tweets.id;
+
+
+--
 -- Name: user_emails; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2226,6 +2261,13 @@ ALTER TABLE ONLY stolen_records ALTER COLUMN id SET DEFAULT nextval('stolen_reco
 
 
 --
+-- Name: tweets id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY tweets ALTER COLUMN id SET DEFAULT nextval('tweets_id_seq'::regclass);
+
+
+--
 -- Name: user_emails id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2604,6 +2646,14 @@ ALTER TABLE ONLY stolen_notifications
 
 ALTER TABLE ONLY stolen_records
     ADD CONSTRAINT stolen_records_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tweets tweets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY tweets
+    ADD CONSTRAINT tweets_pkey PRIMARY KEY (id);
 
 
 --
@@ -3276,4 +3326,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170227012150');
 INSERT INTO schema_migrations (version) VALUES ('20170503024611');
 
 INSERT INTO schema_migrations (version) VALUES ('20170617222902');
+
+INSERT INTO schema_migrations (version) VALUES ('20170618205609');
 

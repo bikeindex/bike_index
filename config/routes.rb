@@ -26,6 +26,14 @@ Bikeindex::Application.routes.draw do
     get slug, to: 'landing_pages#show', organization_id: slug
   end
 
+  %w(for_law_enforcement for_schools).freeze.each do |page|
+    get page, controller: 'landing_pages', action: page
+  end
+
+  %w(update_browser user_home choose_registration goodbye bike_creation_graph).freeze.each do |page|
+    get page, controller: 'welcome', action: page
+  end
+
   get 'update_browser', to: 'welcome#update_browser'
   get 'user_home', to: 'welcome#user_home'
   get 'choose_registration', to: 'welcome#choose_registration'
@@ -151,6 +159,7 @@ Bikeindex::Application.routes.draw do
       collection { get :graphs }
     end
     resources :ownerships, only: [:edit, :update]
+    resources :tweets
     get 'blog', to: redirect('/news')
     resources :news do
       collection do

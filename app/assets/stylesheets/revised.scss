@@ -197,6 +197,8 @@ $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 
 // Landing page styles
 @import "revised/pages/landing/organizations";
+@import "revised/pages/landing/signup";
+
 
 // LEGACY PAGES general styles - replace as soon as all pages have been restyled
 @import "revised/sections/legacy_content"; // general legacy content styles

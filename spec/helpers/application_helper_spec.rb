@@ -46,6 +46,14 @@ describe ApplicationHelper do
           expect(helper.current_page_skeleton).to be_nil
         end
       end
+      %w(for_law_enfocement for_schools).each do |action|
+        context action do
+          it 'returns nil' do
+            allow(view).to receive(:action_name) { action }
+            expect(helper.current_page_skeleton).to be_nil
+          end
+        end
+      end
     end
     describe 'bikes controller' do
       before { allow(view).to receive(:controller_name) { 'bikes' } }
@@ -223,6 +231,28 @@ describe ApplicationHelper do
             expect(helper.current_page_skeleton).to eq 'content_skeleton'
           end
         end
+      end
+    end
+  end
+
+  describe 'body_class' do
+    context 'organized_skeleton' do
+      it 'returns organized-body' do
+        expect(helper).to receive(:current_page_skeleton) { 'organized_skeleton' }
+        expect(helper.body_class).to eq 'organized-body'
+      end
+    end
+    context 'landing_page controller' do
+      before { allow(view).to receive(:controller_name) { 'landing_pages' } }
+      it 'returns organized-body' do
+        expect(helper.body_class).to eq 'landing-page-body'
+      end
+    end
+    context 'bikes controller' do
+      before { allow(view).to receive(:controller_name) { 'bikes' } }
+      before { allow(view).to receive(:controller_namespace) { nil } }
+      it 'returns nil' do
+        expect(helper.body_class).to be_nil
       end
     end
   end

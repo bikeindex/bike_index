@@ -55,6 +55,7 @@ gem 'sitemap_generator'
 gem 'paranoia'
 
 gem 'sparkpost' # ruby client for email
+gem 'twitter' # Twitter. For rendering tweets
 
 # OAuth provider, Grape, associated parts of API V2
 gem 'doorkeeper'

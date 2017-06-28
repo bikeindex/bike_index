@@ -63,16 +63,40 @@ describe FeedbacksController do
       end
     end
 
-    context 'invalid feedback' do
+    context 'feedback with additional' do
       it 'creates a feedback message' do
-        set_current_user(user)
         expect do
-          post :create, feedback: feedback_attrs.merge(email: '')
+          post :create, feedback: feedback_attrs.merge(additional: 'stuff')
         end.to change(EmailFeedbackNotificationWorker.jobs, :size).by(0)
-        expect(response).to render_template(:index)
-        feedback = assigns(:feedback)
-        feedback_attrs.except(:email).each { |k, v| expect(feedback.send(k)).to eq(v) }
-        expect(assigns(:page_errors).full_messages.to_s).to match "Email can't be blank"
+        expect(flash[:error]).to match(/sign in/i)
+        expect(response).to redirect_to feedbacks_path(anchor: 'contact_us_section')
+      end
+    end
+
+    context 'invalid feedback' do
+      context 'no referrer' do
+        it 'does not create a feedback message' do
+          expect do
+            post :create, feedback: feedback_attrs.merge(email: '')
+          end.to change(EmailFeedbackNotificationWorker.jobs, :size).by(0)
+          expect(response).to render_template(:index)
+          feedback = assigns(:feedback)
+          feedback_attrs.except(:email).each { |k, v| expect(feedback.send(k)).to eq(v) }
+          expect(assigns(:page_errors).full_messages.to_s).to match "Email can't be blank"
+        end
+      end
+      context 'referrer set' do
+        it 'does not create a feedback message' do
+          set_current_user(user)
+          request.env['HTTP_REFERER'] = for_schools_url
+          expect do
+            post :create, feedback: feedback_attrs.merge(body: '')
+          end.to change(EmailFeedbackNotificationWorker.jobs, :size).by(0)
+          expect(response).to render_template('landing_pages/for_schools')
+          feedback = assigns(:feedback)
+          feedback_attrs.except(:body).each { |k, v| expect(feedback.send(k)).to eq(v) }
+          expect(assigns(:page_errors).full_messages.to_s).to match "Body can't be blank"
+        end
       end
     end
   end

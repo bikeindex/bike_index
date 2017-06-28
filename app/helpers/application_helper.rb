@@ -23,6 +23,7 @@ module ApplicationHelper
   #  - nil - which just calls yield directly
   def current_page_skeleton
     return 'organized_skeleton' if controller_namespace == 'organized' && action_name != 'landing'
+    return nil if @force_landing_page_render
     case controller_name
     when 'bikes'
       'edit_bike_skeleton' if %w(edit update).include?(action_name)
@@ -45,6 +46,14 @@ module ApplicationHelper
       action_name
     elsif controller_name == 'news'
       'news'
+    end
+  end
+
+  def body_class
+    if controller_name == 'landing_pages' || @force_landing_page_render
+      'landing-page-body'
+    elsif current_page_skeleton == 'organized_skeleton'
+      'organized-body'
     end
   end
 

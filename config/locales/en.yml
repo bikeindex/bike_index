@@ -35,6 +35,8 @@ en:
     stolen_howworks: "How it works"
     stolen_merging: "Stolen bike registry"
     landing_pages_show: "%{organization} Bike Registration"
+    landing_pages_for_law_enforcement: Bike Index for Law Enforcement
+    landing_pages_for_schools: Bike Index for Schools
   meta_descriptions:
     welcome_index: "The best bike registry: Simple, secure and free."
     welcome_user_home: "Your bikes on Bike Index"
@@ -61,6 +63,9 @@ en:
     stolen_index: "Bike Index helps recover your stolen bike"
     stolen_merging: "StolenBicycleRegistry.com merged with Bike Index in 2014 to become the largest open bike registration service in the world"
     landing_pages_show: "Register your bicycle with %{organization} - powered by Bike Index"
+    landing_pages_for_law_enforcement: Is your agency equipped to fight bike theft? Bike Index can help officers get bikes back into the right hands.
+    landing_pages_for_schools: With bicycle theft a growing problem across campuses everywhere, students’ bikes can be difficult to protect without help.
+
   doorkeeper:
     scopes:
       public: "Authenticate with you, view public information"

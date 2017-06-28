@@ -1,0 +1,92 @@
+%header
+  %h3
+    = link_to 'View all tweets', admin_tweets_url
+
+.row-fluid
+  .form.form-horizontal
+    .span6
+      .control-group.padded
+        %label.control-label
+          Twitter id
+        .controls
+          = text_field_tag :twitter_id, @tweet.twitter_id, disabled: true
+    .span6
+      .control-group.padded
+        %label.control-label
+          Tweet by
+        .controls
+          = text_field_tag :twitter_id, @tweet.tweetor, disabled: true
+.form
+  = form_for [:admin, @tweet], url: { action: 'update', controller: 'tweets' } do |f|
+    - if @tweet.errors.any?
+      #alert-block
+        .alert.alert-error
+          %h4
+            Please fix the following 
+            = pluralize(@tweet.errors.count, 'error')
+          %ul
+            - @tweet.errors.full_messages.each do |msg|
+              %li
+                = msg
+    .row-fluid
+      .span8
+        .control-group
+          = f.label :body_html, 'Tweet display html', class: 'control-label'
+          .blog-field
+            = f.text_area :body_html, rows: 4
+      .span4.padded
+        .control-group.avatar-upload
+          = f.label :image, 'Tweet photo', class: 'control-label'
+          .controls
+            .avatar-img
+              - if @tweet.image?
+                = image_tag(@tweet.image_url(:small))
+              - else
+                %p
+                  No picture!
+            = f.file_field :image
+        - if @tweet.image.present?
+          .control-group
+            = f.label :remove_image, class: 'control-label'
+            .controls
+              = f.check_box :remove_image
+    .row-fluid
+      .controls.radio-controls
+        <em>Tweet alignment in image:</em>
+        %label.radio
+          = f.radio_button :alignment, 'top-left'
+          top left
+        %label.radio
+          = f.radio_button :alignment, 'top-right'
+          top right
+        %label.radio
+          = f.radio_button :alignment, 'bottom-left'
+          bottom left
+        %label.radio
+          = f.radio_button :alignment, 'bottom-right'
+          bottom right
+    .row-fluid
+      .span12
+        = f.submit 'Save', class: 'button-green pull-right'
+
+.padded
+%hr
+%h3
+  Landing page rendering:
+= stylesheet_link_tag 'revised', media: 'all'
+
+.padded.cleafix
+
+.signup-landing-page
+  .container
+    .row
+      .landing-why-col
+        = render partial: '/landing_pages/tweet', locals: { tweet_id: @tweet.id }
+
+.padded
+%hr
+.control-group.padded
+%label.control-label
+  Twitter response data
+%pre
+  = @tweet.twitter_response.to_yaml

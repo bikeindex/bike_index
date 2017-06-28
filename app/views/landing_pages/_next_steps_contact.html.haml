@@ -1,0 +1,19 @@
+= form_for @feedback, html: { class: 'organized-form' } do |f|
+  .form-group
+    = f.label :name, 'Organization name', class: 'form-label'
+    = f.text_field :name, required: true, class: 'form-control'
+  - unless current_user.present?
+    .form-group
+      = f.label :email, class: 'form-label'
+      = f.text_field :email, class: 'form-control'
+  .form-group.additional-field
+    = f.label :additional, class: 'form-label'
+    = f.text_field :additional, class: 'form-control'
+  .form-group
+    = f.label :body, 'Message', class: 'form-label'
+    = f.text_area :body, class: 'form-control'
+
+  = f.hidden_field :feedback_type, value: "lead_for_#{landing_page_target}"
+
+  = f.submit 'Get in touch', class: 'btn btn-primary btn-lg'
+    
