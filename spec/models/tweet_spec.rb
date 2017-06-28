@@ -36,7 +36,7 @@ RSpec.describe Tweet, type: :model do
   describe 'auto_link_mentions' do
     it 'auto links mentioned folk' do
       input = 'Portland Patrol officer Baxter assists in another #biketheft recovery today in Old Town! Great looking out and using @stolenbikereg 👍'
-      target = 'Portland Patrol officer Baxter assists in another <a href="https://twitter.com/hashtag/biketheft">#biketheft</a> recovery today in Old Town! Great looking out and using <a href="https://twitter.com/stolenbikereg">@stolenbikereg</a> 👍'
+      target = 'Portland Patrol officer Baxter assists in another <a href="https://twitter.com/hashtag/biketheft" target="_blank">#biketheft</a> recovery today in Old Town! Great looking out and using <a href="https://twitter.com/stolenbikereg" target="_blank">@stolenbikereg</a> 👍'
       expect(Tweet.auto_link_text(input)).to eq target
     end
   end
@@ -45,7 +45,7 @@ RSpec.describe Tweet, type: :model do
     let(:tweet) { Tweet.new(twitter_id: '874644243737751553', twitter_response: twitter_response) }
     it 'sets the body on create' do
       tweet.save
-      expect(tweet.body_html).to eq 'Remember this stolen Novara? The "Wedding gift" bike? It has now been recovered with an assist by <a href="https://twitter.com/PPBBikeTheft">@PPBBikeTheft</a> :) https://t.co/hiZZYtCBC1'
+      expect(tweet.body_html).to eq 'Remember this stolen Novara? The "Wedding gift" bike? It has now been recovered with an assist by <a href="https://twitter.com/PPBBikeTheft" target="_blank">@PPBBikeTheft</a> :) https://t.co/hiZZYtCBC1'
     end
 
     it 'gives us the responses we want' do

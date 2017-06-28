@@ -19,10 +19,10 @@ class Tweet < ActiveRecord::Base
   def self.auto_link_text(text)
     text.gsub /@([^\s])*/ do
       username = Regexp.last_match[0]
-      "<a href=\"https://twitter.com/#{username.delete('@')}\">#{username}</a>"
+      "<a href=\"https://twitter.com/#{username.delete('@')}\" target=\"_blank\">#{username}</a>"
     end.gsub /#([^\s])*/ do
       hashtag = Regexp.last_match[0]
-      "<a href=\"https://twitter.com/hashtag/#{hashtag.delete('#')}\">#{hashtag}</a>"
+      "<a href=\"https://twitter.com/hashtag/#{hashtag.delete('#')}\" target=\"_blank\">#{hashtag}</a>"
     end
   end
 

@@ -4,7 +4,7 @@
   .landing-page-tweet
     = image_tag tweet.image
     .tweet-display{ class: "tweet-align-#{tweet.alignment}" }
-      %a.tweetor-header{ href: tweet.tweetor_link }
+      %a.tweetor-header{ href: tweet.tweetor_link, target: '_blank' }
         = image_tag tweet.tweetor_avatar
         %span.tweetor-name
           = tweet.tweetor_name
@@ -13,4 +13,4 @@
           @#{tweet.tweetor}
       .tweet-body
         = tweet.body_html.html_safe
-      %a.body-link{ href: tweet.tweet_link }
+      %a.body-link{ href: tweet.tweet_link, target: '_blank' }

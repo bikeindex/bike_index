@@ -142,7 +142,7 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law';
     .ribbon { display: none; }
 
     @include media-breakpoint-up(md) {
-      padding-top: 24*$vertical-height;
+      padding-top: 12*$vertical-height;
       padding-bottom: 0;
       .icon-wrapper {
         // There is a 1/6 overhang to the left (8.33333/6 ~ 1.33333)
