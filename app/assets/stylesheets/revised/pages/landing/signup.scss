@@ -225,26 +225,18 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law';
       margin-bottom: 2*$vertical-height;
     }
     .btn { width: 100%; margin-top: 2*$vertical-height; }
-    .trusted-by {
-      padding: 2.5*$vertical-height 0.5*$contact-us-gutter 12px;
-      background: white;
-      @include media-breakpoint-down(md) { display: none; }
-    }
   }
 }
 
 .signup-landing-page {
-  .mobile-bottom {
+  .mobile-contact-link {
     display: none;
-    margin-top: 2*$vertical-height;
-    .contact-internal-link {
+    margin: 2*$vertical-height 0 4*$vertical-height;
+    a {
       display: block;
       width: 20em;
       max-width: 100%;
       margin: 0 auto;
-    }
-    .trusted-by {
-      margin-top: 4*$vertical-height;
     }
     @include media-breakpoint-down(md) {
       display: block;

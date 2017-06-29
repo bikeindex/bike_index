@@ -16,6 +16,7 @@ class BikeIndex.Init extends BikeIndex
     new BikeIndex.NavHeader
     @loadFancySelects()
     @initializeNoTabLinks()
+    @initializeScrollToRef()
     window.BikeIndexAlerts = new window.Alerts
     # Put this last, so if it fails, we still have some functionality
     @loadPageScript(document.getElementsByTagName('body')[0].id)
@@ -60,6 +61,17 @@ class BikeIndex.Init extends BikeIndex
       else
         window.open(local, '_blank')
 
+  initializeScrollToRef: ->
+    $('.scroll-to-ref').click (e) ->
+      e.preventDefault()
+      $target = $(event.target)
+      # specify an additional manual offset if you'd like
+      offset = $target.attr('data-offset')
+      if offset? then offset = parseInt(offset, 10)
+      offset ||= -20
+      $('body').animate(
+        scrollTop: $($target.attr('href')).offset().top + offset, 'fast'
+      )
 
 # Check if the browser supports Flexbox
 warnIfUnsupportedBrowser = ->
