@@ -16,11 +16,29 @@ describe LandingPagesController do
   %w(for_law_enforcement for_schools).each do |landing_type|
     describe landing_type do
       it 'renders with correct title' do
-        get landing_type.to_sym
+        get landing_type.to_sym, preview: true
         expect(response.status).to eq(200)
         expect(response).to render_template(landing_type)
         expect(response).to render_with_layout('application_revised')
         expect(title).to eq "Bike Index #{landing_type.titleize.gsub(/\AF/, 'f')}"
+      end
+    end
+  end
+
+  describe 'view landing page' do
+    context 'non-preview enabled user' do
+      it 'redirects' do
+        get :for_law_enforcement
+        expect(response).to redirect_to root_url
+        expect(flash).to be_present
+      end
+    end
+    context 'preview enabled user' do
+      include_context :logged_in_as_super_admin
+      it 'redirects' do
+        get :for_schools
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:for_schools)
       end
     end
   end
