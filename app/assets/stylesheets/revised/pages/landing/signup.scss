@@ -230,7 +230,6 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law';
 
 .signup-landing-page {
   .mobile-contact-link {
-    display: none;
     margin: 2*$vertical-height 0 4*$vertical-height;
     a {
       display: block;
@@ -238,8 +237,8 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law';
       max-width: 100%;
       margin: 0 auto;
     }
-    @include media-breakpoint-down(md) {
-      display: block;
+    @include media-breakpoint-up(lg) {
+      display: none;
     }
   }
 }

@@ -4,13 +4,17 @@
 
 .row-fluid
   .form.form-horizontal
-    .span6
+    .span4
+      .control-group.padded
+        %small
+        = link_to @tweet.tweet_link.gsub(/https?..\//, ''), @tweet.tweet_link, target: '_blank'
+    .span4
       .control-group.padded
         %label.control-label
           Twitter id
         .controls
           = text_field_tag :twitter_id, @tweet.twitter_id, disabled: true
-    .span6
+    .span4
       .control-group.padded
         %label.control-label
           Tweet by
