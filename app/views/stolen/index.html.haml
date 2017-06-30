@@ -65,7 +65,7 @@
                     %ul
                       - @feedback.errors.full_messages.each do |msg|
                         %li 
-                          = msg  
+                          = msg
               .report-type
                 %label
                   = f.radio_button :title, "Someone is selling a stolen bike", checked: true
@@ -73,7 +73,11 @@
                 %label
                   = f.radio_button :title, "Bike ChopShop report"
                   Report a bicycle chop shop
-                    
+              %label
+                Reporting your own bike stolen? You need to
+                %a{ href: new_bike_path, style: "font-weight: bold; color: #fff; text-decoration: underline;" }
+                  register it
+                first
               .contact-text
                 = f.text_area :body, placeholder: "Where is this happening? URL, address - any information you have", rows: 5, class: 'form-control'
               .contact-actions.control-group
