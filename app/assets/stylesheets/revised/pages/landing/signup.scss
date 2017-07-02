@@ -195,8 +195,6 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law';
   $contact-us-gutter: 30px;
   .next-steps-col {
     margin-top: -8.5*$vertical-height;
-    position: -webkit-sticky;
-    position: sticky;
     @include media-breakpoint-down(md) {
       @include make-col-ready();
       @include make-col(12);
@@ -209,6 +207,9 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law';
       @include make-col-offset(1);
     }
     .next-steps-wrap {
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0;
       padding: 2.5*$vertical-height $contact-us-gutter;
       background: $gray-darker;
       border-radius: $border-radius;
