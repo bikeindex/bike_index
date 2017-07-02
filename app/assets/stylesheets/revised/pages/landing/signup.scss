@@ -182,6 +182,7 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law';
     @include make-col(8);
     @include media-breakpoint-down(md) {
       @include make-col(12);
+      min-height: auto;
     }
     @include media-breakpoint-up(lg) {
       @include make-col(7);
@@ -196,6 +197,7 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law';
     @include make-col(5);
     @include media-breakpoint-down(md) {
       @include make-col(12);
+      min-height: auto;
     }
     @include media-breakpoint-up(xl) {
       @include make-col(4);
