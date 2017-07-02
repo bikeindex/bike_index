@@ -1,0 +1,42 @@
+.organized-page-header
+  %h1
+    %em
+      = current_organization.name
+    bikes
+  %p
+    %strong
+      #{ pluralize(@bikes_count, 'bike') }
+    registered
+
+.organized-bikes-table.table-responsive
+  %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
+    %thead.small-header
+      %tr
+        %th.date-added Date added
+        %th Manufacturer
+        %th Model
+        %th Color
+        %th Sent to
+        / %th View PDF
+    %tbody
+      - @bikes.each do |bike|
+        %tr
+          %td
+            = link_to l(bike.created_at, format: :dotted), bike_path(bike)
+          %td
+            = bike.mnfg_name
+          %td
+            = bike.frame_model
+          %td
+            = bike.frame_colors.to_sentence
+          %td
+            = bike.first_owner_email
+            %small.less-strong
+              - if bike.creation_description
+                = bike.creation_description
+              - unless bike.owner_email == bike.first_owner_email
+                (sent to a new owner)
+          / %td
+- unless current_organization.is_paid
+  .paginate-container.paginate-container-bottom
+    = paginate @bikes
