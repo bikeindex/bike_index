@@ -34,6 +34,32 @@
 
         %p
           With now almost 4,000 succesful recoveries, Bike Index has experience to offer to your campus staff and security. You will have the support you need to increase bike protection on your campus.
+
+
+        .mobile-contact-link
+          %a.btn.btn-primary.btn-lg.scroll-to-ref{ href: '#contact-bike-index', data: { offset: -110 } }
+            Contact Bike Index
+
+        .trusted-by
+          %h3
+            Trusted by top universities and police departments
+          %ul
+            %li
+              = image_tag 'landing_pages/used_by.png'
+              %span A School
+            %li
+              = image_tag 'landing_pages/used_by.png'
+              %span Another School
+            %li
+              = image_tag 'landing_pages/used_by.png'
+              %span Another School
+            %li
+              = image_tag 'landing_pages/used_by.png'
+              %span A police Department
+            %li
+              = image_tag 'landing_pages/used_by.png'
+              %span A police Department
+
       .next-steps-col
         .next-steps-wrap
           %header#contact-bike-index
@@ -41,45 +67,5 @@
           = render partial: '/landing_pages/next_steps_contact', locals: { landing_page_target: landing_page_target }
           / %a.btn.btn-primary.btn-lg
           /   Get in touch
-        .next-steps-wrap
-          - trusted_by = capture_haml do
-            .trusted-by
-              %h3
-                Trusted by top universities and police departments
-              %ul
-                %li
-                  = image_tag 'landing_pages/used_by.png'
-                  %span A School
-                %li
-                  = image_tag 'landing_pages/used_by.png'
-                  %span Another School
-                %li
-                  = image_tag 'landing_pages/used_by.png'
-                  %span Another School
-                %li
-                  = image_tag 'landing_pages/used_by.png'
-                  %span A police Department
-                %li
-                  = image_tag 'landing_pages/used_by.png'
-                  %span A police Department
-          / = trusted_by
-
-    .row.mobile-bottom
-      .col-xs-12
-        %a.btn.btn-primary.btn-lg.contact-internal-link{ href: '#contact-bike-index' }
-          Contact the Bike Index
-      .col-xs-12
-        = trusted_by
-
+            
   = render '/landing_pages/footer'
-
-:javascript
-  $(document).ready(function() {
-    $('.contact-internal-link').click(function(e) {
-      event.preventDefault();
-      var $target = $($(event.target).attr('href'));
-      return $('body').animate({
-        scrollTop: $target.offset().top - 100
-      }, 'fast');
-    });
-  });

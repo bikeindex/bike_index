@@ -26,24 +26,25 @@ module AuthenticationHelper
     end
   end
 
-  def preview_enabled?
-    (current_user && $rollout.active?(:preview, current_user)) || (params && params[:preview])
+  def ensure_preview_enabled!
+    return true if preview_enabled?
+    flash[:notice] = "Sorry, you don't have permission to view that page"
+    redirect_to user_root_url and return
   end
 
   protected
 
   def remove_session
     cookies.delete(:auth)
-
   end
 
   def current_user
     @current_user ||= User.from_auth(cookies.signed[:auth])
   end
 
-  # def permitted_params
-  #   @permitted_params ||= PermittedParams.new(params, current_user)
-  # end
+  def preview_enabled?
+    (current_user && $rollout.active?(:preview, current_user)) || (params && params[:preview])
+  end
 
   def require_member!
     return true if current_user.is_member_of?(current_organization)

@@ -16,6 +16,7 @@ class BikeIndex.Init extends BikeIndex
     new BikeIndex.NavHeader
     @loadFancySelects()
     @initializeNoTabLinks()
+    @initializeScrollToRef()
     window.BikeIndexAlerts = new window.Alerts
     # Put this last, so if it fails, we still have some functionality
     @loadPageScript(document.getElementsByTagName('body')[0].id)
@@ -23,7 +24,10 @@ class BikeIndex.Init extends BikeIndex
     new BikeIndex.Organized if $('.organized-body').length > 0
 
   loadPageScript: (body_id) ->
-    # All the per-page javascripts
+    # If this is a landing page
+    if body_id.match 'landing_pages_for_'
+      return window.pageScript = new BikeIndex.LandingPage
+    # All the rest per-page javascripts
     pageClasses =
       welcome_index: BikeIndex.WelcomeIndex
       info_where: BikeIndex.InfoWhere
@@ -60,6 +64,17 @@ class BikeIndex.Init extends BikeIndex
       else
         window.open(local, '_blank')
 
+  initializeScrollToRef: ->
+    $('.scroll-to-ref').click (e) ->
+      e.preventDefault()
+      $target = $(event.target)
+      # specify an additional manual offset if you'd like
+      offset = $target.attr('data-offset')
+      if offset? then offset = parseInt(offset, 10)
+      offset ||= -20
+      $('body').animate(
+        scrollTop: $($target.attr('href')).offset().top + offset, 'fast'
+      )
 
 # Check if the browser supports Flexbox
 warnIfUnsupportedBrowser = ->

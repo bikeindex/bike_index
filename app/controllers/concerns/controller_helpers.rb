@@ -6,7 +6,7 @@ module ControllerHelpers
 
   included do
     helper_method :current_user, :current_organization, :user_root_url, :controller_namespace,
-                :page_id, :remove_session, :preview_enabled?, :forwarded_ip_address
+                  :page_id, :remove_session, :ensure_preview_enabled!, :forwarded_ip_address
     before_filter :enable_rack_profiler
   end
 

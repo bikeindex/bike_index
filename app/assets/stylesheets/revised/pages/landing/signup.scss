@@ -171,17 +171,15 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law';
 }
 
 .signup-landing-page {
-  .landing-why-col, .next-steps-col { @include make-col-ready(); }
   .main-body-row {
     @include media-breakpoint-down(md) {
       flex-direction: column-reverse;
     }
   }
+  .landing-why-col, .next-steps-col { @include make-col-ready(); }
   .landing-why-col {
     margin-top: 2*$vertical-height;
-    @include media-breakpoint-down(lg) {
-      @include make-col(8);
-    }
+    @include make-col(8);
     @include media-breakpoint-down(md) {
       @include make-col(12);
     }
@@ -195,24 +193,21 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law';
   $contact-us-gutter: 30px;
   .next-steps-col {
     margin-top: -8.5*$vertical-height;
-    @include make-col(4);
+    @include make-col(5);
     @include media-breakpoint-down(md) {
       @include make-col(12);
     }
-    @include media-breakpoint-up(md) {
-      padding: 0;
-    }
-    @include media-breakpoint-up(lg) {
+    @include media-breakpoint-up(xl) {
+      @include make-col(4);
       @include make-col-offset(1);
     }
     .next-steps-wrap {
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0;
       padding: 2.5*$vertical-height $contact-us-gutter;
       background: $gray-darker;
-      border-radius: $border-radius $border-radius 0 0;
-      &:last-of-type {
-        padding: 0 0.5*$contact-us-gutter 0.5*$contact-us-gutter;
-        border-radius: 0 0 $border-radius $border-radius;
-      }
+      border-radius: $border-radius;
     }
     .form-group.additional-field { display: none !important; }
     header {
@@ -225,29 +220,20 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law';
       margin-bottom: 2*$vertical-height;
     }
     .btn { width: 100%; margin-top: 2*$vertical-height; }
-    .trusted-by {
-      padding: 2.5*$vertical-height 0.5*$contact-us-gutter 12px;
-      background: white;
-      @include media-breakpoint-down(md) { display: none; }
-    }
   }
 }
 
 .signup-landing-page {
-  .mobile-bottom {
-    display: none;
-    margin-top: 2*$vertical-height;
-    .contact-internal-link {
+  .mobile-contact-link {
+    margin: 2*$vertical-height 0 4*$vertical-height;
+    a {
       display: block;
       width: 20em;
       max-width: 100%;
       margin: 0 auto;
     }
-    .trusted-by {
-      margin-top: 4*$vertical-height;
-    }
-    @include media-breakpoint-down(md) {
-      display: block;
+    @include media-breakpoint-up(lg) {
+      display: none;
     }
   }
 }
