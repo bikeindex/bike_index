@@ -24,35 +24,37 @@
       %th.table-cell-check
         Approved
     %tbody
-      - @organizations.each do |organization|
-        %tr
-          %td
-            = link_to organization.name, admin_organization_url(organization)
-            %small.less-strong.large-screens
-              = organization.org_type
-          %td.medium-screens
-            %span.hidden
-              = organization.created_at.to_i
-            - if organization.created_at.today?
-              Today at #{organization.created_at.strftime("%-I %p")}
-            - elsif Date.yesterday().beginning_of_day() <= organization.created_at
-              
-              Yesterday at #{organization.created_at.strftime("%-I %p")}
-            - else
-              = l organization.created_at, format: :dotted
-          %td
-            = @bikes.where(creation_organization_id: organization.id).count
-          %td.medium-screens
-            = organization.memberships.count
-          %td.large-screens
-            .less-strong-hold
-              
-              = organization.locations.count
-              - if organization.show_on_map
-                %span.less-strong-right
-                  Mapped
-          %td
-            = 'f' unless organization.approved
+      - cache("admin/#{@organizations.count}-#{@organizations.maximum(:updated_at)}") do
+        - @organizations.each do |organization|
+          - cache(organization) do
+            %tr
+              %td
+                = link_to organization.name, admin_organization_url(organization)
+                %small.less-strong.large-screens
+                  = organization.org_type
+              %td.medium-screens
+                %span.hidden
+                  = organization.created_at.to_i
+                - if organization.created_at.today?
+                  Today at #{organization.created_at.strftime("%-I %p")}
+                - elsif Date.yesterday().beginning_of_day() <= organization.created_at
+                  
+                  Yesterday at #{organization.created_at.strftime("%-I %p")}
+                - else
+                  = l organization.created_at, format: :dotted
+              %td
+                = organization.bikes.count
+              %td.medium-screens
+                = organization.memberships.count
+              %td.large-screens
+                .less-strong-hold
+                  
+                  = organization.locations.count
+                  - if organization.show_on_map
+                    %span.less-strong-right
+                      Mapped
+              %td
+                = 'f' unless organization.approved
 
 
 

@@ -27,11 +27,19 @@ module Organized
     def new
     end
 
+    helper_method :stolenness
+
     private
 
     def permitted_search_params
-      params.permit(*Bike.permitted_search_params).tap do |p|
-        p.merge!(stolenness: 'all') unless p[:stolenness].present? || p['stolenness'].present?
+      params.permit(*Bike.permitted_search_params).merge(stolenness: stolenness)
+    end
+
+    def stolenness
+      if params['stolenness'].present?
+        params['stolenness']
+      else
+        'all'
       end
     end
 
