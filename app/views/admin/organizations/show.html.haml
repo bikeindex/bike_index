@@ -54,7 +54,12 @@
           - else
             no landing page
         - else
-          false
+          - if LandingPages::ORGANIZATIONS.include?(@organization.slug)
+            %alert.alert-danger
+              IS NOT MARKED PAID BUT HAS A LANGING PAGE
+          - else
+            false
+
       %dt
         Created at
       %dd
