@@ -3,7 +3,6 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def index
     @organizations = Organization.all
-    @bikes = Bike
   end
 
   def show
