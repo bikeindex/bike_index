@@ -176,12 +176,10 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law';
       flex-direction: column-reverse;
     }
   }
+  .landing-why-col, .next-steps-col { @include make-col-ready(); }
   .landing-why-col {
-    @include make-col-ready();
     margin-top: 2*$vertical-height;
-    @include media-breakpoint-down(lg) {
-      @include make-col(8);
-    }
+    @include make-col(8);
     @include media-breakpoint-down(md) {
       @include make-col(12);
     }
@@ -195,15 +193,12 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law';
   $contact-us-gutter: 30px;
   .next-steps-col {
     margin-top: -8.5*$vertical-height;
+    @include make-col(5);
     @include media-breakpoint-down(md) {
-      @include make-col-ready();
       @include make-col(12);
     }
-    @include media-breakpoint-up(lg) {
-      float: right;
-      width: 33.33333%;
-    }
-    @include media-breakpoint-up(lg) {
+    @include media-breakpoint-up(xl) {
+      @include make-col(4);
       @include make-col-offset(1);
     }
     .next-steps-wrap {

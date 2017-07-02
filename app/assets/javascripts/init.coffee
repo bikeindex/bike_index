@@ -24,7 +24,10 @@ class BikeIndex.Init extends BikeIndex
     new BikeIndex.Organized if $('.organized-body').length > 0
 
   loadPageScript: (body_id) ->
-    # All the per-page javascripts
+    # If this is a landing page
+    if body_id.match 'landing_pages_for_'
+      return window.pageScript = new BikeIndex.LandingPage
+    # All the rest per-page javascripts
     pageClasses =
       welcome_index: BikeIndex.WelcomeIndex
       info_where: BikeIndex.InfoWhere
@@ -48,7 +51,6 @@ class BikeIndex.Init extends BikeIndex
       locks_new: BikeIndex.LocksForm
       locks_edit: BikeIndex.LocksForm
       locks_create: BikeIndex.LocksForm
-      bike_index_landing: BikeIndex.LandingPage
     window.pageScript = new pageClasses[body_id] if Object.keys(pageClasses).includes(body_id)
 
   initializeNoTabLinks: ->
