@@ -22,13 +22,13 @@ module ControllerHelpers
   end
 
   def recovered_bike_count
-    # if Rails.env.production?
+    if Rails.env.production?
       Rails.cache.fetch "recovered_bike_count_#{Date.today.to_formatted_s(:number)}" do
         StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count
       end
-    # else
-      # 3_020
-    # end
+    else
+      3_021
+    end
   end
 
   def controller_namespace
