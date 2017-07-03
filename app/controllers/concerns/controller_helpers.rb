@@ -6,7 +6,8 @@ module ControllerHelpers
 
   included do
     helper_method :current_user, :current_organization, :user_root_url, :controller_namespace,
-                  :page_id, :remove_session, :ensure_preview_enabled!, :forwarded_ip_address
+                  :page_id, :remove_session, :ensure_preview_enabled!, :forwarded_ip_address,
+                  :recovered_bike_count
     before_filter :enable_rack_profiler
   end
 
@@ -18,6 +19,16 @@ module ControllerHelpers
 
   def page_id
     @page_id ||= [controller_namespace, controller_name, action_name].compact.join('_')
+  end
+
+  def recovered_bike_count
+    if Rails.env.production?
+      Rails.cache.fetch "recovered_bike_count_#{Date.today.to_formatted_s(:number)}" do
+        StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count
+      end
+    else
+      3_021
+    end
   end
 
   def controller_namespace
