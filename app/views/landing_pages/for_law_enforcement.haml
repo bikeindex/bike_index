@@ -1,0 +1,64 @@
+- landing_page_target = 'law_enforcement'
+.signup-landing-page{ class: "signup-landing-page-#{landing_page_target}" }
+  %header.banner-header
+    .container
+      .banner.row
+        .icon-wrapper
+          = render "/landing_pages/icons/header_#{landing_page_target}_svg"
+        .banner-text
+          %h1 Bike Index for <br> Law Enforcement
+          %h3 Is your agency equipped to fight bike theft? Bike Index can help officers get bikes back into the right hands.
+    .ribbon
+      .container
+        %h2 Don’t let bike theft handcuff your department
+  .container
+    .row.main-body-row
+      .landing-why-col
+        %h3 What is Bike Index?
+        %p
+          Bike Index is the nation’s most widely used bicycle registration and recovery service. By partnering with Bike Index, your department will have access to our database of approximately 100,000 catalogued bikes, as well as a network of over 75,000 registered riders and 250+ additional partners across law enforcement agencies, bike organizations, pawnshops and retail businesses, dedicated to recovering lost or stolen bikes at no cost to their owner.
+
+
+        = render partial: '/landing_pages/tweet', locals: { tweet_id: 839247587521679360 }
+
+        %h3 How it works
+        %p
+          Bike Index users provide serial numbers, proof of ownership, photographs, component information and detailed descriptions of their bikes. When a bike is reported lost or stolen, our partners can search Bike Index to identify, locate, and track it from any computer or Smartphone. Our extensive archive has helped officers recover bikes involved in criminal situations ranging from simple theft to chop shops, drug houses, fencing rings, and online black markets.
+
+        = render partial: '/landing_pages/tweet', locals: { tweet_id: 875747265167491072 }
+
+        %p
+          Read about our over #{ number_with_delimiter recovered_bike_count.round(-2) } recoveries on our <a href="/news">blog</a>. For a complete list of Bike Index’s partners, visit <a href="/where">our partners page</a>, and for information on partnering with Bike Index, please contact us.
+
+
+        .mobile-contact-link
+          %a.btn.btn-primary.btn-lg.scroll-to-ref{ href: '#contact-bike-index', data: { offset: -110 } }
+            Contact Bike Index
+
+        .trusted-by
+          %h3
+            Trusted by top universities and police departments
+          %ul
+            %li
+              = image_tag 'landing_pages/used_by.png'
+              %span A School
+            %li
+              = image_tag 'landing_pages/used_by.png'
+              %span Another School
+            %li
+              = image_tag 'landing_pages/used_by.png'
+              %span Another School
+            %li
+              = image_tag 'landing_pages/used_by.png'
+              %span A police Department
+            %li
+              = image_tag 'landing_pages/used_by.png'
+              %span A police Department
+
+      .next-steps-col
+        .next-steps-wrap
+          %header#contact-bike-index
+            Talk to us today
+          = render partial: '/landing_pages/next_steps_contact', locals: { landing_page_target: landing_page_target }
+            
+  = render '/landing_pages/footer'

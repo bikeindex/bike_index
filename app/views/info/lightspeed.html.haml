@@ -13,7 +13,7 @@
 
     - if current_user.present? && current_user.memberships.present?
       %p
-        All you have to do is go to #{ link_to 'posintegration.bikeindex.org', 'https://posintegration.bikeindex.org' }, where you'll be asked to authorize Bike Index to access your Lightspeed Account.
+        All you have to do is go to #{ link_to 'bikeindex.org/connect_lightspeed', connect_lightspeed_path }, where you'll be asked to authorize Bike Index to access your Lightspeed Account.
     - else
       %p
         The first step is to create an account for yourself and your shop - you can do that <a href="#add_organization" class="scroll-to-ref">at the bottom of this page</a>
@@ -129,4 +129,4 @@
       Sign your shop up
 
 
-    = render "new_form"
+    = render "/organizations/new_form"

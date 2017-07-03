@@ -35,6 +35,8 @@ en:
     stolen_howworks: "How it works"
     stolen_merging: "Stolen bike registry"
     landing_pages_show: "%{organization} Bike Registration"
+    landing_pages_for_shops: Bike Index for Shops
+    landing_pages_for_advocacy: Bike Index for Advocacy Organizations
     landing_pages_for_law_enforcement: Bike Index for Law Enforcement
     landing_pages_for_schools: Bike Index for Schools
   meta_descriptions:

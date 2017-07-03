@@ -13,14 +13,18 @@ describe LandingPagesController do
     end
   end
 
-  %w(for_law_enforcement for_schools).each do |landing_type|
+  %w(for_shops for_advocacy for_law_enforcement for_schools).each do |landing_type|
     describe landing_type do
       it 'renders with correct title' do
         get landing_type.to_sym, preview: true
         expect(response.status).to eq(200)
         expect(response).to render_template(landing_type)
         expect(response).to render_with_layout('application_revised')
-        expect(title).to eq "Bike Index #{landing_type.titleize.gsub(/\AF/, 'f')}"
+        if landing_type == 'for_advocacy'
+          expect(title).to eq "Bike Index for Advocacy Organizations"
+        else
+          expect(title).to eq "Bike Index #{landing_type.titleize.gsub(/\AF/, 'f')}"
+        end
       end
     end
   end

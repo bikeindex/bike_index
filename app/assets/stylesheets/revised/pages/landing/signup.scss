@@ -3,7 +3,7 @@
   .primary-footer { margin-top: 0; }
 }
 
-$landing-page-targets: 'shop', 'school', 'advocacy', 'law';
+$landing-page-targets: 'shop', 'school', 'advocacy', 'law_enforcement';
 @each $target in $landing-page-targets {
   .signup-landing-page-#{$target} {
     .banner-header {
@@ -222,6 +222,11 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law';
       margin-bottom: 2*$vertical-height;
     }
     .btn { width: 100%; margin-top: 2*$vertical-height; }
+  }
+  .landing-lightspeed-logo {
+    max-width: 280px;
+    margin: 2*$vertical-height 0 -1 * $vertical-height 0;
+    display: block;
   }
 }
 

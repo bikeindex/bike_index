@@ -1,0 +1,72 @@
+- landing_page_target = 'shop'
+.signup-landing-page{ class: "signup-landing-page-#{landing_page_target}" }
+  %header.banner-header
+    .container
+      .banner.row
+        .icon-wrapper
+          = render "/landing_pages/icons/header_#{landing_page_target}_svg"
+        .banner-text
+          %h1 Bike Index for <br> Bike Shops
+          %h3 The most wide-reaching and effective tools against bike theft - period.
+
+    .ribbon
+      .container
+        %h2 Unite against bike theft
+  .container
+    .row.main-body-row
+      .landing-why-col
+        %h3 Why Bike Index?
+        %p
+          Bike Index is the nation’s largest and most effective bicycle registration and recovery service. By partnering with Bike Index, your shop will be able to register bikes for your customers and ensure they always have access to the vital information they need.
+
+        %p
+          Also we're free, and a non-profit
+
+        %p
+          It would be cool to get a tweet from a shop...
+
+        = render partial: '/landing_pages/tweet', locals: { tweet_id: 839247587521679360 }
+
+        %h3 Register bikes for your customers
+        %p
+          We offer an easy way for you to register your customer's bikes. You can simply put in three basic pieces of information at point of sale - serial number, manufacturer, color and the customer's email, and they will receive an email with all the pertinent information and their bicycle will be protected, forever, for free.
+
+        = image_tag 'lightspeed_logo.png', class: 'landing-lightspeed-logo', alt: 'Lightspeed logo'
+        %h3 Use Lightspeed Retail?
+        %p
+          We have an official Lightspeed add-on to provide entirely automated registration. If you store your serial numbers in the serial number field in Lightspeed, we can register every bike you sell. All you'll have to do is make sure you take the customer's email.
+        %p
+          <a href="/lightspeed">Learn more</a> or <a href="/connect_lightspeed">connect your Lightspeed account</a>.
+
+        .mobile-contact-link
+          %a.btn.btn-primary.btn-lg{ href: new_organization_path }
+            Sign up for Bike Index
+
+        .trusted-by
+          %h3
+            Trusted by top universities and police departments
+          %ul
+            %li
+              = image_tag 'landing_pages/used_by.png'
+              %span A School
+            %li
+              = image_tag 'landing_pages/used_by.png'
+              %span Another School
+            %li
+              = image_tag 'landing_pages/used_by.png'
+              %span Another School
+            %li
+              = image_tag 'landing_pages/used_by.png'
+              %span A police Department
+            %li
+              = image_tag 'landing_pages/used_by.png'
+              %span A police Department
+
+      .next-steps-col
+        .next-steps-wrap
+          %header#contact-bike-index
+            Sign up for free
+          %a.btn.btn-primary.btn-lg{ href: new_organization_path }
+            Get started
+            
+  = render '/landing_pages/footer'

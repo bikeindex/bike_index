@@ -26,7 +26,7 @@ Bikeindex::Application.routes.draw do
     get slug, to: 'landing_pages#show', organization_id: slug
   end
 
-  %w(for_law_enforcement for_schools).freeze.each do |page|
+  %w(for_shops for_advocacy for_law_enforcement for_schools).freeze.each do |page|
     get page, controller: 'landing_pages', action: page
   end
 
@@ -61,7 +61,7 @@ Bikeindex::Application.routes.draw do
 
   resources :feedbacks, only: [:index, :create]
   get 'vendor_signup', to: redirect('/organizations/new')
-  get 'lightspeed_integration', to: 'organizations#lightspeed_integration'
+  get 'connect_lightspeed', to: 'organizations#connect_lightspeed'
   get 'help', to: 'feedbacks#index'
   get 'feedbacks/new', to: redirect('/help')
   %w(support contact contact_us).each { |p| get p, to: redirect('/help') }
@@ -227,9 +227,10 @@ Bikeindex::Application.routes.draw do
 
   %w(support_the_index support_the_bike_index protect_your_bike privacy terms
      serials about where vendor_terms resources image_resources
-     how_not_to_buy_stolen dev_and_design).freeze.each do |page|
+     how_not_to_buy_stolen dev_and_design lightspeed).freeze.each do |page|
     get page, controller: 'info', action: page
   end
+  get 'lightspeed_integration', to: redirect('/lightspeed')
 
   %w(stolen_bikes roadmap security spokecard how_it_works).freeze.each { |p| get p, to: redirect('/resources') }
 

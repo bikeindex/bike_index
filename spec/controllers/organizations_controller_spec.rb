@@ -148,13 +148,28 @@ describe OrganizationsController do
     end
   end
 
-  describe 'lightspeed_integration' do
-    context 'revised' do
-      it 'renders with revised_layout' do
-        get :lightspeed_integration
-        expect(response.status).to eq(200)
-        expect(response).to render_template(:lightspeed_integration)
-        expect(response).to render_with_layout('application_revised')
+  describe 'connect_lightspeed' do
+    context 'with user with organization' do
+      include_context :logged_in_as_organization_admin
+      it 'redirects to posintegration' do
+        get :connect_lightspeed
+        expect(response).to redirect_to 'https://posintegration.bikeindex.org'
+      end
+    end
+    context 'with user without organization' do
+      include_context :logged_in_as_user
+      it 'redirects to posintegration' do
+        get :connect_lightspeed
+        expect(flash[:info]).to match(/organization/)
+        expect(response).to redirect_to new_organization_path
+      end
+    end
+    context 'without user' do
+      it 'redirects to posintegration' do
+        get :connect_lightspeed
+        expect(response).to redirect_to new_user_path
+        expect(flash[:info]).to match(/sign up/)
+        expect(session[:return_to]).to eq connect_lightspeed_path
       end
     end
   end

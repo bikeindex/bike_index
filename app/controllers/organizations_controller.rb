@@ -5,13 +5,23 @@ class OrganizationsController < ApplicationController
 
   def new
     session[:return_to] ||= new_organization_url unless current_user.present?
-    prep_new_organization
+    @organization = Organization.new
+    @active_section = "contact"
   end
 
-  def lightspeed_integration
-    session[:return_to] = lightspeed_integration_url unless current_user.present?
-    @stuff = session[:return_to]
-    prep_new_organization
+  def connect_lightspeed
+    if current_user && current_user.organizations.any?
+      redirect_to 'https://posintegration.bikeindex.org' and return
+    end
+
+    session[:return_to] = connect_lightspeed_path
+    if current_user.present?
+      flash[:info] = "You have to create an organization on Bike Index before you can connect with Lightspeed"
+      redirect_to new_organization_path
+    else
+      flash[:info] = "You have to sign up for an account on Bike Index before you can connect with Lightspeed"
+      redirect_to new_user_path and return
+    end
   end
 
   def create
@@ -71,14 +81,6 @@ class OrganizationsController < ApplicationController
   end
 
   protected
-
-  def prep_new_organization
-    unless current_user.present?
-      @user = User.new
-    end
-    @organization = Organization.new
-    @active_section = "contact"
-  end
 
   def set_bparam
     unless find_organization.auto_user.present?

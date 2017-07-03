@@ -1,0 +1,67 @@
+- landing_page_target = 'advocacy'
+.signup-landing-page{ class: "signup-landing-page-#{landing_page_target}" }
+  %header.banner-header
+    .container
+      .banner.row
+        .icon-wrapper
+          = render "/landing_pages/icons/header_#{landing_page_target}_svg"
+        .banner-text
+          %h1 Bike Index for <br> Advocacy Organizations
+          %h3 The most wide-reaching and effective tools against bike theft - period.
+
+    .ribbon
+      .container
+        %h2 Unite against bike theft
+  .container
+    .row.main-body-row
+      .landing-why-col
+        %h3 Why Bike Index?
+        %p
+          Bike Index is the nation’s largest and most effective bicycle registration and recovery service. By partnering with Bike Index, your shop will be able to register bikes for your customers and ensure they always have access to the vital information they need.
+
+        %p
+          Also we're free, and a non-profit
+
+        %p
+          It would be cool to get a tweet from an advocacy organization... There are a bunch, I'm sure.
+
+        = render partial: '/landing_pages/tweet', locals: { tweet_id: 839247587521679360 }
+
+        %h3 Partner made in heaven
+        %p
+          Run registration drives? Include a widget on your page? You should add Bike Index and connect with your constituents!
+        %p
+          Read about our over #{ number_with_delimiter recovered_bike_count.round(-2) } recoveries on our <a href="/news">blog</a>. For a complete list of Bike Index’s partners, visit <a href="/where">our partners page</a>, and for information on partnering with Bike Index, please contact us.
+
+        .mobile-contact-link
+          %a.btn.btn-primary.btn-lg{ href: new_organization_path }
+            Sign up for Bike Index
+
+        .trusted-by
+          %h3
+            Trusted by top universities and police departments
+          %ul
+            %li
+              = image_tag 'landing_pages/used_by.png'
+              %span A School
+            %li
+              = image_tag 'landing_pages/used_by.png'
+              %span Another School
+            %li
+              = image_tag 'landing_pages/used_by.png'
+              %span Another School
+            %li
+              = image_tag 'landing_pages/used_by.png'
+              %span A police Department
+            %li
+              = image_tag 'landing_pages/used_by.png'
+              %span A police Department
+
+      .next-steps-col
+        .next-steps-wrap
+          %header#contact-bike-index
+            Sign up for free
+          %a.btn.btn-primary.btn-lg{ href: new_organization_path }
+            Get started
+            
+  = render '/landing_pages/footer'
