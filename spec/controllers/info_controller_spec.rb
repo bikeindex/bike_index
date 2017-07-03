@@ -2,7 +2,9 @@ require 'spec_helper'
 
 describe InfoController do
   describe 'revised views' do
-    pages = %w(about protect_your_bike where serials image_resources resources dev_and_design support_the_index terms vendor_terms support_the_index)
+    pages = %w(about protect_your_bike where serials image_resources resources
+               dev_and_design support_the_index terms vendor_terms support_the_index
+               lightspeed)
     context 'no user' do
       pages.each do |page|
         context "#{page} with revised_layout enabled" do

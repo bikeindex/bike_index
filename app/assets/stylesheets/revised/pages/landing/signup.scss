@@ -223,6 +223,11 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law_enforcement';
     }
     .btn { width: 100%; margin-top: 2*$vertical-height; }
   }
+  .landing-lightspeed-logo {
+    max-width: 280px;
+    margin: 2*$vertical-height 0 -1 * $vertical-height 0;
+    display: block;
+  }
 }
 
 .signup-landing-page {
