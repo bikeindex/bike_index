@@ -13,7 +13,7 @@ describe LandingPagesController do
     end
   end
 
-  %w(for_law_enforcement for_schools).each do |landing_type|
+  %w(for_shops for_advocacy for_law_enforcement for_schools).each do |landing_type|
     describe landing_type do
       it 'renders with correct title' do
         get landing_type.to_sym, preview: true

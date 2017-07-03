@@ -3,7 +3,7 @@
   .primary-footer { margin-top: 0; }
 }
 
-$landing-page-targets: 'shop', 'school', 'advocacy', 'law';
+$landing-page-targets: 'shop', 'school', 'advocacy', 'law_enforcement';
 @each $target in $landing-page-targets {
   .signup-landing-page-#{$target} {
     .banner-header {
