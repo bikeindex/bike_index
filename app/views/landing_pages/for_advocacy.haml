@@ -7,31 +7,28 @@
           = render "/landing_pages/icons/header_#{landing_page_target}_svg"
         .banner-text
           %h1 Bike Index for <br> Advocacy Organizations
-          %h3 The most wide-reaching and effective tools against bike theft - period.
+          %h3 The most wide-reaching and effective tools against bike theft - period. 
 
     .ribbon
       .container
-        %h2 Unite against bike theft
+        %h2 Leverage us for your mission
   .container
     .row.main-body-row
       .landing-why-col
         %h3 Why Bike Index?
         %p
-          Bike Index is the nation’s largest and most effective bicycle registration and recovery service. By partnering with Bike Index, your shop will be able to register bikes for your customers and ensure they always have access to the vital information they need.
+          Gone are the days where you had to register your bike in your neighborhood, county, city, state and country. Bike Index provides one registry, giving all registrants around the U.S. access to our network of over 120,000 cyclists.  Our goal is to provide free and easy access to our registry for anyone and everyone who rides a bicycle, in any capacity.  
 
         %p
-          Also we're free, and a non-profit
+          We want to recover bikes that are stolen. And so do you. We need your help spreading the Bike Index word. In return, we can offer you the most widely used bike registration system in the country.
 
-        %p
-          It would be cool to get a tweet from an advocacy organization... There are a bunch, I'm sure.
+        = render partial: '/landing_pages/tweet', locals: { tweet_id: 875377223322259457 }
 
-        = render partial: '/landing_pages/tweet', locals: { tweet_id: 839247587521679360 }
-
-        %h3 Partner made in heaven
+        %h3 Partners made in heaven
         %p
           Run registration drives? Include a widget on your page? You should add Bike Index and connect with your constituents!
         %p
-          Read about our over #{ number_with_delimiter recovered_bike_count.round(-2) } recoveries on our <a href="/news">blog</a>. For a complete list of Bike Index’s partners, visit <a href="/where">our partners page</a>, and for information on partnering with Bike Index, please contact us.
+          Read about our over #{ number_with_delimiter recovered_bike_count.round(-2) } recoveries on our <a href="/news">blog</a>. For a complete list of Bike Index’s partners, visit <a href="/where">our partners page</a>. For information on partnering with Bike Index, please <a href="mailto:lily@bikeindex.org">contact us</a>.
 
         .mobile-contact-link
           %a.btn.btn-primary.btn-lg{ href: new_organization_path }
