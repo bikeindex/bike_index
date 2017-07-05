@@ -51,6 +51,10 @@ class StolenRecord < ActiveRecord::Base
     '%a %b %d %Y'
   end
 
+  def self.iso8601_date_format
+    '%Y-%m-%d'
+  end
+
   def self.revised_date_format_hour
     "#{revised_date_format} %H"
   end
