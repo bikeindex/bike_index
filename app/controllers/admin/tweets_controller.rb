@@ -1,7 +1,7 @@
 class Admin::TweetsController < Admin::BaseController
   before_filter :find_tweet, except: [:new, :create, :index]
   def index
-    @tweets = Tweet.all
+    @tweets = Tweet.order(created_at: :desc)
   end
 
   def show
