@@ -14,21 +14,21 @@
   .container
     .row.main-body-row
       .landing-why-col
-        %h3 What is Bike Index?
+        %h3 Why is Bike Index?
         %p
-          Bike Index is the nation’s most widely used bicycle registration and recovery service. By partnering with Bike Index, your department will have access to our database of approximately 100,000 catalogued bikes, as well as a network of over 75,000 registered riders and 250+ additional partners across law enforcement agencies, bike organizations, pawnshops and retail businesses, dedicated to recovering lost or stolen bikes at no cost to their owner.
+          Bike Index is the nation’s most widely used bicycle registration and recovery service. By partnering with Bike Index, your department will have access to our database of approximately 120,000 catalogued bikes, as well as a network of over 80,000 registered riders. We have 370+ additional partners across law enforcement agencies, bike organizations, pawn shops and retail businesses, all dedicated to recovering lost or stolen bikes, at no cost to the owners.
 
-
+        %p
+          You're the first one people call when their bike is stolen. You have the authority to bring bikes back, and it's not an easy job - we know. Let us provide you with tools to make this process smoother.
+        
         = render partial: '/landing_pages/tweet', locals: { tweet_id: 839247587521679360 }
 
         %h3 How it works
         %p
-          Bike Index users provide serial numbers, proof of ownership, photographs, component information and detailed descriptions of their bikes. When a bike is reported lost or stolen, our partners can search Bike Index to identify, locate, and track it from any computer or Smartphone. Our extensive archive has helped officers recover bikes involved in criminal situations ranging from simple theft to chop shops, drug houses, fencing rings, and online black markets.
-
-        = render partial: '/landing_pages/tweet', locals: { tweet_id: 875747265167491072 }
+          Bike Index users provide serial numbers, proof of ownership and identifying information about their bikes. When a bike is reported lost or stolen, our partners can search Bike Index to identify, locate, and track it from any computer or smartphone. Our extensive archive has helped officers recover bikes involved in criminal situations, from simple theft to chop shops, drug houses - even fencing rings and online black markets.
 
         %p
-          Read about our over #{ number_with_delimiter recovered_bike_count.round(-2) } recoveries on our <a href="/news">blog</a>. For a complete list of Bike Index’s partners, visit <a href="/where">our partners page</a>, and for information on partnering with Bike Index, please contact us.
+          Read about our over #{ number_with_delimiter recovered_bike_count.round(-2) } recoveries on our <a href="/news">blog</a>. For a complete list of Bike Index’s partners, visit <a href="/where">our partners page</a>, and for information on partnering with Bike Index, please <a hreft="mailto:lily@bikeindex.org">contact us</a>.
 
 
         .mobile-contact-link
