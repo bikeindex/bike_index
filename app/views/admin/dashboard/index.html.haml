@@ -34,16 +34,16 @@
           %td.medium-screens
             - if user.created_at.today?
               %span.hidden
-                = user.created_at.strftime("%-m.%-d.%Y %-H.%M")
+                = user.created_at.strftime("%Y-%m-%d %-H.%M")
               Today at #{user.created_at.strftime("%-I %p")}
             - elsif Date.yesterday().beginning_of_day() <= user.created_at
               %span.hidden
-                = user.created_at.strftime("%-m.%-d.%Y %-H.%M")
+                = user.created_at.strftime("%Y-%m-%d %-H.%M")
               Yesterday at #{user.created_at.strftime("%-I %p")}
             - else
               %span.hidden
-                = user.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              = user.created_at.strftime("%-m/%-d/%Y at %-I %p")
+                = user.created_at.strftime("%Y-%m-%d %-H.%M")
+              = user.created_at.strftime("%Y-%m-%d at %-I %p")
           %td
             = link_to user.email, edit_admin_user_url(user)
           %td
@@ -98,16 +98,16 @@
           %td
             - if flavor.created_at.today?
               %span.hidden
-                = flavor.created_at.strftime("%-m.%-d.%Y %-H.%M")
+                = flavor.created_at.strftime("%Y-%m-%d %-H.%M")
               Today at #{flavor.created_at.strftime("%-I %p")}
             - elsif Date.yesterday().beginning_of_day() <= flavor.created_at
               %span.hidden
-                = flavor.created_at.strftime("%-m.%-d.%Y %-H.%M")
+                = flavor.created_at.strftime("%Y-%m-%d %-H.%M")
               Yesterday at #{flavor.created_at.strftime("%-I %p")}
             - else
               %span.hidden
-                = flavor.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              = flavor.created_at.strftime("%-m/%-d/%Y at %-I %p")
+                = flavor.created_at.strftime("%Y-%m-%d %-H.%M")
+              = flavor.created_at.strftime("%Y/%m/%d at %-I %p")
           %td
             = link_to "delete", admin_flavor_text_url(flavor), method: :delete
 

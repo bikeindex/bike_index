@@ -51,7 +51,7 @@
                 - elsif Date.yesterday().beginning_of_day() <= bike.created_at
                   Yesterday at #{bike.created_at.strftime("%-I %p")}
                 - else
-                  = bike.created_at.strftime("%-m.%-d.%Y")
+                  = bike.created_at.strftime("%Y-%m-%d")
 
             %td
               - if bike.manufacturer_other.present?
