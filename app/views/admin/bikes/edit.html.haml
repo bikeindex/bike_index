@@ -20,7 +20,7 @@
         - if @bike.current_stolen_record.present?
           = @bike.dl_list_item(@bike.current_stolen_record.phone, 'Phone')
       %dl.dl-horizontal
-        = @bike.dl_list_item(@bike.created_at.strftime('%m-%d-%Y'), 'Created')
+        = @bike.dl_list_item(@bike.created_at.strftime('%Y-%m-%d'), 'Created')
         - if @bike.creation_organization.present?
           = @bike.dl_list_item(@bike.creation_organization.name, 'Creation org')
           = @bike.dl_from_attribute('cached_data')
@@ -208,16 +208,16 @@
             %td
               - if ownership.created_at.today?
                 %span.hidden
-                  = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
+                  = ownership.created_at.strftime("%Y-%m-%d %-H.%M")
                 Today at #{ownership.created_at.strftime("%-I %p")}
               - elsif Date.yesterday().beginning_of_day() <= ownership.created_at
                 %span.hidden
-                  = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
+                  = ownership.created_at.strftime("%Y-%m-%d %-H.%M")
                 Yesterday at #{ownership.created_at.strftime("%-I %p")}
               - else
                 %span.hidden
-                  = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
-                = ownership.created_at.strftime("%-m/%-d/%Y at %-I %p")
+                  = ownership.created_at.strftime("%Y-%m-%d %-H.%M")
+                = ownership.created_at.strftime("%Y-%m-%d at %-I %p")
             %td
               - u = ownership.creator
               - if u.name.present?
