@@ -1,7 +1,7 @@
 class LandingPagesController < ApplicationController
   layout 'application_revised'
   before_filter :instantiate_feedback, except: [:show]
-  before_filter :ensure_preview_enabled!, only: [:for_schools, :for_law_enforcement]
+  before_filter :ensure_preview_enabled!, only: [:for_shops, :for_advocacy, :for_schools, :for_law_enforcement]
   def show
     raise ActionController::RoutingError, 'Not found' unless current_organization.present?
   end
