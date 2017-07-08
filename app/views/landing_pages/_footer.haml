@@ -1,7 +1,11 @@
+- is_root ||= false
+
 %nav.banner-footer
   %span.chainring-bg
   %span.chainring-bg
   .container
+    - if is_root
+      %h3.landing-container-label Bike Index is for
     %ul
       %li
         .landing-group-card

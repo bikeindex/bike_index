@@ -1,0 +1,41 @@
+.root-landing-page
+  %header.banner-header
+    .container
+      .banner.row
+        .banner-text
+          %h1 Bike Index for <br> Universities
+          %h3 So many campus members ride bicycles. Protecting these bikes can be a full-time job. Let us help.
+
+  .root-landing-recovery-stories
+    .container
+      .row
+        .recovery-story-wrapper
+          %h3
+            Recovery story goes here
+
+  .root-landing-how-it-works
+    .container
+      .row
+        register, etc
+            
+  = render partial: '/landing_pages/footer', locals: { is_root: true }
+
+  .root-landing-who
+    .container
+      %h3.landing-container-label Used By
+      .root-landing-who-wrap
+        .root-landing-who-square
+          = image_tag 'landing_pages/partners/people_for_bikes.png', alt: 'People For Bikes'
+        .root-landing-who-square
+          = image_tag 'landing_pages/partners/people_for_bikes.png', alt: 'People For Bikes'
+        .root-landing-who-rectangle
+          = image_tag 'landing_pages/partners/bike_east_bay.png', alt: 'Bike East Bay'
+        .root-landing-who-square
+          = image_tag 'landing_pages/partners/people_for_bikes.png', alt: 'People For Bikes'
+        .root-landing-who-rectangle
+          = image_tag 'landing_pages/partners/bike_east_bay.png', alt: 'Bike East Bay'
+        .root-landing-who-square
+          = image_tag 'landing_pages/partners/people_for_bikes.png', alt: 'People For Bikes'
+        .root-landing-who-rectangle
+          = image_tag 'landing_pages/partners/bike_east_bay.png', alt: 'Bike East Bay'
+
