@@ -1,10 +1,38 @@
 .root-landing-page
-  %header.banner-header
+  %header.root-landing-banner-header
     .container
-      .banner.row
-        .banner-text
-          %h1 Bike Index for <br> Universities
-          %h3 So many campus members ride bicycles. Protecting these bikes can be a full-time job. Let us help.
+      .row
+        .root-landing-header-text
+          %p
+            %strong
+              = number_with_delimiter recovered_bike_count
+            bikes recovered.
+          %h1 Bike Registration that Works
+        .root-landing-signup
+          = form_for User.new do |f|
+            .form-group
+              = f.label :email, class: 'sr-only'
+              = f.email_field :email, placeholder: 'email', class: 'form-control'
+            .form-group
+              = f.label :name, class: 'sr-only'
+              = f.text_field :name, placeholder: 'name', class: 'form-control'
+            .form-group
+              = f.label :password, class: 'sr-only'
+              = f.password_field :password, placeholder: 'password', class: 'form-control'
+
+            .checkbox
+              %label
+                = f.check_box :terms_of_service
+                I agree to Bike Index 
+                %a.no-tab{ data: { target: terms_url } }
+                  terms and conditions
+
+            = f.submit 'Sign up for free', class: 'btn btn-success btn-lg'
+            .or-block
+              or
+            %a.btn.btn-primary.btn-lg.root-landing-facebook{ href: '/auth/facebook' }
+              SIgn up with Facebook
+
 
   .root-landing-recovery-stories
     .container
