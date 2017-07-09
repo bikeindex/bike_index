@@ -21,7 +21,7 @@ describe LandingPagesController do
         expect(response).to render_template(landing_type)
         expect(response).to render_with_layout('application_revised')
         if landing_type == 'for_advocacy'
-          expect(title).to eq "Bike Index for Advocacy Organizations"
+          expect(title).to eq 'Bike Index for Advocacy Organizations'
         else
           expect(title).to eq "Bike Index #{landing_type.titleize.gsub(/\AF/, 'f')}"
         end
@@ -40,9 +40,9 @@ describe LandingPagesController do
     context 'preview enabled user' do
       include_context :logged_in_as_super_admin
       it 'redirects' do
-        get :for_schools
+        get :new_homepage
         expect(response.status).to eq(200)
-        expect(response).to render_template(:for_schools)
+        expect(response).to render_template(:new_homepage)
       end
     end
   end
