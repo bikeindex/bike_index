@@ -7,18 +7,22 @@
             %strong
               = number_with_delimiter recovered_bike_count
             bikes recovered.
-          %h1 Bike Registration that Works
+          %h1
+            <span>Bike</span> <span>Registration</span> <span>that</span> <span>Works</span>
+          %a.btn.btn-lg.btn-success.signup-link{ href: new_user_path }
+            Get started, it's free
         .root-landing-signup
           = form_for User.new do |f|
             .form-group
-              = f.label :email, class: 'sr-only'
-              = f.email_field :email, placeholder: 'email', class: 'form-control'
-            .form-group
-              = f.label :name, class: 'sr-only'
+              = f.label :name, 'full name', class: 'sr-only'
               = f.text_field :name, placeholder: 'name', class: 'form-control'
-            .form-group
-              = f.label :password, class: 'sr-only'
-              = f.password_field :password, placeholder: 'password', class: 'form-control'
+            .row
+              .form-group.col-md-6
+                = f.label :email, class: 'sr-only'
+                = f.email_field :email, placeholder: 'email', class: 'form-control'
+              .form-group.col-md-6
+                = f.label :password, class: 'sr-only'
+                = f.password_field :password, placeholder: 'password', class: 'form-control'
 
             .checkbox
               %label
@@ -31,7 +35,7 @@
             .or-block
               or
             %a.btn.btn-primary.btn-lg.root-landing-facebook{ href: '/auth/facebook' }
-              Sign up with Facebook
+              Sign up for free with Facebook
 
 
   .root-landing-recovery-stories
