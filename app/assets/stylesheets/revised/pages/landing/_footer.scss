@@ -1,4 +1,4 @@
-.signup-landing-page, .root-landing-page {
+.org-signup-landing-page, .root-landing-page {
   .banner-footer {
     background-color: $blue-dark;
     margin-top: 5*$vertical-height;
@@ -74,7 +74,7 @@
 }
 
 @media (max-width: $grid-breakpoint-lg - 1px) {
-  .signup-landing-page, .root-landing-page {
+  .org-signup-landing-page, .root-landing-page {
     .banner-footer ul li {
       margin: 2*$vertical-height auto 0;
       background: white;
@@ -110,7 +110,7 @@
   }
 }
 @media (min-width: $grid-breakpoint-lg) {
-  .signup-landing-page, .root-landing-page {
+  .org-signup-landing-page, .root-landing-page {
     .banner-footer ul {
       @include make-row;
       li {
@@ -143,7 +143,7 @@
  @media (min-width: $grid-breakpoint-lg) and (max-width: $grid-breakpoint-xl) {
   // Between lg & xl, text breaks an extra line and throws everything off
   // so make it wider ;)
-  .signup-landing-page, .root-landing-page {
+  .org-signup-landing-page, .root-landing-page {
     .banner-footer ul li p {
       width: 130%;
       margin-left: -15%;
