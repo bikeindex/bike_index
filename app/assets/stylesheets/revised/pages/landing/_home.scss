@@ -1,6 +1,10 @@
 .root-landing-page {
-  h3.landing-container-label {  
-    text-align: center;
+  h3.landing-container-label { text-align: center; }
+  .root-action-btn {
+    display: block;
+    max-width: 30em;
+    width: 80%;
+    margin: 3*$vertical-height auto 0;
   }
 }
 
@@ -24,12 +28,7 @@
     h1 {
       font-size: 60px;
     }
-    .signup-link {
-      display: none;
-      max-width: 30em;
-      width: 80%;
-      margin: 3*$vertical-height auto 0;
-    }
+    .root-action-btn { display: none; }
   }
   .root-landing-signup {
     display: none;
@@ -77,7 +76,7 @@
   }
   @include media-breakpoint-down(md) {
     .root-landing-header-text {
-      .signup-link { display: block; }
+      .root-action-btn { display: block; }
     }
   }
   @include media-breakpoint-up(lg) {
@@ -99,6 +98,41 @@
 .root-landing-recovery-stories {
   background: #f9f9f9;
   padding: 4*$vertical-height;
+}
+
+
+.root-landing-how-it-works {
+  padding-top: 4*$vertical-height;
+  h3.landing-container-label, h4 { color: $header-font-nocolor; }
+  .row {
+    margin-top: 6*$vertical-height;
+    &:nth-of-type(2n) .root-landing-how-icon { @include make-col-offset(3); }
+  }
+  .root-landing-how-icon {
+    padding-right: 0;
+    svg, img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+  }
+  .root-landing-explanation {
+    .root-landing-explanation-wrap {
+      position: relative;
+      top: 50%;
+      transform: translateY(-50%);
+      padding-left: 15px;
+    }
+    h4 {
+      font-size: 21px;
+      margin-bottom: $vertical-height;
+    }
+    p {
+      color: $gray-light;
+      font-size: 18px;
+      margin-bottom: 0;
+    }
+  }
 }
 
 .root-landing-who {

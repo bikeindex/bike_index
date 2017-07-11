@@ -9,7 +9,7 @@
             bikes recovered.
           %h1
             <span>Bike</span> <span>Registration</span> <span>that</span> <span>Works</span>
-          %a.btn.btn-lg.btn-success.signup-link{ href: new_user_path }
+          %a.btn.btn-lg.btn-success.root-action-btn{ href: new_user_path }
             Get started, it's free
         .root-landing-signup
           = form_for User.new do |f|
@@ -47,8 +47,42 @@
 
   .root-landing-how-it-works
     .container
+      %h3.landing-container-label But How Does it work?
       .row
-        register, etc
+        .col-md-2.root-landing-how-icon
+          = image_tag 'landing_pages/how_icon_register.svg', alt: 'Register your bike'
+        .col-md-7.root-landing-explanation
+          .root-landing-explanation-wrap
+            %h4 Register Your Bike
+            %p
+              It’s simple. Submit your name, bike manufacturer, serial number, and component information to enter your bike into the most widely used bike registry on the planet.
+      .row
+        .col-md-2.root-landing-how-icon
+          = image_tag 'landing_pages/how_icon_alert.svg', alt: 'Alert the community'
+        .col-md-7.root-landing-explanation
+          .root-landing-explanation-wrap
+            %h4 Alert the Community
+            %p
+              If your bike goes missing, mark it as lost or stolen to notify the entire Bike Index community and its partners.
+      .row
+        .col-md-2.root-landing-how-icon
+          = image_tag 'landing_pages/how_icon_responds.svg', alt: 'The community responds'
+        .col-md-7.root-landing-explanation
+          .root-landing-explanation-wrap
+            %h4 The community responds
+            %p
+              A user or partner encounters your bike, uses Bike Index to identify it, and contacts you.
+      .row
+        .col-md-2.root-landing-how-icon
+          = image_tag 'landing_pages/how_icon_recover.svg', alt: 'Recover your bike'
+        .col-md-7.root-landing-explanation
+          .root-landing-explanation-wrap
+            %h4 You Get your Bike Back
+            %p
+              With the help of the Bike Index community and its partners, you have the information necessary to recover your lost or stolen bike at no cost to you. It’s what we do.
+
+    %a.btn.btn-lg.btn-success.root-action-btn{ href: new_bike_path }
+      Register now!
             
   = render partial: '/landing_pages/footer', locals: { is_root: true }
 
