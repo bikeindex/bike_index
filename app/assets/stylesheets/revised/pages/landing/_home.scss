@@ -119,6 +119,11 @@
         top: 72%;
       }
     }
+    @include media-breakpoint-down(sm) {
+      &:last-of-type .root-landing-explanation {
+        padding-top: 0;
+      }
+    }
   }
   .root-landing-how-icon {
     padding-right: 0;
@@ -126,6 +131,10 @@
       width: 100%;
       height: auto;
       display: block;
+    }
+    @include media-breakpoint-down(sm) {
+      width: 50%;
+      margin: 0 auto;
     }
     .root-icon-connector {
       display: none;
@@ -157,6 +166,10 @@
       font-size: 18px;
       margin-bottom: 0;
     }
+    @include media-breakpoint-down(sm) {
+      padding-top: 4*$vertical-height;
+      h4, p { text-align: center; }
+    }
   }
 }
 
@@ -174,14 +187,14 @@
     flex-wrap: wrap;
   }
   .root-landing-who-square, .root-landing-who-rectangle {
-    padding: $vertical-height 2*$vertical-height 2*$vertical-height;
+    padding: $vertical-height 0.5*$vertical-height 2*$vertical-height;
     img {
       display: block;
       width: 100%;
       height: auto;
       position: relative;
-      top: 50%;
-      transform: translateY(-50%);
+      // top: 50%;
+      // transform: translateY(-50%);
     }
   }
   .root-landing-who-square { flex: 0 0 10%; }
