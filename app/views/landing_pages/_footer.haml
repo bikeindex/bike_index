@@ -1,7 +1,11 @@
+- is_root ||= false
+
 %nav.banner-footer
   %span.chainring-bg
   %span.chainring-bg
   .container
+    - if is_root
+      %h3.landing-container-label Bike Index is for
     %ul
       %li
         .landing-group-card
@@ -10,7 +14,7 @@
           .col-xs-8
             %h4 Bike Shops
             %p Protect your customers' purchases
-            %a{ href: for_shops_path }
+            %a.btn.btn-lg.btn-outline-success{ href: for_shops_path }
               Learn More
       %li
         .landing-group-card
@@ -19,7 +23,7 @@
           .col-xs-8
             %h4 Schools
             %p Safeguard your campus
-            %a{ href: for_schools_path }
+            %a.btn.btn-lg.btn-outline-success{ href: for_schools_path }
               Learn More
       %li
         .landing-group-card
@@ -28,7 +32,7 @@
           .col-xs-8
             %h4 Community Groups
             %p Promote anti-theft awareness
-            %a{ href: for_advocacy_path }
+            %a.btn.btn-lg.btn-outline-success{ href: for_advocacy_path }
               Learn More
       %li
         .landing-group-card
@@ -37,5 +41,5 @@
           .col-xs-8
             %h4 Law Enforcement
             %p Improve your resources
-            %a{ href: for_law_enforcement_path }
+            %a.btn.btn-lg.btn-outline-success{ href: for_law_enforcement_path }
               Learn More

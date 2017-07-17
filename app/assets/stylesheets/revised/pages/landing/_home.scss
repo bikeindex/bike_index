@@ -1,0 +1,202 @@
+.root-landing-page {
+  h3.landing-container-label { text-align: center; }
+  .root-action-btn {
+    display: block;
+    max-width: 30em;
+    width: 80%;
+    margin: 3*$vertical-height auto 0;
+  }
+}
+
+.root-landing-banner-header {
+  background-image: image-url('landing_pages/header_bg_root.jpg');
+  width: 100%;
+  padding-top: 12*$vertical-height;
+  padding-bottom: 6*$vertical-height;
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  .root-landing-header-text {
+    @include make-col-ready();
+    @include make-col(12);
+    h1, p { color: white; }
+    p {
+      font-size: 28px;
+      margin-bottom: 0;
+      strong { color: $green; }
+    }
+    h1 {
+      font-size: 60px;
+    }
+    .root-action-btn { display: none; }
+  }
+  .root-landing-signup {
+    display: none;
+    $signup-form-border-radius: 4px;
+    form {
+      background: rgba(249,249,249,0.6);
+      padding: 3*$vertical-height 2*$vertical-height;
+    }
+    form, .form-control, .btn {
+      border-radius: $signup-form-border-radius;
+    }
+    .btn { width: 100%; }
+    label, .or-block { color: white; }
+    // There needs to be a little bit less spacing between the form controls
+    .form-group.col-md-6:nth-of-type(1) { padding-right: 7px; }
+    .form-group.col-md-6:nth-of-type(2) { padding-left: 7px; }
+    .or-block {
+      line-height: 1em;
+      margin: $vertical-height 0;
+      text-transform: uppercase;
+      text-align: center;
+      position: relative;
+      &:before, &:after {
+        display: block;
+        position: absolute;
+        content: '';
+        top: ($body-font-size/2) - 1px;
+        height: 0;
+        width: 44%;
+        border-top: 1px solid white;
+      }
+      &:before { left: 0; }
+      &:after { right: 0; }
+    }
+  }
+  input { border-color: transparent; } // so we don't overpower the active border
+  @include media-breakpoint-down(sm) {
+    .root-landing-header-text {
+      p { font-size: 20px; }
+      h1 {
+        font-size: 45px;
+        span { display: block; }
+      }
+    }
+  }
+  @include media-breakpoint-down(md) {
+    .root-landing-header-text {
+      .root-action-btn { display: block; }
+    }
+  }
+  @include media-breakpoint-up(lg) {
+    padding-top: 20*$vertical-height;
+    padding-bottom: 12*$vertical-height;
+    .root-landing-header-text {
+      @include make-col(7);
+      margin-top: 77px;
+      p { line-height: 1.3em; }
+    }
+    .root-landing-signup {
+      display: block;
+      @include make-col-ready();
+      @include make-col(5);
+    }
+  }
+}
+
+.root-landing-recovery-stories {
+  background: #f9f9f9;
+  padding: 4*$vertical-height;
+}
+
+
+.root-landing-how-it-works {
+  padding-top: 4*$vertical-height;
+  h3.landing-container-label, h4 { color: $header-font-nocolor; }
+  .row {
+    margin-top: 5*$vertical-height;
+    @include media-breakpoint-up(lg) {
+      margin-top: 7*$vertical-height;
+      &:nth-of-type(2n) .root-landing-how-icon {
+        @include make-col-offset(3);
+        .root-icon-connector {
+          right: 120%;
+          transform: rotate(45deg);
+        }
+      }
+      &:nth-of-type(3) .root-landing-how-icon .root-icon-connector {
+        top: 72%;
+      }
+    }
+    @include media-breakpoint-down(sm) {
+      &:last-of-type .root-landing-explanation {
+        padding-top: 0;
+      }
+    }
+  }
+  .root-landing-how-icon {
+    padding-right: 0;
+    svg, img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    @include media-breakpoint-down(sm) {
+      width: 50%;
+      margin: 0 auto;
+    }
+    .root-icon-connector {
+      display: none;
+      @include media-breakpoint-up(lg) {
+        display: block;
+        height: 17*$vertical-height;
+        width: auto;
+        position: absolute;
+        right: -32%;
+        top: 66%;
+        transform: rotate(-45deg);
+      }
+    }
+  }
+  .root-landing-explanation {
+    .root-landing-explanation-wrap {
+      padding-top: 2*$vertical-height;
+      // position: relative;
+      // top: 50%;
+      // transform: translateY(-50%);
+      padding-left: 15px;
+    }
+    h4 {
+      font-size: 21px;
+      margin-bottom: $vertical-height;
+    }
+    p {
+      color: $gray-light;
+      font-size: 18px;
+      margin-bottom: 0;
+    }
+    @include media-breakpoint-down(sm) {
+      padding-top: 4*$vertical-height;
+      h4, p { text-align: center; }
+    }
+  }
+}
+
+.root-landing-who {
+  padding-bottom: 6*$vertical-height;
+  h3.landing-container-label {
+    color: $gray-darker;
+    margin: 2*$vertical-height 0;
+    @include media-breakpoint-up(lg) {
+      margin: 4*$vertical-height 0;
+    }
+  }
+  .root-landing-who-wrap {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .root-landing-who-square, .root-landing-who-rectangle {
+    padding: $vertical-height 0.5*$vertical-height 2*$vertical-height;
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+      position: relative;
+      // top: 50%;
+      // transform: translateY(-50%);
+    }
+  }
+  .root-landing-who-square { flex: 0 0 10%; }
+  .root-landing-who-rectangle { flex: 0 0 20%; }
+}

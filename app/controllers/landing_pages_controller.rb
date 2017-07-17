@@ -14,6 +14,8 @@ class LandingPagesController < ApplicationController
 
   def for_schools; end
 
+  def new_homepage; end
+
   protected
 
   def instantiate_feedback
