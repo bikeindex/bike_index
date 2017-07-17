@@ -150,7 +150,7 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law_enforcement';
     .ribbon { display: none; }
 
     @include media-breakpoint-up(md) {
-      padding-top: 12*$vertical-height;
+      padding-top: 17*$vertical-height;
       padding-bottom: 0;
       .icon-wrapper {
         // There is a 1/6 overhang to the left (8.33333/6 ~ 1.33333)
@@ -166,7 +166,7 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law_enforcement';
       h1, h2, h3 { text-align: left; }
       .ribbon {
         display: block;
-        margin-top: 12*$vertical-height;
+        margin-top: 7*$vertical-height;
         background: $gray-darker;
         h2 {
           font-size: 24px;
@@ -201,7 +201,7 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law_enforcement';
 
   $contact-us-gutter: 30px;
   .next-steps-col {
-    margin-top: -8.5*$vertical-height;
+    margin-top: -9.5*$vertical-height;
     @include make-col(5);
     @include media-breakpoint-down(md) {
       @include make-col(12);
