@@ -108,7 +108,16 @@
     margin-top: 5*$vertical-height;
     @include media-breakpoint-up(lg) {
       margin-top: 7*$vertical-height;
-      &:nth-of-type(2n) .root-landing-how-icon { @include make-col-offset(3); }
+      &:nth-of-type(2n) .root-landing-how-icon {
+        @include make-col-offset(3);
+        .root-icon-connector {
+          right: 120%;
+          transform: rotate(45deg);
+        }
+      }
+      &:nth-of-type(3) .root-landing-how-icon .root-icon-connector {
+        top: 72%;
+      }
     }
   }
   .root-landing-how-icon {
@@ -119,15 +128,24 @@
       display: block;
     }
     .root-icon-connector {
-      height: 7*$vertical-height;
-      width: auto;
+      display: none;
+      @include media-breakpoint-up(lg) {
+        display: block;
+        height: 17*$vertical-height;
+        width: auto;
+        position: absolute;
+        right: -32%;
+        top: 66%;
+        transform: rotate(-45deg);
+      }
     }
   }
   .root-landing-explanation {
     .root-landing-explanation-wrap {
-      position: relative;
-      top: 50%;
-      transform: translateY(-50%);
+      padding-top: 2*$vertical-height;
+      // position: relative;
+      // top: 50%;
+      // transform: translateY(-50%);
       padding-left: 15px;
     }
     h4 {
