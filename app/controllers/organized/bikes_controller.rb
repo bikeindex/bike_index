@@ -7,7 +7,7 @@ module Organized
         search
       else
         @bikes_count = organization_bikes.count
-        @bikes = organization_bikes.page(@page).per(@per_page)
+        @bikes = organization_bikes.order('created_at desc').page(@page).per(@per_page)
       end
     end
 
@@ -16,7 +16,7 @@ module Organized
       @interpreted_params = Bike.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
       bikes = organization_bikes.search(@interpreted_params)
       @bikes_count = bikes.count
-      @bikes = bikes.page(@page).per(@per_page)
+      @bikes = bikes.order('created_at desc').page(@page).per(@per_page)
       if @interpreted_params[:serial]
         @close_serials = organization_bikes.search_close_serials(@interpreted_params).limit(25)
       end
