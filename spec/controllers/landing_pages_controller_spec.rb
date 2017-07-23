@@ -28,22 +28,4 @@ describe LandingPagesController do
       end
     end
   end
-
-  describe 'view landing page' do
-    context 'non-preview enabled user' do
-      it 'redirects' do
-        get :for_law_enforcement
-        expect(response).to redirect_to root_url
-        expect(flash).to be_present
-      end
-    end
-    context 'preview enabled user' do
-      include_context :logged_in_as_super_admin
-      it 'redirects' do
-        get :new_homepage
-        expect(response.status).to eq(200)
-        expect(response).to render_template(:new_homepage)
-      end
-    end
-  end
 end

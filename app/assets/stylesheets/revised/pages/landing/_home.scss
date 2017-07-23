@@ -193,10 +193,17 @@
       width: 100%;
       height: auto;
       position: relative;
-      // top: 50%;
-      // transform: translateY(-50%);
     }
   }
-  .root-landing-who-square { flex: 0 0 10%; }
-  .root-landing-who-rectangle { flex: 0 0 20%; }
+  @include media-breakpoint-down(sm) {
+    .root-landing-who-wrap > div {
+      &:nth-of-type(10+n) { display: none; }
+    }
+    .root-landing-who-square { flex: 0 0 20%; }
+    .root-landing-who-rectangle { flex: 0 0 40%; }
+  }
+  @include media-breakpoint-up(md) {
+    .root-landing-who-square { flex: 0 0 10%; }
+    .root-landing-who-rectangle { flex: 0 0 20%; }
+  }
 }
