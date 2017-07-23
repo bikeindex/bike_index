@@ -40,25 +40,27 @@
           %a.btn.btn-primary.btn-lg{ href: new_organization_path }
             Sign up for Bike Index
 
-        .trusted-by
+        .trusted-by.hidden-lg-up
           %h3
-            Trusted by top universities and police departments
-          %ul
-            %li
-              = image_tag 'landing_pages/used_by.png'
-              %span A School
-            %li
-              = image_tag 'landing_pages/used_by.png'
-              %span Another School
-            %li
-              = image_tag 'landing_pages/used_by.png'
-              %span Another School
-            %li
-              = image_tag 'landing_pages/used_by.png'
-              %span A police Department
-            %li
-              = image_tag 'landing_pages/used_by.png'
-              %span A police Department
+            Used by bike shops everywhere
+          - shop_partners = capture_haml do
+            %ul
+              %li.hidden-on-trusted-by-next-steps
+                = image_tag 'landing_pages/partners/Joe-Bike.png', alt: 'Joe Bike'
+              %li.partner-logo-rectangle
+                = image_tag 'landing_pages/partners/Gray-Goat.png', alt: 'Gray Goat'
+              %li
+                = image_tag 'landing_pages/partners/Bike-Lane-Chicago.png', alt: 'Bike Lane Chicago'
+              %li
+                = image_tag 'landing_pages/partners/All-Star-Bikes.png', alt: 'All Star Bikes'
+              %li.partner-logo-rectangle
+                = image_tag 'landing_pages/partners/Mission-Bicycle-Company.png', alt: 'Mission Bicycle Company'
+              %li.partner-logo-rectangle
+                = image_tag 'landing_pages/partners/City-Bikes-DC.png', alt: 'City Bikes DC'
+              %li
+                = image_tag 'landing_pages/partners/Ferris-Wheels.png', alt: 'Ferris Wheels'
+              
+          = shop_partners
 
       .next-steps-col
         .next-steps-wrap
@@ -66,5 +68,9 @@
             Sign up for free
           %a.btn.btn-primary.btn-lg{ href: new_organization_path }
             Get started
+          .trusted-by-next-steps.hidden-md-down
+            %h3
+              Used everywhere
+            = shop_partners
             
   = render '/landing_pages/footer'
