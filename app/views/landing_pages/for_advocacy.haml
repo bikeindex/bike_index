@@ -34,25 +34,29 @@
           %a.btn.btn-primary.btn-lg{ href: new_organization_path }
             Sign up for Bike Index
 
-        .trusted-by
+        .trusted-by.hidden-lg-up
           %h3
-            Trusted by top universities and police departments
-          %ul
-            %li
-              = image_tag 'landing_pages/used_by.png'
-              %span A School
-            %li
-              = image_tag 'landing_pages/used_by.png'
-              %span Another School
-            %li
-              = image_tag 'landing_pages/used_by.png'
-              %span Another School
-            %li
-              = image_tag 'landing_pages/used_by.png'
-              %span A police Department
-            %li
-              = image_tag 'landing_pages/used_by.png'
-              %span A police Department
+            Trusted by organizations everywhere
+          - advocacy_partners = capture_haml do
+            %ul
+              %li.partner-logo-rectangle
+                = image_tag 'landing_pages/partners/Indycog.png', alt: 'Indycog'
+              %li
+                = image_tag 'landing_pages/partners/Bike-Pittsburgh.png', alt: 'Bike Pittsburgh'
+              %li.hidden-on-trusted-by-next-steps
+                = image_tag 'landing_pages/partners/Bike-Portland.png', alt: 'Bike Portland'
+              %li
+                = image_tag 'landing_pages/partners/Stolen-Bikes-NOLA.png', alt: 'Stolen Bikes NOLA'
+              %li.partner-logo-rectangle
+                = image_tag 'landing_pages/partners/Bike-East-Bay.png', alt: 'Bike East Bay'
+
+              %li.partner-logo-rectangle
+                = image_tag 'landing_pages/partners/Seattle-Bike-Blog.png', alt: 'Seattle Bike Blog'
+              %li
+                = image_tag 'landing_pages/partners/Wisconsin-Bike-Fed.png', alt: 'Wisconsin Bike Federation'
+
+
+          = advocacy_partners
 
       .next-steps-col
         .next-steps-wrap
@@ -60,5 +64,9 @@
             Sign up for free
           %a.btn.btn-primary.btn-lg{ href: new_organization_path }
             Get started
+          .trusted-by-next-steps.hidden-md-down
+            %h3
+              Trusted everywhere
+            = advocacy_partners
             
   = render '/landing_pages/footer'
