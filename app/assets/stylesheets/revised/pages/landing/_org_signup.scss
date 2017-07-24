@@ -100,12 +100,22 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law_enforcement';
     }
   }
   .trusted-by {
-    ul { @include list-unstyled; }
+    ul {
+      @include list-unstyled;
+      display: flex;
+      flex-wrap: wrap;
+    }
     li {
+      flex: 0 0 20%;
+      &.partner-logo-rectangle { flex: 0 0 40%; }
+      padding: $vertical-height 0.5*$vertical-height 2*$vertical-height;
       img {
-        display: inline-block;
-        width: 16.66666%;
+        display: block;
+        width: 100%;
         height: auto;
+      }
+      &.offset-partner-logo {
+        margin-left: 20%;
       }
     }
   }
@@ -230,6 +240,29 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law_enforcement';
       margin-bottom: 2*$vertical-height;
     }
     .btn { width: 100%; margin-top: 2*$vertical-height; }
+  }
+  .trusted-by-next-steps {
+    margin: 2*$vertical-height -15px 0;
+    background: white;
+    h3 {
+      padding: 2*$vertical-height 0.5*$vertical-height 0;
+    }
+    ul {
+      @include list-unstyled;
+      display: flex;
+      flex-wrap: wrap;
+    }
+    li {
+      flex: 0 0 33%;
+      &.partner-logo-rectangle { flex: 0 0 66%; }
+      padding: 0 0.5*$vertical-height 2*$vertical-height;
+      img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+    }
+    .hidden-on-trusted-by-next-steps { display: none; }
   }
   .landing-lightspeed-logo {
     max-width: 280px;

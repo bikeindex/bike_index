@@ -9,13 +9,30 @@
 }
 
 .root-landing-banner-header {
-  background-image: image-url('landing_pages/header_bg_root.jpg');
+  background-image: image-url('landing_pages/header_bg_root-1080.jpg');
   width: 100%;
   padding-top: 12*$vertical-height;
   padding-bottom: 6*$vertical-height;
   background-size: cover;
   background-position: center bottom;
   background-repeat: no-repeat;
+}
+@media screen
+  and (min-device-width: 1000px) {
+  .root-landing-banner-header {
+    background-image: image-url('landing_pages/header_bg_root-2000.jpg');
+  }  
+}
+@media screen
+  and (min-device-width: 1000px)
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (min-resolution: 192dpi) {
+  .root-landing-banner-header {
+    background-image: image-url('landing_pages/header_bg_root-full.jpg');
+  }
+}
+
+.root-landing-banner-header {
   .root-landing-header-text {
     @include make-col-ready();
     @include make-col(12);
@@ -94,12 +111,6 @@
     }
   }
 }
-
-.root-landing-recovery-stories {
-  background: #f9f9f9;
-  padding: 4*$vertical-height;
-}
-
 
 .root-landing-how-it-works {
   padding-top: 4*$vertical-height;
@@ -193,10 +204,12 @@
       width: 100%;
       height: auto;
       position: relative;
-      // top: 50%;
-      // transform: translateY(-50%);
     }
   }
   .root-landing-who-square { flex: 0 0 10%; }
   .root-landing-who-rectangle { flex: 0 0 20%; }
+  @include media-breakpoint-down(sm) {
+    .root-landing-who-square { flex: 0 0 20%; }
+    .root-landing-who-rectangle { flex: 0 0 40%; }
+  }
 }

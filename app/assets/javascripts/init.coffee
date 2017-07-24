@@ -118,6 +118,11 @@ $(document).ready ->
   new BikeIndex.Init
   if document.getElementById('binx_registration_widget')
     new window.ManufacturersSelect('#binx_registration_widget #b_param_manufacturer_id')
+  else if document.getElementById('recovery-stories-container')
+    # If on the homepage, make everything slick
+    $('#recovery-stories-container').slick
+      infinite: false
+      lazyLoad: 'ondemand'
   new window.AdDisplayer
   warnIfUnsupportedBrowser()
   enableEscapeForModals()

@@ -12,103 +12,142 @@
           %a.btn.btn-lg.btn-success.root-action-btn{ href: new_user_path }
             Get started, it's free
         .root-landing-signup
-          = form_for User.new do |f|
-            .form-group
-              = f.label :name, 'full name', class: 'sr-only'
-              = f.text_field :name, placeholder: 'name', class: 'form-control'
-            .row
-              .form-group.col-md-6
-                = f.label :email, class: 'sr-only'
-                = f.email_field :email, placeholder: 'email', class: 'form-control'
-              .form-group.col-md-6
-                = f.label :password, class: 'sr-only'
-                = f.password_field :password, placeholder: 'password', class: 'form-control'
+          - unless current_user.present?
+            = form_for User.new do |f|
+              .form-group
+                = f.label :name, 'full name', class: 'sr-only'
+                = f.text_field :name, placeholder: 'name', class: 'form-control'
+              .row
+                .form-group.col-md-6
+                  = f.label :email, class: 'sr-only'
+                  = f.email_field :email, placeholder: 'email', class: 'form-control'
+                .form-group.col-md-6
+                  = f.label :password, class: 'sr-only'
+                  = f.password_field :password, placeholder: 'password', class: 'form-control'
 
-            .checkbox
-              %label
-                = f.check_box :terms_of_service
-                I agree to Bike Index 
-                %a.no-tab{ data: { target: terms_url } }
-                  terms and conditions
+              .checkbox
+                %label
+                  = f.check_box :terms_of_service
+                  I agree to Bike Index 
+                  %a.no-tab{ data: { target: terms_url } }
+                    terms and conditions
 
-            = f.submit 'Sign up for free', class: 'btn btn-success btn-lg'
-            .or-block
-              or
-            %a.btn.btn-primary.btn-lg.root-landing-facebook{ href: '/auth/facebook' }
-              Sign up for free with Facebook
+              = f.submit 'Sign up for free', class: 'btn btn-success btn-lg'
+              .or-block
+                or
+              %a.btn.btn-primary.btn-lg.root-landing-facebook{ href: '/auth/facebook' }
+                Sign up for free with Facebook
 
+  - cache 'root_body_wrap', skip_digest: true do # Expired in recovery_displays_controller
+    .root-landing-recovery-stories
+      .container
+        #recovery-stories-container
+          - RecoveryDisplay.limit(10).each_with_index do |recovery, i|
+            - cache(recovery) do
+              .recovery-block{ class: "recovery-#{recovery.id}" }
+                %p.recovery-quote
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 31.75 23.54"><path class="svg-q-p" d="M15.68,2.74q-2,1-3.8,2.11a25.37,25.37,0,0,0-3,2.11A13.08,13.08,0,0,0,6.43,9.64a14.15,14.15,0,0,0-1.65,3.69H6.64a5,5,0,0,1,3.93,1.35,4.41,4.41,0,0,1,1.19,3,6.07,6.07,0,0,1-1.61,4,5.46,5.46,0,0,1-4.39,1.89,5.43,5.43,0,0,1-4.36-1.65A6.45,6.45,0,0,1,0,17.54a13.41,13.41,0,0,1,1.52-6.38A20.73,20.73,0,0,1,5.34,6a25.06,25.06,0,0,1,4.71-3.61Q12.51,1,14.37,0Zm16.07,0q-2,1-3.8,2.11a25.37,25.37,0,0,0-3,2.11A13.08,13.08,0,0,0,22.5,9.64a14.15,14.15,0,0,0-1.65,3.69h1.87a5,5,0,0,1,3.93,1.35,4.41,4.41,0,0,1,1.19,3,6.07,6.07,0,0,1-1.61,4,5.46,5.46,0,0,1-4.39,1.89,5.43,5.43,0,0,1-4.36-1.65,6.45,6.45,0,0,1-1.41-4.34,13.41,13.41,0,0,1,1.52-6.38A20.73,20.73,0,0,1,21.41,6a25.06,25.06,0,0,1,4.71-3.61Q28.57,1,30.44,0Z"/></svg>
 
-  .root-landing-recovery-stories
-    .container
-      .row
-        .recovery-story-wrapper
-          %h3
-            Recovery stories go here
+                  %span.precovery
+                    = recovery.quote.html_safe
+                %span.recovery-user
+                  - if recovery.image.present?
+                    %img{ data: { lazy: recovery.image_url(:medium) }}
+                  - else
+                    %span.no-image-spacer
+                  - if recovery.quote_by
+                    %span.h3recovery
+                      = recovery.quote_by
+                  %span.h4recovery
+                    - txt = recovery.bike.present? ? recovery.bike.type.titleize : 'Bike'
+                    - txt += " <span class='recover-date'>recovered #{l recovery.date_recovered, format: :dotted}</span>"
+                    - if recovery.link.present?
+                      %a.recover-date{ href: recovery.link }
+                        = txt.html_safe
+                    - else
+                      = txt.html_safe
 
-  .root-landing-how-it-works
-    .container
-      %h3.landing-container-label But How Does it work?
-      .row
-        .col-md-2.root-landing-how-icon
-          = render '/landing_pages/icons/how_icon_register_svg'
-          = image_tag 'landing_pages/dashed_line.svg', class: 'root-icon-connector'
-        .col-md-7.root-landing-explanation
-          .root-landing-explanation-wrap
-            %h4 Register Your Bike
-            %p
-              It’s simple. Submit your name, bike manufacturer, serial number, and component information to enter your bike into the most widely used bike registry on the planet.
-      .row
-        .col-md-2.root-landing-how-icon
-          = render '/landing_pages/icons/how_icon_alert_svg'
-          = image_tag 'landing_pages/dashed_line.svg', class: 'root-icon-connector'
-        .col-md-7.root-landing-explanation
-          .root-landing-explanation-wrap
-            %h4 Alert the Community
-            %p
-              If your bike goes missing, mark it as lost or stolen to notify the entire Bike Index community and its partners.
-      .row
-        .col-md-2.root-landing-how-icon
-          = render '/landing_pages/icons/how_icon_responds_svg'
-          = image_tag 'landing_pages/dashed_line.svg', class: 'root-icon-connector'
-        .col-md-7.root-landing-explanation
-          .root-landing-explanation-wrap
-            %h4 The community responds
-            %p
-              A user or partner encounters your bike, uses Bike Index to identify it, and contacts you.
-      .row
-        .col-md-2.root-landing-how-icon
-          = render '/landing_pages/icons/how_icon_recover_svg'
-        .col-md-7.root-landing-explanation
-          .root-landing-explanation-wrap
-            %h4 You Get your Bike Back
-            %p
-              With the help of the Bike Index community and its partners, you have the information necessary to recover your lost or stolen bike at no cost to you. It’s what we do.
+    .root-landing-how-it-works
+      .container
+        %h3.landing-container-label But How Does it work?
+        .row
+          .col-md-2.root-landing-how-icon
+            = render '/landing_pages/icons/how_icon_register_svg'
+            = image_tag 'landing_pages/dashed_line.svg', class: 'root-icon-connector'
+          .col-md-7.root-landing-explanation
+            .root-landing-explanation-wrap
+              %h4 Register Your Bike
+              %p
+                It’s simple. Submit your name, bike manufacturer, serial number, and component information to enter your bike into the most widely used bike registry on the planet.
+        .row
+          .col-md-2.root-landing-how-icon
+            = render '/landing_pages/icons/how_icon_alert_svg'
+            = image_tag 'landing_pages/dashed_line.svg', class: 'root-icon-connector'
+          .col-md-7.root-landing-explanation
+            .root-landing-explanation-wrap
+              %h4 Alert the Community
+              %p
+                If your bike goes missing, mark it as lost or stolen to notify the entire Bike Index community and its partners.
+        .row
+          .col-md-2.root-landing-how-icon
+            = render '/landing_pages/icons/how_icon_responds_svg'
+            = image_tag 'landing_pages/dashed_line.svg', class: 'root-icon-connector'
+          .col-md-7.root-landing-explanation
+            .root-landing-explanation-wrap
+              %h4 The community responds
+              %p
+                A user or partner encounters your bike, uses Bike Index to identify it, and contacts you.
+        .row
+          .col-md-2.root-landing-how-icon
+            = render '/landing_pages/icons/how_icon_recover_svg'
+          .col-md-7.root-landing-explanation
+            .root-landing-explanation-wrap
+              %h4 You Get your Bike Back
+              %p
+                With the help of the Bike Index community and its partners, you have the information necessary to recover your lost or stolen bike at no cost to you. It’s what we do.
 
-    %a.btn.btn-lg.btn-success.root-action-btn{ href: new_bike_path }
-      Register now!
-            
-  = render partial: '/landing_pages/footer', locals: { is_root: true }
+      %a.btn.btn-lg.btn-success.root-action-btn{ href: new_bike_path }
+        Register now!
+              
+    = render partial: '/landing_pages/footer', locals: { is_root: true }
 
-  .root-landing-who
-    .container
-      %h3.landing-container-label Used By
+    .root-landing-who
+      .container
+        %h3.landing-container-label Used By
 
-      .root-landing-who-wrap
-        .root-landing-who-square
-          = image_tag 'landing_pages/partners/UMD.png', alt: 'University of Maryland'
-        .root-landing-who-rectangle
-          = image_tag 'landing_pages/partners/Bike-East-Bay.png', alt: 'Bike East Bay'
-        .root-landing-who-square
-          = image_tag 'landing_pages/partners/University-of-Washington.png', alt: 'University of Washington'
-        .root-landing-who-square
-          = image_tag 'landing_pages/partners/Bike-Pittsburgh.png', alt: 'Bike Pittsburgh'
-        .root-landing-who-square
-          = image_tag 'landing_pages/partners/SFPD.png', alt: 'San Francisco Police Department'
-        .root-landing-who-square
-          = image_tag 'landing_pages/partners/Wisconsin-Bike-Fed.png', alt: 'Wisconsin Bike Federation'
-        .root-landing-who-rectangle
-          = image_tag 'landing_pages/partners/bike-theft-taskforce.png', alt: 'Portland Bike Theft taskforce'
-        .root-landing-who-square
-          = image_tag 'landing_pages/partners/Santa-Monica-PD.png', alt: 'Santa Monica Police Department'
+        .root-landing-who-wrap
+          .root-landing-who-square
+            = image_tag 'landing_pages/partners/UMD.png', alt: 'University of Maryland'
+          .root-landing-who-rectangle
+            = image_tag 'landing_pages/partners/Bike-East-Bay.png', alt: 'Bike East Bay'
+          .root-landing-who-square
+            = image_tag 'landing_pages/partners/University-of-Washington.png', alt: 'University of Washington'
+          .root-landing-who-square
+            = image_tag 'landing_pages/partners/Bike-Pittsburgh.png', alt: 'Bike Pittsburgh'
+          .root-landing-who-square
+            = image_tag 'landing_pages/partners/SFPD.png', alt: 'San Francisco Police Department'
+          .root-landing-who-square
+            = image_tag 'landing_pages/partners/Wisconsin-Bike-Fed.png', alt: 'Wisconsin Bike Federation'
+          .root-landing-who-rectangle
+            = image_tag 'landing_pages/partners/Bike-Theft-Task-Force-Portland.png', alt: 'Portland Bike Theft taskforce'
+          .root-landing-who-square
+            = image_tag 'landing_pages/partners/Santa-Monica-PD.png', alt: 'Santa Monica Police Department'
+
+          .root-landing-who-square
+            = image_tag 'landing_pages/partners/St-Louis-PD.png', alt: 'St. Louis PD'
+          .root-landing-who-rectangle
+            = image_tag 'landing_pages/partners/Seattle-Bike-Blog.png', alt: 'Seattle Bike Blog'
+          .root-landing-who-square
+            = image_tag 'landing_pages/partners/Sunnyvale.png', alt: 'Sunnyvale'
+          .root-landing-who-square
+            = image_tag 'landing_pages/partners/Stolen-Bikes-NOLA.png', alt: 'Stolen Bikes NOLA'
+          .root-landing-who-square
+            = image_tag 'landing_pages/partners/City-of-Bend.png', alt: 'City of Bend'
+          .root-landing-who-rectangle
+            = image_tag 'landing_pages/partners/Mission-Bicycle-Company.png', alt: 'Mission Bicycle Company'
+          .root-landing-who-square
+            = image_tag 'landing_pages/partners/BYU.png', alt: 'Brigham Young University'
+          .root-landing-who-square
+            = image_tag 'landing_pages/partners/Bike-Portland.png', alt: 'Bike Portland'
 
 
