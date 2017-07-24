@@ -194,13 +194,17 @@
     }
   }
   .root-landing-who-wrap {
-    display: flex;
+    display: none;
     flex-wrap: wrap;
+  }
+  &.scrolled .root-landing-who-wrap {
+    display: flex;
+    img { display: block; }
   }
   .root-landing-who-square, .root-landing-who-rectangle {
     padding: $vertical-height 0.5*$vertical-height 2*$vertical-height;
     img {
-      display: block;
+      display: none;
       width: 100%;
       height: auto;
       position: relative;

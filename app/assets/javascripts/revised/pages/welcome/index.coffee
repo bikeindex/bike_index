@@ -4,3 +4,5 @@ class BikeIndex.WelcomeIndex extends BikeIndex
     $('#recovery-stories-container').slick
       infinite: false
       lazyLoad: 'ondemand'
+    $(window).scroll ->
+      $('.root-landing-who').addClass('scrolled')
