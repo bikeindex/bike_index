@@ -189,18 +189,15 @@ $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 @import "revised/pages/news/index";
 @import "revised/pages/news/show";
 
-// Home styles
-@import "legacy_includes/slick.scss"; // legacy carousel, delete when it's gone!
-@import "revised/pages/home/home";
-@import "revised/pages/home/supporters";
-@import "revised/pages/home/testimonials";
-
 // Landing page styles
 @import "revised/pages/landing/organizations";
-@import "revised/pages/landing/home";
-@import "revised/pages/landing/recoveries";
 @import "revised/pages/landing/org_signup";
 @import "revised/pages/landing/footer";
+
+// Home styles
+@import "legacy_includes/slick.scss";
+@import "revised/pages/landing/home";
+@import "revised/pages/landing/recoveries";
 
 
 // LEGACY PAGES general styles - replace as soon as all pages have been restyled
@@ -219,12 +216,6 @@ body { min-height: 400px; }
 
 // Pickaday overrides
 .pika-button:hover { background: $blue; }
-
-// Slick - legacy from homepage
-@media (min-width: $grid-breakpoint-md) {
-  .slick-prev,
-  .slick-next { display: none; }
-}
 
 #old-browser-warning {
   width: 100%;
