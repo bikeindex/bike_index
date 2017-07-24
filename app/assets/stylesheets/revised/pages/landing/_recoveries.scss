@@ -11,13 +11,16 @@
   .slick-next { right: -6%; }
   .slick-prev,
   .slick-next {
-    display: block;
     &:before {
       color: $gray;
       font-weight: 600;
       font-size: 30px;
       font-family: sans-serif;
     }
+  }
+  // Avoid having a flash where all the recoveries are shown
+  &.extras-hidden .recovery-block {
+    &:nth-of-type(n+2) { display: none; }
   }
 }
 
@@ -58,8 +61,8 @@ $recovery-text-bg: #fff;
   .h3recovery, .h4recovery { 
     float: left;
     text-align: right;
-    margin-left: $gutter*$row-width;
-    width: 80%-$gutter*$row-width;        
+    margin-left: 2%*$row-width;
+    width: 80%-2%*$row-width;        
   }
 
   .recovery-quote {
@@ -146,7 +149,7 @@ $recovery-tri-2: 15px;
     .h3recovery { margin-top: 1em; }
     .h3recovery, .h4recovery {
       text-align: right;
-      margin-right: $gutter;
+      margin-right: 2%;
       margin-left: 0;
     }
     img { 
