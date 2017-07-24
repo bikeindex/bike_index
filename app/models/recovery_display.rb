@@ -1,9 +1,4 @@
 class RecoveryDisplay < ActiveRecord::Base
-  def self.old_attr_accessible
-    %w(stolen_record_id quote quote_by date_recovered link image remote_image_url
-       date_input remove_image).map(&:to_sym).freeze
-  end
-
   validates_presence_of :quote, :date_recovered
   mount_uploader :image, CircularImageUploader
   process_in_background :image, CarrierWaveProcessWorker
@@ -19,6 +14,12 @@ class RecoveryDisplay < ActiveRecord::Base
       self.date_recovered = DateTime.strptime("#{date_input} 06", "%m-%d-%Y %H")
     end
     self.date_recovered = Time.now unless date_recovered.present?
+  end
+
+  validate :quote_not_too_long
+  def quote_not_too_long
+    return true if quote.length < 301
+    errors.add :base, 'That quote is too long. Please shorten it to be less than 300 characters'
   end
 
   def from_stolen_record(sr_id)

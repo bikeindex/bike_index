@@ -50,7 +50,9 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
   protected
 
   def permitted_parameters
-    params.require(:recovery_display).permit(RecoveryDisplay.old_attr_accessible)
+    params.require(:recovery_display)
+          .permit(%i(stolen_record_id quote quote_by date_recovered link image
+                     remote_image_url date_input remove_image))
   end
 
   def clear_index_wrap_cache
