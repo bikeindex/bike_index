@@ -35,7 +35,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	chef.add_recipe "build-essential"
 	chef.add_recipe "system::install_packages"
 	chef.add_recipe "ruby_build"
-	chef.add_recipe "ruby_rbenv::user"
 	chef.add_recipe "ruby_rbenv::user_install"
 	chef.add_recipe "vim"
    	chef.add_recipe "postgresql::server"
