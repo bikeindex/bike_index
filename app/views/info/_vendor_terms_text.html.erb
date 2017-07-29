@@ -1,8 +1,9 @@
+<% file_path = @view_renderer.lookup_context.find_template(@virtual_path).identifier.gsub(/\A.*\/app\//i, 'app/') %>
 <header>
 <h1>
 <a name="terms-of-service-for-vendors" class="anchor" href="#terms-of-service-for-vendors"><span class="mini-icon mini-icon-link"></span></a>Terms of Service for Vendors</h1>
 
-<p>Last updated June 9th, 2014. Previous versions and the change history is <a href="https://github.com/bikeindex/bike_index_terms/">available here</a>.</p>
+<p>Last updated July 29th, 2017. Previous versions and the change history is <a href="https://github.com/bikeindex/bike_index/tree/master/<%= file_path %>">available here</a>.</p>
 
 <hr>
 </header>
@@ -10,36 +11,32 @@
 <h2>
 <a name="about-our-terms-of-service-for-vendors" class="anchor" href="#about-our-terms-of-service-for-vendors"><span class="mini-icon mini-icon-link"></span></a>About our terms of service for vendors</h2>
 
-<p><strong>Welcome to Bike Index</strong>, an Illinois Benefit corporation. We developed a publicly-accessible bike registration service (the "Service") that gives you the ability to quickly and easily register bikes for your customers. We believe that such a service will deter bike theft.</p>
+<p><strong>Welcome to Bike Index</strong>, a 501(c)(3) nonprofit. We developed a publicly-accessible bike registration service (the "Service") that gives organizations registered on Bike Index ("Vendors", "you") the ability to quickly and easily register bikes for their "Customers" - patrons of their services - using Vendor "Accounts." We believe that such a service that the Service deters bike theft and helps Customers recover stolen bikes.
+</p>
 
-<p>By giving bike shop employees and bike advocacy organizations (the "Vendors") the ability to add bikes to the service for free we aim to encourage registration and to fight procrastinating. If you have any questions or concerns, or simply want to better understand how we do things at Bike Index, please do not hesitate to <a href="https://www.bikeindex.org/contact_us">contact us</a>.</p>
+<p>By giving bike shop employees and bike advocacy organizations - Vendors - the ability to add bikes to the Service for free, we aim to encourage registration and to fight procrastination of bike registrations. We have additionally developed a Lightspeed integration that allows shops that use Lightspeed as your point of sale to register bikes immediately upon sale. We discuss this in detail later in this document. If you have any questions or concerns, or simply want to better understand how we do things at Bike Index, please do not hesitate to <a href="https://www.bikeindex.org/contact_us">contact us</a>.</p>
 
-<p>With the following brief descriptions of the parts of this Agreement, we attempt to explain the important parts of our service. But there are significant details in the whole document that make it worth reading.</p>
+<p>With the following brief descriptions of the parts of this "Agreement", we attempt to explain the important parts of our Service. But there are significant details in the whole document that make it worth reading.</p>
 
 <h2>
 <a name="bike-index-vendor-service" class="anchor" href="#bike-index-vendor-service"><span class="mini-icon mini-icon-link"></span></a>Bike Index Vendor Service</h2>
 
-<p>We provide you with a service to register the bikes you interact with; we will respect and protect your and your customers' privacy, data and personal information. You run your business, service your customers, and observe all laws, rules, and regulations. <a href="#section_a">Complete details</a></p>
-
-<h2>
-<a name="charges-for-the-service" class="anchor" href="#charges-for-the-service"><span class="mini-icon mini-icon-link"></span></a>Charges for the Service</h2>
-
-<p>There are charges for the use of the vendor service</p>
+<p>We provide you with a service to register the bikes you interact with; we will respect and protect your and your Customers' privacy, data and personal information. You run your business, service your Customers, and observe all laws, rules, and regulations. <a href="#section_a">Complete details</a></p>
 
 <h2>
 <a name="becoming-a-vendor-on-the-bike-index" class="anchor" href="#becoming-a-vendor-on-the-bike-index"><span class="mini-icon mini-icon-link"></span></a>Becoming a Vendor on Bike Index</h2>
 
-<p>Because Bike Index relies on partnering with bike organizations, we may need to verify your status as a bike organization. You provide us with basic information about your organization; we will seek to verify your information (we may work with third parties to do so) and approve your service account unless deemed risky (by us or our friends). You give us permission to do all this, and to periodically update the information or we otherwise must decline to offer you the service. <a href="#section_c">Complete details</a></p>
+<p>Because Bike Index relies on partnering with bike organizations, we may need to verify your status as a bike organization. You provide us with basic information about your organization and we will seek to verify your information (we may work with third parties to do so) and approve your Vendor Account unless deemed risky (by us or our friends). You give us permission to do all this, and to periodically update the information or we otherwise must decline to offer you the Service. <a href="#section_c">Complete details</a></p>
 
 <h2>
 <a name="termination-and-other-legal-terms" class="anchor" href="#termination-and-other-legal-terms"><span class="mini-icon mini-icon-link"></span></a>Termination and Other Legal Terms</h2>
 
-<p>We can deactivate your ability to register new bikes or terminate this agreement at any time (especially if you do something bad). You can also terminate anytime. Termination is effective immediately. Termination does not alter your previously registered bikes. This section also includes all the extra legal stuff they make us add (e.g. indemnification, warranties, assignment). <a href="#section_d">Complete details</a></p>
+<p>We can deactivate your ability to register new bikes or terminate this "Agreement" at any time (especially if you do something bad). You can also terminate anytime. Termination is effective immediately. Termination does not alter your previously registered bikes. This section also includes all the extra legal stuff they make us add (e.g. indemnification, warranties, assignment). <a href="#section_d">Complete details</a></p>
 
 <h2>
 <a name="bike-index-vendor-terms-of-service" class="anchor" href="#bike-index-vendor-terms-of-service"><span class="mini-icon mini-icon-link"></span></a>Bike Index Vendor Terms of Service</h2>
 
-<p>The Terms and Conditions described here constitute a legal agreement ("Agreement") between the sole proprietor or business organization listed as the "Vendor" on the Service registration page (sometimes referred to as "you," "your", "merchant"), and Bike Index, Inc. ("Bike Index").</p>
+<p>The Terms and Conditions described here constitute a legal "Agreement" between the sole proprietor or business organization listed as the "Vendor" on the Service registration page (sometimes referred to as "you," "your", "merchant"), and Bike Index, NFP. ("Bike Index").</p>
 
 <h1 id="section_a">
 <a name="section-a-the-bike-index-service" class="anchor" href="#section-a-the-bike-index-service"><span class="mini-icon mini-icon-link"></span></a>Section A: The Bike Index Service</h1>
@@ -49,19 +46,19 @@
 <h3>
 <a name="our-role" class="anchor" href="#our-role"><span class="mini-icon mini-icon-link"></span></a>Our Role</h3>
 
-<p>Our Service helps you quickly and easily register bikes for your customers, and gives customers the ability to modify most aspects of their registrations. You will be required to register with Bike Index to use Bike Index Vendor Service (see Becoming a Bike Index Vendor). In addition, we do not assume any liability for bicycles, tricycles or other types of crafts (collectively "Bikes") registered through our Service.</p>
+<p>Our Service helps you quickly and easily register bikes for your Customers, and gives Customers the ability to modify most aspects of their registrations. You will be required to register with Bike Index to use Bike Index Vendor Service (see Becoming a Bike Index Vendor). In addition, we do not assume any liability for bicycles, tricycles or other types of crafts (collectively "Bikes") registered through our Service.</p>
 </li>
 <li>
 <h3>
 <a name="customer-service" class="anchor" href="#customer-service"><span class="mini-icon mini-icon-link"></span></a>Customer Service</h3>
 
-<p>We will provide you with customer service to resolve any issues relating to your Bike Index account, the registration of bikes through our service, and use of our software.</p>
+<p>We will provide you with customer service to resolve any issues relating to your Bike Index Account, the registration of bikes through our service, and use of our software.</p>
 </li>
 <li>
 <h3>
 <a name="security" class="anchor" href="#security"><span class="mini-icon mini-icon-link"></span></a>Security</h3>
 
-<p>Bike Index is responsible for protecting the security of user data in our possession from unauthorized access and accidental loss or modification. We will maintain commercially reasonable administrative, technical and physical procedures to protect all the personal information regarding you and your customers that is stored in our servers. However, we cannot guarantee that unauthorized third parties will never be able to defeat those measures or use such personal information for improper purposes. You acknowledge that you provide this personal information regarding you and your customers at your own risk. We recommend you review our <a href="https://bikeindex.org/privacy">Privacy Policy</a>, which will help you understand how we collect, use and safeguard the information you provide to us.</p>
+<p>Bike Index is responsible for protecting the security of Customer data in our possession from unauthorized access and accidental loss or modification. We will maintain commercially reasonable administrative, technical and physical procedures to protect all the personal information regarding you and your Customers that is stored in our servers. However, we cannot guarantee that unauthorized third parties will never be able to defeat those measures or use such personal information for improper purposes. You acknowledge that you provide this personal information regarding you and your Customers at your own risk. We recommend you review our <a href="https://bikeindex.org/privacy">Privacy Policy</a>, which will help you understand how we collect, use and safeguard the information you provide to us.</p>
 </li>
 <li>
 <h3>
@@ -73,9 +70,21 @@
 <h3>
 <a name="privacy-of-others" class="anchor" href="#privacy-of-others"><span class="mini-icon mini-icon-link"></span></a>Privacy of Others</h3>
 
-<p>You represent to Bike Index that you are in compliance with all applicable privacy laws, you have obtained all necessary rights and consents under applicable law to disclose to Bike Index, or allow Bike Index to collect, use, retain and disclose any customer data that you provide to us or authorize us to collect. You are solely responsible for disclosing to your customers that accessing our service will require their acceptance of our <a href="https://bikeindex.org/terms">Customer Terms of Service</a> and <a href="https://bikeindex.org/privacy">Privacy Policy</a></p>
+<p>You represent to Bike Index that you are in compliance with all applicable privacy laws, you have obtained all necessary rights and consents under applicable law to disclose to Bike Index, or allow Bike Index to collect, use, retain and disclose any Customer data that you provide to us or authorize us to collect. You are solely responsible for disclosing to your Customers that accessing our service will require their acceptance of our <a href="https://bikeindex.org/terms">Terms of Service</a> and <a href="https://bikeindex.org/privacy">Privacy Policy</a></p>
 
 <p>If you receive information about others, including Bike Index Users, through the use of the Service, you must keep such information confidential and only use it in connection with the Service. You may not disclose or distribute any such information to a third party or use any such information for marketing purposes unless you receive the express consent of the user to do so.</p>
+
+<p>We will never sell, trade, or give out information about your Customers. If Bike Index is acquired by another organization, we will notify all users via the primary e-mail address on file that their information is being transferred and may be subject to a different privacy policy.</p>
+
+<p>Customer data you have collected prior to this partnership but that you want Bike Index to incorporate into the Service will be protected by all of the terms listed in this Agreement.</p>      
+</li>
+<li>
+<h3>
+<a name="lightspeed-integration" class="anchor" href="#lightspeed-integration"><span class="mini-icon mini-icon-link"></span></a>Lightspeed Integration</h3>
+
+<p>To register a customer’s bicycle directly from your shop, you must collect the customer’s bike serial number and the customer’s e-mail address. If your shop uses Lightspeed Retail and you use the Bike Index Lightspeed integration, Lightspeed will collect and send to us all information in Lightspeed at the time of the sale. This information could include, but is not limited to, customer phone number, customer address, bike color and bike size. We only collect the information necessary to effectively register the bicycle for your Customer.</p>
+
+<p>We are committed to keeping customer information private. We do not store any of the information transmitted from Lightspeed other than the information needed to create the Bike Index registration. All communication between Lightspeed and our Service is encrypted and covered under our Terms and the applicable terms and agreements set by Lightspeed.</p>
 </li>
 <li>
 <h3>
@@ -101,8 +110,7 @@
 
 <p>You agree, from the time that you accept this Agreement with Bike Index until you terminate your account with us, that we may identify you as a Vendor of Bike Index. Neither you nor we will imply any untrue sponsorship, endorsement or affiliation between you and Bike Index. You give us permission to post information on our website regarding your business including but not limited to it's name, location, and phone number.</p>
 </li>
-</ol><h1 id="section_b">
-<a name="section-b-bike-index-terms-and-conditions-of-sale" class="anchor" href="#section-b-bike-index-terms-and-conditions-of-sale"><span class="mini-icon mini-icon-link"></span></a>Section B: Bike Index Terms and Conditions of Registration</h1>
+</ol>
 
 <h1 id="section_c">
 <a name="section-c-registering-for-bike-index-vendor-status" class="anchor" href="#section-c-registering-for-bike-index-vendor-status"><span class="mini-icon mini-icon-link"></span></a>Section C: Registering for Bike Index Vendor Status</h1>
@@ -112,7 +120,7 @@
 <h3>
 <a name="vendor-registration" class="anchor" href="#vendor-registration"><span class="mini-icon mini-icon-link"></span></a>Vendor Registration</h3>
 
-<p>The Bike Index Vendor Service is only made available under this Agreement to persons in the United States that operate a business selling goods or services, or operate cycling related organizations. To use Bike Index to register bikes, you will first have to register for a Vendor Account. When you register for a Bike Index Vendor Account, we will collect basic information including your name, company name, location, email address, and phone number. If you have not already done so, you will also be required to provide an email address and password for your Bike Index account.</p>
+<p>The Bike Index Vendor Service is only made available under this Agreement to persons that operate a business selling goods or services, or operate cycling related organizations. To use Bike Index to register bikes, you will first have to register for a "Vendor Account." When you register for a Bike Index Vendor Account, we will collect basic information including your name, company name, location, email address, and phone number. If you have not already done so, you will also be required to provide an email address and password for your Bike Index account.</p>
 
 <p>When you register as a Vendor, you must also provide information about an owner or principal of the business or organization and you must be authorized to act on behalf of the business and have the authority to bind the business to this Agreement. To sign up a business to use the Service, you must agree to this Agreement on behalf of the business. If you have so agreed, the term "you" will mean you, the natural person, as well as the business organization that you represent.</p>
 </li>
@@ -122,17 +130,17 @@
 
 <p>We may ask for information to help verify your identity including a driver’s license or other government issued identification, or a business license. We may request your permission to do a physical inspection at your place of business and to examine bicycles that pertain to your compliance with this Agreement. Your failure to comply with any of these requests within five (5) days may result in deactivation or termination of your Bike Index account. You authorize us to retrieve additional information about you from third parties and other identification services.</p>
 
-<p>After we have collected and verified all your information, Bike Index will review your account and determine if you are eligible to use the Service. Bike Index will notify you once your account has been either approved or deemed ineligible for use of the Service.</p>
+<p>After we have collected and verified all your information, Bike Index will review your Account and determine if you are eligible to use the Service. Bike Index will notify you once your account has been either approved or deemed ineligible for use of the Service.</p>
 
 <p>By accepting the terms of this Agreement, you are providing us with authorization to retrieve information about you by using third parties, including bike industry wholesalers, distributors, and other information providers. You acknowledge that such information retrieved may include your name, address history, business history, and other data about you. Bike Index may periodically update this information to determine whether you continue to meet our eligibility requirements.</p>
 
-<p>You agree that Bike Index is permitted to contact and share information about you and your application (including whether you are approved or declined), and your use of Bike Index with our friends.</p>
+<p>You agree that Bike Index is permitted to contact and share information about you and your application (including whether you are approved or declined), as well as your use of Bike Index with our friends.</p>
 </li>
 <li>
 <h3>
 <a name="prohibited-businesses" class="anchor" href="#prohibited-businesses"><span class="mini-icon mini-icon-link"></span></a>Prohibited Businesses</h3>
 
-<p>By registering for Bike Index Vendor Service, you are confirming that you will not use the Service to register bikes in connection with the following businesses, business activities or business practices: (1) Knowingly selling stolen bikes, (2) Stealing bikes.</p>
+<p>By registering for Bike Index Vendor Service, you are confirming that you will not use the Service to register bikes in connection with the following businesses, business activities or business practices: (1) knowingly selling stolen bikes, (2) stealing bikes.</p>
 
 <p>By accepting this Agreement you confirm that you will satisfy these requirements.</p>
 </li>
@@ -150,7 +158,7 @@
 <h3>
 <a name="termination" class="anchor" href="#termination"><span class="mini-icon mini-icon-link"></span></a>Termination</h3>
 
-<p>You may terminate this Agreement by closing your Bike Index account at any time by following the instructions on our website in your Organization Account Profile. We may terminate this Agreement and close your Bike Index Vendor Account at any time for any reason effective upon providing you notice in accordance with Section A10(references to our relationships) above. We may suspend your Bike Index account and your access to the Service, or terminate this Agreement, if (i) we determine in our sole discretion that you are ineligible for the Service for reasons, including without limitation customer complaints about your use of the service, or for any other reason; or (ii) you do not comply with any of the provisions of this Agreement.</p>
+<p>You may terminate this Agreement by closing your Bike Index account at any time by following the instructions on our website in your organization’s Vendor Account profile. We may terminate this Agreement and close your Bike Index Vendor Account at any time for any reason effective upon providing you notice in accordance with Section A11(references to our relationships) above. We may suspend your Bike Index account and your access to the Service, or terminate this Agreement, if (i) we determine in our sole discretion that you are ineligible for the Service for reasons, including without limitation customer complaints about your use of the service, or for any other reason; or (ii) you do not comply with any of the provisions of this Agreement.</p>
 </li>
 <li>
 <h3>
@@ -180,7 +188,7 @@
 
 <p>The Service is licensed and not sold. We reserve all rights not expressly granted to you in this Agreement. The Service is protected by copyright, trade secret and other intellectual property laws. We own the title, copyright and other worldwide Intellectual Property Rights (as defined below) in the Service and all copies of the Service. This Agreement does not grant you any rights to our trademarks or service marks.</p>
 
-<p>For the purposes of this Agreement, "Intellectual Property Rights" means all patent rights, copyright rights, mask work rights, moral rights, rights of publicity, trademark, trade dress and service mark rights, goodwill, trade secret rights and other intellectual property rights as may now exist or hereafter come into existence, and all applications therefor and registrations, renewals and extensions thereof, under the laws of any state, country, territory or other jurisdiction.</p>
+<p>For the purposes of this Agreement, "Intellectual Property Rights" means all patent rights, copyright rights, mask work rights, moral rights, rights of publicity, trademark, trade dress and service mark rights, goodwill, trade secret rights and other intellectual property rights as may now exist or hereafter come into existence, and all applications therefore and registrations, renewals and extensions thereof, under the laws of any state, country, territory or other jurisdiction.</p>
 
 <p>You may choose to or we may invite you to submit comments or ideas about the Service, including without limitation about how to improve the Service or our products ("Ideas"). By submitting any Idea, you agree that your disclosure is gratuitous, unsolicited and without restriction and will not place Bike Index under any fiduciary or other obligation, and that we are free to use the Idea without any additional compensation to you, and/or to disclose the Idea on a non-confidential basis or otherwise to anyone. You further acknowledge that, by acceptance of your submission, Bike Index does not waive any rights to use similar or related ideas previously known to Bike Index, or developed by its employees, or obtained from sources other than you.</p>
 </li>
@@ -188,15 +196,15 @@
 <h3>
 <a name="your-liability" class="anchor" href="#your-liability"><span class="mini-icon mini-icon-link"></span></a>Your Liability</h3>
 
-<p>You are responsible for all Claims, fines, fees, penalties and other liability arising out of or relating to your breach of this Agreement, and/or your use of the Service. Bike Index will have the final decision-making authority with respect to Claims, including without limitation claims for refunds for purchased registrations that are filed with Bike Index by you or your customers. You will be required to reimburse Bike Index for your liability. You will not receive a refund of any fees paid to Bike Index.</p>
+<p>You are responsible for all claims, fines, fees, penalties and other liability arising out of or relating to your breach of this Agreement, and/or your use of the Service. Bike Index will have the final decision-making authority with respect to claims. You will be required to reimburse Bike Index for your liability. You will not receive a refund of any fees paid to Bike Index.</p>
 
-<p>Without limiting the foregoing, you agree to defend, indemnify, and hold harmless Bike Index and its respective employees and agents (collectively "Disclaiming Entities") from and against any claim, suit, demand, loss, liability, damage, action or proceeding arising out of or relating to (i) your breach of any provision of this Agreement, and/or (ii) your use of the Service, including without limitation any Reversals, Claims, fines, fees, penalties and attorneys’ fees; (iii) your, or your employee’s or agent’s, negligence or willful misconduct; or (iv) third party indemnity obligations we incur as a direct or indirect result of your acts or omissions.</p>
+<p>Without limiting the foregoing, you agree to defend, indemnify, and hold harmless Bike Index and its respective employees and agents (collectively "Disclaiming Entities") from and against any claim, suit, demand, loss, liability, damage, action or proceeding arising out of or relating to (i) your breach of any provision of this Agreement, and/or (ii) your use of the Service, including without limitation any reversals, claims, fines, fees, penalties and attorneys’ fees; (iii) your, or your employee’s or agent’s, negligence or willful misconduct; or (iv) third party indemnity obligations we incur as a direct or indirect result of your acts or omissions.</p>
 </li>
 <li>
 <h3>
 <a name="representation-and-warranties" class="anchor" href="#representation-and-warranties"><span class="mini-icon mini-icon-link"></span></a>Representation and Warranties</h3>
 
-<p>You represent and warrant to us that: (a) if you are a natural person, you are at least eighteen (18) years of age or, if you are under eighteen (18) years of age have obtained the consent of your parent or legal guardian to your execution of this Agreement and use of Bike Index Vendor Services in the manner prescribed by Bike Index; (b) you are eligible to register and use the Service and have the right, power, and ability to enter into and perform under this Agreement; (c) the name identified by you when you registered is the business name under which you sell goods and services; (d) any registration submitted by you will represent a bona fide sale by you; (e) you will fulfill all of your obligations to each customer for which you submit a registration and will resolve any consumer dispute or complaint directly with the purchaser; (f) you and all registrations initiated by you will comply with all federal, state, and local laws, rules, and regulations applicable to your business, including any applicable tax laws and regulations; (g) you will not use the Service, directly or indirectly, for any fraudulent undertaking or in any manner so as to interfere with the use of the Service.</p>
+<p>You represent and warrant to us that: (a) you are a natural person at least eighteen (18) years of age or, if you are under eighteen (18) years of age have obtained the consent of your parent or legal guardian to your execution of this Agreement and use of Bike Index Vendor Services in the manner prescribed by Bike Index; (b) you are eligible to register and use the Service and have the right, power, and ability to enter into and perform under this Agreement; (c) the name identified by you when you registered is the business name under which you sell goods and services; (d) any registration submitted by you will represent a bona fide sale by you; (e) you will fulfill all of your obligations to each customer for which you submit a registration and will resolve any Customer dispute or complaint directly with the Customer; (f) you and all registrations initiated by you will comply with all federal, state, and local laws, rules, and regulations applicable to your business, including any applicable tax laws and regulations; (g) you will not use the Service, directly or indirectly, for any fraudulent undertaking or in any manner so as to interfere with the use of the Service.</p>
 </li>
 <li>
 <h3>
@@ -214,11 +222,11 @@
 <h3>
 <a name="limitation-of-liability-and-damages" class="anchor" href="#limitation-of-liability-and-damages"><span class="mini-icon mini-icon-link"></span></a>Limitation of Liability and Damages</h3>
 
-<p>IN NO EVENT SHALL A DISCLAIMING ENTITY (AS DEFINED IN SECTION 9 ABOVE) BE LIABLE FOR ANY LOST PROFITS, LOSS OF DATA, OR ANY INDIRECT, PUNITIVE, INCIDENTAL, SPECIAL, CONSEQUENTIAL OR EXEMPLARY DAMAGES ARISING OUT OF, IN CONNECTION WITH OR RELATING TO THIS AGREEMENT OR THE SERVICES, INCLUDING WITHOUT LIMITATION THE USE OF, INABILITY TO USE, OR UNAVAILABILITY OF THE SERVICE. UNDER NO CIRCUMSTANCES WILL ANY OF THE DISCLAIMING ENTITIES (AS DEFINED IN SECTION 9 ABOVE) BE RESPONSIBLE FOR ANY DAMAGE, LOSS OR INJURY RESULTING FROM HACKING, TAMPERING OR OTHER UNAUTHORIZED ACCESS OR USE OF THE SERVICE OR YOUR BIKE INDEX ACCOUNT OR THE INFORMATION CONTAINED THEREIN.</p>
+<p>IN NO EVENT SHALL A DISCLAIMING ENTITY (AS DEFINED IN SECTION 9 ABOVE) BE LIABLE FOR ANY LOST PROFITS, LOSS OF DATA, OR ANY INDIRECT, PUNITIVE, INCIDENTAL, SPECIAL, CONSEQUENTIAL OR EXEMPLARY DAMAGES ARISING OUT OF, IN CONNECTION WITH OR RELATING TO THIS AGREEMENT OR THE SERVICES, INCLUDING WITHOUT LIMITATION THE USE OF, INABILITY TO USE, OR UNAVAILABILITY OF THE SERVICE. UNDER NO CIRCUMSTANCES WILL ANY OF THE DISCLAIMING ENTITIES (AS DEFINED IN SECTION 12 ABOVE) BE RESPONSIBLE FOR ANY DAMAGE, LOSS OR INJURY RESULTING FROM HACKING, TAMPERING OR OTHER UNAUTHORIZED ACCESS OR USE OF THE SERVICE OR YOUR BIKE INDEX ACCOUNT OR THE INFORMATION CONTAINED THEREIN.</p>
 
 <p>THE DISCLAIMING ENTITIES ASSUME NO LIABILITY OR RESPONSIBILITY FOR (A) ANY PERSONAL INJURY OR PROPERTY DAMAGE, OF ANY NATURE WHATSOEVER, RESULTING FROM YOUR ACCESS TO OR USE OF THE SERVICE; (B) ANY UNAUTHORIZED ACCESS TO OR USE OF SERVERS USED IN CONNECTION WITH THE SERVICES AND/OR ANY AND ALL PERSONAL INFORMATION STORED THEREIN; (C) ANY INTERRUPTION OR CESSATION OF TRANSMISSION TO OR FROM THE SERVICE; (D) ANY SOFTWARE BUGS, VIRUSES, TROJAN HORSES, OR OTHER HARMFUL CODE THAT MAY BE TRANSMITTED TO OR THROUGH THE SERVICE; (E) ANY ERRORS, INACCURACIES OR OMISSIONS IN ANY CONTENT OR INFORMATION, FOR ANY LOSS OR DAMAGE INCURRED AS A RESULT OF THE USE OF ANY CONTENT OR INFORMATION, IN EACH CASE POSTED, EMAILED, STORED, TRANSMITTED, OR OTHERWISE MADE AVAILABLE THROUGH THE SERVICE; AND/OR (F) USER CONTENT OR THE DEFAMATORY, OFFENSIVE, OR ILLEGAL CONDUCT OF ANY THIRD PARTY.</p>
 
-<p>WITHOUT LIMITING THE FOREGOING PROVISIONS OF THS SECTION 10, THE DISCLAIMING ENTITIES’ CUMULATIVE LIABILITY TO YOU SHALL BE LIMITED TO DIRECT DAMAGES AND IN ALL EVENTS SHALL NOT EXCEED IN THE AGGREGATE THE AMOUNT OF FEES PAID BY YOU TO BIKE INDEX DURING THE THREE (3) MONTH PERIOD IMMEDIATELY PRECEDING THE EVENT GIVING RISE TO THE CLAIM FOR LIABILITY.</p>
+<p>WITHOUT LIMITING THE FOREGOING PROVISIONS OF THS SECTION 12, THE DISCLAIMING ENTITIES’ CUMULATIVE LIABILITY TO YOU SHALL BE LIMITED TO DIRECT DAMAGES AND IN ALL EVENTS SHALL NOT EXCEED IN THE AGGREGATE THE AMOUNT OF FEES PAID BY YOU TO BIKE INDEX DURING THE TWELVE (12) MONTH PERIOD IMMEDIATELY PRECEDING THE EVENT GIVING RISE TO THE CLAIM FOR LIABILITY.</p>
 
 <p>THIS LIMITATION OF LIABILITY SECTION APPLIES REGARDLESS OF THE LEGAL THEORY ON WHICH THE CLAIM IS BASED, INCLUDING WITHOUT LIMITATION CONTRACT, TORT (INCLUDING NEGLIGENCE), STRICT LIABILITY, OR ANY OTHER BASIS. THE LIMITATIONS APPLY EVEN IF BIKE INDEX HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
 
