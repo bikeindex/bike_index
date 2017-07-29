@@ -30,7 +30,8 @@
         %p
           Read about our over #{ number_with_delimiter recovered_bike_count.round(-2) } recoveries on our <a href="/news">blog</a>. For a complete list of Bike Index’s partners, visit <a href="/where">our partners page</a>, and for information on partnering with Bike Index, please contact us.
 
-
+        = render partial: '/landing_pages/tweet', locals: { tweet_id: 890211853942407168 }
+        
         .mobile-contact-link
           %a.btn.btn-primary.btn-lg.scroll-to-ref{ href: '#contact-bike-index', data: { offset: -110 } }
             Contact Bike Index
