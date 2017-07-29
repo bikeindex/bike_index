@@ -111,6 +111,8 @@
                 %span.less-strong
                   = s_project = count + (BigDecimal.new(count) / yday * days_left).to_i
           %td
+            / To calculate for a specific time period:
+            / StolenRecord.unscoped.where(created_at: Time.now.beginning_of_month..Time.now).within_bounding_box(Geocoder::Calculations.bounding_box('Seattle', 25)).count
             = count = StolenRecord.unscoped.where('created_at < ?', date.end_of_year).within_bounding_box(box).count
             - if year == Time.zone.now.year
               %span.less-strong
