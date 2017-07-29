@@ -130,4 +130,15 @@ describe CustomerMailer do
       expect(stolen_notification.send_dates[1]).to be > stolen_notification.updated_at.to_i - 2
     end
   end
+
+  describe 'updated_terms_email' do
+    let(:user) { FactoryGirl.create(:user) }
+    it 'renders email' do
+      mail = CustomerMailer.updated_terms_email(user)
+      expect(mail.subject).to eq 'Bike Index Terms and Privacy Policy Update'
+      expect(mail.from.count).to eq(1)
+      expect(mail.from.first).to eq('lily@bikeindex.org')
+      expect(mail.body.encoded).to_not match 'vendor terms'
+    end
+  end
 end
