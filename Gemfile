@@ -14,7 +14,7 @@ gem 'fast_blank', '~> 1.0'
 # Redis and redis dependents
 gem 'hiredis', '~> 0.6.0'
 gem 'redis', '>= 3.2.0', require: ['redis', 'redis/connection/hiredis']
-gem 'sidekiq' # Background processing
+gem 'sidekiq', '~> 4.2.10' # Background processing
 gem 'sidekiq-failures'
 gem 'rollout' # Feature flags
 gem 'soulheart', '~> 0.3.0'
