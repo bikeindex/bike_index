@@ -30,14 +30,25 @@ describe EmailUpdatedTermsWorker do
     end
   end
 
-  context 'message fails to send' do
+  context 'Mailer errors' do
     it 'pushes the email key back on the updated email' do
-      subject.redis.lpush(subject.enqueued_emails_key, 42)
+      subject.redis.lpush(subject.enqueued_emails_key, user.id)
+      allow(CustomerMailer).to receive(:updated_terms_email).and_raise('boom')
+      expect { subject.perform }.to raise_error('boom')
 
-      expect { subject.perform }.to raise_error(ActiveRecord::RecordNotFound)
       expect(ActionMailer::Base.deliveries.empty?).to be_truthy
       expect(subject.redis.llen(subject.enqueued_emails_key)).to eq 1
-      expect(subject.redis.lpop(subject.enqueued_emails_key).to_i).to eq 42
+      expect(subject.redis.lpop(subject.enqueued_emails_key).to_i).to eq user.id
+    end
+  end
+
+  context 'user not found' do
+    it 'removes from the redis list' do
+      subject.redis.lpush(subject.enqueued_emails_key, 42)
+
+      subject.perform
+      expect(ActionMailer::Base.deliveries.empty?).to be_truthy
+      expect(subject.redis.llen(subject.enqueued_emails_key)).to eq 0
     end
   end
 end
