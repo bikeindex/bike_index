@@ -55,7 +55,7 @@ class CustomerMailer < ActionMailer::Base
 
   def updated_terms_email(user)
     @user = user
-    @_action_has_layout = false
+    @_action_has_layout = false # layout is manually included here
     mail(to: @user.email,
          from: '"Lily Williams" <lily@bikeindex.org>',
          subject: 'Bike Index Terms and Privacy Policy Update')
