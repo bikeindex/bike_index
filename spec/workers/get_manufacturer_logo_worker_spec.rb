@@ -5,7 +5,7 @@ describe GetManufacturerLogoWorker do
 
   it 'enqueues listing ordering job' do
     GetManufacturerLogoWorker.perform_async
-    expect(GetManufacturerLogoWorker).to have_enqueued_job
+    expect(GetManufacturerLogoWorker).to have_enqueued_sidekiq_job
   end
 
   # Test is failing inexplicably - http://logo.clearbit.com/trekbikes.com?size=400 still works

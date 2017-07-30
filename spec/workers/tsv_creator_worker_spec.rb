@@ -5,7 +5,7 @@ describe TsvCreatorWorker do
 
   it 'enqueues another awesome job' do
     TsvCreatorWorker.perform_async
-    expect(TsvCreatorWorker).to have_enqueued_job
+    expect(TsvCreatorWorker).to have_enqueued_sidekiq_job
   end
 
   it "sends tsv creator the method it's passed" do

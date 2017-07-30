@@ -34,7 +34,7 @@ describe CreateUserJobs do
       user = User.new
       allow(user).to receive(:id).and_return(69)
       CreateUserJobs.new(user).send_welcome_email
-      expect(EmailWelcomeWorker).to have_enqueued_job(69)
+      expect(EmailWelcomeWorker).to have_enqueued_sidekiq_job(69)
     end
   end
 
@@ -43,7 +43,7 @@ describe CreateUserJobs do
       user = User.new
       allow(user).to receive(:id).and_return(69)
       CreateUserJobs.new(user).send_confirmation_email
-      expect(EmailConfirmationWorker).to have_enqueued_job(69)
+      expect(EmailConfirmationWorker).to have_enqueued_sidekiq_job(69)
     end
   end
 

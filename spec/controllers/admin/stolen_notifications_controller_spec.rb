@@ -30,7 +30,7 @@ describe Admin::StolenNotificationsController do
       sender = FactoryGirl.create(:user)
       admin = FactoryGirl.create(:admin)
       stolen_notification = FactoryGirl.create(:stolen_notification, sender: sender)
-      # pp expect(EmailStolenNotificationWorker).to have_enqueued_job
+      # pp expect(EmailStolenNotificationWorker).to have_enqueued_sidekiq_job
       set_current_user(admin)
       expect do
         get :resend, id: stolen_notification.id

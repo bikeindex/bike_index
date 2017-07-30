@@ -1,6 +1,6 @@
 require 'soulheart/server'
 require 'sidekiq/web'
-Sidekiq::Web.set :session_secret, Rails.application.secrets[:secret_key_base]
+Sidekiq::Web.set :session_secret, ENV['SECRET_KEY_BASE']
 Bikeindex::Application.routes.draw do
   use_doorkeeper do
     controllers applications: 'oauth/applications'

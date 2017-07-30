@@ -5,7 +5,7 @@ describe BikeBookUpdateWorker do
 
   it 'enqueues listing ordering job' do
     BikeBookUpdateWorker.perform_async
-    expect(BikeBookUpdateWorker).to have_enqueued_job
+    expect(BikeBookUpdateWorker).to have_enqueued_sidekiq_job
   end
 
   it "Doesn't break if the bike isn't on bikebook" do

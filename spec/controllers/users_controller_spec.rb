@@ -155,7 +155,7 @@ describe UsersController do
         expect do
           post :password_reset, email: user_email.email
         end.to change(EmailResetPasswordWorker.jobs, :size).by(1)
-        expect(EmailResetPasswordWorker).to have_enqueued_job(user.id)
+        expect(EmailResetPasswordWorker).to have_enqueued_sidekiq_job(user.id)
       end
     end
 

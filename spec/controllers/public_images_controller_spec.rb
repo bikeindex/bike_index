@@ -12,7 +12,7 @@ describe PublicImagesController do
           post :create, bike_id: bike.id, public_image: { name: 'cool name' }, format: :js
           bike.reload
           expect(bike.public_images.first.name).to eq 'cool name'
-          expect(AfterBikeSaveWorker).to have_enqueued_job(bike.id)
+          expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
         end
       end
       context 'no user' do
@@ -207,7 +207,7 @@ describe PublicImagesController do
           post :is_private, id: public_image.id, is_private: 'true'
           public_image.reload
           expect(public_image.is_private).to be_truthy
-          expect(AfterBikeSaveWorker).to have_enqueued_job(bike.id)
+          expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
         end
       end
       context 'is_private false' do
@@ -219,7 +219,7 @@ describe PublicImagesController do
           post :is_private, id: public_image.id, is_private: false
           public_image.reload
           expect(public_image.is_private).to be_falsey
-          expect(AfterBikeSaveWorker).to have_enqueued_job(bike.id)
+          expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
         end
       end
     end
@@ -262,7 +262,7 @@ describe PublicImagesController do
       expect(public_image_2.listing_order).to eq 4
       expect(public_image_1.listing_order).to eq 2
       expect(public_image_other.listing_order).to eq 0
-      expect(AfterBikeSaveWorker).to have_enqueued_job(bike.id)
+      expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
     end
   end
 end

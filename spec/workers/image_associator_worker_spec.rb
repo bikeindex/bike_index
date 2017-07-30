@@ -5,6 +5,6 @@ describe ImageAssociatorWorker do
 
   it 'enqueues another awesome job' do
     ImageAssociatorWorker.perform_async
-    expect(ImageAssociatorWorker).to have_enqueued_job
+    expect(ImageAssociatorWorker).to have_enqueued_sidekiq_job
   end
 end

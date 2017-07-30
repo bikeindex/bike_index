@@ -6,7 +6,7 @@ describe ApproveStolenListingWorker do
   it 'enqueues another awesome job' do
     bike = FactoryGirl.create(:bike)
     ApproveStolenListingWorker.perform_async(bike.id)
-    expect(ApproveStolenListingWorker).to have_enqueued_job(bike.id)
+    expect(ApproveStolenListingWorker).to have_enqueued_sidekiq_job(bike.id)
   end
 
   it 'calls stolen twitterbot integration' do

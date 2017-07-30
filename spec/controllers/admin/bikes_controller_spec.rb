@@ -43,7 +43,7 @@ describe Admin::BikesController do
       end.to change(Bike, :count).by(-1)
       expect(response).to redirect_to(:admin_bikes)
       expect(flash[:success]).to match(/deleted/i)
-      expect(AfterBikeSaveWorker).to have_enqueued_job(bike.id)
+      expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
     end
   end
 

@@ -5,7 +5,7 @@ describe UnusedOwnershipRemovalWorker do
 
   it 'enqueues listing ordering job' do
     UnusedOwnershipRemovalWorker.perform_async
-    expect(UnusedOwnershipRemovalWorker).to have_enqueued_job
+    expect(UnusedOwnershipRemovalWorker).to have_enqueued_sidekiq_job
   end
 
   it 'makes non existent ownerships not current' do
