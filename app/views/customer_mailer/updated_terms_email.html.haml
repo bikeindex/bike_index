@@ -1,0 +1,44 @@
+!!!
+%html
+  %head
+    %meta{ content: 'text/html; charset=UTF-8', 'http-equiv' => 'Content-Type' }
+    %title
+      = content_for?(:title) ? yield(:title) : 'Bike Index'
+    = stylesheet_link_tag 'email'
+  %body
+    .binx-wrapper
+      .binx-header
+        %img{ src: 'https://files.bikeindex.org/email_assets/logo.png' }
+      .binx-body
+        - if @organization.present? && controller_path == 'organized_mailer' && @organization.mail_snippet_body('header').present?
+          = @organization.mail_snippet_body('header').html_safe
+        %h2
+          Hello #{@user.display_name}!
+
+        %p
+          %strong
+            You many not know, but Bike Index recently became a 501(c)(3) nonprofit.
+          We've always wanted to provide one free, universal registration and being a nonprofit helps us get there. You can read more <a href="https://bikeindex.org/news/bike-index--now-a-nonprofit">here</a>
+
+        %p
+          We're emailing you because we updated our privacy policy to reflect the fact that we're now a nonprofit. We also made some copy edits and clarifications. The updated versions of our <a href="https://bikeindex.org/privacy">privacy policy</a>#{", #{link_to 'vendor terms', vendor_terms_url}".html_safe if @user.has_membership? } and <a href="https://bikeindex.org/terms">terms of service</a> are live on Bike Index.
+
+        %p
+          Nothing significant has changed about how we handle your data or trust. We will always protect your information and never sell or trade it. This is the first substantive change we've made to our privacy policy and terms since we first drafted them in 2014. We take your trust very seriously and don't plan on having to do this often. Even three years was too soon.
+
+        %p
+          Check <a href="https://bikeindex.org/news">here</a> to see more of what we’ve been up to. 
+
+        %p{ style: "margin-top: 40px;" }
+          As always, thanks for helping register bikes,
+          %br
+          Lily Williams and the Bike Index Team
+
+        %p{ style: "margin-bottom: 40px;" }
+          %em.less-strong
+            p.s. If you like reading these kinds of documents or have any questions, just reply to this email!
+
+      .binx-footer
+        %h5
+          Help prevent bike theft, #{ link_to 'make a donation', support_the_index_url }
+
