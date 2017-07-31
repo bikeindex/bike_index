@@ -15,6 +15,38 @@ describe StolenRecord do
     expect(stolen_record.current).to be_truthy
   end
 
+  describe 'find_or_create_recovered_link_token' do
+    let(:stolen_record) { StolenRecord.new }
+    it 'returns an existing recovered_link_token' do
+      stolen_record.recovered_link_token = 'blah'
+      expect(stolen_record).to_not receive(:save)
+      expect(stolen_record.find_or_create_recovered_link_token).to eq 'blah'
+    end
+
+    it 'creates a recovered_link_token and saves' do
+      stolen_record = StolenRecord.new
+      expect(stolen_record).to receive(:save)
+      result = stolen_record.find_or_create_recovered_link_token
+      expect(result).to eq stolen_record.recovered_link_token
+    end
+  end
+
+  describe 'find_or_create_recovered_confirmation_token' do
+    let(:stolen_record) { StolenRecord.new }
+    it 'returns an existing recovered_link_token' do
+      stolen_record.recovered_confirmation_token = 'blah'
+      expect(stolen_record).to_not receive(:save)
+      expect(stolen_record.find_or_create_recovered_confirmation_token).to eq 'blah'
+    end
+
+    it 'creates a recovered_confirmation_token and saves' do
+      stolen_record = StolenRecord.new
+      expect(stolen_record).to receive(:save)
+      result = stolen_record.find_or_create_recovered_confirmation_token
+      expect(result).to eq stolen_record.recovered_confirmation_token
+    end
+  end
+
   describe 'scopes' do
     it 'default scopes to current' do
       expect(StolenRecord.all.to_sql).to eq(StolenRecord.unscoped.where(current: true).to_sql)
