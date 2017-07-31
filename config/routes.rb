@@ -100,6 +100,7 @@ Bikeindex::Application.routes.draw do
   resources :registrations, only: [:new, :create] do
     collection { get :embed }
   end
+
   resources :bikes do
     collection { get :scanned }
     member do
@@ -107,7 +108,9 @@ Bikeindex::Application.routes.draw do
       get :scanned
       get :pdf
     end
+    resource :recovery, only: [:edit, :update], controller: 'bikes/recovery'
   end
+
   resources :locks, except: [:show, :index]
 
   namespace :admin do

@@ -68,6 +68,10 @@ class StolenRecord < ActiveRecord::Base
     date_stolen && date_stolen.strftime(self.class.revised_date_format)
   end
 
+  def recovered?
+    date_recovered.present?
+  end
+
   def address
     return nil unless country
     a = []
@@ -188,32 +192,18 @@ class StolenRecord < ActiveRecord::Base
     info = ActiveSupport::HashWithIndifferentAccess.new(info)
     bike.update_attribute :stolen, false if bike.stolen
     self.date_recovered ||= Time.now
-    self.update_attributes = {
-      recovered_description: info[:request_reason],
-      current: false,
-      recovered: true,
-      index_helped_recovery: info[:index_helped_recovery].present? &&
-                               info[:index_helped_recovery].to_s.match(/t|1/i),
-      can_share_recovery: info[:can_share_recovery].present? &&
-                            info[:can_share_recovery].to_s.match(/t|1/i),
-    }
+    update_attributes(current: false,
+                      recovered_description: info[:request_reason],
+                      index_helped_recovery: ("#{info[:index_helped_recovery]}" =~ /t|1/i).present?,
+                      can_share_recovery: ("#{info[:can_share_recovery]}" =~ /t|1/i).present?)
   end
 
-  def find_or_create_recovered_link_token
-    return recovered_link_token if recovered_link_token.present?
+  def find_or_create_recovery_link_token
+    return recovery_link_token if recovery_link_token.present?
     begin
-      self.recovered_link_token = SecureRandom.urlsafe_base64
-    end while self.class.where(recovered_link_token: recovered_link_token).exists?
+      self.recovery_link_token = SecureRandom.urlsafe_base64
+    end while self.class.where(recovery_link_token: recovery_link_token).exists?
     save
-    recovered_link_token
-  end
-
-  def find_or_create_recovered_confirmation_token
-    return recovered_confirmation_token if recovered_confirmation_token.present?
-    begin
-      self.recovered_confirmation_token = SecureRandom.urlsafe_base64
-    end while self.class.where(recovered_confirmation_token: recovered_confirmation_token).exists?
-    save
-    recovered_confirmation_token
+    recovery_link_token
   end
 end

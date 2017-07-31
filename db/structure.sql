@@ -1755,9 +1755,7 @@ CREATE TABLE stolen_records (
     create_open311 boolean DEFAULT false NOT NULL,
     tsved_at timestamp without time zone,
     estimated_value integer,
-    recovered_link_token text,
-    recovered_confirmation_token text,
-    recovered boolean DEFAULT false NOT NULL
+    recovery_link_token text
 );
 
 

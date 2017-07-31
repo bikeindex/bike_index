@@ -15,35 +15,19 @@ describe StolenRecord do
     expect(stolen_record.current).to be_truthy
   end
 
-  describe 'find_or_create_recovered_link_token' do
+  describe 'find_or_create_recovery_link_token' do
     let(:stolen_record) { StolenRecord.new }
-    it 'returns an existing recovered_link_token' do
-      stolen_record.recovered_link_token = 'blah'
+    it 'returns an existing recovery_link_token' do
+      stolen_record.recovery_link_token = 'blah'
       expect(stolen_record).to_not receive(:save)
-      expect(stolen_record.find_or_create_recovered_link_token).to eq 'blah'
+      expect(stolen_record.find_or_create_recovery_link_token).to eq 'blah'
     end
 
-    it 'creates a recovered_link_token and saves' do
+    it 'creates a recovery_link_token and saves' do
       stolen_record = StolenRecord.new
       expect(stolen_record).to receive(:save)
-      result = stolen_record.find_or_create_recovered_link_token
-      expect(result).to eq stolen_record.recovered_link_token
-    end
-  end
-
-  describe 'find_or_create_recovered_confirmation_token' do
-    let(:stolen_record) { StolenRecord.new }
-    it 'returns an existing recovered_link_token' do
-      stolen_record.recovered_confirmation_token = 'blah'
-      expect(stolen_record).to_not receive(:save)
-      expect(stolen_record.find_or_create_recovered_confirmation_token).to eq 'blah'
-    end
-
-    it 'creates a recovered_confirmation_token and saves' do
-      stolen_record = StolenRecord.new
-      expect(stolen_record).to receive(:save)
-      result = stolen_record.find_or_create_recovered_confirmation_token
-      expect(result).to eq stolen_record.recovered_confirmation_token
+      result = stolen_record.find_or_create_recovery_link_token
+      expect(result).to eq stolen_record.recovery_link_token
     end
   end
 
@@ -233,6 +217,35 @@ describe StolenRecord do
       stolen_record.update_attributes(police_report_department: 'CPD')
       stolen_record.reload
       expect(stolen_record.tsved_at).to be_nil
+    end
+  end
+
+  describe 'add_recovery_information' do
+    let(:bike) { FactoryGirl.create(:stolen_bike) }
+    let(:stolen_record) { bike.current_stolen_record }
+    let(:recovery_request) do
+      {
+        request_type: 'bike_recovery',
+        user_id: 69,
+        request_bike_id: bike.id,
+        request_reason: 'Some reason',
+        index_helped_recovery: 'true',
+        can_share_recovery: 'false'
+      }
+    end
+    before { expect(bike.stolen).to be_truthy }
+    it 'updates recovered bike' do
+      stolen_record.add_recovery_information(recovery_request.as_json)
+      bike.reload
+      stolen_record.reload
+
+      expect(bike.stolen).to be_falsey
+      expect(stolen_record.recovered?).to be_truthy
+      expect(stolen_record.current).to be_falsey
+      expect(bike.current_stolen_record).not_to be_present
+      expect(stolen_record.reload.date_recovered).to be_within(1.second).of Time.now
+      expect(stolen_record.index_helped_recovery).to be_truthy
+      expect(stolen_record.can_share_recovery).to be_falsey
     end
   end
 end
