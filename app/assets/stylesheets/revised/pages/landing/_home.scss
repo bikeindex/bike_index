@@ -100,8 +100,8 @@
     padding-top: 20*$vertical-height;
     padding-bottom: 12*$vertical-height;
     .root-landing-header-text {
+      margin-top: 55px;
       @include make-col(7);
-      margin-top: 77px;
       p { line-height: 1.3em; }
     }
     .root-landing-signup {
@@ -110,7 +110,19 @@
       @include make-col(5);
     }
   }
+  @include media-breakpoint-up(xl) {
+    .root-landing-header-text {
+      margin-top: 85px;
+    }
+  }
 }
+// @media screen
+//   and (min-device-width: 1155px) {
+//   .root-landing-banner-header .root-landing-header-text {
+//     margin-top: 55px;
+//   }
+// }
+
 
 .root-landing-how-it-works {
   padding-top: 4*$vertical-height;
