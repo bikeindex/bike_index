@@ -83,7 +83,8 @@ class Admin::BikesController < Admin::BaseController
       @bike.current_stolen_record.add_recovery_information(
         request_reason: params[:mark_recovered_reason],
         index_helped_recovery: params[:mark_recovered_we_helped],
-        can_share_recovery: params[:can_share_recovery])
+        can_share_recovery: params[:can_share_recovery]
+      )
     end
     if @bike.update_attributes(permitted_parameters.except(:stolen_records_attributes))
       @bike.create_normalized_serial_segments

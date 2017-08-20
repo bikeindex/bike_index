@@ -32,16 +32,12 @@ class StolenRecord < ActiveRecord::Base
 
   default_scope { where(current: true) }
   scope :approveds, -> { where(approved: true) }
-  scope :approveds_with_reports, -> {
-    approveds.where('police_report_number IS NOT NULL')
-             .where('police_report_department IS NOT NULL')
-  }
+  scope :approveds_with_reports, -> { approveds.where('police_report_number IS NOT NULL').where('police_report_department IS NOT NULL') }
   scope :not_tsved, -> { where('tsved_at IS NULL') }
   scope :tsv_today, -> { where("tsved_at IS NULL OR tsved_at >= '#{Time.now.beginning_of_day}'") }
 
   scope :recovered, -> { unscoped.where(current: false).order('date_recovered desc') }
-  # scope :recovered, -> { unscoped.where(recovered: true) }
-  scope :displayable, -> { unscoped.where(current: false, can_share_recovery: true).order('date_recovered desc') }
+  scope :displayable, -> { recovered.where(can_share_recovery: true) }
   scope :recovery_unposted, -> { unscoped.where(current: false, recovery_posted: false) }
 
   geocoded_by :address
@@ -57,19 +53,16 @@ class StolenRecord < ActiveRecord::Base
 
   before_validation :date_from_date_stolen_input
   def date_from_date_stolen_input
-    if date_stolen_input.present?
-      self.date_stolen = DateTime.strptime("#{date_stolen_input} 06", self.class.revised_date_format_hour)
-    else
-      true
-    end
+    return true unless date_stolen_input.present?
+    self.date_stolen = DateTime.strptime("#{date_stolen_input} 06", self.class.revised_date_format_hour)
+  end
+
+  def recovered?
+    !current?
   end
 
   def formatted_date
     date_stolen && date_stolen.strftime(self.class.revised_date_format)
-  end
-
-  def recovered?
-    date_recovered.present?
   end
 
   def address
@@ -190,12 +183,13 @@ class StolenRecord < ActiveRecord::Base
 
   def add_recovery_information(info)
     info = ActiveSupport::HashWithIndifferentAccess.new(info)
-    bike.update_attribute :stolen, false if bike.stolen
     self.date_recovered ||= Time.now
     update_attributes(current: false,
                       recovered_description: info[:request_reason],
                       index_helped_recovery: ("#{info[:index_helped_recovery]}" =~ /t|1/i).present?,
                       can_share_recovery: ("#{info[:can_share_recovery]}" =~ /t|1/i).present?)
+    bike.stolen = false
+    bike.save
   end
 
   def find_or_create_recovery_link_token
