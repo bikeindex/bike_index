@@ -81,7 +81,7 @@ class Admin::BikesController < Admin::BaseController
     @bike = @bike.decorate
     if params[:mark_recovered_reason].present?
       @bike.current_stolen_record.add_recovery_information(
-        request_reason: params[:mark_recovered_reason],
+        recovered_description: params[:mark_recovered_reason],
         index_helped_recovery: params[:mark_recovered_we_helped],
         can_share_recovery: params[:can_share_recovery]
       )

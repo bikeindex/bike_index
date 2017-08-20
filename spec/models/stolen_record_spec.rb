@@ -223,18 +223,18 @@ describe StolenRecord do
   describe 'add_recovery_information' do
     let(:bike) { FactoryGirl.create(:stolen_bike) }
     let(:stolen_record) { bike.current_stolen_record }
-    let(:recovery_request) do
+    let(:recovery_info) do
       {
         request_type: 'bike_recovery',
         user_id: 69,
         request_bike_id: bike.id,
-        request_reason: 'Some reason',
+        recovered_description: 'Some reason',
         index_helped_recovery: 'true',
         can_share_recovery: 'false'
       }
     end
-    before { expect(bike.stolen).to be_truthy }
-    it 'updates recovered bike' do
+    before do
+      expect(bike.stolen).to be_truthy
       stolen_record.add_recovery_information(recovery_request.as_json)
       bike.reload
       stolen_record.reload
@@ -243,9 +243,20 @@ describe StolenRecord do
       expect(stolen_record.recovered?).to be_truthy
       expect(stolen_record.current).to be_falsey
       expect(bike.current_stolen_record).not_to be_present
-      expect(stolen_record.reload.date_recovered).to be_within(1.second).of Time.now
       expect(stolen_record.index_helped_recovery).to be_truthy
       expect(stolen_record.can_share_recovery).to be_falsey
+    end
+    context 'no date_recovered' do
+      let(:recovery_request) { recovery_info.except(:can_share_recovery) }
+      it 'updates recovered bike' do
+        expect(stolen_record.reload.date_recovered).to be_within(1.second).of Time.now
+      end
+    end
+    context 'date_recovered' do
+      let(:recovery_request) { recovery_info.merge(date_recovered: 'Tue Jan 31 2017') }
+      it 'updates recovered bike and assigns date' do
+        expect(stolen_record.reload.date_recovered.to_date).to eq Date.civil(2017, 1, 31)
+      end
     end
   end
 end

@@ -4,10 +4,23 @@ module Bikes
     before_filter :ensure_token_match!
     layout 'application_revised'
 
-    def edit
+    def edit; end
+
+    def update
+      if @stolen_record.add_recovery_information(permitted_params)
+        flash[:success] = 'Bike marked recovered! Thank you!'
+        redirect_to bike_path(@bike)
+      else
+        render :edit, bike_id: @bike.id, token: params[:token]
+      end
     end
 
     private
+
+    def permitted_params
+       params.require(:stolen_record).permit(:date_recovered, :recovered_description,
+                                             :index_helped_recovery, :can_share_recovery)
+    end
 
     def find_bike
       @bike = Bike.unscoped.find(params[:bike_id])
@@ -19,8 +32,12 @@ module Bikes
       @stolen_record = @bike && StolenRecord.unscoped
                                             .where(bike_id: @bike.id,
                                                    recovery_link_token: params[:token]).first
-      return true if @stolen_record.present?
-      flash[:error] = 'Incorrect Token, check your email again'
+      if @stolen_record.present?
+        return true if @bike.stolen
+        flash[:info] = 'Bike has already been marked recovered!'
+      else
+        flash[:error] = 'Incorrect Token, check your email again'
+      end
       redirect_to bike_path(@bike) and return
     end
   end

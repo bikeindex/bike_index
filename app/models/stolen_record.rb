@@ -54,7 +54,12 @@ class StolenRecord < ActiveRecord::Base
   before_validation :date_from_date_stolen_input
   def date_from_date_stolen_input
     return true unless date_stolen_input.present?
-    self.date_stolen = DateTime.strptime("#{date_stolen_input} 06", self.class.revised_date_format_hour)
+    self.date_stolen = parse_date_from_input(date_stolen_input)
+  end
+
+  def parse_date_from_input(date_string)
+    return Time.now unless date_string.present?
+    DateTime.strptime("#{date_string} 06", self.class.revised_date_format_hour)
   end
 
   def recovered?
@@ -181,11 +186,11 @@ class StolenRecord < ActiveRecord::Base
     row
   end
 
-  def add_recovery_information(info)
+  def add_recovery_information(info = {})
     info = ActiveSupport::HashWithIndifferentAccess.new(info)
-    self.date_recovered ||= Time.now
+    self.date_recovered ||= parse_date_from_input(info[:date_recovered])
     update_attributes(current: false,
-                      recovered_description: info[:request_reason],
+                      recovered_description: info[:recovered_description],
                       index_helped_recovery: ("#{info[:index_helped_recovery]}" =~ /t|1/i).present?,
                       can_share_recovery: ("#{info[:can_share_recovery]}" =~ /t|1/i).present?)
     bike.stolen = false

@@ -72,7 +72,9 @@ module Api
         if params[:can_share_recovery].present?
           feedback.feedback_hash[:can_share_recovery] = params[:can_share_recovery]
         end
-        bike.current_stolen_record.add_recovery_information(params)
+        bike.current_stolen_record.add_recovery_information(
+          params.merge(recovered_description: params[:recovered_description])
+        )
       end
     end
   end
