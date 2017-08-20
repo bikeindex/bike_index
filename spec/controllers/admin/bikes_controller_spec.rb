@@ -26,12 +26,26 @@ describe Admin::BikesController do
   end
 
   describe 'edit' do
-    it 'renders' do
-      bike = FactoryGirl.create(:bike)
-      get :edit, id: bike.id
-      expect(response.code).to eq('200')
-      expect(response).to render_template('edit')
-      expect(flash).to_not be_present
+    let(:bike) { FactoryGirl.create(:stolen_bike) }
+    let(:stolen_record) { bike.current_stolen_record }
+    context 'standard' do
+      it 'renders' do
+        get :edit, id: FactoryGirl.create(:bike).id
+        expect(response.code).to eq('200')
+        expect(response).to render_template('edit')
+        expect(flash).to_not be_present
+      end
+    end
+    context 'with recovery' do
+      before { stolen_record.add_recovery_information }
+      it 'includes recovery' do
+        get :edit, id: bike.id
+        expect(response.code).to eq('200')
+        expect(response).to render_template('edit')
+        expect(flash).to_not be_present
+        expect(assigns(:recoveries)).to eq bike.recovered_records
+        expect(assigns(:recoveries).pluck(:id)).to eq([stolen_record.id])
+      end
     end
   end
 

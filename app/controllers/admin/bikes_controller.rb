@@ -71,6 +71,7 @@ class Admin::BikesController < Admin::BaseController
   def edit
     @bike = @bike.decorate
     @fast_attr_update = params[:fast_attr_update]
+    @recoveries = @bike.recovered_records
   end
 
   def update

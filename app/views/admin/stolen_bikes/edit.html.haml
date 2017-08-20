@@ -51,7 +51,12 @@
               = "Users" if @stolen_record.phone_for_users
               = " Shops" if @stolen_record.phone_for_shops
               = " Police" if @stolen_record.phone_for_police
-          - if @stolen_record.approved 
+          .clearfix
+          %dt
+            Link to recover
+          %dd
+            %input{ disabled: true, type: 'text', value: edit_bike_recovery_url(bike_id: @bike.id, token: @stolen_record.find_or_create_recovery_link_token).to_s }
+          - if @stolen_record.approved
             %h2
               Stolen bike approved
           - else

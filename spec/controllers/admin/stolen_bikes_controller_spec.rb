@@ -16,9 +16,14 @@ describe Admin::StolenBikesController do
   end
 
   describe 'edit' do
+    let(:bike) { FactoryGirl.create(:stolen_bike) }
+    let(:stolen_record) { bike.current_stolen_record }
     it 'renders' do
-      bike = FactoryGirl.create(:bike)
+      expect(stolen_record.recovery_link_token).to_not be_present
       get :edit, id: bike.id
+      stolen_record.reload
+
+      expect(stolen_record.recovery_link_token).to be_present
       expect(response.code).to eq('200')
       expect(response).to render_template('edit')
       expect(flash).to_not be_present
