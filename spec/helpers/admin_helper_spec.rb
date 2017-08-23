@@ -15,9 +15,11 @@ describe AdminHelper do
       end
     end
     context 'other date' do
-      let(:target) { '2/20/2017 at 1pm' }
+      let(:target) { '2/20/2017 at 10am' }
+      let(:time) { Time.parse('2017-02-20T10:37:39.000-06:00') }
       it 'returns in correct format' do
-        expect(admin_display_date(Time.at(1487615859))).to eq target
+        expect(Time.zone.name).to eq 'Central Time (US & Canada)'
+        expect(admin_display_date(time)).to eq target
       end
     end
   end
