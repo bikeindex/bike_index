@@ -1,5 +1,5 @@
 - @ownership ||= @bike.current_ownership
-- bike_url = ownership_url(@ownership)
+- bike_url ||= ownership_url(@ownership)
 - thumb_url = @bike.thumb_path || @bike.stock_photo_url
 - unless thumb_url.present?
   - thumbclass = 'placeholder'

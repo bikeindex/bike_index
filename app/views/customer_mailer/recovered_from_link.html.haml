@@ -1,0 +1,19 @@
+%h1 We're so glad you got your #{ @biketype } back!
+
+%p
+  Your #{ @biketype } was marked recovered on Bike Index:
+
+= render partial: '/shared/email_bike_box', locals: { bike_url: bike_url(@bike) }
+
+%p
+  The description of the recovery was:
+  %span.less-strong
+    = @stolen_record.recovered_description
+
+%hr
+
+%p.center-text
+  %em
+    %strong
+      Note:
+    If you didn't recover your bike, or marked it recovered accidentally, reply to this email and let us know!

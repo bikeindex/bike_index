@@ -42,8 +42,10 @@ describe Bikes::RecoveryController, type: :controller do
     end
     context 'matching recovery token' do
       it 'updates' do
-        put :update, bike_id: bike.id, token: recovery_link_token,
-                     stolen_record: recovery_info
+        expect do
+          put :update, bike_id: bike.id, token: recovery_link_token,
+                       stolen_record: recovery_info
+        end.to change(EmailNotifyRecoveredFromLinkWorker.jobs, :size).by(1)
         stolen_record.reload
         bike.reload
 
@@ -59,8 +61,10 @@ describe Bikes::RecoveryController, type: :controller do
     end
     context 'non-matching recovery token' do
       it 'does not update' do
-        put :update, bike_id: bike.id, token: 'XDSFCVVVVVVVVVSD888',
-                     stolen_record: recovery_info
+        expect do
+          put :update, bike_id: bike.id, token: 'XDSFCVVVVVVVVVSD888',
+                       stolen_record: recovery_info
+        end.to change(EmailNotifyRecoveredFromLinkWorker.jobs, :size).by(0)
         stolen_record.reload
         bike.reload
 

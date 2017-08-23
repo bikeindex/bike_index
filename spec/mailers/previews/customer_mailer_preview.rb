@@ -41,6 +41,11 @@ class CustomerMailerPreview < ActionMailer::Preview
     CustomerMailer.updated_terms_email(User.find(85))
   end
 
+  def recovered_from_link
+    recovered_record = StolenRecord.recovered.where.not(date_recovered: nil).first
+    CustomerMailer.recovered_from_link(recovered_record)
+  end
+
   private
 
   def preview_user
