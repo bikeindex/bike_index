@@ -4,10 +4,14 @@ module Bikes
     before_filter :ensure_token_match!
     layout 'application_revised'
 
-    def edit; end
+    def edit
+      # redirect to bike show and set session - so the token isn't available to on page js
+      # and so we can render show with a modal
+    end
 
     def update
       if @stolen_record.add_recovery_information(permitted_params)
+        EmailRecoveredFromLinkWorker.perform_async(@stolen_record.id)
         flash[:success] = 'Bike marked recovered! Thank you!'
         redirect_to bike_path(@bike)
       else

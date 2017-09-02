@@ -45,7 +45,7 @@ describe Bikes::RecoveryController, type: :controller do
         expect do
           put :update, bike_id: bike.id, token: recovery_link_token,
                        stolen_record: recovery_info
-        end.to change(EmailNotifyRecoveredFromLinkWorker.jobs, :size).by(1)
+        end.to change(EmailRecoveredFromLinkWorker.jobs, :size).by(1)
         stolen_record.reload
         bike.reload
 
@@ -64,7 +64,7 @@ describe Bikes::RecoveryController, type: :controller do
         expect do
           put :update, bike_id: bike.id, token: 'XDSFCVVVVVVVVVSD888',
                        stolen_record: recovery_info
-        end.to change(EmailNotifyRecoveredFromLinkWorker.jobs, :size).by(0)
+        end.to change(EmailRecoveredFromLinkWorker.jobs, :size).by(0)
         stolen_record.reload
         bike.reload
 
