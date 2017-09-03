@@ -6,8 +6,9 @@
       .modal-body
         %p
           Please tell us how you got your #{@bike.type} back, we really care! 
-        %p
-          It's also how we get better at recovering bikes.
+          %br
+          %strong
+            It's also how we get better at recovering bikes.
         = form_for @stolen_record, url: bike_recovery_path(bike_id: @bike.id) do |f|
           = hidden_field_tag :token, stolen_record.recovery_link_token
           .form-group

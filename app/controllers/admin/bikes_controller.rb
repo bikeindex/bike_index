@@ -101,6 +101,20 @@ class Admin::BikesController < Admin::BaseController
     end
   end
 
+  def unrecover
+    stolen_record = StolenRecord.unscoped.where(bike_id: params[:bike_id],
+                                                id: params[:stolen_record_id]).first
+    if stolen_record.present?
+      bike = Bike.unscoped.find(params[:bike_id])
+      flash[:success] = "Marked unrecovered!"
+      stolen_record.update_attributes(date_recovered: nil, current: true)
+      bike.update_attribute :stolen, true
+    else
+      flash[:error] = "Stolen record not found! Contact a developer"
+    end
+    redirect_to admin_bike_path(params[:bike_id])
+  end
+
   protected
 
   def permitted_parameters

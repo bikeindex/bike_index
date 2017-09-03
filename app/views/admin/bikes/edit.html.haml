@@ -251,4 +251,4 @@
               %td.table-cell-check
                 = "&#x2713;".html_safe if recovery.can_share_recovery
               %td
-                = link_to 'unrecover', '#'
+                = link_to 'unrecover', unrecover_admin_bikes_path(stolen_record_id: recovery.id, bike_id: @bike.id), method: :put

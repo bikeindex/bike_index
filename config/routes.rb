@@ -121,6 +121,7 @@ Bikeindex::Application.routes.draw do
         put :ignore_duplicate_toggle
         get :missing_manufacturer
         post :update_manufacturers
+        put :unrecover
       end
       member { get :get_destroy }
     end
