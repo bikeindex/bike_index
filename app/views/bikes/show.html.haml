@@ -53,7 +53,7 @@
           = l @stolen_record.date_stolen, format: :dotted
           %strong
             at
-          = @stolen_record.show_stolen_address
+          = @stolen_record.address(skip_default_country: true)
 
       - if @bike.should_show_other_bikes
         %h4
@@ -127,7 +127,7 @@
             = render 'stolen_map'
             .col-md-4
               %ul.attr-list.separate-lines
-                = @bike.attr_list_item(@stolen_record.show_stolen_address, 'Location')
+                = @bike.attr_list_item(@stolen_record.address(skip_default_country: true), 'Location')
                 = @bike.attr_list_item(@stolen_record.locking_description, 'Locking description')
                 = @bike.attr_list_item(@stolen_record.lock_defeat_description, 'Locking circumvented')
                 = @bike.attr_list_item((l @stolen_record.date_stolen, format: :dotted), "Date #{stolen_type}") # stolen_type defined at start of document

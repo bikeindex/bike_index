@@ -89,11 +89,26 @@ describe StolenRecord do
   end
 
   describe 'address' do
+    let(:country) { Country.create(name: 'Neverland', iso: 'NEVVVV') }
+    let(:state) { State.create(country_id: country.id, name: 'BullShit', abbreviation: 'XXX')}
     it 'creates an address' do
-      c = Country.create(name: 'Neverland', iso: 'XXX')
-      s = State.create(country_id: c.id, name: 'BullShit', abbreviation: 'XXX')
-      stolen_record = FactoryGirl.create(:stolen_record, street: '2200 N Milwaukee Ave', city: 'Chicago', state_id: s.id, zipcode: '60647', country_id: c.id)
-      expect(stolen_record.address).to eq('2200 N Milwaukee Ave, Chicago, XXX, 60647, Neverland')
+      stolen_record = StolenRecord.new(street: '2200 N Milwaukee Ave',
+                                       city: 'Chicago',
+                                       state_id: state.id,
+                                       zipcode: '60647',
+                                       country_id: country.id)
+      expect(stolen_record.address).to eq('2200 N Milwaukee Ave, Chicago, XXX, 60647, NEVVVV')
+    end
+    it 'is ok with missing information' do
+      stolen_record = StolenRecord.new(street: '2200 N Milwaukee Ave',
+                                       zipcode: '60647',
+                                       country_id: country.id)
+      expect(stolen_record.address).to eq('2200 N Milwaukee Ave, 60647, NEVVVV')
+    end
+    it 'returns nil if there is no country' do
+      stolen_record = StolenRecord.new(street: '302666 Richmond Blvd')
+      expect(stolen_record.address).to be_nil
+
     end
   end
 

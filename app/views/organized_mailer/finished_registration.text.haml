@@ -21,7 +21,7 @@ Color#{ 's' if @bike.frame_colors.count > 1 }: #{ @bike.frame_colors.to_sentence
 
 - if @bike.stolen
   - stolen_record = @bike.current_stolen_record
-  #{ @bike.recovered ? 'Found:' : 'Stolen from:' }#{ stolen_record.show_stolen_address }
+  #{ @bike.recovered ? 'Found:' : 'Stolen from:' }#{ stolen_record.address(skip_default_country: true) }
 
   Date: #{ l stolen_record.date_stolen, format: :dotted }
 

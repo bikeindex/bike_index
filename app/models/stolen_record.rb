@@ -75,29 +75,26 @@ class StolenRecord < ActiveRecord::Base
     date_stolen && date_stolen.strftime(self.class.revised_date_format)
   end
 
-  def address
-    return nil unless country
-    a = []
-    a << street if street.present?
-    a << city
-    a << state.abbreviation if state.present?
-    (a + [zipcode, country.name]).compact.join(', ')
+  def address(skip_default_country: false)
+    country_string = country && country.iso
+    if skip_default_country
+      country_string = nil if country_string == 'US'
+    else
+      return nil unless country
+    end
+    [
+      street,
+      city,
+      (state && state.abbreviation),
+      zipcode,
+      country_string
+    ].reject(&:blank?).join(', ')
   end
 
   def address_short # Doesn't include street
     [city,
      (state && state.abbreviation),
      zipcode].reject(&:blank?).join(',')
-  end
-
-  def show_stolen_address
-    [
-      street,
-      city,
-      (state && state.abbreviation),
-      zipcode,
-      (country && country.iso unless country && country.iso == 'US')
-    ].reject(&:blank?).join(', ')
   end
 
   def self.locking_description
