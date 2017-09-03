@@ -95,6 +95,7 @@
                 This #{@bike.type} has been returned!
 
 - if @bike.stolen and @bike.find_current_stolen_record.present?
+  / Similar form and text exists in initial_modal_for_show
   - modal_title = "We're so glad you got your #{@bike.type} back!"
   - alert_body = capture_haml do
     %p
@@ -104,7 +105,7 @@
   - modal_body = capture_haml do
     .modal-body
       = render partial: '/shared/alert', locals: { body: alert_body, title: 'Not enough information!', class_names: 'currently-hidden' }
-      = form_tag  do |t|
+      = form_tag do |t|
         = hidden_field_tag :mark_recovered_bike_id, @bike.id
         = hidden_field_tag :mark_recovered_stolen_record_id, (@bike.current_stolen_record_id if @bike.current_stolen_record_id.present?)
         .form-group

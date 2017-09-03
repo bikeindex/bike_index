@@ -7,6 +7,8 @@ module Bikes
     def edit
       # redirect to bike show and set session - so the token isn't available to on page js
       # and so we can render show with a modal
+      session[:recovery_link_token] = params[:token]
+      redirect_to bike_path(@bike)
     end
 
     def update
@@ -22,8 +24,8 @@ module Bikes
     private
 
     def permitted_params
-       params.require(:stolen_record).permit(:date_recovered, :recovered_description,
-                                             :index_helped_recovery, :can_share_recovery)
+      params.require(:stolen_record).permit(:date_recovered, :recovered_description,
+                                            :index_helped_recovery, :can_share_recovery)
     end
 
     def find_bike
@@ -33,9 +35,8 @@ module Bikes
     end
 
     def ensure_token_match!
-      @stolen_record = @bike && StolenRecord.unscoped
-                                            .where(bike_id: @bike.id,
-                                                   recovery_link_token: params[:token]).first
+      @stolen_record = StolenRecord.find_matching_token(bike_id: @bike && @bike.id,
+                                                        recovery_link_token: params[:token])
       if @stolen_record.present?
         return true if @bike.stolen
         flash[:info] = 'Bike has already been marked recovered!'

@@ -4,8 +4,8 @@ class BikeIndex.BikesShow extends BikeIndex
     if $('.bike-edit-overlay').length > 0
       @showBikeEditOverlay()
 
-    # Show the "claim bike" modal if it's present
-    $('#claim-bike-modal').modal('show') if document.getElementById('claim-bike-modal')
+    # Show the "claim bike" modal (or recovery modal) if present
+    $('#initial-open-modal').modal('show') if document.getElementById('initial-open-modal')
 
     # Hide the message button after click
     $('#write_them_a_message').click (e) ->

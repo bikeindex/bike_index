@@ -51,6 +51,11 @@ class StolenRecord < ActiveRecord::Base
     "#{revised_date_format} %H"
   end
 
+  def self.find_matching_token(bike_id:, recovery_link_token:)
+    return nil unless bike_id.present? && recovery_link_token.present?
+    unscoped.where(bike_id: bike_id, recovery_link_token: recovery_link_token).first
+  end
+
   before_validation :date_from_date_stolen_input
   def date_from_date_stolen_input
     return true unless date_stolen_input.present?

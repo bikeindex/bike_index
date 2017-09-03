@@ -11,22 +11,25 @@ describe Bikes::RecoveryController, type: :controller do
         get :edit, bike_id: bike.id, token: 'XXXXXXXX'
         expect(response).to redirect_to bike_url(bike)
         expect(flash[:error]).to be_present
+        expect(session[:recovery_link_token]).to be_blank
       end
     end
     context 'matching recovery token' do
       it 'renders' do
         get :edit, bike_id: bike.id, token: recovery_link_token
-        expect(response).to be_success
-        expect(response).to render_template(:edit)
-        expect(assigns(:stolen_record)).to eq stolen_record
+        expect(response).to redirect_to bike_path(bike)
+        expect(session[:recovery_link_token]).to eq recovery_link_token
       end
     end
     context 'already recovered bike' do
       before { stolen_record.add_recovery_information }
       it 'redirects' do
+        bike.reload
+        expect(bike.stolen).to be_falsey
         get :edit, bike_id: bike.id, token: recovery_link_token
         expect(response).to redirect_to bike_url(bike)
         expect(flash[:info]).to match(/already/)
+        expect(session[:recovery_link_token]).to be_blank
       end
     end
   end
