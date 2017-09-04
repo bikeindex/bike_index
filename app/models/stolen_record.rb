@@ -20,7 +20,7 @@ class StolenRecord < ActiveRecord::Base
   has_one :recovery_display
   belongs_to :country
   belongs_to :state
-  belongs_to :creation_organization, class_name: "Organization"
+  belongs_to :creation_organization, class_name: 'Organization'
 
   validates_presence_of :bike
   validate :date_present
@@ -32,17 +32,13 @@ class StolenRecord < ActiveRecord::Base
 
   default_scope { where(current: true) }
   scope :approveds, -> { where(approved: true) }
-  scope :approveds_with_reports, -> { approveds.where("police_report_number IS NOT NULL").
-    where("police_report_department IS NOT NULL") }
-  scope :not_tsved, -> { where("tsved_at IS NULL") }
+  scope :approveds_with_reports, -> { approveds.where('police_report_number IS NOT NULL').where('police_report_department IS NOT NULL') }
+  scope :not_tsved, -> { where('tsved_at IS NULL') }
   scope :tsv_today, -> { where("tsved_at IS NULL OR tsved_at >= '#{Time.now.beginning_of_day}'") }
 
-  scope :recovered, -> { unscoped.where(current: false).order("date_recovered desc") }
-  scope :displayable, -> { unscoped.where(current: false, can_share_recovery: true).order("date_recovered desc") }
-  scope :recovery_unposted, -> { unscoped.where(
-    current: false,
-    recovery_posted: false
-  )}
+  scope :recovered, -> { unscoped.where(current: false).order('date_recovered desc') }
+  scope :displayable, -> { recovered.where(can_share_recovery: true) }
+  scope :recovery_unposted, -> { unscoped.where(current: false, recovery_posted: false) }
 
   geocoded_by :address
   after_validation :geocode, if: lambda { (self.city.present? || self.zipcode.present?) && self.country.present? }
@@ -55,50 +51,57 @@ class StolenRecord < ActiveRecord::Base
     "#{revised_date_format} %H"
   end
 
+  def self.find_matching_token(bike_id:, recovery_link_token:)
+    return nil unless bike_id.present? && recovery_link_token.present?
+    unscoped.where(bike_id: bike_id, recovery_link_token: recovery_link_token).first
+  end
+
   before_validation :date_from_date_stolen_input
   def date_from_date_stolen_input
-    if date_stolen_input.present?
-      self.date_stolen = DateTime.strptime("#{date_stolen_input} 06", self.class.revised_date_format_hour)
-    else
-      true
-    end
+    return true unless date_stolen_input.present?
+    self.date_stolen = parse_date_from_input(date_stolen_input)
+  end
+
+  def parse_date_from_input(date_string)
+    return Time.now unless date_string.present?
+    DateTime.strptime("#{date_string} 06", self.class.revised_date_format_hour)
+  end
+
+  def recovered?
+    !current?
   end
 
   def formatted_date
     date_stolen && date_stolen.strftime(self.class.revised_date_format)
   end
 
-  def address
-    return nil unless self.country
-    a = []
-    a << street if street.present?
-    a << city
-    a << state.abbreviation if state.present?
-    (a+[zipcode, country.name]).compact.join(', ')
-  end
-
-  def address_short # Doesn't include street
-    [
-      city,
-      (state && state.abbreviation),
-      zipcode,
-    ].reject(&:blank?).join(',')
-  end
-
-  def show_stolen_address
+  def address(skip_default_country: false)
+    country_string = country && country.iso
+    if skip_default_country
+      country_string = nil if country_string == 'US'
+    else
+      return nil unless country
+    end
     [
       street,
       city,
       (state && state.abbreviation),
       zipcode,
-      (country && country.iso unless country && country.iso == 'US')
+      country_string
     ].reject(&:blank?).join(', ')
+  end
+
+  def address_short # Doesn't include street
+    [city,
+     (state && state.abbreviation),
+     zipcode].reject(&:blank?).join(',')
   end
 
   def self.locking_description
     ['U-lock', 'Two U-locks', 'U-lock and cable', 'Chain with padlock',
-      'Cable lock', 'Heavy duty bicycle security chain', 'Not locked', 'Other'].freeze
+     'Cable lock', 'Heavy duty bicycle security chain', 'Not locked', 'Other'].freeze
   end
+
   def self.locking_description_select
     locking_description.map { |l| [l, l] }
   end
@@ -120,26 +123,26 @@ class StolenRecord < ActiveRecord::Base
 
   before_save :set_phone, :fix_date, :titleize_city, :update_tsved_at
   def set_phone
-    self.phone = Phonifyer.phonify(self.phone) if self.phone
-    self.secondary_phone = Phonifyer.phonify(self.secondary_phone) if self.secondary_phone
+    self.phone = Phonifyer.phonify(phone) if phone
+    self.secondary_phone = Phonifyer.phonify(secondary_phone) if secondary_phone
   end
 
   def fix_date
     year = date_stolen.year
     if date_stolen.year < (Time.now - 100.years).year
       decade = year.to_s.chars.last(2).join('')
-      corrected = date_stolen.change({year: "20#{decade}".to_i })
+      corrected = date_stolen.change(year: "20#{decade}".to_i)
       self.date_stolen = corrected
     end
     if date_stolen > Time.now + 2.days
-      corrected = date_stolen.change({year: Time.now.year - 1 })
+      corrected = date_stolen.change(year: Time.now.year - 1)
       self.date_stolen = corrected
     end
   end
 
   def titleize_city
     if city.present?
-      self.city = city.gsub('USA','').gsub(/,?(,|\s)[A-Z]+\s?++\z/,'')
+      self.city = city.gsub('USA', '').gsub(/,?(,|\s)[A-Z]+\s?++\z/, '')
       self.city = city.strip.titleize
     end
     true
@@ -151,15 +154,15 @@ class StolenRecord < ActiveRecord::Base
   end
 
   def tsv_col(i)
-    col = ""
-    col << i.gsub(/\\?(\t|\\t)+/i, ' ').gsub(/\\?(\r|\\r)+/i,' ').gsub(/\\?(\n|\\n)+/i,' ').gsub(/\\?\\?('|")+/,' ') if i.present?
-    col
+    return '' unless i.present?
+    i.gsub(/\\?(\t|\\t)+/i, ' ').gsub(/\\?(\r|\\r)+/i, ' ')
+     .gsub(/\\?(\n|\\n)+/i, ' ').gsub(/\\?\\?('|")+/, ' ')
   end
 
-  def tsv_row(with_article=true, with_stolen_locations: false)
-    b = self.bike
+  def tsv_row(with_article = true, with_stolen_locations: false)
+    b = bike
     return '' unless b.present?
-    row = ""
+    row = ''
     if with_stolen_locations
       row << "#{tsv_col(city)}\t#{tsv_col(state && state.abbreviation)}\t"
     end
@@ -171,35 +174,37 @@ class StolenRecord < ActiveRecord::Base
     row << "\t"
     row << tsv_col(b.frame_colors.to_sentence)
     row << tsv_col(b.description)
-    row << " #{tsv_col(self.theft_description)}"
-    row << " Stolen from: #{tsv_col(self.address)}"
+    row << " #{tsv_col(theft_description)}"
+    row << " Stolen from: #{tsv_col(address)}"
     row << "\t"
     row << "Article\t" if with_article
-    row << self.date_stolen.strftime("%Y-%m-%d")
+    row << date_stolen.strftime('%Y-%m-%d')
     row << "\t"
-    row << tsv_col(self.police_report_number)
+    row << tsv_col(police_report_number)
     row << "\t"
-    row << tsv_col(self.police_report_department)
+    row << tsv_col(police_report_department)
     row << "\t\t"
     row << "#{ENV['BASE_URL']}/bikes/#{b.id}\n"
     row
   end
 
-  def add_recovery_information(info)
-    bike.update_attribute :stolen, false if bike.stolen
-    self.date_recovered = Time.now
-    self.recovered_description = info[:request_reason]
-    self.current = false
-    if info[:index_helped_recovery].present?
-      if info[:index_helped_recovery].to_s.match(/t|1/i)
-        self.index_helped_recovery = true
-      end
-    end
-    if info[:can_share_recovery].present?
-      if info[:can_share_recovery].to_s.match(/t|1/i)
-        self.can_share_recovery = true
-      end
-    end
+  def add_recovery_information(info = {})
+    info = ActiveSupport::HashWithIndifferentAccess.new(info)
+    self.date_recovered ||= parse_date_from_input(info[:date_recovered])
+    update_attributes(current: false,
+                      recovered_description: info[:recovered_description],
+                      index_helped_recovery: ("#{info[:index_helped_recovery]}" =~ /t|1/i).present?,
+                      can_share_recovery: ("#{info[:can_share_recovery]}" =~ /t|1/i).present?)
+    bike.stolen = false
+    bike.save
   end
 
+  def find_or_create_recovery_link_token
+    return recovery_link_token if recovery_link_token.present?
+    begin
+      self.recovery_link_token = SecureRandom.urlsafe_base64
+    end while self.class.where(recovery_link_token: recovery_link_token).exists?
+    save
+    recovery_link_token
+  end
 end

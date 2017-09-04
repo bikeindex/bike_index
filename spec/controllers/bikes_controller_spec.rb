@@ -989,4 +989,16 @@ describe BikesController do
       end
     end
   end
+
+  describe 'show with recovery token present' do
+    let(:bike) { FactoryGirl.create(:stolen_bike) }
+    let(:stolen_record) { bike.current_stolen_record }
+    let(:recovery_link_token) { stolen_record.find_or_create_recovery_link_token }
+    it 'renders a mark recovered modal, and deletes the session recovery_link_token' do
+      session[:recovery_link_token] = recovery_link_token
+      get :show, id: bike.id
+      expect(response.body).to match(recovery_link_token)
+      expect(session[:recovery_link_token]).to be_nil
+    end
+  end
 end

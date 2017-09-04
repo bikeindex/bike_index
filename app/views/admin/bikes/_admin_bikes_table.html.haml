@@ -26,13 +26,7 @@
             - else
               = bike.id 
         %a{href: edit_admin_bike_url(bike) }
-
-          - if bike.created_at.today?
-            Today at #{bike.created_at.strftime("%-I %p")}
-          - elsif Date.yesterday().beginning_of_day() <= bike.created_at          
-            Yesterday at #{bike.created_at.strftime("%-I %p")}
-          - else
-            = bike.created_at.strftime("%-m.%-d.%Y")
+          = admin_display_date(bike.created_at)
       %td.medium-screens
         = bike.owner_email
       %td

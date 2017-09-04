@@ -1,0 +1,54 @@
+- if @bike.stolen && session[:recovery_link_token].present?
+  - stolen_record = StolenRecord.find_matching_token(bike_id: @bike.id, recovery_link_token: session.delete(:recovery_link_token)) # Delete token so modal doesn't keep rendering
+  - if stolen_record.present?
+    / Similar form exists in edit_stolen
+    - modal_title = "Mark your #{@bike.type} recovered!"
+    - modal_body = capture_haml do
+      .modal-body
+        %p
+          Please tell us how you got your #{@bike.type} back, we really care! 
+          %br
+          %strong
+            It's also how we get better at recovering bikes.
+        = form_for @stolen_record, url: bike_recovery_path(bike_id: @bike.id) do |f|
+          = hidden_field_tag :token, stolen_record.recovery_link_token
+          .form-group
+            = f.label :recovered_description, 'How did you get it back?'
+            = f.text_area :recovered_description, class: 'form-control'
+          .form-group
+            = f.label :date_recovered, 'When did you recover it?', class: 'form-well-label'
+            - date_string = (stolen_record.date_recovered || Date.today).strftime(StolenRecord.revised_date_format)
+            = f.text_field :date_recovered, required: true, class: 'form-control date_recovered_input', value: date_string
+          .checkbox
+            %label
+              = f.check_box :index_helped_recovery
+              Did we help?
+          .checkbox
+            %label
+              = f.check_box :can_share_recovery
+              Can we share your story?
+          .modal-btn-footer
+            .row
+              .col-xs-6.col-xs-push-6
+                = submit_tag 'Mark recovered', class: 'btn btn-success'
+              .col-xs-6.col-xs-pull-6
+                %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
+                  Nevermind
+              
+
+- elsif current_user.present? and @bike.can_be_claimed_by(current_user)
+  - modal_title = "Your #{@bike.type}"
+  - modal_body = capture_haml do
+    .modal-body
+      %p
+        We're honored to have your #{@bike.type} on the Index.  
+      %p
+        Claim it so you can update your listing.
+    .modal-btn-footer
+      .row
+        .col-xs-6.col-xs-push-3
+          %a.btn.btn-success{ href: "/ownerships/#{@bike.current_ownership.id}" }
+            Claim #{@bike.type}
+
+- if modal_title.present?
+  = render partial: '/shared/modal', locals: { title: modal_title, id: 'initial-open-modal', modal_body: modal_body }

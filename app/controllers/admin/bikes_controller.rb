@@ -71,6 +71,7 @@ class Admin::BikesController < Admin::BaseController
   def edit
     @bike = @bike.decorate
     @fast_attr_update = params[:fast_attr_update]
+    @recoveries = @bike.recovered_records
   end
 
   def update
@@ -80,12 +81,11 @@ class Admin::BikesController < Admin::BaseController
     updator.update_stolen_record
     @bike = @bike.decorate
     if params[:mark_recovered_reason].present?
-      info = {
-        request_reason: params[:mark_recovered_reason],
+      @bike.current_stolen_record.add_recovery_information(
+        recovered_description: params[:mark_recovered_reason],
         index_helped_recovery: params[:mark_recovered_we_helped],
         can_share_recovery: params[:can_share_recovery]
-      }
-      StolenRecordRecoverer.new.update(@bike.current_stolen_record.id, info)
+      )
     end
     if @bike.update_attributes(permitted_parameters.except(:stolen_records_attributes))
       @bike.create_normalized_serial_segments
@@ -99,6 +99,20 @@ class Admin::BikesController < Admin::BaseController
     else
       render action: "edit"
     end
+  end
+
+  def unrecover
+    stolen_record = StolenRecord.unscoped.where(bike_id: params[:bike_id],
+                                                id: params[:stolen_record_id]).first
+    if stolen_record.present?
+      bike = Bike.unscoped.find(params[:bike_id])
+      flash[:success] = "Marked unrecovered!"
+      stolen_record.update_attributes(date_recovered: nil, current: true, recovery_link_token: nil)
+      bike.update_attribute :stolen, true
+    else
+      flash[:error] = "Stolen record not found! Contact a developer"
+    end
+    redirect_to admin_bike_path(params[:bike_id])
   end
 
   protected

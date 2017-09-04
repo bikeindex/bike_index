@@ -48,11 +48,11 @@ module Api
               recover_bike(bike, feedback)
             end
             feedback.save
-            success = {success: 'submitted request'}
+            success = { success: 'submitted request' }
             render json: success and return
           end
         end
-        message = {errors: {not_allowed: 'nuh-uh'}}
+        message = { errors: { not_allowed: 'nuh-uh' } }
         render json: message, status: 403
       end
 
@@ -65,20 +65,13 @@ module Api
       private
 
       def recover_bike(bike, feedback)
-        if bike.current_stolen_record.present?
-          stolen_record_id = params[:mark_recovered_stolen_record_id]
-          unless stolen_record_id.present?
-            stolen_record_id = bike.current_stolen_record_id
-          end
-          if params[:index_helped_recovery].present?
-            feedback.feedback_hash[:index_helped_recovery] = params[:index_helped_recovery]
-          end
-          if params[:can_share_recovery].present?
-            feedback.feedback_hash[:can_share_recovery] = params[:can_share_recovery]
-          end
-          # We don't want to delay processing on this, it creates problems
-          StolenRecordRecoverer.new.update(stolen_record_id, params)
-        end
+        return true unless bike.current_stolen_record.present?
+        feedback.feedback_hash.merge!(index_helped_recovery: params[:index_helped_recovery],
+                                      can_share_recovery: params[:can_share_recovery])
+
+        bike.current_stolen_record.add_recovery_information(
+          params.merge(recovered_description: feedback.body)
+        )
       end
     end
   end

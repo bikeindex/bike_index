@@ -4,8 +4,14 @@ class BikeIndex.BikesShow extends BikeIndex
     if $('.bike-edit-overlay').length > 0
       @showBikeEditOverlay()
 
-    # Show the "claim bike" modal if it's present
-    $('#claim-bike-modal').modal('show') if document.getElementById('claim-bike-modal')
+    # Show the "claim bike" modal (or recovery modal) if present
+    if document.getElementById('initial-open-modal')
+      $('#initial-open-modal').modal('show')
+      if $('#initial-open-modal .date_recovered_input').length > 0
+        new Pikaday(
+          field: $('.date_recovered_input')[0]
+          format: 'MM-DD-YYYY'
+        )
 
     # Hide the message button after click
     $('#write_them_a_message').click (e) ->

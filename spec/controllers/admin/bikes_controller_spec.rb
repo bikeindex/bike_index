@@ -26,12 +26,26 @@ describe Admin::BikesController do
   end
 
   describe 'edit' do
-    it 'renders' do
-      bike = FactoryGirl.create(:bike)
-      get :edit, id: bike.id
-      expect(response.code).to eq('200')
-      expect(response).to render_template('edit')
-      expect(flash).to_not be_present
+    let(:bike) { FactoryGirl.create(:stolen_bike) }
+    let(:stolen_record) { bike.current_stolen_record }
+    context 'standard' do
+      it 'renders' do
+        get :edit, id: FactoryGirl.create(:bike).id
+        expect(response.code).to eq('200')
+        expect(response).to render_template('edit')
+        expect(flash).to_not be_present
+      end
+    end
+    context 'with recovery' do
+      before { stolen_record.add_recovery_information }
+      it 'includes recovery' do
+        get :edit, id: bike.id
+        expect(response.code).to eq('200')
+        expect(response).to render_template('edit')
+        expect(flash).to_not be_present
+        expect(assigns(:recoveries)).to eq bike.recovered_records
+        expect(assigns(:recoveries).pluck(:id)).to eq([stolen_record.id])
+      end
     end
   end
 
@@ -175,6 +189,41 @@ describe Admin::BikesController do
       end
       bike3.reload
       expect(bike3.manufacturer_other).to eq '69' # Sanity check
+    end
+  end
+
+  describe 'unrecover' do
+    let(:bike) { FactoryGirl.create(:stolen_bike) }
+    let(:stolen_record) { bike.current_stolen_record }
+    let(:recovery_link_token) { stolen_record.find_or_create_recovery_link_token }
+    let(:recovered_description) { 'something cool and party and things and stuff and it came back!!! XOXO' }
+    before do
+      stolen_record.add_recovery_information(recovered_description: recovered_description)
+      bike.reload
+      expect(bike.stolen).to be_falsey
+    end
+
+    it 'marks unrecovered, without deleting the information about the recovery' do
+      og_recover_link_token = recovery_link_token
+      put :unrecover, bike_id: bike.id, stolen_record_id: stolen_record.id
+      expect(flash[:success]).to match(/unrecovered/i)
+      expect(response).to redirect_to admin_bike_path(bike)
+
+      bike.reload
+      expect(bike.stolen).to be_truthy
+      stolen_record.reload
+      expect(stolen_record.recovered_description).to eq recovered_description
+      expect(stolen_record.recovery_link_token).to_not eq og_recover_link_token
+    end
+    context 'not matching stolen_record' do
+      it 'returns to bike page and renders flash' do
+        put :unrecover, bike_id: bike.id + 10, stolen_record_id: stolen_record.id
+        expect(flash[:error]).to match(/contact/i)
+        expect(response).to redirect_to admin_bike_path(bike.id + 10)
+
+        bike.reload
+        expect(bike.stolen).to be_falsey
+      end
     end
   end
 end

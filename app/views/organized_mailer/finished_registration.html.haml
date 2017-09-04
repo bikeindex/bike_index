@@ -42,11 +42,12 @@
 - if @bike.stolen
   %p
     - if @bike.recovered
-      Hopefully you find the owner soon.
+      Hopefully you find the owner soon. #{ link_to "Give us a heads up", edit_bike_url(@bike) } when you do!
     - else 
-      Hopefully you find the #{ @bike.type } soon.
-
-    #{ link_to "Give us a heads up", edit_bike_url(@bike) } when you do!
+      Hopefully you find the #{ @bike.type } soon. 
+      %strong
+        #{ link_to "Mark your bike recovered", edit_bike_recovery_url(bike_id: @bike.id, token: @bike.current_stolen_record.find_or_create_recovery_link_token) }
+      when you do!
 
 - unless @ownership.claimed
   - claim_type = @vars[:registered_by_owner] ? 'Claim the' : 'Confirm this'

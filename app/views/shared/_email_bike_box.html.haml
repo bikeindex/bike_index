@@ -1,5 +1,5 @@
 - @ownership ||= @bike.current_ownership
-- bike_url = ownership_url(@ownership)
+- bike_url ||= ownership_url(@ownership)
 - thumb_url = @bike.thumb_path || @bike.stock_photo_url
 - unless thumb_url.present?
   - thumbclass = 'placeholder'
@@ -26,7 +26,7 @@
       %li
         %strong
           = @bike.recovered ? 'Found:' : 'Stolen from:'
-        = stolen_record.show_stolen_address
+        = stolen_record.address(skip_default_country: true)
       %li
         %strong
           Date:

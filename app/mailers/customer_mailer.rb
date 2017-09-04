@@ -53,6 +53,15 @@ class CustomerMailer < ActionMailer::Base
     stolen_notification.update_attribute :send_dates, dates
   end
 
+  def recovered_from_link(stolen_record)
+    @stolen_record = stolen_record
+    @bike = stolen_record.bike
+    @biketype = CycleType.find(@bike.cycle_type_id).name.downcase
+    mail(to: [@bike.owner_email],
+         from: 'bryan@bikeindex.org',
+         subject: "Your #{@biketype} has been marked recovered!")
+  end
+
   def updated_terms_email(user)
     @user = user
     @_action_has_layout = false # layout is manually included here

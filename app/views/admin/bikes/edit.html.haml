@@ -206,18 +206,9 @@
             %td
               = link_to ownership.id, edit_admin_ownership_url(ownership.id)
             %td
-              - if ownership.created_at.today?
-                %span.hidden
-                  = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
-                Today at #{ownership.created_at.strftime("%-I %p")}
-              - elsif Date.yesterday().beginning_of_day() <= ownership.created_at
-                %span.hidden
-                  = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
-                Yesterday at #{ownership.created_at.strftime("%-I %p")}
-              - else
-                %span.hidden
-                  = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
-                = ownership.created_at.strftime("%-m/%-d/%Y at %-I %p")
+              %span.hidden
+                = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
+              = admin_display_date(ownership.created_at)
             %td
               - u = ownership.creator
               - if u.name.present?
@@ -232,4 +223,32 @@
               = "&#x2713;".html_safe if ownership.claimed
             %td.table-cell-check
               = "&#x2713;".html_safe if ownership.user_hidden
-
+  - if @recoveries.any?
+    %h3.padded
+      Recoveries
+    %section.full-screen-table
+      %table.table.table-striped.table-bordered
+        %thead
+          %th
+            Date Recovered
+          %th
+            Description
+          %th
+            Helped?
+          %th
+            Share?
+          %th
+            unrecover
+        %tbody
+          - @recoveries.each do |recovery|
+            %tr
+              %td
+                = admin_display_date(recovery.date_recovered)
+              %td
+                = recovery.recovered_description
+              %td.table-cell-check
+                = "&#x2713;".html_safe if recovery.index_helped_recovery
+              %td.table-cell-check
+                = "&#x2713;".html_safe if recovery.can_share_recovery
+              %td
+                = link_to 'unrecover', unrecover_admin_bikes_path(stolen_record_id: recovery.id, bike_id: @bike.id), method: :put, data: { confirm: "Are you sure you want to mark this #{@bike.type} unrecovered? The #{@bike.type} will be stolen again." }

@@ -1754,7 +1754,8 @@ CREATE TABLE stolen_records (
     recovery_share text,
     create_open311 boolean DEFAULT false NOT NULL,
     tsved_at timestamp without time zone,
-    estimated_value integer
+    estimated_value integer,
+    recovery_link_token text
 );
 
 
@@ -3328,4 +3329,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170503024611');
 INSERT INTO schema_migrations (version) VALUES ('20170617222902');
 
 INSERT INTO schema_migrations (version) VALUES ('20170618205609');
+
+INSERT INTO schema_migrations (version) VALUES ('20170731023746');
 

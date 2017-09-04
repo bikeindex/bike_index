@@ -15,6 +15,22 @@ describe StolenRecord do
     expect(stolen_record.current).to be_truthy
   end
 
+  describe 'find_or_create_recovery_link_token' do
+    let(:stolen_record) { StolenRecord.new }
+    it 'returns an existing recovery_link_token' do
+      stolen_record.recovery_link_token = 'blah'
+      expect(stolen_record).to_not receive(:save)
+      expect(stolen_record.find_or_create_recovery_link_token).to eq 'blah'
+    end
+
+    it 'creates a recovery_link_token and saves' do
+      stolen_record = StolenRecord.new
+      expect(stolen_record).to receive(:save)
+      result = stolen_record.find_or_create_recovery_link_token
+      expect(result).to eq stolen_record.recovery_link_token
+    end
+  end
+
   describe 'scopes' do
     it 'default scopes to current' do
       expect(StolenRecord.all.to_sql).to eq(StolenRecord.unscoped.where(current: true).to_sql)
@@ -73,11 +89,26 @@ describe StolenRecord do
   end
 
   describe 'address' do
+    let(:country) { Country.create(name: 'Neverland', iso: 'NEVVVV') }
+    let(:state) { State.create(country_id: country.id, name: 'BullShit', abbreviation: 'XXX')}
     it 'creates an address' do
-      c = Country.create(name: 'Neverland', iso: 'XXX')
-      s = State.create(country_id: c.id, name: 'BullShit', abbreviation: 'XXX')
-      stolen_record = FactoryGirl.create(:stolen_record, street: '2200 N Milwaukee Ave', city: 'Chicago', state_id: s.id, zipcode: '60647', country_id: c.id)
-      expect(stolen_record.address).to eq('2200 N Milwaukee Ave, Chicago, XXX, 60647, Neverland')
+      stolen_record = StolenRecord.new(street: '2200 N Milwaukee Ave',
+                                       city: 'Chicago',
+                                       state_id: state.id,
+                                       zipcode: '60647',
+                                       country_id: country.id)
+      expect(stolen_record.address).to eq('2200 N Milwaukee Ave, Chicago, XXX, 60647, NEVVVV')
+    end
+    it 'is ok with missing information' do
+      stolen_record = StolenRecord.new(street: '2200 N Milwaukee Ave',
+                                       zipcode: '60647',
+                                       country_id: country.id)
+      expect(stolen_record.address).to eq('2200 N Milwaukee Ave, 60647, NEVVVV')
+    end
+    it 'returns nil if there is no country' do
+      stolen_record = StolenRecord.new(street: '302666 Richmond Blvd')
+      expect(stolen_record.address).to be_nil
+
     end
   end
 
@@ -201,6 +232,46 @@ describe StolenRecord do
       stolen_record.update_attributes(police_report_department: 'CPD')
       stolen_record.reload
       expect(stolen_record.tsved_at).to be_nil
+    end
+  end
+
+  describe 'add_recovery_information' do
+    let(:bike) { FactoryGirl.create(:stolen_bike) }
+    let(:stolen_record) { bike.current_stolen_record }
+    let(:recovery_info) do
+      {
+        request_type: 'bike_recovery',
+        user_id: 69,
+        request_bike_id: bike.id,
+        recovered_description: 'Some reason',
+        index_helped_recovery: 'true',
+        can_share_recovery: 'false'
+      }
+    end
+    before do
+      expect(bike.stolen).to be_truthy
+      stolen_record.add_recovery_information(recovery_request.as_json)
+      bike.reload
+      stolen_record.reload
+
+      expect(bike.stolen).to be_falsey
+      expect(stolen_record.recovered?).to be_truthy
+      expect(stolen_record.current).to be_falsey
+      expect(bike.current_stolen_record).not_to be_present
+      expect(stolen_record.index_helped_recovery).to be_truthy
+      expect(stolen_record.can_share_recovery).to be_falsey
+    end
+    context 'no date_recovered' do
+      let(:recovery_request) { recovery_info.except(:can_share_recovery) }
+      it 'updates recovered bike' do
+        expect(stolen_record.reload.date_recovered).to be_within(1.second).of Time.now
+      end
+    end
+    context 'date_recovered' do
+      let(:recovery_request) { recovery_info.merge(date_recovered: 'Tue Jan 31 2017') }
+      it 'updates recovered bike and assigns date' do
+        expect(stolen_record.reload.date_recovered.to_date).to eq Date.civil(2017, 1, 31)
+      end
     end
   end
 end
