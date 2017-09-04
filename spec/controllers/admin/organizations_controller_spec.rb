@@ -29,6 +29,7 @@ describe Admin::OrganizationsController, type: :controller do
         name: 'new name thing stuff',
         show_on_map: true,
         org_type: 'shop',
+        is_paid: 'true',
         locations_attributes: {
           '0' => {
             id: location_1.id,
@@ -71,6 +72,7 @@ describe Admin::OrganizationsController, type: :controller do
       end.to change(Location, :count).by 1
       organization.reload
       expect(organization.name).to eq update_attributes[:name]
+      expect(organization.is_paid).to be_truthy
       # Existing location is updated
       location_1.reload
       expect(location_1.organization).to eq organization
