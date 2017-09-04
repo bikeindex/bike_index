@@ -12,7 +12,6 @@ class BikeIndex.BikesShow extends BikeIndex
           field: $('.date_recovered_input')[0]
           format: 'MM-DD-YYYY'
         )
-        $('.pika-single').css('z-index', '1100')
 
     # Hide the message button after click
     $('#write_them_a_message').click (e) ->
