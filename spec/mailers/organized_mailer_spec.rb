@@ -69,10 +69,12 @@ describe OrganizedMailer do
       end
       context 'stolen' do
         let(:cycle_type) { FactoryGirl.create(:cycle_type, name: 'sweet cycle type') }
+        let(:country) { FactoryGirl.create(:country) }
         let(:bike) { FactoryGirl.create(:stolen_bike, cycle_type: cycle_type) }
         it 'renders email with the stolen title' do
           expect(mail.subject).to eq("Confirm your stolen #{cycle_type.name} on Bike Index")
           expect(mail.reply_to).to eq(['contact@bikeindex.org'])
+          expect(mail.body.encoded).to match bike.current_stolen_record.find_or_create_recovery_link_token
         end
       end
     end
