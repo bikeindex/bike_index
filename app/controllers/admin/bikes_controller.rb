@@ -107,7 +107,7 @@ class Admin::BikesController < Admin::BaseController
     if stolen_record.present?
       bike = Bike.unscoped.find(params[:bike_id])
       flash[:success] = "Marked unrecovered!"
-      stolen_record.update_attributes(date_recovered: nil, current: true)
+      stolen_record.update_attributes(date_recovered: nil, current: true, recovery_link_token: nil)
       bike.update_attribute :stolen, true
     else
       flash[:error] = "Stolen record not found! Contact a developer"

@@ -213,7 +213,7 @@ describe Admin::BikesController do
       expect(bike.stolen).to be_truthy
       stolen_record.reload
       expect(stolen_record.recovered_description).to eq recovered_description
-      expect(stolen_record.recovery_link_token).to eq og_recover_link_token
+      expect(stolen_record.recovery_link_token).to_not eq og_recover_link_token
     end
     context 'not matching stolen_record' do
       it 'returns to bike page and renders flash' do
