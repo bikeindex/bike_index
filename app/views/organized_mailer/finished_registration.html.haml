@@ -49,8 +49,6 @@
         #{ link_to "Mark your bike recovered", edit_bike_recovery_url(bike_id: @bike.id, token: @bike.current_stolen_record.find_or_create_recovery_link_token) }
       when you do!
 
-    
-
 - unless @ownership.claimed
   - claim_type = @vars[:registered_by_owner] ? 'Claim the' : 'Confirm this'
   = link_to "#{claim_type} #{ @bike.type }", bike_url(@bike), class: 'binx-button'
