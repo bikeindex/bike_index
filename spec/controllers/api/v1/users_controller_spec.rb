@@ -159,10 +159,16 @@ describe Api::V1::UsersController do
         expect(response.code).to eq('200')
         bike.reload
         stolen_record.reload
+        feedback = Feedback.last
+
         expect(bike.stolen).to be_falsey
-        # ALSO MAKE SURE IT RECOVERY NOTIFIES
+        expect(feedback.body).to eq recovery_request[:request_reason]
+        expect(feedback.feedback_hash).to eq recovery_request
+          .slice(:index_helped_recovery, :can_share_recovery).merge(bike_id: bike.id.to_s)
         expect(stolen_record.current).to be_falsey
         expect(stolen_record.bike).to eq(bike)
+        expect(stolen_record.recovered?).to be_truthy
+        expect(stolen_record.recovered_description).to eq recovery_request[:request_reason]
         expect(stolen_record.date_recovered).to be_present
         expect(stolen_record.recovery_posted).to be_falsey
         expect(stolen_record.index_helped_recovery).to be_truthy

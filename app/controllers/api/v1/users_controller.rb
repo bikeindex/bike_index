@@ -66,14 +66,11 @@ module Api
 
       def recover_bike(bike, feedback)
         return true unless bike.current_stolen_record.present?
-        if params[:index_helped_recovery].present?
-          feedback.feedback_hash[:index_helped_recovery] = params[:index_helped_recovery]
-        end
-        if params[:can_share_recovery].present?
-          feedback.feedback_hash[:can_share_recovery] = params[:can_share_recovery]
-        end
+        feedback.feedback_hash.merge!(index_helped_recovery: params[:index_helped_recovery],
+                                      can_share_recovery: params[:can_share_recovery])
+
         bike.current_stolen_record.add_recovery_information(
-          params.merge(recovered_description: params[:recovered_description])
+          params.merge(recovered_description: feedback.body)
         )
       end
     end
