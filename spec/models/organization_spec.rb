@@ -24,6 +24,15 @@ describe Organization do
     end
   end
 
+  describe 'admin_text_search' do
+    let!(:organization1) { FactoryGirl.create(:organization, name: 'Chainlink Chicago') }
+    let!(:organization2) { FactoryGirl.create(:organization, name: 'XXXX') }
+    let!(:location) { FactoryGirl.create(:location, organization: organization2, city: 'Chicago') }
+    it 'finds organizations' do
+      expect(Organization.admin_text_search('chica').pluck(:id).include?(organization2)).to be_truthy
+    end
+  end
+
   describe 'set_and_clean_attributes' do
     it 'sets the short_name and the slug on save' do
       organization = Organization.new(name: 'something')

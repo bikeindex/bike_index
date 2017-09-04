@@ -1,8 +1,16 @@
 class Admin::OrganizationsController < Admin::BaseController
   before_filter :find_organization, only: [:show, :edit, :update, :destroy]
+  before_filter :set_sort_and_direction, only: [:index]
 
   def index
-    @organizations = Organization.all
+    page = params[:page] || 1
+    per_page = params[:per_page] || 50
+    organizations = Organization.unscoped.where(is_paid: params[:is_paid])
+    if params[:query].present?
+      organizations = organizations.admin_text_search(params[:query])
+    end
+    @organizations = organizations.order("#{@sort} #{@sort_direction}").page(page).per(per_page)
+    @organizations_count = organizations.count
   end
 
   def show
@@ -68,8 +76,15 @@ class Admin::OrganizationsController < Admin::BaseController
     (%w(available_invitation_count sent_invitation_count name short_name slug website
        show_on_map is_suspended org_type embedable_user_email auto_user_id lock_show_on_map
        api_access_approved access_token new_bike_notification avatar avatar_cache
-       lightspeed_cloud_api_key use_additional_registration_field approved
+       lightspeed_cloud_api_key use_additional_registration_field approved is_paid
       ).map(&:to_sym) + [locations_attributes: permitted_locations_params]).freeze
+  end
+
+  def set_sort_and_direction
+    @sort = params[:sort]
+    @sort = 'name' unless %w(name created_at approved).include?(@sort)
+    @sort_direction = params[:sort_direction]
+    @sort_direction = 'desc' unless %w(asc desc).include?(@sort_direction)
   end
 
   def permitted_locations_params

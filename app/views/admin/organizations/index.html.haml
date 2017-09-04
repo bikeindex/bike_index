@@ -3,60 +3,81 @@
     Manage Organizations
   = link_to 'New Organization', new_admin_organization_url, class: "button-green sharing-links"
 
-%h4.padded
-  = @organizations.count
-  organizations are in the system so far!
+%h3
+  = @sort
+  = @sort_direction
 
+  #{number_with_delimiter(@organizations_count)} organizations
+  = (params[:query].present? || params[:is_paid].present?) ? 'matching' : 'in the system'
+
+.special-search-field-container
+  .special-search-field
+    = form_tag admin_organizations_path, method: :get do
+      = hidden_field_tag :sort, @sort
+      = hidden_field_tag :sort_direction, @sort_direction
+      %label{ style: 'display: inline-block; margin-right: 1em;' }
+        = check_box_tag :is_paid, true, params[:is_paid]
+        paid
+      = text_field_tag :query, params[:query], placeholder: 'Find by name or city'
+      = submit_tag 'Search', name: 'search', class: 'button-blue'
+
+
+
+- if @organizations.present?
+  .paginate-container
+    = paginate @organizations
 
 %section.full-screen-table
-  %table#admin-orgs-table.table.table-striped.table-bordered
+  %table.table.table-striped.table-bordered
     %thead
-      %th
-        Name
-      %th.medium-screens
-        Created
+      - ['name', 'approved', 'created_at'].each do |col|
+        - active_col = @sort == col
+        %th
+          %a.column_sort_update{ href: '#', class: ('active' if active_col), style: 'display: block;', data: { sort: col, direction: (active_col && @sort_direction == 'desc' ? 'asc' : 'desc') } }
+            = col.titleize
+            - if active_col
+              .pull-right
+                %small
+                  = (@sort_direction == 'asc' ? '&#x2193;' : '&#x2191;').html_safe
+
       %th
         Bikes
       %th.medium-screens
         Memberships
       %th.large-screens
         Locations
-      %th.table-cell-check
-        Approved
     %tbody
-      - cache("admin/#{@organizations.count}-#{@organizations.maximum(:updated_at)}") do
-        - @organizations.each do |organization|
-          - cache(organization) do
-            %tr
-              %td
-                = link_to organization.name, admin_organization_url(organization)
-                %small.less-strong.large-screens
-                  = organization.org_type
-              %td.medium-screens
-                %span.hidden
-                  = organization.created_at.to_i
-                - if organization.created_at.today?
-                  Today at #{organization.created_at.strftime("%-I %p")}
-                - elsif Date.yesterday().beginning_of_day() <= organization.created_at
-                  
-                  Yesterday at #{organization.created_at.strftime("%-I %p")}
-                - else
-                  = l organization.created_at, format: :dotted
-              %td
-                = organization.bikes.count
-              %td.medium-screens
-                = organization.memberships.count
-              %td.large-screens
-                .less-strong-hold
-                  
-                  = organization.locations.count
-                  - if organization.show_on_map
-                    %span.less-strong-right
-                      Mapped
-              %td
-                = 'f' unless organization.approved
+      - @organizations.each do |organization|
+        - cache(organization) do
+          %tr
+            %td
+              = link_to organization.name, admin_organization_url(organization)
+              %small.less-strong.large-screens
+                = organization.org_type
+            %td
+              = 'f' unless organization.approved
+            %td.medium-screens
+              = admin_display_date(organization.created_at)
+            %td
+              = organization.bikes.count
+            %td.medium-screens
+              = organization.memberships.count
+            %td.large-screens
+              .less-strong-hold
+                
+                = organization.locations.count
+                - if organization.show_on_map
+                  %span.less-strong-right
+                    Mapped
 
 
+:coffeescript
+  $('.column_sort_update').click (e) ->
+    e.preventDefault()
+    target = $(e.target)
+    $('.special-search-field #sort').val($(target).attr('data-sort'))
+    $('.special-search-field #sort_direction').val($(target).attr('data-direction'))
+    $('.special-search-field form').submit()
 
 %hr
   = link_to "View deleted organizations", admin_show_deleted_organizations_url

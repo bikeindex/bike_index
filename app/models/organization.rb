@@ -49,6 +49,13 @@ class Organization < ActiveRecord::Base
     n.is_a?(Integer) || n.match(/\A\d*\z/).present?
   end
 
+  def self.admin_text_search(n)
+    str = "%#{n.strip}%"
+    match_cols = ['organizations.name', 'locations.name', 'locations.city']
+    joins(:locations).where(match_cols.map { |col| "#{col} ILIKE :str" }.join(' OR '),
+      { str: str })
+  end
+
   def to_param
     slug
   end

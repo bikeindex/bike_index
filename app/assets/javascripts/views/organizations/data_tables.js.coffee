@@ -10,8 +10,6 @@ class BikeIndex.Views.DataTables extends Backbone.View
       @loadDataTable('#admin-manufacturers-list')
     else if $('#admin-ads-table').length > 0
       @loadDataTable('#admin-ads-table')
-    else if $('#admin-orgs-table').length > 0
-      @loadDataTable('#admin-orgs-table')
     else if $('#admin-bikes-index').length > 0
       $('#admin-bikes-index').dataTable
         aaSorting: [ ]

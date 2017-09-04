@@ -9,88 +9,123 @@
           %li
             = msg
 
-.control-group.padded
-  .control-label
-    = f.label :name
-  .controls
-    = f.text_field :name
+/ Using .admin-bike-edit because avoiding redoing css
+.clearfix.admin-bike-edit
+  .bike-fields
+    .control-group.padded
+      .control-label
+        = f.label :name
+      .controls
+        = f.text_field :name
 
-.control-group.padded
-  .control-label
-    = f.label :available_invitation_count, "Available invitations"
-  .controls
-    = f.number_field :available_invitation_count
-  .controls.extra-field
-    %p
-      = "Invitations sent: #{@organization.sent_invitation_count}"
+    .control-group.padded
+      .control-label
+        = f.label :available_invitation_count, "Available invitations"
+      .controls
+        = f.number_field :available_invitation_count
+      .controls.extra-field
+        %p
+          = "Invitations sent: #{@organization.sent_invitation_count}"
 
-.control-group
-  .control-label
-    %label
-      Short Name
-      %br
-      (15 characters or less)
-  .controls
-    = f.text_field :short_name
-
-.control-group
-  = f.label :slug, "Slug", class: "control-label"
-  .controls
-    %p
-      = @organization.slug
-
-.control-group
-  .control-label
-    = f.label :website
-  .controls
-    = f.text_field :website
-- if @organization.id.present?
-  - emails = @organization.users.pluck(:email)
-  - emails << ENV['AUTO_ORG_MEMBER'] unless emails.any?
-  .control-group.chosen-select
-    .control-label
-      = f.label :embedable_user_email
-    .controls
-      = f.select :embedable_user_email, emails, prompt: "Select email", selected: @embedable_email
-    .controls.extra-field
-      .less-strong
-        - if @organization.memberships.count == 0
-          You can use #{ENV['AUTO_ORG_MEMBER']} if 
+    .control-group
+      .control-label
+        %label
+          Short Name
           %br
-          there are no members of the organization
+          (15 characters or less)
+      .controls
+        = f.text_field :short_name
+
+    .control-group
+      = f.label :slug, "Slug", class: "control-label"
+      .controls
+        %p
+          = @organization.slug
+
+    .control-group
+      .control-label
+        = f.label :website
+      .controls
+        = f.text_field :website
+    - if @organization.id.present?
+      - emails = @organization.users.pluck(:email)
+      - emails << ENV['AUTO_ORG_MEMBER'] unless emails.any?
+      .control-group.chosen-select
+        .control-label
+          = f.label :embedable_user_email
+        .controls
+          = f.select :embedable_user_email, emails, prompt: "Select email", selected: @embedable_email
+        .controls.extra-field
+          .less-strong
+            - if @organization.memberships.count == 0
+              You can use #{ENV['AUTO_ORG_MEMBER']} if 
+              %br
+              there are no members of the organization
+
+    .control-group
+      .control-label
+        %label
+          Organization type
+      .controls.radio-controls
+        %label.radio
+          = f.radio_button :org_type, 'shop'
+          Bike shop
+        %label.radio
+          = f.radio_button :org_type, 'advocacy'
+          Advocacy group
+        %label.radio
+          = f.radio_button :org_type, 'police'
+          Police department
+        %label.radio
+          = f.radio_button :org_type, 'school'
+          School
+        %label.radio
+          = f.radio_button :org_type, 'manufacturer'
+          Manufacturer
+        %label.radio
+          = f.radio_button :org_type, 'software'
+          Software
 
 
+  .bike-fields
+    .control-group.padded
+      .control-label
+        = f.label :show_on_map
+      .controls
+        = f.check_box :show_on_map
 
-  .control-group.padded
-    .control-label
-      = f.label :show_on_map
-    .controls
-      = f.check_box :show_on_map
+    .control-group.padded
+      .control-label
+        = f.label :lock_show_on_map, 'Lock shown on map'
+      .controls
+        = f.check_box :lock_show_on_map, style: "margin: 4px .5em 0 0;"
+        %small.less-strong
+          Restrict org from updating show on map above (e.g. they're known bad actors)
 
-  .control-group.padded
-    .control-label
-      = f.label :lock_show_on_map, 'Lock shown on map'
-      %small.less-strong
-        Restrict org from updating show on map above (e.g. they're known bad actors)
-    .controls
-      = f.check_box :lock_show_on_map
+    .control-group.padded
+      .control-label
+        = f.label :api_access_approved
+      .controls
+        = f.check_box :api_access_approved
+    .control-group.padded
+      .control-label
+        = f.label :approved, 'Validated & approved'
+      .controls
+        = f.check_box :approved
 
-  .control-group.padded
-    .control-label
-      = f.label :api_access_approved
-    .controls
-      = f.check_box :api_access_approved
-  .control-group.padded
-    .control-label
-      = f.label :approved, "Validated & approved"
-    .controls
-      = f.check_box :approved
+    .control-group.padded
+      .control-label
+        = f.label :is_paid, 'Paid organization'
+      .controls
+        = f.check_box :is_paid, style: "margin: 4px .5em 0 0;"
+        %small.less-strong
+          Only check if this organization has given us money
 
-  .control-group.padded
-    .control-label
-      = f.label :use_additional_registration_field, "Show secondary registration number on embed"
-    .controls
-      = f.check_box :use_additional_registration_field
+    .control-group.padded
+      .control-label
+        = f.label :use_additional_registration_field, "Show secondary registration number on embed"
+      .controls
+        = f.check_box :use_additional_registration_field
 
 / .control-group.padded
 /   .control-label
@@ -98,27 +133,3 @@
 /   .controls
 /     = f.check_box :is_suspended
 
-
-.control-group
-  .control-label
-    %label
-      Organization type
-  .controls.radio-controls
-    %label.radio
-      = f.radio_button :org_type, 'shop'
-      Bike shop
-    %label.radio
-      = f.radio_button :org_type, 'advocacy'
-      Advocacy group
-    %label.radio
-      = f.radio_button :org_type, 'police'
-      Police department
-    %label.radio
-      = f.radio_button :org_type, 'school'
-      School
-    %label.radio
-      = f.radio_button :org_type, 'manufacturer'
-      Manufacturer
-    %label.radio
-      = f.radio_button :org_type, 'software'
-      Software
