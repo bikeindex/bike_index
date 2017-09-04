@@ -1,6 +1,7 @@
 - if @bike.stolen && session[:recovery_link_token].present?
   - stolen_record = StolenRecord.find_matching_token(bike_id: @bike.id, recovery_link_token: session.delete(:recovery_link_token)) # Delete token so modal doesn't keep rendering
   - if stolen_record.present?
+    / Similar form exists in edit_stolen
     - modal_title = "Mark your #{@bike.type} recovered!"
     - modal_body = capture_haml do
       .modal-body
