@@ -5,7 +5,7 @@ class Admin::OrganizationsController < Admin::BaseController
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 50
-    organizations = Organization.unscoped.where(is_paid: params[:is_paid])
+    organizations = Organization.unscoped.where(is_paid: params[:is_paid].present?)
     if params[:query].present?
       organizations = organizations.admin_text_search(params[:query])
     end
@@ -82,7 +82,7 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def set_sort_and_direction
     @sort = params[:sort]
-    @sort = 'name' unless %w(name created_at approved).include?(@sort)
+    @sort = 'created_at' unless %w(name created_at approved).include?(@sort)
     @sort_direction = params[:sort_direction]
     @sort_direction = 'desc' unless %w(asc desc).include?(@sort_direction)
   end

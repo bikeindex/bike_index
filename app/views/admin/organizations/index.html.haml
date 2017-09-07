@@ -4,9 +4,6 @@
   = link_to 'New Organization', new_admin_organization_url, class: "button-green sharing-links"
 
 %h3
-  = @sort
-  = @sort_direction
-
   #{number_with_delimiter(@organizations_count)} organizations
   = (params[:query].present? || params[:is_paid].present?) ? 'matching' : 'in the system'
 
