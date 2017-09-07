@@ -9,6 +9,9 @@ before_install:
    - gem install bundler -v 1.9.10
 script:
   - bundle exec rspec
+branches:
+  only:
+    - master # We want to build PRs, and merges to master
 before_script:
   - redis-cli info
   - psql -c 'create database bikeindex_test' -U postgres
