@@ -45,27 +45,26 @@
         Locations
     %tbody
       - @organizations.each do |organization|
-        - cache(organization) do
-          %tr
-            %td
-              = link_to organization.name, admin_organization_url(organization)
-              %small.less-strong.large-screens
-                = organization.org_type
-            %td
-              = 'f' unless organization.approved
-            %td.medium-screens
-              = admin_display_date(organization.created_at)
-            %td
-              = organization.bikes.count
-            %td.medium-screens
-              = organization.memberships.count
-            %td.large-screens
-              .less-strong-hold
-                
-                = organization.locations.count
-                - if organization.show_on_map
-                  %span.less-strong-right
-                    Mapped
+        %tr
+          %td
+            = link_to organization.name, admin_organization_url(organization)
+            %small.less-strong.large-screens
+              = organization.org_type
+          %td
+            = 'f' unless organization.approved
+          %td.medium-screens
+            = admin_display_date(organization.created_at)
+          %td
+            = organization.bikes.count
+          %td.medium-screens
+            = organization.memberships.count
+          %td.large-screens
+            .less-strong-hold
+              
+              = organization.locations.count
+              - if organization.show_on_map
+                %span.less-strong-right
+                  Mapped
 
 
 :coffeescript
