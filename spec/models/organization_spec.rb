@@ -47,6 +47,7 @@ describe Organization do
       end
       context 'by location city' do
         let(:location) { FactoryGirl.create(:location, city: 'Chicago') }
+        let!(:location_2) { FactoryGirl.create(:location, city: 'Chicago', organization: organization) }
         it 'finds the organization' do
           expect(Organization.admin_text_search('chi')).to eq([organization])
         end
