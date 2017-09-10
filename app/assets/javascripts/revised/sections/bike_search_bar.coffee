@@ -15,8 +15,8 @@ class BikeIndex.BikeSearchBar extends BikeIndex
     location = $location.val()
     location = if location? then location.replace(/^\s*|\s*$/g, '') else ''
     # If there is a search_location, it means this was an IP search and we need to set location
-    if window.interpreted_params.location && Array.isArray(window.interpreted_params.location) && window.interpreted_params.location[0]?
-      location_data = window.interpreted_params.location[0].data
+    if window.interpreted_params.location?
+      location_data = window.interpreted_params.location
       # Maxmind (what we use in production for ip lookup) formats results differently than google
       # This doesn't work in dev... but it wouldn't work anyway because localhost
       if Array.isArray(location_data)
