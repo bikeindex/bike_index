@@ -3,10 +3,10 @@ require 'spec_helper'
 describe BikesController do
   describe 'index' do
     include_context :geocoder_default_location
-    let(:stolen_bike) { FactoryGirl.create(:stolen_bike, latitude: default_location[:latitude], longitude: default_location[:longitude]) }
+    let!(:non_stolen_bike) { FactoryGirl.create(:bike, serial_number: '1234567890') }
+    let!(:stolen_bike) { FactoryGirl.create(:stolen_bike, latitude: default_location[:latitude], longitude: default_location[:longitude]) }
     let(:serial) { '1234567890' }
-    let(:stolen_bike_2) { FactoryGirl.create(:stolen_bike, latitude: 41.8961603, longitude: -87.677215) }
-    let(:non_stolen_bike) { FactoryGirl.create(:bike, serial_number: '1234567890') }
+    let!(:stolen_bike_2) { FactoryGirl.create(:stolen_bike, latitude: 41.8961603, longitude: -87.677215) }
     let(:ip_address) { '127.0.0.1' }
     let(:target_interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: ip_address) }
     context 'with subdomain' do
@@ -17,9 +17,6 @@ describe BikesController do
       end
     end
     describe 'assignment' do
-      before do
-        expect([non_stolen_bike, stolen_bike, stolen_bike_2].size).to eq 3
-      end
       context 'no params' do
         it 'assigns defaults, stolenness: stolen' do
           get :index

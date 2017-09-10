@@ -33,8 +33,8 @@ class BikeIndex.BikeSearchBar extends BikeIndex
         localStorage.setItem('distance', $('#distance').val())
     else
       location = localStorage.getItem('location')
-      # Make location 'you' if location is anywhere, so user isn't stuck and unable to use location
-      location = 'you' if location.match(/anywhere/i)
+      # Make location 'you' if location is anywhere or blank, so user isn't stuck and unable to use location
+      location = 'you' if !location? || location.match(/anywhere/i)
       # Then set the location from whatever we got
       $location.val(location)
     # Then set up search view and the top menu link

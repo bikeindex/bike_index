@@ -18,12 +18,14 @@ class @AdDisplayer
       .addClass('rendered-ad photo-ad')
 
   geolocatedAd: ->
-    # Wrap the string in blank space so it's possible to check for non word chars
-    location = " #{localStorage.getItem('location').toLowerCase()} "
-    for match in lemonade_location_matches
-      # Check if the matching strings are separate words in the location string
-      expression = ///[^\w]#{match}[^\w]///
-      return lemonade_ad if location.match(///[^\w]#{match}[^\w]///)
+    location = localStorage.getItem('location')
+    if location?
+      # Wrap the string in blank space so it's possible to check for non word chars
+      location = " #{location.toLowerCase()} "
+      for match in lemonade_location_matches
+        # Check if the matching strings are separate words in the location string
+        expression = ///[^\w]#{match}[^\w]///
+        return lemonade_ad if location.match(///[^\w]#{match}[^\w]///)
     # return an empty string if there aren't any matches
     ''
 
