@@ -24,6 +24,36 @@ describe Organization do
     end
   end
 
+  describe 'admin text search' do
+    context 'by name' do
+      let!(:organization) { FactoryGirl.create(:organization, name: 'University of Maryland') }
+      it 'finds the organization' do
+        expect(Organization.admin_text_search('maryl')).to eq([organization])
+      end
+    end
+    context 'by slug' do
+      let!(:organization) { FactoryGirl.create(:organization, short_name: 'UMD') }
+      it 'finds the organization' do
+        expect(Organization.admin_text_search('umd')).to eq([organization])
+      end
+    end
+    context 'through locations' do
+      let!(:organization) { location.organization }
+      context 'by location name' do
+        let(:location) { FactoryGirl.create(:location, name: 'Sweet spot') }
+        it 'finds the organization' do
+          expect(Organization.admin_text_search('sweet Spot')).to eq([organization])
+        end
+      end
+      context 'by location city' do
+        let(:location) { FactoryGirl.create(:location, city: 'Chicago') }
+        it 'finds the organization' do
+          expect(Organization.admin_text_search('chi')).to eq([organization])
+        end
+      end
+    end
+  end
+
   describe 'set_and_clean_attributes' do
     it 'sets the short_name and the slug on save' do
       organization = Organization.new(name: 'something')

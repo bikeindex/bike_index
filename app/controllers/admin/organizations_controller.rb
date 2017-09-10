@@ -5,12 +5,11 @@ class Admin::OrganizationsController < Admin::BaseController
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 50
-    organizations = Organization.unscoped.where(deleted_at: nil, is_paid: params[:is_paid].present?)
-    if params[:query].present?
-      organizations = organizations.admin_text_search(params[:query])
-    end
-    @organizations = organizations.order("#{@sort} #{@sort_direction}").page(page).per(per_page)
-    @organizations_count = organizations.count
+    orgs = Organization.unscoped.where(deleted_at: nil)
+    orgs = orgs.paid if params[:is_paid].present?
+    orgs = orgs.admin_text_search(params[:query]) if params[:query].present?
+    @organizations = orgs.order("#{@sort} #{@sort_direction}").page(page).per(per_page)
+    @organizations_count = orgs.count
   end
 
   def show
