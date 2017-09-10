@@ -51,9 +51,9 @@ class Organization < ActiveRecord::Base
 
   def self.admin_text_search(n)
     str = "%#{n.strip}%"
-    match_cols = ['organizations.name', 'locations.name', 'locations.city']
-    joins(:locations).where(match_cols.map { |col| "#{col} ILIKE :str" }.join(' OR '),
-      { str: str })
+    match_cols = %w(organizations.name organizations.short_name locations.name locations.city)
+    joins('LEFT OUTER JOIN locations AS locations ON organizations.id = locations.organization_id')
+      .where(match_cols.map { |col| "#{col} ILIKE :str" }.join(' OR '), { str: str })
   end
 
   def to_param

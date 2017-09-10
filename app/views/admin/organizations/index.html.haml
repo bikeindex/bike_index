@@ -14,7 +14,7 @@
       = hidden_field_tag :sort_direction, @sort_direction
       %label{ style: 'display: inline-block; margin-right: 1em;' }
         = check_box_tag :is_paid, true, params[:is_paid]
-        paid
+        paid only
       = text_field_tag :query, params[:query], placeholder: 'Find by name or city'
       = submit_tag 'Search', name: 'search', class: 'button-blue'
 
