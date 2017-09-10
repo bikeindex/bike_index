@@ -118,9 +118,10 @@ module BikeSearchable
       location = query_params[:location].present? && query_params[:location]
       return false unless location && !(location =~ /anywhere/i)
       distance = query_params[:distance] && query_params[:distance].to_i
-      if location == 'ip' || location == 'you'
+      if location.downcase == 'ip' || location.downcase == 'you'
         return false unless ip.present?
         location = Geocoder.search(ip)
+        location = location.first.data.to_s if defined?(location.first.data)
       end
       bounding_box = Geocoder::Calculations.bounding_box(location, distance)
       return false if bounding_box.detect(&:nan?) # If we can't create a bounding box, skip

@@ -45,12 +45,23 @@ describe BikesController do
         end
       end
       context 'ip proximity' do
-        let(:query_params) { { location: 'you', distance: 1, stolenness: 'proximity' } }
+        let(:query_params) { { location: 'yoU', distance: 1, stolenness: 'proximity' } }
         context 'found location' do
           it 'assigns passed parameters and close_serials' do
             expect_any_instance_of(BikesController).to receive(:forwarded_ip_address) { ip_address }
-            allow(Geocoder).to receive(:search) { production_ip_search_result }
+            allow(Geocoder).to receive(:search) { legacy_production_ip_search_result }
             get :index, query_params
+            expect(response.status).to eq 200
+            expect(assigns(:interpreted_params)).to eq target_interpreted_params
+            expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id])
+          end
+        end
+        context 'ip passed as parameter' do
+          let(:ip_query_params) { query_params.merge(location: 'IP') }
+          it 'assigns passed parameters and close_serials' do
+            expect_any_instance_of(BikesController).to receive(:forwarded_ip_address) { ip_address }
+            allow(Geocoder).to receive(:search) { production_ip_search_result }
+            get :index, ip_query_params
             expect(response.status).to eq 200
             expect(assigns(:interpreted_params)).to eq target_interpreted_params
             expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id])
