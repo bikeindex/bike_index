@@ -5,7 +5,7 @@ class Admin::OrganizationsController < Admin::BaseController
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 50
-    organizations = Organization.unscoped.where(is_paid: params[:is_paid].present?)
+    organizations = Organization.unscoped.where(deleted_at: nil, is_paid: params[:is_paid].present?)
     if params[:query].present?
       organizations = organizations.admin_text_search(params[:query])
     end

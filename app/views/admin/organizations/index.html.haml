@@ -45,6 +45,7 @@
         Locations
     %tbody
       - @organizations.each do |organization|
+        - next if organization.deleted_at.present?
         %tr
           %td
             = link_to organization.name, admin_organization_url(organization)
