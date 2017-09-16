@@ -83,6 +83,7 @@ class OrganizationsController < ApplicationController
   protected
 
   def set_bparam
+    return true unless find_organization.present?
     unless find_organization.auto_user.present?
       flash[:error] = "We're sorry, that organization doesn't have a user set up to register bikes through. Email contact@bikeindex.org if this seems like an error."
       redirect_to root_url and return
