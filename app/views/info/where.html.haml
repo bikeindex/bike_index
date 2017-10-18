@@ -6,6 +6,7 @@
   - locations = []
   - @organizations.each do |organization|
     - organization.locations.each_with_index do |location, index|
+      - next unless location.latitude && location.longitude
       - locations << [ "#shop#{location.org_location_id}", location.latitude, location.longitude]
   :javascript
     window.shop_locations = #{locations};
