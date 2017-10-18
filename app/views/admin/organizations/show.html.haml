@@ -129,20 +129,15 @@
     - @locations.each do |location|
       .span4
         .alert.alert-info
-          - if location.name
-            %p
-              Name:
-              = location.name
-
-          - if location.phone
-            %p
-              Phone:
-              = location.display_phone
-
-          - if location.street
-            %p
-              Street address:
-              = location.street
+          %p
+            Name:
+            = location.name
+          %p
+            Phone:
+            = location.display_phone
+          %p
+            Address:
+            = location.address
 
 .actions.padded
   = link_to "Manage organization invitations", admin_organization_invitation_url(organization_id: @organization.to_param), class: "button-yellow"
