@@ -4,8 +4,7 @@
   - @countries = Country.where('iso != ?', 'US').includes(:locations)
   / Set the locations on the window for the partial
   - locations = []
-  - @organizations.shop.each do |organization|
-    - next unless organization.org_type == 'shop'
+  - @organizations.each do |organization|
     - organization.locations.each_with_index do |location, index|
       - locations << [ "#shop#{location.org_location_id}", location.latitude, location.longitude]
   :javascript

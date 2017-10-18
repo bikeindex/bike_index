@@ -6,6 +6,9 @@ class BikeIndex.InfoWhere extends BikeIndex
   initializeEventListeners: ->
     $('a.where-shop-location').click (e) =>
       @updateMapLocation(e)
+      $('html').animate( 
+        scrollTop: "#{$('#map_canvas').offset().top - 100}px", 'fast'
+      )
   
   initializeMap: ->
     # Ideally we'll use the localstorage location information about the user 
@@ -14,9 +17,6 @@ class BikeIndex.InfoWhere extends BikeIndex
 
   updateMapLocation: (event) ->
     target = $(event.target)
-    $('body').animate( 
-      scrollTop: ($('#where-bike-index').offset().top - 20), 'fast' 
-    )
     latLng = new google.maps.LatLng(target.attr('data-lat'), target.attr('data-long'))
     window.map.setZoom(13)
     window.map.panTo(latLng)
