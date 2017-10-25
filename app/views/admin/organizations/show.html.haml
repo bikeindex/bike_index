@@ -129,7 +129,7 @@
     - @locations.each do |location|
       .span4
         .alert.alert-info
-          - if !location.shown && organization.allowed_show
+          - if !location.shown && @organization.allowed_show
             %h2
               Location is not visible! Try updating the organization
           %p
