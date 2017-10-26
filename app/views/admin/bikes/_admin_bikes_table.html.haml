@@ -16,47 +16,48 @@
 
 %tbody
   - bikes.each do |bike|
-    %tr
-      %td
-        .less-strong-hold
-          %span.less-strong-right.medium-screens
-            - if bike.example
-              %span.table-error
+    - cache(bike) do
+      %tr
+        %td
+          .less-strong-hold
+            %span.less-strong-right.medium-screens
+              - if bike.example
+                %span.table-error
+                  = bike.id 
+              - else
                 = bike.id 
-            - else
-              = bike.id 
-        %a{href: edit_admin_bike_url(bike) }
-          = admin_display_date(bike.created_at)
-      %td.medium-screens
-        = bike.owner_email
-      %td
-        - if bike.manufacturer_other.present?
-          %span.table-error
-            %span.hidden
-              0 1
-            = bike.manufacturer_other
-        - else
-          = bike.mnfg_name
-      %td.large-screens
-        .less-strong-hold
-          = [bike.year, bike.frame_model].join(' ')
-          = "(#{bike.type})" unless bike.type == 'bike'
-          - if bike.paint.present? && bike.paint.color_id.blank?
-            .less-strong
-              = link_to bike.paint.name, edit_admin_paint_url(bike.paint)
-              = bike.frame_colors.to_sentence
-          - if bike.stolen
-            %span.less-strong-right
-              stolen
-          - if show_serial
-            %br
-            %span.less-strong
-              = bike.serial_number
+          %a{href: edit_admin_bike_url(bike) }
+            = admin_display_date(bike.created_at)
+        %td.medium-screens
+          = bike.owner_email
+        %td
+          - if bike.manufacturer_other.present?
+            %span.table-error
+              %span.hidden
+                0 1
+              = bike.manufacturer_other
+          - else
+            = bike.mnfg_name
+        %td.large-screens
+          .less-strong-hold
+            = [bike.year, bike.frame_model].join(' ')
+            = "(#{bike.type})" unless bike.type == 'bike'
+            - if bike.paint.present? && bike.paint.color_id.blank?
+              .less-strong
+                = link_to bike.paint.name, edit_admin_paint_url(bike.paint)
+                = bike.frame_colors.to_sentence
+            - if bike.stolen
+              %span.less-strong-right
+                stolen
+            - if show_serial
+              %br
+              %span.less-strong
+                = bike.serial_number
 
-      %td.not-tiny-screens
-        .less-strong-hold
-          = bike.creation_organization.name if bike.creation_organization.present?
-          - if bike.creation_description
-            %span.less-strong-right
-              = bike.creation_description
-        
+        %td.not-tiny-screens
+          .less-strong-hold
+            = bike.creation_organization.name if bike.creation_organization.present?
+            - if bike.creation_description
+              %span.less-strong-right
+                = bike.creation_description
+          

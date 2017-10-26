@@ -41,6 +41,8 @@
         Bikes
       %th.medium-screens
         Memberships
+      %th
+        Type
       %th.large-screens
         Locations
     %tbody
@@ -59,6 +61,8 @@
             = organization.bikes.count
           %td.medium-screens
             = organization.memberships.count
+          %td
+            = link_to organization.org_type, admin_organizations_path(org_type: organization.org_type)
           %td.large-screens
             .less-strong-hold
               
