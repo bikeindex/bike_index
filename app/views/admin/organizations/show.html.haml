@@ -72,11 +72,9 @@
 
 
 
-%section.full-screen-table
-  %h2
-    = pluralize(@bikes.count, "Bike")
-
 - if @bikes.present?
+  %h2.pull-left
+    = pluralize(@bikes.total_count, "Bike")
   .paginate-container
     = paginate @bikes
   %section.full-screen-table
@@ -111,7 +109,7 @@
           %td
             = user.email
           %td
-            = user.bike_ids.count
+            = user.creation_states.where(organization_id: @organization.id).count
 
 
 %ul

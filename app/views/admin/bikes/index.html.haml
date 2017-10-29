@@ -27,6 +27,8 @@
 - if @bikes.present?
   .paginate-container
     = paginate @bikes
+    %h4.pull-left
+      = pluralize(@bikes.total_count, 'Matching Bike')
   %section.full-screen-table
     %table.table.table-striped.table-bordered#admin-bikes-index
       - if params[:multi_delete]

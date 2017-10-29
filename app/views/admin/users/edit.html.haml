@@ -5,13 +5,17 @@
   .span6.padded
     = render partial: "form"
 
-- if @bikes.any?
+- if @bikes.present?
+  %h2.pull-left
+    = pluralize(@bikes.total_count, "Bike")
+  .paginate-container
+    = paginate @bikes
   %h3.padded
     %span
       #{@user.email}
     Bikes
   %ul
-    - @bikes.each do |bike|
+    - @bikes.decorate.each do |bike|
       - display = bike.title
       - display = "#{display} (hidden)" if bike.hidden
       - display = "#{display} (example)" if bike.example
@@ -24,7 +28,9 @@
   %span
     #{@user.email}
   ownerships
-- if @user.ownerships.any?
+- if @ownerships.present?
+  %h2.pull-left
+    = pluralize(@ownerships.total_count, "Ownership")
   %section.full-screen-table
     %table.table.table-striped.table-bordered
       %thead
@@ -39,7 +45,7 @@
         %th
           Current?
       %tbody
-        - @user.ownerships.each do |ownership|
+        - @ownerships.each do |ownership|
           %tr
             %td
               = link_to ownership.id, edit_admin_ownership_url(ownership.id)
@@ -66,6 +72,8 @@
               = ownership.owner_email
             %td.table-cell-check
               = "&#x2713;".html_safe if ownership.current
+  .paginate-container
+    = paginate @ownerships
 - else
   %p
     #{@user.email} has no Bikes
