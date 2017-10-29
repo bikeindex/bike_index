@@ -22,8 +22,10 @@ class Admin::UsersController < Admin::BaseController
   end
 
   def edit
-    bikes = @user.bikes
-    @bikes = BikeDecorator.decorate_collection(bikes)
+    page = params[:page] || 1
+    per_page = params[:per_page] || 50
+    @bikes = @user.bikes.page(page).per(per_page)
+    @ownerships = @user.ownerships.page(page).per(per_page)
   end
 
   def update

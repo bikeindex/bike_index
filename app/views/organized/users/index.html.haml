@@ -23,8 +23,8 @@
         Email
       %th
         Date added
-      / %th
-      /   Total indexed
+      %th.hidden-md-down
+        Total indexed
     %tbody
       - @memberships.each do |membership|
         %tr
@@ -34,8 +34,8 @@
             = membership.user.email
           %td
             = l membership.created_at, format: :short_with_year
-          / %td.medium-screens
-          /   = @bikes.where(creator_id: membership.user.id).count if @bikes.present?
+          %td.hidden-md-down
+            = membership.user.creation_states.where(organization_id: current_organization.id).count
       - @organization_invitations.each do |organization_invitation|
         %tr
           %td
@@ -49,4 +49,3 @@
             %small
               invited #{l organization_invitation.created_at, format: :short_with_year}
           %td
-          / %td

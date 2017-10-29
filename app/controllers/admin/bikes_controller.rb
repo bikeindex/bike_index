@@ -10,8 +10,7 @@ class Admin::BikesController < Admin::BaseController
     end
     @page = params[:page] || 1
     per_page = params[:per_page] || 100
-    bikes = bikes.page(@page).per(per_page)
-    @bikes = bikes.decorate
+    @bikes = bikes.page(@page).per(per_page)
   end
 
   def missing_manufacturer
@@ -20,8 +19,7 @@ class Admin::BikesController < Admin::BaseController
     bikes = session[:missing_manufacturer_time_order] ? bikes.order('created_at desc') : bikes.order('manufacturer_other ASC')
     page = params[:page] || 1
     per_page = params[:per_page] || 100
-    bikes = bikes.page(page).per(per_page)
-    @bikes = bikes.decorate
+    @bikes = bikes.page(page).per(per_page)
   end
 
   def update_manufacturers

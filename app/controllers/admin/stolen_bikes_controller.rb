@@ -10,8 +10,7 @@ class Admin::StolenBikesController < Admin::BaseController
     end
     page = params[:page] || 1
     per_page = params[:per_page] || 50
-    bikes = bikes.page(page).per(per_page)
-    @bikes = bikes.decorate
+    @bikes = bikes.page(page).per(per_page)
   end
 
   def approve

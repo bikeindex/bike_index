@@ -18,8 +18,7 @@ class Admin::OrganizationsController < Admin::BaseController
     bikes = Bike.where(creation_organization_id: @organization.id).reorder('created_at desc')
     page = params[:page] || 1
     per_page = params[:per_page] || 25
-    bikes = bikes.page(page).per(per_page)
-    @bikes = bikes.decorate
+    @bikes = bikes.page(page).per(per_page)
     @organization = @organization.decorate
   end
 

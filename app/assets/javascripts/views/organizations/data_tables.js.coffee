@@ -3,7 +3,7 @@ class BikeIndex.Views.DataTables extends Backbone.View
   initialize: ->
     # Later we can seperate these, for now though here is good enough
     if $('#truncated-data-table').length > 0
-      @loadShortDataTable('#truncated-data-table')
+      @loadDataTable('#truncated-data-table')
     else if $('#admin-users-table').length > 0
       @loadDataTable('#admin-users-table')
     else if $('#admin-manufacturers-list').length > 0
@@ -15,20 +15,9 @@ class BikeIndex.Views.DataTables extends Backbone.View
         aaSorting: [ ]
         aLengthMenu: [[25, 50, 100, 200, -1], [25, 50, 100, 200, "All"]]
         iDisplayLength: -1
-      
-
 
   loadDataTable:(table_id) ->
     $(table_id).dataTable
       aaSorting: [ ]
       aLengthMenu: [[25, 50, 100, 200, -1], [25, 50, 100, 200, "All"]]
-      iDisplayLength: 50
-
-      
-
-  loadShortDataTable:(table_id) ->
-    $(table_id).dataTable
-      aaSorting: [ ]
-      aLengthMenu: [[25, 50, -1], [25, 50, "All"]]
-      iDisplayLength: 25
-
+      iDisplayLength: -1
