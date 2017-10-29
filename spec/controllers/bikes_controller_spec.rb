@@ -69,7 +69,7 @@ describe BikesController do
           end
         end
         context 'no location' do
-          let(:ip_query_params) { query_params.merge(location: '') }
+          let(:ip_query_params) { query_params.merge(location: '   ') }
           it 'assigns passed parameters and close_serials' do
             expect_any_instance_of(BikesController).to receive(:forwarded_ip_address) { ip_address }
             allow(Geocoder).to receive(:search) { production_ip_search_result }
