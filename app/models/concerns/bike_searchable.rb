@@ -115,15 +115,17 @@ module BikeSearchable
 
     def extracted_searchable_proximity_hash(query_params, ip)
       return false unless query_params[:stolenness] == 'proximity'
-      location = query_params[:location].present? && query_params[:location]
+      location = query_params[:location]
       return false unless location && !(location =~ /anywhere/i)
       distance = query_params[:distance] && query_params[:distance].to_i
-      if location.downcase == 'ip' || location.downcase == 'you'
+      if ['', 'ip', 'you'].include?(location.strip.downcase)
         return false unless ip.present?
         location = Geocoder.search(ip)
-        location = location.first.data if defined?(location.first.data)
+        if defined?(location.first.data) && location.first.data.is_a?(Array)
+          location = location.first.data.reverse.compact.select { |i| i.match(/\A\D*\z/).present? }
+        end
       end
-      bounding_box = Geocoder::Calculations.bounding_box(location, distance)
+      bounding_box = Geocoder::Calculations.bounding_box(location.to_s, distance)
       return false if bounding_box.detect(&:nan?) # If we can't create a bounding box, skip
       {
         bounding_box: bounding_box,
