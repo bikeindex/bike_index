@@ -126,13 +126,6 @@ RSpec.shared_examples 'bike_searchable' do
               expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
             end
           end
-          context 'proximity of empty string' do
-            let(:query_params) { { stolenness: 'proximity', location: '     ', distance: 100 } }
-            let(:target) { { stolenness: 'stolen' } }
-            it 'returns a non-proximity search' do
-              expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
-            end
-          end
         end
         context 'input location' do
           let(:query_params) { { stolenness: 'proximity', location: 'these parts', distance: '-1' } }

@@ -6,7 +6,13 @@
   height: 600px;
 }
 
-.ad-col { @include media-breakpoint-down(md) { width: 100%; } }
+.ad-col {
+  @include media-breakpoint-down(md) { width: 100%; }
+  .ad-block img {
+    margin-bottom: $vertical-height;
+    &:last-of-type { margin-bottom: 0 }
+  }
+}
 
 .ad-block {
   display: none;
@@ -31,10 +37,10 @@
       margin-bottom: $vertical-height;
     }
   }
-  &#right300x600 {
-    @extend .ad300x600;
-    margin-top: $vertical-height;
-  }
+  // &#right300x600 {
+  //   @extend .ad300x600;
+  //   margin-top: $vertical-height;
+  // }
   h3 {
     font-size: 21px;
     margin: 0 0 0.5*$vertical-height;

@@ -8,6 +8,7 @@ describe BikesController do
     let(:serial) { '1234567890' }
     let!(:stolen_bike_2) { FactoryGirl.create(:stolen_bike, latitude: 41.8961603, longitude: -87.677215) }
     let(:ip_address) { '127.0.0.1' }
+    let(:target_location) { ['New York', 'NY', 'US'] }
     let(:target_interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: ip_address) }
     context 'with subdomain' do
       it 'redirects to no subdomain' do
@@ -63,7 +64,18 @@ describe BikesController do
             allow(Geocoder).to receive(:search) { production_ip_search_result }
             get :index, ip_query_params
             expect(response.status).to eq 200
-            expect(assigns(:interpreted_params)).to eq target_interpreted_params
+            expect(assigns(:interpreted_params)).to eq target_interpreted_params.merge(location: target_location)
+            expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id])
+          end
+        end
+        context 'no location' do
+          let(:ip_query_params) { query_params.merge(location: '   ') }
+          it 'assigns passed parameters and close_serials' do
+            expect_any_instance_of(BikesController).to receive(:forwarded_ip_address) { ip_address }
+            allow(Geocoder).to receive(:search) { production_ip_search_result }
+            get :index, ip_query_params
+            expect(response.status).to eq 200
+            expect(assigns(:interpreted_params)).to eq target_interpreted_params.merge(location: target_location)
             expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id])
           end
         end

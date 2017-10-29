@@ -5,7 +5,9 @@ class @AdDisplayer
   iota_ad = '<h3><a href="https://bikeindex.org/news/iota---a-tiny-tracker-with-huge-potential">Bike Index Approved:</a></h3>' +
                    "<a href=\"http://iotatracker.refr.cc/bikeindex\" onclick=\"trackOutboundLink('http://iotatracker.refr.cc/bikeindex'); return false;\"><img src=\"/ads/iota-square.jpg\" alt=\"Iota Tracker\"></a>"
 
-  lemonade_ad = ''
+  lemonade_ad = '<h3><a href="https://bikeindex.org/news/bike-index-partners-with-renters-and-homeowners-insurance-company-lemo">Bike Index Approved:</a></h3>' +
+                   "<a href=\"https://www.lemonade.com/l/bike-index?utm_medium=partners&utm_source=bike-index&utm_campaign=website\" onclick=\"trackOutboundLink('https://www.lemonade.com/l/bike-index?utm_medium=partners&utm_source=bike-index&utm_campaign=website'); return false;\"><img src=\"https://files.bikeindex.org/partner/Lemonade-Tile.jpg\" alt=\"Lemonade\" style=\"margin-bottom: 30px;\"></a>"
+
   lemonade_location_matches = ['california', 'ca', 'ny', 'new york', 'nj', 'new jersey', 'il', 'illinois']
 
   constructor: ->
@@ -26,6 +28,9 @@ class @AdDisplayer
         # Check if the matching strings are separate words in the location string
         expression = ///[^\w]#{match}[^\w]///
         return lemonade_ad if location.match(///[^\w]#{match}[^\w]///)
+    else
+      # Display it anyway, our location tracking is sort of BS
+      return lemonade_ad
     # return an empty string if there aren't any matches
     ''
 

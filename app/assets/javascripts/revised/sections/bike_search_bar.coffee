@@ -20,7 +20,7 @@ class BikeIndex.BikeSearchBar extends BikeIndex
       # Maxmind (what we use in production for ip lookup) formats results differently than google
       # This doesn't work in dev... but it wouldn't work anyway because localhost
       if Array.isArray(location_data)
-        location = "#{location_data[2]}, #{location_data[1]}"
+        location = location_data.join(', ')
         # Set the text box
         $('#location').val(location)
     # Store location in localStorage if it's there, otherwise -
