@@ -3,11 +3,11 @@
     Manage Paints
 
 %h4
-  = @paints.count
+  = Paint.count
   indexed,
   %em
     (#{Paint.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
-  = @paints.where('color_id IS NULL').count
+  = Paint.where('color_id IS NULL').count
   are unlinked
 
 .special-search-field-container
@@ -54,7 +54,7 @@
               = paint.name
             %td.medium-screens
               - if paint.color_id.present?
-                = paint.color.name
+                = paint.color && paint.color.name
               - if paint.secondary_color_id.present?
                 = "- #{paint.secondary_color.name}"
               - if paint.tertiary_color_id.present?
