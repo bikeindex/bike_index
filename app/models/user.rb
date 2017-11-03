@@ -212,6 +212,10 @@ class User < ActiveRecord::Base
     Bike.unscoped.where(id: bike_ids(user_hidden))
   end
 
+  def rough_approx_bikes # Rough fix for users with large numbers of bikes
+    Bike.includes(:ownerships).where(ownerships: { current: true, user_id: id })
+  end
+
   def bike_ids(user_hidden=true)
     ows = ownerships.where(example: false).where(current: true)
     if user_hidden
