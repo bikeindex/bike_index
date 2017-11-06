@@ -5,6 +5,7 @@ class @ManufacturersSelect
     $target = $(target_selector)
     return true unless $target.hasClass('unfancy')
     initial_opts = if $target.data('initial') then [$target.data('initial')] else []
+    $target.parents('.form-group').addClass('hide-selectize-dropdown-arrow')
     if frame_mnfg
       @makeFrameManufacturer($target, initial_opts)
     else

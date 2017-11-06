@@ -197,6 +197,9 @@ img { max-width: 100%; } // don't break random stuff images!
 .selectize-dropdown .active { background-color: lighten(#bebebe, 10%); }
 // Make selectize inputs the same size as form inputs
 .form-group .selectize-control .selectize-input { padding: 0.475rem 0.75rem; }
+// Make placeholder text the same as other placeholders
+.registration-widget .selectize-input.not-full > input { font-style: italic; }
+.registration-widget .selectize-input.not-full.input-active > input { font-style: normal; }
 
 // // Pickaday overrides
 // .pika-button:hover { background: $blue; }
@@ -268,6 +271,7 @@ img { max-width: 100%; } // don't break random stuff images!
   input[type='email'], select, .form-control { width: 100%; }
   .below-input-help { padding: 0 6px; }
   .fancy-select .selectize-control { width: 100%; }
+  label { line-height: 1.2em; }
   .submit-wrapper .btn {
     display: block;
     margin: 0;
