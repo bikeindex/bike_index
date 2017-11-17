@@ -8,7 +8,7 @@
   %body
     .binx-wrapper
       .binx-header
-        %img{ src: 'https://files.bikeindex.org/email_assets/logo.png' }
+        %img{ src: 'https://files.bikeindex.org/email_assets/logo.png', height: '70', alt: 'Bike Index logo' }
       .binx-body
         - if @organization.present? && controller_path == 'organized_mailer' && @organization.mail_snippet_body('header').present?
           = @organization.mail_snippet_body('header').html_safe
