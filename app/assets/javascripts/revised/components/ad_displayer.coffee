@@ -5,6 +5,9 @@ class @AdDisplayer
   iota_ad = '<h3><a href="https://bikeindex.org/news/iota---a-tiny-tracker-with-huge-potential">Bike Index Approved:</a></h3>' +
                    "<a href=\"http://iotatracker.refr.cc/bikeindex\" onclick=\"trackOutboundLink('http://iotatracker.refr.cc/bikeindex'); return false;\"><img src=\"/ads/iota-square.jpg\" alt=\"Iota Tracker\"></a>"
 
+  boomerang_ad = '<h3><a href="https://bikeindex.org/news/bikeindex-checks-out-boomerang-cyclotrac---gps-tracking-for-bikes">Bike Index Approved:</a></h3>' +
+                   "<a href=\"http://www.boomerangbike.com\" onclick=\"trackOutboundLink('http://www.boomerangbike.com/'); return false;\"><img src=\"/ads/boomerang.gif\" alt=\"Boomerang Tracker\"></a>"
+
   lemonade_ad = '<h3><a href="https://bikeindex.org/news/bike-index-partners-with-renters-and-homeowners-insurance-company-lemo">Bike Index Approved:</a></h3>' +
                    "<a href=\"https://www.lemonade.com/l/bike-index?utm_medium=partners&utm_source=bike-index&utm_campaign=website\" onclick=\"trackOutboundLink('https://www.lemonade.com/l/bike-index?utm_medium=partners&utm_source=bike-index&utm_campaign=website'); return false;\"><img src=\"https://files.bikeindex.org/partner/Lemonade-Tile.jpg\" alt=\"Lemonade\" style=\"margin-bottom: 30px;\"></a>"
 
@@ -16,7 +19,7 @@ class @AdDisplayer
 
   photoAd: (unit) ->
     $('.content-nav-group:last').addClass('additional-ad-space')
-    $("##{unit}").html([@geolocatedAd(), iota_ad].join(''))
+    $("##{unit}").html([@geolocatedAd(), boomerang_ad].join(''))
       .addClass('rendered-ad photo-ad')
 
   geolocatedAd: ->
