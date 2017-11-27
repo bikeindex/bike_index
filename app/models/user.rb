@@ -34,7 +34,7 @@ class User < ActiveRecord::Base
   has_many :created_ownerships, class_name: 'Ownership', inverse_of: :creator, foreign_key: :creator_id
   has_many :created_bikes, class_name: 'Bike', inverse_of: :creator, foreign_key: :creator_id
   has_many :locks, dependent: :destroy
-  has_many :user_emails
+  has_many :user_emails, dependent: :destroy
 
   has_many :sent_stolen_notifications, class_name: 'StolenNotification', foreign_key: :sender_id
   has_many :received_stolen_notifications, class_name: 'StolenNotification', foreign_key: :receiver_id
