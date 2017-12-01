@@ -178,7 +178,7 @@ Bikeindex::Application.routes.draw do
     resources :manufacturers do
       collection { post :import }
     end
-    resources :users, only: [:index, :edit, :update, :destroy]
+    resources :users, only: [:index, :show, :edit, :update, :destroy]
   end
 
   namespace :api, defaults: { format: 'json' } do
