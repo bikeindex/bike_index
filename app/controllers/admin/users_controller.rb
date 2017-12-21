@@ -1,5 +1,5 @@
 class Admin::UsersController < Admin::BaseController
-  before_filter :find_user, only: [:show, :edit, :update, :destroy]
+  before_filter :find_user, only: [:edit, :update, :destroy]
 
   def index
     page = params[:page] || 1
@@ -18,7 +18,10 @@ class Admin::UsersController < Admin::BaseController
       @users = users.page(page).per(per_page)
     end
     @user_count = users.count
-    
+  end
+
+  def show
+    redirect_to edit_admin_user_url
   end
 
   def edit

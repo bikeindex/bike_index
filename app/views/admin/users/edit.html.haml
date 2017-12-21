@@ -5,6 +5,7 @@
   .span6.padded
     = render partial: "form"
 
+
 - if @bikes.present?
   %h2.pull-left
     = pluralize(@bikes.total_count, "Bike")
@@ -50,18 +51,7 @@
             %td
               = link_to ownership.id, edit_admin_ownership_url(ownership.id)
             %td
-              - if ownership.created_at.today?
-                %span.hidden
-                  = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
-                Today at #{ownership.created_at.strftime("%-I %p")}
-              - elsif Date.yesterday().beginning_of_day() <= ownership.created_at
-                %span.hidden
-                  = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
-                Yesterday at #{ownership.created_at.strftime("%-I %p")}
-              - else
-                %span.hidden
-                  = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
-                = ownership.created_at.strftime("%-m/%-d/%Y at %-I %p")
+              = admin_display_date(ownership.created_at)
             %td
               - u = ownership.creator
               - if u.name.present?
@@ -77,6 +67,34 @@
 - else
   %p
     #{@user.email} has no Bikes
+
+- if @user.user_emails.count > 1
+  %h2 User emails
+  %section.full-screen-table
+    %table.table.table-striped.table-bordered
+      %thead
+        %th
+          Date Created
+        %th
+          Confirmed
+        %th
+          Primary
+        %th
+          Old User Id
+      %tbody
+        - @user.user_emails.each do |user_email|
+          %tr
+            %td
+              .less-strong-hold
+                %span.less-strong-right.medium-screens
+                  = user_email.id
+              = admin_display_date(user_email.created_at)
+            %td
+              = "&#x2713;".html_safe if user_email.confirmed
+            %td
+              = "&#x2713;".html_safe if user_email.primary
+            %td
+              = user_email.old_user_id
 
 .actions.padded
   = link_to "Delete #{@user.email}!", admin_user_url(@user), method: :delete, confirm: "Are you sure?", class: "button-red"
