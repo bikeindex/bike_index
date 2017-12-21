@@ -26,13 +26,12 @@ gem 'geocoder'
 gem 'money-rails'
 gem 'i18n'
 gem 'hamlit'
-gem 'haml-rails'
 gem 'journey', '~> 1.0.3'
 gem 'kramdown' # Markdown
 gem 'redcarpet' # Something to do with swagger? Guess we needed another markdown parser
 gem 'kaminari' # pagination
 gem 'pg_search'
-gem 'nokogiri'
+gem 'nokogiri', '~> 1.8.1'
 gem 'carrierwave'
 gem 'carrierwave_backgrounder'
 gem 'rmagick'
