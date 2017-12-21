@@ -58,7 +58,7 @@ gem 'sparkpost' # ruby client for email
 gem 'twitter' # Twitter. For rendering tweets
 
 # OAuth provider, Grape, associated parts of API V2
-gem 'doorkeeper'
+gem 'doorkeeper', '~> 3.1.0'
 gem 'wine_bouncer'
 gem 'grape', '~> 0.14.0'
 gem 'grape-active_model_serializers', '~> 1.4.0'

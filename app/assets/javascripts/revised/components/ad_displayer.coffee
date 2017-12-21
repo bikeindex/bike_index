@@ -19,7 +19,7 @@ class @AdDisplayer
 
   photoAd: (unit) ->
     $('.content-nav-group:last').addClass('additional-ad-space')
-    $("##{unit}").html([@geolocatedAd(), boomerang_ad].join(''))
+    $("##{unit}").html([@geolocatedAd()].join(''))
       .addClass('rendered-ad photo-ad')
 
   geolocatedAd: ->
