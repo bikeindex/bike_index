@@ -55,6 +55,29 @@ describe Organization do
     end
   end
 
+  describe 'organization recoveries' do
+    let(:organization) { FactoryGirl.create(:organization) }
+    let(:bike) { FactoryGirl.create(:stolen_bike, creation_organization_id: organization.id) }
+    let(:stolen_record) { bike.find_current_stolen_record }
+    let!(:bike_organization) { FactoryGirl.create(:bike_organization, bike: bike, organization: organization) }
+    let(:recovery_information) do
+      {
+        recovered_description: 'recovered it on a special corner',
+        index_helped_recovery: true,
+        can_share_recovery: true
+      }
+    end
+    it 'returns recovered bikes' do
+      organization.reload
+      expect(organization.bikes).to eq([bike])
+      expect(organization.bikes.stolen).to eq([bike])
+      stolen_record.add_recovery_information(recovery_information)
+      bike.reload
+      expect(bike.stolen_recovery?).to be_truthy
+      expect(organization.recovered_records).to eq([stolen_record])
+    end
+  end
+
   describe 'set_and_clean_attributes' do
     it 'sets the short_name and the slug on save' do
       organization = Organization.new(name: 'something')

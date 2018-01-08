@@ -1,0 +1,52 @@
+.organized-page-header
+  %h1
+    %em
+      = current_organization.name
+    Recoveries
+  %p
+    %strong
+      #{ pluralize(@recoveries_count, 'recovery') }
+
+  %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border.table-compact-long
+    %thead.small-header
+      %tr
+        %th.date-added Date Recovered
+        %th Description
+        %th
+          mnfg, model,
+          %span.less-strong
+            color
+        %th
+          Owner
+    %tbody
+      - display_recovery_ids = current_user.superuser?
+      - @recoveries.each do |recovered_record|
+        - bike = recovered_record.bike
+        %tr
+          %td
+            - if recovered_record.date_recovered.present?
+              = link_to l(recovered_record.date_recovered, format: :dotted), bike_path(bike)
+            - if display_recovery_ids
+              %small.less-strong
+                = recovered_record.id
+          %td.hidden-xs-down
+            - recovery_display = recovered_record.recovery_display
+            - if recovery_display && recovery_display.quote.present?
+              %small
+                = recovery_display.quote
+            - else
+              %em
+                %small
+
+          %td
+            %small
+              = bike.mnfg_name
+              = ", #{bike.frame_model}" if bike.frame_model.present?
+              %span.less-strong
+                = bike.frame_colors.to_sentence
+          %td
+            %small
+              = bike.owner_email
+
+.paginate-container.paginate-container-bottom
+  = paginate @recoveries

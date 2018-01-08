@@ -17,6 +17,9 @@
             = active_link (current_organization.is_paid ? 'Search' : 'List'), organization_bikes_path(organization_id: current_organization.to_param), class_name: 'nav-link'
           %li
             = active_link 'Add a bike', new_organization_bike_path(current_organization), class_name: 'nav-link'
+          - if current_organization.is_paid
+            %li
+              = active_link 'Recoveries', recoveries_organization_bikes_path(current_organization), class_name: 'nav-link'
       - if current_user.is_admin_of?(current_organization)
         %li
           - manage_active = %w(users manage emails).include?(controller_name)

@@ -7,7 +7,7 @@ module Organized
         search
       else
         @bikes_count = organization_bikes.count
-        @bikes = organization_bikes.order('created_at desc').page(@page).per(@per_page)
+        @bikes = organization_bikes.order('bikes.created_at desc').page(@page).per(@per_page)
       end
     end
 
@@ -16,7 +16,7 @@ module Organized
       @interpreted_params = Bike.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
       bikes = organization_bikes.search(@interpreted_params)
       @bikes_count = bikes.count
-      @bikes = bikes.order('created_at desc').page(@page).per(@per_page)
+      @bikes = bikes.order('bikes.created_at desc').page(@page).per(@per_page)
       if @interpreted_params[:serial]
         @close_serials = organization_bikes.search_close_serials(@interpreted_params).limit(25)
       end
@@ -24,8 +24,15 @@ module Organized
       render :search
     end
 
-    def new
+    def recoveries
+      redirect_to current_index_path and return unless current_organization.is_paid
+      @page = params[:page] || 1
+      @per_page = params[:per_page] || 25
+      @recoveries_count = current_organization.recovered_records.count
+      @recoveries = current_organization.recovered_records.order('date_recovered desc').page(@page).per(@per_page)
     end
+
+    def new; end
 
     helper_method :stolenness
 
@@ -36,11 +43,7 @@ module Organized
     end
 
     def stolenness
-      if params['stolenness'].present?
-        params['stolenness']
-      else
-        'all'
-      end
+      params['stolenness'].present? ? params['stolenness'] : 'all'
     end
 
     def organization_bikes

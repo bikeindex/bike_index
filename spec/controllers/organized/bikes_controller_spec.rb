@@ -31,12 +31,12 @@ describe Organized::BikesController, type: :controller do
 
   context 'logged_in_as_organization_member' do
     include_context :logged_in_as_organization_member
-    describe 'index' do
-      context 'paid organization' do
-        before do
-          organization.update_attribute :is_paid, true
-          expect(organization.is_paid).to be_truthy
-        end
+    context 'paid organization' do
+      before do
+        organization.update_attribute :is_paid, true
+        expect(organization.is_paid).to be_truthy
+      end
+      describe 'index' do
         context 'with params' do
           let(:query_params) do
             {
@@ -76,10 +76,40 @@ describe Organized::BikesController, type: :controller do
           end
         end
       end
-      context 'unpaid organization' do
-        before do
-          expect(organization.is_paid).to be_falsey
+      describe 'recoveries' do
+        let(:bike) { FactoryGirl.create(:stolen_bike) }
+        let(:bike2) { FactoryGirl.create(:stolen_bike) }
+        let(:recovered_record) { bike.find_current_stolen_record }
+        let(:recovered_record2) { bike2.find_current_stolen_record }
+        let!(:bike_organization) { FactoryGirl.create(:bike_organization, bike: bike, organization: organization) }
+        let!(:bike_organization2) { FactoryGirl.create(:bike_organization, bike: bike2, organization: organization) }
+        let(:date) { Date.civil(2016, 1, 10) }
+        let(:recovery_information) do
+          {
+            recovered_description: 'recovered it on a special corner',
+            index_helped_recovery: true,
+            can_share_recovery: true,
+            date_recovered: 'Sun Jan 10 2016'
+          }
         end
+        before do
+          recovered_record.add_recovery_information
+          recovered_record2.add_recovery_information(recovery_information)
+        end
+        it 'renders, assigns search_query_present and stolenness all' do
+          expect(recovered_record2.date_recovered.to_date).to eq date
+          get :recoveries, organization_id: organization.to_param
+          expect(assigns(:recoveries).pluck(:id)).to eq([recovered_record.id, recovered_record2.id])
+          expect(response.status).to eq(200)
+          expect(response).to render_template :recoveries
+        end
+      end
+    end
+    context 'unpaid organization' do
+      before do
+        expect(organization.is_paid).to be_falsey
+      end
+      describe 'index' do
         it 'renders without search' do
           expect(Bike).to_not receive(:search)
           get :index, organization_id: organization.to_param
@@ -88,6 +118,12 @@ describe Organized::BikesController, type: :controller do
           expect(response).to render_with_layout('application_revised')
           expect(assigns(:current_organization)).to eq organization
           expect(assigns(:bikes).pluck(:id).include?(non_organization_bike.id)).to be_falsey
+        end
+      end
+      describe 'recoveries' do
+        it 'redirects recoveries' do
+          get :recoveries, organization_id: organization.to_param
+          expect(response.location).to match(organization_bikes_path(organization_id: organization.to_param))
         end
       end
     end
