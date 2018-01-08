@@ -1,0 +1,8 @@
+.organized-page-header
+  %h1
+    %em
+      = current_organization.name
+    Recoveries
+  %p
+    %strong
+      #{ pluralize(@recoveries_count, 'recovery') }

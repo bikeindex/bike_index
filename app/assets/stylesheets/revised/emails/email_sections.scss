@@ -17,7 +17,7 @@
     display: block;
     margin: .5*$vertical-height 1.5*$vertical-height 0 0;
     float: right;
-    height: $header-height - $vertical-height;
+    height: $header-height - $vertical-height; // This is also manually set in HTML attrs because of outlook
     max-height: $header-height - $vertical-height;
     width: auto;
   }

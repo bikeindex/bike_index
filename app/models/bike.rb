@@ -66,6 +66,8 @@ class Bike < ActiveRecord::Base
   scope :stolen, -> { where(stolen: true) }
   scope :non_stolen, -> { where(stolen: false) }
   scope :with_serial, -> { where('serial_number != ?', 'absent') }
+  # "Recovered" bikes are bikes that were found and are waiting to be claimed. This is confusing and should be fixed
+  # so that it no longer is the same word as stolen recoveries
   scope :non_recovered, -> { where(recovered: false) }
 
   include PgSearch
@@ -299,6 +301,10 @@ class Bike < ActiveRecord::Base
 
   def serial
     serial_number unless recovered
+  end
+
+  def stolen_recovery?
+    recovered_records.any?
   end
 
   before_save :set_paints

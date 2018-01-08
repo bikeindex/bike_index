@@ -258,7 +258,9 @@ Bikeindex::Application.routes.draw do
   resources :organizations, only: [], path: 'o', module: 'organized' do
     get '/', to: 'bikes#index', as: :root
     get 'landing', to: 'manage#landing', as: :landing
-    resources :bikes, only: [:index, :new, :show]
+    resources :bikes, only: [:index, :new, :show] do
+      collection { get :recoveries }
+    end
     # Below are admin controllers, inherit from Organized::AdminController not BaseController
     resources :manage, only: [:index, :update, :destroy] do
       collection do
