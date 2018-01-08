@@ -58,6 +58,7 @@ $border-radius-sm:       1px;
 }
 @import "bootstrap/grid";
 @import "bootstrap/tables";
+.table-compact-long { line-height: 1.2em; }
 @import "bootstrap/forms";
 // @import "bootstrap/buttons"; // Override buttons with our own buttons
 

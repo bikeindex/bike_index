@@ -99,7 +99,7 @@ describe Organized::BikesController, type: :controller do
         it 'renders, assigns search_query_present and stolenness all' do
           expect(recovered_record2.date_recovered.to_date).to eq date
           get :recoveries, organization_id: organization.to_param
-          expect(assigns(:recovered_records).pluck(:id)).to eq([recovered_record.id, recovered_record2.id])
+          expect(assigns(:recoveries).pluck(:id)).to eq([recovered_record.id, recovered_record2.id])
           expect(response.status).to eq(200)
           expect(response).to render_template :recoveries
         end

@@ -29,7 +29,7 @@ module Organized
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
       @recoveries_count = current_organization.recovered_records.count
-      @recovered_records = current_organization.recovered_records.order('date_recovered desc').page(@page).per(@per_page)
+      @recoveries = current_organization.recovered_records.order('date_recovered desc').page(@page).per(@per_page)
     end
 
     def new; end
