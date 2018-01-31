@@ -40,13 +40,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   SHELL
 
   # This provisioner runs on every `vagrant provision`, `vagrant reload`, and the initial `vagrant up`.
-  # Configure PostgreSQL because that's the only thing we can get working reliably
+  # Use echo to create a provisioning script, chmod +x it, and execute it.
   config.vm.provision "recompose", type: "shell",
 	  run: "always", privileged: false, inline: <<-SHELL
-  sudo -u postgres -H bash << EOF
-  psql -c "CREATE ROLE vagrant WITH PASSWORD 'vagrant' SUPERUSER CREATEDB LOGIN;"
-  EOF
-  createdb vagrant
-  echo 'Vagrant provisioning appears to have been a success. You can now "vagrant ssh" and "cd /vagrant". Follow the prompts to install Ruby 2.2.5 and then "gem install bundler". Continue with the steps in the Bike Index README to finish initializing a local development environment.'
+  echo -e '#!/bin/bash -l\r\nsudo -u vagrant -H bash << EOL\r\npsql -c "CREATE ROLE vagrant WITH PASSWORD 'vagrant' SUPERUSER CREATEDB LOGIN;"\r\nEOL\r\ncreatedb vagrant\r\nrvm install 2.2.5\r\ngem install bundler\r\ncd /vagrant\r\nbundle install\r\nrake db:setup\r\nrake seed_test_users_and_bikes' > ~/rubydevprovision.sh && chmod +x rubydevprovision.sh
+  ./rubydevprovision.sh
+  echo 'Vagrant provisioning appears to have been a success. You can now "vagrant ssh" and "./rubydevprovision.sh" to finish initializing a local development environment.'
   SHELL
 end
