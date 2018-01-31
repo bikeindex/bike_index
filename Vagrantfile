@@ -48,4 +48,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   EOF
   createdb vagrant
   echo 'Vagrant provisioning appears to have been a success. You can now "vagrant ssh" and "cd /vagrant". Follow the prompts to install Ruby 2.2.5 and then "gem install bundler". Continue with the steps in the Bike Index README to finish initializing a local development environment.'
+  SHELL
 end
