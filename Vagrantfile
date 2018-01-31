@@ -43,7 +43,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Use echo to create a provisioning script, chmod +x it, and execute it.
   config.vm.provision "recompose", type: "shell",
 	  run: "always", privileged: false, inline: <<-SHELL
-  echo -e '#!/bin/bash -l\r\nsudo -u vagrant -H bash << EOL\r\npsql -c "CREATE ROLE vagrant WITH PASSWORD 'vagrant' SUPERUSER CREATEDB LOGIN;"\r\nEOL\r\ncreatedb vagrant\r\nrvm install 2.2.5\r\ngem install bundler\r\ncd /vagrant\r\nbundle install\r\nrake db:setup\r\nrake seed_test_users_and_bikes' > ~/rubydevprovision.sh && chmod +x rubydevprovision.sh
+  echo -e '#!/bin/bash -l\r\nsudo -u postgres -H bash << EOL\r\npsql -c "CREATE ROLE vagrant WITH PASSWORD '"'vagrant'"' SUPERUSER CREATEDB LOGIN;"\r\nEOL\r\ncreatedb vagrant\r\nrvm install 2.2.5\r\ngem install bundler\r\ncd /vagrant\r\nbundle install\r\nrake db:setup\r\nrake seed_test_users_and_bikes' > ~/rubydevprovision.sh && chmod +x rubydevprovision.sh
   ./rubydevprovision.sh
   echo 'Vagrant provisioning appears to have been a success. You can now "vagrant ssh" and start using it. You can find your local git repo in /vagrant.'
   SHELL
