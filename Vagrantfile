@@ -45,6 +45,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	  run: "always", privileged: false, inline: <<-SHELL
   echo -e '#!/bin/bash -l\nsudo -u postgres -H bash << EOL\npsql -c "CREATE ROLE vagrant WITH PASSWORD '"'vagrant'"' SUPERUSER CREATEDB LOGIN;"\nEOL\ncreatedb vagrant\nnewgrp rvm\nrvm install 2.2.5\ngem install bundler\ncd /vagrant\nbundle install\nrake db:setup\nrake seed_test_users_and_bikes' > ~/rubydevprovision.sh && chmod +x rubydevprovision.sh
   sg rvm -c './rubydevprovision.sh'
-  echo 'Vagrant provisioning has completed. You can now "vagrant ssh" and start using it. If any errors were thrown during provisioning, try running "./rubydevprovision.sh" inside the vagrant environment or run the provisioning scripts a second time with "vagrant provision". You can find your local git repo in /vagrant.'
+  echo -e 'Vagrant provisioning has completed. You can now "vagrant ssh" and start using it. If any\nerrors were thrown during provisioning, try running "./rubydevprovision.sh" inside the\nvagrant environment or run all of the provisioning scripts a second time\nwith "vagrant provision". You can find your local git repo in /vagrant.'
   SHELL
 end
