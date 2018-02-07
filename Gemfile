@@ -86,6 +86,7 @@ gem 'stackprof', require: false
 gem 'memory_profiler', require: false
 gem 'flamegraph', require: false
 gem 'rack-mini-profiler', require: false # If you can't see it you can't make it better
+gem 'skylight'
 
 gem 'responders', '~> 2.0' # required because of class level respond_to blocks (API v1)
 gem 'thor', '0.19.1' # Locking it; http://stackoverflow.com/questions/40986923/meaning-of-expected-string-default-value-for-on-ruby-on-rails

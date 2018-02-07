@@ -597,6 +597,8 @@ GEM
     sitemap_generator (5.1.0)
       builder
     sixarm_ruby_unaccent (1.1.1)
+    skylight (1.2.0)
+      activesupport (>= 3.0.0)
     slop (3.6.0)
     soulheart (0.3.0)
       multi_json (~> 1.11, >= 1.11.2)
@@ -749,6 +751,7 @@ DEPENDENCIES
   sidekiq (~> 4.2.10)
   sidekiq-failures
   sitemap_generator
+  skylight
   soulheart (~> 0.3.0)
   sparkpost
   sprockets-rails (~> 3.0.4)
