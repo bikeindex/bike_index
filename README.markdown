@@ -14,7 +14,7 @@ We're an open source project. Take a gander through our code, report bugs, or do
 
 - [Rails 4.2](http://rubyonrails.org/)
 
-- PostgreSQL >= 9.4
+- PostgreSQL >= 9.6
 
 - Imagemagick ([railscast](http://railscasts.com/episodes/374-image-manipulation?view=asciicast))
 
