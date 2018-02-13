@@ -5,15 +5,14 @@ describe 'Search API V3' do
   let(:manufacturer) { FactoryGirl.create(:manufacturer) }
   let(:color) { FactoryGirl.create(:color) }
   describe '/' do
-    let!(:bike) { FactoryGirl.create(:stolen_bike, manufacturer: manufacturer) }
+    let!(:bike) { FactoryGirl.create(:bike, manufacturer: manufacturer) }
     let!(:bike_2) { FactoryGirl.create(:stolen_bike, manufacturer: manufacturer) }
     let(:query_params) { { query_items: [manufacturer.search_id] } }
     context 'with per_page' do
       it 'returns matching bikes, defaults to stolen' do
         expect(Bike.count).to eq 2
         get '/api/v3/search', query_params.merge(per_page: 1), format: :json
-        expect(response.header['Total']).to eq('2')
-        expect(response.header['Link'].match('page=2&per_page=1&query_items')).to be_present
+        expect(response.header['Total']).to eq('1')
         result = JSON.parse(response.body)
         expect(result['bikes'][0]['id']).to eq bike_2.id
       end
