@@ -13,6 +13,8 @@
         - if @organization.present? && controller_path == 'organized_mailer' && @organization.mail_snippet_body('header').present?
           = @organization.mail_snippet_body('header').html_safe
         = yield
+        - if @organization.present? && controller_path == 'organized_mailer' && @organization.mail_snippet_body('footer').present?
+          = @organization.mail_snippet_body('footer').html_safe
       .binx-pstscpt
         .hearts
           %span &#9829;
