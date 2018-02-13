@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 ruby '2.2.5'
-gem 'rails', '4.2.8'
+gem 'rails', '4.2.10'
 
 gem 'pg'
 gem 'jquery-rails'
@@ -42,7 +42,7 @@ gem 'stripe', git: 'https://github.com/stripe/stripe-ruby'
 gem 'high_voltage'
 gem 'omniauth-facebook'
 gem 'omniauth-strava'
-gem 'omniauth'
+gem 'omniauth', '~> 1.3.1'
 gem 'fog'
 gem 'dalli'
 gem 'draper', require: false
