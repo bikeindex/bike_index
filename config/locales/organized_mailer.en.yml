@@ -9,4 +9,4 @@ en:
     finished_owned_registration:
       subject: "%{organization_name}Bike Index registration successful"
     organization_invitation:
-      subject: Join %{organization_name} on Bike Index
+      subject: Join %{organization_name}on Bike Index
