@@ -91,6 +91,10 @@ class Organization < ActiveRecord::Base
     save
   end
 
+  def school?
+    org_type == 'school'
+  end
+
   before_save :set_auto_user
   def set_auto_user
     if embedable_user_email.present?
