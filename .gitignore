@@ -11,6 +11,7 @@ public/caches
 .sass-cache
 public/partner
 .vagrant
+ubuntu-xenial-16.04-cloudimg-console.log
 *.rdb
 current_stolen_bikes.tsv
 spec/fixtures/tsv_creation/*.tsv

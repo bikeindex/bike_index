@@ -3,7 +3,7 @@
 
 VAGRANTFILE_API_VERSION = "2"
 
-required_plugins = %w(vagrant-vbguest vagrant-librarian-chef-nochef)
+required_plugins = %w(vagrant-vbguest)
 
 plugins_to_install = required_plugins.select { |plugin| not Vagrant.has_plugin? plugin }
 if not plugins_to_install.empty?
@@ -16,8 +16,8 @@ if not plugins_to_install.empty?
 end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  # Use David Warkentin's Ubuntu 16.04 Xenial Xerus 64-bit as our operating system (https://bugs.launchpad.net/cloud-images/+bug/1569237/comments/33)
-  config.vm.box = "v0rtex/xenial64"
+  # https://bugs.launchpad.net/cloud-images/+bug/1569237 has been fixed, use official Ubuntu box
+  config.vm.box = "ubuntu/xenial64"
 
   # Configurate the virtual machine to use 1.5GB of RAM
   config.vm.provider :virtualbox do |vb|
@@ -27,60 +27,24 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Forward the Rails server default port to the host
   config.vm.network :forwarded_port, guest: 3001, host: 3001
 
-  # Use Chef Solo to provision our virtual machine
-  config.vm.provision :chef_solo do |chef|
-	  chef.cookbooks_path = ["cookbooks", "site-cookbooks"]
+  # This provisioner runs on every `vagrant provision` and the initial `vagrant up`.
+  # Install dependencies and add 'vagrant' user to 'rvm' group
+  config.vm.provision "install", type: "shell", inline: <<-SHELL
+  apt-get install -y --reinstall pkg-config libmagickcore-dev libmagickwand-dev libpq-dev redis-server rubygems-integration
+  apt-add-repository -y ppa:rael-gc/rvm
+  add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main"
+  wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+  apt-get update
+  apt-get install -y --reinstall rvm postgresql-9.6
+  usermod -a -G rvm vagrant
+  SHELL
 
-	chef.add_recipe "apt"
-	chef.add_recipe "build-essential"
-	chef.add_recipe "system::install_packages"
-	chef.add_recipe "ruby_build"
-	chef.add_recipe "ruby_rbenv::user_install"
-	chef.add_recipe "vim"
-   	chef.add_recipe "postgresql::server"
-   	chef.add_recipe "postgresql::client"
-   	chef.add_recipe "postgresql::setup_users"
-
-    # Install Ruby 2.2.5 and Bundler
-    chef.json = {
-		rbenv: {
-			user_installs: [{
-				user: 'vagrant',
-				rubies: ["2.2.5"],
-				global: "2.2.5",
-				gems: {
-					"2.2.5" => [
-					 { name: "bundler" }
-					]
-				}
-			}]
-		},
-		system: {
-			:packages => {
-				:install => ['pkg-config', 'libmagickcore-dev', 'libmagickwand-dev', 'libpq-dev', 'redis-server']
-			}
-		},
-		postgresql: {
-			:version => "9.4",
-			:apt_distribution => "xenial",
-			:pg_hba	=> [{
-				:comment => "# Add vagrant role",
-				:type => 'local', :db => 'all', :user => 'vagrant', :addr => nil, :method => 'trust'
-			}],
-			:users => [{
-				"username": "vagrant",
-				"password": "vagrant",
-				"superuser": true,
-				"replication": false,
-				"createdb": true,
-				"createrole": false,
-				"inherit": false,
-				"login": true
-			}]
-		},
-		"build-essential" => {
-			"compiletime" => true
-		}
-	}
-  end
+  # This provisioner runs on every `vagrant provision`, `vagrant reload`, and the initial `vagrant up`.
+  # Use echo to create a provisioning script, chmod +x it, and execute it.
+  config.vm.provision "recompose", type: "shell",
+	  run: "reload", privileged: false, inline: <<-SHELL
+  echo -e '#!/bin/bash -l\nsudo -u postgres -H bash << EOL\npsql -c "CREATE ROLE vagrant WITH PASSWORD '"'vagrant'"' SUPERUSER CREATEDB LOGIN;"\nEOL\ncreatedb vagrant\nnewgrp rvm\nrvm install 2.2.5\ngem install bundler\ncd /vagrant\nbundle install\nrake db:setup\nrake seed_test_users_and_bikes' > ~/rubydevprovision.sh && chmod +x rubydevprovision.sh
+  sg rvm -c './rubydevprovision.sh'
+  echo -e 'Vagrant provisioning has completed. You can now "vagrant ssh" and start using it. If any\nerrors were thrown during provisioning, try running "./rubydevprovision.sh" inside the\nvagrant environment or run all of the provisioning scripts a second time\nwith "vagrant provision". You can find your local git repo in /vagrant.'
+  SHELL
 end
