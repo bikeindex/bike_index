@@ -55,6 +55,7 @@ gem 'paranoia'
 
 gem 'sparkpost' # ruby client for email
 gem 'twitter' # Twitter. For rendering tweets
+gem 'gibbon' # Mailchimp API wrapper
 
 # OAuth provider, Grape, associated parts of API V2
 gem 'doorkeeper', '~> 3.1.0'

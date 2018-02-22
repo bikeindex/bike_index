@@ -232,6 +232,31 @@ describe User do
     end
   end
 
+  describe 'update_mailchimp' do
+    context 'not is_emailable' do
+      let(:user) { FactoryGirl.create(:confirmed_user, is_emailable: false) }
+      it 'does not update mailchimp' do
+        user.reload
+        expect(user.add_to_mailchimp?).to be_falsey
+        user.name = 'cool stuff'
+        expect do
+          user.save
+        end.to_not change(UpdateMailchimpUserWorker.jobs, :size)
+      end
+    end
+    context 'is_emailable' do
+      let(:user) { FactoryGirl.create(:confirmed_user, is_emailable: true) }
+      it 'updates mailchimp on create and on save' do
+        user.reload
+        expect(user.add_to_mailchimp?).to be_truthy
+        user.name = 'cool stuff'
+        expect do
+          user.save
+        end.to change(UpdateMailchimpUserWorker.jobs, :size).by(1)
+      end
+    end
+  end
+
   describe 'set_urls' do
     xit "adds http:// to twitter and website if the url doesn't have it so that the link goes somewhere" do
       user = User.new(show_twitter: true, twitter: 'http://somewhere.com', show_website: true, website: 'somewhere.org')

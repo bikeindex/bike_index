@@ -44,6 +44,7 @@ class User < ActiveRecord::Base
 
   before_create :generate_username_confirmation_and_auth
   after_create :perform_create_jobs
+  after_save :update_mailchimp
   serialize :paid_membership_info
   serialize :my_bikes_hash
   scope :confirmed, -> { where(confirmed: true) }
@@ -112,6 +113,14 @@ class User < ActiveRecord::Base
 
   def perform_create_jobs
     CreateUserJobs.new(self).perform_create_jobs
+  end
+
+  def update_mailchimp
+    UpdateMailchimpUserWorker.perform_async(id) if add_to_mailchimp?
+  end
+
+  def add_to_mailchimp?
+    is_emailable && confirmed? && !banned
   end
 
   def superuser?
