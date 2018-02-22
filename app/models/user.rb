@@ -112,7 +112,6 @@ class User < ActiveRecord::Base
   end
 
   def perform_create_jobs
-    update_mailchimp
     CreateUserJobs.new(self).perform_create_jobs
   end
 
