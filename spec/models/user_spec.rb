@@ -413,6 +413,17 @@ describe User do
     end
   end
 
+  describe 'donations' do
+    let(:user) { FactoryGirl.create(:user) }
+    it 'returns the payment amount' do
+      Payment.create(user: user, amount: 200)
+      expect(user.donations).to eq 200
+      expect(user.donor?).to be_falsey
+      Payment.create(user: user, amount: 800)
+      expect(user.donor?).to be_truthy
+    end
+  end
+
   describe 'subscriptions' do
     it 'returns the payment if payment is subscription' do
       user = FactoryGirl.create(:user)

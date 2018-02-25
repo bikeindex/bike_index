@@ -5,6 +5,18 @@
   - body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
   - body_class = "vendor-signup-page" if current_page?(:vendor_signup)
   - body_class = "news-page" if controller_name == "news"
+  :scss
+    .donor-icon {
+      display: inline-block;
+      color: white;
+      font-size: 75%;
+      background: #2ecc71;
+      font-weight: 800;
+      padding: .15em .25em;
+      border: 1px solid #ccc;
+      line-height: 1em;
+      border-radius: 0.5em;
+    }
   %body#body{ class: body_class }
     = render 'layouts/messages'
 
