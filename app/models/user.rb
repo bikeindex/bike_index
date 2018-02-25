@@ -135,6 +135,14 @@ class User < ActiveRecord::Base
     name || email
   end
 
+  def donations
+    payments.sum(:amount)
+  end
+
+  def donor?
+    donations > 900
+  end
+
   def admin_authorized(type)
     return true if superuser
     return case type

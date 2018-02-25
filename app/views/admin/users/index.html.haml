@@ -41,6 +41,8 @@
             %td
               .less-strong-hold
                 = link_to user.email, edit_admin_user_url(user)
+                - if user.donor?
+                  <span class="donor-icon">D</span>
                 %span.less-strong-right
                   = user.id
             %td.medium-screens

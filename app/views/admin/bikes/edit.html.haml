@@ -13,6 +13,10 @@
         = @bike.dl_from_attribute('owner_email')
         - if @bike.owner.present?
           = @bike.dl_list_item((link_to @bike.owner.email, edit_admin_user_url(@bike.owner)), 'Current Owner')
+          %dt Donor:
+          %dd
+            - if @bike.owner.donor?
+              TRUE!
         - else
           %strong
             Missing owner!

@@ -1,5 +1,27 @@
 %h1
   Editing #{@user.email}
+  - if @user.donor?
+    <span class="donor-icon">D</span>
+
+%h3
+  Donations
+%section.full-screen-table{ style: 'padding-top: 0;' }
+  %table.table.table-striped.table-bordered
+    %thead
+      %th
+        Date
+      %th
+        Amount
+      %th
+        Payment?
+    - @user.payments.each do |payment|
+      %tr
+        %td
+          = admin_display_date(payment.created_at)
+        %td
+          = payment.amount.to_i/100.00
+        %td
+          = "&#x2713;".html_safe if payment.is_payment
 
 .row-fluid
   .span6.padded
@@ -23,7 +45,6 @@
 
       %li
         = link_to display, edit_admin_bike_url(bike)
-
 
 %h3.padded
   %span
