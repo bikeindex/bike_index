@@ -43,6 +43,27 @@ describe OrganizationsController do
       expect(organization.memberships.first.user_id).to eq(user.id)
     end
 
+    it 'creates org, membership, filters approved attrs & redirect to org with current_user' do
+      expect(Organization.count).to eq(0)
+      user = FactoryGirl.create(:user)
+      set_current_user(user)
+      org_attrs = {
+        name: 'a new org',
+        org_type: 'property',
+        api_access_approved: 'true',
+        approved: 'false'
+      }
+      post :create, organization: org_attrs
+      expect(Organization.count).to eq(1)
+      organization = Organization.where(name: 'a new org').first
+      expect(response).to redirect_to organization_manage_index_path(organization_id: organization.to_param)
+      expect(organization.approved).to be_truthy
+      expect(organization.api_access_approved).to be_falsey
+      expect(organization.auto_user_id).to eq(user.id)
+      expect(organization.memberships.count).to eq(1)
+      expect(organization.memberships.first.user_id).to eq(user.id)
+    end
+
     it "Doesn't xss" do
       expect(Organization.count).to eq(0)
       user = FactoryGirl.create(:user)
