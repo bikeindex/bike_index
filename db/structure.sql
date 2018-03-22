@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.6.5
--- Dumped by pg_dump version 9.6.5
+-- Dumped from database version 9.6.2
+-- Dumped by pg_dump version 9.6.2
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -54,14 +54,14 @@ SET default_with_oids = false;
 
 CREATE TABLE ads (
     id integer NOT NULL,
-    title character varying(255),
+    title character varying,
     body text,
-    image character varying(255),
+    image character varying,
     target_url text,
     organization_id integer,
     live boolean DEFAULT false NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -91,14 +91,14 @@ ALTER SEQUENCE ads_id_seq OWNED BY ads.id;
 CREATE TABLE b_params (
     id integer NOT NULL,
     old_params text,
-    bike_title character varying(255),
+    bike_title character varying,
     creator_id integer,
     created_bike_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     bike_errors text,
-    image character varying(255),
-    image_tmp character varying(255),
+    image character varying,
+    image_tmp character varying,
     image_processed boolean DEFAULT true,
     id_token text,
     params json DEFAULT '{"bike":{}}'::json,
@@ -163,10 +163,10 @@ ALTER SEQUENCE bike_organizations_id_seq OWNED BY bike_organizations.id;
 
 CREATE TABLE bikes (
     id integer NOT NULL,
-    name character varying(255),
+    name character varying,
     cycle_type_id integer,
-    serial_number character varying(255) NOT NULL,
-    frame_model character varying(255),
+    serial_number character varying NOT NULL,
+    frame_model character varying,
     manufacturer_id integer,
     rear_tire_narrow boolean DEFAULT true,
     frame_material_id integer,
@@ -176,9 +176,9 @@ CREATE TABLE bikes (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     stolen boolean DEFAULT false NOT NULL,
-    propulsion_type_other character varying(255),
-    manufacturer_other character varying(255),
-    zipcode character varying(255),
+    propulsion_type_other character varying,
+    manufacturer_other character varying,
+    zipcode character varying,
     cached_data text,
     description text,
     owner_email text,
@@ -192,30 +192,30 @@ CREATE TABLE bikes (
     secondary_frame_color_id integer,
     tertiary_frame_color_id integer,
     handlebar_type_id integer,
-    handlebar_type_other character varying(255),
+    handlebar_type_other character varying,
     front_wheel_size_id integer,
     rear_wheel_size_id integer,
     rear_gear_type_id integer,
     front_gear_type_id integer,
-    additional_registration character varying(255),
+    additional_registration character varying,
     belt_drive boolean DEFAULT false NOT NULL,
     coaster_brake boolean DEFAULT false NOT NULL,
-    frame_size character varying(255),
-    frame_size_unit character varying(255),
-    pdf character varying(255),
+    frame_size character varying,
+    frame_size_unit character varying,
+    serial_normalized character varying,
+    pdf character varying,
     card_id integer,
     recovered boolean DEFAULT false NOT NULL,
     paint_id integer,
     registered_new boolean,
     example boolean DEFAULT false NOT NULL,
     country_id integer,
-    serial_normalized character varying(255),
-    stock_photo_url character varying(255),
+    stock_photo_url character varying,
     current_stolen_record_id integer,
     listing_order integer,
     approved_stolen boolean,
     all_description text,
-    mnfg_name character varying(255),
+    mnfg_name character varying,
     hidden boolean DEFAULT false NOT NULL,
     frame_size_number double precision,
     updator_id integer,
@@ -253,21 +253,21 @@ ALTER SEQUENCE bikes_id_seq OWNED BY bikes.id;
 CREATE TABLE blogs (
     id integer NOT NULL,
     title text,
-    title_slug character varying(255),
+    title_slug character varying,
     body text,
     body_abbr text,
     user_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     published_at timestamp without time zone,
-    tags character varying(255),
+    tags character varying,
     published boolean,
-    old_title_slug character varying(255),
+    old_title_slug character varying,
     description_abbr text,
     is_listicle boolean DEFAULT false NOT NULL,
-    index_image character varying(255),
+    index_image character varying,
     index_image_id integer,
-    index_image_lg character varying(255)
+    index_image_lg character varying
 );
 
 
@@ -296,9 +296,9 @@ ALTER SEQUENCE blogs_id_seq OWNED BY blogs.id;
 
 CREATE TABLE cgroups (
     id integer NOT NULL,
-    name character varying(255),
-    slug character varying(255),
-    description character varying(255),
+    name character varying,
+    slug character varying,
+    description character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -329,11 +329,11 @@ ALTER SEQUENCE cgroups_id_seq OWNED BY cgroups.id;
 
 CREATE TABLE colors (
     id integer NOT NULL,
-    name character varying(255),
+    name character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     priority integer,
-    display character varying(255)
+    display character varying
 );
 
 
@@ -362,19 +362,19 @@ ALTER SEQUENCE colors_id_seq OWNED BY colors.id;
 
 CREATE TABLE components (
     id integer NOT NULL,
-    cmodel_name character varying(255),
+    cmodel_name character varying,
     year integer,
     description text,
     manufacturer_id integer,
     ctype_id integer,
-    ctype_other character varying(255),
+    ctype_other character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     bike_id integer,
     front boolean,
     rear boolean,
-    manufacturer_other character varying(255),
-    serial_number character varying(255),
+    manufacturer_other character varying,
+    serial_number character varying,
     is_stock boolean DEFAULT false NOT NULL
 );
 
@@ -404,10 +404,10 @@ ALTER SEQUENCE components_id_seq OWNED BY components.id;
 
 CREATE TABLE countries (
     id integer NOT NULL,
-    name character varying(255),
-    iso character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    name character varying,
+    iso character varying,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -473,10 +473,10 @@ ALTER SEQUENCE creation_states_id_seq OWNED BY creation_states.id;
 
 CREATE TABLE ctypes (
     id integer NOT NULL,
-    name character varying(255),
-    slug character varying(255),
-    secondary_name character varying(255),
-    image character varying(255),
+    name character varying,
+    slug character varying,
+    secondary_name character varying,
+    image character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     has_multiple boolean DEFAULT false NOT NULL,
@@ -510,15 +510,15 @@ ALTER SEQUENCE ctypes_id_seq OWNED BY ctypes.id;
 CREATE TABLE customer_contacts (
     id integer NOT NULL,
     user_id integer,
-    user_email character varying(255),
+    user_email character varying,
     creator_id integer,
-    creator_email character varying(255),
-    title character varying(255),
-    contact_type character varying(255),
+    creator_email character varying,
+    title character varying,
+    contact_type character varying,
     body text,
     bike_id integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
     info_hash text
 );
 
@@ -548,8 +548,8 @@ ALTER SEQUENCE customer_contacts_id_seq OWNED BY customer_contacts.id;
 
 CREATE TABLE cycle_types (
     id integer NOT NULL,
-    name character varying(255),
-    slug character varying(255),
+    name character varying,
+    slug character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -582,8 +582,8 @@ CREATE TABLE duplicate_bike_groups (
     id integer NOT NULL,
     ignore boolean DEFAULT false NOT NULL,
     added_bike_at timestamp without time zone,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -612,14 +612,15 @@ ALTER SEQUENCE duplicate_bike_groups_id_seq OWNED BY duplicate_bike_groups.id;
 
 CREATE TABLE feedbacks (
     id integer NOT NULL,
-    name character varying(255),
-    email character varying(255),
-    title character varying(255),
+    name character varying,
+    email character varying,
+    title character varying,
     body text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    feedback_type character varying(255),
-    feedback_hash text
+    feedback_type character varying,
+    feedback_hash text,
+    user_id integer
 );
 
 
@@ -648,7 +649,7 @@ ALTER SEQUENCE feedbacks_id_seq OWNED BY feedbacks.id;
 
 CREATE TABLE flavor_texts (
     id integer NOT NULL,
-    message character varying(255),
+    message character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -679,10 +680,10 @@ ALTER SEQUENCE flavor_texts_id_seq OWNED BY flavor_texts.id;
 
 CREATE TABLE frame_materials (
     id integer NOT NULL,
-    name character varying(255),
+    name character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    slug character varying(255)
+    slug character varying
 );
 
 
@@ -711,13 +712,13 @@ ALTER SEQUENCE frame_materials_id_seq OWNED BY frame_materials.id;
 
 CREATE TABLE front_gear_types (
     id integer NOT NULL,
-    name character varying(255),
+    name character varying,
     count integer,
     internal boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     standard boolean,
-    slug character varying(255)
+    slug character varying
 );
 
 
@@ -746,10 +747,10 @@ ALTER SEQUENCE front_gear_types_id_seq OWNED BY front_gear_types.id;
 
 CREATE TABLE handlebar_types (
     id integer NOT NULL,
-    name character varying(255),
+    name character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    slug character varying(255)
+    slug character varying
 );
 
 
@@ -780,7 +781,7 @@ CREATE TABLE integrations (
     id integer NOT NULL,
     user_id integer,
     access_token text,
-    provider_name character varying(255),
+    provider_name character varying,
     information text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
@@ -815,7 +816,7 @@ CREATE TABLE listicles (
     list_order integer,
     body text,
     blog_id integer,
-    image character varying(255),
+    image character varying,
     title text,
     body_html text,
     image_width integer,
@@ -823,8 +824,8 @@ CREATE TABLE listicles (
     image_credits text,
     image_credits_html text,
     crop_top_offset integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -854,12 +855,12 @@ ALTER SEQUENCE listicles_id_seq OWNED BY listicles.id;
 CREATE TABLE locations (
     id integer NOT NULL,
     organization_id integer,
-    zipcode character varying(255),
-    city character varying(255),
-    street character varying(255),
-    phone character varying(255),
-    email character varying(255),
-    name character varying(255),
+    zipcode character varying,
+    city character varying,
+    street character varying,
+    phone character varying,
+    email character varying,
+    name character varying,
     latitude double precision,
     longitude double precision,
     created_at timestamp without time zone NOT NULL,
@@ -896,8 +897,8 @@ ALTER SEQUENCE locations_id_seq OWNED BY locations.id;
 
 CREATE TABLE lock_types (
     id integer NOT NULL,
-    name character varying(255),
-    slug character varying(255),
+    name character varying,
+    slug character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -931,12 +932,12 @@ CREATE TABLE locks (
     lock_type_id integer DEFAULT 1,
     has_key boolean DEFAULT true,
     has_combination boolean,
-    combination character varying(255),
-    key_serial character varying(255),
+    combination character varying,
+    key_serial character varying,
     manufacturer_id integer,
-    manufacturer_other character varying(255),
+    manufacturer_other character varying,
     user_id integer,
-    lock_model character varying(255),
+    lock_model character varying,
     notes text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
@@ -968,16 +969,16 @@ ALTER SEQUENCE locks_id_seq OWNED BY locks.id;
 
 CREATE TABLE mail_snippets (
     id integer NOT NULL,
-    name character varying(255),
+    name character varying,
     is_enabled boolean DEFAULT false NOT NULL,
     is_location_triggered boolean DEFAULT false NOT NULL,
     body text,
-    address character varying(255),
+    address character varying,
     latitude double precision,
     longitude double precision,
     proximity_radius integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
     organization_id integer
 );
 
@@ -1007,19 +1008,19 @@ ALTER SEQUENCE mail_snippets_id_seq OWNED BY mail_snippets.id;
 
 CREATE TABLE manufacturers (
     id integer NOT NULL,
-    name character varying(255),
-    slug character varying(255),
-    website character varying(255),
+    name character varying,
+    slug character varying,
+    website character varying,
     frame_maker boolean,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    total_years_active character varying(255),
+    total_years_active character varying,
     notes text,
     open_year integer,
     close_year integer,
-    logo character varying(255),
+    logo character varying,
     description text,
-    logo_source character varying(255)
+    logo_source character varying
 );
 
 
@@ -1050,8 +1051,8 @@ CREATE TABLE memberships (
     id integer NOT NULL,
     organization_id integer NOT NULL,
     user_id integer,
-    role character varying(255) DEFAULT 'member'::character varying NOT NULL,
-    invited_email character varying(255),
+    role character varying DEFAULT 'member'::character varying NOT NULL,
+    invited_email character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     deleted_at timestamp without time zone
@@ -1083,10 +1084,10 @@ ALTER SEQUENCE memberships_id_seq OWNED BY memberships.id;
 
 CREATE TABLE normalized_serial_segments (
     id integer NOT NULL,
-    segment character varying(255),
+    segment character varying,
     bike_id integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
     duplicate_bike_group_id integer
 );
 
@@ -1118,12 +1119,12 @@ CREATE TABLE oauth_access_grants (
     id integer NOT NULL,
     resource_owner_id integer NOT NULL,
     application_id integer NOT NULL,
-    token character varying(255) NOT NULL,
+    token character varying NOT NULL,
     expires_in integer NOT NULL,
     redirect_uri text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     revoked_at timestamp without time zone,
-    scopes character varying(255)
+    scopes character varying
 );
 
 
@@ -1154,12 +1155,12 @@ CREATE TABLE oauth_access_tokens (
     id integer NOT NULL,
     resource_owner_id integer,
     application_id integer,
-    token character varying(255) NOT NULL,
-    refresh_token character varying(255),
+    token character varying NOT NULL,
+    refresh_token character varying,
     expires_in integer,
     revoked_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
-    scopes character varying(255)
+    scopes character varying
 );
 
 
@@ -1188,17 +1189,17 @@ ALTER SEQUENCE oauth_access_tokens_id_seq OWNED BY oauth_access_tokens.id;
 
 CREATE TABLE oauth_applications (
     id integer NOT NULL,
-    name character varying(255) NOT NULL,
-    uid character varying(255) NOT NULL,
-    secret character varying(255) NOT NULL,
+    name character varying NOT NULL,
+    uid character varying NOT NULL,
+    secret character varying NOT NULL,
     redirect_uri text NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
     owner_id integer,
-    owner_type character varying(255),
+    owner_type character varying,
     is_internal boolean DEFAULT false NOT NULL,
     can_send_stolen_notifications boolean DEFAULT false NOT NULL,
-    scopes character varying(255) DEFAULT ''::character varying NOT NULL
+    scopes character varying DEFAULT ''::character varying NOT NULL
 );
 
 
@@ -1228,11 +1229,11 @@ ALTER SEQUENCE oauth_applications_id_seq OWNED BY oauth_applications.id;
 CREATE TABLE organization_deals (
     id integer NOT NULL,
     organization_id integer,
-    deal_name character varying(255),
-    email character varying(255),
-    user_id character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    deal_name character varying,
+    email character varying,
+    user_id character varying,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -1261,13 +1262,13 @@ ALTER SEQUENCE organization_deals_id_seq OWNED BY organization_deals.id;
 
 CREATE TABLE organization_invitations (
     id integer NOT NULL,
-    invitee_email character varying(255),
-    invitee_name character varying(255),
+    invitee_email character varying,
+    invitee_name character varying,
     invitee_id integer,
     organization_id integer,
     inviter_id integer,
     redeemed boolean,
-    membership_role character varying(255) DEFAULT 'member'::character varying,
+    membership_role character varying DEFAULT 'member'::character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     deleted_at timestamp without time zone
@@ -1299,25 +1300,25 @@ ALTER SEQUENCE organization_invitations_id_seq OWNED BY organization_invitations
 
 CREATE TABLE organizations (
     id integer NOT NULL,
-    name character varying(255),
-    slug character varying(255) NOT NULL,
+    name character varying,
+    slug character varying NOT NULL,
     available_invitation_count integer DEFAULT 10,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    website character varying(255),
-    short_name character varying(255),
+    website character varying,
+    short_name character varying,
     show_on_map boolean,
     sent_invitation_count integer DEFAULT 0,
     deleted_at timestamp without time zone,
     is_suspended boolean DEFAULT false NOT NULL,
     auto_user_id integer,
-    org_type character varying(255) DEFAULT 'shop'::character varying NOT NULL,
-    access_token character varying(255),
+    org_type character varying DEFAULT 'shop'::character varying NOT NULL,
+    access_token character varying,
     new_bike_notification text,
     api_access_approved boolean DEFAULT false NOT NULL,
-    approved boolean DEFAULT false NOT NULL,
+    approved boolean DEFAULT true,
     use_additional_registration_field boolean DEFAULT false NOT NULL,
-    avatar character varying(255),
+    avatar character varying,
     is_paid boolean DEFAULT false NOT NULL,
     lock_show_on_map boolean DEFAULT false NOT NULL,
     landing_html text
@@ -1350,10 +1351,10 @@ ALTER SEQUENCE organizations_id_seq OWNED BY organizations.id;
 CREATE TABLE other_listings (
     id integer NOT NULL,
     bike_id integer,
-    url character varying(255),
-    listing_type character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    url character varying,
+    listing_type character varying,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -1384,7 +1385,7 @@ CREATE TABLE ownerships (
     id integer NOT NULL,
     bike_id integer,
     user_id integer,
-    owner_email character varying(255),
+    owner_email character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     creator_id integer,
@@ -1421,11 +1422,11 @@ ALTER SEQUENCE ownerships_id_seq OWNED BY ownerships.id;
 
 CREATE TABLE paints (
     id integer NOT NULL,
-    name character varying(255),
+    name character varying,
     color_id integer,
     manufacturer_id integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
     secondary_color_id integer,
     tertiary_color_id integer,
     bikes_count integer DEFAULT 0 NOT NULL
@@ -1460,13 +1461,13 @@ CREATE TABLE payments (
     user_id integer,
     is_current boolean DEFAULT true,
     is_recurring boolean DEFAULT false NOT NULL,
-    stripe_id character varying(255),
+    stripe_id character varying,
     last_payment_date timestamp without time zone,
     first_payment_date timestamp without time zone,
     amount integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    email character varying(255),
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
+    email character varying,
     is_payment boolean DEFAULT false NOT NULL
 );
 
@@ -1496,10 +1497,10 @@ ALTER SEQUENCE payments_id_seq OWNED BY payments.id;
 
 CREATE TABLE propulsion_types (
     id integer NOT NULL,
-    name character varying(255),
+    name character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    slug character varying(255)
+    slug character varying
 );
 
 
@@ -1528,11 +1529,11 @@ ALTER SEQUENCE propulsion_types_id_seq OWNED BY propulsion_types.id;
 
 CREATE TABLE public_images (
     id integer NOT NULL,
-    image character varying(255),
-    name character varying(255),
+    image character varying,
+    name character varying,
     listing_order integer DEFAULT 0,
     imageable_id integer,
-    imageable_type character varying(255),
+    imageable_type character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     is_private boolean DEFAULT false NOT NULL
@@ -1564,13 +1565,13 @@ ALTER SEQUENCE public_images_id_seq OWNED BY public_images.id;
 
 CREATE TABLE rear_gear_types (
     id integer NOT NULL,
-    name character varying(255),
+    name character varying,
     count integer,
     internal boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     standard boolean,
-    slug character varying(255)
+    slug character varying
 );
 
 
@@ -1601,12 +1602,12 @@ CREATE TABLE recovery_displays (
     id integer NOT NULL,
     stolen_record_id integer,
     quote text,
-    quote_by character varying(255),
+    quote_by character varying,
     date_recovered timestamp without time zone,
-    link character varying(255),
-    image character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    link character varying,
+    image character varying,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -1634,7 +1635,7 @@ ALTER SEQUENCE recovery_displays_id_seq OWNED BY recovery_displays.id;
 --
 
 CREATE TABLE schema_migrations (
-    version character varying(255) NOT NULL
+    version character varying NOT NULL
 );
 
 
@@ -1644,11 +1645,11 @@ CREATE TABLE schema_migrations (
 
 CREATE TABLE states (
     id integer NOT NULL,
-    name character varying(255),
-    abbreviation character varying(255),
+    name character varying,
+    abbreviation character varying,
     country_id integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -1677,14 +1678,14 @@ ALTER SEQUENCE states_id_seq OWNED BY states.id;
 
 CREATE TABLE stolen_notifications (
     id integer NOT NULL,
-    subject character varying(255),
+    subject character varying,
     message text,
     sender_id integer,
     receiver_id integer,
     bike_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    receiver_email character varying(255),
+    receiver_email character varying,
     oauth_application_id integer,
     reference_url text,
     send_dates json
@@ -1716,31 +1717,31 @@ ALTER SEQUENCE stolen_notifications_id_seq OWNED BY stolen_notifications.id;
 
 CREATE TABLE stolen_records (
     id integer NOT NULL,
-    zipcode character varying(255),
-    city character varying(255),
+    zipcode character varying,
+    city character varying,
     theft_description text,
     "time" text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     bike_id integer,
     current boolean DEFAULT true,
-    street character varying(255),
+    street character varying,
     latitude double precision,
     longitude double precision,
     date_stolen timestamp without time zone,
-    phone character varying(255),
+    phone character varying,
     phone_for_everyone boolean,
     phone_for_users boolean DEFAULT true,
     phone_for_shops boolean DEFAULT true,
     phone_for_police boolean DEFAULT true,
-    police_report_number character varying(255),
-    locking_description character varying(255),
-    lock_defeat_description character varying(255),
+    police_report_number character varying,
+    locking_description character varying,
+    lock_defeat_description character varying,
     country_id integer,
-    police_report_department character varying(255),
+    police_report_department character varying,
     state_id integer,
     creation_organization_id integer,
-    secondary_phone character varying(255),
+    secondary_phone character varying,
     approved boolean DEFAULT false NOT NULL,
     receive_notifications boolean DEFAULT true,
     proof_of_ownership boolean,
@@ -1753,7 +1754,8 @@ CREATE TABLE stolen_records (
     recovery_share text,
     create_open311 boolean DEFAULT false NOT NULL,
     tsved_at timestamp without time zone,
-    estimated_value integer
+    estimated_value integer,
+    recovery_link_token text
 );
 
 
@@ -1817,12 +1819,12 @@ ALTER SEQUENCE tweets_id_seq OWNED BY tweets.id;
 
 CREATE TABLE user_emails (
     id integer NOT NULL,
-    email character varying(255),
+    email character varying,
     user_id integer,
     old_user_id integer,
     confirmation_token text,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -1851,37 +1853,37 @@ ALTER SEQUENCE user_emails_id_seq OWNED BY user_emails.id;
 
 CREATE TABLE users (
     id integer NOT NULL,
-    name character varying(255),
-    email character varying(255),
+    name character varying,
+    email character varying,
     password text,
     last_login timestamp without time zone,
     superuser boolean DEFAULT false NOT NULL,
     password_reset_token text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    password_digest character varying(255),
-    banned boolean DEFAULT false NOT NULL,
-    phone character varying(255),
-    zipcode character varying(255),
-    twitter character varying(255),
+    password_digest character varying,
+    banned boolean,
+    phone character varying,
+    zipcode character varying,
+    twitter character varying,
     show_twitter boolean DEFAULT false NOT NULL,
-    website character varying(255),
+    website character varying,
     show_website boolean DEFAULT false NOT NULL,
     show_phone boolean DEFAULT true,
     show_bikes boolean DEFAULT false NOT NULL,
-    username character varying(255),
+    username character varying,
     has_stolen_bikes boolean,
-    avatar character varying(255),
+    avatar character varying,
     description text,
     title text,
     terms_of_service boolean DEFAULT false NOT NULL,
     vendor_terms_of_service boolean,
     when_vendor_terms_of_service timestamp without time zone,
     confirmed boolean DEFAULT false NOT NULL,
-    confirmation_token character varying(255),
+    confirmation_token character varying,
     can_send_many_stolen_notifications boolean DEFAULT false NOT NULL,
-    auth_token character varying(255),
-    stripe_id character varying(255),
+    auth_token character varying,
+    stripe_id character varying,
     is_paid_member boolean DEFAULT false NOT NULL,
     paid_membership_info text,
     is_content_admin boolean DEFAULT false NOT NULL,
@@ -1916,8 +1918,8 @@ ALTER SEQUENCE users_id_seq OWNED BY users.id;
 
 CREATE TABLE wheel_sizes (
     id integer NOT NULL,
-    name character varying(255),
-    description character varying(255),
+    name character varying,
+    description character varying,
     iso_bsd integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -2632,19 +2634,19 @@ ALTER TABLE ONLY states
 
 
 --
--- Name: stolen_records stolen_bike_descriptions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY stolen_records
-    ADD CONSTRAINT stolen_bike_descriptions_pkey PRIMARY KEY (id);
-
-
---
 -- Name: stolen_notifications stolen_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY stolen_notifications
     ADD CONSTRAINT stolen_notifications_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: stolen_records stolen_records_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY stolen_records
+    ADD CONSTRAINT stolen_records_pkey PRIMARY KEY (id);
 
 
 --
@@ -2803,6 +2805,13 @@ CREATE INDEX index_creation_states_on_creator_id ON creation_states USING btree 
 --
 
 CREATE INDEX index_creation_states_on_organization_id ON creation_states USING btree (organization_id);
+
+
+--
+-- Name: index_feedbacks_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_feedbacks_on_user_id ON feedbacks USING btree (user_id);
 
 
 --
@@ -3006,294 +3015,6 @@ CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (v
 --
 
 SET search_path TO "$user", public;
-
-INSERT INTO schema_migrations (version) VALUES ('20120911182934');
-
-INSERT INTO schema_migrations (version) VALUES ('20120911183639');
-
-INSERT INTO schema_migrations (version) VALUES ('20120911184407');
-
-INSERT INTO schema_migrations (version) VALUES ('20120911185927');
-
-INSERT INTO schema_migrations (version) VALUES ('20120911230801');
-
-INSERT INTO schema_migrations (version) VALUES ('20120912003857');
-
-INSERT INTO schema_migrations (version) VALUES ('20120913164701');
-
-INSERT INTO schema_migrations (version) VALUES ('20120914193704');
-
-INSERT INTO schema_migrations (version) VALUES ('20120914194950');
-
-INSERT INTO schema_migrations (version) VALUES ('20120914214119');
-
-INSERT INTO schema_migrations (version) VALUES ('20120914221204');
-
-INSERT INTO schema_migrations (version) VALUES ('20121010120352');
-
-INSERT INTO schema_migrations (version) VALUES ('20121012140221');
-
-INSERT INTO schema_migrations (version) VALUES ('20121028230353');
-
-INSERT INTO schema_migrations (version) VALUES ('20121029020401');
-
-INSERT INTO schema_migrations (version) VALUES ('20121029232446');
-
-INSERT INTO schema_migrations (version) VALUES ('20121030004253');
-
-INSERT INTO schema_migrations (version) VALUES ('20121031232916');
-
-INSERT INTO schema_migrations (version) VALUES ('20121031234103');
-
-INSERT INTO schema_migrations (version) VALUES ('20121101002812');
-
-INSERT INTO schema_migrations (version) VALUES ('20121101002951');
-
-INSERT INTO schema_migrations (version) VALUES ('20121102144757');
-
-INSERT INTO schema_migrations (version) VALUES ('20121103160512');
-
-INSERT INTO schema_migrations (version) VALUES ('20121103201904');
-
-INSERT INTO schema_migrations (version) VALUES ('20121107230721');
-
-INSERT INTO schema_migrations (version) VALUES ('20121108220013');
-
-INSERT INTO schema_migrations (version) VALUES ('20121111190041');
-
-INSERT INTO schema_migrations (version) VALUES ('20121114221424');
-
-INSERT INTO schema_migrations (version) VALUES ('20121114223945');
-
-INSERT INTO schema_migrations (version) VALUES ('20121117213635');
-
-INSERT INTO schema_migrations (version) VALUES ('20121122183150');
-
-INSERT INTO schema_migrations (version) VALUES ('20121124163916');
-
-INSERT INTO schema_migrations (version) VALUES ('20121216155454');
-
-INSERT INTO schema_migrations (version) VALUES ('20121218161337');
-
-INSERT INTO schema_migrations (version) VALUES ('20121218163801');
-
-INSERT INTO schema_migrations (version) VALUES ('20121218165048');
-
-INSERT INTO schema_migrations (version) VALUES ('20121218175444');
-
-INSERT INTO schema_migrations (version) VALUES ('20121218232923');
-
-INSERT INTO schema_migrations (version) VALUES ('20121223151926');
-
-INSERT INTO schema_migrations (version) VALUES ('20121223152831');
-
-INSERT INTO schema_migrations (version) VALUES ('20121223160807');
-
-INSERT INTO schema_migrations (version) VALUES ('20121223175254');
-
-INSERT INTO schema_migrations (version) VALUES ('20130111143823');
-
-INSERT INTO schema_migrations (version) VALUES ('20130111161224');
-
-INSERT INTO schema_migrations (version) VALUES ('20130111165852');
-
-INSERT INTO schema_migrations (version) VALUES ('20130111230539');
-
-INSERT INTO schema_migrations (version) VALUES ('20130116160029');
-
-INSERT INTO schema_migrations (version) VALUES ('20130120201311');
-
-INSERT INTO schema_migrations (version) VALUES ('20130125155810');
-
-INSERT INTO schema_migrations (version) VALUES ('20130126000921');
-
-INSERT INTO schema_migrations (version) VALUES ('20130126010711');
-
-INSERT INTO schema_migrations (version) VALUES ('20130128182738');
-
-INSERT INTO schema_migrations (version) VALUES ('20130128183512');
-
-INSERT INTO schema_migrations (version) VALUES ('20130206030035');
-
-INSERT INTO schema_migrations (version) VALUES ('20130210182811');
-
-INSERT INTO schema_migrations (version) VALUES ('20130210183940');
-
-INSERT INTO schema_migrations (version) VALUES ('20130210184643');
-
-INSERT INTO schema_migrations (version) VALUES ('20130212215600');
-
-INSERT INTO schema_migrations (version) VALUES ('20130213230159');
-
-INSERT INTO schema_migrations (version) VALUES ('20130214204648');
-
-INSERT INTO schema_migrations (version) VALUES ('20130214211116');
-
-INSERT INTO schema_migrations (version) VALUES ('20130214231224');
-
-INSERT INTO schema_migrations (version) VALUES ('20130217161855');
-
-INSERT INTO schema_migrations (version) VALUES ('20130217161945');
-
-INSERT INTO schema_migrations (version) VALUES ('20130217170709');
-
-INSERT INTO schema_migrations (version) VALUES ('20130220010120');
-
-INSERT INTO schema_migrations (version) VALUES ('20130225180109');
-
-INSERT INTO schema_migrations (version) VALUES ('20130225202426');
-
-INSERT INTO schema_migrations (version) VALUES ('20130225215129');
-
-INSERT INTO schema_migrations (version) VALUES ('20130226165427');
-
-INSERT INTO schema_migrations (version) VALUES ('20130226170115');
-
-INSERT INTO schema_migrations (version) VALUES ('20130226171603');
-
-INSERT INTO schema_migrations (version) VALUES ('20130227022823');
-
-INSERT INTO schema_migrations (version) VALUES ('20130308162717');
-
-INSERT INTO schema_migrations (version) VALUES ('20130312214622');
-
-INSERT INTO schema_migrations (version) VALUES ('20130312234622');
-
-INSERT INTO schema_migrations (version) VALUES ('20130314000516');
-
-INSERT INTO schema_migrations (version) VALUES ('20130314202232');
-
-INSERT INTO schema_migrations (version) VALUES ('20130314214024');
-
-INSERT INTO schema_migrations (version) VALUES ('20130314235254');
-
-INSERT INTO schema_migrations (version) VALUES ('20130315022544');
-
-INSERT INTO schema_migrations (version) VALUES ('20130318004611');
-
-INSERT INTO schema_migrations (version) VALUES ('20130329212736');
-
-INSERT INTO schema_migrations (version) VALUES ('20130403012755');
-
-INSERT INTO schema_migrations (version) VALUES ('20130420195053');
-
-INSERT INTO schema_migrations (version) VALUES ('20130422133115');
-
-INSERT INTO schema_migrations (version) VALUES ('20130422162415');
-
-INSERT INTO schema_migrations (version) VALUES ('20130422162432');
-
-INSERT INTO schema_migrations (version) VALUES ('20130422170303');
-
-INSERT INTO schema_migrations (version) VALUES ('20130424134913');
-
-INSERT INTO schema_migrations (version) VALUES ('20130424155646');
-
-INSERT INTO schema_migrations (version) VALUES ('20130424161125');
-
-INSERT INTO schema_migrations (version) VALUES ('20130424225341');
-
-INSERT INTO schema_migrations (version) VALUES ('20130506191950');
-
-INSERT INTO schema_migrations (version) VALUES ('20130506194218');
-
-INSERT INTO schema_migrations (version) VALUES ('20130507033150');
-
-INSERT INTO schema_migrations (version) VALUES ('20130508162206');
-
-INSERT INTO schema_migrations (version) VALUES ('20130509213617');
-
-INSERT INTO schema_migrations (version) VALUES ('20130510144825');
-
-INSERT INTO schema_migrations (version) VALUES ('20130510154536');
-
-INSERT INTO schema_migrations (version) VALUES ('20130510161119');
-
-INSERT INTO schema_migrations (version) VALUES ('20130510191228');
-
-INSERT INTO schema_migrations (version) VALUES ('20130511175952');
-
-INSERT INTO schema_migrations (version) VALUES ('20130511181304');
-
-INSERT INTO schema_migrations (version) VALUES ('20130511182611');
-
-INSERT INTO schema_migrations (version) VALUES ('20130515014438');
-
-INSERT INTO schema_migrations (version) VALUES ('20130515140718');
-
-INSERT INTO schema_migrations (version) VALUES ('20130515202608');
-
-INSERT INTO schema_migrations (version) VALUES ('20130517154952');
-
-INSERT INTO schema_migrations (version) VALUES ('20130522165237');
-
-INSERT INTO schema_migrations (version) VALUES ('20130524164449');
-
-INSERT INTO schema_migrations (version) VALUES ('20130604205407');
-
-INSERT INTO schema_migrations (version) VALUES ('20130607162957');
-
-INSERT INTO schema_migrations (version) VALUES ('20130613144600');
-
-INSERT INTO schema_migrations (version) VALUES ('20130613153522');
-
-INSERT INTO schema_migrations (version) VALUES ('20130619234253');
-
-INSERT INTO schema_migrations (version) VALUES ('20130621012516');
-
-INSERT INTO schema_migrations (version) VALUES ('20130628161112');
-
-INSERT INTO schema_migrations (version) VALUES ('20130629152453');
-
-INSERT INTO schema_migrations (version) VALUES ('20130629152508');
-
-INSERT INTO schema_migrations (version) VALUES ('20130629162208');
-
-INSERT INTO schema_migrations (version) VALUES ('20130629165920');
-
-INSERT INTO schema_migrations (version) VALUES ('20130629165929');
-
-INSERT INTO schema_migrations (version) VALUES ('20130629171337');
-
-INSERT INTO schema_migrations (version) VALUES ('20130629183647');
-
-INSERT INTO schema_migrations (version) VALUES ('20130629183656');
-
-INSERT INTO schema_migrations (version) VALUES ('20130630190556');
-
-INSERT INTO schema_migrations (version) VALUES ('20130709160337');
-
-INSERT INTO schema_migrations (version) VALUES ('20130709215543');
-
-INSERT INTO schema_migrations (version) VALUES ('20130711200929');
-
-INSERT INTO schema_migrations (version) VALUES ('20130711201434');
-
-INSERT INTO schema_migrations (version) VALUES ('20130711230226');
-
-INSERT INTO schema_migrations (version) VALUES ('20130714155827');
-
-INSERT INTO schema_migrations (version) VALUES ('20130716213553');
-
-INSERT INTO schema_migrations (version) VALUES ('20130717195126');
-
-INSERT INTO schema_migrations (version) VALUES ('20130718175528');
-
-INSERT INTO schema_migrations (version) VALUES ('20130724145302');
-
-INSERT INTO schema_migrations (version) VALUES ('20130725191328');
-
-INSERT INTO schema_migrations (version) VALUES ('20130729190352');
-
-INSERT INTO schema_migrations (version) VALUES ('20130729190514');
-
-INSERT INTO schema_migrations (version) VALUES ('20130729195607');
-
-INSERT INTO schema_migrations (version) VALUES ('20130802145610');
-
-INSERT INTO schema_migrations (version) VALUES ('20130807173218');
-
-INSERT INTO schema_migrations (version) VALUES ('20130807215021');
 
 INSERT INTO schema_migrations (version) VALUES ('20130807222803');
 
@@ -3610,6 +3331,4 @@ INSERT INTO schema_migrations (version) VALUES ('20170617222902');
 INSERT INTO schema_migrations (version) VALUES ('20170618205609');
 
 INSERT INTO schema_migrations (version) VALUES ('20170731023746');
-
-INSERT INTO schema_migrations (version) VALUES ('20180225205617');
 
