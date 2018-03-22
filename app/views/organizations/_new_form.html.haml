@@ -66,6 +66,10 @@
                 %label
                   = f.radio_button :org_type, 'manufacturer'
                   Manufacturer
+              .radio
+                %label
+                  = f.radio_button :org_type, 'property'
+                  Property Manager
           .form-group.row
             .col-sm-4.col-sm-push-4
               = f.submit 'add organization', class: 'btn btn-success'
