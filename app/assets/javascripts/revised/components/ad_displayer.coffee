@@ -16,7 +16,7 @@ class @AdDisplayer
 
   photoAd: (unit) ->
     $('.content-nav-group:last').addClass('additional-ad-space')
-    $("##{unit}").html([@geolocatedAd(), iota_ad].join('')).addClass('rendered-ad photo-ad')
+    $("##{unit}").html([@geolocatedAd()].join('')).addClass('rendered-ad photo-ad')
 
   geolocatedAd: ->
     location = localStorage.getItem('location')
