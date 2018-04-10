@@ -1,0 +1,69 @@
+- landing_page_target = 'ambassador'
+.org-signup-landing-page{ class: "org-landing-page-#{landing_page_target}" }
+  %header.banner-header
+    .container
+      .banner.row
+        .icon-wrapper
+          = render "/landing_pages/icons/header_#{landing_page_target}_svg"
+        .banner-text
+          %h1 Become a Bike Index <br> Ambassador
+          %h3 Want to help fight bike theft in your community? <br> Start Here!
+
+  .container
+    .row.main-body-row
+      .landing-why-col
+        %h3 Why Bike Index?
+        %p
+          Gone are the days where you had to register your bike in your neighborhood, county, city, state and country. Bike Index provides one registry, giving all registrants around the U.S. access to our network of over 120,000 cyclists.  Our goal is to provide free and easy access to our registry for anyone and everyone who rides a bicycle, in any capacity.  
+
+        %p
+          We want to recover bikes that are stolen. And so do you. We need your help spreading the Bike Index word. In return, we can offer you the most widely used bike registration system in the country.
+
+        = render partial: '/landing_pages/tweet', locals: { tweet_id: 875377223322259457 }
+
+        %h3 Partners made in heaven
+        %p
+          Run registration drives? Include a widget on your page? You should add Bike Index and connect with your constituents!
+        %p
+          Read about our over #{ number_with_delimiter recovered_bike_count.round(-2) } recoveries on our <a href="/news">blog</a>. For a complete list of Bike Index’s partners, visit <a href="/where">our partners page</a>. For information on partnering with Bike Index, please contact us.
+
+        .mobile-contact-link
+          %a.btn.btn-primary.btn-lg{ href: new_organization_path }
+            Sign up for Bike Index
+
+        .trusted-by.hidden-lg-up
+          %h3
+            Trusted by organizations everywhere
+          - advocacy_partners = capture_haml do
+            %ul
+              %li.partner-logo-rectangle
+                = image_tag 'landing_pages/partners/Indycog.png', alt: 'Indycog'
+              %li
+                = image_tag 'landing_pages/partners/Bike-Pittsburgh.png', alt: 'Bike Pittsburgh'
+              %li.hidden-on-trusted-by-next-steps
+                = image_tag 'landing_pages/partners/Bike-Portland.png', alt: 'Bike Portland'
+              %li
+                = image_tag 'landing_pages/partners/Stolen-Bikes-NOLA.png', alt: 'Stolen Bikes NOLA'
+              %li.partner-logo-rectangle
+                = image_tag 'landing_pages/partners/Bike-East-Bay.png', alt: 'Bike East Bay'
+
+              %li.partner-logo-rectangle
+                = image_tag 'landing_pages/partners/Seattle-Bike-Blog.png', alt: 'Seattle Bike Blog'
+              %li
+                = image_tag 'landing_pages/partners/Wisconsin-Bike-Fed.png', alt: 'Wisconsin Bike Federation'
+
+
+          = advocacy_partners
+
+      .next-steps-col
+        .next-steps-wrap
+          %header#contact-bike-index
+            Sign up for free
+          %a.btn.btn-primary.btn-lg{ href: new_organization_path }
+            Get started
+          .trusted-by-next-steps.hidden-md-down
+            %h3
+              Trusted everywhere
+            = advocacy_partners
+            
+  = render '/landing_pages/footer'
