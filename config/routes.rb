@@ -28,9 +28,11 @@ Bikeindex::Application.routes.draw do
     get slug, to: 'landing_pages#show', organization_id: slug
   end
 
-  %w(for_shops for_advocacy for_law_enforcement for_schools new_homepage).freeze.each do |page|
+  %w(for_shops for_advocacy for_law_enforcement for_schools ambassadors_how_to ambassadors_current).freeze.each do |page|
     get page, controller: 'landing_pages', action: page
   end
+
+  get 'ambassadors', to: redirect('/ambassadors_how_to') # Because convenience
 
   %w(update_browser user_home choose_registration goodbye bike_creation_graph).freeze.each do |page|
     get page, controller: 'welcome', action: page

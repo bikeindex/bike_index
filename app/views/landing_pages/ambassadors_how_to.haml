@@ -1,26 +1,30 @@
-- landing_page_target = 'shop'
-.signup-landing-page{ class: "signup-landing-page-#{landing_page_target}" }
+.signup-landing-page.ambassadors-landing-page-how-to
   %header.banner-header
     .container
       .banner.row
         .icon-wrapper
-          = render "/landing_pages/icons/header_#{landing_page_target}_svg"
+          = render "/landing_pages/icons/header_ambassadors_svg"
         .banner-text
-          %h1 Bike Index for <br> Bike Shops
-          %h3 Unite against bike theft and protect your customers' bikes before they're even out there.
+          %h1 Become a Bike Index<br>Ambassador
+          %h3 Want to help fight bike theft in your community?<br>Start here!
 
     .ribbon
       .container
-        %h2 Provide your customers just one, easy registry.
+        %h2
   .container
     .row.main-body-row
       .landing-why-col
-        %h3 Why Bike Index?
+        %h3 Why Work With Bike Index?
         %p
-          Bike Index is the nation’s most widely used and most effective bicycle registration and recovery service. By partnering with Bike Index, your shop will be able to provide your customers easy and official access to a network of over 120,000 users keeping an eye out for stolen bikes. 
+          Bike Index is a non-profit
 
         %p
-          Also we're free, and a non-profit. Our only goal is to help the community counter bike theft and know their bike's information. Anyone who rides a bike knows how integral bike shops are to any local cycling community.  
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+          quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+          consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+          cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+          proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
         = render partial: '/landing_pages/tweet', locals: { tweet_id: 840324239425073152 }
 
@@ -38,7 +42,7 @@
 
         .mobile-contact-link
           %a.btn.btn-primary.btn-lg{ href: new_organization_path }
-            Sign up for Bike Index
+            Apply
 
         .trusted-by.hidden-lg-up
           %h3
@@ -73,4 +77,3 @@
               Used everywhere
             = shop_partners
             
-  = render '/landing_pages/footer'

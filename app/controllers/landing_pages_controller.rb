@@ -14,6 +14,10 @@ class LandingPagesController < ApplicationController
 
   def for_schools; end
 
+  def ambassadors_current; end
+
+  def ambassadors_how_to; end
+
   protected
 
   def instantiate_feedback
