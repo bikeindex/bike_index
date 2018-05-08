@@ -14,9 +14,9 @@ class LandingPagesController < ApplicationController
 
   def for_schools; end
 
-  def ambassadors_current; end
+  def ambassadors_current; @page_title ||= 'Current Ambassadors' end
 
-  def ambassadors_how_to; end
+  def ambassadors_how_to; @page_title ||= 'Ambassadors' end
 
   protected
 

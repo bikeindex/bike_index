@@ -1,0 +1,46 @@
+// Most of the styles for the signup page are in _signup.scss - only a few overrides here
+.signup-landing-page-ambassadors {
+  .ambassadors-blank-footer {
+    padding-bottom: 4*$vertical-height;
+    @include media-breakpoint-up(md) {
+      padding-bottom: 10*$vertical-height;
+    }
+  }
+  .next-steps-col .next-steps-wrap { padding-top: $vertical-height; }
+  .trusted-by-next-steps {
+    margin-top: 0;
+    h3 {
+      padding-top: 18px;
+      font-size: 18px;
+      margin-bottom: 6px; // because line-height
+    }
+    ul {
+      padding-bottom: 1.5*$vertical-height;
+      margin: 0;
+    }
+    li {
+      display: block;
+      flex: 0 0 100%;
+      padding: 0;
+      position: relative;
+      a {
+        display: block;
+        padding: 0 0 0 2*$vertical-height;
+        width: 100%;
+        color: $body-font-color;
+        &.current {
+          text-decoration: underline;
+          &:before {
+            position: absolute;
+            left: 8px;
+            top: 11px;
+            height: 10px;
+            width: 10px;
+            content: '';
+            background: $blue;
+          }
+        }
+      }
+    }
+  }
+}

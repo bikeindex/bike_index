@@ -72,7 +72,9 @@ class BikeIndex.Init extends BikeIndex
       offset = $target.attr('data-offset')
       if offset? then offset = parseInt(offset, 10)
       offset ||= -20
-      $('body').animate(
+      console.log offset
+      console.log $($target.attr('href')).offset().top  
+      $('body, html').animate(
         scrollTop: $($target.attr('href')).offset().top + offset, 'fast'
       )
 
