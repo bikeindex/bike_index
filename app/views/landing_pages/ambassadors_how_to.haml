@@ -1,0 +1,149 @@
+.signup-landing-page.signup-landing-page-ambassadors.signup-landing-page-ambassadors-how-to
+  %header.banner-header
+    .container
+      .row
+        .icon-wrapper
+          = render "/landing_pages/icons/header_ambassadors_svg"
+        .banner-text
+          %h1 Become a Bike Index<br>Ambassador
+          %h3 Want to help fight bike theft in your community?<br>Start here!
+
+    .ribbon
+      .container
+        .noribbon
+  .container
+    .row.main-body-row
+      .landing-why-col
+        %h3#ambassadors_why Why Work With Bike Index?
+        %p
+          Bike Index is a nonprofit with big mission: register every bicycle out there, and recover every bike that gets stolen. We are a national registry, which means much of our work involves reaching out to bike organizations and communities in every corner of the continent.
+        %p
+          That’s why we need your help. You know your cycling communities best, and you know how Bike Index could best work there. Maybe you know of a great shop or a budding advocacy group in your town that would love to register bikes for their users and constituents. Or maybe your local police department is looking to upgrade their registry. (Or maybe they don’t even have one yet). You bring the ideas, and we’ll give you the resources to make Bike Index a reality in your community. 
+
+        = image_tag 'landing_pages/ambassador_1.jpg', alt: 'A Bike Index Ambassador'
+
+        %h3#ambassadors_how How it Works
+        
+        %p
+          To become a Bike Index Ambassador, we want you to write us a little bit about yourself. Nothing long, just a paragraph or two about who you are and why you want to be an ambassador. Next, you purchase a box of materials that contains what you need to get started with Bike Index. Don’t have the funds for this right now? No problem! #{link_to 'Scholarships are available!', '#ambassadors_scholarships', class: 'scroll-to-ref'}.
+
+        %p
+          You receive support from us thereafter, whether you have questions, suggestions, or ideas. We will feature you on the Bike Index website to give you an official status as you make way contacting the necessary folks in your city.
+
+        %h3#ambassadors_kits Ambassador kits
+        %p
+          There are three levels to the Bike Index Ambassador Program. Each level involves a box of materials to get you started and while eacth level comes with different materials, all three come with Bike Index support and a feature of you on the Bike Index site.
+
+        = image_tag 'landing_pages/ambassadors_package_small.jpg', alt: 'Small package'
+
+        %h3 Small Package: $75
+        %p
+          This package is for those of you who are just beginning to test out and advocate for Bike Index in your city or town. We’ll provide the materials for you to start speaking with those in your community who handle a lot of bikes.
+        %p
+          %strong This box includes:
+        %ul
+          %li
+            Bike Index cycling cap
+          %li
+            50 Bike Index bike registration cards
+          %li
+            50 Bike Index tall bike rack stickers
+          %li
+            3 "How Not to Buy Stolen Bikes" posters for distribution at shops who want to register bikes in Bike Index
+          %li
+            50 "Bike Index, What We Do" flyers for distribution at these shops
+          %li
+            Tips for approaching different kinds of bike organizations
+
+        = image_tag 'landing_pages/ambassadors_package_medium.jpg', alt: 'Medium package'
+
+        %h3 Medium Package: $300
+
+        %p
+          This package is for those who are looking to jump into a bigger role in their community.
+        %p
+          %strong This box includes:
+        %ul
+          %li
+            Bike Index cycling cap
+          %li
+            250 Bike Index registration cards
+          %li
+            250 Bike Index "registered" stickers
+          %li
+            250 Bike Index tall frame stickers
+          %li
+            5 window clings to put in your office, hand out to shops, etc.
+          %li
+            10 "How Not to Buy Stolen Bikes" posters for distribution at shops
+          %li
+            100 "Bike Index, What We Do" flyers for distribution at shops
+          %li
+            Tips for approaching different kinds of bike organizations
+
+        = image_tag 'landing_pages/ambassadors_package_large.jpg', alt: 'Large package'
+
+        %h3 Large Package: $500
+
+        %p
+          The Big One. Perfect if you’re working with several shops, advocacy groups, and are putting on registration drives of 1,000 bikes or more. You’re ready to get out there and share Bike Index with the universe.
+        %p
+          %strong This box includes:
+        %ul
+          %li
+            Bike Index cycling cap
+          %li
+            500 Bike Index registration cards
+          %li
+            500 Bike Index "registered" stickers
+          %li
+            500 Bike Index tall frame stickers
+          %li
+            5 window clings to put in your office, hand out to shops, etc.
+          %li
+            Banner to put on reg booths
+          %li
+            15 "How Not to Buy Stolen Bikes" posters for distribution at shops
+          %li
+            200 "Bike Index, What We Do" flyers for distribution at shops
+          %li
+            Tips for approaching different kinds of bike organizations
+
+        %h3#ambassadors_scholarships Scholarship Opportunities
+        %p
+          If you want to become a Bike Index Ambassador but need some financial help, include 3-4 additional sentences in your email to  #{link_to 'lily@bikeindex.org', 'mailto:lily@bikeindex.org'} about why you should receive a scholarship. And don’t worry, this isn’t a test of your essay ability. We want you to be able to help us!
+
+        %h3
+          = link_to 'View Current Ambassadors', ambassadors_current_path
+
+
+
+        .mobile-contact-link
+          %a.btn.btn-primary.btn-lg{ href: 'mailto:lily@bikeindex.org' }
+            Apply today
+
+      .next-steps-col
+        .next-steps-wrap
+          .trusted-by-next-steps.hidden-md-down
+            %h3
+              Become an ambassador
+            %ul
+              %li
+                %a{ href: '#ambassadors_why', class: 'scroll-to-ref', data: { offset: -80 } }
+                  Why Work with Bike Index
+              %li
+                %a{ href: '#ambassadors_how', class: 'scroll-to-ref', data: { offset: -80 } }
+                  How it works
+              %li
+                %a{ href: '#ambassadors_kits', class: 'scroll-to-ref', data: { offset: -80 } }
+                  Ambassador kits
+              %li
+                %a{ href: '#ambassadors_scholarships', class: 'scroll-to-ref', data: { offset: -80 } }
+                  Scholarships
+              %li
+                %a{ href: ambassadors_current_path }
+                  Current ambassadors
+          %a.btn.btn-primary.btn-lg{ href: 'mailto:lily@bikeindex.org' }
+            Apply Today
+            
+  %footer.ambassadors-blank-footer

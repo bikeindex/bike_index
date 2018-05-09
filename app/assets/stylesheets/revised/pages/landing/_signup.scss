@@ -1,19 +1,21 @@
+// This was originally specific to the org signup pages - now it includes ambassadors.
+// The ambassador specific styles are in a separate file though
 .landing-page-body, #welcome_index {
   padding-top: 0;
   .primary-footer { margin-top: 0; }
 }
 
-$landing-page-targets: 'shop', 'school', 'advocacy', 'law_enforcement';
+$landing-page-targets: 'shop', 'school', 'advocacy', 'law_enforcement', 'ambassadors-how-to', 'ambassadors-current';
 @each $target in $landing-page-targets {
-  .org-landing-page-#{$target} {
+  .signup-landing-page-#{$target} {
     .banner-header {
       background-image: image-url('landing_pages/header_bg_#{$target}.jpg');
     }
   }
 }
 
-// Including root-landing-page because required for footer
-.org-signup-landing-page, .root-landing-page {
+// Including root-landing-page because required for footer, also ambassadors
+.signup-landing-page, .root-landing-page {
   svg {
     // SVG icon colors. Manually added to svgs, replacing .cls- classes
     .svgicon-border { fill: #3498db; }
@@ -22,7 +24,7 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law_enforcement';
   }
 }
 
-.org-signup-landing-page {
+.signup-landing-page {
   .landing-page-tweet {
     $tweet-link-color: #3498DC;
     $tweet-black: #2C2C2C;
@@ -122,7 +124,7 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law_enforcement';
 }
 
 
-.org-signup-landing-page {
+.signup-landing-page {
   .banner-header {
     padding-top: 6*$vertical-height;
     padding-bottom: 12*$vertical-height;
@@ -188,7 +190,7 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law_enforcement';
   }
 }
 
-.org-signup-landing-page {
+.signup-landing-page {
   .main-body-row {
     @include media-breakpoint-down(md) {
       flex-direction: column-reverse;
@@ -271,7 +273,7 @@ $landing-page-targets: 'shop', 'school', 'advocacy', 'law_enforcement';
   }
 }
 
-.org-signup-landing-page {
+.signup-landing-page {
   .mobile-contact-link {
     margin: 2*$vertical-height 0 4*$vertical-height;
     a {

@@ -25,7 +25,7 @@ class BikeIndex.Init extends BikeIndex
 
   loadPageScript: (body_id) ->
     # If this is a landing page
-    if body_id.match 'landing_pages_for_'
+    if body_id.match 'landing_pages_'
       return window.pageScript = new BikeIndex.LandingPage
     # All the rest per-page javascripts
     pageClasses =
@@ -72,7 +72,7 @@ class BikeIndex.Init extends BikeIndex
       offset = $target.attr('data-offset')
       if offset? then offset = parseInt(offset, 10)
       offset ||= -20
-      $('body').animate(
+      $('body, html').animate(
         scrollTop: $($target.attr('href')).offset().top + offset, 'fast'
       )
 

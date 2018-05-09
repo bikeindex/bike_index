@@ -1,0 +1,47 @@
+.signup-landing-page.signup-landing-page-ambassadors.signup-landing-page-ambassadors-current
+  %header.banner-header
+    .container
+      .row
+        .icon-wrapper
+          = render "/landing_pages/icons/header_ambassadors_svg"
+      .row
+        %h1 Current Ambassadors
+        %h3 The heroes of bikedom
+        %a.btn.btn-primary.btn-lg{ href: 'mailto:lily@bikeindex.org' }
+          Join their ranks
+
+    .ribbon
+      .container
+        .noribbon
+  .container.ambassadors-list
+    .row
+      .col-md-3.col-xs-6
+        = image_tag 'landing_pages/ambassadors/Chris-Olin.jpg', alt: 'Chris Olin'
+        %h2
+          Chris Olin
+        %h3
+          Washington, D.C.
+        %h4
+          Why Bike Index?
+        %p
+          Bike Index isn't the only internet bike registry, but it's the only one that works and I firmly believe it's a direct result of how it was designed.
+      .col-md-3.col-xs-6
+        = image_tag 'landing_pages/ambassadors/Dirk-Degroot.jpg', alt: 'Dirk Degroot'
+        %h2
+          Dirk Degroot
+        %h3
+          Seattle, WA
+        %h4
+          Why Bike Index?
+        %p
+          After a couple of recoveries, I got hooked. It was so nice to be able to return some of these bikes to people who really love them.
+      .col-md-3.col-xs-6
+        = image_tag 'landing_pages/ambassadors/placeholder.png', alt: 'This could be you!'
+        %h2
+          Your Name Here
+        %h3
+          Anytown, USA
+        %h4
+          What's your story?
+        %p
+          Become a Bike Index Ambassador and help stolen bikes find their way home
