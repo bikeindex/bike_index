@@ -70,6 +70,7 @@
       width: 100%;
       height: auto;
       margin: 0 0 2*$vertical-height;
+      clip-path: circle(50%);
     }
     .ambassador-question {
       font-weight: bold;
