@@ -1,8 +1,5 @@
 require 'spec_helper'
 
-# This entire thing is commented out because it requires putting in the API key and the template ID for Sparkpost - which we don't want to expose
-# So rather than doing that, just run this if it needs to run and manually put in the ENV variables
-
 describe SendNewsletterWorker do
   it { is_expected.to be_processed_in :notify }
   let(:subject) { SendNewsletterWorker }
