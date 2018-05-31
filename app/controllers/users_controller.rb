@@ -160,6 +160,13 @@ class UsersController < ApplicationController
     end
   end
 
+  def unsubscribe
+    user = User.find_by_username(params[:id])
+    user.update_attribute :is_emailable, false if user.present?
+    flash[:success] = 'You have been unsubscribed from Bike Index updates'
+    redirect_to user_root_url and return
+  end
+
   private
 
   def permitted_parameters

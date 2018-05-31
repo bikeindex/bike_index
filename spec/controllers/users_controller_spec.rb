@@ -377,4 +377,37 @@ describe UsersController do
       expect(user.reload.name).to eq('Cool stuff')
     end
   end
+  describe 'unsubscribe' do
+    context 'subscribed user' do
+      let(:user) { FactoryGirl.create(:user, is_emailable: true) }
+      it 'updates is_emailable' do
+        expect(user.is_emailable).to be_truthy
+        expect(user.confirmed).to be_falsey
+        get :unsubscribe, id: user.username
+        expect(response.code).to eq('302')
+        expect(flash[:success]).to be_present
+        user.reload
+        expect(user.is_emailable).to be_falsey
+        expect(user.confirmed).to be_falsey
+      end
+    end
+    context 'user not present' do
+      it 'does not error, shows same flash success (to prevent email enumeration)' do
+        get :unsubscribe, id: 'cvxvxxxxx'
+        expect(response.code).to eq('302')
+        expect(flash[:success]).to be_present
+      end
+    end
+    context 'user already unsubscribed' do
+      let(:user) { FactoryGirl.create(:confirmed_user, is_emailable: false) }
+      it 'does nothing' do
+        expect(user.is_emailable).to be_falsey
+        get :unsubscribe, id: user.username
+        expect(response.code).to eq('302')
+        expect(flash[:success]).to be_present
+        user.reload
+        expect(user.is_emailable).to be_falsey
+      end
+    end
+  end
 end
