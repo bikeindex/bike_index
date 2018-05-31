@@ -78,6 +78,7 @@ Bikeindex::Application.routes.draw do
       get 'password_reset'
       get 'update_password'
     end
+    member { get 'unsubscribe' }
   end
   get :my_account, to: 'users#edit', as: :my_account
   get :accept_vendor_terms, to: 'users#accept_vendor_terms'

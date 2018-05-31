@@ -75,10 +75,10 @@
               = admin_display_date(ownership.created_at)
             %td
               - u = ownership.creator
-              - if u.name.present?
+              - if u && u.name.present?
                 = u.name
               - else
-                = u.email
+                = u && u.email
             %td
               = ownership.owner_email
             %td.table-cell-check
