@@ -2,14 +2,15 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.6.2
--- Dumped by pg_dump version 9.6.2
+-- Dumped from database version 10.3
+-- Dumped by pg_dump version 10.3
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
 SET client_min_messages = warning;
 SET row_security = off;
@@ -42,8 +43,6 @@ CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;
 COMMENT ON EXTENSION fuzzystrmatch IS 'determine similarities and distance between strings';
 
 
-SET search_path = public, pg_catalog;
-
 SET default_tablespace = '';
 
 SET default_with_oids = false;
@@ -52,7 +51,7 @@ SET default_with_oids = false;
 -- Name: ads; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE ads (
+CREATE TABLE public.ads (
     id integer NOT NULL,
     title character varying,
     body text,
@@ -69,7 +68,7 @@ CREATE TABLE ads (
 -- Name: ads_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE ads_id_seq
+CREATE SEQUENCE public.ads_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -81,14 +80,14 @@ CREATE SEQUENCE ads_id_seq
 -- Name: ads_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE ads_id_seq OWNED BY ads.id;
+ALTER SEQUENCE public.ads_id_seq OWNED BY public.ads.id;
 
 
 --
 -- Name: b_params; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE b_params (
+CREATE TABLE public.b_params (
     id integer NOT NULL,
     old_params text,
     bike_title character varying,
@@ -110,7 +109,7 @@ CREATE TABLE b_params (
 -- Name: b_params_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE b_params_id_seq
+CREATE SEQUENCE public.b_params_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -122,14 +121,14 @@ CREATE SEQUENCE b_params_id_seq
 -- Name: b_params_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE b_params_id_seq OWNED BY b_params.id;
+ALTER SEQUENCE public.b_params_id_seq OWNED BY public.b_params.id;
 
 
 --
 -- Name: bike_organizations; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE bike_organizations (
+CREATE TABLE public.bike_organizations (
     id integer NOT NULL,
     bike_id integer,
     organization_id integer,
@@ -142,7 +141,7 @@ CREATE TABLE bike_organizations (
 -- Name: bike_organizations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE bike_organizations_id_seq
+CREATE SEQUENCE public.bike_organizations_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -154,14 +153,14 @@ CREATE SEQUENCE bike_organizations_id_seq
 -- Name: bike_organizations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE bike_organizations_id_seq OWNED BY bike_organizations.id;
+ALTER SEQUENCE public.bike_organizations_id_seq OWNED BY public.bike_organizations.id;
 
 
 --
 -- Name: bikes; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE bikes (
+CREATE TABLE public.bikes (
     id integer NOT NULL,
     name character varying,
     cycle_type_id integer,
@@ -231,7 +230,7 @@ CREATE TABLE bikes (
 -- Name: bikes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE bikes_id_seq
+CREATE SEQUENCE public.bikes_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -243,14 +242,14 @@ CREATE SEQUENCE bikes_id_seq
 -- Name: bikes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE bikes_id_seq OWNED BY bikes.id;
+ALTER SEQUENCE public.bikes_id_seq OWNED BY public.bikes.id;
 
 
 --
 -- Name: blogs; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE blogs (
+CREATE TABLE public.blogs (
     id integer NOT NULL,
     title text,
     title_slug character varying,
@@ -275,7 +274,7 @@ CREATE TABLE blogs (
 -- Name: blogs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE blogs_id_seq
+CREATE SEQUENCE public.blogs_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -287,14 +286,50 @@ CREATE SEQUENCE blogs_id_seq
 -- Name: blogs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE blogs_id_seq OWNED BY blogs.id;
+ALTER SEQUENCE public.blogs_id_seq OWNED BY public.blogs.id;
+
+
+--
+-- Name: bulk_imports; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.bulk_imports (
+    id integer NOT NULL,
+    organization_id integer,
+    user_id integer,
+    file_url text,
+    bikes_imported integer,
+    import_errors json DEFAULT '{}'::json,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: bulk_imports_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.bulk_imports_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: bulk_imports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.bulk_imports_id_seq OWNED BY public.bulk_imports.id;
 
 
 --
 -- Name: cgroups; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE cgroups (
+CREATE TABLE public.cgroups (
     id integer NOT NULL,
     name character varying,
     slug character varying,
@@ -308,7 +343,7 @@ CREATE TABLE cgroups (
 -- Name: cgroups_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE cgroups_id_seq
+CREATE SEQUENCE public.cgroups_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -320,14 +355,14 @@ CREATE SEQUENCE cgroups_id_seq
 -- Name: cgroups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE cgroups_id_seq OWNED BY cgroups.id;
+ALTER SEQUENCE public.cgroups_id_seq OWNED BY public.cgroups.id;
 
 
 --
 -- Name: colors; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE colors (
+CREATE TABLE public.colors (
     id integer NOT NULL,
     name character varying,
     created_at timestamp without time zone NOT NULL,
@@ -341,7 +376,7 @@ CREATE TABLE colors (
 -- Name: colors_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE colors_id_seq
+CREATE SEQUENCE public.colors_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -353,14 +388,14 @@ CREATE SEQUENCE colors_id_seq
 -- Name: colors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE colors_id_seq OWNED BY colors.id;
+ALTER SEQUENCE public.colors_id_seq OWNED BY public.colors.id;
 
 
 --
 -- Name: components; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE components (
+CREATE TABLE public.components (
     id integer NOT NULL,
     cmodel_name character varying,
     year integer,
@@ -383,7 +418,7 @@ CREATE TABLE components (
 -- Name: components_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE components_id_seq
+CREATE SEQUENCE public.components_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -395,14 +430,14 @@ CREATE SEQUENCE components_id_seq
 -- Name: components_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE components_id_seq OWNED BY components.id;
+ALTER SEQUENCE public.components_id_seq OWNED BY public.components.id;
 
 
 --
 -- Name: countries; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE countries (
+CREATE TABLE public.countries (
     id integer NOT NULL,
     name character varying,
     iso character varying,
@@ -415,7 +450,7 @@ CREATE TABLE countries (
 -- Name: countries_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE countries_id_seq
+CREATE SEQUENCE public.countries_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -427,14 +462,14 @@ CREATE SEQUENCE countries_id_seq
 -- Name: countries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE countries_id_seq OWNED BY countries.id;
+ALTER SEQUENCE public.countries_id_seq OWNED BY public.countries.id;
 
 
 --
 -- Name: creation_states; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE creation_states (
+CREATE TABLE public.creation_states (
     id integer NOT NULL,
     bike_id integer,
     organization_id integer,
@@ -452,7 +487,7 @@ CREATE TABLE creation_states (
 -- Name: creation_states_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE creation_states_id_seq
+CREATE SEQUENCE public.creation_states_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -464,14 +499,14 @@ CREATE SEQUENCE creation_states_id_seq
 -- Name: creation_states_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE creation_states_id_seq OWNED BY creation_states.id;
+ALTER SEQUENCE public.creation_states_id_seq OWNED BY public.creation_states.id;
 
 
 --
 -- Name: ctypes; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE ctypes (
+CREATE TABLE public.ctypes (
     id integer NOT NULL,
     name character varying,
     slug character varying,
@@ -488,7 +523,7 @@ CREATE TABLE ctypes (
 -- Name: ctypes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE ctypes_id_seq
+CREATE SEQUENCE public.ctypes_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -500,14 +535,14 @@ CREATE SEQUENCE ctypes_id_seq
 -- Name: ctypes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE ctypes_id_seq OWNED BY ctypes.id;
+ALTER SEQUENCE public.ctypes_id_seq OWNED BY public.ctypes.id;
 
 
 --
 -- Name: customer_contacts; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE customer_contacts (
+CREATE TABLE public.customer_contacts (
     id integer NOT NULL,
     user_id integer,
     user_email character varying,
@@ -527,7 +562,7 @@ CREATE TABLE customer_contacts (
 -- Name: customer_contacts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE customer_contacts_id_seq
+CREATE SEQUENCE public.customer_contacts_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -539,14 +574,14 @@ CREATE SEQUENCE customer_contacts_id_seq
 -- Name: customer_contacts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE customer_contacts_id_seq OWNED BY customer_contacts.id;
+ALTER SEQUENCE public.customer_contacts_id_seq OWNED BY public.customer_contacts.id;
 
 
 --
 -- Name: cycle_types; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE cycle_types (
+CREATE TABLE public.cycle_types (
     id integer NOT NULL,
     name character varying,
     slug character varying,
@@ -559,7 +594,7 @@ CREATE TABLE cycle_types (
 -- Name: cycle_types_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE cycle_types_id_seq
+CREATE SEQUENCE public.cycle_types_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -571,14 +606,14 @@ CREATE SEQUENCE cycle_types_id_seq
 -- Name: cycle_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE cycle_types_id_seq OWNED BY cycle_types.id;
+ALTER SEQUENCE public.cycle_types_id_seq OWNED BY public.cycle_types.id;
 
 
 --
 -- Name: duplicate_bike_groups; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE duplicate_bike_groups (
+CREATE TABLE public.duplicate_bike_groups (
     id integer NOT NULL,
     ignore boolean DEFAULT false NOT NULL,
     added_bike_at timestamp without time zone,
@@ -591,7 +626,7 @@ CREATE TABLE duplicate_bike_groups (
 -- Name: duplicate_bike_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE duplicate_bike_groups_id_seq
+CREATE SEQUENCE public.duplicate_bike_groups_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -603,14 +638,14 @@ CREATE SEQUENCE duplicate_bike_groups_id_seq
 -- Name: duplicate_bike_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE duplicate_bike_groups_id_seq OWNED BY duplicate_bike_groups.id;
+ALTER SEQUENCE public.duplicate_bike_groups_id_seq OWNED BY public.duplicate_bike_groups.id;
 
 
 --
 -- Name: feedbacks; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE feedbacks (
+CREATE TABLE public.feedbacks (
     id integer NOT NULL,
     name character varying,
     email character varying,
@@ -628,7 +663,7 @@ CREATE TABLE feedbacks (
 -- Name: feedbacks_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE feedbacks_id_seq
+CREATE SEQUENCE public.feedbacks_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -640,14 +675,14 @@ CREATE SEQUENCE feedbacks_id_seq
 -- Name: feedbacks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE feedbacks_id_seq OWNED BY feedbacks.id;
+ALTER SEQUENCE public.feedbacks_id_seq OWNED BY public.feedbacks.id;
 
 
 --
 -- Name: flavor_texts; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE flavor_texts (
+CREATE TABLE public.flavor_texts (
     id integer NOT NULL,
     message character varying,
     created_at timestamp without time zone NOT NULL,
@@ -659,7 +694,7 @@ CREATE TABLE flavor_texts (
 -- Name: flavor_texts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE flavor_texts_id_seq
+CREATE SEQUENCE public.flavor_texts_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -671,14 +706,14 @@ CREATE SEQUENCE flavor_texts_id_seq
 -- Name: flavor_texts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE flavor_texts_id_seq OWNED BY flavor_texts.id;
+ALTER SEQUENCE public.flavor_texts_id_seq OWNED BY public.flavor_texts.id;
 
 
 --
 -- Name: frame_materials; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE frame_materials (
+CREATE TABLE public.frame_materials (
     id integer NOT NULL,
     name character varying,
     created_at timestamp without time zone NOT NULL,
@@ -691,7 +726,7 @@ CREATE TABLE frame_materials (
 -- Name: frame_materials_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE frame_materials_id_seq
+CREATE SEQUENCE public.frame_materials_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -703,14 +738,14 @@ CREATE SEQUENCE frame_materials_id_seq
 -- Name: frame_materials_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE frame_materials_id_seq OWNED BY frame_materials.id;
+ALTER SEQUENCE public.frame_materials_id_seq OWNED BY public.frame_materials.id;
 
 
 --
 -- Name: front_gear_types; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE front_gear_types (
+CREATE TABLE public.front_gear_types (
     id integer NOT NULL,
     name character varying,
     count integer,
@@ -726,7 +761,7 @@ CREATE TABLE front_gear_types (
 -- Name: front_gear_types_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE front_gear_types_id_seq
+CREATE SEQUENCE public.front_gear_types_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -738,14 +773,14 @@ CREATE SEQUENCE front_gear_types_id_seq
 -- Name: front_gear_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE front_gear_types_id_seq OWNED BY front_gear_types.id;
+ALTER SEQUENCE public.front_gear_types_id_seq OWNED BY public.front_gear_types.id;
 
 
 --
 -- Name: handlebar_types; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE handlebar_types (
+CREATE TABLE public.handlebar_types (
     id integer NOT NULL,
     name character varying,
     created_at timestamp without time zone NOT NULL,
@@ -758,7 +793,7 @@ CREATE TABLE handlebar_types (
 -- Name: handlebar_types_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE handlebar_types_id_seq
+CREATE SEQUENCE public.handlebar_types_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -770,14 +805,14 @@ CREATE SEQUENCE handlebar_types_id_seq
 -- Name: handlebar_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE handlebar_types_id_seq OWNED BY handlebar_types.id;
+ALTER SEQUENCE public.handlebar_types_id_seq OWNED BY public.handlebar_types.id;
 
 
 --
 -- Name: integrations; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE integrations (
+CREATE TABLE public.integrations (
     id integer NOT NULL,
     user_id integer,
     access_token text,
@@ -792,7 +827,7 @@ CREATE TABLE integrations (
 -- Name: integrations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE integrations_id_seq
+CREATE SEQUENCE public.integrations_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -804,14 +839,14 @@ CREATE SEQUENCE integrations_id_seq
 -- Name: integrations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE integrations_id_seq OWNED BY integrations.id;
+ALTER SEQUENCE public.integrations_id_seq OWNED BY public.integrations.id;
 
 
 --
 -- Name: listicles; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE listicles (
+CREATE TABLE public.listicles (
     id integer NOT NULL,
     list_order integer,
     body text,
@@ -833,7 +868,7 @@ CREATE TABLE listicles (
 -- Name: listicles_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE listicles_id_seq
+CREATE SEQUENCE public.listicles_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -845,14 +880,14 @@ CREATE SEQUENCE listicles_id_seq
 -- Name: listicles_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE listicles_id_seq OWNED BY listicles.id;
+ALTER SEQUENCE public.listicles_id_seq OWNED BY public.listicles.id;
 
 
 --
 -- Name: locations; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE locations (
+CREATE TABLE public.locations (
     id integer NOT NULL,
     organization_id integer,
     zipcode character varying,
@@ -876,7 +911,7 @@ CREATE TABLE locations (
 -- Name: locations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE locations_id_seq
+CREATE SEQUENCE public.locations_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -888,14 +923,14 @@ CREATE SEQUENCE locations_id_seq
 -- Name: locations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE locations_id_seq OWNED BY locations.id;
+ALTER SEQUENCE public.locations_id_seq OWNED BY public.locations.id;
 
 
 --
 -- Name: lock_types; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE lock_types (
+CREATE TABLE public.lock_types (
     id integer NOT NULL,
     name character varying,
     slug character varying,
@@ -908,7 +943,7 @@ CREATE TABLE lock_types (
 -- Name: lock_types_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE lock_types_id_seq
+CREATE SEQUENCE public.lock_types_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -920,14 +955,14 @@ CREATE SEQUENCE lock_types_id_seq
 -- Name: lock_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE lock_types_id_seq OWNED BY lock_types.id;
+ALTER SEQUENCE public.lock_types_id_seq OWNED BY public.lock_types.id;
 
 
 --
 -- Name: locks; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE locks (
+CREATE TABLE public.locks (
     id integer NOT NULL,
     lock_type_id integer DEFAULT 1,
     has_key boolean DEFAULT true,
@@ -948,7 +983,7 @@ CREATE TABLE locks (
 -- Name: locks_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE locks_id_seq
+CREATE SEQUENCE public.locks_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -960,14 +995,14 @@ CREATE SEQUENCE locks_id_seq
 -- Name: locks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE locks_id_seq OWNED BY locks.id;
+ALTER SEQUENCE public.locks_id_seq OWNED BY public.locks.id;
 
 
 --
 -- Name: mail_snippets; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE mail_snippets (
+CREATE TABLE public.mail_snippets (
     id integer NOT NULL,
     name character varying,
     is_enabled boolean DEFAULT false NOT NULL,
@@ -987,7 +1022,7 @@ CREATE TABLE mail_snippets (
 -- Name: mail_snippets_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE mail_snippets_id_seq
+CREATE SEQUENCE public.mail_snippets_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -999,14 +1034,14 @@ CREATE SEQUENCE mail_snippets_id_seq
 -- Name: mail_snippets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE mail_snippets_id_seq OWNED BY mail_snippets.id;
+ALTER SEQUENCE public.mail_snippets_id_seq OWNED BY public.mail_snippets.id;
 
 
 --
 -- Name: manufacturers; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE manufacturers (
+CREATE TABLE public.manufacturers (
     id integer NOT NULL,
     name character varying,
     slug character varying,
@@ -1028,7 +1063,7 @@ CREATE TABLE manufacturers (
 -- Name: manufacturers_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE manufacturers_id_seq
+CREATE SEQUENCE public.manufacturers_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1040,14 +1075,14 @@ CREATE SEQUENCE manufacturers_id_seq
 -- Name: manufacturers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE manufacturers_id_seq OWNED BY manufacturers.id;
+ALTER SEQUENCE public.manufacturers_id_seq OWNED BY public.manufacturers.id;
 
 
 --
 -- Name: memberships; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE memberships (
+CREATE TABLE public.memberships (
     id integer NOT NULL,
     organization_id integer NOT NULL,
     user_id integer,
@@ -1063,7 +1098,7 @@ CREATE TABLE memberships (
 -- Name: memberships_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE memberships_id_seq
+CREATE SEQUENCE public.memberships_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1075,14 +1110,14 @@ CREATE SEQUENCE memberships_id_seq
 -- Name: memberships_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE memberships_id_seq OWNED BY memberships.id;
+ALTER SEQUENCE public.memberships_id_seq OWNED BY public.memberships.id;
 
 
 --
 -- Name: normalized_serial_segments; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE normalized_serial_segments (
+CREATE TABLE public.normalized_serial_segments (
     id integer NOT NULL,
     segment character varying,
     bike_id integer,
@@ -1096,7 +1131,7 @@ CREATE TABLE normalized_serial_segments (
 -- Name: normalized_serial_segments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE normalized_serial_segments_id_seq
+CREATE SEQUENCE public.normalized_serial_segments_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1108,14 +1143,14 @@ CREATE SEQUENCE normalized_serial_segments_id_seq
 -- Name: normalized_serial_segments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE normalized_serial_segments_id_seq OWNED BY normalized_serial_segments.id;
+ALTER SEQUENCE public.normalized_serial_segments_id_seq OWNED BY public.normalized_serial_segments.id;
 
 
 --
 -- Name: oauth_access_grants; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE oauth_access_grants (
+CREATE TABLE public.oauth_access_grants (
     id integer NOT NULL,
     resource_owner_id integer NOT NULL,
     application_id integer NOT NULL,
@@ -1132,7 +1167,7 @@ CREATE TABLE oauth_access_grants (
 -- Name: oauth_access_grants_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE oauth_access_grants_id_seq
+CREATE SEQUENCE public.oauth_access_grants_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1144,14 +1179,14 @@ CREATE SEQUENCE oauth_access_grants_id_seq
 -- Name: oauth_access_grants_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE oauth_access_grants_id_seq OWNED BY oauth_access_grants.id;
+ALTER SEQUENCE public.oauth_access_grants_id_seq OWNED BY public.oauth_access_grants.id;
 
 
 --
 -- Name: oauth_access_tokens; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE oauth_access_tokens (
+CREATE TABLE public.oauth_access_tokens (
     id integer NOT NULL,
     resource_owner_id integer,
     application_id integer,
@@ -1168,7 +1203,7 @@ CREATE TABLE oauth_access_tokens (
 -- Name: oauth_access_tokens_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE oauth_access_tokens_id_seq
+CREATE SEQUENCE public.oauth_access_tokens_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1180,14 +1215,14 @@ CREATE SEQUENCE oauth_access_tokens_id_seq
 -- Name: oauth_access_tokens_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE oauth_access_tokens_id_seq OWNED BY oauth_access_tokens.id;
+ALTER SEQUENCE public.oauth_access_tokens_id_seq OWNED BY public.oauth_access_tokens.id;
 
 
 --
 -- Name: oauth_applications; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE oauth_applications (
+CREATE TABLE public.oauth_applications (
     id integer NOT NULL,
     name character varying NOT NULL,
     uid character varying NOT NULL,
@@ -1207,7 +1242,7 @@ CREATE TABLE oauth_applications (
 -- Name: oauth_applications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE oauth_applications_id_seq
+CREATE SEQUENCE public.oauth_applications_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1219,14 +1254,14 @@ CREATE SEQUENCE oauth_applications_id_seq
 -- Name: oauth_applications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE oauth_applications_id_seq OWNED BY oauth_applications.id;
+ALTER SEQUENCE public.oauth_applications_id_seq OWNED BY public.oauth_applications.id;
 
 
 --
 -- Name: organization_deals; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE organization_deals (
+CREATE TABLE public.organization_deals (
     id integer NOT NULL,
     organization_id integer,
     deal_name character varying,
@@ -1241,7 +1276,7 @@ CREATE TABLE organization_deals (
 -- Name: organization_deals_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE organization_deals_id_seq
+CREATE SEQUENCE public.organization_deals_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1253,14 +1288,14 @@ CREATE SEQUENCE organization_deals_id_seq
 -- Name: organization_deals_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE organization_deals_id_seq OWNED BY organization_deals.id;
+ALTER SEQUENCE public.organization_deals_id_seq OWNED BY public.organization_deals.id;
 
 
 --
 -- Name: organization_invitations; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE organization_invitations (
+CREATE TABLE public.organization_invitations (
     id integer NOT NULL,
     invitee_email character varying,
     invitee_name character varying,
@@ -1279,7 +1314,7 @@ CREATE TABLE organization_invitations (
 -- Name: organization_invitations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE organization_invitations_id_seq
+CREATE SEQUENCE public.organization_invitations_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1291,14 +1326,14 @@ CREATE SEQUENCE organization_invitations_id_seq
 -- Name: organization_invitations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE organization_invitations_id_seq OWNED BY organization_invitations.id;
+ALTER SEQUENCE public.organization_invitations_id_seq OWNED BY public.organization_invitations.id;
 
 
 --
 -- Name: organizations; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE organizations (
+CREATE TABLE public.organizations (
     id integer NOT NULL,
     name character varying,
     slug character varying NOT NULL,
@@ -1329,7 +1364,7 @@ CREATE TABLE organizations (
 -- Name: organizations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE organizations_id_seq
+CREATE SEQUENCE public.organizations_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1341,14 +1376,14 @@ CREATE SEQUENCE organizations_id_seq
 -- Name: organizations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE organizations_id_seq OWNED BY organizations.id;
+ALTER SEQUENCE public.organizations_id_seq OWNED BY public.organizations.id;
 
 
 --
 -- Name: other_listings; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE other_listings (
+CREATE TABLE public.other_listings (
     id integer NOT NULL,
     bike_id integer,
     url character varying,
@@ -1362,7 +1397,7 @@ CREATE TABLE other_listings (
 -- Name: other_listings_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE other_listings_id_seq
+CREATE SEQUENCE public.other_listings_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1374,14 +1409,14 @@ CREATE SEQUENCE other_listings_id_seq
 -- Name: other_listings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE other_listings_id_seq OWNED BY other_listings.id;
+ALTER SEQUENCE public.other_listings_id_seq OWNED BY public.other_listings.id;
 
 
 --
 -- Name: ownerships; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE ownerships (
+CREATE TABLE public.ownerships (
     id integer NOT NULL,
     bike_id integer,
     user_id integer,
@@ -1401,7 +1436,7 @@ CREATE TABLE ownerships (
 -- Name: ownerships_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE ownerships_id_seq
+CREATE SEQUENCE public.ownerships_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1413,14 +1448,14 @@ CREATE SEQUENCE ownerships_id_seq
 -- Name: ownerships_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE ownerships_id_seq OWNED BY ownerships.id;
+ALTER SEQUENCE public.ownerships_id_seq OWNED BY public.ownerships.id;
 
 
 --
 -- Name: paints; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE paints (
+CREATE TABLE public.paints (
     id integer NOT NULL,
     name character varying,
     color_id integer,
@@ -1437,7 +1472,7 @@ CREATE TABLE paints (
 -- Name: paints_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE paints_id_seq
+CREATE SEQUENCE public.paints_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1449,14 +1484,14 @@ CREATE SEQUENCE paints_id_seq
 -- Name: paints_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE paints_id_seq OWNED BY paints.id;
+ALTER SEQUENCE public.paints_id_seq OWNED BY public.paints.id;
 
 
 --
 -- Name: payments; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE payments (
+CREATE TABLE public.payments (
     id integer NOT NULL,
     user_id integer,
     is_current boolean DEFAULT true,
@@ -1476,7 +1511,7 @@ CREATE TABLE payments (
 -- Name: payments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE payments_id_seq
+CREATE SEQUENCE public.payments_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1488,14 +1523,14 @@ CREATE SEQUENCE payments_id_seq
 -- Name: payments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE payments_id_seq OWNED BY payments.id;
+ALTER SEQUENCE public.payments_id_seq OWNED BY public.payments.id;
 
 
 --
 -- Name: propulsion_types; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE propulsion_types (
+CREATE TABLE public.propulsion_types (
     id integer NOT NULL,
     name character varying,
     created_at timestamp without time zone NOT NULL,
@@ -1508,7 +1543,7 @@ CREATE TABLE propulsion_types (
 -- Name: propulsion_types_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE propulsion_types_id_seq
+CREATE SEQUENCE public.propulsion_types_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1520,14 +1555,14 @@ CREATE SEQUENCE propulsion_types_id_seq
 -- Name: propulsion_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE propulsion_types_id_seq OWNED BY propulsion_types.id;
+ALTER SEQUENCE public.propulsion_types_id_seq OWNED BY public.propulsion_types.id;
 
 
 --
 -- Name: public_images; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public_images (
+CREATE TABLE public.public_images (
     id integer NOT NULL,
     image character varying,
     name character varying,
@@ -1544,7 +1579,7 @@ CREATE TABLE public_images (
 -- Name: public_images_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public_images_id_seq
+CREATE SEQUENCE public.public_images_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1556,14 +1591,14 @@ CREATE SEQUENCE public_images_id_seq
 -- Name: public_images_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public_images_id_seq OWNED BY public_images.id;
+ALTER SEQUENCE public.public_images_id_seq OWNED BY public.public_images.id;
 
 
 --
 -- Name: rear_gear_types; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE rear_gear_types (
+CREATE TABLE public.rear_gear_types (
     id integer NOT NULL,
     name character varying,
     count integer,
@@ -1579,7 +1614,7 @@ CREATE TABLE rear_gear_types (
 -- Name: rear_gear_types_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE rear_gear_types_id_seq
+CREATE SEQUENCE public.rear_gear_types_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1591,14 +1626,14 @@ CREATE SEQUENCE rear_gear_types_id_seq
 -- Name: rear_gear_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE rear_gear_types_id_seq OWNED BY rear_gear_types.id;
+ALTER SEQUENCE public.rear_gear_types_id_seq OWNED BY public.rear_gear_types.id;
 
 
 --
 -- Name: recovery_displays; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE recovery_displays (
+CREATE TABLE public.recovery_displays (
     id integer NOT NULL,
     stolen_record_id integer,
     quote text,
@@ -1615,7 +1650,7 @@ CREATE TABLE recovery_displays (
 -- Name: recovery_displays_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE recovery_displays_id_seq
+CREATE SEQUENCE public.recovery_displays_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1627,14 +1662,14 @@ CREATE SEQUENCE recovery_displays_id_seq
 -- Name: recovery_displays_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE recovery_displays_id_seq OWNED BY recovery_displays.id;
+ALTER SEQUENCE public.recovery_displays_id_seq OWNED BY public.recovery_displays.id;
 
 
 --
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE schema_migrations (
+CREATE TABLE public.schema_migrations (
     version character varying NOT NULL
 );
 
@@ -1643,7 +1678,7 @@ CREATE TABLE schema_migrations (
 -- Name: states; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE states (
+CREATE TABLE public.states (
     id integer NOT NULL,
     name character varying,
     abbreviation character varying,
@@ -1657,7 +1692,7 @@ CREATE TABLE states (
 -- Name: states_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE states_id_seq
+CREATE SEQUENCE public.states_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1669,14 +1704,14 @@ CREATE SEQUENCE states_id_seq
 -- Name: states_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE states_id_seq OWNED BY states.id;
+ALTER SEQUENCE public.states_id_seq OWNED BY public.states.id;
 
 
 --
 -- Name: stolen_notifications; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE stolen_notifications (
+CREATE TABLE public.stolen_notifications (
     id integer NOT NULL,
     subject character varying,
     message text,
@@ -1696,7 +1731,7 @@ CREATE TABLE stolen_notifications (
 -- Name: stolen_notifications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE stolen_notifications_id_seq
+CREATE SEQUENCE public.stolen_notifications_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1708,14 +1743,14 @@ CREATE SEQUENCE stolen_notifications_id_seq
 -- Name: stolen_notifications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE stolen_notifications_id_seq OWNED BY stolen_notifications.id;
+ALTER SEQUENCE public.stolen_notifications_id_seq OWNED BY public.stolen_notifications.id;
 
 
 --
 -- Name: stolen_records; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE stolen_records (
+CREATE TABLE public.stolen_records (
     id integer NOT NULL,
     zipcode character varying,
     city character varying,
@@ -1763,7 +1798,7 @@ CREATE TABLE stolen_records (
 -- Name: stolen_records_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE stolen_records_id_seq
+CREATE SEQUENCE public.stolen_records_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1775,14 +1810,14 @@ CREATE SEQUENCE stolen_records_id_seq
 -- Name: stolen_records_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE stolen_records_id_seq OWNED BY stolen_records.id;
+ALTER SEQUENCE public.stolen_records_id_seq OWNED BY public.stolen_records.id;
 
 
 --
 -- Name: tweets; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE tweets (
+CREATE TABLE public.tweets (
     id integer NOT NULL,
     twitter_id character varying,
     twitter_response json,
@@ -1798,7 +1833,7 @@ CREATE TABLE tweets (
 -- Name: tweets_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE tweets_id_seq
+CREATE SEQUENCE public.tweets_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1810,14 +1845,14 @@ CREATE SEQUENCE tweets_id_seq
 -- Name: tweets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE tweets_id_seq OWNED BY tweets.id;
+ALTER SEQUENCE public.tweets_id_seq OWNED BY public.tweets.id;
 
 
 --
 -- Name: user_emails; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE user_emails (
+CREATE TABLE public.user_emails (
     id integer NOT NULL,
     email character varying,
     user_id integer,
@@ -1832,7 +1867,7 @@ CREATE TABLE user_emails (
 -- Name: user_emails_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE user_emails_id_seq
+CREATE SEQUENCE public.user_emails_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1844,14 +1879,14 @@ CREATE SEQUENCE user_emails_id_seq
 -- Name: user_emails_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE user_emails_id_seq OWNED BY user_emails.id;
+ALTER SEQUENCE public.user_emails_id_seq OWNED BY public.user_emails.id;
 
 
 --
 -- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE users (
+CREATE TABLE public.users (
     id integer NOT NULL,
     name character varying,
     email character varying,
@@ -1897,7 +1932,7 @@ CREATE TABLE users (
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE users_id_seq
+CREATE SEQUENCE public.users_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1909,14 +1944,14 @@ CREATE SEQUENCE users_id_seq
 -- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE users_id_seq OWNED BY users.id;
+ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 
 --
 -- Name: wheel_sizes; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE wheel_sizes (
+CREATE TABLE public.wheel_sizes (
     id integer NOT NULL,
     name character varying,
     description character varying,
@@ -1931,7 +1966,7 @@ CREATE TABLE wheel_sizes (
 -- Name: wheel_sizes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE wheel_sizes_id_seq
+CREATE SEQUENCE public.wheel_sizes_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1943,357 +1978,364 @@ CREATE SEQUENCE wheel_sizes_id_seq
 -- Name: wheel_sizes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE wheel_sizes_id_seq OWNED BY wheel_sizes.id;
+ALTER SEQUENCE public.wheel_sizes_id_seq OWNED BY public.wheel_sizes.id;
 
 
 --
 -- Name: ads id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY ads ALTER COLUMN id SET DEFAULT nextval('ads_id_seq'::regclass);
+ALTER TABLE ONLY public.ads ALTER COLUMN id SET DEFAULT nextval('public.ads_id_seq'::regclass);
 
 
 --
 -- Name: b_params id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY b_params ALTER COLUMN id SET DEFAULT nextval('b_params_id_seq'::regclass);
+ALTER TABLE ONLY public.b_params ALTER COLUMN id SET DEFAULT nextval('public.b_params_id_seq'::regclass);
 
 
 --
 -- Name: bike_organizations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY bike_organizations ALTER COLUMN id SET DEFAULT nextval('bike_organizations_id_seq'::regclass);
+ALTER TABLE ONLY public.bike_organizations ALTER COLUMN id SET DEFAULT nextval('public.bike_organizations_id_seq'::regclass);
 
 
 --
 -- Name: bikes id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY bikes ALTER COLUMN id SET DEFAULT nextval('bikes_id_seq'::regclass);
+ALTER TABLE ONLY public.bikes ALTER COLUMN id SET DEFAULT nextval('public.bikes_id_seq'::regclass);
 
 
 --
 -- Name: blogs id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY blogs ALTER COLUMN id SET DEFAULT nextval('blogs_id_seq'::regclass);
+ALTER TABLE ONLY public.blogs ALTER COLUMN id SET DEFAULT nextval('public.blogs_id_seq'::regclass);
+
+
+--
+-- Name: bulk_imports id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bulk_imports ALTER COLUMN id SET DEFAULT nextval('public.bulk_imports_id_seq'::regclass);
 
 
 --
 -- Name: cgroups id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY cgroups ALTER COLUMN id SET DEFAULT nextval('cgroups_id_seq'::regclass);
+ALTER TABLE ONLY public.cgroups ALTER COLUMN id SET DEFAULT nextval('public.cgroups_id_seq'::regclass);
 
 
 --
 -- Name: colors id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY colors ALTER COLUMN id SET DEFAULT nextval('colors_id_seq'::regclass);
+ALTER TABLE ONLY public.colors ALTER COLUMN id SET DEFAULT nextval('public.colors_id_seq'::regclass);
 
 
 --
 -- Name: components id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY components ALTER COLUMN id SET DEFAULT nextval('components_id_seq'::regclass);
+ALTER TABLE ONLY public.components ALTER COLUMN id SET DEFAULT nextval('public.components_id_seq'::regclass);
 
 
 --
 -- Name: countries id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY countries ALTER COLUMN id SET DEFAULT nextval('countries_id_seq'::regclass);
+ALTER TABLE ONLY public.countries ALTER COLUMN id SET DEFAULT nextval('public.countries_id_seq'::regclass);
 
 
 --
 -- Name: creation_states id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY creation_states ALTER COLUMN id SET DEFAULT nextval('creation_states_id_seq'::regclass);
+ALTER TABLE ONLY public.creation_states ALTER COLUMN id SET DEFAULT nextval('public.creation_states_id_seq'::regclass);
 
 
 --
 -- Name: ctypes id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY ctypes ALTER COLUMN id SET DEFAULT nextval('ctypes_id_seq'::regclass);
+ALTER TABLE ONLY public.ctypes ALTER COLUMN id SET DEFAULT nextval('public.ctypes_id_seq'::regclass);
 
 
 --
 -- Name: customer_contacts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY customer_contacts ALTER COLUMN id SET DEFAULT nextval('customer_contacts_id_seq'::regclass);
+ALTER TABLE ONLY public.customer_contacts ALTER COLUMN id SET DEFAULT nextval('public.customer_contacts_id_seq'::regclass);
 
 
 --
 -- Name: cycle_types id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY cycle_types ALTER COLUMN id SET DEFAULT nextval('cycle_types_id_seq'::regclass);
+ALTER TABLE ONLY public.cycle_types ALTER COLUMN id SET DEFAULT nextval('public.cycle_types_id_seq'::regclass);
 
 
 --
 -- Name: duplicate_bike_groups id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY duplicate_bike_groups ALTER COLUMN id SET DEFAULT nextval('duplicate_bike_groups_id_seq'::regclass);
+ALTER TABLE ONLY public.duplicate_bike_groups ALTER COLUMN id SET DEFAULT nextval('public.duplicate_bike_groups_id_seq'::regclass);
 
 
 --
 -- Name: feedbacks id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY feedbacks ALTER COLUMN id SET DEFAULT nextval('feedbacks_id_seq'::regclass);
+ALTER TABLE ONLY public.feedbacks ALTER COLUMN id SET DEFAULT nextval('public.feedbacks_id_seq'::regclass);
 
 
 --
 -- Name: flavor_texts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY flavor_texts ALTER COLUMN id SET DEFAULT nextval('flavor_texts_id_seq'::regclass);
+ALTER TABLE ONLY public.flavor_texts ALTER COLUMN id SET DEFAULT nextval('public.flavor_texts_id_seq'::regclass);
 
 
 --
 -- Name: frame_materials id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY frame_materials ALTER COLUMN id SET DEFAULT nextval('frame_materials_id_seq'::regclass);
+ALTER TABLE ONLY public.frame_materials ALTER COLUMN id SET DEFAULT nextval('public.frame_materials_id_seq'::regclass);
 
 
 --
 -- Name: front_gear_types id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY front_gear_types ALTER COLUMN id SET DEFAULT nextval('front_gear_types_id_seq'::regclass);
+ALTER TABLE ONLY public.front_gear_types ALTER COLUMN id SET DEFAULT nextval('public.front_gear_types_id_seq'::regclass);
 
 
 --
 -- Name: handlebar_types id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY handlebar_types ALTER COLUMN id SET DEFAULT nextval('handlebar_types_id_seq'::regclass);
+ALTER TABLE ONLY public.handlebar_types ALTER COLUMN id SET DEFAULT nextval('public.handlebar_types_id_seq'::regclass);
 
 
 --
 -- Name: integrations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY integrations ALTER COLUMN id SET DEFAULT nextval('integrations_id_seq'::regclass);
+ALTER TABLE ONLY public.integrations ALTER COLUMN id SET DEFAULT nextval('public.integrations_id_seq'::regclass);
 
 
 --
 -- Name: listicles id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY listicles ALTER COLUMN id SET DEFAULT nextval('listicles_id_seq'::regclass);
+ALTER TABLE ONLY public.listicles ALTER COLUMN id SET DEFAULT nextval('public.listicles_id_seq'::regclass);
 
 
 --
 -- Name: locations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY locations ALTER COLUMN id SET DEFAULT nextval('locations_id_seq'::regclass);
+ALTER TABLE ONLY public.locations ALTER COLUMN id SET DEFAULT nextval('public.locations_id_seq'::regclass);
 
 
 --
 -- Name: lock_types id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY lock_types ALTER COLUMN id SET DEFAULT nextval('lock_types_id_seq'::regclass);
+ALTER TABLE ONLY public.lock_types ALTER COLUMN id SET DEFAULT nextval('public.lock_types_id_seq'::regclass);
 
 
 --
 -- Name: locks id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY locks ALTER COLUMN id SET DEFAULT nextval('locks_id_seq'::regclass);
+ALTER TABLE ONLY public.locks ALTER COLUMN id SET DEFAULT nextval('public.locks_id_seq'::regclass);
 
 
 --
 -- Name: mail_snippets id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY mail_snippets ALTER COLUMN id SET DEFAULT nextval('mail_snippets_id_seq'::regclass);
+ALTER TABLE ONLY public.mail_snippets ALTER COLUMN id SET DEFAULT nextval('public.mail_snippets_id_seq'::regclass);
 
 
 --
 -- Name: manufacturers id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY manufacturers ALTER COLUMN id SET DEFAULT nextval('manufacturers_id_seq'::regclass);
+ALTER TABLE ONLY public.manufacturers ALTER COLUMN id SET DEFAULT nextval('public.manufacturers_id_seq'::regclass);
 
 
 --
 -- Name: memberships id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY memberships ALTER COLUMN id SET DEFAULT nextval('memberships_id_seq'::regclass);
+ALTER TABLE ONLY public.memberships ALTER COLUMN id SET DEFAULT nextval('public.memberships_id_seq'::regclass);
 
 
 --
 -- Name: normalized_serial_segments id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY normalized_serial_segments ALTER COLUMN id SET DEFAULT nextval('normalized_serial_segments_id_seq'::regclass);
+ALTER TABLE ONLY public.normalized_serial_segments ALTER COLUMN id SET DEFAULT nextval('public.normalized_serial_segments_id_seq'::regclass);
 
 
 --
 -- Name: oauth_access_grants id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY oauth_access_grants ALTER COLUMN id SET DEFAULT nextval('oauth_access_grants_id_seq'::regclass);
+ALTER TABLE ONLY public.oauth_access_grants ALTER COLUMN id SET DEFAULT nextval('public.oauth_access_grants_id_seq'::regclass);
 
 
 --
 -- Name: oauth_access_tokens id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY oauth_access_tokens ALTER COLUMN id SET DEFAULT nextval('oauth_access_tokens_id_seq'::regclass);
+ALTER TABLE ONLY public.oauth_access_tokens ALTER COLUMN id SET DEFAULT nextval('public.oauth_access_tokens_id_seq'::regclass);
 
 
 --
 -- Name: oauth_applications id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY oauth_applications ALTER COLUMN id SET DEFAULT nextval('oauth_applications_id_seq'::regclass);
+ALTER TABLE ONLY public.oauth_applications ALTER COLUMN id SET DEFAULT nextval('public.oauth_applications_id_seq'::regclass);
 
 
 --
 -- Name: organization_deals id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY organization_deals ALTER COLUMN id SET DEFAULT nextval('organization_deals_id_seq'::regclass);
+ALTER TABLE ONLY public.organization_deals ALTER COLUMN id SET DEFAULT nextval('public.organization_deals_id_seq'::regclass);
 
 
 --
 -- Name: organization_invitations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY organization_invitations ALTER COLUMN id SET DEFAULT nextval('organization_invitations_id_seq'::regclass);
+ALTER TABLE ONLY public.organization_invitations ALTER COLUMN id SET DEFAULT nextval('public.organization_invitations_id_seq'::regclass);
 
 
 --
 -- Name: organizations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY organizations ALTER COLUMN id SET DEFAULT nextval('organizations_id_seq'::regclass);
+ALTER TABLE ONLY public.organizations ALTER COLUMN id SET DEFAULT nextval('public.organizations_id_seq'::regclass);
 
 
 --
 -- Name: other_listings id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY other_listings ALTER COLUMN id SET DEFAULT nextval('other_listings_id_seq'::regclass);
+ALTER TABLE ONLY public.other_listings ALTER COLUMN id SET DEFAULT nextval('public.other_listings_id_seq'::regclass);
 
 
 --
 -- Name: ownerships id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY ownerships ALTER COLUMN id SET DEFAULT nextval('ownerships_id_seq'::regclass);
+ALTER TABLE ONLY public.ownerships ALTER COLUMN id SET DEFAULT nextval('public.ownerships_id_seq'::regclass);
 
 
 --
 -- Name: paints id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY paints ALTER COLUMN id SET DEFAULT nextval('paints_id_seq'::regclass);
+ALTER TABLE ONLY public.paints ALTER COLUMN id SET DEFAULT nextval('public.paints_id_seq'::regclass);
 
 
 --
 -- Name: payments id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY payments ALTER COLUMN id SET DEFAULT nextval('payments_id_seq'::regclass);
+ALTER TABLE ONLY public.payments ALTER COLUMN id SET DEFAULT nextval('public.payments_id_seq'::regclass);
 
 
 --
 -- Name: propulsion_types id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY propulsion_types ALTER COLUMN id SET DEFAULT nextval('propulsion_types_id_seq'::regclass);
+ALTER TABLE ONLY public.propulsion_types ALTER COLUMN id SET DEFAULT nextval('public.propulsion_types_id_seq'::regclass);
 
 
 --
 -- Name: public_images id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public_images ALTER COLUMN id SET DEFAULT nextval('public_images_id_seq'::regclass);
+ALTER TABLE ONLY public.public_images ALTER COLUMN id SET DEFAULT nextval('public.public_images_id_seq'::regclass);
 
 
 --
 -- Name: rear_gear_types id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY rear_gear_types ALTER COLUMN id SET DEFAULT nextval('rear_gear_types_id_seq'::regclass);
+ALTER TABLE ONLY public.rear_gear_types ALTER COLUMN id SET DEFAULT nextval('public.rear_gear_types_id_seq'::regclass);
 
 
 --
 -- Name: recovery_displays id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY recovery_displays ALTER COLUMN id SET DEFAULT nextval('recovery_displays_id_seq'::regclass);
+ALTER TABLE ONLY public.recovery_displays ALTER COLUMN id SET DEFAULT nextval('public.recovery_displays_id_seq'::regclass);
 
 
 --
 -- Name: states id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY states ALTER COLUMN id SET DEFAULT nextval('states_id_seq'::regclass);
+ALTER TABLE ONLY public.states ALTER COLUMN id SET DEFAULT nextval('public.states_id_seq'::regclass);
 
 
 --
 -- Name: stolen_notifications id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY stolen_notifications ALTER COLUMN id SET DEFAULT nextval('stolen_notifications_id_seq'::regclass);
+ALTER TABLE ONLY public.stolen_notifications ALTER COLUMN id SET DEFAULT nextval('public.stolen_notifications_id_seq'::regclass);
 
 
 --
 -- Name: stolen_records id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY stolen_records ALTER COLUMN id SET DEFAULT nextval('stolen_records_id_seq'::regclass);
+ALTER TABLE ONLY public.stolen_records ALTER COLUMN id SET DEFAULT nextval('public.stolen_records_id_seq'::regclass);
 
 
 --
 -- Name: tweets id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY tweets ALTER COLUMN id SET DEFAULT nextval('tweets_id_seq'::regclass);
+ALTER TABLE ONLY public.tweets ALTER COLUMN id SET DEFAULT nextval('public.tweets_id_seq'::regclass);
 
 
 --
 -- Name: user_emails id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_emails ALTER COLUMN id SET DEFAULT nextval('user_emails_id_seq'::regclass);
+ALTER TABLE ONLY public.user_emails ALTER COLUMN id SET DEFAULT nextval('public.user_emails_id_seq'::regclass);
 
 
 --
 -- Name: users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
+ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
 
 
 --
 -- Name: wheel_sizes id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY wheel_sizes ALTER COLUMN id SET DEFAULT nextval('wheel_sizes_id_seq'::regclass);
+ALTER TABLE ONLY public.wheel_sizes ALTER COLUMN id SET DEFAULT nextval('public.wheel_sizes_id_seq'::regclass);
 
 
 --
 -- Name: ads ads_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY ads
+ALTER TABLE ONLY public.ads
     ADD CONSTRAINT ads_pkey PRIMARY KEY (id);
 
 
@@ -2301,7 +2343,7 @@ ALTER TABLE ONLY ads
 -- Name: b_params b_params_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY b_params
+ALTER TABLE ONLY public.b_params
     ADD CONSTRAINT b_params_pkey PRIMARY KEY (id);
 
 
@@ -2309,7 +2351,7 @@ ALTER TABLE ONLY b_params
 -- Name: bike_organizations bike_organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY bike_organizations
+ALTER TABLE ONLY public.bike_organizations
     ADD CONSTRAINT bike_organizations_pkey PRIMARY KEY (id);
 
 
@@ -2317,7 +2359,7 @@ ALTER TABLE ONLY bike_organizations
 -- Name: bikes bikes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY bikes
+ALTER TABLE ONLY public.bikes
     ADD CONSTRAINT bikes_pkey PRIMARY KEY (id);
 
 
@@ -2325,15 +2367,23 @@ ALTER TABLE ONLY bikes
 -- Name: blogs blogs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY blogs
+ALTER TABLE ONLY public.blogs
     ADD CONSTRAINT blogs_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bulk_imports bulk_imports_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bulk_imports
+    ADD CONSTRAINT bulk_imports_pkey PRIMARY KEY (id);
 
 
 --
 -- Name: cgroups cgroups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY cgroups
+ALTER TABLE ONLY public.cgroups
     ADD CONSTRAINT cgroups_pkey PRIMARY KEY (id);
 
 
@@ -2341,7 +2391,7 @@ ALTER TABLE ONLY cgroups
 -- Name: colors colors_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY colors
+ALTER TABLE ONLY public.colors
     ADD CONSTRAINT colors_pkey PRIMARY KEY (id);
 
 
@@ -2349,7 +2399,7 @@ ALTER TABLE ONLY colors
 -- Name: components components_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY components
+ALTER TABLE ONLY public.components
     ADD CONSTRAINT components_pkey PRIMARY KEY (id);
 
 
@@ -2357,7 +2407,7 @@ ALTER TABLE ONLY components
 -- Name: countries countries_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY countries
+ALTER TABLE ONLY public.countries
     ADD CONSTRAINT countries_pkey PRIMARY KEY (id);
 
 
@@ -2365,7 +2415,7 @@ ALTER TABLE ONLY countries
 -- Name: creation_states creation_states_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY creation_states
+ALTER TABLE ONLY public.creation_states
     ADD CONSTRAINT creation_states_pkey PRIMARY KEY (id);
 
 
@@ -2373,7 +2423,7 @@ ALTER TABLE ONLY creation_states
 -- Name: ctypes ctypes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY ctypes
+ALTER TABLE ONLY public.ctypes
     ADD CONSTRAINT ctypes_pkey PRIMARY KEY (id);
 
 
@@ -2381,7 +2431,7 @@ ALTER TABLE ONLY ctypes
 -- Name: customer_contacts customer_contacts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY customer_contacts
+ALTER TABLE ONLY public.customer_contacts
     ADD CONSTRAINT customer_contacts_pkey PRIMARY KEY (id);
 
 
@@ -2389,7 +2439,7 @@ ALTER TABLE ONLY customer_contacts
 -- Name: cycle_types cycle_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY cycle_types
+ALTER TABLE ONLY public.cycle_types
     ADD CONSTRAINT cycle_types_pkey PRIMARY KEY (id);
 
 
@@ -2397,7 +2447,7 @@ ALTER TABLE ONLY cycle_types
 -- Name: duplicate_bike_groups duplicate_bike_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY duplicate_bike_groups
+ALTER TABLE ONLY public.duplicate_bike_groups
     ADD CONSTRAINT duplicate_bike_groups_pkey PRIMARY KEY (id);
 
 
@@ -2405,7 +2455,7 @@ ALTER TABLE ONLY duplicate_bike_groups
 -- Name: feedbacks feedbacks_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY feedbacks
+ALTER TABLE ONLY public.feedbacks
     ADD CONSTRAINT feedbacks_pkey PRIMARY KEY (id);
 
 
@@ -2413,7 +2463,7 @@ ALTER TABLE ONLY feedbacks
 -- Name: flavor_texts flavor_texts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY flavor_texts
+ALTER TABLE ONLY public.flavor_texts
     ADD CONSTRAINT flavor_texts_pkey PRIMARY KEY (id);
 
 
@@ -2421,7 +2471,7 @@ ALTER TABLE ONLY flavor_texts
 -- Name: frame_materials frame_materials_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY frame_materials
+ALTER TABLE ONLY public.frame_materials
     ADD CONSTRAINT frame_materials_pkey PRIMARY KEY (id);
 
 
@@ -2429,7 +2479,7 @@ ALTER TABLE ONLY frame_materials
 -- Name: front_gear_types front_gear_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY front_gear_types
+ALTER TABLE ONLY public.front_gear_types
     ADD CONSTRAINT front_gear_types_pkey PRIMARY KEY (id);
 
 
@@ -2437,7 +2487,7 @@ ALTER TABLE ONLY front_gear_types
 -- Name: handlebar_types handlebar_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY handlebar_types
+ALTER TABLE ONLY public.handlebar_types
     ADD CONSTRAINT handlebar_types_pkey PRIMARY KEY (id);
 
 
@@ -2445,7 +2495,7 @@ ALTER TABLE ONLY handlebar_types
 -- Name: integrations integrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY integrations
+ALTER TABLE ONLY public.integrations
     ADD CONSTRAINT integrations_pkey PRIMARY KEY (id);
 
 
@@ -2453,7 +2503,7 @@ ALTER TABLE ONLY integrations
 -- Name: listicles listicles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY listicles
+ALTER TABLE ONLY public.listicles
     ADD CONSTRAINT listicles_pkey PRIMARY KEY (id);
 
 
@@ -2461,7 +2511,7 @@ ALTER TABLE ONLY listicles
 -- Name: locations locations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY locations
+ALTER TABLE ONLY public.locations
     ADD CONSTRAINT locations_pkey PRIMARY KEY (id);
 
 
@@ -2469,7 +2519,7 @@ ALTER TABLE ONLY locations
 -- Name: lock_types lock_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY lock_types
+ALTER TABLE ONLY public.lock_types
     ADD CONSTRAINT lock_types_pkey PRIMARY KEY (id);
 
 
@@ -2477,7 +2527,7 @@ ALTER TABLE ONLY lock_types
 -- Name: locks locks_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY locks
+ALTER TABLE ONLY public.locks
     ADD CONSTRAINT locks_pkey PRIMARY KEY (id);
 
 
@@ -2485,7 +2535,7 @@ ALTER TABLE ONLY locks
 -- Name: mail_snippets mail_snippets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY mail_snippets
+ALTER TABLE ONLY public.mail_snippets
     ADD CONSTRAINT mail_snippets_pkey PRIMARY KEY (id);
 
 
@@ -2493,7 +2543,7 @@ ALTER TABLE ONLY mail_snippets
 -- Name: manufacturers manufacturers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY manufacturers
+ALTER TABLE ONLY public.manufacturers
     ADD CONSTRAINT manufacturers_pkey PRIMARY KEY (id);
 
 
@@ -2501,7 +2551,7 @@ ALTER TABLE ONLY manufacturers
 -- Name: memberships memberships_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY memberships
+ALTER TABLE ONLY public.memberships
     ADD CONSTRAINT memberships_pkey PRIMARY KEY (id);
 
 
@@ -2509,7 +2559,7 @@ ALTER TABLE ONLY memberships
 -- Name: normalized_serial_segments normalized_serial_segments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY normalized_serial_segments
+ALTER TABLE ONLY public.normalized_serial_segments
     ADD CONSTRAINT normalized_serial_segments_pkey PRIMARY KEY (id);
 
 
@@ -2517,7 +2567,7 @@ ALTER TABLE ONLY normalized_serial_segments
 -- Name: oauth_access_grants oauth_access_grants_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY oauth_access_grants
+ALTER TABLE ONLY public.oauth_access_grants
     ADD CONSTRAINT oauth_access_grants_pkey PRIMARY KEY (id);
 
 
@@ -2525,7 +2575,7 @@ ALTER TABLE ONLY oauth_access_grants
 -- Name: oauth_access_tokens oauth_access_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY oauth_access_tokens
+ALTER TABLE ONLY public.oauth_access_tokens
     ADD CONSTRAINT oauth_access_tokens_pkey PRIMARY KEY (id);
 
 
@@ -2533,7 +2583,7 @@ ALTER TABLE ONLY oauth_access_tokens
 -- Name: oauth_applications oauth_applications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY oauth_applications
+ALTER TABLE ONLY public.oauth_applications
     ADD CONSTRAINT oauth_applications_pkey PRIMARY KEY (id);
 
 
@@ -2541,7 +2591,7 @@ ALTER TABLE ONLY oauth_applications
 -- Name: organization_deals organization_deals_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY organization_deals
+ALTER TABLE ONLY public.organization_deals
     ADD CONSTRAINT organization_deals_pkey PRIMARY KEY (id);
 
 
@@ -2549,7 +2599,7 @@ ALTER TABLE ONLY organization_deals
 -- Name: organization_invitations organization_invitations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY organization_invitations
+ALTER TABLE ONLY public.organization_invitations
     ADD CONSTRAINT organization_invitations_pkey PRIMARY KEY (id);
 
 
@@ -2557,7 +2607,7 @@ ALTER TABLE ONLY organization_invitations
 -- Name: organizations organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY organizations
+ALTER TABLE ONLY public.organizations
     ADD CONSTRAINT organizations_pkey PRIMARY KEY (id);
 
 
@@ -2565,7 +2615,7 @@ ALTER TABLE ONLY organizations
 -- Name: other_listings other_listings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY other_listings
+ALTER TABLE ONLY public.other_listings
     ADD CONSTRAINT other_listings_pkey PRIMARY KEY (id);
 
 
@@ -2573,7 +2623,7 @@ ALTER TABLE ONLY other_listings
 -- Name: ownerships ownerships_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY ownerships
+ALTER TABLE ONLY public.ownerships
     ADD CONSTRAINT ownerships_pkey PRIMARY KEY (id);
 
 
@@ -2581,7 +2631,7 @@ ALTER TABLE ONLY ownerships
 -- Name: paints paints_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY paints
+ALTER TABLE ONLY public.paints
     ADD CONSTRAINT paints_pkey PRIMARY KEY (id);
 
 
@@ -2589,7 +2639,7 @@ ALTER TABLE ONLY paints
 -- Name: payments payments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY payments
+ALTER TABLE ONLY public.payments
     ADD CONSTRAINT payments_pkey PRIMARY KEY (id);
 
 
@@ -2597,7 +2647,7 @@ ALTER TABLE ONLY payments
 -- Name: propulsion_types propulsion_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY propulsion_types
+ALTER TABLE ONLY public.propulsion_types
     ADD CONSTRAINT propulsion_types_pkey PRIMARY KEY (id);
 
 
@@ -2605,7 +2655,7 @@ ALTER TABLE ONLY propulsion_types
 -- Name: public_images public_images_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public_images
+ALTER TABLE ONLY public.public_images
     ADD CONSTRAINT public_images_pkey PRIMARY KEY (id);
 
 
@@ -2613,7 +2663,7 @@ ALTER TABLE ONLY public_images
 -- Name: rear_gear_types rear_gear_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY rear_gear_types
+ALTER TABLE ONLY public.rear_gear_types
     ADD CONSTRAINT rear_gear_types_pkey PRIMARY KEY (id);
 
 
@@ -2621,7 +2671,7 @@ ALTER TABLE ONLY rear_gear_types
 -- Name: recovery_displays recovery_displays_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY recovery_displays
+ALTER TABLE ONLY public.recovery_displays
     ADD CONSTRAINT recovery_displays_pkey PRIMARY KEY (id);
 
 
@@ -2629,7 +2679,7 @@ ALTER TABLE ONLY recovery_displays
 -- Name: states states_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY states
+ALTER TABLE ONLY public.states
     ADD CONSTRAINT states_pkey PRIMARY KEY (id);
 
 
@@ -2637,7 +2687,7 @@ ALTER TABLE ONLY states
 -- Name: stolen_notifications stolen_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY stolen_notifications
+ALTER TABLE ONLY public.stolen_notifications
     ADD CONSTRAINT stolen_notifications_pkey PRIMARY KEY (id);
 
 
@@ -2645,7 +2695,7 @@ ALTER TABLE ONLY stolen_notifications
 -- Name: stolen_records stolen_records_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY stolen_records
+ALTER TABLE ONLY public.stolen_records
     ADD CONSTRAINT stolen_records_pkey PRIMARY KEY (id);
 
 
@@ -2653,7 +2703,7 @@ ALTER TABLE ONLY stolen_records
 -- Name: tweets tweets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY tweets
+ALTER TABLE ONLY public.tweets
     ADD CONSTRAINT tweets_pkey PRIMARY KEY (id);
 
 
@@ -2661,7 +2711,7 @@ ALTER TABLE ONLY tweets
 -- Name: user_emails user_emails_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_emails
+ALTER TABLE ONLY public.user_emails
     ADD CONSTRAINT user_emails_pkey PRIMARY KEY (id);
 
 
@@ -2669,7 +2719,7 @@ ALTER TABLE ONLY user_emails
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY users
+ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
 
 
@@ -2677,7 +2727,7 @@ ALTER TABLE ONLY users
 -- Name: wheel_sizes wheel_sizes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY wheel_sizes
+ALTER TABLE ONLY public.wheel_sizes
     ADD CONSTRAINT wheel_sizes_pkey PRIMARY KEY (id);
 
 
@@ -2685,329 +2735,329 @@ ALTER TABLE ONLY wheel_sizes
 -- Name: index_bike_organizations_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bike_organizations_on_bike_id ON bike_organizations USING btree (bike_id);
+CREATE INDEX index_bike_organizations_on_bike_id ON public.bike_organizations USING btree (bike_id);
 
 
 --
 -- Name: index_bike_organizations_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bike_organizations_on_organization_id ON bike_organizations USING btree (organization_id);
+CREATE INDEX index_bike_organizations_on_organization_id ON public.bike_organizations USING btree (organization_id);
 
 
 --
 -- Name: index_bikes_on_card_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_card_id ON bikes USING btree (card_id);
+CREATE INDEX index_bikes_on_card_id ON public.bikes USING btree (card_id);
 
 
 --
 -- Name: index_bikes_on_creation_state_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_creation_state_id ON bikes USING btree (creation_state_id);
+CREATE INDEX index_bikes_on_creation_state_id ON public.bikes USING btree (creation_state_id);
 
 
 --
 -- Name: index_bikes_on_current_stolen_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_current_stolen_record_id ON bikes USING btree (current_stolen_record_id);
+CREATE INDEX index_bikes_on_current_stolen_record_id ON public.bikes USING btree (current_stolen_record_id);
 
 
 --
 -- Name: index_bikes_on_cycle_type_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_cycle_type_id ON bikes USING btree (cycle_type_id);
+CREATE INDEX index_bikes_on_cycle_type_id ON public.bikes USING btree (cycle_type_id);
 
 
 --
 -- Name: index_bikes_on_manufacturer_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_manufacturer_id ON bikes USING btree (manufacturer_id);
+CREATE INDEX index_bikes_on_manufacturer_id ON public.bikes USING btree (manufacturer_id);
 
 
 --
 -- Name: index_bikes_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_organization_id ON bikes USING btree (creation_organization_id);
+CREATE INDEX index_bikes_on_organization_id ON public.bikes USING btree (creation_organization_id);
 
 
 --
 -- Name: index_bikes_on_paint_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_paint_id ON bikes USING btree (paint_id);
+CREATE INDEX index_bikes_on_paint_id ON public.bikes USING btree (paint_id);
 
 
 --
 -- Name: index_bikes_on_primary_frame_color_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_primary_frame_color_id ON bikes USING btree (primary_frame_color_id);
+CREATE INDEX index_bikes_on_primary_frame_color_id ON public.bikes USING btree (primary_frame_color_id);
 
 
 --
 -- Name: index_bikes_on_secondary_frame_color_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_secondary_frame_color_id ON bikes USING btree (secondary_frame_color_id);
+CREATE INDEX index_bikes_on_secondary_frame_color_id ON public.bikes USING btree (secondary_frame_color_id);
 
 
 --
 -- Name: index_bikes_on_stolen_lat_and_stolen_long; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_stolen_lat_and_stolen_long ON bikes USING btree (stolen_lat, stolen_long);
+CREATE INDEX index_bikes_on_stolen_lat_and_stolen_long ON public.bikes USING btree (stolen_lat, stolen_long);
 
 
 --
 -- Name: index_bikes_on_tertiary_frame_color_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_tertiary_frame_color_id ON bikes USING btree (tertiary_frame_color_id);
+CREATE INDEX index_bikes_on_tertiary_frame_color_id ON public.bikes USING btree (tertiary_frame_color_id);
 
 
 --
 -- Name: index_components_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_components_on_bike_id ON components USING btree (bike_id);
+CREATE INDEX index_components_on_bike_id ON public.components USING btree (bike_id);
 
 
 --
 -- Name: index_components_on_manufacturer_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_components_on_manufacturer_id ON components USING btree (manufacturer_id);
+CREATE INDEX index_components_on_manufacturer_id ON public.components USING btree (manufacturer_id);
 
 
 --
 -- Name: index_creation_states_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_creation_states_on_bike_id ON creation_states USING btree (bike_id);
+CREATE INDEX index_creation_states_on_bike_id ON public.creation_states USING btree (bike_id);
 
 
 --
 -- Name: index_creation_states_on_creator_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_creation_states_on_creator_id ON creation_states USING btree (creator_id);
+CREATE INDEX index_creation_states_on_creator_id ON public.creation_states USING btree (creator_id);
 
 
 --
 -- Name: index_creation_states_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_creation_states_on_organization_id ON creation_states USING btree (organization_id);
+CREATE INDEX index_creation_states_on_organization_id ON public.creation_states USING btree (organization_id);
 
 
 --
 -- Name: index_feedbacks_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_feedbacks_on_user_id ON feedbacks USING btree (user_id);
+CREATE INDEX index_feedbacks_on_user_id ON public.feedbacks USING btree (user_id);
 
 
 --
 -- Name: index_integrations_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_integrations_on_user_id ON integrations USING btree (user_id);
+CREATE INDEX index_integrations_on_user_id ON public.integrations USING btree (user_id);
 
 
 --
 -- Name: index_locks_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_locks_on_user_id ON locks USING btree (user_id);
+CREATE INDEX index_locks_on_user_id ON public.locks USING btree (user_id);
 
 
 --
 -- Name: index_mail_snippets_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_mail_snippets_on_organization_id ON mail_snippets USING btree (organization_id);
+CREATE INDEX index_mail_snippets_on_organization_id ON public.mail_snippets USING btree (organization_id);
 
 
 --
 -- Name: index_memberships_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_memberships_on_organization_id ON memberships USING btree (organization_id);
+CREATE INDEX index_memberships_on_organization_id ON public.memberships USING btree (organization_id);
 
 
 --
 -- Name: index_memberships_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_memberships_on_user_id ON memberships USING btree (user_id);
+CREATE INDEX index_memberships_on_user_id ON public.memberships USING btree (user_id);
 
 
 --
 -- Name: index_normalized_serial_segments_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_normalized_serial_segments_on_bike_id ON normalized_serial_segments USING btree (bike_id);
+CREATE INDEX index_normalized_serial_segments_on_bike_id ON public.normalized_serial_segments USING btree (bike_id);
 
 
 --
 -- Name: index_normalized_serial_segments_on_duplicate_bike_group_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_normalized_serial_segments_on_duplicate_bike_group_id ON normalized_serial_segments USING btree (duplicate_bike_group_id);
+CREATE INDEX index_normalized_serial_segments_on_duplicate_bike_group_id ON public.normalized_serial_segments USING btree (duplicate_bike_group_id);
 
 
 --
 -- Name: index_oauth_access_grants_on_token; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_oauth_access_grants_on_token ON oauth_access_grants USING btree (token);
+CREATE UNIQUE INDEX index_oauth_access_grants_on_token ON public.oauth_access_grants USING btree (token);
 
 
 --
 -- Name: index_oauth_access_tokens_on_refresh_token; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_oauth_access_tokens_on_refresh_token ON oauth_access_tokens USING btree (refresh_token);
+CREATE UNIQUE INDEX index_oauth_access_tokens_on_refresh_token ON public.oauth_access_tokens USING btree (refresh_token);
 
 
 --
 -- Name: index_oauth_access_tokens_on_resource_owner_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_oauth_access_tokens_on_resource_owner_id ON oauth_access_tokens USING btree (resource_owner_id);
+CREATE INDEX index_oauth_access_tokens_on_resource_owner_id ON public.oauth_access_tokens USING btree (resource_owner_id);
 
 
 --
 -- Name: index_oauth_access_tokens_on_token; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_oauth_access_tokens_on_token ON oauth_access_tokens USING btree (token);
+CREATE UNIQUE INDEX index_oauth_access_tokens_on_token ON public.oauth_access_tokens USING btree (token);
 
 
 --
 -- Name: index_oauth_applications_on_owner_id_and_owner_type; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_oauth_applications_on_owner_id_and_owner_type ON oauth_applications USING btree (owner_id, owner_type);
+CREATE INDEX index_oauth_applications_on_owner_id_and_owner_type ON public.oauth_applications USING btree (owner_id, owner_type);
 
 
 --
 -- Name: index_oauth_applications_on_uid; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_oauth_applications_on_uid ON oauth_applications USING btree (uid);
+CREATE UNIQUE INDEX index_oauth_applications_on_uid ON public.oauth_applications USING btree (uid);
 
 
 --
 -- Name: index_organization_invitations_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_organization_invitations_on_organization_id ON organization_invitations USING btree (organization_id);
+CREATE INDEX index_organization_invitations_on_organization_id ON public.organization_invitations USING btree (organization_id);
 
 
 --
 -- Name: index_organizations_on_slug; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_organizations_on_slug ON organizations USING btree (slug);
+CREATE UNIQUE INDEX index_organizations_on_slug ON public.organizations USING btree (slug);
 
 
 --
 -- Name: index_ownerships_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_ownerships_on_bike_id ON ownerships USING btree (bike_id);
+CREATE INDEX index_ownerships_on_bike_id ON public.ownerships USING btree (bike_id);
 
 
 --
 -- Name: index_ownerships_on_creator_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_ownerships_on_creator_id ON ownerships USING btree (creator_id);
+CREATE INDEX index_ownerships_on_creator_id ON public.ownerships USING btree (creator_id);
 
 
 --
 -- Name: index_ownerships_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_ownerships_on_user_id ON ownerships USING btree (user_id);
+CREATE INDEX index_ownerships_on_user_id ON public.ownerships USING btree (user_id);
 
 
 --
 -- Name: index_payments_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_payments_on_user_id ON payments USING btree (user_id);
+CREATE INDEX index_payments_on_user_id ON public.payments USING btree (user_id);
 
 
 --
 -- Name: index_public_images_on_imageable_id_and_imageable_type; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_public_images_on_imageable_id_and_imageable_type ON public_images USING btree (imageable_id, imageable_type);
+CREATE INDEX index_public_images_on_imageable_id_and_imageable_type ON public.public_images USING btree (imageable_id, imageable_type);
 
 
 --
 -- Name: index_recovery_displays_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_recovery_displays_on_stolen_record_id ON recovery_displays USING btree (stolen_record_id);
+CREATE INDEX index_recovery_displays_on_stolen_record_id ON public.recovery_displays USING btree (stolen_record_id);
 
 
 --
 -- Name: index_states_on_country_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_states_on_country_id ON states USING btree (country_id);
+CREATE INDEX index_states_on_country_id ON public.states USING btree (country_id);
 
 
 --
 -- Name: index_stolen_notifications_on_oauth_application_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_stolen_notifications_on_oauth_application_id ON stolen_notifications USING btree (oauth_application_id);
+CREATE INDEX index_stolen_notifications_on_oauth_application_id ON public.stolen_notifications USING btree (oauth_application_id);
 
 
 --
 -- Name: index_stolen_records_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_stolen_records_on_bike_id ON stolen_records USING btree (bike_id);
+CREATE INDEX index_stolen_records_on_bike_id ON public.stolen_records USING btree (bike_id);
 
 
 --
 -- Name: index_stolen_records_on_latitude_and_longitude; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_stolen_records_on_latitude_and_longitude ON stolen_records USING btree (latitude, longitude);
+CREATE INDEX index_stolen_records_on_latitude_and_longitude ON public.stolen_records USING btree (latitude, longitude);
 
 
 --
 -- Name: index_user_emails_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_user_emails_on_user_id ON user_emails USING btree (user_id);
+CREATE INDEX index_user_emails_on_user_id ON public.user_emails USING btree (user_id);
 
 
 --
 -- Name: index_users_on_password_reset_token; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_users_on_password_reset_token ON users USING btree (password_reset_token);
+CREATE INDEX index_users_on_password_reset_token ON public.users USING btree (password_reset_token);
 
 
 --
 -- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (version);
+CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING btree (version);
 
 
 --
@@ -3331,4 +3381,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170617222902');
 INSERT INTO schema_migrations (version) VALUES ('20170618205609');
 
 INSERT INTO schema_migrations (version) VALUES ('20170731023746');
+
+INSERT INTO schema_migrations (version) VALUES ('20180604023602');
 
