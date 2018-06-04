@@ -2,6 +2,8 @@
   Editing #{@user.email}
   - if @user.donor?
     <span class="donor-icon">D</span>
+  - if @user.paid_org?
+    <span class="paid-org-icon">O</span>
 
 %h3
   Donations

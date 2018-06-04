@@ -43,6 +43,8 @@
                 = link_to user.email, edit_admin_user_url(user)
                 - if user.donor?
                   <span class="donor-icon">D</span>
+                - elsif user.paid_org?
+                  <span class="paid-org-icon">O</span>
                 %span.less-strong-right
                   = user.id
             %td.medium-screens
