@@ -49,6 +49,13 @@
         #{ link_to "Mark your bike recovered", edit_bike_recovery_url(bike_id: @bike.id, token: @bike.current_stolen_record.find_or_create_recovery_link_token) }
       when you do!
 
+- if @vars[:donation_message]
+  .donate-message
+    %h5
+      Please consider #{ link_to 'donating', support_bike_index_url } to Bike Index!
+    %p
+      A donation will #{ link_to 'prioritize your listing', 'https://bikeindex.org/news/get-your-donations-in-this-summer-to-help-bike-index-master-bike-seaso' } and help us get your bike back to you. We're a 501(c)(3) nonprofit and depend on donations to operate
+
 - unless @ownership.claimed
   - claim_type = @vars[:registered_by_owner] ? 'Claim the' : 'Confirm this'
   = link_to "#{claim_type} #{ @bike.type }", bike_url(@bike), class: 'binx-button'
@@ -63,7 +70,8 @@
   = @organization.mail_snippet_body('security').html_safe
 - else
   - unless @bike.recovered
-    %hr
+    - unless @vars[:donation_message]
+      %hr
 
     %h2
       Protect your bike by following these locking guidelines.

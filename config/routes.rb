@@ -234,8 +234,8 @@ Bikeindex::Application.routes.draw do
   get '/auth/:provider/callback', to: 'integrations#create'
   get '/auth/failure', to: 'integrations#integrations_controller_creation_error'
 
-  %w(support_the_index support_the_bike_index protect_your_bike privacy terms
-     serials about where vendor_terms resources image_resources
+  %w(support_bike_index support_the_index support_the_bike_index protect_your_bike
+     serials about where vendor_terms resources image_resources privacy terms
      how_not_to_buy_stolen dev_and_design lightspeed).freeze.each do |page|
     get page, controller: 'info', action: page
   end

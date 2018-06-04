@@ -35,9 +35,13 @@ class InfoController < ApplicationController
   def image_resources
   end
 
-  def support_the_index
+  def support_bike_index
     @page_title = 'Support Bike Index'
     render layout: 'payments_layout'
+  end
+
+  def support_the_index
+    redirect_to support_bike_index_url
   end
 
   def support_the_bike_index

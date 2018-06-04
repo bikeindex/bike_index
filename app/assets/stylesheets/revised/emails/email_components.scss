@@ -11,6 +11,22 @@
   max-width: 100%;
 }
 
+.donate-message {
+  h5, p { text-align: center; }
+  h5 { font-size: 16px; }
+  p {
+    line-height: 1.5em;
+    margin: 8px 0 0;
+    opacity: .8;
+    font-size: 15px;
+    font-style: italic;
+  }
+  padding: $vertical-height 0;
+  border-top: 1px solid $red;
+  border-bottom: 1px solid $red;
+  margin: 0 0 2.5*$vertical-height;
+}
+
 .locking-demonstration {
   border: solid $vertical-height $email-light-bg;
   width: 100%;
