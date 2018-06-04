@@ -33,7 +33,7 @@
           - if bike.current_owner_exists
             - if bike.owner.donor?
               <span class="donor-icon">D</span>
-            - elsif user.paid_org?
+            - elsif bike.owner.paid_org?
               <span class="paid-org-icon">O</span>
         %td
           - if bike.manufacturer_other.present?
