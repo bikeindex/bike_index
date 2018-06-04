@@ -13,10 +13,16 @@
         = @bike.dl_from_attribute('owner_email')
         - if @bike.owner.present?
           = @bike.dl_list_item((link_to @bike.owner.email, edit_admin_user_url(@bike.owner)), 'Current Owner')
-          %dt Donor:
+          %dt Donor
           %dd
             - if @bike.owner.donor?
               TRUE!
+          %dt Paid Org
+          %dd
+            - if @bike.owner.paid_org?
+              - @bike.owner.organizations.paid.each do |organization|
+                <small>#{link_to organization.name, admin_organization_path(organization)}</small>
+                %br
         - else
           %strong
             Missing owner!

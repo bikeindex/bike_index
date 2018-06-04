@@ -71,10 +71,18 @@
                 = current_stolen_record.city
             %td.table-cell-check
               = "&#x2713;".html_safe if current_stolen_record.approved
+              - if bike.owner.donor?
+                <span class="donor-icon">D</span>
+              - elsif bike.owner.paid_org?
+                <span class="paid-org-icon">O</span>
           - else
             %td.large-screens
             %td
             %td
+              - if bike.owner.donor?
+                <span class="donor-icon">D</span>
+              - elsif bike.owner.paid_org?
+                <span class="paid-org-icon">O</span>
 
   .paginate-container
     = paginate @bikes
