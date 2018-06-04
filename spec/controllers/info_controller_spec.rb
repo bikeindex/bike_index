@@ -33,7 +33,7 @@ describe InfoController do
             get page.to_sym
             expect(response.status).to eq(200)
             expect(response).to render_template(page.to_sym)
-            if page == 'support_the_index'
+            if page == 'support_bike_index'
               expect(response).to render_with_layout('payments_layout')
             else
               expect(response).to render_with_layout('application_revised')
