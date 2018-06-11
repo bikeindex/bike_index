@@ -31,7 +31,7 @@ class BikeIndex.Init extends BikeIndex
     pageClasses =
       welcome_index: BikeIndex.WelcomeIndex
       info_where: BikeIndex.InfoWhere
-      info_support_the_index: BikeIndex.Payments
+      info_support_bike_index: BikeIndex.Payments
       payments_new: BikeIndex.Payments
       bikes_new: BikeIndex.BikesNew
       bikes_create: BikeIndex.BikesNew
