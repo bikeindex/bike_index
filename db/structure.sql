@@ -475,15 +475,14 @@ CREATE TABLE public.creation_states (
     id integer NOT NULL,
     bike_id integer,
     organization_id integer,
-    origin_string character varying,
+    origin character varying,
     is_bulk boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     is_pos boolean DEFAULT false NOT NULL,
     is_new boolean DEFAULT false NOT NULL,
     creator_id integer,
-    bulk_import_id integer,
-    origin integer
+    bulk_import_id integer
 );
 
 
@@ -3398,6 +3397,4 @@ INSERT INTO schema_migrations (version) VALUES ('20180624192035');
 INSERT INTO schema_migrations (version) VALUES ('20180624211320');
 
 INSERT INTO schema_migrations (version) VALUES ('20180624211323');
-
-INSERT INTO schema_migrations (version) VALUES ('20180624223538');
 
