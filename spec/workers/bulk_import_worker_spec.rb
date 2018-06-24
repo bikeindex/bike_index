@@ -78,10 +78,42 @@ describe BulkImportWorker do
   end
 
   describe "register bike" do
-    it "registers a bike" do
+    before { instance.bulk_import = bulk_import }
+    let(:row) { sample_csv_lines[0].map(&:to_sym).zip(csv_lines[1]).to_h }
+    context "with some extra bits" do
+      it "registers a bike" do
+        expect(Bike.count).to eq 0
+        expect do
+          instance.register_bike(row.merge(hidden: true, another_thing: '912913'))
+        end.to change(Bike, :count).by 1
+        bike = Bike.last
+        expect(bike.hidden).to be_falsey
+        row.each do |k, v|
+          pp k unless bike.send(k).to_s == v.to_s
+          expect(bike.send(k).to_s).to eq v.to_s
+        end
+        creation_state = Bike.creation_state
+        expect(creation_state.is_bulk).to be_truthy
+        # expect(creation_state.csv).to be_truthy
+      end
     end
     context "no_notify true" do
-      it "registers a bike without sending email"
+      let(:organization) { FactoryGirl.create(:organization) }
+      let!(:bulk_import) { FactoryGirl.create(:bulk_import, organization: organization, no_notify: true) }
+      xit "registers a bike without sending email" do
+        expect do
+          instance.register_bike(row)
+        end.to change(Bike, :count).by 1
+        bike = Bike.last
+        expect(bike.hidden).to be_falsey
+        row.each do |k, v|
+          pp k unless bike.send(k).to_s == v.to_s
+          expect(bike.send(k).to_s).to eq v.to_s
+        end
+        creation_state = Bike.creation_state
+        expect(creation_state.is_bulk).to be_truthy
+        # expect(creation_state.csv).to be_truthy
+      end
     end
   end
 end

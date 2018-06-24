@@ -7,7 +7,7 @@ class BulkImport < ActiveRecord::Base
   validates_uniqueness_of :file_url
   has_many :bikes
 
-  enum progress: VALID_PROGRESS
+  enum progress: VALID_PROGRESSES
 
   def file_import_errors
     import_errors["file"]

@@ -14,16 +14,19 @@ class BulkImportWorker
   end
 
   def process_csv(file)
-    return false if @bulk_import.finished? # If file failed to load, this will catch
+    return false if @bulk_import.finished? # If url fails to load, this will catch
     CSV.new(file, headers: true, header_converters: [:downcase, :symbol]).each do |r|
-      validate_headers(r.headers) unless @valid_headers
-      break false if @bulk_import.finished? # Check headers first, so we can break
+      validate_headers(r.headers) unless @valid_headers # Check headers first, so we can break if they fail
+      break false if @bulk_import.finished?
       register_bike(r.to_h)
     end
   end
 
   def register_bike(row)
-
+    b_param = BParam.create(creator_id: @bulk_import.user_id,
+                            params: row,
+                            origin: 'bulk_importer')
+    BikeCreator.new(b_param).create_bike
   end
 
   private
