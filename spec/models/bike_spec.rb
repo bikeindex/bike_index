@@ -752,7 +752,7 @@ describe Bike do
         bike_organization.reload
         expect(bike_organization.deleted_at).to be_within(1.second).of Time.now
         expect(bike.bike_organization_ids).to eq([])
-        bike.bike_organization_ids = organization.id
+        bike.bike_organization_ids = [organization.id]
         bike.reload
         expect(bike.bike_organization_ids).to eq([organization.id]) # despite uniqueness validation
       end
