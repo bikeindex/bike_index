@@ -9,7 +9,7 @@ class CreationState < ActiveRecord::Base
   def self.origins; VALID_ORIGINS.map(&:to_s) end
 
   def origin=(val) # ignore invalid origins
-    return nil unless self.class.origins.include?(val.downcase)
+    return true unless val.present? && self.class.origins.include?(val.downcase)
     super(val)
   end
 
