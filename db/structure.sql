@@ -299,7 +299,8 @@ CREATE TABLE public.bulk_imports (
     organization_id integer,
     user_id integer,
     file_url text,
-    bikes_imported integer,
+    progress integer DEFAULT 0,
+    no_notify boolean DEFAULT false,
     import_errors json DEFAULT '{}'::json,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
@@ -480,7 +481,8 @@ CREATE TABLE public.creation_states (
     updated_at timestamp without time zone NOT NULL,
     is_pos boolean DEFAULT false NOT NULL,
     is_new boolean DEFAULT false NOT NULL,
-    creator_id integer
+    creator_id integer,
+    bulk_import_id integer
 );
 
 
@@ -3390,7 +3392,9 @@ INSERT INTO schema_migrations (version) VALUES ('20170618205609');
 
 INSERT INTO schema_migrations (version) VALUES ('20170731023746');
 
-INSERT INTO schema_migrations (version) VALUES ('20180604023602');
-
 INSERT INTO schema_migrations (version) VALUES ('20180624192035');
+
+INSERT INTO schema_migrations (version) VALUES ('20180624211320');
+
+INSERT INTO schema_migrations (version) VALUES ('20180624211323');
 
