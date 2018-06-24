@@ -134,6 +134,10 @@ class User < ActiveRecord::Base
     donations > 900
   end
 
+  def paid_org?
+    organizations.paid.any?
+  end
+
   def admin_authorized(type)
     return true if superuser
     return case type

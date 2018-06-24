@@ -30,8 +30,11 @@
             = admin_display_date(bike.created_at)
         %td.medium-screens
           = bike.owner_email
-          - if bike.owner.donor?
-            <span class="donor-icon">D</span>
+          - if bike.current_owner_exists
+            - if bike.owner.donor?
+              <span class="donor-icon">D</span>
+            - elsif bike.owner.paid_org?
+              <span class="paid-org-icon">O</span>
         %td
           - if bike.manufacturer_other.present?
             %span.table-error
