@@ -27,3 +27,7 @@ Style/StringLiterals:
 
 NumericLiterals:
   Enabled: false
+
+Metrics/ModuleLength:
+  Exclude:
+    - '**/*_spec.rb'
