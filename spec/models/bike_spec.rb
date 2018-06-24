@@ -741,13 +741,20 @@ describe Bike do
   describe 'assignment of bike_organization_ids' do
     let(:bike) { FactoryGirl.create(:organization_bike) }
     let(:organization) { bike.organizations.first }
+    let(:bike_organization) { bike.bike_organizations.first }
     let(:organization_2) { FactoryGirl.create(:organization) }
     before { expect(bike.bike_organization_ids).to eq([organization.id]) }
     context 'no organization_ids' do
       it 'removes bike organizations' do
         expect(bike.bike_organization_ids).to eq([organization.id])
         bike.bike_organization_ids = ''
+        # Acts as paranoid
+        bike_organization.reload
+        expect(bike_organization.deleted_at).to be_within(1.second).of Time.now
         expect(bike.bike_organization_ids).to eq([])
+        bike.bike_organization_ids = organization.id
+        bike.reload
+        expect(bike.bike_organization_ids).to eq([organization.id]) # despite uniqueness validation
       end
     end
     context 'invalid organization_id' do
