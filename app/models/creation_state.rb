@@ -1,22 +1,26 @@
 class CreationState < ActiveRecord::Base
+  VALID_ORIGINS = %i(embed embed_extended embed_partial api_v1 api_v2 api_v3 csv_importer).freeze
   belongs_to :bike
   belongs_to :organization
-  belongs_to :creator, class_name: 'User'
+  belongs_to :creator, class_name: "User"
 
-  def self.origins
-    %w(embed embed_extended embed_partial api_v1 api_v2).freeze
+  enum origin: VALID_ORIGINS
+
+  def self.origins; VALID_ORIGINS.map(&:to_s) end
+
+  def origin=(val) # ignore invalid origins
+    return nil unless self.class.origins.include?(val.downcase)
+    super(val)
   end
 
   def creation_description
-    return 'pos' if is_pos
-    return 'bulk reg' if is_bulk
+    return "pos" if is_pos
+    return "bulk reg" if is_bulk
     return "#{origin.humanize.downcase}" if origin
   end
 
-  before_validation :ensure_permitted_origin
-  def ensure_permitted_origin
-    self.origin = nil unless self.class.origins.include?(origin)
-    true
+  def set_origin_from_origin_string!
+    update_attribute :origin, origin_string
   end
 
   after_create :create_bike_organization

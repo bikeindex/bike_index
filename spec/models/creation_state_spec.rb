@@ -11,7 +11,6 @@ RSpec.describe CreationState, type: :model do
     context 'unknown origin' do
       it 'ignores an unknown origin' do
         creation_state = CreationState.new(origin: 'SOMEwhere', bike_id: 2)
-        creation_state.ensure_permitted_origin
         expect(creation_state.origin).to be_nil
       end
     end
@@ -19,13 +18,8 @@ RSpec.describe CreationState, type: :model do
       let(:origin) { CreationState.origins.last }
       it 'uses the origin' do
         creation_state = CreationState.new(origin: origin)
-        creation_state.ensure_permitted_origin
         expect(creation_state.origin).to eq origin
       end
-    end
-    it 'has a before_save callback for ensure_permitted_origin' do
-      expect(CreationState._validation_callbacks.select { |cb| cb.kind.eql?(:before) }
-        .map(&:raw_filter).include?(:ensure_permitted_origin)).to be_truthy
     end
   end
 
