@@ -1,5 +1,5 @@
 class CreationState < ActiveRecord::Base
-  VALID_ORIGINS = %i(embed embed_extended embed_partial api_v1 api_v2 api_v3 csv_importer).freeze
+  VALID_ORIGINS = %w(embed embed_extended embed_partial api_v1 api_v2 api_v3 csv_importer).freeze
   belongs_to :bike
   belongs_to :organization
   belongs_to :creator, class_name: "User"
@@ -7,11 +7,6 @@ class CreationState < ActiveRecord::Base
   enum origin: VALID_ORIGINS
 
   def self.origins; VALID_ORIGINS.map(&:to_s) end
-
-  def origin=(val) # ignore invalid origins
-    return true unless val.present? && self.class.origins.include?(val.downcase)
-    super(val)
-  end
 
   def creation_description
     return "pos" if is_pos
