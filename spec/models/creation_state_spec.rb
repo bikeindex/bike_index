@@ -10,9 +10,8 @@ RSpec.describe CreationState, type: :model do
   describe 'origin' do
     context 'known origin' do
       let(:origin) { CreationState.origins.last }
-      xit 'uses the origin' do
+      it 'uses the origin' do
         creation_state = CreationState.new(origin: origin)
-        pp creation_state, creation_state.origin
         expect(creation_state.origin).to eq origin
       end
     end
