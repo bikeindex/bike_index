@@ -1,5 +1,5 @@
 class BulkImport < ActiveRecord::Base
-  VALID_PROGRESS = %i[pending ongoing finished].freeze
+  VALID_PROGRESSES = %i[pending ongoing finished].freeze
 
   belongs_to :organization
   belongs_to :user
