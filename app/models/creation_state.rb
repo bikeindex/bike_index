@@ -2,9 +2,10 @@ class CreationState < ActiveRecord::Base
   belongs_to :bike
   belongs_to :organization
   belongs_to :creator, class_name: 'User'
+  belongs_to :bulk_import
 
   def self.origins
-    %w(embed embed_extended embed_partial api_v1 api_v2).freeze
+    %w(embed embed_extended embed_partial api_v1 api_v2 bulk_import).freeze
   end
 
   def creation_description

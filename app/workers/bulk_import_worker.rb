@@ -1,30 +1,34 @@
+require 'csv'
+
 class BulkImportWorker
   include Sidekiq::Worker
-  sidekiq_options queue: 'afterward' # Because it's low priority!
+  sidekiq_options queue: "afterward" # Because it's low priority!
   sidekiq_options backtrace: true
 
-  attr_accessor :organization, :bulk_import
+  attr_accessor :bulk_import
 
-  def perform(file_url, organization_id, user_id = nil)
-    existing = BulkImport.where(file_url: file_url, organization_id: organization_id).first
-    return existing if existing.present?
-    @organization = Organization.find organization_id
-    @bulk_import = BulkImport.create(file_url: file_url, organization_id: organization_id, user_id: user_id)
-    process_import(file_url)
+  def perform(bulk_import_id)
+    @bulk_import = BulkImport.find(bulk_import_id)
+
+    process_csv_file(@bulk_import.file)
   end
 
-  def csv_from_url(file_url)
-    CSV.foreach(file_url, headers: true, header_converters: :symbol) { |r| register_bike(r) }
+  def process_csv_file(file)
+    CSV.new(file, headers: true, header_converters: :symbol) do |r|
+      break if @bulk_import.file_import_errors.present?
+      register_bike(r)
+    end
   end
 
   def register_bike(row)
-    validate_headers(r.keys) unless @valid_headers
+    validate_headers(r.keys) unless defined?(@valid_headers)
   end
 
   private
 
   def validate_headers(attrs)
     @valid_headers = (attrs & %i[manufacturer email serial]).count == 3
+    # if @valid_headers
   end
 
   def permitted_csv_attrs

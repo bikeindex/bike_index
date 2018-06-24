@@ -5,6 +5,8 @@ class CreateBulkImports < ActiveRecord::Migration
       t.references :user
       t.text :file_url
       t.integer :bikes_imported
+      t.integer :progress, default: 0
+      t.boolean :no_notify, default: false
       t.json :import_errors, default: {}
 
       t.timestamps null: false

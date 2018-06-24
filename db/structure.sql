@@ -133,7 +133,8 @@ CREATE TABLE public.bike_organizations (
     bike_id integer,
     organization_id integer,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    deleted_at timestamp without time zone
 );
 
 
@@ -2739,6 +2740,13 @@ CREATE INDEX index_bike_organizations_on_bike_id ON public.bike_organizations US
 
 
 --
+-- Name: index_bike_organizations_on_deleted_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_organizations_on_deleted_at ON public.bike_organizations USING btree (deleted_at);
+
+
+--
 -- Name: index_bike_organizations_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3383,4 +3391,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170618205609');
 INSERT INTO schema_migrations (version) VALUES ('20170731023746');
 
 INSERT INTO schema_migrations (version) VALUES ('20180604023602');
+
+INSERT INTO schema_migrations (version) VALUES ('20180624192035');
 

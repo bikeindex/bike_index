@@ -23,6 +23,7 @@ class Bike < ActiveRecord::Base
   belongs_to :current_stolen_record, class_name: 'StolenRecord'
   belongs_to :creator, class_name: 'User' # to be deprecated and removed
   belongs_to :creation_organization, class_name: 'Organization' # to be deprecated and removed
+  belongs_to :bulk_import
 
   has_many :bike_organizations, dependent: :destroy
   has_many :organizations, through: :bike_organizations
