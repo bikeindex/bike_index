@@ -4,7 +4,7 @@ class CreationState < ActiveRecord::Base
   belongs_to :creator, class_name: 'User'
 
   def self.origins
-    %w(embed embed_extended embed_partial api_v1 api_v2 bulk_import).freeze
+    %w(embed embed_extended embed_partial api_v1 api_v2 bulk_import_worker).freeze
   end
 
   def creation_description
