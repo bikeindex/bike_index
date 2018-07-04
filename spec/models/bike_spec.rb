@@ -217,6 +217,15 @@ describe Bike do
     end
   end
 
+  describe 'cleaned_error_messages' do
+    let(:errors) { ["Manufacturer can't be blank", "Bike can't be blank", "Association error Ownership wasn't saved. Are you sure the bike was created?"] }
+    it "removes error messages we don't want to show users" do
+      bike = Bike.new
+      errors.each { |e| bike.errors.add(:base, e) }
+      expect(bike.cleaned_error_messages.length).to eq(1)
+    end
+  end
+
   describe 'authorize_bike_for_user!' do
     let(:bike) { ownership.bike }
     let(:creator) { ownership.creator }

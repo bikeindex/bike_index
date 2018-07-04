@@ -107,7 +107,7 @@ class BikesController < ApplicationController
                                  origin: (params[:bike][:embeded_extended] ? 'embed_extended' : 'embed'))
       @bike = BikeCreator.new(@b_param).create_bike
       if @bike.errors.any?
-        @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
+        @b_param.update_attributes(bike_errors: @bike.cleaned_error_messages)
         flash[:error] = @b_param.bike_errors.to_sentence
         if params[:bike][:embeded_extended]
           redirect_to embed_extended_organization_url(id: @bike.creation_organization.slug, b_param_id_token: @b_param.id_token) and return
@@ -130,7 +130,7 @@ class BikesController < ApplicationController
       @b_param.clean_params(permitted_bparams)
       @bike = BikeCreator.new(@b_param).create_bike
       if @bike.errors.any?
-        @b_param.update_attributes(bike_errors: @bike.errors.full_messages)
+        @b_param.update_attributes(bike_errors: @bike.cleaned_error_messages)
         redirect_to new_bike_url(b_param_token: @b_param.id_token)
       else
         flash[:success] = 'Bike successfully added to the index!'

@@ -110,15 +110,9 @@ class BParam < ActiveRecord::Base
   def clean_params(updated_params = {}) # So we can pass in the params
     self.params ||= { bike: {} } # ensure valid json object
     self.params = params.with_indifferent_access.deep_merge(updated_params.with_indifferent_access)
-    clean_errors
     massage_if_v2
     set_foreign_keys
     self
-  end
-
-  def clean_errors # This is not what should happen - it should use the cleaned_error_messages method on bicycle. Fixing this soon
-    return true unless bike_errors.present?
-    self.bike_errors = bike_errors.delete_if { |a| a[/(bike can.t be blank|are you sure the bike was created)/i] }
   end
 
   def massage_if_v2
