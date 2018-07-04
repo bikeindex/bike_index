@@ -52,9 +52,9 @@
           %td
             = link_to organization.name, admin_organization_url(organization)
             %small.less-strong.large-screens
-              = organization.org_type
+              = "paid" if organization.is_paid
           %td
-            = 'f' unless organization.approved
+            = "&#x2713;".html_safe if organization.approved
           %td.medium-screens
             = admin_display_date(organization.created_at)
           %td
