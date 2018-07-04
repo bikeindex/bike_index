@@ -16,7 +16,7 @@ class Admin::BulkImportsController < Admin::BaseController
   def show; end
 
   def new
-    @bulk_import ||= BulkImport.new
+    @bulk_import = BulkImport.new
   end
 
   def create

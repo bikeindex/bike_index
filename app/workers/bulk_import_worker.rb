@@ -2,7 +2,7 @@ require 'csv'
 
 class BulkImportWorker
   include Sidekiq::Worker
-  sidekiq_options queue: "afterward" # Because it's low priority!
+  sidekiq_options queue: "afterwards" # Because it's low priority!
   sidekiq_options backtrace: true
 
   attr_accessor :bulk_import, :line_errors # Only necessary for testing

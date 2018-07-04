@@ -3,7 +3,7 @@ class BulkImport < ActiveRecord::Base
 
   belongs_to :organization
   belongs_to :user
-  validates_presence_of :user_id, :file_url
+  validates_presence_of :file_url
   validates_uniqueness_of :file_url
   has_many :creation_states
   has_many :bikes, through: :creation_states
