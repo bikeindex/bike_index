@@ -10,6 +10,8 @@ class BulkImport < ActiveRecord::Base
 
   enum progress: VALID_PROGRESSES
 
+  before_save :validate_creator_present
+
   def file_import_errors
     import_errors["file"]
   end
@@ -26,6 +28,15 @@ class BulkImport < ActiveRecord::Base
 
   def send_email
     !no_notify
+  end
+
+  def creator
+    organization && organization.auto_user || user
+  end
+
+  def validate_creator_present
+    return true if creator.present?
+    add_file_error("Needs to have a user or an organization with an auto user")
   end
 
   def file
