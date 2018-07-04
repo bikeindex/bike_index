@@ -4,7 +4,7 @@ describe BulkImportWorker do
   let(:subject) { BulkImportWorker }
   let(:instance) { subject.new }
   it { is_expected.to be_processed_in :afterward }
-  let(:bulk_import) { FactoryGirl.create(:bulk_import) }
+  let(:bulk_import) { FactoryGirl.create(:bulk_import, progress: "pending") }
   let!(:black) { FactoryGirl.create(:color, name: "Black") } # Because we use it as a default color
 
   let(:sample_csv_lines) do
@@ -62,13 +62,14 @@ describe BulkImportWorker do
       let!(:surly) { FactoryGirl.create(:manufacturer, name: "Surly") }
       let!(:trek) { FactoryGirl.create(:manufacturer, name: "Trek") }
       let(:file_url) { "https://gist.githubusercontent.com/sethherr/b003843d49aa2d6f6888b4889079b9ba/raw/7f65da1db0a2ea3fd51737aca6e5a5080d60dda9/test_bulk_import.csv" }
-      let!(:bulk_import) { FactoryGirl.create(:bulk_import, file_url: file_url) }
+      let!(:bulk_import) { FactoryGirl.create(:bulk_import, file_url: file_url, progress: "pending") }
       it "creates the bikes, doesn't have any errors" do
         VCR.use_cassette("BulkImportWorker-file-success") do
           expect do
             instance.perform(bulk_import.id)
           end.to change(Bike, :count).by 2
           bulk_import.reload
+          expect(bulk_import.progress).to eq "finished"
           expect(bulk_import.bikes.count).to eq 2
           expect(bulk_import.file_import_errors).to_not be_present
 
@@ -99,6 +100,7 @@ describe BulkImportWorker do
           instance.process_csv(csv_string)
           bulk_import.reload
           expect(bulk_import.file_import_errors.to_s).to match(/invalid csv headers/i)
+          expect(bulk_import.progress).to eq "finished"
         end
       end
       context "with an invalid header" do
@@ -108,6 +110,7 @@ describe BulkImportWorker do
           instance.process_csv(csv_string)
           bulk_import.reload
           expect(bulk_import.file_import_errors.to_s).to match(/invalid csv headers/i)
+          expect(bulk_import.progress).to eq "finished"
         end
       end
       context "with failed row" do
@@ -118,6 +121,7 @@ describe BulkImportWorker do
           instance.process_csv(csv_string)
           expect(instance.line_errors.count).to eq 1
           expect(instance.line_errors.first).to eq target_line_error
+          expect(bulk_import.progress).to eq "ongoing"
         end
       end
       context "with two valid bikes" do
@@ -129,6 +133,7 @@ describe BulkImportWorker do
           instance.process_csv(csv_string)
           bulk_import.reload
           expect(bulk_import.import_errors).to_not be_present
+          expect(bulk_import.progress).to eq "ongoing"
         end
       end
     end

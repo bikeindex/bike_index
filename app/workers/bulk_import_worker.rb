@@ -70,7 +70,8 @@ class BulkImportWorker
 
   def validate_headers(attrs)
     @valid_headers = (attrs & %i[manufacturer email serial]).count == 3
-    return true if @valid_headers
+    # Update the progress in here, since we're successfully processing the file right now
+    return @bulk_import.update_attribute :progress, "ongoing" if @valid_headers
     @bulk_import.add_file_error("Invalid CSV Headers: #{attrs}")
   end
 
