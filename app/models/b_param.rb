@@ -116,7 +116,7 @@ class BParam < ActiveRecord::Base
     self
   end
 
-  def clean_errors
+  def clean_errors # This is not what should happen - it should use the cleaned_error_messages method on bicycle. Fixing this soon
     return true unless bike_errors.present?
     self.bike_errors = bike_errors.delete_if { |a| a[/(bike can.t be blank|are you sure the bike was created)/i] }
   end

@@ -23,7 +23,6 @@ class Bike < ActiveRecord::Base
   belongs_to :current_stolen_record, class_name: 'StolenRecord'
   belongs_to :creator, class_name: 'User' # to be deprecated and removed
   belongs_to :creation_organization, class_name: 'Organization' # to be deprecated and removed
-  belongs_to :bulk_import
 
   has_many :bike_organizations, dependent: :destroy
   has_many :organizations, through: :bike_organizations
@@ -110,6 +109,10 @@ class Bike < ActiveRecord::Base
     def admin_text_search(query)
       query.present? ? admin_search(query) : all
     end
+  end
+
+  def cleaned_error_messages # We don't actually want to show these messages to the user, since they just tell us the bike wasn't created
+    errors.full_messages.reject { |m| m[/(bike can.t be blank|are you sure the bike was created)/i] }
   end
 
   def get_listing_order

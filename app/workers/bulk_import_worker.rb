@@ -5,20 +5,26 @@ class BulkImportWorker
   sidekiq_options queue: "afterward" # Because it's low priority!
   sidekiq_options backtrace: true
 
-  attr_accessor :bulk_import
+  attr_accessor :bulk_import, :line_errors # Only necessary for testing
 
   def perform(bulk_import_id)
     @bulk_import = BulkImport.find(bulk_import_id)
     return false unless process_csv(@bulk_import.file)
-    @bulk_import.update_attributes(progress: "finished")
+    @bulk_import.progress = "finished"
+    return @bulk_import.save unless @line_errors.any?
+    # Using update_attribute here to avoid validation checks that sometimes block updating postgres json in rails
+    @bulk_import.update_attribute :import_errors, (@bulk_import.import_errors || {}).merge("line" => @line_errors.compact)
   end
 
   def process_csv(file)
     return false if @bulk_import.finished? # If url fails to load, this will catch
-    CSV.new(file, headers: true, header_converters: [:downcase, :symbol]).each do |r|
-      validate_headers(r.headers) unless @valid_headers # Check headers first, so we can break if they fail
+    @line_errors = @bulk_import.line_import_errors || []
+    CSV.new(file, headers: true, header_converters: %i[downcase symbol]).each_with_index do |row, index|
+      validate_headers(row.headers) unless @valid_headers # Check headers first, so we can break if they fail
       break false if @bulk_import.finished?
-      register_bike(row_to_b_param_hash(r.to_h))
+      bike = register_bike(row_to_b_param_hash(row.to_h))
+      next if bike.id.present?
+      @line_errors << [index + 1, bike.cleaned_error_messages]
     end
   end
 
@@ -30,19 +36,34 @@ class BulkImportWorker
   end
 
   def row_to_b_param_hash(row)
+    # Set a default color of black, since sometimes there aren't colors in imports
+    color = row[:color].present? ? row[:color] : "Black"
+    # Set default manufacture, since sometimes manufacture is blank
+    manufacturer = row[:manufacturer].present? ? row[:manufacturer] : "Unknown"
     {
+      bulk_import_id: @bulk_import.id,
       bike: {
         is_bulk: true,
-        manufacturer_id: row[:manufacturer],
+        manufacturer_id: manufacturer,
         owner_email: row[:email],
-        color: row[:color],
-        serial_number: row[:serial],
+        color: color,
+        serial_number: rescue_blank_serial(row[:serial]),
         year: row[:year],
         frame_model: row[:model],
         send_email: @bulk_import.send_email,
         creation_organization_id: @bulk_import.organization_id
       }
     }
+  end
+
+  def rescue_blank_serial(serial)
+    return "absent" unless serial.present?
+    serial.strip!
+    if ["n.?a", "none", "unkn?own"].any? { |m| serial.match(/\A#{m}\z/i).present? }
+      "absent"
+    else
+      serial
+    end
   end
 
   private
@@ -53,7 +74,8 @@ class BulkImportWorker
     @bulk_import.add_file_error("Invalid CSV Headers: #{attrs}")
   end
 
-  def permitted_csv_attrs # Mayber there is a way to rename the headers, ignoring for now
+  def permitted_csv_attrs
+    # Mayber there is a way to rename the headers, simple solution for now
     {
       manufacturer: :manufacturer_id,
       model: :frame_model,

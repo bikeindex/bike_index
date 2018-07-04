@@ -5,7 +5,8 @@ class BulkImport < ActiveRecord::Base
   belongs_to :user
   validates_presence_of :user_id, :file_url
   validates_uniqueness_of :file_url
-  has_many :bikes
+  has_many :creation_states
+  has_many :bikes, through: :creation_states
 
   enum progress: VALID_PROGRESSES
 
@@ -19,6 +20,7 @@ class BulkImport < ActiveRecord::Base
 
   def add_file_error(error_msg)
     self.progress = "finished"
+    # Using update_attribute here to avoid validation checks that sometimes block updating postgres json in rails
     update_attribute :import_errors, (import_errors || {}).merge("file" => [file_import_errors, error_msg].compact)
   end
 
