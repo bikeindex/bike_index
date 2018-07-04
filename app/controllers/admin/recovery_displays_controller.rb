@@ -2,7 +2,9 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
   before_filter :find_recovery_displays, only: [:edit, :update, :destroy]
 
   def index
-    @recovery_displays = RecoveryDisplay.all
+    page = params[:page] || 1
+    per_page = params[:per_page] || 50
+    @recovery_displays = RecoveryDisplay.page(page).per(per_page)
   end
 
   def new
