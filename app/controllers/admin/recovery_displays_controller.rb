@@ -4,7 +4,7 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 50
-    @recovery_displays = RecoveryDisplay.page(page).per(per_page)
+    @recovery_displays = RecoveryDisplay.order(created_at: :desc).page(page).per(per_page)
   end
 
   def new
