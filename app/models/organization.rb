@@ -70,6 +70,10 @@ class Organization < ActiveRecord::Base
   end
 
   before_save :set_and_clean_attributes
+  before_save :set_access_token
+  before_save :set_auto_user
+  before_save :set_locations_shown
+
   def set_and_clean_attributes
     self.name = strip_tags(name)
     self.name = "Stop messing about" unless name[/\d|\w/].present?
@@ -95,7 +99,6 @@ class Organization < ActiveRecord::Base
     org_type == 'school'
   end
 
-  before_save :set_auto_user
   def set_auto_user
     if embedable_user_email.present?
       u = User.fuzzy_email_find(embedable_user_email)
@@ -118,7 +121,6 @@ class Organization < ActiveRecord::Base
     is_paid && avatar.present?
   end
 
-  before_save :set_locations_shown
   def set_locations_shown
     # Locations set themselves on save
     locations.each { |l| l.save unless l.shown == allowed_show }
@@ -128,14 +130,8 @@ class Organization < ActiveRecord::Base
     is_suspended?
   end
 
-  before_save :set_access_token
   def set_access_token
     generate_access_token unless self.access_token.present?
-  end
-
-  after_save :clear_map_cache
-  def clear_map_cache
-    Rails.cache.delete "views/info_where_page"
   end
 
   def generate_access_token

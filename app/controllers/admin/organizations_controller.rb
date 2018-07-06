@@ -75,7 +75,7 @@ class Admin::OrganizationsController < Admin::BaseController
     (%w(available_invitation_count sent_invitation_count name short_name slug website
        show_on_map is_suspended org_type embedable_user_email auto_user_id lock_show_on_map
        api_access_approved access_token new_bike_notification avatar avatar_cache
-       lightspeed_cloud_api_key use_additional_registration_field approved is_paid
+       lightspeed_cloud_api_key use_additional_registration_field approved is_paid show_bulk_import
       ).map(&:to_sym) + [locations_attributes: permitted_locations_params]).freeze
   end
 
