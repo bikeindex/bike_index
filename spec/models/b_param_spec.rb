@@ -24,7 +24,6 @@ describe BParam do
         b_param = BParam.new
         expect(b_param).to receive(:set_foreign_keys)
         expect(b_param).to receive(:massage_if_v2)
-        expect(b_param).to receive(:clean_errors)
         b_param.clean_params(bike: { cool: 'lol' }.as_json)
         expect(b_param.params['bike']['cool']).to eq('lol') # indifferent access
       end
@@ -110,15 +109,6 @@ describe BParam do
       expect(b_param).to receive(:set_handlebar_type_key).and_return(true)
       expect(b_param).to receive(:set_frame_material_key).and_return(true)
       b_param.set_foreign_keys
-    end
-  end
-
-  describe 'clean_errors' do
-    it "removes error messages we don't want to show users" do
-      errors = ["Manufacturer can't be blank", "Bike can't be blank", "Association error Ownership wasn't saved. Are you sure the bike was created?"]
-      b_param = BParam.new(bike_errors: errors)
-      b_param.clean_errors
-      expect(b_param.bike_errors.length).to eq(1)
     end
   end
 

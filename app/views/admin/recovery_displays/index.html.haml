@@ -4,7 +4,10 @@
       Recoveries to display
     = link_to "New recovery display", new_admin_recovery_display_url, class: "button-green sharing-links"
   %p 
-    Displaying #{pluralize(@recovery_displays.count, "recovery")}.
+    #{pluralize(RecoveryDisplay.count, "recovery display")}
+
+  .paginate-container
+    = paginate @recovery_displays
 
   %table.table.table-striped.table-bordered.padded
     %thead

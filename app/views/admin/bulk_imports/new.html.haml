@@ -1,0 +1,39 @@
+%header.with-subtitle
+  %h1
+    New Bulk Import
+.clearfix{ style: "margin-top: 40px; margin-bottom: 100px;" }
+  .form.form-horizontal#chosen-container
+    = form_for [:admin, @bulk_import] do |f|
+      - if @bulk_import.errors.any?
+        #alert-block
+          .alert.alert-error
+            %h4
+              Please fix the following 
+              = pluralize(@bulk_import.errors.count, "error")
+            %ul
+              - @bulk_import.errors.full_messages.each do |msg|
+                %li
+                  = msg
+
+      .row-fluid
+        .span6
+          .control-group.chosen-select
+            = f.label :organization_id, class: "control-label"
+            .controls
+              = f.collection_select(:organization_id, Organization.all, :id, :name, prompt: "Choose organization")
+        .span6
+          .control-group
+            = f.label :file, "CSV", class: "control-label"
+            .controls
+              = f.file_field :file
+      .row-fluid
+        .controls.radio-controls
+          %label.checkbox
+            = f.check_box :no_notify
+            Don't sent emails to registrations
+
+
+      .clearfix
+        .padded
+          = f.submit 'Create', class: 'button-green pull-right'
+    
