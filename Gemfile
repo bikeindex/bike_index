@@ -141,4 +141,6 @@ group :test do
   gem 'guard-rspec', '~> 4.6.4', require: false
   gem 'guard-rubocop', require: false
   gem 'guard-livereload', require: false
+  gem 'vcr' # Stub external HTTP requests
+  gem 'webmock' # mocking for VCR
 end

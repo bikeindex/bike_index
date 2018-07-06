@@ -111,6 +111,10 @@ class Bike < ActiveRecord::Base
     end
   end
 
+  def cleaned_error_messages # We don't actually want to show these messages to the user, since they just tell us the bike wasn't created
+    errors.full_messages.reject { |m| m[/(bike can.t be blank|are you sure the bike was created)/i] }
+  end
+
   def get_listing_order
     return current_stolen_record.date_stolen.to_time.to_i.abs if stolen && current_stolen_record.present?
     t = updated_at.to_time.to_i/10000

@@ -1,0 +1,35 @@
+%p
+  Created: 
+  = @bulk_import.created_at.strftime("%-I:%M %p on %-m/%-d/%Y")
+
+%p
+  Progress:
+  = @bulk_import.progress
+
+%p
+  File:
+  = link_to @bulk_import.file_url.truncate(25), @bulk_import.file_url
+
+%p
+  User:
+  - if @bulk_import.user.present?
+    = link_to @bulk_import.user.display_name, admin_user_path(@bulk_import.user)
+  - else
+    None
+%p
+  Organization:
+  - if @bulk_import.organization.present?
+    = link_to @bulk_import.organization.name, admin_organization_path(@bulk_import.organization)
+  - else
+    None
+
+%hr
+%h2 Errors
+- if @bulk_import.import_errors.present?
+  %pre
+    = @bulk_import.import_errors
+
+%hr
+%h2 Bikes
+%table.table.table-striped.table-bordered
+  = render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: @bulk_import.bikes }

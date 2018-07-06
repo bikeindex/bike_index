@@ -21,5 +21,13 @@ Style/AndOr:
 ParameterLists:
   CountKeywordArgs: false
 
+# https://anti-pattern.com/always-use-double-quoted-strings-in-ruby
+Style/StringLiterals:
+  EnforcedStyle: double_quotes # Always do it, lower cost cognitively
+
 NumericLiterals:
   Enabled: false
+
+Metrics/ModuleLength:
+  Exclude:
+    - '**/*_spec.rb'

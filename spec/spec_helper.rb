@@ -1,5 +1,13 @@
 ENV['BASE_URL'] = 'http://test.host' # Assign here because only one .env file
 require 'sidekiq/testing'
+require 'vcr'
+
+VCR.configure do |config|
+  config.cassette_library_dir = 'spec/vcr_cassettes'
+  config.allow_http_connections_when_no_cassette = true
+  config.hook_into :webmock
+end
+
 if ENV['CODECLIMATE_REPO_TOKEN']
   require 'codeclimate-test-reporter'
   CodeClimate::TestReporter.start

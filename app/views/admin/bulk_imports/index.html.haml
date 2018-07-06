@@ -1,0 +1,53 @@
+%section.full-screen-table
+  %header.with-subtitle
+    %h1
+      Bulk Imports
+    = link_to "New bulk import", new_admin_bulk_import_url, class: "button-green sharing-links"
+  %p 
+    #{pluralize(BulkImport.count, "bulk imports")}
+
+  .paginate-container
+    = paginate @bulk_imports
+
+  %table.table.table-striped.table-bordered.padded
+    %thead
+      %th
+        Date
+      %th
+        Progress
+      %th
+        Errors
+      %th
+        Creator
+      %th
+        Organization
+      %th
+        Bikes
+    %tbody
+      - @bulk_imports.each do |bulk_import|
+        %tr
+          %td
+            - date = l bulk_import.created_at, format: :dotted
+            = link_to date, admin_bulk_import_url(bulk_import)
+          %td
+            - bulk_import_progress_class = bulk_import.progress == "finished" ? "text-success" : ""
+            %span{ class: bulk_import_progress_class }
+              = bulk_import.progress
+          %td
+            - if bulk_import.line_import_errors.present?
+              <span class="text-danger">Line</span>
+            - if bulk_import.file_import_errors.present?
+              <span class="text-danger">File!</span>
+          %td
+            - if bulk_import.user_id.present?
+              = bulk_import.user.display_name
+          %td
+            - if bulk_import.organization.present?
+              = link_to bulk_import.organization.name, admin_bulk_imports_url(organization_id: bulk_import.organization_id)
+            - else
+              = link_to "none", admin_bulk_imports_url(organization_id: "none"), style: "color: #ccc"
+          %td
+            = bulk_import.creation_states.count # Don't need to do bikes through creation states
+
+:javascript
+  $(document).ready(function() {$('.full-screen-table').parents('.receptacle').css('max-width', '100%');});

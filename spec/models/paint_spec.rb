@@ -20,7 +20,7 @@ describe Paint do
   end
 
   describe 'friendly_find' do
-    it "finds users by email address when the case doesn't match" do
+    it "finds color when the case doesn't match" do
       paint = FactoryGirl.create(:paint, name: 'Poopy PAiNTERS')
       expect(Paint.friendly_find('poopy painters')).to eq(paint)
     end
