@@ -1,10 +1,10 @@
 class BulkImport < ActiveRecord::Base
   VALID_PROGRESSES = %i[pending ongoing finished].freeze
+  mount_uploader :file, ImportExportUploader
 
   belongs_to :organization
   belongs_to :user
-  validates_presence_of :file_url
-  validates_uniqueness_of :file_url
+  validates_presence_of :file
   has_many :creation_states
   has_many :bikes, through: :creation_states
 
@@ -39,10 +39,9 @@ class BulkImport < ActiveRecord::Base
     add_file_error("Needs to have a user or an organization with an auto user")
   end
 
-  def file
-    require "open-uri"
-    open(file_url)
-  rescue OpenURI::HTTPError => e
+  def open_file
+    file.read # This isn't stream processing, it would be nice if it was
+  rescue OpenURI::HTTPError => e # This probably isn't the error that will happen, replace it with the one that is
     add_file_error(e.message)
   end
 end

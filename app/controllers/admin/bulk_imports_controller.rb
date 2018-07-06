@@ -35,7 +35,7 @@ class Admin::BulkImportsController < Admin::BaseController
 
   def permitted_parameters
     params.require(:bulk_import)
-          .permit(%i(organization_id file_url no_notify))
+          .permit(%i(organization_id file no_notify))
   end
 
   def find_bulk_import

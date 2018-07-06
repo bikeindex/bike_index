@@ -298,7 +298,7 @@ CREATE TABLE public.bulk_imports (
     id integer NOT NULL,
     organization_id integer,
     user_id integer,
-    file_url text,
+    file text,
     progress integer DEFAULT 0,
     no_notify boolean DEFAULT false,
     import_errors json DEFAULT '{}'::json,

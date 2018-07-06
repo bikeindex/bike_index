@@ -3,7 +3,7 @@ class CreateBulkImports < ActiveRecord::Migration
     create_table :bulk_imports do |t|
       t.references :organization
       t.references :user
-      t.text :file_url
+      t.text :file
       t.integer :progress, default: 0
       t.boolean :no_notify, default: false
       t.json :import_errors, default: {}

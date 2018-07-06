@@ -18,20 +18,10 @@ describe BulkImportWorker do
   let(:csv_string) { csv_lines.map { |r| r.join(",") }.join("\n") }
 
   describe "perform" do
-    context "file 404s" do
-      let!(:bulk_import) { FactoryGirl.create(:bulk_import, file_url: "https://bikeindex.org/not_a_location") }
-      it "adds a file error" do
-        VCR.use_cassette("BulkImportWorker-file-404") do
-          instance.perform(bulk_import.id)
-          bulk_import.reload
-          expect(bulk_import.file_import_errors.to_s).to match(/404/)
-        end
-      end
-    end
     context "bulk import already processed" do
       let(:bulk_import) { FactoryGirl.create(:bulk_import, progress: "finished") }
       it "returns true" do
-        allow_any_instance_of(BulkImport).to receive(:file) { csv_string }
+        allow_any_instance_of(BulkImport).to receive(:open_file) { csv_string }
         expect(instance).to_not receive(:register_bike)
         instance.perform(bulk_import.id)
       end
@@ -42,7 +32,7 @@ describe BulkImportWorker do
       let(:target_line_error) { [1, ["Owner email can't be blank"]] }
       let(:csv_lines) { [sample_csv_lines[0], error_line, sample_csv_lines[2]] }
       it "registers bike, adds row that is an error" do
-        allow_any_instance_of(BulkImport).to receive(:file) { csv_string }
+        allow_any_instance_of(BulkImport).to receive(:open_file) { csv_string }
         expect do
           instance.perform(bulk_import.id)
         end.to change(Bike, :count).by 1
@@ -56,41 +46,39 @@ describe BulkImportWorker do
         expect(bike.primary_frame_color).to eq color
       end
     end
-    context "valid external file" do
+    context "valid file" do
       let!(:green) { FactoryGirl.create(:color, name: "Green") }
       let!(:white) { FactoryGirl.create(:color, name: "White") }
       let!(:surly) { FactoryGirl.create(:manufacturer, name: "Surly") }
       let!(:trek) { FactoryGirl.create(:manufacturer, name: "Trek") }
-      let(:file_url) { "https://gist.githubusercontent.com/sethherr/b003843d49aa2d6f6888b4889079b9ba/raw/7f65da1db0a2ea3fd51737aca6e5a5080d60dda9/test_bulk_import.csv" }
+      let(:file_path) { File.open(Rails.root.join("public", "import_all_optional_fields.csv")) }
       let(:organization) { FactoryGirl.create(:organization_with_auto_user) }
-      let!(:bulk_import) { FactoryGirl.create(:bulk_import, file_url: file_url, progress: "pending", user_id: nil, organization_id: organization.id) }
+      let!(:bulk_import) { FactoryGirl.create(:bulk_import, file: file_path, progress: "pending", user_id: nil, organization_id: organization.id) }
       it "creates the bikes, doesn't have any errors" do
-        VCR.use_cassette("BulkImportWorker-file-success") do
-          expect do
-            instance.perform(bulk_import.id)
-          end.to change(Bike, :count).by 2
-          bulk_import.reload
-          expect(bulk_import.progress).to eq "finished"
-          expect(bulk_import.bikes.count).to eq 2
-          expect(bulk_import.file_import_errors).to_not be_present
+        expect do
+          instance.perform(bulk_import.id)
+        end.to change(Bike, :count).by 2
+        bulk_import.reload
+        expect(bulk_import.progress).to eq "finished"
+        expect(bulk_import.bikes.count).to eq 2
+        expect(bulk_import.file_import_errors).to_not be_present
 
-          bike1 = bulk_import.bikes.reorder(:created_at).first
-          expect(bike1.primary_frame_color).to eq green
-          expect(bike1.serial_number).to eq "xyz_test"
-          expect(bike1.owner_email).to eq "test@bikeindex.org"
-          expect(bike1.manufacturer).to eq trek
-          expect(bike1.creation_state.origin).to eq "bulk_import_worker"
-          expect(bike1.creator).to eq organization.auto_user
-          expect(bike1.creation_organization).to eq organization
-          bike2 = bulk_import.bikes.reorder(:created_at).last
-          expect(bike2.primary_frame_color).to eq white
-          expect(bike2.serial_number).to eq "example"
-          expect(bike2.owner_email).to eq "test2@bikeindex.org"
-          expect(bike2.manufacturer).to eq surly
-          expect(bike2.creation_state.origin).to eq "bulk_import_worker"
-          expect(bike2.creator).to eq organization.auto_user
-          expect(bike1.creation_organization).to eq organization
-        end
+        bike1 = bulk_import.bikes.reorder(:created_at).first
+        expect(bike1.primary_frame_color).to eq green
+        expect(bike1.serial_number).to eq "xyz_test"
+        expect(bike1.owner_email).to eq "test@bikeindex.org"
+        expect(bike1.manufacturer).to eq trek
+        expect(bike1.creation_state.origin).to eq "bulk_import_worker"
+        expect(bike1.creator).to eq organization.auto_user
+        expect(bike1.creation_organization).to eq organization
+        bike2 = bulk_import.bikes.reorder(:created_at).last
+        expect(bike2.primary_frame_color).to eq white
+        expect(bike2.serial_number).to eq "example"
+        expect(bike2.owner_email).to eq "test2@bikeindex.org"
+        expect(bike2.manufacturer).to eq surly
+        expect(bike2.creation_state.origin).to eq "bulk_import_worker"
+        expect(bike2.creator).to eq organization.auto_user
+        expect(bike1.creation_organization).to eq organization
       end
     end
   end

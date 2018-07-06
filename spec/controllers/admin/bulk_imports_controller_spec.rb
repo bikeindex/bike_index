@@ -38,7 +38,8 @@ describe Admin::BulkImportsController do
   describe "create" do
     context "valid create" do
       let(:organization) { FactoryGirl.create(:organization) }
-      let(:valid_attrs) { { file_url: "https://something.com", organization_id: organization.id, no_notify: "1" } }
+      let(:file) { Rack::Test::UploadedFile.new(File.open(File.join("public", "import_all_optional_fields.csv"))) }
+      let(:valid_attrs) { { file: file, organization_id: organization.id, no_notify: "1" } }
       it "creates" do
         expect do
           post :create, bulk_import: valid_attrs
@@ -46,7 +47,7 @@ describe Admin::BulkImportsController do
 
         bulk_import = BulkImport.last
         expect(bulk_import.user).to eq user
-        expect(bulk_import.file_url).to eq valid_attrs[:file_url]
+        expect(bulk_import.file_url).to be_present
         expect(bulk_import.progress).to eq "pending"
         expect(bulk_import.organization).to eq organization
         expect(bulk_import.send_email).to be_falsey

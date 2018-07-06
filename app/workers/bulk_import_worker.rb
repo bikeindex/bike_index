@@ -9,7 +9,7 @@ class BulkImportWorker
 
   def perform(bulk_import_id)
     @bulk_import = BulkImport.find(bulk_import_id)
-    return false unless process_csv(@bulk_import.file)
+    return false unless process_csv(@bulk_import.open_file)
     @bulk_import.progress = "finished"
     return @bulk_import.save unless @line_errors.any?
     # Using update_attribute here to avoid validation checks that sometimes block updating postgres json in rails
@@ -19,7 +19,9 @@ class BulkImportWorker
   def process_csv(file)
     return false if @bulk_import.finished? # If url fails to load, this will catch
     @line_errors = @bulk_import.line_import_errors || []
-    CSV.new(file, headers: true, header_converters: %i[downcase symbol]).each_with_index do |row, index|
+    # This isn't stream processing. If memory becomes an issue,
+    # figure out how to open a carrierwave file (rather than read) and switch CSV.parse -> CSV.new
+    CSV.parse(file, headers: true, header_converters: %i[downcase symbol]).each_with_index do |row, index|
       validate_headers(row.headers) unless @valid_headers # Check headers first, so we can break if they fail
       break false if @bulk_import.finished?
       bike = register_bike(row_to_b_param_hash(row.to_h))
@@ -31,7 +33,7 @@ class BulkImportWorker
   def register_bike(b_param_hash)
     b_param = BParam.create(creator_id: creator_id,
                             params: b_param_hash,
-                            origin: 'bulk_import_worker')
+                            origin: "bulk_import_worker")
     BikeCreator.new(b_param).create_bike
   end
 

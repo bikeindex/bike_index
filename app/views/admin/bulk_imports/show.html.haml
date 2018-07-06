@@ -6,11 +6,9 @@
   Progress:
   = @bulk_import.progress
 
-.clearfix
-%p.pull-left{ style: "padding-right: .5rem;" }
-  File url:
-.controls
-  = text_field_tag :file_url, @bulk_import.file_url
+%p
+  File:
+  = link_to @bulk_import.file_url.truncate(25), @bulk_import.file_url
 
 %p
   User:

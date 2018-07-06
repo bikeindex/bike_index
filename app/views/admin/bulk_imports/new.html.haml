@@ -23,9 +23,9 @@
               = f.collection_select(:organization_id, Organization.all, :id, :name, prompt: "Choose organization")
         .span6
           .control-group
-            = f.label :file_url, "File Url", class: "control-label"
+            = f.label :file, "CSV", class: "control-label"
             .controls
-              = f.text_field :file_url
+              = f.file_field :file
       .row-fluid
         .controls.radio-controls
           %label.checkbox
