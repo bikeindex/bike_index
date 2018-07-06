@@ -2,7 +2,7 @@ require 'csv'
 
 class BulkImportWorker
   include Sidekiq::Worker
-  sidekiq_options queue: "afterward" # Because it's low priority!
+  sidekiq_options queue: "afterwards" # Because it's low priority!
   sidekiq_options backtrace: true
 
   attr_accessor :bulk_import, :line_errors # Only necessary for testing
@@ -29,7 +29,7 @@ class BulkImportWorker
   end
 
   def register_bike(b_param_hash)
-    b_param = BParam.create(creator_id: @bulk_import.user_id,
+    b_param = BParam.create(creator_id: creator_id,
                             params: b_param_hash,
                             origin: 'bulk_import_worker')
     BikeCreator.new(b_param).create_bike
@@ -64,6 +64,11 @@ class BulkImportWorker
     else
       serial
     end
+  end
+
+  def creator_id
+    # We want to use the organization auto user id if it exists
+    @creator_id ||= @bulk_import.creator.id
   end
 
   private

@@ -3,7 +3,7 @@ require "spec_helper"
 describe BulkImportWorker do
   let(:subject) { BulkImportWorker }
   let(:instance) { subject.new }
-  it { is_expected.to be_processed_in :afterward }
+  it { is_expected.to be_processed_in :afterwards }
   let(:bulk_import) { FactoryGirl.create(:bulk_import, progress: "pending") }
   let!(:black) { FactoryGirl.create(:color, name: "Black") } # Because we use it as a default color
 
@@ -62,7 +62,8 @@ describe BulkImportWorker do
       let!(:surly) { FactoryGirl.create(:manufacturer, name: "Surly") }
       let!(:trek) { FactoryGirl.create(:manufacturer, name: "Trek") }
       let(:file_url) { "https://gist.githubusercontent.com/sethherr/b003843d49aa2d6f6888b4889079b9ba/raw/7f65da1db0a2ea3fd51737aca6e5a5080d60dda9/test_bulk_import.csv" }
-      let!(:bulk_import) { FactoryGirl.create(:bulk_import, file_url: file_url, progress: "pending") }
+      let(:organization) { FactoryGirl.create(:organization_with_auto_user) }
+      let!(:bulk_import) { FactoryGirl.create(:bulk_import, file_url: file_url, progress: "pending", user_id: nil, organization_id: organization.id) }
       it "creates the bikes, doesn't have any errors" do
         VCR.use_cassette("BulkImportWorker-file-success") do
           expect do
@@ -79,12 +80,16 @@ describe BulkImportWorker do
           expect(bike1.owner_email).to eq "test@bikeindex.org"
           expect(bike1.manufacturer).to eq trek
           expect(bike1.creation_state.origin).to eq "bulk_import_worker"
+          expect(bike1.creator).to eq organization.auto_user
+          expect(bike1.creation_organization).to eq organization
           bike2 = bulk_import.bikes.reorder(:created_at).last
           expect(bike2.primary_frame_color).to eq white
           expect(bike2.serial_number).to eq "example"
           expect(bike2.owner_email).to eq "test2@bikeindex.org"
           expect(bike2.manufacturer).to eq surly
           expect(bike2.creation_state.origin).to eq "bulk_import_worker"
+          expect(bike2.creator).to eq organization.auto_user
+          expect(bike1.creation_organization).to eq organization
         end
       end
     end
@@ -173,10 +178,11 @@ describe BulkImportWorker do
     describe "register bike" do
       let!(:manufacturer) { FactoryGirl.create(:manufacturer, name: "Surly") }
       context "valid organization bike" do
-        let(:organization) { FactoryGirl.create(:organization) }
+        let(:organization) { FactoryGirl.create(:organization_with_auto_user) }
         let!(:bulk_import) { FactoryGirl.create(:bulk_import, organization: organization) }
         let(:row) { { manufacturer: " Surly", serial: "na", color: nil, email: "test2@bikeindex.org", year: "2018", model: "Midnight Special" } }
         it "registers a bike" do
+          expect(organization.auto_user).to_not eq bulk_import.user
           expect(Bike.count).to eq 0
           expect do
             instance.register_bike(instance.row_to_b_param_hash(row))
@@ -188,13 +194,13 @@ describe BulkImportWorker do
           expect(bike.serial_number).to eq "absent"
           expect(bike.frame_model).to eq "Midnight Special"
           expect(bike.primary_frame_color).to eq black
-          expect(bike.creation_organization).to eq organization
 
           creation_state = bike.creation_state
           expect(creation_state.is_bulk).to be_truthy
           expect(creation_state.origin).to eq "bulk_import_worker"
-          expect(creation_state.creator).to eq bulk_import.user
           expect(creation_state.organization).to eq organization
+          expect(bike.creation_organization).to eq organization
+          expect(bike.creator).to eq organization.auto_user
         end
       end
       context "not valid bike" do

@@ -3,12 +3,14 @@ class BulkImport < ActiveRecord::Base
 
   belongs_to :organization
   belongs_to :user
-  validates_presence_of :user_id, :file_url
+  validates_presence_of :file_url
   validates_uniqueness_of :file_url
   has_many :creation_states
   has_many :bikes, through: :creation_states
 
   enum progress: VALID_PROGRESSES
+
+  before_save :validate_creator_present
 
   def file_import_errors
     import_errors["file"]
@@ -26,6 +28,15 @@ class BulkImport < ActiveRecord::Base
 
   def send_email
     !no_notify
+  end
+
+  def creator
+    organization && organization.auto_user || user
+  end
+
+  def validate_creator_present
+    return true if creator.present?
+    add_file_error("Needs to have a user or an organization with an auto user")
   end
 
   def file
