@@ -16,15 +16,15 @@ describe Admin::BulkImportsController do
     end
   end
 
-  # describe "show" do
-  #   let!(:bulk_import) { FactoryGirl.create(:bulk_import) }
-  #   it "renders" do
-  #     get :show, id: bulk_import.id
-  #     expect(response).to be_success
-  #     expect(response).to render_template(:show)
-  #     expect(flash).to_not be_present
-  #   end
-  # end
+  describe "show" do
+    let!(:bulk_import) { FactoryGirl.create(:bulk_import) }
+    it "renders" do
+      get :show, id: bulk_import.id
+      expect(response).to be_success
+      expect(response).to render_template(:show)
+      expect(flash).to_not be_present
+    end
+  end
 
   describe "new" do
     it "renders" do
