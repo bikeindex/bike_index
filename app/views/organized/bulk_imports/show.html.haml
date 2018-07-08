@@ -1,0 +1,61 @@
+.organized-page-header
+  %h1
+    Bulk import
+%ul
+  %li
+    Created:
+    = l @bulk_import.created_at, format: :convert_time
+
+  %li
+    Progress:
+    = @bulk_import.progress
+
+  %li
+    File:
+    = link_to @bulk_import.file_url.truncate(100), @bulk_import.file_url
+
+  %li
+    Creator:
+    - if @bulk_import.user.present?
+      = @bulk_import.user.display_name
+    - else
+      None
+
+%hr{ style: "margin: 15px 0;" }
+- if @bulk_import.import_errors?
+  %hr
+  %h2 Errors
+  - if @bulk_import.import_errors.present?
+    %pre
+      = @bulk_import.import_errors
+  %hr
+
+%h2 Bikes
+
+.organized-bikes-table.table-responsive
+  %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
+    %thead.small-header
+      %tr
+        %th Created
+        %th Manufacturer
+        %th Model
+        %th Color
+        %th Sent to
+    %tbody
+      - @bikes.each do |bike|
+        %tr
+          %td
+            = link_to l(bike.created_at, format: :convert_time), bike_path(bike)
+          %td
+            = bike.mnfg_name
+          %td
+            = bike.frame_model
+          %td
+            = bike.frame_colors.to_sentence
+          %td
+            = bike.first_owner_email
+            %small.less-strong
+              - if bike.creation_description
+                = bike.creation_description
+              - unless bike.owner_email == bike.first_owner_email
+                (sent to a new owner)

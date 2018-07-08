@@ -116,6 +116,29 @@ describe Organized::BulkImportsController, type: :controller do
           end
         end
       end
+      describe "create" do
+        context "valid create" do
+          let(:file) { Rack::Test::UploadedFile.new(File.open(File.join("public", "import_all_optional_fields.csv"))) }
+          let(:valid_attrs) { { file: file, organization_id: organization.id, no_notify: "1" } }
+          it "creates" do
+            # FIXME: Because travis isn't creating the sequential ids, something to do with the missmatched postgres versions
+            # Just don't run on travis :/
+            unless ENV["TRAVIS"].present?
+              expect do
+                post :create, organization_id: organization.to_param, bulk_import: valid_attrs
+              end.to change(BulkImport, :count).by 1
+
+              bulk_import = BulkImport.last
+              expect(bulk_import.user).to eq user
+              expect(bulk_import.file_url).to be_present
+              expect(bulk_import.progress).to eq "pending"
+              expect(bulk_import.organization).to eq organization
+              expect(bulk_import.send_email).to be_truthy # Because no_notify isn't permitted here, only in admin
+              expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
+            end
+          end
+        end
+      end      
     end
   end
 end
