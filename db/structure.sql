@@ -1359,7 +1359,8 @@ CREATE TABLE public.organizations (
     avatar character varying,
     is_paid boolean DEFAULT false NOT NULL,
     lock_show_on_map boolean DEFAULT false NOT NULL,
-    landing_html text
+    landing_html text,
+    show_bulk_import boolean DEFAULT false
 );
 
 
@@ -3397,4 +3398,6 @@ INSERT INTO schema_migrations (version) VALUES ('20180624192035');
 INSERT INTO schema_migrations (version) VALUES ('20180624211320');
 
 INSERT INTO schema_migrations (version) VALUES ('20180624211323');
+
+INSERT INTO schema_migrations (version) VALUES ('20180706162137');
 

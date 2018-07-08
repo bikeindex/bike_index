@@ -1,6 +1,5 @@
 class InfoController < ApplicationController
   layout 'application_revised'
-  # caches_page :about, :where, :roadmap, :security, :serials, :stolen_bikes, :privacy, :terms, :vendor_terms, :downloads, :resources, :spokecard
 
   def about
   end

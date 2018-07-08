@@ -61,7 +61,7 @@ a.optional-form-block {
 // 
 // Avatar uploader
 // 
-.avatar-upload-wrapper {
+.avatar-upload-wrapper, .file-upload-wrapper {
   img { padding-bottom: $vertical-height; }
   label.file { display: block; }
   .file-custom {
@@ -79,7 +79,10 @@ a.optional-form-block {
       border-color: $green;
     }
   }
+  // Override the content display for files so it says file not photo
+  &.file-upload-wrapper .file-custom::before { content: "Upload file"; }
 }
+
 
 
 // Old Bootstrap-4 custom file upload css - https://github.com/twbs/bootstrap-rubygem/blob/0bbd14de56ef118c27a42aa89623cca5edeec94c/assets/stylesheets/bootstrap/_custom-forms.scss

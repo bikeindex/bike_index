@@ -20,6 +20,10 @@ class BulkImport < ActiveRecord::Base
     import_errors["line"]
   end
 
+  def import_errors?
+    line_import_errors.present? || file_import_errors.present?
+  end
+
   def add_file_error(error_msg)
     self.progress = "finished"
     # Using update_attribute here to avoid validation checks that sometimes block updating postgres json in rails

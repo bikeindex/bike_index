@@ -27,8 +27,7 @@
       - @bulk_imports.each do |bulk_import|
         %tr
           %td
-            - date = l bulk_import.created_at, format: :dotted
-            = link_to date, admin_bulk_import_url(bulk_import)
+            = link_to l(bulk_import.created_at, format: :dotted), admin_bulk_import_url(bulk_import)
           %td
             - bulk_import_progress_class = bulk_import.progress == "finished" ? "text-success" : ""
             %span{ class: bulk_import_progress_class }

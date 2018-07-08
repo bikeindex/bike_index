@@ -213,12 +213,6 @@ describe Organization do
     end
   end
 
-  describe 'clear_map_cache' do
-    it 'has before_save_callback_method defined for clear clear_map_cache' do
-      expect(Organization._save_callbacks.select { |cb| cb.kind.eql?(:after) }.map(&:raw_filter).include?(:clear_map_cache)).to eq(true)
-    end
-  end
-
   describe 'mail_snippet_body' do
     let(:organization) { FactoryGirl.create(:organization) }
     before do

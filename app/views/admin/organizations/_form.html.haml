@@ -101,12 +101,19 @@
         = f.check_box :lock_show_on_map, style: "margin: 4px .5em 0 0;"
         %small.less-strong
           Restrict org from updating show on map above (e.g. they're known bad actors)
-
+    .control-group.padded
+      .control-label
+        = f.label :show_bulk_import
+      .controls
+        = f.check_box :show_bulk_import
     .control-group.padded
       .control-label
         = f.label :api_access_approved
       .controls
         = f.check_box :api_access_approved
+        %small.less-strong
+          to be able to post updates via API, check this too
+
     .control-group.padded
       .control-label
         = f.label :approved, 'Validated & approved'
