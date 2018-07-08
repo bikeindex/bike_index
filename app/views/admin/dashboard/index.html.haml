@@ -131,5 +131,7 @@
       = link_to 'Tweets', admin_tweets_url
     %li
       = link_to 'Stolen Twitterbot URL', ENV['STOLEN_TWITTERBOT_URL'].gsub(/bikes\z/, '')
+    %li
+      = link_to 'Bulk Imports', admin_bulk_imports_url
 
   / # = link_to "Clear cache", admin_bust_z_cache_url, class: "button-blue"

@@ -10,7 +10,8 @@ class Admin::BulkImportsController < Admin::BaseController
     else
       bulk_imports = BulkImport.all
     end
-    @bulk_imports = bulk_imports.order(created_at: :desc).page(page).per(per_page)
+    @bulk_imports = bulk_imports.order(created_at: :desc).includes(:creation_states)
+                                .page(page).per(per_page)
   end
 
   def show; end
@@ -34,8 +35,7 @@ class Admin::BulkImportsController < Admin::BaseController
   protected
 
   def permitted_parameters
-    params.require(:bulk_import)
-          .permit(%i(organization_id file no_notify))
+    params.require(:bulk_import).permit(%i(organization_id file no_notify))
   end
 
   def find_bulk_import

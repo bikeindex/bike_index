@@ -1,0 +1,26 @@
+.organized-page-header
+  %h1
+    Register bikes from a CSV
+  %p
+    %strong
+      Your CSV <em>must</em> have our required headers.
+    The required headers are <code>manufacturer</code>, <code>model</code> <code>color</code> <code>email</code> and <code>serial</code>.
+
+  %p
+    You can see #{link_to "an example CSV here", "https://raw.githubusercontent.com/bikeindex/bike_index/master/public/import_only_required.csv"} - which contains just the required columns. An example with additional supported (optional) columns can be seen #{link_to "here", "https://raw.githubusercontent.com/bikeindex/bike_index/master/public/import_all_optional_fields.csv"}.
+
+
+= form_for @bulk_import, { as: :bulk_import, url: organization_bulk_imports_path(organization_id: current_organization.to_param), action: "create", html: { class: "organized-form" } } do |f|
+  .card.col-sm-6
+    .card-block
+      = f.label :file, "CSV File with bikes"
+      .form-group.row.file-upload-wrapper
+        .form-well-input
+          %label.file
+            = f.file_field :file, class: "avatar-upload-field"
+            %span.file-custom
+              %span.file-upload-text Choose file...
+
+      .form-group.row
+        .col-sm-4.col-sm-push-4
+          = f.submit "Upload and begin import", class: "btn btn-secondary btn-lg"
