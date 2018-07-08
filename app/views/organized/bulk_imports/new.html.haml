@@ -7,8 +7,16 @@
     The required headers are <code>manufacturer</code>, <code>model</code> <code>color</code> <code>email</code> and <code>serial</code>.
 
   %p
-    You can see #{link_to "an example CSV here", "https://raw.githubusercontent.com/bikeindex/bike_index/master/public/import_only_required.csv"} - which contains just the required columns. An example with additional supported (optional) columns can be seen #{link_to "here", "https://raw.githubusercontent.com/bikeindex/bike_index/master/public/import_all_optional_fields.csv"}.
+    Look at #{link_to "our example CSV here", "https://raw.githubusercontent.com/bikeindex/bike_index/master/public/import_only_required.csv"}. This example contains just the required columns.
 
+  %h5 Notes on successfully importing:
+  %ul
+    %li
+      For best results, put quotes around all the cells.
+    %li
+      Your headers must match our headers <em>exactly</em> - for example if you have "serial #" as a header, the import will not work.
+    %li
+      Doing an import for the first time? Try importing a sample of your CSV with just 1 or 2 rows, and replace the email with your own email - so if the bikes don't import correctly, you can make adjustments and delete the bikes, without having to delete a large number of bikes.
 
 = form_for @bulk_import, { url: organization_bulk_imports_path(organization_id: current_organization.to_param), action: "create", html: { class: "organized-form" } } do |f|
   .card.col-sm-6
@@ -24,3 +32,13 @@
       .form-group.row
         .col-sm-4.col-sm-push-4
           = f.submit "Upload and begin import", class: "btn btn-secondary btn-lg"
+%hr{ style: "margin: 24px 0 48px;" }
+%h5
+  Optional additions:
+%ul
+  %li
+    We support a few additional, optional columns. You do not have to include them unless you want to
+  %li
+    You can see an #{link_to "example CSV here", "https://raw.githubusercontent.com/bikeindex/bike_index/master/public/import_all_optional_fields.csv"} with all the columns we support
+  %li
+    If only some of your bikes have values in optional columns, leave the cell blank for the ones that don't have it (rather than putting like <em>unknown</em> or <em>n/a</em>). For example, as shown in the above csv, the second bike doesn't have a year.

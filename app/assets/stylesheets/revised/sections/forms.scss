@@ -79,9 +79,9 @@ a.optional-form-block {
       border-color: $green;
     }
   }
+  // Override the content display for files so it says file not photo
+  &.file-upload-wrapper .file-custom::before { content: "Upload file"; }
 }
-// Override the content display for files so it says file not photo
-.file-upload-wrapper .file-custom::before { content: "Upload file"; }
 
 
 
