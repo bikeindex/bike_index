@@ -50,6 +50,7 @@ module Organized
     def ensure_can_create_import!
       @is_api = params[:api_token].present? # who cares about accept headers and file types ;)
       if @is_api
+        @current_user = current_organization.auto_user
         return true if params[:api_token] == current_organization.access_token
         render json: { error: "Not permitted" }, status: 401 and return
       else
@@ -66,7 +67,7 @@ module Organized
     end
 
     def permitted_parameters
-      params.require(:bulk_import).permit(%i[file]).merge(user_id: current_user.id, organization: current_organization)
+      params.require(:bulk_import).permit([:file]).merge(user_id: current_user.id, organization_id: current_organization.id)
     end
   end
 end

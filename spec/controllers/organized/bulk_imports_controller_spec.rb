@@ -4,7 +4,7 @@ describe Organized::BulkImportsController, type: :controller do
   let(:root_path) { organization_bikes_path(organization_id: organization.to_param) }
   let(:bulk_import) { FactoryGirl.create(:bulk_import, organization: organization) }
 
-  before { set_current_user(user) }
+  before { set_current_user(user) if user.present? }
 
   context "organization without show_bulk_import" do
     let!(:organization) { FactoryGirl.create(:organization) }
@@ -139,6 +139,8 @@ describe Organized::BulkImportsController, type: :controller do
           end
         end
         context "API create" do
+          let(:organization) { FactoryGirl.create(:organization_with_auto_user, show_bulk_import: true, api_access_approved: true) }
+          let(:user) { nil }
           context "invalid API token" do
             it "returns JSON message" do
               post :create, organization_id: organization.to_param, api_token: "a9s0dfsdf", bulk_import: { file: file }
@@ -156,7 +158,7 @@ describe Organized::BulkImportsController, type: :controller do
                 expect(json_result["success"]).to be_present
 
                 bulk_import = BulkImport.last
-                expect(bulk_import.user).to eq user
+                expect(bulk_import.user).to eq organization.auto_user
                 expect(bulk_import.file_url).to be_present
                 expect(bulk_import.progress).to eq "pending"
                 expect(bulk_import.organization).to eq organization

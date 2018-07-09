@@ -22,8 +22,9 @@ ParameterLists:
   CountKeywordArgs: false
 
 # https://anti-pattern.com/always-use-double-quoted-strings-in-ruby
+# All future updates should use double quotes, don't enforce so there aren't a ton of errors
 Style/StringLiterals:
-  EnforcedStyle: double_quotes # Always do it, lower cost cognitively
+  Enabled: false
 
 NumericLiterals:
   Enabled: false
