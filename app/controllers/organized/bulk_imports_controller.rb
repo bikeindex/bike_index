@@ -1,6 +1,7 @@
 module Organized
   class BulkImportsController < Organized::BaseController
-    before_action :ensure_access_to_bulk_import!
+    skip_before_filter :ensure_member!
+    before_action :ensure_access_to_bulk_import!, except: [:create] # Because this checks ensure_admin
 
     def index
       @bulk_imports = bulk_imports.includes(:creation_states).order(created_at: :desc)
@@ -20,14 +21,23 @@ module Organized
     end
 
     def create
+      return unless ensure_can_create_import!
       @bulk_import = BulkImport.new(permitted_parameters)
       if @bulk_import.save
         BulkImportWorker.perform_async(@bulk_import.id)
-        flash[:success] = "Bulk Import created!"
-        redirect_to organization_bulk_imports_path(organization_id: current_organization.to_param)
+        if @is_api
+          render json: { success: "File imported" }, status: 201
+        else
+          flash[:success] = "Bulk Import created!"
+          redirect_to organization_bulk_imports_path(organization_id: current_organization.to_param)
+        end
       else
-        flash[:error] = "Unable to create bulk import"
-        render action: :new
+        if @is_api
+          render json: { error: @bulk_import.errors.full_messages }
+        else
+          flash[:error] = "Unable to create bulk import"
+          render action: :new
+        end
       end
     end
 
@@ -35,6 +45,16 @@ module Organized
 
     def bulk_imports
       BulkImport.where(organization_id: current_organization.id)
+    end
+
+    def ensure_can_create_import!
+      @is_api = params[:api_token].present? # who cares about accept headers and file types ;)
+      if @is_api
+        return true if params[:api_token] == current_organization.access_token
+        render json: { error: "Not permitted" }, status: 401 and return
+      else
+        ensure_access_to_bulk_import!
+      end
     end
 
     def ensure_access_to_bulk_import!
