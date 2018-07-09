@@ -54,7 +54,9 @@ class BulkImportWorker
         frame_model: row[:model],
         send_email: @bulk_import.send_email,
         creation_organization_id: @bulk_import.organization_id
-      }
+      },
+      # Photo need to be an array - only include if photo has a value
+      photos: row[:photo].present? ? [row[:photo]] : nil
     }
   end
 
@@ -90,7 +92,8 @@ class BulkImportWorker
       year: :frame_year,
       color: :color,
       email: :email,
-      serial: :serial_number
+      serial: :serial_number,
+      photo_url: :photo
     }
   end
 end

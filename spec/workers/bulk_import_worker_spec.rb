@@ -71,6 +71,8 @@ describe BulkImportWorker do
         expect(bike1.creation_state.origin).to eq "bulk_import_worker"
         expect(bike1.creator).to eq organization.auto_user
         expect(bike1.creation_organization).to eq organization
+        expect(bike1.year).to eq 2019
+        expect(bike1.public_images.count).to eq 0
         bike2 = bulk_import.bikes.reorder(:created_at).last
         expect(bike2.primary_frame_color).to eq white
         expect(bike2.serial_number).to eq "example"
@@ -78,7 +80,9 @@ describe BulkImportWorker do
         expect(bike2.manufacturer).to eq surly
         expect(bike2.creation_state.origin).to eq "bulk_import_worker"
         expect(bike2.creator).to eq organization.auto_user
-        expect(bike1.creation_organization).to eq organization
+        expect(bike2.creation_organization).to eq organization
+        expect(bike2.year).to_not be_present
+        expect(bike2.public_images.count).to eq 1
       end
     end
   end
