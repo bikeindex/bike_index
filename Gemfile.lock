@@ -599,8 +599,10 @@ GEM
     sitemap_generator (5.1.0)
       builder
     sixarm_ruby_unaccent (1.1.1)
-    skylight (1.2.0)
-      activesupport (>= 3.0.0)
+    skylight (2.0.2)
+      skylight-core (= 2.0.2)
+    skylight-core (2.0.2)
+      activesupport (>= 4.2.0)
     slop (3.6.0)
     soulheart (0.3.0)
       multi_json (~> 1.11, >= 1.11.2)
@@ -776,7 +778,7 @@ DEPENDENCIES
   wkhtmltopdf-binary
 
 RUBY VERSION
-   ruby 2.2.5p319
+   ruby 2.5.0p0
 
 BUNDLED WITH
-   1.15.4
+   1.16.3

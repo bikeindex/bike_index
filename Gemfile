@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
-ruby '2.2.5'
-gem 'rails', '4.2.10'
+ruby "2.5.0"
+gem "rails", "4.2.10"
 
 gem 'pg'
 gem 'jquery-rails'
@@ -111,9 +111,8 @@ gem 'grape_logging' # Grape logging. Also how we pass it to lograge. Always used
 gem 'lograge' # Structure log data, put it in single lines to improve the functionality
 gem 'logstash-event' # Use logstash format for logging data
 group :production do
-  gem 'honeybadger', '~> 2.0' # Error monitoring
-  # gem 'librato-rails' # Monitoring and display
-  gem 'skylight'
+  gem "honeybadger", "~> 2.0" # Error monitoring
+  gem "skylight"
 end
 
 group :development do
