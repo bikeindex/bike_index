@@ -18,6 +18,43 @@ class BikeIndex.Views.Global extends Backbone.View
     if $('#what-spokecards-are').length > 0
       $('.spokecard-extension').addClass('on-spokecard-page')
     @intializeContent() if $('.content-nav').length > 0
+
+    # Pulled from init, because we need it
+    @localizeTimes()
+
+  displayLocalDate: (time, preciseTime = false) ->
+    # Ensure we return if it's a big future day
+    if time < window.tomorrow
+      if time > window.today
+        return time.format("h:mma")
+      else if time > window.yesterday
+        return "Yday #{time.format('h:mma')}"
+    if time.year() == moment().year()
+      if preciseTime then time.format("MMM Do[,] h:mma") else time.format("MMM Do[,] ha")
+    else
+      if preciseTime then time.format("YYYY-MM-DD h:mma") else time.format("YYYY-MM-DD")
+
+  localizeTimes: ->
+    window.timezone ||= moment.tz.guess()
+    moment.tz.setDefault(window.timezone)
+    window.yesterday = moment().subtract(1, "day").startOf("day")
+    window.today = moment().startOf("day")
+    window.tomorrow = moment().endOf("day")
+    displayLocalDate = @displayLocalDate
+    $(".convertTime").each ->
+      $this = $(this)
+      $this.removeClass("convertTime")
+      text = $this.text().trim()
+      return unless text.length > 0
+      time = moment(text, moment.ISO_8601)
+      return unless time.isValid()
+      $this.text(displayLocalDate(time, $this.hasClass("precise-time")))
+
+    # Write timezone
+    $(".convertTimezone").each ->
+      $this = $(this)
+      $this.text(moment().format("z"))
+      $this.removeClass("convertTimezone")
     
   openNewWindow: (e) ->
     e.preventDefault()

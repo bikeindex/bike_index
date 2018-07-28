@@ -8,7 +8,6 @@ class BikeIndex.OrganizedManageLocations extends BikeIndex
 
   initializeEventListeners: ->
     setDefaultCountryAndName = @setDefaultCountryAndName
-    loadFancySelects = @loadFancySelects
     $('form').on 'click', '.remove_fields', (event) ->
       # We don't need to do anything except slide the input up, because the label is on it.
       $(this).closest('fieldset').slideUp()
@@ -19,7 +18,7 @@ class BikeIndex.OrganizedManageLocations extends BikeIndex
       regexp = new RegExp($(this).data('id'), 'g')
       $('#fieldsetend').before($(this).data('fields').replace(regexp, time))
       setDefaultCountryAndName()
-      loadFancySelects()
+      window.BikeIndex.Init.loadFancySelects()
 
 
   setDefaultCountryAndName: ->

@@ -32,6 +32,8 @@
         %th
           %a.column_sort_update{ href: '#', class: ('active' if active_col), style: 'display: block;', data: { sort: col, direction: (active_col && @sort_direction == 'desc' ? 'asc' : 'desc') } }
             = col.titleize
+            - if col == "created_at"
+              <small class="convertTimezone"></small>
             - if active_col
               .pull-right
                 %small
@@ -56,7 +58,8 @@
           %td
             = "&#x2713;".html_safe if organization.approved
           %td.medium-screens
-            = admin_display_date(organization.created_at)
+            %span.convertTime
+              = l organization.created_at, format: :convert_time
           %td
             = organization.bikes.count
           %td.medium-screens

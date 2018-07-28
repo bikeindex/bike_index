@@ -21,7 +21,7 @@ class BikeIndex.BikesEditOwnership extends BikeIndex
     $('#add_additional_organization').click (e) =>
       e.preventDefault()
       $('#additional_organization_fields').append(Mustache.render(add_organization_template, { organizations: window.organizations }))
-      @loadFancySelects()
+      window.BikeIndex.Init.loadFancySelects()
       $('#additional_organization_fields .collapse').collapse('show')
 
   bikeOrganizationIds: ->

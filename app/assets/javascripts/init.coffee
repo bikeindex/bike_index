@@ -84,38 +84,38 @@ class BikeIndex.Init extends BikeIndex
 
   displayLocalDate: (time, preciseTime = false) ->
     # Ensure we return if it's a big future day
-    if time < @tomorrow
-      if time > @today
-        return time.format('h:mma')
-      else if time > yesterday
+    if time < window.tomorrow
+      if time > window.today
+        return time.format("h:mma")
+      else if time > window.yesterday
         return "Yday #{time.format('h:mma')}"
     if time.year() == moment().year()
-      if preciseTime then time.format('MMM Do[,] h:mma') else time.format('MMM Do[,] ha')
+      if preciseTime then time.format("MMM Do[,] h:mma") else time.format("MMM Do[,] ha")
     else
-      if preciseTime then time.format('YYYY-MM-DD h:mma') else time.format('YYYY-MM-DD')
+      if preciseTime then time.format("YYYY-MM-DD h:mma") else time.format("YYYY-MM-DD")
 
   localizeTimes: ->
-    @timezone ||= moment.tz.guess()
-    moment.tz.setDefault(@timezone)
-    @yesterday = moment().subtract(1, 'day').startOf('day')
-    @today = moment().startOf('day')
-    @tomorrow = moment().endOf('day')
+    window.timezone ||= moment.tz.guess()
+    moment.tz.setDefault(window.timezone)
+    window.yesterday = moment().subtract(1, "day").startOf("day")
+    window.today = moment().startOf("day")
+    window.tomorrow = moment().endOf("day")
 
     displayLocalDate = @displayLocalDate
-    $('.convertTime').each ->
+    $(".convertTime").each ->
       $this = $(this)
-      $this.removeClass('convertTime')
+      $this.removeClass("convertTime")
       text = $this.text().trim()
       return unless text.length > 0
       time = moment(text, moment.ISO_8601)
       return unless time.isValid()
-      $this.text(displayLocalDate(time, $this.hasClass('precise-time')))
+      $this.text(displayLocalDate(time, $this.hasClass("precise-time")))
 
     # Write timezone
-    $('.convertTimezone').each ->
+    $(".convertTimezone").each ->
       $this = $(this)
-      $this.text(moment().format('z'))
-      $this.removeClass('convertTimezone')
+      $this.text(moment().format("z"))
+      $this.removeClass("convertTimezone")
 
 # Check if the browser supports Flexbox
 warnIfUnsupportedBrowser = ->
@@ -156,7 +156,7 @@ window.updateSearchBikesHeaderLink = ->
 
 $(document).ready ->
   window.updateSearchBikesHeaderLink()
-  new BikeIndex.Init
+  window.BikeIndex.Init = new BikeIndex.Init
   if document.getElementById('binx_registration_widget')
     new window.ManufacturersSelect('#binx_registration_widget #b_param_manufacturer_id')
   new window.AdDisplayer
