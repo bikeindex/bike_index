@@ -199,7 +199,7 @@
         %th
           ID
         %th
-          Date Created
+          Created&nbsp;<small class="convertTimezone"></small>
         %th
           Creator
         %th
@@ -218,7 +218,8 @@
             %td
               %span.hidden
                 = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              = admin_display_date(ownership.created_at)
+              %span.convertTime
+                = l ownership.created_at, format: :convert_time
             %td
               - u = ownership.creator
               - if u.name.present?
@@ -240,7 +241,7 @@
       %table.table.table-striped.table-bordered
         %thead
           %th
-            Date Recovered
+            Date Recovered&nbsp;<small class="convertTimezone"></small>
           %th
             Description
           %th
@@ -253,7 +254,8 @@
           - @recoveries.each do |recovery|
             %tr
               %td
-                = admin_display_date(recovery.date_recovered)
+                %span.convertTime
+                  = l recovery.date_recovered, format: :convert_time
               %td
                 = recovery.recovered_description
               %td.table-cell-check

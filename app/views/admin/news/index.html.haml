@@ -7,7 +7,7 @@
   %table.table.table-striped.table-bordered
     %thead
       %th.medium-screens
-        Date
+        Date&nbsp;<small class="convertTimezone"></small>
       %th.medium-screens
         Creator
       %th
@@ -20,7 +20,8 @@
       - @blogs.each do |blog|
         %tr
           %td.medium-screens
-            = l blog.published_at, format: :dotted
+            %span.convertTime
+              = l blog.published_at, format: :convert_time
           %td.medium-screens
             = blog.user.name || blog.user.email
           %td
