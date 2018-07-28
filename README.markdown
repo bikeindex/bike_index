@@ -1,6 +1,5 @@
 # ![BIKE INDEX](https://github.com/bikeindex/bike_index/blob/master/bike_index.png?raw=true) This is the [Bike Index](https://www.bikeindex.org) [![Build Status](https://travis-ci.org/bikeindex/bike_index.svg?branch=master)](https://travis-ci.org/bikeindex/bike_index)
-[![Code Climate](https://codeclimate.com/github/bikeindex/bike_index/badges/gpa.svg)](https://codeclimate.com/github/bikeindex/bike_index)
-[![Test Coverage](https://codeclimate.com/github/bikeindex/bike_index/badges/coverage.svg)](https://codeclimate.com/github/bikeindex/bike_index)
+[![Test Coverage](https://codeclimate.com/github/bikeindex/bike_index/badges/coverage.svg)](https://codeclimate.com/github/bikeindex/bike_index) [![View performance data on Skylight](https://badges.skylight.io/rpm/j93iQ4K2pxCP.svg)](https://oss.skylight.io/app/applications/j93iQ4K2pxCP)
 
 Bike registration that works: online, powerful, free.
 
@@ -10,7 +9,7 @@ We're an open source project. Take a gander through our code, report bugs, or do
 
 ### Dependencies
 
-- [Ruby 2.2.5](http://www.ruby-lang.org/en/) (we use [RVM](https://rvm.io/))
+- [Ruby 2.5.0](http://www.ruby-lang.org/en/) (we use [RVM](https://rvm.io/))
 
 - [Rails 4.2](http://rubyonrails.org/)
 
