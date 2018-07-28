@@ -44,7 +44,7 @@ class StolenRecord < ActiveRecord::Base
   after_validation :geocode, if: lambda { (self.city.present? || self.zipcode.present?) && self.country.present? }
 
   def self.revised_date_format
-    '%Y-%m-%d'
+    "%a %b %d %Y"
   end
 
   def self.revised_date_format_hour

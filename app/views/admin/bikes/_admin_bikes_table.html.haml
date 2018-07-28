@@ -4,7 +4,7 @@
 - unless no_show_header
   %thead
     %th
-      Date indexed
+      Added&nbsp;<small class="convertTimezone"></small>
     %th.medium-screens
       Sent to
     %th
@@ -26,8 +26,8 @@
                   = bike.id
               - else
                 = bike.id 
-          %a{href: edit_admin_bike_url(bike) }
-            = admin_display_date(bike.created_at)
+          %a.convertTime{ href: edit_admin_bike_url(bike) }
+            = l bike.created_at, format: :convert_time
         %td.medium-screens
           = bike.owner_email
           - if bike.current_owner_exists

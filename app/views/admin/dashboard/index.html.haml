@@ -21,37 +21,8 @@
     Recent
     = link_to "Users", admin_users_url
   %table.table.table-striped.table-bordered
-    %thead
-      %th.medium-screens
-        Created
-      %th
-        Email
-      %th
-        Bikes
-    %tbody
-      - @users.each do |user|
-        %tr
-          %td.medium-screens
-            - if user.created_at.today?
-              %span.hidden
-                = user.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              Today at #{user.created_at.strftime("%-I %p")}
-            - elsif Date.yesterday().beginning_of_day() <= user.created_at
-              %span.hidden
-                = user.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              Yesterday at #{user.created_at.strftime("%-I %p")}
-            - else
-              %span.hidden
-                = user.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              = user.created_at.strftime("%-m/%-d/%Y at %-I %p")
-          %td
-            = link_to user.email, edit_admin_user_url(user)
-          %td
-            = user.ownerships.count
-          %td.medium-screens
-            - if user.memberships.present?
-              - user.memberships.each do |membership|
-                = link_to "#{membership.organization.name} ", admin_membership_url(membership)
+    = render partial: "/admin/users/table"
+
   %p.pull-right
     #{User.count} users total
     - today = User.where("created_at >= ?", Time.zone.now.beginning_of_day).count

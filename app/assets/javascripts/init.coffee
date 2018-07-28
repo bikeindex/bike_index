@@ -1,14 +1,8 @@
+# Ensure we have string trim
+unless String::trim then String::trim = -> @replace /^\s+|\s+$/g, ""
+
 # All the classes inherit from this
 class window.BikeIndex
-  loadFancySelects: ->
-    $('.unfancy.fancy-select select').selectize
-      create: false
-      plugins: ['restore_on_backspace']
-    $('.unfancy.fancy-select-placeholder select').selectize # When empty options are allowed
-      create: false
-      plugins: ['restore_on_backspace', 'selectable_placeholder']
-    # Remove them so we don't initialize twice
-    $('.unfancy.fancy-select, .unfancy.fancy-select-placeholder').removeClass('unfancy')
 
 # This file initializes scripts for the application
 class BikeIndex.Init extends BikeIndex
@@ -22,6 +16,8 @@ class BikeIndex.Init extends BikeIndex
     @loadPageScript(document.getElementsByTagName('body')[0].id)
     # Initialize the js for the organized menu pages
     new BikeIndex.Organized if $('.organized-body').length > 0
+    # Set the local timezone and convert all the times to local
+    @localizeTimes()
 
   loadPageScript: (body_id) ->
     # If this is a landing page
@@ -53,6 +49,16 @@ class BikeIndex.Init extends BikeIndex
       locks_create: BikeIndex.LocksForm
     window.pageScript = new pageClasses[body_id] if Object.keys(pageClasses).includes(body_id)
 
+  loadFancySelects: ->
+    $('.unfancy.fancy-select select').selectize
+      create: false
+      plugins: ['restore_on_backspace']
+    $('.unfancy.fancy-select-placeholder select').selectize # When empty options are allowed
+      create: false
+      plugins: ['restore_on_backspace', 'selectable_placeholder']
+    # Remove them so we don't initialize twice
+    $('.unfancy.fancy-select, .unfancy.fancy-select-placeholder').removeClass('unfancy')
+
   initializeNoTabLinks: ->
     # So in forms we can provide help without breaking tab index
     $('.no-tab').click (e) ->
@@ -75,6 +81,41 @@ class BikeIndex.Init extends BikeIndex
       $('body, html').animate(
         scrollTop: $($target.attr('href')).offset().top + offset, 'fast'
       )
+
+  displayLocalDate: (time, preciseTime = false) ->
+    # Ensure we return if it's a big future day
+    if time < @tomorrow
+      if time > @today
+        return time.format('h:mma')
+      else if time > yesterday
+        return "Yday #{time.format('h:mma')}"
+    if time.year() == moment().year()
+      if preciseTime then time.format('MMM Do[,] h:mma') else time.format('MMM Do[,] ha')
+    else
+      if preciseTime then time.format('YYYY-MM-DD h:mma') else time.format('YYYY-MM-DD')
+
+  localizeTimes: ->
+    @timezone ||= moment.tz.guess()
+    moment.tz.setDefault(@timezone)
+    @yesterday = moment().subtract(1, 'day').startOf('day')
+    @today = moment().startOf('day')
+    @tomorrow = moment().endOf('day')
+
+    displayLocalDate = @displayLocalDate
+    $('.convertTime').each ->
+      $this = $(this)
+      $this.removeClass('convertTime')
+      text = $this.text().trim()
+      return unless text.length > 0
+      time = moment(text, moment.ISO_8601)
+      return unless time.isValid()
+      $this.text(displayLocalDate(time, $this.hasClass('precise-time')))
+
+    # Write timezone
+    $('.convertTimezone').each ->
+      $this = $(this)
+      $this.text(moment().format('z'))
+      $this.removeClass('convertTimezone')
 
 # Check if the browser supports Flexbox
 warnIfUnsupportedBrowser = ->
