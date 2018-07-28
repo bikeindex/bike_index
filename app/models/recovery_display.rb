@@ -11,7 +11,7 @@ class RecoveryDisplay < ActiveRecord::Base
   before_validation :set_time
   def set_time
     if date_input.present?
-      self.date_recovered = DateTime.strptime("#{date_input} 06", '%Y-%m-%d %H')
+      self.date_recovered = DateTime.strptime("#{date_input} 06", '%m-%d-%Y %H')
     end
     self.date_recovered = Time.now unless date_recovered.present?
   end
