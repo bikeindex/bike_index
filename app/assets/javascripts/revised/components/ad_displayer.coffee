@@ -15,7 +15,6 @@ class @AdDisplayer
 
   photoAd: (unit) ->
     $('.content-nav-group:last').addClass('additional-ad-space')
-    console.log @geolocatedAd()
     $("##{unit}").html([@geolocatedAd()].join('')).addClass('rendered-ad photo-ad')
 
   geolocatedAd: ->
