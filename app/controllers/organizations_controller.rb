@@ -112,7 +112,7 @@ class OrganizationsController < ApplicationController
   end
 
   def built_stolen_record_date(str)
-    DateTime.strptime("#{str} 06", '%m-%d-%Y %H') if str.present?
+    DateTime.strptime("#{str} 06", '%Y-%m-%d %H') if str.present?
     rescue ArgumentError
     Time.zone.now
   end
