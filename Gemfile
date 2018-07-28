@@ -103,6 +103,8 @@ source 'https://rails-assets.org' do # JS land is crazy, so lock everything
   gem 'rails-assets-Stickyfill', '~> 1.1.3' # Affix bike edit menu
   gem 'rails-assets-mailcheck', '~> 1.1.2' # Check for common email errors
   gem 'rails-assets-waypoints', '~> 3.1.1' # For documentation pages
+  gem 'rails-assets-moment', '~> 2.18.1' # Javascript Time - localizing :)
+  gem 'rails-assets-moment-timezone', '~> 0.5.13' # Timezones for moment
   # Sortable breaks assets:precompile, so it's included manually
   # gem 'rails-assets-jquery-sortable', '~> 0.9.12' # Sort photo order
 end
