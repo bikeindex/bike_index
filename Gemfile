@@ -43,7 +43,7 @@ gem 'high_voltage'
 gem 'omniauth-facebook'
 gem 'omniauth-strava'
 gem 'omniauth', '~> 1.3.1'
-gem 'fog'
+gem "fog-aws"
 gem 'dalli'
 gem 'draper', require: false
 gem 'wkhtmltopdf-binary'
