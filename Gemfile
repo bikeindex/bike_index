@@ -110,9 +110,10 @@ end
 gem 'grape_logging' # Grape logging. Also how we pass it to lograge. Always used, not just in Prod
 gem 'lograge' # Structure log data, put it in single lines to improve the functionality
 gem 'logstash-event' # Use logstash format for logging data
+
 group :production do
   gem "honeybadger", "~> 2.0" # Error monitoring
-  gem "skylight"
+  gem "skylight" # Performance monitoring
 end
 
 group :development do
