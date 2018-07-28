@@ -30,7 +30,7 @@ class Blog < ActiveRecord::Base
   before_save :set_published_at_and_published
   def set_published_at_and_published
     if self.post_date.present?
-      self.published_at = DateTime.strptime("#{self.post_date} 06", "%m-%d-%Y %H")
+      self.published_at = DateTime.strptime("#{self.post_date} 06", "%Y-%m-%d %H")
     end
     self.published_at = Time.now if self.post_now == '1'
     if self.user_email.present?

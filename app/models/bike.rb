@@ -189,7 +189,7 @@ class Bike < ActiveRecord::Base
     return nil unless stolen and current_stolen_record.present?
     [
       'Stolen ',
-      current_stolen_record.date_stolen && current_stolen_record.date_stolen.strftime("%m-%d-%Y"),
+      current_stolen_record.date_stolen && current_stolen_record.date_stolen.strftime("%Y-%m-%d"),
       current_stolen_record.address && "from #{current_stolen_record.address}. "
     ].compact.join(' ')
   end

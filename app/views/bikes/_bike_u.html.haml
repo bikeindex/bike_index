@@ -31,11 +31,11 @@
               %p
                 %span.attr-title
                   Stolen on
-                = bike_u.current_stolen_record.date_stolen.strftime("%m-%d-%Y")
+                = bike_u.current_stolen_record.date_stolen.strftime("%Y-%m-%d")
             
             /         - date_label = "Stolen"
             /         - date_label = "Recovered" 
-            /         = bike_u.dl_list_item(bike_u.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), date_label)
+            /         = bike_u.dl_list_item(bike_u.current_stolen_record.date_stolen.strftime("%Y-%m-%d"), date_label)
             /       %dl.dl-horizontal
             /         = bike_u.dl_list_item(bike_u.short_address(bike_u.current_stolen_record), "From")
 

@@ -99,7 +99,7 @@
             = builder.label :date_stolen_input, "When was it stolen?", class: "control-label"
             .controls
               #stolen_date
-                = builder.text_field :date_stolen_input, value: @stolen_record.date_stolen.strftime('%m-%d-%Y'), required: true, data: { :'date-format' => 'mm-dd-yyyy' }
+                = builder.text_field :date_stolen_input, value: @stolen_record.date_stolen.strftime('%Y-%m-%d'), required: true, data: { :'date-format' => 'mm-dd-yyyy' }
         #stolen-bike-location.input-group
           .control-group.special-select-single
             = builder.label :street, 'Where was it stolen?', class: 'control-label'
