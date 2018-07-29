@@ -62,6 +62,7 @@
                 = label :post_date, "Post date", class: "control-label"
                 .controls
                   #post-date-field
+                    - @blog.post_date = TimeParser.round(@blog.published_at || Time.now, "seconds")
                     = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
                     = f.datetime_local_field :post_date, max: Time.now + 1.week, step: 60, required: true, class: 'form-control'
 
