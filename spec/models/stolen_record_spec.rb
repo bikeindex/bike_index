@@ -249,8 +249,6 @@ describe StolenRecord do
       let(:target_timestamp) { 1485907076 }
       let(:recovery_request) { recovery_info.merge(date_recovered: time_str, timezone: "Atlantic/Reykjavik") }
       it "updates recovered bike and assigns date" do
-        # Ensure we're converting the timestamp successfully
-        expect(Time.parse(time_str).to_i).to_not eq target_timestamp
         expect(stolen_record.date_recovered.to_i).to be_within(1).of target_timestamp
       end
     end
