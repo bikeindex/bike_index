@@ -58,8 +58,14 @@ class StolenRecordUpdator
     stolen_record.attributes = permitted_attributes(sr)
 
     unless @date_stolen.present?
-      timezone = sr["timezone"] && ActiveSupport::TimeZone[sr["timezone"]] || ActiveSupport::TimeZone["America/Los_Angeles"]
-      stolen_record.date_stolen = sr["date_stolen"] && timezone.parse(sr["date_stolen"]) || Time.now
+      if sr["date_stolen"].to_s.strip.match(/^\d+\z/) # it's only numbers, so it's a timestamp
+        stolen_record.date_stolen = Time.at(sr["date_stolen"].to_i)
+      elsif sr["date_stolen"].present?
+        Time.zone = ActiveSupport::TimeZone[sr["timezone"]] # If zone isn't found, don't explode
+        stolen_record.date_stolen = Time.parse(sr["date_stolen"])
+      else
+        stolen_record.date_stolen = Time.now
+      end
     end
     if sr['country'].present?
       country = Country.fuzzy_iso_find(sr['country'])

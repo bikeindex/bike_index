@@ -100,7 +100,7 @@ describe StolenRecordUpdator do
 
     it 'sets the data that is submitted' do
       time = "2018-07-26T19:41:41.784"
-      target_time = 1532601701
+      target_time = 1532659301
       sr = {
         phone: '2123123',
         date_stolen: time,
@@ -123,7 +123,7 @@ describe StolenRecordUpdator do
       expect(stolen_record.street).to eq(sr[:street])
       expect(stolen_record.city).to eq(sr[:city])
       expect(stolen_record.zipcode).to eq('60666')
-      expect(stolen_record.date_stolen.to_i).to be_within(1).of 1532601701
+      expect(stolen_record.date_stolen.to_i).to be_within(1).of target_time
     end
 
     it "creates the associations that it's suppose to" do

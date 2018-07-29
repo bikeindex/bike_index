@@ -55,7 +55,6 @@ class BikeUpdator
     if @bike_params['bike'] && @bike_params['bike']['date_stolen']
       StolenRecordUpdator.new(bike: @bike, date_stolen: @bike_params['bike']['date_stolen']).update_records
     else
-      pp @bike_params
       if @bike_params['stolen_record'] || @bike_params['bike']['stolen_records_attributes']
         StolenRecordUpdator.new(bike: @bike, b_param: @bike_params).update_records
         @bike.reload

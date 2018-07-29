@@ -94,7 +94,7 @@ class Bike < ActiveRecord::Base
         primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
         propulsion_type_id propulsion_type_other zipcode country_id belt_drive
         coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
-        date_stolen receive_notifications phone creator creator_id image
+        timezone date_stolen receive_notifications phone creator creator_id image
         components_attributes b_param_id embeded embeded_extended example hidden
         card_id stock_photo_url pdf send_email other_listing_urls listing_order approved_stolen
         marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids

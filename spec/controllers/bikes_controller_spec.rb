@@ -391,7 +391,8 @@ describe BikesController do
             end
           end
           context 'new date input' do
-            let(:alt_stolen_params) { stolen_params.merge(date_stolen: "2018-07-28T19:02:32") }
+            let(:alt_stolen_params) { stolen_params.merge(date_stolen: "2018-07-28T20:34:00", timezone: "America/Los_Angeles") }
+            let(:target_time) { 1532835240 }
             it 'creates a new ownership and bike from an organization' do
               expect do
                 post :create, bike: bike_params.merge(stolen: true), stolen_record: alt_stolen_params
@@ -403,7 +404,7 @@ describe BikesController do
               testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
               stolen_record = bike.current_stolen_record
               stolen_params.except(:date_stolen, :timezone).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
-              expect(stolen_record.date_stolen.to_i).to be_within(1).of 1532804552
+              expect(stolen_record.date_stolen.to_i).to be_within(1).of target_time
             end
           end
         end
@@ -891,7 +892,7 @@ describe BikesController do
           let(:state) { FactoryGirl.create(:state) }
           let(:country) { state.country }
           let(:stolen_record) { FactoryGirl.create(:stolen_record, bike: bike, city: 'party') }
-          let(:target_time) { 1454918400 }
+          let(:target_time) { 1454925600 }
           let(:stolen_attrs) do
             {
               date_stolen: "2016-02-08 02:00:00",
