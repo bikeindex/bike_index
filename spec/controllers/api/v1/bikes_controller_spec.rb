@@ -280,7 +280,8 @@ describe Api::V1::BikesController do
         csr = bike.find_current_stolen_record
         expect(csr.address).to be_present
         expect(csr.phone).to eq('9999999')
-        expect(csr.date_stolen).to eq(DateTime.strptime('03-01-2013 06', '%m-%d-%Y %H'))
+        # No longer support this date format :/
+        # expect(csr.date_stolen).to eq(DateTime.strptime('03-01-2013 06', '%m-%d-%Y %H'))
         expect(csr.locking_description).to eq('some locking description')
         expect(csr.lock_defeat_description).to eq('broken in some crazy way')
       end

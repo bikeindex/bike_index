@@ -61,7 +61,7 @@ class StolenRecordUpdator
       if sr["date_stolen"].to_s.strip.match(/^\d+\z/) # it's only numbers, so it's a timestamp
         stolen_record.date_stolen = Time.at(sr["date_stolen"].to_i)
       elsif sr["date_stolen"].present?
-        Time.zone = ActiveSupport::TimeZone[sr["timezone"]] # If zone isn't found, don't explode
+        Time.zone = ActiveSupport::TimeZone[sr["timezone"]] if sr["timezone"].present? # Do this so if zone isn't found, no explode
         stolen_record.date_stolen = Time.parse(sr["date_stolen"])
       else
         stolen_record.date_stolen = Time.now
