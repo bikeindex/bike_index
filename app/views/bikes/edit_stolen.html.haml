@@ -18,8 +18,8 @@
                 = srecord.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
                 = srecord.label :date_stolen, "When was it #{stolen_type}", class: 'form-well-label'
                 .form-well-input
-                  - srecord.object.date_stolen ||= Time.now
-                  = srecord.datetime_local_field :date_stolen, max: Time.now.end_of_day, step: 60, required: true, class: 'form-control'
+                  - srecord.object.date_stolen = TimeParser.round(srecord.object.date_stolen || Time.now)
+                  = srecord.datetime_local_field :date_stolen, max: Time.now + 1.day, step: 60, required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(srecord.object.date_stolen, format: :convert_time)
 
               .form-group.row.unnested-field
                 = srecord.label :phone, class: 'form-well-label'

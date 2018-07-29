@@ -14,4 +14,13 @@ class TimeParser
       time
     end
   end
+
+  # Accepts a time object, rounds to minutes
+  def self.round(time, unit = "minute")
+    if unit == "second"
+      time.change(usec: 0, sec: 0)
+    else # Default is minute, nothing is built to manage anything else
+      time.change(min: 0, usec: 0, sec: 0)
+    end
+  end
 end

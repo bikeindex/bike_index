@@ -9,7 +9,7 @@ class Blog < ActiveRecord::Base
   has_many :listicles, dependent: :destroy
   accepts_nested_attributes_for :listicles, allow_destroy: true
 
-  attr_accessor :post_date, :post_now, :update_title, :user_email
+  attr_accessor :post_date, :post_now, :update_title, :user_email, :timezone
 
   validates_presence_of :title, :body, :user_id
   validates_uniqueness_of :title, message: "has already been taken. If you believe that this message is an error, contact us!"
@@ -30,7 +30,7 @@ class Blog < ActiveRecord::Base
   before_save :set_published_at_and_published
   def set_published_at_and_published
     if self.post_date.present?
-      self.published_at = DateTime.strptime("#{self.post_date} 06", "%m-%d-%Y %H")
+      self.published_at = TimeParser.parse(post_date, timezone)
     end
     self.published_at = Time.now if self.post_now == '1'
     if self.user_email.present?
