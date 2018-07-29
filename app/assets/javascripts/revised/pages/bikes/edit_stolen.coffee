@@ -1,8 +1,7 @@
 class BikeIndex.BikesEditStolen extends BikeIndex
   constructor: ->
     @initializeEventListeners()
-    if $('.date_stolen_input').length > 0
-      @initializeDateSelector()
+    if $('.stolenEditPage').length > 0
       united_stated_id = $('#stolen_record_us_id').data('usid')
       new BikeIndex.ToggleHiddenOther('.country-select-input', united_stated_id)
 
@@ -12,12 +11,6 @@ class BikeIndex.BikesEditStolen extends BikeIndex
     $('#toggle-stolen form').submit (e) =>
       e.preventDefault()
       @markRecovered()
-
-  initializeDateSelector: ->
-    new Pikaday(
-      field: $('.date_stolen_input')[0]
-      format: 'MM-DD-YYYY'
-    )
 
   markStolen: (e) ->
     e.preventDefault()

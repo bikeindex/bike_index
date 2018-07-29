@@ -102,9 +102,7 @@ class OrganizationsController < ApplicationController
 
   def built_stolen_record
     if @b_param.params && @b_param.params['stolen_record'].present?
-      stolen_attrs = @b_param.params['stolen_record'].except('phone_no_show', 'date_stolen_input')
-      date_stolen = built_stolen_record_date(@b_param.params['stolen_record']['date_stolen_input'])
-      stolen_attrs.merge!(date_stolen: date_stolen)
+      stolen_attrs = @b_param.params['stolen_record'].except('phone_no_show')
     else
       stolen_attrs = { country_id: Country.united_states.id, date_stolen: Time.zone.now }
     end

@@ -156,8 +156,11 @@ $(document).ready ->
       $('#bike_stolen').val(1)
     toggleRegistrationType()
 
-  $('#stolen_record_date_stolen_input').datepicker('format: mm-dd-yyy')
   $('#stolen_fields').appendTo('#stolen_fields_store')
   toggleRegistrationType() if $('#stolen_registration_first').length > 0
+
+  # Update any hidden fields with current timezone
+  window.timezone ||= moment.tz.guess()
+  $(".hiddenFieldTimezone").val(window.timezone)
 
   new window.CheckEmail('#bike_owner_email')

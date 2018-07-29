@@ -20,7 +20,6 @@ class BikeCreatorAssociator
 
   def create_stolen_record(bike)
     StolenRecordUpdator.new(bike: bike, user: @b_param.creator, b_param: @b_param.params).create_new_record
-    StolenRecordUpdator.new(bike: bike).set_creation_organization if bike.creation_organization.present?
     bike.save
   end
 

@@ -15,7 +15,6 @@
 //= require external_scripts/selectize_placeholder_plugin.js
 //= require external_scripts/headroom
 //= require external_scripts/jQuery.headroom
-//= require pikaday
 //= require mailcheck
 //= require moment
 //= require moment-timezone

@@ -79,8 +79,7 @@ en:
       blog: "%m_%d_%Y"
       dotted: "%_m.%_d.%Y"
       short_with_hour: "%m.%d.%y - %l%P"
-      # Future update will convert times to local times for users - initially though, we're going to display something random
-      convert_time: "%FT%TZ"
+      convert_time: "%FT%T%z"
   errors: &errors
     format: ! '%{attribute} %{message}'
     messages:

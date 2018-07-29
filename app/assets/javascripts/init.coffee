@@ -100,6 +100,8 @@ class BikeIndex.Init extends BikeIndex
     window.yesterday = moment().subtract(1, "day").startOf("day")
     window.today = moment().startOf("day")
     window.tomorrow = moment().endOf("day")
+    # Update any hidden fields with current timezone
+    $(".hiddenFieldTimezone").val(window.timezone)
 
     displayLocalDate = @displayLocalDate
     $(".convertTime").each ->
@@ -109,7 +111,7 @@ class BikeIndex.Init extends BikeIndex
       return unless text.length > 0
       time = moment(text, moment.ISO_8601)
       return unless time.isValid()
-      $this.text(displayLocalDate(time, $this.hasClass("precise-time")))
+      $this.text(displayLocalDate(time, $this.hasClass("preciseTime")))
 
     # Write timezone
     $(".convertTimezone").each ->

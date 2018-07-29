@@ -148,8 +148,7 @@ describe OrganizationsController do
           },
           stolen_record: {
             phone_no_show: 'true',
-            phone: '7183839292',
-            date_stolen_input: 'not stolen yet'
+            phone: '7183839292'
           }
         }
       end

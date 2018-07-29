@@ -40,29 +40,6 @@ describe StolenRecordUpdator do
     end
   end
 
-  describe 'create_date_from_string' do
-    let(:updator) { StolenRecordUpdator.new(bike: Bike.new) }
-    context 'date_time' do
-      it 'correctly translates a date string to a date_time' do
-        date_time = DateTime.strptime('07-09-2000 06', '%m-%d-%Y %H')
-        expect(updator.create_date_from_string('07-09-2000')).to eq(date_time)
-      end
-    end
-    context 'timestamp' do
-      it 'correctly translates a date string to a date_time' do
-        date_time = Time.zone.now
-        expect(updator.create_date_from_string(date_time.to_i.to_s)).to be_within(1.second).of(date_time)
-      end
-    end
-    context 'revised date time version' do
-      it 'correctly translates a date string to a date_time' do
-        date_string = 'Sun Feb 7 2016'
-        date_time = DateTime.strptime("#{date_string} 06", '%a %b %d %Y %H')
-        expect(updator.create_date_from_string(date_string)).to eq(date_time)
-      end
-    end
-  end
-
   describe 'update_records' do
     it "sets the current stolen record as not current if the bike isn't stolen" do
       FactoryGirl.create(:country, iso: 'US')
@@ -84,8 +61,9 @@ describe StolenRecordUpdator do
       stolen_record = FactoryGirl.create(:stolen_record)
       bike = stolen_record.bike
       bike.update_attributes(stolen: true)
-      StolenRecordUpdator.new(bike: bike, date_stolen_input: '01-01-1969').update_records
-      expect(bike.reload.current_stolen_record.date_stolen).to eq(DateTime.strptime('01-01-1969 06', '%m-%d-%Y %H'))
+      time = DateTime.strptime('01-01-1969 06', '%m-%d-%Y %H').end_of_day
+      StolenRecordUpdator.new(bike: bike, date_stolen: time.to_i).update_records
+      expect(bike.reload.current_stolen_record.date_stolen).to be_within(1.second).of time
     end
 
     it "marks all stolen records false and mark the bike unrecovered if the bike isn't stolen" do
@@ -113,17 +91,6 @@ describe StolenRecordUpdator do
     end
   end
 
-  describe 'set_creation_organization' do
-    it 'sets the creation organization from the bike' do
-      organization = FactoryGirl.create(:organization)
-      bike = FactoryGirl.create(:bike, creation_organization_id: organization.id)
-      stolen_record = FactoryGirl.create(:stolen_record, bike: bike)
-      StolenRecordUpdator.new(bike: bike).set_creation_organization
-      stolen_record.reload
-      expect(stolen_record.creation_organization).to eq(organization)
-    end
-  end
-
   describe 'update_with_params' do
     it 'returns the stolen record if no stolen record is associated' do
       stolen_record = StolenRecord.new
@@ -132,9 +99,12 @@ describe StolenRecordUpdator do
     end
 
     it 'sets the data that is submitted' do
+      time = "2018-07-26T19:41:41.784"
+      target_time = 1532601701
       sr = {
         phone: '2123123',
-        date_stolen: Time.now.beginning_of_day.strftime('%m-%d-%Y'),
+        date_stolen: time,
+        timezone: "Asia/Tokyo",
         police_report_number: 'XXX',
         police_report_department: 'highway 69',
         theft_description: 'blah blah blah',
@@ -153,7 +123,7 @@ describe StolenRecordUpdator do
       expect(stolen_record.street).to eq(sr[:street])
       expect(stolen_record.city).to eq(sr[:city])
       expect(stolen_record.zipcode).to eq('60666')
-      expect(stolen_record.date_stolen).to be > Time.now - 2.days
+      expect(stolen_record.date_stolen.to_i).to be_within(1).of 1532601701
     end
 
     it "creates the associations that it's suppose to" do

@@ -140,3 +140,12 @@ a.optional-form-block {
 .file input:focus ~ .file-custom {
   @include box-shadow(0 0 0 .075rem #fff, 0 0 0 .2rem #0074d9);
 }
+
+// Remove trailing seconds select from datetime inputs -- GROSS HACK
+::-webkit-datetime-edit-second-field {
+  background: white;
+  color: transparent;
+  margin-left: -3px;
+  position: absolute;
+  width: 1px;
+}

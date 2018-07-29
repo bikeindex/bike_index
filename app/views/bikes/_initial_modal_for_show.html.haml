@@ -17,8 +17,9 @@
             = f.text_area :recovered_description, class: 'form-control'
           .form-group
             = f.label :date_recovered, 'When did you recover it?', class: 'form-well-label'
-            - date_string = (stolen_record.date_recovered || Date.today).strftime(StolenRecord.revised_date_format)
-            = f.text_field :date_recovered, required: true, class: 'form-control date_recovered_input', value: date_string
+            - f.object.date_recovered ||= Time.now
+            = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
+            = f.datetime_local_field :date_recovered, max: Time.now.end_of_day, step: 60, required: true, class: 'form-control'
           .checkbox
             %label
               = f.check_box :index_helped_recovery

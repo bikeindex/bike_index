@@ -2,18 +2,14 @@ class StolenRecord < ActiveRecord::Base
   include ActiveModel::Dirty
   include Phonifyerable
   def self.old_attr_accessible
-    # recovery_share, # We edit this in the admin panel
-    # recovery_tweet, # We edit this in the admin panel
-    # date_stolen_input # now putting this in here, on revised, because less stupid
+    # recovery_tweet, recovery_share # We edit this in the admin panel
     %w(police_report_number police_report_department locking_description lock_defeat_description
-       date_stolen date_stolen_input bike creation_organization_id country_id state_id street zipcode city latitude
+       timezone date_stolen bike creation_organization_id country_id state_id street zipcode city latitude
        longitude theft_description current phone secondary_phone phone_for_everyone
        phone_for_users phone_for_shops phone_for_police receive_notifications proof_of_ownership
        approved date_recovered recovered_description index_helped_recovery can_share_recovery
        recovery_posted tsved_at estimated_value).map(&:to_sym).freeze
  end
-
-  attr_accessor :date_stolen_input
 
   belongs_to :bike
   has_one :current_bike, class_name: 'Bike', foreign_key: :current_stolen_record_id
@@ -23,12 +19,7 @@ class StolenRecord < ActiveRecord::Base
   belongs_to :creation_organization, class_name: 'Organization'
 
   validates_presence_of :bike
-  validate :date_present
-  def date_present
-    unless date_stolen.present? || date_stolen_input.present?
-      errors.add :base, 'You need to include the date stolen'
-    end
-  end
+  validates_presence_of :date_stolen
 
   default_scope { where(current: true) }
   scope :approveds, -> { where(approved: true) }
@@ -43,36 +34,13 @@ class StolenRecord < ActiveRecord::Base
   geocoded_by :address
   after_validation :geocode, if: lambda { (self.city.present? || self.zipcode.present?) && self.country.present? }
 
-  def self.revised_date_format
-    "%a %b %d %Y"
-  end
-
-  def self.revised_date_format_hour
-    "#{revised_date_format} %H"
-  end
-
   def self.find_matching_token(bike_id:, recovery_link_token:)
     return nil unless bike_id.present? && recovery_link_token.present?
     unscoped.where(bike_id: bike_id, recovery_link_token: recovery_link_token).first
   end
 
-  before_validation :date_from_date_stolen_input
-  def date_from_date_stolen_input
-    return true unless date_stolen_input.present?
-    self.date_stolen = parse_date_from_input(date_stolen_input)
-  end
-
-  def parse_date_from_input(date_string)
-    return Time.now unless date_string.present?
-    DateTime.strptime("#{date_string} 06", self.class.revised_date_format_hour)
-  end
-
   def recovered?
     !current?
-  end
-
-  def formatted_date
-    date_stolen && date_stolen.strftime(self.class.revised_date_format)
   end
 
   def address(skip_default_country: false)
@@ -190,7 +158,13 @@ class StolenRecord < ActiveRecord::Base
 
   def add_recovery_information(info = {})
     info = ActiveSupport::HashWithIndifferentAccess.new(info)
-    self.date_recovered ||= parse_date_from_input(info[:date_recovered])
+    if info[:date_recovered].present? && info[:timezone].present?
+      # Fallback, prevent nil or missing timezone issues
+      timezone = ActiveSupport::TimeZone[info[:timezone]] || ActiveSupport::TimeZone["America/Los_Angeles"]
+      self.date_recovered = timezone.parse(info[:date_recovered])
+    else
+      self.date_recovered = Time.now
+    end
     update_attributes(current: false,
                       recovered_description: info[:recovered_description],
                       index_helped_recovery: ("#{info[:index_helped_recovery]}" =~ /t|1/i).present?,

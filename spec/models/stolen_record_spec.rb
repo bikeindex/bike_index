@@ -65,29 +65,6 @@ describe StolenRecord do
 
   it 'only allows one current stolen record per bike'
 
-  describe 'date_present' do
-    let(:bike) { Bike.new }
-    context 'both date_stolen and date_stolen_input absent' do
-      it 'adds an error' do
-        stolen_record = StolenRecord.new(bike: bike)
-        expect(stolen_record.valid?).to be_falsey
-        expect(stolen_record.errors.full_messages.to_s).to match 'date stolen'
-      end
-    end
-    context 'date_stolen present' do
-      it 'is valid' do
-        stolen_record = StolenRecord.new(bike: bike, date_stolen: Date.yesterday)
-        expect(stolen_record.valid?).to be_truthy
-      end
-    end
-    context 'date_stolen_input present' do
-      it 'is valid' do
-        stolen_record = StolenRecord.new(bike: bike, date_stolen_input: 'Mon Feb 22 2016')
-        expect(stolen_record.valid?).to be_truthy
-      end
-    end
-  end
-
   describe 'address' do
     let(:country) { Country.create(name: 'Neverland', iso: 'NEVVVV') }
     let(:state) { State.create(country_id: country.id, name: 'BullShit', abbreviation: 'XXX')}
@@ -267,10 +244,14 @@ describe StolenRecord do
         expect(stolen_record.reload.date_recovered).to be_within(1.second).of Time.now
       end
     end
-    context 'date_recovered' do
-      let(:recovery_request) { recovery_info.merge(date_recovered: 'Tue Jan 31 2017') }
-      it 'updates recovered bike and assigns date' do
-        expect(stolen_record.reload.date_recovered.to_date).to eq Date.civil(2017, 1, 31)
+    context "date_recovered" do
+      let(:time_str) { "2017-01-31T17:57:56.615" }
+      let(:target_timestamp) { 1485903476 }
+      let(:recovery_request) { recovery_info.merge(date_recovered: time_str, timezone: "EST") }
+      it "updates recovered bike and assigns date" do
+        # Ensure we're converting the timestamp successfully
+        expect(Time.parse("2017-01-31T17:57:56.615").to_i).to_not eq target_timestamp
+        expect(stolen_record.date_recovered.to_i).to be_within(1).of target_timestamp
       end
     end
   end

@@ -48,7 +48,7 @@ class BikeIndex.Views.Global extends Backbone.View
       return unless text.length > 0
       time = moment(text, moment.ISO_8601)
       return unless time.isValid()
-      $this.text(displayLocalDate(time, $this.hasClass("precise-time")))
+      $this.text(displayLocalDate(time, $this.hasClass("preciseTime")))
 
     # Write timezone
     $(".convertTimezone").each ->

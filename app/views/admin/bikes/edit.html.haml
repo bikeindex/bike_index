@@ -4,7 +4,7 @@
   #bike_edit_root_url.hidden{data: { url: ENV['BASE_URL'] }}
   #chosen-container
     %ul.bike-boxes
-      = render partial: "/bikes/bike", locals: {bike: @bike, target: "show" }
+      = render partial: "/bikes/bike", locals: { bike: @bike, target: "show" }
     - if @bike.stolen
       %h4
         = link_to 'Stolen edit page', edit_admin_stolen_bike_url(@bike)
@@ -30,7 +30,11 @@
         - if @bike.current_stolen_record.present?
           = @bike.dl_list_item(@bike.current_stolen_record.phone, 'Phone')
       %dl.dl-horizontal
-        = @bike.dl_list_item(@bike.created_at.strftime('%m-%d-%Y'), 'Created')
+        %dt Created
+        %dd
+          %span.convertTime
+            = l @bike.created_at, format: :convert_time
+          %small.convertTimezone
         - if @bike.creation_organization.present?
           = @bike.dl_list_item(@bike.creation_organization.name, 'Creation org')
           = @bike.dl_from_attribute('cached_data')
