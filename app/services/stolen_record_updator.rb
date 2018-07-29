@@ -4,7 +4,7 @@ end
 class StolenRecordUpdator
   def initialize(creation_params = {})
     @bike = creation_params[:bike]
-    @date_stolen = Time.at(creation_params[:date_stolen].to_i) if creation_params[:date_stolen].present?
+    @date_stolen = TimeParser.parse(creation_params[:date_stolen])
     @user = creation_params[:user]
     @b_param = creation_params[:b_param]
   end 
@@ -58,14 +58,7 @@ class StolenRecordUpdator
     stolen_record.attributes = permitted_attributes(sr)
 
     unless @date_stolen.present?
-      if sr["date_stolen"].to_s.strip.match(/^\d+\z/) # it's only numbers, so it's a timestamp
-        stolen_record.date_stolen = Time.at(sr["date_stolen"].to_i)
-      elsif sr["date_stolen"].present?
-        Time.zone = ActiveSupport::TimeZone[sr["timezone"]] if sr["timezone"].present? # Do this so if zone isn't found, no explode
-        stolen_record.date_stolen = Time.parse(sr["date_stolen"])
-      else
-        stolen_record.date_stolen = Time.now
-      end
+      stolen_record.date_stolen = TimeParser.parse(sr["date_stolen"], sr["timezone"]) || Time.now
     end
     if sr['country'].present?
       country = Country.fuzzy_iso_find(sr['country'])

@@ -391,7 +391,7 @@ describe BikesController do
             end
           end
           context 'new date input' do
-            let(:alt_stolen_params) { stolen_params.merge(date_stolen: "2018-07-28T20:34:00", timezone: "America/Los_Angeles") }
+            let(:alt_stolen_params) { stolen_params.merge(date_stolen: "2018-07-28T23:34:00", timezone: "America/New_York") }
             let(:target_time) { 1532835240 }
             it 'creates a new ownership and bike from an organization' do
               expect do
@@ -895,7 +895,7 @@ describe BikesController do
           let(:target_time) { 1454925600 }
           let(:stolen_attrs) do
             {
-              date_stolen: "2016-02-08 02:00:00",
+              date_stolen: "2016-02-08 04:00:00",
               timezone: "America/Chicago",
               phone: '9999999999',
               street: '66666666 foo street',

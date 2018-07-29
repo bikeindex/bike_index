@@ -99,7 +99,7 @@ describe StolenRecordUpdator do
     end
 
     it 'sets the data that is submitted' do
-      time = "2018-07-26T19:41:41.784"
+      time = "2018-07-27T11:41:41.484"
       target_time = 1532659301
       sr = {
         phone: '2123123',

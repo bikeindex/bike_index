@@ -158,13 +158,7 @@ class StolenRecord < ActiveRecord::Base
 
   def add_recovery_information(info = {})
     info = ActiveSupport::HashWithIndifferentAccess.new(info)
-    if info[:date_recovered].present? && info[:timezone].present?
-      # Fallback, prevent nil or missing timezone issues
-      timezone = ActiveSupport::TimeZone[info[:timezone]] || ActiveSupport::TimeZone["America/Los_Angeles"]
-      self.date_recovered = timezone.parse(info[:date_recovered])
-    else
-      self.date_recovered = Time.now
-    end
+    self.date_recovered = TimeParser.parse(info[:date_recovered], info[:timezone]) || Time.now
     update_attributes(current: false,
                       recovered_description: info[:recovered_description],
                       index_helped_recovery: ("#{info[:index_helped_recovery]}" =~ /t|1/i).present?,
