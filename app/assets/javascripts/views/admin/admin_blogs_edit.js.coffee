@@ -53,8 +53,6 @@ class BikeIndex.Views.AdminBlogsEdit extends Backbone.View
   editDate: (event) ->
     event.preventDefault()
     unless $('#blog-date').is(":visible")
-      target = $(event.target)
-      date = target.attr('data-date')
       $('#blog-date').slideDown()
 
 

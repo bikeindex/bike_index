@@ -19,7 +19,7 @@ class BikeIndex.Views.Global extends Backbone.View
       $('.spokecard-extension').addClass('on-spokecard-page')
     @intializeContent() if $('.content-nav').length > 0
 
-    # Pulled from init, because we need it
+    # Pulled from init, because we need it in admin
     @localizeTimes()
 
   displayLocalDate: (time, preciseTime = false) ->
