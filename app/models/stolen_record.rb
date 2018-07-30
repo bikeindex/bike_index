@@ -11,6 +11,8 @@ class StolenRecord < ActiveRecord::Base
        recovery_posted tsved_at estimated_value).map(&:to_sym).freeze
  end
 
+ attr_accessor :timezone # Just to provide a backup and permit assignment
+
   belongs_to :bike
   has_one :current_bike, class_name: 'Bike', foreign_key: :current_stolen_record_id
   has_one :recovery_display
