@@ -1,35 +1,71 @@
-.receptacle.overfloating
-  .inner-recep
-    %h1
-      Oh no! That spoke card isn't linked to a bike
-    %article
-      %h3
-        Tell us what bike it should connected to!
-    
-    = form_for @feedback do |f|
-      - if @feedback.errors.any?
-        #alert-block
-          .alert.alert-error
-            %a.close{"data-dismiss" => "alert"} ×
-            %h4
-              Please fix the following 
-              = pluralize(@feedback.errors.count, "error")
-            %ul
-              - @feedback.errors.full_messages.each do |msg|
-                %li 
-                  = msg  
+.container.scanned-not-claimed-page
+  %h1
+    Oh no!
+  %h2
+    That #{@bike_code.kind} isn't linked to a bike.
+  %hr{ style: "margin: 24px 0 36px;" }
 
-      .feedbacks.padded
-        .contact-info
-          = f.hidden_field :name, value: "spoke card connect"
-          = f.hidden_field :feedback_type, value: 'spokecard'
-          = f.email_field :email, required: true, placeholder: "Enter your email address", value: current_user ? current_user.email : ""
-          = f.hidden_field :title, value: @card_id
-        .contact-text
-          - if current_user.present? && current_user.bikes.any?
-            = f.text_area :body, placeholder: "Bike url it should be associated with (and anything else you want to say)", rows: 7, value: "I would like to connect this spoke card to my bike \n\nhttps://bikeindex.org/bikes/#{current_user.bike_ids.first}"
-          - else
-            = f.hidden_field :body, value: 'not logged in'
-        .feedback-actions.control-group
-          = f.submit 'Submit!', class: 'button-green pull-right'
+  - if current_user.present?
+    - if current_user.is_member_of?(@organization)
+
+    - elsif !@bike_code.linkable_by?(current_user)
+      %h3
+        You have claimed the maximum permitted number of Bike Codes.
+      %p
+        Please email #{ link_to "support@bikeindex.org", "mailto:support@bikeindex.org" } if you don't understand why you're seeing this message or if you need an exception made.
+    - else
+      %p
+        You can enter the URL of the bike you would like to link this #{@bike_code.kind} to:
+      .row
+        .col-sm-8.col-lg-10
+          .form-group
+            = text_field_tag :title, "", placeholder: "https://bikeindex.org/bikes/1234", class: "form-control"
+        .col-sm-4.col-lg-2
+          = link_to "Update", "#", class: "btn btn-success"
         
+      %p{ style: "margin-top: 24px;" }
+        Or, click <em>link it</em> on of your bikes to connect it to this #{@bike_code.kind}:
+
+      %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
+        %thead.small-header
+          %tr
+            %th.date-added
+              Added&nbsp;<small class="convertTimezone"></small>
+            %th.hidden-xs-down Manufacturer
+            %th.hidden-xs-down Model
+            %th.hidden-xs-down Color
+            %th.hidden-sm-up.hidden-sm-up
+              %small
+                mnfg, model,
+                %span.less-strong
+                  color
+            %th
+              Link IT!
+        %tbody
+          - @bikes.each do |bike|
+            %tr
+              %td
+                %small
+                  %a.convertTime{ href: bike_path(bike) }
+                    = l bike.created_at, format: :convert_time
+              %td.hidden-xs-down
+                = bike.mnfg_name
+              %td.hidden-xs-down
+                = bike.frame_model
+              %td.hidden-xs-down
+                = bike.frame_colors.to_sentence
+              %td.hidden-sm-up
+                %small
+                  = bike.mnfg_name
+                  = ", #{bike.frame_model}" if bike.frame_model.present?
+                  %span.less-strong
+                    = bike.frame_colors.to_sentence
+                  %br
+              %td
+                %small
+                  %a{ href: "#" }
+                    Link&nbsp;#{@bike_code.kind}
+  - else
+    %p{ style: "margin-top: 24px;" }
+      To link that card with a bike,
+      = link_to "please sign in", new_session_url(return_to: "/bikes/#{@bike_code.code}/scanned?organization_id=#{@bike_code.organization_id}")

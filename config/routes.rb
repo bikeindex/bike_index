@@ -116,6 +116,7 @@ Bikeindex::Application.routes.draw do
     resource :recovery, only: [:edit, :update], controller: 'bikes/recovery'
   end
 
+  resources :bike_codes, only: [:update]
   resources :locks, except: [:show, :index]
 
   namespace :admin do
