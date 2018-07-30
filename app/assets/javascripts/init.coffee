@@ -104,13 +104,15 @@ class BikeIndex.Init extends BikeIndex
     $(".hiddenFieldTimezone").val(window.timezone)
 
     displayLocalDate = @displayLocalDate
+
+    # Write local time
     $(".convertTime").each ->
       $this = $(this)
       $this.removeClass("convertTime")
       text = $this.text().trim()
       return unless text.length > 0
       time = moment(text, moment.ISO_8601)
-      return unless time.isVali
+      return unless time.isValid
       $this.text(displayLocalDate(time, $this.hasClass("preciseTime")))
 
     # Write timezone
@@ -119,6 +121,7 @@ class BikeIndex.Init extends BikeIndex
       $this.text(moment().format("z"))
       $this.removeClass("convertTimezone")
 
+    # Write local time in fields
     $(".dateInputUpdateZone").each ->
       $this = $(this)
       time = moment($this.attr("data-initialtime"), moment.ISO_8601)
