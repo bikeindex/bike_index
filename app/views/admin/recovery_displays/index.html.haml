@@ -12,7 +12,7 @@
   %table.table.table-striped.table-bordered.padded
     %thead
       %th
-        Date
+        Date&nbsp;<small class="convertTimezone"></small>
       %th
         Quote
       %th.large-screens
@@ -25,8 +25,8 @@
       - @recovery_displays.each do |recovery_display|
         %tr
           %td
-            - date = l recovery_display.date_recovered, format: :dotted
-            = link_to date, edit_admin_recovery_display_url(recovery_display)
+            %a.convertTime{ href: edit_admin_recovery_display_url(recovery_display) }
+              = l recovery_display.date_recovered, format: :convert_time
             .less-strong-hold
               %span.less-strong-right.medium-screens
                 = recovery_display.bike && recovery_display.bike.id

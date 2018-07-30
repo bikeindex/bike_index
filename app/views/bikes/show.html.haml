@@ -50,7 +50,9 @@
               Recovered
             - else
               Last seen
-          = l @stolen_record.date_stolen, format: :dotted
+          %span.convertTime
+            = l @stolen_record.date_stolen, format: :convert_time
+          %small.convertTimezone
           %strong
             at
           = @stolen_record.address(skip_default_country: true)

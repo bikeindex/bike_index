@@ -41,18 +41,17 @@ describe BikeCreatorAssociator do
   end
 
   describe 'create_stolen_record' do
-    it 'calls create stolen record and set_creation_organization' do
+    it 'calls create stolen record' do
       b_param = BParam.new
       bike = Bike.new
       allow(bike).to receive(:creation_organization).and_return(true)
       expect_any_instance_of(StolenRecordUpdator).to receive(:create_new_record).and_return(true)
-      expect_any_instance_of(StolenRecordUpdator).to receive(:set_creation_organization).and_return(true)
       BikeCreatorAssociator.new(b_param).create_stolen_record(bike)
     end
   end
 
   describe 'add_other_listings' do
-    it 'calls create stolen record and set_creation_organization' do
+    it 'calls create stolen record' do
       b_param = BParam.new
       bike = FactoryGirl.create(:bike)
       urls = ['http://some_blog.com', 'http://some_thing.com']

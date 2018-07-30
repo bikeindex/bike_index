@@ -22,7 +22,7 @@ module Bikeindex
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password]
 
-    config.time_zone = 'Central Time (US & Canada)'
+    config.time_zone = "Central Time (US & Canada)" # Also set in TimeParser::DEFAULT_TIMEZONE
 
     # Force sql schema use so we get psql extensions
     config.active_record.schema_format = :sql

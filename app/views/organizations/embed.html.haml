@@ -89,17 +89,17 @@
       = f.hidden_field :stolen, value: true
       = fields_for @stolen_record do |builder|
         = builder.hidden_field :phone_no_show, value: true
-        .input-group
+        .input-group#stolenDisplay
           .control-group
             = builder.label :phone, class: "control-label"
             .controls
               = builder.text_field :phone, required: "true"
         .input-group
-          .control-group.datepicker-container
-            = builder.label :date_stolen_input, "When was it stolen?", class: "control-label"
-            .controls
-              #stolen_date
-                = builder.text_field :date_stolen_input, value: @stolen_record.date_stolen.strftime('%m-%d-%Y'), required: true, data: { :'date-format' => 'mm-dd-yyyy' }
+          .control-group{ style: "width: 300px; max-width: 100%;" }
+            = builder.label :date_stolen, "When was it stolen?", class: "control-label"
+            - builder.object.date_stolen = TimeParser.round(builder.object.date_stolen || Time.now)
+            = builder.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
+            = builder.datetime_local_field :date_stolen, max: Time.now + 1.day, step: 3600, required: true, class: 'form-control', style: "font-size: 90%; width: 100%;"
         #stolen-bike-location.input-group
           .control-group.special-select-single
             = builder.label :street, 'Where was it stolen?', class: 'control-label'

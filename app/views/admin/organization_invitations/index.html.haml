@@ -13,7 +13,7 @@
       %th
         Id&nbsp;
       %th.large-screens
-        Date sent
+        Sent&nbsp;<small class="convertTimezone"></small>
       %th.medium-screens
         Name
       %th
@@ -31,7 +31,8 @@
           %td
             = link_to org_invite.id, edit_admin_organization_invitation_url(org_invite.id, organization_id: current_organization.to_param)
           %td.large-screens
-            = org_invite.created_at.strftime("%-I %p on %-m/%-d/%Y ")
+            %span.convert-time
+              = l org_invite.created_at, format: :convert_time
           %td.medium-screens
             - if org_invite.invitee_name
               = org_invite.invitee_name

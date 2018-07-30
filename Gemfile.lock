@@ -365,8 +365,10 @@ GEM
     rails-assets-lodash (4.9.0)
     rails-assets-mailcheck (1.1.2)
     rails-assets-microplugin (0.0.3)
+    rails-assets-moment (2.18.1)
+    rails-assets-moment-timezone (0.5.17)
+      rails-assets-moment (>= 2.9.0)
     rails-assets-mustache (2.2.1)
-    rails-assets-pikaday (1.4.0)
     rails-assets-select2 (4.0.3)
     rails-assets-selectize (0.12.1)
       rails-assets-jquery (>= 1.7.0)
@@ -616,8 +618,9 @@ DEPENDENCIES
   rails-assets-jquery.dirtyforms (~> 2.0.0)!
   rails-assets-lodash (~> 4.9.0)!
   rails-assets-mailcheck (~> 1.1.2)!
+  rails-assets-moment (~> 2.18.1)!
+  rails-assets-moment-timezone (~> 0.5.13)!
   rails-assets-mustache (~> 2.2.1)!
-  rails-assets-pikaday (~> 1.4.0)!
   rails-assets-select2 (~> 4.0.3)!
   rails-assets-selectize (~> 0.12.1)!
   rails-assets-tether (~> 1.1.0)!

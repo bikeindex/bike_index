@@ -37,7 +37,8 @@ describe Bikes::RecoveryController, type: :controller do
   describe 'update' do
     let(:recovery_info) do
       {
-        date_recovered: 'Sun Aug 20 2017',
+        date_recovered: "2018-07-28T18:57:13.277",
+        timezone: "America/Monterrey",
         recovered_description: 'Some sweet description',
         index_helped_recovery: '0',
         can_share_recovery: '1'
@@ -59,7 +60,7 @@ describe Bikes::RecoveryController, type: :controller do
         expect(stolen_record.index_helped_recovery).to be_falsey
         expect(stolen_record.can_share_recovery).to be_truthy
         expect(stolen_record.recovered_description).to eq recovery_info[:recovered_description]
-        expect(stolen_record.reload.date_recovered.to_date).to eq Date.civil(2017, 8, 20)
+        expect(stolen_record.reload.date_recovered.to_i).to be_within(1).of 1532822233
       end
     end
     context 'non-matching recovery token' do

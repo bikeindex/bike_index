@@ -17,7 +17,6 @@
 //= require external_scripts/bootstrap-modal.js
 //= require external_scripts/bootstrap-collapse.js
 //= require external_scripts/bootstrap-tab.js
-//= require external_scripts/bootstrap-datepicker.js
 //= require external_scripts/bootstrap-dropdown.js
 //= require external_scripts/zoom.js
 //= require external_scripts/bootstrap-button.js
@@ -35,5 +34,7 @@
 //= require dataTables/bootstrap/2/jquery.dataTables.bootstrap
 //= require underscore
 //= require backbone
+//= require moment
+//= require moment-timezone
 //= require bike_index
 //= require_tree ./views

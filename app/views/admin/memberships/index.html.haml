@@ -11,7 +11,7 @@
       %th
         Id&nbsp;
       %th.medium-screens
-        Created
+        Created&nbsp;<small class="convertTimezone"></small>
       %th
         Email
       %th
@@ -24,18 +24,8 @@
           %td
             = link_to membership.id, admin_membership_url(membership)
           %td.medium-screens
-            - if membership.created_at.today?
-              %span.hidden
-                = membership.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              Today at #{membership.created_at.strftime("%-I %p")}
-            - elsif Date.yesterday().beginning_of_day() <= membership.created_at
-              %span.hidden
-                = membership.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              Yesterday at #{membership.created_at.strftime("%-I %p")}
-            - else
-              %span.hidden
-                = membership.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              = membership.created_at.strftime("%-m/%-d/%Y at %-I %p")
+            %span.convertTime
+              = l membership.created_at, format: :convert_time
           %td
             = membership.user.email
           %td

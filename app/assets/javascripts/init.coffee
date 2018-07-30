@@ -1,14 +1,8 @@
+# Ensure we have string trim
+unless String::trim then String::trim = -> @replace /^\s+|\s+$/g, ""
+
 # All the classes inherit from this
 class window.BikeIndex
-  loadFancySelects: ->
-    $('.unfancy.fancy-select select').selectize
-      create: false
-      plugins: ['restore_on_backspace']
-    $('.unfancy.fancy-select-placeholder select').selectize # When empty options are allowed
-      create: false
-      plugins: ['restore_on_backspace', 'selectable_placeholder']
-    # Remove them so we don't initialize twice
-    $('.unfancy.fancy-select, .unfancy.fancy-select-placeholder').removeClass('unfancy')
 
 # This file initializes scripts for the application
 class BikeIndex.Init extends BikeIndex
@@ -22,6 +16,8 @@ class BikeIndex.Init extends BikeIndex
     @loadPageScript(document.getElementsByTagName('body')[0].id)
     # Initialize the js for the organized menu pages
     new BikeIndex.Organized if $('.organized-body').length > 0
+    # Set the local timezone and convert all the times to local
+    @localizeTimes()
 
   loadPageScript: (body_id) ->
     # If this is a landing page
@@ -53,6 +49,16 @@ class BikeIndex.Init extends BikeIndex
       locks_create: BikeIndex.LocksForm
     window.pageScript = new pageClasses[body_id] if Object.keys(pageClasses).includes(body_id)
 
+  loadFancySelects: ->
+    $('.unfancy.fancy-select select').selectize
+      create: false
+      plugins: ['restore_on_backspace']
+    $('.unfancy.fancy-select-placeholder select').selectize # When empty options are allowed
+      create: false
+      plugins: ['restore_on_backspace', 'selectable_placeholder']
+    # Remove them so we don't initialize twice
+    $('.unfancy.fancy-select, .unfancy.fancy-select-placeholder').removeClass('unfancy')
+
   initializeNoTabLinks: ->
     # So in forms we can provide help without breaking tab index
     $('.no-tab').click (e) ->
@@ -75,6 +81,48 @@ class BikeIndex.Init extends BikeIndex
       $('body, html').animate(
         scrollTop: $($target.attr('href')).offset().top + offset, 'fast'
       )
+
+  displayLocalDate: (time, preciseTime = false) ->
+    # Ensure we return if it's a big future day
+    if time < window.tomorrow
+      if time > window.today
+        return time.format("h:mma")
+      else if time > window.yesterday
+        return "Yday #{time.format('h:mma')}"
+    if time.year() == moment().year()
+      if preciseTime then time.format("MMM Do[,] h:mma") else time.format("MMM Do[,] ha")
+    else
+      if preciseTime then time.format("YYYY-MM-DD h:mma") else time.format("YYYY-MM-DD")
+
+  localizeTimes: ->
+    window.timezone ||= moment.tz.guess()
+    moment.tz.setDefault(window.timezone)
+    window.yesterday = moment().subtract(1, "day").startOf("day")
+    window.today = moment().startOf("day")
+    window.tomorrow = moment().endOf("day")
+    # Update any hidden fields with current timezone
+    $(".hiddenFieldTimezone").val(window.timezone)
+
+    displayLocalDate = @displayLocalDate
+    $(".convertTime").each ->
+      $this = $(this)
+      $this.removeClass("convertTime")
+      text = $this.text().trim()
+      return unless text.length > 0
+      time = moment(text, moment.ISO_8601)
+      return unless time.isVali
+      $this.text(displayLocalDate(time, $this.hasClass("preciseTime")))
+
+    # Write timezone
+    $(".convertTimezone").each ->
+      $this = $(this)
+      $this.text(moment().format("z"))
+      $this.removeClass("convertTimezone")
+
+    $(".dateInputUpdateZone").each ->
+      $this = $(this)
+      time = moment($this.attr("data-initialtime"), moment.ISO_8601)
+      $this.val(time.format("YYYY-MM-DDTHH:mm")) # Format that at least Chrome expects for field
 
 # Check if the browser supports Flexbox
 warnIfUnsupportedBrowser = ->
@@ -115,7 +163,7 @@ window.updateSearchBikesHeaderLink = ->
 
 $(document).ready ->
   window.updateSearchBikesHeaderLink()
-  new BikeIndex.Init
+  window.BikeIndex.Init = new BikeIndex.Init
   if document.getElementById('binx_registration_widget')
     new window.ManufacturersSelect('#binx_registration_widget #b_param_manufacturer_id')
   new window.AdDisplayer

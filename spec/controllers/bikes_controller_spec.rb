@@ -362,6 +362,7 @@ describe BikesController do
       context 'stolen' do
         let(:state) { FactoryGirl.create(:state) }
         let(:country) { state.country }
+        let(:target_time) { Time.now.to_i }
         let(:stolen_params) do
           {
             country_id: country.id,
@@ -369,7 +370,8 @@ describe BikesController do
             city: 'Chicago',
             zipcode: '60622',
             state_id: state.id,
-            date_stolen_input: "#{Time.now.month}-#{Time.now.day}-#{Time.now.year}"
+            date_stolen: (Time.now - 1.day).utc,
+            timezone: "UTC"
           }
         end
         context 'valid' do
@@ -384,14 +386,13 @@ describe BikesController do
               expect(bike.creation_state.creator).to eq bike.creator
               testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
               stolen_record = bike.current_stolen_record
-              stolen_params.except(:date_stolen_input).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
-              # pp stolen_record.date_stolen
-              expect(stolen_record.date_stolen.to_date).to eq Time.now.to_date
+              stolen_params.except(:date_stolen, :timezone).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
+              expect(stolen_record.date_stolen.to_i).to be_within(1).of(Time.now.yesterday.to_i)
             end
           end
           context 'new date input' do
-            let(:date_stolen_input) { Time.now.to_date.strftime(StolenRecord.revised_date_format) }
-            let(:alt_stolen_params) { stolen_params.merge(date_stolen_input: date_stolen_input) }
+            let(:alt_stolen_params) { stolen_params.merge(date_stolen: "2018-07-28T23:34:00", timezone: "America/New_York") }
+            let(:target_time) { 1532835240 }
             it 'creates a new ownership and bike from an organization' do
               expect do
                 post :create, bike: bike_params.merge(stolen: true), stolen_record: alt_stolen_params
@@ -402,9 +403,8 @@ describe BikesController do
               expect(bike.creation_state.creator).to eq bike.creator
               testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
               stolen_record = bike.current_stolen_record
-              stolen_params.except(:date_stolen_input).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
-              # pp stolen_record.date_stolen
-              expect(stolen_record.date_stolen.to_date).to eq Time.now.to_date
+              stolen_params.except(:date_stolen, :timezone).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
+              expect(stolen_record.date_stolen.to_i).to be_within(1).of target_time
             end
           end
         end
@@ -892,9 +892,11 @@ describe BikesController do
           let(:state) { FactoryGirl.create(:state) }
           let(:country) { state.country }
           let(:stolen_record) { FactoryGirl.create(:stolen_record, bike: bike, city: 'party') }
+          let(:target_time) { 1454925600 }
           let(:stolen_attrs) do
             {
-              date_stolen_input: 'Mon Feb 8 2016',
+              date_stolen: "2016-02-08 04:00:00",
+              timezone: "America/Chicago",
               phone: '9999999999',
               street: '66666666 foo street',
               country_id: country.id,
@@ -920,7 +922,7 @@ describe BikesController do
               }
             }
           end
-          let(:skipped_attrs) { %w(proof_of_ownership receive_notifications date_stolen_input estimated_value).map(&:to_sym) }
+          let(:skipped_attrs) { %w(proof_of_ownership receive_notifications timezone date_stolen estimated_value).map(&:to_sym) }
           it 'updates and returns to the right page' do
             bike.update_attribute :stolen, true
             bike.reload
@@ -945,7 +947,7 @@ describe BikesController do
             expect(bike.find_current_stolen_record.id).to eq stolen_record.id
             # stolen_record.reload
             expect(bike.find_current_stolen_record.id).to eq stolen_record.id
-            expect(current_stolen_record.date_stolen).to be_within(1.second).of DateTime.strptime('02-08-2016 06', '%m-%d-%Y %H')
+            expect(current_stolen_record.date_stolen.to_i).to be_within(1).of target_time
             expect(current_stolen_record.proof_of_ownership).to be_truthy
             expect(current_stolen_record.receive_notifications).to be_falsey
             expect(current_stolen_record.estimated_value).to eq 1200

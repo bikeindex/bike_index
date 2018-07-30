@@ -99,10 +99,11 @@ source 'https://rails-assets.org' do # JS land is crazy, so lock everything
   gem 'rails-assets-jquery.dirtyforms', '~> 2.0.0' # Alert on attempts to leave with dirt on forms
   gem 'rails-assets-selectize', '~> 0.12.1' # Manually configured scss
   gem 'rails-assets-select2', '~> 4.0.3' # Use select2 for a few things, it's a bit better sometimes
-  gem 'rails-assets-pikaday', '~> 1.4.0' # Datepicker
   gem 'rails-assets-Stickyfill', '~> 1.1.3' # Affix bike edit menu
   gem 'rails-assets-mailcheck', '~> 1.1.2' # Check for common email errors
   gem 'rails-assets-waypoints', '~> 3.1.1' # For documentation pages
+  gem 'rails-assets-moment', '~> 2.18.1' # Javascript Time - localizing :)
+  gem 'rails-assets-moment-timezone', '~> 0.5.13' # Timezones for moment
   # Sortable breaks assets:precompile, so it's included manually
   # gem 'rails-assets-jquery-sortable', '~> 0.9.12' # Sort photo order
 end
