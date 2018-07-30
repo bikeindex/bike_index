@@ -352,6 +352,7 @@ describe BikesController do
           bike = Bike.last
           expect(bike.creation_state.origin).to eq 'embed'
           expect(bike.creation_state.organization).to eq organization
+          expect(organization.bikes.pluck(:id)).to eq([bike.id])
           expect(bike.creation_state.creator).to eq bike.creator
           testable_bike_params.each do |k, v|
             pp k unless bike.send(k).to_s == v.to_s
@@ -384,6 +385,7 @@ describe BikesController do
               expect(bike.creation_state.origin).to eq 'embed'
               expect(bike.creation_state.organization).to eq organization
               expect(bike.creation_state.creator).to eq bike.creator
+              expect(organization.bikes.pluck(:id)).to eq([bike.id])
               testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
               stolen_record = bike.current_stolen_record
               stolen_params.except(:date_stolen, :timezone).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
@@ -401,6 +403,7 @@ describe BikesController do
               expect(bike.creation_state.origin).to eq 'embed'
               expect(bike.creation_state.organization).to eq organization
               expect(bike.creation_state.creator).to eq bike.creator
+              expect(organization.bikes.pluck(:id)).to eq([bike.id])
               testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
               stolen_record = bike.current_stolen_record
               stolen_params.except(:date_stolen, :timezone).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
@@ -459,6 +462,7 @@ describe BikesController do
             expect(bike.creation_state.origin).to eq 'embed_extended'
             expect(bike.creation_state.organization).to eq organization
             expect(bike.creation_state.creator).to eq bike.creator
+            expect(organization.bikes.pluck(:id)).to eq([bike.id])
             expect(bike.manufacturer).to eq manufacturer
           end
         end
@@ -525,6 +529,7 @@ describe BikesController do
               post :create, bike: bike_params.merge(creation_organization_id: organization.id)
             end.to change(Ownership, :count).by(1)
             expect(Bike.last.creation_organization_id).to eq(organization.id)
+            expect(organization.bikes.count).to eq 1
           end
         end
       end
@@ -1008,6 +1013,8 @@ describe BikesController do
           expect(bike.send(key)).to eq value
         end
         expect(bike.bike_organization_ids).to eq([organization.id, organization_2.id])
+        expect(organization.bikes.pluck(:id)).to eq([bike.id])
+        expect(organization_2.bikes.pluck(:id)).to eq([bike.id])
       end
     end
   end
