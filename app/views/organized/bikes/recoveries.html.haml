@@ -25,7 +25,8 @@
         %tr
           %td
             - if recovered_record.date_recovered.present?
-              = link_to l(recovered_record.date_recovered, format: :dotted), bike_path(bike)
+              %a.convertTime{ href: bike_path(bike) }
+                = l recovered_record.date_recovered, format: :convert_time
             - if display_recovery_ids
               %small.less-strong
                 = recovered_record.id

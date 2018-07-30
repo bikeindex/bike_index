@@ -49,7 +49,7 @@
             - if @bike.recovered
               Recovered
             - else
-              Last seen
+              Stolen
           %span.convertTime
             = l @stolen_record.date_stolen, format: :convert_time
           %small.convertTimezone
@@ -126,7 +126,8 @@
           %h3
             #{@bike.recovered ? 'Recovery' : 'Theft'} Details
           .row
-            = render 'stolen_map'
+            - if @bike.current_stolen_record.latitude.present?
+              = render 'stolen_map'
             .col-md-4
               %ul.attr-list.separate-lines
                 = @bike.attr_list_item(@stolen_record.address(skip_default_country: true), 'Location')

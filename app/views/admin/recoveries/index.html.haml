@@ -62,7 +62,8 @@
                 - else
                   - date = recovery.created_at
                   Stolen on
-                = l date, format: :dotted
+                %span.convertTime
+                  = l date, format: :convert_time
 
             %td.medium-screens
               - if recovery.bike.present?
