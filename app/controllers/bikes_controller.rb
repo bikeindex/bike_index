@@ -61,7 +61,7 @@ class BikesController < ApplicationController
   def scanned
     @bike_code = BikeCode.lookup(params[:id] || params[:card_id], organization_id: params[:organization_id])
     if @bike_code.blank?
-      raise ActionController::RoutingError.new("Not Found")
+      raise ActiveRecord::RecordNotFound
     elsif @bike_code.bike.present?
       redirect_to bike_url(@bike_code.bike_id) and return
     elsif current_user.present?

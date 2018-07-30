@@ -27,20 +27,23 @@ describe BikeCodesController do
           expect(bike_code.bike).to eq bike
         end
       end
-      # context "not found" do
-      #   it "responds with 404" do
-      #     put :update, id: "asdffdf", organization_id: "cvxcvcv"
-      #     expect(response[:code]).to eq 404
-      #   end
-      # end
-      # context "already claimed bike" do
-      #   it "responds with flash error" do
-
-      #   end
-      # end
-      # context "user part of organization" do
-
-      # end
+      context "not found" do
+        it "responds with 404" do
+          expect do
+            put :update, id: "asdffdf", organization_id: "cvxcvcv"
+          end.to raise_error(ActiveRecord::RecordNotFound)
+        end
+      end
+      context "already claimed bike" do
+        let(:bike_code) { FactoryGirl.create(:bike_code, bike_id: bike.id) }
+        let(:bike2) { FactoryGirl.create(:bike) }
+        it "responds with flash error" do
+          put :update, id: bike_code.code, bike_id: "https://bikeindex.org/bikes/#{bike2.id} "
+          expect(flash[:error]).to be_present
+          bike_code.reload
+          expect(bike_code.bike).to eq bike
+        end
+      end
     end
   end
 end

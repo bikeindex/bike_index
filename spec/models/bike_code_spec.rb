@@ -73,10 +73,10 @@ RSpec.describe BikeCode, type: :model do
       expect(bike_code.user).to eq user
       expect(bike_code.bike).to eq bike
       bike_code.claim(user, "https://bikeindex.org/bikes/9#{bike.id}")
-      expect(bike_code.errors.full_messages).to_not be_present
+      expect(bike_code.errors.full_messages).to be_present
       expect(bike_code.bike).to eq bike
       bike_code.claim(user, "https://bikeindex.org/bikes?per_page=200")
-      expect(bike_code.errors.full_messages).to_not be_present
+      expect(bike_code.errors.full_messages).to be_present
       expect(bike_code.bike).to eq bike
     end
     context "with weird strings" do

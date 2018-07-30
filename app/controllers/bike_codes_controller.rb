@@ -1,22 +1,16 @@
 class BikeCodesController < ApplicationController
+  rescue_from ActionController::RedirectBackError, with: :redirect_back # Gross. Excited for rails 5
   before_filter :find_bike_code
 
   def update
-
-  end
-
-  def scanned
-    unless @bike_code.linkable_by?(current_user)
+    if !@bike_code.linkable_by?(current_user)
       flash[:error] = "You can't update that #{@bike_code.kind}. Please contact support@bikeindex.org if you think you should be able to"
-      redirect_back(fallback_location: path_for_code)
-      return
+    elsif @bike_code.claim(current_user, params[:bike_id])
+      flash[:success] = "#{@bike_code.kind.titleize} claimed"
+    else
+      flash[:error] = @bike_code.errors.full_messages.to_sentence
     end
-    if @bike_code.bike.present?
-      redirect_to bike_url(@bike_code.bike_id) and return
-    elsif current_user.present?
-      @bikes = current_user.bikes.reorder(created_at: :desc).limit(100)
-    end
-    @organization = @bike_code.organization
+    redirect_to :back
   end
 
   protected
@@ -24,14 +18,15 @@ class BikeCodesController < ApplicationController
   def find_bike_code
     unless current_user.present?
       flash[:error] = "You must be signed in to do that"
-      redirect_back(fallback_location: path_for_code)
+      redirect_to :back
       return
     end
     @bike_code = BikeCode.lookup(params[:id], organization_id: params[:organization_id])
-    raise ActionController::RoutingError.new("Not Found") unless @bike_code.present?
+    raise ActiveRecord::RecordNotFound unless @bike_code.present?
   end
 
-  def path_for_code
-    scanned_bike_path(params[:id], organization_id: params[:organization_id])
+  def redirect_back
+    redirect_to scanned_bike_path(params[:id], organization_id: params[:organization_id])
+    return
   end
 end

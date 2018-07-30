@@ -12,6 +12,8 @@ class BikeCode < ActiveRecord::Base
 
   enum kind: KIND_ENUM
 
+  validates_presence_of :code
+
   def self.lookup(str, organization_id: nil)
     code = str.to_s.strip.gsub(/\A0*/, "") # Strip leading 0s, because we don't care about them
     if organization_id.present?
@@ -37,15 +39,16 @@ class BikeCode < ActiveRecord::Base
   end
 
   def claim(user, bike_str)
-    errors.base.add(:user, "not found") unless user.present?
+    errors.add(:user, "not found") unless user.present?
     bike_str = bike_str.to_s.strip
     if bike_str.match(/^\d+\z/) # it's only numbers, so it's a timestamp
       bike_id = bike_str
     else
-      bike_id = bike_str.match(/bikes\/\d*/i)[0]
+      bike_id = bike_str.match(/bikes\/\d*/i)
+      bike_id = bike_id && bike_id[0].gsub(/bikes./, "") || nil
     end
-    new_bike = Bike.where(id: bike_id).first
-    errors.base.add(:bike, "Bike #{bike_id} not found") unless new_bike.present?
+    new_bike = Bike.where(id: bike_id).first if bike_id.present?
+    errors.add(:bike, "#{bike_id} not found") unless new_bike.present?
     return self if errors.any?
     update(bike_id: new_bike.id, user_id: user.id)
     self
