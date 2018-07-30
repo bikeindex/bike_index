@@ -88,7 +88,7 @@ class BikeIndex.Init extends BikeIndex
       if time > window.today
         return time.format("h:mma")
       else if time > window.yesterday
-        return "Yday #{time.format('h:mma')}"
+        return "Yesterday #{time.format('h:mma')}"
     if time.year() == moment().year()
       if preciseTime then time.format("MMM Do[,] h:mma") else time.format("MMM Do[,] ha")
     else
