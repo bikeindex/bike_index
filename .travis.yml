@@ -2,7 +2,14 @@ language: ruby
 services:
   - redis
 addons:
-  postgresql: '9.4'
+  postgresql: "10"
+apt:
+  packages:
+  - postgresql-10
+  - postgresql-client-10
+env:
+  global:
+  - PGPORT=5433
 rvm:
   - 2.5.1
 before_install:
@@ -19,6 +26,7 @@ before_script:
 cache: bundler
 env:
   global:
+    - PGPORT=5433
     secure: nFEP4tS5b44gE84jiZmcUebG6uflwYGwDyX2OR5vqVbYjFRqxwCUaLLUO98kga2KmzMsELQRpZz8mFWXMt9o37Fl0wbSJN574Mb/8z9kOZfUJutJOps2qYgbTgbAYNBnPPoFJIu2t2Dw6MOSRGgUguHmUV0gGEIeBInxZa23QOw=
 notifications:
   email:
