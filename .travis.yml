@@ -3,10 +3,6 @@ services:
   - redis
 addons:
   postgresql: "10"
-  apt:
-    packages:
-    - postgresql-10
-    - postgresql-client-10
 rvm:
   - 2.5.1
 before_install:
@@ -21,9 +17,6 @@ before_script:
   - psql -c 'create database bikeindex_test' -U postgres
   - bundle exec rake db:structure:load
 cache: bundler
-env:
-  global:
-  - PGPORT=5433
 notifications:
   email:
     on_success: never
