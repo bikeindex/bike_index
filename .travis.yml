@@ -24,7 +24,6 @@ cache: bundler
 env:
   global:
   - PGPORT=5433
-    secure: nFEP4tS5b44gE84jiZmcUebG6uflwYGwDyX2OR5vqVbYjFRqxwCUaLLUO98kga2KmzMsELQRpZz8mFWXMt9o37Fl0wbSJN574Mb/8z9kOZfUJutJOps2qYgbTgbAYNBnPPoFJIu2t2Dw6MOSRGgUguHmUV0gGEIeBInxZa23QOw=
 notifications:
   email:
     on_success: never
