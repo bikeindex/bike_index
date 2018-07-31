@@ -6,9 +6,7 @@
   %hr{ style: "margin: 24px 0 36px;" }
 
   - if current_user.present?
-    - if current_user.is_member_of?(@organization)
-
-    - elsif !@bike_code.linkable_by?(current_user)
+    - if !@bike_code.linkable_by?(current_user)
       %h3
         You have claimed the maximum permitted number of Bike Codes.
       %p
@@ -16,17 +14,17 @@
     - else
       %p
         You can enter the URL of the bike you would like to link this #{@bike_code.kind} to:
-      .row
+      = form_tag bike_code_path(id: @bike_code.code, organization_id: @bike_code.organization_id), method: "PUT", class: "row" do
         .col-sm-8.col-lg-10
           .form-group
-            = text_field_tag :title, "", placeholder: "https://bikeindex.org/bikes/1234", class: "form-control"
+            = text_field_tag :bike_id, "", placeholder: "https://bikeindex.org/bikes/1234", class: "form-control"
         .col-sm-4.col-lg-2
-          = link_to "Update", "#", class: "btn btn-success"
+          = submit_tag "Update", class: "btn btn-success"
         
       %p{ style: "margin-top: 24px;" }
         Or, click <em>link it</em> on of your bikes to connect it to this #{@bike_code.kind}:
 
-      %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
+      %table.table.table-striped.table-bordered.table-sm.without-exterior-border
         %thead.small-header
           %tr
             %th.date-added
@@ -63,7 +61,7 @@
                   %br
               %td
                 %small
-                  %a{ href: "#" }
+                  = link_to bike_code_path(id: @bike_code.code, organization_id: @bike_code.organization_id, bike_id: bike.id), method: "PUT" do
                     Link&nbsp;#{@bike_code.kind}
   - else
     %p{ style: "margin-top: 24px;" }

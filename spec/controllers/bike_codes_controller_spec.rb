@@ -27,7 +27,16 @@ describe BikeCodesController do
           expect(bike_code.bike).to eq bike
         end
       end
-      context "not found" do
+      context "bike not found" do
+        it "shows error message" do
+          put :update, id: bike_code.code, bike_id: "https://bikeindex.org/bikes/ "
+          expect(flash[:error]).to be_present
+          bike_code.reload
+          expect(bike_code.bike).to be_nil
+          expect(bike_code.user).to be_nil
+        end
+      end
+      context "code not found" do
         it "responds with 404" do
           expect do
             put :update, id: "asdffdf", organization_id: "cvxcvcv"

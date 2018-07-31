@@ -48,7 +48,7 @@ class BikeCode < ActiveRecord::Base
       bike_id = bike_id && bike_id[0].gsub(/bikes./, "") || nil
     end
     new_bike = Bike.where(id: bike_id).first if bike_id.present?
-    errors.add(:bike, "#{bike_id} not found") unless new_bike.present?
+    errors.add(:bike, "\"#{bike_id}\" not found") unless new_bike.present?
     return self if errors.any?
     update(bike_id: new_bike.id, user_id: user.id)
     self
