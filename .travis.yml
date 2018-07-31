@@ -1,8 +1,16 @@
 language: ruby
 services:
   - redis
+  - postgres
 addons:
   postgresql: "10"
+  apt:
+    packages:
+    - postgresql-10
+    - postgresql-client-10
+env:
+  global:
+  - PGPORT=5433
 rvm:
   - 2.5.1
 before_install:
@@ -14,7 +22,7 @@ branches:
     - master # We want to build PRs, and merges to master
 before_script:
   - redis-cli info
-  - psql -c 'create database bikeindex_test' -U postgres
+  - psql -c 'create database bikeindex_test'
   - bundle exec rake db:structure:load
 cache: bundler
 notifications:
