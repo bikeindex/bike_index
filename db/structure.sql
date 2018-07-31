@@ -125,6 +125,42 @@ ALTER SEQUENCE public.b_params_id_seq OWNED BY public.b_params.id;
 
 
 --
+-- Name: bike_codes; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.bike_codes (
+    id integer NOT NULL,
+    kind integer DEFAULT 0,
+    code character varying,
+    bike_id integer,
+    organization_id integer,
+    user_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: bike_codes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.bike_codes_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: bike_codes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.bike_codes_id_seq OWNED BY public.bike_codes.id;
+
+
+--
 -- Name: bike_organizations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2000,6 +2036,13 @@ ALTER TABLE ONLY public.b_params ALTER COLUMN id SET DEFAULT nextval('public.b_p
 
 
 --
+-- Name: bike_codes id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bike_codes ALTER COLUMN id SET DEFAULT nextval('public.bike_codes_id_seq'::regclass);
+
+
+--
 -- Name: bike_organizations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2349,6 +2392,14 @@ ALTER TABLE ONLY public.ads
 
 ALTER TABLE ONLY public.b_params
     ADD CONSTRAINT b_params_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bike_codes bike_codes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bike_codes
+    ADD CONSTRAINT bike_codes_pkey PRIMARY KEY (id);
 
 
 --
@@ -2733,6 +2784,13 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.wheel_sizes
     ADD CONSTRAINT wheel_sizes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: index_bike_codes_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_codes_on_bike_id ON public.bike_codes USING btree (bike_id);
 
 
 --
@@ -3400,4 +3458,6 @@ INSERT INTO schema_migrations (version) VALUES ('20180624211320');
 INSERT INTO schema_migrations (version) VALUES ('20180624211323');
 
 INSERT INTO schema_migrations (version) VALUES ('20180706162137');
+
+INSERT INTO schema_migrations (version) VALUES ('20180730013343');
 

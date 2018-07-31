@@ -206,20 +206,30 @@ describe BikesController do
     end
   end
 
-  describe 'scanned' do
-    it 'renders the page from bike id' do
-      bike = FactoryGirl.create(:bike)
-      get :scanned, id: bike.id
-      expect(response).to redirect_to bike_url(bike)
+  describe "scanned" do
+    let(:bike) { FactoryGirl.create(:bike) }
+    let!(:bike_code) { FactoryGirl.create(:bike_code, bike: bike, code: 900) }
+    context "organized no bike" do
+      let(:organization) { FactoryGirl.create(:organization) }
+      let!(:bike_code2) { FactoryGirl.create(:bike_code, organization: organization, code: 900) }
+      it "renders the scanned page" do
+        get :scanned, id: "000900", organization_id: organization.to_param
+        expect(assigns(:bike_code)).to eq bike_code2
+        expect(response).to render_template(:scanned)
+        expect(response.code).to eq("200")
+      end
     end
-    it 'redirects to the proper page' do
-      bike = FactoryGirl.create(:bike, card_id: 2)
-      get :scanned, card_id: bike.card_id
-      expect(response).to redirect_to bike_url(bike)
+    context "code_id" do
+      it "redirects to the proper page" do
+        get :scanned, card_id: " 000000900"
+        expect(response).to redirect_to bike_url(bike)
+      end
     end
-    it "renders a page if there isn't a connection" do
-      get :scanned, card_id: 12
-      expect(response.code).to eq('200')
+    context "id" do
+      it "redirects to the proper page" do
+        get :scanned, id: 900
+        expect(response).to redirect_to bike_url(bike)
+      end
     end
   end
 
