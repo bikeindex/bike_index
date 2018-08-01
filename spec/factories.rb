@@ -166,11 +166,6 @@ FactoryGirl.define do
     message 'This is a test email.'
   end
 
-  factory :stolen_record do
-    bike
-    date_stolen Time.now
-  end
-
   factory :customer_contact do
     association :creator, factory: :user
     association :bike
