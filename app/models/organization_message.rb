@@ -13,17 +13,25 @@ class OrganizationMessage < ActiveRecord::Base
 
   before_validation :set_calculated_attributes
   before_validation :validate_requirements_for_kind
+  after_create :send_email_message
 
   def set_calculated_attributes
     self.email ||= bike.owner_email
     if latitude.present? && longitude.present?
-      self.location_name ||= Geohelper.reverse_geocode(latitude, longitude)
+      self.address ||= Geohelper.reverse_geocode(latitude, longitude)
+    elsif address.present?
+      coordinates = Geohelper.coordinates_for(address)
+      self.attributes = coordinates if coordinates.present?
     end
   end
 
   def validate_requirements_for_kind # currently all require geolocation and bike, but eventually some won't, e.g. partial registrations
     self.errors.add(:bike, "Required") unless bike.present?
     self.errors.add(:location, "(latitude and longitude) required") unless latitude.present? && longitude.present?
-    true # Legacy concerns
+    true # Legacy concerns, so excited for rails 5
+  end
+
+  def send_email_message
+    EmailOrganizationMessageWorker.perform_async(id)
   end
 end

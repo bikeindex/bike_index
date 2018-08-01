@@ -168,7 +168,7 @@ describe Organized::BulkImportsController, type: :controller do
             end
           end
         end
-      end      
+      end
     end
   end
 end

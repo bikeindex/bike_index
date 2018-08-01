@@ -274,6 +274,7 @@ Bikeindex::Application.routes.draw do
     resources :users, except: [:show]
     resources :emails
     resources :bulk_imports, only: [:index, :show, :new, :create]
+    resources :messages, only: [:index, :show, :create]
   end
 
   get '*unmatched_route', to: 'errors#not_found' if Rails.env.production? # Handle 404s with lograge

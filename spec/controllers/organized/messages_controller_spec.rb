@@ -1,173 +1,110 @@
 require "spec_helper"
 
-describe Organized::MessagesImportsController, type: :controller do
-  let(:root_path) { organization_messages_path(organization_id: organization.to_param) }
+describe Organized::MessagesController, type: :controller do
+  include_context :geocoder_default_location
+  let(:root_path) { organization_messages_path(organization_id: organization.to_param, kind: kind) }
+  let(:user) { FactoryGirl.create(:organization_member, organization: organization) }
+  let(:bike) { FactoryGirl.create(:bike, owner_email: "party_time@stuff.com") }
+  let(:organization) { FactoryGirl.create(:organization, is_paid: false, geolocated_emails: true) }
 
   before { set_current_user(user) if user.present? }
 
-  context "organization without show_bulk_import" do
-    let!(:organization) { FactoryGirl.create(:organization) }
-    context "logged in as organization admin" do
-      let(:user) { FactoryGirl.create(:organization_admin, organization: organization) }
-      describe "index" do
-        it "redirects" do
-          get :index, organization_id: organization.to_param
-          expect(response).to redirect_to root_path
-        end
-      end
-      describe "new" do
-        it "redirects" do
-          get :new, organization_id: organization.to_param
-          expect(response).to redirect_to root_path
-        end
-      end
-      describe "show" do
-        it "redirects" do
-          get :show, id: bulk_import.id, organization_id: organization.to_param
-          expect(response).to redirect_to root_path
-        end
-      end
+  describe "create" do
+    let(:message_params) do
+      {
+        kind: kind,
+        body: "some message text and stuff",
+        bike_id: bike.to_param,
+        latitude: default_location[:latitude],
+        longitude: default_location[:longitude]
+      }
     end
 
-    context "logged in as super admin" do
-      let(:user) { FactoryGirl.create(:admin) }
-      describe "index" do
-        it "renders" do
-          get :index, organization_id: organization.to_param
-          expect(response.status).to eq(200)
-          expect(response).to render_template :index
-          expect(response).to render_with_layout("application_revised")
-          expect(assigns(:current_organization)).to eq organization
+    context "geolocated" do
+      let(:kind) { "geolocated" }
+      context "organization without geolocated messages" do
+        let(:user) { FactoryGirl.create(:organization_admin, organization: organization) }
+        let(:organization) { FactoryGirl.create(:organization, is_paid: true, geolocated_emails: false) }
+        it "does not create" do
+          expect(organization.permitted_message_kind?(kind)).to be_falsey
+          expect do
+            post :create, organization_id: organization.to_param, organization_message: message_params
+            expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param)
+            expect(flash[:error]).to be_present
+          end.to_not change(OrganizationMessage, :count)
         end
       end
 
-      describe "new" do
-        it "renders" do
-          get :new, organization_id: organization.to_param
-          expect(response.status).to eq(200)
-          expect(response).to render_template :new
-          expect(response).to render_with_layout("application_revised")
-          expect(assigns(:current_organization)).to eq organization
+      context "organization with geolocated messages" do
+        context "user without organization membership" do
+          let(:user) { FactoryGirl.create(:confirmed_user) }
+          it "does not create" do
+            expect(organization.permitted_message_kind?(kind)).to be_truthy
+            expect do
+              post :create, organization_id: organization.to_param, organization_message: message_params
+              expect(response).to redirect_to user_home_url
+              expect(flash[:error]).to be_present
+            end.to_not change(OrganizationMessage, :count)
+          end
+        end
+
+        context "without a required param" do
+          it "fails and renders error" do
+            request.env['HTTP_REFERER'] = bike_url(bike)
+            expect do
+              post :create, organization_id: organization.to_param, organization_message: message_params.except(:latitude)
+              expect(response).to redirect_to bike_url(bike)
+              expect(flash[:error]).to match(/location/i)
+            end.to_not change(EmailOrganizationMessageWorker.jobs, :count)
+          end
+        end
+
+        it "creates" do
+          expect(organization.permitted_message_kind?(kind)).to be_truthy
+          expect do
+            post :create, organization_id: organization.to_param, organization_message: message_params
+            expect(response).to redirect_to root_path
+            expect(flash[:success]).to be_present
+          end.to change(EmailOrganizationMessageWorker.jobs, :count).by(1)
+          organization_message = OrganizationMessage.last
+
+          expect(organization_message.email).to eq "party_time@stuff.com"
+          expect(organization_message.delivery_status).to eq nil
+          expect(organization_message.sender).to eq user
+          expect(organization_message.organization).to eq organization
+          expect(organization_message.kind).to eq kind
+          expect(organization_message.bike).to eq bike
+          expect(organization_message.latitude).to eq message_params[:latitude]
+          expect(organization_message.longitude).to eq message_params[:longitude]
+          expect(organization_message.address).to eq default_location[:formatted_address]
         end
       end
     end
   end
 
-  context "organization with show_bulk_import" do
-    let!(:organization) { FactoryGirl.create(:organization, show_bulk_import: true) }
-    context "logged in as organization member" do
-      let(:user) { FactoryGirl.create(:organization_member, organization: organization) }
-      describe "index" do
-        it "redirects" do
-          get :index, organization_id: organization.to_param
-          expect(response).to redirect_to root_path
-        end
-      end
-      describe "new" do
-        it "redirects" do
-          get :new, organization_id: organization.to_param
-          expect(response).to redirect_to root_path
-        end
-      end
-      describe "show" do
-        it "redirects" do
-          get :show, id: bulk_import.id, organization_id: organization.to_param
-          expect(response).to redirect_to root_path
-        end
+  describe "index" do
+    context "organization without geolocated messages" do
+      let(:user) { FactoryGirl.create(:organization_admin, organization: organization) }
+      let(:organization) { FactoryGirl.create(:organization, is_paid: true, geolocated_emails: false) }
+      it "redirects" do
+        get :index, organization_id: organization.to_param
+        expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param)
+        expect(flash[:error]).to be_present
       end
     end
-    context "logged_in_as_organization_admin" do
-      let(:user) { FactoryGirl.create(:organization_admin, organization: organization) }
-      describe "index" do
-        it "renders" do
-          get :index, organization_id: organization.to_param
-          expect(response.status).to eq(200)
-          expect(response).to render_template :index
-          expect(response).to render_with_layout("application_revised")
-          expect(assigns(:current_organization)).to eq organization
-        end
+    context "no kind" do
+      it "redirects" do
+        get :index, organization_id: organization.to_param
+        expect(response).to redirect_to organization_messages_path(organization_id: organization.to_param, kind: "geolocated")
+        expect(flash[:error]).to be_present
       end
-
-      describe "new" do
-        it "renders" do
-          get :new, organization_id: organization.to_param
-          expect(response.status).to eq(200)
-          expect(response).to render_template :new
-          expect(response).to render_with_layout("application_revised")
-          expect(assigns(:current_organization)).to eq organization
-        end
-      end
-
-      describe "show" do
-        it "redirects" do
-          get :show, id: bulk_import.id, organization_id: organization.to_param
-          expect(response.status).to eq(200)
-          expect(response).to render_template :show
-          expect(response).to render_with_layout("application_revised")
-        end
-        context "not organizations bulk_import" do
-          let(:bulk_import) { FactoryGirl.create(:bulk_import) }
-          it "redirects" do
-            expect(bulk_import.organization).to_not eq organization
-            get :show, id: bulk_import.id, organization_id: organization.to_param
-            expect(response).to redirect_to organization_bulk_imports_path(organization_id: organization.to_param)
-            expect(flash[:error]).to be_present
-          end
-        end
-      end
-      describe "create" do
-        let(:file) { Rack::Test::UploadedFile.new(File.open(File.join("public", "import_all_optional_fields.csv"))) }
-        context "valid create" do
-          let(:bulk_import_params) { { file: file, organization_id: 392, no_notify: "1" } }
-          it "creates" do
-            # FIXME: Because travis isn't creating the sequential ids, something to do with the missmatched postgres versions
-            # Just don't run on travis :/
-            unless ENV["TRAVIS"].present?
-              expect do
-                post :create, organization_id: organization.to_param, bulk_import: bulk_import_params
-              end.to change(BulkImport, :count).by 1
-
-              bulk_import = BulkImport.last
-              expect(bulk_import.user).to eq user
-              expect(bulk_import.file_url).to be_present
-              expect(bulk_import.progress).to eq "pending"
-              expect(bulk_import.organization).to eq organization
-              expect(bulk_import.send_email).to be_truthy # Because no_notify isn't permitted here, only in admin
-              expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
-            end
-          end
-        end
-        context "API create" do
-          let(:organization) { FactoryGirl.create(:organization_with_auto_user, show_bulk_import: true, api_access_approved: true) }
-          let(:user) { nil }
-          context "invalid API token" do
-            it "returns JSON message" do
-              post :create, organization_id: organization.to_param, api_token: "a9s0dfsdf", bulk_import: { file: file }
-              expect(response.status).to eq(401)
-              json_result = JSON.parse(response.body)
-              expect(json_result["error"]).to be_present
-            end
-          end
-          context "valid" do
-            it "returns JSON message" do
-              unless ENV["TRAVIS"].present?
-                post :create, organization_id: organization.to_param, api_token: organization.access_token, bulk_import: { file: file }
-                expect(response.status).to eq(201)
-                json_result = JSON.parse(response.body)
-                expect(json_result["success"]).to be_present
-
-                bulk_import = BulkImport.last
-                expect(bulk_import.user).to eq organization.auto_user
-                expect(bulk_import.file_url).to be_present
-                expect(bulk_import.progress).to eq "pending"
-                expect(bulk_import.organization).to eq organization
-                expect(bulk_import.send_email).to be_truthy # Because no_notify isn't permitted here, only in admin
-                expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
-              end
-            end
-          end
-        end
-      end      
+    end
+    it "renders" do
+      get :index, organization_id: organization.to_param, kind: "geolocated"
+      expect(response.status).to eq(200)
+      expect(response).to render_template :index
+      expect(response).to render_with_layout("application_revised")
+      expect(assigns(:current_organization)).to eq organization
     end
   end
 end

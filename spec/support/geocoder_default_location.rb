@@ -1,10 +1,10 @@
 shared_context :geocoder_default_location do
   let(:default_location) do
     {
-      latitude:  40.7143528,
+      latitude: 40.7143528,
       longitude: -74.0059731,
       address: "New York, NY, USA",
-      formatted_address: "188 King St, San Francisco, CA 94107, USA",
+      formatted_address: "278 Broadway, New York, NY 10007, USA",
       state: "New York",
       state_code: "NY",
       country: "United States",

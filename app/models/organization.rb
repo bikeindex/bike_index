@@ -71,9 +71,13 @@ class Organization < ActiveRecord::Base
     snippet && snippet.body
   end
 
-  def message_kinds
+  def organization_message_kinds # Matches organization_message kinds
     return [] unless geolocated_emails
     ["geolocated", (abandoned_bike_emails ? "abandoned_bike" : nil)].compact
+  end
+
+  def permitted_message_kind?(kind)
+    organization_message_kinds.include?(kind.to_s)
   end
 
   def set_calculated_attributes

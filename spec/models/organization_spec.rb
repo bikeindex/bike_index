@@ -230,17 +230,21 @@ describe Organization do
     end
   end
 
-  describe "paid_email_kinds" do
+  describe "organization_message_kinds" do
     let(:time) { Time.now - 5.minutes }
     let(:organization) { FactoryGirl.create(:organization, geolocated_emails: true, updated_at: time) }
     let(:mail_snippet) { FactoryGirl.create(:mail_snippet, organization: organization, name: "abandoned_bike") }
     it "returns empty for non-geolocated_emails" do
-      expect(Organization.new.paid_email_kinds).to eq([])
-      expect(organization.paid_email_kinds).to eq(["geolocated"])
+      expect(Organization.new.organization_message_kinds).to eq([])
+      expect(organization.organization_message_kinds).to eq(["geolocated"])
+      expect(Organization.new.permitted_message_kind?(nil)).to be_falsey
+      expect(organization.permitted_message_kind?("abandoned_bike")).to be_falsey
       expect(mail_snippet).to be_present
-      organization.update_attributes(updated_at: Time.now) # Have to manually deal with this because rspec doesn't correctly manage after_commit
+      # TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
+      organization.update_attributes(updated_at: Time.now)
       expect(organization.updated_at).to be_within(1.second).of Time.now # Because mail snippet updated it - doesn't work with current version of rspec bs pp mail_snippet.kind
-      expect(organization.paid_email_kinds).to match_array(["geolocated", "abandoned_bike"])
+      expect(organization.organization_message_kinds).to match_array(%w[geolocated abandoned_bike])
+      expect(organization.permitted_message_kind?("abandoned_bike")).to be_truthy
     end
   end
 end

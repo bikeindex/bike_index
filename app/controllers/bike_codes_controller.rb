@@ -1,5 +1,5 @@
 class BikeCodesController < ApplicationController
-  rescue_from ActionController::RedirectBackError, with: :redirect_back # Gross. Excited for rails 5
+  rescue_from ActionController::RedirectBackError, with: :redirect_back # Gross. TODO: Rails 5 update
   before_filter :find_bike_code
 
   def update
