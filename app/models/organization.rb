@@ -8,7 +8,6 @@ class Organization < ActiveRecord::Base
 
   has_many :memberships, dependent: :destroy
   has_many :mail_snippets
-  has_many :organization_deals, dependent: :destroy
   has_many :users, through: :memberships
   has_many :organization_invitations, dependent: :destroy
   has_many :bike_organizations
