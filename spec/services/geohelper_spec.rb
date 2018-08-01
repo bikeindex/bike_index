@@ -1,22 +1,19 @@
 require "spec_helper"
 
 describe Geohelper do
+  after { Geocoder.configure(lookup: :test) }
+
   describe "reverse_geocode" do
     context "point" do
-      let(:target) { "700 Huckleberry Hill Ln, Sylacauga, AL 35150, USA" }
-      before { Geocoder.configure(lookup: :google, use_https: true) }
-      after { Geocoder.configure(lookup: :test) }
+      let(:address) { "1740 E 2nd St, Casper, WY 82601, USA" }
+      let(:latitude) { 42.8490197 }
+      let(:longitude) { -106.3015341 }
+
       it "returns correct location" do
         VCR.use_cassette("geohelper-reverse_geocode") do
-          expect(Geohelper.reverse_geocode(33.143204, -86.2246457)).to eq target
+          # Geocoder.configure(lookup: :google, use_https: true)
+          expect(Geohelper.reverse_geocode(latitude, longitude)).to eq address
         end
-      end
-    end
-    context "lat and lng" do
-      include_context :geocoder_default_location
-      it "returns correct location" do
-        expect(Geohelper.reverse_geocode(default_location[:latitude], default_location[:longitude]))
-          .to eq default_location[:address]
       end
     end
   end

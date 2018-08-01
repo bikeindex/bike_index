@@ -9,6 +9,9 @@ AllCops:
 Style/Documentation:
   Enabled: false
 
+FrozenStringLiteralComment:
+  Enabled: false
+
 Style/SymbolProc:
   Enabled: false
 

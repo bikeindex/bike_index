@@ -10,7 +10,7 @@ class Organization < ActiveRecord::Base
   has_many :mail_snippets
   has_many :users, through: :memberships
   has_many :organization_invitations, dependent: :destroy
-  has_many :organization_emails
+  has_many :organization_messages
   has_many :bike_organizations
   has_many :bikes, through: :bike_organizations
   # has_many :bikes, foreign_key: 'creation_organization_id'
@@ -71,7 +71,7 @@ class Organization < ActiveRecord::Base
     snippet && snippet.body
   end
 
-  def paid_email_kinds
+  def message_kinds
     return [] unless geolocated_emails
     ["geolocated", (abandoned_bike_emails ? "abandoned_bike" : nil)].compact
   end

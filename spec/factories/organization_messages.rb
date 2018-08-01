@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :organization_email do
+  factory :organization_message do
     sender { FactoryGirl.create(:organized_user) }
     organization { sender&.organizations&.first || FactoryGirl.create(:organization) }
     bike { FactoryGirl.create(:bike) }
