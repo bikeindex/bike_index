@@ -34,7 +34,7 @@ class BikesController < ApplicationController
     @stolen_notification = StolenNotification.new if @bike.stolen
     respond_to do |format|
       format.html { render :show }
-      format.gif  { render qrcode: scanned_bike_url(@bike), level: :h, unit: 50 }
+      format.gif  { render qrcode: bike_url(@bike), level: :h, unit: 50 }
     end
   end
 
