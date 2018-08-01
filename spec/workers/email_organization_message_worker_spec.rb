@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe EmailOrganizationMesssageWorker do
+describe EmailOrganizationMessageWorker do
   it { is_expected.to be_processed_in :notify }
 
   context "delivery failed" do

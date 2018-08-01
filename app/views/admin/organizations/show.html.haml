@@ -79,12 +79,14 @@
             - else
               &nbsp;
           %dt
-            = link_to "Templates", admin_organization_custom_layouts_path(organization_id: @organization.to_param)
+            Templates
           %dd
-            - if @organization.mail_snippets.any?
-              = @organization.mail_snippets.pluck(:name).to_sentence
-            - else
-              &nbsp;
+            %a{ href: admin_organization_custom_layouts_path(organization_id: @organization.to_param) }
+              - if @organization.mail_snippets.any?
+                = @organization.mail_snippets.pluck(:name).to_sentence
+              - else
+                %small
+                  none
           %dt
             Landing Page
           %dd
@@ -98,7 +100,7 @@
           %dt
             Org emails
           %dd
-            = @organization.paid_emails.to_sentence
+            = @organization.organization_message_kinds.to_sentence
 
 
 
