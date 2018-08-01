@@ -1405,7 +1405,8 @@ CREATE TABLE public.organizations (
     landing_html text,
     show_bulk_import boolean DEFAULT false,
     paid_at timestamp without time zone,
-    geolocated_emails boolean DEFAULT false NOT NULL
+    geolocated_emails boolean DEFAULT false NOT NULL,
+    abandoned_bike_emails boolean DEFAULT false NOT NULL
 );
 
 
@@ -3498,4 +3499,6 @@ INSERT INTO schema_migrations (version) VALUES ('20180801010129');
 INSERT INTO schema_migrations (version) VALUES ('20180801011704');
 
 INSERT INTO schema_migrations (version) VALUES ('20180801025713');
+
+INSERT INTO schema_migrations (version) VALUES ('20180801050740');
 

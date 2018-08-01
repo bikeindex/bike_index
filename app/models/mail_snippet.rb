@@ -1,5 +1,5 @@
 class MailSnippet < ActiveRecord::Base
-  KIND_ENUM = { custom: 0, header: 1, welcome: 2, footer: 3, security: 4, abandoned: 5, location_triggered: 6 }.freeze
+  KIND_ENUM = { custom: 0, header: 1, welcome: 2, footer: 3, security: 4, abandoned_bike: 5, location_triggered: 6 }.freeze
   validates_presence_of :name
 
   belongs_to :organization
@@ -15,6 +15,7 @@ class MailSnippet < ActiveRecord::Base
 
   geocoded_by :address
   after_validation :geocode, if: lambda { is_location_triggered && address.present? }
+  after_commit :update_organization
 
   before_validation :set_calculated_attributes
 
@@ -24,7 +25,7 @@ class MailSnippet < ActiveRecord::Base
       welcome: "Below header",
       footer: "Above <3 <3 <3 <3 Bike Index Team",
       security: "How to keep your bike safe, in email \"finished registration\"",
-      abandoned: "Template for geocoded abandoned bike email"
+      abandoned_bike: "Template for geocoded abandoned bike email"
     }.as_json
   end
 
@@ -41,5 +42,11 @@ class MailSnippet < ActiveRecord::Base
     else
       self.kind = self.class.kinds.include?(name) ? name : "custom"
     end
+  end
+
+  def update_organization
+    # Because we need to update the organization and make sure mail snippet calculations are included
+    # Manually update to ensure that it runs the before save stuff
+    organization && organization.update_attributes(updated_at: Time.now)
   end
 end

@@ -10,6 +10,7 @@ class Organization < ActiveRecord::Base
   has_many :mail_snippets
   has_many :users, through: :memberships
   has_many :organization_invitations, dependent: :destroy
+  has_many :organization_emails
   has_many :bike_organizations
   has_many :bikes, through: :bike_organizations
   # has_many :bikes, foreign_key: 'creation_organization_id'
@@ -27,7 +28,6 @@ class Organization < ActiveRecord::Base
   has_many :public_images, as: :imageable, dependent: :destroy
 
   validates_presence_of :name
-
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact admin@bikeindex.org"
 
   default_scope { order(:name) }
@@ -40,6 +40,8 @@ class Organization < ActiveRecord::Base
   scope :manufacturer, -> { where(org_type: 'manufacturer') }
   scope :paid, -> { where(is_paid: true) }
   scope :valid, -> { where(is_suspended: false) }
+
+  before_validation :set_calculated_attributes
 
   def self.friendly_find(n)
     return nil unless n.present?
@@ -71,27 +73,30 @@ class Organization < ActiveRecord::Base
 
   def paid_email_kinds
     return [] unless geolocated_emails
-    ["geolocated", (abandoned_bike_email? ? "abandoned_bike" : nil)].compact
+    ["geolocated", (abandoned_bike_emails ? "abandoned_bike" : nil)].compact
   end
 
-  before_save :set_and_clean_attributes
-  before_save :set_access_token
-  before_save :set_auto_user
-  before_save :set_locations_shown
-
-  def set_and_clean_attributes
+  def set_calculated_attributes
+    return true unless name.present?
     self.name = strip_tags(name)
     self.name = "Stop messing about" unless name[/\d|\w/].present?
     self.website = Urlifyer.urlify(website) if website.present?
     self.short_name = (short_name || name).truncate(30)
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, '')
-    # If the organization exists, don't invalidate because of it's own slug
-    orgs = id.present? ? Organization.where('id != ?', id) : Organization.all
-    while orgs.where(slug: new_slug).exists?
-      i = i.present? ? i + 1 : 2
-      new_slug = "#{new_slug}-#{i}"
+    if new_slug != slug
+      # If the organization exists, don't invalidate because of it's own slug
+      orgs = id.present? ? Organization.where('id != ?', id) : Organization.all
+      while orgs.where(slug: new_slug).exists?
+        i = i.present? ? i + 1 : 2
+        new_slug = "#{new_slug}-#{i}"
+      end
+      self.slug = new_slug
     end
-    self.slug = new_slug
+    generate_access_token unless self.access_token.present?
+    set_auto_user
+    locations.each { |l| l.save unless l.shown == allowed_show }
+    self.abandoned_bike_emails = mail_snippets.abandoned_bike.enabled.any? if geolocated_emails
+    true # legacy bs rails concerns
   end
 
   def ensure_auto_user
@@ -126,28 +131,13 @@ class Organization < ActiveRecord::Base
     is_paid && avatar.present?
   end
 
-  def set_locations_shown
-    # Locations set themselves on save
-    locations.each { |l| l.save unless l.shown == allowed_show }
-  end
-
   def suspended?
     is_suspended?
-  end
-
-  def set_access_token
-    generate_access_token unless self.access_token.present?
   end
 
   def generate_access_token
     begin
       self.access_token = SecureRandom.hex
     end while self.class.exists?(access_token: access_token)
-  end
-
-  private
-
-  def abandoned_bike_email?
-    mail_snippets.abandoned.any?
   end
 end
