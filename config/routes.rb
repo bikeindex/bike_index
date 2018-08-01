@@ -230,7 +230,6 @@ Bikeindex::Application.routes.draw do
   end
   get 'manufacturers_tsv', to: 'manufacturers#tsv'
 
-  resources :organization_deals, only: [:create, :new]
   resource :integrations, only: [:create]
   get '/auth/:provider/callback', to: 'integrations#create'
   get '/auth/failure', to: 'integrations#integrations_controller_creation_error'
