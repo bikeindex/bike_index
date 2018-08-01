@@ -43,7 +43,8 @@ class Organization < ActiveRecord::Base
 
   def self.friendly_find(n)
     return nil unless n.present?
-    integer_slug?(n) ? find(n) : find_by_slug(Slugifyer.slugify(n))
+    return find(n) if integer_slug?(n)
+    find_by_slug(Slugifyer.slugify(n)) || find_by_name(n) # Fallback, search by name just in case
   end
 
   def self.integer_slug?(n)
