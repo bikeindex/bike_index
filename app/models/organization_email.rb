@@ -3,7 +3,7 @@
 class OrganizationEmail < ActiveRecord::Base
   KIND_ENUM = { geolocated: 0, abandoned_bike: 1 }.freeze
 
-  belongs_to :organization 
+  belongs_to :organization
   belongs_to :sender, class_name: "User"
   belongs_to :bike
 
