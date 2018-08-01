@@ -5,7 +5,6 @@ describe Organization do
     # it { should validate_uniqueness_of :slug }
     it { is_expected.to validate_presence_of :name }
     it { is_expected.to have_many :memberships }
-    it { is_expected.to have_many :organization_deals }
     it { is_expected.to have_many :mail_snippets }
     it { is_expected.to have_many :users }
     it { is_expected.to have_many :organization_invitations }
@@ -236,6 +235,18 @@ describe Organization do
       it 'returns nil for not-enabled snippet' do
         expect(organization.mail_snippet_body(mail_snippet.name)).to eq mail_snippet.body
       end
+    end
+  end
+
+  describe "paid_email_kinds" do
+    let(:organization) { FactoryGirl.create(:organization, geolocated_emails: true) }
+    let(:mail_snippet) { FactoryGirl.create(:mail_snippet, organization: organization, name: "abandoned") }
+    it "returns empty for non-geolocated_emails" do
+      expect(Organization.new.paid_email_kinds).to eq([])
+      expect(organization.paid_email_kinds).to eq(["geolocated"])
+      expect(mail_snippet).to be_present
+      organization.reload
+      expect(organization.paid_email_kinds).to match_array(["geolocated", "abandoned_bike"])
     end
   end
 end

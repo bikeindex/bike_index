@@ -3,7 +3,7 @@ FactoryGirl.define do
     name
     is_enabled true
     body '<p>Foo</p>'
-    factory :location_triggered_mail_snippet do
+    factory :mail_snippet_location_triggered do
       is_location_triggered true
       proximity_radius 100
       address 'New York, NY'

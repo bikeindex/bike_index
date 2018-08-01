@@ -1,4 +1,5 @@
 class MailSnippet < ActiveRecord::Base
+  KIND_ENUM = { custom: 0, header: 1, welcome: 2, footer: 3, security: 4, abandoned: 5, location_triggered: 6 }.freeze
   validates_presence_of :name
 
   belongs_to :organization
@@ -10,34 +11,35 @@ class MailSnippet < ActiveRecord::Base
   scope :with_organizations, -> { where.not(organization_id: nil) }
   scope :without_organizations, -> { where(organization_id: nil) }
 
+  enum kind: KIND_ENUM
+
   geocoded_by :address
   after_validation :geocode, if: lambda { is_location_triggered && address.present? }
 
-  class << self
-    def organization_snippets
-      {
-        header: 'Top of email block',
-        welcome: 'Below header',
-        footer: 'Above <3 <3 <3 <3 Bike Index Team',
-        security: 'How to keep your bike safe, in email "finished registration"'
-      }.as_json
-    end
+  before_validation :set_calculated_attributes
 
-    def organization_snippet_types
-      organization_snippets.keys
-    end
-
-    def matching_opts(opts)
-      return nil unless opts[:mailer_method].match('ownership_invitation_email')
-      return nil unless opts[:bike] && opts[:bike].stolen && opts[:bike].current_stolen_record
-      stolen_record = opts[:bike].current_stolen_record
-      return nil unless stolen_record.present? && stolen_record.latitude.present?
-      enabled.location_triggered.detect { |s| s.distance_to(stolen_record) <= s.proximity_radius }
-    end
+  def self.organization_snippets
+    {
+      header: "Top of email block",
+      welcome: "Below header",
+      footer: "Above <3 <3 <3 <3 Bike Index Team",
+      security: "How to keep your bike safe, in email \"finished registration\"",
+      abandoned: "Template for geocoded abandoned bike email"
+    }.as_json
   end
 
-  before_save :disable_if_blank
-  def disable_if_blank
+  def self.organization_snippet_types
+    organization_snippets.keys
+  end
+
+  def self.kinds; KIND_ENUM.keys.map(&:to_s) end
+
+  def set_calculated_attributes
     self.is_enabled = false if is_enabled && body.blank?
+    if is_location_triggered # No longer used, but keeping in case we decide to use
+      self.kind = "location_triggered"
+    else
+      self.kind = self.class.kinds.include?(name) ? name : "custom"
+    end
   end
 end

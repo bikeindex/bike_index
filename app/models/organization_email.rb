@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class OrganizationEmail < ActiveRecord::Base
   KIND_ENUM = { geolocated: 0, abandoned_bike: 1 }.freeze
 
@@ -15,7 +17,7 @@ class OrganizationEmail < ActiveRecord::Base
   def set_calculated_attributes
     self.email ||= bike.owner_email
     if latitude.present? && longitude.present?
-      # self.location_name ||= Geocoder.search(latitude, longitude)
+      self.location_name ||= Geocoder.search(latitude, longitude)
     end
   end
 

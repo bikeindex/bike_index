@@ -8,7 +8,6 @@ class Organization < ActiveRecord::Base
 
   has_many :memberships, dependent: :destroy
   has_many :mail_snippets
-  has_many :organization_deals, dependent: :destroy
   has_many :users, through: :memberships
   has_many :organization_invitations, dependent: :destroy
   has_many :bike_organizations
@@ -68,6 +67,11 @@ class Organization < ActiveRecord::Base
     return nil unless MailSnippet.organization_snippet_types.include?(type)
     snippet = mail_snippets.enabled.where(name: type).first
     snippet && snippet.body
+  end
+
+  def paid_email_kinds
+    return [] unless geolocated_emails
+    ["geolocated", (abandoned_bike_email? ? "abandoned_bike" : nil)].compact
   end
 
   before_save :set_and_clean_attributes
@@ -139,5 +143,11 @@ class Organization < ActiveRecord::Base
     begin
       self.access_token = SecureRandom.hex
     end while self.class.exists?(access_token: access_token)
+  end
+
+  private
+
+  def abandoned_bike_email?
+    mail_snippets.abandoned.any?
   end
 end

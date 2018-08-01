@@ -1053,7 +1053,8 @@ CREATE TABLE public.mail_snippets (
     proximity_radius integer,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
-    organization_id integer
+    organization_id integer,
+    kind integer DEFAULT 0
 );
 
 
@@ -1294,40 +1295,6 @@ CREATE SEQUENCE public.oauth_applications_id_seq
 --
 
 ALTER SEQUENCE public.oauth_applications_id_seq OWNED BY public.oauth_applications.id;
-
-
---
--- Name: organization_deals; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.organization_deals (
-    id integer NOT NULL,
-    organization_id integer,
-    deal_name character varying,
-    email character varying,
-    user_id character varying,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
---
--- Name: organization_deals_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.organization_deals_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: organization_deals_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.organization_deals_id_seq OWNED BY public.organization_deals.id;
 
 
 --
@@ -2295,13 +2262,6 @@ ALTER TABLE ONLY public.oauth_applications ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
--- Name: organization_deals id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.organization_deals ALTER COLUMN id SET DEFAULT nextval('public.organization_deals_id_seq'::regclass);
-
-
---
 -- Name: organization_emails id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2689,14 +2649,6 @@ ALTER TABLE ONLY public.oauth_access_tokens
 
 ALTER TABLE ONLY public.oauth_applications
     ADD CONSTRAINT oauth_applications_pkey PRIMARY KEY (id);
-
-
---
--- Name: organization_deals organization_deals_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.organization_deals
-    ADD CONSTRAINT organization_deals_pkey PRIMARY KEY (id);
 
 
 --
@@ -3542,4 +3494,8 @@ INSERT INTO schema_migrations (version) VALUES ('20180730013343');
 INSERT INTO schema_migrations (version) VALUES ('20180731194240');
 
 INSERT INTO schema_migrations (version) VALUES ('20180801010129');
+
+INSERT INTO schema_migrations (version) VALUES ('20180801011704');
+
+INSERT INTO schema_migrations (version) VALUES ('20180801025713');
 
