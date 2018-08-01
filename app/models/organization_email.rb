@@ -17,7 +17,7 @@ class OrganizationEmail < ActiveRecord::Base
   def set_calculated_attributes
     self.email ||= bike.owner_email
     if latitude.present? && longitude.present?
-      self.location_name ||= Geocoder.search(latitude, longitude)
+      self.location_name ||= Geohelper.reverse_geocode(latitude, longitude)
     end
   end
 

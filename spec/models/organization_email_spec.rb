@@ -10,6 +10,7 @@ RSpec.describe OrganizationEmail, type: :model do
 
   describe "set_calculated_attributes" do
     context "geolocated" do
+      include_context :geocoder_default_location
       let(:ownership) { FactoryGirl.create(:ownership, owner_email: "stuff@stuff.com") }
       let(:bike) { ownership.bike }
       let(:organization_email) { FactoryGirl.build(:organization_email, email: nil, kind: :geolocated, bike: bike, latitude: nil, longitude: nil) }
