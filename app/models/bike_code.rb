@@ -13,9 +13,16 @@ class BikeCode < ActiveRecord::Base
   enum kind: KIND_ENUM
 
   validates_presence_of :code
+  validates_uniqueness_of :code, scope: [:organization_id], allow_nil: false
+
+  before_validation :set_calculated_attributes
+
+  def self.normalize_code(code = nil)
+    code.to_s.upcase.strip.gsub(/\A0*/, "") # Strip leading 0s, because we don't care about them
+  end
 
   def self.lookup(str, organization_id: nil)
-    code = str.to_s.strip.gsub(/\A0*/, "") # Strip leading 0s, because we don't care about them
+    code = normalize_code(str)
     if organization_id.present?
       org = Organization.friendly_find(organization_id)
       return where(code: code, organization_id: org.id).first if org.present?
@@ -52,5 +59,9 @@ class BikeCode < ActiveRecord::Base
     return self if errors.any?
     update(bike_id: new_bike.id, user_id: user.id)
     self
+  end
+
+  def set_calculated_attributes
+    self.code = self.class.normalize_code(code)
   end
 end
