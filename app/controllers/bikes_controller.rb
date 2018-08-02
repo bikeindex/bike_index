@@ -59,7 +59,7 @@ class BikesController < ApplicationController
   end
 
   def scanned
-    @bike_code = BikeCode.lookup(params[:id] || params[:card_id], organization_id: params[:organization_id])
+    @bike_code = BikeCode.lookup(scanned_id, organization_id: params[:organization_id])
     if @bike_code.blank?
       raise ActiveRecord::RecordNotFound
     elsif @bike_code.bike.present?
@@ -233,6 +233,10 @@ class BikesController < ApplicationController
 
   def render_ad
     @ad = true
+  end
+
+  def scanned_id
+    params[:id] || params[:scanned_id] || params[:card_id]
   end
 
   def remove_subdomain

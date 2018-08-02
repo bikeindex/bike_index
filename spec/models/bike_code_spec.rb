@@ -42,11 +42,11 @@ RSpec.describe BikeCode, type: :model do
       expect(spokecard2.code).to eq "A00000012"
       [sticker, sticker2, spokecard, spokecard2].each { |bike_code| expect(bike_code).to be_valid }
       expect(sticker_dupe_number.save).to be_falsey
-      expect(sticker_dupe_number.errors.messages.to_s).to match(/uniqueness/i)
-      expect(spokecard_dupe_number.save).to be_falsey
-      expect(sticker_dupe_number.errors.messages.to_s).to match(/uniqueness/i)
+      expect(sticker_dupe_number.errors.messages.to_s).to match(/already been taken/i)
+      expect(spokecard_dupe_letter.save).to be_falsey
+      expect(sticker_dupe_number.errors.messages.to_s).to match(/already been taken/i)
       expect(spokecard_empty.save).to be_falsey
-      expect(spokecard_empty.errors.messages.to_s).to match(/presence/i)
+      expect(spokecard_empty.errors.messages.to_s).to match(/blank/i)
     end
   end
 

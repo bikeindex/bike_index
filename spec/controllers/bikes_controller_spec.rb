@@ -225,6 +225,13 @@ describe BikesController do
         expect(response).to redirect_to bike_url(bike)
       end
     end
+    context "code_id" do
+      let!(:bike_code) { FactoryGirl.create(:bike_code, code: "sss") }
+      it "redirects to the proper page" do
+        get :scanned, scanned_id: "sss"
+        expect(response).to redirect_to bike_url(bike)
+      end
+    end
     context "id" do
       it "redirects to the proper page" do
         get :scanned, id: 900
