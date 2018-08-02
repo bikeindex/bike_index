@@ -226,7 +226,7 @@ describe BikesController do
       end
     end
     context "code_id" do
-      let!(:bike_code) { FactoryGirl.create(:bike_code, code: "sss") }
+      let!(:bike_code) { FactoryGirl.create(:bike_code, code: "sss", bike: bike) }
       it "redirects to the proper page" do
         get :scanned, scanned_id: "sss"
         expect(response).to redirect_to bike_url(bike)
