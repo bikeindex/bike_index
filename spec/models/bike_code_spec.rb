@@ -1,6 +1,18 @@
 require "spec_helper"
 
 RSpec.describe BikeCode, type: :model do
+  describe "normalize_code" do
+    let(:url) { "https://bikeindex.org/bikes/scanned/000012?organization_id=palo-party" }
+    let(:url2) { "bikeindex.org/bikes/000012/scanned?organization_id=bikeindex" }
+    let(:url2) { "www.bikeindex.org/bikes/12/scanned?organization_id=bikeindex" }
+    let(:code) { "bike_code999" }
+    it "strips the right stuff" do
+      expect(BikeCode.normalize_code(code)).to eq "BIKE_CODE999"
+      expect(BikeCode.normalize_code(url)).to eq "12"
+      expect(BikeCode.normalize_code(url2)).to eq "12"
+    end
+  end
+
   describe "basic stuff" do
     let(:bike) { FactoryGirl.create(:bike) }
     let(:organization) { FactoryGirl.create(:organization, name: "Bike all night long", short_name: "bikenight") }
@@ -15,13 +27,12 @@ RSpec.describe BikeCode, type: :model do
       expect(BikeCode.sticker.count).to eq 1
       expect(BikeCode.lookup("000012", organization_id: organization.id)).to eq sticker
       expect(BikeCode.lookup("000012", organization_id: organization.to_param)).to eq sticker
-      expect(BikeCode.lookup("000012", organization_id: organization.short_name)).to eq sticker
+      expect(BikeCode.lookup("https://bikeindex.org/bikes/scanned/000012?organization_id=#{organization.short_name}", organization_id: organization.short_name)).to eq sticker
       expect(BikeCode.lookup("000012", organization_id: organization.name)).to eq sticker
       expect(BikeCode.lookup("000012", organization_id: "whateves")).to eq spokecard
       expect(BikeCode.lookup("000012")).to eq spokecard
       expect(spokecard.claimed?).to be_truthy
       expect(sticker_dupe.save).to be_falsey
-      
     end
   end
 

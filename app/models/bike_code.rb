@@ -17,8 +17,13 @@ class BikeCode < ActiveRecord::Base
 
   before_validation :set_calculated_attributes
 
-  def self.normalize_code(code = nil)
-    code.to_s.upcase.strip.gsub(/\A0*/, "") # Strip leading 0s, because we don't care about them
+  def self.normalize_code(str = nil)
+    code = str.to_s.upcase.strip
+    if code.match(/BIKEINDEX.ORG/)
+      code = code.gsub(/\A.*BIKEINDEX.ORG\/BIKES/, "").gsub(/\?.*/, "") # Remove the start and query string
+      code = code.gsub(/\/SCANNED\/?/, "").gsub(/\A\//, "") # Remove scanned, wherever it is, and a trailing / if it exists
+    end
+    code.gsub(/\A0*/, "") # Strip leading 0s, because we don't care about them
   end
 
   def self.lookup(str, organization_id: nil)
