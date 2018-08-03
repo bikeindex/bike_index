@@ -20,6 +20,13 @@
           - if current_organization.is_paid
             %li
               = active_link 'Recoveries', recoveries_organization_bikes_path(current_organization), class_name: 'nav-link'
+      - if current_organization.has_bike_codes
+        %li
+          %span.menu-item.top-level{ class: ("active" if controller_name == "stickers") }
+            Stickers
+          %ul.organized-submenu
+            %li
+              = active_link "List", organization_stickers_path(organization_id: current_organization.to_param), class_name: "nav-link"
       - if current_user.is_admin_of?(current_organization)
         %li
           - manage_active = %w(users manage emails).include?(controller_name)
