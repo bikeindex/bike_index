@@ -1,6 +1,5 @@
 module Organized
   class StickersController < Organized::BaseController
-    skip_before_filter :ensure_member!
     before_action :ensure_access_to_bike_codes!, except: [:create] # Because this checks ensure_admin
 
     def index
