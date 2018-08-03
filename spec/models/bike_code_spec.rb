@@ -118,6 +118,7 @@ RSpec.describe BikeCode, type: :model do
       bike_code.claim(user, "https://bikeindex.org/bikes?per_page=200")
       expect(bike_code.errors.full_messages).to be_present
       expect(bike_code.bike).to eq bike
+      expect(bike_code.claimed_at).to be_within(1.second).of Time.now
     end
     context "with weird strings" do
       it "updates" do

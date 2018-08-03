@@ -136,7 +136,8 @@ CREATE TABLE public.bike_codes (
     organization_id integer,
     user_id integer,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    claimed_at timestamp without time zone
 );
 
 
@@ -3511,4 +3512,6 @@ INSERT INTO schema_migrations (version) VALUES ('20180801150039');
 INSERT INTO schema_migrations (version) VALUES ('20180801153625');
 
 INSERT INTO schema_migrations (version) VALUES ('20180802235809');
+
+INSERT INTO schema_migrations (version) VALUES ('20180803003635');
 

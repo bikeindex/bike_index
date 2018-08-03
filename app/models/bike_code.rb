@@ -38,6 +38,13 @@ class BikeCode < ActiveRecord::Base
   def claimed?; bike_id.present? end
   def unclaimed?; !claimed? end
 
+  def url
+    [
+      "#{ENV["BASE_URL"]}/scanned/bikes/#{code}",
+      organization.present? ? "?organization_id=#{organization.slug}" : nil
+   ].compact.join("")
+ end
+
   def linkable_by?(user)
     return false unless user.present?
     return true if user.superuser?
@@ -62,7 +69,7 @@ class BikeCode < ActiveRecord::Base
     new_bike = Bike.where(id: bike_id).first if bike_id.present?
     errors.add(:bike, "\"#{bike_id}\" not found") unless new_bike.present?
     return self if errors.any?
-    update(bike_id: new_bike.id, user_id: user.id)
+    update(bike_id: new_bike.id, user_id: user.id, claimed_at: Time.now)
     self
   end
 
