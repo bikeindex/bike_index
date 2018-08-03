@@ -22,7 +22,9 @@ describe Organized::StickersController, type: :controller do
       describe "index" do
         it "redirects" do
           get :index, organization_id: organization.to_param
-          expect(response).to redirect_to root_path
+          expect(response).to render_template(:index)
+          expect(response).to render_with_layout("application_revised")
+          expect(assigns(:current_organization)).to eq organization
         end
       end
     end
