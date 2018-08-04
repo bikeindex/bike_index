@@ -1,5 +1,10 @@
-= render partial: 'initial_modal_for_show'
+= render partial: "initial_modal_for_show"
 
+- if current_user&.bike_actions_organization&.present?
+  - organization = current_user.bike_actions_organization
+  .organization-bike-actions
+    - organization.organization_message_kinds.each do |organization_message|
+      .cool-button-group-or-something
 - if @bike.owner == current_user
   .bike-edit-overlay
     - if @bike.user_hidden
