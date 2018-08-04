@@ -35,6 +35,12 @@ class BikeCode < ActiveRecord::Base
     where(code: code).first
   end
 
+  def self.admin_text_search(str)
+    code = normalize_code(str)
+    return all unless code.present?
+    where("code ILIKE ?", "%#{code}%")
+  end
+
   def claimed?; bike_id.present? end
   def unclaimed?; !claimed? end
 

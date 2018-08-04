@@ -31,6 +31,9 @@ RSpec.describe BikeCode, type: :model do
       expect(BikeCode.lookup("000012", organization_id: organization.name)).to eq sticker
       expect(BikeCode.lookup("000012", organization_id: "whateves")).to eq spokecard
       expect(BikeCode.lookup("000012")).to eq spokecard
+      expect(BikeCode.admin_text_search("1").pluck(:id)).to match_array([spokecard.id, sticker.id])
+      expect(BikeCode.admin_text_search(" ").pluck(:id)).to match_array([spokecard.id, sticker.id])
+      expect(BikeCode.admin_text_search("0012").pluck(:id)).to match_array([spokecard.id, sticker.id])
       expect(spokecard.claimed?).to be_truthy
       expect(sticker_dupe.save).to be_falsey
     end
