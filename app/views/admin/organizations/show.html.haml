@@ -77,16 +77,16 @@
                 = l @organization.paid_at, format: :convert_time
               %small.convertTimezone
             - else
-              &nbsp;
+              %small.less-strong
+                not set
           %dt
             Templates
           %dd
-            %a{ href: admin_organization_custom_layouts_path(organization_id: @organization.to_param) }
-              - if @organization.mail_snippets.any?
-                = @organization.mail_snippets.pluck(:name).to_sentence
-              - else
-                %small
-                  none
+            - if @organization.mail_snippets.any?
+              = @organization.mail_snippets.pluck(:name).to_sentence
+            - else
+              %small.less-strong
+                none
           %dt
             Landing Page
           %dd
@@ -96,11 +96,20 @@
               - else
                 landing page is not public - #{ link_to 'landing page', organization_landing_path(organization_id: @organization.to_param) }
             - else
-              no landing page
+              %small.less-strong
+                no landing page
           %dt
             Org emails
           %dd
             = @organization.organization_message_kinds.to_sentence
+          %dt
+            Stickers
+          %dd
+            - if @organization.has_bike_codes
+              = link_to "Has stickers", organization_stickers_path(organization_id: @organization.to_param)
+            - else
+              %small.less-strong
+                no
 
 
 
