@@ -1977,7 +1977,8 @@ CREATE TABLE public.users (
     is_content_admin boolean DEFAULT false NOT NULL,
     my_bikes_hash text,
     is_emailable boolean DEFAULT false NOT NULL,
-    developer boolean DEFAULT false NOT NULL
+    developer boolean DEFAULT false NOT NULL,
+    bike_actions_organization_id integer
 );
 
 
@@ -3150,6 +3151,13 @@ CREATE INDEX index_user_emails_on_user_id ON public.user_emails USING btree (use
 
 
 --
+-- Name: index_users_on_bike_actions_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_bike_actions_organization_id ON public.users USING btree (bike_actions_organization_id);
+
+
+--
 -- Name: index_users_on_password_reset_token; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3514,4 +3522,6 @@ INSERT INTO schema_migrations (version) VALUES ('20180801153625');
 INSERT INTO schema_migrations (version) VALUES ('20180802235809');
 
 INSERT INTO schema_migrations (version) VALUES ('20180803003635');
+
+INSERT INTO schema_migrations (version) VALUES ('20180804170624');
 

@@ -41,11 +41,8 @@ class User < ActiveRecord::Base
 
   has_many :organization_invitations, class_name: 'OrganizationInvitation', inverse_of: :inviter
   has_many :organization_invitations, class_name: 'OrganizationInvitation', inverse_of: :invitee
+  belongs_to :bike_actions_organization, class_name: "Organization"
 
-  before_create :generate_username_confirmation_and_auth
-  after_create :perform_create_jobs
-  serialize :paid_membership_info
-  serialize :my_bikes_hash
   scope :confirmed, -> { where(confirmed: true) }
   scope :unconfirmed, -> { where(confirmed: false) }
 
@@ -69,6 +66,14 @@ class User < ActiveRecord::Base
 
   validates_presence_of :email
   validates_uniqueness_of :email, case_sensitive: false
+
+  serialize :paid_membership_info
+  serialize :my_bikes_hash
+
+  before_validation :normalize_attributes
+  before_create :generate_username_confirmation_and_auth
+  after_create :perform_create_jobs
+  before_save :set_calculated_attributes
 
   class << self
     def fuzzy_email_find(email)
@@ -261,8 +266,7 @@ class User < ActiveRecord::Base
     return stolen
   end
 
-  before_save :set_urls
-  def set_urls
+  def set_calculated_attributes
     self.title = strip_tags(title) if title.present?
     if website
       self.website = Urlifyer.urlify(website)
@@ -271,6 +275,7 @@ class User < ActiveRecord::Base
     mbh[:link_target] = Urlifyer.urlify(my_bikes_link_target) if my_bikes_link_target.present?
     mbh[:link_title] = my_bikes_link_title if my_bikes_link_title.present?
     self.my_bikes_hash = mbh
+    self.bike_actions_organization_id = organizations.with_bike_actions.reorder(:created_at).pluck(:id).first
     true
   end
 
@@ -282,7 +287,6 @@ class User < ActiveRecord::Base
     (my_bikes_hash && my_bikes_hash[:link_title]) || mb_link_target
   end
 
-  before_validation :normalize_attributes
   def normalize_attributes
     self.phone = Phonifyer.phonify(phone) if phone 
     self.username = Slugifyer.slugify(username) if username

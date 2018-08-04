@@ -40,6 +40,9 @@ class Organization < ActiveRecord::Base
   scope :manufacturer, -> { where(org_type: 'manufacturer') }
   scope :paid, -> { where(is_paid: true) }
   scope :valid, -> { where(is_suspended: false) }
+  scope :valid, -> { where(is_suspended: false) }
+  # Eventually there will be other actions beside organization_messages, but for now it's just messages
+  scope :with_bike_actions, -> { where("organizations.geolocated_emails = ? OR organizations.abandoned_bike_emails = ?", true, true) }
 
   before_validation :set_calculated_attributes
 
@@ -72,12 +75,18 @@ class Organization < ActiveRecord::Base
   end
 
   def organization_message_kinds # Matches organization_message kinds
-    return [] unless geolocated_emails
-    ["geolocated", (abandoned_bike_emails ? "abandoned_bike" : nil)].compact
+    [
+      (geolocated_emails ? "geolocated" : nil),
+      (abandoned_bike_emails ? "abandoned_bike" : nil)
+    ].compact
   end
 
   def permitted_message_kind?(kind)
     organization_message_kinds.include?(kind.to_s)
+  end
+
+  def bike_actions? # Eventually there will be other actions beside organization_messages, so use this as general reference
+    organization_message_kinds.any?
   end
 
   def set_calculated_attributes
@@ -99,7 +108,6 @@ class Organization < ActiveRecord::Base
     generate_access_token unless self.access_token.present?
     set_auto_user
     locations.each { |l| l.save unless l.shown == allowed_show }
-    self.abandoned_bike_emails = mail_snippets.abandoned_bike.enabled.any? if geolocated_emails
     true # legacy bs rails concerns
   end
 
