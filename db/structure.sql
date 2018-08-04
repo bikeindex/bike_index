@@ -136,7 +136,8 @@ CREATE TABLE public.bike_codes (
     organization_id integer,
     user_id integer,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    claimed_at timestamp without time zone
 );
 
 
@@ -1407,7 +1408,8 @@ CREATE TABLE public.organizations (
     show_bulk_import boolean DEFAULT false,
     paid_at timestamp without time zone,
     geolocated_emails boolean DEFAULT false NOT NULL,
-    abandoned_bike_emails boolean DEFAULT false NOT NULL
+    abandoned_bike_emails boolean DEFAULT false NOT NULL,
+    has_bike_codes boolean DEFAULT false NOT NULL
 );
 
 
@@ -3500,4 +3502,16 @@ INSERT INTO schema_migrations (version) VALUES ('20180801010129');
 INSERT INTO schema_migrations (version) VALUES ('20180801011704');
 
 INSERT INTO schema_migrations (version) VALUES ('20180801025713');
+
+INSERT INTO schema_migrations (version) VALUES ('20180801050740');
+
+INSERT INTO schema_migrations (version) VALUES ('20180801145322');
+
+INSERT INTO schema_migrations (version) VALUES ('20180801150039');
+
+INSERT INTO schema_migrations (version) VALUES ('20180801153625');
+
+INSERT INTO schema_migrations (version) VALUES ('20180802235809');
+
+INSERT INTO schema_migrations (version) VALUES ('20180803003635');
 

@@ -18,6 +18,7 @@
         %th Model
         %th Color
         %th Sent to
+        %th Claimed
         / %th View PDF
     %tbody
       - @bikes.each do |bike|
@@ -38,7 +39,8 @@
                 = bike.creation_description
               - unless bike.owner_email == bike.first_owner_email
                 (sent to a new owner)
-          / %td
+          %td
+            = "&#x2713;".html_safe if bike.current_owner_exists
 - unless current_organization.is_paid
   .paginate-container.paginate-container-bottom
     = paginate @bikes

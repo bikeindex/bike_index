@@ -225,6 +225,13 @@ describe BikesController do
         expect(response).to redirect_to bike_url(bike)
       end
     end
+    context "code_id" do
+      let!(:bike_code) { FactoryGirl.create(:bike_code, code: "sss", bike: bike) }
+      it "redirects to the proper page" do
+        get :scanned, scanned_id: "sss"
+        expect(response).to redirect_to bike_url(bike)
+      end
+    end
     context "id" do
       it "redirects to the proper page" do
         get :scanned, id: 900
@@ -483,6 +490,25 @@ describe BikesController do
           expect(bike.creation_state.creator).to eq bike.creator
           expect(bike.manufacturer).to eq Manufacturer.other
           expect(bike.manufacturer_other).to eq 'A crazy different thing'
+        end
+      end
+      context "with organization bike code" do
+        let!(:bike_code) { FactoryGirl.create(:bike_code, organization: organization, code: "aaa", kind: "sticker") }
+        let!(:wrong_bike_code) { FactoryGirl.create(:bike_code, code: "aaa", kind: "sticker") }
+        it "registers a bike and redirects with persist_email" do
+          post :create, bike: bike_params.merge(bike_code: "AAA")
+          expect(response).to redirect_to(embed_extended_organization_url(organization))
+          bike = Bike.last
+          expect(bike.creation_state.origin).to eq 'embed_extended'
+          expect(bike.creation_state.organization).to eq organization
+          expect(bike.creation_state.creator).to eq bike.creator
+          expect(bike.manufacturer).to eq manufacturer
+          bike_code.reload
+          expect(bike_code.claimed?).to be_truthy
+          expect(bike_code.bike).to eq bike
+          expect(bike_code.user).to eq bike.creator
+          wrong_bike_code.reload
+          expect(wrong_bike_code.claimed?).to be_falsey
         end
       end
     end

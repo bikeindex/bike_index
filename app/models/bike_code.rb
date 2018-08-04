@@ -13,9 +13,21 @@ class BikeCode < ActiveRecord::Base
   enum kind: KIND_ENUM
 
   validates_presence_of :code
+  validates_uniqueness_of :code, scope: [:organization_id], allow_nil: false
+
+  before_validation :set_calculated_attributes
+
+  def self.normalize_code(str = nil)
+    code = str.to_s.upcase.strip
+    if code.match(/BIKEINDEX.ORG/)
+      code = code.gsub(/\A.*BIKEINDEX.ORG\/BIKES/, "").gsub(/\?.*/, "") # Remove the start and query string
+      code = code.gsub(/\/SCANNED\/?/, "").gsub(/\A\//, "") # Remove scanned, wherever it is, and a trailing / if it exists
+    end
+    code.gsub(/\A0*/, "") # Strip leading 0s, because we don't care about them
+  end
 
   def self.lookup(str, organization_id: nil)
-    code = str.to_s.strip.gsub(/\A0*/, "") # Strip leading 0s, because we don't care about them
+    code = normalize_code(str)
     if organization_id.present?
       org = Organization.friendly_find(organization_id)
       return where(code: code, organization_id: org.id).first if org.present?
@@ -25,6 +37,13 @@ class BikeCode < ActiveRecord::Base
 
   def claimed?; bike_id.present? end
   def unclaimed?; !claimed? end
+
+  def url
+    [
+      "#{ENV["BASE_URL"]}/scanned/bikes/#{code}",
+      organization.present? ? "?organization_id=#{organization.slug}" : nil
+   ].compact.join("")
+ end
 
   def linkable_by?(user)
     return false unless user.present?
@@ -50,7 +69,11 @@ class BikeCode < ActiveRecord::Base
     new_bike = Bike.where(id: bike_id).first if bike_id.present?
     errors.add(:bike, "\"#{bike_id}\" not found") unless new_bike.present?
     return self if errors.any?
-    update(bike_id: new_bike.id, user_id: user.id)
+    update(bike_id: new_bike.id, user_id: user.id, claimed_at: Time.now)
     self
+  end
+
+  def set_calculated_attributes
+    self.code = self.class.normalize_code(code)
   end
 end

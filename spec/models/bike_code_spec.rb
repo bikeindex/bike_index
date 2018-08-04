@@ -1,11 +1,25 @@
 require "spec_helper"
 
 RSpec.describe BikeCode, type: :model do
+  describe "normalize_code" do
+    let(:url) { "https://bikeindex.org/bikes/scanned/000012?organization_id=palo-party" }
+    let(:url2) { "bikeindex.org/bikes/000012/scanned?organization_id=bikeindex" }
+    let(:url2) { "www.bikeindex.org/bikes/12/scanned?organization_id=bikeindex" }
+    let(:code) { "bike_code999" }
+    it "strips the right stuff" do
+      expect(BikeCode.normalize_code(code)).to eq "BIKE_CODE999"
+      expect(BikeCode.normalize_code(url)).to eq "12"
+      expect(BikeCode.normalize_code(url2)).to eq "12"
+    end
+  end
+
   describe "basic stuff" do
     let(:bike) { FactoryGirl.create(:bike) }
     let(:organization) { FactoryGirl.create(:organization, name: "Bike all night long", short_name: "bikenight") }
     let!(:spokecard) { FactoryGirl.create(:bike_code, kind: "spokecard", code: 12, bike: bike) }
     let!(:sticker) { FactoryGirl.create(:bike_code, code: 12, organization_id: organization.id) }
+    let!(:sticker_dupe) { FactoryGirl.build(:bike_code, code: "00012", organization_id: organization.id) }
+
     it "calls the things we expect and finds the things we expect" do
       expect(BikeCode.claimed.count).to eq 1
       expect(BikeCode.unclaimed.count).to eq 1
@@ -13,11 +27,37 @@ RSpec.describe BikeCode, type: :model do
       expect(BikeCode.sticker.count).to eq 1
       expect(BikeCode.lookup("000012", organization_id: organization.id)).to eq sticker
       expect(BikeCode.lookup("000012", organization_id: organization.to_param)).to eq sticker
-      expect(BikeCode.lookup("000012", organization_id: organization.short_name)).to eq sticker
+      expect(BikeCode.lookup("https://bikeindex.org/bikes/scanned/000012?organization_id=#{organization.short_name}", organization_id: organization.short_name)).to eq sticker
       expect(BikeCode.lookup("000012", organization_id: organization.name)).to eq sticker
       expect(BikeCode.lookup("000012", organization_id: "whateves")).to eq spokecard
       expect(BikeCode.lookup("000012")).to eq spokecard
       expect(spokecard.claimed?).to be_truthy
+      expect(sticker_dupe.save).to be_falsey
+    end
+  end
+
+  describe "duplication and integers" do
+    let(:organization) { FactoryGirl.create(:organization) }
+    let!(:sticker) { FactoryGirl.create(:bike_code, kind: "sticker", code: 12, organization_id: organization.id) }
+    let!(:sticker2) { FactoryGirl.create(:bike_code, kind: "sticker", code: " 12", organization: FactoryGirl.create(:organization)) }
+    let!(:spokecard) { FactoryGirl.create(:bike_code, kind: "spokecard", code: "00000012") }
+    let!(:spokecard2) { FactoryGirl.create(:bike_code, kind: "sticker", code: "a00000012") }
+    let(:sticker_dupe_number) { FactoryGirl.build(:bike_code, kind: "sticker", code: "00012", organization_id: organization.id) }
+    # Note: unique across kinds, so just check that here
+    let(:spokecard_dupe_letter) { FactoryGirl.build(:bike_code, kind: "sticker", code: " A00000012") }
+    let(:spokecard_empty) { FactoryGirl.build(:bike_code, kind: "sticker", code: " ") }
+
+    it "doesn't permit duplicates" do
+      expect(sticker.code).to eq "12"
+      expect(sticker2.code).to eq "12"
+      expect(spokecard2.code).to eq "A00000012"
+      [sticker, sticker2, spokecard, spokecard2].each { |bike_code| expect(bike_code).to be_valid }
+      expect(sticker_dupe_number.save).to be_falsey
+      expect(sticker_dupe_number.errors.messages.to_s).to match(/already been taken/i)
+      expect(spokecard_dupe_letter.save).to be_falsey
+      expect(sticker_dupe_number.errors.messages.to_s).to match(/already been taken/i)
+      expect(spokecard_empty.save).to be_falsey
+      expect(spokecard_empty.errors.messages.to_s).to match(/blank/i)
     end
   end
 
@@ -78,6 +118,7 @@ RSpec.describe BikeCode, type: :model do
       bike_code.claim(user, "https://bikeindex.org/bikes?per_page=200")
       expect(bike_code.errors.full_messages).to be_present
       expect(bike_code.bike).to eq bike
+      expect(bike_code.claimed_at).to be_within(1.second).of Time.now
     end
     context "with weird strings" do
       it "updates" do

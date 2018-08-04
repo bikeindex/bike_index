@@ -52,6 +52,7 @@ class BParam < ActiveRecord::Base
   def is_new; bike['is_new'] || false end
   def is_bulk; bike['is_bulk'] || false end
   def no_duplicate; bike['no_duplicate'] || false end
+  def bike_code; bike["bike_code"] end
 
   def creation_organization; Organization.friendly_find(creation_organization_id) end
   def manufacturer; bike['manufacturer_id'] && Manufacturer.friendly_find(bike['manufacturer_id']) end
@@ -98,7 +99,7 @@ class BParam < ActiveRecord::Base
     end
 
     def skipped_bike_attrs # Attrs that need to be skipped on bike assignment
-      %w(cycle_type_slug cycle_type_name rear_gear_type_slug front_gear_type_slug
+      %w(cycle_type_slug cycle_type_name rear_gear_type_slug front_gear_type_slug bike_code
          handlebar_type_slug frame_material_slug is_bulk is_new is_pos no_duplicate)
     end
   end

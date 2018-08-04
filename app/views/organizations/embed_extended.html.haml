@@ -85,6 +85,11 @@
   .input-group
     %h3
       Optional additions
+    - if @organization.has_bike_codes
+      .control-group.special-select-single
+      = f.label :bike_code, "Sticker id", class: "control-label"
+      .controls
+        = f.text_field :bike_code, value: ""
     .control-group.special-select-single
       = f.label :frame_material_id, "Primary frame material", class: "control-label"
       .controls

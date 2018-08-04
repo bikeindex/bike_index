@@ -115,6 +115,7 @@ Bikeindex::Application.routes.draw do
     end
     resource :recovery, only: [:edit, :update], controller: 'bikes/recovery'
   end
+  get "bikes/scanned/:scanned_id", to: "bikes#scanned"
 
   resources :bike_codes, only: [:update]
   resources :locks, except: [:show, :index]
@@ -275,6 +276,7 @@ Bikeindex::Application.routes.draw do
     resources :emails
     resources :bulk_imports, only: [:index, :show, :new, :create]
     resources :messages, only: [:index, :show, :create]
+    resources :stickers, only: [:index, :show, :edit, :update]
   end
 
   get '*unmatched_route', to: 'errors#not_found' if Rails.env.production? # Handle 404s with lograge
