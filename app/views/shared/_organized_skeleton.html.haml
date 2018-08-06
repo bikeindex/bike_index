@@ -25,7 +25,7 @@
             Stickers
           %ul.organized-submenu
             %li
-              = active_link "Search", organization_stickers_path(organization_id: current_organization.to_param), class_name: "nav-link"
+              = active_link "List", organization_stickers_path(organization_id: current_organization.to_param), class_name: "nav-link"
       - if current_user.is_admin_of?(current_organization)
         %li
           - manage_active = %w(users manage emails).include?(controller_name)

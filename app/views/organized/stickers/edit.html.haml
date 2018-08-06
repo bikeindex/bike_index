@@ -1,0 +1,35 @@
+.organized-page-header
+  %h1
+    Edit Sticker
+    %em
+      = @bike_code.code
+  - if @bike_code.claimed?
+    %p.text-right
+      = link_to "Remove Bike link", organization_sticker_path(id: @bike_code.code, organization_id: current_organization.to_param, bike_id: nil), method: :put, class: "btn btn-danger"
+%p
+  Bike:
+  - if @bike_code.claimed?
+    = link_to organized_bike_text(@bike_code.bike), bike_path(@bike_code.bike)
+  - else
+    %strong
+      Unclaimed
+  %br
+  Claimed:
+  - if @bike_code.claimed_at.present?
+    %span.convertTime
+      = l @bike_code.created_at, format: :convert_time
+  %br
+  Claimed by:
+  - if @bike_code.user.present?
+    = @bike_code.user.display_name
+
+%hr.mt-4.mb-4
+
+= form_for @bike_code, { url: organization_sticker_path(id: @bike_code.code, organization_id: current_organization.to_param), action: "update", html: { class: "organized-form" } } do |f|
+
+  .form-group.row
+    = f.label :bike_id, "Bike ID", class: "org-form-label"
+    .form-well-input
+      = f.text_field :bike_id, required: true, class: "form-control"
+
+  = f.submit "Update", class: "btn btn-success btn-lg"

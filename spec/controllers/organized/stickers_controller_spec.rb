@@ -78,7 +78,7 @@ describe Organized::StickersController, type: :controller do
         let(:bike_code) { FactoryGirl.create(:bike_code, bike_id: bike.id, organization_id: organization.id) }
         let(:bike2) { FactoryGirl.create(:bike) }
         it "updates" do
-          put :update, id: bike_code.code, bike_id: "https://bikeindex.org/bikes/#{bike2.id} ", organization_id: organization.id
+          put :update, id: bike_code.code, organization_id: organization.id, bike_code: { bike_id: "https://bikeindex.org/bikes/#{bike2.id} " }
           expect(assigns(:current_organization)).to eq organization
           expect(flash[:success]).to be_present
           expect(response).to redirect_to stickers_root_path

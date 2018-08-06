@@ -6,7 +6,7 @@ module Organized
     def index
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
-      @bike_codes = searched.order(created_at: :desc).page(@page).per(@per_page)
+      @bike_codes = searched.includes(:bike).order(created_at: :desc).page(@page).per(@per_page)
     end
 
     def edit
@@ -17,7 +17,8 @@ module Organized
       if !@bike_code.claimable_by?(current_user)
         flash[:error] = "You can't update that #{@bike_code.kind}. Please contact support@bikeindex.org if you think you should be able to"
       else
-        @bike_code.claim(current_user, params[:bike_id])
+        bike_id = params[:bike_id].present? ? params[:bike_id] : params.dig(:bike_code, :bike_id)
+        @bike_code.claim(current_user, bike_id)
         if @bike_code.errors.any?
           flash[:error] = @bike_code.errors.full_messages.to_sentence
         else
@@ -25,7 +26,7 @@ module Organized
           redirect_to organization_stickers_path(organization_id: current_organization.to_param) and return
         end
       end
-      redirect_to organization_sticker_path(organization_id: current_organization.to_param, id: @bike_code.code)
+      redirect_to edit_organization_sticker_path(organization_id: current_organization.to_param, id: @bike_code.code)
     end
 
     private

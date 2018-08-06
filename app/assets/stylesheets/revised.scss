@@ -92,7 +92,6 @@ $modal-backdrop-opacity: 0.8;
 // Utility classes
 @import "bootstrap/utilities";
 
-
 //
 // Other (non-bootstrap) external styles
 @import "legacy_includes/zoom.scss";
@@ -144,7 +143,6 @@ $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 // Shared organized styles
 @import "revised/pages/organized/forms";
 @import "revised/pages/organized/header";
-@import "revised/pages/organized/bikes_index";
 @import "revised/sections/organized_menu"; // left hand organized menu
 
 //
@@ -215,9 +213,6 @@ body { min-height: 400px; }
 // External overrides
 //
 
-// Pickaday overrides
-.pika-button:hover { background: $blue; }
-
 #old-browser-warning {
   width: 100%;
   background: $gray-lighter;
@@ -230,3 +225,12 @@ body { min-height: 400px; }
   p { margin: 0; }
   h4 { color: $red; margin: 0 0 $vertical-height; }
 }
+
+
+
+// New version of Bootstrap include these and so I'm using them, delete once upgraded
+.text-right { text-align: right; }
+.mt-4 { padding-top: $vertical-height; }
+.mt-2 { padding-top: 0.5 * $vertical-height; }
+.mb-4 { padding-bottom: $vertical-height; }
+.mb-2 { padding-bottom: 0.5 * $vertical-height; }
