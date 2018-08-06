@@ -12,6 +12,7 @@ module Organized
     def edit
     end
 
+    # This is exactly the same as bike_codes_controller update - except the redirect is different
     def update
       if !@bike_code.claimable_by?(current_user)
         flash[:error] = "You can't update that #{@bike_code.kind}. Please contact support@bikeindex.org if you think you should be able to"
@@ -20,16 +21,21 @@ module Organized
         if @bike_code.errors.any?
           flash[:error] = @bike_code.errors.full_messages.to_sentence
         else
-          flash[:success] = "#{@bike_code.kind.titleize} claimed"
+          flash[:success] = "#{@bike_code.kind.titleize} #{@bike_code.claimed? ? "claimed" : "unclaimed"}"
+          redirect_to organization_stickers_path(organization_id: current_organization.to_param) and return
         end
       end
-      redirect_to organization_stickers_path(organization_id: current_organization.to_param)
+      redirect_to organization_sticker_path(organization_id: current_organization.to_param, id: @bike_code.code)
     end
 
     private
 
     def find_bike_code
       @bike_code = bike_codes.lookup(params[:id])
+      unless @bike_code.present?
+        flash[:error] = "Unable to find that sticker"
+        redirect_to organization_stickers_path(organization_id: current_organization.to_param) and return
+      end
     end
 
     def bike_codes
