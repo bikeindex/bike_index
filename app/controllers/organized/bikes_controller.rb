@@ -3,11 +3,11 @@ module Organized
     def index
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
-      if current_organization.is_paid
+      if current_organization.bike_search?
         search
       else
         @bikes_count = organization_bikes.count
-        @bikes = organization_bikes.order('bikes.created_at desc').page(@page).per(@per_page)
+        @bikes = organization_bikes.order("bikes.created_at desc").page(@page).per(@per_page)
       end
     end
 
@@ -25,7 +25,7 @@ module Organized
     end
 
     def recoveries
-      redirect_to current_index_path and return unless current_organization.is_paid
+      redirect_to current_index_path and return unless current_organization.show_recoveries?
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
       @recoveries_count = current_organization.recovered_records.count

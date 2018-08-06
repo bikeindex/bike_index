@@ -95,9 +95,10 @@ class Organization < ActiveRecord::Base
     save
   end
 
-  def school?
-    org_type == 'school'
-  end
+  def bike_search?; has_bike_search end
+  def show_recoveries?; is_paid end
+  def show_bulk_import?; show_bulk_import end
+  def school?; org_type == "school" end
 
   def set_auto_user
     if embedable_user_email.present?

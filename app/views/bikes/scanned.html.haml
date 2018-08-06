@@ -6,7 +6,7 @@
   %hr{ style: "margin: 24px 0 36px;" }
 
   - if current_user.present?
-    - if !@bike_code.linkable_by?(current_user)
+    - if !@bike_code.claimable_by?(current_user)
       %h3
         You have claimed the maximum permitted number of Bike Codes.
       %p

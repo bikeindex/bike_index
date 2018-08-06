@@ -63,6 +63,37 @@ describe Organized::StickersController, type: :controller do
           expect(assigns(:current_organization)).to eq organization
         end
       end
+
+      describe "update" do
+        let(:bike) { FactoryGirl.create(:bike) }
+        let(:bike_code) { FactoryGirl.create(:bike_code, bike_id: bike.id, organization_id: organization.id) }
+        let(:bike2) { FactoryGirl.create(:bike) }
+        it "updates" do
+          put :update, id: bike_code.code, bike_id: "https://bikeindex.org/bikes/#{bike2.id} "
+          expect(response).to render_template(:index)
+          expect(assigns(:current_organization)).to eq organization
+          bike_code.reload
+          expect(bike_code.bike).to eq bike
+        end
+        context "other organization bike_code" do
+          let(:bike_code) { FactoryGirl.create(:bike_code, bike_id: bike.id) }
+          it "responds with flash error" do
+            put :update, id: bike_code.code, bike_id: "https://bikeindex.org/bikes/#{bike2.id} "
+            expect(flash[:error]).to be_present
+            bike_code.reload
+            expect(bike_code.bike).to eq bike
+          end
+        end
+        context "nil bike_id" do
+          it "updates and removes the assignment" do
+            put :update, id: bike_code.code, bike_id: " "
+            expect(response).to render_template(:index)
+            expect(bike_code.claimed_at).to be_nil
+            expect(bike_code.bike_id).to be_nil
+            expect(bike_code.user_id).to be_nil
+          end
+        end
+      end
     end
   end
 end
