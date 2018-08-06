@@ -1,4 +1,4 @@
-.organized-page-header
+.mb-4
   %h1
     %em
       = current_organization.name
@@ -35,19 +35,17 @@
       %th
         Added&nbsp;<small class="convertTimezone"></small>
       %th
-        Code
-      %th
         Linked&nbsp;<small class="convertTimezone"></small>
       %th
         Bike
+      %th
+        Code
     %tbody
       - @bike_codes.each do |bike_code|
         %tr
           %td
             %a.convertTime{ href: edit_organization_sticker_path(organization_id: current_organization.id, id: bike_code.code) }
               = l bike_code.created_at, format: :convert_time
-          %td
-            = bike_code.code
           %td
             - if bike_code.claimed? && bike_code.claimed_at.present?
               %span.convertTime
@@ -56,6 +54,8 @@
             - if bike_code.claimed?
               / For these, use bike_id to avoid loading association
               = link_to organized_bike_text(bike_code.bike), bike_path(bike_code.bike_id)
+          %td
+            = link_to bike_code.code, "/bikes/scanned/#{bike_code.code}?organization_id=#{current_organization.to_param}"
 
 .paginate-container.paginate-container-bottom
   = paginate @bike_codes

@@ -230,7 +230,7 @@ body { min-height: 400px; }
 
 // New version of Bootstrap include these and so I'm using them, delete once upgraded
 .text-right { text-align: right; }
-.mt-4 { padding-top: $vertical-height; }
-.mt-2 { padding-top: 0.5 * $vertical-height; }
-.mb-4 { padding-bottom: $vertical-height; }
-.mb-2 { padding-bottom: 0.5 * $vertical-height; }
+.mt-4 { padding-top: 2 * $vertical-height; }
+.mt-2 { padding-top: $vertical-height; }
+.mb-4 { padding-bottom: 2 * $vertical-height; }
+.mb-2 { padding-bottom: $vertical-height; }
