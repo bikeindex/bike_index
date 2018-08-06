@@ -34,7 +34,7 @@ class BikesController < ApplicationController
     @stolen_notification = StolenNotification.new if @bike.stolen
     respond_to do |format|
       format.html { render :show }
-      format.gif  { render qrcode: scanned_bike_url(@bike), level: :h, unit: 50 }
+      format.gif  { render qrcode: bike_url(@bike), level: :h, unit: 50 }
     end
   end
 
@@ -59,14 +59,15 @@ class BikesController < ApplicationController
   end
 
   def scanned
-    if params[:id]
-      b = Bike.find(params[:id])
-    else
-      b = Bike.find_by_card_id(params[:card_id])
+    @bike_code = BikeCode.lookup(scanned_id, organization_id: params[:organization_id])
+    if @bike_code.blank?
+      raise ActiveRecord::RecordNotFound
+    elsif @bike_code.bike.present?
+      redirect_to bike_url(@bike_code.bike_id) and return
+    elsif current_user.present?
+      @bikes = current_user.bikes.reorder(created_at: :desc).limit(100)
     end
-    redirect_to bike_url(b) if b.present?
-    @feedback = Feedback.new
-    @card_id = params[:card_id]
+    @organization = @bike_code.organization
   end
 
   def spokecard
@@ -232,6 +233,10 @@ class BikesController < ApplicationController
 
   def render_ad
     @ad = true
+  end
+
+  def scanned_id
+    params[:id] || params[:scanned_id] || params[:card_id]
   end
 
   def remove_subdomain

@@ -125,6 +125,43 @@ ALTER SEQUENCE public.b_params_id_seq OWNED BY public.b_params.id;
 
 
 --
+-- Name: bike_codes; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.bike_codes (
+    id integer NOT NULL,
+    kind integer DEFAULT 0,
+    code character varying,
+    bike_id integer,
+    organization_id integer,
+    user_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    claimed_at timestamp without time zone
+);
+
+
+--
+-- Name: bike_codes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.bike_codes_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: bike_codes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.bike_codes_id_seq OWNED BY public.bike_codes.id;
+
+
+--
 -- Name: bike_organizations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1017,7 +1054,8 @@ CREATE TABLE public.mail_snippets (
     proximity_radius integer,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
-    organization_id integer
+    organization_id integer,
+    kind integer DEFAULT 0
 );
 
 
@@ -1261,40 +1299,6 @@ ALTER SEQUENCE public.oauth_applications_id_seq OWNED BY public.oauth_applicatio
 
 
 --
--- Name: organization_deals; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.organization_deals (
-    id integer NOT NULL,
-    organization_id integer,
-    deal_name character varying,
-    email character varying,
-    user_id character varying,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
---
--- Name: organization_deals_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.organization_deals_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: organization_deals_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.organization_deals_id_seq OWNED BY public.organization_deals.id;
-
-
---
 -- Name: organization_invitations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1333,6 +1337,47 @@ ALTER SEQUENCE public.organization_invitations_id_seq OWNED BY public.organizati
 
 
 --
+-- Name: organization_messages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.organization_messages (
+    id integer NOT NULL,
+    kind integer DEFAULT 0,
+    organization_id integer,
+    sender_id integer,
+    bike_id integer,
+    email character varying,
+    body text,
+    delivery_status character varying,
+    address character varying,
+    latitude double precision,
+    longitude double precision,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: organization_messages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organization_messages_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organization_messages_id_seq OWNED BY public.organization_messages.id;
+
+
+--
 -- Name: organizations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1360,7 +1405,11 @@ CREATE TABLE public.organizations (
     is_paid boolean DEFAULT false NOT NULL,
     lock_show_on_map boolean DEFAULT false NOT NULL,
     landing_html text,
-    show_bulk_import boolean DEFAULT false
+    show_bulk_import boolean DEFAULT false,
+    paid_at timestamp without time zone,
+    geolocated_emails boolean DEFAULT false NOT NULL,
+    abandoned_bike_emails boolean DEFAULT false NOT NULL,
+    has_bike_codes boolean DEFAULT false NOT NULL
 );
 
 
@@ -2000,6 +2049,13 @@ ALTER TABLE ONLY public.b_params ALTER COLUMN id SET DEFAULT nextval('public.b_p
 
 
 --
+-- Name: bike_codes id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bike_codes ALTER COLUMN id SET DEFAULT nextval('public.bike_codes_id_seq'::regclass);
+
+
+--
 -- Name: bike_organizations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2210,17 +2266,17 @@ ALTER TABLE ONLY public.oauth_applications ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
--- Name: organization_deals id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.organization_deals ALTER COLUMN id SET DEFAULT nextval('public.organization_deals_id_seq'::regclass);
-
-
---
 -- Name: organization_invitations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.organization_invitations ALTER COLUMN id SET DEFAULT nextval('public.organization_invitations_id_seq'::regclass);
+
+
+--
+-- Name: organization_messages id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_messages ALTER COLUMN id SET DEFAULT nextval('public.organization_messages_id_seq'::regclass);
 
 
 --
@@ -2349,6 +2405,14 @@ ALTER TABLE ONLY public.ads
 
 ALTER TABLE ONLY public.b_params
     ADD CONSTRAINT b_params_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bike_codes bike_codes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bike_codes
+    ADD CONSTRAINT bike_codes_pkey PRIMARY KEY (id);
 
 
 --
@@ -2592,19 +2656,19 @@ ALTER TABLE ONLY public.oauth_applications
 
 
 --
--- Name: organization_deals organization_deals_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.organization_deals
-    ADD CONSTRAINT organization_deals_pkey PRIMARY KEY (id);
-
-
---
 -- Name: organization_invitations organization_invitations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.organization_invitations
     ADD CONSTRAINT organization_invitations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: organization_messages organization_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_messages
+    ADD CONSTRAINT organization_messages_pkey PRIMARY KEY (id);
 
 
 --
@@ -2733,6 +2797,13 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.wheel_sizes
     ADD CONSTRAINT wheel_sizes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: index_bike_codes_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_codes_on_bike_id ON public.bike_codes USING btree (bike_id);
 
 
 --
@@ -2971,6 +3042,27 @@ CREATE UNIQUE INDEX index_oauth_applications_on_uid ON public.oauth_applications
 --
 
 CREATE INDEX index_organization_invitations_on_organization_id ON public.organization_invitations USING btree (organization_id);
+
+
+--
+-- Name: index_organization_messages_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_messages_on_bike_id ON public.organization_messages USING btree (bike_id);
+
+
+--
+-- Name: index_organization_messages_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_messages_on_organization_id ON public.organization_messages USING btree (organization_id);
+
+
+--
+-- Name: index_organization_messages_on_sender_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_messages_on_sender_id ON public.organization_messages USING btree (sender_id);
 
 
 --
@@ -3400,4 +3492,26 @@ INSERT INTO schema_migrations (version) VALUES ('20180624211320');
 INSERT INTO schema_migrations (version) VALUES ('20180624211323');
 
 INSERT INTO schema_migrations (version) VALUES ('20180706162137');
+
+INSERT INTO schema_migrations (version) VALUES ('20180730013343');
+
+INSERT INTO schema_migrations (version) VALUES ('20180731194240');
+
+INSERT INTO schema_migrations (version) VALUES ('20180801010129');
+
+INSERT INTO schema_migrations (version) VALUES ('20180801011704');
+
+INSERT INTO schema_migrations (version) VALUES ('20180801025713');
+
+INSERT INTO schema_migrations (version) VALUES ('20180801050740');
+
+INSERT INTO schema_migrations (version) VALUES ('20180801145322');
+
+INSERT INTO schema_migrations (version) VALUES ('20180801150039');
+
+INSERT INTO schema_migrations (version) VALUES ('20180801153625');
+
+INSERT INTO schema_migrations (version) VALUES ('20180802235809');
+
+INSERT INTO schema_migrations (version) VALUES ('20180803003635');
 

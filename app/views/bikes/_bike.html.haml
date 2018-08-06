@@ -20,7 +20,11 @@
         %dl.dl-horizontal
           - date_label = "Stolen"
           - date_label = "Recovered" if bike.recovered
-          = bike.dl_list_item(bike.current_stolen_record.date_stolen.strftime("%m-%d-%Y"), date_label)
+          %dt
+            Stolen
+          %dd
+            %span.convertTime.preciseTime
+              = l bike.current_stolen_record.date_stolen, format: :convert_time
         %dl.dl-horizontal
           = bike.dl_list_item(bike.short_address(bike.current_stolen_record), "From")
   - pdf ||= false

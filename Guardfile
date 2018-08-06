@@ -2,6 +2,7 @@ group :red_green_refactor, halt_on_fail: true do
   guard :rspec, cmd: 'bundle exec rspec', failed_mode: :focus do
     watch(%r{^spec/.+_spec\.rb$})
     watch(%r{^lib/(.+)\.rb$})     { |m| "spec/lib/#{m[1]}_spec.rb" }
+    watch(%r{^config/initializers/(.+)\.rb$})     { |m| "spec/initializers/#{m[1]}_spec.rb" }
     watch('spec/spec_helper.rb')  { "spec" }
     watch(%r{^app/controllers/api/v2/(.+)\.rb$})        { |m| "spec/api/v2/#{m[1]}_spec.rb"}
     watch(%r{^app/controllers/api/v3/(.+)\.rb$})        { |m| "spec/api/v3/#{m[1]}_spec.rb"}

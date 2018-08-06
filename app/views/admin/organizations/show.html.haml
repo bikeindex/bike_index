@@ -63,7 +63,9 @@
       %dt
         Created at
       %dd
-        = l @organization.created_at, format: :dotted
+        %span.convertTime.preciseTime
+          = l @organization.created_at, format: :convert_time
+        %small.convertTimezone
 
 
     - if @organization.is_suspended

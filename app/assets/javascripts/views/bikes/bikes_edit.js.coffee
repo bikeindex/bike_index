@@ -111,8 +111,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
 
   setInitialValues: ->
     @initializeComponentManufacturers()
-    if $('#stolen_date').length > 0
-      $('#stolen_date input').datepicker('format: mm-dd-yyy')
+    if $('#stolenDisplay').length > 0
       if $('#stolen-bike-location select').val().length > 0
         @updateCountry()
     $('#edit_wheels select').selectize

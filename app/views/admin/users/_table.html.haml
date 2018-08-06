@@ -1,0 +1,51 @@
+%section.full-screen-table
+  %table.table.table-striped.table-bordered
+    %thead
+      %th.medium-screens
+        Added&nbsp;<small class="convertTimezone"></small>
+      %th
+        Email
+      %th.medium-screens
+        Secondary Emails
+      %th.large-screens
+        Name
+      %th
+        Bikes
+      %th.medium-screens
+        Memberships
+      %th.large-screens
+        Admin?
+      %th.large-screens
+        Confirmed
+    %tbody
+      - @users.each do |user|
+        %tr
+          %td
+            %span.convertTime
+              = l user.created_at, format: :convert_time
+          %td
+            .less-strong-hold
+              = link_to user.email, edit_admin_user_url(user)
+              - if user.donor?
+                <span class="donor-icon">D</span>
+              - elsif user.paid_org?
+                <span class="paid-org-icon">O</span>
+              %small.less-strong-right
+                = user.id
+          %td.medium-screens
+            %small.less-strong
+              = user.secondary_emails.join(', ')
+          %td.large-screens
+            - if user.name?
+              = user.name
+          %td
+            = user.ownerships.count
+          %td.medium-screens
+            - if user.memberships.present?
+              - user.memberships.each do |membership|
+                = link_to "#{membership.organization.name} ", admin_membership_url(membership)
+          %td.large-screens
+            = "super" if user.superuser?
+            = "content" if user.content?
+          %td.large-screens.table-cell-check
+            = "&#x2713;".html_safe if user.confirmed

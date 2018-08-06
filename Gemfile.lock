@@ -9,7 +9,6 @@ GEM
   remote: https://rubygems.org/
   remote: https://rails-assets.org/
   specs:
-    CFPropertyList (2.3.2)
     actionmailer (4.2.10)
       actionpack (= 4.2.10)
       actionview (= 4.2.10)
@@ -86,18 +85,18 @@ GEM
     coderay (1.1.1)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
-    coffee-rails (4.1.1)
+    coffee-rails (4.2.2)
       coffee-script (>= 2.2.0)
-      railties (>= 4.0.0, < 5.1.x)
+      railties (>= 4.0.0)
     coffee-script (2.4.1)
       coffee-script-source
       execjs
-    coffee-script-source (1.10.0)
+    coffee-script-source (1.12.2)
     concurrent-ruby (1.0.5)
     connection_pool (2.2.1)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
-    crass (1.0.3)
+    crass (1.0.4)
     css_parser (1.4.5)
       addressable
     dalli (2.7.6)
@@ -125,13 +124,10 @@ GEM
       execjs
     eco-source (1.1.0.rc.1)
     ejs (1.1.1)
-    em-websocket (0.5.1)
-      eventmachine (>= 0.12.9)
-      http_parser.rb (~> 0.6.0)
     equalizer (0.0.11)
     erubis (2.7.0)
     eventmachine (1.2.0.1)
-    excon (0.50.1)
+    excon (0.62.0)
     execjs (2.7.0)
     factory_girl (4.7.0)
       activesupport (>= 3.0.0)
@@ -142,135 +138,23 @@ GEM
       multipart-post (>= 1.2, < 3)
     fast_blank (1.0.0)
     ffi (1.9.10)
-    fission (0.5.0)
-      CFPropertyList (~> 2.2)
     flamegraph (0.9.5)
-    fog (1.38.0)
-      fog-aliyun (>= 0.1.0)
-      fog-atmos
-      fog-aws (>= 0.6.0)
-      fog-brightbox (~> 0.4)
-      fog-cloudatcost (~> 0.1.0)
-      fog-core (~> 1.32)
-      fog-dynect (~> 0.0.2)
-      fog-ecloud (~> 0.1)
-      fog-google (<= 0.1.0)
-      fog-json
-      fog-local
-      fog-openstack
-      fog-powerdns (>= 0.1.1)
-      fog-profitbricks
-      fog-rackspace
-      fog-radosgw (>= 0.0.2)
-      fog-riakcs
-      fog-sakuracloud (>= 0.0.4)
-      fog-serverlove
-      fog-softlayer
-      fog-storm_on_demand
-      fog-terremark
-      fog-vmfusion
-      fog-voxel
-      fog-vsphere (>= 0.4.0)
-      fog-xenserver
-      fog-xml (~> 0.1.1)
-      ipaddress (~> 0.5)
-    fog-aliyun (0.1.0)
-      fog-core (~> 1.27)
-      fog-json (~> 1.0)
-      ipaddress (~> 0.8)
-      xml-simple (~> 1.1)
-    fog-atmos (0.1.0)
-      fog-core
-      fog-xml
-    fog-aws (0.9.4)
-      fog-core (~> 1.38)
-      fog-json (~> 1.0)
+    fog-aws (3.0.0)
+      fog-core (~> 2.1)
+      fog-json (~> 1.1)
       fog-xml (~> 0.1)
       ipaddress (~> 0.8)
-    fog-brightbox (0.10.1)
-      fog-core (~> 1.22)
-      fog-json
-      inflecto (~> 0.0.2)
-    fog-cloudatcost (0.1.2)
-      fog-core (~> 1.36)
-      fog-json (~> 1.0)
-      fog-xml (~> 0.1)
-      ipaddress (~> 0.8)
-    fog-core (1.40.0)
+    fog-core (2.1.0)
       builder
-      excon (~> 0.49)
+      excon (~> 0.58)
       formatador (~> 0.2)
-    fog-dynect (0.0.3)
+      mime-types
+    fog-json (1.2.0)
       fog-core
-      fog-json
-      fog-xml
-    fog-ecloud (0.3.0)
-      fog-core
-      fog-xml
-    fog-google (0.1.0)
-      fog-core
-      fog-json
-      fog-xml
-    fog-json (1.0.2)
-      fog-core (~> 1.0)
       multi_json (~> 1.10)
-    fog-local (0.3.0)
-      fog-core (~> 1.27)
-    fog-openstack (0.1.7)
-      fog-core (>= 1.40)
-      fog-json (>= 1.0)
-      ipaddress (>= 0.8)
-    fog-powerdns (0.1.1)
-      fog-core (~> 1.27)
-      fog-json (~> 1.0)
-      fog-xml (~> 0.1)
-    fog-profitbricks (0.0.5)
+    fog-xml (0.1.3)
       fog-core
-      fog-xml
-      nokogiri
-    fog-rackspace (0.1.1)
-      fog-core (>= 1.35)
-      fog-json (>= 1.0)
-      fog-xml (>= 0.1)
-      ipaddress (>= 0.8)
-    fog-radosgw (0.0.5)
-      fog-core (>= 1.21.0)
-      fog-json
-      fog-xml (>= 0.0.1)
-    fog-riakcs (0.1.0)
-      fog-core
-      fog-json
-      fog-xml
-    fog-sakuracloud (1.7.5)
-      fog-core
-      fog-json
-    fog-serverlove (0.1.2)
-      fog-core
-      fog-json
-    fog-softlayer (1.1.2)
-      fog-core
-      fog-json
-    fog-storm_on_demand (0.1.1)
-      fog-core
-      fog-json
-    fog-terremark (0.1.0)
-      fog-core
-      fog-xml
-    fog-vmfusion (0.1.0)
-      fission
-      fog-core
-    fog-voxel (0.1.0)
-      fog-core
-      fog-xml
-    fog-vsphere (0.8.0)
-      fog-core
-      rbvmomi (~> 1.8)
-    fog-xenserver (0.2.3)
-      fog-core
-      fog-xml
-    fog-xml (0.1.2)
-      fog-core
-      nokogiri (~> 1.5, >= 1.5.11)
+      nokogiri (>= 1.5.11, < 2.0.0)
     foreman (0.82.0)
       thor (~> 0.19.1)
     formatador (0.2.5)
@@ -312,11 +196,6 @@ GEM
       shellany (~> 0.0)
       thor (>= 0.18.1)
     guard-compat (1.2.1)
-    guard-livereload (2.5.2)
-      em-websocket (~> 0.5)
-      guard (~> 2.8)
-      guard-compat (~> 1.0)
-      multi_json (~> 1.8)
     guard-rspec (4.6.5)
       guard (~> 2.1)
       guard-compat (~> 1.1)
@@ -324,8 +203,8 @@ GEM
     guard-rubocop (1.2.0)
       guard (~> 2.0)
       rubocop (~> 0.20)
-    hamlit (2.5.0)
-      temple (~> 0.7.6)
+    hamlit (2.8.8)
+      temple (>= 0.8.0)
       thor
       tilt
     hashdiff (0.3.7)
@@ -336,13 +215,11 @@ GEM
     htmlentities (4.3.4)
     http-cookie (1.0.2)
       domain_name (~> 0.5)
-    http_parser.rb (0.6.0)
     httparty (0.13.7)
       json (~> 1.8)
       multi_xml (>= 0.5.2)
     i18n (0.7.0)
     ice_nine (0.11.2)
-    inflecto (0.0.2)
     ipaddress (0.8.3)
     journey (1.0.4)
     jquery-datatables-rails (3.4.0)
@@ -359,9 +236,9 @@ GEM
     kaminari (0.17.0)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
-    kgio (2.10.0)
+    kgio (2.11.2)
     kramdown (1.11.1)
-    libv8 (3.16.14.15)
+    libv8 (3.16.14.19)
     listen (3.1.5)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
@@ -371,7 +248,7 @@ GEM
       activesupport (>= 4, < 5.1)
       railties (>= 4, < 5.1)
     logstash-event (1.2.02)
-    loofah (2.2.0)
+    loofah (2.2.2)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     lumberjack (1.0.10)
@@ -395,12 +272,12 @@ GEM
       monetize (~> 1.4.0)
       money (~> 6.7)
       railties (>= 3.0)
-    multi_json (1.12.1)
+    multi_json (1.13.1)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
     nenv (0.3.0)
     netrc (0.11.0)
-    nokogiri (1.8.2)
+    nokogiri (1.8.4)
       mini_portile2 (~> 2.3.0)
     notiffany (0.1.0)
       nenv (~> 0.1)
@@ -443,19 +320,17 @@ GEM
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
       slop (~> 3.4)
-    rack (1.6.8)
+    rack (1.6.10)
     rack-accept (0.4.5)
       rack (>= 0.4)
     rack-contrib (1.4.0)
       git-version-bump (~> 0.15)
       rack (~> 1.4)
-    rack-livereload (0.3.16)
-      rack
     rack-mini-profiler (0.10.1)
       rack (>= 1.2.0)
     rack-mount (0.8.3)
       rack (>= 1.0.0)
-    rack-protection (1.5.3)
+    rack-protection (1.5.5)
       rack
     rack-test (0.6.3)
       rack (>= 1.0)
@@ -479,8 +354,10 @@ GEM
     rails-assets-lodash (4.9.0)
     rails-assets-mailcheck (1.1.2)
     rails-assets-microplugin (0.0.3)
+    rails-assets-moment (2.18.1)
+    rails-assets-moment-timezone (0.5.17)
+      rails-assets-moment (>= 2.9.0)
     rails-assets-mustache (2.2.1)
-    rails-assets-pikaday (1.4.0)
     rails-assets-select2 (4.0.3)
     rails-assets-selectize (0.12.1)
       rails-assets-jquery (>= 1.7.0)
@@ -495,23 +372,19 @@ GEM
       activesupport (>= 4.2.0, < 5.0)
       nokogiri (~> 1.6)
       rails-deprecated_sanitizer (>= 1.0.1)
-    rails-html-sanitizer (1.0.3)
-      loofah (~> 2.0)
+    rails-html-sanitizer (1.0.4)
+      loofah (~> 2.2, >= 2.2.2)
     railties (4.2.10)
       actionpack (= 4.2.10)
       activesupport (= 4.2.10)
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
     rainbow (3.0.0)
-    raindrops (0.17.0)
-    rake (12.3.0)
+    raindrops (0.19.0)
+    rake (12.3.1)
     rb-fsevent (0.9.7)
     rb-inotify (0.9.7)
       ffi (>= 0.5.0)
-    rbvmomi (1.8.2)
-      builder
-      nokogiri (>= 1.4.1)
-      trollop
     redcarpet (3.3.4)
     redis (3.3.3)
     ref (2.0.0)
@@ -592,15 +465,17 @@ GEM
       json (~> 1.8)
       simplecov-html (~> 0.10.0)
     simplecov-html (0.10.0)
-    sinatra (1.4.7)
+    sinatra (1.4.8)
       rack (~> 1.5)
       rack-protection (~> 1.4)
       tilt (>= 1.3, < 3)
-    sitemap_generator (5.1.0)
-      builder
+    sitemap_generator (5.3.1)
+      builder (~> 3.0)
     sixarm_ruby_unaccent (1.1.1)
-    skylight (1.2.0)
-      activesupport (>= 3.0.0)
+    skylight (2.0.2)
+      skylight-core (= 2.0.2)
+    skylight-core (2.0.2)
+      activesupport (>= 4.2.0)
     slop (3.6.0)
     soulheart (0.3.0)
       multi_json (~> 1.11, >= 1.11.2)
@@ -614,16 +489,15 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    stackprof (0.2.9)
+    stackprof (0.2.12)
     swagger-ui_rails (0.1.7)
-    temple (0.7.7)
-    therubyracer (0.12.2)
-      libv8 (~> 3.16.14.0)
+    temple (0.8.0)
+    therubyracer (0.12.3)
+      libv8 (~> 3.16.14.15)
       ref
     thor (0.19.1)
     thread_safe (0.3.6)
-    tilt (2.0.5)
-    trollop (2.1.2)
+    tilt (2.0.8)
     twitter (4.8.1)
       faraday (~> 0.8, < 0.10)
       multi_json (~> 1.0)
@@ -636,7 +510,7 @@ GEM
       unf_ext
     unf_ext (0.0.7.2)
     unicode-display_width (1.3.0)
-    unicorn (5.1.0)
+    unicorn (5.4.1)
       kgio (~> 2.6)
       raindrops (~> 0.7)
     unicorn-worker-killer (0.4.4)
@@ -660,7 +534,6 @@ GEM
       doorkeeper (>= 1.4, < 4.0)
       grape (~> 0.10, < 1.0)
     wkhtmltopdf-binary (0.9.9.3)
-    xml-simple (1.1.5)
 
 PLATFORMS
   ruby
@@ -687,7 +560,7 @@ DEPENDENCIES
   factory_girl_rails
   fast_blank (~> 1.0)
   flamegraph
-  fog
+  fog-aws
   foreman
   geocoder
   grape (~> 0.14.0)
@@ -696,7 +569,6 @@ DEPENDENCIES
   grape_logging
   groupdate
   guard (~> 2.13.0)
-  guard-livereload
   guard-rspec (~> 4.6.4)
   guard-rubocop
   hamlit
@@ -726,7 +598,6 @@ DEPENDENCIES
   premailer-rails
   pry
   rack-contrib
-  rack-livereload
   rack-mini-profiler
   rack-throttle
   rails (= 4.2.10)
@@ -734,8 +605,9 @@ DEPENDENCIES
   rails-assets-jquery.dirtyforms (~> 2.0.0)!
   rails-assets-lodash (~> 4.9.0)!
   rails-assets-mailcheck (~> 1.1.2)!
+  rails-assets-moment (~> 2.18.1)!
+  rails-assets-moment-timezone (~> 0.5.13)!
   rails-assets-mustache (~> 2.2.1)!
-  rails-assets-pikaday (~> 1.4.0)!
   rails-assets-select2 (~> 4.0.3)!
   rails-assets-selectize (~> 0.12.1)!
   rails-assets-tether (~> 1.1.0)!
@@ -756,7 +628,7 @@ DEPENDENCIES
   sidekiq (~> 4.2.10)
   sidekiq-failures
   simple_spark
-  sitemap_generator
+  sitemap_generator (~> 5.1)
   skylight
   soulheart (~> 0.3.0)
   sprockets-rails (~> 3.0.4)
@@ -776,7 +648,7 @@ DEPENDENCIES
   wkhtmltopdf-binary
 
 RUBY VERSION
-   ruby 2.2.5p319
+   ruby 2.5.1p57
 
 BUNDLED WITH
-   1.15.4
+   1.16.3

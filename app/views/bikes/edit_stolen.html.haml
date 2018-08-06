@@ -1,4 +1,4 @@
-= form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do |f|
+= form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form stolenEditPage' } do |f|
   = f.hidden_field :stolen
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
@@ -13,10 +13,13 @@
             - stolen_type = @bike.recovered ? 'recovered' : 'stolen'
             = f.fields_for :stolen_records do |srecord|
               - next unless srecord.object.current # Because they may have multiple stolen records
+              %h3
               .form-group.row.unnested-field
-                = srecord.label :date_stolen_input, "When was it #{stolen_type}", class: 'form-well-label'
+                = srecord.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
+                = srecord.label :date_stolen, "When was it #{stolen_type}", class: 'form-well-label'
                 .form-well-input
-                  = srecord.text_field :date_stolen_input, required: true, class: 'form-control date_stolen_input', value: srecord.object.formatted_date
+                  - srecord.object.date_stolen = TimeParser.round(srecord.object.date_stolen || Time.now)
+                  = srecord.datetime_local_field :date_stolen, max: Time.now + 1.day, step: 60, required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(srecord.object.date_stolen, format: :convert_time)
 
               .form-group.row.unnested-field
                 = srecord.label :phone, class: 'form-well-label'

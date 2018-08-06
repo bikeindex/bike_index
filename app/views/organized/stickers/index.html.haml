@@ -1,0 +1,33 @@
+.organized-page-header
+  %h1
+    %em
+      = current_organization.name
+    Stickers
+
+.organized-bikes-table.table-responsive
+  %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
+    %thead.small-header
+      %th
+        Added&nbsp;<small class="convertTimezone"></small>
+      %th
+        Code
+      %th
+        Linked&nbsp;<small class="convertTimezone"></small>
+      %th
+        Bike
+    %tbody
+      - @bike_codes.each do |bike_code|
+        %tr
+          %td
+            %spn.convertTime
+              = l bike_code.created_at, format: :convert_time
+          %td
+            = link_to bike_code.code, bike_code.url
+          %td
+            - if bike_code.claimed? && bike_code.claimed_at.present?
+              %spn.convertTime
+                = l bike_code.claimed_at, format: :convert_time
+          %td
+            - if bike_code.claimed?
+              / For these, use bike_id to avoid loading association
+              = link_to bike_code.bike_id, bike_path(bike_code.bike_id)

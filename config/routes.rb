@@ -115,7 +115,9 @@ Bikeindex::Application.routes.draw do
     end
     resource :recovery, only: [:edit, :update], controller: 'bikes/recovery'
   end
+  get "bikes/scanned/:scanned_id", to: "bikes#scanned"
 
+  resources :bike_codes, only: [:update]
   resources :locks, except: [:show, :index]
 
   namespace :admin do
@@ -229,7 +231,6 @@ Bikeindex::Application.routes.draw do
   end
   get 'manufacturers_tsv', to: 'manufacturers#tsv'
 
-  resources :organization_deals, only: [:create, :new]
   resource :integrations, only: [:create]
   get '/auth/:provider/callback', to: 'integrations#create'
   get '/auth/failure', to: 'integrations#integrations_controller_creation_error'
@@ -274,6 +275,7 @@ Bikeindex::Application.routes.draw do
     resources :users, except: [:show]
     resources :emails
     resources :bulk_imports, only: [:index, :show, :new, :create]
+    resources :stickers, only: [:index, :show, :edit, :update]
   end
 
   get '*unmatched_route', to: 'errors#not_found' if Rails.env.production? # Handle 404s with lograge

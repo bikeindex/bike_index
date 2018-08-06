@@ -63,7 +63,8 @@ class Admin::NewsController < Admin::BaseController
   protected
 
   def permitted_parameters
-    params.require(:blog).permit(Blog.old_attr_accessible)
+    params.require(:blog).permit(*%w(title body user_id published_at post_date post_now tags published old_title_slug
+       timezone description_abbr update_title is_listicle listicles_attributes user_email index_image_id index_image).map(&:to_sym).freeze)
   end
 
   def set_dignified_name

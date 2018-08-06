@@ -4,7 +4,6 @@
     <span class="donor-icon">D</span>
   - if @user.paid_org?
     <span class="paid-org-icon">O</span>
-
 %h3
   Donations
 %section.full-screen-table{ style: 'padding-top: 0;' }
@@ -19,7 +18,9 @@
     - @user.payments.each do |payment|
       %tr
         %td
-          = admin_display_date(payment.created_at)
+          %span.convertTime
+            = l payment.created_at, format: :convert_time
+          %small.convertTimezone
         %td
           = payment.amount.to_i/100.00
         %td
@@ -27,7 +28,68 @@
 
 .row-fluid
   .span6.padded
-    = render partial: "form"
+    .form.form-horizontal
+      = form_for [:admin, @user] do |f|
+        - if @user.errors.any?
+          #alert-block
+            .alert.alert-error
+              %h4
+                Please fix the following 
+                = pluralize(@user.errors.count, "error")
+              %ul
+                - @user.errors.full_messages.each do |msg|
+                  %li
+                    = msg
+        %h3
+          User attributes
+        .control-group.padded
+          %lable.control-label
+            Created
+          .controls.convertTime
+            = l @user.created_at, format: :convert_time
+
+        .control-group.padded
+          = f.label :name, class: "control-label"
+          .controls
+            = f.text_field :name
+        .control-group
+          = f.label :email, class: "control-label"
+          .controls
+            = f.text_field :email
+        .control-group
+          = f.label :username, class: "control-label"
+          .controls
+            = f.text_field :username
+        .control-group
+          = f.label :confirmed, class: "control-label"
+          .controls
+            = f.check_box :confirmed, disabled: @user.confirmed
+        .control-group
+          = f.label :superuser, class: "control-label"
+          .controls
+            = f.check_box :superuser
+        - if current_user.developer?
+          .control-group
+            = f.label :developer, class: "control-label"
+            .controls
+              = f.check_box :developer
+        .control-group
+          = f.label :is_content_admin, "News editor", class: "control-label"
+          .controls
+            = f.check_box :is_content_admin
+        .control-group
+          = f.label :banned, class: "control-label"
+          .controls
+            = f.check_box :banned
+        .control-group
+          = f.label :can_send_many_stolen_notifications, class: "control-label"
+          .controls
+            = f.check_box :can_send_many_stolen_notifications
+
+        .padded
+          = f.submit 'Save', class: 'button-green pull-right'
+
+      
 
 
 - if @bikes.present?
@@ -61,7 +123,7 @@
         %th
           ID
         %th
-          Date Created
+          Created&nbsp;<small class="convertTimezone"></small>
         %th
           Creator
         %th
@@ -74,7 +136,8 @@
             %td
               = link_to ownership.id, edit_admin_ownership_url(ownership.id)
             %td
-              = admin_display_date(ownership.created_at)
+              %span.convertTime
+                = l ownership.created_at, format: :convert_time
             %td
               - u = ownership.creator
               - if u && u.name.present?
@@ -97,7 +160,7 @@
     %table.table.table-striped.table-bordered
       %thead
         %th
-          Date Created
+          Created&nbsp;<small class="convertTimezone"></small>
         %th
           Confirmed
         %th
@@ -111,7 +174,8 @@
               .less-strong-hold
                 %span.less-strong-right.medium-screens
                   = user_email.id
-              = admin_display_date(user_email.created_at)
+              %span.convertTime
+                = l user_email.created_at, format: :convert_time
             %td
               = "&#x2713;".html_safe if user_email.confirmed
             %td

@@ -112,7 +112,6 @@ describe OrganizationsController do
         expect(assigns(:stolen)).to be_falsey
         bike = assigns(:bike)
         expect(bike.stolen).to be_falsey
-        expect(assigns(:stolen_record).date_stolen).to be_within(1.second).of Time.now
       end
     end
     context 'stolen' do
@@ -124,7 +123,6 @@ describe OrganizationsController do
         expect(assigns(:stolen)).to be_truthy
         bike = assigns(:bike)
         expect(bike.stolen).to be_truthy
-        expect(assigns(:stolen_record).date_stolen).to be_within(1.second).of Time.now
       end
     end
     context 'embed_extended' do
@@ -148,8 +146,7 @@ describe OrganizationsController do
           },
           stolen_record: {
             phone_no_show: 'true',
-            phone: '7183839292',
-            date_stolen_input: 'not stolen yet'
+            phone: '7183839292'
           }
         }
       end
@@ -164,7 +161,6 @@ describe OrganizationsController do
         bike = assigns(:bike)
         expect(bike.stolen).to be_truthy
         expect(bike.owner_email).to eq(b_param_attrs[:bike][:owner_email])
-        expect(bike.stolen_records.first.date_stolen).to be_within(1.second).of Time.now
       end
     end
   end

@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
-ruby '2.2.5'
-gem 'rails', '4.2.10'
+ruby "2.5.1"
+gem "rails", "4.2.10"
 
 gem 'pg'
 gem 'jquery-rails'
@@ -43,14 +43,14 @@ gem 'high_voltage'
 gem 'omniauth-facebook'
 gem 'omniauth-strava'
 gem 'omniauth', '~> 1.3.1'
-gem 'fog'
+gem "fog-aws"
 gem 'dalli'
 gem 'draper', require: false
 gem 'wkhtmltopdf-binary'
 gem 'wicked_pdf'
 gem 'eventmachine'
 gem 'httparty'
-gem 'sitemap_generator'
+gem "sitemap_generator", "~> 5.1"
 gem 'paranoia'
 
 # API wrappers
@@ -99,10 +99,11 @@ source 'https://rails-assets.org' do # JS land is crazy, so lock everything
   gem 'rails-assets-jquery.dirtyforms', '~> 2.0.0' # Alert on attempts to leave with dirt on forms
   gem 'rails-assets-selectize', '~> 0.12.1' # Manually configured scss
   gem 'rails-assets-select2', '~> 4.0.3' # Use select2 for a few things, it's a bit better sometimes
-  gem 'rails-assets-pikaday', '~> 1.4.0' # Datepicker
   gem 'rails-assets-Stickyfill', '~> 1.1.3' # Affix bike edit menu
   gem 'rails-assets-mailcheck', '~> 1.1.2' # Check for common email errors
   gem 'rails-assets-waypoints', '~> 3.1.1' # For documentation pages
+  gem 'rails-assets-moment', '~> 2.18.1' # Javascript Time - localizing :)
+  gem 'rails-assets-moment-timezone', '~> 0.5.13' # Timezones for moment
   # Sortable breaks assets:precompile, so it's included manually
   # gem 'rails-assets-jquery-sortable', '~> 0.9.12' # Sort photo order
 end
@@ -110,10 +111,10 @@ end
 gem 'grape_logging' # Grape logging. Also how we pass it to lograge. Always used, not just in Prod
 gem 'lograge' # Structure log data, put it in single lines to improve the functionality
 gem 'logstash-event' # Use logstash format for logging data
+
 group :production do
-  gem 'honeybadger', '~> 2.0' # Error monitoring
-  # gem 'librato-rails' # Monitoring and display
-  gem 'skylight'
+  gem "honeybadger", "~> 2.0" # Error monitoring
+  gem "skylight" # Performance monitoring
 end
 
 group :development do
@@ -129,7 +130,6 @@ group :development, :test do
   gem 'foreman'
   gem 'database_cleaner'
   gem 'dotenv-rails'
-  gem 'rack-livereload'
 end
 
 group :test do
@@ -140,7 +140,6 @@ group :test do
   gem 'guard', '~> 2.13.0', require: false
   gem 'guard-rspec', '~> 4.6.4', require: false
   gem 'guard-rubocop', require: false
-  gem 'guard-livereload', require: false
   gem 'vcr' # Stub external HTTP requests
   gem 'webmock' # mocking for VCR
 end
