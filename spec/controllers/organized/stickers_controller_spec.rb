@@ -3,7 +3,7 @@ require "spec_helper"
 describe Organized::StickersController, type: :controller do
   let(:root_path) { organization_bikes_path(organization_id: organization.to_param) }
   let(:stickers_root_path) { organization_stickers_path(organization_id: organization.to_param) }
-  let(:bike_code) { FactoryGirl.create(:bike_code, organization: organization, code: "partee") }
+  let!(:bike_code) { FactoryGirl.create(:bike_code, organization: organization, code: "partee") }
 
   before { set_current_user(user) if user.present? }
 
