@@ -70,16 +70,6 @@
       .clearfix
         %dl.dl-horizontal
           %dt
-            Paid on
-          %dd
-            - if @organization.paid_at
-              %span.convertTime
-                = l @organization.paid_at, format: :convert_time
-              %small.convertTimezone
-            - else
-              %small.less-strong
-                not set
-          %dt
             Templates
           %dd
             - if @organization.mail_snippets.any?

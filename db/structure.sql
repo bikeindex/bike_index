@@ -1406,7 +1406,6 @@ CREATE TABLE public.organizations (
     lock_show_on_map boolean DEFAULT false NOT NULL,
     landing_html text,
     show_bulk_import boolean DEFAULT false,
-    paid_at timestamp without time zone,
     geolocated_emails boolean DEFAULT false NOT NULL,
     abandoned_bike_emails boolean DEFAULT false NOT NULL,
     has_bike_codes boolean DEFAULT false NOT NULL,
@@ -3527,4 +3526,6 @@ INSERT INTO schema_migrations (version) VALUES ('20180803003635');
 INSERT INTO schema_migrations (version) VALUES ('20180804170624');
 
 INSERT INTO schema_migrations (version) VALUES ('20180806172125');
+
+INSERT INTO schema_migrations (version) VALUES ('20180807161501');
 
