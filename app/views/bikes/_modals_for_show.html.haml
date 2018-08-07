@@ -1,0 +1,16 @@
+- modal_body = capture_haml do
+  .modal-body
+    = form_for OrganizationMessage.new, url: organization_messages_path(organization_id: current_user.bike_actions_organization_id) do |f|
+      = hidden_field_tag :bike_id, @bike.id
+      = hidden_field_tag :kind
+      = hidden_field_tag :latitude
+      = hidden_field_tag :longitude
+      .form-group
+        = f.label :body, "Additional message"
+        = f.text_area :body, class: 'form-control'
+      .modal-btn-footer
+        .row
+          .col-xs-6.col-xs-push-6
+            = submit_tag "Send message", class: "btn btn-success"
+
+= render partial: '/shared/modal', locals: { title: "Message #{@bike.type} owner!", modal_body: modal_body }

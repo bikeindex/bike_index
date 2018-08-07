@@ -45,6 +45,7 @@ class Organization < ActiveRecord::Base
   scope :with_bike_actions, -> { where("organizations.geolocated_emails = ? OR organizations.abandoned_bike_emails = ?", true, true) }
 
   before_validation :set_calculated_attributes
+  after_commit :update_user_bike_actions_organizations
 
   def self.friendly_find(n)
     return nil unless n.present?
@@ -107,6 +108,7 @@ class Organization < ActiveRecord::Base
     end
     generate_access_token unless self.access_token.present?
     set_auto_user
+    update_user_bike_actions_organizations
     locations.each { |l| l.save unless l.shown == allowed_show }
     true # legacy bs rails concerns
   end
@@ -134,6 +136,14 @@ class Organization < ActiveRecord::Base
       return nil unless users.any?
       self.auto_user_id = users.first.id
     end
+  end
+
+  def update_user_bike_actions_organizations
+    if bike_actions?
+      users.where("bike_actions_organization_id IS NULL or bike_actions_organization_id != ?", id)
+    else
+      users.where(bike_actions_organization_id: id)
+    end.each { |u| u.update_attributes(updated_at: Time.now) } # Force updating
   end
 
   def allowed_show

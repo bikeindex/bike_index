@@ -1,8 +1,8 @@
 class BikeIndex.BikesShow extends BikeIndex
   constructor: ->
     window.bike_photos_loaded = false
-    if $('.bike-edit-overlay').length > 0
-      @showBikeEditOverlay()
+    if $(".bike-overlay-wrapper").length > 0
+      @showBikeOverlay()
 
     # Show the "claim bike" modal (or recovery modal) if present
     if document.getElementById('initial-open-modal')
@@ -40,11 +40,12 @@ class BikeIndex.BikesShow extends BikeIndex
       @loadPhotos()
       $(window).unbind('scroll')
 
-  showBikeEditOverlay: ->
+  showBikeOverlay: ->
     # Affix the edit menu to the page - broken in chrome, so we're using position fixed
     # $('.bike-edit-overlay').Stickyfill()
     # Add class to footer so it's still visible
-    $('.primary-footer .terms-and-stuff').addClass('bike-show-page-with-edit-overlay')
+    height = 36 + $(".bike-overlay-wrapper").outerHeight() # 36 is base height, add height from overlays too
+    $(".primary-footer .terms-and-stuff").css("padding-bottom", "#{height}px")
 
   initializeThumbnailSwitching: ->
     # Set up the template for injecting photos

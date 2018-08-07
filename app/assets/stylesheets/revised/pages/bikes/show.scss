@@ -1,11 +1,8 @@
 #bikes_show {
-  .bike-edit-overlay {
-    @include box-shadow(0 0 2px rgba(black,.2));
-    padding: $vertical-height;
+  .bike-overlay-wrapper {
     position: fixed;
     bottom: 0;
     width: 100%;
-    background: rgba($blue, .92  );
     z-index: $zindex-navbar-fixed - 1;
     p {
       text-align: center;
@@ -13,7 +10,13 @@
       color: white;
     }
     .btn { margin-left: 20px; }
+    .organization-actions-overlay, .bike-edit-overlay {
+      @include box-shadow(0 0 2px rgba(black,.2));
+      padding: $vertical-height;
+    }
   }
+  .bike-edit-overlay { background: rgba($blue, .92); }
+  .organization-actions-overlay { background: rgba($red, .92); }
 
   h1 {
     margin-bottom: 0;
