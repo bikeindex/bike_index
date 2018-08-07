@@ -5,7 +5,8 @@
     bikes
   %p
     %strong
-      #{ pluralize(@bikes.total_count, 'bike') }
+      - count = defined?(@bikes.total_count) ? @bikes.total_count : @bikes.count
+      #{ pluralize(count, 'bike') }
     registered
 
 %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
@@ -48,6 +49,6 @@
           %td
             %small
               = link_to "Link", bike_code_path(id: @bike_code.code, organization_id: @bike_code.organization_id, bike_id: bike.id), method: "PUT"
-- unless current_organization.is_paid
-  .paginate-container.paginate-container-bottom
-    = paginate @bikes
+  - if defined?(@bikes.total_count)
+    .paginate-container.paginate-container-bottom
+      = paginate @bikes

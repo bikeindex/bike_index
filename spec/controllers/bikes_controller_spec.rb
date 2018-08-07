@@ -219,7 +219,7 @@ describe BikesController do
         expect(assigns(:bike_code)).to eq bike_code2
         expect(response).to render_template(:scanned)
         expect(response.code).to eq("200")
-        expect(assigns(:current_organization)).to be_nil
+        expect(assigns(:show_organization_bikes)).to be_falsey
       end
       context "user part of organization" do
         let!(:user) { FactoryGirl.create(:organization_member, organization: organization) }
@@ -229,6 +229,7 @@ describe BikesController do
           expect(response).to render_template(:scanned)
           expect(response.code).to eq("200")
           expect(assigns(:current_organization)).to eq organization
+          expect(assigns(:show_organization_bikes)).to be_truthy
         end
       end
     end

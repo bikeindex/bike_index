@@ -9,7 +9,7 @@
   %hr.mb-4.mb-4
 
   - if current_user.present?
-    - if current_organization.present? # Only present if code has organization and user is part of it org
+    - if @show_organization_bikes
       - if current_organization.bike_search?
         %p.less-strong{ style: "margin-bottom: 0; font-style: italic;" }
           Link one of #{current_organization.name} bikes to this sticker
@@ -48,7 +48,7 @@
                 %span.less-strong
                   color
             %th
-              Link IT!
+              Link&nbsp;IT!
         %tbody
           - @bikes.each do |bike|
             %tr
