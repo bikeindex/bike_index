@@ -35,6 +35,12 @@ class BikeCode < ActiveRecord::Base
     where(code: code).first
   end
 
+  def self.admin_text_search(str)
+    code = normalize_code(str)
+    return all unless code.present?
+    where("code ILIKE ?", "%#{code}%")
+  end
+
   def claimed?; bike_id.present? end
   def unclaimed?; !claimed? end
 
@@ -45,7 +51,7 @@ class BikeCode < ActiveRecord::Base
    ].compact.join("")
  end
 
-  def linkable_by?(user)
+  def claimable_by?(user)
     return false unless user.present?
     return true if user.superuser?
     user_organization_ids = user.memberships.pluck(:organization_id)
@@ -55,6 +61,10 @@ class BikeCode < ActiveRecord::Base
     total_codes = BikeCode.where(user_id: user.id).where(organization_id: nil).count
     total_codes += BikeCode.where(user_id: user.id).where.not(organization_id: user_organization_ids).count
     total_codes < MAX_UNORGANIZED
+  end
+
+  def unclaimable_by?(user)
+    !errors.any? && claimed? && organization.present? && user.is_member_of?(organization)
   end
 
   def claim(user, bike_str)
@@ -67,9 +77,14 @@ class BikeCode < ActiveRecord::Base
       bike_id = bike_id && bike_id[0].gsub(/bikes./, "") || nil
     end
     new_bike = Bike.where(id: bike_id).first if bike_id.present?
-    errors.add(:bike, "\"#{bike_id}\" not found") unless new_bike.present?
-    return self if errors.any?
-    update(bike_id: new_bike.id, user_id: user.id, claimed_at: Time.now)
+    # Check bike_str, not bike_id, because we don't want to allow people adding bikes
+    if bike_str.blank? && unclaimable_by?(user)
+      update(bike_id: nil, user_id: nil, claimed_at: nil)
+    elsif new_bike.present?
+      update(bike_id: new_bike.id, user_id: user.id, claimed_at: Time.now) unless errors.any?
+    else
+      errors.add(:bike, "\"#{bike_id}\" not found") 
+    end
     self
   end
 

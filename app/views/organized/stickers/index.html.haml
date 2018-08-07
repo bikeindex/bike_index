@@ -1,33 +1,61 @@
-.organized-page-header
+.mb-4
   %h1
     %em
       = current_organization.name
     Stickers
 
-.organized-bikes-table.table-responsive
-  %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
+= form_tag organization_stickers_path(organization_id: current_organization.to_param), method: :get, class: "stickers-form" do
+  .row
+    .col-md-4
+      = text_field_tag :query, params[:query], placeholder: "Search Sticker ID", class: "form-control"
+    .col-md-6
+      .btn-group{ role: "group", "aria-label" => "Size", data: { toggle: "buttons" }, style: "margin-top: 0.3rem;" }
+        - claimedness = "claimed" if params[:claimedness] == "claimed"
+        - claimedness ||= "unclaimed" if params[:claimedness] == "unclaimed"
+        - claimedness ||= "all"
+        %label.btn.btn-sm.btn-secondary{ class: ("active" if claimedness == "all") }
+          %input{ type: "radio", name: "claimedness", autocomplete: "off", checked: claimedness == "all", value: "all" }
+          All
+        %label.btn.btn-sm.btn-secondary{ class: ("active" if claimedness == "claimed") }
+          %input{ type: "radio", name: "claimedness", autocomplete: "off", checked: claimedness == "claimed", value: "claimed" }
+          Claimed
+        %label.btn.btn-sm.btn-secondary{ class: ("active" if claimedness == "unclaimed") }
+          %input{ type: "radio", name: "claimedness", autocomplete: "off", checked: claimedness == "unclaimed", value: "unclaimed" }
+          Unclaimed
+    .col-sm-2.text-right
+      = submit_tag "Search", class: "btn btn-primary"
+
+.table-responsive.mt-4
+  %p{ style: "margin-bottom: 0;" }
+    %strong
+      = number_with_delimiter(@bike_codes.total_count)
+    = "Sticker".pluralize(@bike_codes.total_count)
+  %table.table.table-striped.table-bordered.table-sm.without-exterior-border
     %thead.small-header
       %th
         Added&nbsp;<small class="convertTimezone"></small>
       %th
-        Code
-      %th
         Linked&nbsp;<small class="convertTimezone"></small>
       %th
         Bike
+      %th
+        Code
     %tbody
       - @bike_codes.each do |bike_code|
         %tr
           %td
-            %spn.convertTime
+            %a.convertTime{ href: edit_organization_sticker_path(organization_id: current_organization.id, id: bike_code.code) }
               = l bike_code.created_at, format: :convert_time
           %td
-            = link_to bike_code.code, bike_code.url
-          %td
             - if bike_code.claimed? && bike_code.claimed_at.present?
-              %spn.convertTime
+              %span.convertTime
                 = l bike_code.claimed_at, format: :convert_time
           %td
             - if bike_code.claimed?
               / For these, use bike_id to avoid loading association
-              = link_to bike_code.bike_id, bike_path(bike_code.bike_id)
+              = link_to organized_bike_text(bike_code.bike), bike_path(bike_code.bike_id)
+          %td
+            = link_to bike_code.code, "/bikes/scanned/#{bike_code.code}?organization_id=#{current_organization.to_param}"
+
+.paginate-container.paginate-container-bottom
+  = paginate @bike_codes

@@ -212,11 +212,25 @@ describe BikesController do
     context "organized no bike" do
       let(:organization) { FactoryGirl.create(:organization) }
       let!(:bike_code2) { FactoryGirl.create(:bike_code, organization: organization, code: 900) }
+      let!(:user) { FactoryGirl.create(:confirmed_user) }
+      before { set_current_user(user) }
       it "renders the scanned page" do
         get :scanned, id: "000900", organization_id: organization.to_param
         expect(assigns(:bike_code)).to eq bike_code2
         expect(response).to render_template(:scanned)
         expect(response.code).to eq("200")
+        expect(assigns(:show_organization_bikes)).to be_falsey
+      end
+      context "user part of organization" do
+        let!(:user) { FactoryGirl.create(:organization_member, organization: organization) }
+        it "makes current_organization the organization" do
+          get :scanned, id: "000900", organization_id: organization.to_param
+          expect(assigns(:bike_code)).to eq bike_code2
+          expect(response).to render_template(:scanned)
+          expect(response.code).to eq("200")
+          expect(assigns(:current_organization)).to eq organization
+          expect(assigns(:show_organization_bikes)).to be_truthy
+        end
       end
     end
     context "code_id" do

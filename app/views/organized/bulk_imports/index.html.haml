@@ -1,42 +1,41 @@
-.organized-page-header
+.mb-4
   %h1
     %em
       = current_organization.name
     Bulk Imports
 
-.organized-bikes-table
-  %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
-    %thead.small-header
-      %th
-        Added&nbsp;<small class="convertTimezone"></small>
-      %th
-        Progress
-      %th
-        Errors
-      %th
-        Creator
-      %th
-        Bikes
-    %tbody
-      - @bulk_imports.each do |bulk_import|
-        %tr
-          %td
-            %a.convertTime{ href: organization_bulk_import_path(bulk_import, organization_id: current_organization.to_param) }
-              = l bulk_import.created_at, format: :convert_time
-          %td
-            - bulk_import_progress_class = bulk_import.progress == "finished" ? "text-success" : ""
-            %span{ class: bulk_import_progress_class }
-              = bulk_import.progress
-          %td
-            - if bulk_import.line_import_errors.present?
-              <span class="text-danger">Line</span>
-            - if bulk_import.file_import_errors.present?
-              <span class="text-danger">File!</span>
-          %td
-            - if bulk_import.user_id.present?
-              = bulk_import.user.display_name
-          %td
-            = bulk_import.creation_states.count # Don't need to do bikes through creation states
+%table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
+  %thead.small-header
+    %th
+      Added&nbsp;<small class="convertTimezone"></small>
+    %th
+      Progress
+    %th
+      Errors
+    %th
+      Creator
+    %th
+      Bikes
+  %tbody
+    - @bulk_imports.each do |bulk_import|
+      %tr
+        %td
+          %a.convertTime{ href: organization_bulk_import_path(bulk_import, organization_id: current_organization.to_param) }
+            = l bulk_import.created_at, format: :convert_time
+        %td
+          - bulk_import_progress_class = bulk_import.progress == "finished" ? "text-success" : ""
+          %span{ class: bulk_import_progress_class }
+            = bulk_import.progress
+        %td
+          - if bulk_import.line_import_errors.present?
+            <span class="text-danger">Line</span>
+          - if bulk_import.file_import_errors.present?
+            <span class="text-danger">File!</span>
+        %td
+          - if bulk_import.user_id.present?
+            = bulk_import.user.display_name
+        %td
+          = bulk_import.creation_states.count # Don't need to do bikes through creation states
 
-%p{ style: "text-align: right;" }
+%p.text-right
   = link_to "New import", new_organization_bulk_import_path(organization_id: current_organization.to_param), class: "btn btn-secondary"

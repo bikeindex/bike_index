@@ -1409,7 +1409,8 @@ CREATE TABLE public.organizations (
     paid_at timestamp without time zone,
     geolocated_emails boolean DEFAULT false NOT NULL,
     abandoned_bike_emails boolean DEFAULT false NOT NULL,
-    has_bike_codes boolean DEFAULT false NOT NULL
+    has_bike_codes boolean DEFAULT false NOT NULL,
+    has_bike_search boolean DEFAULT false NOT NULL
 );
 
 
@@ -3524,4 +3525,6 @@ INSERT INTO schema_migrations (version) VALUES ('20180802235809');
 INSERT INTO schema_migrations (version) VALUES ('20180803003635');
 
 INSERT INTO schema_migrations (version) VALUES ('20180804170624');
+
+INSERT INTO schema_migrations (version) VALUES ('20180806172125');
 

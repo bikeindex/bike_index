@@ -1,4 +1,4 @@
-.organized-page-header
+.mb-4
   %h1
     Bulk import
 %ul
@@ -32,30 +32,29 @@
 
 %h2 Bikes
 
-.organized-bikes-table
-  %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
-    %thead.small-header
+%table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
+  %thead.small-header
+    %tr
+      %th Created
+      %th Manufacturer
+      %th Model
+      %th Color
+      %th Sent to
+  %tbody
+    - @bikes.each do |bike|
       %tr
-        %th Created
-        %th Manufacturer
-        %th Model
-        %th Color
-        %th Sent to
-    %tbody
-      - @bikes.each do |bike|
-        %tr
-          %td
-            = link_to l(bike.created_at, format: :convert_time), bike_path(bike)
-          %td
-            = bike.mnfg_name
-          %td
-            = bike.frame_model
-          %td
-            = bike.frame_colors.to_sentence
-          %td
-            = bike.first_owner_email
-            %small.less-strong
-              - if bike.creation_description
-                = bike.creation_description
-              - unless bike.owner_email == bike.first_owner_email
-                (sent to a new owner)
+        %td
+          = link_to l(bike.created_at, format: :convert_time), bike_path(bike)
+        %td
+          = bike.mnfg_name
+        %td
+          = bike.frame_model
+        %td
+          = bike.frame_colors.to_sentence
+        %td
+          = bike.first_owner_email
+          %small.less-strong
+            - if bike.creation_description
+              = bike.creation_description
+            - unless bike.owner_email == bike.first_owner_email
+              (sent to a new owner)

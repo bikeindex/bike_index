@@ -33,8 +33,8 @@ describe Organized::BikesController, type: :controller do
     include_context :logged_in_as_organization_member
     context 'paid organization' do
       before do
-        organization.update_attribute :is_paid, true
-        expect(organization.is_paid).to be_truthy
+        organization.update_attributes(is_paid: true, has_bike_search: true)
+        expect(organization.bike_search?).to be_truthy
       end
       describe 'index' do
         context 'with params' do
@@ -52,13 +52,8 @@ describe Organized::BikesController, type: :controller do
           end
           let(:organization_bikes) { organization.bikes }
           it 'sends all the params and renders search template to organization_bikes' do
-            expect_any_instance_of(Organized::BikesController).to receive(:forwarded_ip_address) { 'special' }
-            allow_any_instance_of(Organized::BikesController).to receive(:organization_bikes) { organization_bikes }
-            expect(Bike).to receive(:searchable_interpreted_params).with(query_params, ip: 'special') { { search_params: '' } }
-            expect(organization_bikes).to receive(:search).with(search_params: '') { organization_bikes }
             get :index, query_params.merge(organization_id: organization.to_param)
             expect(response.status).to eq(200)
-            expect(response).to render_template :search
             expect(assigns(:current_organization)).to eq organization
             expect(assigns(:search_query_present)).to be_truthy
             expect(assigns(:bikes).pluck(:id).include?(non_organization_bike.id)).to be_falsey
@@ -68,7 +63,6 @@ describe Organized::BikesController, type: :controller do
           it 'renders, assigns search_query_present and stolenness all' do
             get :index, organization_id: organization.to_param
             expect(response.status).to eq(200)
-            expect(response).to render_template :search
             expect(assigns(:interpreted_params)[:stolenness]).to eq 'all'
             expect(assigns(:current_organization)).to eq organization
             expect(assigns(:search_query_present)).to be_falsey
