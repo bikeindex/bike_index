@@ -1,12 +1,15 @@
 AllCops:
   TargetRubyVersion:
-    2.2
+    2.5
   Exclude:
     - 'bin/**/*'
     - 'db/schema.rb'
     - 'db/migrate/**/*'
 
 Style/Documentation:
+  Enabled: false
+
+FrozenStringLiteralComment:
   Enabled: false
 
 Style/SymbolProc:

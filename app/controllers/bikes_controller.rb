@@ -65,9 +65,16 @@ class BikesController < ApplicationController
     elsif @bike_code.bike.present?
       redirect_to bike_url(@bike_code.bike_id) and return
     elsif current_user.present?
-      @bikes = current_user.bikes.reorder(created_at: :desc).limit(100)
+      @page = params[:page] || 1
+      @per_page = params[:per_page] || 25
+      if current_user.is_member_of?(@bike_code.organization)
+        @show_organization_bikes = true
+        @current_organization = @bike_code.organization
+        search_organization_bikes
+      else
+        @bikes = current_user.bikes.reorder(created_at: :desc).limit(100)
+      end
     end
-    @organization = @bike_code.organization
   end
 
   def spokecard

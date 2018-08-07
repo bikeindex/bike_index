@@ -31,10 +31,10 @@
               
       .span6
         .control-group
-          = f.label :date_input, class: "control-label"
+          = f.label :date_recovered, class: "control-label"
           .controls
-            - date = @recovery_display.date_recovered || Time.now
-            = f.text_field :date_input, value: date.strftime("%m-%d-%Y")
+            - f.object.date_recovered = Time.now
+            = f.datetime_local_field :date_recovered, max: Time.now + 1.day, step: 60, required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(f.object.date_recovered, format: :convert_time)
         .control-group.avatar-upload
           = f.label :image, "Recovery photo", class: "control-label"
           .controls

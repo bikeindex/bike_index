@@ -2,11 +2,21 @@
   %h1
     Oh no!
   %h2
-    That #{@bike_code.kind} isn't linked to a bike.
-  %hr{ style: "margin: 24px 0 36px;" }
+    = @bike_code.kind
+    %em
+      = @bike_code.code
+    isn't linked to a bike.
+  %hr.mb-4.mb-4
 
   - if current_user.present?
-    - if !@bike_code.linkable_by?(current_user)
+    - if @show_organization_bikes
+      - if current_organization.bike_search?
+        %p.less-strong{ style: "margin-bottom: 0; font-style: italic;" }
+          Link one of #{current_organization.name} bikes to this sticker
+        = render partial: "/organized/bikes/search", locals: { path_for_search: scanned_bike_path(@bike_code.code, organization_id: current_organization.to_param), skip_view_just_stolen: true }
+      - else
+        = render "/organized/bikes/list"
+    - elsif !@bike_code.claimable_by?(current_user)
       %h3
         You have claimed the maximum permitted number of Bike Codes.
       %p
@@ -38,7 +48,7 @@
                 %span.less-strong
                   color
             %th
-              Link IT!
+              Link&nbsp;IT!
         %tbody
           - @bikes.each do |bike|
             %tr

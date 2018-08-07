@@ -36,7 +36,8 @@ module ControllerHelpers
   end
 
   def current_organization
-    @current_organization ||= Organization.friendly_find(params[:organization_id])
+    return @current_organization if defined?(@current_organization)
+    @current_organization = Organization.friendly_find(params[:organization_id])
   end
 
   def store_return_to

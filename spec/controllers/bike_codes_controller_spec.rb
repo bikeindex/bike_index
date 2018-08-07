@@ -13,14 +13,14 @@ describe BikeCodesController do
     end
     context "user present" do
       include_context :logged_in_as_user
-      it "works" do
+      it "succeeds" do
         put :update, id: bike_code.code, bike_id: "#{bike.id}"
         expect(flash[:success]).to be_present
         bike_code.reload
         expect(bike_code.bike).to eq bike
       end
       context "bikeindex url" do
-        it "works" do
+        it "succeeds" do
           put :update, id: bike_code.code, bike_id: "https://bikeindex.org/bikes/#{bike.id} "
           expect(flash[:success]).to be_present
           bike_code.reload
@@ -51,6 +51,17 @@ describe BikeCodesController do
           expect(flash[:error]).to be_present
           bike_code.reload
           expect(bike_code.bike).to eq bike
+        end
+        context "organized" do
+          let(:organization) { FactoryGirl.create(:organization) }
+          let(:user) { FactoryGirl.create(:organization_member, organization: organization) }
+          let(:bike_code) { FactoryGirl.create(:bike_code, bike_id: bike.id, organization: organization) }
+          it "succeeds" do
+            put :update, id: bike_code.code, bike_id: "  #{bike2.id} "
+            expect(flash[:success]).to be_present
+            bike_code.reload
+            expect(bike_code.bike).to eq bike2
+          end
         end
       end
     end

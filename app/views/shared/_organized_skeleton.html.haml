@@ -9,17 +9,16 @@
         Admin panel
     %ul.organized-mainmenu
       %li
-        - bikes_active = %w(bikes).include?(controller_name)
-        %span.menu-item.top-level{ class: ('active' if bikes_active) }
+        %span.menu-item.top-level{ class: ("active" if controller_name == "bikes") }
           Bikes
         %ul.organized-submenu
           %li
-            = active_link (current_organization.is_paid ? 'Search' : 'List'), organization_bikes_path(organization_id: current_organization.to_param), class_name: 'nav-link'
+            = active_link (current_organization.bike_search? ? "Search" : "List"), organization_bikes_path(organization_id: current_organization.to_param), class_name: "nav-link"
           %li
-            = active_link 'Add a bike', new_organization_bike_path(current_organization), class_name: 'nav-link'
-          - if current_organization.is_paid
+            = active_link "Add a bike", new_organization_bike_path(current_organization), class_name: "nav-link"
+          - if current_organization.show_recoveries?
             %li
-              = active_link 'Recoveries', recoveries_organization_bikes_path(current_organization), class_name: 'nav-link'
+              = active_link "Recoveries", recoveries_organization_bikes_path(current_organization), class_name: "nav-link"
       - if current_organization.has_bike_codes
         %li
           %span.menu-item.top-level{ class: ("active" if controller_name == "stickers") }
@@ -30,24 +29,21 @@
       - if current_user.is_admin_of?(current_organization)
         %li
           - manage_active = %w(users manage emails).include?(controller_name)
-          %span.menu-item.top-level{ class: ('active' if manage_active) }
+          %span.menu-item.top-level{ class: ("active" if manage_active) }
             Manage
           %ul.organized-submenu
             %li
-              = active_link 'Users', organization_users_path(organization_id: current_organization.to_param), class_name: 'nav-link', match_controller: true
+              = active_link "Users", organization_users_path(organization_id: current_organization.to_param), class_name: "nav-link", match_controller: true
             %li
-              = active_link 'Organization', organization_manage_index_path(organization_id: current_organization.to_param), class_name: 'nav-link'
+              = active_link "Organization", organization_manage_index_path(organization_id: current_organization.to_param), class_name: "nav-link"
             %li
-              = active_link 'Locations', locations_organization_manage_index_path(organization_id: current_organization.to_param), class_name: 'nav-link'
-              / - if current_organization.is_paid
-              /   %li
-              /     = active_link 'Emails', organization_emails_path(organization_id: current_organization.to_param), class_name: 'nav-link', match_controller: true
+              = active_link "Locations", locations_organization_manage_index_path(organization_id: current_organization.to_param), class_name: "nav-link"
               %li
-                = active_link 'Dev resources', dev_organization_manage_index_path(organization_id: current_organization.to_param), class_name: 'nav-link'
-            - if current_organization.show_bulk_import || current_user.superuser?
+                = active_link "Dev resources", dev_organization_manage_index_path(organization_id: current_organization.to_param), class_name: "nav-link"
+            - if current_organization.show_bulk_import?
               %ul.organized-submenu
                 %li
-                  = active_link 'Bulk Imports', organization_bulk_imports_path(organization_id: current_organization.to_param), class_name: 'nav-link', match_controller: true
+                  = active_link "Bulk Imports", organization_bulk_imports_path(organization_id: current_organization.to_param), class_name: "nav-link", match_controller: true
 
 .organized-wrap
   .container
