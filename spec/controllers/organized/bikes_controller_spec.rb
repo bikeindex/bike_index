@@ -52,10 +52,6 @@ describe Organized::BikesController, type: :controller do
           end
           let(:organization_bikes) { organization.bikes }
           it 'sends all the params and renders search template to organization_bikes' do
-            expect_any_instance_of(Organized::BikesController).to receive(:forwarded_ip_address) { 'special' }
-            allow_any_instance_of(Organized::BikesController).to receive(:organization_bikes) { organization_bikes }
-            expect(Bike).to receive(:searchable_interpreted_params).with(query_params, ip: 'special') { { search_params: '' } }
-            expect(organization_bikes).to receive(:search).with(search_params: '') { organization_bikes }
             get :index, query_params.merge(organization_id: organization.to_param)
             expect(response.status).to eq(200)
             expect(assigns(:current_organization)).to eq organization
