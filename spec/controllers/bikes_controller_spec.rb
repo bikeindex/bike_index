@@ -495,7 +495,7 @@ describe BikesController do
         end
       end
       context "with persisted email and non-member" do
-        let!(:user2) { FactoryGirl.create(:user_confirmed) }
+        let!(:user2) { FactoryGirl.create(:confirmed_user) }
         it "registers a bike and redirects with persist_email" do
           set_current_user(user2)
           post :create, bike: bike_params.merge(manufacturer_id: "A crazy different thing"), persist_email: true
@@ -506,7 +506,7 @@ describe BikesController do
           expect(bike.creation_state.creator).to eq bike.creator
           expect(bike.manufacturer).to eq Manufacturer.other
           expect(bike.manufacturer_other).to eq "A crazy different thing"
-          expect(bike.creator_id).to eq user.id # It isn't registered to the signed in user
+          expect(bike.creator_id).to eq organization.auto_user_id # It isn't registered to the signed in user
         end
       end
       context "with organization bike code and signed in member" do
