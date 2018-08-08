@@ -2,7 +2,7 @@
   - organization_message_overlay = current_user.bike_actions_organization&.present?
   - edit_overlay = @bike.owner == current_user
 
-= render partial: "modals_for_show"
+= render partial: "modals_for_show" # organization_message_overlay actually. Probably better naming
 
 = render partial: "organization_message_overlay" if organization_message_overlay
 

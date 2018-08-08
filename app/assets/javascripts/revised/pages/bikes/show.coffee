@@ -46,6 +46,8 @@ class BikeIndex.BikesShow extends BikeIndex
     # Add class to footer so it's still visible
     height = 36 + $(".bike-overlay-wrapper").outerHeight() # 36 is base height, add height from overlays too
     $(".primary-footer .terms-and-stuff").css("padding-bottom", "#{height}px")
+    # Click needs to open modal and for message send and populate the kind field
+    # $("")
 
   initializeThumbnailSwitching: ->
     # Set up the template for injecting photos
