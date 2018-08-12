@@ -27,6 +27,8 @@ describe EmailOrganizationMessageWorker do
       ActionMailer::Base.deliveries = []
       instance.perform(organization_message.id)
       expect(ActionMailer::Base.deliveries.empty?).to be_falsey
+      organization_message.reload
+      expect(organization_message.delivery_status).to be_present
     end
   end
 end

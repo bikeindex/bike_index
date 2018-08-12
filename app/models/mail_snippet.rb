@@ -37,7 +37,7 @@ class MailSnippet < ActiveRecord::Base
 
   def set_calculated_attributes
     self.is_enabled = false if is_enabled && body.blank?
-    if is_location_triggered # No longer used, but keeping in case we decide to use. Check PR/415
+    if is_location_triggered # No longer used, but keeping in case we decide to use. Check PR#415
       self.kind = "location_triggered"
     else
       self.kind = self.class.kinds.include?(name) ? name : "custom"

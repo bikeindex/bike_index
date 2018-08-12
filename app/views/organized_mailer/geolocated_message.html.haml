@@ -10,8 +10,7 @@
   %strong
     #{@organization_message.body}
 
-.map-wrap
-  <img class="geolocated-message-map" src="https://maps.googleapis.com/maps/api/staticmap?center=#{@organization_message.latitude},#{@organization_message.longitude}&zoom=13&size=640x400&maptype=roadmap&scale=2&markers=color:red%7C#{@organization_message.latitude},#{@organization_message.longitude}&key=#{ENV["GOOGLE_MAPS_STATIC"]}">
+<img class="geolocated-message-map" src="https://maps.googleapis.com/maps/api/staticmap?center=#{@organization_message.latitude},#{@organization_message.longitude}&zoom=13&size=640x400&maptype=roadmap&scale=2&markers=color:red%7C#{@organization_message.latitude},#{@organization_message.longitude}&key=#{ENV["GOOGLE_MAPS_STATIC"]}">
 
 %p
   %em

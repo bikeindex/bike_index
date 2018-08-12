@@ -54,10 +54,11 @@ class BikeIndex.BikesShow extends BikeIndex
   showBikeOverlay: ->
     # Affix the edit menu to the page - broken in chrome, so we're using position fixed
     # $('.bike-edit-overlay').Stickyfill()
-    # Add class to footer so it's still visible
+    # Make footer taller so it's still visible
     height = 36 + $(".bike-overlay-wrapper").outerHeight() # 36 is base height, add height from overlays too
     $(".primary-footer .terms-and-stuff").css("padding-bottom", "#{height}px")
-    # Click needs to open modal and for message send and populate the kind field
+
+    # If it's an organization message modal, clicking the button opens the modal and fills in the kind
     $(".openMessageModal").on "click", (e) ->
       $("#organizationMessageModal").modal("show")
       $("#organizationMessageModal #kind").val($(e.target).attr("data-kind"))
