@@ -34,4 +34,8 @@ class OrganizationMessage < ActiveRecord::Base
   def send_email_message
     EmailOrganizationMessageWorker.perform_async(id)
   end
+
+  def subject
+    "#{organization.short_name} - Your #{bike.mnfg_name}"
+  end
 end

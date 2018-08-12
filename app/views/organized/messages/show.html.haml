@@ -29,6 +29,18 @@
   - if @bike.present?
     = link_to organized_bike_text(@bike), bike_path(@bike)
 
+  %br
+  Subject:
+  = @organization_message.subject
+
+  %br
+  Additional text:
+  - if @organization_message.body.present?
+    = @organization_message.body
+  - else
+    %em.less-strong
+      none
+
 #map_canvas{ style: "height: 400px;" }
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><script src="https://maps.googleapis.com/maps/api/js?key=#{ENV["GOOGLE_MAPS"]}&sensor=false" type="text/javascript"></script></script>

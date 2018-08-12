@@ -25,6 +25,10 @@ class OrganizedMailerPreview < ActionMailer::Preview
     OrganizedMailer.organization_invitation(OrganizationInvitation.last)
   end
 
+  def geolocated_message
+    OrganizedMailer.custom_message(OrganizationMessage.geolocated.last)
+  end
+
   private
 
   def render_finished_registration(bikes)

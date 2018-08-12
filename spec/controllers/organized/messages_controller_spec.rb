@@ -113,7 +113,7 @@ describe Organized::MessagesController, type: :controller do
   describe "show" do
     let(:organization_message) { FactoryGirl.create(:organization_message, organization: organization) }
     it "renders" do
-      get :index, organization_id: organization.to_param, id: organization_message.id
+      get :show, organization_id: organization.to_param, id: organization_message.id
       expect(response.status).to eq(200)
       expect(response).to render_template :show
     end
