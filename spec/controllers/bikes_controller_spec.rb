@@ -494,29 +494,36 @@ describe BikesController do
           end
         end
       end
-      context 'with persisted email' do
-        it 'registers a bike and redirects with persist_email' do
-          post :create, bike: bike_params.merge(manufacturer_id: 'A crazy different thing'), persist_email: true
-          expect(response).to redirect_to(embed_extended_organization_url(organization, email: 'flow@goodtimes.com'))
+      context "with persisted email and non-member" do
+        let!(:user2) { FactoryGirl.create(:confirmed_user) }
+        it "registers a bike and redirects with persist_email" do
+          set_current_user(user2)
+          post :create, bike: bike_params.merge(manufacturer_id: "A crazy different thing"), persist_email: true
+          expect(response).to redirect_to(embed_extended_organization_url(organization, email: "flow@goodtimes.com"))
           bike = Bike.last
-          expect(bike.creation_state.origin).to eq 'embed_extended'
+          expect(bike.creation_state.origin).to eq "embed_extended"
           expect(bike.creation_state.organization).to eq organization
           expect(bike.creation_state.creator).to eq bike.creator
           expect(bike.manufacturer).to eq Manufacturer.other
-          expect(bike.manufacturer_other).to eq 'A crazy different thing'
+          expect(bike.manufacturer_other).to eq "A crazy different thing"
+          expect(bike.creator_id).to eq organization.auto_user_id # It isn't registered to the signed in user
         end
       end
-      context "with organization bike code" do
+      context "with organization bike code and signed in member" do
+        let!(:user) { FactoryGirl.create(:organization_member, organization: organization) }
         let!(:bike_code) { FactoryGirl.create(:bike_code, organization: organization, code: "aaa", kind: "sticker") }
         let!(:wrong_bike_code) { FactoryGirl.create(:bike_code, code: "aaa", kind: "sticker") }
-        it "registers a bike and redirects with persist_email" do
+        it "registers a bike under signed in user and redirects with persist_email" do
+          set_current_user(user)
           post :create, bike: bike_params.merge(bike_code: "AAA")
           expect(response).to redirect_to(embed_extended_organization_url(organization))
           bike = Bike.last
-          expect(bike.creation_state.origin).to eq 'embed_extended'
+          expect(bike.creation_state.origin).to eq "embed_extended"
           expect(bike.creation_state.organization).to eq organization
           expect(bike.creation_state.creator).to eq bike.creator
+          expect(bike.creation_state.creator).to eq bike.creator
           expect(bike.manufacturer).to eq manufacturer
+          expect(bike.creator_id).to eq user.id
           bike_code.reload
           expect(bike_code.claimed?).to be_truthy
           expect(bike_code.bike).to eq bike

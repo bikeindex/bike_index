@@ -79,10 +79,16 @@ class BParam < ActiveRecord::Base
       b ||= with_organization_or_no_creator(toke)
       b ||= BParam.new(creator_id: user_id, params: { revised_new: true }.as_json)
       b.creator_id ||= user_id
-      # If the org_id is present, add it to the params. Only save it if the b_param is created
+      # If the org_id is present, add it to the params. Only save it if the b_param is created_at
       if organization_id.present? && b.creation_organization_id != organization_id
         b.params = b.params.merge(bike: b.bike.merge(creation_organization_id: organization_id))
         b.update_attribute :params, b.params if b.id.present?
+      end
+      # Assign the correct user if user is part of the org (for embed submissions)
+      if b.creation_organization_id.present? && b.creator_id != user_id
+        if Membership.where(user_id: user_id, organization_id: b.creation_organization_id).present?
+          b.update_attribute :creator_id, user_id
+        end
       end
       b
     end
@@ -263,7 +269,7 @@ class BParam < ActiveRecord::Base
   end
 
   def creation_organization_id
-    bike && bike['creation_organization_id']
+    bike && bike['creation_organization_id'] || params["creation_organization_id"]
   end
 
   def owner_email
