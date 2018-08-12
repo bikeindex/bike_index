@@ -109,4 +109,13 @@ describe Organized::MessagesController, type: :controller do
       expect(assigns(:current_organization)).to eq organization
     end
   end
+
+  describe "show" do
+    let(:organization_message) { FactoryGirl.create(:organization_message, organization: organization) }
+    it "renders" do
+      get :index, organization_id: organization.to_param, id: organization_message.id
+      expect(response.status).to eq(200)
+      expect(response).to render_template :show
+    end
+  end
 end

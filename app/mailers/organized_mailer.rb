@@ -35,6 +35,15 @@ class OrganizedMailer < ActionMailer::Base
     mail('Reply-To' => reply_to, to: @organization_invitation.invitee_email, subject: default_i18n_subject(default_subject_vars))
   end
 
+  def custom_message(organization_message)
+    @organization_message = organization_message
+    @organization = @organization_message.organization
+    @bike = @organization_message.bike
+    @sender = @organization_message.sender
+
+    mail('Reply-To' => @organization_message.sender.email, to: @organization_message.email, subject: default_i18n_subject(default_subject_vars))
+  end
+
   private
 
   def finished_registration_type

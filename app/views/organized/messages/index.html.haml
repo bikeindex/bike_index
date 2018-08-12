@@ -22,8 +22,12 @@
             = l organization_message.created_at, format: :convert_time
           - if organization_message.delivery_status != "success"
             %br
-            %span.text-danger
-              Delivery Failed
+            - if organization_message.delivery_status.blank?
+              %em.text-warning
+                Pending
+            - else
+              %span.text-danger
+                = organization_message.delivery_status
         %td
           %a{ href: bike_path(organization_message.bike) }
           = link_to organized_bike_text(organization_message.bike), bike_path(organization_message.bike)

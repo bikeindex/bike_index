@@ -9,6 +9,7 @@ module Organized
 
     def show
       @organization_message = organization_messages.find(params[:id])
+      @bike = @organization_message.bike
     end
 
     def create

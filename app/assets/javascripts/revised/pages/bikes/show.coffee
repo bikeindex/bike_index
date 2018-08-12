@@ -1,12 +1,12 @@
-# These two are required by getCurrentPosition
+# These two functions are required by getCurrentPosition
 window.fillInMessageLocation = (position) ->
   $("#organizationMessageModal #organization_message_latitude").val(position.coords.latitude)
   $("#organizationMessageModal #organization_message_longitude").val(position.coords.longitude)
   $("#organizationMessageModal #organization_message_accuracy").val(position.coords.accuracy)
   $("#submitMessageBtn").attr("disabled", false)
   $("#waitingOnLocationText").slideUp()
-
 window.messageLocationError = (err) ->
+  # Not sure what the error will say. Might as well put it in the text to make diagnosing problems easier
   $("#waitingOnLocationText").text(err)
 
 class BikeIndex.BikesShow extends BikeIndex
