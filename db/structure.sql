@@ -1353,7 +1353,8 @@ CREATE TABLE public.organization_messages (
     latitude double precision,
     longitude double precision,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    accuracy double precision
 );
 
 
@@ -3528,4 +3529,6 @@ INSERT INTO schema_migrations (version) VALUES ('20180804170624');
 INSERT INTO schema_migrations (version) VALUES ('20180806172125');
 
 INSERT INTO schema_migrations (version) VALUES ('20180807161501');
+
+INSERT INTO schema_migrations (version) VALUES ('20180812192948');
 

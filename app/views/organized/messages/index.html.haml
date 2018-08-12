@@ -18,7 +18,7 @@
     - @organization_messages.each do |organization_message|
       %tr
         %td
-          %a.convertTime{ href: organization_messages_path(organization_message, organization_id: current_organization.to_param) }
+          %a.convertTime{ href: organization_message_path(organization_message, organization_id: current_organization.to_param) }
             = l organization_message.created_at, format: :convert_time
           - if organization_message.delivery_status != "success"
             %br
@@ -26,13 +26,7 @@
               Delivery Failed
         %td
           %a{ href: bike_path(organization_message.bike) }
-            = bike.mnfg_name
-            = ", #{bike.frame_model}" if bike.frame_model.present?
-            %span.less-strong
-              = bike.frame_colors.to_sentence
-            - if bike.creation_description
-              %small.less-string
-                = bike.creation_description
+          = link_to organized_bike_text(organization_message.bike), bike_path(organization_message.bike)
         %td
           = organization_message.sender.display_name
         %td

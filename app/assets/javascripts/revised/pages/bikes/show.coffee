@@ -1,3 +1,14 @@
+# These two are required by getCurrentPosition
+window.fillInMessageLocation = (position) ->
+  $("#organizationMessageModal #organization_message_latitude").val(position.coords.latitude)
+  $("#organizationMessageModal #organization_message_longitude").val(position.coords.longitude)
+  $("#organizationMessageModal #organization_message_accuracy").val(position.coords.accuracy)
+  $("#submitMessageBtn").attr("disabled", false)
+  $("#waitingOnLocationText").slideUp()
+
+window.messageLocationError = (err) ->
+  $("#waitingOnLocationText").text(err)
+
 class BikeIndex.BikesShow extends BikeIndex
   constructor: ->
     window.bike_photos_loaded = false
@@ -47,7 +58,10 @@ class BikeIndex.BikesShow extends BikeIndex
     height = 36 + $(".bike-overlay-wrapper").outerHeight() # 36 is base height, add height from overlays too
     $(".primary-footer .terms-and-stuff").css("padding-bottom", "#{height}px")
     # Click needs to open modal and for message send and populate the kind field
-    # $("")
+    $(".openMessageModal").on "click", (e) ->
+      $("#organizationMessageModal").modal("show")
+      $("#organizationMessageModal #kind").val($(e.target).attr("data-kind"))
+      navigator.geolocation.getCurrentPosition(window.fillInMessageLocation, window.messageLocationError, { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 })
 
   initializeThumbnailSwitching: ->
     # Set up the template for injecting photos

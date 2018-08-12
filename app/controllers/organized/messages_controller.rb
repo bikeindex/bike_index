@@ -14,7 +14,7 @@ module Organized
     def create
       @organization_message = OrganizationMessage.new(permitted_parameters)
       if @organization_message.save
-        flash[:success] = "#{@organization_message.kind} sent"
+        flash[:success] = "#{@organization_message.kind} message sent"
       else
         flash[:error] = "Unable to send message - #{@organization_message.errors.full_messages.to_sentence}"
       end
@@ -42,7 +42,7 @@ module Organized
     end
 
     def permitted_parameters
-      params.require(:organization_message).permit(:kind, :body, :bike_id, :latitude, :longitude)
+      params.require(:organization_message).permit(:kind, :body, :bike_id, :latitude, :longitude, :accuracy)
             .merge(sender_id: current_user.id, organization_id: current_organization.id)
     end
 

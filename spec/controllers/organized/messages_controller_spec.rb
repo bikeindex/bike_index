@@ -16,7 +16,8 @@ describe Organized::MessagesController, type: :controller do
         body: "some message text and stuff",
         bike_id: bike.to_param,
         latitude: default_location[:latitude],
-        longitude: default_location[:longitude]
+        longitude: default_location[:longitude],
+        accuracy: 12
       }
     end
 
@@ -77,6 +78,7 @@ describe Organized::MessagesController, type: :controller do
           expect(organization_message.latitude).to eq message_params[:latitude]
           expect(organization_message.longitude).to eq message_params[:longitude]
           expect(organization_message.address).to eq default_location[:formatted_address]
+          expect(organization_message.accuracy).to eq 12
         end
       end
     end
