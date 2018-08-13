@@ -18,7 +18,7 @@ module Organized
     end
 
     def incompletes
-      redirect_to current_index_path and return unless current_organization.show_recoveries?
+      redirect_to current_index_path and return unless current_organization.show_partial_registrations?
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
       b_params = current_organization.b_params.partial_registrations.without_bike
