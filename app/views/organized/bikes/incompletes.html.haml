@@ -1,0 +1,46 @@
+.organized-page-header
+  %h1
+    %em
+      = current_organization.name
+    Incomplete Registrations
+
+%p
+  %strong
+    = @b_params.total_count
+    - if params[:query].present?
+      matching
+    incomplete
+    = "registration".pluralize(@b_params.total_count)
+.mt-4.mb-2
+  = form_tag incompletes_organization_bikes_path(organization_id: current_organization.to_param), method: :get do
+    .row
+      .col-sm-8.col-md-10
+        .form-group
+          = text_field_tag :query, params[:query], placeholder: "Search emails", class: "form-control"
+      .col-sm-4.col-md-2
+        .actions
+          = submit_tag "Search", class: "btn btn-primary"
+
+%table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
+  %thead.small-header
+    %th
+      Sent&nbsp;<small class="convertTimezone"></small>
+    %th
+      Bike
+    %th
+      email
+  %tbody
+    - @b_params.each do |b_param|
+      %tr
+        %td
+          %span.convertTime
+            = l b_param.created_at, format: :convert_time
+        %td
+          %strong
+            = b_param.primary_frame_color
+          = b_param.mnfg_name
+        %td
+          = b_param.owner_email
+
+.paginate-container.paginate-container-bottom
+  = paginate @b_params

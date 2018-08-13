@@ -263,7 +263,10 @@ Bikeindex::Application.routes.draw do
     get '/', to: 'bikes#index', as: :root
     get 'landing', to: 'manage#landing', as: :landing
     resources :bikes, only: [:index, :new, :show] do
-      collection { get :recoveries }
+      collection do
+        get :recoveries
+        get :incompletes
+      end
     end
     # Below are admin controllers, inherit from Organized::AdminController not BaseController
     resources :manage, only: [:index, :update, :destroy] do

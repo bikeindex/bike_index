@@ -113,6 +113,11 @@ class Bike < ActiveRecord::Base
       query.present? ? pg_search(query) : all
     end
 
+    def organized_email_search(query)
+      return all unless query.present?
+      where("owner_email ilike ?", "%#{query.strip}%")
+    end
+
     def admin_text_search(query)
       query.present? ? admin_search(query) : all
     end

@@ -5,7 +5,7 @@
     Recoveries
   %p
     %strong
-      #{ pluralize(@recoveries_count, 'recovery') }
+      #{ pluralize(@recoveries.total_count, 'recovery') }
 
   %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border.table-compact-long
     %thead.small-header

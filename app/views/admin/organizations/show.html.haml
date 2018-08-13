@@ -70,6 +70,13 @@
       .clearfix
         %dl.dl-horizontal
           %dt
+            Bike Search
+          %dd
+            - if @organization.has_bike_search
+              yes
+            - else
+              <small class="less-strong">no</small>
+          %dt
             Templates
           %dd
             - if @organization.mail_snippets.any?
@@ -98,7 +105,7 @@
           %dt
             Additional fields
           %dd
-            - additional_fields = [@organization.use_additional_registration_field ? "Additional serial" : nil, @organization.require_address_on_registration ? "Requires address" : nil].compact
+            - additional_fields = [@organization.use_additional_registration_field? ? "Additional serial" : nil, @organization.require_address_on_registration? ? "Registration address" : nil].compact
             - if additional_fields.any?
               = additional_fields.join(", ")
             - else
@@ -111,6 +118,13 @@
             - else
               %small.less-strong
                 no
+          %dt
+            Partial reg list
+          %dd
+            - if @organization.show_partial_registrations
+              yes
+            - else
+              <small class="less-strong">no</small>
 
 
 

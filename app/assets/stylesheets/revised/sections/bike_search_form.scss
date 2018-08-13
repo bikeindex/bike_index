@@ -14,6 +14,20 @@
   }
   .select2-container { margin-bottom: 0; }
 
+  // If the email field is there too, we want to put the two search bars together for large screens
+  .sidebyside-queries {
+    .email-field-too { margin-top: 0.5*$vertical-height; } // Always give both fields a top margin
+    @include media-breakpoint-up(md) {
+      display: flex;
+      flex-wrap: wrap;
+      .email-field-too {
+        width: 49%;
+        &:last-of-type { margin-left: 2%; }
+      }
+    }
+  }
+
+
   .select2-results__options {
     .sch_s { display: inline-block; }
     .sch_m, .sch_ { color: #ccc; }

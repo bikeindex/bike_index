@@ -13,6 +13,7 @@ class Organization < ActiveRecord::Base
   has_many :organization_messages
   has_many :bike_organizations
   has_many :bikes, through: :bike_organizations
+  has_many :b_params
   # has_many :bikes, foreign_key: 'creation_organization_id'
   has_many :creation_states
   has_many :created_bikes, through: :creation_states, source: :bike
@@ -119,10 +120,15 @@ class Organization < ActiveRecord::Base
     save
   end
 
-  def bike_search?; has_bike_search end
-  def show_recoveries?; is_paid end
-  def show_bulk_import?; show_bulk_import end
   def school?; org_type == "school" end
+
+  # I'm trying to ammass a list of paid features here (also in admin organization show)
+  def bike_search?; has_bike_search end
+  def show_recoveries?; has_bike_search end
+  def show_bulk_import?; show_bulk_import end
+  def show_partial_registrations?; show_partial_registrations end
+  def require_address_on_registration?; require_address_on_registration end
+  def use_additional_registration_field?; use_additional_registration_field end
 
   def set_auto_user
     if embedable_user_email.present?

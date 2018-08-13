@@ -391,7 +391,7 @@ describe BikesController do
             post :create, bike: bike_params
           end.to change(Ownership, :count).by 1
           bike = Bike.last
-          expect(bike.creation_state.origin).to eq 'embed'
+          expect(bike.creation_state.origin).to eq "embed"
           expect(bike.creation_state.organization).to eq organization
           expect(bike.creation_state.creator).to eq bike.creator
           testable_bike_params.each do |k, v|
