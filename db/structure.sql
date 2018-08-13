@@ -102,7 +102,8 @@ CREATE TABLE public.b_params (
     id_token text,
     params json DEFAULT '{"bike":{}}'::json,
     origin character varying,
-    organization_id integer
+    organization_id integer,
+    email character varying
 );
 
 

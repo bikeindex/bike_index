@@ -62,57 +62,60 @@ class BParam < ActiveRecord::Base
   def manufacturer; bike['manufacturer_id'] && Manufacturer.friendly_find(bike['manufacturer_id']) end
   def partial_registration?; origin == "embed_partial" end
 
-  class << self
-    def v2_params(hash)
-      h = hash['bike'].present? ? hash : { 'bike' => hash.with_indifferent_access }
-      h['bike']['serial_number'] = h['bike'].delete 'serial'
-      h['bike']['send_email'] = !(h['bike'].delete 'no_notify')
-      org = Organization.friendly_find(h['bike'].delete 'organization_slug')
-      h['bike']['creation_organization_id'] = org.id if org.present?
-      # Move un-nested params outside of bike
-      %w(test id components).each { |k| h[k] = h['bike'].delete k }
-      stolen_attrs = h['bike'].delete 'stolen_record'
-      if stolen_attrs && stolen_attrs.delete_if { |k,v| v.blank? } && stolen_attrs.keys.any?
-        h['bike']['stolen'] = true
-        h['stolen_record'] = stolen_attrs
+  def self.v2_params(hash)
+    h = hash['bike'].present? ? hash : { 'bike' => hash.with_indifferent_access }
+    h['bike']['serial_number'] = h['bike'].delete 'serial'
+    h['bike']['send_email'] = !(h['bike'].delete 'no_notify')
+    org = Organization.friendly_find(h['bike'].delete 'organization_slug')
+    h['bike']['creation_organization_id'] = org.id if org.present?
+    # Move un-nested params outside of bike
+    %w(test id components).each { |k| h[k] = h['bike'].delete k }
+    stolen_attrs = h['bike'].delete 'stolen_record'
+    if stolen_attrs && stolen_attrs.delete_if { |k,v| v.blank? } && stolen_attrs.keys.any?
+      h['bike']['stolen'] = true
+      h['stolen_record'] = stolen_attrs
+    end
+    h
+  end
+
+  def self.find_or_new_from_token(toke = nil, user_id: nil, organization_id: nil)
+    b = where(creator_id: user_id, id_token: toke).first if user_id.present?
+    b ||= with_organization_or_no_creator(toke)
+    b ||= BParam.new(creator_id: user_id, params: { revised_new: true }.as_json)
+    b.creator_id ||= user_id
+    # If the org_id is present, add it to the params. Only save it if the b_param is created_at
+    if organization_id.present? && b.creation_organization_id != organization_id
+      b.params = b.params.merge(bike: b.bike.merge(creation_organization_id: organization_id))
+      b.update_attribute :params, b.params if b.id.present?
+    end
+    # Assign the correct user if user is part of the org (for embed submissions)
+    if b.creation_organization_id.present? && b.creator_id != user_id
+      if Membership.where(user_id: user_id, organization_id: b.creation_organization_id).present?
+        b.update_attribute :creator_id, user_id
       end
-      h
     end
+    b
+  end
 
-    def find_or_new_from_token(toke = nil, user_id: nil, organization_id: nil)
-      b = where(creator_id: user_id, id_token: toke).first if user_id.present?
-      b ||= with_organization_or_no_creator(toke)
-      b ||= BParam.new(creator_id: user_id, params: { revised_new: true }.as_json)
-      b.creator_id ||= user_id
-      # If the org_id is present, add it to the params. Only save it if the b_param is created_at
-      if organization_id.present? && b.creation_organization_id != organization_id
-        b.params = b.params.merge(bike: b.bike.merge(creation_organization_id: organization_id))
-        b.update_attribute :params, b.params if b.id.present?
-      end
-      # Assign the correct user if user is part of the org (for embed submissions)
-      if b.creation_organization_id.present? && b.creator_id != user_id
-        if Membership.where(user_id: user_id, organization_id: b.creation_organization_id).present?
-          b.update_attribute :creator_id, user_id
-        end
-      end
-      b
-    end
+  def self.with_organization_or_no_creator(toke) # Because organization embed bikes might not match the creator
+    without_bike.where('created_at >= ?', Time.now - 1.month).where(id_token: toke)
+      .detect { |b| b.creator_id.blank? || b.creation_organization_id.present? || b.params['creation_organization_id'].present? }
+  end
 
-    def with_organization_or_no_creator(toke) # Because organization embed bikes might not match the creator
-      without_bike.where('created_at >= ?', Time.now - 1.month).where(id_token: toke)
-        .detect { |b| b.creator_id.blank? || b.creation_organization_id.present? || b.params['creation_organization_id'].present? }
-    end
+  def self.assignable_attrs
+    %w(manufacturer_id manufacturer_other frame_model year owner_email creation_organization_id
+       stolen recovered serial_number has_no_serial made_without_serial
+       primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id)
+  end
 
-    def assignable_attrs
-      %w(manufacturer_id manufacturer_other frame_model year owner_email creation_organization_id
-         stolen recovered serial_number has_no_serial made_without_serial
-         primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id)
-    end
+  def self.skipped_bike_attrs # Attrs that need to be skipped on bike assignment
+    %w(cycle_type_slug cycle_type_name rear_gear_type_slug front_gear_type_slug bike_code address
+       handlebar_type_slug frame_material_slug is_bulk is_new is_pos no_duplicate)
+  end
 
-    def skipped_bike_attrs # Attrs that need to be skipped on bike assignment
-      %w(cycle_type_slug cycle_type_name rear_gear_type_slug front_gear_type_slug bike_code address
-         handlebar_type_slug frame_material_slug is_bulk is_new is_pos no_duplicate)
-    end
+  def self.email_search(str)
+    return all unless str.present?
+    where("email ilike ?", "%#{str.strip}%")
   end
 
   # Right now this is a partial update. It's improved from where it was, but it still uses the BikeCreator
@@ -296,6 +299,7 @@ class BParam < ActiveRecord::Base
 
   def set_calculated_attributes
     self.organization_id = creation_organization_id
+    self.email = owner_email
   end
 
   protected

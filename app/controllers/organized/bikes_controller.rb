@@ -21,7 +21,9 @@ module Organized
       redirect_to current_index_path and return unless current_organization.show_recoveries?
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
-      @b_params = current_organization.b_params.partial_registrations.without_bike.reorder(created_at: :desc).page(@page).per(@per_page)
+      b_params = current_organization.b_params.partial_registrations.without_bike
+      b_params = b_params.email_search(params[:query]) if params[:query].present?
+      @b_params = b_params.order(created_at: :desc).page(@page).per(@per_page)
     end
 
     def new; end
