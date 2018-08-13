@@ -36,6 +36,6 @@ class OrganizationMessage < ActiveRecord::Base
   end
 
   def subject
-    "#{organization.short_name} - Your #{bike.mnfg_name}"
+    "#{organization.short_name} - the location of your #{bike.mnfg_name}"
   end
 end

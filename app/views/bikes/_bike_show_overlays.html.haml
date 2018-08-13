@@ -27,7 +27,7 @@
   - if organization_message_overlay
     .organization-actions-overlay
       %p
-        Send owner
+        Send
         - current_user.bike_actions_organization.organization_message_kinds.each do |kind|
           %a.btn.btn-secondary.openMessageModal{ "data-kind" => kind }
             - if kind == "geolocated"
