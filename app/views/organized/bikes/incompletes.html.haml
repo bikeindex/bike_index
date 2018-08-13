@@ -1,0 +1,33 @@
+.organized-page-header
+  %h1
+    %em
+      = current_organization.name
+    Incomplete Registrations
+
+%p
+  %strong
+    #{pluralize(@b_params.total_count, "Incomplete registration")}
+
+%table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
+  %thead.small-header
+    %th
+      Sent&nbsp;<small class="convertTimezone"></small>
+    %th
+      Bike
+    %th
+      email
+  %tbody
+    - @b_params.each do |b_param|
+      %tr
+        %td
+          %span.convertTime
+            = l b_param.created_at, format: :convert_time
+        %td
+          %strong
+            = b_param.primary_frame_color
+          = b_param.mnfg_name
+        %td
+          = b_param.owner_email
+
+.paginate-container.paginate-container-bottom
+  = paginate @b_params

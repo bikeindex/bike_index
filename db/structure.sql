@@ -101,7 +101,8 @@ CREATE TABLE public.b_params (
     image_processed boolean DEFAULT true,
     id_token text,
     params json DEFAULT '{"bike":{}}'::json,
-    origin character varying
+    origin character varying,
+    organization_id integer
 );
 
 
@@ -1411,7 +1412,8 @@ CREATE TABLE public.organizations (
     abandoned_bike_emails boolean DEFAULT false NOT NULL,
     has_bike_codes boolean DEFAULT false NOT NULL,
     has_bike_search boolean DEFAULT false NOT NULL,
-    require_address_on_registration boolean DEFAULT false NOT NULL
+    require_address_on_registration boolean DEFAULT false NOT NULL,
+    show_partial_registrations boolean DEFAULT false NOT NULL
 );
 
 
@@ -2803,6 +2805,13 @@ ALTER TABLE ONLY public.wheel_sizes
 
 
 --
+-- Name: index_b_params_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_b_params_on_organization_id ON public.b_params USING btree (organization_id);
+
+
+--
 -- Name: index_bike_codes_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3534,4 +3543,8 @@ INSERT INTO schema_migrations (version) VALUES ('20180807161501');
 INSERT INTO schema_migrations (version) VALUES ('20180812192948');
 
 INSERT INTO schema_migrations (version) VALUES ('20180813004404');
+
+INSERT INTO schema_migrations (version) VALUES ('20180813020849');
+
+INSERT INTO schema_migrations (version) VALUES ('20180813023344');
 

@@ -8,13 +8,15 @@ class BParam < ActiveRecord::Base
 
   belongs_to :created_bike, class_name: 'Bike'
   belongs_to :creator, class_name: 'User'
+  belongs_to :organization
 
   scope :with_bike, -> { where('created_bike_id IS NOT NULL') }
   scope :without_bike, -> { where(created_bike_id: nil) }
   scope :without_creator, -> { where(creator_id: nil) }
-  scope :partial_registration, -> { where(origin: "embed_partial") }
+  scope :partial_registrations, -> { where(origin: "embed_partial") }
 
   before_create :generate_id_token
+  before_save :set_calculated_attributes
 
   # Crazy new shit
   def manufacturer_id=(val)
@@ -45,6 +47,7 @@ class BParam < ActiveRecord::Base
 
   def bike; (params && params['bike'] || {}).with_indifferent_access end
   def primary_frame_color_id; bike['primary_frame_color_id'] end
+  def primary_frame_color; primary_frame_color_id && Color.where(id: primary_frame_color_id).first&.name end
   def secondary_frame_color_id; bike['secondary_frame_color_id'] end
   def tertiary_frame_color_id; bike['tertiary_frame_color_id'] end
   def manufacturer_id; bike['manufacturer_id'] end
@@ -244,7 +247,7 @@ class BParam < ActiveRecord::Base
   def mnfg_name
     return nil unless manufacturer.present?
     if manufacturer.other? && bike["manufacturer_other"].present?
-      Rails::Html::FullSanitizer.new.sanitize(bike["manufacturer_other"])
+      Rails::Html::FullSanitizer.new.sanitize(bike["manufacturer_other"].to_s)
     else
       manufacturer.simple_name
     end.strip.truncate(60)
@@ -289,6 +292,10 @@ class BParam < ActiveRecord::Base
 
   def display_email? # For revised form. If there aren't errors and there is an email, then we don't need to show
     true unless owner_email.present? && bike_errors.blank?
+  end
+
+  def set_calculated_attributes
+    self.organization_id = creation_organization_id
   end
 
   protected
