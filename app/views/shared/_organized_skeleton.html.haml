@@ -14,11 +14,14 @@
         %ul.organized-submenu
           %li
             = active_link (current_organization.bike_search? ? "Search" : "List"), organization_bikes_path(organization_id: current_organization.to_param), class_name: "nav-link"
-          %li
-            = active_link "Add a bike", new_organization_bike_path(current_organization), class_name: "nav-link"
           - if current_organization.show_recoveries?
             %li
               = active_link "Recoveries", recoveries_organization_bikes_path(current_organization), class_name: "nav-link"
+          - if current_organization.show_partial_registrations?
+            %li
+              = active_link "Incompletes", recoveries_organization_bikes_path(current_organization), class_name: "nav-link"
+          %li
+            = active_link "Add a bike", new_organization_bike_path(current_organization), class_name: "nav-link"
       - if current_organization.has_bike_codes
         %li
           %span.menu-item.top-level{ class: ("active" if controller_name == "stickers") }
