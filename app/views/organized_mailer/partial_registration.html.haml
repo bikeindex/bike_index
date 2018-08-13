@@ -1,7 +1,11 @@
 %h1
   You’re Almost Done!
 %p
-  You’re just a few steps away from registering your bike on the world’s most comprehensive bike registry!
+  You’re just a few steps away from registering your
+  %strong
+    = Color.find(@b_param.primary_frame_color_id).name if @b_param.primary_frame_color_id.present?
+    = @b_param.mnfg_name
+  on the world’s most comprehensive bike registry!
 %p
   Click below to complete your registration
 

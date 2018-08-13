@@ -329,6 +329,7 @@ describe BikesController do
               expect(bike.send(k)).to eq(v)
             end
             expect(response).to render_with_layout('application_revised')
+            expect(assigns(:organization)).to eq organization
           end
         end
         context 'invalid b_param' do
@@ -342,6 +343,15 @@ describe BikesController do
             expect(response).to render_with_layout('application_revised')
             expect(flash[:error]).to match(/sorry/i)
           end
+        end
+      end
+      context "created bike" do
+        let(:bike) { FactoryGirl.create(:bike) }
+        let(:b_param) { BParam.create(params: { bike: {} }, created_bike_id: bike.id, creator_id: user.id) }
+        it "redirects to the bike" do
+          expect(b_param.created_bike).to be_present
+          get :new, b_param_token: b_param.id_token
+          expect(response).to redirect_to(bike_path(bike.id))
         end
       end
     end
@@ -666,8 +676,8 @@ describe BikesController do
       end
       context 'existing b_param' do
         context 'no bike' do
-          it 'creates a bike' do
-            bike_params = {
+          let(:bike_params) do
+            {
               cycle_type_id: CycleType.bike.id.to_s,
               serial_number: 'example serial',
               manufacturer_other: '',
@@ -677,15 +687,18 @@ describe BikesController do
               secondary_frame_color_id: '',
               tertiary_frame_color_id: '',
               owner_email: 'something@stuff.com'
-            }.as_json
-            b_param = BParam.create(params: { 'bike' => bike_params }, origin: 'embed_partial')
+            }
+          end
+          it 'creates a bike' do
+            b_param = BParam.create(params: { 'bike' => bike_params.as_json }, origin: 'embed_partial')
+            expect(b_param.partial_registration?).to be_truthy
             bb_data = { bike: {} }
             # We need to call clean_params on the BParam after bikebook update, so that
             # the foreign keys are assigned correctly. This is how we test that we're
             # This is also where we're testing bikebook assignment
             expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
             expect do
-              post :create, bike: { manufacturer_id: manufacturer.slug, b_param_id_token: b_param.id_token }
+              post :create, bike: { manufacturer_id: manufacturer.slug, b_param_id_token: b_param.id_token, address: "188 King St" }
             end.to change(Bike, :count).by(1)
             expect(flash[:success]).to be_present
             bike = Bike.last
@@ -697,6 +710,7 @@ describe BikesController do
             expect(bike.manufacturer).to eq manufacturer
             expect(bike.creation_state.origin).to eq 'embed_partial'
             expect(bike.creation_state.creator).to eq bike.creator
+            expect(bike.registration_address).to eq "188 King St"
           end
         end
         context 'created bike' do

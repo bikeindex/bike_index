@@ -118,4 +118,12 @@ class Manufacturer < ActiveRecord::Base
   def search_id
     "m_#{id}"
   end
+
+  def other?
+    name == "Other"
+  end
+
+  def simple_name
+    name.gsub(/\s?\([^\)]*\)/i, "")
+  end
 end

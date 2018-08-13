@@ -4,9 +4,9 @@
   %h1
     Enter #{@bike.type} details
 = form_for @bike, multipart: true do |f|
-  = f.hidden_field :b_param_id_token
-  - if @bike.creation_organization_id.present?
-    = f.hidden_field :creation_organization_id
+  = f.hidden_field :b_param_id_token, value: @b_param&.id_token
+  - if @organization.present?
+    = f.hidden_field :creation_organization_id, value: @organization.id
   - if @bike.stolen?
     = f.hidden_field :stolen, value: true
     = hidden_field_tag :stolen, value: true
@@ -83,6 +83,14 @@
               = render partial: '/bikes/bike_fields/stolen_location', locals: { srecord: srecord }
           / Commenting out for now, more trouble than it's worth
           / # - if @b_param.display_email?
+          - if @organization.present? && @organization.require_address_on_registration
+            .form-group.row.unnested-field.no-divider-row
+              = f.label :address, class: 'form-well-label'
+              .form-well-input
+                = f.text_field :address, required: true, placeholder: 'required', class: 'form-control'
+                %span.below-input-help
+                  Your address is required by #{@organization.short_name}
+
           .form-group.row.unnested-field.no-divider-row
             = f.label :owner_email, class: 'form-well-label'
             .form-well-input
