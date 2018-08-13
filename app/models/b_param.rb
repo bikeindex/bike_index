@@ -16,51 +16,7 @@ class BParam < ActiveRecord::Base
   scope :partial_registrations, -> { where(origin: "embed_partial") }
 
   before_create :generate_id_token
-  before_save :set_calculated_attributes
-
-  # Crazy new shit
-  def manufacturer_id=(val)
-    params['bike']['manufacturer_id'] = val
-  end
-
-  def creation_organization_id=(val)
-    params['bike']['creation_organization_id'] = val
-  end
-
-  def owner_email=(val)
-    params['bike']['owner_email'] = val
-  end
-
-  def stolen=(val)
-    params['bike']['stolen'] = ActiveRecord::Type::Boolean.new.type_cast_from_database(val)
-  end
-
-  def primary_frame_color_id=(val)
-    params['bike']['primary_frame_color_id'] = val
-  end
-  def secondary_frame_color_id=(val)
-    params['bike']['secondary_frame_color_id'] = val
-  end
-  def tertiary_frame_color_id=(val)
-    params['bike']['tertiary_frame_color_id'] = val
-  end
-
-  def bike; (params && params['bike'] || {}).with_indifferent_access end
-  def primary_frame_color_id; bike['primary_frame_color_id'] end
-  def primary_frame_color; primary_frame_color_id && Color.find(primary_frame_color_id).name end
-  def secondary_frame_color_id; bike['secondary_frame_color_id'] end
-  def tertiary_frame_color_id; bike['tertiary_frame_color_id'] end
-  def manufacturer_id; bike['manufacturer_id'] end
-  def stolen; bike['stolen'] end
-  def is_pos; bike['is_pos'] || false end
-  def is_new; bike['is_new'] || false end
-  def is_bulk; bike['is_bulk'] || false end
-  def no_duplicate; bike['no_duplicate'] || false end
-  def bike_code; bike["bike_code"] end
-
-  def creation_organization; Organization.friendly_find(creation_organization_id) end
-  def manufacturer; bike['manufacturer_id'] && Manufacturer.friendly_find(bike['manufacturer_id']) end
-  def partial_registration?; origin == "embed_partial" end
+  before_save :clean_params
 
   def self.v2_params(hash)
     h = hash['bike'].present? ? hash : { 'bike' => hash.with_indifferent_access }
@@ -118,15 +74,60 @@ class BParam < ActiveRecord::Base
     where("email ilike ?", "%#{str.strip}%")
   end
 
+  # Crazy new shit
+  def manufacturer_id=(val)
+    params['bike']['manufacturer_id'] = val
+  end
+
+  def creation_organization_id=(val)
+    params['bike']['creation_organization_id'] = val
+  end
+
+  def owner_email=(val)
+    params['bike']['owner_email'] = val
+  end
+
+  def stolen=(val)
+    params['bike']['stolen'] = ActiveRecord::Type::Boolean.new.type_cast_from_database(val)
+  end
+
+  def primary_frame_color_id=(val)
+    params['bike']['primary_frame_color_id'] = val
+  end
+  def secondary_frame_color_id=(val)
+    params['bike']['secondary_frame_color_id'] = val
+  end
+  def tertiary_frame_color_id=(val)
+    params['bike']['tertiary_frame_color_id'] = val
+  end
+
+  def bike; (params && params['bike'] || {}).with_indifferent_access end
+  def primary_frame_color_id; bike['primary_frame_color_id'] end
+  def secondary_frame_color_id; bike['secondary_frame_color_id'] end
+  def tertiary_frame_color_id; bike['tertiary_frame_color_id'] end
+  def manufacturer_id; bike['manufacturer_id'] end
+  def stolen; bike['stolen'] end
+  def is_pos; bike['is_pos'] || false end
+  def is_new; bike['is_new'] || false end
+  def is_bulk; bike['is_bulk'] || false end
+  def no_duplicate; bike['no_duplicate'] || false end
+  def bike_code; bike["bike_code"] end
+
+  def creation_organization; Organization.friendly_find(creation_organization_id) end
+  def manufacturer; bike['manufacturer_id'] && Manufacturer.friendly_find(bike['manufacturer_id']) end
+  def partial_registration?; origin == "embed_partial" end
+  def primary_frame_color; primary_frame_color_id && Color.find(primary_frame_color_id).name end
+
   # Right now this is a partial update. It's improved from where it was, but it still uses the BikeCreator
   # code for protection. Ideally, we would use the revised merge code to ensure we aren't letting users
   # write illegal things to the bikes
-  before_save :clean_params
   def clean_params(updated_params = {}) # So we can pass in the params
     self.params ||= { bike: {} } # ensure valid json object
     self.params = params.with_indifferent_access.deep_merge(updated_params.with_indifferent_access)
     massage_if_v2
     set_foreign_keys
+    self.organization_id = creation_organization_id
+    self.email = owner_email
     self
   end
 
@@ -286,7 +287,7 @@ class BParam < ActiveRecord::Base
   end
 
   def creation_organization_id
-    bike && bike['creation_organization_id'] || params["creation_organization_id"]
+    bike && bike["creation_organization_id"] || params && params["creation_organization_id"]
   end
 
   def owner_email
@@ -295,11 +296,6 @@ class BParam < ActiveRecord::Base
 
   def display_email? # For revised form. If there aren't errors and there is an email, then we don't need to show
     true unless owner_email.present? && bike_errors.blank?
-  end
-
-  def set_calculated_attributes
-    self.organization_id = creation_organization_id
-    self.email = owner_email
   end
 
   protected

@@ -103,7 +103,7 @@ describe Organized::BikesController, type: :controller do
           {
             bike: {
               manufacturer_id: Manufacturer.other.id,
-              primary_frame_color_id: Color.black,
+              primary_frame_color_id: Color.black.id,
               owner_email: "something@stuff.com",
               creation_organization_id: organization.id
             }

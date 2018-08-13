@@ -114,6 +114,7 @@ class Bike < ActiveRecord::Base
     end
 
     def organized_email_search(query)
+      return all unless query.present?
       where("owner_email ilike ?", "%#{query.strip}%")
     end
 
