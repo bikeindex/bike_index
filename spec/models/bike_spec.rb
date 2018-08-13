@@ -441,11 +441,10 @@ describe Bike do
     end
     it 'sets a bikes mnfg_name' do
       manufacturer = FactoryGirl.create(:manufacturer, name: 'Other')
-      bike = Bike.new
+      bike = Bike.new(manufacturer_other: '<a href="bad_site.js">stuff</a>')
       allow(bike).to receive(:manufacturer).and_return(manufacturer)
-      allow(bike).to receive(:manufacturer_other).and_return('<a href="bad_site.js">stuff</a>')
       bike.set_mnfg_name
-      expect(bike.mnfg_name).to eq('stuff')
+      expect(bike.mnfg_name).to eq("stuff")
     end
     it 'has before_save_callback_method defined for set_mnfg_name' do
       expect(Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_mnfg_name)).to eq(true)

@@ -26,11 +26,13 @@ class Location < ActiveRecord::Base
 
   def address
     return nil unless self.country
-    a = []
-    a << street
-    a << city
-    a << state.abbreviation if state.present?
-    (a+[zipcode, country.name]).compact.join(', ')
+    [
+      street,
+      city,
+      state.present? ? state.abbreviation : nil,
+      zipcode, 
+      country.name
+    ].compact.reject(&:blank?).join(", ")
   end
 
   def set_phone
