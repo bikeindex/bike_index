@@ -1,19 +1,20 @@
 shared_context :geocoder_default_location do
   let(:default_location) do
     {
-      latitude:  40.7143528,
+      latitude: 40.7143528,
       longitude: -74.0059731,
-      address: 'New York, NY, USA',
-      state: 'New York',
-      state_code: 'NY',
-      country: 'United States',
-      country_code: 'US'
+      address: "New York, NY, USA",
+      formatted_address: "278 Broadway, New York, NY 10007, USA",
+      state: "New York",
+      state_code: "NY",
+      country: "United States",
+      country_code: "US"
     }
   end
 
   let(:geo_hash) do
     {
-      data: ['US', 'NY', 'New York', default_location[:latitude].to_s, default_location[:longitude].to_s],
+      data: ["US", "NY", "New York", default_location[:latitude].to_s, default_location[:longitude].to_s],
       cache_hit: true
     }
   end

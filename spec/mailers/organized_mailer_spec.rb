@@ -150,4 +150,20 @@ describe OrganizedMailer do
       expect(mail.reply_to).to eq([organization.auto_user.email])
     end
   end
+
+  describe "custom_message" do
+    context "geolocation" do
+      let(:organization_message) { FactoryGirl.create(:organization_message, organization: organization) }
+      let(:mail) { OrganizedMailer.custom_message(organization_message) }
+      before do
+        expect(header_mail_snippet).to be_present
+      end
+      it 'renders email' do
+        expect(mail.body.encoded).to match header_mail_snippet.body
+        expect(mail.body.encoded).to match "278 Broadway, New York, NY 10007, USA" # includes location
+        expect(mail.subject).to eq(organization_message.subject)
+        expect(mail.reply_to).to eq([organization_message.sender.email])
+      end
+    end
+  end
 end

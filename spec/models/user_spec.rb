@@ -232,17 +232,45 @@ describe User do
     end
   end
 
-  describe 'set_urls' do
-    xit "adds http:// to twitter and website if the url doesn't have it so that the link goes somewhere" do
-      user = User.new(show_twitter: true, twitter: 'http://somewhere.com', show_website: true, website: 'somewhere.org')
-      user.set_urls
-      expect(user.website).to eq('http://somewhere.org')
+  describe 'set_calculated_attributes' do
+    describe "title, urls" do
+      it "adds http:// to twitter and website if the url doesn't have it so that the link goes somewhere" do
+        user = User.new(show_twitter: true, twitter: 'http://somewhere.com', show_website: true, website: 'somewhere.org')
+        user.set_calculated_attributes
+        expect(user.website).to eq('http://somewhere.org')
+      end
+      it "does not add http:// to twitter if it's already there" do
+        user = User.new(show_twitter: true, twitter: 'http://somewhere.com', show_website: true, website: 'somewhere', my_bikes_link_target: 'https://something.com')
+        user.set_calculated_attributes
+        expect(user.my_bikes_hash[:link_target]).to eq('https://something.com')
+        expect(user.twitter).to eq('http://somewhere.com')
+        expect(user.bike_actions_organization).to be_nil
+      end
     end
-    it "does not add http:// to twitter if it's already there" do
-      user = User.new(show_twitter: true, twitter: 'http://somewhere.com', show_website: true, website: 'somewhere', my_bikes_link_target: 'https://something.com')
-      user.set_urls
-      expect(user.my_bikes_hash[:link_target]).to eq('https://something.com')
-      expect(user.twitter).to eq('http://somewhere.com')
+    describe "bike_actions_organization" do
+      let!(:user) { FactoryGirl.create(:organization_admin, organization: organization) }
+      context "organization without actions" do
+        let(:organization) { FactoryGirl.create(:organization) }
+        it "sets nil if there is no organization with bike actions" do
+          user.bike_actions_organization_id = organization.id
+          user.save # Also just testing that this is called in a callback, because stuff
+          expect(user.bike_actions_organization_id).to be_nil
+        end
+      end
+      context "two organizations with actions" do
+        let(:organization) { FactoryGirl.create(:organization, geolocated_emails: true, name: "aaaaa") }
+        let(:organization2) { FactoryGirl.create(:organization, abandoned_bike_emails: true, name: "XXXXX") }
+        it "It selects the first organization created" do
+          organization2.update_attribute :created_at, Time.now - 1.day
+          # default_scope is by name, using this to check we're sqling right and that we're actually reordering
+          # But it looks like rspec isn't honoring the default scope so whateves
+          expect(Organization.with_bike_actions.pluck(:id)).to match_array([organization.id, organization2.id])
+          FactoryGirl.create(:membership, user: user, organization: organization2)
+          user.update_attributes(updated_at: Time.now) # TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
+          user.reload
+          expect(user.bike_actions_organization).to eq organization2
+        end
+      end
     end
   end
 

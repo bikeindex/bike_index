@@ -77,10 +77,10 @@ describe Organization do
     end
   end
 
-  describe 'set_and_clean_attributes' do
+  describe 'set_calculated_attributes' do
     it 'sets the short_name and the slug on save' do
       organization = Organization.new(name: 'something')
-      organization.set_and_clean_attributes
+      organization.set_calculated_attributes
       expect(organization.short_name).to be_present
       expect(organization.slug).to be_present
       slug = organization.slug
@@ -91,7 +91,7 @@ describe Organization do
     it "doesn't xss" do
       org = Organization.new(name: '<script>alert(document.cookie)</script>',
                              website: '<script>alert(document.cookie)</script>')
-      org.set_and_clean_attributes
+      org.set_calculated_attributes
       expect(org.name).to match(/stop messing about/i)
       expect(org.website).to eq('http://<script>alert(document.cookie)</script>')
       expect(org.short_name).to match(/stop messing about/i)
@@ -102,69 +102,61 @@ describe Organization do
       org1.reload.save
       expect(org1.reload.slug).to eq('bicycle-shop')
       organization = Organization.new(name: 'Bicycle shop')
-      organization.set_and_clean_attributes
+      organization.set_calculated_attributes
       expect(organization.slug).to eq('bicycle-shop-2')
     end
-
-    it 'has before_save_callback_method defined for set_and_clean_attributes' do
-      expect(Organization._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_and_clean_attributes)).to eq(true)
-    end
-  end
-
-  describe 'set_locations_shown' do
-    let(:country) { FactoryGirl.create(:country) }
-    let(:organization) { FactoryGirl.create(:organization, show_on_map: true, approved: true) }
-    let(:location) { Location.create(country_id: country.id, city: 'Chicago', name: 'stuff', organization_id: organization.id, shown: true) }
-    context 'organization approved' do
-      it 'sets the locations shown to be org shown on save' do
-        expect(organization.allowed_show).to be_truthy
-        organization.set_locations_shown
-        expect(location.reload.shown).to be_truthy
+    describe 'set_locations_shown' do
+      let(:country) { FactoryGirl.create(:country) }
+      let(:organization) { FactoryGirl.create(:organization, show_on_map: true, approved: true) }
+      let(:location) { Location.create(country_id: country.id, city: 'Chicago', name: 'stuff', organization_id: organization.id, shown: true) }
+      context 'organization approved' do
+        it 'sets the locations shown to be org shown on save' do
+          expect(organization.allowed_show).to be_truthy
+          organization.set_calculated_attributes
+          expect(location.reload.shown).to be_truthy
+        end
+      end
+      context 'not approved' do
+        it 'sets not shown' do
+          organization.update_attribute :approved, false
+          organization.reload
+          expect(organization.allowed_show).to be_falsey
+          organization.set_calculated_attributes
+          expect(location.reload.shown).to be_falsey
+        end
       end
     end
-    context 'not approved' do
-      it 'sets not shown' do
-        organization.update_attribute :approved, false
-        organization.reload
-        expect(organization.allowed_show).to be_falsey
-        organization.set_locations_shown
-        expect(location.reload.shown).to be_falsey
-      end
-    end
-    it 'has before_save_callback_method defined for set_locations_shown' do
-      expect(Organization._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_locations_shown)).to eq(true)
-    end
-  end
 
-  describe 'set_auto_user' do
-    it 'sets the embedable user' do
-      organization = FactoryGirl.create(:organization)
-      user = FactoryGirl.create(:confirmed_user, email: 'embed@org.com')
-      FactoryGirl.create(:membership, organization: organization, user: user)
-      organization.embedable_user_email = 'embed@org.com'
-      organization.save
-      expect(organization.reload.auto_user_id).to eq(user.id)
-    end
-    it 'does not set the embedable user if user is not a member' do
-      organization = FactoryGirl.create(:organization)
-      FactoryGirl.create(:confirmed_user, email: 'no_embed@org.com')
-      organization.embedable_user_email = 'no_embed@org.com'
-      organization.save
-      expect(organization.reload.auto_user_id).to be_nil
-    end
-    it 'Makes a membership if the user is auto user' do
-      organization = FactoryGirl.create(:organization)
-      user = FactoryGirl.create(:confirmed_user, email: ENV['AUTO_ORG_MEMBER'])
-      organization.embedable_user_email = ENV['AUTO_ORG_MEMBER']
-      organization.save
-      expect(organization.reload.auto_user_id).to eq(user.id)
-    end
-    it "sets the embedable user if it isn't set and the org has members" do
-      organization = FactoryGirl.create(:organization)
-      user = FactoryGirl.create(:confirmed_user)
-      FactoryGirl.create(:membership, user: user, organization: organization)
-      organization.save
-      expect(organization.reload.auto_user_id).not_to be_nil
+    describe 'set_auto_user' do
+      it 'sets the embedable user' do
+        organization = FactoryGirl.create(:organization)
+        user = FactoryGirl.create(:confirmed_user, email: 'embed@org.com')
+        FactoryGirl.create(:membership, organization: organization, user: user)
+        organization.embedable_user_email = 'embed@org.com'
+        organization.save
+        expect(organization.reload.auto_user_id).to eq(user.id)
+      end
+      it 'does not set the embedable user if user is not a member' do
+        organization = FactoryGirl.create(:organization)
+        FactoryGirl.create(:confirmed_user, email: 'no_embed@org.com')
+        organization.embedable_user_email = 'no_embed@org.com'
+        organization.save
+        expect(organization.reload.auto_user_id).to be_nil
+      end
+      it 'Makes a membership if the user is auto user' do
+        organization = FactoryGirl.create(:organization)
+        user = FactoryGirl.create(:confirmed_user, email: ENV['AUTO_ORG_MEMBER'])
+        organization.embedable_user_email = ENV['AUTO_ORG_MEMBER']
+        organization.save
+        expect(organization.reload.auto_user_id).to eq(user.id)
+      end
+      it "sets the embedable user if it isn't set and the org has members" do
+        organization = FactoryGirl.create(:organization)
+        user = FactoryGirl.create(:confirmed_user)
+        FactoryGirl.create(:membership, user: user, organization: organization)
+        organization.save
+        expect(organization.reload.auto_user_id).not_to be_nil
+      end
     end
   end
 
@@ -235,6 +227,24 @@ describe Organization do
       it 'returns nil for not-enabled snippet' do
         expect(organization.mail_snippet_body(mail_snippet.name)).to eq mail_snippet.body
       end
+    end
+  end
+
+  describe "organization_message_kinds" do
+    let(:organization) { FactoryGirl.create(:organization) }
+    let!(:mail_snippet) { FactoryGirl.create(:mail_snippet, organization: organization, name: "abandoned_bike") }
+    let!(:user) { FactoryGirl.create(:organization_member, organization: organization) }
+    it "returns empty for non-geolocated_emails" do
+      expect(organization.organization_message_kinds).to eq([])
+      expect(organization.permitted_message_kind?(nil)).to be_falsey
+      expect(mail_snippet).to be_present
+      expect(user.bike_actions_organization_id).to eq nil
+      organization.update_attributes(geolocated_emails: true, abandoned_bike_emails: true)
+      expect(organization.organization_message_kinds).to match_array(%w[geolocated abandoned_bike])
+      expect(organization.permitted_message_kind?("abandoned_bike")).to be_truthy
+      # TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
+      user.update_attributes(updated_at: Time.now)
+      expect(user.bike_actions_organization_id).to eq organization.id
     end
   end
 end

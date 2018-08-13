@@ -26,6 +26,14 @@
           %ul.organized-submenu
             %li
               = active_link "List", organization_stickers_path(organization_id: current_organization.to_param), class_name: "nav-link"
+      - if current_organization.organization_message_kinds.any?
+        %li
+          %span.menu-item.top-level{ class: ("active" if controller_name == "messages") }
+            Messages
+          %ul.organized-submenu
+            - current_organization.organization_message_kinds.each do |message_kind|
+              %li
+                = link_to message_kind.titleize, organization_messages_path(organization_id: current_organization.to_param, kind: message_kind), class: "nav-link #{ params[:kind] == message_kind ? "active" : "" }"
       - if current_user.is_admin_of?(current_organization)
         %li
           - manage_active = %w(users manage emails).include?(controller_name)

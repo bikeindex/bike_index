@@ -45,14 +45,7 @@
       %dt Paid
       %dd
         - if @organization.is_paid
-          <strong>true</strong> - 
-          - if @organization.landing_html.present?
-            - if LandingPages::ORGANIZATIONS.include?(@organization.slug)
-              = link_to 'public landing page', "#{ENV['BASE_URL']}/#{@organization.slug}"
-            - else
-              landing page is not public - #{ link_to 'landing page', organization_landing_path(organization_id: @organization.to_param) }
-          - else
-            no landing page
+          <strong>true</strong>
         - else
           - if LandingPages::ORGANIZATIONS.include?(@organization.slug)
             %alert.alert-danger
@@ -71,6 +64,42 @@
     - if @organization.is_suspended
       %h2.red-text
         Organization is suspended
+
+  - if @organization.is_paid
+    .well
+      .clearfix
+        %dl.dl-horizontal
+          %dt
+            Templates
+          %dd
+            - if @organization.mail_snippets.any?
+              = @organization.mail_snippets.pluck(:name).to_sentence
+            - else
+              %small.less-strong
+                none
+          %dt
+            Landing Page
+          %dd
+            - if @organization.landing_html.present?
+              - if LandingPages::ORGANIZATIONS.include?(@organization.slug)
+                = link_to 'public landing page', "#{ENV['BASE_URL']}/#{@organization.slug}"
+              - else
+                landing page is not public - #{ link_to 'landing page', organization_landing_path(organization_id: @organization.to_param) }
+            - else
+              %small.less-strong
+                no landing page
+          %dt
+            Org emails
+          %dd
+            = @organization.organization_message_kinds.to_sentence
+          %dt
+            Stickers
+          %dd
+            - if @organization.has_bike_codes
+              = link_to "Has stickers", organization_stickers_path(organization_id: @organization.to_param)
+            - else
+              %small.less-strong
+                no
 
 
 

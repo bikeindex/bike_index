@@ -1,0 +1,37 @@
+.organized-page-header
+  %h1
+    %em
+      = current_organization.name
+    #{@kind.titleize} Messages
+
+%table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
+  %thead.small-header
+    %th
+      Sent&nbsp;<small class="convertTimezone"></small>
+    %th
+      Bike
+    %th
+      Sender
+    %th
+      Address
+  %tbody
+    - @organization_messages.each do |organization_message|
+      %tr
+        %td
+          %a.convertTime{ href: organization_message_path(organization_message, organization_id: current_organization.to_param) }
+            = l organization_message.created_at, format: :convert_time
+          - if organization_message.delivery_status != "success"
+            %br
+            - if organization_message.delivery_status.blank?
+              %em.text-warning
+                Pending
+            - else
+              %span.text-danger
+                = organization_message.delivery_status
+        %td
+          %a{ href: bike_path(organization_message.bike) }
+          = link_to organized_bike_text(organization_message.bike), bike_path(organization_message.bike)
+        %td
+          = organization_message.sender.display_name
+        %td
+          = organization_message.address

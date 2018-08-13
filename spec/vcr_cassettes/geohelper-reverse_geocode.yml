@@ -1,0 +1,489 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://maps.googleapis.com/maps/api/geocode/json?language=en&latlng=42.8490197,-106.3015341&sensor=false
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Wed, 01 Aug 2018 15:30:43 GMT
+      Expires:
+      - Thu, 02 Aug 2018 15:30:43 GMT
+      Cache-Control:
+      - public, max-age=86400
+      Access-Control-Allow-Origin:
+      - "*"
+      Server:
+      - mafe
+      Content-Length:
+      - '1318'
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Frame-Options:
+      - SAMEORIGIN
+      Alt-Svc:
+      - quic=":443"; ma=2592000; v="44,43,39,35"
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+           "results" : [
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "1740",
+                       "short_name" : "1740",
+                       "types" : [ "street_number" ]
+                    },
+                    {
+                       "long_name" : "East 2nd Street",
+                       "short_name" : "E 2nd St",
+                       "types" : [ "route" ]
+                    },
+                    {
+                       "long_name" : "Casper",
+                       "short_name" : "Casper",
+                       "types" : [ "locality", "political" ]
+                    },
+                    {
+                       "long_name" : "Natrona County",
+                       "short_name" : "Natrona County",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "Wyoming",
+                       "short_name" : "WY",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    },
+                    {
+                       "long_name" : "82601",
+                       "short_name" : "82601",
+                       "types" : [ "postal_code" ]
+                    },
+                    {
+                       "long_name" : "3007",
+                       "short_name" : "3007",
+                       "types" : [ "postal_code_suffix" ]
+                    }
+                 ],
+                 "formatted_address" : "1740 E 2nd St, Casper, WY 82601, USA",
+                 "geometry" : {
+                    "bounds" : {
+                       "northeast" : {
+                          "lat" : 42.8490078,
+                          "lng" : -106.3013532
+                       },
+                       "southwest" : {
+                          "lat" : 42.8489134,
+                          "lng" : -106.3015509
+                       }
+                    },
+                    "location" : {
+                       "lat" : 42.8489622,
+                       "lng" : -106.3014293
+                    },
+                    "location_type" : "ROOFTOP",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 42.85030958029149,
+                          "lng" : -106.3001030697085
+                       },
+                       "southwest" : {
+                          "lat" : 42.84761161970849,
+                          "lng" : -106.3028010302915
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJd_2x8IC8YIcRXpq0Mx1lH78",
+                 "types" : [ "premise" ]
+              },
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "124",
+                       "short_name" : "124",
+                       "types" : [ "street_number" ]
+                    },
+                    {
+                       "long_name" : "South Lowell Street",
+                       "short_name" : "S Lowell St",
+                       "types" : [ "route" ]
+                    },
+                    {
+                       "long_name" : "Casper",
+                       "short_name" : "Casper",
+                       "types" : [ "locality", "political" ]
+                    },
+                    {
+                       "long_name" : "Natrona County",
+                       "short_name" : "Natrona County",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "Wyoming",
+                       "short_name" : "WY",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    },
+                    {
+                       "long_name" : "82601",
+                       "short_name" : "82601",
+                       "types" : [ "postal_code" ]
+                    },
+                    {
+                       "long_name" : "2733",
+                       "short_name" : "2733",
+                       "types" : [ "postal_code_suffix" ]
+                    }
+                 ],
+                 "formatted_address" : "124 S Lowell St, Casper, WY 82601, USA",
+                 "geometry" : {
+                    "location" : {
+                       "lat" : 42.8495731,
+                       "lng" : -106.3013868
+                    },
+                    "location_type" : "ROOFTOP",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 42.8509220802915,
+                          "lng" : -106.3000378197085
+                       },
+                       "southwest" : {
+                          "lat" : 42.8482241197085,
+                          "lng" : -106.3027357802915
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJ_Vmo6IC8YIcRtqJk1uMfymA",
+                 "types" : [ "street_address" ]
+              },
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "Casper",
+                       "short_name" : "Casper",
+                       "types" : [ "locality", "political" ]
+                    },
+                    {
+                       "long_name" : "Natrona County",
+                       "short_name" : "Natrona County",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "Wyoming",
+                       "short_name" : "WY",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    }
+                 ],
+                 "formatted_address" : "Casper, WY, USA",
+                 "geometry" : {
+                    "bounds" : {
+                       "northeast" : {
+                          "lat" : 42.9079695,
+                          "lng" : -106.2176299
+                       },
+                       "southwest" : {
+                          "lat" : 42.735236,
+                          "lng" : -106.4321299
+                       }
+                    },
+                    "location" : {
+                       "lat" : 42.8500769,
+                       "lng" : -106.3251749
+                    },
+                    "location_type" : "APPROXIMATE",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 42.9079695,
+                          "lng" : -106.2176299
+                       },
+                       "southwest" : {
+                          "lat" : 42.735236,
+                          "lng" : -106.4321299
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJY3peyGWTYIcRUz40Fzn8zmk",
+                 "types" : [ "locality", "political" ]
+              },
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "82601",
+                       "short_name" : "82601",
+                       "types" : [ "postal_code" ]
+                    },
+                    {
+                       "long_name" : "Casper",
+                       "short_name" : "Casper",
+                       "types" : [ "locality", "political" ]
+                    },
+                    {
+                       "long_name" : "Natrona County",
+                       "short_name" : "Natrona County",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "Wyoming",
+                       "short_name" : "WY",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    }
+                 ],
+                 "formatted_address" : "Casper, WY 82601, USA",
+                 "geometry" : {
+                    "bounds" : {
+                       "northeast" : {
+                          "lat" : 43.4153499,
+                          "lng" : -106.073188
+                       },
+                       "southwest" : {
+                          "lat" : 42.6724999,
+                          "lng" : -106.6782201
+                       }
+                    },
+                    "location" : {
+                       "lat" : 43.0981345,
+                       "lng" : -106.3934777
+                    },
+                    "location_type" : "APPROXIMATE",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 43.4153499,
+                          "lng" : -106.073188
+                       },
+                       "southwest" : {
+                          "lat" : 42.6724999,
+                          "lng" : -106.6782201
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJISsLkDuFYIcRr5xjNr8ioNE",
+                 "postcode_localities" : [ "Bar Nunn", "Casper" ],
+                 "types" : [ "postal_code" ]
+              },
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "Casper, WY",
+                       "short_name" : "Casper, WY",
+                       "types" : [ "political" ]
+                    },
+                    {
+                       "long_name" : "Natrona County",
+                       "short_name" : "Natrona County",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "Wyoming",
+                       "short_name" : "WY",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    }
+                 ],
+                 "formatted_address" : "Casper, WY, WY, USA",
+                 "geometry" : {
+                    "bounds" : {
+                       "northeast" : {
+                          "lat" : 43.501897,
+                          "lng" : -106.0705689
+                       },
+                       "southwest" : {
+                          "lat" : 42.430488,
+                          "lng" : -107.543526
+                       }
+                    },
+                    "location" : {
+                       "lat" : 42.8313837,
+                       "lng" : -106.912251
+                    },
+                    "location_type" : "APPROXIMATE",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 43.501897,
+                          "lng" : -106.0705689
+                       },
+                       "southwest" : {
+                          "lat" : 42.430488,
+                          "lng" : -107.543526
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJ4x9ZOMs7XocRUfUX9JnLZY4",
+                 "types" : [ "political" ]
+              },
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "Natrona County",
+                       "short_name" : "Natrona County",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "Wyoming",
+                       "short_name" : "WY",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    }
+                 ],
+                 "formatted_address" : "Natrona County, WY, USA",
+                 "geometry" : {
+                    "bounds" : {
+                       "northeast" : {
+                          "lat" : 43.501898,
+                          "lng" : -106.0705689
+                       },
+                       "southwest" : {
+                          "lat" : 42.430488,
+                          "lng" : -107.543526
+                       }
+                    },
+                    "location" : {
+                       "lat" : 42.8313837,
+                       "lng" : -106.912251
+                    },
+                    "location_type" : "APPROXIMATE",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 43.501898,
+                          "lng" : -106.0705689
+                       },
+                       "southwest" : {
+                          "lat" : 42.430488,
+                          "lng" : -107.543526
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJ6ZENbZKQYIcR1BVum_c3z9s",
+                 "types" : [ "administrative_area_level_2", "political" ]
+              },
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "Wyoming",
+                       "short_name" : "WY",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    }
+                 ],
+                 "formatted_address" : "Wyoming, USA",
+                 "geometry" : {
+                    "bounds" : {
+                       "northeast" : {
+                          "lat" : 45.005904,
+                          "lng" : -104.0522449
+                       },
+                       "southwest" : {
+                          "lat" : 40.994746,
+                          "lng" : -111.056889
+                       }
+                    },
+                    "location" : {
+                       "lat" : 43.0759678,
+                       "lng" : -107.2902839
+                    },
+                    "location_type" : "APPROXIMATE",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 45.005904,
+                          "lng" : -104.0522449
+                       },
+                       "southwest" : {
+                          "lat" : 40.994746,
+                          "lng" : -111.056889
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJaS7hSDTiXocRLzh90nkisCY",
+                 "types" : [ "administrative_area_level_1", "political" ]
+              },
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    }
+                 ],
+                 "formatted_address" : "United States",
+                 "geometry" : {
+                    "bounds" : {
+                       "northeast" : {
+                          "lat" : 71.5388001,
+                          "lng" : -66.885417
+                       },
+                       "southwest" : {
+                          "lat" : 18.7763,
+                          "lng" : 170.5957
+                       }
+                    },
+                    "location" : {
+                       "lat" : 37.09024,
+                       "lng" : -95.712891
+                    },
+                    "location_type" : "APPROXIMATE",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 49.38,
+                          "lng" : -66.94
+                       },
+                       "southwest" : {
+                          "lat" : 25.82,
+                          "lng" : -124.39
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJCzYy5IS16lQRQrfeQ5K5Oxw",
+                 "types" : [ "country", "political" ]
+              }
+           ],
+           "status" : "OK"
+        }
+    http_version: 
+  recorded_at: Wed, 01 Aug 2018 15:30:43 GMT
+recorded_with: VCR 4.0.0

@@ -1,0 +1,17 @@
+%h1
+  Your #{@bike.title_string}
+
+%p
+  Is located at:
+  %strong
+    = @organization_message.address
+
+%p
+  %strong
+    #{@organization_message.body}
+
+<img class="geolocated-message-map" src="https://maps.googleapis.com/maps/api/staticmap?center=#{@organization_message.latitude},#{@organization_message.longitude}&zoom=13&size=640x400&maptype=roadmap&scale=2&markers=color:red%7C#{@organization_message.latitude},#{@organization_message.longitude}&key=#{ENV["GOOGLE_MAPS_STATIC"]}">
+
+%p
+  %em
+    Sent by: #{@organization_message.sender.display_name} at #{@organization_message.organization.name}

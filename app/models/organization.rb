@@ -10,6 +10,7 @@ class Organization < ActiveRecord::Base
   has_many :mail_snippets
   has_many :users, through: :memberships
   has_many :organization_invitations, dependent: :destroy
+  has_many :organization_messages
   has_many :bike_organizations
   has_many :bikes, through: :bike_organizations
   # has_many :bikes, foreign_key: 'creation_organization_id'
@@ -27,7 +28,6 @@ class Organization < ActiveRecord::Base
   has_many :public_images, as: :imageable, dependent: :destroy
 
   validates_presence_of :name
-
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact admin@bikeindex.org"
 
   default_scope { order(:name) }
@@ -40,6 +40,12 @@ class Organization < ActiveRecord::Base
   scope :manufacturer, -> { where(org_type: 'manufacturer') }
   scope :paid, -> { where(is_paid: true) }
   scope :valid, -> { where(is_suspended: false) }
+  scope :valid, -> { where(is_suspended: false) }
+  # Eventually there will be other actions beside organization_messages, but for now it's just messages
+  scope :with_bike_actions, -> { where("organizations.geolocated_emails = ? OR organizations.abandoned_bike_emails = ?", true, true) }
+
+  before_validation :set_calculated_attributes
+  after_commit :update_user_bike_actions_organizations
 
   def self.friendly_find(n)
     return nil unless n.present?
@@ -69,24 +75,42 @@ class Organization < ActiveRecord::Base
     snippet && snippet.body
   end
 
-  before_save :set_and_clean_attributes
-  before_save :set_access_token
-  before_save :set_auto_user
-  before_save :set_locations_shown
+  def organization_message_kinds # Matches organization_message kinds
+    [
+      (geolocated_emails ? "geolocated" : nil),
+      (abandoned_bike_emails ? "abandoned_bike" : nil)
+    ].compact
+  end
 
-  def set_and_clean_attributes
+  def permitted_message_kind?(kind)
+    organization_message_kinds.include?(kind.to_s)
+  end
+
+  def bike_actions? # Eventually there will be other actions beside organization_messages, so use this as general reference
+    organization_message_kinds.any?
+  end
+
+  def set_calculated_attributes
+    return true unless name.present?
     self.name = strip_tags(name)
     self.name = "Stop messing about" unless name[/\d|\w/].present?
     self.website = Urlifyer.urlify(website) if website.present?
     self.short_name = (short_name || name).truncate(30)
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, '')
-    # If the organization exists, don't invalidate because of it's own slug
-    orgs = id.present? ? Organization.where('id != ?', id) : Organization.all
-    while orgs.where(slug: new_slug).exists?
-      i = i.present? ? i + 1 : 2
-      new_slug = "#{new_slug}-#{i}"
+    if new_slug != slug
+      # If the organization exists, don't invalidate because of it's own slug
+      orgs = id.present? ? Organization.where('id != ?', id) : Organization.all
+      while orgs.where(slug: new_slug).exists?
+        i = i.present? ? i + 1 : 2
+        new_slug = "#{new_slug}-#{i}"
+      end
+      self.slug = new_slug
     end
-    self.slug = new_slug
+    generate_access_token unless self.access_token.present?
+    set_auto_user
+    update_user_bike_actions_organizations
+    locations.each { |l| l.save unless l.shown == allowed_show }
+    true # legacy bs rails concerns
   end
 
   def ensure_auto_user
@@ -114,6 +138,14 @@ class Organization < ActiveRecord::Base
     end
   end
 
+  def update_user_bike_actions_organizations
+    if bike_actions?
+      users.where("bike_actions_organization_id IS NULL or bike_actions_organization_id != ?", id)
+    else
+      users.where(bike_actions_organization_id: id)
+    end.each { |u| u.update_attributes(updated_at: Time.now) } # Force updating
+  end
+
   def allowed_show
     show_on_map && approved
   end
@@ -122,17 +154,8 @@ class Organization < ActiveRecord::Base
     is_paid && avatar.present?
   end
 
-  def set_locations_shown
-    # Locations set themselves on save
-    locations.each { |l| l.save unless l.shown == allowed_show }
-  end
-
   def suspended?
     is_suspended?
-  end
-
-  def set_access_token
-    generate_access_token unless self.access_token.present?
   end
 
   def generate_access_token

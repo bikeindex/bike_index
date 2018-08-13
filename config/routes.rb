@@ -275,6 +275,7 @@ Bikeindex::Application.routes.draw do
     resources :users, except: [:show]
     resources :emails
     resources :bulk_imports, only: [:index, :show, :new, :create]
+    resources :messages, only: [:index, :show, :create]
     resources :stickers, only: [:index, :show, :edit, :update]
   end
 

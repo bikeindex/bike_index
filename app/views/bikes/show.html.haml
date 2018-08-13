@@ -1,35 +1,8 @@
-= render partial: 'initial_modal_for_show'
+= render partial: "initial_modal_for_show"
 
-- if @bike.owner == current_user
-  .bike-edit-overlay
-    - if @bike.user_hidden
-      %p
-        %strong
-          This bike is hidden.
-        
-        No one can see it but you
-    %p
-      - if @bike.current_owner_exists
-        - if @bike.recovered
-          Thank you for recovering this #{@bike.type}!
-        - elsif @bike.stolen
-          We're really bummed your #{@bike.type} was stolen.
-        - else
-          Whoah, this awesome #{@bike.type} is yours!
+- if current_user.present? && (current_user.bike_actions_organization&.present? || @bike.owner == current_user)
+  = render partial: "bike_show_overlays"
 
-        - if @bike.public_images.any?
-          Add some more information about it.
-        - else
-          - if @bike.stolen
-            Add a picture so people know what to look for!
-          - else
-            Add a picture of it, so everyone can admire its beauty!
-      - elsif @bike.current_ownership
-        You sent this bike to
-        %em
-          = @bike.current_ownership.owner_email
-        but it hasn't been claimed yet. You can update it
-      = link_to  'Edit', edit_bike_path, class: 'btn btn-secondary'
 
 / Caching should go here:
 / - cache(@bike) do

@@ -21,3 +21,10 @@ $email-light-bg: #ddd;
   text-align: center;
   font-style: italic;
 }
+
+.geolocated-message-map {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 24px auto;
+}

@@ -1,0 +1,120 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://maps.googleapis.com/maps/api/geocode/json?address=3550%20W%20Shakespeare%20Ave,%2060647&language=en&sensor=false
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Wed, 01 Aug 2018 16:23:48 GMT
+      Expires:
+      - Thu, 02 Aug 2018 16:23:48 GMT
+      Cache-Control:
+      - public, max-age=86400
+      Access-Control-Allow-Origin:
+      - "*"
+      Server:
+      - mafe
+      Content-Length:
+      - '649'
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Frame-Options:
+      - SAMEORIGIN
+      Alt-Svc:
+      - quic=":443"; ma=2592000; v="44,43,39,35"
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+           "results" : [
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "3550",
+                       "short_name" : "3550",
+                       "types" : [ "street_number" ]
+                    },
+                    {
+                       "long_name" : "West Shakespeare Avenue",
+                       "short_name" : "W Shakespeare Ave",
+                       "types" : [ "route" ]
+                    },
+                    {
+                       "long_name" : "Logan Square",
+                       "short_name" : "Logan Square",
+                       "types" : [ "neighborhood", "political" ]
+                    },
+                    {
+                       "long_name" : "Chicago",
+                       "short_name" : "Chicago",
+                       "types" : [ "locality", "political" ]
+                    },
+                    {
+                       "long_name" : "Cook County",
+                       "short_name" : "Cook County",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "Illinois",
+                       "short_name" : "IL",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    },
+                    {
+                       "long_name" : "60647",
+                       "short_name" : "60647",
+                       "types" : [ "postal_code" ]
+                    },
+                    {
+                       "long_name" : "3536",
+                       "short_name" : "3536",
+                       "types" : [ "postal_code_suffix" ]
+                    }
+                 ],
+                 "formatted_address" : "3550 W Shakespeare Ave, Chicago, IL 60647, USA",
+                 "geometry" : {
+                    "location" : {
+                       "lat" : 41.9202661,
+                       "lng" : -87.7156846
+                    },
+                    "location_type" : "RANGE_INTERPOLATED",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 41.9216150802915,
+                          "lng" : -87.71433561970851
+                       },
+                       "southwest" : {
+                          "lat" : 41.9189171197085,
+                          "lng" : -87.71703358029151
+                       }
+                    }
+                 },
+                 "place_id" : "Ei4zNTUwIFcgU2hha2VzcGVhcmUgQXZlLCBDaGljYWdvLCBJTCA2MDY0NywgVVNBIhsSGQoUChIJm9ZhPWvND4gRlgAk98FUWaEQ3hs",
+                 "types" : [ "street_address" ]
+              }
+           ],
+           "status" : "OK"
+        }
+    http_version: 
+  recorded_at: Wed, 01 Aug 2018 16:23:48 GMT
+recorded_with: VCR 4.0.0
