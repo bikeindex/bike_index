@@ -47,7 +47,7 @@ class BParam < ActiveRecord::Base
 
   def bike; (params && params['bike'] || {}).with_indifferent_access end
   def primary_frame_color_id; bike['primary_frame_color_id'] end
-  def primary_frame_color; primary_frame_color_id && Color.where(id: primary_frame_color_id).first&.name end
+  def primary_frame_color; primary_frame_color_id && Color.find(primary_frame_color_id).name end
   def secondary_frame_color_id; bike['secondary_frame_color_id'] end
   def tertiary_frame_color_id; bike['tertiary_frame_color_id'] end
   def manufacturer_id; bike['manufacturer_id'] end
