@@ -288,4 +288,7 @@ img { max-width: 100%; } // don't break random stuff images!
   &.upitt {
     .submit-wrapper .btn { background: #102F59; }
   }
+  &.psu {
+    .submit-wrapper .btn { background: #074378; } 
+  }
 }
