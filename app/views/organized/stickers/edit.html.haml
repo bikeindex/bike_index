@@ -28,7 +28,7 @@
 = form_for @bike_code, { url: organization_sticker_path(id: @bike_code.code, organization_id: current_organization.to_param), action: "update", html: { class: "organized-form" } } do |f|
 
   .form-group.row
-    = f.label :bike_id, "Bike ID", class: "org-form-label"
+    = f.label :bike_id, "Bike ID/URL", class: "org-form-label"
     .form-well-input
       = f.text_field :bike_id, required: true, class: "form-control"
 
