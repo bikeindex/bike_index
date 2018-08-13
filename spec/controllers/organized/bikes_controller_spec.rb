@@ -101,7 +101,6 @@ describe Organized::BikesController, type: :controller do
       describe "incompletes" do
         let(:partial_reg_attrs) do
           {
-            origin: "embed_partial",
             bike: {
               manufacturer_id: Manufacturer.other.id,
               primary_frame_color_id: Color.black,
@@ -110,11 +109,11 @@ describe Organized::BikesController, type: :controller do
             }
           }
         end
-        let!(:partial_registration) { BParam.create(params: partial_reg_attrs) }
+        let!(:partial_registration) { BParam.create(params: partial_reg_attrs, origin: "embed_partial") }
         it "renders" do
           expect(partial_registration.organization).to eq organization
           get :incompletes, organization_id: organization.to_param
-          expect(assigns(:partial_registrations).pluck(:id)).to eq([partial_registration.id])
+          expect(assigns(:b_params).pluck(:id)).to eq([partial_registration.id])
           expect(response.status).to eq(200)
           expect(response).to render_template :incompletes
         end

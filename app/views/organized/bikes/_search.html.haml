@@ -13,7 +13,10 @@
         multiple: true
 
       = text_field_tag :query, params[:query], placeholder: 'Search bike descriptions', class: 'form-control query-field'
-      = text_field_tag :serial, params[:serial], placeholder: 'Search for serial number', class: 'form-control query-field'
+      .sidebyside-queries
+        = text_field_tag :email, params[:email], placeholder: 'Search owner email', class: 'form-control query-field email-field-too'
+        = text_field_tag :serial, params[:serial], placeholder: 'Search for serial number', class: 'form-control query-field email-field-too'
+
     .search-button-wrap
       = button_tag(type: 'submit', class: 'searchit btn btn-primary') do
         :plain
@@ -33,7 +36,7 @@
 
   - unless skip_view_just_stolen
     - if @stolenness == 'all'
-      %a.organized-bikes-stolenness-toggle{ href: organization_bikes_path(search_params.merge(stolenness: 'stolen')), data: { stolenness: 'stolen' } }
+      %a.pull-right.organized-bikes-stolenness-toggle{ href: organization_bikes_path(search_params.merge(stolenness: 'stolen')), data: { stolenness: 'stolen' } }
         view just stolen bikes
     - else
       %em
