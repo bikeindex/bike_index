@@ -10,8 +10,9 @@ class BParam < ActiveRecord::Base
   belongs_to :creator, class_name: 'User'
 
   scope :with_bike, -> { where('created_bike_id IS NOT NULL') }
-  scope :without_bike, -> { where('created_bike_id IS NULL') }
-  scope :without_creator, -> { where('creator_id IS NULL') }
+  scope :without_bike, -> { where(created_bike_id: nil) }
+  scope :without_creator, -> { where(creator_id: nil) }
+  scope :partial_registration, -> { where(origin: "embed_partial") }
 
   before_create :generate_id_token
 
@@ -56,6 +57,7 @@ class BParam < ActiveRecord::Base
 
   def creation_organization; Organization.friendly_find(creation_organization_id) end
   def manufacturer; bike['manufacturer_id'] && Manufacturer.friendly_find(bike['manufacturer_id']) end
+  def partial_registration?; origin == "embed_partial" end
 
   class << self
     def v2_params(hash)
@@ -105,7 +107,7 @@ class BParam < ActiveRecord::Base
     end
 
     def skipped_bike_attrs # Attrs that need to be skipped on bike assignment
-      %w(cycle_type_slug cycle_type_name rear_gear_type_slug front_gear_type_slug bike_code
+      %w(cycle_type_slug cycle_type_name rear_gear_type_slug front_gear_type_slug bike_code address
          handlebar_type_slug frame_material_slug is_bulk is_new is_pos no_duplicate)
     end
   end
@@ -237,6 +239,15 @@ class BParam < ActiveRecord::Base
             .where.not(id: bike.id).order(:created_at).first
     return nil unless dupe.present?
     self.update_attribute :created_bike_id, dupe.id
+  end
+
+  def mnfg_name
+    return nil unless manufacturer.present?
+    if manufacturer.other? && bike["manufacturer_other"].present?
+      Rails::Html::FullSanitizer.new.sanitize(bike["manufacturer_other"])
+    else
+      manufacturer.simple_name
+    end.strip.truncate(60)
   end
 
   def generate_id_token

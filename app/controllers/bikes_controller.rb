@@ -89,9 +89,11 @@ class BikesController < ApplicationController
       redirect_to new_user_path and return
     end
     find_or_new_b_param
+    redirect_to bike_path(@b_param.created_bike_id) and return if @b_param.created_bike.present?
     # Let them know if they sent an invalid b_param token
     flash[:error] = "Sorry! We couldn't find that bike" if @b_param.id.blank? && params[:b_param_token].present?
     @bike ||= @b_param.bike_from_attrs(is_stolen: params[:stolen], recovered: params[:recovered])
+    @organization = @bike.creation_organization
     if @bike.stolen
       @stolen_record = @bike.stolen_records.build(@b_param.params['stolen_record'])
       @stolen_record.country_id ||= Country.united_states.id

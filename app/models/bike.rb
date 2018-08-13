@@ -37,7 +37,7 @@ class Bike < ActiveRecord::Base
   has_many :ownerships, dependent: :destroy
   has_many :public_images, as: :imageable, dependent: :destroy
   has_many :components, dependent: :destroy
-  has_many :b_params, as: :created_bike
+  has_many :b_params, foreign_key: :created_bike_id
   has_many :duplicate_bike_groups, through: :normalized_serial_segments
   has_many :recovered_records, -> { recovered }, class_name: 'StolenRecord'
 
@@ -58,7 +58,7 @@ class Bike < ActiveRecord::Base
   validates_presence_of :primary_frame_color_id
 
   attr_accessor :other_listing_urls, :date_stolen, :receive_notifications,
-    :phone, :image, :b_param_id, :embeded,
+    :phone, :image, :b_param_id, :embeded, :address,
     :embeded_extended, :paint_name, :bike_image_cache, :send_email,
     :marked_user_hidden, :marked_user_unhidden, :b_param_id_token
 
@@ -69,6 +69,13 @@ class Bike < ActiveRecord::Base
   # "Recovered" bikes are bikes that were found and are waiting to be claimed. This is confusing and should be fixed
   # so that it no longer is the same word as stolen recoveries
   scope :non_recovered, -> { where(recovered: false) }
+
+  before_save :clean_frame_size
+  before_save :set_mnfg_name
+  before_save :set_user_hidden
+  before_save :normalize_attributes
+  before_save :set_paints
+  before_save :cache_bike
 
   include PgSearch
   pg_search_scope :pg_search, against: {
@@ -225,17 +232,15 @@ class Bike < ActiveRecord::Base
     nil
   end
 
-  before_save :set_mnfg_name
   def set_mnfg_name
     if manufacturer.name == 'Other' && manufacturer_other.present?
       n = Rails::Html::FullSanitizer.new.sanitize(manufacturer_other)
     else
-      n = manufacturer.name.gsub(/\s?\([^\)]*\)/i,'')
+      n = manufacturer.simple_name
     end
     self.mnfg_name = n.strip.truncate(60)
   end
 
-  before_save :set_user_hidden
   def set_user_hidden
     if marked_user_hidden.present? && marked_user_hidden.to_s != '0'
       self.hidden = true
@@ -247,7 +252,6 @@ class Bike < ActiveRecord::Base
     true
   end
 
-  before_save :normalize_attributes
   def normalize_attributes
     self.serial_number = 'absent' if serial_number.blank? || serial_number.strip.downcase == 'unknown'
     self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
@@ -263,7 +267,6 @@ class Bike < ActiveRecord::Base
     SerialNormalizer.new(serial: serial_number).save_segments(id)
   end
 
-  before_save :clean_frame_size
   def clean_frame_size
     return true unless frame_size.present? || frame_size_number.present?
     if frame_size.present? && frame_size.match(/\d+\.?\d*/).present?
@@ -311,7 +314,6 @@ class Bike < ActiveRecord::Base
     recovered_records.any?
   end
 
-  before_save :set_paints
   def set_paints
     self.paint_id = nil if paint_id.present? && paint_name.blank? && paint_name != nil
     return true unless paint_name.present?
@@ -324,6 +326,10 @@ class Bike < ActiveRecord::Base
 
   def paint_description
     paint.name.titleize if paint.present?
+  end
+
+  def registration_address # Goes along with organization.require_address_on_registration
+    b_params.first && b_params.first.bike["address"]
   end
 
   def frame_colors
@@ -366,7 +372,6 @@ class Bike < ActiveRecord::Base
     }
   end
 
-  before_save :cache_bike
   def cache_bike
     cache_stolen_attributes
     cache_photo

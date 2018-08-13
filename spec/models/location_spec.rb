@@ -23,11 +23,17 @@ describe Location do
       location = FactoryGirl.create(:location)
       expect(location.address).to be_a(String)
     end
-    it 'creates an address' do
-      c = Country.create(name: 'Neverland', iso: 'XXX')
-      s = State.create(country_id: c.id, name: 'BullShit', abbreviation: 'XXX')
-      location = FactoryGirl.create(:location, street: '300 Blossom Hill Dr', city: 'Lancaster', state_id: s.id, zipcode: '17601', country_id: c.id)
-      expect(location.address).to eq('300 Blossom Hill Dr, Lancaster, XXX, 17601, Neverland')
+    it "creates an address, ignoring blank fields" do
+      c = Country.create(name: "Neverland", iso: "XXX")
+      s = State.create(country_id: c.id, name: "BullShit", abbreviation: "XXX")
+      location = Location.new(street: "300 Blossom Hill Dr", city: "Lancaster", state_id: s.id, zipcode: "17601", country_id: c.id)
+      expect(location.address).to eq("300 Blossom Hill Dr, Lancaster, XXX, 17601, Neverland")
+      location.street = " "
+      expect(location.address).to eq("Lancaster, XXX, 17601, Neverland")
+    end
+    context "empty things" do
+      it "still returns what we want" do
+      end
     end
   end
 

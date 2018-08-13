@@ -125,6 +125,7 @@ describe RegistrationsController do
           b_param = BParam.last
           expect(b_param.owner_email).to eq 'something@stuff.com'
           expect(b_param.origin).to eq 'embed_partial'
+          expect(b_param.partial_registration?).to be_truthy
           expect(EmailPartialRegistrationWorker).to have_enqueued_sidekiq_job(b_param.id)
           expect(assigns(:simple_header)).to be_truthy
         end
@@ -147,6 +148,7 @@ describe RegistrationsController do
           end
           expect(b_param.origin).to eq 'embed_partial'
           expect(EmailPartialRegistrationWorker).to have_enqueued_sidekiq_job(b_param.id)
+          expect(b_param.partial_registration?).to be_truthy
         end
       end
     end

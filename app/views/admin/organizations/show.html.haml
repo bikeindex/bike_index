@@ -91,7 +91,18 @@
           %dt
             Org emails
           %dd
-            = @organization.organization_message_kinds.to_sentence
+            - if @organization.organization_message_kinds.any?
+              = @organization.organization_message_kinds.to_sentence
+            - else
+              <small class="less-strong">none</small>
+          %dt
+            Additional fields
+          %dd
+            - additional_fields = [@organization.use_additional_registration_field ? "Additional serial" : nil, @organization.require_address_on_registration ? "Requires address" : nil].compact
+            - if additional_fields.any?
+              = additional_fields.join(", ")
+            - else
+              <small class="less-strong">none</small>
           %dt
             Stickers
           %dd

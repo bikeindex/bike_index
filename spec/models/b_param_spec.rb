@@ -112,6 +112,22 @@ describe BParam do
     end
   end
 
+  describe "manufacturer_name" do
+    context "manufacturer_id" do
+      let(:manufacturer) { FactoryGirl.create(:manufacturer) }
+      let(:b_param) { BParam.new(params: { bike: { manufacturer_id: manufacturer.id } }.to_json) }
+      it "is the manufacturers name" do
+        expect(b_param.mnfg_name).to eq manufacturer.name
+      end
+    end
+    context "other" do
+      let(:b_param) { BParam.new(params: { bike: { manufacturer_id: Manufacturer.other.id, manufacturer_other: '<a href="bad_site.js">stuff</a>' } }.to_json) }
+      it "is a sanitized version" do
+        expect(b_param.mnfg_name).to eq("stuff")
+      end
+    end
+  end
+
   describe 'set_wheel_size_key' do
     it 'sets rear_wheel_size_id to the bsd submitted' do
       ws = FactoryGirl.create(:wheel_size, iso_bsd: 'Bike')

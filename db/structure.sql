@@ -1410,7 +1410,8 @@ CREATE TABLE public.organizations (
     geolocated_emails boolean DEFAULT false NOT NULL,
     abandoned_bike_emails boolean DEFAULT false NOT NULL,
     has_bike_codes boolean DEFAULT false NOT NULL,
-    has_bike_search boolean DEFAULT false NOT NULL
+    has_bike_search boolean DEFAULT false NOT NULL,
+    require_address_on_registration boolean DEFAULT false NOT NULL
 );
 
 
@@ -3531,4 +3532,6 @@ INSERT INTO schema_migrations (version) VALUES ('20180806172125');
 INSERT INTO schema_migrations (version) VALUES ('20180807161501');
 
 INSERT INTO schema_migrations (version) VALUES ('20180812192948');
+
+INSERT INTO schema_migrations (version) VALUES ('20180813004404');
 
