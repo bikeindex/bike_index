@@ -29,7 +29,7 @@ $ ->
       log "added key " + key
       window.authorizations.add "access_token", new ApiKeyAuthorization("access_token", key, "query")
     return
-  
+
   url = window.swagger_url
   window.swaggerUi = new SwaggerUi(
     url: url
@@ -71,8 +71,6 @@ $ ->
     addApiKeyAuthorization()
     localStorage.setItem('access_token', $('#input_apiKey').val())
     return
-
-  $('#header').headroom()
 
   $('.set-token').click (e) ->
     e.preventDefault()
