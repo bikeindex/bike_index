@@ -1,9 +1,10 @@
 scrollToRef = (event) ->
   event.preventDefault()
   target = $(event.target).attr('href')
-  $('body').animate( 
-    scrollTop: ($(target).offset().top - 10), 'fast' 
-  )
+  window.scrollTo({
+    top: $(target).offset().top - 90,
+    behavior: 'smooth'
+  })
 
 waypointer = ->
   for l in $('#navmenu-fixed a')
@@ -72,6 +73,7 @@ $ ->
     return
 
   $('#header').headroom()
+
   $('.set-token').click (e) ->
     e.preventDefault()
     $('#header').addClass('headroom--pinned').removeClass('headroom--unpinned')
@@ -80,14 +82,14 @@ $ ->
       input_key.val($(e.target).attr('data-token')).change()
       input_key.fadeIn('fast')
     )
-    
-  
+
+
   $('.newtoken-scope-check').change (e) ->
     app = $(e.target).parents('.application_list_box')
     link = app.find('.authorize_new_token_link')
     checked = app.find('.newtoken-scope-check input:checked')
     scopes = []
-    scopes.push($(s).attr('id')) for s in checked   
+    scopes.push($(s).attr('id')) for s in checked
     url = link.attr('data-base')
     url = "#{url}&scope=#{scopes.join('+')}" if scopes.length > 0
     link.attr('href', url).text(url)
@@ -112,4 +114,3 @@ $ ->
   window.setTimeout (->
     operationsAfterSwaggerLoads()
   ), 2000
-  
