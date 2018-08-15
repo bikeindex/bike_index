@@ -1,6 +1,7 @@
 module Organized
   class BulkImportsController < Organized::BaseController
     skip_before_filter :ensure_member!
+    skip_before_filter  :verify_authenticity_token, only: [:create]
     before_action :ensure_access_to_bulk_import!, except: [:create] # Because this checks ensure_admin
 
     def index
@@ -48,12 +49,13 @@ module Organized
     end
 
     def ensure_can_create_import!
-      @is_api = params[:api_token].present? # who cares about accept headers and file types ;)
+      @is_api = request.headers["Authorization"].present?
       if @is_api
         @current_user = current_organization.auto_user
-        return true if params[:api_token] == current_organization.access_token
+        return true if request.headers["Authorization"] == current_organization.access_token
         render json: { error: "Not permitted" }, status: 401 and return
       else
+        verify_authenticity_token
         ensure_access_to_bulk_import!
       end
     end
@@ -67,7 +69,11 @@ module Organized
     end
 
     def permitted_parameters
-      params.require(:bulk_import).permit([:file]).merge(user_id: current_user.id, organization_id: current_organization.id)
+      if params[:file].present?
+        { file: params[:file] }
+      else
+        params.require(:bulk_import).permit([:file])
+      end.merge(user_id: current_user.id, organization_id: current_organization.id)
     end
   end
 end

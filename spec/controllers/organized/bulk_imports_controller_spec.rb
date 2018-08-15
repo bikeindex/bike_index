@@ -143,7 +143,8 @@ describe Organized::BulkImportsController, type: :controller do
           let(:user) { nil }
           context "invalid API token" do
             it "returns JSON message" do
-              post :create, organization_id: organization.to_param, api_token: "a9s0dfsdf", bulk_import: { file: file }
+              request.headers.merge!("Authorization" => "a9s0dfsdf")
+              post :create, organization_id: organization.to_param, file: file
               expect(response.status).to eq(401)
               json_result = JSON.parse(response.body)
               expect(json_result["error"]).to be_present
@@ -152,7 +153,8 @@ describe Organized::BulkImportsController, type: :controller do
           context "valid" do
             it "returns JSON message" do
               unless ENV["TRAVIS"].present?
-                post :create, organization_id: organization.to_param, api_token: organization.access_token, bulk_import: { file: file }
+                request.headers.merge!("Authorization" => organization.access_token) # Rspec doesn't support headers key here. TODO: Rails 5 update
+                post :create, organization_id: organization.to_param, file: file
                 expect(response.status).to eq(201)
                 json_result = JSON.parse(response.body)
                 expect(json_result["success"]).to be_present
