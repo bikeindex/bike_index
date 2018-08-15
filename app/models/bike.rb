@@ -121,6 +121,18 @@ class Bike < ActiveRecord::Base
     def admin_text_search(query)
       query.present? ? admin_search(query) : all
     end
+
+    def friendly_find(bike_str)
+      return nil unless bike_str.present?
+      bike_str = bike_str.to_s.strip
+      if bike_str.match(/^\d+\z/) # it's only numbers, so it's a timestamp
+        bike_id = bike_str
+      else
+        bike_id = bike_str.match(/bikes\/\d*/i)
+        bike_id = bike_id && bike_id[0].gsub(/bikes./, "") || nil
+      end
+      where(id: bike_id).first
+    end
   end
 
   def cleaned_error_messages # We don't actually want to show these messages to the user, since they just tell us the bike wasn't created

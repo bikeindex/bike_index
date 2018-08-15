@@ -64,26 +64,19 @@ class BikeCode < ActiveRecord::Base
   end
 
   def unclaimable_by?(user)
-    !errors.any? && claimed? && organization.present? && user.is_member_of?(organization)
+    errors.none? && claimed? && organization.present? && user.is_member_of?(organization)
   end
 
   def claim(user, bike_str)
     errors.add(:user, "not found") unless user.present?
-    bike_str = bike_str.to_s.strip
-    if bike_str.match(/^\d+\z/) # it's only numbers, so it's a timestamp
-      bike_id = bike_str
-    else
-      bike_id = bike_str.match(/bikes\/\d*/i)
-      bike_id = bike_id && bike_id[0].gsub(/bikes./, "") || nil
-    end
-    new_bike = Bike.where(id: bike_id).first if bike_id.present?
+    new_bike = Bike.friendly_find(bike_str)
     # Check bike_str, not bike_id, because we don't want to allow people adding bikes
     if bike_str.blank? && unclaimable_by?(user)
       update(bike_id: nil, user_id: nil, claimed_at: nil)
     elsif new_bike.present?
       update(bike_id: new_bike.id, user_id: user.id, claimed_at: Time.now) unless errors.any?
     else
-      errors.add(:bike, "\"#{bike_id}\" not found") 
+      errors.add(:bike, "\"#{bike_str}\" not found")
     end
     self
   end

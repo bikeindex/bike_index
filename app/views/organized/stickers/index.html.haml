@@ -8,7 +8,11 @@
   .row
     .col-md-4
       = text_field_tag :query, params[:query], placeholder: "Search Sticker ID", class: "form-control"
-    .col-md-6
+    .col-md-4
+      = text_field_tag :bike_query, params[:bike_query], placeholder: "Search Bike URL or ID", class: "form-control"
+    .col-sm-2.text-right
+      = submit_tag "Search", class: "btn btn-primary"
+    .col-md-12
       .btn-group{ role: "group", "aria-label" => "Size", data: { toggle: "buttons" }, style: "margin-top: 0.3rem;" }
         - claimedness = "claimed" if params[:claimedness] == "claimed"
         - claimedness ||= "unclaimed" if params[:claimedness] == "unclaimed"
@@ -22,8 +26,6 @@
         %label.btn.btn-sm.btn-secondary{ class: ("active" if claimedness == "unclaimed") }
           %input{ type: "radio", name: "claimedness", autocomplete: "off", checked: claimedness == "unclaimed", value: "unclaimed" }
           Unclaimed
-    .col-sm-2.text-right
-      = submit_tag "Search", class: "btn btn-primary"
 
 .table-responsive.mt-4
   %p{ style: "margin-bottom: 0;" }
@@ -53,7 +55,7 @@
           %td
             - if bike_code.claimed?
               / For these, use bike_id to avoid loading association
-              = link_to organized_bike_text(bike_code.bike), bike_path(bike_code.bike_id)
+              = organized_bike_text(bike_code.bike)
           %td
             = link_to bike_code.code, "/bikes/scanned/#{bike_code.code}?organization_id=#{current_organization.to_param}"
 

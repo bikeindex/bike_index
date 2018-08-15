@@ -45,7 +45,9 @@ module Organized
 
     def searched
       searched_codes = bike_codes
-      if params[:claimedness] && params[:claimedness] != "all"
+      if params[:bike_query].present?
+        searched_codes = searched_codes.claimed.where(bike_id: Bike.friendly_find(params[:bike_query])&.id)
+      elsif params[:claimedness] && params[:claimedness] != "all"
         searched_codes = params[:claimedness] == "claimed" ? searched_codes.claimed : searched_codes.unclaimed
       end
       searched_codes.admin_text_search(params[:query])

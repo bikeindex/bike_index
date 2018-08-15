@@ -28,7 +28,7 @@
             Stickers
           %ul.organized-submenu
             %li
-              = active_link "List", organization_stickers_path(organization_id: current_organization.to_param), class_name: "nav-link"
+              = active_link "Search", organization_stickers_path(organization_id: current_organization.to_param), class_name: "nav-link"
       - if current_organization.organization_message_kinds.any?
         %li
           %span.menu-item.top-level{ class: ("active" if controller_name == "messages") }

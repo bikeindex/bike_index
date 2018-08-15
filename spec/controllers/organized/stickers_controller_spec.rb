@@ -52,7 +52,7 @@ describe Organized::StickersController, type: :controller do
           expect(assigns(:current_organization)).to eq organization
           expect(assigns(:bike_codes).pluck(:id)).to eq([bike_code.id])
         end
-        context "with search" do
+        context "with query search" do
           let!(:bike_code_claimed) { FactoryGirl.create(:bike_code, organization: organization, code: "part") }
           let!(:bike_code_no_org) { FactoryGirl.create(:bike_code, code: "part") }
           before { bike_code_claimed.claim(user, FactoryGirl.create(:bike).id) }
@@ -61,6 +61,18 @@ describe Organized::StickersController, type: :controller do
             expect(response).to render_template(:index)
             expect(assigns(:current_organization)).to eq organization
             expect(assigns(:bike_codes).pluck(:id)).to eq([bike_code.id])
+          end
+        end
+        context "with bike_query" do
+          let!(:bike) { FactoryGirl.create(:bike) }
+          let!(:bike_code_claimed) { FactoryGirl.create(:bike_code, organization: organization, code: "part") }
+          before { bike_code_claimed.claim(user, bike.id) }
+          it "renders" do
+            expect(BikeCode.where(bike_id: bike.id).pluck(:id)).to eq([bike_code_claimed.id])
+            get :index, organization_id: organization.to_param, bike_query: "https://bikeindex.org/bikes/#{bike.id}/edit?cool=stuff"
+            expect(response).to render_template(:index)
+            expect(assigns(:current_organization)).to eq organization
+            expect(assigns(:bike_codes).pluck(:id)).to eq([bike_code_claimed.id])
           end
         end
       end
