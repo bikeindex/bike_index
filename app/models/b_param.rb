@@ -268,7 +268,7 @@ class BParam < ActiveRecord::Base
   # Now that we're on rails 4, this is just a giant headache.
   def bike_from_attrs(is_stolen: nil, recovered: nil)
     is_stolen = params['bike']['stolen'] if params['bike'] && params['bike'].keys.include?('stolen')
-    Bike.new safe_bike_attrs({ 'stolen' => is_stolen, 'recovered' => recovered }).as_json
+    Bike.new(safe_bike_attrs({ 'stolen' => is_stolen, 'recovered' => recovered }).as_json)
   end
 
   def safe_bike_attrs(param_overrides)

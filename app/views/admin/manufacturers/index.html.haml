@@ -18,6 +18,8 @@
         Frames
       %th.large-screens
         Website
+      %th.large-screens
+        Added
     %tbody
       - @manufacturers.each do |manufacturer|
         %tr
@@ -28,6 +30,9 @@
           %td.large-screens
             - if manufacturer.website
               = link_to "Company website", manufacturer.website
+          %td
+            %span.convertTime
+              = l manufacturer.created_at, format: :convert_time
 
 .form
   = form_tag import_admin_manufacturers_path, multipart: true do

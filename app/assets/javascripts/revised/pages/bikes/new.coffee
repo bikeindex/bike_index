@@ -29,21 +29,24 @@ class BikeIndex.BikesNew extends BikeIndex
   updateSerial: (serial_absent) ->
     @madeWithoutSerial()
     if serial_absent
+      serialVal = $('#bike_serial_number').val()
+      window.existingSerialNumber = serialVal unless serialVal == "absent"
       $('#bike_serial_number').val('absent').addClass('absent-serial')
       $('#made-without-serial-help .hidden-other').slideDown()
     else
-      $('#bike_serial_number').val('').removeClass('absent-serial')
+      if $('#bike_serial_number').val() == "absent"
+        $('#bike_serial_number').val(window.existingSerialNumber || "").removeClass('absent-serial')
       $('#made-without-serial-help .hidden-other').slideUp()
 
   madeWithoutSerial: (no_serial = false) ->
     # Show the made_without_serial checkbox, hide other serial inputs
     $('#made-without-serial-modal').modal('hide')
     if no_serial
-      $('#serial-input').slideUp()
+      $("#serial-input, #made-without-serial-help").slideUp()
       $('#made-without-serial-input').slideDown()
       $('#bike_made_without_serial').prop('checked', true)
     else
-      $('#serial-input').slideDown()
+      $("#serial-input, #made-without-serial-help").slideDown()
       $('#made-without-serial-input').slideUp()
       $('#bike_made_without_serial').prop('checked', false)
 
