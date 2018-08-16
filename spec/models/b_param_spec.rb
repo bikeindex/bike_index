@@ -423,6 +423,17 @@ describe BParam do
         end
       end
     end
+    context "with existing b_param with nil for id_token value - legacy issue" do
+      let(:b_param_nil) { FactoryGirl.create(:b_param, creator_id: user.id) }
+      it "does not return that BParam" do
+        b_param_nil.update_column :id_token, nil
+        b_param_nil.reload
+        result = BParam.find_or_new_from_token(nil, user_id: user.id)
+        expect(result.is_a?(BParam)).to be_truthy
+        expect(result.id).to be_nil
+        expect(result.creator_id).to eq user.id
+      end
+    end
   end
 
   describe 'safe_bike_hash' do

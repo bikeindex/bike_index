@@ -35,7 +35,7 @@ class BParam < ActiveRecord::Base
   end
 
   def self.find_or_new_from_token(toke = nil, user_id: nil, organization_id: nil)
-    b = where(creator_id: user_id, id_token: toke).first if user_id.present?
+    b = where(creator_id: user_id, id_token: toke).first if toke.present? && user_id.present?
     b ||= with_organization_or_no_creator(toke)
     b ||= BParam.new(creator_id: user_id, params: { revised_new: true }.as_json)
     b.creator_id ||= user_id
