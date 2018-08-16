@@ -15,7 +15,10 @@
   }
   #made-without-serial-help {
     .hidden-other { margin-top: .5em; }
-    a { cursor: pointer; }
+    a {
+      cursor: pointer;
+      text-decoration: underline;
+    }
   }
   #made-without-serial-modal {
     ul { margin-top: -1em; } // Line height looks better this way...

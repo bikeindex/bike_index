@@ -39,7 +39,7 @@ colors = [
   { name: 'Pink', priority: 1, display: '#ff7dfd' },
   { name: 'Purple', priority: 1, display: '#a745c0' },
   { name: 'Red', priority: 1, display: '#ec1313' },
-  { name: 'Silver or Gray', priority: 1, display: '#b0b0b0' },
+  { name: 'Silver, Gray or Bare Metal', priority: 1, display: '#b0b0b0' },
   { name: 'Stickers tape or other cover-up', priority: 3, display: '#fff' },
   { name: 'Teal', priority: 1, display: '#3bede7' },
   { name: 'White', priority: 1, display: '#fff' },

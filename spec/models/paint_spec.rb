@@ -28,7 +28,7 @@ describe Paint do
 
   describe 'assign_colors' do
     before(:each) do
-      bi_colors = ['Black', 'Blue', 'Brown', 'Green', 'Orange', 'Pink', 'Purple', 'Red', 'Silver or Gray', 'Stickers tape or other cover-up', 'Teal', 'White', 'Yellow or Gold']
+      bi_colors = ['Black', 'Blue', 'Brown', 'Green', 'Orange', 'Pink', 'Purple', 'Red', 'Silver, Gray or Bare Metal', 'Stickers tape or other cover-up', 'Teal', 'White', 'Yellow or Gold']
       bi_colors.each do |col|
         FactoryGirl.create(:color, name: col)
       end
