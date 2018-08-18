@@ -33,7 +33,10 @@
             %span.less-strong-right
               = application.id
         %td
-          = application.owner.display_name
+          - if application.owner.present?
+            = application.owner.display_name
+          - else
+            no owner
         %td
           .less-strong-hold
             = application.redirect_uri
