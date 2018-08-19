@@ -482,7 +482,7 @@ GEM
       redis (~> 3.0, >= 3.0.5)
       sinatra (>= 1.4.4)
       vegas (>= 0.1.0)
-    sprockets (3.7.1)
+    sprockets (3.7.2)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
     sprockets-rails (3.0.4)
