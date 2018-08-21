@@ -8,6 +8,14 @@ describe Organized::BulkImportsController, type: :controller do
 
   context "organization without show_bulk_import" do
     let!(:organization) { FactoryGirl.create(:organization) }
+    context "not logged in" do
+      let(:user) { nil }
+      it "redirects" do
+        get :index, organization_id: organization.to_param
+        expect(response).to redirect_to root_path
+      end
+    end
+
     context "logged in as organization admin" do
       let(:user) { FactoryGirl.create(:organization_admin, organization: organization) }
       describe "index" do
