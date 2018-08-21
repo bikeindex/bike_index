@@ -62,7 +62,7 @@ module Organized
 
     def ensure_access_to_bulk_import!
       return false unless ensure_admin! # Need to return so we don't double render
-      return true if current_user.superuser? # ensure_admin! passes with superuser - allow superuser to see even if org not enabled
+      return true if current_user.superuser? # ensure_admin! passes with superuser - this allow superuser to see even if org not enabled
       return true if current_organization.show_bulk_import?
       flash[:error] = "Your organization doesn't have access to that, please contact Bike Index support"
       redirect_to organization_bikes_path(organization_id: current_organization.to_param) and return
