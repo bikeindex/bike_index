@@ -1,5 +1,6 @@
 #!/bin/bash
 touch log/development.log
-> log/development.log
+> log/development.log # Clear out development log, otherwise it balloons
+> log/test.log # Clear out test log too
 redis-server &
 bundle exec foreman start -f Procfile_development

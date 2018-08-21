@@ -91,8 +91,8 @@ Bikeindex::Application.routes.draw do
       post 'make_primary'
     end
   end
+  resources :payments
   resources :news, only: [:show, :index]
-  resources :blogs, only: [:show, :index]
   get 'blog', to: redirect('/news')
 
   resources :public_images, only: [:create, :show, :edit, :update, :destroy] do
