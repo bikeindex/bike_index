@@ -7,14 +7,11 @@ class Invoice < ActiveRecord::Base
   scope :expired, -> { where("subscription_end_at < ?", Time.now) }
 
   belongs_to :organization
-  belongs_to :renews_subscription, class_name: "Invoice"
+  belongs_to :subscription_first_invoice, class_name: "Invoice"
 
   before_save :set_calculated_attributes
 
-  def subscription_duration
-    "1_year" # Static, at least for now
-  end
-
+  def subscription_duration; 1.year end # Static, at least for now
   def initial?; renews_subscription_id.present? end
   def renewal?; !initial? end
   def current?; subscription_end_at > Time.now end
