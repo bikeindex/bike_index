@@ -6,11 +6,9 @@ RSpec.shared_examples 'friendly_slug_findable' do
 
   describe 'callbacks' do
     it 'calls set slug before create' do
-      unless model_sym == :paid_feature
-        obj = FactoryGirl.build(model_sym, name: 'something cool and things&')
-        expect(obj).to receive :set_slug
-        obj.save
-      end
+      obj = FactoryGirl.build(model_sym, name: 'something cool and things&')
+      expect(obj).to receive :set_slug
+      obj.save
     end
   end
 
