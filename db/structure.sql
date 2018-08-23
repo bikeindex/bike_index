@@ -1592,9 +1592,9 @@ CREATE TABLE public.paid_features (
     amount_cents integer,
     name character varying,
     slug character varying,
-    name_locked boolean,
+    is_locked boolean DEFAULT false NOT NULL,
     description text,
-    view_more_link character varying,
+    details_link character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );

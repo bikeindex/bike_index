@@ -16,8 +16,11 @@ class PaidFeature < ActiveRecord::Base
   scope :recurring, -> { where(kind: %w[standard custom]) }
   scope :upfront, -> { where(kind: %w[standard_upfront custom_upfront]) }
 
+  def self.kinds; KIND_ENUM.keys.map(&:to_s) end
+
   def one_time?; standard_one_time? || custom_one_time? end
   def recurring?; !one_time? end
+  def locked?; is_locked end
 
   def set_calculated_attributes
     self.slug = Slugifyer.slugify(name)

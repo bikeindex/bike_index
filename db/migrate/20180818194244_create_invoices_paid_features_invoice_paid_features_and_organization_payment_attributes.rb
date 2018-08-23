@@ -20,9 +20,9 @@ class CreateInvoicesPaidFeaturesInvoicePaidFeaturesAndOrganizationPaymentAttribu
       t.integer :amount_cents
       t.string :name
       t.string :slug
-      t.boolean :name_locked
+      t.boolean :is_locked, default: false, null: false
       t.text :description
-      t.string :view_more_link
+      t.string :details_link
 
       t.timestamps null: false
     end
