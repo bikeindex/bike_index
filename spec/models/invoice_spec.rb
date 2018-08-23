@@ -3,59 +3,22 @@ require "spec_helper"
 RSpec.describe Invoice, type: :model do
   let(:organization) { invoice.organization }
 
-  # describe "calculated_attributes" do
-  #   let(:first_date) { Time.now - 2.years }
-  #   let(:paid_feature) { FactoryGirl.create(:paid_feature, upfront_cents: 50_000, recurring_cents: 10_000) }
-  #   let(:invoice) { FactoryGirl.create(:invoice, subscription_end_at: nil, subscription_start_at: first_date) }
-  #   it "sets useful things" do
-  #     invoice.reload
-  #     expect(invoice.paid_in_full?).to be_falsey
-  #     expect(invoice.renewal_invoice?).to be_truthy
-  #     expect(invoice.subscription_start_at).to be_within(1.second).of first_date
-  #     expect(invoice.subscription_end_at).to be_within(1.second).of first_date + 1.year
-  #     expect(invoice.features_at_start_cents).to eq 50_000
-  #     expect(invoice.features_at_start_recurring_cents).to eq 10_000
-  #     expect(invoice.amount_due_cents).to eq 50_000
-
-  #     invoice2 = invoice.create_following_invoice
-  #     expect(invoice2.paid_in_full?).to be_falsey
-  #     expect(invoice2.renewal_invoice?).to be_falsey
-  #     expect(invoice2.organization).to eq organization
-  #     expect(invoice2.subscription_start_at).to be_within(1.second).of invoice.subscription_end_at
-  #     expect(invoice2.subscription_end_at).to be_within(1.second).of invoice.subscription_end_at + 1.year
-  #     expect(invoice2.features_at_start_cents).to eq 50_000
-  #     expect(invoice2.features_at_start_recurring_cents).to eq 10_000
-  #     expect(invoice2.amount_due_cents).to eq 10_000
-
-  #     expect do
-  #       FactoryGirl.create(:payment, organization: organization, invoice: invoice2, amount_cents: 50_000)
-  #     end.to change(Invoice, :count).by 1
-
-  #     expect(Invoice.paid_in_full.pluck(:id)).to eq([invoice2.id])
-  #     invoice3 = Invoice.last
-  #     expect(invoice3.renewal_invoice?).to be_falsey
-  #     expect(invoice3.organization).to eq organization
-  #     expect(invoice3.subscription_start_at).to be_within(1.second).of invoice.subscription_end_at
-  #     expect(invoice3.subscription_end_at).to be_within(1.second).of invoice.subscription_end_at + 1.year
-  #     expect(invoice3.features_at_start_cents).to eq 50_000
-  #     expect(invoice3.features_at_start_recurring_cents).to eq 10_000
-  #     expect(invoice3.amount_due_cents).to eq 10_000
-  #   end
-  # end
-
-  # describe "previous_invoice" do
-  #   let(:invoice) { FactoryGirl.create(:invoice, subscription_start_at: Time.now - 4.years, is_active: true) }
-  #   let(:invoice2) { invoice.create_following_invoice }
-  #   let(:invoice2) { invoice2.create_following_invoice }
-  #   it "returns correct invoices" do
-  #     expect(invoice.previous_invoice).to be_nil
-  #     expect(invoice2.subscription_start_at).to be_within(1.minute).of Time.now - 3.years
-  #     expect(invoice2.previous_invoice).to eq invoice
-  #     expect(invoice3.subscription_start_at).to be_within(1.minute).of Time.now - 2.years
-  #     expect(invoice3.previous_invoice).to eq invoice2
-  #     expect(invoice3.first_invoice).to eq invoice
-  #   end
-  # end
+  describe "previous_invoice" do
+    let(:invoice) { FactoryGirl.create(:invoice, subscription_start_at: Time.now - 4.years, force_active: true) }
+    let(:invoice2) { invoice.create_following_invoice }
+    let(:invoice3) { invoice2.create_following_invoice }
+    it "returns correct invoices" do
+      expect(invoice.previous_invoice).to be_nil
+      expect(invoice2.subscription_first_invoice).to eq invoice
+      invoice2.update_attribute :force_active, true # So we can create another invoice after
+      expect(invoice3.subscription_first_invoice).to eq invoice
+      expect(invoice2.subscription_start_at).to be_within(1.minute).of Time.now - 3.years
+      expect(invoice2.renewal_invoice?).to be_truthy
+      expect(invoice2.previous_invoice).to eq invoice
+      expect(invoice3.subscription_start_at).to be_within(1.minute).of Time.now - 2.years
+      expect(invoice3.previous_invoice).to eq invoice2
+    end
+  end
 
   describe "create_following_invoice" do
     context "with not active invoice" do

@@ -56,7 +56,7 @@ class Invoice < ActiveRecord::Base
 
   def previous_invoice
     return nil unless renewal_invoice?
-    subscription_invoices.order(id: :desc).limit(2).last
+    subscription_invoices.where("id < ?", id).order(:id).last || subscription_first_invoice
   end
 
   def following_invoice
