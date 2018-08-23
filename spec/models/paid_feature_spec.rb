@@ -1,5 +1,6 @@
-require 'rails_helper'
+require "spec_helper"
 
 RSpec.describe PaidFeature, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  it_behaves_like "friendly_slug_findable"
+
 end

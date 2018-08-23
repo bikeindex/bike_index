@@ -1,4 +1,5 @@
 class Payment < ActiveRecord::Base
+  include Amountable
   KIND_ENUM = { stripe: 0, check: 1 }.freeze
 
   scope :current, -> { where(is_current: true) }

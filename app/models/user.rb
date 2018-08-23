@@ -132,7 +132,7 @@ class User < ActiveRecord::Base
   end
 
   def donations
-    payments.sum(:amount)
+    payments.sum(:amount_cents)
   end
 
   def donor?

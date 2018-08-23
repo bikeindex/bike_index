@@ -5,11 +5,11 @@
     .select-amount
       - if @payment.is_donation
         %p
-          Your donation of $#{@payment.amount.to_i/100.00} just saved the bikes.
+          Your donation of $#{@payment.amount} just saved the bikes.
         %p.padded
           XOXO,
           %br
           Bike Index team
       - else
         %p
-          We received your payment of $#{@payment.amount.to_i/100.00}
+          We received your payment of $#{@payment.amount}

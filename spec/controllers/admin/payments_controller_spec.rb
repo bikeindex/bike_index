@@ -4,7 +4,7 @@ describe Admin::PaymentsController, type: :controller do
   let(:subject) { FactoryGirl.create(:payment) }
   let(:organization) { FactoryGirl.create(:organization) }
   include_context :logged_in_as_super_admin
-  let(:params) { { organization_id: 10000, email: user2.email, amount: 22_222 } }
+  let(:params) { { organization_id: 10000, email: user2.email, amount_cents: 22_222 } }
 
   describe "index" do
     it "renders" do
@@ -37,18 +37,18 @@ describe Admin::PaymentsController, type: :controller do
         subject.reload
         expect(subject.organization).to eq organization
         expect(subject.user).to eq user # Not changed for stripe payments
-        expect(subject.amount).to_not eq 22_222 # Not changed
+        expect(subject.amount_cents).to_not eq 22_222 # Not changed
       end
     end
     context "check payment" do
-      let(:subject) { FactoryGirl.create(:payment_check, organization: nil, amount: 55_555, user: user) }
+      let(:subject) { FactoryGirl.create(:payment_check, organization: nil, amount_cents: 55_555, user: user) }
       it "updates available attributes" do
         put :update, id: subject.to_param, payment: params
         subject.reload
         expect(subject.organization).to eq organization
         expect(subject.user).to be_nil
         expect(subject.email).to eq "cool@party.com"
-        expect(subject.amount).to eq 55555 # Not changed
+        expect(subject.amount_cents).to eq 55555 # Not changed
       end
     end
   end
@@ -71,7 +71,7 @@ describe Admin::PaymentsController, type: :controller do
         expect(payment.organization).to eq organization
         expect(payment.user).to eq user2
         expect(payment.email).to eq user2.email
-        expect(payment.amount).to eq 22_222
+        expect(payment.amount_cents).to eq 22_222
         expect(payment.kind).to eq "check"
       end
     end

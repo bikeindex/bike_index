@@ -5,22 +5,25 @@ class CreateInvoicesPaidFeaturesInvoicePaidFeaturesAndOrganizationPaymentAttribu
     create_table :invoices do |t|
       t.references :organization, index: true
       t.references :subscription_first_invoice_id, index: true
+      t.boolean :is_active, default: false, null: false
       t.datetime :subscription_start_at
       t.datetime :subscription_end_at
-      t.integer :features_at_start_cents
+      t.integer :features_at_start_upfront_cents
+      t.integer :features_at_start_recurring_cents
       t.integer :amount_due_cents
+      t.integer :amount_paid_cents
 
       t.timestamps null: false
     end
 
     create_table :paid_features do |t|
       t.integer :kind, default: 0
+      t.integer :amount_cents
       t.string :name
       t.string :slug
       t.boolean :name_locked
-      t.text :descrtiption
-      t.integer :upfront_cents
-      t.integer :recurring_cents
+      t.text :description
+      t.string :view_more_link
 
       t.timestamps null: false
     end
@@ -32,6 +35,7 @@ class CreateInvoicesPaidFeaturesInvoicePaidFeaturesAndOrganizationPaymentAttribu
       t.timestamps null: false
     end
 
+    rename_column :payments, :amount, :amount_cents
     add_column :payments, :kind, :integer, default: 0
     add_reference :payments, :organization
     add_reference :payments, :invoice

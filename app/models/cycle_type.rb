@@ -1,7 +1,5 @@
 class CycleType < ActiveRecord::Base # Defines things like unicycles and recumbent
   include FriendlySlugFindable
-  validates_presence_of :name, :slug
-  validates_uniqueness_of :name, :slug
 
   has_many :bikes
 

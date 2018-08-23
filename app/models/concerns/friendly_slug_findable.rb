@@ -7,7 +7,11 @@ module FriendlySlugFindable
       find_by_slug(Slugifyer.slugify(n)) || where('lower(name) = ?', n.downcase.strip).first
     end
   end
+
   included do
+    validates_presence_of :name
+    validates_uniqueness_of :name, :slug
+
     before_create :set_slug
   end
 
