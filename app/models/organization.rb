@@ -14,6 +14,7 @@ class Organization < ActiveRecord::Base
   has_many :bike_organizations
   has_many :bikes, through: :bike_organizations
   has_many :b_params
+  has_many :invoices
   # has_many :bikes, foreign_key: 'creation_organization_id'
   has_many :creation_states
   has_many :created_bikes, through: :creation_states, source: :bike

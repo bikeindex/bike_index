@@ -885,6 +885,78 @@ ALTER SEQUENCE public.integrations_id_seq OWNED BY public.integrations.id;
 
 
 --
+-- Name: invoice_paid_features; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.invoice_paid_features (
+    id integer NOT NULL,
+    invoice_id integer,
+    paid_feature_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: invoice_paid_features_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.invoice_paid_features_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: invoice_paid_features_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.invoice_paid_features_id_seq OWNED BY public.invoice_paid_features.id;
+
+
+--
+-- Name: invoices; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.invoices (
+    id integer NOT NULL,
+    organization_id integer,
+    first_invoice_id integer,
+    is_active boolean DEFAULT false NOT NULL,
+    force_active boolean DEFAULT false NOT NULL,
+    subscription_start_at timestamp without time zone,
+    subscription_end_at timestamp without time zone,
+    amount_due_cents integer,
+    amount_paid_cents integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: invoices_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.invoices_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: invoices_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.invoices_id_seq OWNED BY public.invoices.id;
+
+
+--
 -- Name: listicles; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1414,7 +1486,8 @@ CREATE TABLE public.organizations (
     has_bike_codes boolean DEFAULT false NOT NULL,
     has_bike_search boolean DEFAULT false NOT NULL,
     require_address_on_registration boolean DEFAULT false NOT NULL,
-    show_partial_registrations boolean DEFAULT false NOT NULL
+    show_partial_registrations boolean DEFAULT false NOT NULL,
+    paid_feature_slugs text[] DEFAULT '{}'::text[]
 );
 
 
@@ -1510,6 +1583,44 @@ ALTER SEQUENCE public.ownerships_id_seq OWNED BY public.ownerships.id;
 
 
 --
+-- Name: paid_features; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.paid_features (
+    id integer NOT NULL,
+    kind integer DEFAULT 0,
+    amount_cents integer,
+    name character varying,
+    slug character varying,
+    name_locked boolean,
+    description text,
+    view_more_link character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: paid_features_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.paid_features_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: paid_features_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.paid_features_id_seq OWNED BY public.paid_features.id;
+
+
+--
 -- Name: paints; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1557,11 +1668,14 @@ CREATE TABLE public.payments (
     stripe_id character varying,
     last_payment_date timestamp without time zone,
     first_payment_date timestamp without time zone,
-    amount integer,
+    amount_cents integer,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
     email character varying,
-    is_payment boolean DEFAULT false NOT NULL
+    is_payment boolean DEFAULT false NOT NULL,
+    kind integer DEFAULT 0,
+    organization_id integer,
+    invoice_id integer
 );
 
 
@@ -2195,6 +2309,20 @@ ALTER TABLE ONLY public.integrations ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
+-- Name: invoice_paid_features id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.invoice_paid_features ALTER COLUMN id SET DEFAULT nextval('public.invoice_paid_features_id_seq'::regclass);
+
+
+--
+-- Name: invoices id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.invoices ALTER COLUMN id SET DEFAULT nextval('public.invoices_id_seq'::regclass);
+
+
+--
 -- Name: listicles id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2304,6 +2432,13 @@ ALTER TABLE ONLY public.other_listings ALTER COLUMN id SET DEFAULT nextval('publ
 --
 
 ALTER TABLE ONLY public.ownerships ALTER COLUMN id SET DEFAULT nextval('public.ownerships_id_seq'::regclass);
+
+
+--
+-- Name: paid_features id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.paid_features ALTER COLUMN id SET DEFAULT nextval('public.paid_features_id_seq'::regclass);
 
 
 --
@@ -2574,6 +2709,22 @@ ALTER TABLE ONLY public.integrations
 
 
 --
+-- Name: invoice_paid_features invoice_paid_features_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.invoice_paid_features
+    ADD CONSTRAINT invoice_paid_features_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: invoices invoices_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.invoices
+    ADD CONSTRAINT invoices_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: listicles listicles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2699,6 +2850,14 @@ ALTER TABLE ONLY public.other_listings
 
 ALTER TABLE ONLY public.ownerships
     ADD CONSTRAINT ownerships_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: paid_features paid_features_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.paid_features
+    ADD CONSTRAINT paid_features_pkey PRIMARY KEY (id);
 
 
 --
@@ -2964,6 +3123,34 @@ CREATE INDEX index_feedbacks_on_user_id ON public.feedbacks USING btree (user_id
 --
 
 CREATE INDEX index_integrations_on_user_id ON public.integrations USING btree (user_id);
+
+
+--
+-- Name: index_invoice_paid_features_on_invoice_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_invoice_paid_features_on_invoice_id ON public.invoice_paid_features USING btree (invoice_id);
+
+
+--
+-- Name: index_invoice_paid_features_on_paid_feature_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_invoice_paid_features_on_paid_feature_id ON public.invoice_paid_features USING btree (paid_feature_id);
+
+
+--
+-- Name: index_invoices_on_first_invoice_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_invoices_on_first_invoice_id ON public.invoices USING btree (first_invoice_id);
+
+
+--
+-- Name: index_invoices_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_invoices_on_organization_id ON public.invoices USING btree (organization_id);
 
 
 --
@@ -3548,4 +3735,6 @@ INSERT INTO schema_migrations (version) VALUES ('20180813004404');
 INSERT INTO schema_migrations (version) VALUES ('20180813020849');
 
 INSERT INTO schema_migrations (version) VALUES ('20180813023344');
+
+INSERT INTO schema_migrations (version) VALUES ('20180818194244');
 

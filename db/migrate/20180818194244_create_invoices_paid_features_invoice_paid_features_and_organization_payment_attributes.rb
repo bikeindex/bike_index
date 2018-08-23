@@ -4,12 +4,11 @@ class CreateInvoicesPaidFeaturesInvoicePaidFeaturesAndOrganizationPaymentAttribu
   def change
     create_table :invoices do |t|
       t.references :organization, index: true
-      t.references :subscription_first_invoice_id, index: true
+      t.references :first_invoice, index: true
       t.boolean :is_active, default: false, null: false
+      t.boolean :force_active, default: false, null: false
       t.datetime :subscription_start_at
       t.datetime :subscription_end_at
-      t.integer :features_at_start_upfront_cents
-      t.integer :features_at_start_recurring_cents
       t.integer :amount_due_cents
       t.integer :amount_paid_cents
 
