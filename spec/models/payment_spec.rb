@@ -1,11 +1,6 @@
 require "spec_helper"
 
 describe Payment do
-  describe "validations" do
-    it { is_expected.to belong_to :user }
-    it { is_expected.to validate_presence_of :email }
-  end
-
   describe "create" do
     context "stripe" do
       let(:user) { FactoryGirl.create(:user) }
