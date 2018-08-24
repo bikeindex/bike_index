@@ -22,7 +22,7 @@
             = l payment.created_at, format: :convert_time
           %small.convertTimezone
         %td
-          = payment.amount.to_i/100.00
+          = payment.amount
         %td
           = "&#x2713;".html_safe if payment.is_payment
 

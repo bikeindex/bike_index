@@ -45,40 +45,43 @@
             = admin_nav_link "Go hard", admin_root_path
           %ul
             %li
-              = admin_nav_link "Organizations", admin_organizations_url
+              = admin_nav_link "Organizations", admin_organizations_path
 
             %li
-              = admin_nav_link "Users", admin_users_url
+              = admin_nav_link "Users", admin_users_path
 
             %li
-              = admin_nav_link "Memberships", admin_memberships_url
+              = admin_nav_link "Memberships", admin_memberships_path
 
             %li
-              = admin_nav_link "Manufacturers", admin_manufacturers_url
+              = admin_nav_link "Manufacturers", admin_manufacturers_path
 
             %li
-              = admin_nav_link "Bikes", admin_bikes_url
+              = admin_nav_link "Bikes", admin_bikes_path
 
             %li
-              = admin_nav_link "Invitations", admin_invitations_url
+              = admin_nav_link "Invitations", admin_invitations_path
 
             %li
-              = admin_nav_link "News", admin_news_index_url
+              = admin_nav_link "News", admin_news_index_path
             %li
-              = admin_nav_link "Stolen", admin_stolen_bikes_url
+              = admin_nav_link "Stolen", admin_stolen_bikes_path
             / %li
-            /   = admin_nav_link "Recoveries", admin_recoveries_url
+            /   = admin_nav_link "Recoveries", admin_recoveries_path
             %li
-              = admin_nav_link "Recovery displays", admin_recovery_displays_url
+              = admin_nav_link "Recovery displays", admin_recovery_displays_path
+            %li
+              = admin_nav_link "Paid Features", admin_paid_features_path
+
             - if Rails.env.development?
               %li
                 Mailers: #{admin_nav_link "organized", '/rails/mailers/organized_mailer'}, #{admin_nav_link "admin", '/rails/mailers/admin_mailer'}, #{admin_nav_link "customer", '/rails/mailers/customer_mailer'}
         - elsif current_user.is_content_admin?
           %h2.new-title 
-            = admin_nav_link "Go hard", admin_news_index_url
+            = admin_nav_link "Go hard", admin_news_index_path
           %ul
             %li
-              = admin_nav_link "News", admin_news_index_url
+              = admin_nav_link "News", admin_news_index_path
 
 
 

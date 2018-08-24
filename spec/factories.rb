@@ -73,11 +73,6 @@ FactoryGirl.define do
     name { FactoryGirl.generate(:unique_name) }
   end
 
-  factory :payment do
-    association :user
-    amount '999'
-  end
-
   factory :cgroup do
     name { FactoryGirl.generate(:unique_name) }
   end

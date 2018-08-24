@@ -5,7 +5,7 @@ class PaymentsController < ApplicationController
   end
 
   def create
-    amount = params[:stripe_amount]
+    amount_cents = params[:stripe_amount]
     subscription = params[:stripe_subscription] if params[:stripe_subscription].present?
     user = current_user || User.fuzzy_confirmed_or_unconfirmed_email_find(params[:stripe_email])
     email = params[:stripe_email].strip.downcase
@@ -37,7 +37,7 @@ class PaymentsController < ApplicationController
     else
       charge = Stripe::Charge.create(
         customer:     customer.id,
-        amount:       amount,
+        amount:       amount_cents,
         description:  'Bike Index customer',
         currency:     'usd'
       )
@@ -49,7 +49,7 @@ class PaymentsController < ApplicationController
       is_current: true,
       stripe_id: charge.id,
       first_payment_date: Time.at(charge_time).utc.to_datetime,
-      amount: amount,
+      amount_cents: amount_cents
     )
     @payment.is_recurring = true if subscription
     @payment.is_payment = true if params[:is_payment]
