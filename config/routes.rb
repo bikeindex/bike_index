@@ -139,7 +139,7 @@ Bikeindex::Application.routes.draw do
     get 'bust_z_cache', to: 'dashboard#bust_z_cache'
     get 'destroy_example_bikes', to: 'dashboard#destroy_example_bikes'
     resources :memberships, :organization_invitations, :bulk_imports,
-              :paints, :ads, :recovery_displays, :mail_snippets
+              :paints, :ads, :recovery_displays, :mail_snippets, :paid_features
     resources :organizations do
       resources :custom_layouts, only: [:index, :edit, :update], controller: 'organizations/custom_layouts'
     end
