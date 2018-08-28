@@ -9,6 +9,6 @@
     That you for signing up to be a member of Bike Index. We'll send you invoices every month to this email address
 %p
   - if @payment.is_donation
-    Your donation of #{@payment.amount} really will help us rescue more bikes.
+    Your donation of #{@payment.amount_formatted} really will help us rescue more bikes.
   - else
-    Your payment of #{@payment.amount} has been received.
+    Your payment of #{@payment.amount_formatted} has been received.

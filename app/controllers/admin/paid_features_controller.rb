@@ -18,7 +18,7 @@ class Admin::PaidFeaturesController < Admin::BaseController
 
   def update
     @paid_feature.update_attributes(permitted_update_parameters)
-    flash[:success] = "Feature created"
+    flash[:success] = "Feature updated"
     redirect_to admin_paid_features_path
   end
 
@@ -28,7 +28,7 @@ class Admin::PaidFeaturesController < Admin::BaseController
       flash[:success] = "Feature created"
       redirect_to admin_paid_features_path
     else
-      flash[:error] = "unable to create"
+      flash[:error] = "Unable to create"
       render :new
     end
   end

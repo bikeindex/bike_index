@@ -18,6 +18,9 @@ class Payment < ActiveRecord::Base
   before_validation :set_calculated_attributes
   after_create :send_invoice_email
 
+  def self.kinds; KIND_ENUM.keys.map(&:to_s) end
+  def self.admin_creatable_kinds; ["check"] end
+
   def set_calculated_attributes
     if user.present?
       self.email ||= user.email

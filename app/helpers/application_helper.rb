@@ -134,7 +134,7 @@ module ApplicationHelper
   end
 
   def sortable(column, title = nil, html_options = {})
-    title ||= column.titleize
+    title ||= column.gsub(/_id\z/, "").titleize
     html_options[:class] = "#{html_options[:class]} sortable-link"
     direction = column == sort_column && sort_direction == "desc" ? "asc" : "desc"
     if column == sort_column
