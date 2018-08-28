@@ -1,0 +1,51 @@
+%header.with-subtitle
+  %h1 Payments
+  = link_to "New payment", new_admin_payment_url, class: "button-green sharing-links"
+
+.paginate-container{ style: "margin-top: 30px;" }
+  %h4.pull-left
+    = pluralize(@payments.total_count, "matching payment")
+  = paginate @payments
+
+
+%section.full-screen-table
+  %table.table.table-striped.table-bordered.sortable
+    %thead
+      %th
+        = sortable "created_at", "Paid"
+      %th
+        = sortable "user_id"
+      %th
+        = sortable "organization_id"
+      %th
+        = sortable "invoice_id"
+      %th
+        = sortable "kind"
+      %th
+        = sortable "amount_cents", "Amount"
+    %tbody
+      - @payments.each do |payment|
+        %tr
+          %td
+            %a.convertTime{ href: edit_admin_payment_path(payment) }
+              = l payment.created_at, format: :convert_time
+          %td
+            - if payment.user_id.present?
+              = link_to payment.user.display_name, edit_admin_user_path(payment.user)
+            - elsif payment.email.present?
+              = payment.email
+              %small.less-strong
+                no user
+
+          %td
+            - if payment.organization_id.present?
+              = link_to payment.organization.short_name, admin_organization_path(payment.organization)
+          %td
+            - if payment.invoice_id.present?
+              %span.convertTime
+                = l payment.invoice.created_at, format: :convert_time
+          %td
+            %small
+              = payment.kind.humanize
+          %td
+            = payment.amount_formatted

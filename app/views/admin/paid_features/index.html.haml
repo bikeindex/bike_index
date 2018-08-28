@@ -6,16 +6,16 @@
   #{@paid_features.count} total
 
 %section.full-screen-table
-  %table.table.table-striped.table-bordered
+  %table.table.table-striped.table-bordered.sortable
     %thead
       %th
-        Added
+        = sortable "created_at", "Added"
       %th
-        Name
+        = sortable "name"
       %th
-        Kind
+        = sortable "kind"
       %th
-        Amount
+        = sortable "amount_cents", "Amount"
     %tbody
       - @paid_features.each do |paid_feature|
         %tr
@@ -33,6 +33,7 @@
                   = paid_feature.details_link
 
           %td
-            = paid_feature.kind
+            %small
+              = paid_feature.kind.humanize
           %td
-            = paid_feature.amount
+            = paid_feature.amount_formatted

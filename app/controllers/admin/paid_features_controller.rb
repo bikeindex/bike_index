@@ -1,8 +1,9 @@
 class Admin::PaidFeaturesController < Admin::BaseController
+  include SortableTable
   before_filter :find_paid_feature, only: [:edit, :update]
 
   def index
-    @paid_features = PaidFeature.order(created_at: :desc)
+    @paid_features = PaidFeature.order(sort_column + " " + sort_direction)
   end
 
   def new
@@ -17,7 +18,7 @@ class Admin::PaidFeaturesController < Admin::BaseController
 
   def update
     @paid_feature.update_attributes(permitted_update_parameters)
-    flash[:success] = "Feature created"
+    flash[:success] = "Feature updated"
     redirect_to admin_paid_features_path
   end
 
@@ -27,12 +28,16 @@ class Admin::PaidFeaturesController < Admin::BaseController
       flash[:success] = "Feature created"
       redirect_to admin_paid_features_path
     else
-      flash[:error] = "unable to create"
+      flash[:error] = "Unable to create"
       render :new
     end
   end
 
   protected
+
+  def sortable_columns
+    %w(created_at kind name amount_cents)
+  end
 
   def permitted_update_parameters
     if @paid_feature.locked?
@@ -43,7 +48,7 @@ class Admin::PaidFeaturesController < Admin::BaseController
   end
 
   def permitted_parameters
-    params.require(:paid_feature).permit(:amount_cents, :description, :details_link, :kind, :name)
+    params.require(:paid_feature).permit(:amount, :description, :details_link, :kind, :name)
   end
 
   def find_paid_feature

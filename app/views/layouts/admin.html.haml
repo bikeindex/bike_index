@@ -28,6 +28,29 @@
       line-height: 1em;
       border-radius: 0.5em;
     }
+    thead.sortable {
+      th {
+        font-weight: normal;
+        a.sortable-link {
+          display: block;
+          position: relative;
+          // To give a spot for the sortable direction
+          &.active {
+            padding-right: 1.5rem;
+          }
+          span.sortable-direction {
+            display: block;
+            position: absolute;
+            right: 0;
+            top: 0;
+          }
+          &.active {
+            font-weight: strong;
+            text-decoration: underline;
+          }
+        }
+      }
+    }
   %body#body{ class: body_class }
     = render 'layouts/messages'
 
@@ -72,6 +95,8 @@
               = admin_nav_link "Recovery displays", admin_recovery_displays_path
             %li
               = admin_nav_link "Paid Features", admin_paid_features_path
+            %li
+              = admin_nav_link "Payments", admin_payments_path
 
             - if Rails.env.development?
               %li

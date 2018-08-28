@@ -1,0 +1,40 @@
+%h1
+  New Payment
+
+.form.form-horizontal{ style: "margin-bottom: 120px" }
+  = form_for [:admin, @payment] do |f|
+    - if @payment.errors.any?
+      = render partial: "/shared/errors", locals: { name: "Payment", obj: @payment }
+
+    .control-group.padded
+      .control-label
+        = f.label :kind
+      .controls
+        = f.select :kind, Payment.admin_creatable_kinds.map { |k| [k.humanize, k] }
+
+    .control-group.padded
+      - f.object.created_at = TimeParser.round(f.object.created_at || Time.now)
+      .control-label
+        = f.label :created_at, "Time of payment"
+      .controls
+        = f.datetime_local_field :created_at, max: Time.now + 1.week, step: 60, required: true, class: 'form-control'
+
+    .control-group.padded
+      .control-label
+        = f.label :amount
+      .controls
+        = f.number_field :amount, step: 1, min: 0
+
+    .control-group.padded
+      .control-label
+        = f.label :email, "Email of user who created payment"
+      .controls
+        = f.email_field :email
+
+    - organizations = Organization.all
+    .control-group.chosen-select
+      = f.label :organization_id, class: "control-label"
+      .controls
+        = collection_select(:payment, :organization_id, organizations, :id, :name, prompt: "Choose organization")
+
+    = f.submit "Submit", class: 'button-green'

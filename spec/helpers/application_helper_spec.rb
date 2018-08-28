@@ -301,4 +301,28 @@ describe ApplicationHelper do
       expect(html).to eq(target)
     end
   end
+
+  describe "sortable_search_params" do
+    before { controller.params = ActionController::Parameters.new(passed_params) }
+    context "no sortable_search_params" do
+      let(:passed_params) { { party: "stuff" } }
+      it "returns an empty hash" do
+        expect(sortable_search_params.to_unsafe_h).to eq({})
+      end
+    end
+    context "direction, sort" do
+      let(:passed_params) { { direction: "asc", sort: "stolen", party: "long" } }
+      let(:target) { { direction: "asc", sort: "stolen" } }
+      it "returns an empty hash" do
+        expect(sortable_search_params.to_unsafe_h).to eq(target.as_json)
+      end
+    end
+    context "direction, sort, search param" do
+      let(:passed_params) { { direction: "asc", sort: "stolen", party: "long", search_stuff: "xxx" } }
+      let(:target) { { direction: "asc", sort: "stolen", search_stuff: "xxx" } }
+      it "returns an empty hash" do
+        expect(sortable_search_params.to_unsafe_h).to eq(target.as_json)
+      end
+    end
+  end
 end

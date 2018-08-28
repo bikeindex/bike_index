@@ -1,15 +1,8 @@
 .form.form-horizontal
   = form_for [:admin, @paid_feature] do |f|
     - if @paid_feature.errors.any?
-      #alert-block
-        .alert.alert-error
-          %h4
-            Please fix the following 
-            = pluralize(@paid_feature.errors.count, "error")
-          %ul
-            - @paid_feature.errors.full_messages.each do |msg|
-              %li
-                = msg
+      = render partial: "/shared/errors", locals: { name: "Paid feature", obj: @paid_feature }
+
     .control-group.padded
       .control-label
         = f.label :kind
@@ -18,7 +11,7 @@
           %span.less-strong
             = @paid_feature.kind
         - else
-          = f.select :kind, PaidFeature.kinds
+          = f.select :kind, PaidFeature.kinds.map { |k| [k.humanize, k] }
 
     .control-group.padded
       .control-label
@@ -32,9 +25,9 @@
 
     .control-group.padded
       .control-label
-        = f.label :amount_cents
+        = f.label :amount
       .controls
-        = f.number_field :amount_cents, step: 1, min: 0
+        = f.number_field :amount, step: 1, min: 0
 
     .control-group.padded
       .control-label

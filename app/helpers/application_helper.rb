@@ -132,4 +132,23 @@ module ApplicationHelper
     c << content_tag(:article, list_item.body_html.html_safe) if list_item.body_html.present?
     c
   end
+
+  def sortable(column, title = nil, html_options = {})
+    title ||= column.gsub(/_id\z/, "").titleize
+    html_options[:class] = "#{html_options[:class]} sortable-link"
+    direction = column == sort_column && sort_direction == "desc" ? "asc" : "desc"
+    if column == sort_column
+      html_options[:class] += " active"
+      span_content = direction == "asc" ? "\u2193" : "\u2191"
+    end
+    link_to(sortable_search_params.merge(sort: column, direction: direction, query: params[:query]), html_options) do
+      concat(title.html_safe)
+      concat(content_tag(:span, span_content, class: "sortable-direction"))
+    end
+  end
+
+  def sortable_search_params
+    search_param_keys = params.keys.select { |k| k.to_s.match(/\Asearch_/) }
+    params.permit(:direction, :sort, *search_param_keys)
+  end
 end

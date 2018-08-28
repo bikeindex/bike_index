@@ -1,10 +1,13 @@
 require "spec_helper"
 
-describe Admin::PaidFeaturesController, type: :controller do
-  let(:subject) { FactoryGirl.create(:paid_feature) }
+describe Admin::PaymentsController, type: :controller do
   include_context :logged_in_as_super_admin
-  let(:passed_params) { { amount_cents: 22_222, description: "Some really long description or wahtttt", details_link: "https://example.com" } }
-  let(:full_params) { passed_params.merge(kind: "custom_one_time", name: "another name stuff") }
+  let(:subject) { FactoryGirl.create(:payment, user: user) }
+  let(:organization) { FactoryGirl.create(:organization) }
+  let(:invoice) { FactoryGirl.create(:invoice, organization: organization) }
+  let(:user2) { FactoryGirl.create(:user) }
+  let(:create_time) { Time.now - 2.weeks }
+  let(:params) { { organization_id: organization.id, invoice_id: invoice.id, email: user2.email, amount: 222.22, kind: "stripe", created_at: create_time.strftime("%FT%T%:z") } }
 
   describe "index" do
     it "renders" do
@@ -31,33 +34,59 @@ describe Admin::PaidFeaturesController, type: :controller do
   end
 
   describe "update" do
-    let!(:original_name) { subject.name }
-    let!(:original_kind) { subject.kind }
-    it "updates available attributes" do
-      put :update, id: subject.to_param, paid_feature: full_params
-      expect(flash[:success]).to be_present
-      subject.reload
-      full_params.each { |k, v| expect(subject.send(k)).to eq(v) }
-    end
-    context "locked paid_feature" do
-      let(:subject) { FactoryGirl.create(:paid_feature, is_locked: true) }
-      it "does not update locked attributes" do
-        put :update, id: subject.to_param, paid_feature: full_params
+    context "stripe payment" do
+      it "updates available attributes" do
+        put :update, id: subject.to_param, payment: params
         subject.reload
-        passed_params.each { |k, v| expect(subject.send(k)).to eq(v) }
-        expect(subject.name).to eq original_name
-        expect(subject.kind).to eq original_kind
+        expect(subject.organization).to eq organization
+        expect(subject.invoice).to eq invoice
+        # Not changed attrs:
+        expect(subject.kind).to eq "stripe"
+        expect(subject.created_at).to be_within(1.minute).of Time.now
+        expect(subject.user).to eq user
+        expect(subject.amount_cents).to_not eq 22_222
+      end
+    end
+    context "check payment" do
+      let(:subject) { FactoryGirl.create(:payment_check, organization: nil, amount_cents: 55_555, user: user) }
+      it "updates available attributes" do
+        put :update, id: subject.to_param, payment: params
+        subject.reload
+        expect(subject.organization).to eq organization
+        expect(subject.invoice).to eq invoice
+        # Not changed attrs:
+        expect(subject.kind).to eq "check"
+        expect(subject.created_at).to be_within(1.minute).of Time.now
+        expect(subject.user).to eq user
+        expect(subject.email).to eq user.email
+        expect(subject.amount_cents).to eq 55555
       end
     end
   end
 
   describe "create" do
-    it "succeeds" do
-      expect do
-        post :create, paid_feature: full_params
-      end.to change(PaidFeature, :count).by 1
-      paid_feature = PaidFeature.last
-      full_params.each { |k, v| expect(paid_feature.send(k)).to eq(v) }
+    context "stripe payment" do
+      it "does not create" do
+        expect do
+          post :create, payment: params.merge(kind: "stripe")
+          expect(flash[:error]).to match(/stripe/i)
+        end.to_not change(Payment, :count)
+      end
+    end
+    context "check payment" do
+      it "creates" do
+        expect do
+          post :create, payment: params.merge(kind: "check")
+        end.to change(Payment, :count).by 1
+        payment = Payment.last
+        expect(payment.organization).to eq organization
+        expect(payment.invoice).to eq invoice
+        expect(payment.user).to eq user2
+        expect(payment.email).to eq user2.email
+        expect(payment.amount_cents).to eq 22_222
+        expect(payment.kind).to eq "check"
+        expect(payment.created_at).to be_within(1.minute).of create_time
+      end
     end
   end
 end

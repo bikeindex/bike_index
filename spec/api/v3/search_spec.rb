@@ -63,7 +63,7 @@ describe 'Search API V3' do
         get '/api/v3/search/count', request_query_params, format: :json
         result = JSON.parse(response.body)
         # The result is counts of the arrays we stubbed :/
-        expect(result).to eq({ non: 3, stolen: 2, proximity: 1 }.as_json)
+        expect(result).to match({ non: 3, stolen: 2, proximity: 1 }.as_json)
         expect(response.status).to eq(200)
       end
     end
