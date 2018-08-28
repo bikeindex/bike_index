@@ -317,7 +317,7 @@ describe ApplicationHelper do
         expect(sortable_search_params.to_unsafe_h).to eq(target.as_json)
       end
     end
-    context "direction, sort" do
+    context "direction, sort, search param" do
       let(:passed_params) { { direction: "asc", sort: "stolen", party: "long", search_stuff: "xxx" } }
       let(:target) { { direction: "asc", sort: "stolen", search_stuff: "xxx" } }
       it "returns an empty hash" do

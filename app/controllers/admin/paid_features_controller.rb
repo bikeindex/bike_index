@@ -3,7 +3,7 @@ class Admin::PaidFeaturesController < Admin::BaseController
   before_filter :find_paid_feature, only: [:edit, :update]
 
   def index
-    @paid_features = PaidFeature.order(sort_column + ' ' + sort_direction)
+    @paid_features = PaidFeature.order(sort_column + " " + sort_direction)
   end
 
   def new
