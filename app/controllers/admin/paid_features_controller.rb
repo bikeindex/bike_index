@@ -1,8 +1,9 @@
 class Admin::PaidFeaturesController < Admin::BaseController
+  include SortableTable
   before_filter :find_paid_feature, only: [:edit, :update]
 
   def index
-    @paid_features = PaidFeature.order(created_at: :desc)
+    @paid_features = PaidFeature.order(sort_column + ' ' + sort_direction)
   end
 
   def new
@@ -34,6 +35,10 @@ class Admin::PaidFeaturesController < Admin::BaseController
 
   protected
 
+  def sortable_columns
+    %w(created_at kind name amount_cents)
+  end
+
   def permitted_update_parameters
     if @paid_feature.locked?
       permitted_parameters.except("kind", "name")
@@ -43,7 +48,7 @@ class Admin::PaidFeaturesController < Admin::BaseController
   end
 
   def permitted_parameters
-    params.require(:paid_feature).permit(:amount_cents, :description, :details_link, :kind, :name)
+    params.require(:paid_feature).permit(:amount, :description, :details_link, :kind, :name)
   end
 
   def find_paid_feature

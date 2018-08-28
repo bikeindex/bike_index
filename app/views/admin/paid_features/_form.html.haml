@@ -18,7 +18,7 @@
           %span.less-strong
             = @paid_feature.kind
         - else
-          = f.select :kind, PaidFeature.kinds
+          = f.select :kind, PaidFeature.kinds.map { |k| [k.humanize, k] }
 
     .control-group.padded
       .control-label
@@ -32,9 +32,9 @@
 
     .control-group.padded
       .control-label
-        = f.label :amount_cents
+        = f.label :amount
       .controls
-        = f.number_field :amount_cents, step: 1, min: 0
+        = f.number_field :amount, step: 1, min: 0
 
     .control-group.padded
       .control-label

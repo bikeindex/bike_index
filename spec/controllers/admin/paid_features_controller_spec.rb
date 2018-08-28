@@ -3,7 +3,7 @@ require "spec_helper"
 describe Admin::PaidFeaturesController, type: :controller do
   let(:subject) { FactoryGirl.create(:paid_feature) }
   include_context :logged_in_as_super_admin
-  let(:passed_params) { { amount_cents: 22_222, description: "Some really long description or wahtttt", details_link: "https://example.com" } }
+  let(:passed_params) { { amount: 222.22, description: "Some really long description or wahtttt", details_link: "https://example.com" } }
   let(:full_params) { passed_params.merge(kind: "custom_one_time", name: "another name stuff") }
 
   describe "index" do
