@@ -116,7 +116,7 @@ class BParam < ActiveRecord::Base
   def creation_organization; Organization.friendly_find(creation_organization_id) end
   def manufacturer; bike['manufacturer_id'] && Manufacturer.friendly_find(bike['manufacturer_id']) end
   def partial_registration?; origin == "embed_partial" end
-  def primary_frame_color; primary_frame_color_id && Color.find(primary_frame_color_id).name end
+  def primary_frame_color; primary_frame_color_id.present? && Color.find(primary_frame_color_id)&.name end
 
   # Right now this is a partial update. It's improved from where it was, but it still uses the BikeCreator
   # code for protection. Ideally, we would use the revised merge code to ensure we aren't letting users
