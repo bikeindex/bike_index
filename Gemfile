@@ -50,7 +50,7 @@ gem 'wkhtmltopdf-binary'
 gem 'wicked_pdf'
 gem 'eventmachine'
 gem 'httparty'
-gem "sitemap_generator", "~> 5.1"
+gem "sitemap_generator", "~> 6"
 gem 'paranoia'
 
 # API wrappers
