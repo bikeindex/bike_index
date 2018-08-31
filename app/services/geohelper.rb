@@ -10,8 +10,10 @@ class Geohelper
       result.first.formatted_address || result.first.address
     end
 
-    def coordinates_for(address)
-      geometry = Geocoder.search(address)&.first&.data["geometry"]
+    def coordinates_for(addy)
+      result = Geocoder.search(formatted_address(addy))
+      return nil unless result&.any?
+      geometry = result.first&.data && result.first.data["geometry"]
       if geometry && geometry["location"].present?
         location = geometry["location"]
       elsif geometry && geometry["bounds"].present?
@@ -20,6 +22,12 @@ class Geohelper
       end
       return nil unless location
       { latitude: location["lat"], longitude: location["lng"] }
+    end
+
+    # Google isn't a fan of bare zipcodes anymore. But we search using bare zipcodes a lot - so make it work
+    def formatted_address(addy)
+      address = addy.to_s.strip
+      address.match(/\A\d{5}\z/).present? ? "zipcode: #{address}" : address
     end
   end
 end

@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe Payment do
+  it_behaves_like "amountable"
   describe "create" do
     context "stripe" do
       let(:user) { FactoryGirl.create(:user) }

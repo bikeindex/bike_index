@@ -15,6 +15,6 @@ module Amountable
   end
 
   def amount_formatted
-    Money.new(amount_cents, currency).format
+    Money.new(amount_cents || 0, currency).format
   end
 end
