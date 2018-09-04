@@ -18,7 +18,7 @@
       %th Model
       %th Color
       %th Sent to
-      %th Claimed
+      / %th Claimed
       - if @bike_code.present?
         %th
           Link
@@ -43,8 +43,8 @@
               = bike.creation_description
             - unless bike.owner_email == bike.first_owner_email
               (sent to a new owner)
-        %td
-          = "&#x2713;".html_safe if bike.current_owner_exists
+        / %td
+        /   = "&#x2713;".html_safe if bike.current_owner_exists
         - if @bike_code.present?
           %td
             %small
