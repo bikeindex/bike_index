@@ -9,7 +9,7 @@ describe AfterBikeChangeWorker do
     instance.perform(0)
   end
 
-  describe "not failing" do
+  describe "serialized" do
     let!(:bike) { FactoryGirl.create(:stolen_bike) }
     it "calls the things we expect it to call" do
       ENV["BIKE_WEBHOOK_AUTH_TOKEN"] = "xxxx"
