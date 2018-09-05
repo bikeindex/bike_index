@@ -1,0 +1,22 @@
+# This replaces WebhookRunner - which is brittle and not flexible enough for what I'm looking for now
+# Basically I need to refactor that, but I don't want to right now because I hate myself
+
+class AfterBikeChangeWorker
+  include Sidekiq::Worker
+  sidekiq_options queue: "updates"
+  sidekiq_options backtrace: true
+
+  def perform(id)
+    bike = Bike.where(id: id)
+    return true unless bike.present? && bike.stolen
+    post_bike_to_webhook(serialized(bike))
+  end
+
+  def serialized(bike)
+    {
+      auth_token: ENV["BIKE_WEBHOOK_AUTH_TOKEN"],
+      bike: BikeV2ShowSerializer.new(bike, root: false).as_json,
+      update: bike.created_at > Time.now - 30.seconds
+    }
+  end
+end
