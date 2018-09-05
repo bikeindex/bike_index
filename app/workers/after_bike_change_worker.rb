@@ -3,7 +3,7 @@
 
 class AfterBikeChangeWorker
   include Sidekiq::Worker
-  sidekiq_options queue: "updates"
+  sidekiq_options queue: "afterwards"
   sidekiq_options backtrace: true
   POST_URL = ENV["BIKE_WEBHOOK_URL"]
   AUTH_TOKEN = ENV["BIKE_WEBHOOK_AUTH_TOKEN"]

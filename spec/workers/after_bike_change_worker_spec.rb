@@ -3,7 +3,7 @@ require "spec_helper"
 describe AfterBikeChangeWorker do
   let(:subject) { AfterBikeChangeWorker }
   let(:instance) { subject.new }
-  it { is_expected.to be_processed_in :updates }
+  it { is_expected.to be_processed_in :afterwards }
 
   it "doesn't fail if the bike doesn't exist" do
     instance.perform(0)
