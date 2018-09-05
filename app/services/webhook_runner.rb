@@ -1,4 +1,7 @@
+
+# This is deprecated and should be removed or refactored eventually. Check AfterBikeChangeWorker
 class WebhookRunner
+
   require 'httparty'
   
   def make_request(url)
