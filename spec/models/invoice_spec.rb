@@ -3,6 +3,15 @@ require "spec_helper"
 RSpec.describe Invoice, type: :model do
   let(:organization) { invoice.organization }
 
+  describe "friendly_find" do
+    let!(:invoice) { FactoryGirl.create(:invoice) }
+    it "finds or doesn't appropriately" do
+      expect(Invoice.friendly_find(invoice.id)).to eq invoice
+      expect(Invoice.friendly_find("Invoice ##{invoice.id}")).to eq invoice
+      expect(Invoice.friendly_find("Invoice 82812812")).to be_nil
+    end
+  end
+
   describe "previous_invoice" do
     let(:invoice) { FactoryGirl.create(:invoice, subscription_start_at: Time.now - 4.years, force_active: true) }
     let(:invoice2) { invoice.create_following_invoice }

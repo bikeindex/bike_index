@@ -61,6 +61,32 @@ describe Admin::PaymentsController, type: :controller do
         expect(subject.email).to eq user.email
         expect(subject.amount_cents).to eq 55555
       end
+      context "no invoice" do
+        it "updates available attributes" do
+          put :update, id: subject.to_param, payment: params.merge(invoice_id: "")
+          subject.reload
+          expect(subject.organization).to eq organization
+          expect(subject.invoice).to be_nil
+          # Not changed attrs:
+          expect(subject.kind).to eq "check"
+          expect(subject.created_at).to be_within(1.minute).of Time.now
+          expect(subject.user).to eq user
+          expect(subject.email).to eq user.email
+          expect(subject.amount_cents).to eq 55555
+        end
+      end
+      context "invoice for different organization" do
+        let(:invoice) { FactoryGirl.create(:invoice) }
+        let!(:subject) { FactoryGirl.create(:payment_check, organization: organization, amount_cents: 55_555, user: user, invoice: nil) }
+        it "Does not update" do
+          expect(invoice.organization).to_not eq organization
+          expect(subject.organization).to eq organization
+          put :update, id: subject.to_param, payment: params
+          expect(flash[:error]).to match(/#{organization.short_name}/)
+          subject.reload
+          expect(subject.invoice).to be_nil
+        end
+      end
     end
   end
 
@@ -86,6 +112,21 @@ describe Admin::PaymentsController, type: :controller do
         expect(payment.amount_cents).to eq 22_222
         expect(payment.kind).to eq "check"
         expect(payment.created_at).to be_within(1.minute).of create_time
+      end
+      context "no organization" do
+        it "creates" do
+          expect do
+            post :create, payment: params.merge(kind: "check", organization_id: "", invoice_id: "Invoice ##{invoice.id}")
+          end.to change(Payment, :count).by 1
+          payment = Payment.last
+          expect(payment.organization).to eq organization
+          expect(payment.invoice).to eq invoice
+          expect(payment.user).to eq user2
+          expect(payment.email).to eq user2.email
+          expect(payment.amount_cents).to eq 22_222
+          expect(payment.kind).to eq "check"
+          expect(payment.created_at).to be_within(1.minute).of create_time
+        end
       end
     end
   end

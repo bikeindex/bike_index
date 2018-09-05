@@ -18,6 +18,11 @@ class Invoice < ActiveRecord::Base
   scope :current, -> { active.where("subscription_end_at > ?", Time.now) }
   scope :expired, -> { active.where("subscription_end_at < ?", Time.now) }
 
+  def self.friendly_find(str)
+    str = str[/\d+/] if str.is_a?(String)
+    where(id: str).first
+  end
+
   def subscription_duration; 1.year end # Static, at least for now
   def renewal_invoice?; first_invoice_id.present? end
   def active?; is_active && subscription_start_at.present? end # Alias - don't directly access the db attribute, because it might change
@@ -28,6 +33,7 @@ class Invoice < ActiveRecord::Base
   def subscription_first_invoice_id; first_invoice_id || id end
   def subscription_first_invoice; first_invoice || self end
   def subscription_invoices; self.class.where(first_invoice_id: subscription_first_invoice_id) end
+  def display_name; "Invoice ##{id}" end
 
   # There can be multiple features of the same id. View the spec for additional info
   def paid_feature_ids=(val) # This isn't super efficient, but whateves

@@ -10,11 +10,11 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
     @invoice = @organization.invoices.new
   end
 
+  def show
+    redirect_to edit_admin_organization_invoice_path
+  end
+
   def edit
-    @edit_template = edit_layout_pages.include?(params[:id]) ? params[:id] : edit_layout_pages.first
-    unless @edit_template == 'landing_page' # Otherwise, we're rendering a snippet
-      @mail_snippet = @organization.mail_snippets.where(name: @edit_template).first_or_create
-    end
   end
 
   def update
