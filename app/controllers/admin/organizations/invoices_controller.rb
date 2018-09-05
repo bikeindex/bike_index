@@ -1,7 +1,13 @@
-class Admin::Organizations::CustomLayoutsController < Admin::BaseController
-  before_filter :find_and_authorize_organization
+class Admin::Organizations::InvoicesController < Admin::BaseController
+  before_action :find_organization
+  before_action :find_invoice, only: [:edit, :update]
 
   def index
+    @invoices = @organization.invoices.order(id: :desc)
+  end
+
+  def new
+    @invoice = @organization.invoices.new
   end
 
   def edit
@@ -27,19 +33,15 @@ class Admin::Organizations::CustomLayoutsController < Admin::BaseController
           .permit(:landing_html, mail_snippets_attributes: [:body, :is_enabled, :id])
   end
 
-  def edit_layout_pages
-    @edit_layout_pages ||= MailSnippet.organization_snippet_types + %w(landing_page)
-  end
-
-  def find_and_authorize_organization
+  def find_organization
     @organization = Organization.friendly_find(params[:organization_id])
-    unless current_user.developer
-      flash[:info] = 'Sorry, you must be a developer to access that page.'
-      redirect_to admin_organization_url(@organization) and return
-    end
     unless @organization
       flash[:error] = "Sorry! That organization doesn't exist"
       redirect_to admin_organizations_url and return
     end
+  end
+
+  def find_invoice
+    @invoice = @organization.invoices.find(params[:id])
   end
 end
