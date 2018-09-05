@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Invoice < ActiveRecord::Base
+  include Amountable # included for formatting stuff
   belongs_to :organization
   belongs_to :first_invoice, class_name: "Invoice" # Use subscription_first_invoice_id + subscription_first_invoice, NOT THIS
 
@@ -57,7 +58,23 @@ class Invoice < ActiveRecord::Base
         end
       end
     end
-    self.amount_due_cents = new_features.map(&:amount_cents).sum
+  end
+
+  def amount_due
+    amnt = (amount_due_cents.to_i / 100.00)
+    amnt % 1 != 0 ? amnt : amnt.round
+  end
+
+  def amount_due=(val)
+    self.amount_due_cents = val.to_f * 100
+  end
+
+  def amount_due_formatted
+    money_formatted(amount_due_cents)
+  end
+
+  def amount_paid_formatted
+    money_formatted(amount_paid_cents)
   end
 
   def previous_invoice

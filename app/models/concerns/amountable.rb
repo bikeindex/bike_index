@@ -14,7 +14,11 @@ module Amountable
     self.amount_cents = val.to_f * 100
   end
 
+  def money_formatted(amnt)
+    Money.new(amnt || 0, currency).format
+  end
+
   def amount_formatted
-    Money.new(amount_cents || 0, currency).format
+    money_formatted(amount_cents)
   end
 end

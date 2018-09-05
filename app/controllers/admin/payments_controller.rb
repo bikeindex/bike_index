@@ -1,6 +1,6 @@
 class Admin::PaymentsController < Admin::BaseController
   include SortableTable
-  before_filter :find_payment, only: [:edit, :update]
+  before_filter :find_payment, only: %i[edit update]
 
   def index
     page = params[:page] || 1
@@ -17,8 +17,7 @@ class Admin::PaymentsController < Admin::BaseController
     redirect_to edit_admin_payment_url
   end
 
-  def edit
-  end
+  def edit; end
 
   def update
     if valid_invoice_parameters?
@@ -49,7 +48,7 @@ class Admin::PaymentsController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w(created_at user_id organization_id kind invoice_id amount_cents)
+    %w[created_at user_id organization_id kind invoice_id amount_cents]
   end
 
   def valid_invoice_parameters?

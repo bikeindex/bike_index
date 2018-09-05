@@ -1,42 +1,50 @@
 %header.with-subtitle.padded
   %h1
-    Edit #{ link_to @organization.name, admin_organization_path(@organization) } Invoices
-%section
-  .dl-holder.padded
-    %dl.dl-horizontal
-      %dt Paid
-      %dd
-        = @organization.is_paid
+    #{ link_to @organization.name, admin_organization_path(@organization) } Invoices
+  = link_to "New Invoice", new_admin_organization_invoice_path(organization_id: @organization.to_param), class: "button-green sharing-links"
 
-          
-/ %section.full-screen-table
-/   %table.table.table-striped.table-bordered
-/     %thead
-/       %th
-/         Link to edit
-/       %th
-/         Has content
-/       %th
-/         Enabled
-/     %tbody
-/       %tr
-/         %td
-/           = link_to 'Landing page', edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: 'landing_page')
-/           %small.less-strong
-/             page  #{ link_to 'previewable here', organization_landing_path(organization_id: @organization.to_param) }, even if "off"
-/         %td
-/           = @organization.landing_html.present?
-/         %td
-/           = link_to LandingPages::ORGANIZATIONS.include?(@organization.slug), 'https://github.com/bikeindex/bike_index/blob/master/config/landing_pages.rb'
-/       - MailSnippet.organization_snippets.each do |snippet_name, snippet_description|
-/         - snippet = @organization.mail_snippets.where(name: snippet_name).first
-/         %tr
-/           %td
-/             = link_to snippet_description, edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: snippet_name)
-/           %td.table-cell-check
-/             = "&#x2713;".html_safe if snippet && snippet.body.present?
-/           %td.table-cell-check
-/             = "&#x2713;".html_safe if snippet && snippet.is_enabled
+%section.full-screen-table
+  %table.table.table-striped.table-bordered
+    %thead
+      %th
+      %th
+        Subscription&nbsp;start
+      %th
+        Subscription&nbsp;end
+      %th
+        Amount Due
+      %th
+        Amount paid
+      %th
+        Features
+    %tbody
+      - @organization.invoices.each do |invoice|
+        %tr
+          %td
+            = link_to invoice.display_name, edit_admin_organization_invoice_path(organization_id: @organization.to_param, id: invoice.to_param)
+          %td
+            - if invoice.subscription_start_at.present?
+              %span.convertTime
+                = l invoice.subscription_start_at, format: :convert_time
+          %td
+            - if invoice.subscription_end_at.present?
+              %span.convertTime
+                = l invoice.subscription_end_at, format: :convert_time
+          %td
+            = invoice.amount_due_formatted
+          %td
+            = invoice.amount_paid_formatted
+            - invoice.payments.each do |payment|
+              %small
+                = link_to payment.kind.humanize, edit_admin_payment_path(payment)
+          %td
+            %ul
+              - invoice.paid_features.each do |paid_feature|
+                %li
+                  = link_to paid_feature.name, edit_admin_paid_feature_path(paid_feature)
+                  %em
+                    = paid_feature.kind
+
 
 %h2
   #{@organization.name} has #{pluralize(@organization.payments.count, "payment")}
@@ -45,7 +53,7 @@
   You can add invoices to payments by editing them. If you don't see a payment in this list, #{link_to "search the payments", admin_payments_path } and add it by editing it.
 
 %section.full-screen-table
-  %table.table.table-striped.table-bordered.sortable
+  %table.table.table-striped.table-bordered
     %thead
       %th
         Paid&nbsp;at

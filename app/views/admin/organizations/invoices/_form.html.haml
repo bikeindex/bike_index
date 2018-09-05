@@ -1,0 +1,56 @@
+.form.form-horizontal
+  = form_for [:admin, @organization, @invoice] do |f|
+    - if @invoice.errors.any?
+      = render partial: "/shared/errors", locals: { name: "Invoice", obj: @invoice }
+
+    %section.full-screen-table
+      %table.table.table-striped.table-bordered
+        %thead
+          %th.table-cell-check
+            = link_to "&#x2713;".html_safe, "#" # make this select/deselect all
+          %th
+            Name
+          %th
+            Kind
+          %th
+            Amount
+        %tbody
+          - @paid_features.each do |paid_feature|
+            %tr
+              %td
+                = check_box_tag "paid_feature_selected[#{paid_feature.id}]", paid_feature.id
+              %td
+                = link_to paid_feature.name, edit_admin_paid_feature_url(paid_feature)
+              %td
+                %small
+                  = paid_feature.kind.humanize
+              %td
+                = paid_feature.amount_formatted
+          %tr
+            %td
+            %td
+              Upfront Features
+              %span#upfrontCount
+                X
+            %td
+            %td
+              $<span id="upfrontCost">X</span>
+          %tr
+            %td
+            %td
+              Recuring Features
+              %span#recurringCount
+                X
+            %td
+            %td
+              $<span id="recurringCost">X</span>
+
+
+
+    .control-group.padded
+      .control-label
+        = f.label :amount_due, "Amount due $"
+      .controls
+        = f.number_field :amount_due
+
+    = f.submit "Save", class: 'button-green'

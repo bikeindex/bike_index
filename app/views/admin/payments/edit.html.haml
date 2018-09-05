@@ -25,5 +25,10 @@
       = f.label :organization_id, class: "control-label"
       .controls
         = collection_select(:payment, :organization_id, organizations, :id, :name, prompt: "Choose organization")
+    .control-group.padded
+      .control-label
+        = f.label :invoice_id, "Invoice #"
+      .controls
+        = f.text_field :invoice_id
 
     = f.submit "Submit", class: 'button-green'

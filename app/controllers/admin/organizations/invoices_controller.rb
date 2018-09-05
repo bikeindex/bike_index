@@ -1,6 +1,7 @@
 class Admin::Organizations::InvoicesController < Admin::BaseController
   before_action :find_organization
-  before_action :find_invoice, only: [:edit, :update]
+  before_action :find_invoice, only: %i[edit update]
+  before_action :find_paid_features, only: %i[new edit]
 
   def index
     @invoices = @organization.invoices.order(id: :desc)
@@ -14,7 +15,9 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
     redirect_to edit_admin_organization_invoice_path
   end
 
-  def edit
+  def edit; end
+
+  def create
   end
 
   def update
@@ -28,9 +31,13 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
 
   protected
 
+  def find_paid_features
+    @paid_features = PaidFeature.order(:name)
+  end
+
   def permitted_parameters
-    params.require(:organization)
-          .permit(:landing_html, mail_snippets_attributes: [:body, :is_enabled, :id])
+    params.require(:invoice)
+          .permit(:paid_feature_ids, :subscription_start_at, :amount_due)
   end
 
   def find_organization
