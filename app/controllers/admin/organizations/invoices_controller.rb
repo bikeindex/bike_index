@@ -18,6 +18,8 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
   def edit; end
 
   def create
+    pp params
+    redirect_to admin_organization_invoices_path(organization_id: @organization.to_param)
   end
 
   def update

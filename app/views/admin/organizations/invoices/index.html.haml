@@ -7,14 +7,17 @@
   %table.table.table-striped.table-bordered
     %thead
       %th
+        \#
       %th
-        Subscription&nbsp;start
+        Start
       %th
-        Subscription&nbsp;end
+        End
       %th
-        Amount Due
+        Due
       %th
-        Amount paid
+        Discount
+      %th
+        Paid
       %th
         Features
     %tbody
@@ -32,6 +35,8 @@
                 = l invoice.subscription_end_at, format: :convert_time
           %td
             = invoice.amount_due_formatted
+          %td
+            = invoice.discount_formatted
           %td
             = invoice.amount_paid_formatted
             - invoice.payments.each do |payment|

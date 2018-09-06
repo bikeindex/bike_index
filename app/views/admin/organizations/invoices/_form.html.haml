@@ -15,10 +15,11 @@
           %th
             Amount
         %tbody
+          - paid_feature_ids = @invoice.paid_feature_ids
           - @paid_features.each do |paid_feature|
             %tr
               %td
-                = check_box_tag "paid_feature_selected[#{paid_feature.id}]", paid_feature.id
+                = f.check_box "paid_feature_ids[#{paid_feature.id}]", checked: paid_feature_ids.include?(paid_feature.id)
               %td
                 = link_to paid_feature.name, edit_admin_paid_feature_url(paid_feature)
               %td
@@ -27,30 +28,37 @@
               %td
                 = paid_feature.amount_formatted
           %tr
-            %td
-            %td
+            %td{ style: "border-top: 2px solid black;" }
+            %td{ style: "border-top: 2px solid black;" }
+            %td{ style: "text-align: right; border-top: 2px solid black;" }
               Upfront Features
               %span#upfrontCount
                 X
-            %td
-            %td
+            %td{ style: "border-top: 2px solid black;" }
               $<span id="upfrontCost">X</span>
           %tr
             %td
             %td
+            %td{ style: "text-align: right;" }
               Recuring Features
               %span#recurringCount
                 X
             %td
-            %td
               $<span id="recurringCost">X</span>
+          %tr
+            %td
+            %td
+            %td{ style: "text-align: right;" }
+              Discount
+            %td
+              $<span id="discountCost">X</span> 
+          %tr
+            %td
+            %td
+            %td{ style: "text-align: right;" }
+              = f.label :amount_due, "Amount due $"
+            %td
+              = f.number_field :amount_due
 
-
-
-    .control-group.padded
-      .control-label
-        = f.label :amount_due, "Amount due $"
-      .controls
-        = f.number_field :amount_due
 
     = f.submit "Save", class: 'button-green'

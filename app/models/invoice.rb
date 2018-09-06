@@ -29,13 +29,14 @@ class Invoice < ActiveRecord::Base
   def active?; is_active && subscription_start_at.present? end # Alias - don't directly access the db attribute, because it might change
   def current?; active? && subscription_end_at > Time.now end
   def expired?; active? && !current? end
-  def discount; features_at_start_cents end
+  def discount_cents; feature_cost_cents - amount_due_cents end
   def paid_in_full?; amount_paid_cents.present? && amount_due_cents.present? && amount_paid_cents >= amount_due_cents end
   def subscription_first_invoice_id; first_invoice_id || id end
   def subscription_first_invoice; first_invoice || self end
   def subscription_invoices; self.class.where(first_invoice_id: subscription_first_invoice_id) end
   def display_name; "Invoice ##{id}" end
 
+  def paid_feature_ids; invoice_paid_features.pluck(:paid_feature_id) end
   # There can be multiple features of the same id. View the spec for additional info
   def paid_feature_ids=(val) # This isn't super efficient, but whateves
     val = val.to_s.split(",") unless val.is_a?(Array)
@@ -75,6 +76,10 @@ class Invoice < ActiveRecord::Base
 
   def amount_paid_formatted
     money_formatted(amount_paid_cents)
+  end
+
+  def discount_formatted
+    money_formatted(discount_cents)
   end
 
   def previous_invoice
