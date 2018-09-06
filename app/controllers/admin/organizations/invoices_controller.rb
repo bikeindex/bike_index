@@ -23,12 +23,6 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
   end
 
   def update
-    if @organization.update_attributes(permitted_parameters)
-      flash[:success] = 'Organization Saved!'
-      redirect_to edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id])
-    else
-      render action: :edit, id: params[:id]
-    end
   end
 
   protected
@@ -39,7 +33,7 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
 
   def permitted_parameters
     params.require(:invoice)
-          .permit(:paid_feature_ids, :subscription_start_at, :amount_due)
+          .permit(:paid_feature_ids, :subscription_start_at, :timezone, :amount_due)
   end
 
   def find_organization
