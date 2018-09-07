@@ -9,6 +9,10 @@ class Admin::PaymentsController < Admin::BaseController
                        .order(sort_column + " " + sort_direction).page(page).per(per_page)
   end
 
+  def invoices
+    @invoices = Invoice.order(id: :desc)
+  end
+
   def new
     @payment = Payment.new
   end
