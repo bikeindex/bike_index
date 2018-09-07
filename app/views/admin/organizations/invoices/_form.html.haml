@@ -1,0 +1,86 @@
+.form.form-horizontal#invoiceForm
+  = form_for [:admin, @organization, @invoice] do |f|
+    = f.hidden_field :paid_feature_ids
+    - if @invoice.errors.any?
+      = render partial: "/shared/errors", locals: { name: "Invoice", obj: @invoice }
+
+    %section.full-screen-table
+      %table.table.table-striped.table-bordered
+        %thead
+          %th.table-cell-check
+            = link_to "&#x2713;".html_safe, "#" # make this select/deselect all
+          %th
+            Name
+          %th
+            Kind
+          %th
+            Amount
+        %tbody
+          - paid_feature_ids = @invoice.paid_feature_ids
+          - @paid_features.each do |paid_feature|
+            %tr
+              %td.paidFeatureCheck
+                / I know there is a way to make rails do this, but I'm having trouble making it happen, so whatever
+                = check_box_tag "paid_feature_ids_#{paid_feature.id}", paid_feature.id, paid_feature_ids.include?(paid_feature.id), { class: (paid_feature.one_time? ? "oneTime" : "recurring"), "data-amount" => paid_feature.amount, "data-id" => paid_feature.id }
+
+              %td
+                = link_to paid_feature.name, edit_admin_paid_feature_url(paid_feature)
+              %td
+                %small
+                  = paid_feature.kind.humanize
+              %td
+                = paid_feature.amount_formatted
+
+          %tr
+            %td{ style: "border-top: 2px solid black;" }
+            %td{ style: "border-top: 2px solid black;" }
+            %td{ style: "text-align: right; border-top: 2px solid black;" }
+              One Time Features
+              %small.less-strong#oneTimeCount
+            %td{ style: "border-top: 2px solid black;" }
+              $<span id="oneTimeCost"></span>
+          %tr
+            %td
+            %td
+            %td{ style: "text-align: right;" }
+              Recurring Features
+              %small.less-strong#recurringCount
+            %td
+              $<span id="recurringCost"></span>
+          %tr
+            %td
+            %td
+            %td{ style: "text-align: right;" }
+              Total
+            %td
+              $<span id="totalCost"></span>
+          %tr
+            %td
+            %td
+            %td{ style: "text-align: right;" }
+              = f.label :amount_due, "Amount due $"
+            %td.inputTriggerRecalculation
+              = f.number_field :amount_due, class: "form-control"
+          %tr
+            %td
+            %td
+            %td{ style: "text-align: right;" }
+              Discount
+            %td
+              $<span id="discountCost"></span> 
+
+    .control-group
+      = label :subscription_start_at, "Coverage starts", class: "control-label"
+      .controls
+        - @invoice.subscription_start_at = TimeParser.round(@invoice.subscription_start_at || Time.now, "seconds")
+        = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
+        = f.datetime_local_field :subscription_start_at, step: 60, required: true, class: "form-control"
+    - if @invoice.id.present? && @invoice.subscription_start_at.present?
+      .control-group
+        = label :subscription_end_at, "Coverage ends", class: "control-label"
+        .controls
+          - @invoice.subscription_end_at = TimeParser.round(@invoice.subscription_end_at || Time.now, "seconds")
+          = f.datetime_local_field :subscription_end_at, step: 60, required: true, class: "form-control"
+    .control-group
+    = f.submit "Save", class: 'button-green'
+

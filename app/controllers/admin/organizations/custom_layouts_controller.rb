@@ -6,7 +6,7 @@ class Admin::Organizations::CustomLayoutsController < Admin::BaseController
 
   def edit
     @edit_template = edit_layout_pages.include?(params[:id]) ? params[:id] : edit_layout_pages.first
-    unless @edit_template == 'landing_page' # Otherwise, we're rendering a nsnippet
+    unless @edit_template == 'landing_page' # Otherwise, we're rendering a snippet
       @mail_snippet = @organization.mail_snippets.where(name: @edit_template).first_or_create
     end
   end

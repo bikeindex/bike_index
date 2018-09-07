@@ -64,6 +64,11 @@
     - if @organization.is_suspended
       %h2.red-text
         Organization is suspended
+  %p
+    %strong
+      = link_to "Edit/Create Invoices", admin_organization_invoices_path(organization_id: @organization.to_param)
+    %em.less-strong
+      #{@organization.name} has #{pluralize(@organization.invoices.count, "invoice")}
 
   - if @organization.is_paid
     .well

@@ -141,7 +141,8 @@ Bikeindex::Application.routes.draw do
     resources :memberships, :organization_invitations, :bulk_imports,
               :paints, :ads, :recovery_displays, :mail_snippets, :paid_features, :payments
     resources :organizations do
-      resources :custom_layouts, only: [:index, :edit, :update], controller: 'organizations/custom_layouts'
+      resources :custom_layouts, only: [:index, :edit, :update], controller: "organizations/custom_layouts"
+      resources :invoices, controller: "organizations/invoices"
     end
     get 'recover_organization', to: 'organizations#recover'
     get 'show_deleted_organizations', to: 'organizations#show_deleted'

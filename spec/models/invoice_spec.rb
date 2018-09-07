@@ -3,6 +3,15 @@ require "spec_helper"
 RSpec.describe Invoice, type: :model do
   let(:organization) { invoice.organization }
 
+  describe "friendly_find" do
+    let!(:invoice) { FactoryGirl.create(:invoice) }
+    it "finds or doesn't appropriately" do
+      expect(Invoice.friendly_find(invoice.id)).to eq invoice
+      expect(Invoice.friendly_find("Invoice ##{invoice.id}")).to eq invoice
+      expect(Invoice.friendly_find("Invoice 82812812")).to be_nil
+    end
+  end
+
   describe "previous_invoice" do
     let(:invoice) { FactoryGirl.create(:invoice, subscription_start_at: Time.now - 4.years, force_active: true) }
     let(:invoice2) { invoice.create_following_invoice }
@@ -50,22 +59,20 @@ RSpec.describe Invoice, type: :model do
   end
 
   describe "paid_feature_ids" do
-    let(:invoice) { FactoryGirl.create(:invoice, amount_due_cents: 0, subscription_start_at: Time.now - 1.week) }
+    let(:invoice) { FactoryGirl.create(:invoice, amount_due_cents: nil, subscription_start_at: Time.now - 1.week) }
     let(:paid_feature) { FactoryGirl.create(:paid_feature, amount_cents: 100_000) }
     let(:paid_feature2) { FactoryGirl.create(:paid_feature) }
     let(:paid_feature_one_time) { FactoryGirl.create(:paid_feature_one_time, name: "one Time Feature", slug: "one-time") }
     it "adds the paid feature ids and updates amount_due_cents" do
-      expect(invoice.amount_due_cents).to eq 0
+      expect(invoice.amount_due_cents).to be_nil
       invoice.update_attributes(paid_feature_ids: paid_feature.slug)
       invoice.reload
-      expect(invoice.amount_due_cents).to eq 100_000
       invoice.update_attributes(amount_due_cents: 0)
       expect(invoice.paid_in_full?).to be_truthy # Because it was just overridden
       expect(invoice.active?).to be_truthy
       expect(invoice.paid_features.pluck(:id)).to eq([paid_feature.id])
       invoice.update_attributes(paid_feature_ids: " #{paid_feature.slug}, #{paid_feature_one_time.name}, #{paid_feature_one_time.slug}, xxxxx,#{paid_feature.slug}")
       invoice.reload
-      expect(invoice.amount_due_cents).to eq invoice.feature_cost_cents
       expect(invoice.paid_features.pluck(:id)).to match_array([paid_feature.id, paid_feature_one_time.id] * 2)
       invoice.paid_feature_ids = [paid_feature_one_time.id, paid_feature2.id, "xxxxx"]
       invoice.reload

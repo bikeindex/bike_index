@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Invoice < ActiveRecord::Base
+  include Amountable # included for formatting stuff
   belongs_to :organization
   belongs_to :first_invoice, class_name: "Invoice" # Use subscription_first_invoice_id + subscription_first_invoice, NOT THIS
 
@@ -18,17 +19,24 @@ class Invoice < ActiveRecord::Base
   scope :current, -> { active.where("subscription_end_at > ?", Time.now) }
   scope :expired, -> { active.where("subscription_end_at < ?", Time.now) }
 
+  def self.friendly_find(str)
+    str = str[/\d+/] if str.is_a?(String)
+    where(id: str).first
+  end
+
   def subscription_duration; 1.year end # Static, at least for now
   def renewal_invoice?; first_invoice_id.present? end
   def active?; is_active && subscription_start_at.present? end # Alias - don't directly access the db attribute, because it might change
   def current?; active? && subscription_end_at > Time.now end
   def expired?; active? && !current? end
-  def discount; features_at_start_cents end
+  def discount_cents; feature_cost_cents - amount_due_cents end
   def paid_in_full?; amount_paid_cents.present? && amount_due_cents.present? && amount_paid_cents >= amount_due_cents end
   def subscription_first_invoice_id; first_invoice_id || id end
   def subscription_first_invoice; first_invoice || self end
   def subscription_invoices; self.class.where(first_invoice_id: subscription_first_invoice_id) end
+  def display_name; "Invoice ##{id}" end
 
+  def paid_feature_ids; invoice_paid_features.pluck(:paid_feature_id) end
   # There can be multiple features of the same id. View the spec for additional info
   def paid_feature_ids=(val) # This isn't super efficient, but whateves
     val = val.to_s.split(",") unless val.is_a?(Array)
@@ -51,7 +59,27 @@ class Invoice < ActiveRecord::Base
         end
       end
     end
-    self.amount_due_cents = new_features.map(&:amount_cents).sum
+  end
+
+  def amount_due
+    amnt = (amount_due_cents.to_i / 100.00)
+    amnt % 1 != 0 ? amnt : amnt.round
+  end
+
+  def amount_due=(val)
+    self.amount_due_cents = val.to_f * 100
+  end
+
+  def amount_due_formatted
+    money_formatted(amount_due_cents)
+  end
+
+  def amount_paid_formatted
+    money_formatted(amount_paid_cents)
+  end
+
+  def discount_formatted
+    money_formatted(discount_cents)
   end
 
   def previous_invoice
