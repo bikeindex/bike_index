@@ -25,7 +25,7 @@ window.BikeIndex =
     # $('#total-top-header .global-tabs').append(tab)
     # $('#total-top-header .tab-content').append(links)
 
-
+# Invoices - written here in bare coffeescript because I don't fuck with backbone anymore
 updateInvoiceCalculations = ->
   recurring = $(".paidFeatureCheck input.recurring:checked").get().map (i) -> parseInt($(i).attr("data-amount"), 10)
   if recurring.length > 0
@@ -44,6 +44,9 @@ updateInvoiceCalculations = ->
   $("#totalCost").text("#{recurringCost + oneTimeCost}.00")
   due = parseInt($("#invoice_amount_due").val(), 10)
   $("#discountCost").text("#{recurringCost + oneTimeCost - due}.00")
+
+  checked_ids = $(".paidFeatureCheck input:checked").get().map (i) -> $(i).attr("data-id")
+  $("#invoice_paid_feature_ids").val(checked_ids)
 
 
 initializeInvoiceForm = ->

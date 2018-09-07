@@ -8,7 +8,7 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
   end
 
   def new
-    @invoice = @organization.invoices.new
+    @invoice ||= @organization.invoices.new
   end
 
   def show
@@ -18,11 +18,24 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
   def edit; end
 
   def create
-    pp params
-    redirect_to admin_organization_invoices_path(organization_id: @organization.to_param)
+    @invoice = @organization.invoices.build(permitted_parameters.except(:paid_feature_ids))
+    if @invoice.save
+      # Invoice has to be created before it can get paid_feature_ids
+      @invoice.paid_feature_ids = permitted_parameters[:paid_feature_ids]
+      flash[:success] = "Invoice created"
+      redirect_to admin_organization_invoices_path(organization_id: @organization.to_param)
+    else
+      render :new
+    end
   end
 
   def update
+    if @invoice.update_attributes(permitted_parameters)
+      flash[:success] = "Invoice created"
+      redirect_to admin_organization_invoices_path(organization_id: @organization.to_param)
+    else
+      render :edit
+    end
   end
 
   protected
@@ -32,8 +45,8 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
   end
 
   def permitted_parameters
-    params.require(:invoice)
-          .permit(:paid_feature_ids, :subscription_start_at, :timezone, :amount_due)
+    params.require(:invoice).permit(:paid_feature_ids, :amount_due)
+          .merge(subscription_start_at: TimeParser.parse(params.dig(:invoice, :subscription_start_at), params.dig(:invoice, :timezone)))
   end
 
   def find_organization

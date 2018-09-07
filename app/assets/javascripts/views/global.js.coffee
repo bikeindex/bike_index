@@ -55,6 +55,7 @@ class BikeIndex.Views.Global extends Backbone.View
       $this = $(this)
       $this.text(moment().format("z"))
       $this.removeClass("convertTimezone")
+    $(".hiddenFieldTimezone").val(window.timezone)
     
   openNewWindow: (e) ->
     e.preventDefault()
