@@ -46,7 +46,12 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
 
   def permitted_parameters
     params.require(:invoice).permit(:paid_feature_ids, :amount_due)
-          .merge(subscription_start_at: TimeParser.parse(params.dig(:invoice, :subscription_start_at), params.dig(:invoice, :timezone)))
+          .merge(subscription_start_at: TimeParser.parse(time_params[:subscription_start_at], time_params[:timezone]),
+                 subscription_end_at: TimeParser.parse(time_params[:subscription_end_at], time_params[:timezone]))
+  end
+
+  def time_params
+    params.require(:invoice).permit(:subscription_start_at, :subscription_end_at, :timezone)
   end
 
   def find_organization

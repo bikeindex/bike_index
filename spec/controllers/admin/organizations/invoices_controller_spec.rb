@@ -52,12 +52,13 @@ describe Admin::Organizations::InvoicesController, type: :controller do
         invoice.paid_feature_ids = [paid_feature3.id]
         invoice.reload
         expect(invoice.paid_features.pluck(:id)).to eq([paid_feature3.id])
-        put :update, organization_id: organization.to_param, id: invoice.to_param, invoice: params
+        put :update, organization_id: organization.to_param, id: invoice.to_param, invoice: params.merge(subscription_end_at: "2019-07-05T23:00:00")
         invoice.reload
         expect(invoice.paid_feature_ids).to match_array([paid_feature1.id, paid_feature2.id])
         expect(invoice.amount_due).to eq 1220
         # TimeParser isn't storing records perfectly - for now, just ignoring since fix can be separate
         expect(invoice.subscription_start_at.to_i).to be_within(1.day).of 1536202800
+        expect(invoice.subscription_end_at.to_i).to be_within(1.day).of 1562385600
       end
     end
   end
