@@ -1,0 +1,56 @@
+%header.with-subtitle
+  %h1 Payments
+%p
+  Go to organizations to create new invoices
+
+%section.full-screen-table
+  %table.table.table-striped.table-bordered
+    %thead
+      %th
+        \#
+      %th
+        Organization
+      %th
+        Start
+      %th
+        End
+      %th
+        Due
+      %th
+        Discount
+      %th
+        Paid
+      %th
+        Features
+    %tbody
+      - @invoices.each do |invoice|
+        %tr
+          %td
+            = link_to invoice.display_name, edit_admin_organization_invoice_path(organization_id: invoice.organization.to_param, id: invoice.to_param)
+          %td
+            = link_to invoice.organization.short_name, admin_organization_path(invoice.organization)
+          %td
+            - if invoice.subscription_start_at.present?
+              %span.convertTime
+                = l invoice.subscription_start_at, format: :convert_time
+          %td
+            - if invoice.subscription_end_at.present?
+              %span.convertTime
+                = l invoice.subscription_end_at, format: :convert_time
+          %td
+            = invoice.amount_due_formatted
+          %td
+            = invoice.discount_formatted
+          %td
+            = invoice.amount_paid_formatted
+            - invoice.payments.each do |payment|
+              %small
+                = link_to payment.kind.humanize, edit_admin_payment_path(payment)
+          %td
+            %ul
+              - invoice.paid_features.each do |paid_feature|
+                %li
+                  = link_to paid_feature.name, edit_admin_paid_feature_path(paid_feature)
+                  %em
+                    = paid_feature.kind
+
