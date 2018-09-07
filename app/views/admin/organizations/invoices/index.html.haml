@@ -85,9 +85,10 @@
                 no user
           %td
             - if payment.invoice_id.present?
-              %span.convertTime
-                = l payment.invoice.created_at, format: :convert_time
               = link_to payment.invoice.display_name, edit_admin_organization_invoice_path(organization_id: @organization.to_param, id: payment.invoice.to_param)
+              - if payment.invoice.subscription_start_at
+                %small.convertTime
+                  = l payment.invoice.subscription_start_at, format: :convert_time
           %td
             %small
               = payment.kind.humanize
