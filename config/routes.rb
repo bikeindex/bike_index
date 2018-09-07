@@ -138,7 +138,7 @@ Bikeindex::Application.routes.draw do
     get 'tsvs', to: 'dashboard#tsvs'
     get 'bust_z_cache', to: 'dashboard#bust_z_cache'
     get 'destroy_example_bikes', to: 'dashboard#destroy_example_bikes'
-    get "invoices", to: 'payments#invoices'
+    get "invoices", to: 'payments#invoices', as: :invoices
     resources :memberships, :organization_invitations, :bulk_imports,
               :paints, :ads, :recovery_displays, :mail_snippets, :paid_features, :payments
     resources :organizations do
