@@ -17,6 +17,7 @@ class Payment < ActiveRecord::Base
 
   before_validation :set_calculated_attributes
   after_create :send_invoice_email
+  after_commit :update_invoice
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
   def self.admin_creatable_kinds; ["check"] end
@@ -39,5 +40,10 @@ class Payment < ActiveRecord::Base
 
   def email_or_organization_present
     errors.add(:organization_or_email, "Requires an email address or organization") unless email.present? || organization_id.present?
+  end
+
+  def update_invoice
+    return true unless invoice.present?
+    invoice.update_attributes(updated_at: Time.now) # Manually trigger invoice update
   end
 end

@@ -60,6 +60,17 @@ describe Admin::Organizations::InvoicesController, type: :controller do
         expect(invoice.subscription_start_at.to_i).to be_within(1.day).of 1536202800
         expect(invoice.subscription_end_at.to_i).to be_within(1.day).of 1562385600
       end
+      context "create_following_invoice" do
+        let!(:invoice) { FactoryGirl.create(:invoice, organization: organization, subscription_start_at: Time.now - 2.years, force_active: true) }
+        it "creates following invoice" do
+          expect do
+            put :update, organization_id: organization.to_param, id: invoice.to_param, create_following_invoice: true
+          end.to change(Invoice, :count).by 1
+          invoice.reload
+          following_invoice = invoice.following_invoice
+          expect(following_invoice.previous_invoice).to eq invoice
+        end
+      end
     end
   end
 end

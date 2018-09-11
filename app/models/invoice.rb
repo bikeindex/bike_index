@@ -27,8 +27,9 @@ class Invoice < ActiveRecord::Base
   def subscription_duration; 1.year end # Static, at least for now
   def renewal_invoice?; first_invoice_id.present? end
   def active?; is_active && subscription_start_at.present? end # Alias - don't directly access the db attribute, because it might change
+  def was_active?; expired? && force_active || subscription_start_at.present? && paid_in_full? end
   def current?; active? && subscription_end_at > Time.now end
-  def expired?; active? && !current? end
+  def expired?; subscription_end_at && subscription_end_at < Time.now end
   def discount_cents; feature_cost_cents - amount_due_cents end
   def paid_in_full?; amount_paid_cents.present? && amount_due_cents.present? && amount_paid_cents >= amount_due_cents end
   def subscription_first_invoice_id; first_invoice_id || id end
@@ -37,6 +38,7 @@ class Invoice < ActiveRecord::Base
   def display_name; "Invoice ##{id}" end
 
   def paid_feature_ids; invoice_paid_features.pluck(:paid_feature_id) end
+
   # There can be multiple features of the same id. View the spec for additional info
   def paid_feature_ids=(val) # This isn't super efficient, but whateves
     val = val.to_s.split(",") unless val.is_a?(Array)
@@ -96,7 +98,7 @@ class Invoice < ActiveRecord::Base
   end
 
   def create_following_invoice
-    return nil unless active?
+    return nil unless active? || was_active?
     return following_invoice if following_invoice.present?
     new_invoice = organization.invoices.create(subscription_start_at: subscription_end_at,
                                                first_invoice_id: subscription_first_invoice_id)
@@ -107,7 +109,11 @@ class Invoice < ActiveRecord::Base
 
   def set_calculated_attributes
     self.amount_paid_cents = payments.sum(:amount_cents)
-    self.is_active = force_active || paid_in_full?
+    if force_active
+      self.is_active = !expired? # Even with force_active, if it's expired it's expired
+    else
+      self.is_active = paid_in_full?
+    end
     if subscription_start_at.present?
       self.subscription_end_at ||= subscription_start_at + subscription_duration
     end

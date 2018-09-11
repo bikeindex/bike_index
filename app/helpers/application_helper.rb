@@ -57,29 +57,25 @@ module ApplicationHelper
     end
   end
 
-  def current_link(link_text, link_path, class: '') # Revised layout link
-    class_name = current_page?(link_path) ? 'active' : ''
-    class_name = 'active' if link_path.match(news_index_path) && controller_name == 'news'
-    (link_to raw(link_text), link_path, class: class_name).html_safe
-  end
-
   def admin_nav_link(link_text, link_path)
-    if controller_name == 'dashboard'
-      if action_name == 'invitations' && link_text == 'Invitations'
-        class_name = 'active'
-      elsif action_name == 'show' && link_text == 'Go hard'
-        class_name = 'active'
+    if controller_name == "dashboard"
+      if action_name == "invitations" && link_text == "Invitations"
+        class_name = "active"
+      elsif action_name == "show" && link_text == "Go hard"
+        class_name = "active"
       end
-    elsif controller_name == 'organization_invitations' && link_text == 'Invitations'
-      class_name = 'active'
+    elsif controller_name == "organization_invitations" && link_text == "Invitations"
+      class_name = "active"
+    elsif controller_name == "payments"
+      if action_name == "invoices"
+        class_name = "active" if link_text == "Invoices"
+      else
+        class_name = "active" if link_text == "Payments"
+      end
     else
-      class_name = controller_name == link_text.downcase.gsub(' ', '_') ? 'active' : ''
+      class_name = controller_name == link_text.downcase.gsub(" ", "_") ? "active" : ""
     end
     (link_to link_text, link_path, class: class_name).html_safe
-  end
-
-  def content_nav_class(section)
-    'active-menu' if section == @active_section
   end
 
   def link_to_add_fields(name, f, association)
