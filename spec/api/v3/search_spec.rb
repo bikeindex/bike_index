@@ -57,7 +57,7 @@ describe 'Search API V3' do
       let(:stolen_interpreted_params) { proximity_interpreted_params.merge(stolenness: 'stolen') }
       let(:non_stolen_interpreted_params) { proximity_interpreted_params.merge(stolenness: 'non') }
       it 'calls Bike Search with the expected interpreted_params' do
-        expect(Bike).to receive(:search).with(proximity_interpreted_params) { %w(1) }
+        expect(Bike).to receive(:search).with(hash_including(proximity_interpreted_params)) { %w(1) }
         expect(Bike).to receive(:search).with(stolen_interpreted_params) { %w(1 2) }
         expect(Bike).to receive(:search).with(non_stolen_interpreted_params) { %w(1 2 3) }
         get '/api/v3/search/count', request_query_params, format: :json

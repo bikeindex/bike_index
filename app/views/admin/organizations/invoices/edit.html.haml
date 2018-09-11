@@ -17,8 +17,9 @@
       Expired:
     - else
       Expires:
-    %span.convertTime
-      = l @invoice.subscription_end_at, format: :convert_time
+    - if @invoice.subscription_end_at.present?
+      %span.convertTime
+        = l @invoice.subscription_end_at, format: :convert_time
   %p
     Associated invoices:
     %ul
