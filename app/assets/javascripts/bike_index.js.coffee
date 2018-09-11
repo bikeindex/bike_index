@@ -43,7 +43,7 @@ updateInvoiceCalculations = ->
   $("#oneTimeCost").text("#{oneTimeCost}.00")
   $("#totalCost").text("#{recurringCost + oneTimeCost}.00")
   due = parseInt($("#invoice_amount_due").val(), 10)
-  $("#discountCost").text("#{recurringCost + oneTimeCost - due}.00")
+  $("#discountCost").text("#{-1 * (recurringCost + oneTimeCost - due)}.00")
 
   checked_ids = $(".paidFeatureCheck input:checked").get().map (i) -> $(i).attr("data-id")
   $("#invoice_paid_feature_ids").val(checked_ids)

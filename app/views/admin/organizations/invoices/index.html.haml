@@ -2,7 +2,8 @@
   %h1
     #{ link_to @organization.name, admin_organization_path(@organization) } Invoices
   = link_to "New Invoice", new_admin_organization_invoice_path(organization_id: @organization.to_param), class: "button-green sharing-links"
-
+:scss
+  .text-success { color: #27ae60; }
 %section.full-screen-table
   %table.table.table-striped.table-bordered
     %thead
@@ -15,9 +16,9 @@
       %th
         Due
       %th
-        Discount
-      %th
         Paid
+      %th
+        Discount
       %th
         Features
     %tbody
@@ -36,12 +37,13 @@
           %td
             = invoice.amount_due_formatted
           %td
-            = invoice.discount_formatted
-          %td
-            = invoice.amount_paid_formatted
+            %span{ class: invoice.paid_in_full? ? "text-success" : "" }
+              = invoice.amount_paid_formatted
             - invoice.payments.each do |payment|
               %small
                 = link_to payment.kind.humanize, edit_admin_payment_path(payment)
+          %td
+            = invoice.discount_formatted
           %td
             %ul
               - invoice.paid_features.each do |paid_feature|

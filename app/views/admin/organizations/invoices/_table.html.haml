@@ -1,0 +1,74 @@
+- sortable ||= false
+- display_organization ||= false
+
+:scss
+  .text-success { color: #27ae60; }
+
+%section.full-screen-table
+  %table.table.table-striped.table-bordered{ class: sortable ? "sortable" : "" }
+    %thead
+      %th
+        \#
+      - if display_organization
+        %th
+          - if sortable
+            = sortable "Organization"
+          - else
+            Organization
+      %th
+        - if sortable
+          = sortable "subscription_start_at", "Start"
+        - else
+          Start
+      %th
+        - if sortable
+          = sortable "subscription_end_at", "End"
+        - else
+          End
+      %th
+        - if sortable
+          = sortable "amount_due_cents", "$ Due"
+        - else
+          $ Due
+      %th
+        - if sortable
+          = sortable "amount_paid_cents", "$ Paid"
+        - else
+          $ paid
+      %th
+        Discount
+      %th
+        Features
+    %tbody
+      - invoices.each do |invoice|
+        %tr
+          %td
+            = link_to invoice.display_name, edit_admin_organization_invoice_path(organization_id: invoice.organization.to_param, id: invoice.to_param)
+          %td
+            = link_to invoice.organization.short_name, admin_organization_path(invoice.organization)
+          %td
+            - if invoice.subscription_start_at.present?
+              %span.convertTime
+                = l invoice.subscription_start_at, format: :convert_time
+          %td
+            - if invoice.subscription_end_at.present?
+              %span.convertTime
+                = l invoice.subscription_end_at, format: :convert_time
+          %td
+            = invoice.amount_due_formatted
+          %td
+            %span{ class: invoice.paid_in_full? ? "text-success" : "" }
+              = invoice.amount_paid_formatted
+            - invoice.payments.each do |payment|
+              %small
+                = link_to payment.kind.humanize, edit_admin_payment_path(payment)
+          %td
+            %span{ class: invoice.discount_cents > 0 ? "red-text" : "" }
+              = invoice.discount_formatted
+          %td
+            %ul
+              - invoice.paid_features.each do |paid_feature|
+                %li
+                  = link_to paid_feature.name, edit_admin_paid_feature_path(paid_feature)
+                  %em
+                    = paid_feature.kind

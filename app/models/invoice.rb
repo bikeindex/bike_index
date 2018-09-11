@@ -30,7 +30,7 @@ class Invoice < ActiveRecord::Base
   def was_active?; expired? && force_active || subscription_start_at.present? && paid_in_full? end
   def current?; active? && subscription_end_at > Time.now end
   def expired?; subscription_end_at && subscription_end_at < Time.now end
-  def discount_cents; feature_cost_cents - amount_due_cents end
+  def discount_cents; feature_cost_cents - (amount_due_cents || 0) end
   def paid_in_full?; amount_paid_cents.present? && amount_due_cents.present? && amount_paid_cents >= amount_due_cents end
   def subscription_first_invoice_id; first_invoice_id || id end
   def subscription_first_invoice; first_invoice || self end
@@ -81,7 +81,7 @@ class Invoice < ActiveRecord::Base
   end
 
   def discount_formatted
-    money_formatted(discount_cents)
+    money_formatted(- (discount_cents || 0))
   end
 
   def previous_invoice
