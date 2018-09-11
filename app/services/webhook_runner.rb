@@ -1,5 +1,5 @@
 
-# This is deprecated and should be removed or refactored eventually. Check AfterBikeChangeWorker
+# This is deprecated and should be removed or refactored eventually. Check AfterBikeSaveWorker
 class WebhookRunner
 
   require 'httparty'
