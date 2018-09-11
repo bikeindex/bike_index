@@ -9,10 +9,6 @@ task :slow_save => :environment do
   # end
 end
 
-task delete_expired_b_params: :environment do
-  BParam.pluck(:id).each { |id| RemoveExpiredBParamsWorker.perform_async(id) }
-end
-
 desc 'Create frame_makers and push to redis'
 task :sm_import_manufacturers => :environment do
   AutocompleteLoaderWorker.perform_async('load_manufacturers')
@@ -31,11 +27,6 @@ end
 desc 'Remove expired file caches'
 task :remove_expired_file_caches => :environment do
   RemoveExpiredFileCacheWorker.perform_async
-end
-
-desc 'remove unused'
-task :cache_all_stolen => :environment do
-  CacheAllStolenWorker.perform_async
 end
 
 desc 'Create stolen tsv'

@@ -99,6 +99,7 @@ class Organization < ActiveRecord::Base
     self.name = "Stop messing about" unless name[/\d|\w/].present?
     self.website = Urlifyer.urlify(website) if website.present?
     self.short_name = (short_name || name).truncate(30)
+    self.paid_feature_slugs = current_invoice && current_invoice.paid_features.pluck(:slug) || []
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, '')
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
@@ -123,6 +124,8 @@ class Organization < ActiveRecord::Base
   end
 
   def school?; org_type == "school" end
+  def current_invoice; invoices.active.last end
+  def paid_features; PaidFeature.where(slug: paid_feature_slugs) end
 
   # I'm trying to ammass a list of paid features here (also in admin organization show)
   def bike_search?; has_bike_search end

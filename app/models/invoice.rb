@@ -12,6 +12,7 @@ class Invoice < ActiveRecord::Base
   validates_presence_of :organization_id
 
   before_save :set_calculated_attributes
+  after_commit :update_organization
 
   scope :first_invoice, -> { where(first_invoice_id: nil) }
   scope :renewal_invoice, -> { where.not(first_invoice_id: nil) }
@@ -118,5 +119,9 @@ class Invoice < ActiveRecord::Base
       self.subscription_end_at ||= subscription_start_at + subscription_duration
     end
     true # TODO: Rails 5 update
+  end
+
+  def update_organization
+    organization.update_attributes(updated_at: Time.now)
   end
 end
