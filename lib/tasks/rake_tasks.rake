@@ -14,19 +14,17 @@ task :sm_import_manufacturers => :environment do
   AutocompleteLoaderWorker.perform_async('load_manufacturers')
 end
 
-desc 'Create frame_makers and push to redis'
-task :remove_unused_ownerships => :environment do
-  Ownership.pluck(:id).each { |id| UnusedOwnershipRemovalWorker.perform_async(id) }
-end
-
 desc 'cache all stolen response'
 task :cache_all_stolen => :environment do
   CacheAllStolenWorker.perform_async
 end
 
-desc 'Remove expired file caches'
-task :remove_expired_file_caches => :environment do
+desc "Daily maintenance tasks to be run"
+task :daily_maintenance_tasks => :environment do
   RemoveExpiredFileCacheWorker.perform_async
+  Invoice.where(subscription_end_at: (Time.now - 25.hours)..(Time.now + 25.hours))
+         .each { |i| Invoice.update_attributes(updated_at: Time.now) }
+  Ownership.pluck(:id).each { |id| UnusedOwnershipRemovalWorker.perform_async(id) }
 end
 
 desc 'Create stolen tsv'

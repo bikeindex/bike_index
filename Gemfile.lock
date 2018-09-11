@@ -529,6 +529,7 @@ GEM
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
       hashdiff
+    where-or (0.1.6)
     wicked_pdf (1.0.6)
     wine_bouncer (0.5.1)
       doorkeeper (>= 1.4, < 4.0)
@@ -643,6 +644,7 @@ DEPENDENCIES
   unicorn-worker-killer
   vcr
   webmock
+  where-or
   wicked_pdf
   wine_bouncer
   wkhtmltopdf-binary

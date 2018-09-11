@@ -53,6 +53,8 @@ gem 'httparty'
 gem "sitemap_generator", "~> 6"
 gem 'paranoia'
 
+gem "where-or" # backports rails 5 or query support - TODO: Rails 5 update, remove
+
 # API wrappers
 gem 'twitter' # Twitter. For rendering tweets
 gem 'simple_spark' # Sparkpost gem - we use it to send newsletters

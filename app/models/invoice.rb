@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# daily_maintenance_tasks updates all invoices that have expiring subscriptions every day
 class Invoice < ActiveRecord::Base
   include Amountable # included for formatting stuff
   belongs_to :organization

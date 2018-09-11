@@ -1482,7 +1482,7 @@ CREATE TABLE public.organizations (
     abandoned_bike_emails boolean DEFAULT false NOT NULL,
     require_address_on_registration boolean DEFAULT false NOT NULL,
     show_partial_registrations boolean DEFAULT false NOT NULL,
-    paid_feature_slugs json,
+    paid_feature_slugs jsonb,
     parent_organization_id integer
 );
 
