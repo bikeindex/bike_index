@@ -48,6 +48,9 @@
                   = l payment.invoice.subscription_start_at, format: :convert_time
           %td
             %small
-              = payment.kind.humanize
+              - if payment.stripe?
+                = link_to "Stripe", "https://dashboard.stripe.com/payments/#{payment.stripe_id}"
+              - else
+                = payment.kind.humanize
           %td
             = payment.amount_formatted
