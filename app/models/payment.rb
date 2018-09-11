@@ -23,6 +23,7 @@ class Payment < ActiveRecord::Base
   def self.admin_creatable_kinds; ["check"] end
 
   def set_calculated_attributes
+    self.is_payment = true if invoice_id.present?
     if user.present?
       self.email ||= user.email
     elsif email.present?
