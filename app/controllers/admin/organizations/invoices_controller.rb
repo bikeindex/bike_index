@@ -30,7 +30,14 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
   end
 
   def update
-    if @invoice.update_attributes(permitted_parameters)
+    if params[:create_following_invoice]
+      if @invoice.create_following_invoice
+        flash[:success] = "Invoice created"
+      else
+        flash[:error] = "unable to create following invoice. Was this invoice active?"
+      end
+      redirect_to admin_organization_invoices_path(organization_id: @organization.to_param)
+    elsif @invoice.update_attributes(permitted_parameters)
       flash[:success] = "Invoice created"
       redirect_to admin_organization_invoices_path(organization_id: @organization.to_param)
     else

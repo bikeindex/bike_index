@@ -281,13 +281,6 @@ describe ApplicationHelper do
     end
   end
 
-  describe 'content_nav_class' do
-    it 'returns active if the section is the active_section' do
-      @active_section = 'resources'
-      expect(helper.content_nav_class('resources')).to eq('active-menu')
-    end
-  end
-
   describe 'listicle_html' do
     it 'returns the html formatted as we want' do
       l = Listicle.new(body: 'body', title: 'title', image_credits: 'credit')

@@ -1,0 +1,97 @@
+- sortable ||= false
+- display_organization ||= false
+
+:scss
+  .table-sub-list {
+    list-style-type: disc;
+    margin: 0 0 10px;
+    padding: 10px 0 5px;
+    -webkit-margin-before: 0px;
+    -webkit-margin-after: 0px;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    -webkit-padding-start: 15px;
+  }
+/ Gross hack to make it full-screen, because this table is big
+:coffee
+  $("#admin-content > .receptacle").css("max-width", "100%")
+
+%section.full-screen-table
+  %table.table.table-striped.table-bordered.sortable
+    %thead
+      %th
+        - if sortable
+          = sortable "id", "#"
+        - else
+          \#
+      - if display_organization
+        %th
+          - if sortable
+            = sortable "organization_id"
+          - else
+            Organization
+      %th
+        - if sortable
+          = sortable "subscription_start_at", "Start"
+        - else
+          Start
+      %th
+        - if sortable
+          = sortable "subscription_end_at", "End"
+        - else
+          End
+      %th
+        - if sortable
+          = sortable "amount_due_cents", "$ Due"
+        - else
+          $ Due
+      %th
+        - if sortable
+          = sortable "amount_paid_cents", "$ Paid"
+        - else
+          $ paid
+      %th
+        Discount
+      %th
+        Features
+    %tbody
+      - invoices.each do |invoice|
+        %tr
+          %td
+            = link_to invoice.display_name, edit_admin_organization_invoice_path(organization_id: invoice.organization.to_param, id: invoice.to_param)
+            - if invoice.active?
+              %small.text-success
+                Active
+          - if display_organization
+            %td
+              = link_to invoice.organization.short_name, admin_organization_path(invoice.organization)
+          %td
+            - if invoice.subscription_start_at.present?
+              %span.convertTime
+                = l invoice.subscription_start_at, format: :convert_time
+          %td
+            - if invoice.subscription_end_at.present?
+              %span.convertTime
+                = l invoice.subscription_end_at, format: :convert_time
+          %td
+            = invoice.amount_due_formatted
+          %td
+            %span{ class: invoice.paid_in_full? ? "text-success" : "" }
+              = invoice.amount_paid_formatted
+            - if invoice.payments.any?
+              %ul.table-sub-list
+                - invoice.payments.each do |payment|
+                  %li{ style: "font-size: 80%;" }
+                    #{link_to "#{payment.amount_formatted} #{payment.kind}", admin_payment_path(payment)},
+                    %span.convertTime
+                      = l payment.created_at, format: :convert_time
+          %td
+            %span{ class: invoice.discount_cents > 0 ? "text-danger" : "" }
+              = invoice.discount_formatted
+          %td
+            %ul.table-sub-list
+              - invoice.paid_features.each do |paid_feature|
+                %li
+                  = link_to paid_feature.name, edit_admin_paid_feature_path(paid_feature)
+                  %em{ style: "font-size: 70%;" }
+                    = paid_feature.kind

@@ -1,5 +1,5 @@
 %header.with-subtitle.padded
   %h1
-    New invoice
+    New invoice for #{link_to @invoice.organization.short_name, admin_organization_invoices_path(@invoice.organization)}
 
 = render "form"

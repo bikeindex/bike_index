@@ -43,7 +43,10 @@ describe Admin::PaymentsController, type: :controller do
 
   describe "update" do
     context "stripe payment" do
+      let(:og_time) { Time.now - 3.hours }
+      let(:invoice) { FactoryGirl.create(:invoice, organization: organization, updated_at: og_time) }
       it "updates available attributes" do
+        expect(subject.invoice).to be_nil
         put :update, id: subject.to_param, payment: params
         subject.reload
         expect(subject.organization).to eq organization
@@ -53,6 +56,8 @@ describe Admin::PaymentsController, type: :controller do
         expect(subject.created_at).to be_within(1.minute).of Time.now
         expect(subject.user).to eq user
         expect(subject.amount_cents).to_not eq 22_222
+        # invoice.reload
+        # expect(invoice.updated_at).to be_within(1.second).of Time.now # TODO: Rails 5 update - enable this, rspec doesn't correctly manage after_commit right now
       end
     end
     context "check payment" do
