@@ -5,7 +5,7 @@ class Invoice < ActiveRecord::Base
   belongs_to :organization
   belongs_to :first_invoice, class_name: "Invoice" # Use subscription_first_invoice_id + subscription_first_invoice, NOT THIS
 
-  has_many :invoice_paid_features
+  has_many :invoice_paid_features, dependent: :destroy
   has_many :paid_features, through: :invoice_paid_features
   has_many :payments
 
@@ -110,11 +110,7 @@ class Invoice < ActiveRecord::Base
 
   def set_calculated_attributes
     self.amount_paid_cents = payments.sum(:amount_cents)
-    if force_active
-      self.is_active = !expired? # Even with force_active, if it's expired it's expired
-    else
-      self.is_active = paid_in_full?
-    end
+    self.is_active = !expired? && (force_active || paid_in_full?)
     if subscription_start_at.present?
       self.subscription_end_at ||= subscription_start_at + subscription_duration
     end

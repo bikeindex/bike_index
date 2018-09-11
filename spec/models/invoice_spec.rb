@@ -12,6 +12,18 @@ RSpec.describe Invoice, type: :model do
     end
   end
 
+  describe "set_calculated_attributes" do
+    context "expired paid_in_full" do
+      let(:invoice) { Invoice.new(subscription_start_at: Time.now.yesterday - 1.year, amount_due: 0) }
+      it "is not active" do
+        invoice.set_calculated_attributes
+        expect(invoice.expired?).to be_truthy
+        expect(invoice.paid_in_full?).to be_truthy
+        expect(invoice.was_active?).to be_truthy
+      end
+    end
+  end
+
   describe "previous_invoice" do
     let(:invoice) { FactoryGirl.create(:invoice, subscription_start_at: Time.now - 4.years, force_active: true) }
     let(:invoice2) { invoice.create_following_invoice }
