@@ -70,6 +70,7 @@ describe Organization do
       expect(organization_child.is_paid).to be_truthy
       expect(organization_child.current_invoice).to eq invoice
       expect(organization_child.paid_feature_slugs).to eq([paid_feature.slug])
+      expect(organization.child_organizations.pluck(:id)).to eq([organization_child.id])
     end
   end
 

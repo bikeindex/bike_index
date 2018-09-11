@@ -504,7 +504,9 @@ describe BikesController do
           end
         end
       end
-      context "with persisted email and non-member" do
+      context "with persisted email and non-member and parent organization" do
+        let(:organization_parent) { FactoryGirl.create(:organization) }
+        let(:organization) { FactoryGirl.create(:organization_with_auto_user, parent_organization_id: organization_parent.id) }
         let!(:user2) { FactoryGirl.create(:confirmed_user) }
         it "registers a bike and redirects with persist_email" do
           set_current_user(user2)
@@ -517,6 +519,7 @@ describe BikesController do
           expect(bike.manufacturer).to eq Manufacturer.other
           expect(bike.manufacturer_other).to eq "A crazy different thing"
           expect(bike.creator_id).to eq organization.auto_user_id # It isn't registered to the signed in user
+          expect(bike.organizations.pluck(:id)).to match_array([organization.id, organization_parent.id])
         end
       end
       context "with organization bike code and signed in member" do

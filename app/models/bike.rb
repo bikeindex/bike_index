@@ -46,7 +46,6 @@ class Bike < ActiveRecord::Base
 
   geocoded_by nil, latitude: :stolen_lat, longitude: :stolen_long
   after_validation :geocode, if: lambda { |o| false } # Never geocode, it's from stolen_record
-  after_commit :run_after_bike_change_worker
 
   validates_presence_of :serial_number
   validates_presence_of :propulsion_type_id
@@ -388,10 +387,6 @@ class Bike < ActiveRecord::Base
       stolen_lat: csr && csr.latitude,
       stolen_long: csr && csr.longitude
     }
-  end
-
-  def run_after_bike_change_worker
-    AfterBikeChangeWorker.perform_async(id)
   end
 
   def cache_bike

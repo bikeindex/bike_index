@@ -17,7 +17,7 @@ class Organization < ActiveRecord::Base
   has_many :invoices
   has_many :payments
   belongs_to :parent_organization, class_name: "Organization"
-  has_many :child_organizations, class_name: "Organization"
+  has_many :child_organizations, class_name: "Organization", foreign_key: :parent_organization_id
   # has_many :bikes, foreign_key: 'creation_organization_id'
   has_many :creation_states
   has_many :created_bikes, through: :creation_states, source: :bike
