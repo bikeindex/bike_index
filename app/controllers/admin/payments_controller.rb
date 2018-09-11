@@ -54,7 +54,7 @@ class Admin::PaymentsController < Admin::BaseController
 
   protected
 
-  def sortable_columns # Contains the sortable list for both payments and invoices ;)
+  def sortable_columns # sortable columns for both payments and invoices ;)
     %w[created_at user_id organization_id kind invoice_id amount_cents
        subscription_start_at subscription_end_at amount_due_cents amount_paid_cents id]
   end
