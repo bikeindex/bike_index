@@ -77,6 +77,11 @@ RSpec.describe CreationState, type: :model do
         expect(bike.bike_organizations.first.organization).to eq organization
       end
     end
+    context "parent organization" do
+      it "creates the bike_organization for both" do
+        
+      end
+    end
     context 'already existing bike_organization' do
       let(:creation_state) { FactoryGirl.create(:creation_state, bike: bike) }
       it 'does not error or duplicate' do

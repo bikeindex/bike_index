@@ -14,11 +14,11 @@ class AfterBikeSaveWorker
     if bike.present? && bike.listing_order != bike.get_listing_order
       bike.update_attribute :listing_order, bike.get_listing_order
     end
+    return true unless bike.stolen # For now, only hooking on stolen bikes
     post_bike_to_webhook(serialized(bike))
   end
 
   def post_bike_to_webhook(post_body)
-    return true unless bike.stolen # For now, only hooking on stolen bikes
     Faraday.new(url: POST_URL).post do |req|
       req.headers["Content-Type"] = "application/json"
       req.body = post_body.to_json
