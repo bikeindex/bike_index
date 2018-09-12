@@ -71,7 +71,7 @@
                 = l invoice.subscription_start_at, format: :convert_time
           %td
             - if invoice.subscription_end_at.present?
-              %span.convertTime
+              %span.convertTime{ class: invoice.subscription_end_at < Time.now ? "text-danger" : "" }
                 = l invoice.subscription_end_at, format: :convert_time
           %td
             = invoice.amount_due_formatted
