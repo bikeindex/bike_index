@@ -111,10 +111,10 @@ class Invoice < ActiveRecord::Base
 
   def set_calculated_attributes
     self.amount_paid_cents = payments.sum(:amount_cents)
-    self.is_active = !expired? && (force_active || paid_in_full?)
     if subscription_start_at.present?
       self.subscription_end_at ||= subscription_start_at + subscription_duration
     end
+    self.is_active = !expired? && (force_active || paid_in_full?)
     true # TODO: Rails 5 update
   end
 
