@@ -1,7 +1,7 @@
 class BikeCreatorOrganizer
   def initialize(b_param = nil, bike = nil)
     @b_param = b_param
-    @bike = bike 
+    @bike = bike
   end
 
   def unorganize
@@ -17,7 +17,7 @@ class BikeCreatorOrganizer
   end
 
   def find_organization(organization_id)
-    begin 
+    begin
       organization = Organization.friendly_find(organization_id)
     rescue ActiveRecord::RecordNotFound
       @bike.errors.add(:creation_organization, "Uh oh, we couldn't find that organization. Try again?")
@@ -43,11 +43,10 @@ class BikeCreatorOrganizer
       unorganize
     end
   end
-  
+
   def organized_bike
     check_organization
     unorganize if @bike.errors.messages[:creation_organization].present?
     @bike
   end
-
 end

@@ -16,6 +16,8 @@ class Organization < ActiveRecord::Base
   has_many :b_params
   has_many :invoices
   has_many :payments
+  belongs_to :parent_organization, class_name: "Organization"
+  has_many :child_organizations, class_name: "Organization", foreign_key: :parent_organization_id
   # has_many :bikes, foreign_key: 'creation_organization_id'
   has_many :creation_states
   has_many :created_bikes, through: :creation_states, source: :bike
@@ -63,7 +65,7 @@ class Organization < ActiveRecord::Base
   def self.admin_text_search(n)
     str = "%#{n.strip}%"
     match_cols = %w(organizations.name organizations.short_name locations.name locations.city)
-    joins('LEFT OUTER JOIN locations AS locations ON organizations.id = locations.organization_id')
+    joins("LEFT OUTER JOIN locations AS locations ON organizations.id = locations.organization_id")
       .distinct
       .where(match_cols.map { |col| "#{col} ILIKE :str" }.join(' OR '), { str: str })
   end
@@ -99,6 +101,9 @@ class Organization < ActiveRecord::Base
     self.name = "Stop messing about" unless name[/\d|\w/].present?
     self.website = Urlifyer.urlify(website) if website.present?
     self.short_name = (short_name || name).truncate(30)
+    self.is_paid = true if current_invoice&.paid_in_full?
+    # For now, just use them. However - nesting organizations probably need slightly modified paid_feature slugs
+    self.paid_feature_slugs = current_invoice && current_invoice.paid_features.pluck(:slug) || []
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, '')
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
@@ -123,6 +128,8 @@ class Organization < ActiveRecord::Base
   end
 
   def school?; org_type == "school" end
+  def current_invoice; invoices.active.last || parent_organization&.current_invoice end # Parent invoice serves as invoice
+  def paid_features; PaidFeature.where(slug: paid_feature_slugs) end
 
   # I'm trying to ammass a list of paid features here (also in admin organization show)
   def bike_search?; has_bike_search end

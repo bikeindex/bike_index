@@ -87,9 +87,7 @@ class BikeUpdator
     update_ownership
     update_api_components if @bike_params['components'].present?
     update_stolen_record if @bike.update_attributes(@bike_params['bike'].except('stolen_records_attributes'))
-    if @bike.present?
-      AfterBikeSaveWorker.perform_async(@bike.id) # run immediately
-    end
+    AfterBikeSaveWorker.perform_async(@bike.id) if @bike.present? # run immediately
     remove_blank_components
     @bike
   end

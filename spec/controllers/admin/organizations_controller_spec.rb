@@ -23,6 +23,7 @@ describe Admin::OrganizationsController, type: :controller do
   describe 'organization update' do
     let(:state) { FactoryGirl.create(:state) }
     let(:country) { state.country }
+    let(:parent_organization) { FactoryGirl.create(:organization) }
     let(:location_1) { FactoryGirl.create(:location, organization: organization, street: 'old street', name: 'cool name') }
     let(:update_attributes) do
       {
@@ -30,6 +31,7 @@ describe Admin::OrganizationsController, type: :controller do
         show_on_map: true,
         org_type: 'shop',
         is_paid: 'true',
+        parent_organization_id: parent_organization.id,
         locations_attributes: {
           '0' => {
             id: location_1.id,
@@ -71,6 +73,7 @@ describe Admin::OrganizationsController, type: :controller do
         put :update, organization_id: organization.to_param, id: organization.to_param, organization: update_attributes
       end.to change(Location, :count).by 1
       organization.reload
+      expect(organization.parent_organization).to eq parent_organization
       expect(organization.name).to eq update_attributes[:name]
       expect(organization.is_paid).to be_truthy
       # Existing location is updated

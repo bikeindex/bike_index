@@ -50,18 +50,26 @@ describe RegistrationsController do
     context 'with organization' do
       context 'no user' do
         it 'renders' do
-          get :embed, organization_id: organization.to_param, simple_header: true
+          get :embed, organization_id: organization.to_param, simple_header: true, select_child_organization: true
           expect_it_to_render_correctly
           expect(assigns(:stolen)).to eq 0
           expect(assigns(:organization)).to eq organization
+          expect(assigns(:selectable_child_organizations)).to eq []
           expect(assigns(:creator)).to be_nil
           expect(assigns(:simple_header)).to be_truthy
+          # Since we're creating these in line, actually test the rendered body
+          body = response.body
+          # creation_organization
+          creator_organization_input = body[/value=.*id..b_param_creation_organization_id/i]
+          creator_organization_value = creator_organization_input.gsub(/value=./, '').match(/\A[^\"]*/)[0]
+          expect(creator_organization_value).to eq organization.id.to_s
         end
       end
       context 'with user' do
+        let!(:organization_child) { FactoryGirl.create(:organization, parent_organization_id: organization.id) }
         it 'renders, testing variables' do
           set_current_user(user)
-          get :embed, organization_id: organization.id, stolen: true
+          get :embed, organization_id: organization.id, stolen: true, select_child_organization: true
           expect_it_to_render_correctly
           # Since we're creating these in line, actually test the rendered body
           body = response.body
@@ -69,14 +77,12 @@ describe RegistrationsController do
           owner_email_input = body[/value=.*id..b_param_owner_email*/i]
           email_value = owner_email_input.gsub(/value=./, '').match(/\A[^\"]*/)[0]
           expect(email_value).to eq user.email
-          # creation_organization
-          creator_organization_input = body[/value=.*id..b_param_creation_organization_id/i]
-          creator_organization_value = creator_organization_input.gsub(/value=./, '').match(/\A[^\"]*/)[0]
-          expect(creator_organization_value).to eq organization.id.to_s
 
           expect(assigns(:simple_header)).to be_falsey
           expect(assigns(:stolen)).to be_truthy
           expect(assigns(:organization)).to eq organization
+          expect(assigns(:selectable_child_organizations)).to eq([organization_child])
+          expect(assigns(:b_param).creation_organization_id).to be_nil
           expect(assigns(:creator)).to be_nil
           expect(assigns(:owner_email)).to eq user.email
         end

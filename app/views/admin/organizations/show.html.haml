@@ -36,6 +36,12 @@
       %dt Auto user email
       %dd
         = @organization.auto_user.email if @organization.auto_user.present?
+      %dt
+        Created at
+      %dd
+        %span.convertTime.preciseTime
+          = l @organization.created_at, format: :convert_time
+        %small.convertTimezone
 
     %dl.dl-horizontal
       = @organization.dl_list_item(@organization.users.count, "Users")
@@ -52,14 +58,21 @@
               IS NOT MARKED PAID BUT HAS A LANGING PAGE
           - else
             false
+        %em.less-strong
+          Set this via #{link_to "invoices", admin_organization_invoices_path(organization_id: @organization.to_param)}
 
       %dt
-        Created at
+        Parent
       %dd
-        %span.convertTime.preciseTime
-          = l @organization.created_at, format: :convert_time
-        %small.convertTimezone
-
+        - if @organization.parent_organization.present?
+          = link_to @organization.parent_organization.name, admin_organization_path(@organization.parent_organization)
+          %small.less-strong
+            if parent's paid, so's this
+      %dt
+        Children
+      %dd
+        - @organization.child_organizations.each do |org|
+          = link_to org.name, admin_organization_path(org)
 
     - if @organization.is_suspended
       %h2.red-text
