@@ -102,7 +102,7 @@ class Organization < ActiveRecord::Base
     self.website = Urlifyer.urlify(website) if website.present?
     self.short_name = (short_name || name).truncate(30)
     self.is_paid = true if current_invoice&.paid_in_full?
-    self.paid_feature_slugs = current_invoice && current_invoice.paid_features.pluck(:slug) || []
+    self.paid_feature_slugs = permitted_paid_feature_slugs
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, '')
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
@@ -176,5 +176,12 @@ class Organization < ActiveRecord::Base
     begin
       self.access_token = SecureRandom.hex
     end while self.class.exists?(access_token: access_token)
+  end
+
+  private
+
+  def permitted_paid_feature_slugs
+    # For now, just return all of them. However - nesting organizations probably need slightly modified paid_feature slugs
+    current_invoice && current_invoice.paid_features.pluck(:slug) || []
   end
 end
