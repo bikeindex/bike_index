@@ -120,5 +120,6 @@ class Invoice < ActiveRecord::Base
 
   def update_organization
     organization.update_attributes(updated_at: Time.now)
+    organization.child_organizations.each { |o| o.update_attributes(updated_at: Time.now) }
   end
 end
