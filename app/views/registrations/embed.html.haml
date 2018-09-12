@@ -9,8 +9,11 @@
       Select 'Other' if manufacturer doesn't show up when entered
   .form-group.fancy-select.unfancy
     = f.collection_select(:primary_frame_color_id, Color.all, :id, :name, required: true, prompt: 'primary frame color', class: 'form-control')
-
-  = f.hidden_field :creation_organization_id
+  - if @selectable_child_organizations.any?
+    .form-group
+      = f.collection_select(:creation_organization_id, @selectable_child_organizations, :id, :name, { prompt: "Choose Specific Organization" }, { required: true, class: "form-control" })
+  - else
+    = f.hidden_field :creation_organization_id
   .form-group
     %label
       = f.check_box :stolen

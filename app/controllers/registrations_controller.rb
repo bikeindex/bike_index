@@ -11,8 +11,10 @@ class RegistrationsController < ApplicationController
   def embed # Attributes assigned in the partial, but can be overridden so it can be used anywhere
     @organization = current_organization
     @owner_email = current_user && current_user.email
+    @selectable_child_organizations = find_selectable_child_organizations
     @stolen = params[:stolen] ? 1 : 0
-    @b_param ||= BParam.new(creation_organization_id: @organization && @organization.id,
+    creation_organization_id = @selectable_child_organizations.any? ? nil : @organization&.id
+    @b_param ||= BParam.new(creation_organization_id: creation_organization_id,
                             owner_email: @owner_email,
                             stolen: @stolen)
   end
@@ -32,6 +34,11 @@ class RegistrationsController < ApplicationController
 
   def simple_header
     @simple_header ||= params[:simple_header]
+  end
+
+  def find_selectable_child_organizations
+    return [] unless @organization.present? && ActiveRecord::Type::Boolean.new.type_cast_from_database(params[:select_child_organization])
+    @organization.child_organizations
   end
 
   def permitted_params
