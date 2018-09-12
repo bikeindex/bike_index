@@ -5,7 +5,7 @@
 
 .paginate-container{ style: "margin-top: 30px;" }
   %h4.pull-left
-    = pluralize(@invoices.total_count, "matching invoice")
+    = pluralize(@invoices.total_count, "invoice")
   = paginate @invoices
 
 = render partial: "/admin/organizations/invoices/table", locals: { invoices: @invoices, sortable: true, display_organization: true }
