@@ -81,7 +81,7 @@ gem 'premailer-rails' # Inline styles for email
 gem 'backbone-on-rails', '~>0.9.10.0' # Legacy js
 gem 'chartkick' # Display charts
 gem 'groupdate' # Required for charts
-gem 'bootstrap', '~> 4.0.0.alpha3' # Bootstrap 4 - used for revised stylesheets
+gem 'bootstrap', '~> 4.1.3' # Bootstrap 4 - used for revised stylesheets
 gem 'jquery-datatables-rails', '~>3.4.0'
 
 # Show performance metrics
