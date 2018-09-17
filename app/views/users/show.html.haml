@@ -7,7 +7,7 @@
             - if @user.avatar
               - unless @user.avatar.url(:medium) == 'https://files.bikeindex.org/blank.png'
                 = image_tag @user.avatar.url(:medium), class: 'users-show-avatar'
-          .col-xs-3
+          .col-xs-9
             %header.with-subtitle
             %h2
               - if @user.title.present?
