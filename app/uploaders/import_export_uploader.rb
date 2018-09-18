@@ -18,6 +18,6 @@ class ImportExportUploader < CarrierWave::Uploader::Base
   end
 
   def extension_white_list
-    %w(csv tsv)
+    %w(csv tsv xls xlsx)
   end
 end

@@ -682,6 +682,44 @@ ALTER SEQUENCE public.duplicate_bike_groups_id_seq OWNED BY public.duplicate_bik
 
 
 --
+-- Name: exports; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.exports (
+    id integer NOT NULL,
+    organization_id integer,
+    file text,
+    kind integer DEFAULT 0,
+    progress integer DEFAULT 0,
+    rows integer DEFAULT 0,
+    export_errors json DEFAULT '{}'::json,
+    options json DEFAULT '{}'::json,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: exports_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.exports_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: exports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.exports_id_seq OWNED BY public.exports.id;
+
+
+--
 -- Name: feedbacks; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2262,6 +2300,13 @@ ALTER TABLE ONLY public.duplicate_bike_groups ALTER COLUMN id SET DEFAULT nextva
 
 
 --
+-- Name: exports id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.exports ALTER COLUMN id SET DEFAULT nextval('public.exports_id_seq'::regclass);
+
+
+--
 -- Name: feedbacks id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2653,6 +2698,14 @@ ALTER TABLE ONLY public.cycle_types
 
 ALTER TABLE ONLY public.duplicate_bike_groups
     ADD CONSTRAINT duplicate_bike_groups_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: exports exports_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.exports
+    ADD CONSTRAINT exports_pkey PRIMARY KEY (id);
 
 
 --
@@ -3104,6 +3157,13 @@ CREATE INDEX index_creation_states_on_creator_id ON public.creation_states USING
 --
 
 CREATE INDEX index_creation_states_on_organization_id ON public.creation_states USING btree (organization_id);
+
+
+--
+-- Name: index_exports_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_exports_on_organization_id ON public.exports USING btree (organization_id);
 
 
 --
@@ -4013,4 +4073,6 @@ INSERT INTO schema_migrations (version) VALUES ('20180813023344');
 INSERT INTO schema_migrations (version) VALUES ('20180818194244');
 
 INSERT INTO schema_migrations (version) VALUES ('20180911215238');
+
+INSERT INTO schema_migrations (version) VALUES ('20180918220604');
 
