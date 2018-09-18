@@ -239,52 +239,56 @@ describe Api::V1::BikesController do
         expect(bike.rear_wheel_size.iso_bsd).to eq 559
       end
 
-      it 'creates a stolen record' do
-        manufacturer = FactoryGirl.create(:manufacturer)
-        @organization.users.first.update_attribute :phone, '123-456-6969'
-        FactoryGirl.create(:country, iso: 'US')
-        FactoryGirl.create(:state, abbreviation: 'Palace')
-        bike_attrs = {
-          serial_number: '69 stolen bike',
-          manufacturer_id: manufacturer.id,
-          rear_tire_narrow: 'true',
-          rear_wheel_size: 559,
-          primary_frame_color_id: FactoryGirl.create(:color).id,
-          owner_email: 'fun_times@examples.com',
-          stolen: 'true',
-          phone: '9999999',
-          cycle_type_slug: 'bike'
-        }
-        stolen_record = {
-          date_stolen: '03-01-2013',
-          theft_description: "This bike was stolen and that's no fair.",
-          country: 'US',
-          street: 'Cortland and Ashland',
-          zipcode: '60622',
-          state: 'Palace',
-          police_report_number: '99999999',
-          police_report_department: 'Chicago',
-          locking_description: 'some locking description',
-          lock_defeat_description: 'broken in some crazy way'
-        }
-        expect_any_instance_of(OwnershipCreator).to receive(:send_notification_email)
-        expect do
-          post :create, bike: bike_attrs, stolen_record: stolen_record, organization_slug: @organization.slug, access_token: @organization.access_token
-          pp response.body
-          expect(response.code).to eq('200')
-          bike = Bike.unscoped.where(serial_number: '69 stolen bike').first
-          expect(bike.creation_state.origin).to eq 'api_v1'
+      it "creates a stolen record" do
+        Geocoder.configure(lookup: :google, use_https: true)
+        VCR.use_cassette("v1_bikes_create-stolen") do
+          manufacturer = FactoryGirl.create(:manufacturer)
+          @organization.users.first.update_attribute :phone, "123-456-6969"
+          FactoryGirl.create(:country, iso: "US")
+          FactoryGirl.create(:state, abbreviation: "IL", name: "Illinois")
+          bike_attrs = {
+            serial_number: "69 stolen bike",
+            manufacturer_id: manufacturer.id,
+            rear_tire_narrow: "true",
+            rear_wheel_size: 559,
+            primary_frame_color_id: FactoryGirl.create(:color).id,
+            owner_email: "fun_times@examples.com",
+            stolen: "true",
+            phone: "9999999",
+            cycle_type_slug: "bike"
+          }
+          stolen_record = {
+            date_stolen: "03-01-2013",
+            theft_description: "This bike was stolen and that's no fair.",
+            country: "US",
+            street: "Cortland and Ashland",
+            zipcode: "60622",
+            state: "IL",
+            police_report_number: "99999999",
+            police_report_department: "Chicago",
+            locking_description: "some locking description",
+            lock_defeat_description: "broken in some crazy way"
+          }
+          expect_any_instance_of(OwnershipCreator).to receive(:send_notification_email)
+
+          expect do
+            post :create, bike: bike_attrs, stolen_record: stolen_record, organization_slug: @organization.slug, access_token: @organization.access_token
+          end.to change(Ownership, :count).by(1)
+          expect(response.code).to eq("200")
+          bike = Bike.unscoped.where(serial_number: "69 stolen bike").first
+          expect(bike.creation_state.origin).to eq "api_v1"
           expect(bike.creation_state.creator).to eq bike.creator
           expect(bike.creation_state.organization).to eq @organization
           expect(bike.rear_wheel_size.iso_bsd).to eq 559
           csr = bike.find_current_stolen_record
           expect(csr.address).to be_present
-          expect(csr.phone).to eq('9999999')
+          expect(csr.phone).to eq("9999999")
           # No longer support this date format :/
-          # expect(csr.date_stolen).to eq(DateTime.strptime('03-01-2013 06', '%m-%d-%Y %H'))
-          expect(csr.locking_description).to eq('some locking description')
-          expect(csr.lock_defeat_description).to eq('broken in some crazy way')
-        end.to change(Ownership, :count).by 1
+          # expect(csr.date_stolen).to eq(DateTime.strptime("03-01-2013 06", "%m-%d-%Y %H"))
+          expect(csr.locking_description).to eq("some locking description")
+          expect(csr.lock_defeat_description).to eq("broken in some crazy way")
+        end
+        Geocoder.configure(lookup: :test)
       end
 
       it 'creates an example bike if the bike is from example, and include all the options' do
