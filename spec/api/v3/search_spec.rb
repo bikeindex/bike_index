@@ -57,7 +57,7 @@ describe 'Search API V3' do
       let(:stolen_interpreted_params) { proximity_interpreted_params.merge(stolenness: "stolen") }
       let(:non_stolen_interpreted_params) { proximity_interpreted_params.merge(stolenness: "non") }
       let!(:non_stolen) { FactoryGirl.create(:bike, manufacturer: manufacturer, primary_frame_color: color, serial_number: "s") }
-      let!(:stolen) { FactoryGirl.create(:stolen_bike, manufacturer: manufacturer, primary_frame_color: color, serial_number: "5", ) }
+      let!(:stolen) { FactoryGirl.create(:stolen_bike, manufacturer: manufacturer, primary_frame_color: color, serial_number: "5") }
       let!(:stolen_proximity) { FactoryGirl.create(:stolen_bike, manufacturer: manufacturer, secondary_frame_color: color, serial_number: "S", latitude: 41.8624488, longitude: -87.6591502) }
       before { Geocoder.configure(lookup: :google, use_https: true) } # Configuration matches geocode initializer
       after { Geocoder.configure(lookup: :test) } # reset to test
