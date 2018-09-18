@@ -36,7 +36,9 @@
             = l @bike.created_at, format: :convert_time
           %small.convertTimezone
         - if @bike.creation_organization.present?
-          = @bike.dl_list_item(@bike.creation_organization.name, 'Creation org')
+          %dt Creation org
+          %dd
+            = link_to @bike.creation_organization.name, admin_organization_path(@bike.creation_organization)
           = @bike.dl_from_attribute('cached_data')
     %hr
     = form_for [:admin, @bike], html: { class: 'form form-horizontal admin-bike-edit' } do |f|

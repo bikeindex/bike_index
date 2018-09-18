@@ -1,0 +1,174 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://maps.googleapis.com/maps/api/geocode/json?address=Cortland%20and%20Ashland,%20IL,%2060622,%20US&language=en&sensor=false
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Tue, 18 Sep 2018 21:18:14 GMT
+      Expires:
+      - Wed, 19 Sep 2018 21:18:14 GMT
+      Cache-Control:
+      - public, max-age=86400
+      Access-Control-Allow-Origin:
+      - "*"
+      Server:
+      - mafe
+      Content-Length:
+      - '737'
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Frame-Options:
+      - SAMEORIGIN
+      Alt-Svc:
+      - quic=":443"; ma=2592000; v="44,43,39,35"
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+           "results" : [
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    },
+                    {
+                       "long_name" : "Bucktown",
+                       "short_name" : "Bucktown",
+                       "types" : [ "neighborhood", "political" ]
+                    },
+                    {
+                       "long_name" : "Chicago",
+                       "short_name" : "Chicago",
+                       "types" : [ "locality", "political" ]
+                    },
+                    {
+                       "long_name" : "Cook County",
+                       "short_name" : "Cook County",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "Illinois",
+                       "short_name" : "IL",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "60622",
+                       "short_name" : "60622",
+                       "types" : [ "postal_code" ]
+                    }
+                 ],
+                 "formatted_address" : "Chicago, IL 60622, USA",
+                 "geometry" : {
+                    "location" : {
+                       "lat" : 41.9160178,
+                       "lng" : -87.66812849999999
+                    },
+                    "location_type" : "GEOMETRIC_CENTER",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 41.91736678029149,
+                          "lng" : -87.66677951970848
+                       },
+                       "southwest" : {
+                          "lat" : 41.9146688197085,
+                          "lng" : -87.6694774802915
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJOddSAOjSD4gRfJHFSVhXVSM",
+                 "types" : [
+                    "bus_station",
+                    "establishment",
+                    "point_of_interest",
+                    "transit_station"
+                 ]
+              },
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "1645",
+                       "short_name" : "1645",
+                       "types" : [ "street_number" ]
+                    },
+                    {
+                       "long_name" : "West Cortland Street",
+                       "short_name" : "W Cortland St",
+                       "types" : [ "route" ]
+                    },
+                    {
+                       "long_name" : "Bucktown",
+                       "short_name" : "Bucktown",
+                       "types" : [ "neighborhood", "political" ]
+                    },
+                    {
+                       "long_name" : "Chicago",
+                       "short_name" : "Chicago",
+                       "types" : [ "locality", "political" ]
+                    },
+                    {
+                       "long_name" : "Cook County",
+                       "short_name" : "Cook County",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "Illinois",
+                       "short_name" : "IL",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    },
+                    {
+                       "long_name" : "60622",
+                       "short_name" : "60622",
+                       "types" : [ "postal_code" ]
+                    }
+                 ],
+                 "formatted_address" : "1645 W Cortland St, Chicago, IL 60622, USA",
+                 "geometry" : {
+                    "location" : {
+                       "lat" : 41.9159752,
+                       "lng" : -87.66959229999999
+                    },
+                    "location_type" : "ROOFTOP",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 41.91732418029149,
+                          "lng" : -87.66824331970848
+                       },
+                       "southwest" : {
+                          "lat" : 41.9146262197085,
+                          "lng" : -87.67094128029149
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJ53HcncLSD4gRRiSbj06ahKw",
+                 "types" : [ "bar", "establishment", "food", "point_of_interest", "restaurant" ]
+              }
+           ],
+           "status" : "OK"
+        }
+    http_version: 
+  recorded_at: Tue, 18 Sep 2018 21:18:14 GMT
+recorded_with: VCR 4.0.0
