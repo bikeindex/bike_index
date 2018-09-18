@@ -270,7 +270,7 @@ describe Api::V1::BikesController do
         expect_any_instance_of(OwnershipCreator).to receive(:send_notification_email)
         expect do
           post :create, bike: bike_attrs, stolen_record: stolen_record, organization_slug: @organization.slug, access_token: @organization.access_token
-        end.to change(Ownership, :count).by(1)
+        end.to change(Ownership, :count).by 1
         expect(response.code).to eq('200')
         bike = Bike.unscoped.where(serial_number: '69 stolen bike').first
         expect(bike.creation_state.origin).to eq 'api_v1'
