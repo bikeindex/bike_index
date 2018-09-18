@@ -65,7 +65,7 @@ describe 'Search API V3' do
         # The result is counts of the arrays we stubbed :/
         expect(result[:non]).to eq 3
         expect(result[:stolen]).to eq 2
-        expect(result[:proximity].to eq 1
+        expect(result[:proximity]).to eq 1
         expect(response.status).to eq(200)
       end
     end
