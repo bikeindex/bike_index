@@ -270,20 +270,21 @@ describe Api::V1::BikesController do
         expect_any_instance_of(OwnershipCreator).to receive(:send_notification_email)
         expect do
           post :create, bike: bike_attrs, stolen_record: stolen_record, organization_slug: @organization.slug, access_token: @organization.access_token
+          pp response.body
+          expect(response.code).to eq('200')
+          bike = Bike.unscoped.where(serial_number: '69 stolen bike').first
+          expect(bike.creation_state.origin).to eq 'api_v1'
+          expect(bike.creation_state.creator).to eq bike.creator
+          expect(bike.creation_state.organization).to eq @organization
+          expect(bike.rear_wheel_size.iso_bsd).to eq 559
+          csr = bike.find_current_stolen_record
+          expect(csr.address).to be_present
+          expect(csr.phone).to eq('9999999')
+          # No longer support this date format :/
+          # expect(csr.date_stolen).to eq(DateTime.strptime('03-01-2013 06', '%m-%d-%Y %H'))
+          expect(csr.locking_description).to eq('some locking description')
+          expect(csr.lock_defeat_description).to eq('broken in some crazy way')
         end.to change(Ownership, :count).by 1
-        expect(response.code).to eq('200')
-        bike = Bike.unscoped.where(serial_number: '69 stolen bike').first
-        expect(bike.creation_state.origin).to eq 'api_v1'
-        expect(bike.creation_state.creator).to eq bike.creator
-        expect(bike.creation_state.organization).to eq @organization
-        expect(bike.rear_wheel_size.iso_bsd).to eq 559
-        csr = bike.find_current_stolen_record
-        expect(csr.address).to be_present
-        expect(csr.phone).to eq('9999999')
-        # No longer support this date format :/
-        # expect(csr.date_stolen).to eq(DateTime.strptime('03-01-2013 06', '%m-%d-%Y %H'))
-        expect(csr.locking_description).to eq('some locking description')
-        expect(csr.lock_defeat_description).to eq('broken in some crazy way')
       end
 
       it 'creates an example bike if the bike is from example, and include all the options' do
