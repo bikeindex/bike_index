@@ -7,7 +7,7 @@ class CreateExports < ActiveRecord::Migration
       t.integer :progress, default: 0
       t.integer :rows, default: 0
       t.json :export_errors, default: {}
-      t.json :options, default: {}
+      t.jsonb :options, default: {}
 
       t.timestamps null: false
     end

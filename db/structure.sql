@@ -693,7 +693,7 @@ CREATE TABLE public.exports (
     progress integer DEFAULT 0,
     rows integer DEFAULT 0,
     export_errors json DEFAULT '{}'::json,
-    options json DEFAULT '{}'::json,
+    options jsonb DEFAULT '{}'::jsonb,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
