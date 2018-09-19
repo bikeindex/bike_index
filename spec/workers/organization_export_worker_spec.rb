@@ -20,10 +20,10 @@ describe OrganizationExportWorker do
 
   describe "perform" do
     context "bulk import already processed" do
-      let(:bulk_import) { FactoryGirl.create(:export, progress: "finished") }
+      let(:export) { FactoryGirl.create(:export, progress: "finished") }
       it "returns true" do
-        expect(instance).to_not receive(:process_csv)
-        instance.perform(bulk_import.id)
+        expect(instance).to_not receive(:create_csv)
+        instance.perform(export.id)
       end
     end
   end
@@ -33,19 +33,20 @@ describe OrganizationExportWorker do
 
     describe "bike_to_row" do
       let(:bike) { FactoryGirl.create(:bike, manufacturer: trek, primary_frame_color: black) }
-      let(:target_hash) do
-        {
-          registered_at: bike.created_at.utc,
-          manufacturer: "Trek",
-          model: "",
-          color: "Black",
-          serial: bike.serial_number,
-          is_stolen: false
-        }
+      let(:target_values) do
+        [
+          "http://test.host/bikes/1",
+          bike.created_at.utc,
+          "Trek",
+          nil,
+          "Black",
+          bike.serial_number,
+          false
+        ]
       end
       context "default" do
         it "returns the hash we want" do
-          expect(instance.bike_to_row(bike)).to eq target_hash.values
+          expect(instance.bike_to_row(bike)).to eq target_values
         end
       end
     end

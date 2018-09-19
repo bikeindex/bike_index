@@ -1,8 +1,8 @@
 class Export < ActiveRecord::Base
   VALID_PROGRESSES = %i[pending ongoing finished].freeze
   VALID_KINDS = %i[organization stolen manufacturer].freeze
-  DEFAULT_HEADERS = %w[registered_at].freeze
-  PERMITTED_HEADERS = (DEFAULT_HEADERS + %w[registered_by registration_type]).freeze
+  DEFAULT_HEADERS = %w[link registered_at manufacturer model color serial is_stolen].freeze
+  PERMITTED_HEADERS = (DEFAULT_HEADERS + %w[registered_by registration_type owner_email]).freeze
   mount_uploader :file, ImportExportUploader
 
   belongs_to :organization
