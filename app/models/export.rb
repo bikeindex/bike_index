@@ -1,6 +1,9 @@
+
+
 class Export < ActiveRecord::Base
   VALID_PROGRESSES = %i[pending ongoing finished].freeze
   VALID_KINDS = %i[organization stolen manufacturer].freeze
+  VALID_FORMATS = %i[csv].freeze
   DEFAULT_HEADERS = %w[link registered_at manufacturer model color serial is_stolen].freeze
   PERMITTED_HEADERS = (DEFAULT_HEADERS + %w[registered_by registration_type owner_email]).freeze
   mount_uploader :file, ImportExportUploader
@@ -8,13 +11,14 @@ class Export < ActiveRecord::Base
   belongs_to :organization
   enum progress: VALID_PROGRESSES
   enum kind: VALID_KINDS
+  enum file_format: VALID_FORMATS
 
   before_validation :set_calculated_attributes
 
   def self.default_headers; DEFAULT_HEADERS end
 
   def self.default_options(kind)
-    { "format" => "csv", "headers" => default_headers }.merge(default_kind_options[kind.to_s])
+    { "headers" => default_headers }.merge(default_kind_options[kind.to_s])
   end
 
   def self.default_kind_options
@@ -46,6 +50,18 @@ class Export < ActiveRecord::Base
 
   def end_at
     option?("end_at") ? Time.parse(options["end_at"]) : nil
+  end
+
+  def tmp_file
+    @tmp_file ||= Tempfile.new(["#{kind}_#{id}", ".#{file_format}"])
+  end
+
+  def tmp_file_rows
+    `wc -l "#{tmp_file.path}"`.strip.split(' ')[0].to_i - 1 # Because we don't count header
+  end
+
+  def open_file
+    file.read # Created file.
   end
 
   def description

@@ -689,9 +689,10 @@ CREATE TABLE public.exports (
     id integer NOT NULL,
     organization_id integer,
     file text,
+    file_format integer DEFAULT 0,
     kind integer DEFAULT 0,
     progress integer DEFAULT 0,
-    rows integer DEFAULT 0,
+    rows integer,
     options jsonb DEFAULT '{}'::jsonb,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL

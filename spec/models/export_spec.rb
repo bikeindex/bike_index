@@ -7,7 +7,6 @@ RSpec.describe Export, type: :model do
     let(:export) { FactoryGirl.create(:export, options: { with_blacklist: true, headers: %w[party registered_at] }) }
     it "is with blacklist" do
       expect(export.stolen?).to be_truthy
-      expect(export.options).to eq(Export.default_options("stolen").merge("with_blacklist" => true))
       expect(export.option?(:with_blacklist)).to be_truthy
       expect(export.option?(:only_serials_and_police_reports)).to be_falsey
       expect(export.description).to eq "Stolen"
@@ -18,6 +17,7 @@ RSpec.describe Export, type: :model do
   describe "organization" do
     let(:export) { FactoryGirl.create(:export_organization) }
     it "is as expected" do
+      expect(export.options).to eq(Export.default_options("organization"))
       expect(export.stolen?).to be_falsey
       expect(export.organization?).to be_truthy
       expect(export.option?("start_at")).to be_falsey
@@ -31,6 +31,16 @@ RSpec.describe Export, type: :model do
         expect(export.valid?).to be_falsey
         expect(export.errors.full_messages.to_s).to match(/organization/i)
       end
+    end
+  end
+
+  describe "tmp_file" do
+    let(:export) { FactoryGirl.build(:export, file_format: "csv") }
+    it "has the correct format" do
+      expect(export.kind).to eq "stolen"
+      expect(export.tmp_file.path.to_s).to match(/\.csv\z/)
+      export.tmp_file.close
+      export.tmp_file.unlink
     end
   end
 

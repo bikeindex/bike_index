@@ -1,5 +1,3 @@
-require 'csv'
-
 class OrganizationExportWorker
   include Sidekiq::Worker
   sidekiq_options queue: "afterwards" # Because it's low priority!
@@ -11,12 +9,30 @@ class OrganizationExportWorker
   def perform(export_id)
     @export = Export.find(export_id)
     return true if @export.finished?
-    return false unless create_csv(@bulk_import.open_file)
+    write_csv(@export.tmp_file)
+    @export.tmp_file.close # Because buffered output, closing instead of rewinding
+    @export.update_attribute :rows, @export.tmp_file_rows
+    @export.file = @export.tmp_file
     @export.progress = "finished"
-    @bulk_import.save
+    @export.save
+    @export.tmp_file.unlink # Remove it and unlink
+    @export
   end
 
-  def create_csv(file)
+  def upload(file)
+  end
+
+  def write_csv(file)
+    require "csv"
+    file.write(comma_wrapped_string(export_headers))
+    @export.bikes_scoped.find_each(batch_size: 100) do |bike|
+      file.write(comma_wrapped_string(bike_to_row(bike)))
+    end
+    true
+  end
+
+  def comma_wrapped_string(array)
+    ('"' + array.join('","') + '"\n')
   end
 
   def bike_to_row(bike)
