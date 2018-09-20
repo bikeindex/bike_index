@@ -19,9 +19,6 @@ class OrganizationExportWorker
     @export
   end
 
-  def upload(file)
-  end
-
   def write_csv(file)
     require "csv"
     file.write(comma_wrapped_string(export_headers))
@@ -32,7 +29,7 @@ class OrganizationExportWorker
   end
 
   def comma_wrapped_string(array)
-    ('"' + array.join('","') + '"\n')
+    ('"' + array.join('","') + "\"\n")
   end
 
   def bike_to_row(bike)

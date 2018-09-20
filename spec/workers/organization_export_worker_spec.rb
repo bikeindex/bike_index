@@ -22,19 +22,6 @@ describe OrganizationExportWorker do
   let(:csv_string) { csv_lines.map { |r| r.join(",") }.join("\n") }
 
   describe "perform" do
-    context "stub" do
-      # This is just intended for planning everything out - not important and can be removed once everything works
-      it "calls things in the order that we expect" do
-        expect(export.rows).to be_nil
-        expect(export.progress).to eq "pending"
-        expect(instance).to receive(:create_csv)
-        expect(instance).to receive(:upload)
-        instance.perform(export.id)
-        export.reload
-        expect(export.progress).to eq "finished"
-        expect(export.rows).to eq 0
-      end
-    end
     context "bulk import already processed" do
       let(:export) { FactoryGirl.create(:export, progress: "finished") }
       it "returns true" do
@@ -50,7 +37,6 @@ describe OrganizationExportWorker do
         instance.perform(export.id)
         export.reload
         expect(export.progress).to eq "finished"
-        p export.open_file
         expect(export.open_file).to eq(csv_string)
         expect(export.rows).to eq 1
       end
