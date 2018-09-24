@@ -1,11 +1,9 @@
-
-
 class Export < ActiveRecord::Base
   VALID_PROGRESSES = %i[pending ongoing finished].freeze
   VALID_KINDS = %i[organization stolen manufacturer].freeze
   VALID_FORMATS = %i[csv].freeze
   DEFAULT_HEADERS = %w[link registered_at manufacturer model color serial is_stolen].freeze
-  PERMITTED_HEADERS = (DEFAULT_HEADERS + %w[registered_by registration_type owner_email]).freeze
+  PERMITTED_HEADERS = (DEFAULT_HEADERS + %w[thumbnail registered_by registration_type owner_email owner_name]).freeze
   mount_uploader :file, ImportExportUploader
 
   belongs_to :organization
@@ -53,7 +51,7 @@ class Export < ActiveRecord::Base
   end
 
   def tmp_file
-    @tmp_file ||= Tempfile.new(["#{kind}_#{id}", ".#{file_format}"])
+    @tmp_file ||= Tempfile.new(["exports/#{kind}_#{id}", ".#{file_format}"])
   end
 
   def tmp_file_rows

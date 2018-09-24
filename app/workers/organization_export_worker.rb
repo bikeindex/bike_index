@@ -43,9 +43,11 @@ class OrganizationExportWorker
   def value_for_header(header, bike)
     case header
     when "link" then LINK_BASE + bike.id.to_s
+    when "thumbnail" then bike.thumb_path
     when "registered_at" then bike.created_at.utc
     when "manufacturer" then bike.mnfg_name
     when "model" then bike.frame_model
+    when "year" then bike.year
     when "color" then bike.frame_colors.join(', ')
     when "serial" then bike.serial_number
     when "is_stolen" then bike.stolen

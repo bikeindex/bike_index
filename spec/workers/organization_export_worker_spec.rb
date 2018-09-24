@@ -19,7 +19,7 @@ describe OrganizationExportWorker do
       false
     ]
   end
-  let(:csv_string) { csv_lines.map { |r| r.join(",") }.join("\n") }
+  let(:csv_string) { csv_lines.map { |r| instance.comma_wrapped_string(r) }.join }
 
   describe "perform" do
     context "bulk import already processed" do
@@ -41,6 +41,22 @@ describe OrganizationExportWorker do
         expect(export.rows).to eq 1
       end
     end
+
+    # Setting up what we have, rather than waiting on everything
+    # Maybe will finish this before shipping
+    # context "all header options" do
+    #   let(:export) { FactoryGirl.create(:export_organization, progress: "pending", file: nil, options: { headers: Export::PERMITTED_HEADERS }) }
+    #   let(:fancy_bike) - bike with ownership, multiple colors, manufacturer other
+    #   let(:csv_lines) { [export.headers, basic_bike_values, fancy_bike_values] }
+    #   it "does the thing we expect" do
+    #     expect(export.file.present?).to be_falsey
+    #     instance.perform(export.id)
+    #     export.reload
+    #     expect(export.progress).to eq "finished"
+    #     expect(export.open_file).to eq(csv_string)
+    #     expect(export.rows).to eq 1
+    #   end
+    # end
   end
 
   context "with assigned export" do
@@ -49,7 +65,6 @@ describe OrganizationExportWorker do
     describe "bike_to_row" do
       context "default" do
         it "returns the hash we want" do
-          pp bike.id
           expect(instance.bike_to_row(bike)).to eq basic_values
         end
       end
