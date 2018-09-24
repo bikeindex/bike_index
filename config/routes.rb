@@ -279,6 +279,7 @@ Bikeindex::Application.routes.draw do
     end
     resources :users, except: [:show]
     resources :emails
+    resources :exports, except: [:edit, :update]
     resources :bulk_imports, only: [:index, :show, :new, :create]
     resources :messages, only: [:index, :show, :create]
     resources :stickers, only: [:index, :show, :edit, :update]

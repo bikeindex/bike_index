@@ -688,6 +688,7 @@ ALTER SEQUENCE public.duplicate_bike_groups_id_seq OWNED BY public.duplicate_bik
 CREATE TABLE public.exports (
     id integer NOT NULL,
     organization_id integer,
+    user_id integer,
     file text,
     file_format integer DEFAULT 0,
     kind integer DEFAULT 0,
@@ -3164,6 +3165,13 @@ CREATE INDEX index_creation_states_on_organization_id ON public.creation_states 
 --
 
 CREATE INDEX index_exports_on_organization_id ON public.exports USING btree (organization_id);
+
+
+--
+-- Name: index_exports_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_exports_on_user_id ON public.exports USING btree (user_id);
 
 
 --

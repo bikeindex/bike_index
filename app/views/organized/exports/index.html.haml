@@ -1,0 +1,39 @@
+.organized-page-header
+  %h1
+    %em
+      = current_organization.name
+    Exports
+
+.text-right
+  = link_to "New Export", new_organization_export_path(organization_id: current_organization.to_param), class: "btn btn-secondary pull-right"
+
+.table-responsive.mt-4
+  %p{ style: "margin-bottom: 0;" }
+    %strong
+      = number_with_delimiter(@exports.total_count)
+    = "Export".pluralize(@exports.total_count)
+
+  %table.table.table-striped.table-bordered.table-sm.without-exterior-border
+    %thead.small-header
+      %th
+        Created&nbsp;<small class="convertTimezone"></small>
+      %th
+        Progress
+      %th
+        Bikes in export
+    %tbody
+      - @exports.each do |bike_code|
+        %tr
+          %td
+            %a.convertTime{ href: organization_export_path(export, organization_id: current_organization.to_param) }
+              = l export.created_at, format: :convert_time
+          %td
+            - export_progress_class = export.progress == "finished" ? "text-success" : ""
+            %span{ class: export_progress_class }
+              = export.progress
+          %td
+            - if export.finished?
+              = number_with_delimiter(export.rows)
+
+.paginate-container.paginate-container-bottom
+  = paginate @exports

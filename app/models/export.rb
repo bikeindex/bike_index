@@ -7,6 +7,7 @@ class Export < ActiveRecord::Base
   mount_uploader :file, ImportExportUploader
 
   belongs_to :organization
+  belongs_to :user # Creator of export
   enum progress: VALID_PROGRESSES
   enum kind: VALID_KINDS
   enum file_format: VALID_FORMATS
