@@ -42,21 +42,13 @@ describe OrganizationExportWorker do
       end
     end
 
-    # Setting up what we have, rather than waiting on everything
-    # Maybe will finish this before shipping
-    # context "all header options" do
-    #   let(:export) { FactoryGirl.create(:export_organization, progress: "pending", file: nil, options: { headers: Export::PERMITTED_HEADERS }) }
-    #   let(:fancy_bike) - bike with ownership, multiple colors, manufacturer other
-    #   let(:csv_lines) { [export.headers, basic_bike_values, fancy_bike_values] }
-    #   it "does the thing we expect" do
-    #     expect(export.file.present?).to be_falsey
-    #     instance.perform(export.id)
-    #     export.reload
-    #     expect(export.progress).to eq "finished"
-    #     expect(export.open_file).to eq(csv_string)
-    #     expect(export.rows).to eq 1
-    #   end
-    # end
+    context "all headers" do
+      # Setting up what we have, rather than waiting on everything
+      # let(:export) { FactoryGirl.create(:export_organization, progress: "pending", file: nil, options: { headers: Export::PERMITTED_HEADERS }) }
+      # let(:fancy_bike) - bike with ownership, multiple colors, manufacturer other
+      # let(:csv_lines) { [export.headers, basic_bike_values, fancy_bike_values] }
+      it "exports with all the header values"
+    end
   end
 
   context "with assigned export" do

@@ -9,9 +9,9 @@ class StolenRecord < ActiveRecord::Base
        phone_for_users phone_for_shops phone_for_police receive_notifications proof_of_ownership
        approved date_recovered recovered_description index_helped_recovery can_share_recovery
        recovery_posted tsved_at estimated_value).map(&:to_sym).freeze
- end
+  end
 
- attr_accessor :timezone # Just to provide a backup and permit assignment
+  attr_accessor :timezone # Just to provide a backup and permit assignment
 
   belongs_to :bike
   has_one :current_bike, class_name: 'Bike', foreign_key: :current_stolen_record_id

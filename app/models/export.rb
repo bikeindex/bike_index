@@ -14,6 +14,8 @@ class Export < ActiveRecord::Base
 
   before_validation :set_calculated_attributes
 
+  attr_accessor :timezone # permit assignment
+
   def self.default_headers; DEFAULT_HEADERS end
 
   def self.default_options(kind)
@@ -41,6 +43,20 @@ class Export < ActiveRecord::Base
 
   def option?(str)
     options[str.to_s].present?
+  end
+
+  def start_at=(val)
+    return true unless val.present?
+    self.options = options.merge("start_at" => TimeParser.parse(val, timezone))
+  end
+
+  def end_at=(val)
+    return true unless val.present?
+    self.options = options.merge("end_at" => TimeParser.parse(val, timezone))
+  end
+
+  def headers=(val)
+    self.options = options.merge("headers" => val)
   end
 
   def start_at

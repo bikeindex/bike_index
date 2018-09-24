@@ -18,15 +18,20 @@
       %th
         Created&nbsp;<small class="convertTimezone"></small>
       %th
+        Creator
+      %th
         Progress
       %th
         Bikes in export
     %tbody
-      - @exports.each do |bike_code|
+      - @exports.each do |export|
         %tr
           %td
             %a.convertTime{ href: organization_export_path(export, organization_id: current_organization.to_param) }
               = l export.created_at, format: :convert_time
+          %td
+            - if export.user.present?
+              = export.user.display_name
           %td
             - export_progress_class = export.progress == "finished" ? "text-success" : ""
             %span{ class: export_progress_class }

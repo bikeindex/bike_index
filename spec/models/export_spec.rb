@@ -44,13 +44,29 @@ RSpec.describe Export, type: :model do
     end
   end
 
-  describe "bikes_scoped" do
-    context "stolen" do
-      # Pending - we're getting the organization scopes up and running before migrating existing TsvCreator tasks
-      it "matches existing tsv scopes"
+  describe "assignment" do
+    let(:time_start) { "2018-01-30T23:57:56" }
+    let(:time_end) { "2018-08-23T23:51:56" }
+    let(:target_start) { 1517378276 }
+    let(:target_end) { 1535086316 }
+    let(:timezone) { "America/Chicago" }
+    let(:export) { FactoryGirl.build(:export) }
+    it "assigns correctly" do
+      export.update_attributes(timezone: timezone, start_at: time_start, end_at: time_end, headers: %w[party registered_at])
+      expect(export.start_at.to_i).to be_within(1).of target_start
+      expect(export.end_at.to_i).to be_within(1).of target_end
+      expect(export.headers).to eq(["registered_at"])
     end
+  end
+
+  describe "bikes_scoped" do
+    # Pending - we're getting the organization scopes up and running before migrating existing TsvCreator tasks
+    # But we eventually want to add stolen tsv's into here
+    # context "stolen" do
+    #   it "matches existing tsv scopes"
+    # end
     context "organization" do
-      let(:export) { FactoryGirl.create(:export_organization) }
+      let(:export) { FactoryGirl.create(:export_organization, file: nil) }
       let(:start_time) { Time.now - 20.hours }
       let(:end_time) { Time.now - 5.minutes }
       it "has the scopes we expect" do

@@ -1,0 +1,13 @@
+.organized-page-header
+  %h1
+    %em
+      = current_organization.name
+    new export
+
+= form_for @export, { url: organization_export_path(organization_id: current_organization.to_param), action: "create", html: { class: "organized-form" } } do |f|
+  / .form-group.row
+  /   = f.label :start_at, "Bike ID/URL", class: "org-form-label"
+  /   .form-well-input
+  /     = f.text_field :bike_id, required: true, class: "form-control"
+
+  = f.submit "Create export", class: "btn btn-success btn-lg"
