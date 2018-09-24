@@ -4,7 +4,7 @@
       = current_organization.name
     new export
 
-= form_for @export, { url: organization_export_path(organization_id: current_organization.to_param), action: "create", html: { class: "organized-form" } } do |f|
+= form_for @export, { url: new_organization_export_path(organization_id: current_organization.to_param), action: "create", html: { class: "organized-form" } } do |f|
   / .form-group.row
   /   = f.label :start_at, "Bike ID/URL", class: "org-form-label"
   /   .form-well-input

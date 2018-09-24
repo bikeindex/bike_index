@@ -11,7 +11,9 @@ module Organized
 
     def show; end
 
-    def new; end
+    def new
+      @export = Export.new(organization_id: current_organization.id)
+    end
 
     def create
     end
