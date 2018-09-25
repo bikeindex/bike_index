@@ -29,7 +29,7 @@ class OrganizationExportWorker
   end
 
   def comma_wrapped_string(array)
-    '"' + array.map { |val| val.is_a?(String) ? val.gsub(/\\*\"/, '\"') : val }.join('","') + "\"\n"
+    array.map { |val| "\"#{val.to_s.gsub(/\\*\"/, '\"')}\"" }.join(",") + "\n"
   end
 
   def bike_to_row(bike)

@@ -88,11 +88,15 @@ describe OrganizationExportWorker do
           "George Smith"
         ]
       end
+      let(:target_csv_line) { "\"http://test.host/bikes/#{bike.id}\",\"#{bike.created_at.utc}\",\"Sweet manufacturer &lt;&gt;&lt;&gt;&gt;\",\"\",,,\"<script>XSSSSS</script>\"\",\"Black, #{secondary_color.name}\",\"#{bike.serial_number}\",\"\",\"\",\"\",\"\",\"#{email}\",\"George Smith\"" }
       it "exports with all the header values" do
         instance.perform(export.id)
         export.reload
         expect(export.progress).to eq "finished"
-        expect(export.open_file).to eq(csv_string)
+        generated_csv_string = export.open_file
+        expect(generated_csv_string).to eq(csv_string)
+        # Ensure we actually match the exact thing with correct escaping
+        expect(generated_csv_string.split("\n").last).to eq target_csv_line
         expect(export.rows).to eq 1
       end
     end
