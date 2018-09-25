@@ -1,10 +1,11 @@
 .mb-4
   %h1
     Bulk import
-%ul
+%ul.organized-show-list
   %li
     Created:
-    = l @bulk_import.created_at, format: :convert_time
+    %span.convertTime
+      = l @bulk_import.created_at, format: :convert_time
 
   %li
     Progress:
@@ -44,7 +45,8 @@
     - @bikes.each do |bike|
       %tr
         %td
-          = link_to l(bike.created_at, format: :convert_time), bike_path(bike)
+
+          = link_to l(bike.created_at, format: :convert_time), bike_path(bike), class: "convertTime"
         %td
           = bike.mnfg_name
         %td

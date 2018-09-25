@@ -95,6 +95,11 @@ class Organization < ActiveRecord::Base
     organization_message_kinds.any?
   end
 
+  def paid_for?(feature_name)
+    return true if paid_feature_slugs.include?(feature_name)
+    paid_feature_slugs.include?(PaidFeature.friendly_find(feature_name)&.slug) 
+  end
+
   def set_calculated_attributes
     return true unless name.present?
     self.name = strip_tags(name)

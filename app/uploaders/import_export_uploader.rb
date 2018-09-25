@@ -12,12 +12,12 @@ class ImportExportUploader < CarrierWave::Uploader::Base
   def store_dir
     "#{base_store_dir}import_exports"
   end
-  
+
   def base_store_dir
     "uploads/"
   end
 
   def extension_white_list
-    %w(csv tsv)
+    %w(csv tsv xls xlsx)
   end
 end

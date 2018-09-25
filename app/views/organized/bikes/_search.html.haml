@@ -50,6 +50,9 @@
     %tr
       %th.date-added
         Added&nbsp;<small class="convertTimezone"></small>
+      %th.hidden-xs-down
+        %small
+          Stolen
       %th.hidden-xs-down Manufacturer
       %th.hidden-xs-down Model
       %th.hidden-xs-down Color
@@ -72,6 +75,8 @@
           %a.convertTime{ href: bike_path(bike) }
             = l bike.created_at, format: :convert_time
         %td.hidden-xs-down
+          = bike.stolen ? "True" : ""
+        %td.hidden-xs-down
           = bike.mnfg_name
         %td.hidden-xs-down
           = bike.frame_model
@@ -82,8 +87,11 @@
             = organized_bike_text(bike)
             %br
           = bike.owner_email
+          - if bike.owner_name.present?
+            %em
+              = bike.owner_name
           - if bike.creation_description
-            %small.less-string
+            %small.less-strong
               = bike.creation_description
         - if @bike_code.present?
           %td

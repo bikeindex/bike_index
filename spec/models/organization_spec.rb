@@ -54,22 +54,25 @@ describe Organization do
     end
   end
 
-  describe "is_paid calculations" do
-    let(:paid_feature) { FactoryGirl.create(:paid_feature, amount_cents: 10_000) }
+  describe "is_paid and paid_for? calculations" do
+    let(:paid_feature) { FactoryGirl.create(:paid_feature, amount_cents: 10_000, name: "CSV Exports") }
     let(:invoice) { FactoryGirl.create(:invoice_paid, amount_due: 0) }
     let(:organization) { invoice.organization }
     let(:organization_child) { FactoryGirl.create(:organization) }
     it "uses associations to determine is_paid" do
+      expect(organization.paid_for?("csv-exports")).to be_falsey
       invoice.update_attributes(paid_feature_ids: [paid_feature.id])
       organization.update_attributes(updated_at: Time.now) # TODO: Rails 5 update - after_commit
       expect(organization.is_paid).to be_truthy
       expect(organization.paid_feature_slugs).to eq([paid_feature.slug])
+      expect(organization.paid_for?("csv-exports")).to be_truthy
       organization_child.update_attributes(updated_at: Time.now) # TODO: Rails 5 update - after_commit
       expect(organization_child.is_paid).to be_falsey
       organization_child.update_attributes(parent_organization: organization)
       expect(organization_child.is_paid).to be_truthy
       expect(organization_child.current_invoice).to eq invoice
       expect(organization_child.paid_feature_slugs).to eq([paid_feature.slug])
+      expect(organization_child.paid_for?("CSV Exports")).to be_truthy # It also checks for the full name version
       expect(organization.child_organizations.pluck(:id)).to eq([organization_child.id])
     end
   end

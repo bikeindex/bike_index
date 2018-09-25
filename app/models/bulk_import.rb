@@ -38,6 +38,10 @@ class BulkImport < ActiveRecord::Base
     organization && organization.auto_user || user
   end
 
+  def filename
+    "#{organization}_import_#{id}"
+  end
+
   def validate_creator_present
     return true if creator.present?
     add_file_error("Needs to have a user or an organization with an auto user")

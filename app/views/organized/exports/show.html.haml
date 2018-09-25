@@ -1,0 +1,37 @@
+.organized-page-header
+  %h1
+    %em
+      = current_organization.name
+    Export
+
+%ul.organized-show-list
+  %li
+    %strong
+    = link_to "Download Export", @export.file.url
+  %li
+    Created:
+    %span.convertTime
+      = l @export.created_at, format: :convert_time
+
+  %li
+    By:
+    - if @export.user.present?
+      = @export.user.display_name
+
+  %li
+    Progress:
+    - export_progress_class = @export.progress == "finished" ? "text-success" : ""
+    %span{ class: export_progress_class }
+      = @export.progress
+
+  %li
+    Bikes exported:
+    = @export.rows
+
+  %li
+    Columns in csv:
+    %ul
+      - @export.headers.each do |header|
+        %li
+          %small
+            = header.humanize
