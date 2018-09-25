@@ -16,6 +16,8 @@ class Export < ActiveRecord::Base
 
   attr_accessor :timezone # permit assignment
 
+  def self.permitted_headers; PERMITTED_HEADERS end
+
   def self.default_headers; DEFAULT_HEADERS end
 
   def self.default_options(kind)
@@ -46,12 +48,10 @@ class Export < ActiveRecord::Base
   end
 
   def start_at=(val)
-    return true unless val.present?
     self.options = options.merge("start_at" => TimeParser.parse(val, timezone))
   end
 
   def end_at=(val)
-    return true unless val.present?
     self.options = options.merge("end_at" => TimeParser.parse(val, timezone))
   end
 

@@ -8,11 +8,17 @@ class TimeParser
     if time_str.is_a?(Integer) || time_str.to_s.strip.match(/^\d+\z/) # it's only numbers, so it's a timestamp
       Time.at(time_str.to_i)
     else
-      Time.zone = ActiveSupport::TimeZone[timezone_str] if timezone_str.present? # Use hash lookup so if zone isn't found, no explode
+      Time.zone = parse_timezone(timezone_str)
       time = Time.zone.parse(time_str)
       Time.zone = DEFAULT_TIMEZONE
       time
     end
+  end
+
+  def self.parse_timezone(timezone_str)
+    return nil unless timezone_str.present?
+    # tzinfo requires non-whitespaced strings, so try that if the normal lookup fails
+    ActiveSupport::TimeZone[timezone_str] || ActiveSupport::TimeZone[timezone_str.strip.gsub("\s", "_")]
   end
 
   # Accepts a time object, rounds to minutes

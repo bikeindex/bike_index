@@ -1,7 +1,7 @@
 module Organized
   class ExportsController < Organized::BaseController
     before_action :ensure_access_to_exports!
-    before_action :find_export, only: [:show, :destroy]
+    before_action :find_export, only: %i[show destroy]
 
     def index
       @page = params[:page] || 1
@@ -12,16 +12,31 @@ module Organized
     def show; end
 
     def new
-      @export = Export.new(organization_id: current_organization.id)
+      @export ||= Export.new
     end
 
     def create
+      @export = Export.new(permitted_parameters)
+      if @export.update_attributes(kind: "organization", organization_id: current_organization.id, user_id: current_user.id)
+        flash[:success] = "Export Created. Please wait for it to finish processing to be able to download it"
+        OrganizationExportWorker.perform_async(@export.id)
+        redirect_to organization_exports_path(organization_id: current_organization.to_param)
+      else
+        render :new
+      end
     end
 
     def destroy
+      @export.destroy
+      flash[:success] = "export was successfully deleted!"
+      redirect_to organization_exports_path(organization_id: current_organization.to_param)
     end
 
     private
+
+    def permitted_parameters
+      params.require(:export).permit(:timezone, :start_at, :end_at, headers: [])
+    end
 
     def find_export
       @export = exports.find(params[:id])

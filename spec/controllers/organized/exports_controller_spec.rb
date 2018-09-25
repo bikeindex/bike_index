@@ -86,5 +86,39 @@ describe Organized::ExportsController, type: :controller do
         expect(flash).to_not be_present
       end
     end
+
+    describe "destroy" do
+      it "renders" do
+        expect(export).to be_present
+        expect do
+          delete :destroy, id: export.id, organization_id: organization.to_param
+        end.to change(Export, :count).by(-1)
+        expect(response).to redirect_to exports_root_path
+        expect(flash[:success]).to be_present
+      end
+    end
+
+    describe "create" do
+      let(:start_at) { 1454925600 }
+      let(:valid_attrs) do
+        {
+          start_at: "2016-02-08 05:00:00",
+          end_at: nil,
+          timezone: "America/New York",
+          headers: %w[link registered_at manufacturer model registered_by]
+        }
+      end
+      it "creates the expected export" do
+        expect do
+          post :create, export: valid_attrs, organization_id: organization.to_param
+        end.to change(Export, :count).by 1
+        export = Export.last
+        expect(export.kind).to eq "organization"
+        expect(export.user).to eq user
+        expect(export.headers).to eq valid_attrs[:headers]
+        expect(export.start_at.to_i).to be_within(1).of start_at
+        expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
+      end
+    end
   end
 end
