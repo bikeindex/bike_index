@@ -2,7 +2,7 @@ class OrganizationExportWorker
   include Sidekiq::Worker
   sidekiq_options queue: "afterwards" # Because it's low priority!
   sidekiq_options backtrace: true
-  LINK_BASE = "#{ENV["BASE_URL"]}/bikes/".freeze
+  LINK_BASE = "#{ENV['BASE_URL']}/bikes/".freeze
 
   attr_accessor :export # Only necessary for testing
 
@@ -29,7 +29,9 @@ class OrganizationExportWorker
   end
 
   def comma_wrapped_string(array)
-    array.map { |val| "\"#{val.to_s.gsub(/\\*\"/, '\"')}\"" }.join(",") + "\n"
+    array.map do |val|
+      '"' + val.to_s.tr("\\", "").gsub(/(\\)?\"/, '\"') + '"'
+    end.join(",") + "\n"
   end
 
   def bike_to_row(bike)
