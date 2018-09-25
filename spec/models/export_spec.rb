@@ -72,7 +72,7 @@ RSpec.describe Export, type: :model do
       it "has the scopes we expect" do
         expect(export.bikes_scoped.to_sql).to eq organization.bikes.to_sql
         export.options = export.options.merge("start_at" => start_time)
-        expect(export.bikes_scoped.to_sql).to eq organization.bikes.where("created_at > ?", export.start_at).to_sql
+        expect(export.bikes_scoped.to_sql).to eq organization.bikes.where("bikes.created_at > ?", export.start_at).to_sql
         export.options = export.options.merge("end_at" => end_time)
         expect(export.bikes_scoped.to_sql).to eq organization.bikes.where(created_at: export.start_at..export.end_at).to_sql
       end

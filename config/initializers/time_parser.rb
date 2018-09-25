@@ -9,7 +9,7 @@ class TimeParser
       Time.at(time_str.to_i)
     else
       Time.zone = parse_timezone(timezone_str)
-      time = Time.zone.parse(time_str)
+      time = Time.zone.parse(time_str.to_s)
       Time.zone = DEFAULT_TIMEZONE
       time
     end

@@ -6,6 +6,9 @@
 
 %ul.organized-show-list
   %li
+    %strong
+    = link_to "Download Export", @export.file.url
+  %li
     Created:
     %span.convertTime
       = l @export.created_at, format: :convert_time

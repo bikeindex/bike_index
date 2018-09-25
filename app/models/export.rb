@@ -68,7 +68,7 @@ class Export < ActiveRecord::Base
   end
 
   def tmp_file
-    @tmp_file ||= Tempfile.new(["exports/#{kind}_#{id}", ".#{file_format}"])
+    @tmp_file ||= Tempfile.new(["#{kind == 'organization' ? organization.slug : kind}_#{id}", ".#{file_format}"])
   end
 
   def tmp_file_rows
@@ -96,9 +96,12 @@ class Export < ActiveRecord::Base
     raise "#{kind} scoping not set up" unless kind == "organization"
     bikes = organization.bikes
     if option?("start_at")
-      bikes = option?("end_at") ? bikes.where(created_at: start_at..end_at) : bikes.where("created_at > ?", start_at)
+      option?("end_at") ? bikes.where(created_at: start_at..end_at) : bikes.where("bikes.created_at > ?", start_at)
+    elsif option?("end_at") # If only end_at is present
+      bikes.where("bikes.created_at < ?", end_at)
+    else
+      bikes
     end
-    bikes
   end
 
   def set_calculated_attributes

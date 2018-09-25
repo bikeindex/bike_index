@@ -162,6 +162,11 @@ class Bike < ActiveRecord::Base
     first_ownership.owner_email
   end
 
+  # This is for organizations - might be useful for admin as well
+  def owner_name
+    current_ownership.user&.name # User - not ownership, because we don't want registrar
+  end
+
   def current_owner_exists
     current_ownership && current_ownership.claimed
   end

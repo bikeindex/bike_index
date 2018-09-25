@@ -82,8 +82,11 @@
             = organized_bike_text(bike)
             %br
           = bike.owner_email
+          - if bike.owner_name.present?
+            %em
+              = bike.owner_name
           - if bike.creation_description
-            %small.less-string
+            %small.less-strong
               = bike.creation_description
         - if @bike_code.present?
           %td

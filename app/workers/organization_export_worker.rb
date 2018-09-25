@@ -29,7 +29,7 @@ class OrganizationExportWorker
   end
 
   def comma_wrapped_string(array)
-    ('"' + array.join('","') + "\"\n")
+    '"' + array.map { |val| val.is_a?(String) ? val.gsub(/\\*\"/, '\"') : val }.join('","') + "\"\n"
   end
 
   def bike_to_row(bike)
@@ -43,6 +43,9 @@ class OrganizationExportWorker
   def value_for_header(header, bike)
     case header
     when "link" then LINK_BASE + bike.id.to_s
+    when "owner_email" then bike.owner_email
+    when "owner_name" then bike.owner_name
+    when "registration_method" then bike.creation_description
     when "thumbnail" then bike.thumb_path
     when "registered_at" then bike.created_at.utc
     when "manufacturer" then bike.mnfg_name
@@ -50,7 +53,7 @@ class OrganizationExportWorker
     when "year" then bike.year
     when "color" then bike.frame_colors.join(', ')
     when "serial" then bike.serial_number
-    when "is_stolen" then bike.stolen
+    when "is_stolen" then bike.stolen ? "true" : nil
     end
   end
 end

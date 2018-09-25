@@ -12,7 +12,7 @@ class ImportExportUploader < CarrierWave::Uploader::Base
   def store_dir
     "#{base_store_dir}import_exports"
   end
-  
+
   def base_store_dir
     "uploads/"
   end
