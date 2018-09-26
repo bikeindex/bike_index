@@ -9,6 +9,7 @@ class OrganizationExportWorker
   def perform(export_id)
     @export = Export.find(export_id)
     return true if @export.finished?
+    @export.update_attribute :progress, "ongoing"
     write_csv(@export.tmp_file)
     @export.tmp_file.close # Because buffered output, closing instead of rewinding
     @export.update_attribute :rows, @export.tmp_file_rows

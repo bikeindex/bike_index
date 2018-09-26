@@ -36,7 +36,7 @@ class Invoice < ActiveRecord::Base
   def paid_in_full?; amount_paid_cents.present? && amount_due_cents.present? && amount_paid_cents >= amount_due_cents end
   def subscription_first_invoice_id; first_invoice_id || id end
   def subscription_first_invoice; first_invoice || self end
-  def subscription_invoices; self.class.where(first_invoice_id: subscription_first_invoice_id) end
+  def subscription_invoices; self.class.where(first_invoice_id: subscription_first_invoice_id).where.not(id: id) end
   def display_name; "Invoice ##{id}" end
 
   def paid_feature_ids; invoice_paid_features.pluck(:paid_feature_id) end
@@ -88,11 +88,11 @@ class Invoice < ActiveRecord::Base
 
   def previous_invoice
     return nil unless renewal_invoice?
-    subscription_invoices.where("id < ?", id).order(:id).last || subscription_first_invoice
+    subscription_invoices.where("id < ?", id).reorder(:id).last || subscription_first_invoice
   end
 
   def following_invoice
-    subscription_invoices.where("id > ?", id).order(:id).first
+    subscription_invoices.where("id > ?", id).reorder(:id).first
   end
 
   def feature_cost_cents

@@ -4,7 +4,7 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
   before_action :find_paid_features, only: %i[new edit]
 
   def index
-    @invoices = @organization.invoices.order(id: :desc)
+    @invoices = @organization.invoices.reorder(id: :desc)
   end
 
   def new

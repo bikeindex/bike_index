@@ -13,7 +13,7 @@ class Admin::PaymentsController < Admin::BaseController
     page = params[:page] || 1
     per_page = params[:per_page] || 50
     @invoices = Invoice.includes(:organization, :payments)
-                       .order(sort_column + " " + sort_direction).page(page).per(per_page)
+                       .reorder(sort_column + " " + sort_direction).page(page).per(per_page)
   end
 
   def new
@@ -55,7 +55,7 @@ class Admin::PaymentsController < Admin::BaseController
   protected
 
   def sortable_columns # sortable columns for both payments and invoices ;)
-    %w[created_at user_id organization_id kind invoice_id amount_cents
+    %w[id created_at user_id organization_id kind invoice_id amount_cents
        subscription_start_at subscription_end_at amount_due_cents amount_paid_cents id]
   end
 
