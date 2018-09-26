@@ -60,8 +60,11 @@
           %td
             = link_to invoice.display_name, edit_admin_organization_invoice_path(organization_id: invoice.organization.to_param, id: invoice.to_param)
             - if invoice.active?
-              %small.text-success
+              %small.text-success{ style: "display: block;" }
                 Active
+            - if invoice.previous_invoice.present?
+              %small.less-strong{ style: "display: block; margin-top: 1rem;" }
+                Follows ##{invoice.previous_invoice.id}
           - if display_organization
             %td
               = link_to invoice.organization.short_name, admin_organization_path(invoice.organization)
