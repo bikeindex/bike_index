@@ -5,7 +5,7 @@
   .table-sub-list {
     list-style-type: disc;
     margin: 0 0 10px;
-    padding: 10px 0 5px;
+    padding: 0 0 5px;
     -webkit-margin-before: 0px;
     -webkit-margin-after: 0px;
     -webkit-margin-start: 0px;
@@ -82,7 +82,7 @@
             %span{ class: invoice.paid_in_full? ? "text-success" : "" }
               = invoice.amount_paid_formatted
             - if invoice.payments.any?
-              %ul.table-sub-list
+              %ul.table-sub-list{ style: "padding-top: 10px;" }
                 - invoice.payments.each do |payment|
                   %li{ style: "font-size: 80%;" }
                     #{link_to "#{payment.amount_formatted} #{payment.kind}", admin_payment_path(payment)},
@@ -92,7 +92,7 @@
             %span{ class: invoice.discount_cents > 0 ? "text-danger" : "" }
               = invoice.discount_formatted
           %td
-            %ul.table-sub-list
+            %ul.table-sub-list{ style: "font-size: 80%;" }
               - invoice.paid_features.each do |paid_feature|
                 %li
                   = link_to paid_feature.name, edit_admin_paid_feature_path(paid_feature)
