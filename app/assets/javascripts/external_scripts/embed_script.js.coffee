@@ -164,12 +164,13 @@ $(document).ready ->
   $(".hiddenFieldTimezone").val(window.timezone)
   
   # prevent double posting
-  $('#new_bike').submit(function()) -> 
+  $('#new_bike').submit -> 
     $this = $(this)
-    if ($this.data().isSubmitted) ->
-        return false
+    if $this.data().isSubmitted
+      return false
+
     # mark the form as processed, so we will not process it again
     $this.data().isSubmitted = true
-    return true
+    true
 
   new window.CheckEmail('#bike_owner_email')
