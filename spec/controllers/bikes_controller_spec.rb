@@ -341,7 +341,7 @@ describe BikesController do
             expect(bike.is_a?(Bike)).to be_truthy
             expect(assigns(:b_param)).to_not eq b_param
             expect(response).to render_with_layout('application_revised')
-            expect(flash[:error]).to match(/sorry/i)
+            expect(flash[:info]).to match(/couldn.t find/i)
           end
         end
       end
