@@ -101,6 +101,7 @@ class BParam < ActiveRecord::Base
     params['bike']['tertiary_frame_color_id'] = val
   end
 
+  def with_bike?; created_bike_id.present? end
   def bike; (params && params['bike'] || {}).with_indifferent_access end
   def primary_frame_color_id; bike['primary_frame_color_id'] end
   def secondary_frame_color_id; bike['secondary_frame_color_id'] end
