@@ -61,10 +61,9 @@ class Admin::UsersController < Admin::BaseController
   def find_user
     user_id = params[:id]
     if user_id.is_a?(Integer) || user_id.match(/\A\d*\z/).present?
-      @user = where(id: user_id).first
-    else
-      @user = User.find_by_username(user_id)
+      @user = User.where(id: user_id).first
     end
+    @user ||= User.find_by_username(user_id)
     raise ActionController::RoutingError.new('Not Found') unless @user.present?
   end
 end

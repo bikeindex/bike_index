@@ -91,7 +91,7 @@ class BikesController < ApplicationController
     find_or_new_b_param
     redirect_to bike_path(@b_param.created_bike_id) and return if @b_param.created_bike.present?
     # Let them know if they sent an invalid b_param token - use flash#info rather than error because we're aggressive about removing b_params
-    flash[:info] = "Oops! We couldn't find that registration, please reenter the information here" if @b_param.id.blank? && params[:b_param_token].present?
+    flash[:info] = "Oops! We couldn't find that registration, please re-enter the information here" if @b_param.id.blank? && params[:b_param_token].present?
     @bike ||= @b_param.bike_from_attrs(is_stolen: params[:stolen], recovered: params[:recovered])
     @organization = @bike.creation_organization
     if @bike.stolen

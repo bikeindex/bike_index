@@ -19,11 +19,11 @@ describe Admin::UsersController do
 
   describe 'update' do
     context 'non developer' do
-      it 'updates all the things that can be edited' do
+      it "updates all the things that can be edited (finding via user id)" do
         admin = FactoryGirl.create(:admin)
         user = FactoryGirl.create(:user, confirmed: false)
         set_current_user(admin)
-        post :update, id: user.username, user: {
+        post :update, id: user.id, user: {
           name: 'New Name',
           email: 'newemailexample.com',
           confirmed: true,

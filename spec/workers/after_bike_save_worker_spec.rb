@@ -61,7 +61,7 @@ describe AfterBikeSaveWorker do
     end
     context "with a more accurate match" do
       let(:manufacturer) { bike.manufacturer }
-      let!(:partial_registration_accurate) { FactoryGirl.create(:b_param_partial_registration, owner_email: "stuff@things.COM", manufacturer: manufacturer) }
+      let!(:partial_registration_accurate) { FactoryGirl.create(:b_param_partial_registration, owner_email: "STUFF@things.com", manufacturer: manufacturer) }
       it "only removes the more accurate match" do
         expect(partial_registration.partial_registration?).to be_truthy
         expect(partial_registration.with_bike?).to be_falsey
