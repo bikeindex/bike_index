@@ -47,4 +47,33 @@ describe AfterBikeSaveWorker do
       expect(serialized[:update]).to be_truthy
     end
   end
+
+  describe "remove_partial_registrations" do
+    let!(:partial_registration) { FactoryGirl.create(:b_param_partial_registration, owner_email: "stuff@things.COM") }
+    let(:bike) { FactoryGirl.create(:bike, owner_email: "stuff@things.com") }
+    it "removes the partial registration" do
+      expect(partial_registration.partial_registration?).to be_truthy
+      expect(partial_registration.with_bike?).to be_falsey
+      instance.perform(bike.id)
+      partial_registration.reload
+      expect(partial_registration.with_bike?).to be_truthy
+      expect(partial_registration.created_bike).to eq bike
+    end
+    context "with a more accurate match" do
+      let(:manufacturer) { bike.manufacturer }
+      let!(:partial_registration_accurate) { FactoryGirl.create(:b_param_partial_registration, owner_email: "stuff@things.COM", manufacturer: manufacturer) }
+      it "only removes the more accurate match" do
+        expect(partial_registration.partial_registration?).to be_truthy
+        expect(partial_registration.with_bike?).to be_falsey
+        expect(partial_registration_accurate.partial_registration?).to be_truthy
+        expect(partial_registration_accurate.with_bike?).to be_falsey
+        instance.perform(bike.id)
+        partial_registration.reload
+        partial_registration_accurate.reload
+        expect(partial_registration.with_bike?).to be_falsey
+        expect(partial_registration_accurate.with_bike?).to be_truthy
+        expect(partial_registration_accurate.created_bike).to eq bike
+      end
+    end
+  end
 end

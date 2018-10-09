@@ -15,6 +15,22 @@ FactoryGirl.define do
       transient do
         organization { FactoryGirl.create(:organization) }
       end
+      factory :b_param_partial_registration do
+        transient do
+          manufacturer { FactoryGirl.create(:manufacturer) }
+        end
+        origin "embed_partial"
+        params do
+          {
+            bike: {
+              revised_new: true,
+              manufacturer_id: manufacturer.id,
+              owner_email: owner_email,
+              creation_organization_id: organization.id
+            }
+          }
+        end
+      end
       factory :b_param_with_creation_organization do
         params do
           {
