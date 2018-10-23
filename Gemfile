@@ -83,6 +83,7 @@ gem 'chartkick' # Display charts
 gem 'groupdate' # Required for charts
 gem 'bootstrap', '~> 4.0.0.alpha3' # Bootstrap 4 - used for revised stylesheets
 gem 'jquery-datatables-rails', '~>3.4.0'
+gem 'webpacker', '~> 3.5' #Webpacker - used to transpile and compact javascript assets
 
 # Show performance metrics
 gem 'stackprof', require: false
