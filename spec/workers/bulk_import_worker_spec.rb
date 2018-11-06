@@ -72,6 +72,7 @@ describe BulkImportWorker do
         expect(bike1.creator).to eq organization.auto_user
         expect(bike1.creation_organization).to eq organization
         expect(bike1.year).to eq 2019
+        expect(bike1.description).to eq "I love this, it's my favorite"
         expect(bike1.public_images.count).to eq 0
         bike2 = bulk_import.bikes.reorder(:created_at).last
         expect(bike2.primary_frame_color).to eq white
@@ -220,5 +221,9 @@ describe BulkImportWorker do
         end
       end
     end
+  end
+
+  describe "convert_header" do
+    it "returns the symbol if the symbol exists"
   end
 end

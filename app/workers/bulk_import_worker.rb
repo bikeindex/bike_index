@@ -21,7 +21,7 @@ class BulkImportWorker
     @line_errors = @bulk_import.line_import_errors || []
     # This isn't stream processing. If memory becomes an issue,
     # figure out how to open a carrierwave file (rather than read) and switch CSV.parse -> CSV.new
-    CSV.parse(file, headers: true, header_converters: %i[downcase symbol]).each_with_index do |row, index|
+    CSV.parse(file, headers: true, header_convert: { |b| convert_header(b) }).each_with_index do |row, index|
       validate_headers(row.headers) unless @valid_headers # Check headers first, so we can break if they fail
       break false if @bulk_import.finished?
       bike = register_bike(row_to_b_param_hash(row.to_h))
@@ -75,6 +75,11 @@ class BulkImportWorker
     @creator_id ||= @bulk_import.creator.id
   end
 
+  def convert_header(header)
+    new_header = header.downcase.to_sym
+
+  end
+
   private
 
   def validate_headers(attrs)
@@ -84,16 +89,13 @@ class BulkImportWorker
     @bulk_import.add_file_error("Invalid CSV Headers: #{attrs}")
   end
 
-  def permitted_csv_attrs
-    # Mayber there is a way to rename the headers, simple solution for now
+  def header_name_map
     {
-      manufacturer: :manufacturer_id,
-      model: :frame_model,
-      year: :frame_year,
-      color: :color,
-      email: :email,
-      serial: :serial_number,
-      photo_url: :photo
+      manufacturer: %i[manufacturer_id],
+      model: %i[frame_model],
+      year: %i[frame_year],
+      serial: %i[serial_number],
+      photo_url: %i[photo]
     }
   end
 end
