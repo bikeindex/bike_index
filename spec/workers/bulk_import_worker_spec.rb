@@ -46,6 +46,28 @@ describe BulkImportWorker do
         expect(bike.primary_frame_color).to eq color
       end
     end
+    context "remapped headers" do
+      let(:csv_lines) do
+        [
+          # It honors the order of the header name map - if both brand and vendor are headers, only brand is renamed to manufacturer
+          %w[brand vendor frame_model frame_year size color customer_email serial_number],
+        ]
+      end
+      xit "registers the bikes" do
+        allow_any_instance_of(BulkImport).to receive(:open_file) { csv_string }
+        expect do
+          instance.perform(bulk_import.id)
+        end.to change(Bike, :count).by 1
+        bulk_import.reload
+        expect(bulk_import.line_import_errors).to eq([target_line_error])
+        expect(bulk_import.import_errors).to eq({ line: [target_line_error] }.as_json)
+        expect(bulk_import.bikes.count).to eq 1
+        bike = bulk_import.bikes.first
+        expect(bike.manufacturer).to eq Manufacturer.other
+        expect(bike.manufacturer_other).to eq "Surly"
+        expect(bike.primary_frame_color).to eq color
+      end
+    end
     context "valid file" do
       let!(:green) { FactoryGirl.create(:color, name: "Green") }
       let!(:white) { FactoryGirl.create(:color, name: "White") }
@@ -73,6 +95,8 @@ describe BulkImportWorker do
         expect(bike1.creation_organization).to eq organization
         expect(bike1.year).to eq 2019
         expect(bike1.description).to eq "I love this, it's my favorite"
+        expect(bike1.frame_size).to eq "29in"
+        expect(bike1.frame_size_unit).to eq "in"
         expect(bike1.public_images.count).to eq 0
         bike2 = bulk_import.bikes.reorder(:created_at).last
         expect(bike2.primary_frame_color).to eq white
@@ -84,6 +108,8 @@ describe BulkImportWorker do
         expect(bike2.creation_organization).to eq organization
         expect(bike2.year).to_not be_present
         expect(bike2.public_images.count).to eq 1
+        expect(bike2.frame_size).to eq "m"
+        expect(bike2.frame_size_unit).to eq "ordinal"
       end
     end
   end
@@ -147,8 +173,10 @@ describe BulkImportWorker do
           serial_number: row[:serial],
           year: row[:year],
           frame_model: "Roscoe 8",
+          description: nil,
+          frame_size: nil,
           send_email: true,
-          creation_organization_id: nil
+          creation_organization_id: nil,
         }
       end
       describe "row_to_b_param_hash" do

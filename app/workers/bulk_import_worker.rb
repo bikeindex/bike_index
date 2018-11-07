@@ -21,7 +21,8 @@ class BulkImportWorker
     @line_errors = @bulk_import.line_import_errors || []
     # This isn't stream processing. If memory becomes an issue,
     # figure out how to open a carrierwave file (rather than read) and switch CSV.parse -> CSV.new
-    CSV.parse(file, headers: true, header_convert: { |b| convert_header(b) }).each_with_index do |row, index|
+    # CSV.parse(file, headers: true, header_converters: %i[downcase symbol]).each_with_index do |row, index|
+    CSV.parse(file, headers: true, header_converters: lambda { |b| convert_header(b) }).each_with_index do |row, index|
       validate_headers(row.headers) unless @valid_headers # Check headers first, so we can break if they fail
       break false if @bulk_import.finished?
       bike = register_bike(row_to_b_param_hash(row.to_h))
@@ -52,6 +53,8 @@ class BulkImportWorker
         serial_number: rescue_blank_serial(row[:serial]),
         year: row[:year],
         frame_model: row[:model],
+        description: row[:description],
+        frame_size: row[:frame_size],
         send_email: @bulk_import.send_email,
         creation_organization_id: @bulk_import.organization_id
       },
@@ -95,7 +98,8 @@ class BulkImportWorker
       model: %i[frame_model],
       year: %i[frame_year],
       serial: %i[serial_number],
-      photo_url: %i[photo]
+      photo_url: %i[photo],
+      email: %i[customer_email]
     }
   end
 end
