@@ -75,7 +75,7 @@ class Export < ActiveRecord::Base
     `wc -l "#{tmp_file.path}"`.strip.split(' ')[0].to_i - 1 # Because we don't count header
   end
 
-  def open_file
+  def read_file
     file.read # Created file.
   end
 

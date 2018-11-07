@@ -47,8 +47,13 @@ class BulkImport < ActiveRecord::Base
     add_file_error("Needs to have a user or an organization with an auto user")
   end
 
+  # Because the way we load the file is different if it's remote or local
+  def local_file?
+    file&._storage&.to_s == "CarrierWave::Storage::File"
+  end
+
   def open_file
-    file.read # This isn't stream processing, it would be nice if it was
+    @open_file ||= local_file? ? IO.open(file.path) : open(file.url, "r")
   rescue OpenURI::HTTPError => e # This probably isn't the error that will happen, replace it with the one that is
     add_file_error(e.message)
   end

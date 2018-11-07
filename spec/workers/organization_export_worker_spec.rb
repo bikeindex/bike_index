@@ -37,7 +37,7 @@ describe OrganizationExportWorker do
         instance.perform(export.id)
         export.reload
         expect(export.progress).to eq "finished"
-        expect(export.open_file).to eq(csv_string)
+        expect(export.read_file).to eq(csv_string)
         expect(export.rows).to eq 1
       end
     end
@@ -49,7 +49,7 @@ describe OrganizationExportWorker do
         instance.perform(export.id)
         export.reload
         expect(export.progress).to eq "finished"
-        expect(export.open_file).to eq(csv_string)
+        expect(export.read_file).to eq(csv_string)
         expect(export.rows).to eq 0
       end
     end

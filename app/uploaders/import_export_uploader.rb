@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 class ImportExportUploader < CarrierWave::Uploader::Base
-   if Rails.env.test?
+  if Rails.env.test?
     storage :file
   elsif Rails.env.development?
     storage :file

@@ -21,8 +21,12 @@ class BulkImportWorker
     @line_errors = @bulk_import.line_import_errors || []
     # This isn't stream processing. If memory becomes an issue,
     # figure out how to open a carrierwave file (rather than read) and switch CSV.parse -> CSV.new
-    # CSV.parse(file, headers: true, header_converters: %i[downcase symbol]).each_with_index do |row, index|
-    CSV.parse(file, headers: true, header_converters: lambda { |b| convert_header(b) }).each_with_index do |row, index|
+    pp "fasdf"
+    pp file.readline
+    headers = file.gets
+    pp headers
+    # CSV.for_each(file.name, headers: true, header_converters: lambda { |b| b }.map convert_header(b) }).each_with_index do |row, index|
+    CSV.foreach(file, headers: headers).each_with_index do |row, index|
       validate_headers(row.headers) unless @valid_headers # Check headers first, so we can break if they fail
       break false if @bulk_import.finished?
       bike = register_bike(row_to_b_param_hash(row.to_h))
