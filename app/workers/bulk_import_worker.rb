@@ -9,7 +9,8 @@ class BulkImportWorker
 
   def perform(bulk_import_id)
     @bulk_import = BulkImport.find(bulk_import_id)
-    return false unless process_csv(@bulk_import.open_file)
+    process_csv(@bulk_import.open_file)
+    return false if @bulk_import.import_errors?
     @bulk_import.progress = "finished"
     return @bulk_import.save unless @line_errors.any?
     # Using update_attribute here to avoid validation checks that sometimes block updating postgres json in rails
@@ -17,21 +18,20 @@ class BulkImportWorker
   end
 
   def process_csv(file)
+    @line_errors = @bulk_import.line_import_errors || [] # We always need line_import_errors
     return false if @bulk_import.finished? # If url fails to load, this will catch
-    @line_errors = @bulk_import.line_import_errors || []
-    # This isn't stream processing. If memory becomes an issue,
-    # figure out how to open a carrierwave file (rather than read) and switch CSV.parse -> CSV.new
-    pp "fasdf"
-    pp file.readline
-    headers = file.gets
-    pp headers
-    # CSV.for_each(file.name, headers: true, header_converters: lambda { |b| b }.map convert_header(b) }).each_with_index do |row, index|
-    CSV.foreach(file, headers: headers).each_with_index do |row, index|
-      validate_headers(row.headers) unless @valid_headers # Check headers first, so we can break if they fail
+    # Grab the first line of the csv (which is the header line) and transform it
+    headers = convert_headers(file.readline)
+    # Stream process the rest of the csv
+    row_index = 1
+    CSV.foreach(file, headers: headers) do |row|
       break false if @bulk_import.finished?
+      row_index += 1
+      next if row_index == 2 # Because we manually set the header
       bike = register_bike(row_to_b_param_hash(row.to_h))
       next if bike.id.present?
-      @line_errors << [index + 1, bike.cleaned_error_messages]
+      # row_index is current line + 1, we want to offset count by 1 (people don't use line 0)
+      @line_errors << [row_index, bike.cleaned_error_messages]
     end
   end
 
@@ -82,27 +82,36 @@ class BulkImportWorker
     @creator_id ||= @bulk_import.creator.id
   end
 
-  def convert_header(header)
-    new_header = header.downcase.to_sym
-
+  def convert_headers(str)
+    headers = str.split(",").map { |h| h.strip.gsub(/\s/, "_").downcase.to_sym }
+    header_name_map.each do |value, replacements|
+      next if headers.include?(value)
+      replacements.each do |v|
+        next unless headers.index(v).present?
+        headers[headers.index(v)] = value
+        break # Because we have found the header we're replacing, stop iterating
+      end
+    end
+    validate_headers(headers)
+    headers
   end
 
   private
 
   def validate_headers(attrs)
-    @valid_headers = (attrs & %i[manufacturer email serial]).count == 3
+    valid_headers = (attrs & %i[manufacturer email serial]).count == 3
     # Update the progress in here, since we're successfully processing the file right now
-    return @bulk_import.update_attribute :progress, "ongoing" if @valid_headers
+    return @bulk_import.update_attribute :progress, "ongoing" if valid_headers
     @bulk_import.add_file_error("Invalid CSV Headers: #{attrs}")
   end
 
   def header_name_map
     {
-      manufacturer: %i[manufacturer_id],
+      manufacturer: %i[manufacturer_id brand vendor],
       model: %i[frame_model],
       year: %i[frame_year],
       serial: %i[serial_number],
-      photo_url: %i[photo],
+      photo: %i[photo_url],
       email: %i[customer_email]
     }
   end

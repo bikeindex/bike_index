@@ -52,8 +52,12 @@ class BulkImport < ActiveRecord::Base
     file&._storage&.to_s == "CarrierWave::Storage::File"
   end
 
+  # To enable stream processing, so that we aren't loading the whole file into memory all at once
+  # also so we can separately deal with the header line
   def open_file
-    @open_file ||= local_file? ? IO.open(file.path) : open(file.url, "r")
+    @open_file ||= local_file? ? File.open(file.path, "r") : open(file.url)
+  rescue => e
+    pp e
   rescue OpenURI::HTTPError => e # This probably isn't the error that will happen, replace it with the one that is
     add_file_error(e.message)
   end
