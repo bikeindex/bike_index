@@ -89,7 +89,7 @@ class BulkImportWorker
       replacements.each do |v|
         next unless headers.index(v).present?
         headers[headers.index(v)] = value
-        break # Because we have found the header we're replacing, stop iterating
+        break # Because we've found the header we're replacing, stop iterating
       end
     end
     validate_headers(headers)
@@ -100,7 +100,7 @@ class BulkImportWorker
 
   def validate_headers(attrs)
     valid_headers = (attrs & %i[manufacturer owner_email serial_number]).count == 3
-    # Update the progress in here, since we're successfully processing the file right now
+    # Update progress here, since we're successfully processing the file now - and we update here if invalid headers
     return @bulk_import.update_attribute :progress, "ongoing" if valid_headers
     @bulk_import.add_file_error("Invalid CSV Headers: #{attrs}")
   end
