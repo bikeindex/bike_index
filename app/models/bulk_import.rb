@@ -1,6 +1,6 @@
 class BulkImport < ActiveRecord::Base
   VALID_PROGRESSES = %i[pending ongoing finished].freeze
-  mount_uploader :file, ImportExportUploader
+  mount_uploader :file, BulkImportUploader
 
   belongs_to :organization
   belongs_to :user
@@ -48,6 +48,7 @@ class BulkImport < ActiveRecord::Base
   end
 
   # Because the way we load the file is different if it's remote or local
+  # This is hacky, but whatever
   def local_file?
     file&._storage&.to_s == "CarrierWave::Storage::File"
   end

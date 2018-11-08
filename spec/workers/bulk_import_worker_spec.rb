@@ -9,13 +9,19 @@ describe BulkImportWorker do
 
   let(:sample_csv_lines) do
     [
-      %w[manufacturer model year color email serial],
+      %w[manufacturer model year color owner_email serial_number],
       ["Trek", "Roscoe 8", "2019", "Green", "test@bikeindex.org", "xyz_test"],
       ["Surly", "Midnight Special", "2018", "White", "test2@bikeindex.org", "example"]
     ]
   end
   let(:csv_lines) { sample_csv_lines }
   let(:csv_string) { csv_lines.map { |r| r.join(",") }.join("\n") }
+  let(:tempfile) do
+    file = Tempfile.new
+    file.write(csv_lines.join("\n"))
+    file.rewind
+    file
+  end
 
   describe "perform" do
     context "bulk import already processed" do
@@ -26,35 +32,19 @@ describe BulkImportWorker do
         instance.perform(bulk_import.id)
       end
     end
-    # context "valid bike and an invalid bike" do
-    #   let!(:color) { FactoryGirl.create(:color, name: "White") }
-    #   let(:error_line) { ["Trek", "Roscoe 8", "2019", "White", nil, "xyz_test"] }
-    #   let(:target_line_error) { [1, ["Owner email can't be blank"]] }
-    #   let(:csv_lines) { [sample_csv_lines[0], error_line, sample_csv_lines[2]] }
-    #   it "registers bike, adds row that is an error" do
-    #     allow_any_instance_of(BulkImport).to receive(:open_file) { csv_string }
-    #     expect do
-    #       instance.perform(bulk_import.id)
-    #     end.to change(Bike, :count).by 1
-    #     bulk_import.reload
-    #     expect(bulk_import.line_import_errors).to eq([target_line_error])
-    #     expect(bulk_import.import_errors).to eq({ line: [target_line_error] }.as_json)
-    #     expect(bulk_import.bikes.count).to eq 1
-    #     bike = bulk_import.bikes.first
-    #     expect(bike.manufacturer).to eq Manufacturer.other
-    #     expect(bike.manufacturer_other).to eq "Surly"
-    #     expect(bike.primary_frame_color).to eq color
-    #   end
-    # end
-    context "remapped headers" do
+    context "valid bike and an invalid bike with substituted header" do
+      let!(:color) { FactoryGirl.create(:color, name: "White") }
+      let(:target_line_error) { [2, ["Owner email can't be blank"]] }
       let(:csv_lines) do
         [
-          # It honors the order of the header name map - if both brand and vendor are headers, only brand is renamed to manufacturer
-          %w[brand vendor frame_model frame_year size color customer_email serial_number],
+          "Product Description,Vendor,Brand,Color,Size,Serial Number,Customer Last Name,Customer First Name,Customer Email",
+          '"Blah","Blah","Surly","","","XXXXX","","",""',
+          '"Midnight Special","","Surly","White","19","ZZZZ","","","test2@bikeindex.org"'
         ]
       end
-      xit "registers the bikes" do
-        allow_any_instance_of(BulkImport).to receive(:open_file) { csv_string }
+      after { tempfile.close && tempfile.unlink }
+      it "registers bike, adds row that is an error" do
+        allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") }
         expect do
           instance.perform(bulk_import.id)
         end.to change(Bike, :count).by 1
@@ -66,6 +56,10 @@ describe BulkImportWorker do
         expect(bike.manufacturer).to eq Manufacturer.other
         expect(bike.manufacturer_other).to eq "Surly"
         expect(bike.primary_frame_color).to eq color
+        expect(bike.frame_size).to eq "19in"
+        expect(bike.serial_number).to eq "ZZZZ"
+        expect(bike.owner_email).to eq "test2@bikeindex.org"
+        expect(bike.description).to eq "Midnight Special"
       end
     end
     context "valid file" do
@@ -116,61 +110,62 @@ describe BulkImportWorker do
 
   context "with assigned bulk import" do
     before { instance.bulk_import = bulk_import }
-    # describe "process_csv" do
-    #   context "without a header" do
-    #     let(:csv_lines) { sample_csv_lines.slice(1, 2) }
-    #     it "adds a file error" do
-    #       expect(instance).to_not receive(:register_bike)
-    #       instance.process_csv(csv_string)
-    #       bulk_import.reload
-    #       expect(bulk_import.file_import_errors.to_s).to match(/invalid csv headers/i)
-    #       expect(bulk_import.progress).to eq "finished"
-    #     end
-    #   end
-    #   context "with an invalid header" do
-    #     let(:csv_lines) { [%w[manufacturer email name color]] + sample_csv_lines.slice(1, 2) }
-    #     it "adds a file error" do
-    #       expect(instance).to_not receive(:register_bike)
-    #       instance.process_csv(csv_string)
-    #       bulk_import.reload
-    #       expect(bulk_import.file_import_errors.to_s).to match(/invalid csv headers/i)
-    #       expect(bulk_import.progress).to eq "finished"
-    #     end
-    #   end
-    #   context "with failed row" do
-    #     let(:error_line) { ["Surly", "Midnight Special", "2018", nil, " ", "example"] }
-    #     let(:csv_lines) { [sample_csv_lines[0], error_line] }
-    #     let(:target_line_error) { [1, ["Owner email can't be blank"]] }
-    #     it "registers a bike and adds a row error" do
-    #       instance.process_csv(csv_string)
-    #       expect(instance.line_errors.count).to eq 1
-    #       expect(instance.line_errors.first).to eq target_line_error
-    #       expect(bulk_import.progress).to eq "ongoing"
-    #     end
-    #   end
-    #   context "with two valid bikes" do
-    #     let(:bparam_line1) { instance.row_to_b_param_hash(sample_csv_lines[0].map(&:to_sym).zip(csv_lines[1]).to_h) }
-    #     let(:bparam_line2) { instance.row_to_b_param_hash(sample_csv_lines[0].map(&:to_sym).zip(csv_lines[2]).to_h) }
-    #     it "calls register bike with the valid bikes" do
-    #       expect(instance).to receive(:register_bike).with(bparam_line1) { Bike.new(id: 1) }
-    #       expect(instance).to receive(:register_bike).with(bparam_line2) { Bike.new(id: 1) }
-    #       instance.process_csv(csv_string)
-    #       bulk_import.reload
-    #       expect(bulk_import.import_errors).to_not be_present
-    #       expect(bulk_import.progress).to eq "ongoing"
-    #     end
-    #   end
-    # end
+    describe "process_csv" do
+      after { tempfile.close && tempfile.unlink }
+      context "without a header" do
+        let(:csv_lines) { sample_csv_lines.slice(1, 2) }
+        it "adds a file error" do
+          expect(instance).to_not receive(:register_bike)
+          instance.process_csv(File.open(tempfile.path, "r"))
+          bulk_import.reload
+          expect(bulk_import.file_import_errors.to_s).to match(/invalid csv headers/i)
+          expect(bulk_import.progress).to eq "finished"
+        end
+      end
+      context "with an invalid header" do
+        let(:csv_lines) { [%w[manufacturer email name color]] + sample_csv_lines.slice(1, 2) }
+        it "adds a file error" do
+          expect(instance).to_not receive(:register_bike)
+          instance.process_csv(File.open(tempfile.path, "r"))
+          bulk_import.reload
+          expect(bulk_import.file_import_errors.to_s).to match(/invalid csv headers/i)
+          expect(bulk_import.progress).to eq "finished"
+        end
+      end
+      context "with failed row" do
+        let(:error_line) { ["Surly", "Midnight Special", "2018", nil, " ", "example"].join(",") }
+        let(:csv_lines) { [sample_csv_lines[0].join(","), error_line] }
+        let(:target_line_error) { [2, ["Owner email can't be blank"]] }
+        it "registers a bike and adds a row error" do
+          instance.process_csv(File.open(tempfile.path, "r"))
+          expect(instance.line_errors.count).to eq 1
+          expect(instance.line_errors.first).to eq target_line_error
+          expect(bulk_import.progress).to eq "ongoing"
+        end
+      end
+      # context "with two valid bikes" do
+      #   let(:bparam_line1) { instance.row_to_b_param_hash(sample_csv_lines[0].map(&:to_sym).zip(csv_lines[1]).to_h) }
+      #   let(:bparam_line2) { instance.row_to_b_param_hash(sample_csv_lines[0].map(&:to_sym).zip(csv_lines[2]).to_h) }
+      #   it "calls register bike with the valid bikes" do
+      #     expect(instance).to receive(:register_bike).with(bparam_line1) { Bike.new(id: 1) }
+      #     expect(instance).to receive(:register_bike).with(bparam_line2) { Bike.new(id: 1) }
+      #     instance.process_csv(File.open(tempfile.path, "r"))
+      #     bulk_import.reload
+      #     expect(bulk_import.import_errors).to_not be_present
+      #     expect(bulk_import.progress).to eq "ongoing"
+      #   end
+      # end
+    end
 
     describe "row_to_b_param_hash" do
       let(:row) { sample_csv_lines[0].map(&:to_sym).zip(csv_lines[1]).to_h }
       let(:target) do
         {
-          owner_email: row[:email],
+          owner_email: row[:owner_email],
           manufacturer_id: "Trek",
           is_bulk: true,
           color: "Green",
-          serial_number: row[:serial],
+          serial_number: row[:serial_number],
           year: row[:year],
           frame_model: "Roscoe 8",
           description: nil,
@@ -201,7 +196,7 @@ describe BulkImportWorker do
       context "valid organization bike" do
         let(:organization) { FactoryGirl.create(:organization_with_auto_user) }
         let!(:bulk_import) { FactoryGirl.create(:bulk_import, organization: organization) }
-        let(:row) { { manufacturer: " Surly", serial: "na", color: nil, email: "test2@bikeindex.org", year: "2018", model: "Midnight Special" } }
+        let(:row) { { manufacturer: " Surly", serial_number: "na", color: nil, owner_email: "test2@bikeindex.org", year: "2018", model: "Midnight Special" } }
         it "registers a bike" do
           expect(organization.auto_user).to_not eq bulk_import.user
           expect(Bike.count).to eq 0
@@ -210,7 +205,7 @@ describe BulkImportWorker do
           end.to change(Bike, :count).by 1
           bike = Bike.last
 
-          expect(bike.owner_email).to eq row[:email]
+          expect(bike.owner_email).to eq row[:owner_email]
           expect(bike.manufacturer).to eq manufacturer
           expect(bike.serial_number).to eq "absent"
           expect(bike.frame_model).to eq "Midnight Special"
@@ -225,7 +220,7 @@ describe BulkImportWorker do
         end
       end
       context "not valid bike" do
-        let(:row) { { manufacturer_id: "\n", serial: "na", color: nil } }
+        let(:row) { { manufacturer_id: "\n", serial_number: "na", color: nil } }
         let(:target_errors) { ["Owner email can't be blank"] }
         it "returns the invalid bike with errors" do
           expect do

@@ -1,6 +1,7 @@
 # encoding: utf-8
 
-class ImportExportUploader < CarrierWave::Uploader::Base
+# We really should obfuscate the filename, for this and bulk imports
+class ExportUploader < CarrierWave::Uploader::Base
   if Rails.env.test?
     storage :file
   elsif Rails.env.development?
@@ -10,7 +11,7 @@ class ImportExportUploader < CarrierWave::Uploader::Base
   end
 
   def store_dir
-    "#{base_store_dir}import_exports"
+    "#{base_store_dir}exports/#{model.id}"
   end
 
   def base_store_dir
