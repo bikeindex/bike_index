@@ -23,11 +23,12 @@ class BulkImportWorker
     # Grab the first line of the csv (which is the header line) and transform it
     headers = convert_headers(open_file.readline)
     # Stream process the rest of the csv
-    row_index = 0
-    CSV.foreach(open_file, headers: headers) do |row|
+    row_index = 1 # We've already remove the first line, so it doesn't count
+    csv = CSV.new(open_file, headers: headers)
+    while row = csv.shift
       break false if @bulk_import.finished? # Means there was an error or something, so noop
       row_index += 1
-      next if row_index == 1 # Because we manually set the header
+      # next if row_index == 1 # Because we manually set the header
       bike = register_bike(row_to_b_param_hash(row.to_h))
       next if bike.id.present?
       # row_index is current line + 1, we want to offset count by 1 (people don't use line 0)
