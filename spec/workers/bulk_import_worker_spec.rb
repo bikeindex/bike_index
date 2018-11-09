@@ -67,43 +67,49 @@ describe BulkImportWorker do
       let!(:white) { FactoryGirl.create(:color, name: "White") }
       let!(:surly) { FactoryGirl.create(:manufacturer, name: "Surly") }
       let!(:trek) { FactoryGirl.create(:manufacturer, name: "Trek") }
-      let(:file_path) { File.open(Rails.root.join("public", "import_all_optional_fields.csv")) }
+      let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/master/public/import_all_optional_fields.csv" }
       let(:organization) { FactoryGirl.create(:organization_with_auto_user) }
-      let!(:bulk_import) { FactoryGirl.create(:bulk_import, file: file_path, progress: "pending", user_id: nil, organization_id: organization.id) }
+      # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
+      let!(:bulk_import) { FactoryGirl.create(:bulk_import, progress: "pending", user_id: nil, organization_id: organization.id) }
       it "creates the bikes, doesn't have any errors" do
-        expect do
-          instance.perform(bulk_import.id)
-        end.to change(Bike, :count).by 2
-        bulk_import.reload
-        expect(bulk_import.progress).to eq "finished"
-        expect(bulk_import.bikes.count).to eq 2
-        expect(bulk_import.file_import_errors).to_not be_present
+        # In production, we actually use remote files rather than local files.
+        # simulate what that process looks like by loading a remote file in the way we use open_file in BulkImport
+        VCR.use_cassette("bulk_import-perform-success") do
+          allow_any_instance_of(BulkImport).to receive(:open_file) { open(file_url) }
+          expect do
+            instance.perform(bulk_import.id)
+          end.to change(Bike, :count).by 2
+          bulk_import.reload
+          expect(bulk_import.progress).to eq "finished"
+          expect(bulk_import.bikes.count).to eq 2
+          expect(bulk_import.file_import_errors).to_not be_present
 
-        bike1 = bulk_import.bikes.reorder(:created_at).first
-        expect(bike1.primary_frame_color).to eq green
-        expect(bike1.serial_number).to eq "xyz_test"
-        expect(bike1.owner_email).to eq "test@bikeindex.org"
-        expect(bike1.manufacturer).to eq trek
-        expect(bike1.creation_state.origin).to eq "bulk_import_worker"
-        expect(bike1.creator).to eq organization.auto_user
-        expect(bike1.creation_organization).to eq organization
-        expect(bike1.year).to eq 2019
-        expect(bike1.description).to eq "I love this, it's my favorite"
-        expect(bike1.frame_size).to eq "29in"
-        expect(bike1.frame_size_unit).to eq "in"
-        expect(bike1.public_images.count).to eq 0
-        bike2 = bulk_import.bikes.reorder(:created_at).last
-        expect(bike2.primary_frame_color).to eq white
-        expect(bike2.serial_number).to eq "example"
-        expect(bike2.owner_email).to eq "test2@bikeindex.org"
-        expect(bike2.manufacturer).to eq surly
-        expect(bike2.creation_state.origin).to eq "bulk_import_worker"
-        expect(bike2.creator).to eq organization.auto_user
-        expect(bike2.creation_organization).to eq organization
-        expect(bike2.year).to_not be_present
-        expect(bike2.public_images.count).to eq 1
-        expect(bike2.frame_size).to eq "m"
-        expect(bike2.frame_size_unit).to eq "ordinal"
+          bike1 = bulk_import.bikes.reorder(:created_at).first
+          expect(bike1.primary_frame_color).to eq green
+          expect(bike1.serial_number).to eq "xyz_test"
+          expect(bike1.owner_email).to eq "test@bikeindex.org"
+          expect(bike1.manufacturer).to eq trek
+          expect(bike1.creation_state.origin).to eq "bulk_import_worker"
+          expect(bike1.creator).to eq organization.auto_user
+          expect(bike1.creation_organization).to eq organization
+          expect(bike1.year).to eq 2019
+          expect(bike1.description).to eq "I love this, it's my favorite"
+          expect(bike1.frame_size).to eq "29in"
+          expect(bike1.frame_size_unit).to eq "in"
+          expect(bike1.public_images.count).to eq 0
+          bike2 = bulk_import.bikes.reorder(:created_at).last
+          expect(bike2.primary_frame_color).to eq white
+          expect(bike2.serial_number).to eq "example"
+          expect(bike2.owner_email).to eq "test2@bikeindex.org"
+          expect(bike2.manufacturer).to eq surly
+          expect(bike2.creation_state.origin).to eq "bulk_import_worker"
+          expect(bike2.creator).to eq organization.auto_user
+          expect(bike2.creation_organization).to eq organization
+          expect(bike2.year).to_not be_present
+          expect(bike2.public_images.count).to eq 1
+          expect(bike2.frame_size).to eq "m"
+          expect(bike2.frame_size_unit).to eq "ordinal"
+        end
       end
     end
   end
