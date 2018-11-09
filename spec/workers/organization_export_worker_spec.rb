@@ -37,7 +37,7 @@ describe OrganizationExportWorker do
         instance.perform(export.id)
         export.reload
         expect(export.progress).to eq "finished"
-        expect(export.open_file).to eq(csv_string)
+        expect(export.file.read).to eq(csv_string)
         expect(export.rows).to eq 1
       end
     end
@@ -49,7 +49,7 @@ describe OrganizationExportWorker do
         instance.perform(export.id)
         export.reload
         expect(export.progress).to eq "finished"
-        expect(export.open_file).to eq(csv_string)
+        expect(export.file.read).to eq(csv_string)
         expect(export.rows).to eq 0
       end
     end
@@ -93,7 +93,7 @@ describe OrganizationExportWorker do
         instance.perform(export.id)
         export.reload
         expect(export.progress).to eq "finished"
-        generated_csv_string = export.open_file
+        generated_csv_string = export.file.read
         # Ensure we actually match the exact thing with correct escaping
         expect(generated_csv_string.split("\n").last).to eq target_csv_line
         # And matching the whole thing

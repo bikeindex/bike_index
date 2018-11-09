@@ -1,6 +1,6 @@
 class BulkImport < ActiveRecord::Base
   VALID_PROGRESSES = %i[pending ongoing finished].freeze
-  mount_uploader :file, ImportExportUploader
+  mount_uploader :file, BulkImportUploader
 
   belongs_to :organization
   belongs_to :user
@@ -47,8 +47,16 @@ class BulkImport < ActiveRecord::Base
     add_file_error("Needs to have a user or an organization with an auto user")
   end
 
+  # Because the way we load the file is different if it's remote or local
+  # This is hacky, but whatever
+  def local_file?
+    file&._storage&.to_s == "CarrierWave::Storage::File"
+  end
+
+  # To enable stream processing, so that we aren't loading the whole file into memory all at once
+  # also so we can separately deal with the header line
   def open_file
-    file.read # This isn't stream processing, it would be nice if it was
+    @open_file ||= local_file? ? File.open(file.path, "r") : open(file.url)
   rescue OpenURI::HTTPError => e # This probably isn't the error that will happen, replace it with the one that is
     add_file_error(e.message)
   end

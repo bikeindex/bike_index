@@ -4,7 +4,7 @@ class Export < ActiveRecord::Base
   VALID_FORMATS = %i[csv].freeze
   DEFAULT_HEADERS = %w[link registered_at manufacturer model color serial is_stolen].freeze
   PERMITTED_HEADERS = (DEFAULT_HEADERS + %w[thumbnail registered_by registration_type owner_email owner_name]).freeze
-  mount_uploader :file, ImportExportUploader
+  mount_uploader :file, ExportUploader
 
   belongs_to :organization
   belongs_to :user # Creator of export
@@ -73,10 +73,6 @@ class Export < ActiveRecord::Base
 
   def tmp_file_rows
     `wc -l "#{tmp_file.path}"`.strip.split(' ')[0].to_i - 1 # Because we don't count header
-  end
-
-  def open_file
-    file.read # Created file.
   end
 
   def description
