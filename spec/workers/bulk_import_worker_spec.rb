@@ -113,7 +113,7 @@ describe BulkImportWorker do
     describe "process_csv" do
       after { tempfile.close && tempfile.unlink }
       context "without a header" do
-        let(:csv_lines) { sample_csv_lines.slice(1, 2) }
+        let(:csv_lines) { sample_csv_lines.slice(1, 2).map { |l| l.join(",") } }
         it "adds a file error" do
           expect(instance).to_not receive(:register_bike)
           instance.process_csv(File.open(tempfile.path, "r"))
@@ -123,7 +123,7 @@ describe BulkImportWorker do
         end
       end
       context "with an invalid header" do
-        let(:csv_lines) { [%w[manufacturer email name color]] + sample_csv_lines.slice(1, 2) }
+        let(:csv_lines) { ([%w[manufacturer email name color]] + sample_csv_lines.slice(1, 2)).map { |l| l.join(",") } }
         it "adds a file error" do
           expect(instance).to_not receive(:register_bike)
           instance.process_csv(File.open(tempfile.path, "r"))
@@ -133,8 +133,8 @@ describe BulkImportWorker do
         end
       end
       context "with failed row" do
-        let(:error_line) { ["Surly", "Midnight Special", "2018", nil, " ", "example"].join(",") }
-        let(:csv_lines) { [sample_csv_lines[0].join(","), error_line] }
+        let(:error_line) { ["Surly", "Midnight Special", "2018", nil, " ", "example"] }
+        let(:csv_lines) { [[sample_csv_lines[0]], [error_line]].map { |l| l.join(",") } }
         let(:target_line_error) { [2, ["Owner email can't be blank"]] }
         it "registers a bike and adds a row error" do
           instance.process_csv(File.open(tempfile.path, "r"))
@@ -143,18 +143,19 @@ describe BulkImportWorker do
           expect(bulk_import.progress).to eq "ongoing"
         end
       end
-      # context "with two valid bikes" do
-      #   let(:bparam_line1) { instance.row_to_b_param_hash(sample_csv_lines[0].map(&:to_sym).zip(csv_lines[1]).to_h) }
-      #   let(:bparam_line2) { instance.row_to_b_param_hash(sample_csv_lines[0].map(&:to_sym).zip(csv_lines[2]).to_h) }
-      #   it "calls register bike with the valid bikes" do
-      #     expect(instance).to receive(:register_bike).with(bparam_line1) { Bike.new(id: 1) }
-      #     expect(instance).to receive(:register_bike).with(bparam_line2) { Bike.new(id: 1) }
-      #     instance.process_csv(File.open(tempfile.path, "r"))
-      #     bulk_import.reload
-      #     expect(bulk_import.import_errors).to_not be_present
-      #     expect(bulk_import.progress).to eq "ongoing"
-      #   end
-      # end
+      context "with two valid bikes" do
+        let(:csv_lines) { sample_csv_lines.map { |l| l.join(",") } }
+        let(:bparam_line1) { instance.row_to_b_param_hash(sample_csv_lines[0].map(&:to_sym).zip(sample_csv_lines[1]).to_h) }
+        let(:bparam_line2) { instance.row_to_b_param_hash(sample_csv_lines[0].map(&:to_sym).zip(sample_csv_lines[2]).to_h) }
+        it "calls register bike with the valid bikes" do
+          expect(instance).to receive(:register_bike).with(bparam_line1) { Bike.new(id: 1) }
+          expect(instance).to receive(:register_bike).with(bparam_line2) { Bike.new(id: 1) }
+          instance.process_csv(File.open(tempfile.path, "r"))
+          bulk_import.reload
+          expect(bulk_import.import_errors).to_not be_present
+          expect(bulk_import.progress).to eq "ongoing"
+        end
+      end
     end
 
     describe "row_to_b_param_hash" do
