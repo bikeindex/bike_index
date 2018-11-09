@@ -10,6 +10,9 @@ class BulkImport < ActiveRecord::Base
 
   enum progress: VALID_PROGRESSES
 
+  scope :with_file_errors, -> { where("(import_errors -> 'file') is not null") }
+  scope :with_line_errors, -> { where("(import_errors -> 'line') is not null") }
+
   before_save :validate_creator_present
 
   def file_import_errors
