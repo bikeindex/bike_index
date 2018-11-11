@@ -64,7 +64,7 @@ describe BulkImportWorker do
       end
     end
     context "empty import" do
-      let(:csv_lines) { sample_csv_lines[0] }
+      let(:csv_lines) { [sample_csv_lines[0].join(","), ""] }
       it "marks the import empty" do
         allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") }
         expect do
