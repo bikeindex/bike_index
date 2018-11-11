@@ -13,6 +13,7 @@ class BulkImport < ActiveRecord::Base
   scope :file_errors, -> { where("(import_errors -> 'file') is not null") }
   scope :line_errors, -> { where("(import_errors -> 'line') is not null") }
   scope :no_bikes, -> { where("(import_errors -> 'bikes') is not null") }
+  scope :with_bikes, -> { where.not("(import_errors -> 'bikes') is not null") }
 
   before_save :set_calculated_attributes
 

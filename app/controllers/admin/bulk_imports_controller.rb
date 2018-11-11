@@ -7,9 +7,9 @@ class Admin::BulkImportsController < Admin::BaseController
     if params[:organization_id].present?
       organization_id = params[:organization_id] == "none" ? nil : params[:organization_id]
       bulk_imports = BulkImport.where(organization_id: organization_id)
-    else
-      bulk_imports = BulkImport.all
     end
+    bulk_imports ||= BulkImport.all
+    bulk_imports = bulk_impors.with_bikes unless params[:with_empty]
     @bulk_imports = bulk_imports.order(created_at: :desc).includes(:creation_states)
                                 .page(page).per(per_page)
   end
