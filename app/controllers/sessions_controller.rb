@@ -5,6 +5,7 @@ class SessionsController < ApplicationController
   before_filter :skip_if_signed_in, only: [:new]
 
   def new
+    render layout: params[:partner] == "bikehub" ? "application_revised_bikehub" : "application_revised"
   end
 
   def create

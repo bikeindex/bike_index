@@ -1,0 +1,61 @@
+/ copies application_revised assets but dramatically different
+!!!
+%html{ style: "background: #fff; padding-bottom: 40px;" }
+  %head
+    = header_tags
+    = stylesheet_link_tag 'revised', media: 'all'
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+    = javascript_include_tag 'application_revised'
+    <!--[if IE]>$('body').prepend("<div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>")<![endif]-->
+  %body{ id: page_id, class:  body_class, style: "padding-top: 0;" }
+    %nav.navbar.nav.bikehub-nav
+      .container-fluid
+        .row
+          %a.bikehub-logo{ href: "https://bikehub.com" }
+            = image_tag "bikehub.png", class: "primary-nav", alt: "BikeHub home"
+          %p.logo-plus
+            +
+          %a.primary-logo{ href: user_root_url }
+            = image_tag 'logo.svg', class: 'primary-nav', alt: 'Bike Index home'
+          %a.bikehub-nav-item.bikehub-nav-item-first{ href: "https://bikehub.com/contact/" }
+            Contact
+          %a.bikehub-nav-item.active{ href: new_user_path(partner: params[:partner]) }
+            Sign up
+    .container.bikehub-explanation.mb-4
+      .row
+        %h1
+          BIKEHUB SIGNUP
+      .row
+        %p
+          BikeHub accounts are powered by Bike Index – the premier bike registry.
+
+    = render 'layouts/revised_messages'
+    = yield
+
+    .container.bikehub-explanation{ style: "margin-top: 60px;" }
+      .row
+        %h2
+          WHY BIKEINDEX?
+      .row
+        %p
+          Bike Index is a 501(c)(3) nonprofit and the most widely used bicycle registration service in the world.
+        %p
+          At BikeHub, we believe bike security is more than just a strong U-lock.
+        %p
+          Through this partnership, BikeHub patrons enjoy access to the most secure public bike parking – and registration with nation’s largest network, used by law enforcement agencies, universities, and advocates to connect recovered bikes with their owners.
+
+  :javascript
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-38316708-1', 'auto');
+    ga('send', 'pageview');
+
+    var trackOutboundLink = function(url) {
+      ga('send', 'event', 'outbound', 'click', url, {
+        'transport': 'beacon',
+        'hitCallback': function(){document.location = url;}
+      });
+    }
