@@ -60,6 +60,20 @@ describe BulkImportWorker do
         expect(bike.serial_number).to eq "ZZZZ"
         expect(bike.owner_email).to eq "test2@bikeindex.org"
         expect(bike.description).to eq "Midnight Special"
+        expect(BulkImport.line_errors.pluck(:id)).to eq([bulk_import.id])
+      end
+    end
+    context "empty import" do
+      let(:csv_lines) { [sample_csv_lines[0].join(","), ""] }
+      it "marks the import empty" do
+        allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") }
+        expect do
+          instance.perform(bulk_import.id)
+        end.to_not change(Bike, :count)
+        bulk_import.reload
+        expect(bulk_import.no_bikes?).to be_truthy
+        expect(bulk_import.import_errors?).to be_falsey
+        expect(BulkImport.no_bikes.pluck(:id)).to eq([bulk_import.id])
       end
     end
     context "valid file" do
