@@ -18,9 +18,9 @@ describe SessionsController do
         expect(session[:return_to]).to eq '/bikes/12?contact_owner=true'
       end
       context "with partner_signin" do
-        it 'actually sets it' do
-          get :new, return_to: '/bikes/12?contact_owner=true', partner: "bikehub"
-          expect(session[:return_to]).to eq '/bikes/12?contact_owner=true'
+        it "actually sets it" do
+          get :new, return_to: "/bikes/12?contact_owner=true", partner: "bikehub"
+          expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
           expect(response).to render_with_layout("application_revised_bikehub")
         end
       end
