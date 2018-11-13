@@ -5,7 +5,11 @@ module Organized
     before_action :ensure_access_to_bulk_import!, except: [:create] # Because this checks ensure_admin
 
     def index
-      @bulk_imports = bulk_imports.includes(:creation_states).order(created_at: :desc)
+      page = params[:page] || 1
+      per_page = params[:per_page] || 25
+      shown_imports = bulk_imports.includes(:creation_states).order(created_at: :desc)
+      shown_imports = shown_imports.with_bikes unless params[:with_empty]
+      @bulk_imports = shown_imports.page(page).per(per_page)
     end
 
     def show

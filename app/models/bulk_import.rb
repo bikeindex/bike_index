@@ -10,10 +10,12 @@ class BulkImport < ActiveRecord::Base
 
   enum progress: VALID_PROGRESSES
 
-  scope :with_file_errors, -> { where("(import_errors -> 'file') is not null") }
-  scope :with_line_errors, -> { where("(import_errors -> 'line') is not null") }
+  scope :file_errors, -> { where("(import_errors -> 'file') is not null") }
+  scope :line_errors, -> { where("(import_errors -> 'line') is not null") }
+  scope :no_bikes, -> { where("(import_errors -> 'bikes') is not null") }
+  scope :with_bikes, -> { where.not("(import_errors -> 'bikes') is not null") }
 
-  before_save :validate_creator_present
+  before_save :set_calculated_attributes
 
   def file_import_errors
     import_errors["file"]
@@ -25,6 +27,10 @@ class BulkImport < ActiveRecord::Base
 
   def import_errors?
     line_import_errors.present? || file_import_errors.present?
+  end
+
+  def no_bikes?
+    import_errors["bikes"] == "none_imported"
   end
 
   def add_file_error(error_msg)
@@ -45,9 +51,14 @@ class BulkImport < ActiveRecord::Base
     "#{organization}_import_#{id}"
   end
 
-  def validate_creator_present
-    return true if creator.present?
-    add_file_error("Needs to have a user or an organization with an auto user")
+  def set_calculated_attributes
+    unless creator.present?
+      add_file_error("Needs to have a user or an organization with an auto user")
+    end
+    if finished? && bikes.count == 0
+      import_errors["bikes"] = "none_imported"
+    end
+    true
   end
 
   # Because the way we load the file is different if it's remote or local
