@@ -10,7 +10,6 @@ describe "Oauth::AuthorizationsController" do
     end
     context "partner parameter" do
       it "redirects to sign in with the partners parameter included" do
-        pp "fsdfsdf"
         get "/oauth/authorize", response_type: "code", scope: "read_bikes+read_user",
                                 client_id: doorkeeper_app.uid, redirect_uri: doorkeeper_app.redirect_uri,
                                 partner: "bikehub"
