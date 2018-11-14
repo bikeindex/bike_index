@@ -3,9 +3,9 @@ require "spec_helper"
 describe LandingPagesController do
   include_context :page_content_values
   describe "show" do
-    let(:organization) { FactoryGirl.create(:organization, short_name: "University") }
+    let!(:organization) { FactoryGirl.create(:organization, short_name: "University") }
     it "renders revised_layout" do
-      get :show, organization_id: "#{organization.slug} "
+      get :show, organization_id: "university"
       expect(response.status).to eq(200)
       expect(response).to render_template("show")
       expect(response).to render_with_layout("application_revised")
@@ -22,7 +22,7 @@ describe LandingPagesController do
     end
   end
 
-  %w(for_shops for_advocacy for_law_enforcement for_schools).each do |landing_type|
+  %w[for_shops for_advocacy for_law_enforcement for_schools].each do |landing_type|
     describe landing_type do
       it "renders with correct title" do
         get landing_type.to_sym, preview: true
