@@ -57,6 +57,7 @@ def create_doorkeeper(_opts = {})
   @application = Doorkeeper::Application.new(name: 'MyApp', redirect_uri: 'https://app.com')
   @application.owner = @user
   @application.save
+  @application
 end
 
 def create_doorkeeper_app(opts = {})

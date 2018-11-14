@@ -11,20 +11,28 @@ describe UsersController do
         expect(flash).to be_present
       end
     end
-    context 'not signed in' do
-      it 'renders and calls set store_return_to' do
+    context "not signed in" do
+      it "renders and calls set store_return_to" do
         expect(controller).to receive(:store_return_to)
         get :new
-        expect(response.code).to eq('200')
-        expect(response).to render_template('new')
+        expect(response.code).to eq("200")
+        expect(response).to render_template("new")
         expect(flash).to_not be_present
-        expect(response).to render_with_layout('application_revised')
+        expect(response).to render_with_layout("application_revised")
       end
       context "with partner_signin" do
-        it 'actually sets it' do
-          get :new, return_to: '/bikes/12?contact_owner=true', partner: "bikehub"
-          expect(session[:return_to]).to eq '/bikes/12?contact_owner=true'
+        it "actually sets it" do
+          get :new, return_to: "/bikes/12?contact_owner=true", partner: "bikehub"
+          expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
           expect(response).to render_with_layout("application_revised_bikehub")
+        end
+        context "with partner_signin" do
+          it "actually sets it" do
+            session[:partner] = "bikehub"
+            get :new, return_to: "/bikes/12?contact_owner=true"
+            expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
+            expect(response).to render_with_layout("application_revised_bikehub")
+          end
         end
       end
     end

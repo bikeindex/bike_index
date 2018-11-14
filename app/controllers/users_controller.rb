@@ -11,7 +11,8 @@ class UsersController < ApplicationController
       flash[:success] = "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
       redirect_to user_home_url and return
     end
-    render layout: params[:partner] == "bikehub" ? "application_revised_bikehub" : "application_revised"
+    @partner = params[:partner] || session[:partner]
+    render layout: @partner == "bikehub" ? "application_revised_bikehub" : "application_revised"
   end
 
   def create

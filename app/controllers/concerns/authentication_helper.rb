@@ -8,9 +8,9 @@ module AuthenticationHelper
     else
       flash[flash_type] = msg
       if msg.match(/create an account/i).present?
-        redirect_to new_user_url(subdomain: false) and return
+        redirect_to new_user_url(subdomain: false, partner: params[:partner]) and return
       else
-        redirect_to new_session_url(subdomain: false) and return
+        redirect_to new_session_url(subdomain: false, partner: params[:partner]) and return
       end
     end
   end
