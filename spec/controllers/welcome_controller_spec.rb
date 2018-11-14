@@ -11,7 +11,7 @@ describe WelcomeController do
     end
     context "json request format" do
       it "renders revised_layout (ignoring response format)" do
-        get "/", format: :json
+        get :index, format: :json
         expect(response.status).to eq(200)
         expect(response).to render_template("index")
         expect(response).to render_with_layout("application_revised")
