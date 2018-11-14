@@ -1,5 +1,6 @@
 class LandingPagesController < ApplicationController
   layout 'application_revised'
+  before_action :force_html_response
   before_filter :instantiate_feedback, except: [:show]
 
   def show

@@ -45,6 +45,10 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def force_html_response
+    request.format = "html"
+  end
+
   # Needs to be callable by BikesController for scanning as well as BikesController, fastest easiest way to share
   def search_organization_bikes
     @search_query_present = permitted_org_bike_search_params.except(:stolenness).values.reject(&:blank?).any?
