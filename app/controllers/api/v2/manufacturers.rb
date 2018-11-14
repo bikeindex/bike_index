@@ -7,7 +7,7 @@ module API
         desc "All the manufacturers with pagination"
         paginate
         get '/' do
-          paginate Manufacturer.all
+          paginate Manufacturer.reorder(:name)
         end
       
         desc "Manufacturer matching ID or name", {

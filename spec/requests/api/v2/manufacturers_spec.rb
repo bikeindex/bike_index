@@ -3,7 +3,7 @@ require 'spec_helper'
 describe 'Manufacturers API V2' do
   describe 'root' do
     it 'responds on index with pagination' do
-      manufacturer = FactoryGirl.create(:manufacturer)
+      manufacturer = FactoryGirl.create(:manufacturer, name: "AAAAAzz") # make sure it's the first manufacturer
       FactoryGirl.create(:manufacturer) unless Manufacturer.count >= 2
       FactoryGirl.create(:manufacturer) unless Manufacturer.count >= 2
       get '/api/v2/manufacturers?per_page=1'
@@ -11,7 +11,6 @@ describe 'Manufacturers API V2' do
       pagination_link = '<http://www.example.com/api/v2/manufacturers?page=2&per_page=1>; rel="last", <http://www.example.com/api/v2/manufacturers?page=2&per_page=1>; rel="next"'
       expect(response.header['Link']).to eq(pagination_link)
       expect(response.code).to eq('200')
-      # pp response.headers
       expect(response.headers['Access-Control-Allow-Origin']).to eq('*')
       expect(response.headers['Access-Control-Request-Method']).to eq('*')
       expect(JSON.parse(response.body)['manufacturers'][0]['id']).to eq(manufacturer.id)
