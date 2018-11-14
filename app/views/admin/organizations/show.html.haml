@@ -68,6 +68,8 @@
           = link_to @organization.parent_organization.name, admin_organization_path(@organization.parent_organization)
           %small.less-strong
             if parent's paid, so's this
+        - else
+          &nbsp;
       %dt
         Children
       %dd
