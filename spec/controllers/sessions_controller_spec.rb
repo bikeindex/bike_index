@@ -1,21 +1,36 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe SessionsController do
-  describe 'new' do
-    context 'calls required things' do
-      it 'renders and calls store_return_to' do
+  describe "new" do
+    context "calls required things" do
+      it "renders and calls store_return_to" do
         expect(controller).to receive(:store_return_to)
         get :new
-        expect(response.code).to eq('200')
-        expect(response).to render_template('new')
+        expect(response.code).to eq("200")
+        expect(response).to render_template("new")
         expect(flash).to_not be_present
-        expect(response).to render_with_layout('application_revised')
+        expect(response).to render_with_layout("application_revised")
       end
     end
-    context 'setting return_to' do
-      it 'actually sets it' do
-        get :new, return_to: '/bikes/12?contact_owner=true'
-        expect(session[:return_to]).to eq '/bikes/12?contact_owner=true'
+    context "setting return_to" do
+      it "actually sets it" do
+        get :new, return_to: "/bikes/12?contact_owner=true"
+        expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
+      end
+      context "with partner" do
+        it "actually sets it, renders bikehub layout" do
+          get :new, return_to: "/bikes/12?contact_owner=true", partner: "bikehub"
+          expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
+          expect(response).to render_with_layout("application_revised_bikehub")
+        end
+        context "partner in session" do
+          it "actually sets it, renders bikehub layout" do
+            session[:partner] = "bikehub"
+            get :new, return_to: "/bikes/12?contact_owner=true"
+            expect(response).to render_with_layout("application_revised_bikehub")
+            expect(session[:partner]).to be_nil
+          end
+        end
       end
     end
   end
@@ -38,13 +53,15 @@ describe SessionsController do
         expect(User).to receive(:fuzzy_email_find).and_return(@user)
       end
 
-      describe 'when authentication works' do
-        it 'authenticates' do
+      describe "when authentication works" do
+        it "authenticates and removes partner session" do
+          session[:partner] = "bikehub"
           expect(@user).to receive(:authenticate).and_return(true)
-          request.env['HTTP_REFERER'] = user_home_url
-          post :create, session: { password: 'would be correct' }
+          request.env["HTTP_REFERER"] = user_home_url
+          post :create, session: { password: "would be correct" }
           expect(cookies.signed[:auth][1]).to eq(@user.auth_token)
           expect(response).to redirect_to user_home_url
+          expect(session[:partner]).to be_nil
         end
 
         it 'authenticates and redirects to admin' do

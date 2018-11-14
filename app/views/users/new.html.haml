@@ -25,8 +25,11 @@
           %h3.sign-in-up-main-form-header
             = t("sign_in_up.#{controller_name}_main_form_action")
             %small
-              already have an account? #{ link_to 'log in', new_session_path }
+              already have an account? #{ link_to 'log in', new_session_path(partner: @partner) }
           = form_for @user do |f|
+            - if @partner
+              = hidden_field_tag :partner, @partner
+
             .form-group
               = f.label :email, class: 'sr-only'
               = f.email_field :email, placeholder: 'email', class: 'form-control'

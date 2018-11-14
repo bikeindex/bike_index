@@ -8,10 +8,22 @@ module AuthenticationHelper
     else
       flash[flash_type] = msg
       if msg.match(/create an account/i).present?
-        redirect_to new_user_url(subdomain: false) and return
+        redirect_to new_user_url(subdomain: false, partner: params[:partner]) and return
       else
-        redirect_to new_session_url(subdomain: false) and return
+        redirect_to new_session_url(subdomain: false, partner: params[:partner]) and return
       end
+    end
+  end
+
+  def render_partner_or_default_signin_layout(render_action: nil)
+    # We set partner in session because of AuthorizationsController - but we don't want the session to stick around
+    # so people can navigate around the site and return to the sign in without unexpected results
+    @partner = params[:partner] || session.delete(:partner)
+    layout = @partner == "bikehub" ? "application_revised_bikehub" : "application_revised"
+    if render_action
+      render action: render_action, layout: layout
+    else
+      render layout: layout
     end
   end
 
