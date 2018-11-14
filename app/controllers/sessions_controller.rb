@@ -5,8 +5,7 @@ class SessionsController < ApplicationController
   before_filter :skip_if_signed_in, only: [:new]
 
   def new
-    @partner = params[:partner] || session[:partner]
-    render layout: @partner == "bikehub" ? "application_revised_bikehub" : "application_revised"
+    render_partner_or_default_signin_layout
   end
 
   def create
@@ -16,21 +15,21 @@ class SessionsController < ApplicationController
         sign_in_and_redirect
       else
         # User couldn't authenticate, so password is invalid
-        flash.now[:error] = 'Invalid email/password'
+        flash.now[:error] = "Invalid email/password"
         # If user is banned, tell them about it.
         if @user.banned?
           flash.now[:error] = "We're sorry, but it appears that your account has been locked. If you are unsure as to the reasons for this, please contact us"
         end
-        render :new
+        render_partner_or_default_signin_layout(render_action: :new)
       end
     elsif (@user && @user.confirmed?) || User.fuzzy_unconfirmed_primary_email_find(permitted_parameters[:email]).present?
       # Email address is not confirmed
-      flash.now[:error] = 'You must confirm your email address to continue'
-      render :new
+      flash.now[:error] = "You must confirm your email address to continue"
+      render_partner_or_default_signin_layout(render_action: :new)
     else
       # Email address is not in the DB
-      flash.now[:error] = 'Invalid email/password'
-      render :new
+      flash.now[:error] = "Invalid email/password"
+      render_partner_or_default_signin_layout(render_action: :new)
     end
   end
 

@@ -27,6 +27,8 @@
             %small
               don't have an account? #{ link_to 'sign up', new_user_path(partner: @partner) }
           = form_for :session, url: session_url do |f|
+            - if @partner
+              = hidden_field_tag :partner, @partner
             .form-group
               = f.label :email, class: 'sr-only'
               = f.email_field :email, placeholder: 'email', class: 'form-control'

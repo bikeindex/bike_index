@@ -1,9 +1,9 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe UsersController do
-  describe 'new' do
-    context 'already signed in' do
-      it 'redirects and sets the flash' do
+  describe "new" do
+    context "already signed in" do
+      it "redirects and sets the flash" do
         user = FactoryGirl.create(:user)
         set_current_user(user)
         get :new
@@ -20,57 +20,76 @@ describe UsersController do
         expect(flash).to_not be_present
         expect(response).to render_with_layout("application_revised")
       end
-      context "with partner_signin" do
+      context "with partner param" do
         it "actually sets it" do
           get :new, return_to: "/bikes/12?contact_owner=true", partner: "bikehub"
           expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
           expect(response).to render_with_layout("application_revised_bikehub")
+          expect(session[:partner]).to be_nil
         end
-        context "with partner_signin" do
+        context "with partner param" do
           it "actually sets it" do
             session[:partner] = "bikehub"
             get :new, return_to: "/bikes/12?contact_owner=true"
             expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
             expect(response).to render_with_layout("application_revised_bikehub")
+            session[:partner] = "bikehub"
           end
         end
       end
     end
   end
 
-  describe 'create' do
-    context 'legacy' do
-      describe 'success' do
-        it 'creates a non-confirmed record' do
+  describe "create" do
+    context "legacy" do
+      describe "success" do
+        it "creates a non-confirmed record" do
           expect do
             post :create, user: FactoryGirl.attributes_for(:user)
           end.to change(User, :count).by(1)
+          expect(flash).to_not be_present
+          expect(response).to render_with_layout("application_revised")
         end
-        it 'creates a confirmed user, log in, and send welcome if user has org invite' do
+        it "creates a confirmed user, log in, and send welcome if user has org invite" do
           expect_any_instance_of(CreateUserJobs).to receive(:send_welcome_email)
-          organization_invitation = FactoryGirl.create(:organization_invitation, invitee_email: 'poo@pile.com')
-          post :create, user: FactoryGirl.attributes_for(:user, email: 'poo@pile.com')
-          expect(User.from_auth(cookies.signed[:auth])).to eq(User.fuzzy_email_find('poo@pile.com'))
+          organization_invitation = FactoryGirl.create(:organization_invitation, invitee_email: "poo@pile.com")
+          post :create, user: FactoryGirl.attributes_for(:user, email: "poo@pile.com")
+          expect(User.from_auth(cookies.signed[:auth])).to eq(User.fuzzy_email_find("poo@pile.com"))
           expect(response).to redirect_to(user_home_url)
+        end
+        context "with partner param" do
+          it "renders parter sign in page" do
+            session[:partner] = "bikehub"
+            expect do
+              post :create, user: FactoryGirl.attributes_for(:user), partner: "bikehub"
+            end.to change(User, :count).by(1)
+            expect(flash).to_not be_present
+            expect(response).to render_template("create")
+            expect(response).to render_with_layout("application_revised_bikehub")
+            expect(session[:partner]).to be_nil
+          end
         end
       end
 
-      describe 'failure' do
+      describe "failure" do
         let(:user_attributes) do
           user = FactoryGirl.attributes_for(:user)
-          user[:password_confirmation] = 'bazoo'
+          user[:password_confirmation] = "bazoo"
           user
         end
-        it 'does not create a user or send a welcome email' do
+        it "does not create a user or send a welcome email" do
           expect do
             post :create, user: user_attributes
           end.to change(EmailWelcomeWorker.jobs, :size).by(0)
           expect(User.count).to eq(0)
         end
-        it 'renders new' do
-          post :create, user: user_attributes
-          expect(response).to render_template('new')
-          expect(assigns(:page_errors)).to be_present
+        context "partner param" do
+          it "renders new" do
+            post :create, partner: "bikehub", user: user_attributes
+            expect(response).to render_template("new")
+            expect(assigns(:page_errors)).to be_present
+            expect(response).to render_with_layout("application_revised_bikehub")
+          end
         end
       end
     end
@@ -89,11 +108,13 @@ describe UsersController do
             expect(User).to receive(:find).and_return(@user)
           end
 
-          it 'logins and redirect when confirmation succeeds' do
+          it "logins and redirect when confirmation succeeds" do
+            session[:partner] = "bikehub"
             expect(@user).to receive(:confirm).and_return(true)
             get :confirm, id: @user.id, code: @user.confirmation_token
             expect(User.from_auth(cookies.signed[:auth])).to eq(@user)
             expect(response).to redirect_to user_home_url
+            expect(session[:partner]).to be_nil
           end
 
           it 'shows a view when confirmation fails' do
