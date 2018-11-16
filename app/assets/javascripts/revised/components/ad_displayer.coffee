@@ -2,7 +2,7 @@ class @AdDisplayer
   photo_ads = ['right300x600']
   other_ads = ['top468x60']
 
-  boomerang_ad = "<a href=\"https://www.indiegogo.com/projects/boomerang-v2-bike-anti-theft-safety-system?secret_perk_token=5fb2f2d3&utm_source=BIKEINDEX\" onclick=\"trackOutboundLink('https://shop.boomerangbike.com'); return false;\"><img src=\"/ads/boomerang_v2.jpg\" alt=\"Boomerang\"></a>"
+  boomerang_ad = "<a href=\"https://www.indiegogo.com/projects/boomerang-v2-bike-anti-theft-safety-system?secret_perk_token=5fb2f2d3&utm_source=BIKEINDEX\" onclick=\"trackOutboundLink('https://www.indiegogo.com/projects/boomerang-v2-bike-anti-theft-safety-system?secret_perk_token=5fb2f2d3&utm_source=BIKEINDEX'); return false;\"><img src=\"/ads/boomerang_v2.jpg\" alt=\"Boomerang\"></a>"
 
   lemonade_ad = '<h3><a href="https://bikeindex.org/news/bike-index-partners-with-renters-and-homeowners-insurance-company-lemo">Bike Index Approved:</a></h3>' +
                    "<a href=\"https://www.lemonade.com/l/bike-index?utm_medium=partners&utm_source=bike-index&utm_campaign=website\" onclick=\"trackOutboundLink('https://www.lemonade.com/l/bike-index?utm_medium=partners&utm_source=bike-index&utm_campaign=website'); return false;\"><img src=\"https://files.bikeindex.org/partner/Lemonade-Tile.jpg\" alt=\"Lemonade\" style=\"margin-bottom: 30px;\"></a>"
