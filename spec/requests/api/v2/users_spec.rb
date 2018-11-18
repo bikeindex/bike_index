@@ -13,16 +13,17 @@ describe 'Users API V2' do
       create_doorkeeper_app
     end
 
-    it 'responds with all available attributes with full scoped token' do
+    it "responds with all available attributes with full scoped token" do
       @token.update_attribute :scopes, OAUTH_SCOPES_S
       token = Doorkeeper::AccessToken.create!(application_id: @application.id, resource_owner_id: @user.id, scopes: OAUTH_SCOPES_S)
-      get '/api/v2/users/current', format: :json, access_token: @token.token
+      get "/api/v2/users/current", format: :json, access_token: @token.token
       expect(response.response_code).to eq(200)
       result = JSON.parse(response.body)
-      expect(result['id']).to eq(@user.id.to_s)
-      expect(result['user'].is_a?(Hash)).to be_truthy
-      expect(result['bike_ids'].is_a?(Array)).to be_truthy
-      expect(result['memberships'].is_a?(Array)).to be_truthy
+      expect(result["id"]).to eq(@user.id.to_s)
+      expect(result["user"].is_a?(Hash)).to be_truthy
+      expect(result["bike_ids"].is_a?(Array)).to be_truthy
+      expect(result["memberships"].is_a?(Array)).to be_truthy
+      expect(result["user"].keys.include?("secondary_emails")).to be_falsey
     end
 
     it "doesn't include bikes if no bikes scoped" do

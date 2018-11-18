@@ -44,7 +44,7 @@ describe "Me API V3" do
         result = JSON.parse(response.body)
         expect(result["id"]).to eq(@user.id.to_s)
         expect(result["bike_ids"].present?).to be_falsey
-        expect(result["user"]["secondary_emails"].is_a?(Array)).to be_truthy
+        expect(result["user"]).to be_nil
       end
     end
 
