@@ -10,7 +10,8 @@ module API
               user: {
                 username: current_user.username,
                 name: current_user.name,
-                email: current_user.email, 
+                email: current_user.email,
+                secondary_emails: current_user.secondary_emails,
                 twitter: (current_user.twitter if current_user.show_twitter),
                 image: (current_user.avatar_url if current_user.show_bikes)
               }
@@ -48,6 +49,7 @@ module API
           NOTE
         }
         get '/' do
+          pp "fs89afasdf"
           { id: current_user.id.to_s }.merge(user_info).merge(bike_ids).merge(organization_memberships)
         end
 
