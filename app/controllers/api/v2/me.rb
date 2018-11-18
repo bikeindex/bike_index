@@ -49,7 +49,6 @@ module API
           NOTE
         }
         get '/' do
-          pp "fs89afasdf"
           { id: current_user.id.to_s }.merge(user_info).merge(bike_ids).merge(organization_memberships)
         end
 
