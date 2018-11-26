@@ -1,3 +1,4 @@
 web: bundle exec unicorn_rails -p 3001
+webpacker: ./bin/webpack-dev-server # Live update webpack js
 log: tail -f log/development.log
 hard_worker: bundle exec rerun --background --dir app,db,lib --pattern '{**/*.rb}' -- bundle exec sidekiq
