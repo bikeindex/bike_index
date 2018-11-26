@@ -16,7 +16,7 @@ rvm:
 before_install:
   - gem install bundler -v 1.9.10
 script:
-  - bundle exec rails webpacker:compile
+  - bundle exec rake webpacker:compile
   - bundle exec rspec
 branches:
   only:
