@@ -10,7 +10,7 @@ class DocumentationController < ApplicationController
       redirect_to documentation_index_path and return
     end
     @root = ENV['BASE_URL']
-    render layout: 'documentation'
+    render layout: false
   end
 
   def api_v2
