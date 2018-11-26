@@ -37,7 +37,8 @@ spec/fixtures/bikes/*.json
 manufacturer.tsv
 
 # Ignore special configuration env file
-.env.*/public/packs
+.env.*
+/public/packs
 /public/packs-test
 /node_modules
 yarn-debug.log*
