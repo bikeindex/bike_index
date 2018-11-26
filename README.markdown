@@ -13,6 +13,8 @@ We're an open source project. Take a gander through our code, report bugs, or do
 
 - [Rails 4.2](http://rubyonrails.org/)
 
+- [Node 10.13.0](https://nodejs.org/en/) & [yarn](https://yarnpkg.com/en/) (We use [nvm](https://github.com/creationix/nvm) to manage our node version)
+
 - PostgreSQL >= 9.6
 
 - Imagemagick ([railscast](http://railscasts.com/episodes/374-image-manipulation?view=asciicast))
@@ -28,7 +30,9 @@ We're an open source project. Take a gander through our code, report bugs, or do
 
 This explanation assumes you're familiar with developing Ruby on Rails applications.
 
-- `bundle install` install gems
+- `bundle install` install ruby gems
+
+- `yarn install` install js packages
 
 - `rake db:setup` create and seed your database
 
