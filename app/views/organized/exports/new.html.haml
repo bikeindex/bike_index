@@ -6,24 +6,28 @@
 
 = form_for @export, { url: organization_exports_path(organization_id: current_organization.to_param), action: "create", html: { class: "organized-form" } } do |f|
   .row.mt-2
-    .col-lg-3
+    .col-lg-4
       %p.export-included-columns-label
         Included columns:
-    .col-lg-9
+    .col-lg-8
       .row
         - Export.permitted_headers.each do |header|
-          .form-group.col-xs-6.col-md-3
+          .form-group.col-xs-6.col-md-4
             %label.checkbox
               = f.check_box :headers, { multiple: true, checked: Export.default_headers.include?(header) }, header, 1
               = header.titleize
   .form-group.row.mt-4
     = f.label :start_at, "Registered after", class: "org-form-label"
-    .form-well-input
+    .col-sm-4
       = f.datetime_local_field :start_at, step: 60, class: "form-control"
   .form-group.row
     = f.label :end_at, "Registered before", class: "org-form-label"
-    .form-well-input
+    .col-sm-4
       = f.datetime_local_field :end_at, step: 60, class: "form-control"
+  .form-group.row.mt-2
+    = f.label :format, "Export file format", class: "org-form-label"
+    .col-sm-4
+      = f.select :file_format, Export::VALID_FILE_FORMATS, {}, class: "form-control"
   .row.mt-4
     .form-submit-button
       = f.submit "Create export", class: "btn btn-success btn-lg"

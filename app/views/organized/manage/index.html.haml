@@ -19,7 +19,7 @@
     = f.label :embedable_user_email, class: 'org-form-label' do
       Registration email
     .col-sm-4
-      = f.select :embedable_user_email, @organization.users.pluck(:email), prompt: 'Select email', selected: (@organization.auto_user && @organization.auto_user.email)
+      = f.select :embedable_user_email, @organization.users.pluck(:email), prompt: 'Select email', selected: (@organization.auto_user && @organization.auto_user.email), class: "form-control"
       %span.below-input-help
         Email address that registrations through #{@organization.name} will be sent from
 
