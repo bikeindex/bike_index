@@ -31,5 +31,6 @@
     = f.label :bike_id, "Bike ID/URL", class: "org-form-label"
     .form-well-input
       = f.text_field :bike_id, required: true, class: "form-control"
-
-  = f.submit "Update", class: "btn btn-success btn-lg"
+  .row.mt-4
+    .form-submit-button
+      = f.submit "Update", class: "btn btn-success btn-lg"

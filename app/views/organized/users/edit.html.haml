@@ -3,9 +3,10 @@
     Edit membership for
     %em
       = @name
-  %p
+%p
+  .clearfix
     - id = (@organization_invitation || @membership).id
-    = link_to 'remove from organization', organization_user_path(id: id, organization_id: current_organization.to_param, is_invitation: @is_invitation), method: :delete, confirm: "Are you sure you want to remove #{@name} from #{current_organization.name}? (They will still be to use their personal account)", class: 'btn btn-danger'
+    = link_to 'remove from organization', organization_user_path(id: id, organization_id: current_organization.to_param, is_invitation: @is_invitation), method: :delete, confirm: "Are you sure you want to remove #{@name} from #{current_organization.name}? (They will still be to use their personal account)", class: 'btn btn-danger pull-right'
   - if @is_invitation
     %p
       Invited
@@ -52,8 +53,8 @@
             = f.radio_button :membership_role, Membership.membership_types.second
             Member of organization
 
-    .form-group.row
-      .col-sm-4.col-sm-push-4
+    .form-group.row.mt-4
+      .form-submit-button
         = f.submit 'Update', class: 'btn btn-success btn-lg'
 
 - else
@@ -79,6 +80,6 @@
             = f.radio_button :role, Membership.membership_types.second
             Member of organization
 
-    .form-group.row
-      .col-sm-4.col-sm-push-4
+    .row.mt-4.form-group
+      .form-submit-button
         = f.submit 'Update', class: 'btn btn-success btn-lg'

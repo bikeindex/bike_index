@@ -26,6 +26,21 @@
       }
     }
   }
+  .form-submit-button {
+    @include make-col-ready();
+    @include media-breakpoint-up(sm) {
+      @include make-col(8);
+      @include make-col-offset(4);
+    }
+  }
+  .export-included-columns-label {
+    @extend .less-strong;
+    margin-bottom: 0;
+    @include media-breakpoint-up(lg) {
+      text-align: right;
+      margin-top: 0.25rem;
+    }
+  }
   .locations-where-and-add {
     padding-bottom: $vertical-height;
     .btn {
