@@ -13,11 +13,11 @@
     = f.label :end_at, "Registered before", class: "org-form-label"
     .form-well-input
       = f.datetime_local_field :end_at, step: 60, class: "form-control"
-  %p.less-strong.offset-md-2.mt-4{ style: "margin-bottom: 0;" }
+  %p.less-strong.mt-4{ style: "margin-bottom: 0;" }
     Included columns:
   - Export.permitted_headers.each do |header|
-    .form-group.row
-      .form-well-input.offset-md-4
+    .form-group
+      .form-well-input
         %label.checkbox
           = f.check_box :headers, { multiple: true, checked: Export.default_headers.include?(header) }, header, 1
           = header.titleize
