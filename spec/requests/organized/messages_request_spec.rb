@@ -12,7 +12,7 @@ describe "Organized::MessagesController" do
       it "returns empty" do
         get base_url, format: :json
         expect(response.status).to eq(200)
-        expect(JSON.parse(response.body)).to eq([])
+        expect(JSON.parse(response.body)).to eq("messages" => [])
         expect(response.headers['Access-Control-Allow-Origin']).not_to be_present
         expect(response.headers['Access-Control-Request-Method']).not_to be_present
       end
@@ -36,7 +36,7 @@ describe "Organized::MessagesController" do
         it "renders json, no cors present" do
           get base_url, format: :json
           expect(response.status).to eq(200)
-          result = JSON.parse(response.body)
+          result = JSON.parse(response.body)["messages"]
           expect(result.count).to eq 1
           expect(result.first).to eq target.as_json
           expect(response.headers['Access-Control-Allow-Origin']).not_to be_present
@@ -53,7 +53,7 @@ describe "Organized::MessagesController" do
           it "returns the matches" do
             get "#{base_url}?per_page=1&page=1", format: :json
             expect(response.status).to eq(200)
-            result = JSON.parse(response.body)
+            result = JSON.parse(response.body)["messages"]
             expect(result.count).to eq 1
             expect(result.first).to eq target.as_json
             expect(response.header["Total"]).to eq("2")

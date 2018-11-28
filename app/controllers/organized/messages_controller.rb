@@ -8,7 +8,7 @@ module Organized
         format.html
         format.json do
           paginate json: searched_organization_messages,
-                   root: false,
+                   root: "messages",
                    each_serializer: OrganizedMessageSerializer,
                    page: params[:page] || 1,
                    per_page: params[:per_page] || 25
