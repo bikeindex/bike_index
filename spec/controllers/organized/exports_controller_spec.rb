@@ -104,6 +104,7 @@ describe Organized::ExportsController, type: :controller do
         {
           start_at: "2016-02-08 05:00:00",
           end_at: nil,
+          file_format: "xlsx",
           timezone: "America/New York",
           headers: %w[link registered_at manufacturer model registered_by]
         }
@@ -114,6 +115,7 @@ describe Organized::ExportsController, type: :controller do
         end.to change(Export, :count).by 1
         export = Export.last
         expect(export.kind).to eq "organization"
+        expect(export.file_format).to eq "xlsx"
         expect(export.user).to eq user
         expect(export.headers).to eq valid_attrs[:headers]
         expect(export.start_at.to_i).to be_within(1).of start_at

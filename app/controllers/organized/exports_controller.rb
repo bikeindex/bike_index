@@ -35,7 +35,7 @@ module Organized
     private
 
     def permitted_parameters
-      params.require(:export).permit(:timezone, :start_at, :end_at, headers: [])
+      params.require(:export).permit(:timezone, :start_at, :end_at, :file_format, headers: [])
     end
 
     def find_export

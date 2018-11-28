@@ -10,7 +10,7 @@ class OrganizationExportWorker
     @export = Export.find(export_id)
     return true if @export.finished?
     @export.update_attribute :progress, "ongoing"
-    write_csv(@export.tmp_file)
+    write_spreadsheet(@export.file_format, @export.tmp_file)
     @export.tmp_file.close # Because buffered output, closing instead of rewinding
     @export.update_attribute :rows, @export.tmp_file_rows
     @export.file = @export.tmp_file
@@ -18,6 +18,13 @@ class OrganizationExportWorker
     @export.save
     @export.tmp_file.unlink # Remove it and unlink
     @export
+  end
+
+  def write_spreadsheet(file_format, file)
+    file_format == "csv" ? write_csv(file) : write_excel(file)
+  end
+
+  def write_excel(file)
   end
 
   def write_csv(file)
