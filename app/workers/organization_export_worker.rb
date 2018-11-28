@@ -25,6 +25,8 @@ class OrganizationExportWorker
   end
 
   def write_excel(file)
+    @export.update_attribute :progress, "finished"
+    raise StandardError, "Excel export not implemented"
   end
 
   def write_csv(file)
