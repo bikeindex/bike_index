@@ -49,7 +49,14 @@ const localizeTimes = function() {
     if (!(text.length > 0)) {
       return;
     }
-    const time = moment(text, moment.ISO_8601);
+    let time = "";
+    if (isNaN(text)) {
+      time = moment(text, moment.ISO_8601);
+    } else {
+      // it's a timestamp!
+      time = moment.unix(text);
+    }
+
     if (!time.isValid) {
       return;
     }
@@ -68,12 +75,23 @@ const renderOrganizedMessages = function(messages) {
   let body_html = "";
   if (messages.length > 0) {
     for (let message of Array.from(messages)) {
-      body_html += "ffff";
+      let bikeCellUrl = `/bikes/${message.bike.id}`;
+      let sentCellUrl = `${window.pageInfo.message_root_path}/${message.id}`;
+      let sender = window.pageInfo.members[message.sender_id];
+      if (sender !== undefined) {
+        sender = sender.name;
+      }
+      body_html += `<tr><td><a href="${sentCellUrl}" class="convertTime">${
+        message.created_at
+      }</a></td><td><a href="${bikeCellUrl}">${
+        message.bike.title
+      }</a></td><td>${sender}</td>`;
     }
   } else {
-    body_html += "<tr><td colspan=4>No messages</td></tr>";
+    body_html += "<tr><td colspan=4>No messages have been sent</td></tr>";
   }
   $("#messages_table tbody").html(body_html);
+  localizeTimes();
 };
 
 const initializeOrganizedMessages = function() {
@@ -81,7 +99,7 @@ const initializeOrganizedMessages = function() {
   $.ajax({
     type: "GET",
     dataType: "json",
-    url: window.pageInfo.current_path,
+    url: window.pageInfo.message_root_path,
     success(data, textStatus, jqXHR) {
       renderOrganizedMessages(data.messages);
     },
