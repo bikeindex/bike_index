@@ -52,6 +52,15 @@ describe OrganizationExportWorker do
         expect(export.file.read).to eq(csv_string)
         expect(export.rows).to eq 0
       end
+      context "xlsx format" do
+        let(:export) { FactoryGirl.create(:export_organization, progress: "pending", file: nil, end_at: Time.now - 1.week, file_format: "xlsx") }
+        it "raises because we haven't made it yet" do
+          expect(bike.organizations.pluck(:id)).to eq([organization.id])
+          expect { instance.perform(export.id) }.to raise_error(/not implemented/)
+          export.reload
+          expect(export.progress).to eq "finished"
+        end
+      end
     end
 
     context "all headers" do
