@@ -46,13 +46,16 @@ gem 'omniauth', '~> 1.3.1'
 gem "fog-aws"
 gem 'dalli'
 gem 'draper', require: false
-gem 'wkhtmltopdf-binary'
-gem 'wicked_pdf'
 gem 'eventmachine'
 gem 'httparty'
 gem "sitemap_generator", "~> 6"
 gem 'paranoia'
 
+# Making other files
+gem "wkhtmltopdf-binary"
+gem "wicked_pdf"
+
+# Rails upgrade
 gem "where-or" # backports rails 5 or query support - TODO: Rails 5 update, remove
 
 # API wrappers

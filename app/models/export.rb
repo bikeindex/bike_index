@@ -1,7 +1,7 @@
 class Export < ActiveRecord::Base
   VALID_PROGRESSES = %i[pending ongoing finished].freeze
   VALID_KINDS = %i[organization stolen manufacturer].freeze
-  VALID_FORMATS = %i[csv].freeze
+  VALID_FILE_FORMATS = %i[csv xlsx].freeze
   DEFAULT_HEADERS = %w[link registered_at manufacturer model color serial is_stolen].freeze
   PERMITTED_HEADERS = (DEFAULT_HEADERS + %w[thumbnail registered_by registration_type owner_email owner_name]).freeze
   mount_uploader :file, ExportUploader
@@ -10,7 +10,7 @@ class Export < ActiveRecord::Base
   belongs_to :user # Creator of export
   enum progress: VALID_PROGRESSES
   enum kind: VALID_KINDS
-  enum file_format: VALID_FORMATS
+  enum file_format: VALID_FILE_FORMATS
 
   before_validation :set_calculated_attributes
 
