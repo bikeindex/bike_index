@@ -1,5 +1,4 @@
 class OrganizedMessageIndexSerializer < ActiveModel::Serializer
-
   attributes :id, :kind, :created_at, :lat, :lng
 
   def created_at

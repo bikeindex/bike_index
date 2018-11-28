@@ -18,13 +18,19 @@ describe "Organized::MessagesController" do
       end
       context "with a message" do
         let!(:organization_message_1) { FactoryGirl.create(:organization_message, organization: organization, kind: "geolocated", created_at: Time.now - 1.hour) }
+        let(:bike) { organization_message_1.bike }
         let(:target) do
           {
             id: organization_message_1.id,
             kind: "geolocated",
             created_at: organization_message_1.created_at.to_i,
             lat: organization_message_1.latitude,
-            lng: organization_message_1.longitude
+            lng: organization_message_1.longitude,
+            sender_id: organization_message_1.sender_id,
+            bike: {
+              id: bike.id,
+              title: bike.title_string
+            }
           }
         end
         it "renders json, no cors present" do
@@ -37,7 +43,13 @@ describe "Organized::MessagesController" do
           expect(response.headers['Access-Control-Request-Method']).not_to be_present
         end
         context "with parameters" do
-          let!(:organization_message_2) { FactoryGirl.create(:organization_message, organization: organization, kind: "geolocated", created_at: Time.now - 1.day) }
+          let!(:organization_message_2) do
+            FactoryGirl.create(:organization_message,
+                               organization: organization,
+                               kind: "geolocated",
+                               created_at: Time.now - 1.day,
+                               bike: bike)
+          end
           it "returns the matches" do
             get "#{base_url}?per_page=1&page=1", format: :json
             expect(response.status).to eq(200)
