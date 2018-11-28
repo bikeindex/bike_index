@@ -2,7 +2,7 @@
   %h1
     %em
       = current_organization.name
-    #{@kind.titleize} Messages
+    #{[@kind].flatten.map(&:titleize).join(", ")} Messages
 
 %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
   %thead.small-header

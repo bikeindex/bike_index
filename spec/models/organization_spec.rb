@@ -265,6 +265,8 @@ describe Organization do
       organization.update_attributes(geolocated_emails: true, abandoned_bike_emails: true)
       expect(organization.organization_message_kinds).to match_array(%w[geolocated abandoned_bike])
       expect(organization.permitted_message_kind?("abandoned_bike")).to be_truthy
+      expect(organization.permitted_message_kind?(%w[geolocated abandoned_bike])).to be_truthy
+      expect(organization.permitted_message_kind?(%w[geolocated abandoned_bike weird_type])).to be_falsey
       # TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
       user.update_attributes(updated_at: Time.now)
       expect(user.bike_actions_organization_id).to eq organization.id

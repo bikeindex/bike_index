@@ -87,8 +87,13 @@ class Organization < ActiveRecord::Base
     ].compact
   end
 
-  def permitted_message_kind?(kind)
-    organization_message_kinds.include?(kind.to_s)
+  def permitted_message_kind?(kinds)
+    # If kinds is an array, make sure they all are permitted kinds
+    if kinds.is_a?(Array)
+      return false unless kinds.any?
+      return kinds.none? { |k| !permitted_message_kind?(k) }
+    end
+    organization_message_kinds.include?(kinds.to_s)
   end
 
   def bike_actions? # Eventually there will be other actions beside organization_messages, so use this as general reference
