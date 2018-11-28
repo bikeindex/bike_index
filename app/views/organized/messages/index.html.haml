@@ -15,6 +15,7 @@
     %th
       Address
   %tbody
+    - @organization_messages = organization_messages
     - @organization_messages.each do |organization_message|
       %tr
         %td

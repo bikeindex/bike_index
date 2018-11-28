@@ -4,7 +4,10 @@ module Organized
     before_action :ensure_permitted_message_kind!, only: [:index, :create]
 
     def index
-      @organization_messages = organization_messages
+      respond_to do |format|
+        format.html
+        format.json { render json: searched_organization_messages }
+      end
     end
 
     def show
@@ -28,6 +31,10 @@ module Organized
 
     def organization_messages
       current_organization.organization_messages
+    end
+
+    def searched_organization_messages
+      []
     end
 
     def ensure_permitted_message_kind!
