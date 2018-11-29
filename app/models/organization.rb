@@ -149,6 +149,15 @@ class Organization < ActiveRecord::Base
   def require_address_on_registration?; require_address_on_registration end
   def use_additional_registration_field?; use_additional_registration_field end
 
+  # Can be improved later, for now just always get a location for the map
+  def map_focus_coordinates
+    location = locations&.first
+    {
+      latitude: location&.latitude || 37.7870322,
+      longitude: location&.longitude || -122.4061122
+    }
+  end
+
   def set_auto_user
     if embedable_user_email.present?
       u = User.fuzzy_email_find(embedable_user_email)

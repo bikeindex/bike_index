@@ -18,6 +18,8 @@
 :javascript
   window.pageInfo = {
     "google_maps_key": "#{ENV["GOOGLE_MAPS"]}",
+    "map_center_lat": #{current_organization.map_focus_coordinates[:latitude]},
+    "map_center_lng": #{current_organization.map_focus_coordinates[:longitude]},
     "members": #{serialized_members},
     "message_root_path": "#{organization_messages_path(organization_id: current_organization.to_param)}"
   }

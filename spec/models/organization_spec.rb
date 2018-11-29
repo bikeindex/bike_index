@@ -54,6 +54,22 @@ describe Organization do
     end
   end
 
+  describe "map_coordinates" do
+    # There is definitely a better way to do this!
+    # But for now, just stubbing it because whatever, they haven't put anything in
+    it "defaults to SF" do
+      expect(Organization.new.map_focus_coordinates).to eq(latitude: 37.7870322, longitude: -122.4061122)
+    end
+    context "organization with a location" do
+      let(:location) { FactoryGirl.create(:location) }
+      let!(:organization) { location.organization }
+      it "is the locations coordinates" do
+        organization.reload # Somehow doesn't pick this up - TODO: Rails 5 update
+        expect(organization.map_focus_coordinates).to eq(latitude: 41.9282162, longitude: -87.6327552)
+      end
+    end
+  end
+
   describe "is_paid and paid_for? calculations" do
     let(:paid_feature) { FactoryGirl.create(:paid_feature, amount_cents: 10_000, name: "CSV Exports") }
     let(:invoice) { FactoryGirl.create(:invoice_paid, amount_due: 0) }

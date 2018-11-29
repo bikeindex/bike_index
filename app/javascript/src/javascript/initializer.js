@@ -90,13 +90,25 @@ const googleMapsLoaded = function() {
   return typeof google === "object" && typeof google.maps === "object";
 };
 
-// Window function because we're calling it from google maps callback
-// it calls itself if we haven't loaded google maps and if we haven't
+// Window function because we're calling it from google maps callback.
+// it loops and calls itself again if we haven't finished rendering the map and the messages
 window.mapOrganizedMessages = function() {
   if (googleMapsLoaded()) {
     log.warn("maps LOADED");
     if (!window.messagePageStatus.mapReady) {
-      // render the actual map,
+      var center = new google.maps.LatLng(
+        window.pageInfo.map_center_lat,
+        window.pageInfo.map_center_lng
+      );
+      var myOptions = {
+        zoom: 13,
+        center: center,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      };
+      window.map = new google.maps.Map(
+        document.getElementById("map"),
+        myOptions
+      );
       window.messagePageStatus.mapReady = true;
     }
     // If the message list is rendered, it means we could be finished rendering!
