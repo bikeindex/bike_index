@@ -11,6 +11,7 @@
     - else
       = link_to "Include Empty", organization_bulk_imports_path(organization_id: current_organization.to_param, with_empty: true), class: "btn btn-lg btn-secondary"
   = paginate @bulk_imports
+
 %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
   %thead.small-header
     %th

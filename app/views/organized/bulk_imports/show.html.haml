@@ -1,26 +1,35 @@
 .mb-4
   %h1
     Bulk import
-%ul.organized-show-list
-  %li
-    Created:
-    %span.convertTime
-      = l @bulk_import.created_at, format: :convert_time
+%table.organized-list-table
+  %tbody
+    %tr
+      %td
+        Created
+      %td
+        %span.convertTime
+          = l @bulk_import.created_at, format: :convert_time
 
-  %li
-    Progress:
-    = @bulk_import.progress
+    %tr
+      %td
+        Progress
+      %td
+        = @bulk_import.progress
 
-  %li
-    File:
-    = link_to @bulk_import.file_url.truncate(100), @bulk_import.file_url
+    %tr
+      %td
+        File
+      %td
+        = link_to @bulk_import.file_url.truncate(100), @bulk_import.file_url
 
-  %li
-    Creator:
-    - if @bulk_import.user.present?
-      = @bulk_import.user.display_name
-    - else
-      None
+    %tr
+      %td
+        Creator
+      %td
+        - if @bulk_import.user.present?
+          = @bulk_import.user.display_name
+        - else
+          None
 
 %hr{ style: "margin: 15px 0;" }
 - if @bulk_import.import_errors?
