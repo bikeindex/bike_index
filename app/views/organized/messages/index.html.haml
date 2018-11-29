@@ -14,8 +14,7 @@
       Sender
   %tbody
 
-/ # - cache "organized-members-#{current_organization.to_param}-#{current_organization.updated_at.to_i}", skip_digest: true do # no digests because we're writing our own cache key
-- serialized_members = current_organization.users.map { |u| u && [u.id.to_s, { name: u.name }] }.compact.to_h.to_json
+- serialized_members = current_organization.users.map { |u| u && [u.id.to_s, { name: u.display_name }] }.compact.to_h.to_json
 :javascript
   window.pageInfo = {
     "google_maps_key": "#{ENV["GOOGLE_MAPS"]}",

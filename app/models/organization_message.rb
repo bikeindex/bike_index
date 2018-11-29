@@ -32,7 +32,8 @@ class OrganizationMessage < ActiveRecord::Base
   end
 
   def send_email_message
-    EmailOrganizationMessageWorker.perform_async(id)
+    # Enable skipping so we can generate sample messages
+    EmailOrganizationMessageWorker.perform_async(id) unless ENV["SKIP_ORGANIZED_MESSAGE_SEND"]
   end
 
   def subject
