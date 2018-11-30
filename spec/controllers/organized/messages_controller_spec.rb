@@ -101,17 +101,6 @@ describe Organized::MessagesController, type: :controller do
       expect(response).to render_with_layout("application_revised")
       expect(assigns(:current_organization)).to eq organization
     end
-    # context "json" do
-    #   let(:organization_message_1) { FactoryGirl.create(:organization_message, organization: organization, kind: "geolocated", created_at: Time.now - 1.day) }
-    #   let(:organization_message_2) { FactoryGirl.create(:organization_message, organization: organization, kind: "geolocated", created_at: Time.now - 1.hour) }
-    #   it "renders" do
-    #     get :index, organization_id: organization.to_param, kind: "geolocated"
-    #     expect(response.status).to eq(200)
-    #     expect(response).to render_template :index
-    #     expect(response).to render_with_layout("application_revised")
-    #     expect(assigns(:current_organization)).to eq organization
-    #   end
-    # end
   end
 
   describe "show" do
