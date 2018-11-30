@@ -6,7 +6,7 @@ class Membership < ActiveRecord::Base
   acts_as_paranoid
 
   belongs_to :user
-  belongs_to :organization, touch: true
+  belongs_to :organization
 
   validates_presence_of :role, message: 'How the hell did you manage to not choose a role? You have to choose one.'
   validates_presence_of :organization, message: "Sorry, organization doesn't exist"
