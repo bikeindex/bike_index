@@ -49,24 +49,31 @@ describe UsersController do
           end.to change(User, :count).by(1)
           expect(flash).to_not be_present
           expect(response).to render_with_layout("application_revised")
+          expect(User.order(:created_at).last.sign_up_partner).to be_nil
         end
         it "creates a confirmed user, log in, and send welcome if user has org invite" do
           expect_any_instance_of(CreateUserJobs).to receive(:send_welcome_email)
           organization_invitation = FactoryGirl.create(:organization_invitation, invitee_email: "poo@pile.com")
-          post :create, user: FactoryGirl.attributes_for(:user, email: "poo@pile.com")
+          post :create, user: FactoryGirl.attributes_for(:user, email: "poo@pile.com"), partner: "somethingcool"
           expect(User.from_auth(cookies.signed[:auth])).to eq(User.fuzzy_email_find("poo@pile.com"))
           expect(response).to redirect_to(user_home_url)
+          expect(User.order(:created_at).last.sign_up_partner).to be_nil
         end
         context "with partner param" do
+          let(:user_attributes) { FactoryGirl.attributes_for(:user) }
           it "renders parter sign in page" do
             session[:partner] = "bikehub"
             expect do
-              post :create, user: FactoryGirl.attributes_for(:user), partner: "bikehub"
+              post :create, user: user_attributes, partner: "bikehub"
             end.to change(User, :count).by(1)
             expect(flash).to_not be_present
             expect(response).to render_template("create")
             expect(response).to render_with_layout("application_revised_bikehub")
             expect(session[:partner]).to be_nil
+            user = User.order(:created_at).last
+            expect(user.email).to eq(user_attributes[:email])
+            expect(user.sign_up_partner).to eq "bikehub"
+            expect(user.partner_data).to eq(sign_up: "bikehub")
           end
         end
       end
