@@ -87,16 +87,6 @@ FactoryGirl.define do
     association :ctype
   end
 
-  factory :location do
-    name
-    association :organization
-    association :country
-    association :state
-    zipcode '60647'
-    city 'Chicago'
-    street 'foo address'
-  end
-
   factory :country do
     name
     sequence(:iso) { |n| "D#{n}" }

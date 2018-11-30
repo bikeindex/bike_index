@@ -4,43 +4,56 @@
       = current_organization.name
     #{@organization_message.kind.titleize} Message
 
-%ul.organized-show-list
-  %li
-    Created:
-    %span.convertTime
-      = l @organization_message.created_at, format: :convert_time
+%table.organized-list-table
+  %tbody
+    %tr
+      %td
+        Created
+      %td
+        %span.convertTime
+          = l @organization_message.created_at, format: :convert_time
 
-  %li
-    Delivered:
-    - if @organization_message.delivery_status == "success"
-      %span.text-success
-        Success
-    - elsif @organization_message.delivery_status.blank?
-      %em.text-warning
-        Pending delivery
-    - else
-      %span.text-danger
-        = @organization_message.delivery_status
+    %tr
+      %td
+        Delivered
+      %td
+        - if @organization_message.delivery_status == "success"
+          %span.text-success
+            Success
+        - elsif @organization_message.delivery_status.blank?
+          %em.text-warning
+            Pending delivery
+        - else
+          %span.text-danger
+            = @organization_message.delivery_status
 
-  %li
-    Sender: #{@organization_message.sender.display_name}
+    %tr
+      %td
+        Sender
+      %td
+        = @organization_message.sender.display_name
+    %tr
+      %td
+        Bike
+      %td
+        - if @bike.present?
+          = link_to organized_bike_text(@bike), bike_path(@bike)
 
-  %li
-    Bike: 
-    - if @bike.present?
-      = link_to organized_bike_text(@bike), bike_path(@bike)
+    %tr
+      %td
+        Subject
+      %td
+        = @organization_message.subject
 
-  %li
-    Subject:
-    = @organization_message.subject
-
-  %li
-    Additional text:
-    - if @organization_message.body.present?
-      = @organization_message.body
-    - else
-      %em.less-strong
-        none
+    %tr
+      %td
+        Additional text
+      %td
+        - if @organization_message.body.present?
+          = @organization_message.body
+        - else
+          %em.less-strong
+            none
 
 #map_canvas{ style: "height: 400px;" }
 

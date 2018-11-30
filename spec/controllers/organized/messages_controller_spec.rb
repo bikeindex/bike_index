@@ -94,13 +94,6 @@ describe Organized::MessagesController, type: :controller do
         expect(flash[:error]).to be_present
       end
     end
-    context "no kind" do
-      it "redirects" do
-        get :index, organization_id: organization.to_param
-        expect(response).to redirect_to organization_messages_path(organization_id: organization.to_param, kind: "geolocated")
-        expect(flash[:error]).to be_present
-      end
-    end
     it "renders" do
       get :index, organization_id: organization.to_param, kind: "geolocated"
       expect(response.status).to eq(200)

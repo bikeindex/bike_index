@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe 'Search API V3' do
-  # For the time being, only count is implemented
   let(:manufacturer) { FactoryGirl.create(:manufacturer) }
   let(:color) { FactoryGirl.create(:color) }
   describe '/' do

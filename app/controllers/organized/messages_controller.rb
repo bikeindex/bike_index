@@ -1,10 +1,19 @@
 module Organized
   class MessagesController < Organized::BaseController
     rescue_from ActionController::RedirectBackError, with: :redirect_back # Gross. TODO: Rails 5 update
-    before_action :ensure_permitted_message_kind!, only: [:index, :create]
+    before_action :ensure_permitted_message_kind!, only: %i[index create]
 
     def index
-      @organization_messages = organization_messages
+      respond_to do |format|
+        format.html
+        format.json do
+          paginate json: searched_organization_messages,
+                   root: "messages",
+                   each_serializer: OrganizedMessageSerializer,
+                   page: params[:page] || 1,
+                   per_page: params[:per_page] || 25
+        end
+      end
     end
 
     def show
@@ -30,8 +39,13 @@ module Organized
       current_organization.organization_messages
     end
 
+    def searched_organization_messages
+      organization_messages.reorder(created_at: :desc)
+    end
+
     def ensure_permitted_message_kind!
       @kind = params[:organization_message].present? ? params[:organization_message][:kind] : params[:kind]
+      @kind ||= current_organization.organization_message_kinds
       return true if current_organization.permitted_message_kind?(@kind)
       flash[:error] = "Your organization doesn't have access to that, please contact Bike Index support"
       if current_organization.organization_message_kinds.any?

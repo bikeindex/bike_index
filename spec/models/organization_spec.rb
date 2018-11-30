@@ -54,6 +54,22 @@ describe Organization do
     end
   end
 
+  describe "map_coordinates" do
+    # There is definitely a better way to do this!
+    # But for now, just stubbing it because whatever, they haven't put anything in
+    it "defaults to SF" do
+      expect(Organization.new.map_focus_coordinates).to eq(latitude: 37.7870322, longitude: -122.4061122)
+    end
+    context "organization with a location" do
+      let(:location) { FactoryGirl.create(:location) }
+      let!(:organization) { location.organization }
+      it "is the locations coordinates" do
+        organization.reload # Somehow doesn't pick this up - TODO: Rails 5 update
+        expect(organization.map_focus_coordinates).to eq(latitude: 41.9282162, longitude: -87.6327552)
+      end
+    end
+  end
+
   describe "is_paid and paid_for? calculations" do
     let(:paid_feature) { FactoryGirl.create(:paid_feature, amount_cents: 10_000, name: "CSV Exports") }
     let(:invoice) { FactoryGirl.create(:invoice_paid, amount_due: 0) }
@@ -265,6 +281,8 @@ describe Organization do
       organization.update_attributes(geolocated_emails: true, abandoned_bike_emails: true)
       expect(organization.organization_message_kinds).to match_array(%w[geolocated abandoned_bike])
       expect(organization.permitted_message_kind?("abandoned_bike")).to be_truthy
+      expect(organization.permitted_message_kind?(%w[geolocated abandoned_bike])).to be_truthy
+      expect(organization.permitted_message_kind?(%w[geolocated abandoned_bike weird_type])).to be_falsey
       # TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
       user.update_attributes(updated_at: Time.now)
       expect(user.bike_actions_organization_id).to eq organization.id
