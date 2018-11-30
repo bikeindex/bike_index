@@ -15,12 +15,14 @@ module AuthenticationHelper
     end
   end
 
-  def render_partner_or_default_signin_layout(render_action: nil)
+  def render_partner_or_default_signin_layout(render_action: nil, redirect_path: nil)
     # We set partner in session because of AuthorizationsController - but we don't want the session to stick around
     # so people can navigate around the site and return to the sign in without unexpected results
     @partner = params[:partner] || session.delete(:partner)
     layout = @partner == "bikehub" ? "application_revised_bikehub" : "application_revised"
-    if render_action
+    if redirect_path
+      redirect_to redirect_path, layout: layout
+    elsif render_action
       render action: render_action, layout: layout
     else
       render layout: layout

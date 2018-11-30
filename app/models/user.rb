@@ -225,7 +225,7 @@ class User < ActiveRecord::Base
     organizations.shop.any?
   end
 
-  def sign_up_partner
+  def partner_sign_up
     partner_data && partner_data["sign_up"].present? ? partner_data["sign_up"] : nil
   end
 

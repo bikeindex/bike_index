@@ -33,6 +33,10 @@
       .row
         %p
           BikeHub accounts are powered by Bike Index – the premier bike registry.
+          = signup_page ? "Creating an account" : "Logging in"
+          here will 
+          = signup_page ? "sign you up for" : "log you in to"
+          BikeHub.
 
     = render "layouts/revised_messages"
     = yield

@@ -17,7 +17,7 @@ class UsersController < ApplicationController
   def create
     @user = User.new(permitted_parameters)
     if @user.save
-      session[:partner] = nil
+      session[:partner] = nil # So they can leave this signup page if they want
       if @user.confirmed
         sign_in_and_redirect
       else
@@ -33,7 +33,8 @@ class UsersController < ApplicationController
     begin
       @user = User.find(params[:id])
       if @user.confirmed?
-        redirect_to new_session_url, notice: "Your user account is already confirmed. Please log in"
+        flash[:success] = "Your user account is already confirmed. Please log in"
+        render_partner_or_default_signin_layout(redirect_path: new_session_path)
       else
         if @user.confirm(params[:code])
           sign_in_and_redirect

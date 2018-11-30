@@ -10,13 +10,15 @@ module Sessionable
 
   def sign_in_and_redirect
     session[:last_seen] = Time.now
-    session[:partner] = nil
     if params[:session].present? && params[:session][:remember_me].present? && params[:session][:remember_me].to_s == '1'
       cookies.permanent.signed[:auth] = cookie_options
     else
       default_session_set
     end
-    unless return_to_if_present
+    if params[:partner].present? || session[:partner].present?
+      session[:partner] = nil # Ensure they won't be redirected in the future
+      redirect_to "https://new.bikehub.com/account"
+    elsif !return_to_if_present
       flash[:success] = 'Logged in!'
       redirect_to user_root_url and return
     end

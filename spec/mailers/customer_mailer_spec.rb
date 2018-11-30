@@ -15,9 +15,19 @@ describe CustomerMailer do
   describe 'confirmation_email' do
     it 'renders email' do
       mail = CustomerMailer.confirmation_email(user)
-      expect(mail.subject).to eq('Welcome to Bike Index!')
+      expect(mail.subject).to eq("Please confirm your Bike Index email!")
       expect(mail.to).to eq([user.email])
-      expect(mail.from).to eq(['contact@bikeindex.org'])
+      expect(mail.from).to eq(["contact@bikeindex.org"])
+    end
+    context "partner signup" do
+      let(:user) { FactoryGirl.create(:user_bikehub_signup) }
+      it "renders bikehub partner email" do
+        expect(user.partner_sign_up).to eq "bikehub"
+        mail = CustomerMailer.confirmation_email(user)
+        expect(mail.subject).to eq("Please confirm your Bike Index email!")
+        expect(mail.to).to eq([user.email])
+        expect(mail.from).to eq(["contact@bikeindex.org"])
+      end
     end
   end
 
