@@ -12,11 +12,18 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
   init() {
     // load the maps API
     binxMapping.loadMap("binxAppOrgMessages.mapOrganizedMessages");
-    // Fetch the messages. Using ajax here instead of fetch because we're relying on the cookies for auth for now
+    binxAppOrgMessages.fetchMessages([["per_page", 50]]);
+  }
+
+  fetchMessages(opts) {
+    // lazy parameter to query string
+    let queryString = opts.map(i => `${i[0]}=${i[1]}`);
+    let url = `${window.pageInfo.message_root_path}?${queryString.join("&")}`;
+    // Using ajax here instead of fetch because we're relying on the cookies for auth for now
     $.ajax({
       type: "GET",
       dataType: "json",
-      url: window.pageInfo.message_root_path,
+      url: url,
       success(data, textStatus, jqXHR) {
         binxAppOrgMessages.fetchedMessages = true;
         binxAppOrgMessages.renderOrganizedMessages(data.messages);
@@ -31,8 +38,6 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
   // this loops and calls itself again if we haven't finished rendering the map and the messages
   mapOrganizedMessages() {
     if (binxMapping.googleMapsLoaded()) {
-      log.warn("maps LOADED");
-
       if (!binxAppOrgMessages.mapReady) {
         binxMapping.render(
           window.pageInfo.map_center_lat,
@@ -48,7 +53,7 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
           return true;
         }
         // Otherwise we rendered the list without rendering the map points, so just render
-        binxMapping.addMarkers();
+        binxMapping.addMarkers(true);
         binxAppOrgMessages.messagesMapRendered = true;
         return true;
       }
@@ -72,8 +77,13 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
     }</a></td><td>${sender}</td>`;
   }
 
-  geolocatedMapPopup(point) {
-    return `${JSON.stringify(point)}`;
+  geolocatedMessageMapPopup(point) {
+    let message = _.find(binxAppOrgMessages.messages, ["id", point.id]);
+    let tableTop =
+      '<table class="table table table-striped table-hover table-bordered table-sm"><tbody><tr><td>Sent</td><td>Bike</td><td>Sender</td></tr>';
+    return `${tableTop}${binxAppOrgMessages.tableRowForMessage(
+      message
+    )}</tbody></table>`;
   }
 
   addMarkerPointsForMessages(messages) {
