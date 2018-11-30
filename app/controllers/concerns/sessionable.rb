@@ -15,7 +15,7 @@ module Sessionable
     else
       default_session_set
     end
-    if params[:partner].present? || session[:partner].present?
+    if params[:partner].present? || session[:partner].present? # Check present? of both in case one is empty
       session[:partner] = nil # Ensure they won't be redirected in the future
       redirect_to "https://new.bikehub.com/account"
     elsif !return_to_if_present
