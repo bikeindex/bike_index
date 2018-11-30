@@ -225,6 +225,10 @@ class User < ActiveRecord::Base
     organizations.shop.any?
   end
 
+  def partner_sign_up
+    partner_data && partner_data["sign_up"].present? ? partner_data["sign_up"] : nil
+  end
+
   def bikes(user_hidden=true)
     Bike.unscoped.where(id: bike_ids(user_hidden))
   end

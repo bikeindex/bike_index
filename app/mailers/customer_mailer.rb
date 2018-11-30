@@ -12,6 +12,7 @@ class CustomerMailer < ActionMailer::Base
 
   def confirmation_email(user)
     @user = user
+    @partner = @user.partner_sign_up
     mail(to: @user.email)
   end
 

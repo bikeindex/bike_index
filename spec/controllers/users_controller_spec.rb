@@ -49,24 +49,31 @@ describe UsersController do
           end.to change(User, :count).by(1)
           expect(flash).to_not be_present
           expect(response).to render_with_layout("application_revised")
+          expect(User.order(:created_at).last.partner_sign_up).to be_nil
         end
         it "creates a confirmed user, log in, and send welcome if user has org invite" do
           expect_any_instance_of(CreateUserJobs).to receive(:send_welcome_email)
           organization_invitation = FactoryGirl.create(:organization_invitation, invitee_email: "poo@pile.com")
-          post :create, user: FactoryGirl.attributes_for(:user, email: "poo@pile.com")
+          post :create, user: FactoryGirl.attributes_for(:user, email: "poo@pile.com"), partner: "somethingcool"
           expect(User.from_auth(cookies.signed[:auth])).to eq(User.fuzzy_email_find("poo@pile.com"))
-          expect(response).to redirect_to(user_home_url)
+          expect(response).to redirect_to("https://new.bikehub.com/account")
+          expect(User.order(:created_at).last.partner_sign_up).to be_nil
         end
         context "with partner param" do
+          let(:user_attributes) { FactoryGirl.attributes_for(:user) }
           it "renders parter sign in page" do
             session[:partner] = "bikehub"
             expect do
-              post :create, user: FactoryGirl.attributes_for(:user), partner: "bikehub"
+              post :create, user: user_attributes, partner: "bikehub"
             end.to change(User, :count).by(1)
             expect(flash).to_not be_present
             expect(response).to render_template("create")
             expect(response).to render_with_layout("application_revised_bikehub")
             expect(session[:partner]).to be_nil
+            user = User.order(:created_at).last
+            expect(user.email).to eq(user_attributes[:email])
+            expect(user.partner_sign_up).to eq "bikehub"
+            expect(user.partner_data).to eq({ sign_up: "bikehub" }.as_json)
           end
         end
       end
@@ -109,12 +116,30 @@ describe UsersController do
           end
 
           it "logins and redirect when confirmation succeeds" do
-            session[:partner] = "bikehub"
             expect(@user).to receive(:confirm).and_return(true)
             get :confirm, id: @user.id, code: @user.confirmation_token
             expect(User.from_auth(cookies.signed[:auth])).to eq(@user)
             expect(response).to redirect_to user_home_url
             expect(session[:partner]).to be_nil
+          end
+          context "with partner" do
+            it "logins and redirect when confirmation succeeds" do
+              expect(@user).to receive(:confirm).and_return(true)
+              get :confirm, id: @user.id, code: @user.confirmation_token, partner: "bikehub"
+              expect(User.from_auth(cookies.signed[:auth])).to eq(@user)
+              expect(response).to redirect_to "https://new.bikehub.com/account"
+              expect(session[:partner]).to be_nil
+            end
+            context "in session" do
+              it "logins and redirect when confirmation succeeds" do
+                session[:partner] = "bikehub"
+                expect(@user).to receive(:confirm).and_return(true)
+                get :confirm, id: @user.id, code: @user.confirmation_token
+                expect(User.from_auth(cookies.signed[:auth])).to eq(@user)
+                expect(response).to redirect_to "https://new.bikehub.com/account"
+                expect(session[:partner]).to be_nil
+              end
+            end
           end
 
           it 'shows a view when confirmation fails' do

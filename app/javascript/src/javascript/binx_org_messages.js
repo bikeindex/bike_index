@@ -30,7 +30,7 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
       },
       error(data, textStatus, jqXHR) {
         binxAppOrgMessages.fetchedMessages = true;
-        log.warn(data);
+        log.debug(data);
       }
     });
   }
@@ -59,7 +59,7 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
       }
     }
     // call this again in .5 seconds, unless we returned prematurely (because things have rendered)
-    log.warn("looping mapOrganizedMessages");
+    log.debug("looping mapOrganizedMessages");
     setTimeout(binxAppOrgMessages.mapOrganizedMessages, 500);
   }
 

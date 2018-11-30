@@ -3,7 +3,7 @@ en:
     welcome_email:
       subject: Welcome to Bike Index!
     confirmation_email:
-      subject: Welcome to Bike Index!
+      subject: Please confirm your Bike Index email!
     invoice_email:
       subject: Thank you for supporting Bike Index!
     password_reset_email:

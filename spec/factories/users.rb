@@ -6,8 +6,9 @@ FactoryGirl.define do
     password_confirmation 'testthisthing7$'
     terms_of_service true
     factory :confirmed_user do
-      after(:create) do |user|
-        user.confirm(user.confirmation_token)
+      after(:create) { |u| u.confirm(u.confirmation_token) }
+      factory :user_bikehub_signup do
+        partner_data { { sign_up: "bikehub" } }
       end
       factory :admin do
         superuser true

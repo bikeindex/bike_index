@@ -87,7 +87,7 @@ window.BinxMapping = class BinxMapping {
     if (binxMapping.kind == "geolocated_messages") {
       popupContent = binxAppOrgMessages.geolocatedMessageMapPopup(point);
     } else {
-      log.warn(binxMapping.kind);
+      log.debug(binxMapping.kind);
       popupContent = "Missing template!";
     }
     window.infoWindow.setContent(popupContent);
@@ -96,12 +96,12 @@ window.BinxMapping = class BinxMapping {
   }
 
   addMarkers(fit_map) {
-    log.warn(`adding markers - fit_map: ${fit_map}`);
+    log.debug(`adding markers - fit_map: ${fit_map}`);
     while (binxMapping.markerPointsToRender.length > 0) {
       let point = binxMapping.markerPointsToRender.shift();
       let markerId = point.id;
       if (_.find(binxMapping.markersRendered, ["id", point.id])) {
-        log.warn(`already rendered point: ${point.id}`);
+        log.debug(`already rendered point: ${point.id}`);
       } else {
         let marker = new google.maps.Marker({
           position: new google.maps.LatLng(point.lat, point.lng),

@@ -705,7 +705,6 @@ CREATE TABLE public.exports (
 --
 
 CREATE SEQUENCE public.exports_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2131,7 +2130,8 @@ CREATE TABLE public.users (
     my_bikes_hash text,
     is_emailable boolean DEFAULT false NOT NULL,
     developer boolean DEFAULT false NOT NULL,
-    bike_actions_organization_id integer
+    bike_actions_organization_id integer,
+    partner_data json
 );
 
 
@@ -4083,4 +4083,6 @@ INSERT INTO schema_migrations (version) VALUES ('20180818194244');
 INSERT INTO schema_migrations (version) VALUES ('20180911215238');
 
 INSERT INTO schema_migrations (version) VALUES ('20180918220604');
+
+INSERT INTO schema_migrations (version) VALUES ('20181130200131');
 
