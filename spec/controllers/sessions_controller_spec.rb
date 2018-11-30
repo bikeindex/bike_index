@@ -60,7 +60,7 @@ describe SessionsController do
           request.env["HTTP_REFERER"] = user_home_url
           post :create, session: { password: "would be correct" }
           expect(cookies.signed[:auth][1]).to eq(@user.auth_token)
-          expect(response).to redirect_to user_home_url
+          expect(response).to redirect_to "https://new.bikehub.com/account"
           expect(session[:partner]).to be_nil
         end
 
