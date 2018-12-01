@@ -42,24 +42,6 @@ describe "Organized::MessagesController" do
           expect(response.headers['Access-Control-Allow-Origin']).not_to be_present
           expect(response.headers['Access-Control-Request-Method']).not_to be_present
         end
-        context "with parameters" do
-          let!(:organization_message_2) do
-            FactoryGirl.create(:organization_message,
-                               organization: organization,
-                               kind: "geolocated",
-                               created_at: Time.now - 1.day,
-                               bike: bike)
-          end
-          it "returns the matches" do
-            get "#{base_url}?per_page=1&page=1", format: :json
-            expect(response.status).to eq(200)
-            result = JSON.parse(response.body)["messages"]
-            expect(result.count).to eq 1
-            expect(result.first).to eq target.as_json
-            expect(response.header["Total"]).to eq("2")
-            expect(response.header["link"]).to match(/#{base_url}/)
-          end
-        end
       end
     end
   end

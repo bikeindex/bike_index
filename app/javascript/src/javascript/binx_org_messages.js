@@ -1,4 +1,5 @@
 import * as log from "loglevel";
+if (process.env.NODE_ENV != "production") log.setLevel("debug");
 
 window.BinxAppOrgMessages = class BinxAppOrgMessages {
   constructor() {
@@ -114,6 +115,8 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
 
     // Render the body - whether it says no messages or messages
     $("#messages_table tbody").html(body_html);
+
+    $("#messagesCount").text(`${messages.length} matching messages`);
 
     // Set the markers for the map, it can render as soon as messageListRendered is true
     binxAppOrgMessages.addMarkerPointsForMessages(messages);

@@ -7,11 +7,9 @@ module Organized
       respond_to do |format|
         format.html
         format.json do
-          paginate json: searched_organization_messages,
-                   root: "messages",
-                   each_serializer: OrganizedMessageSerializer,
-                   page: params[:page] || 1,
-                   per_page: params[:per_page] || 25
+          render json: organization_messages.reorder(created_at: :desc),
+                 root: "messages",
+                 each_serializer: OrganizedMessageSerializer
         end
       end
     end
@@ -37,10 +35,6 @@ module Organized
 
     def organization_messages
       current_organization.organization_messages
-    end
-
-    def searched_organization_messages
-      organization_messages.reorder(created_at: :desc)
     end
 
     def ensure_permitted_message_kind!
