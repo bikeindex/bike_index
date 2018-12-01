@@ -83,6 +83,13 @@ window.BinxMapping = class BinxMapping {
     return (window.renderedMarkerIds = []);
   }
 
+  markersInViewport() {
+    let bounds = binxMap.getBounds();
+    return _.filter(binxMapping.markersRendered, function(m) {
+      return bounds.contains(m.getPosition());
+    });
+  }
+
   renderMarker(point) {
     let popupContent = "";
     if (binxMapping.kind == "geolocated_messages") {

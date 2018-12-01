@@ -53,15 +53,31 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
         if (binxAppOrgMessages.messagesMapRendered) {
           return true;
         }
-        // Otherwise we rendered the list without rendering the map points, so just render
-        binxMapping.addMarkers(true);
-        binxAppOrgMessages.messagesMapRendered = true;
-        return true;
+        // Otherwise we rendered the list without rendering the map points, so render
+        return binxAppOrgMessages.inititalizeMapMarkers();
       }
     }
     // call this again in .5 seconds, unless we returned prematurely (because things have rendered)
     log.debug("looping mapOrganizedMessages");
     setTimeout(binxAppOrgMessages.mapOrganizedMessages, 500);
+  }
+
+  inititalizeMapMarkers() {
+    binxMapping.addMarkers(true);
+    binxAppOrgMessages.messagesMapRendered = true;
+
+    // Add a trigger to the map when it becomes idle after panning or zooming.
+    google.maps.event.addListener(binxMap, "idle", function() {
+      // This is grabbing the markers in viewport and logging the ids for them.
+      // We actually need to rerender the the marker table
+      log.debug(
+        _.map(binxMapping.markersInViewport(), function(m) {
+          return m.binxId;
+        })
+      );
+    });
+
+    return true; // returning true for consistency in mapOrganizedMessages
   }
 
   tableRowForMessage(message) {
@@ -116,7 +132,7 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
     // Render the body - whether it says no messages or messages
     $("#messages_table tbody").html(body_html);
 
-    $("#messagesCount").text(`${messages.length} matching messages`);
+    $("#messagesCount").text(`${messages.length} visible messages`);
 
     // Set the markers for the map, it can render as soon as messageListRendered is true
     binxAppOrgMessages.addMarkerPointsForMessages(messages);
