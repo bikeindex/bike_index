@@ -1,15 +1,12 @@
-%h1
-  Welcome to Bike Index
-  - if @partner
-    and #{@partner}
-%p
-  Good thinking! We’re glad you’ve joined.
+%h1.center-text{ style: "margin-top: 2rem;" }
+  You're almost there!
 
-%p{ style: 'margin-bottom: 2em;' }
-  %strong
-    Please confirm your email address.
 
-= link_to 'Verify email', confirm_users_url(id: @user.id, code: @user.confirmation_token, partner: @partner), class: 'binx-button'
+%h3.center-text{ style: "margin: 2rem 0 3rem;" }
+  Please confirm your email address
 
-%p.less-strong.center-text
-  Click the <em>Verify email</em> button to finish signing up for BikeIndex.org!
+= link_to "Verify email", confirm_users_url(id: @user.id, code: @user.confirmation_token, partner: @partner), class: "binx-button"
+
+- unless @partner
+  %p.less-strong.center-text
+    Click the <em>Verify email</em> button to finish signing up!

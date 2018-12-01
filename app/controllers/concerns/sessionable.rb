@@ -19,7 +19,7 @@ module Sessionable
       session[:partner] = nil # Ensure they won't be redirected in the future
       redirect_to "https://new.bikehub.com/account"
     elsif !return_to_if_present
-      flash[:success] = 'Logged in!'
+      flash[:success] = "Logged in!"
       redirect_to user_root_url and return
     end
   end
