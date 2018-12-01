@@ -22,17 +22,31 @@
     max-height: $header-height - $vertical-height;
     width: auto;
   }
-  .logo-plus {
-    color: #555;
-    font-size: 40px;
-    float: right;
-    line-height: 1;
-    margin: 17px 12px 0;
-  }
-  .partner-header-logo {
-    margin-top: 21px; // Margin calculated above is 6px
-    margin-right: 0;
-    height: 45px; // This is also manually set in HTML attrs because of outlook
+  .partner-logo-wrapper {
+    display: block;
+    float: left;
+    background: #fff;
+    height: 84px;
+    // .logo-wrapper {
+    //   background: $gray-darker;
+    //   display: block;
+    //   float: right;
+    //   max-width: 50%;
+    //   padding-left: 1.5 * $vertical-height;
+    // }
+    .logo-plus {
+      color: $gray-darker;
+      font-size: 40px;
+      float: left;
+      line-height: 1;
+      margin: 17px 12px 0;
+    }
+    .partner-header-logo {
+      float: left;
+      margin-top: 21px; // Margin calculated above is 6px
+      margin-right: 0;
+      height: 45px; // This is also manually set in HTML attrs because of outlook
+    }
   }
 }
 

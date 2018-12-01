@@ -10,9 +10,10 @@
       .binx-header
         %img{ src: "https://files.bikeindex.org/email_assets/logo.png", height: "70", alt: "Bike Index logo" }
         - if @partner
-          %span.logo-plus
-            +
-          = image_tag "logos/bikehub_logo.png", height: "50", alt: "BikeHub Logo", class: "partner-header-logo"
+          %span.partner-logo-wrapper
+            = image_tag "logos/bikehub_logo.png", height: "50", alt: "BikeHub Logo", class: "partner-header-logo"
+            %span.logo-plus
+              +
       .binx-body
         - if @organization.present? && controller_path == 'organized_mailer' && @organization.mail_snippet_body('header').present?
           = @organization.mail_snippet_body('header').html_safe
