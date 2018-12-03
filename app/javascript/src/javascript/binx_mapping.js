@@ -106,11 +106,8 @@ window.BinxMapping = class BinxMapping {
         );
         bounds.extend(place.geometry.location);
       });
-      return binxMap.fitBounds(bounds);
+      binxMap.fitBounds(bounds);
     });
-
-    // Record that the place search is rendered
-    return (binxMapping.renderedAddressSearch = true);
   }
 
   clearMarkers() {
