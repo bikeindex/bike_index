@@ -128,13 +128,13 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
     if (sender !== undefined) {
       sender = sender.name;
     }
+    let bikeLink = `<a href="${bikeCellUrl}">${message.bike.title}</a>`;
     return `<tr class="message-row" data-msgid="${
       message.id
     }"><td class="map-cell"><a>↑</a></td><td><a href="${sentCellUrl}" class="convertTime">${
       message.created_at
-    }</a></td><td><a href="${bikeCellUrl}">${
-      message.bike.title
-    }</a></td><td>${sender}</td>`;
+    }</a> <span class="extended-col-info small">by ${sender}</span> <span class="extended-col-info"><br>${bikeLink}</span>
+      </td><td class="hidden-sm-cells">${bikeLink}</td><td class="hidden-sm-cells">${sender}</td>`;
   }
 
   geolocatedMessageMapPopup(point) {

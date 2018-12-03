@@ -263,9 +263,15 @@ body {
 .mb-2 {
   padding-bottom: $vertical-height;
 }
+.small {
+  @extend small;
+}
+// pull-right and pull-left should be replaced by float-right and float-left
+.float-right,
 .pull-right {
   float: right;
 }
+.float-left,
 .pull-left {
   float: right;
 }

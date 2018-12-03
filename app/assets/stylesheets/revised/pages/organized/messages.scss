@@ -16,6 +16,10 @@
       display: inline-block;
     }
   }
+  // We don't want to display extended-col-info except on the main table when the screen is small
+  .extended-col-info {
+    display: none;
+  }
   #messages_table {
     .map-cell {
       display: table-cell;
@@ -30,6 +34,19 @@
         &:active {
           color: $link-color;
         }
+      }
+    }
+    // For small tables, we want to just have two cells, so that it isn't too wide for the page
+    @include media-breakpoint-down(md) {
+      line-height: 1.25;
+      .extended-col-info {
+        display: inline-block;
+      }
+      .msgbikelink {
+        display: block;
+      }
+      .hidden-sm-cells {
+        display: none;
       }
     }
   }
