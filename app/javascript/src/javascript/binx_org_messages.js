@@ -75,7 +75,7 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
     setTimeout(binxAppOrgMessages.mapOrganizedMessages, 500);
   }
 
-  // When the link button is clicked on the table, scroll up to the map and open applicable marker
+  // When the link button is clicked on the table, scroll up to the map and open the applicable marker
   addTableMapLinkHandler() {
     $("#messages_table").on("click", ".map-cell a", e => {
       e.preventDefault();
@@ -110,7 +110,7 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
   inititalizeMapMarkers() {
     binxMapping.addMarkers({ fitMap: true });
     binxAppOrgMessages.messagesMapRendered = true;
-    // Add a trigger to the map when it becomes idle after panning or zooming.
+    // Add a trigger to the map when the viewport changes (after it has finished moving)
     google.maps.event.addListener(binxMap, "idle", function() {
       // This is grabbing the markers in viewport and logging the ids for them.
       // We actually need to rerender the the marker table
