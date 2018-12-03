@@ -66,7 +66,7 @@ gem 'simple_spark' # Sparkpost gem - we use it to send newsletters
 gem 'doorkeeper', '~> 3.1.0'
 gem 'wine_bouncer'
 gem 'grape', '~> 0.14.0'
-gem 'grape-active_model_serializers', '~> 1.4.0'
+gem 'grape-active_model_serializers'
 gem 'grape-swagger', '~> 0.10.4'
 gem 'swagger-ui_rails'
 gem 'api-pagination'
