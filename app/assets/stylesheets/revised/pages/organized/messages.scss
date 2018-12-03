@@ -33,4 +33,14 @@
       }
     }
   }
+  #placeSearch {
+    max-width: 60%;
+    @include media-breakpoint-down(md) {
+      max-width: 50%;
+    }
+    box-shadow: 0 0 4px rgba(black, 0.1);
+    margin: 9px 9px 0 0;
+    border-radius: 1px;
+    padding: 0.6rem;
+  }
 }

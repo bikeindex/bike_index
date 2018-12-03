@@ -162,6 +162,8 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
 
     // Render the body - whether it says no messages or messages
     $("#messages_table tbody").html(body_html);
+    // And localize the times since we added times to the table
+    binxApp.localizeTimes();
 
     $("#messagesCount .number").text(messages.length);
     if (messages.length == 1) {
@@ -195,7 +197,5 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
     binxAppOrgMessages.messagesListRendered = true;
     // call map organized messages - so that we can render it
     binxAppOrgMessages.mapOrganizedMessages();
-    // And localize the times since we added times to the table
-    binxApp.localizeTimes();
   }
 };
