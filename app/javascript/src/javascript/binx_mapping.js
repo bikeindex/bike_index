@@ -32,6 +32,7 @@ window.BinxMapping = class BinxMapping {
     var myOptions = {
       zoom: zoom,
       center: new google.maps.LatLng(lat, lng),
+      gestureHandling: "cooperative",
       mapTypeId: google.maps.MapTypeId.ROADMAP
     };
     if (!window.infoWindow) {
@@ -103,8 +104,34 @@ window.BinxMapping = class BinxMapping {
     window.setTimeout(() => binxApp.localizeTimes(), 50);
   }
 
-  addMarkers(fit_map) {
-    log.debug(`adding markers - fit_map: ${fit_map}`);
+  openInfoWindow(marker, markerId, point) {
+    window.infoWindow.setContent("");
+    window.infoWindow.open(window.binxMap, marker);
+    binxMapping.enableEscapeForInfoWindows();
+    return binxMapping.renderMarker(point);
+  }
+
+  // Called when an infoWindow is opened, to enable closing the window with escape
+  enableEscapeForInfoWindows() {
+    // Make sure we aren't adding duplicate handlers, sometimes we don't catch the close event
+    $(window).off("keyup");
+    // Add the trigger for the escape closing the window
+    $(window).on("keyup", function(e) {
+      if (e.keyCode === 27) {
+        window.infoWindow.close();
+        // Escape was pressed, infoWindow is closed, so remove the keyup handler
+        $(window).off("keyup");
+      }
+      return true; // allow bubbling up
+    });
+    // on infowindow close, remove keyup handler - aka clean up after yourself
+    google.maps.event.addListener(window.infoWindow, "closeclick", function() {
+      $(window).off("keyup");
+    });
+  }
+
+  addMarkers({ fitMap = false }) {
+    log.debug(`adding markers - fitMap: ${fitMap}`);
     while (binxMapping.markerPointsToRender.length > 0) {
       let point = binxMapping.markerPointsToRender.shift();
       let markerId = point.id;
@@ -122,16 +149,14 @@ window.BinxMapping = class BinxMapping {
           "click",
           ((marker, markerId) =>
             function() {
-              window.infoWindow.setContent("");
-              window.infoWindow.open(window.binxMap, marker);
-              return binxMapping.renderMarker(point);
+              binxMapping.openInfoWindow(marker, markerId, point);
             })(marker, markerId)
         );
         binxMapping.markersRendered.push(marker);
       }
     }
     // If we're suppose to fit the map to the markers - and if there are markers that have been rendered - fit it
-    if (fit_map == true && binxMapping.markersRendered.length > 0) {
+    if (fitMap == true && binxMapping.markersRendered.length > 0) {
       binxMapping.fitMap();
     }
   }

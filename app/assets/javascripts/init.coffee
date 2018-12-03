@@ -141,8 +141,8 @@ warnIfUnsupportedBrowser = ->
 enableEscapeForModals = ->
   $('.modal').on 'show.bs.modal', ->
     $(window).on 'keyup', (e) ->
-      return unless e.keyCode == 27 # Escape key
-      $('.modal').modal('hide')
+      $('.modal').modal('hide') if e.keyCode == 27 # Escape key
+      return true
   # Remove keyup trigger, clean up after yourself
   $('.modal').on 'hide.bs.modal', ->
     $(window).off 'keyup'

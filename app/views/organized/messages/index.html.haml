@@ -2,19 +2,24 @@
   %h1
     #{[@kind].flatten.map(&:titleize).join(", ")} Messages
 
-.organized-messages#map
+.organized-messages
+  #map
 
-%p#messagesCount.text-right.less-strong
+  %p#messagesCount.text-right.less-strong.number-is-plural
+    %span.number
+      0
+    matching message<span class="plural">s</span>
 
-%table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border#messages_table
-  %thead.small-header
-    %th
-      Sent&nbsp;<small class="convertTimezone"></small>
-    %th
-      Bike
-    %th
-      Sender
-  %tbody
+  %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border#messages_table
+    %thead.small-header
+      %th.map-cell
+      %th
+        Sent&nbsp;<small class="convertTimezone"></small>
+      %th
+        Bike
+      %th
+        Sender
+    %tbody
 
 - serialized_members = current_organization.users.map { |u| u && [u.id.to_s, { name: u.display_name }] }.compact.to_h.to_json
 :javascript

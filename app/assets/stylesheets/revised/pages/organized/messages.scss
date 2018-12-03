@@ -1,5 +1,36 @@
-.organized-messages#map {
-  width: 100%;
-  height: 600px;
-  margin-bottom: 4 * $vertical-height;
+.organized-messages {
+  #map {
+    width: 100%;
+    height: 400px;
+    margin-bottom: 4 * $vertical-height;
+  }
+  // messages table rows are rendered when you click on a point on the map too - only show the map link when on the table
+  .map-cell {
+    display: none;
+  }
+  #messagesCount {
+    span.plural {
+      display: none;
+    }
+    &.number-is-plural span.plural {
+      display: inline-block;
+    }
+  }
+  #messages_table {
+    .map-cell {
+      display: table-cell;
+      padding: 0;
+      text-align: center;
+      a {
+        color: $gray-light;
+        cursor: pointer;
+        display: block;
+        padding: 0.3rem;
+        &:hover,
+        &:active {
+          color: $link-color;
+        }
+      }
+    }
+  }
 }
