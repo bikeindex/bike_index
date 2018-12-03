@@ -1,4 +1,5 @@
-class OrganizedMessageSerializer < ActiveModel::Serializer
+class OrganizedMessageSerializer < ApplicationSerializer
+  def perform_caching; true end
   attributes :id, :kind, :created_at, :lat, :lng, :sender_id, :bike
 
   def created_at

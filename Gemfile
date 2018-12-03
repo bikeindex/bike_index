@@ -5,11 +5,12 @@ gem "rails", "4.2.10"
 gem 'pg'
 gem 'jquery-rails'
 gem 'bcrypt', '~> 3.1.7'
-gem 'active_model_serializers', '~> 0.9.3'
 gem 'aws-sdk', '~> 1.33'
 
 # Speed
-gem 'fast_blank', '~> 1.0'
+gem "fast_blank", "~> 1.0"
+gem "dalli"
+gem "active_model_serializers", "~> 0.8.3" # Use active model serializers to serialize JSON. Use version 0.8 because it supports caching
 
 # Redis and redis dependents
 gem 'hiredis', '~> 0.6.0'
@@ -44,7 +45,6 @@ gem 'omniauth-facebook'
 gem 'omniauth-strava'
 gem 'omniauth', '~> 1.3.1'
 gem "fog-aws"
-gem 'dalli'
 gem 'draper', require: false
 gem 'eventmachine'
 gem 'httparty'

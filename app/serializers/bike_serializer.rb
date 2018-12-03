@@ -1,4 +1,4 @@
-class BikeSerializer < ActiveModel::Serializer
+class BikeSerializer < ApplicationSerializer
 
   attributes :id,
     :serial,
