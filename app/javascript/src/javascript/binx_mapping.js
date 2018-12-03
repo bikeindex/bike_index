@@ -94,7 +94,7 @@ window.BinxMapping = class BinxMapping {
         if (!place.geometry) {
           log.debug("Returned place contains no geometry");
         }
-        // Create a flag marker for each place
+        // Create a marker for each place
         binxMapping.searchMarkers.push(
           new google.maps.Marker({
             map: binxMap,
@@ -155,11 +155,12 @@ window.BinxMapping = class BinxMapping {
     window.infoWindow.setContent("");
     window.infoWindow.open(window.binxMap, marker);
     binxMapping.enableEscapeForInfoWindows();
+    // For an unclear reason, this needs to return the rendered marker
     return binxMapping.renderMarker(point);
   }
 
-  // Called when an infoWindow is opened, to enable closing the window with escape
   enableEscapeForInfoWindows() {
+    // Enable using escape key to close info windows
     // Make sure we aren't adding duplicate handlers, sometimes we don't catch the close event
     $(window).off("keyup");
     // Add the trigger for the escape closing the window
@@ -196,7 +197,7 @@ window.BinxMapping = class BinxMapping {
           "click",
           ((marker, markerId) =>
             function() {
-              binxMapping.openInfoWindow(marker, markerId, point);
+              return binxMapping.openInfoWindow(marker, markerId, point);
             })(marker, markerId)
         );
         binxMapping.markersRendered.push(marker);

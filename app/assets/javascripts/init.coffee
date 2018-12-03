@@ -142,7 +142,7 @@ enableEscapeForModals = ->
   $('.modal').on 'show.bs.modal', ->
     $(window).on 'keyup', (e) ->
       $('.modal').modal('hide') if e.keyCode == 27 # Escape key
-      return true
+    return true
   # Remove keyup trigger, clean up after yourself
   $('.modal').on 'hide.bs.modal', ->
     $(window).off 'keyup'

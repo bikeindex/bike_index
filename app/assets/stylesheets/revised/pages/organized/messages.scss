@@ -1,4 +1,12 @@
 .organized-messages {
+  #messagesCount {
+    span.plural {
+      display: none;
+    }
+    &.number-is-plural span.plural {
+      display: inline-block;
+    }
+  }
   #map {
     width: 100%;
     height: 400px;
@@ -8,15 +16,7 @@
   .map-cell {
     display: none;
   }
-  #messagesCount {
-    span.plural {
-      display: none;
-    }
-    &.number-is-plural span.plural {
-      display: inline-block;
-    }
-  }
-  // We don't want to display extended-col-info except on the main table when the screen is small
+  // We don't want to display extended-col-info except on the main table, when the screen is small
   .extended-col-info {
     display: none;
   }
