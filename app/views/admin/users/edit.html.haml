@@ -55,7 +55,12 @@
         .control-group
           = f.label :email, class: "control-label"
           .controls
-            = f.text_field :email
+            = f.email_field :email
+        .control-group
+          %label.control-label
+            Secondary Emails
+          .controls{ style: "width: 100%;" }
+            = text_area_tag :secondary_emails, @user.secondary_emails.join(", "), disabled: true, rows: 1, style: "width: 100%; font-size: 80%;"
         .control-group
           = f.label :username, class: "control-label"
           .controls

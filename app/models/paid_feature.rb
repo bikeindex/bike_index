@@ -19,6 +19,7 @@ class PaidFeature < ActiveRecord::Base
 
   scope :recurring, -> { where(kind: %w[standard custom]) }
   scope :upfront, -> { where(kind: %w[standard_upfront custom_upfront]) }
+  scope :locked, -> { where(is_locked: true) }
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
 

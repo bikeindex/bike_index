@@ -12,7 +12,7 @@ module ControllerHelpers
   end
 
   def enable_rack_profiler
-    if current_user && current_user.developer?
+    if current_user&.developer?
       Rack::MiniProfiler.authorize_request unless Rails.env.test?
     end
   end
