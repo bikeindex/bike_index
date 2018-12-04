@@ -27,7 +27,7 @@ describe Organized::MessagesController, type: :controller do
         let(:user) { FactoryGirl.create(:organization_admin, organization: organization) }
         let(:organization) { FactoryGirl.create(:organization, is_paid: true, geolocated_emails: false) }
         it "does not create" do
-          expect(organization.permitted_message_kind?(kind)).to be_falsey
+          expect(organization.paid_for?(kind)).to be_falsey
           expect do
             post :create, organization_id: organization.to_param, organization_message: message_params
             expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param)
@@ -40,7 +40,7 @@ describe Organized::MessagesController, type: :controller do
         context "user without organization membership" do
           let(:user) { FactoryGirl.create(:confirmed_user) }
           it "does not create" do
-            expect(organization.permitted_message_kind?(kind)).to be_truthy
+            expect(organization.paid_for?(kind)).to be_truthy
             expect do
               post :create, organization_id: organization.to_param, organization_message: message_params
               expect(response).to redirect_to user_home_url
@@ -61,7 +61,7 @@ describe Organized::MessagesController, type: :controller do
         end
 
         it "creates" do
-          expect(organization.permitted_message_kind?(kind)).to be_truthy
+          expect(organization.paid_for?(kind)).to be_truthy
           expect do
             post :create, organization_id: organization.to_param, organization_message: message_params
             expect(response).to redirect_to root_path

@@ -40,7 +40,7 @@ module Organized
     def ensure_permitted_message_kind!
       @kind = params[:organization_message].present? ? params[:organization_message][:kind] : params[:kind]
       @kind ||= current_organization.organization_message_kinds
-      return true if current_organization.permitted_message_kind?(@kind)
+      return true if current_organization.paid_for?(@kind)
       flash[:error] = "Your organization doesn't have access to that, please contact Bike Index support"
       if current_organization.organization_message_kinds.any?
         redirect_to organization_messages_path(organization_id: current_organization.to_param, kind: current_organization.organization_message_kinds.first)

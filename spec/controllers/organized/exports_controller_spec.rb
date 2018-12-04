@@ -41,16 +41,16 @@ describe Organized::ExportsController, type: :controller do
     end
   end
 
-  context "organization with csv-exports" do
+  context "organization with csv_exports" do
     let!(:organization) { FactoryGirl.create(:organization) }
     let(:user) { FactoryGirl.create(:organization_member, organization: organization) }
-    before { organization.update_column :paid_feature_slugs, ["csv-exports"] } # Stub organization having paid feature
+    before { organization.update_column :paid_feature_slugs, ["csv_exports"] } # Stub organization having paid feature
 
     describe "index" do
       it "renders" do
         expect(export).to be_present # So that we're actually rendering an export
         organization.reload
-        expect(organization.paid_for?("csv-exports")).to be_truthy
+        expect(organization.paid_for?("csv_exports")).to be_truthy
         get :index, organization_id: organization.to_param
         expect(response.code).to eq("200")
         expect(response).to render_with_layout("application_revised")

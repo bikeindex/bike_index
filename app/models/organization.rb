@@ -47,7 +47,7 @@ class Organization < ActiveRecord::Base
   scope :valid, -> { where(is_suspended: false) }
   scope :valid, -> { where(is_suspended: false) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
-  scope :with_bike_actions, -> { where("organizations.geolocated_emails = ? OR organizations.abandoned_bike_emails = ?", true, true) }
+  scope :with_bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: ["messages"]) }
 
   before_validation :set_calculated_attributes
   after_commit :update_user_bike_actions_organizations
@@ -90,8 +90,8 @@ class Organization < ActiveRecord::Base
   def permitted_message_kind?(kinds)
     # If kinds is an array, make sure they all are permitted kinds
     if kinds.is_a?(Array)
-      return false unless kinds.any?
-      return kinds.none? { |k| !permitted_message_kind?(k) }
+      return false unless kinds.any? # If they passed an empty array, it's false
+      return kinds.none? { |k| !paid_for?(k) }
     end
     organization_message_kinds.include?(kinds.to_s)
   end
@@ -101,8 +101,12 @@ class Organization < ActiveRecord::Base
   end
 
   def paid_for?(feature_name)
-    return true if paid_feature_slugs.include?(feature_name)
-    paid_feature_slugs.include?(PaidFeature.friendly_find(feature_name)&.slug) 
+    # If kinds is an array, make sure they all are permitted kinds
+    if feature_name.is_a?(Array)
+      return false unless feature_name.any? # If they passed an empty array, it's false
+      return feature_name.none? { |k| !paid_for?(k) }
+    end
+    paid_feature_slugs.include?(feature_name.strip.downcase.gsub(/\s/, "_")) # gnarly custom slug function because fml
   end
 
   def set_calculated_attributes

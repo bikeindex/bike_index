@@ -41,7 +41,7 @@ describe Admin::PaidFeaturesController, type: :controller do
     context "feature_slugs" do
       let(:subject) { FactoryGirl.create(:paid_feature) }
       it "does not update feature_slugs" do
-        put :update, id: subject.to_param, paid_feature: passed_params.merge(feature_slugs_string: "cool_slug")
+        put :update, id: subject.to_param, paid_feature: passed_params.merge(feature_slugs_string: "csv_exports")
         subject.reload
         passed_params.each { |k, v| expect(subject.send(k)).to eq(v) }
         expect(subject.feature_slugs).to eq([])
@@ -50,10 +50,10 @@ describe Admin::PaidFeaturesController, type: :controller do
         let(:user) { FactoryGirl.create(:admin_developer) }
         let(:subject) { FactoryGirl.create(:paid_feature) }
         it "does not update feature_slugs" do
-          put :update, id: subject.to_param, paid_feature: passed_params.merge(feature_slugs_string: "cool_slug, sOmeThing,stuff")
+          put :update, id: subject.to_param, paid_feature: passed_params.merge(feature_slugs_string: "csv_exports, MessagES,geolocated_messages, blarg")
           subject.reload
           passed_params.each { |k, v| expect(subject.send(k)).to eq(v) }
-          expect(subject.feature_slugs).to eq(%w[cool_slug something stuff])
+          expect(subject.feature_slugs).to eq(%w[csv_exports messages geolocated_messages])
         end
       end
     end

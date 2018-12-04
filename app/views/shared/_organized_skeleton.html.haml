@@ -20,7 +20,7 @@
           - if current_organization.show_partial_registrations?
             %li
               = active_link "Incompletes", incompletes_organization_bikes_path(current_organization), class_name: "nav-link"
-          - if current_organization.paid_for?("csv-exports")
+          - if current_organization.paid_for?("csv_exports")
             %li
               = active_link "Exports", organization_exports_path(organization_id: current_organization.to_param), class_name: "nav-link", match_controller: true
           %li
