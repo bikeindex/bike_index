@@ -32,8 +32,7 @@ class OrganizationExportWorker
 
   def write_excel(file)
     axlsx_package = Axlsx::Package.new
-    workbook = axlsx_package.workbook
-    workbook.add_worksheet(name: "Basic export") do |sheet|
+    axlsx_package.workbook.add_worksheet(name: "Basic export") do |sheet|
       sheet.add_row(export_headers)
       rows = 0
       @export.bikes_scoped.find_each(batch_size: 100) do |bike|
@@ -42,8 +41,10 @@ class OrganizationExportWorker
       end
       @export.rows = rows
     end
-    stream = axlsx_package.to_stream()
-    file.write(stream.read)
+    # stream = axlsx_package.to_stream()
+    # file.write(stream.read)
+    file.write(axlsx_package.to_stream().read)
+    @export.tmp_file.close
     true
   end
 

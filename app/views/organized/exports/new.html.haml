@@ -24,10 +24,10 @@
     = f.label :end_at, "Registered before", class: "org-form-label"
     .col-sm-4
       = f.datetime_local_field :end_at, step: 60, class: "form-control"
-  / .form-group.row.mt-2
-  /   = f.label :format, "Export file format", class: "org-form-label"
-  /   .col-sm-4
-  /     = f.select :file_format, Export::VALID_FILE_FORMATS, {}, class: "form-control"
+  .form-group.row.mt-2
+    = f.label :format, "Export file format", class: "org-form-label"
+    .col-sm-4
+      = f.select :file_format, Export::VALID_FILE_FORMATS, {}, class: "form-control"
   .row.mt-4
     .form-submit-button
       = f.submit "Create export", class: "btn btn-success btn-lg"
