@@ -10,7 +10,7 @@ class OrganizationExportWorker
     @export = Export.find(export_id)
     return true if @export.finished?
     @export.update_attribute :progress, "ongoing"
-    write_spreadsheet(@export.file_format)
+    write_spreadsheet(@export.file_format, @export.tmp_file)
     @export.file = @export.tmp_file
     @export.progress = "finished"
     @export.save
