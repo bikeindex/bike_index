@@ -15,6 +15,20 @@
       .controls
         = f.text_field :name
 
+    - if current_user.developer?
+      .control-group.padded
+        .control-label
+          = f.label :feature_slugs_string do
+            Paid Feature Slugs <small>comma delineated</small>
+        .controls
+          = f.text_area :feature_slugs_string
+          %br
+          %small.less-strong
+            Used slugs:
+            - PaidFeature::EXPECTED_SLUGS.each do |slug|
+              %code
+                = slug
+
     .control-group.padded
       .control-label
         = f.label :amount

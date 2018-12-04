@@ -35,7 +35,7 @@
                   = paid_feature.details_link
             - if current_user.developer
               %small.less-strong
-                = paid_feature.feature_slugs
+                slugs: #{paid_feature.feature_slugs_string}
 
           %td
             %small

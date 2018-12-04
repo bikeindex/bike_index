@@ -71,7 +71,7 @@ describe Organization do
   end
 
   describe "is_paid and paid_for? calculations" do
-    let(:paid_feature) { FactoryGirl.create(:paid_feature, amount_cents: 10_000, name: "CSV Exports") }
+    let(:paid_feature) { FactoryGirl.create(:paid_feature, amount_cents: 10_000, name: "CSV Exports", feature_slugs: ["csv-exports"]) }
     let(:invoice) { FactoryGirl.create(:invoice_paid, amount_due: 0) }
     let(:organization) { invoice.organization }
     let(:organization_child) { FactoryGirl.create(:organization) }
@@ -276,6 +276,7 @@ describe Organization do
     it "returns empty for non-geolocated_emails" do
       expect(organization.organization_message_kinds).to eq([])
       expect(organization.permitted_message_kind?(nil)).to be_falsey
+      expect(organization.paid_for?("organization_messages"))
       expect(mail_snippet).to be_present
       expect(user.bike_actions_organization_id).to eq nil
       organization.update_attributes(geolocated_emails: true, abandoned_bike_emails: true)

@@ -113,7 +113,7 @@ class Organization < ActiveRecord::Base
     self.short_name = (short_name || name).truncate(30)
     self.is_paid = true if current_invoice&.paid_in_full?
     # For now, just use them. However - nesting organizations probably need slightly modified paid_feature slugs
-    self.paid_feature_slugs = current_invoice && current_invoice.paid_features.pluck(:slug) || []
+    self.paid_feature_slugs = current_invoice && current_invoice.paid_features.pluck(:feature_slugs).flatten.uniq || []
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, '')
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
