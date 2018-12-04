@@ -8,7 +8,12 @@
   %body
     .binx-wrapper
       .binx-header
-        %img{ src: 'https://files.bikeindex.org/email_assets/logo.png', height: '70', alt: 'Bike Index logo' }
+        %img{ src: "https://files.bikeindex.org/email_assets/logo.png", height: "70", alt: "Bike Index logo" }
+        - if @partner
+          %span.partner-logo-wrapper
+            = image_tag "logos/bikehub_logo.png", height: "50", alt: "BikeHub Logo", class: "partner-header-logo"
+            %span.logo-plus
+              +
       .binx-body
         - if @organization.present? && controller_path == 'organized_mailer' && @organization.mail_snippet_body('header').present?
           = @organization.mail_snippet_body('header').html_safe
@@ -28,4 +33,4 @@
         %h5
           #{Time.zone.now.year} &copy; Bike Index.
           - unless @organization.present? && controller_path == 'organized_mailer' && @organization.is_paid
-            Bike Index. Help prevent bike theft, #{ link_to 'make a donation.', support_the_index_url }
+            Help prevent bike theft, #{ link_to 'make a donation.', support_the_index_url }
