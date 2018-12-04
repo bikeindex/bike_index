@@ -54,7 +54,7 @@ gem 'paranoia'
 # Making other files
 gem "wkhtmltopdf-binary"
 gem "wicked_pdf"
-gem "axlsx"
+gem "axlsx" # Write Excel files - OrganizationExports
 
 # Rails upgrade
 gem "where-or" # backports rails 5 or query support - TODO: Rails 5 update, remove
