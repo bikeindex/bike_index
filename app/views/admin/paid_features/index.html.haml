@@ -33,6 +33,9 @@
                 - if paid_feature.details_link.present?
                   %br
                   = paid_feature.details_link
+            - if current_user.developer
+              %small.less-strong
+                = paid_feature.feature_slugs
 
           %td
             %small

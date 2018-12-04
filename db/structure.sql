@@ -1626,11 +1626,11 @@ CREATE TABLE public.paid_features (
     amount_cents integer,
     name character varying,
     slug character varying,
-    is_locked boolean DEFAULT false NOT NULL,
     description text,
     details_link character varying,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    feature_slugs text[] DEFAULT '{}'::text[]
 );
 
 
@@ -4085,4 +4085,6 @@ INSERT INTO schema_migrations (version) VALUES ('20180911215238');
 INSERT INTO schema_migrations (version) VALUES ('20180918220604');
 
 INSERT INTO schema_migrations (version) VALUES ('20181130200131');
+
+INSERT INTO schema_migrations (version) VALUES ('20181204215943');
 

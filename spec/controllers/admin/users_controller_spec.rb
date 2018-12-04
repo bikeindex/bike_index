@@ -44,10 +44,7 @@ describe Admin::UsersController do
     end
     context 'developer' do
       it 'updates developer' do
-        admin = FactoryGirl.create(:admin)
-        admin.developer = true
-        admin.save
-        admin.reload
+        admin = FactoryGirl.create(:admin_developer)
         set_current_user(admin)
         user = FactoryGirl.create(:user)
 

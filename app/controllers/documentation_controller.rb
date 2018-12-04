@@ -5,7 +5,7 @@ class DocumentationController < ApplicationController
   end
 
   def api_v1
-    unless current_user && current_user.developer
+    unless current_user&.developer?
       flash[:notice] = 'API V1 is deprecated, please use our current API version'
       redirect_to documentation_index_path and return
     end

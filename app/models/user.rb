@@ -127,6 +127,10 @@ class User < ActiveRecord::Base
     is_content_admin
   end
 
+  def developer?
+    developer
+  end
+
   def display_name
     name.present? ? name : email
   end

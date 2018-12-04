@@ -35,7 +35,7 @@ class Admin::UsersController < Admin::BaseController
     @user.name = params[:user][:name]
     @user.email = params[:user][:email]
     @user.superuser = params[:user][:superuser]
-    @user.developer = params[:user][:developer] if current_user.developer
+    @user.developer = params[:user][:developer] if current_user.developer?
     @user.is_content_admin = params[:user][:is_content_admin]
     @user.banned = params[:user][:banned]
     @user.username = params[:user][:username]

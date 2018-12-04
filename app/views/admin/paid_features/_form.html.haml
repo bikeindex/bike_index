@@ -7,21 +7,13 @@
       .control-label
         = f.label :kind
       .controls
-        - if @paid_feature.locked?
-          %span.less-strong
-            = @paid_feature.kind
-        - else
-          = f.select :kind, PaidFeature.kinds.map { |k| [k.humanize, k] }
+        = f.select :kind, PaidFeature.kinds.map { |k| [k.humanize, k] }
 
     .control-group.padded
       .control-label
         = f.label :name
       .controls
-        - if @paid_feature.locked?
-          %span.less-strong
-            = @paid_feature.name
-        - else
-          = f.text_field :name
+        = f.text_field :name
 
     .control-group.padded
       .control-label
@@ -41,4 +33,4 @@
       .controls
         = f.text_field :details_link
 
-    = f.submit "Submit", class: 'button-green'
+    = f.submit (@paid_feature.id.present? ? "Update" : "Create"), class: 'button-green'

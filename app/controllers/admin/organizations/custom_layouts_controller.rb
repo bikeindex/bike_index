@@ -33,7 +33,7 @@ class Admin::Organizations::CustomLayoutsController < Admin::BaseController
 
   def find_and_authorize_organization
     @organization = Organization.friendly_find(params[:organization_id])
-    unless current_user.developer
+    unless current_user.developer?
       flash[:info] = 'Sorry, you must be a developer to access that page.'
       redirect_to admin_organization_url(@organization) and return
     end

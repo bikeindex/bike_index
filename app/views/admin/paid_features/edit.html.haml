@@ -1,8 +1,4 @@
 %h1
   Edit #{@paid_feature.name}
 
-- if @paid_feature.is_locked
-  .alert.alert-info{ style: "padding-top: 15px; max-width: 500px;" }
-    %p
-      <strong>#{@paid_feature.name}</strong> is <strong>locked</strong> - which means its <em>name</em> and <em>kind</em> can't be changed. This is done because this feature is being used in the code ;)
 = render partial: "form"

@@ -3,8 +3,7 @@ require "spec_helper"
 describe Admin::PaidFeaturesController, type: :controller do
   let(:subject) { FactoryGirl.create(:paid_feature) }
   include_context :logged_in_as_super_admin
-  let(:passed_params) { { amount: 222.22, description: "Some really long description or wahtttt", details_link: "https://example.com" } }
-  let(:full_params) { passed_params.merge(kind: "custom_one_time", name: "another name stuff") }
+  let(:passed_params) { { amount: 222.22, description: "Some really long description or wahtttt", details_link: "https://example.com", kind: "custom_one_time", name: "another name stuff" } }
 
   describe "index" do
     it "renders" do
@@ -34,19 +33,28 @@ describe Admin::PaidFeaturesController, type: :controller do
     let!(:original_name) { subject.name }
     let!(:original_kind) { subject.kind }
     it "updates available attributes" do
-      put :update, id: subject.to_param, paid_feature: full_params
+      put :update, id: subject.to_param, paid_feature: passed_params
       expect(flash[:success]).to be_present
       subject.reload
-      full_params.each { |k, v| expect(subject.send(k)).to eq(v) }
+      passed_params.each { |k, v| expect(subject.send(k)).to eq(v) }
     end
-    context "locked paid_feature" do
-      let(:subject) { FactoryGirl.create(:paid_feature, is_locked: true) }
-      it "does not update locked attributes" do
-        put :update, id: subject.to_param, paid_feature: full_params
+    context "feature_slugs" do
+      let(:subject) { FactoryGirl.create(:paid_feature) }
+      it "does not update feature_slugs" do
+        put :update, id: subject.to_param, paid_feature: passed_params.merge(feature_slugs_string: "cool_slug")
         subject.reload
         passed_params.each { |k, v| expect(subject.send(k)).to eq(v) }
-        expect(subject.name).to eq original_name
-        expect(subject.kind).to eq original_kind
+        expect(subject.feature_slugs).to eq([])
+      end
+      context "developer" do
+        let(:user) { FactoryGirl.create(:admin_developer) }
+        let(:subject) { FactoryGirl.create(:paid_feature) }
+        it "does not update feature_slugs" do
+          put :update, id: subject.to_param, paid_feature: passed_params.merge(feature_slugs_string: "cool_slug, sOmeThing,stuff")
+          subject.reload
+          passed_params.each { |k, v| expect(subject.send(k)).to eq(v) }
+          expect(subject.feature_slugs).to eq(%w[cool_slug something stuff])
+        end
       end
     end
   end
@@ -54,10 +62,10 @@ describe Admin::PaidFeaturesController, type: :controller do
   describe "create" do
     it "succeeds" do
       expect do
-        post :create, paid_feature: full_params
+        post :create, paid_feature: passed_params
       end.to change(PaidFeature, :count).by 1
       paid_feature = PaidFeature.last
-      full_params.each { |k, v| expect(paid_feature.send(k)).to eq(v) }
+      passed_params.each { |k, v| expect(paid_feature.send(k)).to eq(v) }
     end
   end
 end

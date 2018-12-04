@@ -15,7 +15,7 @@ describe Admin::Organizations::CustomLayoutsController, type: :controller do
   end
 
   context 'super admin and developer' do
-    let(:user) { FactoryGirl.create(:admin, developer: true) }
+    let(:user) { FactoryGirl.create(:admin_developer) }
     before do
       set_current_user(user)
     end

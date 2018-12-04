@@ -40,8 +40,8 @@ class Admin::PaidFeaturesController < Admin::BaseController
   end
 
   def permitted_update_parameters
-    if @paid_feature.locked?
-      permitted_parameters.except("kind", "name")
+    if current_user.developer?
+      permitted_parameters.merge(params.require(:paid_feature).permit(:feature_slugs_string))
     else
       permitted_parameters
     end
