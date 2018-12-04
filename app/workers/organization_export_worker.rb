@@ -11,8 +11,6 @@ class OrganizationExportWorker
     return true if @export.finished?
     @export.update_attribute :progress, "ongoing"
     write_spreadsheet(@export.file_format, @export.tmp_file)
-    @export.tmp_file.close # Because buffered output, closing instead of rewinding
-    @export.update_attribute :rows, @export.tmp_file_rows
     @export.file = @export.tmp_file
     @export.progress = "finished"
     @export.save
@@ -21,12 +19,31 @@ class OrganizationExportWorker
   end
 
   def write_spreadsheet(file_format, file)
-    file_format == "csv" ? write_csv(file) : write_excel(file)
+    if file_format == "csv"
+      # With CSV's we do a little lower level handling of file I/O (because we can, to save memory)
+      # Deal with that in here
+      write_csv(file)
+      @export.tmp_file.close # Because buffered output, closing instead of rewinding
+      @export.update_attribute :rows, @export.tmp_file_rows
+    else # It's an excel file!
+      write_excel(file)
+    end
   end
 
   def write_excel(file)
-    @export.update_attribute :progress, "finished"
-    raise StandardError, "Excel export not implemented"
+    axlsx_package = Axlsx::Package.new
+    axlsx_package.workbook.add_worksheet(name: "Basic Worksheet") do |sheet|
+      sheet.add_row(export_headers)
+      rows = 0
+      @export.bikes_scoped.find_each(batch_size: 100) do |bike|
+        rows += 1
+        sheet.add_row(bike_to_row(bike))
+      end
+      @export.rows = rows
+    end
+    file.write(axlsx_package.to_stream.read)
+    @export.tmp_file.close
+    true
   end
 
   def write_csv(file)

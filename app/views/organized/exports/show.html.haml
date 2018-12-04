@@ -21,6 +21,11 @@
           = @export.user.display_name
     %tr
       %td
+        Format
+      %td
+        = @export.file_format
+    %tr
+      %td
         Progress
       %td
         - export_progress_class = @export.progress == "finished" ? "text-success" : ""

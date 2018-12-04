@@ -22,23 +22,35 @@ describe OrganizationExportWorker do
   let(:csv_string) { csv_lines.map { |r| instance.comma_wrapped_string(r) }.join }
 
   describe "perform" do
-    context "bulk import already processed" do
-      let(:export) { FactoryGirl.create(:export, progress: "finished") }
-      it "returns true" do
-        expect(instance).to_not receive(:create_csv)
-        instance.perform(export.id)
-      end
-    end
-    context "default" do
+    context "success" do
       let(:csv_lines) { [export.headers, basic_values] }
-      it "does the thing we expect" do
+      before do
         expect(bike.organizations.pluck(:id)).to eq([organization.id])
         expect(export.file.present?).to be_falsey
+      end
+      it "does the thing we expect" do
         instance.perform(export.id)
         export.reload
         expect(export.progress).to eq "finished"
         expect(export.file.read).to eq(csv_string)
         expect(export.rows).to eq 1
+      end
+      context "xlsx format" do
+        let(:export) { FactoryGirl.create(:export_organization, progress: "pending", file: nil, file_format: "xlsx") }
+        it "raises because we haven't made it yet" do
+          instance.perform(export.id)
+          export.reload
+          expect(export.progress).to eq "finished"
+          expect(export.file.read).to be_present
+          expect(export.rows).to eq 1
+        end
+      end
+    end
+    context "bulk import already processed" do
+      let(:export) { FactoryGirl.create(:export, progress: "finished") }
+      it "returns true" do
+        expect(instance).to_not receive(:create_csv)
+        instance.perform(export.id)
       end
     end
     context "no bikes" do
@@ -51,15 +63,6 @@ describe OrganizationExportWorker do
         expect(export.progress).to eq "finished"
         expect(export.file.read).to eq(csv_string)
         expect(export.rows).to eq 0
-      end
-      context "xlsx format" do
-        let(:export) { FactoryGirl.create(:export_organization, progress: "pending", file: nil, end_at: Time.now - 1.week, file_format: "xlsx") }
-        it "raises because we haven't made it yet" do
-          expect(bike.organizations.pluck(:id)).to eq([organization.id])
-          expect { instance.perform(export.id) }.to raise_error(/not implemented/)
-          export.reload
-          expect(export.progress).to eq "finished"
-        end
       end
     end
 
