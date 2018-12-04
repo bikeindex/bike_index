@@ -24,9 +24,8 @@ class OrganizationExportWorker
       # Deal with that in here
       write_csv(file)
       @export.tmp_file.close # Because buffered output, closing instead of rewinding
-      @export.rows = @export.tmp_file_rows
-    else
-      # It's an excel file!
+      @export.update_attribute :rows, @export.tmp_file_rows
+    else # It's an excel file!
       write_excel(file)
     end
   end
@@ -41,8 +40,10 @@ class OrganizationExportWorker
         rows += 1
         sheet.add_row(bike_to_row(bike))
       end
-      @export.update_attribute :rows, @export.tmp_file_rows
+      @export.rows = rows
     end
+    stream = axlsx_package.to_stream()
+    file.write(stream.read)
     true
   end
 

@@ -24,9 +24,11 @@ describe OrganizationExportWorker do
   describe "perform" do
     context "success" do
       let(:csv_lines) { [export.headers, basic_values] }
-      it "does the thing we expect" do
+      before do
         expect(bike.organizations.pluck(:id)).to eq([organization.id])
         expect(export.file.present?).to be_falsey
+      end
+      it "does the thing we expect" do
         instance.perform(export.id)
         export.reload
         expect(export.progress).to eq "finished"
@@ -36,12 +38,10 @@ describe OrganizationExportWorker do
       context "xlsx format" do
         let(:export) { FactoryGirl.create(:export_organization, progress: "pending", file: nil, file_format: "xlsx") }
         it "raises because we haven't made it yet" do
-          expect(bike.organizations.pluck(:id)).to eq([organization.id])
+          instance.perform(export.id)
           export.reload
           expect(export.progress).to eq "finished"
-          pp export.file.read
-          expect(export.progress).to eq "finished"
-          # expect(export.file.read).to eq(csv_string)
+          expect(export.file.read).to be_present
           expect(export.rows).to eq 1
         end
       end
