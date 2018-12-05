@@ -95,7 +95,7 @@ RSpec.describe Invoice, type: :model do
       # TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
       organization.update_attributes(updated_at: Time.now)
       organization.reload
-      expect(organization.paid_feature_slugs).to match_array([paid_feature2.slug, paid_feature_one_time.slug])
+      expect(organization.paid_feature_slugs).to eq([])
     end
   end
 end
