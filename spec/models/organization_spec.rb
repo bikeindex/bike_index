@@ -95,7 +95,7 @@ describe Organization do
       let!(:paid_feature2) { FactoryGirl.create(:paid_feature, name: "abandoned message", feature_slugs: %w[messages abandoned_bike_messages]) }
       let!(:user) { FactoryGirl.create(:organization_member, organization: organization) }
       it "returns empty for non-geolocated_emails" do
-        expect(organization.organization_message_kinds).to eq([])
+        expect(organization.message_kinds).to eq([])
         expect(organization.paid_for?(nil)).to be_falsey
         expect(organization.paid_for?("messages")).to be_falsey
         expect(organization.paid_for?("geolocated_messages")).to be_falsey
@@ -105,7 +105,7 @@ describe Organization do
         expect(organization.paid_for?("messages")).to be_truthy
         expect(organization.paid_for?("geolocated_messages")).to be_falsey
         expect(organization.paid_for?("abandoned_bike_messages")).to be_truthy
-        expect(organization.organization_message_kinds).to eq(["abandoned_bike_messages"])
+        expect(organization.message_kinds).to eq(["abandoned_bike_messages"])
         expect(organization.paid_for?("weird_type")).to be_falsey
         expect(organization.paid_for?(%w[geolocated abandoned_bike weird_type])).to be_falsey
         expect(Organization.with_bike_actions.pluck(:id)).to eq([organization.id])

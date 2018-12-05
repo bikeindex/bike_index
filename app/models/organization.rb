@@ -80,22 +80,22 @@ class Organization < ActiveRecord::Base
     snippet && snippet.body
   end
 
-  def organization_message_kinds # Matches organization_message kinds
+  def message_kinds # Matches organization_message kinds
     [
       paid_for?("geolocated_messages") ? "geolocated_messages" : nil,
       paid_for?("abandoned_bike_messages") ? "abandoned_bike_messages" : nil
     ].compact
   end
 
-  def organization_additional_registration_fields
+  def additional_registration_fields
     [
-      paid_for?("registration_address") ? "geolocated_messages" : nil,
-      paid_for?("abandoned_bike_messages") ? "abandoned_bike_messages" : nil
+      paid_for?("registration_address_field") ? "registration_address_field" : nil,
+      paid_for?("registration_secondary_serial_field") ? "registration_secondary_serial_field" : nil
     ].compact
   end
 
   def bike_actions? # Eventually there will be other actions beside organization_messages, so use this as general reference
-    organization_message_kinds.any?
+    message_kinds.any?
   end
 
   def paid_for?(feature_name)
@@ -131,7 +131,7 @@ class Organization < ActiveRecord::Base
     set_auto_user
     update_user_bike_actions_organizations
     locations.each { |l| l.save unless l.shown == allowed_show }
-    true # legacy bs rails concerns
+    true # TODO: Rails 5 update
   end
 
   def ensure_auto_user

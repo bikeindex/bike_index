@@ -28,7 +28,7 @@
     .organization-actions-overlay
       %p
         Send
-        - current_user.bike_actions_organization.organization_message_kinds.each do |kind|
+        - current_user.bike_actions_organization.message_kinds.each do |kind|
           %a.btn.btn-secondary.openMessageModal{ "data-kind" => kind }
             - if kind == "geolocated"
               Location notice

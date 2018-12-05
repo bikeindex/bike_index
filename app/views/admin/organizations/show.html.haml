@@ -118,8 +118,8 @@
           %dt
             Org emails
           %dd
-            - if @organization.organization_message_kinds.any?
-              = @organization.organization_message_kinds.to_sentence
+            - if @organization.message_kinds.any?
+              = @organization.message_kinds.to_sentence
             - else
               <small class="less-strong">none</small>
           %dt
