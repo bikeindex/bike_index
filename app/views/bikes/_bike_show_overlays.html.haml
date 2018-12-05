@@ -9,7 +9,7 @@
     .modal-body
       = form_for OrganizationMessage.new(bike_id: @bike.id), url: organization_messages_path(organization_id: current_user.bike_actions_organization_id) do |f|
         = f.hidden_field :bike_id
-        = f.hidden_field :kind
+        = f.hidden_field :kind_slug
         = f.hidden_field :latitude
         = f.hidden_field :longitude
         = f.hidden_field :accuracy
@@ -28,7 +28,7 @@
     .organization-actions-overlay
       %p
         Send
-        - current_user.bike_actions_organization.organization_message_kinds.each do |kind|
+        - current_user.bike_actions_organization.message_kinds.each do |kind|
           %a.btn.btn-secondary.openMessageModal{ "data-kind" => kind }
             - if kind == "geolocated"
               Location notice

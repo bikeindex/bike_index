@@ -2,6 +2,8 @@
   %h1 Paid Features
   = link_to "New Feature", new_admin_paid_feature_url, class: "button-green sharing-links"
 
+%span#pageContainerFluid
+
 %h4
   #{@paid_features.count} total
 
@@ -30,7 +32,10 @@
                 = paid_feature.description
                 - if paid_feature.details_link.present?
                   %br
-                  = paid_feature.details_link
+                  = link_to paid_feature.details_link, paid_feature.details_link
+            - if current_user.developer
+              %small.less-strong
+                <span class="large-screens">feature</span> slugs: #{paid_feature.feature_slugs_string}
 
           %td
             %small

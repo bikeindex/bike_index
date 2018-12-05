@@ -258,17 +258,17 @@ describe User do
         end
       end
       context "two organizations with actions" do
-        let(:organization) { FactoryGirl.create(:organization, geolocated_emails: true, name: "aaaaa") }
-        let(:organization2) { FactoryGirl.create(:organization, abandoned_bike_emails: true, name: "XXXXX") }
-        it "It selects the first organization created" do
+        include_context :organization_with_geolocated_messages
+        let(:organization2) { FactoryGirl.create(:organization, name: "XXXXX") }
+        it "It selects the first matching organization" do
           organization2.update_attribute :created_at, Time.now - 1.day
-          # default_scope is by name, using this to check we're sqling right and that we're actually reordering
-          # But it looks like rspec isn't honoring the default scope so whateves
-          expect(Organization.with_bike_actions.pluck(:id)).to match_array([organization.id, organization2.id])
+          # default_scope is by name, trying to test that we're sqling right and actually reordering
+          # ... But it looks like rspec isn't honoring the default scope so whateves
+          expect(Organization.with_bike_actions.pluck(:id)).to match_array([organization.id])
           FactoryGirl.create(:membership, user: user, organization: organization2)
           user.update_attributes(updated_at: Time.now) # TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
           user.reload
-          expect(user.bike_actions_organization).to eq organization2
+          expect(user.bike_actions_organization).to eq organization
         end
       end
     end

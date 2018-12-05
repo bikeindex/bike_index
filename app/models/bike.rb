@@ -162,7 +162,7 @@ class Bike < ActiveRecord::Base
     first_ownership.owner_email
   end
 
-  # This is for organizations - might be useful for admin as well
+  # This is for organizations - might be useful for admin as well. We want it to be nil if it isn't present
   def owner_name
     current_ownership.user&.name # User - not ownership, because we don't want registrar
   end
@@ -350,7 +350,7 @@ class Bike < ActiveRecord::Base
     paint.name.titleize if paint.present?
   end
 
-  def registration_address # Goes along with organization.require_address_on_registration
+  def registration_address # Goes along with organization.require_address_on_registration?
     b_params.first && b_params.first.bike["address"]
   end
 

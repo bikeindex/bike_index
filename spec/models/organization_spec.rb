@@ -71,25 +71,48 @@ describe Organization do
   end
 
   describe "is_paid and paid_for? calculations" do
-    let(:paid_feature) { FactoryGirl.create(:paid_feature, amount_cents: 10_000, name: "CSV Exports") }
+    let(:paid_feature) { FactoryGirl.create(:paid_feature, amount_cents: 10_000, name: "CSV Exports", feature_slugs: ["csv_exports"]) }
     let(:invoice) { FactoryGirl.create(:invoice_paid, amount_due: 0) }
     let(:organization) { invoice.organization }
     let(:organization_child) { FactoryGirl.create(:organization) }
     it "uses associations to determine is_paid" do
-      expect(organization.paid_for?("csv-exports")).to be_falsey
+      expect(organization.paid_for?("csv_exports")).to be_falsey
       invoice.update_attributes(paid_feature_ids: [paid_feature.id])
       organization.update_attributes(updated_at: Time.now) # TODO: Rails 5 update - after_commit
       expect(organization.is_paid).to be_truthy
-      expect(organization.paid_feature_slugs).to eq([paid_feature.slug])
-      expect(organization.paid_for?("csv-exports")).to be_truthy
+      expect(organization.paid_feature_slugs).to eq(["csv_exports"])
+      expect(organization.paid_for?("csv_exports")).to be_truthy
       organization_child.update_attributes(updated_at: Time.now) # TODO: Rails 5 update - after_commit
       expect(organization_child.is_paid).to be_falsey
       organization_child.update_attributes(parent_organization: organization)
       expect(organization_child.is_paid).to be_truthy
       expect(organization_child.current_invoice).to eq invoice
-      expect(organization_child.paid_feature_slugs).to eq([paid_feature.slug])
-      expect(organization_child.paid_for?("CSV Exports")).to be_truthy # It also checks for the full name version
+      expect(organization_child.paid_feature_slugs).to eq(["csv_exports"])
+      expect(organization_child.paid_for?("csv_exports")).to be_truthy # It also checks for the full name version
       expect(organization.child_organizations.pluck(:id)).to eq([organization_child.id])
+    end
+    context "messages" do
+      let!(:paid_feature2) { FactoryGirl.create(:paid_feature, name: "abandoned message", feature_slugs: %w[messages abandoned_bike_messages]) }
+      let!(:user) { FactoryGirl.create(:organization_member, organization: organization) }
+      it "returns empty for non-geolocated_emails" do
+        expect(organization.message_kinds).to eq([])
+        expect(organization.paid_for?(nil)).to be_falsey
+        expect(organization.paid_for?("messages")).to be_falsey
+        expect(organization.paid_for?("geolocated_messages")).to be_falsey
+        expect(user.bike_actions_organization_id).to eq nil
+        invoice.update_attributes(paid_feature_ids: [paid_feature.id, paid_feature2.id])
+        organization.update_attributes(updated_at: Time.now) # TODO: Rails 5 update - after_commit
+        expect(organization.paid_for?("messages")).to be_truthy
+        expect(organization.paid_for?("geolocated_messages")).to be_falsey
+        expect(organization.paid_for?("abandoned_bike_messages")).to be_truthy
+        expect(organization.message_kinds).to eq(["abandoned_bike_messages"])
+        expect(organization.paid_for?("weird_type")).to be_falsey
+        expect(organization.paid_for?(%w[geolocated abandoned_bike weird_type])).to be_falsey
+        expect(Organization.with_bike_actions.pluck(:id)).to eq([organization.id])
+        # TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
+        user.update_attributes(updated_at: Time.now)
+        expect(user.bike_actions_organization_id).to eq organization.id
+      end
     end
   end
 
@@ -246,7 +269,7 @@ describe Organization do
   describe 'mail_snippet_body' do
     let(:organization) { FactoryGirl.create(:organization) }
     before do
-      expect([organization, mail_snippet].size).to eq 2
+      expect((organization && mail_snippet).present?).to be_truthy
       expect(organization.mail_snippets).to be_present
     end
     context 'not included snippet type' do
@@ -266,26 +289,6 @@ describe Organization do
       it 'returns nil for not-enabled snippet' do
         expect(organization.mail_snippet_body(mail_snippet.name)).to eq mail_snippet.body
       end
-    end
-  end
-
-  describe "organization_message_kinds" do
-    let(:organization) { FactoryGirl.create(:organization) }
-    let!(:mail_snippet) { FactoryGirl.create(:mail_snippet, organization: organization, name: "abandoned_bike") }
-    let!(:user) { FactoryGirl.create(:organization_member, organization: organization) }
-    it "returns empty for non-geolocated_emails" do
-      expect(organization.organization_message_kinds).to eq([])
-      expect(organization.permitted_message_kind?(nil)).to be_falsey
-      expect(mail_snippet).to be_present
-      expect(user.bike_actions_organization_id).to eq nil
-      organization.update_attributes(geolocated_emails: true, abandoned_bike_emails: true)
-      expect(organization.organization_message_kinds).to match_array(%w[geolocated abandoned_bike])
-      expect(organization.permitted_message_kind?("abandoned_bike")).to be_truthy
-      expect(organization.permitted_message_kind?(%w[geolocated abandoned_bike])).to be_truthy
-      expect(organization.permitted_message_kind?(%w[geolocated abandoned_bike weird_type])).to be_falsey
-      # TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
-      user.update_attributes(updated_at: Time.now)
-      expect(user.bike_actions_organization_id).to eq organization.id
     end
   end
 end

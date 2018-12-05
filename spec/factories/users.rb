@@ -12,6 +12,9 @@ FactoryGirl.define do
       end
       factory :admin do
         superuser true
+        factory :admin_developer do
+          developer true
+        end
       end
       factory :content_admin do
         is_content_admin true

@@ -58,9 +58,9 @@ RSpec.describe Invoice, type: :model do
       let(:paid_feature) { FactoryGirl.create(:paid_feature, kind: "standard") }
       let(:paid_feature_one_time) { FactoryGirl.create(:paid_feature_one_time) }
       it "returns invoice" do
-        invoice.update_attributes(paid_feature_ids: [paid_feature.slug, paid_feature_one_time.id])
+        expect(organization.paid_feature_slugs).to eq([])
+        invoice.update_attributes(paid_feature_ids: [paid_feature.id, paid_feature_one_time.id])
         expect(invoice.paid_features.pluck(:id)).to match_array([paid_feature.id, paid_feature_one_time.id])
-
         invoice2 = invoice.create_following_invoice
         expect(invoice2.is_a?(Invoice)).to be_truthy
         expect(invoice2.active?).to be_falsey
@@ -80,13 +80,13 @@ RSpec.describe Invoice, type: :model do
     let(:paid_feature_one_time) { FactoryGirl.create(:paid_feature_one_time, name: "one Time Feature", slug: "one-time") }
     it "adds the paid feature ids and updates amount_due_cents" do
       expect(invoice.amount_due_cents).to be_nil
-      invoice.update_attributes(paid_feature_ids: paid_feature.slug)
+      invoice.update_attributes(paid_feature_ids: paid_feature.id)
       invoice.reload
       invoice.update_attributes(amount_due_cents: 0)
       expect(invoice.paid_in_full?).to be_truthy # Because it was just overridden
       expect(invoice.active?).to be_truthy
       expect(invoice.paid_features.pluck(:id)).to eq([paid_feature.id])
-      invoice.update_attributes(paid_feature_ids: " #{paid_feature.slug}, #{paid_feature_one_time.name}, #{paid_feature_one_time.slug}, xxxxx,#{paid_feature.slug}")
+      invoice.update_attributes(paid_feature_ids: " #{paid_feature.id}, #{paid_feature_one_time.id}, #{paid_feature_one_time.id}, xxxxx,#{paid_feature.id}")
       invoice.reload
       expect(invoice.paid_features.pluck(:id)).to match_array([paid_feature.id, paid_feature_one_time.id] * 2)
       invoice.paid_feature_ids = [paid_feature_one_time.id, paid_feature2.id, "xxxxx"]
@@ -95,7 +95,7 @@ RSpec.describe Invoice, type: :model do
       # TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
       organization.update_attributes(updated_at: Time.now)
       organization.reload
-      expect(organization.paid_feature_slugs).to match_array([paid_feature2.slug, paid_feature_one_time.slug])
+      expect(organization.paid_feature_slugs).to eq([])
     end
   end
 end

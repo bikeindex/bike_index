@@ -47,7 +47,7 @@ module Organized
     end
 
     def ensure_access_to_exports!
-      return true if current_organization.paid_for?("csv-exports") || current_user.superuser?
+      return true if current_organization.paid_for?("csv_exports") || current_user.superuser?
       flash[:error] = "Your organization doesn't have access to that, please contact Bike Index support"
       redirect_to organization_bikes_path(organization_id: current_organization.to_param) and return
     end

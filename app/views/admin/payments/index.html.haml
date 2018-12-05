@@ -30,7 +30,7 @@
             %a.convertTime{ href: edit_admin_payment_path(payment) }
               = l payment.created_at, format: :convert_time
           %td
-            - if payment.user_id.present?
+            - if payment.user.present?
               = link_to payment.user.display_name, edit_admin_user_path(payment.user)
             - elsif payment.email.present?
               = payment.email

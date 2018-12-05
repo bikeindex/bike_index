@@ -15,6 +15,15 @@ class OrganizationMessage < ActiveRecord::Base
   before_validation :validate_requirements_for_kind
   after_create :send_email_message
 
+  # To match the feature_slug on organizations
+  def kind_slug
+    "#{kind}_messages"
+  end
+
+  def kind_slug=(val)
+    self.kind = val.gsub(/_messages/, "")
+  end
+
   def set_calculated_attributes
     self.email ||= bike.owner_email
     if latitude.present? && longitude.present?

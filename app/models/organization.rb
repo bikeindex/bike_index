@@ -47,7 +47,7 @@ class Organization < ActiveRecord::Base
   scope :valid, -> { where(is_suspended: false) }
   scope :valid, -> { where(is_suspended: false) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
-  scope :with_bike_actions, -> { where("organizations.geolocated_emails = ? OR organizations.abandoned_bike_emails = ?", true, true) }
+  scope :with_bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: ["messages"]) }
 
   before_validation :set_calculated_attributes
   after_commit :update_user_bike_actions_organizations
@@ -80,29 +80,32 @@ class Organization < ActiveRecord::Base
     snippet && snippet.body
   end
 
-  def organization_message_kinds # Matches organization_message kinds
+  def message_kinds # Matches organization_message kinds
     [
-      (geolocated_emails ? "geolocated" : nil),
-      (abandoned_bike_emails ? "abandoned_bike" : nil)
+      paid_for?("geolocated_messages") ? "geolocated_messages" : nil,
+      paid_for?("abandoned_bike_messages") ? "abandoned_bike_messages" : nil
     ].compact
   end
 
-  def permitted_message_kind?(kinds)
-    # If kinds is an array, make sure they all are permitted kinds
-    if kinds.is_a?(Array)
-      return false unless kinds.any?
-      return kinds.none? { |k| !permitted_message_kind?(k) }
-    end
-    organization_message_kinds.include?(kinds.to_s)
+  def additional_registration_fields
+    [
+      paid_for?("reg_address") ? "reg_address" : nil,
+      paid_for?("reg_secondary_serial") ? "reg_secondary_serial" : nil
+    ].compact
   end
 
   def bike_actions? # Eventually there will be other actions beside organization_messages, so use this as general reference
-    organization_message_kinds.any?
+    message_kinds.any?
   end
 
   def paid_for?(feature_name)
-    return true if paid_feature_slugs.include?(feature_name)
-    paid_feature_slugs.include?(PaidFeature.friendly_find(feature_name)&.slug) 
+    return false unless feature_name.present?
+    # If kinds is an array, make sure they all are permitted kinds
+    if feature_name.is_a?(Array)
+      return false unless feature_name.any? # If they passed an empty array, it's false
+      return feature_name.none? { |k| !paid_for?(k) }
+    end
+    paid_feature_slugs.include?(feature_name.strip.downcase.gsub(/\s/, "_")) # gnarly custom slug function because fml
   end
 
   def set_calculated_attributes
@@ -113,7 +116,7 @@ class Organization < ActiveRecord::Base
     self.short_name = (short_name || name).truncate(30)
     self.is_paid = true if current_invoice&.paid_in_full?
     # For now, just use them. However - nesting organizations probably need slightly modified paid_feature slugs
-    self.paid_feature_slugs = current_invoice && current_invoice.paid_features.pluck(:slug) || []
+    self.paid_feature_slugs = current_invoice && current_invoice.paid_features.pluck(:feature_slugs).flatten.uniq || []
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, '')
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
@@ -128,7 +131,7 @@ class Organization < ActiveRecord::Base
     set_auto_user
     update_user_bike_actions_organizations
     locations.each { |l| l.save unless l.shown == allowed_show }
-    true # legacy bs rails concerns
+    true # TODO: Rails 5 update
   end
 
   def ensure_auto_user
@@ -139,15 +142,16 @@ class Organization < ActiveRecord::Base
 
   def school?; org_type == "school" end
   def current_invoice; invoices.active.last || parent_organization&.current_invoice end # Parent invoice serves as invoice
-  def paid_features; PaidFeature.where(slug: paid_feature_slugs) end
 
   # I'm trying to ammass a list of paid features here (also in admin organization show)
   def bike_search?; has_bike_search end
   def show_recoveries?; has_bike_search end
   def show_bulk_import?; show_bulk_import end
   def show_partial_registrations?; show_partial_registrations end
-  def require_address_on_registration?; require_address_on_registration end
-  def use_additional_registration_field?; use_additional_registration_field end
+
+  # For both of these, deprecating the stand alone attributes and instead using invoices. But - for now, not doing that because time
+  def require_address_on_registration?; paid_for?("reg_address") || require_address_on_registration end
+  def use_additional_registration_field?; paid_for?("reg_secondary_serial") || use_additional_registration_field end
 
   # Can be improved later, for now just always get a location for the map
   def map_focus_coordinates
