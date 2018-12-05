@@ -78,6 +78,7 @@ describe Organization do
     it "uses associations to determine is_paid" do
       expect(organization.paid_for?("csv_exports")).to be_falsey
       invoice.update_attributes(paid_feature_ids: [paid_feature.id])
+      expect(invoice.feature_slugs).to eq(["csv_exports"])
       organization.update_attributes(updated_at: Time.now) # TODO: Rails 5 update - after_commit
       expect(organization.is_paid).to be_truthy
       expect(organization.paid_feature_slugs).to eq(["csv_exports"])

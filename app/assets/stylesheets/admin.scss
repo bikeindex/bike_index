@@ -1,0 +1,65 @@
+// Right now, admin styles are jumbled into og_application.
+// In the interest of making the path to upgrading the admin styles, add a new stylesheet that we can modify
+
+@media (max-width: 700px) {
+  .full-screen-table {
+    table {
+      table-layout: fixed;
+      .date-recovered-cell {
+        width: 6em;
+      }
+      .sm-cell {
+        width: 2em;
+      }
+      .sm-cell-hide {
+        display: none;
+      }
+    }
+  }
+}
+
+.donor-icon {
+  display: inline-block;
+  color: white;
+  font-size: 75%;
+  background: #2ecc71;
+  font-weight: 800;
+  padding: 0.15em 0.25em;
+  border: 1px solid #ccc;
+  line-height: 1em;
+  border-radius: 0.5em;
+}
+.paid-org-icon {
+  display: inline-block;
+  color: white;
+  font-size: 75%;
+  background: #2980b9;
+  font-weight: 800;
+  padding: 0.15em 0.25em;
+  border: 1px solid #ccc;
+  line-height: 1em;
+  border-radius: 0.5em;
+}
+thead.sortable {
+  th {
+    font-weight: normal;
+    a.sortable-link {
+      display: block;
+      position: relative;
+      // To give a spot for the sortable direction
+      &.active {
+        padding-right: 1.5rem;
+      }
+      span.sortable-direction {
+        display: block;
+        position: absolute;
+        right: 0;
+        top: 0;
+      }
+      &.active {
+        font-weight: strong;
+        text-decoration: underline;
+      }
+    }
+  }
+}

@@ -3,8 +3,9 @@
 class PaidFeature < ActiveRecord::Base
   include Amountable
   KIND_ENUM = { standard: 0, standard_one_time: 1, custom: 2, custom_one_time: 3 }.freeze
-  # Just to keep track of this somewhere - every paid feature that is locked should be in this array
-  # These slugs are used in the code (e.g. in the views)
+  # Organizations have paid_feature_slugs as an array attribute to track which features should be enabled
+  # Every feature slug that is used in the code should be in this array
+  # Only slugs that are used in the code should be in this array
   EXPECTED_SLUGS = %w[csv_exports messages geolocated_messages abandoned_bike_messages reg_address reg_secondary_serial].freeze
 
   has_many :invoice_paid_features
@@ -31,6 +32,8 @@ class PaidFeature < ActiveRecord::Base
     feature_slugs.join(", ")
   end
 
+  # We only want to store features that are used in the code. Some features overlap - e.g. there are packages that apply multiple features
+  # So check for matches with the EXPECTED_SLUGS which tracks which features we're using
   def feature_slugs_string=(val)
     self.feature_slugs = val.split(",").reject(&:blank?).map do |str|
       fslug = str.downcase.strip

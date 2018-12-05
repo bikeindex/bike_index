@@ -47,6 +47,3 @@
               = link_to "none", admin_bulk_imports_url(organization_id: "none"), style: "color: #ccc"
           %td
             = bulk_import.creation_states.count # Don't need to do bikes through creation states
-
-:javascript
-  $(document).ready(function() {$('.full-screen-table').parents('.receptacle').css('max-width', '100%');});

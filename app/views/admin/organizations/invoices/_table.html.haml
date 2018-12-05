@@ -58,7 +58,7 @@
           %td
             = link_to invoice.display_name, edit_admin_organization_invoice_path(organization_id: invoice.organization.to_param, id: invoice.to_param)
             - if invoice.active?
-              %small.text-success{ style: "display: block;" }
+              %small.hidden.medium-screens.text-success{ style: "display: block;" }
                 Active
             - if invoice.previous_invoice.present?
               %small.less-strong{ style: "display: block; margin-top: 1rem;" }
@@ -96,3 +96,4 @@
                   = link_to paid_feature.name, edit_admin_paid_feature_path(paid_feature)
                   %em{ style: "font-size: 70%;" }
                     = paid_feature.kind
+              - invoice

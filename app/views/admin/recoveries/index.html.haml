@@ -95,16 +95,3 @@
           
   .paginate-container
     = paginate @recoveries
-:scss
-  @media (max-width: 700px) {
-    .full-screen-table {
-      table {
-        table-layout: fixed;
-        .date-recovered-cell { width: 6em; }
-        .sm-cell { width: 2em; }
-        .sm-cell-hide { display: none; }
-      }
-    }
-  }
-:javascript
-  $(document).ready(function() {$('.full-screen-table').parents('.receptacle').css('max-width', '100%');});

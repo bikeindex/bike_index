@@ -1516,8 +1516,6 @@ CREATE TABLE public.organizations (
     show_bulk_import boolean DEFAULT false,
     has_bike_codes boolean DEFAULT false NOT NULL,
     has_bike_search boolean DEFAULT false NOT NULL,
-    geolocated_emails boolean DEFAULT false NOT NULL,
-    abandoned_bike_emails boolean DEFAULT false NOT NULL,
     require_address_on_registration boolean DEFAULT false NOT NULL,
     show_partial_registrations boolean DEFAULT false NOT NULL,
     paid_feature_slugs jsonb,
@@ -1625,7 +1623,6 @@ CREATE TABLE public.paid_features (
     kind integer DEFAULT 0,
     amount_cents integer,
     name character varying,
-    slug character varying,
     description text,
     details_link character varying,
     created_at timestamp without time zone NOT NULL,
@@ -4087,4 +4084,6 @@ INSERT INTO schema_migrations (version) VALUES ('20180918220604');
 INSERT INTO schema_migrations (version) VALUES ('20181130200131');
 
 INSERT INTO schema_migrations (version) VALUES ('20181204215943');
+
+INSERT INTO schema_migrations (version) VALUES ('20181205180633');
 

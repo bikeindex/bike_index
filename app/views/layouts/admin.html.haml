@@ -5,52 +5,9 @@
   - body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
   - body_class = "vendor-signup-page" if current_page?(:vendor_signup)
   - body_class = "news-page" if controller_name == "news"
-  :scss
-    .donor-icon {
-      display: inline-block;
-      color: white;
-      font-size: 75%;
-      background: #2ecc71;
-      font-weight: 800;
-      padding: .15em .25em;
-      border: 1px solid #ccc;
-      line-height: 1em;
-      border-radius: 0.5em;
-    }
-    .paid-org-icon {
-      display: inline-block;
-      color: white;
-      font-size: 75%;
-      background: #2980B9;
-      font-weight: 800;
-      padding: .15em .25em;
-      border: 1px solid #ccc;
-      line-height: 1em;
-      border-radius: 0.5em;
-    }
-    thead.sortable {
-      th {
-        font-weight: normal;
-        a.sortable-link {
-          display: block;
-          position: relative;
-          // To give a spot for the sortable direction
-          &.active {
-            padding-right: 1.5rem;
-          }
-          span.sortable-direction {
-            display: block;
-            position: absolute;
-            right: 0;
-            top: 0;
-          }
-          &.active {
-            font-weight: strong;
-            text-decoration: underline;
-          }
-        }
-      }
-    }
+
+  = stylesheet_link_tag "admin_styles", media: "all"
+    
   %body#body{ class: body_class }
     = render 'layouts/messages'
 
