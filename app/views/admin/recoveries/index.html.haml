@@ -21,7 +21,7 @@
 
 .paginate-container
   = paginate @recoveries
-%section.full-screen-table
+%section.full-screen-table.small-fixed-width
   = form_tag approve_admin_recoveries_path, class: '', id: 'multi_check' do
     = hidden_field_tag :multipost, true
     / - unless @posted
