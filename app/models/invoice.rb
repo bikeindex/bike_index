@@ -44,7 +44,7 @@ class Invoice < ActiveRecord::Base
   # There can be multiple features of the same id. View the spec for additional info
   def paid_feature_ids=(val) # This isn't super efficient, but whateves
     val = val.to_s.split(",") unless val.is_a?(Array)
-    new_features = val.map { |v| PaidFeature.friendly_find(v) }.compact
+    new_features = val.map { |v| PaidFeature.where(id: v).first }.compact
     new_feature_ids = new_features.map(&:id)
     existing_feature_ids = invoice_paid_features.pluck(:paid_feature_id)
     (existing_feature_ids - new_feature_ids).uniq.each do |absent_id| # ids absent from new features

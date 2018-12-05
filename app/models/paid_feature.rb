@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class PaidFeature < ActiveRecord::Base
-  include FriendlySlugFindable
   include Amountable
   KIND_ENUM = { standard: 0, standard_one_time: 1, custom: 2, custom_one_time: 3 }.freeze
   # Just to keep track of this somewhere - every paid feature that is locked should be in this array
@@ -14,7 +13,6 @@ class PaidFeature < ActiveRecord::Base
 
   enum kind: KIND_ENUM
 
-  before_validation :set_calculated_attributes
   after_commit :update_invoices
 
   scope :recurring, -> { where(kind: %w[standard custom]) }
@@ -34,10 +32,6 @@ class PaidFeature < ActiveRecord::Base
       fslug = str.downcase.strip
       EXPECTED_SLUGS.include?(fslug) ? fslug : nil
     end.compact
-  end
-
-  def set_calculated_attributes
-    self.slug = Slugifyer.slugify(name)
   end
 
   # Trigger an update to invoices which will, in turn, update the associated organizations

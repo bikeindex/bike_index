@@ -52,6 +52,6 @@ class Admin::PaidFeaturesController < Admin::BaseController
   end
 
   def find_paid_feature
-    @paid_feature = PaidFeature.friendly_find(params[:id])
+    @paid_feature = PaidFeature.find(params[:id])
   end
 end
