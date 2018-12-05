@@ -69,6 +69,7 @@ RSpec.describe Invoice, type: :model do
         expect(invoice.following_invoice).to eq invoice2
         expect(invoice2.following_invoice).to be_nil
         expect(invoice2.paid_features.pluck(:id)).to eq([paid_feature.id])
+        expect(invoice2.feature_slugs).to eq([])
       end
     end
   end
@@ -77,7 +78,7 @@ RSpec.describe Invoice, type: :model do
     let(:invoice) { FactoryGirl.create(:invoice, amount_due_cents: nil, subscription_start_at: Time.now - 1.week) }
     let(:paid_feature) { FactoryGirl.create(:paid_feature, amount_cents: 100_000) }
     let(:paid_feature2) { FactoryGirl.create(:paid_feature) }
-    let(:paid_feature_one_time) { FactoryGirl.create(:paid_feature_one_time, name: "one Time Feature", slug: "one-time") }
+    let(:paid_feature_one_time) { FactoryGirl.create(:paid_feature_one_time, name: "one Time Feature") }
     it "adds the paid feature ids and updates amount_due_cents" do
       expect(invoice.amount_due_cents).to be_nil
       invoice.update_attributes(paid_feature_ids: paid_feature.id)

@@ -1,19 +1,6 @@
 - sortable ||= false
 - display_organization ||= false
 
-:scss
-  .table-sub-list {
-    list-style-type: disc;
-    margin: 0 0 10px;
-    padding: 0 0 5px;
-    -webkit-margin-before: 0px;
-    -webkit-margin-after: 0px;
-    -webkit-margin-start: 0px;
-    -webkit-margin-end: 0px;
-    -webkit-padding-start: 15px;
-  }
-%span#pageContainerFluid
-
 %section.full-screen-table
   %table.table.table-striped.table-bordered.sortable
     %thead
@@ -96,3 +83,9 @@
                   = link_to paid_feature.name, edit_admin_paid_feature_path(paid_feature)
                   %em{ style: "font-size: 70%;" }
                     = paid_feature.kind
+
+            - if current_user.developer?
+              %small
+                - invoice.feature_slugs.each do |slug|
+                  %code
+                    = slug

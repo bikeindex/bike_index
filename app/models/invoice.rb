@@ -99,6 +99,10 @@ class Invoice < ActiveRecord::Base
     paid_features.sum(:amount_cents)
   end
 
+  def feature_slugs
+    paid_features.pluck(:feature_slugs).flatten.uniq
+  end
+
   def create_following_invoice
     return nil unless active? || was_active?
     return following_invoice if following_invoice.present?

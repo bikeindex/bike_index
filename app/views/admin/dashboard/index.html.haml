@@ -20,8 +20,7 @@
   %h2
     Recent
     = link_to "Users", admin_users_url
-  %table.table.table-striped.table-bordered
-    = render partial: "/admin/users/table"
+  = render partial: "/admin/users/table"
 
   %p.pull-right
     #{User.count} users total

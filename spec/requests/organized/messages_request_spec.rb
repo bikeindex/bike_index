@@ -3,7 +3,6 @@ require "spec_helper"
 describe "Organized::MessagesController" do
   include_context :geocoder_default_location
   include_context :organization_with_geolocated_messages
-  let(:organization) { FactoryGirl.create(:organization, is_paid: false, geolocated_emails: true) }
   let(:base_url) { "/o/#{organization.to_param}/messages" }
   before { set_current_user(user, request_spec: true) if user.present? }
 
