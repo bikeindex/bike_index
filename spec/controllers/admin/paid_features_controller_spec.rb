@@ -48,7 +48,24 @@ describe Admin::PaidFeaturesController, type: :controller do
       end
       context "developer" do
         let(:user) { FactoryGirl.create(:admin_developer) }
-        let(:subject) { FactoryGirl.create(:paid_feature) }
+        it "does not update feature_slugs" do
+          put :update, id: subject.to_param, paid_feature: passed_params.merge(feature_slugs_string: "csv_exports, MessagES,geolocated_messages, blarg")
+          subject.reload
+          passed_params.each { |k, v| expect(subject.send(k)).to eq(v) }
+          expect(subject.feature_slugs).to eq(%w[csv_exports messages geolocated_messages])
+        end
+      end
+    end
+    context "locked" do
+      before { allow_any_instance_of(PaidFeature).to receive(:locked?) { true } }
+      it "does not update" do
+        put :update, id: subject.to_param, paid_feature: passed_params.merge(feature_slugs_string: "csv_exports")
+        expect(flash[:error]).to be_present
+        subject.reload
+        passed_params.each { |k, v| expect(subject.send(k)).to_not eq(v) }
+      end
+      context "developer" do
+        let(:user) { FactoryGirl.create(:admin_developer) }
         it "does not update feature_slugs" do
           put :update, id: subject.to_param, paid_feature: passed_params.merge(feature_slugs_string: "csv_exports, MessagES,geolocated_messages, blarg")
           subject.reload

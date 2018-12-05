@@ -23,6 +23,10 @@ class PaidFeature < ActiveRecord::Base
   def one_time?; standard_one_time? || custom_one_time? end
   def recurring?; !one_time? end
 
+  def locked?
+    feature_slugs.any? && invoices.active.any?
+  end
+
   def feature_slugs_string
     feature_slugs.join(", ")
   end

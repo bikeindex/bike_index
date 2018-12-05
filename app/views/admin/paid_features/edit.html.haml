@@ -1,4 +1,10 @@
 %h1
   Edit #{@paid_feature.name}
 
+- if @paid_feature.locked?
+  .alert.alert-danger{ style: "margin: 40px 0;" }
+    %p
+      This Feature is used to enable and disable functionality for organizations in Bike Index
+    %p
+      If you need to update it, talk to Seth
 = render partial: "form"

@@ -1,6 +1,6 @@
 class Admin::PaidFeaturesController < Admin::BaseController
   include SortableTable
-  before_filter :find_paid_feature, only: [:edit, :update]
+  before_filter :find_paid_feature, only: %i[edit update]
 
   def index
     @paid_features = PaidFeature.order(sort_column + " " + sort_direction)
@@ -18,7 +18,7 @@ class Admin::PaidFeaturesController < Admin::BaseController
 
   def update
     @paid_feature.update_attributes(permitted_update_parameters)
-    flash[:success] = "Feature updated"
+    flash[:success] = "Feature updated" unless flash[:error].present?
     redirect_to admin_paid_features_path
   end
 
@@ -42,6 +42,9 @@ class Admin::PaidFeaturesController < Admin::BaseController
   def permitted_update_parameters
     if current_user.developer?
       permitted_parameters.merge(params.require(:paid_feature).permit(:feature_slugs_string))
+    elsif @paid_feature&.id&.present? && @paid_feature.locked?
+      flash[:error] = "Can't update locked paid feature! Please ask Seth"
+      {}
     else
       permitted_parameters
     end
