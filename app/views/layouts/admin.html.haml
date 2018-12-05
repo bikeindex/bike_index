@@ -6,7 +6,7 @@
   - body_class = "vendor-signup-page" if current_page?(:vendor_signup)
   - body_class = "news-page" if controller_name == "news"
 
-  = stylesheet_link_tag "admin_styles", media: "all"
+  = stylesheet_link_tag "admin", media: "all"
     
   %body#body{ class: body_class }
     = render 'layouts/messages'

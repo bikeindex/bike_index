@@ -1,19 +1,6 @@
 - sortable ||= false
 - display_organization ||= false
 
-:scss
-  .table-sub-list {
-    list-style-type: disc;
-    margin: 0 0 10px;
-    padding: 0 0 5px;
-    -webkit-margin-before: 0px;
-    -webkit-margin-after: 0px;
-    -webkit-margin-start: 0px;
-    -webkit-margin-end: 0px;
-    -webkit-padding-start: 15px;
-  }
-%span#pageContainerFluid
-
 %section.full-screen-table
   %table.table.table-striped.table-bordered.sortable
     %thead
@@ -58,7 +45,7 @@
           %td
             = link_to invoice.display_name, edit_admin_organization_invoice_path(organization_id: invoice.organization.to_param, id: invoice.to_param)
             - if invoice.active?
-              %small.hidden.medium-screens.text-success{ style: "display: block;" }
+              %small.text-success{ style: "display: block;" }
                 Active
             - if invoice.previous_invoice.present?
               %small.less-strong{ style: "display: block; margin-top: 1rem;" }
@@ -96,4 +83,9 @@
                   = link_to paid_feature.name, edit_admin_paid_feature_path(paid_feature)
                   %em{ style: "font-size: 70%;" }
                     = paid_feature.kind
-              - invoice
+
+            - if current_user.developer?
+              %small
+                - invoice.feature_slugs.each do |slug|
+                  %code
+                    = slug
