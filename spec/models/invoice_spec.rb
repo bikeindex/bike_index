@@ -55,8 +55,8 @@ RSpec.describe Invoice, type: :model do
     end
     context "with active invoice" do
       let(:invoice) { FactoryGirl.create(:invoice, subscription_start_at: Time.now - 4.years, force_active: true) }
-      let(:paid_feature) { FactoryGirl.create(:paid_feature, kind: "standard", feature_slugs: ["cool"]) }
-      let(:paid_feature_one_time) { FactoryGirl.create(:paid_feature_one_time, feature_slugs: %w[cool bike]) }
+      let(:paid_feature) { FactoryGirl.create(:paid_feature, kind: "standard") }
+      let(:paid_feature_one_time) { FactoryGirl.create(:paid_feature_one_time) }
       it "returns invoice" do
         expect(organization.paid_feature_slugs).to eq([])
         invoice.update_attributes(paid_feature_ids: [paid_feature.id, paid_feature_one_time.id])

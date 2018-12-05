@@ -2,18 +2,12 @@ require "spec_helper"
 
 describe Organized::MessagesController, type: :controller do
   include_context :geocoder_default_location
+  include_context :organization_with_geolocated_messages
   let(:root_path) { organization_messages_path(organization_id: organization.to_param, kind: kind_slug) }
   let(:user) { FactoryGirl.create(:organization_member, organization: organization) }
   let(:bike) { FactoryGirl.create(:bike, owner_email: "party_time@stuff.com") }
-  let(:organization) { FactoryGirl.create(:organization, is_paid: false, geolocated_emails: true) }
-  let(:paid_feature) { FactoryGirl.create(:paid_feature, feature_slugs: %w[messages geolocated_messages]) }
+  let(:organization) { FactoryGirl.create(:organization, is_paid: false) }
   let(:kind_slug) { "geolocated_messages" }
-  let!(:invoice) do
-    inv = FactoryGirl.create(:invoice_paid, organization: organization)
-    inv.update_attributes(paid_feature_ids: [paid_feature&.id]) # Because we have to create the invoice first
-    organization.update_attributes(updated_at: Time.now) # TODO: Rails 5 update - after_commit
-    inv
-  end
 
   before { set_current_user(user) if user.present? }
 
