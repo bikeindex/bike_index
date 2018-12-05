@@ -87,6 +87,13 @@ class Organization < ActiveRecord::Base
     ].compact
   end
 
+  def organization_additional_registration_fields
+    [
+      paid_for?("registration_address") ? "geolocated_messages" : nil,
+      paid_for?("abandoned_bike_messages") ? "abandoned_bike_messages" : nil
+    ].compact
+  end
+
   def bike_actions? # Eventually there will be other actions beside organization_messages, so use this as general reference
     organization_message_kinds.any?
   end
@@ -135,7 +142,6 @@ class Organization < ActiveRecord::Base
 
   def school?; org_type == "school" end
   def current_invoice; invoices.active.last || parent_organization&.current_invoice end # Parent invoice serves as invoice
-  def paid_features; PaidFeature.where(slug: paid_feature_slugs) end
 
   # I'm trying to ammass a list of paid features here (also in admin organization show)
   def bike_search?; has_bike_search end
