@@ -38,7 +38,7 @@ module Organized
     end
 
     def ensure_permitted_message_kind!
-      @kind = params[:organization_message].present? ? params[:organization_message][:kind] : params[:kind]
+      @kind = params[:organization_message].present? ? params[:organization_message][:kind_slug] : params[:kind]
       @kind ||= current_organization.organization_message_kinds
       return true if current_organization.paid_for?(@kind)
       flash[:error] = "Your organization doesn't have access to that, please contact Bike Index support"
@@ -51,7 +51,7 @@ module Organized
     end
 
     def permitted_parameters
-      params.require(:organization_message).permit(:kind, :body, :bike_id, :latitude, :longitude, :accuracy)
+      params.require(:organization_message).permit(:kind_slug, :body, :bike_id, :latitude, :longitude, :accuracy)
             .merge(sender_id: current_user.id, organization_id: current_organization.id)
     end
 

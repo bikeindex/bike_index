@@ -82,18 +82,9 @@ class Organization < ActiveRecord::Base
 
   def organization_message_kinds # Matches organization_message kinds
     [
-      (geolocated_emails ? "geolocated" : nil),
-      (abandoned_bike_emails ? "abandoned_bike" : nil)
+      paid_for?("geolocated_messages") ? "geolocated_messages" : nil,
+      paid_for?("abandoned_bike_messages") ? "abandoned_bike_messages" : nil
     ].compact
-  end
-
-  def permitted_message_kind?(kinds)
-    # If kinds is an array, make sure they all are permitted kinds
-    if kinds.is_a?(Array)
-      return false unless kinds.any? # If they passed an empty array, it's false
-      return kinds.none? { |k| !paid_for?(k) }
-    end
-    organization_message_kinds.include?(kinds.to_s)
   end
 
   def bike_actions? # Eventually there will be other actions beside organization_messages, so use this as general reference
@@ -101,6 +92,7 @@ class Organization < ActiveRecord::Base
   end
 
   def paid_for?(feature_name)
+    return false unless feature_name.present?
     # If kinds is an array, make sure they all are permitted kinds
     if feature_name.is_a?(Array)
       return false unless feature_name.any? # If they passed an empty array, it's false

@@ -96,7 +96,7 @@ describe Organization do
       let!(:user) { FactoryGirl.create(:organization_member, organization: organization) }
       it "returns empty for non-geolocated_emails" do
         expect(organization.organization_message_kinds).to eq([])
-        expect(organization.permitted_message_kind?(nil)).to be_falsey
+        expect(organization.paid_for?(nil)).to be_falsey
         expect(organization.paid_for?("messages")).to be_falsey
         expect(organization.paid_for?("geolocated_messages")).to be_falsey
         expect(user.bike_actions_organization_id).to eq nil
@@ -105,8 +105,9 @@ describe Organization do
         expect(organization.paid_for?("messages")).to be_truthy
         expect(organization.paid_for?("geolocated_messages")).to be_falsey
         expect(organization.paid_for?("abandoned_bike_messages")).to be_truthy
+        expect(organization.organization_message_kinds).to eq(["abandoned_bike_messages"])
         expect(organization.paid_for?("weird_type")).to be_falsey
-        expect(organization.permitted_message_kind?(%w[geolocated abandoned_bike weird_type])).to be_falsey
+        expect(organization.paid_for?(%w[geolocated abandoned_bike weird_type])).to be_falsey
         expect(Organization.with_bike_actions.pluck(:id)).to eq([organization.id])
         # TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
         user.update_attributes(updated_at: Time.now)
