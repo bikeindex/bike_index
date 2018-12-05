@@ -350,7 +350,7 @@ class Bike < ActiveRecord::Base
     paint.name.titleize if paint.present?
   end
 
-  def registration_address # Goes along with organization.require_address_on_registration
+  def registration_address # Goes along with organization.require_address_on_registration?
     b_params.first && b_params.first.bike["address"]
   end
 

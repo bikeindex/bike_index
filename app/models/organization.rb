@@ -89,8 +89,8 @@ class Organization < ActiveRecord::Base
 
   def additional_registration_fields
     [
-      paid_for?("registration_address_field") ? "registration_address_field" : nil,
-      paid_for?("registration_secondary_serial_field") ? "registration_secondary_serial_field" : nil
+      paid_for?("reg_address") ? "reg_address" : nil,
+      paid_for?("reg_secondary_serial") ? "reg_secondary_serial" : nil
     ].compact
   end
 
@@ -148,8 +148,10 @@ class Organization < ActiveRecord::Base
   def show_recoveries?; has_bike_search end
   def show_bulk_import?; show_bulk_import end
   def show_partial_registrations?; show_partial_registrations end
-  def require_address_on_registration?; require_address_on_registration end
-  def use_additional_registration_field?; use_additional_registration_field end
+
+  # For both of these, deprecating the stand alone attributes and instead using invoices. But - for now, not doing that because time
+  def require_address_on_registration?; paid_for?("reg_address") || require_address_on_registration end
+  def use_additional_registration_field?; paid_for?("reg_secondary_serial") || use_additional_registration_field end
 
   # Can be improved later, for now just always get a location for the map
   def map_focus_coordinates

@@ -5,7 +5,7 @@ class PaidFeature < ActiveRecord::Base
   KIND_ENUM = { standard: 0, standard_one_time: 1, custom: 2, custom_one_time: 3 }.freeze
   # Just to keep track of this somewhere - every paid feature that is locked should be in this array
   # These slugs are used in the code (e.g. in the views)
-  EXPECTED_SLUGS = %w[csv_exports messages geolocated_messages abandoned_bike_messages].freeze
+  EXPECTED_SLUGS = %w[csv_exports messages geolocated_messages abandoned_bike_messages reg_address reg_secondary_serial].freeze
 
   has_many :invoice_paid_features
   has_many :invoices, through: :invoice_paid_features
