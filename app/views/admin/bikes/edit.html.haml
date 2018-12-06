@@ -34,6 +34,9 @@
         %dd
           - if @bike.creation_organization.present?
             = link_to @bike.creation_organization.name, admin_organization_path(@bike.creation_organization)
+          - else
+            %small.less-strong
+              self reg
           - if @bike.creation_description.present?
             \-
             %em
