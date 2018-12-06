@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 RSpec.shared_examples 'amountable' do
   let(:model_sym) { subject.class.name.underscore.to_sym }
