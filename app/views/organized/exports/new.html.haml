@@ -11,7 +11,7 @@
         Included columns:
     .col-lg-8
       .row
-        - Export.permitted_headers.each do |header|
+        - Export.permitted_headers(current_organization).each do |header|
           .form-group.col-xs-6.col-md-4
             %label.checkbox
               = f.check_box :headers, { multiple: true, checked: Export.default_headers.include?(header) }, header, 1

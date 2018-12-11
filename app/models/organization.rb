@@ -99,7 +99,7 @@ class Organization < ActiveRecord::Base
   end
 
   def paid_for?(feature_name)
-    return false unless feature_name.present?
+    return false unless feature_name.present? && paid_feature_slugs.is_a?(Array)
     # If kinds is an array, make sure they all are permitted kinds
     if feature_name.is_a?(Array)
       return false unless feature_name.any? # If they passed an empty array, it's false

@@ -16,12 +16,14 @@ class Export < ActiveRecord::Base
 
   attr_accessor :timezone # permit assignment
 
-  def self.permitted_headers; PERMITTED_HEADERS end
-
   def self.default_headers; DEFAULT_HEADERS end
 
   def self.default_options(kind)
     { "headers" => default_headers }.merge(default_kind_options[kind.to_s])
+  end
+
+  def self.additional_registration_fields
+    { reg_address: "registration_address", reg_secondary_serial: "additional_registration_number" }
   end
 
   def self.default_kind_options
@@ -39,6 +41,12 @@ class Export < ActiveRecord::Base
         frame_only: false
       }
     }.as_json.freeze
+  end
+
+  def self.permitted_headers(organization = nil)
+    return PERMITTED_HEADERS unless organization.present?
+    PERMITTED_HEADERS + organization.additional_registration_fields
+                                    .map { |f| additional_registration_fields[f.to_sym] }
   end
 
   def headers; options["headers"] end
