@@ -29,5 +29,26 @@ class Geohelper
       address = addy.to_s.strip
       address.match(/\A\d{5}\z/).present? ? "zipcode: #{address}" : address
     end
+
+    # Given a string, return a address hash for that location
+    def formatted_address_hash(addy)
+      result = Geocoder.search(formatted_address(addy))
+      address_hash_from_geocoder_result(result&.first&.formatted_address)
+    end
+
+    def address_hash_from_geocoder_result(addy)
+      return nil unless addy.present?
+      address_array = addy.split(",").map(&:strip)
+      country = address_array.pop # Don't care about this rn
+      code_and_state = address_array.pop
+      state, code = code_and_state.split(" ") # In case it's a full zipcode with a dash
+      city = address_array.pop
+      {
+        address: address_array.join(", "),
+        city: city,
+        state: state,
+        zipcode: code
+      }.with_indifferent_access
+    end
   end
 end

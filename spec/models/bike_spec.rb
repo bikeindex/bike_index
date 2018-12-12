@@ -520,6 +520,43 @@ describe Bike do
     end
   end
 
+  describe "registration_address" do
+    let(:bike) { Bike.new }
+    let(:b_param) { BParam.new }
+    it "returns nil when no b_param and with a b_param without address" do
+      expect(bike.registration_address).to be_nil
+      allow(bike).to receive(:b_params) { [b_param] }
+      expect(bike.registration_address).to be_nil
+    end
+    context "with registration_address" do
+      let!(:b_param) { FactoryGirl.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
+      let(:bike) { FactoryGirl.create(:bike) }
+      let(:b_param_params) { { bike: { address: "2864 Milwaukee Ave" } } }
+      let(:target) { { address: "2864 N Milwaukee Ave", city: "Chicago", state: "IL", zipcode: "60618" } }
+      it "returns the fetched address" do
+        expect(bike.b_params.pluck(:id)).to eq([b_param.id])
+        bike.reload
+        Geocoder.configure(lookup: :google, use_https: true)
+        VCR.use_cassette("bike-fetch_formatted_address") do
+          expect(bike.registration_address).to eq target.as_json
+        end
+        b_param.reload
+        # Just check that we stored it, since lazily not testing this anywhere else
+        expect(b_param.params["formatted_address"]).to eq target.as_json
+      end
+      context "with multiple b_params" do
+        let!(:b_param_params) { { formatted_address: target, bike: { address: "2864 Milwaukee Ave" } } }
+        let!(:b_param2) { FactoryGirl.create(:b_param, created_bike_id: bike.id, params: { bike: { address: "" } }) }
+        it "gets the one that has an address, doesn't lookup if formatted_address stored" do
+          expect(bike.b_params.pluck(:id)).to match_array([b_param2.id, b_param.id])
+          bike.reload
+          expect_any_instance_of(Geohelper).to_not receive(:formatted_address_hash)
+          expect(bike.registration_address).to eq target.as_json
+        end
+      end
+    end
+  end
+
   describe 'set_paints' do
     it 'returns true if paint is a color' do
       FactoryGirl.create(:color, name: 'Bluety')

@@ -82,6 +82,8 @@ class OrganizationExportWorker
     when "year" then bike.year
     when "color" then bike.frame_colors.join(', ')
     when "serial" then bike.serial_number
+    when "registration_address" then bike.registration_address
+    when "additional_registration_number" then bike.additional_registration
     when "is_stolen" then bike.stolen ? "true" : nil
     end
   end

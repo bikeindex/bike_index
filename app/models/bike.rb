@@ -351,7 +351,7 @@ class Bike < ActiveRecord::Base
   end
 
   def registration_address # Goes along with organization.require_address_on_registration?
-    b_params.first && b_params.first.bike["address"]
+    b_params.map(&:fetch_formatted_address).first
   end
 
   def frame_colors

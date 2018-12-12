@@ -299,6 +299,14 @@ class BParam < ActiveRecord::Base
     true unless owner_email.present? && bike_errors.blank?
   end
 
+  def fetch_formatted_address
+    return nil unless bike["address"].present?
+    return params["formatted_address"] if params["formatted_address"].present?
+    formatted_address = Geohelper.formatted_address_hash(bike["address"])
+    update_attribute :params, params.merge(formatted_address: formatted_address) if formatted_address.present?
+    formatted_address
+  end
+
   protected
 
   def generate_unique_token
