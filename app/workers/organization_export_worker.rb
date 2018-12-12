@@ -66,7 +66,12 @@ class OrganizationExportWorker
   end
 
   def export_headers
-    @export_headers ||= @export.headers
+    return @export_headers if defined?(@export_headers)
+    @export_headers = @export.headers
+    if @export_headers.include?("registration_address")
+      @export_headers = @export_headers.reject { |v| v == "registration_address" } + %w[address city state zipcode]
+    end
+    @export_headers
   end
 
   def value_for_header(header, bike)
@@ -82,9 +87,12 @@ class OrganizationExportWorker
     when "year" then bike.year
     when "color" then bike.frame_colors.join(', ')
     when "serial" then bike.serial_number
-    when "registration_address" then bike.registration_address
     when "additional_registration_number" then bike.additional_registration
     when "is_stolen" then bike.stolen ? "true" : nil
+    when "address" then bike.registration_address["address"] # These are the expanded values for bike registration address
+    when "city" then bike.registration_address["city"]
+    when "state" then bike.registration_address["state"]
+    when "zipcode" then bike.registration_address["zipcode"]
     end
   end
 end

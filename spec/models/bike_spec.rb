@@ -524,9 +524,9 @@ describe Bike do
     let(:bike) { Bike.new }
     let(:b_param) { BParam.new }
     it "returns nil when no b_param and with a b_param without address" do
-      expect(bike.registration_address).to be_nil
+      expect(bike.registration_address).to eq({})
       allow(bike).to receive(:b_params) { [b_param] }
-      expect(bike.registration_address).to be_nil
+      expect(bike.registration_address).to eq({})
     end
     context "with registration_address" do
       let!(:b_param) { FactoryGirl.create(:b_param, created_bike_id: bike.id, params: b_param_params) }

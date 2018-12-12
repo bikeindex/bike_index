@@ -300,10 +300,11 @@ class BParam < ActiveRecord::Base
   end
 
   def fetch_formatted_address
-    return nil unless bike["address"].present?
+    return {} unless bike["address"].present?
     return params["formatted_address"] if params["formatted_address"].present?
     formatted_address = Geohelper.formatted_address_hash(bike["address"])
-    update_attribute :params, params.merge(formatted_address: formatted_address) if formatted_address.present?
+    return {} unless formatted_address.present?
+    update_attribute :params, params.merge(formatted_address: formatted_address)
     formatted_address
   end
 

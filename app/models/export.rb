@@ -45,8 +45,8 @@ class Export < ActiveRecord::Base
 
   def self.permitted_headers(organization = nil)
     return PERMITTED_HEADERS unless organization.present?
-    PERMITTED_HEADERS + organization.additional_registration_fields
-                                    .map { |f| additional_registration_fields[f.to_sym] }
+    additional_headers = organization == "include_paid" ? additional_registration_fields.keys : organization.additional_registration_fields
+    PERMITTED_HEADERS + additional_headers.map { |f| additional_registration_fields[f.to_sym] }
   end
 
   def headers; options["headers"] end
@@ -116,7 +116,9 @@ class Export < ActiveRecord::Base
 
   def validated_options(opts)
     opts = self.class.default_options(kind).merge(opts)
-    opts["headers"] = opts["headers"] & PERMITTED_HEADERS
+    # Permit setting any header - we'll block organizations setting those headers via show and also via controller
+    # but if we want to manually create an export, we should be able to do so
+    opts["headers"] = opts["headers"] & self.class.permitted_headers("include_paid")
     opts
   end
 end

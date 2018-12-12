@@ -79,6 +79,7 @@ describe OrganizationExportWorker do
                            year: 2001,
                            manufacturer_other: "Sweet manufacturer <><>><\\",
                            primary_frame_color: Color.black,
+                           additional_registration: "cool extra serial",
                            secondary_frame_color: secondary_color,
                            owner_email: email)
       end
@@ -111,6 +112,36 @@ describe OrganizationExportWorker do
         # And matching the whole thing
         expect(generated_csv_string).to eq(csv_string)
         expect(export.rows).to eq 1
+      end
+    end
+    context "special headers" do
+      let(:special_bike_values) do
+        [
+          "http://test.host/bikes/#{bike.id}",
+          "cool extra serial",
+          "717 Market St",
+          "San Francisco",
+          "CA",
+          "94103"
+        ]
+      end
+      let(:export) { FactoryGirl.create(:export_organization, progress: "pending", file: nil, options: { headers: %w[link additional_registration_number registration_address] }) }
+      let(:paid_feature) { FactoryGirl.create(:paid_feature, amount_cents: 10_000, name: "CSV Exports", feature_slugs: ["csv_exports"]) }
+      let(:invoice) { FactoryGirl.create(:invoice_paid, amount_due: 0) }
+      let!(:b_param) { FactoryGirl.create(:b_param, created_bike_id: bike.id, params: { bike: { address: "717 Market St, SF" } }) }
+      let(:target_headers) { %w[link additional_registration_number address city state zipcode] }
+      let(:bike) { FactoryGirl.create(:creation_organization_bike, organization: organization, additional_registration: "cool extra serial") }
+      it "returns the expected values" do
+        expect(bike.additional_registration).to eq "cool extra serial"
+        Geocoder.configure(lookup: :google, use_https: true)
+        VCR.use_cassette("geohelper-formatted_address_hash") do
+          instance.perform(export.id)
+        end
+        export.reload
+        expect(instance.export_headers).to eq target_headers
+        expect(export.progress).to eq "finished"
+        generated_csv_string = export.file.read
+        expect(generated_csv_string.split("\n").last).to eq instance.comma_wrapped_string(special_bike_values).strip
       end
     end
   end
