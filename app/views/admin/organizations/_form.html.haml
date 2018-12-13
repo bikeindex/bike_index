@@ -125,11 +125,6 @@
         = f.label :parent_organization_id
       .controls
         = f.collection_select(:parent_organization_id, Organization.all, :id, :name, prompt: "Choose organization")
-    .control-group.padded
-      .control-label
-        = f.label :use_additional_registration_field, "Show secondary registration number on embed"
-      .controls
-        = f.check_box :use_additional_registration_field
 
 / .control-group.padded
 /   .control-label

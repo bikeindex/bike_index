@@ -1508,7 +1508,6 @@ CREATE TABLE public.organizations (
     new_bike_notification text,
     api_access_approved boolean DEFAULT false NOT NULL,
     approved boolean DEFAULT true,
-    use_additional_registration_field boolean DEFAULT false NOT NULL,
     avatar character varying(255),
     is_paid boolean DEFAULT false NOT NULL,
     lock_show_on_map boolean DEFAULT false NOT NULL,
@@ -1516,7 +1515,6 @@ CREATE TABLE public.organizations (
     show_bulk_import boolean DEFAULT false,
     has_bike_codes boolean DEFAULT false NOT NULL,
     has_bike_search boolean DEFAULT false NOT NULL,
-    require_address_on_registration boolean DEFAULT false NOT NULL,
     show_partial_registrations boolean DEFAULT false NOT NULL,
     paid_feature_slugs jsonb,
     parent_organization_id integer
@@ -4086,4 +4084,6 @@ INSERT INTO schema_migrations (version) VALUES ('20181130200131');
 INSERT INTO schema_migrations (version) VALUES ('20181204215943');
 
 INSERT INTO schema_migrations (version) VALUES ('20181205180633');
+
+INSERT INTO schema_migrations (version) VALUES ('20181213224936');
 

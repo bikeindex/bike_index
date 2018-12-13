@@ -149,10 +149,6 @@ class Organization < ActiveRecord::Base
   def show_bulk_import?; show_bulk_import end
   def show_partial_registrations?; show_partial_registrations end
 
-  # For both of these, deprecating the stand alone attributes and instead using invoices. But - for now, not doing that because time
-  def require_address_on_registration?; paid_for?("reg_address") || require_address_on_registration end
-  def use_additional_registration_field?; paid_for?("reg_secondary_serial") || use_additional_registration_field end
-
   # Can be improved later, for now just always get a location for the map
   def map_focus_coordinates
     location = locations&.first

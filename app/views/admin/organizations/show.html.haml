@@ -125,7 +125,7 @@
           %dt
             Additional fields
           %dd
-            - additional_fields = [@organization.use_additional_registration_field? ? "Additional serial" : nil, @organization.require_address_on_registration? ? "Registration address" : nil].compact
+            - additional_fields = @organization.additional_registration_fields.map(&:titleize)
             - if additional_fields.any?
               = additional_fields.join(", ")
             - else

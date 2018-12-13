@@ -350,8 +350,8 @@ class Bike < ActiveRecord::Base
     paint.name.titleize if paint.present?
   end
 
-  def registration_address # Goes along with organization.require_address_on_registration?
-    b_params.map(&:fetch_formatted_address).first || {}
+  def registration_address # Goes along with organization additional_registration_fields
+    b_params.map(&:fetch_formatted_address).reject(&:blank?).first || {}
   end
 
   def frame_colors
