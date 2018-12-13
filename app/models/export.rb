@@ -16,12 +16,14 @@ class Export < ActiveRecord::Base
 
   attr_accessor :timezone # permit assignment
 
-  def self.permitted_headers; PERMITTED_HEADERS end
-
   def self.default_headers; DEFAULT_HEADERS end
 
   def self.default_options(kind)
     { "headers" => default_headers }.merge(default_kind_options[kind.to_s])
+  end
+
+  def self.additional_registration_fields
+    { reg_address: "registration_address", reg_secondary_serial: "additional_registration_number" }
   end
 
   def self.default_kind_options
@@ -39,6 +41,12 @@ class Export < ActiveRecord::Base
         frame_only: false
       }
     }.as_json.freeze
+  end
+
+  def self.permitted_headers(organization = nil)
+    return PERMITTED_HEADERS unless organization.present?
+    additional_headers = organization == "include_paid" ? additional_registration_fields.keys : organization.additional_registration_fields
+    PERMITTED_HEADERS + additional_headers.map { |f| additional_registration_fields[f.to_sym] }
   end
 
   def headers; options["headers"] end
@@ -108,7 +116,9 @@ class Export < ActiveRecord::Base
 
   def validated_options(opts)
     opts = self.class.default_options(kind).merge(opts)
-    opts["headers"] = opts["headers"] & PERMITTED_HEADERS
+    # Permit setting any header - we'll block organizations setting those headers via show and also via controller
+    # but if we want to manually create an export, we should be able to do so
+    opts["headers"] = opts["headers"] & self.class.permitted_headers("include_paid")
     opts
   end
 end

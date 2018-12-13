@@ -6,7 +6,8 @@ class PaidFeature < ActiveRecord::Base
   # Organizations have paid_feature_slugs as an array attribute to track which features should be enabled
   # Every feature slug that is used in the code should be in this array
   # Only slugs that are used in the code should be in this array
-  EXPECTED_SLUGS = %w[csv_exports messages geolocated_messages abandoned_bike_messages reg_address reg_secondary_serial].freeze
+  EXPECTED_SLUGS = %w[csv_exports messages geolocated_messages abandoned_bike_messages avery_export
+                      reg_address reg_secondary_serial].freeze
 
   has_many :invoice_paid_features
   has_many :invoices, through: :invoice_paid_features

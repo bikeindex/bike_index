@@ -38,8 +38,8 @@ RSpec.describe OrganizationMessage, type: :model do
       let(:latitude) { 41.9202384 }
       let(:longitude) { -87.7158185 }
       let(:organization_message) { FactoryGirl.build(:organization_message, kind: :geolocated, latitude: nil, longitude: nil, address: "3554 W Shakespeare Ave, 60647") }
+      include_context :geocoder_real
       it "sets location" do
-        Geocoder.configure(lookup: :google, use_https: true)
         VCR.use_cassette("organization_message-address_lookup") do
           organization_message.save
           expect(organization_message.latitude).to eq latitude

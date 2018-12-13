@@ -30,3 +30,8 @@ shared_context :geocoder_default_location do
     allow(Geocoder::Calculations).to receive(:bounding_box) { bounding_box }
   end
 end
+
+shared_context :geocoder_real do
+  before { Geocoder.configure(lookup: :google, use_https: true) }
+  after { Geocoder.configure(lookup: :test) }
+end

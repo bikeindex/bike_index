@@ -1,0 +1,187 @@
+http_interactions:
+  - request:
+      method: get
+      uri: https://maps.googleapis.com/maps/api/geocode/json?address=2864%20Milwaukee%20Ave&language=en&sensor=false
+      body:
+        encoding: US-ASCII
+        string: ""
+      headers:
+        Accept-Encoding:
+          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+        Accept:
+          - "*/*"
+        User-Agent:
+          - Ruby
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json; charset=UTF-8
+        Date:
+          - Wed, 12 Dec 2018 19:32:56 GMT
+        Expires:
+          - Thu, 13 Dec 2018 19:32:56 GMT
+        Cache-Control:
+          - public, max-age=86400
+        Access-Control-Allow-Origin:
+          - "*"
+        Server:
+          - mafe
+        Content-Length:
+          - "870"
+        X-Xss-Protection:
+          - 1; mode=block
+        X-Frame-Options:
+          - SAMEORIGIN
+        Alt-Svc:
+          - quic=":443"; ma=2592000; v="44,43,39,35"
+      body:
+        encoding: ASCII-8BIT
+        string: |
+          {
+             "results" : [
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "2864",
+                         "short_name" : "2864",
+                         "types" : [ "street_number" ]
+                      },
+                      {
+                         "long_name" : "North Milwaukee Avenue",
+                         "short_name" : "N Milwaukee Ave",
+                         "types" : [ "route" ]
+                      },
+                      {
+                         "long_name" : "Avondale",
+                         "short_name" : "Avondale",
+                         "types" : [ "neighborhood", "political" ]
+                      },
+                      {
+                         "long_name" : "Chicago",
+                         "short_name" : "Chicago",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "Cook County",
+                         "short_name" : "Cook County",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "Illinois",
+                         "short_name" : "IL",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "United States",
+                         "short_name" : "US",
+                         "types" : [ "country", "political" ]
+                      },
+                      {
+                         "long_name" : "60618",
+                         "short_name" : "60618",
+                         "types" : [ "postal_code" ]
+                      },
+                      {
+                         "long_name" : "7413",
+                         "short_name" : "7413",
+                         "types" : [ "postal_code_suffix" ]
+                      }
+                   ],
+                   "formatted_address" : "2864 N Milwaukee Ave, Chicago, IL 60618, USA",
+                   "geometry" : {
+                      "location" : {
+                         "lat" : 41.933238,
+                         "lng" : -87.71476299999999
+                      },
+                      "location_type" : "ROOFTOP",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 41.9345869802915,
+                            "lng" : -87.71341401970849
+                         },
+                         "southwest" : {
+                            "lat" : 41.9318890197085,
+                            "lng" : -87.7161119802915
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJO21SX3TND4gRtII9-0XkLsE",
+                   "plus_code" : {
+                      "compound_code" : "W7MP+73 Chicago, Illinois, United States",
+                      "global_code" : "86HJW7MP+73"
+                   },
+                   "types" : [ "street_address" ]
+                },
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "2864",
+                         "short_name" : "2864",
+                         "types" : [ "street_number" ]
+                      },
+                      {
+                         "long_name" : "Milwaukee Avenue",
+                         "short_name" : "Milwaukee Ave",
+                         "types" : [ "route" ]
+                      },
+                      {
+                         "long_name" : "Northbrook",
+                         "short_name" : "Northbrook",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "Northfield Township",
+                         "short_name" : "Northfield Township",
+                         "types" : [ "administrative_area_level_3", "political" ]
+                      },
+                      {
+                         "long_name" : "Cook County",
+                         "short_name" : "Cook County",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "Illinois",
+                         "short_name" : "IL",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "United States",
+                         "short_name" : "US",
+                         "types" : [ "country", "political" ]
+                      },
+                      {
+                         "long_name" : "60062",
+                         "short_name" : "60062",
+                         "types" : [ "postal_code" ]
+                      }
+                   ],
+                   "formatted_address" : "2864 Milwaukee Ave, Northbrook, IL 60062, USA",
+                   "geometry" : {
+                      "location" : {
+                         "lat" : 42.1013513,
+                         "lng" : -87.88406599999999
+                      },
+                      "location_type" : "RANGE_INTERPOLATED",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 42.1027002802915,
+                            "lng" : -87.88271701970848
+                         },
+                         "southwest" : {
+                            "lat" : 42.1000023197085,
+                            "lng" : -87.88541498029149
+                         }
+                      }
+                   },
+                   "place_id" : "Ei0yODY0IE1pbHdhdWtlZSBBdmUsIE5vcnRoYnJvb2ssIElMIDYwMDYyLCBVU0EiGxIZChQKEgmDYrFk97gPiBEEXM240TayHBCwFg",
+                   "types" : [ "street_address" ]
+                }
+             ],
+             "status" : "OK"
+          }
+      ? http_version
+    recorded_at: Wed, 12 Dec 2018 19:32:54 GMT
+recorded_with: VCR 4.0.0

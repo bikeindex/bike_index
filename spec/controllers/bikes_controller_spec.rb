@@ -692,6 +692,8 @@ describe BikesController do
               owner_email: 'something@stuff.com'
             }
           end
+          include_context :geocoder_default_location
+          let(:target_address) { { address: "278 Broadway", city: "New York", state: "NY", zipcode: "10007" } }
           it 'creates a bike' do
             b_param = BParam.create(params: { 'bike' => bike_params.as_json }, origin: 'embed_partial')
             expect(b_param.partial_registration?).to be_truthy
@@ -700,8 +702,9 @@ describe BikesController do
             # the foreign keys are assigned correctly. This is how we test that we're
             # This is also where we're testing bikebook assignment
             expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
+            Geocoder.configure(lookup: :test)
             expect do
-              post :create, bike: { manufacturer_id: manufacturer.slug, b_param_id_token: b_param.id_token, address: "188 King St" }
+              post :create, bike: { manufacturer_id: manufacturer.slug, b_param_id_token: b_param.id_token, address: default_location[:address] }
             end.to change(Bike, :count).by(1)
             expect(flash[:success]).to be_present
             bike = Bike.last
@@ -713,7 +716,7 @@ describe BikesController do
             expect(bike.manufacturer).to eq manufacturer
             expect(bike.creation_state.origin).to eq 'embed_partial'
             expect(bike.creation_state.creator).to eq bike.creator
-            expect(bike.registration_address).to eq "188 King St"
+            expect(bike.registration_address).to eq target_address.as_json
           end
         end
         context 'created bike' do

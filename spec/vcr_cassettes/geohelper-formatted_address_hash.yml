@@ -1,0 +1,118 @@
+http_interactions:
+  - request:
+      method: get
+      uri: https://maps.googleapis.com/maps/api/geocode/json?address=717%20Market%20St,%20SF&language=en&sensor=false
+      body:
+        encoding: US-ASCII
+        string: ""
+      headers:
+        Accept-Encoding:
+          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+        Accept:
+          - "*/*"
+        User-Agent:
+          - Ruby
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json; charset=UTF-8
+        Date:
+          - Wed, 12 Dec 2018 18:52:51 GMT
+        Expires:
+          - Thu, 13 Dec 2018 18:52:51 GMT
+        Cache-Control:
+          - public, max-age=86400
+        Access-Control-Allow-Origin:
+          - "*"
+        Server:
+          - mafe
+        Content-Length:
+          - "588"
+        X-Xss-Protection:
+          - 1; mode=block
+        X-Frame-Options:
+          - SAMEORIGIN
+        Alt-Svc:
+          - quic=":443"; ma=2592000; v="44,43,39,35"
+      body:
+        encoding: ASCII-8BIT
+        string: |
+          {
+             "results" : [
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "717",
+                         "short_name" : "717",
+                         "types" : [ "street_number" ]
+                      },
+                      {
+                         "long_name" : "Market Street",
+                         "short_name" : "Market St",
+                         "types" : [ "route" ]
+                      },
+                      {
+                         "long_name" : "SoMa",
+                         "short_name" : "SoMa",
+                         "types" : [ "neighborhood", "political" ]
+                      },
+                      {
+                         "long_name" : "San Francisco",
+                         "short_name" : "SF",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "San Francisco County",
+                         "short_name" : "San Francisco County",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "California",
+                         "short_name" : "CA",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "United States",
+                         "short_name" : "US",
+                         "types" : [ "country", "political" ]
+                      },
+                      {
+                         "long_name" : "94103",
+                         "short_name" : "94103",
+                         "types" : [ "postal_code" ]
+                      }
+                   ],
+                   "formatted_address" : "717 Market St, San Francisco, CA 94103, USA",
+                   "geometry" : {
+                      "location" : {
+                         "lat" : 37.7870322,
+                         "lng" : -122.4039235
+                      },
+                      "location_type" : "ROOFTOP",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 37.7883811802915,
+                            "lng" : -122.4025745197085
+                         },
+                         "southwest" : {
+                            "lat" : 37.7856832197085,
+                            "lng" : -122.4052724802915
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJhZ74MY-AhYARscx5mk67G-w",
+                   "plus_code" : {
+                      "compound_code" : "QHPW+RC SoMa, San Francisco, CA, United States",
+                      "global_code" : "849VQHPW+RC"
+                   },
+                   "types" : [ "street_address" ]
+                }
+             ],
+             "status" : "OK"
+          }
+      ? http_version
+    recorded_at: Wed, 12 Dec 2018 18:52:49 GMT
+recorded_with: VCR 4.0.0
