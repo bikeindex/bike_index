@@ -532,10 +532,10 @@ describe Bike do
       let(:bike) { FactoryGirl.create(:bike) }
       let(:b_param_params) { { bike: { address: "2864 Milwaukee Ave" } } }
       let(:target) { { address: "2864 N Milwaukee Ave", city: "Chicago", state: "IL", zipcode: "60618" } }
+      include_context :geocoder_real
       it "returns the fetched address" do
         expect(bike.b_params.pluck(:id)).to eq([b_param.id])
         bike.reload
-        Geocoder.configure(lookup: :google, use_https: true)
         VCR.use_cassette("bike-fetch_formatted_address") do
           expect(bike.registration_address).to eq target.as_json
         end

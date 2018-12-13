@@ -239,8 +239,8 @@ describe Api::V1::BikesController do
         expect(bike.rear_wheel_size.iso_bsd).to eq 559
       end
 
+      include_context :geocoder_real
       it "creates a stolen record" do
-        Geocoder.configure(lookup: :google, use_https: true)
         VCR.use_cassette("v1_bikes_create-stolen") do
           manufacturer = FactoryGirl.create(:manufacturer)
           @organization.users.first.update_attribute :phone, "123-456-6969"
@@ -288,7 +288,6 @@ describe Api::V1::BikesController do
           expect(csr.locking_description).to eq("some locking description")
           expect(csr.lock_defeat_description).to eq("broken in some crazy way")
         end
-        Geocoder.configure(lookup: :test)
       end
 
       it 'creates an example bike if the bike is from example, and include all the options' do

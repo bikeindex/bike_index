@@ -58,8 +58,7 @@ describe 'Search API V3' do
       let!(:non_stolen) { FactoryGirl.create(:bike, manufacturer: manufacturer, primary_frame_color: color, serial_number: "s") }
       let!(:stolen) { FactoryGirl.create(:stolen_bike, manufacturer: manufacturer, primary_frame_color: color, serial_number: "5") }
       let!(:stolen_proximity) { FactoryGirl.create(:stolen_bike, manufacturer: manufacturer, secondary_frame_color: color, serial_number: "S", latitude: 41.8624488, longitude: -87.6591502) }
-      before { Geocoder.configure(lookup: :google, use_https: true) } # Configuration matches geocode initializer
-      after { Geocoder.configure(lookup: :test) } # reset to test
+      include_context :geocoder_real
       it "calls Bike Search with the expected interpreted_params" do
         VCR.use_cassette("v3_bike_search-count") do
           get "/api/v3/search/count", request_query_params, format: :json

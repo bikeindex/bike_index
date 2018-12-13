@@ -131,9 +131,9 @@ describe OrganizationExportWorker do
       let!(:b_param) { FactoryGirl.create(:b_param, created_bike_id: bike.id, params: { bike: { address: "717 Market St, SF" } }) }
       let(:target_headers) { %w[link additional_registration_number address city state zipcode] }
       let(:bike) { FactoryGirl.create(:creation_organization_bike, organization: organization, additional_registration: "cool extra serial") }
+      include_context :geocoder_real
       it "returns the expected values" do
         expect(bike.additional_registration).to eq "cool extra serial"
-        Geocoder.configure(lookup: :google, use_https: true)
         VCR.use_cassette("geohelper-formatted_address_hash") do
           instance.perform(export.id)
         end

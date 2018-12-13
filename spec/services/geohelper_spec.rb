@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe Geohelper do
-  after { Geocoder.configure(lookup: :test) }
+  include_context :geocoder_real
 
   describe "reverse_geocode" do
     context "point" do
@@ -10,7 +10,6 @@ describe Geohelper do
       let(:longitude) { -106.3015341 }
 
       it "returns correct location" do
-        Geocoder.configure(lookup: :google, use_https: true)
         VCR.use_cassette("geohelper-reverse_geocode") do
           expect(Geohelper.reverse_geocode(latitude, longitude)).to eq address
         end
@@ -24,7 +23,6 @@ describe Geohelper do
     let(:longitude) { -87.7156846 }
 
     it "returns correct location" do
-      Geocoder.configure(lookup: :google, use_https: true)
       VCR.use_cassette("geohelper-coordinates") do
         expect(Geohelper.coordinates_for(address)).to eq(latitude: latitude, longitude: longitude)
       end
@@ -50,7 +48,6 @@ describe Geohelper do
       let(:address_str) { "717 Market St, SF" }
       let(:target) { { address: "717 Market St", city: "San Francisco", state: "CA", zipcode: "94103" } }
       it "returns our desires" do
-        Geocoder.configure(lookup: :google, use_https: true)
         VCR.use_cassette("geohelper-formatted_address_hash") do
           expect(Geohelper.formatted_address_hash(address_str)).to eq target.as_json
         end
