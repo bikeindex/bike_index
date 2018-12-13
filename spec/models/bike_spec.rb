@@ -266,7 +266,7 @@ describe Bike do
     context 'creation organization' do
       let(:ownership) { FactoryGirl.create(:organization_ownership) }
       let(:organization) { bike.creation_organization }
-      let(:member) { FactoryGirl.create(:organization_member, organization: organization ) }
+      let(:member) { FactoryGirl.create(:organization_member, organization: organization) }
       before { expect(bike.creation_organization).to eq member.organizations.first }
       context 'unclaimed' do
         context 'member of organization' do
@@ -286,7 +286,6 @@ describe Bike do
           expect(bike.owner).to eq user
           expect(bike.authorize_bike_for_user!(member)).to be_falsey
         end
-
       end
       context 'more than one ownership' do
         let!(:ownership_2) { FactoryGirl.create(:organization_ownership, bike: bike, creator: user) }
@@ -684,7 +683,7 @@ describe Bike do
       allow(bike).to receive(:primary_frame_color).and_return(color)
       allow(bike).to receive(:secondary_frame_color).and_return(color2)
       allow(bike).to receive(:tertiary_frame_color).and_return(color)
-      expect(bike.frame_colors).to eq(%w(Blue Black Blue))
+      expect(bike.frame_colors).to eq(%w[Blue Black Blue])
     end
   end
 
