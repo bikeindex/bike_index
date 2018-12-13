@@ -3,7 +3,7 @@ class Export < ActiveRecord::Base
   VALID_KINDS = %i[organization stolen manufacturer].freeze
   VALID_FILE_FORMATS = %i[csv xlsx].freeze
   DEFAULT_HEADERS = %w[link registered_at manufacturer model color serial is_stolen].freeze
-  PERMITTED_HEADERS = (DEFAULT_HEADERS + %w[thumbnail registered_by registration_type owner_email owner_name]).freeze
+  PERMITTED_HEADERS = (DEFAULT_HEADERS + %w[thumbnail registered_by registration_type owner_email owner_name owner_name_with_fallback]).freeze
   mount_uploader :file, ExportUploader
 
   belongs_to :organization
