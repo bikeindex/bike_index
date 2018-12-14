@@ -1,13 +1,17 @@
 // Most of the styles for the signup page are in _signup.scss - only a few overrides here
 .signup-landing-page-ambassadors {
-  .banner-header .ribbon .noribbon { height: 1px; }
+  .banner-header .ribbon .noribbon {
+    height: 1px;
+  }
   .ambassadors-blank-footer {
-    padding-bottom: 4*$vertical-height;
+    padding-bottom: 4 * $vertical-height;
     @include media-breakpoint-up(md) {
-      padding-bottom: 10*$vertical-height;
+      padding-bottom: 10 * $vertical-height;
     }
   }
-  .next-steps-col .next-steps-wrap { padding-top: $vertical-height; }
+  .next-steps-col .next-steps-wrap {
+    padding-top: $vertical-height;
+  }
   .trusted-by-next-steps {
     margin-top: 0;
     h3 {
@@ -16,7 +20,7 @@
       margin-bottom: 6px; // because line-height
     }
     ul {
-      padding-bottom: 1.5*$vertical-height;
+      padding-bottom: 1.5 * $vertical-height;
       margin: 0;
     }
     li {
@@ -26,7 +30,7 @@
       position: relative;
       a {
         display: block;
-        padding: 0 0 0 2*$vertical-height;
+        padding: 0 0 0 2 * $vertical-height;
         width: 100%;
         color: $body-font-color;
         &.current {
@@ -37,7 +41,7 @@
             top: 11px;
             height: 10px;
             width: 10px;
-            content: '';
+            content: "";
             background: $blue;
           }
         }
@@ -48,41 +52,61 @@
 
 .signup-landing-page-ambassadors-current {
   .banner-header {
-    .icon-wrapper { margin: 0 auto 2*$vertical-height auto; }
-    h1, h3 {
+    .icon-wrapper {
+      margin: 0 auto 2 * $vertical-height auto;
+    }
+    h1,
+    h3 {
       width: 100%;
       text-align: center;
     }
-    h1 { margin-bottom: 6px; }
-    h3 { margin-bottom: 36px; }
+    h1 {
+      margin-bottom: 6px;
+    }
+    h3 {
+      margin-bottom: 36px;
+    }
     .btn {
       font-size: 18px;
       margin: 0 auto;
     }
   }
   .ambassadors-list {
-    padding-top: 4*$vertical-height;
-    padding-bottom: 4*$vertical-height;
+    padding-top: 4 * $vertical-height;
+    padding-bottom: 4 * $vertical-height;
     text-align: center;
-    .row { justify-content: space-around; }
+    .row {
+      // Read comment in HTML
+      justify-content: center;
+    }
     img {
       display: block;
       width: 100%;
       height: auto;
-      margin: 0 0 2*$vertical-height;
+      margin: 0 0 2 * $vertical-height;
       clip-path: circle(50%);
+      &.no-clip {
+        clip-path: none;
+      }
     }
     .ambassador-question {
       font-weight: bold;
       margin-bottom: $vertical-height;
     }
-    h2, h3, h4 { line-height: 1.2rem; }
-    h2 { font-size: 24px; }
+    h2,
+    h3,
+    h4 {
+      line-height: 1.2rem;
+    }
+    h2 {
+      font-size: 24px;
+    }
     h3 {
       @extend .body-font;
-      font-size: 2*$vertical-height;
+      font-size: 2 * $vertical-height;
     }
-    h3, p {
+    h3,
+    p {
       font-style: italic;
       color: $gray-light;
     }
