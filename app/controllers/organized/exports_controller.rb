@@ -16,12 +16,21 @@ module Organized
     end
 
     def create
-      @export = Export.new(permitted_parameters)
-      if @export.update_attributes(kind: "organization", organization_id: current_organization.id, user_id: current_user.id)
+      if params.dig(:export, :avery_export)
+        if current_organization.paid_for?("avery_export")
+          @export = avery_export
+        else
+          flash[:error] = "You don't have permission to make that sort of export! Please contact support@bikeindex.org"
+        end
+      else
+        @export = Export.new(permitted_parameters)
+      end
+      if flash[:error].blank? && @export.update_attributes(kind: "organization", organization_id: current_organization.id, user_id: current_user.id)
         flash[:success] = "Export Created. Please wait for it to finish processing to be able to download it"
         OrganizationExportWorker.perform_async(@export.id)
         redirect_to organization_exports_path(organization_id: current_organization.to_param)
       else
+        @export ||= Export.new
         render :new
       end
     end
@@ -36,6 +45,14 @@ module Organized
 
     def permitted_parameters
       params.require(:export).permit(:timezone, :start_at, :end_at, :file_format, headers: [])
+    end
+
+    def avery_export
+      export = Export.new(params.require(:export).permit(:timezone, :start_at, :end_at).merge(file_format: :csv))
+      # attributes that we set manually
+      export.headers = %w[owner_name_or_email registration_address]
+      export.options = export.options.merge(avery_export: true)
+      export
     end
 
     def find_export

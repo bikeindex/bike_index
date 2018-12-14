@@ -59,7 +59,7 @@ class Export < ActiveRecord::Base
 
 
   def avery_export?
-    options?("avery_export")
+    option?("avery_export")
   end
 
   def start_at=(val)
