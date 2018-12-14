@@ -28,7 +28,11 @@ module Organized
       if flash[:error].blank? && @export.update_attributes(kind: "organization", organization_id: current_organization.id, user_id: current_user.id)
         flash[:success] = "Export Created. Please wait for it to finish processing to be able to download it"
         OrganizationExportWorker.perform_async(@export.id)
-        redirect_to organization_exports_path(organization_id: current_organization.to_param)
+        if @export.avery_export? # Send to the show page, with avery export parameter set so we can redirect when the processing is finished
+          redirect_to organization_export_path(organization_id: current_organization.to_param, id: @export.id, avery_redirect: true)
+        else
+          redirect_to organization_exports_path(organization_id: current_organization.to_param)
+        end
       else
         @export ||= Export.new
         render :new
