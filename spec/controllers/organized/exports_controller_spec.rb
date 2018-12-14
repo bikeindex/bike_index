@@ -76,6 +76,13 @@ describe Organized::ExportsController, type: :controller do
           end.to raise_error(ActiveRecord::RecordNotFound)
         end
       end
+      context "avery_export" do
+        it "redirects" do
+          export.update_attributes(progress: "finished", options: export.options.merge(avery_export: true))
+          get :show, organization_id: organization.to_param, id: export.id, avery_redirect: true
+          expect(response).to redirect_to export.avery_export_url
+        end
+      end
     end
 
     describe "new" do
@@ -140,7 +147,7 @@ describe Organized::ExportsController, type: :controller do
             export = Export.last
             expect(response).to redirect_to organization_export_path(organization_id: organization.to_param, id: export.id, avery_redirect: true)
             expect(export.kind).to eq "organization"
-            expect(export.file_format).to eq "csv"
+            expect(export.file_format).to eq "xlsx"
             expect(export.user).to eq user
             expect(export.headers).to eq target_headers
             expect(export.avery_export?).to be_truthy

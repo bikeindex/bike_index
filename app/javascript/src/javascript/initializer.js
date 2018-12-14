@@ -93,6 +93,7 @@ $(document).ready(function() {
       window.binxMapping = new BinxMapping("geolocated_messages");
       window.binxAppOrgMessages = new BinxAppOrgMessages();
       binxAppOrgMessages.init();
+    case "organized_exports_show":
     case "organized_exports_new":
       window.binxAppOrgExport = new BinxAppOrgExport();
       binxAppOrgExport.init();

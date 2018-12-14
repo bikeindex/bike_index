@@ -1,14 +1,21 @@
 import * as log from "loglevel";
 if (process.env.NODE_ENV != "production") log.setLevel("debug");
+import moment from "moment-timezone";
 
 window.BinxAppOrgExport = class BinxAppOrgExport {
   init() {
-    // Show what should be shown
-    binxAppOrgExport.showOrHideNonAvery();
-    // and on future changes, trigger the update
-    $("#export_avery_export").on("change", e => {
+    let body_id = document.getElementsByTagName("body")[0].id;
+
+    if (body_id == "organized_exports_new") {
+      // Show what should be shown
       binxAppOrgExport.showOrHideNonAvery();
-    });
+      // and on future changes, trigger the update
+      $("#export_avery_export").on("change", e => {
+        binxAppOrgExport.showOrHideNonAvery();
+      });
+    } else {
+      binxAppOrgExport.reloadIfUnfinished();
+    }
   }
 
   showOrHideNonAvery() {
@@ -19,6 +26,18 @@ window.BinxAppOrgExport = class BinxAppOrgExport {
       $(".hiddenOnAveryExport")
         .slideDown("fast")
         .css("display", "flex");
+    }
+  }
+
+  reloadIfUnfinished() {
+    if (!$("#exportProgress").hasClass("finished")) {
+      // Reload the page after 2 seconds unless the export is more than 5 minutes old - at which point we assume something is broken
+      let created = parseInt($("#exportProgress").attr("data-createdat"));
+      if (moment().unix() - created < 300) {
+        window.setTimeout(() => {
+          location.reload(true);
+        }, 5000);
+      }
     }
   }
 };

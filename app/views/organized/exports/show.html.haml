@@ -1,8 +1,14 @@
+- export_progress_class = @export.progress == "finished" ? "text-success" : "text-warning"
+
 .organized-page-header
   %h1
     Exports
     %small
       = link_to "Download Export", @export.file.url, class: "btn btn-secondary pull-right"
+
+- if @avery_export_redirect
+  .mb-4
+    = render partial: '/shared/alert', locals: { body: "You'll be automatically redirected to the labels once processing is finished", type: "success" }
 
 %table.organized-list-table
   %tbody
@@ -27,8 +33,7 @@
     %tr
       %td
         Progress
-      %td
-        - export_progress_class = @export.progress == "finished" ? "text-success" : ""
+      %td#exportProgress{ class: @export.progress, "data-createdat" => @export.created_at.to_i }
         %span{ class: export_progress_class }
           = @export.progress
 
@@ -40,9 +45,44 @@
 
     %tr
       %td
+        Bikes Registered after
+      %td
+        - if @export.start_at.present?
+          %span.convertTime
+            = l @export.start_at, format: :convert_time
+        - else
+          %small.less-strong
+            \-
+    %tr
+      %td
+        Bikes Registered before
+      %td
+        - if @export.end_at.present?
+          %span.convertTime
+            = l @export.end_at, format: :convert_time
+        - else
+          %small.less-strong
+            \-
+
+    - if @export.avery_export?
+      %tr
+        %td
+          Avery Export
+        %td
+          - if @export.finished?
+            %strong
+              = link_to "View Avery Labels", @export.avery_export_url, class: "avery_export_url"
+          - else
+            %em{ class: "text-success" }
+              pending...
+
+    %tr
+      %td
         Columns in csv
       %td
         %ul
           - @export.headers.each do |header|
             %li
               = header.humanize
+
+= javascript_pack_tag "application"
