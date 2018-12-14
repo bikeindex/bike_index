@@ -121,6 +121,33 @@ describe Organized::ExportsController, type: :controller do
         expect(export.start_at.to_i).to be_within(1).of start_at
         expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
       end
+      context "avery export" do
+        it "fails" do
+          expect do
+            post :create, export: valid_attrs.merge(avery_export: true), organization_id: organization.to_param
+          end.to_not change(Export, :count)
+          expect(flash[:error]).to be_present
+        end
+        context "organization with avery export" do
+          let(:end_at) { 1457431200 }
+          before { organization.update_column :paid_feature_slugs, %w[csv_exports avery_export] } # Stub organization having features
+          let(:target_headers) { %w[owner_name_or_email address city state zipcode] }
+          it "makes the avery export" do
+            expect do
+              post :create, export: valid_attrs.merge(end_at: "2016-03-08 05:00:00", avery_export: true), organization_id: organization.to_param
+            end.to change(Export, :count).by 1
+            export = Export.last
+            expect(export.kind).to eq "organization"
+            expect(export.file_format).to eq "csv"
+            expect(export.user).to eq user
+            expect(export.headers).to eq target_headers
+            expect(export.avery_export?).to be_truthy
+            expect(export.start_at.to_i).to be_within(1).of start_at
+            expect(export.end_at.to_i).to be_within(1).of end_at
+            expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
+          end
+        end
+      end
     end
   end
 end

@@ -167,7 +167,7 @@ class Bike < ActiveRecord::Base
     current_ownership.user&.name # User - not ownership, because we don't want registrar
   end
 
-  def owner_name_with_fallback
+  def owner_name_or_email
     current_ownership.user&.name || owner_email
   end
 

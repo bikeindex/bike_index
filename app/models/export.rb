@@ -3,7 +3,9 @@ class Export < ActiveRecord::Base
   VALID_KINDS = %i[organization stolen manufacturer].freeze
   VALID_FILE_FORMATS = %i[csv xlsx].freeze
   DEFAULT_HEADERS = %w[link registered_at manufacturer model color serial is_stolen].freeze
-  PERMITTED_HEADERS = (DEFAULT_HEADERS + %w[thumbnail registered_by registration_type owner_email owner_name owner_name_with_fallback]).freeze
+  HIDDEN_HEADERS = %w[owner_name_or_email].freeze
+  PERMITTED_HEADERS = (DEFAULT_HEADERS + %w[thumbnail registered_by registration_type owner_email owner_name] + HIDDEN_HEADERS).freeze
+
   mount_uploader :file, ExportUploader
 
   belongs_to :organization
@@ -14,7 +16,7 @@ class Export < ActiveRecord::Base
 
   before_validation :set_calculated_attributes
 
-  attr_accessor :timezone # permit assignment
+  attr_accessor :timezone, :avery_export # permit assignment
 
   def self.default_headers; DEFAULT_HEADERS end
 
@@ -53,6 +55,11 @@ class Export < ActiveRecord::Base
 
   def option?(str)
     options[str.to_s].present?
+  end
+
+
+  def avery_export?
+    options?("avery_export")
   end
 
   def start_at=(val)

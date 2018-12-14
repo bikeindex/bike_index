@@ -85,7 +85,7 @@ RSpec.describe Export, type: :model do
     let(:organization_full) { Organization.new(paid_feature_slugs: %w[reg_secondary_serial reg_address]) }
     let(:permitted_headers) { Export::PERMITTED_HEADERS }
     it "returns the array we expect" do
-      expect(permitted_headers.count).to eq 12
+      expect(permitted_headers.count).to eq 13
       expect(Export.permitted_headers).to eq permitted_headers
       expect(Export.permitted_headers(organization)).to eq permitted_headers
       expect(Export.permitted_headers(organization_secondary_reg)).to eq permitted_headers + ["additional_registration_number"]
