@@ -16,7 +16,7 @@
       %td
         Created
       %td
-        %span.convertTime
+        %span.convertTime.preciseTime
           = l @export.created_at, format: :convert_time
 
     %tr
@@ -48,7 +48,7 @@
         Bikes Registered after
       %td
         - if @export.start_at.present?
-          %span.convertTime
+          %span.convertTime.preciseTime
             = l @export.start_at, format: :convert_time
         - else
           %small.less-strong
@@ -58,7 +58,7 @@
         Bikes Registered before
       %td
         - if @export.end_at.present?
-          %span.convertTime
+          %span.convertTime.preciseTime
             = l @export.end_at, format: :convert_time
         - else
           %small.less-strong

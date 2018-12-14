@@ -77,10 +77,13 @@ describe Organized::ExportsController, type: :controller do
         end
       end
       context "avery_export" do
+        let(:target_redirect_url) { "https://avery.com?mergeDataURL=https%3A%2F%2Ffiles.bikeindex.org%2Fexports%2F820181214ccc.xlsx" }
         it "redirects" do
+          ENV["AVERY_EXPORT_URL"] = "https://avery.com?mergeDataURL="
+          allow_any_instance_of(Export).to receive(:file_url) { "https://files.bikeindex.org/exports/820181214ccc.xlsx" }
           export.update_attributes(progress: "finished", options: export.options.merge(avery_export: true))
           get :show, organization_id: organization.to_param, id: export.id, avery_redirect: true
-          expect(response).to redirect_to export.avery_export_url
+          expect(response).to redirect_to target_redirect_url
         end
       end
     end

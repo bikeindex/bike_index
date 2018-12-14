@@ -63,7 +63,7 @@ class Export < ActiveRecord::Base
 
   def avery_export_url
     return nil unless avery_export? && finished?
-    ENV["AVERY_EXPORT_URL"] + CGI.escape(file_url)
+    (ENV["AVERY_EXPORT_URL"] || "") + CGI.escape(file_url)
   end
 
   def start_at=(val)
