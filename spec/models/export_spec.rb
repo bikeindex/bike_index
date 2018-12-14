@@ -59,6 +59,22 @@ RSpec.describe Export, type: :model do
     end
   end
 
+  describe "avery_export" do
+    let(:export) { Export.new }
+    let(:target_url) { "https://avery.com?mergeDataURL=https%3A%2F%2Ffiles.bikeindex.org%2Fexports%2F820181214ccc.xlsx" }
+    it "is false unless it should be true" do
+      ENV["AVERY_EXPORT_URL"] = "https://avery.com?mergeDataURL="
+      allow(export).to receive(:file_url) { "https://files.bikeindex.org/exports/820181214ccc.xlsx" }
+      expect(export.avery_export?).to be_falsey
+      expect(export.avery_export_url).to be_nil
+      export.options = { avery_export: true }
+      expect(export.avery_export?).to be_truthy
+      expect(export.avery_export_url).to be_nil
+      export.progress = :finished
+      expect(export.avery_export_url).to eq target_url
+    end
+  end
+
   describe "bikes_scoped" do
     # Pending - we're getting the organization scopes up and running before migrating existing TsvCreator tasks
     # But we eventually want to add stolen tsv's into here
@@ -85,7 +101,7 @@ RSpec.describe Export, type: :model do
     let(:organization_full) { Organization.new(paid_feature_slugs: %w[reg_secondary_serial reg_address]) }
     let(:permitted_headers) { Export::PERMITTED_HEADERS }
     it "returns the array we expect" do
-      expect(permitted_headers.count).to eq 12
+      expect(permitted_headers.count).to eq 13
       expect(Export.permitted_headers).to eq permitted_headers
       expect(Export.permitted_headers(organization)).to eq permitted_headers
       expect(Export.permitted_headers(organization_secondary_reg)).to eq permitted_headers + ["additional_registration_number"]

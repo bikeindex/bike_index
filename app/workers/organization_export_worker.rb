@@ -79,6 +79,7 @@ class OrganizationExportWorker
     when "link" then LINK_BASE + bike.id.to_s
     when "owner_email" then bike.owner_email
     when "owner_name" then bike.owner_name
+    when "owner_name_or_email" then bike.owner_name_or_email
     when "registration_method" then bike.creation_description
     when "thumbnail" then bike.thumb_path
     when "registered_at" then bike.created_at.utc

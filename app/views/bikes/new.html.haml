@@ -83,7 +83,7 @@
               = render partial: '/bikes/bike_fields/stolen_location', locals: { srecord: srecord }
           / Commenting out for now, more trouble than it's worth
           / # - if @b_param.display_email?
-          - if @organization.present? && @organization.require_address_on_registration
+          - if @organization.present? && @organization.additional_registration_fields.include?("reg_address")
             .form-group.row.unnested-field.no-divider-row
               = f.label :address, class: 'form-well-label'
               .form-well-input

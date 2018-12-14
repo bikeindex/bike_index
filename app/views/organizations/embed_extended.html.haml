@@ -10,7 +10,7 @@
       = f.label :serial_number, class: "control-label"
       .controls
         = f.text_field :serial_number, :required =>true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
-      - if @organization.use_additional_registration_field
+      - if @organization.additional_registration_fields.include?("reg_secondary_serial")
         = f.label :additional_registration, "Additional registration number", class: "control-label"
         .controls
           = f.text_field :additional_registration, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off' 
