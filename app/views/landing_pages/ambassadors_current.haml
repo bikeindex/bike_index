@@ -17,16 +17,6 @@
     // Right now, this looks better with justify-content: center - but space-around looks better depending on the item count.
     .row
       .col-md-3.col-xs-6
-        = image_tag 'landing_pages/ambassadors/StolenBikesEdmonton.png', alt: 'Stolen Bikes Edmonton', class: "no-clip"
-        %h2
-          Brent Thorvaldson
-        %h3
-          Edmonton, Alberta
-        %h4
-          Why Bike Index?
-        %p
-          Bike Index allows us to verify details about the bike, theft details, police file number and contact info for the owner. We can also share the registry directly to Law Enforcement to expedite the recovery process.
-      .col-md-3.col-xs-6
         = image_tag 'landing_pages/ambassadors/Steve-Piercy.jpg', alt: 'Steve Piercy'
         %h2
           Steve Piercy
@@ -36,6 +26,26 @@
           Why Bike Index?
         %p
           Bike Index helps people recover their stolen bikes, educates on the prevention of theft, and builds a community through its website.  And it's a non-profit organization that released its software as open source.
+      .col-md-3.col-xs-6
+        .sponsored-by-block
+          %p
+            %em
+              Steve Piercy's
+            ambassadorship is sponsored by
+            %strong
+              = link_to "GEARs", "https://eugenegears.org/"
+          = link_to image_tag('landing_pages/ambassadors/sponsor-GEARs.png', alt: 'Greater Eugene Area Riders', class: "no-clip"), "https://eugenegears.org/"
+
+      .col-md-3.col-xs-6
+        = image_tag 'landing_pages/ambassadors/StolenBikesEdmonton.png', alt: 'Stolen Bikes Edmonton', class: "no-clip"
+        %h2
+          Brent Thorvaldson
+        %h3
+          Edmonton, Alberta
+        %h4
+          Why Bike Index?
+        %p
+          Bike Index allows us to verify details about the bike, theft details, police file number and contact info for the owner. We can also share the registry directly to Law Enforcement to expedite the recovery process.
       .col-md-3.col-xs-6
         = image_tag 'landing_pages/ambassadors/Michelle-Farris.jpg', alt: 'Michelle Farris'
         %h2

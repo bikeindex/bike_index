@@ -116,3 +116,32 @@
     }
   }
 }
+
+$sponsor-tri-1: 20px; // lifted from _recoveries.scss
+$sponsor-border-color: $gray-lighter;
+.signup-landing-page-ambassadors-current {
+  .sponsored-by-block {
+    margin-top: 124px; // gross hack, it looks better to me
+    border: 5px solid $sponsor-border-color;
+    padding: 10px;
+    p {
+      line-height: 1.5;
+    }
+    em {
+      text-decoration: none;
+      color: $header-font-color;
+    }
+    img {
+      margin-bottom: 0;
+    }
+    &:before {
+      content: "";
+      height: 0;
+      width: 0;
+      left: -10px;
+      position: absolute;
+      border-bottom: $sponsor-tri-1 solid transparent;
+      border-right: ($sponsor-tri-1 * 1.3) solid $sponsor-border-color;
+    }
+  }
+}
