@@ -70,9 +70,8 @@ describe 'Me API V2' do
   end
 
   describe 'current/bikes' do
-    before :each do
-      create_doorkeeper_app
-    end
+    before { expect(doorkeeper_app).to be_present }
+
     it "works if it's authorized" do
       token.update_attribute :scopes, 'read_bikes'
       get '/api/v2/me/bikes', format: :json, access_token: token.token
