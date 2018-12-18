@@ -293,7 +293,7 @@ describe 'Bikes API V3' do
     let(:params) { { year: 1999, serial_number: 'XXX69XXX' } }
     let(:url) { "/api/v3/bikes/#{bike.id}?access_token=#{token.token}" }
     let(:bike) { FactoryGirl.create(:ownership, creator_id: user.id).bike }
-    let!(:token) { create_doorkeeper_token(scope: "read_user read_bikes write_bikes") }
+    let!(:token) { create_doorkeeper_token(scopes: "read_user read_bikes write_bikes") }
 
     it "doesn't update if user doesn't own the bike" do
       bike.current_ownership.update_attributes(user_id: FactoryGirl.create(:user).id, claimed: true)
