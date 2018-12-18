@@ -53,7 +53,7 @@ module AuthenticationHelper
   end
 
   def current_user
-    @current_user ||= User.from_auth(cookies.signed[:auth])
+    @current_user ||= User.confirmed.from_auth(cookies.signed[:auth])
   end
 
   def preview_enabled?

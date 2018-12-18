@@ -34,6 +34,26 @@ describe "Me API V3" do
       end
     end
 
+    context "unconfirmed user" do
+      let(:user) { FactoryGirl.create(:user) }
+      let(:token) { create_doorkeeper_token(scopes: "read_user unconfirmed") }
+      it "responds with all available attributes" do
+        user.reload
+        expect(user.confirmed?).to be_falsey
+        get "/api/v3/me", format: :json, access_token: token.token
+        result = JSON.parse(response.body)
+        expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
+        expect(result["user"]["name"]).to eq(user.name)
+        expect(result["user"]["secondary_emails"]).to eq([])
+        expect(result["user"]["confirmed"]).to be_falsey
+        expect(result["id"]).to eq(user.id.to_s)
+        expect(result["user"].is_a?(Hash)).to be_truthy
+        expect(result.keys.include?("bike_ids")).to be_falsey
+        expect(result.keys.include?("memberships")).to be_falsey
+        expect(response.response_code).to eq(200)
+      end
+    end
+
     context "no bikes scoped" do
       let(:token) { Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id, resource_owner_id: user.id) }
       it "doesn't include bikes" do
