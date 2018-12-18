@@ -3,6 +3,7 @@ require "spec_helper"
 describe "Oauth::AuthorizationsController" do
   include_context :existing_doorkeeper_app
   before { expect(doorkeeper_app).to be_present }
+
   context "no current user present" do
     it "redirects to sign in" do
       get "/oauth/authorize", response_type: "code", scope: "read_bikes+read_user",

@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe Oauth::ApplicationsController do
+  include_context :existing_doorkeeper_app
   describe 'index' do
     context 'current user present' do
       it 'renders' do
@@ -22,8 +23,7 @@ describe Oauth::ApplicationsController do
 
   describe 'create' do
     it 'creates an application and adds the v2 accessor to it' do
-      create_v2_access_id
-      user = FactoryGirl.create(:user)
+      v2_access_id
       set_current_user(user)
       app_attrs = {
         name: 'Some app',
@@ -39,59 +39,55 @@ describe Oauth::ApplicationsController do
     end
   end
 
-  describe 'edit' do
-    it 'renders if owned by user' do
-      create_doorkeeper
-      set_current_user(@user)
-      get :edit, id: @application.id
-      expect(response.code).to eq('200')
-      expect(flash).not_to be_present
+  context "existing_doorkeeper_app" do
+    before { expect(doorkeeper_app).to be_present }
+    describe 'edit' do
+      it 'renders if owned by user' do
+        set_current_user(user)
+        get :edit, id: doorkeeper_app.id
+        expect(response.code).to eq('200')
+        expect(flash).not_to be_present
+      end
+
+      it 'renders if superuser' do
+        admin = FactoryGirl.create(:admin)
+        set_current_user(admin)
+        get :edit, id: doorkeeper_app.id
+        expect(response.code).to eq('200')
+        expect(flash).not_to be_present
+      end
+
+      it 'redirects if no user present' do
+        get :edit, id: doorkeeper_app.id
+        expect(response).to redirect_to new_session_url
+        expect(flash).to be_present
+      end
+
+      it 'redirects if not owned by user' do
+        visitor = FactoryGirl.create(:user)
+        set_current_user(visitor)
+        get :edit, id: doorkeeper_app.id
+        expect(response).to redirect_to oauth_applications_url
+        expect(flash).to be_present
+      end
     end
 
-    it 'renders if superuser' do
-      create_doorkeeper
-      admin = FactoryGirl.create(:admin)
-      set_current_user(admin)
-      get :edit, id: @application.id
-      expect(response.code).to eq('200')
-      expect(flash).not_to be_present
-    end
+    describe 'update' do
+      it 'renders if owned by user' do
+        set_current_user(application_owner)
+        put :update, id: doorkeeper_app.id, doorkeeper_application: { name: 'new thing' }
+        doorkeeper_app.reload
+        expect(doorkeeper_app.name).to eq('new thing')
+      end
 
-    it 'redirects if no user present' do
-      create_doorkeeper
-      get :edit, id: @application.id
-      expect(response).to redirect_to new_session_url
-      expect(flash).to be_present
-    end
-
-    it 'redirects if not owned by user' do
-      create_doorkeeper
-      visitor = FactoryGirl.create(:user)
-      set_current_user(visitor)
-      get :edit, id: @application.id
-      expect(response).to redirect_to oauth_applications_url
-      expect(flash).to be_present
-    end
-  end
-
-  describe 'update' do
-    it 'renders if owned by user' do
-      create_doorkeeper
-      set_current_user(@user)
-      put :update, id: @application.id, doorkeeper_application: { name: 'new thing' }
-      @application.reload
-      expect(@application.name).to eq('new thing')
-    end
-
-    it "doesn't update if not users" do
-      create_doorkeeper
-      name = @application.name
-      user = FactoryGirl.create(:user)
-      set_current_user(user)
-      put :update, id: @application.id, doorkeeper_application: { name: 'new thing' }
-      @application.reload
-      expect(@application.name).to eq(name)
-      expect(response).to redirect_to oauth_applications_url
+      it "doesn't update if not users" do
+        name = doorkeeper_app.name
+        set_current_user(FactoryGirl.create(:confirmed_user))
+        put :update, id: doorkeeper_app.id, doorkeeper_application: { name: 'new thing' }
+        doorkeeper_app.reload
+        expect(doorkeeper_app.name).to eq(name)
+        expect(response).to redirect_to oauth_applications_url
+      end
     end
   end
 end
