@@ -1,12 +1,11 @@
-require 'spec_helper'
+require "spec_helper"
 
-describe UserSerializer do
-  let(:user) { FactoryGirl.create(:user) }
-  let(:organization) { FactoryGirl.create(:organization) }
-  let(:membership) { FactoryGirl.create(:membership, user: user, organization: organization) }
-  subject { UserSerializer.new(user) }
+describe OrganizedMessageSerializer, type: :lib do
+  let(:subject) { OrganizedMessageSerializer }
+  let(:obj) { FactoryGirl.create(:organization_message) }
+  let(:serializer) { subject.new(obj, root: false) }
 
-  it { expect(subject.user_present).to be_truthy }
-  it { expect(subject.is_superuser).to be_falsey }
-  xit { expect(subject.memberships.first).to eq(membership) }
+  it "works" do
+    expect(serializer.as_json.is_a?(Hash)).to be_truthy
+  end
 end
