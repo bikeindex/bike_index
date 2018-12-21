@@ -16,8 +16,8 @@ class OrganizedMessageSerializer < ActiveModel::Serializer
   def bike
     bike_obj = object.bike
     {
-      id: bike_obj.id,
-      title: bike_obj.title_string
+      id: bike_obj&.id,
+      title: bike_obj&.title_string
     }
   end
 end
