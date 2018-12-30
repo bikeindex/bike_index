@@ -8,3 +8,7 @@
     %p
       If you need to update it, talk to Seth
 = render partial: "form"
+
+%h3
+  Invoices with this feature
+= render partial: "/admin/organizations/invoices/table", locals: { invoices: @invoices, sortable: false, display_organization: true }
