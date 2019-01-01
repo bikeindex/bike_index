@@ -11,7 +11,7 @@
       .controls
         = f.text_field :serial_number, :required =>true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
       - if @organization.additional_registration_fields.include?("reg_secondary_serial")
-        = f.label :additional_registration, "Additional registration number", class: "control-label"
+        = f.label :additional_registration, "Additional serial/sticker number", class: "control-label"
         .controls
           = f.text_field :additional_registration, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off' 
     .has-no-serial.optional-block
