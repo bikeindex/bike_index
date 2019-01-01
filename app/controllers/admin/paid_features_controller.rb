@@ -14,7 +14,9 @@ class Admin::PaidFeaturesController < Admin::BaseController
     redirect_to edit_admin_paid_feature_path
   end
 
-  def edit; end
+  def edit
+    @invoices = @paid_feature.invoices.includes(:organization, :payments)
+  end
 
   def update
     @paid_feature.update_attributes(permitted_update_parameters)

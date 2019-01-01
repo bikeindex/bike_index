@@ -83,13 +83,20 @@
               = render partial: '/bikes/bike_fields/stolen_location', locals: { srecord: srecord }
           / Commenting out for now, more trouble than it's worth
           / # - if @b_param.display_email?
-          - if @organization.present? && @organization.additional_registration_fields.include?("reg_address")
-            .form-group.row.unnested-field.no-divider-row
-              = f.label :address, class: 'form-well-label'
-              .form-well-input
-                = f.text_field :address, required: true, placeholder: 'required', class: 'form-control'
-                %span.below-input-help
-                  Your address is required by #{@organization.short_name}
+          - if @organization.present? && @organization.additional_registration_fields.any?
+            - if @organization.additional_registration_fields.include?("reg_address")
+              .form-group.row.unnested-field.no-divider-row
+                = f.label :address, class: 'form-well-label'
+                .form-well-input
+                  = f.text_field :address, required: true, placeholder: 'required', class: 'form-control'
+                  %span.below-input-help
+                    Your address is required by #{@organization.short_name}
+
+            - if @organization.additional_registration_fields.include?("reg_secondary_serial")
+              .form-group.row.unnested-field.no-divider-row
+                = f.label :additional_registration, "Additional serial/sticker number", class: "form-well-label"
+                .form-well-input
+                  = f.text_field :additional_registration, autocomplete: "off", autocorrect: "off", autocapitalize: "off", class: "form-control"
 
           .form-group.row.unnested-field.no-divider-row
             = f.label :owner_email, class: 'form-well-label'
