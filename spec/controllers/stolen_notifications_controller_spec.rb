@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe StolenNotificationsController do
   before :each do
-    @user = FactoryGirl.create(:user)
-    @user2 = FactoryGirl.create(:user, name: 'User2')
+    @user = FactoryGirl.create(:confirmed_user)
+    @user2 = FactoryGirl.create(:confirmed_user, name: 'User2')
     @bike = FactoryGirl.create(:bike)
     @ownership = FactoryGirl.create(:ownership, user: @user, bike: @bike, current: true)
   end

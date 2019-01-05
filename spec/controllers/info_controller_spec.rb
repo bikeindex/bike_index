@@ -21,7 +21,7 @@ describe InfoController do
       end
     end
     context 'signed in user' do
-      let(:user) { FactoryGirl.create(:user) }
+      let(:user) { FactoryGirl.create(:confirmed_user) }
       # Since we're rendering things, and these are important pages,
       # let's test with users as well
       before do

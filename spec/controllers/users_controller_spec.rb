@@ -4,7 +4,7 @@ describe UsersController do
   describe "new" do
     context "already signed in" do
       it "redirects and sets the flash" do
-        user = FactoryGirl.create(:user)
+        user = FactoryGirl.create(:confirmed_user)
         set_current_user(user)
         get :new
         expect(response).to redirect_to(:user_home)
@@ -104,7 +104,7 @@ describe UsersController do
     describe 'confirm' do
       describe 'user exists' do
         it 'tells the user to log in when already confirmed' do
-          @user = FactoryGirl.create(:user, confirmed: true)
+          @user = FactoryGirl.create(:confirmed_user, confirmed: true)
           get :confirm, id: @user.id, code: 'wtfmate'
           expect(response).to redirect_to new_session_url
         end
@@ -112,11 +112,11 @@ describe UsersController do
         describe 'user not yet confirmed' do
           before :each do
             @user = FactoryGirl.create(:user)
+            expect(@user.confirmed?).to be_falsey
             expect(User).to receive(:find).and_return(@user)
           end
 
           it "logins and redirect when confirmation succeeds" do
-            expect(@user).to receive(:confirm).and_return(true)
             get :confirm, id: @user.id, code: @user.confirmation_token
             expect(User.from_auth(cookies.signed[:auth])).to eq(@user)
             expect(response).to redirect_to user_home_url
@@ -179,7 +179,7 @@ describe UsersController do
   describe 'password_reset' do
     describe 'if the token is present and valid' do
       it 'logs in and redirects' do
-        user = FactoryGirl.create(:user, email: 'ned@foo.com')
+        user = FactoryGirl.create(:confirmed_user, email: 'ned@foo.com')
         user.set_password_reset_token
         post :password_reset, token: user.password_reset_token
         expect(User.from_auth(cookies.signed[:auth])).to eq(user)
@@ -188,7 +188,7 @@ describe UsersController do
     end
 
     it 'renders get request' do
-      user = FactoryGirl.create(:user, email: 'ned@foo.com')
+      user = FactoryGirl.create(:confirmed_user, email: 'ned@foo.com')
       user.set_password_reset_token
       get :password_reset, token: user.password_reset_token
       expect(response.code).to eq('200')
@@ -222,7 +222,7 @@ describe UsersController do
 
     context 'unconfirmed user' do
       it 'enqueues a password reset email job' do
-        user = FactoryGirl.create(:user, email: 'ned@foo.com')
+        user = FactoryGirl.create(:confirmed_user, email: 'ned@foo.com')
         expect do
           post :password_reset, email: user.email
         end.to change(EmailResetPasswordWorker.jobs, :size).by(1)
@@ -238,7 +238,7 @@ describe UsersController do
     end
 
     it "redirects to user home url if the user exists but doesn't want to show their page" do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryGirl.create(:confirmed_user)
       @user.show_bikes = false
       @user.save
       get :show, id: @user.username
@@ -246,7 +246,7 @@ describe UsersController do
     end
 
     it 'shows the page if the user exists and wants to show their page' do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryGirl.create(:confirmed_user)
       @user.show_bikes = true
       @user.save
       get :show, id: @user.username, page: 1, per_page: 1
@@ -258,7 +258,7 @@ describe UsersController do
 
   describe 'accept_vendor_terms' do
     it 'renders' do
-      user = FactoryGirl.create(:user)
+      user = FactoryGirl.create(:confirmed_user)
       set_current_user(user)
       get :accept_vendor_terms
       expect(response.status).to eq(200)
@@ -269,7 +269,7 @@ describe UsersController do
 
   describe 'accept_terms' do
     it 'renders' do
-      user = FactoryGirl.create(:user)
+      user = FactoryGirl.create(:confirmed_user)
       set_current_user(user)
       get :accept_terms
       expect(response).to render_template(:accept_terms)
@@ -306,7 +306,7 @@ describe UsersController do
   describe 'update' do
     context 'nil username' do
       it "doesn't update username" do
-        user = FactoryGirl.create(:user) 
+        user = FactoryGirl.create(:confirmed_user) 
         user.update_attribute :username, 'something'
         set_current_user(user)
         post :update, id: user.username, user: { username: ' ', name: 'tim' }, page: 'sharing'
@@ -317,7 +317,7 @@ describe UsersController do
     end
 
     it "doesn't update user if current password not present" do
-      user = FactoryGirl.create(:user, terms_of_service: false, password: 'old_pass', password_confirmation: 'old_pass')
+      user = FactoryGirl.create(:confirmed_user, terms_of_service: false, password: 'old_pass', password_confirmation: 'old_pass')
       set_current_user(user)
       post :update, id: user.username, user: {
         password: 'new_pass',
@@ -326,7 +326,7 @@ describe UsersController do
     end
 
     it "doesn't update user if password doesn't match" do
-      user = FactoryGirl.create(:user, terms_of_service: false, password: 'old_pass', password_confirmation: 'old_pass')
+      user = FactoryGirl.create(:confirmed_user, terms_of_service: false, password: 'old_pass', password_confirmation: 'old_pass')
       set_current_user(user)
       post :update, id: user.username, user: {
         current_password: 'old_pass',
@@ -338,7 +338,7 @@ describe UsersController do
     end
 
     it 'Updates user if there is a reset_pass token' do
-      user = FactoryGirl.create(:user)
+      user = FactoryGirl.create(:confirmed_user)
       user.set_password_reset_token((Time.now - 30.minutes).to_i)
       user.reload
       auth = user.auth_token
@@ -358,7 +358,7 @@ describe UsersController do
     end
 
     it "Doesn't updates user if reset_pass token doesn't match" do
-      user = FactoryGirl.create(:user)
+      user = FactoryGirl.create(:confirmed_user)
       user.set_password_reset_token
       user.reload
       reset = user.password_reset_token
@@ -374,7 +374,7 @@ describe UsersController do
     end
 
     it "Doesn't update user if reset_pass token is more than an hour old" do
-      user = FactoryGirl.create(:user)
+      user = FactoryGirl.create(:confirmed_user)
       user.set_password_reset_token((Time.now - 61.minutes).to_i)
       auth = user.auth_token
       email = user.email
@@ -390,7 +390,7 @@ describe UsersController do
     end
 
     it 'resets users auth if password changed, updates current session' do
-      user = FactoryGirl.create(:user, terms_of_service: false, password: 'old_pass', password_confirmation: 'old_pass', password_reset_token: 'stuff')
+      user = FactoryGirl.create(:confirmed_user, terms_of_service: false, password: 'old_pass', password_confirmation: 'old_pass', password_reset_token: 'stuff')
       auth = user.auth_token
       email = user.email
       set_current_user(user)
@@ -410,7 +410,7 @@ describe UsersController do
     end
 
     it 'updates the terms of service' do
-      user = FactoryGirl.create(:user, terms_of_service: false)
+      user = FactoryGirl.create(:confirmed_user, terms_of_service: false)
       set_current_user(user)
       post :update, id: user.username, user: { terms_of_service: '1' }
       expect(response).to redirect_to(user_home_url)
@@ -418,7 +418,7 @@ describe UsersController do
     end
 
     it 'updates the vendor terms of service and emailable' do
-      user = FactoryGirl.create(:user, terms_of_service: false, is_emailable: false)
+      user = FactoryGirl.create(:confirmed_user, terms_of_service: false, is_emailable: false)
       expect(user.is_emailable).to be_falsey
       org = FactoryGirl.create(:organization)
       FactoryGirl.create(:membership, organization: org, user: user)
@@ -430,7 +430,7 @@ describe UsersController do
     end
 
     it 'enqueues job (it enqueues job whenever update is successful)' do
-      user = FactoryGirl.create(:user)
+      user = FactoryGirl.create(:confirmed_user)
       set_current_user(user)
       expect do
         post :update, id: user.username, user: { name: 'Cool stuff' }
@@ -439,7 +439,7 @@ describe UsersController do
     end
   end
   describe 'unsubscribe' do
-    context 'subscribed user' do
+    context 'subscribed, unconfirmed user' do
       let(:user) { FactoryGirl.create(:user, is_emailable: true) }
       it 'updates is_emailable' do
         expect(user.is_emailable).to be_truthy

@@ -174,7 +174,7 @@ describe BikesController do
           end
           context 'non-owner non-admin viewing' do
             it 'redirects' do
-              set_current_user(FactoryGirl.create(:user))
+              set_current_user(FactoryGirl.create(:confirmed_user))
               get :show, id: bike.id
               expect(response).to redirect_to(:root)
               expect(flash[:error]).to be_present
@@ -757,7 +757,7 @@ describe BikesController do
       end
     end
     context 'user present' do
-      let(:user) { FactoryGirl.create(:user) }
+      let(:user) { FactoryGirl.create(:confirmed_user) }
       before { set_current_user(user) }
       context "user present but isn't allowed to edit the bike" do
         it 'redirects and sets the flash' do
@@ -857,7 +857,7 @@ describe BikesController do
     context 'user is present but is not allowed to edit' do
       it 'does not update and redirects' do
         ownership = FactoryGirl.create(:ownership)
-        user = FactoryGirl.create(:user)
+        user = FactoryGirl.create(:confirmed_user)
         set_current_user(user)
         put :update, id: ownership.bike.id, bike: { serial_number: '69' }
         expect(response).to redirect_to bike_url(ownership.bike)

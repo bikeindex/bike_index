@@ -11,7 +11,7 @@ describe Api::V1::UsersController do
 
     it 'returns user_present if a user is present' do
       # We need to test that cors isn't present
-      u = FactoryGirl.create(:user)
+      u = FactoryGirl.create(:confirmed_user)
       set_current_user(u)
       get :current, format: :json
       expect(response.code).to eq('200')
@@ -187,7 +187,7 @@ describe Api::V1::UsersController do
     it 'does not create a new serial request mailer if wrong user user is present' do
       o = FactoryGirl.create(:ownership)
       bike = o.bike
-      user = FactoryGirl.create(:user)
+      user = FactoryGirl.create(:confirmed_user)
       set_current_user(user)
       params = { request_bike_id: bike.id, serial_update_serial: 'some update', request_reason: 'Some reason' }
       post :send_request, params

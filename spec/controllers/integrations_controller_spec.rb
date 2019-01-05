@@ -15,7 +15,7 @@ describe IntegrationsController do
     end
 
     describe 'when there is a user' do
-      let(:user) { FactoryGirl.create(:user) }
+      let(:user) { FactoryGirl.create(:confirmed_user) }
       before :each do
         request.env['omniauth.auth'] = OmniAuth.config.mock_auth[:facebook]
       end

@@ -5,7 +5,7 @@ describe Oauth::ApplicationsController do
   describe 'index' do
     context 'current user present' do
       it 'renders' do
-        user = FactoryGirl.create(:user)
+        user = FactoryGirl.create(:confirmed_user)
         set_current_user(user)
         get :index
         expect(response.status).to eq 200
@@ -64,7 +64,7 @@ describe Oauth::ApplicationsController do
       end
 
       it 'redirects if not owned by user' do
-        visitor = FactoryGirl.create(:user)
+        visitor = FactoryGirl.create(:confirmed_user)
         set_current_user(visitor)
         get :edit, id: doorkeeper_app.id
         expect(response).to redirect_to oauth_applications_url
