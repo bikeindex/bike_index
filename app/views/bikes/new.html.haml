@@ -84,7 +84,7 @@
           / Commenting out for now, more trouble than it's worth
           / # - if @b_param.display_email?
           - if @organization.present? && @organization.additional_registration_fields.any?
-            - if @organization.additional_registration_fields.include?("reg_address")
+            - if @organization.include_field_reg_address?(current_user)
               .form-group.row.unnested-field.no-divider-row
                 = f.label :address, class: 'form-well-label'
                 .form-well-input
@@ -92,7 +92,15 @@
                   %span.below-input-help
                     Your address is required by #{@organization.short_name}
 
-            - if @organization.additional_registration_fields.include?("reg_secondary_serial")
+            - if @organization.include_field_phone_number?(current_user)
+              .form-group.row.unnested-field.no-divider-row
+                = f.label :phone_number, class: 'form-well-label'
+                .form-well-input
+                  = f.text_field :phone_number, required: true, placeholder: 'required', class: 'form-control'
+                  %span.below-input-help
+                    Your phone number is required by #{@organization.short_name}
+
+            - if @organization.include_field_reg_secondary_serial?(current_user)
               .form-group.row.unnested-field.no-divider-row
                 = f.label :additional_registration, "Additional serial/sticker number", class: "form-well-label"
                 .form-well-input
