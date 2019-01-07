@@ -73,38 +73,31 @@
           - classname = (@b_param.display_email? ? '' : 'no-divider-row')
           = render partial: '/bikes/bike_fields/revised_colors', locals: { f: f, classname: classname }
 
-          - if @bike.stolen
+          - if @bike.stolen || @organization&.include_field_reg_phone?(current_user)
             .form-group.row.unnested-field
-              = f.label :phone, class: 'form-well-label'
+              = f.label :phone, class: "form-well-label"
               .form-well-input
-                = f.text_field :phone, required: true, value: current_user.phone, class: 'form-control'
+                = f.text_field :phone, required: true, value: current_user&.phone, class: "form-control"
 
+          - if @bike.stolen
             = fields_for @stolen_record do |srecord|
               = render partial: '/bikes/bike_fields/stolen_location', locals: { srecord: srecord }
+
           / Commenting out for now, more trouble than it's worth
           / # - if @b_param.display_email?
-          - if @organization.present? && @organization.additional_registration_fields.any?
-            - if @organization.include_field_reg_address?(current_user)
-              .form-group.row.unnested-field.no-divider-row
-                = f.label :address, class: 'form-well-label'
-                .form-well-input
-                  = f.text_field :address, required: true, placeholder: 'required', class: 'form-control'
-                  %span.below-input-help
-                    Your address is required by #{@organization.short_name}
+          - if @organization&.include_field_reg_address?(current_user)
+            .form-group.row.unnested-field.no-divider-row
+              = f.label :address, class: 'form-well-label'
+              .form-well-input
+                = f.text_field :address, required: true, placeholder: 'required', class: 'form-control'
+                %span.below-input-help
+                  Your address is required by #{@organization.short_name}
 
-            - if @organization.include_field_phone_number?(current_user)
-              .form-group.row.unnested-field.no-divider-row
-                = f.label :phone_number, class: 'form-well-label'
-                .form-well-input
-                  = f.text_field :phone_number, required: true, placeholder: 'required', class: 'form-control'
-                  %span.below-input-help
-                    Your phone number is required by #{@organization.short_name}
-
-            - if @organization.include_field_reg_secondary_serial?(current_user)
-              .form-group.row.unnested-field.no-divider-row
-                = f.label :additional_registration, "Additional serial/sticker number", class: "form-well-label"
-                .form-well-input
-                  = f.text_field :additional_registration, autocomplete: "off", autocorrect: "off", autocapitalize: "off", class: "form-control"
+          - if @organization&.include_field_reg_secondary_serial?(current_user)
+            .form-group.row.unnested-field.no-divider-row
+              = f.label :additional_registration, "Additional serial/sticker number", class: "form-well-label"
+              .form-well-input
+                = f.text_field :additional_registration, autocomplete: "off", autocorrect: "off", autocapitalize: "off", class: "form-control"
 
           .form-group.row.unnested-field.no-divider-row
             = f.label :owner_email, class: 'form-well-label'

@@ -199,6 +199,10 @@ class Bike < ActiveRecord::Base
     hidden && !user_hidden
   end
 
+  def phone
+    owner&.phone || b_params.map(&:phone).reject(&:blank?).first
+  end
+
   def visible_by(user=nil)
     return true unless hidden
     if user.present?

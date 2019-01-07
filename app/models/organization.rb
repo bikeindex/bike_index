@@ -97,7 +97,7 @@ class Organization < ActiveRecord::Base
 
   def include_field_reg_phone?(user = nil)
     return false unless additional_registration_fields.include?("reg_phone")
-    user.blank? || user.phone.blank?
+    !user&.phone&.present?
   end
 
   def include_field_reg_address?(user = nil)
