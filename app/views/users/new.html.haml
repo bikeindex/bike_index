@@ -50,10 +50,11 @@
               %label
                 = f.check_box :terms_of_service
                 I agree to
-                - if @partner.present?
+                - if @partner == "bikehub"
                   BikeHub's
                   %a.no-tab{ data: { target: "https://basic.bikehub.com/terms.html" } }
-                    terms and conditions  
+                    terms and conditions
+                  and
                 Bike Index
                 %a.no-tab{ data: { target: terms_url } }
                   terms and conditions
