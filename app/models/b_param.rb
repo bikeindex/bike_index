@@ -113,6 +113,7 @@ class BParam < ActiveRecord::Base
   def is_bulk; bike['is_bulk'] || false end
   def no_duplicate; bike['no_duplicate'] || false end
   def bike_code; bike["bike_code"] end
+  def phone; bike["phone"] end
 
   def creation_organization; Organization.friendly_find(creation_organization_id) end
   def manufacturer; bike['manufacturer_id'] && Manufacturer.friendly_find(bike['manufacturer_id']) end

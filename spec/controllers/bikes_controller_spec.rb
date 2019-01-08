@@ -704,19 +704,28 @@ describe BikesController do
             expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
             Geocoder.configure(lookup: :test)
             expect do
-              post :create, bike: { manufacturer_id: manufacturer.slug, b_param_id_token: b_param.id_token, address: default_location[:address] }
+              post :create, bike: {
+                manufacturer_id: manufacturer.slug,
+                b_param_id_token: b_param.id_token,
+                address: default_location[:address],
+                additional_registration: "XXXZZZ",
+                phone: "888.777.6666"
+              }
             end.to change(Bike, :count).by(1)
             expect(flash[:success]).to be_present
             bike = Bike.last
             expect(bike.creator_id).to eq user.id
             b_param.reload
             expect(b_param.created_bike_id).to eq bike.id
+            expect(b_param.phone).to eq "888.777.6666"
             bike_params.delete(:manufacturer_id)
             bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v }
             expect(bike.manufacturer).to eq manufacturer
             expect(bike.creation_state.origin).to eq 'embed_partial'
             expect(bike.creation_state.creator).to eq bike.creator
             expect(bike.registration_address).to eq target_address.as_json
+            expect(bike.additional_registration).to eq "XXXZZZ"
+            expect(bike.phone).to eq "888.777.6666"
           end
         end
         context 'created bike' do

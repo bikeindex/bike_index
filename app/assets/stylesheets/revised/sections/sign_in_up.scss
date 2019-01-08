@@ -171,6 +171,10 @@ $sign-in-up-form-bg: $gray-lighter;
   .oauth-providers {
     margin-top: $vertical-height;
   }
+  .terms-and-conditions label {
+    text-indent: -1rem;
+    padding-left: 1rem;
+  }
 }
 
 //
