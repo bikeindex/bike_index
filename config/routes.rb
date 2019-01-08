@@ -70,15 +70,16 @@ Bikeindex::Application.routes.draw do
   get 'feedbacks/new', to: redirect('/help')
   %w(support contact contact_us).each { |p| get p, to: redirect('/help') }
 
-  resources :users, only: [:new, :create, :show, :edit, :update] do
+  resources :users, only: %i[new create show edit update] do
     collection do
-      get 'confirm'
-      get 'request_password_reset'
-      post 'password_reset'
-      get 'password_reset'
-      get 'update_password'
+      get "please_confirm_email"
+      get "confirm" # Get because needs to be called from a link
+      get "request_password_reset"
+      post "password_reset"
+      get "password_reset"
+      get "update_password"
     end
-    member { get 'unsubscribe' }
+    member { get "unsubscribe" }
   end
   get :my_account, to: 'users#edit', as: :my_account
   get :accept_vendor_terms, to: 'users#accept_vendor_terms'

@@ -18,6 +18,8 @@ module Sessionable
     if params[:partner].present? || session[:partner].present? # Check present? of both in case one is empty
       session[:partner] = nil # Ensure they won't be redirected in the future
       redirect_to "https://new.bikehub.com/account"
+    elsif @user.unconfirmed?
+      render_partner_or_default_signin_layout(redirect_path: please_confirm_email_users_path) and return
     elsif !return_to_if_present
       flash[:success] = "Logged in!"
       redirect_to user_root_url and return

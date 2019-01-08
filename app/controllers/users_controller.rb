@@ -18,15 +18,15 @@ class UsersController < ApplicationController
     @user = User.new(permitted_parameters)
     if @user.save
       session[:partner] = nil # So they can leave this signup page if they want
-      if @user.confirmed
-        sign_in_and_redirect
-      else
-        render_partner_or_default_signin_layout
-      end
+      sign_in_and_redirect
     else
       @page_errors = @user.errors
       render_partner_or_default_signin_layout(render_action: :new)
     end
+  end
+
+  def please_confirm_email
+
   end
 
   def confirm

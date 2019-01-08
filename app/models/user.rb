@@ -115,37 +115,25 @@ class User < ActiveRecord::Base
     errors.add(:email, 'That email is already signed up on Bike Index.')
   end
 
-  def perform_create_jobs
-    CreateUserJobs.new(self).perform_create_jobs
-  end
+  def confirmed?; confirmed end
 
-  def superuser?
-    superuser
-  end
+  def unconfirmed?; !confirmed? end
 
-  def content?
-    is_content_admin
-  end
+  def perform_create_jobs; CreateUserJobs.new(self).perform_create_jobs end
 
-  def developer?
-    developer
-  end
+  def superuser?; superuser end
 
-  def display_name
-    name.present? ? name : email
-  end
+  def content?; is_content_admin end
 
-  def donations
-    payments.sum(:amount_cents)
-  end
+  def developer?; developer end
 
-  def donor?
-    donations > 900
-  end
+  def display_name; name.present? ? name : email end
 
-  def paid_org?
-    organizations.paid.any?
-  end
+  def donations; payments.sum(:amount_cents) end
+
+  def donor?; donations > 900 end
+
+  def paid_org?; organizations.paid.any? end
 
   def admin_authorized(type)
     return true if superuser
