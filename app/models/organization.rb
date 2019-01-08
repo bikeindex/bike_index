@@ -90,8 +90,22 @@ class Organization < ActiveRecord::Base
   def additional_registration_fields
     [
       paid_for?("reg_address") ? "reg_address" : nil,
+      paid_for?("reg_phone") ? "reg_phone" : nil,
       paid_for?("reg_secondary_serial") ? "reg_secondary_serial" : nil
     ].compact
+  end
+
+  def include_field_reg_phone?(user = nil)
+    return false unless additional_registration_fields.include?("reg_phone")
+    !user&.phone&.present?
+  end
+
+  def include_field_reg_address?(user = nil)
+    additional_registration_fields.include?("reg_address")
+  end
+
+  def include_field_reg_secondary_serial?(user = nil)
+    additional_registration_fields.include?("reg_secondary_serial")
   end
 
   def bike_actions? # Eventually there will be other actions beside organization_messages, so use this as general reference

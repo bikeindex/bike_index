@@ -10,7 +10,7 @@
       = f.label :serial_number, class: "control-label"
       .controls
         = f.text_field :serial_number, :required =>true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
-      - if @organization.additional_registration_fields.include?("reg_secondary_serial")
+      - if @organization&.include_field_reg_secondary_serial?
         = f.label :additional_registration, "Additional serial/sticker number", class: "control-label"
         .controls
           = f.text_field :additional_registration, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off' 
@@ -78,6 +78,16 @@
       %label.control-label{ for: 'bike_owner_email' }
         Owner's email address
         = f.email_field :owner_email
+  - if @organization&.include_field_reg_address?
+    .input-group
+      = f.label :address, "Owner's Street address"
+      .controls
+        = f.text_field :address, required: true
+  - if @organization&.include_field_reg_phone?
+    .input-group
+      = f.label :phone, "Owner's phone"
+      .controls
+        = f.text_field :phone, required: true
   .input-group
     .submit-registration
       = submit_tag "Register this", class: "button-submit"
