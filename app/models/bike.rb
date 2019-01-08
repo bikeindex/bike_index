@@ -200,7 +200,8 @@ class Bike < ActiveRecord::Base
   end
 
   def phone
-    owner&.phone || b_params.map(&:phone).reject(&:blank?).first
+    # Include @phone because attr_accessor
+    @phone || owner&.phone || b_params.map(&:phone).reject(&:blank?).first
   end
 
   def visible_by(user=nil)
