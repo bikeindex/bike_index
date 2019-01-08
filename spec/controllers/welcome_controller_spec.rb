@@ -65,6 +65,14 @@ describe WelcomeController do
       end
     end
 
+    context "user is unconfirmed" do
+      let(:user) { FactoryGirl.create(:user) }
+      it "redirects" do
+        get :user_home
+        expect(response).to redirect_to(please_confirm_email_users_path)
+      end
+    end
+
     context "when user is present" do
       let(:user) { FactoryGirl.create(:confirmed_user) }
       context "without anything" do

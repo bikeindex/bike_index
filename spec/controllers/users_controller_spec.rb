@@ -69,8 +69,9 @@ describe UsersController do
               post :create, user: user_attributes, partner: "bikehub"
             end.to change(User, :count).by(1)
             expect(flash).to_not be_present
-            expect(response).to redirect_to please_confirm_email_users_path(layout: "application_revised_bikehub")
+            expect(response).to redirect_to("https://new.bikehub.com/account")
             expect(session[:partner]).to be_nil
+            expect(User.from_auth(cookies.signed[:auth])).to eq(User.fuzzy_email_find("poo@pile.com"))
             user = User.order(:created_at).last
             expect(user.email).to eq(user_attributes[:email])
             expect(user.partner_sign_up).to eq "bikehub"
