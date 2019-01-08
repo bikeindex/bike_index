@@ -15,10 +15,11 @@
         .row
           %a.bikehub-logo{ href: "https://bikehub.com" }
             = image_tag "logos/bikehub_logo.png", class: "primary-nav", alt: "BikeHub home"
-          %p.logo-plus
-            +
-          %a.primary-logo{ href: user_root_url }
-            = image_tag "logo.svg", class: "primary-nav", alt: "Bike Index home"
+          .poweredby
+            %p
+              powered by
+            %a.primary-logo{ href: user_root_url }
+              = image_tag "logo.svg", class: "primary-nav", alt: "Bike Index home"
           %a.bikehub-nav-item.bikehub-nav-item-first{ href: "https://bikehub.com/contact/" }
             Contact
           %a.bikehub-nav-item{ href: new_user_path(partner: params[:partner]), class: (signup_page ? "active" : "") }
@@ -27,31 +28,35 @@
             Log in
     .container.bikehub-explanation.mb-4
       .row
-        %h1
-          BikeHub
-          = signup_page ? "Log In" : "Sign up"
+        .col-sm-12
+          %h1
+            BikeHub
+            = signup_page ? "Log In" : "Sign up"
       .row
-        %p
-          BikeHub accounts are powered by Bike Index – the premier bike registry.
-          = signup_page ? "Creating an account" : "Logging in"
-          here will 
-          = signup_page ? "sign you up for" : "log you in to"
-          BikeHub.
+        .col-sm-12
+          %p
+            BikeHub accounts are powered by Bike Index – the premier bike registry.
+            = signup_page ? "Creating an account" : "Logging in"
+            here will 
+            = signup_page ? "sign you up for" : "log you in to"
+            BikeHub.
 
     = render "layouts/revised_messages"
     = yield
 
     .container.bikehub-explanation{ style: "margin-top: 60px;" }
       .row
-        %h2
-          WHY BIKEINDEX?
+        .col-sm-12
+          %h2
+            WHY BIKEINDEX?
       .row
-        %p
-          Bike Index is a 501(c)(3) nonprofit and the most widely used bicycle registration service in the world.
-        %p
-          At BikeHub, we believe bike security is more than just a strong U-lock.
-        %p
-          Through this partnership, BikeHub patrons enjoy access to the most secure public bike parking – and registration with nation’s largest network, used by law enforcement agencies, universities, and advocates to connect recovered bikes with their owners.
+        .col-sm-12
+          %p
+            Bike Index is a 501(c)(3) nonprofit and the most widely used bicycle registration service in the world.
+          %p
+            At BikeHub, we believe bike security is more than just a strong U-lock.
+          %p
+            Through this partnership, BikeHub patrons enjoy access to the most secure public bike parking – and registration with nation’s largest network, used by law enforcement agencies, universities, and advocates to connect recovered bikes with their owners.
 
   :javascript
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

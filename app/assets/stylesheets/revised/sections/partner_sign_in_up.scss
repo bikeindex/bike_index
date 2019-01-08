@@ -36,14 +36,17 @@ nav.bikehub-nav {
       height: 54px;
     }
   }
-  .logo-plus {
+  .poweredby p {
     float: left;
-    padding: 12px;
-    font-weight: 800;
-    font-size: 36px;
+    padding: 18px 6px 0 24px;
+    font-size: 18px;
     margin: 0;
-    color: #ccc;
+    color: #000;
     line-height: 1;
+  }
+  .primary-logo,
+  .poweredby p {
+    opacity: 0.7;
   }
   .bikehub-nav-item {
     margin: 0;
@@ -67,6 +70,26 @@ nav.bikehub-nav {
     &:last-of-type {
       border-right: 1px solid #ededed;
     }
+  }
+}
+
+@media (min-width: $grid-breakpoint-lg - 1px) {
+  nav.bikehub-nav .poweredby p {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: $grid-breakpoint-sm - 1px) {
+  nav.bikehub-nav {
+    .poweredby {
+      position: absolute;
+      left: 0;
+      top: 48px;
+      p {
+        padding-left: 16px;
+      }
+    }
+    margin-bottom: 60px;
   }
 }
 

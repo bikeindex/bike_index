@@ -1,8 +1,9 @@
-.sign-in-up
-  .sign-in-up-header.container
-    .row
-      %h1
-        = t("sign_in_up.#{controller_name}_h1")
+.sign-in-up{ class: (@partner.present? ? "with-partner" : "not-partner") }
+  - unless @partner.present?
+    .sign-in-up-header.container
+      .row
+        %h1
+          = t("sign_in_up.#{controller_name}_h1")
   .container
     .sign-in-up-wrap
       .row
@@ -25,7 +26,12 @@
           %h3.sign-in-up-main-form-header
             = t("sign_in_up.#{controller_name}_main_form_action")
             %small
-              already have an account? #{ link_to 'log in', new_session_path(partner: @partner) }
+              already have
+              - if @partner.present?
+                a Bike Index
+              - else
+                an
+              account? #{link_to 'log in', new_session_path(partner: @partner)}
           = form_for @user do |f|
             - if @partner
               = hidden_field_tag :partner, @partner
@@ -40,16 +46,23 @@
               = f.label :password, class: 'sr-only'
               = f.password_field :password, placeholder: 'password', class: 'form-control'
 
-            .checkbox
+            .checkbox.terms-and-conditions
               %label
                 = f.check_box :terms_of_service
-                I agree to Bike Index 
+                I agree to
+                - if @partner == "bikehub"
+                  BikeHub's
+                  %a.no-tab{ data: { target: "https://basic.bikehub.com/terms.html" } }
+                    terms and conditions
+                  and
+                Bike Index
                 %a.no-tab{ data: { target: terms_url } }
                   terms and conditions
-            .checkbox
-              %label
-                = f.check_box :is_emailable
-                Get Bike Index's Newsletter
+            - unless @partner.present?
+              .checkbox
+                %label
+                  = f.check_box :is_emailable
+                  Get Bike Index's Newsletter
 
             = f.submit t("sign_in_up.#{controller_name}_main_form_action"), class: 'btn btn-primary btn-lg'
 
