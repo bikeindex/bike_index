@@ -36,14 +36,17 @@ nav.bikehub-nav {
       height: 54px;
     }
   }
-  .logo-plus {
+  .poweredby {
     float: left;
-    padding: 12px;
-    font-weight: 800;
-    font-size: 36px;
+    padding: 12px 6px 0 24px;
+    font-size: 24px;
     margin: 0;
-    color: #ccc;
+    color: #000;
     line-height: 1;
+  }
+  .primary-logo,
+  .poweredby {
+    opacity: 0.7;
   }
   .bikehub-nav-item {
     margin: 0;
@@ -67,6 +70,11 @@ nav.bikehub-nav {
     &:last-of-type {
       border-right: 1px solid #ededed;
     }
+  }
+}
+@media (min-width: $grid-breakpoint-lg - 1px) {
+  nav.bikehub-nav .poweredby {
+    padding-top: 19px;
   }
 }
 
