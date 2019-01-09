@@ -101,6 +101,7 @@ describe BikeCreatorAssociator do
       creator.associate(bike)
     end
     it 'rescues from the error and add the message to the bike' do
+      expect(StolenRecordUpdator).to be_present # Load the error
       bike = Bike.new
       creator = BikeCreatorAssociator.new
       allow(bike).to receive(:stolen).and_return(true)
