@@ -69,7 +69,7 @@ class OrganizationExportWorker
   def valid_export_bike?(bike)
     @avery_export ||= @export.avery_export?
     return true unless @avery_export
-    bike.registration_address.present? && bike.owner_name.present?
+    bike.registration_address.present? && bike.user_name.present?
   end
 
   def export_headers
