@@ -558,7 +558,8 @@ describe Bike do
     end
     context "owner" do
       let(:ownership) { Ownership.new(user: user) }
-      it "returns owners phone" do
+      it "returns users phone" do
+        allow(bike).to receive(:current_ownership) { ownership }
         expect(ownership.first?).to be_truthy
         expect(user.phone).to eq "888.888.8888"
         expect(bike.phone).to eq "888.888.8888"
