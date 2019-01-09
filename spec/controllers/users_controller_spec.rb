@@ -85,11 +85,11 @@ describe UsersController do
           user
         end
         it "does not create a user or send a welcome email" do
-          expect(User.count).to eq(0)
           expect do
-            post :create, user: user_attributes
-          end.to change(EmailWelcomeWorker.jobs, :size).by(0)
-          expect(User.count).to eq(0)
+            expect do
+              post :create, user: user_attributes
+            end.to_not change(EmailWelcomeWorker.jobs, :count)
+          end.to_not change(User, :count)
         end
         context "partner param" do
           it "renders new" do
