@@ -9,7 +9,7 @@ describe BikeDecorator do
       allow(user).to receive(:show_bikes).and_return(true)
       allow(user).to receive(:username).and_return('i')
       decorator = BikeDecorator.new(bike)
-      allow(bike).to receive(:current_owner_exists).and_return(true)
+      allow(bike).to receive(:user?).and_return(true)
       expect(decorator.show_other_bikes.match("href='/users/i")).to be_present
     end
   end
@@ -20,7 +20,7 @@ describe BikeDecorator do
       bike = Bike.new
       allow(bike).to receive(:owner).and_return(user)
       decorator = BikeDecorator.new(bike)
-      allow(bike).to receive(:current_owner_exists).and_return(true)
+      allow(bike).to receive(:user?).and_return(true)
       expect(decorator).to receive(:show_twitter_and_website).with(user)
       decorator.bike_show_twitter_and_website
     end

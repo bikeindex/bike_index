@@ -22,12 +22,9 @@ class Ownership < ActiveRecord::Base
     self.owner_email = EmailNormalizer.normalize(owner_email)
   end
 
-  def name_for_creator
-    if creator.name.present?
-      creator.name
-    else
-      creator.email
-    end
+  def first?
+    return true if id.blank?
+    bike && bike.ownerships.reorder(:created_at).first.id == id
   end
 
   def owner
@@ -50,13 +47,4 @@ class Ownership < ActiveRecord::Base
   def can_be_claimed_by(u)
     u == User.fuzzy_email_find(owner_email) || u == user
   end
-
-  def proper_owner
-    user
-  end
-
-  def proper_owner_name
-    proper_owner && proper_owner.name
-  end
-
 end

@@ -99,7 +99,7 @@ describe OrganizationExportWorker do
           nil,
           email,
           "George Smith",
-          "George Smith" # Because of owner_name_with_fallback
+          "George Smith" # Because of user_name_with_fallback
         ]
       end
       let(:target_csv_line) { "\"http://test.host/bikes/#{bike.id}\",\"#{bike.created_at.utc}\",\"Sweet manufacturer &lt;&gt;&lt;&gt;&gt;\",\"\\\",,,\\\"<script>XSSSSS</script>\",\"Black, #{secondary_color.name}\",\"#{bike.serial_number}\",\"\",\"\",\"\",\"\",\"#{email}\",\"George Smith\",\"George Smith\"" }

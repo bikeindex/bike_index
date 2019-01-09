@@ -86,7 +86,7 @@ describe ApplicationDecorator do
     it 'justs return website if no twitter' do
       user = User.new
       decorator = ApplicationDecorator.new(user)
-      allow(decorator).to receive(:current_owner_exists).and_return(true)
+      allow(decorator).to receive(:user?).and_return(true)
       allow(decorator).to receive(:twitterable).and_return(nil)
       allow(decorator).to receive(:websiteable).and_return('website')
       expect(decorator.show_twitter_and_website(user)).to eq('website')

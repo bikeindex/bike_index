@@ -4,12 +4,11 @@ class BikeCreatorAssociator
   end
 
   def create_ownership(bike)
-    send_email = true
-    send = @b_param.params['bike']['send_email'] 
-    if send == false
+    passed_send_email = @b_param.params.dig("bike", "send_email")
+    if passed_send_email.present? && passed_send_email.to_s[/false/i]
       send_email = false
-    elsif send.present? && send != true && send.to_s[/false/i]
-      send_email = false
+    else
+      send_email = true
     end
     OwnershipCreator.new(bike: bike, creator: @b_param.creator, send_email: send_email).create_ownership
   end

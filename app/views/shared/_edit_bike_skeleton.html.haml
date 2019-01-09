@@ -10,7 +10,7 @@
       = @bike.mnfg_name
       = @bike.frame_model
       = @bike.type unless @bike.type == 'bike'
-    - unless @bike.current_owner_exists
+    - unless @bike.user?
       %p.edit-bike-title-submenu
         Sent to 
         %em

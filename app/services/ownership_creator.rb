@@ -17,7 +17,7 @@ class OwnershipCreator
 
   def creator_id
     @creator = @bike.creator unless @creator.present?
-    @creator.id 
+    @creator.id
   end
 
   def owner_id
@@ -36,7 +36,7 @@ class OwnershipCreator
   end
 
   def new_ownership_params
-    ownership = {
+    {
       bike_id: @bike.id,
       user_id: owner_id,
       owner_email: find_owner_email,
@@ -47,7 +47,6 @@ class OwnershipCreator
       send_email: @send_email,
       user_hidden: @user_hidden
     }
-    ownership
   end
 
   def mark_other_ownerships_not_current

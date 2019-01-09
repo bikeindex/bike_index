@@ -146,37 +146,28 @@ class Bike < ActiveRecord::Base
     t
   end
 
-  def current_ownership
-    ownerships && ownerships.last
-  end
+  def current_ownership; ownerships.reorder(:created_at).last end
 
-  def owner
-    current_ownership && current_ownership.owner
-  end
+  # owner resolves to creator if user isn't present, or organization auto user. shouldn't ever be nil
+  def owner; current_ownership && current_ownership.owner end
 
-  def first_ownership
-    ownerships.first
-  end
+  # This can be nil!
+  def user; current_ownership&.user end
 
-  def first_owner_email
-    first_ownership.owner_email
-  end
+  def user?; user.present? end
 
   # This is for organizations - might be useful for admin as well. We want it to be nil if it isn't present
-  def owner_name
-    current_ownership.user&.name # User - not ownership, because we don't want registrar
-  end
+  # User - not ownership, because we don't want registrar
+  def user_name; user&.name end
 
-  def owner_name_or_email
-    current_ownership.user&.name || owner_email
-  end
+  def user_name_or_email; user&.name || owner_email end
 
-  def current_owner_exists
-    current_ownership && current_ownership.claimed
-  end
+  def first_ownership; ownerships.reorder(:created_at).first end
+
+  def first_owner_email; first_ownership.owner_email end
 
   def can_be_claimed_by(u)
-    return false if current_owner_exists || current_ownership.blank?
+    return false if user? || current_ownership.blank?
     current_ownership.user == u || current_ownership.can_be_claimed_by(u)
   end
 
@@ -204,11 +195,11 @@ class Bike < ActiveRecord::Base
     @phone || owner&.phone || b_params.map(&:phone).reject(&:blank?).first
   end
 
-  def visible_by(user=nil)
+  def visible_by(passed_user=nil)
     return true unless hidden
-    if user.present?
-      return true if user.superuser
-      return true if owner == user && user_hidden
+    if passed_user.present?
+      return true if passed_user.superuser
+      return true if owner == passed_user && user_hidden
     end
     false
   end

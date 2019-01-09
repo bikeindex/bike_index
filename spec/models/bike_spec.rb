@@ -173,18 +173,18 @@ describe Bike do
     end
   end
 
-  describe 'current_owner_exists' do
+  describe 'user?' do
     it "returns false if ownership isn't claimed" do
       bike = Bike.new
       ownership = Ownership.new
       allow(bike).to receive(:ownerships).and_return([ownership])
-      expect(bike.current_owner_exists).to be_falsey
+      expect(bike.user?).to be_falsey
     end
     it 'returns true if ownership is claimed' do
       bike = Bike.new
       ownership = Ownership.new(claimed: true)
       allow(bike).to receive(:ownerships).and_return([ownership])
-      expect(bike.current_owner_exists).to be_truthy
+      expect(bike.user?).to be_truthy
     end
   end
 
@@ -193,7 +193,7 @@ describe Bike do
       it 'returns false' do
         user = User.new
         bike = Bike.new
-        allow(bike).to receive(:current_owner_exists).and_return(true)
+        allow(bike).to receive(:user?).and_return(true)
         expect(bike.can_be_claimed_by(user)).to be_falsey
       end
     end
@@ -204,7 +204,7 @@ describe Bike do
         bike = Bike.new
         allow(bike).to receive(:current_ownership).and_return(ownership)
         allow(ownership).to receive(:user).and_return(user)
-        allow(bike).to receive(:current_owner_exists).and_return(false)
+        allow(bike).to receive(:user?).and_return(false)
         expect(bike.can_be_claimed_by(user)).to be_truthy
       end
     end
@@ -552,6 +552,40 @@ describe Bike do
           expect_any_instance_of(Geohelper).to_not receive(:formatted_address_hash)
           expect(bike.registration_address).to eq target.as_json
         end
+      end
+    end
+  end
+
+  describe "phone" do
+    let(:bike) { Bike.new }
+    let(:user) { User.new(phone: "888.888.8888") }
+    context "assigned phone" do
+      it "returns phone" do
+        bike.phone = user.phone
+        expect(bike.phone).to eq "888.888.8888"
+      end
+    end
+    context "owner" do
+      let(:ownership) { Ownership.new(user: user) }
+      it "returns owners phone" do
+        expect(ownership.first?).to be_truthy
+        expect(user.phone).to eq "888.888.8888"
+        allow(bike).to receive(:current_ownership) { ownership }
+        expect(bike.phone).to eq "888.888.8888"
+      end
+      context "not first ownerships" do
+        it "is nil" do
+          allow(ownership).to receive(:first?) { false }
+          allow(bike).to receive(:current_ownership) { ownership }
+          expect(bike.phone).to be_nil
+        end
+      end
+    end
+    context "creator" do
+      let(:ownership) { Ownership.new(creator: user) }
+      it "returns nil" do
+        allow(bike).to receive(:current_ownership) { ownership }
+        expect(bike.phone).to be_nil
       end
     end
   end

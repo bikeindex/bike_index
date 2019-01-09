@@ -69,20 +69,4 @@ describe Ownership do
       expect(ownership.can_be_claimed_by(user)).to be_falsey
     end
   end
-
-  describe 'proper_owner_name' do
-    it 'is nil if no owner' do
-      ownership = Ownership.new(owner_email: 'something@example.com')
-      user = User.new(name: 'foo')
-      allow(ownership).to receive(:creator).and_return(user)
-      expect(ownership.proper_owner_name).to be_nil
-    end
-
-    it 'is owners name' do
-      ownership = Ownership.new(owner_email: 'something@example.com')
-      user = User.new(name: 'foo')
-      allow(ownership).to receive(:user).and_return(user)
-      expect(ownership.proper_owner_name).to eq('foo')
-    end
-  end
 end
