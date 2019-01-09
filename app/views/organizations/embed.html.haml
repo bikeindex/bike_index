@@ -17,8 +17,8 @@
       = f.label :serial_number, class: "control-label"
       .controls
         = f.text_field :serial_number, :required =>true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
-      - if @organization.additional_registration_fields.include?("reg_secondary_serial")
-        = f.label :additional_registration, "Additional registration number", class: "control-label"
+      - if @organization.include_field_reg_secondary_serial?
+        = f.label :additional_registration, "Additional serial/sticker number", class: "control-label"
         .controls
           = f.text_field :additional_registration, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
     .has-no-serial.optional-block
@@ -89,12 +89,13 @@
       = f.hidden_field :stolen, value: true
       = fields_for @stolen_record do |builder|
         = builder.hidden_field :phone_no_show, value: true
+        - unless @organization&.include_field_reg_phone?
+          .input-group
+            .control-group
+              = builder.label :phone, class: "control-label"
+              .controls
+                = builder.text_field :phone, required: "true"
         .input-group#stolenDisplay
-          .control-group
-            = builder.label :phone, class: "control-label"
-            .controls
-              = builder.text_field :phone, required: "true"
-        .input-group
           .control-group{ style: "width: 300px; max-width: 100%;" }
             = builder.label :date_stolen, "When was it stolen?", class: "control-label"
             - builder.object.date_stolen = TimeParser.round(builder.object.date_stolen || Time.now)
@@ -144,6 +145,16 @@
                 Receive notifications from the Index about this stolen #{@bike.type}
                 %span
                   eg if we tweet about or someone searches for it's serial number
+  - if @organization&.include_field_reg_address?
+    .input-group
+      = f.label :address, "Your street address"
+      .controls
+        = f.text_field :address, required: true
+  - if @organization&.include_field_reg_phone?
+    .input-group
+      = f.label :phone, "Your phone number"
+      .controls
+        = f.text_field :phone, required: true
 
   .input-group.form-foot
     .control-group
@@ -155,15 +166,8 @@
       = submit_tag "Register", class: "button-submit"
       %span.what-you-register
         this
-      = collection_select( :bike, :cycle_type_id, CycleType.all, :id, :name, required: true)
-  - if @phone
-    .input-group#optional-phone
-      .control-group
-        = f.label :phone, 'Phone - optional', class: "control-label"
-        .controls
-          = f.text_field :phone
+      = collection_select(:bike, :cycle_type_id, CycleType.all, :id, :name, required: true)
   .input-group.optional-group.form-photo-group
-  
     - if @b_param.image.present? or @b_param.image_tmp.present?
       %strong
         Image has been uploaded
