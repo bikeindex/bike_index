@@ -10,13 +10,10 @@ class StolenRecordUpdator
   end 
 
   def updated_phone
-    if @bike.phone.present?
-      phone = @bike.phone 
-      if @user.present?
-        @user.update_attributes(phone: phone) unless @user.phone
-      end
-      return phone 
-    end
+    phone = @bike.phone
+    return nil unless phone.present?
+    @user.update_attributes(phone: phone) if @user.present? && @user.phone.blank?
+    phone
   end
 
   def mark_records_not_current
