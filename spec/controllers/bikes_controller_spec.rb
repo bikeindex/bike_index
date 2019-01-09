@@ -1013,7 +1013,8 @@ describe BikesController do
           let(:skipped_attrs) { %w[proof_of_ownership receive_notifications timezone date_stolen estimated_value].map(&:to_sym) }
           include_context :geocoder_real
           it "updates and returns to the right page" do
-            VCR.use_cassette("bikes_controller-create-stolen") do
+            # VCR for some reason fails to match this request with standard matching, so specify different
+            VCR.use_cassette("bikes_controller-create-stolen", match_requests_on: [:path]) do
               bike.update_attribute :stolen, true
               bike.reload
               expect(bike.stolen).to be_truthy
