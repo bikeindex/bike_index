@@ -53,7 +53,7 @@ describe UsersController do
         end
         it "creates a confirmed user, log in, and send welcome if user has org invite" do
           expect_any_instance_of(CreateUserJobs).to receive(:send_welcome_email)
-          organization_invitation = FactoryGirl.create(:organization_invitation, invitee_email: "poo@pile.com")
+          FactoryGirl.create(:organization_invitation, invitee_email: "poo@pile.com")
           post :create, user: FactoryGirl.attributes_for(:user, email: "poo@pile.com"), partner: "somethingcool"
           expect(User.from_auth(cookies.signed[:auth])).to eq(User.fuzzy_email_find("poo@pile.com"))
           expect(response).to redirect_to("https://new.bikehub.com/account")
@@ -85,6 +85,7 @@ describe UsersController do
           user
         end
         it "does not create a user or send a welcome email" do
+          expect(User.count).to eq(0)
           expect do
             post :create, user: user_attributes
           end.to change(EmailWelcomeWorker.jobs, :size).by(0)
@@ -278,7 +279,7 @@ describe UsersController do
   end
 
   describe 'edit' do
-    include_context :logged_in_as_user 
+    include_context :logged_in_as_user
     context 'no page given' do
       it 'renders root' do
         get :edit
@@ -289,7 +290,7 @@ describe UsersController do
       end
     end
     context 'application_revised layout' do
-      %w(root password sharing).each do |template|
+      %w[root password sharing].each do |template|
         context template do
           it 'renders the template' do
             get :edit, page: template
@@ -306,7 +307,7 @@ describe UsersController do
   describe 'update' do
     context 'nil username' do
       it "doesn't update username" do
-        user = FactoryGirl.create(:user) 
+        user = FactoryGirl.create(:user)
         user.update_attribute :username, 'something'
         set_current_user(user)
         post :update, id: user.username, user: { username: ' ', name: 'tim' }, page: 'sharing'
@@ -321,7 +322,8 @@ describe UsersController do
       set_current_user(user)
       post :update, id: user.username, user: {
         password: 'new_pass',
-        password_confirmation: 'new_pass' }
+        password_confirmation: 'new_pass'
+      }
       expect(user.reload.authenticate('new_pass')).to be_falsey
     end
 
@@ -332,7 +334,8 @@ describe UsersController do
         current_password: 'old_pass',
         password: 'new_pass',
         name: 'Mr. Slick',
-        password_confirmation: 'new_passd' }
+        password_confirmation: 'new_passd'
+      }
       expect(user.reload.authenticate('new_pass')).to be_falsey
       expect(user.name).not_to eq('Mr. Slick')
     end
@@ -348,7 +351,8 @@ describe UsersController do
         email: 'cool_new_email@something.com',
         password_reset_token: user.password_reset_token,
         password: 'new_pass',
-        password_confirmation: 'new_pass' }
+        password_confirmation: 'new_pass'
+      }
       expect(user.reload.authenticate('new_pass')).to be_truthy
       expect(user.email).to eq(email)
       expect(user.password_reset_token).not_to eq('stuff')
@@ -362,13 +366,14 @@ describe UsersController do
       user.set_password_reset_token
       user.reload
       reset = user.password_reset_token
-      auth = user.auth_token
-      email = user.email
+      user.auth_token
+      user.email
       set_current_user(user)
       post :update, id: user.username, user: {
         password_reset_token: 'something_else',
         password: 'new_pass',
-        password_confirmation: 'new_pass' }
+        password_confirmation: 'new_pass'
+      }
       expect(user.reload.authenticate('new_pass')).to be_falsey
       expect(user.password_reset_token).to eq(reset)
     end
@@ -377,12 +382,13 @@ describe UsersController do
       user = FactoryGirl.create(:user)
       user.set_password_reset_token((Time.now - 61.minutes).to_i)
       auth = user.auth_token
-      email = user.email
+      user.email
       set_current_user(user)
       post :update, id: user.username, user: {
         password_reset_token: user.password_reset_token,
         password: 'new_pass',
-        password_confirmation: 'new_pass' }
+        password_confirmation: 'new_pass'
+      }
       expect(user.reload.authenticate('new_pass')).not_to be_truthy
       expect(user.auth_token).to eq(auth)
       expect(user.password_reset_token).not_to eq('stuff')
@@ -399,7 +405,8 @@ describe UsersController do
         current_password: 'old_pass',
         password: 'new_pass',
         name: 'Mr. Slick',
-        password_confirmation: 'new_pass' }
+        password_confirmation: 'new_pass'
+      }
       expect(response).to redirect_to(my_account_url)
       expect(user.reload.authenticate('new_pass')).to be_truthy
       expect(user.auth_token).not_to eq(auth)

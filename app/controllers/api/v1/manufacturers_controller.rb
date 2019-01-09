@@ -5,7 +5,7 @@ module Api
       after_filter :cors_set_access_control_headers
 
       def index
-        manufacturers = Manufacturer.all
+        manufacturers = Manufacturer.reorder(:name)
         if params[:query]
           if params[:query].strip == "frame_makers"
             Manufacturer.frames

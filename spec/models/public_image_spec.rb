@@ -24,13 +24,15 @@ describe PublicImage do
     end
   end
 
-  describe 'lottapixel' do
+  describe "lottapixel" do
     it "doesn't break" do
-      lottapixel = File.open(File.join(Rails.root, 'spec', 'fixtures', 'hugeimg.png'))
+      lottapixel = File.open(File.join(Rails.root, "spec", "fixtures", "hugeimg.png"))
       public_image = FactoryGirl.build(:public_image, image: lottapixel)
       public_image.save
       expect(public_image.id).to be_nil
-      expect(public_image.errors.full_messages.to_s.match('dimensions too large')).to be_truthy
+      # Because updated versions of imagemagick respond with different errors
+      error_msg = public_image.errors.full_messages.to_s
+      expect(error_msg).to match(/(too large)|(width exceeds)/)
     end
   end
 
