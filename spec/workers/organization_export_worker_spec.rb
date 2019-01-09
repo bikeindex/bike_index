@@ -119,6 +119,7 @@ describe OrganizationExportWorker do
       let(:special_bike_values) do
         [
           "http://test.host/bikes/#{bike.id}",
+          "717.742.3423",
           "cool extra serial",
           "717 Market St",
           "San Francisco",
@@ -126,11 +127,11 @@ describe OrganizationExportWorker do
           "94103"
         ]
       end
-      let(:export) { FactoryGirl.create(:export_organization, progress: "pending", file: nil, options: { headers: %w[link additional_registration_number registration_address] }) }
+      let(:export) { FactoryGirl.create(:export_organization, progress: "pending", file: nil, options: { headers: %w[link phone additional_registration_number registration_address] }) }
       let(:paid_feature) { FactoryGirl.create(:paid_feature, amount_cents: 10_000, name: "CSV Exports", feature_slugs: ["csv_exports"]) }
       let(:invoice) { FactoryGirl.create(:invoice_paid, amount_due: 0) }
-      let!(:b_param) { FactoryGirl.create(:b_param, created_bike_id: bike.id, params: { bike: { address: "717 Market St, SF" } }) }
-      let(:target_headers) { %w[link additional_registration_number address city state zipcode] }
+      let!(:b_param) { FactoryGirl.create(:b_param, created_bike_id: bike.id, params: { bike: { address: "717 Market St, SF", phone: "717.742.3423" } }) }
+      let(:target_headers) { %w[link phone additional_registration_number address city state zipcode] }
       let(:bike) { FactoryGirl.create(:creation_organization_bike, organization: organization, additional_registration: "cool extra serial") }
       include_context :geocoder_real
       it "returns the expected values" do
