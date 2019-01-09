@@ -2,18 +2,18 @@ class BikeDecorator < ApplicationDecorator
   delegate_all
 
   def should_show_other_bikes
-    object.user? and object.user.show_bikes
+    object.user? && object.user.show_bikes
   end
 
   def show_other_bikes
     return nil unless should_show_other_bikes
-    html = "<a href='/users/#{object.owner.username}'>View user's other bikes</a>"
+    html = "<a href='/users/#{object.user.username}'>View user's other bikes</a>"
     html.html_safe
   end
 
   def bike_show_twitter_and_website
     return nil unless object.user?
-    user = object.owner
+    user = object.user
     show_twitter_and_website(user)
   end
 
@@ -37,8 +37,8 @@ class BikeDecorator < ApplicationDecorator
     return true if object.current_stolen_record.phone_for_everyone
     if user.present?
       return true if user.superuser
-      return true if object.current_stolen_record.phone_for_shops and user.has_shop_membership?
-      return true if object.current_stolen_record.phone_for_police and user.has_police_membership?
+      return true if object.current_stolen_record.phone_for_shops && user.has_shop_membership?
+      return true if object.current_stolen_record.phone_for_police && user.has_police_membership?
       true if object.current_stolen_record.phone_for_users      
     end
   end
