@@ -422,6 +422,7 @@ describe BikesController do
                 post :create, bike: bike_params.merge(stolen: true), stolen_record: stolen_params
               end.to change(Ownership, :count).by 1
               bike = Bike.last
+              expect(bike).to be_present
               expect(bike.creation_state.origin).to eq 'embed'
               expect(bike.creation_state.organization).to eq organization
               expect(bike.creation_state.creator).to eq bike.creator
@@ -439,6 +440,7 @@ describe BikesController do
                 post :create, bike: bike_params.merge(stolen: true), stolen_record: alt_stolen_params
               end.to change(Ownership, :count).by 1
               bike = Bike.last
+              expect(bike).to be_present
               expect(bike.creation_state.origin).to eq 'embed'
               expect(bike.creation_state.organization).to eq organization
               expect(bike.creation_state.creator).to eq bike.creator
@@ -1009,37 +1011,40 @@ describe BikesController do
             }
           end
           let(:skipped_attrs) { %w[proof_of_ownership receive_notifications timezone date_stolen estimated_value].map(&:to_sym) }
+          include_context :geocoder_real
           it 'updates and returns to the right page' do
-            bike.update_attribute :stolen, true
-            bike.reload
-            expect(bike.stolen).to be_truthy
-            # bike.save
-            expect(stolen_record.date_stolen).to be_present
-            expect(stolen_record.proof_of_ownership).to be_falsey
-            expect(stolen_record.receive_notifications).to be_truthy
-            # bike.reload
-            # bike.update_attributes(stolen: true, current_stolen_record_id: stolen_record.id)
-            bike.reload
-            expect(bike.find_current_stolen_record).to eq stolen_record
-            put :update, id: bike.id, bike: bike_attrs, edit_template: 'fancy_template'
-            expect(flash[:error]).to_not be_present
-            expect(response).to redirect_to edit_bike_url(page: 'fancy_template')
-            bike.reload
-            expect(bike.stolen).to be_truthy
-            # expect(bike.hidden).to be_truthy
-            # Stupid cheat because we're creating an extra record here for fuck all reason
-            current_stolen_record = bike.find_current_stolen_record
-            expect(bike.stolen_records.count).to eq 1
-            expect(bike.find_current_stolen_record.id).to eq stolen_record.id
-            # stolen_record.reload
-            expect(bike.find_current_stolen_record.id).to eq stolen_record.id
-            expect(current_stolen_record.date_stolen.to_i).to be_within(1).of target_time
-            expect(current_stolen_record.proof_of_ownership).to be_truthy
-            expect(current_stolen_record.receive_notifications).to be_falsey
-            expect(current_stolen_record.estimated_value).to eq 1200
-            stolen_attrs.except(*skipped_attrs).each do |key, value|
-              pp key unless current_stolen_record.send(key) == value
-              expect(current_stolen_record.send(key)).to eq value
+            VCR.use_cassette("bikes_controller-create-stolen") do
+              bike.update_attribute :stolen, true
+              bike.reload
+              expect(bike.stolen).to be_truthy
+              # bike.save
+              expect(stolen_record.date_stolen).to be_present
+              expect(stolen_record.proof_of_ownership).to be_falsey
+              expect(stolen_record.receive_notifications).to be_truthy
+              # bike.reload
+              # bike.update_attributes(stolen: true, current_stolen_record_id: stolen_record.id)
+              bike.reload
+              expect(bike.find_current_stolen_record).to eq stolen_record
+              put :update, id: bike.id, bike: bike_attrs, edit_template: 'fancy_template'
+              expect(flash[:error]).to_not be_present
+              expect(response).to redirect_to edit_bike_url(page: 'fancy_template')
+              bike.reload
+              expect(bike.stolen).to be_truthy
+              # expect(bike.hidden).to be_truthy
+              # Stupid cheat because we're creating an extra record here for fuck all reason
+              current_stolen_record = bike.find_current_stolen_record
+              expect(bike.stolen_records.count).to eq 1
+              expect(bike.find_current_stolen_record.id).to eq stolen_record.id
+              # stolen_record.reload
+              expect(bike.find_current_stolen_record.id).to eq stolen_record.id
+              expect(current_stolen_record.date_stolen.to_i).to be_within(1).of target_time
+              expect(current_stolen_record.proof_of_ownership).to be_truthy
+              expect(current_stolen_record.receive_notifications).to be_falsey
+              expect(current_stolen_record.estimated_value).to eq 1200
+              stolen_attrs.except(*skipped_attrs).each do |key, value|
+                pp key unless current_stolen_record.send(key) == value
+                expect(current_stolen_record.send(key)).to eq value
+              end
             end
           end
           context 'recovered bike' do
