@@ -27,7 +27,7 @@ describe BikesController do
           expect(flash).to_not be_present
           expect(assigns(:interpreted_params)).to eq(stolenness: 'stolen')
           expect(assigns(:selected_query_items_options)).to eq([])
-          expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id, stolen_bike_2.id])
+          expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, stolen_bike_2.id])
           expect(assigns(:page_id)).to eq 'bikes_index'
         end
       end
