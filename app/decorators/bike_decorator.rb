@@ -2,7 +2,7 @@ class BikeDecorator < ApplicationDecorator
   delegate_all
 
   def should_show_other_bikes
-    object.user_exists and object.owner.show_bikes
+    object.user? and object.user.show_bikes
   end
 
   def show_other_bikes
@@ -12,7 +12,7 @@ class BikeDecorator < ApplicationDecorator
   end
 
   def bike_show_twitter_and_website
-    return nil unless object.user_exists
+    return nil unless object.user?
     user = object.owner
     show_twitter_and_website(user)
   end
