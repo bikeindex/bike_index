@@ -91,4 +91,5 @@ jobs:
           path: test-artifacts
       - deploy:
           command: |
+            echo $CIRCLE_NODE_TOTAL
             ./cc-test-reporter sum-coverage --output - --parts $CIRCLE_NODE_TOTAL coverage/codeclimate.*.json | ./cc-test-reporter upload-coverage --debug --input -
