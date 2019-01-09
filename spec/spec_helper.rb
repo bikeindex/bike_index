@@ -8,10 +8,10 @@ VCR.configure do |config|
   config.hook_into :webmock
 end
 
-# if ENV["COVERAGE"]
+if ENV["COVERAGE"]
   require 'simplecov'
   SimpleCov.start "rails"
-# end
+end
 
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../../config/environment', __FILE__)
