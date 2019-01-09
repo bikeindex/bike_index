@@ -49,6 +49,11 @@ jobs:
           command: yarn install --cache-folder ~/.cache/yarn
       - run: bundle exec rake assets:precompile
       - run:
+          name: Install Code Climate Test Reporter
+          command: |
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
+      - run:
           name: Wait for PostgreSQL to start
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
       - save_cache:
@@ -64,11 +69,6 @@ jobs:
           command: |
             bundle exec rake db:create db:structure:load
       - run:
-          name: Install Code Climate Test Reporter
-          command: |
-            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-            chmod +x ./cc-test-reporter
-      - run:
           name: Run tests
           command: |
             mkdir -p test-results/rspec test-artifacts
@@ -81,6 +81,10 @@ jobs:
                               --out test-results/rspec/rspec.xml \
                               --format progress \
                               -- ${TESTFILES}
+      - run:
+          name: Code Climate Test Coverage
+          command: |
+            ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.$CIRCLE_NODE_INDEX.json"
       - store_test_results:
           path: test-results
       - store_artifacts:
