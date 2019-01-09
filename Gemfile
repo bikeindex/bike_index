@@ -130,13 +130,14 @@ group :development do
 end
 
 group :development, :test do
-  gem 'rb-fsevent', '~> 0.9.1'
-  gem 'rspec', '~> 3.3.0'
-  gem 'rspec-rails', '~> 3.3.0'
-  gem 'shoulda-matchers', '~> 2.8.0'
-  gem 'foreman'
-  gem 'database_cleaner'
-  gem 'dotenv-rails'
+  gem "rb-fsevent", "~> 0.9.1"
+  gem "rspec", "~> 3.3.0"
+  gem "rspec-rails", "~> 3.3.0"
+  gem "rspec_junit_formatter" # For circle ci
+  gem "shoulda-matchers", "~> 2.8.0"
+  gem "foreman"
+  gem "database_cleaner"
+  gem "dotenv-rails"
 end
 
 group :test do
