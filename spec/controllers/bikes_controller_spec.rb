@@ -976,43 +976,43 @@ describe BikesController do
         # Firstly, new stolen update code paths
         # Also, that we can apply stolen changes to hidden bikes
         # And finally, that it redirects to the correct page
-        context 'stolen update' do
+        context "stolen update" do
           let(:state) { FactoryGirl.create(:state) }
           let(:country) { state.country }
-          let(:stolen_record) { FactoryGirl.create(:stolen_record, bike: bike, city: 'party') }
+          let(:stolen_record) { FactoryGirl.create(:stolen_record, bike: bike, city: "party") }
           let(:target_time) { 1454925600 }
           let(:stolen_attrs) do
             {
               date_stolen: "2016-02-08 04:00:00",
               timezone: "America/Chicago",
-              phone: '9999999999',
-              street: '66666666 foo street',
+              phone: "9999999999",
+              street: "66666666 foo street",
               country_id: country.id,
-              city: 'Chicago',
-              zipcode: '60647',
+              city: "Chicago",
+              zipcode: "60647",
               state_id: state.id,
-              locking_description: 'Some description',
-              lock_defeat_description: 'It was cuttttt',
-              theft_description: 'Someone stole it and stuff',
-              police_report_number: '#444444',
-              police_report_department: 'department of party',
-              secondary_phone: '8888888888',
+              locking_description: "Some description",
+              lock_defeat_description: "It was cuttttt",
+              theft_description: "Someone stole it and stuff",
+              police_report_number: "#444444",
+              police_report_department: "department of party",
+              secondary_phone: "8888888888",
               proof_of_ownership: 1,
               receive_notifications: 0,
-              estimated_value: '1200'
+              estimated_value: "1200"
             }
           end
           let(:bike_attrs) do
             {
               stolen: true,
               stolen_records_attributes: {
-                '0' => stolen_attrs
+                "0" => stolen_attrs
               }
             }
           end
           let(:skipped_attrs) { %w[proof_of_ownership receive_notifications timezone date_stolen estimated_value].map(&:to_sym) }
           include_context :geocoder_real
-          it 'updates and returns to the right page' do
+          it "updates and returns to the right page" do
             VCR.use_cassette("bikes_controller-create-stolen") do
               bike.update_attribute :stolen, true
               bike.reload
@@ -1025,9 +1025,9 @@ describe BikesController do
               # bike.update_attributes(stolen: true, current_stolen_record_id: stolen_record.id)
               bike.reload
               expect(bike.find_current_stolen_record).to eq stolen_record
-              put :update, id: bike.id, bike: bike_attrs, edit_template: 'fancy_template'
+              put :update, id: bike.id, bike: bike_attrs, edit_template: "fancy_template"
               expect(flash[:error]).to_not be_present
-              expect(response).to redirect_to edit_bike_url(page: 'fancy_template')
+              expect(response).to redirect_to edit_bike_url(page: "fancy_template")
               bike.reload
               expect(bike.stolen).to be_truthy
               # expect(bike.hidden).to be_truthy
