@@ -95,11 +95,11 @@ describe BikesController do
           {
             query: '1',
             manufacturer: '2',
-            colors: %w(3 4),
+            colors: %w[3 4],
             location: '5',
             distance: '6',
             serial: '9',
-            query_items: %w(7 8),
+            query_items: %w[7 8],
             stolenness: 'all'
           }.as_json
         end
@@ -897,11 +897,11 @@ describe BikesController do
         end
 
         it 'updates the bike and components' do
-          component_1 = FactoryGirl.create(:component, bike: bike)
+          component1 = FactoryGirl.create(:component, bike: bike)
           handlebar_type_id = FactoryGirl.create(:handlebar_type).id
-          ctype_id = component_1.ctype_id
+          ctype_id = component1.ctype_id
           bike.reload
-          component_2_attrs = {
+          component2_attrs = {
             _destroy: '0',
             ctype_id: ctype_id,
             description: 'sdfsdfsdf',
@@ -917,9 +917,9 @@ describe BikesController do
             components_attributes: {
               '0' => {
                 '_destroy' => '1',
-                id: component_1.id.to_s
+                id: component1.id.to_s
               },
-              Time.zone.now.to_i.to_s => component_2_attrs
+              Time.zone.now.to_i.to_s => component2_attrs
             }
           }
           put :update, id: bike.id, bike: bike_attrs
@@ -931,10 +931,10 @@ describe BikesController do
           expect(bike.hidden).to be_falsey
 
           expect(bike.components.count).to eq 1
-          expect(bike.components.where(id: component_1.id).any?).to be_falsey
-          component_2 = bike.components.first
-          component_2_attrs.except(:_destroy).each do |key, value|
-            expect(component_2.send(key).to_s).to eq value.to_s
+          expect(bike.components.where(id: component1.id).any?).to be_falsey
+          component2 = bike.components.first
+          component2_attrs.except(:_destroy).each do |key, value|
+            expect(component2.send(key).to_s).to eq value.to_s
           end
         end
 
@@ -1008,7 +1008,7 @@ describe BikesController do
               }
             }
           end
-          let(:skipped_attrs) { %w(proof_of_ownership receive_notifications timezone date_stolen estimated_value).map(&:to_sym) }
+          let(:skipped_attrs) { %w[proof_of_ownership receive_notifications timezone date_stolen estimated_value].map(&:to_sym) }
           it 'updates and returns to the right page' do
             bike.update_attribute :stolen, true
             bike.reload
@@ -1077,7 +1077,7 @@ describe BikesController do
           bike_organization_ids: "#{organization_2.id}, #{organization.id}"
         }
       end
-      let(:skipped_attrs) { %w(marked_user_hidden bike_organization_ids).map(&:to_sym) }
+      let(:skipped_attrs) { %w[marked_user_hidden bike_organization_ids].map(&:to_sym) }
       before do
         ownership.mark_claimed
         set_current_user(user)

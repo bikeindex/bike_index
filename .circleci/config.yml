@@ -62,9 +62,15 @@ jobs:
           command: |
             bundle exec rake db:create db:structure:load
       - run:
+          name: Install Code Climate Test Reporter
+          command: |
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
+      - run:
           name: Run tests
           command: |
             mkdir -p test-results/rspec test-artifacts
+            ./cc-test-reporter before-build
             TESTFILES=$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
             bundle exec rspec --profile 10 \
                               --color \
@@ -77,3 +83,6 @@ jobs:
           path: test-results
       - store_artifacts:
           path: test-artifacts
+      - deploy:
+          command: |
+            ./cc-test-reporter sum-coverage --output - --parts $CIRCLE_NODE_TOTAL coverage/codeclimate.*.json | ./cc-test-reporter upload-coverage --debug --input -       
