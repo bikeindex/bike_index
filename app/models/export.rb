@@ -25,7 +25,7 @@ class Export < ActiveRecord::Base
   end
 
   def self.additional_registration_fields
-    { reg_address: "registration_address", reg_secondary_serial: "additional_registration_number", phone: "phone" }
+    { reg_address: "registration_address", reg_secondary_serial: "additional_registration_number", reg_phone: "phone" }
   end
 
   def self.default_kind_options
