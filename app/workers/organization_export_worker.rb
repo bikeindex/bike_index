@@ -36,6 +36,7 @@ class OrganizationExportWorker
       sheet.add_row(export_headers)
       rows = 0
       @export.bikes_scoped.find_each(batch_size: 100) do |bike|
+        next unless valid_export_bike?(bike)
         rows += 1
         sheet.add_row(bike_to_row(bike))
       end
@@ -65,6 +66,12 @@ class OrganizationExportWorker
     export_headers.map { |header| value_for_header(header, bike) }
   end
 
+  def valid_export_bike?(bike)
+    @avery_export ||= @export.avery_export?
+    return true unless @avery_export
+    bike.registration_address.present? && bike.owner_name.present?
+  end
+
   def export_headers
     return @export_headers if defined?(@export_headers)
     @export_headers = @export.headers
@@ -78,8 +85,8 @@ class OrganizationExportWorker
     case header
     when "link" then LINK_BASE + bike.id.to_s
     when "owner_email" then bike.owner_email
-    when "owner_name" then bike.owner_name
-    when "owner_name_or_email" then bike.owner_name_or_email
+    when "owner_name" then bike.user_name
+    when "owner_name_or_email" then bike.user_name_or_email
     when "registration_method" then bike.creation_description
     when "thumbnail" then bike.thumb_path
     when "registered_at" then bike.created_at.utc

@@ -150,7 +150,7 @@ describe Organized::ExportsController, type: :controller do
         context "organization with avery export" do
           let(:end_at) { 1457431200 }
           before { organization.update_column :paid_feature_slugs, %w[csv_exports avery_export] } # Stub organization having features
-          let(:target_headers) { %w[owner_name_or_email registration_address] }
+          let(:target_headers) { %w[owner_name registration_address] }
           let(:target_redirect) {  }
           it "makes the avery export" do
             expect do
