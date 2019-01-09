@@ -53,17 +53,16 @@ class OrganizationsController < ApplicationController
     elsif @bike.stolen || params[:stolen_first]
       @stolen = true
     end
-    render layout: 'embed_layout'
+    render layout: "embed_layout"
   end
 
   def embed_extended
     @bike = BikeCreator.new(@b_param).new_bike
-    @bike.owner_email = 'info@lumberyardmtb.com' if @organization.slug == 'lumberyard'
     if params[:email].present?
       @bike.owner_email = params[:email]
       @persist_email = true
     end
-    render layout: 'embed_layout'
+    render layout: "embed_layout"
   end
 
   def embed_create_success
