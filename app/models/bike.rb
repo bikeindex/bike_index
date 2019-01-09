@@ -167,7 +167,7 @@ class Bike < ActiveRecord::Base
   def first_owner_email; first_ownership.owner_email end
 
   def can_be_claimed_by(u)
-    return false if current_ownership.claimed? || current_ownership.blank?
+    return false if current_ownership.blank? || current_ownership.claimed? || current_ownership.blank?
     user == u || current_ownership.can_be_claimed_by(u)
   end
 
@@ -194,8 +194,7 @@ class Bike < ActiveRecord::Base
     # use @phone because attr_accessor
     @phone ||= user&.phone
     # Only grab the phone number from b_params if it's the first owner
-    if current_ownership.first?
-      pp "FDFSd"
+    if current_ownership&.first?
       @phone ||= b_params.map(&:phone).reject(&:blank?).first
     end
     @phone

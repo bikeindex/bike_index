@@ -168,7 +168,6 @@ describe Bike do
     let(:ownership) { Ownership.new }
     before { allow(bike).to receive(:current_ownership) { ownership } }
     it "returns false if ownership isn't claimed" do
-      ownership = Ownership.new
       expect(bike.user?).to be_falsey
     end
     context "claimed" do
@@ -562,11 +561,21 @@ describe Bike do
       it "returns owners phone" do
         expect(ownership.first?).to be_truthy
         expect(user.phone).to eq "888.888.8888"
+        expect(bike.phone).to eq "888.888.8888"
+      end
+    end
+    context "b_param" do
+      let(:ownership) { Ownership.new }
+      let(:b_param) { BParam.new(params: { bike: { phone: "888.888.8888" } }) }
+      before do
         allow(bike).to receive(:current_ownership) { ownership }
+        allow(bike).to receive(:b_params) { [b_param] }
+      end
+      it "returns the phone" do
         expect(bike.phone).to eq "888.888.8888"
       end
       context "not first ownerships" do
-        it "is nil" do
+        it "is the users " do
           allow(ownership).to receive(:first?) { false }
           allow(bike).to receive(:current_ownership) { ownership }
           expect(bike.phone).to be_nil
@@ -760,7 +769,7 @@ describe Bike do
       stolen_record = FactoryGirl.create(:stolen_record)
       bike = stolen_record.bike
       digits = (Time.now.year - 1).to_s[2, 3] # last two digits of last year
-      problem_date = Date.strptime("#{Time.now.month}-22-00#{digits}", '%m-%d-%Y')
+      problem_date = Date.strptime("#{Time.now.month}-22-00#{digits}", "%m-%d-%Y")
       bike.update_attribute :stolen, true
       stolen_record.update_attribute :date_stolen, problem_date
       bike.update_attribute :listing_order, bike.get_listing_order
