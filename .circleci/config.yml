@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     working_directory: ~/bikeindex/bikehub
-    parallelism: 3
+    parallelism: 4
     shell: /bin/bash --login
     environment:
       RAILS_ENV: test
@@ -45,7 +45,7 @@ jobs:
       - run:
           name: Yarn Install
           command: yarn install --cache-folder ~/.cache/yarn
-      - run: bundle exec rails assets:precompile
+      - run: bundle exec rake assets:precompile
       - run:
           name: Wait for PostgreSQL to start
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
@@ -60,7 +60,7 @@ jobs:
       - run:
           name: Setup Database
           command: |
-            bundle exec rails db:create db:structure:load
+            bundle exec rake db:create db:structure:load
       - run:
           name: Run tests
           command: |
