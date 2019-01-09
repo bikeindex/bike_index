@@ -8,10 +8,10 @@ VCR.configure do |config|
   config.hook_into :webmock
 end
 
-if ENV['CODECLIMATE_REPO_TOKEN']
-  require 'codeclimate-test-reporter'
-  CodeClimate::TestReporter.start
-end
+# if ENV["COVERAGE"]
+  require 'simplecov'
+  SimpleCov.start "rails"
+# end
 
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../../config/environment', __FILE__)
