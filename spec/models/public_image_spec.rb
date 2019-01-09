@@ -30,6 +30,7 @@ describe PublicImage do
       public_image = FactoryGirl.build(:public_image, image: lottapixel)
       public_image.save
       expect(public_image.id).to be_nil
+      pp public_image, public_image.errors
       expect(public_image.errors.full_messages.to_s.match('dimensions too large')).to be_truthy
     end
   end
