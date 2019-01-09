@@ -73,9 +73,6 @@ $(document).ready ->
     if document.getElementById('manufacturers-list')
       new BikeIndex.Views.ContentManufacturers
   
-  if document.getElementById('stripe_form')
-    new BikeIndex.Views.PaymentsForm
-
   else if document.getElementById('choose-registration-type')
     new BikeIndex.Views.BikesChooseRegistration
 

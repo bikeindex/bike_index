@@ -9,7 +9,6 @@ describe BikeCreatorAssociator do
       bike = Bike.new
       allow(b_param).to receive(:params).and_return({ bike: bike }.as_json)
       allow(b_param).to receive(:creator).and_return('creator')
-      # OwnershipCreator.any_instance.should_receive(:initialize).with(bike: bike, creator: 'creator', send_email: true)
       expect_any_instance_of(OwnershipCreator).to receive(:create_ownership).and_return(true)
       subject.new(b_param).create_ownership(bike)
     end
@@ -18,7 +17,6 @@ describe BikeCreatorAssociator do
       bike = Bike.new
       allow(b_param).to receive(:params).and_return({ bike: { send_email: false } }.as_json)
       allow(b_param).to receive(:creator).and_return('creator')
-      # OwnershipCreator.any_instance.should_receive(:initialize).with(bike: bike, creator: 'creator', send_email: false)
       expect_any_instance_of(OwnershipCreator).to receive(:create_ownership).and_return(true)
       subject.new(b_param).create_ownership(bike)
     end
@@ -122,7 +120,7 @@ describe BikeCreatorAssociator do
       expect(creator).to receive(:add_other_listings)
       creator.associate(bike)
     end
-    it "rescues from the error and add the message to the bike" do
+    it 'rescues from the error and add the message to the bike' do
       expect(StolenRecordUpdator).to be_present # Load the error
       bike = Bike.new
       creator = subject.new

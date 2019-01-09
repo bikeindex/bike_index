@@ -35,7 +35,7 @@ describe 'Bikes API V2' do
     end
 
     it 'stolen search works' do
-      bike = FactoryGirl.create(:stolen_bike)
+      FactoryGirl.create(:stolen_bike)
       get '/api/v2/bikes_search/stolen?per_page=1', format: :json
       expect(response.code).to eq('200')
       expect(response.header['Total']).to eq('1')
@@ -58,7 +58,7 @@ describe 'Bikes API V2' do
 
   describe 'count' do
     it "returns the count hash for matching bikes, doesn't need access_token" do
-      bike = FactoryGirl.create(:bike, serial_number: 'awesome')
+      FactoryGirl.create(:bike, serial_number: 'awesome')
       FactoryGirl.create(:bike)
       get '/api/v2/bikes_search/count?query=awesome', format: :json
       result = JSON.parse(response.body)

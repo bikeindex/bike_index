@@ -38,7 +38,7 @@ gem 'rmagick'
 gem 'mini_magick' # a smaller implementation of rmagick, required for rqrcode
 gem 'rqrcode-rails3'
 gem 'libv8', '~> 3.16.14.7'
-gem 'stripe', git: 'https://github.com/stripe/stripe-ruby'
+gem "stripe"
 gem 'high_voltage'
 gem 'omniauth-facebook'
 gem 'omniauth-strava'
@@ -130,23 +130,24 @@ group :development do
 end
 
 group :development, :test do
-  gem 'rb-fsevent', '~> 0.9.1'
-  gem 'rspec', '~> 3.3.0'
-  gem 'rspec-rails', '~> 3.3.0'
-  gem 'shoulda-matchers', '~> 2.8.0'
-  gem 'foreman'
-  gem 'database_cleaner'
-  gem 'dotenv-rails'
+  gem "rb-fsevent", "~> 0.9.1"
+  gem "rspec", "~> 3.3.0"
+  gem "rspec-rails", "~> 3.3.0"
+  gem "rspec_junit_formatter" # For circle ci
+  gem "shoulda-matchers", "~> 2.8.0"
+  gem "foreman"
+  gem "database_cleaner"
+  gem "dotenv-rails"
 end
 
 group :test do
-  gem 'factory_girl_rails'
-  gem 'codeclimate-test-reporter', require: nil
-  gem 'rspec-sidekiq'
-  gem 'pry'
-  gem 'guard', '~> 2.13.0', require: false
-  gem 'guard-rspec', '~> 4.6.4', require: false
-  gem 'guard-rubocop', require: false
-  gem 'vcr' # Stub external HTTP requests
-  gem 'webmock' # mocking for VCR
+  gem "simplecov", require: false
+  gem "factory_girl_rails"
+  gem "rspec-sidekiq"
+  gem "pry"
+  gem "guard", "~> 2.13.0", require: false
+  gem "guard-rspec", "~> 4.6.4", require: false
+  gem "guard-rubocop", require: false
+  gem "vcr" # Stub external HTTP requests
+  gem "webmock" # mocking for VCR
 end
