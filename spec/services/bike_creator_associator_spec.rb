@@ -107,7 +107,6 @@ describe BikeCreatorAssociator do
     end
   end
 
-
   describe 'associate' do
     it 'calls the required methods' do
       bike = Bike.new
