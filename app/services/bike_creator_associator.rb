@@ -22,6 +22,16 @@ class BikeCreatorAssociator
     bike.save
   end
 
+  def assign_user_attributes(bike)
+    user = bike.user
+    return true unless user.present?
+    if bike.phone.present?
+      user.phone = bike.phone if user.phone.blank?
+    end
+    user.save if user.changed? # Because we're also going to set the address and the name here
+    bike
+  end
+
   def create_normalized_serial_segments(bike)
     bike.create_normalized_serial_segments
   end
@@ -52,6 +62,7 @@ class BikeCreatorAssociator
       create_ownership(bike)
       create_components(bike)
       create_normalized_serial_segments(bike)
+      assign_user_attributes(bike)
       create_stolen_record(bike) if bike.stolen
       attach_photo(bike)
       attach_photos(bike)

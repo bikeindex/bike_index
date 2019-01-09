@@ -22,24 +22,6 @@ describe StolenRecordUpdator do
     end
   end
 
-  describe 'updated_phone' do
-    it 'does not set the phone if the user already has a phone' do
-      user = FactoryGirl.create(:user, phone: '0000000000')
-      bike = Bike.new
-      allow(bike).to receive(:phone).and_return('699.999.9999')
-      expect(StolenRecordUpdator.new(bike: bike, user: user).updated_phone).to eq('699.999.9999')
-      expect(user.phone).to eq('0000000000')
-    end
-
-    it "sets the owner's phone if one is passed in" do
-      user = FactoryGirl.create(:user)
-      bike = Bike.new
-      allow(bike).to receive(:phone).and_return('699.999.9999')
-      expect(StolenRecordUpdator.new(bike: bike, user: user).updated_phone).to eq('699.999.9999')
-      expect(user.phone).to eq('6999999999')
-    end
-  end
-
   describe 'update_records' do
     it "sets the current stolen record as not current if the bike isn't stolen" do
       FactoryGirl.create(:country, iso: 'US')

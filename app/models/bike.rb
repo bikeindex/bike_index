@@ -183,7 +183,7 @@ class Bike < ActiveRecord::Base
   end
 
   def user_hidden
-    hidden && current_ownership && current_ownership.user_hidden
+    hidden && current_ownership&.user_hidden
   end
 
   def fake_deleted

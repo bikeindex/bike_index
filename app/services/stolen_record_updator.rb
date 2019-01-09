@@ -9,13 +9,6 @@ class StolenRecordUpdator
     @b_param = creation_params[:b_param]
   end 
 
-  def updated_phone
-    phone = @bike.phone
-    return nil unless phone.present?
-    @user.update_attributes(phone: phone) if @user.present? && @user.phone.blank?
-    phone
-  end
-
   def mark_records_not_current
     stolen_records = StolenRecord.unscoped.where(bike_id: @bike.id)
     if stolen_records.any?
