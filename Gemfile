@@ -141,13 +141,12 @@ group :development, :test do
 end
 
 group :test do
-  gem 'factory_girl_rails'
-  gem 'codeclimate-test-reporter', require: nil
-  gem 'rspec-sidekiq'
-  gem 'pry'
-  gem 'guard', '~> 2.13.0', require: false
-  gem 'guard-rspec', '~> 4.6.4', require: false
-  gem 'guard-rubocop', require: false
-  gem 'vcr' # Stub external HTTP requests
-  gem 'webmock' # mocking for VCR
+  gem "factory_girl_rails"
+  gem "rspec-sidekiq"
+  gem "pry"
+  gem "guard", "~> 2.13.0", require: false
+  gem "guard-rspec", "~> 4.6.4", require: false
+  gem "guard-rubocop", require: false
+  gem "vcr" # Stub external HTTP requests
+  gem "webmock" # mocking for VCR
 end
