@@ -24,9 +24,9 @@ describe PublicImage do
     end
   end
 
-  describe 'lottapixel' do
+  describe "lottapixel" do
     it "doesn't break" do
-      lottapixel = File.open(File.join(Rails.root, 'spec', 'fixtures', 'hugeimg.png'))
+      lottapixel = File.open(File.join(Rails.root, "spec", "fixtures", "hugeimg.png"))
       public_image = FactoryGirl.build(:public_image, image: lottapixel)
       public_image.save
       expect(public_image.id).to be_nil
