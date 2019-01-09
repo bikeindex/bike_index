@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     working_directory: ~/bikeindex/bike_index
-    parallelism: 2
+    parallelism: 4
     shell: /bin/bash --login
     environment:
       RAILS_ENV: test
@@ -84,11 +84,11 @@ jobs:
       - run:
           name: Code Climate Test Coverage
           command: |
-            ./cc-test-reporter format-coverage -t simplecov -o "coverage/ mate.$CIRCLE_NODE_INDEX.json" --debug
+            ./cc-test-reporter format-coverage -t simplecov -o "coverage/ mate.$CIRCLE_NODE_INDEX.json"
       - store_test_results:
           path: test-results
       - store_artifacts:
           path: test-artifacts
       - deploy:
           command: |
-            ./cc-test-reporter sum-coverage --output - --parts $CIRCLE_NODE_TOTAL coverage/codeclimate.*.json | ./cc-test-reporter upload-coverage --debug --input -
+            ./cc-test-reporter sum-coverage --output - --parts $CIRCLE_NODE_TOTAL coverage/codeclimate.*.json | ./cc-test-reporter upload-coverage --input -
