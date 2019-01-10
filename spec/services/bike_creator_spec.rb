@@ -18,7 +18,7 @@ describe BikeCreator do
         primary_frame_color_id: color.id
       }
       b_param = FactoryGirl.create(:b_param, params: { bike: bike })
-      creator = BikeCreator.new(b_param).add_bike_book_data
+      BikeCreator.new(b_param).add_bike_book_data
 
       b_param.reload
       # pp b_param.params
@@ -116,7 +116,7 @@ describe BikeCreator do
           }
         }
       end
-      let(:b_param) { FactoryGirl.create(:b_param, creator: existing_bike.current_ownership.creator, params: params ) }
+      let(:b_param) { FactoryGirl.create(:b_param, creator: existing_bike.current_ownership.creator, params: params) }
       context 'same email' do
         let(:email) { 'something@gmail.com' }
         let(:new_email) { 'Something@GMAIL.com' }

@@ -13,9 +13,7 @@ class Country < ActiveRecord::Base
     n && where('lower(iso) = ?', n.downcase.strip).first
   end
 
-
   def self.united_states
     where(name: 'United States', iso: 'US').first_or_create
   end
-
 end

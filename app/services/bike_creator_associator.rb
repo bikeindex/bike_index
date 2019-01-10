@@ -73,5 +73,4 @@ class BikeCreatorAssociator
     end
     bike
   end
-
 end
