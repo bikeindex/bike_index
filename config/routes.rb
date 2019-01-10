@@ -270,7 +270,12 @@ Bikeindex::Application.routes.draw do
         get :incompletes
       end
     end
-    # Below are admin controllers, inherit from Organized::AdminController not BaseController
+    resources :exports, except: [:edit, :update]
+    resources :bulk_imports, only: [:index, :show, :new, :create]
+    resources :messages, only: [:index, :show, :create]
+    resources :stickers, only: [:index, :show, :edit, :update]
+
+    # Organized Admin resources (below here controllers should inherit Organized::AdminController)
     resources :manage, only: [:index, :update, :destroy] do
       collection do
         get :dev
@@ -278,11 +283,6 @@ Bikeindex::Application.routes.draw do
       end
     end
     resources :users, except: [:show]
-    resources :emails
-    resources :exports, except: [:edit, :update]
-    resources :bulk_imports, only: [:index, :show, :new, :create]
-    resources :messages, only: [:index, :show, :create]
-    resources :stickers, only: [:index, :show, :edit, :update]
   end
 
   get '*unmatched_route', to: 'errors#not_found' if Rails.env.production? # Handle 404s with lograge
