@@ -62,7 +62,7 @@ class Bike < ActiveRecord::Base
     :embeded_extended, :paint_name, :bike_image_cache, :send_email,
     :marked_user_hidden, :marked_user_unhidden, :b_param_id_token
 
-  attr_writer :phone # reading is managed by a method
+  attr_writer :phone, :user_name # reading is managed by a method
 
   default_scope { where(example: false).where(hidden: false).order('listing_order desc') }
   scope :stolen, -> { where(stolen: true) }
@@ -160,9 +160,14 @@ class Bike < ActiveRecord::Base
 
   # This is for organizations - might be useful for admin as well. We want it to be nil if it isn't present
   # User - not ownership, because we don't want registrar
-  def user_name; user&.name end
+  def user_name
+    return user.name if user&.name.present?
+    # Only grab the name from b_params if it's the first owner - or if no owner, which means testing probably
+    return nil unless current_ownership.blank? || current_ownership&.first?
+    b_params.map(&:user_name).reject(&:blank?).first
+  end
 
-  def user_name_or_email; user&.name || owner_email end
+  def user_name_or_email; user_name || owner_email end
 
   def first_ownership; ownerships.reorder(:created_at).first end
 
