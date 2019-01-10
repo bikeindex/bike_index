@@ -1,7 +1,6 @@
 class Ownership < ActiveRecord::Base
   def self.old_attr_accessible
-    # :user_id # is the owner
-    %w(owner_email bike_id creator_id current user_id claimed example user_hidden send_email).map(&:to_sym).freeze
+    %w[owner_email bike_id creator_id current user_id claimed example user_hidden send_email].map(&:to_sym).freeze
   end
 
   attr_accessor :creator_email, :user_email
@@ -23,8 +22,7 @@ class Ownership < ActiveRecord::Base
   end
 
   def first?
-    return true if id.blank?
-    bike && bike.ownerships.reorder(:created_at).first.id == id
+    bike&.ownerships&.reorder(:created_at)&.first&.id == id
   end
 
   def owner
@@ -33,7 +31,7 @@ class Ownership < ActiveRecord::Base
     elsif creator.present?
       creator
     else
-      User.fuzzy_email_find(ENV['AUTO_ORG_MEMBER'])
+      User.fuzzy_email_find(ENV["AUTO_ORG_MEMBER"])
     end
   end
 

@@ -5,7 +5,7 @@ class BikeCreatorAssociator
 
   def create_ownership(bike)
     passed_send_email = @b_param.params.dig("bike", "send_email")
-    if passed_send_email.present? && passed_send_email.to_s[/false/i]
+    if passed_send_email == false || passed_send_email.present? && passed_send_email.to_s[/false/i]
       send_email = false
     else
       send_email = true

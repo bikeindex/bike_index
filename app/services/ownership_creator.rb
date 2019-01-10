@@ -25,7 +25,7 @@ class OwnershipCreator
   end
 
   def self_made?
-    true if @creator_id == user_id
+    true if creator_id == user_id
   end
 
   def new_ownership_params

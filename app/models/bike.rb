@@ -62,7 +62,7 @@ class Bike < ActiveRecord::Base
     :embeded_extended, :paint_name, :bike_image_cache, :send_email,
     :marked_user_hidden, :marked_user_unhidden, :b_param_id_token
 
-  attr_writer :phone, :current_ownership # enabling some extra trickery in creation
+  attr_writer :phone # reading is managed by a method
 
   default_scope { where(example: false).where(hidden: false).order('listing_order desc') }
   scope :stolen, -> { where(stolen: true) }
@@ -169,7 +169,7 @@ class Bike < ActiveRecord::Base
   def first_owner_email; first_ownership.owner_email end
 
   def can_be_claimed_by(u)
-    return false if current_ownership.blank? || current_ownership.claimed? || current_ownership.blank?
+    return false if current_ownership.blank? || current_ownership.claimed?
     user == u || current_ownership.can_be_claimed_by(u)
   end
 
