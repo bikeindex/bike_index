@@ -65,6 +65,7 @@ class BulkImportWorker
         frame_size: row[:frame_size],
         phone: row[:phone],
         address: row[:address],
+        user_name: row[:owner_name],
         additional_registration: row[:secondary_serial],
         send_email: @bulk_import.send_email,
         creation_organization_id: @bulk_import.organization_id
