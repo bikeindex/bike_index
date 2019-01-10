@@ -547,6 +547,37 @@ describe Bike do
     end
   end
 
+  describe "user_name" do
+    let(:bike) { Bike.new }
+    let(:user) { User.new(name: "Fun McGee") }
+    context "user" do
+      let(:ownership) { Ownership.new(user: user) }
+      it "returns users name" do
+        allow(bike).to receive(:current_ownership) { ownership }
+        expect(ownership.first?).to be_truthy
+        expect(bike.user_name).to eq "Fun McGee"
+      end
+    end
+    context "b_param" do
+      let(:ownership) { Ownership.new }
+      let(:b_param) { BParam.new(params: { bike: { user_name: "Jane Yung" } }) }
+      before do
+        allow(bike).to receive(:current_ownership) { ownership }
+        allow(bike).to receive(:b_params) { [b_param] }
+      end
+      it "returns the phone" do
+        expect(bike.user_name).to eq "Jane Yung"
+      end
+      context "not first ownerships" do
+        it "is the users " do
+          allow(ownership).to receive(:first?) { false }
+          allow(bike).to receive(:current_ownership) { ownership }
+          expect(bike.user_name).to be_nil
+        end
+      end
+    end
+  end
+
   describe "phone" do
     let(:bike) { Bike.new }
     let(:user) { User.new(phone: "888.888.8888") }
@@ -556,7 +587,7 @@ describe Bike do
         expect(bike.phone).to eq "888.888.8888"
       end
     end
-    context "owner" do
+    context "user" do
       let(:ownership) { Ownership.new(user: user) }
       it "returns users phone" do
         allow(bike).to receive(:current_ownership) { ownership }
