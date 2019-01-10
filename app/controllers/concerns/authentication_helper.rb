@@ -1,10 +1,11 @@
 # This isn't a concern so it can be included in the controller_helpers concern
 module AuthenticationHelper
-  def authenticate_user(msg = 'Sorry, you have to log in', flash_type: :error)
+  def authenticate_user(msg = "Sorry, you have to log in", flash_type: :error)
     if current_user.present?
-      unless current_user.terms_of_service
-        redirect_to accept_terms_url(subdomain: false) and return
-      end
+      return true if current_user.terms_of_service
+      redirect_to accept_terms_url(subdomain: false) and return
+    elsif unconfirmed_current_user.present?
+      redirect_to please_confirm_email_users_path and return
     else
       flash[flash_type] = msg
       if msg.match(/create an account/i).present?
@@ -54,7 +55,13 @@ module AuthenticationHelper
   end
 
   def current_user
+    return @current_user if defined?(@current_user)
     @current_user ||= User.confirmed.from_auth(cookies.signed[:auth])
+  end
+
+  def unconfirmed_current_user
+    return @unconfirmed_current_user if defined?(@unconfirmed_current_user)
+    @unconfirmed_current_user ||= User.unconfirmed.from_auth(cookies.signed[:auth])
   end
 
   def preview_enabled?

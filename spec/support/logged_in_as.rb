@@ -1,15 +1,11 @@
 shared_context :logged_in_as_user do
   let(:user) { FactoryGirl.create(:user_confirmed) }
-  before do
-    set_current_user(user)
-  end
+  before { set_current_user(user) }
 end
 
 shared_context :logged_in_as_super_admin do
   let(:user) { FactoryGirl.create(:admin) }
-  before do
-    set_current_user(user)
-  end
+  before { set_current_user(user) }
 end
 
 shared_context :logged_in_as_organization_admin do
