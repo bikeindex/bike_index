@@ -83,10 +83,11 @@ describe BulkImportWorker do
       let!(:trek) { FactoryGirl.create(:manufacturer, name: "Trek") }
       # let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/master/public/import_all_optional_fields.csv" }
       # Temporarily override file_url because the file is being updated
-      let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/more_bulk_import_field/public/import_all_optional_fields.csv" }
+      let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/a088966febbf400368bd0e7cc54e2ecd5875eb7d/public/import_all_optional_fields.csv" }
       let(:organization) { FactoryGirl.create(:organization_with_auto_user) }
       # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
       let!(:bulk_import) { FactoryGirl.create(:bulk_import, progress: "pending", user_id: nil, organization_id: organization.id) }
+      include_context :geocoder_default_location
       it "creates the bikes, doesn't have any errors" do
         # In production, we actually use remote files rather than local files.
         # simulate what that process looks like by loading a remote file in the way we use open_file in BulkImport
@@ -115,8 +116,9 @@ describe BulkImportWorker do
           expect(bike1.frame_size).to eq "29in"
           expect(bike1.frame_size_unit).to eq "in"
           expect(bike1.public_images.count).to eq 0
-          expect(bike1.registration_address).to eq("717 Market St")
           expect(bike1.phone).to eq("(888) 777-6666")
+          expect(bike1.registration_address).to eq default_location_registration_address
+          expect(bike1.additional_registration).to be_nil
 
           bike2 = bulk_import.bikes.reorder(:created_at).last
           expect(bike2.primary_frame_color).to eq white
@@ -130,8 +132,9 @@ describe BulkImportWorker do
           expect(bike2.public_images.count).to eq 1
           expect(bike2.frame_size).to eq "m"
           expect(bike2.frame_size_unit).to eq "ordinal"
-          expect(bike1.registration_address).to be_nil
-          expect(bike1.phone).to be_nil
+          expect(bike2.registration_address).to_not be_present
+          expect(bike2.phone).to be_nil
+          expect(bike2.additional_registration).to eq "extra serial number"
         # end
       end
     end

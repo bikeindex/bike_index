@@ -12,6 +12,16 @@ shared_context :geocoder_default_location do
     }
   end
 
+  let(:default_location_registration_address) do
+    # when passed through the registration address method, default location comes out like this
+    {
+      address: "278 Broadway",
+      city: "New York",
+      state: "NY",
+      zipcode: "10007"
+    }.as_json
+  end
+
   let(:geo_hash) do
     {
       data: ["US", "NY", "New York", default_location[:latitude].to_s, default_location[:longitude].to_s],

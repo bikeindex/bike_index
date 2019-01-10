@@ -41,7 +41,12 @@ class BulkImportWorker
     BikeCreator.new(b_param).create_bike
   end
 
-  def row_to_b_param_hash(row)
+  def row_to_b_param_hash(row_with_whitespaces)
+    # remove whitespace from the values in the row
+    row = row_with_whitespaces.map do |k, v|
+      next [k, v] unless v.is_a?(String)
+      [k, v.blank? ? nil : v.strip]
+    end.to_h
     # Set a default color of black, since sometimes there aren't colors in imports
     color = row[:color].present? ? row[:color] : "Black"
     # Set default manufacture, since sometimes manufacture is blank
@@ -58,6 +63,9 @@ class BulkImportWorker
         frame_model: row[:model],
         description: row[:description],
         frame_size: row[:frame_size],
+        phone: row[:phone],
+        address: row[:address],
+        additional_registration: row[:secondary_serial],
         send_email: @bulk_import.send_email,
         creation_organization_id: @bulk_import.organization_id
       },
