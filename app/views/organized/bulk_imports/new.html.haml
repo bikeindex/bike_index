@@ -32,24 +32,26 @@
       .form-group.row
         .form-well-input
           = f.submit "Upload and begin import", class: "btn btn-secondary btn-lg"
+
 %hr{ style: "margin: 24px 0 48px;" }
 %h5
   Optional additions:
 %ul
   %li
-    We support a few additional, optional columns. You do not have to include them unless you want to
+    We support a few additional, optional columns. You do not have to include them unless you want to.
   %li
-    You can see an #{link_to "example CSV with optional columns here", "https://raw.githubusercontent.com/bikeindex/bike_index/master/public/import_all_optional_fields.csv"} (#{link_to "formatted view of the CSV", "https://github.com/bikeindex/bike_index/blob/master/public/import_all_optional_fields.csv")
+    View an #{link_to "example CSV with all optional columns here", "https://github.com/bikeindex/bike_index/blob/master/public/import_all_optional_fields.csv"}.
   %li
-    If only some of your bikes have values in optional columns, leave the cell blank for the ones that don't have it (rather than putting <em>unknown</em> or <em>n/a</em>). For example, as shown in the above csv, the second bike doesn't have a year.
+    If only some of your bikes have values in optional columns, leave the cell blank for the ones that don't have it (rather than putting <em>unknown</em> or <em>n/a</em>).
   %li
-    If you are including "photo_url" make sure the url is of the image itself. If it's of a webpage with the photo on it, <em>the import will not work</em>. Examples:
+    If you are including "photo_url" make sure the url is of the image itself. If it's of a webpage with the photo on it, <em>the photo import will not work</em>. Examples:
     %ul
       %li
-        Image on webpage, <span class="text-danger">WRONG! Will not work</span>:
-        %a{ href: "https://en.wikipedia.org/wiki/Bike_Index#/media/File:Bike_Index_registration_spokecard.jpg", style: "word-wrap: break-word;" }
-          https://en.wikipedia.org/wiki/Bike_Index#/media/File:Bike_Index_registration_spokecard.jpg
-      %li
-        Actual image url:
-        %a{ href: "https://upload.wikimedia.org/wikipedia/commons/6/68/Bike_Index_registration_spokecard.jpg", style: "word-wrap: break-word;" }
+        <span class="text-success">Correct:</span> actual image url
+        %a.small{ href: "https://upload.wikimedia.org/wikipedia/commons/6/68/Bike_Index_registration_spokecard.jpg", style: "word-wrap: break-word;" }
           https://upload.wikimedia.org/wikipedia/commons/6/68/Bike_Index_registration_spokecard.jpg
+      %li
+        <span class="text-danger">INCORRECT:</span> image on webpage
+        %a.small{ href: "https://en.wikipedia.org/wiki/Bike_Index#/media/File:Bike_Index_registration_spokecard.jpg", style: "word-wrap: break-word;" }
+          https://en.wikipedia.org/wiki/Bike_Index#/media/File:Bike_Index_registration_spokecard.jpg
+        <em class="text-danger">- this will not work!</em>
