@@ -12,7 +12,7 @@ class SessionsController < ApplicationController
     @user = User.fuzzy_email_find(permitted_parameters[:email])
     if @user.present? && @user.confirmed?
       if @user.authenticate(permitted_parameters[:password])
-        sign_in_and_redirect(user)
+        sign_in_and_redirect(@user)
       else
         # User couldn't authenticate, so password is invalid
         flash.now[:error] = "Invalid email/password"
