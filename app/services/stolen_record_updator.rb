@@ -69,7 +69,7 @@ class StolenRecordUpdator
   def create_new_record
     mark_records_not_current
     new_stolen_record = StolenRecord.new(bike: @bike, current: true, date_stolen: @date_stolen || Time.now)
-    new_stolen_record.phone = updated_phone
+    new_stolen_record.phone = @bike.phone
     new_stolen_record.country_id = Country.united_states.id rescue (raise StolenRecordError, "US isn't instantiated - Stolen Record updater error")
     stolen_record = update_with_params(new_stolen_record)
     stolen_record.creation_organization_id = @bike.creation_organization_id

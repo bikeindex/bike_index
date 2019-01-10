@@ -356,7 +356,7 @@ class Bike < ActiveRecord::Base
   end
 
   def registration_address # Goes along with organization additional_registration_fields
-    b_params.map(&:fetch_formatted_address).reject(&:blank?).first || {}
+    @registration_address ||= b_params.map(&:fetch_formatted_address).reject(&:blank?).first || {}
   end
 
   def frame_colors

@@ -37,12 +37,23 @@ describe OrganizationExportWorker do
       end
       context "xlsx format" do
         let(:export) { FactoryGirl.create(:export_organization, progress: "pending", file: nil, file_format: "xlsx") }
-        it "raises because we haven't made it yet" do
+        it "exports" do
           instance.perform(export.id)
           export.reload
           expect(export.progress).to eq "finished"
           expect(export.file.read).to be_present
           expect(export.rows).to eq 1
+        end
+      end
+      context "avery export" do
+        let(:export) { FactoryGirl.create(:export_avery, progress: "pending", file: nil) }
+        it "exports, does not include bike that is missing name and email" do
+          expect(export.avery_export?).to be_truthy
+          instance.perform(export.id)
+          export.reload
+          expect(export.progress).to eq "finished"
+          expect(export.file.read.strip.split(/\n/).count).to eq 1 # Only has the headers exported, no bikes
+          expect(export.rows).to eq 0 # Also has correct count
         end
       end
     end
@@ -135,6 +146,7 @@ describe OrganizationExportWorker do
       let(:bike) { FactoryGirl.create(:creation_organization_bike, organization: organization, additional_registration: "cool extra serial") }
       include_context :geocoder_real
       it "returns the expected values" do
+        expect(bike.phone).to eq "717.742.3423"
         expect(bike.additional_registration).to eq "cool extra serial"
         VCR.use_cassette("geohelper-formatted_address_hash") do
           instance.perform(export.id)
