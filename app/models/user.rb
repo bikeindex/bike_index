@@ -116,7 +116,7 @@ class User < ActiveRecord::Base
   end
 
   def perform_create_jobs
-    CreateUserJobs.new(self).perform_create_jobs
+    AfterUserCreateWorker.new.perform(id, "new", user: self)
   end
 
   def superuser?
@@ -187,7 +187,7 @@ class User < ActiveRecord::Base
       self.confirmation_token = nil
       self.confirmed = true
       self.save
-      CreateUserJobs.new(self).perform_confirmed_jobs
+      AfterUserCreateWorker.new.perform(id, "confirmed", user: self)
       true
     end
   end

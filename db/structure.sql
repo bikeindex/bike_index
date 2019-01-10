@@ -2126,7 +2126,8 @@ CREATE TABLE public.users (
     is_emailable boolean DEFAULT false NOT NULL,
     developer boolean DEFAULT false NOT NULL,
     bike_actions_organization_id integer,
-    partner_data json
+    partner_data json,
+    address character varying
 );
 
 
@@ -4086,4 +4087,6 @@ INSERT INTO schema_migrations (version) VALUES ('20181204215943');
 INSERT INTO schema_migrations (version) VALUES ('20181205180633');
 
 INSERT INTO schema_migrations (version) VALUES ('20181213224936');
+
+INSERT INTO schema_migrations (version) VALUES ('20190110210704');
 

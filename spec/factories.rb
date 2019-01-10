@@ -108,12 +108,6 @@ FactoryGirl.define do
     association :lock_type
   end
 
-  factory :organization_invitation do
-    association :inviter, factory: :user
-    association :organization
-    invitee_email 'mike@test.com'
-  end
-
   factory :membership do
     role 'member'
     factory :existing_membership do
