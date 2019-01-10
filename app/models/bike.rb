@@ -58,9 +58,11 @@ class Bike < ActiveRecord::Base
   validates_presence_of :primary_frame_color_id
 
   attr_accessor :other_listing_urls, :date_stolen, :receive_notifications,
-    :phone, :image, :b_param_id, :embeded, :address,
+    :image, :b_param_id, :embeded, :address,
     :embeded_extended, :paint_name, :bike_image_cache, :send_email,
     :marked_user_hidden, :marked_user_unhidden, :b_param_id_token
+
+  attr_writer :phone, :current_ownership # enabling some extra trickery in creation
 
   default_scope { where(example: false).where(hidden: false).order('listing_order desc') }
   scope :stolen, -> { where(stolen: true) }

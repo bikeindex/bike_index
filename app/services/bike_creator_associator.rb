@@ -22,8 +22,8 @@ class BikeCreatorAssociator
     bike.save
   end
 
-  def assign_user_attributes(bike)
-    user = bike.user
+  def assign_user_attributes(bike, user = nil)
+    user ||= bike.user
     return true unless user.present?
     if bike.phone.present?
       user.phone = bike.phone if user.phone.blank?
@@ -59,10 +59,10 @@ class BikeCreatorAssociator
 
   def associate(bike)
     begin 
-      create_ownership(bike)
+      ownership = create_ownership(bike)
       create_components(bike)
       create_normalized_serial_segments(bike)
-      assign_user_attributes(bike)
+      assign_user_attributes(bike, ownership&.user)
       create_stolen_record(bike) if bike.stolen
       attach_photo(bike)
       attach_photos(bike)

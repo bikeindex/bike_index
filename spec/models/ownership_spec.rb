@@ -32,7 +32,7 @@ describe Ownership do
 
   describe 'owner' do
     it 'returns the current owner if the ownership is claimed' do
-      user = FactoryGirl.create(:confirmed_user)
+      user = FactoryGirl.create(:user_confirmed)
       ownership = Ownership.new
       allow(ownership).to receive(:claimed).and_return(true)
       allow(ownership).to receive(:user).and_return(user)
@@ -40,7 +40,7 @@ describe Ownership do
     end
 
     it "returns the creator if it isn't claimed" do
-      user = FactoryGirl.create(:confirmed_user)
+      user = FactoryGirl.create(:user_confirmed)
       ownership = Ownership.new
       allow(ownership).to receive(:claimed).and_return(false)
       allow(ownership).to receive(:creator).and_return(user)
@@ -48,14 +48,14 @@ describe Ownership do
     end
 
     it 'returns auto user if creator is deleted' do
-      user = FactoryGirl.create(:confirmed_user, email: ENV['AUTO_ORG_MEMBER'])
+      user = FactoryGirl.create(:user_confirmed, email: ENV['AUTO_ORG_MEMBER'])
       ownership = Ownership.new
       expect(ownership.owner).to eq(user)
     end
   end
 
   describe 'can_be_claimed_by' do
-    let(:user) { FactoryGirl.create(:confirmed_user) }
+    let(:user) { FactoryGirl.create(:user_confirmed) }
     it 'true if user email matches' do
       ownership = Ownership.new(owner_email: " #{user.email.upcase}")
       expect(ownership.can_be_claimed_by(user)).to be_truthy

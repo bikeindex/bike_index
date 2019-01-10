@@ -20,7 +20,7 @@ describe UserEmailsController do
 
     context "not user's user_email" do
       it 'does not enqueue a job and sets the flash' do
-        set_current_user(FactoryGirl.create(:confirmed_user))
+        set_current_user(FactoryGirl.create(:user_confirmed))
         expect do
           post :resend_confirmation, id: user_email.id
         end.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
@@ -74,7 +74,7 @@ describe UserEmailsController do
 
     context "not user's user_email" do
       it 'does not enqueue a job and sets the flash' do
-        set_current_user(FactoryGirl.create(:confirmed_user))
+        set_current_user(FactoryGirl.create(:user_confirmed))
         expect do
           get :confirm, id: user_email.id, confirmation_token: user_email.confirmation_token
         end.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
@@ -130,7 +130,7 @@ describe UserEmailsController do
 
     context "not user's user_email" do
       it 'does not delete the email and sets an error flash' do
-        set_current_user(FactoryGirl.create(:confirmed_user))
+        set_current_user(FactoryGirl.create(:user_confirmed))
         expect do
           delete :destroy, id: user_email.id
         end.to change(AdditionalEmailConfirmationWorker.jobs, :size).by 0
@@ -188,7 +188,7 @@ describe UserEmailsController do
 
     context "not user's user_email" do
       it 'does not enqueue a job and sets the flash' do
-        set_current_user(FactoryGirl.create(:confirmed_user))
+        set_current_user(FactoryGirl.create(:user_confirmed))
         post :make_primary, id: user_email.id
         user_email.reload
         expect(user_email.primary).to be_falsey

@@ -20,7 +20,7 @@ class OwnershipCreator
     @creator.id
   end
 
-  def owner_id
+  def user_id
     user = User.fuzzy_email_find(find_owner_email)
     user.id if user
   end
@@ -32,13 +32,13 @@ class OwnershipCreator
   end
 
   def self_made?
-    true if @creator.id == owner_id
+    true if @creator.id == user_id
   end
 
   def new_ownership_params
     {
       bike_id: @bike.id,
-      user_id: owner_id,
+      user_id: user_id,
       owner_email: find_owner_email,
       creator_id: creator_id,
       claimed: self_made?,
@@ -80,6 +80,7 @@ class OwnershipCreator
       add_errors_to_bike(ownership)
       raise OwnershipNotSavedError, "Ownership wasn't saved. Are you sure the bike was created?"
     end
+    ownership
   end
 
 end

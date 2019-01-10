@@ -60,7 +60,7 @@ def set_current_user(user, request_spec: false)
 end
 
 def create_doorkeeper(_opts = {})
-  @user = FactoryGirl.create(:confirmed_user)
+  @user = FactoryGirl.create(:user_confirmed)
   @application = Doorkeeper::Application.new(name: 'MyApp', redirect_uri: 'https://app.com')
   @application.owner = @user
   @application.save

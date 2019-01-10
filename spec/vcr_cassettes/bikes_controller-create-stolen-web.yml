@@ -1,0 +1,132 @@
+http_interactions:
+  - request:
+      method: get
+      uri: https://maps.googleapis.com/maps/api/geocode/json?address=2459%20W%20Division%20St,%20Chicago,%20Q1,%2060622,%20US&language=en&sensor=false
+      body:
+        encoding: US-ASCII
+        string: ""
+      headers:
+        Accept-Encoding:
+          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+        Accept:
+          - "*/*"
+        User-Agent:
+          - Ruby
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json; charset=UTF-8
+        Date:
+          - Thu, 10 Jan 2019 02:17:29 GMT
+        Expires:
+          - Fri, 11 Jan 2019 02:17:29 GMT
+        Cache-Control:
+          - public, max-age=86400
+        Access-Control-Allow-Origin:
+          - "*"
+        Server:
+          - mafe
+        Content-Length:
+          - "614"
+        X-Xss-Protection:
+          - 1; mode=block
+        X-Frame-Options:
+          - SAMEORIGIN
+        Server-Timing:
+          - gfet4t7; dur=455
+        Alt-Svc:
+          - quic=":443"; ma=2592000; v="44,43,39,35"
+      body:
+        encoding: ASCII-8BIT
+        string: |
+          {
+             "results" : [
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "2459",
+                         "short_name" : "2459",
+                         "types" : [ "street_number" ]
+                      },
+                      {
+                         "long_name" : "West Division Street",
+                         "short_name" : "W Division St",
+                         "types" : [ "route" ]
+                      },
+                      {
+                         "long_name" : "West Town",
+                         "short_name" : "West Town",
+                         "types" : [ "neighborhood", "political" ]
+                      },
+                      {
+                         "long_name" : "Chicago",
+                         "short_name" : "Chicago",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "Cook County",
+                         "short_name" : "Cook County",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "Illinois",
+                         "short_name" : "IL",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "United States",
+                         "short_name" : "US",
+                         "types" : [ "country", "political" ]
+                      },
+                      {
+                         "long_name" : "60622",
+                         "short_name" : "60622",
+                         "types" : [ "postal_code" ]
+                      },
+                      {
+                         "long_name" : "2941",
+                         "short_name" : "2941",
+                         "types" : [ "postal_code_suffix" ]
+                      }
+                   ],
+                   "formatted_address" : "2459 W Division St, Chicago, IL 60622, USA",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 41.9028658,
+                            "lng" : -87.6891698
+                         },
+                         "southwest" : {
+                            "lat" : 41.9025376,
+                            "lng" : -87.6893626
+                         }
+                      },
+                      "location" : {
+                         "lat" : 41.9027357,
+                         "lng" : -87.68927599999999
+                      },
+                      "location_type" : "ROOFTOP",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 41.9040506802915,
+                            "lng" : -87.68791721970851
+                         },
+                         "southwest" : {
+                            "lat" : 41.9013527197085,
+                            "lng" : -87.69061518029152
+                         }
+                      }
+                   },
+                   "partial_match" : true,
+                   "place_id" : "ChIJSyHyaa7SD4gRQRfAc7ZrFBg",
+                   "types" : [ "premise" ]
+                }
+             ],
+             "status" : "OK"
+          }
+      ? http_version
+    recorded_at: Thu, 10 Jan 2019 02:17:29 GMT
+recorded_with: VCR 4.0.0

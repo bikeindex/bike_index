@@ -94,7 +94,7 @@ describe OrganizationExportWorker do
                            secondary_frame_color: secondary_color,
                            owner_email: email)
       end
-      let!(:ownership) { FactoryGirl.create(:ownership, bike: bike, creator: FactoryGirl.create(:confirmed_user, name: "other person"), user: FactoryGirl.create(:user, name: "George Smith", email: "testly@bikeindex.org")) }
+      let!(:ownership) { FactoryGirl.create(:ownership, bike: bike, creator: FactoryGirl.create(:user_confirmed, name: "other person"), user: FactoryGirl.create(:user, name: "George Smith", email: "testly@bikeindex.org")) }
       let(:csv_lines) { [export.headers, fancy_bike_values] }
       let(:fancy_bike_values) do
         [
