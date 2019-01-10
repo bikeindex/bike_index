@@ -81,14 +81,18 @@ describe BulkImportWorker do
       let!(:white) { FactoryGirl.create(:color, name: "White") }
       let!(:surly) { FactoryGirl.create(:manufacturer, name: "Surly") }
       let!(:trek) { FactoryGirl.create(:manufacturer, name: "Trek") }
-      let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/master/public/import_all_optional_fields.csv" }
+      # let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/master/public/import_all_optional_fields.csv" }
+      # Temporarily override file_url because the file is being updated
+      let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/more_bulk_import_field/public/import_all_optional_fields.csv" }
       let(:organization) { FactoryGirl.create(:organization_with_auto_user) }
       # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
       let!(:bulk_import) { FactoryGirl.create(:bulk_import, progress: "pending", user_id: nil, organization_id: organization.id) }
       it "creates the bikes, doesn't have any errors" do
         # In production, we actually use remote files rather than local files.
         # simulate what that process looks like by loading a remote file in the way we use open_file in BulkImport
-        VCR.use_cassette("bulk_import-perform-success") do
+
+        # We will re-enable this cassette when we have made the bulk import extension work
+        # VCR.use_cassette("bulk_import-perform-success") do
           allow_any_instance_of(BulkImport).to receive(:open_file) { open(file_url) }
           expect do
             instance.perform(bulk_import.id)
@@ -111,6 +115,9 @@ describe BulkImportWorker do
           expect(bike1.frame_size).to eq "29in"
           expect(bike1.frame_size_unit).to eq "in"
           expect(bike1.public_images.count).to eq 0
+          expect(bike1.registration_address).to eq("717 Market St")
+          expect(bike1.phone).to eq("(888) 777-6666")
+
           bike2 = bulk_import.bikes.reorder(:created_at).last
           expect(bike2.primary_frame_color).to eq white
           expect(bike2.serial_number).to eq "example"
@@ -123,7 +130,9 @@ describe BulkImportWorker do
           expect(bike2.public_images.count).to eq 1
           expect(bike2.frame_size).to eq "m"
           expect(bike2.frame_size_unit).to eq "ordinal"
-        end
+          expect(bike1.registration_address).to be_nil
+          expect(bike1.phone).to be_nil
+        # end
       end
     end
   end
