@@ -193,8 +193,8 @@ class Bike < ActiveRecord::Base
   def phone
     # use @phone because attr_accessor
     @phone ||= user&.phone
-    # Only grab the phone number from b_params if it's the first owner
-    if current_ownership&.first?
+    # Only grab the phone number from b_params if it's the first owner - or if no owner, which means testing probably
+    if current_ownership.blank? || current_ownership&.first?
       @phone ||= b_params.map(&:phone).reject(&:blank?).first
     end
     @phone

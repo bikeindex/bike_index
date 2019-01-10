@@ -56,11 +56,11 @@ class StolenRecordUpdator
     end
     stolen_record.state_id = State.fuzzy_abbr_find(sr['state']).id if sr['state'].present?
     if sr['phone_no_show']
-    	stolen_record.attributes = {
+      stolen_record.attributes = {
         phone_for_everyone: false,
-      	phone_for_users: false,
-      	phone_for_shops: false,
-      	phone_for_police: false
+        phone_for_users: false,
+        phone_for_shops: false,
+        phone_for_police: false
       }
     end
     stolen_record
