@@ -202,7 +202,7 @@ describe UsersController do
 
     context 'confirmed user' do
       it 'enqueues a password reset email job' do
-        user = FactoryGirl.create(:confirmed_user, email: 'something@boo.com')
+        user = FactoryGirl.create(:user_confirmed, email: 'something@boo.com')
         expect do
           post :password_reset, email: user.email
         end.to change(EmailResetPasswordWorker.jobs, :size).by(1)
@@ -467,7 +467,7 @@ describe UsersController do
       end
     end
     context 'user already unsubscribed' do
-      let(:user) { FactoryGirl.create(:confirmed_user, is_emailable: false) }
+      let(:user) { FactoryGirl.create(:user_confirmed, is_emailable: false) }
       it 'does nothing' do
         expect(user.is_emailable).to be_falsey
         get :unsubscribe, id: user.username

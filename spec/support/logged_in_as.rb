@@ -1,5 +1,5 @@
 shared_context :logged_in_as_user do
-  let(:user) { FactoryGirl.create(:confirmed_user) }
+  let(:user) { FactoryGirl.create(:user_confirmed) }
   before do
     set_current_user(user)
   end

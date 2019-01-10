@@ -20,7 +20,7 @@ describe OrganizationInvitation do
     end
 
     it 'assigns to user if the user exists' do
-      @user = FactoryGirl.create(:confirmed_user)
+      @user = FactoryGirl.create(:user_confirmed)
       @o1 = FactoryGirl.create(:organization_invitation, invitee_email: @user.email)
       expect(@user.memberships.count).to eq(1)
       expect(@o1.redeemed).to be_truthy
@@ -45,7 +45,7 @@ describe OrganizationInvitation do
     before :each do
       @organization = FactoryGirl.create(:organization)
       @o = FactoryGirl.create(:organization_invitation, organization: @organization, invitee_email: 'EMAIL@email.com')
-      @user = FactoryGirl.create(:confirmed_user, email: 'EMAIL@email.com')
+      @user = FactoryGirl.create(:user_confirmed, email: 'EMAIL@email.com')
       @o.reload
       @user.reload
     end
@@ -58,7 +58,7 @@ describe OrganizationInvitation do
     end
 
     it "sets the user's name if the name is blank" do
-      @user2 = FactoryGirl.create(:confirmed_user, name: nil)
+      @user2 = FactoryGirl.create(:user_confirmed, name: nil)
       @o2 = FactoryGirl.create(:organization_invitation, organization: @organization, invitee_email: @user2.email, invitee_name: 'Biker Name')
       expect(@user2.reload.name).to eq('Biker Name')
     end

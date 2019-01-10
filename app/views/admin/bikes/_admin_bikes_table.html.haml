@@ -30,7 +30,7 @@
             = l bike.created_at, format: :convert_time
         %td.medium-screens
           = bike.owner_email
-          - if bike.current_owner_exists
+          - if bike.user?
             - if bike.owner.donor?
               <span class="donor-icon">D</span>
             - elsif bike.owner.paid_org?

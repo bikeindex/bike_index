@@ -4,12 +4,11 @@ class BikeCreatorAssociator
   end
 
   def create_ownership(bike)
-    send_email = true
-    send = @b_param.params['bike']['send_email'] 
-    if send == false
+    passed_send_email = @b_param.params.dig("bike", "send_email")
+    if passed_send_email == false || passed_send_email.present? && passed_send_email.to_s[/false/i]
       send_email = false
-    elsif send.present? && send != true && send.to_s[/false/i]
-      send_email = false
+    else
+      send_email = true
     end
     OwnershipCreator.new(bike: bike, creator: @b_param.creator, send_email: send_email).create_ownership
   end
@@ -21,6 +20,16 @@ class BikeCreatorAssociator
   def create_stolen_record(bike)
     StolenRecordUpdator.new(bike: bike, user: @b_param.creator, b_param: @b_param.params).create_new_record
     bike.save
+  end
+
+  def assign_user_attributes(bike, user = nil)
+    user ||= bike.user
+    return true unless user.present?
+    if bike.phone.present?
+      user.phone = bike.phone if user.phone.blank?
+    end
+    user.save if user.changed? # Because we're also going to set the address and the name here
+    bike
   end
 
   def create_normalized_serial_segments(bike)
@@ -50,9 +59,10 @@ class BikeCreatorAssociator
 
   def associate(bike)
     begin 
-      create_ownership(bike)
+      ownership = create_ownership(bike)
       create_components(bike)
       create_normalized_serial_segments(bike)
+      assign_user_attributes(bike, ownership&.user)
       create_stolen_record(bike) if bike.stolen
       attach_photo(bike)
       attach_photos(bike)
@@ -63,5 +73,4 @@ class BikeCreatorAssociator
     end
     bike
   end
-
 end
