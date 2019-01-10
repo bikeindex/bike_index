@@ -203,6 +203,9 @@ describe BulkImportWorker do
           frame_model: "Roscoe 8",
           description: nil,
           frame_size: nil,
+          phone: nil,
+          address: nil,
+          additional_registration: nil,
           send_email: true,
           creation_organization_id: nil
         }
