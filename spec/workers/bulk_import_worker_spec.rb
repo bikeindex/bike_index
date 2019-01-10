@@ -81,9 +81,7 @@ describe BulkImportWorker do
       let!(:white) { FactoryGirl.create(:color, name: "White") }
       let!(:surly) { FactoryGirl.create(:manufacturer, name: "Surly") }
       let!(:trek) { FactoryGirl.create(:manufacturer, name: "Trek") }
-      # let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/master/public/import_all_optional_fields.csv" }
-      # Temporarily override file_url because the file is being updated
-      let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/38b85f85edc76740787164b2f63823d415f7f815/public/import_all_optional_fields.csv" }
+      let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/master/public/import_all_optional_fields.csv" }
       let(:organization) { FactoryGirl.create(:organization_with_auto_user) }
       # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
       let!(:bulk_import) { FactoryGirl.create(:bulk_import, progress: "pending", user_id: nil, organization_id: organization.id) }
@@ -91,9 +89,7 @@ describe BulkImportWorker do
       it "creates the bikes, doesn't have any errors" do
         # In production, we actually use remote files rather than local files.
         # simulate what that process looks like by loading a remote file in the way we use open_file in BulkImport
-
-        # We will re-enable this cassette when we have made the bulk import extension work
-        # VCR.use_cassette("bulk_import-perform-success") do
+        VCR.use_cassette("bulk_import-perform-success") do
           allow_any_instance_of(BulkImport).to receive(:open_file) { open(file_url) }
           expect do
             instance.perform(bulk_import.id)
@@ -137,7 +133,7 @@ describe BulkImportWorker do
           expect(bike2.phone).to be_nil
           expect(bike2.additional_registration).to eq "extra serial number"
           expect(bike2.user_name).to eq "Sally"
-        # end
+        end
       end
     end
   end
